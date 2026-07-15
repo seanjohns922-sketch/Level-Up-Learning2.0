@@ -382,8 +382,9 @@ function ResultsPage() {
         status: "ASSIGNED_PROGRAM",
         placementComplete: true,
         assignedWeek,
-        requiredWeeks: isPostTest ? prev?.requiredWeeks ?? [] : requiredWeeks,
-        optionalWeeks: isPostTest ? prev?.optionalWeeks ?? allProgramWeeks : optionalWeeks,
+        // A failed post-test opens the complete level for unrestricted practice.
+        requiredWeeks: isPostTest ? [] : requiredWeeks,
+        optionalWeeks: isPostTest ? allProgramWeeks : optionalWeeks,
         unlockedLegends: unlocked,
       };
     }

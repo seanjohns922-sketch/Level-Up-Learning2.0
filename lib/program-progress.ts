@@ -187,10 +187,10 @@ export function getPlayableWeeks(
 ): number[] {
   void optionalWeeks;
   const normalizedRequired = normalizeWeekList(requiredWeeks);
-  if (!normalizedRequired.length) return ALL_PROGRAM_WEEKS;
+  if (!normalizedRequired.length) return getProgramWeeks(realmId);
 
   if (hasCompletedRequiredWeeks(store, year, normalizedRequired, realmId)) {
-    return ALL_PROGRAM_WEEKS;
+    return getProgramWeeks(realmId);
   }
 
   const completedRequired = getCompletedRequiredWeeks(store, year, normalizedRequired, realmId);

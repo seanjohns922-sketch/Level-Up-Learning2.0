@@ -10,6 +10,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import {
   getOptionalWeeks,
+  getProgramWeeks,
   getPlayableWeeks,
   getRecommendedAssignedWeek,
   readProgramStore,
@@ -255,11 +256,21 @@ function ProgramPage() {
     () => normalizeWeekList(assignedProgram?.requiredWeeks),
     [assignedProgram?.requiredWeeks]
   );
+  const explicitOptionalWeeks = useMemo(
+    () => normalizeWeekList(assignedProgram?.optionalWeeks),
+    [assignedProgram?.optionalWeeks]
+  );
   const optionalWeeks = useMemo(() => {
-    const explicitOptionalWeeks = normalizeWeekList(assignedProgram?.optionalWeeks);
     return explicitOptionalWeeks.length > 0 ? explicitOptionalWeeks : getOptionalWeeks(requiredWeeks);
-  }, [assignedProgram?.optionalWeeks, requiredWeeks]);
+  }, [explicitOptionalWeeks, requiredWeeks]);
   const hasPersonalizedPlan = requiredWeeks.length > 0;
+  const allRealmWeeks = useMemo(() => getProgramWeeks(realmId), [realmId]);
+  const hasOpenPracticePlan =
+    assignedProgram !== null &&
+    requiredWeeks.length === 0 &&
+    explicitOptionalWeeks.length === allRealmWeeks.length &&
+    allRealmWeeks.every((week) => explicitOptionalWeeks.includes(week));
+  const hasAssignedWeekAccess = hasPersonalizedPlan || hasOpenPracticePlan;
   const fullRequiredPath = useMemo(
     () => isFullRequiredPath(requiredWeeks, optionalWeeks),
     [optionalWeeks, requiredWeeks]
@@ -281,17 +292,17 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    DEMO_MODE || previewMode || teacherMode ? true : hasPersonalizedPlan ? weekIsPlayable : weekNum === 1 ? true : isWeekComplete(prevProgress);
+    DEMO_MODE || previewMode || teacherMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekComplete(prevProgress);
 
   const lastAllowedWeek = useMemo(() => {
-    if (DEMO_MODE || previewMode || teacherMode || hasPersonalizedPlan) return lastWeek;
+    if (DEMO_MODE || previewMode || teacherMode || hasAssignedWeekAccess) return lastWeek;
     let allowed = 1;
     for (let w = 2; w <= lastWeek; w++) {
       if (isWeekComplete(getWeekProgress(store, year, w - 1, realmId))) allowed = w;
       else break;
     }
     return allowed;
-  }, [hasPersonalizedPlan, lastWeek, previewMode, realmId, store, teacherMode, year]);
+  }, [hasAssignedWeekAccess, lastWeek, previewMode, realmId, store, teacherMode, year]);
 
   const progress = getWeekProgress(store, year, week, realmId);
   const pathwayChipBase = isMeasurementRealm
@@ -364,7 +375,7 @@ function ProgramPage() {
 
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(lastWeek, targetWeek));
-    if (!DEMO_MODE && !previewMode && !teacherMode && hasPersonalizedPlan && !playableWeeks.includes(clamped)) return;
+    if (!DEMO_MODE && !previewMode && !teacherMode && hasAssignedWeekAccess && !playableWeeks.includes(clamped)) return;
     const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
     router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1${realmParam}`);
   }
@@ -629,7 +640,7 @@ function ProgramPage() {
                     <ul className="py-0.5">
                       {Array.from({ length: lastWeek }).map((_, index) => {
                         const targetWeek = index + 1;
-                        const isUnlocked = DEMO_MODE || previewMode || teacherMode || (hasPersonalizedPlan ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
+                        const isUnlocked = DEMO_MODE || previewMode || teacherMode || (hasAssignedWeekAccess ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
                         const isCurrent = targetWeek === weekNum;
                         const isRequiredWeek = requiredWeeks.includes(targetWeek);
                         const isDoneWeek = isWeekComplete(getWeekProgress(store, year, targetWeek, realmId));

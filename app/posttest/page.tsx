@@ -14,7 +14,7 @@ import { analyzeAssessmentResult } from "@/data/assessments/analysis";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
-import { getLastProgramWeek, getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
+import { getLastProgramWeek, getProgramWeeks, getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
 import { buildAssessmentReturnRoute } from "@/lib/assessment-routes";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { saveRealmAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
@@ -409,6 +409,7 @@ function PostTestPage() {
 
     const legend = getLegendForYear(year, legendRealmId);
     const didPass = percent >= PASS_THRESHOLD;
+    const allPracticeWeeks = getProgramWeeks(progressRealmId);
     const nextUnlocked = didPass
       ? Array.from(new Set([...unlockedLegends, legend.id]))
       : unlockedLegends;
@@ -422,6 +423,8 @@ function PostTestPage() {
       assignedWeeksHistory: didPass
         ? prev?.assignedWeeksHistory ?? []
         : Array.from(new Set([...(prev?.assignedWeeksHistory ?? []), ...(assignedWeek ? [assignedWeek] : [])])),
+      requiredWeeks: didPass ? prev?.requiredWeeks ?? [] : [],
+      optionalWeeks: didPass ? prev?.optionalWeeks ?? [] : allPracticeWeeks,
       unlockedLegends: nextUnlocked,
       lastPostTestPercent: percent,
       lastPostTestProfile: { ...profile, assignedWeek },
@@ -449,8 +452,8 @@ function PostTestPage() {
           week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
           placement_complete: true,
           assigned_week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
-          required_weeks: prev?.requiredWeeks ?? [],
-          optional_weeks: prev?.optionalWeeks ?? [],
+          required_weeks: didPass ? prev?.requiredWeeks ?? [] : [],
+          optional_weeks: didPass ? prev?.optionalWeeks ?? [] : allPracticeWeeks,
           unlocked_legends: nextUnlocked,
         }, progressRealmId);
       } catch (error) {
