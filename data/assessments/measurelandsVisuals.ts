@@ -190,7 +190,7 @@ const EMOJI: Array<[RegExp, string]> = [
   [/pencil/, "✏️"], [/crayon/, "🖍️"], [/ribbon/, "🎀"], [/rope/, "🪢"], [/straw/, "🥤"],
   [/string/, "🧵"], [/stick/, "🪵"], [/vine/, "🌿"], [/eraser/, "🧽"], [/button/, "🔘"],
   [/peg/, "📌"], [/ruler/, "📏"], [/book/, "📚"], [/feather/, "🪶"], [/leaf|leav/, "🍃"],
-  [/paper/, "📄"], [/rock|brick/, "🪨"], [/apple/, "🍎"], [/backpack|school bag|bag/, "🎒"],
+  [/paper/, "📄"], [/brick/, "🧱"], [/rock/, "🪨"], [/apple/, "🍎"], [/backpack|school bag|bag/, "🎒"],
   [/chair/, "🪑"], [/table|desk/, "🪑"], [/cup|mug/, "☕"], [/bucket/, "🪣"], [/bottle/, "🍼"],
   [/jug/, "🫙"], [/jar/, "🫙"], [/fish tank|tank/, "🐟"], [/bathtub|bath/, "🛁"], [/bowl/, "🥣"],
   [/watering can/, "🪴"], [/teddy|bear/, "🧸"], [/watermelon/, "🍉"], [/dog/, "🐕"], [/car/, "🚗"],
