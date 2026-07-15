@@ -558,6 +558,11 @@ export function getY4MeasurelandsPractisedSkills(lessonId: string): string[] | u
   return Y4_MEASURELANDS_LESSONS.find((entry) => lessonId.startsWith(entry.prefix))?.practisedSkills;
 }
 
+export function getY4MeasurelandsLessonQuizContribution(lessonId: string): PracticeTask[] {
+  const entry = Y4_MEASURELANDS_LESSONS.find((candidate) => lessonId.startsWith(candidate.prefix));
+  return entry?.quizContributionBuilder?.() ?? [];
+}
+
 export type Y4MeasurelandsLessonMeta = Omit<Y4MeasurelandsLessonEntry, "generate" | "reset">;
 
 export function getY4MeasurelandsLessonMeta(lessonId: string): Y4MeasurelandsLessonMeta | null {

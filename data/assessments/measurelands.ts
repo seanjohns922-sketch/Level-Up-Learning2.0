@@ -13,6 +13,10 @@ import {
   YEAR3_MEASURELANDS_POSTTEST,
   YEAR3_MEASURELANDS_PRETEST,
 } from "./year3MeasurelandsAssessments";
+import {
+  YEAR4_MEASURELANDS_POSTTEST,
+  YEAR4_MEASURELANDS_PRETEST,
+} from "./year4MeasurelandsAssessments";
 
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -140,6 +144,8 @@ const LEGACY_YEAR2_POSTTEST: Question[] = [
 // ═══════════════════════ YEAR 4 ══════════════════════════════════════════════
 // W1 Precision (mm) · W2 Scales & Jugs · W3 Temperature · W4 Perimeter ·
 // W5 Area · W6 Time problems · W7 Angles · W8 Measurement missions.
+/* Legacy text-only Year 4 banks retained temporarily for comparison during the
+ * assessment migration. Runtime selection uses the lesson-native banks below.
 const YEAR4_PRETEST: Question[] = [
   buildQuestion("y4-measurement-pre-01", "What does a small mark between whole centimetres show?", ["part of a centimetre", "a kilogram", "an hour", "a litre"], "part of a centimetre", "partial_units", "Precision Measuring", [1], "year4-measurement-pre"),
   buildQuestion("y4-measurement-pre-02", "Which is more precise?", ["4 cm", "4.5 cm", "4 blocks", "4 days"], "4.5 cm", "partial_units", "Precision Measuring", [1], "year4-measurement-pre"),
@@ -184,6 +190,7 @@ const YEAR4_POSTTEST: Question[] = [
   buildQuestion("y4-measurement-pt-18", "Designing a garden that needs fencing and turf is what kind of task?", ["measurement investigation", "spelling test", "calendar only", "money only"], "measurement investigation", "measurement_investigation", "Measurement Missions", [8], "year4-measurement-post"),
   buildQuestion("y4-measurement-pt-19", "Which tool best helps read temperature?", ["thermometer", "ruler", "calendar", "balance cubes"], "thermometer", "temperature_units", "Measurement Missions", [8], "year4-measurement-post"),
 ];
+*/
 
 // ═══════════════════════ YEAR 5 ══════════════════════════════════════════════
 // W1 Metric units · W2 Decimals/precision · W3 Perimeter · W4 Area ·
@@ -286,7 +293,7 @@ export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]
   "Year 1": YEAR1_MEASURELANDS_PRETEST,
   "Year 2": YEAR2_MEASURELANDS_PRETEST,
   "Year 3": YEAR3_MEASURELANDS_PRETEST,
-  "Year 4": YEAR4_PRETEST,
+  "Year 4": YEAR4_MEASURELANDS_PRETEST,
   "Year 5": YEAR5_PRETEST,
   "Year 6": YEAR6_PRETEST,
 };
@@ -296,7 +303,7 @@ export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {
   "Year 1": buildPostTest("Year 1", YEAR1_MEASURELANDS_POSTTEST),
   "Year 2": buildPostTest("Year 2", YEAR2_MEASURELANDS_POSTTEST),
   "Year 3": buildPostTest("Year 3", YEAR3_MEASURELANDS_POSTTEST),
-  "Year 4": buildPostTest("Year 4", YEAR4_POSTTEST),
+  "Year 4": buildPostTest("Year 4", YEAR4_MEASURELANDS_POSTTEST),
   "Year 5": buildPostTest("Year 5", YEAR5_POSTTEST),
   "Year 6": buildPostTest("Year 6", YEAR6_POSTTEST),
 };
