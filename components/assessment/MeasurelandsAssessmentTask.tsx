@@ -28,6 +28,9 @@ export function MeasurelandsAssessmentTask({
     if (recordedRef.current) return;
     recordedRef.current = true;
     onRecord(nextValue);
+    // Lesson cards can set local correct/incorrect feedback before invoking the
+    // callback. Assessments record the response without revealing correctness.
+    setTaskNonce((nonce) => nonce + 1);
   };
 
   const hasRecordedAnswer = Boolean(value);
@@ -40,7 +43,7 @@ export function MeasurelandsAssessmentTask({
 
   return (
     <div className="relative">
-      <div className={hasRecordedAnswer ? "pointer-events-none select-none opacity-75" : undefined}>
+      <div className={hasRecordedAnswer ? "pointer-events-none select-none" : undefined}>
         <TaskRenderer
           key={`${questionId}:${taskNonce}`}
           task={task}
@@ -54,7 +57,7 @@ export function MeasurelandsAssessmentTask({
         />
       </div>
       {hasRecordedAnswer && (
-        <div className="absolute inset-0 z-20 flex items-end justify-center rounded-3xl bg-slate-950/10 p-4">
+        <div className="absolute inset-0 z-20 flex items-end justify-center rounded-3xl p-4">
           <div className="flex items-center gap-3 rounded-full border border-amber-300/60 bg-amber-50 p-2 pl-5 text-base font-black text-amber-950 shadow-lg">
             <span>Answer recorded</span>
             <button

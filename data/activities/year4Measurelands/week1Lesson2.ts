@@ -48,11 +48,12 @@ function buildMeasureTask(): RulerTask {
   const len = object.lengthCm;
   const opts = [len - 1, len, len + 1].filter((v) => v >= 1);
   const options = opts.length === 3 ? opts : [len, len + 1, len + 2];
+  const prompt = object.label === "scissors" ? "How long are the scissors?" : `How long is the ${object.label}?`;
   return {
     kind: "rulerMeasure",
     scene: "measure",
     precision: true,
-    prompt: `How long is the ${object.label}?`,
+    prompt,
     speakText: `Measure the ${object.label}. Line it up at zero and read the final mark carefully.`,
     badgeLabel: "Measure the Object",
     rulerCm: rulerFor(len),

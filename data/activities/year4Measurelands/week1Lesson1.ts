@@ -109,12 +109,13 @@ function buildReadTask(memory: LessonMemory): RulerTask {
   const len = object.lengthCm;
   const opts = [len - 1, len, len + 1].filter((v) => v >= 1);
   const options = opts.length === 3 ? opts : [len, len + 1, len + 2];
+  const prompt = object.label === "scissors" ? "How long are the scissors?" : `How long is the ${object.label}?`;
   return {
     kind: "rulerMeasure",
     scene: "measure",
     precision: true,
-    prompt: `How long is the ${object.label}?`,
-    speakText: `How long is the ${object.label}? Read carefully — look at the smaller marks.`,
+    prompt,
+    speakText: `${prompt} Read carefully — look at the smaller marks.`,
     badgeLabel: "Read the Measurement",
     rulerCm: rulerFor(len),
     object,
