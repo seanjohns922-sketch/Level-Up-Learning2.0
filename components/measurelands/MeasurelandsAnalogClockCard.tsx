@@ -326,19 +326,22 @@ function BuildScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCor
   const targetDisplayHour = displayHourForTime(task.targetHour, task.targetMinute);
   const initialHour = targetDisplayHour === 12 ? 1 : 12;
   const initialMinute = minuteChoices.includes(30) && task.targetMinute === 0 ? 30 : 0;
-  const [selectedHour, setSelectedHour] = useState<number>(initialHour);
-  const [selectedMinute, setSelectedMinute] = useState<ClockMinute>(initialMinute);
-  const renderHour = internalHourForDisplay(selectedHour, selectedMinute);
+  const [selectedHour, setSelectedHour] = useState<number | null>(task.assessmentMode ? null : initialHour);
+  const [selectedMinute, setSelectedMinute] = useState<ClockMinute | null>(task.assessmentMode ? null : initialMinute);
+  const displayHour = selectedHour ?? 12;
+  const displayMinute = selectedMinute ?? 0;
+  const renderHour = internalHourForDisplay(displayHour, displayMinute);
 
-  const isCorrect = normalizeHour(selectedHour) === targetDisplayHour && selectedMinute === task.targetMinute;
+  const hasCompleteSelection = selectedHour !== null && selectedMinute !== null;
+  const isCorrect = hasCompleteSelection && normalizeHour(selectedHour) === targetDisplayHour && selectedMinute === task.targetMinute;
 
   return (
     <Shell task={task}>
       <div className="measurelands-clock-build grid gap-5 rounded-[30px] border border-[rgba(214,184,108,0.34)] bg-white/90 p-5 lg:grid-cols-[360px_1fr]">
         <div className="measurelands-clock-face-wrap flex flex-col items-center justify-center">
-          <ClockFace hour={renderHour} minute={selectedMinute} />
+          <ClockFace hour={renderHour} minute={displayMinute} />
           <div className="mt-3 rounded-full bg-[rgba(91,33,182,0.08)] px-5 py-2 text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">
-            {timeLabel(renderHour, selectedMinute)}
+            {hasCompleteSelection ? timeLabel(renderHour, displayMinute) : "Choose the time"}
           </div>
         </div>
 
@@ -352,7 +355,7 @@ function BuildScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCor
                   type="button"
                   onClick={() => setSelectedHour(hour)}
                   className={`min-h-[52px] rounded-2xl border-2 text-xl font-black transition active:scale-[0.98] ${
-                    normalizeHour(selectedHour) === hour
+                    selectedHour !== null && normalizeHour(selectedHour) === hour
                       ? "border-[#7c3aed] bg-[#ede9fe] text-[#4c1d95]"
                       : "border-[rgba(214,184,108,0.42)] bg-[#fffaf0] text-[#2c1c07]"
                   }`}
@@ -387,7 +390,8 @@ function BuildScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCor
           <button
             type="button"
             onClick={() => (isCorrect ? onCorrect() : onWrong())}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#78350f,#b7791f)] px-6 py-4 text-lg font-black uppercase tracking-[0.14em] text-[#fff8e1] shadow-[0_14px_28px_rgba(120,53,15,0.22)] transition hover:-translate-y-0.5 active:scale-[0.98]"
+            disabled={!hasCompleteSelection}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#78350f,#b7791f)] px-6 py-4 text-lg font-black uppercase tracking-[0.14em] text-[#fff8e1] shadow-[0_14px_28px_rgba(120,53,15,0.22)] transition hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
           >
             <CheckCircle2 className="h-5 w-5" />
             Check Time
@@ -397,7 +401,7 @@ function BuildScene({ task, onCorrect, onWrong }: { task: AnalogClockTask; onCor
 
       {process.env.NODE_ENV === "development" ? (
         <div className="rounded-2xl border border-dashed border-amber-400 bg-amber-50/70 p-3 text-xs font-mono text-amber-950">
-          Target: {digitalLabel(task.targetHour, task.targetMinute)} ({timeLabel(task.targetHour, task.targetMinute)}) | Current: {digitalLabel(renderHour, selectedMinute)} ({timeLabel(renderHour, selectedMinute)}) | Mode: {task.mode} | Granularity: {task.granularity} | Display hour: {selectedHour} | Internal hour: {renderHour} | Minute: {selectedMinute}
+          Target: {digitalLabel(task.targetHour, task.targetMinute)} ({timeLabel(task.targetHour, task.targetMinute)}) | Current: {hasCompleteSelection ? `${digitalLabel(renderHour, displayMinute)} (${timeLabel(renderHour, displayMinute)})` : "not selected"} | Mode: {task.mode} | Granularity: {task.granularity} | Display hour: {selectedHour ?? "none"} | Internal hour: {renderHour} | Minute: {selectedMinute ?? "none"}
         </div>
       ) : null}
     </Shell>

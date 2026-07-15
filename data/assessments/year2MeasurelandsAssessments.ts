@@ -62,7 +62,11 @@ function selectTask(
   if (!task) {
     throw new Error(`[Year2MeasurelandsAssessment] Missing Week ${week} task at index ${index}.`);
   }
-  return { task, week, lesson, skillId, skillLabel };
+  const assessmentTask =
+    task.kind === "analogClock" && task.scene === "build"
+      ? { ...task, assessmentMode: true }
+      : task;
+  return { task: assessmentTask, week, lesson, skillId, skillLabel };
 }
 
 function buildWeek4Tasks(): PracticeTask[] {
@@ -135,7 +139,7 @@ function buildTaskSpecs(mode: "pre" | "post"): AssessmentTaskSpec[] {
       selectTask(weeks[2]!, 10, 3, 3, "capacity_unit", "Choose a Capacity Unit"),
       selectTask(weeks[3]!, 0, 4, 1, "measurement_accuracy", "Recognise Accurate Measurement"),
       selectTask(weeks[3]!, 5, 4, 2, "measurement_accuracy", "Measure More Accurately"),
-      selectTask(weeks[3]!, 10, 4, 3, "informal_units", "Compare Different Informal Units"),
+      selectTask(weeks[3]!, 11, 4, 3, "informal_units", "Measure with an Informal Unit"),
       selectTask(weeks[4]!, 0, 5, 1, "clock_oclock", "Read O'Clock Time"),
       selectTask(weeks[4]!, 5, 5, 2, "clock_half_past", "Read Half-Past Time"),
       selectTask(weeks[5]!, 0, 6, 1, "clock_quarter_past", "Read Quarter-Past Time"),
@@ -149,7 +153,7 @@ function buildTaskSpecs(mode: "pre" | "post"): AssessmentTaskSpec[] {
   return [
     selectTask(weeks[0]!, 4, 1, 1, "length_difference", "Find a Length Difference"),
     selectTask(weeks[0]!, 9, 1, 2, "length_order", "Order Measured Lengths"),
-    selectTask(weeks[0]!, 14, 1, 3, "length_tool", "Justify a Length Tool"),
+    selectTask(weeks[0]!, 13, 1, 3, "length_tool", "Choose a Length Tool"),
     selectTask(weeks[1]!, 4, 2, 1, "mass_measure", "Read an Informal Mass Measurement"),
     selectTask(weeks[1]!, 9, 2, 2, "mass_difference", "Compare Measured Masses"),
     selectTask(weeks[1]!, 14, 2, 3, "mass_reasoning", "Predict and Check Mass"),
@@ -158,7 +162,7 @@ function buildTaskSpecs(mode: "pre" | "post"): AssessmentTaskSpec[] {
     selectTask(weeks[2]!, 14, 3, 3, "capacity_unit", "Justify a Capacity Unit"),
     selectTask(weeks[3]!, 4, 4, 1, "measurement_accuracy", "Choose an Accurate Measurement"),
     selectTask(weeks[3]!, 9, 4, 2, "measurement_accuracy", "Measure More Accurately"),
-    selectTask(weeks[3]!, 14, 4, 3, "informal_units", "Reason About Different Units"),
+    selectTask(weeks[3]!, 13, 4, 3, "informal_units", "Measure with an Informal Unit"),
     selectTask(weeks[4]!, 4, 5, 1, "clock_oclock", "Read O'Clock Time"),
     selectTask(weeks[4]!, 9, 5, 2, "clock_half_past", "Read Half-Past Time"),
     selectTask(weeks[5]!, 4, 6, 1, "clock_quarter_past", "Build Quarter-Past Time"),

@@ -309,8 +309,8 @@ function ResultsPage() {
   const unlockTargets = useMemo(() => {
     if (passedByPretest) return getLegendIdsUpToYear(year, legendRealmId);
     if (!isPostTest) return getLegendIdsBeforeYear(year, legendRealmId); // failed pretest → unlock all prior years
-    return [legend.id];
-  }, [passedByPretest, isPostTest, year, legend.id, legendRealmId]);
+    return passedByPosttest ? [legend.id] : [];
+  }, [passedByPretest, passedByPosttest, isPostTest, year, legend.id, legendRealmId]);
 
   // For a failed pretest we unlock prior-year legends — show the highest one in the overlay
   const unlockDisplayLegend = useMemo(() => {

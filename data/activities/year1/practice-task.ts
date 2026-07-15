@@ -1015,6 +1015,8 @@ export type PracticeTask = (
         focus: "minute" | "hour" | "time";
       }>;
       showDigital?: boolean;
+      /** Assessment builds start with no hour or minute choice selected. */
+      assessmentMode?: boolean;
       feedback?: { correct: string; wrong: string };
     }
   | {
