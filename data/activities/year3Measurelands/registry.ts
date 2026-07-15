@@ -537,6 +537,11 @@ export function getY3MeasurelandsLessonMeta(lessonId: string): Y3MeasurelandsLes
   return meta;
 }
 
+export function getY3MeasurelandsLessonQuizContribution(lessonId: string): PracticeTask[] {
+  const entry = Y3_MEASURELANDS_LESSONS.find((candidate) => lessonId.startsWith(candidate.prefix));
+  return entry?.quizContributionBuilder?.() ?? [];
+}
+
 export function resetY3MeasurelandsLessonSessionState() {
   Y3_MEASURELANDS_LESSONS.forEach((entry) => entry.reset());
 }

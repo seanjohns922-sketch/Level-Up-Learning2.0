@@ -9,6 +9,10 @@ import {
   YEAR2_MEASURELANDS_POSTTEST,
   YEAR2_MEASURELANDS_PRETEST,
 } from "./year2MeasurelandsAssessments";
+import {
+  YEAR3_MEASURELANDS_POSTTEST,
+  YEAR3_MEASURELANDS_PRETEST,
+} from "./year3MeasurelandsAssessments";
 
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -131,54 +135,6 @@ const LEGACY_YEAR2_POSTTEST: Question[] = [
   buildQuestion("y2-measurement-pt-18", "How many days are there in two weeks?", ["7", "10", "14", "20"], "14", "calendar_count_forward", "Calendar", [7], "year2-measurement-post"),
   buildQuestion("y2-measurement-pt-19", "A master measurer needs to weigh a parcel. Which is the right idea?", ["balance it against cubes", "read a clock", "count the days", "pour it into cups"], "balance it against cubes", "mass_units_informal", "Review", [8], "year2-measurement-post"),
   buildQuestion("y2-measurement-pt-20", "To find how much a jug holds, a master measurer should ...", ["fill it with cups and count", "weigh it with cubes", "read a calendar", "use a clock"], "fill it with cups and count", "capacity_better_unit", "Review", [8], "year2-measurement-post"),
-];
-
-// ═══════════════════════ YEAR 3 ══════════════════════════════════════════════
-// W1 Ruler (cm) · W2 Metre (m, cm↔m) · W3 Mass (g/kg, scales) · W4 Capacity
-// (mL/L, jugs) · W5 Duration · W6 Time to the minute · W7 Perimeter · W8 Area.
-const YEAR3_PRETEST: Question[] = [
-  buildQuestion("y3-measurement-pre-01", "Which number should you start at on a ruler?", ["0", "1", "2", "the edge only"], "0", "ruler_zero", "Ruler Use", [1], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-02", "What unit does a small school ruler usually show?", ["centimetres", "kilograms", "litres", "days"], "centimetres", "ruler_units", "Ruler Use", [1], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-03", "Which is longer?", ["7 cm", "5 cm", "they are the same", "cannot tell"], "7 cm", "compare_cm", "Ruler Use", [1], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-04", "Which unit is better for measuring a classroom?", ["centimetres", "metres", "grams", "millilitres"], "metres", "metre_choice", "Length Units", [2], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-05", "Which is longer, 1 metre or 50 centimetres?", ["1 metre", "50 centimetres", "same", "cannot tell"], "1 metre", "compare_metres", "Length Units", [2], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-20", "How many centimetres are in 1 metre?", ["10 cm", "50 cm", "100 cm", "1000 cm"], "100 cm", "metre_choice", "Length Units", [2], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-06", "Which unit would measure a paper clip best?", ["grams", "kilograms", "litres", "days"], "grams", "grams_kilograms", "Mass", [3], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-07", "Which unit would measure a school bag best?", ["grams", "kilograms", "millilitres", "centimetres"], "kilograms", "grams_kilograms", "Mass", [3], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-08", "Which instrument reads mass?", ["scale", "clock", "calendar", "ruler"], "scale", "read_scale", "Mass", [3], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-09", "Which unit is best for a drink bottle?", ["millilitres", "kilograms", "hours", "metres"], "millilitres", "ml_l_units", "Capacity", [4], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-10", "Which tool reads capacity?", ["measuring jug", "calendar", "scale", "clock"], "measuring jug", "read_jug", "Capacity", [4], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-11", "Which event usually lasts longer?", ["a lesson", "a school day", "a blink", "a clap"], "a school day", "duration_compare", "Duration", [5], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-12", "If an event starts at 3 o'clock and ends at 4 o'clock, how long is it?", ["30 minutes", "45 minutes", "1 hour", "2 hours"], "1 hour", "duration_compare", "Duration", [5], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-13", "The long hand points to 12 and the short hand to 6. What time is it?", ["6 o'clock", "half past 6", "quarter past 6", "quarter to 6"], "6 o'clock", "clock_reading", "Time to the minute", [6], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-14", "The long hand points to 6. The time is ...", ["o'clock", "half past", "quarter past", "quarter to"], "half past", "clock_reading", "Time to the minute", [6], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-15", "Perimeter means the distance ...", ["inside the shape", "around the boundary", "through the centre", "under the shape"], "around the boundary", "perimeter_intro", "Perimeter", [7], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-16", "Which shape has the longer perimeter?", ["shape with more outside edges", "shape with more colour", "shape with more inside space", "cannot tell"], "shape with more outside edges", "perimeter_intro", "Perimeter", [7], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-17", "A fence goes around the edge of a yard. That is the ...", ["area", "perimeter", "mass", "time"], "perimeter", "perimeter_intro", "Perimeter", [7], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-18", "Area means the amount of space ...", ["outside a shape", "inside a shape", "between two dates", "on a ruler"], "inside a shape", "area_intro", "Area", [8], "year3-measurement-pre"),
-  buildQuestion("y3-measurement-pre-19", "If two shapes cover the same squares, they have the same ...", ["perimeter", "area", "time", "mass"], "area", "area_intro", "Area", [8], "year3-measurement-pre"),
-];
-const YEAR3_POSTTEST: Question[] = [
-  buildQuestion("y3-measurement-pt-01", "An object starts at 0 cm and ends at 8 cm. How long is it?", ["6 cm", "7 cm", "8 cm", "9 cm"], "8 cm", "read_ruler_cm", "Ruler", [1], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-02", "Professor Gauge lines an object from 1 cm to 9 cm and says it is 9 cm. What is wrong?", ["he should start at 0 and read 8 cm", "he should use kilograms", "the ruler is broken", "nothing is wrong"], "he should start at 0 and read 8 cm", "read_ruler_cm", "Ruler", [1], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-03", "An object starts at 0 cm and ends at 6 cm. How long is it?", ["5 cm", "6 cm", "7 cm", "8 cm"], "6 cm", "read_ruler_cm", "Ruler", [1], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-04", "Which is the better unit for measuring a hallway?", ["centimetres", "metres", "grams", "litres"], "metres", "metre_choice", "Length Units", [2], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-05", "A ribbon is 3 m and a rope is 5 m. How many metres longer is the rope?", ["1 m", "2 m", "3 m", "8 m"], "2 m", "compare_metres", "Length Units", [2], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-20", "A hallway is 8 m and a rug is 3 m. How many metres longer is the hallway?", ["3 m", "5 m", "8 m", "11 m"], "5 m", "compare_metres", "Length Units", [2], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-06", "A scale shows 500 g. Which object could match?", ["paper clip", "apple", "chair", "bicycle"], "apple", "read_scale", "Mass", [3], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-07", "A dog is 18 kg and a backpack is 5 kg. Which is heavier?", ["dog", "backpack", "same", "cannot tell"], "dog", "compare_mass_units", "Mass", [3], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-08", "Which unit makes sense for an apple?", ["g", "kg", "L", "m"], "g", "grams_kilograms", "Mass", [3], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-09", "A measuring jug shows 750 mL. Which is true?", ["less than 1 L", "more than 1 L", "same as 2 L", "same as 10 L"], "less than 1 L", "read_jug", "Capacity", [4], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-10", "A fish tank holds 12 L and a jug holds 2 L. Which holds more?", ["jug", "fish tank", "same", "cannot tell"], "fish tank", "compare_capacity_units", "Capacity", [4], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-11", "A movie runs from 2 o'clock to 3 o'clock. How long is it?", ["30 minutes", "45 minutes", "1 hour", "90 minutes"], "1 hour", "duration_compare", "Duration", [5], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-12", "Which lasts the longest?", ["one lesson", "a school day", "lunch break", "a short walk"], "a school day", "duration_compare", "Duration", [5], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-13", "The long hand points to 6 and the short hand is between 2 and 3. What time is it?", ["2 o'clock", "half past 2", "quarter past 2", "quarter to 3"], "half past 2", "clock_reading", "Time to the minute", [6], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-14", "The long hand points to 3 and the short hand is just after 7. What time is it?", ["quarter past 7", "quarter to 7", "half past 7", "7 o'clock"], "quarter past 7", "clock_reading", "Time to the minute", [6], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-15", "Perimeter is measured around the ...", ["inside", "boundary", "middle", "corner only"], "boundary", "perimeter_intro", "Perimeter", [7], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-16", "A rectangle has sides 6 units and 3 units. What is its perimeter?", ["9 units", "12 units", "18 units", "24 units"], "18 units", "find_perimeter", "Perimeter", [7], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-17", "Which shape has the greater perimeter?", ["a shape with 12 edge units", "a shape with 8 edge units", "same", "cannot tell"], "a shape with 12 edge units", "perimeter_intro", "Perimeter", [7], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-18", "Area measures the space ...", ["around a shape", "inside a shape", "above a shape", "under a shape"], "inside a shape", "area_intro", "Area", [8], "year3-measurement-post"),
-  buildQuestion("y3-measurement-pt-19", "Which shape has the greater area?", ["shape covering 8 squares", "shape covering 6 squares", "same area", "cannot tell"], "shape covering 8 squares", "area_compare", "Area", [8], "year3-measurement-post"),
 ];
 
 // ═══════════════════════ YEAR 4 ══════════════════════════════════════════════
@@ -329,7 +285,7 @@ const YEAR6_POSTTEST: Question[] = [
 export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]>> = {
   "Year 1": YEAR1_MEASURELANDS_PRETEST,
   "Year 2": YEAR2_MEASURELANDS_PRETEST,
-  "Year 3": YEAR3_PRETEST,
+  "Year 3": YEAR3_MEASURELANDS_PRETEST,
   "Year 4": YEAR4_PRETEST,
   "Year 5": YEAR5_PRETEST,
   "Year 6": YEAR6_PRETEST,
@@ -339,7 +295,7 @@ export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {
   Prep: buildPostTest("Prep", PREP_POSTTEST),
   "Year 1": buildPostTest("Year 1", YEAR1_MEASURELANDS_POSTTEST),
   "Year 2": buildPostTest("Year 2", YEAR2_MEASURELANDS_POSTTEST),
-  "Year 3": buildPostTest("Year 3", YEAR3_POSTTEST),
+  "Year 3": buildPostTest("Year 3", YEAR3_MEASURELANDS_POSTTEST),
   "Year 4": buildPostTest("Year 4", YEAR4_POSTTEST),
   "Year 5": buildPostTest("Year 5", YEAR5_POSTTEST),
   "Year 6": buildPostTest("Year 6", YEAR6_POSTTEST),
