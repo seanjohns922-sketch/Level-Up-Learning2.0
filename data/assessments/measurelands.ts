@@ -5,6 +5,10 @@ import {
   YEAR1_MEASURELANDS_POSTTEST,
   YEAR1_MEASURELANDS_PRETEST,
 } from "./year1MeasurelandsAssessments";
+import {
+  YEAR2_MEASURELANDS_POSTTEST,
+  YEAR2_MEASURELANDS_PRETEST,
+} from "./year2MeasurelandsAssessments";
 
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -84,7 +88,7 @@ const PREP_POSTTEST: Question[] = buildGroundMeasurelandsPosttestQuestions();
 // W1 Units & Length · W2 Mass · W3 Capacity · W4 Accuracy · W5 Clock I
 // (o'clock/half past) · W6 Clock II (quarter past/to) · W7 Calendar · W8 Mixed.
 // NOTE: Year 2 does NOT teach perimeter/area (that is Year 3+).
-const YEAR2_PRETEST: Question[] = [
+const LEGACY_YEAR2_PRETEST: Question[] = [
   buildQuestion("y2-measurement-pre-01", "A rope is 8 blocks and a stick is 5 blocks. How many more blocks is the rope?", ["2", "3", "4", "5"], "3", "length_difference", "Measured Length", [1], "year2-measurement-pre"),
   buildQuestion("y2-measurement-pre-02", "Which tool is best for measuring a pencil?", ["ruler", "trundle wheel", "footsteps", "a playground tape"], "ruler", "choose_length_tool", "Measuring Tools", [1], "year2-measurement-pre"),
   buildQuestion("y2-measurement-pre-03", "If a smaller unit is used, the count usually gets ...", ["smaller", "bigger", "the same number", "zero"], "bigger", "informal_units", "Different Units", [1], "year2-measurement-pre"),
@@ -106,7 +110,7 @@ const YEAR2_PRETEST: Question[] = [
   buildQuestion("y2-measurement-pre-19", "Which measurement would you use for how heavy a bag is?", ["balance cubes", "a clock", "a calendar", "cups"], "balance cubes", "mass_units_informal", "Review", [8], "year2-measurement-pre"),
   buildQuestion("y2-measurement-pre-20", "Which tool measures how much water a bucket holds?", ["cups", "a ruler", "balance cubes", "a calendar"], "cups", "capacity_better_unit", "Review", [8], "year2-measurement-pre"),
 ];
-const YEAR2_POSTTEST: Question[] = [
+const LEGACY_YEAR2_POSTTEST: Question[] = [
   buildQuestion("y2-measurement-pt-01", "A rope is 9 blocks and a vine is 6 blocks. How many more blocks is the rope?", ["2", "3", "4", "5"], "3", "length_difference", "Measured Length", [1], "year2-measurement-post"),
   buildQuestion("y2-measurement-pt-02", "Which is the best tool for measuring a classroom?", ["ruler", "cubes", "tape measure", "paper clips"], "tape measure", "choose_length_tool", "Measuring Tools", [1], "year2-measurement-post"),
   buildQuestion("y2-measurement-pt-03", "A pencil measures 6 blocks or 12 paper clips. Why are the numbers different?", ["the pencil changed", "paper clips are smaller", "blocks are heavier", "the ruler is broken"], "paper clips are smaller", "informal_units", "Different Units", [1], "year2-measurement-post"),
@@ -324,7 +328,7 @@ const YEAR6_POSTTEST: Question[] = [
 
 export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]>> = {
   "Year 1": YEAR1_MEASURELANDS_PRETEST,
-  "Year 2": YEAR2_PRETEST,
+  "Year 2": YEAR2_MEASURELANDS_PRETEST,
   "Year 3": YEAR3_PRETEST,
   "Year 4": YEAR4_PRETEST,
   "Year 5": YEAR5_PRETEST,
@@ -334,7 +338,7 @@ export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]
 export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {
   Prep: buildPostTest("Prep", PREP_POSTTEST),
   "Year 1": buildPostTest("Year 1", YEAR1_MEASURELANDS_POSTTEST),
-  "Year 2": buildPostTest("Year 2", YEAR2_POSTTEST),
+  "Year 2": buildPostTest("Year 2", YEAR2_MEASURELANDS_POSTTEST),
   "Year 3": buildPostTest("Year 3", YEAR3_POSTTEST),
   "Year 4": buildPostTest("Year 4", YEAR4_POSTTEST),
   "Year 5": buildPostTest("Year 5", YEAR5_POSTTEST),

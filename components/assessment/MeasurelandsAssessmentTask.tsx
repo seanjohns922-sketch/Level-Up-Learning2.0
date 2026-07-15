@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { TaskRenderer } from "@/components/TaskRenderer";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -12,14 +12,17 @@ export function MeasurelandsAssessmentTask({
   value,
   correctToken,
   onRecord,
+  onClear,
 }: {
   questionId: string;
   task: PracticeTask;
   value: string;
   correctToken: string;
   onRecord: (value: string) => void;
+  onClear: () => void;
 }) {
   const recordedRef = useRef(Boolean(value));
+  const [taskNonce, setTaskNonce] = useState(0);
 
   const record = (nextValue: string) => {
     if (recordedRef.current) return;
@@ -29,12 +32,19 @@ export function MeasurelandsAssessmentTask({
 
   const hasRecordedAnswer = Boolean(value);
 
+  const changeAnswer = () => {
+    recordedRef.current = false;
+    onClear();
+    setTaskNonce((nonce) => nonce + 1);
+  };
+
   return (
     <div className="relative">
       <div className={hasRecordedAnswer ? "pointer-events-none select-none opacity-75" : undefined}>
         <TaskRenderer
+          key={`${questionId}:${taskNonce}`}
           task={task}
-          taskNonce={0}
+          taskNonce={taskNonce}
           callbacks={{
             markCorrect: () => record(correctToken),
             markCorrectSoft: () => record(correctToken),
@@ -45,8 +55,15 @@ export function MeasurelandsAssessmentTask({
       </div>
       {hasRecordedAnswer && (
         <div className="absolute inset-0 z-20 flex items-end justify-center rounded-3xl bg-slate-950/10 p-4">
-          <div className="rounded-full border border-amber-300/60 bg-amber-50 px-6 py-3 text-base font-black text-amber-950 shadow-lg">
-            Answer recorded
+          <div className="flex items-center gap-3 rounded-full border border-amber-300/60 bg-amber-50 p-2 pl-5 text-base font-black text-amber-950 shadow-lg">
+            <span>Answer recorded</span>
+            <button
+              type="button"
+              onClick={changeAnswer}
+              className="rounded-full bg-amber-900 px-5 py-2.5 text-sm font-black text-white transition hover:bg-amber-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amber-500"
+            >
+              Change answer
+            </button>
           </div>
         </div>
       )}

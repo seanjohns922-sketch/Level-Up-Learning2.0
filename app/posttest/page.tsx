@@ -355,6 +355,15 @@ function PostTestPage() {
     setAnswers((prev) => ({ ...prev, [q.id]: option }));
   }
 
+  function clearCurrentAnswer() {
+    if (!q) return;
+    setAnswers((prev) => {
+      const next = { ...prev };
+      delete next[q.id];
+      return next;
+    });
+  }
+
   function changeMab(nextMab: { tens: number; ones: number }) {
     setMab(nextMab);
     if (!q || q.type !== "mab") return;
@@ -491,6 +500,7 @@ function PostTestPage() {
         value={picked}
         correctToken={q.correctAnswer}
         onRecord={pick}
+        onClear={clearCurrentAnswer}
       />
     );
   } else if (q.type === "mab") {

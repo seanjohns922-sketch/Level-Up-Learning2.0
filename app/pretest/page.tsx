@@ -437,6 +437,18 @@ function PretestPage() {
     const next = [...answers];
     next[index] = value;
     setAnswers(next);
+    if (question?.id) {
+      setIdkResponses((prev) => prev.filter((questionId) => questionId !== question.id));
+    }
+  }
+
+  function clearCurrentAnswer() {
+    const next = [...answers];
+    next[index] = null;
+    setAnswers(next);
+    if (question?.id) {
+      setIdkResponses((prev) => prev.filter((questionId) => questionId !== question.id));
+    }
   }
 
   function nextQuestion() {
@@ -686,6 +698,7 @@ function PretestPage() {
         value={selected ?? ""}
         correctToken={question.correctAnswer ?? "__measurelands_task_correct__"}
         onRecord={choose}
+        onClear={clearCurrentAnswer}
       />
     );
   } else if (question.type === "mab") {
