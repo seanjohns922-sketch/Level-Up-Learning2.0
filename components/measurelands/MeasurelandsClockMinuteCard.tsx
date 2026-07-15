@@ -92,7 +92,7 @@ function SpotTimeScene({ task, onCorrect, onWrong }: { task: ClockTask; onCorrec
   return (
     <Shell badge={task.badgeLabel ?? "Is That Right?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <ClockPanel hour={task.targetHour} minute={task.targetMinute} size={200} />
-      <div className="flex items-center justify-center gap-3 rounded-[24px] border-2 border-[rgba(124,58,237,0.28)] bg-[rgba(124,58,237,0.06)] px-5 py-3"><span className="text-3xl">🧑‍🏫</span><span className="text-lg font-black text-[#2c1c07]">Professor Gauge says it&apos;s</span> <DigitalChip text={task.claimedTime ?? ""} /></div>
+      <div className="flex items-center justify-center gap-3 rounded-[24px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fffaf0] px-5 py-3 shadow-sm"><span className="text-3xl">🧑‍🏫</span><span className="text-lg font-black text-[#2c1c07]">Professor Gauge says it&apos;s</span> <DigitalChip text={task.claimedTime ?? ""} /></div>
       <div className="grid grid-cols-2 gap-3">
         {(task.options ?? []).map((o) => (
           <button key={o} type="button" onClick={() => (o === task.correctOption ? onCorrect() : onWrong())} className="relative flex min-h-[64px] items-center justify-center rounded-[22px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] px-3 text-center text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]"><span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={o} /></span>{o}</button>

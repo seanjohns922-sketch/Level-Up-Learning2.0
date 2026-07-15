@@ -958,7 +958,7 @@ function SpotMistakeScene({ task, onCorrect, onWrong }: { task: UnitTask; onCorr
   return (
     <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {task.object ? <ObjectHero object={task.object} /> : null}
-      <div className="flex items-start gap-3 rounded-[24px] border-2 border-[rgba(124,58,237,0.28)] bg-[rgba(124,58,237,0.06)] px-5 py-4">
+      <div className="flex items-start gap-3 rounded-[24px] border-2 border-[rgba(214,184,108,0.58)] bg-[#fffaf0] px-5 py-4 shadow-sm">
         <span className="text-3xl leading-none" aria-hidden>🧑‍🏫</span>
         <p className="text-xl font-black italic leading-snug text-[#2c1c07]">&ldquo;{task.statement}&rdquo;</p>
       </div>
