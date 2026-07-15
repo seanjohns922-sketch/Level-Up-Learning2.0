@@ -85,6 +85,7 @@ function measurelandsLegend(
   stats: LegendStats,
   front: string,
   back: string,
+  videoSlug: string,
 ): Legend {
   return {
     id,
@@ -100,6 +101,8 @@ function measurelandsLegend(
       cardFront: front,
       cardBack: back,
     },
+    unlockVideoUrl: legendVideoUrl(videoSlug),
+    showcaseVideoUrl: legendVideoUrl(videoSlug),
   };
 }
 
@@ -190,6 +193,7 @@ const LEGENDS: Legend[] = [
     { calculation: 30, speed: 34, accuracy: 42 },
     "/cards/meazurex-pebble-y0-front.png",
     "/cards/meazurex-pebble-y0-back.png",
+    "meazurex-pebble",
   ),
   measurelandsLegend(
     "meazurex-ticklet-y1",
@@ -200,6 +204,7 @@ const LEGENDS: Legend[] = [
     { calculation: 40, speed: 42, accuracy: 48 },
     "/cards/meazurex-ticklet-y1-front.png",
     "/cards/meazurex-ticklet-y1-back.png",
+    "meazurex-ticklet",
   ),
   measurelandsLegend(
     "meazurex-measurer-y2",
@@ -210,6 +215,7 @@ const LEGENDS: Legend[] = [
     { calculation: 50, speed: 48, accuracy: 55 },
     "/cards/meazurex-measurer-y2-front.png",
     "/cards/meazurex-measurer-y2-back.png",
+    "meazurex-measurer",
   ),
   measurelandsLegend(
     "meazurex-tracker-y3",
@@ -220,6 +226,7 @@ const LEGENDS: Legend[] = [
     { calculation: 58, speed: 56, accuracy: 60 },
     "/cards/meazurex-tracker-y3-front.png",
     "/cards/meazurex-tracker-y3-back.png",
+    "meazurex-tracker",
   ),
   measurelandsLegend(
     "meazurex-balancer-y4",
@@ -230,6 +237,7 @@ const LEGENDS: Legend[] = [
     { calculation: 66, speed: 62, accuracy: 68 },
     "/cards/meazurex-balancer-y4-front.png",
     "/cards/meazurex-balancer-y4-back.png",
+    "meazurex-balancer",
   ),
   measurelandsLegend(
     "meazurex-calibrator-y5",
@@ -240,6 +248,7 @@ const LEGENDS: Legend[] = [
     { calculation: 76, speed: 70, accuracy: 78 },
     "/cards/meazurex-calibrator-y5-front.png",
     "/cards/meazurex-calibrator-y5-back.png",
+    "meazurex-calibrator",
   ),
   measurelandsLegend(
     "meazurex-timewielder-y6",
@@ -250,6 +259,7 @@ const LEGENDS: Legend[] = [
     { calculation: 84, speed: 78, accuracy: 86 },
     "/cards/meazurex-timewielder-y6-front.png",
     "/cards/meazurex-timewielder-y6-back.png",
+    "meazurex-timewielder",
   ),
 ];
 
