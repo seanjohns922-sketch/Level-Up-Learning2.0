@@ -8,6 +8,7 @@ import type { Question } from "@/data/assessments/pretests";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
+import { MeasurelandsAssessmentTask } from "@/components/assessment/MeasurelandsAssessmentTask";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
@@ -641,6 +642,9 @@ function PretestPage() {
         ? (selected ?? "").trim().length > 0
         : selected !== null;
 
+  const isMeasurelandsTask =
+    question?.type === "measurelandsTask" && Boolean(question.practiceTask);
+
   useEffect(() => {
     if (question?.type !== "mab") return;
     const next = [...answers];
@@ -673,7 +677,18 @@ function PretestPage() {
   /* Build question content based on type */
   let questionContent: React.ReactNode;
 
-  if (question.type === "mab") {
+  if (isMeasurelandsTask && question.practiceTask) {
+    questionContent = (
+      <MeasurelandsAssessmentTask
+        key={question.id}
+        questionId={question.id}
+        task={question.practiceTask}
+        value={selected ?? ""}
+        correctToken={question.correctAnswer ?? "__measurelands_task_correct__"}
+        onRecord={choose}
+      />
+    );
+  } else if (question.type === "mab") {
     questionContent = (
       <MabPicker
         target={question.target ?? 0}
@@ -792,7 +807,7 @@ function PretestPage() {
         currentIndex={index}
         totalQuestions={questions.length}
         questionPrompt={question.prompt}
-        questionContent={
+        questionContent={isMeasurelandsTask ? questionContent :
           <div>
             <div className="flex justify-end mb-3">
               <ReadAloudBtn text={question.prompt} />
@@ -811,6 +826,8 @@ function PretestPage() {
         onHome={exitToHome}
         onExitAssessment={exitToLevels}
         onLogout={exitLogout}
+        wideContent={isMeasurelandsTask}
+        hidePrompt={isMeasurelandsTask}
         realmId={realmId}
       />
 

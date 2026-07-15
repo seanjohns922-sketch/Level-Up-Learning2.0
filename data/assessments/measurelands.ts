@@ -1,6 +1,10 @@
 import type { PostTest, Question } from "./posttests";
 import { deriveMeasurelandsAssessmentVisual } from "./measurelandsVisuals";
 import { buildGroundMeasurelandsPosttestQuestions } from "./groundMeasurelandsPosttest";
+import {
+  YEAR1_MEASURELANDS_POSTTEST,
+  YEAR1_MEASURELANDS_PRETEST,
+} from "./year1MeasurelandsAssessments";
 
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -75,54 +79,6 @@ export const LEGACY_PREP_POSTTEST: Question[] = [
 // in lessons. The exported legacy bank is retained only for migration audits;
 // no assessment route reads it.
 const PREP_POSTTEST: Question[] = buildGroundMeasurelandsPosttestQuestions();
-
-// ═══════════════════════ YEAR 1 ══════════════════════════════════════════════
-// W1 Length · W2 Mass · W3 Capacity · W4 Duration · W5 Calendar (days) ·
-// W6 Weeks & Months · W7 Time units (hour/day/week) · W8 Mixed.
-const YEAR1_PRETEST: Question[] = [
-  buildQuestion("y1-measurement-pre-01", "Which object is longer?", ["pencil", "eraser", "button", "peg"], "pencil", "length_compare", "Length", [1], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-02", "Put these from shortest to longest.", ["straw, ribbon, rope", "rope, ribbon, straw", "ribbon, straw, rope", "rope, straw, ribbon"], "straw, ribbon, rope", "length_order", "Length", [1], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-03", "Which object would you measure for length?", ["rope", "watering can", "apple pie", "clock"], "rope", "length_compare", "Length", [1], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-04", "Which object is heavier?", ["feather", "book", "leaf", "paper"], "book", "mass_compare", "Mass", [2], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-05", "Which object is lightest?", ["rock", "backpack", "apple", "chair"], "apple", "mass_compare", "Mass", [2], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-06", "Which object is the heaviest?", ["feather", "pencil", "brick", "leaf"], "brick", "mass_compare", "Mass", [2], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-07", "Which container holds more?", ["cup", "bucket", "mug", "bottle"], "bucket", "capacity_compare", "Capacity", [3], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-08", "Which container holds less?", ["fish tank", "jug", "bottle", "bathtub"], "bottle", "capacity_compare", "Capacity", [3], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-09", "Which container would you fill with cups?", ["bucket", "pencil", "book", "ruler"], "bucket", "capacity_compare", "Capacity", [3], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-10", "Which takes longer?", ["reading a book", "clapping once", "blinking", "jumping once"], "reading a book", "duration_compare", "Duration", [4], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-11", "Which activity is quickest?", ["watching a movie", "sleeping", "washing hands", "eating dinner"], "washing hands", "duration_compare", "Duration", [4], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-12", "What day comes after Tuesday?", ["Monday", "Wednesday", "Thursday", "Sunday"], "Wednesday", "days_sequence", "Days", [5], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-13", "How many days are in one week?", ["5", "6", "7", "10"], "7", "week_structure", "Days", [5], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-14", "Which month comes after January?", ["December", "March", "February", "April"], "February", "months_sequence", "Months", [6], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-15", "What comes after December?", ["November", "January", "February", "October"], "January", "months_sequence", "Months", [6], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-16", "Which is longer?", ["day", "week", "hour", "minute"], "week", "time_units", "Time Units", [7], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-17", "Which comes next: hour, day, ...?", ["minute", "week", "second", "Monday"], "week", "time_units", "Time Units", [7], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-18", "Which lasts about a week?", ["a camping holiday", "washing hands", "one lesson", "a blink"], "a camping holiday", "time_units", "Time Units", [7], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-19", "If today is Thursday, what is tomorrow?", ["Wednesday", "Friday", "Saturday", "Monday"], "Friday", "calendar_language", "Calendar", [8], "year1-measurement-pre"),
-  buildQuestion("y1-measurement-pre-20", "Which happens first in a day?", ["eat lunch", "wake up", "go to bed", "eat dinner"], "wake up", "sequence_day", "Sequencing", [8], "year1-measurement-pre"),
-];
-const YEAR1_POSTTEST: Question[] = [
-  buildQuestion("y1-measurement-pt-01", "A pencil is 5 blocks long and a crayon is 3 blocks long. Which is longer?", ["pencil", "crayon", "same length", "cannot tell"], "pencil", "length_compare", "Measured Length", [1], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-02", "A rope is 8 blocks and a stick is 6 blocks. How many more blocks is the rope?", ["1", "2", "3", "4"], "2", "length_difference", "Measured Length", [1], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-03", "Why do two objects need the same blocks to compare fairly?", ["same unit makes it fair", "bigger blocks look nicer", "it makes the answer bigger", "it does not matter"], "same unit makes it fair", "fair_units", "Fair Measure", [1], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-04", "An apple balances with 3 cubes. A book balances with 6 cubes. Which has greater mass?", ["apple", "book", "same mass", "cannot tell"], "book", "mass_compare", "Measured Mass", [2], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-05", "A backpack balances with 6 cubes. How many cubes is its mass?", ["5", "6", "7", "8"], "6", "mass_compare", "Measured Mass", [2], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-06", "Why should we use the same balance cubes each time?", ["to make it fair", "to get a bigger number", "to make it harder", "because cubes are blue"], "to make it fair", "fair_units", "Fair Mass Measure", [2], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-07", "A jug holds 4 cups and a bucket holds 8 cups. Which holds more?", ["jug", "bucket", "same amount", "cannot tell"], "bucket", "capacity_compare", "Measured Capacity", [3], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-08", "A mug holds 2 cups. A bucket holds 8 cups. Put them from smallest to largest.", ["mug, bucket", "bucket, mug", "same size", "cannot tell"], "mug, bucket", "capacity_compare", "Measured Capacity", [3], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-09", "Why does more cups mean greater capacity?", ["more cups fills more space", "the container is taller", "the picture is bigger", "the number is purple"], "more cups fills more space", "capacity_compare", "Capacity", [3], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-10", "Which activity lasts longer?", ["a whole school day", "one short lesson", "washing your hands", "clapping once"], "a whole school day", "duration_compare", "Duration", [4], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-11", "Which unit suits a school movie session best?", ["hour", "day", "week", "month"], "hour", "duration_units", "Duration", [4], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-12", "If today is Tuesday, what is tomorrow?", ["Monday", "Wednesday", "Thursday", "Sunday"], "Wednesday", "days_sequence", "Days", [5], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-13", "What date comes after the 14th on a calendar?", ["13", "15", "16", "24"], "15", "days_sequence", "Days", [5], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-14", "What comes after November?", ["October", "December", "January", "February"], "December", "months_sequence", "Months", [6], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-15", "Which month comes after December?", ["November", "January", "March", "June"], "January", "months_sequence", "Months", [6], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-16", "What comes after a week in the order day, week, ...?", ["hour", "month", "Monday", "minute"], "month", "time_units", "Time Units", [7], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-17", "Months are made of ...", ["days only", "weeks", "hours", "weekends"], "weeks", "time_units", "Time Units", [7], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-18", "Which lasts about a day?", ["a school day", "watching a movie", "a summer holiday", "brushing teeth"], "a school day", "time_units", "Time Units", [7], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-19", "Which happens first?", ["go to bed", "eat dinner", "wake up", "read a story at night"], "wake up", "sequence_day", "Sequencing", [8], "year1-measurement-post"),
-  buildQuestion("y1-measurement-pt-20", "Put these in order: wake up, school, sleep.", ["wake up, school, sleep", "school, wake up, sleep", "sleep, wake up, school", "school, sleep, wake up"], "wake up, school, sleep", "sequence_day", "Sequencing", [8], "year1-measurement-post"),
-];
 
 // ═══════════════════════ YEAR 2 ══════════════════════════════════════════════
 // W1 Units & Length · W2 Mass · W3 Capacity · W4 Accuracy · W5 Clock I
@@ -367,7 +323,7 @@ const YEAR6_POSTTEST: Question[] = [
 ];
 
 export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]>> = {
-  "Year 1": YEAR1_PRETEST,
+  "Year 1": YEAR1_MEASURELANDS_PRETEST,
   "Year 2": YEAR2_PRETEST,
   "Year 3": YEAR3_PRETEST,
   "Year 4": YEAR4_PRETEST,
@@ -377,7 +333,7 @@ export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]
 
 export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {
   Prep: buildPostTest("Prep", PREP_POSTTEST),
-  "Year 1": buildPostTest("Year 1", YEAR1_POSTTEST),
+  "Year 1": buildPostTest("Year 1", YEAR1_MEASURELANDS_POSTTEST),
   "Year 2": buildPostTest("Year 2", YEAR2_POSTTEST),
   "Year 3": buildPostTest("Year 3", YEAR3_POSTTEST),
   "Year 4": buildPostTest("Year 4", YEAR4_POSTTEST),
