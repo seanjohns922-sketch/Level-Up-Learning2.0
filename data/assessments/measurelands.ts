@@ -1,5 +1,6 @@
 import type { PostTest, Question } from "./posttests";
 import { deriveMeasurelandsAssessmentVisual } from "./measurelandsVisuals";
+import { buildGroundMeasurelandsPosttestQuestions } from "./groundMeasurelandsPosttest";
 
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -47,7 +48,7 @@ function buildPostTest(yearLabel: YearLabel, questions: Question[]): PostTest {
 // Foundation only: direct comparison of length, mass, capacity and duration,
 // plus days of the week and times of day. No clocks, months, formal dates,
 // indirect ordering of 3 items, or informal/formal measurement units.
-const PREP_POSTTEST: Question[] = [
+export const LEGACY_PREP_POSTTEST: Question[] = [
   buildQuestion("y0-measurement-pt-01", "Which object is longer?", ["Short pencil", "Long ribbon", "Tiny peg", "Small block"], "Long ribbon", "length_compare", "Length", [1], "prep-measurement"),
   buildQuestion("y0-measurement-pt-02", "Which object is shorter?", ["Long rope", "Tall straw", "Little button", "Big ruler"], "Little button", "length_compare", "Length", [1], "prep-measurement"),
   buildQuestion("y0-measurement-pt-03", "Which person is taller?", ["Baby", "Tall teacher", "Cat", "Book"], "Tall teacher", "height_compare", "Length", [1], "prep-measurement"),
@@ -69,6 +70,11 @@ const PREP_POSTTEST: Question[] = [
   buildQuestion("y0-measurement-pt-19", "Which time of day matches eating breakfast?", ["Morning", "Lunchtime", "Afternoon", "Night"], "Morning", "time_of_day", "Time of Day", [5, 6], "prep-measurement"),
   buildQuestion("y0-measurement-pt-20", "Which order makes sense for a day?", ["wake up, eat lunch, go to bed", "go to bed, wake up, eat lunch", "eat lunch, go to bed, wake up", "go to bed, eat lunch, wake up"], "wake up, eat lunch, go to bed", "sequencing_events", "Sequencing", [6, 8], "prep-measurement"),
 ];
+
+// Ground assessment tasks use the same premium interactions students practised
+// in lessons. The exported legacy bank is retained only for migration audits;
+// no assessment route reads it.
+const PREP_POSTTEST: Question[] = buildGroundMeasurelandsPosttestQuestions();
 
 // ═══════════════════════ YEAR 1 ══════════════════════════════════════════════
 // W1 Length · W2 Mass · W3 Capacity · W4 Duration · W5 Calendar (days) ·

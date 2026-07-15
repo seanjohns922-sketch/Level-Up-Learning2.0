@@ -29,6 +29,10 @@ interface AssessmentShellProps {
   onExitAssessment?: () => void;
   onLogout?: () => void;
   realmId?: string;
+  /** Lesson-native assessment tasks need the same canvas width as lessons. */
+  wideContent?: boolean;
+  /** The lesson task renders its own prompt and read-aloud control. */
+  hidePrompt?: boolean;
 }
 
 export default function AssessmentShell({
@@ -51,6 +55,8 @@ export default function AssessmentShell({
   onExitAssessment,
   onLogout,
   realmId,
+  wideContent = false,
+  hidePrompt = false,
 }: AssessmentShellProps) {
   const hasExitMenu = Boolean(onHome || onExitAssessment || onLogout);
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
@@ -73,7 +79,7 @@ export default function AssessmentShell({
       }}
     >
       {/* ── Mission Header ── */}
-      <div className="w-full max-w-2xl mb-6">
+      <div className={`w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} mb-6`}>
         {/* Top bar */}
         <div className="flex items-center justify-between mb-4">
           {hasExitMenu ? (
@@ -191,7 +197,7 @@ export default function AssessmentShell({
       </div>
 
       {/* ── Question Card ── */}
-      <div className="w-full max-w-2xl flex-1">
+      <div className={`w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} flex-1`}>
         <div className="rounded-3xl border border-slate-700/60 bg-slate-800/80 backdrop-blur-sm shadow-2xl shadow-black/30 p-6 md:p-8">
           {/* Question number chip */}
           <div className="flex items-center gap-2 mb-4">
@@ -209,11 +215,13 @@ export default function AssessmentShell({
           </div>
 
           {/* Prompt zone */}
-          <div className="mb-6">
-            <h2 className="text-lg md:text-xl font-extrabold text-white leading-snug">
-              <MathFormattedText text={questionPrompt} />
-            </h2>
-          </div>
+          {!hidePrompt && (
+            <div className="mb-6">
+              <h2 className="text-lg md:text-xl font-extrabold text-white leading-snug">
+                <MathFormattedText text={questionPrompt} />
+              </h2>
+            </div>
+          )}
 
           {/* Answer area */}
           <div className="relative">

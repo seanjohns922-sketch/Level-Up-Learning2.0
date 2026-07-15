@@ -65,6 +65,7 @@ type Question = {
   strand?: string;
   linkedWeeks?: number[];
   visual?: { kind?: string } | unknown;
+  practiceTask?: { kind?: string } | unknown;
 };
 
 // Every Measurelands assessment question must carry a rendered visual.
@@ -145,11 +146,18 @@ for (const year of YEARS) {
 
     for (const q of questions) {
       const qScope = `${scope} ${q.id}`;
+      const isLessonNativeTask = q.type === "measurelandsTask";
       // Structural.
-      if ((q.type ?? "mcq") !== "mcq") fail(`${qScope} is not an MCQ.`);
       const options = Array.isArray(q.options) ? q.options : [];
-      if (options.length < 2 || !q.correctAnswer) fail(`${qScope} has an invalid option set.`);
-      if (options.filter((o) => o === q.correctAnswer).length !== 1) fail(`${qScope} does not have exactly one correct answer.`);
+      if (isLessonNativeTask) {
+        const taskKind = (q.practiceTask as { kind?: string } | undefined)?.kind;
+        if (!taskKind) fail(`${qScope} has no lesson-native task.`);
+        if (!q.correctAnswer) fail(`${qScope} has no assessment answer token.`);
+      } else {
+        if ((q.type ?? "mcq") !== "mcq") fail(`${qScope} is not an MCQ.`);
+        if (options.length < 2 || !q.correctAnswer) fail(`${qScope} has an invalid option set.`);
+        if (options.filter((o) => o === q.correctAnswer).length !== 1) fail(`${qScope} does not have exactly one correct answer.`);
+      }
 
       // Metadata: strand must be Measurement.
       if (q.strand !== "Measurement") fail(`${qScope} has strand "${q.strand}" (expected "Measurement").`);
@@ -158,10 +166,13 @@ for (const year of YEARS) {
       if (!q.id.includes("-measurement-")) fail(`${qScope} id is not a measurement id.`);
       // Metadata: every question maps to at least one source week.
       if (!(q.linkedWeeks && q.linkedWeeks.length)) fail(`${qScope} has no source week.`);
-      // Every question must carry a rendered visual of a known kind.
-      const vk = (q.visual as { kind?: string } | undefined)?.kind;
-      if (!vk) fail(`${qScope} has no visual.`);
-      else if (!KNOWN_VISUAL_KINDS.has(vk)) fail(`${qScope} has an unknown visual kind "${vk}".`);
+      // Native tasks render the same visual interaction used in lessons. Legacy
+      // MCQs must still provide an explicit assessment visual.
+      if (!isLessonNativeTask) {
+        const vk = (q.visual as { kind?: string } | undefined)?.kind;
+        if (!vk) fail(`${qScope} has no visual.`);
+        else if (!KNOWN_VISUAL_KINDS.has(vk)) fail(`${qScope} has an unknown visual kind "${vk}".`);
+      }
 
       const skillId = (q.skillId ?? "").toLowerCase();
       const skillLabel = (q.skillLabel ?? "").toLowerCase();

@@ -9,6 +9,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, writeProgress, type StudentProgress } from "@/data/progress";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
+import { MeasurelandsAssessmentTask } from "@/components/assessment/MeasurelandsAssessmentTask";
 import { analyzeAssessmentResult } from "@/data/assessments/analysis";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { DEMO_MODE } from "@/data/config";
@@ -475,12 +476,24 @@ function PostTestPage() {
     );
   }
 
+  const isMeasurelandsTask = q?.type === "measurelandsTask" && Boolean(q.practiceTask);
   const hasAnswer =
     q?.type === "mab" ? mabHasSelection : q?.type === "numeric" ? picked.trim().length > 0 : !!picked;
 
   let questionContent: React.ReactNode;
 
-  if (q.type === "mab") {
+  if (isMeasurelandsTask && q.practiceTask) {
+    questionContent = (
+      <MeasurelandsAssessmentTask
+        key={q.id}
+        questionId={q.id}
+        task={q.practiceTask}
+        value={picked}
+        correctToken={q.correctAnswer}
+        onRecord={pick}
+      />
+    );
+  } else if (q.type === "mab") {
     questionContent = (
       <MabPicker
         target={Number(q.answer ?? q.correctAnswer ?? 0)}
@@ -593,14 +606,14 @@ function PostTestPage() {
         totalQuestions={questions.length}
         subtitle={`Complete all ${questions.length} questions to unlock your Legend (${PASS_THRESHOLD}%+)`}
         questionPrompt={q.prompt}
-        questionContent={
+        questionContent={isMeasurelandsTask ? questionContent : (
           <div>
             <div className="flex justify-end mb-3">
               <ReadAloudBtn text={q.prompt} />
             </div>
             {questionContent}
           </div>
-        }
+        )}
         hasAnswer={hasAnswer}
         isLast={idx === questions.length - 1}
         submitted={submitted}
@@ -608,6 +621,8 @@ function PostTestPage() {
         onNext={next}
         onSubmit={submit}
         onExit={() => router.push(buildAssessmentReturnRoute({ year, realmId }))}
+        wideContent={isMeasurelandsTask}
+        hidePrompt={isMeasurelandsTask}
         realmId={realmId}
       />
     </>

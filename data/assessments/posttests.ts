@@ -18,6 +18,8 @@ export type Question = {
   strand?: string;
   difficultyBand?: string;
   visual?: unknown;
+  /** Existing lesson interaction reused in assessment mode. */
+  practiceTask?: import("@/data/activities/year1/practice-task").PracticeTask;
 };
 
 export type PostTest = {
