@@ -8,10 +8,10 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 type MetricTask = Extract<PracticeTask, { kind: "metricUnit" }>;
 
 const ATTR_TINT: Record<string, string> = {
-  length: "rgba(91,33,182,0.08)",
-  mass: "rgba(180,83,9,0.08)",
-  capacity: "rgba(14,116,144,0.08)",
-  temperature: "rgba(190,24,93,0.08)",
+  length: "#f7f2ff",
+  mass: "#fff7ed",
+  capacity: "#effcff",
+  temperature: "#fff1f7",
 };
 
 function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: string; speakText?: string; children: React.ReactNode }) {
