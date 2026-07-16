@@ -17,6 +17,10 @@ import {
   YEAR4_MEASURELANDS_POSTTEST,
   YEAR4_MEASURELANDS_PRETEST,
 } from "./year4MeasurelandsAssessments";
+import {
+  YEAR5_MEASURELANDS_POSTTEST,
+  YEAR5_MEASURELANDS_PRETEST,
+} from "./year5MeasurelandsAssessments";
 
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -294,7 +298,7 @@ export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]
   "Year 2": YEAR2_MEASURELANDS_PRETEST,
   "Year 3": YEAR3_MEASURELANDS_PRETEST,
   "Year 4": YEAR4_MEASURELANDS_PRETEST,
-  "Year 5": YEAR5_PRETEST,
+  "Year 5": YEAR5_MEASURELANDS_PRETEST,
   "Year 6": YEAR6_PRETEST,
 };
 
@@ -304,7 +308,7 @@ export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {
   "Year 2": buildPostTest("Year 2", YEAR2_MEASURELANDS_POSTTEST),
   "Year 3": buildPostTest("Year 3", YEAR3_MEASURELANDS_POSTTEST),
   "Year 4": buildPostTest("Year 4", YEAR4_MEASURELANDS_POSTTEST),
-  "Year 5": buildPostTest("Year 5", YEAR5_POSTTEST),
+  "Year 5": buildPostTest("Year 5", YEAR5_MEASURELANDS_POSTTEST),
   "Year 6": buildPostTest("Year 6", YEAR6_POSTTEST),
 };
 
