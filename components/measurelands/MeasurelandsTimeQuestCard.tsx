@@ -263,7 +263,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect:
 }
 
 /* ── L3 — Order the schedule (tap earliest → latest) ── */
-function OrderScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: () => void; onWrong: () => void }) {
+function OrderScene({ task, onCorrect, onWrong, assessmentMode }: { task: TimeTask; onCorrect: () => void; onWrong: () => void; assessmentMode: boolean }) {
   const events = task.events ?? [];
   const target = [...events].sort((a, b) => (a.min ?? 0) - (b.min ?? 0)).map((e) => e.id);
   const [picked, setPicked] = useState<string[]>([]);
@@ -271,6 +271,15 @@ function OrderScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: (
   const tap = (id: string) => {
     if (picked.includes(id)) return;
     const next = [...picked, id];
+    if (assessmentMode) {
+      setPicked(next);
+      if (next.length === events.length) {
+        const isCorrect = next.every((eventId, index) => eventId === target[index]);
+        if (isCorrect) onCorrect();
+        else onWrong();
+      }
+      return;
+    }
     if (target[next.length - 1] !== id) { setBad(true); onWrong(); window.setTimeout(() => { setPicked([]); setBad(false); }, 700); return; }
     setPicked(next);
     if (next.length === events.length) onCorrect();
@@ -341,7 +350,7 @@ function ItineraryScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrec
   );
 }
 
-export function MeasurelandsTimeQuestCard({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: () => void; onWrong: () => void }) {
+export function MeasurelandsTimeQuestCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: TimeTask; onCorrect: () => void; onWrong: () => void; assessmentMode?: boolean }) {
   switch (task.scene) {
     case "itinerary": return <ItineraryScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
@@ -351,7 +360,7 @@ export function MeasurelandsTimeQuestCard({ task, onCorrect, onWrong }: { task: 
     case "howLong": return <HowLongScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "finishTime": return <FinishTimeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "timeline": return <TimelineScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-    case "order": return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "order": return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} assessmentMode={assessmentMode} />;
     default: return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   }
 }

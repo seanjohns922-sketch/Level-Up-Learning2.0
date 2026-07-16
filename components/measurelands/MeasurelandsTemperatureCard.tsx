@@ -147,7 +147,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: TempTask; onCorrect:
 }
 
 /* ── Order — tap items coldest → warmest ── */
-function OrderScene({ task, onCorrect, onWrong }: { task: TempTask; onCorrect: () => void; onWrong: () => void }) {
+function OrderScene({ task, onCorrect, onWrong, assessmentMode }: { task: TempTask; onCorrect: () => void; onWrong: () => void; assessmentMode: boolean }) {
   const items = task.items ?? [];
   const target = task.orderedLabels ?? [...items].sort((a, b) => a.value - b.value).map((i) => i.label);
   const [picked, setPicked] = useState<string[]>([]);
@@ -156,6 +156,15 @@ function OrderScene({ task, onCorrect, onWrong }: { task: TempTask; onCorrect: (
   const handle = (label: string) => {
     if (picked.includes(label)) return;
     const next = [...picked, label];
+    if (assessmentMode) {
+      setPicked(next);
+      if (next.length === items.length) {
+        const isCorrect = next.every((item, index) => item === target[index]);
+        if (isCorrect) onCorrect();
+        else onWrong();
+      }
+      return;
+    }
     if (target[next.length - 1] !== label) {
       setBad(true);
       onWrong();
@@ -197,10 +206,10 @@ function OrderScene({ task, onCorrect, onWrong }: { task: TempTask; onCorrect: (
   );
 }
 
-export function MeasurelandsTemperatureCard({ task, onCorrect, onWrong }: { task: TempTask; onCorrect: () => void; onWrong: () => void }) {
+export function MeasurelandsTemperatureCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: TempTask; onCorrect: () => void; onWrong: () => void; assessmentMode?: boolean }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "match") return <MatchScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "compare") return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-  if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "order") return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} assessmentMode={assessmentMode} />;
   return <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

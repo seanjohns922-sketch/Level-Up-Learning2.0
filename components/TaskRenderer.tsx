@@ -223,10 +223,12 @@ function TaskRendererInner({
   task,
   taskNonce,
   callbacks,
+  assessmentMode = false,
 }: {
   task: PracticeTask;
   taskNonce: number;
   callbacks: Callbacks;
+  assessmentMode?: boolean;
 }) {
   const { markCorrect, markCorrectSoft, markWrong, markAttempted } = callbacks;
   const onC = () => setTimeout(() => markCorrect(), 0);
@@ -438,11 +440,11 @@ function TaskRendererInner({
     case "investigation":
       return wrapMeasurelands(<MeasurelandsInvestigationCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "temperature":
-      return wrapMeasurelands(<MeasurelandsTemperatureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+      return wrapMeasurelands(<MeasurelandsTemperatureCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />);
     case "perimeterCalc":
       return wrapMeasurelands(<MeasurelandsSurveyorCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "timeQuest":
-      return wrapMeasurelands(<MeasurelandsTimeQuestCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+      return wrapMeasurelands(<MeasurelandsTimeQuestCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />);
     case "angleQuest":
       return wrapMeasurelands(<MeasurelandsAngleCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "metricUnit":

@@ -48,6 +48,7 @@ export function MeasurelandsAssessmentTask({
           key={`${questionId}:${taskNonce}`}
           task={task}
           taskNonce={taskNonce}
+          assessmentMode
           callbacks={{
             markCorrect: () => record(correctToken),
             markCorrectSoft: () => record(correctToken),
