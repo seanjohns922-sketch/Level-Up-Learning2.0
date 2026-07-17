@@ -21,6 +21,7 @@ import { buildLessonRoute } from "@/lib/lesson-routing";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { saveRealmAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { getRealmTheme } from "@/lib/useRealmTheme";
+import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 
 const PASS_THRESHOLD = 85;
 
@@ -486,6 +487,12 @@ function PostTestPage() {
 
     const resultsUrl = `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`;
     const reviewItems = buildPosttestPracticeReviewItems(questions, answers);
+    saveAssessmentReviewState({
+      year,
+      realmId: progressRealmId,
+      mode: "posttest",
+      items: reviewItems,
+    });
     if (reviewItems.length > 0) {
       setPosttestReviewItems(reviewItems);
       setPendingResultsUrl(resultsUrl);

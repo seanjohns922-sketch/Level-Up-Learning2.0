@@ -29,10 +29,10 @@ import {
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
 // ── Measurelands pre/post-test banks ──────────────────────────────────────────
-// Every bank has exactly 20 questions spread across the level's 8 taught weeks in
-// a [3,3,3,2,2,2,3,2] pattern, so each week is assessed by 2–3 questions that
-// match what that week actually teaches (source of truth: the program files).
-// Pre = diagnose; Post = apply/master. Same skills, different questions.
+// Every bank has exactly 20 questions aligned to its taught program. Level 6
+// deliberately assesses Weeks 1–7 because Week 8 is a multi-step master project,
+// not a suitable source for a single assessment question. Pre = diagnose; Post =
+// apply/master. Same skills, different questions.
 
 function buildQuestion(
   id: string,

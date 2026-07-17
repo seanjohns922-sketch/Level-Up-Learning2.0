@@ -138,11 +138,13 @@ for (const year of YEARS) {
     const dupes = listDuplicates(ids);
     if (dupes.length) fail(`${scope} has duplicate IDs: ${dupes.join(", ")}.`);
 
-    // Week coverage 1..8 and NO week beyond 8 (outdated/extra weeks).
-    const missingWeeks = Array.from({ length: MEASURELANDS_FINAL_WEEK }, (_, i) => i + 1).filter((w) => !uniqueWeeks.includes(w));
+    // Level 6 Week 8 is a multi-step master project, so its single-question
+    // assessments cover taught Weeks 1–7 and deliberately exclude Week 8 tasks.
+    const finalAssessedWeek = year === "Year 6" ? 7 : MEASURELANDS_FINAL_WEEK;
+    const missingWeeks = Array.from({ length: finalAssessedWeek }, (_, i) => i + 1).filter((w) => !uniqueWeeks.includes(w));
     if (missingWeeks.length) fail(`${scope} is missing week coverage: ${missingWeeks.join(", ")}.`);
-    const extraWeeks = uniqueWeeks.filter((w) => w < 1 || w > MEASURELANDS_FINAL_WEEK);
-    if (extraWeeks.length) fail(`${scope} references weeks beyond the ${MEASURELANDS_FINAL_WEEK}-week program: ${extraWeeks.join(", ")}.`);
+    const extraWeeks = uniqueWeeks.filter((w) => w < 1 || w > finalAssessedWeek);
+    if (extraWeeks.length) fail(`${scope} references excluded assessment weeks: ${extraWeeks.join(", ")}.`);
 
     for (const q of questions) {
       const qScope = `${scope} ${q.id}`;

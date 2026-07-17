@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
 import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { saveStudentProgressState } from "@/lib/student-progress-sync";
@@ -13,6 +14,9 @@ import { hasSeenLegendUnlockVideo } from "@/lib/legend-video-state";
 import { getOptionalWeeks, getProgramWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme, type RealmTheme } from "@/lib/useRealmTheme";
+import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
+import { loadAssessmentReviewItems } from "@/lib/assessment-review-state";
+import { buildLessonRoute } from "@/lib/lesson-routing";
 const POSTTEST_PASS_THRESHOLD = 85;
 const PRETEST_PASS_THRESHOLD = 85;
 
@@ -259,6 +263,20 @@ function ResultsPage() {
   const total = Number(sp.get("total") ?? "0");
   const source = sp.get("source") ?? "pretest";
   const isPostTest = sp.get("posttest") === "1";
+  const [assessmentReviewItems, setAssessmentReviewItems] = useState<MistakeReviewItem[]>([]);
+  const [showAssessmentReview, setShowAssessmentReview] = useState(false);
+
+  useEffect(() => {
+    if (source === "program_complete") {
+      setAssessmentReviewItems([]);
+      return;
+    }
+    setAssessmentReviewItems(loadAssessmentReviewItems({
+      year,
+      realmId: progressRealmId,
+      mode: isPostTest ? "posttest" : "pretest",
+    }));
+  }, [isPostTest, progressRealmId, source, year]);
 
   const scorePercent = useMemo(() => {
     if (!total || total <= 0) return 0;
@@ -451,6 +469,25 @@ function ResultsPage() {
   }
   function goContinue() {
     router.push(realmId === "measurement" ? "/measurelands" : "/levels");
+  }
+
+  if (showAssessmentReview) {
+    return (
+      <MistakeReviewPanel
+        mode={isPostTest ? "posttest" : "pretest"}
+        realmId={realmId}
+        items={assessmentReviewItems}
+        onFinish={() => setShowAssessmentReview(false)}
+        onPractice={isPostTest ? (item) => {
+          router.push(buildLessonRoute({
+            yearLabel: year,
+            week: item.week ?? 1,
+            lessonNumber: item.lesson ?? 1,
+            realmId,
+          }));
+        } : undefined}
+      />
+    );
   }
 
   return (
@@ -814,6 +851,16 @@ function ResultsPage() {
 
           {/* Action buttons */}
           <div className="px-8 pb-8 space-y-3 lg:mx-auto lg:w-full lg:max-w-md">
+            {assessmentReviewItems.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setShowAssessmentReview(true)}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-3 text-sm font-semibold text-slate-200 transition-all hover:bg-white/10 active:scale-[0.98]"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Incorrect Questions
+              </button>
+            ) : null}
             {passed ? (
               <>
                 {isPostTest || passedByProgram ? (

@@ -38,20 +38,15 @@ const PRETEST_SELECTIONS: TaskSelection[] = [
   { week: 6, lesson: 2, index: 0, skillId: "angles_around_point", skillLabel: "Angles Around a Point" },
   { week: 7, lesson: 1, index: 0, skillId: "choose_measurement_strategy", skillLabel: "Choose a Measurement Strategy" },
   { week: 7, lesson: 2, index: 0, skillId: "optimise_measurement_solution", skillLabel: "Optimise a Measurement Solution" },
-  {
-    week: 7,
-    lesson: 3,
-    index: 0,
-    linkedWeeks: [7, 8],
-    skillId: "master_measurement_investigation",
-    skillLabel: "Complete a Measurement Investigation",
-  },
+  { week: 6, lesson: 3, index: 0, skillId: "mixed_angle_reasoning", skillLabel: "Investigate Missing Angles" },
 ];
 
 // The post-test assesses the same curriculum through later, more applied variants.
 const POSTTEST_SELECTIONS: TaskSelection[] = PRETEST_SELECTIONS.map((selection) => ({
   ...selection,
-  index: 4,
+  // The capacity variant states its volume before asking for the answer. Use the
+  // packing calculation instead so the assessment never gives the answer away.
+  index: selection.week === 3 && selection.lesson === 3 ? 1 : 4,
 }));
 
 function createSeededRandom(seed: number) {

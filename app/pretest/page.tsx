@@ -9,6 +9,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { MeasurelandsAssessmentTask } from "@/components/assessment/MeasurelandsAssessmentTask";
+import type { MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
@@ -24,6 +25,7 @@ import {
 } from "@/lib/resume-state";
 import { clearActiveStudentSession } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
+import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 
 const PRETEST_PASS_THRESHOLD = 85;
 const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
@@ -37,6 +39,35 @@ function getNextYearLabel(year: string) {
 function getLowestRecommendedWeek(recommendedWeeks: number[] | undefined) {
   if (!recommendedWeeks?.length) return undefined;
   return Math.min(...recommendedWeeks);
+}
+
+function isPretestResponseCorrect(question: Question, answer: string | null | undefined): boolean {
+  if (!answer) return false;
+  if (question.answerIndex !== undefined && question.answer == null && question.correctAnswer == null) {
+    const option = (question.options ?? [])[question.answerIndex];
+    const correctLabel = typeof option === "string" || typeof option === "number" ? String(option) : option?.label;
+    return answer === correctLabel;
+  }
+  return isAssessmentAnswerCorrect(question, answer);
+}
+
+function buildPretestReviewItems(
+  questions: Question[],
+  answers: Array<string | null>
+): MistakeReviewItem[] {
+  return questions.flatMap((question, index) => {
+    if (isPretestResponseCorrect(question, answers[index])) return [];
+    return [{
+      id: question.id,
+      questionNumber: index + 1,
+      prompt: question.prompt,
+      week: question.linkedWeeks?.[0] ?? null,
+      lesson: question.linkedLessons?.[0] ?? null,
+      lessonTitle: question.skillLabel ?? null,
+      skillLabel: question.skillLabel ?? null,
+      explanation: "You will learn this during your adventure.",
+    }];
+  });
 }
 
 /* ── Inline visuals (kept from original) ── */
@@ -504,13 +535,7 @@ function PretestPage() {
     const resolved = finalAnswers ?? answers;
     const score = resolved.reduce((acc, answer, i) => {
       const q = questions[i];
-      if (!answer) return acc;
-      if (q.answerIndex !== undefined && q.answer == null && q.correctAnswer == null) {
-        const opt = (q.options ?? [])[q.answerIndex ?? 0];
-        const correctLabel = typeof opt === "string" || typeof opt === "number" ? String(opt) : opt.label;
-        return acc + (answer === correctLabel ? 1 : 0);
-      }
-      return acc + (isAssessmentAnswerCorrect(q, answer) ? 1 : 0);
+      return acc + (isPretestResponseCorrect(q, answer) ? 1 : 0);
     }, 0);
 
     const answerMap = questions.reduce<Record<string, string | undefined>>((acc, q, i) => {
@@ -625,6 +650,12 @@ function PretestPage() {
     }
 
     // Assessment complete — clear the resume snapshot so we don't re-offer it.
+    saveAssessmentReviewState({
+      year,
+      realmId: progressRealmId,
+      mode: "pretest",
+      items: buildPretestReviewItems(questions, resolved),
+    });
     clearPretestResume(year, progressRealmId);
 
     // 85%+ → celebrate the level advancement before showing the full results.
