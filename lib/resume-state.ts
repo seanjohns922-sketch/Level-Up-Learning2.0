@@ -93,6 +93,21 @@ export type LessonResumeState = {
   correctAnswers: number;
   /** Current combo chain. */
   comboCount: number;
+  /** Initial incorrect attempts captured for read-only end-of-lesson review. */
+  lessonMistakes?: Array<{
+    id: string;
+    questionNumber: number;
+    prompt: string;
+    studentAnswer?: string | null;
+    correctAnswer?: string | null;
+    explanation?: string | null;
+    week?: number | null;
+    lesson?: number | null;
+    lessonTitle?: string | null;
+    skillLabel?: string | null;
+  }>;
+  /** Per-question attempt summary used to rebuild lesson coach data on resume. */
+  attemptLog?: Array<{ topicLabel: string; correct: boolean; timeSpentSeconds: number }>;
   /** Index of the current activity/step (Year 2+ engine only). */
   activityIndex?: number;
   updatedAt: number;

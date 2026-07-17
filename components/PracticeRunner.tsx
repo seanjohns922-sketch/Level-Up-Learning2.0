@@ -15,6 +15,7 @@ import LessonReflection from "@/components/lesson/LessonReflection";
 import LessonCoachReview from "@/components/lesson/LessonCoachReview";
 import { buildCoachReview } from "@/lib/lesson-coach";
 import LessonResumeGate from "@/components/lesson/LessonResumeGate";
+import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import {
   clearLessonResume,
   loadLessonResume,
@@ -136,7 +137,22 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
     if (task.targetMinute === 15) return `Quarter past ${task.targetHour}`;
     return `Quarter to ${task.targetHour === 12 ? 1 : task.targetHour + 1}`;
   }
+  const genericTask = task as Record<string, unknown>;
+  for (const key of ["correctAnswer", "answer", "correctOption", "correctLabel", "correctReason", "targetNumber", "targetDeg"]) {
+    const value = genericTask[key];
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      return key === "targetDeg" ? `${value}°` : String(value);
+    }
+  }
   return null;
+}
+
+function getPracticeTaskWrongExplanation(task: PracticeTask) {
+  if ("feedback" in task && task.feedback && typeof task.feedback === "object" && "wrong" in task.feedback) {
+    const wrong = task.feedback.wrong;
+    if (typeof wrong === "string" && wrong.trim()) return wrong;
+  }
+  return "Compare your answer with the correct one and focus on the key clue in the question.";
 }
 
 function normalizeScalar(value: unknown): Scalar | undefined {
@@ -314,6 +330,9 @@ export function PracticeRunner({
   const [comboCount, setComboCount] = useState(0);
   const [coachDone, setCoachDone] = useState(false);
   const [reflectionDone, setReflectionDone] = useState(false);
+  const [lessonMistakeReviewDone, setLessonMistakeReviewDone] = useState(false);
+  const [showLessonMistakeReview, setShowLessonMistakeReview] = useState(false);
+  const [lessonMistakes, setLessonMistakes] = useState<MistakeReviewItem[]>([]);
   const [attemptLog, setAttemptLog] = useState<
     Array<{ topicLabel: string; correct: boolean; timeSpentSeconds: number }>
   >([]);
@@ -372,12 +391,14 @@ export function PracticeRunner({
     return safeTask;
   });
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
+  const [awaitingWrongNext, setAwaitingWrongNext] = useState(false);
+  const [currentWrongFeedback, setCurrentWrongFeedback] = useState<MistakeReviewItem | null>(null);
   const [typed, setTyped] = useState("");
   const [order, setOrder] = useState<number[]>([]);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [taskNonce, setTaskNonce] = useState(0);
   const elapsedSeconds = totalSeconds - secondsLeft;
-  const finished = secondsLeft <= 0 || questionsAnswered >= questionLimit;
+  const finished = secondsLeft <= 0 || (questionsAnswered >= questionLimit && !awaitingWrongNext);
   const { autoReadEnabled } = useAutoReadSetting();
   const speechInteractionReady = useSpeechInteractionReady();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
@@ -492,6 +513,8 @@ export function PracticeRunner({
       setCorrectAnswers(snap.correctAnswers);
       correctAnswersRef.current = snap.correctAnswers;
       setComboCount(snap.comboCount);
+      setLessonMistakes(snap.lessonMistakes ?? []);
+      setAttemptLog(snap.attemptLog ?? []);
       bestChainRef.current = Math.max(bestChainRef.current, snap.comboCount);
       // Don't replay brain breaks the student already passed before exiting.
       nextBreakIdxRef.current = brainBreakSchedule.filter((t) => snap.secondsLeft <= t).length;
@@ -503,6 +526,12 @@ export function PracticeRunner({
 
   function restartLesson() {
     if (resumeLessonKey) clearLessonResume(resumeLessonKey);
+    setLessonMistakes([]);
+    setAttemptLog([]);
+    setLessonMistakeReviewDone(false);
+    setShowLessonMistakeReview(false);
+    setAwaitingWrongNext(false);
+    setCurrentWrongFeedback(null);
     setShowLessonResume(false);
     showLessonResumeRef.current = false;
     resumeResolvedRef.current = true;
@@ -518,10 +547,12 @@ export function PracticeRunner({
       questionsAnswered,
       correctAnswers,
       comboCount,
+      lessonMistakes,
+      attemptLog,
       updatedAt: Date.now(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount]);
+  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog]);
 
   // Brain breaks fire at the scheduled seconds-left thresholds (count + timing
   // come from the teacher-set frequency × level). Each pauses the clock and uses
@@ -664,6 +695,8 @@ export function PracticeRunner({
     const generated = generateLessonTask(ctx) ?? task;
     generated.difficulty = ctx.difficulty;
     setStatus("idle");
+    setAwaitingWrongNext(false);
+    setCurrentWrongFeedback(null);
     setTyped("");
     setOrder([]);
     setHasPlayed(false);
@@ -671,6 +704,17 @@ export function PracticeRunner({
     setTaskNonce((n) => n + 1);
     scoredThisTurnRef.current = false;
     questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
+  }
+
+  function continueAfterWrong() {
+    clearPendingTimeout();
+    setAwaitingWrongNext(false);
+    setCurrentWrongFeedback(null);
+    if (questionsAnsweredRef.current >= questionLimit) {
+      setStatus("idle");
+      return;
+    }
+    nextTask();
   }
 
   function bumpSessionCounters(wasCorrect: boolean) {
@@ -688,10 +732,28 @@ export function PracticeRunner({
     return nextQuestionsAnswered;
   }
 
-  function markWrong() {
+  function markWrong(studentAnswer?: string | number | null) {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
     const topicLabel = formatPracticeTopicLabel(task.kind);
+    const questionNumber = questionsAnsweredRef.current + 1;
+    const mistake: MistakeReviewItem = {
+      id: `${resumeLessonKey ?? "lesson"}-mistake-${questionNumber}`,
+      questionNumber,
+      prompt: getPracticeTaskPrompt(task) || topicLabel,
+      studentAnswer:
+        studentAnswer === undefined || studentAnswer === null || studentAnswer === ""
+          ? "Incorrect attempt"
+          : String(studentAnswer),
+      correctAnswer: getPracticeTaskCorrectAnswer(task),
+      explanation: getPracticeTaskWrongExplanation(task),
+      week: liveContext?.week ?? null,
+      lessonTitle: liveContext?.lessonTitle ?? lessonTitle ?? null,
+      skillLabel: topicLabel,
+    };
+    setLessonMistakes((current) => [...current, mistake]);
+    setCurrentWrongFeedback(mistake);
+    setAwaitingWrongNext(true);
     setAttemptLog((current) => [
       ...current,
       {
@@ -702,7 +764,6 @@ export function PracticeRunner({
     ]);
     setStatus("wrong");
     if (liveContext) {
-      const questionNumber = questionsAnsweredRef.current + 1;
       const progressMeta = buildProgressMeta(questionNumber);
       void trackLiveLearningEvent({
         eventType: "answer_incorrect",
@@ -728,15 +789,7 @@ export function PracticeRunner({
     const nextQuestionsAnswered = bumpSessionCounters(false);
     setComboCount(0);
     clearPendingTimeout();
-    if (nextQuestionsAnswered >= questionLimit) {
-      return;
-    }
-    const wrongRevealDelay =
-      task.kind === "measurePath" &&
-      (task.scene === "estimateGuess" || task.scene === "estimateSlider" || task.scene === "estimateLonger")
-        ? 3200
-        : 1200;
-    timeoutRef.current = setTimeout(() => nextTask(), wrongRevealDelay);
+    if (nextQuestionsAnswered >= questionLimit) return;
   }
 
   function markCorrect() {
@@ -797,13 +850,13 @@ export function PracticeRunner({
     if (task.kind === "mcq") return;
     if (task.kind === "count") {
       const n = Number(typed);
-      if (!Number.isFinite(n)) return markWrong();
-      return n === task.count ? markCorrect() : markWrong();
+      if (!Number.isFinite(n)) return markWrong(typed);
+      return n === task.count ? markCorrect() : markWrong(typed);
     }
     if (task.kind === "order3") {
-      if (order.length !== task.numbers.length) return markWrong();
+      if (order.length !== task.numbers.length) return markWrong(order.length ? order.join(", ") : "Incomplete order");
       const ok = order.every((v, i) => v === correctOrder[i]);
-      return ok ? markCorrect() : markWrong();
+      return ok ? markCorrect() : markWrong(order.join(", "));
     }
   }
 
@@ -912,6 +965,52 @@ export function PracticeRunner({
         />
       );
     }
+    if (showLessonMistakeReview) {
+      return (
+        <MistakeReviewPanel
+          mode="lesson"
+          realmId={realmId}
+          items={lessonMistakes}
+          onFinish={() => {
+            setShowLessonMistakeReview(false);
+            setLessonMistakeReviewDone(true);
+          }}
+        />
+      );
+    }
+    if (liveContext && lessonMistakes.length > 0 && !lessonMistakeReviewDone) {
+      return (
+        <main className="min-h-screen bg-slate-950 px-4 py-8">
+          <div className="mx-auto flex min-h-[70vh] max-w-2xl items-center justify-center">
+            <div className="w-full rounded-3xl border border-white/10 bg-white p-6 text-center shadow-xl">
+              <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
+                Lesson Complete
+              </div>
+              <h1 className="mt-2 text-3xl font-black text-slate-950">Review My Mistakes</h1>
+              <p className="mt-2 text-sm font-semibold text-slate-600">
+                You have {lessonMistakes.length} question{lessonMistakes.length === 1 ? "" : "s"} to review. This will not change XP or your score.
+              </p>
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <button
+                  type="button"
+                  onClick={() => setShowLessonMistakeReview(true)}
+                  className="rounded-2xl bg-trust-blue px-5 py-3 font-black text-white transition hover:opacity-90"
+                >
+                  Review My Mistakes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLessonMistakeReviewDone(true)}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3 font-black text-slate-700 transition hover:bg-slate-100"
+                >
+                  Finish Lesson
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      );
+    }
     if (liveContext && !renderCompletionCard && !reflectionDone) {
       return (
         <LessonReflection
@@ -983,6 +1082,8 @@ export function PracticeRunner({
       : "bg-transparent";
 
   const statusMotion = status === "wrong" ? "animate-[shake_0.35s_ease-in-out]" : "";
+  const currentCorrectAnswer = currentWrongFeedback?.correctAnswer ?? getPracticeTaskCorrectAnswer(task);
+  const currentWrongExplanation = currentWrongFeedback?.explanation ?? getPracticeTaskWrongExplanation(task);
 
   return (
     <div className="relative">
@@ -1061,6 +1162,21 @@ export function PracticeRunner({
             </div>
           )}
 
+          {awaitingWrongNext && currentWrongFeedback ? (
+            <div className="rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-800 shadow-sm">
+              <div>Not quite.</div>
+              <div className="mt-1">
+                Your answer: <span className="font-black">{currentWrongFeedback.studentAnswer || "Incorrect attempt"}</span>
+              </div>
+              {currentCorrectAnswer ? (
+                <div className="mt-1 text-emerald-800">
+                  Correct answer: <span className="font-black">{currentCorrectAnswer}</span>
+                </div>
+              ) : null}
+              <div className="mt-1 text-red-900">{currentWrongExplanation}</div>
+            </div>
+          ) : null}
+
           {/* Main task card */}
           <div
             className={`rounded-[1.75rem] border-2 p-5 shadow-lg transition-all duration-300 ${statusBorder} ${statusMotion}`}
@@ -1099,8 +1215,15 @@ export function PracticeRunner({
             {(task as McqTask).options.map((opt: string, idx: number) => (
               <button
                 key={`${opt}-${idx}`}
-                onClick={() => opt === (task as McqTask).answer ? markCorrect() : markWrong()}
-                className="w-full text-left px-5 py-4 rounded-2xl border border-border bg-card hover:bg-muted transition text-xl font-bold"
+                onClick={() => opt === (task as McqTask).answer ? markCorrect() : markWrong(opt)}
+                className={[
+                  "w-full text-left px-5 py-4 rounded-2xl border transition text-xl font-bold",
+                  awaitingWrongNext && opt === currentWrongFeedback?.studentAnswer
+                    ? "border-red-400 bg-red-50 text-red-800"
+                    : awaitingWrongNext && opt === (task as McqTask).answer
+                      ? "border-emerald-400 bg-emerald-50 text-emerald-800"
+                      : "border-border bg-card hover:bg-muted",
+                ].join(" ")}
               >
                 {opt}
               </button>
@@ -1125,7 +1248,16 @@ export function PracticeRunner({
               </div>
               <div className="grid gap-3">
                 {t.options.map((opt: string, idx: number) => (
-                  <button key={`${opt}-${idx}`} onClick={() => opt === t.answer ? markCorrect() : markWrong()} className={`w-full text-left px-5 py-4 rounded-2xl border transition text-xl font-bold ${isMeasurement ? "border-amber-900/20 bg-[#fffaf0] hover:bg-[#fff4dd]" : "border-border bg-card hover:bg-muted"}`}>
+                  <button key={`${opt}-${idx}`} onClick={() => opt === t.answer ? markCorrect() : markWrong(opt)} className={[
+                    "w-full text-left px-5 py-4 rounded-2xl border transition text-xl font-bold",
+                    awaitingWrongNext && opt === currentWrongFeedback?.studentAnswer
+                      ? "border-red-400 bg-red-50 text-red-800"
+                      : awaitingWrongNext && opt === t.answer
+                        ? "border-emerald-400 bg-emerald-50 text-emerald-800"
+                        : isMeasurement
+                          ? "border-amber-900/20 bg-[#fffaf0] hover:bg-[#fff4dd]"
+                          : "border-border bg-card hover:bg-muted",
+                  ].join(" ")}>
                     {opt}
                   </button>
                 ))}
@@ -1178,7 +1310,7 @@ export function PracticeRunner({
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {t.cards.map((n: number) => (
-                  <button key={n} type="button" onClick={() => { if (!hasPlayed) return; if (n === t.targetNumber) { markCorrect(); } else { markWrong(); } }} className="px-4 py-6 rounded-2xl border border-border bg-card hover:bg-muted transition text-3xl font-extrabold">{n}</button>
+                  <button key={n} type="button" onClick={() => { if (!hasPlayed) return; if (n === t.targetNumber) { markCorrect(); } else { markWrong(n); } }} className="px-4 py-6 rounded-2xl border border-border bg-card hover:bg-muted transition text-3xl font-extrabold">{n}</button>
                 ))}
               </div>
               {!hasPlayed && <div className="text-sm text-muted-foreground">Tip: On iPads, audio will only play after a button tap (that&apos;s normal).</div>}
@@ -1196,7 +1328,7 @@ export function PracticeRunner({
               </div>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
                 {t.tiles.map((n: number) => (
-                  <button key={n} type="button" onClick={() => n === t.targetNumber ? markCorrect() : markWrong()} className="rounded-2xl border border-border bg-card hover:bg-muted transition text-lg sm:text-xl font-extrabold py-4 sm:py-5">{n}</button>
+                  <button key={n} type="button" onClick={() => n === t.targetNumber ? markCorrect() : markWrong(n)} className="rounded-2xl border border-border bg-card hover:bg-muted transition text-lg sm:text-xl font-extrabold py-4 sm:py-5">{n}</button>
                 ))}
               </div>
             </div>
@@ -1207,6 +1339,19 @@ export function PracticeRunner({
         {!isBuiltinKind && (
           <TaskRenderer task={task} taskNonce={taskNonce} callbacks={callbacks} />
         )}
+        {awaitingWrongNext ? (
+          <div className="mt-5 flex justify-end">
+            <button
+              type="button"
+              onClick={continueAfterWrong}
+              className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition hover:brightness-105 ${
+                isMeasurement ? "bg-[#8a6422]" : "bg-trust-blue"
+              }`}
+            >
+              Next Question
+            </button>
+          </div>
+        ) : null}
           </div>
         </div>
       </div>

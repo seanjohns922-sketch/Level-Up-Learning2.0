@@ -10,17 +10,38 @@ import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, writeProgress, t
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { MeasurelandsAssessmentTask } from "@/components/assessment/MeasurelandsAssessmentTask";
-import { analyzeAssessmentResult } from "@/data/assessments/analysis";
+import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
+import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getLastProgramWeek, getProgramWeeks, getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
 import { buildAssessmentReturnRoute } from "@/lib/assessment-routes";
+import { buildLessonRoute } from "@/lib/lesson-routing";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { saveRealmAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 
 const PASS_THRESHOLD = 85;
+
+function buildPosttestPracticeReviewItems(
+  questions: Question[],
+  answers: Record<string, string>
+): MistakeReviewItem[] {
+  return questions.flatMap((question, index) => {
+    if (isAssessmentAnswerCorrect(question, answers[question.id])) return [];
+    return [{
+      id: question.id,
+      questionNumber: index + 1,
+      prompt: question.prompt,
+      week: question.linkedWeeks?.[0] ?? null,
+      lesson: question.linkedLessons?.[0] ?? null,
+      lessonTitle: question.skillLabel ?? null,
+      skillLabel: question.skillLabel ?? null,
+      explanation: "Practice this lesson to improve.",
+    }];
+  });
+}
 
 function MabPicker({
   target,
@@ -313,6 +334,8 @@ function PostTestPage() {
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [posttestReviewItems, setPosttestReviewItems] = useState<MistakeReviewItem[]>([]);
+  const [pendingResultsUrl, setPendingResultsUrl] = useState<string | null>(null);
   const [mab, setMab] = useState<{ tens: number; ones: number }>({
     tens: 0,
     ones: 0,
@@ -461,9 +484,14 @@ function PostTestPage() {
       }
     })();
 
-    router.push(
-      `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`
-    );
+    const resultsUrl = `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`;
+    const reviewItems = buildPosttestPracticeReviewItems(questions, answers);
+    if (reviewItems.length > 0) {
+      setPosttestReviewItems(reviewItems);
+      setPendingResultsUrl(resultsUrl);
+      return;
+    }
+    router.push(resultsUrl);
   }
 
   if (!questions.length) {
@@ -485,6 +513,27 @@ function PostTestPage() {
           </button>
         </div>
       </main>
+    );
+  }
+
+  if (pendingResultsUrl) {
+    return (
+      <MistakeReviewPanel
+        mode="posttest"
+        realmId={realmId}
+        items={posttestReviewItems}
+        onFinish={() => router.push(pendingResultsUrl)}
+        onPractice={(item) => {
+          router.push(
+            buildLessonRoute({
+              yearLabel: year,
+              week: item.week ?? 1,
+              lessonNumber: item.lesson ?? 1,
+              realmId,
+            })
+          );
+        }}
+      />
     );
   }
 
