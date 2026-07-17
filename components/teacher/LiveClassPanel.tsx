@@ -81,6 +81,30 @@ type LiveActivityEventRow = {
   payload: Record<string, unknown> | null;
 };
 
+type CompletedActivityAttemptRow = {
+  student_id: string;
+  realm_id: string;
+  working_level: string;
+  week: number;
+  lesson?: number | null;
+  lesson_id?: string | null;
+  quiz_id?: string | null;
+  attempt_no: number;
+  correct_count: number;
+  total_questions: number;
+  accuracy_percent: number;
+  completed?: boolean | null;
+  completed_at: string;
+  activity_type: "lesson" | "quiz";
+};
+
+type CompletedActivityAttemptSummary = {
+  attemptNumber: number | null;
+  answered?: number | null;
+  correct?: number | null;
+  accuracy?: number | null;
+};
+
 type LiveStudentCard = {
   id: string;
   displayName: string;
@@ -168,21 +192,66 @@ function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEv
   );
 }
 
-function buildCurrentLessonAttemptNumber(
+function normalizeAttemptRealm(value?: string | null) {
+  return value === "measurement" || value === "measurelands" ? "measurement" : "number";
+}
+
+function lessonNumberFromRow(row: LiveStudentActivityRow) {
+  const lessonIdMatch = /(?:^|-)l(\d+)$/i.exec(row.current_lesson ?? "");
+  if (lessonIdMatch) return Number(lessonIdMatch[1]);
+  const titleMatch = /lesson\s*(\d+)/i.exec(row.current_lesson_title ?? "");
+  return titleMatch ? Number(titleMatch[1]) : null;
+}
+
+function isQuizActivity(row: LiveStudentActivityRow) {
+  return /quiz/i.test(`${row.current_lesson ?? ""} ${row.current_lesson_title ?? ""}`);
+}
+
+function matchesCompletedAttempt(row: LiveStudentActivityRow, attempt: CompletedActivityAttemptRow) {
+  if (attempt.student_id !== row.student_id) return false;
+  if (attempt.realm_id !== normalizeAttemptRealm(row.current_strand)) return false;
+  if (row.current_level && attempt.working_level !== row.current_level) return false;
+  if (row.current_week != null && attempt.week !== row.current_week) return false;
+
+  if (isQuizActivity(row)) {
+    return attempt.activity_type === "quiz" && (!row.current_lesson || attempt.quiz_id === row.current_lesson || /quiz/i.test(row.current_lesson));
+  }
+
+  if (attempt.activity_type !== "lesson") return false;
+  const lessonNumber = lessonNumberFromRow(row);
+  return Boolean(
+    (row.current_lesson && attempt.lesson_id === row.current_lesson) ||
+    (lessonNumber != null && attempt.lesson === lessonNumber)
+  );
+}
+
+function buildCompletedActivityAttemptSummary(
   row: LiveStudentActivityRow | null | undefined,
-  events: LiveActivityEventRow[],
-) {
+  attempts: CompletedActivityAttemptRow[],
+): CompletedActivityAttemptSummary | null {
   if (!row) return null;
 
-  const startedAttempts = events.filter((event) => {
-    if (event.event_type !== "lesson_started" && event.event_type !== "quiz_started") return false;
-    return matchesCurrentLesson(row, event);
-  }).length;
+  const completedAttempts = attempts
+    .filter((attempt) => attempt.completed !== false && matchesCompletedAttempt(row, attempt))
+    .sort((left, right) => {
+      if (right.attempt_no !== left.attempt_no) return right.attempt_no - left.attempt_no;
+      return new Date(right.completed_at).getTime() - new Date(left.completed_at).getTime();
+    });
 
-  if (startedAttempts > 0) return startedAttempts;
+  const latest = completedAttempts[0] ?? null;
+  if (latest) {
+    return {
+      attemptNumber: Math.max(1, latest.attempt_no),
+      answered: Math.max(0, latest.total_questions ?? 0),
+      correct: Math.max(0, latest.correct_count ?? 0),
+      accuracy: Math.max(0, latest.accuracy_percent ?? 0),
+    };
+  }
 
-  const rowAttempt = numberOrNull(row.attempt_number);
-  return rowAttempt != null && rowAttempt > 0 ? Math.round(rowAttempt) : null;
+  const hasActivity = Boolean(row.last_active_at || row.current_lesson || row.current_lesson_title);
+  return {
+    attemptNumber: hasActivity ? 1 : null,
+  };
 }
 
 function buildCurrentLessonPerformance(
@@ -262,7 +331,7 @@ function toLiveCard(
   student: StudentRow,
   row?: LiveStudentActivityRow | null,
   lessonPerformance?: ReturnType<typeof buildCurrentLessonPerformance> | null,
-  attemptNumber?: number | null,
+  completedAttemptSummary?: CompletedActivityAttemptSummary | null,
 ): LiveStudentCard {
   const insight = row
     ? buildLiveStudentInsight({
@@ -326,10 +395,10 @@ function toLiveCard(
     latestCorrectAnswer: row?.latest_correct_answer ?? null,
     latestAnswerCorrect: row?.latest_answer_correct ?? null,
     timeOnCurrentQuestion: row?.time_on_current_question ?? 0,
-    attemptNumber: attemptNumber ?? null,
-    questionsAnswered: lessonPerformance?.answered ?? null,
-    correctCount: lessonPerformance?.correct ?? null,
-    accuracyPercent: lessonPerformance?.accuracy ?? null,
+    attemptNumber: completedAttemptSummary?.attemptNumber ?? null,
+    questionsAnswered: completedAttemptSummary?.answered ?? lessonPerformance?.answered ?? null,
+    correctCount: completedAttemptSummary?.correct ?? lessonPerformance?.correct ?? null,
+    accuracyPercent: completedAttemptSummary?.accuracy ?? lessonPerformance?.accuracy ?? null,
     currentLessonStatus: lessonPerformance?.completed ? "completed" : (row?.current_lesson_status ?? null),
     completedAt: row?.completed_at ?? null,
     lessonStartedAt: row?.lesson_started_at ?? null,
@@ -412,6 +481,7 @@ export default function LiveClassPanel({
 }) {
   const [rows, setRows] = useState<LiveStudentActivityRow[]>([]);
   const [events, setEvents] = useState<LiveActivityEventRow[]>([]);
+  const [completedAttempts, setCompletedAttempts] = useState<CompletedActivityAttemptRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<LiveStatusFilter>("all");
   const [spotlightMode, setSpotlightMode] = useState(false);
@@ -445,6 +515,7 @@ export default function LiveClassPanel({
         if (!cancelled) {
           setRows([]);
           setEvents([]);
+          setCompletedAttempts([]);
           setLoading(false);
         }
         return;
@@ -469,15 +540,43 @@ export default function LiveClassPanel({
           "quiz_completed",
         ])
         .order("created_at", { ascending: true });
+      const { data: lessonAttemptData, error: lessonAttemptError } = await supabase
+        .from("student_lesson_attempts")
+        .select("student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at")
+        .eq("class_id", selectedClass.id)
+        .eq("completed", true);
+      const { data: quizAttemptData, error: quizAttemptError } = await supabase
+        .from("student_weekly_quiz_attempts")
+        .select("student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at")
+        .eq("class_id", selectedClass.id);
       if (error) {
         console.warn("[LiveClassPanel] Failed to load live student activity", error);
       }
       if (eventError) {
         console.warn("[LiveClassPanel] Failed to load live activity events", eventError);
       }
+      if (lessonAttemptError) {
+        console.warn("[LiveClassPanel] Failed to load completed lesson attempts", lessonAttemptError);
+      }
+      if (quizAttemptError) {
+        console.warn("[LiveClassPanel] Failed to load completed quiz attempts", quizAttemptError);
+      }
       if (!cancelled) {
         setRows((data ?? []) as LiveStudentActivityRow[]);
         setEvents((eventData ?? []) as LiveActivityEventRow[]);
+        setCompletedAttempts([
+          ...((lessonAttemptData ?? []) as Omit<CompletedActivityAttemptRow, "activity_type">[]).map((attempt) => ({
+            ...attempt,
+            activity_type: "lesson" as const,
+          })),
+          ...((quizAttemptData ?? []) as Omit<CompletedActivityAttemptRow, "activity_type" | "completed" | "lesson" | "lesson_id">[]).map((attempt) => ({
+            ...attempt,
+            completed: true,
+            lesson: null,
+            lesson_id: null,
+            activity_type: "quiz" as const,
+          })),
+        ]);
         setLoading(false);
       }
     }
@@ -534,10 +633,10 @@ export default function LiveClassPanel({
       const row = rowMap.get(student.id);
       const studentEvents = eventMap.get(student.id) ?? [];
       const lessonPerformance = buildCurrentLessonPerformance(row, studentEvents);
-      const attemptNumber = buildCurrentLessonAttemptNumber(row, studentEvents);
-      return toLiveCard(student, row, lessonPerformance, attemptNumber);
+      const completedAttemptSummary = buildCompletedActivityAttemptSummary(row, completedAttempts);
+      return toLiveCard(student, row, lessonPerformance, completedAttemptSummary);
     });
-  }, [events, rows, students]);
+  }, [completedAttempts, events, rows, students]);
 
   const filteredCards = useMemo(() => {
     let base = filter === "all" ? cards : cards.filter((card) => getCardDisplayGroup(card) === filter);
