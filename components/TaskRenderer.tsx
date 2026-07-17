@@ -456,7 +456,7 @@ function TaskRendererInner({
     case "timetable":
       return wrapMeasurelands(<MeasurelandsTimetableCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "protractor":
-      return wrapMeasurelands(<MeasurelandsProtractorCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+      return wrapMeasurelands(<MeasurelandsProtractorCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />);
     case "massMeasure":
       return wrapMeasurelands(<MeasurelandsMassMeasureCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "massUnit":

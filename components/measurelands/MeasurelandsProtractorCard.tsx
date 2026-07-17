@@ -123,18 +123,41 @@ function MistakeScene({ task, onCorrect, onWrong }: { task: ProtractorTask; onCo
 }
 
 /* ── L3 Construct (drag) ── */
-function ConstructScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () => void }) {
+function ConstructScene({
+  task,
+  onCorrect,
+  onWrong,
+  assessmentMode,
+}: {
+  task: ProtractorTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+  assessmentMode: boolean;
+}) {
   const target = task.targetDeg ?? 45;
   const [deg, setDeg] = useState(0);
+  const [hasMoved, setHasMoved] = useState(false);
   const atTarget = deg === target;
+  const handleDegreeChange = (value: number) => {
+    setHasMoved(true);
+    setDeg(value);
+  };
+  const handleSubmit = () => {
+    if (deg === target) onCorrect();
+    else onWrong();
+  };
   return (
     <Shell badge={task.badgeLabel ?? "Build the Angle"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="flex flex-col items-center gap-1 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-2">
         <ContextLine task={task} />
-        <MeasurelandsProtractor interactive baselineSide="right" targetDeg={target} currentDeg={deg} onDeg={setDeg} guidance="none" />
-        <p className="text-center text-[13px] font-black text-[#5b21b6]">Target: {target}° — drag the purple arm to build it.</p>
+        <MeasurelandsProtractor interactive baselineSide="right" targetDeg={assessmentMode ? undefined : target} currentDeg={deg} onDeg={handleDegreeChange} guidance="none" />
+        {!assessmentMode ? <p className="text-center text-[13px] font-black text-[#5b21b6]">Target: {target}° — drag the purple arm to build it.</p> : null}
       </div>
-      <button type="button" disabled={!atTarget} onClick={onCorrect} className={`mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 px-10 text-xl font-black uppercase shadow-sm transition ${atTarget ? "border-[#16a34a] bg-[#16a34a] text-white hover:-translate-y-0.5" : "border-[rgba(214,184,108,0.5)] bg-[#f3ead2] text-[#a98b52]"}`}>{atTarget ? `Build ${target}° ✓` : `Build (${deg}°)`}</button>
+      {assessmentMode ? (
+        <button type="button" disabled={!hasMoved} onClick={handleSubmit} className={`mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 px-10 text-xl font-black uppercase shadow-sm transition ${hasMoved ? "border-[#5b21b6] bg-[#5b21b6] text-white hover:-translate-y-0.5" : "border-[rgba(214,184,108,0.5)] bg-[#f3ead2] text-[#a98b52]"}`}>Record angle</button>
+      ) : (
+        <button type="button" disabled={!atTarget} onClick={onCorrect} className={`mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 px-10 text-xl font-black uppercase shadow-sm transition ${atTarget ? "border-[#16a34a] bg-[#16a34a] text-white hover:-translate-y-0.5" : "border-[rgba(214,184,108,0.5)] bg-[#f3ead2] text-[#a98b52]"}`}>{atTarget ? `Build ${target}° ✓` : `Build (${deg}°)`}</button>
+      )}
     </Shell>
   );
 }
@@ -270,7 +293,7 @@ function AlienScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () =
   );
 }
 
-export function MeasurelandsProtractorCard({ task, onCorrect, onWrong }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void }) {
+export function MeasurelandsProtractorCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void; assessmentMode?: boolean }) {
   switch (task.scene) {
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
     case "learn": return <LearnScene task={task} onCorrect={onCorrect} />;
@@ -281,6 +304,6 @@ export function MeasurelandsProtractorCard({ task, onCorrect, onWrong }: { task:
     case "read": return <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Read the Protractor" />;
     case "whichScale": return <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Which Scale?" />;
     case "mistake": return <MistakeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-    default: return <ConstructScene task={task} onCorrect={onCorrect} />;
+    default: return <ConstructScene task={task} onCorrect={onCorrect} onWrong={onWrong} assessmentMode={assessmentMode} />;
   }
 }
