@@ -1015,10 +1015,10 @@ function getStructuredQuizQuestionId(
   fallbackFingerprint: string
 ) {
   const mode = typeof activity.config?.mode === "string" ? String(activity.config.mode) : activity.activityType;
-  const text =
-    questionData.kind === "multiple_choice" || questionData.kind === "typed_response"
-      ? `${questionData.prompt} ${questionData.answer ?? ""}`
-      : JSON.stringify(questionData);
+  if (questionData.kind !== "multiple_choice" && questionData.kind !== "typed_response") {
+    return `${mode}-${fallbackFingerprint}`;
+  }
+  const text = `${questionData.prompt} ${questionData.answer ?? ""}`;
   const normalizedText = String(text ?? "").toLowerCase().replace(/\s+/g, " ").trim();
   const symbolMatch = normalizedText.match(/[+×÷-]/);
   const operation =
@@ -1398,26 +1398,44 @@ function buildStructuredWeeklyQuizQuestions(
     for (const candidate of selectedCandidates) {
       seenQuestions.add(candidate.questionId);
       selectedActivityTypes.push(candidate.sourceActivity.activityType);
+      const index = questions.length + 1;
       const assessmentQuestion = toAssessmentTypedQuizQuestion(
         candidate.questionData,
         lessonNumber,
         candidate.sourceActivity.activityType,
-        questions.length + 1,
+        index,
         candidate.quizMeta
       );
+      const convertedQuestion = assessmentQuestion ?? toQuizQuestionFromYear2Data(
+        candidate.questionData,
+        lessonNumber,
+        candidate.sourceActivity.activityType,
+        index,
+        selectedActivityTypes.length
+      );
       questions.push(
-        assessmentQuestion ?? {
-          id: `q${questions.length + 1}`,
-          lessonNumber,
-          lessonTag: lessonNumber,
-          skill: candidate.sourceActivity.activityType,
-          activityType: candidate.sourceActivity.activityType,
-          kind: "lessonActivity",
-          prompt: candidate.questionData.prompt,
-          activity: candidate.sourceActivity,
-          questionData: candidate.questionData,
-          quizMeta: candidate.quizMeta,
-        }
+        convertedQuestion
+          ? {
+              ...convertedQuestion,
+              id: `q${index}`,
+              lessonNumber,
+              lessonTag: lessonNumber,
+              skill: convertedQuestion.skill ?? candidate.sourceActivity.activityType,
+              activityType: convertedQuestion.activityType ?? candidate.sourceActivity.activityType,
+              quizMeta: candidate.quizMeta,
+            }
+          : {
+              id: `q${index}`,
+              lessonNumber,
+              lessonTag: lessonNumber,
+              skill: candidate.sourceActivity.activityType,
+              activityType: candidate.sourceActivity.activityType,
+              kind: "lessonActivity",
+              prompt: candidate.questionData.prompt,
+              activity: candidate.sourceActivity,
+              questionData: candidate.questionData,
+              quizMeta: candidate.quizMeta,
+            }
       );
     }
 
