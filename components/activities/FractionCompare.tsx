@@ -45,7 +45,7 @@ export default function FractionCompare({
 }: {
   questionData: FractionCompareQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
   const isTapSide = questionData.mode === "greater_less_visual";
@@ -65,7 +65,7 @@ export default function FractionCompare({
   function chooseSide(side: "left" | "right") {
     setPicked(side);
     if (side === questionData.answer) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(side);
   }
 
   return (
@@ -133,7 +133,7 @@ export default function FractionCompare({
           </div>
           <button
             type="button"
-            onClick={() => (picked === questionData.answer ? onCorrect?.() : onWrong?.())}
+            onClick={() => (picked === questionData.answer ? onCorrect?.() : onWrong?.(picked ?? undefined))}
             disabled={!picked}
             className="mt-4 w-full rounded-2xl bg-emerald-600 px-5 py-3 font-black text-white hover:bg-emerald-700 disabled:opacity-40"
           >

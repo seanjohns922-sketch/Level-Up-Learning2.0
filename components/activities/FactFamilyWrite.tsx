@@ -20,7 +20,7 @@ export default function FactFamilyWrite({
 }: {
   questionData: FactFamilyQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [inputs, setInputs] = useState(["", "", "", ""]);
   const [submitted, setSubmitted] = useState(false);
@@ -64,7 +64,7 @@ export default function FactFamilyWrite({
 
     setResults(matchResults);
     if (matchResults.every(Boolean) && remaining.length === 0) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(inputs.filter((input) => input.trim()).join("; "));
   }
 
   const labels =

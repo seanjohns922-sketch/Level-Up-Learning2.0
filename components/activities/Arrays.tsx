@@ -11,7 +11,7 @@ export default function Arrays({
 }: {
   questionData: ArraysQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [picked, setPicked] = useState<number | string | null>(null);
 
@@ -23,7 +23,7 @@ export default function Arrays({
     ) {
       onCorrect?.();
     }
-    else onWrong?.();
+    else onWrong?.(String(option));
   }
 
   return (

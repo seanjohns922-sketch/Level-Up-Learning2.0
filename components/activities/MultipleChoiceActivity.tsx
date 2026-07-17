@@ -197,7 +197,7 @@ export default function MultipleChoiceActivity({
 }: {
   questionData: MultipleChoiceQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
   realmId?: string;
 }) {
@@ -240,6 +240,7 @@ export default function MultipleChoiceActivity({
   }
 
   function choose(option: string) {
+    if (renderMode === "lesson" && submitted) return;
     if (isMultiSelect) {
       if (submitted) return;
       setSelected((current) =>
@@ -248,8 +249,9 @@ export default function MultipleChoiceActivity({
       return;
     }
     setPicked(option);
+    if (renderMode === "lesson") setSubmitted(true);
     if (option === questionData.answer) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(option);
   }
 
   function submitMultiSelect() {
@@ -278,7 +280,7 @@ export default function MultipleChoiceActivity({
           "Partly right. You found one correct answer, but there is another one too."
       );
       setFeedbackTone("partial");
-      onWrong?.();
+      onWrong?.(selected.join(", "));
       return;
     }
 
@@ -286,7 +288,7 @@ export default function MultipleChoiceActivity({
       questionData.incorrectFeedback ?? "That selection does not match the question."
     );
     setFeedbackTone("wrong");
-    onWrong?.();
+    onWrong?.(selected.join(", "));
   }
 
   return (
@@ -458,7 +460,13 @@ export default function MultipleChoiceActivity({
               className={[
                 "group relative w-full rounded-2xl border px-5 py-4 text-left text-xl md:text-[1.4rem] font-extrabold tracking-tight transition-all duration-150",
                 "active:translate-y-[1px] active:shadow-none",
-                isMeasurement
+                renderMode === "lesson" && submitted && !isMultiSelect
+                  ? option === questionData.answer
+                    ? "border-emerald-400 bg-emerald-50 text-emerald-900 ring-1 ring-emerald-300"
+                    : isPicked
+                    ? "border-red-400 bg-red-50 text-red-900 ring-1 ring-red-300"
+                    : "border-slate-200 bg-white text-slate-500"
+                : isMeasurement
                   ? isPicked
                     ? "border-amber-500/60 bg-amber-50 text-amber-900 shadow-[0_2px_0_rgba(180,83,9,0.2),inset_0_1px_0_rgba(255,255,255,0.8)] ring-1 ring-amber-400/40"
                     : "border-amber-800/25 bg-[#fdf6e8] text-slate-800 hover:-translate-y-[1px] hover:border-amber-600/40 hover:shadow-[0_4px_12px_rgba(180,83,9,0.1)]"

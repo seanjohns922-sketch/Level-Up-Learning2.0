@@ -20,7 +20,7 @@ export default function BenchmarkSort({
 }: {
   questionData: BenchmarkSortQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const valuesKey = useMemo(
     () => questionData.values.map((value) => value.id).join("|"),
@@ -34,13 +34,8 @@ export default function BenchmarkSort({
     key: string;
     placements: Record<string, BenchmarkCategory | null>;
   }>(() => ({ key: valuesKey, placements: initialPlacements }));
-  const [feedbackState, setFeedbackState] = useState<{
-    key: string;
-    feedbackById: Record<string, "correct" | "wrong" | undefined>;
-  }>(() => ({ key: valuesKey, feedbackById: {} }));
   const submittedRef = useRef<string | null>(null);
   const placements = placementState.key === valuesKey ? placementState.placements : initialPlacements;
-  const feedbackById = feedbackState.key === valuesKey ? feedbackState.feedbackById : {};
 
   const allPlaced = useMemo(
     () => questionData.values.length > 0 && questionData.values.every((value) => placements[value.id]),
@@ -52,24 +47,21 @@ export default function BenchmarkSort({
     const allCorrect = questionData.values.every((value) => placements[value.id] === value.category);
     submittedRef.current = valuesKey;
     if (allCorrect) onCorrect?.();
-    else onWrong?.();
+    else {
+      const submitted = questionData.values
+        .map((value) => `${value.label} → ${placements[value.id] ?? "unplaced"}`)
+        .join(", ");
+      onWrong?.(submitted);
+    }
   }, [allPlaced, onCorrect, onWrong, placements, questionData.values, valuesKey]);
 
   function placeValue(id: string, category: BenchmarkCategory) {
     if (submittedRef.current === valuesKey) return;
-    const value = questionData.values.find((item) => item.id === id);
     setPlacementState((current) => ({
       key: valuesKey,
       placements: {
         ...(current.key === valuesKey ? current.placements : initialPlacements),
         [id]: category,
-      },
-    }));
-    setFeedbackState((current) => ({
-      key: valuesKey,
-      feedbackById: {
-        ...(current.key === valuesKey ? current.feedbackById : {}),
-        [id]: value?.category === category ? "correct" : "wrong",
       },
     }));
   }
@@ -102,14 +94,7 @@ export default function BenchmarkSort({
           {questionData.values.map((value) => (
             <div
               key={value.id}
-              className={[
-                "rounded-2xl border bg-white p-4 shadow-sm",
-                feedbackById[value.id] === "correct"
-                  ? "border-emerald-300 ring-1 ring-emerald-200"
-                  : feedbackById[value.id] === "wrong"
-                  ? "border-rose-300 ring-1 ring-rose-200"
-                  : "border-white",
-              ].join(" ")}
+              className="rounded-2xl border border-white bg-white p-4 shadow-sm"
             >
               <div className="text-center text-3xl font-black text-slate-900">
                 <MathFormattedText text={value.label} compactFractions />
@@ -131,18 +116,6 @@ export default function BenchmarkSort({
                   </button>
                 ))}
               </div>
-              {feedbackById[value.id] ? (
-                <p
-                  className={[
-                    "mt-2 text-center text-xs font-bold",
-                    feedbackById[value.id] === "correct" ? "text-emerald-700" : "text-rose-700",
-                  ].join(" ")}
-                >
-                  {feedbackById[value.id] === "correct"
-                    ? "Correct benchmark."
-                    : "Try comparing it to 1/2."}
-                </p>
-              ) : null}
             </div>
           ))}
         </div>

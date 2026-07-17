@@ -47,7 +47,7 @@ function PlaceValueBuilderInner({
 }: {
   questionData: PlaceValueBuilderQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [response, setResponse] = useState("");
 
@@ -77,11 +77,11 @@ function PlaceValueBuilderInner({
     if (cleaned === "") return;
     const numericResponse = Number(cleaned);
     if (!Number.isFinite(numericResponse)) {
-      onWrong?.();
+      onWrong?.(response);
       return;
     }
     if (numericResponse === expectedPlaceValueAnswer(questionData)) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(response);
   }
 
   return (
@@ -152,7 +152,7 @@ function PlaceValueBuilderInner({
 export default function PlaceValueBuilder(props: {
   questionData: PlaceValueBuilderQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const { questionData } = props;
   const questionKey = JSON.stringify({

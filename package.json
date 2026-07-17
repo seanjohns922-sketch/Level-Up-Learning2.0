@@ -11,6 +11,7 @@
     "qa:year2-smoke": "node scripts/year2-smoke-qa.mjs",
     "qa:level-aware-regression": "node scripts/level-aware-regression.mjs",
     "qa:quiz-nav": "node scripts/quiz-nav-audit.mjs",
+    "qa:guided-lesson-feedback": "node scripts/guided-lesson-feedback-audit.mjs",
     "qa:level-integrity": "node scripts/level-integrity-audit.mjs",
     "qa:measurelands-assessments": "npx tsx scripts/audit-measurelands-assessments.ts",
     "qa:assessment-routes": "npx tsx scripts/audit-assessment-routes.ts"

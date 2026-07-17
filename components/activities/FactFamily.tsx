@@ -20,7 +20,7 @@ export default function FactFamily({
 }: {
   questionData: FactFamilyQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
@@ -47,7 +47,7 @@ export default function FactFamily({
     const allCorrectPicked = [...correctSet].every((a) => normalizedSelected.has(a));
     const noWrongPicked = [...normalizedSelected].every((s) => correctSet.has(s));
     if (allCorrectPicked && noWrongPicked) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.([...selected].join("; "));
   }
 
   const [a, b, total] = questionData.family;

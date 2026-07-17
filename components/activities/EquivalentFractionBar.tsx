@@ -45,7 +45,7 @@ export default function EquivalentFractionBar({
 }: {
   questionData: Question;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [pickedId, setPickedId] = useState<string | null>(null);
   const [pickedAnswer, setPickedAnswer] = useState<"yes" | "no" | null>(null);
@@ -91,7 +91,7 @@ export default function EquivalentFractionBar({
           </div>
           <button
             type="button"
-            onClick={() => (pickedId === questionData.correctChoiceId ? onCorrect?.() : onWrong?.())}
+            onClick={() => (pickedId === questionData.correctChoiceId ? onCorrect?.() : onWrong?.(pickedId ?? undefined))}
             disabled={!pickedId}
             className="mt-4 w-full rounded-2xl bg-emerald-600 px-5 py-3 font-black text-white hover:bg-emerald-700 disabled:opacity-40"
           >
@@ -125,7 +125,7 @@ export default function EquivalentFractionBar({
           </div>
           <button
             type="button"
-            onClick={() => (pickedId === questionData.correctOptionId ? onCorrect?.() : onWrong?.())}
+            onClick={() => (pickedId === questionData.correctOptionId ? onCorrect?.() : onWrong?.(pickedId ?? undefined))}
             disabled={!pickedId}
             className="mt-4 w-full rounded-2xl bg-emerald-600 px-5 py-3 font-black text-white hover:bg-emerald-700 disabled:opacity-40"
           >
@@ -157,7 +157,7 @@ export default function EquivalentFractionBar({
           </div>
           <button
             type="button"
-            onClick={() => (pickedAnswer === questionData.answer ? onCorrect?.() : onWrong?.())}
+            onClick={() => (pickedAnswer === questionData.answer ? onCorrect?.() : onWrong?.(pickedAnswer ?? undefined))}
             disabled={!pickedAnswer}
             className="mt-4 w-full rounded-2xl bg-emerald-600 px-5 py-3 font-black text-white hover:bg-emerald-700 disabled:opacity-40"
           >

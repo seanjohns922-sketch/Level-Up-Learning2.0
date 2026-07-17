@@ -394,7 +394,7 @@ export default function NumberLineActivity({
 }: {
   questionData: NumberLineQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const isRounding = questionData.mode === "rounding";
   const [roundingStep, setRoundingStep] = useState<"type" | "place" | "done">("type");
@@ -451,7 +451,7 @@ export default function NumberLineActivity({
       onCorrect?.();
     } else {
       setIsCorrect(false);
-      onWrong?.();
+      onWrong?.(String(placed));
     }
   }
 

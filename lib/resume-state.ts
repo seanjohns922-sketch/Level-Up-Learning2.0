@@ -105,6 +105,8 @@ export type LessonResumeState = {
     lesson?: number | null;
     lessonTitle?: string | null;
     skillLabel?: string | null;
+    taskId?: string | null;
+    taskData?: unknown;
   }>;
   /** Per-question attempt summary used to rebuild lesson coach data on resume. */
   attemptLog?: Array<{ topicLabel: string; correct: boolean; timeSpentSeconds: number }>;
@@ -119,6 +121,11 @@ export type LessonResumeState = {
   questionSequence?: number;
   questionKey?: number;
   feedbackStatus?: "idle" | "correct" | "wrong";
+  wrongFeedback?: {
+    studentAnswer: string;
+    correctAnswer: string;
+    explanation: string;
+  } | null;
   scoredCurrentTurn?: boolean;
   coachDone?: boolean;
   mistakeReviewDone?: boolean;

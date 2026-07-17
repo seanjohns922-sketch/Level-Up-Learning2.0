@@ -15,7 +15,7 @@ export default function NumberOrder({
 }: {
   questionData: NumberOrderQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
 }) {
   const isFractionOrder = Array.isArray(questionData.fractions) && questionData.fractions.length > 0;
@@ -87,7 +87,7 @@ export default function NumberOrder({
     const expected = correctOrder[selected.length];
     if (value !== expected) {
       setWrongValue(value);
-      onWrong?.();
+      onWrong?.([...selected, value].join(" → "));
       return;
     }
 
@@ -178,7 +178,7 @@ export default function NumberOrder({
     if (selected.some((value) => !value)) {
       setSubmitted(true);
       setSubmittedCorrect(false);
-      onWrong?.();
+      onWrong?.(selected.filter(Boolean).join(" → "));
       return;
     }
 
@@ -188,7 +188,7 @@ export default function NumberOrder({
     if (isCorrect) {
       onCorrect?.();
     } else {
-      onWrong?.();
+      onWrong?.(selected.join(" → "));
     }
   }
 

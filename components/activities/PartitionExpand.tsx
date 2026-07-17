@@ -34,7 +34,7 @@ export default function PartitionExpand({
 }: {
   questionData: PartitionExpandQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const hasThousands = (questionData.standard.thousands ?? 0) > 0 || questionData.target >= 1000;
 
@@ -105,7 +105,7 @@ export default function PartitionExpand({
           ones === stdOnes;
 
     if (isCorrect) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(quantityExpression);
   }
 
   const total = places.reduce((sum, place) => {

@@ -15,6 +15,8 @@ export type MistakeReviewItem = {
   lesson?: number | null;
   lessonTitle?: string | null;
   skillLabel?: string | null;
+  taskId?: string | null;
+  taskData?: unknown;
 };
 
 type MistakeReviewPanelProps = {

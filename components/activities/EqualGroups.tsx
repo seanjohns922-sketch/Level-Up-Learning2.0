@@ -11,14 +11,14 @@ export default function EqualGroups({
 }: {
   questionData: EqualGroupsQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
 
   function choose(option: number) {
     setPicked(option);
     if (option === questionData.answer) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(String(option));
   }
 
   return (

@@ -63,7 +63,7 @@ type LessonRendererProps = {
   prompt: string;
   questionData: Year2QuestionData;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
   realmId?: string;
 };
@@ -243,7 +243,7 @@ function renderNestedActivity({
   questionData: Year2QuestionData;
   prompt: string;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
 }) {
   return (

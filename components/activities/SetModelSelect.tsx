@@ -76,7 +76,7 @@ export default function SetModelSelect({
 }: {
   questionData: SetModelSelectQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [selected, setSelected] = useState<number[]>([]);
   const [pickedOption, setPickedOption] = useState<string | null>(null);
@@ -108,7 +108,7 @@ export default function SetModelSelect({
           />
           <button
             type="button"
-            onClick={() => (selected.length === questionData.answer ? onCorrect?.() : onWrong?.())}
+            onClick={() => (selected.length === questionData.answer ? onCorrect?.() : onWrong?.(`${selected.length} counters`))}
             className="mt-4 w-full rounded-2xl bg-sky-600 px-5 py-3 font-black text-white hover:bg-sky-700"
           >
             Check counters
@@ -138,7 +138,7 @@ export default function SetModelSelect({
           ))}
           <button
             type="button"
-            onClick={() => (pickedOption === questionData.correctOptionId ? onCorrect?.() : onWrong?.())}
+            onClick={() => (pickedOption === questionData.correctOptionId ? onCorrect?.() : onWrong?.(pickedOption ?? undefined))}
             disabled={!pickedOption}
             className="sm:col-span-3 rounded-2xl bg-sky-600 px-5 py-3 font-black text-white hover:bg-sky-700 disabled:opacity-40"
           >
@@ -174,7 +174,7 @@ export default function SetModelSelect({
           </div>
           <button
             type="button"
-            onClick={() => (pickedNumber === questionData.answer ? onCorrect?.() : onWrong?.())}
+            onClick={() => (pickedNumber === questionData.answer ? onCorrect?.() : onWrong?.(String(pickedNumber)))}
             disabled={pickedNumber === null}
             className="mt-4 w-full rounded-2xl bg-sky-600 px-5 py-3 font-black text-white hover:bg-sky-700 disabled:opacity-40"
           >
@@ -208,7 +208,7 @@ export default function SetModelSelect({
           </div>
           <button
             type="button"
-            onClick={() => (pickedLabel === questionData.correctLabel ? onCorrect?.() : onWrong?.())}
+            onClick={() => (pickedLabel === questionData.correctLabel ? onCorrect?.() : onWrong?.(pickedLabel ?? undefined))}
             disabled={!pickedLabel}
             className="mt-4 w-full rounded-2xl bg-sky-600 px-5 py-3 font-black text-white hover:bg-sky-700 disabled:opacity-40"
           >

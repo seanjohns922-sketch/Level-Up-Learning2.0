@@ -13,7 +13,7 @@ export default function OddEvenSort({
 }: {
   questionData: OddEvenSortQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const questionKey = JSON.stringify(questionData);
 
@@ -34,7 +34,7 @@ function OddEvenSortInner({
 }: {
   questionData: OddEvenSortQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [placements, setPlacements] = useState<Record<string, Bucket | null>>(() =>
     Object.fromEntries(
@@ -70,7 +70,12 @@ function OddEvenSortInner({
     submittedRef.current = true;
     setSubmitted(true);
     if (placedCorrectly && patternCorrect) onCorrect?.();
-    else onWrong?.();
+    else {
+      const submitted = Object.entries(nextPlacements)
+        .map(([key, bucket]) => `${key.replace(/-\d+$/, "")} → ${bucket ?? "unplaced"}`)
+        .join(", ");
+      onWrong?.(nextPattern ? `${submitted}; pattern: ${nextPattern}` : submitted);
+    }
   }
 
   function assign(value: number, index: number, bucket: Bucket) {

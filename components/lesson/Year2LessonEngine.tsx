@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Zap, Sparkle } from "lucide-react";
+import { ArrowRight, Sparkle, Zap } from "lucide-react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
@@ -245,6 +245,12 @@ type LessonAttemptEntry = {
   timeSpentSeconds: number;
 };
 
+type GuidedWrongFeedback = {
+  studentAnswer: string;
+  correctAnswer: string;
+  explanation: string;
+};
+
 export type LessonPerformanceTopicSummary = {
   label: string;
   correct: number;
@@ -304,13 +310,97 @@ function formatLessonTopicLabel(mode: string) {
 
 function getQuestionCorrectAnswer(question: Year2QuestionData | null) {
   if (!question) return null;
+  if ("correctAnswers" in question && Array.isArray(question.correctAnswers)) {
+    return question.correctAnswers.join(", ");
+  }
+  if ("correctOrder" in question && Array.isArray(question.correctOrder)) {
+    return question.correctOrder.join(" → ");
+  }
+  if ("expected" in question && typeof question.expected === "number") {
+    return String(question.expected);
+  }
   if ("answer" in question && question.answer !== undefined && question.answer !== null) {
     return String(question.answer);
   }
   if ("answers" in question && Array.isArray(question.answers)) {
     return question.answers.join(" | ");
   }
+  const data = question as unknown as Record<string, unknown>;
+  if (Array.isArray(data.sets)) {
+    const matches = data.sets
+      .map((entry) => {
+        if (!entry || typeof entry !== "object") return null;
+        const set = entry as Record<string, unknown>;
+        const values = [set.fraction, set.decimal, set.percent].filter(
+          (value): value is string => typeof value === "string"
+        );
+        return values.length > 0 ? values.join(" = ") : null;
+      })
+      .filter((value): value is string => Boolean(value));
+    if (matches.length > 0) return matches.join("; ");
+  }
+  if (Array.isArray(data.values)) {
+    const placements = data.values
+      .map((entry) => {
+        if (!entry || typeof entry !== "object") return null;
+        const value = entry as Record<string, unknown>;
+        return typeof value.label === "string" && typeof value.category === "string"
+          ? `${value.label} → ${value.category}`
+          : null;
+      })
+      .filter((value): value is string => Boolean(value));
+    if (placements.length > 0) return placements.join(", ");
+  }
+  for (const key of [
+    "correctAnswer",
+    "correctOptionId",
+    "correctChoiceId",
+    "correctModelId",
+    "correctLabel",
+    "correctOperation",
+    "correctReason",
+    "targetNumber",
+  ]) {
+    const value = data[key];
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      return String(value);
+    }
+  }
   return null;
+}
+
+function getQuestionExplanation(question: Year2QuestionData | null, correctAnswer: string) {
+  if (!question) return `The correct answer is ${correctAnswer}.`;
+  if (question.kind === "typed_response" && question.visual?.type === "mab") {
+    const mabVisual = question.visual as typeof question.visual & { placeValues?: string[] };
+    const places = [
+      ["hundred_thousands", mabVisual.hundredThousands, 100000, "hundred thousand"],
+      ["ten_thousands", mabVisual.tenThousands, 10000, "ten thousand"],
+      ["thousands", mabVisual.thousands, 1000, "thousand"],
+      ["hundreds", mabVisual.hundreds, 100, "hundred"],
+      ["tens", mabVisual.tens, 10, "ten"],
+      ["ones", mabVisual.ones, 1, "one"],
+    ] as const;
+    const shown = places.filter(
+      ([place, count]) =>
+        (!mabVisual.placeValues || mabVisual.placeValues.includes(place)) &&
+        typeof count === "number" &&
+        count > 0
+    );
+    if (shown.length > 0) {
+      const words = shown
+        .map(([, count, , label]) => `${count} ${count === 1 ? label : `${label}s`}`)
+        .join(", ");
+      const expanded = shown
+        .map(([, count, multiplier]) => ((count ?? 0) * multiplier).toLocaleString("en-AU"))
+        .join(" + ");
+      return `There are ${words}: ${expanded} = ${correctAnswer}.`;
+    }
+  }
+  if ("helper" in question && typeof question.helper === "string" && question.helper.trim()) {
+    return question.helper;
+  }
+  return `The correct answer is ${correctAnswer}. Check the model and the value of each part.`;
 }
 
 function getQuestionOptions(question: Year2QuestionData | null) {
@@ -520,6 +610,7 @@ export function Year2LessonEngine({
   const [lessonMistakeReviewDone, setLessonMistakeReviewDone] = useState(false);
   const [showLessonMistakeReview, setShowLessonMistakeReview] = useState(false);
   const [lessonMistakes, setLessonMistakes] = useState<MistakeReviewItem[]>([]);
+  const [wrongFeedback, setWrongFeedback] = useState<GuidedWrongFeedback | null>(null);
   const [reflectionDone, setReflectionDone] = useState(false);
   // ── Lesson save & resume ──
   const resumeLessonKey = liveContext?.lessonId ?? lesson.id;
@@ -648,6 +739,7 @@ export function Year2LessonEngine({
     setCurrentQuestionSequence(questionOrderRef.current);
     setQuestionKey((v) => v + 1);
     setStatus("idle");
+    setWrongFeedback(null);
     scoredThisTurnRef.current = false;
     questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
   }
@@ -678,14 +770,14 @@ export function Year2LessonEngine({
   useEffect(() => {
     const interval = setInterval(() => {
       setSecondsLeft((c) =>
-        brainBreakActiveRef.current || showLessonResumeRef.current ? c : c - 1
+        brainBreakActiveRef.current || showLessonResumeRef.current || status === "wrong" ? c : c - 1
       );
     }, 1000);
     return () => {
       clearInterval(interval);
       clearPendingTimeout();
     };
-  }, []);
+  }, [status]);
 
   // ── Resume gate: load a saved snapshot once and offer to continue ──
   useEffect(() => {
@@ -733,11 +825,12 @@ export function Year2LessonEngine({
       if (typeof snap.questionSequence === "number") setCurrentQuestionSequence(snap.questionSequence);
       if (typeof snap.questionKey === "number") setQuestionKey(snap.questionKey);
       if (snap.feedbackStatus) setStatus(snap.feedbackStatus);
+      if (snap.wrongFeedback) setWrongFeedback(snap.wrongFeedback);
       scoredThisTurnRef.current = snap.scoredCurrentTurn === true;
       setCoachDone(snap.coachDone === true);
       setLessonMistakeReviewDone(snap.mistakeReviewDone === true);
       setShowLessonMistakeReview(snap.showMistakeReview === true);
-      if (snap.feedbackStatus === "correct" || snap.feedbackStatus === "wrong") {
+      if (snap.feedbackStatus === "correct") {
         timeoutRef.current = setTimeout(() => loadNextQuestion(), 1000);
       }
       nextBreakIdxRef.current = brainBreakSchedule.filter((t) => snap.secondsLeft <= t).length;
@@ -759,6 +852,7 @@ export function Year2LessonEngine({
     setCoachDone(false);
     setReflectionDone(false);
     setStatus("idle");
+    setWrongFeedback(null);
     scoredThisTurnRef.current = false;
     setCurrentActivityIndex(nextTurn.activityIndex);
     setCurrentQuestion(nextTurn.question);
@@ -805,6 +899,7 @@ export function Year2LessonEngine({
       questionSequence: currentQuestionSequence,
       questionKey,
       feedbackStatus: status,
+      wrongFeedback,
       scoredCurrentTurn: scoredThisTurnRef.current,
       coachDone,
       mistakeReviewDone: lessonMistakeReviewDone,
@@ -812,7 +907,7 @@ export function Year2LessonEngine({
       updatedAt: Date.now(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog, currentActivityIndex, currentQuestion, currentQuestionSequence, questionKey, status, coachDone, lessonMistakeReviewDone, showLessonMistakeReview]);
+  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog, currentActivityIndex, currentQuestion, currentQuestionSequence, questionKey, status, wrongFeedback, coachDone, lessonMistakeReviewDone, showLessonMistakeReview]);
 
   // Brain breaks fire at the scheduled seconds-left thresholds (count + timing
   // come from the teacher-set frequency × level). Each pauses the clock and uses
@@ -970,7 +1065,7 @@ export function Year2LessonEngine({
     timeoutRef.current = setTimeout(() => loadNextQuestion(), 1000);
   }
 
-  function handleWrong() {
+  function handleWrong(studentAnswer?: string) {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
     const mode =
@@ -980,17 +1075,21 @@ export function Year2LessonEngine({
       "practice";
     const topicLabel = formatLessonTopicLabel(mode);
     const questionNumber = questionsAnsweredRef.current + 1;
+    const submittedAnswer = studentAnswer?.trim() || "Submitted response";
+    const correctAnswer = getQuestionCorrectAnswer(currentQuestion) ?? "See the worked correction";
+    const explanation = getQuestionExplanation(currentQuestion, correctAnswer);
+    setWrongFeedback({ studentAnswer: submittedAnswer, correctAnswer, explanation });
     setLessonMistakes((current) => [
       ...current,
       {
         id: `${resumeLessonKey}-mistake-${questionNumber}`,
         questionNumber,
         prompt: currentQuestion?.prompt ?? topicLabel,
-        studentAnswer: "Incorrect attempt",
-        correctAnswer: getQuestionCorrectAnswer(currentQuestion),
-        explanation:
-          ((currentQuestion as Record<string, unknown> | null)?.helper as string | undefined) ??
-          "Look at the correct answer and try the idea again next time.",
+        studentAnswer: submittedAnswer,
+        correctAnswer,
+        explanation,
+        taskId: `${resumeLessonKey}-q${currentQuestionSequence}`,
+        taskData: currentQuestion,
         week: liveContext?.week ?? lesson.week ?? null,
         lesson: lesson.lesson ?? null,
         lessonTitle: lesson.title,
@@ -1021,6 +1120,7 @@ export function Year2LessonEngine({
         questionText: currentQuestion?.prompt,
         questionType: currentQuestion?.kind,
         questionOptions: getQuestionOptions(currentQuestion),
+        selectedAnswer: submittedAnswer,
         correctAnswer: getQuestionCorrectAnswer(currentQuestion),
         isCorrect: false,
         timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
@@ -1034,7 +1134,6 @@ export function Year2LessonEngine({
     setQuestionsAnswered((v) => v + 1);
     saveBestChain(comboCount);
     setComboCount(0);
-    timeoutRef.current = setTimeout(() => loadNextQuestion(), 1200);
   }
 
   const hint = currentQuestion
@@ -1363,16 +1462,41 @@ export function Year2LessonEngine({
                   )}
                 </div>
 
-                <LessonRenderer
-                  key={questionKey}
-                  activity={currentActivity}
-                  prompt={lesson.title}
-                  questionData={currentQuestion}
-                  renderMode="lesson"
-                  onCorrect={handleCorrect}
-                  onWrong={handleWrong}
-                  realmId={realmId}
-                />
+                <div className={status === "wrong" ? "pointer-events-none" : undefined} aria-disabled={status === "wrong"}>
+                  <LessonRenderer
+                    key={questionKey}
+                    activity={currentActivity}
+                    prompt={lesson.title}
+                    questionData={currentQuestion}
+                    renderMode="lesson"
+                    onCorrect={handleCorrect}
+                    onWrong={handleWrong}
+                    realmId={realmId}
+                  />
+                </div>
+                {status === "wrong" && wrongFeedback ? (
+                  <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-slate-900" role="status">
+                    <div className="text-lg font-black text-red-800">Not quite.</div>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      <div className="rounded-xl border border-red-200 bg-white px-3 py-2 text-sm font-bold text-red-800">
+                        <span className="font-black">You entered:</span> {wrongFeedback.studentAnswer}
+                      </div>
+                      <div className="rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm font-bold text-emerald-800">
+                        <span className="font-black">Correct answer:</span> {wrongFeedback.correctAnswer}
+                      </div>
+                    </div>
+                    <p className="mt-3 text-sm font-semibold leading-relaxed text-slate-700">{wrongFeedback.explanation}</p>
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={loadNextQuestion}
+                        className="pointer-events-auto inline-flex items-center gap-2 rounded-xl bg-trust-blue px-5 py-3 font-black text-white transition hover:opacity-90"
+                      >
+                        Next Question <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </ComboMilestonePop>
           ) : activities.length > 0 && invalidRecoveryCountRef.current < 3 ? (

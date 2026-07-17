@@ -41,7 +41,7 @@ export default function BuildTheWhole({
 }: {
   questionData: BuildTheWholeQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [selectedParts, setSelectedParts] = useState(1);
   const [pickedId, setPickedId] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export default function BuildTheWhole({
           </div>
           <button
             type="button"
-            onClick={() => (selectedParts === questionData.answer ? onCorrect?.() : onWrong?.())}
+            onClick={() => (selectedParts === questionData.answer ? onCorrect?.() : onWrong?.(String(selectedParts)))}
             className="mt-4 w-full rounded-2xl bg-amber-500 px-5 py-3 font-black text-white hover:bg-amber-600"
           >
             Check whole
@@ -102,7 +102,7 @@ export default function BuildTheWhole({
           ))}
           <button
             type="button"
-            onClick={() => (pickedTotal === questionData.answer ? onCorrect?.() : onWrong?.())}
+            onClick={() => (pickedTotal === questionData.answer ? onCorrect?.() : onWrong?.(String(pickedTotal)))}
             disabled={pickedTotal === null}
             className="rounded-2xl bg-amber-500 px-5 py-3 font-black text-white hover:bg-amber-600 disabled:opacity-40"
           >
@@ -147,7 +147,7 @@ export default function BuildTheWhole({
 
           <button
             type="button"
-            onClick={() => (pickedId === questionData.correctOptionId ? onCorrect?.() : onWrong?.())}
+            onClick={() => (pickedId === questionData.correctOptionId ? onCorrect?.() : onWrong?.(pickedId ?? undefined))}
             disabled={!pickedId}
             className="mt-4 w-full rounded-2xl bg-amber-500 px-5 py-3 font-black text-white hover:bg-amber-600 disabled:opacity-40"
           >

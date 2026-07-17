@@ -18,7 +18,7 @@ export default function FractionDecimalPercentMatch({
 }: {
   questionData: FractionDecimalPercentMatchQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const cards = useMemo(() => {
     const fractions = questionData.sets.map((set) => ({
@@ -66,7 +66,7 @@ export default function FractionDecimalPercentMatch({
           if (nextMatched.length === questionData.sets.length) onCorrect?.();
         } else {
           setFeedback("Not quite — choose one fraction, one decimal and one percentage with the same value.");
-          onWrong?.();
+          onWrong?.(next.map((item) => item.label).join(" = "));
         }
         return [];
       }

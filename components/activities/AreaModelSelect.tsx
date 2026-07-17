@@ -47,7 +47,7 @@ export default function AreaModelSelect({
 }: {
   questionData: AreaModelSelectQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const [selectedParts, setSelectedParts] = useState<number[]>([]);
   const [pickedModelId, setPickedModelId] = useState<string | null>(null);
@@ -64,13 +64,13 @@ export default function AreaModelSelect({
     const correct =
       chosen.length === expected.length && chosen.every((value, index) => value === expected[index]);
     if (correct) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(`${chosen.length} shaded part${chosen.length === 1 ? "" : "s"}`);
   }
 
   function checkModel() {
     if (!pickedModelId) return;
     if (pickedModelId === questionData.correctModelId) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(pickedModelId);
   }
 
   const needsModelPick = questionData.mode !== "shade_fraction";

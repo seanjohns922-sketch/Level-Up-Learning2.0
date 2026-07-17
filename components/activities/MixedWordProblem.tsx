@@ -13,7 +13,7 @@ export default function MixedWordProblem({
 }: {
   questionData: MixedWordProblemQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
 }) {
   const needsOperationChoice =
     questionData.mode === "choose_operation" &&
@@ -40,7 +40,7 @@ export default function MixedWordProblem({
     if (!operationReady) return;
     setPicked(option);
     if (option === questionData.answer) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(String(option));
   }
 
   return (

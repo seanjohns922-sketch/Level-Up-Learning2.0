@@ -90,7 +90,7 @@ export default function NumberLinePlace({
 }: {
   questionData: NumberLinePlaceQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
 }) {
   const [order, setOrder] = useState<string[]>([]);
@@ -231,7 +231,7 @@ export default function NumberLinePlace({
           </div>
           <button
             type="button"
-            onClick={() => (order.join(",") === questionData.answer ? onCorrect?.() : onWrong?.())}
+            onClick={() => (order.join(",") === questionData.answer ? onCorrect?.() : onWrong?.(order.join(" → ")))}
             disabled={order.length !== (questionData.fractions ?? []).length}
             className="mt-4 w-full rounded-2xl bg-emerald-600 px-5 py-3 font-black text-white hover:bg-emerald-700 disabled:opacity-40"
           >
@@ -375,7 +375,7 @@ export default function NumberLinePlace({
             onClick={() => {
               if (isPointPick) {
                 if (selectedPoint === questionData.answer) onCorrect?.();
-                else onWrong?.();
+                else onWrong?.(selectedPoint ?? undefined);
                 return;
               }
               const placedValue = placedFraction ? parseFraction(placedFraction).value : NaN;
@@ -384,7 +384,7 @@ export default function NumberLinePlace({
                 onCorrect?.();
                 return;
               }
-              onWrong?.();
+              onWrong?.(placedFraction ?? undefined);
             }}
             disabled={isPointPick ? !selectedPoint : !placedFraction}
             className="mt-6 w-full rounded-2xl bg-emerald-600 px-5 py-3 font-black text-white hover:bg-emerald-700 disabled:opacity-40"

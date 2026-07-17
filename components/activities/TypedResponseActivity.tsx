@@ -1632,7 +1632,7 @@ export default function TypedResponseActivity({
 }: {
   questionData: TypedResponseQuestion;
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
 }) {
   const writtenMethod = questionData.writtenMethod;
@@ -2043,7 +2043,7 @@ export default function TypedResponseActivity({
           ? `You cannot do ${workingTopDigits[currentColumn]} - ${bottomDigits[currentColumn]} without regrouping.`
           : `You can already do ${workingTopDigits[currentColumn]} - ${bottomDigits[currentColumn]} without regrouping.`
       );
-      onWrong?.();
+      onWrong?.(typed);
       return;
     }
 
@@ -2051,7 +2051,7 @@ export default function TypedResponseActivity({
       const didRegroup = applyRegroup();
       if (!didRegroup) {
         setGuidedFeedback("There is no column available to regroup from.");
-        onWrong?.();
+        onWrong?.(typed);
         return;
       }
       setGuidedFeedback("Good. The top number has updated after regrouping.");
@@ -2079,7 +2079,7 @@ export default function TypedResponseActivity({
           ? `${leftExpression} makes ${columnSum}, so you need to carry.`
           : `${leftExpression} makes ${columnSum}, so no carry is needed.`
       );
-      onWrong?.();
+      onWrong?.(typed);
       return;
     }
 
@@ -2112,7 +2112,7 @@ export default function TypedResponseActivity({
 
       if (typedDigit !== String(expectedDigit)) {
         setGuidedFeedback(`Try the ${columnLabel(writtenMethod.placeValueLabels[currentColumn] ?? "")} column again.`);
-        onWrong?.();
+        onWrong?.(typed);
         return;
       }
 
@@ -2145,7 +2145,7 @@ export default function TypedResponseActivity({
 
     if (typedDigit !== String(expectedDigit)) {
       setGuidedFeedback(`Try the ${columnLabel(writtenMethod.placeValueLabels[currentColumn] ?? "")} column again.`);
-      onWrong?.();
+      onWrong?.(typed);
       return;
     }
 
@@ -2239,7 +2239,7 @@ export default function TypedResponseActivity({
       if (decimalMatches && percentMatches) {
         onCorrect?.();
       } else {
-        onWrong?.();
+        onWrong?.(typed);
       }
       return;
     }
@@ -2254,7 +2254,7 @@ export default function TypedResponseActivity({
         setBuildGroupsFeedback(
           `Reveal the groups until the next multiple is too large, then type what is left.`
         );
-        onWrong?.();
+        onWrong?.(typed);
       }
       return;
     }
@@ -2276,7 +2276,7 @@ export default function TypedResponseActivity({
         onCorrect?.();
       } else {
         setDivisionCheckFeedback(`That doesn't match ${dividend}. Try again.`);
-        onWrong?.();
+        onWrong?.(typed);
       }
       return;
     }
@@ -2323,7 +2323,7 @@ export default function TypedResponseActivity({
     if ((isStrategyMultiplication || isEstimateStrategyMultiplication) && strategyVisual) {
       if (!selectedStrategy) {
         setStrategyFeedback("Choose one method before you start solving.");
-        onWrong?.();
+        onWrong?.(typed);
         return;
       }
 
@@ -2334,7 +2334,7 @@ export default function TypedResponseActivity({
         const expectedEstimate = String(roundedTop * roundedBottom);
         if (normalizeNumberInput(estimateInput) !== expectedEstimate) {
           setStrategyFeedback(`Estimate first by rounding to ${roundedTop} × ${roundedBottom}.`);
-          onWrong?.();
+          onWrong?.(typed);
           return;
         }
       }
@@ -2348,7 +2348,7 @@ export default function TypedResponseActivity({
 
         if (!boxesMatch || !totalMatches) {
           setStrategyFeedback("Check each box value and make sure the total matches the full product.");
-          onWrong?.();
+          onWrong?.(typed);
           return;
         }
       }
@@ -2371,7 +2371,7 @@ export default function TypedResponseActivity({
 
         if (!(carryMatches && onesRowMatches && tensRowMatches && totalMatches)) {
           setStrategyFeedback("Check the carry, both partial-product rows, and then the final total.");
-          onWrong?.();
+          onWrong?.(typed);
           return;
         }
       }
@@ -2385,7 +2385,7 @@ export default function TypedResponseActivity({
 
         if (!(tensMatches && onesMatches && totalMatches)) {
           setStrategyFeedback("Check the tens product, the ones product, and then the total.");
-          onWrong?.();
+          onWrong?.(typed);
           return;
         }
       }
@@ -2393,12 +2393,12 @@ export default function TypedResponseActivity({
       if (isEstimateStrategyMultiplication) {
         if (reasonablenessChoice !== "yes") {
           setStrategyFeedback("After estimating and solving, this answer should be marked as reasonable.");
-          onWrong?.();
+          onWrong?.(typed);
           return;
         }
         if (reasonablenessExplanation.trim().length < 8) {
           setStrategyFeedback("Explain why the answer is reasonable by linking it to your estimate.");
-          onWrong?.();
+          onWrong?.(typed);
           return;
         }
       }
@@ -2426,7 +2426,7 @@ export default function TypedResponseActivity({
           setMultiplicationFeedback(
             `Multiply ${stepData.topOnes} × ${stepData.bottomOnes} and enter only the ones digit.`
           );
-          onWrong?.();
+          onWrong?.(typed);
         }
         return;
       }
@@ -2437,7 +2437,7 @@ export default function TypedResponseActivity({
           setMultiplicationStep("ones_row");
         } else {
           setMultiplicationFeedback("Carry the extra above the next column.");
-          onWrong?.();
+          onWrong?.(typed);
         }
         return;
       }
@@ -2450,7 +2450,7 @@ export default function TypedResponseActivity({
           setMultiplicationFeedback(
             `Now multiply ${stepData.topTens} × ${stepData.bottomOnes} and add the carry.`
           );
-          onWrong?.();
+          onWrong?.(typed);
         }
         return;
       }
@@ -2461,7 +2461,7 @@ export default function TypedResponseActivity({
           setMultiplicationStep("total");
         } else {
           setMultiplicationFeedback("Complete the tens row and remember the place-value shift.");
-          onWrong?.();
+          onWrong?.(typed);
         }
         return;
       }
@@ -2473,7 +2473,7 @@ export default function TypedResponseActivity({
           onCorrect?.();
         } else {
           setMultiplicationFeedback("Add the rows carefully to find the final total.");
-          onWrong?.();
+          onWrong?.(typed);
         }
         return;
       }
@@ -2492,7 +2492,7 @@ export default function TypedResponseActivity({
         onCorrect?.();
       } else {
         setBoxMethodFeedback("Complete each box correctly, then add the totals for the final answer.");
-        onWrong?.();
+        onWrong?.(typed);
       }
       return;
     }
@@ -2524,7 +2524,7 @@ export default function TypedResponseActivity({
             ? "Divide by 100 first, then multiply by the amount."
             : "Break the percentage into easier parts and try this step again."
         );
-        onWrong?.();
+        onWrong?.(typed);
       }
       return;
     }
@@ -2538,7 +2538,7 @@ export default function TypedResponseActivity({
           setRelatedDenominatorFeedback(
             `Check what multiplies ${relatedDenominatorWorking.denominatorToChange} to make ${sameDenominatorOperationVisual.denominator}.`
           );
-          onWrong?.();
+          onWrong?.(typed);
         }
         return;
       }
@@ -2552,7 +2552,7 @@ export default function TypedResponseActivity({
           setRelatedDenominatorStep("solve");
         } else {
           setRelatedDenominatorFeedback("Use the same multiplier on the numerator.");
-          onWrong?.();
+          onWrong?.(typed);
         }
         return;
       }
@@ -2571,7 +2571,7 @@ export default function TypedResponseActivity({
               ? "Now add the numerators."
               : "Now subtract the numerators."
           );
-          onWrong?.();
+          onWrong?.(typed);
         }
         return;
       }
@@ -2604,7 +2604,7 @@ export default function TypedResponseActivity({
               };
 
       if (!parsed) {
-        onWrong?.();
+        onWrong?.(typed);
         return;
       }
 
@@ -2614,7 +2614,7 @@ export default function TypedResponseActivity({
         !Number.isFinite(parsed.denominator) ||
         parsed.denominator === 0
       ) {
-        onWrong?.();
+        onWrong?.(typed);
         return;
       }
 
@@ -2627,7 +2627,7 @@ export default function TypedResponseActivity({
       if (matchesAcceptedFraction) {
         onCorrect?.();
       } else {
-        onWrong?.();
+        onWrong?.(typed);
       }
       return;
     }
@@ -2635,7 +2635,7 @@ export default function TypedResponseActivity({
     if (isFlexibleFractionInput) {
       const parsedInput = parseFlexibleFraction(typed);
       if (!parsedInput) {
-        onWrong?.();
+        onWrong?.(typed);
         return;
       }
 
@@ -2647,7 +2647,7 @@ export default function TypedResponseActivity({
       if (matchesAcceptedFraction) {
         onCorrect?.();
       } else {
-        onWrong?.();
+        onWrong?.(typed);
       }
       return;
     }
@@ -2657,7 +2657,7 @@ export default function TypedResponseActivity({
       if (acceptedAnswerList.some((answerOption) => normalizedTyped === String(answerOption))) {
         onCorrect?.();
       } else {
-        onWrong?.();
+        onWrong?.(typed);
       }
       return;
     }
@@ -2666,7 +2666,7 @@ export default function TypedResponseActivity({
       if (acceptedAnswerList.some((answerOption) => numericInputsMatch(typed, answerOption))) {
         onCorrect?.();
       } else {
-        onWrong?.();
+        onWrong?.(typed);
       }
       return;
     }
@@ -2700,7 +2700,7 @@ export default function TypedResponseActivity({
     if (matchesAcceptedAnswer) {
       onCorrect?.();
     } else {
-      onWrong?.();
+      onWrong?.(typed);
     }
   }
 

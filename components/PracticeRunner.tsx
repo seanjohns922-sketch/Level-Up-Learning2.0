@@ -473,7 +473,7 @@ export function PracticeRunner({
     const t = setInterval(
       () =>
         setSecondsLeft((s) =>
-          brainBreakActiveRef.current || showLessonResumeRef.current ? s : s - 1
+          brainBreakActiveRef.current || showLessonResumeRef.current || status === "wrong" ? s : s - 1
         ),
       1000
     );
@@ -481,7 +481,7 @@ export function PracticeRunner({
       clearInterval(t);
       clearPendingTimeout();
     };
-  }, []);
+  }, [status]);
 
   // Track the best combo chain reached (for the reflection screen).
   useEffect(() => {
@@ -747,6 +747,8 @@ export function PracticeRunner({
           : String(studentAnswer),
       correctAnswer: getPracticeTaskCorrectAnswer(task),
       explanation: getPracticeTaskWrongExplanation(task),
+      taskId: `${resumeLessonKey ?? "lesson"}-q${questionNumber}`,
+      taskData: task,
       week: liveContext?.week ?? null,
       lessonTitle: liveContext?.lessonTitle ?? lessonTitle ?? null,
       skillLabel: topicLabel,
