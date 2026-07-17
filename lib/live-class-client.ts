@@ -33,6 +33,11 @@ type LiveLearningEventInput = {
   attemptNumber?: number | null;
   progressPercent?: number | null;
   progressLabel?: string | null;
+  questionsAnswered?: number | null;
+  totalQuestions?: number | null;
+  correctCount?: number | null;
+  correctAnswers?: number | null;
+  accuracyPercent?: number | null;
   skillTag?: string | null;
   misconceptionTag?: string | null;
   currentStepLabel?: string | null;
@@ -86,6 +91,10 @@ type LiveStudentActivityRow = {
 
 let idleTimer: ReturnType<typeof setTimeout> | null = null;
 let lastIdleKey: string | null = null;
+
+function normalizedCount(value: number | null | undefined) {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? Math.round(value) : null;
+}
 
 function toSnapshot(row: Partial<LiveStudentActivityRow>): LiveStudentSnapshot {
   return {
@@ -202,12 +211,17 @@ function buildNextActivityRow(
       : (existing?.lesson_started_at ?? null);
 
   if (input.eventType === "lesson_completed" || input.eventType === "quiz_completed") {
+    const finalAnswered = normalizedCount(input.questionsAnswered ?? input.totalQuestions);
+    const finalCorrect = normalizedCount(input.correctCount ?? input.correctAnswers);
+    if (finalAnswered != null) questionsAnswered = finalAnswered;
+    if (finalCorrect != null) correctCount = Math.min(finalCorrect, questionsAnswered);
     currentLessonStatus = "completed";
     completedAt = timestamp;
   }
 
   const shouldClearQuestion = input.eventType === "lesson_completed" || input.eventType === "quiz_completed";
-  const accuracyPercent = questionsAnswered > 0 ? Math.round((correctCount / questionsAnswered) * 100) : 0;
+  const explicitAccuracy = normalizedCount(input.accuracyPercent);
+  const accuracyPercent = explicitAccuracy ?? (questionsAnswered > 0 ? Math.round((correctCount / questionsAnswered) * 100) : 0);
 
   const row: LiveStudentActivityRow = {
     ...(existing ?? {}),

@@ -73,6 +73,7 @@ type LiveStudentActivityRow = {
 };
 
 type LiveActivityEventRow = {
+  id?: string;
   student_id: string;
   class_id: string;
   event_type: string;
@@ -142,6 +143,20 @@ function numberOrNull(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function positiveNumberOrNull(value: unknown): number | null {
+  const numberValue = numberOrNull(value);
+  return numberValue != null && numberValue >= 0 ? Math.round(numberValue) : null;
+}
+
+function getQuestionKey(event: LiveActivityEventRow, index: number) {
+  const payload = parseEventPayload(event.payload);
+  const questionId = typeof payload.questionId === "string" ? payload.questionId.trim() : "";
+  if (questionId) return questionId;
+  const questionText = typeof payload.questionText === "string" ? payload.questionText.trim() : "";
+  if (questionText) return `text:${questionText}`;
+  return event.id ?? `${event.created_at}:${event.event_type}:${index}`;
+}
+
 function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEventRow) {
   const payload = parseEventPayload(event.payload);
   const eventLessonId = typeof payload.lessonId === "string" ? payload.lessonId : null;
@@ -158,11 +173,6 @@ function buildCurrentLessonPerformance(
 ) {
   if (!row) return null;
 
-  // The row stores authoritative running totals; the event log is an independent
-  // record of every answer. We derive from BOTH and take whichever is higher so
-  // the card never shows 0 / 0 when either source has fallen behind (e.g. the
-  // row's score columns weren't persisting) and a lesson_completed event never
-  // clobbers a good count with a stale/zero payload.
   const rowAnswered = Math.max(0, row.questions_answered ?? 0);
   const rowCorrect = Math.max(0, row.correct_count ?? 0);
   const rowCompleted = row.current_lesson_status === "completed";
@@ -171,9 +181,10 @@ function buildCurrentLessonPerformance(
     .filter((event) => matchesCurrentLesson(row, event))
     .sort((left, right) => new Date(left.created_at).getTime() - new Date(right.created_at).getTime());
 
-  let eventAnswered = 0;
-  let eventCorrect = 0;
+  let answered = 0;
+  let correct = 0;
   let eventCompleted = false;
+  let hasAttemptAnswerEvents = false;
   let payloadAnswered: number | null = null;
   let payloadCorrect: number | null = null;
 
@@ -187,29 +198,39 @@ function buildCurrentLessonPerformance(
       }
     }
 
-    lessonEvents.slice(startIndex).forEach((event) => {
+    const answerByQuestion = new Map<string, boolean>();
+    lessonEvents.slice(startIndex).forEach((event, index) => {
       if (event.event_type === "answer_correct") {
-        eventAnswered += 1;
-        eventCorrect += 1;
+        hasAttemptAnswerEvents = true;
+        answerByQuestion.set(getQuestionKey(event, index), true);
         return;
       }
       if (event.event_type === "answer_incorrect") {
-        eventAnswered += 1;
+        hasAttemptAnswerEvents = true;
+        answerByQuestion.set(getQuestionKey(event, index), false);
         return;
       }
       if (event.event_type === "lesson_completed" || event.event_type === "quiz_completed") {
         eventCompleted = true;
         const payload = parseEventPayload(event.payload);
-        payloadAnswered = numberOrNull(payload.questionsAnswered ?? payload.totalQuestions);
-        payloadCorrect = numberOrNull(payload.correctCount ?? payload.correctAnswers);
+        payloadAnswered = positiveNumberOrNull(payload.questionsAnswered ?? payload.totalQuestions);
+        payloadCorrect = positiveNumberOrNull(payload.correctCount ?? payload.correctAnswers);
       }
     });
+
+    answered = answerByQuestion.size;
+    correct = Array.from(answerByQuestion.values()).filter(Boolean).length;
   }
 
-  // Take the strongest evidence from any source; never downgrade to 0.
-  const answered = Math.max(rowAnswered, eventAnswered, payloadAnswered ?? 0);
-  const correctRaw = Math.max(rowCorrect, eventCorrect, payloadCorrect ?? 0);
-  const correct = Math.min(correctRaw, answered); // correct can't exceed answered
+  if (payloadAnswered != null && (!hasAttemptAnswerEvents || payloadAnswered <= answered)) {
+    answered = payloadAnswered;
+    correct = Math.min(payloadCorrect ?? correct, answered);
+  }
+
+  if (lessonEvents.length === 0 && answered === 0) {
+    answered = rowAnswered;
+    correct = Math.min(rowCorrect, answered);
+  }
 
   return {
     answered,
@@ -417,7 +438,7 @@ export default function LiveClassPanel({
         .order("last_active_at", { ascending: false });
       const { data: eventData, error: eventError } = await supabase
         .from("live_activity_events")
-        .select("student_id,class_id,event_type,created_at,payload")
+        .select("id,student_id,class_id,event_type,created_at,payload")
         .eq("class_id", selectedClass.id)
         .in("event_type", [
           "lesson_started",

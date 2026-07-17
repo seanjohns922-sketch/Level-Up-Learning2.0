@@ -960,8 +960,12 @@ export function Year2LessonEngine({
       lessonTitle: liveContext.lessonTitle,
       progressPercent: 100,
       progressLabel: `Completed ${questionsAnswered} questions`,
+      questionsAnswered,
+      totalQuestions: questionsAnswered,
+      correctCount: correctAnswers,
+      correctAnswers,
     });
-  }, [finished, liveContext, questionsAnswered]);
+  }, [correctAnswers, finished, liveContext, questionsAnswered]);
 
   // ── Finished state ──
   if (finished) {

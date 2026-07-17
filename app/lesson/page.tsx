@@ -547,6 +547,11 @@ function LessonPage() {
             lessonTitle: liveLessonContext.lessonTitle,
             progressPercent: 100,
             progressLabel: `Completed ${latestLessonSummaryRef.current.questionsAnswered} questions`,
+            questionsAnswered: latestLessonSummaryRef.current.questionsAnswered,
+            totalQuestions: latestLessonSummaryRef.current.questionsAnswered,
+            correctCount: latestLessonSummaryRef.current.correctAnswers,
+            correctAnswers: latestLessonSummaryRef.current.correctAnswers,
+            accuracyPercent: latestLessonSummaryRef.current.accuracy,
           });
           await persistLessonPerformanceSummary(latestLessonSummaryRef.current);
         } else {
@@ -559,6 +564,11 @@ function LessonPage() {
             lessonTitle: liveLessonContext.lessonTitle,
             progressPercent: 100,
             progressLabel: "Lesson completed",
+            questionsAnswered: 0,
+            totalQuestions: 0,
+            correctCount: 0,
+            correctAnswers: 0,
+            accuracyPercent: 0,
           });
 
           const fallbackAttempt = {

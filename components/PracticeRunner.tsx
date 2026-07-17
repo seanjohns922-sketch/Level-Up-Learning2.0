@@ -938,8 +938,12 @@ export function PracticeRunner({
         completionMode === "time_only"
           ? `Completed ${minutes}-minute Ground session`
           : `Completed ${safeQuestionsAnswered} of ${MAX_LESSON_QUESTIONS} questions`,
+      questionsAnswered: safeQuestionsAnswered,
+      totalQuestions: safeQuestionsAnswered,
+      correctCount: correctAnswers,
+      correctAnswers,
     });
-  }, [completionMode, finished, liveContext, minutes, safeQuestionsAnswered]);
+  }, [completionMode, correctAnswers, finished, liveContext, minutes, safeQuestionsAnswered]);
 
   // ── Finished state ──
   if (finished) {
