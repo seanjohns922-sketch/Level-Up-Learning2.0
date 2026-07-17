@@ -12,6 +12,7 @@ import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
 import LessonReflection from "@/components/lesson/LessonReflection";
 import LessonCoachReview from "@/components/lesson/LessonCoachReview";
+import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { buildCoachReview } from "@/lib/lesson-coach";
 import LessonResumeGate from "@/components/lesson/LessonResumeGate";
 import {
@@ -514,6 +515,9 @@ export function Year2LessonEngine({
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [comboCount, setComboCount] = useState(0);
   const [coachDone, setCoachDone] = useState(false);
+  const [lessonMistakeReviewDone, setLessonMistakeReviewDone] = useState(false);
+  const [showLessonMistakeReview, setShowLessonMistakeReview] = useState(false);
+  const [lessonMistakes, setLessonMistakes] = useState<MistakeReviewItem[]>([]);
   const [reflectionDone, setReflectionDone] = useState(false);
   // ── Lesson save & resume ──
   const resumeLessonKey = liveContext?.lessonId ?? lesson.id;
@@ -700,6 +704,16 @@ export function Year2LessonEngine({
       questionsAnsweredRef.current = snap.questionsAnswered;
       setCorrectAnswers(snap.correctAnswers);
       setComboCount(snap.comboCount);
+      setLessonMistakes(snap.lessonMistakes ?? []);
+      setAttemptLog(
+        (snap.attemptLog ?? []).map((entry) => ({
+          mode: entry.topicLabel,
+          topicLabel: entry.topicLabel,
+          questionType: "resumed",
+          correct: entry.correct,
+          timeSpentSeconds: entry.timeSpentSeconds,
+        }))
+      );
       if (typeof snap.activityIndex === "number" && activities[snap.activityIndex]) {
         setCurrentActivityIndex(snap.activityIndex);
       }
@@ -712,6 +726,10 @@ export function Year2LessonEngine({
 
   function restartLesson() {
     clearLessonResume(resumeLessonKey);
+    setLessonMistakes([]);
+    setLessonMistakeReviewDone(false);
+    setShowLessonMistakeReview(false);
+    setAttemptLog([]);
     setShowLessonResume(false);
     showLessonResumeRef.current = false;
     resumeResolvedRef.current = true;
@@ -726,11 +744,13 @@ export function Year2LessonEngine({
       questionsAnswered,
       correctAnswers,
       comboCount,
+      lessonMistakes,
+      attemptLog,
       activityIndex: currentActivityIndex,
       updatedAt: Date.now(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, currentActivityIndex]);
+  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog, currentActivityIndex]);
 
   // Brain breaks fire at the scheduled seconds-left thresholds (count + timing
   // come from the teacher-set frequency × level). Each pauses the clock and uses
@@ -897,9 +917,28 @@ export function Year2LessonEngine({
       ((currentActivity?.config ?? {}) as { mode?: string }).mode ??
       currentActivity?.activityType ??
       "practice";
+    const topicLabel = formatLessonTopicLabel(mode);
+    const questionNumber = questionsAnsweredRef.current + 1;
+    setLessonMistakes((current) => [
+      ...current,
+      {
+        id: `${resumeLessonKey}-mistake-${questionNumber}`,
+        questionNumber,
+        prompt: currentQuestion?.prompt ?? topicLabel,
+        studentAnswer: "Incorrect attempt",
+        correctAnswer: getQuestionCorrectAnswer(currentQuestion),
+        explanation:
+          ((currentQuestion as Record<string, unknown> | null)?.helper as string | undefined) ??
+          "Look at the correct answer and try the idea again next time.",
+        week: liveContext?.week ?? lesson.week ?? null,
+        lesson: lesson.lesson ?? null,
+        lessonTitle: lesson.title,
+        skillLabel: topicLabel,
+      },
+    ]);
     setAttemptLog((current) => [...current, {
       mode,
-      topicLabel: formatLessonTopicLabel(mode),
+      topicLabel,
       questionType: currentQuestion?.kind ?? currentActivity?.activityType ?? "unknown",
       correct: false,
       timeSpentSeconds: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
@@ -988,6 +1027,52 @@ export function Year2LessonEngine({
           realmId={realmId}
           onContinue={() => setCoachDone(true)}
         />
+      );
+    }
+    if (showLessonMistakeReview) {
+      return (
+        <MistakeReviewPanel
+          mode="lesson"
+          realmId={realmId}
+          items={lessonMistakes}
+          onFinish={() => {
+            setShowLessonMistakeReview(false);
+            setLessonMistakeReviewDone(true);
+          }}
+        />
+      );
+    }
+    if (lessonMistakes.length > 0 && !lessonMistakeReviewDone) {
+      return (
+        <main className="min-h-screen bg-slate-950 px-4 py-8">
+          <div className="mx-auto flex min-h-[70vh] max-w-2xl items-center justify-center">
+            <div className="w-full rounded-3xl border border-white/10 bg-white p-6 text-center shadow-xl">
+              <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
+                Lesson Complete
+              </div>
+              <h1 className="mt-2 text-3xl font-black text-slate-950">Review My Mistakes</h1>
+              <p className="mt-2 text-sm font-semibold text-slate-600">
+                You have {lessonMistakes.length} question{lessonMistakes.length === 1 ? "" : "s"} to review. This will not change XP or your score.
+              </p>
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <button
+                  type="button"
+                  onClick={() => setShowLessonMistakeReview(true)}
+                  className="rounded-2xl bg-trust-blue px-5 py-3 font-black text-white transition hover:opacity-90"
+                >
+                  Review My Mistakes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLessonMistakeReviewDone(true)}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3 font-black text-slate-700 transition hover:bg-slate-100"
+                >
+                  Finish Lesson
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
       );
     }
     if (!renderCompletionCard && !reflectionDone) {

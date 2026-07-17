@@ -35,6 +35,7 @@ import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
 import { LessonPageHero } from "@/components/lesson/LessonPageHero";
+import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import { recordStudentActivityDelta } from "@/lib/student-activity";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
@@ -6286,6 +6287,50 @@ function buildQuizQuestionResults(
   });
 }
 
+function buildQuizMistakeReviewItems(
+  questions: QuizQuestion[],
+  quizAnswers: Record<string, number>,
+  quizTyped: Record<string, string>,
+  quizLineAnswers: Record<string, number>,
+  quizChartDone: Record<string, boolean>,
+  quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
+  quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
+  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>,
+  weekNumber: number,
+  lessonTitleLookup?: Record<number, string>
+): MistakeReviewItem[] {
+  return buildQuizQuestionResults(
+    questions,
+    quizAnswers,
+    quizTyped,
+    quizLineAnswers,
+    quizChartDone,
+    quizMabAnswers,
+    quizMoneyAnswers,
+    quizLessonActivityResults
+  ).flatMap((result, index) => {
+    if (result.correct) return [];
+    const question = questions[index];
+    const lessonNumber =
+      question?.lessonNumber ??
+      question?.lessonTag ??
+      (result.lessonTag ? Number(result.lessonTag) : null);
+    const safeLessonNumber = typeof lessonNumber === "number" && Number.isFinite(lessonNumber) ? lessonNumber : null;
+    return [{
+      id: result.questionId ?? question?.id ?? `quiz-mistake-${index + 1}`,
+      questionNumber: index + 1,
+      prompt: result.prompt || question?.prompt || "Quiz question",
+      studentAnswer: result.selectedAnswer ?? "Incorrect attempt",
+      correctAnswer: result.correctAnswer ?? "See the correct option",
+      explanation: question?.feedbackIncorrect ?? "Review the key idea, then continue your adventure.",
+      week: weekNumber,
+      lesson: safeLessonNumber,
+      lessonTitle: safeLessonNumber ? lessonTitleLookup?.[safeLessonNumber] ?? null : null,
+      skillLabel: result.skillTag ?? question?.skill ?? null,
+    }];
+  });
+}
+
 function getWeakestLessonBreakdown(items: LessonBreakdown[]): LessonBreakdown | null {
   if (items.length === 0) return null;
   return [...items].sort((a, b) => {
@@ -8513,6 +8558,8 @@ function SessionPage({
     Record<string, { attempted: boolean; correct: boolean }>
   >({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizMistakeReviewItems, setQuizMistakeReviewItems] = useState<MistakeReviewItem[]>([]);
+  const [showQuizMistakeReview, setShowQuizMistakeReview] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizGroupTaps, setQuizGroupTaps] = useState<Record<string, boolean[]>>(
@@ -8743,6 +8790,7 @@ function SessionPage({
 
     setFinalScore(score);
     setQuizSubmitted(true);
+    setShowQuizMistakeReview(false);
 
     const questionResults = buildQuizQuestionResults(
       quizQuestions,
@@ -8753,6 +8801,20 @@ function SessionPage({
       quizMabAnswers,
       quizMoneyAnswers,
       quizLessonActivityResults
+    );
+    setQuizMistakeReviewItems(
+      buildQuizMistakeReviewItems(
+        quizQuestions,
+        quizAnswers,
+        quizTyped,
+        quizLineAnswers,
+        quizChartDone,
+        quizMabAnswers,
+        quizMoneyAnswers,
+        quizLessonActivityResults,
+        Number(week),
+        lessonTitleLookup
+      )
     );
 
     const store = readStore();
@@ -8922,6 +8984,8 @@ function SessionPage({
     setQuizMoneyAnswers({});
     setQuizLessonActivityResults({});
     setQuizSubmitted(false);
+    setQuizMistakeReviewItems([]);
+    setShowQuizMistakeReview(false);
     setFinalScore(0);
     setQuizIndex(0);
     setQuizGroupTaps({});
@@ -9124,6 +9188,17 @@ function SessionPage({
   // ---------------------------
   if (showPostTestTransition) {
     return <PostTestTransition year={year} realmId={realmId} />;
+  }
+
+  if (showQuizMistakeReview) {
+    return (
+      <MistakeReviewPanel
+        mode="quiz"
+        realmId={realmId}
+        items={quizMistakeReviewItems}
+        onFinish={() => setShowQuizMistakeReview(false)}
+      />
+    );
   }
 
   return (
@@ -9993,6 +10068,15 @@ function SessionPage({
                   >
                     Back to Week
                   </button>
+                  {quizMistakeReviewItems.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowQuizMistakeReview(true)}
+                      className={`px-5 py-3 rounded-2xl font-bold transition ${quizTheme.goToWeek}`}
+                    >
+                      Review My Quiz
+                    </button>
+                  ) : null}
                   {finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
                     <button
                       onClick={() =>
