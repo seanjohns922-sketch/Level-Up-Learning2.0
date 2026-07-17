@@ -318,6 +318,11 @@ export function getY6MeasurelandsPractisedSkills(lessonId: string): string[] | u
   return Y6_MEASURELANDS_LESSONS.find((entry) => lessonId.startsWith(entry.prefix))?.practisedSkills;
 }
 
+export function getY6MeasurelandsLessonQuizContribution(lessonId: string): PracticeTask[] {
+  const entry = Y6_MEASURELANDS_LESSONS.find((candidate) => lessonId.startsWith(candidate.prefix));
+  return entry?.quizContributionBuilder?.() ?? [];
+}
+
 export type Y6MeasurelandsLessonMeta = Omit<Y6MeasurelandsLessonEntry, "generate" | "reset">;
 
 export function getY6MeasurelandsLessonMeta(lessonId: string): Y6MeasurelandsLessonMeta | null {

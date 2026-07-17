@@ -21,6 +21,10 @@ import {
   YEAR5_MEASURELANDS_POSTTEST,
   YEAR5_MEASURELANDS_PRETEST,
 } from "./year5MeasurelandsAssessments";
+import {
+  YEAR6_MEASURELANDS_POSTTEST,
+  YEAR6_MEASURELANDS_PRETEST,
+} from "./year6MeasurelandsAssessments";
 
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -245,61 +249,13 @@ const YEAR5_POSTTEST: Question[] = [
   buildQuestion("y5-measurement-pt-19", "Which decision shows the best measurement thinking?", ["choose the unit that fits the problem", "always choose the biggest number", "always use metres", "always use kilograms"], "choose the unit that fits the problem", "measurement_project", "Master Missions", [8], "year5-measurement-post"),
 ];
 
-// ═══════════════════════ YEAR 6 ══════════════════════════════════════════════
-// W1 Area formula · W2 Composite area · W3 Volume · W4 Metric conversions ·
-// W5 Advanced time · W6 Angle reasoning · W7 Strategy/optimisation · W8 Project.
-const YEAR6_PRETEST: Question[] = [
-  buildQuestion("y6-measurement-pre-01", "Area of a rectangle can be found by ...", ["length + width", "length × width", "length ÷ width", "counting corners"], "length × width", "area_formula", "Area Formula", [1], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-02", "A 5 by 4 rectangle has area ...", ["9 units²", "18 units²", "20 units²", "25 units²"], "20 units²", "area_formula", "Area Formula", [1], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-03", "Composite area means ...", ["one rectangle only", "a shape made from smaller rectangles", "a circular area", "a mass measure"], "a shape made from smaller rectangles", "composite_area", "Composite Area", [2], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-04", "Which area strategy fits a shape made from two rectangles?", ["split it, find each area, then combine", "guess", "measure the perimeter only", "use a clock"], "split it, find each area, then combine", "composite_area", "Composite Area", [2], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-05", "Volume measures the amount of ...", ["space inside a 3D object", "distance around a shape", "time between events", "temperature"], "space inside a 3D object", "volume_intro", "Volume", [3], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-06", "Which unit measures a box's volume?", ["square units", "cubic units", "degrees", "hours"], "cubic units", "volume_intro", "Volume", [3], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-07", "Which has greater volume?", ["shape with 24 cubes", "shape with 18 cubes", "same", "cannot tell"], "shape with 24 cubes", "compare_volume", "Volume", [3], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-08", "Convert 3 m to centimetres.", ["30 cm", "300 cm", "3000 cm", "33 cm"], "300 cm", "metric_convert_length", "Metric Conversions", [4], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-09", "How many grams are in 2 kg?", ["200 g", "2000 g", "20 g", "220 g"], "2000 g", "metric_convert_mass", "Metric Conversions", [4], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-10", "A trip starts at 9:15 and ends at 10:00. The elapsed time is ...", ["30 min", "45 min", "60 min", "75 min"], "45 min", "advanced_time", "Advanced Time", [5], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-11", "Elapsed-time problems ask you to ...", ["find a duration", "find a perimeter", "find an angle", "find a kilogram"], "find a duration", "advanced_time", "Advanced Time", [5], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-12", "Angles on a straight line add to ...", ["90°", "180°", "270°", "360°"], "180°", "straight_line_angles", "Angle Reasoning", [6], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-13", "If one angle on a straight line is 110°, the other is ...", ["60°", "70°", "80°", "90°"], "70°", "straight_line_angles", "Angle Reasoning", [6], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-14", "Which question is about choosing the best tool?", ["Should I use a ruler or tape measure?", "What is 3 × 4?", "What day is Monday?", "How many vowels?"], "Should I use a ruler or tape measure?", "optimisation_tools", "Measurement Mastery", [7], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-15", "Which tool is best for measuring a football field?", ["ruler", "trundle wheel", "paper clips", "teaspoon"], "trundle wheel", "optimisation_tools", "Measurement Mastery", [7], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-16", "Which shows strongest measurement reasoning?", ["choose the strategy that fits the problem", "always choose the biggest unit", "always choose multiplication", "always estimate only"], "choose the strategy that fits the problem", "optimisation_strategy", "Measurement Mastery", [7], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-17", "Which is a real engineering task?", ["design a community park", "alphabetise these words", "copy the date", "find a rhyme"], "design a community park", "master_project", "Master Project", [8], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-18", "A community park design needs fences and lawn cover. Which measurements matter?", ["perimeter and area", "mass and temperature", "angle only", "time only"], "perimeter and area", "master_project", "Master Project", [8], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-19", "A rectangle is 12 cm by 5 cm. Which formula gives its area?", ["A = l + w", "A = l × w", "A = l − w", "A = 2l + 2w"], "A = l × w", "area_formula", "Area Formula", [1], "year6-measurement-pre"),
-  buildQuestion("y6-measurement-pre-20", "What is the best first step for finding composite area?", ["split the shape into rectangles", "find the perimeter", "measure the temperature", "count the angles"], "split the shape into rectangles", "composite_area", "Composite Area", [2], "year6-measurement-pre"),
-];
-const YEAR6_POSTTEST: Question[] = [
-  buildQuestion("y6-measurement-pt-01", "A rectangle is 8 m by 6 m. What is its area?", ["14 m²", "28 m²", "48 m²", "56 m²"], "48 m²", "area_formula", "Area Formula", [1], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-02", "A rectangle area problem asks for the space covered by 7 rows of 4 tiles. Area?", ["11", "21", "28", "56"], "28", "area_formula", "Area Formula", [1], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-03", "A composite shape is made from a 12 m² rectangle and an 8 m² rectangle. Total area?", ["4 m²", "20 m²", "24 m²", "96 m²"], "20 m²", "composite_area", "Composite Area", [2], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-04", "A composite playground has areas 18 m² and 14 m². Total area?", ["22 m²", "28 m²", "32 m²", "252 m²"], "32 m²", "composite_area", "Composite Area", [2], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-05", "A box is built from 3 rows, 2 columns and 4 layers of cubes. How many cubes?", ["9", "18", "24", "36"], "24", "volume_arrays", "Volume", [3], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-06", "What does volume measure?", ["surface", "space inside a 3D object", "distance around", "temperature change"], "space inside a 3D object", "volume_intro", "Volume", [3], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-07", "A storage box has a volume of 30 cubes. Another has 24 cubes. Which has more volume?", ["24-cube box", "30-cube box", "same", "cannot tell"], "30-cube box", "compare_volume", "Volume", [3], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-08", "Convert 2.4 m to centimetres.", ["24 cm", "240 cm", "2400 cm", "244 cm"], "240 cm", "metric_convert_length", "Metric Conversions", [4], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-09", "How many millilitres are in 2.5 L?", ["250 mL", "2500 mL", "25 mL", "2050 mL"], "2500 mL", "metric_convert_capacity", "Metric Conversions", [4], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-10", "A train leaves at 8:35 and arrives at 10:05. Elapsed time?", ["1 h 10 min", "1 h 20 min", "1 h 30 min", "1 h 40 min"], "1 h 30 min", "advanced_time", "Advanced Time", [5], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-11", "A flight starts at 1:45 pm and lasts 2 h 20 min. What finish time?", ["3:55 pm", "4:05 pm", "4:15 pm", "4:25 pm"], "4:05 pm", "advanced_time", "Advanced Time", [5], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-12", "If one angle on a straight line is 125°, the other angle is ...", ["45°", "55°", "65°", "75°"], "55°", "straight_line_angles", "Angle Reasoning", [6], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-13", "Two adjacent angles total 180°. One is 92°. The other is ...", ["78°", "88°", "98°", "108°"], "88°", "missing_angles", "Angle Reasoning", [6], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-14", "Which tool is best for measuring a classroom wall?", ["paper clips", "ruler", "tape measure", "teaspoon"], "tape measure", "optimisation_tools", "Measurement Mastery", [7], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-15", "Which strategy best solves a mixed measurement project?", ["choose the strategy that fits each part", "always use area", "always use time", "always guess first"], "choose the strategy that fits each part", "optimisation_strategy", "Measurement Mastery", [7], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-16", "Which answer shows master measurement thinking?", ["I picked the tool and unit that best fit the problem", "I always used the biggest number", "I only measured one part", "I skipped the diagram"], "I picked the tool and unit that best fit the problem", "optimisation_strategy", "Measurement Mastery", [7], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-17", "To fence a park and cover its lawn, which measurements do you need?", ["perimeter only", "area only", "perimeter and area", "mass and temperature"], "perimeter and area", "master_project", "Master Project", [8], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-18", "A master engineer plans a garden, a path and a water tank. This project combines ...", ["area, length and volume", "only area", "only time", "only mass"], "area, length and volume", "master_project", "Master Project", [8], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-19", "A rectangle is 12 cm by 5 cm. Which formula is correct for its area?", ["A = l + w", "A = l × w", "A = l − w", "A = 2l + 2w"], "A = l × w", "area_formula", "Area Formula", [1], "year6-measurement-post"),
-  buildQuestion("y6-measurement-pt-20", "To find composite area, the smartest first move is to ...", ["split the shape", "find the perimeter", "measure the temperature", "count the angles"], "split the shape", "composite_area", "Composite Area", [2], "year6-measurement-post"),
-];
-
 export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]>> = {
   "Year 1": YEAR1_MEASURELANDS_PRETEST,
   "Year 2": YEAR2_MEASURELANDS_PRETEST,
   "Year 3": YEAR3_MEASURELANDS_PRETEST,
   "Year 4": YEAR4_MEASURELANDS_PRETEST,
   "Year 5": YEAR5_MEASURELANDS_PRETEST,
-  "Year 6": YEAR6_PRETEST,
+  "Year 6": YEAR6_MEASURELANDS_PRETEST,
 };
 
 export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {
@@ -309,7 +265,7 @@ export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {
   "Year 3": buildPostTest("Year 3", YEAR3_MEASURELANDS_POSTTEST),
   "Year 4": buildPostTest("Year 4", YEAR4_MEASURELANDS_POSTTEST),
   "Year 5": buildPostTest("Year 5", YEAR5_MEASURELANDS_POSTTEST),
-  "Year 6": buildPostTest("Year 6", YEAR6_POSTTEST),
+  "Year 6": buildPostTest("Year 6", YEAR6_MEASURELANDS_POSTTEST),
 };
 
 export function getMeasurelandsPretestForYear(yearLabel: string): Question[] {
