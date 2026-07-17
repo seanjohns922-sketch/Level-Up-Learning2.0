@@ -21,6 +21,14 @@ export type CompatProgressRow = {
   updated_at?: string | null;
 };
 
+export type TeacherRealmPlacementRow = {
+  student_id: string;
+  realm_id: string;
+  assigned_start_level: string;
+  assigned_entry_mode: PlacementEntryMode;
+  updated_at: string;
+};
+
 type RealmProgressSummaryRow = {
   student_id: string;
   class_id: string | null;
@@ -531,6 +539,18 @@ export async function fetchNumberCompatProgressForStudent(studentId: string) {
 // teacher owns the student's class and writes a teacher_realm_actions audit row.
 export type PlacementEntryMode = "pretest" | "full_level" | "ground_week1";
 
+export async function fetchTeacherRealmPlacements(studentIds: string[]) {
+  if (studentIds.length === 0) return [] as TeacherRealmPlacementRow[];
+
+  const { data, error } = await supabase
+    .from("student_realm_placement")
+    .select("student_id,realm_id,assigned_start_level,assigned_entry_mode,updated_at")
+    .in("student_id", studentIds);
+
+  if (error) throw error;
+  return (data ?? []) as TeacherRealmPlacementRow[];
+}
+
 export async function teacherChangeStartingLevel(
   studentId: string,
   realmId: string,
@@ -544,6 +564,22 @@ export async function teacherChangeStartingLevel(
     p_entry_mode: entryMode,
   });
   if (error) throw error;
+}
+
+export async function teacherChangeStartingLevels(
+  realmId: string,
+  placements: Array<{ studentId: string; assignedLevel: string; entryMode: PlacementEntryMode }>,
+) {
+  const { data, error } = await supabase.rpc("teacher_change_starting_levels", {
+    p_realm_id: realmId,
+    p_placements: placements.map((placement) => ({
+      student_id: placement.studentId,
+      assigned_level: placement.assignedLevel,
+      entry_mode: placement.entryMode,
+    })),
+  });
+  if (error) throw error;
+  if (data !== placements.length) throw new Error("Not all placements were saved");
 }
 
 export async function teacherResetPretest(studentId: string, realmId: string) {

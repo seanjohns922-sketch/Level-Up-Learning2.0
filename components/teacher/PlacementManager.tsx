@@ -6,12 +6,14 @@ import { getAllRealms } from "@/data/programs/genres";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import {
   fetchRealmCompatProgressForClass,
-  teacherChangeStartingLevel,
+  fetchTeacherRealmPlacements,
+  teacherChangeStartingLevels,
   teacherResetPretest,
   teacherResetRealm,
   teacherResetWeek,
   type CompatProgressRow,
   type PlacementEntryMode,
+  type TeacherRealmPlacementRow,
 } from "@/lib/realm-progress-compat";
 import { normalizeSchoolYearLabel } from "@/lib/studentLevelLabel";
 
@@ -59,25 +61,39 @@ export default function PlacementManager({
 }) {
   const [realmId, setRealmId] = useState<string | null>(null);
   const [progressByRealm, setProgressByRealm] = useState<Record<string, CompatProgressRow[]>>({});
+  const [placements, setPlacements] = useState<TeacherRealmPlacementRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [pending, setPending] = useState<Record<string, { level: string; entry: PlacementEntryMode }>>({});
   const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const [filter, setFilter] = useState<"all" | "needs">("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
 
   const load = useCallback(async () => {
     if (!selectedClass?.id) return;
     setLoading(true);
+    setLoadError(null);
     const ids = students.map((s) => s.id);
-    const results = await Promise.all(
-      ACTIVE_REALM_IDS.map((id) =>
-        fetchRealmCompatProgressForClass(id, selectedClass.id, ids).catch(() => [] as CompatProgressRow[])
-      )
-    );
-    const map: Record<string, CompatProgressRow[]> = {};
-    ACTIVE_REALM_IDS.forEach((id, i) => (map[id] = results[i] ?? []));
-    setProgressByRealm(map);
-    setLoading(false);
+    try {
+      const [results, savedPlacements] = await Promise.all([
+        Promise.all(
+          ACTIVE_REALM_IDS.map((id) =>
+            fetchRealmCompatProgressForClass(id, selectedClass.id, ids).catch(() => [] as CompatProgressRow[])
+          )
+        ),
+        fetchTeacherRealmPlacements(ids),
+      ]);
+      const map: Record<string, CompatProgressRow[]> = {};
+      ACTIVE_REALM_IDS.forEach((id, i) => (map[id] = results[i] ?? []));
+      setProgressByRealm(map);
+      setPlacements(savedPlacements);
+    } catch (error) {
+      console.warn("[PlacementManager] failed to load placements", error);
+      setLoadError("Could not load saved placements. Please retry.");
+    } finally {
+      setLoading(false);
+    }
   }, [selectedClass?.id, students]);
 
   useEffect(() => {
@@ -88,9 +104,19 @@ export default function PlacementManager({
     const out: Record<string, Set<string>> = {};
     for (const id of ACTIVE_REALM_IDS) {
       out[id] = new Set((progressByRealm[id] ?? []).map((r) => r.student_id));
+      placements.filter((placement) => placement.realm_id === id).forEach((placement) => out[id].add(placement.student_id));
     }
     return out;
-  }, [progressByRealm]);
+  }, [placements, progressByRealm]);
+
+  const placementByStudentRealm = useMemo(
+    () => new Map(placements.map((placement) => [`${placement.realm_id}:${placement.student_id}`, placement])),
+    [placements]
+  );
+
+  function savedPlacement(realm: string, studentId: string) {
+    return placementByStudentRealm.get(`${realm}:${studentId}`) ?? null;
+  }
 
   // Current live level/week per (realm, student): pick the furthest level row.
   function currentProgress(realm: string, studentId: string): { year: string; week: number | null } | null {
@@ -103,7 +129,7 @@ export default function PlacementManager({
   }
 
   function defaultLevel(realm: string, s: PMStudent): string {
-    return currentProgress(realm, s.id)?.year ?? schoolYearOf(s);
+    return savedPlacement(realm, s.id)?.assigned_start_level ?? currentProgress(realm, s.id)?.year ?? schoolYearOf(s);
   }
 
   const visibleStudents = useMemo(() => {
@@ -117,13 +143,18 @@ export default function PlacementManager({
 
   const pendingCount = Object.keys(pending).length;
 
-  function setRowLevel(studentId: string, level: string) {
+  function setRowLevel(studentId: string, level: string, realm: string) {
+    setSaveMessage(null);
     setPending((prev) => ({
       ...prev,
-      [studentId]: { level, entry: prev[studentId]?.entry ?? "pretest" },
+      [studentId]: {
+        level,
+        entry: prev[studentId]?.entry ?? savedPlacement(realm, studentId)?.assigned_entry_mode ?? "pretest",
+      },
     }));
   }
   function setRowEntry(studentId: string, entry: PlacementEntryMode, s: PMStudent, realm: string) {
+    setSaveMessage(null);
     setPending((prev) => ({
       ...prev,
       [studentId]: { level: prev[studentId]?.level ?? defaultLevel(realm, s), entry },
@@ -134,10 +165,14 @@ export default function PlacementManager({
   // teacher can still adjust exceptions before Save.
   function useSchoolYearForAll() {
     if (!realmId) return;
+    setSaveMessage(null);
     setPending((prev) => {
       const next = { ...prev };
       for (const s of visibleStudents) {
-        next[s.id] = { level: schoolYearOf(s), entry: prev[s.id]?.entry ?? "pretest" };
+        next[s.id] = {
+          level: schoolYearOf(s),
+          entry: prev[s.id]?.entry ?? savedPlacement(realmId, s.id)?.assigned_entry_mode ?? "pretest",
+        };
       }
       return next;
     });
@@ -145,16 +180,38 @@ export default function PlacementManager({
 
   async function savePlacements() {
     if (!realmId || pendingCount === 0) return;
+    const edits = Object.entries(pending);
     setSaving(true);
+    setSaveMessage(null);
     try {
-      for (const [studentId, edit] of Object.entries(pending)) {
-        await teacherChangeStartingLevel(studentId, realmId, edit.level, edit.entry);
-      }
-      setPending({});
+      await teacherChangeStartingLevels(
+        realmId,
+        edits.map(([studentId, edit]) => ({
+          studentId,
+          assignedLevel: edit.level,
+          entryMode: edit.entry,
+        }))
+      );
+
+      const confirmed = await fetchTeacherRealmPlacements(edits.map(([studentId]) => studentId));
+      const confirmedByStudent = new Map(
+        confirmed.filter((placement) => placement.realm_id === realmId).map((placement) => [placement.student_id, placement])
+      );
+      const unconfirmed = edits.some(([studentId, edit]) => {
+        const saved = confirmedByStudent.get(studentId);
+        return saved?.assigned_start_level !== edit.level || saved.assigned_entry_mode !== edit.entry;
+      });
+      if (unconfirmed) throw new Error("Saved placements could not be verified");
+
       await load();
+      setPending({});
+      setSaveMessage({
+        kind: "success",
+        text: `${edits.length} placement${edits.length === 1 ? "" : "s"} saved`,
+      });
     } catch (err) {
       console.warn("[PlacementManager] save failed", err);
-      alert("Could not save placements. Please try again.");
+      setSaveMessage({ kind: "error", text: "Placements were not fully saved. Please try again." });
     } finally {
       setSaving(false);
     }
@@ -230,6 +287,17 @@ export default function PlacementManager({
         {loading ? (
           <div className="rounded-2xl border border-[#E6E8EC] bg-white p-10 text-center text-sm font-semibold text-[#64748B]">
             Loading class placement…
+          </div>
+        ) : loadError ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+            <p className="text-sm font-semibold text-red-700">{loadError}</p>
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="mt-3 rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white hover:bg-red-800"
+            >
+              Retry
+            </button>
           </div>
         ) : !realmId ? (
           /* Step 1 — realm cards */
@@ -327,7 +395,7 @@ export default function PlacementManager({
                 visibleStudents.map((s) => {
                   const cur = currentProgress(realmId, s.id);
                   const level = pending[s.id]?.level ?? defaultLevel(realmId, s);
-                  const entry = pending[s.id]?.entry ?? "pretest";
+                  const entry = pending[s.id]?.entry ?? savedPlacement(realmId, s.id)?.assigned_entry_mode ?? "pretest";
                   const changed = Boolean(pending[s.id]);
                   return (
                     <div
@@ -338,7 +406,7 @@ export default function PlacementManager({
                       <span className="text-xs font-bold text-[#475569]">{schoolYearOf(s)}</span>
                       <select
                         value={level}
-                        onChange={(e) => setRowLevel(s.id, e.target.value)}
+                        onChange={(e) => setRowLevel(s.id, e.target.value, realmId)}
                         className="rounded-lg border border-[#E6E8EC] bg-white px-2 py-1.5 text-sm font-semibold text-[#0F172A]"
                       >
                         {LEVEL_CATALOG.map((l) => (
@@ -393,9 +461,9 @@ export default function PlacementManager({
 
       {/* Persistent save bar (per-realm view) */}
       {realmId ? (
-        <div className="flex items-center justify-between gap-3 border-t border-[#E6E8EC] bg-white px-6 py-3">
-          <span className="text-sm font-semibold text-[#64748B]">
-            {pendingCount > 0 ? `${pendingCount} change${pendingCount === 1 ? "" : "s"} ready to save` : "No changes to save"}
+        <div className="flex min-h-16 items-center justify-between gap-3 border-t border-[#E6E8EC] bg-white py-3 pl-6 pr-56">
+          <span className={`text-sm font-semibold ${saveMessage?.kind === "success" ? "text-emerald-700" : saveMessage?.kind === "error" ? "text-red-700" : "text-[#64748B]"}`}>
+            {saveMessage?.text ?? (pendingCount > 0 ? `${pendingCount} change${pendingCount === 1 ? "" : "s"} ready to save` : "No changes to save")}
           </span>
           <button
             onClick={savePlacements}
