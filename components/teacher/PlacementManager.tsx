@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ChevronRight, Lock, MoreHorizontal, Users, X } from "lucide-react";
+import { getAllRealms } from "@/data/programs/genres";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import {
   fetchRealmCompatProgressForClass,
@@ -25,14 +26,11 @@ type PMStudent = {
   year_level?: string | null;
 };
 
-const PLACEMENT_REALMS = [
-  { id: "number", name: "Number Nexus", active: true },
-  { id: "measurement", name: "Measurelands", active: true },
-  { id: "space", name: "Starpath", active: false },
-  { id: "reading", name: "Reading Ridge", active: false },
-  { id: "writing", name: "Inkwell Wilds", active: false },
-  { id: "grammar", name: "Runehaven Peaks", active: false },
-];
+const PLACEMENT_REALMS = getAllRealms().map((realm) => ({
+  id: realm.id,
+  label: `${realm.realm} (${realm.strand})`,
+  active: realm.hasContent,
+}));
 const ACTIVE_REALM_IDS = PLACEMENT_REALMS.filter((r) => r.active).map((r) => r.id);
 
 const ENTRY_MODES: { value: PlacementEntryMode; label: string }[] = [
@@ -184,12 +182,12 @@ export default function PlacementManager({
 
   function onResetPretest(s: PMStudent) {
     if (!realmId) return;
-    if (!window.confirm(`Reset ${s.display_name}'s pre-test for ${activeRealm?.name}?\n\nThis clears the pre-test attempt and the pathway it generated, and returns them to "Ready for Pre-Test". Completed lesson history is kept.`)) return;
+    if (!window.confirm(`Reset ${s.display_name}'s pre-test for ${activeRealm?.label}?\n\nThis clears the pre-test attempt and the pathway it generated, and returns them to "Ready for Pre-Test". Completed lesson history is kept.`)) return;
     void runReset(s.id, () => teacherResetPretest(s.id, realmId));
   }
   function onResetWeek(s: PMStudent) {
     if (!realmId) return;
-    if (!window.confirm(`Reset ${s.display_name}'s current week to Week 1 for ${activeRealm?.name}?\n\nThis moves the week pointer only — lesson, quiz and assessment records are preserved.`)) return;
+    if (!window.confirm(`Reset ${s.display_name}'s current week to Week 1 for ${activeRealm?.label}?\n\nThis moves the week pointer only — lesson, quiz and assessment records are preserved.`)) return;
     void runReset(s.id, () => teacherResetWeek(s.id, realmId));
   }
   function confirmResetRealm() {
@@ -219,7 +217,7 @@ export default function PlacementManager({
           <div>
             <h1 className="text-lg font-black text-[#0F172A]">Manage Placements</h1>
             <p className="text-xs font-semibold text-[#64748B]">
-              {selectedClass?.name ?? "Class"}{activeRealm ? ` · ${activeRealm.name}` : ""}
+              {selectedClass?.name ?? "Class"}{activeRealm ? ` · ${activeRealm.label}` : ""}
             </p>
           </div>
         </div>
@@ -241,7 +239,7 @@ export default function PlacementManager({
                 return (
                   <div key={realm.id} className="rounded-2xl border border-[#E6E8EC] bg-white/60 p-5 opacity-70">
                     <div className="flex items-center justify-between">
-                      <div className="text-base font-black text-[#94A3B8]">{realm.name}</div>
+                      <div className="text-base font-black text-[#94A3B8]">{realm.label}</div>
                       <Lock className="h-4 w-4 text-[#CBD5E1]" />
                     </div>
                     <div className="mt-6 text-xs font-bold uppercase tracking-wide text-[#94A3B8]">Coming soon</div>
@@ -257,7 +255,7 @@ export default function PlacementManager({
                   className="rounded-2xl border border-[#E6E8EC] bg-white p-5 text-left shadow-[0_10px_28px_-18px_rgba(15,23,42,0.25)] transition hover:-translate-y-0.5 hover:border-[#0EA5A4]/40 hover:shadow-[0_16px_36px_-18px_rgba(13,148,136,0.35)]"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="text-base font-black text-[#0F172A]">{realm.name}</div>
+                    <div className="text-base font-black text-[#0F172A]">{realm.label}</div>
                     <span className="inline-flex items-center gap-1 text-xs font-bold text-[#0EA5A4]">
                       Manage <ChevronRight className="h-4 w-4" />
                     </span>
@@ -413,9 +411,9 @@ export default function PlacementManager({
       {resetRealmFor ? (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-black text-[#0F172A]">Reset {activeRealm?.name} for {resetRealmFor.display_name}?</h3>
+            <h3 className="text-lg font-black text-[#0F172A]">Reset {activeRealm?.label} for {resetRealmFor.display_name}?</h3>
             <p className="mt-2 text-sm text-[#475569]">
-              This permanently clears this student&apos;s <strong>{activeRealm?.name}</strong> progress, assessments and
+              This permanently clears this student&apos;s <strong>{activeRealm?.label}</strong> progress, assessments and
               unlocks. Other realms are not affected. This cannot be undone.
             </p>
             <label className="mt-4 block text-xs font-bold uppercase tracking-wide text-[#94A3B8]">Type RESET to confirm</label>
