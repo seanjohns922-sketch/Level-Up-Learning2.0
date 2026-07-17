@@ -7,13 +7,11 @@ import { useAuthGuard } from "@/lib/useAuthGuard";
 import QRCode from "qrcode";
 import {
   SCHOOL_YEAR_LEVEL_OPTIONS,
-  formatWorkingLevelOptionLabel,
   normalizeSchoolYearLabel,
-  normalizeWorkingLevelLabel,
 } from "@/lib/studentLevelLabel";
-import { buildDisplayName } from "@/lib/studentName";
+import { buildDisplayName, buildStudentUsername } from "@/lib/studentName";
 
-type AddedStudent = { name: string; pin: string; claimCode: string };
+type AddedStudent = { name: string; username: string; pin: string; claimCode: string };
 
 function isMissingCreateStudentRpc(message?: string | null) {
   return Boolean(message && /create_student_for_class|schema cache|could not find the function/i.test(message));
@@ -32,6 +30,8 @@ export default function NewClassPage() {
   useAuthGuard();
   const [className, setClassName] = useState("");
   const [yearLevels, setYearLevels] = useState<string[]>([]);
+  const [schoolName, setSchoolName] = useState("");
+  const [academicYear, setAcademicYear] = useState(new Date().getFullYear().toString());
   const [creating, setCreating] = useState(false);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [createdClassId, setCreatedClassId] = useState<string | null>(null);
@@ -40,8 +40,8 @@ export default function NewClassPage() {
   // Student adding state
   const [newStudentFirstName, setNewStudentFirstName] = useState("");
   const [newStudentLastName, setNewStudentLastName] = useState("");
+  const [newStudentUsername, setNewStudentUsername] = useState("");
   const [newStudentSchoolYear, setNewStudentSchoolYear] = useState("");
-  const [newStudentWorkingLevel, setNewStudentWorkingLevel] = useState("AUTO_PLACEMENT");
   const [newStudentPin, setNewStudentPin] = useState("");
   const [addingStudent, setAddingStudent] = useState(false);
   const [addedStudents, setAddedStudents] = useState<AddedStudent[]>([]);
@@ -63,7 +63,7 @@ export default function NewClassPage() {
   }
 
   async function handleCreate() {
-    if (!className.trim()) return;
+    if (!className.trim() || !schoolName.trim()) return;
 
     setCreating(true);
     setError("");
@@ -87,6 +87,16 @@ export default function NewClassPage() {
         code = rpcCode;
       }
 
+      const year = Number.parseInt(academicYear, 10);
+      const { data: rpcClass, error: rpcClassError } = await supabase.rpc("create_class_for_teacher", {
+        p_name: className.trim(),
+        p_class_code: code,
+        p_year_levels: yearLevels,
+        p_school_name: schoolName.trim(),
+        p_academic_year: year,
+      });
+      const createdByRpc = Array.isArray(rpcClass) ? rpcClass[0] : rpcClass;
+
       const insertPayload: Record<string, unknown> = {
         name: className.trim(),
         class_code: code,
@@ -94,11 +104,14 @@ export default function NewClassPage() {
       };
       if (yearLevels.length > 0) insertPayload.year_levels = yearLevels;
 
-      let { data: insertedClass, error: classErr } = await supabase
-        .from("classes")
-        .insert(insertPayload)
-        .select("id")
-        .single();
+      let insertedClass: { id: string } | null = createdByRpc?.class_id ? { id: createdByRpc.class_id } : null;
+      let classErr = rpcClassError;
+
+      if (rpcClassError && /create_class_for_teacher|schema cache|could not find the function/i.test(rpcClassError.message)) {
+        const fallback = await supabase.from("classes").insert(insertPayload).select("id").single();
+        insertedClass = fallback.data;
+        classErr = fallback.error;
+      }
 
       if (classErr && /row-level security|get_teacher_id|permission/i.test(classErr.message)) {
         const displayName =
@@ -144,9 +157,9 @@ export default function NewClassPage() {
     const firstName = newStudentFirstName.trim();
     const lastName = newStudentLastName.trim();
     const displayName = buildDisplayName(firstName, lastName);
+    const username = newStudentUsername.trim() || buildStudentUsername(firstName, lastName);
     if (!firstName || !createdClassId) return;
     const schoolYear = normalizeSchoolYearLabel(newStudentSchoolYear);
-    const workingYear = normalizeWorkingLevelLabel(newStudentWorkingLevel === "AUTO_PLACEMENT" ? null : newStudentWorkingLevel);
     if (!schoolYear) {
       setStudentError("Please select the student's school year level.");
       return;
@@ -183,6 +196,7 @@ export default function NewClassPage() {
           display_name: displayName,
           first_name: firstName,
           last_name: lastName || null,
+          username,
           pin: fallbackPin,
         })
         .select("id, pin, qr_token")
@@ -214,22 +228,21 @@ export default function NewClassPage() {
           first_name: firstName,
           last_name: lastName || null,
           display_name: displayName,
+          username,
           school_year_level: schoolYear,
-          working_level: workingYear,
-          year_level: workingYear,
         })
         .eq("id", created.student_id);
     }
     if (created) {
       setAddedStudents((prev) => [
         ...prev,
-        { name: displayName, pin: created.pin, claimCode: created.claim_code || "Pending setup" },
+        { name: displayName, username, pin: created.pin, claimCode: created.claim_code || "Pending setup" },
       ]);
     }
     setNewStudentFirstName("");
     setNewStudentLastName("");
+    setNewStudentUsername("");
     setNewStudentSchoolYear("");
-    setNewStudentWorkingLevel("AUTO_PLACEMENT");
     setNewStudentPin("");
   }
 
@@ -249,6 +262,17 @@ export default function NewClassPage() {
                 className="px-4 py-3 rounded-2xl border border-gray-200 bg-white text-lg"
               />
             </label>
+
+            <div className="grid gap-3 sm:grid-cols-[1fr_140px]">
+              <label className="grid gap-1">
+                <span className="text-sm font-bold text-gray-600">School</span>
+                <input value={schoolName} onChange={(event) => setSchoolName(event.target.value)} placeholder="School name" className="px-4 py-3 rounded-2xl border border-gray-200 bg-white text-base" />
+              </label>
+              <label className="grid gap-1">
+                <span className="text-sm font-bold text-gray-600">Academic Year</span>
+                <input value={academicYear} onChange={(event) => setAcademicYear(event.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" className="px-4 py-3 rounded-2xl border border-gray-200 bg-white text-base" />
+              </label>
+            </div>
 
             <div className="grid gap-2">
               <span className="text-sm font-bold text-gray-600">
@@ -282,7 +306,7 @@ export default function NewClassPage() {
 
             <button
               onClick={handleCreate}
-              disabled={creating || !className.trim()}
+              disabled={creating || !className.trim() || !schoolName.trim() || academicYear.length !== 4}
               className="mt-2 w-full py-3 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-black text-lg hover:bg-[#8fcea4] transition disabled:opacity-50"
             >
               {creating ? "Creating…" : "Create Class"}
@@ -318,13 +342,13 @@ export default function NewClassPage() {
                   {addedStudents.map((s, i) => (
                     <div key={i} className="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-2 text-sm">
                       <span className="font-semibold text-gray-800">{s.name}</span>
-                      <span className="text-gray-500 font-mono text-xs">PIN: <span className="font-black text-gray-800">{s.pin}</span></span>
+                      <span className="text-gray-500 text-xs">{s.username} · Access code: <span className="font-mono font-black text-gray-800">{s.pin}</span></span>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div className="grid gap-2 md:grid-cols-[1fr_1fr_160px_180px_120px_auto]">
+              <div className="grid gap-2 md:grid-cols-[1fr_1fr_190px_160px_130px_auto]">
                 <input
                   value={newStudentFirstName}
                   onChange={(e) => setNewStudentFirstName(e.target.value)}
@@ -339,6 +363,13 @@ export default function NewClassPage() {
                   placeholder="Last name"
                   className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                 />
+                <input
+                  value={newStudentUsername}
+                  onChange={(e) => setNewStudentUsername(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") void addStudent(); }}
+                  placeholder="Username / Student ID (optional)"
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
+                />
                 <select
                   value={newStudentSchoolYear}
                   onChange={(e) => setNewStudentSchoolYear(e.target.value)}
@@ -349,21 +380,11 @@ export default function NewClassPage() {
                     <option key={yr} value={yr}>{yr}</option>
                   ))}
                 </select>
-                <select
-                  value={newStudentWorkingLevel}
-                  onChange={(e) => setNewStudentWorkingLevel(e.target.value)}
-                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
-                >
-                  <option value="AUTO_PLACEMENT">Auto placement…</option>
-                  {yearLevelOptions.map((yr) => (
-                    <option key={yr} value={yr}>{formatWorkingLevelOptionLabel(yr)}</option>
-                  ))}
-                </select>
                 <input
                   value={newStudentPin}
                   onChange={(e) => setNewStudentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
                   onKeyDown={(e) => { if (e.key === "Enter") void addStudent(); }}
-                  placeholder="PIN (opt.)"
+                  placeholder="Access code (opt.)"
                   inputMode="numeric"
                   className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                 />
@@ -393,10 +414,13 @@ export default function NewClassPage() {
                   setCreatedClassId(null);
                   setClassName("");
                   setYearLevels([]);
+                  setSchoolName("");
+                  setAcademicYear(new Date().getFullYear().toString());
                   setQrDataUrl(null);
                   setAddedStudents([]);
                   setNewStudentFirstName("");
                   setNewStudentLastName("");
+                  setNewStudentUsername("");
                   setNewStudentPin("");
                 }}
                 className="px-5 py-3 rounded-2xl bg-white border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition"

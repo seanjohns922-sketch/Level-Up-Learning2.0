@@ -4,6 +4,15 @@ export function buildDisplayName(firstName?: string | null, lastName?: string | 
   return [firstName?.trim(), lastName?.trim()].filter(Boolean).join(" ").trim();
 }
 
+export function buildStudentUsername(firstName?: string | null, lastName?: string | null) {
+  const compactFirstName = (firstName?.trim() ?? "").replace(/\s+/g, "");
+  if (!compactFirstName) return "";
+  const normalizedFirstName =
+    compactFirstName.charAt(0).toUpperCase() + compactFirstName.slice(1).toLowerCase();
+  const lastInitial = (lastName?.trim() ?? "").charAt(0).toLowerCase();
+  return `${normalizedFirstName}${lastInitial}`;
+}
+
 export function splitDisplayName(displayName?: string | null) {
   const raw = displayName?.trim() ?? "";
   if (!raw) {

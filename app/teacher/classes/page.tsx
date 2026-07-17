@@ -2,15 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Archive, Copy, Eye, EyeOff, MoreHorizontal, Trash2, UserPlus, Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import {
   SCHOOL_YEAR_LEVEL_OPTIONS,
-  formatWorkingLevelOptionLabel,
   normalizeSchoolYearLabel,
-  normalizeWorkingLevelLabel,
 } from "@/lib/studentLevelLabel";
-import { buildDisplayName, resolveStudentNameParts } from "@/lib/studentName";
+import { buildDisplayName, buildStudentUsername, resolveStudentNameParts } from "@/lib/studentName";
 
 const YEAR_LEVELS: Array<string> = [...SCHOOL_YEAR_LEVEL_OPTIONS];
 
@@ -22,6 +21,10 @@ type ClassRow = {
   year_levels?: string[] | null;
   created_at: string;
   archived_at?: string | null;
+  school_id?: string | null;
+  school_name?: string | null;
+  academic_year?: number | null;
+  status?: string | null;
 };
 
 type StudentRow = {
@@ -52,7 +55,7 @@ type ParentStudentLinkRow = {
   status: string;
 };
 
-type StudentSortMode = "display_name" | "first_name" | "last_name" | "working_level" | "actual_year";
+type StudentSortMode = "display_name" | "first_name" | "last_name" | "actual_year";
 
 type EditForm = {
   first_name: string;
@@ -60,7 +63,6 @@ type EditForm = {
   username: string;
   pin: string;
   school_year_level: string;
-  working_level: string;
   notes: string;
 };
 
@@ -89,11 +91,11 @@ export default function TeacherClassesPage() {
   const [newStudentUsernames, setNewStudentUsernames] = useState<Record<string, string>>({});
   const [newStudentPins, setNewStudentPins] = useState<Record<string, string>>({});
   const [newStudentSchoolYears, setNewStudentSchoolYears] = useState<Record<string, string>>({});
-  const [newStudentWorkingLevels, setNewStudentWorkingLevels] = useState<Record<string, string>>({});
   const [creatingStudentForClass, setCreatingStudentForClass] = useState<string | null>(null);
   const [lastCreatedLogin, setLastCreatedLogin] = useState<{
     classId: string;
     name: string;
+    username: string;
     pin: string;
     claimCode: string;
   } | null>(null);
@@ -106,7 +108,6 @@ export default function TeacherClassesPage() {
     username: "",
     pin: "",
     school_year_level: "",
-    working_level: "AUTO_PLACEMENT",
     notes: "",
   });
   const [savingEdit, setSavingEdit] = useState(false);
@@ -120,6 +121,8 @@ export default function TeacherClassesPage() {
   const [editingClassId, setEditingClassId] = useState<string | null>(null);
   const [editClassForm, setEditClassForm] = useState<{ name: string; year_levels: string[] }>({ name: "", year_levels: [] });
   const [savingClassEdit, setSavingClassEdit] = useState(false);
+  const [openClassId, setOpenClassId] = useState<string | null>(null);
+  const [revealedPinIds, setRevealedPinIds] = useState<Set<string>>(new Set());
 
   const loadClasses = useCallback(async (teacherId: string) => {
     const { data: cls } = await supabase
@@ -128,7 +131,17 @@ export default function TeacherClassesPage() {
       .eq("teacher_id", teacherId)
       .order("created_at", { ascending: false });
 
-    setClasses(cls ?? []);
+    const loadedClasses = (cls ?? []) as ClassRow[];
+    const schoolIds = [...new Set(loadedClasses.map((entry) => entry.school_id).filter((id): id is string => Boolean(id)))];
+    let schoolNamesById: Record<string, string> = {};
+    if (schoolIds.length > 0) {
+      const { data: schools } = await supabase.from("schools").select("id,name").in("id", schoolIds);
+      schoolNamesById = Object.fromEntries((schools ?? []).map((school) => [school.id, school.name]));
+    }
+    setClasses(loadedClasses.map((entry) => ({
+      ...entry,
+      school_name: entry.school_id ? schoolNamesById[entry.school_id] ?? null : null,
+    })));
     if (cls && cls.length > 0) {
       const classIds = cls.map((c) => c.id);
       const { data: studs } = await supabase
@@ -196,10 +209,6 @@ export default function TeacherClassesPage() {
     return fallback ?? "—";
   }
 
-  function resolveWorkingYearLabel(student: StudentRow) {
-    return normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? null;
-  }
-
   function linkStatus(studentId: string) {
     if (linkedStudentIds.has(studentId)) return "Home linked";
     if (claimCodesByStudentId[studentId]) return "Pending link";
@@ -210,17 +219,12 @@ export default function TeacherClassesPage() {
     const firstName = (newStudentFirstNames[classId] ?? "").trim();
     const lastName = (newStudentLastNames[classId] ?? "").trim();
     const name = buildDisplayName(firstName, lastName);
-    const username = (newStudentUsernames[classId] ?? "").trim();
+    const username = (newStudentUsernames[classId] ?? "").trim() || buildStudentUsername(firstName, lastName);
     const pin = (newStudentPins[classId] ?? "").trim();
     const schoolYear = normalizeSchoolYearLabel(newStudentSchoolYears[classId] ?? "");
-    const workingYear = normalizeWorkingLevelLabel(newStudentWorkingLevels[classId] ?? "");
     if (!firstName) return;
     if (!schoolYear) {
       alert("Please select the student's school year level.");
-      return;
-    }
-    if ((newStudentWorkingLevels[classId] ?? "") === "") {
-      alert("Please choose a working level or auto placement.");
       return;
     }
     if (pin && !/^\d{4}$/.test(pin)) {
@@ -289,6 +293,7 @@ export default function TeacherClassesPage() {
       setLastCreatedLogin({
         classId,
         name,
+        username,
         pin: created.pin,
         claimCode: created.claim_code || "Pending setup",
       });
@@ -300,9 +305,8 @@ export default function TeacherClassesPage() {
           first_name: firstName || null,
           last_name: lastName || null,
           display_name: name,
+          username,
           school_year_level: schoolYear,
-          working_level: workingYear,
-          year_level: workingYear,
         })
         .eq("id", created.student_id);
     }
@@ -311,7 +315,6 @@ export default function TeacherClassesPage() {
     setNewStudentUsernames((current) => ({ ...current, [classId]: "" }));
     setNewStudentPins((current) => ({ ...current, [classId]: "" }));
     setNewStudentSchoolYears((current) => ({ ...current, [classId]: "" }));
-    setNewStudentWorkingLevels((current) => ({ ...current, [classId]: "AUTO_PLACEMENT" }));
     if (authUser?.id) await loadClasses(authUser.id);
   }
 
@@ -347,7 +350,6 @@ export default function TeacherClassesPage() {
       username: student.username ?? "",
       pin: student.pin ?? "",
       school_year_level: resolveSchoolYearLabel(student),
-      working_level: resolveWorkingYearLabel(student) ?? "AUTO_PLACEMENT",
       notes: student.notes ?? "",
     });
   }
@@ -363,28 +365,26 @@ export default function TeacherClassesPage() {
       return;
     }
     if (editForm.pin && !/^\d{4}$/.test(editForm.pin)) {
-      alert("Password must be 4 digits.");
+      alert("Access code must be 4 digits.");
       return;
     }
     setSavingEdit(true);
     const displayName = buildDisplayName(editForm.first_name, editForm.last_name);
+    const username = editForm.username.trim() || buildStudentUsername(editForm.first_name, editForm.last_name);
     const { error } = await supabase
       .from("students")
       .update({
         first_name: editForm.first_name.trim(),
         last_name: editForm.last_name.trim() || null,
         display_name: displayName,
-        username: editForm.username.trim() || null,
+        username,
         pin: editForm.pin || null,
         school_year_level: normalizeSchoolYearLabel(editForm.school_year_level),
-        working_level: normalizeWorkingLevelLabel(editForm.working_level === "AUTO_PLACEMENT" ? null : editForm.working_level),
-        year_level: normalizeWorkingLevelLabel(editForm.working_level === "AUTO_PLACEMENT" ? null : editForm.working_level),
         notes: editForm.notes.trim() || null,
       })
       .eq("id", studentId);
     setSavingEdit(false);
     if (error) { alert(error.message); return; }
-    const normalizedWorking = normalizeWorkingLevelLabel(editForm.working_level === "AUTO_PLACEMENT" ? null : editForm.working_level);
     setStudents((prev) =>
       prev.map((s) =>
         s.id === studentId
@@ -393,11 +393,9 @@ export default function TeacherClassesPage() {
               first_name: editForm.first_name.trim(),
               last_name: editForm.last_name.trim() || null,
               display_name: displayName,
-              username: editForm.username.trim() || null,
+              username,
               pin: editForm.pin || null,
               school_year_level: normalizeSchoolYearLabel(editForm.school_year_level),
-              working_level: normalizedWorking,
-              year_level: normalizedWorking,
               notes: editForm.notes.trim() || null,
             }
           : s
@@ -445,23 +443,23 @@ export default function TeacherClassesPage() {
     setArchivingClassId(cls.id);
     const { error } = await supabase
       .from("classes")
-      .update({ archived_at: new Date().toISOString() })
+      .update({ archived_at: new Date().toISOString(), status: "archived" })
       .eq("id", cls.id);
     setArchivingClassId(null);
     if (error) { alert(error.message); return; }
     setClasses((prev) =>
-      prev.map((c) => (c.id === cls.id ? { ...c, archived_at: new Date().toISOString() } : c))
+      prev.map((c) => (c.id === cls.id ? { ...c, archived_at: new Date().toISOString(), status: "archived" } : c))
     );
   }
 
   async function unarchiveClass(cls: ClassRow) {
     const { error } = await supabase
       .from("classes")
-      .update({ archived_at: null })
+      .update({ archived_at: null, status: "active" })
       .eq("id", cls.id);
     if (error) { alert(error.message); return; }
     setClasses((prev) =>
-      prev.map((c) => (c.id === cls.id ? { ...c, archived_at: null } : c))
+      prev.map((c) => (c.id === cls.id ? { ...c, archived_at: null, status: "active" } : c))
     );
   }
 
@@ -520,7 +518,27 @@ export default function TeacherClassesPage() {
   }
 
   function copyText(value: string) {
-    navigator.clipboard.writeText(value);
+    void navigator.clipboard.writeText(value);
+  }
+
+  function openClass(classId: string) {
+    setOpenClassId((current) => current === classId ? null : classId);
+  }
+
+  function openAddStudent(classId: string) {
+    setOpenClassId(classId);
+    window.setTimeout(() => {
+      document.getElementById(`add-student-${classId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+  }
+
+  function togglePinVisibility(studentId: string) {
+    setRevealedPinIds((current) => {
+      const next = new Set(current);
+      if (next.has(studentId)) next.delete(studentId);
+      else next.add(studentId);
+      return next;
+    });
   }
 
   if (loading) {
@@ -540,15 +558,10 @@ export default function TeacherClassesPage() {
     return index === -1 ? Number.POSITIVE_INFINITY : index;
   };
   const sortSchoolYearLabel = (student: StudentRow) => normalizeSchoolYearLabel(student.school_year_level);
-  const sortWorkingLevelLabel = (student: StudentRow) => normalizeWorkingLevelLabel(student.working_level);
 
   const sortStudentsForClass = (classId: string, includeArchived = false) => {
     const base = students.filter((s) => s.class_id === classId && (includeArchived ? true : !s.archived_at));
     return [...base].sort((a, b) => {
-      if (studentSortMode === "working_level") {
-        const levelDiff = yearIndex(sortWorkingLevelLabel(a)) - yearIndex(sortWorkingLevelLabel(b));
-        if (levelDiff !== 0) return levelDiff;
-      }
       if (studentSortMode === "actual_year") {
         const yearDiff = yearIndex(sortSchoolYearLabel(a)) - yearIndex(sortSchoolYearLabel(b));
         if (yearDiff !== 0) return yearDiff;
@@ -569,36 +582,12 @@ export default function TeacherClassesPage() {
     });
   };
 
-  const sortLabel = studentSortMode === "working_level"
-    ? "Working level"
-    : studentSortMode === "actual_year"
-      ? "School year"
-      : studentSortMode === "first_name"
-        ? "First name"
-        : studentSortMode === "last_name"
-          ? "Surname"
-          : "Full name";
-
   return (
     <main className="min-h-screen bg-[#fbf7f1] px-6 py-10">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
           <h1 className="text-3xl font-black text-gray-900">My Classes</h1>
           <div className="flex items-center gap-3 flex-wrap">
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-500">
-              <span>Order students by</span>
-              <select
-                value={studentSortMode}
-                onChange={(event) => setStudentSortMode(event.target.value as StudentSortMode)}
-                className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
-              >
-                <option value="display_name">Full name</option>
-                <option value="first_name">First name</option>
-                <option value="last_name">Surname</option>
-                <option value="working_level">Working level</option>
-                <option value="actual_year">School year</option>
-              </select>
-            </label>
             <button
               onClick={() => router.push("/teacher/classes/new")}
               className="px-5 py-2.5 rounded-2xl bg-[#9fd7b1] text-[#1f3b2a] font-bold hover:bg-[#8fcea4] transition"
@@ -706,15 +695,29 @@ export default function TeacherClassesPage() {
                               {yr}
                             </span>
                           ))}
+                          {cls.school_name ? <span className="text-xs font-semibold text-gray-400">{cls.school_name}</span> : null}
+                          {cls.academic_year ? <span className="text-xs font-semibold text-gray-400">{cls.academic_year}</span> : null}
+                          {authUser ? (
+                            <span className="text-xs font-semibold text-gray-400">
+                              {(authUser.user_metadata?.display_name as string | undefined) ?? authUser.email ?? "Teacher"}
+                            </span>
+                          ) : null}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex flex-wrap items-center justify-end gap-2">
                         <span className="text-sm font-semibold text-gray-500 mr-1">
                           {activeStuds.length} student{activeStuds.length !== 1 ? "s" : ""}
                         </span>
-                        <span className="text-xs font-semibold text-gray-400">
-                          Sorted: {sortLabel}
-                        </span>
+                        {!isClassArchived ? (
+                          <button type="button" onClick={() => openAddStudent(cls.id)} className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700">
+                            <UserPlus size={14} /> Add Students
+                          </button>
+                        ) : null}
+                        {!isClassArchived ? (
+                          <button type="button" onClick={() => openClass(cls.id)} className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50">
+                            <Users size={14} /> {openClassId === cls.id ? "Close Class" : "Open Class"}
+                          </button>
+                        ) : null}
                         {!isClassArchived && (
                           <button
                             type="button"
@@ -732,30 +735,39 @@ export default function TeacherClassesPage() {
                           >
                             Restore
                           </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => archiveClass(cls)}
-                            disabled={archivingClassId === cls.id}
-                            className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                          >
-                            {archivingClassId === cls.id ? "Archiving…" : "Archive"}
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => deleteClass(cls)}
-                          disabled={deletingClassId === cls.id}
-                          className="rounded-xl border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100 disabled:opacity-50"
-                        >
-                          {deletingClassId === cls.id ? "Deleting…" : "Delete"}
-                        </button>
+                        ) : null}
+                        <details className="relative">
+                          <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 hover:bg-gray-50" title="Class options">
+                            <MoreHorizontal size={16} />
+                          </summary>
+                          <div className="absolute right-0 z-20 mt-1 grid min-w-36 gap-1 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg">
+                            {!isClassArchived ? (
+                              <button type="button" onClick={() => archiveClass(cls)} disabled={archivingClassId === cls.id} className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-50">
+                                <Archive size={14} /> {archivingClassId === cls.id ? "Archiving…" : "Archive"}
+                              </button>
+                            ) : null}
+                            <button type="button" onClick={() => deleteClass(cls)} disabled={deletingClassId === cls.id} className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-bold text-red-600 hover:bg-red-50 disabled:opacity-50">
+                              <Trash2 size={14} /> {deletingClassId === cls.id ? "Deleting…" : "Delete"}
+                            </button>
+                          </div>
+                        </details>
                       </div>
                     </div>
                   )}
 
-                  {!isClassArchived && (
+                  {!isClassArchived && openClassId === cls.id && (
                     <>
+                      <div className="mt-4 flex justify-end">
+                        <label className="flex items-center gap-2 text-xs font-semibold text-gray-500">
+                          Order students by
+                          <select value={studentSortMode} onChange={(event) => setStudentSortMode(event.target.value as StudentSortMode)} className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-gray-700">
+                            <option value="last_name">Surname</option>
+                            <option value="first_name">First name</option>
+                            <option value="display_name">Full name</option>
+                            <option value="actual_year">School year</option>
+                          </select>
+                        </label>
+                      </div>
                       {visibleStuds.length > 0 && (
                         <div className="mt-4 grid gap-2">
                           {visibleStuds.map((s) => {
@@ -799,16 +811,17 @@ export default function TeacherClassesPage() {
                                         </div>
                                       </div>
                                       <div>
-                                        <label className="text-xs font-bold text-gray-500 mb-1 block">Username</label>
+                                        <label className="text-xs font-bold text-gray-500 mb-1 block">Username / Student ID</label>
                                         <input
                                           value={editForm.username}
                                           onChange={(e) => setEditForm((f) => ({ ...f, username: e.target.value }))}
                                           className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
-                                          placeholder="e.g. sean"
+                                          placeholder={buildStudentUsername(editForm.first_name, editForm.last_name) || "e.g. Seanj"}
                                         />
+                                        <p className="mt-1 text-[10px] text-gray-400">Leave blank to generate it from the student&apos;s name.</p>
                                       </div>
                                       <div>
-                                        <label className="text-xs font-bold text-gray-500 mb-1 block">Password (4-digit)</label>
+                                        <label className="text-xs font-bold text-gray-500 mb-1 block">Temporary Access Code (4-digit)</label>
                                         <div className="flex items-center gap-1.5">
                                           <input
                                             value={editForm.pin}
@@ -839,7 +852,7 @@ export default function TeacherClassesPage() {
                                     </div>
                                   </div>
 
-                                  <div className="grid gap-2 md:grid-cols-2">
+                                  <div>
                                     <div>
                                       <label className="text-xs font-bold text-gray-500 mb-1 block">School Year Level</label>
                                       <select
@@ -852,20 +865,6 @@ export default function TeacherClassesPage() {
                                           <option key={yr} value={yr}>{yr}</option>
                                         ))}
                                       </select>
-                                    </div>
-                                    <div>
-                                      <label className="text-xs font-bold text-gray-500 mb-1 block">Working Level</label>
-                                      <select
-                                        value={editForm.working_level}
-                                        onChange={(e) => setEditForm((f) => ({ ...f, working_level: e.target.value }))}
-                                        className="w-full rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-blue-300"
-                                      >
-                                        <option value="AUTO_PLACEMENT">Placement not completed / Auto placement</option>
-                                        {YEAR_LEVELS.map((yr) => (
-                                          <option key={yr} value={yr}>{formatWorkingLevelOptionLabel(yr)}</option>
-                                        ))}
-                                      </select>
-                                      <p className="text-[10px] text-gray-400 mt-1">Placement updates this level, not the school year.</p>
                                     </div>
                                   </div>
 
@@ -914,9 +913,6 @@ export default function TeacherClassesPage() {
                                     <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-sky-50 text-sky-700">
                                       School: {resolveSchoolYearLabel(s, cls.id)}
                                     </span>
-                                    <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-indigo-50 text-indigo-600">
-                                      Working: {resolveWorkingYearLabel(s) ? formatWorkingLevelOptionLabel(resolveWorkingYearLabel(s)!) : "Placement pending"}
-                                    </span>
                                     {isArchived && (
                                       <span className="rounded-full px-2 py-0.5 text-[11px] font-black bg-gray-200 text-gray-500">
                                         Archived
@@ -943,8 +939,12 @@ export default function TeacherClassesPage() {
                                         Username: <span className="font-semibold text-gray-700">{s.username}</span>
                                       </span>
                                     )}
-                                    <span>
-                                      Password: <span className="font-mono font-bold text-gray-700">{s.pin ?? "—"}</span>
+                                    <span className="inline-flex items-center gap-1">
+                                      Access code: <span className="min-w-10 font-mono font-bold text-gray-700">{revealedPinIds.has(s.id) ? s.pin ?? "—" : "••••"}</span>
+                                      <button type="button" onClick={() => togglePinVisibility(s.id)} title={revealedPinIds.has(s.id) ? "Hide access code" : "Reveal access code"} className="text-gray-400 hover:text-gray-700">
+                                        {revealedPinIds.has(s.id) ? <EyeOff size={14} /> : <Eye size={14} />}
+                                      </button>
+                                      {s.pin ? <button type="button" onClick={() => copyText(s.pin!)} title="Copy access code" className="text-gray-400 hover:text-gray-700"><Copy size={14} /></button> : null}
                                     </span>
                                     {!isArchived && claimCodesByStudentId[s.id] && (
                                       <span>
@@ -991,16 +991,9 @@ export default function TeacherClassesPage() {
                                         type="button"
                                         onClick={() => archiveStudent(s)}
                                         disabled={archivingStudentId === s.id}
-                                        className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-100 disabled:opacity-50"
+                                        className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-50"
                                       >
-                                        {archivingStudentId === s.id ? "Archiving…" : "Archive"}
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => deleteStudent(s)}
-                                        className="rounded-xl border border-red-300 bg-red-100 px-3 py-2 text-xs font-bold text-red-800 hover:bg-red-200"
-                                      >
-                                        Delete
+                                        <Archive size={14} /> {archivingStudentId === s.id ? "Archiving…" : "Archive"}
                                       </button>
                                     </>
                                   )}
@@ -1041,14 +1034,14 @@ export default function TeacherClassesPage() {
                         </div>
                       )}
 
-                      <div className="mt-4 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/60 p-4">
+                      <div id={`add-student-${cls.id}`} className="mt-4 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/60 p-4">
                         <div>
                           <div className="text-xs font-black uppercase tracking-wide text-emerald-700">Add Student</div>
                           <p className="text-[11px] text-emerald-600/70 mt-0.5">
-                            Class code: <span className="font-mono font-black tracking-widest">{cls.class_code}</span> · Username + password are what students type to log in.
+                            Class code: <span className="font-mono font-black tracking-widest">{cls.class_code}</span> · Leave username blank to generate it from the student&apos;s name.
                           </p>
                         </div>
-                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_1fr_160px_180px_130px_auto]">
+                        <div className="mt-3 grid gap-2 md:grid-cols-[1fr_1fr_190px_160px_140px_auto]">
                           <input
                             value={newStudentFirstNames[cls.id] ?? ""}
                             onChange={(event) =>
@@ -1070,7 +1063,7 @@ export default function TeacherClassesPage() {
                             onChange={(event) =>
                               setNewStudentUsernames((current) => ({ ...current, [cls.id]: event.target.value }))
                             }
-                            placeholder="Username (login)"
+                            placeholder="Username / Student ID (optional)"
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           />
                           <select
@@ -1085,18 +1078,6 @@ export default function TeacherClassesPage() {
                               <option key={yr} value={yr}>{yr}</option>
                             ))}
                           </select>
-                          <select
-                            value={newStudentWorkingLevels[cls.id] ?? "AUTO_PLACEMENT"}
-                            onChange={(event) =>
-                              setNewStudentWorkingLevels((current) => ({ ...current, [cls.id]: event.target.value }))
-                            }
-                            className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
-                          >
-                            <option value="AUTO_PLACEMENT">Auto placement…</option>
-                            {YEAR_LEVELS.map((yr) => (
-                              <option key={yr} value={yr}>{formatWorkingLevelOptionLabel(yr)}</option>
-                            ))}
-                          </select>
                           <input
                             value={newStudentPins[cls.id] ?? ""}
                             onChange={(event) =>
@@ -1105,7 +1086,7 @@ export default function TeacherClassesPage() {
                                 [cls.id]: event.target.value.replace(/\D/g, "").slice(0, 4),
                               }))
                             }
-                            placeholder="Password (4-digit)"
+                            placeholder="Access code (4-digit)"
                             inputMode="numeric"
                             className="rounded-xl border border-white bg-white px-3 py-2 text-sm font-semibold text-gray-900 outline-none focus:border-emerald-300"
                           />
@@ -1120,7 +1101,7 @@ export default function TeacherClassesPage() {
                         </div>
                         {lastCreatedLogin?.classId === cls.id ? (
                           <div className="mt-3 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-gray-600">
-                            Student added: <span className="font-black text-gray-900">{lastCreatedLogin.name}</span> · Password:{" "}
+                            Student added: <span className="font-black text-gray-900">{lastCreatedLogin.name}</span> · Username: <span className="font-black text-gray-900">{lastCreatedLogin.username}</span> · Access code:{" "}
                             <span className="font-mono font-black text-gray-900">{lastCreatedLogin.pin}</span>
                           </div>
                         ) : null}
