@@ -13,6 +13,10 @@ const sessionPage = read("app/session/page.tsx");
 const typed = read("components/activities/TypedResponseActivity.tsx");
 const multipleChoice = read("components/activities/MultipleChoiceActivity.tsx");
 const benchmarkSort = read("components/activities/BenchmarkSort.tsx");
+const wrongHandler = engine.slice(
+  engine.indexOf("function handleWrong"),
+  engine.indexOf("function handleNextQuestion")
+);
 const submittedAnswerAdapters = [
   "AdditionStrategy.tsx",
   "AreaModelSelect.tsx",
@@ -52,12 +56,20 @@ check(
 check(
   "Incorrect feedback advances only through the explicit Next Question action",
   engine.includes("status === \"wrong\" && wrongFeedback") &&
-    engine.includes("onClick={loadNextQuestion}") &&
+    engine.includes("onClick={handleNextQuestion}") &&
+    engine.includes('feedbackLockRef.current === "incorrect" && !fromIncorrectButton') &&
     engine.includes("Next Question")
 );
 check(
+  "A wrong submission cannot generate or count the next question before Next Question",
+  !wrongHandler.includes("loadNextQuestion(") &&
+    !wrongHandler.includes("setQuestionsAnswered(") &&
+    engine.includes('loadNextQuestion({ fromIncorrectButton: true })')
+);
+check(
   "The held activity cannot be changed after the first wrong submission",
-  engine.includes('status === "wrong" ? "pointer-events-none" : undefined')
+  engine.includes('disabled={status === "wrong"}') &&
+    engine.includes('status === "wrong" ? "pointer-events-none min-w-0 border-0 p-0"')
 );
 check(
   "A wrong submission is scored exactly once",
@@ -78,7 +90,9 @@ check(
 );
 check(
   "Typed responses pass the student's submitted value to the shared engine",
-  typed.includes("onWrong?.(typed)")
+  typed.includes("onWrong?.(typed)") &&
+    engine.includes("<fieldset") &&
+    engine.includes('disabled={status === "wrong"}')
 );
 check(
   "Multiple choice passes the selected option and locks after submission",

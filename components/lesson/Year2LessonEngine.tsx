@@ -371,8 +371,22 @@ function getQuestionCorrectAnswer(question: Year2QuestionData | null) {
 
 function getQuestionExplanation(question: Year2QuestionData | null, correctAnswer: string) {
   if (!question) return `The correct answer is ${correctAnswer}.`;
-  if (question.kind === "typed_response" && question.visual?.type === "mab") {
-    const mabVisual = question.visual as typeof question.visual & { placeValues?: string[] };
+  const questionRecord = question as unknown as Record<string, unknown>;
+  const mabVisual =
+    question.kind === "typed_response" && question.visual?.type === "mab"
+      ? question.visual as typeof question.visual & { placeValues?: string[] }
+      : question.kind === "place_value_builder"
+        ? questionRecord as {
+            placeValues?: string[];
+            hundredThousands?: number;
+            tenThousands?: number;
+            thousands?: number;
+            hundreds?: number;
+            tens?: number;
+            ones?: number;
+          }
+        : null;
+  if (mabVisual) {
     const places = [
       ["hundred_thousands", mabVisual.hundredThousands, 100000, "hundred thousand"],
       ["ten_thousands", mabVisual.tenThousands, 10000, "ten thousand"],
@@ -388,13 +402,15 @@ function getQuestionExplanation(question: Year2QuestionData | null, correctAnswe
         count > 0
     );
     if (shown.length > 0) {
-      const words = shown
-        .map(([, count, , label]) => `${count} ${count === 1 ? label : `${label}s`}`)
-        .join(", ");
       const expanded = shown
         .map(([, count, multiplier]) => ((count ?? 0) * multiplier).toLocaleString("en-AU"))
         .join(" + ");
-      return `There are ${words}: ${expanded} = ${correctAnswer}.`;
+      const working = shown
+        .map(([, count, multiplier, label]) =>
+          `${count} ${count === 1 ? label : `${label}s`} = ${((count ?? 0) * multiplier).toLocaleString("en-AU")}`
+        )
+        .join("\n");
+      return `${working}\n\n${expanded} = ${correctAnswer}.`;
     }
   }
   if ("helper" in question && typeof question.helper === "string" && question.helper.trim()) {
@@ -650,6 +666,7 @@ export function Year2LessonEngine({
   );
   const questionOrderRef = useRef(initialTurn.question ? 1 : 0);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const feedbackLockRef = useRef<"idle" | "correct" | "incorrect">("idle");
   const markedCompleteRef = useRef(false);
   const scoredThisTurnRef = useRef(false);
   const [attemptLog, setAttemptLog] = useState<LessonAttemptEntry[]>([]);
@@ -691,7 +708,8 @@ export function Year2LessonEngine({
     }
   }
 
-  function loadNextQuestion() {
+  function loadNextQuestion({ fromIncorrectButton = false }: { fromIncorrectButton?: boolean } = {}) {
+    if (feedbackLockRef.current === "incorrect" && !fromIncorrectButton) return;
     clearPendingTimeout();
     if (activities.length === 0) return;
 
@@ -738,6 +756,7 @@ export function Year2LessonEngine({
     setCurrentQuestion(nextTurn.question);
     setCurrentQuestionSequence(questionOrderRef.current);
     setQuestionKey((v) => v + 1);
+    feedbackLockRef.current = "idle";
     setStatus("idle");
     setWrongFeedback(null);
     scoredThisTurnRef.current = false;
@@ -826,6 +845,12 @@ export function Year2LessonEngine({
       if (typeof snap.questionKey === "number") setQuestionKey(snap.questionKey);
       if (snap.feedbackStatus) setStatus(snap.feedbackStatus);
       if (snap.wrongFeedback) setWrongFeedback(snap.wrongFeedback);
+      feedbackLockRef.current =
+        snap.feedbackStatus === "wrong"
+          ? "incorrect"
+          : snap.feedbackStatus === "correct"
+            ? "correct"
+            : "idle";
       scoredThisTurnRef.current = snap.scoredCurrentTurn === true;
       setCoachDone(snap.coachDone === true);
       setLessonMistakeReviewDone(snap.mistakeReviewDone === true);
@@ -851,6 +876,7 @@ export function Year2LessonEngine({
     setComboCount(0);
     setCoachDone(false);
     setReflectionDone(false);
+    feedbackLockRef.current = "idle";
     setStatus("idle");
     setWrongFeedback(null);
     scoredThisTurnRef.current = false;
@@ -1018,6 +1044,7 @@ export function Year2LessonEngine({
   function handleCorrect() {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
+    feedbackLockRef.current = "correct";
     const mode =
       questionHistoryRef.current[questionHistoryRef.current.length - 1]?.mode ??
       ((currentActivity?.config ?? {}) as { mode?: string }).mode ??
@@ -1078,6 +1105,7 @@ export function Year2LessonEngine({
     const submittedAnswer = studentAnswer?.trim() || "Submitted response";
     const correctAnswer = getQuestionCorrectAnswer(currentQuestion) ?? "See the worked correction";
     const explanation = getQuestionExplanation(currentQuestion, correctAnswer);
+    feedbackLockRef.current = "incorrect";
     setWrongFeedback({ studentAnswer: submittedAnswer, correctAnswer, explanation });
     setLessonMistakes((current) => [
       ...current,
@@ -1130,10 +1158,15 @@ export function Year2LessonEngine({
         skillTag: mode,
       });
     }
-    questionsAnsweredRef.current += 1;
-    setQuestionsAnswered((v) => v + 1);
     saveBestChain(comboCount);
     setComboCount(0);
+  }
+
+  function handleNextQuestion() {
+    if (feedbackLockRef.current !== "incorrect") return;
+    questionsAnsweredRef.current += 1;
+    setQuestionsAnswered((value) => value + 1);
+    loadNextQuestion({ fromIncorrectButton: true });
   }
 
   const hint = currentQuestion
@@ -1462,7 +1495,11 @@ export function Year2LessonEngine({
                   )}
                 </div>
 
-                <div className={status === "wrong" ? "pointer-events-none" : undefined} aria-disabled={status === "wrong"}>
+                <fieldset
+                  disabled={status === "wrong"}
+                  className={status === "wrong" ? "pointer-events-none min-w-0 border-0 p-0" : "min-w-0 border-0 p-0"}
+                  aria-disabled={status === "wrong"}
+                >
                   <LessonRenderer
                     key={questionKey}
                     activity={currentActivity}
@@ -1473,7 +1510,7 @@ export function Year2LessonEngine({
                     onWrong={handleWrong}
                     realmId={realmId}
                   />
-                </div>
+                </fieldset>
                 {status === "wrong" && wrongFeedback ? (
                   <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-slate-900" role="status">
                     <div className="text-lg font-black text-red-800">Not quite.</div>
@@ -1485,11 +1522,11 @@ export function Year2LessonEngine({
                         <span className="font-black">Correct answer:</span> {wrongFeedback.correctAnswer}
                       </div>
                     </div>
-                    <p className="mt-3 text-sm font-semibold leading-relaxed text-slate-700">{wrongFeedback.explanation}</p>
+                    <p className="mt-3 whitespace-pre-line text-sm font-semibold leading-relaxed text-slate-700">{wrongFeedback.explanation}</p>
                     <div className="mt-4 flex justify-end">
                       <button
                         type="button"
-                        onClick={loadNextQuestion}
+                        onClick={handleNextQuestion}
                         className="pointer-events-auto inline-flex items-center gap-2 rounded-xl bg-trust-blue px-5 py-3 font-black text-white transition hover:opacity-90"
                       >
                         Next Question <ArrowRight className="h-4 w-4" aria-hidden="true" />
