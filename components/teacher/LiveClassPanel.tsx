@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import {
@@ -111,6 +112,7 @@ type LiveStudentCard = {
   workingLevelBadge?: string | null;
   status: LiveStudentStatus;
   currentLevel?: string | null;
+  currentRealm?: string | null;
   currentWeek?: number | null;
   currentLesson?: string | null;
   currentLessonTitle?: string | null;
@@ -143,6 +145,9 @@ type LiveStudentCard = {
 
 type LiveCardDisplayGroup = "live" | "needs_support" | "idle" | "waiting_to_start";
 type LiveStatusFilter = "all" | LiveCardDisplayGroup;
+type LiveSortKey = "student" | "realm" | "level" | "week" | "lesson" | "attempt" | "score" | "percentage" | "lastActive";
+type LiveSortDirection = "asc" | "desc";
+type LiveSort = { key: LiveSortKey; direction: LiveSortDirection } | null;
 
 const STATUS_PRIORITY: Record<LiveCardDisplayGroup, number> = {
   needs_support: 0,
@@ -195,6 +200,118 @@ function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEv
 function normalizeAttemptRealm(value?: string | null) {
   const normalized = value?.trim().toLowerCase();
   return normalized === "measurement" || normalized === "measurelands" ? "measurement" : "number";
+}
+
+function formatRealmBadge(realm?: string | null) {
+  return normalizeAttemptRealm(realm) === "measurement" ? "ML" : "NN";
+}
+
+function compareNullableNumbers(left: number | null, right: number | null, direction: LiveSortDirection) {
+  if (left == null && right == null) return 0;
+  if (left == null) return 1;
+  if (right == null) return -1;
+  return direction === "asc" ? left - right : right - left;
+}
+
+function levelSortValue(card: LiveStudentCard) {
+  const label = card.currentLevel ?? card.workingLevelBadge ?? "";
+  if (/prep|ground/i.test(label)) return 0;
+  const match = /(?:year|level|lvl)\s*(\d+)/i.exec(label);
+  return match ? Number(match[1]) : null;
+}
+
+function lessonSortValue(card: LiveStudentCard) {
+  const lessonIdMatch = /(?:^|-)l(\d+)$/i.exec(card.currentLesson ?? "");
+  if (lessonIdMatch) return Number(lessonIdMatch[1]);
+  const titleMatch = /lesson\s*(\d+)/i.exec(card.currentLessonTitle ?? "");
+  return titleMatch ? Number(titleMatch[1]) : null;
+}
+
+function compareLiveCards(left: LiveStudentCard, right: LiveStudentCard, sort: NonNullable<LiveSort>) {
+  const directionFactor = sort.direction === "asc" ? 1 : -1;
+  let comparison = 0;
+
+  switch (sort.key) {
+    case "student":
+      comparison = left.displayName.localeCompare(right.displayName, undefined, { sensitivity: "base", numeric: true }) * directionFactor;
+      break;
+    case "realm":
+      comparison = formatRealmBadge(left.currentRealm).localeCompare(formatRealmBadge(right.currentRealm)) * directionFactor;
+      break;
+    case "level":
+      comparison = compareNullableNumbers(levelSortValue(left), levelSortValue(right), sort.direction);
+      break;
+    case "week":
+      comparison = compareNullableNumbers(left.currentWeek ?? null, right.currentWeek ?? null, sort.direction);
+      break;
+    case "lesson":
+      comparison = compareNullableNumbers(lessonSortValue(left), lessonSortValue(right), sort.direction);
+      break;
+    case "attempt":
+      comparison = compareNullableNumbers(left.attemptNumber ?? null, right.attemptNumber ?? null, sort.direction);
+      break;
+    case "score":
+      comparison = compareNullableNumbers(
+        (left.questionsAnswered ?? 0) > 0 ? (left.correctCount ?? null) : null,
+        (right.questionsAnswered ?? 0) > 0 ? (right.correctCount ?? null) : null,
+        sort.direction,
+      );
+      if (comparison === 0) {
+        comparison = compareNullableNumbers(
+          (left.questionsAnswered ?? 0) > 0 ? (left.questionsAnswered ?? null) : null,
+          (right.questionsAnswered ?? 0) > 0 ? (right.questionsAnswered ?? null) : null,
+          sort.direction,
+        );
+      }
+      break;
+    case "percentage":
+      comparison = compareNullableNumbers(
+        (left.questionsAnswered ?? 0) > 0 ? (left.accuracyPercent ?? null) : null,
+        (right.questionsAnswered ?? 0) > 0 ? (right.accuracyPercent ?? null) : null,
+        sort.direction,
+      );
+      break;
+    case "lastActive":
+      comparison = compareNullableNumbers(
+        left.lastActiveAt ? new Date(left.lastActiveAt).getTime() : null,
+        right.lastActiveAt ? new Date(right.lastActiveAt).getTime() : null,
+        sort.direction,
+      );
+      break;
+  }
+
+  return comparison || left.displayName.localeCompare(right.displayName, undefined, { sensitivity: "base", numeric: true });
+}
+
+function SortHeader({
+  sortKey,
+  children,
+  sort,
+  onSort,
+  align = "left",
+}: {
+  sortKey: LiveSortKey;
+  children: string;
+  sort: LiveSort;
+  onSort: (key: LiveSortKey) => void;
+  align?: "left" | "right";
+}) {
+  const active = sort?.key === sortKey;
+  const Icon = !active ? ChevronsUpDown : sort.direction === "asc" ? ArrowUp : ArrowDown;
+  return (
+    <button
+      type="button"
+      onClick={() => onSort(sortKey)}
+      className={`flex min-w-0 items-center gap-1 rounded px-1 py-1 transition hover:bg-slate-200 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
+        align === "right" ? "justify-end" : "justify-start"
+      } ${active ? "text-slate-700" : "text-slate-400"}`}
+      aria-label={`Sort by ${children}${active ? `, currently ${sort.direction}ending` : ""}`}
+      title={`Sort by ${children}`}
+    >
+      <span className="truncate">{children}</span>
+      <Icon className="h-3 w-3 shrink-0" aria-hidden="true" />
+    </button>
+  );
 }
 
 function lessonNumberFromRow(row: LiveStudentActivityRow) {
@@ -340,7 +457,7 @@ function toLiveCard(
         studentName: student.display_name,
         classId: student.class_id,
         currentLevel: row.current_level ?? null,
-        currentStrand: null,
+        currentStrand: row.current_strand ?? null,
         currentWeek: row.current_week ?? null,
         currentLesson: row.current_lesson ?? null,
         currentLessonTitle: row.current_lesson_title ?? null,
@@ -381,6 +498,7 @@ function toLiveCard(
     workingLevelBadge: formatWorkingLevelBadge(student.working_level),
     status: insight?.status ?? row?.ai_status ?? "idle",
     currentLevel: row?.current_level ?? null,
+    currentRealm: row?.current_strand ?? null,
     currentWeek: row?.current_week ?? null,
     currentLesson: row?.current_lesson ?? null,
     currentLessonTitle: row?.current_lesson_title ?? null,
@@ -487,6 +605,7 @@ export default function LiveClassPanel({
   const [filter, setFilter] = useState<LiveStatusFilter>("all");
   const [spotlightMode, setSpotlightMode] = useState(false);
   const [activeOnly, setActiveOnly] = useState(false);
+  const [sort, setSort] = useState<LiveSort>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedStudentEvents, setSelectedStudentEvents] = useState<LiveStudentEventRow[]>([]);
 
@@ -649,6 +768,7 @@ export default function LiveClassPanel({
       });
     }
     const sorted = [...base].sort((left, right) => {
+      if (sort) return compareLiveCards(left, right, sort);
       const leftGroup = getCardDisplayGroup(left);
       const rightGroup = getCardDisplayGroup(right);
       const statusGap = STATUS_PRIORITY[leftGroup] - STATUS_PRIORITY[rightGroup];
@@ -662,7 +782,17 @@ export default function LiveClassPanel({
       return rightTime - leftTime;
     });
     return spotlightMode ? sorted.slice(0, 6) : sorted;
-  }, [cards, filter, spotlightMode, activeOnly]);
+  }, [cards, filter, spotlightMode, activeOnly, sort]);
+
+  function updateSort(key: LiveSortKey) {
+    const descendingFirst: LiveSortKey[] = ["score", "percentage", "lastActive"];
+    setSort((current) => {
+      if (current?.key === key) {
+        return { key, direction: current.direction === "asc" ? "desc" : "asc" };
+      }
+      return { key, direction: descendingFirst.includes(key) ? "desc" : "asc" };
+    });
+  }
 
   const selectedStudent = useMemo<LiveStudentDrawerData | null>(
     () => filteredCards.concat(cards).find((card) => card.id === selectedStudentId) ?? null,
@@ -817,15 +947,15 @@ export default function LiveClassPanel({
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_28px_-16px_rgba(15,23,42,0.18)]">
             {/* Column headers */}
             <div className="grid grid-cols-[1.5fr_0.6fr_0.7fr_0.5fr_0.7fr_0.8fr_0.7fr_0.7fr_1fr] items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-400">
-              <span>Student</span>
-              <span>Realm</span>
-              <span>Level</span>
-              <span>Week</span>
-              <span>Lesson</span>
-              <span>Attempt</span>
-              <span className="text-right">Score</span>
-              <span className="text-right">%</span>
-              <span className="text-right">Last active</span>
+              <SortHeader sortKey="student" sort={sort} onSort={updateSort}>Student</SortHeader>
+              <SortHeader sortKey="realm" sort={sort} onSort={updateSort}>Realm</SortHeader>
+              <SortHeader sortKey="level" sort={sort} onSort={updateSort}>Level</SortHeader>
+              <SortHeader sortKey="week" sort={sort} onSort={updateSort}>Week</SortHeader>
+              <SortHeader sortKey="lesson" sort={sort} onSort={updateSort}>Lesson</SortHeader>
+              <SortHeader sortKey="attempt" sort={sort} onSort={updateSort}>Attempt</SortHeader>
+              <SortHeader sortKey="score" sort={sort} onSort={updateSort} align="right">Score</SortHeader>
+              <SortHeader sortKey="percentage" sort={sort} onSort={updateSort} align="right">%</SortHeader>
+              <SortHeader sortKey="lastActive" sort={sort} onSort={updateSort} align="right">Last active</SortHeader>
             </div>
             {filteredCards.map((card) => {
               const displayGroup = getCardDisplayGroup(card);
@@ -850,7 +980,7 @@ export default function LiveClassPanel({
                     <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${meta.dot}`} />
                     <span className="truncate text-sm font-bold text-slate-900">{card.displayName}</span>
                   </div>
-                  <span className="text-xs font-bold text-slate-500">NN</span>
+                  <span className="text-xs font-bold text-slate-500">{formatRealmBadge(card.currentRealm)}</span>
                   <span className="text-xs font-semibold text-slate-600">{levelTag}</span>
                   <span className="text-xs font-semibold text-slate-500 tabular-nums">{weekTag}</span>
                   <span className="truncate text-xs font-semibold text-slate-600">{lessonTag}</span>
