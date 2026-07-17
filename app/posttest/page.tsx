@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPosttestForYearLabel } from "@/data/assessments/api";
 import type { Question } from "@/data/assessments/posttests";
@@ -19,9 +19,10 @@ import { getLastProgramWeek, getProgramWeeks, getWeekProgress, hasCompletedRequi
 import { buildAssessmentReturnRoute } from "@/lib/assessment-routes";
 import { buildLessonRoute } from "@/lib/lesson-routing";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
-import { saveRealmAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { saveRealmAssessment } from "@/lib/student-progress-sync";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
+import { clearCompletionId, getOrCreateCompletionId } from "@/lib/resume-state";
 
 const PASS_THRESHOLD = 85;
 
@@ -348,7 +349,7 @@ function PostTestPage() {
   const mabHasSelection = mab.tens > 0 || mab.ones > 0;
 
   useEffect(() => {
-    const progress = readProgress();
+    const progress = readProgress(progressRealmId);
 
     if (!previewMode && !isPlacementComplete(progress)) {
       router.replace("/home");
@@ -413,8 +414,12 @@ function PostTestPage() {
     }
   }
 
-  function submit() {
+  const submittingRef = useRef(false);
+
+  async function submit() {
     if (!questions.length) return;
+    if (submittingRef.current) return;
+    submittingRef.current = true;
 
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
     const profile = analyzeAssessmentResult({
@@ -425,7 +430,7 @@ function PostTestPage() {
       passThreshold: PASS_THRESHOLD,
       studentId,
     });
-    const prev = readProgress();
+    const prev = readProgress(progressRealmId);
     const correct = profile.score;
     const percent = profile.percentage;
     const assignedWeek = profile.assignedWeek ?? prev?.assignedWeek;
@@ -454,15 +459,21 @@ function PostTestPage() {
       lastPostTestProfile: { ...profile, assignedWeek },
     };
 
-    writeProgress(nextProgress);
-    setSubmitted(true);
-
-    (async () => {
-      try {
-        if (!studentId) return;
-
-        const latest = { ...profile, assignedWeek, at: new Date().toISOString() };
-        await saveRealmAssessment(studentId, year, "posttest", {
+    try {
+      if (!studentId) throw new Error("No active student session");
+      const assessmentCompletionKey = `posttest:${progressRealmId}:${year}`;
+      const completionId = getOrCreateCompletionId(assessmentCompletionKey);
+      const latest = { ...profile, assignedWeek, at: new Date().toISOString() };
+      const progressPayload = {
+        status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
+        current_week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
+        placement_complete: true,
+        assigned_week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
+        required_weeks: didPass ? prev?.requiredWeeks ?? [] : [],
+        optional_weeks: didPass ? prev?.optionalWeeks ?? [] : allPracticeWeeks,
+        unlocked_legends: nextUnlocked,
+      };
+      await saveRealmAssessment(studentId, year, "posttest", {
           correct_count: correct,
           total_questions: questions.length,
           score_percent: percent,
@@ -470,20 +481,17 @@ function PostTestPage() {
           placement_result: latest,
           question_results: [],
           completed_at: new Date().toISOString(),
-        }, progressRealmId);
-        await saveStudentProgressState(studentId, year, {
-          status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
-          week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
-          placement_complete: true,
-          assigned_week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
-          required_weeks: didPass ? prev?.requiredWeeks ?? [] : [],
-          optional_weeks: didPass ? prev?.optionalWeeks ?? [] : allPracticeWeeks,
-          unlocked_legends: nextUnlocked,
-        }, progressRealmId);
-      } catch (error) {
-        console.warn("[PostTest] DB save failed:", error);
-      }
-    })();
+        }, completionId, progressPayload, progressRealmId);
+      clearCompletionId(assessmentCompletionKey);
+    } catch (error) {
+      submittingRef.current = false;
+      console.warn("[PostTest] DB save failed:", error);
+      window.alert("We couldn't save your post-test result yet. Please try again.");
+      return;
+    }
+
+    writeProgress(nextProgress, progressRealmId);
+    setSubmitted(true);
 
     const resultsUrl = `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`;
     const reviewItems = buildPosttestPracticeReviewItems(questions, answers);

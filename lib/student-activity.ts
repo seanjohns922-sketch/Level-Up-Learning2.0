@@ -39,7 +39,7 @@ async function upsertStudentActivity(delta: StudentActivityDelta) {
   const { studentId, classId } = getActivityScope();
   if (!studentId) return;
 
-  const { error } = await supabase.rpc("upsert_student_activity_daily", {
+  const { error } = await supabase.rpc("upsert_student_activity_daily_secure", {
     p_student_id: studentId,
     p_class_id: classId ?? null,
     p_questions_answered: Math.max(0, Math.round(delta.questionsAnswered ?? 0)),
@@ -65,7 +65,7 @@ export async function recordStudentActivityDelta(delta: StudentActivityDelta) {
 
 export async function fetchStudentActivityDaily(studentId: string) {
   if (isDemoPreviewMode()) return [];
-  const { data, error } = await supabase.rpc("get_student_activity_daily", {
+  const { data, error } = await supabase.rpc("get_student_activity_daily_secure", {
     p_student_id: studentId,
   });
   if (error) throw error;

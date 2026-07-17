@@ -7,6 +7,7 @@ import { clearScopedProgramStore } from "@/lib/program-progress";
 const LEGACY_STUDENT_ID_KEY = "lul_student_id";
 const LEGACY_CLASS_ID_KEY = "lul_class_id";
 export const ACTIVE_STUDENT_PROFILE_KEY = "lul_active_student_profile_v1";
+export const STUDENT_SESSION_TOKEN_KEY = "lul_student_session_token_v1";
 
 export type ActiveStudentProfile = {
   studentId: string;
@@ -68,8 +69,19 @@ export function clearActiveStudentSession() {
   clearLegacyBestChainStorage();
   localStorage.removeItem(ACTIVE_STUDENT_KEY);
   localStorage.removeItem(ACTIVE_STUDENT_PROFILE_KEY);
+  localStorage.removeItem(STUDENT_SESSION_TOKEN_KEY);
   localStorage.removeItem(LEGACY_STUDENT_ID_KEY);
   localStorage.removeItem(LEGACY_CLASS_ID_KEY);
+}
+
+export function setStudentSessionToken(token: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(STUDENT_SESSION_TOKEN_KEY, token);
+}
+
+export function getStudentSessionToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(STUDENT_SESSION_TOKEN_KEY)?.trim() || null;
 }
 
 export function getPlacementEntryYear() {

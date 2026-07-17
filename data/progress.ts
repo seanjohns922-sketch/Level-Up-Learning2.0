@@ -47,10 +47,10 @@ export function getScopedProgressKey(
   return `lul:${scope}:${realmId}:student_progress_v1`;
 }
 
-export function readProgress(): StudentProgress | null {
+export function readProgress(realmId: ProgressRealmScope = getActiveRealmScope()): StudentProgress | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(getScopedProgressKey());
+    const raw = localStorage.getItem(getScopedProgressKey(undefined, realmId));
     if (!raw) return null;
     return JSON.parse(raw) as StudentProgress;
   } catch {
@@ -58,11 +58,11 @@ export function readProgress(): StudentProgress | null {
   }
 }
 
-export function writeProgress(next: StudentProgress) {
+export function writeProgress(next: StudentProgress, realmId: ProgressRealmScope = getActiveRealmScope()) {
   if (typeof window === "undefined") return;
   // Reviewing a previous level is read-only — never touch stored progress.
   if (isReviewMode()) return;
-  localStorage.setItem(getScopedProgressKey(), JSON.stringify(next));
+  localStorage.setItem(getScopedProgressKey(undefined, realmId), JSON.stringify(next));
 }
 
 export function clearScopedProgress(
@@ -78,8 +78,11 @@ export function clearScopedProgress(
   localStorage.removeItem(getScopedProgressKey(scope, "measurement"));
 }
 
-export function updateProgress(patch: Partial<StudentProgress>) {
-  const current = readProgress();
+export function updateProgress(
+  patch: Partial<StudentProgress>,
+  realmId: ProgressRealmScope = getActiveRealmScope(),
+) {
+  const current = readProgress(realmId);
   if (!current) return;
 
   const merged: StudentProgress = {
@@ -88,7 +91,7 @@ export function updateProgress(patch: Partial<StudentProgress>) {
     unlockedLegends: patch.unlockedLegends ?? current.unlockedLegends ?? [],
   };
 
-  writeProgress(merged);
+  writeProgress(merged, realmId);
 }
 
 export function isPlacementComplete(progress: StudentProgress | null | undefined) {

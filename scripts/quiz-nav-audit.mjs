@@ -91,11 +91,11 @@ has(
   /if \(target === quizIndex \|\| isQuestionAnswered\(quizQuestions\[target\]\)\)/
 );
 
-// The quiz must be generated once (not re-randomised every render). Guard the
-// regression where the memo depended on the re-created buildQuizQuestions fn.
+// The quiz builder must be stable across renders. Questions are initialized from
+// this callback once; refresh persistence is intentionally a separate concern.
 has(
   "Quiz questions are generated from stable inputs (not regenerated every render)",
-  /\[year, week, realmId, quizConfig, quizWeekPlan\]/
+  /\[isMeasurementRealm, quizConfig, quizWeekPlan, week, year\]/
 );
 check(
   "Quiz questions memo does NOT depend on the re-created buildQuizQuestions function",

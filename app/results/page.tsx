@@ -345,7 +345,7 @@ function ResultsPage() {
     !hasSeenLegendUnlockVideo(unlockDisplayLegend.id) &&
     !unlockDismissed;
   const isFailedPretest = !isPostTest && !passedByPretest;
-  const requiresFullPathway = isFailedPretest && scorePercent < PRETEST_PASS_THRESHOLD;
+  const requiresFullPathway = isFailedPretest && scorePercent < 50;
   const diagnosticRequiredWeeks = useMemo(
     () => (!isPostTest ? normalizeWeekList(storedPretestProfile?.recommendedWeeks) : []),
     [isPostTest, storedPretestProfile]
@@ -365,6 +365,9 @@ function ResultsPage() {
   }, [allProgramWeeks, isFailedPretest, isPostTest, progressRealmId, requiredWeeks, requiresFullPathway]);
 
   useEffect(() => {
+    // Assessment pages persist their result transactionally before navigating
+    // here. Query-string scores are display-only and must never mutate progress.
+    if (!passedByProgram) return;
     const prev = readProgress();
     const prevUnlocked = prev?.unlockedLegends ?? [];
     const alreadyUnlocked = unlockTargets.every((id) => prevUnlocked.includes(id));

@@ -100,10 +100,10 @@ import { getLessonChrome } from "@/lib/levelTheme";
 import { LessonPageHero } from "@/components/lesson/LessonPageHero";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { supabase } from "@/lib/supabase";
-import { recordStudentActivityDelta } from "@/lib/student-activity";
 import type { TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import { saveRealmLessonAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { buildLessonRoute, normalizeStudentYearLabel } from "@/lib/lesson-routing";
+import { clearLessonResume, clearLessonSession, getOrCreateLessonSessionId } from "@/lib/resume-state";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -377,7 +377,7 @@ function LessonPage() {
     let cancelled = false;
     (async () => {
       try {
-        const { data, error } = await supabase.rpc("get_student_runtime_context", { p_student_id: studentId });
+        const { data, error } = await supabase.rpc("get_student_runtime_context_secure", { p_student_id: studentId });
         if (error || cancelled) return;
         const row = Array.isArray(data) ? data[0] : null;
         if (!row) return;
@@ -449,7 +449,7 @@ function LessonPage() {
       isY6MeasurelandsPlaceholderLesson(effectiveLessonId));
 
   useEffect(() => {
-    const p = readProgress();
+    const p = readProgress(lessonRealmId);
     if (!previewMode && !isPlacementComplete(p)) {
       router.replace(`/home`);
       return;
@@ -460,15 +460,15 @@ function LessonPage() {
   }, [previewMode, router, year]);
 
   useEffect(() => {
-    const p = readProgress();
+    const p = readProgress(lessonRealmId);
     if (!p || p.status !== "ASSIGNED_PROGRAM") return;
     if (p.requiredWeeks?.length) return;
     const nextWeek = Math.max(p.assignedWeek ?? 1, week);
-    if (nextWeek !== p.assignedWeek) updateProgress({ assignedWeek: nextWeek });
+    if (nextWeek !== p.assignedWeek) updateProgress({ assignedWeek: nextWeek }, lessonRealmId);
   }, [week]);
 
   useEffect(() => {
-    const p = readProgress();
+    const p = readProgress(lessonRealmId);
     if (previewMode || !p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return;
 
     const store = readProgramStore();
@@ -482,11 +482,11 @@ function LessonPage() {
     if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
       return;
     }
-  }, [lessonNumber, previewMode, router, week, year]);
+  }, [lessonNumber, lessonRealmId, previewMode, router, week, year]);
 
   const blockedPreviousLesson = useMemo(() => {
     if (DEMO_MODE || previewMode) return null;
-    const p = readProgress();
+    const p = readProgress(lessonRealmId);
     if (!p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return null;
     const store = readProgramStore();
     if (!isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks, lessonRealmId)) return null;
@@ -495,7 +495,7 @@ function LessonPage() {
       return lessonNumber - 1;
     }
     return null;
-  }, [lessonNumber, previewMode, week, year]);
+  }, [lessonNumber, lessonRealmId, previewMode, week, year]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -518,23 +518,15 @@ function LessonPage() {
     }
     lessonFinalizedRef.current = true;
 
-    markLessonComplete(year, week, lessonNumber, lessonRealmId);
-    const progress = readProgress();
+    const progress = readProgress(lessonRealmId);
     let nextAssignedWeek = progress?.assignedWeek;
-    if (progress?.status === "ASSIGNED_PROGRAM" && progress.requiredWeeks?.length) {
-      nextAssignedWeek = getRecommendedAssignedWeek(
-        readProgramStore(),
-        year,
-        progress.assignedWeek,
-        progress.requiredWeeks,
-        lessonRealmId
-      );
-      if (nextAssignedWeek !== progress.assignedWeek) {
-        updateProgress({ assignedWeek: nextAssignedWeek });
-      }
-    }
 
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+    if (!studentId && !previewMode) {
+      lessonFinalizedRef.current = false;
+      window.alert("Your student session has expired. Please log in again.");
+      return;
+    }
     if (studentId) {
       try {
         if (latestLessonSummaryRef.current) {
@@ -593,10 +585,13 @@ function LessonPage() {
             insight: null,
           };
 
-          await saveRealmLessonAttempt(studentId, year, week, lessonNumber, effectiveLessonId, fallbackAttempt, lessonRealmId);
+          await saveRealmLessonAttempt(
+            studentId, year, week, lessonNumber, effectiveLessonId, fallbackAttempt,
+            getOrCreateLessonSessionId(effectiveLessonId), lessonRealmId
+          );
         }
 
-        const latest = readProgress();
+        const latest = readProgress(lessonRealmId);
         await saveStudentProgressState(studentId, year, {
           status: latest?.status ?? progress?.status ?? "ASSIGNED_PROGRAM",
           week,
@@ -606,6 +601,17 @@ function LessonPage() {
           optional_weeks: latest?.optionalWeeks ?? progress?.optionalWeeks ?? [],
           unlocked_legends: latest?.unlockedLegends ?? progress?.unlockedLegends ?? [],
         }, lessonRealmId);
+        markLessonComplete(year, week, lessonNumber, lessonRealmId);
+        if (progress?.status === "ASSIGNED_PROGRAM" && progress.requiredWeeks?.length) {
+          nextAssignedWeek = getRecommendedAssignedWeek(
+            readProgramStore(), year, progress.assignedWeek, progress.requiredWeeks, lessonRealmId
+          );
+        }
+        if (nextAssignedWeek !== progress?.assignedWeek) {
+          updateProgress({ assignedWeek: nextAssignedWeek }, lessonRealmId);
+        }
+        clearLessonResume(effectiveLessonId);
+        clearLessonSession(effectiveLessonId);
       } catch (error) {
         lessonFinalizedRef.current = false;
         console.warn("[Lesson] Final completion sync failed:", error);
@@ -697,18 +703,19 @@ function LessonPage() {
         insight,
       };
 
-      await saveRealmLessonAttempt(studentId, year, week, lessonNumber, effectiveLessonId, attempt, lessonRealmId);
-
-      void recordStudentActivityDelta({
-        questionsAnswered: summary.questionsAnswered,
-        correctAnswers: summary.correctAnswers,
-        lessonsCompleted: 1,
-        xpEarned: 40,
-      });
+      await saveRealmLessonAttempt(
+        studentId, year, week, lessonNumber, effectiveLessonId, attempt,
+        getOrCreateLessonSessionId(effectiveLessonId), lessonRealmId
+      );
     } catch (error) {
+      savedLessonSummaryKeysRef.current.delete(summaryKey);
       console.warn("[Lesson] Persist summary failed:", error);
       throw error;
     }
+  }
+
+  function captureLessonPerformanceSummary(summary: LessonPerformanceSummary) {
+    latestLessonSummaryRef.current = summary;
   }
 
   function startPostTest() {
@@ -1411,7 +1418,7 @@ function LessonPage() {
                 return generateWeek1Task(effectiveLessonId, d);
               }}
               onComplete={completeLesson}
-              onPerformanceSummary={persistLessonPerformanceSummary}
+              onPerformanceSummary={captureLessonPerformanceSummary}
             />
             </div>
           </div>
@@ -1454,7 +1461,7 @@ function LessonPage() {
                         )
                       : undefined
                   }
-                  onPerformanceSummary={persistLessonPerformanceSummary}
+                  onPerformanceSummary={captureLessonPerformanceSummary}
                 />
               ) : (
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">

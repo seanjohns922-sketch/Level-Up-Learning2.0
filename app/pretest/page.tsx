@@ -14,11 +14,13 @@ import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracke
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
 import { clearYearProgress, getOptionalWeeks, getProgramWeeks, normalizeWeekList } from "@/lib/program-progress";
-import { saveRealmAssessment, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { saveRealmAssessment } from "@/lib/student-progress-sync";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import {
   clearPretestResume,
+  clearCompletionId,
+  getOrCreateCompletionId,
   loadPretestResume,
   pretestResumeHasProgress,
   savePretestResume,
@@ -398,7 +400,7 @@ function PretestPage() {
 
   useEffect(() => {
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() : null;
-    const progress = readProgress();
+    const progress = readProgress(progressRealmId);
 
     if (!studentId) {
       router.replace("/login");
@@ -553,14 +555,12 @@ function PretestPage() {
       passThreshold: PRETEST_PASS_THRESHOLD,
       studentId,
     });
-    clearYearProgress(year);
-
-    const prev = readProgress();
+    const prev = readProgress(progressRealmId);
     const prevUnlocked = prev?.unlockedLegends ?? [];
     const nextYear = getNextYearLabel(year);
     const passed = profile.percentage >= PRETEST_PASS_THRESHOLD;
     const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks);
-    const requiresFullPathway = !passed && profile.percentage < PRETEST_PASS_THRESHOLD;
+    const requiresFullPathway = !passed && profile.percentage < 50;
     // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
     const allProgramWeeks = getProgramWeeks(progressRealmId);
     const requiredWeeks = passed
@@ -618,11 +618,22 @@ function PretestPage() {
       };
     }
 
-    writeProgress(nextProgress);
-
-    if (studentId) {
-      try {
-        await saveRealmAssessment(studentId, year, "pretest", {
+    try {
+      if (!studentId) throw new Error("No active student session");
+      const assessmentCompletionKey = `pretest:${progressRealmId}:${year}`;
+      const completionId = getOrCreateCompletionId(assessmentCompletionKey);
+      const progressPayload = {
+        pretest_score: profile.percentage,
+        status: nextProgress.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
+        current_week: nextProgress.assignedWeek ?? 1,
+        placement_complete: nextProgress.placementComplete ?? false,
+        assigned_week: nextProgress.assignedWeek ?? null,
+        required_weeks: nextProgress.requiredWeeks ?? [],
+        optional_weeks: nextProgress.optionalWeeks ?? [],
+        unlocked_legends: nextProgress.unlockedLegends ?? [],
+        next_working_level: passed ? nextYear : null,
+      };
+      await saveRealmAssessment(studentId, year, "pretest", {
           correct_count: score,
           total_questions: questions.length,
           score_percent: profile.percentage,
@@ -630,24 +641,17 @@ function PretestPage() {
           placement_result: profile,
           question_results: [],
           completed_at: new Date().toISOString(),
-        }, progressRealmId);
-        await saveStudentProgressState(studentId, year, {
-          pretest_score: profile.percentage,
-          status: nextProgress.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
-          week: nextProgress.assignedWeek ?? 1,
-          placement_complete: nextProgress.placementComplete ?? false,
-          assigned_week: nextProgress.assignedWeek ?? null,
-          required_weeks: nextProgress.requiredWeeks ?? [],
-          optional_weeks: nextProgress.optionalWeeks ?? [],
-          unlocked_legends: nextProgress.unlockedLegends ?? [],
-        }, progressRealmId);
-      } catch (error) {
-        console.warn("[Pretest] DB save failed:", error);
-        window.alert("We couldn't save your pre-test result yet. Please try again.");
-        setSubmitting(false);
-        return;
-      }
+        }, completionId, progressPayload, progressRealmId);
+      clearCompletionId(assessmentCompletionKey);
+    } catch (error) {
+      console.warn("[Pretest] DB save failed:", error);
+      window.alert("We couldn't save your pre-test result yet. Please try again.");
+      setSubmitting(false);
+      return;
     }
+
+    clearYearProgress(year, progressRealmId);
+    writeProgress(nextProgress, progressRealmId);
 
     // Assessment complete — clear the resume snapshot so we don't re-offer it.
     saveAssessmentReviewState({

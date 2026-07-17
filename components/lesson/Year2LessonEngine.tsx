@@ -17,9 +17,11 @@ import { buildCoachReview } from "@/lib/lesson-coach";
 import LessonResumeGate from "@/components/lesson/LessonResumeGate";
 import {
   clearLessonResume,
+  getOrCreateLessonSessionId,
   loadLessonResume,
   lessonResumeHasProgress,
   saveLessonResume,
+  startNewLessonSession,
 } from "@/lib/resume-state";
 import BrainBreak from "@/components/lesson/BrainBreak";
 import { pickVillain, type Villain } from "@/lib/brain-break";
@@ -521,6 +523,7 @@ export function Year2LessonEngine({
   const [reflectionDone, setReflectionDone] = useState(false);
   // ── Lesson save & resume ──
   const resumeLessonKey = liveContext?.lessonId ?? lesson.id;
+  const lessonSessionIdRef = useRef(getOrCreateLessonSessionId(resumeLessonKey));
   const [showLessonResume, setShowLessonResume] = useState(false);
   const resumeResolvedRef = useRef(false);
   const showLessonResumeRef = useRef(false);
@@ -717,6 +720,26 @@ export function Year2LessonEngine({
       if (typeof snap.activityIndex === "number" && activities[snap.activityIndex]) {
         setCurrentActivityIndex(snap.activityIndex);
       }
+      if (snap.sessionId) lessonSessionIdRef.current = snap.sessionId;
+      if (snap.currentQuestion) setCurrentQuestion(snap.currentQuestion as Year2QuestionData);
+      if (Array.isArray(snap.questionBag)) bagRef.current = snap.questionBag;
+      if (typeof snap.lastActivityIndex === "number" || snap.lastActivityIndex === null) {
+        lastIndexRef.current = snap.lastActivityIndex;
+      }
+      if (Array.isArray(snap.questionHistory)) {
+        questionHistoryRef.current = snap.questionHistory as QuestionHistoryEntry[];
+      }
+      if (typeof snap.questionOrder === "number") questionOrderRef.current = snap.questionOrder;
+      if (typeof snap.questionSequence === "number") setCurrentQuestionSequence(snap.questionSequence);
+      if (typeof snap.questionKey === "number") setQuestionKey(snap.questionKey);
+      if (snap.feedbackStatus) setStatus(snap.feedbackStatus);
+      scoredThisTurnRef.current = snap.scoredCurrentTurn === true;
+      setCoachDone(snap.coachDone === true);
+      setLessonMistakeReviewDone(snap.mistakeReviewDone === true);
+      setShowLessonMistakeReview(snap.showMistakeReview === true);
+      if (snap.feedbackStatus === "correct" || snap.feedbackStatus === "wrong") {
+        timeoutRef.current = setTimeout(() => loadNextQuestion(), 1000);
+      }
       nextBreakIdxRef.current = brainBreakSchedule.filter((t) => snap.secondsLeft <= t).length;
     }
     setShowLessonResume(false);
@@ -726,6 +749,32 @@ export function Year2LessonEngine({
 
   function restartLesson() {
     clearLessonResume(resumeLessonKey);
+    lessonSessionIdRef.current = startNewLessonSession(resumeLessonKey);
+    const nextTurn = buildInitialTurn(lesson, activities);
+    setSecondsLeft(totalSeconds);
+    setQuestionsAnswered(0);
+    questionsAnsweredRef.current = 0;
+    setCorrectAnswers(0);
+    setComboCount(0);
+    setCoachDone(false);
+    setReflectionDone(false);
+    setStatus("idle");
+    scoredThisTurnRef.current = false;
+    setCurrentActivityIndex(nextTurn.activityIndex);
+    setCurrentQuestion(nextTurn.question);
+    setQuestionKey((current) => current + 1);
+    setCurrentQuestionSequence(nextTurn.question ? 1 : 0);
+    bagRef.current = nextTurn.bag;
+    lastIndexRef.current = nextTurn.lastIndex;
+    questionHistoryRef.current = nextTurn.fingerprint ? [{
+      fingerprint: nextTurn.fingerprint.fingerprint,
+      templateFingerprint: nextTurn.fingerprint.templateFingerprint,
+      numberSetFingerprint: nextTurn.fingerprint.numberSetFingerprint,
+      mode: nextTurn.fingerprint.mode,
+      contextType: nextTurn.fingerprint.contextType,
+      order: 0,
+    }] : [];
+    questionOrderRef.current = nextTurn.question ? 1 : 0;
     setLessonMistakes([]);
     setLessonMistakeReviewDone(false);
     setShowLessonMistakeReview(false);
@@ -747,10 +796,23 @@ export function Year2LessonEngine({
       lessonMistakes,
       attemptLog,
       activityIndex: currentActivityIndex,
+      sessionId: lessonSessionIdRef.current,
+      currentQuestion,
+      questionBag: bagRef.current,
+      lastActivityIndex: lastIndexRef.current,
+      questionHistory: questionHistoryRef.current,
+      questionOrder: questionOrderRef.current,
+      questionSequence: currentQuestionSequence,
+      questionKey,
+      feedbackStatus: status,
+      scoredCurrentTurn: scoredThisTurnRef.current,
+      coachDone,
+      mistakeReviewDone: lessonMistakeReviewDone,
+      showMistakeReview: showLessonMistakeReview,
       updatedAt: Date.now(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog, currentActivityIndex]);
+  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog, currentActivityIndex, currentQuestion, currentQuestionSequence, questionKey, status, coachDone, lessonMistakeReviewDone, showLessonMistakeReview]);
 
   // Brain breaks fire at the scheduled seconds-left thresholds (count + timing
   // come from the teacher-set frequency × level). Each pauses the clock and uses
@@ -783,7 +845,6 @@ export function Year2LessonEngine({
     if (!finished) return;
     if (!markedCompleteRef.current) {
       markedCompleteRef.current = true;
-      clearLessonResume(resumeLessonKey);
       onTimedComplete();
     }
   }, [finished, onTimedComplete, resumeLessonKey]);

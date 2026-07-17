@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { BarChart3 } from "lucide-react";
 import {
   getGenresForYear,
@@ -144,6 +144,7 @@ type Props = {
   progress: ProgressRow[];
   liveRows: LiveStudentActivityRow[];
   liveEvents: LiveActivityEventRow[];
+  onRealmChange?: (realmId: "number" | "measurement") => void;
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
@@ -946,7 +947,7 @@ function liveRowToStatus(row?: LiveStudentActivityRow | undefined): StrandStatus
   return "Not Started";
 }
 
-export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, liveEvents }: Props) {
+export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, liveEvents, onRealmChange }: Props) {
   const genres = getGenresForYear(yearLabel);
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvail.id);
@@ -982,13 +983,21 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
   const genre = genres.find((g) => g.id === genreId)!;
   const isPlaceholder = !genre.available;
   const selectedRealmId = genreId === "measurement" ? "measurement" : "number";
+  useEffect(() => {
+    onRealmChange?.(selectedRealmId);
+  }, [onRealmChange, selectedRealmId]);
+
+  function matchesSelectedRealm(realmId?: string | null) {
+    const normalized = realmId?.trim().toLowerCase();
+    return (normalized === "measurement" || normalized === "measurelands" ? "measurement" : "number") === selectedRealmId;
+  }
 
   function getProg(studentId: string, year: string) {
-    return progress.find((p) => p.student_id === studentId && p.year === year && (p.realm_id ?? "number") === selectedRealmId);
+    return progress.find((p) => p.student_id === studentId && p.year === year && matchesSelectedRealm(p.realm_id));
   }
 
   function getStudentProgressRows(studentId: string) {
-    return progress.filter((p) => p.student_id === studentId && (p.realm_id ?? "number") === selectedRealmId);
+    return progress.filter((p) => p.student_id === studentId && matchesSelectedRealm(p.realm_id));
   }
 
   function getLatestPretestProgress(studentId: string): ProgressRow | undefined {
@@ -1012,7 +1021,9 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
   function getWorkingYear(student: StudentRow): string {
     const liveYear = levelToYearLabel(getLiveRow(student.id)?.current_level);
     if (liveYear) return liveYear;
-    const rows = progress.filter((p) => p.student_id === student.id);
+    const rows = progress.filter(
+      (p) => p.student_id === student.id && matchesSelectedRealm(p.realm_id)
+    );
     if (rows.length > 0) return pickStudentYear(rows, normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? yearLabel);
     return normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? yearLabel;
   }
@@ -1398,7 +1409,7 @@ function StudentStrandDetail({
     <div className="bg-[#F8FAFC] border-t border-[#E6E8EC] px-5 py-5 space-y-5">
       <div className="flex justify-end">
         <a
-          href={`/teacher/student-insights?studentId=${student.id}`}
+          href={`/teacher/student-insights?studentId=${student.id}&realm_id=${encodeURIComponent(genre.id === "measurement" ? "measurement" : "number")}`}
           className="inline-flex items-center gap-2 rounded-xl border border-[#E6E8EC] bg-white px-3.5 py-2 text-sm font-bold text-[#0F172A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
         >
           <BarChart3 className="h-4 w-4" aria-hidden />

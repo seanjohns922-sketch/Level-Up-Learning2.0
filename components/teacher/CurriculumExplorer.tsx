@@ -70,7 +70,11 @@ export default function CurriculumExplorer({
   const selectedRealmId = genreId === "measurement" ? "measurement" : "number";
 
   const week = plan.find((w) => w.week === weekNum) ?? plan[0];
-  const yearProgress = progress.filter((p) => p.year === yearLabel && (p.realm_id ?? "number") === selectedRealmId);
+  const yearProgress = progress.filter((p) => {
+    const realm = p.realm_id?.trim().toLowerCase();
+    const normalizedRealm = realm === "measurement" || realm === "measurelands" ? "measurement" : "number";
+    return p.year === yearLabel && normalizedRealm === selectedRealmId;
+  });
   const isPlaceholder = !genre?.available;
   const prefix = genreId === "measurement" ? `${lessonIdPrefix(yearLabel)}measurement-` : lessonIdPrefix(yearLabel);
 

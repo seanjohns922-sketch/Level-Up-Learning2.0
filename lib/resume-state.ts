@@ -110,11 +110,69 @@ export type LessonResumeState = {
   attemptLog?: Array<{ topicLabel: string; correct: boolean; timeSpentSeconds: number }>;
   /** Index of the current activity/step (Year 2+ engine only). */
   activityIndex?: number;
+  sessionId?: string;
+  currentQuestion?: unknown;
+  questionBag?: number[];
+  lastActivityIndex?: number | null;
+  questionHistory?: unknown[];
+  questionOrder?: number;
+  questionSequence?: number;
+  questionKey?: number;
+  feedbackStatus?: "idle" | "correct" | "wrong";
+  scoredCurrentTurn?: boolean;
+  coachDone?: boolean;
+  mistakeReviewDone?: boolean;
+  showMistakeReview?: boolean;
   updatedAt: number;
 };
 
 function lessonKey(lessonId: string): string {
   return `lul:lesson-resume:${activeStudentScope()}:${lessonId}`;
+}
+
+function lessonSessionKey(lessonId: string): string {
+  return `lul:lesson-session:${activeStudentScope()}:${lessonId}`;
+}
+
+function completionKey(activityKey: string): string {
+  return `lul:completion:${activeStudentScope()}:${activityKey}`;
+}
+
+export function getOrCreateCompletionId(activityKey: string): string {
+  if (typeof window === "undefined") return "00000000-0000-4000-8000-000000000000";
+  const key = completionKey(activityKey);
+  const existing = localStorage.getItem(key)?.trim();
+  if (existing) return existing;
+  const next = crypto.randomUUID();
+  localStorage.setItem(key, next);
+  return next;
+}
+
+export function clearCompletionId(activityKey: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(completionKey(activityKey));
+}
+
+export function getOrCreateLessonSessionId(lessonId: string): string {
+  if (typeof window === "undefined") return "00000000-0000-4000-8000-000000000000";
+  const key = lessonSessionKey(lessonId);
+  const existing = localStorage.getItem(key)?.trim();
+  if (existing) return existing;
+  const next = crypto.randomUUID();
+  localStorage.setItem(key, next);
+  return next;
+}
+
+export function startNewLessonSession(lessonId: string): string {
+  if (typeof window === "undefined") return "00000000-0000-4000-8000-000000000000";
+  const next = crypto.randomUUID();
+  localStorage.setItem(lessonSessionKey(lessonId), next);
+  return next;
+}
+
+export function clearLessonSession(lessonId: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(lessonSessionKey(lessonId));
 }
 
 export function saveLessonResume(state: LessonResumeState): void {

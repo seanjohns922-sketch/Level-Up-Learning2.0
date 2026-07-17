@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@supabase/supabase-js";
+import { STUDENT_SESSION_TOKEN_KEY } from "@/lib/studentIdentity";
 
 const supabaseUrl = "https://dqncplrxjxvjqbmwcyia.supabase.co";
 const supabaseAnonKey = "sb_publishable_cvaUEdcS16I8T3EqAydiaA_ES8XRgOo";
@@ -8,6 +9,16 @@ const supabaseProjectRef = "dqncplrxjxvjqbmwcyia";
 const supabaseAuthStorageKey = `sb-${supabaseProjectRef}-auth-token`;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: {
+    fetch: (input, init = {}) => {
+      const headers = new Headers(init.headers);
+      if (typeof window !== "undefined") {
+        const studentSession = window.localStorage.getItem(STUDENT_SESSION_TOKEN_KEY)?.trim();
+        if (studentSession) headers.set("x-student-session", studentSession);
+      }
+      return fetch(input, { ...init, headers });
+    },
+  },
   auth: {
     storageKey: supabaseAuthStorageKey,
     persistSession: true,

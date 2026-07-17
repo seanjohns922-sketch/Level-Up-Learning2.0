@@ -193,7 +193,8 @@ function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEv
 }
 
 function normalizeAttemptRealm(value?: string | null) {
-  return value === "measurement" || value === "measurelands" ? "measurement" : "number";
+  const normalized = value?.trim().toLowerCase();
+  return normalized === "measurement" || normalized === "measurelands" ? "measurement" : "number";
 }
 
 function lessonNumberFromRow(row: LiveStudentActivityRow) {
@@ -209,7 +210,7 @@ function isQuizActivity(row: LiveStudentActivityRow) {
 
 function matchesCompletedAttempt(row: LiveStudentActivityRow, attempt: CompletedActivityAttemptRow) {
   if (attempt.student_id !== row.student_id) return false;
-  if (attempt.realm_id !== normalizeAttemptRealm(row.current_strand)) return false;
+  if (normalizeAttemptRealm(attempt.realm_id) !== normalizeAttemptRealm(row.current_strand)) return false;
   if (row.current_level && attempt.working_level !== row.current_level) return false;
   if (row.current_week != null && attempt.week !== row.current_week) return false;
 

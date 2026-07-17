@@ -149,7 +149,8 @@ function chooseCurrentRow(rows: ProgressRow[], fallbackYear?: string | null) {
 }
 
 function strandLabelForRealm(realmId: string | undefined | null) {
-  return realmId === "measurement" ? "Measurement" : "Number";
+  const normalized = realmId?.trim().toLowerCase();
+  return normalized === "measurement" || normalized === "measurelands" ? "Measurement" : "Number";
 }
 
 function toIsoOrNull(value: unknown) {
@@ -230,6 +231,8 @@ type FlattenedQuiz = {
 function StudentInsightsPageInner() {
   const searchParams = useSearchParams();
   const studentId = searchParams.get("studentId");
+  const requestedRealm = searchParams.get("realm_id")?.trim().toLowerCase();
+  const selectedRealmId = requestedRealm === "measurement" || requestedRealm === "measurelands" ? "measurement" : "number";
   const { user, loading: authLoading } = useAuthGuard();
   const [loading, setLoading] = useState(true);
   const [student, setStudent] = useState<StudentRow | null>(null);
@@ -270,11 +273,7 @@ function StudentInsightsPageInner() {
         .eq("id", studentRow.class_id)
         .maybeSingle();
 
-      const [numberProgress, measurementProgress] = await Promise.all([
-        fetchRealmCompatProgressForStudent("number", activeStudentId),
-        fetchRealmCompatProgressForStudent("measurement", activeStudentId),
-      ]);
-      const mergedProgress = [...numberProgress, ...measurementProgress];
+      const realmProgress = await fetchRealmCompatProgressForStudent(selectedRealmId, activeStudentId);
 
       let nextReflections: LessonReflectionRow[] = [];
       const { data: reflectionRows, error: reflectionError } = await supabase
@@ -289,7 +288,7 @@ function StudentInsightsPageInner() {
       if (!cancelled) {
         setStudent(studentRow as StudentRow);
         setClassName(classRow?.name ?? "");
-        setProgressRows(mergedProgress);
+        setProgressRows(realmProgress);
         setReflections(nextReflections);
         setLoading(false);
       }
@@ -299,7 +298,7 @@ function StudentInsightsPageInner() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, studentId, user]);
+  }, [authLoading, selectedRealmId, studentId, user]);
 
   const derived = useMemo(() => {
     if (!student) return null;

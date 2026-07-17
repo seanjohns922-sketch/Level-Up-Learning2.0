@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
-import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile } from "@/lib/studentIdentity";
+import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile, setStudentSessionToken } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
@@ -56,7 +56,7 @@ function isMissingStudentUserIdColumn(message?: string | null) {
 }
 
 async function fetchStudentRuntimeName(studentId: string) {
-  const { data, error } = await supabase.rpc("get_student_runtime_context", {
+  const { data, error } = await supabase.rpc("get_student_runtime_context_secure", {
     p_student_id: studentId,
   });
   if (error) throw error;
@@ -333,6 +333,11 @@ export default function LoginPage() {
       setStudentError("Username or password not recognised. Ask your teacher to check your details.");
       return;
     }
+    if (!student.session_token) {
+      setStudentError("A secure student session could not be created. Please try again.");
+      return;
+    }
+    setStudentSessionToken(student.session_token);
 
     const explicitWorkingYear = normalizeWorkingLevelLabel(student.working_level) ?? null;
     const legacyWorkingYear = normalizeWorkingLevelLabel(student.year_level) ?? null;
@@ -389,7 +394,8 @@ export default function LoginPage() {
     let progressSource: "localStorage" | "progress_snapshot" | "default" = progress ? "localStorage" : "default";
     let restoredRowsSummary: unknown[] = [];
     try {
-      const restored = await restoreStudentStateFromServer(student.student_id);
+      const restored = await restoreStudentStateFromServer(student.student_id, "number");
+      const measurementRestored = await restoreStudentStateFromServer(student.student_id, "measurement");
       if (restored.progress) {
         progress = restored.progress;
         progressSource = "progress_snapshot";
@@ -405,6 +411,15 @@ export default function LoginPage() {
         has_seen_intro: row.has_seen_intro,
         pretest_score: row.pretest_score,
       }));
+      restoredRowsSummary.push(...measurementRestored.rows.map((row) => ({
+        realm_id: row.realm_id,
+        year: row.year,
+        status: row.status,
+        week: row.week,
+        placement_complete: row.placement_complete,
+        assigned_week: row.assigned_week,
+        pretest_score: row.pretest_score,
+      })));
     } catch (error) {
       console.warn("[Login] Could not restore student progress from Supabase", error);
     }

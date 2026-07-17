@@ -402,7 +402,7 @@ async function fetchSnapshotFallbackForClass(studentIds: string[]) {
 }
 
 async function fetchSnapshotFallbackForStudent(studentId: string) {
-  const { data, error } = await supabase.rpc("get_student_progress_snapshot", {
+  const { data, error } = await supabase.rpc("get_student_progress_snapshot_secure", {
     p_student_id: studentId,
   });
   if (error) throw error;
@@ -466,7 +466,7 @@ export async function fetchRealmCompatProgressForClass(realmId: string, classId:
 }
 
 export async function fetchRealmCompatProgressForStudent(realmId: string, studentId: string) {
-  const { data: compatData, error: compatError } = await supabase.rpc("get_student_realm_progress_compat", {
+  const { data: compatData, error: compatError } = await supabase.rpc("get_student_realm_progress_compat_secure", {
     p_student_id: studentId,
     p_realm_id: realmId,
   });
@@ -484,17 +484,17 @@ export async function fetchRealmCompatProgressForStudent(realmId: string, studen
   }
 
   const [lessonAttemptsResponse, quizAttemptsResponse, assessmentsResponse, legacyProgResponse] = await Promise.all([
-    supabase.rpc("get_student_realm_lesson_attempts", {
+    supabase.rpc("get_student_realm_lesson_attempts_secure", {
       p_student_id: studentId,
       p_realm_id: realmId,
       p_working_level: null,
     }),
-    supabase.rpc("get_student_realm_weekly_quiz_attempts", {
+    supabase.rpc("get_student_realm_weekly_quiz_attempts_secure", {
       p_student_id: studentId,
       p_realm_id: realmId,
       p_working_level: null,
     }),
-    supabase.rpc("get_student_realm_assessments", {
+    supabase.rpc("get_student_realm_assessments_secure", {
       p_student_id: studentId,
       p_realm_id: realmId,
       p_working_level: null,

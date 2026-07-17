@@ -3,7 +3,6 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
-import { supabase } from "@/lib/supabase";
 import { saveRealmLessonAttempt, saveNumberWeeklyQuizAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
@@ -37,12 +36,12 @@ import { MathFormattedText } from "@/components/FractionText";
 import { LessonPageHero } from "@/components/lesson/LessonPageHero";
 import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
-import { recordStudentActivityDelta } from "@/lib/student-activity";
+import { clearCompletionId, getOrCreateCompletionId, getOrCreateLessonSessionId } from "@/lib/resume-state";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
 import { Volume2, Sparkles, Zap, Check, PartyPopper, SkipForward } from "lucide-react";
 import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
-import type { TeacherAttemptQuestion, TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
+import type { TeacherAttemptQuestion } from "@/lib/teacher-insights";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
@@ -7869,15 +7868,15 @@ function SessionPage({
           : "Weekly Quiz";
 
   useEffect(() => {
-    const progress = readProgress();
+    const progress = readProgress(quizRealmId);
     if (!previewMode && !isPlacementComplete(progress)) {
       router.replace(`/home`);
       return;
     }
     if (!DEMO_MODE && !previewMode && progress?.year && progress.year !== year) {
-      router.replace(`/number-nexus`);
+      router.replace(isMeasurementRealm ? `/measurelands` : `/number-nexus`);
     }
-  }, [previewMode, router, year]);
+  }, [isMeasurementRealm, previewMode, quizRealmId, router, year]);
 
   useEffect(() => {
     if (isGroundLevelYear(year) && type === "lesson") {
@@ -7893,22 +7892,22 @@ function SessionPage({
   }, [router, year, week, type, n, realmId]);
 
   useEffect(() => {
-    const progress = readProgress();
+    const progress = readProgress(quizRealmId);
     if (previewMode || !progress || progress.status !== "ASSIGNED_PROGRAM" || progress.year !== year) return;
 
     const store = readPersistedProgramStore();
     const numericWeek = Number(week);
     if (!isWeekPlayable(store, year, numericWeek, progress.requiredWeeks, progress.optionalWeeks, quizRealmId)) {
       const fallbackWeek = getRecommendedAssignedWeek(store, year, progress.assignedWeek, progress.requiredWeeks, quizRealmId);
-      router.replace(`/number-nexus`);
+      router.replace(isMeasurementRealm ? `/measurelands` : `/number-nexus`);
       return;
     }
 
     const weekProgress = getPersistedWeekProgress(store, year, numericWeek, quizRealmId);
     if (!DEMO_MODE && !previewMode && type === "quiz" && weekProgress.lessonsCompleted.filter(Boolean).length < 3) {
-      router.replace(`/number-nexus`);
+      router.replace(isMeasurementRealm ? `/measurelands` : `/number-nexus`);
     }
-  }, [previewMode, router, type, week, year]);
+  }, [isMeasurementRealm, previewMode, quizRealmId, router, type, week, year]);
 
   const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
 
@@ -7987,13 +7986,10 @@ function SessionPage({
   );
 
   async function completeLesson() {
-    const store = readStore();
-    setLessonComplete(store, year, week, n, quizRealmId);
-    writeStore(store);
-
     try {
       const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
-      if (studentId) {
+      if (!studentId) throw new Error("No active student session");
+      {
         const yearNum = parseInt(year.replace(/\D/g, ""), 10) || 0;
         const lessonId = quizRealmId === "measurement" ? `y${yearNum}-measurement-w${week}-l${n}` : `y${yearNum}-w${week}-l${n}`;
         const fallbackAttempt = {
@@ -8017,18 +8013,20 @@ function SessionPage({
           insight: null,
         };
 
-        await saveRealmLessonAttempt(studentId, year, Number(week), n, lessonId, fallbackAttempt, quizRealmId);
-
-        void recordStudentActivityDelta({
-          lessonsCompleted: 1,
-          xpEarned: 40,
-        });
+        await saveRealmLessonAttempt(
+          studentId, year, Number(week), n, lessonId, fallbackAttempt,
+          getOrCreateLessonSessionId(lessonId), quizRealmId
+        );
       }
     } catch (e) {
       console.warn("[Lesson] DB save failed:", e);
       window.alert("We couldn't save this lesson yet. Please try again.");
       return;
     }
+
+    const store = readStore();
+    setLessonComplete(store, year, week, n, quizRealmId);
+    writeStore(store);
 
     // After Week 12 Lesson 3, route to post-test transition
     if (Number(week) === 12 && n === 3) {
@@ -8558,6 +8556,7 @@ function SessionPage({
     Record<string, { attempted: boolean; correct: boolean }>
   >({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const quizSavingRef = useRef(false);
   const [quizMistakeReviewItems, setQuizMistakeReviewItems] = useState<MistakeReviewItem[]>([]);
   const [showQuizMistakeReview, setShowQuizMistakeReview] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
@@ -8768,7 +8767,7 @@ function SessionPage({
   const isReadingQuizReview = speakState.isSpeaking && speakState.currentText === quizReviewSpoken;
 
   function completeWeek(currentWeek: number) {
-    const p = readProgress();
+    const p = readProgress(quizRealmId);
     if (!p || p.status !== "ASSIGNED_PROGRAM") return;
     const nextWeek = getRecommendedAssignedWeek(
       readPersistedProgramStore(),
@@ -8777,20 +8776,18 @@ function SessionPage({
       p.requiredWeeks,
       quizRealmId
     );
-    updateProgress({ assignedWeek: nextWeek });
+    updateProgress({ assignedWeek: nextWeek }, quizRealmId);
   }
 
-  function submitQuiz() {
+  async function submitQuiz() {
+    if (quizSavingRef.current || quizSubmitted) return;
+    quizSavingRef.current = true;
     const score = quizScore;
     const total = quizQuestions.length;
     const percent = total > 0 ? Math.round((score / total) * 100) : 0;
     const passRate = percent;
     const passThreshold = (quizConfig?.passPercent ?? 80) / 100;
     const passed = score >= Math.ceil(total * passThreshold);
-
-    setFinalScore(score);
-    setQuizSubmitted(true);
-    setShowQuizMistakeReview(false);
 
     const questionResults = buildQuizQuestionResults(
       quizQuestions,
@@ -8802,8 +8799,7 @@ function SessionPage({
       quizMoneyAnswers,
       quizLessonActivityResults
     );
-    setQuizMistakeReviewItems(
-      buildQuizMistakeReviewItems(
+    const mistakeItems = buildQuizMistakeReviewItems(
         quizQuestions,
         quizAnswers,
         quizTyped,
@@ -8814,8 +8810,51 @@ function SessionPage({
         quizLessonActivityResults,
         Number(week),
         lessonTitleLookup
-      )
-    );
+      );
+
+    const quizCompletionKey = `quiz:${quizRealmId}:${year}:${week}`;
+    const completionId = getOrCreateCompletionId(quizCompletionKey);
+    const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
+    const nextAssignedWeek = passed ? Math.min(12, Number(week) + 1) : Number(week);
+    const attempt = {
+      score,
+      total,
+      percent,
+      passRate,
+      passed,
+      lessonBreakdown,
+      questionResults,
+      insight: null,
+      at: new Date().toISOString(),
+    };
+
+    try {
+      if (!studentId) throw new Error("No active student session");
+      await saveNumberWeeklyQuizAttempt(
+        studentId, year, Number(week), attempt, completionId, quizRealmId
+      );
+      const latestProgress = readProgress(quizRealmId);
+      await saveStudentProgressState(studentId, year, {
+        status: latestProgress?.status ?? "ASSIGNED_PROGRAM",
+        week: nextAssignedWeek,
+        placement_complete: latestProgress?.placementComplete ?? false,
+        assigned_week: nextAssignedWeek,
+        required_weeks: latestProgress?.requiredWeeks ?? [],
+        optional_weeks: latestProgress?.optionalWeeks ?? [],
+        unlocked_legends: latestProgress?.unlockedLegends ?? [],
+      }, quizRealmId);
+      clearCompletionId(quizCompletionKey);
+    } catch (error) {
+      quizSavingRef.current = false;
+      console.warn("[Quiz] Completion save failed:", error);
+      window.alert("We couldn't save this quiz yet. Please try again.");
+      return;
+    }
+
+    setFinalScore(score);
+    setQuizSubmitted(true);
+    setShowQuizMistakeReview(false);
+    setQuizMistakeReviewItems(mistakeItems);
 
     const store = readStore();
     setQuizScore(store, year, week, score, quizRealmId);
@@ -8850,98 +8889,6 @@ function SessionPage({
         : null,
     });
 
-    // Persist quiz score to DB
-    (async () => {
-      try {
-        const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
-        if (!studentId) {
-          console.warn("[Quiz] No active student ID, skipping DB save");
-          return;
-        }
-
-        let insight: TeacherInsight | null = null;
-
-        try {
-          const insightInput: TeacherInsightInput = {
-            studentId,
-            level: year,
-            strand: quizStrand,
-            week: Number(week),
-            quizId: quizLessonId,
-            title: "Weekly Quiz",
-            score,
-            accuracy: percent,
-            timeSpent: null,
-            attempts: 1,
-            questionsAnswered: total,
-            questionResults,
-            lessonBreakdown: lessonBreakdown.map((item) => ({
-              lessonNumber: item.lessonNumber,
-              title: item.lessonTitle,
-              correct: item.correct,
-              total: item.total,
-              percent: item.percent,
-            })),
-            topicSummaries: lessonBreakdown.map((item) => ({
-              label: item.lessonTitle ?? `Lesson ${item.lessonNumber}`,
-              correct: item.correct,
-              total: item.total,
-              accuracy: item.percent,
-            })),
-          };
-
-          const insightResponse = await fetch("/api/teacher-insight", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(insightInput),
-          });
-          if (insightResponse.ok) {
-            const payload = (await insightResponse.json()) as { insight?: TeacherInsight };
-            insight = payload.insight ?? null;
-          }
-        } catch (error) {
-          console.warn("[Quiz] Insight generation failed:", error);
-        }
-
-        const attempt = {
-          score,
-          total,
-          percent,
-          passRate,
-          passed,
-          lessonBreakdown,
-          questionResults,
-          insight,
-          at: new Date().toISOString(),
-        };
-
-        try {
-          const nextAssignedWeek = passed ? Math.min(12, Number(week) + 1) : Number(week);
-          await saveNumberWeeklyQuizAttempt(studentId, year, Number(week), attempt, quizRealmId);
-          const latestProgress = readProgress();
-          await saveStudentProgressState(studentId, year, {
-            status: latestProgress?.status ?? "ASSIGNED_PROGRAM",
-            week: nextAssignedWeek,
-            placement_complete: latestProgress?.placementComplete ?? false,
-            assigned_week: nextAssignedWeek,
-            required_weeks: latestProgress?.requiredWeeks ?? [],
-            optional_weeks: latestProgress?.optionalWeeks ?? [],
-            unlocked_legends: latestProgress?.unlockedLegends ?? [],
-          }, quizRealmId);
-          void recordStudentActivityDelta({
-            questionsAnswered: total,
-            correctAnswers: score,
-            quizzesCompleted: 1,
-            xpEarned: Math.round((percent / 100) * 60),
-          });
-          console.log("[Quiz] Quiz score saved to DB:", attempt);
-        } catch (error) {
-          console.warn("[Quiz] DB save error:", error);
-        }
-      } catch (e) {
-        console.warn("[Quiz] DB save failed:", e);
-      }
-    })();
   }
 
   const currentQuiz = quizQuestions[quizIndex];

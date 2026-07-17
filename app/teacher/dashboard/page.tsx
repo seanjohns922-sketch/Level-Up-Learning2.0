@@ -267,6 +267,7 @@ export default function TeacherDashboardPage() {
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
+  const [analyticsRealmId, setAnalyticsRealmId] = useState<"number" | "measurement">("number");
   const [showPlacements, setShowPlacements] = useState(false);
   const [pinToast, setPinToast] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -851,7 +852,11 @@ export default function TeacherDashboardPage() {
 
   // Whole-class KPI strip — never filter by active year/strand/tab.
   const classStudentIds = new Set(classStudents.map((student) => student.id));
-  const classProgressRows = progress.filter((row) => classStudentIds.has(row.student_id));
+  const classProgressRows = progress.filter((row) => {
+    const realm = row.realm_id?.trim().toLowerCase();
+    const normalizedRealm = realm === "measurement" || realm === "measurelands" ? "measurement" : "number";
+    return classStudentIds.has(row.student_id) && normalizedRealm === analyticsRealmId;
+  });
   const sevenDaysAgoMs = Date.now() - (7 * 24 * 60 * 60 * 1000);
   const activeStudentsThisWeek = new Set<string>();
 
@@ -889,7 +894,9 @@ export default function TeacherDashboardPage() {
   });
 
   liveEvents.forEach((event) => {
-    if (classStudentIds.has(event.student_id) && isRecentIso(event.created_at, sevenDaysAgoMs)) {
+    const strand = typeof event.payload?.strand === "string" ? event.payload.strand.trim().toLowerCase() : "number";
+    const eventRealm = strand === "measurement" || strand === "measurelands" ? "measurement" : "number";
+    if (eventRealm === analyticsRealmId && classStudentIds.has(event.student_id) && isRecentIso(event.created_at, sevenDaysAgoMs)) {
       activeStudentsThisWeek.add(event.student_id);
     }
   });
@@ -1203,6 +1210,7 @@ export default function TeacherDashboardPage() {
                 progress={progress as any}
                 liveRows={liveRows as any}
                 liveEvents={liveEvents as any}
+                onRealmChange={setAnalyticsRealmId}
               />
             )}
             {/* eslint-enable @typescript-eslint/no-explicit-any */}

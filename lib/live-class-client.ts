@@ -290,7 +290,7 @@ export async function trackLiveLearningEvent(input: LiveLearningEventInput) {
   try {
     // Use SECURITY DEFINER RPCs — students have no auth session so direct table access is blocked by RLS
     const { data: existingJson, error: existingError } = await supabase
-      .rpc("get_live_student_activity", { p_student_id: studentId, p_class_id: classId });
+      .rpc("get_live_student_activity_secure", { p_student_id: studentId, p_class_id: classId });
 
     if (existingError) {
       console.warn("[LiveClass] Could not read existing activity row", existingError);
@@ -299,7 +299,7 @@ export async function trackLiveLearningEvent(input: LiveLearningEventInput) {
     const existing = existingJson ?? null;
     const nextRow = buildNextActivityRow(existing, input, studentId, classId, timestamp);
 
-    const { error: upsertError } = await supabase.rpc("upsert_live_student_activity", {
+    const { error: upsertError } = await supabase.rpc("upsert_live_student_activity_secure", {
       p_student_id: studentId,
       p_class_id: classId,
       p_data: nextRow,
@@ -321,7 +321,7 @@ export async function trackLiveLearningEvent(input: LiveLearningEventInput) {
       completedAt: nextRow.completed_at ?? null,
     };
 
-    const { error: eventError } = await supabase.rpc("insert_live_activity_event", {
+    const { error: eventError } = await supabase.rpc("insert_live_activity_event_secure", {
       p_student_id: studentId,
       p_class_id: classId,
       p_session_id: existing?.session_id ?? null,

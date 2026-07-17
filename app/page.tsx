@@ -29,7 +29,7 @@ export default function Page() {
         let restoredRowsSummary: unknown[] = [];
         if (activeStudentId) {
           try {
-            const restored = await restoreStudentStateFromServer(activeStudentId);
+            const restored = await restoreStudentStateFromServer(activeStudentId, "number");
             if (restored.progress) {
               progress = restored.progress;
               progressSource = "progress_snapshot";

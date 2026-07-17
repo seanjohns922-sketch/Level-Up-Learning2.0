@@ -106,7 +106,7 @@ function readStudentNameFromStorage() {
 
 async function fetchStudentDisplayName(studentId: string) {
   const { data, error } = await supabase
-    .rpc("get_student_runtime_context", {
+    .rpc("get_student_runtime_context_secure", {
       p_student_id: studentId,
     });
 
