@@ -102,6 +102,7 @@ type LiveStudentCard = {
   latestCorrectAnswer?: string | null;
   latestAnswerCorrect?: boolean | null;
   timeOnCurrentQuestion?: number | null;
+  attemptNumber?: number | null;
   questionsAnswered?: number | null;
   correctCount?: number | null;
   accuracyPercent?: number | null;
@@ -165,6 +166,23 @@ function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEv
     (row.current_lesson && eventLessonId === row.current_lesson) ||
     (row.current_lesson_title && eventLessonTitle === row.current_lesson_title)
   );
+}
+
+function buildCurrentLessonAttemptNumber(
+  row: LiveStudentActivityRow | null | undefined,
+  events: LiveActivityEventRow[],
+) {
+  if (!row) return null;
+
+  const startedAttempts = events.filter((event) => {
+    if (event.event_type !== "lesson_started" && event.event_type !== "quiz_started") return false;
+    return matchesCurrentLesson(row, event);
+  }).length;
+
+  if (startedAttempts > 0) return startedAttempts;
+
+  const rowAttempt = numberOrNull(row.attempt_number);
+  return rowAttempt != null && rowAttempt > 0 ? Math.round(rowAttempt) : null;
 }
 
 function buildCurrentLessonPerformance(
@@ -244,6 +262,7 @@ function toLiveCard(
   student: StudentRow,
   row?: LiveStudentActivityRow | null,
   lessonPerformance?: ReturnType<typeof buildCurrentLessonPerformance> | null,
+  attemptNumber?: number | null,
 ): LiveStudentCard {
   const insight = row
     ? buildLiveStudentInsight({
@@ -307,6 +326,7 @@ function toLiveCard(
     latestCorrectAnswer: row?.latest_correct_answer ?? null,
     latestAnswerCorrect: row?.latest_answer_correct ?? null,
     timeOnCurrentQuestion: row?.time_on_current_question ?? 0,
+    attemptNumber: attemptNumber ?? null,
     questionsAnswered: lessonPerformance?.answered ?? null,
     correctCount: lessonPerformance?.correct ?? null,
     accuracyPercent: lessonPerformance?.accuracy ?? null,
@@ -512,8 +532,10 @@ export default function LiveClassPanel({
     });
     return students.map((student) => {
       const row = rowMap.get(student.id);
-      const lessonPerformance = buildCurrentLessonPerformance(row, eventMap.get(student.id) ?? []);
-      return toLiveCard(student, row, lessonPerformance);
+      const studentEvents = eventMap.get(student.id) ?? [];
+      const lessonPerformance = buildCurrentLessonPerformance(row, studentEvents);
+      const attemptNumber = buildCurrentLessonAttemptNumber(row, studentEvents);
+      return toLiveCard(student, row, lessonPerformance, attemptNumber);
     });
   }, [events, rows, students]);
 
@@ -694,12 +716,13 @@ export default function LiveClassPanel({
         ) : (
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_28px_-16px_rgba(15,23,42,0.18)]">
             {/* Column headers */}
-            <div className="grid grid-cols-[1.5fr_0.6fr_0.7fr_0.5fr_0.7fr_0.7fr_0.7fr_1fr] items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-400">
+            <div className="grid grid-cols-[1.5fr_0.6fr_0.7fr_0.5fr_0.7fr_0.8fr_0.7fr_0.7fr_1fr] items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-400">
               <span>Student</span>
               <span>Realm</span>
               <span>Level</span>
               <span>Week</span>
               <span>Lesson</span>
+              <span>Attempt</span>
               <span className="text-right">Score</span>
               <span className="text-right">%</span>
               <span className="text-right">Last active</span>
@@ -719,7 +742,7 @@ export default function LiveClassPanel({
                   key={card.id}
                   type="button"
                   onClick={() => setSelectedStudentId(card.id)}
-                  className="grid w-full grid-cols-[1.5fr_0.6fr_0.7fr_0.5fr_0.7fr_0.7fr_0.7fr_1fr] items-center gap-3 border-t border-slate-100 px-4 py-2.5 text-left transition hover:bg-slate-50"
+                  className="grid w-full grid-cols-[1.5fr_0.6fr_0.7fr_0.5fr_0.7fr_0.8fr_0.7fr_0.7fr_1fr] items-center gap-3 border-t border-slate-100 px-4 py-2.5 text-left transition hover:bg-slate-50"
                   title="Open student detail"
                 >
                   {/* status dot + name */}
@@ -731,6 +754,9 @@ export default function LiveClassPanel({
                   <span className="text-xs font-semibold text-slate-600">{levelTag}</span>
                   <span className="text-xs font-semibold text-slate-500 tabular-nums">{weekTag}</span>
                   <span className="truncate text-xs font-semibold text-slate-600">{lessonTag}</span>
+                  <span className="truncate text-xs font-bold tabular-nums text-slate-500">
+                    {!notStarted && card.attemptNumber ? `Attempt ${card.attemptNumber}` : "—"}
+                  </span>
                   {/* score */}
                   <span className="text-right text-sm font-bold tabular-nums text-slate-700">
                     {answered > 0 ? `${correct}/${answered}` : "—"}
