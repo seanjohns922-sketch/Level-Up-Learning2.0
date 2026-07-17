@@ -17,6 +17,14 @@ const wrongHandler = engine.slice(
   engine.indexOf("function handleWrong"),
   engine.indexOf("function handleNextQuestion")
 );
+const correctHandler = engine.slice(
+  engine.indexOf("function handleCorrect"),
+  engine.indexOf("function handleWrong")
+);
+const lessonClockEffect = engine.slice(
+  engine.indexOf("const interval = setInterval"),
+  engine.indexOf("// ── Resume gate")
+);
 const submittedAnswerAdapters = [
   "AdditionStrategy.tsx",
   "AreaModelSelect.tsx",
@@ -57,24 +65,25 @@ check(
   "Incorrect feedback advances only through the explicit Next Question action",
   engine.includes("status === \"wrong\" && wrongFeedback") &&
     engine.includes("onClick={handleNextQuestion}") &&
-    engine.includes('feedbackLockRef.current === "incorrect" && !fromIncorrectButton') &&
+    engine.includes('feedbackLockRef.current !== "idle" && !fromFeedbackButton') &&
     engine.includes("Next Question")
 );
 check(
   "A wrong submission cannot generate or count the next question before Next Question",
   !wrongHandler.includes("loadNextQuestion(") &&
     !wrongHandler.includes("setQuestionsAnswered(") &&
-    engine.includes('loadNextQuestion({ fromIncorrectButton: true })')
+    engine.includes('loadNextQuestion({ fromFeedbackButton: true })')
 );
 check(
   "The held activity cannot be changed after the first wrong submission",
-  engine.includes('disabled={status === "wrong"}') &&
-    engine.includes('status === "wrong" ? "pointer-events-none min-w-0 border-0 p-0"')
+  engine.includes("const taskLocked = turnState !== \"answering\"") &&
+    engine.includes("disabled={taskLocked}") &&
+    engine.includes('taskLocked ? "pointer-events-none min-w-0 border-0 p-0"')
 );
 check(
   "A wrong submission is scored exactly once",
   engine.includes("scoredThisTurnRef.current = true") &&
-    engine.includes("if (finished || status !== \"idle\" || scoredThisTurnRef.current) return;")
+    engine.includes("if (finished || turnState !== \"answering\" || scoredThisTurnRef.current) return;")
 );
 check(
   "Mistake review retains the submitted answer, stable task ID and generated task",
@@ -92,7 +101,31 @@ check(
   "Typed responses pass the student's submitted value to the shared engine",
   typed.includes("onWrong?.(typed)") &&
     engine.includes("<fieldset") &&
-    engine.includes('disabled={status === "wrong"}')
+    engine.includes("disabled={taskLocked}")
+);
+check(
+  "Correct feedback is locked and advances only through the explicit Next Question action",
+  correctHandler.includes('setTurnState("feedback_correct")') &&
+    !correctHandler.includes("setTimeout") &&
+    !correctHandler.includes("loadNextQuestion(") &&
+    engine.includes('status === "correct" ? (') &&
+    engine.includes("onClick={handleNextQuestion}")
+);
+check(
+  "The former correct-answer timeout cannot be cancelled by the lesson clock effect",
+  !engine.includes("timeoutRef") &&
+    !engine.includes("clearPendingTimeout") &&
+    !correctHandler.includes("setTimeout") &&
+    !lessonClockEffect.includes("loadNextQuestion")
+);
+check(
+  "Next Question is idempotent and failed generation preserves a retryable accepted turn",
+  engine.includes("advanceRequestedRef.current") &&
+    engine.includes('setTurnState("advance_error")') &&
+    engine.includes("[LessonTurnAdvanceFailed]") &&
+    engine.includes('advanceError ? "Try Again" : "Next Question"') &&
+    engine.includes("Reload Lesson") &&
+    engine.includes("taskId: `${lesson.id}:${currentActivity?.activityType ?? \"unknown\"}:${currentActivityIndex}`")
 );
 check(
   "Multiple choice passes the selected option and locks after submission",

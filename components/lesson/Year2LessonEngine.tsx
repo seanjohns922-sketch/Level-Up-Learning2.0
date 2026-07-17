@@ -245,6 +245,13 @@ type LessonAttemptEntry = {
   timeSpentSeconds: number;
 };
 
+type LessonTurnState =
+  | "answering"
+  | "feedback_correct"
+  | "feedback_incorrect"
+  | "advancing"
+  | "advance_error";
+
 type GuidedWrongFeedback = {
   studentAnswer: string;
   correctAnswer: string;
@@ -618,7 +625,7 @@ export function Year2LessonEngine({
   const lastVillainIdRef = useRef<string | null>(null);
   const lastVillainGameRef = useRef<Villain["game"] | null>(null);
   const brainBreakActiveRef = useRef(false);
-  const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
+  const [turnState, setTurnState] = useState<LessonTurnState>("answering");
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [comboCount, setComboCount] = useState(0);
@@ -665,10 +672,10 @@ export function Year2LessonEngine({
       : []
   );
   const questionOrderRef = useRef(initialTurn.question ? 1 : 0);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const feedbackLockRef = useRef<"idle" | "correct" | "incorrect">("idle");
   const markedCompleteRef = useRef(false);
   const scoredThisTurnRef = useRef(false);
+  const advanceRequestedRef = useRef(false);
   const [attemptLog, setAttemptLog] = useState<LessonAttemptEntry[]>([]);
   const questionStartedAtElapsedRef = useRef(0);
   const finished = secondsLeft <= 0;
@@ -681,6 +688,16 @@ export function Year2LessonEngine({
   const invalidRecoveryCountRef = useRef(0);
   const showMultiStepCalculationFeedback = isMultiStepCalculationLesson(level, lesson);
   const lastLoggedActivityIdRef = useRef<string | null>(null);
+  const [advanceError, setAdvanceError] = useState<string | null>(null);
+  const status: "idle" | "correct" | "wrong" =
+    turnState === "feedback_correct" ||
+    (turnState === "advance_error" && feedbackLockRef.current === "correct")
+      ? "correct"
+      : turnState === "feedback_incorrect" ||
+          (turnState === "advance_error" && feedbackLockRef.current === "incorrect")
+        ? "wrong"
+        : "idle";
+  const taskLocked = turnState !== "answering";
 
   const accuracy =
     questionsAnswered > 0
@@ -701,66 +718,86 @@ export function Year2LessonEngine({
   );
   const emittedSummaryRef = useRef(false);
 
-  function clearPendingTimeout() {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  }
+  function loadNextQuestion({ fromFeedbackButton = false }: { fromFeedbackButton?: boolean } = {}) {
+    if (feedbackLockRef.current !== "idle" && !fromFeedbackButton) return false;
 
-  function loadNextQuestion({ fromIncorrectButton = false }: { fromIncorrectButton?: boolean } = {}) {
-    if (feedbackLockRef.current === "incorrect" && !fromIncorrectButton) return;
-    clearPendingTimeout();
-    if (activities.length === 0) return;
-
-    const nextTurn = chooseNextLessonTurn(
-      level,
-      lesson,
-      activities,
-      bagRef.current,
-      lastIndexRef.current,
-      questionHistoryRef.current,
-      questionOrderRef.current
-    );
-
-    bagRef.current = nextTurn.bag;
-    lastIndexRef.current = nextTurn.lastIndex;
-    if (nextTurn.fingerprint) {
-      questionHistoryRef.current = [
-        ...questionHistoryRef.current,
-        {
-          fingerprint: nextTurn.fingerprint.fingerprint,
-          templateFingerprint: nextTurn.fingerprint.templateFingerprint,
-          numberSetFingerprint: nextTurn.fingerprint.numberSetFingerprint,
-          mode: nextTurn.fingerprint.mode,
-          contextType: nextTurn.fingerprint.contextType,
-          order: questionOrderRef.current,
-        },
-      ];
-      questionOrderRef.current += 1;
-      if (process.env.NODE_ENV !== "production") {
-        console.info("[LessonQuestionRepeatGuard]", {
-          lessonId: lesson.id,
-          fingerprint: nextTurn.fingerprint.fingerprint,
-          templateFingerprint: nextTurn.fingerprint.templateFingerprint,
-          numberSetFingerprint: nextTurn.fingerprint.numberSetFingerprint,
-          mode: nextTurn.fingerprint.mode,
-          contextType: nextTurn.fingerprint.contextType,
-          reused: nextTurn.reused,
-          fallbackReason: nextTurn.fallbackReason || null,
-        });
+    try {
+      if (activities.length === 0) {
+        throw new Error("Lesson activity pool is empty");
       }
-    }
+      const nextTurn = chooseNextLessonTurn(
+        level,
+        lesson,
+        activities,
+        bagRef.current,
+        lastIndexRef.current,
+        questionHistoryRef.current,
+        questionOrderRef.current
+      );
+      const nextActivity = activities[nextTurn.activityIndex];
+      if (!nextActivity || !nextTurn.question || !isLessonQuestionSafe(nextActivity, nextTurn.question)) {
+        throw new Error("Generated lesson turn failed safety validation");
+      }
 
-    setCurrentActivityIndex(nextTurn.activityIndex);
-    setCurrentQuestion(nextTurn.question);
-    setCurrentQuestionSequence(questionOrderRef.current);
-    setQuestionKey((v) => v + 1);
-    feedbackLockRef.current = "idle";
-    setStatus("idle");
-    setWrongFeedback(null);
-    scoredThisTurnRef.current = false;
-    questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
+      bagRef.current = nextTurn.bag;
+      lastIndexRef.current = nextTurn.lastIndex;
+      if (nextTurn.fingerprint) {
+        questionHistoryRef.current = [
+          ...questionHistoryRef.current,
+          {
+            fingerprint: nextTurn.fingerprint.fingerprint,
+            templateFingerprint: nextTurn.fingerprint.templateFingerprint,
+            numberSetFingerprint: nextTurn.fingerprint.numberSetFingerprint,
+            mode: nextTurn.fingerprint.mode,
+            contextType: nextTurn.fingerprint.contextType,
+            order: questionOrderRef.current,
+          },
+        ];
+        questionOrderRef.current += 1;
+        if (process.env.NODE_ENV !== "production") {
+          console.info("[LessonQuestionRepeatGuard]", {
+            lessonId: lesson.id,
+            fingerprint: nextTurn.fingerprint.fingerprint,
+            templateFingerprint: nextTurn.fingerprint.templateFingerprint,
+            numberSetFingerprint: nextTurn.fingerprint.numberSetFingerprint,
+            mode: nextTurn.fingerprint.mode,
+            contextType: nextTurn.fingerprint.contextType,
+            reused: nextTurn.reused,
+            fallbackReason: nextTurn.fallbackReason || null,
+          });
+        }
+      }
+
+      setCurrentActivityIndex(nextTurn.activityIndex);
+      setCurrentQuestion(nextTurn.question);
+      setCurrentQuestionSequence(questionOrderRef.current);
+      setQuestionKey((v) => v + 1);
+      feedbackLockRef.current = "idle";
+      scoredThisTurnRef.current = false;
+      advanceRequestedRef.current = false;
+      setTurnState("answering");
+      setAdvanceError(null);
+      setWrongFeedback(null);
+      questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
+      return true;
+    } catch (error) {
+      advanceRequestedRef.current = false;
+      setTurnState("advance_error");
+      setAdvanceError("Something went wrong loading the next question.");
+      console.error("[LessonTurnAdvanceFailed]", {
+        realmId,
+        lessonId: lesson.id,
+        level,
+        week: lesson.week,
+        lesson: lesson.lesson,
+        taskType: currentActivity?.activityType ?? "unknown",
+        taskId: `${lesson.id}:${currentActivity?.activityType ?? "unknown"}:${currentActivityIndex}`,
+        sessionId: lessonSessionIdRef.current,
+        turnId: currentQuestionSequence,
+        error: error instanceof Error ? error.message : "Unknown generation error",
+      });
+      return false;
+    }
   }
 
   useEffect(() => {
@@ -784,19 +821,18 @@ export function Year2LessonEngine({
     invalidRecoveryCountRef.current += 1;
     const timeout = window.setTimeout(() => loadNextQuestion(), 0);
     return () => window.clearTimeout(timeout);
+    // loadNextQuestion intentionally reads the latest generated-turn refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activities.length, currentTurnSafe, finished]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setSecondsLeft((c) =>
-        brainBreakActiveRef.current || showLessonResumeRef.current || status === "wrong" ? c : c - 1
+        brainBreakActiveRef.current || showLessonResumeRef.current || turnState !== "answering" ? c : c - 1
       );
     }, 1000);
-    return () => {
-      clearInterval(interval);
-      clearPendingTimeout();
-    };
-  }, [status]);
+    return () => clearInterval(interval);
+  }, [turnState]);
 
   // ── Resume gate: load a saved snapshot once and offer to continue ──
   useEffect(() => {
@@ -807,7 +843,6 @@ export function Year2LessonEngine({
     } else {
       resumeResolvedRef.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumeLessonKey]);
 
   function resumeLesson() {
@@ -843,7 +878,13 @@ export function Year2LessonEngine({
       if (typeof snap.questionOrder === "number") questionOrderRef.current = snap.questionOrder;
       if (typeof snap.questionSequence === "number") setCurrentQuestionSequence(snap.questionSequence);
       if (typeof snap.questionKey === "number") setQuestionKey(snap.questionKey);
-      if (snap.feedbackStatus) setStatus(snap.feedbackStatus);
+      setTurnState(
+        snap.feedbackStatus === "wrong"
+          ? "feedback_incorrect"
+          : snap.feedbackStatus === "correct"
+            ? "feedback_correct"
+            : "answering"
+      );
       if (snap.wrongFeedback) setWrongFeedback(snap.wrongFeedback);
       feedbackLockRef.current =
         snap.feedbackStatus === "wrong"
@@ -852,12 +893,10 @@ export function Year2LessonEngine({
             ? "correct"
             : "idle";
       scoredThisTurnRef.current = snap.scoredCurrentTurn === true;
+      advanceRequestedRef.current = false;
       setCoachDone(snap.coachDone === true);
       setLessonMistakeReviewDone(snap.mistakeReviewDone === true);
       setShowLessonMistakeReview(snap.showMistakeReview === true);
-      if (snap.feedbackStatus === "correct") {
-        timeoutRef.current = setTimeout(() => loadNextQuestion(), 1000);
-      }
       nextBreakIdxRef.current = brainBreakSchedule.filter((t) => snap.secondsLeft <= t).length;
     }
     setShowLessonResume(false);
@@ -877,9 +916,11 @@ export function Year2LessonEngine({
     setCoachDone(false);
     setReflectionDone(false);
     feedbackLockRef.current = "idle";
-    setStatus("idle");
+    setTurnState("answering");
+    setAdvanceError(null);
     setWrongFeedback(null);
     scoredThisTurnRef.current = false;
+    advanceRequestedRef.current = false;
     setCurrentActivityIndex(nextTurn.activityIndex);
     setCurrentQuestion(nextTurn.question);
     setQuestionKey((current) => current + 1);
@@ -932,7 +973,6 @@ export function Year2LessonEngine({
       showMistakeReview: showLessonMistakeReview,
       updatedAt: Date.now(),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog, currentActivityIndex, currentQuestion, currentQuestionSequence, questionKey, status, wrongFeedback, coachDone, lessonMistakeReviewDone, showLessonMistakeReview]);
 
   // Brain breaks fire at the scheduled seconds-left thresholds (count + timing
@@ -1042,7 +1082,7 @@ export function Year2LessonEngine({
   }, [currentActivity, currentActivityIndex, currentQuestion, currentQuestionSequence, liveContext]);
 
   function handleCorrect() {
-    if (finished || status !== "idle" || scoredThisTurnRef.current) return;
+    if (finished || turnState !== "answering" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
     feedbackLockRef.current = "correct";
     const mode =
@@ -1057,8 +1097,7 @@ export function Year2LessonEngine({
       correct: true,
       timeSpentSeconds: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
     }]);
-    clearPendingTimeout();
-    setStatus("correct");
+    setTurnState("feedback_correct");
     if (liveContext) {
       const activityId = `${liveContext.lessonId}:${currentActivity?.activityType ?? "activity"}:${currentActivityIndex}`;
       void trackLiveLearningEvent({
@@ -1089,11 +1128,10 @@ export function Year2LessonEngine({
     const newChain = comboCount + 1;
     saveBestChain(newChain);
     setComboCount(newChain);
-    timeoutRef.current = setTimeout(() => loadNextQuestion(), 1000);
   }
 
   function handleWrong(studentAnswer?: string) {
-    if (finished || status !== "idle" || scoredThisTurnRef.current) return;
+    if (finished || turnState !== "answering" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
     const mode =
       questionHistoryRef.current[questionHistoryRef.current.length - 1]?.mode ??
@@ -1131,8 +1169,7 @@ export function Year2LessonEngine({
       correct: false,
       timeSpentSeconds: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
     }]);
-    clearPendingTimeout();
-    setStatus("wrong");
+    setTurnState("feedback_incorrect");
     if (liveContext) {
       const activityId = `${liveContext.lessonId}:${currentActivity?.activityType ?? "activity"}:${currentActivityIndex}`;
       void trackLiveLearningEvent({
@@ -1163,10 +1200,26 @@ export function Year2LessonEngine({
   }
 
   function handleNextQuestion() {
-    if (feedbackLockRef.current !== "incorrect") return;
-    questionsAnsweredRef.current += 1;
-    setQuestionsAnswered((value) => value + 1);
-    loadNextQuestion({ fromIncorrectButton: true });
+    const acceptedResult = feedbackLockRef.current;
+    if (acceptedResult === "idle" || advanceRequestedRef.current) return;
+    advanceRequestedRef.current = true;
+    setTurnState("advancing");
+    const advanced = loadNextQuestion({ fromFeedbackButton: true });
+    if (advanced && acceptedResult === "incorrect") {
+      questionsAnsweredRef.current += 1;
+      setQuestionsAnswered((value) => value + 1);
+    }
+  }
+
+  function handleRetryQuestion() {
+    if (feedbackLockRef.current !== "idle") {
+      handleNextQuestion();
+      return;
+    }
+    if (advanceRequestedRef.current) return;
+    advanceRequestedRef.current = true;
+    setTurnState("advancing");
+    loadNextQuestion();
   }
 
   const hint = currentQuestion
@@ -1430,21 +1483,56 @@ export function Year2LessonEngine({
             </div>
           ) : null}
 
-          {status !== "idle" && (
+          {(status !== "idle" || advanceError) && (
             <div
-              className={`rounded-xl px-4 py-2.5 text-center text-sm font-extrabold shadow-sm transition-all ${
+              className={`flex flex-wrap items-center justify-center gap-3 rounded-xl px-4 py-2.5 text-center text-sm font-extrabold shadow-sm transition-all ${
                 status === "correct"
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-red-50 text-red-700 border border-red-200"
               }`}
             >
-              {status === "correct"
-                ? showMultiStepCalculationFeedback
-                  ? "Nice — well worked."
-                  : "✓ Correct! +10 XP"
-                : showMultiStepCalculationFeedback
-                ? "Check each step carefully."
-                : "✗ Not quite — keep going!"}
+              <span>
+                {advanceError
+                  ? advanceError
+                  : status === "correct"
+                    ? showMultiStepCalculationFeedback
+                      ? "Nice — well worked."
+                      : "✓ Correct! +10 XP"
+                    : showMultiStepCalculationFeedback
+                      ? "Check each step carefully."
+                      : "✗ Not quite — keep going!"}
+              </span>
+              {status === "correct" ? (
+                <button
+                  type="button"
+                  onClick={handleNextQuestion}
+                  disabled={turnState === "advancing"}
+                  className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2 font-black text-white transition hover:bg-emerald-800 disabled:cursor-wait disabled:opacity-70"
+                >
+                  {turnState === "advancing" ? "Loading..." : advanceError ? "Try Again" : "Next Question"}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+              ) : null}
+              {status === "idle" && advanceError ? (
+                <button
+                  type="button"
+                  onClick={handleRetryQuestion}
+                  disabled={turnState === "advancing"}
+                  className="inline-flex items-center gap-2 rounded-lg bg-amber-700 px-4 py-2 font-black text-white transition hover:bg-amber-800 disabled:cursor-wait disabled:opacity-70"
+                >
+                  {turnState === "advancing" ? "Loading..." : "Try Again"}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+              ) : null}
+              {advanceError ? (
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="rounded-lg border border-current px-4 py-2 font-black transition hover:bg-white/60"
+                >
+                  Reload Lesson
+                </button>
+              ) : null}
             </div>
           )}
 
@@ -1496,9 +1584,9 @@ export function Year2LessonEngine({
                 </div>
 
                 <fieldset
-                  disabled={status === "wrong"}
-                  className={status === "wrong" ? "pointer-events-none min-w-0 border-0 p-0" : "min-w-0 border-0 p-0"}
-                  aria-disabled={status === "wrong"}
+                  disabled={taskLocked}
+                  className={taskLocked ? "pointer-events-none min-w-0 border-0 p-0" : "min-w-0 border-0 p-0"}
+                  aria-disabled={taskLocked}
                 >
                   <LessonRenderer
                     key={questionKey}
@@ -1523,13 +1611,18 @@ export function Year2LessonEngine({
                       </div>
                     </div>
                     <p className="mt-3 whitespace-pre-line text-sm font-semibold leading-relaxed text-slate-700">{wrongFeedback.explanation}</p>
+                    {advanceError ? (
+                      <p className="mt-3 text-sm font-bold text-red-800">{advanceError}</p>
+                    ) : null}
                     <div className="mt-4 flex justify-end">
                       <button
                         type="button"
                         onClick={handleNextQuestion}
-                        className="pointer-events-auto inline-flex items-center gap-2 rounded-xl bg-trust-blue px-5 py-3 font-black text-white transition hover:opacity-90"
+                        disabled={turnState === "advancing"}
+                        className="pointer-events-auto inline-flex items-center gap-2 rounded-xl bg-trust-blue px-5 py-3 font-black text-white transition hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
                       >
-                        Next Question <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                        {turnState === "advancing" ? "Loading..." : advanceError ? "Try Again" : "Next Question"}
+                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </button>
                     </div>
                   </div>
