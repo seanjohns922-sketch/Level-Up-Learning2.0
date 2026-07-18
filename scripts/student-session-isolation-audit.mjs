@@ -17,7 +17,7 @@ const resume = read("lib/resume-state.ts");
 const identity = read("lib/studentIdentity.ts");
 const home = read("app/home/page.tsx");
 const pretest = read("app/pretest/page.tsx");
-const migration = read("supabase/migrations/20260718103000_fix_student_access_legacy_user_id.sql");
+const migration = read("supabase/migrations/20260718104500_guard_optional_parent_student_links.sql");
 
 const results = [];
 const check = (label, ok) => results.push({ label, ok });
@@ -99,8 +99,12 @@ check(
 check(
   "Student authorization does not reference the missing legacy students.user_id",
   !migration.includes("s.user_id") &&
-    migration.includes("public.parent_student_links") &&
     migration.includes("public.student_access_sessions")
+);
+check(
+  "Optional parent linking cannot break school-only student sessions",
+  migration.includes("to_regclass('public.parent_student_links') is not null") &&
+    migration.includes("execute $linked_access$")
 );
 
 const failures = results.filter((result) => !result.ok);
