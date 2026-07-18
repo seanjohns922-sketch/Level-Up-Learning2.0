@@ -7,31 +7,61 @@ import { ACTIVE_STUDENT_KEY } from "@/data/progress";
  * StudentAvatar
  * ----------------------------------------------------
  * Stylised human-child avatar for Level Up Learning.
- * Designed for the long-term customization system —
- * every visual layer (hair, shirt, pants, shoes,
- * accessory) is driven by a prop on `AvatarOutfit`
- * so future cosmetic systems can swap palettes /
- * shapes without touching world-map code.
+ * Every visual layer (hair, shirt, pants, shoes, hat,
+ * glasses, cape, backpack) is driven by a prop on
+ * `AvatarOutfit` so the cosmetic / marketplace system
+ * can swap palettes and shapes without touching
+ * world-map code.
  *
  * Reference vibe: Disney Dreamlight Valley / Pokemon
  * trainer / Fortnite locker — semi-chibi, friendly,
- * gender-neutral, readable at small sizes.
+ * gender-neutral base, readable at small sizes.
  *
- * Customization is NOT implemented yet. This component
- * only ships the default look + the structural hooks.
+ * A marketplace "avatar" item ships a partial AvatarOutfit
+ * in its metadata; equipping it merges those fields over
+ * the default look. Only the fields an item overrides need
+ * to be present.
  */
+
+export type HairStyle =
+  | "short"
+  | "tuft"
+  | "swept"
+  | "long"
+  | "ponytail"
+  | "bun"
+  | "buzz"
+  | "afro"
+  | "curls"
+  | "braids"
+  | "sidepart"
+  | "pigtails"
+  | "spiky";
+export type HatStyle = "none" | "beanie" | "cap" | "explorer" | "crown" | "wizard";
+export type GlassesStyle = "none" | "round" | "shades" | "visor";
+export type CapeStyle = "none" | "hero" | "royal";
+export type BackpackStyle = "none" | "explorer" | "rocket";
 
 export type AvatarOutfit = {
   skin?: string;
   skinShade?: string;
   hair?: string;
   hairShade?: string;
-  hairStyle?: "short" | "tuft" | "swept"; // future: "long" | "bun" | "cap" ...
+  hairStyle?: HairStyle;
   shirt?: string;
   shirtTrim?: string;
   pants?: string;
   shoes?: string;
-  accessory?: "none" | "backpack" | "glasses"; // future: ...
+  hat?: HatStyle;
+  hatColor?: string;
+  glasses?: GlassesStyle;
+  glassesColor?: string;
+  cape?: CapeStyle;
+  capeColor?: string;
+  backpack?: BackpackStyle;
+  backpackColor?: string;
+  /** @deprecated retained for older saved outfits — dedicated fields above supersede it. */
+  accessory?: "none" | "backpack" | "glasses";
 };
 
 export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
@@ -44,6 +74,14 @@ export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
   shirtTrim: "#93c5fd",
   pants: "#111827",
   shoes: "#f8fafc",
+  hat: "none",
+  hatColor: "#ef4444",
+  glasses: "none",
+  glassesColor: "#1f2937",
+  cape: "none",
+  capeColor: "#7c3aed",
+  backpack: "none",
+  backpackColor: "#f59e0b",
   accessory: "none",
 };
 
@@ -58,6 +96,294 @@ function readOutfitFromStorage(): AvatarOutfit {
     /* ignore */
   }
   return {};
+}
+
+type Outfit = Required<AvatarOutfit>;
+
+// ── Behind-body layers (drawn first, occluded by the torso) ────────────────
+function CapeLayer({ o }: { o: Outfit }) {
+  if (o.cape === "none") return null;
+  return (
+    <g data-layer="cape">
+      <path d="M40 94 Q60 88 80 94 L96 190 Q60 202 24 190 Z" fill={o.capeColor} />
+      <path d="M40 94 Q60 88 80 94 L82 114 Q60 122 38 114 Z" fill="#000" opacity="0.16" />
+      {o.cape === "royal" ? (
+        <>
+          <path d="M24 190 Q60 202 96 190" stroke="#fde68a" strokeWidth="3" fill="none" strokeLinecap="round" />
+          <circle cx="50" cy="98" r="2.4" fill="#fde68a" />
+          <circle cx="70" cy="98" r="2.4" fill="#fde68a" />
+        </>
+      ) : (
+        <path d="M46 96 Q60 92 74 96" stroke="#ffffff" strokeOpacity="0.22" strokeWidth="2" fill="none" />
+      )}
+    </g>
+  );
+}
+
+function BackpackPack({ o }: { o: Outfit }) {
+  if (o.backpack === "none") return null;
+  return (
+    <g data-layer="backpack-pack">
+      <rect x="38" y="94" width="44" height="58" rx="12" fill={o.backpackColor} />
+      <rect x="38" y="94" width="44" height="20" rx="10" fill="#000" opacity="0.14" />
+      {o.backpack === "rocket" ? (
+        <path d="M60 152 L53 170 Q60 165 67 170 Z" fill="#f97316" opacity="0.9" />
+      ) : (
+        <rect x="46" y="120" width="28" height="16" rx="4" fill="#000" opacity="0.16" />
+      )}
+    </g>
+  );
+}
+
+// ── Front layers (drawn after head + hair) ─────────────────────────────────
+function BackpackStraps({ o }: { o: Outfit }) {
+  if (o.backpack === "none") return null;
+  return (
+    <g data-layer="backpack-straps">
+      <path d="M45 100 L49 152" stroke={o.backpackColor} strokeWidth="6" strokeLinecap="round" />
+      <path d="M75 100 L71 152" stroke={o.backpackColor} strokeWidth="6" strokeLinecap="round" />
+      <rect x="46" y="126" width="6" height="5" rx="1.5" fill="#000" opacity="0.3" />
+      <rect x="68" y="126" width="6" height="5" rx="1.5" fill="#000" opacity="0.3" />
+    </g>
+  );
+}
+
+function HairLayer({ o }: { o: Outfit }) {
+  const swept = (
+    <path
+      d="M30 44 Q28 16 60 14 Q92 16 90 44 Q86 36 80 34 Q72 28 60 30 Q48 28 40 34 Q34 36 30 44 Z"
+      fill="url(#lul-hair)"
+    />
+  );
+  const short = (
+    <>
+      <path
+        d="M30 54 Q28 20 60 16 Q92 20 90 54 Q86 42 80 40 Q76 34 68 34 Q60 30 52 36 Q44 34 40 40 Q34 42 30 54 Z"
+        fill="url(#lul-hair)"
+      />
+      <path d="M40 44 Q50 50 62 46 Q72 50 82 44 Q80 54 70 54 Q60 56 50 54 Q42 54 40 44 Z" fill={o.hairShade} />
+    </>
+  );
+  switch (o.hairStyle) {
+    case "tuft":
+      return (
+        <g data-layer="hair">
+          <path
+            d="M32 50 Q34 18 60 18 Q86 18 88 50 Q80 38 70 40 Q66 30 60 32 Q54 30 50 40 Q40 38 32 50 Z"
+            fill="url(#lul-hair)"
+          />
+          <path d="M58 20 Q62 10 68 20 Q64 16 58 20 Z" fill="url(#lul-hair)" />
+        </g>
+      );
+    case "short":
+      return <g data-layer="hair">{short}</g>;
+    case "buzz":
+      return (
+        <g data-layer="hair">
+          <path
+            d="M32 48 Q30 22 60 20 Q90 22 88 48 Q80 40 60 40 Q40 40 32 48 Z"
+            fill="url(#lul-hair)"
+            opacity="0.9"
+          />
+        </g>
+      );
+    case "long":
+      return (
+        <g data-layer="hair">
+          {/* side lengths falling to the shoulders (behind the sweep) */}
+          <path d="M30 42 Q24 72 30 96 Q37 98 41 92 Q36 66 40 46 Z" fill="url(#lul-hair)" />
+          <path d="M90 42 Q96 72 90 96 Q83 98 79 92 Q84 66 80 46 Z" fill="url(#lul-hair)" />
+          {swept}
+        </g>
+      );
+    case "ponytail":
+      return (
+        <g data-layer="hair">
+          <path d="M86 30 Q104 36 100 58 Q96 74 86 68 Q92 50 82 42 Z" fill="url(#lul-hair)" />
+          <circle cx="86" cy="31" r="3" fill={o.hairShade} />
+          {short}
+        </g>
+      );
+    case "bun":
+      return (
+        <g data-layer="hair">
+          {swept}
+          <circle cx="60" cy="11" r="8" fill="url(#lul-hair)" />
+          <circle cx="60" cy="11" r="8" fill="#000" opacity="0.1" />
+          <path d="M53 8 Q60 4 67 8" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1.2" fill="none" />
+        </g>
+      );
+    case "afro":
+      return (
+        <g data-layer="hair">
+          <path
+            d="M28 46 Q22 10 60 8 Q98 10 92 46 Q92 60 82 64 Q88 44 78 38 Q84 28 60 26 Q36 28 42 38 Q32 44 38 64 Q28 60 28 46 Z"
+            fill="url(#lul-hair)"
+          />
+          <circle cx="40" cy="20" r="3" fill={o.hairShade} opacity="0.35" />
+          <circle cx="60" cy="13" r="3" fill={o.hairShade} opacity="0.35" />
+          <circle cx="80" cy="20" r="3" fill={o.hairShade} opacity="0.35" />
+          <circle cx="31" cy="38" r="2.6" fill={o.hairShade} opacity="0.3" />
+          <circle cx="89" cy="38" r="2.6" fill={o.hairShade} opacity="0.3" />
+        </g>
+      );
+    case "curls":
+      return (
+        <g data-layer="hair">
+          <path
+            d="M30 50 Q28 18 60 16 Q92 18 90 50 Q86 44 82 44 Q84 34 76 34 Q78 26 68 30 Q70 22 60 26 Q50 22 52 30 Q44 26 44 34 Q36 34 38 44 Q34 44 30 50 Z"
+            fill="url(#lul-hair)"
+          />
+          <circle cx="42" cy="26" r="3.4" fill="#ffffff" opacity="0.08" />
+          <circle cx="60" cy="22" r="3.4" fill="#ffffff" opacity="0.08" />
+          <circle cx="78" cy="26" r="3.4" fill="#ffffff" opacity="0.08" />
+        </g>
+      );
+    case "braids":
+      return (
+        <g data-layer="hair">
+          <path d="M30 44 Q26 74 30 100 L40 100 Q40 72 40 46 Z" fill="url(#lul-hair)" />
+          <path d="M90 44 Q94 74 90 100 L80 100 Q80 72 80 46 Z" fill="url(#lul-hair)" />
+          <line x1="30" y1="58" x2="40" y2="58" stroke={o.hairShade} strokeWidth="1.4" />
+          <line x1="30" y1="70" x2="40" y2="70" stroke={o.hairShade} strokeWidth="1.4" />
+          <line x1="30" y1="82" x2="40" y2="82" stroke={o.hairShade} strokeWidth="1.4" />
+          <line x1="30" y1="94" x2="40" y2="94" stroke={o.hairShade} strokeWidth="1.4" />
+          <line x1="80" y1="58" x2="90" y2="58" stroke={o.hairShade} strokeWidth="1.4" />
+          <line x1="80" y1="70" x2="90" y2="70" stroke={o.hairShade} strokeWidth="1.4" />
+          <line x1="80" y1="82" x2="90" y2="82" stroke={o.hairShade} strokeWidth="1.4" />
+          <line x1="80" y1="94" x2="90" y2="94" stroke={o.hairShade} strokeWidth="1.4" />
+          <path
+            d="M30 44 Q28 16 60 14 Q92 16 90 44 Q84 34 74 34 Q66 26 60 28 Q54 26 46 34 Q36 34 30 44 Z"
+            fill="url(#lul-hair)"
+          />
+        </g>
+      );
+    case "sidepart":
+      return (
+        <g data-layer="hair">
+          <path
+            d="M30 46 Q28 16 60 14 Q92 16 90 46 Q86 34 70 32 Q66 22 48 28 Q40 30 34 40 Q32 42 30 46 Z"
+            fill="url(#lul-hair)"
+          />
+          <path d="M52 20 Q66 25 84 30" stroke={o.hairShade} strokeWidth="1.2" fill="none" opacity="0.7" />
+        </g>
+      );
+    case "pigtails":
+      return (
+        <g data-layer="hair">
+          <circle cx="28" cy="46" r="9" fill="url(#lul-hair)" />
+          <circle cx="92" cy="46" r="9" fill="url(#lul-hair)" />
+          <path
+            d="M30 54 Q28 20 60 16 Q92 20 90 54 Q86 42 80 40 Q76 34 68 34 Q60 30 52 36 Q44 34 40 40 Q34 42 30 54 Z"
+            fill="url(#lul-hair)"
+          />
+          <path d="M40 44 Q50 50 62 46 Q72 50 82 44 Q80 54 70 54 Q60 56 50 54 Q42 54 40 44 Z" fill={o.hairShade} />
+        </g>
+      );
+    case "spiky":
+      return (
+        <g data-layer="hair">
+          <path
+            d="M30 48 Q30 22 60 20 Q90 22 90 48 Q84 40 78 42 L82 28 L72 40 L74 24 L64 38 L62 22 L54 38 L50 26 L48 40 L40 28 L42 42 Q36 40 30 48 Z"
+            fill="url(#lul-hair)"
+          />
+        </g>
+      );
+    default:
+      return (
+        <g data-layer="hair">
+          {swept}
+          <path d="M40 28 Q60 22 80 28" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1.2" fill="none" />
+        </g>
+      );
+  }
+}
+
+function HatLayer({ o }: { o: Outfit }) {
+  switch (o.hat) {
+    case "beanie":
+      return (
+        <g data-layer="hat">
+          <path d="M28 40 Q28 10 60 10 Q92 10 92 40 Q60 30 28 40 Z" fill={o.hatColor} />
+          <rect x="27" y="36" width="66" height="9" rx="4.5" fill={o.hatColor} />
+          <rect x="27" y="36" width="66" height="9" rx="4.5" fill="#ffffff" opacity="0.12" />
+          <circle cx="60" cy="9" r="4" fill="#ffffff" opacity="0.85" />
+        </g>
+      );
+    case "cap":
+      return (
+        <g data-layer="hat">
+          <path d="M30 36 Q32 12 60 12 Q88 12 90 36 Q60 26 30 36 Z" fill={o.hatColor} />
+          <path d="M58 34 Q88 32 102 40 Q88 45 58 41 Z" fill={o.hatColor} />
+          <path d="M58 34 Q88 32 102 40 Q88 45 58 41 Z" fill="#000" opacity="0.14" />
+          <path d="M40 30 Q60 24 80 30" stroke="#ffffff" strokeOpacity="0.2" strokeWidth="1.4" fill="none" />
+        </g>
+      );
+    case "explorer":
+      return (
+        <g data-layer="hat">
+          <ellipse cx="60" cy="37" rx="37" ry="7.5" fill={o.hatColor} />
+          <path d="M40 37 Q40 15 60 15 Q80 15 80 37 Z" fill={o.hatColor} />
+          <rect x="40" y="30" width="40" height="5" rx="2" fill="#000" opacity="0.28" />
+          <ellipse cx="60" cy="37" rx="37" ry="7.5" fill="none" stroke="#000" strokeOpacity="0.12" strokeWidth="1" />
+        </g>
+      );
+    case "crown":
+      return (
+        <g data-layer="hat">
+          <path d="M36 32 L42 13 L51 26 L60 11 L69 26 L78 13 L84 32 Z" fill="#fcd34d" />
+          <rect x="36" y="30" width="48" height="6" rx="2" fill="#f59e0b" />
+          <circle cx="60" cy="19" r="2.2" fill="#ef4444" />
+          <circle cx="46" cy="23" r="1.6" fill="#38bdf8" />
+          <circle cx="74" cy="23" r="1.6" fill="#38bdf8" />
+        </g>
+      );
+    case "wizard":
+      return (
+        <g data-layer="hat">
+          <path d="M60 1 L43 34 Q60 40 77 34 Z" fill={o.hatColor} />
+          <path d="M41 33 Q60 40 79 33 L81 39 Q60 46 39 39 Z" fill={o.hatColor} />
+          <path d="M60 15 L62 21 L68 23 L62 25 L60 31 L58 25 L52 23 L58 21 Z" fill="#fde68a" />
+        </g>
+      );
+    default:
+      return null;
+  }
+}
+
+function GlassesLayer({ o }: { o: Outfit }) {
+  switch (o.glasses) {
+    case "round":
+      return (
+        <g data-layer="glasses" stroke={o.glassesColor} strokeWidth="1.6" fill="none">
+          <circle cx="49" cy="60" r="5.5" />
+          <circle cx="71" cy="60" r="5.5" />
+          <line x1="54.5" y1="60" x2="65.5" y2="60" />
+          <line x1="43.5" y1="59" x2="34" y2="57" strokeLinecap="round" />
+          <line x1="76.5" y1="59" x2="86" y2="57" strokeLinecap="round" />
+        </g>
+      );
+    case "shades":
+      return (
+        <g data-layer="glasses">
+          <path d="M42 56 h14 q3 0 3 3 v3 q0 3 -3 3 h-10 q-3 0 -4 -2 l-2 -4 q-1 -3 2 -3 Z" fill={o.glassesColor} />
+          <path d="M78 56 h-14 q-3 0 -3 3 v3 q0 3 3 3 h10 q3 0 4 -2 l2 -4 q1 -3 -2 -3 Z" fill={o.glassesColor} />
+          <line x1="56" y1="58" x2="64" y2="58" stroke={o.glassesColor} strokeWidth="2" />
+          <line x1="42" y1="57" x2="34" y2="55" stroke={o.glassesColor} strokeWidth="1.6" strokeLinecap="round" />
+          <line x1="78" y1="57" x2="86" y2="55" stroke={o.glassesColor} strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M45 59 Q49 58 53 59" stroke="#ffffff" strokeOpacity="0.35" strokeWidth="1" fill="none" />
+        </g>
+      );
+    case "visor":
+      return (
+        <g data-layer="glasses">
+          <path d="M39 56 Q60 51 81 56 L81 62 Q60 67 39 62 Z" fill={o.glassesColor} opacity="0.88" />
+          <path d="M44 58 Q60 55 76 58" stroke="#ffffff" strokeOpacity="0.4" strokeWidth="1.4" fill="none" />
+        </g>
+      );
+    default:
+      return null;
+  }
 }
 
 type StudentAvatarProps = {
@@ -129,6 +455,10 @@ export default function StudentAvatar({
           </linearGradient>
         </defs>
 
+        {/* ── BEHIND-BODY cosmetic layers ──────────────── */}
+        <CapeLayer o={o} />
+        <BackpackPack o={o} />
+
         {/* ── SHOES layer (chunky sneakers) ────────────── */}
         <g data-layer="shoes">
           <path d="M30 206 Q30 198 42 198 L58 198 Q60 204 60 210 Q60 214 56 214 L32 214 Q28 214 28 210 Z" fill="url(#lul-shoe)" />
@@ -181,6 +511,9 @@ export default function StudentAvatar({
           <path d="M32 108 Q34 138 30 156" stroke="#ffffff" strokeOpacity="0.14" strokeWidth="3" fill="none" />
         </g>
 
+        {/* Backpack straps sit over the hoodie */}
+        <BackpackStraps o={o} />
+
         {/* ── NECK + HEAD ──────────────────────────────── */}
         <g data-layer="head">
           <rect x="54" y="82" width="12" height="10" rx="4" fill={o.skinShade} />
@@ -221,41 +554,10 @@ export default function StudentAvatar({
           <path d="M54 75 Q60 78 66 75" stroke="#f4a8a8" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.7" />
         </g>
 
-        {/* ── HAIR layer (modern silhouettes) ─────────── */}
-        <g data-layer="hair">
-          {o.hairStyle === "tuft" ? (
-            <>
-              <path
-                d="M32 50 Q34 18 60 18 Q86 18 88 50 Q80 38 70 40 Q66 30 60 32 Q54 30 50 40 Q40 38 32 50 Z"
-                fill="url(#lul-hair)"
-              />
-              <path d="M58 20 Q62 10 68 20 Q64 16 58 20 Z" fill="url(#lul-hair)" />
-            </>
-          ) : o.hairStyle === "short" ? (
-            <>
-              <path
-                d="M30 54 Q28 20 60 16 Q92 20 90 54 Q86 42 80 40 Q76 34 68 34 Q60 30 52 36 Q44 34 40 40 Q34 42 30 54 Z"
-                fill="url(#lul-hair)"
-              />
-              <path d="M40 44 Q50 50 62 46 Q72 50 82 44 Q80 54 70 54 Q60 56 50 54 Q42 54 40 44 Z" fill={o.hairShade} />
-            </>
-          ) : (
-            <>
-              {/* Swept Roblox-style cap of hair — sits HIGH on the head,
-                  exposing a clear forehead so it can never be mistaken
-                  for a brow or visor. */}
-              <path
-                d="M30 44 Q28 16 60 14 Q92 16 90 44 Q86 36 80 34 Q72 28 60 30 Q48 28 40 34 Q34 36 30 44 Z"
-                fill="url(#lul-hair)"
-              />
-              {/* Sweep highlight */}
-              <path d="M40 28 Q60 22 80 28" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1.2" fill="none" />
-            </>
-          )}
-        </g>
-
-        {/* ── ACCESSORY layer (reserved) ───────────────── */}
-        <g data-layer="accessory" />
+        {/* ── HAIR + HEADWEAR + EYEWEAR ────────────────── */}
+        <HairLayer o={o} />
+        <HatLayer o={o} />
+        <GlassesLayer o={o} />
       </svg>
 
       {/* Ground glow */}

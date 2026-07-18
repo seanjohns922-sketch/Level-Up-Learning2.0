@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import * as Icons from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import StudentAvatar, { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
-import { economyErrorMessage, equipEconomyItem, fetchStudentEconomy, getExplorerRank, purchaseEconomyItem, RARITY_STYLES, type EconomyCategory, type EconomyItem, type EconomyState } from "@/lib/economy";
+import { economyErrorMessage, equipEconomyItem, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyCategory, type EconomyItem, type EconomyState } from "@/lib/economy";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 
 const CATEGORIES: Array<{ id: "all" | EconomyCategory; label: string }> = [
@@ -39,7 +39,15 @@ export default function MarketplacePage() {
   const items = useMemo(() => (state?.items ?? []).filter((item) => item.purchasable && (category === "all" || item.category === category)), [category, state?.items]);
   const selectedOwned = selected ? owned.has(selected.item_key) : false;
   const selectedEquipped = selected ? Object.values(state?.equipped ?? {}).includes(selected.item_key) : false;
-  const previewOutfit = selected?.category === "avatar" ? selected.metadata as AvatarOutfit : undefined;
+  // Preview an avatar item layered over the student's current look, not in isolation.
+  const previewOutfit = selected?.category === "avatar"
+    ? (() => {
+        const base = state ? mergeAvatarOutfit(state) : {};
+        const layer = { ...(selected.metadata as Record<string, unknown>) };
+        delete layer.slot;
+        return { ...base, ...layer } as AvatarOutfit;
+      })()
+    : undefined;
 
   async function act() {
     if (!student?.studentId || !selected || busy) return;

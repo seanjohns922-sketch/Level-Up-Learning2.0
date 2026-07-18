@@ -16,11 +16,12 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
-import StudentAvatar, { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
+import StudentAvatar from "@/components/avatar/StudentAvatar";
 import {
   economyErrorMessage,
   fetchStudentEconomy,
   getExplorerRank,
+  mergeAvatarOutfit,
   type EconomyItem,
   type EconomyState,
 } from "@/lib/economy";
@@ -89,11 +90,10 @@ export default function HomeBasePage() {
     () => new Map((state?.items ?? []).map((item) => [item.item_key, item])),
     [state?.items],
   );
-  const avatarItem = itemByKey.get(state?.equipped.avatar ?? "") as EconomyItem | undefined;
   const petItem = itemByKey.get(state?.equipped.pet ?? "") as EconomyItem | undefined;
   const homeItem = itemByKey.get(state?.equipped.home ?? "") as EconomyItem | undefined;
   const backgroundItem = itemByKey.get(state?.equipped.background ?? "") as EconomyItem | undefined;
-  const avatarOutfit = avatarItem?.metadata as AvatarOutfit | undefined;
+  const avatarOutfit = state ? mergeAvatarOutfit(state) : undefined;
   const collectibleCount = state?.inventory.filter(
     (entry) => itemByKey.get(entry.item_key)?.category === "collectible",
   ).length ?? 0;
