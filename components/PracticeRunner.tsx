@@ -44,6 +44,13 @@ const MAX_LESSON_QUESTIONS = 10;
 const RECENT_TASK_WINDOW = 6;
 const NEXT_TASK_REROLLS = 8;
 
+type MeasurelandsLessonStage =
+  | "intro"
+  | "activity"
+  | "feedback_correct"
+  | "feedback_incorrect"
+  | "transition_error";
+
 function clampNumber(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -225,6 +232,10 @@ function buildPracticeTaskTargetKey(task: PracticeTask) {
     "shownQuantity",
   ] as const;
   const parts: string[] = [task.kind];
+  const scene = (task as Record<string, unknown>).scene;
+  if (typeof scene === "string" && scene.trim()) {
+    parts.push(`scene:${scene}`);
+  }
   for (const field of targetFields) {
     const value = (task as Record<string, unknown>)[field];
     if (typeof value === "number") {
@@ -313,6 +324,7 @@ export function PracticeRunner({
   const completedRef = useRef(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scoredThisTurnRef = useRef(false);
+  const advancingTaskRef = useRef(false);
 
   // ── Brain breaks (teacher-configurable frequency → 0/1/2 mid-lesson villains) ──
   const [brainBreakVillain, setBrainBreakVillain] = useState<Villain | null>(null);
@@ -391,6 +403,9 @@ export function PracticeRunner({
     return safeTask;
   });
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
+  const pauseLessonClockRef = useRef(false);
+  const [isAdvancingTask, setIsAdvancingTask] = useState(false);
+  const [transitionError, setTransitionError] = useState<string | null>(null);
   const [awaitingWrongNext, setAwaitingWrongNext] = useState(false);
   const [currentWrongFeedback, setCurrentWrongFeedback] = useState<MistakeReviewItem | null>(null);
   const [typed, setTyped] = useState("");
@@ -403,6 +418,16 @@ export function PracticeRunner({
   const speechInteractionReady = useSpeechInteractionReady();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
   const autoReadPrompt = getPracticeTaskSpeechText(task);
+  const isIntroTask = isMeasurement && "scene" in task && task.scene === "intro";
+  const lessonStage: MeasurelandsLessonStage = transitionError
+    ? "transition_error"
+    : isIntroTask
+      ? "intro"
+      : status === "correct"
+        ? "feedback_correct"
+        : status === "wrong"
+          ? "feedback_incorrect"
+          : "activity";
 
   const safeQuestionsAnswered = Math.max(0, questionsAnswered);
   const safeCorrectAnswers = Math.max(0, correctAnswers);
@@ -470,10 +495,15 @@ export function PracticeRunner({
   }
 
   useEffect(() => {
+    pauseLessonClockRef.current =
+      isIntroTask || status !== "idle" || Boolean(transitionError) || isAdvancingTask;
+  }, [isAdvancingTask, isIntroTask, status, transitionError]);
+
+  useEffect(() => {
     const t = setInterval(
       () =>
         setSecondsLeft((s) =>
-          brainBreakActiveRef.current || showLessonResumeRef.current || status === "wrong" ? s : s - 1
+          brainBreakActiveRef.current || showLessonResumeRef.current || pauseLessonClockRef.current ? s : s - 1
         ),
       1000
     );
@@ -481,7 +511,7 @@ export function PracticeRunner({
       clearInterval(t);
       clearPendingTimeout();
     };
-  }, [status]);
+  }, []);
 
   // Track the best combo chain reached (for the reflection screen).
   useEffect(() => {
@@ -685,15 +715,31 @@ export function PracticeRunner({
   }, [buildProgressMeta, completionMode, elapsedSeconds, liveContext, task, taskNonce, totalSeconds]);
 
   function nextTask() {
-    if (finished) return;
+    if (finished || advancingTaskRef.current) return;
+    advancingTaskRef.current = true;
+    setIsAdvancingTask(true);
     const currentRepeatKey = buildPracticeTaskRepeatKey(task);
     const currentTargetKey = buildPracticeTaskTargetKey(task);
     recentTaskKeysRef.current = [currentRepeatKey, ...recentTaskKeysRef.current].slice(0, RECENT_TASK_WINDOW);
     recentTargetKeysRef.current = [currentTargetKey, ...recentTargetKeysRef.current].slice(0, RECENT_TASK_WINDOW);
 
     const ctx = makeCtx();
-    const generated = generateLessonTask(ctx) ?? task;
+    const generated = generateLessonTask(ctx);
+    if (!generated) {
+      console.error("[MeasurelandsLesson] Next challenge generation failed", {
+        stage: lessonStage,
+        taskKind: task.kind,
+        lessonId: liveContext?.lessonId ?? resumeLessonKey,
+        level: liveContext?.level,
+        week: liveContext?.week,
+      });
+      setTransitionError("The next challenge did not load. Please try again.");
+      advancingTaskRef.current = false;
+      setIsAdvancingTask(false);
+      return;
+    }
     generated.difficulty = ctx.difficulty;
+    setTransitionError(null);
     setStatus("idle");
     setAwaitingWrongNext(false);
     setCurrentWrongFeedback(null);
@@ -704,6 +750,23 @@ export function PracticeRunner({
     setTaskNonce((n) => n + 1);
     scoredThisTurnRef.current = false;
     questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
+  }
+
+  useEffect(() => {
+    advancingTaskRef.current = false;
+    setIsAdvancingTask(false);
+  }, [taskNonce]);
+
+  function advanceIntro() {
+    if (!isIntroTask || status !== "idle" || scoredThisTurnRef.current) return;
+    clearPendingTimeout();
+    nextTask();
+  }
+
+  function continueAfterCorrect() {
+    if (status !== "correct") return;
+    clearPendingTimeout();
+    nextTask();
   }
 
   function continueAfterWrong() {
@@ -836,7 +899,9 @@ export function PracticeRunner({
     if (nextQuestionsAnswered >= questionLimit) {
       return;
     }
-    timeoutRef.current = setTimeout(() => nextTask(), 600);
+    if (!isMeasurement) {
+      timeoutRef.current = setTimeout(() => nextTask(), 600);
+    }
   }
 
   function markCorrectSoft() {
@@ -846,7 +911,7 @@ export function PracticeRunner({
     timeoutRef.current = setTimeout(() => setStatus("idle"), 500);
   }
 
-  const callbacks = { markCorrect, markCorrectSoft, markWrong };
+  const callbacks = { markCorrect, markCorrectSoft, markWrong, advanceIntro };
 
   function check() {
     if (task.kind === "mcq") return;
@@ -1183,6 +1248,20 @@ export function PracticeRunner({
             </div>
           ) : null}
 
+          {transitionError ? (
+            <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 px-4 py-4 text-center text-amber-950 shadow-sm">
+              <p className="font-black">{transitionError}</p>
+              <button
+                type="button"
+                onClick={nextTask}
+                disabled={isAdvancingTask}
+                className="mt-3 rounded-2xl bg-[#8a6422] px-5 py-3 text-base font-black text-white transition hover:bg-[#a2732e] disabled:cursor-wait disabled:opacity-60"
+              >
+                {isAdvancingTask ? "Loading..." : "Try Again"}
+              </button>
+            </div>
+          ) : null}
+
           {/* Main task card */}
           <div
             className={`rounded-[1.75rem] border-2 p-5 shadow-lg transition-all duration-300 ${statusBorder} ${statusMotion}`}
@@ -1355,6 +1434,18 @@ export function PracticeRunner({
               }`}
             >
               Next Question
+            </button>
+          </div>
+        ) : null}
+        {isMeasurement && status === "correct" && !transitionError ? (
+          <div className="mt-5 flex justify-end">
+            <button
+              type="button"
+              onClick={continueAfterCorrect}
+              disabled={isAdvancingTask}
+              className="rounded-2xl bg-[#8a6422] px-5 py-3 text-lg font-black text-white transition hover:bg-[#a2732e] disabled:cursor-wait disabled:opacity-60"
+            >
+              {isAdvancingTask ? "Loading..." : "Next Challenge"}
             </button>
           </div>
         ) : null}

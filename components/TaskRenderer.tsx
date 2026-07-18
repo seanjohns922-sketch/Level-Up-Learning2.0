@@ -137,6 +137,7 @@ type Callbacks = {
   markCorrect: () => void;
   markCorrectSoft: () => void;
   markWrong: () => void;
+  advanceIntro?: () => void;
   markAttempted?: () => void;
 };
 
@@ -230,8 +231,15 @@ function TaskRendererInner({
   callbacks: Callbacks;
   assessmentMode?: boolean;
 }) {
-  const { markCorrect, markCorrectSoft, markWrong, markAttempted } = callbacks;
-  const onC = () => setTimeout(() => markCorrect(), 0);
+  const { markCorrect, markCorrectSoft, markWrong, advanceIntro, markAttempted } = callbacks;
+  const isIntroTask = "scene" in task && task.scene === "intro";
+  const onC = () => setTimeout(() => {
+    if (isIntroTask && advanceIntro) {
+      advanceIntro();
+      return;
+    }
+    markCorrect();
+  }, 0);
   const onCS = () => setTimeout(() => markCorrectSoft(), 0);
   const onW = () => markWrong();
   // This renderer fans out across many legacy task variants with different payload shapes.
