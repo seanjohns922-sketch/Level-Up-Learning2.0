@@ -280,7 +280,7 @@ export async function saveRealmLessonAttempt(
 
   const studentRow = await getStudentRuntimeContext(studentId);
 
-  const { error } = await supabase.rpc("complete_realm_lesson", {
+  const { data: completed, error } = await supabase.rpc("complete_realm_lesson", {
     p_student_id: studentId,
     p_class_id: studentRow?.class_id ?? null,
     p_realm_id: realmId,
@@ -295,6 +295,17 @@ export async function saveRealmLessonAttempt(
     p_xp: 40,
   });
   if (error) throw error;
+
+  if (completed === true) {
+    const { error: discoveryError } = await supabase.rpc("discover_realm_collectible_secure", {
+      p_student_id: studentId,
+      p_realm_id: realmId,
+      p_completion_key: completionKey,
+    });
+    if (discoveryError) {
+      console.warn("[Economy] Lesson saved but collectible discovery failed", discoveryError);
+    }
+  }
 
 }
 

@@ -21,6 +21,7 @@ import LevelsDrawer from "@/components/realms/LevelsDrawer";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
+import { fetchGlobalXp } from "@/lib/economy";
 
 // ─── Era system — ONE evolving city, five real background images ─────────────────
 // Prep=0  Y1-2=1  Y3-4=2  Y5=3  Y6=4
@@ -493,6 +494,7 @@ export default function NumberNexusMap() {
   const fogProgress = useMemo(() => computeFogProgress(year, progress?.unlockedLegends), [year, progress?.unlockedLegends]);
   const [bestChain] = useState(() => readBestChain("number", year));
   const [classBestChain, setClassBestChain] = useState<number | null>(null);
+  const [globalXpBalance, setGlobalXpBalance] = useState<number | null>(null);
   const isPrep     = year === "Prep";
   const eraIdx     = getEra(year);
   const era        = ERA_CONFIGS[eraIdx];
@@ -512,7 +514,7 @@ export default function NumberNexusMap() {
     Math.max(0, ...Object.entries(completedByWeek).filter(([, v]) => v).map(([k]) => Number(k))),
     [completedByWeek]);
 
-  const totalXP = useMemo(() => {
+  const realmFallbackXP = useMemo(() => {
     let xp = 0;
     for (let w = 1; w <= 12; w++) {
       const wp = getWeekProgress(store, year, w);
@@ -521,6 +523,16 @@ export default function NumberNexusMap() {
     }
     return xp;
   }, [store, year]);
+
+  useEffect(() => {
+    const studentId = getActiveStudentProfile()?.studentId;
+    if (!studentId || isDemoPreviewMode()) return;
+    let cancelled = false;
+    void fetchGlobalXp(studentId).then(({ balance }) => {
+      if (!cancelled) setGlobalXpBalance(balance);
+    }).catch((error) => console.warn("[NumberNexus] Could not load global XP", error));
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
@@ -818,7 +830,7 @@ export default function NumberNexusMap() {
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
           <Zap size={11} color="#14b8a6" />
-          <span style={{ color: "#99f6e4", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{totalXP} XP</span>
+          <span title="Global XP available in every realm" style={{ color: "#99f6e4", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{globalXpBalance ?? realmFallbackXP} XP</span>
         </div>
         <div style={chip()}>
           <span style={{ color: "#99f6e4", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/12</span>

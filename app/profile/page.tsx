@@ -11,6 +11,7 @@ import { fetchNumberCompatProgressForStudent } from "@/lib/realm-progress-compat
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { resolveStudentNameParts } from "@/lib/studentName";
 import { supabase } from "@/lib/supabase";
+import { fetchGlobalXp, getExplorerRank } from "@/lib/economy";
 import {
   Calendar,
   ChevronLeft,
@@ -30,15 +31,17 @@ import {
   Users,
   Zap,
   BookOpen,
+  House,
+  ShoppingBag,
 } from "lucide-react";
 
 const MELBOURNE_TIME_ZONE = "Australia/Melbourne";
 
 const REALMS = [
   { name: "Number Nexus", icon: BookOpen, status: "active" as const },
+  { name: "Measurelands", icon: BookOpen, status: "active" as const },
   { name: "Reading Ridge", icon: BookOpen, status: "coming-soon" as const },
   { name: "Inkwell Wilds", icon: BookOpen, status: "locked" as const },
-  { name: "Measurelands", icon: BookOpen, status: "locked" as const },
   { name: "Runehaven Peaks", icon: BookOpen, status: "locked" as const },
   { name: "Starpath Realm", icon: BookOpen, status: "locked" as const },
   { name: "Statistica", icon: BookOpen, status: "locked" as const },
@@ -248,12 +251,23 @@ export default function ProfilePage() {
   const [studentName, setStudentName] = useState(readStudentNameFromStorage);
   const [activityRows, setActivityRows] = useState<StudentActivityDailyRow[]>([]);
   const [persistedAccuracy, setPersistedAccuracy] = useState<number | null>(null);
+  const [globalXp, setGlobalXp] = useState<{ balance: number; lifetime: number } | null>(null);
   const [openTooltip, setOpenTooltip] = useState<string | null>(null);
   // Resolved after mount to avoid an SSR/client hydration mismatch on localStorage.
   const [lastRealm, setLastRealmState] = useState("number-nexus");
 
   useEffect(() => {
     setLastRealmState(getLastRealm());
+  }, []);
+
+  useEffect(() => {
+    const studentId = getActiveStudentProfile()?.studentId;
+    if (!studentId) return;
+    let cancelled = false;
+    void fetchGlobalXp(studentId).then((next) => {
+      if (!cancelled) setGlobalXp(next);
+    }).catch((error) => console.warn("[Profile] Failed to load global XP", error));
+    return () => { cancelled = true; };
   }, []);
   const lastRealmLabel = REALM_LABELS[lastRealm] ?? "Number Nexus";
   const lastRealmRoute = REALM_ROUTES[lastRealm] ?? "/number-nexus";
@@ -300,7 +314,7 @@ export default function ProfilePage() {
   }, []);
 
   const stats = useMemo(() => {
-    let xp = 0;
+    let realmFallbackXp = 0;
     let completedLessons = 0;
     let weeksCompleted = 0;
     let quizCount = 0;
@@ -310,9 +324,9 @@ export default function ProfilePage() {
       const weekProgress = getWeekProgress(store, year, week);
       const done = weekProgress.lessonsCompleted.filter(Boolean).length;
       completedLessons += done;
-      xp += done * 40;
+      realmFallbackXp += done * 40;
       if (weekProgress.quizScore !== undefined) {
-        xp += Math.round((weekProgress.quizScore / 100) * 60);
+        realmFallbackXp += Math.round((weekProgress.quizScore / 100) * 60);
         quizCount += 1;
         quizTotal += weekProgress.quizScore;
       }
@@ -322,12 +336,15 @@ export default function ProfilePage() {
     const accuracy =
       quizCount > 0 ? Math.round(quizTotal / quizCount) : (progress?.scorePercent ?? 0);
     const realmProgress = Math.round((weeksCompleted / 12) * 100);
+    const recordedGlobalXp = activityRows.reduce((sum, row) => sum + Math.max(0, row.xp_earned ?? 0), 0);
+    const xp = globalXp?.balance ?? (recordedGlobalXp > 0 ? recordedGlobalXp : realmFallbackXp);
+    const lifetimeXp = globalXp?.lifetime ?? (recordedGlobalXp > 0 ? recordedGlobalXp : realmFallbackXp);
 
-    return { xp, completedLessons, accuracy, weeksCompleted, realmProgress };
-  }, [progress, store, year]);
+    return { xp, lifetimeXp, completedLessons, accuracy, weeksCompleted, realmProgress };
+  }, [activityRows, globalXp, progress, store, year]);
 
-  const levelTitle = levelNum <= 2 ? "Apprentice" : levelNum <= 4 ? "Processor" : "Master";
   const initials = studentName.charAt(0).toUpperCase();
+  const explorerRank = useMemo(() => getExplorerRank(stats.lifetimeXp), [stats.lifetimeXp]);
   const { offset, daysInMonth, today, monthName, year: calendarYear, monthIndex } = useMemo(
     () => getMonthGrid(),
     []
@@ -397,6 +414,22 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/home-base")}
+              className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#64748B] transition-all hover:bg-[#F1F5F9] hover:text-[#0F172A]"
+              aria-label="Home Base"
+              title="Home Base"
+            >
+              <House className="h-[18px] w-[18px]" />
+            </button>
+            <button
+              onClick={() => router.push("/marketplace")}
+              className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#64748B] transition-all hover:bg-[#FFF7ED] hover:text-[#B45309]"
+              aria-label="Marketplace"
+              title="Marketplace"
+            >
+              <ShoppingBag className="h-[18px] w-[18px]" />
+            </button>
             <div className="flex items-center gap-3 rounded-xl border border-[#E6E8EC] bg-white px-3 py-2">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0F172A] text-sm font-black text-white">
                 {initials}
@@ -404,10 +437,10 @@ export default function ProfilePage() {
               <div className="hidden pr-1 sm:block">
                 <h2 className="text-sm font-bold leading-tight text-[#0F172A]">{studentName}</h2>
                 <p className="text-[10px] font-semibold text-[#64748B]">
-                  Numbot {levelTitle} · Lvl {levelNum}
+                  {explorerRank.title} · Rank {explorerRank.level}
                 </p>
               </div>
-              <div className="flex items-center gap-1 rounded-md border border-[#FDE68A] bg-[#FEF3C7] px-2.5 py-1">
+              <div title="Global XP available in every realm" className="flex items-center gap-1 rounded-md border border-[#FDE68A] bg-[#FEF3C7] px-2.5 py-1">
                 <Zap className="h-3 w-3 text-[#F59E0B]" />
                 <span className="text-xs font-extrabold text-[#B45309]">{stats.xp.toLocaleString()}</span>
               </div>
@@ -547,10 +580,11 @@ export default function ProfilePage() {
                 {REALMS.map((realm) => {
                   const isActive = realm.status === "active";
                   const isComingSoon = realm.status === "coming-soon";
+                  const realmRoute = realm.name === "Measurelands" ? "/measurelands" : "/number-nexus";
                   return (
                     <div
                       key={realm.name}
-                      onClick={() => isActive && router.push("/realms")}
+                      onClick={() => isActive && router.push(realmRoute)}
                       className={`relative flex items-center gap-3 rounded-lg border p-2.5 transition-all duration-200 ${
                         isActive
                           ? "cursor-pointer border-[#E6E8EC] bg-white hover:border-[#0EA5A4]"
@@ -560,7 +594,7 @@ export default function ProfilePage() {
                       {isActive ? (
                         <div
                           className="h-9 w-9 flex-shrink-0 rounded-md border border-[#E6E8EC] bg-cover bg-center"
-                          style={{ backgroundImage: "url('/images/number-nexus-tile.jpg')" }}
+                          style={{ backgroundImage: `url('${realm.name === "Measurelands" ? "/images/measurelands-home-bg.jpg" : "/images/number-nexus-tile.jpg"}')` }}
                         />
                       ) : (
                         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md border border-[#E6E8EC] bg-[#F1F5F9]">

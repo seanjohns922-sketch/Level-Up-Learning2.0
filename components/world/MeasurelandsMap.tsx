@@ -18,6 +18,7 @@ import LevelsDrawer from "@/components/realms/LevelsDrawer";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { supabase } from "@/lib/supabase";
+import { fetchGlobalXp } from "@/lib/economy";
 
 type MeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 const REALM_ID = "measurement";
@@ -544,6 +545,7 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
   const [launching, setLaunching] = useState(false);
   const [bestChain] = useState(() => readBestChain("measurement", resolvedYear));
   const [classBestChain, setClassBestChain] = useState<number | null>(null);
+  const [globalXpBalance, setGlobalXpBalance] = useState<number | null>(null);
   const canvasRef = useWorldCanvas();
   const fogProgress = useMemo(() => computeFogProgress(progress?.year, progress?.unlockedLegends), [progress?.year, progress?.unlockedLegends]);
 
@@ -564,7 +566,7 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
     [completedByWeek]
   );
 
-  const totalXP = useMemo(() => {
+  const realmFallbackXP = useMemo(() => {
     let xp = 0;
     for (let week = 1; week <= totalWeeks; week += 1) {
       const wp = getWeekProgress(store, resolvedYear, week, REALM_ID);
@@ -573,6 +575,16 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
     }
     return xp;
   }, [resolvedYear, store, totalWeeks]);
+
+  useEffect(() => {
+    const studentId = getActiveStudentProfile()?.studentId;
+    if (!studentId || isDemoPreviewMode()) return;
+    let cancelled = false;
+    void fetchGlobalXp(studentId).then(({ balance }) => {
+      if (!cancelled) setGlobalXpBalance(balance);
+    }).catch((error) => console.warn("[Measurelands] Could not load global XP", error));
+    return () => { cancelled = true; };
+  }, []);
 
   const districts =
     resolvedYear === "Year 6"
@@ -859,7 +871,7 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
           <Zap size={11} color="#fde68a" />
-          <span style={{ color: "#fef3c7", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{totalXP} XP</span>
+          <span title="Global XP available in every realm" style={{ color: "#fef3c7", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{globalXpBalance ?? realmFallbackXP} XP</span>
         </div>
         <div style={chip()}>
           <span style={{ color: "#fde68a", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/{totalWeeks} weeks</span>
