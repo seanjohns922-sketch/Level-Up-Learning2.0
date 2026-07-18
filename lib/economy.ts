@@ -2,6 +2,30 @@
 
 import { supabase } from "@/lib/supabase";
 import { EXPLORER_XP_LEVEL_BASE, getExplorerRankTitle } from "@/data/explorer-ranks";
+import type { AvatarOutfit } from "@/components/avatar/StudentAvatar";
+
+/** Equip slots that make up a layered avatar (base look + these stack on top). */
+export const AVATAR_LAYER_SLOTS = [
+  "avatar_outfit",
+  "avatar_hat",
+  "avatar_glasses",
+  "avatar_cape",
+  "avatar_backpack",
+] as const;
+export type AvatarLayerSlot = (typeof AVATAR_LAYER_SLOTS)[number];
+
+/** Fields a student can freely set on their base look (no XP). */
+export const AVATAR_BASE_KEYS = [
+  "skin",
+  "skinShade",
+  "hair",
+  "hairShade",
+  "hairStyle",
+  "shirt",
+  "shirtTrim",
+  "pants",
+  "shoes",
+] as const;
 
 export type EconomyCategory =
   | "avatar"
@@ -40,6 +64,8 @@ export type EconomyState = {
   items: EconomyItem[];
   inventory: Array<{ item_key: string; acquired_at: string; acquisition_type: string }>;
   equipped: Record<string, string>;
+  /** Free base look (skin tone, hairstyle, hair + clothing colour). */
+  avatarBase: AvatarOutfit;
 };
 
 export type ExplorerRank = {
@@ -55,11 +81,13 @@ export const EMPTY_ECONOMY: EconomyState = {
   items: [],
   inventory: [],
   equipped: {},
+  avatarBase: {},
 };
 
 function normalizeEconomyState(value: unknown): EconomyState {
   if (!value || typeof value !== "object") return EMPTY_ECONOMY;
-  const row = value as Partial<EconomyState>;
+  const row = value as Partial<EconomyState> & { avatar_base?: AvatarOutfit };
+  const base = row.avatar_base ?? row.avatarBase;
   return {
     wallet: {
       xp_earned: Number(row.wallet?.xp_earned ?? 0),
@@ -70,7 +98,29 @@ function normalizeEconomyState(value: unknown): EconomyState {
     items: Array.isArray(row.items) ? row.items : [],
     inventory: Array.isArray(row.inventory) ? row.inventory : [],
     equipped: row.equipped && typeof row.equipped === "object" ? row.equipped : {},
+    avatarBase: base && typeof base === "object" ? base : {},
   };
+}
+
+/**
+ * Compose the rendered avatar from the free base look plus every equipped
+ * avatar layer (outfit, hat, glasses, cape, backpack). Later layers win, so an
+ * equipped outfit overrides the base clothing colour while the hat/cape/etc.
+ * stack independently.
+ */
+export function mergeAvatarOutfit(state: EconomyState): AvatarOutfit {
+  const out: Record<string, unknown> = { ...(state.avatarBase ?? {}) };
+  const byKey = new Map(state.items.map((i) => [i.item_key, i]));
+  for (const slot of AVATAR_LAYER_SLOTS) {
+    const key = state.equipped[slot];
+    if (!key) continue;
+    const meta = byKey.get(key)?.metadata;
+    if (!meta || typeof meta !== "object") continue;
+    for (const [k, v] of Object.entries(meta)) {
+      if (k !== "slot") out[k] = v;
+    }
+  }
+  return out as AvatarOutfit;
 }
 
 export async function fetchStudentEconomy(studentId: string) {
@@ -118,6 +168,41 @@ export async function equipEconomyItem(studentId: string, itemKey: string) {
   const { data, error } = await supabase.rpc("equip_economy_item_secure", {
     p_student_id: studentId,
     p_item_key: itemKey,
+  });
+  if (error) throw error;
+  return normalizeEconomyState(data);
+}
+
+/**
+ * Mirror the composed avatar into localStorage so every StudentAvatar that
+ * reads its outfit from storage (world maps, dashboards) matches My Home.
+ * Overwrites fully, so unequipped layers are cleared.
+ */
+export function persistAvatarToStorage(studentId: string, state: EconomyState) {
+  if (typeof window === "undefined" || !studentId) return;
+  try {
+    window.localStorage.setItem(
+      `lul:${studentId}:avatar_outfit_v1`,
+      JSON.stringify(mergeAvatarOutfit(state)),
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+export async function unequipEconomySlot(studentId: string, slot: string) {
+  const { data, error } = await supabase.rpc("unequip_economy_slot_secure", {
+    p_student_id: studentId,
+    p_slot: slot,
+  });
+  if (error) throw error;
+  return normalizeEconomyState(data);
+}
+
+export async function saveAvatarBase(studentId: string, base: AvatarOutfit) {
+  const { data, error } = await supabase.rpc("set_student_avatar_base_secure", {
+    p_student_id: studentId,
+    p_base: base,
   });
   if (error) throw error;
   return normalizeEconomyState(data);

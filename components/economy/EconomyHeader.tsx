@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, BookOpen, House, Medal, ShoppingBag, Sparkles, User, Zap } from "lucide-react";
+import { ArrowLeft, BookOpen, House, Medal, Shirt, ShoppingBag, Sparkles, User, Zap } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function EconomyHeader({ xp, essence = 0, rankLevel = 1 }: { xp?: number | null; essence?: number; rankLevel?: number }) {
@@ -8,6 +8,7 @@ export default function EconomyHeader({ xp, essence = 0, rankLevel = 1 }: { xp?:
   const pathname = usePathname();
   const destinations = [
     { href: "/home-base", label: "My Home", icon: House },
+    { href: "/wardrobe", label: "Wardrobe", icon: Shirt },
     { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
     { href: "/collections", label: "Journal", icon: BookOpen },
   ];

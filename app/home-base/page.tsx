@@ -12,15 +12,15 @@ import {
   ShoppingBag,
   Sparkles,
   Trophy,
-  Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
-import StudentAvatar, { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
+import StudentAvatar from "@/components/avatar/StudentAvatar";
 import {
   economyErrorMessage,
   fetchStudentEconomy,
   getExplorerRank,
+  mergeAvatarOutfit,
   type EconomyItem,
   type EconomyState,
 } from "@/lib/economy";
@@ -50,9 +50,9 @@ const HOME_DESTINATIONS = [
     accent: "border-violet-300/45 bg-violet-300/10 text-violet-100",
   },
   {
-    label: "Wardrobe & Pets",
-    description: "Preview outfits and choose a companion.",
-    route: "/marketplace",
+    label: "Avatar Studio",
+    description: "Change your look — hair, outfits, hats and more.",
+    route: "/wardrobe",
     Icon: Shirt,
     accent: "border-cyan-300/45 bg-cyan-300/10 text-cyan-100",
   },
@@ -89,11 +89,10 @@ export default function HomeBasePage() {
     () => new Map((state?.items ?? []).map((item) => [item.item_key, item])),
     [state?.items],
   );
-  const avatarItem = itemByKey.get(state?.equipped.avatar ?? "") as EconomyItem | undefined;
   const petItem = itemByKey.get(state?.equipped.pet ?? "") as EconomyItem | undefined;
   const homeItem = itemByKey.get(state?.equipped.home ?? "") as EconomyItem | undefined;
   const backgroundItem = itemByKey.get(state?.equipped.background ?? "") as EconomyItem | undefined;
-  const avatarOutfit = avatarItem?.metadata as AvatarOutfit | undefined;
+  const avatarOutfit = state ? mergeAvatarOutfit(state) : undefined;
   const collectibleCount = state?.inventory.filter(
     (entry) => itemByKey.get(entry.item_key)?.category === "collectible",
   ).length ?? 0;
