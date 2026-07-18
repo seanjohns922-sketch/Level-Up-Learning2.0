@@ -176,7 +176,7 @@ export default function HomeBasePage() {
         <div className="relative z-10 mx-auto grid min-h-[min(720px,calc(100vh-65px))] max-w-[1440px] gap-6 px-5 py-7 lg:grid-cols-[minmax(270px,420px)_1fr_minmax(240px,330px)] lg:px-8">
           <div className="flex flex-col justify-between gap-8">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-300">My Home</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-white/70">My Home</p>
               <h1 className="mt-2 text-4xl font-black leading-none sm:text-5xl">
                 {student?.displayName ? `${student.displayName}'s place` : "Explorer's place"}
               </h1>
@@ -200,11 +200,11 @@ export default function HomeBasePage() {
             <button
               type="button"
               onClick={continueLearning}
-              className="group flex w-full max-w-sm items-center justify-between rounded-md border border-emerald-200/45 bg-emerald-400 px-5 py-4 text-left text-emerald-950 shadow-[0_14px_40px_rgba(16,185,129,.24)] transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200/70"
+              className="group flex w-full max-w-sm items-center justify-between rounded-md border border-white/40 bg-white/95 px-5 py-4 text-left text-slate-900 shadow-[0_14px_40px_rgba(0,0,0,.35)] transition hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/50"
             >
               <span>
                 <span className="block text-xs font-black uppercase tracking-[0.16em]">Continue Learning</span>
-                <span className="mt-1 block text-sm font-bold text-emerald-950/70">Resume your journey</span>
+                <span className="mt-1 block text-sm font-bold text-slate-900/60">Resume your journey</span>
               </span>
               <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </button>
