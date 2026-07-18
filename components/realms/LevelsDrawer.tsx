@@ -73,6 +73,8 @@ export default function LevelsDrawer({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="menu"
         className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 transition hover:brightness-110"
         style={
           reviewing
@@ -101,15 +103,16 @@ export default function LevelsDrawer({
           className={[
             "absolute w-[248px] rounded-2xl border p-3 backdrop-blur-xl",
             openDirection === "right"
-              ? "left-0 top-[calc(100%+8px)] sm:left-[calc(100%+8px)] sm:top-0"
+              ? "left-0 top-[calc(100%+8px)] xl:left-[calc(100%+8px)] xl:top-0 xl:w-[680px] xl:p-2"
               : "left-0 top-[calc(100%+8px)]",
           ].join(" ")}
           style={{ background: "rgba(8,10,16,0.94)", borderColor: "rgba(255,255,255,0.14)", boxShadow: "0 14px 40px rgba(0,0,0,0.5)", zIndex: 60 }}
+          role="menu"
         >
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">
+          <div className={`mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/45 ${openDirection === "right" ? "xl:mb-1" : ""}`}>
             Levels · revisit past levels
           </div>
-          <div className="flex flex-col gap-1">
+          <div className={openDirection === "right" ? "flex flex-col gap-1 xl:grid xl:grid-cols-7" : "flex flex-col gap-1"}>
             {LEVEL_CATALOG.map((lvl) => {
               const unlocked = isLevelUnlocked(lvl.id, progress, { forceOpen: isPreview, realmId: legendRealm });
               const isPlaced = !!currentYear && lvl.id === currentYear;
@@ -120,8 +123,10 @@ export default function LevelsDrawer({
                   type="button"
                   disabled={!unlocked}
                   onClick={() => unlocked && selectLevel(lvl.id)}
+                  role="menuitem"
                   className={[
                     "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition",
+                    openDirection === "right" ? "xl:min-h-[52px] xl:flex-col xl:justify-center xl:gap-1 xl:px-2 xl:text-center" : "",
                     !unlocked ? "cursor-not-allowed opacity-40" : "cursor-pointer hover:bg-white/10",
                   ].join(" ")}
                   style={
@@ -132,14 +137,14 @@ export default function LevelsDrawer({
                       : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }
                   }
                 >
-                  <span className={`text-sm font-semibold ${isPlaced ? "text-white" : "text-white/80"}`}>{lvl.label}</span>
+                  <span className={`text-sm font-semibold ${openDirection === "right" ? "xl:text-xs xl:leading-tight" : ""} ${isPlaced ? "text-white" : "text-white/80"}`}>{lvl.label}</span>
                   {isPlaced ? (
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide" style={{ color: accent }}>
-                      Current <Check size={13} />
+                      <span className={openDirection === "right" ? "xl:hidden" : ""}>Current</span> <Check size={13} />
                     </span>
                   ) : isViewing ? (
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-amber-300">
-                      Viewing <Eye size={12} />
+                      <span className={openDirection === "right" ? "xl:hidden" : ""}>Viewing</span> <Eye size={12} />
                     </span>
                   ) : !unlocked ? (
                     <Lock size={12} className="text-white/40" />
