@@ -19,6 +19,7 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { supabase } from "@/lib/supabase";
 import { fetchGlobalXp } from "@/lib/economy";
+import RealmDashboardNav from "@/components/world/RealmDashboardNav";
 
 type MeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 const REALM_ID = "measurement";
@@ -408,33 +409,6 @@ function PlayerCharacter() {
       glowColor="rgba(253,230,138,0.34)"
       floatAnimation="ml-char-float 4.6s ease-in-out infinite"
     />
-  );
-}
-
-function LegendsIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <path d="M16 3L23 21H9L16 3Z" fill="#fde68a" stroke="#fffbeb" strokeWidth="1.3" />
-      <rect x="7" y="20" width="18" height="4" rx="2" fill="#7c3aed" stroke="#fffbeb" strokeWidth="1" />
-    </svg>
-  );
-}
-
-function WorldsIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <circle cx="16" cy="16" r="10.5" fill="#1f2937" stroke="#67e8f9" strokeWidth="1.5" />
-      <path d="M5.5 16h21M16 5.5c3.7 3.9 3.7 17.1 0 21M16 5.5c-3.7 3.9-3.7 17.1 0 21" stroke="#fffbeb" strokeWidth="1" opacity="0.75" />
-    </svg>
-  );
-}
-
-function ProgressIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <path d="M9 4h14M9 28h14" stroke="#fffbeb" strokeWidth="1.4" />
-      <path d="M10 5h12l-5 10 5 12H10l5-12-5-10Z" fill="#fde68a" stroke="#fffbeb" strokeWidth="1.1" />
-    </svg>
   );
 }
 
@@ -886,28 +860,16 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
 
       {/* ── Right HUD buttons ── */}
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>
-        {[
-          { key: "legends", label: "LEGENDS", route: "/legends", icon: <LegendsIcon /> },
-          { key: "worlds", label: "WORLDS", route: "/realms", icon: <WorldsIcon /> },
-          { key: "progress", label: "PROGRESS", route: "/realm-stats", icon: <ProgressIcon /> },
-        ].map(({ key, label, route, icon }) => (
-          <button key={key} onClick={() => router.push(route)} style={hudBtn}>
-            <div
-              style={{
-                display: "flex", alignItems: "center", justifyContent: "center",
-                width: 48, height: 48, borderRadius: 14,
-                background: "radial-gradient(circle at 50% 35%, rgba(251,191,36,0.22) 0%, rgba(120,53,15,0.18) 55%, rgba(15,6,0,0) 100%)",
-                border: "1px solid rgba(251,191,36,0.28)",
-                boxShadow: "inset 0 0 14px rgba(251,191,36,0.14), 0 0 18px rgba(251,191,36,0.1)",
-              }}
-            >
-              {icon}
-            </div>
-            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.18em", color: "#fde68a", fontFamily: "ui-monospace,monospace", textShadow: "0 0 10px rgba(251,191,36,0.4)" }}>
-              {label}
-            </span>
-          </button>
-        ))}
+        <RealmDashboardNav
+          buttonStyle={hudBtn}
+          palette={{
+            text: "#fde68a",
+            iconBackground: "radial-gradient(circle at 50% 35%, rgba(251,191,36,0.22) 0%, rgba(120,53,15,0.18) 55%, rgba(15,6,0,0) 100%)",
+            iconBorder: "1px solid rgba(251,191,36,0.28)",
+            iconShadow: "inset 0 0 14px rgba(251,191,36,0.14), 0 0 18px rgba(251,191,36,0.1)",
+            textShadow: "0 0 10px rgba(251,191,36,0.4)",
+          }}
+        />
         <div style={{ ...hudBtn, cursor: "default", gap: 4 }}>
           <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(251,191,36,0.5)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15 }}>
             MY BEST

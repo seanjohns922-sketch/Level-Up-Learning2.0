@@ -22,6 +22,7 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { fetchGlobalXp } from "@/lib/economy";
+import RealmDashboardNav from "@/components/world/RealmDashboardNav";
 
 // ─── Era system — ONE evolving city, five real background images ─────────────────
 // Prep=0  Y1-2=1  Y3-4=2  Y5=3  Y6=4
@@ -413,68 +414,6 @@ function readGenderFromStorage(): "boy" | "girl" {
   return "boy";
 }
 
-// ─── Chunky in-world HUD icons (Clash Royale readability / hologram styling) ───
-function LegendsIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="nnLegA" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#5eead4" />
-          <stop offset="100%" stopColor="#0d9488" />
-        </linearGradient>
-      </defs>
-      {/* back card */}
-      <rect x="5" y="9" width="14" height="18" rx="2.4" transform="rotate(-12 12 18)" fill="#0f766e" stroke="#5eead4" strokeWidth="1.2" opacity="0.85" />
-      {/* front card */}
-      <rect x="11" y="6" width="15" height="20" rx="2.6" fill="url(#nnLegA)" stroke="#ccfbf1" strokeWidth="1.4" />
-      {/* character silhouette */}
-      <circle cx="18.5" cy="13" r="2.6" fill="#022c22" />
-      <path d="M13.5 23c1.2-3.4 3.2-5 5-5s3.8 1.6 5 5z" fill="#022c22" />
-      {/* star */}
-      <path d="M18.5 19.6l0.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z" fill="#fde68a" />
-    </svg>
-  );
-}
-function WorldsIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="nnTwr" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#99f6e4" />
-          <stop offset="100%" stopColor="#0f766e" />
-        </linearGradient>
-      </defs>
-      {/* portal ring base */}
-      <ellipse cx="16" cy="27" rx="11" ry="2.4" fill="#022c22" opacity="0.7" />
-      <ellipse cx="16" cy="27" rx="11" ry="2.4" fill="none" stroke="#5eead4" strokeWidth="1.2" />
-      {/* stacked tower districts */}
-      <rect x="6"  y="20" width="6" height="6" rx="1" fill="url(#nnTwr)" stroke="#ccfbf1" strokeWidth="1" />
-      <rect x="20" y="20" width="6" height="6" rx="1" fill="url(#nnTwr)" stroke="#ccfbf1" strokeWidth="1" />
-      <rect x="11" y="14" width="10" height="7" rx="1.2" fill="url(#nnTwr)" stroke="#ccfbf1" strokeWidth="1.2" />
-      <rect x="13" y="6"  width="6"  height="9" rx="1.2" fill="url(#nnTwr)" stroke="#ccfbf1" strokeWidth="1.2" />
-      {/* tower peak beacon */}
-      <circle cx="16" cy="5.5" r="1.6" fill="#fde68a" />
-      <circle cx="16" cy="5.5" r="3.2" fill="#fde68a" opacity="0.25" />
-    </svg>
-  );
-}
-function ProgressIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="nnBdg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fde68a" />
-          <stop offset="100%" stopColor="#f59e0b" />
-        </linearGradient>
-      </defs>
-      {/* medal shield */}
-      <path d="M16 3l10 3v8c0 7-5 11-10 13C11 25 6 21 6 14V6z" fill="url(#nnBdg)" stroke="#fffbeb" strokeWidth="1.3" />
-      {/* lightning bolt */}
-      <path d="M17 9l-5 8h3.5l-1.5 6 5.5-8H16z" fill="#0f172a" stroke="#fffbeb" strokeWidth="0.8" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default function NumberNexusMap() {
   const router   = useRouter();
   const [progress] = useState(() => readProgress());
@@ -845,25 +784,18 @@ export default function NumberNexusMap() {
 
       {/* ── Right HUD ── */}
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>
-        {[
-          { key: "legends",  label: "LEGENDS",  route: "/legends",     icon: <LegendsIcon /> },
-          { key: "worlds",   label: "WORLDS",   route: "/realms",      icon: <WorldsIcon /> },
-          { key: "progress", label: "PROGRESS", route: "/realm-stats", icon: <ProgressIcon /> },
-        ].map(({ key, label, route, icon }) => (
-          <button key={key} onClick={() => router.push(route)} style={hudBtn} className="nn-hud-btn">
-            <div className="nn-hud-icon" style={{
-              display: "flex", alignItems: "center", justifyContent: "center",
-              width: 48, height: 48, borderRadius: 14,
-              background: "radial-gradient(circle at 50% 35%, rgba(45,212,191,0.32) 0%, rgba(13,148,136,0.18) 55%, rgba(2,8,16,0.0) 100%)",
-              border: "1px solid rgba(94,234,212,0.28)",
-              boxShadow: "inset 0 0 14px rgba(20,184,166,0.25), 0 0 18px rgba(20,184,166,0.18)",
-              transition: "transform 200ms ease, box-shadow 220ms ease",
-            }}>
-              {icon}
-            </div>
-            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.18em", color: "#5eead4", fontFamily: "ui-monospace,monospace", textShadow: "0 0 10px rgba(20,184,166,0.55)" }}>{label}</span>
-          </button>
-        ))}
+        <RealmDashboardNav
+          buttonStyle={hudBtn}
+          buttonClassName="nn-hud-btn"
+          iconClassName="nn-hud-icon"
+          palette={{
+            text: "#5eead4",
+            iconBackground: "radial-gradient(circle at 50% 35%, rgba(45,212,191,0.32) 0%, rgba(13,148,136,0.18) 55%, rgba(2,8,16,0) 100%)",
+            iconBorder: "1px solid rgba(94,234,212,0.28)",
+            iconShadow: "inset 0 0 14px rgba(20,184,166,0.25), 0 0 18px rgba(20,184,166,0.18)",
+            textShadow: "0 0 10px rgba(20,184,166,0.55)",
+          }}
+        />
         <div style={{ ...hudBtn, cursor: "default", gap: 4 }}>
           <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(94,234,212,0.5)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15 }}>
             {"MY BEST"}
