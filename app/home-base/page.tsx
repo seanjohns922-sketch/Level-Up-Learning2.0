@@ -144,7 +144,7 @@ export default function HomeBasePage() {
             <div>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-white/70">My Home</p>
               <h1 className="mt-2 text-4xl font-black leading-none sm:text-5xl">
-                {student?.displayName ? `${student.displayName}'s place` : "Explorer's place"}
+                {student?.displayName ? `${student.displayName.trim().split(/\s+/)[0]}'s home` : "Explorer's home"}
               </h1>
               <p className="mt-4 max-w-sm text-sm font-semibold leading-6 text-white/72">
                 Everything earned through learning lives here, across every realm.
