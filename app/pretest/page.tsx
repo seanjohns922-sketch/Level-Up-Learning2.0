@@ -408,7 +408,7 @@ function PretestPage() {
     }
 
     if (isPlacementComplete(progress)) {
-      router.replace("/levels");
+      router.replace(progressRealmId === "measurement" ? "/measurelands" : "/levels");
       return;
     }
 

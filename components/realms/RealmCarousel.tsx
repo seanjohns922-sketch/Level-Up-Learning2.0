@@ -7,7 +7,10 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
 import { getScopedProgressKey, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import { setLastRealm } from "@/lib/last-realm";
+import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/studentIdentity";
+import { getRealmAvailability, isRealmEnabled, resolveRealmEntryRoute } from "@/lib/realm-entry";
 import { exitReviewMode } from "@/lib/review-mode";
+import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 
 // Read a specific realm's scoped progress (the carousel lives on /realms where
 // the default scope is "number", so the focused realm's scope is passed
@@ -24,21 +27,17 @@ function readScopedProgress(scope: ProgressRealmScope): StudentProgress | null {
 }
 
 const REALMS = [
-  { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)", active: true },
-  { id: "pattern-peaks", name: "Pattern Peaks", symbol: "△", description: "Algebra and pattern recognition", color: "rgb(251,191,36)", colorDim: "rgba(251,191,36,0.2)", active: false },
-  { id: "measurelands", name: "Measurelands", symbol: "◈", description: "Length, mass, capacity & more", color: "rgb(96,165,250)", colorDim: "rgba(96,165,250,0.2)", active: false },
-  { id: "statistica", name: "Statistica", symbol: "▣", description: "Data, graphs & interpretation", color: "rgb(167,139,250)", colorDim: "rgba(167,139,250,0.2)", active: false },
-  { id: "chance-hollow", name: "Chance Hollow", symbol: "◉", description: "Probability & chance", color: "rgb(251,113,133)", colorDim: "rgba(251,113,133,0.2)", active: false },
-  { id: "chronorok", name: "Chronorok", symbol: "⧖", description: "Time & duration", color: "rgb(103,232,249)", colorDim: "rgba(103,232,249,0.2)", active: false, comingSoon: true },
-  { id: "starpath-realm", name: "Starpath Realm", symbol: "✦", description: "Space & spatial reasoning", color: "rgb(129,140,248)", colorDim: "rgba(129,140,248,0.2)", active: false },
-  { id: "reading-ridge", name: "Reading Ridge", symbol: "▧", description: "Reading comprehension & fluency", color: "rgb(250,204,21)", colorDim: "rgba(250,204,21,0.2)", active: false },
-  { id: "inkwell-wilds", name: "Inkwell Wilds", symbol: "✎", description: "Writing, grammar & spelling", color: "rgb(163,230,53)", colorDim: "rgba(163,230,53,0.2)", active: false },
-  { id: "runehaven-peaks", name: "Runehaven Peaks", symbol: "♦", description: "Advanced literacy & lore", color: "rgb(248,113,113)", colorDim: "rgba(248,113,113,0.2)", active: false },
+  { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)" },
+  { id: "pattern-peaks", name: "Pattern Peaks", symbol: "△", description: "Algebra and pattern recognition", color: "rgb(251,191,36)", colorDim: "rgba(251,191,36,0.2)" },
+  { id: "measurelands", name: "Measurelands", symbol: "◈", description: "Length, mass, capacity & more", color: "rgb(96,165,250)", colorDim: "rgba(96,165,250,0.2)" },
+  { id: "statistica", name: "Statistica", symbol: "▣", description: "Data, graphs & interpretation", color: "rgb(167,139,250)", colorDim: "rgba(167,139,250,0.2)" },
+  { id: "chance-hollow", name: "Chance Hollow", symbol: "◉", description: "Probability & chance", color: "rgb(251,113,133)", colorDim: "rgba(251,113,133,0.2)" },
+  { id: "chronorok", name: "Chronorok", symbol: "⧖", description: "Time & duration", color: "rgb(103,232,249)", colorDim: "rgba(103,232,249,0.2)", comingSoon: true },
+  { id: "starpath-realm", name: "Starpath Realm", symbol: "✦", description: "Space & spatial reasoning", color: "rgb(129,140,248)", colorDim: "rgba(129,140,248,0.2)" },
+  { id: "reading-ridge", name: "Reading Ridge", symbol: "▧", description: "Reading comprehension & fluency", color: "rgb(250,204,21)", colorDim: "rgba(250,204,21,0.2)" },
+  { id: "inkwell-wilds", name: "Inkwell Wilds", symbol: "✎", description: "Writing, grammar & spelling", color: "rgb(163,230,53)", colorDim: "rgba(163,230,53,0.2)" },
+  { id: "runehaven-peaks", name: "Runehaven Peaks", symbol: "♦", description: "Advanced literacy & lore", color: "rgb(248,113,113)", colorDim: "rgba(248,113,113,0.2)" },
 ];
-
-function isRealmAccessible(realmId: string, previewMode: boolean) {
-  return realmId === "number-nexus" || (previewMode && realmId === "measurelands");
-}
 
 export default function RealmCarousel() {
   const router = useRouter();
@@ -47,6 +46,8 @@ export default function RealmCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [entered, setEntered] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  const [enteringRealm, setEnteringRealm] = useState<string | null>(null);
+  const [entryError, setEntryError] = useState<string | null>(null);
 
   useEffect(() => {
     // Back at the Tower means any review session is over — restore write access.
@@ -87,7 +88,7 @@ export default function RealmCarousel() {
   }, [navigate]);
 
   const current = REALMS[currentIndex];
-  const isActive = DEMO_MODE || isRealmAccessible(current.id, previewMode);
+  const isActive = DEMO_MODE || isRealmEnabled(current.id);
   const isPreviewRealm = previewMode && current.id === "measurelands";
   const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
   const nextIdx = (currentIndex + 1) % REALMS.length;
@@ -100,25 +101,53 @@ export default function RealmCarousel() {
   const focusedScope: ProgressRealmScope = current.id === "measurelands" ? "measurement" : "number";
   const focusedProgress = useMemo(
     () => readScopedProgress(focusedScope),
-    [focusedScope, currentIndex]
+    [focusedScope]
   );
   const levelNumber = Number((focusedProgress?.year ?? "Year 1").replace(/[^0-9]/g, "")) || 1;
 
-  const realmRoutes: Record<string, string> = {
-    "number-nexus": "/number-nexus",
-    "measurelands": "/measurelands",
-  };
+  async function enterRealm() {
+    if (!isActive || enteringRealm) return;
+    const availability = getRealmAvailability(current.id);
+    if (!availability) return;
 
-  function enterRealm() {
-    if (!isActive) return;
-    const route = realmRoutes[current.id];
-    if (!route) return;
     // Entering a realm always drops the student on their PLACED level (or a
     // pre-test if new). The realm resolves that from its own scoped progress —
     // no level is chosen here, and any prior review session is cleared.
     setLastRealm(current.id);
     exitReviewMode();
-    router.push(route);
+
+    if (previewMode) {
+      router.push(availability.route);
+      return;
+    }
+
+    const identity = getActiveStudentIdentity();
+    if (!identity.studentId) {
+      router.push("/login");
+      return;
+    }
+
+    setEntryError(null);
+    setEnteringRealm(current.id);
+    try {
+      const restored = await restoreStudentStateFromServer(
+        identity.studentId,
+        availability.progressRealmId,
+      );
+      const profile = getActiveStudentProfile();
+      const route = resolveRealmEntryRoute({
+        realmId: availability.progressRealmId,
+        progress: restored.progress,
+        fallbackYear: profile?.yearLevel ?? "Year 1",
+        introSeen: restored.introSeen,
+      });
+      router.push(route);
+    } catch (error) {
+      if (error instanceof StudentRestoreSupersededError) return;
+      console.warn("[RealmCarousel] Could not resolve realm entry", error);
+      setEntryError("We could not load this realm. Please try again.");
+      setEnteringRealm(null);
+    }
   }
 
   return (
@@ -376,14 +405,18 @@ export default function RealmCarousel() {
 
             {isActive ? (
               <button
-                onClick={enterRealm}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void enterRealm();
+                }}
+                disabled={enteringRealm === current.id}
                 className="px-8 py-3 rounded-2xl font-bold text-white text-base transition-all hover:scale-105 active:scale-95 cursor-pointer"
                 style={{
                   background: current.color,
                   boxShadow: `0 6px 24px ${current.colorDim}`,
                 }}
               >
-                {isPreviewRealm ? "Preview Realm" : "Enter Realm"}
+                {enteringRealm === current.id ? "Loading..." : isPreviewRealm ? "Preview Realm" : "Enter Realm"}
               </button>
             ) : current.comingSoon ? (
               <span className="inline-block px-6 py-2.5 rounded-2xl text-sm font-bold text-amber-300/80 border border-amber-400/30" style={{ background: "rgba(251,191,36,0.1)" }}>
@@ -403,6 +436,10 @@ export default function RealmCarousel() {
               <div className="mt-3 inline-flex items-center rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-sky-100">
                 Preview
               </div>
+            ) : null}
+
+            {entryError ? (
+              <p className="mt-3 text-sm font-bold text-red-200">{entryError}</p>
             ) : null}
 
             {/* Dot indicators */}
