@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
-  BookOpen,
   Castle,
   Check,
   Gem,
@@ -11,8 +10,6 @@ import {
   Lock,
   PawPrint,
   Pencil,
-  Shirt,
-  ShoppingBag,
   Sparkles,
   X,
 } from "lucide-react";
@@ -33,30 +30,6 @@ import {
 } from "@/lib/economy";
 import { resolveContinueLearningRoute } from "@/lib/continue-learning";
 import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/studentIdentity";
-
-const HOME_DESTINATIONS = [
-  {
-    label: "Marketplace",
-    description: "Spend global XP on permanent cosmetics.",
-    route: "/marketplace",
-    Icon: ShoppingBag,
-    accent: "border-white/20 bg-white/[0.06] text-white/85",
-  },
-  {
-    label: "Collection Journal",
-    description: "Visit every museum and discovery collection.",
-    route: "/collections",
-    Icon: BookOpen,
-    accent: "border-white/20 bg-white/[0.06] text-white/85",
-  },
-  {
-    label: "Avatar Studio",
-    description: "Change your look — hair, outfits, hats and more.",
-    route: "/wardrobe",
-    Icon: Shirt,
-    accent: "border-white/20 bg-white/[0.06] text-white/85",
-  },
-] as const;
 
 export default function HomeBasePage() {
   const router = useRouter();
@@ -251,27 +224,9 @@ export default function HomeBasePage() {
         </div>
       </section>
 
-      <section className="border-t border-white/10 bg-[#0b0d10] px-5 py-6 lg:px-8" aria-label="My Home destinations">
-        <div className="mx-auto max-w-[1440px] space-y-4">
+      <section className="border-t border-white/10 bg-[#0b0d10] px-5 py-6 lg:px-8" aria-label="Hall of Legends">
+        <div className="mx-auto max-w-[1440px]">
           <HallOfLegendsWidget />
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {HOME_DESTINATIONS.map(({ label, description, route, Icon, accent }) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => router.push(route)}
-              className="group flex min-h-28 items-center gap-4 rounded-md border border-white/10 bg-white/[0.045] p-4 text-left transition hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-            >
-              <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-md border ${accent}`}>
-                <Icon className="h-6 w-6" aria-hidden="true" />
-              </span>
-              <span className="min-w-0">
-                <strong className="block text-sm font-black">{label}</strong>
-                <span className="mt-1 block text-xs leading-5 text-white/55">{description}</span>
-              </span>
-            </button>
-            ))}
-          </div>
         </div>
       </section>
 
