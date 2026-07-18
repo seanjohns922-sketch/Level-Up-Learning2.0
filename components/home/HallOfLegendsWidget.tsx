@@ -50,8 +50,8 @@ export default function HallOfLegendsWidget() {
       aria-label={`Enter the Hall of Legends. ${count} of ${total} legends earned.`}
       className="group relative block w-full overflow-hidden rounded-2xl border border-white/12 text-left transition hover:border-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/70"
     >
-      <img src="/images/legends-bg.jpg" alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(10,12,16,.94)_0%,rgba(10,12,16,.74)_46%,rgba(10,12,16,.42)_100%)]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#15171d] via-[#111318] to-[#0e1014]" aria-hidden="true" />
+      <div className="absolute inset-y-0 right-0 w-2/3 bg-[radial-gradient(circle_at_80%_50%,rgba(251,191,36,0.10),transparent_62%)]" aria-hidden="true" />
 
       <div className="relative z-10 flex flex-col items-start gap-6 p-6 sm:flex-row sm:items-center sm:justify-between md:p-7">
         <div className="max-w-md">
@@ -60,7 +60,7 @@ export default function HallOfLegendsWidget() {
             <span className="text-xs font-black uppercase tracking-[0.18em]">Hall of Legends</span>
           </div>
           <h2 className="mt-2 text-2xl font-black text-white md:text-3xl">Your Legends</h2>
-          <p className="mt-1 text-sm font-semibold text-white/70">Champions you&rsquo;ve earned across every realm.</p>
+          <p className="mt-1 text-sm font-semibold text-white/70">Legends you&rsquo;ve earned across every realm.</p>
 
           <div className="mt-4 flex items-center gap-3">
             <div className="h-2 w-40 overflow-hidden rounded-full bg-white/15">
