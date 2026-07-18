@@ -12,7 +12,6 @@ import {
   ShoppingBag,
   Sparkles,
   Trophy,
-  Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
@@ -51,9 +50,9 @@ const HOME_DESTINATIONS = [
     accent: "border-violet-300/45 bg-violet-300/10 text-violet-100",
   },
   {
-    label: "Wardrobe & Pets",
-    description: "Preview outfits and choose a companion.",
-    route: "/marketplace",
+    label: "Avatar Studio",
+    description: "Change your look — hair, outfits, hats and more.",
+    route: "/wardrobe",
     Icon: Shirt,
     accent: "border-cyan-300/45 bg-cyan-300/10 text-cyan-100",
   },
