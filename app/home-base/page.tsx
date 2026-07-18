@@ -40,28 +40,28 @@ const HOME_DESTINATIONS = [
     description: "Spend global XP on permanent cosmetics.",
     route: "/marketplace",
     Icon: ShoppingBag,
-    accent: "border-amber-300/45 bg-amber-300/10 text-amber-100",
+    accent: "border-white/20 bg-white/[0.06] text-white/85",
   },
   {
     label: "Collection Journal",
     description: "Visit every museum and discovery collection.",
     route: "/collections",
     Icon: BookOpen,
-    accent: "border-emerald-300/45 bg-emerald-300/10 text-emerald-100",
+    accent: "border-white/20 bg-white/[0.06] text-white/85",
   },
   {
     label: "Hall of Legends",
     description: "See the Legends unlocked across every realm.",
     route: "/legends",
     Icon: Trophy,
-    accent: "border-violet-300/45 bg-violet-300/10 text-violet-100",
+    accent: "border-white/20 bg-white/[0.06] text-white/85",
   },
   {
     label: "Avatar Studio",
     description: "Change your look — hair, outfits, hats and more.",
     route: "/wardrobe",
     Icon: Shirt,
-    accent: "border-cyan-300/45 bg-cyan-300/10 text-cyan-100",
+    accent: "border-white/20 bg-white/[0.06] text-white/85",
   },
 ] as const;
 
@@ -158,7 +158,7 @@ export default function HomeBasePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#071513] text-white">
+    <main className="min-h-screen bg-[#0f1115] text-white">
       <EconomyHeader
         xp={state?.wallet.xp_balance}
         essence={state?.wallet.essence}
@@ -170,8 +170,8 @@ export default function HomeBasePage() {
         style={{ backgroundImage: `url('${roomBackground}')` }}
         aria-label="My Home room"
       >
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,15,13,.88)_0%,rgba(3,15,13,.34)_48%,rgba(3,15,13,.72)_100%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(3,15,13,.94)_0%,transparent_55%,rgba(3,15,13,.36)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,11,14,.88)_0%,rgba(9,11,14,.34)_48%,rgba(9,11,14,.72)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(9,11,14,.94)_0%,transparent_55%,rgba(9,11,14,.36)_100%)]" />
 
         <div className="relative z-10 mx-auto grid min-h-[min(720px,calc(100vh-65px))] max-w-[1440px] gap-6 px-5 py-7 lg:grid-cols-[minmax(270px,420px)_1fr_minmax(240px,330px)] lg:px-8">
           <div className="flex flex-col justify-between gap-8">
@@ -211,10 +211,10 @@ export default function HomeBasePage() {
           </div>
 
           <div className="relative flex min-h-[390px] items-end justify-center lg:min-h-0">
-            <div className="absolute bottom-3 h-16 w-72 rounded-[50%] bg-emerald-200/15 blur-xl" />
-            <StudentAvatar height={320} outfit={avatarOutfit} glowColor="rgba(110,231,183,.25)" />
+            <div className="absolute bottom-3 h-16 w-72 rounded-[50%] bg-white/10 blur-xl" />
+            <StudentAvatar height={320} outfit={avatarOutfit} glowColor="rgba(255,255,255,.20)" />
             <div className="absolute bottom-5 left-[calc(50%+70px)] flex min-h-24 w-28 flex-col items-center justify-center rounded-full border border-white/25 bg-slate-950/65 p-3 text-center backdrop-blur-sm">
-              <PawPrint className={`h-8 w-8 ${petItem ? "text-emerald-300" : "text-white/40"}`} aria-hidden="true" />
+              <PawPrint className={`h-8 w-8 ${petItem ? "text-white" : "text-white/40"}`} aria-hidden="true" />
               <span className="mt-1 text-[10px] font-black uppercase tracking-wide text-white/85">
                 {petItem?.name ?? "Pet space"}
               </span>
@@ -236,7 +236,7 @@ export default function HomeBasePage() {
               <button
                 type="button"
                 onClick={() => setRoomPickerOpen(true)}
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-2 text-xs font-black uppercase tracking-wide text-white transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-2 text-xs font-black uppercase tracking-wide text-white transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               >
                 <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Change room
               </button>
@@ -244,12 +244,12 @@ export default function HomeBasePage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-md border border-white/15 bg-black/35 p-3 backdrop-blur-sm">
-                <Library className="h-5 w-5 text-amber-300" aria-hidden="true" />
+                <Library className="h-5 w-5 text-white/75" aria-hidden="true" />
                 <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-white/55">Display</p>
                 <p className="mt-1 text-sm font-bold">{homeItem?.name ?? "Shelf available"}</p>
               </div>
               <div className="rounded-md border border-white/15 bg-black/35 p-3 backdrop-blur-sm">
-                <Gem className="h-5 w-5 text-cyan-300" aria-hidden="true" />
+                <Gem className="h-5 w-5 text-white/75" aria-hidden="true" />
                 <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-white/55">Discoveries</p>
                 <p className="mt-1 text-2xl font-black">{collectibleCount}</p>
               </div>
@@ -258,14 +258,14 @@ export default function HomeBasePage() {
         </div>
       </section>
 
-      <section className="border-t border-white/10 bg-[#07110f] px-5 py-6 lg:px-8" aria-label="My Home destinations">
+      <section className="border-t border-white/10 bg-[#0b0d10] px-5 py-6 lg:px-8" aria-label="My Home destinations">
         <div className="mx-auto grid max-w-[1440px] gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {HOME_DESTINATIONS.map(({ label, description, route, Icon, accent }) => (
             <button
               key={label}
               type="button"
               onClick={() => router.push(route)}
-              className="group flex min-h-28 items-center gap-4 rounded-md border border-white/10 bg-white/[0.045] p-4 text-left transition hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+              className="group flex min-h-28 items-center gap-4 rounded-md border border-white/10 bg-white/[0.045] p-4 text-left transition hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
             >
               <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-md border ${accent}`}>
                 <Icon className="h-6 w-6" aria-hidden="true" />
@@ -288,15 +288,15 @@ export default function HomeBasePage() {
           onClick={() => setRoomPickerOpen(false)}
         >
           <div
-            className="flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#0b1a17] shadow-2xl"
+            className="flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#14161c] shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-300">My Home</p>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-white/70">My Home</p>
                 <h2 className="text-xl font-black text-white">Choose your room</h2>
               </div>
-              <button type="button" onClick={() => setRoomPickerOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-md border border-white/20 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300" aria-label="Close">
+              <button type="button" onClick={() => setRoomPickerOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-md border border-white/20 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60" aria-label="Close">
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
@@ -307,16 +307,16 @@ export default function HomeBasePage() {
                 type="button"
                 onClick={revertToStockRoom}
                 disabled={busy}
-                className={`group overflow-hidden rounded-xl border text-left transition disabled:opacity-60 ${!state?.equipped.background ? "border-emerald-400 ring-2 ring-emerald-400/40" : "border-white/12 hover:border-white/30"}`}
+                className={`group overflow-hidden rounded-xl border text-left transition disabled:opacity-60 ${!state?.equipped.background ? "border-white/80 ring-2 ring-white/30" : "border-white/12 hover:border-white/30"}`}
               >
                 <div className="relative aspect-video w-full bg-cover bg-center" style={{ backgroundImage: "url('/images/home-themes/explorer-study.png')" }}>
                   {!state?.equipped.background ? (
-                    <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-emerald-950"><Check className="h-3 w-3" aria-hidden="true" /> In use</span>
+                    <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-white px-2 py-0.5 text-[10px] font-black text-slate-900"><Check className="h-3 w-3" aria-hidden="true" /> In use</span>
                   ) : null}
                 </div>
                 <div className="flex items-center justify-between gap-2 p-3">
                   <span className="text-sm font-black text-white">Explorer Study</span>
-                  <span className="rounded bg-emerald-400/15 px-1.5 py-0.5 text-[10px] font-black text-emerald-300">Free</span>
+                  <span className="rounded bg-white/15 px-1.5 py-0.5 text-[10px] font-black text-white/80">Free</span>
                 </div>
               </button>
 
@@ -331,7 +331,7 @@ export default function HomeBasePage() {
                     type="button"
                     onClick={() => selectTheme(item)}
                     disabled={busy}
-                    className={`group overflow-hidden rounded-xl border text-left transition disabled:opacity-60 ${isOn ? "border-emerald-400 ring-2 ring-emerald-400/40" : "border-white/12 hover:border-white/30"}`}
+                    className={`group overflow-hidden rounded-xl border text-left transition disabled:opacity-60 ${isOn ? "border-white/80 ring-2 ring-white/30" : "border-white/12 hover:border-white/30"}`}
                   >
                     <div className="relative aspect-video w-full bg-cover bg-center" style={{ backgroundImage: `url('${image}')` }}>
                       {!owned ? (
@@ -340,7 +340,7 @@ export default function HomeBasePage() {
                         </span>
                       ) : null}
                       {isOn ? (
-                        <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-emerald-950"><Check className="h-3 w-3" aria-hidden="true" /> In use</span>
+                        <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-white px-2 py-0.5 text-[10px] font-black text-slate-900"><Check className="h-3 w-3" aria-hidden="true" /> In use</span>
                       ) : null}
                     </div>
                     <div className="flex items-center justify-between gap-2 p-3">
