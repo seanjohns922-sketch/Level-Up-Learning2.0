@@ -33,8 +33,8 @@ export default function StudentHomePage() {
   }, [isGroundLevel, placementYear, progress, router, studentProfile?.studentId]);
 
   async function handleLogout() {
-    await supabase.auth.signOut();
     clearActiveStudentSession();
+    await supabase.auth.signOut();
     router.push("/login");
   }
 

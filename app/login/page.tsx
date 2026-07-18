@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
 import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile, setStudentSessionToken } from "@/lib/studentIdentity";
-import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
+import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { resolveStudentNameParts } from "@/lib/studentName";
@@ -51,26 +51,11 @@ function normalizeClassCode(code: string) {
   return code.replace(/\s+/g, "").trim().toUpperCase();
 }
 
-function isMissingStudentUserIdColumn(message?: string | null) {
-  return Boolean(message && /user_id.*students|students.*user_id|schema cache/i.test(message));
-}
-
-async function fetchStudentRuntimeName(studentId: string) {
-  const { data, error } = await supabase.rpc("get_student_runtime_context_secure", {
-    p_student_id: studentId,
-  });
-  if (error) throw error;
-  const row = Array.isArray(data) ? data[0] : null;
-  if (!row) return null;
-  return resolveStudentNameParts(row).displayName?.trim() || row.display_name?.trim() || null;
-}
-
-function persistStudentBootstrapState(args: {
+function persistStudentIdentity(args: {
   studentId: string;
   classId: string | null;
   displayName: string;
   yearLevel: string;
-  progress: ReturnType<typeof buildDefaultStudentProgress>;
 }) {
   try {
     setActiveStudentProfile(args.studentId, args.classId, {
@@ -83,16 +68,24 @@ function persistStudentBootstrapState(args: {
       throw new Error("active student profile did not persist");
     }
 
-    writeProgress(args.progress);
-    const storedProgress = readProgress();
-    if (!storedProgress || storedProgress.year !== args.progress.year) {
-      throw new Error("student progress did not persist");
-    }
-
     return true;
   } catch (error) {
     console.warn("[Login] Student bootstrap storage failed", error);
     clearActiveStudentSession();
+    return false;
+  }
+}
+
+function persistResolvedStudentProgress(progress: ReturnType<typeof buildDefaultStudentProgress>) {
+  try {
+    writeProgress(progress, "number");
+    const storedProgress = readProgress("number");
+    if (!storedProgress || storedProgress.year !== progress.year) {
+      throw new Error("student progress did not persist");
+    }
+    return true;
+  } catch (error) {
+    console.warn("[Login] Resolved student progress storage failed", error);
     return false;
   }
 }
@@ -160,6 +153,8 @@ export default function LoginPage() {
   const [studentName, setStudentName] = useState("");
   const [studentPin, setStudentPin] = useState("");
   const [studentError, setStudentError] = useState<string | null>(null);
+  const [studentBootstrapState, setStudentBootstrapState] = useState<"idle" | "loading" | "resolved" | "error">("idle");
+  const studentLoginAttemptRef = useRef(0);
   const [showPin, setShowPin] = useState(false);
   const doorTapCountRef = useRef(0);
   const lastDoorTapAtRef = useRef(0);
@@ -307,19 +302,38 @@ export default function LoginPage() {
   }
 
   async function handleStudentLogin() {
+    if (studentBootstrapState === "loading") return;
+
+    const loginAttempt = ++studentLoginAttemptRef.current;
+    const isCurrentAttempt = () => studentLoginAttemptRef.current === loginAttempt;
+    const failCurrentAttempt = (message: string, clearSession = false) => {
+      if (!isCurrentAttempt()) return;
+      if (clearSession) clearActiveStudentSession();
+      setStudentError(message);
+      setStudentBootstrapState("error");
+    };
+
     setStudentError(null);
+    setStudentBootstrapState("loading");
     const normalizedCode = normalizeClassCode(studentCode);
     const displayName = studentName.trim();
     const name = displayName;
     const pin = studentPin.trim();
 
-    if (!normalizedCode || !name || pin.length !== 4) { setStudentError("Please enter class code, username, and password."); return; }
+    if (!normalizedCode || !name || pin.length !== 4) {
+      failCurrentAttempt("Please enter class code, username, and password.");
+      return;
+    }
 
     const { data: lookupRows, error: classLookupError } = await supabase
       .rpc("find_class_by_code", { input_code: normalizedCode });
     const cls = Array.isArray(lookupRows) ? lookupRows[0] ?? null : null;
 
-    if (classLookupError || !cls) { setStudentError("Class code not found."); return; }
+    if (!isCurrentAttempt()) return;
+    if (classLookupError || !cls) {
+      failCurrentAttempt("Class code not found.");
+      return;
+    }
 
     // Look up student server-side — SECURITY DEFINER bypasses RLS entirely, no auth needed
     const { data: studentRows, error: studentErr } = await supabase.rpc("student_login_lookup", {
@@ -329,15 +343,15 @@ export default function LoginPage() {
     });
 
     const student = Array.isArray(studentRows) ? studentRows[0] : studentRows;
+    if (!isCurrentAttempt()) return;
     if (studentErr || !student?.student_id) {
-      setStudentError("Username or password not recognised. Ask your teacher to check your details.");
+      failCurrentAttempt("Username or password not recognised. Ask your teacher to check your details.");
       return;
     }
     if (!student.session_token) {
-      setStudentError("A secure student session could not be created. Please try again.");
+      failCurrentAttempt("A secure student session could not be created. Please try again.");
       return;
     }
-    setStudentSessionToken(student.session_token);
 
     const explicitWorkingYear = normalizeWorkingLevelLabel(student.working_level) ?? null;
     const legacyWorkingYear = normalizeWorkingLevelLabel(student.year_level) ?? null;
@@ -346,63 +360,41 @@ export default function LoginPage() {
       normalizeSchoolYearLabel(student.school_year_level) ??
       normalizeSchoolYearLabel(student.year_level) ??
       null;
-    const previousActiveStudent = getActiveStudentIdentity().studentId;
-    const previousScopedProgress = readProgress();
-
-    if (previousActiveStudent && previousActiveStudent !== student.student_id) {
-      clearScopedProgress(previousActiveStudent);
-      clearScopedProgramStore(previousActiveStudent);
-    }
-
     const resolvedStudentName = resolveStudentNameParts(student).displayName || displayName;
-
     const resolvedYearLevel = studentSchoolYear ?? studentWorkingYear ?? "Year 1";
-    const initialBootstrapProgress = buildDefaultStudentProgress(resolvedYearLevel);
 
-    if (
-      !persistStudentBootstrapState({
-        studentId: student.student_id,
-        classId: student.class_id,
-        displayName: resolvedStudentName,
-        yearLevel: resolvedYearLevel,
-        progress: initialBootstrapProgress,
-      })
-    ) {
-      setStudentError("This device could not save your session. Please allow browser storage, refresh, and try again.");
-      return;
-    }
-
+    // Clear only the incoming student's cache. Other students' scoped records
+    // remain isolated and available for their own next login.
     clearScopedProgress(student.student_id);
     clearScopedProgramStore(student.student_id);
-
-    if (
-      !persistStudentBootstrapState({
-        studentId: student.student_id,
-        classId: student.class_id,
-        displayName: resolvedStudentName,
-        yearLevel: resolvedYearLevel,
-        progress: initialBootstrapProgress,
-      })
-    ) {
-      setStudentError("This device could not save your session. Please allow browser storage, refresh, and try again.");
+    setStudentSessionToken(student.session_token);
+    if (!persistStudentIdentity({
+      studentId: student.student_id,
+      classId: student.class_id,
+      displayName: resolvedStudentName,
+      yearLevel: resolvedYearLevel,
+    })) {
+      failCurrentAttempt("This device could not save your session. Please allow browser storage, refresh, and try again.", true);
       return;
     }
 
-    let progress = readProgress();
-    let introSeen = hasActiveStudentSeenIntro(student.student_id);
-    let introSeenSource: "localStorage" | "students_table" = "localStorage";
-    let progressSource: "localStorage" | "progress_snapshot" | "default" = progress ? "localStorage" : "default";
+    let progress: ReturnType<typeof readProgress> = null;
+    let introSeen = false;
+    let progressSource: "progress_snapshot" | "default" = "default";
     let restoredRowsSummary: unknown[] = [];
     try {
       const restored = await restoreStudentStateFromServer(student.student_id, "number");
+      if (!isCurrentAttempt()) return;
       const measurementRestored = await restoreStudentStateFromServer(student.student_id, "measurement");
+      if (!isCurrentAttempt()) return;
       if (restored.progress) {
         progress = restored.progress;
         progressSource = "progress_snapshot";
       }
       introSeen = restored.introSeen;
-      introSeenSource = "students_table";
       restoredRowsSummary = restored.rows.map((row) => ({
+        realm_id: row.realm_id,
+        is_current: row.is_current,
         year: row.year,
         status: row.status,
         week: row.week,
@@ -413,6 +405,7 @@ export default function LoginPage() {
       }));
       restoredRowsSummary.push(...measurementRestored.rows.map((row) => ({
         realm_id: row.realm_id,
+        is_current: row.is_current,
         year: row.year,
         status: row.status,
         week: row.week,
@@ -421,25 +414,16 @@ export default function LoginPage() {
         pretest_score: row.pretest_score,
       })));
     } catch (error) {
-      console.warn("[Login] Could not restore student progress from Supabase", error);
-    }
-
-    try {
-      const runtimeDisplayName = await fetchStudentRuntimeName(student.student_id);
-      if (runtimeDisplayName) {
-        setActiveStudentProfile(student.student_id, student.class_id, {
-          displayName: runtimeDisplayName,
-          yearLevel: studentSchoolYear ?? studentWorkingYear ?? "Year 1",
-        });
-      }
-    } catch (error) {
-      console.warn("[Login] Could not refresh runtime student name", error);
+      if (error instanceof StudentRestoreSupersededError || !isCurrentAttempt()) return;
+      console.warn("[Login] Authoritative student progress restore failed", error);
+      failCurrentAttempt("We could not load your saved progress. Please try again.", true);
+      return;
     }
 
     const isGroundLevelStudent = (studentSchoolYear ?? studentWorkingYear ?? progress?.year ?? "").trim() === "Prep";
 
     if (!progress) {
-      progress = buildDefaultStudentProgress(studentSchoolYear ?? studentWorkingYear ?? "Year 1");
+      progress = buildDefaultStudentProgress(resolvedYearLevel);
       progressSource = "default";
     }
 
@@ -455,16 +439,8 @@ export default function LoginPage() {
       };
     }
 
-    if (
-      !persistStudentBootstrapState({
-        studentId: student.student_id,
-        classId: student.class_id,
-        displayName: resolvedStudentName,
-        yearLevel: resolvedYearLevel,
-        progress,
-      })
-    ) {
-      setStudentError("This device could not finish loading your session. Please refresh and try again.");
+    if (!persistResolvedStudentProgress(progress)) {
+      failCurrentAttempt("This device could not finish loading your session. Please refresh and try again.", true);
       return;
     }
 
@@ -477,14 +453,9 @@ export default function LoginPage() {
     });
     console.log("[LoginRouteDebug]", {
       student_id: student.student_id,
-      previous_active_student_id: previousActiveStudent,
       student_table: {
         working_level: student.working_level ?? null,
         school_year_level: student.school_year_level ?? null,
-      },
-      localStorage_before_switch: {
-        activeStudentId: previousActiveStudent,
-        progress: summarizeProgress(previousScopedProgress),
       },
       localStorage_after_switch: {
         introSeenForStudent: hasActiveStudentSeenIntro(student.student_id),
@@ -493,7 +464,7 @@ export default function LoginPage() {
       progress_snapshot_rows: restoredRowsSummary,
       resolved: {
         hasSeenIntro: introSeen,
-        hasSeenIntroSource: introSeenSource,
+        hasSeenIntroSource: "students_table",
         placementComplete,
         placementCompleteSource: progressSource === "progress_snapshot" ? "progress_snapshot.placement_complete" : progressSource,
         progressStatus: progress?.status ?? null,
@@ -505,6 +476,8 @@ export default function LoginPage() {
       },
       route: dest,
     });
+    if (!isCurrentAttempt() || getActiveStudentIdentity().studentId !== student.student_id) return;
+    setStudentBootstrapState("resolved");
     router.push(dest);
   }
 
@@ -733,13 +706,13 @@ export default function LoginPage() {
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Class Code</span>
               <InputField icon={<KeyRound size={15} />}>
-                <input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold`} />
+                <input disabled={studentBootstrapState === "loading"} value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold disabled:opacity-60`} />
               </InputField>
             </label>
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Username</span>
               <InputField icon={<User size={15} />}>
-                <input value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your username" className={inputCls} />
+                <input disabled={studentBootstrapState === "loading"} value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your username" className={`${inputCls} disabled:opacity-60`} />
               </InputField>
             </label>
             <label className="grid gap-1.5">
@@ -752,6 +725,7 @@ export default function LoginPage() {
                   className={`${inputCls} tracking-[0.5em] text-center font-semibold`}
                   type={showPin ? "text" : "password"}
                   inputMode="numeric"
+                  disabled={studentBootstrapState === "loading"}
                 />
                 <button
                   type="button"
@@ -773,14 +747,15 @@ export default function LoginPage() {
 
             <button
               onClick={handleStudentLogin}
-              className="mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-[0.97] cursor-pointer"
+              disabled={studentBootstrapState === "loading"}
+              className="mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-[0.97] cursor-pointer disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
               style={{
                 background: "linear-gradient(135deg, hsl(0 0% 22%), hsl(0 0% 15%))",
                 boxShadow: "0 6px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
               }}
               type="button"
             >
-              Enter the Tower
+              {studentBootstrapState === "loading" ? "Loading your progress..." : "Enter the Tower"}
             </button>
           </div>
         ) : passwordRecoveryMode ? (

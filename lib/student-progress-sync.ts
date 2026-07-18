@@ -3,13 +3,14 @@
 import { YEAR_ORDER } from "@/data/yearOrder";
 import { type StudentProgress, writeProgress } from "@/data/progress";
 import { makeProgramProgressKey, readProgramStore, writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
-import { markActiveStudentIntroSeen } from "@/lib/studentIdentity";
+import { getActiveStudentIdentity, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { fetchRealmCompatProgressForStudent } from "@/lib/realm-progress-compat";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 
 export type StudentProgressSnapshotRow = {
   realm_id?: string | null;
+  is_current?: boolean | null;
   year: string | null;
   pretest_score: number | null;
   status: string | null;
@@ -135,8 +136,10 @@ function choosePrimaryRow(rows: StudentProgressSnapshotRow[]) {
   const usableRows = rows.filter((row) => !!row.year);
   if (!usableRows.length) return null;
 
-  const placementCompleteRows = usableRows.filter((row) => row.placement_complete === true);
-  const pool = placementCompleteRows.length > 0 ? placementCompleteRows : usableRows;
+  const currentRows = usableRows.filter((row) => row.is_current === true);
+  const currentPool = currentRows.length > 0 ? currentRows : usableRows;
+  const placementCompleteRows = currentPool.filter((row) => row.placement_complete === true);
+  const pool = placementCompleteRows.length > 0 ? placementCompleteRows : currentPool;
 
   return [...pool].sort((a, b) => {
     const yearDelta = yearIndex(b.year) - yearIndex(a.year);
@@ -145,6 +148,19 @@ function choosePrimaryRow(rows: StudentProgressSnapshotRow[]) {
     const bTime = b.updated_at ? Date.parse(b.updated_at) : 0;
     return bTime - aTime;
   })[0] ?? null;
+}
+
+export class StudentRestoreSupersededError extends Error {
+  constructor() {
+    super("Student restore was superseded by another session");
+    this.name = "StudentRestoreSupersededError";
+  }
+}
+
+function assertActiveRestoreStudent(studentId: string) {
+  if (getActiveStudentIdentity().studentId !== studentId) {
+    throw new StudentRestoreSupersededError();
+  }
 }
 
 function buildStudentProgress(row: StudentProgressSnapshotRow): StudentProgress | null {
@@ -181,6 +197,8 @@ export async function restoreStudentStateFromServer(
     return { rows: [] as StudentProgressSnapshotRow[], progress, introSeen: true };
   }
 
+  assertActiveRestoreStudent(studentId);
+
   const [realmRows, studentResponse] = await Promise.all([
     fetchRealmCompatProgressForStudent(realmId, studentId),
     getStudentRuntimeContext(studentId),
@@ -188,6 +206,7 @@ export async function restoreStudentStateFromServer(
 
   const compatRows = realmRows as StudentProgressSnapshotRow[];
   const contextRow = studentResponse;
+  assertActiveRestoreStudent(studentId);
   const introSeenFromStudentFlag =
     contextRow?.has_seen_intro === true || compatRows.some((row) => row.has_seen_intro === true);
   const introSeenFromHistoricalProgress = compatRows.some(
@@ -204,6 +223,7 @@ export async function restoreStudentStateFromServer(
   }
 
   const progress = buildStudentProgress(primaryRow);
+  assertActiveRestoreStudent(studentId);
   if (progress) {
     writeProgress(progress, realmId);
   }

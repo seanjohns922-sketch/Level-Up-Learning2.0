@@ -522,12 +522,12 @@ function PretestPage() {
   }
   async function exitLogout() {
     persistSnapshot();
+    clearActiveStudentSession();
     try {
       await supabase.auth.signOut();
     } catch {
       /* offline / already signed out — non-fatal */
     }
-    clearActiveStudentSession();
     router.push("/login");
   }
 
