@@ -94,15 +94,14 @@ export function getExplorerRank(lifetimeXp: number): ExplorerRank {
 }
 
 export async function fetchGlobalXp(studentId: string) {
-  try {
-    const economy = await fetchStudentEconomy(studentId);
-    return { balance: economy.wallet.xp_balance, lifetime: economy.wallet.xp_earned };
-  } catch (economyError) {
-    const { data, error } = await supabase.rpc("get_student_activity_daily_secure", { p_student_id: studentId });
-    if (error) throw economyError;
-    const lifetime = (Array.isArray(data) ? data : []).reduce((sum, row) => sum + Math.max(0, Number(row?.xp_earned ?? 0)), 0);
-    return { balance: lifetime, lifetime };
-  }
+  const { data, error } = await supabase.rpc("get_student_global_xp_secure", { p_student_id: studentId });
+  if (error) throw error;
+
+  const row = Array.isArray(data) ? data[0] : data;
+  return {
+    balance: Math.max(0, Number(row?.xp_balance ?? 0)),
+    lifetime: Math.max(0, Number(row?.xp_earned ?? 0)),
+  };
 }
 
 export async function purchaseEconomyItem(studentId: string, itemKey: string) {
