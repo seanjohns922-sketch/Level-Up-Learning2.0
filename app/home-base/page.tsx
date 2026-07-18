@@ -14,12 +14,12 @@ import {
   Shirt,
   ShoppingBag,
   Sparkles,
-  Trophy,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
+import HallOfLegendsWidget from "@/components/home/HallOfLegendsWidget";
 import {
   economyErrorMessage,
   equipEconomyItem,
@@ -47,13 +47,6 @@ const HOME_DESTINATIONS = [
     description: "Visit every museum and discovery collection.",
     route: "/collections",
     Icon: BookOpen,
-    accent: "border-white/20 bg-white/[0.06] text-white/85",
-  },
-  {
-    label: "Hall of Legends",
-    description: "See the Legends unlocked across every realm.",
-    route: "/legends",
-    Icon: Trophy,
     accent: "border-white/20 bg-white/[0.06] text-white/85",
   },
   {
@@ -259,8 +252,10 @@ export default function HomeBasePage() {
       </section>
 
       <section className="border-t border-white/10 bg-[#0b0d10] px-5 py-6 lg:px-8" aria-label="My Home destinations">
-        <div className="mx-auto grid max-w-[1440px] gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {HOME_DESTINATIONS.map(({ label, description, route, Icon, accent }) => (
+        <div className="mx-auto max-w-[1440px] space-y-4">
+          <HallOfLegendsWidget />
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {HOME_DESTINATIONS.map(({ label, description, route, Icon, accent }) => (
             <button
               key={label}
               type="button"
@@ -275,7 +270,8 @@ export default function HomeBasePage() {
                 <span className="mt-1 block text-xs leading-5 text-white/55">{description}</span>
               </span>
             </button>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
