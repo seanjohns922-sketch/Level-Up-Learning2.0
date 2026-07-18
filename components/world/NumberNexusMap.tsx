@@ -514,7 +514,7 @@ export default function NumberNexusMap() {
     Math.max(0, ...Object.entries(completedByWeek).filter(([, v]) => v).map(([k]) => Number(k))),
     [completedByWeek]);
 
-  const realmFallbackXP = useMemo(() => {
+  const demoRealmXP = useMemo(() => {
     let xp = 0;
     for (let w = 1; w <= 12; w++) {
       const wp = getWeekProgress(store, year, w);
@@ -830,7 +830,7 @@ export default function NumberNexusMap() {
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
           <Zap size={11} color="#14b8a6" />
-          <span title="Global XP available in every realm" style={{ color: "#99f6e4", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{globalXpBalance ?? realmFallbackXP} XP</span>
+          <span title="Global XP available in every realm" style={{ color: "#99f6e4", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{isDemoPreviewMode() ? demoRealmXP : globalXpBalance == null ? "—" : globalXpBalance} XP</span>
         </div>
         <div style={chip()}>
           <span style={{ color: "#99f6e4", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/12</span>

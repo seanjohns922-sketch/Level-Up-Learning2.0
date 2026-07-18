@@ -3,7 +3,7 @@
 import { ArrowLeft, BookOpen, House, Medal, ShoppingBag, Sparkles, Zap } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
-export default function EconomyHeader({ xp = 0, essence = 0, rankLevel = 1 }: { xp?: number; essence?: number; rankLevel?: number }) {
+export default function EconomyHeader({ xp, essence = 0, rankLevel = 1 }: { xp?: number | null; essence?: number; rankLevel?: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const destinations = [
@@ -30,7 +30,7 @@ export default function EconomyHeader({ xp = 0, essence = 0, rankLevel = 1 }: { 
         </nav>
         <div className="flex shrink-0 items-center gap-2">
           <div className="hidden items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-800 md:flex"><Medal className="h-3.5 w-3.5" />Rank {rankLevel}</div>
-          <div className="flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800"><Zap className="h-3.5 w-3.5" />{xp.toLocaleString()} XP</div>
+          <div className="flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800"><Zap className="h-3.5 w-3.5" />{xp == null ? "—" : xp.toLocaleString()} XP</div>
           <div className="hidden items-center gap-1.5 rounded-md border border-cyan-200 bg-cyan-50 px-3 py-2 text-xs font-black text-cyan-800 sm:flex"><Sparkles className="h-3.5 w-3.5" />{essence}</div>
         </div>
       </div>

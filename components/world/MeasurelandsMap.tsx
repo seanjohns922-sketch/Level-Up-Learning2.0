@@ -566,7 +566,7 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
     [completedByWeek]
   );
 
-  const realmFallbackXP = useMemo(() => {
+  const demoRealmXP = useMemo(() => {
     let xp = 0;
     for (let week = 1; week <= totalWeeks; week += 1) {
       const wp = getWeekProgress(store, resolvedYear, week, REALM_ID);
@@ -871,7 +871,7 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
           <Zap size={11} color="#fde68a" />
-          <span title="Global XP available in every realm" style={{ color: "#fef3c7", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{globalXpBalance ?? realmFallbackXP} XP</span>
+          <span title="Global XP available in every realm" style={{ color: "#fef3c7", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{isDemoPreviewMode() ? demoRealmXP : globalXpBalance == null ? "—" : globalXpBalance} XP</span>
         </div>
         <div style={chip()}>
           <span style={{ color: "#fde68a", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/{totalWeeks} weeks</span>

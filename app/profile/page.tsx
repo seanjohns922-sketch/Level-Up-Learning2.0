@@ -314,7 +314,6 @@ export default function ProfilePage() {
   }, []);
 
   const stats = useMemo(() => {
-    let realmFallbackXp = 0;
     let completedLessons = 0;
     let weeksCompleted = 0;
     let quizCount = 0;
@@ -324,9 +323,7 @@ export default function ProfilePage() {
       const weekProgress = getWeekProgress(store, year, week);
       const done = weekProgress.lessonsCompleted.filter(Boolean).length;
       completedLessons += done;
-      realmFallbackXp += done * 40;
       if (weekProgress.quizScore !== undefined) {
-        realmFallbackXp += Math.round((weekProgress.quizScore / 100) * 60);
         quizCount += 1;
         quizTotal += weekProgress.quizScore;
       }
@@ -336,12 +333,11 @@ export default function ProfilePage() {
     const accuracy =
       quizCount > 0 ? Math.round(quizTotal / quizCount) : (progress?.scorePercent ?? 0);
     const realmProgress = Math.round((weeksCompleted / 12) * 100);
-    const recordedGlobalXp = activityRows.reduce((sum, row) => sum + Math.max(0, row.xp_earned ?? 0), 0);
-    const xp = globalXp?.balance ?? (recordedGlobalXp > 0 ? recordedGlobalXp : realmFallbackXp);
-    const lifetimeXp = globalXp?.lifetime ?? (recordedGlobalXp > 0 ? recordedGlobalXp : realmFallbackXp);
+    const xp = globalXp?.balance ?? 0;
+    const lifetimeXp = globalXp?.lifetime ?? 0;
 
     return { xp, lifetimeXp, completedLessons, accuracy, weeksCompleted, realmProgress };
-  }, [activityRows, globalXp, progress, store, year]);
+  }, [globalXp, progress, store, year]);
 
   const initials = studentName.charAt(0).toUpperCase();
   const explorerRank = useMemo(() => getExplorerRank(stats.lifetimeXp), [stats.lifetimeXp]);
@@ -442,7 +438,7 @@ export default function ProfilePage() {
               </div>
               <div title="Global XP available in every realm" className="flex items-center gap-1 rounded-md border border-[#FDE68A] bg-[#FEF3C7] px-2.5 py-1">
                 <Zap className="h-3 w-3 text-[#F59E0B]" />
-                <span className="text-xs font-extrabold text-[#B45309]">{stats.xp.toLocaleString()}</span>
+                <span className="text-xs font-extrabold text-[#B45309]">{globalXp == null ? "—" : stats.xp.toLocaleString()}</span>
               </div>
             </div>
 
