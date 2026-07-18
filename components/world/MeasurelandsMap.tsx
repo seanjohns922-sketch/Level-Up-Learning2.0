@@ -848,7 +848,14 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
         <div style={chip({ background: "rgba(120,53,15,0.45)", border: "1px solid rgba(251,191,36,0.32)" })}>
           <span style={{ color: "#fde68a", fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: "ui-monospace,monospace" }}>⚗ MEASURELANDS</span>
         </div>
-        <LevelsDrawer realmId="measurelands" progress={progress} viewingYear={resolvedYear} isPreview={isDemoPreviewMode()} accent="#c4b5fd" />
+        <LevelsDrawer
+          realmId="measurelands"
+          progress={progress}
+          viewingYear={resolvedYear}
+          isPreview={isDemoPreviewMode()}
+          accent="#c4b5fd"
+          openDirection="right"
+        />
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
           <Zap size={11} color="#fde68a" />

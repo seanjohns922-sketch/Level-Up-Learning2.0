@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, Eye, Lock } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, Eye, Lock } from "lucide-react";
 import type { StudentProgress } from "@/data/progress";
 import type { LegendRealmId } from "@/data/legends";
 import { buildRealmLevelHref, isLevelUnlocked, LEVEL_CATALOG } from "@/lib/level-catalog";
@@ -17,12 +17,14 @@ export default function LevelsDrawer({
   viewingYear,
   isPreview,
   accent = "#5eead4",
+  openDirection = "down",
 }: {
   realmId: "number-nexus" | "measurelands";
   progress: StudentProgress | null;
   viewingYear: string;
   isPreview: boolean;
   accent?: string;
+  openDirection?: "down" | "right";
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -87,12 +89,21 @@ export default function LevelsDrawer({
             {triggerLabel}
           </span>
         )}
-        <ChevronDown size={11} color={reviewing ? "#fbbf24" : accent} />
+        {openDirection === "right" ? (
+          <ChevronRight size={11} color={reviewing ? "#fbbf24" : accent} />
+        ) : (
+          <ChevronDown size={11} color={reviewing ? "#fbbf24" : accent} />
+        )}
       </button>
 
       {open ? (
         <div
-          className="absolute left-0 top-[calc(100%+8px)] w-[248px] rounded-2xl border p-3 backdrop-blur-xl"
+          className={[
+            "absolute w-[248px] rounded-2xl border p-3 backdrop-blur-xl",
+            openDirection === "right"
+              ? "left-0 top-[calc(100%+8px)] sm:left-[calc(100%+8px)] sm:top-0"
+              : "left-0 top-[calc(100%+8px)]",
+          ].join(" ")}
           style={{ background: "rgba(8,10,16,0.94)", borderColor: "rgba(255,255,255,0.14)", boxShadow: "0 14px 40px rgba(0,0,0,0.5)", zIndex: 60 }}
         >
           <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">
