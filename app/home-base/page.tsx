@@ -5,22 +5,29 @@ import {
   ArrowRight,
   BookOpen,
   Castle,
+  Check,
   Gem,
   Library,
+  Lock,
   PawPrint,
+  Pencil,
   Shirt,
   ShoppingBag,
   Sparkles,
   Trophy,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import {
   economyErrorMessage,
+  equipEconomyItem,
   fetchStudentEconomy,
   getExplorerRank,
   mergeAvatarOutfit,
+  RARITY_STYLES,
+  unequipEconomySlot,
   type EconomyItem,
   type EconomyState,
 } from "@/lib/economy";
@@ -63,6 +70,8 @@ export default function HomeBasePage() {
   const [student] = useState(() => getActiveStudentProfile());
   const [state, setState] = useState<EconomyState | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [roomPickerOpen, setRoomPickerOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
   const sessionError = student?.studentId ? null : "Log in as a student to visit My Home.";
 
   useEffect(() => {
@@ -102,12 +111,50 @@ export default function HomeBasePage() {
     (backgroundItem?.metadata as { image?: string } | undefined)?.image
     ?? "/images/home-themes/explorer-study.png";
 
+  const roomThemes = useMemo(
+    () => (state?.items ?? [])
+      .filter((item) => item.category === "background" && (item.metadata as { kind?: string })?.kind === "home_theme")
+      .sort((a, b) => a.sort_order - b.sort_order),
+    [state?.items],
+  );
+  const ownedKeys = useMemo(() => new Set(state?.inventory.map((entry) => entry.item_key) ?? []), [state?.inventory]);
+
   function continueLearning() {
     if (!student?.studentId) {
       router.push("/login");
       return;
     }
     router.push(resolveContinueLearningRoute());
+  }
+
+  async function selectTheme(item: EconomyItem) {
+    if (!student?.studentId || busy) return;
+    if (!ownedKeys.has(item.item_key)) {
+      router.push("/marketplace");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      setState(await equipEconomyItem(student.studentId, item.item_key));
+    } catch (nextError) {
+      setError(economyErrorMessage(nextError));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function revertToStockRoom() {
+    if (!student?.studentId || busy || !state?.equipped.background) return;
+    setBusy(true);
+    setError(null);
+    try {
+      setState(await unequipEconomySlot(student.studentId, "background"));
+    } catch (nextError) {
+      setError(economyErrorMessage(nextError));
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -176,13 +223,22 @@ export default function HomeBasePage() {
           </div>
 
           <div className="flex flex-col justify-end gap-3">
-            <div className="mb-auto flex items-center justify-between border-b border-white/15 pb-4">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/55">Current room</p>
-                <p className="mt-1 font-black">{backgroundItem?.name ?? "Explorer Study"}</p>
+            <div className="mb-auto border-b border-white/15 pb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/55">Current room</p>
+                  <p className="mt-1 font-black">{backgroundItem?.name ?? "Explorer Study"}</p>
+                </div>
+                <button type="button" onClick={() => router.push("/realms")} className="flex h-10 w-10 items-center justify-center rounded-md border border-white/20 bg-black/25 text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Open the Tower of Knowledge" title="Tower of Knowledge">
+                  <Castle className="h-5 w-5" aria-hidden="true" />
+                </button>
               </div>
-              <button type="button" onClick={() => router.push("/realms")} className="flex h-10 w-10 items-center justify-center rounded-md border border-white/20 bg-black/25 text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Open the Tower of Knowledge" title="Tower of Knowledge">
-                <Castle className="h-5 w-5" aria-hidden="true" />
+              <button
+                type="button"
+                onClick={() => setRoomPickerOpen(true)}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-2 text-xs font-black uppercase tracking-wide text-white transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+              >
+                <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Change room
               </button>
             </div>
 
@@ -222,6 +278,84 @@ export default function HomeBasePage() {
           ))}
         </div>
       </section>
+
+      {roomPickerOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Choose your room"
+          onClick={() => setRoomPickerOpen(false)}
+        >
+          <div
+            className="flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#0b1a17] shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-300">My Home</p>
+                <h2 className="text-xl font-black text-white">Choose your room</h2>
+              </div>
+              <button type="button" onClick={() => setRoomPickerOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-md border border-white/20 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300" aria-label="Close">
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="grid gap-3 overflow-y-auto p-5 sm:grid-cols-2 lg:grid-cols-3">
+              {/* Free stock room */}
+              <button
+                type="button"
+                onClick={revertToStockRoom}
+                disabled={busy}
+                className={`group overflow-hidden rounded-xl border text-left transition disabled:opacity-60 ${!state?.equipped.background ? "border-emerald-400 ring-2 ring-emerald-400/40" : "border-white/12 hover:border-white/30"}`}
+              >
+                <div className="relative aspect-video w-full bg-cover bg-center" style={{ backgroundImage: "url('/images/home-themes/explorer-study.png')" }}>
+                  {!state?.equipped.background ? (
+                    <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-emerald-950"><Check className="h-3 w-3" aria-hidden="true" /> In use</span>
+                  ) : null}
+                </div>
+                <div className="flex items-center justify-between gap-2 p-3">
+                  <span className="text-sm font-black text-white">Explorer Study</span>
+                  <span className="rounded bg-emerald-400/15 px-1.5 py-0.5 text-[10px] font-black text-emerald-300">Free</span>
+                </div>
+              </button>
+
+              {roomThemes.map((item) => {
+                const image = (item.metadata as { image?: string }).image;
+                const owned = ownedKeys.has(item.item_key);
+                const isOn = state?.equipped.background === item.item_key;
+                const rarity = RARITY_STYLES[item.rarity];
+                return (
+                  <button
+                    key={item.item_key}
+                    type="button"
+                    onClick={() => selectTheme(item)}
+                    disabled={busy}
+                    className={`group overflow-hidden rounded-xl border text-left transition disabled:opacity-60 ${isOn ? "border-emerald-400 ring-2 ring-emerald-400/40" : "border-white/12 hover:border-white/30"}`}
+                  >
+                    <div className="relative aspect-video w-full bg-cover bg-center" style={{ backgroundImage: `url('${image}')` }}>
+                      {!owned ? (
+                        <span className="absolute inset-0 flex items-center justify-center bg-black/55">
+                          <span className="flex items-center gap-1 rounded bg-black/70 px-2 py-1 text-xs font-black text-white"><Lock className="h-3.5 w-3.5" aria-hidden="true" /> {item.price} XP</span>
+                        </span>
+                      ) : null}
+                      {isOn ? (
+                        <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-emerald-950"><Check className="h-3 w-3" aria-hidden="true" /> In use</span>
+                      ) : null}
+                    </div>
+                    <div className="flex items-center justify-between gap-2 p-3">
+                      <span className="truncate text-sm font-black text-white">{item.name}</span>
+                      <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-black" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="border-t border-white/10 px-5 py-3 text-center text-xs text-white/50">Locked rooms open in the Marketplace with XP.</div>
+          </div>
+        </div>
+      ) : null}
 
       {error || sessionError ? (
         <div className="fixed bottom-4 left-1/2 z-40 w-[min(92vw,560px)] -translate-x-1/2 rounded-md border border-amber-200/35 bg-amber-950/95 px-4 py-3 text-center text-sm font-bold text-amber-100 shadow-xl" role="status">
