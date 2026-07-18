@@ -23,6 +23,7 @@ import { supabase } from "@/lib/supabase";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { fetchGlobalXp } from "@/lib/economy";
 import RealmDashboardNav from "@/components/world/RealmDashboardNav";
+import { setLastRealm } from "@/lib/last-realm";
 
 // ─── Era system — ONE evolving city, five real background images ─────────────────
 // Prep=0  Y1-2=1  Y3-4=2  Y5=3  Y6=4
@@ -420,6 +421,10 @@ export default function NumberNexusMap() {
   const [store]    = useState(() => readProgramStore());
   const [gender] = useState<"boy" | "girl">(readGenderFromStorage);
   const [launching, setLaunching] = useState(false);
+
+  useEffect(() => {
+    setLastRealm("number-nexus");
+  }, []);
 
   // Review Mode: a read-only visit to an earlier level. The reviewed level comes
   // from the URL (?review=1&level=…) so it renders regardless of stored progress,

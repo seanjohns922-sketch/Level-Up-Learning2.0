@@ -257,7 +257,7 @@ export default function ProfilePage() {
   const [lastRealm, setLastRealmState] = useState("number-nexus");
 
   useEffect(() => {
-    setLastRealmState(getLastRealm());
+    setLastRealmState(getLastRealm() ?? "number-nexus");
   }, []);
 
   useEffect(() => {

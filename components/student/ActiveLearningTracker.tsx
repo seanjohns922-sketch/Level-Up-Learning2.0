@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { ensureStudentActivityDay, recordStudentActivityDelta } from "@/lib/student-activity";
+import { rememberActiveLearningDestination } from "@/lib/continue-learning";
 
 type ActiveLearningTrackerProps = {
   context: "lesson" | "session" | "pretest" | "posttest";
@@ -16,6 +17,7 @@ export function ActiveLearningTracker({ context }: ActiveLearningTrackerProps) {
   const pendingSecondsRef = useRef(0);
 
   useEffect(() => {
+    rememberActiveLearningDestination(context);
     void ensureStudentActivityDay();
 
     const markInteraction = () => {

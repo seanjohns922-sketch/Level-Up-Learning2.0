@@ -15,6 +15,7 @@
     "qa:student-session-isolation": "node scripts/student-session-isolation-audit.mjs",
     "qa:realm-availability": "node scripts/realm-availability-audit.mjs",
     "qa:realm-dashboard-navigation": "node scripts/realm-dashboard-navigation-audit.mjs",
+    "qa:my-home-shell": "node scripts/my-home-shell-audit.mjs",
     "qa:measurelands-progression": "node scripts/measurelands-progression-audit.mjs",
     "qa:level-integrity": "node scripts/level-integrity-audit.mjs",
     "qa:measurelands-assessments": "npx tsx scripts/audit-measurelands-assessments.ts",

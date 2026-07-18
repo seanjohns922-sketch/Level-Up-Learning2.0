@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
+import { EXPLORER_XP_LEVEL_BASE, getExplorerRankTitle } from "@/data/explorer-ranks";
 
 export type EconomyCategory =
   | "avatar"
@@ -80,13 +81,12 @@ export async function fetchStudentEconomy(studentId: string) {
 
 export function getExplorerRank(lifetimeXp: number): ExplorerRank {
   const safeXp = Math.max(0, Math.floor(lifetimeXp));
-  const level = Math.floor(Math.sqrt(safeXp / 75)) + 1;
-  const currentLevelXp = Math.pow(level - 1, 2) * 75;
-  const nextLevelXp = Math.pow(level, 2) * 75;
-  const tier = level >= 40 ? "Legendary Explorer" : level >= 30 ? "Platinum Explorer" : level >= 20 ? "Gold Explorer" : level >= 10 ? "Silver Explorer" : "Bronze Explorer";
+  const level = Math.floor(Math.sqrt(safeXp / EXPLORER_XP_LEVEL_BASE)) + 1;
+  const currentLevelXp = Math.pow(level - 1, 2) * EXPLORER_XP_LEVEL_BASE;
+  const nextLevelXp = Math.pow(level, 2) * EXPLORER_XP_LEVEL_BASE;
   return {
     level,
-    title: tier,
+    title: getExplorerRankTitle(level),
     currentXp: safeXp,
     nextLevelXp,
     progressPercent: Math.round(((safeXp - currentLevelXp) / Math.max(1, nextLevelXp - currentLevelXp)) * 100),

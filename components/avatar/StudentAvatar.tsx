@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 
 /**
  * StudentAvatar
@@ -49,7 +50,9 @@ export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
 function readOutfitFromStorage(): AvatarOutfit {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem("lul_avatar_outfit_v1");
+    const studentId = localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim();
+    if (!studentId) return {};
+    const raw = localStorage.getItem(`lul:${studentId}:avatar_outfit_v1`);
     if (raw) return JSON.parse(raw) as AvatarOutfit;
   } catch {
     /* ignore */
@@ -87,6 +90,7 @@ export default function StudentAvatar({
 
   return (
     <div
+      className="lul-student-avatar"
       style={{
         position: "relative",
         display: "inline-block",
@@ -274,6 +278,9 @@ export default function StudentAvatar({
         @keyframes lul-avatar-float {
           0%, 100% { transform: translateY(0); }
           50%      { transform: translateY(-4px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .lul-student-avatar { animation: none !important; }
         }
       `}</style>
     </div>

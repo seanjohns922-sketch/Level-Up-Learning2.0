@@ -66,7 +66,13 @@ export function markActiveStudentIntroSeen(studentId?: string | null) {
 
 export function clearActiveStudentSession() {
   if (typeof window === "undefined") return;
+  const studentId = getActiveStudentIdentity().studentId;
   clearLegacyBestChainStorage();
+  if (studentId) {
+    localStorage.removeItem(`lul:${studentId}:active_learning_v1`);
+    localStorage.removeItem(`lul:${studentId}:last_realm_v1`);
+    localStorage.removeItem(`lul:${studentId}:avatar_outfit_v1`);
+  }
   localStorage.removeItem(ACTIVE_STUDENT_KEY);
   localStorage.removeItem(ACTIVE_STUDENT_PROFILE_KEY);
   localStorage.removeItem(STUDENT_SESSION_TOKEN_KEY);

@@ -20,6 +20,7 @@ import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { supabase } from "@/lib/supabase";
 import { fetchGlobalXp } from "@/lib/economy";
 import RealmDashboardNav from "@/components/world/RealmDashboardNav";
+import { setLastRealm } from "@/lib/last-realm";
 
 type MeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 const REALM_ID = "measurement";
@@ -511,6 +512,9 @@ function MeasurelandsDistrictLabel({
 
 export default function MeasurelandsMap({ year = "Prep" }: { year?: MeasurelandsYear }) {
   const router = useRouter();
+  useEffect(() => {
+    setLastRealm("measurelands");
+  }, []);
   const resolvedYear: MeasurelandsYear =
     year === "Year 1" ? "Year 1" : year === "Year 2" ? "Year 2" : year === "Year 3" ? "Year 3" : year === "Year 4" ? "Year 4" : year === "Year 5" ? "Year 5" : year === "Year 6" ? "Year 6" : "Prep";
   const world = useMemo(() => getMeasurelandsWorldConfig(resolvedYear), [resolvedYear]);
