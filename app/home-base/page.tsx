@@ -97,9 +97,10 @@ export default function HomeBasePage() {
     (entry) => itemByKey.get(entry.item_key)?.category === "collectible",
   ).length ?? 0;
   const explorerRank = getExplorerRank(state?.wallet.xp_earned ?? 0);
-  const roomBackground = backgroundItem?.realm_id === "measurement"
-    ? "/images/measurelands-home-bg.jpg"
-    : "/images/number-nexus-home-bg.jpg";
+  // Home themes are realm-agnostic. Explorer Study is the free stock room.
+  const roomBackground =
+    (backgroundItem?.metadata as { image?: string } | undefined)?.image
+    ?? "/images/home-themes/explorer-study.png";
 
   function continueLearning() {
     if (!student?.studentId) {
