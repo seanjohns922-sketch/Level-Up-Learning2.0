@@ -89,6 +89,9 @@ function pick<T>(a: T[]): T {
 function Thumb({ outfit, height = 58 }: { outfit: AvatarOutfit; height?: number }) {
   return <StudentAvatar height={height} outfit={outfit} floatAnimation="none" alive={false} glowColor="rgba(15,23,42,0.10)" />;
 }
+function HeadThumb({ outfit }: { outfit: AvatarOutfit }) {
+  return <StudentAvatar height={67} framing="head" outfit={outfit} floatAnimation="none" alive={false} glowColor="rgba(15,23,42,0.08)" />;
+}
 /** Preview a single earnable garment over the free base look. */
 function layerPreview(base: AvatarOutfit, item: EconomyItem): AvatarOutfit {
   const layer = { ...(item.metadata as Record<string, unknown>) };
@@ -289,7 +292,7 @@ export default function ExplorerOutfitPage() {
       <section className={PANEL}>
         <Heading title={title} />
         <div className="flex flex-wrap gap-2.5">
-          <button type="button" onClick={() => clearSlot(equipSlot)} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center justify-center disabled:opacity-60 ${ring(!equippedKey)}`}>
+          <button type="button" onClick={() => clearSlot(equipSlot)} disabled={busy} className={`${optBase} flex h-[116px] w-[82px] flex-col items-center justify-center disabled:opacity-60 ${ring(!equippedKey)}`}>
             <span className="text-[11px] font-black text-slate-500">None</span>
           </button>
           {premiumCards(equipSlot)}
@@ -307,14 +310,14 @@ export default function ExplorerOutfitPage() {
       const isOn = equippedKey === item.item_key;
       const rarity = RARITY_STYLES[item.rarity];
       return (
-        <button key={item.item_key} type="button" title={item.name} onClick={() => equipItem(item)} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 disabled:opacity-60 ${ring(isOn)}`}>
+        <button key={item.item_key} type="button" title={item.name} onClick={() => equipItem(item)} disabled={busy} className={`${optBase} flex h-[116px] w-[82px] flex-col items-center overflow-hidden px-1 pt-1 disabled:opacity-60 ${ring(isOn)}`}>
           {isOn ? <Check className="absolute right-1 top-1 z-10 h-3.5 w-3.5 rounded-full bg-white text-teal-600" /> : null}
           {!isOwned ? (
             <span className="absolute right-1 top-1 z-10 flex items-center gap-0.5 rounded bg-slate-900/85 px-1 py-0.5 text-[8px] font-black text-white"><Lock className="h-2.5 w-2.5" />{item.price}</span>
           ) : null}
-          <span className="absolute left-1 top-1 z-10 rounded px-1 py-0.5 text-[7px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span>
-          <div className={!isOwned ? "opacity-45" : ""}><Thumb outfit={layerPreview(base, item)} /></div>
-          <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold" style={{ color: rarity.color }}>{item.name}</span>
+          <div className={`h-[67px] ${!isOwned ? "opacity-45" : ""}`}><Thumb outfit={layerPreview(base, item)} height={64} /></div>
+          <span className="w-full truncate text-center text-[9px] font-bold text-slate-600">{item.name}</span>
+          <span className="mb-1 mt-auto rounded px-1.5 py-0.5 text-[7px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span>
         </button>
       );
     });
@@ -429,9 +432,9 @@ export default function ExplorerOutfitPage() {
                 {HAIRSTYLES.map(([value, label]) => {
                   const on = (base.hairStyle ?? "swept") === value;
                   return (
-                    <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ hairStyle: value }, true)} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
-                      <Thumb outfit={{ ...merged, hairStyle: value }} />
-                      <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold text-slate-500">{label}</span>
+                    <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ hairStyle: value }, true)} className={`${optBase} flex h-[94px] w-[78px] flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
+                      <HeadThumb outfit={{ ...merged, hairStyle: value, hat: "none", glasses: "none" }} />
+                      <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[10px] font-bold text-slate-600">{label}</span>
                     </button>
                   );
                 })}

@@ -28,7 +28,8 @@
     "qa:measurelands-assessments": "npx tsx scripts/audit-measurelands-assessments.ts",
     "qa:assessment-routes": "npx tsx scripts/audit-assessment-routes.ts",
     "qa:class-creation-pgcrypto": "node scripts/class-creation-pgcrypto-audit.mjs",
-    "qa:marketplace-artwork": "node scripts/audit-marketplace-artwork.mjs"
+    "qa:marketplace-artwork": "node scripts/audit-marketplace-artwork.mjs",
+    "qa:wardrobe-visuals": "node scripts/wardrobe-visual-audit.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

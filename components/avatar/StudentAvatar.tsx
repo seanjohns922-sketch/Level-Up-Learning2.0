@@ -444,12 +444,10 @@ function BackpackStraps({ o }: { o: Outfit }) {
   );
 }
 
-// Shared RAISED, SWEPT front hairline (right sideburn -> across the forehead ->
-// left sideburn). Sits higher on the left and drops to the right so it reads as
-// styled hair framing the temples, not a low blunt cap. FRONT_L is the wider
-// variant for voluminous styles.
-const HAIR_FRONT = "Q91 49 84 49 Q86 45 79 46 Q71 43 62 43 Q52 41 44 43 Q37 42 39 47 Q33 48 34 53 Q29 53 27 58 Z";
-const HAIR_FRONT_L = "Q95 48 87 48 Q84 44 76 45 Q66 42 58 43 Q49 41 42 44 Q35 44 37 48 Q28 49 22 54 Z";
+// Raised hairlines leave the upper forehead open while keeping sideburns near
+// the ears. The asymmetry prevents the old flat helmet/sticker appearance.
+const HAIR_FRONT = "Q92 45 85 48 Q81 42 73 43 Q66 38 58 40 Q49 37 42 42 Q36 42 38 47 Q31 48 27 56 Z";
+const HAIR_FRONT_L = "Q97 44 88 48 Q83 41 75 42 Q66 37 58 39 Q48 36 40 42 Q33 43 35 48 Q27 49 22 54 Z";
 
 function HairLayer({ o }: { o: Outfit }) {
   // Each style: real VOLUME above the skull, sides that FRAME the temples/ears,
@@ -472,7 +470,7 @@ function HairLayer({ o }: { o: Outfit }) {
     case "buzz": // tight to the scalp, stippled, smallest silhouette
       return (
         <g data-layer="hair">
-          <path d="M30 56 Q28 26 60 22 Q92 26 90 56 Q88 49 82 49 Q84 46 77 47 Q69 44 61 45 Q52 43 45 45 Q38 44 40 48 Q34 49 35 53 Q31 53 30 56 Z" fill="url(#lul-hair)" opacity="0.95" />
+          <path d="M30 54 Q28 23 60 20 Q92 23 90 54 Q86 45 79 46 Q70 41 61 42 Q51 40 42 44 Q35 45 30 54 Z" fill="url(#lul-hair)" opacity="0.95" />
           <g fill={dk} opacity="0.28">
             {[38, 48, 58, 68, 78].map((x) => <circle key={x} cx={x} cy="33" r="0.9" />)}
             {[34, 44, 54, 64, 74, 84].map((x) => <circle key={`a${x}`} cx={x} cy="41" r="0.9" />)}
@@ -481,51 +479,59 @@ function HairLayer({ o }: { o: Outfit }) {
           {sh(46, 30, 15, 8)}
         </g>
       );
-    case "short": // neat crop with body + raised swept hairline
+    case "short": // compact, tidy and clearly layered at thumbnail size
       return (
         <g data-layer="hair">
-          <path d={`M27 58 Q22 10 60 5 Q98 10 93 58 ${HAIR_FRONT}`} fill="url(#lul-hair)" />
-          {sh(46, 24, 19, 11)}
+          <path d={`M27 56 Q22 12 58 7 Q91 5 94 35 Q96 47 92 45 ${HAIR_FRONT}`} fill="url(#lul-hair)" />
+          <path d="M31 37 Q35 14 57 10 Q75 7 88 20 Q71 15 58 25 Q47 18 31 37Z" fill="url(#lul-hair-lock)" opacity="0.82" />
+          {sep("M39 19 Q50 24 58 39")}
+          {sep("M56 12 Q68 21 76 40")}
+          {sh(44, 20, 18, 9)}
         </g>
       );
-    case "swept": // WIDE asymmetric sweep flowing across + past the right side
+    case "swept": // broad directional locks with a lifted forehead
       return (
         <g data-layer="hair">
-          <path d="M26 58 Q20 8 58 6 Q102 4 106 42 Q107 56 92 62 Q96 47 86 46 Q88 42 80 43 Q64 38 50 44 Q44 42 40 46 Q34 47 35 52 Q30 53 26 58 Z" fill="url(#lul-hair)" />
-          {sep("M52 16 Q78 20 98 46")}
-          {sep("M46 22 Q72 26 92 50")}
-          {sh(44, 22, 20, 10)}
+          <path d="M25 56 Q20 11 56 7 Q92 1 105 30 Q112 47 96 56 Q92 48 85 48 Q80 42 72 43 Q63 38 55 41 Q45 37 39 43 Q31 46 25 56Z" fill="url(#lul-hair)" />
+          <path d="M31 38 Q40 11 67 8 Q88 6 103 29 Q78 16 53 37 Q43 31 31 38Z" fill="url(#lul-hair-lock)" opacity="0.88" />
+          <path d="M43 39 Q58 14 91 15 Q74 23 62 42Z" fill={dk} opacity="0.18" />
+          {sep("M51 14 Q77 17 99 37")}
+          {sep("M42 23 Q66 24 88 44")}
+          {sh(43, 19, 20, 9)}
         </g>
       );
     case "sidepart": // deep part on the left + combed-over lift on the big side
       return (
         <g data-layer="hair">
-          <path d="M27 58 Q23 12 52 8 Q56 6 66 6 Q96 8 93 58 Q91 49 84 49 Q86 45 78 46 Q68 42 58 44 Q54 40 50 42 Q49 36 46 37 Q45 44 43 49 Q34 49 35 53 Q30 53 27 58 Z" fill="url(#lul-hair)" />
-          <path d="M48 20 Q45 34 44 48" stroke={dk} strokeWidth="1.8" strokeLinecap="round" opacity="0.4" fill="none" />
-          {sep("M54 16 Q72 20 88 40")}
-          {sep("M55 24 Q71 28 85 46")}
-          {sh(64, 18, 15, 8)}
+          <path d="M27 56 Q23 13 51 9 Q57 5 68 7 Q96 9 93 56 Q89 46 82 47 Q75 41 67 42 Q58 38 50 42 Q45 39 43 47 Q34 48 27 56Z" fill="url(#lul-hair)" />
+          <path d="M50 41 Q51 14 69 9 Q89 10 94 31 Q77 19 56 42Z" fill="url(#lul-hair-lock)" opacity="0.9" />
+          <path d="M50 15 Q47 29 47 43" stroke={dk} strokeWidth="2.2" strokeLinecap="round" opacity="0.55" fill="none" />
+          {sep("M58 14 Q76 18 89 35")}
+          {sep("M58 23 Q73 27 84 43")}
+          {sh(68, 16, 14, 7)}
         </g>
       );
     case "tuft": // compact crop + a bold playful front flick
       return (
         <g data-layer="hair">
-          <path d="M28 57 Q24 16 60 11 Q96 16 92 57 Q90 49 83 49 Q85 45 78 46 Q70 43 61 44 Q52 42 45 44 Q38 43 40 48 Q34 49 35 53 Q30 53 28 57 Z" fill="url(#lul-hair)" />
-          <path d="M50 22 Q46 2 66 3 Q76 4 73 15 Q70 6 61 10 Q68 13 66 20 Q58 13 50 22 Z" fill="url(#lul-hair)" />
-          {sh(46, 28, 14, 7)}
+          <path d="M28 55 Q25 17 60 12 Q94 16 92 55 Q88 46 80 47 Q70 41 61 42 Q50 39 42 44 Q34 47 28 55Z" fill="url(#lul-hair)" />
+          <path d="M44 30 Q43 7 58 7 Q67 -1 78 6 Q69 8 71 17 Q66 11 61 14 Q67 20 61 27 Q54 18 44 30Z" fill="url(#lul-hair-lock)" />
+          {sep("M51 11 Q55 20 57 29")}
+          {sh(45, 24, 14, 7)}
         </g>
       );
     case "spiky": // tall energetic chunky spikes rising from a raised hairline
       return (
         <g data-layer="hair">
-          <path d="M28 56 Q26 30 34 26 L37 12 L45 24 L49 8 L57 22 L61 7 L69 22 L77 9 L81 25 Q90 30 92 56 Q90 48 84 48 Q86 44 79 45 Q71 42 62 43 Q52 41 44 43 Q37 43 39 47 Q32 48 34 52 Q29 51 28 56 Z" fill="url(#lul-hair)" />
-          {sh(46, 22, 16, 9)}
+          <path d="M28 55 Q27 31 34 25 L37 9 46 22 50 4 58 21 63 3 70 21 80 7 82 25 Q91 31 92 55 Q88 46 81 47 Q72 40 63 42 Q52 38 43 43 Q34 46 28 55Z" fill="url(#lul-hair)" />
+          <path d="M36 28 47 13 51 29 63 10 68 29 79 16 82 35 Q62 24 42 36Z" fill="url(#lul-hair-lock)" opacity="0.72" />
+          {sh(45, 19, 15, 8)}
         </g>
       );
     case "curls": // bumpy defined curls all around, wrapping the temples
       return (
         <g data-layer="hair">
-          <path d="M23 60 Q19 22 60 18 Q101 22 97 60 Q94 48 86 48 Q70 42 60 44 Q50 42 34 48 Q26 48 23 60 Z" fill="url(#lul-hair)" />
+          <path d="M23 57 Q19 22 60 17 Q101 22 97 57 Q91 46 84 47 Q72 40 60 42 Q48 40 35 47 Q28 47 23 57Z" fill="url(#lul-hair)" />
           <g fill="url(#lul-hair)">
             <circle cx="28" cy="34" r="11" /><circle cx="26" cy="46" r="9" /><circle cx="38" cy="22" r="11" />
             <circle cx="52" cy="17" r="11" /><circle cx="68" cy="17" r="11" /><circle cx="82" cy="22" r="11" /><circle cx="92" cy="34" r="10" /><circle cx="94" cy="46" r="9" />
@@ -542,7 +548,7 @@ function HairLayer({ o }: { o: Outfit }) {
     case "afro": // huge soft round cloud, far bigger than the head
       return (
         <g data-layer="hair">
-          <path d="M18 54 Q7 40 13 24 Q15 6 34 9 Q42 2 58 5 Q66 2 84 9 Q105 7 107 24 Q114 40 101 54 Q98 44 88 44 Q94 31 60 29 Q26 31 32 44 Q22 44 18 54 Z" fill="url(#lul-hair)" />
+          <path d="M18 54 Q7 40 13 24 Q15 6 34 9 Q42 2 58 5 Q66 2 84 9 Q105 7 107 24 Q114 40 101 54 Q97 44 88 45 Q82 39 73 41 Q61 36 50 40 Q40 38 32 45 Q22 44 18 54Z" fill="url(#lul-hair)" />
           <g fill="#ffffff" opacity="0.09">
             <circle cx="32" cy="20" r="6" /><circle cx="50" cy="11" r="6.4" /><circle cx="72" cy="11" r="6.4" /><circle cx="90" cy="22" r="6" /><circle cx="60" cy="7" r="6.2" /><circle cx="20" cy="38" r="5" />
           </g>
@@ -820,6 +826,8 @@ type StudentAvatarProps = {
   outfit?: AvatarOutfit;
   glowColor?: string;
   floatAnimation?: string; // CSS animation name (e.g. "char-float 4.5s ease-in-out infinite")
+  /** Crop to the head and shoulders for hairstyle and face selectors. */
+  framing?: "full" | "head";
   /** Idle life: blink + breathe. On by default; pass false for tiny thumbnails. */
   alive?: boolean;
   /** Bump this number to play a one-shot "celebrate" pop (e.g. after equipping). */
@@ -831,6 +839,7 @@ export default function StudentAvatar({
   outfit,
   glowColor = "rgba(255,255,255,0.18)",
   floatAnimation = "lul-avatar-float 4.6s ease-in-out infinite",
+  framing = "full",
   alive = true,
   celebrateSignal = 0,
 }: StudentAvatarProps) {
@@ -875,8 +884,8 @@ export default function StudentAvatar({
   // A dress occupies the Bottom slot too — show slim leggings beneath the skirt.
   const bottomStyle: BottomStyle = o.top === "dress" ? "leggings" : o.bottom;
 
-  // Source viewBox is 120 × 220 — keep aspect when scaling by height.
-  const width = Math.round((height * 120) / 220);
+  const sourceHeight = framing === "head" ? 106 : 220;
+  const width = Math.round((height * 120) / sourceHeight);
 
   return (
     <div
@@ -892,7 +901,7 @@ export default function StudentAvatar({
       <svg
         width={width}
         height={height}
-        viewBox="0 0 120 220"
+        viewBox={`0 0 120 ${sourceHeight}`}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         shapeRendering="geometricPrecision"
@@ -909,6 +918,11 @@ export default function StudentAvatar({
           <linearGradient id="lul-hair" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={shade(o.hair, 0.36)} />
             <stop offset="45%" stopColor={o.hair} />
+            <stop offset="100%" stopColor={o.hairShade} />
+          </linearGradient>
+          <linearGradient id="lul-hair-lock" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor={shade(o.hair, 0.52)} />
+            <stop offset="42%" stopColor={shade(o.hair, 0.18)} />
             <stop offset="100%" stopColor={o.hairShade} />
           </linearGradient>
           <radialGradient id="lul-hair-sheen" cx="0.4" cy="0.28" r="0.5">
@@ -965,21 +979,22 @@ export default function StudentAvatar({
         <GlassesLayer o={o} />
       </svg>
 
-      {/* Ground glow */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: -10,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: width * 1.1,
-          height: 22,
-          borderRadius: "50%",
-          background: `radial-gradient(ellipse, ${glowColor} 0%, transparent 70%)`,
-          filter: "blur(6px)",
-          pointerEvents: "none",
-        }}
-      />
+      {framing === "full" ? (
+        <div
+          style={{
+            position: "absolute",
+            bottom: -10,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: width * 1.1,
+            height: 22,
+            borderRadius: "50%",
+            background: `radial-gradient(ellipse, ${glowColor} 0%, transparent 70%)`,
+            filter: "blur(6px)",
+            pointerEvents: "none",
+          }}
+        />
+      ) : null}
 
       <style>{`
         @keyframes lul-avatar-float {
