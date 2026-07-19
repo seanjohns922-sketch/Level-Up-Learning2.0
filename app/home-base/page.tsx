@@ -18,7 +18,6 @@ import EconomyHeader from "@/components/economy/EconomyHeader";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import HallOfLegendsWidget from "@/components/home/HallOfLegendsWidget";
 import GemIcon from "@/components/gems/GemIcon";
-import GemRevealHost from "@/components/gems/GemRevealHost";
 import { awardAndReveal } from "@/lib/gem-reveal";
 import type { GemVault } from "@/lib/gems";
 import {
@@ -143,7 +142,6 @@ export default function HomeBasePage() {
 
   return (
     <main className="min-h-screen bg-[#0f1115] text-white">
-      <GemRevealHost />
       <EconomyHeader
         xp={state?.wallet.xp_balance}
         essence={state?.wallet.essence}
