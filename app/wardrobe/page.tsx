@@ -218,6 +218,20 @@ export default function ExplorerOutfitPage() {
     await updateBase(patch, true);
   }
 
+  // Take an accessory back off (Head / Face Accessory / Cape / Backpack).
+  async function clearSlot(slot: string) {
+    if (!student?.studentId || busy || !state?.equipped[slot]) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      commit(await unequipEconomySlot(student.studentId, slot));
+    } catch (error) {
+      setMessage(economyErrorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function persistPresets(next: OutfitPreset[]) {
     setPresets(next);
     if (student?.studentId && typeof window !== "undefined") {
@@ -264,6 +278,25 @@ export default function ExplorerOutfitPage() {
 
   const dotCls = (on: boolean) => `${optBase} h-9 w-9 rounded-full ${ring(on)}`;
   const swatchCls = (on: boolean) => `${optBase} h-11 w-11 ${ring(on)}`;
+
+  // A worn-accessory section (Head / Face Accessory / Cape / Backpack): a None
+  // tile to take it off, then the earned items for that slot.
+  function accessorySlot(title: string, equipSlot: string) {
+    const items = itemsBySlot.get(equipSlot) ?? [];
+    if (items.length === 0) return null;
+    const equippedKey = state?.equipped[equipSlot];
+    return (
+      <section className={PANEL}>
+        <Heading title={title} />
+        <div className="flex flex-wrap gap-2.5">
+          <button type="button" onClick={() => clearSlot(equipSlot)} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center justify-center disabled:opacity-60 ${ring(!equippedKey)}`}>
+            <span className="text-[11px] font-black text-slate-500">None</span>
+          </button>
+          {premiumCards(equipSlot)}
+        </div>
+      </section>
+    );
+  }
 
   // Earned garments for a slot, shown after the free styles (locked → Marketplace).
   function premiumCards(equipSlot: string) {
@@ -486,6 +519,12 @@ export default function ExplorerOutfitPage() {
                 ))}
               </div>
             </section>
+
+            {/* Worn accessories (earned) */}
+            {accessorySlot("Head", "avatar_hat")}
+            {accessorySlot("Face Accessory", "avatar_glasses")}
+            {accessorySlot("Cape", "avatar_cape")}
+            {accessorySlot("Backpack", "avatar_backpack")}
           </div>
         </div>
       </div>
