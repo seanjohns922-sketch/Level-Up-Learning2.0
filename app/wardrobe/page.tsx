@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, Lock, Shuffle } from "lucide-react";
+import { Check, Lock, Plus, Shuffle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import StudentAvatar, { type AvatarOutfit, type BodyType, type BottomStyle, type FaceType, type HairStyle, type ShoeStyle, type TopStyle } from "@/components/avatar/StudentAvatar";
 import {
+  AVATAR_BASE_KEYS,
   economyErrorMessage,
   equipEconomyItem,
   fetchStudentEconomy,
@@ -95,6 +96,21 @@ function layerPreview(base: AvatarOutfit, item: EconomyItem): AvatarOutfit {
   return { ...base, ...layer } as AvatarOutfit;
 }
 
+// ── Outfit presets (saved looks) ────────────────────────────────────────────
+type OutfitPreset = { id: string; name: string; outfit: AvatarOutfit };
+const MAX_PRESETS = 5;
+const CLOTHING_SLOTS = ["top", "bottom", "footwear"] as const;
+const presetsKey = (studentId: string) => `lul:${studentId}:outfit_presets_v1`;
+/** Keep only the free-base fields of a look (drops equipped-only extras). */
+function baseFieldsOf(outfit: AvatarOutfit): AvatarOutfit {
+  const out: Record<string, unknown> = {};
+  for (const key of AVATAR_BASE_KEYS) {
+    const v = (outfit as Record<string, unknown>)[key];
+    if (v !== undefined) out[key] = v;
+  }
+  return out as AvatarOutfit;
+}
+
 const PANEL = "rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.12)]";
 const optBase = "relative rounded-xl border-2 bg-white transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500";
 const ring = (on: boolean) => (on ? "border-teal-600 ring-2 ring-teal-500/40" : "border-slate-200");
@@ -110,6 +126,7 @@ export default function ExplorerOutfitPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [presets, setPresets] = useState<OutfitPreset[]>([]);
   const sessionMessage = student?.studentId ? null : "Log in as a student to open your Explorer Outfit.";
   const firstName = student?.displayName?.trim().split(/\s+/)[0] ?? "Explorer";
 
@@ -121,6 +138,16 @@ export default function ExplorerOutfitPage() {
         persistAvatarToStorage(student.studentId, next);
       })
       .catch((error) => setMessage(economyErrorMessage(error)));
+  }, [student?.studentId]);
+
+  useEffect(() => {
+    if (!student?.studentId || typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(presetsKey(student.studentId));
+      if (raw) setPresets(JSON.parse(raw) as OutfitPreset[]);
+    } catch {
+      /* ignore */
+    }
   }, [student?.studentId]);
 
   const base: AvatarOutfit = state?.avatarBase ?? {};
@@ -189,6 +216,39 @@ export default function ExplorerOutfitPage() {
       }
     }
     await updateBase(patch, true);
+  }
+
+  function persistPresets(next: OutfitPreset[]) {
+    setPresets(next);
+    if (student?.studentId && typeof window !== "undefined") {
+      window.localStorage.setItem(presetsKey(student.studentId), JSON.stringify(next));
+    }
+  }
+  function savePreset() {
+    if (!state || presets.length >= MAX_PRESETS) return;
+    persistPresets([...presets, { id: crypto.randomUUID(), name: `Outfit ${presets.length + 1}`, outfit: merged }]);
+    bump();
+  }
+  function deletePreset(id: string) {
+    persistPresets(presets.filter((p) => p.id !== id));
+  }
+  async function applyPreset(p: OutfitPreset) {
+    if (!student?.studentId || busy) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      let next = await saveAvatarBase(student.studentId, baseFieldsOf(p.outfit));
+      // Take off any equipped premium clothing so the saved base look shows.
+      for (const slot of CLOTHING_SLOTS) {
+        if (next.equipped[slot]) next = await unequipEconomySlot(student.studentId, slot);
+      }
+      commit(next);
+      bump();
+    } catch (error) {
+      setMessage(economyErrorMessage(error));
+    } finally {
+      setBusy(false);
+    }
   }
 
   function surprise() {
@@ -261,6 +321,31 @@ export default function ExplorerOutfitPage() {
 
           {/* Free customisation */}
           <div className="flex flex-col gap-4">
+            {/* My Outfits (presets) */}
+            <section className={PANEL}>
+              <Heading title="My Outfits" />
+              <div className="flex flex-wrap gap-2.5">
+                {presets.map((p) => (
+                  <div key={p.id} className="relative">
+                    <button type="button" title={`Wear ${p.name}`} onClick={() => applyPreset(p)} disabled={busy} className={`${optBase} flex h-[100px] w-[74px] flex-col items-center overflow-hidden pt-1 disabled:opacity-60 border-slate-200`}>
+                      <Thumb outfit={p.outfit} height={66} />
+                      <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold text-slate-500">{p.name}</span>
+                    </button>
+                    <button type="button" aria-label={`Delete ${p.name}`} onClick={() => deletePreset(p.id)} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm hover:text-rose-500">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+                {presets.length < MAX_PRESETS ? (
+                  <button type="button" onClick={savePreset} disabled={!state} className={`${optBase} flex h-[100px] w-[74px] flex-col items-center justify-center gap-1 border-dashed border-slate-300 text-slate-500 hover:border-teal-500 hover:text-teal-600 disabled:opacity-50`}>
+                    <Plus className="h-5 w-5" />
+                    <span className="text-[10px] font-black">Save look</span>
+                  </button>
+                ) : null}
+              </div>
+              <p className="mt-2.5 text-[11px] text-slate-400">Save up to {MAX_PRESETS} outfits and switch any time.</p>
+            </section>
+
             {/* Character */}
             <section className={PANEL}>
               <Heading title="Character" />
