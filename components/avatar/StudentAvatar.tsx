@@ -444,151 +444,193 @@ function BackpackStraps({ o }: { o: Outfit }) {
 }
 
 function HairLayer({ o }: { o: Outfit }) {
-  // A clean hair cap: covers the crown and temples, with a soft rounded fringe
-  // that sits well ABOVE the eyebrows (brows are at ~y51) — the same hair colour
-  // throughout, so there is never a dark bar reading as a monobrow.
-  const cap = (
-    <path
-      d="M30 55 Q28 18 60 15 Q92 18 90 55 Q85 43 76 41 Q68 38 60 40 Q52 38 44 41 Q35 43 30 55 Z"
-      fill="url(#lul-hair)"
-    />
+  // Hair reads as hair (not a plastic cap) through: volume rising above the
+  // crown, a scalloped lock hairline instead of a smooth arc, strand lines that
+  // show flow direction, and a soft sheen. The fringe stays above the brows
+  // (~y51) so it never becomes a monobrow.
+  const s = o.hairShade;
+  const sheen = (
+    <path d="M41 26 Q57 18 75 27" stroke="#ffffff" strokeOpacity="0.2" strokeWidth="2.4" strokeLinecap="round" fill="none" />
   );
-  const shine = (
-    <path
-      d="M40 33 Q58 25 80 35"
-      stroke="#ffffff"
-      strokeOpacity="0.16"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      fill="none"
-    />
-  );
+  const strand = (d: string) => <path d={d} stroke={s} strokeWidth="1.2" strokeLinecap="round" opacity="0.42" fill="none" />;
 
   switch (o.hairStyle) {
     case "buzz":
       return (
         <g data-layer="hair">
-          <path d="M32 53 Q31 23 60 21 Q89 23 88 53 Q80 47 60 47 Q40 47 32 53 Z" fill="url(#lul-hair)" opacity="0.92" />
+          <path d="M32 52 Q31 24 60 22 Q89 24 88 52 Q80 47 60 47 Q40 47 32 52 Z" fill="url(#lul-hair)" opacity="0.9" />
+          <g fill={s} opacity="0.28">
+            {[38, 48, 58, 68, 78].map((x) => <circle key={x} cx={x} cy="34" r="0.9" />)}
+            {[43, 53, 63, 73].map((x) => <circle key={x} cx={x} cy="41" r="0.9" />)}
+            {[34, 46, 60, 74, 86].map((x) => <circle key={`b${x}`} cx={x} cy="46" r="0.8" />)}
+          </g>
         </g>
       );
     case "short":
       return (
         <g data-layer="hair">
-          {cap}
-          {shine}
+          <path d="M28 54 Q25 20 43 13 Q60 6 78 14 Q95 20 92 54 Q88 45 82 45 Q83 36 74 37 Q72 31 63 35 Q60 31 56 35 Q50 31 47 37 Q39 36 38 44 Q33 45 28 54 Z" fill="url(#lul-hair)" />
+          {strand("M47 19 Q52 30 49 43")}
+          {strand("M60 15 Q62 28 60 41")}
+          {strand("M73 19 Q69 30 72 43")}
+          {sheen}
         </g>
       );
     case "sidepart":
       return (
         <g data-layer="hair">
-          {/* fringe swept across from a side part */}
-          <path d="M30 55 Q29 18 60 15 Q91 18 90 55 Q86 41 72 39 Q64 30 44 37 Q36 41 30 55 Z" fill="url(#lul-hair)" />
-          <path d="M50 22 Q66 28 83 37" stroke={o.hairShade} strokeWidth="1.3" strokeLinecap="round" opacity="0.5" fill="none" />
+          {/* deep left part, hair combed over to the right */}
+          <path d="M28 54 Q26 19 45 13 Q60 8 79 14 Q95 21 92 54 Q88 44 82 44 Q86 33 73 34 Q66 25 52 30 Q48 22 46 22 Q45 30 44 34 Q37 37 34 45 Q31 46 28 54 Z" fill="url(#lul-hair)" />
+          {/* part gap */}
+          <path d="M46 21 Q47 30 45 36" stroke={s} strokeWidth="1.8" strokeLinecap="round" opacity="0.55" fill="none" />
+          {/* comb-over strands */}
+          {strand("M49 26 Q66 30 82 40")}
+          {strand("M50 32 Q66 36 82 45")}
+          {sheen}
         </g>
       );
     case "tuft":
       return (
         <g data-layer="hair">
-          <path d="M33 53 Q34 24 60 22 Q86 24 87 53 Q80 45 70 45 Q66 37 60 38 Q54 37 50 45 Q40 45 33 53 Z" fill="url(#lul-hair)" />
-          <path d="M55 24 Q60 11 66 23 Q62 18 55 24 Z" fill="url(#lul-hair)" />
+          <path d="M32 53 Q32 25 60 23 Q88 25 88 53 Q82 46 72 46 Q68 39 60 40 Q52 39 48 46 Q38 46 32 53 Z" fill="url(#lul-hair)" />
+          {/* front cowlick tuft */}
+          <path d="M54 25 Q57 9 69 16 Q64 14 61 20 Q66 19 68 24 Q60 22 54 25 Z" fill="url(#lul-hair)" />
+          {strand("M45 30 Q49 38 47 45")}
+          {strand("M74 30 Q71 38 73 45")}
         </g>
       );
     case "spiky":
       return (
         <g data-layer="hair">
-          <path d="M30 51 Q30 24 60 21 Q90 24 90 51 Q84 42 78 44 L82 29 L72 42 L74 25 L64 40 L61 23 L54 40 L49 26 L47 44 L40 29 L43 45 Q36 43 30 51 Z" fill="url(#lul-hair)" />
+          <path d="M29 52 Q29 30 60 27 Q91 30 91 52 Q85 44 79 45 L84 24 L74 42 L75 20 L64 39 L61 18 L55 39 L45 20 L46 42 L36 24 L41 45 Q35 44 29 52 Z" fill="url(#lul-hair)" />
+          {strand("M60 24 L60 40")}
+          {strand("M49 27 L52 41")}
+          {strand("M71 27 L68 41")}
         </g>
       );
     case "curls":
       return (
         <g data-layer="hair">
-          <path d="M30 53 Q28 20 60 16 Q92 20 90 53 Q90 46 85 46 Q88 37 79 37 Q82 28 71 31 Q73 22 60 25 Q47 22 49 31 Q38 28 41 37 Q32 37 35 46 Q30 46 30 53 Z" fill="url(#lul-hair)" />
-          <circle cx="42" cy="31" r="4" fill="#ffffff" opacity="0.07" />
-          <circle cx="60" cy="25" r="4.2" fill="#ffffff" opacity="0.07" />
-          <circle cx="78" cy="31" r="4" fill="#ffffff" opacity="0.07" />
-          <circle cx="34" cy="44" r="3.2" fill="#ffffff" opacity="0.06" />
-          <circle cx="86" cy="44" r="3.2" fill="#ffffff" opacity="0.06" />
+          {/* bumpy curl mass */}
+          <path d="M28 50 Q24 20 60 15 Q96 20 92 50 Q94 44 88 42 Q92 34 84 33 Q88 25 78 27 Q80 18 69 23 Q71 14 60 20 Q49 14 51 23 Q40 18 42 27 Q32 25 36 33 Q28 34 32 42 Q26 44 28 50 Z" fill="url(#lul-hair)" />
+          <g fill="#ffffff" opacity="0.1">
+            <circle cx="44" cy="28" r="4.2" /><circle cx="60" cy="22" r="4.6" /><circle cx="76" cy="28" r="4.2" />
+            <circle cx="36" cy="40" r="3.6" /><circle cx="84" cy="40" r="3.6" /><circle cx="52" cy="34" r="3.4" /><circle cx="68" cy="34" r="3.4" />
+          </g>
+          <g fill={s} opacity="0.25">
+            <circle cx="50" cy="26" r="2" /><circle cx="70" cy="26" r="2" /><circle cx="60" cy="33" r="2" />
+          </g>
         </g>
       );
     case "afro":
       return (
         <g data-layer="hair">
-          <path d="M26 48 Q19 9 60 7 Q101 9 94 48 Q95 63 83 67 Q90 45 80 37 Q86 27 60 25 Q34 27 40 37 Q30 45 37 67 Q25 63 26 48 Z" fill="url(#lul-hair)" />
-          <circle cx="40" cy="19" r="3.2" fill="#000" opacity="0.10" />
-          <circle cx="60" cy="11" r="3.2" fill="#000" opacity="0.10" />
-          <circle cx="80" cy="19" r="3.2" fill="#000" opacity="0.10" />
-          <circle cx="30" cy="40" r="3" fill="#000" opacity="0.08" />
-          <circle cx="90" cy="40" r="3" fill="#000" opacity="0.08" />
+          {/* big rounded cloud with a scalloped edge */}
+          <path d="M24 48 Q16 40 20 30 Q18 18 30 15 Q34 6 46 9 Q52 2 60 6 Q68 2 74 9 Q86 6 90 15 Q102 18 100 30 Q104 40 96 48 Q98 60 86 64 Q88 46 80 38 Q86 28 60 26 Q34 28 40 38 Q32 46 34 64 Q22 60 24 48 Z" fill="url(#lul-hair)" />
+          <g fill="#ffffff" opacity="0.08">
+            <circle cx="34" cy="22" r="5" /><circle cx="50" cy="14" r="5" /><circle cx="70" cy="14" r="5" /><circle cx="86" cy="22" r="5" />
+            <circle cx="26" cy="38" r="4.4" /><circle cx="94" cy="38" r="4.4" /><circle cx="60" cy="12" r="5" />
+          </g>
+          <g fill={s} opacity="0.2">
+            <circle cx="42" cy="20" r="2.4" /><circle cx="60" cy="24" r="2.4" /><circle cx="78" cy="20" r="2.4" />
+          </g>
         </g>
       );
     case "long":
       return (
         <g data-layer="hair">
-          {/* long lengths falling past the shoulders */}
-          <path d="M29 48 Q20 82 27 116 Q36 120 43 111 Q37 80 41 50 Z" fill="url(#lul-hair)" />
-          <path d="M91 48 Q100 82 93 116 Q84 120 77 111 Q83 80 79 50 Z" fill="url(#lul-hair)" />
-          {cap}
-          {shine}
+          {/* long locks past the shoulders with pointed, wavy tips */}
+          <path d="M28 46 Q16 78 22 108 Q24 120 32 118 Q30 100 36 92 Q28 118 40 116 Q40 96 44 60 Z" fill="url(#lul-hair)" />
+          <path d="M92 46 Q104 78 98 108 Q96 120 88 118 Q90 100 84 92 Q92 118 80 116 Q80 96 76 60 Z" fill="url(#lul-hair)" />
+          {/* crown + swept fringe */}
+          <path d="M28 54 Q25 16 60 12 Q95 16 92 54 Q88 42 78 41 Q72 32 60 35 Q48 32 42 41 Q32 42 28 54 Z" fill="url(#lul-hair)" />
+          {strand("M33 60 Q28 86 34 108")}
+          {strand("M87 60 Q92 86 86 108")}
+          {sheen}
         </g>
       );
     case "bob":
       return (
         <g data-layer="hair">
-          {/* chin-length bob framing the face */}
-          <path d="M28 52 Q26 20 60 16 Q94 20 92 52 Q92 78 84 92 Q80 78 82 58 Q80 46 72 42 Q66 40 60 41 Q54 40 48 42 Q40 46 38 58 Q40 78 36 92 Q28 78 28 52 Z" fill="url(#lul-hair)" />
-          {shine}
+          {/* chin-length bob with inward-curling tips + a soft fringe */}
+          <path d="M27 52 Q25 18 60 14 Q95 18 93 52 Q94 76 85 94 Q80 96 78 90 Q84 74 82 58 Q80 45 71 42 Q66 38 60 39 Q54 38 49 42 Q40 45 38 58 Q36 74 42 90 Q40 96 35 94 Q26 76 27 52 Z" fill="url(#lul-hair)" />
+          {/* fringe wisps */}
+          {strand("M48 34 Q46 42 48 48")}
+          {strand("M60 32 Q60 40 60 46")}
+          {strand("M72 34 Q74 42 72 48")}
+          {sheen}
         </g>
       );
     case "ponytail":
       return (
         <g data-layer="hair">
-          {/* high ponytail flowing behind on one side */}
-          <path d="M82 26 Q108 32 103 64 Q100 86 87 79 Q98 54 80 43 Z" fill="url(#lul-hair)" />
-          <path d="M79 30 Q88 25 92 33" stroke={o.hairShade} strokeWidth="2.4" strokeLinecap="round" fill="none" opacity="0.55" />
-          {cap}
-          {shine}
+          {/* pulled-back tail with locks + tie */}
+          <path d="M83 24 Q106 30 104 56 Q103 78 88 76 Q99 66 96 50 Q99 40 82 40 Z" fill="url(#lul-hair)" />
+          {strand("M90 34 Q98 46 92 66")}
+          {/* smooth pulled-back crown */}
+          <path d="M28 54 Q26 16 60 13 Q94 16 90 44 Q86 36 78 37 Q70 30 60 33 Q49 31 42 40 Q33 42 28 54 Z" fill="url(#lul-hair)" />
+          {strand("M40 26 Q58 20 78 30")}
+          {/* hair tie */}
+          <path d="M79 37 Q84 40 83 45 Q79 43 76 42 Z" fill={s} />
+          {sheen}
         </g>
       );
     case "pigtails":
       return (
         <g data-layer="hair">
-          {/* two low pigtails */}
-          <path d="M27 46 Q11 50 14 74 Q17 90 31 82 Q23 64 34 54 Z" fill="url(#lul-hair)" />
-          <path d="M93 46 Q109 50 106 74 Q103 90 89 82 Q97 64 86 54 Z" fill="url(#lul-hair)" />
-          {cap}
-          <circle cx="31" cy="49" r="3" fill={o.hairShade} />
-          <circle cx="89" cy="49" r="3" fill={o.hairShade} />
+          {/* two bunches with wavy tips + ties */}
+          <path d="M26 46 Q10 50 12 72 Q13 88 26 84 Q19 76 24 70 Q16 84 28 80 Q29 64 34 54 Z" fill="url(#lul-hair)" />
+          <path d="M94 46 Q110 50 108 72 Q107 88 94 84 Q101 76 96 70 Q104 84 92 80 Q91 64 86 54 Z" fill="url(#lul-hair)" />
+          {/* crown with centre part */}
+          <path d="M29 54 Q27 18 60 14 Q93 18 91 54 Q86 43 78 42 Q71 33 60 36 Q49 33 42 42 Q34 43 29 54 Z" fill="url(#lul-hair)" />
+          <path d="M60 16 Q60 26 60 34" stroke={s} strokeWidth="1.4" opacity="0.5" fill="none" />
+          {/* ties */}
+          <circle cx="30" cy="50" r="3" fill={s} />
+          <circle cx="90" cy="50" r="3" fill={s} />
         </g>
       );
     case "bun":
       return (
         <g data-layer="hair">
-          {cap}
-          <circle cx="60" cy="12" r="9.5" fill="url(#lul-hair)" />
-          <ellipse cx="60" cy="12" rx="9.5" ry="9.5" fill="#000" opacity="0.08" />
-          <path d="M52 9 Q60 3 68 9" stroke="#ffffff" strokeOpacity="0.16" strokeWidth="1.4" fill="none" />
+          {/* smooth swept-up crown */}
+          <path d="M28 54 Q26 20 60 15 Q94 20 92 54 Q88 43 79 42 Q70 34 60 36 Q50 34 41 42 Q32 43 28 54 Z" fill="url(#lul-hair)" />
+          {strand("M40 30 Q60 22 80 30")}
+          {strand("M44 24 Q60 18 76 24")}
+          {/* top bun */}
+          <circle cx="60" cy="11" r="10" fill="url(#lul-hair)" />
+          <path d="M52 8 Q60 3 68 8" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1.6" fill="none" />
+          <path d="M53 15 Q60 18 67 15" stroke={s} strokeWidth="1.4" opacity="0.4" fill="none" />
+          {sheen}
         </g>
       );
     case "braids":
       return (
         <g data-layer="hair">
-          {/* two braids down each side with rung shading */}
-          <path d="M29 48 Q23 80 29 110 L41 110 Q39 80 40 50 Z" fill="url(#lul-hair)" />
-          <path d="M91 48 Q97 80 91 110 L79 110 Q81 80 80 50 Z" fill="url(#lul-hair)" />
-          {[60, 74, 88, 102].map((y) => (
-            <g key={y}>
-              <path d={`M29 ${y} Q35 ${y + 3} 41 ${y}`} stroke={o.hairShade} strokeWidth="1.3" fill="none" opacity="0.6" />
-              <path d={`M79 ${y} Q85 ${y + 3} 91 ${y}`} stroke={o.hairShade} strokeWidth="1.3" fill="none" opacity="0.6" />
+          {/* two plaits: overlapping segments read as braids */}
+          {[
+            [26, 30],
+            [94, 90],
+          ].map(([xOuter, xInner], side) => (
+            <g key={side}>
+              {[54, 66, 78, 90, 102].map((y, i) => (
+                <ellipse key={y} cx={(xOuter + xInner) / 2} cy={y} rx="7" ry="6.5" fill="url(#lul-hair)"
+                  transform={`rotate(${i % 2 === 0 ? -18 : 18} ${(xOuter + xInner) / 2} ${y})`} />
+              ))}
+              <path d={`M${(xOuter + xInner) / 2 - 4} 108 Q${(xOuter + xInner) / 2} 116 ${(xOuter + xInner) / 2 + 4} 108`} fill="url(#lul-hair)" />
             </g>
           ))}
-          {cap}
+          {/* crown with centre part */}
+          <path d="M29 54 Q27 18 60 14 Q93 18 91 54 Q86 43 78 42 Q71 33 60 36 Q49 33 42 42 Q34 43 29 54 Z" fill="url(#lul-hair)" />
+          <path d="M60 16 Q60 26 60 34" stroke={s} strokeWidth="1.4" opacity="0.5" fill="none" />
         </g>
       );
     default: // swept
       return (
         <g data-layer="hair">
-          <path d="M30 55 Q28 17 60 14 Q92 17 90 55 Q86 41 74 39 Q68 31 57 33 Q46 33 40 40 Q34 42 30 55 Z" fill="url(#lul-hair)" />
-          {shine}
+          <path d="M27 54 Q24 17 45 12 Q62 6 80 15 Q94 22 91 52 Q89 43 84 43 Q88 33 79 32 Q68 26 53 33 Q44 37 39 46 Q33 47 27 54 Z" fill="url(#lul-hair)" />
+          {strand("M50 20 Q66 26 82 40")}
+          {strand("M47 27 Q63 33 79 46")}
+          {sheen}
         </g>
       );
   }
