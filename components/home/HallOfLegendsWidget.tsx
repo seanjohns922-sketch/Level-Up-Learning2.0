@@ -19,12 +19,15 @@ export default function HallOfLegendsWidget() {
   useEffect(() => {
     // Progress lives in localStorage, so it can only be read after mount
     // (avoids an SSR/hydration mismatch); the initial null render shows "—".
-    const progress = readProgress();
+    // Progress is realm-scoped, so read each realm's own record — otherwise
+    // Measurelands unlocks (saved under the "measurement" scope) are missed.
+    const numberProgress = readProgress("number");
+    const measureProgress = readProgress("measurement");
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setUnlocked(
       new Set<string>([
-        ...getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends, "number-nexus"),
-        ...getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends, "measurelands"),
+        ...getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
+        ...getEffectiveUnlockedLegendIds(measureProgress?.year, measureProgress?.unlockedLegends, "measurelands"),
       ]),
     );
   }, []);

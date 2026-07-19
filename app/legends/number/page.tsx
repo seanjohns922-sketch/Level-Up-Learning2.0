@@ -19,7 +19,7 @@ export default function NumbotCollectionPage() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setProgress(readProgress());
+      setProgress(readProgress("number"));
       setBarAnimated(true);
     }, 100);
     return () => clearTimeout(t);

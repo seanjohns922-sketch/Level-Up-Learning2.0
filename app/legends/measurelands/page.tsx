@@ -19,7 +19,7 @@ export default function MeasurelandsCollectionPage() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setProgress(readProgress());
+      setProgress(readProgress("measurement"));
       setBarAnimated(true);
     }, 100);
     return () => clearTimeout(t);
