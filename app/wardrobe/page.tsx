@@ -51,7 +51,7 @@ const HAIRSTYLES: Array<[HairStyle, string]> = [
   ["short", "Short"], ["swept", "Swept"], ["sidepart", "Side Part"], ["tuft", "Tuft"],
   ["spiky", "Spiky"], ["curls", "Curly"], ["afro", "Afro"], ["buzz", "Buzz"],
   ["long", "Long"], ["bob", "Bob"], ["ponytail", "Ponytail"], ["pigtails", "Pigtails"],
-  ["bun", "Top Knot"], ["braids", "Braids"],
+  ["bun", "Top Knot"], ["braids", "Braids"], ["bald", "Bald"],
 ];
 const HAIRCOLORS: Array<[string, string, string]> = [
   ["#2e2422", "#161010", "Black"], ["#4a2e1c", "#2e1a0e", "Brown"], ["#6b4423", "#432a13", "Chestnut"],

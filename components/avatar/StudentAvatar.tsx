@@ -37,7 +37,8 @@ export type HairStyle =
   | "sidepart"
   | "pigtails"
   | "bob"
-  | "spiky";
+  | "spiky"
+  | "bald";
 export type HatStyle = "none" | "beanie" | "cap" | "explorer" | "crown" | "wizard";
 export type GlassesStyle = "none" | "round" | "shades" | "visor";
 export type CapeStyle = "none" | "hero" | "royal";
@@ -462,6 +463,12 @@ function HairLayer({ o }: { o: Outfit }) {
   );
 
   switch (o.hairStyle) {
+    case "bald": // no hair — just a soft scalp highlight so it reads intentional
+      return (
+        <g data-layer="hair">
+          <ellipse cx="52" cy="32" rx="14" ry="9" fill="#ffffff" opacity="0.12" transform="rotate(-18 52 32)" />
+        </g>
+      );
     case "buzz": // tight to the scalp, stippled, smallest silhouette
       return (
         <g data-layer="hair">
