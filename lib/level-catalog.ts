@@ -1,5 +1,7 @@
 import type { StudentProgress } from "@/data/progress";
 import { getEffectiveUnlockedLegendIds, getLegendForYear, type LegendRealmId } from "@/data/legends";
+import { normalizeStarpathLevel } from "@/lib/starpath-levels";
+import { buildStarpathWorldHref } from "@/lib/starpath-routes";
 
 // The single source of truth for the 7 progression levels (Ground → Level 6).
 // Shared by the retired Choose-Level screen and the in-realm "Levels" drawer so
@@ -20,9 +22,9 @@ export function levelIndexForYear(year: string | null | undefined): number {
   return LEVEL_CATALOG.findIndex((level) => level.id === year);
 }
 
-const REALM_ROUTES: Record<string, string> = {
-  "number-nexus": "/number-nexus",
-  measurelands: "/measurelands",
+const REALM_ROUTES: Record<string, { route: string; realmId?: string }> = {
+  "number-nexus": { route: "/number-nexus" },
+  measurelands: { route: "/measurelands" },
 };
 
 // Build the URL for entering a realm at a given level. Entering an EARLIER level
@@ -34,15 +36,28 @@ export function buildRealmLevelHref(
   currentYear: string | null | undefined,
   isPreview: boolean
 ): { href: string; review: boolean } {
-  const route = REALM_ROUTES[realmId] ?? "/number-nexus";
+  if (realmId === "starpath-realm") {
+    return {
+      href: buildStarpathWorldHref({ selectedLevel: normalizeStarpathLevel(targetYear) }),
+      review: false,
+    };
+  }
+  const destination = REALM_ROUTES[realmId];
+  if (!destination) {
+    return {
+      href: `/realms?level=${encodeURIComponent(targetYear)}`,
+      review: false,
+    };
+  }
   const review =
     !isPreview &&
     !!currentYear &&
     targetYear !== currentYear &&
     levelIndexForYear(targetYear) < levelIndexForYear(currentYear);
   const params = new URLSearchParams({ level: targetYear });
+  if (destination.realmId) params.set("realm_id", destination.realmId);
   if (review) params.set("review", "1");
-  return { href: `${route}?${params.toString()}`, review };
+  return { href: `${destination.route}?${params.toString()}`, review };
 }
 
 export function levelLabelForYear(year: string | null | undefined): string {

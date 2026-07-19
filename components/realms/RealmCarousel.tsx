@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
@@ -11,6 +11,9 @@ import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/student
 import { getRealmAvailability, isRealmEnabled, resolveRealmEntryRoute } from "@/lib/realm-entry";
 import { exitReviewMode } from "@/lib/review-mode";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import { LEVEL_CATALOG } from "@/lib/level-catalog";
+import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
+import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 
 // Read a specific realm's scoped progress (the carousel lives on /realms where
 // the default scope is "number", so the focused realm's scope is passed
@@ -41,6 +44,7 @@ const REALMS = [
 
 export default function RealmCarousel() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const previewMode = isDemoPreviewMode();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -96,25 +100,49 @@ export default function RealmCarousel() {
   // Use the cathedral/tower-interior aesthetic across all levels.
   const isTopChamber = true;
 
-  // The Tower only picks the realm — the level lives inside each realm now. The
-  // focused realm's scoped progress just drives the portal art (its placed level).
-  const focusedScope: ProgressRealmScope = current.id === "measurelands" ? "measurement" : "number";
+  const requestedLevel = searchParams.get("level");
+  const selectedLevel = LEVEL_CATALOG.some((level) => level.id === requestedLevel)
+    ? requestedLevel
+    : null;
+  const profileLevel = getActiveStudentProfile()?.yearLevel ?? null;
+  const selectedStarpathLevel = tryNormalizeStarpathLevel(requestedLevel) ??
+    tryNormalizeStarpathLevel(profileLevel);
+
+  // Only live curriculum realms may read scoped progress. Locked realms must
+  // never borrow Number Nexus placement as their selected level.
+  const focusedScope: ProgressRealmScope | null = current.id === "measurelands"
+    ? "measurement"
+    : current.id === "number-nexus"
+      ? "number"
+      : null;
   const focusedProgress = useMemo(
-    () => readScopedProgress(focusedScope),
+    () => focusedScope ? readScopedProgress(focusedScope) : null,
     [focusedScope]
   );
-  const levelNumber = Number((focusedProgress?.year ?? "Year 1").replace(/[^0-9]/g, "")) || 1;
+  const displayedLevel = selectedLevel ?? focusedProgress?.year ?? profileLevel ?? "Year 1";
+  const levelNumber = current.id === "starpath-realm" && selectedStarpathLevel
+    ? getStarpathLevel(selectedStarpathLevel).levelNumber
+    : Number(displayedLevel.replace(/[^0-9]/g, "")) || 1;
 
   async function enterRealm() {
     if (!isActive || enteringRealm) return;
     const availability = getRealmAvailability(current.id);
     if (!availability) return;
 
-    // Entering a realm always drops the student on their PLACED level (or a
-    // pre-test if new). The realm resolves that from its own scoped progress —
-    // no level is chosen here, and any prior review session is cleared.
+    // Live curriculum realms resolve their placed level from scoped progress.
+    // Starpath preserves the selected Tower level without treating it as a
+    // placement. Any prior review session is cleared in both cases.
     setLastRealm(current.id);
     exitReviewMode();
+
+    if (availability.destinationRealmId === STARPATH_REALM_ID) {
+      if (!selectedStarpathLevel) {
+        setEntryError("Select a valid Starpath level before entering this realm.");
+        return;
+      }
+      router.push(buildStarpathWorldHref({ selectedLevel: selectedStarpathLevel }));
+      return;
+    }
 
     if (previewMode) {
       router.push(availability.route);
