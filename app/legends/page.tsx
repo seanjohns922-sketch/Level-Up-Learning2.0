@@ -127,12 +127,16 @@ const REALMS: RealmDef[] = [
 
 export default function LegendsPage() {
   const router = useRouter();
-  const [progress] = useState<StudentProgress | null>(() => readProgress());
+  // Progress is realm-scoped in storage, so each realm's legends must be read
+  // from its own record — otherwise Measurelands unlocks (saved under the
+  // "measurement" scope) are invisible on this shared page.
+  const [numberProgress] = useState<StudentProgress | null>(() => readProgress("number"));
+  const [measureProgress] = useState<StudentProgress | null>(() => readProgress("measurement"));
   const demoPreview = isDemoPreviewMode();
 
   const unlockedIds = useMemo(
-    () => getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends),
-    [progress]
+    () => getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
+    [numberProgress]
   );
 
   const numbotCollected = useMemo(() => {
@@ -145,25 +149,11 @@ export default function LegendsPage() {
     const all = getAllLegends("measurelands");
     const visibleIds = demoPreview
       ? all.map((legend) => legend.id)
-      : getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends, "measurelands");
+      : getEffectiveUnlockedLegendIds(measureProgress?.year, measureProgress?.unlockedLegends, "measurelands");
     return all.filter((legend) => visibleIds.includes(legend.id)).length;
-  }, [demoPreview, progress?.unlockedLegends, progress?.year]);
+  }, [demoPreview, measureProgress]);
 
-  const realms = useMemo(
-    () =>
-      REALMS.map((realm) =>
-        realm.id === "measurelands" && !demoPreview
-          ? {
-              ...realm,
-              status: "locked" as const,
-              route: undefined,
-              glowColor: "transparent",
-              borderGlow: "rgba(255,255,255,0.15)",
-            }
-          : realm
-      ),
-    [demoPreview]
-  );
+  const realms = REALMS;
 
   const totalCollected = numbotCollected + measurelandsCollected;
   const totalLegends = realms.reduce((sum, r) => sum + r.totalLegends, 0);
@@ -196,11 +186,11 @@ export default function LegendsPage() {
         <div className="max-w-4xl mx-auto w-full px-5 pt-5 pb-2">
           <div className="flex items-center justify-between mb-6">
             <button
-              onClick={() => router.push("/number-nexus")}
+              onClick={() => router.push("/home-base")}
               className="text-sm font-bold text-amber-200 hover:text-white transition flex items-center gap-1"
               style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
             >
-              ← World Map
+              ← My Home
             </button>
             <div
               className="text-sm font-bold px-4 py-1.5 rounded-full border shadow-sm"
