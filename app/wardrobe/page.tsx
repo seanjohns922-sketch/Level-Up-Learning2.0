@@ -1,16 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, Shuffle } from "lucide-react";
+import { Check, Lock, Shuffle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import StudentAvatar, { type AvatarOutfit, type BodyType, type BottomStyle, type FaceType, type HairStyle, type ShoeStyle, type TopStyle } from "@/components/avatar/StudentAvatar";
 import {
   economyErrorMessage,
+  equipEconomyItem,
   fetchStudentEconomy,
   getExplorerRank,
   mergeAvatarOutfit,
   persistAvatarToStorage,
+  RARITY_STYLES,
   saveAvatarBase,
+  unequipEconomySlot,
+  type EconomyItem,
   type EconomyState,
 } from "@/lib/economy";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
@@ -83,6 +88,12 @@ function pick<T>(a: T[]): T {
 function Thumb({ outfit, height = 58 }: { outfit: AvatarOutfit; height?: number }) {
   return <StudentAvatar height={height} outfit={outfit} floatAnimation="none" alive={false} glowColor="rgba(15,23,42,0.10)" />;
 }
+/** Preview a single earnable garment over the free base look. */
+function layerPreview(base: AvatarOutfit, item: EconomyItem): AvatarOutfit {
+  const layer = { ...(item.metadata as Record<string, unknown>) };
+  delete layer.slot;
+  return { ...base, ...layer } as AvatarOutfit;
+}
 
 const PANEL = "rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.12)]";
 const optBase = "relative rounded-xl border-2 bg-white transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500";
@@ -93,10 +104,12 @@ function Heading({ title }: { title: string }) {
 }
 
 export default function ExplorerOutfitPage() {
+  const router = useRouter();
   const student = useMemo(() => getActiveStudentProfile(), []);
   const [state, setState] = useState<EconomyState | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState(0);
+  const [busy, setBusy] = useState(false);
   const sessionMessage = student?.studentId ? null : "Log in as a student to open your Explorer Outfit.";
   const firstName = student?.displayName?.trim().split(/\s+/)[0] ?? "Explorer";
 
@@ -115,20 +128,67 @@ export default function ExplorerOutfitPage() {
   // Effective top (honours the legacy body:"dress" avatars); a dress owns Bottom.
   const effTop: TopStyle = base.top ?? (base.body === "dress" ? "dress" : "hoodie");
   const isDress = effTop === "dress";
+  const owned = useMemo(() => new Set(state?.inventory.map((e) => e.item_key) ?? []), [state?.inventory]);
+  const itemsBySlot = useMemo(() => {
+    const map = new Map<string, EconomyItem[]>();
+    for (const item of state?.items ?? []) {
+      const slot = (item.metadata as { slot?: string })?.slot ?? item.category;
+      const list = map.get(slot) ?? [];
+      list.push(item);
+      map.set(slot, list);
+    }
+    for (const list of map.values()) list.sort((a, b) => a.sort_order - b.sort_order);
+    return map;
+  }, [state?.items]);
 
   const bump = () => setCelebrate((c) => c + 1);
+  function commit(next: EconomyState) {
+    setState(next);
+    if (student?.studentId) persistAvatarToStorage(student.studentId, next);
+  }
   async function updateBase(patch: Partial<AvatarOutfit>, celebrateChange = false) {
     if (!student?.studentId || !state) return;
     const nextBase = { ...base, ...patch };
     setState({ ...state, avatarBase: nextBase }); // optimistic
     if (celebrateChange) bump();
     try {
-      const next = await saveAvatarBase(student.studentId, nextBase);
-      setState(next);
-      persistAvatarToStorage(student.studentId, next);
+      commit(await saveAvatarBase(student.studentId, nextBase));
     } catch (error) {
       setMessage(economyErrorMessage(error));
     }
+  }
+  // Equip an earned garment (locked → Marketplace to buy it first).
+  async function equipItem(item: EconomyItem) {
+    if (!student?.studentId || busy) return;
+    if (!owned.has(item.item_key)) {
+      router.push("/marketplace");
+      return;
+    }
+    setBusy(true);
+    setMessage(null);
+    try {
+      commit(await equipEconomyItem(student.studentId, item.item_key));
+      bump();
+    } catch (error) {
+      setMessage(economyErrorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+  // Pick a free garment style; take off any equipped premium in that slot first.
+  async function pickFreeStyle(patch: Partial<AvatarOutfit>, equipSlot: string) {
+    if (!student?.studentId || busy) return;
+    if (state?.equipped[equipSlot]) {
+      setBusy(true);
+      try {
+        commit(await unequipEconomySlot(student.studentId, equipSlot));
+      } catch (error) {
+        setMessage(economyErrorMessage(error));
+      } finally {
+        setBusy(false);
+      }
+    }
+    await updateBase(patch, true);
   }
 
   function surprise() {
@@ -144,6 +204,28 @@ export default function ExplorerOutfitPage() {
 
   const dotCls = (on: boolean) => `${optBase} h-9 w-9 rounded-full ${ring(on)}`;
   const swatchCls = (on: boolean) => `${optBase} h-11 w-11 ${ring(on)}`;
+
+  // Earned garments for a slot, shown after the free styles (locked → Marketplace).
+  function premiumCards(equipSlot: string) {
+    const items = itemsBySlot.get(equipSlot) ?? [];
+    const equippedKey = state?.equipped[equipSlot];
+    return items.map((item) => {
+      const isOwned = owned.has(item.item_key);
+      const isOn = equippedKey === item.item_key;
+      const rarity = RARITY_STYLES[item.rarity];
+      return (
+        <button key={item.item_key} type="button" title={item.name} onClick={() => equipItem(item)} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 disabled:opacity-60 ${ring(isOn)}`}>
+          {isOn ? <Check className="absolute right-1 top-1 z-10 h-3.5 w-3.5 rounded-full bg-white text-teal-600" /> : null}
+          {!isOwned ? (
+            <span className="absolute right-1 top-1 z-10 flex items-center gap-0.5 rounded bg-slate-900/85 px-1 py-0.5 text-[8px] font-black text-white"><Lock className="h-2.5 w-2.5" />{item.price}</span>
+          ) : null}
+          <span className="absolute left-1 top-1 z-10 rounded px-1 py-0.5 text-[7px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span>
+          <div className={!isOwned ? "opacity-45" : ""}><Thumb outfit={layerPreview(base, item)} /></div>
+          <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold" style={{ color: rarity.color }}>{item.name}</span>
+        </button>
+      );
+    });
+  }
 
   return (
     <main className="min-h-screen bg-[radial-gradient(1200px_600px_at_50%_-10%,#e7eefc,transparent),linear-gradient(#eef2f6,#e6ebf1)] text-slate-900">
@@ -253,14 +335,15 @@ export default function ExplorerOutfitPage() {
               <Heading title="Top" />
               <div className="mb-3 flex flex-wrap gap-2.5">
                 {TOP_STYLES.map(([value, label]) => {
-                  const on = effTop === value;
+                  const on = !state?.equipped.top && effTop === value;
                   return (
-                    <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ top: value }, true)} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
+                    <button key={value} type="button" aria-label={label} title={label} onClick={() => pickFreeStyle({ top: value }, "top")} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 disabled:opacity-60 ${ring(on)}`}>
                       <Thumb outfit={{ ...merged, top: value }} />
                       <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold text-slate-500">{label}</span>
                     </button>
                   );
                 })}
+                {premiumCards("top")}
               </div>
               <div className="flex flex-wrap gap-2.5">
                 {TOPS.map(([shirt, trim, label]) => (
@@ -278,14 +361,15 @@ export default function ExplorerOutfitPage() {
                 <>
                   <div className="mb-3 flex flex-wrap gap-2.5">
                     {BOTTOM_STYLES.map(([value, label]) => {
-                      const on = (base.bottom ?? "joggers") === value;
+                      const on = !state?.equipped.bottom && (base.bottom ?? "joggers") === value;
                       return (
-                        <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ bottom: value }, true)} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
+                        <button key={value} type="button" aria-label={label} title={label} onClick={() => pickFreeStyle({ bottom: value }, "bottom")} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 disabled:opacity-60 ${ring(on)}`}>
                           <Thumb outfit={{ ...merged, bottom: value }} />
                           <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold text-slate-500">{label}</span>
                         </button>
                       );
                     })}
+                    {premiumCards("bottom")}
                   </div>
                   <div className="flex flex-wrap gap-2.5">
                     {BOTTOMS.map(([pants, label]) => (
@@ -301,14 +385,15 @@ export default function ExplorerOutfitPage() {
               <Heading title="Shoes" />
               <div className="mb-3 flex flex-wrap gap-2.5">
                 {SHOE_STYLES.map(([value, label]) => {
-                  const on = (base.shoeStyle ?? "sneakers") === value;
+                  const on = !state?.equipped.footwear && (base.shoeStyle ?? "sneakers") === value;
                   return (
-                    <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ shoeStyle: value }, true)} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
+                    <button key={value} type="button" aria-label={label} title={label} onClick={() => pickFreeStyle({ shoeStyle: value }, "footwear")} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 disabled:opacity-60 ${ring(on)}`}>
                       <Thumb outfit={{ ...merged, shoeStyle: value }} />
                       <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold text-slate-500">{label}</span>
                     </button>
                   );
                 })}
+                {premiumCards("footwear")}
               </div>
               <div className="flex flex-wrap gap-2.5">
                 {SHOES.map(([shoes, label]) => (
