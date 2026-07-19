@@ -7,6 +7,7 @@ import { getActiveStudentIdentity, markActiveStudentIntroSeen } from "@/lib/stud
 import { fetchRealmCompatProgressForStudent } from "@/lib/realm-progress-compat";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
+import { awardAndReveal } from "@/lib/gem-reveal";
 
 export type StudentProgressSnapshotRow = {
   realm_id?: string | null;
@@ -307,6 +308,8 @@ export async function saveRealmLessonAttempt(
     }
   }
 
+  // Award & reveal any gems earned by this completion (fire-and-forget, safe).
+  void awardAndReveal(studentId, "lesson", completionKey);
 }
 
 export async function saveNumberLessonAttempt(
@@ -351,6 +354,7 @@ export async function saveNumberWeeklyQuizAttempt(
   });
   if (error) throw error;
 
+  void awardAndReveal(studentId, "quiz", completionKey);
 }
 
 export async function saveRealmAssessment(
@@ -380,6 +384,7 @@ export async function saveRealmAssessment(
   });
   if (error) throw error;
 
+  void awardAndReveal(studentId, "assessment", completionKey);
 }
 
 export async function saveNumberAssessment(

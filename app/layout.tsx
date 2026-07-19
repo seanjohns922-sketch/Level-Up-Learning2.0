@@ -5,6 +5,7 @@ import { GlobalTapFeedback } from "@/components/GlobalTapFeedback";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
 import StudentScreenRecorder from "@/components/StudentScreenRecorder";
 import DemoPreviewBanner from "@/components/demo/DemoPreviewBanner";
+import GemRevealHost from "@/components/gems/GemRevealHost";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,6 +26,7 @@ export default function RootLayout({
           <StudentScreenRecorder />
           <DemoPreviewBanner />
           {children}
+          <GemRevealHost />
         </ErrorBoundary>
       </body>
     </html>

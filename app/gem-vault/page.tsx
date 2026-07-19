@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Lock, Sparkles, Star } from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import GemIcon, { GEM_RARITY as RARITY } from "@/components/gems/GemIcon";
-import GemRevealHost from "@/components/gems/GemRevealHost";
 import { enqueueReveal } from "@/lib/gem-reveal";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
@@ -108,7 +107,6 @@ export default function GemVaultPage() {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(1100px_500px_at_50%_-10%,#1a2230,transparent),linear-gradient(#0c0f16,#0a0d13)] text-white">
-      <GemRevealHost />
       <EconomyHeader />
       <div className="mx-auto max-w-[1180px] px-4 py-6 md:px-6">
         {/* Header */}
