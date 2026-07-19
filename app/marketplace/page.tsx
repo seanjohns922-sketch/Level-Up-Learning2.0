@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import * as Icons from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import StudentAvatar, { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
+import PetArt, { petSpeciesForItem } from "@/components/pets/PetArt";
 import { economyErrorMessage, equipEconomyItem, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyCategory, type EconomyItem, type EconomyState } from "@/lib/economy";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 
@@ -16,6 +17,12 @@ const CATEGORIES: Array<{ id: "all" | EconomyCategory; label: string }> = [
 function ItemIcon({ item, size = 32 }: { item: EconomyItem; size?: number }) {
   const Icon = (Icons as unknown as Record<string, React.ComponentType<{ size?: number; strokeWidth?: number }>>)[item.icon] ?? Icons.Sparkles;
   return <Icon size={size} strokeWidth={1.8} />;
+}
+
+// Pets render as premium art; everything else keeps its lucide icon.
+function ItemVisual({ item, size = 32 }: { item: EconomyItem; size?: number }) {
+  if (item.category === "pet") return <PetArt species={petSpeciesForItem(item.item_key, item.metadata)} size={Math.round(size * 1.5)} />;
+  return <ItemIcon item={item} size={size} />;
 }
 
 export default function MarketplacePage() {
@@ -75,7 +82,7 @@ export default function MarketplacePage() {
           <section className="grid content-start grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" aria-label="Marketplace items">
             {items.map((item) => { const rarity = RARITY_STYLES[item.rarity]; const isOwned = owned.has(item.item_key); return (
               <button type="button" key={item.item_key} onClick={() => setSelected(item)} className={`min-h-[190px] overflow-hidden rounded-md border bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${selected?.item_key === item.item_key ? "border-slate-900 ring-2 ring-slate-900/10" : "border-slate-200"}`}>
-                <div className="mb-4 flex h-20 items-center justify-center rounded-md" style={{ color: item.accent, background: `${item.accent}18` }}><ItemIcon item={item} size={42} /></div>
+                <div className="mb-4 flex h-20 items-center justify-center rounded-md" style={{ color: item.accent, background: `${item.accent}18` }}><ItemVisual item={item} size={42} /></div>
                 <div className="flex items-start justify-between gap-2"><h2 className="text-sm font-black leading-tight">{item.name}</h2>{isOwned ? <Icons.Check className="h-4 w-4 shrink-0 text-emerald-600" /> : null}</div>
                 <div className="mt-2 flex items-center justify-between gap-2"><span className="rounded px-1.5 py-0.5 text-[10px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span><span className="text-xs font-black text-amber-700">{isOwned ? "Owned" : `${item.price} XP`}</span></div>
               </button>
@@ -85,7 +92,7 @@ export default function MarketplacePage() {
           <aside className="h-fit rounded-md border border-slate-200 bg-white p-5 lg:sticky lg:top-20">
             {selected ? <>
               <div className="relative flex h-64 items-end justify-center overflow-hidden rounded-md bg-slate-950" style={{ background: `linear-gradient(160deg, ${selected.accent}35, #0f172a 65%)` }}>
-                {selected.category === "avatar" ? <StudentAvatar height={220} outfit={previewOutfit} /> : <div className="mb-16" style={{ color: selected.accent }}><ItemIcon item={selected} size={100} /></div>}
+                {selected.category === "avatar" ? <StudentAvatar height={220} outfit={previewOutfit} /> : selected.category === "pet" ? <div className="mb-6"><PetArt species={petSpeciesForItem(selected.item_key, selected.metadata)} size={170} /></div> : <div className="mb-16" style={{ color: selected.accent }}><ItemIcon item={selected} size={100} /></div>}
                 <span className="absolute left-3 top-3 rounded bg-black/40 px-2 py-1 text-[10px] font-black uppercase text-white">Preview</span>
               </div>
               <p className="mt-5 text-xs font-black uppercase tracking-[0.16em]" style={{ color: selected.accent }}>{selected.realm_id === "measurement" ? "Measurelands" : selected.realm_id === "number" ? "Number Nexus" : "Universal"}</p>
