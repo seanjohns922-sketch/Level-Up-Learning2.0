@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Image is too large" }, { status: 413 });
   }
 
-  let body: { imageDataUrl?: unknown; defaultYear?: unknown };
+  let body: { imageDataUrl?: unknown; defaultYear?: unknown; allowedYears?: unknown };
   try {
     body = JSON.parse(rawBody) as typeof body;
   } catch {
@@ -69,6 +69,13 @@ export async function POST(request: NextRequest) {
   }
 
   const defaultYear = clean(body.defaultYear, 20);
+  const allowedYears = (Array.isArray(body.allowedYears) ? body.allowedYears : [])
+    .map((year) => clean(year, 20))
+    .filter(Boolean)
+    .slice(0, 7);
+  const yearInstruction = defaultYear
+    ? `Use ${defaultYear} only when a row has no printed school year.`
+    : `The class contains ${allowedYears.join(" and ") || "multiple school years"}. Preserve a printed school year, but leave schoolYear empty when the row does not say which one applies.`;
   const model = process.env.OPENAI_ROSTER_MODEL ?? process.env.OPENAI_INSIGHT_MODEL ?? "gpt-4.1-mini";
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -88,7 +95,7 @@ export async function POST(request: NextRequest) {
           content: [
             {
               type: "text",
-              text: `Read up to 60 student rows from this roster screenshot. Return {"students":[{"firstName":"","lastName":"","fullName":"","schoolYear":"","username":"","pin":""}]}. Preserve printed spelling. A blank school year may use ${defaultYear || "an empty string"}. Leave every unavailable field empty.`,
+              text: `Read up to 60 student rows from this roster screenshot. Return {"students":[{"firstName":"","lastName":"","fullName":"","schoolYear":"","username":"","pin":""}]}. Preserve printed spelling. ${yearInstruction} Leave every unavailable field empty.`,
             },
             { type: "image_url", image_url: { url: imageDataUrl, detail: "high" } },
           ],

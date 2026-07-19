@@ -27,18 +27,36 @@ function readAsDataUrl(file: File) {
   });
 }
 
-function rowIsValid(student: RosterDraft) {
-  return Boolean(student.firstName.trim() && student.schoolYear && (!student.pin || /^\d{4}$/.test(student.pin)));
+function rowIsValid(student: RosterDraft, allowedYears: string[]) {
+  return Boolean(
+    student.firstName.trim()
+      && allowedYears.includes(student.schoolYear)
+      && (!student.pin || /^\d{4}$/.test(student.pin))
+  );
 }
 
 export function RosterImportPanel({ classYearLevels, onClose, onImport }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [defaultYear, setDefaultYear] = useState(classYearLevels[0] ?? "");
+  const [selectedYears, setSelectedYears] = useState<string[]>(
+    classYearLevels.length ? classYearLevels : []
+  );
   const [rows, setRows] = useState<RosterDraft[]>([]);
   const [fileName, setFileName] = useState("");
   const [working, setWorking] = useState(false);
   const [importing, setImporting] = useState(false);
   const [message, setMessage] = useState("");
+
+  const singleDefaultYear = selectedYears.length === 1 ? selectedYears[0] : "";
+
+  function toggleSelectedYear(year: string) {
+    setSelectedYears((current) => {
+      if (current.includes(year)) {
+        if (current.length === 1) return current;
+        return current.filter((candidate) => candidate !== year);
+      }
+      return [...current, year];
+    });
+  }
 
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -59,16 +77,20 @@ export function RosterImportPanel({ classYearLevels, onClose, onImport }: Props)
         const response = await fetch("/api/roster-extract", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ imageDataUrl: await readAsDataUrl(file), defaultYear }),
+          body: JSON.stringify({
+            imageDataUrl: await readAsDataUrl(file),
+            defaultYear: singleDefaultYear,
+            allowedYears: selectedYears,
+          }),
         });
         const payload = (await response.json()) as {
           students?: Array<Record<string, unknown>>;
           error?: string;
         };
         if (!response.ok) throw new Error(payload.error || "Could not read that roster image.");
-        importedRows = normalizeRosterStudents(payload.students ?? [], "image", defaultYear);
+        importedRows = normalizeRosterStudents(payload.students ?? [], "image", singleDefaultYear);
       } else {
-        importedRows = await parseRosterWorkbook(file, defaultYear);
+        importedRows = await parseRosterWorkbook(file, singleDefaultYear);
       }
 
       setRows(importedRows);
@@ -86,7 +108,7 @@ export function RosterImportPanel({ classYearLevels, onClose, onImport }: Props)
   }
 
   async function importRows() {
-    const validRows = rows.filter(rowIsValid);
+    const validRows = rows.filter((row) => rowIsValid(row, selectedYears));
     if (!validRows.length) return;
     setImporting(true);
     setMessage("");
@@ -100,7 +122,7 @@ export function RosterImportPanel({ classYearLevels, onClose, onImport }: Props)
     setRows([]);
   }
 
-  const invalidCount = rows.filter((row) => !rowIsValid(row)).length;
+  const invalidCount = rows.filter((row) => !rowIsValid(row, selectedYears)).length;
 
   return (
     <section className="mt-4 border border-emerald-200 bg-emerald-50/50 p-4" aria-label="Import class roster">
@@ -119,13 +141,30 @@ export function RosterImportPanel({ classYearLevels, onClose, onImport }: Props)
       </div>
 
       <div className="mt-4 flex flex-wrap items-end gap-3">
-        <label className="grid gap-1 text-xs font-bold text-gray-600">
-          Default school year
-          <select value={defaultYear} onChange={(event) => setDefaultYear(event.target.value)} className="h-10 rounded-lg border border-emerald-200 bg-white px-3 text-sm text-gray-800">
-            <option value="">Choose year</option>
-            {SCHOOL_YEAR_LEVEL_OPTIONS.map((year) => <option key={year} value={year}>{year}</option>)}
-          </select>
-        </label>
+        <fieldset className="grid gap-1.5">
+          <legend className="text-xs font-bold text-gray-600">Class school years</legend>
+          <div className="flex min-h-10 flex-wrap items-center gap-2">
+            {(classYearLevels.length ? classYearLevels : SCHOOL_YEAR_LEVEL_OPTIONS).map((year) => {
+              const selected = selectedYears.includes(year);
+              return (
+                <label key={year} className={[
+                  "inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-bold",
+                  selected
+                    ? "border-emerald-700 bg-emerald-700 text-white"
+                    : "border-emerald-200 bg-white text-gray-600",
+                ].join(" ")}>
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => toggleSelectedYear(year)}
+                    className="sr-only"
+                  />
+                  {year}
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
         <input
           ref={fileInputRef}
           type="file"
@@ -161,13 +200,13 @@ export function RosterImportPanel({ classYearLevels, onClose, onImport }: Props)
               </thead>
               <tbody className="divide-y divide-emerald-100 bg-white">
                 {rows.map((row) => (
-                  <tr key={row.id} className={rowIsValid(row) ? "" : "bg-red-50"}>
+                  <tr key={row.id} className={rowIsValid(row, selectedYears) ? "" : "bg-red-50"}>
                     <td className="p-1.5"><input value={row.firstName} onChange={(event) => updateRow(row.id, "firstName", event.target.value)} className="w-full rounded-md border border-gray-200 px-2 py-1.5" /></td>
                     <td className="p-1.5"><input value={row.lastName} onChange={(event) => updateRow(row.id, "lastName", event.target.value)} className="w-full rounded-md border border-gray-200 px-2 py-1.5" /></td>
                     <td className="p-1.5">
                       <select value={row.schoolYear} onChange={(event) => updateRow(row.id, "schoolYear", event.target.value)} className="w-full rounded-md border border-gray-200 px-2 py-1.5">
                         <option value="">Choose year</option>
-                        {SCHOOL_YEAR_LEVEL_OPTIONS.map((year) => <option key={year} value={year}>{year}</option>)}
+                        {selectedYears.map((year) => <option key={year} value={year}>{year}</option>)}
                       </select>
                     </td>
                     <td className="p-1.5"><input value={row.username} onChange={(event) => updateRow(row.id, "username", event.target.value)} className="w-full rounded-md border border-gray-200 px-2 py-1.5" /></td>
