@@ -19,6 +19,9 @@ export type AvatarLayerSlot = (typeof AVATAR_LAYER_SLOTS)[number];
 export const AVATAR_BASE_KEYS = [
   "body",
   "face",
+  "top",
+  "bottom",
+  "shoeStyle",
   "skin",
   "skinShade",
   "hair",

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Shuffle } from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
-import StudentAvatar, { type AvatarOutfit, type BodyType, type FaceType, type HairStyle } from "@/components/avatar/StudentAvatar";
+import StudentAvatar, { type AvatarOutfit, type BodyType, type BottomStyle, type FaceType, type HairStyle, type ShoeStyle, type TopStyle } from "@/components/avatar/StudentAvatar";
 import {
   economyErrorMessage,
   fetchStudentEconomy,
@@ -16,9 +16,20 @@ import {
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 
 // ── Every option on this page is FREE. No XP, no unlocking. ─────────────────
-const BODIES: Array<{ value: BodyType; label: string; hairStyle: HairStyle }> = [
-  { value: "neutral", label: "Boy", hairStyle: "short" },
-  { value: "dress", label: "Girl", hairStyle: "ponytail" },
+const BODIES: Array<{ value: BodyType; label: string; patch: Partial<AvatarOutfit> }> = [
+  { value: "neutral", label: "Boy", patch: { body: "neutral", top: "hoodie", bottom: "joggers", hairStyle: "short" } },
+  { value: "dress", label: "Girl", patch: { body: "dress", top: "dress", hairStyle: "ponytail" } },
+];
+const TOP_STYLES: Array<[TopStyle, string]> = [
+  ["hoodie", "Hoodie"], ["tshirt", "T-Shirt"], ["jumper", "Jumper"],
+  ["polo", "Polo"], ["jacket", "Jacket"], ["dress", "Dress"],
+];
+const BOTTOM_STYLES: Array<[BottomStyle, string]> = [
+  ["joggers", "Joggers"], ["jeans", "Jeans"], ["shorts", "Shorts"],
+  ["trackpants", "Track Pants"], ["skirt", "Skirt"], ["leggings", "Leggings"],
+];
+const SHOE_STYLES: Array<[ShoeStyle, string]> = [
+  ["sneakers", "Sneakers"], ["boots", "Boots"], ["hightops", "High-Tops"], ["sandals", "Sandals"],
 ];
 const FACES: Array<[FaceType, string]> = [
   ["smile", "Smile"], ["bigSmile", "Big Smile"], ["happy", "Happy Eyes"],
@@ -101,6 +112,9 @@ export default function ExplorerOutfitPage() {
 
   const base: AvatarOutfit = state?.avatarBase ?? {};
   const merged = state ? mergeAvatarOutfit(state) : {};
+  // Effective top (honours the legacy body:"dress" avatars); a dress owns Bottom.
+  const effTop: TopStyle = base.top ?? (base.body === "dress" ? "dress" : "hoodie");
+  const isDress = effTop === "dress";
 
   const bump = () => setCelebrate((c) => c + 1);
   async function updateBase(patch: Partial<AvatarOutfit>, celebrateChange = false) {
@@ -118,11 +132,13 @@ export default function ExplorerOutfitPage() {
   }
 
   function surprise() {
-    const b = pick(BODIES), s = pick(SKINS), c = pick(HAIRCOLORS), h = pick(HAIRSTYLES),
-      f = pick(FACES), t = pick(TOPS), bo = pick(BOTTOMS), sh = pick(SHOES);
+    const s = pick(SKINS), c = pick(HAIRCOLORS), h = pick(HAIRSTYLES), f = pick(FACES),
+      t = pick(TOPS), bo = pick(BOTTOMS), sh = pick(SHOES),
+      topStyle = pick(TOP_STYLES)[0], bottomStyle = pick(BOTTOM_STYLES)[0], shoeStyle = pick(SHOE_STYLES)[0];
     void updateBase({
-      body: b.value, face: f[0], skin: s[0], skinShade: s[1], hair: c[0], hairShade: c[1],
-      hairStyle: h[0], shirt: t[0], shirtTrim: t[1], pants: bo[0], shoes: sh[0],
+      face: f[0], skin: s[0], skinShade: s[1], hair: c[0], hairShade: c[1], hairStyle: h[0],
+      top: topStyle, bottom: bottomStyle, shoeStyle,
+      shirt: t[0], shirtTrim: t[1], pants: bo[0], shoes: sh[0],
     }, true);
   }
 
@@ -167,12 +183,12 @@ export default function ExplorerOutfitPage() {
             <section className={PANEL}>
               <Heading title="Character" />
               <div className="flex flex-wrap gap-3">
-                {BODIES.map(({ value, label, hairStyle }) => {
+                {BODIES.map(({ value, label, patch }) => {
                   const on = (base.body ?? "neutral") === value;
                   return (
-                    <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ body: value, hairStyle }, true)} className={`${optBase} flex h-[112px] w-[92px] flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
+                    <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase(patch, true)} className={`${optBase} flex h-[112px] w-[92px] flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
                       {on ? <Check className="absolute right-1.5 top-1.5 h-4 w-4 text-teal-600" /> : null}
-                      <Thumb outfit={{ ...merged, body: value, hairStyle }} height={78} />
+                      <Thumb outfit={{ ...merged, ...patch }} height={78} />
                       <span className="mt-auto w-full truncate px-1 pb-1.5 text-center text-[11px] font-black text-slate-600">{label}</span>
                     </button>
                   );
@@ -235,6 +251,17 @@ export default function ExplorerOutfitPage() {
             {/* Top */}
             <section className={PANEL}>
               <Heading title="Top" />
+              <div className="mb-3 flex flex-wrap gap-2.5">
+                {TOP_STYLES.map(([value, label]) => {
+                  const on = effTop === value;
+                  return (
+                    <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ top: value }, true)} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
+                      <Thumb outfit={{ ...merged, top: value }} />
+                      <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold text-slate-500">{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
               <div className="flex flex-wrap gap-2.5">
                 {TOPS.map(([shirt, trim, label]) => (
                   <button key={label} type="button" aria-label={label} title={label} onClick={() => updateBase({ shirt, shirtTrim: trim })} className={swatchCls(base.shirt === shirt)} style={{ background: `linear-gradient(150deg, ${shirt}, ${trim})` }} />
@@ -242,19 +269,47 @@ export default function ExplorerOutfitPage() {
               </div>
             </section>
 
-            {/* Bottoms */}
-            <section className={PANEL}>
+            {/* Bottoms — disabled while a dress is worn (it covers both slots) */}
+            <section className={`${PANEL} ${isDress ? "opacity-55" : ""}`}>
               <Heading title="Bottoms" />
-              <div className="flex flex-wrap gap-2.5">
-                {BOTTOMS.map(([pants, label]) => (
-                  <button key={label} type="button" aria-label={label} title={label} onClick={() => updateBase({ pants })} className={swatchCls(base.pants === pants)} style={{ background: `linear-gradient(150deg, ${pants}, #000)` }} />
-                ))}
-              </div>
+              {isDress ? (
+                <p className="text-xs font-semibold text-slate-400">Your dress covers this — pick a different Top to choose bottoms.</p>
+              ) : (
+                <>
+                  <div className="mb-3 flex flex-wrap gap-2.5">
+                    {BOTTOM_STYLES.map(([value, label]) => {
+                      const on = (base.bottom ?? "joggers") === value;
+                      return (
+                        <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ bottom: value }, true)} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
+                          <Thumb outfit={{ ...merged, bottom: value }} />
+                          <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold text-slate-500">{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="flex flex-wrap gap-2.5">
+                    {BOTTOMS.map(([pants, label]) => (
+                      <button key={label} type="button" aria-label={label} title={label} onClick={() => updateBase({ pants })} className={swatchCls(base.pants === pants)} style={{ background: `linear-gradient(150deg, ${pants}, #000)` }} />
+                    ))}
+                  </div>
+                </>
+              )}
             </section>
 
             {/* Shoes */}
             <section className={PANEL}>
               <Heading title="Shoes" />
+              <div className="mb-3 flex flex-wrap gap-2.5">
+                {SHOE_STYLES.map(([value, label]) => {
+                  const on = (base.shoeStyle ?? "sneakers") === value;
+                  return (
+                    <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ shoeStyle: value }, true)} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 ${ring(on)}`}>
+                      <Thumb outfit={{ ...merged, shoeStyle: value }} />
+                      <span className="mt-auto w-full truncate px-1 pb-1 text-center text-[9px] font-bold text-slate-500">{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
               <div className="flex flex-wrap gap-2.5">
                 {SHOES.map(([shoes, label]) => (
                   <button key={label} type="button" aria-label={label} title={label} onClick={() => updateBase({ shoes })} className={swatchCls(base.shoes === shoes)} style={{ background: `linear-gradient(150deg, #fff, ${shoes})` }} />
