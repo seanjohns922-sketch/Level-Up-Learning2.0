@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Archive, Copy, Eye, EyeOff, MoreHorizontal, Trash2, UserPlus, Users } from "lucide-react";
+import { Archive, Copy, Eye, EyeOff, FileUp, MoreHorizontal, Trash2, UserPlus, Users } from "lucide-react";
+import { RosterImportPanel } from "@/components/teacher/RosterImportPanel";
+import type { RosterDraft } from "@/lib/roster-import";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import {
@@ -122,6 +124,7 @@ export default function TeacherClassesPage() {
   const [editClassForm, setEditClassForm] = useState<{ name: string; year_levels: string[] }>({ name: "", year_levels: [] });
   const [savingClassEdit, setSavingClassEdit] = useState(false);
   const [openClassId, setOpenClassId] = useState<string | null>(null);
+  const [rosterImportClassId, setRosterImportClassId] = useState<string | null>(null);
   const [revealedPinIds, setRevealedPinIds] = useState<Set<string>>(new Set());
 
   const loadClasses = useCallback(async (teacherId: string) => {
@@ -215,24 +218,22 @@ export default function TeacherClassesPage() {
     return "School only";
   }
 
-  async function addStudentToClass(classId: string) {
-    const firstName = (newStudentFirstNames[classId] ?? "").trim();
-    const lastName = (newStudentLastNames[classId] ?? "").trim();
+  async function createStudentRecord(
+    classId: string,
+    draft: Pick<RosterDraft, "firstName" | "lastName" | "username" | "pin" | "schoolYear">,
+    reservedPins: Set<string>
+  ) {
+    const firstName = draft.firstName.trim();
+    const lastName = draft.lastName.trim();
     const name = buildDisplayName(firstName, lastName);
-    const username = (newStudentUsernames[classId] ?? "").trim() || buildStudentUsername(firstName, lastName);
-    const pin = (newStudentPins[classId] ?? "").trim();
-    const schoolYear = normalizeSchoolYearLabel(newStudentSchoolYears[classId] ?? "");
-    if (!firstName) return;
-    if (!schoolYear) {
-      alert("Please select the student's school year level.");
-      return;
-    }
-    if (pin && !/^\d{4}$/.test(pin)) {
-      alert("PIN must be 4 digits.");
-      return;
-    }
+    const username = draft.username.trim() || buildStudentUsername(firstName, lastName);
+    const pin = draft.pin.trim();
+    const schoolYear = normalizeSchoolYearLabel(draft.schoolYear);
+    if (!firstName) throw new Error("First name is required");
+    if (!schoolYear) throw new Error("School year is required");
+    if (pin && !/^\d{4}$/.test(pin)) throw new Error("Access code must be 4 digits");
+    if (pin && reservedPins.has(pin)) throw new Error("Access code is already used in this class");
 
-    setCreatingStudentForClass(classId);
     const { data, error } = await supabase.rpc("create_student_for_class", {
       class_uuid: classId,
       display_name_input: name,
@@ -243,18 +244,7 @@ export default function TeacherClassesPage() {
 
     if (error && isMissingCreateStudentRpc(error.message)) {
       console.warn("[TeacherClasses] create_student_for_class RPC missing, using direct insert fallback", error.message);
-      const existingPins = new Set(
-        students
-          .filter((student) => student.class_id === classId)
-          .map((student) => student.pin)
-          .filter((value): value is string => Boolean(value))
-      );
-      const fallbackPin = pin || generateFallbackPin(existingPins);
-      if (existingPins.has(fallbackPin)) {
-        setCreatingStudentForClass(null);
-        alert("That PIN is already used in this class.");
-        return;
-      }
+      const fallbackPin = pin || generateFallbackPin(reservedPins);
 
       const { data: insertedStudent, error: insertError } = await supabase
         .from("students")
@@ -271,9 +261,7 @@ export default function TeacherClassesPage() {
         .single();
 
       if (insertError) {
-        setCreatingStudentForClass(null);
-        alert(insertError.message);
-        return;
+        throw new Error(insertError.message);
       }
 
       created = {
@@ -283,39 +271,91 @@ export default function TeacherClassesPage() {
         qr_token: insertedStudent.qr_token ?? "",
       };
     } else if (error) {
-      setCreatingStudentForClass(null);
-      alert(error.message);
-      return;
+      throw new Error(error.message);
     }
 
-    setCreatingStudentForClass(null);
-    if (created) {
-      setLastCreatedLogin({
-        classId,
-        name,
+    if (!created?.student_id) throw new Error("Student creation did not return a student record");
+    const { error: updateError } = await supabase
+      .from("students")
+      .update({
+        first_name: firstName || null,
+        last_name: lastName || null,
+        display_name: name,
         username,
-        pin: created.pin,
-        claimCode: created.claim_code || "Pending setup",
-      });
+        school_year_level: schoolYear,
+      })
+      .eq("id", created.student_id);
+    if (updateError) {
+      await supabase.from("students").delete().eq("id", created.student_id);
+      throw new Error(updateError.message);
     }
-    if (created?.student_id) {
-      await supabase
-        .from("students")
-        .update({
-          first_name: firstName || null,
-          last_name: lastName || null,
-          display_name: name,
-          username,
-          school_year_level: schoolYear,
-        })
-        .eq("id", created.student_id);
+
+    const createdPin = String(created?.pin ?? pin);
+    if (createdPin) reservedPins.add(createdPin);
+    return {
+      classId,
+      name,
+      username,
+      pin: createdPin,
+      claimCode: created?.claim_code || "Pending setup",
+    };
+  }
+
+  async function addStudentToClass(classId: string) {
+    const reservedPins = new Set(
+      students
+        .filter((student) => student.class_id === classId)
+        .map((student) => student.pin)
+        .filter((value): value is string => Boolean(value))
+    );
+
+    setCreatingStudentForClass(classId);
+    try {
+      const created = await createStudentRecord(classId, {
+        firstName: newStudentFirstNames[classId] ?? "",
+        lastName: newStudentLastNames[classId] ?? "",
+        username: newStudentUsernames[classId] ?? "",
+        pin: newStudentPins[classId] ?? "",
+        schoolYear: newStudentSchoolYears[classId] ?? "",
+      }, reservedPins);
+      setLastCreatedLogin(created);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Could not add student");
+      setCreatingStudentForClass(null);
+      return;
     }
+    setCreatingStudentForClass(null);
     setNewStudentFirstNames((current) => ({ ...current, [classId]: "" }));
     setNewStudentLastNames((current) => ({ ...current, [classId]: "" }));
     setNewStudentUsernames((current) => ({ ...current, [classId]: "" }));
     setNewStudentPins((current) => ({ ...current, [classId]: "" }));
     setNewStudentSchoolYears((current) => ({ ...current, [classId]: "" }));
     if (authUser?.id) await loadClasses(authUser.id);
+  }
+
+  async function importRoster(classId: string, roster: RosterDraft[]) {
+    const reservedPins = new Set(
+      students
+        .filter((student) => student.class_id === classId)
+        .map((student) => student.pin)
+        .filter((value): value is string => Boolean(value))
+    );
+    const errors: string[] = [];
+    let created = 0;
+
+    setCreatingStudentForClass(classId);
+    for (const student of roster) {
+      try {
+        await createStudentRecord(classId, student, reservedPins);
+        created += 1;
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : "Unknown error";
+        errors.push(`${buildDisplayName(student.firstName, student.lastName) || "Unnamed row"}: ${reason}`);
+      }
+    }
+    setCreatingStudentForClass(null);
+    if (authUser?.id) await loadClasses(authUser.id);
+    return { created, errors };
   }
 
   function regeneratePin() {
@@ -522,14 +562,26 @@ export default function TeacherClassesPage() {
   }
 
   function openClass(classId: string) {
-    setOpenClassId((current) => current === classId ? null : classId);
+    if (openClassId === classId) {
+      setOpenClassId(null);
+      setRosterImportClassId(null);
+      return;
+    }
+    setOpenClassId(classId);
+    setRosterImportClassId(null);
   }
 
   function openAddStudent(classId: string) {
     setOpenClassId(classId);
+    setRosterImportClassId(null);
     window.setTimeout(() => {
       document.getElementById(`add-student-${classId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 50);
+  }
+
+  function openRosterImport(classId: string) {
+    setOpenClassId(classId);
+    setRosterImportClassId(classId);
   }
 
   function togglePinVisibility(studentId: string) {
@@ -710,7 +762,12 @@ export default function TeacherClassesPage() {
                         </span>
                         {!isClassArchived ? (
                           <button type="button" onClick={() => openAddStudent(cls.id)} className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700">
-                            <UserPlus size={14} /> Add Students
+                            <UserPlus size={14} /> Add student
+                          </button>
+                        ) : null}
+                        {!isClassArchived ? (
+                          <button type="button" onClick={() => openRosterImport(cls.id)} className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100">
+                            <FileUp size={14} /> Import roster
                           </button>
                         ) : null}
                         {!isClassArchived ? (
@@ -1033,6 +1090,14 @@ export default function TeacherClassesPage() {
                           </button>
                         </div>
                       )}
+
+                      {rosterImportClassId === cls.id ? (
+                        <RosterImportPanel
+                          classYearLevels={cls.year_levels?.length ? cls.year_levels : cls.year_level ? [cls.year_level] : []}
+                          onClose={() => setRosterImportClassId(null)}
+                          onImport={(roster) => importRoster(cls.id, roster)}
+                        />
+                      ) : null}
 
                       <div id={`add-student-${cls.id}`} className="mt-4 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/60 p-4">
                         <div>

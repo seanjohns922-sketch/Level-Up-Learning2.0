@@ -42,6 +42,7 @@
     "qrcode.react": "^4.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "read-excel-file": "^9.3.2",
     "rrweb": "2.0.0-alpha.20",
     "three": "^0.184.0"
   },
