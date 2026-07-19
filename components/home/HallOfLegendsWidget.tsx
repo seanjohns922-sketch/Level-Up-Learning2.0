@@ -51,26 +51,34 @@ export default function HallOfLegendsWidget() {
       className="group relative block w-full overflow-hidden rounded-2xl border border-white/12 text-left transition hover:border-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/70"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-[#15171d] via-[#111318] to-[#0e1014]" aria-hidden="true" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(251,191,36,0.10),transparent_60%)]" aria-hidden="true" />
+      <div className="absolute inset-y-0 right-0 w-2/3 bg-[radial-gradient(circle_at_80%_50%,rgba(251,191,36,0.10),transparent_62%)]" aria-hidden="true" />
 
-      <div className="relative z-10 flex flex-col items-center p-6 text-center md:p-7">
-        <div className="flex items-center gap-2 text-amber-300">
-          <Trophy className="h-5 w-5" aria-hidden="true" />
-          <span className="text-xs font-black uppercase tracking-[0.18em]">Hall of Legends</span>
-        </div>
-        <h2 className="mt-2 text-2xl font-black text-white md:text-3xl">Your Legends</h2>
-        <p className="mt-1 text-sm font-semibold text-white/70">Legends you&rsquo;ve earned across every realm.</p>
-
-        <div className="mt-4 flex items-center gap-3">
-          <div className="h-2 w-40 overflow-hidden rounded-full bg-white/15">
-            <div className="h-full rounded-full bg-amber-300 transition-[width] duration-500" style={{ width: `${pct}%` }} />
+      <div className="relative z-10 p-6 md:p-7">
+        {/* Centered text block (title, progress, CTA) */}
+        <div className="mx-auto flex max-w-md flex-col items-center text-center">
+          <div className="flex items-center gap-2 text-amber-300">
+            <Trophy className="h-5 w-5" aria-hidden="true" />
+            <span className="text-xs font-black uppercase tracking-[0.18em]">Hall of Legends</span>
           </div>
-          <span className="text-sm font-black text-white">
-            {unlocked ? count : "—"} of {total} <span className="font-bold text-white/60">Legends</span>
+          <h2 className="mt-2 text-2xl font-black text-white md:text-3xl">Your Legends</h2>
+          <p className="mt-1 text-sm font-semibold text-white/70">Legends you&rsquo;ve earned across every realm.</p>
+
+          <div className="mt-4 flex items-center gap-3">
+            <div className="h-2 w-40 overflow-hidden rounded-full bg-white/15">
+              <div className="h-full rounded-full bg-amber-300 transition-[width] duration-500" style={{ width: `${pct}%` }} />
+            </div>
+            <span className="text-sm font-black text-white">
+              {unlocked ? count : "—"} of {total} <span className="font-bold text-white/60">Legends</span>
+            </span>
+          </div>
+
+          <span className="mt-6 inline-flex items-center gap-2 rounded-md bg-white px-5 py-2.5 text-sm font-black text-slate-900 transition group-hover:bg-white/90">
+            Enter the Hall <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </span>
         </div>
 
-        <div className="mt-6 flex items-end justify-center">
+        {/* Cards stay on the right (stack below on small screens) */}
+        <div className="mt-8 flex items-end justify-center lg:absolute lg:right-7 lg:top-1/2 lg:mt-0 lg:-translate-y-1/2 lg:justify-end">
           {previewUnlocked.map((legend, index) => (
             <img
               key={legend.id}
@@ -91,10 +99,6 @@ export default function HallOfLegendsWidget() {
             </div>
           ))}
         </div>
-
-        <span className="mt-6 inline-flex items-center gap-2 rounded-md bg-white px-5 py-2.5 text-sm font-black text-slate-900 transition group-hover:bg-white/90">
-          Enter the Hall <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-        </span>
       </div>
     </button>
   );
