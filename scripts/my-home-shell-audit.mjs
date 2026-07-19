@@ -23,8 +23,8 @@ const results = [];
 const check = (label, ok) => results.push({ label, ok });
 
 check(
-  "My Home exposes the complete Phase 3 shell",
-  ["Continue Learning", "Marketplace", "Collection Journal", "Hall of Legends", "Wardrobe & Pets"]
+  "My Home exposes the current room-first rewards shell",
+  ["Continue Learning", "Explorer Rank", "Current room", "Gem Vault", "Hall of Legends", "Change room"]
     .every((label) => home.includes(label)),
 );
 check(

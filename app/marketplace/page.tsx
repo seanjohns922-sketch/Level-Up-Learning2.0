@@ -41,15 +41,16 @@ export default function MarketplacePage() {
   const selectedUnavailable = selected
     ? !isMarketplaceItemAvailable(selected) || brokenArtworkIds.has(selected.item_key)
     : true;
-  // Preview an avatar item layered over the student's current look, not in isolation.
+  const currentAvatarOutfit = state ? mergeAvatarOutfit(state) : {};
+  // Preview an avatar item layered over the student's current look. Other
+  // categories use the same current look for their contextual preview.
   const previewOutfit = selected?.category === "avatar"
     ? (() => {
-        const base = state ? mergeAvatarOutfit(state) : {};
         const layer = { ...(selected.metadata as Record<string, unknown>) };
         delete layer.slot;
-        return { ...base, ...layer } as AvatarOutfit;
+        return { ...currentAvatarOutfit, ...layer } as AvatarOutfit;
       })()
-    : undefined;
+    : currentAvatarOutfit;
 
   async function act() {
     if (!student?.studentId || !selected || busy || selectedUnavailable) return;

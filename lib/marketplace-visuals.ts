@@ -5,7 +5,7 @@ export type MarketplacePreviewMode = "avatar" | "pet" | "room" | "background" | 
 export type MarketplaceVisual =
   | { type: "avatar-layer"; alt: string; previewMode: "avatar" }
   | { type: "pet"; alt: string; previewMode: "pet" }
-  | { type: "asset"; src: string; alt: string; previewMode: "background" | "room" | "effect" | "title" }
+  | { type: "asset"; src: string; alt: string; previewMode: "background" | "room" | "effect" | "title"; placement?: "desk" | "floor" }
   | { type: "unavailable"; alt: string; reason: "missing-marketplace-artwork" };
 
 const PET_SPECIES = new Set([
@@ -59,6 +59,7 @@ export function resolveMarketplaceVisual(item: EconomyItem): MarketplaceVisual {
   }
 
   const explicitMode = explicitVisual?.previewMode;
+  const explicitPlacement = explicitVisual?.placement;
   if (
     explicitVisual?.type === "asset" &&
     typeof explicitVisual.src === "string" &&
@@ -66,7 +67,13 @@ export function resolveMarketplaceVisual(item: EconomyItem): MarketplaceVisual {
     typeof explicitVisual.alt === "string" &&
     (explicitMode === "background" || explicitMode === "room" || explicitMode === "effect" || explicitMode === "title")
   ) {
-    return { type: "asset", src: explicitVisual.src, alt: explicitVisual.alt, previewMode: explicitMode };
+    return {
+      type: "asset",
+      src: explicitVisual.src,
+      alt: explicitVisual.alt,
+      previewMode: explicitMode,
+      placement: explicitPlacement === "desk" || explicitPlacement === "floor" ? explicitPlacement : undefined,
+    };
   }
 
   return unavailable(item);
