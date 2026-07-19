@@ -39,9 +39,10 @@ const BODIES: Array<{ value: BodyType; label: string; hairStyle: HairStyle }> = 
   { value: "dress", label: "Girl", hairStyle: "ponytail" },
 ];
 const HAIRSTYLES: Array<[HairStyle, string]> = [
-  ["swept", "Swept"], ["short", "Short"], ["tuft", "Tuft"], ["sidepart", "Side Part"],
+  ["short", "Short"], ["swept", "Swept"], ["sidepart", "Side Part"], ["tuft", "Tuft"],
   ["spiky", "Spiky"], ["curls", "Curls"], ["afro", "Afro"], ["buzz", "Buzz"],
-  ["long", "Long"], ["ponytail", "Ponytail"], ["bun", "Top Knot"], ["pigtails", "Pigtails"], ["braids", "Braids"],
+  ["long", "Long"], ["bob", "Bob"], ["ponytail", "Ponytail"], ["pigtails", "Pigtails"],
+  ["bun", "Top Knot"], ["braids", "Braids"],
 ];
 const OUTFITS: Array<[string, string, string]> = [
   ["#1d4ed8", "#93c5fd", "Blue"], ["#dc2626", "#fca5a5", "Red"], ["#166534", "#bbf7d0", "Green"],
