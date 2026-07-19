@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 
 /**
@@ -44,9 +44,12 @@ export type CapeStyle = "none" | "hero" | "royal";
 export type BackpackStyle = "none" | "explorer" | "rocket";
 /** Base body silhouette. "neutral" = trousers look, "dress" = flared skirt look. */
 export type BodyType = "neutral" | "dress";
+/** Free face expression (eyes + mouth, plus freckles / rosy cheeks add-ons). */
+export type FaceType = "smile" | "bigSmile" | "happy" | "determined" | "freckles" | "rosy";
 
 export type AvatarOutfit = {
   body?: BodyType;
+  face?: FaceType;
   skin?: string;
   skinShade?: string;
   hair?: string;
@@ -70,6 +73,7 @@ export type AvatarOutfit = {
 
 export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
   body: "neutral",
+  face: "smile",
   skin: "#f1c8a6",
   skinShade: "#d6a07a",
   hair: "#4a2e1c",
@@ -394,6 +398,87 @@ function HairLayer({ o }: { o: Outfit }) {
   }
 }
 
+// Free face expressions — eyes + mouth, with freckles / rosy-cheek add-ons.
+// Eyes live in a `.lul-eyes` group so the idle blink animation can scale them.
+function FaceLayer({ o }: { o: Outfit }) {
+  const openEyes = (
+    <g className="lul-eyes">
+      <ellipse cx="49" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
+      <ellipse cx="71" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
+      <ellipse cx="49" cy="61" rx="2.4" ry="3.2" fill="#2c1810" />
+      <ellipse cx="71" cy="61" rx="2.4" ry="3.2" fill="#2c1810" />
+      <circle cx="50" cy="59.5" r="1.1" fill="#ffffff" />
+      <circle cx="72" cy="59.5" r="1.1" fill="#ffffff" />
+      <circle cx="48.2" cy="62.4" r="0.5" fill="#ffffff" opacity="0.8" />
+      <circle cx="70.2" cy="62.4" r="0.5" fill="#ffffff" opacity="0.8" />
+    </g>
+  );
+  const happyEyes = (
+    <g>
+      <path d="M45 61 Q49 56 53 61" stroke="#2c1810" strokeWidth="2" strokeLinecap="round" fill="none" />
+      <path d="M67 61 Q71 56 75 61" stroke="#2c1810" strokeWidth="2" strokeLinecap="round" fill="none" />
+    </g>
+  );
+  const determinedEyes = (
+    <g className="lul-eyes">
+      <ellipse cx="49" cy="61" rx="3.4" ry="3.8" fill="#ffffff" />
+      <ellipse cx="71" cy="61" rx="3.4" ry="3.8" fill="#ffffff" />
+      <ellipse cx="49" cy="62" rx="2.3" ry="2.8" fill="#2c1810" />
+      <ellipse cx="71" cy="62" rx="2.3" ry="2.8" fill="#2c1810" />
+      {/* focused lids */}
+      <path d="M45 57.5 L53.5 59" stroke={o.hairShade} strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M75 57.5 L66.5 59" stroke={o.hairShade} strokeWidth="1.6" strokeLinecap="round" />
+    </g>
+  );
+  const smallSmile = <path d="M52 74 Q60 80 68 74" stroke="#3d2613" strokeWidth="1.8" strokeLinecap="round" fill="none" />;
+  const bigSmile = (
+    <g>
+      <path d="M50 73 Q60 84 70 73 Q60 78 50 73 Z" fill="#7a3b2e" />
+      <path d="M53 74.5 Q60 78 67 74.5 Q60 80 53 74.5 Z" fill="#ffffff" />
+    </g>
+  );
+
+  const eyes = o.face === "happy" ? happyEyes : o.face === "determined" ? determinedEyes : openEyes;
+  const mouth = o.face === "bigSmile" ? bigSmile : smallSmile;
+  const cheekOpacity = o.face === "rosy" ? 0.9 : 0.55;
+  const cheekR = o.face === "rosy" ? 5.6 : 4.5;
+
+  return (
+    <g data-layer="face">
+      {/* Cheeks */}
+      <ellipse cx="44" cy="68" rx={cheekR} ry={o.face === "rosy" ? 3.4 : 2.6} fill="#f4a8a8" opacity={cheekOpacity} />
+      <ellipse cx="76" cy="68" rx={cheekR} ry={o.face === "rosy" ? 3.4 : 2.6} fill="#f4a8a8" opacity={cheekOpacity} />
+
+      {/* Eyebrows — two short, well-separated strokes (never a monobrow) */}
+      {o.face === "determined" ? null : (
+        <>
+          <path d="M45.5 52.5 Q49 50.8 52.5 52" stroke={o.hairShade} strokeWidth="1.3" strokeLinecap="round" fill="none" opacity="0.9" />
+          <path d="M67.5 52 Q71 50.8 74.5 52.5" stroke={o.hairShade} strokeWidth="1.3" strokeLinecap="round" fill="none" opacity="0.9" />
+        </>
+      )}
+
+      {eyes}
+
+      {/* Nose hint */}
+      <path d="M60 64 Q61 68 60 70" stroke={o.skinShade} strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6" />
+
+      {mouth}
+
+      {/* Freckles */}
+      {o.face === "freckles" ? (
+        <g fill={o.skinShade} opacity="0.55">
+          <circle cx="42" cy="66" r="0.8" />
+          <circle cx="46" cy="68" r="0.8" />
+          <circle cx="45" cy="64" r="0.7" />
+          <circle cx="78" cy="66" r="0.8" />
+          <circle cx="74" cy="68" r="0.8" />
+          <circle cx="75" cy="64" r="0.7" />
+        </g>
+      ) : null}
+    </g>
+  );
+}
+
 function HatLayer({ o }: { o: Outfit }) {
   switch (o.hat) {
     case "beanie":
@@ -486,6 +571,10 @@ type StudentAvatarProps = {
   outfit?: AvatarOutfit;
   glowColor?: string;
   floatAnimation?: string; // CSS animation name (e.g. "char-float 4.5s ease-in-out infinite")
+  /** Idle life: blink + breathe. On by default; pass false for tiny thumbnails. */
+  alive?: boolean;
+  /** Bump this number to play a one-shot "celebrate" pop (e.g. after equipping). */
+  celebrateSignal?: number;
 };
 
 export default function StudentAvatar({
@@ -493,6 +582,8 @@ export default function StudentAvatar({
   outfit,
   glowColor = "rgba(255,255,255,0.18)",
   floatAnimation = "lul-avatar-float 4.6s ease-in-out infinite",
+  alive = true,
+  celebrateSignal = 0,
 }: StudentAvatarProps) {
   // Pull saved outfit on mount (avoids SSR hydration mismatch).
   const [stored, setStored] = useState<AvatarOutfit>({});
@@ -501,6 +592,27 @@ export default function StudentAvatar({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStored(readOutfitFromStorage());
   }, []);
+
+  // One-shot celebrate pop when celebrateSignal changes (skips the first render).
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const firstSignal = useRef(true);
+  useEffect(() => {
+    if (firstSignal.current) {
+      firstSignal.current = false;
+      return;
+    }
+    if (typeof window === "undefined" || !wrapRef.current?.animate) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    wrapRef.current.animate(
+      [
+        { transform: "scale(1)" },
+        { transform: "scale(1.12) rotate(-1.5deg)", offset: 0.35 },
+        { transform: "scale(0.97) rotate(1deg)", offset: 0.7 },
+        { transform: "scale(1)" },
+      ],
+      { duration: 540, easing: "cubic-bezier(.34,1.56,.64,1)" },
+    );
+  }, [celebrateSignal]);
 
   const o: Required<AvatarOutfit> = {
     ...DEFAULT_OUTFIT,
@@ -513,7 +625,8 @@ export default function StudentAvatar({
 
   return (
     <div
-      className="lul-student-avatar"
+      ref={wrapRef}
+      className={`lul-student-avatar${alive ? " lul-alive" : ""}`}
       style={{
         position: "relative",
         display: "inline-block",
@@ -591,30 +704,7 @@ export default function StudentAvatar({
           <ellipse cx="32" cy="59" rx="1.6" ry="3" fill={o.skinShade} opacity="0.6" />
           <ellipse cx="88" cy="59" rx="1.6" ry="3" fill={o.skinShade} opacity="0.6" />
 
-          {/* Cheeks */}
-          <ellipse cx="44" cy="68" rx="4.5" ry="2.6" fill="#f4a8a8" opacity="0.55" />
-          <ellipse cx="76" cy="68" rx="4.5" ry="2.6" fill="#f4a8a8" opacity="0.55" />
-
-          {/* Eyebrows — two short, well-separated strokes (never a monobrow) */}
-          <path d="M45.5 52.5 Q49 50.8 52.5 52" stroke={o.hairShade} strokeWidth="1.3" strokeLinecap="round" fill="none" opacity="0.9" />
-          <path d="M67.5 52 Q71 50.8 74.5 52.5" stroke={o.hairShade} strokeWidth="1.3" strokeLinecap="round" fill="none" opacity="0.9" />
-
-          {/* Eyes — larger, glossy */}
-          <ellipse cx="49" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
-          <ellipse cx="71" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
-          <ellipse cx="49" cy="61" rx="2.4" ry="3.2" fill="#2c1810" />
-          <ellipse cx="71" cy="61" rx="2.4" ry="3.2" fill="#2c1810" />
-          <circle cx="50" cy="59.5" r="1.1" fill="#ffffff" />
-          <circle cx="72" cy="59.5" r="1.1" fill="#ffffff" />
-          <circle cx="48.2" cy="62.4" r="0.5" fill="#ffffff" opacity="0.8" />
-          <circle cx="70.2" cy="62.4" r="0.5" fill="#ffffff" opacity="0.8" />
-
-          {/* Nose hint */}
-          <path d="M60 64 Q61 68 60 70" stroke={o.skinShade} strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6" />
-
-          {/* Friendly smile */}
-          <path d="M52 74 Q60 80 68 74" stroke="#3d2613" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-          <path d="M54 75 Q60 78 66 75" stroke="#f4a8a8" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.7" />
+          <FaceLayer o={o} />
         </g>
 
         {/* ── HAIR + HEADWEAR + EYEWEAR ────────────────── */}
@@ -641,11 +731,21 @@ export default function StudentAvatar({
 
       <style>{`
         @keyframes lul-avatar-float {
-          0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-4px); }
+          0%, 100% { transform: translateY(0) scale(1); }
+          50%      { transform: translateY(-4px) scale(1.012); }
+        }
+        @keyframes lul-blink {
+          0%, 92%, 100% { transform: scaleY(1); }
+          95%           { transform: scaleY(0.08); }
+        }
+        .lul-alive .lul-eyes {
+          transform-box: fill-box;
+          transform-origin: center;
+          animation: lul-blink 5.4s ease-in-out infinite;
         }
         @media (prefers-reduced-motion: reduce) {
           .lul-student-avatar { animation: none !important; }
+          .lul-alive .lul-eyes { animation: none !important; }
         }
       `}</style>
     </div>
