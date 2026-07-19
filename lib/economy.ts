@@ -2,6 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { EXPLORER_XP_LEVEL_BASE, getExplorerRankTitle } from "@/data/explorer-ranks";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import type { AvatarOutfit } from "@/components/avatar/StudentAvatar";
 
 /** Equip slots that make up a layered avatar (base look + these stack on top). */
@@ -103,6 +104,61 @@ function normalizeEconomyState(value: unknown): EconomyState {
   };
 }
 
+// ── Demo Preview economy ────────────────────────────────────────────────────
+// Demo Preview mode has no real student wallet, so the economy is synthesised
+// client-side: the full catalogue, everything owned, effectively unlimited XP.
+// Equipped layers and the free avatar base persist to localStorage so the demo
+// keeps its look across pages. Every mutator below short-circuits here.
+const DEMO_BASE_STORAGE_KEY = "lul:demo-preview:avatar_base_v1";
+const DEMO_EQUIPPED_STORAGE_KEY = "lul:demo-preview:equipped_v1";
+const DEMO_WALLET = { xp_earned: 999999, xp_spent: 0, xp_balance: 999999, essence: 999 };
+
+function readDemoJson<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeDemoJson(key: string, value: unknown) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* ignore */
+  }
+}
+
+function demoSlotFor(item: EconomyItem | undefined): string | null {
+  if (!item) return null;
+  return (item.metadata as { slot?: string })?.slot ?? item.category;
+}
+
+/** Full active catalogue (no student context). Used to build the demo economy. */
+export async function fetchEconomyCatalog(): Promise<EconomyItem[]> {
+  const { data, error } = await supabase.rpc("get_economy_catalog_secure");
+  if (error) throw error;
+  return Array.isArray(data) ? (data as EconomyItem[]) : [];
+}
+
+function buildDemoEconomyState(items: EconomyItem[]): EconomyState {
+  const now = new Date().toISOString();
+  return {
+    wallet: { ...DEMO_WALLET },
+    items,
+    inventory: items.map((item) => ({ item_key: item.item_key, acquired_at: now, acquisition_type: "demo" })),
+    equipped: readDemoJson<Record<string, string>>(DEMO_EQUIPPED_STORAGE_KEY, {}),
+    avatarBase: readDemoJson<AvatarOutfit>(DEMO_BASE_STORAGE_KEY, {}),
+  };
+}
+
+export async function fetchDemoEconomy(): Promise<EconomyState> {
+  return buildDemoEconomyState(await fetchEconomyCatalog());
+}
+
 /**
  * Compose the rendered avatar from the free base look plus every equipped
  * avatar layer (outfit, hat, glasses, cape, backpack). Later layers win, so an
@@ -125,6 +181,7 @@ export function mergeAvatarOutfit(state: EconomyState): AvatarOutfit {
 }
 
 export async function fetchStudentEconomy(studentId: string) {
+  if (isDemoPreviewMode()) return fetchDemoEconomy();
   const { data, error } = await supabase.rpc("get_student_economy_secure", { p_student_id: studentId });
   if (error) throw error;
   return normalizeEconomyState(data);
@@ -156,6 +213,8 @@ export async function fetchGlobalXp(studentId: string) {
 }
 
 export async function purchaseEconomyItem(studentId: string, itemKey: string) {
+  // Demo owns everything already — treat a "buy" as a no-op refresh.
+  if (isDemoPreviewMode()) return fetchDemoEconomy();
   const { data, error } = await supabase.rpc("purchase_economy_item_secure", {
     p_student_id: studentId,
     p_item_key: itemKey,
@@ -166,6 +225,16 @@ export async function purchaseEconomyItem(studentId: string, itemKey: string) {
 }
 
 export async function equipEconomyItem(studentId: string, itemKey: string) {
+  if (isDemoPreviewMode()) {
+    const items = await fetchEconomyCatalog();
+    const slot = demoSlotFor(items.find((item) => item.item_key === itemKey));
+    if (slot) {
+      const equipped = readDemoJson<Record<string, string>>(DEMO_EQUIPPED_STORAGE_KEY, {});
+      equipped[slot] = itemKey;
+      writeDemoJson(DEMO_EQUIPPED_STORAGE_KEY, equipped);
+    }
+    return buildDemoEconomyState(items);
+  }
   const { data, error } = await supabase.rpc("equip_economy_item_secure", {
     p_student_id: studentId,
     p_item_key: itemKey,
@@ -192,6 +261,12 @@ export function persistAvatarToStorage(studentId: string, state: EconomyState) {
 }
 
 export async function unequipEconomySlot(studentId: string, slot: string) {
+  if (isDemoPreviewMode()) {
+    const equipped = readDemoJson<Record<string, string>>(DEMO_EQUIPPED_STORAGE_KEY, {});
+    delete equipped[slot];
+    writeDemoJson(DEMO_EQUIPPED_STORAGE_KEY, equipped);
+    return fetchDemoEconomy();
+  }
   const { data, error } = await supabase.rpc("unequip_economy_slot_secure", {
     p_student_id: studentId,
     p_slot: slot,
@@ -201,6 +276,10 @@ export async function unequipEconomySlot(studentId: string, slot: string) {
 }
 
 export async function saveAvatarBase(studentId: string, base: AvatarOutfit) {
+  if (isDemoPreviewMode()) {
+    writeDemoJson(DEMO_BASE_STORAGE_KEY, base);
+    return fetchDemoEconomy();
+  }
   const { data, error } = await supabase.rpc("set_student_avatar_base_secure", {
     p_student_id: studentId,
     p_base: base,
