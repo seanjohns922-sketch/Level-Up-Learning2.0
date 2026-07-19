@@ -36,6 +36,7 @@ export type HairStyle =
   | "braids"
   | "sidepart"
   | "pigtails"
+  | "bob"
   | "spiky";
 export type HatStyle = "none" | "beanie" | "cap" | "explorer" | "crown" | "wizard";
 export type GlassesStyle = "none" | "round" | "shades" | "visor";
@@ -162,20 +163,71 @@ function LowerBody({ o }: { o: Outfit }) {
   );
 }
 
-// Flared skirt, drawn over the hoodie hem so the dress reads as one piece.
-function SkirtLayer({ o }: { o: Outfit }) {
-  if (o.body !== "dress") return null;
+// Hoodie (neutral / boy body) — torso, arms, hood, kangaroo pocket.
+function HoodieTorso({ o }: { o: Outfit }) {
   return (
-    <g data-layer="skirt">
-      <path d="M36 148 Q60 156 84 148 L94 184 Q60 196 26 184 Z" fill="url(#lul-shirt)" />
-      {/* pleat shading */}
-      <line x1="52" y1="154" x2="45" y2="188" stroke="#000" strokeOpacity="0.12" strokeWidth="1.4" />
-      <line x1="60" y1="156" x2="60" y2="190" stroke="#000" strokeOpacity="0.12" strokeWidth="1.4" />
-      <line x1="68" y1="154" x2="75" y2="188" stroke="#000" strokeOpacity="0.12" strokeWidth="1.4" />
-      {/* hem trim */}
-      <path d="M26 184 Q60 196 94 184" stroke={o.shirtTrim} strokeWidth="2.6" fill="none" strokeLinecap="round" />
+    <g data-layer="shirt">
+      {/* Arms */}
+      <path d="M22 100 Q14 112 18 150 Q24 158 32 154 Q34 128 34 108 Z" fill="url(#lul-shirt)" />
+      <path d="M98 100 Q106 112 102 150 Q96 158 88 154 Q86 128 86 108 Z" fill="url(#lul-shirt)" />
+      {/* Hands */}
+      <circle cx="24" cy="156" r="7.5" fill="url(#lul-skin)" />
+      <circle cx="96" cy="156" r="7.5" fill="url(#lul-skin)" />
+      {/* Torso (hoodie body) */}
+      <path d="M32 100 Q60 92 88 100 L94 156 Q60 168 26 156 Z" fill="url(#lul-shirt)" />
+      {/* Hood back */}
+      <path d="M34 100 Q40 82 60 80 Q80 82 86 100 Q72 92 60 92 Q48 92 34 100 Z" fill={o.shirt} opacity="0.95" />
+      {/* Kangaroo pocket */}
+      <path d="M42 128 L78 128 Q80 142 60 144 Q40 142 42 128 Z" fill="#000" opacity="0.18" />
+      {/* Drawstrings */}
+      <line x1="54" y1="100" x2="52" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="66" y1="100" x2="68" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
+      <circle cx="52" cy="119" r="1.4" fill={o.shirtTrim} />
+      <circle cx="68" cy="119" r="1.4" fill={o.shirtTrim} />
+      {/* Side highlight */}
+      <path d="M32 108 Q34 138 30 156" stroke="#ffffff" strokeOpacity="0.14" strokeWidth="3" fill="none" />
     </g>
   );
+}
+
+// Dress (girl body) — fitted bodice, puff sleeves, collar, sash and flared
+// skirt in one piece. Deliberately its own shape, not the hoodie plus a skirt.
+function DressTorso({ o }: { o: Outfit }) {
+  return (
+    <g data-layer="dress">
+      {/* Sleeves (dress colour) */}
+      <path d="M24 102 Q16 114 20 150 Q26 158 33 154 Q35 128 35 110 Z" fill="url(#lul-shirt)" />
+      <path d="M96 102 Q104 114 100 150 Q94 158 87 154 Q85 128 85 110 Z" fill="url(#lul-shirt)" />
+      {/* Hands */}
+      <circle cx="26" cy="156" r="7.5" fill="url(#lul-skin)" />
+      <circle cx="94" cy="156" r="7.5" fill="url(#lul-skin)" />
+      {/* Puff sleeve caps at the shoulders */}
+      <ellipse cx="33" cy="105" rx="9.5" ry="8.5" fill="url(#lul-shirt)" />
+      <ellipse cx="87" cy="105" rx="9.5" ry="8.5" fill="url(#lul-shirt)" />
+      <ellipse cx="33" cy="104" rx="9.5" ry="8.5" fill="#ffffff" opacity="0.08" />
+      <ellipse cx="87" cy="104" rx="9.5" ry="8.5" fill="#ffffff" opacity="0.08" />
+      {/* Fitted bodice */}
+      <path d="M34 100 Q60 94 86 100 L82 150 Q60 156 38 150 Z" fill="url(#lul-shirt)" />
+      {/* Neckline collar */}
+      <path d="M49 99 Q60 111 71 99 Q66 104 60 104 Q54 104 49 99 Z" fill={o.shirtTrim} />
+      {/* Waist sash */}
+      <path d="M38 145 Q60 151 82 145 L82 152 Q60 158 38 152 Z" fill={o.shirtTrim} opacity="0.95" />
+      {/* Flared skirt */}
+      <path d="M37 150 Q60 157 83 150 L94 187 Q60 198 26 187 Z" fill="url(#lul-shirt)" />
+      {/* Pleat shading */}
+      <line x1="50" y1="156" x2="43" y2="184" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
+      <line x1="60" y1="158" x2="60" y2="185" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
+      <line x1="70" y1="156" x2="77" y2="184" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
+      {/* Hem trim */}
+      <path d="M26 187 Q60 198 94 187" stroke={o.shirtTrim} strokeWidth="3" fill="none" strokeLinecap="round" />
+      {/* Side highlight */}
+      <path d="M37 110 Q35 130 34 150" stroke="#ffffff" strokeOpacity="0.12" strokeWidth="2.5" fill="none" />
+    </g>
+  );
+}
+
+function Torso({ o }: { o: Outfit }) {
+  return o.body === "dress" ? <DressTorso o={o} /> : <HoodieTorso o={o} />;
 }
 
 // ── Front layers (drawn after head + hair) ─────────────────────────────────
@@ -192,151 +244,151 @@ function BackpackStraps({ o }: { o: Outfit }) {
 }
 
 function HairLayer({ o }: { o: Outfit }) {
-  const swept = (
+  // A clean hair cap: covers the crown and temples, with a soft rounded fringe
+  // that sits well ABOVE the eyebrows (brows are at ~y51) — the same hair colour
+  // throughout, so there is never a dark bar reading as a monobrow.
+  const cap = (
     <path
-      d="M30 44 Q28 16 60 14 Q92 16 90 44 Q86 36 80 34 Q72 28 60 30 Q48 28 40 34 Q34 36 30 44 Z"
+      d="M30 55 Q28 18 60 15 Q92 18 90 55 Q85 43 76 41 Q68 38 60 40 Q52 38 44 41 Q35 43 30 55 Z"
       fill="url(#lul-hair)"
     />
   );
-  const short = (
-    <>
-      <path
-        d="M30 54 Q28 20 60 16 Q92 20 90 54 Q86 42 80 40 Q76 34 68 34 Q60 30 52 36 Q44 34 40 40 Q34 42 30 54 Z"
-        fill="url(#lul-hair)"
-      />
-      <path d="M40 44 Q50 50 62 46 Q72 50 82 44 Q80 54 70 54 Q60 56 50 54 Q42 54 40 44 Z" fill={o.hairShade} />
-    </>
+  const shine = (
+    <path
+      d="M40 33 Q58 25 80 35"
+      stroke="#ffffff"
+      strokeOpacity="0.16"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      fill="none"
+    />
   );
+
   switch (o.hairStyle) {
-    case "tuft":
-      return (
-        <g data-layer="hair">
-          <path
-            d="M32 50 Q34 18 60 18 Q86 18 88 50 Q80 38 70 40 Q66 30 60 32 Q54 30 50 40 Q40 38 32 50 Z"
-            fill="url(#lul-hair)"
-          />
-          <path d="M58 20 Q62 10 68 20 Q64 16 58 20 Z" fill="url(#lul-hair)" />
-        </g>
-      );
-    case "short":
-      return <g data-layer="hair">{short}</g>;
     case "buzz":
       return (
         <g data-layer="hair">
-          <path
-            d="M32 48 Q30 22 60 20 Q90 22 88 48 Q80 40 60 40 Q40 40 32 48 Z"
-            fill="url(#lul-hair)"
-            opacity="0.9"
-          />
+          <path d="M32 53 Q31 23 60 21 Q89 23 88 53 Q80 47 60 47 Q40 47 32 53 Z" fill="url(#lul-hair)" opacity="0.92" />
         </g>
       );
-    case "long":
+    case "short":
       return (
         <g data-layer="hair">
-          {/* side lengths falling to the shoulders (behind the sweep) */}
-          <path d="M30 42 Q24 72 30 96 Q37 98 41 92 Q36 66 40 46 Z" fill="url(#lul-hair)" />
-          <path d="M90 42 Q96 72 90 96 Q83 98 79 92 Q84 66 80 46 Z" fill="url(#lul-hair)" />
-          {swept}
-        </g>
-      );
-    case "ponytail":
-      return (
-        <g data-layer="hair">
-          <path d="M86 30 Q104 36 100 58 Q96 74 86 68 Q92 50 82 42 Z" fill="url(#lul-hair)" />
-          <circle cx="86" cy="31" r="3" fill={o.hairShade} />
-          {short}
-        </g>
-      );
-    case "bun":
-      return (
-        <g data-layer="hair">
-          {swept}
-          <circle cx="60" cy="11" r="8" fill="url(#lul-hair)" />
-          <circle cx="60" cy="11" r="8" fill="#000" opacity="0.1" />
-          <path d="M53 8 Q60 4 67 8" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1.2" fill="none" />
-        </g>
-      );
-    case "afro":
-      return (
-        <g data-layer="hair">
-          <path
-            d="M28 46 Q22 10 60 8 Q98 10 92 46 Q92 60 82 64 Q88 44 78 38 Q84 28 60 26 Q36 28 42 38 Q32 44 38 64 Q28 60 28 46 Z"
-            fill="url(#lul-hair)"
-          />
-          <circle cx="40" cy="20" r="3" fill={o.hairShade} opacity="0.35" />
-          <circle cx="60" cy="13" r="3" fill={o.hairShade} opacity="0.35" />
-          <circle cx="80" cy="20" r="3" fill={o.hairShade} opacity="0.35" />
-          <circle cx="31" cy="38" r="2.6" fill={o.hairShade} opacity="0.3" />
-          <circle cx="89" cy="38" r="2.6" fill={o.hairShade} opacity="0.3" />
-        </g>
-      );
-    case "curls":
-      return (
-        <g data-layer="hair">
-          <path
-            d="M30 50 Q28 18 60 16 Q92 18 90 50 Q86 44 82 44 Q84 34 76 34 Q78 26 68 30 Q70 22 60 26 Q50 22 52 30 Q44 26 44 34 Q36 34 38 44 Q34 44 30 50 Z"
-            fill="url(#lul-hair)"
-          />
-          <circle cx="42" cy="26" r="3.4" fill="#ffffff" opacity="0.08" />
-          <circle cx="60" cy="22" r="3.4" fill="#ffffff" opacity="0.08" />
-          <circle cx="78" cy="26" r="3.4" fill="#ffffff" opacity="0.08" />
-        </g>
-      );
-    case "braids":
-      return (
-        <g data-layer="hair">
-          <path d="M30 44 Q26 74 30 100 L40 100 Q40 72 40 46 Z" fill="url(#lul-hair)" />
-          <path d="M90 44 Q94 74 90 100 L80 100 Q80 72 80 46 Z" fill="url(#lul-hair)" />
-          <line x1="30" y1="58" x2="40" y2="58" stroke={o.hairShade} strokeWidth="1.4" />
-          <line x1="30" y1="70" x2="40" y2="70" stroke={o.hairShade} strokeWidth="1.4" />
-          <line x1="30" y1="82" x2="40" y2="82" stroke={o.hairShade} strokeWidth="1.4" />
-          <line x1="30" y1="94" x2="40" y2="94" stroke={o.hairShade} strokeWidth="1.4" />
-          <line x1="80" y1="58" x2="90" y2="58" stroke={o.hairShade} strokeWidth="1.4" />
-          <line x1="80" y1="70" x2="90" y2="70" stroke={o.hairShade} strokeWidth="1.4" />
-          <line x1="80" y1="82" x2="90" y2="82" stroke={o.hairShade} strokeWidth="1.4" />
-          <line x1="80" y1="94" x2="90" y2="94" stroke={o.hairShade} strokeWidth="1.4" />
-          <path
-            d="M30 44 Q28 16 60 14 Q92 16 90 44 Q84 34 74 34 Q66 26 60 28 Q54 26 46 34 Q36 34 30 44 Z"
-            fill="url(#lul-hair)"
-          />
+          {cap}
+          {shine}
         </g>
       );
     case "sidepart":
       return (
         <g data-layer="hair">
-          <path
-            d="M30 46 Q28 16 60 14 Q92 16 90 46 Q86 34 70 32 Q66 22 48 28 Q40 30 34 40 Q32 42 30 46 Z"
-            fill="url(#lul-hair)"
-          />
-          <path d="M52 20 Q66 25 84 30" stroke={o.hairShade} strokeWidth="1.2" fill="none" opacity="0.7" />
+          {/* fringe swept across from a side part */}
+          <path d="M30 55 Q29 18 60 15 Q91 18 90 55 Q86 41 72 39 Q64 30 44 37 Q36 41 30 55 Z" fill="url(#lul-hair)" />
+          <path d="M50 22 Q66 28 83 37" stroke={o.hairShade} strokeWidth="1.3" strokeLinecap="round" opacity="0.5" fill="none" />
         </g>
       );
-    case "pigtails":
+    case "tuft":
       return (
         <g data-layer="hair">
-          <circle cx="28" cy="46" r="9" fill="url(#lul-hair)" />
-          <circle cx="92" cy="46" r="9" fill="url(#lul-hair)" />
-          <path
-            d="M30 54 Q28 20 60 16 Q92 20 90 54 Q86 42 80 40 Q76 34 68 34 Q60 30 52 36 Q44 34 40 40 Q34 42 30 54 Z"
-            fill="url(#lul-hair)"
-          />
-          <path d="M40 44 Q50 50 62 46 Q72 50 82 44 Q80 54 70 54 Q60 56 50 54 Q42 54 40 44 Z" fill={o.hairShade} />
+          <path d="M33 53 Q34 24 60 22 Q86 24 87 53 Q80 45 70 45 Q66 37 60 38 Q54 37 50 45 Q40 45 33 53 Z" fill="url(#lul-hair)" />
+          <path d="M55 24 Q60 11 66 23 Q62 18 55 24 Z" fill="url(#lul-hair)" />
         </g>
       );
     case "spiky":
       return (
         <g data-layer="hair">
-          <path
-            d="M30 48 Q30 22 60 20 Q90 22 90 48 Q84 40 78 42 L82 28 L72 40 L74 24 L64 38 L62 22 L54 38 L50 26 L48 40 L40 28 L42 42 Q36 40 30 48 Z"
-            fill="url(#lul-hair)"
-          />
+          <path d="M30 51 Q30 24 60 21 Q90 24 90 51 Q84 42 78 44 L82 29 L72 42 L74 25 L64 40 L61 23 L54 40 L49 26 L47 44 L40 29 L43 45 Q36 43 30 51 Z" fill="url(#lul-hair)" />
         </g>
       );
-    default:
+    case "curls":
       return (
         <g data-layer="hair">
-          {swept}
-          <path d="M40 28 Q60 22 80 28" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="1.2" fill="none" />
+          <path d="M30 53 Q28 20 60 16 Q92 20 90 53 Q90 46 85 46 Q88 37 79 37 Q82 28 71 31 Q73 22 60 25 Q47 22 49 31 Q38 28 41 37 Q32 37 35 46 Q30 46 30 53 Z" fill="url(#lul-hair)" />
+          <circle cx="42" cy="31" r="4" fill="#ffffff" opacity="0.07" />
+          <circle cx="60" cy="25" r="4.2" fill="#ffffff" opacity="0.07" />
+          <circle cx="78" cy="31" r="4" fill="#ffffff" opacity="0.07" />
+          <circle cx="34" cy="44" r="3.2" fill="#ffffff" opacity="0.06" />
+          <circle cx="86" cy="44" r="3.2" fill="#ffffff" opacity="0.06" />
+        </g>
+      );
+    case "afro":
+      return (
+        <g data-layer="hair">
+          <path d="M26 48 Q19 9 60 7 Q101 9 94 48 Q95 63 83 67 Q90 45 80 37 Q86 27 60 25 Q34 27 40 37 Q30 45 37 67 Q25 63 26 48 Z" fill="url(#lul-hair)" />
+          <circle cx="40" cy="19" r="3.2" fill="#000" opacity="0.10" />
+          <circle cx="60" cy="11" r="3.2" fill="#000" opacity="0.10" />
+          <circle cx="80" cy="19" r="3.2" fill="#000" opacity="0.10" />
+          <circle cx="30" cy="40" r="3" fill="#000" opacity="0.08" />
+          <circle cx="90" cy="40" r="3" fill="#000" opacity="0.08" />
+        </g>
+      );
+    case "long":
+      return (
+        <g data-layer="hair">
+          {/* long lengths falling past the shoulders */}
+          <path d="M29 48 Q20 82 27 116 Q36 120 43 111 Q37 80 41 50 Z" fill="url(#lul-hair)" />
+          <path d="M91 48 Q100 82 93 116 Q84 120 77 111 Q83 80 79 50 Z" fill="url(#lul-hair)" />
+          {cap}
+          {shine}
+        </g>
+      );
+    case "bob":
+      return (
+        <g data-layer="hair">
+          {/* chin-length bob framing the face */}
+          <path d="M28 52 Q26 20 60 16 Q94 20 92 52 Q92 78 84 92 Q80 78 82 58 Q80 46 72 42 Q66 40 60 41 Q54 40 48 42 Q40 46 38 58 Q40 78 36 92 Q28 78 28 52 Z" fill="url(#lul-hair)" />
+          {shine}
+        </g>
+      );
+    case "ponytail":
+      return (
+        <g data-layer="hair">
+          {/* high ponytail flowing behind on one side */}
+          <path d="M82 26 Q108 32 103 64 Q100 86 87 79 Q98 54 80 43 Z" fill="url(#lul-hair)" />
+          <path d="M79 30 Q88 25 92 33" stroke={o.hairShade} strokeWidth="2.4" strokeLinecap="round" fill="none" opacity="0.55" />
+          {cap}
+          {shine}
+        </g>
+      );
+    case "pigtails":
+      return (
+        <g data-layer="hair">
+          {/* two low pigtails */}
+          <path d="M27 46 Q11 50 14 74 Q17 90 31 82 Q23 64 34 54 Z" fill="url(#lul-hair)" />
+          <path d="M93 46 Q109 50 106 74 Q103 90 89 82 Q97 64 86 54 Z" fill="url(#lul-hair)" />
+          {cap}
+          <circle cx="31" cy="49" r="3" fill={o.hairShade} />
+          <circle cx="89" cy="49" r="3" fill={o.hairShade} />
+        </g>
+      );
+    case "bun":
+      return (
+        <g data-layer="hair">
+          {cap}
+          <circle cx="60" cy="12" r="9.5" fill="url(#lul-hair)" />
+          <ellipse cx="60" cy="12" rx="9.5" ry="9.5" fill="#000" opacity="0.08" />
+          <path d="M52 9 Q60 3 68 9" stroke="#ffffff" strokeOpacity="0.16" strokeWidth="1.4" fill="none" />
+        </g>
+      );
+    case "braids":
+      return (
+        <g data-layer="hair">
+          {/* two braids down each side with rung shading */}
+          <path d="M29 48 Q23 80 29 110 L41 110 Q39 80 40 50 Z" fill="url(#lul-hair)" />
+          <path d="M91 48 Q97 80 91 110 L79 110 Q81 80 80 50 Z" fill="url(#lul-hair)" />
+          {[60, 74, 88, 102].map((y) => (
+            <g key={y}>
+              <path d={`M29 ${y} Q35 ${y + 3} 41 ${y}`} stroke={o.hairShade} strokeWidth="1.3" fill="none" opacity="0.6" />
+              <path d={`M79 ${y} Q85 ${y + 3} 91 ${y}`} stroke={o.hairShade} strokeWidth="1.3" fill="none" opacity="0.6" />
+            </g>
+          ))}
+          {cap}
+        </g>
+      );
+    default: // swept
+      return (
+        <g data-layer="hair">
+          <path d="M30 55 Q28 17 60 14 Q92 17 90 55 Q86 41 74 39 Q68 31 57 33 Q46 33 40 40 Q34 42 30 55 Z" fill="url(#lul-hair)" />
+          {shine}
         </g>
       );
   }
@@ -519,40 +571,10 @@ export default function StudentAvatar({
         {/* ── LOWER BODY (trousers or leggings) ────────── */}
         <LowerBody o={o} />
 
-        {/* ── HOODIE layer (torso + arms + hood) ────── */}
-        <g data-layer="shirt">
-          {/* Arms */}
-          <path d="M22 100 Q14 112 18 150 Q24 158 32 154 Q34 128 34 108 Z" fill="url(#lul-shirt)" />
-          <path d="M98 100 Q106 112 102 150 Q96 158 88 154 Q86 128 86 108 Z" fill="url(#lul-shirt)" />
-          {/* Hands */}
-          <circle cx="24" cy="156" r="7.5" fill="url(#lul-skin)" />
-          <circle cx="96" cy="156" r="7.5" fill="url(#lul-skin)" />
-          {/* Torso (hoodie body) */}
-          <path
-            d="M32 100 Q60 92 88 100 L94 156 Q60 168 26 156 Z"
-            fill="url(#lul-shirt)"
-          />
-          {/* Hood back (behind neck) */}
-          <path
-            d="M34 100 Q40 82 60 80 Q80 82 86 100 Q72 92 60 92 Q48 92 34 100 Z"
-            fill={o.shirt}
-            opacity="0.95"
-          />
-          {/* Kangaroo pocket */}
-          <path d="M42 128 L78 128 Q80 142 60 144 Q40 142 42 128 Z" fill="#000" opacity="0.18" />
-          {/* Drawstrings */}
-          <line x1="54" y1="100" x2="52" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
-          <line x1="66" y1="100" x2="68" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
-          <circle cx="52" cy="119" r="1.4" fill={o.shirtTrim} />
-          <circle cx="68" cy="119" r="1.4" fill={o.shirtTrim} />
-          {/* Side highlight */}
-          <path d="M32 108 Q34 138 30 156" stroke="#ffffff" strokeOpacity="0.14" strokeWidth="3" fill="none" />
-        </g>
+        {/* ── TORSO (hoodie for boy, dress for girl) ──── */}
+        <Torso o={o} />
 
-        {/* Skirt sits over the hoodie hem so a dress reads as one piece */}
-        <SkirtLayer o={o} />
-
-        {/* Backpack straps sit over the hoodie */}
+        {/* Backpack straps sit over the top */}
         <BackpackStraps o={o} />
 
         {/* ── NECK + HEAD ──────────────────────────────── */}
@@ -573,9 +595,9 @@ export default function StudentAvatar({
           <ellipse cx="44" cy="68" rx="4.5" ry="2.6" fill="#f4a8a8" opacity="0.55" />
           <ellipse cx="76" cy="68" rx="4.5" ry="2.6" fill="#f4a8a8" opacity="0.55" />
 
-          {/* Eyebrows — SEPARATE, not a monobrow */}
-          <path d="M45 53 Q49 51 53 53" stroke={o.hairShade} strokeWidth="1.4" strokeLinecap="round" fill="none" />
-          <path d="M67 53 Q71 51 75 53" stroke={o.hairShade} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+          {/* Eyebrows — two short, well-separated strokes (never a monobrow) */}
+          <path d="M45.5 52.5 Q49 50.8 52.5 52" stroke={o.hairShade} strokeWidth="1.3" strokeLinecap="round" fill="none" opacity="0.9" />
+          <path d="M67.5 52 Q71 50.8 74.5 52.5" stroke={o.hairShade} strokeWidth="1.3" strokeLinecap="round" fill="none" opacity="0.9" />
 
           {/* Eyes — larger, glossy */}
           <ellipse cx="49" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
