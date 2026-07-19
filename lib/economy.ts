@@ -8,6 +8,9 @@ import type { AvatarOutfit } from "@/components/avatar/StudentAvatar";
 /** Equip slots that make up a layered avatar (base look + these stack on top). */
 export const AVATAR_LAYER_SLOTS = [
   "avatar_outfit",
+  "top",
+  "bottom",
+  "footwear",
   "avatar_hat",
   "avatar_glasses",
   "avatar_cape",
