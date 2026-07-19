@@ -33,10 +33,10 @@ const KEY_TO_SPECIES: Record<string, PetSpecies> = {
   pet_star_unicorn: "unicorn",
 };
 
-export function petSpeciesForItem(itemKey: string, metadata?: Record<string, unknown> | null): PetSpecies {
+export function petSpeciesForItem(itemKey: string, metadata?: Record<string, unknown> | null): PetSpecies | null {
   const fromMeta = metadata?.species;
   if (typeof fromMeta === "string" && (PET_SPECIES as string[]).includes(fromMeta)) return fromMeta as PetSpecies;
-  return KEY_TO_SPECIES[itemKey] ?? "cat";
+  return KEY_TO_SPECIES[itemKey] ?? null;
 }
 
 // ── Shared drawing helpers (return SVG string fragments) ───────────────────
@@ -209,8 +209,8 @@ function petSvg(species: PetSpecies): string {
   );
 }
 
-export default function PetArt({ species, size = 72, className }: { species: PetSpecies; size?: number; className?: string }) {
+export default function PetArt({ species, size = 72, className, alt }: { species: PetSpecies; size?: number; className?: string; alt?: string }) {
   const src = `data:image/svg+xml;utf8,${encodeURIComponent(petSvg(species))}`;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} width={size} height={Math.round((size * 150) / 140)} alt="" aria-hidden="true" className={className} draggable={false} />;
+  return <img src={src} width={size} height={Math.round((size * 150) / 140)} alt={alt ?? ""} aria-hidden={alt ? undefined : true} className={className} draggable={false} loading="lazy" />;
 }

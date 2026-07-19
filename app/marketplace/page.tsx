@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import * as Icons from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
-import StudentAvatar, { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
-import PetArt, { petSpeciesForItem } from "@/components/pets/PetArt";
+import { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
+import MarketplaceItemImage from "@/components/economy/MarketplaceItemImage";
 import { economyErrorMessage, equipEconomyItem, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyCategory, type EconomyItem, type EconomyState } from "@/lib/economy";
+import { isMarketplaceItemAvailable, isMarketplaceItemListed } from "@/lib/marketplace-visuals";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 
 const CATEGORIES: Array<{ id: "all" | EconomyCategory; label: string }> = [
@@ -14,22 +15,12 @@ const CATEGORIES: Array<{ id: "all" | EconomyCategory; label: string }> = [
   { id: "trail", label: "Trails" }, { id: "title", label: "Titles" },
 ];
 
-function ItemIcon({ item, size = 32 }: { item: EconomyItem; size?: number }) {
-  const Icon = (Icons as unknown as Record<string, React.ComponentType<{ size?: number; strokeWidth?: number }>>)[item.icon] ?? Icons.Sparkles;
-  return <Icon size={size} strokeWidth={1.8} />;
-}
-
-// Pets render as premium art; everything else keeps its lucide icon.
-function ItemVisual({ item, size = 32 }: { item: EconomyItem; size?: number }) {
-  if (item.category === "pet") return <PetArt species={petSpeciesForItem(item.item_key, item.metadata)} size={Math.round(size * 1.5)} />;
-  return <ItemIcon item={item} size={size} />;
-}
-
 export default function MarketplacePage() {
   const student = useMemo(() => getActiveStudentProfile(), []);
   const [state, setState] = useState<EconomyState | null>(null);
   const [category, setCategory] = useState<"all" | EconomyCategory>("all");
   const [selected, setSelected] = useState<EconomyItem | null>(null);
+  const [brokenArtworkIds, setBrokenArtworkIds] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const sessionMessage = student?.studentId ? null : "Log in as a student to open the Marketplace.";
@@ -38,14 +29,18 @@ export default function MarketplacePage() {
     if (!student?.studentId) return;
     fetchStudentEconomy(student.studentId).then((next) => {
       setState(next);
-      setSelected(next.items.find((item) => item.purchasable) ?? null);
+      setSelected(next.items.find(isMarketplaceItemListed) ?? null);
     }).catch((error) => setMessage(economyErrorMessage(error)));
   }, [student?.studentId]);
 
   const owned = useMemo(() => new Set(state?.inventory.map((entry) => entry.item_key) ?? []), [state?.inventory]);
-  const items = useMemo(() => (state?.items ?? []).filter((item) => item.purchasable && (category === "all" || item.category === category)), [category, state?.items]);
+  const equipped = useMemo(() => new Set(Object.values(state?.equipped ?? {})), [state?.equipped]);
+  const items = useMemo(() => (state?.items ?? []).filter((item) => isMarketplaceItemListed(item) && (category === "all" || item.category === category)), [category, state?.items]);
   const selectedOwned = selected ? owned.has(selected.item_key) : false;
-  const selectedEquipped = selected ? Object.values(state?.equipped ?? {}).includes(selected.item_key) : false;
+  const selectedEquipped = selected ? equipped.has(selected.item_key) : false;
+  const selectedUnavailable = selected
+    ? !isMarketplaceItemAvailable(selected) || brokenArtworkIds.has(selected.item_key)
+    : true;
   // Preview an avatar item layered over the student's current look, not in isolation.
   const previewOutfit = selected?.category === "avatar"
     ? (() => {
@@ -57,7 +52,7 @@ export default function MarketplacePage() {
     : undefined;
 
   async function act() {
-    if (!student?.studentId || !selected || busy) return;
+    if (!student?.studentId || !selected || busy || selectedUnavailable) return;
     setBusy(true); setMessage(null);
     try {
       const next = selectedOwned
@@ -80,25 +75,27 @@ export default function MarketplacePage() {
         {message || sessionMessage ? <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900" role="status">{message ?? sessionMessage}</div> : null}
         <div className="grid gap-5 lg:grid-cols-[1fr_390px]">
           <section className="grid content-start grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" aria-label="Marketplace items">
-            {items.map((item) => { const rarity = RARITY_STYLES[item.rarity]; const isOwned = owned.has(item.item_key); return (
-              <button type="button" key={item.item_key} onClick={() => setSelected(item)} className={`min-h-[190px] overflow-hidden rounded-md border bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${selected?.item_key === item.item_key ? "border-slate-900 ring-2 ring-slate-900/10" : "border-slate-200"}`}>
-                <div className="mb-4 flex h-20 items-center justify-center rounded-md" style={{ color: item.accent, background: `${item.accent}18` }}><ItemVisual item={item} size={42} /></div>
+            {items.map((item) => { const rarity = RARITY_STYLES[item.rarity]; const isOwned = owned.has(item.item_key); const isEquipped = equipped.has(item.item_key); const unavailable = !isMarketplaceItemAvailable(item) || brokenArtworkIds.has(item.item_key); return (
+              <button type="button" key={item.item_key} onClick={() => setSelected(item)} className={`min-h-[220px] overflow-hidden rounded-md border bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${selected?.item_key === item.item_key ? "border-slate-900 ring-2 ring-slate-900/10" : "border-slate-200"}`}>
+                <div className="relative mb-4 flex h-28 items-center justify-center overflow-hidden rounded-md" style={{ background: `${item.accent}18` }}>
+                  <MarketplaceItemImage item={item} context="card" onArtworkError={(itemKey) => setBrokenArtworkIds((current) => new Set(current).add(itemKey))} />
+                </div>
                 <div className="flex items-start justify-between gap-2"><h2 className="text-sm font-black leading-tight">{item.name}</h2>{isOwned ? <Icons.Check className="h-4 w-4 shrink-0 text-emerald-600" /> : null}</div>
-                <div className="mt-2 flex items-center justify-between gap-2"><span className="rounded px-1.5 py-0.5 text-[10px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span><span className="text-xs font-black text-amber-700">{isOwned ? "Owned" : `${item.price} XP`}</span></div>
+                <div className="mt-2 flex items-center justify-between gap-2"><span className="rounded px-1.5 py-0.5 text-[10px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span><span className={`text-xs font-black ${unavailable ? "text-slate-400" : isEquipped ? "text-emerald-700" : "text-amber-700"}`}>{unavailable ? "Unavailable" : isEquipped ? "Equipped" : isOwned ? "Owned" : `${item.price} XP`}</span></div>
               </button>
             ); })}
             {state && items.length === 0 ? <div className="col-span-full rounded-md border border-dashed border-slate-300 bg-white p-10 text-center text-sm font-bold text-slate-500">No items in this category yet.</div> : null}
           </section>
           <aside className="h-fit rounded-md border border-slate-200 bg-white p-5 lg:sticky lg:top-20">
             {selected ? <>
-              <div className="relative flex h-64 items-end justify-center overflow-hidden rounded-md bg-slate-950" style={{ background: `linear-gradient(160deg, ${selected.accent}35, #0f172a 65%)` }}>
-                {selected.category === "avatar" ? <StudentAvatar height={220} outfit={previewOutfit} /> : selected.category === "pet" ? <div className="mb-6"><PetArt species={petSpeciesForItem(selected.item_key, selected.metadata)} size={170} /></div> : <div className="mb-16" style={{ color: selected.accent }}><ItemIcon item={selected} size={100} /></div>}
+              <div className="relative flex h-64 items-center justify-center overflow-hidden rounded-md bg-slate-950" style={{ background: `linear-gradient(160deg, ${selected.accent}35, #0f172a 65%)` }}>
+                <MarketplaceItemImage key={selected.item_key} item={selected} context="preview" avatarOutfit={previewOutfit} onArtworkError={(itemKey) => setBrokenArtworkIds((current) => new Set(current).add(itemKey))} />
                 <span className="absolute left-3 top-3 rounded bg-black/40 px-2 py-1 text-[10px] font-black uppercase text-white">Preview</span>
               </div>
-              <p className="mt-5 text-xs font-black uppercase tracking-[0.16em]" style={{ color: selected.accent }}>{selected.realm_id === "measurement" ? "Measurelands" : selected.realm_id === "number" ? "Number Nexus" : "Universal"}</p>
+              <div className="mt-5 flex items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: selected.accent }}>{selected.realm_id === "measurement" ? "Measurelands" : selected.realm_id === "number" ? "Number Nexus" : "Universal"}</p><span className="rounded px-2 py-1 text-[10px] font-black uppercase" style={{ color: RARITY_STYLES[selected.rarity].color, background: RARITY_STYLES[selected.rarity].background }}>{RARITY_STYLES[selected.rarity].label}</span></div>
               <h2 className="mt-1 text-2xl font-black">{selected.name}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{selected.description}</p>
-              <button type="button" disabled={busy || selectedEquipped || (!selectedOwned && (state?.wallet.xp_balance ?? 0) < (selected.price ?? 0))} onClick={act} className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-amber-400 px-4 py-3 text-sm font-black text-slate-950 hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500">
-                {selectedEquipped ? <><Icons.Check className="h-4 w-4" /> Equipped</> : selectedOwned ? "Equip item" : <><Icons.Zap className="h-4 w-4" /> Buy for {selected.price} XP</>}
+              <button type="button" disabled={busy || selectedUnavailable || selectedEquipped || (!selectedOwned && (state?.wallet.xp_balance ?? 0) < (selected.price ?? 0))} onClick={act} className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-amber-400 px-4 py-3 text-sm font-black text-slate-950 hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500">
+                {selectedUnavailable ? "Artwork unavailable" : selectedEquipped ? <><Icons.Check className="h-4 w-4" /> Equipped</> : selectedOwned ? "Equip item" : <><Icons.Zap className="h-4 w-4" /> Buy for {selected.price} XP</>}
               </button>
             </> : <div className="py-16 text-center text-sm font-bold text-slate-500">Select an item to preview it.</div>}
           </aside>
