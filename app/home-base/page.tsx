@@ -17,6 +17,10 @@ import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import HallOfLegendsWidget from "@/components/home/HallOfLegendsWidget";
+import GemIcon from "@/components/gems/GemIcon";
+import GemRevealHost from "@/components/gems/GemRevealHost";
+import { awardAndReveal } from "@/lib/gem-reveal";
+import type { GemVault } from "@/lib/gems";
 import {
   economyErrorMessage,
   equipEconomyItem,
@@ -38,6 +42,7 @@ export default function HomeBasePage() {
   const [error, setError] = useState<string | null>(null);
   const [roomPickerOpen, setRoomPickerOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [gemVault, setGemVault] = useState<GemVault | null>(null);
   const sessionError = student?.studentId ? null : "Log in as a student to visit My Home.";
 
   useEffect(() => {
@@ -55,6 +60,19 @@ export default function HomeBasePage() {
         setError(economyErrorMessage(nextError));
       });
 
+    return () => {
+      cancelled = true;
+    };
+  }, [student?.studentId]);
+
+  // Award any gems earned since last visit and reveal them here at My Home.
+  useEffect(() => {
+    const sid = student?.studentId;
+    if (!sid || sid === "demo-preview") return;
+    let cancelled = false;
+    void awardAndReveal(sid, "home_open").then((v) => {
+      if (!cancelled && v) setGemVault(v);
+    });
     return () => {
       cancelled = true;
     };
@@ -125,6 +143,7 @@ export default function HomeBasePage() {
 
   return (
     <main className="min-h-screen bg-[#0f1115] text-white">
+      <GemRevealHost />
       <EconomyHeader
         xp={state?.wallet.xp_balance}
         essence={state?.wallet.essence}
@@ -220,6 +239,29 @@ export default function HomeBasePage() {
                 <p className="mt-1 text-2xl font-black">{collectibleCount}</p>
               </div>
             </div>
+
+            {/* Gem Vault — favourite gem on a glowing pedestal */}
+            {(() => {
+              const favGem = gemVault?.definitions.find((d) => d.id === gemVault?.favourite_gem_id) ?? null;
+              const collected = gemVault?.owned.length ?? 0;
+              const totalGems = gemVault?.definitions.filter((d) => d.active_for_completion !== false).length ?? 0;
+              return (
+                <button
+                  type="button"
+                  onClick={() => router.push("/gem-vault")}
+                  className="mt-3 flex w-full items-center gap-3 rounded-md border border-white/15 bg-black/35 p-3 text-left backdrop-blur-sm transition hover:border-amber-300/40 hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/60"
+                >
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[radial-gradient(circle_at_50%_35%,rgba(245,158,11,0.28),transparent_70%)]">
+                    {favGem ? <GemIcon rarity={favGem.rarity} size={40} /> : <Gem className="h-6 w-6 text-white/40" aria-hidden="true" />}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-amber-200/80">Gem Vault</p>
+                    <p className="truncate text-sm font-black">{favGem ? favGem.name : "Choose a gem to display"}</p>
+                    <p className="text-[11px] font-bold text-white/55">{collected} of {totalGems} gems</p>
+                  </div>
+                </button>
+              );
+            })()}
           </div>
         </div>
       </section>
