@@ -8,7 +8,7 @@ export default function EconomyHeader({ xp, essence = 0, rankLevel = 1 }: { xp?:
   const pathname = usePathname();
   const destinations = [
     { href: "/home-base", label: "My Home", icon: House },
-    { href: "/wardrobe", label: "Wardrobe", icon: Shirt },
+    { href: "/wardrobe", label: "Explorer Outfit", icon: Shirt },
     { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
     { href: "/collections", label: "Journal", icon: BookOpen },
   ];
