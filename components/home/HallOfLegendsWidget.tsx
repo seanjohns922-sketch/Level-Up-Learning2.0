@@ -43,6 +43,32 @@ export default function HallOfLegendsWidget() {
   const fanCount = previewUnlocked.length + previewLocked.length;
   const rotationFor = (index: number) => (index - (fanCount - 1) / 2) * 6;
 
+  // A fanned teaser of cards. `mirror` flips the fan so the left copy leans
+  // toward the centre, framing the title symmetrically.
+  const renderFan = (mirror: boolean) => (
+    <>
+      {previewUnlocked.map((legend, index) => (
+        <img
+          key={legend.id}
+          src={legend.images.cardFront}
+          alt={legend.name}
+          className="-ml-5 h-28 w-auto rounded-lg border border-white/25 shadow-[0_12px_28px_rgba(0,0,0,.55)] first:ml-0 md:h-32"
+          style={{ transform: `rotate(${(mirror ? -1 : 1) * rotationFor(index)}deg)` }}
+        />
+      ))}
+      {previewLocked.map((legend, index) => (
+        <div
+          key={legend.id}
+          aria-hidden="true"
+          className="-ml-5 flex h-28 w-[76px] items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] backdrop-blur-sm first:ml-0 md:h-32 md:w-[86px]"
+          style={{ transform: `rotate(${(mirror ? -1 : 1) * rotationFor(previewUnlocked.length + index)}deg)` }}
+        >
+          <Lock className="h-6 w-6 text-white/35" />
+        </div>
+      ))}
+    </>
+  );
+
   return (
     <button
       type="button"
@@ -50,10 +76,16 @@ export default function HallOfLegendsWidget() {
       aria-label={`Enter the Hall of Legends. ${count} of ${total} legends earned.`}
       className="group relative block w-full overflow-hidden rounded-2xl border border-white/12 text-left transition hover:border-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/70"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-[#15171d] via-[#111318] to-[#0e1014]" aria-hidden="true" />
-      <div className="absolute inset-y-0 right-0 w-2/3 bg-[radial-gradient(circle_at_80%_50%,rgba(251,191,36,0.10),transparent_62%)]" aria-hidden="true" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#15171d] via-[#111318] to-[#0e1014]" aria-hidden="true" />
+      <div className="absolute inset-y-0 right-0 w-2/3 bg-[radial-gradient(circle_at_82%_50%,rgba(251,191,36,0.10),transparent_60%)]" aria-hidden="true" />
+      <div className="absolute inset-y-0 left-0 w-2/3 bg-[radial-gradient(circle_at_18%_50%,rgba(251,191,36,0.10),transparent_60%)]" aria-hidden="true" />
 
       <div className="relative z-10 p-6 md:p-7">
+        {/* Mirrored fan on the left (lg+ only), framing the centred title */}
+        <div className="hidden lg:absolute lg:left-7 lg:top-1/2 lg:flex lg:-translate-y-1/2 lg:flex-row-reverse lg:items-end">
+          {renderFan(true)}
+        </div>
+
         {/* Centered text block (title, progress, CTA) */}
         <div className="mx-auto flex max-w-md flex-col items-center text-center">
           <div className="flex items-center gap-2 text-amber-300">
@@ -77,27 +109,9 @@ export default function HallOfLegendsWidget() {
           </span>
         </div>
 
-        {/* Cards stay on the right (stack below on small screens) */}
+        {/* Cards on the right (stack centered below on small screens) */}
         <div className="mt-8 flex items-end justify-center lg:absolute lg:right-7 lg:top-1/2 lg:mt-0 lg:-translate-y-1/2 lg:justify-end">
-          {previewUnlocked.map((legend, index) => (
-            <img
-              key={legend.id}
-              src={legend.images.cardFront}
-              alt={legend.name}
-              className="-ml-5 h-28 w-auto rounded-lg border border-white/25 shadow-[0_12px_28px_rgba(0,0,0,.55)] first:ml-0 md:h-32"
-              style={{ transform: `rotate(${rotationFor(index)}deg)` }}
-            />
-          ))}
-          {previewLocked.map((legend, index) => (
-            <div
-              key={legend.id}
-              aria-hidden="true"
-              className="-ml-5 flex h-28 w-[76px] items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] backdrop-blur-sm first:ml-0 md:h-32 md:w-[86px]"
-              style={{ transform: `rotate(${rotationFor(previewUnlocked.length + index)}deg)` }}
-            >
-              <Lock className="h-6 w-6 text-white/35" />
-            </div>
-          ))}
+          {renderFan(false)}
         </div>
       </div>
     </button>
