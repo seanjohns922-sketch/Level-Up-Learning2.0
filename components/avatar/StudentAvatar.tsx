@@ -109,6 +109,19 @@ function readOutfitFromStorage(): AvatarOutfit {
 
 type Outfit = Required<AvatarOutfit>;
 
+// Lighten (amt > 0) or darken (amt < 0) a hex colour, so shading keeps the
+// chosen colour's identity instead of washing to white / crushing to black.
+function shade(hex: string, amt: number): string {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  if (full.length !== 6) return hex;
+  const to = (v: number) => Math.max(0, Math.min(255, amt >= 0 ? Math.round(v + (255 - v) * amt) : Math.round(v * (1 + amt))));
+  const r = to(parseInt(full.slice(0, 2), 16));
+  const g = to(parseInt(full.slice(2, 4), 16));
+  const b = to(parseInt(full.slice(4, 6), 16));
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+}
+
 // ── Behind-body layers (drawn first, occluded by the torso) ────────────────
 function CapeLayer({ o }: { o: Outfit }) {
   if (o.cape === "none") return null;
@@ -656,11 +669,11 @@ export default function StudentAvatar({
             <stop offset="100%" stopColor={o.hairShade} />
           </linearGradient>
           <linearGradient id="lul-pants" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={o.pants} />
-            <stop offset="100%" stopColor="#000000" stopOpacity="0.85" />
+            <stop offset="0%" stopColor={shade(o.pants, 0.12)} />
+            <stop offset="100%" stopColor={shade(o.pants, -0.35)} />
           </linearGradient>
           <linearGradient id="lul-shoe" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="0%" stopColor={shade(o.shoes, 0.42)} />
             <stop offset="100%" stopColor={o.shoes} />
           </linearGradient>
         </defs>
@@ -673,10 +686,10 @@ export default function StudentAvatar({
         <g data-layer="shoes">
           <path d="M30 206 Q30 198 42 198 L58 198 Q60 204 60 210 Q60 214 56 214 L32 214 Q28 214 28 210 Z" fill="url(#lul-shoe)" />
           <path d="M90 206 Q90 198 78 198 L62 198 Q60 204 60 210 Q60 214 64 214 L88 214 Q92 214 92 210 Z" fill="url(#lul-shoe)" />
-          {/* sole */}
-          <rect x="28" y="210" width="32" height="4" rx="2" fill={o.shirt} opacity="0.85" />
-          <rect x="60" y="210" width="32" height="4" rx="2" fill={o.shirt} opacity="0.85" />
-          {/* swoosh accent */}
+          {/* white soles */}
+          <rect x="28" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
+          <rect x="60" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
+          {/* swoosh accent picks up the top colour */}
           <path d="M34 205 Q44 202 56 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
           <path d="M64 205 Q76 202 86 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
         </g>
