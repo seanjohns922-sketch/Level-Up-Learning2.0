@@ -41,8 +41,11 @@ export type HatStyle = "none" | "beanie" | "cap" | "explorer" | "crown" | "wizar
 export type GlassesStyle = "none" | "round" | "shades" | "visor";
 export type CapeStyle = "none" | "hero" | "royal";
 export type BackpackStyle = "none" | "explorer" | "rocket";
+/** Base body silhouette. "neutral" = trousers look, "dress" = flared skirt look. */
+export type BodyType = "neutral" | "dress";
 
 export type AvatarOutfit = {
+  body?: BodyType;
   skin?: string;
   skinShade?: string;
   hair?: string;
@@ -65,6 +68,7 @@ export type AvatarOutfit = {
 };
 
 export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
+  body: "neutral",
   skin: "#f1c8a6",
   skinShade: "#d6a07a",
   hair: "#4a2e1c",
@@ -131,6 +135,45 @@ function BackpackPack({ o }: { o: Outfit }) {
       ) : (
         <rect x="46" y="120" width="28" height="16" rx="4" fill="#000" opacity="0.16" />
       )}
+    </g>
+  );
+}
+
+// ── Lower body: trousers (neutral) or leggings + flared skirt (dress) ──────
+function LowerBody({ o }: { o: Outfit }) {
+  if (o.body === "dress") {
+    return (
+      <g data-layer="pants">
+        {/* Leggings beneath the skirt */}
+        <path d="M45 178 L41 200 L53 200 L53 178 Z" fill="url(#lul-pants)" />
+        <path d="M75 178 L79 200 L67 200 L67 178 Z" fill="url(#lul-pants)" />
+      </g>
+    );
+  }
+  return (
+    <g data-layer="pants">
+      <path d="M40 150 L34 200 L56 200 L58 168 Z" fill="url(#lul-pants)" />
+      <path d="M80 150 L86 200 L64 200 L62 168 Z" fill="url(#lul-pants)" />
+      {/* waistband */}
+      <path d="M38 148 Q60 154 82 148 L82 158 Q60 164 38 158 Z" fill="#000" opacity="0.35" />
+      {/* center seam */}
+      <line x1="60" y1="158" x2="60" y2="200" stroke="#000" strokeOpacity="0.25" strokeWidth="1" />
+    </g>
+  );
+}
+
+// Flared skirt, drawn over the hoodie hem so the dress reads as one piece.
+function SkirtLayer({ o }: { o: Outfit }) {
+  if (o.body !== "dress") return null;
+  return (
+    <g data-layer="skirt">
+      <path d="M36 148 Q60 156 84 148 L94 184 Q60 196 26 184 Z" fill="url(#lul-shirt)" />
+      {/* pleat shading */}
+      <line x1="52" y1="154" x2="45" y2="188" stroke="#000" strokeOpacity="0.12" strokeWidth="1.4" />
+      <line x1="60" y1="156" x2="60" y2="190" stroke="#000" strokeOpacity="0.12" strokeWidth="1.4" />
+      <line x1="68" y1="154" x2="75" y2="188" stroke="#000" strokeOpacity="0.12" strokeWidth="1.4" />
+      {/* hem trim */}
+      <path d="M26 184 Q60 196 94 184" stroke={o.shirtTrim} strokeWidth="2.6" fill="none" strokeLinecap="round" />
     </g>
   );
 }
@@ -402,6 +445,8 @@ export default function StudentAvatar({
   // Pull saved outfit on mount (avoids SSR hydration mismatch).
   const [stored, setStored] = useState<AvatarOutfit>({});
   useEffect(() => {
+    // localStorage is only readable after mount (avoids SSR hydration mismatch).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStored(readOutfitFromStorage());
   }, []);
 
@@ -471,15 +516,8 @@ export default function StudentAvatar({
           <path d="M64 205 Q76 202 86 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
         </g>
 
-        {/* ── PANTS layer (slim joggers) ───────────────── */}
-        <g data-layer="pants">
-          <path d="M40 150 L34 200 L56 200 L58 168 Z" fill="url(#lul-pants)" />
-          <path d="M80 150 L86 200 L64 200 L62 168 Z" fill="url(#lul-pants)" />
-          {/* waistband */}
-          <path d="M38 148 Q60 154 82 148 L82 158 Q60 164 38 158 Z" fill="#000" opacity="0.35" />
-          {/* center seam */}
-          <line x1="60" y1="158" x2="60" y2="200" stroke="#000" strokeOpacity="0.25" strokeWidth="1" />
-        </g>
+        {/* ── LOWER BODY (trousers or leggings) ────────── */}
+        <LowerBody o={o} />
 
         {/* ── HOODIE layer (torso + arms + hood) ────── */}
         <g data-layer="shirt">
@@ -510,6 +548,9 @@ export default function StudentAvatar({
           {/* Side highlight */}
           <path d="M32 108 Q34 138 30 156" stroke="#ffffff" strokeOpacity="0.14" strokeWidth="3" fill="none" />
         </g>
+
+        {/* Skirt sits over the hoodie hem so a dress reads as one piece */}
+        <SkirtLayer o={o} />
 
         {/* Backpack straps sit over the hoodie */}
         <BackpackStraps o={o} />

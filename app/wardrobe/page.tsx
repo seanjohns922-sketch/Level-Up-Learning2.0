@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, Lock, Shuffle, Sparkles, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
-import StudentAvatar, { type AvatarOutfit, type HairStyle } from "@/components/avatar/StudentAvatar";
+import StudentAvatar, { type AvatarOutfit, type BodyType, type HairStyle } from "@/components/avatar/StudentAvatar";
 import {
   economyErrorMessage,
   equipEconomyItem,
@@ -31,6 +31,12 @@ const HAIRCOLORS: Array<[string, string]> = [
   ["#2e2422", "#161010"], ["#4a2e1c", "#2e1a0e"], ["#6b4423", "#432a13"], ["#8a5a2b", "#5c3a18"],
   ["#b5732e", "#8a5320"], ["#c9962f", "#9a6e1e"], ["#e0c084", "#c39f57"], ["#b0453b", "#7d2c25"],
   ["#9aa3ad", "#6b737c"], ["#4f6d9c", "#334b73"], ["#a1568f", "#753d68"], ["#3d8f7a", "#276055"],
+];
+// The "Character" choice sets the base body silhouette. Hair stays fully free,
+// so any hairstyle works on either body.
+const BODIES: Array<{ value: BodyType; label: string; hairStyle: HairStyle }> = [
+  { value: "neutral", label: "Boy", hairStyle: "short" },
+  { value: "dress", label: "Girl", hairStyle: "ponytail" },
 ];
 const HAIRSTYLES: Array<[HairStyle, string]> = [
   ["swept", "Swept"], ["short", "Short"], ["tuft", "Tuft"], ["sidepart", "Side Part"],
@@ -162,7 +168,7 @@ export default function WardrobePage() {
         <div className="mb-5">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-700">My Home</p>
           <h1 className="text-3xl font-black md:text-4xl">Avatar Studio</h1>
-          <p className="mt-1 text-sm text-slate-600">Pick a look. Skin, hair and colours are free — hats, capes and special outfits are unlocked in the Marketplace.</p>
+          <p className="mt-1 text-sm text-slate-600">Choose your character, then pick a look. Skin, hair and colours are free — hats, capes and special outfits are unlocked in the Marketplace.</p>
         </div>
         {message || sessionMessage ? (
           <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900" role="status">{message ?? sessionMessage}</div>
@@ -188,6 +194,23 @@ export default function WardrobePage() {
 
           {/* Controls */}
           <div className="flex flex-col gap-4">
+            {/* Character (body silhouette) */}
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.12em] text-slate-500">Character <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] text-emerald-700">Free</span></h2>
+              <div className="flex flex-wrap gap-3">
+                {BODIES.map(({ value, label, hairStyle }) => {
+                  const on = (base.body ?? "neutral") === value;
+                  return (
+                    <button key={value} type="button" aria-label={label} title={label} onClick={() => updateBase({ body: value, hairStyle })} className={`${optBase} flex h-[112px] w-[92px] flex-col items-center overflow-hidden pt-1 ${on ? "border-teal-600 ring-2 ring-teal-500/40" : "border-slate-200"}`}>
+                      {on ? <Check className="absolute right-1.5 top-1.5 h-4 w-4 text-teal-600" /> : null}
+                      <StudentAvatar height={78} outfit={{ ...merged, body: value, hairStyle }} floatAnimation="none" glowColor="rgba(15,23,42,0.10)" />
+                      <span className="mt-auto w-full truncate px-1 pb-1.5 text-center text-[11px] font-black text-slate-600">{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
             {/* Skin tone */}
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.12em] text-slate-500">Skin tone <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] text-emerald-700">Free</span></h2>

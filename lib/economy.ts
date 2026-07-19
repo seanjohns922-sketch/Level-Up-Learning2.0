@@ -16,6 +16,7 @@ export type AvatarLayerSlot = (typeof AVATAR_LAYER_SLOTS)[number];
 
 /** Fields a student can freely set on their base look (no XP). */
 export const AVATAR_BASE_KEYS = [
+  "body",
   "skin",
   "skinShade",
   "hair",
