@@ -46,10 +46,17 @@ export type BackpackStyle = "none" | "explorer" | "rocket";
 export type BodyType = "neutral" | "dress";
 /** Free face expression (eyes + mouth, plus freckles / rosy cheeks add-ons). */
 export type FaceType = "smile" | "bigSmile" | "happy" | "determined" | "freckles" | "rosy";
+/** Clothing garment shapes (each occupies one equipment slot). */
+export type TopStyle = "hoodie" | "tshirt" | "jumper" | "polo" | "jacket" | "dress";
+export type BottomStyle = "joggers" | "shorts" | "jeans" | "trackpants" | "skirt" | "leggings";
+export type ShoeStyle = "sneakers" | "boots" | "sandals" | "hightops";
 
 export type AvatarOutfit = {
   body?: BodyType;
   face?: FaceType;
+  top?: TopStyle;
+  bottom?: BottomStyle;
+  shoeStyle?: ShoeStyle;
   skin?: string;
   skinShade?: string;
   hair?: string;
@@ -74,6 +81,9 @@ export type AvatarOutfit = {
 export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
   body: "neutral",
   face: "smile",
+  top: "hoodie",
+  bottom: "joggers",
+  shoeStyle: "sneakers",
   skin: "#f1c8a6",
   skinShade: "#d6a07a",
   hair: "#4a2e1c",
@@ -157,94 +167,267 @@ function BackpackPack({ o }: { o: Outfit }) {
   );
 }
 
-// ── Lower body: trousers (neutral) or leggings + flared skirt (dress) ──────
-function LowerBody({ o }: { o: Outfit }) {
-  if (o.body === "dress") {
-    return (
-      <g data-layer="pants">
-        {/* Leggings beneath the skirt */}
-        <path d="M45 178 L41 200 L53 200 L53 178 Z" fill="url(#lul-pants)" />
-        <path d="M75 178 L79 200 L67 200 L67 178 Z" fill="url(#lul-pants)" />
-      </g>
-    );
-  }
+// ── Shared arm treatments ───────────────────────────────────────────────────
+const Hands = () => (
+  <>
+    <circle cx="24" cy="156" r="7.5" fill="url(#lul-skin)" />
+    <circle cx="96" cy="156" r="7.5" fill="url(#lul-skin)" />
+  </>
+);
+function LongSleeves({ o, cuff }: { o: Outfit; cuff?: boolean }) {
   return (
-    <g data-layer="pants">
-      <path d="M40 150 L34 200 L56 200 L58 168 Z" fill="url(#lul-pants)" />
-      <path d="M80 150 L86 200 L64 200 L62 168 Z" fill="url(#lul-pants)" />
-      {/* waistband */}
-      <path d="M38 148 Q60 154 82 148 L82 158 Q60 164 38 158 Z" fill="#000" opacity="0.35" />
-      {/* center seam */}
-      <line x1="60" y1="158" x2="60" y2="200" stroke="#000" strokeOpacity="0.25" strokeWidth="1" />
-    </g>
-  );
-}
-
-// Hoodie (neutral / boy body) — torso, arms, hood, kangaroo pocket.
-function HoodieTorso({ o }: { o: Outfit }) {
-  return (
-    <g data-layer="shirt">
-      {/* Arms */}
+    <g>
       <path d="M22 100 Q14 112 18 150 Q24 158 32 154 Q34 128 34 108 Z" fill="url(#lul-shirt)" />
       <path d="M98 100 Q106 112 102 150 Q96 158 88 154 Q86 128 86 108 Z" fill="url(#lul-shirt)" />
-      {/* Hands */}
-      <circle cx="24" cy="156" r="7.5" fill="url(#lul-skin)" />
-      <circle cx="96" cy="156" r="7.5" fill="url(#lul-skin)" />
-      {/* Torso (hoodie body) */}
-      <path d="M32 100 Q60 92 88 100 L94 156 Q60 168 26 156 Z" fill="url(#lul-shirt)" />
-      {/* Hood back */}
-      <path d="M34 100 Q40 82 60 80 Q80 82 86 100 Q72 92 60 92 Q48 92 34 100 Z" fill={o.shirt} opacity="0.95" />
-      {/* Kangaroo pocket */}
-      <path d="M42 128 L78 128 Q80 142 60 144 Q40 142 42 128 Z" fill="#000" opacity="0.18" />
-      {/* Drawstrings */}
-      <line x1="54" y1="100" x2="52" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="66" y1="100" x2="68" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
-      <circle cx="52" cy="119" r="1.4" fill={o.shirtTrim} />
-      <circle cx="68" cy="119" r="1.4" fill={o.shirtTrim} />
-      {/* Side highlight */}
-      <path d="M32 108 Q34 138 30 156" stroke="#ffffff" strokeOpacity="0.14" strokeWidth="3" fill="none" />
+      {cuff ? (
+        <>
+          <path d="M18 147 Q25 153 32 149 L31 156 Q24 161 18 154 Z" fill={o.shirtTrim} />
+          <path d="M102 147 Q95 153 88 149 L89 156 Q96 161 102 154 Z" fill={o.shirtTrim} />
+        </>
+      ) : null}
+      <Hands />
     </g>
   );
 }
-
-// Dress (girl body) — fitted bodice, puff sleeves, collar, sash and flared
-// skirt in one piece. Deliberately its own shape, not the hoodie plus a skirt.
-function DressTorso({ o }: { o: Outfit }) {
+function ShortSleeves() {
   return (
-    <g data-layer="dress">
-      {/* Sleeves (dress colour) */}
-      <path d="M24 102 Q16 114 20 150 Q26 158 33 154 Q35 128 35 110 Z" fill="url(#lul-shirt)" />
-      <path d="M96 102 Q104 114 100 150 Q94 158 87 154 Q85 128 85 110 Z" fill="url(#lul-shirt)" />
-      {/* Hands */}
-      <circle cx="26" cy="156" r="7.5" fill="url(#lul-skin)" />
-      <circle cx="94" cy="156" r="7.5" fill="url(#lul-skin)" />
-      {/* Puff sleeve caps at the shoulders */}
-      <ellipse cx="33" cy="105" rx="9.5" ry="8.5" fill="url(#lul-shirt)" />
-      <ellipse cx="87" cy="105" rx="9.5" ry="8.5" fill="url(#lul-shirt)" />
-      <ellipse cx="33" cy="104" rx="9.5" ry="8.5" fill="#ffffff" opacity="0.08" />
-      <ellipse cx="87" cy="104" rx="9.5" ry="8.5" fill="#ffffff" opacity="0.08" />
-      {/* Fitted bodice */}
-      <path d="M34 100 Q60 94 86 100 L82 150 Q60 156 38 150 Z" fill="url(#lul-shirt)" />
-      {/* Neckline collar */}
-      <path d="M49 99 Q60 111 71 99 Q66 104 60 104 Q54 104 49 99 Z" fill={o.shirtTrim} />
-      {/* Waist sash */}
-      <path d="M38 145 Q60 151 82 145 L82 152 Q60 158 38 152 Z" fill={o.shirtTrim} opacity="0.95" />
-      {/* Flared skirt */}
-      <path d="M37 150 Q60 157 83 150 L94 187 Q60 198 26 187 Z" fill="url(#lul-shirt)" />
-      {/* Pleat shading */}
-      <line x1="50" y1="156" x2="43" y2="184" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
-      <line x1="60" y1="158" x2="60" y2="185" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
-      <line x1="70" y1="156" x2="77" y2="184" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
-      {/* Hem trim */}
-      <path d="M26 187 Q60 198 94 187" stroke={o.shirtTrim} strokeWidth="3" fill="none" strokeLinecap="round" />
-      {/* Side highlight */}
-      <path d="M37 110 Q35 130 34 150" stroke="#ffffff" strokeOpacity="0.12" strokeWidth="2.5" fill="none" />
+    <g>
+      {/* bare skin forearms */}
+      <path d="M26 112 Q19 126 23 150 Q28 158 34 154 Q35 132 36 116 Z" fill="url(#lul-skin)" />
+      <path d="M94 112 Q101 126 97 150 Q92 158 86 154 Q85 132 84 116 Z" fill="url(#lul-skin)" />
+      <Hands />
+      {/* sleeve caps */}
+      <path d="M28 99 Q41 97 40 114 Q33 119 25 115 Q23 103 28 99 Z" fill="url(#lul-shirt)" />
+      <path d="M92 99 Q79 97 80 114 Q87 119 95 115 Q97 103 92 99 Z" fill="url(#lul-shirt)" />
     </g>
   );
 }
+const TORSO = "M32 100 Q60 92 88 100 L93 156 Q60 167 27 156 Z";
+const crewNeck = <path d="M51 99 Q60 106 69 99 Q60 103 51 99 Z" fill="url(#lul-skin)" />;
 
-function Torso({ o }: { o: Outfit }) {
-  return o.body === "dress" ? <DressTorso o={o} /> : <HoodieTorso o={o} />;
+// ── Lower body (Bottom slot) ────────────────────────────────────────────────
+function skinLegs(fromY: number) {
+  return (
+    <>
+      <path d={`M45 ${fromY} L42 199 L53 199 L54 ${fromY} Z`} fill="url(#lul-skin)" />
+      <path d={`M75 ${fromY} L78 199 L67 199 L66 ${fromY} Z`} fill="url(#lul-skin)" />
+    </>
+  );
+}
+function BottomLayer({ o, style }: { o: Outfit; style: BottomStyle }) {
+  const waistband = <path d="M38 148 Q60 154 82 148 L82 157 Q60 163 38 157 Z" fill="#000" opacity="0.28" />;
+  switch (style) {
+    case "shorts":
+      return (
+        <g data-layer="pants">
+          {skinLegs(176)}
+          <path d="M39 150 L36 178 L57 178 L58 162 Z" fill="url(#lul-pants)" />
+          <path d="M81 150 L84 178 L63 178 L62 162 Z" fill="url(#lul-pants)" />
+          {waistband}
+        </g>
+      );
+    case "jeans":
+      return (
+        <g data-layer="pants">
+          <path d="M39 150 L37 200 L55 200 L57 160 Z" fill="url(#lul-pants)" />
+          <path d="M81 150 L83 200 L65 200 L63 160 Z" fill="url(#lul-pants)" />
+          {waistband}
+          <line x1="60" y1="158" x2="60" y2="200" stroke="#000" strokeOpacity="0.22" strokeWidth="1" />
+          <path d="M39 196 L55 196" stroke="#fff" strokeOpacity="0.2" strokeWidth="2" />
+          <path d="M65 196 L83 196" stroke="#fff" strokeOpacity="0.2" strokeWidth="2" />
+        </g>
+      );
+    case "trackpants":
+      return (
+        <g data-layer="pants">
+          <path d="M40 150 L34 200 L56 200 L58 168 Z" fill="url(#lul-pants)" />
+          <path d="M80 150 L86 200 L64 200 L62 168 Z" fill="url(#lul-pants)" />
+          {waistband}
+          <path d="M41 152 L37 199" stroke={o.shirtTrim} strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M79 152 L83 199" stroke={o.shirtTrim} strokeWidth="2.4" strokeLinecap="round" />
+        </g>
+      );
+    case "skirt":
+      return (
+        <g data-layer="pants">
+          {skinLegs(172)}
+          <path d="M37 148 Q60 155 83 148 L93 184 Q60 195 27 184 Z" fill="url(#lul-pants)" />
+          <line x1="50" y1="156" x2="43" y2="181" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
+          <line x1="60" y1="158" x2="60" y2="183" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
+          <line x1="70" y1="156" x2="77" y2="181" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
+          <path d="M27 184 Q60 195 93 184" stroke={shade(o.pants, 0.25)} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+        </g>
+      );
+    case "leggings":
+      return (
+        <g data-layer="pants">
+          <path d="M44 150 L42 200 L53 200 L54 168 Z" fill="url(#lul-pants)" />
+          <path d="M76 150 L78 200 L67 200 L66 168 Z" fill="url(#lul-pants)" />
+          {waistband}
+        </g>
+      );
+    default: // joggers
+      return (
+        <g data-layer="pants">
+          <path d="M40 150 L34 200 L56 200 L58 168 Z" fill="url(#lul-pants)" />
+          <path d="M80 150 L86 200 L64 200 L62 168 Z" fill="url(#lul-pants)" />
+          {waistband}
+          <line x1="60" y1="158" x2="60" y2="200" stroke="#000" strokeOpacity="0.25" strokeWidth="1" />
+        </g>
+      );
+  }
+}
+
+// ── Torso (Top slot). "dress" also renders its own skirt. ───────────────────
+function TopLayer({ o }: { o: Outfit }) {
+  switch (o.top) {
+    case "tshirt":
+      return (
+        <g data-layer="shirt">
+          <ShortSleeves />
+          <path d={TORSO} fill="url(#lul-shirt)" />
+          {crewNeck}
+          <path d="M51 99 Q60 105 69 99" stroke={o.shirtTrim} strokeWidth="1.6" fill="none" strokeLinecap="round" />
+          <path d="M33 108 Q34 136 30 156" stroke="#ffffff" strokeOpacity="0.12" strokeWidth="2.6" fill="none" />
+        </g>
+      );
+    case "jumper":
+      return (
+        <g data-layer="shirt">
+          <LongSleeves o={o} cuff />
+          <path d={TORSO} fill="url(#lul-shirt)" />
+          {crewNeck}
+          <path d="M50 100 Q60 108 70 100" stroke={o.shirtTrim} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+          <path d="M28 154 Q60 164 92 154 L92 160 Q60 170 28 160 Z" fill={o.shirtTrim} opacity="0.9" />
+        </g>
+      );
+    case "polo":
+      return (
+        <g data-layer="shirt">
+          <ShortSleeves />
+          <path d={TORSO} fill="url(#lul-shirt)" />
+          {crewNeck}
+          <path d="M52 99 L59 108 L61 100 Z" fill={o.shirtTrim} />
+          <path d="M68 99 L61 108 L59 100 Z" fill={o.shirtTrim} />
+          <line x1="61" y1="106" x2="61" y2="122" stroke={o.shirtTrim} strokeWidth="1.4" />
+          <circle cx="61" cy="112" r="1.1" fill={o.shirtTrim} />
+          <circle cx="61" cy="118" r="1.1" fill={o.shirtTrim} />
+        </g>
+      );
+    case "jacket":
+      return (
+        <g data-layer="shirt">
+          <LongSleeves o={o} />
+          <path d={TORSO} fill="url(#lul-shirt)" />
+          {/* lapels */}
+          <path d="M49 100 L60 114 L51 118 Z" fill={shade(o.shirt, -0.18)} />
+          <path d="M71 100 L60 114 L69 118 Z" fill={shade(o.shirt, -0.18)} />
+          {/* zip */}
+          <line x1="60" y1="112" x2="60" y2="158" stroke={shade(o.shirt, -0.28)} strokeWidth="1.8" />
+          <circle cx="60" cy="132" r="1.6" fill={o.shirtTrim} />
+          {/* chest pockets */}
+          <rect x="39" y="130" width="13" height="11" rx="2" fill={shade(o.shirt, -0.16)} />
+          <rect x="68" y="130" width="13" height="11" rx="2" fill={shade(o.shirt, -0.16)} />
+          <path d="M33 108 Q34 136 30 156" stroke="#ffffff" strokeOpacity="0.12" strokeWidth="2.6" fill="none" />
+        </g>
+      );
+    case "dress":
+      return (
+        <g data-layer="dress">
+          <path d="M24 102 Q16 114 20 150 Q26 158 33 154 Q35 128 35 110 Z" fill="url(#lul-shirt)" />
+          <path d="M96 102 Q104 114 100 150 Q94 158 87 154 Q85 128 85 110 Z" fill="url(#lul-shirt)" />
+          <Hands />
+          <ellipse cx="33" cy="105" rx="9.5" ry="8.5" fill="url(#lul-shirt)" />
+          <ellipse cx="87" cy="105" rx="9.5" ry="8.5" fill="url(#lul-shirt)" />
+          <ellipse cx="33" cy="104" rx="9.5" ry="8.5" fill="#ffffff" opacity="0.08" />
+          <ellipse cx="87" cy="104" rx="9.5" ry="8.5" fill="#ffffff" opacity="0.08" />
+          <path d="M34 100 Q60 94 86 100 L82 150 Q60 156 38 150 Z" fill="url(#lul-shirt)" />
+          <path d="M49 99 Q60 111 71 99 Q66 104 60 104 Q54 104 49 99 Z" fill={o.shirtTrim} />
+          <path d="M38 145 Q60 151 82 145 L82 152 Q60 158 38 152 Z" fill={o.shirtTrim} opacity="0.95" />
+          <path d="M37 150 Q60 157 83 150 L94 187 Q60 198 26 187 Z" fill="url(#lul-shirt)" />
+          <line x1="50" y1="156" x2="43" y2="184" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
+          <line x1="60" y1="158" x2="60" y2="185" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
+          <line x1="70" y1="156" x2="77" y2="184" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
+          <path d="M26 187 Q60 198 94 187" stroke={o.shirtTrim} strokeWidth="3" fill="none" strokeLinecap="round" />
+          <path d="M37 110 Q35 130 34 150" stroke="#ffffff" strokeOpacity="0.12" strokeWidth="2.5" fill="none" />
+        </g>
+      );
+    default: // hoodie
+      return (
+        <g data-layer="shirt">
+          <LongSleeves o={o} />
+          <path d={TORSO} fill="url(#lul-shirt)" />
+          <path d="M34 100 Q40 82 60 80 Q80 82 86 100 Q72 92 60 92 Q48 92 34 100 Z" fill={o.shirt} opacity="0.95" />
+          <path d="M42 128 L78 128 Q80 142 60 144 Q40 142 42 128 Z" fill="#000" opacity="0.18" />
+          <line x1="54" y1="100" x2="52" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
+          <line x1="66" y1="100" x2="68" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
+          <circle cx="52" cy="119" r="1.4" fill={o.shirtTrim} />
+          <circle cx="68" cy="119" r="1.4" fill={o.shirtTrim} />
+          <path d="M32 108 Q34 138 30 156" stroke="#ffffff" strokeOpacity="0.14" strokeWidth="3" fill="none" />
+        </g>
+      );
+  }
+}
+
+// ── Shoes (Shoe slot) ───────────────────────────────────────────────────────
+function ShoeLayer({ o }: { o: Outfit }) {
+  switch (o.shoeStyle) {
+    case "boots":
+      return (
+        <g data-layer="shoes">
+          {/* tall ankle boots, one per foot with a clear gap */}
+          <path d="M34 181 Q46 179 57 182 L58 206 Q58 213 51 213 L38 213 Q33 213 33 207 L33 188 Q33 183 34 181 Z" fill="url(#lul-shoe)" />
+          <path d="M86 181 Q74 179 63 182 L62 206 Q62 213 69 213 L82 213 Q87 213 87 207 L87 188 Q87 183 86 181 Z" fill="url(#lul-shoe)" />
+          {/* folded cuffs */}
+          <path d="M34 186 Q46 190 57 186" stroke={shade(o.shoes, 0.34)} strokeWidth="2.6" fill="none" strokeLinecap="round" />
+          <path d="M63 186 Q74 190 86 186" stroke={shade(o.shoes, 0.34)} strokeWidth="2.6" fill="none" strokeLinecap="round" />
+          {/* laces */}
+          <path d="M39 194 L52 196 M39 199 L52 201" stroke={shade(o.shoes, 0.42)} strokeWidth="1.3" />
+          <path d="M81 194 L68 196 M81 199 L68 201" stroke={shade(o.shoes, 0.42)} strokeWidth="1.3" />
+          {/* soles */}
+          <rect x="31" y="210" width="28" height="4.5" rx="2" fill="#2e2016" />
+          <rect x="61" y="210" width="28" height="4.5" rx="2" fill="#2e2016" />
+        </g>
+      );
+    case "hightops":
+      return (
+        <g data-layer="shoes">
+          <path d="M32 195 Q32 190 40 190 L58 190 Q60 196 60 208 Q60 213 55 213 L34 213 Q30 213 30 208 Z" fill="url(#lul-shoe)" />
+          <path d="M88 195 Q88 190 80 190 L62 190 Q60 196 60 208 Q60 213 65 213 L86 213 Q90 213 90 208 Z" fill="url(#lul-shoe)" />
+          <rect x="28" y="210" width="32" height="4.5" rx="2" fill="#f8fafc" />
+          <rect x="60" y="210" width="32" height="4.5" rx="2" fill="#f8fafc" />
+          <path d="M40 198 L54 200 M40 203 L54 205" stroke="#f8fafc" strokeWidth="1.3" />
+          <path d="M80 198 L66 200 M80 203 L66 205" stroke="#f8fafc" strokeWidth="1.3" />
+        </g>
+      );
+    case "sandals":
+      return (
+        <g data-layer="shoes">
+          {/* bare feet */}
+          <path d="M37 200 Q35 208 41 210 L56 210 Q59 210 59 206 L58 200 Z" fill="url(#lul-skin)" />
+          <path d="M83 200 Q85 208 79 210 L64 210 Q61 210 61 206 L62 200 Z" fill="url(#lul-skin)" />
+          {/* thin soles */}
+          <rect x="35" y="209" width="25" height="3.6" rx="1.8" fill="url(#lul-shoe)" />
+          <rect x="60" y="209" width="25" height="3.6" rx="1.8" fill="url(#lul-shoe)" />
+          {/* Y straps */}
+          <path d="M40 203 L54 203" stroke="url(#lul-shoe)" strokeWidth="2.6" strokeLinecap="round" />
+          <path d="M47 200 L48 208" stroke="url(#lul-shoe)" strokeWidth="2" strokeLinecap="round" />
+          <path d="M66 203 L80 203" stroke="url(#lul-shoe)" strokeWidth="2.6" strokeLinecap="round" />
+          <path d="M73 200 L72 208" stroke="url(#lul-shoe)" strokeWidth="2" strokeLinecap="round" />
+        </g>
+      );
+    default: // sneakers
+      return (
+        <g data-layer="shoes">
+          <path d="M30 206 Q30 198 42 198 L58 198 Q60 204 60 210 Q60 214 56 214 L32 214 Q28 214 28 210 Z" fill="url(#lul-shoe)" />
+          <path d="M90 206 Q90 198 78 198 L62 198 Q60 204 60 210 Q60 214 64 214 L88 214 Q92 214 92 210 Z" fill="url(#lul-shoe)" />
+          <rect x="28" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
+          <rect x="60" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
+          <path d="M34 205 Q44 202 56 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
+          <path d="M64 205 Q76 202 86 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
+        </g>
+      );
+  }
 }
 
 // ── Front layers (drawn after head + hair) ─────────────────────────────────
@@ -632,6 +815,12 @@ export default function StudentAvatar({
     ...stored,
     ...(outfit ?? {}),
   };
+  // Back-compat: pre-slot avatars stored body:"dress" with no `top` — render a dress.
+  if (o.body === "dress" && outfit?.top === undefined && stored.top === undefined) {
+    o.top = "dress";
+  }
+  // A dress occupies the Bottom slot too — show slim leggings beneath the skirt.
+  const bottomStyle: BottomStyle = o.top === "dress" ? "leggings" : o.bottom;
 
   // Source viewBox is 120 × 220 — keep aspect when scaling by height.
   const width = Math.round((height * 120) / 220);
@@ -682,23 +871,14 @@ export default function StudentAvatar({
         <CapeLayer o={o} />
         <BackpackPack o={o} />
 
-        {/* ── SHOES layer (chunky sneakers) ────────────── */}
-        <g data-layer="shoes">
-          <path d="M30 206 Q30 198 42 198 L58 198 Q60 204 60 210 Q60 214 56 214 L32 214 Q28 214 28 210 Z" fill="url(#lul-shoe)" />
-          <path d="M90 206 Q90 198 78 198 L62 198 Q60 204 60 210 Q60 214 64 214 L88 214 Q92 214 92 210 Z" fill="url(#lul-shoe)" />
-          {/* white soles */}
-          <rect x="28" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
-          <rect x="60" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
-          {/* swoosh accent picks up the top colour */}
-          <path d="M34 205 Q44 202 56 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
-          <path d="M64 205 Q76 202 86 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
-        </g>
+        {/* ── LOWER BODY (Bottom slot) ─────────────────── */}
+        <BottomLayer o={o} style={bottomStyle} />
 
-        {/* ── LOWER BODY (trousers or leggings) ────────── */}
-        <LowerBody o={o} />
+        {/* ── SHOES (Shoe slot) — over the pant hem so boots read ── */}
+        <ShoeLayer o={o} />
 
-        {/* ── TORSO (hoodie for boy, dress for girl) ──── */}
-        <Torso o={o} />
+        {/* ── TORSO (Top slot) ─────────────────────────── */}
+        <TopLayer o={o} />
 
         {/* Backpack straps sit over the top */}
         <BackpackStraps o={o} />
