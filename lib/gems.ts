@@ -62,6 +62,13 @@ export async function fetchGemVault(studentId: string): Promise<GemVault> {
   return normalizeVault(data);
 }
 
+/** Ownership-free catalogue (Demo preview / no student): all locked, zero progress. */
+export async function fetchGemCatalog(): Promise<GemVault> {
+  const { data, error } = await supabase.rpc("get_gem_catalog_secure");
+  if (error) throw error;
+  return { definitions: Array.isArray(data) ? (data as GemDefinition[]) : [], owned: [], favourite_gem_id: null, totals: {} };
+}
+
 /**
  * Re-evaluate milestones and award any newly-satisfied gems. Safe to call after
  * any completion event (lesson, quiz, test, XP) or on Gem Vault load — the
