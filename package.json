@@ -18,6 +18,7 @@
     "qa:my-home-shell": "node scripts/my-home-shell-audit.mjs",
     "qa:global-xp": "node scripts/global-xp-foundation-audit.mjs",
     "qa:completion-rewards": "node scripts/completion-reward-integrity-audit.mjs",
+    "qa:demo-rewards": "node scripts/demo-reward-showcase-audit.mjs",
     "qa:starpath-activation": "node scripts/starpath-activation-audit.mjs",
     "qa:starpath-levels": "node scripts/audit-starpath-levels.mjs",
     "qa:starpath-placement-isolation": "node scripts/starpath-placement-isolation-audit.mjs",

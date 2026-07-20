@@ -9,7 +9,6 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import {
   evaluateGems,
-  fetchGemCatalog,
   fetchGemVault,
   setFavouriteGem,
   RARITY_LABEL,
@@ -47,9 +46,9 @@ export default function GemVaultPage() {
     let cancelled = false;
     (async () => {
       try {
-        // Real student: evaluate first so any owed gems are awarded on open.
+        // Demo synthesis happens inside the vault API and never writes student data.
         if (isDemo) {
-          const v = await fetchGemCatalog();
+          const v = await fetchGemVault(studentId);
           if (!cancelled) setVault(v);
         } else {
           const r = await evaluateGems(studentId, "vault_open");
@@ -60,14 +59,10 @@ export default function GemVaultPage() {
         }
       } catch {
         try {
-          const v = isDemo ? await fetchGemCatalog() : await fetchGemVault(studentId);
+          const v = await fetchGemVault(studentId);
           if (!cancelled) setVault(v);
         } catch {
-          try {
-            if (!cancelled) setVault(await fetchGemCatalog());
-          } catch {
-            if (!cancelled) setMessage("The Gem Vault is being prepared. Please try again after the latest update.");
-          }
+          if (!cancelled) setMessage("The Gem Vault is being prepared. Please try again after the latest update.");
         }
       }
     })();
@@ -93,7 +88,7 @@ export default function GemVaultPage() {
   const comingSoonRealms = MATHS_REALMS.filter((r) => r.status === "coming_soon");
 
   async function toggleFavourite(gem: GemDefinition) {
-    if (!studentId || isDemo || busy) return;
+    if (!studentId || busy) return;
     setBusy(true);
     try {
       const next = vault?.favourite_gem_id === gem.id ? null : gem.id;
@@ -167,7 +162,7 @@ export default function GemVaultPage() {
               return (
                 <div key={gem.id} className={`${PANEL} relative flex flex-col items-center overflow-hidden p-4 text-center`} style={owned ? { borderColor: `${c.mid}66`, boxShadow: `0 0 0 1px ${c.mid}33, 0 10px 30px -16px ${c.mid}` } : undefined}>
                   {owned ? (
-                    <button type="button" onClick={() => toggleFavourite(gem)} disabled={isDemo || busy} aria-label={vault?.favourite_gem_id === gem.id ? "Displayed in My Home" : "Display in My Home"} className="absolute right-2 top-2 z-10 text-white/40 transition hover:text-amber-300 disabled:opacity-40">
+                    <button type="button" onClick={() => toggleFavourite(gem)} disabled={busy} aria-label={vault?.favourite_gem_id === gem.id ? "Displayed in My Home" : "Display in My Home"} className="absolute right-2 top-2 z-10 text-white/40 transition hover:text-amber-300 disabled:opacity-40">
                       <Star className="h-4 w-4" fill={vault?.favourite_gem_id === gem.id ? "#fbbf24" : "none"} color={vault?.favourite_gem_id === gem.id ? "#fbbf24" : "currentColor"} />
                     </button>
                   ) : null}

@@ -19,7 +19,7 @@ import StudentAvatar from "@/components/avatar/StudentAvatar";
 import HallOfLegendsWidget from "@/components/home/HallOfLegendsWidget";
 import GemIcon from "@/components/gems/GemIcon";
 import { awardAndReveal } from "@/lib/gem-reveal";
-import type { GemVault } from "@/lib/gems";
+import { fetchGemVault, type GemVault } from "@/lib/gems";
 import {
   economyErrorMessage,
   equipEconomyItem,
@@ -67,9 +67,12 @@ export default function HomeBasePage() {
   // Award any gems earned since last visit and reveal them here at My Home.
   useEffect(() => {
     const sid = student?.studentId;
-    if (!sid || sid === "demo-preview") return;
+    if (!sid) return;
     let cancelled = false;
-    void awardAndReveal(sid, "home_open").then((v) => {
+    const vaultRequest = sid === "demo-preview"
+      ? fetchGemVault(sid)
+      : awardAndReveal(sid, "home_open");
+    void vaultRequest.then((v) => {
       if (!cancelled && v) setGemVault(v);
     });
     return () => {

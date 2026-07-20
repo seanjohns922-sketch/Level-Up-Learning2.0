@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 
 export type GemRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
@@ -56,7 +57,39 @@ function normalizeVault(data: unknown): GemVault {
   };
 }
 
+const DEMO_FAVOURITE_GEM_STORAGE_KEY = "lul:demo-preview:favourite_gem_v1";
+
+function readDemoFavouriteGemId() {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(DEMO_FAVOURITE_GEM_STORAGE_KEY);
+}
+
+function buildDemoGemVault(definitions: GemDefinition[]): GemVault {
+  const activeDefinitions = definitions.filter((definition) => definition.is_active !== false);
+  const earnedAt = new Date().toISOString();
+  const storedFavourite = readDemoFavouriteGemId();
+  const favouriteGemId = activeDefinitions.some((definition) => definition.id === storedFavourite)
+    ? storedFavourite
+    : activeDefinitions[0]?.id ?? null;
+
+  return {
+    definitions: activeDefinitions.map((definition) => ({
+      ...definition,
+      current: Math.max(Number(definition.current ?? 0), Number(definition.target ?? 1)),
+    })),
+    owned: activeDefinitions.map((definition) => ({
+      gem_id: definition.id,
+      slug: definition.slug,
+      earned_at: earnedAt,
+      source_type: "demo_preview",
+    })),
+    favourite_gem_id: favouriteGemId,
+    totals: { demo_preview: { complete: true } },
+  };
+}
+
 export async function fetchGemVault(studentId: string): Promise<GemVault> {
+  if (isDemoPreviewMode()) return fetchDemoGemVault();
   const { data, error } = await supabase.rpc("get_gem_vault_secure", { p_student_id: studentId });
   if (error) throw error;
   return normalizeVault(data);
@@ -69,6 +102,12 @@ export async function fetchGemCatalog(): Promise<GemVault> {
   return { definitions: Array.isArray(data) ? (data as GemDefinition[]) : [], owned: [], favourite_gem_id: null, totals: {} };
 }
 
+/** Complete, non-persistent reward showcase used only by Demo Preview mode. */
+export async function fetchDemoGemVault(): Promise<GemVault> {
+  const catalog = await fetchGemCatalog();
+  return buildDemoGemVault(catalog.definitions);
+}
+
 /**
  * Re-evaluate milestones and award any newly-satisfied gems. Safe to call after
  * any completion event (lesson, quiz, test, XP) or on Gem Vault load — the
@@ -79,6 +118,9 @@ export async function evaluateGems(
   trigger = "manual",
   triggerId?: string,
 ): Promise<GemEvaluation> {
+  if (isDemoPreviewMode()) {
+    return { newly_awarded: [], vault: await fetchDemoGemVault() };
+  }
   const { data, error } = await supabase.rpc("evaluate_gems_secure", {
     p_student_id: studentId,
     p_trigger: trigger,
@@ -94,6 +136,13 @@ export async function evaluateGems(
 
 /** Choose the favourite displayed gem (must be owned) or pass null to clear. */
 export async function setFavouriteGem(studentId: string, gemId: string | null): Promise<GemVault> {
+  if (isDemoPreviewMode()) {
+    if (typeof window !== "undefined") {
+      if (gemId) window.localStorage.setItem(DEMO_FAVOURITE_GEM_STORAGE_KEY, gemId);
+      else window.localStorage.removeItem(DEMO_FAVOURITE_GEM_STORAGE_KEY);
+    }
+    return fetchDemoGemVault();
+  }
   const { data, error } = await supabase.rpc("set_favourite_gem_secure", {
     p_student_id: studentId,
     p_gem_id: gemId,

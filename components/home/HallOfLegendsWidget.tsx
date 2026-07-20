@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Lock, Trophy } from "lucide-react";
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
 import { readProgress } from "@/data/progress";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 
 /**
  * A grand, click-into feature banner for the Hall of Legends on My Home.
@@ -23,13 +24,14 @@ export default function HallOfLegendsWidget() {
     // Measurelands unlocks (saved under the "measurement" scope) are missed.
     const numberProgress = readProgress("number");
     const measureProgress = readProgress("measurement");
+    const nextUnlocked = isDemoPreviewMode()
+      ? new Set(getAllLegends().map((legend) => legend.id))
+      : new Set<string>([
+          ...getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
+          ...getEffectiveUnlockedLegendIds(measureProgress?.year, measureProgress?.unlockedLegends, "measurelands"),
+        ]);
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setUnlocked(
-      new Set<string>([
-        ...getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
-        ...getEffectiveUnlockedLegendIds(measureProgress?.year, measureProgress?.unlockedLegends, "measurelands"),
-      ]),
-    );
+    setUnlocked(nextUnlocked);
   }, []);
 
   const all = useMemo(() => getAllLegends(), []);
