@@ -479,13 +479,20 @@ const IMAGE_HAIR_READY: Partial<Record<HairStyle, boolean>> = {
   braids: true,
   pigtails: true,
   bun: true,
+  afro: true,
   // bald stays SVG by design (bare scalp + shine).
 };
 // Where a hair PNG sits over the SVG head. viewBox is 120 wide; the head spans
 // x≈32–88 with the crown at y≈18 and chin at y≈90. The source art is a square
-// canvas with the head centred, so the image roughly fills the width. Tuned on
-// the first calibrated asset (hair_long).
+// canvas with the head centred, so the image roughly fills the width.
 const HAIR_IMAGE_BOX = { x: -1, y: -6, w: 122, h: 122 };
+// Per-style vertical nudge (SVG units, + = down). The base y suits the top-cap
+// styles; face-framing styles (Long) sit lower or their face-opening rides over
+// the eyes, and up-dos (Bun) sit higher.
+const HAIR_IMAGE_DY: Partial<Record<HairStyle, number>> = {
+  long: 7,
+  bun: -5,
+};
 
 function HairImageLayer({ style }: { style: HairStyle }) {
   const { x, y, w, h } = HAIR_IMAGE_BOX;
@@ -493,7 +500,7 @@ function HairImageLayer({ style }: { style: HairStyle }) {
     <image
       href={`/avatars/hair/hair_${style}.png`}
       x={x}
-      y={y}
+      y={y + (HAIR_IMAGE_DY[style] ?? 0)}
       width={w}
       height={h}
       preserveAspectRatio="xMidYMid meet"
@@ -528,7 +535,7 @@ function HairLayer({ o }: { o: Outfit }) {
       );
     case "buzz": // minimal, clean, tight to the scalp
       return (
-        <g data-layer="hair">
+        <g data-layer="hair" transform="translate(0 -5)">
           <path d="M31 54 Q30 24 60 20 Q90 24 89 54 Q87 47 81 47 Q88 42 79 43 Q70 39 61 40 Q51 38 45 40 Q37 40 41 45 Q34 46 33 50 Q31 51 31 54 Z" fill={hair} opacity="0.95" />
           <g fill={dk} opacity="0.26">
             {[38, 48, 58, 68, 78].map((x) => <circle key={x} cx={x} cy="31" r="0.9" />)}
