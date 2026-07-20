@@ -3,7 +3,11 @@
 import { YEAR_ORDER } from "@/data/yearOrder";
 import { type StudentProgress, writeProgress } from "@/data/progress";
 import { makeProgramProgressKey, readProgramStore, writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
-import { getActiveStudentIdentity, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
+import {
+  getActiveStudentIdentity,
+  hasActiveStudentSeenIntro,
+  markActiveStudentIntroSeen,
+} from "@/lib/studentIdentity";
 import { fetchRealmCompatProgressForStudent } from "@/lib/realm-progress-compat";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
@@ -213,7 +217,13 @@ export async function restoreStudentStateFromServer(
   const introSeenFromHistoricalProgress = compatRows.some(
     (row) => row.pretest_score != null || row.placement_complete === true || row.status === "PASSED"
   );
-  const introSeen = introSeenFromStudentFlag || introSeenFromHistoricalProgress;
+  // beginJourney records this student-scoped flag synchronously, then persists
+  // the server flag in the background. Respect the explicit local confirmation
+  // so an immediate realm restore cannot race the write and bounce to /home.
+  const introSeenFromCurrentSession = hasActiveStudentSeenIntro(studentId);
+  const introSeen = introSeenFromCurrentSession
+    || introSeenFromStudentFlag
+    || introSeenFromHistoricalProgress;
   if (introSeen) {
     markActiveStudentIntroSeen(studentId);
   }

@@ -8,6 +8,7 @@ const availability = read("lib/realm-entry.ts");
 const carousel = read("components/realms/RealmCarousel.tsx");
 const measurelands = read("app/measurelands/page.tsx");
 const entryHandoff = read("lib/realm-entry-handoff.ts");
+const progressSync = read("lib/student-progress-sync.ts");
 const pretest = read("app/pretest/page.tsx");
 
 const results = [];
@@ -71,6 +72,13 @@ check(
     entryHandoff.includes("handoff.studentId === studentId") &&
     entryHandoff.includes("handoff.realmId === realmId") &&
     entryHandoff.includes("sessionStorage.removeItem(HANDOFF_KEY)"),
+);
+check(
+  "Explicit intro completion cannot race the server write and bounce back home",
+  progressSync.includes("hasActiveStudentSeenIntro(studentId)") &&
+    progressSync.includes("introSeenFromCurrentSession") &&
+    progressSync.includes("introSeenFromStudentFlag") &&
+    progressSync.includes("introSeenFromHistoricalProgress"),
 );
 check(
   "Completed Measurelands placement leaves the pre-test for the Measurelands map",
