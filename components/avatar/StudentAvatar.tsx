@@ -477,7 +477,9 @@ const IMAGE_HAIR_READY: Partial<Record<HairStyle, boolean>> = {
   bob: true,
   ponytail: true,
   braids: true,
-  // pigtails, bun: still need hair-only art; fall back to the SVG HairLayer.
+  pigtails: true,
+  bun: true,
+  // bald stays SVG by design (bare scalp + shine).
 };
 // Where a hair PNG sits over the SVG head. viewBox is 120 wide; the head spans
 // x≈32–88 with the crown at y≈18 and chin at y≈90. The source art is a square
