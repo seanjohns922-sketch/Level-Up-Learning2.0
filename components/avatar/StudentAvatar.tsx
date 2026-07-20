@@ -459,6 +459,37 @@ function BackpackStraps({ o }: { o: Outfit }) {
   );
 }
 
+// ── Image-hair mode ─────────────────────────────────────────────────────────
+// Premium illustrated hairstyles ship as transparent hair-only PNGs in
+// public/avatars/hair/hair_<style>.png and are overlaid on the SVG head, which
+// still provides the (customisable) skin tone + face beneath. A style only
+// renders from its image once that asset is confirmed hair-only and calibrated —
+// flip it to true in IMAGE_HAIR_READY. Until then it falls back to the SVG
+// HairLayer, so nothing breaks while assets are still being produced.
+const IMAGE_HAIR_READY: Partial<Record<HairStyle, boolean>> = {
+  // long: true,   // enable per style after its hair-only PNG is calibrated
+};
+// Where a hair PNG sits over the SVG head. viewBox is 120 wide; the head spans
+// x≈32–88 with the crown at y≈18 and chin at y≈90. The source art is a square
+// canvas with the head centred, so the image roughly fills the width. Tuned on
+// the first calibrated asset (hair_long).
+const HAIR_IMAGE_BOX = { x: -1, y: 4, w: 122, h: 122 };
+
+function HairImageLayer({ style }: { style: HairStyle }) {
+  const { x, y, w, h } = HAIR_IMAGE_BOX;
+  return (
+    <image
+      href={`/avatars/hair/hair_${style}.png`}
+      x={x}
+      y={y}
+      width={w}
+      height={h}
+      preserveAspectRatio="xMidYMid meet"
+      data-layer="hair-image"
+    />
+  );
+}
+
 // Hairstyles: simple, clean, premium (Nintendo / Animal Crossing feel). Each is
 // a few clean vector shapes with a RAISED hairline (~30% more forehead than the
 // old low "helmet" line) so the face reads open and the eyes are the focal point.
@@ -997,7 +1028,7 @@ export default function StudentAvatar({
         </g>
 
         {/* ── HAIR + HEADWEAR + EYEWEAR ────────────────── */}
-        <HairLayer o={o} />
+        {IMAGE_HAIR_READY[o.hairStyle] ? <HairImageLayer style={o.hairStyle} /> : <HairLayer o={o} />}
         <HatLayer o={o} />
         <GlassesLayer o={o} />
         </GradientIdContext.Provider>
