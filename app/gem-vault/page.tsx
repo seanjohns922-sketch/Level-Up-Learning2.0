@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Lock, Sparkles, Star } from "lucide-react";
+import { BatteryCharging, Box, Cpu, Gem, Lock, LockKeyhole, Sparkles, Star } from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import GemIcon, { cutForGem, GEM_RARITY as RARITY } from "@/components/gems/GemIcon";
 import { enqueueReveal } from "@/lib/gem-reveal";
@@ -16,6 +16,13 @@ import {
   type GemVault,
 } from "@/lib/gems";
 import { MATHS_REALMS } from "@/data/mathsRealms";
+import { fetchDemoEconomy, fetchStudentEconomy, type EconomyItem, type EconomyState } from "@/lib/economy";
+
+const COLLECTIBLE_ICONS = { Gem, BatteryCharging, Box, Cpu };
+function CollectibleIcon({ item }: { item: EconomyItem }) {
+  const Icon = COLLECTIBLE_ICONS[item.icon as keyof typeof COLLECTIBLE_ICONS] ?? Gem;
+  return <Icon className="h-8 w-8" />;
+}
 
 const TABS: Array<{ id: string; label: string }> = [
   { id: "all", label: "All Gems" },
@@ -35,6 +42,9 @@ export default function GemVaultPage() {
   const [tab, setTab] = useState("all");
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [view, setView] = useState<"achievements" | "discoveries">("achievements");
+  const [economy, setEconomy] = useState<EconomyState | null>(null);
+  const [realm, setRealm] = useState<"measurement" | "number">("measurement");
   const studentId = student?.studentId;
   const isDemo = !studentId || studentId === "demo-preview" || isDemoPreviewMode();
 
@@ -71,6 +81,23 @@ export default function GemVaultPage() {
     };
   }, [studentId, isDemo]);
 
+  // Realm collectibles ("Discoveries") — folded in from the old Collection Journal.
+  useEffect(() => {
+    if (!studentId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const e = isDemo ? await fetchDemoEconomy() : await fetchStudentEconomy(studentId);
+        if (!cancelled) setEconomy(e);
+      } catch {
+        /* discoveries stay empty */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [studentId, isDemo]);
+
   const defs = vault?.definitions ?? [];
   const ownedById = useMemo(() => {
     const map = new Map<string, string>();
@@ -86,6 +113,11 @@ export default function GemVaultPage() {
 
   const visible = tab === "all" ? defs : defs.filter((d) => d.category === tab);
   const comingSoonRealms = MATHS_REALMS.filter((r) => r.status === "coming_soon");
+
+  const ownedInv = useMemo(() => new Map(economy?.inventory.map((e) => [e.item_key, e]) ?? []), [economy?.inventory]);
+  const collectibles = useMemo(() => (economy?.items ?? []).filter((i) => i.category === "collectible" && i.realm_id === realm), [economy?.items, realm]);
+  const discCollected = collectibles.filter((i) => ownedInv.has(i.item_key)).length;
+  const discPct = collectibles.length ? Math.round((discCollected / collectibles.length) * 100) : 0;
 
   async function toggleFavourite(gem: GemDefinition) {
     if (!studentId || busy) return;
@@ -140,6 +172,15 @@ export default function GemVaultPage() {
           <div className="mb-4 rounded-md border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm font-bold text-amber-100" role="status">{message}</div>
         ) : null}
 
+        {/* View toggle: achievement gems vs realm discoveries */}
+        <div className="mb-5 inline-flex rounded-xl border border-white/10 bg-white/[0.04] p-1">
+          {([["achievements", "Achievements"], ["discoveries", "Discoveries"]] as const).map(([id, label]) => (
+            <button key={id} type="button" onClick={() => setView(id)} className={`rounded-lg px-4 py-2 text-xs font-black transition ${view === id ? "bg-white text-slate-900" : "text-white/60 hover:bg-white/10"}`}>{label}</button>
+          ))}
+        </div>
+
+        {view === "achievements" ? (
+        <>
         {/* Tabs */}
         <div className="mb-5 flex gap-1.5 overflow-x-auto pb-1" role="tablist">
           {TABS.map((t) => (
@@ -206,6 +247,43 @@ export default function GemVaultPage() {
                 )
               : null}
           </div>
+        )}
+        </>
+        ) : (
+          <>
+            {/* Discoveries: per-realm collectibles (folded in from the Journal) */}
+            <div className="mb-4 inline-flex rounded-xl border border-white/10 bg-white/[0.04] p-1">
+              {([["measurement", "Measurelands"], ["number", "Number Nexus"]] as const).map(([id, label]) => (
+                <button key={id} type="button" onClick={() => setRealm(id)} className={`rounded-lg px-4 py-2 text-xs font-black transition ${realm === id ? "bg-white text-slate-900" : "text-white/60 hover:bg-white/10"}`}>{label}</button>
+              ))}
+            </div>
+            <div className="mb-5 flex items-center gap-3">
+              <div className="h-2 w-48 overflow-hidden rounded-full bg-white/12"><div className="h-full rounded-full bg-gradient-to-r from-emerald-300 to-cyan-400 transition-[width] duration-500" style={{ width: `${discPct}%` }} /></div>
+              <span className="text-sm font-black">{discCollected} <span className="text-white/50">of {collectibles.length} found</span> · {discPct}%</span>
+            </div>
+            {economy === null ? (
+              <p className="py-16 text-center text-sm font-bold text-white/40">Opening your discoveries…</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                {collectibles.map((item) => {
+                  const inv = ownedInv.get(item.item_key);
+                  const owned = Boolean(inv);
+                  return (
+                    <div key={item.item_key} className={`${PANEL} relative flex flex-col items-center overflow-hidden p-4 text-center`} style={owned ? { borderColor: `${item.accent}66`, boxShadow: `0 0 0 1px ${item.accent}33, 0 10px 30px -16px ${item.accent}` } : undefined}>
+                      <div className="relative flex h-[76px] items-center justify-center" style={{ color: owned ? item.accent : undefined }}>
+                        {owned ? <CollectibleIcon item={item} /> : <LockKeyhole className="h-7 w-7 text-white/40" />}
+                      </div>
+                      <span className="mt-1 rounded px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide" style={{ color: owned ? item.accent : "#94a3b8", background: owned ? `${item.accent}22` : "rgba(148,163,184,0.12)" }}>{item.rarity}</span>
+                      <p className={`mt-1.5 text-sm font-black leading-tight ${owned ? "text-white" : "text-white/60"}`}>{owned ? item.name : "Undiscovered"}</p>
+                      <p className="mt-1 text-[11px] font-semibold leading-snug text-white/45">{owned ? item.description : "Keep learning to discover"}</p>
+                      {owned && inv ? <p className="mt-auto pt-2 text-[10px] font-bold text-white/40">Found {new Date(inv.acquired_at).toLocaleDateString()}</p> : null}
+                    </div>
+                  );
+                })}
+                {collectibles.length === 0 ? <p className="col-span-full py-10 text-center text-sm font-bold text-white/40">No discoveries in this realm yet.</p> : null}
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>

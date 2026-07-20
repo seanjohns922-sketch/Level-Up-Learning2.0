@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, BookOpen, Gem, House, Medal, Shirt, ShoppingBag, Sparkles, User, Zap } from "lucide-react";
+import { ArrowLeft, Gem, House, Medal, Shirt, ShoppingBag, Sparkles, User, Zap } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function EconomyHeader({ xp, essence = 0, rankLevel = 1 }: { xp?: number | null; essence?: number; rankLevel?: number }) {
@@ -11,7 +11,6 @@ export default function EconomyHeader({ xp, essence = 0, rankLevel = 1 }: { xp?:
     { href: "/wardrobe", label: "Explorer Outfit", icon: Shirt },
     { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
     { href: "/gem-vault", label: "Gem Vault", icon: Gem },
-    { href: "/collections", label: "Journal", icon: BookOpen },
   ];
 
   return (
