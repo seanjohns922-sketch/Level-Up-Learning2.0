@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useId, useRef, useState } from "react";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
+
+// Every avatar instance gets a unique gradient-id prefix. Duplicate SVG ids
+// across the many avatars on a page (e.g. the wardrobe thumbnails) are invalid
+// and make iOS Safari drop paint-server fills — the hair renders bald. Each
+// layer reads its prefix from this context so nothing has to be threaded by hand.
+const GradientIdContext = createContext("");
+const useGradPrefix = () => useContext(GradientIdContext);
 
 /**
  * StudentAvatar
@@ -169,17 +176,21 @@ function BackpackPack({ o }: { o: Outfit }) {
 }
 
 // ── Shared arm treatments ───────────────────────────────────────────────────
-const Hands = () => (
-  <>
-    <circle cx="24" cy="156" r="7.5" fill="url(#lul-skin)" />
-    <circle cx="96" cy="156" r="7.5" fill="url(#lul-skin)" />
-  </>
-);
+const Hands = () => {
+  const p = useGradPrefix();
+  return (
+    <>
+      <circle cx="24" cy="156" r="7.5" fill={`url(#${p}lul-skin)`} />
+      <circle cx="96" cy="156" r="7.5" fill={`url(#${p}lul-skin)`} />
+    </>
+  );
+};
 function LongSleeves({ o, cuff }: { o: Outfit; cuff?: boolean }) {
+  const p = useGradPrefix();
   return (
     <g>
-      <path d="M22 100 Q14 112 18 150 Q24 158 32 154 Q34 128 34 108 Z" fill="url(#lul-shirt)" />
-      <path d="M98 100 Q106 112 102 150 Q96 158 88 154 Q86 128 86 108 Z" fill="url(#lul-shirt)" />
+      <path d="M22 100 Q14 112 18 150 Q24 158 32 154 Q34 128 34 108 Z" fill={`url(#${p}lul-shirt)`} />
+      <path d="M98 100 Q106 112 102 150 Q96 158 88 154 Q86 128 86 108 Z" fill={`url(#${p}lul-shirt)`} />
       {cuff ? (
         <>
           <path d="M18 147 Q25 153 32 149 L31 156 Q24 161 18 154 Z" fill={o.shirtTrim} />
@@ -191,47 +202,49 @@ function LongSleeves({ o, cuff }: { o: Outfit; cuff?: boolean }) {
   );
 }
 function ShortSleeves() {
+  const p = useGradPrefix();
   return (
     <g>
       {/* bare skin forearms */}
-      <path d="M26 112 Q19 126 23 150 Q28 158 34 154 Q35 132 36 116 Z" fill="url(#lul-skin)" />
-      <path d="M94 112 Q101 126 97 150 Q92 158 86 154 Q85 132 84 116 Z" fill="url(#lul-skin)" />
+      <path d="M26 112 Q19 126 23 150 Q28 158 34 154 Q35 132 36 116 Z" fill={`url(#${p}lul-skin)`} />
+      <path d="M94 112 Q101 126 97 150 Q92 158 86 154 Q85 132 84 116 Z" fill={`url(#${p}lul-skin)`} />
       <Hands />
       {/* sleeve caps */}
-      <path d="M28 99 Q41 97 40 114 Q33 119 25 115 Q23 103 28 99 Z" fill="url(#lul-shirt)" />
-      <path d="M92 99 Q79 97 80 114 Q87 119 95 115 Q97 103 92 99 Z" fill="url(#lul-shirt)" />
+      <path d="M28 99 Q41 97 40 114 Q33 119 25 115 Q23 103 28 99 Z" fill={`url(#${p}lul-shirt)`} />
+      <path d="M92 99 Q79 97 80 114 Q87 119 95 115 Q97 103 92 99 Z" fill={`url(#${p}lul-shirt)`} />
     </g>
   );
 }
 const TORSO = "M32 100 Q60 92 88 100 L93 156 Q60 167 27 156 Z";
-const crewNeck = <path d="M51 99 Q60 106 69 99 Q60 103 51 99 Z" fill="url(#lul-skin)" />;
+const crewNeck = (p: string) => <path d="M51 99 Q60 106 69 99 Q60 103 51 99 Z" fill={`url(#${p}lul-skin)`} />;
 
 // ── Lower body (Bottom slot) ────────────────────────────────────────────────
-function skinLegs(fromY: number) {
+function skinLegs(fromY: number, p: string) {
   return (
     <>
-      <path d={`M45 ${fromY} L42 199 L53 199 L54 ${fromY} Z`} fill="url(#lul-skin)" />
-      <path d={`M75 ${fromY} L78 199 L67 199 L66 ${fromY} Z`} fill="url(#lul-skin)" />
+      <path d={`M45 ${fromY} L42 199 L53 199 L54 ${fromY} Z`} fill={`url(#${p}lul-skin)`} />
+      <path d={`M75 ${fromY} L78 199 L67 199 L66 ${fromY} Z`} fill={`url(#${p}lul-skin)`} />
     </>
   );
 }
 function BottomLayer({ o, style }: { o: Outfit; style: BottomStyle }) {
+  const p = useGradPrefix();
   const waistband = <path d="M38 148 Q60 154 82 148 L82 157 Q60 163 38 157 Z" fill="#000" opacity="0.28" />;
   switch (style) {
     case "shorts":
       return (
         <g data-layer="pants">
-          {skinLegs(176)}
-          <path d="M39 150 L36 178 L57 178 L58 162 Z" fill="url(#lul-pants)" />
-          <path d="M81 150 L84 178 L63 178 L62 162 Z" fill="url(#lul-pants)" />
+          {skinLegs(176, p)}
+          <path d="M39 150 L36 178 L57 178 L58 162 Z" fill={`url(#${p}lul-pants)`} />
+          <path d="M81 150 L84 178 L63 178 L62 162 Z" fill={`url(#${p}lul-pants)`} />
           {waistband}
         </g>
       );
     case "jeans":
       return (
         <g data-layer="pants">
-          <path d="M39 150 L37 200 L55 200 L57 160 Z" fill="url(#lul-pants)" />
-          <path d="M81 150 L83 200 L65 200 L63 160 Z" fill="url(#lul-pants)" />
+          <path d="M39 150 L37 200 L55 200 L57 160 Z" fill={`url(#${p}lul-pants)`} />
+          <path d="M81 150 L83 200 L65 200 L63 160 Z" fill={`url(#${p}lul-pants)`} />
           {waistband}
           <line x1="60" y1="158" x2="60" y2="200" stroke="#000" strokeOpacity="0.22" strokeWidth="1" />
           <path d="M39 196 L55 196" stroke="#fff" strokeOpacity="0.2" strokeWidth="2" />
@@ -241,8 +254,8 @@ function BottomLayer({ o, style }: { o: Outfit; style: BottomStyle }) {
     case "trackpants":
       return (
         <g data-layer="pants">
-          <path d="M40 150 L34 200 L56 200 L58 168 Z" fill="url(#lul-pants)" />
-          <path d="M80 150 L86 200 L64 200 L62 168 Z" fill="url(#lul-pants)" />
+          <path d="M40 150 L34 200 L56 200 L58 168 Z" fill={`url(#${p}lul-pants)`} />
+          <path d="M80 150 L86 200 L64 200 L62 168 Z" fill={`url(#${p}lul-pants)`} />
           {waistband}
           <path d="M41 152 L37 199" stroke={o.shirtTrim} strokeWidth="2.4" strokeLinecap="round" />
           <path d="M79 152 L83 199" stroke={o.shirtTrim} strokeWidth="2.4" strokeLinecap="round" />
@@ -251,8 +264,8 @@ function BottomLayer({ o, style }: { o: Outfit; style: BottomStyle }) {
     case "skirt":
       return (
         <g data-layer="pants">
-          {skinLegs(172)}
-          <path d="M37 148 Q60 155 83 148 L93 184 Q60 195 27 184 Z" fill="url(#lul-pants)" />
+          {skinLegs(172, p)}
+          <path d="M37 148 Q60 155 83 148 L93 184 Q60 195 27 184 Z" fill={`url(#${p}lul-pants)`} />
           <line x1="50" y1="156" x2="43" y2="181" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
           <line x1="60" y1="158" x2="60" y2="183" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
           <line x1="70" y1="156" x2="77" y2="181" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
@@ -262,16 +275,16 @@ function BottomLayer({ o, style }: { o: Outfit; style: BottomStyle }) {
     case "leggings":
       return (
         <g data-layer="pants">
-          <path d="M44 150 L42 200 L53 200 L54 168 Z" fill="url(#lul-pants)" />
-          <path d="M76 150 L78 200 L67 200 L66 168 Z" fill="url(#lul-pants)" />
+          <path d="M44 150 L42 200 L53 200 L54 168 Z" fill={`url(#${p}lul-pants)`} />
+          <path d="M76 150 L78 200 L67 200 L66 168 Z" fill={`url(#${p}lul-pants)`} />
           {waistband}
         </g>
       );
     default: // joggers
       return (
         <g data-layer="pants">
-          <path d="M40 150 L34 200 L56 200 L58 168 Z" fill="url(#lul-pants)" />
-          <path d="M80 150 L86 200 L64 200 L62 168 Z" fill="url(#lul-pants)" />
+          <path d="M40 150 L34 200 L56 200 L58 168 Z" fill={`url(#${p}lul-pants)`} />
+          <path d="M80 150 L86 200 L64 200 L62 168 Z" fill={`url(#${p}lul-pants)`} />
           {waistband}
           <line x1="60" y1="158" x2="60" y2="200" stroke="#000" strokeOpacity="0.25" strokeWidth="1" />
         </g>
@@ -281,13 +294,14 @@ function BottomLayer({ o, style }: { o: Outfit; style: BottomStyle }) {
 
 // ── Torso (Top slot). "dress" also renders its own skirt. ───────────────────
 function TopLayer({ o }: { o: Outfit }) {
+  const p = useGradPrefix();
   switch (o.top) {
     case "tshirt":
       return (
         <g data-layer="shirt">
           <ShortSleeves />
-          <path d={TORSO} fill="url(#lul-shirt)" />
-          {crewNeck}
+          <path d={TORSO} fill={`url(#${p}lul-shirt)`} />
+          {crewNeck(p)}
           <path d="M51 99 Q60 105 69 99" stroke={o.shirtTrim} strokeWidth="1.6" fill="none" strokeLinecap="round" />
           <path d="M33 108 Q34 136 30 156" stroke="#ffffff" strokeOpacity="0.12" strokeWidth="2.6" fill="none" />
         </g>
@@ -296,8 +310,8 @@ function TopLayer({ o }: { o: Outfit }) {
       return (
         <g data-layer="shirt">
           <LongSleeves o={o} cuff />
-          <path d={TORSO} fill="url(#lul-shirt)" />
-          {crewNeck}
+          <path d={TORSO} fill={`url(#${p}lul-shirt)`} />
+          {crewNeck(p)}
           <path d="M50 100 Q60 108 70 100" stroke={o.shirtTrim} strokeWidth="2.4" fill="none" strokeLinecap="round" />
           <path d="M28 154 Q60 164 92 154 L92 160 Q60 170 28 160 Z" fill={o.shirtTrim} opacity="0.9" />
         </g>
@@ -306,8 +320,8 @@ function TopLayer({ o }: { o: Outfit }) {
       return (
         <g data-layer="shirt">
           <ShortSleeves />
-          <path d={TORSO} fill="url(#lul-shirt)" />
-          {crewNeck}
+          <path d={TORSO} fill={`url(#${p}lul-shirt)`} />
+          {crewNeck(p)}
           <path d="M52 99 L59 108 L61 100 Z" fill={o.shirtTrim} />
           <path d="M68 99 L61 108 L59 100 Z" fill={o.shirtTrim} />
           <line x1="61" y1="106" x2="61" y2="122" stroke={o.shirtTrim} strokeWidth="1.4" />
@@ -319,7 +333,7 @@ function TopLayer({ o }: { o: Outfit }) {
       return (
         <g data-layer="shirt">
           <LongSleeves o={o} />
-          <path d={TORSO} fill="url(#lul-shirt)" />
+          <path d={TORSO} fill={`url(#${p}lul-shirt)`} />
           {/* lapels */}
           <path d="M49 100 L60 114 L51 118 Z" fill={shade(o.shirt, -0.18)} />
           <path d="M71 100 L60 114 L69 118 Z" fill={shade(o.shirt, -0.18)} />
@@ -335,17 +349,17 @@ function TopLayer({ o }: { o: Outfit }) {
     case "dress":
       return (
         <g data-layer="dress">
-          <path d="M24 102 Q16 114 20 150 Q26 158 33 154 Q35 128 35 110 Z" fill="url(#lul-shirt)" />
-          <path d="M96 102 Q104 114 100 150 Q94 158 87 154 Q85 128 85 110 Z" fill="url(#lul-shirt)" />
+          <path d="M24 102 Q16 114 20 150 Q26 158 33 154 Q35 128 35 110 Z" fill={`url(#${p}lul-shirt)`} />
+          <path d="M96 102 Q104 114 100 150 Q94 158 87 154 Q85 128 85 110 Z" fill={`url(#${p}lul-shirt)`} />
           <Hands />
-          <ellipse cx="33" cy="105" rx="9.5" ry="8.5" fill="url(#lul-shirt)" />
-          <ellipse cx="87" cy="105" rx="9.5" ry="8.5" fill="url(#lul-shirt)" />
+          <ellipse cx="33" cy="105" rx="9.5" ry="8.5" fill={`url(#${p}lul-shirt)`} />
+          <ellipse cx="87" cy="105" rx="9.5" ry="8.5" fill={`url(#${p}lul-shirt)`} />
           <ellipse cx="33" cy="104" rx="9.5" ry="8.5" fill="#ffffff" opacity="0.08" />
           <ellipse cx="87" cy="104" rx="9.5" ry="8.5" fill="#ffffff" opacity="0.08" />
-          <path d="M34 100 Q60 94 86 100 L82 150 Q60 156 38 150 Z" fill="url(#lul-shirt)" />
+          <path d="M34 100 Q60 94 86 100 L82 150 Q60 156 38 150 Z" fill={`url(#${p}lul-shirt)`} />
           <path d="M49 99 Q60 111 71 99 Q66 104 60 104 Q54 104 49 99 Z" fill={o.shirtTrim} />
           <path d="M38 145 Q60 151 82 145 L82 152 Q60 158 38 152 Z" fill={o.shirtTrim} opacity="0.95" />
-          <path d="M37 150 Q60 157 83 150 L94 187 Q60 198 26 187 Z" fill="url(#lul-shirt)" />
+          <path d="M37 150 Q60 157 83 150 L94 187 Q60 198 26 187 Z" fill={`url(#${p}lul-shirt)`} />
           <line x1="50" y1="156" x2="43" y2="184" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
           <line x1="60" y1="158" x2="60" y2="185" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
           <line x1="70" y1="156" x2="77" y2="184" stroke="#000" strokeOpacity="0.10" strokeWidth="1.4" />
@@ -357,7 +371,7 @@ function TopLayer({ o }: { o: Outfit }) {
       return (
         <g data-layer="shirt">
           <LongSleeves o={o} />
-          <path d={TORSO} fill="url(#lul-shirt)" />
+          <path d={TORSO} fill={`url(#${p}lul-shirt)`} />
           <path d="M34 100 Q40 82 60 80 Q80 82 86 100 Q72 92 60 92 Q48 92 34 100 Z" fill={o.shirt} opacity="0.95" />
           <path d="M42 128 L78 128 Q80 142 60 144 Q40 142 42 128 Z" fill="#000" opacity="0.18" />
           <line x1="54" y1="100" x2="52" y2="118" stroke={o.shirtTrim} strokeWidth="1.4" strokeLinecap="round" />
@@ -372,13 +386,14 @@ function TopLayer({ o }: { o: Outfit }) {
 
 // ── Shoes (Shoe slot) ───────────────────────────────────────────────────────
 function ShoeLayer({ o }: { o: Outfit }) {
+  const p = useGradPrefix();
   switch (o.shoeStyle) {
     case "boots":
       return (
         <g data-layer="shoes">
           {/* tall ankle boots, one per foot with a clear gap */}
-          <path d="M34 181 Q46 179 57 182 L58 206 Q58 213 51 213 L38 213 Q33 213 33 207 L33 188 Q33 183 34 181 Z" fill="url(#lul-shoe)" />
-          <path d="M86 181 Q74 179 63 182 L62 206 Q62 213 69 213 L82 213 Q87 213 87 207 L87 188 Q87 183 86 181 Z" fill="url(#lul-shoe)" />
+          <path d="M34 181 Q46 179 57 182 L58 206 Q58 213 51 213 L38 213 Q33 213 33 207 L33 188 Q33 183 34 181 Z" fill={`url(#${p}lul-shoe)`} />
+          <path d="M86 181 Q74 179 63 182 L62 206 Q62 213 69 213 L82 213 Q87 213 87 207 L87 188 Q87 183 86 181 Z" fill={`url(#${p}lul-shoe)`} />
           {/* folded cuffs */}
           <path d="M34 186 Q46 190 57 186" stroke={shade(o.shoes, 0.34)} strokeWidth="2.6" fill="none" strokeLinecap="round" />
           <path d="M63 186 Q74 190 86 186" stroke={shade(o.shoes, 0.34)} strokeWidth="2.6" fill="none" strokeLinecap="round" />
@@ -393,8 +408,8 @@ function ShoeLayer({ o }: { o: Outfit }) {
     case "hightops":
       return (
         <g data-layer="shoes">
-          <path d="M32 195 Q32 190 40 190 L58 190 Q60 196 60 208 Q60 213 55 213 L34 213 Q30 213 30 208 Z" fill="url(#lul-shoe)" />
-          <path d="M88 195 Q88 190 80 190 L62 190 Q60 196 60 208 Q60 213 65 213 L86 213 Q90 213 90 208 Z" fill="url(#lul-shoe)" />
+          <path d="M32 195 Q32 190 40 190 L58 190 Q60 196 60 208 Q60 213 55 213 L34 213 Q30 213 30 208 Z" fill={`url(#${p}lul-shoe)`} />
+          <path d="M88 195 Q88 190 80 190 L62 190 Q60 196 60 208 Q60 213 65 213 L86 213 Q90 213 90 208 Z" fill={`url(#${p}lul-shoe)`} />
           <rect x="28" y="210" width="32" height="4.5" rx="2" fill="#f8fafc" />
           <rect x="60" y="210" width="32" height="4.5" rx="2" fill="#f8fafc" />
           <path d="M40 198 L54 200 M40 203 L54 205" stroke="#f8fafc" strokeWidth="1.3" />
@@ -405,23 +420,23 @@ function ShoeLayer({ o }: { o: Outfit }) {
       return (
         <g data-layer="shoes">
           {/* bare feet */}
-          <path d="M37 200 Q35 208 41 210 L56 210 Q59 210 59 206 L58 200 Z" fill="url(#lul-skin)" />
-          <path d="M83 200 Q85 208 79 210 L64 210 Q61 210 61 206 L62 200 Z" fill="url(#lul-skin)" />
+          <path d="M37 200 Q35 208 41 210 L56 210 Q59 210 59 206 L58 200 Z" fill={`url(#${p}lul-skin)`} />
+          <path d="M83 200 Q85 208 79 210 L64 210 Q61 210 61 206 L62 200 Z" fill={`url(#${p}lul-skin)`} />
           {/* thin soles */}
-          <rect x="35" y="209" width="25" height="3.6" rx="1.8" fill="url(#lul-shoe)" />
-          <rect x="60" y="209" width="25" height="3.6" rx="1.8" fill="url(#lul-shoe)" />
+          <rect x="35" y="209" width="25" height="3.6" rx="1.8" fill={`url(#${p}lul-shoe)`} />
+          <rect x="60" y="209" width="25" height="3.6" rx="1.8" fill={`url(#${p}lul-shoe)`} />
           {/* Y straps */}
-          <path d="M40 203 L54 203" stroke="url(#lul-shoe)" strokeWidth="2.6" strokeLinecap="round" />
-          <path d="M47 200 L48 208" stroke="url(#lul-shoe)" strokeWidth="2" strokeLinecap="round" />
-          <path d="M66 203 L80 203" stroke="url(#lul-shoe)" strokeWidth="2.6" strokeLinecap="round" />
-          <path d="M73 200 L72 208" stroke="url(#lul-shoe)" strokeWidth="2" strokeLinecap="round" />
+          <path d="M40 203 L54 203" stroke={`url(#${p}lul-shoe)`} strokeWidth="2.6" strokeLinecap="round" />
+          <path d="M47 200 L48 208" stroke={`url(#${p}lul-shoe)`} strokeWidth="2" strokeLinecap="round" />
+          <path d="M66 203 L80 203" stroke={`url(#${p}lul-shoe)`} strokeWidth="2.6" strokeLinecap="round" />
+          <path d="M73 200 L72 208" stroke={`url(#${p}lul-shoe)`} strokeWidth="2" strokeLinecap="round" />
         </g>
       );
     default: // sneakers
       return (
         <g data-layer="shoes">
-          <path d="M30 206 Q30 198 42 198 L58 198 Q60 204 60 210 Q60 214 56 214 L32 214 Q28 214 28 210 Z" fill="url(#lul-shoe)" />
-          <path d="M90 206 Q90 198 78 198 L62 198 Q60 204 60 210 Q60 214 64 214 L88 214 Q92 214 92 210 Z" fill="url(#lul-shoe)" />
+          <path d="M30 206 Q30 198 42 198 L58 198 Q60 204 60 210 Q60 214 56 214 L32 214 Q28 214 28 210 Z" fill={`url(#${p}lul-shoe)`} />
+          <path d="M90 206 Q90 198 78 198 L62 198 Q60 204 60 210 Q60 214 64 214 L88 214 Q92 214 92 210 Z" fill={`url(#${p}lul-shoe)`} />
           <rect x="28" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
           <rect x="60" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
           <path d="M34 205 Q44 202 56 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
@@ -449,17 +464,18 @@ function BackpackStraps({ o }: { o: Outfit }) {
 const HAIR_FRONT = "Q92 45 85 48 Q81 42 73 43 Q66 38 58 40 Q49 37 42 42 Q36 42 38 47 Q31 48 27 56 Z";
 
 function HairLayer({ o }: { o: Outfit }) {
+  const p = useGradPrefix();
   const dk = o.hairShade;
   const edge = { stroke: dk, strokeWidth: 0.9, strokeOpacity: 0.28, strokeLinejoin: "round" as const };
-  const lock = (d: string, opacity = 1) => <path d={d} fill="url(#lul-hair-lock)" opacity={opacity} {...edge} />;
+  const lock = (d: string, opacity = 1) => <path d={d} fill={`url(#${p}lul-hair-lock)`} opacity={opacity} {...edge} />;
   const sep = (d: string) => <path d={d} stroke={dk} strokeWidth="1.15" strokeLinecap="round" opacity="0.3" fill="none" />;
   const sh = (cx: number, cy: number, rx: number, ry: number) => (
-    <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="url(#lul-hair-sheen)" transform={`rotate(-22 ${cx} ${cy})`} />
+    <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={`url(#${p}lul-hair-sheen)`} transform={`rotate(-22 ${cx} ${cy})`} />
   );
   const crop = (
     <path
       d={`M27 55 C25 29 36 12 55 8 C75 4 91 15 94 35 C95 44 93 50 91 53 ${HAIR_FRONT}`}
-      fill="url(#lul-hair)"
+      fill={`url(#${p}lul-hair)`}
       {...edge}
     />
   );
@@ -475,7 +491,7 @@ function HairLayer({ o }: { o: Outfit }) {
     case "buzz":
       return (
         <g data-layer="hair">
-          <path d="M30 52 C29 29 41 21 59 20 C78 20 90 31 90 52 C85 45 78 44 70 44 C59 41 49 42 40 46 C36 47 33 49 30 52Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M30 52 C29 29 41 21 59 20 C78 20 90 31 90 52 C85 45 78 44 70 44 C59 41 49 42 40 46 C36 47 33 49 30 52Z" fill={`url(#${p}lul-hair)`} {...edge} />
           <g fill={dk} opacity="0.28">
             {[38, 47, 56, 65, 74, 82].map((x) => <circle key={x} cx={x} cy="32" r="0.8" />)}
             {[34, 43, 52, 61, 70, 79, 86].map((x) => <circle key={`a${x}`} cx={x} cy="40" r="0.8" />)}
@@ -497,7 +513,7 @@ function HairLayer({ o }: { o: Outfit }) {
     case "swept":
       return (
         <g data-layer="hair">
-          <path d="M25 55 C22 28 34 11 54 7 C78 1 99 12 104 30 C108 43 103 52 94 56 C92 48 86 45 80 45 C71 40 64 39 55 42 C46 38 37 43 25 55Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M25 55 C22 28 34 11 54 7 C78 1 99 12 104 30 C108 43 103 52 94 56 C92 48 86 45 80 45 C71 40 64 39 55 42 C46 38 37 43 25 55Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {lock("M29 39 C35 17 49 7 66 7 C57 15 50 25 45 38 C39 35 34 36 29 39Z", 0.9)}
           {lock("M39 40 C49 14 68 5 88 13 C75 18 64 28 57 41 C51 38 45 38 39 40Z", 0.96)}
           {lock("M55 42 C67 18 87 15 101 28 C88 27 76 34 69 44 C64 42 60 41 55 42Z", 0.8)}
@@ -521,7 +537,7 @@ function HairLayer({ o }: { o: Outfit }) {
     case "tuft":
       return (
         <g data-layer="hair">
-          <path d="M28 54 C27 31 39 16 58 13 C78 11 91 25 92 54 C85 46 77 43 67 43 C55 40 44 42 35 48 C32 49 30 52 28 54Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M28 54 C27 31 39 16 58 13 C78 11 91 25 92 54 C85 46 77 43 67 43 C55 40 44 42 35 48 C32 49 30 52 28 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {lock("M38 39 C39 20 49 12 59 13 C54 20 53 29 52 40Z", 0.8)}
           {lock("M48 34 C48 13 58 3 69 5 C66 10 68 14 77 13 C73 22 65 29 57 38Z")}
           {lock("M58 40 C66 22 79 18 88 28 C79 29 72 35 68 43Z", 0.72)}
@@ -531,7 +547,7 @@ function HairLayer({ o }: { o: Outfit }) {
     case "spiky":
       return (
         <g data-layer="hair">
-          <path d="M28 54 C27 34 31 28 36 24 C35 17 37 11 39 6 C44 12 47 17 48 22 C50 13 54 7 58 2 C61 10 64 15 65 21 C68 13 73 8 78 5 C80 14 82 20 82 26 C89 31 92 40 92 54 C85 46 77 43 67 43 C56 40 44 42 35 48 C32 50 30 52 28 54Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M28 54 C27 34 31 28 36 24 C35 17 37 11 39 6 C44 12 47 17 48 22 C50 13 54 7 58 2 C61 10 64 15 65 21 C68 13 73 8 78 5 C80 14 82 20 82 26 C89 31 92 40 92 54 C85 46 77 43 67 43 C56 40 44 42 35 48 C32 50 30 52 28 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {lock("M36 30 C40 22 44 17 48 13 C48 22 50 29 53 35 C56 24 61 16 66 11 C66 22 69 29 72 35 C75 28 79 23 82 20 C83 29 85 35 88 41 C68 33 51 34 36 43Z", 0.68)}
           {sh(44, 18, 13, 7)}
         </g>
@@ -539,8 +555,8 @@ function HairLayer({ o }: { o: Outfit }) {
     case "curls":
       return (
         <g data-layer="hair">
-          <path d="M24 55 C20 31 31 16 50 12 C72 6 94 18 97 43 C98 49 96 53 94 57 C88 48 80 45 72 45 C63 41 53 41 45 45 C36 43 29 48 24 55Z" fill="url(#lul-hair)" {...edge} />
-          <g fill="url(#lul-hair-lock)" stroke={dk} strokeOpacity="0.2" strokeWidth="0.7">
+          <path d="M24 55 C20 31 31 16 50 12 C72 6 94 18 97 43 C98 49 96 53 94 57 C88 48 80 45 72 45 C63 41 53 41 45 45 C36 43 29 48 24 55Z" fill={`url(#${p}lul-hair)`} {...edge} />
+          <g fill={`url(#${p}lul-hair-lock)`} stroke={dk} strokeOpacity="0.2" strokeWidth="0.7">
             {[[29, 35, 8], [34, 22, 9], [47, 15, 9], [61, 13, 9], [75, 17, 9], [87, 25, 9], [92, 38, 8], [83, 40, 8], [68, 35, 8], [54, 34, 8], [40, 39, 8], [29, 47, 7]].map(([cx, cy, r]) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} />)}
           </g>
           <g fill="#fff" opacity="0.2"><circle cx="43" cy="13" r="2.5" /><circle cx="58" cy="11" r="2.8" /><circle cx="31" cy="27" r="2" /></g>
@@ -549,7 +565,7 @@ function HairLayer({ o }: { o: Outfit }) {
     case "afro":
       return (
         <g data-layer="hair">
-          <path d="M18 54 C10 50 8 42 13 35 C8 26 14 17 23 16 C25 7 35 3 43 7 C49 0 61 0 67 6 C75 1 87 5 89 13 C100 13 107 22 103 31 C112 38 108 49 101 54 C96 47 90 44 84 45 C75 39 68 40 60 42 C51 39 43 40 35 45 C28 44 22 48 18 54Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M18 54 C10 50 8 42 13 35 C8 26 14 17 23 16 C25 7 35 3 43 7 C49 0 61 0 67 6 C75 1 87 5 89 13 C100 13 107 22 103 31 C112 38 108 49 101 54 C96 47 90 44 84 45 C75 39 68 40 60 42 C51 39 43 40 35 45 C28 44 22 48 18 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {lock("M22 36 C26 15 42 7 58 9 C43 17 37 29 36 43 C31 40 27 38 22 36Z", 0.62)}
           {lock("M42 40 C45 13 67 6 85 18 C69 18 58 27 55 41Z", 0.7)}
           <g fill="#fff" opacity="0.12"><circle cx="34" cy="15" r="3" /><circle cx="52" cy="8" r="3.3" /><circle cx="74" cy="10" r="2.8" /></g>
@@ -558,9 +574,9 @@ function HairLayer({ o }: { o: Outfit }) {
     case "long":
       return (
         <g data-layer="hair">
-          <path d="M22 47 C14 65 15 99 25 124 C29 133 39 132 39 121 C33 97 39 75 43 55Z" fill="url(#lul-hair)" {...edge} />
-          <path d="M98 47 C106 65 105 99 95 124 C91 133 81 132 81 121 C87 97 81 75 77 55Z" fill="url(#lul-hair)" {...edge} />
-          <path d="M22 53 C20 24 35 7 58 6 C82 5 99 22 98 53 C91 45 84 42 76 43 C69 39 64 37 60 39 C55 37 49 39 43 43 C34 42 28 46 22 53Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M22 47 C14 65 15 99 25 124 C29 133 39 132 39 121 C33 97 39 75 43 55Z" fill={`url(#${p}lul-hair)`} {...edge} />
+          <path d="M98 47 C106 65 105 99 95 124 C91 133 81 132 81 121 C87 97 81 75 77 55Z" fill={`url(#${p}lul-hair)`} {...edge} />
+          <path d="M22 53 C20 24 35 7 58 6 C82 5 99 22 98 53 C91 45 84 42 76 43 C69 39 64 37 60 39 C55 37 49 39 43 43 C34 42 28 46 22 53Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {lock("M23 45 C28 18 43 8 58 7 C48 18 43 32 42 51 C34 47 29 45 23 45Z", 0.72)}
           {lock("M60 39 C65 16 82 11 94 28 C83 26 74 33 70 45Z", 0.8)}
           {sep("M31 55 C25 82 27 105 34 124")}
@@ -571,7 +587,7 @@ function HairLayer({ o }: { o: Outfit }) {
     case "bob":
       return (
         <g data-layer="hair">
-          <path d="M22 53 C20 24 36 8 59 7 C82 7 99 23 98 53 C101 72 96 94 87 101 C80 105 77 98 80 88 C84 72 82 55 76 48 C67 43 54 42 44 48 C37 56 36 72 40 88 C43 98 40 105 33 101 C24 94 19 72 22 53Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M22 53 C20 24 36 8 59 7 C82 7 99 23 98 53 C101 72 96 94 87 101 C80 105 77 98 80 88 C84 72 82 55 76 48 C67 43 54 42 44 48 C37 56 36 72 40 88 C43 98 40 105 33 101 C24 94 19 72 22 53Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {lock("M23 45 C28 19 43 9 58 8 C49 18 44 30 43 47 C35 44 29 44 23 45Z", 0.72)}
           {lock("M57 43 C63 18 82 13 94 30 C81 27 71 34 67 45Z", 0.78)}
           {sep("M29 57 C27 74 30 90 35 99")}
@@ -582,8 +598,8 @@ function HairLayer({ o }: { o: Outfit }) {
     case "ponytail":
       return (
         <g data-layer="hair">
-          <path d="M84 25 C105 23 114 38 111 56 C109 72 99 82 89 78 C97 70 99 62 96 54 C94 47 89 43 83 42Z" fill="url(#lul-hair)" {...edge} />
-          <path d="M25 54 C24 28 38 11 59 8 C80 8 94 24 95 51 C88 45 82 43 75 44 C67 40 58 39 49 43 C40 41 32 46 25 54Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M84 25 C105 23 114 38 111 56 C109 72 99 82 89 78 C97 70 99 62 96 54 C94 47 89 43 83 42Z" fill={`url(#${p}lul-hair)`} {...edge} />
+          <path d="M25 54 C24 28 38 11 59 8 C80 8 94 24 95 51 C88 45 82 43 75 44 C67 40 58 39 49 43 C40 41 32 46 25 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {lock("M28 43 C34 20 48 11 61 9 C52 20 48 31 48 43 C41 41 35 41 28 43Z", 0.65)}
           {sep("M91 32 C104 43 104 61 94 74")}
           {sh(43, 19, 15, 7)}
@@ -592,9 +608,9 @@ function HairLayer({ o }: { o: Outfit }) {
     case "pigtails":
       return (
         <g data-layer="hair">
-          <path d="M24 55 C12 56 7 66 11 77 C15 87 27 88 33 79 C38 70 33 59 24 55Z" fill="url(#lul-hair)" {...edge} />
-          <path d="M96 55 C108 56 113 66 109 77 C105 87 93 88 87 79 C82 70 87 59 96 55Z" fill="url(#lul-hair)" {...edge} />
-          <path d="M24 54 C23 26 39 9 59 8 C81 8 97 26 96 54 C89 46 82 43 74 44 C68 40 63 39 60 40 C56 39 50 40 44 44 C36 43 30 47 24 54Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M24 55 C12 56 7 66 11 77 C15 87 27 88 33 79 C38 70 33 59 24 55Z" fill={`url(#${p}lul-hair)`} {...edge} />
+          <path d="M96 55 C108 56 113 66 109 77 C105 87 93 88 87 79 C82 70 87 59 96 55Z" fill={`url(#${p}lul-hair)`} {...edge} />
+          <path d="M24 54 C23 26 39 9 59 8 C81 8 97 26 96 54 C89 46 82 43 74 44 C68 40 63 39 60 40 C56 39 50 40 44 44 C36 43 30 47 24 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {centrePart}
           {lock("M26 44 C32 21 45 11 58 9 C50 20 47 31 47 43 C39 41 32 42 26 44Z", 0.64)}
           {sh(42, 18, 14, 7)}
@@ -603,9 +619,9 @@ function HairLayer({ o }: { o: Outfit }) {
     case "bun":
       return (
         <g data-layer="hair">
-          <ellipse cx="60" cy="9" rx="13" ry="11" fill="url(#lul-hair)" {...edge} />
+          <ellipse cx="60" cy="9" rx="13" ry="11" fill={`url(#${p}lul-hair)`} {...edge} />
           {lock("M49 10 C52 1 64 -2 71 5 C65 5 58 9 54 15Z", 0.74)}
-          <path d="M25 54 C24 27 39 11 59 9 C80 10 95 27 95 54 C88 46 81 43 73 44 C64 40 55 40 46 44 C37 43 30 47 25 54Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M25 54 C24 27 39 11 59 9 C80 10 95 27 95 54 C88 46 81 43 73 44 C64 40 55 40 46 44 C37 43 30 47 25 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {lock("M28 43 C34 21 47 12 59 10 C51 20 48 31 48 43 C41 41 34 42 28 43Z", 0.64)}
           {sh(42, 21, 14, 7)}
         </g>
@@ -616,11 +632,11 @@ function HairLayer({ o }: { o: Outfit }) {
           {[24, 96].map((cx) => (
             <g key={cx}>
               {[58, 70, 82, 94, 106].map((cy, index) => (
-                <ellipse key={cy} cx={cx} cy={cy} rx="7.5" ry="7" fill="url(#lul-hair-lock)" stroke={dk} strokeOpacity="0.24" strokeWidth="0.7" transform={`rotate(${index % 2 ? 18 : -18} ${cx} ${cy})`} />
+                <ellipse key={cy} cx={cx} cy={cy} rx="7.5" ry="7" fill={`url(#${p}lul-hair-lock)`} stroke={dk} strokeOpacity="0.24" strokeWidth="0.7" transform={`rotate(${index % 2 ? 18 : -18} ${cx} ${cy})`} />
               ))}
             </g>
           ))}
-          <path d="M24 54 C23 26 39 9 59 8 C81 8 97 26 96 54 C89 46 82 43 74 44 C68 40 63 39 60 40 C56 39 50 40 44 44 C36 43 30 47 24 54Z" fill="url(#lul-hair)" {...edge} />
+          <path d="M24 54 C23 26 39 9 59 8 C81 8 97 26 96 54 C89 46 82 43 74 44 C68 40 63 39 60 40 C56 39 50 40 44 44 C36 43 30 47 24 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
           {centrePart}
           {lock("M26 44 C32 21 45 11 58 9 C50 20 47 31 47 43 C39 41 32 42 26 44Z", 0.64)}
           {sh(42, 18, 14, 7)}
@@ -719,12 +735,13 @@ function FaceLayer({ o }: { o: Outfit }) {
 }
 
 function HatLayer({ o }: { o: Outfit }) {
+  const p = useGradPrefix();
   switch (o.hat) {
     case "beanie":
       return (
         <g data-layer="hat">
-          <path d="M24 42 C24 18 39 7 60 7 C81 7 96 19 96 42 C83 36 72 34 60 34 C47 34 36 36 24 42Z" fill="url(#lul-hat)" />
-          <rect x="23" y="37" width="74" height="13" rx="6.5" fill="url(#lul-hat)" />
+          <path d="M24 42 C24 18 39 7 60 7 C81 7 96 19 96 42 C83 36 72 34 60 34 C47 34 36 36 24 42Z" fill={`url(#${p}lul-hat)`} />
+          <rect x="23" y="37" width="74" height="13" rx="6.5" fill={`url(#${p}lul-hat)`} />
           <path d="M28 41 C47 37 73 37 92 41" stroke="#fff" strokeOpacity="0.2" strokeWidth="1.5" fill="none" />
           <circle cx="60" cy="6" r="5" fill={o.hatColor} />
           <circle cx="58.5" cy="4.5" r="1.7" fill="#fff" opacity="0.45" />
@@ -733,8 +750,8 @@ function HatLayer({ o }: { o: Outfit }) {
     case "cap":
       return (
         <g data-layer="hat">
-          <path d="M24 42 C26 18 40 9 60 9 C80 9 94 20 96 42 C83 36 72 34 60 34 C47 34 36 36 24 42Z" fill="url(#lul-hat)" />
-          <path d="M55 39 C78 36 99 39 108 46 C95 51 76 50 55 46Z" fill="url(#lul-hat-brim)" />
+          <path d="M24 42 C26 18 40 9 60 9 C80 9 94 20 96 42 C83 36 72 34 60 34 C47 34 36 36 24 42Z" fill={`url(#${p}lul-hat)`} />
+          <path d="M55 39 C78 36 99 39 108 46 C95 51 76 50 55 46Z" fill={`url(#${p}lul-hat-brim)`} />
           <path d="M36 31 C50 24 69 24 83 31" stroke="#fff" strokeOpacity="0.2" strokeWidth="1.5" fill="none" />
           <path d="M60 10 V34" stroke="#000" strokeOpacity="0.12" strokeWidth="1.2" />
         </g>
@@ -742,8 +759,8 @@ function HatLayer({ o }: { o: Outfit }) {
     case "explorer":
       return (
         <g data-layer="hat">
-          <path d="M34 42 C35 17 46 9 60 9 C74 9 85 18 86 42Z" fill="url(#lul-hat)" />
-          <ellipse cx="60" cy="43" rx="42" ry="9" fill="url(#lul-hat-brim)" />
+          <path d="M34 42 C35 17 46 9 60 9 C74 9 85 18 86 42Z" fill={`url(#${p}lul-hat)`} />
+          <ellipse cx="60" cy="43" rx="42" ry="9" fill={`url(#${p}lul-hat-brim)`} />
           <path d="M35 35 H85" stroke={shade(o.hatColor, -0.35)} strokeWidth="6" opacity="0.72" />
           <ellipse cx="60" cy="43" rx="42" ry="9" fill="none" stroke="#000" strokeOpacity="0.16" strokeWidth="1" />
           <path d="M44 20 C53 15 67 15 76 20" stroke="#fff" strokeOpacity="0.18" strokeWidth="1.5" fill="none" />
@@ -752,7 +769,7 @@ function HatLayer({ o }: { o: Outfit }) {
     case "crown":
       return (
         <g data-layer="hat">
-          <path d="M32 36 L39 12 L50 27 L60 8 L70 27 L81 12 L88 36Z" fill="url(#lul-crown)" />
+          <path d="M32 36 L39 12 L50 27 L60 8 L70 27 L81 12 L88 36Z" fill={`url(#${p}lul-crown)`} />
           <rect x="31" y="33" width="58" height="9" rx="4" fill="#f59e0b" />
           <path d="M36 36 H84" stroke="#fff" strokeOpacity="0.32" strokeWidth="1.5" />
           <circle cx="60" cy="19" r="2.2" fill="#ef4444" />
@@ -763,8 +780,8 @@ function HatLayer({ o }: { o: Outfit }) {
     case "wizard":
       return (
         <g data-layer="hat">
-          <path d="M61 -3 C57 10 49 23 39 39 C51 43 70 43 82 38 C72 24 67 10 61 -3Z" fill="url(#lul-hat)" />
-          <path d="M34 39 C49 44 73 45 88 39 L91 47 C73 53 48 52 30 47Z" fill="url(#lul-hat-brim)" />
+          <path d="M61 -3 C57 10 49 23 39 39 C51 43 70 43 82 38 C72 24 67 10 61 -3Z" fill={`url(#${p}lul-hat)`} />
+          <path d="M34 39 C49 44 73 45 88 39 L91 47 C73 53 48 52 30 47Z" fill={`url(#${p}lul-hat-brim)`} />
           <path d="M52 15 C58 12 64 13 69 17" stroke="#fff" strokeOpacity="0.18" strokeWidth="1.5" fill="none" />
           <path d="M60 15 L62 21 L68 23 L62 25 L60 31 L58 25 L52 23 L58 21 Z" fill="#fde68a" />
         </g>
@@ -860,6 +877,9 @@ export default function StudentAvatar({
     );
   }, [celebrateSignal]);
 
+  // Unique per-instance prefix for all SVG gradient ids (see GradientIdContext).
+  const p = `a${useId().replace(/[^a-zA-Z0-9]/g, "")}-`;
+
   const o: Required<AvatarOutfit> = {
     ...DEFAULT_OUTFIT,
     ...stored,
@@ -894,49 +914,50 @@ export default function StudentAvatar({
         xmlns="http://www.w3.org/2000/svg"
         shapeRendering="geometricPrecision"
       >
+        <GradientIdContext.Provider value={p}>
         <defs>
-          <linearGradient id="lul-skin" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={`${p}lul-skin`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={o.skin} />
             <stop offset="100%" stopColor={o.skinShade} />
           </linearGradient>
-          <linearGradient id="lul-shirt" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={`${p}lul-shirt`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={o.shirt} />
             <stop offset="100%" stopColor={o.shirt} stopOpacity="0.85" />
           </linearGradient>
-          <linearGradient id="lul-hair" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={`${p}lul-hair`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={shade(o.hair, 0.36)} />
             <stop offset="45%" stopColor={o.hair} />
             <stop offset="100%" stopColor={o.hairShade} />
           </linearGradient>
-          <linearGradient id="lul-hair-lock" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id={`${p}lul-hair-lock`} x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor={shade(o.hair, 0.52)} />
             <stop offset="42%" stopColor={shade(o.hair, 0.18)} />
             <stop offset="100%" stopColor={o.hairShade} />
           </linearGradient>
-          <radialGradient id="lul-hair-sheen" cx="0.4" cy="0.28" r="0.5">
+          <radialGradient id={`${p}lul-hair-sheen`} cx="0.4" cy="0.28" r="0.5">
             <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
             <stop offset="60%" stopColor="#ffffff" stopOpacity="0.08" />
             <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
           </radialGradient>
-          <linearGradient id="lul-hat" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id={`${p}lul-hat`} x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor={shade(o.hatColor, 0.38)} />
             <stop offset="48%" stopColor={o.hatColor} />
             <stop offset="100%" stopColor={shade(o.hatColor, -0.28)} />
           </linearGradient>
-          <linearGradient id="lul-hat-brim" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={`${p}lul-hat-brim`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={shade(o.hatColor, 0.12)} />
             <stop offset="100%" stopColor={shade(o.hatColor, -0.38)} />
           </linearGradient>
-          <linearGradient id="lul-crown" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id={`${p}lul-crown`} x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#fff3a3" />
             <stop offset="50%" stopColor="#fcd34d" />
             <stop offset="100%" stopColor="#d97706" />
           </linearGradient>
-          <linearGradient id="lul-pants" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={`${p}lul-pants`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={shade(o.pants, 0.12)} />
             <stop offset="100%" stopColor={shade(o.pants, -0.35)} />
           </linearGradient>
-          <linearGradient id="lul-shoe" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={`${p}lul-shoe`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={shade(o.shoes, 0.42)} />
             <stop offset="100%" stopColor={o.shoes} />
           </linearGradient>
@@ -964,11 +985,11 @@ export default function StudentAvatar({
           {/* Head — softly rounded */}
           <path
             d="M32 50 Q32 18 60 18 Q88 18 88 50 L88 62 Q88 86 60 90 Q32 86 32 62 Z"
-            fill="url(#lul-skin)"
+            fill={`url(#${p}lul-skin)`}
           />
           {/* Ears */}
-          <ellipse cx="32" cy="58" rx="4" ry="6" fill="url(#lul-skin)" />
-          <ellipse cx="88" cy="58" rx="4" ry="6" fill="url(#lul-skin)" />
+          <ellipse cx="32" cy="58" rx="4" ry="6" fill={`url(#${p}lul-skin)`} />
+          <ellipse cx="88" cy="58" rx="4" ry="6" fill={`url(#${p}lul-skin)`} />
           <ellipse cx="32" cy="59" rx="1.6" ry="3" fill={o.skinShade} opacity="0.6" />
           <ellipse cx="88" cy="59" rx="1.6" ry="3" fill={o.skinShade} opacity="0.6" />
 
@@ -979,6 +1000,7 @@ export default function StudentAvatar({
         <HairLayer o={o} />
         <HatLayer o={o} />
         <GlassesLayer o={o} />
+        </GradientIdContext.Provider>
       </svg>
 
       {framing === "full" ? (
