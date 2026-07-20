@@ -485,7 +485,7 @@ const IMAGE_HAIR_READY: Partial<Record<HairStyle, boolean>> = {
 // x≈32–88 with the crown at y≈18 and chin at y≈90. The source art is a square
 // canvas with the head centred, so the image roughly fills the width. Tuned on
 // the first calibrated asset (hair_long).
-const HAIR_IMAGE_BOX = { x: -1, y: -4, w: 122, h: 122 };
+const HAIR_IMAGE_BOX = { x: -1, y: -6, w: 122, h: 122 };
 
 function HairImageLayer({ style }: { style: HairStyle }) {
   const { x, y, w, h } = HAIR_IMAGE_BOX;
