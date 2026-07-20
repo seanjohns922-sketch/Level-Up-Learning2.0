@@ -71,17 +71,19 @@ export default function AssessmentShell({
 
   return (
     <main
-      className="min-h-screen flex flex-col items-center px-4 py-6 md:py-10"
+      className="assessment-shell min-h-screen flex flex-col items-center px-4 pt-6 md:pt-10"
+      data-wide-content={wideContent ? "true" : "false"}
       style={{
         background: theme.isMeasurement
           ? "linear-gradient(180deg, #140d04 0%, #2a1a06 40%, #120b03 100%)"
           : "linear-gradient(to bottom, rgb(2 6 23), rgb(15 23 42), rgb(2 6 23))",
+        paddingBottom: "max(7rem, calc(env(safe-area-inset-bottom) + 6rem))",
       }}
     >
       {/* ── Mission Header ── */}
-      <div className={`w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} mb-6`}>
+      <div className={`assessment-header w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} mb-6`}>
         {/* Top bar */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="assessment-top-bar flex items-center justify-between mb-4">
           {hasExitMenu ? (
             <div className="flex items-center gap-1.5">
               {onHome && (
@@ -150,7 +152,7 @@ export default function AssessmentShell({
         </div>
 
         {/* Title block */}
-        <div className="flex items-center gap-3 mb-1">
+        <div className="assessment-title-block flex items-center gap-3 mb-1">
           <div
             className="flex items-center justify-center h-10 w-10 rounded-xl shadow-lg"
             style={{ background: titleIconGradient, boxShadow: theme.ctaShadow }}
@@ -175,7 +177,7 @@ export default function AssessmentShell({
         </div>
 
         {/* Progress bar */}
-        <div className="mt-4">
+        <div className="assessment-progress mt-4">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-bold text-slate-400">
               Question {currentIndex + 1} of {totalQuestions}
@@ -197,8 +199,8 @@ export default function AssessmentShell({
       </div>
 
       {/* ── Question Card ── */}
-      <div className={`w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} flex-1`}>
-        <div className="rounded-3xl border border-slate-700/60 bg-slate-800/80 backdrop-blur-sm shadow-2xl shadow-black/30 p-6 md:p-8">
+      <div className={`assessment-content w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} flex-1`}>
+        <div className="assessment-question-card rounded-3xl border border-slate-700/60 bg-slate-800/80 backdrop-blur-sm shadow-2xl shadow-black/30 p-6 md:p-8">
           {/* Question number chip */}
           <div className="flex items-center gap-2 mb-4">
             <span
@@ -243,7 +245,7 @@ export default function AssessmentShell({
         </div>
 
         {/* ── Navigation ── */}
-        <div className="mt-5 flex items-center justify-between gap-3">
+        <div className="assessment-navigation mt-5 flex items-center justify-between gap-3">
           <button
             onClick={onBack}
             disabled={currentIndex === 0}

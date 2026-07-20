@@ -24,9 +24,9 @@ const GOLD = "#c79a3e";
 // scale down to fit ~132px tall.
 function Panel({ label, children }: { label?: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-[20px] border px-4 py-3" style={{ borderColor: "rgba(184,137,58,0.4)", background: "linear-gradient(150deg,#fdf6e6,#f7ecd2)" }}>
+    <div className="measurelands-assessment-visual rounded-[20px] border px-4 py-3" style={{ borderColor: "rgba(184,137,58,0.4)", background: "linear-gradient(150deg,#fdf6e6,#f7ecd2)" }}>
       {label ? <div className="mb-1.5 text-[11px] font-black uppercase tracking-[0.18em]" style={{ color: GOLD_DEEP }}>{label}</div> : null}
-      <div className="flex items-center justify-center [&_svg]:max-h-[168px] [&_svg]:w-auto">{children}</div>
+      <div className="measurelands-assessment-visual-stage flex items-center justify-center [&_svg]:max-h-[168px] [&_svg]:w-auto">{children}</div>
     </div>
   );
 }
@@ -67,7 +67,7 @@ function Convert({ fromValue, fromUnit, toUnit }: { fromValue: number; fromUnit:
 }
 
 // ── Object cards (compare / sequence) — real art with emoji fallback ───────────
-function Objects({ items, caption }: { items: Array<{ label: string; emoji: string }>; caption?: string }) {
+function Objects({ items }: { items: Array<{ label: string; emoji: string }> }) {
   return (
     <div className={`grid w-full gap-3 ${items.length <= 2 ? "grid-cols-2" : items.length === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4"}`}>
       {items.map((it, i) => (
@@ -106,7 +106,7 @@ function Concept({ icon, label }: { icon: string; label: string }) {
 function scaleSteps(unit: string, max: number) {
   return unit === "kg" ? { majorStep: 1, minorStep: 0.5 } : { majorStep: Math.max(100, Math.round(max / 5)), minorStep: Math.max(50, Math.round(max / 10)) };
 }
-function jugSteps(unit: string, max: number) {
+function jugSteps(unit: string) {
   return unit === "L" ? { majorStep: 1, minorStep: 0.5 } : { majorStep: 250, minorStep: 125 };
 }
 
@@ -127,7 +127,7 @@ export default function MeasurelandsAssessmentVisual({ visual }: { visual: MzVis
       return <Panel label="Read the scale"><MeasurelandsScale value={visual.value} unit={visual.unit} max={visual.max} majorStep={s.majorStep} minorStep={s.minorStep} size={230} /></Panel>;
     }
     case "jug": {
-      const s = jugSteps(visual.unit, visual.max);
+      const s = jugSteps(visual.unit);
       return <Panel label="Read the jug"><MeasurelandsJug value={visual.value} unit={visual.unit} max={visual.max} majorStep={s.majorStep} minorStep={s.minorStep} size={210} /></Panel>;
     }
     case "thermometer":
@@ -147,7 +147,7 @@ export default function MeasurelandsAssessmentVisual({ visual }: { visual: MzVis
     case "convert":
       return <Panel label="Convert the unit"><Convert fromValue={visual.fromValue} fromUnit={visual.fromUnit} toUnit={visual.toUnit} /></Panel>;
     case "objects":
-      return <Panel label={visual.caption ?? "Look at each one"}><Objects items={visual.items} caption={visual.caption} /></Panel>;
+      return <Panel label={visual.caption ?? "Look at each one"}><Objects items={visual.items} /></Panel>;
     case "concept":
       return <Panel><Concept icon={visual.icon} label={visual.label} /></Panel>;
     default:

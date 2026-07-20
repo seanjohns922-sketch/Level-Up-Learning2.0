@@ -5,6 +5,8 @@ import {
   getMeasurelandsPretestForYear,
 } from "../data/assessments/measurelands";
 import { getPretestForYearLabel, getPosttestForYearLabel } from "../data/assessments/api";
+import fs from "node:fs";
+import path from "node:path";
 
 // ── Measurelands Assessment Audit ─────────────────────────────────────────────
 // Validates MEANING, not just structure. Every Measurelands bank must contain
@@ -115,6 +117,59 @@ type AuditRow = {
 
 const rows: AuditRow[] = [];
 
+// The Level 3 pre-test's first clock-reading item is question 14. Safari needs
+// explicit SVG dimensions; a viewBox alone can collapse to a thin empty panel.
+const year3ClockQuestion = getBank("Year 3", "pretest")[13];
+const year3ClockTask = year3ClockQuestion?.practiceTask as {
+  kind?: string;
+  scene?: string;
+  targetHour?: number;
+  targetMinute?: number;
+} | undefined;
+if (
+  year3ClockTask?.kind !== "clockMinute"
+  || year3ClockTask.scene !== "read"
+  || !Number.isFinite(year3ClockTask.targetHour)
+  || !Number.isFinite(year3ClockTask.targetMinute)
+) {
+  fail("Year 3 pretest question 14 must provide a readable analogue clock time.");
+}
+
+const clockSource = fs.readFileSync(
+  path.join(process.cwd(), "components/measurelands/MeasurelandsAnalogClockCard.tsx"),
+  "utf8",
+);
+if (!/viewBox=\{`0 0 \$\{size\} \$\{size\}`\}[\s\S]*width=\{size\}[\s\S]*height=\{size\}/.test(clockSource)) {
+  fail("ClockFace must keep explicit square SVG dimensions for Safari/iPad rendering.");
+}
+if (!clockSource.includes("pointer-events-none")) {
+  fail("ClockFace must not intercept taps from clickable clock answer buttons.");
+}
+
+const assessmentShellSource = fs.readFileSync(
+  path.join(process.cwd(), "components/assessment/AssessmentShell.tsx"),
+  "utf8",
+);
+if (
+  !assessmentShellSource.includes("assessment-navigation")
+  || !assessmentShellSource.includes("env(safe-area-inset-bottom)")
+  || !assessmentShellSource.includes("max(7rem")
+) {
+  fail("Assessment navigation must reserve a bottom safe zone for the Full Screen control.");
+}
+
+const timeQuestSource = fs.readFileSync(
+  path.join(process.cwd(), "components/measurelands/MeasurelandsTimeQuestCard.tsx"),
+  "utf8",
+);
+if (
+  !timeQuestSource.includes("measurelands-time-clock-pair")
+  || !timeQuestSource.includes("measurelands-time-answer-controls")
+  || !timeQuestSource.includes("assessmentMode ? 112 : 150")
+) {
+  fail("Time Quest assessments must keep clocks compact enough to expose their answer controls.");
+}
+
 for (const year of YEARS) {
   const types: AssessmentType[] = year === "Prep" ? ["posttest"] : ["pretest", "posttest"];
   for (const type of types) {
@@ -149,12 +204,43 @@ for (const year of YEARS) {
     for (const q of questions) {
       const qScope = `${scope} ${q.id}`;
       const isLessonNativeTask = q.type === "measurelandsTask";
+      const nativeTask = q.practiceTask as {
+        kind?: string;
+        scene?: string;
+        targetHour?: number;
+        targetMinute?: number;
+        startMin?: number;
+        finishMin?: number;
+        durationMin?: number;
+        clockOptions?: Array<{ id?: string; hour?: number; minute?: number }>;
+      } | undefined;
       // Structural.
       const options = Array.isArray(q.options) ? q.options : [];
       if (isLessonNativeTask) {
-        const taskKind = (q.practiceTask as { kind?: string } | undefined)?.kind;
+        const taskKind = nativeTask?.kind;
         if (!taskKind) fail(`${qScope} has no lesson-native task.`);
         if (!q.correctAnswer) fail(`${qScope} has no assessment answer token.`);
+
+        if (taskKind === "clockMinute") {
+          if (nativeTask?.scene === "matchClock") {
+            const clocks = nativeTask.clockOptions ?? [];
+            if (clocks.length < 2 || clocks.some((clock) => !Number.isFinite(clock.hour) || !Number.isFinite(clock.minute))) {
+              fail(`${qScope} must provide at least two tappable clocks with valid times.`);
+            }
+          } else if (!Number.isFinite(nativeTask?.targetHour) || !Number.isFinite(nativeTask?.targetMinute)) {
+            fail(`${qScope} must provide a visible analogue clock time.`);
+          }
+        }
+
+        if (taskKind === "timeQuest" && nativeTask?.scene === "howLong") {
+          if (
+            !Number.isFinite(nativeTask.startMin)
+            || !Number.isFinite(nativeTask.finishMin)
+            || !Number.isFinite(nativeTask.durationMin)
+          ) {
+            fail(`${qScope} how-long task must provide start, finish and duration values.`);
+          }
+        }
       } else {
         if ((q.type ?? "mcq") !== "mcq") fail(`${qScope} is not an MCQ.`);
         if (options.length < 2 || !q.correctAnswer) fail(`${qScope} has an invalid option set.`);

@@ -27,7 +27,7 @@ function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: 
 function ClockWithLabel({ min, label, size = 150 }: { min: number; label: string; size?: number }) {
   const h = Math.floor(min / 60);
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="measurelands-time-clock flex flex-col items-center gap-1">
       <span className="text-[12px] font-black uppercase tracking-[0.12em] text-[#a98b52]">{label}</span>
       <ClockFace hour={h} minute={min % 60} size={size} />
       <span className="rounded-full bg-[rgba(91,33,182,0.1)] px-3 py-0.5 text-sm font-black text-[#5b21b6]">{fmtTime(min)}</span>
@@ -171,17 +171,17 @@ function ConvertBuildScene({ task, onCorrect, onWrong }: { task: TimeTask; onCor
 }
 
 /* ── L2 A — How Long? (set the duration) ── */
-function HowLongScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: () => void; onWrong: () => void }) {
+function HowLongScene({ task, onCorrect, onWrong, assessmentMode }: { task: TimeTask; onCorrect: () => void; onWrong: () => void; assessmentMode: boolean }) {
   const [h, setH] = useState(0);
   const [m, setM] = useState(0);
   const [wrong, setWrong] = useState(false);
   return (
     <Shell badge={task.badgeLabel ?? "How Long?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid grid-cols-2 gap-3 rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-        <ClockWithLabel min={task.startMin ?? 0} label="Start" />
-        <ClockWithLabel min={task.finishMin ?? 0} label="Finish" />
+      <div className="measurelands-time-clock-pair grid grid-cols-2 gap-3 rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
+        <ClockWithLabel min={task.startMin ?? 0} label="Start" size={assessmentMode ? 112 : 150} />
+        <ClockWithLabel min={task.finishMin ?? 0} label="Finish" size={assessmentMode ? 112 : 150} />
       </div>
-      <div className="flex flex-wrap items-end justify-center gap-4 rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-white p-4">
+      <div className="measurelands-time-answer-controls flex flex-wrap items-end justify-center gap-4 rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-white p-4">
         <Stepper value={h} onChange={(v) => { setH(v); setWrong(false); }} min={0} max={6} step={1} label="hours" />
         <Stepper value={m} onChange={(v) => { setM(v); setWrong(false); }} min={0} max={55} step={5} label="minutes" />
         <div className="flex flex-col items-center gap-2">
@@ -195,7 +195,7 @@ function HowLongScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect:
 }
 
 /* ── L2 B — Finish Time (set the finish clock) ── */
-function FinishTimeScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrect: () => void; onWrong: () => void }) {
+function FinishTimeScene({ task, onCorrect, onWrong, assessmentMode }: { task: TimeTask; onCorrect: () => void; onWrong: () => void; assessmentMode: boolean }) {
   const startMin = task.startMin ?? 0;
   const ampm = Math.floor(startMin / 60) < 12 ? "am" : "pm";
   const [h12, setH12] = useState(1);
@@ -208,7 +208,7 @@ function FinishTimeScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorre
   return (
     <Shell badge={task.badgeLabel ?? "Finish Time"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="flex flex-wrap items-center justify-center gap-4 rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
-        <ClockWithLabel min={startMin} label="Start" />
+        <ClockWithLabel min={startMin} label="Start" size={assessmentMode ? 112 : 150} />
         <div className="rounded-[18px] border-2 border-[rgba(91,33,182,0.3)] bg-white px-4 py-3 text-center">
           <div className="text-[11px] font-black uppercase tracking-[0.12em] text-[#a98b52]">Duration</div>
           <div className="text-2xl font-black text-[#5b21b6]">{fmtDur(task.durationMin ?? 0)}</div>
@@ -314,8 +314,10 @@ function ItineraryScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrec
   const it = task.itinerary!;
   const steps = task.steps ?? [];
   const [idx, setIdx] = useState(0);
-  let t = it.startMin;
-  const rows = it.legs.map((leg) => { const from = t; t += leg.minutes; return { leg, from, to: t }; });
+  const rows = it.legs.reduce<Array<{ leg: (typeof it.legs)[number]; from: number; to: number }>>((result, leg) => {
+    const from = result.at(-1)?.to ?? it.startMin;
+    return [...result, { leg, from, to: from + leg.minutes }];
+  }, []);
   const step = steps[idx];
   return (
     <Shell badge={task.badgeLabel ?? "Expedition Planner"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -357,8 +359,8 @@ export function MeasurelandsTimeQuestCard({ task, onCorrect, onWrong, assessment
     case "matchUnits": return <MatchUnitsScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "convert": return <Shell badge={task.badgeLabel ?? "Which Conversion Is Correct?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}><ChoiceGrid options={task.options ?? []} correct={task.correctOption} onCorrect={onCorrect} onWrong={onWrong} /></Shell>;
     case "convertBuild": return <ConvertBuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-    case "howLong": return <HowLongScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-    case "finishTime": return <FinishTimeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "howLong": return <HowLongScene task={task} onCorrect={onCorrect} onWrong={onWrong} assessmentMode={assessmentMode} />;
+    case "finishTime": return <FinishTimeScene task={task} onCorrect={onCorrect} onWrong={onWrong} assessmentMode={assessmentMode} />;
     case "timeline": return <TimelineScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "order": return <OrderScene task={task} onCorrect={onCorrect} onWrong={onWrong} assessmentMode={assessmentMode} />;
     default: return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

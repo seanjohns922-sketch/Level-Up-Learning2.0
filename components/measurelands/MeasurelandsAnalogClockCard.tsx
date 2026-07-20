@@ -74,7 +74,10 @@ export function ClockFace({
   return (
     <svg
       viewBox={`0 0 ${size} ${size}`}
-      className="drop-shadow-[0_20px_34px_rgba(92,56,14,0.22)]"
+      width={size}
+      height={size}
+      style={{ width: "100%", maxWidth: size, height: "auto", aspectRatio: "1 / 1", display: "block" }}
+      className="pointer-events-none select-none drop-shadow-[0_20px_34px_rgba(92,56,14,0.22)]"
       role="img"
       aria-label={`Analog clock showing ${normalizeHour(hour)}:${String(minute).padStart(2, "0")}`}
     >

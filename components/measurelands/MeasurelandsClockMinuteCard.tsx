@@ -30,7 +30,7 @@ function Shell({ badge, prompt, speakText, children }: { badge: string; prompt: 
 
 function ClockPanel({ hour, minute, size = 230 }: { hour: number; minute: number; size?: number }) {
   return (
-    <div className="mx-auto flex w-full max-w-[300px] items-center justify-center rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-4">
+    <div className="measurelands-assessment-clock mx-auto flex w-full max-w-[300px] items-center justify-center rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-4">
       <ClockFace hour={hour} minute={minute} size={size} />
     </div>
   );
@@ -57,10 +57,10 @@ function IntroScene({ task, onCorrect }: { task: ClockTask; onCorrect: () => voi
   );
 }
 
-function ReadScene({ task, onCorrect, onWrong }: { task: ClockTask; onCorrect: () => void; onWrong: () => void }) {
+function ReadScene({ task, onCorrect, onWrong, clockSize }: { task: ClockTask; onCorrect: () => void; onWrong: () => void; clockSize?: number }) {
   return (
     <Shell badge={task.badgeLabel ?? "Read the Clock"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <ClockPanel hour={task.targetHour} minute={task.targetMinute} />
+      <ClockPanel hour={task.targetHour} minute={task.targetMinute} size={clockSize} />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {(task.options ?? []).map((o) => (
           <button key={o} type="button" onClick={() => (o === task.correctOption ? onCorrect() : onWrong())} className="relative flex min-h-[66px] items-center justify-center rounded-[22px] border-2 border-[rgba(214,184,108,0.55)] bg-[#fffaf0] text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]" style={{ fontFamily: "ui-monospace, Menlo, monospace" }}>
@@ -79,7 +79,7 @@ function MatchClockScene({ task, onCorrect, onWrong }: { task: ClockTask; onCorr
       <div className="flex items-center justify-center gap-3"><span className="text-base font-black text-[#a98b52]">Find</span> <DigitalChip text={task.askDigital ?? ""} big /></div>
       <div className="grid grid-cols-3 gap-2">
         {(task.clockOptions ?? []).map((c) => (
-          <button key={c.id} type="button" onClick={() => (c.id === task.correctClockId ? onCorrect() : (setWrong(c.id), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`rounded-[22px] border-2 p-1 transition hover:-translate-y-0.5 active:scale-[0.98] ${wrong === c.id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
+          <button key={c.id} type="button" onClick={() => (c.id === task.correctClockId ? onCorrect() : (setWrong(c.id), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`touch-manipulation rounded-[22px] border-2 p-1 transition hover:-translate-y-0.5 active:scale-[0.98] ${wrong === c.id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
             <ClockFace hour={c.hour} minute={c.minute} size={150} />
           </button>
         ))}
@@ -107,19 +107,20 @@ function BuildScene({ task, onCorrect }: { task: ClockTask; onCorrect: () => voi
   const [hour, setHour] = useState(12);
   const [minute, setMinute] = useState(0);
   const done = ((hour - 1) % 12) + 1 === ((task.targetHour - 1) % 12) + 1 && minute === task.targetMinute;
-  const bump = (setter: (fn: (v: number) => number) => void, delta: number, mod: number, base: number) => setter((v) => ((v - base + delta + mod) % mod) + base);
+  const bumpHour = (delta: number) => setHour((value) => ((value - 1 + delta + 12) % 12) + 1);
+  const bumpMinute = (delta: number) => setMinute((value) => (value + delta + 60) % 60);
   return (
     <Shell badge={task.badgeLabel ?? "Build the Time"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="flex items-center justify-center gap-2 text-lg font-black text-[#2c1c07]">Build <DigitalChip text={digital(task.targetHour, task.targetMinute)} /></div>
       <ClockPanel hour={hour} minute={minute} size={200} />
       <div className="grid grid-cols-2 gap-4">
-        {([["Hour", hour, (d: number) => bump(setHour as any, d, 12, 1), digital(hour, 0).split(":")[0]], ["Minute", minute, (d: number) => bump(setMinute as any, d, 60, 0), String(minute).padStart(2, "0")]] as const).map(([label, , adj, show]) => (
+        {([["Hour", hour, bumpHour, digital(hour, 0).split(":")[0]], ["Minute", minute, bumpMinute, String(minute).padStart(2, "0")]] as const).map(([label, , adj, show]) => (
           <div key={label} className="flex flex-col items-center gap-2 rounded-[22px] border-2 border-[rgba(214,184,108,0.5)] bg-[rgba(255,252,245,0.96)] p-3">
             <span className="text-[11px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{label}</span>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={() => (adj as (d: number) => void)(label === "Minute" ? -step : -1)} className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[rgba(180,120,20,0.5)] bg-[#fffaf0] text-2xl font-black text-[#2c1c07]">−</button>
+              <button type="button" onClick={() => adj(label === "Minute" ? -step : -1)} className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[rgba(180,120,20,0.5)] bg-[#fffaf0] text-2xl font-black text-[#2c1c07]">−</button>
               <span className="min-w-[48px] text-center text-3xl font-black text-[#2c1c07]" style={{ fontFamily: "ui-monospace, Menlo, monospace" }}>{show}</span>
-              <button type="button" onClick={() => (adj as (d: number) => void)(label === "Minute" ? step : 1)} className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[rgba(180,120,20,0.5)] bg-[#fffaf0] text-2xl font-black text-[#2c1c07]">+</button>
+              <button type="button" onClick={() => adj(label === "Minute" ? step : 1)} className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[rgba(180,120,20,0.5)] bg-[#fffaf0] text-2xl font-black text-[#2c1c07]">+</button>
             </div>
           </div>
         ))}
@@ -129,12 +130,16 @@ function BuildScene({ task, onCorrect }: { task: ClockTask; onCorrect: () => voi
   );
 }
 
-export function MeasurelandsClockMinuteCard({ task, onCorrect, onWrong }: { task: ClockTask; onCorrect: () => void; onWrong: () => void }) {
+export function MeasurelandsClockMinuteCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: ClockTask; onCorrect: () => void; onWrong: () => void; assessmentMode?: boolean }) {
   switch (task.scene) {
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
     case "matchClock": return <MatchClockScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "spotTime": return <SpotTimeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
     case "build": return <BuildScene task={task} onCorrect={onCorrect} />;
-    default: return <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    default: return (
+      <div className={assessmentMode ? "measurelands-clock-assessment" : undefined}>
+        <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} clockSize={assessmentMode ? 180 : undefined} />
+      </div>
+    );
   }
 }

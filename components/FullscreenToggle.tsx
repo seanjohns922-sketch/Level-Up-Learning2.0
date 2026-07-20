@@ -45,7 +45,8 @@ export function FullscreenToggle() {
     <button
       type="button"
       onClick={toggleFullscreen}
-      className="fixed bottom-4 right-4 z-[100] rounded-2xl border border-white/20 bg-slate-950/80 px-4 py-2 text-sm font-black text-white shadow-xl backdrop-blur transition hover:bg-slate-900"
+      className="fullscreen-toggle fixed bottom-4 right-4 z-[100] rounded-2xl border border-white/20 bg-slate-950/80 px-4 py-2 text-sm font-black text-white shadow-xl backdrop-blur transition hover:bg-slate-900"
+      style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
       aria-label={isFullscreen ? "Exit full screen" : "Enter full screen"}
       title={isFullscreen ? "Exit full screen" : "Enter full screen"}
     >

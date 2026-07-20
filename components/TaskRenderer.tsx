@@ -166,10 +166,12 @@ function TaskRecoveryCard({
 function MeasurelandsTaskFrame({
   taskKey,
   taskKind,
+  assessmentMode,
   children,
 }: {
   taskKey: string;
   taskKind: string;
+  assessmentMode: boolean;
   children: ReactNode;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
@@ -210,7 +212,12 @@ function MeasurelandsTaskFrame({
   }, [taskKey, taskKind]);
 
   return (
-    <div ref={frameRef} className="measurelands-task-frame" data-measurelands-task-kind={taskKind}>
+    <div
+      ref={frameRef}
+      className="measurelands-task-frame"
+      data-assessment-mode={assessmentMode ? "true" : "false"}
+      data-measurelands-task-kind={taskKind}
+    >
       {children}
     </div>
   );
@@ -253,7 +260,7 @@ function TaskRendererInner({
   }
 
   const wrapMeasurelands = (children: ReactNode) => (
-    <MeasurelandsTaskFrame taskKey={k} taskKind={task.kind}>
+    <MeasurelandsTaskFrame taskKey={k} taskKind={task.kind} assessmentMode={assessmentMode}>
       {children}
     </MeasurelandsTaskFrame>
   );
@@ -434,7 +441,7 @@ function TaskRendererInner({
     case "duration":
       return wrapMeasurelands(<MeasurelandsDurationCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "clockMinute":
-      return wrapMeasurelands(<MeasurelandsClockMinuteCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+      return wrapMeasurelands(<MeasurelandsClockMinuteCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />);
     case "perimeter":
       return wrapMeasurelands(<MeasurelandsPerimeterCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "area":
