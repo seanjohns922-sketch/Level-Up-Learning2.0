@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
-import GemIcon, { GEM_RARITY } from "@/components/gems/GemIcon";
+import GemIcon, { cutForGem, GEM_RARITY } from "@/components/gems/GemIcon";
 import { RARITY_LABEL, setFavouriteGem, type GemRarity } from "@/lib/gems";
 import { clearReveal, getRevealQueue, subscribeReveal } from "@/lib/gem-reveal";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
@@ -185,7 +185,7 @@ export default function GemRevealHost() {
           ) : null}
           <SparkleBurst colors={[c.light, c.mid, "#ffffff"]} count={PARTICLES[tier]} />
           <div className="lul-reveal-gem relative" style={{ filter: `drop-shadow(0 8px 30px ${c.mid})` }}>
-            <GemIcon rarity={gem.rarity} size={132} />
+            <GemIcon rarity={gem.rarity} cut={cutForGem(gem.id, gem.rarity)} size={132} />
             {tier >= 2 ? <div className="lul-reveal-shimmer pointer-events-none absolute inset-0" aria-hidden="true" /> : null}
           </div>
         </div>

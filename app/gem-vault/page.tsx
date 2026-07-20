@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Lock, Sparkles, Star } from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
-import GemIcon, { GEM_RARITY as RARITY } from "@/components/gems/GemIcon";
+import GemIcon, { cutForGem, GEM_RARITY as RARITY } from "@/components/gems/GemIcon";
 import { enqueueReveal } from "@/lib/gem-reveal";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
@@ -123,7 +123,7 @@ export default function GemVaultPage() {
             <div className="relative flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
               {favourite ? (
                 <>
-                  <GemIcon rarity={favourite.rarity} size={52} />
+                  <GemIcon rarity={favourite.rarity} cut={cutForGem(favourite.id, favourite.rarity)} size={52} />
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.16em] text-white/50">On display</p>
                     <p className="text-sm font-black">{favourite.name}</p>
@@ -167,7 +167,7 @@ export default function GemVaultPage() {
                     </button>
                   ) : null}
                   <div className="relative flex h-[76px] items-center justify-center">
-                    <GemIcon rarity={gem.rarity} locked={!owned} />
+                    <GemIcon rarity={gem.rarity} cut={cutForGem(gem.id, gem.rarity)} locked={!owned} />
                     {!owned ? <Lock className="absolute h-4 w-4 text-white/40" /> : null}
                   </div>
                   <span className="mt-1 rounded px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide" style={{ color: owned ? c.light : "#94a3b8", background: owned ? `${c.mid}22` : "rgba(148,163,184,0.12)" }}>{RARITY_LABEL[gem.rarity]}</span>
@@ -195,7 +195,7 @@ export default function GemVaultPage() {
                   [`${realm.name} First Level`, `${realm.name} Legends`].map((label) => (
                     <div key={label} className={`${PANEL} flex flex-col items-center overflow-hidden p-4 text-center opacity-70`}>
                       <div className="relative flex h-[76px] items-center justify-center">
-                        <GemIcon rarity="legendary" locked />
+                        <GemIcon rarity="legendary" cut={cutForGem(`${realm.realmId}-coming-soon`, "legendary")} locked />
                         <Sparkles className="absolute h-4 w-4 text-amber-300/60" />
                       </div>
                       <span className="mt-1 rounded bg-amber-300/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-amber-200">Coming Soon</span>
