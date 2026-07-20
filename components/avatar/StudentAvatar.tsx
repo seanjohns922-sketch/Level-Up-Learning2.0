@@ -467,7 +467,17 @@ function BackpackStraps({ o }: { o: Outfit }) {
 // flip it to true in IMAGE_HAIR_READY. Until then it falls back to the SVG
 // HairLayer, so nothing breaks while assets are still being produced.
 const IMAGE_HAIR_READY: Partial<Record<HairStyle, boolean>> = {
-  // long: true,   // enable per style after its hair-only PNG is calibrated
+  long: true,
+  short: true,
+  swept: true,
+  sidepart: true,
+  tuft: true,
+  spiky: true,
+  curls: true,
+  bob: true,
+  ponytail: true,
+  braids: true,
+  // pigtails, bun: still need hair-only art; fall back to the SVG HairLayer.
 };
 // Where a hair PNG sits over the SVG head. viewBox is 120 wide; the head spans
 // x≈32–88 with the crown at y≈18 and chin at y≈90. The source art is a square
