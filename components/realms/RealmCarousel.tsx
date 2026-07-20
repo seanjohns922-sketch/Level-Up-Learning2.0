@@ -14,6 +14,7 @@ import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
+import { markRealmEntryRestored } from "@/lib/realm-entry-handoff";
 
 // Read a specific realm's scoped progress (the carousel lives on /realms where
 // the default scope is "number", so the focused realm's scope is passed
@@ -169,6 +170,9 @@ export default function RealmCarousel() {
         fallbackYear: profile?.yearLevel ?? "Year 1",
         introSeen: restored.introSeen,
       });
+      if (route === availability.route) {
+        markRealmEntryRestored(identity.studentId, availability.progressRealmId);
+      }
       router.push(route);
     } catch (error) {
       if (error instanceof StudentRestoreSupersededError) return;

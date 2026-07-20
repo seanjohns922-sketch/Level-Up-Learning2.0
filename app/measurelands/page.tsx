@@ -8,6 +8,7 @@ import { readProgress } from "@/data/progress";
 import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/studentIdentity";
 import { resolveRealmEntryRoute } from "@/lib/realm-entry";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import { consumeRestoredRealmEntry } from "@/lib/realm-entry-handoff";
 
 function MeasurelandsLoading() {
   return (
@@ -96,6 +97,21 @@ export default function MeasurelandsPage() {
     if (!identity.studentId) {
       router.replace("/login");
       return;
+    }
+
+    // The realm carousel has already restored and resolved this exact entry.
+    // Consume its short-lived handoff instead of repeating every secure RPC and
+    // briefly sending the student back through the loading/error transition.
+    if (consumeRestoredRealmEntry(identity.studentId, "measurement")) {
+      const restoredProgress = readProgress("measurement");
+      queueMicrotask(() => {
+        if (cancelled) return;
+        setMeasurementProgress(restoredProgress);
+        setEntryState("resolved");
+      });
+      return () => {
+        cancelled = true;
+      };
     }
 
     void restoreStudentStateFromServer(identity.studentId, "measurement")

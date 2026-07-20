@@ -7,6 +7,7 @@ const read = (file) => fs.readFileSync(path.join(repoRoot, file), "utf8");
 const availability = read("lib/realm-entry.ts");
 const carousel = read("components/realms/RealmCarousel.tsx");
 const measurelands = read("app/measurelands/page.tsx");
+const entryHandoff = read("lib/realm-entry-handoff.ts");
 const pretest = read("app/pretest/page.tsx");
 
 const results = [];
@@ -58,6 +59,18 @@ check(
   "Direct Measurelands navigation resolves authoritative measurement progress",
   measurelands.includes('restoreStudentStateFromServer(identity.studentId, "measurement")') &&
     measurelands.includes("resolveRealmEntryRoute({"),
+);
+check(
+  "Fresh carousel entry avoids a duplicate Measurelands restore",
+  carousel.includes("markRealmEntryRestored(identity.studentId, availability.progressRealmId)") &&
+    measurelands.includes('consumeRestoredRealmEntry(identity.studentId, "measurement")'),
+);
+check(
+  "Realm entry handoff is short-lived and isolated by student and realm",
+  entryHandoff.includes("HANDOFF_MAX_AGE_MS = 30_000") &&
+    entryHandoff.includes("handoff.studentId === studentId") &&
+    entryHandoff.includes("handoff.realmId === realmId") &&
+    entryHandoff.includes("sessionStorage.removeItem(HANDOFF_KEY)"),
 );
 check(
   "Completed Measurelands placement leaves the pre-test for the Measurelands map",
