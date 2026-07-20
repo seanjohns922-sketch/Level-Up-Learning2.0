@@ -51,9 +51,10 @@ check(
     !runner.includes("generateLessonTask(ctx) ?? task"),
 );
 check(
-  "Intro, feedback and recovery states pause the lesson clock",
-  runner.includes("pauseLessonClockRef.current =") &&
-    runner.includes('isIntroTask || status !== "idle" || Boolean(transitionError) || isAdvancingTask') &&
+  "Intro and recovery errors pause the clock without extending feedback time",
+    runner.includes("pauseLessonClockRef.current =") &&
+    runner.includes("isIntroTask || Boolean(transitionError)") &&
+    !runner.includes('isIntroTask || status !== "idle" || Boolean(transitionError) || isAdvancingTask') &&
     runner.includes("pauseLessonClockRef.current ? s : s - 1"),
 );
 check(

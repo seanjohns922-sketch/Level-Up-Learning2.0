@@ -318,8 +318,9 @@ export function PracticeRunner({
 }) {
   const isMeasurement = realmId === "measurement";
   const totalSeconds = minutes * 60;
-  const questionLimit =
-    completionMode === "question_or_time" ? MAX_LESSON_QUESTIONS : Number.POSITIVE_INFINITY;
+  // Timed lessons still need a hard question ceiling. Without one, fast or
+  // repeatedly resumed sessions can produce impossible-looking 100+ scores.
+  const questionLimit = MAX_LESSON_QUESTIONS;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const completedRef = useRef(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -395,6 +396,8 @@ export function PracticeRunner({
     return isPracticeTaskSafe(emergency) ? emergency : null;
   }, [getTask]);
 
+  // The initializer intentionally seeds the repetition refs before first paint.
+  // eslint-disable-next-line react-hooks/refs
   const [task, setTask] = useState<PracticeTask>(() => {
     const ctx = { secondsLeft: totalSeconds, totalSeconds, elapsedSeconds: 0, difficulty: "easy" as Difficulty };
     const initialTask = generateLessonTask(ctx);
@@ -496,8 +499,8 @@ export function PracticeRunner({
 
   useEffect(() => {
     pauseLessonClockRef.current =
-      isIntroTask || status !== "idle" || Boolean(transitionError) || isAdvancingTask;
-  }, [isAdvancingTask, isIntroTask, status, transitionError]);
+      isIntroTask || Boolean(transitionError);
+  }, [isIntroTask, transitionError]);
 
   useEffect(() => {
     const t = setInterval(
@@ -531,7 +534,6 @@ export function PracticeRunner({
     } else {
       resumeResolvedRef.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumeLessonKey]);
 
   function resumeLesson() {
@@ -581,7 +583,6 @@ export function PracticeRunner({
       attemptLog,
       updatedAt: Date.now(),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog]);
 
   // Brain breaks fire at the scheduled seconds-left thresholds (count + timing
@@ -1003,7 +1004,7 @@ export function PracticeRunner({
       progressPercent: 100,
       progressLabel:
         completionMode === "time_only"
-          ? `Completed ${minutes}-minute Ground session`
+          ? `Completed ${safeQuestionsAnswered} of ${MAX_LESSON_QUESTIONS} challenges`
           : `Completed ${safeQuestionsAnswered} of ${MAX_LESSON_QUESTIONS} questions`,
       questionsAnswered: safeQuestionsAnswered,
       totalQuestions: safeQuestionsAnswered,
@@ -1083,6 +1084,9 @@ export function PracticeRunner({
       );
     }
     if (liveContext && !renderCompletionCard && !reflectionDone) {
+      // Completion is terminal, so reading the final accumulated chain is stable.
+      // eslint-disable-next-line react-hooks/refs
+      const completedBestChain = bestChainRef.current;
       return (
         <LessonReflection
           lessonId={liveContext.lessonId}
@@ -1093,7 +1097,7 @@ export function PracticeRunner({
           accuracy={accuracy}
           questionsAnswered={safeQuestionsAnswered}
           correctAnswers={safeCorrectAnswers}
-          bestChain={bestChainRef.current}
+          bestChain={completedBestChain}
           practisedSkills={practisedSkills}
           nextUpLabel={nextUpLabel}
           realmId={realmId}

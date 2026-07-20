@@ -306,10 +306,10 @@ export async function saveRealmLessonAttempt(
     if (discoveryError) {
       console.warn("[Economy] Lesson saved but collectible discovery failed", discoveryError);
     }
-  }
 
-  // Award & reveal any gems earned by this completion (fire-and-forget, safe).
-  void awardAndReveal(studentId, "lesson", completionKey);
+    // Gem and collectible rewards share the server's first-completion gate.
+    void awardAndReveal(studentId, "lesson", completionKey);
+  }
 }
 
 export async function saveNumberLessonAttempt(
@@ -339,7 +339,7 @@ export async function saveNumberWeeklyQuizAttempt(
   const quizId = quizIdForRealm(year, week, realmId);
 
   const percent = typeof attempt.percent === "number" ? attempt.percent : 0;
-  const { error } = await supabase.rpc("complete_realm_quiz", {
+  const { data: rewardEligible, error } = await supabase.rpc("complete_realm_quiz", {
     p_student_id: studentId,
     p_class_id: studentRow?.class_id ?? null,
     p_realm_id: realmId,
@@ -354,7 +354,9 @@ export async function saveNumberWeeklyQuizAttempt(
   });
   if (error) throw error;
 
-  void awardAndReveal(studentId, "quiz", completionKey);
+  if (rewardEligible === true) {
+    void awardAndReveal(studentId, "quiz", completionKey);
+  }
 }
 
 export async function saveRealmAssessment(

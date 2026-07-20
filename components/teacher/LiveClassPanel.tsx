@@ -156,6 +156,8 @@ const STATUS_PRIORITY: Record<LiveCardDisplayGroup, number> = {
   waiting_to_start: 3,
 };
 
+const MAX_LESSON_SCORE_QUESTIONS = 10;
+
 function formatWorkingLevelBadge(workingLevel?: string | null) {
   const normalized = normalizeWorkingLevelLabel(workingLevel);
   if (!normalized) return null;
@@ -358,11 +360,18 @@ function buildCompletedActivityAttemptSummary(
 
   const latest = completedAttempts[0] ?? null;
   if (latest) {
+    const rawAnswered = Math.max(0, latest.total_questions ?? 0);
+    const rawCorrect = Math.min(Math.max(0, latest.correct_count ?? 0), rawAnswered);
+    const shouldCap = latest.activity_type === "lesson" && rawAnswered > MAX_LESSON_SCORE_QUESTIONS;
+    const answered = shouldCap ? MAX_LESSON_SCORE_QUESTIONS : rawAnswered;
+    const correct = shouldCap
+      ? Math.round((rawCorrect / rawAnswered) * answered)
+      : rawCorrect;
     return {
       attemptNumber: Math.max(1, latest.attempt_no),
-      answered: Math.max(0, latest.total_questions ?? 0),
-      correct: Math.max(0, latest.correct_count ?? 0),
-      accuracy: Math.max(0, latest.accuracy_percent ?? 0),
+      answered,
+      correct,
+      accuracy: answered > 0 ? Math.round((correct / answered) * 100) : 0,
     };
   }
 
@@ -435,6 +444,15 @@ function buildCurrentLessonPerformance(
   if (lessonEvents.length === 0 && answered === 0) {
     answered = rowAnswered;
     correct = Math.min(rowCorrect, answered);
+  }
+
+  if (!isQuizActivity(row)) {
+    const rawAnswered = answered;
+    const rawCorrect = Math.min(correct, rawAnswered);
+    answered = Math.min(rawAnswered, MAX_LESSON_SCORE_QUESTIONS);
+    correct = rawAnswered > MAX_LESSON_SCORE_QUESTIONS
+      ? Math.round((rawCorrect / rawAnswered) * answered)
+      : rawCorrect;
   }
 
   return {
@@ -952,7 +970,7 @@ export default function LiveClassPanel({
               <SortHeader sortKey="level" sort={sort} onSort={updateSort}>Level</SortHeader>
               <SortHeader sortKey="week" sort={sort} onSort={updateSort}>Week</SortHeader>
               <SortHeader sortKey="lesson" sort={sort} onSort={updateSort}>Lesson</SortHeader>
-              <SortHeader sortKey="attempt" sort={sort} onSort={updateSort}>Attempt</SortHeader>
+              <SortHeader sortKey="attempt" sort={sort} onSort={updateSort}>Lesson attempt</SortHeader>
               <SortHeader sortKey="score" sort={sort} onSort={updateSort} align="right">Score</SortHeader>
               <SortHeader sortKey="percentage" sort={sort} onSort={updateSort} align="right">%</SortHeader>
               <SortHeader sortKey="lastActive" sort={sort} onSort={updateSort} align="right">Last active</SortHeader>

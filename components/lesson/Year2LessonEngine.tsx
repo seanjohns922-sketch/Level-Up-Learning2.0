@@ -678,7 +678,7 @@ export function Year2LessonEngine({
   const advanceRequestedRef = useRef(false);
   const [attemptLog, setAttemptLog] = useState<LessonAttemptEntry[]>([]);
   const questionStartedAtElapsedRef = useRef(0);
-  const finished = secondsLeft <= 0;
+  const finished = secondsLeft <= 0 || questionsAnswered >= 10;
   const currentActivity = activities[currentActivityIndex] ?? null;
   const currentTurnSafe =
     currentActivity !== null &&
@@ -828,11 +828,11 @@ export function Year2LessonEngine({
   useEffect(() => {
     const interval = setInterval(() => {
       setSecondsLeft((c) =>
-        brainBreakActiveRef.current || showLessonResumeRef.current || turnState !== "answering" ? c : c - 1
+        brainBreakActiveRef.current || showLessonResumeRef.current ? c : c - 1
       );
     }, 1000);
     return () => clearInterval(interval);
-  }, [turnState]);
+  }, []);
 
   // ── Resume gate: load a saved snapshot once and offer to continue ──
   useEffect(() => {
