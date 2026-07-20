@@ -459,236 +459,195 @@ function BackpackStraps({ o }: { o: Outfit }) {
   );
 }
 
-// Hair silhouettes are designed to be *instantly* distinct at wardrobe
-// thumbnail size. Every style has its own outer shape rather than the same
-// dome + variations of a tuft. Head arc runs roughly cx=60, from y≈18 (crown)
-// down to y≈62 (temples). Face reads at y≈52–74.
+// Hairstyles: simple, clean, premium (Nintendo / Animal Crossing feel). Each is
+// a few clean vector shapes with a RAISED hairline (~30% more forehead than the
+// old low "helmet" line) so the face reads open and the eyes are the focal point.
+// Distinct silhouette + personality per style; readable at thumbnail size.
+// Head arc: cx=60, crown y≈18, temples y≈62, eyes y≈60. Spiky is the benchmark.
+const HAIR_FRONT = "Q92 46 86 46 Q88 41 80 42 Q71 38 62 39 Q52 37 45 39 Q38 38 40 44 Q34 45 35 50 Q30 51 28 56 Z";
+const HAIR_FRONT_W = "Q95 45 88 45 Q86 40 78 41 Q68 37 60 38 Q50 36 43 39 Q36 39 38 44 Q30 46 24 53 Z";
+
 function HairLayer({ o }: { o: Outfit }) {
   const p = useGradPrefix();
   const dk = o.hairShade;
-  const edge = { stroke: dk, strokeWidth: 0.9, strokeOpacity: 0.32, strokeLinejoin: "round" as const };
-  const sh = (cx: number, cy: number, rx: number, ry: number, rot = -22) => (
-    <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={`url(#${p}lul-hair-sheen)`} transform={`rotate(${rot} ${cx} ${cy})`} />
+  const hair = `url(#${p}lul-hair)`;
+  const sep = (d: string) => <path d={d} stroke={dk} strokeWidth={1.2} strokeLinecap="round" opacity={0.3} fill="none" />;
+  const sh = (cx: number, cy: number, rx: number, ry: number) => (
+    <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={`url(#${p}lul-hair-sheen)`} transform={`rotate(-18 ${cx} ${cy})`} />
   );
 
   switch (o.hairStyle) {
-    // ── BALD — visible scalp, subtle sheen ─────────────────────────────────
-    case "bald":
+    case "bald": // clean scalp with a soft sheen
       return (
         <g data-layer="hair">
-          <ellipse cx="54" cy="30" rx="16" ry="8" fill="#ffffff" opacity="0.14" transform="rotate(-18 54 30)" />
+          <ellipse cx="52" cy="30" rx="15" ry="9" fill="#ffffff" opacity="0.13" transform="rotate(-18 52 30)" />
         </g>
       );
-
-    // ── BUZZ — very close crop, hugs skull, stubble dots ───────────────────
-    case "buzz":
+    case "buzz": // minimal, clean, tight to the scalp
       return (
         <g data-layer="hair">
-          <path d="M33 50 Q33 22 60 22 Q87 22 87 50 Q80 44 60 44 Q40 44 33 50Z" fill={o.hair} opacity="0.85" {...edge} />
-          <g fill={dk} opacity="0.35">
-            {[38, 46, 54, 62, 70, 78].map((x) => <circle key={`s1-${x}`} cx={x} cy="30" r="0.7" />)}
-            {[36, 44, 52, 60, 68, 76, 84].map((x) => <circle key={`s2-${x}`} cx={x} cy="38" r="0.7" />)}
+          <path d="M31 54 Q30 24 60 20 Q90 24 89 54 Q87 47 81 47 Q88 42 79 43 Q70 39 61 40 Q51 38 45 40 Q37 40 41 45 Q34 46 33 50 Q31 51 31 54 Z" fill={hair} opacity="0.95" />
+          <g fill={dk} opacity="0.26">
+            {[38, 48, 58, 68, 78].map((x) => <circle key={x} cx={x} cy="31" r="0.9" />)}
+            {[43, 53, 63, 73, 83].map((x) => <circle key={`a${x}`} cx={x} cy="39" r="0.9" />)}
           </g>
-          {sh(50, 28, 14, 5)}
+          {sh(46, 28, 14, 7)}
         </g>
       );
-
-    // ── SHORT — neat rounded crop, high hairline, forehead visible ─────────
-    case "short":
+    case "short": // neat, friendly, classic
       return (
         <g data-layer="hair">
-          <path d="M31 52 Q31 20 60 20 Q89 20 89 52 Q87 48 84 46 Q82 42 76 42 Q68 39 60 40 Q52 39 44 42 Q38 42 36 46 Q33 48 31 52Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M36 46 Q60 40 84 46" stroke={dk} strokeWidth="0.9" strokeOpacity="0.35" fill="none" />
-          {sh(46, 30, 18, 7)}
+          <path d={`M28 56 Q22 8 60 3 Q98 8 92 56 ${HAIR_FRONT}`} fill={hair} />
+          {sh(45, 20, 18, 10)}
         </g>
       );
-
-    // ── SWEPT — long side-swept fringe crossing the forehead ───────────────
-    case "swept":
+    case "swept": // confident, modern, smooth
       return (
         <g data-layer="hair">
-          <path d="M30 54 Q28 22 58 18 Q88 16 92 46 Q90 40 86 40 Q78 30 66 30 Q52 28 42 34 Q34 38 30 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          {/* the sweep: heavy fringe from right temple down to left brow */}
-          <path d="M86 30 Q80 48 62 54 Q46 58 34 52 Q30 48 30 44 Q40 34 56 32 Q74 30 86 30Z" fill={`url(#${p}lul-hair-lock)`} {...edge} />
-          <path d="M60 32 Q48 42 36 50" stroke={dk} strokeWidth="0.9" strokeOpacity="0.4" fill="none" />
-          {sh(64, 34, 20, 6, -18)}
+          <path d="M27 56 Q20 6 58 4 Q104 2 108 40 Q109 54 93 60 Q97 45 87 44 Q90 40 82 41 Q66 36 50 42 Q44 40 41 45 Q35 46 36 50 Q30 51 27 56 Z" fill={hair} />
+          {sep("M54 14 Q80 18 100 44")}
+          {sep("M47 20 Q74 24 94 48")}
+          {sh(44, 20, 20, 10)}
         </g>
       );
-
-    // ── SIDEPART — clear parting line, hair swept both ways from part ──────
-    case "sidepart":
+    case "sidepart": // smart, organised, classic
       return (
         <g data-layer="hair">
-          <path d="M31 52 Q31 20 60 20 Q89 20 89 52 Q84 46 76 44 Q66 40 60 40 Q54 40 46 44 Q38 46 31 52Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          {/* short side (student's right, viewer left) */}
-          <path d="M31 52 Q31 30 46 22 Q40 32 40 44 Q35 46 31 52Z" fill={`url(#${p}lul-hair-lock)`} opacity="0.85" {...edge} />
-          {/* long side (viewer right) sweeps across forehead */}
-          <path d="M50 22 Q76 20 89 40 Q86 46 78 46 Q66 42 56 46 Q50 42 50 22Z" fill={`url(#${p}lul-hair-lock)`} {...edge} />
-          {/* the part */}
-          <path d="M48 22 Q48 32 50 44" stroke={dk} strokeWidth="1.6" strokeLinecap="round" opacity="0.7" fill="none" />
-          {sh(66, 30, 14, 5)}
+          <path d="M28 56 Q24 10 50 6 Q54 4 66 4 Q98 6 94 56 Q92 46 84 46 Q88 41 79 42 Q69 38 59 40 Q55 36 51 38 Q50 32 47 33 Q46 40 44 46 Q35 46 36 50 Q30 51 28 56 Z" fill={hair} />
+          <path d="M49 18 Q46 32 45 46" stroke={dk} strokeWidth="1.8" strokeLinecap="round" opacity="0.42" fill="none" />
+          {sep("M55 12 Q74 16 90 38")}
+          {sh(66, 16, 14, 7)}
         </g>
       );
-
-    // ── TUFT — clean crop with a single cowlick sticking up centre-front ───
-    case "tuft":
+    case "tuft": // playful, energetic
       return (
         <g data-layer="hair">
-          <path d="M32 52 Q32 24 60 22 Q88 24 88 52 Q84 46 76 44 Q68 40 60 41 Q52 40 44 44 Q36 46 32 52Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          {/* the tuft */}
-          <path d="M52 24 Q56 8 62 6 Q64 12 62 18 Q68 14 72 16 Q70 24 60 30 Q54 28 52 24Z" fill={`url(#${p}lul-hair-lock)`} {...edge} />
-          {sh(46, 30, 14, 6)}
+          <path d="M29 55 Q24 12 60 8 Q96 12 91 55 Q89 47 82 47 Q86 42 78 43 Q69 39 61 40 Q51 38 45 40 Q38 40 41 45 Q34 46 35 50 Q31 51 29 55 Z" fill={hair} />
+          <path d="M51 18 Q47 -1 67 1 Q77 3 73 13 Q70 4 61 8 Q68 11 65 18 Q58 11 51 18 Z" fill={hair} />
+          {sh(45, 24, 13, 7)}
         </g>
       );
-
-    // ── SPIKY — multiple prominent spikes across the crown ─────────────────
-    case "spiky":
+    case "spiky": // bold, fun, high energy — the quality benchmark
       return (
         <g data-layer="hair">
-          <path d="M32 52 Q32 30 60 28 Q88 30 88 52 Q84 46 76 44 Q66 40 60 41 Q54 40 44 44 Q36 46 32 52Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <g fill={`url(#${p}lul-hair-lock)`} stroke={dk} strokeOpacity="0.35" strokeWidth="0.7" strokeLinejoin="round">
-            <path d="M34 32 L38 10 L44 30Z" />
-            <path d="M42 30 L48 6 L54 30Z" />
-            <path d="M52 30 L58 4 L64 30Z" />
-            <path d="M62 30 L68 6 L74 30Z" />
-            <path d="M72 30 L78 10 L84 32Z" />
+          <path d="M29 54 Q27 28 35 24 L38 9 L46 22 L50 5 L58 20 L62 4 L70 20 L78 6 L82 24 Q91 28 91 54 Q89 46 82 46 Q86 42 78 43 Q69 39 61 40 Q51 38 45 40 Q38 40 41 45 Q33 46 35 50 Q30 50 29 54 Z" fill={hair} />
+          {sh(45, 20, 15, 8)}
+        </g>
+      );
+    case "curls": // soft, happy, rounded
+      return (
+        <g data-layer="hair">
+          <path d="M24 58 Q20 20 60 16 Q100 20 96 58 Q94 47 86 47 Q70 41 60 43 Q50 41 34 47 Q26 47 24 58 Z" fill={hair} />
+          <g fill={hair}>
+            <circle cx="29" cy="32" r="11" /><circle cx="27" cy="45" r="9" /><circle cx="40" cy="20" r="11" /><circle cx="54" cy="15" r="11" /><circle cx="70" cy="15" r="11" /><circle cx="84" cy="20" r="11" /><circle cx="93" cy="33" r="10" /><circle cx="94" cy="45" r="9" />
           </g>
-        </g>
-      );
-
-    // ── CURLS — bumpy scalloped surface all over the crown ─────────────────
-    case "curls":
-      return (
-        <g data-layer="hair">
-          <path d="M28 55 Q26 26 60 20 Q94 26 92 55 Q86 48 78 46 Q68 42 60 43 Q52 42 42 46 Q34 48 28 55Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <g fill={`url(#${p}lul-hair-lock)`} stroke={dk} strokeOpacity="0.28" strokeWidth="0.7">
-            {[[32, 42, 6], [38, 30, 7], [46, 22, 7], [54, 18, 7], [62, 17, 7], [70, 19, 7], [78, 24, 7], [85, 32, 7], [88, 42, 6], [42, 42, 6], [52, 38, 6], [64, 36, 6], [76, 40, 6]].map(([cx, cy, r]) => (
-              <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} />
-            ))}
+          <g fill={dk} opacity="0.28">
+            <circle cx="37" cy="28" r="3.6" /><circle cx="52" cy="21" r="3.8" /><circle cx="66" cy="19" r="3.8" /><circle cx="80" cy="23" r="3.6" /><circle cx="31" cy="39" r="3.2" />
           </g>
-          <g fill="#ffffff" opacity="0.25"><circle cx="52" cy="16" r="1.8" /><circle cx="64" cy="15" r="2" /></g>
-        </g>
-      );
-
-    // ── AFRO — huge round poof extending well beyond the head silhouette ───
-    case "afro":
-      return (
-        <g data-layer="hair">
-          <circle cx="60" cy="34" r="30" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M32 44 Q60 40 88 44 Q82 46 76 46 Q68 42 60 43 Q52 42 44 46 Q38 46 32 44Z" fill={`url(#${p}lul-hair-lock)`} opacity="0.9" />
-          <g fill={dk} opacity="0.25">
-            {[[42, 20], [52, 12], [64, 10], [76, 16], [84, 26], [36, 32], [88, 38], [50, 22], [70, 20], [58, 26]].map(([cx, cy]) => (
-              <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="3.2" />
-            ))}
+          <g fill="#ffffff" opacity="0.16">
+            <circle cx="44" cy="16" r="2.8" /><circle cx="60" cy="12" r="3" /><circle cx="76" cy="16" r="2.8" />
           </g>
-          <g fill="#ffffff" opacity="0.22"><circle cx="50" cy="16" r="2.4" /><circle cx="66" cy="14" r="2.6" /></g>
+          {sh(43, 24, 15, 8)}
         </g>
       );
-
-    // ── LONG — long straight hair falling well below the shoulders ─────────
-    case "long":
+    case "afro": // full, balanced, cloud-like silhouette
       return (
         <g data-layer="hair">
-          {/* back curtain behind body */}
-          <path d="M22 46 Q16 90 26 140 L44 140 Q40 90 44 50Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M98 46 Q104 90 94 140 L76 140 Q80 90 76 50Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          {/* crown + fringe */}
-          <path d="M26 54 Q24 22 60 18 Q96 22 94 54 Q86 44 78 42 Q68 38 60 40 Q52 38 42 42 Q34 44 26 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          {/* soft parted fringe */}
-          <path d="M40 40 Q54 36 60 42 Q66 36 80 40 Q74 48 60 48 Q46 48 40 40Z" fill={`url(#${p}lul-hair-lock)`} opacity="0.9" />
-          <path d="M60 42 Q60 60 60 88" stroke={dk} strokeWidth="0.8" strokeOpacity="0.35" fill="none" />
-          {sh(48, 28, 18, 7)}
+          <path d="M18 54 Q6 40 12 22 Q14 4 34 7 Q42 -1 58 2 Q66 -1 84 6 Q106 5 108 22 Q114 40 100 54 Q98 44 88 44 Q94 30 60 28 Q26 30 32 44 Q22 44 18 54 Z" fill={hair} />
+          <g fill="#ffffff" opacity="0.09">
+            <circle cx="32" cy="18" r="6" /><circle cx="50" cy="9" r="6.4" /><circle cx="72" cy="9" r="6.4" /><circle cx="90" cy="20" r="6" /><circle cx="60" cy="5" r="6.2" />
+          </g>
+          <g fill={dk} opacity="0.18">
+            <circle cx="40" cy="18" r="3" /><circle cx="60" cy="22" r="3" /><circle cx="80" cy="18" r="3" />
+          </g>
+          {sh(42, 20, 18, 10)}
         </g>
       );
-
-    // ── BOB — chin-length straight bob framing the jaw ─────────────────────
-    case "bob":
+    case "long": // soft, layered, face-framing
       return (
         <g data-layer="hair">
-          <path d="M24 52 Q22 22 60 18 Q98 22 96 52 L98 88 Q92 96 84 92 L82 60 Q76 46 60 46 Q44 46 38 60 L36 92 Q28 96 22 88Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M38 44 Q54 40 60 46 Q66 40 82 44 Q74 52 60 52 Q46 52 38 44Z" fill={`url(#${p}lul-hair-lock)`} opacity="0.9" />
-          {sh(48, 28, 18, 7)}
+          <path d="M24 50 Q16 74 20 106 Q24 128 34 130 Q40 130 38 120 Q33 100 42 84 Q40 62 40 50 Z" fill={dk} opacity="0.4" />
+          <path d="M96 50 Q104 74 100 106 Q96 128 86 130 Q80 130 82 120 Q87 100 78 84 Q80 62 80 50 Z" fill={dk} opacity="0.4" />
+          <path d="M21 50 Q13 74 17 106 Q21 126 33 128 Q39 128 37 118 Q32 100 44 84 Q40 60 40 48 Z" fill={hair} />
+          <path d="M99 50 Q107 74 103 106 Q99 126 87 128 Q81 128 83 118 Q88 100 76 84 Q80 60 80 48 Z" fill={hair} />
+          <path d={`M22 54 Q16 6 60 2 Q104 6 98 54 ${HAIR_FRONT_W}`} fill={hair} />
+          {sep("M30 56 Q24 96 34 124")}
+          {sep("M90 56 Q96 96 86 124")}
+          {sh(45, 20, 18, 10)}
         </g>
       );
-
-    // ── PONYTAIL — hair pulled back tight, ponytail visible on left side ───
-    case "ponytail":
+    case "bob": // rounded, simple, modern
       return (
         <g data-layer="hair">
-          {/* the pony hanging behind on the viewer's left */}
-          <path d="M20 34 Q6 46 8 74 Q12 92 22 92 Q24 76 22 60 Q26 46 34 40Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M14 40 Q10 60 14 80" stroke={dk} strokeWidth="0.9" strokeOpacity="0.4" fill="none" />
-          {/* slick-back crown */}
-          <path d="M30 52 Q30 22 60 20 Q90 22 90 52 Q84 44 76 42 Q68 38 60 40 Q52 38 44 42 Q36 44 30 52Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          {/* hair tie */}
-          <ellipse cx="30" cy="40" rx="5" ry="4" fill={shade(o.hair, -0.3)} {...edge} />
-          {sh(52, 28, 18, 6)}
+          <path d="M23 54 Q20 8 60 4 Q100 8 97 54 Q99 82 87 100 Q79 103 79 92 Q85 74 83 58 Q84 46 60 43 Q36 46 37 58 Q35 74 41 92 Q41 103 33 100 Q21 82 23 54 Z" fill={hair} />
+          {sep("M30 58 Q28 80 34 96")}
+          {sep("M90 58 Q92 80 86 96")}
+          {sh(44, 22, 17, 9)}
         </g>
       );
-
-    // ── PIGTAILS — two visible pigtails hanging on both sides ──────────────
-    case "pigtails":
+    case "ponytail": // clean, active
       return (
         <g data-layer="hair">
-          <path d="M18 44 Q10 60 14 84 Q20 92 28 88 Q26 74 26 62 Q28 52 32 46Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M102 44 Q110 60 106 84 Q100 92 92 88 Q94 74 94 62 Q92 52 88 46Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M26 54 Q26 20 60 18 Q94 20 94 54 Q86 46 78 44 Q68 40 60 41 Q52 40 42 44 Q34 46 26 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M60 20 Q59 32 60 42" stroke={dk} strokeWidth="1.2" strokeOpacity="0.55" fill="none" />
-          <ellipse cx="22" cy="48" rx="5" ry="4" fill={shade(o.hair, -0.3)} {...edge} />
-          <ellipse cx="98" cy="48" rx="5" ry="4" fill={shade(o.hair, -0.3)} {...edge} />
-          {sh(48, 30, 16, 6)}
+          <path d="M84 22 Q113 26 113 54 Q111 80 92 80 Q99 74 100 64 Q92 76 86 72 Q98 64 98 50 Q98 40 82 40 Z" fill={hair} />
+          <path d="M83 40 Q97 42 97 52 Q97 64 90 74 Q95 64 92 52 Q90 44 82 44 Z" fill={dk} opacity="0.4" />
+          {sep("M92 32 Q104 46 98 68")}
+          <path d={`M26 54 Q22 8 60 4 Q98 8 94 48 ${HAIR_FRONT}`} fill={hair} />
+          {sh(45, 20, 17, 9)}
         </g>
       );
-
-    // ── BUN — prominent top-knot bun sitting above the head ────────────────
-    case "bun":
+    case "pigtails": // two clean round bunches + centre part
       return (
         <g data-layer="hair">
-          {/* the bun */}
-          <ellipse cx="60" cy="8" rx="14" ry="12" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M50 4 Q60 -2 70 4" stroke={dk} strokeWidth="0.9" strokeOpacity="0.45" fill="none" />
-          <ellipse cx="60" cy="20" rx="10" ry="4" fill={shade(o.hair, -0.3)} {...edge} />
-          {/* slicked-back crown */}
-          <path d="M28 54 Q28 24 60 22 Q92 24 92 54 Q84 46 76 44 Q68 40 60 41 Q52 40 44 44 Q36 46 28 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          {sh(50, 32, 18, 6)}
+          <g fill={hair}>
+            <circle cx="18" cy="66" r="14" /><circle cx="102" cy="66" r="14" />
+          </g>
+          <path d="M12 58 Q6 66 10 76 Q6 66 14 60 Z" fill={dk} opacity="0.32" />
+          <path d="M108 58 Q114 66 110 76 Q114 66 106 60 Z" fill={dk} opacity="0.32" />
+          <path d="M25 54 Q21 8 60 4 Q99 8 95 54 Q92 45 85 45 Q88 40 78 41 Q68 37 60 39 Q51 37 43 40 Q35 40 38 45 Q30 46 25 54 Z" fill={hair} />
+          <path d="M60 6 Q60 20 60 30" stroke={dk} strokeWidth="1.4" opacity="0.38" fill="none" />
+          {sh(44, 20, 15, 8)}
         </g>
       );
-
-    // ── BRAIDS — two long braids down the front of the chest ───────────────
-    case "braids":
+    case "bun": // sleek "top knot" with a round knot on top
       return (
         <g data-layer="hair">
-          <path d="M26 54 Q26 22 60 20 Q94 22 94 54 Q86 46 78 44 Q68 40 60 41 Q52 40 42 44 Q34 46 26 54Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          <path d="M60 22 Q59 34 60 44" stroke={dk} strokeWidth="1.4" strokeOpacity="0.5" fill="none" />
-          {/* two braids hanging in front */}
-          {[26, 94].map((cx) => (
-            <g key={cx}>
-              {[54, 66, 78, 90, 102, 114].map((cy, i) => (
-                <ellipse
-                  key={cy}
-                  cx={cx + (i % 2 ? 2 : -2)}
-                  cy={cy}
-                  rx="6.5"
-                  ry="6"
-                  fill={`url(#${p}lul-hair-lock)`}
-                  stroke={dk}
-                  strokeOpacity="0.32"
-                  strokeWidth="0.7"
-                  transform={`rotate(${i % 2 ? 18 : -18} ${cx} ${cy})`}
-                />
-              ))}
-              <path d={`M${cx - 3} 118 Q${cx} 124 ${cx + 3} 118`} fill={shade(o.hair, -0.3)} />
-            </g>
-          ))}
-          {sh(48, 30, 16, 6)}
+          <ellipse cx="60" cy="11" rx="13" ry="11" fill={dk} opacity="0.4" />
+          <circle cx="60" cy="10" r="10.5" fill={hair} />
+          <path d="M51 5 Q60 0 69 5" stroke="#ffffff" strokeOpacity="0.22" strokeWidth="1.8" fill="none" />
+          <path d="M25 54 Q22 10 60 6 Q98 10 95 54 Q92 45 85 45 Q88 40 78 41 Q68 37 60 39 Q51 37 43 40 Q35 40 38 45 Q30 46 25 54 Z" fill={hair} />
+          {sh(44, 22, 15, 8)}
         </g>
       );
-
+    case "braids": // two clear plaits + centre part
+      return (
+        <g data-layer="hair">
+          {[
+            [18, 30],
+            [102, 90],
+          ].map(([xo, xi], side) => {
+            const cx = (xo + xi) / 2;
+            return (
+              <g key={side}>
+                {[56, 68, 80, 92].map((y, i) => (
+                  <g key={y}>
+                    <ellipse cx={cx} cy={y} rx="9" ry="8" fill={hair} transform={`rotate(${i % 2 === 0 ? -18 : 18} ${cx} ${y})`} />
+                    <ellipse cx={cx} cy={y + 3} rx="8" ry="3.6" fill={dk} opacity="0.26" />
+                  </g>
+                ))}
+                <path d={`M${cx - 4} 98 Q${cx} 108 ${cx + 4} 98`} fill={hair} />
+              </g>
+            );
+          })}
+          <path d="M25 54 Q21 8 60 4 Q99 8 95 54 Q92 45 85 45 Q88 40 78 41 Q68 37 60 39 Q51 37 43 40 Q35 40 38 45 Q30 46 25 54 Z" fill={hair} />
+          <path d="M60 6 Q60 20 60 30" stroke={dk} strokeWidth="1.4" opacity="0.38" fill="none" />
+          {sh(44, 20, 15, 8)}
+        </g>
+      );
     default:
       return (
         <g data-layer="hair">
-          <path d="M31 52 Q31 22 60 20 Q89 22 89 52 Q84 46 76 44 Q68 40 60 41 Q52 40 44 44 Q36 46 31 52Z" fill={`url(#${p}lul-hair)`} {...edge} />
-          {sh(46, 30, 18, 7)}
+          <path d={`M28 56 Q22 8 60 3 Q98 8 92 56 ${HAIR_FRONT}`} fill={hair} />
+          {sh(45, 20, 18, 10)}
         </g>
       );
   }
