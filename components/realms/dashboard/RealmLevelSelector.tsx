@@ -10,12 +10,6 @@ function compactLabel(label: string) {
   return number ? `Level ${number}` : label;
 }
 
-function panelLabel(label: string) {
-  if (/ground/i.test(label)) return "Ground";
-  const number = label.match(/[1-6]/)?.[0];
-  return number ? `Lv${number}` : label;
-}
-
 export default function RealmLevelSelector<TLevel extends string>({
   levels,
   selectedLevel,
@@ -77,7 +71,7 @@ export default function RealmLevelSelector<TLevel extends string>({
         }}
       >
         {reviewing ? <Eye size={11} aria-hidden="true" /> : null}
-        <span>{selected ? compactLabel(selected.label) : "Level"}</span>
+        <span style={{ textTransform: "uppercase" }}>{selected ? compactLabel(selected.label) : "Level"}</span>
         <ChevronDown
           size={12}
           aria-hidden="true"
@@ -85,28 +79,23 @@ export default function RealmLevelSelector<TLevel extends string>({
         />
       </button>
 
-      <nav
+      <div
         id="realm-level-panel"
         aria-label="Choose realm level"
         role="menu"
         className="realm-level-panel"
         style={{
           position: "fixed",
-          top: 60,
+          top: 58,
           left: "50%",
           zIndex: 70,
-          display: "flex",
-          alignItems: "center",
-          gap: 4,
           maxWidth: "calc(100vw - 24px)",
-          padding: 4,
-          overflowX: "auto",
-          scrollbarWidth: "none",
-          borderRadius: 999,
-          background: "rgba(7,10,22,0.96)",
-          border: `1px solid ${accent}44`,
-          boxShadow: `0 10px 28px rgba(0,0,0,0.42), 0 0 18px ${accent}18`,
-          backdropFilter: "blur(16px)",
+          padding: "12px 14px",
+          borderRadius: 20,
+          background: "rgba(8,10,20,0.96)",
+          border: `1px solid ${accent}3a`,
+          boxShadow: `0 16px 44px rgba(0,0,0,0.5), 0 0 20px ${accent}14`,
+          backdropFilter: "blur(18px)",
           visibility: open ? "visible" : "hidden",
           pointerEvents: open ? "auto" : "none",
           opacity: open ? 1 : 0,
@@ -115,60 +104,76 @@ export default function RealmLevelSelector<TLevel extends string>({
           transition: "opacity 160ms ease, transform 180ms ease, visibility 180ms",
         }}
       >
-        {levels.map((level) => {
-          const locked = level.state === "locked";
-          const isSelected = level.id === selectedLevel;
-          const isReviewing = level.state === "reviewing";
+        <div
+          style={{
+            marginBottom: 8,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.45)",
+            fontFamily: "ui-monospace,monospace",
+          }}
+        >
+          Levels · revisit past levels
+        </div>
+        <div style={{ display: "flex", alignItems: "stretch", gap: 8, overflowX: "auto", scrollbarWidth: "none" }}>
+          {levels.map((level) => {
+            const locked = level.state === "locked";
+            const isSelected = level.id === selectedLevel;
+            const isReviewing = level.state === "reviewing";
+            const isCurrent = level.state === "current";
 
-          return (
-            <button
-              key={level.id}
-              type="button"
-              role="menuitem"
-              disabled={locked}
-              onClick={() => {
-                if (locked) return;
-                setOpen(false);
-                onSelect(level.id);
-              }}
-              aria-current={isSelected ? "page" : undefined}
-              aria-label={`${level.label}${locked ? ", locked" : isReviewing ? ", review mode" : ""}`}
-              title={level.label}
-              style={{
-                height: 28,
-                minWidth: /ground/i.test(level.label) ? 66 : 43,
-                padding: "0 9px",
-                borderRadius: 999,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 4,
-                flexShrink: 0,
-                cursor: locked ? "not-allowed" : "pointer",
-                opacity: locked ? 0.38 : 1,
-                background: isReviewing
-                  ? "rgba(245,158,11,0.16)"
-                  : isSelected ? `${accent}22` : "rgba(255,255,255,0.045)",
-                border: isReviewing
-                  ? "1px solid rgba(245,158,11,0.48)"
-                  : `1px solid ${isSelected ? `${accent}88` : "rgba(255,255,255,0.1)"}`,
-                color: isReviewing ? "#fbbf24" : isSelected ? accent : "rgba(255,255,255,0.72)",
-                fontSize: 8,
-                fontWeight: 900,
-                letterSpacing: "0.08em",
-                fontFamily: "ui-monospace,monospace",
-                whiteSpace: "nowrap",
-                transition: "border-color 160ms ease, background 160ms ease, color 160ms ease",
-              }}
-            >
-              {panelLabel(level.label)}
-              {locked ? <Lock size={9} aria-hidden="true" /> : null}
-              {isReviewing ? <Eye size={9} aria-hidden="true" /> : null}
-              {level.state === "current" && isSelected ? <Check size={9} aria-hidden="true" /> : null}
-            </button>
-          );
-        })}
-      </nav>
+            return (
+              <button
+                key={level.id}
+                type="button"
+                role="menuitem"
+                disabled={locked}
+                onClick={() => {
+                  if (locked) return;
+                  setOpen(false);
+                  onSelect(level.id);
+                }}
+                aria-current={isSelected ? "page" : undefined}
+                aria-label={`${level.label}${locked ? ", locked" : isReviewing ? ", review mode" : ""}`}
+                title={level.label}
+                style={{
+                  minWidth: 92,
+                  minHeight: 54,
+                  padding: "8px 14px",
+                  borderRadius: 14,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 4,
+                  flexShrink: 0,
+                  cursor: locked ? "not-allowed" : "pointer",
+                  opacity: locked ? 0.4 : 1,
+                  background: isReviewing
+                    ? "rgba(245,158,11,0.14)"
+                    : isSelected ? `${accent}1f` : "rgba(255,255,255,0.045)",
+                  border: isReviewing
+                    ? "1px solid rgba(245,158,11,0.42)"
+                    : `1px solid ${isSelected ? `${accent}66` : "rgba(255,255,255,0.09)"}`,
+                  color: isReviewing ? "#fbbf24" : isSelected ? "#ffffff" : "rgba(255,255,255,0.8)",
+                  transition: "border-color 160ms ease, background 160ms ease, color 160ms ease",
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>{level.label}</span>
+                {isReviewing ? (
+                  <Eye size={14} aria-hidden="true" style={{ color: "#fbbf24" }} />
+                ) : isCurrent && isSelected ? (
+                  <Check size={14} aria-hidden="true" style={{ color: accent }} />
+                ) : locked ? (
+                  <Lock size={13} aria-hidden="true" style={{ color: "rgba(255,255,255,0.4)" }} />
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
