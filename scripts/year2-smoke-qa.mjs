@@ -41,6 +41,7 @@ function loadTsModule(relativePath) {
 
 const lessonEngine = loadTsModule("data/activities/year2/lessonEngine.ts");
 const rowsModule = loadTsModule("data/programs/raw/year2NumberRows.ts");
+const programBuilder = loadTsModule("data/programs/buildProgram.ts");
 
 const {
   validateLessonActivityIntent,
@@ -48,6 +49,7 @@ const {
   buildYear2QuizActivityPool,
 } = lessonEngine;
 const { year2NumberRows } = rowsModule;
+const { normalizeLessonActivities } = programBuilder;
 
 const targetWeeks = new Set([1, 2, 3, 4, 8, 10, 11, 12]);
 const findings = [];
@@ -65,7 +67,10 @@ function toLesson(row) {
     focus: row.focus,
     activityIdeas: [row.activity],
     curriculum: row.curriculum,
-    activities: row.activities,
+    activities: normalizeLessonActivities(
+      `y2_w${row.week}_l${row.lesson}_${row.topic}`,
+      row.activities
+    ),
   };
 }
 
@@ -83,7 +88,7 @@ for (const week of Array.from(targetWeeks).sort((a, b) => a - b)) {
     const lesson = toLesson(row);
     const lessonLabel = `L${row.lesson}`;
 
-    for (const activity of row.activities) {
+    for (const activity of lesson.activities) {
       const pre = validateLessonActivityIntent(lesson, activity);
       if (!pre.valid) {
         for (const violation of pre.violations) {

@@ -1,5 +1,6 @@
 import type { WeekPlan } from "./year1";
 import type { LessonActivity } from "./types";
+import { normalizeWeekPlans } from "./buildProgram";
 
 function makeActivity(
   activityType: LessonActivity["activityType"],
@@ -18,7 +19,7 @@ function lessonIdeas(core: string, application: string) {
   ];
 }
 
-export const YEAR3_PROGRAM: WeekPlan[] = [
+const YEAR3_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y3-w1",
     week: 1,
@@ -1183,12 +1184,15 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
         activities: [
           makeActivity("number_line_place", 2, {
             mode: "place_fraction",
+            denominators: [2, 3, 4, 5, 10],
           }),
           makeActivity("number_line_place", 1, {
             mode: "pick_point",
+            denominators: [2, 3, 4, 5, 10],
           }),
           makeActivity("number_line_place", 1, {
             mode: "order_fractions",
+            denominators: [2, 3, 4, 5, 10],
           }),
         ],
         curriculum: ["ALL"],
@@ -1219,3 +1223,5 @@ export const YEAR3_PROGRAM: WeekPlan[] = [
     ],
   },
 ];
+
+export const YEAR3_PROGRAM: WeekPlan[] = normalizeWeekPlans(3, YEAR3_PROGRAM_RAW);

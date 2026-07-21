@@ -71,7 +71,7 @@ function loadTsModule(relativePath) {
 }
 
 const engine = loadTsModule("data/activities/year2/lessonEngine.ts");
-const { year2NumberRows } = loadTsModule("data/programs/raw/year2NumberRows.ts");
+const { year2Number } = loadTsModule("data/programs/year2Number.ts");
 const { YEAR3_PROGRAM } = loadTsModule("data/programs/year3.ts");
 const { YEAR4_PROGRAM } = loadTsModule("data/programs/year4.ts");
 const assessments = loadTsModule("data/assessments/api.ts");
@@ -417,19 +417,6 @@ function checkYear3FractionDenominators(lesson) {
   }
 }
 
-function toLesson(row) {
-  return {
-    id: `y2-w${row.week}-l${row.lesson}`,
-    week: row.week,
-    lesson: row.lesson,
-    title: row.topic,
-    focus: row.focus,
-    activityIdeas: [row.activity],
-    curriculum: row.curriculum,
-    activities: row.activities,
-  };
-}
-
 function checkQuiz(programLabel, lesson) {
   if (!lesson) {
     addFinding(`${programLabel} quiz`, "Missing lesson for quiz regression target.");
@@ -505,10 +492,7 @@ function checkStructuredWeeklyQuiz(programLabel, weekPlan, expectedFailureSubstr
 
 const year2Targets = [1, 6, 8, 9, 10, 12];
 for (const week of year2Targets) {
-  const lesson = year2NumberRows
-    .filter((row) => row.week === week)
-    .sort((a, b) => a.lesson - b.lesson)
-    .map(toLesson)[0];
+  const lesson = year2Number.find((weekPlan) => weekPlan.week === week)?.lessons?.[0];
   if (!lesson) {
     addFinding(`Year 2 W${week}`, "Missing lesson for regression target.");
     continue;
@@ -610,17 +594,11 @@ for (const week of [11, 12]) {
 
 checkQuiz(
   "Year 2",
-  year2NumberRows
-    .filter((row) => row.week === 9)
-    .sort((a, b) => a.lesson - b.lesson)
-    .map(toLesson)[0]
+  year2Number.find((weekPlan) => weekPlan.week === 9)?.lessons?.[0]
 );
 checkQuiz(
   "Year 2",
-  year2NumberRows
-    .filter((row) => row.week === 10)
-    .sort((a, b) => a.lesson - b.lesson)
-    .map(toLesson)[0]
+  year2Number.find((weekPlan) => weekPlan.week === 10)?.lessons?.[0]
 );
 checkQuiz("Year 3", YEAR3_PROGRAM.find((item) => item.week === 6)?.lessons?.[0]);
 checkStructuredWeeklyQuiz("Year 3", YEAR3_PROGRAM.find((item) => item.week === 1));

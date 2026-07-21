@@ -145,19 +145,16 @@ function scoreActivityForRole(activity: LessonActivity, role: RotationRole): num
 
 function withRotationMetadata(
   activity: LessonActivity,
-  role: RotationRole,
-  lessonKey: string
+  role: RotationRole
 ): LessonActivity {
   const roleMeta = ROTATION_ROLE_META[role];
   const config = activity.config ?? {};
-  const existingMode = typeof config.mode === "string" ? config.mode : undefined;
 
   return {
     ...activity,
     weight: 1,
     config: {
       ...config,
-      mode: existingMode ?? `${lessonKey}_${role}`,
       rotationRole: role,
       rotationLabel: roleMeta.label,
       rotationPurpose: roleMeta.purpose,
@@ -238,7 +235,7 @@ export function normalizeLessonActivities(
       usedIndexes.add(bestIndex);
     }
 
-    chosen.push(withRotationMetadata(fallbackActivity, role, lessonKey));
+    chosen.push(withRotationMetadata(fallbackActivity, role));
   }
 
   return chosen;
