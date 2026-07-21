@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { isDemoAccessFeatureEnabled, isDemoPreviewMode } from "@/lib/demo-mode";
 import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
 import { getScopedProgressKey, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import { setLastRealm } from "@/lib/last-realm";
@@ -15,6 +15,8 @@ import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import { markRealmEntryRestored } from "@/lib/realm-entry-handoff";
+import { resolveStarpathAccess } from "@/lib/starpath-access";
+import { useAuthorizedDemoSession } from "@/lib/use-authorized-demo-session";
 
 // Read a specific realm's scoped progress (the carousel lives on /realms where
 // the default scope is "number", so the focused realm's scope is passed
@@ -30,7 +32,7 @@ function readScopedProgress(scope: ProgressRealmScope): StudentProgress | null {
   }
 }
 
-const REALMS = [
+const ALL_REALMS = [
   { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)" },
   { id: "pattern-peaks", name: "Pattern Peaks", symbol: "△", description: "Algebra and pattern recognition", color: "rgb(251,191,36)", colorDim: "rgba(251,191,36,0.2)" },
   { id: "measurelands", name: "Measurelands", symbol: "◈", description: "Length, mass, capacity & more", color: "rgb(96,165,250)", colorDim: "rgba(96,165,250,0.2)" },
@@ -47,6 +49,15 @@ export default function RealmCarousel() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const previewMode = isDemoPreviewMode();
+  const authorizedDemoSession = useAuthorizedDemoSession();
+  const starpathAccess = resolveStarpathAccess({
+    demoFeatureEnabled: isDemoAccessFeatureEnabled(),
+    authorizedDemoSession,
+  });
+  const realms = useMemo(
+    () => ALL_REALMS.filter((realm) => realm.id !== "starpath-realm" || starpathAccess.allowed),
+    [starpathAccess.allowed],
+  );
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [entered, setEntered] = useState(false);
@@ -64,9 +75,9 @@ export default function RealmCarousel() {
   const navigate = useCallback((dir: 1 | -1) => {
     if (transitioning) return;
     setTransitioning(true);
-    setCurrentIndex((prev) => (prev + dir + REALMS.length) % REALMS.length);
+    setCurrentIndex((prev) => (prev + dir + realms.length) % realms.length);
     setTimeout(() => setTransitioning(false), 400);
-  }, [transitioning]);
+  }, [realms.length, transitioning]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -92,12 +103,13 @@ export default function RealmCarousel() {
     };
   }, [navigate]);
 
-  const current = REALMS[currentIndex];
-  const isActive = DEMO_MODE || isRealmEnabled(current.id);
+  const current = realms[currentIndex];
+  const isStarpathPreview = current.id === "starpath-realm" && starpathAccess.allowed;
+  const isActive = isStarpathPreview || DEMO_MODE || isRealmEnabled(current.id);
   const isPreviewRealm = previewMode && current.id === "measurelands";
-  const prevIdx = (currentIndex - 1 + REALMS.length) % REALMS.length;
-  const nextIdx = (currentIndex + 1) % REALMS.length;
-  const bgShift = -2 + (currentIndex / REALMS.length) * 4;
+  const prevIdx = (currentIndex - 1 + realms.length) % realms.length;
+  const nextIdx = (currentIndex + 1) % realms.length;
+  const bgShift = -2 + (currentIndex / realms.length) * 4;
   // Use the cathedral/tower-interior aesthetic across all levels.
   const isTopChamber = true;
 
@@ -137,6 +149,7 @@ export default function RealmCarousel() {
     exitReviewMode();
 
     if (availability.destinationRealmId === STARPATH_REALM_ID) {
+      if (!starpathAccess.allowed) return;
       if (!selectedStarpathLevel) {
         setEntryError("Select a valid Starpath level before entering this realm.");
         return;
@@ -254,8 +267,8 @@ export default function RealmCarousel() {
 
             {/* Side doorways (prev & next) */}
             {[
-              { realm: REALMS[prevIdx], position: "left" as const, dir: -1 as const },
-              { realm: REALMS[nextIdx], position: "right" as const, dir: 1 as const },
+              { realm: realms[prevIdx], position: "left" as const, dir: -1 as const },
+              { realm: realms[nextIdx], position: "right" as const, dir: 1 as const },
             ].map(({ realm, position, dir }) => (
               <button
                 key={realm.id + position}
@@ -464,9 +477,9 @@ export default function RealmCarousel() {
               </span>
             )}
 
-            {isPreviewRealm ? (
+            {isPreviewRealm || isStarpathPreview ? (
               <div className="mt-3 inline-flex items-center rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-sky-100">
-                Preview
+                {isStarpathPreview ? "Demo · Preview" : "Preview"}
               </div>
             ) : null}
 
@@ -476,7 +489,7 @@ export default function RealmCarousel() {
 
             {/* Dot indicators */}
             <div className="flex items-center justify-center gap-1.5 mt-5">
-              {REALMS.map((r, i) => (
+              {realms.map((r, i) => (
                 <button
                   key={r.id}
                   type="button"

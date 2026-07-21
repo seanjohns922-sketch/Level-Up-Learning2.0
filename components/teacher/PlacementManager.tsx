@@ -28,11 +28,13 @@ type PMStudent = {
   year_level?: string | null;
 };
 
-const PLACEMENT_REALMS = getAllRealms().map((realm) => ({
-  id: realm.id,
-  label: `${realm.realm} (${realm.strand})`,
-  active: realm.hasContent,
-}));
+const PLACEMENT_REALMS = getAllRealms()
+  .filter((realm) => realm.id !== "space")
+  .map((realm) => ({
+    id: realm.id,
+    label: `${realm.realm} (${realm.strand})`,
+    active: realm.hasContent,
+  }));
 const ACTIVE_REALM_IDS = PLACEMENT_REALMS.filter((r) => r.active).map((r) => r.id);
 
 const ENTRY_MODES: { value: PlacementEntryMode; label: string }[] = [

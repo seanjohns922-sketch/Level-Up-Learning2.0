@@ -20,6 +20,7 @@
     "qa:completion-rewards": "node scripts/completion-reward-integrity-audit.mjs",
     "qa:demo-rewards": "node scripts/demo-reward-showcase-audit.mjs",
     "qa:starpath-activation": "node scripts/starpath-activation-audit.mjs",
+    "qa:starpath-demo-access": "node scripts/audit-starpath-demo-access.mjs",
     "qa:starpath-levels": "node scripts/audit-starpath-levels.mjs",
     "qa:starpath-placement-isolation": "node scripts/starpath-placement-isolation-audit.mjs",
     "qa:starpath-routes": "node scripts/audit-starpath-routes.mjs",

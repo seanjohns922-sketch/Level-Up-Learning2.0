@@ -23,4 +23,5 @@ export function activateDemoPreviewMode() {
 export function deactivateDemoPreviewMode() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(DEMO_PREVIEW_STORAGE_KEY);
+  void fetch("/api/demo-access", { method: "DELETE", keepalive: true }).catch(() => undefined);
 }

@@ -1,4 +1,10 @@
 import { NextResponse } from "next/server";
+import {
+  createDemoSessionToken,
+  DEMO_SESSION_COOKIE,
+  DEMO_SESSION_MAX_AGE_SECONDS,
+  getServerStarpathAccess,
+} from "@/lib/demo-session-server";
 
 export const runtime = "nodejs";
 
@@ -54,7 +60,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "code_mismatch", debug }, { status: 401 });
     }
 
-    return NextResponse.json({ ok: true });
+    const response = NextResponse.json({ ok: true });
+    response.cookies.set(DEMO_SESSION_COOKIE, createDemoSessionToken(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: DEMO_SESSION_MAX_AGE_SECONDS,
+    });
+    return response;
   } catch (error) {
     console.error("[DemoAccessRoute] unhandled error", error);
     return NextResponse.json(
@@ -66,4 +80,24 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+export async function GET() {
+  const access = await getServerStarpathAccess();
+  return NextResponse.json(
+    { authorized: access.allowed, mode: access.allowed ? access.mode : null },
+    { status: access.allowed ? 200 : 403 },
+  );
+}
+
+export async function DELETE() {
+  const response = NextResponse.json({ ok: true });
+  response.cookies.set(DEMO_SESSION_COOKIE, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
+  return response;
 }

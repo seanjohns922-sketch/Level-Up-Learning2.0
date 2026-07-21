@@ -11,6 +11,7 @@ const carousel = read("components/realms/RealmCarousel.tsx");
 const availability = read("lib/realm-entry.ts");
 const routes = read("lib/starpath-routes.ts");
 const starpathPage = read("app/starpath/page.tsx");
+const starpathClient = read("app/starpath/StarpathClient.tsx");
 const levelCatalog = read("lib/level-catalog.ts");
 const levelsPage = read("app/levels/page.tsx");
 
@@ -42,15 +43,21 @@ check(
 );
 check(
   "The Starpath world validates realm and selected-level context",
-  starpathPage.includes('searchParams.get("realm_id") !== STARPATH_REALM_ID') &&
-    starpathPage.includes('searchParams.get("level")') &&
-    starpathPage.includes("tryNormalizeStarpathLevel"),
+  starpathClient.includes('searchParams.get("realm_id") !== STARPATH_REALM_ID') &&
+    starpathClient.includes('searchParams.get("level")') &&
+    starpathClient.includes("tryNormalizeStarpathLevel"),
 );
 check(
   "The Starpath shell cannot load another realm's curriculum",
-  !starpathPage.includes("/number-nexus") &&
-    !starpathPage.includes("/measurelands") &&
-    !starpathPage.includes("restoreStudentStateFromServer"),
+  !starpathClient.includes("/number-nexus") &&
+    !starpathClient.includes("/measurelands") &&
+    !starpathClient.includes("restoreStudentStateFromServer"),
+);
+check(
+  "The Starpath route checks authorised demo access before rendering its client shell",
+  starpathPage.includes("await getServerStarpathAccess()") &&
+    starpathPage.includes('redirect("/realms")') &&
+    starpathPage.indexOf("if (!access.allowed)") < starpathPage.indexOf("<StarpathClient />"),
 );
 check(
   "Unknown level routes do not fall back to Number Nexus",

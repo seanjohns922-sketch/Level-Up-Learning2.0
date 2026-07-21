@@ -9,7 +9,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const read = (file) => fs.readFileSync(path.join(repoRoot, file), "utf8");
 const adapter = read("lib/starpath-placement-adapter.ts");
 const placement = read("lib/starpath-placement.ts");
-const page = read("app/starpath/page.tsx");
+const page = read("app/starpath/StarpathClient.tsx");
 const teacherMigration = read("supabase/migrations/20260718100000_fix_teacher_placement_persistence.sql");
 const secureMigration = read("supabase/migrations/20260717213000_secure_student_completions.sql");
 
