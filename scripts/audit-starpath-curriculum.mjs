@@ -9,6 +9,36 @@ assert.equal(registry.STARPATH_PROGRAMS.length, 7);
 assert.deepEqual(registry.STARPATH_PROGRAMS.map((program) => program.level), expectedLevels);
 assert.equal(registry.STARPATH_WEEK_COUNT, 8);
 
+const groundProgram = registry.STARPATH_PROGRAM_BY_LEVEL.ground;
+assert.equal(groundProgram.assessments.preTest, null);
+assert.deepEqual(
+  groundProgram.weeks.map((week) => week.title),
+  [
+    "Shape Spotters",
+    "Shape Builders",
+    "Shape Sorters",
+    "Shapes Around Us",
+    "Space Positions",
+    "Space Adventures",
+    "Build Starpath",
+    "Space Graduation",
+  ],
+);
+assert.deepEqual(
+  groundProgram.weeks.map((week) => week.lessons.map((lesson) => lesson.title)),
+  [
+    ["Meet the Shapes", "Find the Shapes", "Match the Shapes"],
+    ["Build with Shapes", "Complete the Shape", "Draw with Shapes"],
+    ["Sort by Shape", "What's Different?", "Shape Families"],
+    ["Space Objects", "Home Objects", "Treasure Hunt"],
+    ["Above, Below, Beside", "In, On, Under, Behind", "Move the Object"],
+    ["Guide the Rocket", "Help Geospin", "Hidden Treasure"],
+    ["Build a Planet", "Create a Space Scene", "Describe Your Picture"],
+    ["Shape Explorer Challenge", "Position Explorer Challenge", "Geospin's Final Mission"],
+  ],
+);
+assert.match(groundProgram.progressionRationale, /Ground Level Starpath Graduate title/);
+
 const ids = new Set();
 for (const program of registry.STARPATH_PROGRAMS) {
   assert.equal(program.realmId, "space");

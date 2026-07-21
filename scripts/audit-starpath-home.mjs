@@ -15,7 +15,7 @@ for (const suffix of ["ground", "y1", "y2", "y3", "y4", "y5", "y6"]) {
 }
 
 assert.match(client, /guidedMode = \(selectedDefinition\?\.levelNumber \?\? 0\) <= 2/);
-assert.match(client, /Start Adventure/);
+assert.match(client, /START ADVENTURE/);
 assert.match(client, /Array\.from\(\{ length: 4 \}/);
 assert.match(client, /Weeks \{district\.weekStart\}–\{district\.weekEnd\}/);
 assert.match(client, /STARPATH_DISTRICT_NAMES/);

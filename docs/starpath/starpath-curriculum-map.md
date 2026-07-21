@@ -22,7 +22,7 @@ Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks an
 **Program ID:** `ground-space`
 **Status:** planned
 
-Students name, sort, create and find familiar shapes, then describe position and movement in familiar spaces.
+Young Space Explorers recognise, create, sort and find familiar shapes, then describe and apply position and movement language in a final Starpath adventure.
 
 ### Curriculum Alignment
 
@@ -41,7 +41,7 @@ Students name, sort, create and find familiar shapes, then describe position and
 - Size or colour determines a shape.
 - Position words have a fixed viewpoint.
 
-**Progression rationale:** The sequence begins with concrete recognition and creation, then shifts to relational position and purposeful movement before combining both strands in a familiar-space mission.
+**Progression rationale:** The sequence deliberately moves from recognise to create, sort, describe and apply. Changing the context from shape spotting to building, environmental searches, navigation and a final Space Graduation keeps Foundation practice varied while remaining aligned to AC9MFSP01 and AC9MFSP02. Completion is planned to unlock the Ground Level Starpath Graduate title.
 
 ### Assessment Metadata
 
@@ -52,182 +52,182 @@ Students name, sort, create and find familiar shapes, then describe position and
 
 | Skill ID | Student name | Teacher description | Week | Category | Prerequisites |
 | --- | --- | --- | ---: | --- | --- |
-| `space-ground-shape-recognition` | Spot familiar shapes | Recognises and names familiar shapes despite changes in size, colour or orientation. | 1 | shape-and-object-reasoning | None |
-| `space-ground-shape-sorting` | Sort shapes with a reason | Sorts familiar shapes by a chosen feature and explains the grouping rule. | 2 | shape-and-object-reasoning | `space-ground-shape-recognition` |
-| `space-ground-shape-creation` | Make shapes | Creates familiar shapes and combines parts while retaining shape language. | 3 | construction-and-visualisation | `space-ground-shape-recognition` |
-| `space-ground-shapes-in-objects` | Find shapes in objects | Identifies familiar shapes within environmental objects and gives a reason for the match. | 4 | spatial-representation | `space-ground-shape-recognition` |
-| `space-ground-position-language` | Say where things are | Uses relational position words from a clear viewpoint. | 5 | position-and-navigation | None |
-| `space-ground-location-relations` | Compare locations | Describes inside, outside, near and far relationships between objects and locations. | 6 | position-and-navigation | `space-ground-position-language` |
-| `space-ground-movement-pathways` | Follow a path | Follows and communicates simple movement instructions in a familiar space. | 7 | position-and-navigation | `space-ground-location-relations` |
-| `space-ground-spatial-mission` | Solve a shape and space mission | Integrates shape recognition, location language and movement to solve familiar spatial problems. | 8 | spatial-representation | `space-ground-shapes-in-objects`, `space-ground-movement-pathways` |
+| `space-ground-shape-recognition` | Spot familiar shapes | Recognises and names circles, squares, triangles and rectangles despite changes in size, colour or orientation. | 1 | shape-and-object-reasoning | None |
+| `space-ground-shape-creation` | Make shapes | Creates familiar shapes and simple pictures from lines, parts and smaller shapes while using shape language. | 2 | construction-and-visualisation | `space-ground-shape-recognition` |
+| `space-ground-shape-sorting` | Sort shapes with a reason | Sorts and compares familiar shapes using corners, sides and round or not-round language. | 3 | shape-and-object-reasoning | `space-ground-shape-recognition` |
+| `space-ground-shapes-in-objects` | Find shapes in objects | Identifies familiar shapes within environmental objects and gives a simple reason for the match. | 4 | spatial-representation | `space-ground-shape-recognition` |
+| `space-ground-position-language` | Say where things are | Uses above, below, beside, in, on, under and behind from a clear viewpoint. | 5 | position-and-navigation | None |
+| `space-ground-movement-pathways` | Follow space clues | Follows positional clues to move through a familiar space and locate hidden objects. | 6 | position-and-navigation | `space-ground-position-language` |
+| `space-ground-shape-position-composition` | Build and describe a space scene | Combines familiar shapes in a space scene and describes where objects are using simple positional language. | 7 | construction-and-visualisation | `space-ground-shape-creation`, `space-ground-position-language` |
+| `space-ground-spatial-mission` | Complete Space Graduation | Integrates shape recognition, creation, sorting and positional language to solve a cumulative Starpath mission. | 8 | spatial-representation | `space-ground-shape-sorting`, `space-ground-shapes-in-objects`, `space-ground-movement-pathways`, `space-ground-shape-position-composition` |
 
 ### Eight-Week Sequence
 
 #### Week 1: Shape Spotters
 
-**Central concept:** Recognise and name familiar shapes in varied orientations.
+**Central concept:** Recognise and name familiar two-dimensional shapes in varied Starpath scenes.
 **Curriculum alignment:** AC9MFSP01
 **Practised skills:** `space-ground-shape-recognition`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Meet the Shape Crew (`ground-space-w1-l1`) | build | Recognise circles, triangles, squares and rectangles. | We are learning to recognise circles, triangles, squares and rectangles. | shape-sort, rotation-match, scene-shape-hunt |
-| 2. Turned Shapes (`ground-space-w1-l2`) | develop | Match familiar shapes shown in different sizes and orientations. | We are learning to match familiar shapes shown in different sizes and orientations. | shape-sort, rotation-match, scene-shape-hunt |
-| 3. Shape Hunt (`ground-space-w1-l3`) | apply | Find and justify familiar shapes in a scene. | We are learning to find and justify familiar shapes in a scene. | shape-sort, rotation-match, scene-shape-hunt |
+| 1. Meet the Shapes (`ground-space-w1-l1`) | build | Recognise circles, squares, triangles and rectangles. | We are learning to recognise circles, squares, triangles and rectangles. | shape-introduction, scene-shape-hunt, shape-match-sort |
+| 2. Find the Shapes (`ground-space-w1-l2`) | develop | Search for familiar shapes hidden around Starpath. | We are learning to search for familiar shapes hidden around Starpath. | shape-introduction, scene-shape-hunt, shape-match-sort |
+| 3. Match the Shapes (`ground-space-w1-l3`) | apply | Match and simply sort familiar shapes. | We are learning to match and simply sort familiar shapes. | shape-introduction, scene-shape-hunt, shape-match-sort |
 
-**Vocabulary:** circle, triangle, square, rectangle, shape
-
-**Common misconceptions**
-
-- A rotated square becomes a diamond.
-- All four-sided shapes are squares.
-
-**Weekly quiz:** `ground-space-w1-quiz` - Recognition, naming and orientation invariance. (15 questions; planned)
-
-#### Week 2: Sorting Stations
-
-**Central concept:** Sort and compare shapes using visible features and reasons.
-**Curriculum alignment:** AC9MFSP01
-**Practised skills:** `space-ground-shape-sorting`
-
-| Lesson | Role | Focus | Learning intention | Activity mechanic families |
-| --- | --- | --- | --- | --- |
-| 1. Same and Different (`ground-space-w2-l1`) | build | Compare one visible feature at a time. | We are learning to compare one visible feature at a time. | feature-match, drag-sort, rule-detective |
-| 2. Choose a Sorting Rule (`ground-space-w2-l2`) | develop | Sort a mixed set using shape features. | We are learning to sort a mixed set using shape features. | feature-match, drag-sort, rule-detective |
-| 3. Mystery Sort (`ground-space-w2-l3`) | apply | Infer and explain another person's sorting rule. | We are learning to infer and explain another person's sorting rule. | feature-match, drag-sort, rule-detective |
-
-**Vocabulary:** same, different, sort, group, reason
+**Vocabulary:** circle, square, triangle, rectangle, shape
 
 **Common misconceptions**
 
-- Items can belong to only one possible group.
-- Colour is always the most useful rule.
+- A shape changes name when it is turned.
+- The colour or size determines the shape.
 
-**Weekly quiz:** `ground-space-w2-quiz` - Comparison, sorting rules and explanations. (15 questions; planned)
+**Weekly quiz:** `ground-space-w1-quiz` - Recognition, naming, matching and simple sorting. (15 questions; planned)
 
-#### Week 3: Shape Makers
+#### Week 2: Shape Builders
 
-**Central concept:** Create and compose familiar shapes from parts.
+**Central concept:** Create familiar shapes and pictures from lines, parts and smaller shapes.
 **Curriculum alignment:** AC9MFSP01
 **Practised skills:** `space-ground-shape-creation`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Build One Shape (`ground-space-w3-l1`) | build | Construct familiar shapes from moveable parts. | We are learning to construct familiar shapes from moveable parts. | shape-builder, compose-puzzle, multiple-solution-builder |
-| 2. Shapes from Shapes (`ground-space-w3-l2`) | develop | Combine smaller shapes to make a larger familiar shape. | We are learning to combine smaller shapes to make a larger familiar shape. | shape-builder, compose-puzzle, multiple-solution-builder |
-| 3. More Than One Way (`ground-space-w3-l3`) | apply | Create the same target in different ways and compare solutions. | We are learning to create the same target in different ways and compare solutions. | shape-builder, compose-puzzle, multiple-solution-builder |
+| 1. Build with Shapes (`ground-space-w2-l1`) | build | Create familiar shapes using sticks, stars and lines. | We are learning to create familiar shapes using sticks, stars and lines. | line-shape-builder, missing-part-completer, shape-picture-studio |
+| 2. Complete the Shape (`ground-space-w2-l2`) | develop | Add missing sides or parts to finish a familiar shape. | We are learning to add missing sides or parts to finish a familiar shape. | line-shape-builder, missing-part-completer, shape-picture-studio |
+| 3. Draw with Shapes (`ground-space-w2-l3`) | apply | Create a rocket, house, tree or robot from familiar shapes. | We are learning to create a rocket, house, tree or robot from familiar shapes. | line-shape-builder, missing-part-completer, shape-picture-studio |
 
-**Vocabulary:** make, part, whole, join, turn
+**Vocabulary:** build, side, line, part, picture
 
 **Common misconceptions**
 
-- A target has only one valid construction.
-- Parts stop being shapes when combined.
+- A shape must be drawn in one particular way.
+- A picture can contain only one shape.
 
-**Weekly quiz:** `ground-space-w3-quiz` - Creating, composing and explaining shapes. (15 questions; planned)
+**Weekly quiz:** `ground-space-w2-quiz` - Shape construction, completion and picture composition. (15 questions; planned)
+
+#### Week 3: Shape Sorters
+
+**Central concept:** Sort and compare familiar shapes using Foundation language.
+**Curriculum alignment:** AC9MFSP01
+**Practised skills:** `space-ground-shape-sorting`
+
+| Lesson | Role | Focus | Learning intention | Activity mechanic families |
+| --- | --- | --- | --- | --- |
+| 1. Sort by Shape (`ground-space-w3-l1`) | build | Group familiar shapes by their names. | We are learning to group familiar shapes by their names. | drag-shape-sort, feature-compare, shape-family-builder |
+| 2. What's Different? (`ground-space-w3-l2`) | develop | Compare corners, sides and whether shapes are round or not round. | We are learning to compare corners, sides and whether shapes are round or not round. | drag-shape-sort, feature-compare, shape-family-builder |
+| 3. Shape Families (`ground-space-w3-l3`) | apply | Group similar shapes and explain what belongs together. | We are learning to group similar shapes and explain what belongs together. | drag-shape-sort, feature-compare, shape-family-builder |
+
+**Vocabulary:** sort, same, different, corner, round
+
+**Common misconceptions**
+
+- There is only one way to sort a group of shapes.
+- Shapes that look different cannot belong to the same family.
+
+**Weekly quiz:** `ground-space-w3-quiz` - Sorting, visible-feature comparison and simple explanations. (15 questions; planned)
 
 #### Week 4: Shapes Around Us
 
-**Central concept:** Recognise and describe shapes within everyday objects.
+**Central concept:** Recognise familiar shapes within space and everyday objects.
 **Curriculum alignment:** AC9MFSP01
 **Practised skills:** `space-ground-shapes-in-objects`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Object Shape Hunt (`ground-space-w4-l1`) | build | Locate familiar shapes inside everyday objects. | We are learning to locate familiar shapes inside everyday objects. | image-hotspot, object-shape-match, picture-composer |
-| 2. Which Shape Fits? (`ground-space-w4-l2`) | develop | Match object parts to shape representations. | We are learning to match object parts to shape representations. | image-hotspot, object-shape-match, picture-composer |
-| 3. Design a Space Station (`ground-space-w4-l3`) | apply | Use familiar shapes to design and explain an object. | We are learning to use familiar shapes to design and explain an object. | image-hotspot, object-shape-match, picture-composer |
+| 1. Space Objects (`ground-space-w4-l1`) | build | Find familiar shapes in rockets, planets and satellites. | We are learning to find familiar shapes in rockets, planets and satellites. | space-object-hotspot, home-shape-match, target-shape-hunt |
+| 2. Home Objects (`ground-space-w4-l2`) | develop | Find familiar shapes in everyday environments. | We are learning to find familiar shapes in everyday environments. | space-object-hotspot, home-shape-match, target-shape-hunt |
+| 3. Treasure Hunt (`ground-space-w4-l3`) | apply | Find every object that matches a chosen shape. | We are learning to find every object that matches a chosen shape. | space-object-hotspot, home-shape-match, target-shape-hunt |
 
-**Vocabulary:** object, inside, edge, round, corner
+**Vocabulary:** object, rocket, planet, match, find
 
 **Common misconceptions**
 
 - An object must be exactly one shape.
-- Only the outside outline can contain shapes.
+- Only space objects contain useful shapes.
 
-**Weekly quiz:** `ground-space-w4-quiz` - Environmental recognition and reasoned description. (15 questions; planned)
+**Weekly quiz:** `ground-space-w4-quiz` - Environmental shape recognition across space and familiar contexts. (15 questions; planned)
 
-#### Week 5: Where Is It?
+#### Week 5: Space Positions
 
-**Central concept:** Describe location relative to people and objects.
+**Central concept:** Use positional language to describe where objects are.
 **Curriculum alignment:** AC9MFSP02
 **Practised skills:** `space-ground-position-language`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Position Words (`ground-space-w5-l1`) | build | Connect above, below, beside, in front and behind to scenes. | We are learning to connect above, below, beside, in front and behind to scenes. | position-match, drag-place, scene-description |
-| 2. Place the Astronaut (`ground-space-w5-l2`) | develop | Position an object by following one relational instruction. | We are learning to position an object by following one relational instruction. | position-match, drag-place, scene-description |
-| 3. Describe the Scene (`ground-space-w5-l3`) | apply | Choose precise words to communicate a location. | We are learning to choose precise words to communicate a location. | position-match, drag-place, scene-description |
+| 1. Above, Below, Beside (`ground-space-w5-l1`) | build | Identify and describe simple relative positions. | We are learning to identify and describe simple relative positions. | position-word-match, position-scene-choice, drag-to-position |
+| 2. In, On, Under, Behind (`ground-space-w5-l2`) | develop | Use containment and relative position words in familiar scenes. | We are learning to use containment and relative position words in familiar scenes. | position-word-match, position-scene-choice, drag-to-position |
+| 3. Move the Object (`ground-space-w5-l3`) | apply | Drag an object to a location described by a positional clue. | We are learning to drag an object to a location described by a positional clue. | position-word-match, position-scene-choice, drag-to-position |
 
-**Vocabulary:** above, below, beside, in front, behind
-
-**Common misconceptions**
-
-- Left and right are the same from every viewpoint.
-- Near and beside mean exactly the same thing.
-
-**Weekly quiz:** `ground-space-w5-quiz` - Relational position vocabulary and communication. (15 questions; planned)
-
-#### Week 6: Near, Far, Inside
-
-**Central concept:** Compare proximity and containment in familiar spaces.
-**Curriculum alignment:** AC9MFSP02
-**Practised skills:** `space-ground-location-relations`
-
-| Lesson | Role | Focus | Learning intention | Activity mechanic families |
-| --- | --- | --- | --- | --- |
-| 1. Inside or Outside (`ground-space-w6-l1`) | build | Identify containment relationships. | We are learning to identify containment relationships. | containment-sort, proximity-compare, location-reasoning |
-| 2. Near or Far (`ground-space-w6-l2`) | develop | Compare relative proximity using a shared scene. | We are learning to compare relative proximity using a shared scene. | containment-sort, proximity-compare, location-reasoning |
-| 3. Best Location (`ground-space-w6-l3`) | apply | Choose and justify a location from spatial clues. | We are learning to choose and justify a location from spatial clues. | containment-sort, proximity-compare, location-reasoning |
-
-**Vocabulary:** inside, outside, near, far, between
+**Vocabulary:** above, below, beside, in, under
 
 **Common misconceptions**
 
-- Near and far are absolute distances.
-- An object cannot be between two others.
+- A position word describes an object without a reference object.
+- On and above always mean the same thing.
 
-**Weekly quiz:** `ground-space-w6-quiz` - Containment, proximity and location reasoning. (15 questions; planned)
+**Weekly quiz:** `ground-space-w5-quiz` - Relational position vocabulary and interactive placement. (15 questions; planned)
 
-#### Week 7: Move Through Space
+#### Week 6: Space Adventures
 
-**Central concept:** Follow and describe simple movements and pathways.
+**Central concept:** Follow and apply positional clues in playful movement and location missions.
 **Curriculum alignment:** AC9MFSP02
 **Practised skills:** `space-ground-movement-pathways`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Move One Step (`ground-space-w7-l1`) | build | Follow forward, backward and turn instructions. | We are learning to follow forward, backward and turn instructions. | movement-simulator, path-sequencer, direction-builder |
-| 2. Pathway Pilot (`ground-space-w7-l2`) | develop | Sequence several moves to reach a location. | We are learning to sequence several moves to reach a location. | movement-simulator, path-sequencer, direction-builder |
-| 3. Give the Directions (`ground-space-w7-l3`) | apply | Create directions for another character to follow. | We are learning to create directions for another character to follow. | movement-simulator, path-sequencer, direction-builder |
+| 1. Guide the Rocket (`ground-space-w6-l1`) | build | Move a rocket by following simple positional directions. | We are learning to move a rocket by following simple positional directions. | rocket-position-guide, character-clue-path, hidden-object-clues |
+| 2. Help Geospin (`ground-space-w6-l2`) | develop | Follow positional clues to help Geospin reach a destination. | We are learning to follow positional clues to help Geospin reach a destination. | rocket-position-guide, character-clue-path, hidden-object-clues |
+| 3. Hidden Treasure (`ground-space-w6-l3`) | apply | Find an object by applying a sequence of location clues. | We are learning to find an object by applying a sequence of location clues. | rocket-position-guide, character-clue-path, hidden-object-clues |
 
-**Vocabulary:** forward, backward, turn, path, direction
+**Vocabulary:** move, clue, location, next, behind
 
 **Common misconceptions**
 
-- Turning changes location immediately.
-- A route can omit the order of moves.
+- Clues can be followed in any order.
+- The destination alone tells us how to move.
 
-**Weekly quiz:** `ground-space-w7-quiz` - Movement language, ordered pathways and communication. (15 questions; planned)
+**Weekly quiz:** `ground-space-w6-quiz` - Applying position and movement language in ordered adventures. (15 questions; planned)
 
-#### Week 8: Shape and Space Mission
+#### Week 7: Build Starpath
 
-**Central concept:** Apply shape, position and movement reasoning together.
+**Central concept:** Combine familiar shapes and positions to create and describe a space scene.
+**Curriculum alignment:** AC9MFSP01, AC9MFSP02
+**Practised skills:** `space-ground-shape-position-composition`
+
+| Lesson | Role | Focus | Learning intention | Activity mechanic families |
+| --- | --- | --- | --- | --- |
+| 1. Build a Planet (`ground-space-w7-l1`) | build | Combine familiar shapes to create a planet design. | We are learning to combine familiar shapes to create a planet design. | planet-shape-builder, space-scene-composer, oral-scene-description |
+| 2. Create a Space Scene (`ground-space-w7-l2`) | develop | Arrange shape-built objects in a Starpath scene. | We are learning to arrange shape-built objects in a Starpath scene. | planet-shape-builder, space-scene-composer, oral-scene-description |
+| 3. Describe Your Picture (`ground-space-w7-l3`) | apply | Use simple oral positional language to describe the scene. | We are learning to use simple oral positional language to describe the scene. | planet-shape-builder, space-scene-composer, oral-scene-description |
+
+**Vocabulary:** create, planet, scene, beside, describe
+
+**Common misconceptions**
+
+- A scene has only one correct arrangement.
+- A listener can see where everything is without position words.
+
+**Weekly quiz:** `ground-space-w7-quiz` - Combining shape creation, scene composition and positional description. (15 questions; planned)
+
+#### Week 8: Space Graduation
+
+**Central concept:** Apply shape recognition, creation, sorting and position language in a final adventure.
 **Curriculum alignment:** AC9MFSP01, AC9MFSP02
 **Practised skills:** `space-ground-spatial-mission`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Read the Space Map (`ground-space-w8-l1`) | build | Identify shapes and locations in a pictorial map. | We are learning to identify shapes and locations in a pictorial map. | picture-map-reader, route-planner, spatial-reasoning-choice |
-| 2. Plan the Rescue (`ground-space-w8-l2`) | develop | Build a pathway from ordered spatial clues. | We are learning to build a pathway from ordered spatial clues. | picture-map-reader, route-planner, spatial-reasoning-choice |
-| 3. Explain the Mission (`ground-space-w8-l3`) | apply | Solve and justify a combined shape-and-position problem. | We are learning to solve and justify a combined shape-and-position problem. | picture-map-reader, route-planner, spatial-reasoning-choice |
+| 1. Shape Explorer Challenge (`ground-space-w8-l1`) | build | Recognise, create and sort familiar shapes in a cumulative challenge. | We are learning to recognise, create and sort familiar shapes in a cumulative challenge. | shape-explorer-challenge, position-explorer-challenge, geospin-final-mission |
+| 2. Position Explorer Challenge (`ground-space-w8-l2`) | develop | Describe positions and follow location clues in a cumulative challenge. | We are learning to describe positions and follow location clues in a cumulative challenge. | shape-explorer-challenge, position-explorer-challenge, geospin-final-mission |
+| 3. Geospin's Final Mission (`ground-space-w8-l3`) | apply | Help Geospin complete an adventure combining all Ground Level skills. | We are learning to help Geospin complete an adventure combining all Ground Level skills. | shape-explorer-challenge, position-explorer-challenge, geospin-final-mission |
 
-**Vocabulary:** map, location, pathway, shape, explain
+**Vocabulary:** shape, sort, position, mission, explorer
 
 **Common misconceptions**
 
-- A map must look exactly like the real space.
-- Only one route can be correct.
+- Only one type of shape or position clue can appear in a mission.
+- A successful answer does not need a reason or description.
 
 **Weekly quiz:** none. Week 8 Lesson 3 unlocks `ground-space-post-01`.
 

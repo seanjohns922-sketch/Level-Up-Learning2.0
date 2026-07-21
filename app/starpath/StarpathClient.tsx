@@ -187,6 +187,9 @@ function StarpathWorldShell() {
         <div style={chip({ background: `${theme.accent}1f`, border: `1px solid ${theme.accent}44` })}>
           <span style={{ color: theme.accent, fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: mono }}>✦ STARPATH</span>
         </div>
+        <div style={chip({ padding: "5px 10px", background: "rgba(30,27,75,0.72)", border: `1px solid ${theme.accent}33` })}>
+          <span style={{ color: theme.accentSoft, fontSize: 9, fontWeight: 800, letterSpacing: "0.12em", fontFamily: mono }}>Demo · Preview</span>
+        </div>
         <StarpathLevelsDrawer selectedLevel={selectedLevel} accent={theme.accent} openDirection="right" />
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
@@ -289,6 +292,10 @@ function StarpathWorldShell() {
             ) : null}
           </div>
         )}
+      </div>
+
+      <div style={{ position: "absolute", bottom: 10, left: "50%", zIndex: 24, transform: "translateX(-50%)", ...chip({ padding: "4px 10px", background: "rgba(5,8,28,0.72)" }), color: "rgba(226,232,255,0.74)", fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", fontFamily: mono, pointerEvents: "none", whiteSpace: "nowrap" }}>
+        Demo progress is not saved.
       </div>
 
       <style>{`
