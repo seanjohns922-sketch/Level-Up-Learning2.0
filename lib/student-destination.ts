@@ -27,7 +27,9 @@ export function resolveStudentDestination(args: {
   }
 
   if (isGroundLevel) {
-    return "/measurelands";
+    // Ground Level does not require placement testing. After the shared intro,
+    // let the student choose Number Nexus or Measurelands from the Tower.
+    return "/realms";
   }
 
   if (!isPlacementComplete(args.progress)) {

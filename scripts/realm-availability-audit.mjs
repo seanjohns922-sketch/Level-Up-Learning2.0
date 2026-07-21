@@ -9,6 +9,7 @@ const carousel = read("components/realms/RealmCarousel.tsx");
 const measurelands = read("app/measurelands/page.tsx");
 const entryHandoff = read("lib/realm-entry-handoff.ts");
 const progressSync = read("lib/student-progress-sync.ts");
+const studentDestination = read("lib/student-destination.ts");
 const pretest = read("app/pretest/page.tsx");
 
 const results = [];
@@ -40,6 +41,12 @@ check(
   "A new Ground Level student enters Measurelands without a pre-test",
   resolveRealmEntryRoute({ realmId: "measurement", progress: null, fallbackYear: "Prep", introSeen: true }) ===
     "/measurelands",
+);
+check(
+  "Ground Level students choose a realm after the shared intro",
+  studentDestination.includes("if (isGroundLevel)") &&
+    studentDestination.includes('return "/realms";') &&
+    studentDestination.includes("placementComplete: isGroundLevel"),
 );
 check(
   "A placed Week 2 student returns to Measurelands",

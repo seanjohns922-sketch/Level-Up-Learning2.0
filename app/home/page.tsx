@@ -100,11 +100,11 @@ export default function StudentHomePage() {
       >
         <p className="text-sm font-semibold text-amber-800 uppercase tracking-widest mb-2">Welcome to the</p>
         <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3 uppercase tracking-wide">
-          {isGroundLevel ? "Measurelands" : "Tower of Knowledge"}
+          Tower of Knowledge
         </h1>
         <p className="text-gray-700 max-w-2xl mx-auto mb-8">
           {isGroundLevel
-            ? `${studentProfile?.displayName ? `${studentProfile.displayName}, ` : ""}meet Meazurex, watch the intro, and begin your Ground Level adventure in Measurelands.`
+            ? `${studentProfile?.displayName ? `${studentProfile.displayName}, ` : ""}watch the intro, then choose your first Ground Level adventure in Number Nexus or Measurelands.`
             : `${studentProfile?.displayName ? `${studentProfile.displayName}, ` : ""}your journey starts with a short skill check. We&apos;ll use your pre-test to place you at the right level, unlock the correct learning path, and guide you into the Tower.`}
         </p>
 
