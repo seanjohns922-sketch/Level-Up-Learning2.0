@@ -295,6 +295,10 @@ export default function RealmDashboardShell({
 
   const districts = config.districtsForLevel(resolvedYear);
   const isDistrictMode = config.districtModeLevels.includes(resolvedYear);
+  // The guide companion card overlaps the Tower of Knowledge fog badge on the
+  // early levels, so hide it for Ground -> Level 2 (Prep / Year 1 / Year 2).
+  const hideGuideCompanion =
+    resolvedYear === "Prep" || resolvedYear === "Year 1" || resolvedYear === "Year 2";
   const currentDistrict =
     districts.find((district) => currentWeek >= district.weekStart && currentWeek <= district.weekEnd) ??
     districts[0];
@@ -529,7 +533,7 @@ export default function RealmDashboardShell({
           pointerEvents: "none",
         }}
       >
-        {!isDistrictMode ? (
+        {!isDistrictMode && !hideGuideCompanion ? (
           <div
             style={{
               position: "absolute",
