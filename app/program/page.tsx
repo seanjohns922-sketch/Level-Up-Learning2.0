@@ -255,6 +255,15 @@ function ProgramPage() {
     xpLabelColor: "text-teal-100/90",
   };
 
+  // Starpath nav widgets (Back button, Week selector, XP plate) — match the
+  // Starpath realm's rounded indigo/cyan chip styling instead of the Nexus teal.
+  const starpathNavPillStyle = {
+    borderRadius: 999,
+    border: "1px solid rgba(103,232,249,0.32)",
+    background: "linear-gradient(135deg, rgba(30,27,75,0.88), rgba(76,29,149,0.55) 55%, rgba(8,47,73,0.85))",
+    boxShadow: "inset 0 1px 0 rgba(207,250,254,0.22), 0 0 20px rgba(124,58,237,0.26)",
+  } as const;
+
   const [store, setStore] = useState<ProgramProgressStore>(() =>
     typeof window !== "undefined" ? readProgramStore() : {}
   );
@@ -623,7 +632,7 @@ function ProgramPage() {
           className="w-full h-full object-cover"
           style={{
             filter: isStarpathRealm
-              ? "brightness(0.72) contrast(1.12) saturate(1.08)"
+              ? "brightness(0.88) contrast(1.1) saturate(1.1)"
               : isMeasurementRealm
               ? levelNum === 4
                 ? "brightness(0.90) contrast(1.16) saturate(1.05)"
@@ -742,11 +751,13 @@ function ProgramPage() {
               <button
                 onClick={() => router.push(realmHomeRoute)}
                 className={`px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
-                  isMeasurementRealm
+                  isStarpathRealm
+                    ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
+                    : isMeasurementRealm
                     ? "text-yellow-100/85 hover:bg-yellow-950/30"
                     : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                 }`}
-                style={isMeasurementRealm ? {
+                style={isStarpathRealm ? starpathNavPillStyle : isMeasurementRealm ? {
                   borderRadius: 999,
                   border: "1px solid rgba(200,160,48,0.32)",
                   background: "rgba(22,14,4,0.65)",
@@ -780,10 +791,10 @@ function ProgramPage() {
                   }}
                 >
                   <span className="flex items-center gap-2">
-                    <span className={`h-1.5 w-1.5 rounded-full ${isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
+                    <span className={`h-1.5 w-1.5 rounded-full ${isStarpathRealm ? "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]" : isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
                     Week {weekNum}
                   </span>
-                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition-transform ${isMeasurementRealm ? "text-yellow-200/60" : "text-teal-100/80"} ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition-transform ${isStarpathRealm ? "text-cyan-100/80" : isMeasurementRealm ? "text-yellow-200/60" : "text-teal-100/80"} ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
@@ -791,11 +802,17 @@ function ProgramPage() {
                   <div
                     role="listbox"
                     className={`absolute left-0 top-[calc(100%+6px)] z-50 max-h-[260px] w-[170px] overflow-y-auto backdrop-blur-xl ${
-                      isMeasurementRealm
+                      isStarpathRealm
+                        ? "border border-cyan-300/30"
+                        : isMeasurementRealm
                         ? "border border-yellow-900/40"
                         : "border border-teal-300/30"
                     }`}
-                    style={isMeasurementRealm ? {
+                    style={isStarpathRealm ? {
+                      borderRadius: 14,
+                      background: "rgba(15,17,45,0.95)",
+                      boxShadow: "inset 0 1px 0 rgba(207,250,254,0.2), 0 14px 40px rgba(0,0,0,0.6), 0 0 24px rgba(124,58,237,0.18)",
+                    } : isMeasurementRealm ? {
                       borderRadius: 14,
                       background: "rgba(22,14,4,0.94)",
                       boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), 0 14px 40px rgba(0,0,0,0.6), 0 0 24px rgba(109,40,217,0.12)",
@@ -806,7 +823,7 @@ function ProgramPage() {
                     }}
                   >
                     <div className={`px-3 py-1.5 border-b text-[9px] font-mono font-bold uppercase tracking-[0.2em] ${
-                      isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
+                      isStarpathRealm ? "border-cyan-300/15 text-cyan-300/80" : isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
                     }`}>
                       Select Week
                     </div>
@@ -828,7 +845,13 @@ function ProgramPage() {
                               aria-selected={isCurrent}
                               onClick={() => { setWeekMenuOpen(false); goToWeek(targetWeek); }}
                               className={`group flex w-full items-center justify-between gap-2 px-3 py-1 text-left text-[10px] font-mono font-bold uppercase tracking-[0.12em] transition ${
-                                isMeasurementRealm
+                                isStarpathRealm
+                                  ? isCurrent
+                                    ? "bg-cyan-400/15 text-cyan-100"
+                                    : isUnlocked
+                                    ? "text-cyan-50/85 hover:bg-cyan-400/10 hover:text-cyan-50"
+                                    : "text-cyan-50/30 hover:bg-white/5"
+                                  : isMeasurementRealm
                                   ? isCurrent
                                     ? "bg-yellow-900/20 text-yellow-100"
                                     : isUnlocked
@@ -843,12 +866,14 @@ function ProgramPage() {
                             >
                               <span className="flex items-center gap-1.5">
                                 {isCurrent ? (
-                                  <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 ${isMeasurementRealm ? "text-yellow-300" : "text-teal-300"}`} fill="none" stroke="currentColor" strokeWidth="3">
+                                  <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 ${isStarpathRealm ? "text-cyan-300" : isMeasurementRealm ? "text-yellow-300" : "text-teal-300"}`} fill="none" stroke="currentColor" strokeWidth="3">
                                     <path d="M5 12l5 5L20 7" />
                                   </svg>
                                 ) : (
                                   <span className={`h-1 w-1 rounded-full ${
-                                    isMeasurementRealm
+                                    isStarpathRealm
+                                      ? isUnlocked ? "bg-cyan-400/70" : "bg-white/20"
+                                      : isMeasurementRealm
                                       ? isUnlocked ? "bg-yellow-600/60" : "bg-white/15"
                                       : isUnlocked ? "bg-teal-400/70" : "bg-white/20"
                                   }`} />
@@ -856,7 +881,9 @@ function ProgramPage() {
                                 Week {targetWeek}
                               </span>
                               <span className={`text-[8px] tracking-[0.16em] ${
-                                isMeasurementRealm
+                                isStarpathRealm
+                                  ? isCurrent ? "text-cyan-300" : isUnlocked ? "text-cyan-200/60" : "text-white/30"
+                                  : isMeasurementRealm
                                   ? isCurrent ? "text-yellow-300/80" : isUnlocked ? "text-yellow-200/45" : "text-white/25"
                                   : isCurrent ? "text-teal-300" : isUnlocked ? "text-teal-200/60" : "text-white/30"
                               }`}>
@@ -918,7 +945,10 @@ function ProgramPage() {
             <div className="mt-5 mx-auto max-w-sm relative">
               <div
                 className="absolute -inset-[2px] pointer-events-none"
-                style={isMeasurementRealm ? {
+                style={isStarpathRealm ? {
+                  borderRadius: 14,
+                  background: "linear-gradient(135deg, rgba(103,232,249,0.55), rgba(124,58,237,0.22) 45%, rgba(34,211,238,0.5))",
+                } : isMeasurementRealm ? {
                   borderRadius: 14,
                   background: "linear-gradient(135deg, rgba(200,160,48,0.42), rgba(120,90,15,0.14) 40%, rgba(200,160,48,0.36))",
                 } : {
@@ -928,7 +958,11 @@ function ProgramPage() {
               />
               <div
                 className="relative px-5 py-3"
-                style={isMeasurementRealm ? {
+                style={isStarpathRealm ? {
+                  borderRadius: 12,
+                  background: "linear-gradient(135deg, rgba(30,27,75,0.96) 0%, rgba(15,23,42,0.9) 50%, rgba(8,47,73,0.92) 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(207,250,254,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(124,58,237,0.15)",
+                } : isMeasurementRealm ? {
                   borderRadius: 12,
                   background: "linear-gradient(135deg, #140e04 0%, #1e1506 50%, #2a1e08 100%)",
                   boxShadow: "inset 0 1px 0 rgba(200,160,48,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(109,40,217,0.08)",
@@ -938,13 +972,13 @@ function ProgramPage() {
                   boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 18px rgba(0,0,0,0.45)",
                 }}
               >
-                {!isMeasurementRealm && (
+                {!isMeasurementRealm && !isStarpathRealm && (
                   <div
                     className="absolute inset-0 opacity-15 pointer-events-none"
                     style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.4) 0 1px, transparent 1px 3px)" }}
                   />
                 )}
-                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isMeasurementRealm ? "ring-1 ring-yellow-900/40" : "ring-1 ring-teal-400/20"}`}>
+                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isStarpathRealm ? "ring-1 ring-cyan-400/20" : isMeasurementRealm ? "ring-1 ring-yellow-900/40" : "ring-1 ring-teal-400/20"}`}>
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${percent}%`, background: rt.xpBg, boxShadow: rt.xpGlow }}
