@@ -947,6 +947,20 @@ function liveRowToStatus(row?: LiveStudentActivityRow | undefined): StrandStatus
   return "Not Started";
 }
 
+function resolveDisplayedWeek(prog?: ProgressRow, liveRow?: LiveStudentActivityRow) {
+  const progressWeek = prog?.week ?? null;
+  const liveWeek = liveRow?.current_week ?? null;
+  if (progressWeek == null) return liveWeek;
+  if (liveWeek == null) return progressWeek;
+
+  const progressAt = prog?.updated_at ? new Date(prog.updated_at).getTime() : 0;
+  const liveAt = Math.max(
+    liveRow?.updated_at ? new Date(liveRow.updated_at).getTime() : 0,
+    liveRow?.last_active_at ? new Date(liveRow.last_active_at).getTime() : 0,
+  );
+  return liveAt > progressAt ? liveWeek : progressWeek;
+}
+
 export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, liveEvents, onRealmChange }: Props) {
   const genres = getGenresForYear(yearLabel);
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
@@ -1051,7 +1065,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
       const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
       const placementStatus = computePlacementStatus(prog, pct, isPlaceholder);
-      const week = isPlaceholder ? null : (prog?.week ?? liveRow?.current_week ?? null);
+      const week = isPlaceholder ? null : resolveDisplayedWeek(prog, liveRow);
       const activeWeek = week ?? 1;
       const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
       const activeLessonIds = activeWeekPlan?.lessons.map((lesson) => lesson.id) ?? [];
@@ -1323,7 +1337,7 @@ function StudentStrandDetail({
   const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
   const eventIds = buildCompletedLessonIdsFromEvents(liveEvents, yearLabel);
   const ids = [...new Set([...persistedIds, ...eventIds])];
-  const currentWeek = prog?.week ?? liveRow?.current_week ?? 1;
+  const currentWeek = resolveDisplayedWeek(prog, liveRow) ?? 1;
   const [selectedWeek, setSelectedWeek] = useState<number>(currentWeek);
   const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);

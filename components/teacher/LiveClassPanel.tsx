@@ -29,7 +29,7 @@ type StudentRow = {
 };
 
 type LiveStudentActivityRow = {
-  id: string;
+  id?: string;
   student_id: string;
   class_id: string;
   current_level?: string | null;
@@ -178,6 +178,106 @@ function numberOrNull(value: unknown): number | null {
 function positiveNumberOrNull(value: unknown): number | null {
   const numberValue = numberOrNull(value);
   return numberValue != null && numberValue >= 0 ? Math.round(numberValue) : null;
+}
+
+function stringOrNull(value: unknown): string | null {
+  return typeof value === "string" && value.trim() ? value : null;
+}
+
+function timestampMs(...values: Array<string | null | undefined>) {
+  return values.reduce((latest, value) => {
+    if (!value) return latest;
+    const parsed = new Date(value).getTime();
+    return Number.isFinite(parsed) ? Math.max(latest, parsed) : latest;
+  }, 0);
+}
+
+function resolveCurrentActivityRow(
+  student: StudentRow,
+  row: LiveStudentActivityRow | null | undefined,
+  events: LiveActivityEventRow[],
+  attempts: CompletedActivityAttemptRow[],
+): LiveStudentActivityRow | null {
+  const latestEvent = [...events]
+    .filter((event) => {
+      const payload = parseEventPayload(event.payload);
+      return event.student_id === student.id && (
+        positiveNumberOrNull(payload.week) != null ||
+        stringOrNull(payload.lessonId) != null
+      );
+    })
+    .sort((left, right) => timestampMs(right.created_at) - timestampMs(left.created_at))[0] ?? null;
+
+  const latestAttempt = attempts
+    .filter((attempt) => attempt.student_id === student.id && attempt.completed !== false)
+    .sort((left, right) => timestampMs(right.completed_at) - timestampMs(left.completed_at))[0] ?? null;
+
+  if (!row && !latestEvent && !latestAttempt) return null;
+
+  let resolved: LiveStudentActivityRow = row
+    ? { ...row }
+    : { student_id: student.id, class_id: student.class_id };
+  let resolvedAt = timestampMs(row?.updated_at, row?.last_active_at, row?.completed_at);
+
+  if (latestEvent && timestampMs(latestEvent.created_at) >= resolvedAt) {
+    const payload = parseEventPayload(latestEvent.payload);
+    const eventAt = latestEvent.created_at;
+    const eventType = latestEvent.event_type;
+    const completed = eventType === "lesson_completed" || eventType === "quiz_completed";
+    resolved = {
+      ...resolved,
+      current_level: stringOrNull(payload.level) ?? resolved.current_level ?? null,
+      current_strand: stringOrNull(payload.strand) ?? resolved.current_strand ?? null,
+      current_week: positiveNumberOrNull(payload.week) ?? resolved.current_week ?? null,
+      current_lesson: stringOrNull(payload.lessonId) ?? resolved.current_lesson ?? null,
+      current_lesson_title: stringOrNull(payload.lessonTitle) ?? resolved.current_lesson_title ?? null,
+      current_activity_id: stringOrNull(payload.activityId) ?? resolved.current_activity_id ?? null,
+      current_activity_label: stringOrNull(payload.activityLabel) ?? resolved.current_activity_label ?? null,
+      current_question_id: stringOrNull(payload.questionId) ?? resolved.current_question_id ?? null,
+      current_question_text: stringOrNull(payload.questionText) ?? resolved.current_question_text ?? null,
+      progress_percent: positiveNumberOrNull(payload.progressPercent) ?? resolved.progress_percent ?? null,
+      progress_label: stringOrNull(payload.progressLabel) ?? resolved.progress_label ?? null,
+      latest_event_type: eventType as LiveStudentActivityRow["latest_event_type"],
+      questions_answered: positiveNumberOrNull(payload.questionsAnswered) ?? resolved.questions_answered ?? null,
+      correct_count: positiveNumberOrNull(payload.correctCount) ?? resolved.correct_count ?? null,
+      accuracy_percent: positiveNumberOrNull(payload.accuracyPercent) ?? resolved.accuracy_percent ?? null,
+      current_lesson_status: stringOrNull(payload.currentLessonStatus) ?? (completed ? "completed" : resolved.current_lesson_status ?? "active"),
+      completed_at: stringOrNull(payload.completedAt) ?? (completed ? eventAt : resolved.completed_at ?? null),
+      attempt_number: positiveNumberOrNull(payload.attemptNumber) ?? resolved.attempt_number ?? null,
+      last_active_at: eventAt,
+      updated_at: eventAt,
+    };
+    resolvedAt = timestampMs(eventAt);
+  }
+
+  if (latestAttempt && timestampMs(latestAttempt.completed_at) > resolvedAt) {
+    const lessonId = latestAttempt.activity_type === "quiz"
+      ? latestAttempt.quiz_id
+      : latestAttempt.lesson_id;
+    resolved = {
+      ...resolved,
+      current_level: latestAttempt.working_level,
+      current_strand: latestAttempt.realm_id,
+      current_week: latestAttempt.week,
+      current_lesson: lessonId ?? resolved.current_lesson ?? null,
+      current_lesson_title: latestAttempt.activity_type === "quiz"
+        ? "Weekly Quiz"
+        : `Lesson ${latestAttempt.lesson ?? ""}`.trim(),
+      progress_percent: 100,
+      progress_label: latestAttempt.activity_type === "quiz" ? "Weekly quiz completed" : "Lesson completed",
+      latest_event_type: latestAttempt.activity_type === "quiz" ? "quiz_completed" : "lesson_completed",
+      questions_answered: latestAttempt.total_questions,
+      correct_count: latestAttempt.correct_count,
+      accuracy_percent: latestAttempt.accuracy_percent,
+      current_lesson_status: "completed",
+      completed_at: latestAttempt.completed_at,
+      attempt_number: latestAttempt.attempt_no,
+      last_active_at: latestAttempt.completed_at,
+      updated_at: latestAttempt.completed_at,
+    };
+  }
+
+  return resolved;
 }
 
 function getQuestionKey(event: LiveActivityEventRow, index: number) {
@@ -375,10 +475,7 @@ function buildCompletedActivityAttemptSummary(
     };
   }
 
-  const hasActivity = Boolean(row.last_active_at || row.current_lesson || row.current_lesson_title);
-  return {
-    attemptNumber: hasActivity ? 1 : null,
-  };
+  return null;
 }
 
 function buildCurrentLessonPerformance(
@@ -532,7 +629,7 @@ function toLiveCard(
     latestCorrectAnswer: row?.latest_correct_answer ?? null,
     latestAnswerCorrect: row?.latest_answer_correct ?? null,
     timeOnCurrentQuestion: row?.time_on_current_question ?? 0,
-    attemptNumber: completedAttemptSummary?.attemptNumber ?? null,
+    attemptNumber: completedAttemptSummary?.attemptNumber ?? row?.attempt_number ?? null,
     questionsAnswered: completedAttemptSummary?.answered ?? lessonPerformance?.answered ?? null,
     correctCount: completedAttemptSummary?.correct ?? lessonPerformance?.correct ?? null,
     accuracyPercent: completedAttemptSummary?.accuracy ?? lessonPerformance?.accuracy ?? null,
@@ -768,8 +865,13 @@ export default function LiveClassPanel({
       else eventMap.set(event.student_id, [event]);
     });
     return students.map((student) => {
-      const row = rowMap.get(student.id);
       const studentEvents = eventMap.get(student.id) ?? [];
+      const row = resolveCurrentActivityRow(
+        student,
+        rowMap.get(student.id),
+        studentEvents,
+        completedAttempts,
+      );
       const lessonPerformance = buildCurrentLessonPerformance(row, studentEvents);
       const completedAttemptSummary = buildCompletedActivityAttemptSummary(row, completedAttempts);
       return toLiveCard(student, row, lessonPerformance, completedAttemptSummary);

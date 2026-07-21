@@ -409,7 +409,15 @@ export default function TeacherDashboardPage() {
         .select("student_id,class_id,event_type,created_at,payload")
         .in("student_id", ids)
         .eq("class_id", classId)
-        .in("event_type", ["lesson_started", "question_loaded", "answer_correct", "answer_incorrect", "lesson_completed"])
+        .in("event_type", [
+          "lesson_started",
+          "quiz_started",
+          "question_loaded",
+          "answer_correct",
+          "answer_incorrect",
+          "lesson_completed",
+          "quiz_completed",
+        ])
         .order("created_at", { ascending: true });
       newLiveEvents = (events ?? []) as LiveActivityEventRow[];
     }
