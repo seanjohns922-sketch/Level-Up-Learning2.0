@@ -2,8 +2,9 @@
 
 import { readProgress, type ProgressRealmScope } from "@/data/progress";
 import { buildLessonId } from "@/lib/lesson-routing";
-import { getLastRealm, setLastRealm } from "@/lib/last-realm";
+import { getLastRealm, getLastStarpathRoute, setLastRealm } from "@/lib/last-realm";
 import { getRealmAvailability, resolveRealmEntryRoute } from "@/lib/realm-entry";
+import { STARPATH_WORLD_ROUTE } from "@/lib/starpath-routes";
 import {
   lessonResumeHasProgress,
   loadLessonResume,
@@ -105,6 +106,9 @@ export function resolveContinueLearningRoute() {
 
   const lastRealm = getLastRealm();
   if (!lastRealm) return "/realms";
+  // Starpath is demo/preview (no saved-progress resume), so send them back to the
+  // exact Starpath world they were in rather than a different realm or the Tower.
+  if (lastRealm === "starpath-realm") return getLastStarpathRoute() ?? STARPATH_WORLD_ROUTE;
   const availability = getRealmAvailability(lastRealm);
   if (!availability?.enabled) return "/realms";
 

@@ -11,8 +11,10 @@ import type { StarpathPlacement } from "@/lib/starpath-placement";
 import { computeFogProgress } from "@/lib/fog-progress";
 import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
 import RealmDashboardNav from "@/components/world/RealmDashboardNav";
+import StarpathLevelsDrawer from "@/components/realms/StarpathLevelsDrawer";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { fetchGlobalXp } from "@/lib/economy";
+import { setLastRealm, setLastStarpathRoute } from "@/lib/last-realm";
 import {
   getStarpathLevel,
   tryNormalizeStarpathLevel,
@@ -70,6 +72,14 @@ function StarpathWorldShell() {
       router.replace(canonicalHref);
     }
   }, [invalidRoute, placementLevel, router, selectedLevel]);
+
+  // Record Starpath as the active journey so "Continue Learning" returns here,
+  // not a stale different realm.
+  useEffect(() => {
+    if (invalidRoute || !selectedLevel) return;
+    setLastRealm("starpath-realm");
+    setLastStarpathRoute(buildStarpathWorldHref({ selectedLevel, placementLevel }));
+  }, [invalidRoute, placementLevel, selectedLevel]);
 
   useEffect(() => {
     if (invalidRoute) return;
@@ -187,9 +197,7 @@ function StarpathWorldShell() {
         <div style={chip({ background: `${theme.accent}1f`, border: `1px solid ${theme.accent}44` })}>
           <span style={{ color: theme.accent, fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: mono }}>✦ STARPATH</span>
         </div>
-        <div style={chip()}>
-          <span style={{ color: theme.accentSoft, fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", fontFamily: mono }}>{selectedDefinition.levelNumber === 0 ? "GROUND" : `LV ${selectedDefinition.levelNumber}`}</span>
-        </div>
+        <StarpathLevelsDrawer selectedLevel={selectedLevel} accent={theme.accent} openDirection="right" />
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
           <Zap size={11} color={theme.accent} />
