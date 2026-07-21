@@ -845,6 +845,7 @@ export default function MeasurelandsMap({ year = "Prep" }: { year?: Measurelands
           isPreview={isDemoPreviewMode()}
           accent="#c4b5fd"
           openDirection="right"
+          maxLevelIndex={2}
         />
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>

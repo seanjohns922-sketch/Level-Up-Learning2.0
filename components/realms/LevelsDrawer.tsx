@@ -18,6 +18,7 @@ export default function LevelsDrawer({
   isPreview,
   accent = "#5eead4",
   openDirection = "down",
+  maxLevelIndex,
 }: {
   realmId: "number-nexus" | "measurelands";
   progress: StudentProgress | null;
@@ -25,7 +26,11 @@ export default function LevelsDrawer({
   isPreview: boolean;
   accent?: string;
   openDirection?: "down" | "right";
+  // Cap the levels shown (inclusive index into LEVEL_CATALOG). Omit to show all 7.
+  maxLevelIndex?: number;
 }) {
+  const visibleLevels =
+    typeof maxLevelIndex === "number" ? LEVEL_CATALOG.slice(0, maxLevelIndex + 1) : LEVEL_CATALOG;
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -103,7 +108,7 @@ export default function LevelsDrawer({
           className={[
             "absolute w-[248px] rounded-2xl border p-3 backdrop-blur-xl",
             openDirection === "right"
-              ? "left-0 top-[calc(100%+8px)] xl:left-[calc(100%+8px)] xl:top-0 xl:w-[680px] xl:p-2"
+              ? "left-0 top-[calc(100%+8px)] xl:top-[calc(100%+8px)] xl:w-auto xl:p-2"
               : "left-0 top-[calc(100%+8px)]",
           ].join(" ")}
           style={{ background: "rgba(8,10,16,0.94)", borderColor: "rgba(255,255,255,0.14)", boxShadow: "0 14px 40px rgba(0,0,0,0.5)", zIndex: 60 }}
@@ -112,8 +117,8 @@ export default function LevelsDrawer({
           <div className={`mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/45 ${openDirection === "right" ? "xl:mb-1" : ""}`}>
             Levels · revisit past levels
           </div>
-          <div className={openDirection === "right" ? "flex flex-col gap-1 xl:grid xl:grid-cols-7" : "flex flex-col gap-1"}>
-            {LEVEL_CATALOG.map((lvl) => {
+          <div className={openDirection === "right" ? "flex flex-col gap-1 xl:flex-row xl:flex-wrap" : "flex flex-col gap-1"}>
+            {visibleLevels.map((lvl) => {
               const unlocked = isLevelUnlocked(lvl.id, progress, { forceOpen: isPreview, realmId: legendRealm });
               const isPlaced = !!currentYear && lvl.id === currentYear;
               const isViewing = lvl.id === viewingYear;
@@ -126,7 +131,7 @@ export default function LevelsDrawer({
                   role="menuitem"
                   className={[
                     "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition",
-                    openDirection === "right" ? "xl:min-h-[52px] xl:flex-col xl:justify-center xl:gap-1 xl:px-2 xl:text-center" : "",
+                    openDirection === "right" ? "xl:min-h-[52px] xl:min-w-[88px] xl:flex-col xl:justify-center xl:gap-1 xl:px-4 xl:text-center" : "",
                     !unlocked ? "cursor-not-allowed opacity-40" : "cursor-pointer hover:bg-white/10",
                   ].join(" ")}
                   style={

@@ -20,6 +20,8 @@ export default function StarpathLevelsDrawer({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
+  // Starpath demo content runs Ground → Level 2, so only those are reachable here.
+  const visibleLevels = STARPATH_LEVELS.filter((lvl) => lvl.levelNumber <= 2);
   const current = STARPATH_LEVELS.find((lvl) => lvl.id === selectedLevel);
   const triggerLabel = current && current.levelNumber === 0 ? "GROUND" : `LV ${current?.levelNumber ?? 1}`;
 
@@ -64,14 +66,16 @@ export default function StarpathLevelsDrawer({
         <div
           className={[
             "absolute w-[248px] rounded-2xl border p-3 backdrop-blur-xl",
-            openDirection === "right" ? "left-0 top-[calc(100%+8px)]" : "left-0 top-[calc(100%+8px)]",
+            openDirection === "right"
+              ? "left-0 top-[calc(100%+8px)] xl:top-[calc(100%+8px)] xl:w-auto xl:p-2"
+              : "left-0 top-[calc(100%+8px)]",
           ].join(" ")}
           style={{ background: "rgba(8,10,16,0.94)", borderColor: "rgba(255,255,255,0.14)", boxShadow: "0 14px 40px rgba(0,0,0,0.5)", zIndex: 60 }}
           role="menu"
         >
           <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">Levels · jump to any level</div>
-          <div className="flex flex-col gap-1">
-            {STARPATH_LEVELS.map((lvl) => {
+          <div className={openDirection === "right" ? "flex flex-col gap-1 xl:flex-row xl:flex-wrap" : "flex flex-col gap-1"}>
+            {visibleLevels.map((lvl) => {
               const isViewing = lvl.id === selectedLevel;
               return (
                 <button
@@ -79,7 +83,10 @@ export default function StarpathLevelsDrawer({
                   type="button"
                   onClick={() => selectLevel(lvl.id)}
                   role="menuitem"
-                  className="flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left transition hover:bg-white/10"
+                  className={[
+                    "flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left transition hover:bg-white/10",
+                    openDirection === "right" ? "xl:min-h-[52px] xl:min-w-[88px] xl:flex-col xl:justify-center xl:gap-1 xl:px-4 xl:text-center" : "",
+                  ].join(" ")}
                   style={
                     isViewing
                       ? { background: `${accent}22`, border: `1px solid ${accent}66` }

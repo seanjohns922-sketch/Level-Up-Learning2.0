@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, ChevronRight, Map, Orbit, Sparkles, User, Zap } from "lucide-react";
+import { ArrowLeft, ChevronRight, Map, Orbit, User, Zap } from "lucide-react";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/studentIdentity";
 import { loadStarpathPlacement } from "@/lib/starpath-placement-adapter";
@@ -172,18 +172,8 @@ function StarpathWorldShell() {
       <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse 68% 58% at 50% 38%, ${theme.glow} 0%, transparent 70%)`, opacity: 0.4, pointerEvents: "none" }} />
       <div style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)", width: 128, height: "56%", background: `linear-gradient(180deg, ${theme.accent}00 0%, ${theme.accent}22 55%, ${theme.accent}3a 100%)`, filter: "blur(18px)", pointerEvents: "none" }} />
 
-      {/* Companion + avatar layer */}
+      {/* Avatar layer */}
       <div style={{ position: "absolute", inset: 0, zIndex: 10, opacity: adventureReady ? 0.6 : 1, transition: "opacity 0.4s ease", pointerEvents: "none" }}>
-        <div style={{ position: "absolute", left: "4%", bottom: "10%", display: "flex", alignItems: "center", gap: 12, padding: "10px 16px 10px 12px", borderRadius: 18, background: "linear-gradient(180deg, rgba(49,46,129,0.78) 0%, rgba(30,27,75,0.85) 100%)", border: `1.5px solid ${theme.accent}55`, boxShadow: `0 0 24px ${theme.glow}, 0 10px 28px rgba(0,0,0,0.55)`, backdropFilter: "blur(10px)", maxWidth: 260 }}>
-          <div style={{ width: 46, height: 46, borderRadius: "50%", background: `radial-gradient(circle at 50% 35%, ${theme.accentSoft} 0%, #4338ca 78%)`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "inset 0 -3px 6px rgba(0,0,0,0.3)" }}>
-            <Sparkles size={22} color="#0b1030" />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <span style={{ color: theme.accent, fontSize: 9, fontWeight: 900, letterSpacing: "0.2em", fontFamily: mono }}>NOVA</span>
-            <span style={{ color: "#eef2ff", fontSize: 12, fontWeight: 600, lineHeight: 1.25 }}>Welcome, star explorer! Chart your path.</span>
-          </div>
-        </div>
-
         <div style={{ position: "absolute", bottom: "2%", left: "50%", transform: "translateX(-50%)", zIndex: 12, pointerEvents: "auto" }}>
           <StudentAvatar height={188} glowColor={theme.glow} floatAnimation="sp-char-float 4.6s ease-in-out infinite" />
         </div>

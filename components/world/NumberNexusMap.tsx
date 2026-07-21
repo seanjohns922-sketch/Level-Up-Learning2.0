@@ -770,7 +770,7 @@ export default function NumberNexusMap() {
         <div style={chip()}>
           <span style={{ color: "#5eead4", fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: "ui-monospace,monospace" }}>⚡ NUMBER NEXUS</span>
         </div>
-        <LevelsDrawer realmId="number-nexus" progress={progress} viewingYear={year} isPreview={isDemoPreviewMode()} accent="#5eead4" />
+        <LevelsDrawer realmId="number-nexus" progress={progress} viewingYear={year} isPreview={isDemoPreviewMode()} accent="#5eead4" openDirection="right" />
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
           <Zap size={11} color="#14b8a6" />
