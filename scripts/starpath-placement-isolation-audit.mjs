@@ -9,7 +9,8 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const read = (file) => fs.readFileSync(path.join(repoRoot, file), "utf8");
 const adapter = read("lib/starpath-placement-adapter.ts");
 const placement = read("lib/starpath-placement.ts");
-const page = read("app/starpath/StarpathClient.tsx");
+const dashboard = read("components/world/StarpathMap.tsx");
+const lessonPage = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
 const teacherMigration = read("supabase/migrations/20260718100000_fix_teacher_placement_persistence.sql");
 const secureMigration = read("supabase/migrations/20260717213000_secure_student_completions.sql");
 
@@ -27,7 +28,10 @@ assert.match(placement, /preTestStatus: StarpathAssessmentStatus/);
 assert.match(placement, /postTestStatus: StarpathAssessmentStatus/);
 assert.match(placement, /levelComplete: boolean/);
 assert.match(placement, /nextLevelStatus: StarpathNextLevelStatus/);
-assert.doesNotMatch(page, /number-nexus|measurelands|StudentProgress|restoreStudentStateFromServer/);
+assert.doesNotMatch(dashboard, /number-nexus|measurelands|restoreStudentStateFromServer/);
+assert.match(dashboard, /storageRealmId: "space"/);
+assert.match(lessonPage, /realmId !== STARPATH_REALM_ID/);
+assert.doesNotMatch(lessonPage, /complete_realm|save_student|student_realm_progress/);
 
 assert.match(teacherMigration, /p_realm_id not in \('number', 'measurement'\)/);
 assert.match(secureMigration, /p_realm_id not in \('number', 'measurement'\)/);

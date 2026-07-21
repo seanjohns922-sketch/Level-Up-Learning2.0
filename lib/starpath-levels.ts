@@ -56,6 +56,12 @@ export function getStarpathLevel(level: StarpathLevelId): StarpathLevelDefinitio
   return definition;
 }
 
+export function getStarpathLevelForYear(yearLabel: StarpathLevelDefinition["yearLabel"]): StarpathLevelDefinition {
+  const definition = STARPATH_LEVELS.find((candidate) => candidate.yearLabel === yearLabel);
+  if (!definition) throw new InvalidStarpathLevelError(yearLabel);
+  return definition;
+}
+
 export function isGroundStarpathLevel(level: StarpathLevelId) {
   return level === "ground";
 }

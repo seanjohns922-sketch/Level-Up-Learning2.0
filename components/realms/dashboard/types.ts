@@ -1,7 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
-import type { ProgressRealmScope, StudentProgress } from "@/data/progress";
+import type { StudentProgress } from "@/data/progress";
 import type { LegendRealmId } from "@/data/legends";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
+import type { ProgramRealmId } from "@/lib/program-progress";
 
 export type RealmDistrictState = "complete" | "completed" | "open" | "current" | "locked";
 
@@ -83,8 +84,8 @@ export type RealmDashboardTheme = {
 };
 
 export type CanonicalRealmDashboardConfig = {
-  realmId: LegendRealmId;
-  storageRealmId: ProgressRealmScope;
+  realmId: LegendRealmId | "starpath-realm";
+  storageRealmId: ProgramRealmId;
   slug: string;
   displayName: string;
   realmMark: string;
@@ -113,6 +114,13 @@ export type CanonicalRealmDashboardConfig = {
     glowColor: string;
     floatAnimation: string;
     positionStyle?: CSSProperties;
+  };
+  demo?: {
+    only?: boolean;
+    unlockAllDistricts?: boolean;
+    readJourney: (level: RealmLevelId) => { currentWeek: number; currentLesson: number };
+    buildLevelHref: (level: RealmLevelId) => string;
+    buildLessonHref: (level: RealmLevelId, week: number, lesson: number) => string;
   };
 };
 

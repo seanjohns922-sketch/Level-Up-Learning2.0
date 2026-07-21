@@ -228,12 +228,18 @@ export default function RealmDashboardShell({
   avatar,
 }: RealmDashboardShellProps) {
   const router = useRouter();
+  const previewMode = isDemoPreviewMode();
   useEffect(() => {
     setLastRealm(config.slug);
   }, [config.slug]);
   const resolvedYear = level;
   const world = useMemo(() => config.worldForLevel(resolvedYear), [config, resolvedYear]);
-  const [progress] = useState<StudentProgress | null>(() => restoredProgress ?? readProgress(config.storageRealmId));
+  const [progress] = useState<StudentProgress | null>(() => {
+    if (restoredProgress !== undefined) return restoredProgress;
+    return config.storageRealmId === "number" || config.storageRealmId === "measurement"
+      ? readProgress(config.storageRealmId)
+      : null;
+  });
   const [store] = useState(() => readProgramStore());
   const [launching, setLaunching] = useState(false);
   const [bestChain] = useState(() => readBestChain(config.storageRealmId, resolvedYear));
@@ -243,7 +249,15 @@ export default function RealmDashboardShell({
   const fogProgress = useMemo(() => computeFogProgress(progress?.year, progress?.unlockedLegends), [progress?.year, progress?.unlockedLegends]);
 
   const totalWeeks = config.totalWeeks;
-  const currentWeek = getRecommendedAssignedWeek(store, resolvedYear, progress?.assignedWeek, progress?.requiredWeeks, config.storageRealmId);
+  const demoJourney = previewMode && config.demo ? config.demo.readJourney(resolvedYear) : null;
+  const currentWeek = demoJourney?.currentWeek ?? getRecommendedAssignedWeek(
+    store,
+    resolvedYear,
+    progress?.assignedWeek,
+    progress?.requiredWeeks,
+    config.storageRealmId,
+  );
+  const currentLesson = demoJourney?.currentLesson ?? 1;
   const currentZone =
     world.zones.find((zone) => currentWeek >= zone.weekStart && currentWeek <= zone.weekEnd) ?? world.zones[0];
   const completedByWeek = useMemo(() => {
@@ -290,7 +304,9 @@ export default function RealmDashboardShell({
       (week) => completedByWeek[week]
     );
     if (allWeeksDone) return "complete";
-    if (currentWeek >= district.weekStart) return "current";
+    if (currentWeek >= district.weekStart && currentWeek <= district.weekEnd) return "current";
+    if (previewMode && config.demo?.unlockAllDistricts) return "open";
+    if (currentWeek > district.weekEnd) return "open";
     return "locked";
   };
 
@@ -298,7 +314,6 @@ export default function RealmDashboardShell({
     ? LEVEL_CATALOG.slice(0, config.maxLevelIndex + 1)
     : LEVEL_CATALOG;
   const currentYear = progress?.year;
-  const previewMode = isDemoPreviewMode();
   const levelOptions: RealmDashboardLevelOption[] = visibleLevelCatalog.map((catalogLevel) => {
     const id = catalogLevel.id as RealmLevelId;
     const unlocked = isLevelUnlocked(id, progress, {
@@ -316,6 +331,10 @@ export default function RealmDashboardShell({
 
   function selectLevel(targetYear: RealmLevelId) {
     if (targetYear === resolvedYear) return;
+    if (previewMode && config.demo) {
+      window.location.assign(config.demo.buildLevelHref(targetYear));
+      return;
+    }
     const { href, review } = buildRealmLevelHref(config.realmId, targetYear, currentYear, previewMode);
     if (review) enterReviewMode(config.realmId, targetYear);
     else exitReviewMode();
@@ -383,6 +402,13 @@ export default function RealmDashboardShell({
   }, [config.displayName, config.storageRealmId, resolvedYear]);
 
   function goToFirstIncompleteWeek(weekStart = 1, weekEnd = totalWeeks) {
+    if (previewMode && config.demo) {
+      const continuingCurrentJourney = currentWeek >= weekStart && currentWeek <= weekEnd;
+      const targetWeek = continuingCurrentJourney ? currentWeek : weekStart;
+      const targetLesson = continuingCurrentJourney ? currentLesson : 1;
+      router.push(config.demo.buildLessonHref(resolvedYear, targetWeek, targetLesson));
+      return;
+    }
     for (let week = weekStart; week <= weekEnd; week += 1) {
       if (!completedByWeek[week]) {
         router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${week}&legacy=1&realm_id=${config.storageRealmId}`);

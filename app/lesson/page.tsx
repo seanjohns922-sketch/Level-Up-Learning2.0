@@ -204,6 +204,9 @@ function LessonPage() {
 
   const year = normalizeStudentYearLabel(params.get("year") ?? "Year 1");
   const realmId = params.get("realm_id") ?? "number";
+  if (realmId !== "number" && realmId !== "measurement") {
+    throw new Error(`Unsupported shared lesson realm: ${realmId}`);
+  }
   const week = Number(params.get("week") ?? "1");
   const yearNumber = year === "Prep" ? 0 : parseInt(year.replace(/\D/g, ""), 10) || 1;
   const levelNumber = year === "Prep" ? 1 : yearNumber;

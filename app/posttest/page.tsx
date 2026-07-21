@@ -319,6 +319,9 @@ function PostTestPage() {
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
   const realmId = params.get("realm_id") ?? undefined;
+  if (realmId !== undefined && realmId !== "number" && realmId !== "measurement") {
+    throw new Error(`Unsupported post-test realm: ${realmId}`);
+  }
   const progressRealmId = realmId === "measurement" ? "measurement" : "number";
   // Final week is realm-specific: Measurelands = 8, Number Nexus = 12. Never
   // hardcode 12 for a realm-aware assessment (that leaks a Number assumption).

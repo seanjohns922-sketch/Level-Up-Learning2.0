@@ -11,7 +11,8 @@ const carousel = read("components/realms/RealmCarousel.tsx");
 const availability = read("lib/realm-entry.ts");
 const routes = read("lib/starpath-routes.ts");
 const starpathPage = read("app/starpath/page.tsx");
-const starpathClient = read("app/starpath/StarpathClient.tsx");
+const starpathMap = read("components/world/StarpathMap.tsx");
+const lessonPage = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
 const levelCatalog = read("lib/level-catalog.ts");
 const levelsPage = read("app/levels/page.tsx");
 
@@ -43,21 +44,26 @@ check(
 );
 check(
   "The Starpath world validates realm and selected-level context",
-  starpathClient.includes('searchParams.get("realm_id") !== STARPATH_REALM_ID') &&
-    starpathClient.includes('searchParams.get("level")') &&
-    starpathClient.includes("tryNormalizeStarpathLevel"),
+  starpathPage.includes("realmId !== STARPATH_REALM_ID") &&
+    starpathPage.includes("tryNormalizeStarpathLevel"),
 );
 check(
-  "The Starpath shell cannot load another realm's curriculum",
-  !starpathClient.includes("/number-nexus") &&
-    !starpathClient.includes("/measurelands") &&
-    !starpathClient.includes("restoreStudentStateFromServer"),
+  "Starpath uses the shared shell with isolated space storage",
+  starpathMap.includes("RealmDashboardShell") &&
+    starpathMap.includes('storageRealmId: "space"') &&
+    !starpathMap.includes("restoreStudentStateFromServer"),
 );
 check(
   "The Starpath route checks authorised demo access before rendering its client shell",
   starpathPage.includes("await getServerStarpathAccess()") &&
     starpathPage.includes('redirect("/realms")') &&
-    starpathPage.indexOf("if (!access.allowed)") < starpathPage.indexOf("<StarpathClient />"),
+    starpathPage.indexOf("if (!access.allowed)") < starpathPage.indexOf("<StarpathMap"),
+);
+check(
+  "Starpath lessons are demo guarded and fail closed on realm identity",
+  lessonPage.includes("await getServerStarpathAccess()") &&
+    lessonPage.includes("realmId !== STARPATH_REALM_ID") &&
+    lessonPage.includes("notFound()"),
 );
 check(
   "Unknown level routes do not fall back to Number Nexus",

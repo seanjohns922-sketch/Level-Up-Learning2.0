@@ -12,6 +12,7 @@ const canonicalNav = read("components/realms/dashboard/RealmSideNavigation.tsx")
 const canonicalShell = read("components/realms/dashboard/RealmDashboardShell.tsx");
 const numberMap = read("components/world/NumberNexusMap.tsx");
 const measurelandsMap = read("components/world/MeasurelandsMap.tsx");
+const starpathMap = read("components/world/StarpathMap.tsx");
 
 const results = [];
 const check = (label, ok) => results.push({ label, ok });
@@ -45,8 +46,12 @@ check(
   "Measurelands uses the canonical shared realm HUD",
   measurelandsMap.includes("<RealmDashboardShell") && canonicalShell.includes("<RealmSideNavigation"),
 );
+check(
+  "Starpath uses the canonical shared realm HUD",
+  starpathMap.includes("<RealmDashboardShell") && canonicalShell.includes("<RealmSideNavigation"),
+);
 
-for (const [label, source] of [["Number Nexus", numberMap], ["Measurelands", measurelandsMap]]) {
+for (const [label, source] of [["Number Nexus", numberMap], ["Measurelands", measurelandsMap], ["Starpath", starpathMap]]) {
   check(
     `${label} no longer exposes standalone Legends, Worlds, or Progress HUD routes`,
     !source.includes('label: "LEGENDS"') &&

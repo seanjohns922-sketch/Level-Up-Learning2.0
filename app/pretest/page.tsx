@@ -355,6 +355,9 @@ function PretestPage() {
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
   const realmId = searchParams.get("realm_id") ?? "number";
+  if (realmId !== "number" && realmId !== "measurement") {
+    throw new Error(`Unsupported pre-test realm: ${realmId}`);
+  }
   const progressRealmId = realmId === "measurement" ? "measurement" : "number";
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);

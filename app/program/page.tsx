@@ -44,6 +44,9 @@ function ProgramPage() {
 
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 1");
   const realmId = sp.get("realm_id") ?? "number";
+  if (realmId !== "number" && realmId !== "measurement") {
+    throw new Error(`Unsupported program realm: ${realmId}`);
+  }
   const weekNum = Number(sp.get("week") ?? "1");
   const week = String(weekNum);
   const program = useMemo(

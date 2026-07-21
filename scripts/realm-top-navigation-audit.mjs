@@ -9,14 +9,14 @@ const navigation = read("components/realms/dashboard/RealmTopNavigation.tsx");
 const selector = read("components/realms/dashboard/RealmLevelSelector.tsx");
 const shell = read("components/realms/dashboard/RealmDashboardShell.tsx");
 const number = read("components/world/NumberNexusMap.tsx");
-const starpath = read("app/starpath/StarpathClient.tsx");
+const starpath = read("components/world/StarpathMap.tsx");
 const levels = read("components/realms/LevelsDrawer.tsx");
-const starpathLevels = read("components/realms/StarpathLevelsDrawer.tsx");
 const demoBanner = read("components/demo/DemoPreviewBanner.tsx");
 
-for (const source of [shell, number, starpath]) {
+for (const source of [shell, number]) {
   assert.match(source, /<RealmTopNavigation/, "Realm must use the canonical top navigation");
 }
+assert.match(starpath, /<RealmDashboardShell/, "Starpath must inherit the canonical top navigation through the shared shell");
 
 for (const required of ["levelSelector", "Global XP", "progressLabel", "DemoModeNavigationControls", "Open student profile"]) {
   assert.match(navigation, new RegExp(required), `Top navigation is missing ${required}`);
@@ -34,8 +34,8 @@ assert.match(selector, /setOpen\(false\);[\s\S]*onSelect/);
 assert.match(levels, /enterReviewMode/);
 assert.match(levels, /exitReviewMode/);
 assert.match(levels, /state: !unlocked \? "locked"/);
-assert.match(starpathLevels, /STARPATH_LEVELS\.map/);
-assert.doesNotMatch(starpathLevels, /levelNumber <= 2/);
+assert.match(starpath, /districtModeLevels: \["Year 3", "Year 4", "Year 5", "Year 6"\]/);
+assert.ok(!fs.existsSync(path.join(root, "components/realms/StarpathLevelsDrawer.tsx")));
 
 assert.match(demoBanner, /usesRealmNavigation/);
 assert.doesNotMatch(starpath, /Demo · Preview/);

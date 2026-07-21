@@ -30,16 +30,18 @@ const hrefs = [
   routes.buildStarpathPostTestHref(context),
 ];
 
-for (const href of hrefs) {
+for (const [index, href] of hrefs.entries()) {
   const url = new URL(href, "https://starpath.test");
-  assert.equal(url.pathname, routes.STARPATH_WORLD_ROUTE);
+  assert.equal(url.pathname, index === 5 ? "/starpath/lesson/level-3/4/2" : routes.STARPATH_WORLD_ROUTE);
   assert.equal(url.searchParams.get("realm_id"), routes.STARPATH_REALM_ID);
-  assert.equal(url.searchParams.get("level"), "level-3");
-  assert.equal(url.searchParams.get("placement_level"), "level-2");
+  if (index !== 5) {
+    assert.equal(url.searchParams.get("level"), "level-3");
+    assert.equal(url.searchParams.get("placement_level"), "level-2");
+  }
   assert.equal(href.includes("number-nexus"), false);
   assert.equal(href.includes("measurelands"), false);
 }
-assert.equal(new URL(hrefs[5], "https://starpath.test").searchParams.get("lesson"), "2");
+assert.equal(new URL(hrefs[5], "https://starpath.test").searchParams.get("demo"), "1");
 assert.equal(new URL(hrefs[6], "https://starpath.test").searchParams.get("week"), "4");
 assert.throws(() => levels.normalizeStarpathLevel("Level 8"), /Unsupported Starpath level/);
 
