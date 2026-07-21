@@ -776,11 +776,13 @@ function ProgramPage() {
                   aria-haspopup="listbox"
                   aria-expanded={weekMenuOpen}
                   className={`relative flex min-w-[170px] items-center justify-between gap-3 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
-                    isMeasurementRealm
+                    isStarpathRealm
+                      ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
+                      : isMeasurementRealm
                       ? "text-yellow-100/85 hover:bg-yellow-950/30"
                       : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                   }`}
-                  style={isMeasurementRealm ? {
+                  style={isStarpathRealm ? starpathNavPillStyle : isMeasurementRealm ? {
                     borderRadius: 999,
                     border: "1px solid rgba(200,160,48,0.32)",
                     background: "rgba(22,14,4,0.65)",
