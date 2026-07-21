@@ -135,6 +135,13 @@ export default function RealmCarousel() {
     ? getStarpathLevel(selectedStarpathLevel).levelNumber
     : Number(displayedLevel.replace(/[^0-9]/g, "")) || 1;
 
+  function requestStarpathPreviewAccess() {
+    const returnTo = selectedStarpathLevel
+      ? buildStarpathWorldHref({ selectedLevel: selectedStarpathLevel })
+      : "/realms";
+    router.push(`/login?demo=1&returnTo=${encodeURIComponent(returnTo)}`);
+  }
+
   async function enterRealm() {
     if (!isActive || enteringRealm) return;
     const availability = getRealmAvailability(current.id);
@@ -310,10 +317,10 @@ export default function RealmCarousel() {
 
             {/* CENTER PORTAL — the focused realm */}
             <div
-              className={`absolute left-1/2 top-1/2 ${isActive ? "cursor-pointer" : ""}`}
-              onClick={enterRealm}
-              role={isActive ? "button" : undefined}
-              aria-label={isActive ? `Enter ${current.name}` : undefined}
+              className={`absolute left-1/2 top-1/2 ${isActive || isStarpathRealm ? "cursor-pointer" : ""}`}
+              onClick={isStarpathRealm && !isActive ? requestStarpathPreviewAccess : enterRealm}
+              role={isActive || isStarpathRealm ? "button" : undefined}
+              aria-label={isStarpathRealm && !isActive ? "Request Starpath demo access" : isActive ? `Enter ${current.name}` : undefined}
               style={{
                 transform: "translate(-50%, -52%)",
                 width: "220px",
@@ -462,12 +469,19 @@ export default function RealmCarousel() {
                 {enteringRealm === current.id ? "Loading..." : isPreviewRealm || isStarpathRealm ? "Preview Realm" : "Enter Realm"}
               </button>
             ) : isStarpathRealm ? (
-              <span className="inline-flex items-center gap-2 rounded-2xl border border-indigo-300/30 bg-indigo-400/10 px-6 py-2.5 text-sm font-bold text-indigo-100/80">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  requestStarpathPreviewAccess();
+                }}
+                className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-indigo-300/45 bg-indigo-400/15 px-6 py-2.5 text-sm font-bold text-indigo-50 transition hover:scale-105 hover:bg-indigo-400/25 active:scale-95"
+              >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" />
                 </svg>
                 Preview Realm
-              </span>
+              </button>
             ) : current.comingSoon ? (
               <span className="inline-block px-6 py-2.5 rounded-2xl text-sm font-bold text-amber-300/80 border border-amber-400/30" style={{ background: "rgba(251,191,36,0.1)" }}>
                 Coming Soon

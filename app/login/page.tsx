@@ -11,6 +11,8 @@ import { resolveStudentNameParts } from "@/lib/studentName";
 import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { activateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
 import { buildDefaultStudentProgress, resolveStudentDestination } from "@/lib/student-destination";
+import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
+import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
 type StudentRecord = {
@@ -163,6 +165,7 @@ export default function LoginPage() {
   const [demoError, setDemoError] = useState<string | null>(null);
   const [demoDebug, setDemoDebug] = useState<DemoAccessDebug | null>(null);
   const [demoSubmitting, setDemoSubmitting] = useState(false);
+  const demoQueryHandledRef = useRef(false);
 
   const createdClass = createdCode ? classes[createdCode] : null;
   const classList = useMemo(() => Object.values(classes), [classes]);
@@ -172,6 +175,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     console.log("[DemoAccess] demo enabled:", demoAccessEnabled);
+  }, [demoAccessEnabled]);
+
+  useEffect(() => {
+    if (!demoAccessEnabled || demoQueryHandledRef.current || typeof window === "undefined") return;
+    demoQueryHandledRef.current = true;
+    if (new URLSearchParams(window.location.search).get("demo") === "1") {
+      queueMicrotask(() => setShowDemoModal(true));
+    }
   }, [demoAccessEnabled]);
 
   useEffect(() => {
@@ -560,7 +571,23 @@ export default function LoginPage() {
       });
       setShowDemoModal(false);
       setDemoCode("");
-      router.push("/realms");
+      const search = new URLSearchParams(window.location.search);
+      const requestedReturn = search.get("returnTo");
+      let demoDestination = "/realms";
+      if (requestedReturn?.startsWith("/") && !requestedReturn.startsWith("//")) {
+        const candidate = new URL(requestedReturn, window.location.origin);
+        const selectedLevel = tryNormalizeStarpathLevel(candidate.searchParams.get("level"));
+        if (
+          candidate.origin === window.location.origin &&
+          candidate.pathname === "/starpath" &&
+          candidate.searchParams.get("realm_id") === STARPATH_REALM_ID &&
+          candidate.searchParams.get("destination") === "world" &&
+          selectedLevel
+        ) {
+          demoDestination = buildStarpathWorldHref({ selectedLevel });
+        }
+      }
+      router.push(demoDestination);
     } catch {
       setDemoError("Demo access could not be activated.");
     } finally {

@@ -17,6 +17,7 @@ const loadTypeScriptModule = async (source) => {
 
 const access = await loadTypeScriptModule(read("lib/starpath-access.ts"));
 const carousel = read("components/realms/RealmCarousel.tsx");
+const login = read("app/login/page.tsx");
 const serverPage = read("app/starpath/page.tsx");
 const clientPage = read("app/starpath/StarpathClient.tsx");
 const demoRoute = read("app/api/demo-access/route.ts");
@@ -45,6 +46,9 @@ assert.match(carousel, /const realms = ALL_REALMS/);
 assert.match(carousel, /isStarpathRealm \? \(/);
 assert.match(carousel, /Preview Realm/);
 assert.match(carousel, /Demo access only/);
+assert.match(carousel, /requestStarpathPreviewAccess/);
+assert.match(carousel, /\/login\?demo=1&returnTo=/);
+assert.match(carousel, /<button[\s\S]*Preview Realm/);
 assert.match(carousel, /const isStarpathPreview = isStarpathRealm && starpathAccess\.allowed/);
 assert.match(carousel, /Demo · Preview/);
 assert.match(carousel, /buildStarpathWorldHref\(\{ selectedLevel: selectedStarpathLevel \}\)/);
@@ -53,6 +57,10 @@ assert.match(serverPage, /redirect\("\/realms"\)/);
 assert.ok(serverPage.indexOf("if (!access.allowed)") < serverPage.indexOf("<StarpathClient />"));
 assert.match(clientPage, /Demo progress is not saved\./);
 assert.match(clientPage, /Demo · Preview/);
+assert.match(login, /new URLSearchParams\(window\.location\.search\)\.get\("demo"\) === "1"/);
+assert.match(login, /candidate\.pathname === "\/starpath"/);
+assert.match(login, /candidate\.searchParams\.get\("realm_id"\) === STARPATH_REALM_ID/);
+assert.match(login, /router\.push\(demoDestination\)/);
 
 assert.match(demoRoute, /response\.cookies\.set\(DEMO_SESSION_COOKIE, createDemoSessionToken\(\)/);
 assert.match(demoRoute, /export async function GET\(\)/);
@@ -77,4 +85,4 @@ assert.equal(url.searchParams.get("destination"), "world");
 assert.equal(href.includes("number-nexus"), false);
 assert.equal(href.includes("measurelands"), false);
 
-console.log("Starpath demo access audit passed: card visible as a locked preview, authorised entry only, server guarded, and non-persistent.");
+console.log("Starpath demo access audit passed: preview is clickable, code-authorised, safely returned to Starpath, server guarded, and non-persistent.");
