@@ -15,6 +15,8 @@
     "qa:student-session-isolation": "node scripts/student-session-isolation-audit.mjs",
     "qa:realm-availability": "node scripts/realm-availability-audit.mjs",
     "qa:realm-dashboard-navigation": "node scripts/realm-dashboard-navigation-audit.mjs",
+    "qa:realm-dashboard-framework": "node scripts/realm-dashboard-framework-audit.mjs",
+    "qa:measurelands-dashboard-phase3": "node scripts/measurelands-dashboard-phase3-audit.mjs",
     "qa:my-home-shell": "node scripts/my-home-shell-audit.mjs",
     "qa:global-xp": "node scripts/global-xp-foundation-audit.mjs",
     "qa:completion-rewards": "node scripts/completion-reward-integrity-audit.mjs",

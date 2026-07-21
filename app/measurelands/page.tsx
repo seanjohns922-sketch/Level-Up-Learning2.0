@@ -9,52 +9,14 @@ import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/student
 import { resolveRealmEntryRoute } from "@/lib/realm-entry";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { consumeRestoredRealmEntry } from "@/lib/realm-entry-handoff";
-
-function MeasurelandsLoading() {
-  return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        background: "#07121a",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 16,
-      }}
-    >
-      <div
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: "50%",
-          border: "2px solid rgba(125,211,252,0.15)",
-          borderTopColor: "#22d3ee",
-          animation: "spin 0.9s linear infinite",
-        }}
-      />
-      <p
-        style={{
-          color: "rgba(186,230,253,0.7)",
-          fontSize: 11,
-          fontFamily: "ui-monospace,monospace",
-          letterSpacing: "0.2em",
-          fontWeight: 700,
-        }}
-      >
-        INITIALISING MEASURELANDS…
-      </p>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
-}
+import { RealmDashboardError, RealmDashboardLoading } from "@/components/realms/dashboard";
+import { MEASURELANDS_DASHBOARD_CONFIG } from "@/components/world/MeasurelandsMap";
 
 const MeasurelandsMap = dynamic(
   () => import("@/components/world/MeasurelandsMap"),
   {
     ssr: false,
-    loading: () => <MeasurelandsLoading />,
+    loading: () => <RealmDashboardLoading config={MEASURELANDS_DASHBOARD_CONFIG} />,
   }
 );
 
@@ -143,24 +105,19 @@ export default function MeasurelandsPage() {
     };
   }, [entryAttempt, previewMode, router]);
 
-  if (entryState === "loading") return <MeasurelandsLoading />;
+  if (entryState === "loading") return <RealmDashboardLoading config={MEASURELANDS_DASHBOARD_CONFIG} />;
 
   if (entryState === "error") {
     return (
-      <main className="min-h-screen bg-[#07121a] flex flex-col items-center justify-center gap-5 px-6 text-center">
-        <p className="text-base font-bold text-red-200">{entryError}</p>
-        <button
-          type="button"
-          onClick={() => {
-            setEntryError(null);
-            setEntryState("loading");
-            setEntryAttempt((attempt) => attempt + 1);
-          }}
-          className="rounded-lg bg-cyan-500 px-5 py-3 font-bold text-slate-950"
-        >
-          Try Again
-        </button>
-      </main>
+      <RealmDashboardError
+        config={MEASURELANDS_DASHBOARD_CONFIG}
+        message={entryError ?? "We could not load this realm."}
+        onRetry={() => {
+          setEntryError(null);
+          setEntryState("loading");
+          setEntryAttempt((attempt) => attempt + 1);
+        }}
+      />
     );
   }
 

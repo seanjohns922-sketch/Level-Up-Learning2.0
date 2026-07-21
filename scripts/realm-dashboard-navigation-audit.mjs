@@ -8,6 +8,8 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const read = (file) => fs.readFileSync(path.join(repoRoot, file), "utf8");
 
 const sharedNav = read("components/world/RealmDashboardNav.tsx");
+const canonicalNav = read("components/realms/dashboard/RealmSideNavigation.tsx");
+const canonicalShell = read("components/realms/dashboard/RealmDashboardShell.tsx");
 const numberMap = read("components/world/NumberNexusMap.tsx");
 const measurelandsMap = read("components/world/MeasurelandsMap.tsx");
 
@@ -16,29 +18,35 @@ const check = (label, ok) => results.push({ label, ok });
 
 check(
   "Shared realm HUD exposes exactly My Home and Tower",
-  sharedNav.includes('label: "MY HOME"') &&
-    sharedNav.includes('route: "/home-base"') &&
-    sharedNav.includes('label: "TOWER"') &&
-    sharedNav.includes('route: "/realms"') &&
-    (sharedNav.match(/route:/g) ?? []).length === 2,
+  [sharedNav, canonicalNav].every((source) =>
+    source.includes('label: "MY HOME"') &&
+      source.includes('route: "/home-base"') &&
+      source.includes('label: "TOWER"') &&
+      source.includes('route: "/realms"') &&
+      (source.match(/route:/g) ?? []).length === 2
+  ),
 );
 
 check(
   "Shared realm HUD has accessible destination names",
-  sharedNav.includes('aria-label={accessibleLabel}') &&
-    sharedNav.includes('title={accessibleLabel}') &&
-    sharedNav.includes("Return to the Tower of Knowledge"),
+  [sharedNav, canonicalNav].every((source) =>
+    source.includes('aria-label={accessibleLabel}') &&
+      source.includes('title={accessibleLabel}') &&
+      source.includes("Return to the Tower of Knowledge")
+  ),
 );
 
-for (const [label, source] of [
-  ["Number Nexus", numberMap],
-  ["Measurelands", measurelandsMap],
-]) {
-  check(
-    `${label} uses the shared realm HUD`,
-    source.includes('import RealmDashboardNav from "@/components/world/RealmDashboardNav"') &&
-      source.includes("<RealmDashboardNav"),
-  );
+check(
+  "Number Nexus uses the shared realm HUD",
+  numberMap.includes('import RealmDashboardNav from "@/components/world/RealmDashboardNav"') &&
+    numberMap.includes("<RealmDashboardNav"),
+);
+check(
+  "Measurelands uses the canonical shared realm HUD",
+  measurelandsMap.includes("<RealmDashboardShell") && canonicalShell.includes("<RealmSideNavigation"),
+);
+
+for (const [label, source] of [["Number Nexus", numberMap], ["Measurelands", measurelandsMap]]) {
   check(
     `${label} no longer exposes standalone Legends, Worlds, or Progress HUD routes`,
     !source.includes('label: "LEGENDS"') &&

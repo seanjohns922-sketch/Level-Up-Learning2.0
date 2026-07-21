@@ -1,13 +1,18 @@
-// Pure program-length logic with ZERO app imports, so it is safe to import from
-// standalone scripts (tsx) as well as the app. Program length is realm-specific:
-// Number Nexus runs 12 weeks, Measurelands 8. Resolve the final week from the
-// active realm — never infer 12 for Measurelands.
+import { getRealmDefinition, REALM_REGISTRY } from "./realms/realm-registry";
 
-export const NUMBER_PROGRAM_WEEK_COUNT = 12;
-export const MEASURELANDS_PROGRAM_WEEK_COUNT = 8;
+export const NUMBER_PROGRAM_WEEK_COUNT = REALM_REGISTRY.number.totalWeeks;
+export const MEASURELANDS_PROGRAM_WEEK_COUNT = REALM_REGISTRY.measurement.totalWeeks;
+export const STARPATH_PROGRAM_WEEK_COUNT = REALM_REGISTRY.space.totalWeeks;
 
 export function getProgramWeekCount(realmId?: string | null): number {
-  return realmId === "measurement" ? MEASURELANDS_PROGRAM_WEEK_COUNT : NUMBER_PROGRAM_WEEK_COUNT;
+  // Missing realm_id remains the legacy Number Nexus route contract. Any
+  // supplied value must resolve explicitly and can never fall back to Number.
+  if (realmId == null || realmId.trim() === "") return NUMBER_PROGRAM_WEEK_COUNT;
+  const realm = getRealmDefinition(realmId);
+  if (realm.totalWeeks == null) {
+    throw new Error(`${realm.name} does not have a configured program length`);
+  }
+  return realm.totalWeeks;
 }
 
 export function getProgramWeeks(realmId?: string | null): number[] {

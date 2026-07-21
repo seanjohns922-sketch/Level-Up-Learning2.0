@@ -347,8 +347,8 @@ function ResultsPage() {
   const isFailedPretest = !isPostTest && !passedByPretest;
   const requiresFullPathway = isFailedPretest && scorePercent < 50;
   const diagnosticRequiredWeeks = useMemo(
-    () => (!isPostTest ? normalizeWeekList(storedPretestProfile?.recommendedWeeks) : []),
-    [isPostTest, storedPretestProfile]
+    () => (!isPostTest ? normalizeWeekList(storedPretestProfile?.recommendedWeeks, progressRealmId) : []),
+    [isPostTest, progressRealmId, storedPretestProfile]
   );
   // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
   const allProgramWeeks = useMemo(() => getProgramWeeks(progressRealmId), [progressRealmId]);

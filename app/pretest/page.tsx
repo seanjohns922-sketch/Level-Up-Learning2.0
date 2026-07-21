@@ -559,7 +559,7 @@ function PretestPage() {
     const prevUnlocked = prev?.unlockedLegends ?? [];
     const nextYear = getNextYearLabel(year);
     const passed = profile.percentage >= PRETEST_PASS_THRESHOLD;
-    const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks);
+    const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks, progressRealmId);
     const requiresFullPathway = !passed && profile.percentage < 50;
     // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
     const allProgramWeeks = getProgramWeeks(progressRealmId);
