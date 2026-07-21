@@ -17,18 +17,9 @@ import {
   type StarpathLevelDefinition,
   type StarpathLevelId,
 } from "@/lib/starpath-levels";
-import { buildStarpathLessonHref, buildStarpathWorldHref } from "@/lib/starpath-routes";
+import { buildStarpathProgramHref, buildStarpathWorldHref } from "@/lib/starpath-routes";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
-
-const BACKGROUNDS: Record<RealmLevelId, string> = {
-  Prep: "/images/starpath-home-bg-ground.png",
-  "Year 1": "/images/starpath-home-bg-y1.png",
-  "Year 2": "/images/starpath-home-bg-y2.png",
-  "Year 3": "/images/starpath-home-bg-y3.png",
-  "Year 4": "/images/starpath-home-bg-y4.png",
-  "Year 5": "/images/starpath-home-bg-y5.png",
-  "Year 6": "/images/starpath-home-bg-y6.png",
-};
+import { getStarpathBackground } from "@/lib/starpath-visuals";
 
 const DISTRICT_NAMES: Record<RealmLevelId, readonly [string, string, string, string]> = {
   Prep: ["Shape Sector", "Position Passage", "Adventure Orbit", "Graduation Galaxy"],
@@ -77,7 +68,7 @@ function getStarpathDistricts(level: RealmLevelId): readonly RealmDashboardDistr
 function getStarpathWorld(level: RealmLevelId): RealmDashboardWorld {
   const definition = definitionForYear(level);
   return {
-    bgImage: BACKGROUNDS[level],
+    bgImage: getStarpathBackground(level),
     levelLabel: definition.displayLabel.toUpperCase(),
     zones: getStarpathDistricts(level),
   };
@@ -152,8 +143,8 @@ export const STARPATH_DASHBOARD_CONFIG = {
     unlockAllDistricts: true,
     readJourney: readStarpathDemoJourney,
     buildLevelHref: (level: RealmLevelId) => buildStarpathWorldHref({ selectedLevel: starpathLevelId(level) }),
-    buildLessonHref: (level: RealmLevelId, week: number, lesson: number) =>
-      buildStarpathLessonHref({ selectedLevel: starpathLevelId(level) }, week, lesson),
+    buildLessonHref: (level: RealmLevelId, week: number) =>
+      buildStarpathProgramHref({ selectedLevel: starpathLevelId(level) }, week),
   },
 } satisfies CanonicalRealmDashboardConfig;
 

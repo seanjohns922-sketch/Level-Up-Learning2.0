@@ -14,7 +14,13 @@ const loadTypeScriptModule = async (source) => {
 };
 
 const levels = await loadTypeScriptModule(read("lib/starpath-levels.ts"));
-const routes = await loadTypeScriptModule(read("lib/starpath-routes.ts"));
+const routeSource = read("lib/starpath-routes.ts")
+  .replace(/import \{ getStarpathLevel, type StarpathLevelId \} from "@\/lib\/starpath-levels";\n/, "")
+  .replace(
+    "export const STARPATH_CAROUSEL_ID",
+    'const getStarpathLevel = (level) => ({ yearLabel: level === "ground" ? "Prep" : `Year ${level.slice(-1)}` });\nexport const STARPATH_CAROUSEL_ID',
+  );
+const routes = await loadTypeScriptModule(routeSource);
 const context = {
   selectedLevel: levels.normalizeStarpathLevel("Year 3"),
   placementLevel: levels.normalizeStarpathLevel("Level 2"),
@@ -32,9 +38,16 @@ const hrefs = [
 
 for (const [index, href] of hrefs.entries()) {
   const url = new URL(href, "https://starpath.test");
-  assert.equal(url.pathname, index === 5 ? "/starpath/lesson/level-3/4/2" : routes.STARPATH_WORLD_ROUTE);
+  const expectedPath = index === 4
+    ? "/program"
+    : index === 5
+      ? "/starpath/lesson/level-3/4/2"
+      : index === 6
+        ? "/starpath/quiz/level-3/4"
+        : routes.STARPATH_WORLD_ROUTE;
+  assert.equal(url.pathname, expectedPath);
   assert.equal(url.searchParams.get("realm_id"), routes.STARPATH_REALM_ID);
-  if (index !== 5) {
+  if (index !== 5 && index !== 6) {
     assert.equal(url.searchParams.get("level"), "level-3");
     assert.equal(url.searchParams.get("placement_level"), "level-2");
   }
@@ -42,7 +55,8 @@ for (const [index, href] of hrefs.entries()) {
   assert.equal(href.includes("measurelands"), false);
 }
 assert.equal(new URL(hrefs[5], "https://starpath.test").searchParams.get("demo"), "1");
-assert.equal(new URL(hrefs[6], "https://starpath.test").searchParams.get("week"), "4");
+assert.equal(new URL(hrefs[6], "https://starpath.test").searchParams.get("demo"), "1");
+assert.equal(new URL(hrefs[4], "https://starpath.test").searchParams.get("week"), "1");
 assert.throws(() => levels.normalizeStarpathLevel("Level 8"), /Unsupported Starpath level/);
 
 console.log("Starpath route audit passed: selected and placement levels survive every destination.");

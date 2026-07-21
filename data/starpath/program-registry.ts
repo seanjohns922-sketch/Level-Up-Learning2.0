@@ -3,7 +3,7 @@ import type { StarpathLevelId } from "@/lib/starpath-levels";
 export const STARPATH_PROGRAM_STATUS = "planned" as const;
 export const STARPATH_WEEK_COUNT = 8 as const;
 export const STARPATH_LESSONS_PER_WEEK = 3 as const;
-export const STARPATH_QUIZ_WEEKS = [1, 2, 3, 4, 5, 6, 7] as const;
+export const STARPATH_QUIZ_WEEKS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 export const STARPATH_ASSESSMENT_QUESTION_COUNT = 20 as const;
 export const STARPATH_QUIZ_QUESTIONS_PER_LESSON = 5 as const;
 
@@ -297,12 +297,12 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
       vocabulary: week.vocabulary,
       skillIds: [week.skill.id],
       misconceptions: week.misconceptions,
-      quiz: weekNumber <= 7 ? {
+      quiz: {
         id: `${definition.prefix}-space-w${weekNumber}-quiz`,
         coverage: week.quiz,
         questionCount: STARPATH_QUIZ_QUESTIONS_PER_LESSON * STARPATH_LESSONS_PER_WEEK as 15,
         status: STARPATH_PROGRAM_STATUS,
-      } : null,
+      },
       status: STARPATH_PROGRAM_STATUS,
     };
   });

@@ -23,7 +23,7 @@ export function renderStarpathCurriculumMap() {
     "",
     "> Status: Planned for teacher review. This registry contains no playable lessons, quiz banks or assessment banks.",
     "",
-    "Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Weeks 1-7 have a 15-question weekly quiz (5 questions per lesson); Week 8 has no quiz and unlocks the 20-question post-test after Lesson 3. Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test.",
+    "Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Every week has a 15-question weekly quiz (5 questions per lesson). Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test, and post-test metadata remains planned for the later assessment phase.",
     "",
     "## Pathway Rules",
     "",

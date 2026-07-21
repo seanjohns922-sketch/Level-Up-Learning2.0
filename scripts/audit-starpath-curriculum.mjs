@@ -52,8 +52,8 @@ for (const program of registry.STARPATH_PROGRAMS) {
   for (const week of program.weeks) {
     assert.equal(week.lessons.length, 3);
     assert.deepEqual(week.lessons.map((lesson) => lesson.sequenceRole), ["build", "develop", "apply"]);
-    assert.equal(week.quiz === null, week.week === 8);
-    if (week.quiz) assert.equal(week.quiz.questionCount, 15);
+    assert.ok(week.quiz, `${program.level} week ${week.week} must have a weekly quiz`);
+    assert.equal(week.quiz.questionCount, 15);
     for (const lesson of week.lessons) {
       assert.equal(lesson.activityMechanics.length, 3, `${lesson.id} must plan exactly three activities`);
       assert.match(lesson.id, /^(ground|y[1-6])-space-w[1-8]-l[1-3]$/);
@@ -95,4 +95,4 @@ for (const file of ["lib/program-progress.ts", "lib/program-weeks.ts", "lib/asse
   assert.equal(source.includes("STARPATH_PROGRAMS"), false, `${file} must not consume Starpath until it explicitly supports space`);
 }
 
-console.log("Starpath curriculum audit passed: 7 levels, 56 weeks, 168 planned lessons, 49 quizzes, 56 skills, and isolated 8-week access rules.");
+console.log("Starpath curriculum audit passed: 7 levels, 56 weeks, 168 planned lessons, 56 quizzes, 56 skills, and isolated 8-week access rules.");

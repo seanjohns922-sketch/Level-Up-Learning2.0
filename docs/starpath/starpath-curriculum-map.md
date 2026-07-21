@@ -2,7 +2,7 @@
 
 > Status: Planned for teacher review. This registry contains no playable lessons, quiz banks or assessment banks.
 
-Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Weeks 1-7 have a 15-question weekly quiz (5 questions per lesson); Week 8 has no quiz and unlocks the 20-question post-test after Lesson 3. Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test.
+Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Every week has a 15-question weekly quiz (5 questions per lesson). Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test, and post-test metadata remains planned for the later assessment phase.
 
 ## Pathway Rules
 
@@ -229,7 +229,7 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 - Only one type of shape or position clue can appear in a mission.
 - A successful answer does not need a reason or description.
 
-**Weekly quiz:** none. Week 8 Lesson 3 unlocks `ground-space-post-01`.
+**Weekly quiz:** `ground-space-w8-quiz` - Cumulative Ground Level learning; completion is planned to unlock the Ground Level Starpath Graduate title. (15 questions; planned)
 
 ## Starpath Level 1: Shape Makers and Pathfinders
 
@@ -445,7 +445,7 @@ Students compare and classify familiar shapes and objects, then give and follow 
 - The shortest-looking route always works.
 - Different valid routes cannot share a destination.
 
-**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y1-space-post-01`.
+**Weekly quiz:** `y1-space-w8-quiz` - Cumulative shape classification and route reasoning. (15 questions; planned)
 
 ## Starpath Level 2: Shape Systems and Map Missions
 
@@ -661,7 +661,7 @@ Students classify regular and irregular shapes and objects, use two-dimensional 
 - Shape clues and map clues are unrelated.
 - Only one pathway can solve a spatial task.
 
-**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y2-space-post-01`.
+**Weekly quiz:** `y2-space-w8-quiz` - Cumulative classification, maps, locations and pathway reasoning. (15 questions; planned)
 
 ## Starpath Level 3: Object Design and Mapmaking
 
@@ -877,7 +877,7 @@ Students compare and classify objects for purpose and interpret and create two-d
 - Object design and map design can be considered separately.
 - One representation communicates every purpose equally well.
 
-**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y3-space-post-01`.
+**Weekly quiz:** `y3-space-w8-quiz` - Cumulative object, view, map and design reasoning. (15 questions; planned)
 
 ## Starpath Level 4: Composite Worlds and Symmetry Systems
 
@@ -1094,7 +1094,7 @@ Students represent composite shapes and objects, create and interpret grid refer
 - Meeting one constraint compensates for missing another.
 - Visual balance always proves mathematical symmetry.
 
-**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y4-space-post-01`.
+**Weekly quiz:** `y4-space-w8-quiz` - Cumulative composite, grid and symmetry reasoning. (15 questions; planned)
 
 ## Starpath Level 5: Nets, Coordinates and Transformations
 
@@ -1312,7 +1312,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 - Each representation can be solved independently.
 - A visually plausible design needs no spatial evidence.
 
-**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y5-space-post-01`.
+**Weekly quiz:** `y5-space-w8-quiz` - Cumulative nets, coordinates, transformations and reasoning. (15 questions; planned)
 
 ## Starpath Level 6: Cross-sections, Cartesian Space and Tessellations
 
@@ -1530,4 +1530,4 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 - Each representation can be interpreted independently.
 - A visually plausible solution needs no mathematical evidence.
 
-**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y6-space-post-01`.
+**Weekly quiz:** `y6-space-w8-quiz` - Cumulative spatial visualisation, coordinate and transformation reasoning. (15 questions; planned)

@@ -27,8 +27,14 @@ const placementAdapter = read("lib/starpath-placement-adapter.ts");
 const placementManager = read("components/teacher/PlacementManager.tsx");
 const progressSync = read("lib/student-progress-sync.ts");
 const economy = read("lib/economy.ts");
-const routes = await loadTypeScriptModule(read("lib/starpath-routes.ts"));
 const levels = await loadTypeScriptModule(read("lib/starpath-levels.ts"));
+const routeSource = read("lib/starpath-routes.ts")
+  .replace(/import \{ getStarpathLevel, type StarpathLevelId \} from "@\/lib\/starpath-levels";\n/, "")
+  .replace(
+    "export const STARPATH_CAROUSEL_ID",
+    'const getStarpathLevel = (level) => ({ yearLabel: level === "ground" ? "Prep" : `Year ${level.slice(-1)}` });\nexport const STARPATH_CAROUSEL_ID',
+  );
+const routes = await loadTypeScriptModule(routeSource);
 
 assert.deepEqual(
   access.resolveStarpathAccess({ demoFeatureEnabled: true, authorizedDemoSession: true }),

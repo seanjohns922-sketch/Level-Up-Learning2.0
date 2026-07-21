@@ -122,6 +122,9 @@ export type CanonicalRealmDashboardConfig = {
     buildLevelHref: (level: RealmLevelId) => string;
     buildLessonHref: (level: RealmLevelId, week: number, lesson: number) => string;
   };
+  internalPreview?: {
+    buildLevelHref: (level: RealmLevelId) => string;
+  };
 };
 
 export type RealmDashboardShellProps = {

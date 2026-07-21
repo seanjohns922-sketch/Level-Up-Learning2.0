@@ -331,6 +331,13 @@ export default function RealmDashboardShell({
 
   function selectLevel(targetYear: RealmLevelId) {
     if (targetYear === resolvedYear) return;
+    if (config.internalPreview) {
+      const { review } = buildRealmLevelHref(config.realmId, targetYear, currentYear, previewMode);
+      if (review) enterReviewMode(config.realmId, targetYear);
+      else exitReviewMode();
+      window.location.assign(config.internalPreview.buildLevelHref(targetYear));
+      return;
+    }
     if (previewMode && config.demo) {
       window.location.assign(config.demo.buildLevelHref(targetYear));
       return;

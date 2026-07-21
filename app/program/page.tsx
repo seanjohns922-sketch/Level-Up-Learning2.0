@@ -5,6 +5,7 @@ import { Check, Lock, LockOpen } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
+import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
@@ -24,11 +25,39 @@ import {
 } from "@/lib/program-progress";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
 import { buildLessonRoute, normalizeStudentYearLabel } from "@/lib/lesson-routing";
+import { readStarpathDemoJourney, writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
+import { getStarpathLevelForYear, type StarpathLevelDefinition } from "@/lib/starpath-levels";
+import {
+  buildStarpathProgramHref,
+  buildStarpathWeeklyQuizHref,
+  buildStarpathWorldHref,
+} from "@/lib/starpath-routes";
+import { getStarpathBackground } from "@/lib/starpath-visuals";
+import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
 const PATHWAY_JOURNAL_KEY_PREFIX = "lul:pathway-journal";
+
+function getStarpathWeekProgram(year: string) {
+  const definition = getStarpathLevelForYear(year as StarpathLevelDefinition["yearLabel"]);
+  const starpath = getStarpathProgram(definition.id);
+  return {
+    definition,
+    weeks: starpath.weeks.map((week) => ({
+      week: week.week,
+      topic: week.centralConcept,
+      title: week.title,
+      lessons: week.lessons.map((lesson) => ({
+        title: lesson.title,
+        displayTitle: lesson.title,
+        focus: lesson.focus,
+      })),
+      quiz: week.quiz,
+    })),
+  };
+}
 
 export default function ProgramPageWrapper() {
   return (
@@ -44,14 +73,23 @@ function ProgramPage() {
 
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 1");
   const realmId = sp.get("realm_id") ?? "number";
-  if (realmId !== "number" && realmId !== "measurement") {
+  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space") {
     throw new Error(`Unsupported program realm: ${realmId}`);
   }
+  const isStarpathRealm = realmId === "space";
+  const starpathProgram = useMemo(
+    () => (isStarpathRealm ? getStarpathWeekProgram(year) : null),
+    [isStarpathRealm, year],
+  );
   const weekNum = Number(sp.get("week") ?? "1");
   const week = String(weekNum);
   const program = useMemo(
-    () => (realmId === "measurement" ? getCurriculumPlan(year, "measurement") : getProgramForYear(year)),
-    [realmId, year]
+    () => isStarpathRealm
+      ? starpathProgram?.weeks ?? []
+      : realmId === "measurement"
+        ? getCurriculumPlan(year, "measurement")
+        : getProgramForYear(year),
+    [isStarpathRealm, realmId, starpathProgram, year]
   );
   const curriculumYear = useMemo(() => {
     const selected = program;
@@ -64,9 +102,56 @@ function ProgramPage() {
   const isPrep = curriculumYear === "Prep";
   const lastWeek = Math.max(program.length, 1);
   const isMeasurementRealm = realmId === "measurement";
+  const activityCardVariant: "standard" | "portal-circle" = isStarpathRealm ? "portal-circle" : "standard";
 
   // ── Realm theme ── add a new entry here to support any future realm
-  const rt = isMeasurementRealm ? {
+  const rt = isStarpathRealm ? {
+    rounded: true,
+    scanline: false,
+    cardClip: undefined as string | undefined,
+    bezelClip: undefined as string | undefined,
+    badgeClip: undefined as string | undefined,
+    statusClip: undefined as string | undefined,
+    actionClip: undefined as string | undefined,
+    connClip: undefined as string | undefined,
+    cardActiveBg: "radial-gradient(circle at 50% 18%, rgba(34,211,238,0.24), transparent 34%), linear-gradient(145deg, rgba(24,18,74,0.96), rgba(10,18,54,0.96) 58%, rgba(8,45,68,0.94))",
+    cardCompletedBg: "radial-gradient(circle at 50% 14%, rgba(165,243,252,0.26), transparent 34%), linear-gradient(145deg, #312e81, #155e75)",
+    cardLockedBg: "linear-gradient(145deg, rgba(15,23,42,0.88), rgba(30,27,75,0.82))",
+    bezelActiveBg: "linear-gradient(145deg, rgba(103,232,249,0.72), rgba(139,92,246,0.28) 48%, rgba(34,211,238,0.62))",
+    bezelCompletedBg: "linear-gradient(145deg, rgba(196,181,253,0.72), rgba(34,211,238,0.62))",
+    bezelLockedBg: "linear-gradient(145deg, rgba(148,163,184,0.24), rgba(76,29,149,0.18))",
+    bezelPosttestBg: "linear-gradient(145deg, rgba(253,224,71,0.72), rgba(124,58,237,0.48))",
+    cardActiveShadow: "0 14px 42px rgba(3,7,30,0.62), 0 0 28px rgba(34,211,238,0.22), inset 0 1px 0 rgba(207,250,254,0.2)",
+    cardCompletedShadow: "0 14px 42px rgba(3,7,30,0.58), 0 0 34px rgba(139,92,246,0.28), inset 0 1px 0 rgba(207,250,254,0.28)",
+    cardLockedShadow: "0 8px 26px rgba(3,7,30,0.5)",
+    badgeActiveBg: "linear-gradient(135deg, #4c1d95, #0891b2)",
+    badgeCompletedBg: "linear-gradient(135deg, #6d28d9, #0e7490)",
+    badgeLockedBg: "linear-gradient(135deg, #1e293b, #312e81)",
+    badgePosttestBg: "linear-gradient(135deg, #a16207, #6d28d9)",
+    badgeShadow: "inset 0 1px 0 rgba(207,250,254,0.28), 0 0 12px rgba(34,211,238,0.25)",
+    statusActiveBg: "linear-gradient(135deg, #312e81, #0e7490)",
+    statusCompletedBg: "linear-gradient(135deg, #6d28d9, #0891b2)",
+    statusLockedBg: "linear-gradient(135deg, #1e293b, #312e81)",
+    statusPosttestBg: "linear-gradient(135deg, #a16207, #6d28d9)",
+    statusShadow: "0 0 12px rgba(34,211,238,0.3)",
+    dotClass: "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]",
+    actionActiveBg: "linear-gradient(135deg, #6d28d9, #0891b2 58%, #22d3ee)",
+    actionCompletedBg: "linear-gradient(135deg, #7c3aed, #0e7490)",
+    actionPosttestBg: "linear-gradient(135deg, #a16207, #7c3aed)",
+    actionShadow: "0 0 18px rgba(34,211,238,0.35), 0 6px 16px rgba(3,7,30,0.5), inset 0 1px 0 rgba(207,250,254,0.3)",
+    connActiveBg: "radial-gradient(circle, #67e8f9, #6d28d9 72%)",
+    connCompletedBg: "radial-gradient(circle, #c4b5fd, #0e7490 72%)",
+    connShadow: "0 0 14px rgba(103,232,249,0.55)",
+    xpBg: "linear-gradient(90deg, #7c3aed, #22d3ee 58%, #a5f3fc)",
+    xpGlow: "0 0 14px rgba(34,211,238,0.62)",
+    pillBg: "linear-gradient(135deg, rgba(30,27,75,0.96), rgba(76,29,149,0.92), rgba(8,47,73,0.94))",
+    pillShadow: "inset 0 1px 0 rgba(207,250,254,0.25), 0 0 22px rgba(124,58,237,0.28)",
+    pillDot: "bg-cyan-200 shadow-[0_0_9px_rgba(103,232,249,0.95)]",
+    headingGlow: "drop-shadow-[0_2px_16px_rgba(34,211,238,0.35)]",
+    focusColor: "text-cyan-200",
+    dividerColor: "border-cyan-300/20",
+    xpLabelColor: "text-cyan-100/90",
+  } : isMeasurementRealm ? {
     rounded: true,
     scanline: false,
     // shapes
@@ -174,12 +259,15 @@ function ProgramPage() {
     typeof window !== "undefined" ? readProgramStore() : {}
   );
   const [studentProgress, setStudentProgress] = useState(() =>
-    typeof window !== "undefined" ? readProgress() : null
+    typeof window !== "undefined" && !isStarpathRealm ? readProgress() : null
   );
   const [teacherMode, setTeacherMode] = useState(() =>
     typeof window !== "undefined" ? window.localStorage.getItem(TEACHER_MODE_KEY) === "true" : false
   );
   const [teacherToast, setTeacherToast] = useState("");
+  const [starpathAccess, setStarpathAccess] = useState<"checking" | "allowed" | "denied">(
+    isStarpathRealm ? "checking" : "allowed",
+  );
   const secretTapCountRef = useRef(0);
   const [weekMenuOpen, setWeekMenuOpen] = useState(false);
   const weekMenuRef = useRef<HTMLDivElement | null>(null);
@@ -191,24 +279,52 @@ function ProgramPage() {
 
   const legacyProgramMode = sp.get("legacy") === "1";
   const previewMode = isDemoPreviewMode();
+  const unrestrictedMode = DEMO_MODE || previewMode || teacherMode || isStarpathRealm;
 
   useEffect(() => {
+    if (!isStarpathRealm) return;
+    if (DEMO_MODE) {
+      Promise.resolve().then(() => setStarpathAccess("allowed"));
+      return;
+    }
+
+    let cancelled = false;
+    void fetch("/api/demo-access", { method: "GET", cache: "no-store" })
+      .then((response) => {
+        if (!cancelled) setStarpathAccess(response.ok ? "allowed" : "denied");
+      })
+      .catch(() => {
+        if (!cancelled) setStarpathAccess("denied");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isStarpathRealm]);
+
+  useEffect(() => {
+    if (isStarpathRealm && starpathAccess === "denied") router.replace("/realms");
+  }, [isStarpathRealm, router, starpathAccess]);
+
+  useEffect(() => {
+    if (isStarpathRealm) return;
     const progress = readProgress();
     if (!previewMode && !isPlacementComplete(progress)) {
       router.replace("/home");
     }
-  }, [previewMode, router]);
+  }, [isStarpathRealm, previewMode, router]);
 
   useEffect(() => {
+    if (isStarpathRealm) return;
     const progress = readProgress();
     if (!DEMO_MODE && !previewMode && progress?.year && progress.year !== year) {
       const targetWeek = Math.max(1, Math.min(lastWeek, progress.assignedWeek ?? 1));
       router.replace(`/program?year=${encodeURIComponent(progress.year)}&week=${targetWeek}&legacy=1`);
       return;
     }
-  }, [lastWeek, previewMode, router, year]);
+  }, [isStarpathRealm, lastWeek, previewMode, router, year]);
 
   useEffect(() => {
+    if (isStarpathRealm) return;
     const progress = readProgress();
     if (progress?.status === "ASSIGNED_PROGRAM" && progress.year === year) {
       const nextAssignedWeek = Math.max(1, Math.min(lastWeek, weekNum));
@@ -216,7 +332,16 @@ function ProgramPage() {
         updateProgress({ assignedWeek: nextAssignedWeek });
       }
     }
-  }, [lastWeek, weekNum, year]);
+  }, [isStarpathRealm, lastWeek, weekNum, year]);
+
+  useEffect(() => {
+    if (!isStarpathRealm || !starpathProgram) return;
+    const current = readStarpathDemoJourney(starpathProgram.definition.yearLabel as RealmLevelId);
+    writeStarpathDemoJourney(starpathProgram.definition.yearLabel as RealmLevelId, {
+      ...current,
+      currentWeek: weekNum,
+    });
+  }, [isStarpathRealm, starpathProgram, weekNum]);
 
   useEffect(() => {
     if (!weekMenuOpen) return;
@@ -245,11 +370,11 @@ function ProgramPage() {
   useEffect(() => {
     function onFocus() {
       setStore(readProgramStore());
-      setStudentProgress(readProgress());
+      setStudentProgress(isStarpathRealm ? null : readProgress());
     }
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
-  }, []);
+  }, [isStarpathRealm]);
 
   const assignedProgram =
     studentProgress?.status === "ASSIGNED_PROGRAM" && studentProgress.year === curriculumYear
@@ -295,17 +420,17 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    DEMO_MODE || previewMode || teacherMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekComplete(prevProgress);
+    unrestrictedMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekComplete(prevProgress);
 
   const lastAllowedWeek = useMemo(() => {
-    if (DEMO_MODE || previewMode || teacherMode || hasAssignedWeekAccess) return lastWeek;
+    if (unrestrictedMode || hasAssignedWeekAccess) return lastWeek;
     let allowed = 1;
     for (let w = 2; w <= lastWeek; w++) {
       if (isWeekComplete(getWeekProgress(store, year, w - 1, realmId))) allowed = w;
       else break;
     }
     return allowed;
-  }, [hasAssignedWeekAccess, lastWeek, previewMode, realmId, store, teacherMode, year]);
+  }, [hasAssignedWeekAccess, lastWeek, realmId, store, unrestrictedMode, year]);
 
   const progress = getWeekProgress(store, year, week, realmId);
   const pathwayChipBase = isMeasurementRealm
@@ -318,28 +443,34 @@ function ProgramPage() {
   type ProgramItem = { type: "lesson" | "quiz" | "posttest"; n: number; title: string; focus: string };
   const items: ProgramItem[] = useMemo(() => {
     const weekPlan = program.find((w) => w.week === weekNum);
+    const starpathWeek = starpathProgram?.weeks.find((candidate) => candidate.week === weekNum);
     const lessons = weekPlan?.lessons ?? [];
     const base: ProgramItem[] = [
       { type: "lesson" as const, n: 1, title: lessons[0]?.displayTitle ?? lessons[0]?.title ?? "Lesson 1", focus: lessons[0]?.focus ?? "" },
       { type: "lesson" as const, n: 2, title: lessons[1]?.displayTitle ?? lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.displayTitle ?? lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
     ];
-    if (weekNum !== lastWeek) {
-      base.push({ type: "quiz" as const, n: 1, title: "Weekly Quiz", focus: "15 questions from all 3 lessons" });
+    if (isStarpathRealm || weekNum !== lastWeek) {
+      base.push({
+        type: "quiz" as const,
+        n: 1,
+        title: isStarpathRealm ? `${starpathWeek?.title ?? `Week ${weekNum}`} Voyage Quiz` : "Weekly Quiz",
+        focus: isStarpathRealm ? starpathWeek?.quiz?.coverage ?? "15 questions from all 3 missions" : "15 questions from all 3 lessons",
+      });
     } else {
       base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Score 85%+ to unlock your Legend" });
     }
     return base;
-  }, [lastWeek, program, weekNum]);
+  }, [isStarpathRealm, lastWeek, program, starpathProgram, weekNum]);
 
   const currentWeekPlan = useMemo(() => {
     return program.find((w) => w.week === weekNum);
   }, [program, weekNum]);
 
   function openItem(item: (typeof items)[number]) {
-    if (!weekUnlocked && !teacherMode && !DEMO_MODE && !previewMode) return;
+    if (!weekUnlocked && !unrestrictedMode) return;
 
-    if (!DEMO_MODE && !previewMode && !teacherMode) {
+    if (!unrestrictedMode) {
       if (item.type === "lesson") {
         const lessonIdx = item.n - 1;
         if (lessonIdx > 0 && !progress.lessonsCompleted[lessonIdx - 1]) return;
@@ -369,6 +500,10 @@ function ProgramPage() {
       );
       return;
     }
+    if (isStarpathRealm && starpathProgram && item.type === "quiz") {
+      router.push(buildStarpathWeeklyQuizHref({ selectedLevel: starpathProgram.definition.id }, weekNum));
+      return;
+    }
     if (item.type === "posttest") {
       router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}${realmParam}`);
       return;
@@ -378,7 +513,14 @@ function ProgramPage() {
 
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(lastWeek, targetWeek));
-    if (!DEMO_MODE && !previewMode && !teacherMode && hasAssignedWeekAccess && !playableWeeks.includes(clamped)) return;
+    if (!unrestrictedMode && hasAssignedWeekAccess && !playableWeeks.includes(clamped)) return;
+    if (isStarpathRealm && starpathProgram) {
+      const level = starpathProgram.definition.yearLabel as RealmLevelId;
+      const current = readStarpathDemoJourney(level);
+      writeStarpathDemoJourney(level, { ...current, currentWeek: clamped });
+      router.push(buildStarpathProgramHref({ selectedLevel: starpathProgram.definition.id }, clamped));
+      return;
+    }
     const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
     router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1${realmParam}`);
   }
@@ -411,6 +553,7 @@ function ProgramPage() {
   const weekComplete = isWeekComplete(progress);
 
   useEffect(() => {
+    if (isStarpathRealm) return;
     const student = readProgress();
     if (!student || student.status !== "ASSIGNED_PROGRAM" || student.year !== curriculumYear) return;
     const savedWeek = student.assignedWeek ?? 1;
@@ -422,14 +565,24 @@ function ProgramPage() {
       if (weekComplete) nextWeek = Math.max(nextWeek, Math.min(lastWeek, weekNum + 1));
     }
     if (nextWeek !== savedWeek) updateProgress({ assignedWeek: nextWeek });
-  }, [curriculumYear, hasPersonalizedPlan, lastWeek, store, weekComplete, weekNum]);
+  }, [curriculumYear, hasPersonalizedPlan, isStarpathRealm, lastWeek, realmId, store, weekComplete, weekNum]);
 
   const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
   const totalXp = 50;
   const percent = Math.round((xp / totalXp) * 100);
-  const measurelandsHomeRoute = isMeasurementRealm
-    ? `/measurelands?level=${encodeURIComponent(curriculumYear)}`
-    : "/number-nexus";
+  const realmHomeRoute = isStarpathRealm && starpathProgram
+    ? buildStarpathWorldHref({ selectedLevel: starpathProgram.definition.id })
+    : isMeasurementRealm
+      ? `/measurelands?level=${encodeURIComponent(curriculumYear)}`
+      : "/number-nexus";
+
+  if (isStarpathRealm && starpathAccess !== "allowed") {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#070a1b] text-cyan-100">
+        <p>{starpathAccess === "denied" ? "Returning to the Tower…" : "Opening Starpath…"}</p>
+      </main>
+    );
+  }
 
   if (!legacyProgramMode) {
     return (
@@ -446,7 +599,9 @@ function ProgramPage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={
-            isMeasurementRealm
+            isStarpathRealm
+              ? getStarpathBackground(curriculumYear as RealmLevelId)
+              : isMeasurementRealm
               ? isPrep
                 ? "/images/measurelands-home-bg.jpg"
                 : levelNum === 1
@@ -467,15 +622,17 @@ function ProgramPage() {
           alt=""
           className="w-full h-full object-cover"
           style={{
-            filter: isMeasurementRealm
+            filter: isStarpathRealm
+              ? "brightness(0.72) contrast(1.12) saturate(1.08)"
+              : isMeasurementRealm
               ? levelNum === 4
                 ? "brightness(0.90) contrast(1.16) saturate(1.05)"
                 : "brightness(0.97) contrast(1.16) saturate(1.08)"
               : isPrep
               ? "brightness(1.22) contrast(1.05) saturate(1.18)"
               : getHomeBgFilter(levelNum),
-            imageRendering: isMeasurementRealm ? "auto" : undefined,
-            WebkitBackfaceVisibility: isMeasurementRealm ? "hidden" : undefined,
+            imageRendering: isMeasurementRealm || isStarpathRealm ? "auto" : undefined,
+            WebkitBackfaceVisibility: isMeasurementRealm || isStarpathRealm ? "hidden" : undefined,
           }}
         />
         <div
@@ -483,7 +640,7 @@ function ProgramPage() {
           style={{ boxShadow: getVignetteStyle(levelNum) }}
         />
         <div className={`absolute inset-0 ${isPrep ? "bg-black/10" : "bg-black/30"}`} />
-        {isPrep && !isMeasurementRealm && (
+        {isPrep && !isMeasurementRealm && !isStarpathRealm && (
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -503,17 +660,28 @@ function ProgramPage() {
             }}
           />
         )}
+        {isStarpathRealm && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 42%, rgba(34,211,238,0.12), transparent 34%), linear-gradient(180deg, rgba(7,10,27,0.42), rgba(30,27,75,0.14) 45%, rgba(7,10,27,0.52))",
+            }}
+          />
+        )}
         {/* Soft top glow for premium polish (dialled back on Level 4's brighter art) */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              isMeasurementRealm && levelNum === 4
+              isStarpathRealm
+                ? "radial-gradient(circle at top, rgba(165,243,252,0.12), transparent 58%)"
+                : isMeasurementRealm && levelNum === 4
                 ? "radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 60%)"
                 : "radial-gradient(circle at top, rgba(255,255,255,0.10), transparent 60%)",
           }}
         />
-        {isPrep && !isMeasurementRealm && (
+        {isPrep && !isMeasurementRealm && !isStarpathRealm && (
           <div className="absolute right-3 sm:right-6 md:right-10 top-[32%] pointer-events-none select-none hidden md:block">
             <div
               className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-[18vh] h-[4vh] rounded-[50%]"
@@ -557,7 +725,9 @@ function ProgramPage() {
         <StudentAvatar
           height={160}
           glowColor={
-            isMeasurementRealm
+            isStarpathRealm
+              ? "rgba(34,211,238,0.34)"
+              : isMeasurementRealm
               ? "rgba(251,191,36,0.28)"
               : "rgba(94,234,212,0.30)"
           }
@@ -570,7 +740,7 @@ function ProgramPage() {
           <div className="flex items-start justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => router.push(measurelandsHomeRoute)}
+                onClick={() => router.push(realmHomeRoute)}
                 className={`px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
                   isMeasurementRealm
                     ? "text-yellow-100/85 hover:bg-yellow-950/30"
@@ -586,7 +756,7 @@ function ProgramPage() {
                   boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
                 }}
               >
-                ← Back to Map
+                ← {isStarpathRealm ? "Back to Starpath" : "Back to Map"}
               </button>
               <div ref={weekMenuRef} className="relative">
                 <button
@@ -643,7 +813,7 @@ function ProgramPage() {
                     <ul className="py-0.5">
                       {Array.from({ length: lastWeek }).map((_, index) => {
                         const targetWeek = index + 1;
-                        const isUnlocked = DEMO_MODE || previewMode || teacherMode || (hasAssignedWeekAccess ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
+                        const isUnlocked = unrestrictedMode || (hasAssignedWeekAccess ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
                         const isCurrent = targetWeek === weekNum;
                         const isRequiredWeek = requiredWeeks.includes(targetWeek);
                         const isDoneWeek = isWeekComplete(getWeekProgress(store, year, targetWeek, realmId));
@@ -718,7 +888,7 @@ function ProgramPage() {
               }}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${rt.pillDot}`} />
-              {levelLabel} · Program
+              {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : "Program"}
             </button>
             <h1 className={`text-4xl md:text-5xl font-black text-white mt-3 tracking-tight ${rt.headingGlow}`}>Week {weekNum}</h1>
             <p className={`text-base md:text-lg mt-2 font-semibold ${isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
@@ -734,7 +904,7 @@ function ProgramPage() {
               {weekUnlocked
                 ? weekComplete
                   ? "◆ Completed"
-                  : `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : "Quiz Pending"}`
+                  : `${lessonsDoneCount}/3 ${isStarpathRealm ? "Missions" : "Lessons"} · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : isStarpathRealm ? "Voyage Quiz Pending" : "Quiz Pending"}`
                 : "◆ Preview Locked"}
             </p>
 
@@ -972,7 +1142,7 @@ function ProgramPage() {
                   : progress.quizCompleted;
 
               let locked = false;
-              if (!DEMO_MODE && !previewMode && !teacherMode) {
+              if (!unrestrictedMode) {
                 if (!weekUnlocked) {
                   locked = true;
                 }
@@ -994,7 +1164,7 @@ function ProgramPage() {
                     className="absolute -inset-[2px] pointer-events-none"
                     style={{
                       clipPath: rt.bezelClip,
-                      borderRadius: rt.rounded ? 28 : undefined,
+                      borderRadius: activityCardVariant === "portal-circle" ? 46 : rt.rounded ? 28 : undefined,
                       background: locked
                         ? rt.bezelLockedBg
                         : postTestReady
@@ -1017,7 +1187,7 @@ function ProgramPage() {
                     }}
                     className={[
                       "relative w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden",
-                      rt.rounded ? "rounded-3xl" : "",
+                      activityCardVariant === "portal-circle" ? "rounded-[44px]" : rt.rounded ? "rounded-3xl" : "",
                       locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1 cursor-pointer",
                     ].join(" ")}
                     style={{
@@ -1092,7 +1262,7 @@ function ProgramPage() {
                           boxShadow: locked ? undefined : rt.badgeShadow,
                         }}
                       >
-                        {isPostTest ? "Post Test" : item.type === "quiz" ? "Weekly Quiz" : `Lesson ${item.n}`}
+                        {isPostTest ? "Post Test" : item.type === "quiz" ? isStarpathRealm ? "Voyage Quiz" : "Weekly Quiz" : `${isStarpathRealm ? "Mission" : "Lesson"} ${item.n}`}
                       </span>
 
                       {completed ? (
@@ -1184,7 +1354,7 @@ function ProgramPage() {
                             boxShadow: locked ? undefined : rt.actionShadow,
                           }}
                         >
-                          {completed ? "REPLAY" : "START"}
+                          {completed ? "REPLAY" : isStarpathRealm ? item.type === "quiz" ? "START QUIZ" : "START MISSION" : "START"}
                         </span>
                       )}
                     </div>
@@ -1235,7 +1405,7 @@ function ProgramPage() {
                   Go to Week {lastAllowedWeek}
                 </button>
                 <button
-                  onClick={() => router.push(measurelandsHomeRoute)}
+                  onClick={() => router.push(realmHomeRoute)}
                   className="rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white transition hover:bg-white/15"
                 >
                   Back to Map

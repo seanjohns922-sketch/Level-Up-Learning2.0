@@ -1,26 +1,23 @@
 import { notFound, redirect } from "next/navigation";
-import StarpathDevelopmentLesson from "@/components/starpath/StarpathDevelopmentLesson";
+import StarpathDevelopmentQuiz from "@/components/starpath/StarpathDevelopmentQuiz";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getServerStarpathAccess } from "@/lib/demo-session-server";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
-import {
-  buildStarpathProgramHref,
-  STARPATH_REALM_ID,
-} from "@/lib/starpath-routes";
+import { buildStarpathProgramHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 
 export const dynamic = "force-dynamic";
 
-function parseBoundedInteger(value: string, minimum: number, maximum: number) {
+function parseWeek(value: string) {
   if (!/^\d+$/.test(value)) return null;
   const parsed = Number(value);
-  return Number.isInteger(parsed) && parsed >= minimum && parsed <= maximum ? parsed : null;
+  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 8 ? parsed : null;
 }
 
-export default async function StarpathLessonPage({
+export default async function StarpathQuizPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ level: string; week: string; lesson: string }>;
+  params: Promise<{ level: string; week: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const access = await getServerStarpathAccess();
@@ -28,28 +25,26 @@ export default async function StarpathLessonPage({
 
   const [route, query] = await Promise.all([params, searchParams]);
   const level = tryNormalizeStarpathLevel(route.level);
-  const week = parseBoundedInteger(route.week, 1, 8);
-  const lessonNumber = parseBoundedInteger(route.lesson, 1, 3);
+  const week = parseWeek(route.week);
   const realmId = typeof query.realm_id === "string" ? query.realm_id : null;
-  if (!level || !week || !lessonNumber || realmId !== STARPATH_REALM_ID) notFound();
+  if (!level || !week || realmId !== STARPATH_REALM_ID) notFound();
 
   const definition = getStarpathLevel(level);
   const program = getStarpathProgram(level);
-  const lesson = program.weeks[week - 1]?.lessons[lessonNumber - 1];
-  if (!lesson || program.realmId !== STARPATH_REALM_ID) notFound();
+  const weekPlan = program.weeks[week - 1];
+  if (!weekPlan?.quiz || program.realmId !== STARPATH_REALM_ID) notFound();
 
   return (
-    <StarpathDevelopmentLesson
-      lesson={{
+    <StarpathDevelopmentQuiz
+      quiz={{
         level: definition.yearLabel,
         levelLabel: definition.displayLabel,
         week,
-        lesson: lessonNumber,
-        title: lesson.title,
-        focus: lesson.focus,
-        learningIntention: lesson.learningIntention,
-        registryId: lesson.id,
-        status: lesson.status,
+        title: `${weekPlan.title} Voyage Quiz`,
+        coverage: weekPlan.quiz.coverage,
+        sourceLessons: weekPlan.lessons.map((lesson) => lesson.title),
+        registryId: weekPlan.quiz.id,
+        status: weekPlan.quiz.status,
         weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
       }}
     />
