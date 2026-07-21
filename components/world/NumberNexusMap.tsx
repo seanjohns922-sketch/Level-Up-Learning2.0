@@ -2,10 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  User, Zap, Lock,
-} from "lucide-react";
+import { Lock } from "lucide-react";
 import { readProgress } from "@/data/progress";
 import { computeFogProgress } from "@/lib/fog-progress";
 import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
@@ -18,6 +15,7 @@ import {
 import { readBestChain } from "@/lib/best-chain";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import LevelsDrawer from "@/components/realms/LevelsDrawer";
+import RealmTopNavigation from "@/components/realms/dashboard/RealmTopNavigation";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
@@ -570,11 +568,6 @@ export default function NumberNexusMap() {
   const currentZone = DISTRICT_ZONES.find((z) => viewWeek >= z.weekStart && viewWeek <= z.weekEnd);
   const activeZoneId = currentZone?.id ?? null;
 
-  const chip = (extra?: React.CSSProperties): React.CSSProperties => ({
-    padding: "5px 12px", borderRadius: 999,
-    background: "rgba(14,118,110,0.18)", border: "1px solid rgba(94,234,212,0.18)",
-    ...extra,
-  });
   const hudBtn: React.CSSProperties = {
     display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
     padding: "12px 10px 10px", borderRadius: 18, cursor: "pointer",
@@ -754,38 +747,29 @@ export default function NumberNexusMap() {
         </div>
       </div>
 
-      {/* ── Top bar ── */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, zIndex: 20,
-        display: "flex", alignItems: "center", gap: 8, padding: "10px 14px",
-        background: "rgba(2,6,16,0.72)", borderBottom: "1px solid rgba(94,234,212,0.1)",
-        backdropFilter: "blur(16px)",
-      }}>
-        <button
-          onClick={() => router.push(`/realms?level=${encodeURIComponent(year)}`)}
-          style={{ display: "flex", alignItems: "center", gap: 6, ...chip(), cursor: "pointer", color: "rgba(167,243,208,0.9)", fontSize: 12, fontWeight: 700 }}
-        >
-          <ArrowLeft size={14} /> Back
-        </button>
-        <div style={chip()}>
-          <span style={{ color: "#5eead4", fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: "ui-monospace,monospace" }}>⚡ NUMBER NEXUS</span>
-        </div>
-        <LevelsDrawer realmId="number-nexus" progress={progress} viewingYear={year} isPreview={isDemoPreviewMode()} accent="#5eead4" openDirection="right" />
-        <div style={{ flex: 1 }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
-          <Zap size={11} color="#14b8a6" />
-          <span title="Global XP available in every realm" style={{ color: "#99f6e4", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{isDemoPreviewMode() ? demoRealmXP : globalXpBalance == null ? "—" : globalXpBalance} XP</span>
-        </div>
-        <div style={chip()}>
-          <span style={{ color: "#99f6e4", fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/12</span>
-        </div>
-        <button
-          onClick={() => router.push("/profile")}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: "rgba(14,118,110,0.28)", border: "1px solid rgba(94,234,212,0.28)" }}
-        >
-          <User size={16} color="#5eead4" />
-        </button>
-      </div>
+      <RealmTopNavigation
+        realmName="Number Nexus"
+        realmMark="⚡"
+        accent="#5eead4"
+        text="#99f6e4"
+        navBackground="rgba(2,6,16,0.72)"
+        navBorder="rgba(94,234,212,0.1)"
+        realmChipBackground="rgba(14,118,110,0.28)"
+        realmChipBorder="rgba(94,234,212,0.28)"
+        globalXp={isDemoPreviewMode() ? demoRealmXP : globalXpBalance}
+        progressLabel={`${highestDone}/12 weeks`}
+        onBack={() => router.push(`/realms?level=${encodeURIComponent(year)}`)}
+        onProfile={() => router.push("/profile")}
+        levelSelector={
+          <LevelsDrawer
+            realmId="number-nexus"
+            progress={progress}
+            viewingYear={year}
+            isPreview={isDemoPreviewMode()}
+            accent="#5eead4"
+          />
+        }
+      />
 
       {/* ── Right HUD ── */}
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>

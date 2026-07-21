@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, ChevronRight, Map, Orbit, User, Zap } from "lucide-react";
+import { ArrowLeft, ChevronRight, Map, Orbit } from "lucide-react";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/studentIdentity";
 import { loadStarpathPlacement } from "@/lib/starpath-placement-adapter";
@@ -12,6 +12,7 @@ import { computeFogProgress } from "@/lib/fog-progress";
 import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
 import RealmDashboardNav from "@/components/world/RealmDashboardNav";
 import StarpathLevelsDrawer from "@/components/realms/StarpathLevelsDrawer";
+import RealmTopNavigation from "@/components/realms/dashboard/RealmTopNavigation";
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { fetchGlobalXp } from "@/lib/economy";
 import { setLastRealm, setLastStarpathRoute } from "@/lib/last-realm";
@@ -179,30 +180,21 @@ function StarpathWorldShell() {
         </div>
       </div>
 
-      {/* Top nav bar */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 20, display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "rgba(5,8,28,0.72)", borderBottom: `1px solid ${theme.accent}22`, backdropFilter: "blur(16px)" }}>
-        <button onClick={() => router.push(buildStarpathTowerReturnHref(selectedLevel))} style={{ display: "flex", alignItems: "center", gap: 6, ...chip(), cursor: "pointer", color: "rgba(226,232,255,0.92)", fontSize: 12, fontWeight: 700 }}>
-          <ArrowLeft size={14} /> Back
-        </button>
-        <div style={chip({ background: `${theme.accent}1f`, border: `1px solid ${theme.accent}44` })}>
-          <span style={{ color: theme.accent, fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: mono }}>✦ STARPATH</span>
-        </div>
-        <div style={chip({ padding: "5px 10px", background: "rgba(30,27,75,0.72)", border: `1px solid ${theme.accent}33` })}>
-          <span style={{ color: theme.accentSoft, fontSize: 9, fontWeight: 800, letterSpacing: "0.12em", fontFamily: mono }}>Demo · Preview</span>
-        </div>
-        <StarpathLevelsDrawer selectedLevel={selectedLevel} accent={theme.accent} openDirection="right" />
-        <div style={{ flex: 1 }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
-          <Zap size={11} color={theme.accent} />
-          <span title="Global XP available in every realm" style={{ color: theme.accentSoft, fontSize: 10, fontWeight: 700, fontFamily: mono }}>{globalXp == null ? "—" : globalXp} XP</span>
-        </div>
-        <div style={chip()}>
-          <span style={{ color: theme.accent, fontSize: 10, fontWeight: 700, fontFamily: mono }}>{currentWeek}/8 weeks</span>
-        </div>
-        <button onClick={() => router.push("/profile")} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: "rgba(16,22,52,0.6)", border: `1px solid ${theme.accent}44` }}>
-          <User size={16} color={theme.accent} />
-        </button>
-      </div>
+      <RealmTopNavigation
+        realmName="Starpath"
+        realmMark="✦"
+        accent={theme.accent}
+        text={theme.accentSoft}
+        navBackground="rgba(5,8,28,0.72)"
+        navBorder={`${theme.accent}22`}
+        realmChipBackground={`${theme.accent}1f`}
+        realmChipBorder={`${theme.accent}44`}
+        globalXp={globalXp}
+        progressLabel={`${currentWeek}/8 weeks`}
+        onBack={() => router.push(buildStarpathTowerReturnHref(selectedLevel))}
+        onProfile={() => router.push("/profile")}
+        levelSelector={<StarpathLevelsDrawer selectedLevel={selectedLevel} accent={theme.accent} />}
+      />
 
       {/* Right HUD buttons */}
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>

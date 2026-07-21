@@ -31,9 +31,15 @@ assert.match(measurelands, /satisfies CanonicalRealmDashboardConfig/);
 assert.match(measurelands, /<RealmDashboardShell config=\{MEASURELANDS_DASHBOARD_CONFIG\} level=\{year\}/);
 
 assert.match(selector, /levels\.map/);
-assert.doesNotMatch(selector, /useState|aria-haspopup|role="menu"|ChevronDown|ChevronRight/);
-assert.match(selector, /GROUND/);
-assert.match(selector, /`LV \$\{index\}`/);
+assert.match(selector, /useState/);
+assert.match(selector, /aria-haspopup="menu"/);
+assert.match(selector, /role="menu"/);
+assert.match(selector, /ChevronDown/);
+assert.match(selector, /pointerdown/);
+assert.match(selector, /event\.key === "Escape"/);
+assert.match(selector, /position: "fixed"/);
+assert.match(selector, /top: 60/);
+assert.doesNotMatch(shell, /top: 61/);
 
 assert.match(measurelandsPage, /RealmDashboardLoading/);
 assert.match(measurelandsPage, /RealmDashboardError/);

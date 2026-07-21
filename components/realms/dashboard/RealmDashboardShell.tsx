@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Lock, User, Zap } from "lucide-react";
+import { Lock } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import { computeFogProgress } from "@/lib/fog-progress";
 import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
@@ -22,6 +22,7 @@ import { setLastRealm } from "@/lib/last-realm";
 import { buildRealmLevelHref, isLevelUnlocked, LEVEL_CATALOG } from "@/lib/level-catalog";
 import { enterReviewMode, exitReviewMode } from "@/lib/review-mode";
 import RealmLevelSelector from "./RealmLevelSelector";
+import RealmTopNavigation from "./RealmTopNavigation";
 import RealmSideNavigation from "./RealmSideNavigation";
 import type {
   CanonicalRealmDashboardConfig,
@@ -408,14 +409,6 @@ export default function RealmDashboardShell({
     }, 900);
   }
 
-  const chip = (extra?: React.CSSProperties): React.CSSProperties => ({
-    padding: "5px 12px",
-    borderRadius: 999,
-    background: config.theme.realmChipBackground,
-    border: "1px solid rgba(var(--realm-accent-rgb),0.22)",
-    ...extra,
-  });
-
   const hudBtn: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -561,74 +554,28 @@ export default function RealmDashboardShell({
         </div>
       </div>
 
-      {/* ── Top nav bar ── */}
-      <div
-        style={{
-          position: "absolute", top: 0, left: 0, right: 0, zIndex: 20,
-          display: "flex", alignItems: "center", gap: 8,
-          padding: "10px 14px",
-          background: config.theme.navBackground,
-          borderBottom: `1px solid ${config.theme.navBorder}`,
-          backdropFilter: "blur(16px)",
-        }}
-      >
-        <button
-          onClick={() => router.push(`/realms?level=${encodeURIComponent(resolvedYear)}`)}
-          style={{ display: "flex", alignItems: "center", gap: 6, ...chip(), cursor: "pointer", color: "rgba(254,243,199,0.92)", fontSize: 12, fontWeight: 700 }}
-        >
-          <ArrowLeft size={14} /> Back
-        </button>
-        <div style={chip({ background: config.theme.realmChipBackground, border: `1px solid ${config.theme.realmChipBorder}` })}>
-          <span style={{ color: config.theme.accent, fontSize: 10, fontWeight: 900, letterSpacing: "0.18em", fontFamily: "ui-monospace,monospace" }}>{config.realmMark} {config.displayName.toUpperCase()}</span>
-        </div>
-        <div style={{ flex: 1 }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 5, ...chip() }}>
-          <Zap size={11} color={config.theme.accent} />
-          <span title="Global XP available in every realm" style={{ color: config.theme.text, fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{isDemoPreviewMode() ? demoRealmXP : globalXpBalance == null ? "—" : globalXpBalance} XP</span>
-        </div>
-        <div style={chip()}>
-          <span style={{ color: config.theme.accent, fontSize: 10, fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>{highestDone}/{totalWeeks} weeks</span>
-        </div>
-        <button
-          onClick={() => router.push("/profile")}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", cursor: "pointer", background: config.theme.realmChipBackground, border: `1px solid ${config.theme.realmChipBorder}` }}
-        >
-          <User size={16} color={config.theme.accent} />
-        </button>
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          top: 61,
-          left: 0,
-          right: 0,
-          zIndex: 19,
-          display: "flex",
-          justifyContent: "center",
-          pointerEvents: "none",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "calc(100vw - 32px)",
-            padding: "4px 6px",
-            borderRadius: 999,
-            background: config.theme.navBackground,
-            border: `1px solid ${config.theme.navBorder}`,
-            boxShadow: "0 6px 18px rgba(0,0,0,0.2)",
-            backdropFilter: "blur(12px)",
-            pointerEvents: "auto",
-          }}
-        >
+      <RealmTopNavigation
+        realmName={config.displayName}
+        realmMark={config.realmMark}
+        accent={config.theme.accent}
+        text={config.theme.text}
+        navBackground={config.theme.navBackground}
+        navBorder={config.theme.navBorder}
+        realmChipBackground={config.theme.realmChipBackground}
+        realmChipBorder={config.theme.realmChipBorder}
+        globalXp={previewMode ? demoRealmXP : globalXpBalance}
+        progressLabel={`${highestDone}/${totalWeeks} weeks`}
+        onBack={() => router.push(`/realms?level=${encodeURIComponent(resolvedYear)}`)}
+        onProfile={() => router.push("/profile")}
+        levelSelector={
           <RealmLevelSelector
             levels={levelOptions}
             selectedLevel={resolvedYear}
             accent={config.theme.secondaryAccent}
             onSelect={selectLevel}
           />
-        </div>
-      </div>
+        }
+      />
 
       {/* ── Right HUD buttons ── */}
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", zIndex: 20, display: "flex", flexDirection: "column", gap: 10 }}>

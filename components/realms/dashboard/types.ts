@@ -5,8 +5,8 @@ import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 
 export type RealmDistrictState = "complete" | "completed" | "open" | "current" | "locked";
 
-export type RealmDashboardLevelOption = {
-  id: RealmLevelId;
+export type RealmDashboardLevelOption<TLevel extends string = RealmLevelId> = {
+  id: TLevel;
   label: string;
   state: "locked" | "available" | "current" | "reviewing";
 };

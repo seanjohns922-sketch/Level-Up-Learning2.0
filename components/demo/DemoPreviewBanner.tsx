@@ -8,10 +8,13 @@ import { clearActiveStudentSession } from "@/lib/studentIdentity";
 
 export default function DemoPreviewBanner() {
   const router = useRouter();
-  usePathname();
+  const pathname = usePathname();
   const active = isDemoPreviewMode();
+  const usesRealmNavigation = ["/measurelands", "/number-nexus", "/starpath"].some(
+    (route) => pathname.startsWith(route),
+  );
 
-  if (!active) return null;
+  if (!active || usesRealmNavigation) return null;
 
   function exitDemoMode() {
     clearScopedProgress("demo-preview");
