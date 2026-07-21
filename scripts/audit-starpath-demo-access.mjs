@@ -41,8 +41,11 @@ assert.deepEqual(
   { allowed: false, reason: "not-demo-mode" },
 );
 
-assert.match(carousel, /ALL_REALMS\.filter\(\(realm\) => realm\.id !== "starpath-realm" \|\| starpathAccess\.allowed\)/);
-assert.match(carousel, /const isStarpathPreview = current\.id === "starpath-realm" && starpathAccess\.allowed/);
+assert.match(carousel, /const realms = ALL_REALMS/);
+assert.match(carousel, /isStarpathRealm \? \(/);
+assert.match(carousel, /Preview Realm/);
+assert.match(carousel, /Demo access only/);
+assert.match(carousel, /const isStarpathPreview = isStarpathRealm && starpathAccess\.allowed/);
 assert.match(carousel, /Demo · Preview/);
 assert.match(carousel, /buildStarpathWorldHref\(\{ selectedLevel: selectedStarpathLevel \}\)/);
 assert.match(serverPage, /await getServerStarpathAccess\(\)/);
@@ -74,4 +77,4 @@ assert.equal(url.searchParams.get("destination"), "world");
 assert.equal(href.includes("number-nexus"), false);
 assert.equal(href.includes("measurelands"), false);
 
-console.log("Starpath demo access audit passed: authorised preview only, server guarded, and non-persistent.");
+console.log("Starpath demo access audit passed: card visible as a locked preview, authorised entry only, server guarded, and non-persistent.");

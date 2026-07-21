@@ -54,10 +54,7 @@ export default function RealmCarousel() {
     demoFeatureEnabled: isDemoAccessFeatureEnabled(),
     authorizedDemoSession,
   });
-  const realms = useMemo(
-    () => ALL_REALMS.filter((realm) => realm.id !== "starpath-realm" || starpathAccess.allowed),
-    [starpathAccess.allowed],
-  );
+  const realms = ALL_REALMS;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [entered, setEntered] = useState(false);
@@ -104,8 +101,9 @@ export default function RealmCarousel() {
   }, [navigate]);
 
   const current = realms[currentIndex];
-  const isStarpathPreview = current.id === "starpath-realm" && starpathAccess.allowed;
-  const isActive = isStarpathPreview || DEMO_MODE || isRealmEnabled(current.id);
+  const isStarpathRealm = current.id === "starpath-realm";
+  const isStarpathPreview = isStarpathRealm && starpathAccess.allowed;
+  const isActive = isStarpathPreview || (!isStarpathRealm && (DEMO_MODE || isRealmEnabled(current.id)));
   const isPreviewRealm = previewMode && current.id === "measurelands";
   const prevIdx = (currentIndex - 1 + realms.length) % realms.length;
   const nextIdx = (currentIndex + 1) % realms.length;
@@ -461,8 +459,15 @@ export default function RealmCarousel() {
                   boxShadow: `0 6px 24px ${current.colorDim}`,
                 }}
               >
-                {enteringRealm === current.id ? "Loading..." : isPreviewRealm ? "Preview Realm" : "Enter Realm"}
+                {enteringRealm === current.id ? "Loading..." : isPreviewRealm || isStarpathRealm ? "Preview Realm" : "Enter Realm"}
               </button>
+            ) : isStarpathRealm ? (
+              <span className="inline-flex items-center gap-2 rounded-2xl border border-indigo-300/30 bg-indigo-400/10 px-6 py-2.5 text-sm font-bold text-indigo-100/80">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" />
+                </svg>
+                Preview Realm
+              </span>
             ) : current.comingSoon ? (
               <span className="inline-block px-6 py-2.5 rounded-2xl text-sm font-bold text-amber-300/80 border border-amber-400/30" style={{ background: "rgba(251,191,36,0.1)" }}>
                 Coming Soon
@@ -477,9 +482,9 @@ export default function RealmCarousel() {
               </span>
             )}
 
-            {isPreviewRealm || isStarpathPreview ? (
+            {isPreviewRealm || isStarpathRealm ? (
               <div className="mt-3 inline-flex items-center rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-sky-100">
-                {isStarpathPreview ? "Demo · Preview" : "Preview"}
+                {isStarpathRealm ? isStarpathPreview ? "Demo · Preview" : "Demo access only" : "Preview"}
               </div>
             ) : null}
 
