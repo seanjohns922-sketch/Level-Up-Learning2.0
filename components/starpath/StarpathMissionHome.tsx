@@ -12,6 +12,7 @@ import {
   Play,
   Sparkles,
   Star,
+  Video,
 } from "lucide-react";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
@@ -107,6 +108,56 @@ export default function StarpathMissionHome({
 
           <div className="grid gap-5 p-5 sm:p-7 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-5">
+              {/* Lesson video — placeholder until Starpath mission videos are produced */}
+              <section className="rounded-lg border border-cyan-200/20 bg-white/[0.06] p-5">
+                <div className="mb-3 flex items-center gap-2">
+                  <span
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-white"
+                    style={{ background: "linear-gradient(135deg, #7c3aed, #0891b2)", boxShadow: "0 2px 6px rgba(34,211,238,0.35), inset 0 1px 0 rgba(255,255,255,0.2)" }}
+                  >
+                    <Video className="h-4 w-4" />
+                  </span>
+                  <span className="text-sm font-black uppercase tracking-[0.14em] text-cyan-100">Lesson Video</span>
+                  <span className="ml-auto inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-cyan-300/70">
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#22d3ee", boxShadow: "0 0 6px #22d3ee" }} />
+                    Coming soon
+                  </span>
+                </div>
+                <div
+                  className="relative flex aspect-video flex-col items-center justify-center gap-2 overflow-hidden rounded-xl text-xs shadow-inner"
+                  style={{ background: "linear-gradient(135deg, #1e1040 0%, #241a5e 55%, #0a2f52 100%)", boxShadow: "inset 0 0 0 1px rgba(34,211,238,0.15)" }}
+                >
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 opacity-[0.16]"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(rgba(34,211,238,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.5) 1px, transparent 1px)",
+                      backgroundSize: "28px 28px",
+                      maskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+                      WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+                    }}
+                  />
+                  {(["top-2 left-2", "top-2 right-2", "bottom-2 left-2", "bottom-2 right-2"] as const).map((pos, i) => (
+                    <svg key={i} aria-hidden className={`absolute ${pos} h-5 w-5 pointer-events-none`} style={{ color: "rgba(103,232,249,0.6)" }} viewBox="0 0 20 20" fill="none">
+                      {i === 0 && <path d="M2 8V2h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />}
+                      {i === 1 && <path d="M18 8V2h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />}
+                      {i === 2 && <path d="M2 12v6h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />}
+                      {i === 3 && <path d="M18 12v6h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />}
+                    </svg>
+                  ))}
+                  <span
+                    className="relative inline-flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm"
+                    style={{ background: "rgba(34,211,238,0.12)", border: "1px solid rgba(34,211,238,0.45)", boxShadow: "0 0 24px rgba(34,211,238,0.3)" }}
+                  >
+                    <Play className="ml-0.5 h-5 w-5 fill-current" style={{ color: "#67e8f9" }} />
+                  </span>
+                  <span className="relative font-mono text-[10px] uppercase tracking-[0.25em]" style={{ color: "rgba(207,250,254,0.85)" }}>
+                    Video coming soon
+                  </span>
+                </div>
+              </section>
+
               <section className="rounded-lg border border-violet-300/20 bg-white/[0.06] p-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-200">Today I am learning to...</div>
@@ -167,7 +218,7 @@ export default function StarpathMissionHome({
               ) : (
                 <div className="rounded-lg border border-amber-200/25 bg-amber-300/10 px-5 py-4 text-center">
                   <div className="text-sm font-black text-amber-100">Mission preparation in progress</div>
-                  <p className="mt-1 text-xs font-semibold text-amber-100/75">This mission will open when its three challenges are ready.</p>
+                  <p className="mt-1 text-xs font-semibold text-amber-100/75">This mission will open when its three practice activities are ready.</p>
                 </div>
               )}
             </div>
