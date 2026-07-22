@@ -6,6 +6,10 @@ const migration = fs.readFileSync(
   path.join(root, "supabase/migrations/20260722113000_teacher_progress_overrides.sql"),
   "utf8",
 );
+const permissionFix = fs.readFileSync(
+  path.join(root, "supabase/migrations/20260722114500_fix_progress_override_policy_permission.sql"),
+  "utf8",
+);
 const panel = fs.readFileSync(path.join(root, "components/teacher/StrandStudentsPanel.tsx"), "utf8");
 const dashboard = fs.readFileSync(path.join(root, "app/teacher/dashboard/page.tsx"), "utf8");
 const compat = fs.readFileSync(path.join(root, "lib/realm-progress-compat.ts"), "utf8");
@@ -14,6 +18,7 @@ const checks = [
   ["override has a dedicated audit table", migration.includes("create table if not exists public.student_progress_overrides")],
   ["override reason is mandatory and constrained", migration.includes("reason text not null check")],
   ["class teachers and school administrators are authorised", migration.includes("can_manage_student_progress") && migration.includes("'school_admin'")],
+  ["authenticated RLS policy can execute its permission helper", permissionFix.includes("grant execute on function public.can_manage_student_progress(uuid)") && permissionFix.includes("to authenticated")],
   ["only the canonical current week can advance", migration.includes("Only the student current week can be advanced")],
   ["placement must be resolved before advancement", migration.includes("active placed program")],
   ["override advances only week pointers", /set current_week = v_next_week,[\s\S]*assigned_week = v_next_week/.test(migration)],
