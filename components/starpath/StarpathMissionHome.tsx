@@ -106,8 +106,9 @@ export default function StarpathMissionHome({
             </div>
           </div>
 
-          <div className="grid gap-5 p-5 sm:p-7 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="space-y-5">
+          <div className="space-y-5 p-5 sm:p-7">
+            {/* Top: lesson video alongside the learning intentions */}
+            <div className="grid gap-5 lg:grid-cols-2">
               {/* Lesson video — placeholder until Starpath mission videos are produced */}
               <section className="rounded-lg border border-cyan-200/20 bg-white/[0.06] p-5">
                 <div className="mb-3 flex items-center gap-2">
@@ -158,6 +159,7 @@ export default function StarpathMissionHome({
                 </div>
               </section>
 
+              <div className="space-y-5">
               <section className="rounded-lg border border-violet-300/20 bg-white/[0.06] p-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-200">Today I am learning to...</div>
@@ -182,46 +184,52 @@ export default function StarpathMissionHome({
                   ))}
                 </ul>
               </section>
-            </div>
-
-            <div className="space-y-5">
-              <section className="rounded-lg border border-cyan-200/20 bg-gradient-to-br from-violet-500/15 to-cyan-400/10 p-5">
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-200">Mission rewards</div>
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  {[
-                    { label: "XP", Icon: Star },
-                    { label: "Chain", Icon: Flame },
-                    { label: "Gems", Icon: Gem },
-                    { label: "Mission Complete", Icon: Medal },
-                  ].map(({ label, Icon }) => (
-                    <div key={label} className="flex min-h-20 flex-col items-center justify-center rounded-lg border border-white/10 bg-black/20 p-3 text-center">
-                      <Icon className="h-6 w-6 text-amber-200" />
-                      <span className="mt-2 text-xs font-black text-white">{label}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <div className="flex items-center justify-center gap-3 rounded-lg border border-white/10 bg-black/20 px-4 py-4 text-violet-100">
-                <Clock3 className="h-5 w-5 text-cyan-300" />
-                <span className="font-bold">Approximately 9 minutes</span>
               </div>
-
-              {available ? (
-                <button
-                  type="button"
-                  onClick={onStart}
-                  className="flex min-h-16 w-full items-center justify-center gap-3 rounded-lg bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 px-6 text-xl font-black text-white shadow-[0_16px_40px_rgba(34,211,238,0.24)] transition hover:brightness-110 active:scale-[0.99]"
-                >
-                  <Play className="h-6 w-6 fill-current" /> Start Mission
-                </button>
-              ) : (
-                <div className="rounded-lg border border-amber-200/25 bg-amber-300/10 px-5 py-4 text-center">
-                  <div className="text-sm font-black text-amber-100">Mission preparation in progress</div>
-                  <p className="mt-1 text-xs font-semibold text-amber-100/75">This mission will open when its three practice activities are ready.</p>
-                </div>
-              )}
             </div>
+
+            {/* Bottom: one full-width widget — rewards + time + start */}
+            <section className="rounded-lg border border-cyan-200/20 bg-gradient-to-br from-violet-500/15 to-cyan-400/10 p-5">
+              <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-200">Mission rewards</div>
+                  <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    {[
+                      { label: "XP", Icon: Star },
+                      { label: "Chain", Icon: Flame },
+                      { label: "Gems", Icon: Gem },
+                      { label: "Mission Complete", Icon: Medal },
+                    ].map(({ label, Icon }) => (
+                      <div key={label} className="flex min-h-20 flex-col items-center justify-center rounded-lg border border-white/10 bg-black/20 p-3 text-center">
+                        <Icon className="h-6 w-6 text-amber-200" />
+                        <span className="mt-2 text-xs font-black text-white">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center xl:shrink-0">
+                  <div className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-black/20 px-4 py-3 text-violet-100">
+                    <Clock3 className="h-5 w-5 text-cyan-300" />
+                    <span className="font-bold whitespace-nowrap">Approximately 9 minutes</span>
+                  </div>
+
+                  {available ? (
+                    <button
+                      type="button"
+                      onClick={onStart}
+                      className="flex min-h-14 w-full items-center justify-center gap-3 rounded-lg bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 px-10 text-lg font-black text-white shadow-[0_16px_40px_rgba(34,211,238,0.24)] transition hover:brightness-110 active:scale-[0.99] sm:w-auto"
+                    >
+                      <Play className="h-6 w-6 fill-current" /> Start Mission
+                    </button>
+                  ) : (
+                    <div className="rounded-lg border border-amber-200/25 bg-amber-300/10 px-5 py-4 text-center">
+                      <div className="text-sm font-black text-amber-100">Mission preparation in progress</div>
+                      <p className="mt-1 text-xs font-semibold text-amber-100/75">This mission will open when its three practice activities are ready.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
           </div>
         </section>
       </div>
