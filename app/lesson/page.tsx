@@ -93,6 +93,7 @@ import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress }
 import { resolveBrainBreakFrequency, type BrainBreakFrequency } from "@/lib/brain-break-settings";
 import { trackLiveLearningEvent } from "@/lib/live-class-client";
 import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
+import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
 import { markLessonComplete } from "@/lib/program-progress";
 import { getRecommendedAssignedWeek, isWeekPlayable, readProgramStore, getWeekProgress } from "@/lib/program-progress";
 import { getLessonChrome } from "@/lib/levelTheme";
@@ -758,10 +759,10 @@ function LessonPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-start justify-center px-4 py-6 bg-background">
+    <main className={`min-h-screen flex items-start justify-center px-3 py-3 sm:px-5 sm:py-5 ${started ? "bg-transparent" : "bg-background"}`}>
       <ActiveLearningTracker context="lesson" />
-      <div className="w-full max-w-6xl">
-        {started || blockedPreviousLesson || invalidMeasurelandsLesson || isPlaceholderMeasurelandsLesson ? (
+      <div className={`w-full ${started ? "max-w-[1500px]" : "max-w-6xl"}`}>
+        {blockedPreviousLesson || invalidMeasurelandsLesson || isPlaceholderMeasurelandsLesson ? (
           <div className="mb-4">
             <button
               onClick={() =>
@@ -959,20 +960,18 @@ function LessonPage() {
             }}
           />
         ) : year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands || isYear4Measurelands || isYear5Measurelands || isYear6Measurelands ? (
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <LessonPageHero
-                    levelNumber={levelNumber}
-                    levelLabel={levelLabel}
-                    year={year}
-                    week={week}
-                    lessonNumber={lessonNumber}
-              pageTitle={`Lesson ${lessonNumber} Practise`}
-              lessonTitle={safeLessonTitle}
-              focus={safeLessonFocus}
-              heroClass={lessonChrome.heroClass}
-              realmId={realmId}
-            />
-            <div className="bg-background px-6 py-8">
+          <RealmActiveLessonShell
+            realm={lessonRealmId}
+            levelNumber={levelNumber}
+            levelLabel={levelLabel}
+            year={year}
+            week={week}
+            lessonNumber={lessonNumber}
+            lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+            focus={safeLessonFocus}
+            demoMode={previewMode || DEMO_MODE}
+            onBack={goBackToProgram}
+          >
             <PracticeRunner
               key={`${year}-${week}-${effectiveLessonId}`}
               minutes={9}
@@ -1058,24 +1057,20 @@ function LessonPage() {
               onComplete={completeLesson}
               onPerformanceSummary={captureLessonPerformanceSummary}
             />
-            </div>
-          </div>
+          </RealmActiveLessonShell>
         ) : (
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
-            <LessonPageHero
-              levelNumber={levelNumber}
-              levelLabel={levelLabel}
-              year={year}
-              week={week}
-              lessonNumber={lessonNumber}
-              pageTitle={`Lesson ${lessonNumber} Practise`}
-              lessonTitle={safeLessonTitle}
-              focus={safeLessonFocus}
-              heroClass={lessonChrome.heroClass}
-              realmId={realmId}
-            />
-
-            <div className="bg-background px-4 py-5">
+          <RealmActiveLessonShell
+            realm={lessonRealmId}
+            levelNumber={levelNumber}
+            levelLabel={levelLabel}
+            year={year}
+            week={week}
+            lessonNumber={lessonNumber}
+            lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
+            focus={safeLessonFocus}
+            demoMode={previewMode || DEMO_MODE}
+            onBack={goBackToProgram}
+          >
               {lessonMeta?.activities?.length ? (
                 <Year2LessonEngine
                   key={lessonMeta.id}
@@ -1107,10 +1102,9 @@ function LessonPage() {
                   <div className="text-sm font-bold text-gray-900">
                     Activity configuration missing for this lesson.
                   </div>
-                </div>
+                  </div>
               )}
-            </div>
-          </div>
+          </RealmActiveLessonShell>
         )}
       </div>
     </main>

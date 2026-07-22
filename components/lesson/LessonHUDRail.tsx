@@ -123,7 +123,7 @@ export function LessonHUDRail({
                 color: "rgba(167,243,208,0.9)",
               }}
             >
-              L{levelNumber} · W{week} · L{lessonNumber}
+              {levelNumber === 0 ? "Ground" : `L${levelNumber}`} · W{week} · L{lessonNumber}
             </div>
             {lessonTitle ? (
               <div className="mt-1.5 text-[13px] font-bold leading-snug text-white/95 line-clamp-2">

@@ -1217,6 +1217,21 @@ export function PracticeRunner({
   const statusMotion = status === "wrong" ? "animate-[shake_0.35s_ease-in-out]" : "";
   const currentCorrectAnswer = currentWrongFeedback?.correctAnswer ?? getPracticeTaskCorrectAnswer(task);
   const currentWrongExplanation = currentWrongFeedback?.explanation ?? getPracticeTaskWrongExplanation(task);
+  const hudLessonNumber = Number(liveContext?.lessonId.match(/-l(\d+)$/)?.[1] ?? NaN);
+  const taskSurfaceStyle = isMeasurement
+    ? {
+        background: "linear-gradient(180deg, #fffdf7 0%, #fff7e6 100%)",
+        boxShadow: "0 18px 45px rgba(92,56,10,0.10)",
+      }
+    : isStarpath
+      ? {
+          background: "linear-gradient(180deg, #fbfaff 0%, #effcff 100%)",
+          boxShadow: "0 18px 45px rgba(76,29,149,0.10)",
+        }
+      : {
+          background: "linear-gradient(180deg, #fbfffe 0%, #effcf9 100%)",
+          boxShadow: "0 18px 45px rgba(4,78,70,0.10)",
+        };
 
   return (
     <div className="relative">
@@ -1260,6 +1275,9 @@ export function PracticeRunner({
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
           <LessonHUDRail
+            levelNumber={levelNumber}
+            week={liveContext?.week}
+            lessonNumber={Number.isFinite(hudLessonNumber) ? hudLessonNumber : undefined}
             lessonTitle={lessonTitle ?? null}
             correctAnswers={safeCorrectAnswers}
             xpCorrectAnswers={cappedCorrectAnswers}
@@ -1326,8 +1344,8 @@ export function PracticeRunner({
 
           {/* Main task card */}
           <div
-            className={`rounded-[1.75rem] border-2 p-5 shadow-lg transition-all duration-300 ${statusBorder} ${statusMotion}`}
-            style={isMeasurement ? { background: "#fdf6e8" } : undefined}
+            className={`rounded-[1.75rem] border-2 p-4 shadow-lg transition-all duration-300 sm:p-6 ${statusBorder} ${statusMotion}`}
+            style={taskSurfaceStyle}
           >
         {/* Activity type label */}
         <div className="mb-3">
@@ -1342,9 +1360,7 @@ export function PracticeRunner({
               color: "#15803d",
             }}
           >
-            {realmId === "space"
-              ? `${activityNoun}: ${formatPracticeTopicLabel(task.kind)}`
-              : task.kind.replace(/([A-Z])/g, " $1").toUpperCase()}
+            {`${isStarpath ? activityNoun : "Activity"}: ${formatPracticeTopicLabel(task.kind)}`}
           </span>
         </div>
 
@@ -1494,7 +1510,7 @@ export function PracticeRunner({
               type="button"
               onClick={continueAfterWrong}
               className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition hover:brightness-105 ${
-                isMeasurement ? "bg-[#8a6422]" : realmId === "space" ? "bg-violet-700" : "bg-trust-blue"
+                isMeasurement ? "bg-[#8a6422]" : realmId === "space" ? "bg-violet-700" : "bg-teal-700"
               }`}
             >
               Next Question

@@ -13,6 +13,7 @@
     "qa:quiz-nav": "node scripts/quiz-nav-audit.mjs",
     "qa:guided-lesson-feedback": "node scripts/guided-lesson-feedback-audit.mjs",
     "qa:realm-lesson-home": "node scripts/realm-lesson-home-audit.mjs",
+    "qa:realm-active-lesson": "node scripts/realm-active-lesson-shell-audit.mjs",
     "qa:student-session-isolation": "node scripts/student-session-isolation-audit.mjs",
     "qa:realm-availability": "node scripts/realm-availability-audit.mjs",
     "qa:realm-dashboard-navigation": "node scripts/realm-dashboard-navigation-audit.mjs",

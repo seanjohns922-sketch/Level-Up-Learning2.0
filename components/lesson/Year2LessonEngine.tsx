@@ -1461,6 +1461,9 @@ export function Year2LessonEngine({
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
           <LessonHUDRail
+            levelNumber={levelNumber}
+            week={lesson.week}
+            lessonNumber={lesson.lesson}
             lessonTitle={lesson.title}
             correctAnswers={correctAnswers}
             questionsAnswered={questionsAnswered}
@@ -1542,8 +1545,14 @@ export function Year2LessonEngine({
           {currentTurnSafe && currentActivity && currentQuestion ? (
             <ComboMilestonePop comboCount={comboCount}>
               <div
-                className={`rounded-[1.75rem] border-2 p-5 shadow-lg transition-all duration-500 ${statusBorder} ${statusMotion}`}
-                style={isMeasurement ? { background: "#fdf6e8" } : undefined}
+                className={`rounded-[1.75rem] border-2 p-4 shadow-lg transition-all duration-500 sm:p-6 ${statusBorder} ${statusMotion}`}
+                style={isMeasurement ? {
+                  background: "linear-gradient(180deg, #fffdf7 0%, #fff7e6 100%)",
+                  boxShadow: "0 18px 45px rgba(92,56,10,0.10)",
+                } : {
+                  background: "linear-gradient(180deg, #fbfffe 0%, #effcf9 100%)",
+                  boxShadow: "0 18px 45px rgba(4,78,70,0.10)",
+                }}
               >
                 <div className="mb-3 flex items-center justify-between gap-2">
                   <span
@@ -1557,7 +1566,7 @@ export function Year2LessonEngine({
                       color: "#15803d",
                     }}
                   >
-                    {activityLabel}
+                    Activity: {activityLabel}
                   </span>
                   {isNexus && (
                     <span
@@ -1622,7 +1631,9 @@ export function Year2LessonEngine({
                         type="button"
                         onClick={handleNextQuestion}
                         disabled={turnState === "advancing"}
-                        className="pointer-events-auto inline-flex items-center gap-2 rounded-xl bg-trust-blue px-5 py-3 font-black text-white transition hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
+                        className={`pointer-events-auto inline-flex items-center gap-2 rounded-xl px-5 py-3 font-black text-white transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70 ${
+                          isMeasurement ? "bg-[#8a6422]" : "bg-teal-700"
+                        }`}
                       >
                         {turnState === "advancing" ? "Loading..." : advanceError ? "Try Again" : "Next Question"}
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />

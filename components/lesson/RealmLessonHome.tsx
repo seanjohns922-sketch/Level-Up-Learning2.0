@@ -17,10 +17,10 @@ import {
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { getHomeBg } from "@/lib/levelBand";
 
-type LessonHomeRealm = "number" | "measurement";
+export type RealmLessonThemeId = "number" | "measurement";
 
 type RealmLessonHomeProps = {
-  realm: LessonHomeRealm;
+  realm: RealmLessonThemeId;
   levelNumber: number;
   levelLabel: string;
   year: string;
@@ -43,7 +43,7 @@ const MEASURELANDS_BACKGROUNDS: Record<number, string> = {
   6: "/images/measurelands-home-bg-y6.png",
 };
 
-const THEMES = {
+export const REALM_LESSON_THEMES = {
   number: {
     realmName: "Number Nexus",
     experienceLabel: "Nexus Mission",
@@ -100,7 +100,7 @@ const THEMES = {
   },
 } as const;
 
-function getArtwork(realm: LessonHomeRealm, levelNumber: number, year: string) {
+export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: number, year: string) {
   if (realm === "number") return getHomeBg(levelNumber, year === "Prep");
   if (year === "Prep") return "/images/measurelands-home-bg.jpg";
   return MEASURELANDS_BACKGROUNDS[levelNumber] ?? "/images/measurelands-home-bg.jpg";
@@ -140,9 +140,9 @@ export function RealmLessonHome({
   onBack,
   onStart,
 }: RealmLessonHomeProps) {
-  const theme = THEMES[realm];
+  const theme = REALM_LESSON_THEMES[realm];
   const criteria = uniqueCriteria(successCriteria, focus);
-  const artworkSrc = getArtwork(realm, levelNumber, year);
+  const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
   const learningText = `Today I am learning to ${focus}`;
   const criteriaText = `I can ${criteria.join(". I can ")}.`;
   const readAllText = `${lessonTitle}. ${theme.intro} ${learningText}. ${criteriaText} This lesson takes approximately nine minutes.`;
