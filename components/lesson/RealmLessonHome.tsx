@@ -208,13 +208,13 @@ export function RealmLessonHome({
               <Sparkles className="h-4 w-4" /> {theme.experienceLabel}
             </div>
             <div className="mt-4 flex max-w-3xl flex-wrap items-center gap-3">
-              <h1 className="max-w-2xl text-4xl font-black tracking-normal text-white sm:text-6xl">{lessonTitle}</h1>
+              <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl">{lessonTitle}</h1>
               <ReadAloudBtn
                 text={readAllText}
                 speechKey={`${realm}-lesson-home-${year}-${week}-${lessonNumber}`}
                 size="md"
                 label="Read lesson"
-                className="border-white/20 bg-black/30 text-white hover:bg-black/45"
+                className="!border-white/25 !bg-white/10 !text-white hover:!bg-white/20"
               />
             </div>
             <p className="mt-4 max-w-2xl text-base font-semibold leading-7 sm:text-lg" style={{ color: theme.accentSoft }}>
@@ -270,7 +270,7 @@ export function RealmLessonHome({
               <section className="rounded-lg border p-5" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: theme.accent }}>Today I am learning to...</div>
-                  <ReadAloudBtn text={learningText} label="Read" className="border-white/20 bg-black/20 text-white" />
+                  <ReadAloudBtn text={learningText} label="Read" className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/20" />
                 </div>
                 <p className="mt-3 text-xl font-bold leading-8 text-white">{focus}</p>
               </section>
@@ -278,7 +278,7 @@ export function RealmLessonHome({
               <section className="rounded-lg border p-5" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: theme.secondary }}>I can...</div>
-                  <ReadAloudBtn text={criteriaText} label="Read" className="border-white/20 bg-black/20 text-white" />
+                  <ReadAloudBtn text={criteriaText} label="Read" className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/20" />
                 </div>
                 <ul className="mt-3 space-y-3">
                   {criteria.map((criterion) => (
