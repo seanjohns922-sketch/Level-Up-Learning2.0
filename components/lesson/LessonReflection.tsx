@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ComponentType } from "react";
-import { Frown, Meh, Smile, Zap, Star, Flame, Bot, Ruler } from "lucide-react";
+import { Frown, Meh, Smile, Zap, Star, Flame, Bot, Ruler, Orbit } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { calcXP } from "./LessonXPBar";
@@ -44,6 +44,11 @@ type Props = {
   /** What the student unlocks / does next, e.g. "Lesson 2" or "This week's Quiz". */
   nextUpLabel?: string;
   realmId?: string;
+  copy?: {
+    reflectionTitle?: string;
+    reflectionPrompt?: string;
+    reflectionOptions?: string[];
+  };
   onComplete: () => void;
 };
 
@@ -59,6 +64,7 @@ function mascotForRealm(realmId?: string): {
   name: string;
 } {
   if (realmId === "measurement") return { Icon: Ruler, name: "Meazurex" };
+  if (realmId === "space") return { Icon: Orbit, name: "Geospin" };
   return { Icon: Bot, name: "Numbot" };
 }
 
@@ -200,6 +206,7 @@ export default function LessonReflection({
   correctAnswers,
   bestChain = 0,
   realmId,
+  copy,
   onComplete,
 }: Props) {
   // practisedSkills / nextUpLabel now live on the Coach Review screen; the
@@ -297,7 +304,7 @@ export default function LessonReflection({
           >
             {mascot.name} is proud of you!
           </div>
-          <div className="mt-2 text-2xl font-black text-white">Amazing work!</div>
+          <div className="mt-2 text-2xl font-black text-white">{copy?.reflectionTitle ?? "Amazing work!"}</div>
 
           <div className="mt-4 flex justify-center gap-1.5">
             {[0, 1, 2].map((i) => (
@@ -315,14 +322,33 @@ export default function LessonReflection({
 
           <StatChips xp={xp} chain={bestChain} accuracy={accuracy} {...statChipProps} />
 
-          <button
-            onClick={() => finishWith(null, null)}
-            disabled={saving}
-            className="mt-6 w-full rounded-2xl px-6 py-4 text-base font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
-            style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
-          >
-            Continue →
-          </button>
+          {copy?.reflectionPrompt ? (
+            <div className="mt-6">
+              <div className="text-base font-bold text-white">{copy.reflectionPrompt}</div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                {(copy.reflectionOptions ?? ["I made a discovery!"]).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => finishWith(null, null)}
+                    disabled={saving}
+                    className="min-h-12 rounded-xl border border-cyan-200/25 bg-white/10 px-3 py-2 text-sm font-black text-white transition hover:bg-white/15 disabled:opacity-60"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => finishWith(null, null)}
+              disabled={saving}
+              className="mt-6 w-full rounded-2xl px-6 py-4 text-base font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
+              style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
+            >
+              Continue →
+            </button>
+          )}
         </div>
       </div>
     );

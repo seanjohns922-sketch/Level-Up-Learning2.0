@@ -32,16 +32,33 @@ for (const kind of [
 assert.match(generator, /taskIndex <= 5/);
 assert.match(generator, /taskIndex <= 9/);
 assert.match(generator, /return shapeSceneTask/);
+assert.match(generator, /MEET_THE_SHAPES_CONTENT/);
+assert.match(generator, /satisfies StarpathLessonContent/);
+assert.match(generator, /activities:/);
+for (const title of [
+  "Cosmic Shape Match",
+  "Shape Sorter",
+  "Shapes Hidden in Starpath",
+]) {
+  assert.match(generator, new RegExp(title));
+}
+assert.doesNotMatch(generator, /brainBreak/i);
 
 const route = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
 assert.match(route, /lesson\.id === "ground-space-w1-l1"/);
 assert.match(route, /StarpathMeetTheShapesLesson/);
 
 const lessonComponent = read("components/starpath/StarpathMeetTheShapesLesson.tsx");
-assert.match(lessonComponent, /PracticeRunner/);
-assert.match(lessonComponent, /completionMode="time_only"/);
-assert.match(lessonComponent, /realmId="space"/);
-assert.match(lessonComponent, /writeStarpathDemoJourney/);
+assert.match(lessonComponent, /StarpathLessonShell/);
+assert.match(lessonComponent, /MEET_THE_SHAPES_CONTENT/);
+assert.doesNotMatch(lessonComponent, /PracticeRunner/);
+
+const lessonShell = read("components/starpath/StarpathLessonShell.tsx");
+assert.match(lessonShell, /PracticeRunner/);
+assert.match(lessonShell, /completionMode="time_only"/);
+assert.match(lessonShell, /realmId="space"/);
+assert.match(lessonShell, /writeStarpathDemoJourney/);
+assert.match(lessonShell, /brainBreakFrequency="normal"/);
 
 const renderer = read("components/starpath/StarpathShapeTaskCard.tsx");
 assert.match(renderer, /data-shape-drop/);

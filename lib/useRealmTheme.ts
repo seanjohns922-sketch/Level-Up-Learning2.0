@@ -6,6 +6,7 @@
  *
  * Default theme = Number Nexus (teal / emerald) — visually unchanged.
  * realmId === "measurement" → Measurelands (brass / gold / violet / earth).
+ * realmId === "space" → Starpath (violet / cyan / cosmic navy).
  */
 
 export type RealmTheme = {
@@ -135,9 +136,46 @@ const MEASURELANDS: RealmTheme = {
   confetti: ["#d6b86c", "#e8c97e", "#a78bfa", "#8aa977", "#b8893a"],
 };
 
+const STARPATH: RealmTheme = {
+  ...NUMBER_NEXUS,
+  realmId: "space",
+  ctaFrom: "#7c3aed",
+  ctaTo: "#06b6d4",
+  ctaHoverFrom: "#8b5cf6",
+  ctaHoverTo: "#22d3ee",
+  ctaGradientClass: "bg-gradient-to-r from-violet-600 to-cyan-500",
+  ctaHoverGradientClass: "hover:from-violet-500 hover:to-cyan-400",
+  ctaGradientCss: "linear-gradient(135deg, #6d28d9 0%, #7c3aed 48%, #06b6d4 100%)",
+  ctaShadow: "0 10px 30px -8px rgba(34,211,238,0.48)",
+  accentText: "#a5f3fc",
+  accentTextSoft: "rgba(196,181,253,0.86)",
+  borderRing: "rgba(103,232,249,0.36)",
+  surfaceTint: "rgba(124,58,237,0.10)",
+  haloA: "rgba(124,58,237,0.20)",
+  haloB: "rgba(34,211,238,0.16)",
+  haloC: "rgba(217,70,239,0.08)",
+  passRing: "#67e8f9",
+  passRingGlow: "#7c3aed",
+  cardSurface: "linear-gradient(135deg, #16082f 0%, #1e1b4b 52%, #083344 100%)",
+  cardInsetShadow: "inset 0 1px 0 rgba(165,243,252,0.18), inset 0 -10px 20px rgba(0,0,0,0.48)",
+  cardBorderTint: "rgba(103,232,249,0.18)",
+  chipBorder: "rgba(165,243,252,0.32)",
+  chipBg: "rgba(124,58,237,0.16)",
+  chipText: "#cffafe",
+  trophyGradient: "radial-gradient(circle at 35% 30%, #a5f3fc 0%, #7c3aed 58%, #1e1b4b 100%)",
+  trophyShadow: "inset 0 0 8px rgba(207,250,254,0.50)",
+  statBorder: "rgba(196,181,253,0.25)",
+  statBg: "rgba(124,58,237,0.10)",
+  statLabel: "rgba(207,250,254,0.72)",
+  statIcon: "#67e8f9",
+  confetti: ["#67e8f9", "#a78bfa", "#f0abfc", "#fde68a", "#22d3ee"],
+};
+
 /** Pure resolver — safe in SSR, client, server components. */
 export function getRealmTheme(realmId?: string | null): RealmTheme {
-  return realmId === "measurement" ? MEASURELANDS : NUMBER_NEXUS;
+  if (realmId === "measurement") return MEASURELANDS;
+  if (realmId === "space") return STARPATH;
+  return NUMBER_NEXUS;
 }
 
 /**
@@ -148,4 +186,4 @@ export function useRealmTheme(realmId?: string | null): RealmTheme {
   return getRealmTheme(realmId);
 }
 
-export const REALM_THEME_TOKENS = { NUMBER_NEXUS, MEASURELANDS };
+export const REALM_THEME_TOKENS = { NUMBER_NEXUS, MEASURELANDS, STARPATH };

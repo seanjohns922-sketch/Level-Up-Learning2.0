@@ -1,4 +1,5 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 
 export type FoundationShape = "circle" | "triangle" | "square" | "rectangle";
 
@@ -111,5 +112,47 @@ export const MEET_THE_SHAPES_PRACTISED_SKILLS = [
   "Sort familiar shapes by name",
   "Find familiar shapes inside environmental objects",
 ];
+
+export const MEET_THE_SHAPES_CONTENT = {
+  missionBrief: "Welcome, Explorer! Travel across Starpath and discover the familiar shapes hidden throughout the cosmic world.",
+  successCriteria: [
+    "name familiar shapes",
+    "match familiar shapes",
+    "find shapes around me",
+  ],
+  artworkSrc: "/images/starpath-home-bg-ground.png",
+  teaching: {
+    title: "Meet the Cosmic Shapes",
+    durationMinutes: 1,
+    taskKind: "starpathShapeIntro",
+  },
+  activities: [
+    {
+      key: "cosmic-shape-match",
+      title: "Cosmic Shape Match",
+      description: "Match each glowing target with the familiar shape that has the same name.",
+      taskKinds: ["starpathShapeMatch"],
+    },
+    {
+      key: "shape-sorter",
+      title: "Shape Sorter",
+      description: "Guide each shape to its matching planet. Drag it across space or tap the correct landing zone.",
+      taskKinds: ["starpathShapeSort"],
+    },
+    {
+      key: "shapes-hidden-in-starpath",
+      title: "Shapes Hidden in Starpath",
+      description: "Explore a cosmic scene and find familiar shapes inside planets, flags, windows and doors.",
+      taskKinds: ["starpathShapeScene"],
+    },
+  ],
+  reflection: {
+    prompt: "What new discovery did you make today?",
+    options: ["I named shapes", "I sorted shapes", "I found hidden shapes"],
+  },
+  practisedSkills: MEET_THE_SHAPES_PRACTISED_SKILLS,
+  nextUpLabel: "Find the Shapes",
+  createTaskGenerator: createMeetTheShapesTaskGenerator,
+} satisfies StarpathLessonContent;
 
 export { SHAPE_FACTS };

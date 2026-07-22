@@ -12,6 +12,10 @@ export function LessonCompleteCard({
   accuracy,
   onExit,
   realmId,
+  eyebrow,
+  completionTitle,
+  completionMessage,
+  exitLabel,
 }: {
   lessonTitle: string;
   questionsAnswered: number;
@@ -20,6 +24,10 @@ export function LessonCompleteCard({
   accuracy: number;
   onExit: () => void;
   realmId?: string;
+  eyebrow?: string;
+  completionTitle?: string;
+  completionMessage?: string;
+  exitLabel?: string;
 }) {
   const xp = calcXP(xpCorrectAnswers ?? correctAnswers);
   const theme = getRealmTheme(realmId);
@@ -74,10 +82,10 @@ export function LessonCompleteCard({
               color: theme.chipText,
             }}
           >
-            Lesson Complete
+            {eyebrow ?? "Lesson Complete"}
           </div>
           <h2 className="mt-2 text-2xl font-bold tracking-[-0.01em] text-white">
-            {lessonTitle}
+            {completionTitle ?? lessonTitle}
           </h2>
         </div>
 
@@ -138,7 +146,7 @@ export function LessonCompleteCard({
               color: theme.isMeasurement ? "#f5e6c4" : "#ccfbf1",
             }}
           >
-            Nice work — your progress has been updated.
+            {completionMessage ?? "Nice work — your progress has been updated."}
           </div>
 
           <button
@@ -152,7 +160,7 @@ export function LessonCompleteCard({
                 : "inset 0 1px 0 rgba(204,251,241,0.3), 0 0 18px rgba(45,212,191,0.25)",
             }}
           >
-            Return to Week →
+            {exitLabel ?? "Return to Week →"}
           </button>
         </div>
       </div>

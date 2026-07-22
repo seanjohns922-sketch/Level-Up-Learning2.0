@@ -1,7 +1,7 @@
 "use client";
 
 import { Volume2 } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
@@ -267,6 +267,23 @@ type LiveLessonContext = {
   lessonTitle: string;
 };
 
+export type PracticeTaskTransition = {
+  key: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+};
+
+export type LessonExperienceCopy = {
+  reflectionTitle?: string;
+  reflectionPrompt?: string;
+  reflectionOptions?: string[];
+  completionEyebrow?: string;
+  completionTitle?: string;
+  completionMessage?: string;
+  exitLabel?: string;
+};
+
 type GroundFeedbackTask = Extract<
   PracticeTask,
   { feedback?: { correct: string; wrong: string } }
@@ -302,6 +319,13 @@ export function PracticeRunner({
   practisedSkills,
   nextUpLabel,
   brainBreakFrequency = "normal",
+  getTaskTransition,
+  taskTransitionComponent: TaskTransitionComponent,
+  showResultsAfterReflection = false,
+  experienceCopy,
+  showCoachReview = true,
+  showMistakeReview = true,
+  activityNoun = "Question",
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -322,6 +346,16 @@ export function PracticeRunner({
   practisedSkills?: string[];
   nextUpLabel?: string;
   brainBreakFrequency?: BrainBreakFrequency;
+  getTaskTransition?: (task: PracticeTask) => PracticeTaskTransition | null;
+  taskTransitionComponent?: ComponentType<{
+    transition: PracticeTaskTransition;
+    onBegin: () => void;
+  }>;
+  showResultsAfterReflection?: boolean;
+  experienceCopy?: LessonExperienceCopy;
+  showCoachReview?: boolean;
+  showMistakeReview?: boolean;
+  activityNoun?: string;
 }) {
   const isMeasurement = realmId === "measurement";
   const isStructuredRealm = isMeasurement || realmId === "space";
@@ -414,6 +448,10 @@ export function PracticeRunner({
   const pauseLessonClockRef = useRef(false);
   const [isAdvancingTask, setIsAdvancingTask] = useState(false);
   const [transitionError, setTransitionError] = useState<string | null>(null);
+  const [pendingTaskTransition, setPendingTaskTransition] = useState<{
+    task: PracticeTask;
+    transition: PracticeTaskTransition;
+  } | null>(null);
   const [awaitingWrongNext, setAwaitingWrongNext] = useState(false);
   const [currentWrongFeedback, setCurrentWrongFeedback] = useState<MistakeReviewItem | null>(null);
   const [typed, setTyped] = useState("");
@@ -504,8 +542,8 @@ export function PracticeRunner({
 
   useEffect(() => {
     pauseLessonClockRef.current =
-      isIntroTask || Boolean(transitionError);
-  }, [isIntroTask, transitionError]);
+      isIntroTask || Boolean(transitionError) || Boolean(pendingTaskTransition);
+  }, [isIntroTask, pendingTaskTransition, transitionError]);
 
   useEffect(() => {
     const t = setInterval(
@@ -640,9 +678,9 @@ export function PracticeRunner({
     }
     return {
       progressPercent: Math.round((elapsedSeconds / totalSeconds) * 100),
-      progressLabel: `Question ${questionNumber}`,
+      progressLabel: `${activityNoun} ${questionNumber}`,
     };
-  }, [completionMode, elapsedSeconds, totalSeconds]);
+  }, [activityNoun, completionMode, elapsedSeconds, totalSeconds]);
 
   useEffect(() => {
     if (!autoReadEnabled || !speechInteractionReady) return;
@@ -745,6 +783,8 @@ export function PracticeRunner({
       return;
     }
     generated.difficulty = ctx.difficulty;
+    const currentTransition = getTaskTransition?.(task) ?? null;
+    const generatedTransition = getTaskTransition?.(generated) ?? null;
     setTransitionError(null);
     setStatus("idle");
     setAwaitingWrongNext(false);
@@ -752,9 +792,25 @@ export function PracticeRunner({
     setTyped("");
     setOrder([]);
     setHasPlayed(false);
+    scoredThisTurnRef.current = false;
+    if (generatedTransition && generatedTransition.key !== currentTransition?.key) {
+      pauseLessonClockRef.current = true;
+      setPendingTaskTransition({ task: generated, transition: generatedTransition });
+      advancingTaskRef.current = false;
+      setIsAdvancingTask(false);
+      return;
+    }
     setTask(generated);
     setTaskNonce((n) => n + 1);
-    scoredThisTurnRef.current = false;
+    questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
+  }
+
+  function beginPendingTask() {
+    if (!pendingTaskTransition) return;
+    pauseLessonClockRef.current = false;
+    setTask(pendingTaskTransition.task);
+    setPendingTaskTransition(null);
+    setTaskNonce((n) => n + 1);
     questionStartedAtElapsedRef.current = totalSeconds - secondsLeft;
   }
 
@@ -994,7 +1050,7 @@ export function PracticeRunner({
     // Coach Review (performance guidance) shows first for every lesson —
     // including ones with a bespoke completion card (Prep celebration) — then
     // the Reflection (celebration + confidence) or that bespoke card follows.
-    if (liveContext && !coachDone) {
+    if (liveContext && showCoachReview && !coachDone) {
       return (
         <LessonCoachReview
           review={buildCoachReview({
@@ -1013,7 +1069,7 @@ export function PracticeRunner({
         />
       );
     }
-    if (showLessonMistakeReview) {
+    if (showMistakeReview && showLessonMistakeReview) {
       return (
         <MistakeReviewPanel
           mode="lesson"
@@ -1026,7 +1082,7 @@ export function PracticeRunner({
         />
       );
     }
-    if (liveContext && lessonMistakes.length > 0 && !lessonMistakeReviewDone) {
+    if (liveContext && showMistakeReview && lessonMistakes.length > 0 && !lessonMistakeReviewDone) {
       return (
         <main className="min-h-screen bg-slate-950 px-4 py-8">
           <div className="mx-auto flex min-h-[70vh] max-w-2xl items-center justify-center">
@@ -1077,9 +1133,12 @@ export function PracticeRunner({
           practisedSkills={practisedSkills}
           nextUpLabel={nextUpLabel}
           realmId={realmId}
+          copy={experienceCopy}
           onComplete={() => {
             setReflectionDone(true);
-            onComplete(); // returns to the week page (lesson already finalised)
+            if (!showResultsAfterReflection) {
+              onComplete(); // legacy flow returns directly after reflection
+            }
           }}
         />
       );
@@ -1097,12 +1156,34 @@ export function PracticeRunner({
         accuracy={accuracy}
         xpCorrectAnswers={cappedCorrectAnswers}
         realmId={realmId}
+        eyebrow={experienceCopy?.completionEyebrow}
+        completionTitle={experienceCopy?.completionTitle}
+        completionMessage={experienceCopy?.completionMessage}
+        exitLabel={experienceCopy?.exitLabel}
         onExit={onComplete}
       />
     );
   }
 
   // ── Active state ──
+  if (pendingTaskTransition) {
+    if (TaskTransitionComponent) {
+      return <TaskTransitionComponent transition={pendingTaskTransition.transition} onBegin={beginPendingTask} />;
+    }
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-lg">
+        <div className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+          {pendingTaskTransition.transition.eyebrow}
+        </div>
+        <h2 className="mt-2 text-3xl font-black text-slate-950">{pendingTaskTransition.transition.title}</h2>
+        <p className="mt-2 text-slate-600">{pendingTaskTransition.transition.description}</p>
+        <button type="button" onClick={beginPendingTask} className="mt-5 rounded-xl bg-teal-700 px-6 py-3 font-black text-white">
+          Begin
+        </button>
+      </div>
+    );
+  }
+
   function getComboBorder(count: number) {
     if (isMeasurement) {
       if (count >= 10) return "border-amber-400/60 ring-2 ring-amber-300/40 ring-offset-2 ring-offset-amber-950 nexus-card-glow";
@@ -1260,7 +1341,9 @@ export function PracticeRunner({
               color: "#15803d",
             }}
           >
-            {task.kind.replace(/([A-Z])/g, " $1").toUpperCase()}
+            {realmId === "space"
+              ? `${activityNoun}: ${formatPracticeTopicLabel(task.kind)}`
+              : task.kind.replace(/([A-Z])/g, " $1").toUpperCase()}
           </span>
         </div>
 

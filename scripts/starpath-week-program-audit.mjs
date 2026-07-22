@@ -44,7 +44,8 @@ assert.match(programPage, /activityCardVariant: "standard" \| "portal-circle"/);
 assert.match(programPage, /isStarpathRealm \? null : readProgress\(canonicalRealmId\)/, "Starpath must not read another realm's placement state");
 assert.match(lessonPage, /buildStarpathProgramHref/);
 assert.match(quizPage, /buildStarpathProgramHref/);
-assert.match(lessonPlaceholder, /Back to Week/);
+assert.match(lessonPlaceholder, /StarpathMissionHome/);
+assert.match(read("components/starpath/StarpathMissionHome.tsx"), /Back to Week/);
 assert.match(quizPlaceholder, /Back to Week/);
 assert.match(quizPage, /realmId !== STARPATH_REALM_ID/);
 
