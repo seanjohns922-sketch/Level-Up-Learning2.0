@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
-import StudentAvatar from "@/components/avatar/StudentAvatar";
+import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import HallOfLegendsWidget from "@/components/home/HallOfLegendsWidget";
 import GemIcon, { cutForGem } from "@/components/gems/GemIcon";
 import { awardAndReveal } from "@/lib/gem-reveal";
@@ -25,12 +25,12 @@ import {
   equipEconomyItem,
   fetchStudentEconomy,
   getExplorerRank,
-  mergeAvatarOutfit,
   RARITY_STYLES,
   unequipEconomySlot,
   type EconomyItem,
   type EconomyState,
 } from "@/lib/economy";
+import { persistCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 import { resolveContinueLearningRoute } from "@/lib/continue-learning";
 import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/studentIdentity";
 
@@ -53,6 +53,7 @@ export default function HomeBasePage() {
       .then((nextState) => {
         if (cancelled || getActiveStudentIdentity().studentId !== requestedStudentId) return;
         setState(nextState);
+        persistCanonicalAvatarAppearance(requestedStudentId, nextState);
       })
       .catch((nextError) => {
         if (cancelled || getActiveStudentIdentity().studentId !== requestedStudentId) return;
@@ -87,7 +88,6 @@ export default function HomeBasePage() {
   const petItem = itemByKey.get(state?.equipped.pet ?? "") as EconomyItem | undefined;
   const homeItem = itemByKey.get(state?.equipped.home ?? "") as EconomyItem | undefined;
   const backgroundItem = itemByKey.get(state?.equipped.background ?? "") as EconomyItem | undefined;
-  const avatarOutfit = state ? mergeAvatarOutfit(state) : undefined;
   const collectibleCount = state?.inventory.filter(
     (entry) => itemByKey.get(entry.item_key)?.category === "collectible",
   ).length ?? 0;
@@ -130,7 +130,9 @@ export default function HomeBasePage() {
     setBusy(true);
     setError(null);
     try {
-      setState(await equipEconomyItem(student.studentId, item.item_key));
+      const next = await equipEconomyItem(student.studentId, item.item_key);
+      setState(next);
+      persistCanonicalAvatarAppearance(student.studentId, next);
     } catch (nextError) {
       setError(economyErrorMessage(nextError));
     } finally {
@@ -143,7 +145,9 @@ export default function HomeBasePage() {
     setBusy(true);
     setError(null);
     try {
-      setState(await unequipEconomySlot(student.studentId, "background"));
+      const next = await unequipEconomySlot(student.studentId, "background");
+      setState(next);
+      persistCanonicalAvatarAppearance(student.studentId, next);
     } catch (nextError) {
       setError(economyErrorMessage(nextError));
     } finally {
@@ -206,7 +210,11 @@ export default function HomeBasePage() {
 
           <div className="relative flex min-h-[390px] items-end justify-center lg:min-h-0">
             <div className="absolute bottom-3 h-16 w-72 rounded-[50%] bg-white/10 blur-xl" />
-            <StudentAvatar height={320} outfit={avatarOutfit} glowColor="rgba(255,255,255,.20)" />
+            <CanonicalStudentAvatar
+              studentId={student?.studentId}
+              height={320}
+              glowColor="rgba(255,255,255,.20)"
+            />
             <div className="absolute bottom-5 left-[calc(50%+70px)] flex min-h-24 w-28 flex-col items-center justify-center rounded-full border border-white/25 bg-slate-950/65 p-3 text-center backdrop-blur-sm">
               <PawPrint className={`h-8 w-8 ${petItem ? "text-white" : "text-white/40"}`} aria-hidden="true" />
               <span className="mt-1 text-[10px] font-black uppercase tracking-wide text-white/85">

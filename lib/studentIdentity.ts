@@ -72,6 +72,7 @@ export function clearActiveStudentSession() {
     localStorage.removeItem(`lul:${studentId}:active_learning_v1`);
     localStorage.removeItem(`lul:${studentId}:last_realm_v1`);
     localStorage.removeItem(`lul:${studentId}:avatar_outfit_v1`);
+    localStorage.removeItem(`lul:${studentId}:avatar_appearance_v2`);
   }
   localStorage.removeItem(ACTIVE_STUDENT_KEY);
   localStorage.removeItem(ACTIVE_STUDENT_PROFILE_KEY);

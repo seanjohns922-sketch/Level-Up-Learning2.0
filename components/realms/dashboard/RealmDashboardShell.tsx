@@ -15,7 +15,7 @@ import {
 import { readBestChain } from "@/lib/best-chain";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
-import StudentAvatar from "@/components/avatar/StudentAvatar";
+import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import { supabase } from "@/lib/supabase";
 import { fetchGlobalXp } from "@/lib/economy";
 import { setLastRealm } from "@/lib/last-realm";
@@ -114,7 +114,7 @@ function useWorldCanvas(colors: readonly string[], ringColor: string) {
 
 function PlayerCharacter({ config }: { config: CanonicalRealmDashboardConfig }) {
   return (
-    <StudentAvatar
+    <CanonicalStudentAvatar
       height={config.avatar.height}
       glowColor={config.avatar.glowColor}
       floatAnimation={config.avatar.floatAnimation}

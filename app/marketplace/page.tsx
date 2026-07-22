@@ -8,6 +8,7 @@ import MarketplaceItemImage from "@/components/economy/MarketplaceItemImage";
 import { economyErrorMessage, equipEconomyItem, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyCategory, type EconomyItem, type EconomyState } from "@/lib/economy";
 import { isMarketplaceItemAvailable, isMarketplaceItemListed } from "@/lib/marketplace-visuals";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import { persistCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 
 const CATEGORIES: Array<{ id: "all" | EconomyCategory; label: string }> = [
   { id: "all", label: "All" }, { id: "avatar", label: "Avatar" }, { id: "pet", label: "Pets" },
@@ -29,6 +30,7 @@ export default function MarketplacePage() {
     if (!student?.studentId) return;
     fetchStudentEconomy(student.studentId).then((next) => {
       setState(next);
+      persistCanonicalAvatarAppearance(student.studentId, next);
       setSelected(next.items.find(isMarketplaceItemListed) ?? null);
     }).catch((error) => setMessage(economyErrorMessage(error)));
   }, [student?.studentId]);
@@ -60,6 +62,7 @@ export default function MarketplacePage() {
         ? await equipEconomyItem(student.studentId, selected.item_key)
         : await purchaseEconomyItem(student.studentId, selected.item_key);
       setState(next);
+      persistCanonicalAvatarAppearance(student.studentId, next);
       setMessage(selectedOwned ? `${selected.name} is now equipped.` : `${selected.name} added to your collection.`);
     } catch (error) { setMessage(economyErrorMessage(error)); }
     finally { setBusy(false); }

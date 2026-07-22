@@ -250,23 +250,6 @@ export async function equipEconomyItem(studentId: string, itemKey: string) {
   return normalizeEconomyState(data);
 }
 
-/**
- * Mirror the composed avatar into localStorage so every StudentAvatar that
- * reads its outfit from storage (world maps, dashboards) matches My Home.
- * Overwrites fully, so unequipped layers are cleared.
- */
-export function persistAvatarToStorage(studentId: string, state: EconomyState) {
-  if (typeof window === "undefined" || !studentId) return;
-  try {
-    window.localStorage.setItem(
-      `lul:${studentId}:avatar_outfit_v1`,
-      JSON.stringify(mergeAvatarOutfit(state)),
-    );
-  } catch {
-    /* ignore */
-  }
-}
-
 export async function unequipEconomySlot(studentId: string, slot: string) {
   if (isDemoPreviewMode()) {
     const equipped = readDemoJson<Record<string, string>>(DEMO_EQUIPPED_STORAGE_KEY, {});

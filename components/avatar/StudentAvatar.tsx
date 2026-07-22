@@ -1,7 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useId, useRef, useState } from "react";
-import { ACTIVE_STUDENT_KEY } from "@/data/progress";
+import { createContext, useContext, useEffect, useId, useRef } from "react";
 
 // Every avatar instance gets a unique gradient-id prefix. Duplicate SVG ids
 // across the many avatars on a page (e.g. wardrobe thumbnails) are invalid and
@@ -111,19 +110,6 @@ export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
   backpackColor: "#f59e0b",
   accessory: "none",
 };
-
-function readOutfitFromStorage(): AvatarOutfit {
-  if (typeof window === "undefined") return {};
-  try {
-    const studentId = localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim();
-    if (!studentId) return {};
-    const raw = localStorage.getItem(`lul:${studentId}:avatar_outfit_v1`);
-    if (raw) return JSON.parse(raw) as AvatarOutfit;
-  } catch {
-    /* ignore */
-  }
-  return {};
-}
 
 type Outfit = Required<AvatarOutfit>;
 
@@ -876,7 +862,7 @@ function GlassesLayer({ o }: { o: Outfit }) {
   }
 }
 
-type StudentAvatarProps = {
+export type StudentAvatarProps = {
   height?: number;
   outfit?: AvatarOutfit;
   glowColor?: string;
@@ -898,14 +884,6 @@ export default function StudentAvatar({
   alive = true,
   celebrateSignal = 0,
 }: StudentAvatarProps) {
-  // Pull saved outfit on mount (avoids SSR hydration mismatch).
-  const [stored, setStored] = useState<AvatarOutfit>({});
-  useEffect(() => {
-    // localStorage is only readable after mount (avoids SSR hydration mismatch).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setStored(readOutfitFromStorage());
-  }, []);
-
   // One-shot celebrate pop when celebrateSignal changes (skips the first render).
   const wrapRef = useRef<HTMLDivElement>(null);
   const firstSignal = useRef(true);
@@ -932,11 +910,10 @@ export default function StudentAvatar({
 
   const o: Required<AvatarOutfit> = {
     ...DEFAULT_OUTFIT,
-    ...stored,
     ...(outfit ?? {}),
   };
   // Back-compat: pre-slot avatars stored body:"dress" with no `top` — render a dress.
-  if (o.body === "dress" && outfit?.top === undefined && stored.top === undefined) {
+  if (o.body === "dress" && outfit?.top === undefined) {
     o.top = "dress";
   }
   // A dress occupies the Bottom slot too — show slim leggings beneath the skirt.

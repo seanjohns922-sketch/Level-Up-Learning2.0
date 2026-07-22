@@ -18,7 +18,7 @@ import LevelsDrawer from "@/components/realms/LevelsDrawer";
 import RealmTopNavigation from "@/components/realms/dashboard/RealmTopNavigation";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
-import StudentAvatar from "@/components/avatar/StudentAvatar";
+import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import { fetchGlobalXp } from "@/lib/economy";
 import RealmDashboardNav from "@/components/world/RealmDashboardNav";
 import { setLastRealm } from "@/lib/last-realm";
@@ -311,113 +311,10 @@ function DistrictLabel({
   );
 }
 
-// ─── Player character (SVG silhouette with breathing animation) ─────────────────
-function PlayerCharacter({ gender }: { gender: "boy" | "girl" }) {
-  const teal = "#14b8a6";
-  const jacket = "#0d2644";
-  const pants = "#090f1c";
-  const pack = "#082540";
-  const skin = "#b87652";
-  const hair = gender === "girl" ? "#3a1e06" : "#110b03";
-
-  return (
-    <div
-      style={{
-        position: "relative",
-        display: "inline-block",
-        animation: "char-float 4.5s ease-in-out infinite",
-        filter: "drop-shadow(0 0 14px rgba(20,184,166,0.28)) drop-shadow(0 8px 18px rgba(0,0,0,0.7))",
-      }}
-    >
-      <svg width="96" height="196" viewBox="0 0 96 196" fill="none">
-        {/* Shoes */}
-        <rect x="23" y="172" width="20" height="10" rx="3" fill="#060912" />
-        <rect x="53" y="172" width="20" height="10" rx="3" fill="#060912" />
-        {/* Legs */}
-        <rect x="25" y="130" width="16" height="46" rx="4" fill={pants} />
-        <rect x="55" y="130" width="16" height="46" rx="4" fill={pants} />
-        {/* Body */}
-        <rect x="16" y="74" width="64" height="60" rx="8" fill={jacket} />
-        {/* Body neon trim */}
-        <rect x="14" y="74" width="68" height="7" rx="5" fill={teal} opacity="0.7" />
-        {/* Arms */}
-        <rect x="2"  y="80" width="16" height="48" rx="5" fill={jacket} />
-        <rect x="78" y="80" width="16" height="48" rx="5" fill={jacket} />
-        {/* Arm trim */}
-        <rect x="2"  y="80" width="16" height="5" rx="3" fill={teal} opacity="0.5" />
-        <rect x="78" y="80" width="16" height="5" rx="3" fill={teal} opacity="0.5" />
-        {/* Backpack */}
-        <rect x="18" y="82" width="30" height="42" rx="5" fill={pack} />
-        {/* Backpack strap top */}
-        <rect x="22" y="88" width="22" height="3" rx="1.5" fill={teal} opacity="0.8" />
-        {/* Backpack emblem */}
-        <rect x="27" y="98" width="12" height="12" rx="2.5" fill={teal} opacity="0.55" />
-        <rect x="30" y="101" width="6" height="6" rx="1" fill={teal} opacity="0.9" />
-        {/* Neck */}
-        <rect x="36" y="62" width="24" height="15" rx="5" fill={skin} />
-        {/* Head */}
-        <rect x="25" y="27" width="46" height="40" rx="10" fill={skin} />
-        {/* Hair top */}
-        <rect x="23" y="22" width="50" height="19" rx="9" fill={hair} />
-        <rect x="23" y="30" width="50" height="9" fill={hair} />
-        {/* Girl side hair */}
-        {gender === "girl" && (
-          <>
-            <rect x="20" y="40" width="7" height="22" rx="4" fill={hair} />
-            <rect x="69" y="40" width="7" height="22" rx="4" fill={hair} />
-          </>
-        )}
-      </svg>
-
-      {/* Backpack pack glow orb */}
-      <div style={{
-        position: "absolute",
-        top: "50%",
-        left: "22%",
-        width: 32,
-        height: 32,
-        borderRadius: "50%",
-        background: `radial-gradient(circle, ${teal}66 0%, transparent 70%)`,
-        filter: "blur(7px)",
-        animation: "pack-pulse 2.8s ease-in-out infinite",
-        pointerEvents: "none",
-      }} />
-
-      {/* Ground glow */}
-      <div style={{
-        position: "absolute",
-        bottom: -12,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: 100,
-        height: 24,
-        borderRadius: "50%",
-        background: `radial-gradient(ellipse, ${teal}40 0%, transparent 70%)`,
-        filter: "blur(6px)",
-      }} />
-    </div>
-  );
-}
-
-function readGenderFromStorage(): "boy" | "girl" {
-  if (typeof window === "undefined") return "boy";
-  try {
-    const raw = localStorage.getItem("lul_active_student_v1");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed?.gender === "girl" || parsed?.gender === "female") return "girl";
-    }
-  } catch {
-    // ignore
-  }
-  return "boy";
-}
-
 export default function NumberNexusMap() {
   const router   = useRouter();
   const [progress] = useState(() => readProgress());
   const [store]    = useState(() => readProgramStore());
-  const [gender] = useState<"boy" | "girl">(readGenderFromStorage);
   const [launching, setLaunching] = useState(false);
 
   useEffect(() => {
@@ -437,7 +334,6 @@ export default function NumberNexusMap() {
   const [bestChain] = useState(() => readBestChain("number", year));
   const [classBestChain, setClassBestChain] = useState<number | null>(null);
   const [globalXpBalance, setGlobalXpBalance] = useState<number | null>(null);
-  const isPrep     = year === "Prep";
   const eraIdx     = getEra(year);
   const era        = ERA_CONFIGS[eraIdx];
   const isGuided   = eraIdx <= 1; // Prep, Year 1, Year 2 — single big button, no menu decisions
@@ -478,6 +374,7 @@ export default function NumberNexusMap() {
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- demo mode clears server-only comparison data
       setClassBestChain(null);
       return;
     }
@@ -739,7 +636,7 @@ export default function NumberNexusMap() {
           zIndex: 12,
           pointerEvents: "auto",
         }}>
-          <StudentAvatar
+          <CanonicalStudentAvatar
             height={196}
             glowColor="rgba(20,184,166,0.32)"
             floatAnimation="char-float 4.5s ease-in-out infinite"

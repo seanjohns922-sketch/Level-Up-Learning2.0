@@ -12,13 +12,13 @@ import {
   fetchStudentEconomy,
   getExplorerRank,
   mergeAvatarOutfit,
-  persistAvatarToStorage,
   RARITY_STYLES,
   saveAvatarBase,
   unequipEconomySlot,
   type EconomyItem,
   type EconomyState,
 } from "@/lib/economy";
+import { persistCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 
 // ── Every option on this page is FREE. No XP, no unlocking. ─────────────────
@@ -138,7 +138,7 @@ export default function ExplorerOutfitPage() {
     fetchStudentEconomy(student.studentId)
       .then((next) => {
         setState(next);
-        persistAvatarToStorage(student.studentId, next);
+        persistCanonicalAvatarAppearance(student.studentId, next);
       })
       .catch((error) => setMessage(economyErrorMessage(error)));
   }, [student?.studentId]);
@@ -174,7 +174,7 @@ export default function ExplorerOutfitPage() {
   const bump = () => setCelebrate((c) => c + 1);
   function commit(next: EconomyState) {
     setState(next);
-    if (student?.studentId) persistAvatarToStorage(student.studentId, next);
+    if (student?.studentId) persistCanonicalAvatarAppearance(student.studentId, next);
   }
   async function updateBase(patch: Partial<AvatarOutfit>, celebrateChange = false) {
     if (!student?.studentId || !state) return;

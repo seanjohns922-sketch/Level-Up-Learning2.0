@@ -35,7 +35,7 @@ import {
 } from "@/lib/starpath-routes";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
-import StudentAvatar from "@/components/avatar/StudentAvatar";
+import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
@@ -780,7 +780,7 @@ function ProgramPage() {
         className="pointer-events-none fixed left-1/2 -translate-x-1/2 z-[5] hidden md:block"
         style={{ bottom: "1.5rem" }}
       >
-        <StudentAvatar
+        <CanonicalStudentAvatar
           height={160}
           glowColor={
             isStarpathRealm

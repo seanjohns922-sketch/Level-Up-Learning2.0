@@ -13,11 +13,12 @@ const continueLearning = read("lib/continue-learning.ts");
 const tracker = read("components/student/ActiveLearningTracker.tsx");
 const lastRealm = read("lib/last-realm.ts");
 const avatar = read("components/avatar/StudentAvatar.tsx");
+const avatarAppearance = read("lib/avatar-appearance.ts");
 const rankConfig = read("data/explorer-ranks.ts");
 const economy = read("lib/economy.ts");
 const identity = read("lib/studentIdentity.ts");
 const numberMap = read("components/world/NumberNexusMap.tsx");
-const measurelandsMap = read("components/world/MeasurelandsMap.tsx");
+const realmDashboardShell = read("components/realms/dashboard/RealmDashboardShell.tsx");
 
 const results = [];
 const check = (label, ok) => results.push({ label, ok });
@@ -29,7 +30,7 @@ check(
 );
 check(
   "Continue Learning uses the shared destination resolver",
-  home.includes("router.push(resolveContinueLearningRoute())") &&
+  home.includes("router.push(await resolveContinueLearningRoute())") &&
     !home.includes('onClick={() => router.push("/realms")} className="rounded-md bg-slate-900'),
 );
 check(
@@ -47,19 +48,21 @@ check(
   "Last realm and avatar browser state are student-scoped",
   lastRealm.includes("`lul:${studentId}:${LAST_REALM_KEY_VERSION}`") &&
     !lastRealm.includes('"lul:last_realm"') &&
-    avatar.includes("`lul:${studentId}:avatar_outfit_v1`") &&
-    !avatar.includes('getItem("lul_avatar_outfit_v1")'),
+    avatarAppearance.includes("`lul:${scope}:avatar_appearance_v2`") &&
+    avatarAppearance.includes("DEMO_PREVIEW_SCOPE") &&
+    !avatar.includes("localStorage"),
 );
 check(
   "Direct realm dashboard entry establishes the current realm",
   numberMap.includes('setLastRealm("number-nexus")') &&
-    measurelandsMap.includes('setLastRealm("measurelands")'),
+    realmDashboardShell.includes("setLastRealm(config.slug)"),
 );
 check(
   "Logout clears My Home browser caches before identity",
-  identity.includes("active_learning_v1") &&
+    identity.includes("active_learning_v1") &&
     identity.includes("last_realm_v1") &&
-    identity.includes("avatar_outfit_v1"),
+    identity.includes("avatar_outfit_v1") &&
+    identity.includes("avatar_appearance_v2"),
 );
 check(
   "Explorer Rank thresholds are centralized and use lifetime XP",
