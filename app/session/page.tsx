@@ -6641,8 +6641,9 @@ function makeTypeNumberQuestion(min: number, max: number): QuizQuestion {
   return {
     id: "",
     kind: "typed",
-    prompt: `Write the word for ${answer}.`,
-    correctValue: toWord(answer),
+    prompt: `Enter the numeral for ${toWord(answer)}.`,
+    correctValue: String(answer),
+    responseType: "number",
   };
 }
 
@@ -9651,6 +9652,7 @@ function SessionPage({
                         </div>
                       ) : null}
                       <NumberLineTap
+                        key={currentQuiz.id}
                         min={currentQuiz.line.min}
                         max={currentQuiz.line.max}
                         target={currentQuiz.line.target}
@@ -9672,6 +9674,7 @@ function SessionPage({
                         <span className="font-bold">{currentQuiz.line.target}</span>.
                       </div>
                       <NumberLineJump
+                        key={currentQuiz.id}
                         min={currentQuiz.line.min}
                         max={currentQuiz.line.max}
                         start={currentQuiz.line.start ?? currentQuiz.line.min}

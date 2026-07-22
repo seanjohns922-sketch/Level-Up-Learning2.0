@@ -275,7 +275,7 @@ function TaskRendererInner({
     case "countCircle":
       return <CountAndCircle key={k} config={t.config} onComplete={onC} />;
     case "typeNumber":
-      return <TypeTheNumber key={k} min={t.min} max={t.max} rounds={1} answer={t.answer} mode="word" onComplete={onC} />;
+      return <TypeTheNumber key={k} min={t.min} max={t.max} rounds={1} answer={t.answer} mode="number" onComplete={onC} />;
     case "numberLadder":
       return <NumberLadder key={k} start={t.start} target={t.target} onComplete={onC} />;
     case "numberLineTap":

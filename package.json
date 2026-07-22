@@ -42,7 +42,8 @@
     "qa:wardrobe-visuals": "node scripts/wardrobe-visual-audit.mjs",
     "qa:teacher-week-tally": "node scripts/teacher-week-tally-audit.mjs",
     "qa:canonical-progression": "node scripts/canonical-progression-audit.mjs",
-    "qa:teacher-progress-overrides": "node scripts/teacher-progress-override-audit.mjs"
+    "qa:teacher-progress-overrides": "node scripts/teacher-progress-override-audit.mjs",
+    "qa:early-years-inputs": "node scripts/early-years-answer-input-audit.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

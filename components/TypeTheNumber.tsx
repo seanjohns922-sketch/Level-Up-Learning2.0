@@ -27,14 +27,27 @@ const WORDS_0_20 = [
   "twenty",
 ];
 
-function toWord(n: number) {
+function toWord(n: number): string {
   if (n <= 20) return WORDS_0_20[n];
   const tens = Math.floor(n / 10) * 10;
   const ones = n % 10;
   const tensWord: Record<number, string> = {
+    20: "twenty",
     30: "thirty",
+    40: "forty",
+    50: "fifty",
+    60: "sixty",
+    70: "seventy",
+    80: "eighty",
+    90: "ninety",
   };
-  if (n < 30) return ones === 0 ? "twenty" : `twenty-${WORDS_0_20[ones]}`;
+  if (n >= 100) {
+    const hundreds = Math.floor(n / 100);
+    const remainder = n % 100;
+    return remainder === 0
+      ? `${WORDS_0_20[hundreds]} hundred`
+      : `${WORDS_0_20[hundreds]} hundred and ${toWord(remainder)}`;
+  }
   if (n % 10 === 0) return tensWord[tens] ?? String(n);
   if (tensWord[tens]) return `${tensWord[tens]}-${WORDS_0_20[ones]}`;
   return String(n);
@@ -108,11 +121,11 @@ export default function TypeTheNumber({
       </div>
 
       <div className="text-3xl font-extrabold mb-4">
-        {mode === "word" ? "Type the word:" : "Type this number:"}
+        {mode === "word" ? "Type the word:" : "Type the numeral:"}
       </div>
 
       <div className="text-6xl font-black text-teal-600 mb-6">
-        {currentAnswer}
+        {mode === "word" ? currentAnswer : toWord(currentAnswer)}
       </div>
 
       <input

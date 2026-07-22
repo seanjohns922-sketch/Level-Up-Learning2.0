@@ -69,16 +69,20 @@ export default function NumberLineTap({
     return values;
   }, [min, max]);
 
-  function handleClick(e: React.MouseEvent<HTMLDivElement>) {
+  function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (correct) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const raw = min + pct * range;
     const snapped = Math.round(raw);
     const clamped = Math.max(min, Math.min(max, snapped));
-    setValue(clamped);
-    onAttempt?.(clamped);
-    if (clamped === target) {
+    const hitRadiusPx = e.pointerType === "touch" ? 24 : e.pointerType === "pen" ? 20 : 16;
+    const pixelTolerance = Math.ceil((range / Math.max(1, rect.width)) * hitRadiusPx);
+    const hitTolerance = Math.max(1, Math.min(Math.ceil(range * 0.025), pixelTolerance));
+    const acceptedValue = Math.abs(clamped - target) <= hitTolerance ? target : clamped;
+    setValue(acceptedValue);
+    onAttempt?.(acceptedValue);
+    if (acceptedValue === target) {
       setCorrect(true);
       setTimeout(() => onComplete(), 600);
     }
@@ -114,8 +118,8 @@ export default function NumberLineTap({
 
         {/* Inner container for ticks & markers, inset to match line */}
         <div
-          className="absolute left-6 right-6 top-0 bottom-0 cursor-pointer"
-          onClick={handleClick}
+          className="absolute left-6 right-6 top-0 bottom-0 cursor-pointer touch-none"
+          onPointerDown={handlePointerDown}
         >
           {/* Minor ticks */}
           {minorTicks.map((t) => {

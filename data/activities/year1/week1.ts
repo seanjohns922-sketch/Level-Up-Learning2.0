@@ -114,7 +114,7 @@ export function genY1W1L3_TypeNumber(d: Difficulty): PracticeTask {
   const answer = randInt(lo, hi);
   return {
     kind: "typeNumber",
-    prompt: "Type the number word.",
+    prompt: "Type the numeral for the number word.",
     answer,
     min: lo,
     max: hi,
