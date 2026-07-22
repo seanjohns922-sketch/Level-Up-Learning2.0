@@ -3,12 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Orbit } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { PracticeRunner, type PracticeTaskTransition } from "@/components/PracticeRunner";
-import StarpathChallengeTransition from "@/components/starpath/StarpathChallengeTransition";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { PracticeRunner } from "@/components/PracticeRunner";
 import StarpathMissionHome, { type StarpathMissionMetadata } from "@/components/starpath/StarpathMissionHome";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
-import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { createRandomRealmLessonGenerator } from "@/data/activities/realm-lesson-blueprint";
 import { writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
@@ -27,22 +26,8 @@ export default function StarpathLessonShell({
 }) {
   const router = useRouter();
   const [missionStarted, setMissionStarted] = useState(false);
-  const [getTask] = useState(() => content.createTaskGenerator());
+  const [getTask] = useState(() => createRandomRealmLessonGenerator(content.createTaskSet()));
   const lessonFinalizedRef = useRef(false);
-
-  const transitionForTask = useMemo(() => {
-    const transitions = new Map<PracticeTask["kind"], PracticeTaskTransition>();
-    content.activities.forEach((activity, index) => {
-      const transition = {
-        key: activity.key,
-        eyebrow: `Challenge ${index + 1}`,
-        title: activity.title,
-        description: activity.description,
-      };
-      activity.taskKinds.forEach((kind) => transitions.set(kind, transition));
-    });
-    return (task: PracticeTask) => transitions.get(task.kind) ?? null;
-  }, [content.activities]);
 
   useEffect(() => {
     writeStarpathDemoJourney(lesson.level, {
@@ -124,12 +109,10 @@ export default function StarpathLessonShell({
               practisedSkills={[...content.practisedSkills]}
               nextUpLabel={content.nextUpLabel}
               brainBreakFrequency="normal"
-              getTaskTransition={transitionForTask}
-              taskTransitionComponent={StarpathChallengeTransition}
               showResultsAfterReflection
               showCoachReview={false}
               showMistakeReview={false}
-              activityNoun="Challenge"
+              activityNoun="Activity"
               experienceCopy={{
                 reflectionTitle: "Mission Log",
                 reflectionPrompt: content.reflection.prompt,

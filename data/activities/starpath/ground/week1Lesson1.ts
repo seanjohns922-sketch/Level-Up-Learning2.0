@@ -1,5 +1,6 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
+import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 
 export type FoundationShape = "circle" | "triangle" | "square" | "rectangle";
 
@@ -87,12 +88,15 @@ function shapeSceneTask(round: number, target: number): PracticeTask {
   };
 }
 
-export function createMeetTheShapesTaskGenerator() {
-  let taskIndex = 0;
-  return (): PracticeTask => {
-    const target = taskIndex + 1;
-    taskIndex += 1;
-    if (taskIndex === 1) {
+export function createMeetTheShapesTaskSet(): RealmLessonTaskSet {
+  let target = 0;
+  let matchRound = 0;
+  let sortRound = 0;
+  let sceneRound = 0;
+
+  return {
+    teaching: () => {
+      target += 1;
       return {
         kind: "starpathShapeIntro",
         scene: "intro",
@@ -100,10 +104,27 @@ export function createMeetTheShapesTaskGenerator() {
         speakText: `Meet the shapes. ${SHAPE_FACTS.circle} ${SHAPE_FACTS.triangle} ${SHAPE_FACTS.square} ${SHAPE_FACTS.rectangle}`,
         target,
       };
-    }
-    if (taskIndex <= 5) return shapeMatchTask(taskIndex - 2, target);
-    if (taskIndex <= 9) return shapeSortTask(taskIndex - 6, target);
-    return shapeSceneTask(taskIndex - 10, target);
+    },
+    activities: [
+      () => {
+        target += 1;
+        const task = shapeMatchTask(matchRound, target);
+        matchRound += 1;
+        return task;
+      },
+      () => {
+        target += 1;
+        const task = shapeSortTask(sortRound, target);
+        sortRound += 1;
+        return task;
+      },
+      () => {
+        target += 1;
+        const task = shapeSceneTask(sceneRound, target);
+        sceneRound += 1;
+        return task;
+      },
+    ],
   };
 }
 
@@ -152,7 +173,7 @@ export const MEET_THE_SHAPES_CONTENT = {
   },
   practisedSkills: MEET_THE_SHAPES_PRACTISED_SKILLS,
   nextUpLabel: "Find the Shapes",
-  createTaskGenerator: createMeetTheShapesTaskGenerator,
+  createTaskSet: createMeetTheShapesTaskSet,
 } satisfies StarpathLessonContent;
 
 export { SHAPE_FACTS };

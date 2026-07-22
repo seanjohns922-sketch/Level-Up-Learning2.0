@@ -10,11 +10,11 @@ Only an implemented registry lesson can receive a Start Mission callback. Planne
 
 ## Implemented
 
-- `ground-space-w1-l1` Meet the Shapes: mission home, teaching introduction, three challenge families, shared brain breaks, Mission Log, XP results and Back to Week navigation.
+- `ground-space-w1-l1` Meet the Shapes: mission home, teaching introduction, three randomly rotating activity types, shared brain breaks, Mission Log, XP results and Back to Week navigation.
 
 ## Missing lesson engines
 
-These routes have the shared mission home but are intentionally unavailable until their three curriculum challenges exist:
+These routes have the shared mission home but are intentionally unavailable until their three curriculum activities exist:
 
 - Ground Level: `ground-space-w1-l2` through `ground-space-w1-l3`; `ground-space-w2-l1` through `ground-space-w8-l3`.
 - Level 1: `y1-space-w1-l1` through `y1-space-w8-l3`.
@@ -26,7 +26,7 @@ These routes have the shared mission home but are intentionally unavailable unti
 
 Total: 167 planned lesson engines.
 
-For each route above, the missing pieces are the teaching introduction, three implemented challenge families, reflection content, completion persistence validation and end-to-end results verification. Mission metadata and safe Back to Week navigation are already present through the shared route.
+For each route above, the missing pieces are the teaching introduction, three implemented activity types, reflection content, completion persistence validation and end-to-end results verification. Mission metadata and safe Back to Week navigation are already present through the shared route.
 
 ## Shared architecture
 
@@ -34,7 +34,7 @@ For each route above, the missing pieces are the teaching introduction, three im
 - `StarpathLessonShell` owns Starpath's lesson presentation and translates Starpath terminology into the shared runtime.
 - Individual Starpath lesson files contain curriculum content, artwork, teaching, exactly three activities and reflection only.
 - Timer creation and automatic brain breaks remain inside `PracticeRunner`; it is not mounted before Start Mission.
-- Challenge transitions are opt-in shared-runner extension points, not a Starpath engine.
+- The three curriculum activities rotate in shuffled random cycles inside one continuous timed practice session; they are not presented as separate challenges or fixed time blocks.
 - Mission Log and Mission Complete wording are shared component configuration.
 - Saving, XP, completion and result sequencing remain shared runtime responsibilities.
 - Number Nexus and Measurelands retain their existing runtime behaviour while using their own realm content and presentation.

@@ -51,15 +51,13 @@ for (const required of [
   "Mission Log",
   "Mission Complete!",
   "Back to Week",
-  "getTaskTransition",
 ]) {
   assert.match(lessonShell, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 }
 assert.match(lessonShell, /ReadAloudBtn/);
-
-const challengeTransition = read("components/starpath/StarpathChallengeTransition.tsx");
-assert.match(challengeTransition, /Read challenge/);
-assert.match(challengeTransition, /ReadAloudBtn/);
+assert.doesNotMatch(lessonShell, /getTaskTransition/);
+assert.doesNotMatch(lessonShell, /StarpathChallengeTransition/);
+assert.doesNotMatch(lessonShell, /activityNoun="Challenge"/);
 
 const practiceRunner = read("components/PracticeRunner.tsx");
 assert.match(practiceRunner, /Mission Progress/);
@@ -84,6 +82,11 @@ const platformBlueprint = read("data/activities/realm-lesson-blueprint.ts");
 assert.match(platformBlueprint, /RealmLessonBlueprint/);
 assert.match(platformBlueprint, /activities: readonly \[/);
 assert.equal((platformBlueprint.match(/RealmLessonActivityDefinition,/g) ?? []).length, 3);
+assert.match(platformBlueprint, /createRandomRealmLessonGenerator/);
+assert.match(platformBlueprint, /shuffledActivityBag/);
+assert.match(platformBlueprint, /Math\.random\(\)/);
+assert.match(platformBlueprint, /activityBag\.pop\(\)/);
+assert.doesNotMatch(platformBlueprint, /activityDurationSeconds/);
 
 const starpathBlueprint = read("data/activities/starpath/lesson-blueprint.ts");
 assert.match(starpathBlueprint, /RealmLessonBlueprint/);

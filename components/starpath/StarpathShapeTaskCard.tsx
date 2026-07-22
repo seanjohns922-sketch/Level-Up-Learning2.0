@@ -83,7 +83,7 @@ export function StarpathShapeIntroCard({
         onClick={onContinue}
         className="mx-auto mt-6 block min-h-12 rounded-2xl bg-violet-700 px-7 py-3 text-lg font-black text-white shadow-lg transition hover:bg-violet-600 active:scale-[0.98]"
       >
-        Continue to Challenge 1
+        Start practising
       </button>
     </div>
   );

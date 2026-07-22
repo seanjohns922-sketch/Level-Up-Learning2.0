@@ -29,9 +29,9 @@ for (const kind of [
 ]) {
   assert.match(generator, new RegExp(`kind: [\"']${kind}[\"']`), `${kind} must be generated`);
 }
-assert.match(generator, /taskIndex <= 5/);
-assert.match(generator, /taskIndex <= 9/);
-assert.match(generator, /return shapeSceneTask/);
+assert.match(generator, /createMeetTheShapesTaskSet/);
+assert.match(generator, /activities: \[/);
+assert.match(generator, /shapeSceneTask\(sceneRound, target\)/);
 assert.match(generator, /MEET_THE_SHAPES_CONTENT/);
 assert.match(generator, /satisfies StarpathLessonContent/);
 assert.match(generator, /activities:/);
@@ -59,6 +59,8 @@ assert.match(lessonShell, /completionMode="time_only"/);
 assert.match(lessonShell, /realmId="space"/);
 assert.match(lessonShell, /writeStarpathDemoJourney/);
 assert.match(lessonShell, /brainBreakFrequency="normal"/);
+assert.doesNotMatch(lessonShell, /getTaskTransition/);
+assert.match(lessonShell, /createRandomRealmLessonGenerator/);
 
 const renderer = read("components/starpath/StarpathShapeTaskCard.tsx");
 assert.match(renderer, /data-shape-drop/);
