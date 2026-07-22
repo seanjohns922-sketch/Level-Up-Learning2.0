@@ -31,6 +31,7 @@
     "qa:starpath-routes": "node scripts/audit-starpath-routes.mjs",
     "qa:starpath-curriculum": "node scripts/audit-starpath-curriculum.mjs",
     "qa:starpath-week-program": "node scripts/starpath-week-program-audit.mjs",
+    "qa:starpath-ground-w1l1": "node scripts/audit-starpath-ground-week1-lesson1.mjs",
     "generate:starpath-curriculum": "node scripts/generate-starpath-curriculum-map.mjs",
     "qa:measurelands-progression": "node scripts/measurelands-progression-audit.mjs",
     "qa:level-integrity": "node scripts/level-integrity-audit.mjs",

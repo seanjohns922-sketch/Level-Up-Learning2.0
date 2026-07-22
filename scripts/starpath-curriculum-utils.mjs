@@ -21,7 +21,7 @@ export function renderStarpathCurriculumMap() {
   const lines = [
     "# Starpath Curriculum Map",
     "",
-    "> Status: Planned for teacher review. This registry contains no playable lessons, quiz banks or assessment banks.",
+    "> Status: In development. Ground Level Week 1 Lesson 1 is implemented for Demo Mode; remaining lessons, quiz banks and assessment banks are planned.",
     "",
     "Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Every week has a 15-question weekly quiz (5 questions per lesson). Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test, and post-test metadata remains planned for the later assessment phase.",
     "",
@@ -30,7 +30,7 @@ export function renderStarpathCurriculumMap() {
     "- 85-100%: level mastered; no required weeks.",
     "- 50-84%: targeted pathway based on weak skill-to-week evidence.",
     "- 0-49% or no pre-test result: full 8-week pathway.",
-    "- Starpath remains locked and non-persistent until dedicated `space` persistence and playable content exist.",
+    "- Starpath remains a Demo Mode preview. Its journey state is isolated under `realm_id=space` and is not production student progression.",
     "",
     "## Curriculum Sources",
     "",

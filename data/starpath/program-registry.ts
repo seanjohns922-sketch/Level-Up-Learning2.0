@@ -274,20 +274,32 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
 ];
 
 const ROLES: readonly StarpathSequenceRole[] = ["build", "develop", "apply"];
+const IMPLEMENTED_MEET_THE_SHAPES_ID = "ground-space-w1-l1";
+const MEET_THE_SHAPES_MECHANICS = [
+  "cosmic-shape-match",
+  "shape-sorter",
+  "starpath-environment-shape-find",
+] as const;
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
   const weeks = definition.weeks.map((week, index): StarpathWeekPlan => {
     const weekNumber = index + 1;
-    const lessons = week.lessons.map(([title, focus], lessonIndex): StarpathLessonPlan => ({
-      id: `${definition.prefix}-space-w${weekNumber}-l${lessonIndex + 1}`,
-      title,
-      sequenceRole: ROLES[lessonIndex],
-      focus,
-      learningIntention: `We are learning to ${focus.charAt(0).toLowerCase()}${focus.slice(1)}`,
-      skillIds: [week.skill.id],
-      activityMechanics: week.mechanics,
-      status: STARPATH_PROGRAM_STATUS,
-    })) as unknown as StarpathWeekPlan["lessons"];
+    const lessons = week.lessons.map(([title, focus], lessonIndex): StarpathLessonPlan => {
+      const lessonId = `${definition.prefix}-space-w${weekNumber}-l${lessonIndex + 1}`;
+      const isMeetTheShapes = lessonId === IMPLEMENTED_MEET_THE_SHAPES_ID;
+      return {
+        id: lessonId,
+        title,
+        sequenceRole: ROLES[lessonIndex],
+        focus,
+        learningIntention: isMeetTheShapes
+          ? "I can recognise and name familiar shapes."
+          : `We are learning to ${focus.charAt(0).toLowerCase()}${focus.slice(1)}`,
+        skillIds: [week.skill.id],
+        activityMechanics: isMeetTheShapes ? MEET_THE_SHAPES_MECHANICS : week.mechanics,
+        status: isMeetTheShapes ? "implemented" : STARPATH_PROGRAM_STATUS,
+      };
+    }) as unknown as StarpathWeekPlan["lessons"];
     return {
       week: weekNumber,
       title: week.title,

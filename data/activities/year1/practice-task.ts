@@ -2257,4 +2257,45 @@ export type PracticeTask = (
       total: number;
       size: number;
     }
+  | {
+      kind: "starpathShapeIntro";
+      scene: "intro";
+      prompt: string;
+      speakText: string;
+      target: number;
+    }
+  | {
+      kind: "starpathShapeMatch";
+      prompt: string;
+      speakText: string;
+      target: number;
+      targetShape: "circle" | "triangle" | "square" | "rectangle";
+      options: Array<{
+        id: string;
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+        scale: number;
+      }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathShapeSort";
+      prompt: string;
+      speakText: string;
+      target: number;
+      shape: "circle" | "triangle" | "square" | "rectangle";
+      colour: string;
+      scale: number;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathShapeScene";
+      prompt: string;
+      speakText: string;
+      target: number;
+      targetShape: "circle" | "triangle" | "square" | "rectangle";
+      correctObjectId: "planet" | "flag" | "window" | "door";
+      feedback: { correct: string; wrong: string };
+    }
 ) & { difficulty?: Difficulty };

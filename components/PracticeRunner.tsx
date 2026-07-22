@@ -78,6 +78,10 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "groundMoveCount") return "Move To Count";
   if (kind === "groundFeed") return "Feed Numbot";
   if (kind === "groundSoundCount") return "Sound Count";
+  if (kind === "starpathShapeIntro") return "Meet the Shapes";
+  if (kind === "starpathShapeMatch") return "Match the Cosmic Shapes";
+  if (kind === "starpathShapeSort") return "Shape Sorter";
+  if (kind === "starpathShapeScene") return "Shapes Hidden in Starpath";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";
@@ -119,6 +123,9 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "groundMoveCount") return String(task.targetNumber);
   if (task.kind === "groundFeed") return String(task.targetNumber);
   if (task.kind === "groundSoundCount") return String(task.targetNumber);
+  if (task.kind === "starpathShapeMatch") return task.targetShape;
+  if (task.kind === "starpathShapeSort") return `${task.shape} planet`;
+  if (task.kind === "starpathShapeScene") return task.correctObjectId;
   if (task.kind === "measurementCompare") {
     return task.objects.find((item) => item.id === task.correctOptionId)?.label ?? task.correctOptionId;
   }
@@ -317,6 +324,7 @@ export function PracticeRunner({
   brainBreakFrequency?: BrainBreakFrequency;
 }) {
   const isMeasurement = realmId === "measurement";
+  const isStructuredRealm = isMeasurement || realmId === "space";
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const completedRef = useRef(false);
@@ -418,7 +426,7 @@ export function PracticeRunner({
   const speechInteractionReady = useSpeechInteractionReady();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
   const autoReadPrompt = getPracticeTaskSpeechText(task);
-  const isIntroTask = isMeasurement && "scene" in task && task.scene === "intro";
+  const isIntroTask = isStructuredRealm && "scene" in task && task.scene === "intro";
   const lessonStage: MeasurelandsLessonStage = transitionError
     ? "transition_error"
     : isIntroTask
@@ -889,7 +897,7 @@ export function PracticeRunner({
     }
     bumpSessionCounters(true);
     clearPendingTimeout();
-    if (!isMeasurement) {
+    if (!isStructuredRealm) {
       timeoutRef.current = setTimeout(() => nextTask(), 600);
     }
   }
@@ -942,7 +950,10 @@ export function PracticeRunner({
     task.kind === "groundTapCount" ||
     task.kind === "groundMoveCount" ||
     task.kind === "groundFeed" ||
-    task.kind === "groundSoundCount";
+    task.kind === "groundSoundCount" ||
+    task.kind === "starpathShapeMatch" ||
+    task.kind === "starpathShapeSort" ||
+    task.kind === "starpathShapeScene";
   const hint =
     hasGroundFeedback
       ? status === "wrong"
@@ -1399,20 +1410,22 @@ export function PracticeRunner({
               type="button"
               onClick={continueAfterWrong}
               className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition hover:brightness-105 ${
-                isMeasurement ? "bg-[#8a6422]" : "bg-trust-blue"
+                isMeasurement ? "bg-[#8a6422]" : realmId === "space" ? "bg-violet-700" : "bg-trust-blue"
               }`}
             >
               Next Question
             </button>
           </div>
         ) : null}
-        {isMeasurement && status === "correct" && !transitionError ? (
+        {isStructuredRealm && status === "correct" && !transitionError ? (
           <div className="mt-5 flex justify-end">
             <button
               type="button"
               onClick={continueAfterCorrect}
               disabled={isAdvancingTask}
-              className="rounded-2xl bg-[#8a6422] px-5 py-3 text-lg font-black text-white transition hover:bg-[#a2732e] disabled:cursor-wait disabled:opacity-60"
+              className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition disabled:cursor-wait disabled:opacity-60 ${
+                isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-violet-700 hover:bg-violet-600"
+              }`}
             >
               {isAdvancingTask ? "Loading..." : "Next Challenge"}
             </button>

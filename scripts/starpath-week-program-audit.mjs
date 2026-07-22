@@ -41,7 +41,7 @@ assert.match(programPage, /fetch\("\/api\/demo-access"/, "The shared Starpath we
 assert.match(programPage, /isStarpathRealm \? item\.type === "quiz" \? "START QUIZ" : "START MISSION"/);
 assert.match(programPage, /isStarpathRealm \? "Missions" : "Lessons"/);
 assert.match(programPage, /activityCardVariant: "standard" \| "portal-circle"/);
-assert.match(programPage, /isStarpathRealm \? null : readProgress\(\)/, "Starpath must not read another realm's placement state");
+assert.match(programPage, /isStarpathRealm \? null : readProgress\(canonicalRealmId\)/, "Starpath must not read another realm's placement state");
 assert.match(lessonPage, /buildStarpathProgramHref/);
 assert.match(quizPage, /buildStarpathProgramHref/);
 assert.match(lessonPlaceholder, /Back to Week/);

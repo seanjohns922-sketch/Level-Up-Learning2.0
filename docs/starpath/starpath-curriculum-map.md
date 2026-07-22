@@ -1,6 +1,6 @@
 # Starpath Curriculum Map
 
-> Status: Planned for teacher review. This registry contains no playable lessons, quiz banks or assessment banks.
+> Status: In development. Ground Level Week 1 Lesson 1 is implemented for Demo Mode; remaining lessons, quiz banks and assessment banks are planned.
 
 Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Every week has a 15-question weekly quiz (5 questions per lesson). Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test, and post-test metadata remains planned for the later assessment phase.
 
@@ -9,7 +9,7 @@ Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks an
 - 85-100%: level mastered; no required weeks.
 - 50-84%: targeted pathway based on weak skill-to-week evidence.
 - 0-49% or no pre-test result: full 8-week pathway.
-- Starpath remains locked and non-persistent until dedicated `space` persistence and playable content exist.
+- Starpath remains a Demo Mode preview. Its journey state is isolated under `realm_id=space` and is not production student progression.
 
 ## Curriculum Sources
 
@@ -71,7 +71,7 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Meet the Shapes (`ground-space-w1-l1`) | build | Recognise circles, squares, triangles and rectangles. | We are learning to recognise circles, squares, triangles and rectangles. | shape-introduction, scene-shape-hunt, shape-match-sort |
+| 1. Meet the Shapes (`ground-space-w1-l1`) | build | Recognise circles, squares, triangles and rectangles. | I can recognise and name familiar shapes. | cosmic-shape-match, shape-sorter, starpath-environment-shape-find |
 | 2. Find the Shapes (`ground-space-w1-l2`) | develop | Search for familiar shapes hidden around Starpath. | We are learning to search for familiar shapes hidden around Starpath. | shape-introduction, scene-shape-hunt, shape-match-sort |
 | 3. Match the Shapes (`ground-space-w1-l3`) | apply | Match and simply sort familiar shapes. | We are learning to match and simply sort familiar shapes. | shape-introduction, scene-shape-hunt, shape-match-sort |
 

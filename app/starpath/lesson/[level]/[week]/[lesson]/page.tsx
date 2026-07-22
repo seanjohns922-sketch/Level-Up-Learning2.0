@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import StarpathDevelopmentLesson from "@/components/starpath/StarpathDevelopmentLesson";
+import StarpathMeetTheShapesLesson from "@/components/starpath/StarpathMeetTheShapesLesson";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getServerStarpathAccess } from "@/lib/demo-session-server";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
@@ -38,20 +39,26 @@ export default async function StarpathLessonPage({
   const lesson = program.weeks[week - 1]?.lessons[lessonNumber - 1];
   if (!lesson || program.realmId !== STARPATH_REALM_ID) notFound();
 
+  const lessonMetadata = {
+    level: definition.yearLabel,
+    levelLabel: definition.displayLabel,
+    week,
+    lesson: lessonNumber,
+    title: lesson.title,
+    focus: lesson.focus,
+    learningIntention: lesson.learningIntention,
+    registryId: lesson.id,
+    status: lesson.status,
+    weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
+  };
+
+  if (lesson.id === "ground-space-w1-l1") {
+    return <StarpathMeetTheShapesLesson lesson={lessonMetadata} />;
+  }
+
   return (
     <StarpathDevelopmentLesson
-      lesson={{
-        level: definition.yearLabel,
-        levelLabel: definition.displayLabel,
-        week,
-        lesson: lessonNumber,
-        title: lesson.title,
-        focus: lesson.focus,
-        learningIntention: lesson.learningIntention,
-        registryId: lesson.id,
-        status: lesson.status,
-        weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
-      }}
+      lesson={lessonMetadata}
     />
   );
 }

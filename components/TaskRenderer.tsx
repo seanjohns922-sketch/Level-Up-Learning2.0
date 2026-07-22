@@ -131,6 +131,12 @@ import { MeasurelandsPrecisionCard } from "@/components/measurelands/Measureland
 import { MeasurelandsTime24Card } from "@/components/measurelands/MeasurelandsTime24Card";
 import { MeasurelandsTimetableCard } from "@/components/measurelands/MeasurelandsTimetableCard";
 import { MeasurelandsProtractorCard } from "@/components/measurelands/MeasurelandsProtractorCard";
+import {
+  StarpathShapeIntroCard,
+  StarpathShapeMatchCard,
+  StarpathShapeSceneCard,
+  StarpathShapeSortCard,
+} from "@/components/starpath/StarpathShapeTaskCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -524,6 +530,14 @@ function TaskRendererInner({
       return <GroundFeedTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundSoundCount":
       return <GroundSoundCountTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathShapeIntro":
+      return <StarpathShapeIntroCard key={k} task={t} onContinue={onC} />;
+    case "starpathShapeMatch":
+      return <StarpathShapeMatchCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathShapeSort":
+      return <StarpathShapeSortCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathShapeScene":
+      return <StarpathShapeSceneCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     default:
       return <TaskRecoveryCard onRecover={onW} />;
   }
