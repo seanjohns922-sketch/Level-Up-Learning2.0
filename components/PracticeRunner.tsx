@@ -40,7 +40,7 @@ type GroupCountVisualTask = Extract<PracticeTask, { kind: "groupCountVisual" }>;
 
 type Scalar = string | number | boolean | null;
 
-const MAX_LESSON_QUESTIONS = 10;
+const DEFAULT_LESSON_SCORE_TARGET = 10;
 const RECENT_TASK_WINDOW = 6;
 const NEXT_TASK_REROLLS = 8;
 
@@ -286,7 +286,7 @@ export function PracticeRunner({
   onComplete,
   lessonTitle,
   completionMode = "question_or_time",
-  scoreCap = MAX_LESSON_QUESTIONS,
+  scoreCap = DEFAULT_LESSON_SCORE_TARGET,
   renderCompletionCard,
   onPerformanceSummary,
   liveContext,
@@ -318,9 +318,6 @@ export function PracticeRunner({
 }) {
   const isMeasurement = realmId === "measurement";
   const totalSeconds = minutes * 60;
-  // Timed lessons still need a hard question ceiling. Without one, fast or
-  // repeatedly resumed sessions can produce impossible-looking 100+ scores.
-  const questionLimit = MAX_LESSON_QUESTIONS;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const completedRef = useRef(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -416,7 +413,7 @@ export function PracticeRunner({
   const [hasPlayed, setHasPlayed] = useState(false);
   const [taskNonce, setTaskNonce] = useState(0);
   const elapsedSeconds = totalSeconds - secondsLeft;
-  const finished = secondsLeft <= 0 || (questionsAnswered >= questionLimit && !awaitingWrongNext);
+  const finished = secondsLeft <= 0;
   const { autoReadEnabled } = useAutoReadSetting();
   const speechInteractionReady = useSpeechInteractionReady();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
@@ -634,8 +631,8 @@ export function PracticeRunner({
       };
     }
     return {
-      progressPercent: Math.round((questionsAnsweredRef.current / MAX_LESSON_QUESTIONS) * 100),
-      progressLabel: `Question ${questionNumber} of ${MAX_LESSON_QUESTIONS}`,
+      progressPercent: Math.round((elapsedSeconds / totalSeconds) * 100),
+      progressLabel: `Question ${questionNumber}`,
     };
   }, [completionMode, elapsedSeconds, totalSeconds]);
 
@@ -774,10 +771,6 @@ export function PracticeRunner({
     clearPendingTimeout();
     setAwaitingWrongNext(false);
     setCurrentWrongFeedback(null);
-    if (questionsAnsweredRef.current >= questionLimit) {
-      setStatus("idle");
-      return;
-    }
     nextTask();
   }
 
@@ -852,10 +845,9 @@ export function PracticeRunner({
         skillTag: task.kind,
       });
     }
-    const nextQuestionsAnswered = bumpSessionCounters(false);
+    bumpSessionCounters(false);
     setComboCount(0);
     clearPendingTimeout();
-    if (nextQuestionsAnswered >= questionLimit) return;
   }
 
   function markCorrect() {
@@ -895,11 +887,8 @@ export function PracticeRunner({
         skillTag: task.kind,
       });
     }
-    const nextQuestionsAnswered = bumpSessionCounters(true);
+    bumpSessionCounters(true);
     clearPendingTimeout();
-    if (nextQuestionsAnswered >= questionLimit) {
-      return;
-    }
     if (!isMeasurement) {
       timeoutRef.current = setTimeout(() => nextTask(), 600);
     }
@@ -972,27 +961,6 @@ export function PracticeRunner({
         : null;
 
   useEffect(() => {
-    if (
-      completionMode === "question_or_time" &&
-      (questionsAnswered > MAX_LESSON_QUESTIONS || correctAnswers > MAX_LESSON_QUESTIONS)
-    ) {
-      console.warn("[Level1LessonGuard] Session counters exceeded expected lesson limits.", {
-        lessonTitle,
-        questionsAnswered,
-        correctAnswers,
-        maxQuestions: MAX_LESSON_QUESTIONS,
-      });
-    }
-    if (questionsAnswered > 100 || correctAnswers > 100) {
-      console.warn("[Level1LessonGuard] Counter exceeded safety threshold.", {
-        lessonTitle,
-        questionsAnswered,
-        correctAnswers,
-      });
-    }
-  }, [completionMode, correctAnswers, lessonTitle, questionsAnswered]);
-
-  useEffect(() => {
     if (!finished || !liveContext) return;
     void trackLiveLearningEvent({
       eventType: "lesson_completed",
@@ -1002,10 +970,7 @@ export function PracticeRunner({
       lessonId: liveContext.lessonId,
       lessonTitle: liveContext.lessonTitle,
       progressPercent: 100,
-      progressLabel:
-        completionMode === "time_only"
-          ? `Completed ${safeQuestionsAnswered} of ${MAX_LESSON_QUESTIONS} challenges`
-          : `Completed ${safeQuestionsAnswered} of ${MAX_LESSON_QUESTIONS} questions`,
+      progressLabel: `Completed ${safeQuestionsAnswered} questions`,
       questionsAnswered: safeQuestionsAnswered,
       totalQuestions: safeQuestionsAnswered,
       correctCount: correctAnswers,

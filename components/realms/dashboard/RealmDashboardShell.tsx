@@ -256,6 +256,7 @@ export default function RealmDashboardShell({
     progress?.assignedWeek,
     progress?.requiredWeeks,
     config.storageRealmId,
+    progress?.teacherAdvancedWeeks,
   );
   const currentLesson = demoJourney?.currentLesson ?? 1;
   const currentZone =

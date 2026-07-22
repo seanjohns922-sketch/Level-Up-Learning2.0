@@ -8,7 +8,8 @@ import { getCurriculumPlan } from "@/data/programs/genres";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
-import { isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
+import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import {
   getOptionalWeeks,
   getProgramWeeks,
@@ -264,11 +265,18 @@ function ProgramPage() {
     boxShadow: "inset 0 1px 0 rgba(207,250,254,0.22), 0 0 20px rgba(124,58,237,0.26)",
   } as const;
 
+  const legacyProgramMode = sp.get("legacy") === "1";
+  const previewMode = isDemoPreviewMode();
+  const canonicalRealmId = realmId === "measurement" ? "measurement" : "number";
+
   const [store, setStore] = useState<ProgramProgressStore>(() =>
     typeof window !== "undefined" ? readProgramStore() : {}
   );
   const [studentProgress, setStudentProgress] = useState(() =>
-    typeof window !== "undefined" && !isStarpathRealm ? readProgress() : null
+    typeof window !== "undefined" && !isStarpathRealm ? readProgress(canonicalRealmId) : null
+  );
+  const [canonicalStatus, setCanonicalStatus] = useState<"loading" | "ready" | "error">(
+    isStarpathRealm || DEMO_MODE || previewMode ? "ready" : "loading",
   );
   const [teacherMode, setTeacherMode] = useState(() =>
     typeof window !== "undefined" ? window.localStorage.getItem(TEACHER_MODE_KEY) === "true" : false
@@ -286,9 +294,31 @@ function ProgramPage() {
     return window.sessionStorage.getItem(pathwayJournalStorageKey) === "true";
   });
 
-  const legacyProgramMode = sp.get("legacy") === "1";
-  const previewMode = isDemoPreviewMode();
   const unrestrictedMode = DEMO_MODE || previewMode || teacherMode || isStarpathRealm;
+
+  useEffect(() => {
+    if (isStarpathRealm || DEMO_MODE || previewMode) return;
+    const studentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY);
+    if (!studentId) {
+      Promise.resolve().then(() => setCanonicalStatus("error"));
+      return;
+    }
+    let cancelled = false;
+    void restoreStudentStateFromServer(studentId, canonicalRealmId)
+      .then(({ progress }) => {
+        if (cancelled) return;
+        setStore(readProgramStore());
+        setStudentProgress(progress);
+        setCanonicalStatus("ready");
+      })
+      .catch((error) => {
+        console.error("[Program] Canonical progression bootstrap failed", error);
+        if (!cancelled) setCanonicalStatus("error");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [canonicalRealmId, isStarpathRealm, previewMode]);
 
   useEffect(() => {
     if (!isStarpathRealm) return;
@@ -315,33 +345,21 @@ function ProgramPage() {
   }, [isStarpathRealm, router, starpathAccess]);
 
   useEffect(() => {
-    if (isStarpathRealm) return;
-    const progress = readProgress();
-    if (!previewMode && !isPlacementComplete(progress)) {
+    if (isStarpathRealm || canonicalStatus !== "ready") return;
+    if (!previewMode && !isPlacementComplete(studentProgress)) {
       router.replace("/home");
     }
-  }, [isStarpathRealm, previewMode, router]);
+  }, [canonicalStatus, isStarpathRealm, previewMode, router, studentProgress]);
 
   useEffect(() => {
-    if (isStarpathRealm) return;
-    const progress = readProgress();
-    if (!DEMO_MODE && !previewMode && progress?.year && progress.year !== year) {
-      const targetWeek = Math.max(1, Math.min(lastWeek, progress.assignedWeek ?? 1));
-      router.replace(`/program?year=${encodeURIComponent(progress.year)}&week=${targetWeek}&legacy=1`);
+    if (isStarpathRealm || canonicalStatus !== "ready") return;
+    if (!DEMO_MODE && !previewMode && studentProgress?.year && studentProgress.year !== year) {
+      const targetWeek = Math.max(1, Math.min(lastWeek, studentProgress.assignedWeek ?? 1));
+      const realmParam = canonicalRealmId === "measurement" ? "&realm_id=measurement" : "";
+      router.replace(`/program?year=${encodeURIComponent(studentProgress.year)}&week=${targetWeek}&legacy=1${realmParam}`);
       return;
     }
-  }, [isStarpathRealm, lastWeek, previewMode, router, year]);
-
-  useEffect(() => {
-    if (isStarpathRealm) return;
-    const progress = readProgress();
-    if (progress?.status === "ASSIGNED_PROGRAM" && progress.year === year) {
-      const nextAssignedWeek = Math.max(1, Math.min(lastWeek, weekNum));
-      if ((progress.assignedWeek ?? 1) !== nextAssignedWeek) {
-        updateProgress({ assignedWeek: nextAssignedWeek });
-      }
-    }
-  }, [isStarpathRealm, lastWeek, weekNum, year]);
+  }, [canonicalRealmId, canonicalStatus, isStarpathRealm, lastWeek, previewMode, router, studentProgress, year]);
 
   useEffect(() => {
     if (!isStarpathRealm || !starpathProgram) return;
@@ -375,15 +393,28 @@ function ProgramPage() {
     window.sessionStorage.setItem(pathwayJournalStorageKey, pathwayJournalOpen ? "true" : "false");
   }, [pathwayJournalOpen, pathwayJournalStorageKey]);
 
-  // Re-read store on window focus (in case lesson page updated it)
+  // Rebuild the browser cache from canonical rows when returning from a lesson.
   useEffect(() => {
-    function onFocus() {
-      setStore(readProgramStore());
-      setStudentProgress(isStarpathRealm ? null : readProgress());
+    async function onFocus() {
+      if (isStarpathRealm || DEMO_MODE || previewMode) {
+        setStore(readProgramStore());
+        setStudentProgress(isStarpathRealm ? null : readProgress(canonicalRealmId));
+        return;
+      }
+      const studentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY);
+      if (!studentId) return;
+      try {
+        const restored = await restoreStudentStateFromServer(studentId, canonicalRealmId);
+        setStore(readProgramStore());
+        setStudentProgress(restored.progress);
+      } catch (error) {
+        console.error("[Program] Canonical progression refresh failed", error);
+        setCanonicalStatus("error");
+      }
     }
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
-  }, [isStarpathRealm]);
+  }, [canonicalRealmId, isStarpathRealm, previewMode]);
 
   const assignedProgram =
     studentProgress?.status === "ASSIGNED_PROGRAM" && studentProgress.year === curriculumYear
@@ -413,18 +444,18 @@ function ProgramPage() {
     [optionalWeeks, realmId, requiredWeeks]
   );
   const requiredWeeksComplete = useMemo(
-    () => hasCompletedRequiredWeeks(store, curriculumYear, requiredWeeks, realmId),
-    [store, curriculumYear, requiredWeeks, realmId]
+    () => hasCompletedRequiredWeeks(store, curriculumYear, requiredWeeks, realmId, studentProgress?.teacherAdvancedWeeks),
+    [store, curriculumYear, requiredWeeks, realmId, studentProgress?.teacherAdvancedWeeks]
   );
   const canTakePostTestEarly = hasPersonalizedPlan && requiredWeeksComplete;
   const currentWeekIsRequired = requiredWeeks.includes(weekNum);
   const playableWeeks = useMemo(
-    () => getPlayableWeeks(store, curriculumYear, requiredWeeks, optionalWeeks, realmId),
-    [store, curriculumYear, requiredWeeks, optionalWeeks, realmId]
+    () => getPlayableWeeks(store, curriculumYear, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks),
+    [store, curriculumYear, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks]
   );
   const weekIsPlayable = useMemo(
-    () => isWeekPlayable(store, curriculumYear, weekNum, requiredWeeks, optionalWeeks, realmId),
-    [store, curriculumYear, weekNum, requiredWeeks, optionalWeeks, realmId]
+    () => isWeekPlayable(store, curriculumYear, weekNum, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks),
+    [store, curriculumYear, weekNum, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks]
   );
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
@@ -562,19 +593,19 @@ function ProgramPage() {
   const weekComplete = isWeekComplete(progress);
 
   useEffect(() => {
-    if (isStarpathRealm) return;
-    const student = readProgress();
+    if (isStarpathRealm || !previewMode) return;
+    const student = readProgress(canonicalRealmId);
     if (!student || student.status !== "ASSIGNED_PROGRAM" || student.year !== curriculumYear) return;
     const savedWeek = student.assignedWeek ?? 1;
     let nextWeek = savedWeek;
     if (hasPersonalizedPlan) {
-      nextWeek = getRecommendedAssignedWeek(store, curriculumYear, savedWeek, student.requiredWeeks, realmId);
+      nextWeek = getRecommendedAssignedWeek(store, curriculumYear, savedWeek, student.requiredWeeks, realmId, student.teacherAdvancedWeeks);
     } else {
       if (weekNum > savedWeek) nextWeek = weekNum;
       if (weekComplete) nextWeek = Math.max(nextWeek, Math.min(lastWeek, weekNum + 1));
     }
-    if (nextWeek !== savedWeek) updateProgress({ assignedWeek: nextWeek });
-  }, [curriculumYear, hasPersonalizedPlan, isStarpathRealm, lastWeek, realmId, store, weekComplete, weekNum]);
+    if (nextWeek !== savedWeek) updateProgress({ assignedWeek: nextWeek }, canonicalRealmId);
+  }, [canonicalRealmId, curriculumYear, hasPersonalizedPlan, isStarpathRealm, lastWeek, previewMode, realmId, store, weekComplete, weekNum]);
 
   const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
   const totalXp = 50;
@@ -589,6 +620,24 @@ function ProgramPage() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#070a1b] text-cyan-100">
         <p>{starpathAccess === "denied" ? "Returning to the Tower…" : "Opening Starpath…"}</p>
+      </main>
+    );
+  }
+
+  if (!isStarpathRealm && canonicalStatus !== "ready") {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[#f6f2ec] px-6 text-center">
+        {canonicalStatus === "loading" ? (
+          <p className="font-semibold text-gray-500">Loading saved progress...</p>
+        ) : (
+          <div>
+            <h1 className="text-2xl font-black text-slate-900">Saved progress could not be loaded</h1>
+            <p className="mt-2 text-slate-600">Return to the Tower and try entering the realm again.</p>
+            <button type="button" onClick={() => router.push("/home")} className="mt-5 rounded-md bg-teal-700 px-5 py-3 font-bold text-white">
+              Return to Tower
+            </button>
+          </div>
+        )}
       </main>
     );
   }

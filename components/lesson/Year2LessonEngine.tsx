@@ -590,6 +590,7 @@ export function Year2LessonEngine({
   renderCompletionCard,
   onPerformanceSummary,
   liveContext,
+  sessionScopeKey,
   realmId,
   levelNumber,
   practisedSkills,
@@ -602,6 +603,7 @@ export function Year2LessonEngine({
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
   liveContext?: LiveLessonContext;
+  sessionScopeKey?: string;
   realmId?: string;
   levelNumber?: number;
   practisedSkills?: string[];
@@ -637,7 +639,8 @@ export function Year2LessonEngine({
   const [reflectionDone, setReflectionDone] = useState(false);
   // ── Lesson save & resume ──
   const resumeLessonKey = liveContext?.lessonId ?? lesson.id;
-  const lessonSessionIdRef = useRef(getOrCreateLessonSessionId(resumeLessonKey));
+  const completionSessionKey = sessionScopeKey ?? resumeLessonKey;
+  const lessonSessionIdRef = useRef(getOrCreateLessonSessionId(completionSessionKey));
   const [showLessonResume, setShowLessonResume] = useState(false);
   const resumeResolvedRef = useRef(false);
   const showLessonResumeRef = useRef(false);
@@ -678,7 +681,7 @@ export function Year2LessonEngine({
   const advanceRequestedRef = useRef(false);
   const [attemptLog, setAttemptLog] = useState<LessonAttemptEntry[]>([]);
   const questionStartedAtElapsedRef = useRef(0);
-  const finished = secondsLeft <= 0 || questionsAnswered >= 10;
+  const finished = secondsLeft <= 0;
   const currentActivity = activities[currentActivityIndex] ?? null;
   const currentTurnSafe =
     currentActivity !== null &&
@@ -906,7 +909,7 @@ export function Year2LessonEngine({
 
   function restartLesson() {
     clearLessonResume(resumeLessonKey);
-    lessonSessionIdRef.current = startNewLessonSession(resumeLessonKey);
+    lessonSessionIdRef.current = startNewLessonSession(completionSessionKey);
     const nextTurn = buildInitialTurn(lesson, activities);
     setSecondsLeft(totalSeconds);
     setQuestionsAnswered(0);
@@ -1021,7 +1024,7 @@ export function Year2LessonEngine({
     const activityLabel = formatLessonTopicLabel(mode);
     const activityId = `${liveContext.lessonId}:${currentActivity.activityType}:${currentActivityIndex}`;
     const questionId = `${liveContext.lessonId}-q${currentQuestionSequence}`;
-    const progressPercent = Math.max(0, Math.min(100, Math.round((questionsAnsweredRef.current / 10) * 100)));
+    const progressPercent = Math.max(0, Math.min(100, Math.round(((totalSeconds - secondsLeft) / totalSeconds) * 100)));
     if (lastLoggedActivityIdRef.current !== activityId) {
       lastLoggedActivityIdRef.current = activityId;
       void trackLiveLearningEvent({
@@ -1117,7 +1120,7 @@ export function Year2LessonEngine({
         isCorrect: true,
         timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
         attemptNumber: (questionsAnsweredRef.current ?? 0) + 1,
-        progressPercent: Math.max(0, Math.min(100, Math.round((questionsAnsweredRef.current / 10) * 100))),
+        progressPercent: Math.max(0, Math.min(100, Math.round(((totalSeconds - secondsLeft) / totalSeconds) * 100))),
         progressLabel: `Question ${currentQuestionSequence}`,
         skillTag: mode,
       });
@@ -1190,7 +1193,7 @@ export function Year2LessonEngine({
         isCorrect: false,
         timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
         attemptNumber: (questionsAnsweredRef.current ?? 0) + 1,
-        progressPercent: Math.max(0, Math.min(100, Math.round((questionsAnsweredRef.current / 10) * 100))),
+        progressPercent: Math.max(0, Math.min(100, Math.round(((totalSeconds - secondsLeft) / totalSeconds) * 100))),
         progressLabel: `Question ${currentQuestionSequence}`,
         skillTag: mode,
       });

@@ -18,6 +18,10 @@ export type CompatProgressRow = {
   unlocked_legends: unknown;
   quiz_scores: unknown;
   lesson_attempts?: unknown;
+  pretest_profile?: Record<string, unknown> | null;
+  posttest_profile?: Record<string, unknown> | null;
+  teacher_advanced_weeks?: number[];
+  teacher_overrides?: StudentProgressOverrideRow[];
   has_seen_intro?: boolean | null;
   updated_at?: string | null;
 };
@@ -101,16 +105,18 @@ type RealmAssessmentRow = {
   completed_at: string;
 };
 
-type LegacyProgressRow = {
+export type StudentProgressOverrideRow = {
+  id: string;
   student_id: string;
-  year: string | null;
-  week: number | null;
-  status: string | null;
-  pretest_score: number | null;
-  updated_at?: string | null;
+  realm_id: "number" | "measurement";
+  working_level: string;
+  week: number;
+  advanced_to_week: number;
+  teacher_id: string;
+  reason: string;
+  notes: string | null;
+  created_at: string;
 };
-
-type SnapshotLike = CompatProgressRow;
 
 function parseStringArray(value: unknown): string[] {
   if (Array.isArray(value)) {
@@ -214,7 +220,7 @@ function normalizeQuizAttemptSummary(row: WeeklyQuizAttemptRow) {
   };
 }
 
-function normalizePosttestAttempt(row: RealmAssessmentRow) {
+function normalizeAssessmentAttempt(row: RealmAssessmentRow) {
   const placementResult = parseObject(row.placement_result);
   return {
     ...placementResult,
@@ -234,6 +240,7 @@ function buildRowsFromRealmData(
   lessonAttempts: LessonAttemptRow[],
   quizAttempts: WeeklyQuizAttemptRow[],
   assessments: RealmAssessmentRow[],
+  overrides: StudentProgressOverrideRow[] = [],
 ) {
   const lessonMap = new Map<string, LessonAttemptRow[]>();
   lessonAttempts.forEach((row) => {
@@ -257,6 +264,14 @@ function buildRowsFromRealmData(
     const current = assessmentMap.get(key);
     if (current) current.push(row);
     else assessmentMap.set(key, [row]);
+  });
+
+  const overrideMap = new Map<string, StudentProgressOverrideRow[]>();
+  overrides.forEach((row) => {
+    const key = snapshotKey(row.student_id, row.working_level);
+    const current = overrideMap.get(key);
+    if (current) current.push(row);
+    else overrideMap.set(key, [row]);
   });
 
   return summaries.map((summary) => {
@@ -323,7 +338,7 @@ function buildRowsFromRealmData(
 
     const posttests = assessmentRows.filter((row) => row.assessment_type === "posttest");
     if (posttests.length > 0) {
-      const attempts = posttests.map(normalizePosttestAttempt);
+      const attempts = posttests.map(normalizeAssessmentAttempt);
       quizScores.posttest = {
         latest: attempts[attempts.length - 1],
         attempts,
@@ -332,6 +347,7 @@ function buildRowsFromRealmData(
 
     const pretests = assessmentRows.filter((row) => row.assessment_type === "pretest");
     const latestPretest = pretests[pretests.length - 1] ?? null;
+    const latestPosttest = posttests[posttests.length - 1] ?? null;
 
     return {
       student_id: summary.student_id,
@@ -349,70 +365,16 @@ function buildRowsFromRealmData(
       unlocked_legends: parseStringArray(summary.unlocked_legends),
       quiz_scores: quizScores,
       lesson_attempts: lessonAttemptsById,
+      pretest_profile: latestPretest ? normalizeAssessmentAttempt(latestPretest) : null,
+      posttest_profile: latestPosttest ? normalizeAssessmentAttempt(latestPosttest) : null,
+      teacher_advanced_weeks: (overrideMap.get(key) ?? []).map((row) => row.week).sort((a, b) => a - b),
+      teacher_overrides: [...(overrideMap.get(key) ?? [])].sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      ),
       has_seen_intro: null,
       updated_at: summary.updated_at,
     } satisfies CompatProgressRow;
   });
-}
-
-function mergeLegacyRows(baseRows: SnapshotLike[], legacyRows: LegacyProgressRow[]) {
-  const merged = [...baseRows];
-  legacyRows.forEach((legacyRow) => {
-    if (!legacyRow.year || typeof legacyRow.pretest_score !== "number") return;
-    const existingIndex = merged.findIndex(
-      (row) => row.student_id === legacyRow.student_id && row.year === legacyRow.year,
-    );
-
-    if (existingIndex >= 0) {
-      if (merged[existingIndex].pretest_score == null) {
-        merged[existingIndex] = {
-          ...merged[existingIndex],
-          pretest_score: legacyRow.pretest_score,
-          updated_at: merged[existingIndex].updated_at ?? legacyRow.updated_at ?? null,
-          status: merged[existingIndex].status || legacyRow.status || "ACTIVE",
-          week: merged[existingIndex].week ?? legacyRow.week,
-        };
-      }
-      return;
-    }
-
-    merged.push({
-      student_id: legacyRow.student_id,
-      realm_id: "number",
-      year: legacyRow.year,
-      is_current: false,
-      week: legacyRow.week,
-      status: legacyRow.status ?? "ACTIVE",
-      pretest_score: legacyRow.pretest_score,
-      placement_complete: null,
-      assigned_week: legacyRow.week,
-      required_weeks: [],
-      optional_weeks: [],
-      completed_lesson_ids: [],
-      unlocked_legends: [],
-      quiz_scores: {},
-      lesson_attempts: {},
-      has_seen_intro: null,
-      updated_at: legacyRow.updated_at ?? null,
-    });
-  });
-  return merged;
-}
-
-async function fetchSnapshotFallbackForClass(studentIds: string[]) {
-  const [{ data: prog }, { data: legacyProg }] = await Promise.all([
-    supabase.from("progress_snapshot").select("*").in("student_id", studentIds),
-    supabase
-      .from("progress")
-      .select("student_id,year,week,status,pretest_score,updated_at")
-      .in("student_id", studentIds)
-      .not("pretest_score", "is", null),
-  ]);
-
-  return mergeLegacyRows(
-    ((prog ?? []) as SnapshotLike[]),
-    (legacyProg ?? []) as LegacyProgressRow[],
-  );
 }
 
 export async function fetchRealmCompatProgressForClass(realmId: string, classId: string, studentIds: string[]) {
@@ -425,18 +387,17 @@ export async function fetchRealmCompatProgressForClass(realmId: string, classId:
   });
 
   if (compatError) {
-    console.warn("[RealmProgressCompat] Failed to read class compat rows, falling back to progress_snapshot", compatError);
-    return realmId === "number" ? fetchSnapshotFallbackForClass(studentIds) : [];
+    throw new Error(`Unable to load canonical ${realmId} progress: ${compatError.message}`);
   }
 
   const summaries = (compatData ?? []) as RealmProgressSummaryRow[];
   const realmRows = summaries.filter((row) => row.realm_id === realmId);
 
   if (realmRows.length === 0) {
-    return realmId === "number" ? fetchSnapshotFallbackForClass(studentIds) : [];
+    return [];
   }
 
-  const [lessonAttemptsResponse, quizAttemptsResponse, assessmentsResponse, legacyProgResponse] = await Promise.all([
+  const [lessonAttemptsResponse, quizAttemptsResponse, assessmentsResponse, overridesResponse] = await Promise.all([
     supabase.rpc("get_class_realm_lesson_attempts", {
       p_class_id: classId,
       p_realm_id: realmId,
@@ -450,25 +411,37 @@ export async function fetchRealmCompatProgressForClass(realmId: string, classId:
     supabase
       .from("student_realm_assessments")
       .select("student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,passed,placement_result,question_results,completed_at")
-      .eq("class_id", classId)
+      .in("student_id", studentIds)
       .eq("realm_id", realmId),
-    realmId === "number"
-      ? supabase
-          .from("progress")
-          .select("student_id,year,week,status,pretest_score,updated_at")
-          .in("student_id", studentIds)
-          .not("pretest_score", "is", null)
-      : Promise.resolve({ data: [], error: null }),
+    supabase
+      .from("student_progress_overrides")
+      .select("id,student_id,realm_id,working_level,week,advanced_to_week,teacher_id,reason,notes,created_at")
+      .in("student_id", studentIds)
+      .eq("realm_id", realmId),
   ]);
+
+  if (lessonAttemptsResponse.error) {
+    throw new Error(`Unable to load canonical ${realmId} lesson attempts: ${lessonAttemptsResponse.error.message}`);
+  }
+  if (quizAttemptsResponse.error) {
+    throw new Error(`Unable to load canonical ${realmId} quiz attempts: ${quizAttemptsResponse.error.message}`);
+  }
+  if (assessmentsResponse.error) {
+    throw new Error(`Unable to load canonical ${realmId} assessments: ${assessmentsResponse.error.message}`);
+  }
+  if (overridesResponse.error) {
+    throw new Error(`Unable to load canonical ${realmId} teacher overrides: ${overridesResponse.error.message}`);
+  }
 
   const builtRows = buildRowsFromRealmData(
     realmRows,
     (lessonAttemptsResponse.data ?? []) as LessonAttemptRow[],
     (quizAttemptsResponse.data ?? []) as WeeklyQuizAttemptRow[],
     (assessmentsResponse.data ?? []) as RealmAssessmentRow[],
+    (overridesResponse.data ?? []) as StudentProgressOverrideRow[],
   );
 
-  return realmId === "number" ? mergeLegacyRows(builtRows, (legacyProgResponse.data ?? []) as LegacyProgressRow[]) : builtRows;
+  return builtRows;
 }
 
 export async function fetchRealmCompatProgressForStudent(realmId: string, studentId: string) {
@@ -488,7 +461,7 @@ export async function fetchRealmCompatProgressForStudent(realmId: string, studen
     return [];
   }
 
-  const [lessonAttemptsResponse, quizAttemptsResponse, assessmentsResponse, legacyProgResponse] = await Promise.all([
+  const [lessonAttemptsResponse, quizAttemptsResponse, assessmentsResponse, overridesResponse] = await Promise.all([
     supabase.rpc("get_student_realm_lesson_attempts_secure", {
       p_student_id: studentId,
       p_realm_id: realmId,
@@ -504,23 +477,26 @@ export async function fetchRealmCompatProgressForStudent(realmId: string, studen
       p_realm_id: realmId,
       p_working_level: null,
     }),
-    realmId === "number"
-      ? supabase
-          .from("progress")
-          .select("student_id,year,week,status,pretest_score,updated_at")
-          .eq("student_id", studentId)
-          .not("pretest_score", "is", null)
-      : Promise.resolve({ data: [], error: null }),
+    supabase.rpc("get_student_progress_overrides_secure", {
+      p_student_id: studentId,
+      p_realm_id: realmId,
+    }),
   ]);
+
+  if (lessonAttemptsResponse.error) throw lessonAttemptsResponse.error;
+  if (quizAttemptsResponse.error) throw quizAttemptsResponse.error;
+  if (assessmentsResponse.error) throw assessmentsResponse.error;
+  if (overridesResponse.error) throw overridesResponse.error;
 
   const builtRows = buildRowsFromRealmData(
     realmRows,
     (lessonAttemptsResponse.data ?? []) as LessonAttemptRow[],
     (quizAttemptsResponse.data ?? []) as WeeklyQuizAttemptRow[],
     (assessmentsResponse.data ?? []) as RealmAssessmentRow[],
+    (overridesResponse.data ?? []) as StudentProgressOverrideRow[],
   );
 
-  return realmId === "number" ? mergeLegacyRows(builtRows, (legacyProgResponse.data ?? []) as LegacyProgressRow[]) : builtRows;
+  return builtRows;
 }
 
 export async function fetchNumberCompatProgressForClass(classId: string, studentIds: string[]) {
@@ -601,4 +577,32 @@ export async function teacherResetRealm(studentId: string, realmId: string) {
     p_realm_id: realmId,
   });
   if (error) throw error;
+}
+
+export type TeacherProgressOverrideReason =
+  | "additional_needs"
+  | "iep"
+  | "professional_judgement"
+  | "extended_absence"
+  | "technical_issue"
+  | "other";
+
+export async function teacherAdvanceStudentWeek(input: {
+  studentId: string;
+  realmId: "number" | "measurement";
+  workingLevel: string;
+  week: number;
+  reason: TeacherProgressOverrideReason;
+  notes?: string;
+}) {
+  const { data, error } = await supabase.rpc("teacher_advance_student_week", {
+    p_student_id: input.studentId,
+    p_realm_id: input.realmId,
+    p_working_level: input.workingLevel,
+    p_week: input.week,
+    p_reason: input.reason,
+    p_notes: input.notes?.trim() || null,
+  });
+  if (error) throw error;
+  return data as string;
 }

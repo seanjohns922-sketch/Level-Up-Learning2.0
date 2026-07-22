@@ -105,12 +105,20 @@ export default function HomeBasePage() {
   );
   const ownedKeys = useMemo(() => new Set(state?.inventory.map((entry) => entry.item_key) ?? []), [state?.inventory]);
 
-  function continueLearning() {
+  async function continueLearning() {
     if (!student?.studentId) {
       router.push("/login");
       return;
     }
-    router.push(resolveContinueLearningRoute());
+    setBusy(true);
+    setError(null);
+    try {
+      router.push(await resolveContinueLearningRoute());
+    } catch (error) {
+      console.warn("[HomeBase] Could not restore canonical learning destination", error);
+      setError("We could not load your saved learning progress. Please try again.");
+      setBusy(false);
+    }
   }
 
   async function selectTheme(item: EconomyItem) {

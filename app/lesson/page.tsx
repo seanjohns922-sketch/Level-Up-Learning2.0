@@ -101,9 +101,14 @@ import { LessonPageHero } from "@/components/lesson/LessonPageHero";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { supabase } from "@/lib/supabase";
 import type { TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
-import { saveRealmLessonAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { restoreStudentStateFromServer, saveRealmLessonAttempt } from "@/lib/student-progress-sync";
 import { buildLessonRoute, normalizeStudentYearLabel } from "@/lib/lesson-routing";
-import { clearLessonResume, clearLessonSession, getOrCreateLessonSessionId } from "@/lib/resume-state";
+import {
+  buildLessonCompletionActivityKey,
+  clearLessonResume,
+  clearLessonSession,
+  getOrCreateLessonSessionId,
+} from "@/lib/resume-state";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -237,6 +242,16 @@ function LessonPage() {
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = isMeasurement ? "measurement" : "number";
   const lessonStrand = isMeasurement ? "Measurement" : "Number";
+  const lessonCompletionActivityKey = buildLessonCompletionActivityKey({
+    realmId: lessonRealmId,
+    workingLevel: year,
+    week,
+    lessonNumber,
+    lessonId: effectiveLessonId,
+  });
+  const [canonicalStatus, setCanonicalStatus] = useState<"loading" | "ready" | "error">(
+    previewMode || DEMO_MODE ? "ready" : "loading",
+  );
 
   // ── Lesson page theme — add a new entry here for future realms ────────────
   const lt = isMeasurement ? {
@@ -452,6 +467,28 @@ function LessonPage() {
       isY6MeasurelandsPlaceholderLesson(effectiveLessonId));
 
   useEffect(() => {
+    if (previewMode || DEMO_MODE) return;
+    const studentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY);
+    if (!studentId) {
+      Promise.resolve().then(() => setCanonicalStatus("error"));
+      return;
+    }
+    let cancelled = false;
+    void restoreStudentStateFromServer(studentId, lessonRealmId)
+      .then(() => {
+        if (!cancelled) setCanonicalStatus("ready");
+      })
+      .catch((error) => {
+        console.error("[Lesson] Canonical progression bootstrap failed", error);
+        if (!cancelled) setCanonicalStatus("error");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [lessonRealmId, previewMode]);
+
+  useEffect(() => {
+    if (canonicalStatus !== "ready") return;
     const p = readProgress(lessonRealmId);
     if (!previewMode && !isPlacementComplete(p)) {
       router.replace(`/home`);
@@ -460,22 +497,24 @@ function LessonPage() {
     if (!DEMO_MODE && !previewMode && p?.year && p.year !== year) {
       router.replace(mapRoute);
     }
-  }, [previewMode, router, year]);
+  }, [canonicalStatus, lessonRealmId, mapRoute, previewMode, router, year]);
 
   useEffect(() => {
+    if (canonicalStatus !== "ready" || !previewMode) return;
     const p = readProgress(lessonRealmId);
     if (!p || p.status !== "ASSIGNED_PROGRAM") return;
     if (p.requiredWeeks?.length) return;
     const nextWeek = Math.max(p.assignedWeek ?? 1, week);
     if (nextWeek !== p.assignedWeek) updateProgress({ assignedWeek: nextWeek }, lessonRealmId);
-  }, [week]);
+  }, [canonicalStatus, lessonRealmId, previewMode, week]);
 
   useEffect(() => {
+    if (canonicalStatus !== "ready") return;
     const p = readProgress(lessonRealmId);
     if (previewMode || !p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return;
 
     const store = readProgramStore();
-    const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks, lessonRealmId);
+    const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks, lessonRealmId, p.teacherAdvancedWeeks);
     if (!weekPlayable) {
       router.replace(mapRoute);
       return;
@@ -485,14 +524,14 @@ function LessonPage() {
     if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
       return;
     }
-  }, [lessonNumber, lessonRealmId, previewMode, router, week, year]);
+  }, [canonicalStatus, lessonNumber, lessonRealmId, mapRoute, previewMode, router, week, year]);
 
   const blockedPreviousLesson = useMemo(() => {
     if (DEMO_MODE || previewMode) return null;
     const p = readProgress(lessonRealmId);
     if (!p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return null;
     const store = readProgramStore();
-    if (!isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks, lessonRealmId)) return null;
+    if (!isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks, lessonRealmId, p.teacherAdvancedWeeks)) return null;
     const weekProgress = getWeekProgress(store, year, week, lessonRealmId);
     if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
       return lessonNumber - 1;
@@ -533,39 +572,8 @@ function LessonPage() {
     if (studentId) {
       try {
         if (latestLessonSummaryRef.current) {
-          await trackLiveLearningEvent({
-            eventType: "lesson_completed",
-            level: liveLessonContext.level,
-            strand: liveLessonContext.strand,
-            week: liveLessonContext.week,
-            lessonId: liveLessonContext.lessonId,
-            lessonTitle: liveLessonContext.lessonTitle,
-            progressPercent: 100,
-            progressLabel: `Completed ${latestLessonSummaryRef.current.questionsAnswered} questions`,
-            questionsAnswered: latestLessonSummaryRef.current.questionsAnswered,
-            totalQuestions: latestLessonSummaryRef.current.questionsAnswered,
-            correctCount: latestLessonSummaryRef.current.correctAnswers,
-            correctAnswers: latestLessonSummaryRef.current.correctAnswers,
-            accuracyPercent: latestLessonSummaryRef.current.accuracy,
-          });
           await persistLessonPerformanceSummary(latestLessonSummaryRef.current);
         } else {
-          await trackLiveLearningEvent({
-            eventType: "lesson_completed",
-            level: liveLessonContext.level,
-            strand: liveLessonContext.strand,
-            week: liveLessonContext.week,
-            lessonId: liveLessonContext.lessonId,
-            lessonTitle: liveLessonContext.lessonTitle,
-            progressPercent: 100,
-            progressLabel: "Lesson completed",
-            questionsAnswered: 0,
-            totalQuestions: 0,
-            correctCount: 0,
-            correctAnswers: 0,
-            accuracyPercent: 0,
-          });
-
           const fallbackAttempt = {
             at: new Date().toISOString(),
             completedAt: new Date().toISOString(),
@@ -590,31 +598,43 @@ function LessonPage() {
 
           await saveRealmLessonAttempt(
             studentId, year, week, lessonNumber, effectiveLessonId, fallbackAttempt,
-            getOrCreateLessonSessionId(effectiveLessonId), lessonRealmId
+            getOrCreateLessonSessionId(lessonCompletionActivityKey), lessonRealmId
           );
         }
 
-        const latest = readProgress(lessonRealmId);
-        await saveStudentProgressState(studentId, year, {
-          status: latest?.status ?? progress?.status ?? "ASSIGNED_PROGRAM",
-          week,
-          placement_complete: latest?.placementComplete ?? progress?.placementComplete ?? false,
-          assigned_week: nextAssignedWeek ?? latest?.assignedWeek ?? progress?.assignedWeek ?? null,
-          required_weeks: latest?.requiredWeeks ?? progress?.requiredWeeks ?? [],
-          optional_weeks: latest?.optionalWeeks ?? progress?.optionalWeeks ?? [],
-          unlocked_legends: latest?.unlockedLegends ?? progress?.unlockedLegends ?? [],
-        }, lessonRealmId);
-        markLessonComplete(year, week, lessonNumber, lessonRealmId);
-        if (progress?.status === "ASSIGNED_PROGRAM" && progress.requiredWeeks?.length) {
+        if (previewMode) {
+          markLessonComplete(year, week, lessonNumber, lessonRealmId);
+        } else {
+          await restoreStudentStateFromServer(studentId, lessonRealmId);
+        }
+        if (previewMode && progress?.status === "ASSIGNED_PROGRAM" && progress.requiredWeeks?.length) {
           nextAssignedWeek = getRecommendedAssignedWeek(
-            readProgramStore(), year, progress.assignedWeek, progress.requiredWeeks, lessonRealmId
+            readProgramStore(), year, progress.assignedWeek, progress.requiredWeeks, lessonRealmId, progress.teacherAdvancedWeeks
           );
         }
-        if (nextAssignedWeek !== progress?.assignedWeek) {
+        if (previewMode && nextAssignedWeek !== progress?.assignedWeek) {
           updateProgress({ assignedWeek: nextAssignedWeek }, lessonRealmId);
         }
+        const completedSummary = latestLessonSummaryRef.current;
+        void trackLiveLearningEvent({
+          eventType: "lesson_completed",
+          level: liveLessonContext.level,
+          strand: liveLessonContext.strand,
+          week: liveLessonContext.week,
+          lessonId: liveLessonContext.lessonId,
+          lessonTitle: liveLessonContext.lessonTitle,
+          progressPercent: 100,
+          progressLabel: completedSummary
+            ? `Completed ${completedSummary.questionsAnswered} questions`
+            : "Lesson completed",
+          questionsAnswered: completedSummary?.questionsAnswered ?? 0,
+          totalQuestions: completedSummary?.questionsAnswered ?? 0,
+          correctCount: completedSummary?.correctAnswers ?? 0,
+          correctAnswers: completedSummary?.correctAnswers ?? 0,
+          accuracyPercent: completedSummary?.accuracy ?? 0,
+        });
         clearLessonResume(effectiveLessonId);
-        clearLessonSession(effectiveLessonId);
+        clearLessonSession(lessonCompletionActivityKey);
       } catch (error) {
         lessonFinalizedRef.current = false;
         console.warn("[Lesson] Final completion sync failed:", error);
@@ -708,7 +728,7 @@ function LessonPage() {
 
       await saveRealmLessonAttempt(
         studentId, year, week, lessonNumber, effectiveLessonId, attempt,
-        getOrCreateLessonSessionId(effectiveLessonId), lessonRealmId
+        getOrCreateLessonSessionId(lessonCompletionActivityKey), lessonRealmId
       );
     } catch (error) {
       savedLessonSummaryKeysRef.current.delete(summaryKey);
@@ -828,6 +848,23 @@ function LessonPage() {
           </button>
         </div>
       </div>
+    );
+  }
+
+  if (canonicalStatus === "loading") {
+    return <main className="min-h-screen grid place-items-center bg-background font-semibold text-slate-600">Loading saved progress...</main>;
+  }
+  if (canonicalStatus === "error") {
+    return (
+      <main className="min-h-screen grid place-items-center bg-background px-6">
+        <div className="max-w-md text-center">
+          <h1 className="text-2xl font-black text-slate-900">Saved progress could not be loaded</h1>
+          <p className="mt-2 text-slate-600">Return to the Tower and try entering the lesson again.</p>
+          <button type="button" onClick={() => router.push("/home")} className="mt-5 rounded-md bg-teal-700 px-5 py-3 font-bold text-white">
+            Return to Tower
+          </button>
+        </div>
+      </main>
     );
   }
 
@@ -1448,6 +1485,7 @@ function LessonPage() {
                   onTimedComplete={completeLesson}
                   onExit={goBackToProgram}
                   liveContext={liveLessonContext}
+                  sessionScopeKey={lessonCompletionActivityKey}
                   realmId={realmId}
                   levelNumber={levelNumber}
                   practisedSkills={getLessonPractisedSkills(lessonMeta.id)}

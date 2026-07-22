@@ -16,11 +16,20 @@ export type StudentProgress = {
   lastPreTestProfile?: AssessmentResultProfile;
   lastPostTestPercent?: number;
   lastPostTestProfile?: AssessmentResultProfile;
+  teacherAdvancedWeeks?: number[];
 };
 
 export const STORAGE_KEY = "lul_student_progress_v1";
 export const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
 export type ProgressRealmScope = "number" | "measurement";
+
+type ProgressCacheEnvelope = {
+  student_id: string;
+  realm_id: ProgressRealmScope;
+  server_version: "canonical-v1";
+  updated_at: string;
+  progress: StudentProgress;
+};
 
 function getActiveRealmScope(): ProgressRealmScope {
   if (typeof window === "undefined") return "number";
@@ -52,7 +61,15 @@ export function readProgress(realmId: ProgressRealmScope = getActiveRealmScope()
   try {
     const raw = localStorage.getItem(getScopedProgressKey(undefined, realmId));
     if (!raw) return null;
-    return JSON.parse(raw) as StudentProgress;
+    const parsed = JSON.parse(raw) as StudentProgress | ProgressCacheEnvelope;
+    if ("progress" in parsed) {
+      const scope = getActiveStudentScope();
+      if (parsed.student_id !== scope || parsed.realm_id !== realmId) return null;
+      return parsed.progress;
+    }
+    // Legacy local progress is allowed only in isolated Demo Mode. Real student
+    // routes must rebuild this cache from canonical server rows.
+    return isDemoPreviewMode() ? parsed : null;
   } catch {
     return null;
   }
@@ -62,7 +79,14 @@ export function writeProgress(next: StudentProgress, realmId: ProgressRealmScope
   if (typeof window === "undefined") return;
   // Reviewing a previous level is read-only — never touch stored progress.
   if (isReviewMode()) return;
-  localStorage.setItem(getScopedProgressKey(undefined, realmId), JSON.stringify(next));
+  const envelope: ProgressCacheEnvelope = {
+    student_id: getActiveStudentScope(),
+    realm_id: realmId,
+    server_version: "canonical-v1",
+    updated_at: new Date().toISOString(),
+    progress: next,
+  };
+  localStorage.setItem(getScopedProgressKey(undefined, realmId), JSON.stringify(envelope));
 }
 
 export function clearScopedProgress(

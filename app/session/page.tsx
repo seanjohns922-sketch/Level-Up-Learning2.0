@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
-import { saveRealmLessonAttempt, saveNumberWeeklyQuizAttempt, saveStudentProgressState } from "@/lib/student-progress-sync";
+import { restoreStudentStateFromServer, saveRealmLessonAttempt, saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
@@ -36,7 +36,13 @@ import { MathFormattedText } from "@/components/FractionText";
 import { LessonPageHero } from "@/components/lesson/LessonPageHero";
 import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
-import { clearCompletionId, getOrCreateCompletionId, getOrCreateLessonSessionId } from "@/lib/resume-state";
+import {
+  buildLessonCompletionActivityKey,
+  clearCompletionId,
+  clearLessonSession,
+  getOrCreateCompletionId,
+  getOrCreateLessonSessionId,
+} from "@/lib/resume-state";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
 import { Volume2, Sparkles, Zap, Check, PartyPopper, SkipForward } from "lucide-react";
@@ -48,6 +54,7 @@ import {
   getWeekProgress as getPersistedWeekProgress,
   getRecommendedAssignedWeek,
   isWeekPlayable,
+  markLessonComplete as persistProgramLessonComplete,
   markQuizComplete as persistProgramQuizComplete,
   readProgramStore as readPersistedProgramStore,
 } from "@/lib/program-progress";
@@ -174,95 +181,6 @@ import { buildMeasurelandsWeek7QuizTasks } from "@/data/activities/prepMeasurela
 import { buildMeasurelandsWeek8QuizTasks } from "@/data/activities/prepMeasurelands/week8Quiz";
 import { isLessonQuestionSafe, isPracticeTaskSafe } from "@/lib/task-safety";
 import { buildLessonRoute, isGroundLevelYear, normalizeStudentYearLabel } from "@/lib/lesson-routing";
-
-type WeekProgress = {
-  lessonsCompleted: boolean[]; // [L1, L2, L3]
-  quizCompleted: boolean;
-  quizScore?: number;
-};
-
-type ProgramProgressStore = Record<string, WeekProgress>; // key = `${year}|${week}`
-
-// ACTIVE_STUDENT_KEY imported from @/data/progress
-
-function getScopedSessionStoreKey() {
-  if (typeof window === "undefined") return "lul:server:session_program_progress_v1";
-  const active = localStorage.getItem(ACTIVE_STUDENT_KEY);
-  const scope = active && active.trim()
-    ? active.trim()
-    : (new URLSearchParams(window.location.search).get("demo") === "1" ? "demo" : "anon");
-  return `lul:${scope}:session_program_progress_v1`;
-}
-
-function normalizeProgramRealm(realmId: string | undefined) {
-  return realmId === "measurement" ? "measurement" : "number";
-}
-
-function makeKey(year: string, week: string, realmId = "number") {
-  return `${normalizeProgramRealm(realmId)}|${year}|${week}`;
-}
-
-function legacyNumberKey(year: string, week: string) {
-  return `${year}|${week}`;
-}
-
-function readStore(): ProgramProgressStore {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = localStorage.getItem(getScopedSessionStoreKey());
-    if (!raw) return {};
-    return JSON.parse(raw) as ProgramProgressStore;
-  } catch {
-    return {};
-  }
-}
-
-function writeStore(store: ProgramProgressStore) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(getScopedSessionStoreKey(), JSON.stringify(store));
-}
-
-function getWeekProgress(
-  store: ProgramProgressStore,
-  year: string,
-  week: string,
-  realmId = "number"
-): WeekProgress {
-  const key = makeKey(year, week, realmId);
-  const legacy = normalizeProgramRealm(realmId) === "number" ? store[legacyNumberKey(year, week)] : undefined;
-  return (
-    store[key] ?? legacy ?? {
-      lessonsCompleted: [false, false, false],
-      quizCompleted: false,
-    }
-  );
-}
-
-function setLessonComplete(
-  store: ProgramProgressStore,
-  year: string,
-  week: string,
-  lessonNumber: number,
-  realmId = "number"
-) {
-  const key = makeKey(year, week, realmId);
-  const current = getWeekProgress(store, year, week, realmId);
-  const nextLessons = [...current.lessonsCompleted];
-  nextLessons[lessonNumber - 1] = true;
-  store[key] = { ...current, lessonsCompleted: nextLessons };
-}
-
-function setQuizComplete(store: ProgramProgressStore, year: string, week: string, realmId = "number") {
-  const key = makeKey(year, week, realmId);
-  const current = getWeekProgress(store, year, week, realmId);
-  store[key] = { ...current, quizCompleted: true };
-}
-
-function setQuizScore(store: ProgramProgressStore, year: string, week: string, score: number, realmId = "number") {
-  const key = makeKey(year, week, realmId);
-  const current = getWeekProgress(store, year, week, realmId);
-  store[key] = { ...current, quizScore: score, quizCompleted: true };
-}
 
 type QuizQuestion = {
   id: string;
@@ -7897,8 +7815,8 @@ function SessionPage({
 
     const store = readPersistedProgramStore();
     const numericWeek = Number(week);
-    if (!isWeekPlayable(store, year, numericWeek, progress.requiredWeeks, progress.optionalWeeks, quizRealmId)) {
-      const fallbackWeek = getRecommendedAssignedWeek(store, year, progress.assignedWeek, progress.requiredWeeks, quizRealmId);
+    if (!isWeekPlayable(store, year, numericWeek, progress.requiredWeeks, progress.optionalWeeks, quizRealmId, progress.teacherAdvancedWeeks)) {
+      const fallbackWeek = getRecommendedAssignedWeek(store, year, progress.assignedWeek, progress.requiredWeeks, quizRealmId, progress.teacherAdvancedWeeks);
       router.replace(isMeasurementRealm ? `/measurelands` : `/number-nexus`);
       return;
     }
@@ -7992,6 +7910,13 @@ function SessionPage({
       {
         const yearNum = parseInt(year.replace(/\D/g, ""), 10) || 0;
         const lessonId = quizRealmId === "measurement" ? `y${yearNum}-measurement-w${week}-l${n}` : `y${yearNum}-w${week}-l${n}`;
+        const lessonCompletionActivityKey = buildLessonCompletionActivityKey({
+          realmId: quizRealmId,
+          workingLevel: year,
+          week: Number(week),
+          lessonNumber: n,
+          lessonId,
+        });
         const fallbackAttempt = {
           at: new Date().toISOString(),
           completedAt: new Date().toISOString(),
@@ -8015,18 +7940,20 @@ function SessionPage({
 
         await saveRealmLessonAttempt(
           studentId, year, Number(week), n, lessonId, fallbackAttempt,
-          getOrCreateLessonSessionId(lessonId), quizRealmId
+          getOrCreateLessonSessionId(lessonCompletionActivityKey), quizRealmId
         );
+        clearLessonSession(lessonCompletionActivityKey);
+        if (previewMode) {
+          persistProgramLessonComplete(year, Number(week), n, quizRealmId);
+        } else {
+          await restoreStudentStateFromServer(studentId, quizRealmId);
+        }
       }
     } catch (e) {
       console.warn("[Lesson] DB save failed:", e);
       window.alert("We couldn't save this lesson yet. Please try again.");
       return;
     }
-
-    const store = readStore();
-    setLessonComplete(store, year, week, n, quizRealmId);
-    writeStore(store);
 
     // After Week 12 Lesson 3, route to post-test transition
     if (Number(week) === 12 && n === 3) {
@@ -8774,7 +8701,8 @@ function SessionPage({
       p.year,
       Math.min(12, currentWeek + 1),
       p.requiredWeeks,
-      quizRealmId
+      quizRealmId,
+      p.teacherAdvancedWeeks,
     );
     updateProgress({ assignedWeek: nextWeek }, quizRealmId);
   }
@@ -8815,7 +8743,6 @@ function SessionPage({
     const quizCompletionKey = `quiz:${quizRealmId}:${year}:${week}`;
     const completionId = getOrCreateCompletionId(quizCompletionKey);
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
-    const nextAssignedWeek = passed ? Math.min(12, Number(week) + 1) : Number(week);
     const attempt = {
       score,
       total,
@@ -8833,16 +8760,11 @@ function SessionPage({
       await saveNumberWeeklyQuizAttempt(
         studentId, year, Number(week), attempt, completionId, quizRealmId
       );
-      const latestProgress = readProgress(quizRealmId);
-      await saveStudentProgressState(studentId, year, {
-        status: latestProgress?.status ?? "ASSIGNED_PROGRAM",
-        week: nextAssignedWeek,
-        placement_complete: latestProgress?.placementComplete ?? false,
-        assigned_week: nextAssignedWeek,
-        required_weeks: latestProgress?.requiredWeeks ?? [],
-        optional_weeks: latestProgress?.optionalWeeks ?? [],
-        unlocked_legends: latestProgress?.unlockedLegends ?? [],
-      }, quizRealmId);
+      if (previewMode) {
+        persistProgramQuizComplete(year, Number(week), percent, quizRealmId);
+      } else {
+        await restoreStudentStateFromServer(studentId, quizRealmId);
+      }
       clearCompletionId(quizCompletionKey);
     } catch (error) {
       quizSavingRef.current = false;
@@ -8856,12 +8778,7 @@ function SessionPage({
     setShowQuizMistakeReview(false);
     setQuizMistakeReviewItems(mistakeItems);
 
-    const store = readStore();
-    setQuizScore(store, year, week, score, quizRealmId);
-    writeStore(store);
-    persistProgramQuizComplete(year, Number(week), score, quizRealmId);
-
-    if (passed) {
+    if (previewMode && passed) {
       completeWeek(Number(week));
     }
 

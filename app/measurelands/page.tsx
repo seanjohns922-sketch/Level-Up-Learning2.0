@@ -39,17 +39,19 @@ export default function MeasurelandsPage() {
     if (typeof window === "undefined") return undefined;
     return new URLSearchParams(window.location.search).get("level") ?? undefined;
   });
+  const [requestedReview] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).get("review") === "1";
+  });
   const resolvedYear = useMemo(() => {
-    // The level the user actually clicked (?level=) is authoritative whenever it
-    // is a supported Measurelands level — in both preview and normal mode.
-    // Only fall back to the saved progress year when no valid level was chosen,
-    // so clicking "Level 4 → Measurelands" never snaps back to Ground Level.
-    const requested = SUPPORTED_MEASURELANDS_YEARS.has(requestedYear ?? "")
+    // A URL level may select Demo content or an explicit read-only review.
+    // Live placement always comes from the canonical restored row.
+    const requested = (previewMode || requestedReview) && SUPPORTED_MEASURELANDS_YEARS.has(requestedYear ?? "")
       ? requestedYear
       : undefined;
     const candidate = requested ?? progressYear;
     return SUPPORTED_MEASURELANDS_YEARS.has(candidate ?? "") ? (candidate as SupportedMeasurelandsYear) : "Prep";
-  }, [progressYear, requestedYear]);
+  }, [previewMode, progressYear, requestedReview, requestedYear]);
 
   useEffect(() => {
     if (previewMode) return;

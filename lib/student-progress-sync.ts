@@ -5,13 +5,13 @@ import { type StudentProgress, writeProgress } from "@/data/progress";
 import { makeProgramProgressKey, readProgramStore, writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
 import {
   getActiveStudentIdentity,
-  hasActiveStudentSeenIntro,
   markActiveStudentIntroSeen,
 } from "@/lib/studentIdentity";
 import { fetchRealmCompatProgressForStudent } from "@/lib/realm-progress-compat";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 import { awardAndReveal } from "@/lib/gem-reveal";
+import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 
 export type StudentProgressSnapshotRow = {
   realm_id?: string | null;
@@ -28,6 +28,9 @@ export type StudentProgressSnapshotRow = {
   completed_lesson_ids: unknown;
   quiz_scores: unknown;
   lesson_attempts: unknown;
+  pretest_profile?: unknown;
+  posttest_profile?: unknown;
+  teacher_advanced_weeks?: unknown;
   has_seen_intro: boolean | null;
   updated_at: string | null;
 };
@@ -84,6 +87,12 @@ function parseRecord(value: unknown): Record<string, unknown> {
     : {};
 }
 
+function parseAssessmentProfile(value: unknown): AssessmentResultProfile | undefined {
+  const profile = parseRecord(value);
+  if (typeof profile.score !== "number" || typeof profile.percentage !== "number") return undefined;
+  return profile as unknown as AssessmentResultProfile;
+}
+
 function ensureWeek(store: ProgramProgressStore, year: string, week: number, realmId = "number") {
   const key = makeProgramProgressKey(year, week, realmId);
   if (!store[key]) {
@@ -94,8 +103,13 @@ function ensureWeek(store: ProgramProgressStore, year: string, week: number, rea
 
 function hydrateProgramStore(rows: StudentProgressSnapshotRow[], realmId: StudentProgressRealmId) {
   const prefix = `${realmId}|`;
+  const legacyNumberKey = /^(Prep|Year [1-6])\|\d+$/;
   const store: ProgramProgressStore = Object.fromEntries(
-    Object.entries(readProgramStore()).filter(([key]) => !key.startsWith(prefix))
+    Object.entries(readProgramStore()).filter(([key]) => {
+      if (key.startsWith(prefix)) return false;
+      if (realmId === "number" && legacyNumberKey.test(key)) return false;
+      return true;
+    })
   );
 
   rows.forEach((row) => {
@@ -170,6 +184,8 @@ function assertActiveRestoreStudent(studentId: string) {
 
 function buildStudentProgress(row: StudentProgressSnapshotRow): StudentProgress | null {
   if (!row.year) return null;
+  const pretestProfile = parseAssessmentProfile(row.pretest_profile);
+  const posttestProfile = parseAssessmentProfile(row.posttest_profile);
   return {
     year: row.year,
     scorePercent: row.pretest_score ?? 0,
@@ -180,6 +196,10 @@ function buildStudentProgress(row: StudentProgressSnapshotRow): StudentProgress 
     optionalWeeks: parseNumberArray(row.optional_weeks),
     unlockedLegends: parseStringArray(row.unlocked_legends),
     lastPreTestPercent: row.pretest_score ?? undefined,
+    lastPreTestProfile: pretestProfile,
+    lastPostTestPercent: posttestProfile?.percentage,
+    lastPostTestProfile: posttestProfile,
+    teacherAdvancedWeeks: parseNumberArray(row.teacher_advanced_weeks),
   };
 }
 
@@ -197,6 +217,7 @@ export async function restoreStudentStateFromServer(
       requiredWeeks: [],
       optionalWeeks: [],
       unlockedLegends: [],
+      teacherAdvancedWeeks: [],
     };
     writeProgress(progress, realmId);
     return { rows: [] as StudentProgressSnapshotRow[], progress, introSeen: true };
@@ -217,13 +238,7 @@ export async function restoreStudentStateFromServer(
   const introSeenFromHistoricalProgress = compatRows.some(
     (row) => row.pretest_score != null || row.placement_complete === true || row.status === "PASSED"
   );
-  // beginJourney records this student-scoped flag synchronously, then persists
-  // the server flag in the background. Respect the explicit local confirmation
-  // so an immediate realm restore cannot race the write and bounce to /home.
-  const introSeenFromCurrentSession = hasActiveStudentSeenIntro(studentId);
-  const introSeen = introSeenFromCurrentSession
-    || introSeenFromStudentFlag
-    || introSeenFromHistoricalProgress;
+  const introSeen = introSeenFromStudentFlag || introSeenFromHistoricalProgress;
   if (introSeen) {
     markActiveStudentIntroSeen(studentId);
   }

@@ -9,13 +9,22 @@ const migration = fs.readFileSync(
   path.join(root, "supabase/migrations/20260722100000_prevent_stale_live_activity_overwrites.sql"),
   "utf8",
 );
+const canonicalReadMigration = fs.readFileSync(
+  path.join(root, "supabase/migrations/20260722110500_canonical_teacher_progress_reads.sql"),
+  "utf8",
+);
+const compat = fs.readFileSync(path.join(root, "lib/realm-progress-compat.ts"), "utf8");
 
 const checks = [
   ["live cards reconcile append-only events", /resolveCurrentActivityRow[\s\S]*latestEvent/],
   ["live cards reconcile canonical attempts", /resolveCurrentActivityRow[\s\S]*latestAttempt/],
   ["week identity comes from event payload", /current_week: positiveNumberOrNull\(payload\.week\)/],
   ["missing canonical attempts do not fabricate attempt 1", /function buildCompletedActivityAttemptSummary[\s\S]*return null;/],
-  ["student view compares progress and live timestamps", /function resolveDisplayedWeek[\s\S]*liveAt > progressAt/],
+  ["student week comes only from canonical progress", /function resolveDisplayedWeek\(prog\?: ProgressRow\) \{\s*return prog\?\.week \?\? null;/],
+  ["telemetry cannot create completed lesson ids", !strandPanel.includes("buildCompletedLessonIdsFromEvents")],
+  ["telemetry cannot reconstruct lesson summaries", !strandPanel.includes("buildEventLessonSummary")],
+  ["canonical class read failures are not hidden", /Unable to load canonical \$\{realmId\} progress/.test(compat)],
+  ["class attempts resolve current student membership", /student_lesson_attempts sla[\s\S]*join public\.students s on s\.id = sla\.student_id/.test(canonicalReadMigration)],
   ["teacher event feed includes quiz starts", dashboard.includes('"quiz_started"')],
   ["teacher event feed includes quiz completions", dashboard.includes('"quiz_completed"')],
   ["database rejects older snapshots", /where excluded\.last_active_at >= coalesce\([\s\S]*public\.live_student_activity\.last_active_at/],
@@ -24,7 +33,7 @@ const checks = [
 
 let failed = 0;
 for (const [label, assertion] of checks) {
-  const source = label.startsWith("student view") ? strandPanel
+  const source = label.startsWith("student week") || label.startsWith("telemetry") ? strandPanel
     : label.startsWith("database") || label.startsWith("existing") ? migration
       : livePanel;
   const passed = typeof assertion === "boolean" ? assertion : assertion.test(source);

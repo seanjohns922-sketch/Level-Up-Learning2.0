@@ -6,7 +6,7 @@ import { getPosttestForYearLabel } from "@/data/assessments/api";
 import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
-import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, writeProgress, type StudentProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress } from "@/data/progress";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { MeasurelandsAssessmentTask } from "@/components/assessment/MeasurelandsAssessmentTask";
@@ -19,12 +19,13 @@ import { getLastProgramWeek, getProgramWeeks, getWeekProgress, hasCompletedRequi
 import { buildAssessmentReturnRoute } from "@/lib/assessment-routes";
 import { buildLessonRoute } from "@/lib/lesson-routing";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
-import { saveRealmAssessment } from "@/lib/student-progress-sync";
+import { restoreStudentStateFromServer, saveRealmAssessment, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import { ASSESSMENT_THRESHOLDS, posttestPassed } from "@/lib/assessment-rules";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 import { clearCompletionId, getOrCreateCompletionId } from "@/lib/resume-state";
 
-const PASS_THRESHOLD = 85;
+const PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
 
 function buildPosttestPracticeReviewItems(
   questions: Question[],
@@ -346,37 +347,64 @@ function PostTestPage() {
     ones: 0,
   });
   const previewMode = isDemoPreviewMode();
+  const [canonicalProgress, setCanonicalProgress] = useState<StudentProgress | null>(null);
+  const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">(previewMode ? "ready" : "loading");
+  const [restoreError, setRestoreError] = useState("");
 
   const q = questions[idx];
   const picked = answers[q?.id ?? ""] ?? "";
   const mabHasSelection = mab.tens > 0 || mab.ones > 0;
 
   useEffect(() => {
-    const progress = readProgress(progressRealmId);
-
-    if (!previewMode && !isPlacementComplete(progress)) {
-      router.replace("/home");
+    if (previewMode) {
+      setCanonicalProgress(readProgress(progressRealmId));
       return;
     }
-
-    if (!DEMO_MODE && !previewMode && progress?.year && progress.year !== year) {
-      router.replace("/levels");
+    const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() : null;
+    if (!studentId) {
+      router.replace("/login");
       return;
     }
-
-    if (!DEMO_MODE && !previewMode && progress?.status === "ASSIGNED_PROGRAM" && progress.year === year) {
-      const store = readProgramStore();
-      const hasRequiredPlan = Array.isArray(progress.requiredWeeks) && progress.requiredWeeks.length > 0;
-      const eligibleForPostTest = hasRequiredPlan
-        ? hasCompletedRequiredWeeks(store, year, progress.requiredWeeks)
-        : getWeekProgress(store, year, lastWeek, progressRealmId).lessonsCompleted.filter(Boolean).length === 3;
-
-      if (!eligibleForPostTest) {
-        const fallbackWeek = Math.max(1, Math.min(lastWeek, progress.assignedWeek ?? 1));
-        router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}&legacy=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`);
-      }
-    }
-  }, [previewMode, router, year]);
+    let cancelled = false;
+    void restoreStudentStateFromServer(studentId, progressRealmId)
+      .then((restored) => {
+        if (cancelled) return;
+        const progress = restored.progress;
+        if (!progress) {
+          setRestoreError("Your saved program could not be found. Ask your teacher to check your placement.");
+          setRestoreState("error");
+          return;
+        }
+        setCanonicalProgress(progress);
+        setRestoreState("ready");
+        if (!isPlacementComplete(progress)) {
+          router.replace("/home");
+          return;
+        }
+        if (!DEMO_MODE && progress.year !== year) {
+          router.replace(progressRealmId === "measurement" ? "/measurelands" : "/levels");
+          return;
+        }
+        if (!DEMO_MODE && progress.status === "ASSIGNED_PROGRAM") {
+          const store = readProgramStore();
+          const hasRequiredPlan = Array.isArray(progress.requiredWeeks) && progress.requiredWeeks.length > 0;
+          const eligibleForPostTest = hasRequiredPlan
+            ? hasCompletedRequiredWeeks(store, year, progress.requiredWeeks, progressRealmId, progress.teacherAdvancedWeeks)
+            : getWeekProgress(store, year, lastWeek, progressRealmId).lessonsCompleted.filter(Boolean).length === 3;
+          if (!eligibleForPostTest) {
+            const fallbackWeek = Math.max(1, Math.min(lastWeek, progress.assignedWeek ?? 1));
+            router.replace(`/program?year=${encodeURIComponent(year)}&week=${fallbackWeek}&legacy=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`);
+          }
+        }
+      })
+      .catch((error) => {
+        if (cancelled || error instanceof StudentRestoreSupersededError) return;
+        console.warn("[Posttest] Canonical restore failed", error);
+        setRestoreError("We could not load your saved program. Check your connection and retry.");
+        setRestoreState("error");
+      });
+    return () => { cancelled = true; };
+  }, [lastWeek, previewMode, progressRealmId, realmId, router, year]);
 
   function pick(option: string) {
     if (!q) return;
@@ -433,34 +461,18 @@ function PostTestPage() {
       passThreshold: PASS_THRESHOLD,
       studentId,
     });
-    const prev = readProgress(progressRealmId);
+    const prev = canonicalProgress;
     const correct = profile.score;
     const percent = profile.percentage;
     const assignedWeek = profile.assignedWeek ?? prev?.assignedWeek;
     const unlockedLegends = prev?.unlockedLegends ?? [];
 
     const legend = getLegendForYear(year, legendRealmId);
-    const didPass = percent >= PASS_THRESHOLD;
+    const didPass = posttestPassed(percent);
     const allPracticeWeeks = getProgramWeeks(progressRealmId);
     const nextUnlocked = didPass
       ? Array.from(new Set([...unlockedLegends, legend.id]))
       : unlockedLegends;
-
-    const nextProgress: StudentProgress = {
-      year,
-      scorePercent: prev?.scorePercent ?? 0,
-      status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
-      placementComplete: true,
-      assignedWeek: didPass ? prev?.assignedWeek : assignedWeek,
-      assignedWeeksHistory: didPass
-        ? prev?.assignedWeeksHistory ?? []
-        : Array.from(new Set([...(prev?.assignedWeeksHistory ?? []), ...(assignedWeek ? [assignedWeek] : [])])),
-      requiredWeeks: didPass ? prev?.requiredWeeks ?? [] : [],
-      optionalWeeks: didPass ? prev?.optionalWeeks ?? [] : allPracticeWeeks,
-      unlockedLegends: nextUnlocked,
-      lastPostTestPercent: percent,
-      lastPostTestProfile: { ...profile, assignedWeek },
-    };
 
     try {
       if (!studentId) throw new Error("No active student session");
@@ -485,6 +497,9 @@ function PostTestPage() {
           question_results: [],
           completed_at: new Date().toISOString(),
         }, completionId, progressPayload, progressRealmId);
+      const restored = await restoreStudentStateFromServer(studentId, progressRealmId);
+      if (!restored.progress) throw new Error("Saved post-test did not produce canonical progress");
+      setCanonicalProgress(restored.progress);
       clearCompletionId(assessmentCompletionKey);
     } catch (error) {
       submittingRef.current = false;
@@ -493,7 +508,6 @@ function PostTestPage() {
       return;
     }
 
-    writeProgress(nextProgress, progressRealmId);
     setSubmitted(true);
 
     const resultsUrl = `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`;
@@ -510,6 +524,17 @@ function PostTestPage() {
       return;
     }
     router.push(resultsUrl);
+  }
+
+  if (restoreState !== "ready") {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-slate-950 p-6 text-center">
+        <div>
+          <p className="font-bold text-slate-200">{restoreState === "loading" ? "Loading your program..." : restoreError}</p>
+          {restoreState === "error" ? <button type="button" onClick={() => window.location.reload()} className="mt-4 rounded-xl bg-teal-500 px-5 py-3 font-bold text-slate-950">Retry</button> : null}
+        </div>
+      </main>
+    );
   }
 
   if (!questions.length) {

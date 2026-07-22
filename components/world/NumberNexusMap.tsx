@@ -443,7 +443,7 @@ export default function NumberNexusMap() {
   const isGuided   = eraIdx <= 1; // Prep, Year 1, Year 2 — single big button, no menu decisions
   const canvasRef  = useWorldCanvas(era);
 
-  const currentWeek = getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks);
+  const currentWeek = getRecommendedAssignedWeek(store, year, progress?.assignedWeek, progress?.requiredWeeks, "number", progress?.teacherAdvancedWeeks);
   const [viewWeek] = useState(currentWeek);
 
   const completedByWeek = useMemo(() => {

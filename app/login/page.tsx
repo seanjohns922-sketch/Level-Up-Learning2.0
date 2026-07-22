@@ -10,7 +10,7 @@ import { clearScopedProgramStore } from "@/lib/program-progress";
 import { resolveStudentNameParts } from "@/lib/studentName";
 import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { activateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
-import { buildDefaultStudentProgress, resolveStudentDestination } from "@/lib/student-destination";
+import { resolveStudentDestination } from "@/lib/student-destination";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
@@ -78,19 +78,6 @@ function persistStudentIdentity(args: {
   }
 }
 
-function persistResolvedStudentProgress(progress: ReturnType<typeof buildDefaultStudentProgress>) {
-  try {
-    writeProgress(progress, "number");
-    const storedProgress = readProgress("number");
-    if (!storedProgress || storedProgress.year !== progress.year) {
-      throw new Error("student progress did not persist");
-    }
-    return true;
-  } catch (error) {
-    console.warn("[Login] Resolved student progress storage failed", error);
-    return false;
-  }
-}
 function readClasses(): ClassesStore {
   if (typeof window === "undefined") return {};
   try {
@@ -391,7 +378,7 @@ export default function LoginPage() {
 
     let progress: ReturnType<typeof readProgress> = null;
     let introSeen = false;
-    let progressSource: "progress_snapshot" | "default" = "default";
+    let progressSource: "progress_snapshot" | "none" = "none";
     let restoredRowsSummary: unknown[] = [];
     try {
       const restored = await restoreStudentStateFromServer(student.student_id, "number");
@@ -431,27 +418,8 @@ export default function LoginPage() {
       return;
     }
 
-    const isGroundLevelStudent = (studentSchoolYear ?? studentWorkingYear ?? progress?.year ?? "").trim() === "Prep";
-
     if (!progress) {
-      progress = buildDefaultStudentProgress(resolvedYearLevel);
-      progressSource = "default";
-    }
-
-    if (isGroundLevelStudent && progress.year === "Prep" && progress.placementComplete !== true) {
-      progress = {
-        ...progress,
-        status: "ASSIGNED_PROGRAM",
-        placementComplete: true,
-        assignedWeek: progress.assignedWeek ?? 1,
-        requiredWeeks: progress.requiredWeeks ?? [],
-        optionalWeeks: progress.optionalWeeks ?? [],
-        unlockedLegends: progress.unlockedLegends ?? [],
-      };
-    }
-
-    if (!persistResolvedStudentProgress(progress)) {
-      failCurrentAttempt("This device could not finish loading your session. Please refresh and try again.", true);
+      failCurrentAttempt("Your learning placement is not ready yet. Please ask your teacher to check your starting level, then try again.", true);
       return;
     }
 

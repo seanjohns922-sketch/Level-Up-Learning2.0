@@ -32,6 +32,7 @@ type ProgressRow = {
   unlocked_legends: unknown;
   quiz_scores: unknown;
   lesson_attempts?: unknown;
+  teacher_advanced_weeks?: number[];
   updated_at?: string | null;
 };
 
@@ -262,6 +263,7 @@ export default function TeacherDashboardPage() {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [progress, setProgress] = useState<ProgressRow[]>([]);
+  const [progressLoadError, setProgressLoadError] = useState<string | null>(null);
   const [liveRows, setLiveRows] = useState<LiveStudentActivityRow[]>([]);
   const [liveEvents, setLiveEvents] = useState<LiveActivityEventRow[]>([]);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
@@ -379,64 +381,70 @@ export default function TeacherDashboardPage() {
       selected?.class_code,
       diffOnly ? "(diff)" : ""
     );
-    const { data: studs, error: studErr } = await supabase
-      .from("students")
-      .select("*")
-      .eq("class_id", classId);
-    const newStuds = studs ?? [];
-    console.log("[TeacherDashboard] students fetched for selectedClassId:", classId, "count:", newStuds.length, "error:", studErr);
-
-    let newProg: ProgressRow[] = [];
-    let newLiveRows: LiveStudentActivityRow[] = [];
-    let newLiveEvents: LiveActivityEventRow[] = [];
-    if (newStuds.length > 0) {
-      const ids = newStuds.map((s) => s.id);
-      const [numberProgress, measurementProgress] = await Promise.all([
-        fetchRealmCompatProgressForClass("number", classId, ids),
-        fetchRealmCompatProgressForClass("measurement", classId, ids),
-      ]);
-      newProg = [...numberProgress, ...measurementProgress];
-
-      const { data: live } = await supabase
-        .from("live_student_activity")
+    try {
+      const { data: studs, error: studErr } = await supabase
+        .from("students")
         .select("*")
-        .in("student_id", ids)
         .eq("class_id", classId);
-      newLiveRows = (live ?? []) as LiveStudentActivityRow[];
+      if (studErr) throw studErr;
+      const newStuds = studs ?? [];
+      console.log("[TeacherDashboard] students fetched for selectedClassId:", classId, "count:", newStuds.length);
 
-      const { data: events } = await supabase
-        .from("live_activity_events")
-        .select("student_id,class_id,event_type,created_at,payload")
-        .in("student_id", ids)
-        .eq("class_id", classId)
-        .in("event_type", [
-          "lesson_started",
-          "quiz_started",
-          "question_loaded",
-          "answer_correct",
-          "answer_incorrect",
-          "lesson_completed",
-          "quiz_completed",
-        ])
-        .order("created_at", { ascending: true });
-      newLiveEvents = (events ?? []) as LiveActivityEventRow[];
-    }
+      let newProg: ProgressRow[] = [];
+      let newLiveRows: LiveStudentActivityRow[] = [];
+      let newLiveEvents: LiveActivityEventRow[] = [];
+      if (newStuds.length > 0) {
+        const ids = newStuds.map((s) => s.id);
+        const [numberProgress, measurementProgress] = await Promise.all([
+          fetchRealmCompatProgressForClass("number", classId, ids),
+          fetchRealmCompatProgressForClass("measurement", classId, ids),
+        ]);
+        newProg = [...numberProgress, ...measurementProgress];
 
-    if (diffOnly) {
-      // Only update state if data actually changed — prevents unnecessary re-renders
-      const studJson = JSON.stringify(newStuds);
-      const progJson = JSON.stringify(newProg);
-      const liveJson = JSON.stringify(newLiveRows);
-      const eventsJson = JSON.stringify(newLiveEvents);
-      setStudents((prev) => JSON.stringify(prev) === studJson ? prev : newStuds);
-      setProgress((prev) => JSON.stringify(prev) === progJson ? prev : newProg);
-      setLiveRows((prev) => JSON.stringify(prev) === liveJson ? prev : newLiveRows);
-      setLiveEvents((prev) => JSON.stringify(prev) === eventsJson ? prev : newLiveEvents);
-    } else {
-      setStudents(newStuds);
-      setProgress(newProg);
-      setLiveRows(newLiveRows);
-      setLiveEvents(newLiveEvents);
+        const [{ data: live, error: liveError }, { data: events, error: eventsError }] = await Promise.all([
+          supabase.from("live_student_activity").select("*").in("student_id", ids).eq("class_id", classId),
+          supabase
+            .from("live_activity_events")
+            .select("student_id,class_id,event_type,created_at,payload")
+            .in("student_id", ids)
+            .eq("class_id", classId)
+            .in("event_type", [
+              "lesson_started",
+              "quiz_started",
+              "question_loaded",
+              "answer_correct",
+              "answer_incorrect",
+              "lesson_completed",
+              "quiz_completed",
+            ])
+            .order("created_at", { ascending: true }),
+        ]);
+        if (liveError) throw liveError;
+        if (eventsError) throw eventsError;
+        newLiveRows = (live ?? []) as LiveStudentActivityRow[];
+        newLiveEvents = (events ?? []) as LiveActivityEventRow[];
+      }
+
+      if (diffOnly) {
+        const studJson = JSON.stringify(newStuds);
+        const progJson = JSON.stringify(newProg);
+        const liveJson = JSON.stringify(newLiveRows);
+        const eventsJson = JSON.stringify(newLiveEvents);
+        setStudents((prev) => JSON.stringify(prev) === studJson ? prev : newStuds);
+        setProgress((prev) => JSON.stringify(prev) === progJson ? prev : newProg);
+        setLiveRows((prev) => JSON.stringify(prev) === liveJson ? prev : newLiveRows);
+        setLiveEvents((prev) => JSON.stringify(prev) === eventsJson ? prev : newLiveEvents);
+      } else {
+        setStudents(newStuds);
+        setProgress(newProg);
+        setLiveRows(newLiveRows);
+        setLiveEvents(newLiveEvents);
+      }
+      setProgressLoadError(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Canonical student progress could not be loaded.";
+      console.error("[TeacherDashboard] canonical progress load failed", error);
+      setProgressLoadError(message);
     }
   }
 
@@ -943,6 +951,10 @@ export default function TeacherDashboardPage() {
     }).length;
     return sum + passedWeeks;
   }, 0);
+  const teacherAdvancedWeeks = classProgressRows.reduce(
+    (sum, row) => sum + new Set(row.teacher_advanced_weeks ?? []).size,
+    0,
+  );
   const isDev = process.env.NODE_ENV !== "production";
 
   return (
@@ -1129,6 +1141,11 @@ export default function TeacherDashboardPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {progressLoadError && (
+          <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800" role="alert">
+            Student progress is temporarily unavailable. Existing results have not been replaced. {progressLoadError}
+          </div>
+        )}
         {classes.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-[#E6E8EC]">
             <div className="mx-auto h-12 w-12 rounded-xl bg-teal-50 flex items-center justify-center mb-3">
@@ -1151,7 +1168,7 @@ export default function TeacherDashboardPage() {
               <KpiTile label="Active This Week" value={activeStudentsThisWeek.size} subtitle={`${activeStudentsThisWeek.size} student${activeStudentsThisWeek.size === 1 ? "" : "s"} active`} accent="#0EA5A4" icon={(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>)} />
               <KpiTile label="Average Accuracy" value={averageLessonScore} subtitle={averageLessonScore === "—" ? "no completed lessons" : "average lesson accuracy"} accent="#0EA5A4" icon={(<><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-5" /></>)} />
               <KpiTile label="Lessons Completed" value={lessonsCompleted} subtitle={`${lessonsCompleted} lesson${lessonsCompleted === 1 ? "" : "s"} completed`} accent="#F59E0B" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
-              <KpiTile label="Weeks Passed" value={weeksPassed} subtitle={`${weeksPassed} week${weeksPassed === 1 ? "" : "s"} completed`} accent="#6366F1" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
+              <KpiTile label="Weeks Passed" value={weeksPassed} subtitle={`${weeksPassed} completed normally · ${teacherAdvancedWeeks} teacher advanced`} accent="#6366F1" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
             </div>
 
             {/* Year level + view tabs */}
@@ -1219,6 +1236,7 @@ export default function TeacherDashboardPage() {
                 liveRows={liveRows as any}
                 liveEvents={liveEvents as any}
                 onRealmChange={setAnalyticsRealmId}
+                onProgressChanged={() => selectedClassId ? loadClassData(selectedClassId, false) : undefined}
               />
             )}
             {/* eslint-enable @typescript-eslint/no-explicit-any */}

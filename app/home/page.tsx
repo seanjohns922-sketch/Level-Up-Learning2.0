@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
+import type { StudentProgress } from "@/data/progress";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
-import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYear, hasActiveStudentSeenIntro, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
-import { markStudentIntroSeen } from "@/lib/student-progress-sync";
+import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYear, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
+import { markStudentIntroSeen, restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
-import { buildDefaultStudentProgress, resolveStudentDestination } from "@/lib/student-destination";
+import { resolveStudentDestination } from "@/lib/student-destination";
 
 export default function StudentHomePage() {
   const router = useRouter();
-  const progress = useMemo(() => readProgress(), []);
   const studentProfile = useMemo(() => getActiveStudentProfile(), []);
-  const placementYear = useMemo(() => progress?.year ?? getPlacementEntryYear(), [progress?.year]);
+  const [progress, setProgress] = useState<StudentProgress | null>(null);
+  const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">("loading");
+  const [restoreError, setRestoreError] = useState("");
+  const placementYear = progress?.year ?? getPlacementEntryYear();
   const isGroundLevel = placementYear === "Prep";
 
   useEffect(() => {
@@ -21,16 +23,42 @@ export default function StudentHomePage() {
       router.replace("/realms");
       return;
     }
-    if (studentProfile?.studentId && hasActiveStudentSeenIntro(studentProfile.studentId)) {
-      router.replace(
-        resolveStudentDestination({
-          progress,
-          introSeen: true,
-          fallbackYear: placementYear,
-        })
-      );
+    const studentId = studentProfile?.studentId;
+    if (!studentId) {
+      router.replace("/login?error=session_missing");
+      return;
     }
-  }, [isGroundLevel, placementYear, progress, router, studentProfile?.studentId]);
+
+    let cancelled = false;
+    async function restore() {
+      setRestoreState("loading");
+      try {
+        const restored = await restoreStudentStateFromServer(studentId!, "number");
+        if (cancelled) return;
+        if (!restored.progress) {
+          setRestoreError("Your learning placement is not ready. Ask your teacher to check your starting level.");
+          setRestoreState("error");
+          return;
+        }
+        setProgress(restored.progress);
+        setRestoreState("ready");
+        if (restored.introSeen) {
+          router.replace(resolveStudentDestination({
+            progress: restored.progress,
+            introSeen: true,
+            fallbackYear: restored.progress.year,
+          }));
+        }
+      } catch (error) {
+        if (cancelled || error instanceof StudentRestoreSupersededError) return;
+        console.warn("[Home] Could not restore canonical progress", error);
+        setRestoreError("We could not load your saved progress. Check your connection and try again.");
+        setRestoreState("error");
+      }
+    }
+    void restore();
+    return () => { cancelled = true; };
+  }, [router, studentProfile?.studentId]);
 
   async function handleLogout() {
     clearActiveStudentSession();
@@ -38,42 +66,34 @@ export default function StudentHomePage() {
     router.push("/login");
   }
 
-  function beginJourney() {
-    markActiveStudentIntroSeen(studentProfile?.studentId);
-    if (studentProfile?.studentId) {
-      void markStudentIntroSeen(studentProfile.studentId).catch((error) => {
-        console.warn("[Home] Could not persist intro state", error);
-      });
-    }
-    if (isGroundLevel) {
-      if (!progress) {
-        writeProgress(buildDefaultStudentProgress("Prep"));
-      } else if (!isPlacementComplete(progress)) {
-        writeProgress({
-          ...progress,
-          status: "ASSIGNED_PROGRAM",
-          placementComplete: true,
-          assignedWeek: progress.assignedWeek ?? 1,
-          requiredWeeks: progress.requiredWeeks ?? [],
-          optionalWeeks: progress.optionalWeeks ?? [],
-          unlockedLegends: progress.unlockedLegends ?? [],
-        });
-      }
-      router.push(
-        resolveStudentDestination({
-          progress: readProgress(),
-          introSeen: true,
-          fallbackYear: "Prep",
-        })
-      );
-      return;
-    }
-    router.push(
-      resolveStudentDestination({
-        progress: readProgress(),
+  async function beginJourney() {
+    const studentId = studentProfile?.studentId;
+    if (!studentId || !progress || restoreState !== "ready") return;
+    try {
+      await markStudentIntroSeen(studentId);
+      markActiveStudentIntroSeen(studentId);
+      router.push(resolveStudentDestination({
+        progress,
         introSeen: true,
-        fallbackYear: placementYear,
-      })
+        fallbackYear: progress.year,
+      }));
+    } catch (error) {
+      console.warn("[Home] Could not persist intro state", error);
+      setRestoreError("We could not save that you watched the intro. Please try again.");
+      setRestoreState("error");
+    }
+  }
+
+  if (restoreState !== "ready") {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[#fbf7f1] p-6">
+        <div className="max-w-md text-center">
+          <p className="font-bold text-slate-800">{restoreState === "loading" ? "Loading your journey..." : restoreError}</p>
+          {restoreState === "error" ? (
+            <button type="button" onClick={() => window.location.reload()} className="mt-4 rounded-xl bg-teal-700 px-5 py-3 font-bold text-white">Retry</button>
+          ) : null}
+        </div>
+      </main>
     );
   }
 

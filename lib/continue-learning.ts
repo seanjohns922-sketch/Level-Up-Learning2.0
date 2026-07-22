@@ -1,6 +1,6 @@
 "use client";
 
-import { readProgress, type ProgressRealmScope } from "@/data/progress";
+import type { ProgressRealmScope } from "@/data/progress";
 import { buildLessonId } from "@/lib/lesson-routing";
 import { getLastRealm, getLastStarpathRoute, setLastRealm } from "@/lib/last-realm";
 import { getRealmAvailability, resolveRealmEntryRoute } from "@/lib/realm-entry";
@@ -14,8 +14,9 @@ import {
 import {
   getActiveStudentIdentity,
   getActiveStudentProfile,
-  hasActiveStudentSeenIntro,
 } from "@/lib/studentIdentity";
+import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 
 export type ActiveLearningContext = "lesson" | "session" | "pretest" | "posttest";
 
@@ -98,25 +99,38 @@ function resolveSavedResumeRoute(destination: ActiveLearningDestination | null) 
   return null;
 }
 
-export function resolveContinueLearningRoute() {
+export async function resolveContinueLearningRoute() {
   if (typeof window === "undefined") return "/realms";
 
   const resumeRoute = resolveSavedResumeRoute(readActiveLearningDestination());
-  if (resumeRoute) return resumeRoute;
+  const studentId = getCurrentStudentId();
+  if (resumeRoute && studentId) {
+    const resumeRealm: ProgressRealmScope = new URL(resumeRoute, "https://level-up-learning.local").searchParams.get("realm_id") === "measurement"
+      ? "measurement"
+      : "number";
+    const restored = await restoreStudentStateFromServer(studentId, resumeRealm);
+    if (!restored.progress) throw new Error("Canonical progress was not found for the saved activity");
+    return resumeRoute;
+  }
 
   const lastRealm = getLastRealm();
   if (!lastRealm) return "/realms";
   // Starpath is demo/preview (no saved-progress resume), so send them back to the
   // exact Starpath world they were in rather than a different realm or the Tower.
-  if (lastRealm === "starpath-realm") return getLastStarpathRoute() ?? STARPATH_WORLD_ROUTE;
+  if (lastRealm === "starpath-realm") {
+    return isDemoPreviewMode() ? getLastStarpathRoute() ?? STARPATH_WORLD_ROUTE : "/realms";
+  }
   const availability = getRealmAvailability(lastRealm);
   if (!availability?.enabled) return "/realms";
 
+  if (!studentId) return "/login";
+  const restored = await restoreStudentStateFromServer(studentId, availability.progressRealmId);
+  if (!restored.progress) throw new Error("Canonical realm progress was not found");
   const profile = getActiveStudentProfile();
   return resolveRealmEntryRoute({
     realmId: availability.progressRealmId,
-    progress: readProgress(availability.progressRealmId),
+    progress: restored.progress,
     fallbackYear: profile?.yearLevel ?? "Year 1",
-    introSeen: hasActiveStudentSeenIntro(profile?.studentId),
+    introSeen: restored.introSeen,
   });
 }

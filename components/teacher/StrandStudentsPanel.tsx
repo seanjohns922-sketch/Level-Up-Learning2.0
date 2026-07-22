@@ -16,11 +16,15 @@ import {
   normalizeWorkingLevelLabel,
 } from "@/lib/studentLevelLabel";
 import { resolveStudentNameParts } from "@/lib/studentName";
-import { normalizeLessonId, parseLessonNumberFromId } from "@/lib/lessonIdentity";
 import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
 import type { TeacherInsight, TeacherInsightStatus } from "@/lib/teacher-insights";
+import {
+  teacherAdvanceStudentWeek,
+  type StudentProgressOverrideRow,
+  type TeacherProgressOverrideReason,
+} from "@/lib/realm-progress-compat";
 
 type StudentRow = {
   id: string;
@@ -78,6 +82,8 @@ type ProgressRow = {
   unlocked_legends: unknown;
   quiz_scores: unknown;
   lesson_attempts?: unknown;
+  teacher_advanced_weeks?: number[];
+  teacher_overrides?: StudentProgressOverrideRow[];
   updated_at?: string;
 };
 
@@ -145,6 +151,7 @@ type Props = {
   liveRows: LiveStudentActivityRow[];
   liveEvents: LiveActivityEventRow[];
   onRealmChange?: (realmId: "number" | "measurement") => void;
+  onProgressChanged?: () => Promise<void> | void;
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
@@ -234,95 +241,6 @@ function getQuizPassed(quiz: JsonObject | undefined): boolean {
 function getQuizAttemptsCount(quiz: JsonObject | undefined): number {
   const attempts = quiz?.attempts;
   return Array.isArray(attempts) ? attempts.length : quiz ? 1 : 0;
-}
-
-function parseEventPayload(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
-}
-
-type EventLessonSummary = {
-  started: boolean;
-  completed: boolean;
-  total: number | null;
-  correct: number | null;
-  accuracy: number | null;
-  completedAt: string | null;
-};
-
-function buildCompletedLessonIdsFromEvents(events: LiveActivityEventRow[], yearLabel: string) {
-  const ids = new Set<string>();
-  events.forEach((event) => {
-    const payload = parseEventPayload(event.payload);
-    if (event.event_type !== "lesson_completed") return;
-    const eventLevel = normalizeWorkingLevelLabel(typeof payload.level === "string" ? payload.level : null) ?? yearLabel;
-    const eventWeek = numberOrNull(payload.week);
-    const eventLessonId = typeof payload.lessonId === "string" ? payload.lessonId : null;
-    const lessonNumber = parseLessonNumberFromId(eventLessonId) ?? numberOrNull(payload.lessonNumber);
-    if (eventLevel !== yearLabel || !eventWeek || !lessonNumber) return;
-    ids.add(normalizeLessonId(eventLevel, eventWeek, lessonNumber));
-  });
-  return [...ids];
-}
-
-function buildEventLessonSummary(
-  events: LiveActivityEventRow[],
-  yearLabel: string,
-  weekNumber: number,
-  lesson: Lesson,
-): EventLessonSummary {
-  let started = false;
-  let completed = false;
-  let total = 0;
-  let correct = 0;
-  let accuracy: number | null = null;
-  let completedAt: string | null = null;
-
-  events.forEach((event) => {
-    const payload = parseEventPayload(event.payload);
-    const eventLevel = normalizeWorkingLevelLabel(typeof payload.level === "string" ? payload.level : null) ?? yearLabel;
-    const eventWeek = numberOrNull(payload.week);
-    const rawLessonId = typeof payload.lessonId === "string" ? payload.lessonId : null;
-    const eventLessonNumber = parseLessonNumberFromId(rawLessonId) ?? numberOrNull(payload.lessonNumber);
-    const normalizedId = eventWeek && eventLessonNumber
-      ? normalizeLessonId(eventLevel, eventWeek, eventLessonNumber)
-      : rawLessonId;
-
-    if (eventLevel !== yearLabel || eventWeek !== weekNumber || normalizedId !== lesson.id) return;
-
-    started = true;
-    if (event.event_type === "answer_correct") {
-      total += 1;
-      correct += 1;
-    } else if (event.event_type === "answer_incorrect") {
-      total += 1;
-    } else if (event.event_type === "lesson_completed") {
-      completed = true;
-      completedAt = event.created_at;
-      const payloadTotal = numberOrNull(payload.questionsAnswered ?? payload.totalQuestions);
-      const payloadCorrect = numberOrNull(payload.correctCount ?? payload.correctAnswers);
-      const payloadAccuracy = numberOrNull(payload.accuracyPercent ?? payload.accuracy);
-      if (payloadTotal != null) total = payloadTotal;
-      if (payloadCorrect != null) correct = payloadCorrect;
-      if (payloadAccuracy != null) accuracy = payloadAccuracy;
-    }
-  });
-
-  const resolvedTotal = total > 0 ? total : null;
-  const resolvedCorrect = resolvedTotal != null ? correct : null;
-  const resolvedAccuracy = accuracy ?? (resolvedTotal && resolvedCorrect != null
-    ? Math.round((resolvedCorrect / resolvedTotal) * 100)
-    : null);
-
-  return {
-    started,
-    completed,
-    total: resolvedTotal,
-    correct: resolvedCorrect,
-    accuracy: resolvedAccuracy,
-    completedAt,
-  };
 }
 
 function countCompletedQuizzes(raw: unknown): number {
@@ -547,7 +465,6 @@ function buildWeekSummary(
 }
 
 function buildStudentWeeklyPerformanceSummary({
-  yearLabel,
   weekNumber,
   lessons,
   completedIds,
@@ -555,9 +472,7 @@ function buildStudentWeeklyPerformanceSummary({
   weekQuiz,
   fallbackStatus,
   liveRow,
-  liveEvents,
 }: {
-  yearLabel: string;
   weekNumber: number;
   lessons: Lesson[];
   completedIds: string[];
@@ -565,7 +480,6 @@ function buildStudentWeeklyPerformanceSummary({
   weekQuiz: JsonObject | undefined;
   fallbackStatus: StrandStatus;
   liveRow?: LiveStudentActivityRow | null;
-  liveEvents: LiveActivityEventRow[];
 }): WeeklyPerformanceSummary {
   const liveLessonMatch =
     liveRow &&
@@ -597,21 +511,19 @@ function buildStudentWeeklyPerformanceSummary({
     const summaryAccuracy = numberOrNull(
       latestCompletedAttempt?.accuracy ?? latestCompletedAttempt?.accuracyPercent,
     );
-    const eventSummary = buildEventLessonSummary(liveEvents, yearLabel, weekNumber, lesson);
-
     const liveMatchesThisLesson =
       liveLessonMatch &&
+      liveRow?.current_lesson_status !== "completed" &&
       (liveRow?.current_lesson === lesson.id || liveRow?.current_lesson_title === lesson.title);
 
     const liveTotal = liveMatchesThisLesson ? numberOrNull(liveRow?.questions_answered) : null;
     const liveCorrect = liveMatchesThisLesson ? numberOrNull(liveRow?.correct_count) : null;
     const liveAccuracy = liveMatchesThisLesson ? numberOrNull(liveRow?.accuracy_percent) : null;
 
-    const total = summaryTotal ?? eventSummary.total ?? liveTotal;
-    const correct = summaryCorrect ?? eventSummary.correct ?? liveCorrect;
+    const total = summaryTotal ?? liveTotal;
+    const correct = summaryCorrect ?? liveCorrect;
     const accuracy =
       summaryAccuracy ??
-      eventSummary.accuracy ??
       liveAccuracy ??
       (total && correct != null ? Math.round((correct / total) * 100) : null);
 
@@ -622,9 +534,9 @@ function buildStudentWeeklyPerformanceSummary({
           ? 1
           : 0;
     const hasPersistedSummary = summaryTotal != null || summaryCorrect != null || summaryAccuracy != null;
-    const status: LessonCardPerformance["status"] = completedIds.includes(lesson.id) || hasPersistedSummary || eventSummary.completed
+    const status: LessonCardPerformance["status"] = completedIds.includes(lesson.id) || hasPersistedSummary
       ? "Completed"
-      : total != null || liveMatchesThisLesson || eventSummary.started
+      : total != null || liveMatchesThisLesson
         ? "In Progress"
         : "Not Started";
 
@@ -936,32 +848,17 @@ function pickStudentYear(rows: ProgressRow[], fallback: string): string {
   return sorted[0].year;
 }
 
-function levelToYearLabel(level?: string | null): string | null {
-  return normalizeWorkingLevelLabel(level);
-}
-
 function liveRowToStatus(row?: LiveStudentActivityRow | undefined): StrandStatus {
   if (!row) return "Not Started";
-  if (row.current_lesson_status === "completed") return "Completed";
-  if (row.latest_event_type) return "In Progress";
+  if (row.latest_event_type && row.current_lesson_status !== "completed") return "In Progress";
   return "Not Started";
 }
 
-function resolveDisplayedWeek(prog?: ProgressRow, liveRow?: LiveStudentActivityRow) {
-  const progressWeek = prog?.week ?? null;
-  const liveWeek = liveRow?.current_week ?? null;
-  if (progressWeek == null) return liveWeek;
-  if (liveWeek == null) return progressWeek;
-
-  const progressAt = prog?.updated_at ? new Date(prog.updated_at).getTime() : 0;
-  const liveAt = Math.max(
-    liveRow?.updated_at ? new Date(liveRow.updated_at).getTime() : 0,
-    liveRow?.last_active_at ? new Date(liveRow.last_active_at).getTime() : 0,
-  );
-  return liveAt > progressAt ? liveWeek : progressWeek;
+function resolveDisplayedWeek(prog?: ProgressRow) {
+  return prog?.week ?? null;
 }
 
-export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, liveEvents, onRealmChange }: Props) {
+export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, onRealmChange, onProgressChanged }: Props) {
   const genres = getGenresForYear(yearLabel);
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvail.id);
@@ -1028,13 +925,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
     return liveRows.find((row) => row.student_id === studentId);
   }
 
-  function getStudentEvents(studentId: string) {
-    return liveEvents.filter((event) => event.student_id === studentId);
-  }
-
   function getWorkingYear(student: StudentRow): string {
-    const liveYear = levelToYearLabel(getLiveRow(student.id)?.current_level);
-    if (liveYear) return liveYear;
     const rows = progress.filter(
       (p) => p.student_id === student.id && matchesSelectedRealm(p.realm_id)
     );
@@ -1053,10 +944,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const workingYear = getWorkingYear(s);
       const prog = isPlaceholder ? undefined : getProg(s.id, workingYear);
       const liveRow = getLiveRow(s.id);
-      const studentEvents = getStudentEvents(s.id);
       const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
-      const eventIds = buildCompletedLessonIdsFromEvents(studentEvents, workingYear);
-      const ids = [...new Set([...persistedIds, ...eventIds])];
+      const ids = persistedIds;
       const sPrefix = genreId === "measurement" ? `${lessonIdPrefix(workingYear)}measurement-` : lessonIdPrefix(workingYear);
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
       const planForStudentYear = getCurriculumPlan(workingYear, genreId);
@@ -1065,7 +954,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
       const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
       const placementStatus = computePlacementStatus(prog, pct, isPlaceholder);
-      const week = isPlaceholder ? null : resolveDisplayedWeek(prog, liveRow);
+      const week = isPlaceholder ? null : resolveDisplayedWeek(prog);
       const activeWeek = week ?? 1;
       const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
       const activeLessonIds = activeWeekPlan?.lessons.map((lesson) => lesson.id) ?? [];
@@ -1074,7 +963,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
       const latestPretest = getLatestPretestProgress(s.id);
 
-      return { s, prog, liveRow, studentEvents, pct, status, placementStatus, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
+      return { s, prog, liveRow, pct, status, placementStatus, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
     })
     .sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;
@@ -1256,7 +1145,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             No students enrolled yet.
           </div>
         ) : (
-          studentRows.map(({ s, prog, liveRow, studentEvents, pct, placementStatus, week, schoolYear, workingYear, latestPretest }) => {
+          studentRows.map(({ s, prog, liveRow, pct, placementStatus, week, schoolYear, workingYear, latestPretest }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -1302,10 +1191,10 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     genre={genre}
                     prog={prog}
                     liveRow={liveRow}
-                    liveEvents={studentEvents}
                     latestPretest={latestPretest}
                     isPlaceholder={isPlaceholder}
                     prefix={lessonIdPrefix(workingYear)}
+                    onProgressChanged={onProgressChanged}
                   />
                 )}
               </div>
@@ -1320,7 +1209,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 /* ───────── Detail view ───────── */
 
 function StudentStrandDetail({
-  student, schoolYearLabel, yearLabel, genre, prog, liveRow, liveEvents, latestPretest, isPlaceholder, prefix,
+  student, schoolYearLabel, yearLabel, genre, prog, liveRow, latestPretest, isPlaceholder, prefix, onProgressChanged,
 }: {
   student: StudentRow;
   schoolYearLabel: string;
@@ -1328,23 +1217,56 @@ function StudentStrandDetail({
   genre: Genre;
   prog: ProgressRow | undefined;
   liveRow?: LiveStudentActivityRow | undefined;
-  liveEvents: LiveActivityEventRow[];
   latestPretest?: ProgressRow | undefined;
   isPlaceholder: boolean;
   prefix: string;
+  onProgressChanged?: () => Promise<void> | void;
 }) {
   const plan = useMemo(() => getCurriculumPlan(yearLabel, genre.id), [yearLabel, genre.id]);
   const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
-  const eventIds = buildCompletedLessonIdsFromEvents(liveEvents, yearLabel);
-  const ids = [...new Set([...persistedIds, ...eventIds])];
-  const currentWeek = resolveDisplayedWeek(prog, liveRow) ?? 1;
+  const ids = persistedIds;
+  const currentWeek = resolveDisplayedWeek(prog) ?? 1;
   const [selectedWeek, setSelectedWeek] = useState<number>(currentWeek);
   const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
+  const [showAdvanceDialog, setShowAdvanceDialog] = useState(false);
+  const [advanceReason, setAdvanceReason] = useState<TeacherProgressOverrideReason | "">("");
+  const [advanceNotes, setAdvanceNotes] = useState("");
+  const [advanceState, setAdvanceState] = useState<"idle" | "saving" | "error">("idle");
+  const [advanceError, setAdvanceError] = useState("");
 
   const quizScores = parseQuizScores(prog?.quiz_scores);
   const lessonAttempts = parseLessonAttempts(prog?.lesson_attempts);
   const latestPost = getLatestPosttestProfile(prog?.quiz_scores);
+  const teacherAdvancedWeeks = prog?.teacher_advanced_weeks ?? [];
+  const teacherOverrides = prog?.teacher_overrides ?? [];
+  const maxWeek = plan.length;
+  const studentName = resolveStudentNameParts(student).displayName;
+
+  async function advanceStudent() {
+    if (!advanceReason || selectedWeek !== currentWeek || selectedWeek >= maxWeek) return;
+    setAdvanceState("saving");
+    setAdvanceError("");
+    try {
+      await teacherAdvanceStudentWeek({
+        studentId: student.id,
+        realmId: genre.id === "measurement" ? "measurement" : "number",
+        workingLevel: yearLabel,
+        week: selectedWeek,
+        reason: advanceReason,
+        notes: advanceNotes,
+      });
+      await onProgressChanged?.();
+      setShowAdvanceDialog(false);
+      setAdvanceReason("");
+      setAdvanceNotes("");
+      setAdvanceState("idle");
+      setSelectedWeek(selectedWeek + 1);
+    } catch (error) {
+      setAdvanceError(error instanceof Error ? error.message : "The student could not be advanced.");
+      setAdvanceState("error");
+    }
+  }
 
   function weekStatus(w: number): "Complete" | "Quiz Pending" | "In Progress" | "Not Started" | "Struggled" {
     if (isPlaceholder) return "Not Started";
@@ -1363,7 +1285,6 @@ function StudentStrandDetail({
   const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;  const overallPct = overallProgramPercent(ids.filter((id) => id.startsWith(prefix)).length, countCompletedQuizzes(prog?.quiz_scores), plan);
   const summaryStatus = computeStatus(prog, ids.filter((id) => id.startsWith(prefix)).length, overallPct);
   const weekPerformance = buildStudentWeeklyPerformanceSummary({
-    yearLabel,
     weekNumber: week?.week ?? 1,
     lessons: week?.lessons ?? [],
     completedIds: ids,
@@ -1371,7 +1292,6 @@ function StudentStrandDetail({
     weekQuiz,
     fallbackStatus: summaryStatus,
     liveRow,
-    liveEvents,
   });
   const pretestScore = latestPretest?.pretest_score ?? null;
   const pretestSub =
@@ -1389,7 +1309,6 @@ function StudentStrandDetail({
       expected_lesson_ids: (week?.lessons ?? []).map((lesson) => lesson.id),
       saved_completed_lesson_ids: ids,
       matched_attempt_count: Object.keys(lessonAttempts).filter((key) => (week?.lessons ?? []).some((lesson) => lesson.id === key)).length,
-      matching_event_ids: eventIds,
     });
   }
 
@@ -1435,7 +1354,7 @@ function StudentStrandDetail({
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
         <SnapshotTile label="Strand" value={`${genre.strand}`} sub={genre.realm} />
         <SnapshotTile label="School Year" value={schoolYearLabel} sub="Student's class year" />
-        <SnapshotTile label="Working Level / Week" value={yearToLevelLabel(yearLabel)} sub={`Week ${currentWeek} / 12`} />
+        <SnapshotTile label="Working Level / Week" value={yearToLevelLabel(yearLabel)} sub={`Week ${currentWeek} / ${maxWeek}`} />
         <SnapshotTile label="Current Plan" value={`${yearToLevelLabel(yearLabel)} ${genre.realm}`} sub={week?.topic ?? `Week ${currentWeek}`} />
         <SnapshotTile
           label="Pre-test"
@@ -1502,6 +1421,8 @@ function StudentStrandDetail({
             const st = weekStatus(w.week);
             const active = w.week === selectedWeek;
             const isExpanded = w.week === expandedWeek;
+            const teacherAdvanced = teacherAdvancedWeeks.includes(w.week);
+            const teacherOverride = teacherOverrides.find((entry) => entry.week === w.week);
             const tone =
               st === "Complete"   ? "bg-emerald-500 text-white border-emerald-500" :
               st === "Quiz Pending" ? "bg-amber-50 text-amber-700 border-amber-300" :
@@ -1515,7 +1436,9 @@ function StudentStrandDetail({
                   setSelectedWeek(w.week);
                   setExpandedWeek((prev) => (prev === w.week ? null : w.week));
                 }}
-                title={`Week ${w.week}: ${st} — click to ${isExpanded ? "collapse" : "expand"}`}
+                title={teacherOverride
+                  ? `Week ${w.week}: Teacher Advanced on ${new Date(teacherOverride.created_at).toLocaleDateString()} · ${teacherOverrideReasonLabel(teacherOverride.reason)}${teacherOverride.notes ? ` · ${teacherOverride.notes}` : ""}`
+                  : `Week ${w.week}: ${st} — click to ${isExpanded ? "collapse" : "expand"}`}
                 className={[
                   "rounded-lg border py-2 text-center transition",
                   tone,
@@ -1524,7 +1447,7 @@ function StudentStrandDetail({
                 ].filter(Boolean).join(" ")}
               >
                 <div className="text-[10px] font-extrabold uppercase tracking-wider opacity-80">W{w.week}</div>
-                <div className="text-[9px] font-bold mt-0.5 leading-none">{shortStatus(st)}</div>
+                <div className="text-[9px] font-bold mt-0.5 leading-none">{teacherAdvanced ? "Advanced" : shortStatus(st)}</div>
               </button>
             );
           })}
@@ -1542,11 +1465,13 @@ function StudentStrandDetail({
               <div className="text-base font-black text-[#0F172A] mt-0.5">{week.topic}</div>
             </div>
             <button
-              disabled
-              title="Coming soon"
-              className="px-3 py-1.5 rounded-lg bg-[#F1F5F9] text-[#64748B] text-xs font-bold cursor-not-allowed"
+              type="button"
+              onClick={() => setShowAdvanceDialog(true)}
+              disabled={isPlaceholder || selectedWeek !== currentWeek || selectedWeek >= maxWeek || teacherAdvancedWeeks.includes(selectedWeek)}
+              title={selectedWeek !== currentWeek ? "Select the student's current week to manage progress" : "Manage this student's canonical week progression"}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[#334155] text-xs font-bold disabled:bg-[#F1F5F9] disabled:text-[#94A3B8] disabled:cursor-not-allowed hover:border-teal-300"
             >
-              Assign Week
+              More · Manage Progress
             </button>
           </div>
 
@@ -1714,6 +1639,58 @@ function StudentStrandDetail({
           };
         })() : null}
       />
+
+      {showAdvanceDialog ? (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/55 p-4" role="dialog" aria-modal="true" aria-labelledby="advance-student-title">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="advance-student-title" className="text-xl font-black text-slate-950">Advance Student</h2>
+                <p className="mt-1 text-sm text-slate-600">This records a teacher override. It does not create scores, attempts, XP or rewards.</p>
+              </div>
+              <button type="button" onClick={() => setShowAdvanceDialog(false)} className="h-9 w-9 rounded-lg border border-slate-200 text-lg text-slate-600" aria-label="Close">×</button>
+            </div>
+
+            <dl className="mt-5 grid grid-cols-2 gap-3 rounded-xl bg-slate-50 p-4 text-sm">
+              <div><dt className="font-bold text-slate-500">Student</dt><dd className="mt-1 font-black text-slate-900">{studentName}</dd></div>
+              <div><dt className="font-bold text-slate-500">Level</dt><dd className="mt-1 font-black text-slate-900">{formatStudentLevelLabel(yearLabel)}</dd></div>
+              <div><dt className="font-bold text-slate-500">Current</dt><dd className="mt-1 font-black text-slate-900">Week {selectedWeek}</dd></div>
+              <div><dt className="font-bold text-slate-500">Advance to</dt><dd className="mt-1 font-black text-teal-700">Week {selectedWeek + 1}</dd></div>
+            </dl>
+
+            <fieldset className="mt-5">
+              <legend className="text-sm font-black text-slate-900">Reason <span className="text-rose-600">(required)</span></legend>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {([
+                  ["additional_needs", "Disability / Additional Needs"],
+                  ["iep", "Individual Education Plan"],
+                  ["professional_judgement", "Teacher Professional Judgement"],
+                  ["extended_absence", "Extended Absence"],
+                  ["technical_issue", "Technical Issue"],
+                  ["other", "Other"],
+                ] as Array<[TeacherProgressOverrideReason, string]>).map(([value, label]) => (
+                  <label key={value} className="flex cursor-pointer items-start gap-2 rounded-lg border border-slate-200 p-3 text-sm font-semibold text-slate-700 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50">
+                    <input type="radio" name="advance-reason" value={value} checked={advanceReason === value} onChange={() => setAdvanceReason(value)} className="mt-0.5" />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <label className="mt-4 block text-sm font-black text-slate-900">
+              Notes <span className="font-medium text-slate-500">(optional)</span>
+              <textarea value={advanceNotes} onChange={(event) => setAdvanceNotes(event.target.value)} rows={3} maxLength={1000} className="mt-2 w-full rounded-xl border border-slate-300 p-3 font-medium text-slate-800 outline-none focus:border-teal-500" />
+            </label>
+            {advanceError ? <p className="mt-3 text-sm font-bold text-rose-700">{advanceError}</p> : null}
+            <div className="mt-6 flex justify-end gap-3">
+              <button type="button" onClick={() => setShowAdvanceDialog(false)} className="rounded-xl border border-slate-300 px-4 py-2.5 font-bold text-slate-700">Cancel</button>
+              <button type="button" onClick={() => void advanceStudent()} disabled={!advanceReason || advanceState === "saving"} className="rounded-xl bg-teal-700 px-4 py-2.5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-45">
+                {advanceState === "saving" ? "Advancing..." : "Advance Student"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1728,6 +1705,17 @@ function shortStatus(s: string) {
   if (s === "In Progress") return "•••";
   if (s === "Struggled")   return "!";
   return "—";
+}
+
+function teacherOverrideReasonLabel(reason: string) {
+  return ({
+    additional_needs: "Disability / Additional Needs",
+    iep: "Individual Education Plan",
+    professional_judgement: "Teacher Professional Judgement",
+    extended_absence: "Extended Absence",
+    technical_issue: "Technical Issue",
+    other: "Other",
+  } as Record<string, string>)[reason] ?? reason;
 }
 
 function SnapshotTile({ label, value, sub }: { label: string; value: string; sub?: string }) {

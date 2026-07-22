@@ -4,21 +4,23 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
-import { readProgress, StudentProgress, writeProgress, ACTIVE_STUDENT_KEY } from "@/data/progress";
-import { saveStudentProgressState } from "@/lib/student-progress-sync";
+import { readProgress, ACTIVE_STUDENT_KEY, type StudentProgress } from "@/data/progress";
+import { restoreStudentStateFromServer, StudentRestoreSupersededError, type StudentProgressSnapshotRow } from "@/lib/student-progress-sync";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
 import FogClearCinematic from "@/components/lesson/FogClearCinematic";
 import { getFogProgress } from "@/lib/fog-progress";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { hasSeenLegendUnlockVideo } from "@/lib/legend-video-state";
-import { getOptionalWeeks, getProgramWeeks, normalizeWeekList } from "@/lib/program-progress";
+import { getProgramWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme, type RealmTheme } from "@/lib/useRealmTheme";
-import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
+import MistakeReviewPanel from "@/components/review/MistakeReviewPanel";
 import { loadAssessmentReviewItems } from "@/lib/assessment-review-state";
 import { buildLessonRoute } from "@/lib/lesson-routing";
-const POSTTEST_PASS_THRESHOLD = 85;
-const PRETEST_PASS_THRESHOLD = 85;
+import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
+const POSTTEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
+const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 
 const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
 
@@ -136,6 +138,14 @@ function buildSkillGrowth(
     .filter((item): item is SkillGrowthRow => item !== null);
 
   return rows.sort((a, b) => b.improvement - a.improvement || a.incorrectCount - b.incorrectCount);
+}
+
+function assessmentProfileFromRow(value: unknown): AssessmentResultProfile | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const profile = value as Partial<AssessmentResultProfile>;
+  return typeof profile.score === "number" && typeof profile.total === "number" && typeof profile.percentage === "number"
+    ? profile as AssessmentResultProfile
+    : null;
 }
 
 export default function ResultsPageWrapper() {
@@ -259,55 +269,90 @@ function ResultsPage() {
   const theme = getRealmTheme(realmId);
   const realmParam = realmId ? `&realm_id=${encodeURIComponent(realmId)}` : "";
   const studentLevelLabel = formatStudentLevelLabel(year);
-  const score = Number(sp.get("score") ?? "0");
-  const total = Number(sp.get("total") ?? "0");
+  const queryScore = Number(sp.get("score") ?? "0");
+  const queryTotal = Number(sp.get("total") ?? "0");
   const source = sp.get("source") ?? "pretest";
   const isPostTest = sp.get("posttest") === "1";
-  const [assessmentReviewItems, setAssessmentReviewItems] = useState<MistakeReviewItem[]>([]);
-  const [showAssessmentReview, setShowAssessmentReview] = useState(false);
-
-  useEffect(() => {
-    if (source === "program_complete") {
-      setAssessmentReviewItems([]);
-      return;
-    }
-    setAssessmentReviewItems(loadAssessmentReviewItems({
+  const previewMode = isDemoPreviewMode();
+  const assessmentReviewItems = source === "program_complete" ? [] : loadAssessmentReviewItems({
       year,
       realmId: progressRealmId,
       mode: isPostTest ? "posttest" : "pretest",
-    }));
-  }, [isPostTest, progressRealmId, source, year]);
+    });
+  const [showAssessmentReview, setShowAssessmentReview] = useState(false);
+  const initialPreviewProgress = previewMode ? readProgress(progressRealmId) : null;
+  const [canonicalProgress, setCanonicalProgress] = useState<StudentProgress | null>(initialPreviewProgress);
+  const [storedPretestProfile, setStoredPretestProfile] = useState<AssessmentResultProfile | null>(initialPreviewProgress?.lastPreTestProfile ?? null);
+  const [storedPosttestProfile, setStoredPosttestProfile] = useState<AssessmentResultProfile | null>(initialPreviewProgress?.lastPostTestProfile ?? null);
+  const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">(previewMode ? "ready" : "loading");
+  const [restoreError, setRestoreError] = useState("");
 
+  useEffect(() => {
+    if (previewMode) return;
+    let cancelled = false;
+    async function restore() {
+      const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() : null;
+      await Promise.resolve();
+      if (!studentId) {
+        if (!cancelled) {
+          setRestoreError("Your student session has expired. Please log in again.");
+          setRestoreState("error");
+        }
+        return;
+      }
+      try {
+        const restored = await restoreStudentStateFromServer(studentId, progressRealmId);
+        if (cancelled) return;
+        const levelRow = restored.rows.find((row: StudentProgressSnapshotRow) => row.year === year);
+        const preProfile = assessmentProfileFromRow(levelRow?.pretest_profile);
+        const postProfile = assessmentProfileFromRow(levelRow?.posttest_profile);
+        const requestedProfile = isPostTest ? postProfile : preProfile;
+        if (!restored.progress || (!requestedProfile && source !== "program_complete")) {
+          setRestoreError("Canonical assessment results were not found for this student and level.");
+          setRestoreState("error");
+          return;
+        }
+        if (source === "program_complete") {
+          setRestoreError("This legacy program result is no longer available. Return to your realm to continue.");
+          setRestoreState("error");
+          return;
+        }
+        setCanonicalProgress(restored.progress);
+        setStoredPretestProfile(preProfile);
+        setStoredPosttestProfile(postProfile);
+        setRestoreState("ready");
+      } catch (error) {
+        if (cancelled || error instanceof StudentRestoreSupersededError) return;
+        console.warn("[Results] Canonical restore failed", error);
+        setRestoreError("We could not load your saved result. Check your connection and retry.");
+        setRestoreState("error");
+      }
+    }
+    void restore();
+    return () => { cancelled = true; };
+  }, [isPostTest, previewMode, progressRealmId, source, year]);
+
+  const activeProfile = isPostTest ? storedPosttestProfile : storedPretestProfile;
+  const score = activeProfile?.score ?? (previewMode ? queryScore : 0);
+  const total = activeProfile?.total ?? (previewMode ? queryTotal : 0);
   const scorePercent = useMemo(() => {
+    if (activeProfile) return activeProfile.percentage;
     if (!total || total <= 0) return 0;
     return Math.round((score / total) * 100);
-  }, [score, total]);
+  }, [activeProfile, score, total]);
 
   const passedByPretest = !isPostTest && scorePercent >= PRETEST_PASS_THRESHOLD;
   const passedByPosttest = isPostTest && scorePercent >= POSTTEST_PASS_THRESHOLD;
-  const [showFogCinematic, setShowFogCinematic] = useState(false);
-  useEffect(() => {
-    if (passedByPosttest) setShowFogCinematic(true);
-  }, [passedByPosttest]);
-  const passedByProgram = source === "program_complete";
+  const [fogCinematicDismissed, setFogCinematicDismissed] = useState(false);
+  const showFogCinematic = passedByPosttest && !fogCinematicDismissed;
+  const passedByProgram = previewMode && source === "program_complete";
   const passed = passedByPretest || passedByPosttest || passedByProgram;
   const displayPercent = passedByProgram ? 100 : scorePercent;
   const nextYear = getNextYearLabel(year);
   const nextStudentLevelLabel = nextYear ? formatStudentLevelLabel(nextYear) : null;
 
-  const legend = useMemo(() => getLegendForYear(year, legendRealmId), [legendRealmId, year]);
-  const storedPosttestProfile: AssessmentResultProfile | null = useMemo(() => {
-    const progress = readProgress();
-    return isPostTest ? progress?.lastPostTestProfile ?? null : null;
-  }, [isPostTest]);
-  const storedPretestProfile: AssessmentResultProfile | null = useMemo(() => {
-    const progress = readProgress();
-    return progress?.lastPreTestProfile ?? null;
-  }, []);
-  const skillGrowth = useMemo(
-    () => buildSkillGrowth(storedPretestProfile, storedPosttestProfile),
-    [storedPretestProfile, storedPosttestProfile]
-  );
+  const legend = getLegendForYear(year, legendRealmId);
+  const skillGrowth = buildSkillGrowth(storedPretestProfile, storedPosttestProfile);
   const strongestGrowth = skillGrowth.find((item) => item.improvement > 0) ?? null;
   const keepPractising =
     [...skillGrowth]
@@ -322,22 +367,22 @@ function ResultsPage() {
       ? storedPosttestProfile.score - storedPretestProfile.score
       : null;
 
-  const initialProgress = useMemo(() => readProgress(), []);
+  const initialProgress = canonicalProgress;
   const [unlockDismissed, setUnlockDismissed] = useState(false);
-  const unlockTargets = useMemo(() => {
+  const unlockTargets = (() => {
     if (passedByPretest) return getLegendIdsUpToYear(year, legendRealmId);
     if (!isPostTest) return getLegendIdsBeforeYear(year, legendRealmId); // failed pretest → unlock all prior years
     return passedByPosttest ? [legend.id] : [];
-  }, [passedByPretest, passedByPosttest, isPostTest, year, legend.id, legendRealmId]);
+  })();
 
   // For a failed pretest we unlock prior-year legends — show the highest one in the overlay
-  const unlockDisplayLegend = useMemo(() => {
+  const unlockDisplayLegend = (() => {
     if (!isPostTest && !passedByPretest && unlockTargets.length > 0) {
       const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
       if (yearIndex > 0) return getLegendForYear(YEAR_SEQUENCE[yearIndex - 1], legendRealmId);
     }
     return legend;
-  }, [isPostTest, passedByPretest, unlockTargets, year, legend, legendRealmId]);
+  })();
 
   const shouldShowUnlock =
     unlockTargets.length > 0 &&
@@ -346,92 +391,17 @@ function ResultsPage() {
     !unlockDismissed;
   const isFailedPretest = !isPostTest && !passedByPretest;
   const requiresFullPathway = isFailedPretest && scorePercent < 50;
-  const diagnosticRequiredWeeks = useMemo(
-    () => (!isPostTest ? normalizeWeekList(storedPretestProfile?.recommendedWeeks, progressRealmId) : []),
-    [isPostTest, progressRealmId, storedPretestProfile]
-  );
+  const diagnosticRequiredWeeks = !isPostTest
+    ? normalizeWeekList(storedPretestProfile?.recommendedWeeks, progressRealmId)
+    : [];
   // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
-  const allProgramWeeks = useMemo(() => getProgramWeeks(progressRealmId), [progressRealmId]);
-  const requiredWeeks = useMemo(() => {
+  const allProgramWeeks = getProgramWeeks(progressRealmId);
+  const requiredWeeks = (() => {
     if (isPostTest) return [];
     if (!isFailedPretest) return [];
     if (requiresFullPathway || diagnosticRequiredWeeks.length === 0) return allProgramWeeks;
     return diagnosticRequiredWeeks;
-  }, [allProgramWeeks, diagnosticRequiredWeeks, isFailedPretest, isPostTest, requiresFullPathway]);
-  const optionalWeeks = useMemo(() => {
-    if (isPostTest) return allProgramWeeks;
-    if (!isFailedPretest) return allProgramWeeks;
-    return requiresFullPathway ? [] : getOptionalWeeks(requiredWeeks, progressRealmId);
-  }, [allProgramWeeks, isFailedPretest, isPostTest, progressRealmId, requiredWeeks, requiresFullPathway]);
-
-  useEffect(() => {
-    // Assessment pages persist their result transactionally before navigating
-    // here. Query-string scores are display-only and must never mutate progress.
-    if (!passedByProgram) return;
-    const prev = readProgress();
-    const prevUnlocked = prev?.unlockedLegends ?? [];
-    const alreadyUnlocked = unlockTargets.every((id) => prevUnlocked.includes(id));
-
-    let next: StudentProgress;
-
-    if (passed) {
-      const unlocked = alreadyUnlocked
-        ? prevUnlocked
-        : Array.from(new Set([...prevUnlocked, ...unlockTargets]));
-      next = {
-        ...prev,
-        year: !isPostTest && !passedByProgram && nextYear ? nextYear : year,
-        scorePercent: passedByProgram ? Math.max(prev?.scorePercent ?? 0, POSTTEST_PASS_THRESHOLD) : scorePercent,
-        status: "PASSED",
-        placementComplete: isPostTest || passedByProgram || !nextYear,
-        assignedWeek: prev?.assignedWeek,
-        assignedWeeksHistory: prev?.assignedWeeksHistory,
-        requiredWeeks: [],
-        optionalWeeks: allProgramWeeks,
-        unlockedLegends: unlocked,
-      };
-    } else {
-      const assignedWeek = isPostTest
-        ? getLowestRecommendedWeek(storedPosttestProfile) ?? 1
-        : requiredWeeks[0] ?? getLowestRecommendedWeek(storedPretestProfile) ?? 1;
-      const lowerLegendUnlocks = isFailedPretest ? getLegendIdsBeforeYear(year, legendRealmId) : [];
-      const unlocked = Array.from(new Set([...prevUnlocked, ...lowerLegendUnlocks]));
-      next = {
-        ...prev,
-        year,
-        scorePercent,
-        status: "ASSIGNED_PROGRAM",
-        placementComplete: true,
-        assignedWeek,
-        // A failed post-test opens the complete level for unrestricted practice.
-        requiredWeeks: isPostTest ? [] : requiredWeeks,
-        optionalWeeks: isPostTest ? allProgramWeeks : optionalWeeks,
-        unlockedLegends: unlocked,
-      };
-    }
-
-    writeProgress(next);
-
-    (async () => {
-      try {
-        if (isPostTest || passedByProgram) return;
-        const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
-        if (!studentId) return;
-        await saveStudentProgressState(studentId, year, {
-          pretest_score: scorePercent,
-          status: next.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
-          week: next.assignedWeek ?? null,
-          placement_complete: next.placementComplete ?? false,
-          assigned_week: next.assignedWeek ?? null,
-          required_weeks: next.requiredWeeks ?? [],
-          optional_weeks: next.optionalWeeks ?? [],
-          unlocked_legends: next.unlockedLegends ?? [],
-        }, progressRealmId);
-      } catch (e) {
-        console.warn("[Results] DB pretest save failed:", e);
-      }
-    })();
-  }, [passed, year, scorePercent, isPostTest, isFailedPretest, passedByProgram, storedPosttestProfile, storedPretestProfile, unlockTargets, requiredWeeks, optionalWeeks, allProgramWeeks, nextYear, legendRealmId, progressRealmId]);
+  })();
 
   function goHome() { router.push(realmId === "measurement" ? "/measurelands" : "/levels"); }
   const assignedStartWeek = isPostTest
@@ -474,6 +444,22 @@ function ResultsPage() {
     router.push(realmId === "measurement" ? "/measurelands" : "/levels");
   }
 
+  if (restoreState !== "ready") {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-slate-950 p-6 text-center">
+        <div>
+          <p className="font-bold text-slate-200">{restoreState === "loading" ? "Loading your saved result..." : restoreError}</p>
+          {restoreState === "error" ? (
+            <div className="mt-4 flex justify-center gap-3">
+              <button type="button" onClick={() => window.location.reload()} className="rounded-xl bg-teal-500 px-5 py-3 font-bold text-slate-950">Retry</button>
+              <button type="button" onClick={goHome} className="rounded-xl border border-slate-600 px-5 py-3 font-bold text-slate-200">Return to Realm</button>
+            </div>
+          ) : null}
+        </div>
+      </main>
+    );
+  }
+
   if (showAssessmentReview) {
     return (
       <MistakeReviewPanel
@@ -496,7 +482,7 @@ function ResultsPage() {
   return (
     <main className="min-h-screen bg-slate-950 flex items-start justify-center p-4 pt-8 relative overflow-y-auto">
       {showFogCinematic && (
-        <FogClearCinematic progress={getFogProgress()} onDone={() => setShowFogCinematic(false)} />
+        <FogClearCinematic progress={getFogProgress()} onDone={() => setFogCinematicDismissed(true)} />
       )}
       <FloatingShapes theme={theme} />
 

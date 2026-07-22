@@ -12,9 +12,11 @@ import { MeasurelandsAssessmentTask } from "@/components/assessment/Measurelands
 import type { MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
-import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress, writeProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress } from "@/data/progress";
 import { clearYearProgress, getOptionalWeeks, getProgramWeeks, normalizeWeekList } from "@/lib/program-progress";
-import { saveRealmAssessment } from "@/lib/student-progress-sync";
+import { restoreStudentStateFromServer, saveRealmAssessment, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import { ASSESSMENT_THRESHOLDS, pretestPathwayForPercent } from "@/lib/assessment-rules";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import {
@@ -29,7 +31,7 @@ import { clearActiveStudentSession } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
 import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 
-const PRETEST_PASS_THRESHOLD = 85;
+const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
 
 function getNextYearLabel(year: string) {
@@ -368,10 +370,6 @@ function PretestPage() {
     }
   }, [realmId, router, year]);
 
-  if (year === "Prep") {
-    return null;
-  }
-
   const questions: Question[] = useMemo(
     () => getPretestForYearLabel(year, progressRealmId),
     [year, progressRealmId]
@@ -397,27 +395,50 @@ function PretestPage() {
     nextYear: string | null;
   } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [canonicalProgress, setCanonicalProgress] = useState<StudentProgress | null>(null);
+  const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">(
+    isDemoPreviewMode() ? "ready" : "loading"
+  );
+  const [restoreError, setRestoreError] = useState("");
 
   const question = questions[index];
   const selected = answers[index];
 
   useEffect(() => {
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() : null;
-    const progress = readProgress(progressRealmId);
-
     if (!studentId) {
       router.replace("/login");
       return;
     }
-
-    if (isPlacementComplete(progress)) {
-      router.replace(progressRealmId === "measurement" ? "/measurelands" : "/levels");
+    if (isDemoPreviewMode()) {
+      setCanonicalProgress(readProgress(progressRealmId));
       return;
     }
-
-    if (progress?.year && progress.year !== year) {
-      router.replace(`/pretest?year=${encodeURIComponent(progress.year)}&realm_id=${encodeURIComponent(progressRealmId)}`);
-    }
+    let cancelled = false;
+    void restoreStudentStateFromServer(studentId, progressRealmId)
+      .then((restored) => {
+        if (cancelled) return;
+        const progress = restored.progress;
+        if (!progress) {
+          setRestoreError("Your placement is not ready. Ask your teacher to check your starting level.");
+          setRestoreState("error");
+          return;
+        }
+        setCanonicalProgress(progress);
+        setRestoreState("ready");
+        if (isPlacementComplete(progress)) {
+          router.replace(progressRealmId === "measurement" ? "/measurelands" : "/levels");
+        } else if (progress.year !== year) {
+          router.replace(`/pretest?year=${encodeURIComponent(progress.year)}&realm_id=${encodeURIComponent(progressRealmId)}`);
+        }
+      })
+      .catch((error) => {
+        if (cancelled || error instanceof StudentRestoreSupersededError) return;
+        console.warn("[Pretest] Canonical restore failed", error);
+        setRestoreError("We could not load your saved placement. Check your connection and retry.");
+        setRestoreState("error");
+      });
+    return () => { cancelled = true; };
   }, [progressRealmId, router, year]);
 
   useEffect(() => {
@@ -431,7 +452,6 @@ function PretestPage() {
       setShowResumePrompt(true);
     }
     setResumeReady(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progressRealmId, year]);
 
   function resumeFromSnapshot() {
@@ -558,12 +578,12 @@ function PretestPage() {
       passThreshold: PRETEST_PASS_THRESHOLD,
       studentId,
     });
-    const prev = readProgress(progressRealmId);
+    const prev = canonicalProgress;
     const prevUnlocked = prev?.unlockedLegends ?? [];
     const nextYear = getNextYearLabel(year);
     const passed = profile.percentage >= PRETEST_PASS_THRESHOLD;
     const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks, progressRealmId);
-    const requiresFullPathway = !passed && profile.percentage < 50;
+    const requiresFullPathway = pretestPathwayForPercent(profile.percentage) === "full";
     // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
     const allProgramWeeks = getProgramWeeks(progressRealmId);
     const requiredWeeks = passed
@@ -645,6 +665,9 @@ function PretestPage() {
           question_results: [],
           completed_at: new Date().toISOString(),
         }, completionId, progressPayload, progressRealmId);
+      const restored = await restoreStudentStateFromServer(studentId, progressRealmId);
+      if (!restored.progress) throw new Error("Saved pre-test did not produce canonical progress");
+      setCanonicalProgress(restored.progress);
       clearCompletionId(assessmentCompletionKey);
     } catch (error) {
       console.warn("[Pretest] DB save failed:", error);
@@ -654,8 +677,6 @@ function PretestPage() {
     }
 
     clearYearProgress(year, progressRealmId);
-    writeProgress(nextProgress, progressRealmId);
-
     // Assessment complete — clear the resume snapshot so we don't re-offer it.
     saveAssessmentReviewState({
       year,
@@ -702,6 +723,21 @@ function PretestPage() {
     setAnswers(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mabTotal, mabHasSelection, question?.type, index]);
+
+  if (year === "Prep") {
+    return null;
+  }
+
+  if (restoreState !== "ready") {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-slate-950 p-6 text-center">
+        <div>
+          <p className="font-bold text-slate-200">{restoreState === "loading" ? "Loading your placement..." : restoreError}</p>
+          {restoreState === "error" ? <button type="button" onClick={() => window.location.reload()} className="mt-4 rounded-xl bg-teal-500 px-5 py-3 font-bold text-slate-950">Retry</button> : null}
+        </div>
+      </main>
+    );
+  }
 
   if (!questions.length || !question) {
     return (

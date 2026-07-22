@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete } from "@/data/progress";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { clearActiveStudentSession, getPlacementEntryYear, hasActiveStudentSeenIntro } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
-import { buildDefaultStudentProgress, resolveStudentDestination } from "@/lib/student-destination";
+import { resolveStudentDestination } from "@/lib/student-destination";
 
 export default function Page() {
   const router = useRouter();
@@ -22,10 +22,10 @@ export default function Page() {
           return;
         }
         const activeStudentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim();
-        let progress = activeStudentId ? readProgress() : null;
-        let introSeen = activeStudentId ? hasActiveStudentSeenIntro(activeStudentId) : false;
-        let introSeenSource: "localStorage" | "students_table" = "localStorage";
-        let progressSource: "localStorage" | "progress_snapshot" | "none" = progress ? "localStorage" : "none";
+        let progress = null;
+        let introSeen = false;
+        const introSeenSource = "students_table";
+        let progressSource: "progress_snapshot" | "none" = "none";
         let restoredRowsSummary: unknown[] = [];
         if (activeStudentId) {
           try {
@@ -34,13 +34,8 @@ export default function Page() {
             if (restored.progress) {
               progress = restored.progress;
               progressSource = "progress_snapshot";
-            } else {
-              progress = buildDefaultStudentProgress(getPlacementEntryYear());
-              writeProgress(progress, "number");
-              progressSource = "none";
             }
             introSeen = restored.introSeen;
-            introSeenSource = "students_table";
             restoredRowsSummary = restored.rows.map((row) => ({
               year: row.year,
               status: row.status,
@@ -60,6 +55,11 @@ export default function Page() {
         }
         if (activeStudentId) {
           if (cancelled) return;
+          if (!progress) {
+            clearActiveStudentSession();
+            router.replace("/login?error=progress_missing");
+            return;
+          }
           const dest = resolveStudentDestination({
             progress,
             introSeen,

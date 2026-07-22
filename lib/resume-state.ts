@@ -145,6 +145,22 @@ function completionKey(activityKey: string): string {
   return `lul:completion:${activeStudentScope()}:${activityKey}`;
 }
 
+export function buildLessonCompletionActivityKey({
+  realmId,
+  workingLevel,
+  week,
+  lessonNumber,
+  lessonId,
+}: {
+  realmId: string;
+  workingLevel: string;
+  week: number;
+  lessonNumber: number;
+  lessonId: string;
+}): string {
+  return `lesson:${realmId}:${workingLevel}:${week}:${lessonNumber}:${lessonId}`;
+}
+
 export function getOrCreateCompletionId(activityKey: string): string {
   if (typeof window === "undefined") return "00000000-0000-4000-8000-000000000000";
   const key = completionKey(activityKey);
