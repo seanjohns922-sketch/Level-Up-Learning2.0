@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Compass, HelpCircle, Sparkles, Target } from "lucide-react";
+import { CheckCircle, Compass, HelpCircle, Orbit, Sparkles, Target } from "lucide-react";
 
 export function LessonStatStrip({
   questionsAnswered,
@@ -14,44 +14,51 @@ export function LessonStatStrip({
   realmId?: string;
 }) {
   const isMeasurement = realmId === "measurement";
+  const isStarpath = realmId === "space";
 
   const stats = [
     {
-      label: isMeasurement ? "Challenges" : "Questions",
+      label: isMeasurement || isStarpath ? "Challenges" : "Questions",
       value: questionsAnswered,
-      icon: isMeasurement ? Compass : HelpCircle,
-      iconColor: isMeasurement ? "text-amber-300" : "text-cyan-300",
-      glow: isMeasurement ? "rgba(200,160,48,0.5)" : "rgba(34,211,238,0.45)",
+      icon: isMeasurement ? Compass : isStarpath ? Orbit : HelpCircle,
+      iconColor: isMeasurement ? "text-amber-300" : isStarpath ? "text-violet-200" : "text-cyan-300",
+      glow: isMeasurement ? "rgba(200,160,48,0.5)" : isStarpath ? "rgba(167,139,250,0.55)" : "rgba(34,211,238,0.45)",
     },
     {
-      label: isMeasurement ? "Solved" : "Correct",
+      label: isMeasurement || isStarpath ? "Solved" : "Correct",
       value: correctAnswers,
       icon: CheckCircle,
-      iconColor: isMeasurement ? "text-amber-200" : "text-emerald-300",
-      glow: isMeasurement ? "rgba(232,200,120,0.55)" : "rgba(16,185,129,0.5)",
+      iconColor: isMeasurement ? "text-amber-200" : isStarpath ? "text-cyan-200" : "text-emerald-300",
+      glow: isMeasurement ? "rgba(232,200,120,0.55)" : isStarpath ? "rgba(103,232,249,0.55)" : "rgba(16,185,129,0.5)",
     },
     {
-      label: isMeasurement ? "Mastery" : "Accuracy",
+      label: isMeasurement ? "Mastery" : isStarpath ? "Mission Accuracy" : "Accuracy",
       value: `${accuracy}%`,
-      icon: isMeasurement ? Sparkles : Target,
-      iconColor: isMeasurement ? "text-amber-200" : "text-teal-200",
-      glow: isMeasurement ? "rgba(200,160,48,0.5)" : "rgba(94,234,212,0.5)",
+      icon: isMeasurement || isStarpath ? Sparkles : Target,
+      iconColor: isMeasurement ? "text-amber-200" : isStarpath ? "text-fuchsia-200" : "text-teal-200",
+      glow: isMeasurement ? "rgba(200,160,48,0.5)" : isStarpath ? "rgba(240,171,252,0.5)" : "rgba(94,234,212,0.5)",
     },
   ];
 
   const bezelBg = isMeasurement
     ? "linear-gradient(135deg, rgba(200,160,48,0.42) 0%, rgba(120,90,15,0.18) 50%, rgba(200,160,48,0.36) 100%)"
-    : "linear-gradient(135deg, rgba(94,234,212,0.45) 0%, rgba(15,118,110,0.25) 50%, rgba(94,234,212,0.35) 100%)";
+    : isStarpath
+      ? "linear-gradient(135deg, rgba(103,232,249,0.58) 0%, rgba(124,58,237,0.52) 50%, rgba(240,171,252,0.42) 100%)"
+      : "linear-gradient(135deg, rgba(94,234,212,0.45) 0%, rgba(15,118,110,0.25) 50%, rgba(94,234,212,0.35) 100%)";
 
   const plateBg = isMeasurement
     ? "linear-gradient(135deg, #140e04 0%, #2a1a06 50%, #3d2808 100%)"
-    : "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)";
+    : isStarpath
+      ? "linear-gradient(135deg, #170a35 0%, #23205f 52%, #08364a 100%)"
+      : "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)";
 
   const plateShadow = isMeasurement
     ? "inset 0 1px 0 rgba(200,160,48,0.22), inset 0 -8px 16px rgba(0,0,0,0.4)"
-    : "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 16px rgba(0,0,0,0.4)";
+    : isStarpath
+      ? "inset 0 1px 0 rgba(165,243,252,0.20), inset 0 -8px 18px rgba(2,6,23,0.48)"
+      : "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 16px rgba(0,0,0,0.4)";
 
-  const labelColor = isMeasurement ? "rgba(240,210,150,0.75)" : "rgba(94,234,212,0.8)";
+  const labelColor = isMeasurement ? "rgba(240,210,150,0.75)" : isStarpath ? "rgba(207,250,254,0.88)" : "rgba(94,234,212,0.8)";
 
   return (
     <div className="grid grid-cols-3 gap-2.5">
@@ -62,10 +69,10 @@ export function LessonStatStrip({
             aria-hidden
             className="absolute -inset-[2px] pointer-events-none"
             style={{
-              clipPath: isMeasurement
+              clipPath: isMeasurement || isStarpath
                 ? undefined
                 : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-              borderRadius: isMeasurement ? 10 : undefined,
+              borderRadius: isMeasurement || isStarpath ? 10 : undefined,
               background: bezelBg,
             }}
           />
@@ -73,16 +80,16 @@ export function LessonStatStrip({
           <div
             className="relative px-3 py-2.5 overflow-hidden"
             style={{
-              clipPath: isMeasurement
+              clipPath: isMeasurement || isStarpath
                 ? undefined
                 : "polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px)",
-              borderRadius: isMeasurement ? 8 : undefined,
+              borderRadius: isMeasurement || isStarpath ? 8 : undefined,
               background: plateBg,
               boxShadow: plateShadow,
             }}
           >
             {/* Scanlines — Nexus only */}
-            {!isMeasurement && (
+            {!isMeasurement && !isStarpath && (
               <div
                 aria-hidden
                 className="absolute inset-0 opacity-[0.18] pointer-events-none"

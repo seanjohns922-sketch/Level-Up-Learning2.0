@@ -32,6 +32,8 @@ for (const required of [
 ]) {
   assert.match(missionHome, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 }
+assert.match(missionHome, /Read mission/);
+assert.match(missionHome, /ReadAloudBtn/);
 
 const implementedMission = read("components/starpath/StarpathMeetTheShapesLesson.tsx");
 assert.match(implementedMission, /StarpathLessonShell/);
@@ -52,6 +54,30 @@ for (const required of [
   "getTaskTransition",
 ]) {
   assert.match(lessonShell, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+}
+assert.match(lessonShell, /ReadAloudBtn/);
+
+const challengeTransition = read("components/starpath/StarpathChallengeTransition.tsx");
+assert.match(challengeTransition, /Read challenge/);
+assert.match(challengeTransition, /ReadAloudBtn/);
+
+const practiceRunner = read("components/PracticeRunner.tsx");
+assert.match(practiceRunner, /Mission Progress/);
+
+const hudRail = read("components/lesson/LessonHUDRail.tsx");
+assert.match(hudRail, /isStarpath/);
+assert.match(hudRail, /STAR CHAIN/);
+
+const xpBar = read("components/lesson/LessonXPBar.tsx");
+assert.match(xpBar, /Mission Progress/);
+assert.match(xpBar, /Starpath Progress/);
+
+const stats = read("components/lesson/LessonStatStrip.tsx");
+assert.match(stats, /Mission Accuracy/);
+
+const combo = read("components/lesson/ComboCounter.tsx");
+for (const label of ["STAR CHAIN", "IN ORBIT", "SUPERNOVA", "HYPERDRIVE", "STARPATH STATE"]) {
+  assert.match(combo, new RegExp(label));
 }
 
 const platformBlueprint = read("data/activities/realm-lesson-blueprint.ts");

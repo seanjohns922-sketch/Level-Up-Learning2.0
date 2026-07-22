@@ -2,6 +2,7 @@
 
 import { Orbit, Play, Sparkles } from "lucide-react";
 import type { PracticeTaskTransition } from "@/components/PracticeRunner";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export default function StarpathChallengeTransition({
   transition,
@@ -20,6 +21,12 @@ export default function StarpathChallengeTransition({
         <div className="mt-5 font-mono text-xs font-black uppercase tracking-[0.2em] text-cyan-200">{transition.eyebrow}</div>
         <h2 className="mt-3 text-3xl font-black sm:text-4xl">{transition.title}</h2>
         <p className="mx-auto mt-3 max-w-lg text-base font-semibold leading-7 text-violet-100">{transition.description}</p>
+        <ReadAloudBtn
+          text={`${transition.eyebrow}. ${transition.title}. ${transition.description}`}
+          label="Read challenge"
+          size="md"
+          className="mt-4 border-cyan-200/30 bg-white/10 text-cyan-100 hover:border-cyan-200 hover:text-white"
+        />
         <button
           type="button"
           onClick={onBegin}

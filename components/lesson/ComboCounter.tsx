@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Compass, Zap } from "lucide-react";
+import { Compass, Orbit, Zap } from "lucide-react";
 
 type ComboTier = "cold" | "spark" | "surge" | "overdrive" | "nexus";
 
@@ -130,10 +130,59 @@ const MEASUREMENT_TIER_CONFIG: typeof NEXUS_TIER_CONFIG = {
   },
 };
 
+const STARPATH_TIER_CONFIG: typeof NEXUS_TIER_CONFIG = {
+  cold: {
+    label: "STAR CHAIN",
+    counterColor: "rgba(165,243,252,0.56)",
+    labelColor: "rgba(196,181,253,0.72)",
+    glowColor: "rgba(103,232,249,0.18)",
+    borderGradient: "linear-gradient(135deg, rgba(103,232,249,0.32) 0%, rgba(124,58,237,0.30) 52%, rgba(240,171,252,0.24) 100%)",
+    bgGradient: "linear-gradient(135deg, #13072d 0%, #201a55 58%, #082f42 100%)",
+    iconColor: "rgba(165,243,252,0.55)",
+  },
+  spark: {
+    label: "IN ORBIT",
+    counterColor: "rgba(103,232,249,1)",
+    labelColor: "rgba(207,250,254,1)",
+    glowColor: "rgba(103,232,249,0.58)",
+    borderGradient: "linear-gradient(135deg, rgba(103,232,249,0.72) 0%, rgba(124,58,237,0.48) 55%, rgba(103,232,249,0.58) 100%)",
+    bgGradient: "linear-gradient(135deg, #11113d 0%, #312e81 58%, #083344 100%)",
+    iconColor: "rgba(165,243,252,1)",
+  },
+  surge: {
+    label: "SUPERNOVA",
+    counterColor: "rgba(240,171,252,1)",
+    labelColor: "rgba(250,232,255,0.96)",
+    glowColor: "rgba(217,70,239,0.62)",
+    borderGradient: "linear-gradient(135deg, rgba(240,171,252,0.75) 0%, rgba(124,58,237,0.55) 50%, rgba(34,211,238,0.58) 100%)",
+    bgGradient: "linear-gradient(135deg, #2e1065 0%, #4c1d95 58%, #164e63 100%)",
+    iconColor: "rgba(240,171,252,1)",
+  },
+  overdrive: {
+    label: "HYPERDRIVE",
+    counterColor: "rgba(253,230,138,1)",
+    labelColor: "rgba(254,243,199,0.98)",
+    glowColor: "rgba(250,204,21,0.66)",
+    borderGradient: "linear-gradient(135deg, rgba(253,230,138,0.78) 0%, rgba(217,70,239,0.58) 50%, rgba(34,211,238,0.62) 100%)",
+    bgGradient: "linear-gradient(135deg, #312e0b 0%, #581c87 56%, #155e75 100%)",
+    iconColor: "rgba(253,230,138,1)",
+  },
+  nexus: {
+    label: "STARPATH STATE",
+    counterColor: "rgba(255,255,255,1)",
+    labelColor: "rgba(207,250,254,1)",
+    glowColor: "rgba(103,232,249,0.88)",
+    borderGradient: "linear-gradient(135deg, rgba(165,243,252,0.92) 0%, rgba(168,85,247,0.72) 50%, rgba(240,171,252,0.82) 100%)",
+    bgGradient: "linear-gradient(135deg, #164e63 0%, #4c1d95 55%, #701a75 100%)",
+    iconColor: "rgba(207,250,254,1)",
+  },
+};
+
 export function ComboCounter({ count, chainLabel, realmId }: { count: number; chainLabel?: string; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
-  const TIER_CONFIG = isMeasurement ? MEASUREMENT_TIER_CONFIG : NEXUS_TIER_CONFIG;
-  const IconCmp = isMeasurement ? Compass : Zap;
+  const isStarpath = realmId === "space";
+  const TIER_CONFIG = isMeasurement ? MEASUREMENT_TIER_CONFIG : isStarpath ? STARPATH_TIER_CONFIG : NEXUS_TIER_CONFIG;
+  const IconCmp = isMeasurement ? Compass : isStarpath ? Orbit : Zap;
   const prevCountRef = useRef(count);
   const [broken, setBroken] = useState(false);
   const [bump, setBump] = useState(false);
@@ -169,7 +218,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
       }
       return () => clearTimeout(t);
     }
-  }, [count]);
+  }, [count, TIER_CONFIG]);
 
   const activeTier = broken ? "cold" : getTier(count);
   const config = TIER_CONFIG[activeTier];
@@ -180,7 +229,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
       <div
         aria-hidden
         className="absolute -inset-[2px] pointer-events-none"
-        style={isMeasurement ? {
+        style={isMeasurement || isStarpath ? {
           borderRadius: 12,
           background: config.borderGradient,
           transition: "background 0.5s ease",
@@ -195,13 +244,15 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
       {/* Inner plate */}
       <div
         className="relative overflow-hidden px-3 py-2.5"
-        style={isMeasurement ? {
+        style={isMeasurement || isStarpath ? {
           borderRadius: 10,
           background: config.bgGradient,
           boxShadow:
             activeTier !== "cold"
               ? `inset 0 1px 0 ${config.glowColor}, inset 0 -8px 16px rgba(0,0,0,0.5), 0 0 16px ${config.glowColor}`
-              : "inset 0 1px 0 rgba(200,160,48,0.12), inset 0 -8px 16px rgba(0,0,0,0.4)",
+              : isMeasurement
+                ? "inset 0 1px 0 rgba(200,160,48,0.12), inset 0 -8px 16px rgba(0,0,0,0.4)"
+                : "inset 0 1px 0 rgba(165,243,252,0.14), inset 0 -8px 18px rgba(2,6,23,0.48)",
           transition: "background 0.5s ease, box-shadow 0.5s ease",
         } : {
           clipPath:
@@ -247,7 +298,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
             }}
           >
             {broken
-              ? (isMeasurement ? "STREAK LOST" : "CHAIN BROKEN")
+              ? (isMeasurement ? "STREAK LOST" : isStarpath ? "SIGNAL LOST" : "CHAIN BROKEN")
               : milestone ?? (activeTier === "cold" && chainLabel ? chainLabel : config.label)}
           </span>
           {activeTier !== "cold" && !broken && (

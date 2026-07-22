@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export type StarpathMissionMetadata = {
   level: RealmLevelId;
@@ -41,6 +42,9 @@ export default function StarpathMissionHome({
   const available = lesson.status === "implemented" && Boolean(content) && Boolean(onStart);
   const criteria = content?.successCriteria ?? [lesson.focus];
   const artworkSrc = content?.artworkSrc ?? "/images/starpath-home-bg-ground.png";
+  const learningText = `Today I am learning to ${lesson.learningIntention.replace(/^I can /, "")}`;
+  const criteriaText = `I can ${criteria.join(". I can ")}.`;
+  const missionText = `${lesson.title}. ${content?.missionBrief ?? "This Starpath mission is being prepared for future explorers."} ${learningText}. ${criteriaText} This mission takes approximately nine minutes.`;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#070a1b] px-3 py-3 text-white sm:px-5 sm:py-5">
@@ -85,7 +89,16 @@ export default function StarpathMissionHome({
               <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-cyan-200/25 bg-cyan-300/10 px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-cyan-100">
                 <Sparkles className="h-4 w-4" /> Starpath Mission
               </div>
-              <h1 className="mt-4 max-w-2xl text-4xl font-black tracking-normal text-white sm:text-6xl">{lesson.title}</h1>
+              <div className="mt-4 flex max-w-3xl flex-wrap items-center gap-3">
+                <h1 className="max-w-2xl text-4xl font-black tracking-normal text-white sm:text-6xl">{lesson.title}</h1>
+                <ReadAloudBtn
+                  text={missionText}
+                  speechKey={`starpath-mission-${lesson.registryId}`}
+                  size="md"
+                  label="Read mission"
+                  className="border-cyan-200/30 bg-indigo-950/70 text-cyan-100 hover:border-cyan-200 hover:text-white"
+                />
+              </div>
               <p className="mt-4 max-w-xl text-base font-semibold leading-7 text-violet-100 sm:text-lg">
                 {content?.missionBrief ?? "This Starpath mission is being prepared for future explorers."}
               </p>
@@ -95,12 +108,18 @@ export default function StarpathMissionHome({
           <div className="grid gap-5 p-5 sm:p-7 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-5">
               <section className="rounded-lg border border-violet-300/20 bg-white/[0.06] p-5">
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-200">Today I am learning to...</div>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-200">Today I am learning to...</div>
+                  <ReadAloudBtn text={learningText} label="Read" className="border-cyan-200/25 bg-white/10 text-cyan-100" />
+                </div>
                 <p className="mt-3 text-xl font-bold leading-8 text-white">{lesson.learningIntention.replace(/^I can /, "")}</p>
               </section>
 
               <section className="rounded-lg border border-violet-300/20 bg-white/[0.06] p-5">
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-violet-200">I can...</div>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-xs font-black uppercase tracking-[0.18em] text-violet-200">I can...</div>
+                  <ReadAloudBtn text={criteriaText} label="Read" className="border-violet-200/25 bg-white/10 text-violet-100" />
+                </div>
                 <ul className="mt-3 space-y-3">
                   {criteria.map((criterion) => (
                     <li key={criterion} className="flex items-start gap-3 text-base font-semibold text-slate-100">

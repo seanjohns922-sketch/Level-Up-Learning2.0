@@ -53,7 +53,7 @@ function TaskHeading({ prompt, speech }: { prompt: string; speech: string }) {
   return (
     <div className="mb-5 flex items-center justify-center gap-3 text-center">
       <h2 className="text-2xl font-black text-slate-950 sm:text-3xl">{prompt}</h2>
-      <ReadAloudBtn text={speech} size="md" className="shrink-0" />
+      <ReadAloudBtn text={speech} size="md" label="Read" className="shrink-0" />
     </div>
   );
 }

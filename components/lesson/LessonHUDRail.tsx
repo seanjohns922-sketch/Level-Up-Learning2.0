@@ -54,6 +54,7 @@ export function LessonHUDRail({
 }) {
   const [hintOpen, setHintOpen] = useState(false);
   const isMeasurement = realmId === "measurement";
+  const isStarpath = realmId === "space";
 
   const showCrumb =
     typeof levelNumber === "number" &&
@@ -69,6 +70,9 @@ export function LessonHUDRail({
         style={isMeasurement ? {
           borderRadius: 18,
           background: "linear-gradient(135deg, rgba(200,160,48,0.42) 0%, rgba(120,90,15,0.18) 50%, rgba(200,160,48,0.36) 100%)",
+        } : isStarpath ? {
+          borderRadius: 18,
+          background: "linear-gradient(135deg, rgba(103,232,249,0.72) 0%, rgba(124,58,237,0.68) 48%, rgba(240,171,252,0.52) 100%)",
         } : {
           clipPath: "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
           background: "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
@@ -80,12 +84,26 @@ export function LessonHUDRail({
           borderRadius: 16,
           background: "linear-gradient(135deg, #140e04 0%, #2a1a06 50%, #3d2808 100%)",
           boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), inset 0 -10px 20px rgba(0,0,0,0.45), 0 0 18px rgba(109,40,217,0.08)",
+        } : isStarpath ? {
+          borderRadius: 16,
+          background: "linear-gradient(145deg, #10062b 0%, #17164c 48%, #073448 100%)",
+          boxShadow: "inset 0 1px 0 rgba(165,243,252,0.20), inset 0 -14px 28px rgba(2,6,23,0.58), 0 0 26px rgba(124,58,237,0.20)",
         } : {
           clipPath: "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
           background: "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
           boxShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
         }}
       >
+        {isStarpath ? (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-30"
+            style={{
+              backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1.4px)",
+              backgroundSize: "26px 26px",
+            }}
+          />
+        ) : null}
         {/* Compact crumb + title */}
         {showCrumb && (
           <div>
@@ -95,6 +113,10 @@ export function LessonHUDRail({
                 border: "1px solid rgba(200,160,48,0.35)",
                 background: "rgba(60,30,5,0.4)",
                 color: "rgba(240,210,150,0.88)",
+              } : isStarpath ? {
+                border: "1px solid rgba(103,232,249,0.34)",
+                background: "rgba(124,58,237,0.18)",
+                color: "#cffafe",
               } : {
                 border: "1px solid rgba(94,234,212,0.3)",
                 background: "rgba(94,234,212,0.1)",
@@ -115,6 +137,10 @@ export function LessonHUDRail({
                   border: "1px solid rgba(139,92,246,0.3)",
                   background: "rgba(109,40,217,0.12)",
                   color: "rgba(196,181,253,0.9)",
+                } : isStarpath ? {
+                  border: "1px solid rgba(240,171,252,0.30)",
+                  background: "rgba(217,70,239,0.12)",
+                  color: "#f5d0fe",
                 } : {
                   border: "1px solid rgba(110,231,183,0.3)",
                   background: "rgba(110,231,183,0.1)",
@@ -159,7 +185,7 @@ export function LessonHUDRail({
         {/* Combo chain counter */}
         <ComboCounter
           count={comboCount}
-          chainLabel={isMeasurement ? "EXPLORER STREAK" : undefined}
+          chainLabel={isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : undefined}
           realmId={realmId}
         />
 

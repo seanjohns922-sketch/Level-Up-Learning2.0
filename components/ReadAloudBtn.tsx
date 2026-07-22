@@ -7,14 +7,18 @@ export default function ReadAloudBtn({
   text,
   speechKey,
   size = "sm",
+  label,
   className = "",
 }: {
   text: string;
   speechKey?: string;
   size?: "sm" | "md";
+  label?: string;
   className?: string;
 }) {
-  const px = size === "md" ? "p-2" : "p-1.5";
+  const px = label
+    ? size === "md" ? "px-3 py-2" : "px-2.5 py-1.5"
+    : size === "md" ? "p-2" : "p-1.5";
   const icon = size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
   const { currentText, isSpeaking } = useSpeakState();
   const normalizedText = prepareSpeechText(text);
@@ -33,9 +37,10 @@ export default function ReadAloudBtn({
       }}
       aria-label={isCurrentSpeech ? "Stop read aloud" : "Read aloud"}
       title={isCurrentSpeech ? "Stop read aloud" : "Read aloud"}
-      className={`inline-flex items-center justify-center rounded-full border border-border bg-card text-muted-foreground hover:text-primary hover:border-primary/40 transition ${px} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card text-muted-foreground hover:text-primary hover:border-primary/40 transition ${px} ${className}`}
     >
       {isCurrentSpeech ? <Square className={icon} /> : <Volume2 className={icon} />}
+      {label ? <span className="text-xs font-black">{isCurrentSpeech ? "Stop" : label}</span> : null}
     </button>
   );
 }

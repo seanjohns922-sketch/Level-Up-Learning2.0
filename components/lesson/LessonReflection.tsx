@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
 import { calcXP } from "./LessonXPBar";
 import { getRealmTheme } from "@/lib/useRealmTheme";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 type Confidence = 1 | 2 | 3 | 4;
 type ReflectionChoice =
@@ -304,7 +305,14 @@ export default function LessonReflection({
           >
             {mascot.name} is proud of you!
           </div>
-          <div className="mt-2 text-2xl font-black text-white">{copy?.reflectionTitle ?? "Amazing work!"}</div>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+            <div className="text-2xl font-black text-white">{copy?.reflectionTitle ?? "Amazing work!"}</div>
+            <ReadAloudBtn
+              text={`${copy?.reflectionTitle ?? "Amazing work!"}. ${copy?.reflectionPrompt ?? "Choose how this lesson felt."}`}
+              label="Read"
+              className="border-white/20 bg-white/10 text-white"
+            />
+          </div>
 
           <div className="mt-4 flex justify-center gap-1.5">
             {[0, 1, 2].map((i) => (
@@ -324,7 +332,10 @@ export default function LessonReflection({
 
           {copy?.reflectionPrompt ? (
             <div className="mt-6">
-              <div className="text-base font-bold text-white">{copy.reflectionPrompt}</div>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <div className="text-base font-bold text-white">{copy.reflectionPrompt}</div>
+                <ReadAloudBtn text={copy.reflectionPrompt} label="Read" className="border-white/20 bg-white/10 text-white" />
+              </div>
               <div className="mt-3 grid gap-2 sm:grid-cols-3">
                 {(copy.reflectionOptions ?? ["I made a discovery!"]).map((option) => (
                   <button
@@ -370,7 +381,14 @@ export default function LessonReflection({
         >
           Lesson complete
         </div>
-        <div className="mt-1 text-2xl font-black text-white">Nice work!</div>
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+          <div className="text-2xl font-black text-white">Nice work!</div>
+          <ReadAloudBtn
+            text={`Nice work. ${lessonTitle}. How confident do you feel now?`}
+            label="Read"
+            className="border-white/20 bg-white/10 text-white"
+          />
+        </div>
         <div className="mt-1 text-sm" style={{ color: optionTextColor }}>{lessonTitle}</div>
 
         <StatChips xp={xp} chain={bestChain} accuracy={accuracy} {...statChipProps} />

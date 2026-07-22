@@ -10,6 +10,7 @@ import StarpathMissionHome, { type StarpathMissionMetadata } from "@/components/
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function levelNumber(level: StarpathMissionMetadata["level"]) {
   if (level === "Prep") return 0;
@@ -91,7 +92,14 @@ export default function StarpathLessonShell({
               <div className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-cyan-200">
                 {lesson.levelLabel} · Week {lesson.week} · Mission {lesson.lesson}
               </div>
-              <h1 className="mt-2 text-3xl font-black tracking-normal text-white sm:text-4xl">{lesson.title}</h1>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-black tracking-normal text-white sm:text-4xl">{lesson.title}</h1>
+                <ReadAloudBtn
+                  text={`${lesson.title}. ${lesson.learningIntention}`}
+                  label="Read"
+                  className="border-cyan-200/30 bg-white/10 text-cyan-100 hover:text-white"
+                />
+              </div>
               <p className="mt-2 max-w-3xl text-sm font-semibold text-violet-100 sm:text-base">{lesson.learningIntention}</p>
             </div>
           </div>

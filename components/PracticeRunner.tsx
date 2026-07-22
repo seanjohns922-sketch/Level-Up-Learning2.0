@@ -358,6 +358,7 @@ export function PracticeRunner({
   activityNoun?: string;
 }) {
   const isMeasurement = realmId === "measurement";
+  const isStarpath = realmId === "space";
   const isStructuredRealm = isMeasurement || realmId === "space";
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
@@ -485,7 +486,7 @@ export function PracticeRunner({
   const hudXPMax = isTimeOnlySession ? minutes : undefined;
   const hudXPLabel = isTimeOnlySession ? `${elapsedWholeMinutes} / ${minutes} MIN` : undefined;
   const hudXPRightLabel = isTimeOnlySession
-    ? (isMeasurement ? "Explorer Progress" : "Session Progress")
+    ? (isMeasurement ? "Explorer Progress" : isStarpath ? "Mission Progress" : "Session Progress")
     : undefined;
   const accuracy =
     safeQuestionsAnswered > 0

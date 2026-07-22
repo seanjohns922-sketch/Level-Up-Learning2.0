@@ -3,6 +3,7 @@
 import { Trophy, Star, Target, CheckCircle } from "lucide-react";
 import { calcXP } from "./LessonXPBar";
 import { getRealmTheme } from "@/lib/useRealmTheme";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export function LessonCompleteCard({
   lessonTitle,
@@ -84,9 +85,16 @@ export function LessonCompleteCard({
           >
             {eyebrow ?? "Lesson Complete"}
           </div>
-          <h2 className="mt-2 text-2xl font-bold tracking-[-0.01em] text-white">
-            {completionTitle ?? lessonTitle}
-          </h2>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+            <h2 className="text-2xl font-bold tracking-[-0.01em] text-white">
+              {completionTitle ?? lessonTitle}
+            </h2>
+            <ReadAloudBtn
+              text={`${completionTitle ?? lessonTitle}. ${completionMessage ?? "Nice work. Your progress has been updated."}`}
+              label="Read"
+              className="border-white/20 bg-white/10 text-white"
+            />
+          </div>
         </div>
 
         <div className="p-4 space-y-3">
