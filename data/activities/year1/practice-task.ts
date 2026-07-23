@@ -2298,4 +2298,17 @@ export type PracticeTask = (
       correctObjectId: "planet" | "flag" | "window" | "door";
       feedback: { correct: string; wrong: string };
     }
+  | {
+      kind: "starpathShapeTapAll";
+      prompt: string;
+      speakText: string;
+      target: number;
+      targetShape: "circle" | "triangle" | "square" | "rectangle";
+      items: Array<{
+        id: string;
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+      }>;
+      feedback: { correct: string; wrong: string };
+    }
 ) & { difficulty?: Difficulty };

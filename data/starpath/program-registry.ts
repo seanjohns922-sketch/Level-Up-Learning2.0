@@ -147,7 +147,7 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
     likelyMisconceptions: ["A shape changes name when rotated.", "Size or colour determines a shape.", "Position words have a fixed viewpoint."],
     progressionRationale: "The sequence deliberately moves from recognise to create, sort, describe and apply. Changing the context from shape spotting to building, environmental searches, navigation and a final Space Graduation keeps Foundation practice varied while remaining aligned to AC9MFSP01 and AC9MFSP02. Completion is planned to unlock the Ground Level Starpath Graduate title.",
     weeks: [
-      W("Shape Spotters", "Recognise and name familiar two-dimensional shapes in varied Starpath scenes.", ["AC9MFSP01"], skill("space-ground-shape-recognition", "Spot familiar shapes", "Recognises and names circles, squares, triangles and rectangles despite changes in size, colour or orientation.", ["AC9MFSP01"], "shape-and-object-reasoning"), [["Meet the Shapes", "Recognise circles, squares, triangles and rectangles."], ["Find the Shapes", "Search for familiar shapes hidden around Starpath."], ["Match the Shapes", "Match and simply sort familiar shapes."]], ["shape-introduction", "scene-shape-hunt", "shape-match-sort"], ["circle", "square", "triangle", "rectangle", "shape"], ["A shape changes name when it is turned.", "The colour or size determines the shape."], "Recognition, naming, matching and simple sorting."),
+      W("Shape Spotters", "Recognise and name familiar two-dimensional shapes in varied Starpath scenes.", ["AC9MFSP01"], skill("space-ground-shape-recognition", "Spot familiar shapes", "Recognises and names circles, squares, triangles and rectangles despite changes in size, colour or orientation.", ["AC9MFSP01"], "shape-and-object-reasoning"), [["Meet the Shapes", "Recognise circles, squares, triangles and rectangles."], ["Shape Detectives", "Find familiar shapes hidden inside everyday objects."], ["Match the Shapes", "Match and simply sort familiar shapes."]], ["shape-introduction", "scene-shape-hunt", "shape-match-sort"], ["circle", "square", "triangle", "rectangle", "shape"], ["A shape changes name when it is turned.", "The colour or size determines the shape."], "Recognition, naming, matching and simple sorting."),
       W("Shape Builders", "Create familiar shapes and pictures from lines, parts and smaller shapes.", ["AC9MFSP01"], skill("space-ground-shape-creation", "Make shapes", "Creates familiar shapes and simple pictures from lines, parts and smaller shapes while using shape language.", ["AC9MFSP01"], "construction-and-visualisation", ["space-ground-shape-recognition"]), [["Build with Shapes", "Create familiar shapes using sticks, stars and lines."], ["Complete the Shape", "Add missing sides or parts to finish a familiar shape."], ["Draw with Shapes", "Create a rocket, house, tree or robot from familiar shapes."]], ["line-shape-builder", "missing-part-completer", "shape-picture-studio"], ["build", "side", "line", "part", "picture"], ["A shape must be drawn in one particular way.", "A picture can contain only one shape."], "Shape construction, completion and picture composition."),
       W("Shape Sorters", "Sort and compare familiar shapes using Foundation language.", ["AC9MFSP01"], skill("space-ground-shape-sorting", "Sort shapes with a reason", "Sorts and compares familiar shapes using corners, sides and round or not-round language.", ["AC9MFSP01"], "shape-and-object-reasoning", ["space-ground-shape-recognition"]), [["Sort by Shape", "Group familiar shapes by their names."], ["What's Different?", "Compare corners, sides and whether shapes are round or not round."], ["Shape Families", "Group similar shapes and explain what belongs together."]], ["drag-shape-sort", "feature-compare", "shape-family-builder"], ["sort", "same", "different", "corner", "round"], ["There is only one way to sort a group of shapes.", "Shapes that look different cannot belong to the same family."], "Sorting, visible-feature comparison and simple explanations."),
       W("Shapes Around Us", "Recognise familiar shapes within space and everyday objects.", ["AC9MFSP01"], skill("space-ground-shapes-in-objects", "Find shapes in objects", "Identifies familiar shapes within environmental objects and gives a simple reason for the match.", ["AC9MFSP01"], "spatial-representation", ["space-ground-shape-recognition"]), [["Space Objects", "Find familiar shapes in rockets, planets and satellites."], ["Home Objects", "Find familiar shapes in everyday environments."], ["Treasure Hunt", "Find every object that matches a chosen shape."]], ["space-object-hotspot", "home-shape-match", "target-shape-hunt"], ["object", "rocket", "planet", "match", "find"], ["An object must be exactly one shape.", "Only space objects contain useful shapes."], "Environmental shape recognition across space and familiar contexts."),
@@ -274,30 +274,43 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
 ];
 
 const ROLES: readonly StarpathSequenceRole[] = ["build", "develop", "apply"];
-const IMPLEMENTED_MEET_THE_SHAPES_ID = "ground-space-w1-l1";
 const MEET_THE_SHAPES_MECHANICS = [
   "cosmic-shape-match",
   "shape-sorter",
   "starpath-environment-shape-find",
 ] as const;
+const SHAPE_DETECTIVES_MECHANICS = [
+  "space-object-match",
+  "shape-explorer",
+  "shape-detective-hunt",
+] as const;
+
+// Ground Level lessons with real, playable content (keyed by registry id).
+const IMPLEMENTED_GROUND_LESSONS: Record<
+  string,
+  { learningIntention: string; mechanics: readonly [string, string, string] }
+> = {
+  "ground-space-w1-l1": { learningIntention: "I can recognise and name familiar shapes.", mechanics: MEET_THE_SHAPES_MECHANICS },
+  "ground-space-w1-l2": { learningIntention: "I can find familiar shapes in the world around me.", mechanics: SHAPE_DETECTIVES_MECHANICS },
+};
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
   const weeks = definition.weeks.map((week, index): StarpathWeekPlan => {
     const weekNumber = index + 1;
     const lessons = week.lessons.map(([title, focus], lessonIndex): StarpathLessonPlan => {
       const lessonId = `${definition.prefix}-space-w${weekNumber}-l${lessonIndex + 1}`;
-      const isMeetTheShapes = lessonId === IMPLEMENTED_MEET_THE_SHAPES_ID;
+      const implemented = IMPLEMENTED_GROUND_LESSONS[lessonId];
       return {
         id: lessonId,
         title,
         sequenceRole: ROLES[lessonIndex],
         focus,
-        learningIntention: isMeetTheShapes
-          ? "I can recognise and name familiar shapes."
+        learningIntention: implemented
+          ? implemented.learningIntention
           : `We are learning to ${focus.charAt(0).toLowerCase()}${focus.slice(1)}`,
         skillIds: [week.skill.id],
-        activityMechanics: isMeetTheShapes ? MEET_THE_SHAPES_MECHANICS : week.mechanics,
-        status: isMeetTheShapes ? "implemented" : STARPATH_PROGRAM_STATUS,
+        activityMechanics: implemented ? implemented.mechanics : week.mechanics,
+        status: implemented ? "implemented" : STARPATH_PROGRAM_STATUS,
       };
     }) as unknown as StarpathWeekPlan["lessons"];
     return {

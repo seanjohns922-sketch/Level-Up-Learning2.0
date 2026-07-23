@@ -72,7 +72,8 @@ export type RealmLessonBlueprint = {
   ];
   reflection: {
     prompt: string;
-    options: readonly [string, string, string];
+    // At least three options; some lessons (e.g. the four familiar shapes) use four.
+    options: readonly [string, string, string, ...string[]];
   };
   practisedSkills: readonly string[];
   nextUpLabel: string;

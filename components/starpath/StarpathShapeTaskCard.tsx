@@ -13,7 +13,7 @@ type ShapeSceneTask = Extract<PracticeTask, { kind: "starpathShapeScene" }>;
 
 const SHAPES: FoundationShape[] = ["circle", "triangle", "square", "rectangle"];
 
-function ShapeVisual({
+export function ShapeVisual({
   shape,
   colour,
   scale = 1,
@@ -49,7 +49,7 @@ function ShapeVisual({
   );
 }
 
-function TaskHeading({ prompt, speech }: { prompt: string; speech: string }) {
+export function TaskHeading({ prompt, speech }: { prompt: string; speech: string }) {
   return (
     <div className="mb-5 flex items-center justify-center gap-3 text-center">
       <h2 className="text-2xl font-black text-slate-950 sm:text-3xl">{prompt}</h2>

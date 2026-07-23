@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import StarpathDevelopmentLesson from "@/components/starpath/StarpathDevelopmentLesson";
-import StarpathMeetTheShapesLesson from "@/components/starpath/StarpathMeetTheShapesLesson";
+import StarpathGroundLesson from "@/components/starpath/StarpathGroundLesson";
+import { GROUND_LESSON_CONTENT } from "@/data/activities/starpath/ground";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getServerStarpathAccess } from "@/lib/demo-session-server";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
@@ -52,8 +53,8 @@ export default async function StarpathLessonPage({
     weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
   };
 
-  if (lesson.id === "ground-space-w1-l1") {
-    return <StarpathMeetTheShapesLesson lesson={lessonMetadata} />;
+  if (GROUND_LESSON_CONTENT[lesson.id]) {
+    return <StarpathGroundLesson lesson={lessonMetadata} />;
   }
 
   return (
