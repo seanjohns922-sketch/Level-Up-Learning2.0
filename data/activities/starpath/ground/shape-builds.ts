@@ -23,10 +23,15 @@ export type StarpathBuildPiece = {
   rotation?: number;
 };
 
+export type StarpathBuildDetail = StarpathBuildPiece & {
+  parentPieceId: string;
+};
+
 export type StarpathBuildObject = {
   id: StarpathBuildObjectId;
   label: string;
   pieces: readonly StarpathBuildPiece[];
+  details?: readonly StarpathBuildDetail[];
 };
 
 const piece = (
@@ -40,25 +45,50 @@ const piece = (
   rotation = 0
 ): StarpathBuildPiece => ({ id, shape, colour, x, y, width, height, rotation });
 
+const detail = (
+  parentPieceId: string,
+  id: string,
+  shape: FoundationShape,
+  colour: string,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  rotation = 0
+): StarpathBuildDetail => ({
+  ...piece(id, shape, colour, x, y, width, height, rotation),
+  parentPieceId,
+});
+
 export const STARPATH_BUILD_OBJECTS: Record<StarpathBuildObjectId, StarpathBuildObject> = {
   rocket: {
     id: "rocket",
     label: "Rocket",
     pieces: [
-      piece("body", "rectangle", "#67e8f9", 32, 37, 24, 34),
-      piece("nose", "triangle", "#fde047", 32, 14, 28, 24),
-      piece("window", "circle", "#c4b5fd", 32, 34, 13, 13),
-      piece("flame", "triangle", "#fb7185", 32, 59, 18, 18, 180),
+      piece("body", "rectangle", "#67e8f9", 32, 36, 22, 34),
+      piece("nose", "triangle", "#fde047", 32, 13, 22, 20),
+      piece("window", "circle", "#c4b5fd", 32, 31, 11, 11),
+      piece("fin-left", "triangle", "#fb7185", 20, 48, 15, 17, -12),
+      piece("fin-right", "triangle", "#fb7185", 44, 48, 15, 17, 12),
+    ],
+    details: [
+      detail("body", "body-stripe", "rectangle", "#22d3ee", 32, 42, 20, 3),
+      detail("body", "flame", "triangle", "#f59e0b", 32, 58, 11, 13, 180),
     ],
   },
   house: {
     id: "house",
     label: "House",
     pieces: [
-      piece("home", "square", "#86efac", 32, 42, 38, 38),
-      piece("roof", "triangle", "#f9a8d4", 32, 18, 48, 30),
-      piece("door", "rectangle", "#c4b5fd", 32, 49, 13, 24),
-      piece("window", "square", "#67e8f9", 21, 38, 10, 10),
+      piece("home", "square", "#86efac", 32, 43, 36, 36),
+      piece("roof", "triangle", "#f9a8d4", 32, 17, 42, 25),
+      piece("door", "rectangle", "#c4b5fd", 37, 50, 12, 22),
+      piece("window", "square", "#67e8f9", 22, 40, 10, 10),
+    ],
+    details: [
+      detail("door", "door-knob", "circle", "#fde047", 40, 50, 3, 3),
+      detail("window", "window-bar", "rectangle", "#312e81", 22, 40, 1.5, 8),
+      detail("window", "window-cross", "rectangle", "#312e81", 22, 40, 8, 1.5),
     ],
   },
   tree: {
@@ -136,10 +166,17 @@ export const STARPATH_BUILD_OBJECTS: Record<StarpathBuildObjectId, StarpathBuild
     id: "cat",
     label: "Cat",
     pieces: [
-      piece("head", "circle", "#f9a8d4", 32, 25, 32, 30),
-      piece("ear-left", "triangle", "#fde047", 21, 10, 16, 17),
-      piece("ear-right", "triangle", "#fde047", 43, 10, 16, 17),
-      piece("body", "rectangle", "#c4b5fd", 32, 49, 27, 28),
+      piece("head", "circle", "#f9a8d4", 32, 25, 31, 29),
+      piece("ear-left", "triangle", "#f9a8d4", 21, 10, 15, 17, -5),
+      piece("ear-right", "triangle", "#f9a8d4", 43, 10, 15, 17, 5),
+      piece("body", "rectangle", "#c4b5fd", 32, 49, 25, 27),
+    ],
+    details: [
+      detail("ear-left", "inner-ear-left", "triangle", "#fde047", 21, 11, 7, 8, -5),
+      detail("ear-right", "inner-ear-right", "triangle", "#fde047", 43, 11, 7, 8, 5),
+      detail("head", "eye-left", "circle", "#1e1b4b", 26, 24, 4, 5),
+      detail("head", "eye-right", "circle", "#1e1b4b", 38, 24, 4, 5),
+      detail("head", "nose", "triangle", "#7c3aed", 32, 30, 5, 4, 180),
     ],
   },
 };

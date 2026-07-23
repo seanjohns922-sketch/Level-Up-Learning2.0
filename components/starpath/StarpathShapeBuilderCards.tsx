@@ -72,6 +72,12 @@ export function BuildObjectVisual({
         if (visible && !visible.has(item.id)) return null;
         return <PieceShape key={item.id} piece={item} />;
       })}
+      {object.details?.map((item) => {
+        const parentIsGhost = ghosts.has(item.parentPieceId);
+        const parentIsVisible = !visible || visible.has(item.parentPieceId);
+        if (!parentIsGhost && !parentIsVisible) return null;
+        return <PieceShape key={item.id} piece={item} muted={parentIsGhost} />;
+      })}
     </svg>
   );
 }
