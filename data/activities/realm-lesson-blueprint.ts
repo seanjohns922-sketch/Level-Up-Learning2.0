@@ -24,10 +24,11 @@ export type RealmLessonTaskGenerator = (ctx?: RealmLessonTaskContext) => Practic
 
 export type RealmLessonTaskSet = {
   teaching: RealmLessonTaskGenerator;
+  // At least two activity generators; most lessons use three.
   activities: readonly [
     RealmLessonTaskGenerator,
     RealmLessonTaskGenerator,
-    RealmLessonTaskGenerator,
+    ...RealmLessonTaskGenerator[],
   ];
 };
 
@@ -65,10 +66,11 @@ export type RealmLessonBlueprint = {
   successCriteria: readonly string[];
   artworkSrc: string;
   teaching: RealmLessonTeachingDefinition;
+  // At least two activities; most lessons use three.
   activities: readonly [
     RealmLessonActivityDefinition,
     RealmLessonActivityDefinition,
-    RealmLessonActivityDefinition,
+    ...RealmLessonActivityDefinition[],
   ];
   reflection: {
     prompt: string;

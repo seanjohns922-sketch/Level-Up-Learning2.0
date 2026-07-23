@@ -64,35 +64,10 @@ function shapeSortTask(round: number, target: number): PracticeTask {
   };
 }
 
-const SCENE_OBJECTS = {
-  circle: { id: "planet", label: "planet" },
-  triangle: { id: "flag", label: "flag" },
-  square: { id: "window", label: "window" },
-  rectangle: { id: "door", label: "door" },
-} as const;
-
-function shapeSceneTask(round: number, target: number): PracticeTask {
-  const targetShape = SHAPES[round % SHAPES.length]!;
-  const object = SCENE_OBJECTS[targetShape];
-  return {
-    kind: "starpathShapeScene",
-    prompt: `Which object contains a ${targetShape}?`,
-    speakText: `Which object contains a ${targetShape}? Look for ${SHAPE_FACTS[targetShape].toLowerCase()}`,
-    target,
-    targetShape,
-    correctObjectId: object.id,
-    feedback: {
-      correct: `Correct! The ${object.label} contains a ${targetShape}. ${SHAPE_FACTS[targetShape]}`,
-      wrong: `The ${object.label} contains the ${targetShape}. Look for the object that matches this shape.`,
-    },
-  };
-}
-
 export function createMeetTheShapesTaskSet(): RealmLessonTaskSet {
   let target = 0;
   let matchRound = 0;
   let sortRound = 0;
-  let sceneRound = 0;
 
   return {
     teaching: () => {
@@ -118,20 +93,14 @@ export function createMeetTheShapesTaskSet(): RealmLessonTaskSet {
         sortRound += 1;
         return task;
       },
-      () => {
-        target += 1;
-        const task = shapeSceneTask(sceneRound, target);
-        sceneRound += 1;
-        return task;
-      },
     ],
   };
 }
 
 export const MEET_THE_SHAPES_PRACTISED_SKILLS = [
   "Recognise circles, triangles, squares and rectangles",
+  "Name each familiar shape",
   "Sort familiar shapes by name",
-  "Find familiar shapes inside environmental objects",
 ];
 
 export const MEET_THE_SHAPES_CONTENT = {
@@ -139,7 +108,7 @@ export const MEET_THE_SHAPES_CONTENT = {
   successCriteria: [
     "name familiar shapes",
     "match familiar shapes",
-    "find shapes around me",
+    "sort familiar shapes",
   ],
   artworkSrc: "/images/starpath-home-bg-ground.png",
   teaching: {
@@ -160,19 +129,13 @@ export const MEET_THE_SHAPES_CONTENT = {
       description: "Guide each shape to its matching planet. Drag it across space or tap the correct landing zone.",
       taskKinds: ["starpathShapeSort"],
     },
-    {
-      key: "shapes-hidden-in-starpath",
-      title: "Shapes Hidden in Starpath",
-      description: "Explore a cosmic scene and find familiar shapes inside planets, flags, windows and doors.",
-      taskKinds: ["starpathShapeScene"],
-    },
   ],
   reflection: {
-    prompt: "What new discovery did you make today?",
-    options: ["I named shapes", "I sorted shapes", "I found hidden shapes"],
+    prompt: "What did you practise today?",
+    options: ["I named shapes", "I matched shapes", "I sorted shapes"],
   },
   practisedSkills: MEET_THE_SHAPES_PRACTISED_SKILLS,
-  nextUpLabel: "Find the Shapes",
+  nextUpLabel: "Shape Detectives",
   createTaskSet: createMeetTheShapesTaskSet,
 } satisfies StarpathLessonContent;
 

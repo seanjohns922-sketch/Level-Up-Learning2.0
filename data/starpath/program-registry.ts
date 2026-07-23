@@ -276,8 +276,8 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
 const ROLES: readonly StarpathSequenceRole[] = ["build", "develop", "apply"];
 const MEET_THE_SHAPES_MECHANICS = [
   "cosmic-shape-match",
+  "shape-name-recall",
   "shape-sorter",
-  "starpath-environment-shape-find",
 ] as const;
 const SHAPE_DETECTIVES_MECHANICS = [
   "space-object-match",
