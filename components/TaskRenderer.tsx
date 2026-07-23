@@ -144,6 +144,13 @@ import {
   StarpathObjectShapeCard,
   StarpathShapeNameCard,
 } from "@/components/starpath/StarpathShapeChallengeCards";
+import {
+  StarpathBuildMatchCard,
+  StarpathBuildShapeIdentifyCard,
+  StarpathFinishPictureCard,
+  StarpathShapeBuilderCard,
+  StarpathSpaceMuseumCard,
+} from "@/components/starpath/StarpathShapeBuilderCards";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -555,6 +562,16 @@ function TaskRendererInner({
       return <StarpathOddOneOutCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathCollectMission":
       return <StarpathCollectMissionCard key={k} task={t} onComplete={onC} />;
+    case "starpathFinishPicture":
+      return <StarpathFinishPictureCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathShapeBuilder":
+      return <StarpathShapeBuilderCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathBuildShapeIdentify":
+      return <StarpathBuildShapeIdentifyCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathBuildMatch":
+      return <StarpathBuildMatchCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathSpaceMuseum":
+      return <StarpathSpaceMuseumCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     default:
       return <TaskRecoveryCard onRecover={onW} />;
   }

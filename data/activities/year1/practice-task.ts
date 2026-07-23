@@ -2264,7 +2264,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues";
+      variant?: "shapes" | "objects" | "clues" | "builders";
       heading?: string;
     }
   | {
@@ -2365,6 +2365,71 @@ export type PracticeTask = (
         shape: "circle" | "triangle" | "square" | "rectangle";
         colour: string;
       }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathFinishPicture";
+      prompt: string;
+      speakText: string;
+      target: number;
+      objectId: string;
+      missingPieceId: string;
+      options: Array<{
+        id: string;
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+      }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathShapeBuilder";
+      prompt: string;
+      speakText: string;
+      target: number;
+      objectId: string;
+      mode: "guided" | "copy" | "challenge" | "free";
+      requiredPieceIds: string[];
+      options: Array<{
+        id: string;
+        pieceId: string | null;
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+      }>;
+      minimumPieces: number;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathBuildShapeIdentify";
+      prompt: string;
+      speakText: string;
+      target: number;
+      objectId: string;
+      targetShapes: Array<"circle" | "triangle" | "square" | "rectangle">;
+      options: Array<"circle" | "triangle" | "square" | "rectangle">;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathBuildMatch";
+      prompt: string;
+      speakText: string;
+      target: number;
+      objectId: string;
+      options: Array<{ id: string; objectId: string }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathSpaceMuseum";
+      prompt: string;
+      speakText: string;
+      target: number;
+      criterion: {
+        type: "contains" | "most";
+        shape: "circle" | "triangle" | "square" | "rectangle";
+      };
+      options: Array<{ id: string; objectId: string }>;
+      correctOptionId: string;
       feedback: { correct: string; wrong: string };
     }
 ) & { difficulty?: Difficulty };

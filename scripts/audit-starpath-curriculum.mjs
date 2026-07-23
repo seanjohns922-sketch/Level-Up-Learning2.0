@@ -27,8 +27,8 @@ assert.deepEqual(
 assert.deepEqual(
   groundProgram.weeks.map((week) => week.lessons.map((lesson) => lesson.title)),
   [
-    ["Meet the Shapes", "Find the Shapes", "Match the Shapes"],
-    ["Build with Shapes", "Complete the Shape", "Draw with Shapes"],
+    ["Meet the Shapes", "Shape Detectives", "Shape Masters"],
+    ["Build with Shapes", "Shape Creators", "Space Builders"],
     ["Sort by Shape", "What's Different?", "Shape Families"],
     ["Space Objects", "Home Objects", "Treasure Hunt"],
     ["Above, Below, Beside", "In, On, Under, Behind", "Move the Object"],

@@ -87,6 +87,11 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "starpathShapeTapAll") return "Shape Detective Hunt";
   if (kind === "starpathOddOneOut") return "Which One Doesn't Belong?";
   if (kind === "starpathCollectMission") return "Cosmic Shape Mission";
+  if (kind === "starpathFinishPicture") return "Finish the Picture";
+  if (kind === "starpathShapeBuilder") return "Shape Builder";
+  if (kind === "starpathBuildShapeIdentify") return "Name the Build Shapes";
+  if (kind === "starpathBuildMatch") return "Match the Build";
+  if (kind === "starpathSpaceMuseum") return "Space Museum";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";
@@ -139,6 +144,17 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   }
   if (task.kind === "starpathCollectMission") {
     return task.requests.map((request) => `${request.count} ${request.shape}`).join(", ");
+  }
+  if (task.kind === "starpathFinishPicture") {
+    return task.options.find((option) => option.id === task.correctOptionId)?.shape ?? "missing shape";
+  }
+  if (task.kind === "starpathShapeBuilder") return task.objectId;
+  if (task.kind === "starpathBuildShapeIdentify") return task.targetShapes.join(", ");
+  if (task.kind === "starpathBuildMatch") {
+    return task.options.find((option) => option.id === task.correctOptionId)?.objectId ?? "matching build";
+  }
+  if (task.kind === "starpathSpaceMuseum") {
+    return task.options.find((option) => option.id === task.correctOptionId)?.objectId ?? "museum picture";
   }
   if (task.kind === "measurementCompare") {
     return task.objects.find((item) => item.id === task.correctOptionId)?.label ?? task.correctOptionId;
@@ -1029,7 +1045,12 @@ export function PracticeRunner({
     task.kind === "starpathShapeName" ||
     task.kind === "starpathShapeTapAll" ||
     task.kind === "starpathOddOneOut" ||
-    task.kind === "starpathCollectMission";
+    task.kind === "starpathCollectMission" ||
+    task.kind === "starpathFinishPicture" ||
+    task.kind === "starpathShapeBuilder" ||
+    task.kind === "starpathBuildShapeIdentify" ||
+    task.kind === "starpathBuildMatch" ||
+    task.kind === "starpathSpaceMuseum";
   const hint =
     hasGroundFeedback
       ? status === "wrong"

@@ -1,6 +1,6 @@
 # Starpath Curriculum Map
 
-> Status: In development. Ground Level Week 1 Lesson 1 is implemented for Demo Mode; remaining lessons, quiz banks and assessment banks are planned.
+> Status: In development. Ground Level Weeks 1-2 lessons and the Week 1 quiz are implemented for Demo Mode; remaining lessons, quiz banks and assessment banks are planned.
 
 Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Every week has a 15-question weekly quiz (5 questions per lesson). Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test, and post-test metadata remains planned for the later assessment phase.
 
@@ -53,7 +53,7 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 | Skill ID | Student name | Teacher description | Week | Category | Prerequisites |
 | --- | --- | --- | ---: | --- | --- |
 | `space-ground-shape-recognition` | Spot familiar shapes | Recognises and names circles, squares, triangles and rectangles despite changes in size, colour or orientation. | 1 | shape-and-object-reasoning | None |
-| `space-ground-shape-creation` | Make shapes | Creates familiar shapes and simple pictures from lines, parts and smaller shapes while using shape language. | 2 | construction-and-visualisation | `space-ground-shape-recognition` |
+| `space-ground-shape-creation` | Build with shapes | Creates familiar shape pictures, recognises the shapes within completed objects and explains simple visual reasoning. | 2 | construction-and-visualisation | `space-ground-shape-recognition` |
 | `space-ground-shape-sorting` | Sort shapes with a reason | Sorts and compares familiar shapes using corners, sides and round or not-round language. | 3 | shape-and-object-reasoning | `space-ground-shape-recognition` |
 | `space-ground-shapes-in-objects` | Find shapes in objects | Identifies familiar shapes within environmental objects and gives a simple reason for the match. | 4 | spatial-representation | `space-ground-shape-recognition` |
 | `space-ground-position-language` | Say where things are | Uses above, below, beside, in, on, under and behind from a clear viewpoint. | 5 | position-and-navigation | None |
@@ -71,9 +71,9 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Meet the Shapes (`ground-space-w1-l1`) | build | Recognise circles, squares, triangles and rectangles. | I can recognise and name familiar shapes. | cosmic-shape-match, shape-sorter, starpath-environment-shape-find |
-| 2. Find the Shapes (`ground-space-w1-l2`) | develop | Search for familiar shapes hidden around Starpath. | We are learning to search for familiar shapes hidden around Starpath. | shape-introduction, scene-shape-hunt, shape-match-sort |
-| 3. Match the Shapes (`ground-space-w1-l3`) | apply | Match and simply sort familiar shapes. | We are learning to match and simply sort familiar shapes. | shape-introduction, scene-shape-hunt, shape-match-sort |
+| 1. Meet the Shapes (`ground-space-w1-l1`) | build | Recognise circles, squares, triangles and rectangles. | I can recognise and name familiar shapes. | cosmic-shape-match, shape-name-recall, shape-sorter |
+| 2. Shape Detectives (`ground-space-w1-l2`) | develop | Find familiar shapes hidden inside everyday objects. | I can find familiar shapes in the world around me. | space-object-match, shape-explorer, shape-detective-hunt |
+| 3. Shape Masters (`ground-space-w1-l3`) | apply | Recognise and sort familiar shapes independently. | I can recognise shapes by myself. | which-one-doesnt-belong, space-shape-sort, cosmic-mission |
 
 **Vocabulary:** circle, square, triangle, rectangle, shape
 
@@ -86,24 +86,24 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 
 #### Week 2: Shape Builders
 
-**Central concept:** Create familiar shapes and pictures from lines, parts and smaller shapes.
+**Central concept:** Use familiar shapes as building blocks to create pictures and explain the shapes within them.
 **Curriculum alignment:** AC9MFSP01
 **Practised skills:** `space-ground-shape-creation`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Build with Shapes (`ground-space-w2-l1`) | build | Create familiar shapes using sticks, stars and lines. | We are learning to create familiar shapes using sticks, stars and lines. | line-shape-builder, missing-part-completer, shape-picture-studio |
-| 2. Complete the Shape (`ground-space-w2-l2`) | develop | Add missing sides or parts to finish a familiar shape. | We are learning to add missing sides or parts to finish a familiar shape. | line-shape-builder, missing-part-completer, shape-picture-studio |
-| 3. Draw with Shapes (`ground-space-w2-l3`) | apply | Create a rocket, house, tree or robot from familiar shapes. | We are learning to create a rocket, house, tree or robot from familiar shapes. | line-shape-builder, missing-part-completer, shape-picture-studio |
+| 1. Build with Shapes (`ground-space-w2-l1`) | build | Use familiar shapes to build simple pictures. | I can use shapes to build pictures. | finish-the-picture, shape-builder, which-shapes-did-you-use |
+| 2. Shape Creators (`ground-space-w2-l2`) | develop | Combine familiar shapes to create new pictures. | I can make new things using shapes. | copy-my-picture, shape-challenge, find-the-missing-shape |
+| 3. Space Builders (`ground-space-w2-l3`) | apply | Build and explain shape creations using visual reasoning. | I can build and explain my creations. | cosmic-construction, match-the-build, space-museum |
 
-**Vocabulary:** build, side, line, part, picture
+**Vocabulary:** build, shape, combine, picture, explain
 
 **Common misconceptions**
 
-- A shape must be drawn in one particular way.
 - A picture can contain only one shape.
+- A creation must match one exact arrangement.
 
-**Weekly quiz:** `ground-space-w2-quiz` - Shape construction, completion and picture composition. (15 questions; planned)
+**Weekly quiz:** `ground-space-w2-quiz` - Guided construction, creative composition and visual shape reasoning. (15 questions; planned)
 
 #### Week 3: Shape Sorters
 

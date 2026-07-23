@@ -86,13 +86,33 @@ export function StarpathShapeIntroCard({
   const variant = task.variant ?? "shapes";
   const heading =
     task.heading ??
-    (variant === "objects" ? "Shapes are everywhere" : variant === "clues" ? "Look for the clues" : "Meet the cosmic shapes");
+    (variant === "objects"
+      ? "Shapes are everywhere"
+      : variant === "clues"
+        ? "Look for the clues"
+        : variant === "builders"
+          ? "Little shapes make big pictures"
+          : "Meet the cosmic shapes");
 
   return (
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-5 sm:p-7">
       <TaskHeading prompt={heading} speech={task.speakText} />
 
-      {variant === "objects" ? (
+      {variant === "builders" ? (
+        <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3">
+          {[
+            { shape: "rectangle" as const, colour: "#67e8f9", label: "Rocket body" },
+            { shape: "triangle" as const, colour: "#fde047", label: "Rocket top" },
+            { shape: "circle" as const, colour: "#86efac", label: "Rocket window" },
+          ].map((part) => (
+            <div key={part.label} className="relative flex min-h-44 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">
+              <OptionReadAloudButton text={`${part.label}.`} className="absolute right-2 top-2" />
+              <ShapeVisual shape={part.shape} colour={part.colour} className="h-20 w-20" />
+              <div className="mt-2 text-base font-black text-indigo-950">{part.label}</div>
+            </div>
+          ))}
+        </div>
+      ) : variant === "objects" ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {TEACH_OBJECT_PAIRS.map(({ objectId, shape }) => (
             <div key={objectId} className="relative flex min-h-48 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">

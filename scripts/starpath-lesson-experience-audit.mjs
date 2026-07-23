@@ -15,10 +15,17 @@ const allLessons = registry.STARPATH_PROGRAMS.flatMap((program) =>
 const implemented = allLessons.filter((lesson) => lesson.status === "implemented");
 
 assert.equal(allLessons.length, 7 * 8 * 3, "Starpath must expose 168 canonical lesson routes");
-assert.deepEqual(implemented.map((lesson) => lesson.id), ["ground-space-w1-l1"]);
+assert.deepEqual(implemented.map((lesson) => lesson.id), [
+  "ground-space-w1-l1",
+  "ground-space-w1-l2",
+  "ground-space-w1-l3",
+  "ground-space-w2-l1",
+  "ground-space-w2-l2",
+  "ground-space-w2-l3",
+]);
 
 const route = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
-assert.match(route, /StarpathMeetTheShapesLesson/);
+assert.match(route, /StarpathGroundLesson/);
 assert.match(route, /StarpathDevelopmentLesson/);
 
 const missionHome = read("components/starpath/StarpathMissionHome.tsx");
@@ -35,9 +42,9 @@ for (const required of [
 assert.match(missionHome, /Read mission/);
 assert.match(missionHome, /ReadAloudBtn/);
 
-const implementedMission = read("components/starpath/StarpathMeetTheShapesLesson.tsx");
+const implementedMission = read("components/starpath/StarpathGroundLesson.tsx");
 assert.match(implementedMission, /StarpathLessonShell/);
-assert.match(implementedMission, /MEET_THE_SHAPES_CONTENT/);
+assert.match(implementedMission, /GROUND_LESSON_CONTENT/);
 assert.doesNotMatch(implementedMission, /PracticeRunner/);
 
 const lessonShell = read("components/starpath/StarpathLessonShell.tsx");
@@ -81,7 +88,8 @@ for (const label of ["STAR CHAIN", "IN ORBIT", "SUPERNOVA", "HYPERDRIVE", "STARP
 const platformBlueprint = read("data/activities/realm-lesson-blueprint.ts");
 assert.match(platformBlueprint, /RealmLessonBlueprint/);
 assert.match(platformBlueprint, /activities: readonly \[/);
-assert.equal((platformBlueprint.match(/RealmLessonActivityDefinition,/g) ?? []).length, 3);
+assert.equal((platformBlueprint.match(/RealmLessonActivityDefinition,/g) ?? []).length, 2);
+assert.match(platformBlueprint, /\.\.\.RealmLessonActivityDefinition\[\]/);
 assert.match(platformBlueprint, /createRandomRealmLessonGenerator/);
 assert.match(platformBlueprint, /shuffledActivityBag/);
 assert.match(platformBlueprint, /Math\.random\(\)/);

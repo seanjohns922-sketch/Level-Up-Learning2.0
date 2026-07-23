@@ -148,7 +148,7 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
     progressionRationale: "The sequence deliberately moves from recognise to create, sort, describe and apply. Changing the context from shape spotting to building, environmental searches, navigation and a final Space Graduation keeps Foundation practice varied while remaining aligned to AC9MFSP01 and AC9MFSP02. Completion is planned to unlock the Ground Level Starpath Graduate title.",
     weeks: [
       W("Shape Spotters", "Recognise and name familiar two-dimensional shapes in varied Starpath scenes.", ["AC9MFSP01"], skill("space-ground-shape-recognition", "Spot familiar shapes", "Recognises and names circles, squares, triangles and rectangles despite changes in size, colour or orientation.", ["AC9MFSP01"], "shape-and-object-reasoning"), [["Meet the Shapes", "Recognise circles, squares, triangles and rectangles."], ["Shape Detectives", "Find familiar shapes hidden inside everyday objects."], ["Shape Masters", "Recognise and sort familiar shapes independently."]], ["shape-introduction", "scene-shape-hunt", "shape-match-sort"], ["circle", "square", "triangle", "rectangle", "shape"], ["A shape changes name when it is turned.", "The colour or size determines the shape."], "Recognition, naming, matching and simple sorting."),
-      W("Shape Builders", "Create familiar shapes and pictures from lines, parts and smaller shapes.", ["AC9MFSP01"], skill("space-ground-shape-creation", "Make shapes", "Creates familiar shapes and simple pictures from lines, parts and smaller shapes while using shape language.", ["AC9MFSP01"], "construction-and-visualisation", ["space-ground-shape-recognition"]), [["Build with Shapes", "Create familiar shapes using sticks, stars and lines."], ["Complete the Shape", "Add missing sides or parts to finish a familiar shape."], ["Draw with Shapes", "Create a rocket, house, tree or robot from familiar shapes."]], ["line-shape-builder", "missing-part-completer", "shape-picture-studio"], ["build", "side", "line", "part", "picture"], ["A shape must be drawn in one particular way.", "A picture can contain only one shape."], "Shape construction, completion and picture composition."),
+      W("Shape Builders", "Use familiar shapes as building blocks to create pictures and explain the shapes within them.", ["AC9MFSP01"], skill("space-ground-shape-creation", "Build with shapes", "Creates familiar shape pictures, recognises the shapes within completed objects and explains simple visual reasoning.", ["AC9MFSP01"], "construction-and-visualisation", ["space-ground-shape-recognition"]), [["Build with Shapes", "Use familiar shapes to build simple pictures."], ["Shape Creators", "Combine familiar shapes to create new pictures."], ["Space Builders", "Build and explain shape creations using visual reasoning."]], ["finish-the-picture", "shape-builder", "shape-reasoning"], ["build", "shape", "combine", "picture", "explain"], ["A picture can contain only one shape.", "A creation must match one exact arrangement."], "Guided construction, creative composition and visual shape reasoning."),
       W("Shape Sorters", "Sort and compare familiar shapes using Foundation language.", ["AC9MFSP01"], skill("space-ground-shape-sorting", "Sort shapes with a reason", "Sorts and compares familiar shapes using corners, sides and round or not-round language.", ["AC9MFSP01"], "shape-and-object-reasoning", ["space-ground-shape-recognition"]), [["Sort by Shape", "Group familiar shapes by their names."], ["What's Different?", "Compare corners, sides and whether shapes are round or not round."], ["Shape Families", "Group similar shapes and explain what belongs together."]], ["drag-shape-sort", "feature-compare", "shape-family-builder"], ["sort", "same", "different", "corner", "round"], ["There is only one way to sort a group of shapes.", "Shapes that look different cannot belong to the same family."], "Sorting, visible-feature comparison and simple explanations."),
       W("Shapes Around Us", "Recognise familiar shapes within space and everyday objects.", ["AC9MFSP01"], skill("space-ground-shapes-in-objects", "Find shapes in objects", "Identifies familiar shapes within environmental objects and gives a simple reason for the match.", ["AC9MFSP01"], "spatial-representation", ["space-ground-shape-recognition"]), [["Space Objects", "Find familiar shapes in rockets, planets and satellites."], ["Home Objects", "Find familiar shapes in everyday environments."], ["Treasure Hunt", "Find every object that matches a chosen shape."]], ["space-object-hotspot", "home-shape-match", "target-shape-hunt"], ["object", "rocket", "planet", "match", "find"], ["An object must be exactly one shape.", "Only space objects contain useful shapes."], "Environmental shape recognition across space and familiar contexts."),
       W("Space Positions", "Use positional language to describe where objects are.", ["AC9MFSP02"], skill("space-ground-position-language", "Say where things are", "Uses above, below, beside, in, on, under and behind from a clear viewpoint.", ["AC9MFSP02"], "position-and-navigation"), [["Above, Below, Beside", "Identify and describe simple relative positions."], ["In, On, Under, Behind", "Use containment and relative position words in familiar scenes."], ["Move the Object", "Drag an object to a location described by a positional clue."]], ["position-word-match", "position-scene-choice", "drag-to-position"], ["above", "below", "beside", "in", "under"], ["A position word describes an object without a reference object.", "On and above always mean the same thing."], "Relational position vocabulary and interactive placement."),
@@ -289,6 +289,21 @@ const SHAPE_MASTERS_MECHANICS = [
   "space-shape-sort",
   "cosmic-mission",
 ] as const;
+const BUILD_WITH_SHAPES_MECHANICS = [
+  "finish-the-picture",
+  "shape-builder",
+  "which-shapes-did-you-use",
+] as const;
+const SHAPE_CREATORS_MECHANICS = [
+  "copy-my-picture",
+  "shape-challenge",
+  "find-the-missing-shape",
+] as const;
+const SPACE_BUILDERS_MECHANICS = [
+  "cosmic-construction",
+  "match-the-build",
+  "space-museum",
+] as const;
 
 // Ground Level lessons with real, playable content (keyed by registry id).
 const IMPLEMENTED_GROUND_LESSONS: Record<
@@ -298,6 +313,9 @@ const IMPLEMENTED_GROUND_LESSONS: Record<
   "ground-space-w1-l1": { learningIntention: "I can recognise and name familiar shapes.", mechanics: MEET_THE_SHAPES_MECHANICS },
   "ground-space-w1-l2": { learningIntention: "I can find familiar shapes in the world around me.", mechanics: SHAPE_DETECTIVES_MECHANICS },
   "ground-space-w1-l3": { learningIntention: "I can recognise shapes by myself.", mechanics: SHAPE_MASTERS_MECHANICS },
+  "ground-space-w2-l1": { learningIntention: "I can use shapes to build pictures.", mechanics: BUILD_WITH_SHAPES_MECHANICS },
+  "ground-space-w2-l2": { learningIntention: "I can make new things using shapes.", mechanics: SHAPE_CREATORS_MECHANICS },
+  "ground-space-w2-l3": { learningIntention: "I can build and explain my creations.", mechanics: SPACE_BUILDERS_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
