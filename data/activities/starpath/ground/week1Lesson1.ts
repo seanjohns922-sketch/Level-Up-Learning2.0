@@ -23,7 +23,7 @@ function rotatedShapes(target: FoundationShape, round: number) {
     .sort((left, right) => ((SHAPES.indexOf(left) + round * 2) % 5) - ((SHAPES.indexOf(right) + round * 3) % 5));
 }
 
-function shapeMatchTask(round: number, target: number): PracticeTask {
+export function shapeMatchTask(round: number, target: number): PracticeTask {
   const targetShape = SHAPES[round % SHAPES.length]!;
   const options = rotatedShapes(targetShape, round).map((shape, index) => ({
     id: `${shape}-${target}-${index}`,
@@ -65,7 +65,7 @@ function shapeSortTask(round: number, target: number): PracticeTask {
 }
 
 // Name the Shape — shape shown, choose its name (word). Reinforces vocabulary.
-function shapeNameTask(round: number, target: number): PracticeTask {
+export function shapeNameTask(round: number, target: number): PracticeTask {
   const shape = SHAPES[round % SHAPES.length]!;
   const others = SHAPES.filter((candidate) => candidate !== shape).slice(0, 2);
   const options = [shape, ...others]

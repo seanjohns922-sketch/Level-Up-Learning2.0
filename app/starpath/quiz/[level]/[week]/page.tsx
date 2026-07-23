@@ -1,5 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import StarpathDevelopmentQuiz from "@/components/starpath/StarpathDevelopmentQuiz";
+import StarpathVoyageQuiz from "@/components/starpath/StarpathVoyageQuiz";
+import { getStarpathQuizTasks } from "@/data/activities/starpath/ground/week1Quiz";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getServerStarpathAccess } from "@/lib/demo-session-server";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
@@ -33,6 +35,23 @@ export default async function StarpathQuizPage({
   const program = getStarpathProgram(level);
   const weekPlan = program.weeks[week - 1];
   if (!weekPlan?.quiz || program.realmId !== STARPATH_REALM_ID) notFound();
+
+  const quizTasks = getStarpathQuizTasks(level, week);
+  if (quizTasks && quizTasks.length > 0) {
+    return (
+      <StarpathVoyageQuiz
+        quiz={{
+          level: definition.yearLabel,
+          levelLabel: definition.displayLabel,
+          week,
+          title: `${weekPlan.title} Voyage Quiz`,
+          coverage: weekPlan.quiz.coverage,
+          weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
+        }}
+        tasks={quizTasks}
+      />
+    );
+  }
 
   return (
     <StarpathDevelopmentQuiz

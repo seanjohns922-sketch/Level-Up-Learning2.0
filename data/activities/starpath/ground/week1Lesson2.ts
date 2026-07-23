@@ -12,7 +12,7 @@ function colour(index: number) {
 }
 
 // A1 — Space Object Match: show one space object, choose the shape inside it.
-function objectMatchTask(round: number, target: number): PracticeTask {
+export function objectMatchTask(round: number, target: number): PracticeTask {
   const targetShape = SHAPES[round % SHAPES.length]!;
   const objectOptions = OBJECTS_BY_SHAPE[targetShape];
   const objectId = objectOptions[round % objectOptions.length]!;
@@ -39,7 +39,7 @@ function objectMatchTask(round: number, target: number): PracticeTask {
 }
 
 // A2 — Shape Explorer: find the object in a varied scene that holds the target shape.
-function shapeExplorerTask(round: number, target: number): PracticeTask {
+export function shapeExplorerTask(round: number, target: number): PracticeTask {
   const targetShape = SHAPES[round % SHAPES.length]!;
   const { objects, correctObjectId } = buildObjectScene(targetShape, round);
   const label = SHAPE_OBJECTS[correctObjectId].label.toLowerCase();

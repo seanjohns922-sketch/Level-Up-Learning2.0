@@ -11,7 +11,7 @@ function colour(index: number) {
 }
 
 // A1 — Which One Doesn't Belong? Three of one shape and one different shape.
-function oddOneOutTask(round: number, target: number): PracticeTask {
+export function oddOneOutTask(round: number, target: number): PracticeTask {
   const commonShape = SHAPES[round % SHAPES.length]!;
   // (round + 2) mod 4 is always a different index, so the odd shape never
   // accidentally matches the common shape.
