@@ -12,6 +12,7 @@ type ShapeTapAllTask = Extract<PracticeTask, { kind: "starpathShapeTapAll" }>;
 type OddOneOutTask = Extract<PracticeTask, { kind: "starpathOddOneOut" }>;
 type CollectMissionTask = Extract<PracticeTask, { kind: "starpathCollectMission" }>;
 type ObjectShapeTask = Extract<PracticeTask, { kind: "starpathObjectShape" }>;
+type ShapeNameTask = Extract<PracticeTask, { kind: "starpathShapeName" }>;
 
 const SHAPE_ICON_COLOUR: Record<FoundationShape, string> = {
   circle: "#67e8f9",
@@ -133,6 +134,41 @@ export function StarpathOddOneOutCard({
           >
             <OptionReadAloudButton text={option.shape} className="absolute right-3 top-3" />
             <ShapeVisual shape={option.shape} colour={option.colour} className="h-24 w-24" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// A (Lesson 1) — Name the Shape: shape shown, pick its name (word). Reinforces
+// vocabulary — distinct from Match, which is picture -> picture.
+export function StarpathShapeNameCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: ShapeNameTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  return (
+    <div>
+      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <div className="mx-auto mb-5 flex w-full max-w-xs flex-col items-center rounded-2xl border-2 border-cyan-300 bg-cyan-50 p-4">
+        <span className="text-xs font-black uppercase tracking-[0.16em] text-cyan-800">Name this shape</span>
+        <ShapeVisual shape={task.shape} colour="#a5f3fc" className="mt-1 h-28 w-28" />
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {task.options.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="relative flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+          >
+            <span className="text-xl font-black capitalize text-indigo-950">{option.name}</span>
+            <OptionReadAloudButton text={option.name} className="absolute right-2 top-1/2 -translate-y-1/2" />
           </button>
         ))}
       </div>

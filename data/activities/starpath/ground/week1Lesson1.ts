@@ -64,9 +64,33 @@ function shapeSortTask(round: number, target: number): PracticeTask {
   };
 }
 
+// Name the Shape — shape shown, choose its name (word). Reinforces vocabulary.
+function shapeNameTask(round: number, target: number): PracticeTask {
+  const shape = SHAPES[round % SHAPES.length]!;
+  const others = SHAPES.filter((candidate) => candidate !== shape).slice(0, 2);
+  const options = [shape, ...others]
+    .map((name, index) => ({ id: `${name}-${target}-${index}`, name }))
+    .sort((left, right) => ((SHAPES.indexOf(left.name) + round) % 3) - ((SHAPES.indexOf(right.name) + round * 2) % 3));
+  const correct = options.find((option) => option.name === shape)!;
+  return {
+    kind: "starpathShapeName",
+    prompt: "What is this shape called?",
+    speakText: `What is this shape called? ${SHAPE_FACTS[shape]}`,
+    target,
+    shape,
+    options,
+    correctOptionId: correct.id,
+    feedback: {
+      correct: `Yes! This is a ${shape}. ${SHAPE_FACTS[shape]}`,
+      wrong: `This shape is called a ${shape}. ${SHAPE_FACTS[shape]}`,
+    },
+  };
+}
+
 export function createMeetTheShapesTaskSet(): RealmLessonTaskSet {
   let target = 0;
   let matchRound = 0;
+  let nameRound = 0;
   let sortRound = 0;
 
   return {
@@ -85,6 +109,12 @@ export function createMeetTheShapesTaskSet(): RealmLessonTaskSet {
         target += 1;
         const task = shapeMatchTask(matchRound, target);
         matchRound += 1;
+        return task;
+      },
+      () => {
+        target += 1;
+        const task = shapeNameTask(nameRound, target);
+        nameRound += 1;
         return task;
       },
       () => {
@@ -122,6 +152,12 @@ export const MEET_THE_SHAPES_CONTENT = {
       title: "Cosmic Shape Match",
       description: "Match each glowing target with the familiar shape that has the same name.",
       taskKinds: ["starpathShapeMatch"],
+    },
+    {
+      key: "name-the-shape",
+      title: "Name the Shape",
+      description: "See a shape and choose its name in a quick naming round.",
+      taskKinds: ["starpathShapeName"],
     },
     {
       key: "shape-sorter",

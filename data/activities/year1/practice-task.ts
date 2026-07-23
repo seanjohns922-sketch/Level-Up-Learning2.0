@@ -2319,6 +2319,16 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      kind: "starpathShapeName";
+      prompt: string;
+      speakText: string;
+      target: number;
+      shape: "circle" | "triangle" | "square" | "rectangle";
+      options: Array<{ id: string; name: "circle" | "triangle" | "square" | "rectangle" }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       kind: "starpathShapeTapAll";
       prompt: string;
       speakText: string;
