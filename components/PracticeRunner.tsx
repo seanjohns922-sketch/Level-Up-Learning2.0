@@ -80,6 +80,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "groundSoundCount") return "Sound Count";
   if (kind === "starpathShapeIntro") return "Meet the Shapes";
   if (kind === "starpathShapeMatch") return "Match the Cosmic Shapes";
+  if (kind === "starpathShapeCompare") return "Same or Different";
   if (kind === "starpathShapeSort") return "Shape Sorter";
   if (kind === "starpathShapeScene") return "Shapes Hidden in Starpath";
   if (kind === "starpathObjectShape") return "Space Object Match";
@@ -134,6 +135,7 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "groundFeed") return String(task.targetNumber);
   if (task.kind === "groundSoundCount") return String(task.targetNumber);
   if (task.kind === "starpathShapeMatch") return task.targetShape;
+  if (task.kind === "starpathShapeCompare") return task.answer;
   if (task.kind === "starpathShapeSort") return `${task.shape} planet`;
   if (task.kind === "starpathShapeScene") return task.correctObjectId;
   if (task.kind === "starpathObjectShape") return task.targetShape;
@@ -1039,6 +1041,7 @@ export function PracticeRunner({
     task.kind === "groundFeed" ||
     task.kind === "groundSoundCount" ||
     task.kind === "starpathShapeMatch" ||
+    task.kind === "starpathShapeCompare" ||
     task.kind === "starpathShapeSort" ||
     task.kind === "starpathShapeScene" ||
     task.kind === "starpathObjectShape" ||

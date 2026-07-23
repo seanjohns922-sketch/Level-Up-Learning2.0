@@ -13,6 +13,7 @@ type OddOneOutTask = Extract<PracticeTask, { kind: "starpathOddOneOut" }>;
 type CollectMissionTask = Extract<PracticeTask, { kind: "starpathCollectMission" }>;
 type ObjectShapeTask = Extract<PracticeTask, { kind: "starpathObjectShape" }>;
 type ShapeNameTask = Extract<PracticeTask, { kind: "starpathShapeName" }>;
+type ShapeCompareTask = Extract<PracticeTask, { kind: "starpathShapeCompare" }>;
 
 const SHAPE_ICON_COLOUR: Record<FoundationShape, string> = {
   circle: "#67e8f9",
@@ -134,6 +135,52 @@ export function StarpathOddOneOutCard({
           >
             <OptionReadAloudButton text={option.shape} className="absolute right-3 top-3" />
             <ShapeVisual shape={option.shape} colour={option.colour} className="h-24 w-24" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function StarpathShapeCompareCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: ShapeCompareTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  return (
+    <div>
+      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4">
+        {[task.left, task.right].map((item, index) => (
+          <div
+            key={`${item.shape}-${index}`}
+            className="flex min-h-44 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm"
+          >
+            <div style={{ transform: `rotate(${item.rotation}deg)` }}>
+              <ShapeVisual
+                shape={item.shape}
+                colour={item.colour}
+                scale={item.scale}
+                className="h-28 w-28 sm:h-36 sm:w-36"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mx-auto mt-5 grid max-w-xl grid-cols-2 gap-4">
+        {(["same", "different"] as const).map((answer) => (
+          <button
+            key={answer}
+            type="button"
+            onClick={() => (answer === task.answer ? onCorrect() : onWrong())}
+            className="relative min-h-16 rounded-2xl border-2 border-violet-200 bg-white px-5 text-xl font-black capitalize text-indigo-950 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+          >
+            {answer}
+            <OptionReadAloudButton text={answer} className="absolute right-2 top-1/2 -translate-y-1/2" />
           </button>
         ))}
       </div>

@@ -142,6 +142,7 @@ import {
   StarpathOddOneOutCard,
   StarpathCollectMissionCard,
   StarpathObjectShapeCard,
+  StarpathShapeCompareCard,
   StarpathShapeNameCard,
 } from "@/components/starpath/StarpathShapeChallengeCards";
 import {
@@ -548,6 +549,8 @@ function TaskRendererInner({
       return <StarpathShapeIntroCard key={k} task={t} onContinue={onC} />;
     case "starpathShapeMatch":
       return <StarpathShapeMatchCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathShapeCompare":
+      return <StarpathShapeCompareCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathShapeSort":
       return <StarpathShapeSortCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathShapeScene":

@@ -149,7 +149,7 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
     weeks: [
       W("Shape Spotters", "Recognise and name familiar two-dimensional shapes in varied Starpath scenes.", ["AC9MFSP01"], skill("space-ground-shape-recognition", "Spot familiar shapes", "Recognises and names circles, squares, triangles and rectangles despite changes in size, colour or orientation.", ["AC9MFSP01"], "shape-and-object-reasoning"), [["Meet the Shapes", "Recognise circles, squares, triangles and rectangles."], ["Shape Detectives", "Find familiar shapes hidden inside everyday objects."], ["Shape Masters", "Recognise and sort familiar shapes independently."]], ["shape-introduction", "scene-shape-hunt", "shape-match-sort"], ["circle", "square", "triangle", "rectangle", "shape"], ["A shape changes name when it is turned.", "The colour or size determines the shape."], "Recognition, naming, matching and simple sorting."),
       W("Shape Builders", "Use familiar shapes as building blocks to create pictures and explain the shapes within them.", ["AC9MFSP01"], skill("space-ground-shape-creation", "Build with shapes", "Creates familiar shape pictures, recognises the shapes within completed objects and explains simple visual reasoning.", ["AC9MFSP01"], "construction-and-visualisation", ["space-ground-shape-recognition"]), [["Build with Shapes", "Use familiar shapes to build simple pictures."], ["Shape Creators", "Combine familiar shapes to create new pictures."], ["Space Builders", "Build and explain shape creations using visual reasoning."]], ["finish-the-picture", "shape-builder", "shape-reasoning"], ["build", "shape", "combine", "picture", "explain"], ["A picture can contain only one shape.", "A creation must match one exact arrangement."], "Guided construction, creative composition and visual shape reasoning."),
-      W("Shape Sorters", "Sort and compare familiar shapes using Foundation language.", ["AC9MFSP01"], skill("space-ground-shape-sorting", "Sort shapes with a reason", "Sorts and compares familiar shapes using corners, sides and round or not-round language.", ["AC9MFSP01"], "shape-and-object-reasoning", ["space-ground-shape-recognition"]), [["Sort by Shape", "Group familiar shapes by their names."], ["What's Different?", "Compare corners, sides and whether shapes are round or not round."], ["Shape Families", "Group similar shapes and explain what belongs together."]], ["drag-shape-sort", "feature-compare", "shape-family-builder"], ["sort", "same", "different", "corner", "round"], ["There is only one way to sort a group of shapes.", "Shapes that look different cannot belong to the same family."], "Sorting, visible-feature comparison and simple explanations."),
+      W("Shape Sorters", "Sort and compare familiar shapes by noticing simple visual similarities and differences.", ["AC9MFSP01"], skill("space-ground-shape-sorting", "Sort shapes with a reason", "Sorts and compares familiar shapes despite changes in colour and size, then gives a simple reason for a choice.", ["AC9MFSP01"], "shape-and-object-reasoning", ["space-ground-shape-recognition"]), [["Shape Families", "Sort familiar shapes into matching groups."], ["Same or Different?", "Compare familiar shapes despite changes in colour and size."], ["Shape Challenge", "Apply shape recognition, sorting and comparing together."]], ["shape-families", "same-or-different", "mixed-shape-challenge"], ["sort", "same", "different", "family", "belong"], ["Colour changes the name of a shape.", "Size changes the name of a shape."], "Shape-family sorting, visual comparison and simple explanations."),
       W("Shapes Around Us", "Recognise familiar shapes within space and everyday objects.", ["AC9MFSP01"], skill("space-ground-shapes-in-objects", "Find shapes in objects", "Identifies familiar shapes within environmental objects and gives a simple reason for the match.", ["AC9MFSP01"], "spatial-representation", ["space-ground-shape-recognition"]), [["Space Objects", "Find familiar shapes in rockets, planets and satellites."], ["Home Objects", "Find familiar shapes in everyday environments."], ["Treasure Hunt", "Find every object that matches a chosen shape."]], ["space-object-hotspot", "home-shape-match", "target-shape-hunt"], ["object", "rocket", "planet", "match", "find"], ["An object must be exactly one shape.", "Only space objects contain useful shapes."], "Environmental shape recognition across space and familiar contexts."),
       W("Space Positions", "Use positional language to describe where objects are.", ["AC9MFSP02"], skill("space-ground-position-language", "Say where things are", "Uses above, below, beside, in, on, under and behind from a clear viewpoint.", ["AC9MFSP02"], "position-and-navigation"), [["Above, Below, Beside", "Identify and describe simple relative positions."], ["In, On, Under, Behind", "Use containment and relative position words in familiar scenes."], ["Move the Object", "Drag an object to a location described by a positional clue."]], ["position-word-match", "position-scene-choice", "drag-to-position"], ["above", "below", "beside", "in", "under"], ["A position word describes an object without a reference object.", "On and above always mean the same thing."], "Relational position vocabulary and interactive placement."),
       W("Space Adventures", "Follow and apply positional clues in playful movement and location missions.", ["AC9MFSP02"], skill("space-ground-movement-pathways", "Follow space clues", "Follows positional clues to move through a familiar space and locate hidden objects.", ["AC9MFSP02"], "position-and-navigation", ["space-ground-position-language"]), [["Guide the Rocket", "Move a rocket by following simple positional directions."], ["Help Geospin", "Follow positional clues to help Geospin reach a destination."], ["Hidden Treasure", "Find an object by applying a sequence of location clues."]], ["rocket-position-guide", "character-clue-path", "hidden-object-clues"], ["move", "clue", "location", "next", "behind"], ["Clues can be followed in any order.", "The destination alone tells us how to move."], "Applying position and movement language in ordered adventures."),
@@ -304,6 +304,21 @@ const SPACE_BUILDERS_MECHANICS = [
   "match-the-build",
   "space-museum",
 ] as const;
+const SHAPE_FAMILIES_WEEK3_MECHANICS = [
+  "shape-families",
+  "which-group",
+  "find-the-odd-shape",
+] as const;
+const SAME_OR_DIFFERENT_MECHANICS = [
+  "same-shape",
+  "match-the-pair",
+  "spot-the-difference",
+] as const;
+const SHAPE_CHALLENGE_MECHANICS = [
+  "mixed-shape-hunt",
+  "space-sorting-station",
+  "explorers-final-mission",
+] as const;
 
 // Ground Level lessons with real, playable content (keyed by registry id).
 const IMPLEMENTED_GROUND_LESSONS: Record<
@@ -316,6 +331,9 @@ const IMPLEMENTED_GROUND_LESSONS: Record<
   "ground-space-w2-l1": { learningIntention: "I can use shapes to build pictures.", mechanics: BUILD_WITH_SHAPES_MECHANICS },
   "ground-space-w2-l2": { learningIntention: "I can make new things using shapes.", mechanics: SHAPE_CREATORS_MECHANICS },
   "ground-space-w2-l3": { learningIntention: "I can build and explain my creations.", mechanics: SPACE_BUILDERS_MECHANICS },
+  "ground-space-w3-l1": { learningIntention: "I can sort shapes into groups.", mechanics: SHAPE_FAMILIES_WEEK3_MECHANICS },
+  "ground-space-w3-l2": { learningIntention: "I can compare familiar shapes.", mechanics: SAME_OR_DIFFERENT_MECHANICS },
+  "ground-space-w3-l3": { learningIntention: "I can recognise, sort and compare familiar shapes.", mechanics: SHAPE_CHALLENGE_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {

@@ -59,7 +59,7 @@ export function shapeExplorerTask(round: number, target: number): PracticeTask {
 }
 
 // A3 — Shape Detective Hunt: tap EVERY item of the target shape in a mixed field.
-function shapeDetectiveTask(round: number, target: number): PracticeTask {
+export function shapeDetectiveTask(round: number, target: number): PracticeTask {
   const targetShape = SHAPES[round % SHAPES.length]!;
   const distractorShapes = SHAPES.filter((shape) => shape !== targetShape);
   const targetCount = 2 + (round % 2); // 2 or 3 to find

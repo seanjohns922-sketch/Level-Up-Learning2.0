@@ -2283,6 +2283,26 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      kind: "starpathShapeCompare";
+      prompt: string;
+      speakText: string;
+      target: number;
+      left: {
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+        scale: number;
+        rotation: number;
+      };
+      right: {
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+        scale: number;
+        rotation: number;
+      };
+      answer: "same" | "different";
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       kind: "starpathShapeSort";
       prompt: string;
       speakText: string;
