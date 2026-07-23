@@ -350,7 +350,11 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
         id: `${definition.prefix}-space-w${weekNumber}-quiz`,
         coverage: week.quiz,
         questionCount: STARPATH_QUIZ_QUESTIONS_PER_LESSON * STARPATH_LESSONS_PER_WEEK as 15,
-        status: `${definition.prefix}-space-w${weekNumber}-quiz` === "ground-space-w1-quiz" ? "implemented" : STARPATH_PROGRAM_STATUS,
+        status: ["ground-space-w1-quiz", "ground-space-w2-quiz"].includes(
+          `${definition.prefix}-space-w${weekNumber}-quiz`
+        )
+          ? "implemented"
+          : STARPATH_PROGRAM_STATUS,
       },
       status: STARPATH_PROGRAM_STATUS,
     };

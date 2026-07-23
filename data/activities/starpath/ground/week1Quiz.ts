@@ -2,6 +2,7 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { shapeMatchTask, shapeNameTask } from "@/data/activities/starpath/ground/week1Lesson1";
 import { objectMatchTask, shapeExplorerTask } from "@/data/activities/starpath/ground/week1Lesson2";
 import { oddOneOutTask } from "@/data/activities/starpath/ground/week1Lesson3";
+import { buildGroundWeek2VoyageQuiz } from "@/data/activities/starpath/ground/week2Quiz";
 
 // Ground Level · Week 1 Voyage Quiz — 15 questions, 5 from each lesson, using
 // single-answer shape tasks only (so every question is graded pass/fail).
@@ -36,6 +37,7 @@ export function buildGroundWeek1VoyageQuiz(): PracticeTask[] {
 // Registry keyed by `${level}-w${week}`; extend as new weeks are authored.
 const STARPATH_QUIZ_BUILDERS: Record<string, () => PracticeTask[]> = {
   "ground-w1": buildGroundWeek1VoyageQuiz,
+  "ground-w2": buildGroundWeek2VoyageQuiz,
 };
 
 export function getStarpathQuizTasks(levelPrefix: string, week: number): PracticeTask[] | null {
