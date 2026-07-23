@@ -30,6 +30,7 @@ export default function SurgeAmbience({
   dimmed?: boolean;
 }) {
   const isMeasurement = realmId === "measurement";
+  const isStarpath = realmId === "space";
   const tier =
     comboCount >= 10 ? 4 : comboCount >= 8 ? 3 : comboCount >= 5 ? 2 : comboCount >= 3 ? 1 : 0;
 
@@ -44,7 +45,16 @@ export default function SurgeAmbience({
         const sizeSeed = seededValue(tier * 100 + i * 7 + 4);
         const hueSeed = seededValue(tier * 100 + i * 7 + 5);
         let hue: number;
-        if (isMeasurement) {
+        if (isStarpath) {
+          // cyan → violet → magenta, with a gold sparkle at singularity
+          hue = tier >= 4
+            ? (hueSeed < 0.5 ? 265 : 45)
+            : tier >= 3
+            ? (hueSeed < 0.4 ? 290 : 265)
+            : tier >= 2
+            ? 265
+            : 190;
+        } else if (isMeasurement) {
           // brass at low/mid tiers, purple+brass mix at top tiers
           hue = tier >= 4
             ? (hueSeed < 0.5 ? 265 : 42)
@@ -68,7 +78,7 @@ export default function SurgeAmbience({
         };
       });
     },
-    [tier, isMeasurement]
+    [tier, isMeasurement, isStarpath]
   );
 
   if (tier === 0) return null;
@@ -92,14 +102,31 @@ export default function SurgeAmbience({
       ? "radial-gradient(ellipse at 50% 100%, rgba(167,139,250,0.28) 0%, transparent 65%), radial-gradient(ellipse at 50% 0%, rgba(200,160,48,0.22) 0%, transparent 60%), radial-gradient(ellipse at 0% 50%, rgba(167,139,250,0.16) 0%, transparent 50%), radial-gradient(ellipse at 100% 50%, rgba(200,160,48,0.16) 0%, transparent 50%)"
       : "radial-gradient(ellipse at 50% 100%, rgba(200,160,48,0.40) 0%, transparent 70%), radial-gradient(ellipse at 50% 0%, rgba(167,139,250,0.32) 0%, transparent 65%), radial-gradient(ellipse at 0% 50%, rgba(232,200,120,0.24) 0%, transparent 55%), radial-gradient(ellipse at 100% 50%, rgba(167,139,250,0.24) 0%, transparent 55%)";
 
-  const vignette = isMeasurement ? measureVignette : nexusVignette;
+  const starpathVignette =
+    tier === 1
+      ? "radial-gradient(ellipse at 50% 100%, rgba(103,232,249,0.10) 0%, transparent 55%), radial-gradient(ellipse at 50% 0%, rgba(103,232,249,0.06) 0%, transparent 50%)"
+      : tier === 2
+      ? "radial-gradient(ellipse at 50% 100%, rgba(167,139,250,0.22) 0%, transparent 60%), radial-gradient(ellipse at 50% 0%, rgba(103,232,249,0.14) 0%, transparent 55%), radial-gradient(ellipse at 0% 50%, rgba(167,139,250,0.10) 0%, transparent 45%), radial-gradient(ellipse at 100% 50%, rgba(167,139,250,0.10) 0%, transparent 45%)"
+      : tier === 3
+      ? "radial-gradient(ellipse at 50% 100%, rgba(232,121,249,0.28) 0%, transparent 65%), radial-gradient(ellipse at 50% 0%, rgba(167,139,250,0.22) 0%, transparent 60%), radial-gradient(ellipse at 0% 50%, rgba(232,121,249,0.16) 0%, transparent 50%), radial-gradient(ellipse at 100% 50%, rgba(167,139,250,0.16) 0%, transparent 50%)"
+      : "radial-gradient(ellipse at 50% 100%, rgba(167,139,250,0.42) 0%, transparent 70%), radial-gradient(ellipse at 50% 0%, rgba(103,232,249,0.30) 0%, transparent 65%), radial-gradient(ellipse at 0% 50%, rgba(196,181,253,0.26) 0%, transparent 55%), radial-gradient(ellipse at 100% 50%, rgba(214,166,74,0.20) 0%, transparent 55%)";
+
+  const vignette = isStarpath ? starpathVignette : isMeasurement ? measureVignette : nexusVignette;
   const pulseSpeed = tier === 1 ? "5s" : tier === 2 ? "3.5s" : tier === 3 ? "2.4s" : "1.6s";
 
-  const topBar = isMeasurement
+  const topBar = isStarpath
+    ? "linear-gradient(to bottom, rgba(167,139,250,0.34), transparent)"
+    : isMeasurement
     ? "linear-gradient(to bottom, rgba(200,160,48,0.32), transparent)"
     : "linear-gradient(to bottom, rgba(253,224,71,0.35), transparent)";
 
-  const bottomBar = isMeasurement
+  const bottomBar = isStarpath
+    ? tier >= 4
+      ? "linear-gradient(to top, rgba(167,139,250,0.5), rgba(103,232,249,0.22), transparent)"
+      : tier >= 3
+      ? "linear-gradient(to top, rgba(232,121,249,0.42), transparent)"
+      : "linear-gradient(to top, rgba(167,139,250,0.3), transparent)"
+    : isMeasurement
     ? tier >= 4
       ? "linear-gradient(to top, rgba(200,160,48,0.45), rgba(167,139,250,0.22), transparent)"
       : tier >= 3
@@ -111,7 +138,11 @@ export default function SurgeAmbience({
     ? "linear-gradient(to top, rgba(251,146,60,0.42), transparent)"
     : "linear-gradient(to top, rgba(253,200,40,0.32), transparent)";
 
-  const rays = isMeasurement
+  const rays = isStarpath
+    ? tier >= 4
+      ? "repeating-conic-gradient(from 0deg at 50% 110%, rgba(196,181,253,0.14) 0deg, transparent 6deg, transparent 12deg, rgba(103,232,249,0.14) 18deg)"
+      : "repeating-conic-gradient(from 0deg at 50% 110%, rgba(167,139,250,0.10) 0deg, transparent 6deg, transparent 12deg, rgba(167,139,250,0.10) 18deg)"
+    : isMeasurement
     ? tier >= 4
       ? "repeating-conic-gradient(from 0deg at 50% 110%, rgba(200,160,48,0.14) 0deg, transparent 6deg, transparent 12deg, rgba(167,139,250,0.14) 18deg)"
       : "repeating-conic-gradient(from 0deg at 50% 110%, rgba(200,160,48,0.10) 0deg, transparent 6deg, transparent 12deg, rgba(200,160,48,0.10) 18deg)"
@@ -119,13 +150,19 @@ export default function SurgeAmbience({
     ? "repeating-conic-gradient(from 0deg at 50% 110%, rgba(94,234,212,0.14) 0deg, transparent 6deg, transparent 12deg, rgba(45,212,191,0.14) 18deg)"
     : "repeating-conic-gradient(from 0deg at 50% 110%, rgba(253,224,71,0.10) 0deg, transparent 6deg, transparent 12deg, rgba(253,224,71,0.10) 18deg)";
 
-  const shimmerA = isMeasurement
+  const shimmerA = isStarpath
+    ? "linear-gradient(115deg, transparent 0%, rgba(196,181,253,0.26) 50%, transparent 100%)"
+    : isMeasurement
     ? "linear-gradient(115deg, transparent 0%, rgba(232,200,120,0.26) 50%, transparent 100%)"
     : "linear-gradient(115deg, transparent 0%, rgba(167,243,208,0.28) 50%, transparent 100%)";
-  const shimmerB = isMeasurement
+  const shimmerB = isStarpath
+    ? "linear-gradient(115deg, transparent 0%, rgba(103,232,249,0.2) 50%, transparent 100%)"
+    : isMeasurement
     ? "linear-gradient(115deg, transparent 0%, rgba(196,181,253,0.2) 50%, transparent 100%)"
     : "linear-gradient(115deg, transparent 0%, rgba(94,234,212,0.18) 50%, transparent 100%)";
-  const dataColumn = isMeasurement
+  const dataColumn = isStarpath
+    ? "linear-gradient(to bottom, transparent, rgba(103,232,249,0.7), rgba(167,139,250,0.4), transparent)"
+    : isMeasurement
     ? "linear-gradient(to bottom, transparent, rgba(200,160,48,0.7), rgba(167,139,250,0.4), transparent)"
     : "linear-gradient(to bottom, transparent, rgba(94,234,212,0.7), rgba(45,212,191,0.4), transparent)";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Hourglass, Cog, Timer, Scale, Ruler } from "lucide-react";
+import { Hourglass, Cog, Timer, Scale, Ruler, Star, Sparkles } from "lucide-react";
 
 /**
  * The top-tier 10-combo celebration.
@@ -98,11 +98,42 @@ const MEASURE_THEME: RealmTheme = {
   particleSplit: 0.5,
 };
 
+const STARPATH_THEME: RealmTheme = {
+  flashBg: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.6) 0%, rgba(167,139,250,0.35) 38%, rgba(5,8,28,0) 74%)",
+  gridColor: "rgba(196,181,253,0.16)",
+  scanColor: "rgba(103,232,249,0.45)",
+  ringInner: "rgba(255,255,255,0.92)",
+  ringOuter: "rgba(196,181,253,0.6)",
+  ringShadow: "0 0 54px rgba(196,181,253,0.7), inset 0 0 26px rgba(255,255,255,0.4)",
+  cornerConic:
+    "conic-gradient(from 45deg, rgba(196,181,253,0.0), rgba(214,166,74,0.7) 15%, rgba(196,181,253,0.5) 30%, rgba(103,232,249,0.3) 45%, rgba(196,181,253,0.0) 60%)",
+  titleGradient: "linear-gradient(180deg, #ffffff 0%, #e9d5ff 42%, #7c3aed 100%)",
+  titleFilter: "drop-shadow(0 0 26px rgba(233,213,255,0.98)) drop-shadow(0 0 52px rgba(124,58,237,0.7))",
+  title: "SINGULARITY",
+  engaged: "ACHIEVED",
+  engagedColor: "rgba(233,213,255,0.98)",
+  engagedShadow: "0 0 18px rgba(196,181,253,0.9), 0 0 36px rgba(103,232,249,0.6)",
+  dividerGradient: "linear-gradient(90deg, transparent, rgba(233,213,255,0.9), rgba(214,166,74,0.7), transparent)",
+  dividerShadow: "0 0 12px rgba(196,181,253,0.7)",
+  copy: "Your star chain collapses into a singularity!",
+  copyColor: "rgba(221,214,254,0.92)",
+  copyShadow: "0 0 10px rgba(124,58,237,0.8)",
+  bottomText: "10 correct in a row — cosmic mastery",
+  bottomColor: "rgba(196,181,253,0.9)",
+  bottomShadow: "0 0 12px rgba(124,58,237,0.8)",
+  particleHues: [265, 45], // violet + gold
+  particleSplit: 0.6,
+};
+
 const MEASURE_GLYPHS = [Hourglass, Cog, Timer, Scale, Ruler];
+const STARPATH_GLYPHS = [Star, Sparkles];
 
 export default function NexusActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
-  const t = isMeasurement ? MEASURE_THEME : NEXUS_THEME;
+  const isStarpath = realmId === "space";
+  const t = isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : NEXUS_THEME;
+  const glyphSet = isMeasurement ? MEASURE_GLYPHS : STARPATH_GLYPHS;
+  const glyphColorRgb = isStarpath ? "196,181,253" : "200,160,48";
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);
@@ -135,15 +166,15 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
   }, [active, t.particleHues, t.particleSplit]);
 
   const glyphs = useMemo(() => {
-    if (!active || !isMeasurement) return [];
+    if (!active || (!isMeasurement && !isStarpath)) return [];
     return Array.from({ length: 14 }, (_, i) => {
       const left = 5 + seeded(active.id * 61 + i) * 90;
       const delay = seeded(active.id * 67 + i) * 0.7;
       const size = 24 + seeded(active.id * 71 + i) * 32;
       const rot = (seeded(active.id * 73 + i) - 0.5) * 50;
-      return { id: i, Icon: MEASURE_GLYPHS[i % MEASURE_GLYPHS.length], left, delay, size, rot };
+      return { id: i, Icon: glyphSet[i % glyphSet.length], left, delay, size, rot };
     });
-  }, [active, isMeasurement]);
+  }, [active, isMeasurement, isStarpath, glyphSet]);
 
   if (!active) return null;
 
@@ -308,14 +339,14 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
               {
                 left: `${g.left}%`,
                 lineHeight: 1,
-                filter: "drop-shadow(0 0 12px rgba(200,160,48,0.7))",
+                filter: `drop-shadow(0 0 12px rgba(${glyphColorRgb},0.7))`,
                 "--rot": `${g.rot}deg`,
                 animation: `nexusGlyph 2.5s ease-out ${g.delay.toFixed(2)}s forwards`,
                 opacity: 0,
               } as React.CSSProperties
             }
           >
-            <G style={{ width: g.size, height: g.size, color: "rgb(200,160,48)" }} />
+            <G style={{ width: g.size, height: g.size, color: `rgb(${glyphColorRgb})` }} />
           </span>
         );
       })}

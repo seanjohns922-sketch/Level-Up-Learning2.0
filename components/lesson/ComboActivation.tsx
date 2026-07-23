@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
-import { Hourglass, Cog, Timer, Scale, Ruler } from "lucide-react";
+import { Hourglass, Cog, Timer, Scale, Ruler, Star, Sparkles, Orbit } from "lucide-react";
 
 type GlyphIcon = ComponentType<{ className?: string; style?: React.CSSProperties }>;
 
@@ -116,11 +116,71 @@ const MEASURE_TIERS: TierConfig[] = [
   },
 ];
 
+// Starpath — cosmic "supernova" ladder: STARDUST (3) / SUPERNOVA (5) / PULSAR (8).
+// (The 10-combo SINGULARITY finale lives in NexusActivation.)
+const STARPATH_TIERS: TierConfig[] = [
+  {
+    threshold: 3,
+    title: "STARDUST",
+    engaged: "IGNITED",
+    subtitle: "3 in a row — your star begins to glow!",
+    hues: [190, 205], // cyan
+    flashColor: "rgba(103,232,249,0.5)",
+    ringColor: "rgba(103,232,249,0.85)",
+    ringCount: 2,
+    particleCount: 22,
+    duration: 1.5,
+    cornerSize: 100,
+    titleGradient: "linear-gradient(180deg, #ecfeff 0%, #67e8f9 48%, #0891b2 100%)",
+    titleFilter: "drop-shadow(0 0 18px rgba(103,232,249,0.95)) drop-shadow(0 0 40px rgba(8,145,178,0.7))",
+    accentColor: "rgba(165,243,252,0.95)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(103,232,249,0.9), rgba(8,145,178,0.7), transparent)",
+    glyphs: [Star, Sparkles],
+  },
+  {
+    threshold: 5,
+    title: "SUPERNOVA",
+    engaged: "ERUPTED",
+    subtitle: "5 in a row — your star goes supernova!",
+    hues: [255, 190], // violet + cyan
+    flashColor: "rgba(167,139,250,0.55)",
+    ringColor: "rgba(196,181,253,0.9)",
+    ringCount: 3,
+    particleCount: 32,
+    duration: 1.9,
+    cornerSize: 130,
+    titleGradient: "linear-gradient(180deg, #ffffff 0%, #c4b5fd 45%, #7c3aed 100%)",
+    titleFilter: "drop-shadow(0 0 22px rgba(196,181,253,0.98)) drop-shadow(0 0 46px rgba(124,58,237,0.75))",
+    accentColor: "rgba(221,214,254,0.97)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(196,181,253,0.9), rgba(103,232,249,0.6), transparent)",
+    glyphs: [Star, Sparkles],
+  },
+  {
+    threshold: 8,
+    title: "PULSAR",
+    engaged: "SURGING",
+    subtitle: "8 in a row — cosmic energy is surging!",
+    hues: [290, 260], // magenta + violet
+    flashColor: "rgba(232,121,249,0.55)",
+    ringColor: "rgba(240,171,252,0.9)",
+    ringCount: 4,
+    particleCount: 40,
+    duration: 2.2,
+    cornerSize: 150,
+    titleGradient: "linear-gradient(180deg, #fdf4ff 0%, #e879f9 46%, #a21caf 100%)",
+    titleFilter: "drop-shadow(0 0 24px rgba(232,121,249,0.98)) drop-shadow(0 0 48px rgba(162,28,175,0.75))",
+    accentColor: "rgba(245,208,254,0.97)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(240,171,252,0.9), rgba(167,139,250,0.6), transparent)",
+    glyphs: [Star, Sparkles, Orbit],
+  },
+];
+
 type ActivationKey = { id: number; tier: TierConfig };
 
 export default function ComboActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
-  const tiers = isMeasurement ? MEASURE_TIERS : NEXUS_TIERS;
+  const isStarpath = realmId === "space";
+  const tiers = isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : NEXUS_TIERS;
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);
