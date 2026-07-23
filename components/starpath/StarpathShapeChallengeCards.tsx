@@ -4,12 +4,14 @@ import { useMemo, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { ShapeVisual, TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
+import { ShapeVisual, TaskHeading, SceneObjectVisual } from "@/components/starpath/StarpathShapeTaskCard";
+import { SHAPE_OBJECTS, type ShapeObjectId } from "@/data/activities/starpath/ground/shape-objects";
 
 type FoundationShape = "circle" | "triangle" | "square" | "rectangle";
 type ShapeTapAllTask = Extract<PracticeTask, { kind: "starpathShapeTapAll" }>;
 type OddOneOutTask = Extract<PracticeTask, { kind: "starpathOddOneOut" }>;
 type CollectMissionTask = Extract<PracticeTask, { kind: "starpathCollectMission" }>;
+type ObjectShapeTask = Extract<PracticeTask, { kind: "starpathObjectShape" }>;
 
 const SHAPE_ICON_COLOUR: Record<FoundationShape, string> = {
   circle: "#67e8f9",
@@ -131,6 +133,43 @@ export function StarpathOddOneOutCard({
           >
             <OptionReadAloudButton text={option.shape} className="absolute right-3 top-3" />
             <ShapeVisual shape={option.shape} colour={option.colour} className="h-24 w-24" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// A1 (Lesson 2) — Space Object Match: one cosmic object, which shape is it?
+export function StarpathObjectShapeCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: ObjectShapeTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const objectId = task.objectId as ShapeObjectId;
+  return (
+    <div>
+      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <div className="mx-auto mb-5 flex w-full max-w-xs flex-col items-center rounded-2xl border-2 border-violet-200 bg-gradient-to-b from-indigo-950 via-violet-900 to-slate-950 p-4 text-white shadow-inner">
+        <span className="text-xs font-black uppercase tracking-[0.16em] text-cyan-200">Space object</span>
+        <SceneObjectVisual objectId={objectId} />
+        <span className="mt-1 text-base font-black">{SHAPE_OBJECTS[objectId].label}</span>
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {task.options.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            aria-label={option.shape}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="relative flex min-h-36 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+          >
+            <OptionReadAloudButton text={option.shape} className="absolute right-2 top-2" />
+            <ShapeVisual shape={option.shape} colour={option.colour} className="h-20 w-20 sm:h-24 sm:w-24" />
           </button>
         ))}
       </div>

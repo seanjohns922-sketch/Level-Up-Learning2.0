@@ -128,6 +128,7 @@ export function createShapeMastersTaskSet(): RealmLessonTaskSet {
       return {
         kind: "starpathShapeIntro",
         scene: "intro",
+        variant: "clues",
         prompt: "Good explorers look carefully.",
         speakText:
           "Good explorers look carefully. Don't rush. Look at the sides. Look at whether it is round. Every shape has clues.",

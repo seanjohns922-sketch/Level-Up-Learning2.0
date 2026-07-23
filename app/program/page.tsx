@@ -1241,7 +1241,10 @@ function ProgramPage() {
               const postTestReady = isPostTest && !locked;
               const isLast = idx === items.length - 1;
               return (
-                <div key={`${item.type}-${item.n}`} className="relative flex min-w-0">
+                <div
+                  key={`${item.type}-${item.n}`}
+                  className={isStarpathRealm ? "relative flex min-w-0" : "relative flex"}
+                >
                   {/* Bezel / border frame */}
                   <div
                     className="absolute -inset-[2px] pointer-events-none"
@@ -1269,10 +1272,9 @@ function ProgramPage() {
                       }
                     }}
                     className={[
-                      "relative w-full text-left transition-all flex flex-col group overflow-hidden",
                       isStarpathRealm
-                        ? "min-h-[190px] gap-2.5 rounded-[8px] p-4"
-                        : `min-h-[246px] gap-3 p-5 ${rt.rounded ? "rounded-3xl" : ""}`,
+                        ? "relative min-h-[190px] w-full rounded-[8px] p-4 text-left transition-all flex flex-col gap-2.5 group overflow-hidden"
+                        : `relative w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden ${rt.rounded ? "rounded-3xl" : ""}`,
                       locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1 cursor-pointer",
                     ].join(" ")}
                     style={{

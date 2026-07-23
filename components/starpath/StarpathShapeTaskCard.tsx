@@ -5,6 +5,7 @@ import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { SHAPE_FACTS, type FoundationShape } from "@/data/activities/starpath/ground/week1Lesson1";
+import { SHAPE_OBJECTS, type ShapeObjectId } from "@/data/activities/starpath/ground/shape-objects";
 
 type ShapeIntroTask = Extract<PracticeTask, { kind: "starpathShapeIntro" }>;
 type ShapeMatchTask = Extract<PracticeTask, { kind: "starpathShapeMatch" }>;
@@ -58,6 +59,23 @@ export function TaskHeading({ prompt, speech }: { prompt: string; speech: string
   );
 }
 
+const SHAPE_TEACH_COLOUR = ["#67e8f9", "#fde047", "#86efac", "#f9a8d4"] as const;
+
+// L2 teaching — shapes live inside familiar space objects.
+const TEACH_OBJECT_PAIRS: Array<{ objectId: ShapeObjectId; shape: FoundationShape }> = [
+  { objectId: "planet", shape: "circle" },
+  { objectId: "rocket", shape: "triangle" },
+  { objectId: "window", shape: "square" },
+  { objectId: "door", shape: "rectangle" },
+];
+
+// L3 teaching — the clues that tell shapes apart.
+const TEACH_CLUES: Array<{ title: string; shape: FoundationShape; colour: string; tip: string }> = [
+  { title: "Round", shape: "circle", colour: "#67e8f9", tip: "A circle is round with no corners." },
+  { title: "3 straight sides", shape: "triangle", colour: "#fde047", tip: "A triangle has 3 straight sides." },
+  { title: "4 straight sides", shape: "square", colour: "#86efac", tip: "Squares and rectangles have 4 straight sides." },
+];
+
 export function StarpathShapeIntroCard({
   task,
   onContinue,
@@ -65,19 +83,57 @@ export function StarpathShapeIntroCard({
   task: ShapeIntroTask;
   onContinue: () => void;
 }) {
+  const variant = task.variant ?? "shapes";
+  const heading =
+    task.heading ??
+    (variant === "objects" ? "Shapes are everywhere" : variant === "clues" ? "Look for the clues" : "Meet the cosmic shapes");
+
   return (
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-5 sm:p-7">
-      <TaskHeading prompt="Meet the cosmic shapes" speech={task.speakText} />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {SHAPES.map((shape, index) => (
-          <div key={shape} className="relative flex min-h-44 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">
-            <OptionReadAloudButton text={`${shape}. ${SHAPE_FACTS[shape]}`} className="absolute right-2 top-2" />
-            <ShapeVisual shape={shape} colour={["#67e8f9", "#fde047", "#86efac", "#f9a8d4"][index]!} className="h-20 w-20 sm:h-24 sm:w-24" />
-            <div className="mt-1 text-lg font-black capitalize text-indigo-950">{shape}</div>
-            <div className="mt-1 text-xs font-semibold leading-5 text-slate-600">{SHAPE_FACTS[shape]}</div>
-          </div>
-        ))}
-      </div>
+      <TaskHeading prompt={heading} speech={task.speakText} />
+
+      {variant === "objects" ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {TEACH_OBJECT_PAIRS.map(({ objectId, shape }) => (
+            <div key={objectId} className="relative flex min-h-48 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">
+              <OptionReadAloudButton text={SHAPE_OBJECTS[objectId].part} className="absolute right-2 top-2" />
+              <SceneObjectVisual objectId={objectId} />
+              <div className="mt-1 flex items-center gap-1.5 text-sm font-black text-indigo-950">
+                <span>{SHAPE_OBJECTS[objectId].label}</span>
+                <span className="text-cyan-600">=</span>
+                <ShapeVisual shape={shape} colour={SHAPE_TEACH_COLOUR[["circle", "triangle", "square", "rectangle"].indexOf(shape)]!} className="h-6 w-6" />
+                <span className="capitalize">{shape}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : variant === "clues" ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {TEACH_CLUES.map((clue) => (
+            <div key={clue.title} className="relative flex min-h-48 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">
+              <OptionReadAloudButton text={`${clue.title}. ${clue.tip}`} className="absolute right-2 top-2" />
+              <div className="flex items-end gap-1">
+                <ShapeVisual shape={clue.shape} colour={clue.colour} className="h-16 w-16 sm:h-20 sm:w-20" />
+                {clue.shape === "square" ? <ShapeVisual shape="rectangle" colour="#f9a8d4" className="h-12 w-16" /> : null}
+              </div>
+              <div className="mt-1 text-base font-black text-indigo-950">{clue.title}</div>
+              <div className="mt-1 text-xs font-semibold leading-5 text-slate-600">{clue.tip}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {SHAPES.map((shape, index) => (
+            <div key={shape} className="relative flex min-h-44 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">
+              <OptionReadAloudButton text={`${shape}. ${SHAPE_FACTS[shape]}`} className="absolute right-2 top-2" />
+              <ShapeVisual shape={shape} colour={SHAPE_TEACH_COLOUR[index]!} className="h-20 w-20 sm:h-24 sm:w-24" />
+              <div className="mt-1 text-lg font-black capitalize text-indigo-950">{shape}</div>
+              <div className="mt-1 text-xs font-semibold leading-5 text-slate-600">{SHAPE_FACTS[shape]}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <button
         type="button"
         onClick={onContinue}
@@ -191,14 +247,9 @@ export function StarpathShapeSortCard({
   );
 }
 
-const SCENE_OBJECTS = [
-  { id: "planet", label: "Planet" },
-  { id: "flag", label: "Flag" },
-  { id: "window", label: "Window" },
-  { id: "door", label: "Door" },
-] as const;
+const DEFAULT_SCENE_OBJECTS: ShapeObjectId[] = ["planet", "flag", "window", "door"];
 
-function SceneObjectVisual({ objectId }: { objectId: (typeof SCENE_OBJECTS)[number]["id"] }) {
+export function SceneObjectVisual({ objectId }: { objectId: ShapeObjectId }) {
   return (
     <svg viewBox="0 0 120 120" className="h-24 w-24" aria-hidden="true">
       {objectId === "planet" ? (
@@ -206,6 +257,24 @@ function SceneObjectVisual({ objectId }: { objectId: (typeof SCENE_OBJECTS)[numb
           <ellipse cx="60" cy="65" rx="54" ry="15" fill="none" stroke="#fde68a" strokeWidth="8" transform="rotate(-12 60 65)" />
           <circle cx="60" cy="58" r="31" fill="#67e8f9" stroke="#312e81" strokeWidth="5" />
           <path d="M42 42c8 8 13 6 20 2 7-4 15 1 19 8" fill="none" stroke="#0891b2" strokeWidth="6" strokeLinecap="round" />
+        </>
+      ) : null}
+      {objectId === "moon" ? (
+        <>
+          <circle cx="60" cy="60" r="36" fill="#c4b5fd" stroke="#312e81" strokeWidth="5" />
+          <circle cx="48" cy="50" r="7" fill="#a78bfa" />
+          <circle cx="72" cy="68" r="9" fill="#a78bfa" />
+          <circle cx="66" cy="44" r="5" fill="#a78bfa" />
+          <path d="M96 30l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#fde047" />
+        </>
+      ) : null}
+      {objectId === "rocket" ? (
+        <>
+          <path d="M60 12 80 48H40Z" fill="#fde047" stroke="#312e81" strokeWidth="5" strokeLinejoin="round" />
+          <rect x="44" y="46" width="32" height="46" rx="7" fill="#67e8f9" stroke="#312e81" strokeWidth="5" />
+          <circle cx="60" cy="64" r="8" fill="#fff" stroke="#312e81" strokeWidth="4" />
+          <path d="M44 74 30 92h14zM76 74 90 92H76z" fill="#f9a8d4" stroke="#312e81" strokeWidth="4" strokeLinejoin="round" />
+          <path d="M54 92h12l-6 14z" fill="#fb923c" />
         </>
       ) : null}
       {objectId === "flag" ? (
@@ -222,12 +291,27 @@ function SceneObjectVisual({ objectId }: { objectId: (typeof SCENE_OBJECTS)[numb
           <circle cx="39" cy="39" r="4" fill="#fff" opacity="0.8" />
         </>
       ) : null}
+      {objectId === "crate" ? (
+        <>
+          <rect x="22" y="22" width="76" height="76" rx="5" fill="#86efac" stroke="#312e81" strokeWidth="6" />
+          <path d="M22 22 98 98M98 22 22 98" stroke="#0e7490" strokeWidth="5" />
+          <rect x="22" y="22" width="76" height="76" rx="5" fill="none" stroke="#0e7490" strokeWidth="4" />
+        </>
+      ) : null}
       {objectId === "door" ? (
         <>
           <path d="M25 105V17h70v88" fill="#f9a8d4" stroke="#312e81" strokeWidth="6" strokeLinejoin="round" />
           <path d="M38 105V31h44v74" fill="#7c3aed" stroke="#312e81" strokeWidth="5" />
           <circle cx="72" cy="69" r="5" fill="#fde047" />
           <path d="M15 105h90" stroke="#67e8f9" strokeWidth="7" strokeLinecap="round" />
+        </>
+      ) : null}
+      {objectId === "bridge" ? (
+        <>
+          <path d="M14 44q46 -24 92 0" fill="none" stroke="#c4b5fd" strokeWidth="5" strokeLinecap="round" />
+          <path d="M32 50V72M60 40V72M88 50V72" stroke="#c4b5fd" strokeWidth="4" />
+          <rect x="12" y="62" width="96" height="20" rx="3" fill="#f9a8d4" stroke="#312e81" strokeWidth="5" />
+          <path d="M22 82v18M98 82v18" stroke="#312e81" strokeWidth="6" strokeLinecap="round" />
         </>
       ) : null}
     </svg>
@@ -243,24 +327,28 @@ export function StarpathShapeSceneCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  const objectIds = (task.objects && task.objects.length ? task.objects : DEFAULT_SCENE_OBJECTS) as ShapeObjectId[];
   return (
     <div>
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
       <div className="relative overflow-hidden rounded-2xl border-2 border-violet-200 bg-gradient-to-b from-indigo-950 via-violet-900 to-slate-950 p-5 shadow-inner">
         <div className="pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
         <div className="relative grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {SCENE_OBJECTS.map((object) => (
-            <button
-              key={object.id}
-              type="button"
-              onClick={() => object.id === task.correctObjectId ? onCorrect() : onWrong()}
-              className="relative flex min-h-44 flex-col items-center justify-center rounded-2xl border-2 border-white/30 bg-white/10 p-3 text-white backdrop-blur-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:bg-white/20 active:scale-[0.98]"
-            >
-              <OptionReadAloudButton text={object.label} className="absolute right-2 top-2 bg-white" />
-              <SceneObjectVisual objectId={object.id} />
-              <span className="mt-2 text-sm font-black">{object.label}</span>
-            </button>
-          ))}
+          {objectIds.map((objectId) => {
+            const label = SHAPE_OBJECTS[objectId].label;
+            return (
+              <button
+                key={objectId}
+                type="button"
+                onClick={() => (objectId === task.correctObjectId ? onCorrect() : onWrong())}
+                className="relative flex min-h-44 flex-col items-center justify-center rounded-2xl border-2 border-white/30 bg-white/10 p-3 text-white backdrop-blur-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:bg-white/20 active:scale-[0.98]"
+              >
+                <OptionReadAloudButton text={label} className="absolute right-2 top-2 bg-white" />
+                <SceneObjectVisual objectId={objectId} />
+                <span className="mt-2 text-sm font-black">{label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

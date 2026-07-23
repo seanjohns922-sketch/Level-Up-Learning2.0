@@ -2263,6 +2263,9 @@ export type PracticeTask = (
       prompt: string;
       speakText: string;
       target: number;
+      /** Which teaching layout to render. Defaults to "shapes". */
+      variant?: "shapes" | "objects" | "clues";
+      heading?: string;
     }
   | {
       kind: "starpathShapeMatch";
@@ -2295,7 +2298,24 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       targetShape: "circle" | "triangle" | "square" | "rectangle";
-      correctObjectId: "planet" | "flag" | "window" | "door";
+      correctObjectId: string;
+      /** The 4 objects to show. Defaults to planet/flag/window/door when omitted. */
+      objects?: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathObjectShape";
+      prompt: string;
+      speakText: string;
+      target: number;
+      objectId: string;
+      targetShape: "circle" | "triangle" | "square" | "rectangle";
+      options: Array<{
+        id: string;
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+      }>;
+      correctOptionId: string;
       feedback: { correct: string; wrong: string };
     }
   | {
