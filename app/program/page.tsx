@@ -103,7 +103,6 @@ function ProgramPage() {
   const isPrep = curriculumYear === "Prep";
   const lastWeek = Math.max(program.length, 1);
   const isMeasurementRealm = realmId === "measurement";
-  const activityCardVariant: "standard" | "portal-circle" = isStarpathRealm ? "portal-circle" : "standard";
 
   // ── Realm theme ── add a new entry here to support any future realm
   const rt = isStarpathRealm ? {
@@ -115,16 +114,16 @@ function ProgramPage() {
     statusClip: undefined as string | undefined,
     actionClip: undefined as string | undefined,
     connClip: undefined as string | undefined,
-    cardActiveBg: "radial-gradient(circle at 50% 18%, rgba(34,211,238,0.24), transparent 34%), linear-gradient(145deg, rgba(24,18,74,0.96), rgba(10,18,54,0.96) 58%, rgba(8,45,68,0.94))",
-    cardCompletedBg: "radial-gradient(circle at 50% 14%, rgba(165,243,252,0.26), transparent 34%), linear-gradient(145deg, #312e81, #155e75)",
+    cardActiveBg: "linear-gradient(145deg, rgba(30,27,75,0.97), rgba(12,20,55,0.97) 58%, rgba(8,47,73,0.95))",
+    cardCompletedBg: "linear-gradient(145deg, rgba(49,46,129,0.98), rgba(21,94,117,0.96))",
     cardLockedBg: "linear-gradient(145deg, rgba(15,23,42,0.88), rgba(30,27,75,0.82))",
-    bezelActiveBg: "linear-gradient(145deg, rgba(103,232,249,0.72), rgba(139,92,246,0.28) 48%, rgba(34,211,238,0.62))",
-    bezelCompletedBg: "linear-gradient(145deg, rgba(196,181,253,0.72), rgba(34,211,238,0.62))",
+    bezelActiveBg: "linear-gradient(145deg, rgba(103,232,249,0.58), rgba(139,92,246,0.26) 48%, rgba(34,211,238,0.52))",
+    bezelCompletedBg: "linear-gradient(145deg, rgba(196,181,253,0.6), rgba(34,211,238,0.52))",
     bezelLockedBg: "linear-gradient(145deg, rgba(148,163,184,0.24), rgba(76,29,149,0.18))",
     bezelPosttestBg: "linear-gradient(145deg, rgba(253,224,71,0.72), rgba(124,58,237,0.48))",
-    cardActiveShadow: "0 14px 42px rgba(3,7,30,0.62), 0 0 28px rgba(34,211,238,0.22), inset 0 1px 0 rgba(207,250,254,0.2)",
-    cardCompletedShadow: "0 14px 42px rgba(3,7,30,0.58), 0 0 34px rgba(139,92,246,0.28), inset 0 1px 0 rgba(207,250,254,0.28)",
-    cardLockedShadow: "0 8px 26px rgba(3,7,30,0.5)",
+    cardActiveShadow: "0 12px 30px rgba(3,7,30,0.55), 0 0 16px rgba(34,211,238,0.14), inset 0 1px 0 rgba(207,250,254,0.18)",
+    cardCompletedShadow: "0 12px 30px rgba(3,7,30,0.52), 0 0 18px rgba(139,92,246,0.18), inset 0 1px 0 rgba(207,250,254,0.24)",
+    cardLockedShadow: "0 8px 20px rgba(3,7,30,0.46)",
     badgeActiveBg: "linear-gradient(135deg, #4c1d95, #0891b2)",
     badgeCompletedBg: "linear-gradient(135deg, #6d28d9, #0e7490)",
     badgeLockedBg: "linear-gradient(135deg, #1e293b, #312e81)",
@@ -1243,13 +1242,13 @@ function ProgramPage() {
               const postTestReady = isPostTest && !locked;
               const isLast = idx === items.length - 1;
               return (
-                <div key={`${item.type}-${item.n}`} className="relative flex">
+                <div key={`${item.type}-${item.n}`} className="relative flex min-w-0">
                   {/* Bezel / border frame */}
                   <div
                     className="absolute -inset-[2px] pointer-events-none"
                     style={{
                       clipPath: rt.bezelClip,
-                      borderRadius: activityCardVariant === "portal-circle" ? 46 : rt.rounded ? 28 : undefined,
+                      borderRadius: isStarpathRealm ? 12 : rt.rounded ? 28 : undefined,
                       background: locked
                         ? rt.bezelLockedBg
                         : postTestReady
@@ -1271,8 +1270,8 @@ function ProgramPage() {
                       }
                     }}
                     className={[
-                      "relative w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden",
-                      activityCardVariant === "portal-circle" ? "rounded-[44px]" : rt.rounded ? "rounded-3xl" : "",
+                      "relative min-h-[246px] w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden",
+                      isStarpathRealm ? "rounded-[10px]" : rt.rounded ? "rounded-3xl" : "",
                       locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1 cursor-pointer",
                     ].join(" ")}
                     style={{
@@ -1335,7 +1334,7 @@ function ProgramPage() {
                         className="inline-flex items-center px-3 py-1 text-[11px] font-mono font-extrabold uppercase tracking-[0.18em]"
                         style={{
                           clipPath: rt.badgeClip,
-                          borderRadius: rt.rounded ? 999 : undefined,
+                          borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
                           background: locked
                             ? rt.badgeLockedBg
                             : postTestReady
@@ -1355,7 +1354,7 @@ function ProgramPage() {
                           className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] ${isMeasurementRealm ? "text-yellow-50" : "text-emerald-100"}`}
                           style={{
                             clipPath: rt.statusClip,
-                            borderRadius: rt.rounded ? 999 : undefined,
+                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
                             background: rt.statusCompletedBg,
                             boxShadow: isMeasurementRealm
                               ? "inset 0 1px 0 rgba(252,211,77,0.32), 0 0 10px rgba(109,40,217,0.18)"
@@ -1370,7 +1369,7 @@ function ProgramPage() {
                           className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-slate-400"
                           style={{
                             clipPath: rt.statusClip,
-                            borderRadius: rt.rounded ? 999 : undefined,
+                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
                             background: rt.statusLockedBg,
                           }}
                         >
@@ -1381,7 +1380,7 @@ function ProgramPage() {
                           className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-white"
                           style={{
                             clipPath: rt.statusClip,
-                            borderRadius: rt.rounded ? 999 : undefined,
+                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
                             background: postTestReady ? rt.statusPosttestBg : rt.statusActiveBg,
                             boxShadow: rt.statusShadow,
                           }}
@@ -1430,7 +1429,7 @@ function ProgramPage() {
                           className="text-[10px] font-mono font-extrabold tracking-[0.18em] px-4 py-1.5 text-white"
                           style={{
                             clipPath: rt.actionClip,
-                            borderRadius: rt.rounded ? 999 : undefined,
+                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
                             background: postTestReady
                               ? rt.actionPosttestBg
                               : completed
@@ -1452,7 +1451,7 @@ function ProgramPage() {
                         className="h-7 w-7 flex items-center justify-center"
                         style={{
                           clipPath: rt.connClip,
-                          borderRadius: rt.rounded ? "50%" : undefined,
+                          borderRadius: isStarpathRealm ? 7 : rt.rounded ? "50%" : undefined,
                           background: completed ? rt.connCompletedBg : rt.connActiveBg,
                           boxShadow: rt.connShadow,
                         }}
