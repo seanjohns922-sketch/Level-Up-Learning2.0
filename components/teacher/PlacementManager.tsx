@@ -181,7 +181,8 @@ export default function PlacementManager({
   }
 
   async function savePlacements() {
-    if (!realmId || pendingCount === 0) return;
+    const selectedClassId = selectedClass?.id;
+    if (!realmId || !selectedClassId || pendingCount === 0) return;
     const edits = Object.entries(pending);
     setSaving(true);
     setSaveMessage(null);
@@ -204,6 +205,23 @@ export default function PlacementManager({
         return saved?.assigned_start_level !== edit.level || saved.assigned_entry_mode !== edit.entry;
       });
       if (unconfirmed) throw new Error("Saved placements could not be verified");
+
+      const confirmedProgress = await fetchRealmCompatProgressForClass(
+        realmId,
+        selectedClassId,
+        edits.map(([studentId]) => studentId),
+      );
+      const studentsWithCanonicalProgress = new Set(
+        confirmedProgress
+          .filter((row) => row.realm_id === realmId)
+          .map((row) => row.student_id),
+      );
+      const missingCanonicalProgress = edits.some(
+        ([studentId]) => !studentsWithCanonicalProgress.has(studentId),
+      );
+      if (missingCanonicalProgress) {
+        throw new Error("Saved placements are missing canonical progress");
+      }
 
       await load();
       setPending({});
