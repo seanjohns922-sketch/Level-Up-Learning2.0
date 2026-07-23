@@ -46,6 +46,7 @@ export default async function StarpathQuizPage({
           week,
           title: `${weekPlan.title} Voyage Quiz`,
           coverage: weekPlan.quiz.coverage,
+          lessonTitles: weekPlan.lessons.map((lesson) => lesson.title) as [string, string, string],
           weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
         }}
         tasks={quizTasks}
