@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock } from "lucide-react";
+import { Lock, Play } from "lucide-react";
 import { readProgress } from "@/data/progress";
 import { computeFogProgress } from "@/lib/fog-progress";
 import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
@@ -732,35 +732,53 @@ export default function NumberNexusMap() {
           <button
             onClick={launchGuidedAdventure}
             disabled={launching}
+            className="realm-cta"
             style={{
               position: "relative",
+              overflow: "hidden",
               pointerEvents: "auto",
               cursor: launching ? "default" : "pointer",
-              padding: "22px 56px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 16,
+              padding: "16px 40px 16px 22px",
               borderRadius: 999,
-              border: "2px solid rgba(94,234,212,0.85)",
+              border: "1px solid rgba(94,234,212,0.5)",
               background: "linear-gradient(180deg, #14b8a6 0%, #0d9488 55%, #0f766e 100%)",
               color: "#ffffff",
-              fontSize: 20,
+              fontSize: 19,
               fontWeight: 900,
-              letterSpacing: "0.22em",
+              letterSpacing: "0.18em",
               fontFamily: "ui-monospace, monospace",
-              textShadow: "0 2px 8px rgba(0,0,0,0.55)",
+              textShadow: "0 1px 3px rgba(0,0,0,0.45)",
               boxShadow: [
-                "0 0 0 4px rgba(20,184,166,0.18)",
-                "0 0 38px rgba(20,184,166,0.65)",
-                "0 0 90px rgba(20,184,166,0.45)",
-                "0 14px 32px rgba(0,0,0,0.55)",
-                "inset 0 2px 0 rgba(255,255,255,0.35)",
-                "inset 0 -4px 0 rgba(0,0,0,0.25)",
+                "0 12px 30px rgba(20,184,166,0.30)",
+                "0 8px 18px rgba(0,0,0,0.5)",
+                "inset 0 1px 0 rgba(255,255,255,0.4)",
+                "inset 0 -3px 10px rgba(0,0,0,0.3)",
               ].join(", "),
-              transform: launching ? "scale(1.08)" : "scale(1)",
-              transition: "transform 0.25s ease",
-              animation: "guided-pulse 2.4s ease-in-out infinite",
+              transform: launching ? "scale(1.06)" : undefined,
               whiteSpace: "nowrap",
             }}
           >
-            ▶  {highestDone === 0 ? "START ADVENTURE" : "CONTINUE ADVENTURE"}
+            <span
+              aria-hidden="true"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 40,
+                height: 40,
+                borderRadius: 999,
+                flexShrink: 0,
+                background: "rgba(255,255,255,0.16)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.32)",
+              }}
+            >
+              <Play size={17} fill="currentColor" style={{ marginLeft: 2 }} />
+            </span>
+            <span>{highestDone === 0 ? "START ADVENTURE" : "CONTINUE ADVENTURE"}</span>
           </button>
 
           <div style={{
@@ -838,25 +856,28 @@ export default function NumberNexusMap() {
           0%, 100% { transform: scale(1);   opacity: 0.85; }
           50%       { transform: scale(1.6); opacity: 1;   }
         }
-        @keyframes guided-pulse {
-          0%, 100% {
-            box-shadow:
-              0 0 0 4px rgba(20,184,166,0.18),
-              0 0 38px rgba(20,184,166,0.55),
-              0 0 90px rgba(20,184,166,0.40),
-              0 14px 32px rgba(0,0,0,0.55),
-              inset 0 2px 0 rgba(255,255,255,0.35),
-              inset 0 -4px 0 rgba(0,0,0,0.25);
-          }
-          50% {
-            box-shadow:
-              0 0 0 6px rgba(94,234,212,0.30),
-              0 0 60px rgba(94,234,212,0.85),
-              0 0 130px rgba(20,184,166,0.65),
-              0 14px 32px rgba(0,0,0,0.55),
-              inset 0 2px 0 rgba(255,255,255,0.45),
-              inset 0 -4px 0 rgba(0,0,0,0.25);
-          }
+        .realm-cta { transition: transform 160ms ease, filter 160ms ease, box-shadow 220ms ease; }
+        .realm-cta:hover { transform: translateY(-2px); filter: brightness(1.06); }
+        .realm-cta:active { transform: translateY(1px) scale(0.99); }
+        .realm-cta::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -75%;
+          width: 45%;
+          height: 100%;
+          pointer-events: none;
+          background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.30) 50%, transparent 100%);
+          transform: skewX(-18deg);
+          animation: realm-cta-sheen 6s ease-in-out infinite;
+        }
+        @keyframes realm-cta-sheen {
+          0%, 80%, 100% { left: -75%; }
+          90% { left: 140%; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .realm-cta::after { display: none; }
+          .realm-cta:hover { transform: none; }
         }
       `}</style>
     </div>

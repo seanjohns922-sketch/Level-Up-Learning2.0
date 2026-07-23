@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock } from "lucide-react";
+import { Lock, Play } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import { computeFogProgress } from "@/lib/fog-progress";
 import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
@@ -745,39 +745,57 @@ export default function RealmDashboardShell({
           </>
         ) : (
           <>
-            {/* Main adventure button — warm gold, round, magical */}
+            {/* Main adventure button — refined, realm-coloured, no idle pulse */}
             <button
               onClick={launchGuidedAdventure}
               disabled={launching}
+              className="realm-cta"
               style={{
                 position: "relative",
+                overflow: "hidden",
                 pointerEvents: "auto",
                 cursor: launching ? "default" : "pointer",
-                padding: "22px 60px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 16,
+                padding: "16px 40px 16px 22px",
                 borderRadius: 999,
-                border: "2px solid rgba(var(--realm-pulse-rgb),0.65)",
+                border: "1px solid rgba(var(--realm-pulse-rgb),0.55)",
                 background: config.theme.actionBackground,
                 color: config.theme.actionText,
-                fontSize: 20,
+                fontSize: 19,
                 fontWeight: 900,
-                letterSpacing: "0.2em",
+                letterSpacing: "0.18em",
                 fontFamily: "ui-monospace, monospace",
-                textShadow: "0 1px 4px rgba(0,0,0,0.5)",
+                textShadow: "0 1px 3px rgba(0,0,0,0.45)",
                 boxShadow: [
-                  "0 0 0 4px rgba(var(--realm-pulse-rgb),0.18)",
-                  "0 0 40px rgba(var(--realm-pulse-rgb),0.42)",
-                  "0 0 90px rgba(var(--realm-secondary-rgb),0.18)",
-                  "0 14px 32px rgba(0,0,0,0.55)",
-                  "inset 0 2px 0 rgba(var(--realm-pulse-rgb),0.3)",
-                  "inset 0 -4px 0 rgba(0,0,0,0.3)",
+                  "0 12px 30px rgba(var(--realm-pulse-rgb),0.28)",
+                  "0 8px 18px rgba(0,0,0,0.45)",
+                  "inset 0 1px 0 rgba(255,255,255,0.38)",
+                  "inset 0 -3px 10px rgba(0,0,0,0.3)",
                 ].join(", "),
-                transform: launching ? "scale(1.08)" : "scale(1)",
-                transition: "transform 0.25s ease",
-                animation: "realm-guided-pulse 2.4s ease-in-out infinite",
+                transform: launching ? "scale(1.06)" : undefined,
                 whiteSpace: "nowrap",
               }}
             >
-              ✦ {highestDone === 0 ? config.labels.start : config.labels.continue}
+              <span
+                aria-hidden="true"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 40,
+                  height: 40,
+                  borderRadius: 999,
+                  flexShrink: 0,
+                  background: "rgba(255,255,255,0.16)",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.32)",
+                }}
+              >
+                <Play size={17} fill="currentColor" style={{ marginLeft: 2 }} />
+              </span>
+              <span>{highestDone === 0 ? config.labels.start : config.labels.continue}</span>
             </button>
 
             <div
@@ -833,25 +851,28 @@ export default function RealmDashboardShell({
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-7px); }
         }
-        @keyframes realm-guided-pulse {
-          0%, 100% {
-            box-shadow:
-              0 0 0 4px rgba(var(--realm-pulse-rgb),0.18),
-              0 0 38px rgba(var(--realm-pulse-rgb),0.42),
-              0 0 90px rgba(var(--realm-secondary-rgb),0.18),
-              0 14px 32px rgba(0,0,0,0.55),
-              inset 0 2px 0 rgba(var(--realm-pulse-rgb),0.3),
-              inset 0 -4px 0 rgba(0,0,0,0.3);
-          }
-          50% {
-            box-shadow:
-              0 0 0 6px rgba(var(--realm-pulse-rgb),0.28),
-              0 0 58px rgba(var(--realm-pulse-rgb),0.6),
-              0 0 120px rgba(var(--realm-secondary-rgb),0.28),
-              0 14px 32px rgba(0,0,0,0.55),
-              inset 0 2px 0 rgba(var(--realm-pulse-rgb),0.38),
-              inset 0 -4px 0 rgba(0,0,0,0.3);
-          }
+        .realm-cta { transition: transform 160ms ease, filter 160ms ease, box-shadow 220ms ease; }
+        .realm-cta:hover { transform: translateY(-2px); filter: brightness(1.06); }
+        .realm-cta:active { transform: translateY(1px) scale(0.99); }
+        .realm-cta::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -75%;
+          width: 45%;
+          height: 100%;
+          pointer-events: none;
+          background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.30) 50%, transparent 100%);
+          transform: skewX(-18deg);
+          animation: realm-cta-sheen 6s ease-in-out infinite;
+        }
+        @keyframes realm-cta-sheen {
+          0%, 80%, 100% { left: -75%; }
+          90% { left: 140%; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .realm-cta::after { display: none; }
+          .realm-cta:hover { transform: none; }
         }
       `}</style>
     </div>
