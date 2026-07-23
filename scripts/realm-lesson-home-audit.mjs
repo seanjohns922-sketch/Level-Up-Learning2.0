@@ -15,7 +15,7 @@ for (const marker of [
   'realmName: "Measurelands"',
   "getHomeBg",
   "MEASURELANDS_BACKGROUNDS",
-  'if (year === "Prep") return "/images/measurelands-home-bg.jpg"',
+  'if (year === "Prep") return "/images/measurelands-home-bg.png"',
   "childFacingCriterion",
   "explain how I know",
   "Today I am learning to...",

@@ -590,7 +590,7 @@ export default function ProfilePage() {
                       {isActive ? (
                         <div
                           className="h-9 w-9 flex-shrink-0 rounded-md border border-[#E6E8EC] bg-cover bg-center"
-                          style={{ backgroundImage: `url('${realm.name === "Measurelands" ? "/images/measurelands-home-bg.jpg" : "/images/number-nexus-tile.jpg"}')` }}
+                          style={{ backgroundImage: `url('${realm.name === "Measurelands" ? "/images/measurelands-home-bg.png" : "/images/number-nexus-tile.jpg"}')` }}
                         />
                       ) : (
                         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md border border-[#E6E8EC] bg-[#F1F5F9]">

@@ -65,7 +65,7 @@ export default function MeasurelandsCollectionPage() {
           }}
         >
           <img
-            src="/images/measurelands-home-bg.jpg"
+            src="/images/measurelands-home-bg.png"
             alt=""
             aria-hidden="true"
             width={1920}

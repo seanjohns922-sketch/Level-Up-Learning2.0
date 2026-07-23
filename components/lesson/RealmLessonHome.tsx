@@ -102,8 +102,8 @@ export const REALM_LESSON_THEMES = {
 
 export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: number, year: string) {
   if (realm === "number") return getHomeBg(levelNumber, year === "Prep");
-  if (year === "Prep") return "/images/measurelands-home-bg.jpg";
-  return MEASURELANDS_BACKGROUNDS[levelNumber] ?? "/images/measurelands-home-bg.jpg";
+  if (year === "Prep") return "/images/measurelands-home-bg.png";
+  return MEASURELANDS_BACKGROUNDS[levelNumber] ?? "/images/measurelands-home-bg.png";
 }
 
 function childFacingCriterion(criterion: string) {

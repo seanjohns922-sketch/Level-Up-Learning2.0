@@ -661,7 +661,7 @@ function ProgramPage() {
               ? getStarpathBackground(curriculumYear as RealmLevelId)
               : isMeasurementRealm
               ? isPrep
-                ? "/images/measurelands-home-bg.jpg"
+                ? "/images/measurelands-home-bg.png"
                 : levelNum === 1
                 ? "/images/measurelands-home-bg-y1.jpg"
                 : levelNum === 2
@@ -674,7 +674,7 @@ function ProgramPage() {
                 ? "/images/measurelands-home-bg-y5.png"
                 : levelNum === 6
                 ? "/images/measurelands-home-bg-y6.png"
-                : "/images/measurelands-home-bg.jpg"
+                : "/images/measurelands-home-bg.png"
               : getHomeBg(levelNum, isPrep)
           }
           alt=""
