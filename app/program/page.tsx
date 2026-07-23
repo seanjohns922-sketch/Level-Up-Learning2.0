@@ -163,9 +163,9 @@ function ProgramPage() {
     actionClip: undefined as string | undefined,
     connClip:   undefined as string | undefined,
     // colours — card body (aged parchment / dark leather)
-    cardActiveBg:     "linear-gradient(135deg, rgba(26,17,10,0.97) 0%, rgba(43,28,18,0.95) 52%, rgba(60,40,24,0.92) 100%)",
-    cardCompletedBg:  "linear-gradient(135deg, #201409 0%, #4a2f1e 50%, #8b6520 100%)",
-    cardLockedBg:     "linear-gradient(135deg, rgba(23,15,9,0.85) 0%, rgba(38,25,15,0.74) 100%)",
+    cardActiveBg:     "linear-gradient(135deg, rgba(16,11,6,0.985) 0%, rgba(28,18,11,0.97) 52%, rgba(42,27,16,0.95) 100%)",
+    cardCompletedBg:  "linear-gradient(135deg, #160d06 0%, #3a2413 50%, #7a5518 100%)",
+    cardLockedBg:     "linear-gradient(135deg, rgba(16,11,6,0.9) 0%, rgba(30,20,12,0.8) 100%)",
     // colours — bezel / border (aged brass — less saturated, more antique)
     bezelActiveBg:    "linear-gradient(135deg, rgba(200,160,48,0.48), rgba(120,90,15,0.16) 40%, rgba(200,160,48,0.42))",
     bezelCompletedBg: "linear-gradient(135deg, rgba(200,160,48,0.48), rgba(109,40,217,0.18) 45%, rgba(200,160,48,0.44))",
@@ -201,7 +201,7 @@ function ProgramPage() {
     xpBg:   "linear-gradient(90deg, #3d2808 0%, #7a5418 25%, #c8a030 55%, #e8d5a8 65%, #c8a030 75%, #7a5418 90%, #3d2808 100%)",
     xpGlow: "0 0 10px rgba(200,160,48,0.5)",
     // header / nav (antiqued dark + purple magical glow)
-    pillBg:     "linear-gradient(135deg, #17100a 0%, #2b1c12 50%, #4a2f1e 100%)",
+    pillBg:     "linear-gradient(135deg, #120b06 0%, #221609 50%, #33210f 100%)",
     pillShadow: "inset 0 1px 0 rgba(200,160,48,0.25), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 16px rgba(109,40,217,0.18)",
     pillDot:    "bg-yellow-200/80 shadow-[0_0_8px_rgba(200,160,48,0.5)]",
     headingGlow:  "drop-shadow-[0_2px_14px_rgba(109,40,217,0.3)]",
