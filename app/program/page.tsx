@@ -255,13 +255,12 @@ function ProgramPage() {
     xpLabelColor: "text-teal-100/90",
   };
 
-  // Starpath nav widgets (Back button, Week selector, XP plate) — match the
-  // Starpath realm's rounded indigo/cyan chip styling instead of the Nexus teal.
-  const starpathNavPillStyle = {
-    borderRadius: 999,
+  // Starpath uses compact rectangular controls throughout the week page.
+  const starpathNavWidgetStyle = {
+    borderRadius: 8,
     border: "1px solid rgba(103,232,249,0.32)",
     background: "linear-gradient(135deg, rgba(30,27,75,0.88), rgba(76,29,149,0.55) 55%, rgba(8,47,73,0.85))",
-    boxShadow: "inset 0 1px 0 rgba(207,250,254,0.22), 0 0 20px rgba(124,58,237,0.26)",
+    boxShadow: "inset 0 1px 0 rgba(207,250,254,0.18), 0 8px 20px rgba(7,10,27,0.28)",
   } as const;
 
   const legacyProgramMode = sp.get("legacy") === "1";
@@ -805,7 +804,7 @@ function ProgramPage() {
                     ? "text-yellow-100/85 hover:bg-yellow-950/30"
                     : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                 }`}
-                style={isStarpathRealm ? starpathNavPillStyle : isMeasurementRealm ? {
+                style={isStarpathRealm ? starpathNavWidgetStyle : isMeasurementRealm ? {
                   borderRadius: 999,
                   border: "1px solid rgba(200,160,48,0.32)",
                   background: "rgba(22,14,4,0.65)",
@@ -830,7 +829,7 @@ function ProgramPage() {
                       ? "text-yellow-100/85 hover:bg-yellow-950/30"
                       : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                   }`}
-                  style={isStarpathRealm ? starpathNavPillStyle : isMeasurementRealm ? {
+                  style={isStarpathRealm ? starpathNavWidgetStyle : isMeasurementRealm ? {
                     borderRadius: 999,
                     border: "1px solid rgba(200,160,48,0.32)",
                     background: "rgba(22,14,4,0.65)",
@@ -859,7 +858,7 @@ function ProgramPage() {
                         : "border border-teal-300/30"
                     }`}
                     style={isStarpathRealm ? {
-                      borderRadius: 14,
+                      borderRadius: 8,
                       background: "rgba(15,17,45,0.95)",
                       boxShadow: "inset 0 1px 0 rgba(207,250,254,0.2), 0 14px 40px rgba(0,0,0,0.6), 0 0 24px rgba(124,58,237,0.18)",
                     } : isMeasurementRealm ? {
@@ -960,7 +959,7 @@ function ProgramPage() {
               style={{
                 background: rt.pillBg,
                 clipPath: rt.rounded ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                borderRadius: rt.rounded ? 999 : undefined,
+                borderRadius: isStarpathRealm ? 8 : rt.rounded ? 999 : undefined,
                 boxShadow: rt.pillShadow,
               }}
             >
@@ -992,11 +991,11 @@ function ProgramPage() {
             ) : null}
 
             {/* XP plate */}
-            <div className="mt-5 mx-auto max-w-sm relative">
+            <div className={`mt-5 mx-auto relative ${isStarpathRealm ? "max-w-xs" : "max-w-sm"}`}>
               <div
                 className="absolute -inset-[2px] pointer-events-none"
                 style={isStarpathRealm ? {
-                  borderRadius: 14,
+                  borderRadius: 8,
                   background: "linear-gradient(135deg, rgba(103,232,249,0.55), rgba(124,58,237,0.22) 45%, rgba(34,211,238,0.5))",
                 } : isMeasurementRealm ? {
                   borderRadius: 14,
@@ -1007,11 +1006,11 @@ function ProgramPage() {
                 }}
               />
               <div
-                className="relative px-5 py-3"
+                className={`relative px-5 ${isStarpathRealm ? "py-2.5" : "py-3"}`}
                 style={isStarpathRealm ? {
-                  borderRadius: 12,
+                  borderRadius: 6,
                   background: "linear-gradient(135deg, rgba(30,27,75,0.96) 0%, rgba(15,23,42,0.9) 50%, rgba(8,47,73,0.92) 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(207,250,254,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(124,58,237,0.15)",
+                  boxShadow: "inset 0 1px 0 rgba(207,250,254,0.18), inset 0 -6px 14px rgba(0,0,0,0.42), 0 8px 20px rgba(7,10,27,0.24)",
                 } : isMeasurementRealm ? {
                   borderRadius: 12,
                   background: "linear-gradient(135deg, #140e04 0%, #1e1506 50%, #2a1e08 100%)",
@@ -1270,8 +1269,10 @@ function ProgramPage() {
                       }
                     }}
                     className={[
-                      "relative min-h-[246px] w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden",
-                      isStarpathRealm ? "rounded-[10px]" : rt.rounded ? "rounded-3xl" : "",
+                      "relative w-full text-left transition-all flex flex-col group overflow-hidden",
+                      isStarpathRealm
+                        ? "min-h-[190px] gap-2.5 rounded-[8px] p-4"
+                        : `min-h-[246px] gap-3 p-5 ${rt.rounded ? "rounded-3xl" : ""}`,
                       locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1 cursor-pointer",
                     ].join(" ")}
                     style={{

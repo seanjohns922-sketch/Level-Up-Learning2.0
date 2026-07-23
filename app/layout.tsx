@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GlobalTapFeedback } from "@/components/GlobalTapFeedback";
@@ -24,7 +25,9 @@ export default function RootLayout({
           <GlobalTapFeedback />
           <FullscreenToggle />
           <StudentScreenRecorder />
-          <DemoPreviewBanner />
+          <Suspense fallback={null}>
+            <DemoPreviewBanner />
+          </Suspense>
           {children}
           <GemRevealHost />
         </ErrorBoundary>
