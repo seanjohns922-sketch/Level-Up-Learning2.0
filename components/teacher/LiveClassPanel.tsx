@@ -290,12 +290,20 @@ function getQuestionKey(event: LiveActivityEventRow, index: number) {
 }
 
 function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEventRow) {
+  if (event.student_id !== row.student_id) return false;
+
   const payload = parseEventPayload(event.payload);
   const eventLessonId = typeof payload.lessonId === "string" ? payload.lessonId : null;
   const eventLessonTitle = typeof payload.lessonTitle === "string" ? payload.lessonTitle : null;
+
+  // Canonical activity IDs distinguish quizzes that all share the display
+  // title "Weekly Quiz". Only fall back to a title when neither side has an ID.
+  if (row.current_lesson || eventLessonId) {
+    return Boolean(row.current_lesson && eventLessonId === row.current_lesson);
+  }
+
   return Boolean(
-    (row.current_lesson && eventLessonId === row.current_lesson) ||
-    (row.current_lesson_title && eventLessonTitle === row.current_lesson_title)
+    row.current_lesson_title && eventLessonTitle === row.current_lesson_title
   );
 }
 
