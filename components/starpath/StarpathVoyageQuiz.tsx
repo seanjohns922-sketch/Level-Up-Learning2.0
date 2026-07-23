@@ -14,6 +14,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/RealmWeeklyQuizChrome";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskRenderer } from "@/components/TaskRenderer";
 import { weeklyQuizPassed, ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
@@ -30,6 +31,7 @@ export type StarpathVoyageQuizMeta = {
   coverage: string;
   lessonTitles: [string, string, string];
   weekHref: string;
+  nextWeekHref?: string;
 };
 
 type QuizPhase = "home" | "quiz" | "results" | "review";
@@ -105,6 +107,7 @@ export default function StarpathVoyageQuiz({
   const wrongIndexes = orderedTasks
     .map((_, questionIndex) => questionIndex)
     .filter((questionIndex) => answers[String(questionIndex)] === false);
+  const quizIntroduction = `${quiz.title}. Great work completing this week's missions! It is time to show what you discovered across all three missions. There are 15 questions, with five questions from each mission. The quiz takes approximately 8 to 10 minutes. Work at your own pace. The pass mark is 80 percent. You can earn ${QUIZ_XP} XP, chain progress, and gems.`;
 
   useEffect(() => {
     try {
@@ -172,7 +175,11 @@ export default function StarpathVoyageQuiz({
     const studentId = getActiveStudentIdentity().studentId;
 
     try {
-      writeStarpathDemoJourney(quiz.level, { currentWeek: quiz.week, currentLesson: 3 });
+      const passedQuiz = weeklyQuizPassed(finalPercent);
+      writeStarpathDemoJourney(quiz.level, {
+        currentWeek: passedQuiz ? Math.min(8, quiz.week + 1) : quiz.week,
+        currentLesson: passedQuiz ? 0 : 3,
+      });
       if (studentId) {
         await saveNumberWeeklyQuizAttempt(
           studentId,
@@ -234,7 +241,16 @@ export default function StarpathVoyageQuiz({
                     <div className="font-mono text-xs font-black uppercase tracking-[0.2em] text-cyan-200">
                       Starpath Voyage Quiz
                     </div>
-                    <h1 className="mt-3 text-3xl font-black sm:text-5xl">{quiz.title}</h1>
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <h1 className="text-3xl font-black sm:text-5xl">{quiz.title}</h1>
+                      <ReadAloudBtn
+                        text={quizIntroduction}
+                        speechKey={`starpath-voyage-quiz-${quiz.level}-${quiz.week}`}
+                        size="md"
+                        label="Read quiz"
+                        className="border-cyan-200/30 bg-indigo-950/70 text-cyan-100 hover:border-cyan-200 hover:text-white"
+                      />
+                    </div>
                     <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-violet-100">
                       Great work completing this week&apos;s missions! It&apos;s time to show what you discovered across all three missions.
                     </p>
@@ -410,13 +426,15 @@ export default function StarpathVoyageQuiz({
                 </div>
               ) : null}
               <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={restart}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-violet-300 bg-white px-6 text-base font-black text-violet-800"
-                >
-                  <RotateCcw className="h-5 w-5" /> Try Again
-                </button>
+                {!passed ? (
+                  <button
+                    type="button"
+                    onClick={restart}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-violet-300 bg-white px-6 text-base font-black text-violet-800"
+                  >
+                    <RotateCcw className="h-5 w-5" /> Retry Quiz
+                  </button>
+                ) : null}
                 {wrongIndexes.length ? (
                   <button
                     type="button"
@@ -428,10 +446,13 @@ export default function StarpathVoyageQuiz({
                 ) : null}
                 <button
                   type="button"
-                  onClick={() => router.push(quiz.weekHref)}
+                  onClick={() => router.push(passed && quiz.nextWeekHref ? quiz.nextWeekHref : quiz.weekHref)}
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-cyan-500 px-6 text-base font-black text-white shadow-lg"
                 >
-                  Back to Week {quiz.week} <ArrowRight className="h-5 w-5" />
+                  {passed && quiz.nextWeekHref
+                    ? `Continue to Week ${quiz.week + 1}`
+                    : `Back to Week ${quiz.week}`}
+                  <ArrowRight className="h-5 w-5" />
                 </button>
               </div>
             </div>

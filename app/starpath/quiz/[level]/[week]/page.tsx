@@ -48,6 +48,10 @@ export default async function StarpathQuizPage({
           coverage: weekPlan.quiz.coverage,
           lessonTitles: weekPlan.lessons.map((lesson) => lesson.title) as [string, string, string],
           weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
+          nextWeekHref:
+            week < program.weeks.length
+              ? buildStarpathProgramHref({ selectedLevel: level }, week + 1)
+              : undefined,
         }}
         tasks={quizTasks}
       />
