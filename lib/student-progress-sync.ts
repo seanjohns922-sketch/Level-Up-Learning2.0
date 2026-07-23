@@ -44,15 +44,22 @@ type StudentRuntimeContextRow = {
   last_name?: string | null;
 };
 
-export type StudentProgressRealmId = "number" | "measurement";
+export type StudentProgressRealmId = "number" | "measurement" | "space";
+
+const REALM_PROGRAM_SUFFIX: Record<StudentProgressRealmId, string> = {
+  number: "number",
+  measurement: "measurelands",
+  space: "starpath",
+};
 
 function realmProgramKey(year: string, realmId: StudentProgressRealmId) {
-  return `${year.toLowerCase().replace(/\s+/g, "")}-${realmId === "measurement" ? "measurelands" : "number"}`;
+  return `${year.toLowerCase().replace(/\s+/g, "")}-${REALM_PROGRAM_SUFFIX[realmId]}`;
 }
 
 function quizIdForRealm(year: string, week: number, realmId: StudentProgressRealmId) {
   const yearNumber = parseInt(year.replace(/\D/g, ""), 10) || 0;
-  return `y${yearNumber}-${realmId === "measurement" ? "measurement" : "number"}-w${week}-quiz`;
+  const segment = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : "number";
+  return `y${yearNumber}-${segment}-w${week}-quiz`;
 }
 
 async function getStudentRuntimeContext(studentId: string) {
@@ -207,6 +214,11 @@ export async function restoreStudentStateFromServer(
   studentId: string,
   realmId: StudentProgressRealmId,
 ) {
+  // Starpath ('space') persists server-side only; it has no local number/measurement
+  // progress store to restore into.
+  if (realmId === "space") {
+    return { rows: [] as StudentProgressSnapshotRow[], progress: null as StudentProgress | null, introSeen: false };
+  }
   if (isDemoPreviewMode()) {
     const progress = {
       year: "Prep",

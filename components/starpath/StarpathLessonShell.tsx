@@ -9,6 +9,10 @@ import StarpathMissionHome, { type StarpathMissionMetadata } from "@/components/
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import { createRandomRealmLessonGenerator } from "@/data/activities/realm-lesson-blueprint";
 import { writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { getActiveStudentIdentity } from "@/lib/studentIdentity";
+import { saveRealmLessonAttempt } from "@/lib/student-progress-sync";
+import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function levelNumber(level: StarpathMissionMetadata["level"]) {
@@ -28,6 +32,42 @@ export default function StarpathLessonShell({
   const [missionStarted, setMissionStarted] = useState(false);
   const [getTask] = useState(() => createRandomRealmLessonGenerator(content.createTaskSet()));
   const lessonFinalizedRef = useRef(false);
+  const summaryRef = useRef<LessonPerformanceSummary | null>(null);
+
+  // Persist a completed mission for real students. Self-guards on demo mode so a
+  // demo view never writes progress or banks XP.
+  const persistLessonCompletion = useCallback(async () => {
+    if (isDemoPreviewMode()) return;
+    try {
+      const studentId = getActiveStudentIdentity().studentId;
+      if (!studentId) return;
+      const summary = summaryRef.current;
+      const completionKey =
+        typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+      const attempt = {
+        completed: true,
+        lessonId: lesson.registryId,
+        lessonNumber: lesson.lesson,
+        title: lesson.title,
+        questionsAnswered: summary?.questionsAnswered ?? 0,
+        correctAnswers: summary?.correctAnswers ?? 0,
+        accuracy: summary?.accuracy ?? 0,
+        bestChain: summary?.bestChain ?? 0,
+      };
+      await saveRealmLessonAttempt(
+        studentId,
+        lesson.level,
+        lesson.week,
+        lesson.lesson,
+        lesson.registryId,
+        attempt,
+        completionKey,
+        "space",
+      );
+    } catch (error) {
+      console.warn("[Starpath] Lesson persist failed", error);
+    }
+  }, [lesson.level, lesson.registryId, lesson.lesson, lesson.title, lesson.week]);
 
   useEffect(() => {
     writeStarpathDemoJourney(lesson.level, {
@@ -43,10 +83,11 @@ export default function StarpathLessonShell({
         currentWeek: lesson.week,
         currentLesson: Math.min(3, lesson.lesson + 1),
       });
+      void persistLessonCompletion();
       return;
     }
     router.push(lesson.weekHref);
-  }, [lesson.lesson, lesson.level, lesson.week, lesson.weekHref, router]);
+  }, [lesson.lesson, lesson.level, lesson.week, lesson.weekHref, persistLessonCompletion, router]);
 
   if (!missionStarted) {
     return <StarpathMissionHome lesson={lesson} content={content} onStart={() => setMissionStarted(true)} />;
@@ -66,7 +107,7 @@ export default function StarpathLessonShell({
             <ArrowLeft className="h-4 w-4" /> Back to Week {lesson.week}
           </Link>
           <div className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em] text-violet-200">
-            <Orbit className="h-5 w-5 text-cyan-300" /> Starpath · Demo Mode
+            <Orbit className="h-5 w-5 text-cyan-300" /> Starpath{isDemoPreviewMode() ? " · Demo Mode" : ""}
           </div>
         </header>
 
@@ -94,6 +135,7 @@ export default function StarpathLessonShell({
               minutes={9}
               getTask={getTask}
               onComplete={completeLesson}
+              onPerformanceSummary={(summary) => { summaryRef.current = summary; }}
               lessonTitle={lesson.title}
               completionMode="time_only"
               scoreCap={10}

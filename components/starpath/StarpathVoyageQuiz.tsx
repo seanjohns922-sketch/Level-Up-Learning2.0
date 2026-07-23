@@ -7,6 +7,8 @@ import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/Real
 import { TaskRenderer } from "@/components/TaskRenderer";
 import { weeklyQuizPassed, ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
+import { saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
+import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -23,6 +25,10 @@ const QUIZ_XP = 20;
 
 function taskFeedback(task: PracticeTask) {
   return (task as { feedback?: { correct: string; wrong: string } }).feedback;
+}
+
+function newCompletionKey() {
+  return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
 }
 
 export default function StarpathVoyageQuiz({
@@ -59,6 +65,21 @@ export default function StarpathVoyageQuiz({
       if (index + 1 >= total) {
         setDone(true);
         writeStarpathDemoJourney(quiz.level, { currentWeek: quiz.week, currentLesson: 3 });
+        // Persist for real students (self-gates on demo mode, so a demo view
+        // never writes). A fresh completion key each attempt lets the server
+        // reward the first logical pass only.
+        const finalPercent = total > 0 ? Math.round((nextCorrect / total) * 100) : 0;
+        const studentId = getActiveStudentIdentity().studentId;
+        if (studentId) {
+          void saveNumberWeeklyQuizAttempt(
+            studentId,
+            quiz.level,
+            quiz.week,
+            { percent: finalPercent, score: nextCorrect, total },
+            newCompletionKey(),
+            "space",
+          ).catch((error) => console.warn("[Starpath] Voyage Quiz persist failed", error));
+        }
       } else {
         setIndex((value) => value + 1);
         setNonce((value) => value + 1);
