@@ -3,7 +3,7 @@
 const heroNumberNexus = { src: "/images/lesson-hero-number-nexus.jpg" };
 const heroMeasurelands = { src: "/images/measurelands-home-bg.png" };
 const heroMeasurelandsByYear: Record<number, string> = {
-  1: "/images/measurelands-home-bg-y1.jpg",
+  1: "/images/measurelands-home-bg-y1.png",
   2: "/images/measurelands-home-bg-y2.jpg",
   3: "/images/measurelands-home-bg-y3.jpg",
   4: "/images/measurelands-home-bg-y4.jpg",
