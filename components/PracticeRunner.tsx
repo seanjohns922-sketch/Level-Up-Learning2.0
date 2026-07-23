@@ -83,6 +83,8 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "starpathShapeSort") return "Shape Sorter";
   if (kind === "starpathShapeScene") return "Shapes Hidden in Starpath";
   if (kind === "starpathShapeTapAll") return "Shape Detective Hunt";
+  if (kind === "starpathOddOneOut") return "Which One Doesn't Belong?";
+  if (kind === "starpathCollectMission") return "Cosmic Shape Mission";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";
@@ -128,6 +130,12 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   if (task.kind === "starpathShapeSort") return `${task.shape} planet`;
   if (task.kind === "starpathShapeScene") return task.correctObjectId;
   if (task.kind === "starpathShapeTapAll") return `every ${task.targetShape}`;
+  if (task.kind === "starpathOddOneOut") {
+    return task.options.find((option) => option.id === task.oddOptionId)?.shape ?? "the odd shape";
+  }
+  if (task.kind === "starpathCollectMission") {
+    return task.requests.map((request) => `${request.count} ${request.shape}`).join(", ");
+  }
   if (task.kind === "measurementCompare") {
     return task.objects.find((item) => item.id === task.correctOptionId)?.label ?? task.correctOptionId;
   }
@@ -1013,7 +1021,9 @@ export function PracticeRunner({
     task.kind === "starpathShapeMatch" ||
     task.kind === "starpathShapeSort" ||
     task.kind === "starpathShapeScene" ||
-    task.kind === "starpathShapeTapAll";
+    task.kind === "starpathShapeTapAll" ||
+    task.kind === "starpathOddOneOut" ||
+    task.kind === "starpathCollectMission";
   const hint =
     hasGroundFeedback
       ? status === "wrong"

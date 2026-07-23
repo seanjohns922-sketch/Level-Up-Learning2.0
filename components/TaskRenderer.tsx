@@ -137,7 +137,11 @@ import {
   StarpathShapeSceneCard,
   StarpathShapeSortCard,
 } from "@/components/starpath/StarpathShapeTaskCard";
-import { StarpathShapeTapAllCard } from "@/components/starpath/StarpathShapeChallengeCards";
+import {
+  StarpathShapeTapAllCard,
+  StarpathOddOneOutCard,
+  StarpathCollectMissionCard,
+} from "@/components/starpath/StarpathShapeChallengeCards";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -541,6 +545,10 @@ function TaskRendererInner({
       return <StarpathShapeSceneCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathShapeTapAll":
       return <StarpathShapeTapAllCard key={k} task={t} onComplete={onC} />;
+    case "starpathOddOneOut":
+      return <StarpathOddOneOutCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathCollectMission":
+      return <StarpathCollectMissionCard key={k} task={t} onComplete={onC} />;
     default:
       return <TaskRecoveryCard onRecover={onW} />;
   }

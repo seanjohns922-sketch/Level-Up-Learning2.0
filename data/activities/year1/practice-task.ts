@@ -2311,4 +2311,30 @@ export type PracticeTask = (
       }>;
       feedback: { correct: string; wrong: string };
     }
+  | {
+      kind: "starpathOddOneOut";
+      prompt: string;
+      speakText: string;
+      target: number;
+      options: Array<{
+        id: string;
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+      }>;
+      oddOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathCollectMission";
+      prompt: string;
+      speakText: string;
+      target: number;
+      requests: Array<{ shape: "circle" | "triangle" | "square" | "rectangle"; count: number }>;
+      items: Array<{
+        id: string;
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+      }>;
+      feedback: { correct: string; wrong: string };
+    }
 ) & { difficulty?: Difficulty };
