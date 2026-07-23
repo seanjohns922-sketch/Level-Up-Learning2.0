@@ -665,7 +665,7 @@ function ProgramPage() {
                 : levelNum === 1
                 ? "/images/measurelands-home-bg-y1.png"
                 : levelNum === 2
-                ? "/images/measurelands-home-bg-y2.jpg"
+                ? "/images/measurelands-home-bg-y2.png"
                 : levelNum === 3
                 ? "/images/measurelands-home-bg-y3.jpg"
                 : levelNum === 4

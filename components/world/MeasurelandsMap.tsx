@@ -6,7 +6,7 @@ import type { CanonicalRealmDashboardConfig } from "@/components/realms/dashboar
 type MeasurelandsYear = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 const PREP_BG_IMAGE = "/images/measurelands-home-bg.png";
 const YEAR1_BG_IMAGE = "/images/measurelands-home-bg-y1.png";
-const YEAR2_BG_IMAGE = "/images/measurelands-home-bg-y2.jpg";
+const YEAR2_BG_IMAGE = "/images/measurelands-home-bg-y2.png";
 const YEAR3_BG_IMAGE = "/images/measurelands-home-bg-y3.jpg";
 const YEAR4_BG_IMAGE = "/images/measurelands-home-bg-y4.jpg";
 const YEAR5_BG_IMAGE = "/images/measurelands-home-bg-y5.png";
