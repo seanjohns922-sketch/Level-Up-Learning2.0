@@ -33,7 +33,7 @@ import MoneyMakeAmount from "@/components/week7/MoneyMakeAmount";
 import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
-import { LessonPageHero } from "@/components/lesson/LessonPageHero";
+import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/RealmWeeklyQuizChrome";
 import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import {
@@ -8580,6 +8580,8 @@ function SessionPage({
   const measurementQuizFocus = isMeasurementRealm
     ? quizWeekPlan?.lessons?.map((lesson) => lesson.title).filter(Boolean).join(" · ") || null
     : null;
+  const quizLevelNumber = year === "Prep" ? 0 : Number(year.replace(/\D/g, "")) || 0;
+  const quizChromeTheme = REALM_QUIZ_THEMES[quizRealmId];
 
   // Realm-consistent theming for the quiz results screen. Measurelands uses the
   // gold/violet Meazurex palette; everything else keeps Number Nexus teal.
@@ -9067,10 +9069,14 @@ function SessionPage({
   }
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center px-6 py-10">
+    <main
+      className={isLesson
+        ? "min-h-screen bg-background flex items-center justify-center px-6 py-10"
+        : "relative isolate min-h-screen px-3 py-4 sm:px-6"}
+    >
       <ActiveLearningTracker context="session" />
-      <div className="w-full max-w-5xl">
-        <div className="mb-4">
+      <div className={isLesson ? "w-full max-w-5xl" : "mx-auto w-full max-w-[1500px]"}>
+        {isLesson ? <div className="mb-4">
           <button
             onClick={backToWeek}
             className={[
@@ -9084,10 +9090,30 @@ function SessionPage({
           >
             ← Back to Week {week}
           </button>
-        </div>
+        </div> : (
+          <RealmWeeklyQuizChrome
+            realm={quizRealmId}
+            levelNumber={quizLevelNumber}
+            levelLabel={studentLevelLabel}
+            year={year}
+            week={Number(week)}
+            questionCount={quizQuestions.length || 15}
+            focus={measurementQuizFocus}
+            demoMode={previewMode || DEMO_MODE}
+            onBack={backToWeek}
+          />
+        )}
 
         {/* Wrapper card */}
-        <div className="rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card">
+        <div
+          className={isLesson
+            ? "rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card"
+            : "overflow-hidden rounded-b-lg border shadow-[0_24px_90px_rgba(0,0,0,0.42)]"}
+          style={!isLesson ? {
+            borderColor: quizChromeTheme.panelBorder,
+            background: quizChromeTheme.workspaceBg,
+          } : undefined}
+        >
           {/* Hero gradient header */}
           {isLesson ? (
             <div className="bg-gradient-to-br from-primary to-primary/80 text-white px-6 py-8">
@@ -9099,90 +9125,12 @@ function SessionPage({
                 {lessonStarted ? "Complete the timed practice" : "Watch the video and begin practice"}
               </p>
             </div>
-          ) : isMeasurementRealm ? (
-            <LessonPageHero
-              levelNumber={0}
-              levelLabel={studentLevelLabel}
-              week={Number(week)}
-              lessonNumber={0}
-              breadcrumbText={`${studentLevelLabel} • Week ${week}`}
-              pageTitle={title}
-              lessonTitle="15 questions · Show what you know"
-              focus={measurementQuizFocus}
-              heroClass=""
-              realmId={realmId}
-            />
-          ) : (
-            <div className="relative overflow-hidden text-white" style={{ background: "#021716" }}>
-              {/* Number Nexus city artwork */}
-              <div className="pointer-events-none absolute inset-0" aria-hidden>
-                <img
-                  src="/images/lesson-hero-number-nexus.jpg"
-                  alt=""
-                  className="h-full w-full object-cover"
-                  style={{
-                    objectPosition: "78% center",
-                    transform: "scale(1.02)",
-                    filter: "contrast(1.18) saturate(1.08) brightness(1.06) hue-rotate(-4deg)",
-                  }}
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #021716 0%, rgba(2,23,22,0.98) 20%, rgba(2,23,22,0.9) 35%, rgba(2,23,22,0.65) 52%, rgba(2,23,22,0.3) 70%, rgba(2,23,22,0.1) 86%, rgba(2,23,22,0) 100%)",
-                  }}
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, rgba(0,0,0,0.22) 0%, transparent 40%, rgba(0,0,0,0.3) 100%)",
-                  }}
-                />
-                <div
-                  className="absolute inset-y-0 right-0 w-[35%]"
-                  style={{
-                    background:
-                      "radial-gradient(ellipse at 80% 35%, rgba(94,234,212,0.16), transparent 60%)",
-                  }}
-                />
-              </div>
+          ) : null}
 
-              {/* Floating numbers overlay */}
-              <div
-                className="pointer-events-none absolute inset-y-0 right-0 w-[30%] select-none font-mono text-[10px] leading-[16px] tracking-widest text-cyan-200/[0.18] mix-blend-screen"
-                style={{
-                  maskImage:
-                    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.9) 30%, rgba(0,0,0,0.9) 80%, transparent 100%)",
-                  WebkitMaskImage:
-                    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.9) 30%, rgba(0,0,0,0.9) 80%, transparent 100%)",
-                }}
-                aria-hidden
-              >
-                <div className="flex flex-wrap gap-x-3 p-3">
-                  {Array.from({ length: 40 }).map((_, i) => (
-                    <span key={i}>{(i * 53 + 7) % 1000}</span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="relative z-10 px-5 py-4 md:px-7 md:py-5 max-w-[58%]">
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-sm md:text-xs">
-                  {studentLevelLabel} • Week {week}
-                </div>
-                <h1 className="mt-2 text-2xl font-bold tracking-[-0.02em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] md:text-3xl">
-                  {title}
-                </h1>
-                <p className="mt-1 text-sm font-medium text-white/85 md:text-base">
-                  15 questions · Show what you know
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="bg-background px-6 py-8">
+          <div
+            className={isLesson ? "bg-background px-6 py-8" : "px-3 py-5 sm:px-6 sm:py-7"}
+            style={!isLesson ? { background: quizChromeTheme.workspaceBg } : undefined}
+          >
 
         {isLesson ? (
           <>
@@ -9259,7 +9207,7 @@ function SessionPage({
             {quizQuestions.length ? (
               <div
                 className={[
-                  "-mx-6 -mt-8 mb-6 border-t px-6 pt-3 pb-4",
+                  "-mx-3 -mt-5 mb-6 border-t px-3 pt-3 pb-4 sm:-mx-6 sm:-mt-7 sm:px-6",
                   isMeasurementRealm ? "border-yellow-900/20" : "border-teal-300/15",
                 ].join(" ")}
                 style={isMeasurementRealm ? {
@@ -9376,10 +9324,10 @@ function SessionPage({
               </div>
             ) : null}
 
-            <div className="bg-card rounded-3xl border border-border shadow-sm p-6 mb-6">
+            <div className="mb-6 rounded-lg border border-border bg-white/90 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.12)] sm:p-6">
 
               {quizQuestions.length ? (
-                <div className="rounded-2xl border border-border/60 p-5 bg-background">
+                <div className="rounded-lg border border-border/60 bg-white/75 p-3 sm:p-5">
                   {!isMoneyQuiz && currentQuiz?.kind !== "lessonActivity" ? (
                     <div
                       className={[

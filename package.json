@@ -11,6 +11,7 @@
     "qa:year2-smoke": "node scripts/year2-smoke-qa.mjs",
     "qa:level-aware-regression": "node scripts/level-aware-regression.mjs",
     "qa:quiz-nav": "node scripts/quiz-nav-audit.mjs",
+    "qa:realm-weekly-quiz": "node scripts/realm-weekly-quiz-chrome-audit.mjs",
     "qa:guided-lesson-feedback": "node scripts/guided-lesson-feedback-audit.mjs",
     "qa:realm-lesson-home": "node scripts/realm-lesson-home-audit.mjs",
     "qa:realm-active-lesson": "node scripts/realm-active-lesson-shell-audit.mjs",
