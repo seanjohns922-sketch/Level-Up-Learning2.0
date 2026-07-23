@@ -9,7 +9,7 @@ import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress }
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { resolveStudentNameParts } from "@/lib/studentName";
 import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
-import { activateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
+import { activateDemoPreviewMode, deactivateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
 import { resolveStudentDestination } from "@/lib/student-destination";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
@@ -360,6 +360,11 @@ export default function LoginPage() {
       null;
     const resolvedStudentName = resolveStudentNameParts(student).displayName || displayName;
     const resolvedYearLevel = studentSchoolYear ?? studentWorkingYear ?? "Year 1";
+
+    // A real student session must never inherit Demo Mode from another user of
+    // the same browser. Clear both the local preview marker and demo cookie
+    // before establishing the student's canonical identity.
+    deactivateDemoPreviewMode();
 
     // Clear only the incoming student's cache. Other students' scoped records
     // remain isolated and available for their own next login.

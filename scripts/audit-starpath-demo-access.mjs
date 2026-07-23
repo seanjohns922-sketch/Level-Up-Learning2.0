@@ -18,6 +18,7 @@ const loadTypeScriptModule = async (source) => {
 const access = await loadTypeScriptModule(read("lib/starpath-access.ts"));
 const carousel = read("components/realms/RealmCarousel.tsx");
 const login = read("app/login/page.tsx");
+const demoMode = read("lib/demo-mode.ts");
 const serverPage = read("app/starpath/page.tsx");
 const starpathMap = read("components/world/StarpathMap.tsx");
 const lessonPage = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
@@ -49,16 +50,22 @@ assert.deepEqual(
   { allowed: false, reason: "not-demo-mode" },
 );
 
+assert.match(carousel, /const starpathDemoActive = previewMode && authorizedDemoSession/);
 assert.match(carousel, /const realms = ALL_REALMS/);
-assert.match(carousel, /isStarpathRealm \? \(/);
 assert.match(carousel, /Preview Realm/);
-assert.match(carousel, /Demo access only/);
-assert.match(carousel, /requestStarpathPreviewAccess/);
-assert.match(carousel, /\/login\?demo=1&returnTo=/);
-assert.match(carousel, /<button[\s\S]*Preview Realm/);
-assert.match(carousel, /const isStarpathPreview = isStarpathRealm && starpathAccess\.allowed/);
+assert.doesNotMatch(carousel, /Demo access only/);
+assert.doesNotMatch(carousel, /requestStarpathPreviewAccess/);
+assert.doesNotMatch(carousel, /\/login\?demo=1&returnTo=/);
+assert.match(carousel, /const isStarpathPreview = isStarpathRealm && starpathDemoActive/);
+assert.match(carousel, /onClick=\{isActive \? enterRealm : undefined\}/);
+assert.match(carousel, /role=\{isActive \? "button" : undefined\}/);
+assert.match(carousel, /aria-label=\{isActive \? `Enter \$\{current\.name\}` : undefined\}/);
+assert.match(carousel, /\) : current\.comingSoon \? \(/);
+assert.match(carousel, /Locked/);
 assert.match(carousel, /Demo · Preview/);
 assert.match(carousel, /buildStarpathWorldHref\(\{ selectedLevel: selectedStarpathLevel \}\)/);
+assert.match(demoMode, /localStorage\.getItem\(ACTIVE_STUDENT_KEY\)\?\.trim\(\) === DEMO_PREVIEW_SCOPE/);
+assert.match(login, /deactivateDemoPreviewMode\(\)/);
 assert.match(serverPage, /await getServerStarpathAccess\(\)/);
 assert.match(serverPage, /redirect\("\/realms"\)/);
 assert.ok(serverPage.indexOf("if (!access.allowed)") < serverPage.indexOf("<StarpathMap"));
@@ -95,4 +102,4 @@ assert.equal(url.searchParams.get("destination"), "world");
 assert.equal(href.includes("number-nexus"), false);
 assert.equal(href.includes("measurelands"), false);
 
-console.log("Starpath demo access audit passed: preview is clickable, code-authorised, safely returned to Starpath, server guarded, and non-persistent.");
+console.log("Starpath demo access audit passed: visible-but-locked outside Demo Mode, clickable only in an authorised demo profile, server guarded, and non-persistent.");

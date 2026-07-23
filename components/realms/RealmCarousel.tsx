@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
-import { isDemoAccessFeatureEnabled, isDemoPreviewMode } from "@/lib/demo-mode";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import RealmPortalPreview from "@/components/realms/RealmPortalPreview";
 import { getScopedProgressKey, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import { setLastRealm } from "@/lib/last-realm";
@@ -15,7 +15,6 @@ import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import { markRealmEntryRestored } from "@/lib/realm-entry-handoff";
-import { resolveStarpathAccess } from "@/lib/starpath-access";
 import { useAuthorizedDemoSession } from "@/lib/use-authorized-demo-session";
 
 // Read a specific realm's scoped progress (the carousel lives on /realms where
@@ -50,10 +49,7 @@ export default function RealmCarousel() {
   const searchParams = useSearchParams();
   const previewMode = isDemoPreviewMode();
   const authorizedDemoSession = useAuthorizedDemoSession();
-  const starpathAccess = resolveStarpathAccess({
-    demoFeatureEnabled: isDemoAccessFeatureEnabled(),
-    authorizedDemoSession,
-  });
+  const starpathDemoActive = previewMode && authorizedDemoSession;
   const realms = ALL_REALMS;
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -102,7 +98,7 @@ export default function RealmCarousel() {
 
   const current = realms[currentIndex];
   const isStarpathRealm = current.id === "starpath-realm";
-  const isStarpathPreview = isStarpathRealm && starpathAccess.allowed;
+  const isStarpathPreview = isStarpathRealm && starpathDemoActive;
   const isActive = isStarpathPreview || (!isStarpathRealm && (DEMO_MODE || isRealmEnabled(current.id)));
   const isPreviewRealm = previewMode && current.id === "measurelands";
   const prevIdx = (currentIndex - 1 + realms.length) % realms.length;
@@ -135,13 +131,6 @@ export default function RealmCarousel() {
     ? getStarpathLevel(selectedStarpathLevel).levelNumber
     : Number(displayedLevel.replace(/[^0-9]/g, "")) || 1;
 
-  function requestStarpathPreviewAccess() {
-    const returnTo = selectedStarpathLevel
-      ? buildStarpathWorldHref({ selectedLevel: selectedStarpathLevel })
-      : "/realms";
-    router.push(`/login?demo=1&returnTo=${encodeURIComponent(returnTo)}`);
-  }
-
   async function enterRealm() {
     if (!isActive || enteringRealm) return;
     const availability = getRealmAvailability(current.id);
@@ -154,7 +143,7 @@ export default function RealmCarousel() {
     exitReviewMode();
 
     if (availability.destinationRealmId === STARPATH_REALM_ID) {
-      if (!starpathAccess.allowed) return;
+      if (!starpathDemoActive) return;
       if (!selectedStarpathLevel) {
         setEntryError("Select a valid Starpath level before entering this realm.");
         return;
@@ -317,10 +306,10 @@ export default function RealmCarousel() {
 
             {/* CENTER PORTAL — the focused realm */}
             <div
-              className={`absolute left-1/2 top-1/2 ${isActive || isStarpathRealm ? "cursor-pointer" : ""}`}
-              onClick={isStarpathRealm && !isActive ? requestStarpathPreviewAccess : enterRealm}
-              role={isActive || isStarpathRealm ? "button" : undefined}
-              aria-label={isStarpathRealm && !isActive ? "Request Starpath demo access" : isActive ? `Enter ${current.name}` : undefined}
+              className={`absolute left-1/2 top-1/2 ${isActive ? "cursor-pointer" : ""}`}
+              onClick={isActive ? enterRealm : undefined}
+              role={isActive ? "button" : undefined}
+              aria-label={isActive ? `Enter ${current.name}` : undefined}
               style={{
                 transform: "translate(-50%, -52%)",
                 width: "220px",
@@ -468,20 +457,6 @@ export default function RealmCarousel() {
               >
                 {enteringRealm === current.id ? "Loading..." : isPreviewRealm || isStarpathRealm ? "Preview Realm" : "Enter Realm"}
               </button>
-            ) : isStarpathRealm ? (
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  requestStarpathPreviewAccess();
-                }}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-indigo-300/45 bg-indigo-400/15 px-6 py-2.5 text-sm font-bold text-indigo-50 transition hover:scale-105 hover:bg-indigo-400/25 active:scale-95"
-              >
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" />
-                </svg>
-                Preview Realm
-              </button>
             ) : current.comingSoon ? (
               <span className="inline-block px-6 py-2.5 rounded-2xl text-sm font-bold text-amber-300/80 border border-amber-400/30" style={{ background: "rgba(251,191,36,0.1)" }}>
                 Coming Soon
@@ -496,9 +471,9 @@ export default function RealmCarousel() {
               </span>
             )}
 
-            {isPreviewRealm || isStarpathRealm ? (
+            {isPreviewRealm || isStarpathPreview ? (
               <div className="mt-3 inline-flex items-center rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-sky-100">
-                {isStarpathRealm ? isStarpathPreview ? "Demo · Preview" : "Demo access only" : "Preview"}
+                {isStarpathRealm ? "Demo · Preview" : "Preview"}
               </div>
             ) : null}
 
