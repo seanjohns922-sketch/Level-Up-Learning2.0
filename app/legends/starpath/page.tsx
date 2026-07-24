@@ -15,15 +15,22 @@ export default function StarpathCollectionPage() {
   const [progress, setProgress] = useState<StudentProgress | null>(null);
   const [selectedLegend, setSelectedLegend] = useState<Legend | null>(null);
   const [barAnimated, setBarAnimated] = useState(false);
-  const demoPreview = isDemoPreviewMode();
+  const [demoPreview, setDemoPreview] = useState(false);
+  const [demoResolved, setDemoResolved] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
+      setDemoPreview(isDemoPreviewMode());
+      setDemoResolved(true);
       setProgress(readProgress("space"));
       setBarAnimated(true);
     }, 100);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (demoResolved && !demoPreview) router.replace("/legends");
+  }, [demoPreview, demoResolved, router]);
 
   const unlockedIds = useMemo(
     () => getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends, "starpath"),
@@ -45,6 +52,14 @@ export default function StarpathCollectionPage() {
   const collectedCount = allLegends.filter((legend) => visibleUnlockedIds.includes(legend.id)).length;
   const totalCount = allLegends.length;
   const pct = totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0;
+
+  if (!demoResolved || !demoPreview) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#09091f] text-cyan-100">
+        <p className="font-semibold">Opening the Legend Vault...</p>
+      </main>
+    );
+  }
 
   return (
     <main

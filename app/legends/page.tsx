@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Zap, Clock, Mountain, Compass, Triangle, BarChart3, Dices, BookOpen, Feather, Languages, Lightbulb } from "lucide-react";
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
@@ -59,7 +59,7 @@ const REALMS: RealmDef[] = [
     legendLine: "Geospin Collection",
     icon: <Compass className="h-5 w-5" />,
     totalLegends: 6,
-    status: "open",
+    status: "locked",
     route: "/legends/starpath",
     glowColor: "rgba(103, 232, 249, 0.22)",
     borderGlow: "rgba(139, 92, 246, 0.62)",
@@ -134,7 +134,11 @@ export default function LegendsPage() {
   const [numberProgress] = useState<StudentProgress | null>(() => readProgress("number"));
   const [measureProgress] = useState<StudentProgress | null>(() => readProgress("measurement"));
   const [spaceProgress] = useState<StudentProgress | null>(() => readProgress("space"));
-  const demoPreview = isDemoPreviewMode();
+  const [demoPreview, setDemoPreview] = useState(false);
+
+  useEffect(() => {
+    setDemoPreview(isDemoPreviewMode());
+  }, []);
 
   const unlockedIds = useMemo(
     () => getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
@@ -163,7 +167,15 @@ export default function LegendsPage() {
     return all.filter((legend) => visibleIds.includes(legend.id)).length;
   }, [demoPreview, spaceProgress]);
 
-  const realms = REALMS;
+  const realms = useMemo(
+    () =>
+      REALMS.map((realm) =>
+        realm.id === "starpath-realm" && demoPreview
+          ? { ...realm, status: "open" as const }
+          : realm,
+      ),
+    [demoPreview],
+  );
 
   const totalCollected = numbotCollected + measurelandsCollected + starpathCollected;
   const totalLegends = realms.reduce((sum, r) => sum + r.totalLegends, 0);
