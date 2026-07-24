@@ -294,6 +294,16 @@ const LEGENDS: Legend[] = [
     "meazurex-timewielder",
   ),
   starpathLegend(
+    "geospin-explorer-y0",
+    "Prep",
+    "Geospin Explorer",
+    "Begins exploring familiar shapes and positions across the Starpath realm.",
+    0.5,
+    { calculation: 35, speed: 30, accuracy: 40 },
+    "/cards/geospin-explorer-y0-front.png",
+    "/cards/geospin-explorer-y0-back.png",
+  ),
+  starpathLegend(
     "geospin-roller-y1",
     "Year 1",
     "Geospin Roller",

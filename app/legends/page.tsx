@@ -58,7 +58,7 @@ const REALMS: RealmDef[] = [
     name: "Starpath Realm",
     legendLine: "Geospin Collection",
     icon: <Compass className="h-5 w-5" />,
-    totalLegends: 6,
+    totalLegends: 7,
     status: "locked",
     route: "/legends/starpath",
     glowColor: "rgba(103, 232, 249, 0.22)",

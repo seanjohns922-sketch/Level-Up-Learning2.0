@@ -237,7 +237,7 @@ export default function StarpathCollectionPage() {
                 How to collect Starpath legends
               </div>
               <div className="text-sm" style={{ color: "hsl(216, 20%, 78%)" }}>
-                Complete each Starpath level to unlock its Geospin evolution. Ground Level prepares explorers for the first card.
+                Complete each Starpath level to unlock its Geospin evolution, beginning with Ground Level.
               </div>
             </div>
           </div>
