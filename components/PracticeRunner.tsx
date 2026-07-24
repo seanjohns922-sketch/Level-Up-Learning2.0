@@ -78,7 +78,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "groundMoveCount") return "Move To Count";
   if (kind === "groundFeed") return "Feed Numbot";
   if (kind === "groundSoundCount") return "Sound Count";
-  if (kind === "starpathShapeIntro") return "Meet the Shapes";
+  if (kind === "starpathShapeIntro") return "Warm Up";
   if (kind === "starpathShapeMatch") return "Match the Cosmic Shapes";
   if (kind === "starpathShapeCompare") return "Same or Different";
   if (kind === "starpathShapeSort") return "Shape Sorter";
@@ -93,6 +93,16 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "starpathBuildShapeIdentify") return "Name the Build Shapes";
   if (kind === "starpathBuildMatch") return "Match the Build";
   if (kind === "starpathSpaceMuseum") return "Space Museum";
+  if (kind === "starpathFamilySort") return "Sorting Station";
+  if (kind === "starpathWhatChanged") return "What Changed?";
+  if (kind === "starpathShapeSprint") return "Shape Sprint";
+  if (kind === "starpathPositionFind") return "Find It";
+  if (kind === "starpathPositionWord") return "Say Where";
+  if (kind === "starpathPositionPlace") return "Place It";
+  if (kind === "starpathPositionPicture") return "Which Picture";
+  if (kind === "starpathPositionSequence") return "Follow the Clues";
+  if (kind === "starpathDirectionPath") return "Follow the Directions";
+  if (kind === "starpathDirectionChoice") return "Which Way?";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";
