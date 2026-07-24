@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Check } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -14,6 +14,9 @@ type CollectMissionTask = Extract<PracticeTask, { kind: "starpathCollectMission"
 type ObjectShapeTask = Extract<PracticeTask, { kind: "starpathObjectShape" }>;
 type ShapeNameTask = Extract<PracticeTask, { kind: "starpathShapeName" }>;
 type ShapeCompareTask = Extract<PracticeTask, { kind: "starpathShapeCompare" }>;
+type FamilySortTask = Extract<PracticeTask, { kind: "starpathFamilySort" }>;
+type WhatChangedTask = Extract<PracticeTask, { kind: "starpathWhatChanged" }>;
+type ShapeSprintTask = Extract<PracticeTask, { kind: "starpathShapeSprint" }>;
 
 const SHAPE_ICON_COLOUR: Record<FoundationShape, string> = {
   circle: "#67e8f9",
@@ -368,6 +371,315 @@ export function StarpathCollectMissionCard({
                 {isCollected ? (
                   <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400 text-indigo-950 shadow">
                     <Check className="h-4 w-4" strokeWidth={3} />
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {SHAKE_STYLE}
+    </div>
+  );
+}
+
+const SHAPE_WORD: Record<FoundationShape, string> = {
+  circle: "Circle",
+  triangle: "Triangle",
+  square: "Square",
+  rectangle: "Rectangle",
+};
+
+// W3 L1 — Sorting Station. A queue of shapes; drag the current one into its
+// family bin (or tap the bin). Forgiving: a wrong bin shakes and the shape
+// stays. Completes once every shape in the queue has found its family.
+export function StarpathFamilySortCard({
+  task,
+  onComplete,
+}: {
+  task: FamilySortTask;
+  onComplete: () => void;
+}) {
+  const [placed, setPlaced] = useState(0);
+  const [wrongBin, setWrongBin] = useState<string | null>(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const dragStart = useRef<{ x: number; y: number } | null>(null);
+  const doneRef = useRef(false);
+  const current = task.items[placed];
+
+  function place(binShape: FoundationShape) {
+    if (doneRef.current || !current) return;
+    if (binShape === current.shape) {
+      const next = placed + 1;
+      setPlaced(next);
+      if (next >= task.items.length) {
+        doneRef.current = true;
+        setTimeout(onComplete, 420);
+      }
+    } else {
+      setWrongBin(binShape);
+      setTimeout(() => setWrongBin((value) => (value === binShape ? null : value)), 480);
+    }
+  }
+
+  function finishDrop(clientX: number, clientY: number) {
+    const dropTarget = document
+      .elementFromPoint(clientX, clientY)
+      ?.closest<HTMLElement>("[data-shape-drop]");
+    setOffset({ x: 0, y: 0 });
+    dragStart.current = null;
+    if (dropTarget?.dataset.shapeDrop) place(dropTarget.dataset.shapeDrop as FoundationShape);
+  }
+
+  return (
+    <div>
+      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <div className="relative mb-5 flex min-h-40 items-center justify-center overflow-hidden rounded-2xl border border-dashed border-cyan-300 bg-cyan-50/70 p-3">
+        <div className="absolute left-3 top-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-700">
+          Sorted {placed} of {task.items.length}
+        </div>
+        {current ? (
+          <button
+            type="button"
+            aria-label={`Drag the ${current.shape}`}
+            onPointerDown={(event: ReactPointerEvent<HTMLButtonElement>) => {
+              dragStart.current = { x: event.clientX, y: event.clientY };
+              event.currentTarget.setPointerCapture(event.pointerId);
+            }}
+            onPointerMove={(event) => {
+              if (!dragStart.current) return;
+              setOffset({ x: event.clientX - dragStart.current.x, y: event.clientY - dragStart.current.y });
+            }}
+            onPointerUp={(event) => finishDrop(event.clientX, event.clientY)}
+            onPointerCancel={() => {
+              dragStart.current = null;
+              setOffset({ x: 0, y: 0 });
+            }}
+            className="touch-none cursor-grab rounded-2xl border-2 border-violet-300 bg-white p-2 shadow-lg active:cursor-grabbing"
+            style={{ transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`, zIndex: offset.x || offset.y ? 20 : 1 }}
+          >
+            <ShapeVisual shape={current.shape} colour={current.colour} scale={current.scale} className="h-24 w-28" />
+          </button>
+        ) : (
+          <span className="flex items-center gap-2 text-lg font-black text-emerald-700">
+            <Check className="h-6 w-6" strokeWidth={3} /> Station cleared!
+          </span>
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {task.bins.map((shape) => (
+          <button
+            key={shape}
+            type="button"
+            data-shape-drop={shape}
+            onClick={() => place(shape)}
+            className={[
+              "flex min-h-32 flex-col items-center justify-center rounded-2xl border-2 p-3 shadow-sm transition",
+              wrongBin === shape
+                ? "sp-shake border-rose-400 bg-rose-50"
+                : "border-indigo-200 bg-gradient-to-b from-indigo-50 to-violet-100 hover:border-cyan-400 hover:shadow-md",
+            ].join(" ")}
+          >
+            <ShapeVisual shape={shape} colour={SHAPE_ICON_COLOUR[shape]} className="h-12 w-12" />
+            <span className="mt-2 text-sm font-black text-indigo-950">{SHAPE_WORD[shape]} family</span>
+          </button>
+        ))}
+      </div>
+      <p className="mt-3 text-center text-sm font-semibold text-slate-600">Drag the shape to its family, or tap the bin.</p>
+      {SHAKE_STYLE}
+    </div>
+  );
+}
+
+// W3 L2 — What Changed? Same shape shown twice; exactly one thing changed.
+// Reinforces that colour and size do not change what a shape is.
+const WHAT_CHANGED_OPTIONS: Array<{ id: WhatChangedTask["answer"]; label: string }> = [
+  { id: "colour", label: "The colour" },
+  { id: "size", label: "The size" },
+  { id: "shape", label: "A different shape" },
+];
+
+export function StarpathWhatChangedCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: WhatChangedTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  return (
+    <div>
+      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <div className="mx-auto mb-5 flex max-w-2xl items-center justify-center gap-4">
+        {[task.before, task.after].map((view, index) => (
+          <div key={index} className="flex flex-col items-center gap-1">
+            <span className="text-xs font-black uppercase tracking-[0.16em] text-cyan-700">
+              {index === 0 ? "Before" : "After"}
+            </span>
+            <div className="flex h-36 w-36 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-3 shadow-sm">
+              <ShapeVisual shape={view.shape} colour={view.colour} scale={view.scale} className="h-28 w-28" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {WHAT_CHANGED_OPTIONS.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => (option.id === task.answer ? onCorrect() : onWrong())}
+            className="relative flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+          >
+            <span className="text-lg font-black text-indigo-950">{option.label}</span>
+            <OptionReadAloudButton text={option.label} className="absolute right-2 top-1/2 -translate-y-1/2" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// W3 L3 capstone — Shape Sprint. A gentle, no-penalty speed round: after a
+// "ready" gate, find as many of the target shape as you can before the fuel
+// runs out. Wrong taps never count against the child; the round always ends in
+// celebration and completes.
+export function StarpathShapeSprintCard({
+  task,
+  onComplete,
+}: {
+  task: ShapeSprintTask;
+  onComplete: () => void;
+}) {
+  const total = useMemo(
+    () => task.items.filter((item) => item.shape === task.targetShape).length,
+    [task]
+  );
+  const [phase, setPhase] = useState<"ready" | "playing" | "done">("ready");
+  const [found, setFound] = useState<Set<string>>(() => new Set());
+  const [wrongId, setWrongId] = useState<string | null>(null);
+  const [remaining, setRemaining] = useState(task.seconds);
+  const finishedRef = useRef(false);
+
+  const finish = () => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+    setPhase("done");
+    setTimeout(onComplete, 1300);
+  };
+
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const start = Date.now();
+    const timer = window.setInterval(() => {
+      const left = task.seconds - (Date.now() - start) / 1000;
+      if (left <= 0) {
+        setRemaining(0);
+        window.clearInterval(timer);
+        finish();
+      } else {
+        setRemaining(left);
+      }
+    }, 100);
+    return () => window.clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
+  function tapItem(item: ShapeSprintTask["items"][number]) {
+    if (phase !== "playing") return;
+    if (item.shape === task.targetShape) {
+      if (found.has(item.id)) return;
+      const next = new Set(found);
+      next.add(item.id);
+      setFound(next);
+      if (next.size >= total) finish();
+    } else {
+      setWrongId(item.id);
+      setTimeout(() => setWrongId((value) => (value === item.id ? null : value)), 420);
+    }
+  }
+
+  if (phase === "ready") {
+    return (
+      <div className="rounded-2xl border-2 border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-6 text-center sm:p-8">
+        <TaskHeading prompt={task.prompt} speech={task.speakText} />
+        <div className="mx-auto my-4 flex h-32 w-32 items-center justify-center rounded-2xl border-2 border-cyan-300 bg-white shadow-sm">
+          <ShapeVisual shape={task.targetShape} colour={SHAPE_ICON_COLOUR[task.targetShape]} className="h-24 w-24" />
+        </div>
+        <p className="text-base font-bold text-slate-700">
+          Find as many <span className="capitalize">{task.targetShape}s</span> as you can in {task.seconds} seconds!
+        </p>
+        <button
+          type="button"
+          onClick={() => setPhase("playing")}
+          className="mx-auto mt-5 block min-h-12 rounded-2xl bg-violet-700 px-8 py-3 text-lg font-black text-white shadow-lg transition hover:bg-violet-600 active:scale-[0.98]"
+        >
+          Start the sprint
+        </button>
+      </div>
+    );
+  }
+
+  if (phase === "done") {
+    return (
+      <div className="rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-8 text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400 text-white shadow">
+          <Check className="h-9 w-9" strokeWidth={3} />
+        </div>
+        <h2 className="mt-4 text-2xl font-black text-emerald-900 sm:text-3xl">
+          You found {found.size} of {total} <span className="capitalize">{task.targetShape}s</span>!
+        </h2>
+        <p className="mt-1 text-base font-bold text-emerald-700">{task.feedback.correct}</p>
+      </div>
+    );
+  }
+
+  const barPct = Math.max(0, (remaining / task.seconds) * 100);
+  return (
+    <div>
+      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <div className="mx-auto mb-3 flex max-w-3xl items-center gap-3">
+        <div className="h-3 flex-1 overflow-hidden rounded-full bg-violet-100">
+          <div
+            className={[
+              "h-full rounded-full transition-[width] duration-100 ease-linear",
+              barPct > 33 ? "bg-gradient-to-r from-violet-500 to-cyan-400" : "bg-gradient-to-r from-amber-400 to-rose-400",
+            ].join(" ")}
+            style={{ width: `${barPct}%` }}
+          />
+        </div>
+        <span className="w-16 text-right font-mono text-sm font-black tabular-nums text-violet-800">
+          {Math.ceil(remaining)}s · {found.size}/{total}
+        </span>
+      </div>
+      <div className="relative overflow-hidden rounded-2xl border-2 border-violet-200 bg-gradient-to-b from-indigo-950 via-violet-900 to-slate-950 p-4 shadow-inner sm:p-5">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-50"
+          aria-hidden="true"
+          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "30px 30px" }}
+        />
+        <div className="relative grid grid-cols-3 gap-3 sm:grid-cols-5">
+          {task.items.map((item) => {
+            const isFound = found.has(item.id);
+            const isWrong = wrongId === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-label={item.shape}
+                onClick={() => tapItem(item)}
+                className={[
+                  "relative flex min-h-20 items-center justify-center rounded-2xl border-2 p-2 transition active:scale-[0.97]",
+                  isFound
+                    ? "border-emerald-300 bg-emerald-400/20"
+                    : "border-white/25 bg-white/10 hover:-translate-y-1 hover:border-cyan-300 hover:bg-white/20",
+                  isWrong ? "sp-shake border-rose-400 bg-rose-500/20" : "",
+                ].join(" ")}
+              >
+                <ShapeVisual shape={item.shape} colour={item.colour} className="h-14 w-14 sm:h-16 sm:w-16" />
+                {isFound ? (
+                  <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400 text-indigo-950 shadow">
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} />
                   </span>
                 ) : null}
               </button>

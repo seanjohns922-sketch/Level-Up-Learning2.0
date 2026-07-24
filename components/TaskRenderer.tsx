@@ -144,7 +144,21 @@ import {
   StarpathObjectShapeCard,
   StarpathShapeCompareCard,
   StarpathShapeNameCard,
+  StarpathFamilySortCard,
+  StarpathWhatChangedCard,
+  StarpathShapeSprintCard,
 } from "@/components/starpath/StarpathShapeChallengeCards";
+import {
+  StarpathPositionFindCard,
+  StarpathPositionWordCard,
+  StarpathPositionPlaceCard,
+  StarpathPositionPictureCard,
+  StarpathPositionSequenceCard,
+} from "@/components/starpath/StarpathPositionCards";
+import {
+  StarpathDirectionPathCard,
+  StarpathDirectionChoiceCard,
+} from "@/components/starpath/StarpathDirectionCards";
 import {
   StarpathBuildMatchCard,
   StarpathBuildShapeIdentifyCard,
@@ -575,6 +589,26 @@ function TaskRendererInner({
       return <StarpathBuildMatchCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathSpaceMuseum":
       return <StarpathSpaceMuseumCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathFamilySort":
+      return <StarpathFamilySortCard key={k} task={t} onComplete={onC} />;
+    case "starpathWhatChanged":
+      return <StarpathWhatChangedCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathShapeSprint":
+      return <StarpathShapeSprintCard key={k} task={t} onComplete={onC} />;
+    case "starpathPositionFind":
+      return <StarpathPositionFindCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathPositionWord":
+      return <StarpathPositionWordCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathPositionPlace":
+      return <StarpathPositionPlaceCard key={k} task={t} onComplete={onC} />;
+    case "starpathPositionPicture":
+      return <StarpathPositionPictureCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathPositionSequence":
+      return <StarpathPositionSequenceCard key={k} task={t} onComplete={onC} />;
+    case "starpathDirectionPath":
+      return <StarpathDirectionPathCard key={k} task={t} onComplete={onC} />;
+    case "starpathDirectionChoice":
+      return <StarpathDirectionChoiceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     default:
       return <TaskRecoveryCard onRecover={onW} />;
   }

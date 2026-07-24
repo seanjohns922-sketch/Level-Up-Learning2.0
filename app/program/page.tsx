@@ -29,6 +29,7 @@ import { buildLessonRoute, normalizeStudentYearLabel } from "@/lib/lesson-routin
 import { readStarpathDemoJourney, writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
 import { getStarpathLevelForYear, type StarpathLevelDefinition } from "@/lib/starpath-levels";
 import {
+  buildStarpathPostTestPageHref,
   buildStarpathProgramHref,
   buildStarpathWeeklyQuizHref,
   buildStarpathWorldHref,
@@ -505,7 +506,7 @@ function ProgramPage() {
       { type: "lesson" as const, n: 2, title: lessons[1]?.displayTitle ?? lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.displayTitle ?? lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
     ];
-    if (isStarpathRealm || weekNum !== lastWeek) {
+    if (weekNum !== lastWeek) {
       base.push({
         type: "quiz" as const,
         n: 1,
@@ -557,6 +558,10 @@ function ProgramPage() {
     }
     if (isStarpathRealm && starpathProgram && item.type === "quiz") {
       router.push(buildStarpathWeeklyQuizHref({ selectedLevel: starpathProgram.definition.id }, weekNum));
+      return;
+    }
+    if (isStarpathRealm && starpathProgram && item.type === "posttest") {
+      router.push(buildStarpathPostTestPageHref({ selectedLevel: starpathProgram.definition.id }));
       return;
     }
     if (item.type === "posttest") {

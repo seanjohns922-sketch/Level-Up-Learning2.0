@@ -1,11 +1,11 @@
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
-import { familySortTask, oddShapeTask } from "./week3Tasks";
+import { collectFamilyTask, familyStationTask, oddShapeTask } from "./week3Tasks";
 
 export function createShapeFamiliesTaskSet(): RealmLessonTaskSet {
   let target = 0;
-  let familyRound = 0;
-  let groupRound = 0;
+  let stationRound = 0;
+  let collectRound = 0;
   let oddRound = 0;
   return {
     teaching: () => ({
@@ -17,25 +17,25 @@ export function createShapeFamiliesTaskSet(): RealmLessonTaskSet {
       target: ++target,
     }),
     activities: [
-      () => familySortTask(familyRound++, ++target, "drag"),
-      () => familySortTask(groupRound++, ++target, "group"),
+      () => familyStationTask(stationRound++, ++target),
+      () => collectFamilyTask(collectRound++, ++target),
       () => oddShapeTask(oddRound++, ++target),
     ],
   };
 }
 
 export const SHAPE_FAMILIES_CONTENT = {
-  missionBrief: "Help Geospin organise the sorting station. Group familiar shapes into families and find the shape that does not belong.",
-  successCriteria: ["put the same shapes together", "recognise different shapes", "explain my choice"],
+  missionBrief: "Help Geospin run the sorting station. Sort every shape into its family, gather a whole family together and spot the shape that does not belong.",
+  successCriteria: ["sort shapes into families", "gather a whole family", "spot the shape that does not belong"],
   artworkSrc: "/images/starpath-home-bg-ground.png",
   teaching: { title: "Shape Families", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "shape-families", title: "Shape Families", description: "Sort different colours and sizes into the correct shape family.", taskKinds: ["starpathShapeSort"] },
-    { key: "which-group", title: "Which Group?", description: "Choose the family where each shape belongs.", taskKinds: ["starpathShapeSort"] },
+    { key: "sorting-station", title: "Sorting Station", description: "Sort each shape into the correct family bin.", taskKinds: ["starpathFamilySort"] },
+    { key: "collect-the-family", title: "Collect the Family", description: "Gather every shape that belongs to one family.", taskKinds: ["starpathCollectMission"] },
     { key: "find-the-odd-shape", title: "Find the Odd Shape", description: "Find the one shape that does not belong with the others.", taskKinds: ["starpathOddOneOut"] },
   ],
   reflection: { prompt: "How did you decide where a shape belonged?", options: ["I looked at its shape", "I found the matching family", "I found what was different"] },
-  practisedSkills: ["Sort familiar shapes into groups", "Recognise shape families despite colour or size", "Identify a shape that does not belong"],
+  practisedSkills: ["Sort several shapes into families", "Gather a whole shape family", "Identify a shape that does not belong"],
   nextUpLabel: "Same or Different?",
   createTaskSet: createShapeFamiliesTaskSet,
 } satisfies StarpathLessonContent;

@@ -1,13 +1,12 @@
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
-import { shapeMatchTask } from "./week1Lesson1";
-import { compareShapeTask, oddShapeTask } from "./week3Tasks";
+import { compareShapeTask, twinMatchTask, whatChangedTask } from "./week3Tasks";
 
 export function createSameOrDifferentTaskSet(): RealmLessonTaskSet {
   let target = 0;
   let compareRound = 0;
-  let pairRound = 0;
-  let oddRound = 0;
+  let twinRound = 0;
+  let changeRound = 0;
   return {
     teaching: () => ({
       kind: "starpathShapeIntro",
@@ -19,24 +18,24 @@ export function createSameOrDifferentTaskSet(): RealmLessonTaskSet {
     }),
     activities: [
       () => compareShapeTask(compareRound++, ++target),
-      () => shapeMatchTask(pairRound++, ++target),
-      () => oddShapeTask(oddRound++, ++target),
+      () => twinMatchTask(twinRound++, ++target),
+      () => whatChangedTask(changeRound++, ++target),
     ],
   };
 }
 
 export const SAME_OR_DIFFERENT_CONTENT = {
-  missionBrief: "Visit the Cosmic Comparison Lab. Decide whether shapes are the same, match shape partners and spot what is different.",
-  successCriteria: ["see when shapes are the same", "see when shapes are different", "explain my thinking"],
+  missionBrief: "Visit the Cosmic Comparison Lab. Decide whether shapes are the same, find shape twins hiding in new colours and sizes, and spot exactly what changed.",
+  successCriteria: ["see when shapes are the same", "match a shape to its twin", "notice what changes without changing the shape"],
   artworkSrc: "/images/starpath-home-bg-ground.png",
   teaching: { title: "Same or Different?", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "same-shape", title: "Same Shape?", description: "Compare two shapes even when their colours and sizes differ.", taskKinds: ["starpathShapeCompare"] },
-    { key: "match-the-pair", title: "Match the Pair", description: "Match a target shape with its shape partner.", taskKinds: ["starpathShapeMatch"] },
-    { key: "spot-the-difference", title: "Spot the Difference", description: "Find the different shape in a group of four.", taskKinds: ["starpathOddOneOut"] },
+    { key: "same-or-different", title: "Same or Different?", description: "Decide if two shapes are the same, even when their colour and size change.", taskKinds: ["starpathShapeCompare"] },
+    { key: "twins-in-disguise", title: "Twins in Disguise", description: "Find the shape that is the same, hiding in a new colour and size.", taskKinds: ["starpathShapeMatch"] },
+    { key: "what-changed", title: "What Changed?", description: "Spot what changed: the colour, the size, or the shape itself.", taskKinds: ["starpathWhatChanged"] },
   ],
   reflection: { prompt: "What can change without changing the shape?", options: ["The colour", "The size", "The way it is shown"] },
-  practisedSkills: ["Compare two familiar shapes", "Match shapes across colour and size changes", "Identify a visual difference"],
+  practisedSkills: ["Compare two familiar shapes", "Match a shape to its twin across colour and size", "Notice what changes without changing the shape"],
   nextUpLabel: "Shape Challenge",
   createTaskSet: createSameOrDifferentTaskSet,
 } satisfies StarpathLessonContent;

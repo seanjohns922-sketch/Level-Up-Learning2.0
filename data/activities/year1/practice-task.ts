@@ -2264,7 +2264,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "builders";
+      variant?: "shapes" | "objects" | "clues" | "builders" | "positions" | "positionsDepth" | "directions";
       heading?: string;
     }
   | {
@@ -2449,6 +2449,153 @@ export type PracticeTask = (
         shape: "circle" | "triangle" | "square" | "rectangle";
       };
       options: Array<{ id: string; objectId: string }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathFamilySort";
+      prompt: string;
+      speakText: string;
+      target: number;
+      bins: Array<"circle" | "triangle" | "square" | "rectangle">;
+      items: Array<{
+        id: string;
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+        scale: number;
+      }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathWhatChanged";
+      prompt: string;
+      speakText: string;
+      target: number;
+      before: { shape: "circle" | "triangle" | "square" | "rectangle"; colour: string; scale: number };
+      after: { shape: "circle" | "triangle" | "square" | "rectangle"; colour: string; scale: number };
+      answer: "colour" | "size" | "shape";
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathShapeSprint";
+      prompt: string;
+      speakText: string;
+      target: number;
+      targetShape: "circle" | "triangle" | "square" | "rectangle";
+      /** How long the speed round runs, in seconds. */
+      seconds: number;
+      items: Array<{
+        id: string;
+        shape: "circle" | "triangle" | "square" | "rectangle";
+        colour: string;
+      }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Find It — tap the object that matches a positional clue.
+      kind: "starpathPositionFind";
+      prompt: string;
+      speakText: string;
+      target: number;
+      anchorObject: string;
+      placements: Array<{
+        id: string;
+        object: string;
+        relation: "above" | "below" | "beside" | "in-front" | "behind" | "inside";
+        side?: "left" | "right";
+      }>;
+      correctId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Say Where — read a scene and pick the position word.
+      kind: "starpathPositionWord";
+      prompt: string;
+      speakText: string;
+      target: number;
+      anchorObject: string;
+      subjectObject: string;
+      relation: "above" | "below" | "beside" | "in-front" | "behind" | "inside";
+      side?: "left" | "right";
+      options: Array<{
+        id: string;
+        relation: "above" | "below" | "beside" | "in-front" | "behind" | "inside";
+      }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Place It — drag an object into the correct position around an anchor.
+      kind: "starpathPositionPlace";
+      prompt: string;
+      speakText: string;
+      target: number;
+      anchorObject: string;
+      moverObject: string;
+      relation: "above" | "below" | "beside" | "in-front" | "behind" | "inside";
+      slots: Array<"above" | "below" | "beside" | "in-front" | "behind" | "inside">;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Which Picture — choose the mini-scene that matches the clue.
+      kind: "starpathPositionPicture";
+      prompt: string;
+      speakText: string;
+      target: number;
+      options: Array<{
+        id: string;
+        anchorObject: string;
+        subjectObject: string;
+        relation: "above" | "below" | "beside" | "in-front" | "behind" | "inside";
+        side?: "left" | "right";
+      }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Follow the Clues — one positional instruction at a time in one scene.
+      kind: "starpathPositionSequence";
+      prompt: string;
+      speakText: string;
+      target: number;
+      anchorObject: string;
+      placements: Array<{
+        id: string;
+        object: string;
+        relation: "above" | "below" | "beside" | "in-front" | "behind" | "inside";
+        side?: "left" | "right";
+      }>;
+      steps: Array<{ instruction: string; speakText: string; targetId: string }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Follow a sequence of directions to move a traveller across a grid.
+      kind: "starpathDirectionPath";
+      prompt: string;
+      speakText: string;
+      target: number;
+      cols: number;
+      rows: number;
+      object: string;
+      start: { r: number; c: number };
+      goal?: { r: number; c: number; object: string; reveal?: boolean };
+      steps: Array<{ direction: "up" | "down" | "left" | "right"; instruction: string; speakText: string }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Choose the direction that moves a traveller from one cell to another.
+      kind: "starpathDirectionChoice";
+      prompt: string;
+      speakText: string;
+      target: number;
+      cols: number;
+      rows: number;
+      object: string;
+      from: { r: number; c: number };
+      to: { r: number; c: number };
+      /** When set, the destination shows this object (reach-the-goal framing). */
+      goalObject?: string;
+      options: Array<{ id: string; direction: "up" | "down" | "left" | "right" }>;
       correctOptionId: string;
       feedback: { correct: string; wrong: string };
     }

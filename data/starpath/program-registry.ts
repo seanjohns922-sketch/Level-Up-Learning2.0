@@ -145,16 +145,16 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
     achievementStandardConnection: "Students describe familiar shapes and the position and location of themselves and objects relative to other objects and people in familiar spaces.",
     prerequisites: ["Everyday experience with objects, movement and simple location words."],
     likelyMisconceptions: ["A shape changes name when rotated.", "Size or colour determines a shape.", "Position words have a fixed viewpoint."],
-    progressionRationale: "The sequence deliberately moves from recognise to create, sort, describe and apply. Changing the context from shape spotting to building, environmental searches, navigation and a final Space Graduation keeps Foundation practice varied while remaining aligned to AC9MFSP01 and AC9MFSP02. Completion is planned to unlock the Ground Level Starpath Graduate title.",
+    progressionRationale: "The sequence runs shapes first, then space. Weeks 1-3 recognise, create, sort and compare familiar shapes (AC9MFSP01). Weeks 4-6 then move into position, direction and movement using those same shapes as context (AC9MFSP02): describe where objects are, follow and give directions, then navigate a pathway. Weeks 7-8 combine both descriptors to build and describe a space scene and complete a cumulative Space Graduation. Completion is planned to unlock the Ground Level Starpath Graduate title.",
     weeks: [
       W("Shape Spotters", "Recognise and name familiar two-dimensional shapes in varied Starpath scenes.", ["AC9MFSP01"], skill("space-ground-shape-recognition", "Spot familiar shapes", "Recognises and names circles, squares, triangles and rectangles despite changes in size, colour or orientation.", ["AC9MFSP01"], "shape-and-object-reasoning"), [["Meet the Shapes", "Recognise circles, squares, triangles and rectangles."], ["Shape Detectives", "Find familiar shapes hidden inside everyday objects."], ["Shape Masters", "Recognise and sort familiar shapes independently."]], ["shape-introduction", "scene-shape-hunt", "shape-match-sort"], ["circle", "square", "triangle", "rectangle", "shape"], ["A shape changes name when it is turned.", "The colour or size determines the shape."], "Recognition, naming, matching and simple sorting."),
       W("Shape Builders", "Use familiar shapes as building blocks to create pictures and explain the shapes within them.", ["AC9MFSP01"], skill("space-ground-shape-creation", "Build with shapes", "Creates familiar shape pictures, recognises the shapes within completed objects and explains simple visual reasoning.", ["AC9MFSP01"], "construction-and-visualisation", ["space-ground-shape-recognition"]), [["Build with Shapes", "Use familiar shapes to build simple pictures."], ["Shape Creators", "Combine familiar shapes to create new pictures."], ["Space Builders", "Build and explain shape creations using visual reasoning."]], ["finish-the-picture", "shape-builder", "shape-reasoning"], ["build", "shape", "combine", "picture", "explain"], ["A picture can contain only one shape.", "A creation must match one exact arrangement."], "Guided construction, creative composition and visual shape reasoning."),
       W("Shape Sorters", "Sort and compare familiar shapes by noticing simple visual similarities and differences.", ["AC9MFSP01"], skill("space-ground-shape-sorting", "Sort shapes with a reason", "Sorts and compares familiar shapes despite changes in colour and size, then gives a simple reason for a choice.", ["AC9MFSP01"], "shape-and-object-reasoning", ["space-ground-shape-recognition"]), [["Shape Families", "Sort familiar shapes into matching groups."], ["Same or Different?", "Compare familiar shapes despite changes in colour and size."], ["Shape Challenge", "Apply shape recognition, sorting and comparing together."]], ["shape-families", "same-or-different", "mixed-shape-challenge"], ["sort", "same", "different", "family", "belong"], ["Colour changes the name of a shape.", "Size changes the name of a shape."], "Shape-family sorting, visual comparison and simple explanations."),
-      W("Shapes Around Us", "Recognise familiar shapes within space and everyday objects.", ["AC9MFSP01"], skill("space-ground-shapes-in-objects", "Find shapes in objects", "Identifies familiar shapes within environmental objects and gives a simple reason for the match.", ["AC9MFSP01"], "spatial-representation", ["space-ground-shape-recognition"]), [["Space Objects", "Find familiar shapes in rockets, planets and satellites."], ["Home Objects", "Find familiar shapes in everyday environments."], ["Treasure Hunt", "Find every object that matches a chosen shape."]], ["space-object-hotspot", "home-shape-match", "target-shape-hunt"], ["object", "rocket", "planet", "match", "find"], ["An object must be exactly one shape.", "Only space objects contain useful shapes."], "Environmental shape recognition across space and familiar contexts."),
-      W("Space Positions", "Use positional language to describe where objects are.", ["AC9MFSP02"], skill("space-ground-position-language", "Say where things are", "Uses above, below, beside, in, on, under and behind from a clear viewpoint.", ["AC9MFSP02"], "position-and-navigation"), [["Above, Below, Beside", "Identify and describe simple relative positions."], ["In, On, Under, Behind", "Use containment and relative position words in familiar scenes."], ["Move the Object", "Drag an object to a location described by a positional clue."]], ["position-word-match", "position-scene-choice", "drag-to-position"], ["above", "below", "beside", "in", "under"], ["A position word describes an object without a reference object.", "On and above always mean the same thing."], "Relational position vocabulary and interactive placement."),
-      W("Space Adventures", "Follow and apply positional clues in playful movement and location missions.", ["AC9MFSP02"], skill("space-ground-movement-pathways", "Follow space clues", "Follows positional clues to move through a familiar space and locate hidden objects.", ["AC9MFSP02"], "position-and-navigation", ["space-ground-position-language"]), [["Guide the Rocket", "Move a rocket by following simple positional directions."], ["Help Geospin", "Follow positional clues to help Geospin reach a destination."], ["Hidden Treasure", "Find an object by applying a sequence of location clues."]], ["rocket-position-guide", "character-clue-path", "hidden-object-clues"], ["move", "clue", "location", "next", "behind"], ["Clues can be followed in any order.", "The destination alone tells us how to move."], "Applying position and movement language in ordered adventures."),
-      W("Build Starpath", "Combine familiar shapes and positions to create and describe a space scene.", ["AC9MFSP01", "AC9MFSP02"], skill("space-ground-shape-position-composition", "Build and describe a space scene", "Combines familiar shapes in a space scene and describes where objects are using simple positional language.", ["AC9MFSP01", "AC9MFSP02"], "construction-and-visualisation", ["space-ground-shape-creation", "space-ground-position-language"]), [["Build a Planet", "Combine familiar shapes to create a planet design."], ["Create a Space Scene", "Arrange shape-built objects in a Starpath scene."], ["Describe Your Picture", "Use simple oral positional language to describe the scene."]], ["planet-shape-builder", "space-scene-composer", "oral-scene-description"], ["create", "planet", "scene", "beside", "describe"], ["A scene has only one correct arrangement.", "A listener can see where everything is without position words."], "Combining shape creation, scene composition and positional description."),
-      W("Space Graduation", "Apply shape recognition, creation, sorting and position language in a final adventure.", ["AC9MFSP01", "AC9MFSP02"], skill("space-ground-spatial-mission", "Complete Space Graduation", "Integrates shape recognition, creation, sorting and positional language to solve a cumulative Starpath mission.", ["AC9MFSP01", "AC9MFSP02"], "spatial-representation", ["space-ground-shape-sorting", "space-ground-shapes-in-objects", "space-ground-movement-pathways", "space-ground-shape-position-composition"]), [["Shape Explorer Challenge", "Recognise, create and sort familiar shapes in a cumulative challenge."], ["Position Explorer Challenge", "Describe positions and follow location clues in a cumulative challenge."], ["Geospin's Final Mission", "Help Geospin complete an adventure combining all Ground Level skills."]], ["shape-explorer-challenge", "position-explorer-challenge", "geospin-final-mission"], ["shape", "sort", "position", "mission", "explorer"], ["Only one type of shape or position clue can appear in a mission.", "A successful answer does not need a reason or description."], "Cumulative Ground Level learning; completion is planned to unlock the Ground Level Starpath Graduate title."),
+      W("Space Positions", "Describe where objects are using simple positional language within a familiar space.", ["AC9MFSP02"], skill("space-ground-describe-position", "Say where things are", "Describes the position and location of objects in relation to other objects using above, below, beside, behind, in front and inside.", ["AC9MFSP02"], "position-and-navigation", ["space-ground-shape-recognition"]), [["Where Is It?", "Describe where objects are using above, below and beside."], ["Around Starpath", "Describe where objects are using behind, in front and inside."], ["Position Challenge", "Follow positional clues to complete a space mission."]], ["find-it", "place-it", "which-picture"], ["above", "below", "beside", "behind", "inside"], ["A position word describes an object without a reference object.", "Above and on always mean the same thing."], "Positional language: above, below, beside, behind, in front and inside."),
+      W("Space Directions", "Follow and give simple directions to move objects around a familiar space.", ["AC9MFSP02"], skill("space-ground-follow-directions", "Follow and give directions", "Follows and gives simple directions — up, down, left, right and next to — to move and place objects within a familiar space.", ["AC9MFSP02"], "position-and-navigation", ["space-ground-describe-position"]), [["Move It There", "Move an object up, down, left or right on request."], ["Which Way?", "Choose the direction that describes how an object moved."], ["Direction Mission", "Follow a short set of directions to place several objects."]], ["move-it-there", "which-way", "direction-mission"], ["up", "down", "left", "right", "next to"], ["Left and right stay the same when you turn to face the other way.", "A direction does not need a starting point."], "Following and giving simple directions to move objects."),
+      W("Space Adventures", "Follow and apply positional clues in playful movement and location missions.", ["AC9MFSP02"], skill("space-ground-movement-pathways", "Follow space clues", "Follows positional clues to move through a familiar space and locate hidden objects.", ["AC9MFSP02"], "position-and-navigation", ["space-ground-follow-directions"]), [["Guide the Rocket", "Move a rocket by following simple positional directions."], ["Help Geospin", "Follow positional clues to help Geospin reach a destination."], ["Hidden Treasure", "Find an object by applying a sequence of location clues."]], ["rocket-position-guide", "character-clue-path", "hidden-object-clues"], ["move", "clue", "location", "next", "behind"], ["Clues can be followed in any order.", "The destination alone tells us how to move."], "Applying position and movement language in ordered adventures."),
+      W("Build Starpath", "Combine familiar shapes and positions to create and describe a space scene.", ["AC9MFSP01", "AC9MFSP02"], skill("space-ground-shape-position-composition", "Build and describe a space scene", "Combines familiar shapes in a space scene and describes where objects are using simple positional language.", ["AC9MFSP01", "AC9MFSP02"], "construction-and-visualisation", ["space-ground-shape-creation", "space-ground-describe-position"]), [["Build a Planet", "Combine familiar shapes to create a planet design."], ["Create a Space Scene", "Arrange shape-built objects in a Starpath scene."], ["Describe Your Picture", "Use simple oral positional language to describe the scene."]], ["planet-shape-builder", "space-scene-composer", "oral-scene-description"], ["create", "planet", "scene", "beside", "describe"], ["A scene has only one correct arrangement.", "A listener can see where everything is without position words."], "Combining shape creation, scene composition and positional description."),
+      W("Space Graduation", "Apply shape recognition, creation, sorting and position language in a final adventure.", ["AC9MFSP01", "AC9MFSP02"], skill("space-ground-spatial-mission", "Complete Space Graduation", "Integrates shape recognition, creation, sorting and positional language to solve a cumulative Starpath mission.", ["AC9MFSP01", "AC9MFSP02"], "spatial-representation", ["space-ground-shape-sorting", "space-ground-describe-position", "space-ground-movement-pathways", "space-ground-shape-position-composition"]), [["Shape Explorer Challenge", "Recognise, create and sort familiar shapes in a cumulative challenge."], ["Position Explorer Challenge", "Describe positions and follow location clues in a cumulative challenge."], ["Geospin's Final Mission", "Help Geospin complete an adventure combining all Ground Level skills."]], ["shape-explorer-challenge", "position-explorer-challenge", "geospin-final-mission"], ["shape", "sort", "position", "mission", "explorer"], ["Only one type of shape or position clue can appear in a mission.", "A successful answer does not need a reason or description."], "Cumulative Ground Level learning; completion is planned to unlock the Ground Level Starpath Graduate title."),
     ],
   },
   {
@@ -305,20 +305,47 @@ const SPACE_BUILDERS_MECHANICS = [
   "space-museum",
 ] as const;
 const SHAPE_FAMILIES_WEEK3_MECHANICS = [
-  "shape-families",
-  "which-group",
+  "sorting-station",
+  "collect-the-family",
   "find-the-odd-shape",
 ] as const;
 const SAME_OR_DIFFERENT_MECHANICS = [
-  "same-shape",
-  "match-the-pair",
-  "spot-the-difference",
+  "same-or-different",
+  "twins-in-disguise",
+  "what-changed",
 ] as const;
 const SHAPE_CHALLENGE_MECHANICS = [
   "mixed-shape-hunt",
-  "space-sorting-station",
-  "explorers-final-mission",
+  "same-or-different-recap",
+  "shape-sprint",
 ] as const;
+const WHERE_IS_IT_MECHANICS = [
+  "find-it",
+  "place-it",
+  "which-picture",
+] as const;
+const AROUND_STARPATH_MECHANICS = [
+  "hide-and-seek",
+  "space-explorer",
+  "match-the-position",
+] as const;
+const POSITION_CHALLENGE_MECHANICS = [
+  "follow-the-clues",
+  "space-map",
+  "explorer-mission",
+] as const;
+const MOVE_IT_THERE_MECHANICS = ["move-one-step", "move-two-steps", "which-way"] as const;
+const WHICH_WAY_MECHANICS = ["which-way-moved", "which-way-goal", "move-there"] as const;
+const DIRECTION_MISSION_MECHANICS = ["two-steps", "which-way", "direction-mission"] as const;
+const GUIDE_THE_ROCKET_MECHANICS = ["guide-to-star", "which-way-goal", "guide-the-path"] as const;
+const HELP_GEOSPIN_MECHANICS = ["reach-the-flag", "which-way-goal", "reach-destination"] as const;
+const HIDDEN_TREASURE_MECHANICS = ["find-treasure", "which-way-goal", "treasure-mission"] as const;
+const BUILD_A_PLANET_MECHANICS = ["build-object", "finish-picture", "name-the-shapes"] as const;
+const SPACE_SCENE_MECHANICS = ["build-for-scene", "place-in-scene", "which-scene"] as const;
+const DESCRIBE_PICTURE_MECHANICS = ["say-where", "find-in-scene", "scene-reasoning"] as const;
+const SHAPE_EXPLORER_MECHANICS = ["recognise", "odd-one-out", "compare"] as const;
+const POSITION_EXPLORER_MECHANICS = ["find-by-position", "say-where", "which-way"] as const;
+const FINAL_MISSION_MECHANICS = ["sort-shapes", "which-picture", "final-path"] as const;
 
 // Ground Level lessons with real, playable content (keyed by registry id).
 const IMPLEMENTED_GROUND_LESSONS: Record<
@@ -334,6 +361,21 @@ const IMPLEMENTED_GROUND_LESSONS: Record<
   "ground-space-w3-l1": { learningIntention: "I can sort shapes into groups.", mechanics: SHAPE_FAMILIES_WEEK3_MECHANICS },
   "ground-space-w3-l2": { learningIntention: "I can compare familiar shapes.", mechanics: SAME_OR_DIFFERENT_MECHANICS },
   "ground-space-w3-l3": { learningIntention: "I can recognise, sort and compare familiar shapes.", mechanics: SHAPE_CHALLENGE_MECHANICS },
+  "ground-space-w4-l1": { learningIntention: "I can describe where objects are.", mechanics: WHERE_IS_IT_MECHANICS },
+  "ground-space-w4-l2": { learningIntention: "I can describe where objects are in space.", mechanics: AROUND_STARPATH_MECHANICS },
+  "ground-space-w4-l3": { learningIntention: "I can use positional language to complete a mission.", mechanics: POSITION_CHALLENGE_MECHANICS },
+  "ground-space-w5-l1": { learningIntention: "I can move objects up, down, left and right.", mechanics: MOVE_IT_THERE_MECHANICS },
+  "ground-space-w5-l2": { learningIntention: "I can say which way something moved.", mechanics: WHICH_WAY_MECHANICS },
+  "ground-space-w5-l3": { learningIntention: "I can follow directions to complete a mission.", mechanics: DIRECTION_MISSION_MECHANICS },
+  "ground-space-w6-l1": { learningIntention: "I can guide an object along a path of directions.", mechanics: GUIDE_THE_ROCKET_MECHANICS },
+  "ground-space-w6-l2": { learningIntention: "I can follow clues to reach a destination.", mechanics: HELP_GEOSPIN_MECHANICS },
+  "ground-space-w6-l3": { learningIntention: "I can follow a sequence of clues to find a hidden object.", mechanics: HIDDEN_TREASURE_MECHANICS },
+  "ground-space-w7-l1": { learningIntention: "I can build pictures using shapes.", mechanics: BUILD_A_PLANET_MECHANICS },
+  "ground-space-w7-l2": { learningIntention: "I can build objects and arrange them in a scene.", mechanics: SPACE_SCENE_MECHANICS },
+  "ground-space-w7-l3": { learningIntention: "I can describe where objects are in my scene.", mechanics: DESCRIBE_PICTURE_MECHANICS },
+  "ground-space-w8-l1": { learningIntention: "I can recognise, sort and compare shapes.", mechanics: SHAPE_EXPLORER_MECHANICS },
+  "ground-space-w8-l2": { learningIntention: "I can find, describe and travel by position.", mechanics: POSITION_EXPLORER_MECHANICS },
+  "ground-space-w8-l3": { learningIntention: "I can combine all my skills to complete a mission.", mechanics: FINAL_MISSION_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
@@ -368,9 +410,7 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
         id: `${definition.prefix}-space-w${weekNumber}-quiz`,
         coverage: week.quiz,
         questionCount: STARPATH_QUIZ_QUESTIONS_PER_LESSON * STARPATH_LESSONS_PER_WEEK as 15,
-        status: ["ground-space-w1-quiz", "ground-space-w2-quiz"].includes(
-          `${definition.prefix}-space-w${weekNumber}-quiz`
-        )
+        status: definition.prefix === "ground"
           ? "implemented"
           : STARPATH_PROGRAM_STATUS,
       },
@@ -394,7 +434,7 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
     weeks,
     assessments: {
       preTest: definition.level === "ground" ? null : { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: STARPATH_PROGRAM_STATUS },
-      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: STARPATH_PROGRAM_STATUS },
+      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" ? "implemented" : STARPATH_PROGRAM_STATUS },
     },
     status: STARPATH_PROGRAM_STATUS,
   };

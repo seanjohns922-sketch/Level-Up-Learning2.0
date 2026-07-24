@@ -1,11 +1,14 @@
 "use client";
 
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { SHAPE_FACTS, type FoundationShape } from "@/data/activities/starpath/ground/week1Lesson1";
 import { SHAPE_OBJECTS, type ShapeObjectId } from "@/data/activities/starpath/ground/shape-objects";
+import { PositionObjectVisual } from "@/components/starpath/StarpathPositionCards";
+import type { PositionRelation } from "@/data/activities/starpath/ground/position-objects";
 
 type ShapeIntroTask = Extract<PracticeTask, { kind: "starpathShapeIntro" }>;
 type ShapeMatchTask = Extract<PracticeTask, { kind: "starpathShapeMatch" }>;
@@ -76,6 +79,90 @@ const TEACH_CLUES: Array<{ title: string; shape: FoundationShape; colour: string
   { title: "4 straight sides", shape: "square", colour: "#86efac", tip: "Squares and rectangles have 4 straight sides." },
 ];
 
+// Week 4 teaching — position words shown with a small example scene.
+type PositionTeach = { word: string; tip: string; anchor: string; subject: string; relation: PositionRelation; side?: "left" | "right" };
+const TEACH_POSITIONS: PositionTeach[] = [
+  { word: "Above", tip: "Above means higher up.", anchor: "planet", subject: "star", relation: "above" },
+  { word: "Below", tip: "Below means lower down.", anchor: "star", subject: "moon", relation: "below" },
+  { word: "Beside", tip: "Beside means right next to.", anchor: "rocket", subject: "crystal", relation: "beside", side: "right" },
+];
+const TEACH_POSITIONS_DEPTH: PositionTeach[] = [
+  { word: "Behind", tip: "Behind means at the back.", anchor: "rocket", subject: "alien", relation: "behind" },
+  { word: "In front", tip: "In front means at the front.", anchor: "planet", subject: "satellite", relation: "in-front" },
+  { word: "Inside", tip: "Inside means tucked within.", anchor: "cave", subject: "crystal", relation: "inside" },
+];
+
+function TeachRelation({ anchor, subject, relation, side }: { anchor: string; subject: string; relation: PositionRelation; side?: "left" | "right" }) {
+  const pos =
+    relation === "above"
+      ? { left: "50%", top: "8%" }
+      : relation === "below"
+        ? { left: "50%", top: "92%" }
+        : relation === "beside"
+          ? { left: side === "left" ? "8%" : "92%", top: "50%" }
+          : relation === "behind"
+            ? { left: "50%", top: "30%" }
+            : relation === "in-front"
+              ? { left: "50%", top: "70%" }
+              : { left: "50%", top: "60%" };
+  const scale = relation === "behind" ? 0.7 : relation === "in-front" ? 1.05 : relation === "inside" ? 0.5 : 1;
+  const z = relation === "behind" ? 1 : relation === "in-front" || relation === "inside" ? 30 : 10;
+  return (
+    <div className="relative h-24 w-24">
+      <div className="absolute" style={{ left: "50%", top: "50%", transform: "translate(-50%,-50%)", zIndex: 20 }}>
+        <PositionObjectVisual objectId={anchor} className="h-12 w-12" />
+      </div>
+      <div className="absolute" style={{ ...pos, transform: `translate(-50%,-50%) scale(${scale})`, zIndex: z }}>
+        <PositionObjectVisual objectId={subject} className="h-9 w-9" />
+      </div>
+    </div>
+  );
+}
+
+const TEACH_DIRECTIONS = [
+  { word: "Up", icon: ArrowUp, tip: "Up moves toward the top." },
+  { word: "Down", icon: ArrowDown, tip: "Down moves toward the bottom." },
+  { word: "Left", icon: ArrowLeft, tip: "Left moves to your left." },
+  { word: "Right", icon: ArrowRight, tip: "Right moves to your right." },
+] as const;
+
+function DirectionTeachGrid() {
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {TEACH_DIRECTIONS.map((item) => {
+        const Icon = item.icon;
+        return (
+          <div key={item.word} className="relative flex min-h-44 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">
+            <OptionReadAloudButton text={`${item.word}. ${item.tip}`} className="absolute right-2 top-2" />
+            <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-b from-indigo-950 to-violet-900 text-cyan-200">
+              <Icon className="h-8 w-8" strokeWidth={2.75} />
+            </span>
+            <div className="mt-2 text-lg font-black text-indigo-950">{item.word}</div>
+            <div className="mt-1 text-xs font-semibold leading-5 text-slate-600">{item.tip}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PositionTeachGrid({ items }: { items: PositionTeach[] }) {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      {items.map((item) => (
+        <div key={item.word} className="relative flex min-h-52 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">
+          <OptionReadAloudButton text={`${item.word}. ${item.tip}`} className="absolute right-2 top-2" />
+          <div className="rounded-xl bg-gradient-to-b from-indigo-950 to-violet-900 p-1">
+            <TeachRelation anchor={item.anchor} subject={item.subject} relation={item.relation} side={item.side} />
+          </div>
+          <div className="mt-2 text-base font-black text-indigo-950">{item.word}</div>
+          <div className="mt-1 text-xs font-semibold leading-5 text-slate-600">{item.tip}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function StarpathShapeIntroCard({
   task,
   onContinue,
@@ -92,7 +179,11 @@ export function StarpathShapeIntroCard({
         ? "Look for the clues"
         : variant === "builders"
           ? "Little shapes make big pictures"
-          : "Meet the cosmic shapes");
+          : variant === "positions" || variant === "positionsDepth"
+            ? "Where is it?"
+            : variant === "directions"
+              ? "Which way?"
+              : "Meet the cosmic shapes");
 
   return (
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-5 sm:p-7">
@@ -127,6 +218,12 @@ export function StarpathShapeIntroCard({
             </div>
           ))}
         </div>
+      ) : variant === "positions" ? (
+        <PositionTeachGrid items={TEACH_POSITIONS} />
+      ) : variant === "positionsDepth" ? (
+        <PositionTeachGrid items={TEACH_POSITIONS_DEPTH} />
+      ) : variant === "directions" ? (
+        <DirectionTeachGrid />
       ) : variant === "clues" ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {TEACH_CLUES.map((clue) => (

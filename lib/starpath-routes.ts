@@ -69,6 +69,10 @@ export const buildStarpathWeeklyQuizHref = (context: StarpathRouteContext, week:
 };
 export const buildStarpathPostTestHref = (context: StarpathRouteContext) =>
   buildStarpathHref("post-test", context);
+export const buildStarpathPostTestPageHref = (context: StarpathRouteContext) => {
+  const params = new URLSearchParams({ realm_id: STARPATH_REALM_ID, demo: "1" });
+  return `/starpath/posttest/${encodeURIComponent(context.selectedLevel)}?${params.toString()}`;
+};
 
 export function buildStarpathTowerReturnHref(level: StarpathLevelId) {
   return `/realms?level=${encodeURIComponent(level)}`;
