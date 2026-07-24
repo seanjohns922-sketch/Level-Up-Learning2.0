@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
+import { getLegendForYear, normalizeLegendRealmId, type LegendRealmId } from "@/data/legends";
 import { readProgress, ACTIVE_STUDENT_KEY, type StudentProgress } from "@/data/progress";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError, type StudentProgressSnapshotRow } from "@/lib/student-progress-sync";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
@@ -50,13 +50,13 @@ function getNextYearLabel(year: string) {
   return YEAR_SEQUENCE[index + 1] ?? null;
 }
 
-function getLegendIdsUpToYear(year: string, realmId: "number-nexus" | "measurelands") {
+function getLegendIdsUpToYear(year: string, realmId: LegendRealmId) {
   const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
   if (yearIndex === -1) return [getLegendForYear(year, realmId).id];
   return YEAR_SEQUENCE.slice(0, yearIndex + 1).map((label) => getLegendForYear(label, realmId).id);
 }
 
-function getLegendIdsBeforeYear(year: string, realmId: "number-nexus" | "measurelands") {
+function getLegendIdsBeforeYear(year: string, realmId: LegendRealmId) {
   const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
   if (yearIndex <= 0) return [];
   return YEAR_SEQUENCE.slice(0, yearIndex).map((label) => getLegendForYear(label, realmId).id);

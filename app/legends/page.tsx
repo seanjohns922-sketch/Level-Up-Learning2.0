@@ -56,12 +56,13 @@ const REALMS: RealmDef[] = [
   {
     id: "starpath-realm",
     name: "Starpath Realm",
-    legendLine: "Star Navigators",
+    legendLine: "Geospin Collection",
     icon: <Compass className="h-5 w-5" />,
-    totalLegends: 7,
-    status: "locked",
-    glowColor: "transparent",
-    borderGlow: "rgba(255,255,255,0.15)",
+    totalLegends: 6,
+    status: "open",
+    route: "/legends/starpath",
+    glowColor: "rgba(103, 232, 249, 0.22)",
+    borderGlow: "rgba(139, 92, 246, 0.62)",
   },
   {
     id: "pattern-peaks",
@@ -132,6 +133,7 @@ export default function LegendsPage() {
   // "measurement" scope) are invisible on this shared page.
   const [numberProgress] = useState<StudentProgress | null>(() => readProgress("number"));
   const [measureProgress] = useState<StudentProgress | null>(() => readProgress("measurement"));
+  const [spaceProgress] = useState<StudentProgress | null>(() => readProgress("space"));
   const demoPreview = isDemoPreviewMode();
 
   const unlockedIds = useMemo(
@@ -153,9 +155,17 @@ export default function LegendsPage() {
     return all.filter((legend) => visibleIds.includes(legend.id)).length;
   }, [demoPreview, measureProgress]);
 
+  const starpathCollected = useMemo(() => {
+    const all = getAllLegends("starpath");
+    const visibleIds = demoPreview
+      ? all.map((legend) => legend.id)
+      : getEffectiveUnlockedLegendIds(spaceProgress?.year, spaceProgress?.unlockedLegends, "starpath");
+    return all.filter((legend) => visibleIds.includes(legend.id)).length;
+  }, [demoPreview, spaceProgress]);
+
   const realms = REALMS;
 
-  const totalCollected = numbotCollected + measurelandsCollected;
+  const totalCollected = numbotCollected + measurelandsCollected + starpathCollected;
   const totalLegends = realms.reduce((sum, r) => sum + r.totalLegends, 0);
   const pct = totalLegends > 0 ? Math.round((totalCollected / totalLegends) * 100) : 0;
 
@@ -264,6 +274,8 @@ export default function LegendsPage() {
                     ? numbotCollected
                     : realm.id === "measurelands"
                       ? measurelandsCollected
+                      : realm.id === "starpath-realm"
+                        ? starpathCollected
                       : 0
                 }
                 onClick={realm.route ? () => router.push(realm.route!) : undefined}

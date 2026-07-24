@@ -107,6 +107,29 @@ export default function MeasurelandsPage() {
     };
   }, [entryAttempt, previewMode, router]);
 
+  useEffect(() => {
+    if (previewMode) return;
+
+    let cancelled = false;
+    async function refreshCanonicalProgress() {
+      const studentId = getActiveStudentIdentity().studentId;
+      if (!studentId) return;
+      try {
+        const restored = await restoreStudentStateFromServer(studentId, "measurement");
+        if (!cancelled) setMeasurementProgress(restored.progress);
+      } catch (error) {
+        if (error instanceof StudentRestoreSupersededError) return;
+        console.warn("[Measurelands] Could not refresh canonical progress", error);
+      }
+    }
+
+    window.addEventListener("focus", refreshCanonicalProgress);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("focus", refreshCanonicalProgress);
+    };
+  }, [previewMode]);
+
   if (entryState === "loading") return <RealmDashboardLoading config={MEASURELANDS_DASHBOARD_CONFIG} />;
 
   if (entryState === "error") {

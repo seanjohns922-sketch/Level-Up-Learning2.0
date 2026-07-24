@@ -390,6 +390,8 @@ export default function LoginPage() {
       if (!isCurrentAttempt()) return;
       const measurementRestored = await restoreStudentStateFromServer(student.student_id, "measurement");
       if (!isCurrentAttempt()) return;
+      const spaceRestored = await restoreStudentStateFromServer(student.student_id, "space");
+      if (!isCurrentAttempt()) return;
       if (restored.progress) {
         progress = restored.progress;
         progressSource = "progress_snapshot";
@@ -407,6 +409,16 @@ export default function LoginPage() {
         pretest_score: row.pretest_score,
       }));
       restoredRowsSummary.push(...measurementRestored.rows.map((row) => ({
+        realm_id: row.realm_id,
+        is_current: row.is_current,
+        year: row.year,
+        status: row.status,
+        week: row.week,
+        placement_complete: row.placement_complete,
+        assigned_week: row.assigned_week,
+        pretest_score: row.pretest_score,
+      })));
+      restoredRowsSummary.push(...spaceRestored.rows.map((row) => ({
         realm_id: row.realm_id,
         is_current: row.is_current,
         year: row.year,

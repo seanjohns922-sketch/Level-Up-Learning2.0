@@ -1,5 +1,5 @@
-export type LegendRealmId = "number-nexus" | "measurelands";
-export type LegendStrand = "Number" | "Measurement";
+export type LegendRealmId = "number-nexus" | "measurelands" | "starpath";
+export type LegendStrand = "Number" | "Measurement" | "Space";
 
 export type LegendStats = {
   calculation: number;
@@ -39,6 +39,11 @@ const DEFAULT_IMAGES: Record<LegendRealmId, LegendImages> = {
     avatar: "/cards/meazurex-balancer-y4-front.png",
     cardFront: "/cards/meazurex-balancer-y4-front.png",
     cardBack: "/cards/meazurex-balancer-y4-back.png",
+  },
+  starpath: {
+    avatar: "/cards/geospin-shapeshifter-y4-front.png",
+    cardFront: "/cards/geospin-shapeshifter-y4-front.png",
+    cardBack: "/cards/geospin-shapeshifter-y4-back.png",
   },
 };
 
@@ -103,6 +108,33 @@ function measurelandsLegend(
     },
     unlockVideoUrl: legendVideoUrl(videoSlug),
     showcaseVideoUrl: legendVideoUrl(videoSlug),
+  };
+}
+
+function starpathLegend(
+  id: string,
+  yearLabel: string,
+  name: string,
+  description: string,
+  stars: number,
+  stats: LegendStats,
+  front: string,
+  back: string,
+): Legend {
+  return {
+    id,
+    realmId: "starpath",
+    yearLabel,
+    strand: "Space",
+    name,
+    description,
+    stars,
+    stats,
+    images: {
+      avatar: front,
+      cardFront: front,
+      cardBack: back,
+    },
   };
 }
 
@@ -261,12 +293,72 @@ const LEGENDS: Legend[] = [
     "/cards/meazurex-timewielder-y6-back.png",
     "meazurex-timewielder",
   ),
+  starpathLegend(
+    "geospin-roller-y1",
+    "Year 1",
+    "Geospin Roller",
+    "Begins the Starpath journey by recognising, sorting, and creating shapes with confidence.",
+    1,
+    { calculation: 40, speed: 42, accuracy: 48 },
+    "/cards/geospin-roller-y1-front.png",
+    "/cards/geospin-roller-y1-back.png",
+  ),
+  starpathLegend(
+    "geospin-mapper-y2",
+    "Year 2",
+    "Geospin Mapper",
+    "Maps shapes, positions, and spatial relationships across the Starpath realm.",
+    2,
+    { calculation: 50, speed: 48, accuracy: 55 },
+    "/cards/geospin-mapper-y2-front.png",
+    "/cards/geospin-mapper-y2-back.png",
+  ),
+  starpathLegend(
+    "geospin-navigator-y3",
+    "Year 3",
+    "Geospin Navigator",
+    "Navigates increasingly complex spatial challenges with precision and insight.",
+    3,
+    { calculation: 58, speed: 56, accuracy: 60 },
+    "/cards/geospin-navigator-y3-front.png",
+    "/cards/geospin-navigator-y3-back.png",
+  ),
+  starpathLegend(
+    "geospin-shapeshifter-y4",
+    "Year 4",
+    "Geospin Shapeshifter",
+    "Transforms and reasons about shapes across challenging Starpath missions.",
+    4,
+    { calculation: 66, speed: 62, accuracy: 68 },
+    "/cards/geospin-shapeshifter-y4-front.png",
+    "/cards/geospin-shapeshifter-y4-back.png",
+  ),
+  starpathLegend(
+    "geospin-galaxycrafter-y5",
+    "Year 5",
+    "Geospin Galaxycrafter",
+    "Crafts sophisticated spatial strategies and geometric solutions.",
+    5,
+    { calculation: 76, speed: 70, accuracy: 78 },
+    "/cards/geospin-galaxycrafter-y5-front.png",
+    "/cards/geospin-galaxycrafter-y5-back.png",
+  ),
+  starpathLegend(
+    "geospin-starweaver-y6",
+    "Year 6",
+    "Geospin Starweaver",
+    "Weaves advanced geometric reasoning into legendary Starpath discoveries.",
+    6,
+    { calculation: 84, speed: 78, accuracy: 86 },
+    "/cards/geospin-starweaver-y6-front.png",
+    "/cards/geospin-starweaver-y6-back.png",
+  ),
 ];
 
 export function normalizeLegendRealmId(realmId?: string | null): LegendRealmId {
-  return realmId === "measurelands" || realmId === "measurement"
-    ? "measurelands"
-    : "number-nexus";
+  if (realmId === "measurelands" || realmId === "measurement") return "measurelands";
+  if (realmId === "starpath" || realmId === "starpath-realm" || realmId === "space") return "starpath";
+  return "number-nexus";
 }
 
 export function getAllLegends(realmId?: LegendRealmId): Legend[] {
@@ -286,7 +378,7 @@ export function getLegendForYear(
       id: `unknown-legend-${realmId}-${yearLabel.toLowerCase().replace(/\s+/g, "-")}`,
       realmId,
       yearLabel,
-      strand: realmId === "measurelands" ? "Measurement" : "Number",
+      strand: realmId === "measurelands" ? "Measurement" : realmId === "starpath" ? "Space" : "Number",
       name: "Unknown Legend",
       description: "Legend data missing for this year.",
       stars: 1,
@@ -304,7 +396,9 @@ export function getLegendIdsUpToYear(
 ) {
   const yearIndex = YEAR_LABELS.indexOf(yearLabel as (typeof YEAR_LABELS)[number]);
   if (yearIndex === -1) return [getLegendForYear(yearLabel, realmId).id];
-  return YEAR_LABELS.slice(0, yearIndex + 1).map((label) => getLegendForYear(label, realmId).id);
+  return YEAR_LABELS.slice(0, yearIndex + 1)
+    .map((label) => LEGENDS.find((legend) => legend.realmId === realmId && legend.yearLabel === label)?.id)
+    .filter((id): id is string => Boolean(id));
 }
 
 export function getLegendIdsBeforeYear(
@@ -313,7 +407,9 @@ export function getLegendIdsBeforeYear(
 ) {
   const yearIndex = YEAR_LABELS.indexOf(yearLabel as (typeof YEAR_LABELS)[number]);
   if (yearIndex <= 0) return [];
-  return YEAR_LABELS.slice(0, yearIndex).map((label) => getLegendForYear(label, realmId).id);
+  return YEAR_LABELS.slice(0, yearIndex)
+    .map((label) => LEGENDS.find((legend) => legend.realmId === realmId && legend.yearLabel === label)?.id)
+    .filter((id): id is string => Boolean(id));
 }
 
 export function getEffectiveUnlockedLegendIds(

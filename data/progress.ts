@@ -21,7 +21,7 @@ export type StudentProgress = {
 
 export const STORAGE_KEY = "lul_student_progress_v1";
 export const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
-export type ProgressRealmScope = "number" | "measurement";
+export type ProgressRealmScope = "number" | "measurement" | "space";
 
 type ProgressCacheEnvelope = {
   student_id: string;
@@ -35,8 +35,10 @@ function getActiveRealmScope(): ProgressRealmScope {
   if (typeof window === "undefined") return "number";
   const searchRealm = new URLSearchParams(window.location.search).get("realm_id");
   if (searchRealm === "measurement") return "measurement";
+  if (searchRealm === "space") return "space";
   const pathname = window.location.pathname.toLowerCase();
   if (pathname.startsWith("/measurelands")) return "measurement";
+  if (pathname.startsWith("/starpath") || pathname.startsWith("/legends/starpath")) return "space";
   return "number";
 }
 
@@ -100,6 +102,7 @@ export function clearScopedProgress(
   }
   localStorage.removeItem(getScopedProgressKey(scope, "number"));
   localStorage.removeItem(getScopedProgressKey(scope, "measurement"));
+  localStorage.removeItem(getScopedProgressKey(scope, "space"));
 }
 
 export function updateProgress(

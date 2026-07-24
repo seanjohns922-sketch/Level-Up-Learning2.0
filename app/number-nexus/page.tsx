@@ -56,6 +56,7 @@ const NumberNexusMap = dynamic(
 
 export default function NumberNexusPage() {
   const router = useRouter();
+  const [progressVersion, setProgressVersion] = useState(0);
   const [canonicalStatus, setCanonicalStatus] = useState<"loading" | "ready" | "error">(
     isDemoPreviewMode() ? "ready" : "loading",
   );
@@ -69,17 +70,24 @@ export default function NumberNexusPage() {
       return;
     }
     let cancelled = false;
-    void restoreStudentStateFromServer(studentId, "number")
-      .then((restored) => {
+    async function refreshCanonicalProgress() {
+      try {
+        const restored = await restoreStudentStateFromServer(studentId!, "number");
         if (!restored.progress) throw new Error("Canonical Number Nexus progress was not found");
-        if (!cancelled) setCanonicalStatus("ready");
-      })
-      .catch((error) => {
+        if (!cancelled) {
+          setProgressVersion((version) => version + 1);
+          setCanonicalStatus("ready");
+        }
+      } catch (error) {
         console.error("[NumberNexus] Canonical progression bootstrap failed", error);
         if (!cancelled) setCanonicalStatus("error");
-      });
+      }
+    }
+    void refreshCanonicalProgress();
+    window.addEventListener("focus", refreshCanonicalProgress);
     return () => {
       cancelled = true;
+      window.removeEventListener("focus", refreshCanonicalProgress);
     };
   }, []);
 
@@ -133,5 +141,5 @@ export default function NumberNexusPage() {
     );
   }
 
-  return <NumberNexusMap />;
+  return <NumberNexusMap key={progressVersion} />;
 }

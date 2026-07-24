@@ -7816,7 +7816,16 @@ function SessionPage({
 
     const store = readPersistedProgramStore();
     const numericWeek = Number(week);
-    if (!isWeekPlayable(store, year, numericWeek, progress.requiredWeeks, progress.optionalWeeks, quizRealmId, progress.teacherAdvancedWeeks)) {
+    if (!isWeekPlayable(
+      store,
+      year,
+      numericWeek,
+      progress.requiredWeeks,
+      progress.optionalWeeks,
+      quizRealmId,
+      progress.teacherAdvancedWeeks,
+      progress.assignedWeek,
+    )) {
       const fallbackWeek = getRecommendedAssignedWeek(store, year, progress.assignedWeek, progress.requiredWeeks, quizRealmId, progress.teacherAdvancedWeeks);
       router.replace(isMeasurementRealm ? `/measurelands` : `/number-nexus`);
       return;

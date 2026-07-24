@@ -14,12 +14,17 @@ export default function BinderCard({
   isDemoPreview?: boolean;
   onClick: () => void;
 }) {
-  const programLabel = legend.realmId === "measurelands" ? "Measurelands" : "Number";
+  const programLabel =
+    legend.realmId === "measurelands"
+      ? "Measurelands"
+      : legend.realmId === "starpath"
+        ? "Starpath"
+        : "Number";
   return (
     <button
       onClick={isUnlocked ? onClick : undefined}
       disabled={!isUnlocked}
-      className="group relative w-full focus:outline-none"
+      className="group relative min-w-0 w-full focus:outline-none"
       title={
         isUnlocked
           ? `View ${legend.name}`
@@ -61,7 +66,7 @@ export default function BinderCard({
           <img
             src={legend.images.cardFront}
             alt={legend.name}
-            className="h-full w-full object-cover transition-all duration-300"
+            className="h-full w-full object-contain transition-all duration-300"
             style={{
               filter: isUnlocked ? "none" : "blur(2px) grayscale(60%)",
               opacity: isUnlocked ? 1 : 0.5,

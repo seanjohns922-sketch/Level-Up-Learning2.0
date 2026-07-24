@@ -448,12 +448,29 @@ function ProgramPage() {
   const canTakePostTestEarly = hasPersonalizedPlan && requiredWeeksComplete;
   const currentWeekIsRequired = requiredWeeks.includes(weekNum);
   const playableWeeks = useMemo(
-    () => getPlayableWeeks(store, curriculumYear, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks),
-    [store, curriculumYear, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks]
+    () => getPlayableWeeks(
+      store,
+      curriculumYear,
+      requiredWeeks,
+      optionalWeeks,
+      realmId,
+      studentProgress?.teacherAdvancedWeeks,
+      studentProgress?.assignedWeek,
+    ),
+    [store, curriculumYear, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks, studentProgress?.assignedWeek]
   );
   const weekIsPlayable = useMemo(
-    () => isWeekPlayable(store, curriculumYear, weekNum, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks),
-    [store, curriculumYear, weekNum, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks]
+    () => isWeekPlayable(
+      store,
+      curriculumYear,
+      weekNum,
+      requiredWeeks,
+      optionalWeeks,
+      realmId,
+      studentProgress?.teacherAdvancedWeeks,
+      studentProgress?.assignedWeek,
+    ),
+    [store, curriculumYear, weekNum, requiredWeeks, optionalWeeks, realmId, studentProgress?.teacherAdvancedWeeks, studentProgress?.assignedWeek]
   );
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);

@@ -234,12 +234,15 @@ export default function RealmDashboardShell({
   }, [config.slug]);
   const resolvedYear = level;
   const world = useMemo(() => config.worldForLevel(resolvedYear), [config, resolvedYear]);
-  const [progress] = useState<StudentProgress | null>(() => {
+  const [progress, setProgress] = useState<StudentProgress | null>(() => {
     if (restoredProgress !== undefined) return restoredProgress;
     return config.storageRealmId === "number" || config.storageRealmId === "measurement"
       ? readProgress(config.storageRealmId)
       : null;
   });
+  useEffect(() => {
+    if (restoredProgress !== undefined) setProgress(restoredProgress);
+  }, [restoredProgress]);
   const [store] = useState(() => readProgramStore());
   const [launching, setLaunching] = useState(false);
   const [bestChain] = useState(() => readBestChain(config.storageRealmId, resolvedYear));

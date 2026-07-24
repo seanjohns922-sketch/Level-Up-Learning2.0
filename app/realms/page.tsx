@@ -23,6 +23,7 @@ function GuardedRealmsPage() {
     void Promise.all([
       restoreStudentStateFromServer(studentId, "number"),
       restoreStudentStateFromServer(studentId, "measurement"),
+      restoreStudentStateFromServer(studentId, "space"),
     ]).then(([numberState]) => {
       if (cancelled) return;
       if (!numberState.progress) {

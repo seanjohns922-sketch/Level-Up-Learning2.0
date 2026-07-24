@@ -404,7 +404,16 @@ function LessonPage() {
     if (previewMode || !p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return;
 
     const store = readProgramStore();
-    const weekPlayable = isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks, lessonRealmId, p.teacherAdvancedWeeks);
+    const weekPlayable = isWeekPlayable(
+      store,
+      year,
+      week,
+      p.requiredWeeks,
+      p.optionalWeeks,
+      lessonRealmId,
+      p.teacherAdvancedWeeks,
+      p.assignedWeek,
+    );
     if (!weekPlayable) {
       router.replace(mapRoute);
       return;
@@ -421,7 +430,16 @@ function LessonPage() {
     const p = readProgress(lessonRealmId);
     if (!p || p.status !== "ASSIGNED_PROGRAM" || p.year !== year) return null;
     const store = readProgramStore();
-    if (!isWeekPlayable(store, year, week, p.requiredWeeks, p.optionalWeeks, lessonRealmId, p.teacherAdvancedWeeks)) return null;
+    if (!isWeekPlayable(
+      store,
+      year,
+      week,
+      p.requiredWeeks,
+      p.optionalWeeks,
+      lessonRealmId,
+      p.teacherAdvancedWeeks,
+      p.assignedWeek,
+    )) return null;
     const weekProgress = getWeekProgress(store, year, week, lessonRealmId);
     if (lessonNumber > 1 && !weekProgress.lessonsCompleted[lessonNumber - 2]) {
       return lessonNumber - 1;

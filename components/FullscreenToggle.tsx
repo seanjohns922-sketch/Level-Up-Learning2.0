@@ -9,12 +9,12 @@ function isFullscreenActive() {
 
 export function FullscreenToggle() {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const isSupported =
-    typeof document !== "undefined" && typeof document.documentElement.requestFullscreen === "function";
+  const [isSupported, setIsSupported] = useState(false);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
 
+    setIsSupported(typeof document.documentElement.requestFullscreen === "function");
     const syncFullscreenState = () => setIsFullscreen(isFullscreenActive());
     const frame = window.requestAnimationFrame(syncFullscreenState);
     document.addEventListener("fullscreenchange", syncFullscreenState);

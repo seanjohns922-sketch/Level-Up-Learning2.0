@@ -55,8 +55,9 @@ export default function LegendDetailModal({
     setEnlarged(false);
   }, [legend.id]);
 
-  // Realm-aware theming: Measurelands = gold/violet, Number Nexus = teal.
+  // Realm-aware theming keeps the shared card interaction consistent.
   const isMeasure = legend.realmId === "measurelands";
+  const isStarpath = legend.realmId === "starpath";
   const t = isMeasure
     ? {
         panelBg: "bg-gradient-to-br from-amber-50 via-yellow-50 to-violet-50",
@@ -65,7 +66,15 @@ export default function LegendDetailModal({
         pill: "rounded-full border border-violet-500/25 bg-white/80 px-3 py-1 text-xs font-black text-violet-700 transition hover:bg-white",
         year: "text-violet-600",
       }
-    : {
+    : isStarpath
+      ? {
+          panelBg: "bg-gradient-to-br from-violet-50 via-indigo-50 to-cyan-50",
+          glow: "from-violet-400/25 to-cyan-400/25",
+          active: "bg-violet-600 text-white",
+          pill: "rounded-full border border-violet-600/20 bg-white/80 px-3 py-1 text-xs font-black text-violet-700 transition hover:bg-white",
+          year: "text-violet-600",
+        }
+      : {
         panelBg: "bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50",
         glow: "from-teal-400/20 to-emerald-400/20",
         active: "bg-teal-600 text-white",

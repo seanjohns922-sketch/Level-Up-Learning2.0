@@ -186,9 +186,17 @@ export function getRecommendedAssignedWeek(
   realmId: string = "number",
   teacherAdvancedWeeks: number[] = [],
 ): number {
+  const canonicalAssignedWeek = Math.max(
+    1,
+    Math.min(getProgramWeeks(realmId).length, currentAssignedWeek ?? 1),
+  );
   const firstIncompleteRequired = getFirstIncompleteRequiredWeek(store, year, requiredWeeks, realmId, teacherAdvancedWeeks);
-  if (firstIncompleteRequired != null) return firstIncompleteRequired;
-  return Math.max(1, Math.min(getProgramWeeks(realmId).length, currentAssignedWeek ?? 1));
+  if (firstIncompleteRequired != null) {
+    // The server-owned assignment is authoritative. Local completion cache can
+    // move a student forward, but it must never undo a teacher advancement.
+    return Math.max(canonicalAssignedWeek, firstIncompleteRequired);
+  }
+  return canonicalAssignedWeek;
 }
 
 export function getPlayableWeeks(
@@ -198,6 +206,7 @@ export function getPlayableWeeks(
   optionalWeeks: number[] | undefined | null,
   realmId: string = "number",
   teacherAdvancedWeeks: number[] = [],
+  currentAssignedWeek?: number,
 ): number[] {
   void optionalWeeks;
   const normalizedRequired = normalizeWeekList(requiredWeeks, realmId);
@@ -209,9 +218,18 @@ export function getPlayableWeeks(
 
   const completedRequired = getCompletedRequiredWeeks(store, year, normalizedRequired, realmId, teacherAdvancedWeeks);
   const firstIncompleteRequired = getFirstIncompleteRequiredWeek(store, year, normalizedRequired, realmId, teacherAdvancedWeeks);
+  const canonicalAssignedWeek =
+    currentAssignedWeek == null
+      ? null
+      : Math.max(1, Math.min(getProgramWeeks(realmId).length, currentAssignedWeek));
+  const canonicallyReachedWeeks =
+    canonicalAssignedWeek == null
+      ? []
+      : normalizedRequired.filter((week) => week <= canonicalAssignedWeek);
 
   return normalizeWeekList([
     ...completedRequired,
+    ...canonicallyReachedWeeks,
     ...(firstIncompleteRequired != null ? [firstIncompleteRequired] : []),
   ], realmId);
 }
@@ -224,8 +242,17 @@ export function isWeekPlayable(
   optionalWeeks: number[] | undefined | null,
   realmId: string = "number",
   teacherAdvancedWeeks: number[] = [],
+  currentAssignedWeek?: number,
 ): boolean {
-  return getPlayableWeeks(store, year, requiredWeeks, optionalWeeks, realmId, teacherAdvancedWeeks).includes(week);
+  return getPlayableWeeks(
+    store,
+    year,
+    requiredWeeks,
+    optionalWeeks,
+    realmId,
+    teacherAdvancedWeeks,
+    currentAssignedWeek,
+  ).includes(week);
 }
 
 /**

@@ -122,7 +122,12 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[], realmId: Studen
   rows.forEach((row) => {
     const year = row.year;
     if (!year) return;
-    const realmId = row.realm_id === "measurement" ? "measurement" : "number";
+    const rowRealmId =
+      row.realm_id === "measurement"
+        ? "measurement"
+        : row.realm_id === "space"
+          ? "space"
+          : "number";
 
     const completedLessonIds = parseStringArray(row.completed_lesson_ids);
     completedLessonIds.forEach((lessonId) => {
@@ -132,7 +137,7 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[], realmId: Studen
       const lessonNumber = Number(match[2]);
       if (!Number.isInteger(week) || week < 1 || week > 12) return;
       if (!Number.isInteger(lessonNumber) || lessonNumber < 1 || lessonNumber > 3) return;
-      const wp = ensureWeek(store, year, week, realmId);
+      const wp = ensureWeek(store, year, week, rowRealmId);
       wp.lessonsCompleted[lessonNumber - 1] = true;
     });
 
@@ -142,7 +147,7 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[], realmId: Studen
       const week = Number(weekKey);
       if (!Number.isInteger(week) || week < 1 || week > 12) return;
       const quiz = parseRecord(value);
-      const wp = ensureWeek(store, year, week, realmId);
+      const wp = ensureWeek(store, year, week, rowRealmId);
       wp.quizCompleted = true;
       const percent = Number(quiz.percent);
       const score = Number(quiz.score);
@@ -151,7 +156,7 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[], realmId: Studen
     });
 
     if (Number.isInteger(row.week) && row.week! >= 1 && row.week! <= 12) {
-      ensureWeek(store, year, row.week!, realmId);
+      ensureWeek(store, year, row.week!, rowRealmId);
     }
   });
 
@@ -214,11 +219,6 @@ export async function restoreStudentStateFromServer(
   studentId: string,
   realmId: StudentProgressRealmId,
 ) {
-  // Starpath ('space') persists server-side only; it has no local number/measurement
-  // progress store to restore into.
-  if (realmId === "space") {
-    return { rows: [] as StudentProgressSnapshotRow[], progress: null as StudentProgress | null, introSeen: false };
-  }
   if (isDemoPreviewMode()) {
     const progress = {
       year: "Prep",
