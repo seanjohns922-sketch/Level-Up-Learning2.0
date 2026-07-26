@@ -37,6 +37,10 @@ interface AssessmentShellProps {
   hidePrompt?: boolean;
   /** Render the answer area on a light panel (lesson-native tasks draw dark text). */
   lightSurface?: boolean;
+  /** Per-question answered flags — enables the "check your answers" navigator. */
+  answeredFlags?: boolean[];
+  /** Jump to an already-reached question (review answers; unanswered stay locked). */
+  onJump?: (index: number) => void;
 }
 
 export default function AssessmentShell({
@@ -62,7 +66,18 @@ export default function AssessmentShell({
   wideContent = false,
   hidePrompt = false,
   lightSurface = false,
+  answeredFlags,
+  onJump,
 }: AssessmentShellProps) {
+  // The frontier is the first unanswered question — you may review anything up to
+  // and including it, but never jump ahead to questions you haven't answered.
+  const firstUnanswered = answeredFlags ? answeredFlags.indexOf(false) : -1;
+  const frontier = !answeredFlags
+    ? totalQuestions - 1
+    : firstUnanswered === -1
+      ? totalQuestions - 1
+      : firstUnanswered;
+  const showNavigator = Boolean(onJump && answeredFlags && totalQuestions > 1);
   const hasExitMenu = Boolean(onHome || onExitAssessment || onLogout);
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
   const isPost = testType.toLowerCase().includes("post");
@@ -216,6 +231,45 @@ export default function AssessmentShell({
             />
           </div>
         </div>
+
+        {/* Review navigator — jump back to any answered question; unanswered stay locked */}
+        {showNavigator && answeredFlags && onJump && (
+          <div className="assessment-nav-strip mt-4">
+            <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Jump to a question
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {answeredFlags.map((answered, i) => {
+                const reachable = i <= frontier;
+                const isCurrent = i === currentIndex;
+                const style: React.CSSProperties = !reachable
+                  ? { background: "rgba(148,163,184,0.10)", color: "#64748b", border: "1px solid rgba(148,163,184,0.22)" }
+                  : isCurrent
+                    ? { background: theme.chipBg, color: theme.accentText, border: `2px solid ${theme.accentText}` }
+                    : answered
+                      ? { background: theme.chipBg, color: theme.accentText, border: `1px solid ${theme.chipBorder}` }
+                      : { background: "transparent", color: "rgba(226,232,240,0.7)", border: "1px dashed rgba(148,163,255,0.4)" };
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    disabled={!reachable}
+                    aria-current={isCurrent ? "true" : undefined}
+                    aria-label={`Question ${i + 1}${answered ? ", answered" : ""}${!reachable ? ", locked" : ""}`}
+                    onClick={() => reachable && onJump(i)}
+                    className={[
+                      "flex h-8 min-w-[2rem] items-center justify-center rounded-lg px-2 text-xs font-black transition",
+                      reachable ? "hover:brightness-110 active:scale-95" : "cursor-not-allowed",
+                    ].join(" ")}
+                    style={style}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Question Card ── */}

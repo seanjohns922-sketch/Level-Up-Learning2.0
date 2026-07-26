@@ -917,6 +917,8 @@ function PretestPage() {
         wideContent={isMeasurelandsTask}
         hidePrompt={isMeasurelandsTask}
         lightSurface={isMeasurelandsTask}
+        answeredFlags={answers.map((a) => a !== null && a !== undefined && a !== "")}
+        onJump={(i) => setIndex(i)}
         realmId={realmId}
       />
 

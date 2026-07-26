@@ -798,6 +798,14 @@ function PostTestPage() {
         wideContent={isInteractiveTask}
         hidePrompt={isInteractiveTask}
         lightSurface={isInteractiveTask}
+        answeredFlags={questions.map((qq) => {
+          const a = answers[qq.id];
+          return a !== undefined && a !== "";
+        })}
+        onJump={(i) => {
+          setMab({ tens: 0, ones: 0 });
+          setIdx(i);
+        }}
         realmId={realmId}
       />
     </>
