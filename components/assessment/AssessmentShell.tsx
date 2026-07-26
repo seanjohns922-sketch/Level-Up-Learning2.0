@@ -5,6 +5,8 @@ import { ChevronLeft, Home, LogOut, DoorOpen, Trophy, Zap, HelpCircle } from "lu
 import { MathFormattedText } from "@/components/FractionText";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
+import { getStarpathBackground } from "@/lib/starpath-visuals";
+import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 
 interface AssessmentShellProps {
   /** "Pre-Test" or "Post-Test" */
@@ -63,25 +65,51 @@ export default function AssessmentShell({
   const isPost = testType.toLowerCase().includes("post");
   const studentLevelLabel = formatStudentLevelLabel(year);
   const theme = getRealmTheme(realmId);
+  const isSpace = realmId === "space";
   const titleIconGradient = theme.isMeasurement
     ? "linear-gradient(135deg, #7c5a20 0%, #b8893a 55%, #d6b86c 100%)"
-    : "linear-gradient(135deg, #14b8a6 0%, #059669 100%)";
-  const progressTrack = theme.isMeasurement ? "rgba(214,184,108,0.22)" : "rgba(94,234,212,0.18)";
+    : isSpace
+      ? theme.trophyGradient
+      : "linear-gradient(135deg, #14b8a6 0%, #059669 100%)";
+  const progressTrack = theme.isMeasurement
+    ? "rgba(214,184,108,0.22)"
+    : isSpace
+      ? "rgba(124,58,237,0.22)"
+      : "rgba(94,234,212,0.18)";
   const progressBg = theme.ctaGradientCss;
 
   return (
     <main
-      className="assessment-shell min-h-screen flex flex-col items-center px-4 pt-6 md:pt-10"
+      className="assessment-shell relative min-h-screen flex flex-col items-center px-4 pt-6 md:pt-10"
       data-wide-content={wideContent ? "true" : "false"}
       style={{
         background: theme.isMeasurement
           ? "linear-gradient(180deg, #140d04 0%, #2a1a06 40%, #120b03 100%)"
-          : "linear-gradient(to bottom, rgb(2 6 23), rgb(15 23 42), rgb(2 6 23))",
+          : isSpace
+            ? "#070a1b"
+            : "linear-gradient(to bottom, rgb(2 6 23), rgb(15 23 42), rgb(2 6 23))",
         paddingBottom: "max(7rem, calc(env(safe-area-inset-bottom) + 6rem))",
       }}
     >
+      {/* ── Starpath cosmic backdrop (matches the lesson theme) ── */}
+      {isSpace && (
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={getStarpathBackground(year as RealmLevelId) ?? "/images/starpath-home-bg-ground.png"}
+            alt=""
+            className="h-full w-full object-cover"
+            style={{ filter: "brightness(0.32) saturate(1.2)" }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, rgba(7,10,27,0.70), rgba(19,12,52,0.86))" }}
+          />
+        </div>
+      )}
+
       {/* ── Mission Header ── */}
-      <div className={`assessment-header w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} mb-6`}>
+      <div className={`assessment-header relative z-10 w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} mb-6`}>
         {/* Top bar */}
         <div className="assessment-top-bar flex items-center justify-between mb-4">
           {hasExitMenu ? (
@@ -199,8 +227,13 @@ export default function AssessmentShell({
       </div>
 
       {/* ── Question Card ── */}
-      <div className={`assessment-content w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} flex-1`}>
-        <div className="assessment-question-card rounded-3xl border border-slate-700/60 bg-slate-800/80 backdrop-blur-sm shadow-2xl shadow-black/30 p-6 md:p-8">
+      <div className={`assessment-content relative z-10 w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} flex-1`}>
+        <div
+          className={[
+            "assessment-question-card rounded-3xl border backdrop-blur-sm shadow-2xl shadow-black/30 p-6 md:p-8",
+            isSpace ? "border-cyan-200/25 bg-[#150f38]/80" : "border-slate-700/60 bg-slate-800/80",
+          ].join(" ")}
+        >
           {/* Question number chip */}
           <div className="flex items-center gap-2 mb-4">
             <span
