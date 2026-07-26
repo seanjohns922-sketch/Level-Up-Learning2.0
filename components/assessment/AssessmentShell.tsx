@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ChevronLeft, Home, LogOut, DoorOpen, Trophy, Zap, HelpCircle } from "lucide-react";
+import { ChevronLeft, Home, LogOut, DoorOpen, HelpCircle } from "lucide-react";
 import { MathFormattedText } from "@/components/FractionText";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
@@ -35,6 +35,8 @@ interface AssessmentShellProps {
   wideContent?: boolean;
   /** The lesson task renders its own prompt and read-aloud control. */
   hidePrompt?: boolean;
+  /** Render the answer area on a light panel (lesson-native tasks draw dark text). */
+  lightSurface?: boolean;
 }
 
 export default function AssessmentShell({
@@ -59,6 +61,7 @@ export default function AssessmentShell({
   realmId,
   wideContent = false,
   hidePrompt = false,
+  lightSurface = false,
 }: AssessmentShellProps) {
   const hasExitMenu = Boolean(onHome || onExitAssessment || onLogout);
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
@@ -66,11 +69,6 @@ export default function AssessmentShell({
   const studentLevelLabel = formatStudentLevelLabel(year);
   const theme = getRealmTheme(realmId);
   const isSpace = realmId === "space";
-  const titleIconGradient = theme.isMeasurement
-    ? "linear-gradient(135deg, #7c5a20 0%, #b8893a 55%, #d6b86c 100%)"
-    : isSpace
-      ? theme.trophyGradient
-      : "linear-gradient(135deg, #14b8a6 0%, #059669 100%)";
   const progressTrack = theme.isMeasurement
     ? "rgba(214,184,108,0.22)"
     : isSpace
@@ -180,28 +178,22 @@ export default function AssessmentShell({
         </div>
 
         {/* Title block */}
-        <div className="assessment-title-block flex items-center gap-3 mb-1">
+        <div className="assessment-title-block mb-1">
           <div
-            className="flex items-center justify-center h-10 w-10 rounded-xl shadow-lg"
-            style={{ background: titleIconGradient, boxShadow: theme.ctaShadow }}
+            className="text-[11px] font-black uppercase tracking-[0.22em]"
+            style={{ color: theme.accentText }}
           >
-            {isPost ? (
-              <Trophy className="h-5 w-5 text-white" />
-            ) : (
-              <Zap className="h-5 w-5 text-white" />
-            )}
+            {isPost ? "Final Challenge" : "Skill Check"}
           </div>
-          <div>
-            <h1 className="text-xl md:text-2xl font-extrabold text-white tracking-tight">
-              {isPost ? "Final Challenge" : "Skill Check"}
-            </h1>
-            <p className="text-sm text-slate-400">
-              {subtitle ??
-                (isPost
-                  ? "Complete all questions to unlock your Legend"
-                  : `${totalQuestions} questions · Show what you know`)}
-            </p>
-          </div>
+          <h1 className="mt-1 text-2xl md:text-[2rem] font-black text-white leading-tight tracking-tight">
+            {isPost ? "Show what you've mastered" : "Let's see what you know"}
+          </h1>
+          <p className="mt-1.5 text-sm md:text-base" style={{ color: "rgba(226,232,240,0.72)" }}>
+            {subtitle ??
+              (isPost
+                ? "Complete all questions to unlock your Legend"
+                : `${totalQuestions} questions · Show what you know`)}
+          </p>
         </div>
 
         {/* Progress bar */}
@@ -258,8 +250,8 @@ export default function AssessmentShell({
             </div>
           )}
 
-          {/* Answer area */}
-          <div className="relative">
+          {/* Answer area — lesson-native tasks draw dark text, so give them a light panel */}
+          <div className={lightSurface ? "relative rounded-2xl bg-[#f6f5ff] p-4 text-slate-950 sm:p-6" : "relative"}>
             {questionContent}
           </div>
 

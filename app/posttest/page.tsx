@@ -488,17 +488,32 @@ function PostTestPage() {
     }
   }
 
+  // "I Don't Know" — records the current question as incorrect and advances (or
+  // submits on the last question). Mirrors the pre-test behaviour.
+  function answerIdk() {
+    if (!q) return;
+    const nextAnswers = { ...answers, [q.id]: "idk" };
+    setAnswers(nextAnswers);
+    if (idx < questions.length - 1) {
+      setMab({ tens: 0, ones: 0 });
+      setIdx((v) => v + 1);
+    } else {
+      void submit(nextAnswers);
+    }
+  }
+
   const submittingRef = useRef(false);
 
-  async function submit() {
+  async function submit(answersOverride?: Record<string, string>) {
     if (!questions.length) return;
     if (submittingRef.current) return;
     submittingRef.current = true;
 
+    const finalAnswers = answersOverride ?? answers;
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
     const profile = analyzeAssessmentResult({
       questions,
-      answers,
+      answers: finalAnswers,
       yearLevel: year === "Prep" ? 0 : Number(year.replace(/\D/g, "")) || 3,
       testType: "post",
       passThreshold: PASS_THRESHOLD,
@@ -539,8 +554,8 @@ function PostTestPage() {
           placement_result: latest,
           question_results: questions.map((question) => ({
             question_id: question.id,
-            answer: answers[question.id] ?? null,
-            correct: isAssessmentAnswerCorrect(question, answers[question.id]),
+            answer: finalAnswers[question.id] ?? null,
+            correct: isAssessmentAnswerCorrect(question, finalAnswers[question.id]),
             skill_id: question.skillId ?? null,
             skill_label: question.skillLabel ?? null,
             week: question.linkedWeeks?.[0] ?? null,
@@ -563,7 +578,7 @@ function PostTestPage() {
     setSubmitted(true);
 
     const resultsUrl = `/results?year=${encodeURIComponent(year)}&score=${correct}&total=${questions.length}&posttest=1${realmId ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`;
-    const reviewItems = buildPosttestPracticeReviewItems(questions, answers);
+    const reviewItems = buildPosttestPracticeReviewItems(questions, finalAnswers);
     saveAssessmentReviewState({
       year,
       realmId: progressRealmId,
@@ -777,10 +792,12 @@ function PostTestPage() {
         submitted={submitted}
         onBack={back}
         onNext={next}
-        onSubmit={submit}
+        onSubmit={() => submit()}
+        onIdk={answerIdk}
         onExit={() => router.push(buildAssessmentReturnRoute({ year, realmId }))}
         wideContent={isInteractiveTask}
         hidePrompt={isInteractiveTask}
+        lightSurface={isInteractiveTask}
         realmId={realmId}
       />
     </>

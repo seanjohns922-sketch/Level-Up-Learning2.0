@@ -714,7 +714,8 @@ function PretestPage() {
         : selected !== null;
 
   const isMeasurelandsTask =
-    question?.type === "measurelandsTask" && Boolean(question.practiceTask);
+    (question?.type === "measurelandsTask" || question?.type === "starpathTask") &&
+    Boolean(question.practiceTask);
 
   useEffect(() => {
     if (question?.type !== "mab") return;
@@ -915,6 +916,7 @@ function PretestPage() {
         onLogout={exitLogout}
         wideContent={isMeasurelandsTask}
         hidePrompt={isMeasurelandsTask}
+        lightSurface={isMeasurelandsTask}
         realmId={realmId}
       />
 
