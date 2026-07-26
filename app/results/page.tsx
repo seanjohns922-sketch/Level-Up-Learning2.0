@@ -50,6 +50,12 @@ function getNextYearLabel(year: string) {
   return YEAR_SEQUENCE[index + 1] ?? null;
 }
 
+function getRealmHomeRoute(realmId?: string | null): string {
+  if (realmId === "measurement") return "/measurelands";
+  if (realmId === "space") return "/starpath?realm_id=space&level=ground";
+  return "/levels";
+}
+
 function getLegendIdsUpToYear(year: string, realmId: LegendRealmId) {
   const yearIndex = YEAR_SEQUENCE.indexOf(year as (typeof YEAR_SEQUENCE)[number]);
   if (yearIndex === -1) return [getLegendForYear(year, realmId).id];
@@ -264,7 +270,8 @@ function ResultsPage() {
 
   const year = sp.get("year") ?? "Year 3";
   const realmId = sp.get("realm_id") ?? undefined;
-  const progressRealmId = realmId === "measurement" ? "measurement" : "number";
+  const progressRealmId =
+    realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : "number";
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const realmParam = realmId ? `&realm_id=${encodeURIComponent(realmId)}` : "";
@@ -403,13 +410,13 @@ function ResultsPage() {
     return diagnosticRequiredWeeks;
   })();
 
-  function goHome() { router.push(realmId === "measurement" ? "/measurelands" : "/levels"); }
+  function goHome() { router.push(getRealmHomeRoute(realmId)); }
   const assignedStartWeek = isPostTest
     ? getAssignedReviewWeek(storedPosttestProfile) ?? 1
     : getAssignedReviewWeek(storedPretestProfile) ?? 1;
 
   function goProgram() {
-    router.push(realmId === "measurement" ? "/measurelands" : "/levels");
+    router.push(getRealmHomeRoute(realmId));
   }
   function goNextPretest() {
     if (!nextYear) {
@@ -441,7 +448,7 @@ function ResultsPage() {
     router.push(`/program?${qs}&legacy=1${realmParam}`);
   }
   function goContinue() {
-    router.push(realmId === "measurement" ? "/measurelands" : "/levels");
+    router.push(getRealmHomeRoute(realmId));
   }
 
   if (restoreState !== "ready") {

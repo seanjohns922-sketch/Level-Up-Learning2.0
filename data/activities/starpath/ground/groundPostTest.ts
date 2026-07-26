@@ -1,65 +1,175 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { shapeMatchTask, shapeNameTask } from "@/data/activities/starpath/ground/week1Lesson1";
-import { objectMatchTask, shapeExplorerTask } from "@/data/activities/starpath/ground/week1Lesson2";
-import { compareShapeTask, oddShapeTask, twinMatchTask, whatChangedTask } from "@/data/activities/starpath/ground/week3Tasks";
-import { findItTask, sayWhereTask, whichPictureTask } from "@/data/activities/starpath/ground/week4Tasks";
-import { directionChoiceTask } from "@/data/activities/starpath/ground/directionTasks";
+import type { PostTest, Question } from "@/data/assessments/posttests";
+import { buildGroundWeek1VoyageQuiz } from "@/data/activities/starpath/ground/week1Quiz";
+import { buildGroundWeek2VoyageQuiz } from "@/data/activities/starpath/ground/week2Quiz";
+import { buildGroundWeek3VoyageQuiz } from "@/data/activities/starpath/ground/week3Quiz";
+import { buildGroundWeek4VoyageQuiz } from "@/data/activities/starpath/ground/week4Quiz";
+import { buildGroundWeek5VoyageQuiz } from "@/data/activities/starpath/ground/week5Quiz";
+import { buildGroundWeek6VoyageQuiz } from "@/data/activities/starpath/ground/week6Quiz";
+import { buildGroundWeek7VoyageQuiz } from "@/data/activities/starpath/ground/week7Quiz";
+import { oddShapeTask } from "@/data/activities/starpath/ground/week3Tasks";
+import { whichPictureTask } from "@/data/activities/starpath/ground/week4Tasks";
 import type { PositionRelation } from "@/data/activities/starpath/ground/position-objects";
 
-const PLANAR: PositionRelation[] = ["above", "below", "beside"];
-const DEPTH: PositionRelation[] = ["behind", "in-front", "inside"];
-const ALL: PositionRelation[] = ["above", "below", "beside", "behind", "in-front", "inside"];
+export const STARPATH_GROUND_POSTTEST_ID = "ground-space-post-01";
 
-// Ground Level Post-Test — the cumulative graduation assessment. 20 single-answer
-// graded questions spanning the whole Ground Level:
-//   • Shapes (AC9MFSP01): recognise, name, sort, compare, shapes-in-objects
-//   • Position (AC9MFSP02): find by position, say where, which picture
-//   • Direction (AC9MFSP02): which way / reach the goal
-// Same shared rules as every other realm's post-test: 20 questions, 85% to pass,
-// unlocks the realm's Legend. Completion-style mechanics (Place It, Follow the
-// Clues, paths, collect, sprint) are excluded because each question is graded.
-export function buildGroundPostTest(): PracticeTask[] {
-  const tasks: PracticeTask[] = [];
-  let n = 0;
-  const push = (task: PracticeTask) => {
-    tasks.push(task);
-  };
+const CORRECT_TOKEN = "__starpath_task_correct__";
+const ASSESSMENT_SEED = 0x53504143;
+const POSITION_RELATIONS: PositionRelation[] = [
+  "above",
+  "below",
+  "beside",
+  "behind",
+  "in-front",
+  "inside",
+];
 
-  // ── Shapes · AC9MFSP01 (7) ─────────────────────────────────────────────────
-  push(shapeMatchTask(0, (n += 1)));
-  push(shapeNameTask(1, (n += 1)));
-  push(objectMatchTask(0, (n += 1)));
-  push(shapeExplorerTask(1, (n += 1)));
-  push(oddShapeTask(2, (n += 1)));
-  push(compareShapeTask(0, (n += 1)));
-  push(twinMatchTask(1, (n += 1)));
-
-  // ── Position · AC9MFSP02 (7) ───────────────────────────────────────────────
-  push(findItTask(0, (n += 1), PLANAR));
-  push(sayWhereTask(0, (n += 1), DEPTH, ALL));
-  push(whichPictureTask(1, (n += 1), PLANAR));
-  push(findItTask(2, (n += 1), DEPTH));
-  push(sayWhereTask(3, (n += 1), ALL, ALL));
-  push(whichPictureTask(2, (n += 1), DEPTH));
-  push(whatChangedTask(2, (n += 1)));
-
-  // ── Direction · AC9MFSP02 (6) ──────────────────────────────────────────────
-  push(directionChoiceTask(0, (n += 1), "moved"));
-  push(directionChoiceTask(1, (n += 1), "goal"));
-  push(directionChoiceTask(2, (n += 1), "moved"));
-  push(directionChoiceTask(3, (n += 1), "goal"));
-  push(findItTask(4, (n += 1), ALL));
-  push(directionChoiceTask(5, (n += 1), "goal"));
-
-  return tasks;
-}
-
-// Registry keyed by level prefix; only Ground has a real post-test today.
-const POST_TEST_BUILDERS: Record<string, () => PracticeTask[]> = {
-  ground: buildGroundPostTest,
+type TaskSelection = {
+  week: number;
+  skillId: string;
+  skillLabel: string;
+  build: () => PracticeTask[];
+  indices: number[];
 };
 
-export function getStarpathPostTestTasks(levelPrefix: string): PracticeTask[] | null {
-  const builder = POST_TEST_BUILDERS[levelPrefix];
-  return builder ? builder() : null;
+const TASK_SELECTIONS: TaskSelection[] = [
+  {
+    week: 1,
+    skillId: "shape_recognition",
+    skillLabel: "Recognise Familiar Shapes",
+    build: buildGroundWeek1VoyageQuiz,
+    indices: [0, 6],
+  },
+  {
+    week: 2,
+    skillId: "shape_creation",
+    skillLabel: "Create with Familiar Shapes",
+    build: buildGroundWeek2VoyageQuiz,
+    indices: [0, 5, 10],
+  },
+  {
+    week: 3,
+    skillId: "shape_sort_compare",
+    skillLabel: "Sort and Compare Familiar Shapes",
+    build: buildGroundWeek3VoyageQuiz,
+    indices: [0, 5, 10],
+  },
+  {
+    week: 4,
+    skillId: "position_language",
+    skillLabel: "Describe Object Positions",
+    build: buildGroundWeek4VoyageQuiz,
+    indices: [0, 5, 10],
+  },
+  {
+    week: 5,
+    skillId: "location_movement",
+    skillLabel: "Locate and Move Objects",
+    build: buildGroundWeek5VoyageQuiz,
+    indices: [0, 5, 10],
+  },
+  {
+    week: 6,
+    skillId: "positional_clues",
+    skillLabel: "Follow Positional Clues",
+    build: buildGroundWeek6VoyageQuiz,
+    indices: [0, 10],
+  },
+  {
+    week: 7,
+    skillId: "shape_position_application",
+    skillLabel: "Apply Shapes and Position",
+    build: buildGroundWeek7VoyageQuiz,
+    indices: [0, 10],
+  },
+  {
+    week: 8,
+    skillId: "space_mastery",
+    skillLabel: "Shape and Position Reasoning",
+    build: () => [
+      oddShapeTask(8, 1),
+      whichPictureTask(8, 2, POSITION_RELATIONS),
+    ],
+    indices: [0, 1],
+  },
+];
+
+function createSeededRandom(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    return state / 0x100000000;
+  };
 }
+
+function buildStableTasks(build: () => PracticeTask[], week: number): PracticeTask[] {
+  const originalRandom = Math.random;
+  Math.random = createSeededRandom(ASSESSMENT_SEED + week);
+  try {
+    return build();
+  } finally {
+    Math.random = originalRandom;
+  }
+}
+
+function getTaskPrompt(task: PracticeTask, fallback: string): string {
+  return "prompt" in task && typeof task.prompt === "string" ? task.prompt : fallback;
+}
+
+function getReviewFeedback(task: PracticeTask, skillLabel: string): string {
+  if ("feedback" in task && task.feedback && typeof task.feedback.wrong === "string") {
+    return task.feedback.wrong;
+  }
+  return `Review ${skillLabel.toLowerCase()} and try again.`;
+}
+
+export function buildGroundPostTestQuestions(): Question[] {
+  let questionNumber = 0;
+
+  return TASK_SELECTIONS.flatMap(({ week, skillId, skillLabel, build, indices }) => {
+    const tasks = buildStableTasks(build, week);
+    return indices.map((taskIndex) => {
+      const practiceTask = tasks[taskIndex];
+      if (!practiceTask) {
+        throw new Error(`Starpath Ground post-test is missing Week ${week} task ${taskIndex}.`);
+      }
+
+      questionNumber += 1;
+      return {
+        id: `${STARPATH_GROUND_POSTTEST_ID}-q${String(questionNumber).padStart(2, "0")}`,
+        type: "starpathTask",
+        prompt: getTaskPrompt(practiceTask, skillLabel),
+        correctAnswer: CORRECT_TOKEN,
+        answer: CORRECT_TOKEN,
+        skillId,
+        skillLabel,
+        linkedWeeks: [week],
+        linkedLessons: [1, 2, 3],
+        strand: "Space",
+        difficultyBand: "foundation-space-post",
+        reviewFeedback: getReviewFeedback(practiceTask, skillLabel),
+        practiceTask,
+      } satisfies Question;
+    });
+  });
+}
+
+export function buildGroundPostTest(): PracticeTask[] {
+  return buildGroundPostTestQuestions().flatMap((question) =>
+    question.practiceTask ? [question.practiceTask] : []
+  );
+}
+
+export function getStarpathPosttestForYear(yearLabel: string): PostTest | undefined {
+  if (yearLabel !== "Prep") return undefined;
+  return {
+    yearLabel: "Prep",
+    questions: buildGroundPostTestQuestions(),
+  };
+}
+
+export function getStarpathPostTestTasks(levelPrefix: string): PracticeTask[] | null {
+  return levelPrefix === "ground" ? buildGroundPostTest() : null;
+}
+
+export const STARPATH_GROUND_POSTTEST_CORRECT_TOKEN = CORRECT_TOKEN;

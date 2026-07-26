@@ -1,6 +1,7 @@
 import { getPretestForYear, type Question as PretestQuestion } from "./pretests";
 import { POSTTESTS, buildPrepPosttest, type PostTest, type Question as PosttestQuestion } from "./posttests";
 import { getMeasurelandsPosttestForYear, getMeasurelandsPretestForYear } from "./measurelands";
+import { getStarpathPosttestForYear } from "@/data/activities/starpath/ground/groundPostTest";
 import type { SupportedMathLevel } from "@/data/activities/year2/lessonEngine";
 import {
   buildLevel3PosttestFormB,
@@ -9,13 +10,16 @@ import {
 } from "./level3Blueprint";
 
 export type AssessmentQuestion = PretestQuestion | PosttestQuestion;
-export type AssessmentRealmId = "number" | "measurement";
+export type AssessmentRealmId = "number" | "measurement" | "space";
 
 function yearLabelForLevel(level: SupportedMathLevel): string {
   return `Year ${level}`;
 }
 
 export function getPretestForLevel(level: SupportedMathLevel, realmId: AssessmentRealmId = "number"): PretestQuestion[] {
+  if (realmId === "space") {
+    return [];
+  }
   if (realmId === "measurement") {
     return getMeasurelandsPretestForYear(yearLabelForLevel(level)) as PretestQuestion[];
   }
@@ -26,6 +30,9 @@ export function getPretestForLevel(level: SupportedMathLevel, realmId: Assessmen
 }
 
 export function getPosttestForLevel(level: SupportedMathLevel, realmId: AssessmentRealmId = "number"): PostTest | undefined {
+  if (realmId === "space") {
+    return getStarpathPosttestForYear(yearLabelForLevel(level));
+  }
   if (realmId === "measurement") {
     return getMeasurelandsPosttestForYear(yearLabelForLevel(level));
   }
@@ -40,6 +47,9 @@ export function getAssessmentYearLabel(level: SupportedMathLevel): string {
 }
 
 export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number"): PretestQuestion[] {
+  if (realmId === "space") {
+    return [];
+  }
   if (realmId === "measurement") {
     return getMeasurelandsPretestForYear(yearLabel) as PretestQuestion[];
   }
@@ -50,6 +60,9 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
 }
 
 export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number"): PostTest | undefined {
+  if (realmId === "space") {
+    return getStarpathPosttestForYear(yearLabel);
+  }
   if (realmId === "measurement") {
     return getMeasurelandsPosttestForYear(yearLabel);
   }
@@ -63,6 +76,9 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
 }
 
 export function validateAssessmentBlueprintForLevel(level: SupportedMathLevel, realmId: AssessmentRealmId = "number"): string[] {
+  if (realmId === "space") {
+    return [];
+  }
   if (realmId === "measurement") {
     return [];
   }

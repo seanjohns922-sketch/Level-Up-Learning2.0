@@ -1,10 +1,8 @@
 import { notFound, redirect } from "next/navigation";
-import StarpathPostTest from "@/components/starpath/StarpathPostTest";
-import { getStarpathPostTestTasks } from "@/data/activities/starpath/ground/groundPostTest";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getServerStarpathAccess } from "@/lib/demo-session-server";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
-import { buildStarpathProgramHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
+import { STARPATH_REALM_ID } from "@/lib/starpath-routes";
 
 export const dynamic = "force-dynamic";
 
@@ -27,22 +25,7 @@ export default async function StarpathPostTestPage({
   const program = getStarpathProgram(level);
   if (program.realmId !== STARPATH_REALM_ID) notFound();
 
-  const tasks = getStarpathPostTestTasks(level);
-  if (!tasks || tasks.length === 0) notFound();
+  if (program.assessments.postTest?.status !== "implemented") notFound();
 
-  const finalWeek = program.weeks.length;
-  return (
-    <StarpathPostTest
-      meta={{
-        year: definition.yearLabel,
-        levelLabel: definition.displayLabel,
-        title: `${definition.displayLabel} Post-Test`,
-        coverage: program.assessments.postTest
-          ? "Shapes, position and directions from the whole Ground Level."
-          : "Everything from this level.",
-        programHref: buildStarpathProgramHref({ selectedLevel: level }, finalWeek),
-      }}
-      tasks={tasks}
-    />
-  );
+  redirect(`/posttest?year=${encodeURIComponent(definition.yearLabel)}&realm_id=${STARPATH_REALM_ID}`);
 }

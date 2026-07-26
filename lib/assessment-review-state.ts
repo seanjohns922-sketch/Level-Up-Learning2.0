@@ -5,12 +5,13 @@ export type AssessmentReviewMode = "pretest" | "posttest";
 
 type AssessmentReviewState = {
   year: string;
-  realmId: "number" | "measurement";
+  realmId: "number" | "measurement" | "space";
   mode: AssessmentReviewMode;
   items: MistakeReviewItem[];
 };
 
-function normalizeRealmId(realmId?: string | null): "number" | "measurement" {
+function normalizeRealmId(realmId?: string | null): "number" | "measurement" | "space" {
+  if (realmId === "space") return "space";
   return realmId === "measurement" ? "measurement" : "number";
 }
 

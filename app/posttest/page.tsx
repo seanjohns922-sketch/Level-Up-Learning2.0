@@ -26,6 +26,13 @@ import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 import { clearCompletionId, getOrCreateCompletionId } from "@/lib/resume-state";
 
 const PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
+const POSTTEST_DRAFT_VERSION = 1;
+
+function getPosttestDraftKey(realmId: string, year: string): string {
+  const studentId =
+    typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() || "demo" : "demo";
+  return `posttest-draft:v${POSTTEST_DRAFT_VERSION}:${studentId}:${realmId}:${year}`;
+}
 
 function buildPosttestPracticeReviewItems(
   questions: Question[],
@@ -41,7 +48,7 @@ function buildPosttestPracticeReviewItems(
       lesson: question.linkedLessons?.[0] ?? null,
       lessonTitle: question.skillLabel ?? null,
       skillLabel: question.skillLabel ?? null,
-      explanation: "Practice this lesson to improve.",
+      explanation: question.reviewFeedback ?? "Practice this lesson to improve.",
     }];
   });
 }
@@ -320,10 +327,11 @@ function PostTestPage() {
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
   const realmId = params.get("realm_id") ?? undefined;
-  if (realmId !== undefined && realmId !== "number" && realmId !== "measurement") {
+  if (realmId !== undefined && realmId !== "number" && realmId !== "measurement" && realmId !== "space") {
     throw new Error(`Unsupported post-test realm: ${realmId}`);
   }
-  const progressRealmId = realmId === "measurement" ? "measurement" : "number";
+  const progressRealmId =
+    realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : "number";
   // Final week is realm-specific: Measurelands = 8, Number Nexus = 12. Never
   // hardcode 12 for a realm-aware assessment (that leaks a Number assumption).
   const lastWeek = getLastProgramWeek(progressRealmId);
@@ -350,6 +358,7 @@ function PostTestPage() {
   const [canonicalProgress, setCanonicalProgress] = useState<StudentProgress | null>(null);
   const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">(previewMode ? "ready" : "loading");
   const [restoreError, setRestoreError] = useState("");
+  const [draftLoaded, setDraftLoaded] = useState(false);
 
   const q = questions[idx];
   const picked = answers[q?.id ?? ""] ?? "";
@@ -405,6 +414,40 @@ function PostTestPage() {
       });
     return () => { cancelled = true; };
   }, [lastWeek, previewMode, progressRealmId, realmId, router, year]);
+
+  useEffect(() => {
+    if (restoreState !== "ready" || draftLoaded || questions.length === 0) return;
+    try {
+      const raw = localStorage.getItem(getPosttestDraftKey(progressRealmId, year));
+      if (raw) {
+        const draft = JSON.parse(raw) as { index?: unknown; answers?: unknown };
+        if (draft.answers && typeof draft.answers === "object") {
+          const validIds = new Set(questions.map((question) => question.id));
+          const restoredAnswers = Object.fromEntries(
+            Object.entries(draft.answers as Record<string, unknown>).flatMap(([id, value]) =>
+              validIds.has(id) && typeof value === "string" ? [[id, value]] : []
+            )
+          );
+          setAnswers(restoredAnswers);
+        }
+        if (typeof draft.index === "number" && Number.isInteger(draft.index)) {
+          setIdx(Math.max(0, Math.min(questions.length - 1, draft.index)));
+        }
+      }
+    } catch {
+      localStorage.removeItem(getPosttestDraftKey(progressRealmId, year));
+    } finally {
+      setDraftLoaded(true);
+    }
+  }, [draftLoaded, progressRealmId, questions, restoreState, year]);
+
+  useEffect(() => {
+    if (!draftLoaded || submitted || questions.length === 0) return;
+    localStorage.setItem(
+      getPosttestDraftKey(progressRealmId, year),
+      JSON.stringify({ index: idx, answers })
+    );
+  }, [answers, draftLoaded, idx, progressRealmId, questions.length, submitted, year]);
 
   function pick(option: string) {
     if (!q) return;
@@ -494,13 +537,22 @@ function PostTestPage() {
           score_percent: percent,
           passed: didPass,
           placement_result: latest,
-          question_results: [],
+          question_results: questions.map((question) => ({
+            question_id: question.id,
+            answer: answers[question.id] ?? null,
+            correct: isAssessmentAnswerCorrect(question, answers[question.id]),
+            skill_id: question.skillId ?? null,
+            skill_label: question.skillLabel ?? null,
+            week: question.linkedWeeks?.[0] ?? null,
+            lesson: question.linkedLessons?.[0] ?? null,
+          })),
           completed_at: new Date().toISOString(),
         }, completionId, progressPayload, progressRealmId);
       const restored = await restoreStudentStateFromServer(studentId, progressRealmId);
       if (!restored.progress) throw new Error("Saved post-test did not produce canonical progress");
       setCanonicalProgress(restored.progress);
       clearCompletionId(assessmentCompletionKey);
+      localStorage.removeItem(getPosttestDraftKey(progressRealmId, year));
     } catch (error) {
       submittingRef.current = false;
       console.warn("[PostTest] DB save failed:", error);
@@ -580,13 +632,14 @@ function PostTestPage() {
     );
   }
 
-  const isMeasurelandsTask = q?.type === "measurelandsTask" && Boolean(q.practiceTask);
+  const isInteractiveTask =
+    (q?.type === "measurelandsTask" || q?.type === "starpathTask") && Boolean(q.practiceTask);
   const hasAnswer =
     q?.type === "mab" ? mabHasSelection : q?.type === "numeric" ? picked.trim().length > 0 : !!picked;
 
   let questionContent: React.ReactNode;
 
-  if (isMeasurelandsTask && q.practiceTask) {
+  if (isInteractiveTask && q.practiceTask) {
     questionContent = (
       <MeasurelandsAssessmentTask
         key={q.id}
@@ -711,7 +764,7 @@ function PostTestPage() {
         totalQuestions={questions.length}
         subtitle={`Complete all ${questions.length} questions to unlock your Legend (${PASS_THRESHOLD}%+)`}
         questionPrompt={q.prompt}
-        questionContent={isMeasurelandsTask ? questionContent : (
+        questionContent={isInteractiveTask ? questionContent : (
           <div>
             <div className="flex justify-end mb-3">
               <ReadAloudBtn text={q.prompt} />
@@ -726,8 +779,8 @@ function PostTestPage() {
         onNext={next}
         onSubmit={submit}
         onExit={() => router.push(buildAssessmentReturnRoute({ year, realmId }))}
-        wideContent={isMeasurelandsTask}
-        hidePrompt={isMeasurelandsTask}
+        wideContent={isInteractiveTask}
+        hidePrompt={isInteractiveTask}
         realmId={realmId}
       />
     </>
