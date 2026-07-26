@@ -5,7 +5,20 @@ import { finishPictureTask, identifyBuildShapesTask, shapeBuilderTask, spaceMuse
 import { findItTask, placeItTask, sayWhereTask, whichPictureTask } from "./week4Tasks";
 import type { PositionRelation } from "./position-objects";
 
-const BUILD_OBJECTS: StarpathBuildObjectId[] = ["rocket", "planet", "satellite", "alien", "house"];
+// Rotate through the whole build catalog so every visit shows a different
+// shape-built picture (not a rocket every time), keeping the skill the same.
+const BUILD_OBJECTS: StarpathBuildObjectId[] = [
+  "rocket",
+  "house",
+  "tree",
+  "robot",
+  "cat",
+  "planet",
+  "satellite",
+  "alien",
+  "moon-buggy",
+  "space-station",
+];
 const W7_RELATIONS: PositionRelation[] = ["above", "below", "beside", "behind", "inside"];
 const W7_POOL: PositionRelation[] = ["above", "below", "beside", "behind", "in-front", "inside"];
 

@@ -8,7 +8,18 @@ import {
 import { findItTask, sayWhereTask, whichPictureTask } from "@/data/activities/starpath/ground/week4Tasks";
 import type { PositionRelation } from "@/data/activities/starpath/ground/position-objects";
 
-const BUILD_OBJECTS: StarpathBuildObjectId[] = ["rocket", "planet", "satellite", "alien", "house"];
+const BUILD_OBJECTS: StarpathBuildObjectId[] = [
+  "rocket",
+  "house",
+  "tree",
+  "robot",
+  "cat",
+  "planet",
+  "satellite",
+  "alien",
+  "moon-buggy",
+  "space-station",
+];
 const RELATIONS: PositionRelation[] = ["above", "below", "beside", "behind", "inside"];
 const POOL: PositionRelation[] = ["above", "below", "beside", "behind", "in-front", "inside"];
 
