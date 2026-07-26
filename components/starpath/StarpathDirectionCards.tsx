@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Check, Sparkles, Star } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
@@ -26,7 +26,9 @@ const DIR_SHAKE = (
   <style>{`
     @keyframes sp-dir-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
     .sp-dir-shake { animation: sp-dir-shake 0.4s ease-in-out; }
-    @media (prefers-reduced-motion: reduce) { .sp-dir-shake { animation: none; } }
+    @keyframes sp-dir-pop { 0%{transform:scale(0.6);opacity:0} 60%{transform:scale(1.08);opacity:1} 100%{transform:scale(1);opacity:1} }
+    .sp-dir-pop { animation: sp-dir-pop 0.4s ease-out; }
+    @media (prefers-reduced-motion: reduce) { .sp-dir-shake, .sp-dir-pop { animation: none; } }
   `}</style>
 );
 
@@ -39,18 +41,25 @@ function cellStyle(cell: Cell, cols: number, rows: number): CSSProperties {
   };
 }
 
+const SURFACE_BG: Record<"space" | "planet", string> = {
+  space: "bg-gradient-to-b from-indigo-950 via-violet-900 to-slate-950",
+  planet: "bg-gradient-to-b from-teal-900 via-emerald-950 to-stone-950",
+};
+
 function DirectionGrid({
   cols,
   rows,
+  surface = "space",
   children,
 }: {
   cols: number;
   rows: number;
+  surface?: "space" | "planet";
   children: ReactNode;
 }) {
   return (
     <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: `${cols} / ${rows}` }}>
-      <div className="absolute inset-0 overflow-hidden rounded-2xl border-2 border-violet-200 bg-gradient-to-b from-indigo-950 via-violet-900 to-slate-950 shadow-inner">
+      <div className={`absolute inset-0 overflow-hidden rounded-2xl border-2 border-violet-200 shadow-inner ${SURFACE_BG[surface]}`}>
         <div
           className="grid h-full w-full"
           style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}
@@ -145,7 +154,13 @@ export function StarpathDirectionPathCard({
   task: DirectionPathTask;
   onComplete: () => void;
 }) {
+  const cellKey = (c: Cell) => `${c.r},${c.c}`;
+  const collectibleKeys = useRef(new Set((task.collectibles ?? []).map(cellKey)));
+  const totalStars = task.collectibles?.length ?? 0;
+
   const [cell, setCell] = useState<Cell>(task.start);
+  const [visited, setVisited] = useState<Cell[]>([task.start]);
+  const [collected, setCollected] = useState<Set<string>>(() => new Set());
   const [stepIndex, setStepIndex] = useState(0);
   const [wrong, setWrong] = useState<Direction | null>(null);
   const [reached, setReached] = useState(false);
@@ -161,10 +176,14 @@ export function StarpathDirectionPathCard({
         c: Math.min(task.cols - 1, Math.max(0, cell.c + delta.dc)),
       };
       setCell(next);
+      setVisited((prev) => [...prev, next]);
+      if (collectibleKeys.current.has(cellKey(next))) {
+        setCollected((prev) => new Set(prev).add(cellKey(next)));
+      }
       if (stepIndex + 1 >= task.steps.length) {
         doneRef.current = true;
         setReached(true);
-        setTimeout(onComplete, 640);
+        setTimeout(onComplete, 900);
       } else {
         setStepIndex(stepIndex + 1);
       }
@@ -186,24 +205,69 @@ export function StarpathDirectionPathCard({
             {reached ? "You made it!" : step?.instruction ?? "Done!"}
           </span>
         </div>
-        {step && !reached ? <ReadAloudBtn text={step.speakText} size="md" label="Read" className="shrink-0" /> : null}
+        <div className="flex items-center gap-2">
+          {totalStars > 0 ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-sm font-black text-amber-700">
+              <Star className="h-4 w-4 fill-amber-400 text-amber-500" /> {collected.size}/{totalStars}
+            </span>
+          ) : null}
+          {step && !reached ? <ReadAloudBtn text={step.speakText} size="md" label="Read" className="shrink-0" /> : null}
+        </div>
       </div>
-      <DirectionGrid cols={task.cols} rows={task.rows}>
-        {task.goal ? (
-          <GridMarker cell={task.goal} cols={task.cols} rows={task.rows} z={5}>
-            <div className="flex h-4/5 w-4/5 items-center justify-center rounded-xl border-2 border-dashed border-amber-300/70 bg-amber-300/10">
-              {task.goal.reveal && !reached ? (
-                <span className="text-2xl font-black text-amber-300/80">?</span>
-              ) : (
-                <PositionObjectVisual objectId={task.goal.object} className="h-3/4 w-3/4" />
-              )}
-            </div>
+      <div className="relative">
+        <DirectionGrid cols={task.cols} rows={task.rows} surface={task.surface}>
+          {/* Trail */}
+          {task.trail
+            ? visited.slice(0, -1).map((visitedCell, index) => (
+                <GridMarker key={`trail-${index}`} cell={visitedCell} cols={task.cols} rows={task.rows} z={2}>
+                  <span className="h-2.5 w-2.5 rounded-full bg-cyan-300/60 shadow-[0_0_8px_rgba(103,232,249,0.7)]" />
+                </GridMarker>
+              ))
+            : null}
+          {/* Collectible stars */}
+          {(task.collectibles ?? []).map((starCell, index) => {
+            const got = collected.has(cellKey(starCell));
+            return (
+              <GridMarker key={`star-${index}`} cell={starCell} cols={task.cols} rows={task.rows} z={got ? 3 : 6}>
+                <Star
+                  className={[
+                    "h-1/2 w-1/2 transition",
+                    got ? "scale-125 fill-amber-300 text-amber-400 opacity-40" : "fill-amber-300 text-amber-500",
+                  ].join(" ")}
+                />
+              </GridMarker>
+            );
+          })}
+          {task.goal ? (
+            <GridMarker cell={task.goal} cols={task.cols} rows={task.rows} z={5}>
+              <div className="flex h-4/5 w-4/5 items-center justify-center rounded-xl border-2 border-dashed border-amber-300/70 bg-amber-300/10">
+                {task.goal.reveal && !reached ? (
+                  <span className="text-2xl font-black text-amber-300/80">?</span>
+                ) : (
+                  <PositionObjectVisual objectId={task.goal.object} className="h-3/4 w-3/4" />
+                )}
+              </div>
+            </GridMarker>
+          ) : null}
+          <GridMarker cell={cell} cols={task.cols} rows={task.rows} z={20}>
+            <PositionObjectVisual objectId={task.object} className="h-4/5 w-4/5" />
           </GridMarker>
+        </DirectionGrid>
+        {/* Arrival celebration */}
+        {reached ? (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-1 rounded-2xl bg-white/90 px-5 py-3 text-center shadow-xl sp-dir-pop">
+              <Sparkles className="h-8 w-8 text-amber-500" />
+              <span className="text-lg font-black text-indigo-950">
+                {task.goal?.reveal ? "Treasure found!" : "You made it!"}
+              </span>
+              {totalStars > 0 ? (
+                <span className="text-sm font-black text-amber-600">{collected.size}/{totalStars} stars collected</span>
+              ) : null}
+            </div>
+          </div>
         ) : null}
-        <GridMarker cell={cell} cols={task.cols} rows={task.rows} z={20}>
-          <PositionObjectVisual objectId={task.object} className="h-4/5 w-4/5" />
-        </GridMarker>
-      </DirectionGrid>
+      </div>
       <ArrowPad onPick={pick} wrong={wrong} />
       <p className="mt-3 text-center text-sm font-semibold text-slate-600">
         Step {Math.min(stepIndex + 1, task.steps.length)} of {task.steps.length}

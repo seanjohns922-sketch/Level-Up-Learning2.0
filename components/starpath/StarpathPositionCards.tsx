@@ -183,6 +183,18 @@ export function PositionObjectVisual({
           <path d="M48 24q12-11 24 0-12 13-24 0Z" fill={gradient("gold")} stroke="#312e81" strokeWidth="4" />
         </>
       ) : null}
+      {objectId === "rover" ? (
+        <>
+          <circle cx="38" cy="92" r="14" fill="#1e293b" stroke="#312e81" strokeWidth="5" />
+          <circle cx="82" cy="92" r="14" fill="#1e293b" stroke="#312e81" strokeWidth="5" />
+          <circle cx="38" cy="92" r="5" fill="#94a3b8" />
+          <circle cx="82" cy="92" r="5" fill="#94a3b8" />
+          <rect x="26" y="52" width="68" height="30" rx="8" fill="#67e8f9" stroke="#312e81" strokeWidth="5" />
+          <rect x="40" y="58" width="40" height="16" rx="3" fill="#0e7490" />
+          <path d="M60 52 V36" stroke="#312e81" strokeWidth="5" strokeLinecap="round" />
+          <circle cx="60" cy="32" r="7" fill="#fde047" stroke="#312e81" strokeWidth="4" />
+        </>
+      ) : null}
       {objectId === "cave" ? (
         <>
           <path d="M11 105Q12 39 60 32Q108 39 109 105Z" fill={gradient("stone")} stroke="#312e81" strokeWidth="5" strokeLinejoin="round" />

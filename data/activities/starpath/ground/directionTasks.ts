@@ -48,7 +48,17 @@ function generatePath(cols: number, rows: number, start: Cell, count: number, se
 export function directionPathTask(
   round: number,
   target: number,
-  opts: { steps: number; object?: string; goalObject?: string; reveal?: boolean; prompt?: string; speakText?: string }
+  opts: {
+    steps: number;
+    object?: string;
+    goalObject?: string;
+    reveal?: boolean;
+    prompt?: string;
+    speakText?: string;
+    trail?: boolean;
+    collect?: boolean;
+    surface?: "space" | "planet";
+  }
 ): PracticeTask {
   const object = opts.object ?? "rocket";
   const start: Cell = { r: GRID - 1, c: 0 };
@@ -59,6 +69,22 @@ export function directionPathTask(
     instruction: `Move the ${object} ${DIRECTION_PHRASE[direction]}.`,
     speakText: `Move the ${object} ${DIRECTION_PHRASE[direction]}.`,
   }));
+
+  // Stars sit on cells along the route (never the start or the destination) and
+  // are gathered automatically as the traveller follows the clues.
+  let collectibles: Cell[] | undefined;
+  if (opts.collect) {
+    const cells: Cell[] = [start];
+    let current = start;
+    for (const direction of directions) {
+      current = move(current, direction);
+      cells.push(current);
+    }
+    const middle = cells.slice(1, -1);
+    collectibles = middle.filter((_, index) => index % 2 === 0).slice(0, 2);
+    if (collectibles.length === 0 && middle.length > 0) collectibles = [middle[0]!];
+  }
+
   return {
     kind: "starpathDirectionPath",
     prompt: opts.prompt ?? "Follow the directions.",
@@ -70,6 +96,9 @@ export function directionPathTask(
     start,
     goal: { r: end.r, c: end.c, object: goalObject, reveal: opts.reveal },
     steps,
+    trail: opts.trail,
+    collectibles,
+    surface: opts.surface,
     feedback: {
       correct: opts.reveal ? "You found the treasure!" : "You followed every direction!",
       wrong: "Read the direction again and tap the matching arrow.",
@@ -78,12 +107,16 @@ export function directionPathTask(
 }
 
 // ── Which way? (single-choice) ───────────────────────────────────────────────
-export function directionChoiceTask(round: number, target: number, mode: "moved" | "goal"): PracticeTask {
+export function directionChoiceTask(
+  round: number,
+  target: number,
+  mode: "moved" | "goal",
+  object = "rocket",
+): PracticeTask {
   const direction = ALL_DIRECTIONS[round % ALL_DIRECTIONS.length]!;
   const delta = DELTA[direction];
   const to: Cell = { r: 1 + (round % 2), c: 1 + (Math.floor(round / 2) % 2) };
   const from: Cell = { r: to.r - delta.dr, c: to.c - delta.dc };
-  const object = "rocket";
   const goalObject = GOAL_OBJECTS[round % GOAL_OBJECTS.length]!;
   const options = ALL_DIRECTIONS.map((dir, index) => ({ id: `dir-${target}-${dir}-${index}`, direction: dir }));
   const correct = options.find((option) => option.direction === direction)!;

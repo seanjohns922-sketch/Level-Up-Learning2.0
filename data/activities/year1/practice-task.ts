@@ -2580,6 +2580,12 @@ export type PracticeTask = (
       start: { r: number; c: number };
       goal?: { r: number; c: number; object: string; reveal?: boolean };
       steps: Array<{ direction: "up" | "down" | "left" | "right"; instruction: string; speakText: string }>;
+      /** Journey styling: leave a glowing trail through visited cells. */
+      trail?: boolean;
+      /** Stars collected as the traveller passes through these cells. */
+      collectibles?: Array<{ r: number; c: number }>;
+      /** Grid backdrop theme. Defaults to "space". */
+      surface?: "space" | "planet";
       feedback: { correct: string; wrong: string };
     }
   | {
