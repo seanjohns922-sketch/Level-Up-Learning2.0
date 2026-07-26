@@ -10,7 +10,11 @@ export type StarpathBuildObjectId =
   | "planet"
   | "alien"
   | "satellite"
-  | "cat";
+  | "cat"
+  | "space-dog"
+  | "ufo"
+  | "astronaut"
+  | "telescope";
 
 export type StarpathBuildPiece = {
   id: string;
@@ -177,6 +181,55 @@ export const STARPATH_BUILD_OBJECTS: Record<StarpathBuildObjectId, StarpathBuild
       detail("head", "eye-left", "circle", "#1e1b4b", 26, 24, 4, 5),
       detail("head", "eye-right", "circle", "#1e1b4b", 38, 24, 4, 5),
       detail("head", "nose", "triangle", "#7c3aed", 32, 30, 5, 4, 180),
+    ],
+  },
+  "space-dog": {
+    id: "space-dog",
+    label: "Space dog",
+    pieces: [
+      piece("body", "rectangle", "#fbbf24", 28, 44, 32, 16),
+      piece("head", "circle", "#fcd34d", 47, 30, 22, 22),
+      piece("ear", "triangle", "#f59e0b", 41, 16, 11, 13, -20),
+      piece("snout", "square", "#fde68a", 56, 34, 11, 11),
+      piece("tail", "rectangle", "#f59e0b", 11, 40, 12, 6, -35),
+    ],
+    details: [
+      detail("head", "eye", "circle", "#1e1b4b", 49, 27, 4, 5),
+      detail("snout", "nose", "triangle", "#7c3aed", 61, 34, 4, 4, 180),
+    ],
+  },
+  ufo: {
+    id: "ufo",
+    label: "Flying saucer",
+    pieces: [
+      piece("saucer", "rectangle", "#c4b5fd", 32, 36, 52, 12),
+      piece("dome", "circle", "#a5f3fc", 32, 27, 24, 20),
+      piece("window", "square", "#38bdf8", 32, 26, 8, 8),
+      piece("light-left", "circle", "#fde047", 18, 38, 6, 6),
+      piece("light-right", "circle", "#fde047", 46, 38, 6, 6),
+      piece("beam", "triangle", "#fef08a", 32, 52, 30, 20, 180),
+    ],
+  },
+  astronaut: {
+    id: "astronaut",
+    label: "Astronaut",
+    pieces: [
+      piece("body", "rectangle", "#e2e8f0", 32, 44, 26, 28),
+      piece("helmet", "circle", "#f8fafc", 32, 20, 26, 26),
+      piece("visor", "square", "#38bdf8", 32, 20, 15, 15),
+      piece("arm-left", "rectangle", "#cbd5e1", 15, 42, 8, 20, 18),
+      piece("arm-right", "rectangle", "#cbd5e1", 49, 42, 8, 20, -18),
+      piece("badge", "triangle", "#fb7185", 32, 42, 10, 9),
+    ],
+  },
+  telescope: {
+    id: "telescope",
+    label: "Telescope",
+    pieces: [
+      piece("tube", "rectangle", "#67e8f9", 34, 28, 36, 12, -18),
+      piece("lens", "circle", "#fde047", 51, 20, 12, 12),
+      piece("eyepiece", "square", "#c4b5fd", 17, 37, 9, 9),
+      piece("stand", "triangle", "#f9a8d4", 30, 52, 32, 18),
     ],
   },
 };

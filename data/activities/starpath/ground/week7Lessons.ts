@@ -18,6 +18,10 @@ const BUILD_OBJECTS: StarpathBuildObjectId[] = [
   "alien",
   "moon-buggy",
   "space-station",
+  "space-dog",
+  "ufo",
+  "astronaut",
+  "telescope",
 ];
 const W7_RELATIONS: PositionRelation[] = ["above", "below", "beside", "behind", "inside"];
 const W7_POOL: PositionRelation[] = ["above", "below", "beside", "behind", "in-front", "inside"];
