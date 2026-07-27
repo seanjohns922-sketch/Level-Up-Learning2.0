@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import StarpathDevelopmentLesson from "@/components/starpath/StarpathDevelopmentLesson";
-import StarpathLessonShell from "@/components/starpath/StarpathLessonShell";
+import StarpathGroundLesson from "@/components/starpath/StarpathGroundLesson";
+import StarpathLevelOneLesson from "@/components/starpath/StarpathLevelOneLesson";
 import { GROUND_LESSON_CONTENT } from "@/data/activities/starpath/ground";
 import { LEVEL_ONE_LESSON_CONTENT } from "@/data/activities/starpath/level1";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
@@ -54,11 +55,12 @@ export default async function StarpathLessonPage({
     weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
   };
 
-  const lessonContent =
-    GROUND_LESSON_CONTENT[lesson.id] ?? LEVEL_ONE_LESSON_CONTENT[lesson.id];
+  if (GROUND_LESSON_CONTENT[lesson.id]) {
+    return <StarpathGroundLesson lesson={lessonMetadata} />;
+  }
 
-  if (lessonContent) {
-    return <StarpathLessonShell lesson={lessonMetadata} content={lessonContent} />;
+  if (LEVEL_ONE_LESSON_CONTENT[lesson.id]) {
+    return <StarpathLevelOneLesson lesson={lessonMetadata} />;
   }
 
   return (
