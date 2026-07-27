@@ -220,16 +220,16 @@ function mysteryTask(
     return {
       kind: "starpathMysteryShape",
       mode,
-      prompt: "Which scanner label is wrong?",
+      prompt: "Which picture has the wrong shape name?",
       speakText:
-        "One scanner label does not match its shape. Tap the card with the incorrect label.",
+        "One shape name does not match its picture. Tap the card with the wrong name.",
       target,
       clues: [],
       options,
       correctOptionId: answerId,
       feedback: {
-        correct: "You repaired the incorrect scanner label.",
-        wrong: "That label matches its shape. Check the other scanner cards.",
+        correct: "You found and repaired the incorrect shape name.",
+        wrong: "That name matches its picture. Check the other scanner cards.",
       },
     };
   }

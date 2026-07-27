@@ -176,7 +176,13 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
     return task.options.find((option) => option.id === task.correctOptionId)?.label ?? "comparison";
   }
   if (task.kind === "starpathMysteryShape") {
-    return task.options.find((option) => option.id === task.correctOptionId)?.label ?? "mystery shape";
+    const correctOption = task.options.find(
+      (option) => option.id === task.correctOptionId
+    );
+    if (!correctOption) return "mystery shape";
+    return task.mode === "label-repair"
+      ? `${correctOption.shape} labelled ${correctOption.label}`
+      : correctOption.label;
   }
   if (task.kind === "measurementCompare") {
     return task.objects.find((item) => item.id === task.correctOptionId)?.label ?? task.correctOptionId;
@@ -1365,7 +1371,7 @@ export function PracticeRunner({
 
         <div className="min-w-0 space-y-3">
           {/* Status feedback pill */}
-          {status !== "idle" && (
+          {status !== "idle" && !awaitingWrongNext && (
             <div
               className={`rounded-xl px-4 py-2.5 text-center text-sm font-extrabold shadow-sm transition-all ${
                 status === "correct"

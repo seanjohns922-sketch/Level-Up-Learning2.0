@@ -211,7 +211,7 @@ export function StarpathMysteryShapeCard({
 }: {
   task: MysteryTask;
   onCorrect: () => void;
-  onWrong: () => void;
+  onWrong: (studentAnswer?: string) => void;
 }) {
   const [visibleClues, setVisibleClues] = useState(
     task.mode === "elimination" ? 1 : task.clues.length
@@ -254,7 +254,7 @@ export function StarpathMysteryShapeCard({
           </>
         ) : (
           <p className="mt-2 text-center font-bold text-violet-100">
-            One scanner label is wrong. Tap the card that needs repairing.
+            One shape name does not match its picture. Tap the card that needs repairing.
           </p>
         )}
       </div>
@@ -267,7 +267,13 @@ export function StarpathMysteryShapeCard({
             onClick={() => {
               if (!cluesReady && task.mode === "elimination") return;
               if (option.id === task.correctOptionId) onCorrect();
-              else onWrong();
+              else {
+                onWrong(
+                  task.mode === "label-repair"
+                    ? `${option.shape} labelled ${option.label}`
+                    : option.label
+                );
+              }
             }}
             showLabel={task.mode === "label-repair"}
           />
