@@ -10,10 +10,10 @@ import {
   TWO_WAYS_TO_SORT_CONTENT,
 } from "./week2Lessons";
 import {
-  DESIGN_TWO_WAYS_CONTENT,
-  FIND_HIDDEN_PARTS_CONTENT,
-} from "./week3Lessons";
-import { SHAPE_DETECTIVES_PICTURE_CONTENT } from "./week3ShapeHunt";
+  HIDDEN_SHAPE_HUNT_CONTENT,
+  MASTER_DETECTIVE_CONTENT,
+  SHAPE_DETECTIVES_PICTURE_CONTENT,
+} from "./week3ShapeHunt";
 import {
   CHOOSE_BEST_VIEW_CONTENT,
   LOOK_FROM_HERE_CONTENT,
@@ -48,8 +48,8 @@ export const LEVEL_ONE_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y1-space-w2-l2": MAKE_YOUR_OWN_RULE_CONTENT,
   "y1-space-w2-l3": TWO_WAYS_TO_SORT_CONTENT,
   "y1-space-w3-l1": SHAPE_DETECTIVES_PICTURE_CONTENT,
-  "y1-space-w3-l2": FIND_HIDDEN_PARTS_CONTENT,
-  "y1-space-w3-l3": DESIGN_TWO_WAYS_CONTENT,
+  "y1-space-w3-l2": HIDDEN_SHAPE_HUNT_CONTENT,
+  "y1-space-w3-l3": MASTER_DETECTIVE_CONTENT,
   "y1-space-w4-l1": OBJECT_OR_PICTURE_CONTENT,
   "y1-space-w4-l2": LOOK_FROM_HERE_CONTENT,
   "y1-space-w4-l3": CHOOSE_BEST_VIEW_CONTENT,

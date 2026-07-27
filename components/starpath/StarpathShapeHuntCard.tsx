@@ -8,6 +8,7 @@ import type { PracticeTask, StarpathShape } from "@/data/activities/year1/practi
 import {
   HUNT_VIEWBOX,
   getHuntScene,
+  huntCornerRadius,
   type ShapeHuntPiece,
 } from "@/data/activities/starpath/level1/shape-hunt-scenes";
 
@@ -73,7 +74,9 @@ function HuntPiece({
     const points = `${cx},${piece.y} ${piece.x + piece.w},${piece.y + piece.h} ${piece.x},${piece.y + piece.h}`;
     shapeEl = <polygon points={points} {...shared} />;
   } else {
-    shapeEl = <rect x={piece.x} y={piece.y} width={piece.w} height={piece.h} rx={3} {...shared} />;
+    shapeEl = (
+      <rect x={piece.x} y={piece.y} width={piece.w} height={piece.h} rx={huntCornerRadius(piece)} {...shared} />
+    );
   }
 
   return (
