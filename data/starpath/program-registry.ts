@@ -364,7 +364,7 @@ const LEVEL_ONE_SHAPE_DETECTIVE_MECHANICS = [
 const L1_MEET_FAMILIES_MECHANICS = ["meet-the-families", "family-check", "family-mastery"] as const;
 const L1_MAKE_RULE_MECHANICS = ["find-the-rule", "rule-check", "rule-mastery"] as const;
 const L1_TWO_WAYS_MECHANICS = ["another-way", "another-way-2", "rule-recap"] as const;
-const L1_BUILD_TARGET_MECHANICS = ["guided-build", "challenge-build", "solo-build"] as const;
+const L1_SHAPE_HUNT_MECHANICS = ["hunt-1", "hunt-2", "hunt-3"] as const;
 const L1_HIDDEN_PARTS_MECHANICS = ["decompose-1", "decompose-2", "decompose-3"] as const;
 const L1_DESIGN_TWO_WAYS_MECHANICS = ["match-build", "shape-rule", "match-master"] as const;
 const L1_OBJECT_PICTURE_MECHANICS = ["match-picture", "match-picture-2", "match-picture-3"] as const;
@@ -433,7 +433,7 @@ const IMPLEMENTED_LEVEL_ONE_LESSONS: Record<
   "y1-space-w2-l1": { learningIntention: "I can sort shapes into families by their features.", mechanics: L1_MEET_FAMILIES_MECHANICS },
   "y1-space-w2-l2": { learningIntention: "I can work out the rule behind a group of shapes.", mechanics: L1_MAKE_RULE_MECHANICS },
   "y1-space-w2-l3": { learningIntention: "I can sort the same shapes in more than one way.", mechanics: L1_TWO_WAYS_MECHANICS },
-  "y1-space-w3-l1": { learningIntention: "I can build an object from familiar shapes.", mechanics: L1_BUILD_TARGET_MECHANICS },
+  "y1-space-w3-l1": { learningIntention: "I can find and count the shapes hidden in a picture.", mechanics: L1_SHAPE_HUNT_MECHANICS },
   "y1-space-w3-l2": { learningIntention: "I can find the familiar shapes hidden inside an object.", mechanics: L1_HIDDEN_PARTS_MECHANICS },
   "y1-space-w3-l3": { learningIntention: "I can see that an object can be built more than one way.", mechanics: L1_DESIGN_TWO_WAYS_MECHANICS },
   "y1-space-w4-l1": { learningIntention: "I can match an object to the picture that shows it.", mechanics: L1_OBJECT_PICTURE_MECHANICS },

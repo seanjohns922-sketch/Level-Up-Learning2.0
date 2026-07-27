@@ -2667,6 +2667,18 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Level 1 · W3 — Shape Hunt. A picture built from many familiar shapes;
+      // find and tally every shape of each requested kind. Self-grading: the
+      // round advances as each shape's full count is found.
+      kind: "starpathShapeHunt";
+      prompt: string;
+      speakText: string;
+      target: number;
+      sceneId: string;
+      hunts: Array<{ shape: StarpathShape; count: number }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 1 · W2 — Classify shapes by a shared feature (round vs straight,
       // corners, number of sides). Single-answer MCQ so it grades in quizzes.
       kind: "starpathShapeClassify";

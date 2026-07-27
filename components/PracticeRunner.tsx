@@ -111,6 +111,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "starpathTurnMove") return "Direction Words";
   if (kind === "starpathRouteDebug") return "Fix the Route";
   if (kind === "starpathRouteBuild") return "Give the Route";
+  if (kind === "starpathShapeHunt") return "Shape Hunt";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";

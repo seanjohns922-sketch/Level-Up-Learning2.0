@@ -178,6 +178,7 @@ import {
   StarpathRouteDebugCard,
   StarpathTurnMoveCard,
 } from "@/components/starpath/StarpathLevelOnePathCards";
+import { StarpathShapeHuntCard } from "@/components/starpath/StarpathShapeHuntCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -637,6 +638,8 @@ function TaskRendererInner({
       return <StarpathRouteDebugCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathRouteBuild":
       return <StarpathRouteBuildCard key={k} task={t} onComplete={onC} />;
+    case "starpathShapeHunt":
+      return <StarpathShapeHuntCard key={k} task={t} onComplete={onC} />;
     default:
       return <TaskRecoveryCard onRecover={onW} />;
   }
