@@ -9,6 +9,12 @@ import { buildGroundWeek5VoyageQuiz } from "@/data/activities/starpath/ground/we
 import { buildGroundWeek6VoyageQuiz } from "@/data/activities/starpath/ground/week6Quiz";
 import { buildGroundWeek7VoyageQuiz } from "@/data/activities/starpath/ground/week7Quiz";
 import { buildLevelOneWeek1VoyageQuiz } from "@/data/activities/starpath/level1/week1Quiz";
+import { buildLevelOneWeek2VoyageQuiz } from "@/data/activities/starpath/level1/week2Quiz";
+import { buildLevelOneWeek3VoyageQuiz } from "@/data/activities/starpath/level1/week3Quiz";
+import { buildLevelOneWeek4VoyageQuiz } from "@/data/activities/starpath/level1/week4Quiz";
+import { buildLevelOneWeek5VoyageQuiz } from "@/data/activities/starpath/level1/week5Quiz";
+import { buildLevelOneWeek6VoyageQuiz } from "@/data/activities/starpath/level1/week6Quiz";
+import { buildLevelOneWeek7VoyageQuiz } from "@/data/activities/starpath/level1/week7Quiz";
 
 // Ground Level · Week 1 Voyage Quiz — 15 questions, 5 from each lesson, using
 // single-answer shape tasks only (so every question is graded pass/fail).
@@ -50,7 +56,13 @@ const STARPATH_QUIZ_BUILDERS: Record<string, () => PracticeTask[]> = {
   "ground-w6": buildGroundWeek6VoyageQuiz,
   "ground-w7": buildGroundWeek7VoyageQuiz,
   "level-1-w1": buildLevelOneWeek1VoyageQuiz,
-  // Week 8 has no weekly quiz — its assessment is the Ground Level Post-Test.
+  "level-1-w2": buildLevelOneWeek2VoyageQuiz,
+  "level-1-w3": buildLevelOneWeek3VoyageQuiz,
+  "level-1-w4": buildLevelOneWeek4VoyageQuiz,
+  "level-1-w5": buildLevelOneWeek5VoyageQuiz,
+  "level-1-w6": buildLevelOneWeek6VoyageQuiz,
+  "level-1-w7": buildLevelOneWeek7VoyageQuiz,
+  // Week 8 has no weekly quiz — its assessment is the Post-Test.
 };
 
 export function getStarpathQuizTasks(levelPrefix: string, week: number): PracticeTask[] | null {

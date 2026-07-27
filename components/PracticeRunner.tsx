@@ -106,6 +106,11 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "starpathPositionSequence") return "Follow the Clues";
   if (kind === "starpathDirectionPath") return "Follow the Directions";
   if (kind === "starpathDirectionChoice") return "Which Way?";
+  if (kind === "starpathShapeClassify") return "Shape Families";
+  if (kind === "starpathViewpoint") return "Objects and Views";
+  if (kind === "starpathTurnMove") return "Direction Words";
+  if (kind === "starpathRouteDebug") return "Fix the Route";
+  if (kind === "starpathRouteBuild") return "Give the Route";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";

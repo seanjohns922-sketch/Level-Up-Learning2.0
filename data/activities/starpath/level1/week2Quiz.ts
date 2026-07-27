@@ -1,0 +1,16 @@
+import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { fifteenFrom } from "./quizUtils";
+import {
+  createMakeYourOwnRuleTaskSet,
+  createMeetTheFamiliesTaskSet,
+  createTwoWaysToSortTaskSet,
+} from "./week2Lessons";
+
+// Level 1 · Week 2 Voyage Quiz — 15 questions (5 per lesson).
+export function buildLevelOneWeek2VoyageQuiz(): PracticeTask[] {
+  return fifteenFrom(
+    createMeetTheFamiliesTaskSet(),
+    createMakeYourOwnRuleTaskSet(),
+    createTwoWaysToSortTaskSet()
+  );
+}

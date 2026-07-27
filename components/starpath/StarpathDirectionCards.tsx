@@ -10,17 +10,17 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type DirectionPathTask = Extract<PracticeTask, { kind: "starpathDirectionPath" }>;
 type DirectionChoiceTask = Extract<PracticeTask, { kind: "starpathDirectionChoice" }>;
-type Direction = "up" | "down" | "left" | "right";
-type Cell = { r: number; c: number };
+export type Direction = "up" | "down" | "left" | "right";
+export type Cell = { r: number; c: number };
 
-const DIRECTION_WORD: Record<Direction, string> = { up: "Up", down: "Down", left: "Left", right: "Right" };
-const DELTA: Record<Direction, { dr: number; dc: number }> = {
+export const DIRECTION_WORD: Record<Direction, string> = { up: "Up", down: "Down", left: "Left", right: "Right" };
+export const DELTA: Record<Direction, { dr: number; dc: number }> = {
   up: { dr: -1, dc: 0 },
   down: { dr: 1, dc: 0 },
   left: { dr: 0, dc: -1 },
   right: { dr: 0, dc: 1 },
 };
-const ARROW_ICON: Record<Direction, typeof ArrowUp> = { up: ArrowUp, down: ArrowDown, left: ArrowLeft, right: ArrowRight };
+export const ARROW_ICON: Record<Direction, typeof ArrowUp> = { up: ArrowUp, down: ArrowDown, left: ArrowLeft, right: ArrowRight };
 
 const DIR_SHAKE = (
   <style>{`
@@ -46,7 +46,7 @@ const SURFACE_BG: Record<"space" | "planet", string> = {
   planet: "bg-gradient-to-b from-teal-900 via-emerald-950 to-stone-950",
 };
 
-function DirectionGrid({
+export function DirectionGrid({
   cols,
   rows,
   surface = "space",
@@ -74,7 +74,7 @@ function DirectionGrid({
   );
 }
 
-function GridMarker({
+export function GridMarker({
   cell,
   cols,
   rows,

@@ -361,6 +361,27 @@ const LEVEL_ONE_SHAPE_DETECTIVE_MECHANICS = [
   "shape-elimination",
   "label-repair",
 ] as const;
+const L1_MEET_FAMILIES_MECHANICS = ["meet-the-families", "family-check", "family-mastery"] as const;
+const L1_MAKE_RULE_MECHANICS = ["find-the-rule", "rule-check", "rule-mastery"] as const;
+const L1_TWO_WAYS_MECHANICS = ["another-way", "another-way-2", "rule-recap"] as const;
+const L1_BUILD_TARGET_MECHANICS = ["guided-build", "challenge-build", "solo-build"] as const;
+const L1_HIDDEN_PARTS_MECHANICS = ["decompose-1", "decompose-2", "decompose-3"] as const;
+const L1_DESIGN_TWO_WAYS_MECHANICS = ["match-build", "shape-rule", "match-master"] as const;
+const L1_OBJECT_PICTURE_MECHANICS = ["match-picture", "match-picture-2", "match-picture-3"] as const;
+const L1_LOOK_FROM_HERE_MECHANICS = ["viewpoint-1", "viewpoint-2", "viewpoint-3"] as const;
+const L1_BEST_VIEW_MECHANICS = ["best-view-1", "best-view-2", "best-view-3"] as const;
+const L1_FACE_MOVE_MECHANICS = ["forward-back", "facing-check", "facing-master"] as const;
+const L1_TURNS_MECHANICS = ["turn-1", "turn-2", "turn-3"] as const;
+const L1_SAY_MOVE_MECHANICS = ["describe-1", "describe-2", "describe-3"] as const;
+const L1_START_HERE_MECHANICS = ["follow-1", "follow-2", "follow-3"] as const;
+const L1_MISSION_ROUTE_MECHANICS = ["mission-1", "mission-2", "mission-3"] as const;
+const L1_FIND_ERROR_MECHANICS = ["debug-1", "debug-2", "debug-3"] as const;
+const L1_BUILD_ROUTE_MECHANICS = ["build-1", "build-2", "build-3"] as const;
+const L1_DIRECTIONS_FRIEND_MECHANICS = ["record-1", "record-2", "record-3"] as const;
+const L1_TEST_IMPROVE_MECHANICS = ["improve-1", "improve-2", "improve-3"] as const;
+const L1_FIND_LANDMARK_MECHANICS = ["landmark-classify", "landmark-view", "landmark-match"] as const;
+const L1_PLAN_OBSTACLES_MECHANICS = ["plan-build", "plan-repair", "plan-follow"] as const;
+const L1_EXPLAIN_PATH_MECHANICS = ["explain-route", "explain-move", "explain-shape"] as const;
 
 // Ground Level lessons with real, playable content (keyed by registry id).
 const IMPLEMENTED_GROUND_LESSONS: Record<
@@ -409,6 +430,27 @@ const IMPLEMENTED_LEVEL_ONE_LESSONS: Record<
     learningIntention: "I can use shape clues to solve a shape challenge.",
     mechanics: LEVEL_ONE_SHAPE_DETECTIVE_MECHANICS,
   },
+  "y1-space-w2-l1": { learningIntention: "I can sort shapes into families by their features.", mechanics: L1_MEET_FAMILIES_MECHANICS },
+  "y1-space-w2-l2": { learningIntention: "I can work out the rule behind a group of shapes.", mechanics: L1_MAKE_RULE_MECHANICS },
+  "y1-space-w2-l3": { learningIntention: "I can sort the same shapes in more than one way.", mechanics: L1_TWO_WAYS_MECHANICS },
+  "y1-space-w3-l1": { learningIntention: "I can build an object from familiar shapes.", mechanics: L1_BUILD_TARGET_MECHANICS },
+  "y1-space-w3-l2": { learningIntention: "I can find the familiar shapes hidden inside an object.", mechanics: L1_HIDDEN_PARTS_MECHANICS },
+  "y1-space-w3-l3": { learningIntention: "I can see that an object can be built more than one way.", mechanics: L1_DESIGN_TWO_WAYS_MECHANICS },
+  "y1-space-w4-l1": { learningIntention: "I can match an object to the picture that shows it.", mechanics: L1_OBJECT_PICTURE_MECHANICS },
+  "y1-space-w4-l2": { learningIntention: "I can work out what shape an object looks like from a viewpoint.", mechanics: L1_LOOK_FROM_HERE_MECHANICS },
+  "y1-space-w4-l3": { learningIntention: "I can choose the picture that shows an object best.", mechanics: L1_BEST_VIEW_MECHANICS },
+  "y1-space-w5-l1": { learningIntention: "I know forward is the way I am facing.", mechanics: L1_FACE_MOVE_MECHANICS },
+  "y1-space-w5-l2": { learningIntention: "I can turn left and right from a facing.", mechanics: L1_TURNS_MECHANICS },
+  "y1-space-w5-l3": { learningIntention: "I can describe a move precisely.", mechanics: L1_SAY_MOVE_MECHANICS },
+  "y1-space-w6-l1": { learningIntention: "I can follow a route from a starting point.", mechanics: L1_START_HERE_MECHANICS },
+  "y1-space-w6-l2": { learningIntention: "I can follow a full route in order.", mechanics: L1_MISSION_ROUTE_MECHANICS },
+  "y1-space-w6-l3": { learningIntention: "I can find and fix a wrong step in a route.", mechanics: L1_FIND_ERROR_MECHANICS },
+  "y1-space-w7-l1": { learningIntention: "I can build a route to reach a goal.", mechanics: L1_BUILD_ROUTE_MECHANICS },
+  "y1-space-w7-l2": { learningIntention: "I can record clear directions for someone else.", mechanics: L1_DIRECTIONS_FRIEND_MECHANICS },
+  "y1-space-w7-l3": { learningIntention: "I can test a route and improve it.", mechanics: L1_TEST_IMPROVE_MECHANICS },
+  "y1-space-w8-l1": { learningIntention: "I can use shapes and views to find landmarks.", mechanics: L1_FIND_LANDMARK_MECHANICS },
+  "y1-space-w8-l2": { learningIntention: "I can plan and repair a route.", mechanics: L1_PLAN_OBSTACLES_MECHANICS },
+  "y1-space-w8-l3": { learningIntention: "I can give and explain a clear route.", mechanics: L1_EXPLAIN_PATH_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
@@ -445,7 +487,7 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
         id: `${definition.prefix}-space-w${weekNumber}-quiz`,
         coverage: week.quiz,
         questionCount: STARPATH_QUIZ_QUESTIONS_PER_LESSON * STARPATH_LESSONS_PER_WEEK as 15,
-        status: definition.prefix === "ground"
+        status: definition.prefix === "ground" || definition.prefix === "y1"
           ? "implemented"
           : STARPATH_PROGRAM_STATUS,
       },
@@ -469,7 +511,7 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
     weeks,
     assessments: {
       preTest: definition.level === "ground" ? null : { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: STARPATH_PROGRAM_STATUS },
-      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" ? "implemented" : STARPATH_PROGRAM_STATUS },
+      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" ? "implemented" : STARPATH_PROGRAM_STATUS },
     },
     status: STARPATH_PROGRAM_STATUS,
   };

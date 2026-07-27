@@ -2,6 +2,7 @@ import { getPretestForYear, type Question as PretestQuestion } from "./pretests"
 import { POSTTESTS, buildPrepPosttest, type PostTest, type Question as PosttestQuestion } from "./posttests";
 import { getMeasurelandsPosttestForYear, getMeasurelandsPretestForYear } from "./measurelands";
 import { getStarpathPosttestForYear } from "@/data/activities/starpath/ground/groundPostTest";
+import { getLevelOnePosttest } from "@/data/activities/starpath/level1/level1PostTest";
 import type { SupportedMathLevel } from "@/data/activities/year2/lessonEngine";
 import {
   buildLevel3PosttestFormB,
@@ -11,6 +12,13 @@ import {
 
 export type AssessmentQuestion = PretestQuestion | PosttestQuestion;
 export type AssessmentRealmId = "number" | "measurement" | "space";
+
+// Resolve the Starpath (space) post-test for a given year label. Ground Level
+// (Prep) and Level 1 (Year 1) have full post-tests; later levels fall through.
+function getStarpathPosttest(yearLabel: string): PostTest | undefined {
+  if (yearLabel === "Year 1") return getLevelOnePosttest();
+  return getStarpathPosttestForYear(yearLabel);
+}
 
 function yearLabelForLevel(level: SupportedMathLevel): string {
   return `Year ${level}`;
@@ -31,7 +39,7 @@ export function getPretestForLevel(level: SupportedMathLevel, realmId: Assessmen
 
 export function getPosttestForLevel(level: SupportedMathLevel, realmId: AssessmentRealmId = "number"): PostTest | undefined {
   if (realmId === "space") {
-    return getStarpathPosttestForYear(yearLabelForLevel(level));
+    return getStarpathPosttest(yearLabelForLevel(level));
   }
   if (realmId === "measurement") {
     return getMeasurelandsPosttestForYear(yearLabelForLevel(level));
@@ -61,7 +69,7 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
 
 export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number"): PostTest | undefined {
   if (realmId === "space") {
-    return getStarpathPosttestForYear(yearLabel);
+    return getStarpathPosttest(yearLabel);
   }
   if (realmId === "measurement") {
     return getMeasurelandsPosttestForYear(yearLabel);

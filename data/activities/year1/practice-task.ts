@@ -2666,4 +2666,87 @@ export type PracticeTask = (
       correctOptionId: string;
       feedback: { correct: string; wrong: string };
     }
+  | {
+      // Level 1 · W2 — Classify shapes by a shared feature (round vs straight,
+      // corners, number of sides). Single-answer MCQ so it grades in quizzes.
+      kind: "starpathShapeClassify";
+      mode: "belongs" | "rule" | "reclassify";
+      prompt: string;
+      speakText: string;
+      target: number;
+      specimens: Array<{ id: string; shape: StarpathShape; colour: string; scale: number }>;
+      options: Array<{ id: string; label: string }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 1 · W4 — Objects and Views. Match an object to a picture, or pick
+      // the view seen from the front/top. Options render a shape or an object.
+      kind: "starpathViewpoint";
+      mode: "match" | "viewpoint" | "bestview";
+      prompt: string;
+      speakText: string;
+      target: number;
+      objectId: string;
+      viewpoint?: "front" | "top" | "side";
+      options: Array<{
+        id: string;
+        render: "object" | "shape";
+        objectId?: string;
+        shape?: StarpathShape;
+        label: string;
+      }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 1 · W5 — Direction Words. Facing-aware: turn left/right from a
+      // stated facing, or read which move a traveller made. Single-answer MCQ.
+      kind: "starpathTurnMove";
+      mode: "face" | "turn" | "describe";
+      prompt: string;
+      speakText: string;
+      target: number;
+      object: string;
+      facing: "up" | "down" | "left" | "right";
+      turn?: "left" | "right";
+      options: Array<{ id: string; direction?: "up" | "down" | "left" | "right"; label: string }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 1 · W6 — Route debugger. One step in an ordered route is wrong;
+      // tap the broken step. Single-answer MCQ over the step chips.
+      kind: "starpathRouteDebug";
+      prompt: string;
+      speakText: string;
+      target: number;
+      cols: number;
+      rows: number;
+      object: string;
+      start: { r: number; c: number };
+      goal: { r: number; c: number; object: string };
+      steps: Array<{ id: string; direction: "up" | "down" | "left" | "right" }>;
+      wrongStepId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 1 · W7 — Give the Route. Compose an ordered sequence of moves that
+      // carries the traveller from start to goal. Self-grading: the built path
+      // must land on the goal without leaving the grid.
+      kind: "starpathRouteBuild";
+      mode: "build" | "record" | "improve";
+      prompt: string;
+      speakText: string;
+      target: number;
+      cols: number;
+      rows: number;
+      object: string;
+      start: { r: number; c: number };
+      goal: { r: number; c: number; object: string };
+      palette: Array<"up" | "down" | "left" | "right">;
+      preset?: Array<"up" | "down" | "left" | "right">;
+      maxSteps: number;
+      feedback: { correct: string; wrong: string };
+    }
 ) & { difficulty?: Difficulty };
