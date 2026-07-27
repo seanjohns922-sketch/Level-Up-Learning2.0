@@ -9894,7 +9894,12 @@ function SessionPage({
               ) : null}
             </div>
 
-            <div className="flex items-center justify-between mb-4 gap-3 sticky bottom-2 z-10">
+            <div
+              className="quiz-navigation sticky z-20 mb-4 flex items-center justify-between gap-3"
+              style={{
+                bottom: "max(5rem, calc(env(safe-area-inset-bottom) + 4rem))",
+              }}
+            >
               <button
                 onClick={() => setQuizIndex((i) => Math.max(0, i - 1))}
                 disabled={quizIndex === 0}

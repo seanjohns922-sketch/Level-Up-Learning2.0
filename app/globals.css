@@ -317,7 +317,7 @@ body {
 }
 
 html:fullscreen .assessment-shell .assessment-navigation {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
 html:fullscreen .measurelands-task-frame[data-measurelands-task-kind="timeQuest"] .measurelands-time-clock-pair {

@@ -1,14 +1,240 @@
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
-import {
-  compareShapeTask,
-  familyStationTask,
-  oddShapeTask,
-  twinMatchTask,
-  whatChangedTask,
-} from "@/data/activities/starpath/ground/week3Tasks";
+import type {
+  PracticeTask,
+  StarpathShape,
+} from "@/data/activities/year1/practice-task";
 
 const LEVEL_ONE_ARTWORK = "/images/starpath-home-bg-y1.png";
+const LEVEL_ONE_SHAPES: StarpathShape[] = [
+  "circle",
+  "oval",
+  "triangle",
+  "square",
+  "rectangle",
+];
+const LEVEL_ONE_COLOURS = [
+  "#67e8f9",
+  "#c4b5fd",
+  "#fde047",
+  "#86efac",
+  "#f9a8d4",
+] as const;
+
+function rotated<T>(items: readonly T[], by: number): T[] {
+  const shift = ((by % items.length) + items.length) % items.length;
+  return [...items.slice(shift), ...items.slice(0, shift)];
+}
+
+function shapeTwinTask(round: number, target: number): PracticeTask {
+  const shape = LEVEL_ONE_SHAPES[round % LEVEL_ONE_SHAPES.length]!;
+  const closeDistractor: StarpathShape =
+    shape === "circle"
+      ? "oval"
+      : shape === "oval"
+        ? "circle"
+        : shape === "square"
+          ? "rectangle"
+          : shape === "rectangle"
+            ? "square"
+            : "oval";
+  const other = LEVEL_ONE_SHAPES.find(
+    (candidate) => candidate !== shape && candidate !== closeDistractor
+  )!;
+  const options = rotated(
+    [
+      {
+        id: `correct-${target}`,
+        shape,
+        colour: LEVEL_ONE_COLOURS[(round + 2) % LEVEL_ONE_COLOURS.length]!,
+        scale: 0.7 + (round % 3) * 0.12,
+        rotation: shape === "circle" ? 0 : 18 + (round % 3) * 17,
+      },
+      {
+        id: `close-${target}`,
+        shape: closeDistractor,
+        colour: LEVEL_ONE_COLOURS[(round + 3) % LEVEL_ONE_COLOURS.length]!,
+        scale: 0.92,
+        rotation: -12,
+      },
+      {
+        id: `other-${target}`,
+        shape: other,
+        colour: LEVEL_ONE_COLOURS[(round + 4) % LEVEL_ONE_COLOURS.length]!,
+        scale: 0.84,
+        rotation: 22,
+      },
+    ],
+    round
+  );
+
+  return {
+    kind: "starpathShapeMatch",
+    prompt: `Find the matching ${shape}.`,
+    speakText: `Find the shape that is also a ${shape}. It may be turned, a different size or a different colour.`,
+    target,
+    targetShape: shape,
+    options,
+    correctOptionId: `correct-${target}`,
+    feedback: {
+      correct: `Correct. It is still a ${shape}, even when its colour, size or direction changes.`,
+      wrong: `Look at the whole outline. Find the shape that is still a ${shape}.`,
+    },
+  };
+}
+
+function compareLevelOneShapesTask(round: number, target: number): PracticeTask {
+  const comparisons: Array<{
+    left: StarpathShape;
+    right: StarpathShape;
+    answer: "same" | "different";
+  }> = [
+    { left: "circle", right: "oval", answer: "different" },
+    { left: "square", right: "rectangle", answer: "different" },
+    { left: "oval", right: "oval", answer: "same" },
+    { left: "triangle", right: "triangle", answer: "same" },
+    { left: "rectangle", right: "rectangle", answer: "same" },
+  ];
+  const comparison = comparisons[round % comparisons.length]!;
+
+  return {
+    kind: "starpathShapeCompare",
+    prompt: "Are these the same shape?",
+    speakText:
+      "Compare the outlines carefully. Remember that colour, size and turning do not change a shape.",
+    target,
+    left: {
+      shape: comparison.left,
+      colour: LEVEL_ONE_COLOURS[round % LEVEL_ONE_COLOURS.length]!,
+      scale: 0.82,
+      rotation: round % 2 === 0 ? -14 : 0,
+    },
+    right: {
+      shape: comparison.right,
+      colour: LEVEL_ONE_COLOURS[(round + 2) % LEVEL_ONE_COLOURS.length]!,
+      scale: 0.66 + (round % 3) * 0.12,
+      rotation: comparison.right === "circle" ? 0 : 24 + (round % 2) * 20,
+    },
+    answer: comparison.answer,
+    feedback: {
+      correct:
+        comparison.answer === "same"
+          ? `Yes. They are both ${comparison.left}s, even though they look different.`
+          : `Correct. A ${comparison.left} and a ${comparison.right} are different shapes.`,
+      wrong:
+        comparison.answer === "same"
+          ? `They are both ${comparison.left}s. Turning, colour and size do not change the shape.`
+          : `Look closely at the outlines. One is a ${comparison.left} and one is a ${comparison.right}.`,
+    },
+  };
+}
+
+function levelOneWhatChangedTask(round: number, target: number): PracticeTask {
+  const change = (["colour", "size", "shape"] as const)[round % 3]!;
+  const shape = LEVEL_ONE_SHAPES[round % LEVEL_ONE_SHAPES.length]!;
+  const changedShape =
+    shape === "circle"
+      ? "oval"
+      : shape === "oval"
+        ? "circle"
+        : shape === "square"
+          ? "rectangle"
+          : shape === "rectangle"
+            ? "square"
+            : "oval";
+  const colour = LEVEL_ONE_COLOURS[round % LEVEL_ONE_COLOURS.length]!;
+
+  return {
+    kind: "starpathWhatChanged",
+    prompt: "What changed?",
+    speakText:
+      "Compare the two shapes. Did the colour change, did the size change, or is it a different shape?",
+    target,
+    before: { shape, colour, scale: 0.9 },
+    after:
+      change === "colour"
+        ? {
+            shape,
+            colour: LEVEL_ONE_COLOURS[(round + 2) % LEVEL_ONE_COLOURS.length]!,
+            scale: 0.9,
+          }
+        : change === "size"
+          ? { shape, colour, scale: 0.58 }
+          : { shape: changedShape, colour, scale: 0.9 },
+    answer: change,
+    feedback: {
+      correct:
+        change === "shape"
+          ? `Correct. The ${shape} changed into a ${changedShape}.`
+          : `Correct. Only the ${change} changed, so it is still a ${shape}.`,
+      wrong: `Compare the outlines, colours and sizes one more time.`,
+    },
+  };
+}
+
+function levelOneOddShapeTask(round: number, target: number): PracticeTask {
+  const pairs: Array<[StarpathShape, StarpathShape]> = [
+    ["circle", "oval"],
+    ["square", "rectangle"],
+    ["oval", "triangle"],
+    ["rectangle", "circle"],
+  ];
+  const [commonShape, oddShape] = pairs[round % pairs.length]!;
+  const options = rotated(
+    [
+      ...Array.from({ length: 3 }, (_, index) => ({
+        id: `same-${target}-${index}`,
+        shape: commonShape,
+        colour: LEVEL_ONE_COLOURS[(round + index) % LEVEL_ONE_COLOURS.length]!,
+      })),
+      {
+        id: `odd-${target}`,
+        shape: oddShape,
+        colour: LEVEL_ONE_COLOURS[(round + 3) % LEVEL_ONE_COLOURS.length]!,
+      },
+    ],
+    round
+  );
+
+  return {
+    kind: "starpathOddOneOut",
+    prompt: "Which shape does not belong?",
+    speakText:
+      "Three shapes have the same outline. Find the one shape with a different outline.",
+    target,
+    options,
+    oddOptionId: `odd-${target}`,
+    feedback: {
+      correct: `Correct. The ${oddShape} is different from the ${commonShape}s.`,
+      wrong: `Look closely. Three are ${commonShape}s and one is a ${oddShape}.`,
+    },
+  };
+}
+
+function levelOneFamilyTask(round: number, target: number): PracticeTask {
+  const queue = rotated(
+    [...LEVEL_ONE_SHAPES, LEVEL_ONE_SHAPES[round % LEVEL_ONE_SHAPES.length]!],
+    round
+  );
+  return {
+    kind: "starpathFamilySort",
+    prompt: "Classify each shape into its family.",
+    speakText:
+      "Sort each shape into its matching family. Pay special attention to circles and ovals, and squares and rectangles.",
+    target,
+    bins: [...LEVEL_ONE_SHAPES],
+    items: queue.map((shape, index) => ({
+      id: `family-${target}-${index}`,
+      shape,
+      colour: LEVEL_ONE_COLOURS[(round + index) % LEVEL_ONE_COLOURS.length]!,
+      scale: 0.68 + ((round + index) % 3) * 0.13,
+    })),
+    feedback: {
+      correct: "Excellent classifying. Every shape is in the correct family.",
+      wrong: "Compare the outline carefully before choosing its family.",
+    },
+  };
+}
 
 export function createShapeReviewMissionTaskSet(): RealmLessonTaskSet {
   let target = 0;
@@ -20,6 +246,7 @@ export function createShapeReviewMissionTaskSet(): RealmLessonTaskSet {
     teaching: () => ({
       kind: "starpathShapeIntro",
       scene: "intro",
+      variant: "levelOneShapes",
       heading: "A shape stays the same",
       prompt: "Colour, size and a small turn do not change a shape.",
       speakText:
@@ -27,9 +254,9 @@ export function createShapeReviewMissionTaskSet(): RealmLessonTaskSet {
       target: ++target,
     }),
     activities: [
-      () => twinMatchTask(matchRound++, ++target),
-      () => compareShapeTask(compareRound++, ++target),
-      () => whatChangedTask(changeRound++, ++target),
+      () => shapeTwinTask(matchRound++, ++target),
+      () => compareLevelOneShapesTask(compareRound++, ++target),
+      () => levelOneWhatChangedTask(changeRound++, ++target),
     ],
   };
 }
@@ -95,6 +322,7 @@ export function createCompareTheShapesTaskSet(): RealmLessonTaskSet {
     teaching: () => ({
       kind: "starpathShapeIntro",
       scene: "intro",
+      variant: "levelOneShapes",
       heading: "Compare like an explorer",
       prompt: "Look for what is the same and what is different.",
       speakText:
@@ -102,9 +330,9 @@ export function createCompareTheShapesTaskSet(): RealmLessonTaskSet {
       target: ++target,
     }),
     activities: [
-      () => compareShapeTask(compareRound++, ++target),
-      () => whatChangedTask(changeRound++, ++target),
-      () => oddShapeTask(oddRound++, ++target),
+      () => compareLevelOneShapesTask(compareRound++, ++target),
+      () => levelOneWhatChangedTask(changeRound++, ++target),
+      () => levelOneOddShapeTask(oddRound++, ++target),
     ],
   };
 }
@@ -170,6 +398,7 @@ export function createShapeDetectiveChallengeTaskSet(): RealmLessonTaskSet {
     teaching: () => ({
       kind: "starpathShapeIntro",
       scene: "intro",
+      variant: "levelOneShapes",
       heading: "Use every shape clue",
       prompt: "Recognise, compare and group familiar shapes.",
       speakText:
@@ -177,9 +406,9 @@ export function createShapeDetectiveChallengeTaskSet(): RealmLessonTaskSet {
       target: ++target,
     }),
     activities: [
-      () => familyStationTask(familyRound++, ++target),
-      () => twinMatchTask(matchRound++, ++target),
-      () => oddShapeTask(oddRound++, ++target),
+      () => levelOneFamilyTask(familyRound++, ++target),
+      () => shapeTwinTask(matchRound++, ++target),
+      () => levelOneOddShapeTask(oddRound++, ++target),
     ],
   };
 }

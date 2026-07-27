@@ -1,4 +1,5 @@
 export type Difficulty = "easy" | "medium" | "hard";
+export type StarpathShape = "circle" | "oval" | "triangle" | "square" | "rectangle";
 
 /** Time-based difficulty gates (strict) */
 export function getDifficultyFromTime(elapsedSeconds: number): Difficulty {
@@ -2264,7 +2265,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "builders" | "positions" | "positionsDepth" | "directions";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions";
       heading?: string;
     }
   | {
@@ -2272,12 +2273,13 @@ export type PracticeTask = (
       prompt: string;
       speakText: string;
       target: number;
-      targetShape: "circle" | "triangle" | "square" | "rectangle";
+      targetShape: StarpathShape;
       options: Array<{
         id: string;
-        shape: "circle" | "triangle" | "square" | "rectangle";
+        shape: StarpathShape;
         colour: string;
         scale: number;
+        rotation?: number;
       }>;
       correctOptionId: string;
       feedback: { correct: string; wrong: string };
@@ -2288,13 +2290,13 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       left: {
-        shape: "circle" | "triangle" | "square" | "rectangle";
+        shape: StarpathShape;
         colour: string;
         scale: number;
         rotation: number;
       };
       right: {
-        shape: "circle" | "triangle" | "square" | "rectangle";
+        shape: StarpathShape;
         colour: string;
         scale: number;
         rotation: number;
@@ -2332,7 +2334,7 @@ export type PracticeTask = (
       targetShape: "circle" | "triangle" | "square" | "rectangle";
       options: Array<{
         id: string;
-        shape: "circle" | "triangle" | "square" | "rectangle";
+        shape: StarpathShape;
         colour: string;
       }>;
       correctOptionId: string;
@@ -2368,7 +2370,7 @@ export type PracticeTask = (
       target: number;
       options: Array<{
         id: string;
-        shape: "circle" | "triangle" | "square" | "rectangle";
+        shape: StarpathShape;
         colour: string;
       }>;
       oddOptionId: string;
@@ -2457,10 +2459,10 @@ export type PracticeTask = (
       prompt: string;
       speakText: string;
       target: number;
-      bins: Array<"circle" | "triangle" | "square" | "rectangle">;
+      bins: Array<StarpathShape>;
       items: Array<{
         id: string;
-        shape: "circle" | "triangle" | "square" | "rectangle";
+        shape: StarpathShape;
         colour: string;
         scale: number;
       }>;
@@ -2471,8 +2473,8 @@ export type PracticeTask = (
       prompt: string;
       speakText: string;
       target: number;
-      before: { shape: "circle" | "triangle" | "square" | "rectangle"; colour: string; scale: number };
-      after: { shape: "circle" | "triangle" | "square" | "rectangle"; colour: string; scale: number };
+      before: { shape: StarpathShape; colour: string; scale: number };
+      after: { shape: StarpathShape; colour: string; scale: number };
       answer: "colour" | "size" | "shape";
       feedback: { correct: string; wrong: string };
     }

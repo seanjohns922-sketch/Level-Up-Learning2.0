@@ -324,7 +324,12 @@ export default function AssessmentShell({
         </div>
 
         {/* ── Navigation ── */}
-        <div className="assessment-navigation mt-5 flex items-center justify-between gap-3">
+        <div
+          className="assessment-navigation sticky z-20 mt-5 flex items-center justify-between gap-3"
+          style={{
+            bottom: "max(5rem, calc(env(safe-area-inset-bottom) + 4rem))",
+          }}
+        >
           <button
             onClick={onBack}
             disabled={currentIndex === 0}

@@ -3,11 +3,11 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Check } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
-import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import type { PracticeTask, StarpathShape } from "@/data/activities/year1/practice-task";
 import { ShapeVisual, TaskHeading, SceneObjectVisual } from "@/components/starpath/StarpathShapeTaskCard";
 import { SHAPE_OBJECTS, type ShapeObjectId } from "@/data/activities/starpath/ground/shape-objects";
 
-type FoundationShape = "circle" | "triangle" | "square" | "rectangle";
+type FoundationShape = StarpathShape;
 type ShapeTapAllTask = Extract<PracticeTask, { kind: "starpathShapeTapAll" }>;
 type OddOneOutTask = Extract<PracticeTask, { kind: "starpathOddOneOut" }>;
 type CollectMissionTask = Extract<PracticeTask, { kind: "starpathCollectMission" }>;
@@ -20,6 +20,7 @@ type ShapeSprintTask = Extract<PracticeTask, { kind: "starpathShapeSprint" }>;
 
 const SHAPE_ICON_COLOUR: Record<FoundationShape, string> = {
   circle: "#67e8f9",
+  oval: "#c4b5fd",
   triangle: "#fde047",
   square: "#86efac",
   rectangle: "#f9a8d4",
@@ -385,6 +386,7 @@ export function StarpathCollectMissionCard({
 
 const SHAPE_WORD: Record<FoundationShape, string> = {
   circle: "Circle",
+  oval: "Oval",
   triangle: "Triangle",
   square: "Square",
   rectangle: "Rectangle",
@@ -466,7 +468,7 @@ export function StarpathFamilySortCard({
           </span>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className={`grid grid-cols-2 gap-3 ${task.bins.length > 4 ? "sm:grid-cols-5" : "sm:grid-cols-4"}`}>
         {task.bins.map((shape) => (
           <button
             key={shape}

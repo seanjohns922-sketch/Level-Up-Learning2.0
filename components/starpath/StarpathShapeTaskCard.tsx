@@ -4,7 +4,7 @@ import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
-import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import type { PracticeTask, StarpathShape } from "@/data/activities/year1/practice-task";
 import { SHAPE_FACTS, type FoundationShape } from "@/data/activities/starpath/ground/week1Lesson1";
 import { SHAPE_OBJECTS, type ShapeObjectId } from "@/data/activities/starpath/ground/shape-objects";
 import { PositionObjectVisual } from "@/components/starpath/StarpathPositionCards";
@@ -23,7 +23,7 @@ export function ShapeVisual({
   scale = 1,
   className = "h-24 w-24",
 }: {
-  shape: FoundationShape;
+  shape: StarpathShape;
   colour: string;
   scale?: number;
   className?: string;
@@ -45,6 +45,7 @@ export function ShapeVisual({
         strokeLinejoin="round"
       >
         {shape === "circle" ? <circle cx="60" cy="60" r="38" /> : null}
+        {shape === "oval" ? <ellipse cx="60" cy="60" rx="45" ry="29" /> : null}
         {shape === "triangle" ? <path d="M60 17 105 98H15Z" /> : null}
         {shape === "square" ? <rect x="22" y="22" width="76" height="76" rx="4" /> : null}
         {shape === "rectangle" ? <rect x="13" y="31" width="94" height="58" rx="4" /> : null}
@@ -78,6 +79,33 @@ const TEACH_CLUES: Array<{ title: string; shape: FoundationShape; colour: string
   { title: "3 straight sides", shape: "triangle", colour: "#fde047", tip: "A triangle has 3 straight sides." },
   { title: "4 straight sides", shape: "square", colour: "#86efac", tip: "Squares and rectangles have 4 straight sides." },
 ];
+
+const LEVEL_ONE_SHAPE_PAIRS = [
+  {
+    title: "Circle and oval",
+    tip: "Both are round. An oval is longer in one direction.",
+    shapes: [
+      { shape: "circle" as const, colour: "#67e8f9", rotation: 0 },
+      { shape: "oval" as const, colour: "#c4b5fd", rotation: 24 },
+    ],
+  },
+  {
+    title: "Square and rectangle",
+    tip: "Both have 4 straight sides, but their sides are not arranged the same way.",
+    shapes: [
+      { shape: "square" as const, colour: "#86efac", rotation: 12 },
+      { shape: "rectangle" as const, colour: "#f9a8d4", rotation: -18 },
+    ],
+  },
+  {
+    title: "Turned shapes",
+    tip: "Turning a familiar shape does not change its name.",
+    shapes: [
+      { shape: "triangle" as const, colour: "#fde047", rotation: 0 },
+      { shape: "triangle" as const, colour: "#fb923c", rotation: 42 },
+    ],
+  },
+] as const;
 
 // Week 4 teaching — position words shown with a small example scene.
 type PositionTeach = { word: string; tip: string; anchor: string; subject: string; relation: PositionRelation; side?: "left" | "right" };
@@ -224,6 +252,29 @@ export function StarpathShapeIntroCard({
         <PositionTeachGrid items={TEACH_POSITIONS_DEPTH} />
       ) : variant === "directions" ? (
         <DirectionTeachGrid />
+      ) : variant === "levelOneShapes" ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {LEVEL_ONE_SHAPE_PAIRS.map((item) => (
+            <div
+              key={item.title}
+              className="relative flex min-h-48 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm"
+            >
+              <OptionReadAloudButton text={`${item.title}. ${item.tip}`} className="absolute right-2 top-2" />
+              <div className="flex items-center gap-2">
+                {item.shapes.map((shape, index) => (
+                  <div
+                    key={`${shape.shape}-${index}`}
+                    style={{ transform: `rotate(${shape.rotation}deg)` }}
+                  >
+                    <ShapeVisual shape={shape.shape} colour={shape.colour} className="h-16 w-20 sm:h-20 sm:w-24" />
+                  </div>
+                ))}
+              </div>
+              <div className="mt-1 text-base font-black text-indigo-950">{item.title}</div>
+              <div className="mt-1 text-xs font-semibold leading-5 text-slate-600">{item.tip}</div>
+            </div>
+          ))}
+        </div>
       ) : variant === "clues" ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {TEACH_CLUES.map((clue) => (
@@ -288,7 +339,9 @@ export function StarpathShapeMatchCard({
             className="relative flex min-h-44 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             <OptionReadAloudButton text={option.shape} className="absolute right-3 top-3" />
-            <ShapeVisual shape={option.shape} colour={option.colour} scale={option.scale} className="h-28 w-28" />
+            <div style={{ transform: `rotate(${option.rotation ?? 0}deg)` }}>
+              <ShapeVisual shape={option.shape} colour={option.colour} scale={option.scale} className="h-28 w-28" />
+            </div>
           </button>
         ))}
       </div>
