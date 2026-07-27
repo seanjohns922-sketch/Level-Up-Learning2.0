@@ -2479,6 +2479,65 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      kind: "starpathShapeDisguise";
+      mode: "hologram" | "turntable" | "match";
+      prompt: string;
+      speakText: string;
+      target: number;
+      shape: StarpathShape;
+      colour: string;
+      scale: number;
+      rotation: number;
+      options: Array<{
+        id: string;
+        shape: StarpathShape;
+        colour: string;
+        scale: number;
+        rotation: number;
+      }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathShapeFaceOff";
+      mode: "close-pair" | "similarity" | "difference";
+      prompt: string;
+      speakText: string;
+      target: number;
+      left: {
+        shape: StarpathShape;
+        colour: string;
+        scale: number;
+        rotation: number;
+      };
+      right: {
+        shape: StarpathShape;
+        colour: string;
+        scale: number;
+        rotation: number;
+      };
+      options: Array<{ id: string; label: string }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      kind: "starpathMysteryShape";
+      mode: "clue-decoder" | "elimination" | "label-repair";
+      prompt: string;
+      speakText: string;
+      target: number;
+      clues: string[];
+      options: Array<{
+        id: string;
+        shape: StarpathShape;
+        label: string;
+        colour: string;
+        rotation: number;
+      }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       kind: "starpathShapeSprint";
       prompt: string;
       speakText: string;

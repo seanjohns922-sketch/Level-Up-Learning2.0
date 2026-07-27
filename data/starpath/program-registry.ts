@@ -166,7 +166,7 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
     likelyMisconceptions: ["Orientation changes a shape's identity.", "Directions work without a starting position.", "An object has only one useful shape description."],
     progressionRationale: "Foundation recognition develops into comparison, classification and construction; familiar movement develops into ordered, communicable routes.",
     weeks: [
-      W("Shape Experts", "Recognise and compare familiar shapes despite changes in colour, size and orientation.", ["AC9M1SP01"], skill("space-l1-shape-features", "Become a shape expert", "Recognises and compares familiar shapes in varied forms, identifying simple similarities and differences.", ["AC9M1SP01"], "shape-and-object-reasoning", ["space-ground-shape-recognition"]), [["Shape Review Mission", "Recognise familiar shapes when colour, size or orientation changes."], ["Compare the Shapes", "Identify simple similarities and differences between familiar shapes."], ["Shape Detective Challenge", "Recognise, compare and group familiar shapes using visual clues."]], ["shape-invariance-match", "shape-compare", "shape-detective-reasoning"], ["shape", "same", "different", "compare", "clue"], ["Colour or size changes a shape's identity.", "A small turn makes a familiar shape into a new shape."], "Recognition, comparison and simple classification of familiar shapes."),
+      W("Shape Experts", "Recognise and compare familiar shapes despite changes in colour, size and orientation.", ["AC9M1SP01"], skill("space-l1-shape-features", "Become a shape expert", "Recognises and compares familiar shapes in varied forms, identifying simple similarities and differences.", ["AC9M1SP01"], "shape-and-object-reasoning", ["space-ground-shape-recognition"]), [["Shape Disguise Mission", "Recognise familiar shapes after changes in colour, size or orientation."], ["Shape Face-Off", "Compare close shape pairs and identify similarities and differences."], ["Mystery Shape Rescue", "Use several visual clues to identify and check familiar shapes."]], ["shape-disguise-lab", "shape-face-off", "mystery-shape-rescue"], ["shape", "same", "different", "compare", "clue"], ["Colour or size changes a shape's identity.", "A small turn makes a familiar shape into a new shape."], "Shape invariance, close-shape comparison and visual clue reasoning."),
       W("Shape Families", "Classify shapes and objects using shared features.", ["AC9M1SP01"], skill("space-l1-shape-classification", "Build shape families", "Classifies familiar shapes and objects and explains the shared feature.", ["AC9M1SP01"], "shape-and-object-reasoning", ["space-l1-shape-features"]), [["Meet the Families", "Group shapes by a given feature."], ["Make Your Own Rule", "Classify a mixed collection in a useful way."], ["Two Ways to Sort", "Reclassify the same set and compare rules."]], ["guided-sort", "open-sort", "reclassify-challenge"], ["classify", "family", "rule", "similar", "different"], ["There is only one correct classification.", "Objects with different uses cannot share shape features."], "Classification rules and flexible grouping."),
       W("Build and Take Apart", "Make shapes and identify parts within composites.", ["AC9M1SP01"], skill("space-l1-shape-composition", "Build shapes from parts", "Composes and decomposes familiar shapes while describing constituent parts.", ["AC9M1SP01"], "construction-and-visualisation", ["space-l1-shape-classification"]), [["Build the Target", "Compose a target from familiar shapes."], ["Find the Hidden Parts", "Decompose a composite into familiar shapes."], ["Design Two Ways", "Create and compare two valid constructions."]], ["shape-composer", "decompose-overlay", "design-builder"], ["compose", "decompose", "part", "whole", "overlap"], ["Parts cannot overlap.", "A composite has only one decomposition."], "Composition, decomposition and multiple solutions."),
       W("Objects and Views", "Connect familiar objects with simple shape representations.", ["AC9M1SP01"], skill("space-l1-objects-and-views", "Match objects and views", "Recognises shape features in simple pictures and views of familiar objects.", ["AC9M1SP01"], "spatial-representation", ["space-l1-shape-features"]), [["Object or Picture?", "Match familiar objects to simple representations."], ["Look from Here", "Compare how one object appears from two viewpoints."], ["Choose the Best View", "Select and explain a useful representation."]], ["object-picture-match", "viewpoint-toggle", "view-reasoning"], ["object", "picture", "view", "front", "top"], ["An object looks identical from every viewpoint.", "A picture is the object itself."], "Object-shape connections and simple viewpoints."),
@@ -347,19 +347,19 @@ const SHAPE_EXPLORER_MECHANICS = ["recognise", "odd-one-out", "compare"] as cons
 const POSITION_EXPLORER_MECHANICS = ["find-by-position", "say-where", "which-way"] as const;
 const FINAL_MISSION_MECHANICS = ["sort-shapes", "which-picture", "final-path"] as const;
 const LEVEL_ONE_SHAPE_REVIEW_MECHANICS = [
-  "shape-twins",
-  "same-or-different",
-  "what-changed",
+  "hologram-stabiliser",
+  "turntable-scanner",
+  "disguise-match",
 ] as const;
 const LEVEL_ONE_COMPARE_SHAPES_MECHANICS = [
-  "shape-comparison",
-  "change-detector",
-  "odd-shape",
+  "close-pair",
+  "similarity-scan",
+  "difference-scan",
 ] as const;
 const LEVEL_ONE_SHAPE_DETECTIVE_MECHANICS = [
-  "shape-families",
-  "detective-match",
-  "detective-odd-one-out",
+  "clue-decoder",
+  "shape-elimination",
+  "label-repair",
 ] as const;
 
 // Ground Level lessons with real, playable content (keyed by registry id).

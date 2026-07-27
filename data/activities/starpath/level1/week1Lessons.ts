@@ -6,460 +6,411 @@ import type {
 } from "@/data/activities/year1/practice-task";
 
 const LEVEL_ONE_ARTWORK = "/images/starpath-home-bg-y1.png";
-const LEVEL_ONE_SHAPES: StarpathShape[] = [
+const SHAPES: StarpathShape[] = [
   "circle",
   "oval",
   "triangle",
   "square",
   "rectangle",
 ];
-const LEVEL_ONE_COLOURS = [
-  "#67e8f9",
-  "#c4b5fd",
-  "#fde047",
-  "#86efac",
-  "#f9a8d4",
-] as const;
+const COLOURS = ["#67e8f9", "#c4b5fd", "#fde047", "#86efac", "#f9a8d4"] as const;
 
-function rotated<T>(items: readonly T[], by: number): T[] {
+const CLOSE_SHAPE: Record<StarpathShape, StarpathShape> = {
+  circle: "oval",
+  oval: "circle",
+  triangle: "oval",
+  square: "rectangle",
+  rectangle: "square",
+};
+
+const SHAPE_CLUES: Record<StarpathShape, string[]> = {
+  circle: ["I am round", "I am equally wide and tall", "I have no straight sides"],
+  oval: ["I am round", "I am longer in one direction", "I am not a circle"],
+  triangle: ["I have 3 straight sides", "I have 3 corners", "I can be turned"],
+  square: ["I have 4 equal sides", "I have 4 corners", "All my sides look equal"],
+  rectangle: ["I have 4 straight sides", "2 sides are longer", "I have 4 corners"],
+};
+
+function rotate<T>(items: readonly T[], by: number): T[] {
   const shift = ((by % items.length) + items.length) % items.length;
   return [...items.slice(shift), ...items.slice(0, shift)];
 }
 
-function shapeTwinTask(round: number, target: number): PracticeTask {
-  const shape = LEVEL_ONE_SHAPES[round % LEVEL_ONE_SHAPES.length]!;
-  const closeDistractor: StarpathShape =
-    shape === "circle"
-      ? "oval"
-      : shape === "oval"
-        ? "circle"
-        : shape === "square"
-          ? "rectangle"
-          : shape === "rectangle"
-            ? "square"
-            : "oval";
-  const other = LEVEL_ONE_SHAPES.find(
-    (candidate) => candidate !== shape && candidate !== closeDistractor
+function disguiseTask(
+  mode: "hologram" | "turntable" | "match",
+  round: number,
+  target: number
+): PracticeTask {
+  const shape = SHAPES[round % SHAPES.length]!;
+  const closeShape = CLOSE_SHAPE[shape];
+  const thirdShape = SHAPES.find(
+    (candidate) => candidate !== shape && candidate !== closeShape
   )!;
-  const options = rotated(
+  const correctId = `correct-${target}`;
+  const options = rotate(
     [
       {
-        id: `correct-${target}`,
+        id: correctId,
         shape,
-        colour: LEVEL_ONE_COLOURS[(round + 2) % LEVEL_ONE_COLOURS.length]!,
-        scale: 0.7 + (round % 3) * 0.12,
-        rotation: shape === "circle" ? 0 : 18 + (round % 3) * 17,
+        colour: COLOURS[(round + 2) % COLOURS.length]!,
+        scale: 0.68 + (round % 3) * 0.12,
+        rotation: shape === "circle" ? 0 : 25 + (round % 3) * 19,
       },
       {
         id: `close-${target}`,
-        shape: closeDistractor,
-        colour: LEVEL_ONE_COLOURS[(round + 3) % LEVEL_ONE_COLOURS.length]!,
+        shape: closeShape,
+        colour: COLOURS[(round + 3) % COLOURS.length]!,
         scale: 0.92,
-        rotation: -12,
+        rotation: -18,
       },
       {
         id: `other-${target}`,
-        shape: other,
-        colour: LEVEL_ONE_COLOURS[(round + 4) % LEVEL_ONE_COLOURS.length]!,
-        scale: 0.84,
-        rotation: 22,
+        shape: thirdShape,
+        colour: COLOURS[(round + 4) % COLOURS.length]!,
+        scale: 0.82,
+        rotation: 16,
       },
     ],
     round
   );
 
   return {
-    kind: "starpathShapeMatch",
-    prompt: `Find the matching ${shape}.`,
-    speakText: `Find the shape that is also a ${shape}. It may be turned, a different size or a different colour.`,
+    kind: "starpathShapeDisguise",
+    mode,
+    prompt:
+      mode === "hologram"
+        ? "Stabilise the hologram. Which shape is hiding?"
+        : mode === "turntable"
+          ? "Turn the scanner. Which shape stays the same?"
+          : `Find the disguised ${shape}.`,
+    speakText:
+      mode === "hologram"
+        ? "Stabilise the hologram, then identify the familiar shape. Its colour and size may have changed."
+        : mode === "turntable"
+          ? "Turn the scanner and identify the shape. Turning a shape does not change its name."
+          : `Find the ${shape} in disguise. It may be turned, resized or recoloured.`,
     target,
-    targetShape: shape,
+    shape,
+    colour: COLOURS[round % COLOURS.length]!,
+    scale: 0.72 + (round % 3) * 0.12,
+    rotation: shape === "circle" ? 0 : 30 + (round % 4) * 22,
     options,
-    correctOptionId: `correct-${target}`,
+    correctOptionId: correctId,
     feedback: {
-      correct: `Correct. It is still a ${shape}, even when its colour, size or direction changes.`,
-      wrong: `Look at the whole outline. Find the shape that is still a ${shape}.`,
+      correct: `Scanner confirmed: ${shape}. Its colour, size and direction did not change its identity.`,
+      wrong: `Compare the whole outline and look again for the ${shape}.`,
     },
   };
 }
 
-function compareLevelOneShapesTask(round: number, target: number): PracticeTask {
-  const comparisons: Array<{
-    left: StarpathShape;
-    right: StarpathShape;
-    answer: "same" | "different";
-  }> = [
-    { left: "circle", right: "oval", answer: "different" },
-    { left: "square", right: "rectangle", answer: "different" },
-    { left: "oval", right: "oval", answer: "same" },
-    { left: "triangle", right: "triangle", answer: "same" },
-    { left: "rectangle", right: "rectangle", answer: "same" },
-  ];
-  const comparison = comparisons[round % comparisons.length]!;
+function faceOffTask(
+  mode: "close-pair" | "similarity" | "difference",
+  round: number,
+  target: number
+): PracticeTask {
+  if (mode === "close-pair") {
+    const pair =
+      round % 2 === 0
+        ? (["circle", "oval"] as const)
+        : (["square", "rectangle"] as const);
+    const order = round % 4 < 2 ? pair : ([pair[1], pair[0]] as const);
+    const wanted = round % 2 === 0 ? "oval" : "rectangle";
+    const correctOptionId = order[0] === wanted ? "left" : "right";
+    return {
+      kind: "starpathShapeFaceOff",
+      mode,
+      prompt: `Which shape is the ${wanted}?`,
+      speakText: `Compare Shape A and Shape B carefully. Which shape is the ${wanted}?`,
+      target,
+      left: {
+        shape: order[0],
+        colour: COLOURS[round % COLOURS.length]!,
+        scale: 0.9,
+        rotation: -12,
+      },
+      right: {
+        shape: order[1],
+        colour: COLOURS[(round + 2) % COLOURS.length]!,
+        scale: 0.78,
+        rotation: 18,
+      },
+      options: [
+        { id: "left", label: "Shape A" },
+        { id: "right", label: "Shape B" },
+      ],
+      correctOptionId,
+      feedback: {
+        correct: `Correct. ${correctOptionId === "left" ? "Shape A" : "Shape B"} is the ${wanted}.`,
+        wrong: `Compare the outlines again. Look for the ${wanted}.`,
+      },
+    };
+  }
 
+  const shape = SHAPES[round % SHAPES.length]!;
+  const changedShape = CLOSE_SHAPE[shape];
+  const isSimilarity = mode === "similarity";
   return {
-    kind: "starpathShapeCompare",
-    prompt: "Are these the same shape?",
-    speakText:
-      "Compare the outlines carefully. Remember that colour, size and turning do not change a shape.",
+    kind: "starpathShapeFaceOff",
+    mode,
+    prompt: isSimilarity
+      ? "What stayed the same?"
+      : "What is different?",
+    speakText: isSimilarity
+      ? "Compare both shapes. What stayed the same: the outline, colour or size?"
+      : "Compare both shapes. What is different: the shape, colour or size?",
     target,
     left: {
-      shape: comparison.left,
-      colour: LEVEL_ONE_COLOURS[round % LEVEL_ONE_COLOURS.length]!,
-      scale: 0.82,
-      rotation: round % 2 === 0 ? -14 : 0,
+      shape,
+      colour: COLOURS[round % COLOURS.length]!,
+      scale: 0.92,
+      rotation: -10,
     },
     right: {
-      shape: comparison.right,
-      colour: LEVEL_ONE_COLOURS[(round + 2) % LEVEL_ONE_COLOURS.length]!,
-      scale: 0.66 + (round % 3) * 0.12,
-      rotation: comparison.right === "circle" ? 0 : 24 + (round % 2) * 20,
+      shape: isSimilarity ? shape : changedShape,
+      colour: isSimilarity
+        ? COLOURS[(round + 2) % COLOURS.length]!
+        : COLOURS[round % COLOURS.length]!,
+      scale: isSimilarity ? 0.68 : 0.92,
+      rotation: isSimilarity ? 32 : -10,
     },
-    answer: comparison.answer,
+    options: isSimilarity
+      ? [
+          { id: "outline", label: "The outline" },
+          { id: "colour", label: "The colour" },
+          { id: "size", label: "The size" },
+        ]
+      : [
+          { id: "shape", label: "The shape" },
+          { id: "colour", label: "The colour" },
+          { id: "size", label: "The size" },
+        ],
+    correctOptionId: isSimilarity ? "outline" : "shape",
     feedback: {
-      correct:
-        comparison.answer === "same"
-          ? `Yes. They are both ${comparison.left}s, even though they look different.`
-          : `Correct. A ${comparison.left} and a ${comparison.right} are different shapes.`,
-      wrong:
-        comparison.answer === "same"
-          ? `They are both ${comparison.left}s. Turning, colour and size do not change the shape.`
-          : `Look closely at the outlines. One is a ${comparison.left} and one is a ${comparison.right}.`,
+      correct: isSimilarity
+        ? `Correct. Both outlines are ${shape}s.`
+        : `Correct. The ${shape} changed into a ${changedShape}.`,
+      wrong: isSimilarity
+        ? "The colour, size and direction changed, but the outline stayed the same."
+        : `The colour and size stayed the same. The ${shape} became a ${changedShape}.`,
     },
   };
 }
 
-function levelOneWhatChangedTask(round: number, target: number): PracticeTask {
-  const change = (["colour", "size", "shape"] as const)[round % 3]!;
-  const shape = LEVEL_ONE_SHAPES[round % LEVEL_ONE_SHAPES.length]!;
-  const changedShape =
-    shape === "circle"
-      ? "oval"
-      : shape === "oval"
-        ? "circle"
-        : shape === "square"
-          ? "rectangle"
-          : shape === "rectangle"
-            ? "square"
-            : "oval";
-  const colour = LEVEL_ONE_COLOURS[round % LEVEL_ONE_COLOURS.length]!;
+function mysteryTask(
+  mode: "clue-decoder" | "elimination" | "label-repair",
+  round: number,
+  target: number
+): PracticeTask {
+  const answerShape = SHAPES[round % SHAPES.length]!;
+  const answerId = `answer-${target}`;
 
-  return {
-    kind: "starpathWhatChanged",
-    prompt: "What changed?",
-    speakText:
-      "Compare the two shapes. Did the colour change, did the size change, or is it a different shape?",
-    target,
-    before: { shape, colour, scale: 0.9 },
-    after:
-      change === "colour"
-        ? {
-            shape,
-            colour: LEVEL_ONE_COLOURS[(round + 2) % LEVEL_ONE_COLOURS.length]!,
-            scale: 0.9,
-          }
-        : change === "size"
-          ? { shape, colour, scale: 0.58 }
-          : { shape: changedShape, colour, scale: 0.9 },
-    answer: change,
-    feedback: {
-      correct:
-        change === "shape"
-          ? `Correct. The ${shape} changed into a ${changedShape}.`
-          : `Correct. Only the ${change} changed, so it is still a ${shape}.`,
-      wrong: `Compare the outlines, colours and sizes one more time.`,
-    },
-  };
-}
-
-function levelOneOddShapeTask(round: number, target: number): PracticeTask {
-  const pairs: Array<[StarpathShape, StarpathShape]> = [
-    ["circle", "oval"],
-    ["square", "rectangle"],
-    ["oval", "triangle"],
-    ["rectangle", "circle"],
-  ];
-  const [commonShape, oddShape] = pairs[round % pairs.length]!;
-  const options = rotated(
-    [
-      ...Array.from({ length: 3 }, (_, index) => ({
-        id: `same-${target}-${index}`,
-        shape: commonShape,
-        colour: LEVEL_ONE_COLOURS[(round + index) % LEVEL_ONE_COLOURS.length]!,
-      })),
-      {
-        id: `odd-${target}`,
-        shape: oddShape,
-        colour: LEVEL_ONE_COLOURS[(round + 3) % LEVEL_ONE_COLOURS.length]!,
-      },
-    ],
-    round
-  );
-
-  return {
-    kind: "starpathOddOneOut",
-    prompt: "Which shape does not belong?",
-    speakText:
-      "Three shapes have the same outline. Find the one shape with a different outline.",
-    target,
-    options,
-    oddOptionId: `odd-${target}`,
-    feedback: {
-      correct: `Correct. The ${oddShape} is different from the ${commonShape}s.`,
-      wrong: `Look closely. Three are ${commonShape}s and one is a ${oddShape}.`,
-    },
-  };
-}
-
-function levelOneFamilyTask(round: number, target: number): PracticeTask {
-  const queue = rotated(
-    [...LEVEL_ONE_SHAPES, LEVEL_ONE_SHAPES[round % LEVEL_ONE_SHAPES.length]!],
-    round
-  );
-  return {
-    kind: "starpathFamilySort",
-    prompt: "Classify each shape into its family.",
-    speakText:
-      "Sort each shape into its matching family. Pay special attention to circles and ovals, and squares and rectangles.",
-    target,
-    bins: [...LEVEL_ONE_SHAPES],
-    items: queue.map((shape, index) => ({
-      id: `family-${target}-${index}`,
+  if (mode === "label-repair") {
+    const visibleShapes = rotate(SHAPES, round).slice(0, 4);
+    const wrongIndex = round % visibleShapes.length;
+    const options = visibleShapes.map((shape, index) => ({
+      id: index === wrongIndex ? answerId : `correct-label-${target}-${index}`,
       shape,
-      colour: LEVEL_ONE_COLOURS[(round + index) % LEVEL_ONE_COLOURS.length]!,
-      scale: 0.68 + ((round + index) % 3) * 0.13,
+      label:
+        index === wrongIndex
+          ? CLOSE_SHAPE[shape].charAt(0).toUpperCase() + CLOSE_SHAPE[shape].slice(1)
+          : shape.charAt(0).toUpperCase() + shape.slice(1),
+      colour: COLOURS[(round + index) % COLOURS.length]!,
+      rotation: shape === "circle" ? 0 : (index - 1) * 12,
+    }));
+    return {
+      kind: "starpathMysteryShape",
+      mode,
+      prompt: "Which scanner label is wrong?",
+      speakText:
+        "One scanner label does not match its shape. Tap the card with the incorrect label.",
+      target,
+      clues: [],
+      options,
+      correctOptionId: answerId,
+      feedback: {
+        correct: "You repaired the incorrect scanner label.",
+        wrong: "That label matches its shape. Check the other scanner cards.",
+      },
+    };
+  }
+
+  const closeShape = CLOSE_SHAPE[answerShape];
+  const otherShapes = [
+    closeShape,
+    ...SHAPES.filter((shape) => shape !== answerShape && shape !== closeShape),
+  ].slice(0, 3);
+  const options = rotate(
+    [answerShape, ...otherShapes].map((shape, index) => ({
+      id: shape === answerShape ? answerId : `option-${target}-${index}`,
+      shape,
+      label: shape.charAt(0).toUpperCase() + shape.slice(1),
+      colour: COLOURS[(round + index) % COLOURS.length]!,
+      rotation: shape === "circle" ? 0 : (round + index) * 11,
     })),
+    round
+  );
+  return {
+    kind: "starpathMysteryShape",
+    mode,
+    prompt:
+      mode === "clue-decoder"
+        ? "Decode Geospin's mystery shape."
+        : "Reveal the clues and eliminate the impossible shapes.",
+    speakText:
+      mode === "clue-decoder"
+        ? "Listen to Geospin's clues and choose the mystery shape."
+        : "Reveal each clue. Use every clue to eliminate shapes that cannot be the answer.",
+    target,
+    clues: SHAPE_CLUES[answerShape],
+    options,
+    correctOptionId: answerId,
     feedback: {
-      correct: "Excellent classifying. Every shape is in the correct family.",
-      wrong: "Compare the outline carefully before choosing its family.",
+      correct: `Mystery solved. The clues describe a ${answerShape}.`,
+      wrong: `That shape does not match every clue. Check the clues again.`,
     },
   };
 }
 
 export function createShapeReviewMissionTaskSet(): RealmLessonTaskSet {
   let target = 0;
+  let hologramRound = 0;
+  let turntableRound = 0;
   let matchRound = 0;
-  let compareRound = 0;
-  let changeRound = 0;
-
   return {
     teaching: () => ({
       kind: "starpathShapeIntro",
       scene: "intro",
       variant: "levelOneShapes",
-      heading: "A shape stays the same",
-      prompt: "Colour, size and a small turn do not change a shape.",
+      heading: "Welcome to the Shape Disguise Lab",
+      prompt: "Colour, size and turning do not change a shape.",
       speakText:
-        "Welcome, Junior Space Explorer! A familiar shape can change colour, become bigger or smaller, or turn around and still be the same shape. Look at the shape clues, not its decoration.",
+        "A shape can be recoloured, resized or turned and still keep its identity. Train the scanner to see through every disguise.",
       target: ++target,
     }),
     activities: [
-      () => shapeTwinTask(matchRound++, ++target),
-      () => compareLevelOneShapesTask(compareRound++, ++target),
-      () => levelOneWhatChangedTask(changeRound++, ++target),
+      () => disguiseTask("hologram", hologramRound++, ++target),
+      () => disguiseTask("turntable", turntableRound++, ++target),
+      () => disguiseTask("match", matchRound++, ++target),
     ],
   };
 }
 
 export const SHAPE_REVIEW_MISSION_CONTENT = {
   missionBrief:
-    "Begin your Junior Space Explorer training by recognising familiar shapes when their colour, size or direction changes.",
+    "Enter Geospin's Shape Disguise Lab. Stabilise holograms, turn the scanner and recognise familiar shapes in disguise.",
   successCriteria: [
-    "recognise familiar shapes",
-    "match the same shape in a different size or colour",
-    "notice what changed",
+    "recognise a resized shape",
+    "recognise a turned shape",
+    "recognise a recoloured shape",
   ],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: {
-    title: "Shape Expert Review",
-    durationMinutes: 1,
-    taskKind: "starpathShapeIntro",
-  },
+  teaching: { title: "Shape Disguise Lab", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    {
-      key: "shape-twins",
-      title: "Shape Twins",
-      description: "Match familiar shapes despite changes in colour and size.",
-      taskKinds: ["starpathShapeMatch"],
-    },
-    {
-      key: "same-or-different",
-      title: "Same or Different?",
-      description: "Compare two familiar shapes.",
-      taskKinds: ["starpathShapeCompare"],
-    },
-    {
-      key: "what-changed",
-      title: "What Changed?",
-      description: "Decide whether the colour, size or shape changed.",
-      taskKinds: ["starpathWhatChanged"],
-    },
+    { key: "hologram-stabiliser", title: "Hologram Stabiliser", description: "Reveal and identify a distorted hologram.", taskKinds: ["starpathShapeDisguise"] },
+    { key: "turntable-scanner", title: "Turntable Scanner", description: "Turn and identify a familiar shape.", taskKinds: ["starpathShapeDisguise"] },
+    { key: "disguise-match", title: "Disguise Match", description: "Find a shape after several visual changes.", taskKinds: ["starpathShapeDisguise"] },
   ],
   reflection: {
-    prompt: "What helped you recognise a shape?",
-    options: [
-      "I ignored its colour",
-      "I ignored its size",
-      "I looked at the whole shape",
-    ],
+    prompt: "What can change without changing a shape's name?",
+    options: ["Its colour", "Its size", "The way it is turned"],
   },
-  practisedSkills: [
-    "Recognise familiar shapes in varied colours and sizes",
-    "Compare two familiar shapes",
-    "Identify which visual feature changed",
-  ],
-  nextUpLabel: "Compare the Shapes",
+  practisedSkills: ["Recognise resized shapes", "Recognise rotated shapes", "Recognise recoloured shapes"],
+  nextUpLabel: "Shape Face-Off",
   createTaskSet: createShapeReviewMissionTaskSet,
 } satisfies StarpathLessonContent;
 
 export function createCompareTheShapesTaskSet(): RealmLessonTaskSet {
   let target = 0;
-  let compareRound = 0;
-  let changeRound = 0;
-  let oddRound = 0;
-
+  let closePairRound = 0;
+  let similarityRound = 0;
+  let differenceRound = 0;
   return {
     teaching: () => ({
       kind: "starpathShapeIntro",
       scene: "intro",
       variant: "levelOneShapes",
-      heading: "Compare like an explorer",
-      prompt: "Look for what is the same and what is different.",
+      heading: "Shape Face-Off",
+      prompt: "Compare close shapes carefully.",
       speakText:
-        "Space explorers compare carefully. Two shapes can have the same name even when their colour, size or direction is different. Look at both shapes and explain what stayed the same or what changed.",
+        "Circle or oval? Square or rectangle? Compare the outlines and decide what stayed the same and what is different.",
       target: ++target,
     }),
     activities: [
-      () => compareLevelOneShapesTask(compareRound++, ++target),
-      () => levelOneWhatChangedTask(changeRound++, ++target),
-      () => levelOneOddShapeTask(oddRound++, ++target),
+      () => faceOffTask("close-pair", closePairRound++, ++target),
+      () => faceOffTask("similarity", similarityRound++, ++target),
+      () => faceOffTask("difference", differenceRound++, ++target),
     ],
   };
 }
 
 export const COMPARE_THE_SHAPES_CONTENT = {
   missionBrief:
-    "Compare familiar shapes across Starpath. Decide what is the same, what is different and which shape does not belong.",
+    "Enter the Shape Face-Off arena. Compare close shape pairs, find similarities and detect important differences.",
   successCriteria: [
-    "compare two familiar shapes",
-    "notice a similarity or difference",
-    "find a shape that does not belong",
+    "tell a circle from an oval",
+    "tell a square from a rectangle",
+    "identify a similarity or difference",
   ],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: {
-    title: "Compare the Shapes",
-    durationMinutes: 1,
-    taskKind: "starpathShapeIntro",
-  },
+  teaching: { title: "Shape Face-Off", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    {
-      key: "shape-comparison",
-      title: "Shape Comparison",
-      description: "Decide whether two shapes are the same or different.",
-      taskKinds: ["starpathShapeCompare"],
-    },
-    {
-      key: "change-detector",
-      title: "Change Detector",
-      description: "Identify what changed between two shapes.",
-      taskKinds: ["starpathWhatChanged"],
-    },
-    {
-      key: "odd-shape",
-      title: "Odd Shape",
-      description: "Find the one shape that is different.",
-      taskKinds: ["starpathOddOneOut"],
-    },
+    { key: "close-pair", title: "Close Pair", description: "Distinguish shapes with similar outlines.", taskKinds: ["starpathShapeFaceOff"] },
+    { key: "similarity-scan", title: "Similarity Scan", description: "Identify what stayed the same.", taskKinds: ["starpathShapeFaceOff"] },
+    { key: "difference-scan", title: "Difference Scan", description: "Identify what changed.", taskKinds: ["starpathShapeFaceOff"] },
   ],
   reflection: {
-    prompt: "How did you compare the shapes?",
-    options: [
-      "I looked for what stayed the same",
-      "I looked for what changed",
-      "I ignored colour and size",
-    ],
+    prompt: "What helped you compare close shapes?",
+    options: ["I compared the outlines", "I checked what stayed the same", "I checked what changed"],
   },
-  practisedSkills: [
-    "Compare familiar shapes",
-    "Identify visual similarities and differences",
-    "Use comparison clues to find an odd shape",
-  ],
-  nextUpLabel: "Shape Detective Challenge",
+  practisedSkills: ["Compare close shape pairs", "Identify similarities", "Identify differences"],
+  nextUpLabel: "Mystery Shape Rescue",
   createTaskSet: createCompareTheShapesTaskSet,
 } satisfies StarpathLessonContent;
 
 export function createShapeDetectiveChallengeTaskSet(): RealmLessonTaskSet {
   let target = 0;
-  let familyRound = 0;
-  let matchRound = 0;
-  let oddRound = 0;
-
+  let clueRound = 0;
+  let eliminationRound = 0;
+  let repairRound = 0;
   return {
     teaching: () => ({
       kind: "starpathShapeIntro",
       scene: "intro",
       variant: "levelOneShapes",
-      heading: "Use every shape clue",
-      prompt: "Recognise, compare and group familiar shapes.",
+      heading: "Mystery Shape Rescue",
+      prompt: "Use every clue before choosing.",
       speakText:
-        "Junior Space Explorers use every clue they know. Recognise each familiar shape, compare it with the others, then decide which shapes belong together.",
+        "Geospin's shape records are scrambled. Decode clues, eliminate impossible choices and repair incorrect scanner labels.",
       target: ++target,
     }),
     activities: [
-      () => levelOneFamilyTask(familyRound++, ++target),
-      () => shapeTwinTask(matchRound++, ++target),
-      () => levelOneOddShapeTask(oddRound++, ++target),
+      () => mysteryTask("clue-decoder", clueRound++, ++target),
+      () => mysteryTask("elimination", eliminationRound++, ++target),
+      () => mysteryTask("label-repair", repairRound++, ++target),
     ],
   };
 }
 
 export const SHAPE_DETECTIVE_CHALLENGE_CONTENT = {
   missionBrief:
-    "Complete Geospin's detective challenge by recognising, comparing and grouping familiar shapes across a busy sorting station.",
+    "Rescue Geospin's scrambled records by decoding mystery clues, eliminating impossible shapes and repairing incorrect labels.",
   successCriteria: [
-    "recognise familiar shapes in different forms",
-    "put matching shapes together",
-    "explain which shape is different",
+    "use several clues together",
+    "eliminate shapes that do not fit",
+    "identify an incorrect shape label",
   ],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: {
-    title: "Shape Detective Challenge",
-    durationMinutes: 1,
-    taskKind: "starpathShapeIntro",
-  },
+  teaching: { title: "Mystery Shape Rescue", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    {
-      key: "shape-families",
-      title: "Shape Families",
-      description: "Classify familiar shapes into matching groups.",
-      taskKinds: ["starpathFamilySort"],
-    },
-    {
-      key: "detective-match",
-      title: "Detective Match",
-      description: "Find the matching shape despite visual changes.",
-      taskKinds: ["starpathShapeMatch"],
-    },
-    {
-      key: "detective-odd-one-out",
-      title: "Which Does Not Belong?",
-      description: "Use shape clues to find the different shape.",
-      taskKinds: ["starpathOddOneOut"],
-    },
+    { key: "clue-decoder", title: "Clue Decoder", description: "Identify a mystery shape from several clues.", taskKinds: ["starpathMysteryShape"] },
+    { key: "shape-elimination", title: "Shape Elimination", description: "Reveal clues and remove impossible answers.", taskKinds: ["starpathMysteryShape"] },
+    { key: "label-repair", title: "Scanner Repair", description: "Find and repair an incorrect shape label.", taskKinds: ["starpathMysteryShape"] },
   ],
   reflection: {
-    prompt: "Which clue made you a strong shape detective?",
-    options: [
-      "I matched the shape",
-      "I compared what was different",
-      "I grouped the same shapes",
-    ],
+    prompt: "How did you solve the mystery?",
+    options: ["I used every clue", "I removed impossible shapes", "I checked each label"],
   },
-  practisedSkills: [
-    "Recognise familiar shapes despite visual changes",
-    "Classify familiar shapes",
-    "Explain a simple similarity or difference",
-  ],
+  practisedSkills: ["Interpret shape clues", "Use elimination", "Check shape labels"],
   nextUpLabel: "Week 1 Voyage Quiz",
   createTaskSet: createShapeDetectiveChallengeTaskSet,
 } satisfies StarpathLessonContent;

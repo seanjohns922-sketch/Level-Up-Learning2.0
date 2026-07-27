@@ -166,6 +166,11 @@ import {
   StarpathShapeBuilderCard,
   StarpathSpaceMuseumCard,
 } from "@/components/starpath/StarpathShapeBuilderCards";
+import {
+  StarpathMysteryShapeCard,
+  StarpathShapeDisguiseCard,
+  StarpathShapeFaceOffCard,
+} from "@/components/starpath/StarpathLevelOneShapeCards";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -593,6 +598,12 @@ function TaskRendererInner({
       return <StarpathFamilySortCard key={k} task={t} onComplete={onC} />;
     case "starpathWhatChanged":
       return <StarpathWhatChangedCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathShapeDisguise":
+      return <StarpathShapeDisguiseCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathShapeFaceOff":
+      return <StarpathShapeFaceOffCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathMysteryShape":
+      return <StarpathMysteryShapeCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathShapeSprint":
       return <StarpathShapeSprintCard key={k} task={t} onComplete={onC} />;
     case "starpathPositionFind":

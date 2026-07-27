@@ -95,6 +95,9 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "starpathSpaceMuseum") return "Space Museum";
   if (kind === "starpathFamilySort") return "Sorting Station";
   if (kind === "starpathWhatChanged") return "What Changed?";
+  if (kind === "starpathShapeDisguise") return "Shape Disguise Lab";
+  if (kind === "starpathShapeFaceOff") return "Shape Face-Off";
+  if (kind === "starpathMysteryShape") return "Mystery Shape Rescue";
   if (kind === "starpathShapeSprint") return "Shape Sprint";
   if (kind === "starpathPositionFind") return "Find It";
   if (kind === "starpathPositionWord") return "Say Where";
@@ -167,6 +170,13 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   }
   if (task.kind === "starpathSpaceMuseum") {
     return task.options.find((option) => option.id === task.correctOptionId)?.objectId ?? "museum picture";
+  }
+  if (task.kind === "starpathShapeDisguise") return task.shape;
+  if (task.kind === "starpathShapeFaceOff") {
+    return task.options.find((option) => option.id === task.correctOptionId)?.label ?? "comparison";
+  }
+  if (task.kind === "starpathMysteryShape") {
+    return task.options.find((option) => option.id === task.correctOptionId)?.label ?? "mystery shape";
   }
   if (task.kind === "measurementCompare") {
     return task.objects.find((item) => item.id === task.correctOptionId)?.label ?? task.correctOptionId;
@@ -1063,7 +1073,10 @@ export function PracticeRunner({
     task.kind === "starpathShapeBuilder" ||
     task.kind === "starpathBuildShapeIdentify" ||
     task.kind === "starpathBuildMatch" ||
-    task.kind === "starpathSpaceMuseum";
+    task.kind === "starpathSpaceMuseum" ||
+    task.kind === "starpathShapeDisguise" ||
+    task.kind === "starpathShapeFaceOff" ||
+    task.kind === "starpathMysteryShape";
   const hint =
     hasGroundFeedback
       ? status === "wrong"
