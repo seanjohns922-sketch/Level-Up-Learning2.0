@@ -3,6 +3,11 @@
 // "coaching key". Tips stay short, positive, and tied to the current lesson or
 // quiz objective. Unknown skills fall back safely.
 
+import {
+  STARPATH_LESSON_COACHING,
+  STARPATH_LESSON_COACHING_KEYS,
+} from "@/data/starpath/coaching";
+
 export type SkillCoaching = {
   /** One short rule/strategy ("Coach Tip"). Under 15 words. */
   tip: string;
@@ -10,6 +15,12 @@ export type SkillCoaching = {
   strengthLine?: string;
   /** Gentle "what to focus on" line. */
   focusLine?: string;
+  /** A likely lesson-specific misunderstanding for teacher interpretation. */
+  misconception?: string;
+  /** A concrete lesson-specific next teaching move. */
+  teacherAction?: string;
+  /** A short intervention or follow-up activity. */
+  suggestedPractice?: string;
 };
 
 const TABLE: Record<string, SkillCoaching> = {
@@ -318,6 +329,7 @@ const TABLE: Record<string, SkillCoaching> = {
   ml_y6_w8_l1: { tip: "Every great design begins with the right measurements." },
   ml_y6_w8_l2: { tip: "Good engineers compare several solutions before choosing the best one." },
   ml_y6_w8_l3: { tip: "The best mathematicians can explain why their solution works." },
+  ...STARPATH_LESSON_COACHING,
 };
 
 const FALLBACK: SkillCoaching = {
@@ -480,6 +492,7 @@ const LESSON_KEY_MAP: Record<string, string> = {
   "y6-measurement-w8-l1": "ml_y6_w8_l1",
   "y6-measurement-w8-l2": "ml_y6_w8_l2",
   "y6-measurement-w8-l3": "ml_y6_w8_l3",
+  ...STARPATH_LESSON_COACHING_KEYS,
 };
 
 function normalizeLessonId(lessonId: string): string {

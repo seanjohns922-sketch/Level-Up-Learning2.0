@@ -1,3 +1,5 @@
+import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
+
 export type TeacherInsightStatus =
   | "On Track"
   | "Quick Check-in Recommended"
@@ -9,6 +11,8 @@ export type TeacherInsight = {
   strongestSkill: string;
   needsSupport: string;
   teacherAction: string;
+  misconception?: string;
+  suggestedPractice?: string;
 };
 
 export type TeacherAttemptQuestion = {
@@ -73,6 +77,12 @@ export function buildHeuristicTeacherInsight(input: TeacherInsightInput): Teache
   const weakestTopic = getWeakestTopic(input);
   const strongestTopic = getStrongestTopic(input);
   const breakdownWeakest = [...(input.lessonBreakdown ?? [])].sort((a, b) => a.percent - b.percent)[0] ?? null;
+  const coaching = getSkillCoaching(
+    resolveCoachingKey({
+      lessonId: input.lessonId,
+      topicLabels: (input.topicSummaries ?? []).map((topic) => topic.label),
+    }),
+  );
 
   let status: TeacherInsightStatus = "On Track";
   if (input.accuracy >= 90) status = "Ready to Move On";
@@ -95,11 +105,20 @@ export function buildHeuristicTeacherInsight(input: TeacherInsightInput): Teache
       : "Choosing strategies independently";
 
   const teacherAction =
-    weakestTopic
+    coaching.teacherAction
+      ? coaching.teacherAction
+      : weakestTopic
       ? `Show one worked example on ${weakestTopic.label.toLowerCase()}, then ask the student to solve a similar problem aloud.`
       : breakdownWeakest
       ? `Revisit one problem from Lesson ${breakdownWeakest.lessonNumber} and ask the student to explain their method before solving.`
       : "Ask the student to talk through their next problem before writing an answer.";
 
-  return { status, strongestSkill, needsSupport, teacherAction };
+  return {
+    status,
+    strongestSkill,
+    needsSupport,
+    teacherAction,
+    misconception: coaching.misconception,
+    suggestedPractice: coaching.suggestedPractice,
+  };
 }

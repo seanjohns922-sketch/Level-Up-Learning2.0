@@ -23,6 +23,8 @@ function cleanInsight(candidate: Partial<TeacherInsight>, fallback: TeacherInsig
     strongestSkill: pick(candidate.strongestSkill, fallback.strongestSkill),
     needsSupport: pick(candidate.needsSupport, fallback.needsSupport),
     teacherAction: pick(candidate.teacherAction, fallback.teacherAction),
+    misconception: pick(candidate.misconception, fallback.misconception ?? ""),
+    suggestedPractice: pick(candidate.suggestedPractice, fallback.suggestedPractice ?? ""),
   };
 }
 
@@ -33,11 +35,14 @@ async function generateAiInsight(input: TeacherInsightInput, fallback: TeacherIn
 
   const prompt = [
     "You are generating a short teacher dashboard insight from student maths attempt data.",
-    "Return strict JSON with keys: status, strongestSkill, needsSupport, teacherAction.",
+    "Return strict JSON with keys: status, strongestSkill, needsSupport, teacherAction, misconception, suggestedPractice.",
     "Rules:",
     "- strongestSkill: a short topic label (e.g. 'Place Value') where the student performed best.",
     "- needsSupport: a short topic label (e.g. 'Flexible Partitioning') where they need help.",
     "- teacherAction: one practical sentence — what the teacher should do next.",
+    "- misconception: preserve the lesson-specific misconception from the fallback unless attempt evidence supports a more precise version.",
+    "- suggestedPractice: preserve the lesson-specific follow-up practice from the fallback.",
+    "- Keep every field within the exact curriculum scope of this lesson.",
     "- Do not shame the student. Keep it concise and actionable.",
     `Attempt data: ${JSON.stringify(input)}`,
     `Fallback draft: ${JSON.stringify(fallback)}`,

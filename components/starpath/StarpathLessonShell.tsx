@@ -13,6 +13,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import { saveRealmLessonAttempt } from "@/lib/student-progress-sync";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
+import type { TeacherInsight, TeacherInsightInput } from "@/lib/teacher-insights";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function levelNumber(level: StarpathMissionMetadata["level"]) {
@@ -44,15 +45,54 @@ export default function StarpathLessonShell({
       const summary = summaryRef.current;
       const completionKey =
         typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+      let insight: TeacherInsight | null = null;
+      if (summary) {
+        const insightInput: TeacherInsightInput = {
+          studentId,
+          level: lesson.level,
+          strand: "Space",
+          week: lesson.week,
+          lessonId: lesson.registryId,
+          title: lesson.title,
+          score: summary.correctAnswers,
+          accuracy: summary.accuracy,
+          timeSpent: summary.timeSpentSeconds,
+          questionsAnswered: summary.questionsAnswered,
+          topicSummaries: summary.topicSummaries,
+        };
+        try {
+          const response = await fetch("/api/teacher-insight", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(insightInput),
+          });
+          if (response.ok) {
+            const payload = (await response.json()) as { insight?: TeacherInsight };
+            insight = payload.insight ?? null;
+          }
+        } catch (error) {
+          console.warn("[Starpath] Coaching insight generation failed", error);
+        }
+      }
       const attempt = {
+        at: new Date().toISOString(),
         completed: true,
         lessonId: lesson.registryId,
         lessonNumber: lesson.lesson,
         title: lesson.title,
         questionsAnswered: summary?.questionsAnswered ?? 0,
+        totalQuestions: summary?.questionsAnswered ?? 0,
         correctAnswers: summary?.correctAnswers ?? 0,
+        correctCount: summary?.correctAnswers ?? 0,
         accuracy: summary?.accuracy ?? 0,
+        accuracyPercent: summary?.accuracy ?? 0,
         bestChain: summary?.bestChain ?? 0,
+        timeSpentSeconds: summary?.timeSpentSeconds ?? 0,
+        topicSummaries: summary?.topicSummaries ?? [],
+        strengths: summary?.strengths ?? [],
+        areasToImprove: summary?.areasToImprove ?? [],
+        struggledQuestionTypes: summary?.struggledQuestionTypes ?? [],
+        insight,
       };
       await saveRealmLessonAttempt(
         studentId,
@@ -152,7 +192,7 @@ export default function StarpathLessonShell({
               nextUpLabel={content.nextUpLabel}
               brainBreakFrequency="normal"
               showResultsAfterReflection
-              showCoachReview={false}
+              showCoachReview
               showMistakeReview={false}
               activityNoun="Activity"
               experienceCopy={{
