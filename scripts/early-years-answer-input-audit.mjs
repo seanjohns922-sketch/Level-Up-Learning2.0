@@ -46,6 +46,26 @@ requirePattern(
   "quiz number-line jumps must reset for each question"
 );
 requirePattern(
+  "app/session/page.tsx",
+  /function quizQuestionExpectsNumeric[\s\S]+isNumericAnswerValue\(question\.correctValue\)/,
+  "typed quiz inputs must infer numeric mode from numeric correct answers"
+);
+requirePattern(
+  "app/session/page.tsx",
+  /quizQuestionExpectsNumeric\(currentQuiz\)[\s\S]+replace\(\/\[\^\\d\.,-\]\/g,\s*""\)/,
+  "numeric quiz inputs must accept digits even when adapter metadata is absent"
+);
+rejectPattern(
+  "app/session/page.tsx",
+  /currentQuiz\.responseType === "number" \? "Type the answer" : "Type the word"/,
+  "quiz input must not default an untyped numeric answer to a word-only field"
+);
+requirePattern(
+  "components/activities/TypedResponseActivity.tsx",
+  /const inferredIntegerInput =[\s\S]+questionData\.answer\.replace\(\/,\/g,\s*""\)/,
+  "shared typed activities must infer numeral entry for integer answers"
+);
+requirePattern(
   "components/NumberLineTap.tsx",
   /e\.pointerType === "touch" \? 24[\s\S]+range \* 0\.025/,
   "number-line taps must provide a touch-friendly, range-bounded correct zone"

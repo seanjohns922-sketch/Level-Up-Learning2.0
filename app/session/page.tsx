@@ -386,6 +386,18 @@ function getLessonFeedback(correct: number, total: number) {
   return "Needs more practice.";
 }
 
+function isNumericAnswerValue(value?: string | number | null) {
+  if (value === undefined || value === null) return false;
+  return /^-?(?:\d+|\d*\.\d+)$/.test(String(value).replace(/,/g, "").trim());
+}
+
+function quizQuestionExpectsNumeric(question?: QuizQuestion | null) {
+  return (
+    question?.kind === "typed" &&
+    (question.responseType === "number" || isNumericAnswerValue(question.correctValue))
+  );
+}
+
 function toYear2QuizQuestion(
   question: Year2MultipleChoiceQuestion | Year2TypedResponseQuestion,
   lessonNumber: number,
@@ -404,6 +416,9 @@ function toYear2QuizQuestion(
     };
   }
 
+  const expectsNumericAnswer =
+    question.inputType === "integer" || isNumericAnswerValue(question.answer);
+
   return {
     id: `q${index}`,
     lessonNumber,
@@ -411,6 +426,10 @@ function toYear2QuizQuestion(
     kind: "typed",
     prompt: question.prompt,
     correctValue: question.answer,
+    acceptedValues: question.acceptedAnswers,
+    responseType: expectsNumericAnswer ? "number" : undefined,
+    placeholder:
+      question.placeholder ?? (expectsNumericAnswer ? "Type the number" : "Type your answer"),
   };
 }
 
@@ -5723,6 +5742,8 @@ function toQuizQuestionFromYear2Data(
             kind: "typed",
             prompt: `What digit is in the tens column in ${target}?`,
             correctValue: String(questionData.standard.tens / 10),
+            responseType: "number",
+            placeholder: "Type the digit",
           }
         : {
             id: `q${index}`,
@@ -5768,6 +5789,8 @@ function toQuizQuestionFromYear2Data(
           kind: "typed",
           prompt: `${askSmallest ? "Type the smallest" : "Type the largest"} number: ${questionData.numbers.join(", ")}`,
           correctValue: answer,
+          responseType: "number",
+          placeholder: "Type the number",
         }
       : {
           id: `q${index}`,
@@ -6018,15 +6041,24 @@ function toQuizQuestionFromYear2Data(
 
   if ("options" in questionData && Array.isArray(questionData.options) && "answer" in questionData) {
     const options = questionData.options.map(String);
+    const answer = String(questionData.answer);
+    const expectsNumericAnswer = isNumericAnswerValue(answer);
     return {
       id: `q${index}`,
       lessonNumber,
       skill,
       kind: useTyped ? "typed" : "mcq",
       prompt: questionData.prompt,
-      correctValue: useTyped ? String(questionData.answer) : undefined,
+      correctValue: useTyped ? answer : undefined,
+      responseType: useTyped && expectsNumericAnswer ? "number" : undefined,
+      placeholder:
+        useTyped && expectsNumericAnswer
+          ? "Type the number"
+          : useTyped
+            ? "Type your answer"
+            : undefined,
       options: useTyped ? undefined : options,
-      correctIndex: useTyped ? undefined : options.findIndex((option) => option === String(questionData.answer)),
+      correctIndex: useTyped ? undefined : options.findIndex((option) => option === answer),
     };
   }
 
@@ -9797,16 +9829,18 @@ function SessionPage({
                         setQuizTyped((prev) => ({
                           ...prev,
                           [currentQuiz.id]:
-                            currentQuiz.responseType === "number"
+                            quizQuestionExpectsNumeric(currentQuiz)
                               ? e.target.value.replace(/[^\d.,-]/g, "")
-                              : e.target.value.replace(/[^a-zA-Z- ]/g, ""),
+                              : e.target.value,
                         }))
                       }
-                      inputMode={currentQuiz.responseType === "number" ? "decimal" : "text"}
+                      inputMode={quizQuestionExpectsNumeric(currentQuiz) ? "decimal" : "text"}
                       className="w-full px-4 py-4 rounded-xl border text-xl font-bold"
                       placeholder={
                         currentQuiz.placeholder ??
-                        (currentQuiz.responseType === "number" ? "Type the answer" : "Type the word")
+                        (quizQuestionExpectsNumeric(currentQuiz)
+                          ? "Type the number"
+                          : "Type your answer")
                       }
                     />
                   ) : currentQuiz?.kind === "audio" ||

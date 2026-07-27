@@ -1700,7 +1700,10 @@ export default function TypedResponseActivity({
   const showsWholeNumberField = isMixedNumberResponse || isFlexibleFractionInput;
   const usesFixedDenominator =
     (isStructuredFractionResponse || isFractionInput) && typeof questionData.fixedDenominator === "number";
-  const isIntegerInput = declaredInputType === "integer";
+  const inferredIntegerInput =
+    !declaredInputType &&
+    /^-?\d+$/.test(questionData.answer.replace(/,/g, "").trim());
+  const isIntegerInput = declaredInputType === "integer" || inferredIntegerInput;
   const isCartesianPlotTask =
     questionData.visual?.type === "cartesian_grid" &&
     Boolean(questionData.visual.targetCoordinate) &&
@@ -3835,7 +3838,9 @@ export default function TypedResponseActivity({
                   ? "Type the final answer"
                   : questionData.placeholder ??
                     (isIntegerInput
-                      ? "Type the integer"
+                      ? inferredIntegerInput
+                        ? "Type the number"
+                        : "Type the integer"
                       : isFlexibleFractionInput
                         ? "Type a fraction or mixed number"
                         : isNumericInputOnly
