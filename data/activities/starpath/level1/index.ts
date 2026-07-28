@@ -15,10 +15,10 @@ import {
   SHAPE_DETECTIVES_PICTURE_CONTENT,
 } from "./week3ShapeHunt";
 import {
-  CHOOSE_BEST_VIEW_CONTENT,
-  LOOK_FROM_HERE_CONTENT,
-  OBJECT_OR_PICTURE_CONTENT,
-} from "./week4Lessons";
+  SAME_OR_DIFFERENT_WORLD_CONTENT,
+  SHAPE_MATCH_CONTENT,
+  SHAPE_SPOTTER_CONTENT,
+} from "./week4WorldObjects";
 import {
   FACE_AND_MOVE_CONTENT,
   SAY_THE_MOVE_CONTENT,
@@ -50,9 +50,9 @@ export const LEVEL_ONE_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y1-space-w3-l1": SHAPE_DETECTIVES_PICTURE_CONTENT,
   "y1-space-w3-l2": HIDDEN_SHAPE_HUNT_CONTENT,
   "y1-space-w3-l3": MASTER_DETECTIVE_CONTENT,
-  "y1-space-w4-l1": OBJECT_OR_PICTURE_CONTENT,
-  "y1-space-w4-l2": LOOK_FROM_HERE_CONTENT,
-  "y1-space-w4-l3": CHOOSE_BEST_VIEW_CONTENT,
+  "y1-space-w4-l1": SHAPE_SPOTTER_CONTENT,
+  "y1-space-w4-l2": SAME_OR_DIFFERENT_WORLD_CONTENT,
+  "y1-space-w4-l3": SHAPE_MATCH_CONTENT,
   "y1-space-w5-l1": FACE_AND_MOVE_CONTENT,
   "y1-space-w5-l2": TURNS_CONTENT,
   "y1-space-w5-l3": SAY_THE_MOVE_CONTENT,

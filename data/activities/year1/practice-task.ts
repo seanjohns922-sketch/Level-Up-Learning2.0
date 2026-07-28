@@ -2667,6 +2667,40 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Level 1 · W4 — Shape Spotter. Tap every everyday object of the requested
+      // shape in a set; advances through shape families like the Shape Hunt.
+      kind: "starpathObjectSpotter";
+      prompt: string;
+      speakText: string;
+      target: number;
+      objects: Array<{ id: string; objectId: string }>;
+      hunts: Array<{ shape: StarpathShape; count: number }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 1 · W4 — Same or Different. Compare two everyday objects by shape.
+      kind: "starpathObjectCompare";
+      mode: "sameDiff" | "whatSame";
+      prompt: string;
+      speakText: string;
+      target: number;
+      left: string;
+      right: string;
+      options: Array<{ id: string; label: string }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 1 · W4 — Shape Match. Tap two objects that share a shape to pair
+      // them; clear the whole board.
+      kind: "starpathObjectMatch";
+      prompt: string;
+      speakText: string;
+      target: number;
+      objects: Array<{ id: string; objectId: string }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 1 · W3 — Shape Hunt. A picture built from many familiar shapes;
       // find and tally every shape of each requested kind. Self-grading: the
       // round advances as each shape's full count is found.

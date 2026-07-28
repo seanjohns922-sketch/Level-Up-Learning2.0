@@ -4,7 +4,9 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { directionPathTask } from "@/data/activities/starpath/ground/directionTasks";
 import { LEVEL_ONE_ARTWORK } from "./shared";
 import { belongsTask, reclassifyTask, ruleTask } from "./week2Lessons";
-import { objectMatchTask, viewpointTask } from "./week4Lessons";
+import { shapeHuntTask } from "./week3ShapeHunt";
+import { scenesByDifficulty } from "./shape-hunt-scenes";
+import { compareTask } from "./week4WorldObjects";
 import { turnTask } from "./week5Lessons";
 import { routeDebugTask } from "./week6Lessons";
 import { routeBuildTask } from "./week7Lessons";
@@ -34,16 +36,17 @@ export function createFindLandmarkTaskSet(): RealmLessonTaskSet {
   let a = 0;
   let b = 0;
   let c = 0;
+  const scenes = scenesByDifficulty("easy", "medium");
   return {
     teaching: teaching(
       "Find the Shape Landmark",
-      "Shapes and views help you name landmarks.",
-      "Landmarks on a route can be named by their shape or how they look. Use your shape skills to find them."
+      "Shapes help you name landmarks.",
+      "Landmarks on a route can be named by their shape. Use your shape skills to classify, compare and find them."
     ),
     activities: [
       () => belongsTask(a++, ++target),
-      () => viewpointTask(b++ + 1, ++target),
-      () => objectMatchTask(c++ + 2, ++target),
+      () => compareTask(b++ + 1, ++target, "sameDiff"),
+      () => shapeHuntTask(scenes[c++ % scenes.length]!, ++target),
     ],
   };
 }
