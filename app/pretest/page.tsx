@@ -15,7 +15,11 @@ import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/asses
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress } from "@/data/progress";
 import { clearYearProgress, getOptionalWeeks, getProgramWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { restoreStudentStateFromServer, saveRealmAssessment, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
-import { ASSESSMENT_THRESHOLDS, pretestPathwayForPercent } from "@/lib/assessment-rules";
+import {
+  ASSESSMENT_THRESHOLDS,
+  pretestPathwayForPercent,
+  pretestStartingWeekForPercent,
+} from "@/lib/assessment-rules";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
@@ -647,7 +651,11 @@ function PretestPage() {
         lastPreTestProfile: profile,
       };
     } else {
-      const assignedWeek = profile.assignedWeek ?? getLowestRecommendedWeek(profile.recommendedWeeks) ?? 1;
+      const assignedWeek = pretestStartingWeekForPercent(profile.percentage, [
+        profile.assignedWeek,
+        getLowestRecommendedWeek(profile.recommendedWeeks),
+        ...profile.recommendedWeeks,
+      ]);
       nextProgress = {
         ...(prev ?? {
           year,

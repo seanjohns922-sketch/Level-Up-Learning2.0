@@ -11,6 +11,18 @@ export function pretestPathwayForPercent(percent: number) {
   return "full" as const;
 }
 
+export function pretestStartingWeekForPercent(
+  percent: number,
+  recommendedWeeks: Array<number | null | undefined>,
+) {
+  if (pretestPathwayForPercent(percent) === "full") return 1;
+
+  const validWeeks = recommendedWeeks.filter(
+    (week): week is number => Number.isInteger(week) && Number(week) >= 1,
+  );
+  return validWeeks.length > 0 ? Math.min(...validWeeks) : 1;
+}
+
 export function weeklyQuizPassed(percent: number) {
   return percent >= ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent;
 }

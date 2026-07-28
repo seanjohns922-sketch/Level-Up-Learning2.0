@@ -18,6 +18,10 @@ import {
 import { resolveStudentNameParts } from "@/lib/studentName";
 import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
+import {
+  ASSESSMENT_THRESHOLDS,
+  pretestPathwayForPercent,
+} from "@/lib/assessment-rules";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
 import type { TeacherInsight, TeacherInsightStatus } from "@/lib/teacher-insights";
 import {
@@ -278,31 +282,31 @@ function overallProgramPercent(
 function computeStatus(prog: ProgressRow | undefined, completedCount: number, pct: number): StrandStatus {
   if (!prog) return completedCount > 0 ? (pct >= 100 ? "Completed" : "In Progress") : "Not Started";
   if (prog.week == null && completedCount === 0) return "Not Started";
-  if (pct >= 100) return "Completed";
-  if (prog.pretest_score != null && prog.pretest_score < ASSESSMENT_PASS_THRESHOLD) return "Needs Support";
   // Latest post-test failed?
   const latest = getLatestPosttestProfile(prog.quiz_scores);
   if (latest && !latest.passed) return "Needs Support";
+  if (pct >= 100) return "Completed";
+  if (completedCount === 0 && pct === 0) return "Not Started";
   return "In Progress";
 }
 
-const ASSESSMENT_PASS_THRESHOLD = 85;
+const ASSESSMENT_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 
 // Teacher-facing placement status for the overview column. Never surfaces the
 // internal `placement_complete` flag — only these plain-language stages.
 type PlacementStatus =
   | "Not Placed"
   | "Ready for Pre-Test"
-  | "Learning"
-  | "Targeted Pathway"
+  | "Full Program"
+  | "Targeted Program"
   | "Post-Test Ready"
   | "Complete";
 
 const PLACEMENT_STATUS_RANK: Record<PlacementStatus, number> = {
   "Not Placed": 0,
   "Ready for Pre-Test": 1,
-  "Learning": 2,
-  "Targeted Pathway": 3,
+  "Full Program": 2,
+  "Targeted Program": 3,
   "Post-Test Ready": 4,
   "Complete": 5,
 };
@@ -310,8 +314,8 @@ const PLACEMENT_STATUS_RANK: Record<PlacementStatus, number> = {
 const PLACEMENT_STATUS_STYLE: Record<PlacementStatus, string> = {
   "Not Placed": "bg-[#F1F5F9] text-[#64748B]",
   "Ready for Pre-Test": "bg-[#FEF3C7] text-[#B45309]",
-  "Learning": "bg-[#E0F2FE] text-[#0369A1]",
-  "Targeted Pathway": "bg-[#EDE9FE] text-[#6D28D9]",
+  "Full Program": "bg-[#E0F2FE] text-[#0369A1]",
+  "Targeted Program": "bg-[#EDE9FE] text-[#6D28D9]",
   "Post-Test Ready": "bg-[#DCFCE7] text-[#15803D]",
   "Complete": "bg-[#D1FAE5] text-[#047857]",
 };
@@ -320,17 +324,25 @@ function computePlacementStatus(
   prog: ProgressRow | undefined,
   pct: number,
   isPlaceholder: boolean,
+  programWeekCount: number,
 ): PlacementStatus {
   if (isPlaceholder || !prog) return "Not Placed";
   const latestPost = getLatestPosttestProfile(prog.quiz_scores);
   if (latestPost?.passed) return "Complete";
   if (prog.placement_complete !== true) {
-    return prog.pretest_score == null ? "Ready for Pre-Test" : "Learning";
+    return "Ready for Pre-Test";
   }
   if (pct >= 100) return "Post-Test Ready";
+
+  if (prog.pretest_score != null) {
+    const pathway = pretestPathwayForPercent(prog.pretest_score);
+    if (pathway === "pass") return "Complete";
+    return pathway === "targeted" ? "Targeted Program" : "Full Program";
+  }
+
   const req = Array.isArray(prog.required_weeks) ? prog.required_weeks : [];
-  if (req.length > 0 && req.length < 12) return "Targeted Pathway";
-  return "Learning";
+  if (req.length > 0 && req.length < programWeekCount) return "Targeted Program";
+  return "Full Program";
 }
 
 const INSIGHT_SEVERITY: Record<TeacherInsightStatus, number> = {
@@ -581,11 +593,15 @@ function buildStudentWeeklyPerformanceSummary({
       : "Attempted"
     : "Not Attempted";
 
-  let resolvedStatus = questionsAnswered === 0 && !weekQuiz ? "Not Started" : weekSummary.status;
+  const hasNoWeekEvidence = questionsAnswered === 0 && !weekQuiz && lessonsCompleted === 0;
+  let resolvedStatus = hasNoWeekEvidence ? "Not Started" : weekSummary.status;
   let resolvedMainGap = weekSummary.mainGap;
   let resolvedSuggestedAction = weekSummary.suggestedAction;
 
-  if (lessonsCompleted >= lessons.length && lessons.length > 0) {
+  if (hasNoWeekEvidence) {
+    resolvedMainGap = "No learning activity recorded for this week";
+    resolvedSuggestedAction = `Begin Week ${weekNumber}, Lesson 1.`;
+  } else if (lessonsCompleted >= lessons.length && lessons.length > 0) {
     if (weeklyQuizStatus === "Not Attempted") {
       resolvedStatus = "Lessons Complete — Quiz Pending";
       resolvedMainGap = "Weekly quiz not attempted yet";
@@ -965,7 +981,12 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const pct = isPlaceholder ? 0 : overallProgramPercent(strandIds.length, completedQuizzes, planForStudentYear);
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
       const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
-      const placementStatus = computePlacementStatus(prog, pct, isPlaceholder);
+      const placementStatus = computePlacementStatus(
+        prog,
+        pct,
+        isPlaceholder,
+        planForStudentYear.length || (selectedRealmId === "measurement" ? 8 : 12),
+      );
       const week = isPlaceholder ? null : resolveDisplayedWeek(prog);
       const activeWeek = week ?? 1;
       const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
@@ -1130,7 +1151,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             ["schoolYear", "School Year"],
             ["workingLevel", "Working Level"],
             ["week", "Week"],
-            ["status", "Status"],
+            ["status", "Pathway"],
             ["tower", "Progress"],
           ] as [SortKey, string][]).map(([key, label], idx) => {
             const active = sortKey === key;
@@ -1204,6 +1225,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     prog={prog}
                     liveRow={liveRow}
                     latestPretest={latestPretest}
+                    pathwayStatus={placementStatus}
                     isPlaceholder={isPlaceholder}
                     prefix={lessonIdPrefix(workingYear)}
                     onProgressChanged={onProgressChanged}
@@ -1221,7 +1243,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 /* ───────── Detail view ───────── */
 
 function StudentStrandDetail({
-  student, schoolYearLabel, yearLabel, genre, prog, liveRow, latestPretest, isPlaceholder, prefix, onProgressChanged,
+  student, schoolYearLabel, yearLabel, genre, prog, liveRow, latestPretest, pathwayStatus, isPlaceholder, prefix, onProgressChanged,
 }: {
   student: StudentRow;
   schoolYearLabel: string;
@@ -1230,6 +1252,7 @@ function StudentStrandDetail({
   prog: ProgressRow | undefined;
   liveRow?: LiveStudentActivityRow | undefined;
   latestPretest?: ProgressRow | undefined;
+  pathwayStatus: PlacementStatus;
   isPlaceholder: boolean;
   prefix: string;
   onProgressChanged?: () => Promise<void> | void;
@@ -1350,6 +1373,15 @@ function StudentStrandDetail({
         <SnapshotTile label="Strand" value={`${genre.strand}`} sub={genre.realm} />
         <SnapshotTile label="School Year" value={schoolYearLabel} sub="Student's class year" />
         <SnapshotTile label="Working Level / Week" value={yearToLevelLabel(yearLabel)} sub={`Week ${currentWeek} / ${maxWeek}`} />
+        <SnapshotTile
+          label="Pathway"
+          value={pathwayStatus}
+          sub={pathwayStatus === "Full Program"
+            ? `All ${maxWeek} weeks required`
+            : pathwayStatus === "Targeted Program"
+              ? `Starts at Week ${currentWeek}`
+              : "Canonical placement"}
+        />
         <SnapshotTile label="Current Plan" value={`${yearToLevelLabel(yearLabel)} ${genre.realm}`} sub={week?.topic ?? `Week ${currentWeek}`} />
         <SnapshotTile
           label="Current Pre-test"
