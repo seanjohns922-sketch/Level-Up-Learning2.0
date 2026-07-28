@@ -1294,7 +1294,6 @@ function StudentStrandDetail({
   }
 
   const week = plan.find((p) => p.week === selectedWeek) ?? plan[0];
-  const weekDone = weekLessonsDone(ids, week?.week ?? 1);
   const weekQuiz = quizScores[String(week?.week ?? 1)];
   const canonicalWeekQuizAttempts = (prog?.weekly_quiz_attempts ?? [])
     .filter((attempt) => attempt.week === (week?.week ?? 1) && attempt.workingLevel === yearLabel)
@@ -1332,32 +1331,6 @@ function StudentStrandDetail({
       saved_completed_lesson_ids: ids,
       matched_attempt_count: Object.keys(lessonAttempts).filter((key) => (week?.lessons ?? []).some((lesson) => lesson.id === key)).length,
     });
-  }
-
-  // Teacher insights
-  const insights: string[] = [];
-  if (!isPlaceholder) {
-    if (prog?.pretest_score != null && prog.pretest_score < ASSESSMENT_PASS_THRESHOLD) {
-      insights.push("Failed pre-test — start with foundation review");
-    }
-    if (latestPost && !latestPost.passed) {
-      insights.push(`Post-test ${latestPost.percentage}% — assign Week ${latestPost.assignedWeek ?? currentWeek}`);
-    }
-    plan.forEach((w) => {
-      const q = quizScores[String(w.week)];
-      if (q && !getQuizPassed(q)) insights.push(`Failed Week ${w.week} quiz — revisit lessons`);
-    });
-    if (weekDone > 0 && weekDone < 3 && week?.week === currentWeek) {
-      insights.push(`Currently on Week ${currentWeek}, ${weekDone}/3 lessons done`);
-    }
-    if (pctTotal(ids, prefix) >= 100) {
-      insights.push("Strand complete — ready for next level");
-    }
-    if (insights.length === 0) {
-      insights.push("On track — continue current week");
-    }
-  } else {
-    insights.push("Curriculum coming soon for this strand.");
   }
 
   return (
@@ -1711,21 +1684,6 @@ function StudentStrandDetail({
         </div>
       )}
 
-      {/* Teacher insights */}
-      <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
-        <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
-          Teacher Insights
-        </div>
-        <ul className="grid sm:grid-cols-2 gap-2">
-          {insights.map((tip, i) => (
-            <li key={i} className="flex items-start gap-2 text-xs text-[#0F172A] bg-[#F8FAFC] border border-[#E6E8EC] rounded-lg px-3 py-2">
-              <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-teal-500 shrink-0" />
-              <span className="font-semibold">{tip}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
       <LessonPreviewDrawer
         open={!!previewLesson}
         onClose={() => setPreviewLesson(null)}
@@ -1810,10 +1768,6 @@ function StudentStrandDetail({
       ) : null}
     </div>
   );
-}
-
-function pctTotal(ids: string[], prefix: string) {
-  return Math.min(100, Math.round((ids.filter((id) => id.startsWith(prefix)).length / 36) * 100));
 }
 
 function shortStatus(s: string) {
