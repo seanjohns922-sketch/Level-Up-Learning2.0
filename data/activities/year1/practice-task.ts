@@ -2691,9 +2691,10 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
-      // Level 1 · W4 — Shape Match. Tap two objects that share a shape to pair
-      // them; clear the whole board.
+      // Level 1 · W4 — Shape Match. Pair objects that share a shape to clear the
+      // board. "open" shows every card; "memory" starts them face-down.
       kind: "starpathObjectMatch";
+      mode?: "open" | "memory";
       prompt: string;
       speakText: string;
       target: number;

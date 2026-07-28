@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { ShapeVisual, TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
@@ -201,7 +201,7 @@ export function StarpathObjectCompareCard({
   );
 }
 
-// ── L3 · Shape Match (pairs) ─────────────────────────────────────────────────
+// ── L3 · Shape Match (pairs) — open or face-down memory ──────────────────────
 export function StarpathObjectMatchCard({
   task,
   onComplete,
@@ -209,13 +209,50 @@ export function StarpathObjectMatchCard({
   task: MatchTask;
   onComplete: () => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
+  const isMemory = task.mode === "memory";
+  const [selected, setSelected] = useState<string | null>(null); // open mode
+  const [flipped, setFlipped] = useState<string[]>([]); // memory mode (face-up, unpaired)
   const [paired, setPaired] = useState<Set<string>>(() => new Set());
   const [wrongPair, setWrongPair] = useState<[string, string] | null>(null);
   const [pulse, setPulse] = useState<string | null>(null);
+  const lockRef = useRef(false);
   const doneRef = useRef(false);
 
-  function tap(entry: MatchTask["objects"][number]) {
+  function complete(next: Set<string>) {
+    if (next.size >= task.objects.length) {
+      doneRef.current = true;
+      setTimeout(onComplete, 900);
+    }
+  }
+
+  function tapMemory(entry: MatchTask["objects"][number]) {
+    if (doneRef.current || lockRef.current) return;
+    if (paired.has(entry.id) || flipped.includes(entry.id)) return;
+    if (flipped.length === 0) {
+      setFlipped([entry.id]);
+      return;
+    }
+    const first = task.objects.find((o) => o.id === flipped[0])!;
+    if (worldObjectShape(first.objectId) === worldObjectShape(entry.objectId)) {
+      const next = new Set(paired).add(first.id).add(entry.id);
+      setPaired(next);
+      setFlipped([]);
+      setPulse(entry.id);
+      setTimeout(() => setPulse(null), 400);
+      complete(next);
+    } else {
+      setFlipped([first.id, entry.id]);
+      setWrongPair([first.id, entry.id]);
+      lockRef.current = true;
+      setTimeout(() => {
+        setFlipped([]);
+        setWrongPair(null);
+        lockRef.current = false;
+      }, 900);
+    }
+  }
+
+  function tapOpen(entry: MatchTask["objects"][number]) {
     if (doneRef.current || paired.has(entry.id) || wrongPair) return;
     if (selected === null) {
       setSelected(entry.id);
@@ -232,10 +269,7 @@ export function StarpathObjectMatchCard({
       setSelected(null);
       setPulse(entry.id);
       setTimeout(() => setPulse(null), 400);
-      if (next.size >= task.objects.length) {
-        doneRef.current = true;
-        setTimeout(onComplete, 900);
-      }
+      complete(next);
     } else {
       setWrongPair([first.id, entry.id]);
       setSelected(null);
@@ -252,27 +286,36 @@ export function StarpathObjectMatchCard({
       <div className="mx-auto grid max-w-md grid-cols-3 gap-3 sm:grid-cols-4">
         {task.objects.map((entry) => {
           const isPaired = paired.has(entry.id);
-          const isSelected = selected === entry.id;
+          const isFaceUp = isMemory ? isPaired || flipped.includes(entry.id) : true;
+          const isSelected = !isMemory && selected === entry.id;
           const isWrong = wrongPair?.includes(entry.id) ?? false;
           return (
             <button
               key={entry.id}
               type="button"
               disabled={isPaired}
-              aria-label={getWorldObject(entry.objectId).label}
-              onClick={() => tap(entry)}
+              aria-label={isFaceUp ? getWorldObject(entry.objectId).label : "Face-down card"}
+              onClick={() => (isMemory ? tapMemory(entry) : tapOpen(entry))}
               className={[
                 "relative flex min-h-24 items-center justify-center rounded-2xl border-2 p-2 transition active:scale-[0.97]",
                 isPaired
                   ? "border-emerald-300 bg-emerald-50 opacity-70"
                   : isSelected
                     ? "-translate-y-1 border-cyan-400 bg-cyan-50 shadow-md"
-                    : "border-violet-200 bg-white hover:-translate-y-1 hover:border-cyan-400 hover:shadow-md",
+                    : isFaceUp
+                      ? "border-violet-200 bg-white hover:-translate-y-1 hover:border-cyan-400 hover:shadow-md"
+                      : "border-violet-300 bg-gradient-to-br from-violet-500 to-indigo-600 hover:-translate-y-1 hover:shadow-md",
                 isWrong ? "sp-world-shake border-rose-400 bg-rose-50" : "",
                 pulse === entry.id ? "sp-world-pop" : "",
               ].join(" ")}
             >
-              <WorldObjectVisual objectId={entry.objectId} className="block h-16 w-16 sm:h-20 sm:w-20" />
+              {isFaceUp ? (
+                <WorldObjectVisual objectId={entry.objectId} className="block h-16 w-16 sm:h-20 sm:w-20" />
+              ) : (
+                <span className="flex h-16 w-16 items-center justify-center sm:h-20 sm:w-20" aria-hidden="true">
+                  <Sparkles className="h-8 w-8 text-white/80" strokeWidth={2.25} />
+                </span>
+              )}
               {isPaired ? (
                 <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400 text-indigo-950 shadow">
                   <Check className="h-4 w-4" strokeWidth={3} />
@@ -282,7 +325,11 @@ export function StarpathObjectMatchCard({
           );
         })}
       </div>
-      <p className="mt-3 text-center text-sm font-semibold text-slate-600">Tap two objects that are the same shape.</p>
+      <p className="mt-3 text-center text-sm font-semibold text-slate-600">
+        {isMemory
+          ? "Flip two cards. If they are the same shape, they stay. If not, they flip back."
+          : "Tap two objects that are the same shape."}
+      </p>
       {WORLD_STYLE}
     </div>
   );

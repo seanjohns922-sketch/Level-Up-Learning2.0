@@ -122,18 +122,22 @@ const SQUARES = ["window", "present", "frame"];
 const RECTS = ["door", "book", "tv"];
 const TRIS = ["flag", "hat", "pizza"];
 
-export function matchTask(round: number, target: number): PracticeTask {
+export function matchTask(round: number, target: number, mode: "open" | "memory" = "open"): PracticeTask {
   const pick = (pool: string[]) => [pool[round % pool.length]!, pool[(round + 1) % pool.length]!];
   const [c1, c2] = pick(CIRCLES);
   const [s1, s2] = pick(SQUARES);
   const [r1, r2] = pick(RECTS);
   const [t1, t2] = pick(TRIS);
-  // Interleave so paired shapes are not adjacent.
+  // Interleave so paired shapes are not adjacent (matters most in open mode).
   const order = [c1, s1, r1, t1, c2, s2, r2, t2];
   return {
     kind: "starpathObjectMatch",
-    prompt: "Match the objects that are the same shape.",
-    speakText: "Tap two objects that are the same shape to pair them. Clear the whole board.",
+    mode,
+    prompt: mode === "memory" ? "Memory match: find the pairs that share a shape." : "Match the objects that are the same shape.",
+    speakText:
+      mode === "memory"
+        ? "The cards are face down. Flip two cards. If they are the same shape they stay; if not they flip back. Remember where they are."
+        : "Tap two objects that are the same shape to pair them. Clear the whole board.",
     target,
     objects: order.map((objectId, index) => ({ id: `m-${target}-${index}`, objectId })),
     feedback: {
@@ -204,12 +208,12 @@ export function createShapeMatchTaskSet(): RealmLessonTaskSet {
     teaching: teaching(
       "Shape Match",
       "Objects that share a shape make a pair.",
-      "Some objects are the same shape even though they are different things. Pair up the objects that share a shape."
+      "Some objects are the same shape even though they are different things. Pair up the objects that share a shape — first face up, then from memory."
     ),
     activities: [
-      () => matchTask(a++, ++target),
-      () => matchTask(b++ + 2, ++target),
-      () => matchTask(c++ + 4, ++target),
+      () => matchTask(a++, ++target, "open"),
+      () => matchTask(b++ + 2, ++target, "memory"),
+      () => matchTask(c++ + 4, ++target, "memory"),
     ],
   };
 }
@@ -262,12 +266,12 @@ export const SHAPE_MATCH_CONTENT = {
   teaching: { title: "Shape Match", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
     { key: "match-1", title: "Shape Match", description: "Pair objects that share a shape.", taskKinds: ["starpathObjectMatch"] },
-    { key: "match-2", title: "Match Round", description: "Clear a new board of objects.", taskKinds: ["starpathObjectMatch"] },
-    { key: "match-3", title: "Match Master", description: "Pair every object independently.", taskKinds: ["starpathObjectMatch"] },
+    { key: "match-2", title: "Memory Match", description: "Flip face-down cards to find shape pairs.", taskKinds: ["starpathObjectMatch"] },
+    { key: "match-3", title: "Memory Master", description: "Clear a face-down board from memory.", taskKinds: ["starpathObjectMatch"] },
   ],
   reflection: {
     prompt: "How did you make pairs?",
-    options: ["I found objects with the same shape", "Different things can share a shape", "I cleared the whole board"],
+    options: ["I found objects with the same shape", "I remembered where cards were", "Different things can share a shape"],
   },
   practisedSkills: ["Match objects by shape", "Recognise shared shapes", "Reason about similarities"],
   nextUpLabel: "Week 4 Voyage Quiz",
