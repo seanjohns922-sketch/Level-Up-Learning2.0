@@ -5,7 +5,6 @@ import { LEVEL_ONE_ARTWORK } from "./shared";
 import {
   routeBuildTask,
   routeMissionTask,
-  routeRecordTask,
 } from "./route-tasks";
 
 // Level 1 · Week 6 — Build a Route. The genuine Year 1 step past Foundation:
@@ -45,21 +44,21 @@ export function createBuildARouteTaskSet(): RealmLessonTaskSet {
   };
 }
 
-export function createDirectionsForAFriendTaskSet(): RealmLessonTaskSet {
+export function createMissionRoutesTaskSet(): RealmLessonTaskSet {
   let target = 20;
   let a = 0;
   let b = 0;
   let c = 0;
   return {
     teaching: teaching(
-      "Directions for a Friend",
-      "A planned path can be communicated as ordered directions.",
-      "Read a route from its start. Record each move in order so another explorer can follow the same path."
+      "Mission Routes",
+      "A route can reach a goal while following a mission rule.",
+      "Plan a route to the goal. Check the mission rule before you run it. Your route may need to visit a checkpoint or avoid an asteroid."
     ),
     activities: [
-      () => routeRecordTask(a++, ++target),
-      () => routeRecordTask(b++ + 1, ++target),
-      () => routeRecordTask(c++ + 2, ++target),
+      () => routeMissionTask(a++, ++target, "standard"),
+      () => routeMissionTask(b++ + 1, ++target, "standard"),
+      () => routeMissionTask(c++ + 2, ++target, "standard"),
     ],
   };
 }
@@ -76,9 +75,9 @@ export function createRouteDesignerTaskSet(): RealmLessonTaskSet {
       "Plan a route that collects checkpoints, avoids blocked squares and reaches the goal. More than one route can work."
     ),
     activities: [
-      () => routeMissionTask(a++, ++target),
-      () => routeMissionTask(b++ + 1, ++target),
-      () => routeMissionTask(c++ + 2, ++target),
+      () => routeMissionTask(a++, ++target, "wide"),
+      () => routeMissionTask(b++ + 1, ++target, "wide"),
+      () => routeMissionTask(c++ + 2, ++target, "wide"),
     ],
   };
 }
@@ -99,46 +98,46 @@ export const BUILD_A_ROUTE_CONTENT = {
     options: ["I chose moves in order", "I ran it to test", "I checked it reached the goal"],
   },
   practisedSkills: ["Compose an ordered route", "Test a route", "Reach a stated goal"],
-  nextUpLabel: "Directions for a Friend",
+  nextUpLabel: "Mission Routes",
   createTaskSet: createBuildARouteTaskSet,
 } satisfies StarpathLessonContent;
 
-export const DIRECTIONS_FOR_A_FRIEND_CONTENT = {
+export const MISSION_ROUTES_CONTENT = {
   missionBrief:
-    "A glowing trail is already planned. Translate it into ordered directions and send them to another explorer.",
-  successCriteria: ["start at the rover", "read each trail step", "record directions in order"],
+    "Plan routes across a 4 by 4 mission grid. Reach the goal while visiting checkpoints or avoiding blocked asteroid squares.",
+  successCriteria: ["check the mission rule", "plan a valid route", "reach the goal"],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: { title: "Directions for a Friend", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Mission Routes", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "record-1", title: "Read the Trail", description: "Translate a glowing trail into directions.", taskKinds: ["starpathRouteRecord"] },
-    { key: "record-2", title: "Send the Route", description: "Record ordered moves for a friend.", taskKinds: ["starpathRouteRecord"] },
-    { key: "record-3", title: "Mission Message", description: "Communicate a complete route independently.", taskKinds: ["starpathRouteRecord"] },
+    { key: "mission-1", title: "Checkpoint Route", description: "Plan a route through a checkpoint.", taskKinds: ["starpathRouteBuild"] },
+    { key: "mission-2", title: "Avoid the Asteroid", description: "Plan a route around blocked squares.", taskKinds: ["starpathRouteBuild"] },
+    { key: "mission-3", title: "Mission Route", description: "Follow a mission rule independently.", taskKinds: ["starpathRouteBuild"] },
   ],
   reflection: {
-    prompt: "What makes directions clear?",
-    options: ["They begin at the start", "The moves are in order", "They match the pathway"],
+    prompt: "How did you make your mission route work?",
+    options: ["I checked the rule", "I planned around obstacles", "I made sure I reached the goal"],
   },
-  practisedSkills: ["Translate a visual route", "Record ordered directions", "Communicate a pathway"],
-  nextUpLabel: "Route Designer",
-  createTaskSet: createDirectionsForAFriendTaskSet,
+  practisedSkills: ["Plan with one constraint", "Avoid blocked locations", "Visit a checkpoint"],
+  nextUpLabel: "Wide Grid Route Designer",
+  createTaskSet: createMissionRoutesTaskSet,
 } satisfies StarpathLessonContent;
 
 export const ROUTE_DESIGNER_CONTENT = {
   missionBrief:
-    "Plan Starpath missions with checkpoints and blocked squares. Any route works if it follows every rule and reaches the goal.",
-  successCriteria: ["follow the mission rule", "avoid blocked squares", "reach the goal"],
+    "Take mission planning onto a wider 8 by 4 grid. Visit multiple checkpoints, avoid several asteroids and still reach the goal.",
+  successCriteria: ["plan across the wider grid", "follow every mission rule", "reach the goal"],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: { title: "Route Designer", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Wide Grid Route Designer", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "design-1", title: "Checkpoint Mission", description: "Plan a route through a checkpoint.", taskKinds: ["starpathRouteBuild"] },
-    { key: "design-2", title: "Asteroid Avoidance", description: "Plan around blocked squares.", taskKinds: ["starpathRouteBuild"] },
-    { key: "design-3", title: "Mission Planner", description: "Satisfy several route rules.", taskKinds: ["starpathRouteBuild"] },
+    { key: "design-1", title: "Double Checkpoint", description: "Visit two checkpoints on a wide grid.", taskKinds: ["starpathRouteBuild"] },
+    { key: "design-2", title: "Asteroid Field", description: "Plan around several blocked squares.", taskKinds: ["starpathRouteBuild"] },
+    { key: "design-3", title: "Wide Grid Mission", description: "Satisfy every rule across an 8 by 4 grid.", taskKinds: ["starpathRouteBuild"] },
   ],
   reflection: {
     prompt: "How did you design a route?",
     options: ["I checked every rule", "I planned around obstacles", "I visited the checkpoint"],
   },
-  practisedSkills: ["Plan with constraints", "Avoid blocked locations", "Visit required checkpoints"],
+  practisedSkills: ["Plan longer routes", "Combine multiple constraints", "Navigate an 8 by 4 grid"],
   nextUpLabel: "Week 6 Voyage Quiz",
   createTaskSet: createRouteDesignerTaskSet,
 } satisfies StarpathLessonContent;

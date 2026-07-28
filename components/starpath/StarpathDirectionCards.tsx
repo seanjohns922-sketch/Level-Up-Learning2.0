@@ -58,7 +58,10 @@ export function DirectionGrid({
   children: ReactNode;
 }) {
   return (
-    <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: `${cols} / ${rows}` }}>
+    <div
+      className={`relative mx-auto w-full ${cols >= rows * 2 ? "max-w-3xl" : "max-w-md"}`}
+      style={{ aspectRatio: `${cols} / ${rows}` }}
+    >
       <div className={`absolute inset-0 overflow-hidden rounded-2xl border-2 border-violet-200 shadow-inner ${SURFACE_BG[surface]}`}>
         <div
           className="grid h-full w-full"

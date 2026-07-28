@@ -422,9 +422,8 @@ function routeTrail(start: Cell, route: Direction[]) {
   return cells;
 }
 
-// ── Level 1 · Week 6 — Directions for a Friend ──────────────────────────────
-// The route is already planned. Students communicate it by translating the
-// numbered visual trail into an ordered direction sequence.
+// Shared displayed-route recorder for future direction activities. The route
+// is already planned, and students translate it into an ordered move sequence.
 export function StarpathRouteRecordCard({
   task,
   onCorrect,

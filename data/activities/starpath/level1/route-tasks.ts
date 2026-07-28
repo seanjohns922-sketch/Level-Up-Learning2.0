@@ -68,6 +68,55 @@ const MISSION_CASES: Array<{
   },
 ];
 
+const WIDE_MISSION_CASES: Array<{
+  start: { r: number; c: number };
+  goal: { r: number; c: number };
+  blocked: Array<{ r: number; c: number }>;
+  checkpoints: Array<{ r: number; c: number; object: string }>;
+  rule: string;
+}> = [
+  {
+    start: { r: 3, c: 0 },
+    goal: { r: 0, c: 7 },
+    blocked: [{ r: 2, c: 2 }, { r: 1, c: 4 }],
+    checkpoints: [
+      { r: 3, c: 4, object: "crystal" },
+      { r: 0, c: 5, object: "satellite" },
+    ],
+    rule: "Collect the crystal, visit the satellite and avoid both asteroids.",
+  },
+  {
+    start: { r: 3, c: 7 },
+    goal: { r: 0, c: 0 },
+    blocked: [{ r: 2, c: 6 }, { r: 2, c: 3 }],
+    checkpoints: [
+      { r: 3, c: 4, object: "crystal" },
+      { r: 1, c: 1, object: "satellite" },
+    ],
+    rule: "Collect both space objects, avoid the asteroids and reach the goal.",
+  },
+  {
+    start: { r: 0, c: 0 },
+    goal: { r: 3, c: 7 },
+    blocked: [{ r: 1, c: 1 }, { r: 2, c: 4 }],
+    checkpoints: [
+      { r: 1, c: 3, object: "satellite" },
+      { r: 2, c: 6, object: "crystal" },
+    ],
+    rule: "Visit the satellite and the crystal while avoiding both asteroids.",
+  },
+  {
+    start: { r: 0, c: 7 },
+    goal: { r: 3, c: 0 },
+    blocked: [{ r: 1, c: 5 }, { r: 2, c: 2 }],
+    checkpoints: [
+      { r: 0, c: 3, object: "crystal" },
+      { r: 3, c: 1, object: "satellite" },
+    ],
+    rule: "Collect the crystal and visit the satellite before reaching the goal.",
+  },
+];
+
 function endpoint(start: { r: number; c: number }, route: Dir[]) {
   return route.reduce(
     (cell, direction) => {
@@ -143,17 +192,24 @@ export function routeRecordTask(round: number, target: number): PracticeTask {
   };
 }
 
-export function routeMissionTask(round: number, target: number): PracticeTask {
-  const mission = MISSION_CASES[round % MISSION_CASES.length]!;
+export function routeMissionTask(
+  round: number,
+  target: number,
+  difficulty: "standard" | "wide" = "standard"
+): PracticeTask {
+  const cases = difficulty === "wide" ? WIDE_MISSION_CASES : MISSION_CASES;
+  const mission = cases[round % cases.length]!;
   const goalObject = GOAL_OBJECTS[(round + 1) % GOAL_OBJECTS.length]!;
+  const cols = difficulty === "wide" ? 8 : 4;
+  const rows = 4;
   return {
     kind: "starpathRouteBuild",
     mode: "mission",
     prompt: `Plan a mission route to the ${goalObject}.`,
     speakText: `${mission.rule} Any route that follows the mission rule and reaches the goal will work.`,
     target,
-    cols: 4,
-    rows: 4,
+    cols,
+    rows,
     object: "rover",
     start: mission.start,
     goal: { ...mission.goal, object: goalObject },
@@ -162,7 +218,7 @@ export function routeMissionTask(round: number, target: number): PracticeTask {
     checkpoints: mission.checkpoints,
     missionRule: mission.rule,
     singleAttempt: true,
-    maxSteps: 16,
+    maxSteps: cols * rows,
     feedback: {
       correct: "Mission complete. Your planned route followed every rule!",
       wrong: "This route did not complete the mission. Check every rule before planning the next route.",

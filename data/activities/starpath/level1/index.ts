@@ -26,7 +26,7 @@ import {
 } from "./week5MakeShape";
 import {
   BUILD_A_ROUTE_CONTENT,
-  DIRECTIONS_FOR_A_FRIEND_CONTENT,
+  MISSION_ROUTES_CONTENT,
   ROUTE_DESIGNER_CONTENT,
 } from "./week6Lessons";
 import {
@@ -57,7 +57,7 @@ export const LEVEL_ONE_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y1-space-w5-l2": SHAPE_REPAIR_CONTENT,
   "y1-space-w5-l3": BUILD_AND_COMPARE_CONTENT,
   "y1-space-w6-l1": BUILD_A_ROUTE_CONTENT,
-  "y1-space-w6-l2": DIRECTIONS_FOR_A_FRIEND_CONTENT,
+  "y1-space-w6-l2": MISSION_ROUTES_CONTENT,
   "y1-space-w6-l3": ROUTE_DESIGNER_CONTENT,
   "y1-space-w7-l1": FIND_THE_ERROR_CONTENT,
   "y1-space-w7-l2": FIX_THE_ROUTE_CONTENT,
