@@ -8,7 +8,7 @@ import { buildLevelOneWeek5VoyageQuiz } from "./week5Quiz";
 import { buildLevelOneWeek6VoyageQuiz } from "./week6Quiz";
 import { buildLevelOneWeek7VoyageQuiz } from "./week7Quiz";
 import { belongsTask } from "./week2Lessons";
-import { routeBuildTask } from "./week7Lessons";
+import { routeBuildTask } from "./route-tasks";
 
 export const STARPATH_LEVEL_ONE_POSTTEST_ID = "y1-space-post-01";
 
@@ -26,11 +26,11 @@ type TaskSelection = {
 const TASK_SELECTIONS: TaskSelection[] = [
   { week: 1, skillId: "shape_recognition", skillLabel: "Recognise and Compare Shapes", build: buildLevelOneWeek1VoyageQuiz, indices: [0, 6] },
   { week: 2, skillId: "shape_classification", skillLabel: "Classify Shapes into Families", build: buildLevelOneWeek2VoyageQuiz, indices: [0, 5, 10] },
-  { week: 3, skillId: "shape_composition", skillLabel: "Build and Take Apart Shapes", build: buildLevelOneWeek3VoyageQuiz, indices: [0, 5, 10] },
-  { week: 4, skillId: "objects_and_views", skillLabel: "Objects and Views", build: buildLevelOneWeek4VoyageQuiz, indices: [0, 5, 10] },
-  { week: 5, skillId: "direction_language", skillLabel: "Direction Words", build: buildLevelOneWeek5VoyageQuiz, indices: [0, 5, 10] },
-  { week: 6, skillId: "follow_directions", skillLabel: "Follow and Repair Routes", build: buildLevelOneWeek6VoyageQuiz, indices: [0, 10] },
-  { week: 7, skillId: "give_directions", skillLabel: "Give Clear Directions", build: buildLevelOneWeek7VoyageQuiz, indices: [0, 10] },
+  { week: 3, skillId: "shape_decomposition", skillLabel: "Find Shapes in Pictures", build: buildLevelOneWeek3VoyageQuiz, indices: [0, 5, 10] },
+  { week: 4, skillId: "shapes_in_world", skillLabel: "Shapes in the World", build: buildLevelOneWeek4VoyageQuiz, indices: [0, 5, 10] },
+  { week: 5, skillId: "shape_composition", skillLabel: "Make Shapes from Parts", build: buildLevelOneWeek5VoyageQuiz, indices: [0, 5, 10] },
+  { week: 6, skillId: "give_directions", skillLabel: "Build a Route", build: buildLevelOneWeek6VoyageQuiz, indices: [0, 10] },
+  { week: 7, skillId: "fix_routes", skillLabel: "Test and Fix Routes", build: buildLevelOneWeek7VoyageQuiz, indices: [0, 10] },
   {
     week: 8,
     skillId: "pathfinder_reasoning",

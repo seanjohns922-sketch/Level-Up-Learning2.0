@@ -112,6 +112,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "starpathRouteDebug") return "Fix the Route";
   if (kind === "starpathRouteBuild") return "Give the Route";
   if (kind === "starpathShapeHunt") return "Shape Hunt";
+  if (kind === "starpathShapeCompose") return "Make a Shape";
   if (kind === "starpathObjectSpotter") return "Shape Spotter";
   if (kind === "starpathObjectCompare") return "Same or Different";
   if (kind === "starpathObjectMatch") return "Shape Match";

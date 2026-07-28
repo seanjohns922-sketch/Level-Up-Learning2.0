@@ -1,55 +1,12 @@
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { directionPathTask } from "@/data/activities/starpath/ground/directionTasks";
 import { LEVEL_ONE_ARTWORK } from "./shared";
+import { routeBuildTask } from "./route-tasks";
 
-// Level 1 · Week 6 — Follow the Route. Students follow multi-step directions
-// from a stated start, then diagnose and repair a broken route. Following
-// reuses the shared path engine; the route debugger is a Level 1 mechanic.
-
-type Dir = "up" | "down" | "left" | "right";
-const GOAL_OBJECTS = ["star", "crystal", "flag"] as const;
-
-type DebugCase = {
-  goal: { r: number; c: number };
-  steps: Dir[];
-  corruptIndex: number;
-  corruptDir: Dir;
-  start: { r: number; c: number };
-};
-const DEBUG_CASES: DebugCase[] = [
-  { start: { r: 3, c: 0 }, goal: { r: 1, c: 2 }, steps: ["up", "right", "up", "right"], corruptIndex: 2, corruptDir: "down" },
-  { start: { r: 3, c: 0 }, goal: { r: 0, c: 1 }, steps: ["up", "up", "right", "up"], corruptIndex: 1, corruptDir: "right" },
-  { start: { r: 3, c: 3 }, goal: { r: 1, c: 1 }, steps: ["up", "left", "up", "left"], corruptIndex: 2, corruptDir: "down" },
-];
-
-// L3 — Find the Error: one step is wrong; tap it.
-export function routeDebugTask(round: number, target: number, object = "rover"): PracticeTask {
-  const debugCase = DEBUG_CASES[round % DEBUG_CASES.length]!;
-  const goalObject = GOAL_OBJECTS[round % GOAL_OBJECTS.length]!;
-  const steps = debugCase.steps.map((direction, index) => ({
-    id: `step-${target}-${index}`,
-    direction: index === debugCase.corruptIndex ? debugCase.corruptDir : direction,
-  }));
-  return {
-    kind: "starpathRouteDebug",
-    prompt: `This route should reach the ${goalObject}, but one step is wrong. Which step?`,
-    speakText: `Follow the steps in your head from the rover. One step goes the wrong way. Tap the step that breaks the route.`,
-    target,
-    cols: 4,
-    rows: 4,
-    object,
-    start: debugCase.start,
-    goal: { r: debugCase.goal.r, c: debugCase.goal.c, object: goalObject },
-    steps,
-    wrongStepId: `step-${target}-${debugCase.corruptIndex}`,
-    feedback: {
-      correct: "You found the broken step. Swap it and the route works.",
-      wrong: "Follow each step from the start. Find the one that heads the wrong way.",
-    },
-  };
-}
+// Level 1 · Week 6 — Build a Route. The genuine Year 1 step past Foundation:
+// the child CREATES an ordered set of moves (an algorithm) to carry the rover
+// to a goal, and records a route another explorer could follow.
 
 function teaching(heading: string, prompt: string, speakText: string) {
   let target = 0;
@@ -65,119 +22,119 @@ function teaching(heading: string, prompt: string, speakText: string) {
     }) satisfies PracticeTask;
 }
 
-export function createStartHereTaskSet(): RealmLessonTaskSet {
+export function createBuildARouteTaskSet(): RealmLessonTaskSet {
   let target = 10;
   let a = 0;
   let b = 0;
   let c = 0;
   return {
     teaching: teaching(
-      "Start Here",
-      "Every route needs a starting point.",
-      "A route only works if you know where to start. Follow each clue in order from the start."
+      "Build a Route",
+      "You can make the route, not just follow it.",
+      "Now you build the route. Choose moves in order that carry the rover to the goal, then run it to test."
     ),
     activities: [
-      () => directionPathTask(a++, ++target, { steps: 3, object: "rover" }),
-      () => directionPathTask(b++ + 1, ++target, { steps: 3, object: "rover" }),
-      () => directionPathTask(c++ + 2, ++target, { steps: 4, object: "rover" }),
+      () => routeBuildTask(a++, ++target, "build"),
+      () => routeBuildTask(b++ + 1, ++target, "build"),
+      () => routeBuildTask(c++ + 2, ++target, "build"),
     ],
   };
 }
 
-export function createMissionRouteTaskSet(): RealmLessonTaskSet {
+export function createDirectionsForAFriendTaskSet(): RealmLessonTaskSet {
   let target = 20;
   let a = 0;
   let b = 0;
   let c = 0;
   return {
     teaching: teaching(
-      "Mission Route",
-      "Follow the steps in order to reach the goal.",
-      "A route is a list of steps in order. Follow them one at a time to reach the destination."
+      "Directions for a Friend",
+      "Clear directions can be followed by someone else.",
+      "Record a route another explorer could follow. Put the moves in order so it reaches the goal."
     ),
     activities: [
-      () => directionPathTask(a++, ++target, { steps: 4, object: "rover", trail: true }),
-      () => directionPathTask(b++ + 1, ++target, { steps: 4, object: "rover", trail: true, collect: true }),
-      () => directionPathTask(c++ + 2, ++target, { steps: 5, object: "rover", trail: true, collect: true }),
+      () => routeBuildTask(a++, ++target, "record"),
+      () => routeBuildTask(b++ + 1, ++target, "record"),
+      () => routeBuildTask(c++ + 2, ++target, "record"),
     ],
   };
 }
 
-export function createFindTheErrorTaskSet(): RealmLessonTaskSet {
+export function createRouteDesignerTaskSet(): RealmLessonTaskSet {
   let target = 30;
   let a = 0;
   let b = 0;
   let c = 0;
   return {
     teaching: teaching(
-      "Find the Error",
-      "A route can have a wrong step. Find and fix it.",
-      "Sometimes a route has one wrong step. Follow it in your head and find the step that heads the wrong way."
+      "Route Designer",
+      "Design a clear route to any goal.",
+      "Design routes to different goals. Build the moves in order and run each one to check it works."
     ),
     activities: [
-      () => routeDebugTask(a++, ++target),
-      () => routeDebugTask(b++ + 1, ++target),
-      () => routeDebugTask(c++ + 2, ++target),
+      () => routeBuildTask(a++ + 2, ++target, "build"),
+      () => routeBuildTask(b++ + 3, ++target, "record"),
+      () => routeBuildTask(c++ + 1, ++target, "build"),
     ],
   };
 }
 
-export const START_HERE_CONTENT = {
+export const BUILD_A_ROUTE_CONTENT = {
   missionBrief:
-    "Take the rover's controls. Follow each clue in order from the marked start to reach the goal.",
-  successCriteria: ["find the start", "follow clues in order", "reach the destination"],
+    "Time to give the orders. Choose moves in order to build a route that carries the rover to the goal, then run it.",
+  successCriteria: ["choose moves in order", "reach the goal", "test the route"],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: { title: "Start Here", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Build a Route", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "follow-1", title: "First Route", description: "Follow a short route from the start.", taskKinds: ["starpathDirectionPath"] },
-    { key: "follow-2", title: "Route Check", description: "Follow another route in order.", taskKinds: ["starpathDirectionPath"] },
-    { key: "follow-3", title: "Route Master", description: "Follow a longer route.", taskKinds: ["starpathDirectionPath"] },
+    { key: "build-1", title: "First Orders", description: "Build a route to the goal.", taskKinds: ["starpathRouteBuild"] },
+    { key: "build-2", title: "Route Orders", description: "Build another route.", taskKinds: ["starpathRouteBuild"] },
+    { key: "build-3", title: "Orders Master", description: "Build a route independently.", taskKinds: ["starpathRouteBuild"] },
   ],
   reflection: {
-    prompt: "What does a route need?",
-    options: ["A starting point", "Steps in order", "A destination"],
+    prompt: "How did you build the route?",
+    options: ["I chose moves in order", "I ran it to test", "I checked it reached the goal"],
   },
-  practisedSkills: ["Identify a start", "Follow ordered steps", "Reach a destination"],
-  nextUpLabel: "Mission Route",
-  createTaskSet: createStartHereTaskSet,
+  practisedSkills: ["Compose an ordered route", "Test a route", "Reach a stated goal"],
+  nextUpLabel: "Directions for a Friend",
+  createTaskSet: createBuildARouteTaskSet,
 } satisfies StarpathLessonContent;
 
-export const MISSION_ROUTE_CONTENT = {
+export const DIRECTIONS_FOR_A_FRIEND_CONTENT = {
   missionBrief:
-    "Run Geospin's supply routes. Follow the full sequence of steps to guide the rover home, collecting stars on the way.",
-  successCriteria: ["follow every step", "keep the order", "reach the goal"],
+    "Another explorer will follow your directions. Record a route, in order, that gets the rover to the goal.",
+  successCriteria: ["record moves in order", "make the route reach the goal", "keep it clear"],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: { title: "Mission Route", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Directions for a Friend", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "mission-1", title: "Supply Run", description: "Follow a full route with a trail.", taskKinds: ["starpathDirectionPath"] },
-    { key: "mission-2", title: "Star Run", description: "Follow a route and collect stars.", taskKinds: ["starpathDirectionPath"] },
-    { key: "mission-3", title: "Long Haul", description: "Follow a longer supply route.", taskKinds: ["starpathDirectionPath"] },
+    { key: "record-1", title: "Write It Down", description: "Record a route for a friend.", taskKinds: ["starpathRouteBuild"] },
+    { key: "record-2", title: "Route Note", description: "Record another route.", taskKinds: ["starpathRouteBuild"] },
+    { key: "record-3", title: "Note Master", description: "Record a clear route independently.", taskKinds: ["starpathRouteBuild"] },
   ],
   reflection: {
-    prompt: "How did you complete the route?",
-    options: ["I followed every step", "I kept them in order", "I checked I reached the goal"],
+    prompt: "What makes directions clear?",
+    options: ["The moves are in order", "They reach the goal", "Someone else could follow them"],
   },
-  practisedSkills: ["Follow multi-step routes", "Keep step order", "Track a destination"],
-  nextUpLabel: "Find the Error",
-  createTaskSet: createMissionRouteTaskSet,
+  practisedSkills: ["Record an ordered route", "Communicate directions", "Reach a goal for another"],
+  nextUpLabel: "Route Designer",
+  createTaskSet: createDirectionsForAFriendTaskSet,
 } satisfies StarpathLessonContent;
 
-export const FIND_THE_ERROR_CONTENT = {
+export const ROUTE_DESIGNER_CONTENT = {
   missionBrief:
-    "A route in the flight log is broken. Follow it in your head and find the one step that heads the wrong way.",
-  successCriteria: ["follow a route mentally", "spot the wrong step", "explain the fix"],
+    "Become a route designer. Build clear routes to different goals across the grid and run each one to prove it works.",
+  successCriteria: ["design a route to any goal", "keep the moves in order", "test each route"],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: { title: "Find the Error", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Route Designer", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "debug-1", title: "Broken Route", description: "Find the wrong step in a route.", taskKinds: ["starpathRouteDebug"] },
-    { key: "debug-2", title: "Log Repair", description: "Diagnose another broken route.", taskKinds: ["starpathRouteDebug"] },
-    { key: "debug-3", title: "Repair Master", description: "Find the error independently.", taskKinds: ["starpathRouteDebug"] },
+    { key: "design-1", title: "Design a Route", description: "Design a route to a goal.", taskKinds: ["starpathRouteBuild"] },
+    { key: "design-2", title: "Design Round", description: "Design another route.", taskKinds: ["starpathRouteBuild"] },
+    { key: "design-3", title: "Design Master", description: "Design routes independently.", taskKinds: ["starpathRouteBuild"] },
   ],
   reflection: {
-    prompt: "How did you find the wrong step?",
-    options: ["I followed each step from the start", "I found the step going the wrong way", "I checked the goal"],
+    prompt: "How did you design a route?",
+    options: ["I planned the moves in order", "I ran it to check", "I reached the goal"],
   },
-  practisedSkills: ["Trace a route mentally", "Diagnose a wrong step", "Reason about repairs"],
+  practisedSkills: ["Design ordered routes", "Reach varied goals", "Test a design"],
   nextUpLabel: "Week 6 Voyage Quiz",
-  createTaskSet: createFindTheErrorTaskSet,
+  createTaskSet: createRouteDesignerTaskSet,
 } satisfies StarpathLessonContent;

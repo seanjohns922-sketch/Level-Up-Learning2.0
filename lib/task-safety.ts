@@ -265,6 +265,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "starpathRouteDebug",
   "starpathRouteBuild",
   "starpathShapeHunt",
+  "starpathShapeCompose",
   "starpathObjectSpotter",
   "starpathObjectCompare",
   "starpathObjectMatch",

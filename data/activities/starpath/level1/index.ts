@@ -20,18 +20,18 @@ import {
   SHAPE_SPOTTER_CONTENT,
 } from "./week4WorldObjects";
 import {
-  MOVE_ROVER_CONTENT,
-  SAY_THE_MOVE_CONTENT,
-  WHICH_WAY_CONTENT,
-} from "./week5Lessons";
-import {
-  FIND_THE_ERROR_CONTENT,
-  MISSION_ROUTE_CONTENT,
-  START_HERE_CONTENT,
-} from "./week6Lessons";
+  BUILD_THE_SHAPE_CONTENT,
+  SHAPE_MAKER_CONTENT,
+  TWO_MAKE_ONE_CONTENT,
+} from "./week5MakeShape";
 import {
   BUILD_A_ROUTE_CONTENT,
   DIRECTIONS_FOR_A_FRIEND_CONTENT,
+  ROUTE_DESIGNER_CONTENT,
+} from "./week6Lessons";
+import {
+  FIND_THE_ERROR_CONTENT,
+  FIX_THE_ROUTE_CONTENT,
   TEST_AND_IMPROVE_CONTENT,
 } from "./week7Lessons";
 import {
@@ -53,14 +53,14 @@ export const LEVEL_ONE_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y1-space-w4-l1": SHAPE_SPOTTER_CONTENT,
   "y1-space-w4-l2": SAME_OR_DIFFERENT_WORLD_CONTENT,
   "y1-space-w4-l3": SHAPE_MATCH_CONTENT,
-  "y1-space-w5-l1": WHICH_WAY_CONTENT,
-  "y1-space-w5-l2": MOVE_ROVER_CONTENT,
-  "y1-space-w5-l3": SAY_THE_MOVE_CONTENT,
-  "y1-space-w6-l1": START_HERE_CONTENT,
-  "y1-space-w6-l2": MISSION_ROUTE_CONTENT,
-  "y1-space-w6-l3": FIND_THE_ERROR_CONTENT,
-  "y1-space-w7-l1": BUILD_A_ROUTE_CONTENT,
-  "y1-space-w7-l2": DIRECTIONS_FOR_A_FRIEND_CONTENT,
+  "y1-space-w5-l1": TWO_MAKE_ONE_CONTENT,
+  "y1-space-w5-l2": BUILD_THE_SHAPE_CONTENT,
+  "y1-space-w5-l3": SHAPE_MAKER_CONTENT,
+  "y1-space-w6-l1": BUILD_A_ROUTE_CONTENT,
+  "y1-space-w6-l2": DIRECTIONS_FOR_A_FRIEND_CONTENT,
+  "y1-space-w6-l3": ROUTE_DESIGNER_CONTENT,
+  "y1-space-w7-l1": FIND_THE_ERROR_CONTENT,
+  "y1-space-w7-l2": FIX_THE_ROUTE_CONTENT,
   "y1-space-w7-l3": TEST_AND_IMPROVE_CONTENT,
   "y1-space-w8-l1": FIND_LANDMARK_CONTENT,
   "y1-space-w8-l2": PLAN_OBSTACLES_CONTENT,

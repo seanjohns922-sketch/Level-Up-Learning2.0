@@ -2667,6 +2667,17 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Level 1 · W5 — Make a Shape. Compose a target shape from congruent parts
+      // by tapping the piece shape to fill each slot until the target is built.
+      kind: "starpathShapeCompose";
+      prompt: string;
+      speakText: string;
+      target: number;
+      compositionId: string;
+      targetShape: StarpathShape;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 1 · W4 — Shape Spotter. Tap every everyday object of the requested
       // shape in a set; advances through shape families like the Shape Hunt.
       kind: "starpathObjectSpotter";

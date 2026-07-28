@@ -1,15 +1,14 @@
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { directionPathTask } from "@/data/activities/starpath/ground/directionTasks";
+import { directionChoiceTask, directionPathTask } from "@/data/activities/starpath/ground/directionTasks";
 import { LEVEL_ONE_ARTWORK } from "./shared";
 import { belongsTask, reclassifyTask, ruleTask } from "./week2Lessons";
 import { shapeHuntTask } from "./week3ShapeHunt";
 import { scenesByDifficulty } from "./shape-hunt-scenes";
 import { compareTask } from "./week4WorldObjects";
-import { sayMoveTask } from "./week5Lessons";
-import { routeDebugTask } from "./week6Lessons";
-import { routeBuildTask } from "./week7Lessons";
+import { composeTask } from "./week5MakeShape";
+import { routeBuildTask, routeDebugTask } from "./route-tasks";
 
 // Level 1 · Week 8 — Pathfinder Challenge. Cumulative: shape classification and
 // views serve as landmarks, then routes are planned, tested and repaired.
@@ -46,10 +45,13 @@ export function createFindLandmarkTaskSet(): RealmLessonTaskSet {
     activities: [
       () => belongsTask(a++, ++target),
       () => compareTask(b++ + 1, ++target, "sameDiff"),
+      () => composeTask(COMPOSE_POOL[a % COMPOSE_POOL.length]!, ++target),
       () => shapeHuntTask(scenes[c++ % scenes.length]!, ++target),
     ],
   };
 }
+
+const COMPOSE_POOL = ["square-2tri", "big-square-4", "rect-2square"];
 
 // L2 — Plan Around Obstacles: build and repair valid pathways.
 export function createPlanAroundObstaclesTaskSet(): RealmLessonTaskSet {
@@ -85,7 +87,7 @@ export function createExplainYourPathTaskSet(): RealmLessonTaskSet {
     ),
     activities: [
       () => routeBuildTask(a++, ++target, "record"),
-      () => sayMoveTask(b++ + 1, ++target),
+      () => directionChoiceTask(b++ + 1, ++target, "goal", "rover"),
       () => (c % 2 === 0 ? ruleTask(c++, ++target) : reclassifyTask(c++, ++target)),
     ],
   };

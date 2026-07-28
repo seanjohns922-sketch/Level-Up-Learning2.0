@@ -179,6 +179,7 @@ import {
   StarpathTurnMoveCard,
 } from "@/components/starpath/StarpathLevelOnePathCards";
 import { StarpathShapeHuntCard } from "@/components/starpath/StarpathShapeHuntCard";
+import { StarpathShapeComposeCard } from "@/components/starpath/StarpathShapeComposeCard";
 import {
   StarpathObjectCompareCard,
   StarpathObjectMatchCard,
@@ -645,6 +646,8 @@ function TaskRendererInner({
       return <StarpathRouteBuildCard key={k} task={t} onComplete={onC} />;
     case "starpathShapeHunt":
       return <StarpathShapeHuntCard key={k} task={t} onComplete={onC} />;
+    case "starpathShapeCompose":
+      return <StarpathShapeComposeCard key={k} task={t} onComplete={onC} />;
     case "starpathObjectSpotter":
       return <StarpathObjectSpotterCard key={k} task={t} onComplete={onC} />;
     case "starpathObjectCompare":
