@@ -202,12 +202,15 @@ export function StarpathRouteBuildCard({
     setStatus("running");
     let index = 0;
     let position: Cell = task.start;
+    let leftGrid = false;
     setCell(task.start);
     const timer = window.setInterval(() => {
       const direction = moves[index];
       if (!direction) {
         window.clearInterval(timer);
-        const reached = position.r === task.goal.r && position.c === task.goal.c;
+        const reached = !leftGrid
+          && position.r === task.goal.r
+          && position.c === task.goal.c;
         if (reached && !doneRef.current) {
           doneRef.current = true;
           setStatus("done");
@@ -218,10 +221,20 @@ export function StarpathRouteBuildCard({
         return;
       }
       const delta = DELTA[direction];
-      position = {
-        r: Math.min(task.rows - 1, Math.max(0, position.r + delta.dr)),
-        c: Math.min(task.cols - 1, Math.max(0, position.c + delta.dc)),
+      const next = {
+        r: position.r + delta.dr,
+        c: position.c + delta.dc,
       };
+      if (
+        next.r < 0
+        || next.r >= task.rows
+        || next.c < 0
+        || next.c >= task.cols
+      ) {
+        leftGrid = true;
+      } else {
+        position = next;
+      }
       setCell(position);
       index += 1;
     }, 340);
@@ -255,9 +268,14 @@ export function StarpathRouteBuildCard({
 
       <div className="mx-auto mt-4 max-w-xl">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs font-black uppercase tracking-[0.16em] text-violet-700">{paletteWord}</span>
+          <div>
+            <span className="block text-xs font-black uppercase tracking-[0.16em] text-violet-700">{paletteWord}</span>
+            <span className="mt-1 block text-xs font-semibold text-slate-500">
+              Any route works if it stays on the grid and reaches the goal.
+            </span>
+          </div>
           <span className="text-xs font-black text-slate-500">
-            {moves.length}/{task.maxSteps} moves
+            {moves.length}/{task.maxSteps} maximum
           </span>
         </div>
         <div className="mb-3 flex min-h-14 flex-wrap items-center gap-2 rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50/60 p-2">

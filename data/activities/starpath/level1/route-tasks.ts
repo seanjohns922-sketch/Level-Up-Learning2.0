@@ -10,14 +10,13 @@ const GOAL_OBJECTS = ["star", "crystal", "flag"] as const;
 type RouteCase = {
   start: { r: number; c: number };
   goal: { r: number; c: number };
-  distance: number;
   preset?: Dir[];
 };
 const ROUTE_CASES: RouteCase[] = [
-  { start: { r: 3, c: 0 }, goal: { r: 1, c: 2 }, distance: 4, preset: ["up"] },
-  { start: { r: 3, c: 0 }, goal: { r: 3, c: 3 }, distance: 3, preset: ["right"] },
-  { start: { r: 3, c: 0 }, goal: { r: 0, c: 1 }, distance: 4, preset: ["up"] },
-  { start: { r: 3, c: 3 }, goal: { r: 1, c: 1 }, distance: 4, preset: ["up"] },
+  { start: { r: 3, c: 0 }, goal: { r: 1, c: 2 }, preset: ["up"] },
+  { start: { r: 3, c: 0 }, goal: { r: 3, c: 3 }, preset: ["right"] },
+  { start: { r: 3, c: 0 }, goal: { r: 0, c: 1 }, preset: ["up"] },
+  { start: { r: 3, c: 3 }, goal: { r: 1, c: 1 }, preset: ["up"] },
 ];
 
 export function routeBuildTask(
@@ -38,7 +37,7 @@ export function routeBuildTask(
     kind: "starpathRouteBuild",
     mode,
     prompt,
-    speakText: `${prompt} Add moves in order, then press Run route to test it.`,
+    speakText: `${prompt} Any route that stays on the grid and reaches the goal will work. Add moves in order, then press Run route to test it.`,
     target,
     cols: 4,
     rows: 4,
@@ -47,10 +46,12 @@ export function routeBuildTask(
     goal: { r: routeCase.goal.r, c: routeCase.goal.c, object: goalObject },
     palette: ["up", "down", "left", "right"],
     preset: mode === "improve" ? routeCase.preset : undefined,
-    maxSteps: routeCase.distance,
+    // A 4×4 board has 16 cells. This permits every simple path across the
+    // board, plus sensible detours, instead of enforcing the shortest route.
+    maxSteps: 16,
     feedback: {
-      correct: "Your route reaches the goal — a clear set of directions!",
-      wrong: "The route did not land on the goal. Adjust your moves and run it again.",
+      correct: "Your route reaches the goal — one of many routes that can work!",
+      wrong: "The route must stay on the grid and finish on the goal. Adjust your moves and run it again.",
     },
   };
 }
