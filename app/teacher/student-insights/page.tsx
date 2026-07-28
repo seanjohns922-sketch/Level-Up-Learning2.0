@@ -11,6 +11,9 @@ import { YEAR_ORDER } from "@/data/yearOrder";
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { buildHeuristicTeacherInsight, type TeacherAttemptTopicSummary } from "@/lib/teacher-insights";
 import { fetchRealmCompatProgressForStudent } from "@/lib/realm-progress-compat";
+import AssessmentReplay, {
+  type TeacherAssessmentAttempt,
+} from "@/components/teacher/AssessmentReplay";
 
 type StudentRow = {
   id: string;
@@ -32,6 +35,8 @@ type ProgressRow = {
   unlocked_legends: unknown;
   quiz_scores: unknown;
   lesson_attempts?: unknown;
+  assessment_attempts?: TeacherAssessmentAttempt[];
+  weekly_quiz_attempts?: TeacherAssessmentAttempt[];
   updated_at?: string | null;
 };
 
@@ -97,10 +102,6 @@ function parseCompleted(raw: unknown): string[] {
   return [];
 }
 
-function parseRecord(raw: unknown): JsonObject {
-  return raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as JsonObject) : {};
-}
-
 function parseLessonAttempts(raw: unknown): Record<string, LessonAttemptRecord> {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) return raw as Record<string, LessonAttemptRecord>;
   if (typeof raw === "string") {
@@ -150,7 +151,9 @@ function chooseCurrentRow(rows: ProgressRow[], fallbackYear?: string | null) {
 
 function strandLabelForRealm(realmId: string | undefined | null) {
   const normalized = realmId?.trim().toLowerCase();
-  return normalized === "measurement" || normalized === "measurelands" ? "Measurement" : "Number";
+  if (normalized === "measurement" || normalized === "measurelands") return "Measurement";
+  if (normalized === "space" || normalized === "starpath") return "Space";
+  return "Number";
 }
 
 function toIsoOrNull(value: unknown) {
@@ -232,7 +235,12 @@ function StudentInsightsPageInner() {
   const searchParams = useSearchParams();
   const studentId = searchParams.get("studentId");
   const requestedRealm = searchParams.get("realm_id")?.trim().toLowerCase();
-  const selectedRealmId = requestedRealm === "measurement" || requestedRealm === "measurelands" ? "measurement" : "number";
+  const selectedRealmId =
+    requestedRealm === "measurement" || requestedRealm === "measurelands"
+      ? "measurement"
+      : requestedRealm === "space" || requestedRealm === "starpath"
+        ? "space"
+        : "number";
   const { user, loading: authLoading } = useAuthGuard();
   const [loading, setLoading] = useState(true);
   const [student, setStudent] = useState<StudentRow | null>(null);
@@ -240,6 +248,7 @@ function StudentInsightsPageInner() {
   const [progressRows, setProgressRows] = useState<ProgressRow[]>([]);
   const [reflections, setReflections] = useState<LessonReflectionRow[]>([]);
   const [tab, setTab] = useState<"overview" | "progress" | "assessments" | "reflections" | "mastery">("overview");
+  const [selectedAssessment, setSelectedAssessment] = useState<TeacherAssessmentAttempt | null>(null);
 
   useEffect(() => {
     if (authLoading || !user || !studentId) return;
@@ -491,6 +500,13 @@ function StudentInsightsPageInner() {
       }))
       .filter((item) => item.profile);
 
+    const assessmentAttempts = progressRows
+      .flatMap((row) => row.assessment_attempts ?? [])
+      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+    const weeklyQuizAttempts = progressRows
+      .flatMap((row) => row.weekly_quiz_attempts ?? [])
+      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+
     const masterySkills: Array<{
       skill: string;
       status: "mastered" | "developing" | "not_yet";
@@ -519,6 +535,8 @@ function StudentInsightsPageInner() {
       timelineEntries,
       pretests,
       posttests,
+      assessmentAttempts,
+      weeklyQuizAttempts,
       masterySkills,
     };
   }, [progressRows, student]);
@@ -636,28 +654,34 @@ function StudentInsightsPageInner() {
         ) : null}
 
         {tab === "assessments" ? (
-          <div className="grid gap-5 lg:grid-cols-2">
-            <HistoryCard title="Pre-Test">
-              {derived.pretests.length > 0 ? derived.pretests.map((item) => (
-                <HistoryRow
-                  key={`pre-${item.year}`}
-                  title={item.year}
-                  value={`${item.score}%`}
-                  meta={`Completed ${formatDate(item.date)}`}
-                />
-              )) : <EmptyState text="No pre-test history yet." />}
-            </HistoryCard>
-            <HistoryCard title="Post-Test">
-              {derived.posttests.length > 0 ? derived.posttests.map((item) => (
-                <HistoryRow
-                  key={`post-${item.year}`}
-                  title={item.year}
-                  value={`${item.profile?.percentage ?? "—"}%`}
-                  meta={item.profile?.passed ? "Passed" : "Needs review"}
-                />
-              )) : <EmptyState text="Post-Test not completed." />}
-            </HistoryCard>
-          </div>
+          selectedAssessment ? (
+            <AssessmentReplay
+              attempt={selectedAssessment}
+              studentName={student.display_name}
+              onBack={() => setSelectedAssessment(null)}
+            />
+          ) : (
+            <div className="grid gap-5 lg:grid-cols-3">
+              <AssessmentAttemptHistory
+                title="Pre-Test"
+                attempts={derived.assessmentAttempts.filter((attempt) => attempt.assessmentType === "pretest")}
+                emptyText="No pre-test history yet."
+                onView={setSelectedAssessment}
+              />
+              <AssessmentAttemptHistory
+                title="Weekly Quizzes"
+                attempts={derived.weeklyQuizAttempts}
+                emptyText="No weekly quiz history yet."
+                onView={setSelectedAssessment}
+              />
+              <AssessmentAttemptHistory
+                title="Post-Test"
+                attempts={derived.assessmentAttempts.filter((attempt) => attempt.assessmentType === "posttest")}
+                emptyText="Post-Test not completed."
+                onView={setSelectedAssessment}
+              />
+            </div>
+          )
         ) : null}
 
         {tab === "reflections" ? (
@@ -896,17 +920,48 @@ function HistoryCard({ title, children }: { title: string; children: React.React
   );
 }
 
-function HistoryRow({ title, value, meta }: { title: string; value: string; meta: string }) {
+function AssessmentAttemptHistory({
+  title,
+  attempts,
+  emptyText,
+  onView,
+}: {
+  title: string;
+  attempts: TeacherAssessmentAttempt[];
+  emptyText: string;
+  onView: (attempt: TeacherAssessmentAttempt) => void;
+}) {
   return (
-    <div className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-4 py-3">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-sm font-bold text-[#0F172A]">{title}</div>
-          <div className="text-xs text-[#64748B]">{meta}</div>
+    <HistoryCard title={title}>
+      {attempts.length > 0 ? attempts.map((attempt) => (
+        <div key={attempt.id} className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-4 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-bold text-[#0F172A]">
+                {attempt.workingLevel}
+                {attempt.assessmentType === "weekly_quiz" ? ` · Week ${attempt.week ?? "—"}` : ""}
+              </div>
+              <div className="mt-0.5 text-xs text-[#64748B]">
+                Completed {formatDate(attempt.completedAt)} · Attempt {attempt.attemptNumber}
+              </div>
+              <div className={`mt-1 text-xs font-extrabold ${attempt.passed ? "text-emerald-700" : "text-amber-700"}`}>
+                {attempt.passed ? "Passed" : "Not Passed"}
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-xl font-black text-[#0F172A]">{attempt.scorePercent}%</div>
+              <button
+                type="button"
+                onClick={() => onView(attempt)}
+                className="rounded-lg bg-[#0A2F2A] px-3 py-2 text-xs font-extrabold text-white hover:bg-[#12483F]"
+              >
+                View {attempt.assessmentType === "weekly_quiz" ? "Quiz" : "Assessment"}
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="text-xl font-black text-[#0F172A]">{value}</div>
-      </div>
-    </div>
+      )) : <EmptyState text={emptyText} />}
+    </HistoryCard>
   );
 }
 

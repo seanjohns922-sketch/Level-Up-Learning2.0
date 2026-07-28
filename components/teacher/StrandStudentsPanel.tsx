@@ -82,6 +82,9 @@ type ProgressRow = {
   unlocked_legends: unknown;
   quiz_scores: unknown;
   lesson_attempts?: unknown;
+  pretest_profile?: {
+    completedAt?: string | null;
+  } | null;
   teacher_advanced_weeks?: number[];
   teacher_overrides?: StudentProgressOverrideRow[];
   updated_at?: string;
@@ -821,6 +824,10 @@ function timeAgo(iso?: string): string {
   return `${Math.floor(d / 30)}mo ago`;
 }
 
+function pretestCompletedAt(row?: ProgressRow): string | undefined {
+  return row?.pretest_profile?.completedAt ?? row?.updated_at;
+}
+
 function formatDuration(seconds?: number | null) {
   if (!seconds || seconds <= 0) return "n/a";
   const minutes = Math.floor(seconds / 60);
@@ -914,8 +921,10 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
   function getLatestPretestProgress(studentId: string): ProgressRow | undefined {
     const rows = getStudentProgressRows(studentId).filter((p) => p.pretest_score != null);
     return [...rows].sort((a, b) => {
-      const tA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
-      const tB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+      const completedAtA = pretestCompletedAt(a);
+      const completedAtB = pretestCompletedAt(b);
+      const tA = completedAtA ? new Date(completedAtA).getTime() : 0;
+      const tB = completedAtB ? new Date(completedAtB).getTime() : 0;
       if (tA !== tB) return tB - tA;
       return yearOrdinal(b.year) - yearOrdinal(a.year);
     })[0];
@@ -1293,13 +1302,17 @@ function StudentStrandDetail({
     fallbackStatus: summaryStatus,
     liveRow,
   });
-  const pretestScore = latestPretest?.pretest_score ?? null;
+  const currentPretestScore = prog?.pretest_score ?? null;
+  const previousPretest =
+    latestPretest && latestPretest.year !== yearLabel ? latestPretest : undefined;
   const pretestSub =
-    pretestScore == null
-      ? "Not taken"
-      : pretestScore >= ASSESSMENT_PASS_THRESHOLD
-        ? `${yearToLevelLabel(latestPretest?.year ?? yearLabel)} pre-test passed · ${timeAgo(latestPretest?.updated_at)}`
-        : `${yearToLevelLabel(latestPretest?.year ?? yearLabel)} assigned · ${timeAgo(latestPretest?.updated_at)}`;
+    currentPretestScore != null
+      ? currentPretestScore >= ASSESSMENT_PASS_THRESHOLD
+        ? `${yearToLevelLabel(yearLabel)} pre-test passed · ${timeAgo(pretestCompletedAt(prog))}`
+        : `${yearToLevelLabel(yearLabel)} assigned · ${timeAgo(pretestCompletedAt(prog))}`
+      : previousPretest?.pretest_score != null
+        ? `${yearToLevelLabel(yearLabel)} not completed · Previous: ${yearToLevelLabel(previousPretest.year)} ${previousPretest.pretest_score}%`
+        : `${yearToLevelLabel(yearLabel)} not completed`;
 
   if (process.env.NODE_ENV !== "production") {
     console.debug("[StudentsTabDebug]", {
@@ -1357,8 +1370,8 @@ function StudentStrandDetail({
         <SnapshotTile label="Working Level / Week" value={yearToLevelLabel(yearLabel)} sub={`Week ${currentWeek} / ${maxWeek}`} />
         <SnapshotTile label="Current Plan" value={`${yearToLevelLabel(yearLabel)} ${genre.realm}`} sub={week?.topic ?? `Week ${currentWeek}`} />
         <SnapshotTile
-          label="Pre-test"
-          value={pretestScore != null ? `${pretestScore}%` : "—"}
+          label="Current Pre-test"
+          value={currentPretestScore != null ? `${currentPretestScore}%` : "—"}
           sub={pretestSub}
         />
         <SnapshotTile

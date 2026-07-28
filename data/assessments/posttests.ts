@@ -16,6 +16,7 @@ export type Question = {
   linkedWeeks?: number[];
   linkedLessons?: number[];
   strand?: string;
+  curriculumCodes?: string[];
   difficultyBand?: string;
   reviewFeedback?: string;
   visual?: unknown;

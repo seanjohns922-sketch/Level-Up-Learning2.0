@@ -22,6 +22,7 @@ import { saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { buildAssessmentQuestionSnapshots, type ReplayQuestionSource } from "@/lib/assessment-replay";
 
 export type StarpathVoyageQuizMeta = {
   level: RealmLevelId;
@@ -30,6 +31,8 @@ export type StarpathVoyageQuizMeta = {
   title: string;
   coverage: string;
   lessonTitles: [string, string, string];
+  lessonCurriculumCodes: [string[], string[], string[]];
+  lessonSkillIds: [string[], string[], string[]];
   weekHref: string;
   nextWeekHref?: string;
 };
@@ -81,6 +84,7 @@ export default function StarpathVoyageQuiz({
   const [hasResume, setHasResume] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
 
   const orderedTasks = useMemo(
     () => order.map((taskIndex) => tasks[taskIndex]).filter((task): task is PracticeTask => Boolean(task)),
@@ -164,6 +168,7 @@ export default function StarpathVoyageQuiz({
       setAnswers({});
       localStorage.removeItem(storageKey);
     }
+    setStartedAt((current) => current ?? Date.now());
     setPhase("quiz");
   }
 
@@ -173,6 +178,34 @@ export default function StarpathVoyageQuiz({
     const score = Object.values(answers).filter(Boolean).length;
     const finalPercent = total > 0 ? Math.round((score / total) * 100) : 0;
     const studentId = getActiveStudentIdentity().studentId;
+    const completedAt = new Date().toISOString();
+    const replaySources: ReplayQuestionSource[] = orderedTasks.map((quizTask, questionIndex) => {
+      const lessonIndex = Math.min(2, Math.floor(questionIndex / 5));
+      return {
+        id: `${quiz.level}-space-w${quiz.week}-quiz-q${questionIndex + 1}`,
+        prompt: taskPrompt(quizTask),
+        type: "practiceTask",
+        correctAnswer: "Correct response",
+        skillId: quiz.lessonSkillIds[lessonIndex][0],
+        skillLabel: quiz.lessonTitles[lessonIndex],
+        strand: "Space",
+        curriculumCodes: quiz.lessonCurriculumCodes[lessonIndex],
+        linkedWeeks: [quiz.week],
+        linkedLessons: [lessonIndex + 1],
+        reviewFeedback: taskFeedback(quizTask)?.wrong,
+        practiceTask: quizTask,
+      };
+    });
+    const questionResults = buildAssessmentQuestionSnapshots(
+      replaySources,
+      (_question, questionIndex) =>
+        answers[String(questionIndex)] === true ? "Correct response" : "Incorrect response",
+      (_question, _answer) => {
+        const questionIndex = replaySources.indexOf(_question);
+        return answers[String(questionIndex)] === true;
+      },
+      completedAt,
+    );
 
     try {
       const passedQuiz = weeklyQuizPassed(finalPercent);
@@ -185,7 +218,25 @@ export default function StarpathVoyageQuiz({
           studentId,
           quiz.level,
           quiz.week,
-          { percent: finalPercent, score, total },
+          {
+            percent: finalPercent,
+            score,
+            total,
+            passed: passedQuiz,
+            lessonBreakdown: lessonScores.map((result) => ({
+              lessonNumber: result.lesson,
+              lessonTitle: result.title,
+              correct: result.score,
+              total: 5,
+              percent: result.score * 20,
+            })),
+            questionResults,
+            replay_metadata: {
+              duration_seconds: startedAt ? Math.max(0, Math.floor((Date.now() - startedAt) / 1000)) : null,
+              question_snapshot_schema: 1,
+            },
+            at: completedAt,
+          },
           newCompletionKey(),
           "space"
         );
@@ -208,6 +259,7 @@ export default function StarpathVoyageQuiz({
     setIndex(0);
     setNonce((value) => value + 1);
     setFinalScore(0);
+    setStartedAt(Date.now());
     setHasResume(false);
     localStorage.removeItem(storageKey);
     setPhase("quiz");

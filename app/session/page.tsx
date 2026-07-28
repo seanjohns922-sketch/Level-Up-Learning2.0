@@ -48,6 +48,7 @@ import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechI
 import { Volume2, Sparkles, Zap, Check, PartyPopper, SkipForward } from "lucide-react";
 import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
 import type { TeacherAttemptQuestion } from "@/lib/teacher-insights";
+import { buildAssessmentQuestionSnapshots, type ReplayQuestionSource } from "@/lib/assessment-replay";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
@@ -7944,6 +7945,13 @@ function SessionPage({
       ),
     [quizWeekPlan]
   );
+  const lessonCurriculumLookup = useMemo<Record<number, string[]>>(
+    () =>
+      Object.fromEntries(
+        (quizWeekPlan?.lessons ?? []).map((lesson) => [lesson.lesson, lesson.curriculum ?? []])
+      ),
+    [quizWeekPlan]
+  );
 
   async function completeLesson() {
     try {
@@ -8771,6 +8779,36 @@ function SessionPage({
       quizMoneyAnswers,
       quizLessonActivityResults
     );
+    const completedAt = new Date().toISOString();
+    const replaySources: ReplayQuestionSource[] = quizQuestions.map((question, index) => {
+      const result = questionResults[index];
+      const lessonNumber = question.lessonTag ?? question.lessonNumber ?? Math.floor(index / 5) + 1;
+      return {
+        id: question.id,
+        prompt: question.prompt,
+        type: question.kind,
+        options: question.options,
+        correctAnswer: result?.correctAnswer ?? null,
+        skillId: question.skill ?? question.quizMeta?.type,
+        skillLabel: question.skill ?? lessonTitleLookup[lessonNumber] ?? `Lesson ${lessonNumber}`,
+        strand: isMeasurementRealm ? "Measurement" : "Number",
+        curriculumCodes: lessonCurriculumLookup[lessonNumber] ?? quizWeekPlan?.curriculum ?? [],
+        linkedWeeks: [Number(week)],
+        linkedLessons: [lessonNumber],
+        reviewFeedback: question.feedbackIncorrect ?? question.feedbackCorrect,
+        visual: question.visual,
+        practiceTask: question.practiceTask,
+      };
+    });
+    const replayQuestionResults = buildAssessmentQuestionSnapshots(
+      replaySources,
+      (_question, index) => questionResults[index]?.selectedAnswer ?? null,
+      (_question, _answer, ) => {
+        const index = replaySources.indexOf(_question);
+        return questionResults[index]?.correct === true;
+      },
+      completedAt,
+    );
     const mistakeItems = buildQuizMistakeReviewItems(
         quizQuestions,
         quizAnswers,
@@ -8794,9 +8832,13 @@ function SessionPage({
       passRate,
       passed,
       lessonBreakdown,
-      questionResults,
+      questionResults: replayQuestionResults,
+      replay_metadata: {
+        duration_seconds: Math.max(0, Math.floor((Date.now() - sessionStartTime) / 1000)),
+        question_snapshot_schema: 1,
+      },
       insight: null,
-      at: new Date().toISOString(),
+      at: completedAt,
     };
 
     try {

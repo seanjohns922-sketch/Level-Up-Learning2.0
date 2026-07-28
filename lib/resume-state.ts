@@ -20,6 +20,8 @@ export type PretestResumeState = {
   answers: Array<string | null>;
   /** Question ids the student tapped "I Don't Know" on (for later analytics). */
   idkResponses: string[];
+  /** First time this assessment attempt was started, retained across resumes. */
+  startedAt?: number;
   updatedAt: number;
 };
 

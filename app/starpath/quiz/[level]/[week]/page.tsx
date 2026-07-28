@@ -47,6 +47,16 @@ export default async function StarpathQuizPage({
           title: `${weekPlan.title} Voyage Quiz`,
           coverage: weekPlan.quiz.coverage,
           lessonTitles: weekPlan.lessons.map((lesson) => lesson.title) as [string, string, string],
+          lessonCurriculumCodes: weekPlan.lessons.map(() => [...weekPlan.descriptorCodes]) as [
+            string[],
+            string[],
+            string[],
+          ],
+          lessonSkillIds: weekPlan.lessons.map((lesson) => [...lesson.skillIds]) as [
+            string[],
+            string[],
+            string[],
+          ],
           weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
           nextWeekHref:
             week < program.weeks.length

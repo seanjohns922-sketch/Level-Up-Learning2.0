@@ -24,6 +24,8 @@ import { ASSESSMENT_THRESHOLDS, posttestPassed } from "@/lib/assessment-rules";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 import { clearCompletionId, getOrCreateCompletionId } from "@/lib/resume-state";
+import { buildAssessmentQuestionSnapshots } from "@/lib/assessment-replay";
+import { curriculumCodesForAssessmentQuestion } from "@/lib/assessment-curriculum";
 
 const PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
 const POSTTEST_DRAFT_VERSION = 1;
@@ -339,15 +341,15 @@ function PostTestPage() {
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
 
-  const test = useMemo(() => {
-    return getPosttestForYearLabel(year, progressRealmId);
-  }, [year, progressRealmId]);
-
-  const questions: Question[] = test?.questions ?? [];
+  const questions = useMemo<Question[]>(
+    () => getPosttestForYearLabel(year, progressRealmId)?.questions ?? [],
+    [year, progressRealmId],
+  );
 
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [assessmentStartedAt, setAssessmentStartedAt] = useState(() => Date.now());
   const [posttestReviewItems, setPosttestReviewItems] = useState<MistakeReviewItem[]>([]);
   const [pendingResultsUrl, setPendingResultsUrl] = useState<string | null>(null);
   const [mab, setMab] = useState<{ tens: number; ones: number }>({
@@ -420,7 +422,7 @@ function PostTestPage() {
     try {
       const raw = localStorage.getItem(getPosttestDraftKey(progressRealmId, year));
       if (raw) {
-        const draft = JSON.parse(raw) as { index?: unknown; answers?: unknown };
+        const draft = JSON.parse(raw) as { index?: unknown; answers?: unknown; startedAt?: unknown };
         if (draft.answers && typeof draft.answers === "object") {
           const validIds = new Set(questions.map((question) => question.id));
           const restoredAnswers = Object.fromEntries(
@@ -432,6 +434,9 @@ function PostTestPage() {
         }
         if (typeof draft.index === "number" && Number.isInteger(draft.index)) {
           setIdx(Math.max(0, Math.min(questions.length - 1, draft.index)));
+        }
+        if (typeof draft.startedAt === "number" && Number.isFinite(draft.startedAt)) {
+          setAssessmentStartedAt(draft.startedAt);
         }
       }
     } catch {
@@ -445,9 +450,9 @@ function PostTestPage() {
     if (!draftLoaded || submitted || questions.length === 0) return;
     localStorage.setItem(
       getPosttestDraftKey(progressRealmId, year),
-      JSON.stringify({ index: idx, answers })
+      JSON.stringify({ index: idx, answers, startedAt: assessmentStartedAt })
     );
-  }, [answers, draftLoaded, idx, progressRealmId, questions.length, submitted, year]);
+  }, [answers, assessmentStartedAt, draftLoaded, idx, progressRealmId, questions.length, submitted, year]);
 
   function pick(option: string) {
     if (!q) return;
@@ -531,12 +536,34 @@ function PostTestPage() {
     const nextUnlocked = didPass
       ? Array.from(new Set([...unlockedLegends, legend.id]))
       : unlockedLegends;
+    const completedAt = new Date().toISOString();
+    const durationSeconds = Math.max(0, Math.round((Date.now() - assessmentStartedAt) / 1000));
+    const replayQuestions = questions.map((question) => ({
+      ...question,
+      curriculumCodes: curriculumCodesForAssessmentQuestion(progressRealmId, year, question),
+    }));
+    const questionResults = buildAssessmentQuestionSnapshots(
+      replayQuestions,
+      (snapshotQuestion) => finalAnswers[snapshotQuestion.id] ?? null,
+      (snapshotQuestion, answer) =>
+        isAssessmentAnswerCorrect(snapshotQuestion as Question, typeof answer === "string" ? answer : undefined),
+      completedAt,
+    );
 
     try {
       if (!studentId) throw new Error("No active student session");
       const assessmentCompletionKey = `posttest:${progressRealmId}:${year}`;
       const completionId = getOrCreateCompletionId(assessmentCompletionKey);
-      const latest = { ...profile, assignedWeek, at: new Date().toISOString() };
+      const latest = {
+        ...profile,
+        assignedWeek,
+        at: completedAt,
+        replay_metadata: {
+          started_at: new Date(assessmentStartedAt).toISOString(),
+          completed_at: completedAt,
+          duration_seconds: durationSeconds,
+        },
+      };
       const progressPayload = {
         status: didPass ? "PASSED" : "ASSIGNED_PROGRAM",
         current_week: didPass ? prev?.assignedWeek ?? null : assignedWeek ?? prev?.assignedWeek ?? 1,
@@ -552,16 +579,8 @@ function PostTestPage() {
           score_percent: percent,
           passed: didPass,
           placement_result: latest,
-          question_results: questions.map((question) => ({
-            question_id: question.id,
-            answer: finalAnswers[question.id] ?? null,
-            correct: isAssessmentAnswerCorrect(question, finalAnswers[question.id]),
-            skill_id: question.skillId ?? null,
-            skill_label: question.skillLabel ?? null,
-            week: question.linkedWeeks?.[0] ?? null,
-            lesson: question.linkedLessons?.[0] ?? null,
-          })),
-          completed_at: new Date().toISOString(),
+          question_results: questionResults,
+          completed_at: completedAt,
         }, completionId, progressPayload, progressRealmId);
       const restored = await restoreStudentStateFromServer(studentId, progressRealmId);
       if (!restored.progress) throw new Error("Saved post-test did not produce canonical progress");

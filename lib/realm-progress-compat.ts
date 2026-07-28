@@ -20,6 +20,8 @@ export type CompatProgressRow = {
   lesson_attempts?: unknown;
   pretest_profile?: Record<string, unknown> | null;
   posttest_profile?: Record<string, unknown> | null;
+  assessment_attempts?: NormalizedAssessmentAttempt[];
+  weekly_quiz_attempts?: NormalizedWeeklyQuizAttempt[];
   teacher_advanced_weeks?: number[];
   teacher_overrides?: StudentProgressOverrideRow[];
   has_seen_intro?: boolean | null;
@@ -75,6 +77,7 @@ type LessonAttemptRow = {
 };
 
 type WeeklyQuizAttemptRow = {
+  id: string;
   student_id: string;
   realm_id: string;
   working_level: string;
@@ -92,6 +95,7 @@ type WeeklyQuizAttemptRow = {
 };
 
 type RealmAssessmentRow = {
+  id: string;
   student_id: string;
   realm_id: string;
   working_level: string;
@@ -103,6 +107,37 @@ type RealmAssessmentRow = {
   placement_result: Record<string, unknown> | null;
   question_results: unknown;
   completed_at: string;
+};
+
+export type NormalizedAssessmentAttempt = {
+  id: string;
+  realmId: string;
+  workingLevel: string;
+  assessmentType: "pretest" | "posttest";
+  attemptNumber: number;
+  correctCount: number | null;
+  totalQuestions: number | null;
+  scorePercent: number;
+  passed: boolean | null;
+  completedAt: string;
+  placementResult: Record<string, unknown>;
+  questionResults: unknown[];
+};
+
+export type NormalizedWeeklyQuizAttempt = {
+  id: string;
+  realmId: string;
+  workingLevel: string;
+  assessmentType: "weekly_quiz";
+  week: number;
+  attemptNumber: number;
+  correctCount: number;
+  totalQuestions: number;
+  scorePercent: number;
+  passed: boolean;
+  completedAt: string;
+  placementResult: Record<string, unknown>;
+  questionResults: unknown[];
 };
 
 export type StudentProgressOverrideRow = {
@@ -220,7 +255,26 @@ function normalizeQuizAttemptSummary(row: WeeklyQuizAttemptRow) {
   };
 }
 
-function normalizeAssessmentAttempt(row: RealmAssessmentRow) {
+function normalizeWeeklyQuizAttempt(row: WeeklyQuizAttemptRow): NormalizedWeeklyQuizAttempt {
+  const summary = normalizeQuizAttemptSummary(row) as Record<string, unknown>;
+  return {
+    id: row.id,
+    realmId: row.realm_id,
+    workingLevel: row.working_level,
+    assessmentType: "weekly_quiz",
+    week: row.week,
+    attemptNumber: row.attempt_no,
+    correctCount: row.correct_count,
+    totalQuestions: row.total_questions,
+    scorePercent: row.accuracy_percent,
+    passed: row.passed,
+    completedAt: row.completed_at,
+    placementResult: summary,
+    questionResults: Array.isArray(summary.questionResults) ? summary.questionResults : [],
+  };
+}
+
+function normalizeAssessmentProfile(row: RealmAssessmentRow) {
   const placementResult = parseObject(row.placement_result);
   return {
     ...placementResult,
@@ -232,6 +286,26 @@ function normalizeAssessmentAttempt(row: RealmAssessmentRow) {
     passed: row.passed ?? placementResult.passed ?? null,
     questionResults: row.question_results ?? placementResult.questionResults ?? [],
     completedAt: row.completed_at,
+  };
+}
+
+function normalizeAssessmentAttempt(
+  row: RealmAssessmentRow,
+  attemptNumber: number,
+): NormalizedAssessmentAttempt {
+  return {
+    id: row.id,
+    realmId: row.realm_id,
+    workingLevel: row.working_level,
+    assessmentType: row.assessment_type === "posttest" ? "posttest" : "pretest",
+    attemptNumber,
+    correctCount: row.correct_count,
+    totalQuestions: row.total_questions,
+    scorePercent: row.score_percent,
+    passed: row.passed,
+    completedAt: row.completed_at,
+    placementResult: parseObject(row.placement_result),
+    questionResults: Array.isArray(row.question_results) ? row.question_results : [],
   };
 }
 
@@ -338,7 +412,7 @@ function buildRowsFromRealmData(
 
     const posttests = assessmentRows.filter((row) => row.assessment_type === "posttest");
     if (posttests.length > 0) {
-      const attempts = posttests.map(normalizeAssessmentAttempt);
+      const attempts = posttests.map(normalizeAssessmentProfile);
       quizScores.posttest = {
         latest: attempts[attempts.length - 1],
         attempts,
@@ -365,8 +439,17 @@ function buildRowsFromRealmData(
       unlocked_legends: parseStringArray(summary.unlocked_legends),
       quiz_scores: quizScores,
       lesson_attempts: lessonAttemptsById,
-      pretest_profile: latestPretest ? normalizeAssessmentAttempt(latestPretest) : null,
-      posttest_profile: latestPosttest ? normalizeAssessmentAttempt(latestPosttest) : null,
+      pretest_profile: latestPretest ? normalizeAssessmentProfile(latestPretest) : null,
+      posttest_profile: latestPosttest ? normalizeAssessmentProfile(latestPosttest) : null,
+      assessment_attempts: assessmentRows.map((row) => {
+        const sameTypeAndLevel = assessmentRows.filter(
+          (candidate) =>
+            candidate.assessment_type === row.assessment_type &&
+            candidate.working_level === row.working_level,
+        );
+        return normalizeAssessmentAttempt(row, sameTypeAndLevel.indexOf(row) + 1);
+      }),
+      weekly_quiz_attempts: quizRows.map(normalizeWeeklyQuizAttempt),
       teacher_advanced_weeks: (overrideMap.get(key) ?? []).map((row) => row.week).sort((a, b) => a - b),
       teacher_overrides: [...(overrideMap.get(key) ?? [])].sort(
         (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
@@ -410,7 +493,7 @@ export async function fetchRealmCompatProgressForClass(realmId: string, classId:
     }),
     supabase
       .from("student_realm_assessments")
-      .select("student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,passed,placement_result,question_results,completed_at")
+      .select("id,student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,passed,placement_result,question_results,completed_at")
       .in("student_id", studentIds)
       .eq("realm_id", realmId),
     supabase

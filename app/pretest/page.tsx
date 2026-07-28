@@ -30,6 +30,8 @@ import {
 import { clearActiveStudentSession } from "@/lib/studentIdentity";
 import { supabase } from "@/lib/supabase";
 import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
+import { buildAssessmentQuestionSnapshots } from "@/lib/assessment-replay";
+import { curriculumCodesForAssessmentQuestion } from "@/lib/assessment-curriculum";
 
 const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
@@ -385,6 +387,7 @@ function PretestPage() {
   });
   // Question ids the student tapped "I Don't Know" on (analytics-only).
   const [idkResponses, setIdkResponses] = useState<string[]>([]);
+  const [assessmentStartedAt, setAssessmentStartedAt] = useState(() => Date.now());
   // Save & resume gate + restored-snapshot flag.
   const [resumeReady, setResumeReady] = useState(false);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
@@ -463,6 +466,7 @@ function PretestPage() {
       });
       setAnswers(restored);
       setIdkResponses(snapshot.idkResponses ?? []);
+      setAssessmentStartedAt(snapshot.startedAt ?? Date.now());
       setIndex(Math.min(snapshot.index, Math.max(0, questions.length - 1)));
     }
     setShowResumePrompt(false);
@@ -472,6 +476,7 @@ function PretestPage() {
     clearPretestResume(year, progressRealmId);
     setAnswers(Array(questions.length).fill(null));
     setIdkResponses([]);
+    setAssessmentStartedAt(Date.now());
     setIndex(0);
     setShowResumePrompt(false);
   }
@@ -485,9 +490,10 @@ function PretestPage() {
       index,
       answers,
       idkResponses,
+      startedAt: assessmentStartedAt,
       updatedAt: Date.now(),
     });
-  }, [resumeReady, showResumePrompt, year, progressRealmId, index, answers, idkResponses]);
+  }, [resumeReady, showResumePrompt, year, progressRealmId, index, answers, idkResponses, assessmentStartedAt]);
 
   function choose(value: string) {
     const next = [...answers];
@@ -533,7 +539,15 @@ function PretestPage() {
 
   // ── Exit options — every path saves the snapshot first so nothing is lost ──
   function persistSnapshot() {
-    savePretestResume({ year, realmId: progressRealmId, index, answers, idkResponses, updatedAt: Date.now() });
+    savePretestResume({
+      year,
+      realmId: progressRealmId,
+      index,
+      answers,
+      idkResponses,
+      startedAt: assessmentStartedAt,
+      updatedAt: Date.now(),
+    });
   }
   function exitToHome() {
     persistSnapshot();
@@ -596,6 +610,19 @@ function PretestPage() {
       : requiresFullPathway
         ? []
         : getOptionalWeeks(requiredWeeks, progressRealmId);
+    const completedAt = new Date().toISOString();
+    const durationSeconds = Math.max(0, Math.round((Date.now() - assessmentStartedAt) / 1000));
+    const replayQuestions = questions.map((question) => ({
+      ...question,
+      curriculumCodes: curriculumCodesForAssessmentQuestion(progressRealmId, year, question),
+    }));
+    const questionResults = buildAssessmentQuestionSnapshots(
+      replayQuestions,
+      (_question, questionIndex) => resolved[questionIndex],
+      (snapshotQuestion, answer) =>
+        isPretestResponseCorrect(snapshotQuestion as Question, typeof answer === "string" ? answer : null),
+      completedAt,
+    );
 
     let nextProgress: StudentProgress;
 
@@ -661,9 +688,16 @@ function PretestPage() {
           total_questions: questions.length,
           score_percent: profile.percentage,
           passed: nextProgress.status === "PASSED",
-          placement_result: profile,
-          question_results: [],
-          completed_at: new Date().toISOString(),
+          placement_result: {
+            ...profile,
+            replay_metadata: {
+              started_at: new Date(assessmentStartedAt).toISOString(),
+              completed_at: completedAt,
+              duration_seconds: durationSeconds,
+            },
+          },
+          question_results: questionResults,
+          completed_at: completedAt,
         }, completionId, progressPayload, progressRealmId);
       const restored = await restoreStudentStateFromServer(studentId, progressRealmId);
       if (!restored.progress) throw new Error("Saved pre-test did not produce canonical progress");
