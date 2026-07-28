@@ -18,6 +18,10 @@ const scoreRestoration = fs.readFileSync(
   path.join(root, "supabase/migrations/20260722110000_restore_unbounded_timed_lesson_totals.sql"),
   "utf8",
 );
+const remainingScoreRestoration = fs.readFileSync(
+  path.join(root, "supabase/migrations/20260729100000_restore_remaining_uncapped_lesson_totals.sql"),
+  "utf8",
+);
 const resumeState = fs.readFileSync(path.join(root, "lib/resume-state.ts"), "utf8");
 const lessonPage = fs.readFileSync(path.join(root, "app/lesson/page.tsx"), "utf8");
 const sessionPage = fs.readFileSync(path.join(root, "app/session/page.tsx"), "utf8");
@@ -43,6 +47,9 @@ const checks = [
   ["legacy impossible totals retain repair metadata", /original_total_questions[\s\S]*where total_questions > 10/.test(scoreRepair)],
   ["preserved timed lesson totals are restored", /original_total_questions[\s\S]*timed_lessons_are_unbounded/.test(scoreRestoration)],
   ["live snapshots are repaired from canonical attempts", /latest_restored_attempt[\s\S]*update public\.live_student_activity/.test(scoreRestoration)],
+  ["remaining capped rows require proof of a higher saved total", /total_questions = 10[\s\S]*recovered_total > 10/.test(remainingScoreRestoration)],
+  ["legitimate ten-question sessions remain unchanged", /recovered_total > 10/.test(remainingScoreRestoration)],
+  ["remaining restoration reads saved attempt totals", /totalQuestions[\s\S]*questionsAnswered/.test(remainingScoreRestoration)],
 ];
 
 let failed = 0;
