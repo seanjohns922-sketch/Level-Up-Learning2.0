@@ -2815,6 +2815,7 @@ export type PracticeTask = (
       blocked?: Array<{ r: number; c: number }>;
       checkpoints?: Array<{ r: number; c: number; object: string }>;
       missionRule?: string;
+      singleAttempt?: boolean;
       maxSteps: number;
       feedback: { correct: string; wrong: string };
     }

@@ -167,20 +167,24 @@ export function StarpathRouteDebugCard({
 export function StarpathRouteBuildCard({
   task,
   onComplete,
+  onWrong,
 }: {
   task: RouteBuildTask;
   onComplete: () => void;
+  onWrong: (studentAnswer?: string) => void;
 }) {
   const [moves, setMoves] = useState<Direction[]>(task.preset ? [...task.preset] : []);
   const [cell, setCell] = useState<Cell>(task.start);
   const [status, setStatus] = useState<"editing" | "running" | "fail" | "done">("editing");
   const doneRef = useRef(false);
+  const submittedRef = useRef(false);
   const cellKey = (value: Cell) => `${value.r}:${value.c}`;
   const blockedKeys = new Set((task.blocked ?? []).map(cellKey));
   const checkpointKeys = new Set((task.checkpoints ?? []).map(cellKey));
+  const attemptLocked = task.singleAttempt === true && submittedRef.current;
 
   function add(direction: Direction) {
-    if (status === "running" || status === "done") return;
+    if (status === "running" || status === "done" || attemptLocked) return;
     if (moves.length >= task.maxSteps) return;
     setMoves((prev) => [...prev, direction]);
     setStatus("editing");
@@ -188,21 +192,22 @@ export function StarpathRouteBuildCard({
   }
 
   function undo() {
-    if (status === "running" || status === "done") return;
+    if (status === "running" || status === "done" || attemptLocked) return;
     setMoves((prev) => prev.slice(0, -1));
     setStatus("editing");
     setCell(task.start);
   }
 
   function reset() {
-    if (status === "done") return;
+    if (status === "done" || attemptLocked) return;
     setMoves(task.preset ? [...task.preset] : []);
     setStatus("editing");
     setCell(task.start);
   }
 
   function run() {
-    if (status === "running" || status === "done" || moves.length === 0) return;
+    if (status === "running" || status === "done" || attemptLocked || moves.length === 0) return;
+    if (task.singleAttempt) submittedRef.current = true;
     setStatus("running");
     let index = 0;
     let position: Cell = task.start;
@@ -228,6 +233,9 @@ export function StarpathRouteBuildCard({
           setTimeout(onComplete, 1000);
         } else {
           setStatus("fail");
+          if (task.singleAttempt) {
+            onWrong(moves.join(", "));
+          }
         }
         return;
       }
@@ -312,7 +320,9 @@ export function StarpathRouteBuildCard({
           <div>
             <span className="block text-xs font-black uppercase tracking-[0.16em] text-violet-700">{paletteWord}</span>
             <span className="mt-1 block text-xs font-semibold text-slate-500">
-              Any route works if it stays on the grid and reaches the goal.
+              {task.mode === "mission"
+                ? "Follow every mission rule and reach the goal. You can run this route once."
+                : "Any route works if it stays on the grid and reaches the goal."}
             </span>
           </div>
           <span className="text-xs font-black text-slate-500">
@@ -341,7 +351,7 @@ export function StarpathRouteBuildCard({
         <div className="flex flex-wrap items-center justify-center gap-2">
           {task.palette.map((direction) => {
             const Icon = ARROW_ICON[direction];
-            const disabled = status === "running" || status === "done" || moves.length >= task.maxSteps;
+            const disabled = status === "running" || status === "done" || attemptLocked || moves.length >= task.maxSteps;
             return (
               <button
                 key={direction}
@@ -362,7 +372,7 @@ export function StarpathRouteBuildCard({
           <button
             type="button"
             onClick={undo}
-            disabled={status === "running" || status === "done" || moves.length === 0}
+            disabled={status === "running" || status === "done" || attemptLocked || moves.length === 0}
             className="flex min-h-11 items-center gap-1.5 rounded-xl border-2 border-slate-200 bg-white px-4 font-black text-slate-700 transition hover:border-slate-300 active:scale-95 disabled:opacity-30"
           >
             <X className="h-4 w-4" strokeWidth={3} /> Undo
@@ -370,7 +380,7 @@ export function StarpathRouteBuildCard({
           <button
             type="button"
             onClick={reset}
-            disabled={status === "running" || status === "done"}
+            disabled={status === "running" || status === "done" || attemptLocked}
             className="flex min-h-11 items-center gap-1.5 rounded-xl border-2 border-slate-200 bg-white px-4 font-black text-slate-700 transition hover:border-slate-300 active:scale-95 disabled:opacity-30"
           >
             <RotateCcw className="h-4 w-4" strokeWidth={3} /> Reset
@@ -378,7 +388,7 @@ export function StarpathRouteBuildCard({
           <button
             type="button"
             onClick={run}
-            disabled={status === "running" || status === "done" || moves.length === 0}
+            disabled={status === "running" || status === "done" || attemptLocked || moves.length === 0}
             className="flex min-h-11 items-center gap-1.5 rounded-xl bg-violet-700 px-6 font-black text-white shadow-lg transition hover:bg-violet-600 active:scale-95 disabled:opacity-40"
           >
             <Play className="h-4 w-4 fill-white" strokeWidth={3} /> Run route

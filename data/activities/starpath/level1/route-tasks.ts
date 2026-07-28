@@ -161,10 +161,11 @@ export function routeMissionTask(round: number, target: number): PracticeTask {
     blocked: mission.blocked,
     checkpoints: mission.checkpoints,
     missionRule: mission.rule,
+    singleAttempt: true,
     maxSteps: 16,
     feedback: {
       correct: "Mission complete. Your planned route followed every rule!",
-      wrong: "Check the mission rule, stay on the grid and finish on the goal.",
+      wrong: "This route did not complete the mission. Check every rule before planning the next route.",
     },
   };
 }

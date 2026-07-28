@@ -644,7 +644,7 @@ function TaskRendererInner({
     case "starpathRouteDebug":
       return <StarpathRouteDebugCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathRouteBuild":
-      return <StarpathRouteBuildCard key={k} task={t} onComplete={onC} />;
+      return <StarpathRouteBuildCard key={k} task={t} onComplete={onC} onWrong={onW} />;
     case "starpathRouteRecord":
       return <StarpathRouteRecordCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathShapeHunt":
