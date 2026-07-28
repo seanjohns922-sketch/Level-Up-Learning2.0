@@ -2,7 +2,11 @@ import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprin
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { LEVEL_ONE_ARTWORK } from "./shared";
-import { routeBuildTask } from "./route-tasks";
+import {
+  routeBuildTask,
+  routeMissionTask,
+  routeRecordTask,
+} from "./route-tasks";
 
 // Level 1 · Week 6 — Build a Route. The genuine Year 1 step past Foundation:
 // the child CREATES an ordered set of moves (an algorithm) to carry the rover
@@ -49,13 +53,13 @@ export function createDirectionsForAFriendTaskSet(): RealmLessonTaskSet {
   return {
     teaching: teaching(
       "Directions for a Friend",
-      "Clear directions can be followed by someone else.",
-      "Record a route another explorer could follow. Put the moves in order so it reaches the goal."
+      "A planned path can be communicated as ordered directions.",
+      "Read a route from its start. Record each move in order so another explorer can follow the same path."
     ),
     activities: [
-      () => routeBuildTask(a++, ++target, "record"),
-      () => routeBuildTask(b++ + 1, ++target, "record"),
-      () => routeBuildTask(c++ + 2, ++target, "record"),
+      () => routeRecordTask(a++, ++target),
+      () => routeRecordTask(b++ + 1, ++target),
+      () => routeRecordTask(c++ + 2, ++target),
     ],
   };
 }
@@ -68,13 +72,13 @@ export function createRouteDesignerTaskSet(): RealmLessonTaskSet {
   return {
     teaching: teaching(
       "Route Designer",
-      "Design a clear route to any goal.",
-      "Design routes to different goals. Build the moves in order and run each one to check it works."
+      "A mission route must reach its goal and follow every rule.",
+      "Plan a route that collects checkpoints, avoids blocked squares and reaches the goal. More than one route can work."
     ),
     activities: [
-      () => routeBuildTask(a++ + 2, ++target, "build"),
-      () => routeBuildTask(b++ + 3, ++target, "record"),
-      () => routeBuildTask(c++ + 1, ++target, "build"),
+      () => routeMissionTask(a++, ++target),
+      () => routeMissionTask(b++ + 1, ++target),
+      () => routeMissionTask(c++ + 2, ++target),
     ],
   };
 }
@@ -101,40 +105,40 @@ export const BUILD_A_ROUTE_CONTENT = {
 
 export const DIRECTIONS_FOR_A_FRIEND_CONTENT = {
   missionBrief:
-    "Another explorer will follow your directions. Record a route, in order, that gets the rover to the goal.",
-  successCriteria: ["record moves in order", "make the route reach the goal", "keep it clear"],
+    "A glowing trail is already planned. Translate it into ordered directions and send them to another explorer.",
+  successCriteria: ["start at the rover", "read each trail step", "record directions in order"],
   artworkSrc: LEVEL_ONE_ARTWORK,
   teaching: { title: "Directions for a Friend", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "record-1", title: "Write It Down", description: "Record a route for a friend.", taskKinds: ["starpathRouteBuild"] },
-    { key: "record-2", title: "Route Note", description: "Record another route.", taskKinds: ["starpathRouteBuild"] },
-    { key: "record-3", title: "Note Master", description: "Record a clear route independently.", taskKinds: ["starpathRouteBuild"] },
+    { key: "record-1", title: "Read the Trail", description: "Translate a glowing trail into directions.", taskKinds: ["starpathRouteRecord"] },
+    { key: "record-2", title: "Send the Route", description: "Record ordered moves for a friend.", taskKinds: ["starpathRouteRecord"] },
+    { key: "record-3", title: "Mission Message", description: "Communicate a complete route independently.", taskKinds: ["starpathRouteRecord"] },
   ],
   reflection: {
     prompt: "What makes directions clear?",
-    options: ["The moves are in order", "They reach the goal", "Someone else could follow them"],
+    options: ["They begin at the start", "The moves are in order", "They match the pathway"],
   },
-  practisedSkills: ["Record an ordered route", "Communicate directions", "Reach a goal for another"],
+  practisedSkills: ["Translate a visual route", "Record ordered directions", "Communicate a pathway"],
   nextUpLabel: "Route Designer",
   createTaskSet: createDirectionsForAFriendTaskSet,
 } satisfies StarpathLessonContent;
 
 export const ROUTE_DESIGNER_CONTENT = {
   missionBrief:
-    "Become a route designer. Build clear routes to different goals across the grid and run each one to prove it works.",
-  successCriteria: ["design a route to any goal", "keep the moves in order", "test each route"],
+    "Plan Starpath missions with checkpoints and blocked squares. Any route works if it follows every rule and reaches the goal.",
+  successCriteria: ["follow the mission rule", "avoid blocked squares", "reach the goal"],
   artworkSrc: LEVEL_ONE_ARTWORK,
   teaching: { title: "Route Designer", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "design-1", title: "Design a Route", description: "Design a route to a goal.", taskKinds: ["starpathRouteBuild"] },
-    { key: "design-2", title: "Design Round", description: "Design another route.", taskKinds: ["starpathRouteBuild"] },
-    { key: "design-3", title: "Design Master", description: "Design routes independently.", taskKinds: ["starpathRouteBuild"] },
+    { key: "design-1", title: "Checkpoint Mission", description: "Plan a route through a checkpoint.", taskKinds: ["starpathRouteBuild"] },
+    { key: "design-2", title: "Asteroid Avoidance", description: "Plan around blocked squares.", taskKinds: ["starpathRouteBuild"] },
+    { key: "design-3", title: "Mission Planner", description: "Satisfy several route rules.", taskKinds: ["starpathRouteBuild"] },
   ],
   reflection: {
     prompt: "How did you design a route?",
-    options: ["I planned the moves in order", "I ran it to check", "I reached the goal"],
+    options: ["I checked every rule", "I planned around obstacles", "I visited the checkpoint"],
   },
-  practisedSkills: ["Design ordered routes", "Reach varied goals", "Test a design"],
+  practisedSkills: ["Plan with constraints", "Avoid blocked locations", "Visit required checkpoints"],
   nextUpLabel: "Week 6 Voyage Quiz",
   createTaskSet: createRouteDesignerTaskSet,
 } satisfies StarpathLessonContent;

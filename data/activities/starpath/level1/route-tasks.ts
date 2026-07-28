@@ -19,6 +19,70 @@ const ROUTE_CASES: RouteCase[] = [
   { start: { r: 3, c: 3 }, goal: { r: 1, c: 1 }, preset: ["up"] },
 ];
 
+const RECORD_CASES: Array<{
+  start: { r: number; c: number };
+  route: Dir[];
+}> = [
+  { start: { r: 3, c: 0 }, route: ["up", "right", "up", "right"] },
+  { start: { r: 3, c: 0 }, route: ["right", "right", "up", "right"] },
+  { start: { r: 3, c: 3 }, route: ["up", "left", "left", "up"] },
+  { start: { r: 2, c: 0 }, route: ["up", "right", "right", "down"] },
+  { start: { r: 3, c: 1 }, route: ["right", "up", "up", "right"] },
+  { start: { r: 1, c: 3 }, route: ["left", "down", "left", "down"] },
+];
+
+const MISSION_CASES: Array<{
+  start: { r: number; c: number };
+  goal: { r: number; c: number };
+  blocked: Array<{ r: number; c: number }>;
+  checkpoints: Array<{ r: number; c: number; object: string }>;
+  rule: string;
+}> = [
+  {
+    start: { r: 3, c: 0 },
+    goal: { r: 0, c: 3 },
+    blocked: [],
+    checkpoints: [{ r: 2, c: 1, object: "crystal" }],
+    rule: "Collect the crystal before reaching the goal.",
+  },
+  {
+    start: { r: 3, c: 0 },
+    goal: { r: 0, c: 3 },
+    blocked: [{ r: 2, c: 0 }, { r: 1, c: 2 }],
+    checkpoints: [],
+    rule: "Avoid every asteroid square.",
+  },
+  {
+    start: { r: 3, c: 3 },
+    goal: { r: 0, c: 0 },
+    blocked: [{ r: 1, c: 1 }],
+    checkpoints: [{ r: 2, c: 2, object: "crystal" }],
+    rule: "Collect the crystal and avoid the asteroid.",
+  },
+  {
+    start: { r: 3, c: 1 },
+    goal: { r: 0, c: 2 },
+    blocked: [{ r: 2, c: 2 }],
+    checkpoints: [{ r: 1, c: 1, object: "satellite" }],
+    rule: "Visit the satellite and avoid the asteroid.",
+  },
+];
+
+function endpoint(start: { r: number; c: number }, route: Dir[]) {
+  return route.reduce(
+    (cell, direction) => {
+      const delta = {
+        up: { dr: -1, dc: 0 },
+        down: { dr: 1, dc: 0 },
+        left: { dr: 0, dc: -1 },
+        right: { dr: 0, dc: 1 },
+      }[direction];
+      return { r: cell.r + delta.dr, c: cell.c + delta.dc };
+    },
+    start
+  );
+}
+
 export function routeBuildTask(
   round: number,
   target: number,
@@ -52,6 +116,55 @@ export function routeBuildTask(
     feedback: {
       correct: "Your route reaches the goal — one of many routes that can work!",
       wrong: "The route must stay on the grid and finish on the goal. Adjust your moves and run it again.",
+    },
+  };
+}
+
+export function routeRecordTask(round: number, target: number): PracticeTask {
+  const routeCase = RECORD_CASES[round % RECORD_CASES.length]!;
+  const goalObject = GOAL_OBJECTS[round % GOAL_OBJECTS.length]!;
+  const goal = endpoint(routeCase.start, routeCase.route);
+  return {
+    kind: "starpathRouteRecord",
+    prompt: `Record the glowing route so a friend can reach the ${goalObject}.`,
+    speakText:
+      "Read the numbered trail from the rover to the goal. Add the matching directions in the same order, then send them to your friend.",
+    target,
+    cols: 4,
+    rows: 4,
+    object: "rover",
+    start: routeCase.start,
+    goal: { ...goal, object: goalObject },
+    route: routeCase.route,
+    feedback: {
+      correct: "Your directions match the trail. Your friend reached the goal!",
+      wrong: "Read the numbered trail from the start and check each direction in order.",
+    },
+  };
+}
+
+export function routeMissionTask(round: number, target: number): PracticeTask {
+  const mission = MISSION_CASES[round % MISSION_CASES.length]!;
+  const goalObject = GOAL_OBJECTS[(round + 1) % GOAL_OBJECTS.length]!;
+  return {
+    kind: "starpathRouteBuild",
+    mode: "mission",
+    prompt: `Plan a mission route to the ${goalObject}.`,
+    speakText: `${mission.rule} Any route that follows the mission rule and reaches the goal will work.`,
+    target,
+    cols: 4,
+    rows: 4,
+    object: "rover",
+    start: mission.start,
+    goal: { ...mission.goal, object: goalObject },
+    palette: ["up", "down", "left", "right"],
+    blocked: mission.blocked,
+    checkpoints: mission.checkpoints,
+    missionRule: mission.rule,
+    maxSteps: 16,
+    feedback: {
+      correct: "Mission complete. Your planned route followed every rule!",
+      wrong: "Check the mission rule, stay on the grid and finish on the goal.",
     },
   };
 }

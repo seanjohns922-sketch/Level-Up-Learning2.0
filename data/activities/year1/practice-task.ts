@@ -2797,11 +2797,11 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
-      // Level 1 · W7 — Give the Route. Compose an ordered sequence of moves that
+      // Level 1 · W6 — Give the Route. Compose an ordered sequence of moves that
       // carries the traveller from start to goal. Self-grading: the built path
       // must land on the goal without leaving the grid.
       kind: "starpathRouteBuild";
-      mode: "build" | "record" | "improve";
+      mode: "build" | "record" | "improve" | "mission";
       prompt: string;
       speakText: string;
       target: number;
@@ -2812,7 +2812,25 @@ export type PracticeTask = (
       goal: { r: number; c: number; object: string };
       palette: Array<"up" | "down" | "left" | "right">;
       preset?: Array<"up" | "down" | "left" | "right">;
+      blocked?: Array<{ r: number; c: number }>;
+      checkpoints?: Array<{ r: number; c: number; object: string }>;
+      missionRule?: string;
       maxSteps: number;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 1 · W6 — Translate a displayed trail into ordered directions so
+      // another explorer can follow the exact communicated route.
+      kind: "starpathRouteRecord";
+      prompt: string;
+      speakText: string;
+      target: number;
+      cols: number;
+      rows: number;
+      object: string;
+      start: { r: number; c: number };
+      goal: { r: number; c: number; object: string };
+      route: Array<"up" | "down" | "left" | "right">;
       feedback: { correct: string; wrong: string };
     }
 ) & { difficulty?: Difficulty };

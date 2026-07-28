@@ -6,7 +6,8 @@ import {
   createRouteDesignerTaskSet,
 } from "./week6Lessons";
 
-// Level 1 · Week 6 Voyage Quiz — 15 questions (5 per lesson): Build a Route.
+// Level 1 · Week 6 Voyage Quiz — 15 questions (5 per lesson):
+// create routes, communicate displayed routes, then plan routes with rules.
 export function buildLevelOneWeek6VoyageQuiz(): PracticeTask[] {
   return fifteenFrom(
     createBuildARouteTaskSet(),

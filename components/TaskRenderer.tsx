@@ -176,6 +176,7 @@ import {
 import {
   StarpathRouteBuildCard,
   StarpathRouteDebugCard,
+  StarpathRouteRecordCard,
   StarpathTurnMoveCard,
 } from "@/components/starpath/StarpathLevelOnePathCards";
 import { StarpathShapeHuntCard } from "@/components/starpath/StarpathShapeHuntCard";
@@ -644,6 +645,8 @@ function TaskRendererInner({
       return <StarpathRouteDebugCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathRouteBuild":
       return <StarpathRouteBuildCard key={k} task={t} onComplete={onC} />;
+    case "starpathRouteRecord":
+      return <StarpathRouteRecordCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathShapeHunt":
       return <StarpathShapeHuntCard key={k} task={t} onComplete={onC} />;
     case "starpathShapeWorkshop":
