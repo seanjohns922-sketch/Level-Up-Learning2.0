@@ -19,6 +19,13 @@ const ROUTE_CASES: RouteCase[] = [
   { start: { r: 3, c: 3 }, goal: { r: 1, c: 1 }, preset: ["up"] },
 ];
 
+const WIDE_ROUTE_CASES: RouteCase[] = [
+  { start: { r: 3, c: 0 }, goal: { r: 0, c: 7 }, preset: ["right", "right"] },
+  { start: { r: 0, c: 0 }, goal: { r: 3, c: 7 }, preset: ["down", "right"] },
+  { start: { r: 3, c: 7 }, goal: { r: 0, c: 0 }, preset: ["left", "left"] },
+  { start: { r: 0, c: 7 }, goal: { r: 3, c: 0 }, preset: ["down", "left"] },
+];
+
 const RECORD_CASES: Array<{
   start: { r: number; c: number };
   route: Dir[];
@@ -136,10 +143,14 @@ export function routeBuildTask(
   round: number,
   target: number,
   mode: "build" | "record" | "improve",
-  object = "rover"
+  object = "rover",
+  grid: "standard" | "wide" = "standard"
 ): PracticeTask {
-  const routeCase = ROUTE_CASES[round % ROUTE_CASES.length]!;
+  const cases = grid === "wide" ? WIDE_ROUTE_CASES : ROUTE_CASES;
+  const routeCase = cases[round % cases.length]!;
   const goalObject = GOAL_OBJECTS[round % GOAL_OBJECTS.length]!;
+  const cols = grid === "wide" ? 8 : 4;
+  const rows = 4;
   const prompt =
     mode === "record"
       ? `Record a route that takes the rover to the ${goalObject}.`
@@ -152,16 +163,16 @@ export function routeBuildTask(
     prompt,
     speakText: `${prompt} Any route that stays on the grid and reaches the goal will work. Add moves in order, then press Run route to test it.`,
     target,
-    cols: 4,
-    rows: 4,
+    cols,
+    rows,
     object,
     start: routeCase.start,
     goal: { r: routeCase.goal.r, c: routeCase.goal.c, object: goalObject },
     palette: ["up", "down", "left", "right"],
     preset: mode === "improve" ? routeCase.preset : undefined,
-    // A 4×4 board has 16 cells. This permits every simple path across the
-    // board, plus sensible detours, instead of enforcing the shortest route.
-    maxSteps: 16,
+    // Permit every simple path across the board instead of enforcing the
+    // shortest route.
+    maxSteps: cols * rows,
     feedback: {
       correct: "Your route reaches the goal — one of many routes that can work!",
       wrong: "The route must stay on the grid and finish on the goal. Adjust your moves and run it again.",
@@ -240,9 +251,23 @@ const DEBUG_CASES: DebugCase[] = [
   { start: { r: 3, c: 3 }, goal: { r: 1, c: 1 }, steps: ["up", "left", "up", "left"], corruptIndex: 2, corruptDir: "down" },
 ];
 
-export function routeDebugTask(round: number, target: number, object = "rover"): PracticeTask {
-  const debugCase = DEBUG_CASES[round % DEBUG_CASES.length]!;
+const WIDE_DEBUG_CASES: DebugCase[] = [
+  { start: { r: 3, c: 0 }, goal: { r: 1, c: 6 }, steps: ["up", "right", "right", "up", "right", "right", "right", "right"], corruptIndex: 3, corruptDir: "down" },
+  { start: { r: 0, c: 0 }, goal: { r: 3, c: 5 }, steps: ["right", "right", "down", "right", "down", "right", "right", "down"], corruptIndex: 4, corruptDir: "up" },
+  { start: { r: 3, c: 7 }, goal: { r: 0, c: 1 }, steps: ["left", "left", "up", "left", "left", "up", "left", "left", "up"], corruptIndex: 5, corruptDir: "down" },
+  { start: { r: 0, c: 7 }, goal: { r: 3, c: 2 }, steps: ["down", "left", "left", "down", "left", "left", "down", "left"], corruptIndex: 2, corruptDir: "right" },
+];
+
+export function routeDebugTask(
+  round: number,
+  target: number,
+  object = "rover",
+  grid: "standard" | "wide" = "standard"
+): PracticeTask {
+  const cases = grid === "wide" ? WIDE_DEBUG_CASES : DEBUG_CASES;
+  const debugCase = cases[round % cases.length]!;
   const goalObject = GOAL_OBJECTS[round % GOAL_OBJECTS.length]!;
+  const cols = grid === "wide" ? 8 : 4;
   const steps = debugCase.steps.map((direction, index) => ({
     id: `step-${target}-${index}`,
     direction: index === debugCase.corruptIndex ? debugCase.corruptDir : direction,
@@ -252,7 +277,7 @@ export function routeDebugTask(round: number, target: number, object = "rover"):
     prompt: `This route should reach the ${goalObject}, but one step is wrong. Which step?`,
     speakText: `Follow the steps in your head from the rover. One step goes the wrong way. Tap the step that breaks the route.`,
     target,
-    cols: 4,
+    cols,
     rows: 4,
     object,
     start: debugCase.start,

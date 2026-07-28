@@ -53,9 +53,9 @@ export function createFixTheRouteTaskSet(): RealmLessonTaskSet {
       "A route was started but it is not finished. Add the moves it needs and run it to reach the goal."
     ),
     activities: [
-      () => routeBuildTask(a++, ++target, "improve"),
-      () => routeBuildTask(b++ + 1, ++target, "improve"),
-      () => routeBuildTask(c++ + 2, ++target, "improve"),
+      () => routeBuildTask(a++, ++target, "improve", "rover", "wide"),
+      () => routeBuildTask(b++ + 1, ++target, "improve", "rover", "wide"),
+      () => routeBuildTask(c++ + 2, ++target, "improve", "rover", "wide"),
     ],
   };
 }
@@ -72,9 +72,9 @@ export function createTestAndImproveTaskSet(): RealmLessonTaskSet {
       "Find broken steps and finish started routes. Run each one and improve it until the rover reaches the goal."
     ),
     activities: [
-      () => routeDebugTask(a++ + 1, ++target),
-      () => routeBuildTask(b++ + 3, ++target, "improve"),
-      () => routeDebugTask(c++ + 2, ++target),
+      () => routeDebugTask(a++ + 1, ++target, "rover", "wide"),
+      () => routeBuildTask(b++ + 3, ++target, "improve", "rover", "wide"),
+      () => routeDebugTask(c++ + 2, ++target, "rover", "wide"),
     ],
   };
 }
@@ -101,7 +101,7 @@ export const FIND_THE_ERROR_CONTENT = {
 
 export const FIX_THE_ROUTE_CONTENT = {
   missionBrief:
-    "A route was started for you but it is not finished. Add the moves it needs and run it until the rover arrives.",
+    "A route across a wide 8 by 4 grid was started for you but is not finished. Add the moves it needs and run it until the rover arrives.",
   successCriteria: ["see what is missing", "add the moves", "run it to the goal"],
   artworkSrc: LEVEL_ONE_ARTWORK,
   teaching: { title: "Fix the Route", durationMinutes: 1, taskKind: "starpathShapeIntro" },
@@ -121,7 +121,7 @@ export const FIX_THE_ROUTE_CONTENT = {
 
 export const TEST_AND_IMPROVE_CONTENT = {
   missionBrief:
-    "Test routes and make them work: find broken steps, finish started routes, and run each one until the rover arrives.",
+    "Test routes across a wide 8 by 4 grid: find broken steps, finish started routes, and run each one until the rover arrives.",
   successCriteria: ["test a route", "find or fix the problem", "improve until it works"],
   artworkSrc: LEVEL_ONE_ARTWORK,
   teaching: { title: "Test and Improve", durationMinutes: 1, taskKind: "starpathShapeIntro" },
