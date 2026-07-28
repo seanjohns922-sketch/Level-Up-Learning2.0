@@ -7,7 +7,7 @@ import { belongsTask, reclassifyTask, ruleTask } from "./week2Lessons";
 import { shapeHuntTask } from "./week3ShapeHunt";
 import { scenesByDifficulty } from "./shape-hunt-scenes";
 import { compareTask } from "./week4WorldObjects";
-import { composeTask } from "./week5MakeShape";
+import { workshopCompareTask } from "./week5MakeShape";
 import { routeBuildTask, routeDebugTask } from "./route-tasks";
 
 // Level 1 · Week 8 — Pathfinder Challenge. Cumulative: shape classification and
@@ -45,13 +45,11 @@ export function createFindLandmarkTaskSet(): RealmLessonTaskSet {
     activities: [
       () => belongsTask(a++, ++target),
       () => compareTask(b++ + 1, ++target, "sameDiff"),
-      () => composeTask(COMPOSE_POOL[a % COMPOSE_POOL.length]!, ++target),
+      () => workshopCompareTask(a++, ++target),
       () => shapeHuntTask(scenes[c++ % scenes.length]!, ++target),
     ],
   };
 }
-
-const COMPOSE_POOL = ["square-2tri", "big-square-4", "rect-2square"];
 
 // L2 — Plan Around Obstacles: build and repair valid pathways.
 export function createPlanAroundObstaclesTaskSet(): RealmLessonTaskSet {

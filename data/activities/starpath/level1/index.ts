@@ -20,9 +20,9 @@ import {
   SHAPE_SPOTTER_CONTENT,
 } from "./week4WorldObjects";
 import {
-  BUILD_THE_SHAPE_CONTENT,
-  SHAPE_MAKER_CONTENT,
-  TWO_MAKE_ONE_CONTENT,
+  BUILD_AND_COMPARE_CONTENT,
+  CONNECT_THE_STARS_CONTENT,
+  SHAPE_REPAIR_CONTENT,
 } from "./week5MakeShape";
 import {
   BUILD_A_ROUTE_CONTENT,
@@ -53,9 +53,9 @@ export const LEVEL_ONE_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y1-space-w4-l1": SHAPE_SPOTTER_CONTENT,
   "y1-space-w4-l2": SAME_OR_DIFFERENT_WORLD_CONTENT,
   "y1-space-w4-l3": SHAPE_MATCH_CONTENT,
-  "y1-space-w5-l1": TWO_MAKE_ONE_CONTENT,
-  "y1-space-w5-l2": BUILD_THE_SHAPE_CONTENT,
-  "y1-space-w5-l3": SHAPE_MAKER_CONTENT,
+  "y1-space-w5-l1": CONNECT_THE_STARS_CONTENT,
+  "y1-space-w5-l2": SHAPE_REPAIR_CONTENT,
+  "y1-space-w5-l3": BUILD_AND_COMPARE_CONTENT,
   "y1-space-w6-l1": BUILD_A_ROUTE_CONTENT,
   "y1-space-w6-l2": DIRECTIONS_FOR_A_FRIEND_CONTENT,
   "y1-space-w6-l3": ROUTE_DESIGNER_CONTENT,

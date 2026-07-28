@@ -2667,14 +2667,22 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
-      // Level 1 · W5 — Make a Shape. Compose a target shape from congruent parts
-      // by tapping the piece shape to fill each slot until the target is built.
-      kind: "starpathShapeCompose";
+      // Level 1 · W5 — Shape Workshop. Construct shapes on a point grid, repair
+      // a missing edge, or compare two completed constructions.
+      kind: "starpathShapeWorkshop";
+      mode: "construct" | "repair" | "compare";
       prompt: string;
       speakText: string;
       target: number;
-      compositionId: string;
-      targetShape: StarpathShape;
+      shapeLabel: string;
+      points: Array<{ r: number; c: number }>;
+      missingEdgeIndex?: number;
+      secondShape?: {
+        label: string;
+        points: Array<{ r: number; c: number }>;
+      };
+      options?: Array<{ id: string; label: string }>;
+      correctOptionId?: string;
       feedback: { correct: string; wrong: string };
     }
   | {

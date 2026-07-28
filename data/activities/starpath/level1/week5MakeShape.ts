@@ -2,29 +2,181 @@ import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprin
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { LEVEL_ONE_ARTWORK } from "./shared";
-import { getComposition } from "./shape-compositions";
 
-// Level 1 · Week 5 — Make a Shape (AC9M1SP01, the "make" verb). Compose a target
-// shape from congruent parts: two triangles make a square, four squares make a
-// big square. Plants part-whole reasoning for fractions and symmetry later.
+type Point = { r: number; c: number };
+type Diagram = { label: string; points: Point[] };
 
-const EASY = ["rect-2square", "square-2rect", "rect-2rect"];
-const MEDIUM = ["square-2tri", "big-square-4"];
-const ALL = [...EASY, ...MEDIUM];
+// Level 1 · Week 5 — Shape Workshop (AC9M1SP01). Students now make familiar
+// shapes deliberately by joining points, repair incomplete shapes, then compare
+// completed constructions. This is distinct from the earlier tap-and-find work.
 
-export function composeTask(compositionId: string, target: number): PracticeTask {
-  const comp = getComposition(compositionId);
-  const pieceWord = comp.pieceShape;
+const DIAGRAMS = {
+  triangleWide: {
+    label: "triangle",
+    points: [{ r: 4, c: 0 }, { r: 0, c: 2 }, { r: 4, c: 4 }],
+  },
+  triangleSmall: {
+    label: "triangle",
+    points: [{ r: 3, c: 1 }, { r: 0, c: 2 }, { r: 3, c: 3 }],
+  },
+  squareLarge: {
+    label: "square",
+    points: [{ r: 0, c: 0 }, { r: 0, c: 4 }, { r: 4, c: 4 }, { r: 4, c: 0 }],
+  },
+  squareSmall: {
+    label: "square",
+    points: [{ r: 1, c: 1 }, { r: 1, c: 3 }, { r: 3, c: 3 }, { r: 3, c: 1 }],
+  },
+  squareTurned: {
+    label: "square",
+    points: [{ r: 0, c: 2 }, { r: 2, c: 4 }, { r: 4, c: 2 }, { r: 2, c: 0 }],
+  },
+  rectangleWide: {
+    label: "rectangle",
+    points: [{ r: 1, c: 0 }, { r: 1, c: 4 }, { r: 3, c: 4 }, { r: 3, c: 0 }],
+  },
+  rectangleTall: {
+    label: "rectangle",
+    points: [{ r: 0, c: 1 }, { r: 0, c: 3 }, { r: 4, c: 3 }, { r: 4, c: 1 }],
+  },
+} satisfies Record<string, Diagram>;
+
+const CONSTRUCT_POOL = [
+  DIAGRAMS.triangleWide,
+  DIAGRAMS.squareLarge,
+  DIAGRAMS.rectangleWide,
+  DIAGRAMS.squareTurned,
+  DIAGRAMS.rectangleTall,
+  DIAGRAMS.triangleSmall,
+];
+
+const REPAIR_POOL = [
+  DIAGRAMS.squareLarge,
+  DIAGRAMS.triangleWide,
+  DIAGRAMS.rectangleWide,
+  DIAGRAMS.squareTurned,
+  DIAGRAMS.rectangleTall,
+  DIAGRAMS.triangleSmall,
+];
+
+const COMPARISONS = [
+  {
+    left: DIAGRAMS.triangleWide,
+    right: DIAGRAMS.squareLarge,
+    options: [
+      { id: "same", label: "They are the same shape" },
+      { id: "sides", label: "One has 3 sides and one has 4 sides" },
+      { id: "both-square", label: "They are both squares" },
+    ],
+    correctOptionId: "sides",
+  },
+  {
+    left: DIAGRAMS.squareLarge,
+    right: DIAGRAMS.squareSmall,
+    options: [
+      { id: "same", label: "They are the same shape" },
+      { id: "different", label: "They are different shapes" },
+      { id: "triangle", label: "One is a triangle" },
+    ],
+    correctOptionId: "same",
+  },
+  {
+    left: DIAGRAMS.squareLarge,
+    right: DIAGRAMS.rectangleWide,
+    options: [
+      { id: "same", label: "They are the same shape" },
+      { id: "four", label: "They both have 4 sides" },
+      { id: "three", label: "They both have 3 sides" },
+    ],
+    correctOptionId: "four",
+  },
+  {
+    left: DIAGRAMS.rectangleWide,
+    right: DIAGRAMS.rectangleTall,
+    options: [
+      { id: "same", label: "They are both rectangles" },
+      { id: "square", label: "One is a square" },
+      { id: "triangle", label: "One is a triangle" },
+    ],
+    correctOptionId: "same",
+  },
+  {
+    left: DIAGRAMS.squareLarge,
+    right: DIAGRAMS.squareTurned,
+    options: [
+      { id: "same", label: "They are both squares" },
+      { id: "changed", label: "Turning made a new shape" },
+      { id: "rectangle", label: "One is a rectangle" },
+    ],
+    correctOptionId: "same",
+  },
+  {
+    left: DIAGRAMS.triangleWide,
+    right: DIAGRAMS.triangleSmall,
+    options: [
+      { id: "same", label: "They are both triangles" },
+      { id: "changed", label: "Size made a new shape" },
+      { id: "square", label: "One is a square" },
+    ],
+    correctOptionId: "same",
+  },
+];
+
+export function constructTask(index: number, target: number): PracticeTask {
+  const diagram = CONSTRUCT_POOL[index % CONSTRUCT_POOL.length]!;
   return {
-    kind: "starpathShapeCompose",
-    prompt: `Make a ${comp.label} from ${pieceWord}s.`,
-    speakText: `Put ${pieceWord}s together to make a ${comp.label}. Tap a ${pieceWord} to add each part.`,
+    kind: "starpathShapeWorkshop",
+    mode: "construct",
+    prompt: `Connect the stars to make a ${diagram.label}.`,
+    speakText: `Start at the glowing star. Join the corners in order and return to the start to make a ${diagram.label}.`,
     target,
-    compositionId: comp.id,
-    targetShape: comp.targetShape,
+    shapeLabel: diagram.label,
+    points: diagram.points,
     feedback: {
-      correct: `You made a ${comp.label} from ${pieceWord}s.`,
-      wrong: `That piece is not a ${pieceWord}. Tap the ${pieceWord} to add a part.`,
+      correct: `You constructed a ${diagram.label}.`,
+      wrong: `Try the next corner around the ${diagram.label}.`,
+    },
+  };
+}
+
+export function repairTask(index: number, target: number): PracticeTask {
+  const diagram = REPAIR_POOL[index % REPAIR_POOL.length]!;
+  const missingEdgeIndex = index % diagram.points.length;
+  return {
+    kind: "starpathShapeWorkshop",
+    mode: "repair",
+    prompt: `Repair the ${diagram.label}. Which corners need joining?`,
+    speakText: `One side of this ${diagram.label} is missing. Tap the two corners that need to be joined.`,
+    target,
+    shapeLabel: diagram.label,
+    points: diagram.points,
+    missingEdgeIndex,
+    feedback: {
+      correct: `You repaired the ${diagram.label}.`,
+      wrong: `Those corners already have a side. Find the dashed missing side.`,
+    },
+  };
+}
+
+export function workshopCompareTask(index: number, target: number): PracticeTask {
+  const comparison = COMPARISONS[index % COMPARISONS.length]!;
+  return {
+    kind: "starpathShapeWorkshop",
+    mode: "compare",
+    prompt: "Compare the two shapes. Which statement is true?",
+    speakText: "Look closely at both constructed shapes. Choose the statement that is true.",
+    target,
+    shapeLabel: comparison.left.label,
+    points: comparison.left.points,
+    secondShape: {
+      label: comparison.right.label,
+      points: comparison.right.points,
+    },
+    options: comparison.options,
+    correctOptionId: comparison.correctOptionId,
+    feedback: {
+      correct: "You compared the shapes carefully.",
+      wrong: "Count the sides and check whether size or turning changed the shape.",
     },
   };
 }
@@ -43,107 +195,110 @@ function teaching(heading: string, prompt: string, speakText: string) {
     }) satisfies PracticeTask;
 }
 
-function huntActivities(pool: string[], start: number) {
-  let a = start;
-  let b = start + 1;
-  let c = start + 2;
-  let target = 10;
+function rotatingActivities(
+  task: (index: number, target: number) => PracticeTask,
+  targetStart: number
+) {
+  let a = 0;
+  let b = 1;
+  let c = 2;
+  let target = targetStart;
   return [
-    () => composeTask(pool[a++ % pool.length]!, ++target),
-    () => composeTask(pool[b++ % pool.length]!, ++target),
-    () => composeTask(pool[c++ % pool.length]!, ++target),
+    () => task(a += 3, ++target),
+    () => task(b += 3, ++target),
+    () => task(c += 3, ++target),
   ] as const;
 }
 
-export function createTwoMakeOneTaskSet(): RealmLessonTaskSet {
+export function createConnectTheStarsTaskSet(): RealmLessonTaskSet {
   return {
     teaching: teaching(
-      "Two Make One",
-      "Two shapes can join to make one bigger shape.",
-      "Two shapes fit together to make a new shape. Tap the pieces to build the target."
+      "Connect the Stars",
+      "A shape can be made by joining its corners.",
+      "Start at one corner, join each corner in order, then return to the start. The joined lines make a familiar shape."
     ),
-    activities: huntActivities(EASY, 0),
+    activities: rotatingActivities(constructTask, 10),
   };
 }
 
-export function createBuildTheShapeTaskSet(): RealmLessonTaskSet {
+export function createShapeRepairTaskSet(): RealmLessonTaskSet {
   return {
     teaching: teaching(
-      "Build the Shape",
-      "More parts can make one shape.",
-      "Some shapes are made of two triangles or four squares. Add each part to build the target shape."
+      "Shape Repair Crew",
+      "An unfinished shape needs its missing side.",
+      "Look for the gap in the shape. Join the two corners beside the gap to repair the missing side."
     ),
-    activities: huntActivities(MEDIUM, 0),
+    activities: rotatingActivities(repairTask, 20),
   };
 }
 
-export function createShapeMakerTaskSet(): RealmLessonTaskSet {
+export function createBuildAndCompareTaskSet(): RealmLessonTaskSet {
   return {
     teaching: teaching(
-      "Shape Maker",
-      "You can make shapes from lots of different parts.",
-      "Make each target shape from its parts. Some take two pieces, some take four."
+      "Build and Compare",
+      "Constructed shapes can be compared by what is the same and different.",
+      "Look at the sides and overall shape. A shape stays the same when it is made larger, smaller or turned."
     ),
-    activities: huntActivities(ALL, 0),
+    activities: rotatingActivities(workshopCompareTask, 30),
   };
 }
 
-export const TWO_MAKE_ONE_CONTENT = {
+export const CONNECT_THE_STARS_CONTENT = {
   missionBrief:
-    "Geospin's shape forge builds shapes from parts. Put two shapes together to make one bigger shape.",
-  successCriteria: ["choose the right piece", "add each part", "make the target shape"],
+    "Enter Geospin's constellation workshop. Join glowing stars in order to construct triangles, squares and rectangles.",
+  successCriteria: ["start at a corner", "join corners in order", "close the shape"],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: { title: "Two Make One", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Connect the Stars", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "make-1", title: "Two Make One", description: "Join two shapes to make one.", taskKinds: ["starpathShapeCompose"] },
-    { key: "make-2", title: "Forge Round", description: "Build another shape from parts.", taskKinds: ["starpathShapeCompose"] },
-    { key: "make-3", title: "Forge Master", description: "Make a shape independently.", taskKinds: ["starpathShapeCompose"] },
+    { key: "construct-1", title: "Triangle Trails", description: "Join stars to construct triangles.", taskKinds: ["starpathShapeWorkshop"] },
+    { key: "construct-2", title: "Four-Side Flight", description: "Construct squares and rectangles.", taskKinds: ["starpathShapeWorkshop"] },
+    { key: "construct-3", title: "Constellation Builder", description: "Construct familiar shapes independently.", taskKinds: ["starpathShapeWorkshop"] },
   ],
   reflection: {
-    prompt: "How did you make the shape?",
-    options: ["I put two parts together", "I chose the right piece", "The parts made one shape"],
+    prompt: "What helped you construct each shape?",
+    options: ["I joined every corner", "I followed the sides around", "I returned to the start"],
   },
-  practisedSkills: ["Compose a shape from parts", "Choose the right piece", "See part and whole"],
-  nextUpLabel: "Build the Shape",
-  createTaskSet: createTwoMakeOneTaskSet,
+  practisedSkills: ["Construct familiar shapes", "Join corners in sequence", "Close a shape"],
+  nextUpLabel: "Shape Repair Crew",
+  createTaskSet: createConnectTheStarsTaskSet,
 } satisfies StarpathLessonContent;
 
-export const BUILD_THE_SHAPE_CONTENT = {
+export const SHAPE_REPAIR_CONTENT = {
   missionBrief:
-    "Bigger builds now: two triangles make a square, four squares make a big square. Add every part to complete the shape.",
-  successCriteria: ["use more parts", "add each piece", "complete the shape"],
+    "A meteor shower damaged the constellation shapes. Find each missing side and reconnect the correct corners.",
+  successCriteria: ["find the gap", "choose the correct corners", "repair the shape"],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: { title: "Build the Shape", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Shape Repair Crew", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "make-1", title: "Two Triangles", description: "Make a square from triangles.", taskKinds: ["starpathShapeCompose"] },
-    { key: "make-2", title: "Four Squares", description: "Make a big square from squares.", taskKinds: ["starpathShapeCompose"] },
-    { key: "make-3", title: "Build Master", description: "Complete a build from many parts.", taskKinds: ["starpathShapeCompose"] },
+    { key: "repair-1", title: "Find the Gap", description: "Find where a side is missing.", taskKinds: ["starpathShapeWorkshop"] },
+    { key: "repair-2", title: "Reconnect", description: "Join the correct corners.", taskKinds: ["starpathShapeWorkshop"] },
+    { key: "repair-3", title: "Repair Crew", description: "Repair different familiar shapes.", taskKinds: ["starpathShapeWorkshop"] },
   ],
   reflection: {
-    prompt: "What did you notice?",
-    options: ["Two triangles can make a square", "Four squares can make a big square", "Parts join to make a whole"],
+    prompt: "How did you repair the shapes?",
+    options: ["I found the gap", "I checked the corners", "I added the missing side"],
   },
-  practisedSkills: ["Compose from several parts", "Use triangles and squares", "Complete a target"],
-  nextUpLabel: "Shape Maker",
-  createTaskSet: createBuildTheShapeTaskSet,
+  practisedSkills: ["Recognise incomplete shapes", "Identify a missing side", "Repair a construction"],
+  nextUpLabel: "Build and Compare",
+  createTaskSet: createShapeRepairTaskSet,
 } satisfies StarpathLessonContent;
 
-export const SHAPE_MAKER_CONTENT = {
+export const BUILD_AND_COMPARE_CONTENT = {
   missionBrief:
-    "You are a Shape Maker. Build every target shape from its parts — some take two pieces, some take four.",
-  successCriteria: ["make different shapes", "use the right parts", "finish every shape"],
+    "Inspect pairs from the constellation workshop. Compare their sides and decide what stayed the same or changed.",
+  successCriteria: ["compare two shapes", "notice sides", "ignore size and turning"],
   artworkSrc: LEVEL_ONE_ARTWORK,
-  teaching: { title: "Shape Maker", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Build and Compare", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "make-1", title: "Shape Maker", description: "Make a shape from its parts.", taskKinds: ["starpathShapeCompose"] },
-    { key: "make-2", title: "Maker Round", description: "Make another target shape.", taskKinds: ["starpathShapeCompose"] },
-    { key: "make-3", title: "Master Maker", description: "Make every shape confidently.", taskKinds: ["starpathShapeCompose"] },
+    { key: "compare-build-1", title: "Side Scanner", description: "Compare shapes by their sides.", taskKinds: ["starpathShapeWorkshop"] },
+    { key: "compare-build-2", title: "Size Check", description: "Recognise a shape at different sizes.", taskKinds: ["starpathShapeWorkshop"] },
+    { key: "compare-build-3", title: "Turn Check", description: "Recognise a shape after it turns.", taskKinds: ["starpathShapeWorkshop"] },
   ],
   reflection: {
-    prompt: "You are a Shape Maker! What did you learn?",
-    options: ["Shapes are made of parts", "The same shape can be made different ways", "Parts join to make a whole"],
+    prompt: "What did you check when comparing shapes?",
+    options: ["I checked the sides", "I ignored colour and size", "I checked the whole shape"],
   },
-  practisedSkills: ["Compose familiar shapes", "Choose correct parts", "Recognise part and whole"],
+  practisedSkills: ["Compare constructed shapes", "Identify similarities", "Identify differences"],
   nextUpLabel: "Week 5 Voyage Quiz",
-  createTaskSet: createShapeMakerTaskSet,
+  createTaskSet: createBuildAndCompareTaskSet,
 } satisfies StarpathLessonContent;
