@@ -7,7 +7,7 @@ import { belongsTask, reclassifyTask, ruleTask } from "./week2Lessons";
 import { shapeHuntTask } from "./week3ShapeHunt";
 import { scenesByDifficulty } from "./shape-hunt-scenes";
 import { compareTask } from "./week4WorldObjects";
-import { turnTask } from "./week5Lessons";
+import { sayMoveTask } from "./week5Lessons";
 import { routeDebugTask } from "./week6Lessons";
 import { routeBuildTask } from "./week7Lessons";
 
@@ -85,7 +85,7 @@ export function createExplainYourPathTaskSet(): RealmLessonTaskSet {
     ),
     activities: [
       () => routeBuildTask(a++, ++target, "record"),
-      () => turnTask(b++ + 1, ++target),
+      () => sayMoveTask(b++ + 1, ++target),
       () => (c % 2 === 0 ? ruleTask(c++, ++target) : reclassifyTask(c++, ++target)),
     ],
   };

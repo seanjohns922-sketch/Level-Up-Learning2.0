@@ -20,9 +20,9 @@ import {
   SHAPE_SPOTTER_CONTENT,
 } from "./week4WorldObjects";
 import {
-  FACE_AND_MOVE_CONTENT,
+  MOVE_ROVER_CONTENT,
   SAY_THE_MOVE_CONTENT,
-  TURNS_CONTENT,
+  WHICH_WAY_CONTENT,
 } from "./week5Lessons";
 import {
   FIND_THE_ERROR_CONTENT,
@@ -53,8 +53,8 @@ export const LEVEL_ONE_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y1-space-w4-l1": SHAPE_SPOTTER_CONTENT,
   "y1-space-w4-l2": SAME_OR_DIFFERENT_WORLD_CONTENT,
   "y1-space-w4-l3": SHAPE_MATCH_CONTENT,
-  "y1-space-w5-l1": FACE_AND_MOVE_CONTENT,
-  "y1-space-w5-l2": TURNS_CONTENT,
+  "y1-space-w5-l1": WHICH_WAY_CONTENT,
+  "y1-space-w5-l2": MOVE_ROVER_CONTENT,
   "y1-space-w5-l3": SAY_THE_MOVE_CONTENT,
   "y1-space-w6-l1": START_HERE_CONTENT,
   "y1-space-w6-l2": MISSION_ROUTE_CONTENT,
