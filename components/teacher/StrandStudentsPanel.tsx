@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, ChevronDown, ChevronUp, Eye } from "lucide-react";
 import {
   getGenresForYear,
   getCurriculumPlan,
@@ -22,9 +22,11 @@ import LessonPreviewDrawer from "./LessonPreviewDrawer";
 import type { TeacherInsight, TeacherInsightStatus } from "@/lib/teacher-insights";
 import {
   teacherAdvanceStudentWeek,
+  type NormalizedWeeklyQuizAttempt,
   type StudentProgressOverrideRow,
   type TeacherProgressOverrideReason,
 } from "@/lib/realm-progress-compat";
+import AssessmentReplay from "./AssessmentReplay";
 
 type StudentRow = {
   id: string;
@@ -82,6 +84,7 @@ type ProgressRow = {
   unlocked_legends: unknown;
   quiz_scores: unknown;
   lesson_attempts?: unknown;
+  weekly_quiz_attempts?: NormalizedWeeklyQuizAttempt[];
   pretest_profile?: {
     completedAt?: string | null;
   } | null;
@@ -1243,6 +1246,8 @@ function StudentStrandDetail({
   const [advanceNotes, setAdvanceNotes] = useState("");
   const [advanceState, setAdvanceState] = useState<"idle" | "saving" | "error">("idle");
   const [advanceError, setAdvanceError] = useState("");
+  const [showQuizAttempts, setShowQuizAttempts] = useState(false);
+  const [selectedQuizAttempt, setSelectedQuizAttempt] = useState<NormalizedWeeklyQuizAttempt | null>(null);
 
   const quizScores = parseQuizScores(prog?.quiz_scores);
   const lessonAttempts = parseLessonAttempts(prog?.lesson_attempts);
@@ -1290,7 +1295,11 @@ function StudentStrandDetail({
 
   const week = plan.find((p) => p.week === selectedWeek) ?? plan[0];
   const weekDone = weekLessonsDone(ids, week?.week ?? 1);
-  const weekQuiz = quizScores[String(week?.week ?? 1)];  const weekQuizAttempts = getQuizAttemptsCount(weekQuiz);
+  const weekQuiz = quizScores[String(week?.week ?? 1)];
+  const canonicalWeekQuizAttempts = (prog?.weekly_quiz_attempts ?? [])
+    .filter((attempt) => attempt.week === (week?.week ?? 1) && attempt.workingLevel === yearLabel)
+    .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+  const weekQuizAttempts = canonicalWeekQuizAttempts.length || getQuizAttemptsCount(weekQuiz);
   const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;  const overallPct = overallProgramPercent(ids.filter((id) => id.startsWith(prefix)).length, countCompletedQuizzes(prog?.quiz_scores), plan);
   const summaryStatus = computeStatus(prog, ids.filter((id) => id.startsWith(prefix)).length, overallPct);
   const weekPerformance = buildStudentWeeklyPerformanceSummary({
@@ -1448,6 +1457,8 @@ function StudentStrandDetail({
                 onClick={() => {
                   setSelectedWeek(w.week);
                   setExpandedWeek((prev) => (prev === w.week ? null : w.week));
+                  setShowQuizAttempts(false);
+                  setSelectedQuizAttempt(null);
                 }}
                 title={teacherOverride
                   ? `Week ${w.week}: Teacher Advanced on ${new Date(teacherOverride.created_at).toLocaleDateString()} · ${teacherOverrideReasonLabel(teacherOverride.reason)}${teacherOverride.notes ? ` · ${teacherOverride.notes}` : ""}`
@@ -1582,6 +1593,21 @@ function StudentStrandDetail({
               <span>Attempts: <b className="text-[#0F172A]">{weekQuizAttempts}</b></span>
               <span>Accuracy: <b className="text-[#0F172A]">{weekPerformance.weeklyQuizAccuracy != null ? `${weekPerformance.weeklyQuizAccuracy}%` : "n/a"}</b></span>
               <span>Result: <b className="text-[#0F172A]">{weekPerformance.weeklyQuizPassed == null ? "Not attempted" : weekPerformance.weeklyQuizPassed ? "Passed" : "Needs Review"}</b></span>
+              {weekQuizAttempts > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowQuizAttempts((current) => !current);
+                    setSelectedQuizAttempt(null);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-[11px] font-extrabold text-indigo-700 hover:bg-indigo-100"
+                  aria-expanded={showQuizAttempts}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                  View attempts
+                  {showQuizAttempts ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                </button>
+              ) : null}
               <button
                 disabled
                 title="Coming soon"
@@ -1591,6 +1617,84 @@ function StudentStrandDetail({
               </button>
             </div>
           </div>
+          {showQuizAttempts ? (
+            <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-3">
+              {selectedQuizAttempt ? (
+                <AssessmentReplay
+                  attempt={selectedQuizAttempt}
+                  studentName={studentName}
+                  backLabel={`Back to Week ${week.week} attempts`}
+                  onBack={() => setSelectedQuizAttempt(null)}
+                />
+              ) : (
+                <>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-indigo-700">
+                        Week {week.week} Quiz Attempts
+                      </div>
+                      <p className="mt-1 text-xs font-semibold text-slate-600">
+                        Canonical attempts for {studentName}. Open an attempt to review the saved answers.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowQuizAttempts(false)}
+                      className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600 hover:bg-slate-50"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  {canonicalWeekQuizAttempts.length > 0 ? (
+                    <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white">
+                      {canonicalWeekQuizAttempts.map((attempt) => (
+                        <div
+                          key={attempt.id}
+                          className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-3 py-3 last:border-b-0"
+                        >
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs">
+                            <span className="font-black text-slate-950">Attempt {attempt.attemptNumber}</span>
+                            <span className="font-semibold text-slate-600">
+                              {new Date(attempt.completedAt).toLocaleString("en-AU", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                            <span className="font-bold text-slate-800">
+                              {attempt.correctCount}/{attempt.totalQuestions} · {attempt.scorePercent}%
+                            </span>
+                            <span className={[
+                              "rounded-md px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.06em]",
+                              attempt.passed
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-rose-100 text-rose-700",
+                            ].join(" ")}>
+                              {attempt.passed ? "Passed" : "Needs Review"}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedQuizAttempt(attempt)}
+                            className="inline-flex items-center gap-1.5 rounded-md bg-[#0A2F2A] px-3 py-1.5 text-[11px] font-extrabold text-white hover:bg-[#0E443C]"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                            View attempt
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-xs font-semibold text-amber-900">
+                      The summary records {weekQuizAttempts} attempt{weekQuizAttempts === 1 ? "" : "s"}, but no canonical attempt history is available for replay.
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          ) : null}
           {weekQuizInsight ? (
             <div className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-3">
               <div className="text-[10px] font-extrabold text-indigo-700 uppercase tracking-[0.14em] mb-2">

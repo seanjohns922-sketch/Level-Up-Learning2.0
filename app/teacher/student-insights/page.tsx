@@ -36,7 +36,6 @@ type ProgressRow = {
   quiz_scores: unknown;
   lesson_attempts?: unknown;
   assessment_attempts?: TeacherAssessmentAttempt[];
-  weekly_quiz_attempts?: TeacherAssessmentAttempt[];
   updated_at?: string | null;
 };
 
@@ -503,10 +502,6 @@ function StudentInsightsPageInner() {
     const assessmentAttempts = progressRows
       .flatMap((row) => row.assessment_attempts ?? [])
       .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
-    const weeklyQuizAttempts = progressRows
-      .flatMap((row) => row.weekly_quiz_attempts ?? [])
-      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
-
     const masterySkills: Array<{
       skill: string;
       status: "mastered" | "developing" | "not_yet";
@@ -536,7 +531,6 @@ function StudentInsightsPageInner() {
       pretests,
       posttests,
       assessmentAttempts,
-      weeklyQuizAttempts,
       masterySkills,
     };
   }, [progressRows, student]);
@@ -661,17 +655,11 @@ function StudentInsightsPageInner() {
               onBack={() => setSelectedAssessment(null)}
             />
           ) : (
-            <div className="grid gap-5 lg:grid-cols-3">
+            <div className="grid gap-5 lg:grid-cols-2">
               <AssessmentAttemptHistory
                 title="Pre-Test"
                 attempts={derived.assessmentAttempts.filter((attempt) => attempt.assessmentType === "pretest")}
                 emptyText="No pre-test history yet."
-                onView={setSelectedAssessment}
-              />
-              <AssessmentAttemptHistory
-                title="Weekly Quizzes"
-                attempts={derived.weeklyQuizAttempts}
-                emptyText="No weekly quiz history yet."
                 onView={setSelectedAssessment}
               />
               <AssessmentAttemptHistory

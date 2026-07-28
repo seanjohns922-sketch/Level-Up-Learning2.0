@@ -249,10 +249,12 @@ export default function AssessmentReplay({
   attempt,
   studentName,
   onBack,
+  backLabel = "Assessment History",
 }: {
   attempt: TeacherAssessmentAttempt;
   studentName: string;
   onBack: () => void;
+  backLabel?: string;
 }) {
   const questions = useMemo(
     () => attempt.questionResults.filter(isAssessmentQuestionSnapshot),
@@ -353,7 +355,7 @@ export default function AssessmentReplay({
         className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
       >
         <ArrowLeft className="h-4 w-4" />
-        Assessment History
+        {backLabel}
       </button>
 
       <section className="overflow-hidden rounded-2xl border border-[#D9E2EA] bg-white">
