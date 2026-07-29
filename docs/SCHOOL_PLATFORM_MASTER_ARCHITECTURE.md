@@ -296,6 +296,21 @@ grant read-only visibility and home-learning access subject to entitlement.
 A parent is not made a school staff member and cannot write canonical
 progression.
 
+### 4.5 Student Public Identity
+
+`students.id` remains the private, permanent canonical identity. Every student
+also has exactly one active Explorer Code in `student_explorer_codes`.
+
+Explorer Codes use the canonical `LUL-XXXX-XXXX` format, are generated from
+cryptographically secure random bytes, and are globally unique across active
+and revoked history. They are case-insensitive on entry and displayed in
+uppercase. Codes are not login secrets and never grant access on their own.
+
+New student inserts receive a code in the same database transaction. Resetting
+a code revokes the old row, creates a replacement, and preserves the same
+student, learning history, entitlements, and relationships. See
+`docs/EXPLORER_CODE_ARCHITECTURE.md`.
+
 ## 5. Target Entity Relationship Diagram
 
 ```mermaid
@@ -315,6 +330,7 @@ erDiagram
   AUTH_USERS ||--o{ PARENT_STUDENT_LINKS : guardian
   STUDENTS ||--o{ PARENT_STUDENT_LINKS : child
   STUDENTS ||--o{ STUDENT_CREDENTIALS : authenticates
+  STUDENTS ||--o{ STUDENT_EXPLORER_CODES : identifies
   STUDENTS ||--o{ STUDENT_SESSIONS : opens
   STUDENTS ||--o{ STUDENT_REALM_PROGRESS : progresses
   STUDENTS ||--o{ STUDENT_LESSON_ATTEMPTS : attempts

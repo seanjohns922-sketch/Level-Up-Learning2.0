@@ -5,13 +5,16 @@ import {
   BookOpen,
   CheckCircle2,
   ChevronDown,
+  Copy,
   GraduationCap,
   HelpCircle,
   LayoutDashboard,
   LogOut,
   Mail,
   Plus,
+  RotateCcw,
   School,
+  Search,
   Settings,
   ShieldCheck,
   UserPlus,
@@ -122,6 +125,7 @@ async function sendCommand(
   const result = (await response.json()) as {
     error?: string;
     classId?: string;
+    explorerCode?: string;
   };
   if (!response.ok) throw new Error(result.error ?? "Action failed");
   return result;
@@ -389,6 +393,257 @@ function OtherSchoolClasses({
   );
 }
 
+function StudentDirectory({
+  students,
+  busy,
+  onReset,
+}: {
+  students: SchoolHomeSnapshot["students"];
+  busy: boolean;
+  onReset: (studentId: string, reason: string) => Promise<boolean>;
+}) {
+  const [query, setQuery] = useState("");
+  const [copiedCode, setCopiedCode] = useState("");
+  const [resetStudent, setResetStudent] = useState<
+    SchoolHomeSnapshot["students"][number] | null
+  >(null);
+  const [resetReason, setResetReason] = useState("");
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredStudents = students.filter((student) =>
+    [
+      student.name,
+      student.username ?? "",
+      student.explorerCode,
+      ...student.classes,
+    ].some((value) => value.toLowerCase().includes(normalizedQuery)),
+  );
+
+  async function copyCode(code: string) {
+    await navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    window.setTimeout(() => setCopiedCode(""), 1800);
+  }
+
+  async function submitReset() {
+    if (!resetStudent || !resetReason.trim()) return;
+    const completed = await onReset(resetStudent.id, resetReason.trim());
+    if (completed) {
+      setResetStudent(null);
+      setResetReason("");
+    }
+  }
+
+  if (students.length === 0) {
+    return (
+      <EmptyState
+        icon={GraduationCap}
+        title="No students found"
+        detail="Students assigned to this school will appear here with their Explorer Code."
+      />
+    );
+  }
+
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold">School Students</h2>
+          <p className="text-sm text-slate-500">
+            Explorer Codes are public linking identifiers, not passwords.
+          </p>
+        </div>
+        <label className="relative block w-full max-w-sm">
+          <span className="sr-only">Search students</span>
+          <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search name, username, class or code"
+            className="w-full rounded-md border border-slate-300 bg-white py-2.5 pl-9 pr-3 text-sm"
+          />
+        </label>
+      </div>
+
+      <div className="hidden overflow-x-auto border border-slate-200 bg-white md:block">
+        <table className="min-w-full divide-y divide-slate-200 text-left">
+          <thead className="bg-slate-50 text-xs font-bold uppercase text-slate-500">
+            <tr>
+              <th className="px-4 py-3">Student</th>
+              <th className="px-4 py-3">Year</th>
+              <th className="px-4 py-3">Username</th>
+              <th className="px-4 py-3">PIN</th>
+              <th className="px-4 py-3">Explorer Code</th>
+              <th className="px-4 py-3">Current classes</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {filteredStudents.map((student) => (
+              <tr key={student.id} className="text-sm">
+                <td className="px-4 py-4 font-bold text-slate-950">
+                  {student.name}
+                </td>
+                <td className="px-4 py-4 text-slate-600">
+                  {student.yearLevel ?? "Not set"}
+                </td>
+                <td className="px-4 py-4 font-mono text-xs text-slate-600">
+                  {student.username ?? "Not set"}
+                </td>
+                <td className="px-4 py-4 capitalize text-slate-600">
+                  {student.pinStatus === "set" ? "Set" : "Not set"}
+                </td>
+                <td className="px-4 py-4">
+                  <span className="font-mono font-bold text-slate-900">
+                    {student.explorerCode}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-slate-600">
+                  {student.classes.join(", ") || "Not assigned"}
+                </td>
+                <td className="px-4 py-4">
+                  <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold capitalize text-slate-600">
+                    {student.status}
+                  </span>
+                </td>
+                <td className="px-4 py-4">
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void copyCode(student.explorerCode)}
+                      className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-2 text-xs font-bold"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                      {copiedCode === student.explorerCode ? "Copied" : "Copy"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setResetStudent(student)}
+                      className="inline-flex items-center gap-1 rounded-md border border-red-200 px-2.5 py-2 text-xs font-bold text-red-700"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Reset
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="divide-y divide-slate-200 border border-slate-200 bg-white md:hidden">
+        {filteredStudents.map((student) => (
+          <details key={student.id} className="group px-4 py-3">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+              <span>
+                <span className="block text-sm font-bold">{student.name}</span>
+                <span className="font-mono text-xs text-slate-500">
+                  {student.explorerCode}
+                </span>
+              </span>
+              <ChevronDown className="h-4 w-4 text-slate-400 group-open:rotate-180" />
+            </summary>
+            <dl className="mt-3 grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <dt className="font-bold text-slate-500">Year</dt>
+                <dd>{student.yearLevel ?? "Not set"}</dd>
+              </div>
+              <div>
+                <dt className="font-bold text-slate-500">PIN</dt>
+                <dd>{student.pinStatus === "set" ? "Set" : "Not set"}</dd>
+              </div>
+              <div>
+                <dt className="font-bold text-slate-500">Username</dt>
+                <dd>{student.username ?? "Not set"}</dd>
+              </div>
+              <div>
+                <dt className="font-bold text-slate-500">Classes</dt>
+                <dd>{student.classes.join(", ") || "Not assigned"}</dd>
+              </div>
+            </dl>
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => void copyCode(student.explorerCode)}
+                className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-3 py-2 text-xs font-bold"
+              >
+                <Copy className="h-3.5 w-3.5" />
+                Copy
+              </button>
+              <button
+                type="button"
+                onClick={() => setResetStudent(student)}
+                className="inline-flex items-center gap-1 rounded-md border border-red-200 px-3 py-2 text-xs font-bold text-red-700"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Reset
+              </button>
+            </div>
+          </details>
+        ))}
+      </div>
+
+      {filteredStudents.length === 0 ? (
+        <p className="border border-slate-200 bg-white px-5 py-8 text-center text-sm text-slate-500">
+          No students match this search.
+        </p>
+      ) : null}
+
+      {resetStudent ? (
+        <Modal
+          title="Reset Explorer Code?"
+          onClose={() => {
+            setResetStudent(null);
+            setResetReason("");
+          }}
+        >
+          <div className="space-y-4 p-6">
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+              <p className="font-bold">{resetStudent.name}</p>
+              <p className="mt-1">
+                The old code will stop working immediately. Progress, XP and
+                account data will not change.
+              </p>
+            </div>
+            <label className="block text-sm font-bold text-slate-700">
+              Reason
+              <textarea
+                value={resetReason}
+                onChange={(event) => setResetReason(event.target.value)}
+                rows={3}
+                placeholder="Required for the audit record"
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+              />
+            </label>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setResetStudent(null);
+                  setResetReason("");
+                }}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={busy || !resetReason.trim()}
+                onClick={() => void submitReset()}
+                className="rounded-md bg-red-700 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                {busy ? "Resetting..." : "Reset Explorer Code"}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
+    </>
+  );
+}
+
 export default function SchoolHomeClient({
   initialSnapshot,
   schools,
@@ -467,6 +722,18 @@ export default function SchoolHomeClient({
     } finally {
       setBusy(false);
     }
+  }
+
+  async function resetExplorerCode(studentId: string, reason: string) {
+    const result = await command(
+      {
+        action: "resetExplorerCode",
+        studentId,
+        reason,
+      },
+      "Explorer Code reset",
+    );
+    return Boolean(result?.explorerCode);
   }
 
   const homeStats = [
@@ -773,10 +1040,10 @@ export default function SchoolHomeClient({
           ) : null}
 
           {tab === "students" ? (
-            <EmptyState
-              icon={GraduationCap}
-              title="Student directory comes next"
-              detail="The school student pool and spreadsheet import workflow are reserved for Phase 3. Existing class dashboards remain available."
+            <StudentDirectory
+              students={snapshot.students}
+              busy={busy}
+              onReset={resetExplorerCode}
             />
           ) : null}
 

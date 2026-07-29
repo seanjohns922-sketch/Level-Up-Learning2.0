@@ -139,8 +139,9 @@ const checks = [
     ),
   ],
   [
-    "student and insights scope remain placeholders",
-    /Student directory comes next/.test(client) &&
+    "student identity directory and insights scope",
+    /School Students/.test(client) &&
+      /Explorer Code/.test(client) &&
       /Whole-school insights are coming soon/.test(client),
   ],
   [

@@ -57,6 +57,11 @@ type ParentStudentLinkRow = {
   status: string;
 };
 
+type StudentExplorerCodeRow = {
+  student_id: string;
+  explorer_code: string;
+};
+
 type StudentSortMode = "display_name" | "first_name" | "last_name" | "actual_year";
 
 type EditForm = {
@@ -86,6 +91,7 @@ export default function TeacherClassesPage() {
   const [classes, setClasses] = useState<ClassRow[]>([]);
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [claimCodesByStudentId, setClaimCodesByStudentId] = useState<Record<string, string>>({});
+  const [explorerCodesByStudentId, setExplorerCodesByStudentId] = useState<Record<string, string>>({});
   const [linkedStudentIds, setLinkedStudentIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [newStudentFirstNames, setNewStudentFirstNames] = useState<Record<string, string>>({});
@@ -156,7 +162,7 @@ export default function TeacherClassesPage() {
 
       const studentIds = loadedStudents.map((student) => student.id);
       if (studentIds.length > 0) {
-        const [{ data: links }, { data: credentials }] = await Promise.all([
+        const [{ data: links }, { data: credentials }, { data: explorerCodes }] = await Promise.all([
           supabase
             .from("parent_student_links")
             .select("student_id,status")
@@ -167,6 +173,9 @@ export default function TeacherClassesPage() {
             .eq("credential_type", "claim_code")
             .is("revoked_at", null)
             .in("student_id", studentIds),
+          supabase.rpc("get_student_explorer_codes", {
+            p_student_ids: studentIds,
+          }),
         ]);
 
         setLinkedStudentIds(
@@ -184,14 +193,24 @@ export default function TeacherClassesPage() {
             ])
           )
         );
+        setExplorerCodesByStudentId(
+          Object.fromEntries(
+            ((explorerCodes ?? []) as StudentExplorerCodeRow[]).map((entry) => [
+              entry.student_id,
+              entry.explorer_code,
+            ])
+          )
+        );
       } else {
         setLinkedStudentIds(new Set());
         setClaimCodesByStudentId({});
+        setExplorerCodesByStudentId({});
       }
     } else {
       setStudents([]);
       setLinkedStudentIds(new Set());
       setClaimCodesByStudentId({});
+      setExplorerCodesByStudentId({});
     }
     setLoading(false);
   }, []);
@@ -1003,6 +1022,22 @@ export default function TeacherClassesPage() {
                                       </button>
                                       {s.pin ? <button type="button" onClick={() => copyText(s.pin!)} title="Copy access code" className="text-gray-400 hover:text-gray-700"><Copy size={14} /></button> : null}
                                     </span>
+                                    {explorerCodesByStudentId[s.id] ? (
+                                      <span className="inline-flex items-center gap-1">
+                                        Explorer Code:{" "}
+                                        <span className="font-mono font-bold text-gray-700">
+                                          {explorerCodesByStudentId[s.id]}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => copyText(explorerCodesByStudentId[s.id])}
+                                          title="Copy Explorer Code"
+                                          className="text-gray-400 hover:text-gray-700"
+                                        >
+                                          <Copy size={14} />
+                                        </button>
+                                      </span>
+                                    ) : null}
                                     {!isArchived && claimCodesByStudentId[s.id] && (
                                       <span>
                                         Claim:{" "}

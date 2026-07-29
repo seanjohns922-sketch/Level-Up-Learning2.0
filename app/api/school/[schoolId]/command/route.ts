@@ -148,6 +148,19 @@ export async function POST(
         });
         return NextResponse.json({ success: true });
 
+      case "resetExplorerCode": {
+        const explorerCode = await runSchoolCommand<string>(
+          schoolId,
+          "reset_student_explorer_code",
+          {
+            p_school_id: schoolId,
+            p_student_id: stringValue(payload.studentId),
+            p_reason: stringValue(payload.reason),
+          },
+        );
+        return NextResponse.json({ explorerCode });
+      }
+
       default:
         return errorResponse("Unknown school command");
     }

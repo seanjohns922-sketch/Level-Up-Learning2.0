@@ -91,6 +91,16 @@ export type SchoolHomeSnapshot = {
     requestedClassId: string | null;
     createdAt: string;
   }>;
+  students: Array<{
+    id: string;
+    name: string;
+    yearLevel: string | null;
+    username: string | null;
+    pinStatus: "set" | "not_set";
+    explorerCode: string;
+    classes: string[];
+    status: "active" | "archived";
+  }>;
 };
 
 export function isSchoolPlatformPreviewEnabled() {
@@ -201,6 +211,26 @@ export async function canViewSchoolAdministration(
   }
 }
 
+async function getSchoolStudentDirectory(
+  schoolId: string,
+  accessToken: string,
+) {
+  try {
+    return await supabaseRequest<SchoolHomeSnapshot["students"]>(
+      "/rest/v1/rpc/get_school_student_directory",
+      accessToken,
+      {
+        method: "POST",
+        body: JSON.stringify({ p_school_id: schoolId }),
+      },
+    );
+  } catch {
+    // The School Home remains available while the additive migration deploys,
+    // and ordinary teachers do not have school-directory permission.
+    return [];
+  }
+}
+
 async function recordSchoolPreviewAccess(
   schoolId: string,
   accessToken: string,
@@ -239,7 +269,8 @@ export async function loadSchoolHomePreview(schoolId: string) {
 
   const accessToken = await getSchoolPreviewToken();
   try {
-    const [snapshot, schools, canViewAdministration] = await Promise.all([
+    const [snapshot, schools, canViewAdministration, students] =
+      await Promise.all([
       supabaseRequest<SchoolHomeSnapshot>(
         "/rest/v1/rpc/get_school_home_snapshot",
         accessToken,
@@ -250,6 +281,7 @@ export async function loadSchoolHomePreview(schoolId: string) {
       ),
       getMySchoolContexts(accessToken),
       canViewSchoolAdministration(schoolId, accessToken),
+      getSchoolStudentDirectory(schoolId, accessToken),
     ]);
     return {
       ...access,
@@ -261,6 +293,7 @@ export async function loadSchoolHomePreview(schoolId: string) {
           isLeadingTeacher:
             snapshot.actor.role === "teacher" && canViewAdministration,
         },
+        students,
       },
       schools,
     };
