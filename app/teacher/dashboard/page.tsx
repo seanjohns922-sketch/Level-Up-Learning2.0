@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Star, Check, X, Lock, LockOpen, KeyRound, Trophy, Brain } from "lucide-react";
+import { Star, Check, X, Lock, LockOpen, KeyRound, Trophy, Brain, Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
@@ -258,6 +258,10 @@ function StudentQRSection({ student, classCode, className2, onRegenerate }: {
 /* ── component ─────────────────────────────────────── */
 export default function TeacherDashboardPage() {
   const router = useRouter();
+  const [schoolPreviewClassId, setSchoolPreviewClassId] = useState<
+    string | null
+  >(null);
+  const isSchoolPreview = Boolean(schoolPreviewClassId);
   const [loading, setLoading] = useState(true);
   const [classes, setClasses] = useState<ClassRow[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
@@ -281,6 +285,10 @@ export default function TeacherDashboardPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [openingSchoolPreview, setOpeningSchoolPreview] = useState(false);
+  const [schoolPreviewError, setSchoolPreviewError] = useState<string | null>(
+    null,
+  );
 
   // Refs to prevent duplicate fetches and stale closures
   const mountedRef = useRef(false);
@@ -301,7 +309,16 @@ export default function TeacherDashboardPage() {
     if (authLoading || !authUser) return;
     if (mountedRef.current) return;
     mountedRef.current = true;
-    loadClasses(authUser.id);
+    const previewParams = new URLSearchParams(window.location.search);
+    const requestedClassId =
+      previewParams.get("schoolPreview") === "1"
+        ? previewParams.get("classId")
+        : null;
+    const requestedSchoolId = requestedClassId
+      ? previewParams.get("schoolId")
+      : null;
+    setSchoolPreviewClassId(requestedClassId);
+    loadClasses(authUser.id, requestedClassId, requestedSchoolId);
   }, [authLoading, authUser]);
 
   // Re-fetch students when tab gains focus — uses ref to avoid dep on selectedClassId
@@ -329,20 +346,42 @@ export default function TeacherDashboardPage() {
     return () => window.clearInterval(intervalId);
   }, [selectedClassId]);
 
-  async function loadClasses(teacherId: string) {
+  async function loadClasses(
+    teacherId: string,
+    requestedClassId: string | null = null,
+    requestedSchoolId: string | null = null,
+  ) {
     if (fetchingRef.current) return;
     fetchingRef.current = true;
     console.log("[TeacherDashboard] loadClasses()");
 
     try {
+      if (requestedClassId) {
+        if (!requestedSchoolId) {
+          window.location.replace("/teacher/dashboard");
+          return;
+        }
+        const accessResponse = await fetch(
+          `/api/school/${requestedSchoolId}/class-access?classId=${encodeURIComponent(requestedClassId)}`,
+          { cache: "no-store" },
+        );
+        if (!accessResponse.ok) {
+          window.location.replace("/teacher/dashboard");
+          return;
+        }
+      }
+
       // Load classes for current authenticated teacher id
       console.log("[TeacherDashboard] teacher_id from auth:", teacherId);
 
-      const { data: cls, error: clsErr } = await supabase
-        .from("classes")
-        .select("*")
-        .eq("teacher_id", teacherId)
-        .order("created_at", { ascending: false });
+      let classQuery = supabase.from("classes").select("*");
+      classQuery = requestedClassId
+        ? classQuery.eq("id", requestedClassId)
+        : classQuery.eq("teacher_id", teacherId);
+      const { data: cls, error: clsErr } = await classQuery.order(
+        "created_at",
+        { ascending: false },
+      );
 
       console.log(
         "[TeacherDashboard] classes loaded:",
@@ -957,6 +996,47 @@ export default function TeacherDashboardPage() {
   );
   const isDev = process.env.NODE_ENV !== "production";
 
+  async function openSchoolPreview() {
+    setOpeningSchoolPreview(true);
+    setSchoolPreviewError(null);
+
+    try {
+      const { data } = await supabase.auth.getSession();
+      const accessToken = data.session?.access_token;
+      if (!accessToken) {
+        setSchoolPreviewError("Please sign in again before opening School Home.");
+        return;
+      }
+
+      const response = await fetch("/api/school-preview-session", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const result = (await response.json().catch(() => null)) as
+        | {
+            error?: string;
+            schools?: Array<{ id: string; name: string; role: string }>;
+          }
+        | null;
+
+      if (!response.ok || !result?.schools?.length) {
+        setSchoolPreviewError(
+          result?.error ??
+            "School Home is unavailable. Check that the preview migration is deployed.",
+        );
+        return;
+      }
+
+      window.location.assign(`/school/${result.schools[0].id}`);
+    } catch {
+      setSchoolPreviewError(
+        "School Home could not be opened. Please try again.",
+      );
+    } finally {
+      setOpeningSchoolPreview(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#E2E8F0] via-[#DEE5EC] to-[#D6DEE6]">
       {/* Header */}
@@ -969,11 +1049,17 @@ export default function TeacherDashboardPage() {
                   <path d="M3 12l9-9 9 9M5 10v10h14V10" />
                 </svg>
               </div>
-              <h1 className="text-xl font-black text-[#0F172A] tracking-tight">Teacher Dashboard</h1>
+              <h1 className="text-xl font-black text-[#0F172A] tracking-tight">
+                {isSchoolPreview && selectedClass
+                  ? selectedClass.name
+                  : "Teacher Dashboard"}
+              </h1>
             </div>
             {selectedClass && (
               <div className="flex items-center gap-2 mt-1.5 ml-9">
-                <span className="text-sm font-semibold text-[#475569]">{selectedClass.name}</span>
+                <span className="text-sm font-semibold text-[#475569]">
+                  {isSchoolPreview ? "Class dashboard" : selectedClass.name}
+                </span>
                 <span className="h-1 w-1 rounded-full bg-[#CBD5E1]" />
                 <button
                   onClick={copyCode}
@@ -1007,6 +1093,17 @@ export default function TeacherDashboardPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {isDev && !isSchoolPreview && (
+              <button
+                onClick={() => void openSchoolPreview()}
+                disabled={openingSchoolPreview}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#0EA5A4]/40 bg-[#0EA5A4]/10 text-[#0F766E] font-bold text-sm hover:bg-[#0EA5A4]/15 transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
+                type="button"
+              >
+                <Building2 className="h-4 w-4" />
+                {openingSchoolPreview ? "Opening..." : "School Home Preview"}
+              </button>
+            )}
             {classes.length > 1 && (
               <select
                 value={selectedClassId ?? ""}
@@ -1141,6 +1238,14 @@ export default function TeacherDashboardPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {schoolPreviewError && (
+          <div
+            className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900"
+            role="alert"
+          >
+            {schoolPreviewError}
+          </div>
+        )}
         {progressLoadError && (
           <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800" role="alert">
             Student progress is temporarily unavailable. Existing results have not been replaced. {progressLoadError}

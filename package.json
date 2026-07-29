@@ -53,7 +53,9 @@
     "qa:teacher-progress-overrides": "node scripts/teacher-progress-override-audit.mjs",
     "qa:pretest-pathway": "node --no-warnings --experimental-strip-types scripts/pretest-pathway-assignment-audit.mjs",
     "qa:early-years-inputs": "node scripts/early-years-answer-input-audit.mjs",
-    "qa:avatar-consistency": "node scripts/avatar-consistency-audit.mjs"
+    "qa:avatar-consistency": "node scripts/avatar-consistency-audit.mjs",
+    "qa:school-platform-phase2a": "node scripts/school-platform-phase2a-audit.mjs",
+    "qa:school-platform-phase2b1": "node scripts/school-platform-phase2b1-audit.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

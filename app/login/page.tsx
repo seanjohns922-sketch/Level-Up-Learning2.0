@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
 import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile, setStudentSessionToken } from "@/lib/studentIdentity";
@@ -15,25 +15,6 @@ import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
 
-type StudentRecord = {
-  id: string;
-  firstName: string;
-  pin: string;
-  progressPercent: number;
-  currentWeek: number;
-  pretestPercent?: number | null;
-};
-
-type ClassRecord = {
-  code: string;
-  name: string;
-  teacherEmail: string;
-  teacherName?: string;
-  students: StudentRecord[];
-  createdAt: string;
-};
-
-type ClassesStore = Record<string, ClassRecord>;
 type DemoAccessDebug = {
   featureEnabledRaw?: string | null;
   hasExpectedCode?: boolean;
@@ -48,7 +29,6 @@ type DemoAccessDebug = {
   message?: string | null;
 };
 
-const CLASSES_KEY = "lul_classes_v1";
 function normalizeClassCode(code: string) {
   return code.replace(/\s+/g, "").trim().toUpperCase();
 }
@@ -78,22 +58,6 @@ function persistStudentIdentity(args: {
   }
 }
 
-function readClasses(): ClassesStore {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = localStorage.getItem(CLASSES_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) as ClassesStore;
-  } catch {
-    return {};
-  }
-}
-
-function writeClasses(store: ClassesStore) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(CLASSES_KEY, JSON.stringify(store));
-}
-
 function summarizeProgress(progress: ReturnType<typeof readProgress>) {
   return progress
     ? {
@@ -119,13 +83,9 @@ export default function LoginPage() {
   const router = useRouter();
   const [tab, setTab] = useState<"student" | "teacher">("student");
   const [teacherMode, setTeacherMode] = useState<"login" | "signup">("login");
-  const [classes, setClasses] = useState<ClassesStore>(() => readClasses());
-
   const [teacherEmail, setTeacherEmail] = useState("");
   const [teacherPassword, setTeacherPassword] = useState("");
   const [teacherName, setTeacherName] = useState("");
-  const [className, setClassName] = useState("");
-  const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [teacherResetNotice, setTeacherResetNotice] = useState<string | null>(null);
   const [teacherResetLoading, setTeacherResetLoading] = useState(false);
   const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
@@ -154,8 +114,6 @@ export default function LoginPage() {
   const [demoSubmitting, setDemoSubmitting] = useState(false);
   const demoQueryHandledRef = useRef(false);
 
-  const createdClass = createdCode ? classes[createdCode] : null;
-  const classList = useMemo(() => Object.values(classes), [classes]);
   const [teacherError, setTeacherError] = useState<string | null>(null);
   const [teacherLoading, setTeacherLoading] = useState(false);
   const demoAccessEnabled = isDemoAccessFeatureEnabled();
@@ -198,11 +156,6 @@ export default function LoginPage() {
     };
   }, []);
 
-  function saveClasses(next: ClassesStore) {
-    setClasses(next);
-    writeClasses(next);
-  }
-
   async function handleTeacherSignup() {
     if (!teacherEmail || !teacherPassword) return;
     setTeacherError(null);
@@ -216,14 +169,8 @@ export default function LoginPage() {
     const userId = signUpData.user?.id;
     if (!userId) { setTeacherError("Sign up failed. Please try again."); setTeacherLoading(false); return; }
     await supabase.from("teachers").upsert({ id: userId, email: teacherEmail, display_name: teacherName.trim() || teacherEmail });
-    if (className.trim()) {
-      const { data: code } = await supabase.rpc("generate_class_code");
-      if (code) {
-        await supabase.from("classes").insert({ name: className.trim(), year_level: "1", class_code: code, teacher_id: userId });
-        setCreatedCode(code);
-        saveClasses({ ...classes, [code]: { code, name: className.trim(), teacherEmail, teacherName: teacherName.trim() || undefined, students: [], createdAt: new Date().toISOString() } });
-      }
-    }
+    // A new educator account is intentionally unscoped. School membership and
+    // class creation are completed by an authorised school or platform admin.
     setTeacherLoading(false);
     router.push("/teacher/dashboard");
   }
@@ -879,12 +826,6 @@ export default function LoginPage() {
                     <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} />
                   </InputField>
                 </label>
-                <label className="grid gap-1.5">
-                  <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Class Name</span>
-                  <InputField icon={<Briefcase size={14} />}>
-                    <input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="3/4 SJ" className={inputCls} />
-                  </InputField>
-                </label>
               </>
             )}
 
@@ -908,12 +849,6 @@ export default function LoginPage() {
               {teacherLoading ? "Please wait..." : teacherMode === "signup" ? "Sign Up" : "Log In"}
             </button>
 
-            {createdClass && (
-              <div className="rounded-xl p-3 text-sm text-emerald-200" style={{ background: "rgba(40,180,100,0.12)", border: "1px solid rgba(80,200,120,0.2)" }}>
-                <div className="font-bold">Class Created</div>
-                <div>Name: {createdClass.name} · Code: {createdClass.code}</div>
-              </div>
-            )}
           </div>
         )}
 
