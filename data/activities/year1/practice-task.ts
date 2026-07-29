@@ -2265,8 +2265,30 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps";
       heading?: string;
+    }
+  | {
+      // Level 2 · W4 — Map Reader. Locate landmarks on a simple 2D star map:
+      // tap a named landmark, name what sits at a highlighted spot, or reason
+      // about a landmark's position relative to another.
+      kind: "starpathMapLocate";
+      mode: "find" | "whatIsHere" | "relative";
+      prompt: string;
+      speakText: string;
+      target: number;
+      mapId: string;
+      cols: number;
+      rows: number;
+      landmarks: Array<{ id: string; label: string; object: string; r: number; c: number }>;
+      /** find: the landmark to tap. */
+      correctLandmarkId?: string;
+      /** whatIsHere: the highlighted cell. */
+      highlight?: { r: number; c: number };
+      /** whatIsHere / relative: multiple-choice options. */
+      options?: Array<{ id: string; label: string }>;
+      correctOptionId?: string;
+      feedback: { correct: string; wrong: string };
     }
   | {
       kind: "starpathShapeMatch";

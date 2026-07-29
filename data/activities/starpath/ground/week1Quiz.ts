@@ -9,6 +9,7 @@ import { buildGroundWeek5VoyageQuiz } from "@/data/activities/starpath/ground/we
 import { buildGroundWeek6VoyageQuiz } from "@/data/activities/starpath/ground/week6Quiz";
 import { buildGroundWeek7VoyageQuiz } from "@/data/activities/starpath/ground/week7Quiz";
 import { buildLevelOneWeek1VoyageQuiz } from "@/data/activities/starpath/level1/week1Quiz";
+import { buildLevelTwoWeek4VoyageQuiz } from "@/data/activities/starpath/level2/week4Quiz";
 import { buildLevelOneWeek2VoyageQuiz } from "@/data/activities/starpath/level1/week2Quiz";
 import { buildLevelOneWeek3VoyageQuiz } from "@/data/activities/starpath/level1/week3Quiz";
 import { buildLevelOneWeek4VoyageQuiz } from "@/data/activities/starpath/level1/week4Quiz";
@@ -62,6 +63,7 @@ const STARPATH_QUIZ_BUILDERS: Record<string, () => PracticeTask[]> = {
   "level-1-w5": buildLevelOneWeek5VoyageQuiz,
   "level-1-w6": buildLevelOneWeek6VoyageQuiz,
   "level-1-w7": buildLevelOneWeek7VoyageQuiz,
+  "level-2-w4": buildLevelTwoWeek4VoyageQuiz,
   // Week 8 has no weekly quiz — its assessment is the Post-Test.
 };
 

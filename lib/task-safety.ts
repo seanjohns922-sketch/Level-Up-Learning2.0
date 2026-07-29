@@ -270,6 +270,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "starpathObjectSpotter",
   "starpathObjectCompare",
   "starpathObjectMatch",
+  "starpathMapLocate",
   "mcq",
   "count",
   "order3",

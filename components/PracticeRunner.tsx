@@ -117,6 +117,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "starpathObjectSpotter") return "Shape Spotter";
   if (kind === "starpathObjectCompare") return "Same or Different";
   if (kind === "starpathObjectMatch") return "Shape Match";
+  if (kind === "starpathMapLocate") return "Star Map";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";
