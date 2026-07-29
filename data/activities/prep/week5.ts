@@ -669,8 +669,8 @@ function createWhichIsNotEqualTask(lessonId: string, difficulty: Difficulty): Pr
   ]);
   const correctGroup = groups.find((group) => group.quantity !== target)!;
   return makeCompareTask({
-    prompt: "Which group is NOT equal?",
-    speakText: "Which group is not equal?",
+    prompt: "Tap the group that is different.",
+    speakText: "Tap the group that is different.",
     targetNumber: target,
     comparisonType: "different",
     referenceGroup,

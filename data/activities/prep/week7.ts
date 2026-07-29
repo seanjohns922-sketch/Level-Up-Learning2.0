@@ -374,8 +374,8 @@ function createOrganiseCollectionTask(lessonId: string, difficulty: Difficulty):
   const objectType = pickObject(memory);
   const options = closeNumeralOptions(target, memory);
   return makeMoveCountTask({
-    prompt: "Move the objects into the counting zone, then count.",
-    speakText: "Move each object into the counting zone, then count how many there are.",
+    prompt: "Drag each one across, then count.",
+    speakText: "Drag each object across, then count how many there are.",
     targetNumber: target,
     objectType,
     options,
@@ -992,8 +992,8 @@ function createLesson3QuickGroupFlashTask(lessonId: string, difficulty: Difficul
   const memory = getMemory(lessonId);
   const options = closeNumeralOptions(target, memory).map((option) => ({ id: option.id, numeral: option.numeral }));
   return makeFlashTask({
-    prompt: "Quick sort flash. Which collection was organised to count best?",
-    speakText: "Quick sort flash. Which collection was organised to count best?",
+    prompt: "Which group is easiest to count?",
+    speakText: "Which group is easiest to count?",
     targetNumber: target,
     objectType: pickObject(memory),
     patternLayout: "ten_frame",

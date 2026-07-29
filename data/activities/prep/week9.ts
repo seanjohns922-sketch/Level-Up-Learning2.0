@@ -889,7 +889,7 @@ function createFollowInstructionTask(memory: Week9Memory): PracticeTask {
     bankCharacterIds: ["alien"],
     targetCharacterId: "alien",
     targetSlotId: slots[1]!.id,
-    feedback: { correct: "You followed Hannah's instruction!", wrong: "Place the alien in the middle spot." },
+    feedback: { correct: "You followed Numbot's instruction!", wrong: "Place the alien in the middle spot." },
   });
 }
 

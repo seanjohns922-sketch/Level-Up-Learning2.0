@@ -537,8 +537,8 @@ function createSameTotalTenTask(lessonId: string): PracticeTask {
   const exampleParts = chooseMake10Pair(memory);
   return createSplitBuildTask({
     lessonId,
-    prompt: "Do both parts still make 10? Build one that does.",
-    speakText: "Do both parts still make ten? Build one that does.",
+    prompt: "Build two parts that make 10.",
+    speakText: "Build two parts that make ten.",
     total: 10,
     exampleParts,
     requireDifferentFromExample: false,

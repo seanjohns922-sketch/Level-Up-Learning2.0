@@ -1,13 +1,18 @@
 "use client";
 
+import { useEffect } from "react";
 import { Volume2 } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type GroundMatchTask = Extract<PracticeTask, { kind: "groundMatch" }>;
 type GroundOption = GroundMatchTask["options"][number];
 
+// Monochrome geometric glyphs only — no colour emoji (planets/rockets/orbs used
+// to render as OS emoji, and ⚡ defaults to emoji presentation, so it is pinned
+// to text with a variation selector).
 const OBJECT_META = {
   dots: { label: "dots", emoji: "●" },
   gems: { label: "gems", emoji: "◆" },
@@ -16,11 +21,11 @@ const OBJECT_META = {
   robot_tokens: { label: "robot tokens", emoji: "⬢" },
   energy_orbs: { label: "energy orbs", emoji: "⬤" },
   crystals: { label: "crystals", emoji: "✦" },
-  bolts: { label: "bolts", emoji: "⚡" },
+  bolts: { label: "bolts", emoji: "⚡︎" },
   futuristic_coins: { label: "coins", emoji: "◉" },
-  planets: { label: "planets", emoji: "🪐" },
-  rockets: { label: "rockets", emoji: "🚀" },
-  number_orbs: { label: "number orbs", emoji: "🔵" },
+  planets: { label: "planets", emoji: "◍" },
+  rockets: { label: "rockets", emoji: "▲" },
+  number_orbs: { label: "number orbs", emoji: "◎" },
 } as const;
 
 type GroundPatternLayout = GroundMatchTask["patternLayout"];
@@ -372,6 +377,16 @@ export default function GroundMatchTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  const questionVisual = renderQuestionVisual(task);
+  // When there is no number/group shown on screen, the target lives only in the
+  // spoken prompt — auto-play it once so a pre-reader can start without having to
+  // discover the speaker, and pulse the speaker as a visual cue.
+  const audioLocked = questionVisual === null;
+  useEffect(() => {
+    if (!audioLocked) return;
+    void speak(task.speakText ?? task.prompt, undefined, "auto");
+  }, [task, audioLocked]);
+
   return (
     <div className="space-y-5">
       <div className="rounded-[28px] border border-cyan-200/70 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-5 shadow-[0_6px_18px_rgba(13,148,136,0.08)]">
@@ -382,11 +397,15 @@ export default function GroundMatchTaskCard({
           <div className="flex-1 text-2xl font-black leading-tight text-slate-900 sm:text-3xl">
             {task.prompt}
           </div>
-          <ReadAloudBtn text={task.speakText ?? task.prompt} size="md" className="shrink-0" />
+          <ReadAloudBtn
+            text={task.speakText ?? task.prompt}
+            size="md"
+            className={`shrink-0${audioLocked ? " animate-pulse ring-2 ring-cyan-300" : ""}`}
+          />
         </div>
         {renderHelperVisual(task)}
-        {renderQuestionVisual(task) ? (
-          <div className="mt-4 flex justify-center">{renderQuestionVisual(task)}</div>
+        {questionVisual ? (
+          <div className="mt-4 flex justify-center">{questionVisual}</div>
         ) : null}
       </div>
 

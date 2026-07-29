@@ -570,8 +570,8 @@ export function createGroundMoveToCountTask(lessonId: string): GroundMoveCountTa
 
   return {
     kind: "groundMoveCount",
-    prompt: "Move each object into the counting zone.",
-    speakText: `Move each ${objectLabel(objectType)} into the counting zone.`,
+    prompt: "Drag each one across to count.",
+    speakText: `Drag each ${objectLabel(objectType)} across to count.`,
     targetNumber: target,
     objectType,
     options,
@@ -860,8 +860,8 @@ export function createGroundThreeWayMatchTask(lessonId: string): GroundMatchTask
     options,
     correctOptionId,
     feedback: {
-      correct: `Correct — ${numberWord(target)}, ${target} and ${target} dots match.`,
-      wrong: "Find the pair where the number and dots are the same.",
+      correct: `Correct — ${numberWord(target)}, ${target} and ${target} ${objectLabel(objectType)} match.`,
+      wrong: `Find the pair where the number and ${objectLabel(objectType)} are the same.`,
     },
   };
 }
@@ -943,7 +943,7 @@ export function createGroundNumeralToWordTask(lessonId: string): GroundMatchTask
     correctOptionId: options.find((option) => option.word === toGroundWord(target))!.id,
     feedback: {
       correct: `Correct — ${numberWord(target)} matches ${target}.`,
-      wrong: "Listen again.",
+      wrong: "Look at the number, then find its word.",
     },
   };
 }

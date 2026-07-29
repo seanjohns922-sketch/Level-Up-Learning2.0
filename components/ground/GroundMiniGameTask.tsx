@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type GroundCollectTask = Extract<PracticeTask, { kind: "groundCollect" }>;
@@ -26,11 +27,11 @@ const OBJECT_META = {
   robot_tokens: { label: "robot tokens", emoji: "⬢" },
   energy_orbs: { label: "energy orbs", emoji: "⬤" },
   crystals: { label: "crystals", emoji: "✦" },
-  bolts: { label: "bolts", emoji: "⚡" },
+  bolts: { label: "bolts", emoji: "⚡︎" },
   futuristic_coins: { label: "coins", emoji: "◉" },
-  planets: { label: "planets", emoji: "🪐" },
-  rockets: { label: "rockets", emoji: "🚀" },
-  number_orbs: { label: "number orbs", emoji: "🔵" },
+  planets: { label: "planets", emoji: "◍" },
+  rockets: { label: "rockets", emoji: "▲" },
+  number_orbs: { label: "number orbs", emoji: "◎" },
 } as const;
 
 type GroundPatternLayout = GroundFlashTask["patternLayout"];
@@ -1431,6 +1432,8 @@ export function GroundSoundCountTaskCard({
 
   useEffect(() => {
     replayPulses();
+    // The number is spoken, not shown — auto-play it so a pre-reader can start.
+    void speak(task.speakText ?? task.prompt, undefined, "auto");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task]);
 
