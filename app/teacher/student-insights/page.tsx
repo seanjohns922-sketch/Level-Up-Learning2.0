@@ -14,6 +14,7 @@ import { fetchRealmCompatProgressForStudent } from "@/lib/realm-progress-compat"
 import AssessmentReplay, {
   type TeacherAssessmentAttempt,
 } from "@/components/teacher/AssessmentReplay";
+import { calculateAccuracy, formatAccuracy } from "@/lib/learning-score";
 
 type StudentRow = {
   id: string;
@@ -225,6 +226,8 @@ type FlattenedAttempt = {
 type FlattenedQuiz = {
   year: string;
   week: number;
+  correct: number;
+  total: number;
   percent: number | null;
   completedAt: string | null;
   passed: boolean;
@@ -334,7 +337,7 @@ function StudentInsightsPageInner() {
             year: row.year,
             week: extractWeekFromLessonId(attempt.lessonId ?? lessonId) ?? row.week,
             completedAt,
-            accuracy: toNumberOrNull(attempt.accuracy),
+            accuracy: calculateAccuracy(stats.correct, stats.total),
             correct: stats.correct,
             total: stats.total,
             title: typeof attempt.title === "string" ? attempt.title : null,
@@ -349,28 +352,22 @@ function StudentInsightsPageInner() {
         if (!/^\d+$/.test(weekKey)) return;
         const week = Number(weekKey);
         const quiz = rawQuiz as JsonObject;
-        const percent =
-          toNumberOrNull(quiz.percent) ??
-          (() => {
-            const score = toNumberOrNull(quiz.score);
-            const total = toNumberOrNull(quiz.total);
-            return score != null && total && total > 0 ? Math.round((score / total) * 100) : null;
-          })();
+        const quizCorrect = toNumberOrNull(quiz.score) ?? 0;
+        const quizTotal = toNumberOrNull(quiz.total) ?? 0;
+        const percent = calculateAccuracy(quizCorrect, quizTotal);
         const attempts = Array.isArray(quiz.attempts) ? quiz.attempts : [];
         if (attempts.length > 0) {
           attempts.forEach((attempt) => {
             if (!attempt || typeof attempt !== "object") return;
             const record = attempt as JsonObject;
+            const correct = toNumberOrNull(record.score ?? record.correct) ?? 0;
+            const total = toNumberOrNull(record.total ?? record.totalQuestions) ?? 0;
             quizAttempts.push({
               year: row.year,
               week,
-              percent:
-                toNumberOrNull(record.percent) ??
-                (() => {
-                  const score = toNumberOrNull(record.score);
-                  const total = toNumberOrNull(record.total);
-                  return score != null && total && total > 0 ? Math.round((score / total) * 100) : percent;
-                })(),
+              correct,
+              total,
+              percent: calculateAccuracy(correct, total),
               completedAt: toIsoOrNull(record.completedAt) ?? row.updated_at ?? null,
               passed: record.passed === true,
             });
@@ -381,6 +378,8 @@ function StudentInsightsPageInner() {
           quizAttempts.push({
             year: row.year,
             week,
+            correct: quizCorrect,
+            total: quizTotal,
             percent,
             completedAt: toIsoOrNull(quiz.completedAt) ?? row.updated_at ?? null,
             passed: weekQuizPassed(quiz),
@@ -394,7 +393,7 @@ function StudentInsightsPageInner() {
 
     const totalCorrect = completedAttempts.reduce((sum, attempt) => sum + attempt.correct, 0);
     const totalQuestions = completedAttempts.reduce((sum, attempt) => sum + attempt.total, 0);
-    const currentAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : null;
+    const currentAccuracy = calculateAccuracy(totalCorrect, totalQuestions);
     const lessonsCompleted = completedAttempts.length;
 
     const weeksPassed = progressRows.reduce((sum, row) => {
@@ -420,7 +419,7 @@ function StudentInsightsPageInner() {
       label,
       correct: value.correct,
       total: value.total,
-      accuracy: value.total > 0 ? Math.round((value.correct / value.total) * 100) : 0,
+      accuracy: calculateAccuracy(value.correct, value.total) ?? 0,
     }));
 
     const heuristicInsight = buildHeuristicTeacherInsight({
@@ -446,7 +445,7 @@ function StudentInsightsPageInner() {
       .map(([week, value]) => ({
         label: `Week ${week}`,
         shortLabel: `W${week}`,
-        value: value.total > 0 ? Math.round((value.correct / value.total) * 100) : 0,
+        value: calculateAccuracy(value.correct, value.total) ?? 0,
       }));
 
     const quizAccuracyByWeek: WeeklyPoint[] = quizAttempts
@@ -937,7 +936,9 @@ function AssessmentAttemptHistory({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="text-xl font-black text-[#0F172A]">{attempt.scorePercent}%</div>
+              <div className="text-xl font-black text-[#0F172A]">
+                {formatAccuracy(attempt.correctCount, attempt.totalQuestions, `${attempt.scorePercent}%`)}
+              </div>
               <button
                 type="button"
                 onClick={() => onView(attempt)}

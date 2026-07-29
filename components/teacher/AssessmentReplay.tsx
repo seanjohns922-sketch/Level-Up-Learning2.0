@@ -9,6 +9,7 @@ import {
   List,
   X,
 } from "lucide-react";
+import { formatAccuracy } from "@/lib/learning-score";
 import {
   isAssessmentQuestionSnapshot,
   type AssessmentQuestionSnapshot,
@@ -373,7 +374,14 @@ export default function AssessmentReplay({
             ["Completed", formatDateTime(attempt.completedAt)],
             ["Time taken", durationSeconds != null ? `${Math.floor(durationSeconds / 60)}m ${durationSeconds % 60}s` : "Not recorded"],
             ["Attempt", String(attempt.attemptNumber)],
-            ["Result", `${attempt.correctCount ?? "—"}/${attempt.totalQuestions ?? "—"} · ${attempt.scorePercent}%`],
+            [
+              "Result",
+              `${attempt.correctCount ?? "—"}/${attempt.totalQuestions ?? "—"} · ${formatAccuracy(
+                attempt.correctCount,
+                attempt.totalQuestions,
+                `${attempt.scorePercent}%`,
+              )}`,
+            ],
             ["Outcome", attempt.passed ? "Passed" : "Not Passed"],
             [
               outcomeLabel,

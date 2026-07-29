@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatRelativeTime, formatTimeActive, getLearningStateMeta, getLiveStatusTone, type LearningState, type LiveStudentStatus } from "@/lib/live-class";
 import StudentScreenViewer from "@/components/teacher/StudentScreenViewer";
+import { formatAccuracy } from "@/lib/learning-score";
 
 export type LiveStudentEventRow = {
   id: string;
@@ -41,6 +42,7 @@ export type LiveStudentDrawerData = {
   questionsAnswered?: number | null;
   correctCount?: number | null;
   accuracyPercent?: number | null;
+  scoreSource?: "live" | "canonical" | null;
   currentLessonStatus?: string | null;
   completedAt?: string | null;
   lastEventText?: string | null;
@@ -239,8 +241,14 @@ export function LiveStudentDrawer({
               ) : null}
               {(student.questionsAnswered ?? 0) > 0 ? (
                 <div className="mt-3 flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-600">
-                  <span>Correct: {student.correctCount ?? 0} / {student.questionsAnswered ?? 0}</span>
-                  <span>Accuracy: {student.accuracyPercent ?? 0}%</span>
+                  <span>
+                    {student.scoreSource === "canonical" ? "Final score" : "Current lesson score"}:{" "}
+                    {student.correctCount ?? 0}/{student.questionsAnswered ?? 0}
+                  </span>
+                  <span>
+                    {student.scoreSource === "canonical" ? "Final accuracy" : "Current lesson accuracy"}:{" "}
+                    {formatAccuracy(student.correctCount, student.questionsAnswered)}
+                  </span>
                 </div>
               ) : null}
               <div className="mt-3 text-xs text-slate-500">

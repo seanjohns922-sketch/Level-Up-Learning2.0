@@ -10,6 +10,7 @@ import {
 } from "@/data/programs/genres";
 import type { Lesson } from "@/data/programs/year1";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
+import { calculateAccuracy } from "@/lib/learning-score";
 
 type ProgressLike = {
   student_id: string;
@@ -146,17 +147,20 @@ export default function CurriculumExplorer({
   /** Class average quiz accuracy % for a week (across all students who attempted). */
   function weekAvgAccuracy(w: number): { avg: number; attempts: number } {
     if (isPlaceholder) return { avg: 0, attempts: 0 };
-    let sum = 0;
+    let correct = 0;
+    let total = 0;
     let n = 0;
     for (const p of yearProgress) {
       const qs = parseQuiz(p.quiz_scores);
       const wq = qs[String(w)];
-      if (typeof wq?.percent === "number") {
-        sum += wq.percent;
+      const quizCorrect = wq?.score ?? wq?.correct;
+      if (typeof quizCorrect === "number" && typeof wq?.total === "number" && wq.total > 0) {
+        correct += quizCorrect;
+        total += wq.total;
         n += 1;
       }
     }
-    return { avg: n === 0 ? 0 : Math.round(sum / n), attempts: n };
+    return { avg: calculateAccuracy(correct, total) ?? 0, attempts: n };
   }
 
   /** Class average per-lesson accuracy from weekly quiz lessonBreakdown. */
@@ -176,7 +180,7 @@ export default function CurriculumExplorer({
         n += 1;
       }
     }
-    return { avg: sumTotal === 0 ? 0 : Math.round((sumCorrect / sumTotal) * 100), attempts: n };
+    return { avg: calculateAccuracy(sumCorrect, sumTotal) ?? 0, attempts: n };
   }
 
   function accTone(avg: number, attempts: number) {

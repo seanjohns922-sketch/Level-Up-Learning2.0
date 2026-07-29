@@ -17,6 +17,7 @@ import {
   isBrainBreakFrequency,
   type BrainBreakFrequency,
 } from "@/lib/brain-break-settings";
+import { formatAccuracy } from "@/lib/learning-score";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = { id: string; class_code: string; name: string; year_level: string; brain_break_frequency?: string | null };
@@ -854,7 +855,7 @@ export default function TeacherDashboardPage() {
                           <div key={i} className="py-1.5 px-3 rounded-lg bg-white mb-0.5">
                             <div className="flex items-center justify-between">
                               <span className="text-gray-600 text-xs">
-                                Attempt {i + 1} — {a.score}/{a.total} ({a.percent}%)
+                                Attempt {i + 1} — {a.score}/{a.total} ({formatAccuracy(a.score, a.total, `${a.percent}%`)})
                               </span>
                               <span className={["inline-flex items-center gap-1 font-bold text-xs px-2 py-0.5 rounded-full", a.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
                                 {a.passed ? <><Check className="h-3 w-3" /> Pass</> : <><X className="h-3 w-3" /> Fail</>}
@@ -867,7 +868,8 @@ export default function TeacherDashboardPage() {
                               <div className="mt-1 grid gap-1">
                                 {a.lessonBreakdown.map((item: any) => (
                                   <div key={item.lessonNumber} className="text-[11px] text-gray-500">
-                                    Lesson {item.lessonNumber}: {item.correct}/{item.total} ({item.percent}%)
+                                    Lesson {item.lessonNumber}: {item.correct}/{item.total} (
+                                    {formatAccuracy(item.correct, item.total, `${item.percent}%`)})
                                   </div>
                                 ))}
                               </div>
@@ -876,7 +878,9 @@ export default function TeacherDashboardPage() {
                         ))
                       ) : (
                         <div className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white">
-                          <span className="text-gray-600">Score: {wd?.score}/{wd?.total} ({wd?.percent}%)</span>
+                          <span className="text-gray-600">
+                            Score: {wd?.score}/{wd?.total} ({formatAccuracy(wd?.score, wd?.total, `${wd?.percent}%`)})
+                          </span>
                           <span className={["inline-flex items-center gap-1 font-bold text-xs px-2 py-0.5 rounded-full", wd?.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
                             {wd?.passed ? <><Check className="h-3 w-3" /> Pass</> : <><X className="h-3 w-3" /> Fail</>}
                           </span>
@@ -979,7 +983,7 @@ export default function TeacherDashboardPage() {
   });
 
   const averageLessonScore = lessonQuestionSum > 0
-    ? `${Math.round((lessonCorrectSum / lessonQuestionSum) * 100)}%`
+    ? formatAccuracy(lessonCorrectSum, lessonQuestionSum)
     : "—";
 
   const weeksPassed = classProgressRows.reduce((sum, row) => {

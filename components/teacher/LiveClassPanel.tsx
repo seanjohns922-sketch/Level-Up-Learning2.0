@@ -5,6 +5,12 @@ import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import {
+  aggregateLearningScores,
+  calculateAccuracy,
+  formatAccuracy,
+  normalizeLearningScore,
+} from "@/lib/learning-score";
+import {
   buildLiveClassInsight,
   buildLiveStudentInsight,
   formatRelativeTime,
@@ -132,6 +138,7 @@ type LiveStudentCard = {
   questionsAnswered?: number | null;
   correctCount?: number | null;
   accuracyPercent?: number | null;
+  scoreSource?: "live" | "canonical" | null;
   currentLessonStatus?: string | null;
   completedAt?: string | null;
   lessonStartedAt?: string | null;
@@ -155,8 +162,6 @@ const STATUS_PRIORITY: Record<LiveCardDisplayGroup, number> = {
   idle: 2,
   waiting_to_start: 3,
 };
-
-const MAX_LESSON_SCORE_QUESTIONS = 10;
 
 function formatWorkingLevelBadge(workingLevel?: string | null) {
   const normalized = normalizeWorkingLevelLabel(workingLevel);
@@ -468,18 +473,12 @@ function buildCompletedActivityAttemptSummary(
 
   const latest = completedAttempts[0] ?? null;
   if (latest) {
-    const rawAnswered = Math.max(0, latest.total_questions ?? 0);
-    const rawCorrect = Math.min(Math.max(0, latest.correct_count ?? 0), rawAnswered);
-    const shouldCap = latest.activity_type === "lesson" && rawAnswered > MAX_LESSON_SCORE_QUESTIONS;
-    const answered = shouldCap ? MAX_LESSON_SCORE_QUESTIONS : rawAnswered;
-    const correct = shouldCap
-      ? Math.round((rawCorrect / rawAnswered) * answered)
-      : rawCorrect;
+    const score = normalizeLearningScore(latest.correct_count, latest.total_questions);
     return {
       attemptNumber: Math.max(1, latest.attempt_no),
-      answered,
-      correct,
-      accuracy: answered > 0 ? Math.round((correct / answered) * 100) : 0,
+      answered: score?.total ?? 0,
+      correct: score?.correct ?? 0,
+      accuracy: score?.accuracy ?? 0,
     };
   }
 
@@ -551,19 +550,12 @@ function buildCurrentLessonPerformance(
     correct = Math.min(rowCorrect, answered);
   }
 
-  if (!isQuizActivity(row)) {
-    const rawAnswered = answered;
-    const rawCorrect = Math.min(correct, rawAnswered);
-    answered = Math.min(rawAnswered, MAX_LESSON_SCORE_QUESTIONS);
-    correct = rawAnswered > MAX_LESSON_SCORE_QUESTIONS
-      ? Math.round((rawCorrect / rawAnswered) * answered)
-      : rawCorrect;
-  }
+  const score = normalizeLearningScore(correct, answered);
 
   return {
-    answered,
-    correct,
-    accuracy: answered > 0 ? Math.round((correct / answered) * 100) : 0,
+    answered: score?.total ?? 0,
+    correct: score?.correct ?? 0,
+    accuracy: score?.accuracy ?? 0,
     completed: rowCompleted || eventCompleted,
   };
 }
@@ -574,6 +566,11 @@ function toLiveCard(
   lessonPerformance?: ReturnType<typeof buildCurrentLessonPerformance> | null,
   completedAttemptSummary?: CompletedActivityAttemptSummary | null,
 ): LiveStudentCard {
+  const useCanonicalScore = Boolean(
+    completedAttemptSummary &&
+    (lessonPerformance?.completed || row?.current_lesson_status === "completed")
+  );
+  const displayedScore = useCanonicalScore ? completedAttemptSummary : lessonPerformance;
   const insight = row
     ? buildLiveStudentInsight({
         studentId: student.id,
@@ -604,9 +601,9 @@ function toLiveCard(
         consecutiveIncorrectCount: row.consecutive_incorrect_count ?? null,
         sessionHintCount: row.session_hint_count ?? null,
         attemptNumber: row.attempt_number ?? null,
-        questionsAnswered: row.questions_answered ?? null,
-        correctCount: row.correct_count ?? null,
-        accuracy: row.accuracy_percent ?? null,
+        questionsAnswered: displayedScore?.answered ?? row.questions_answered ?? null,
+        correctCount: displayedScore?.correct ?? row.correct_count ?? null,
+        accuracy: displayedScore?.accuracy ?? row.accuracy_percent ?? null,
         completedAt: row.completed_at ?? null,
         skillTag: row.skill_tag ?? null,
         misconceptionTag: row.misconception_tag ?? null,
@@ -637,10 +634,13 @@ function toLiveCard(
     latestCorrectAnswer: row?.latest_correct_answer ?? null,
     latestAnswerCorrect: row?.latest_answer_correct ?? null,
     timeOnCurrentQuestion: row?.time_on_current_question ?? 0,
-    attemptNumber: completedAttemptSummary?.attemptNumber ?? row?.attempt_number ?? null,
-    questionsAnswered: completedAttemptSummary?.answered ?? lessonPerformance?.answered ?? null,
-    correctCount: completedAttemptSummary?.correct ?? lessonPerformance?.correct ?? null,
-    accuracyPercent: completedAttemptSummary?.accuracy ?? lessonPerformance?.accuracy ?? null,
+    attemptNumber: useCanonicalScore
+      ? completedAttemptSummary?.attemptNumber ?? null
+      : row?.attempt_number ?? completedAttemptSummary?.attemptNumber ?? null,
+    questionsAnswered: displayedScore?.answered ?? null,
+    correctCount: displayedScore?.correct ?? null,
+    accuracyPercent: displayedScore?.accuracy ?? null,
+    scoreSource: useCanonicalScore ? "canonical" : displayedScore ? "live" : null,
     currentLessonStatus: lessonPerformance?.completed ? "completed" : (row?.current_lesson_status ?? null),
     completedAt: row?.completed_at ?? null,
     lessonStartedAt: row?.lesson_started_at ?? null,
@@ -731,10 +731,13 @@ export default function LiveClassPanel({
   const [sort, setSort] = useState<LiveSort>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedStudentEvents, setSelectedStudentEvents] = useState<LiveStudentEventRow[]>([]);
+  const studentIdsKey = students.map((student) => student.id).sort().join(",");
 
   useEffect(() => {
     let cancelled = false;
     let intervalId: ReturnType<typeof setInterval> | null = null;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    const studentIds = studentIdsKey ? studentIdsKey.split(",") : [];
 
     async function ensureLiveSession() {
       if (!selectedClass?.id) return;
@@ -783,15 +786,21 @@ export default function LiveClassPanel({
           "quiz_completed",
         ])
         .order("created_at", { ascending: true });
-      const { data: lessonAttemptData, error: lessonAttemptError } = await supabase
-        .from("student_lesson_attempts")
-        .select("student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at")
-        .eq("class_id", selectedClass.id)
-        .eq("completed", true);
-      const { data: quizAttemptData, error: quizAttemptError } = await supabase
-        .from("student_weekly_quiz_attempts")
-        .select("student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at")
-        .eq("class_id", selectedClass.id);
+      const lessonAttemptResult = studentIds.length > 0
+        ? await supabase
+            .from("student_lesson_attempts")
+            .select("student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at")
+            .in("student_id", studentIds)
+            .eq("completed", true)
+        : { data: [], error: null };
+      const quizAttemptResult = studentIds.length > 0
+        ? await supabase
+            .from("student_weekly_quiz_attempts")
+            .select("student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at")
+            .in("student_id", studentIds)
+        : { data: [], error: null };
+      const { data: lessonAttemptData, error: lessonAttemptError } = lessonAttemptResult;
+      const { data: quizAttemptData, error: quizAttemptError } = quizAttemptResult;
       if (error) {
         console.warn("[LiveClassPanel] Failed to load live student activity", error);
       }
@@ -827,11 +836,42 @@ export default function LiveClassPanel({
     void ensureLiveSession();
     void loadRows();
     intervalId = setInterval(loadRows, 30000);
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") void loadRows();
+    };
+    window.addEventListener("focus", loadRows);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    channel = supabase
+      .channel(`live-class-${selectedClass?.id ?? "none"}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "live_student_activity", filter: `class_id=eq.${selectedClass?.id}` },
+        () => void loadRows(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "live_activity_events", filter: `class_id=eq.${selectedClass?.id}` },
+        () => void loadRows(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "student_lesson_attempts", filter: `class_id=eq.${selectedClass?.id}` },
+        () => void loadRows(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "student_weekly_quiz_attempts", filter: `class_id=eq.${selectedClass?.id}` },
+        () => void loadRows(),
+      )
+      .subscribe();
     return () => {
       cancelled = true;
       if (intervalId) clearInterval(intervalId);
+      window.removeEventListener("focus", loadRows);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+      if (channel) void supabase.removeChannel(channel);
     };
-  }, [selectedClass?.id]);
+  }, [selectedClass?.id, studentIdsKey]);
 
   useEffect(() => {
     let cancelled = false;
@@ -944,11 +984,12 @@ export default function LiveClassPanel({
 
   const activeStudentCount = cards.filter((card) => getCardDisplayGroup(card) === "live").length;
   const classAccuracy = useMemo(() => {
-    const answered = cards.filter((card) => (card.questionsAnswered ?? 0) > 0);
-    if (answered.length === 0) return null;
-    return Math.round(
-      answered.reduce((sum, card) => sum + Math.max(0, card.accuracyPercent ?? 0), 0) / answered.length
-    );
+    return aggregateLearningScores(
+      cards.map((card) => ({
+        correct: card.correctCount ?? 0,
+        total: card.questionsAnswered ?? 0,
+      })),
+    )?.accuracy ?? null;
   }, [cards]);
   const classInsight = useMemo(
     () =>
@@ -1081,8 +1122,8 @@ export default function LiveClassPanel({
               <SortHeader sortKey="week" sort={sort} onSort={updateSort}>Week</SortHeader>
               <SortHeader sortKey="lesson" sort={sort} onSort={updateSort}>Lesson</SortHeader>
               <SortHeader sortKey="attempt" sort={sort} onSort={updateSort}>Lesson attempt</SortHeader>
-              <SortHeader sortKey="score" sort={sort} onSort={updateSort} align="right">Score</SortHeader>
-              <SortHeader sortKey="percentage" sort={sort} onSort={updateSort} align="right">%</SortHeader>
+              <SortHeader sortKey="score" sort={sort} onSort={updateSort} align="right">Current score</SortHeader>
+              <SortHeader sortKey="percentage" sort={sort} onSort={updateSort} align="right">Current accuracy</SortHeader>
               <SortHeader sortKey="lastActive" sort={sort} onSort={updateSort} align="right">Last active</SortHeader>
             </div>
             {filteredCards.map((card) => {
@@ -1090,7 +1131,7 @@ export default function LiveClassPanel({
               const meta = rowStatusMeta(card, displayGroup);
               const answered = Math.max(0, card.questionsAnswered ?? 0);
               const correct = Math.max(0, card.correctCount ?? 0);
-              const accuracy = answered > 0 ? Math.max(0, card.accuracyPercent ?? 0) : null;
+              const accuracy = calculateAccuracy(correct, answered);
               const notStarted = displayGroup === "waiting_to_start";
               const levelTag = notStarted ? "—" : (card.workingLevelBadge ?? "—");
               const weekTag = notStarted ? "—" : (card.currentWeek ? `W${card.currentWeek}` : "—");
@@ -1126,7 +1167,7 @@ export default function LiveClassPanel({
                     : accuracy >= 50 ? "text-amber-700"
                     : "text-rose-700"
                   }`}>
-                    {accuracy == null ? "—" : `${accuracy}%`}
+                    {formatAccuracy(correct, answered)}
                   </span>
                   {/* last active */}
                   <span className="text-right text-[11px] font-semibold text-slate-400">

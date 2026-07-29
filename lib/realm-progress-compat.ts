@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
+import { calculateAccuracy } from "@/lib/learning-score";
 
 export type CompatProgressRow = {
   student_id: string;
@@ -191,21 +192,16 @@ function snapshotKey(studentId: string, year: string) {
 
 function normalizeLessonAttemptSummary(row: LessonAttemptRow) {
   const summary = parseObject(row.summary);
+  const accuracy = calculateAccuracy(row.correct_count, row.total_questions) ?? row.accuracy_percent;
   return {
     ...summary,
     completedAt: typeof summary.completedAt === "string" ? summary.completedAt : row.completed_at,
-    questionsAnswered:
-      typeof summary.questionsAnswered === "number" ? summary.questionsAnswered : row.total_questions,
-    totalQuestions:
-      typeof summary.totalQuestions === "number" ? summary.totalQuestions : row.total_questions,
-    correctAnswers:
-      typeof summary.correctAnswers === "number" ? summary.correctAnswers : row.correct_count,
-    correctCount:
-      typeof summary.correctCount === "number" ? summary.correctCount : row.correct_count,
-    accuracy:
-      typeof summary.accuracy === "number" ? summary.accuracy : row.accuracy_percent,
-    accuracy_percent:
-      typeof summary.accuracy_percent === "number" ? summary.accuracy_percent : row.accuracy_percent,
+    questionsAnswered: row.total_questions,
+    totalQuestions: row.total_questions,
+    correctAnswers: row.correct_count,
+    correctCount: row.correct_count,
+    accuracy,
+    accuracy_percent: accuracy,
     time_spent_seconds:
       typeof summary.time_spent_seconds === "number" ? summary.time_spent_seconds : row.time_spent_seconds,
   };
@@ -213,44 +209,18 @@ function normalizeLessonAttemptSummary(row: LessonAttemptRow) {
 
 function normalizeQuizAttemptSummary(row: WeeklyQuizAttemptRow) {
   const summary = parseObject(row.summary);
+  const accuracy = calculateAccuracy(row.correct_count, row.total_questions) ?? row.accuracy_percent;
   return {
     ...summary,
     completedAt: typeof summary.completedAt === "string" ? summary.completedAt : row.completed_at,
-    correct:
-      typeof summary.correct === "number"
-        ? summary.correct
-        : typeof summary.score === "number"
-        ? summary.score
-        : row.correct_count,
-    score:
-      typeof summary.score === "number"
-        ? summary.score
-        : typeof summary.correct === "number"
-        ? summary.correct
-        : row.correct_count,
-    total:
-      typeof summary.total === "number"
-        ? summary.total
-        : typeof summary.totalQuestions === "number"
-        ? summary.totalQuestions
-        : row.total_questions,
-    totalQuestions:
-      typeof summary.totalQuestions === "number" ? summary.totalQuestions : row.total_questions,
-    percent:
-      typeof summary.percent === "number"
-        ? summary.percent
-        : typeof summary.accuracy === "number"
-        ? summary.accuracy
-        : row.accuracy_percent,
-    accuracy:
-      typeof summary.accuracy === "number"
-        ? summary.accuracy
-        : typeof summary.percent === "number"
-        ? summary.percent
-        : row.accuracy_percent,
-    accuracy_percent:
-      typeof summary.accuracy_percent === "number" ? summary.accuracy_percent : row.accuracy_percent,
-    passed: typeof summary.passed === "boolean" ? summary.passed : row.passed,
+    correct: row.correct_count,
+    score: row.correct_count,
+    total: row.total_questions,
+    totalQuestions: row.total_questions,
+    percent: accuracy,
+    accuracy,
+    accuracy_percent: accuracy,
+    passed: row.passed,
     lessonBreakdown: summary.lessonBreakdown ?? row.lesson_breakdown ?? [],
   };
 }
@@ -266,7 +236,7 @@ function normalizeWeeklyQuizAttempt(row: WeeklyQuizAttemptRow): NormalizedWeekly
     attemptNumber: row.attempt_no,
     correctCount: row.correct_count,
     totalQuestions: row.total_questions,
-    scorePercent: row.accuracy_percent,
+    scorePercent: calculateAccuracy(row.correct_count, row.total_questions) ?? row.accuracy_percent,
     passed: row.passed,
     completedAt: row.completed_at,
     placementResult: summary,

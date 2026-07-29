@@ -31,6 +31,7 @@ import {
   type TeacherProgressOverrideReason,
 } from "@/lib/realm-progress-compat";
 import AssessmentReplay from "./AssessmentReplay";
+import { calculateAccuracy, formatAccuracy } from "@/lib/learning-score";
 
 type StudentRow = {
   id: string;
@@ -230,8 +231,7 @@ function weekLessonsDone(ids: string[], week: number): number {
 }
 
 function getQuizPercent(quiz: JsonObject | undefined): number | null {
-  const value = quiz?.percent;
-  return typeof value == "number" ? value : null;
+  return calculateAccuracy(getQuizScore(quiz), getQuizTotal(quiz));
 }
 
 function getQuizScore(quiz: JsonObject | undefined): number | null {
@@ -420,7 +420,7 @@ function buildWeekSummary(
   if (liveRow) {
     const answered = liveRow.questions_answered ?? 0;
     const correct = liveRow.correct_count ?? 0;
-    const accuracy = liveRow.accuracy_percent ?? (answered > 0 ? Math.round((correct / answered) * 100) : 0);
+    const accuracy = calculateAccuracy(correct, answered) ?? 0;
     const lessonLabel = liveRow.current_lesson_title ?? liveRow.current_lesson ?? "current lesson";
     const inactive = timeAgo(liveRow.last_active_at ?? undefined);
 
@@ -526,9 +526,6 @@ function buildStudentWeeklyPerformanceSummary({
     const summaryCorrect = numberOrNull(
       latestCompletedAttempt?.correctCount ?? latestCompletedAttempt?.correctAnswers,
     );
-    const summaryAccuracy = numberOrNull(
-      latestCompletedAttempt?.accuracy ?? latestCompletedAttempt?.accuracyPercent,
-    );
     const liveMatchesThisLesson =
       liveLessonMatch &&
       liveRow?.current_lesson_status !== "completed" &&
@@ -536,14 +533,9 @@ function buildStudentWeeklyPerformanceSummary({
 
     const liveTotal = liveMatchesThisLesson ? numberOrNull(liveRow?.questions_answered) : null;
     const liveCorrect = liveMatchesThisLesson ? numberOrNull(liveRow?.correct_count) : null;
-    const liveAccuracy = liveMatchesThisLesson ? numberOrNull(liveRow?.accuracy_percent) : null;
-
     const total = summaryTotal ?? liveTotal;
     const correct = summaryCorrect ?? liveCorrect;
-    const accuracy =
-      summaryAccuracy ??
-      liveAccuracy ??
-      (total && correct != null ? Math.round((correct / total) * 100) : null);
+    const accuracy = calculateAccuracy(correct, total);
 
     const attemptCount =
       attempts.length > 0
@@ -551,7 +543,7 @@ function buildStudentWeeklyPerformanceSummary({
         : latestCompletedAttempt
           ? 1
           : 0;
-    const hasPersistedSummary = summaryTotal != null || summaryCorrect != null || summaryAccuracy != null;
+    const hasPersistedSummary = summaryTotal != null || summaryCorrect != null;
     const status: LessonCardPerformance["status"] = completedIds.includes(lesson.id) || hasPersistedSummary
       ? "Completed"
       : total != null || liveMatchesThisLesson
@@ -572,7 +564,7 @@ function buildStudentWeeklyPerformanceSummary({
   const questionsAnswered = lessonCards.reduce((sum, card) => sum + (card.total ?? 0), 0);
   const correctCount = lessonCards.reduce((sum, card) => sum + (card.correct ?? 0), 0);
   const incorrectCount = Math.max(0, questionsAnswered - correctCount);
-  const weeklyAccuracy = questionsAnswered > 0 ? Math.round((correctCount / questionsAnswered) * 100) : null;
+  const weeklyAccuracy = calculateAccuracy(correctCount, questionsAnswered);
 
   const weekInsights = lessons
     .map((lesson) => lessonAttempts[lesson.id]?.latestInsight as TeacherInsight | null | undefined)
@@ -581,11 +573,7 @@ function buildStudentWeeklyPerformanceSummary({
 
   const weeklyQuizCorrect = getQuizScore(weekQuiz);
   const weeklyQuizTotal = getQuizTotal(weekQuiz);
-  const weeklyQuizAccuracy =
-    getQuizPercent(weekQuiz) ??
-    (weeklyQuizCorrect != null && weeklyQuizTotal && weeklyQuizTotal > 0
-      ? Math.round((weeklyQuizCorrect / weeklyQuizTotal) * 100)
-      : null);
+  const weeklyQuizAccuracy = calculateAccuracy(weeklyQuizCorrect, weeklyQuizTotal);
   const weeklyQuizPassed = weekQuiz ? getQuizPassed(weekQuiz) : null;
   const weeklyQuizStatus: WeeklyPerformanceSummary["weeklyQuizStatus"] = weekQuiz
     ? weeklyQuizPassed
@@ -679,9 +667,7 @@ function buildClassInsight(
       const record = latestCompleted as Record<string, unknown>;
       const total = numberOrNull(record.totalQuestions ?? record.questionsAnswered);
       const correct = numberOrNull(record.correctCount ?? record.correctAnswers);
-      const accuracy =
-        numberOrNull(record.accuracy ?? record.accuracyPercent) ??
-        (total && correct != null && total > 0 ? Math.round((correct / total) * 100) : null);
+      const accuracy = calculateAccuracy(correct, total);
 
       if (!total || total <= 0 || correct == null || accuracy == null) return;
 
@@ -721,7 +707,7 @@ function buildClassInsight(
       breakdown.forEach((item) => {
         const total = numberOrNull(item.total);
         const correct = numberOrNull(item.correct);
-        const accuracy = numberOrNull(item.percent);
+        const accuracy = calculateAccuracy(correct, total);
         if (!total || total <= 0 || correct == null || accuracy == null) return;
 
         evidence.push({
@@ -802,8 +788,7 @@ function buildClassInsight(
   const lessonCount = completedLessonEvidence.length;
   const totalQuestions = completedLessonEvidence.reduce((sum, item) => sum + item.total, 0);
   const totalCorrect = completedLessonEvidence.reduce((sum, item) => sum + item.correct, 0);
-  const averageAccuracy =
-    totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : null;
+  const averageAccuracy = calculateAccuracy(totalCorrect, totalQuestions);
 
   if (averageAccuracy != null && lessonCount > 0 && averageAccuracy >= 85) {
     return {
@@ -1422,7 +1407,11 @@ function StudentStrandDetail({
                     ? `${weekPerformance.weeklyQuizCorrect} / ${weekPerformance.weeklyQuizTotal}`
                     : "— / —"}
                 </div>
-                <div>{weekPerformance.weeklyQuizAccuracy != null ? `${weekPerformance.weeklyQuizAccuracy}% accuracy` : "— accuracy"}</div>
+                <div>
+                  {weekPerformance.weeklyQuizAccuracy != null
+                    ? `${formatAccuracy(weekPerformance.weeklyQuizCorrect, weekPerformance.weeklyQuizTotal)} accuracy`
+                    : "— accuracy"}
+                </div>
                 <div>
                   {weekPerformance.weeklyQuizPassed == null
                     ? "Not attempted"
@@ -1556,7 +1545,9 @@ function StudentStrandDetail({
                         : "— / —"}
                     </div>
                     <div className="font-semibold text-[#475569]">
-                      {performance.accuracy != null ? `${performance.accuracy}% accuracy` : "— accuracy"}
+                      {performance.accuracy != null
+                        ? `${formatAccuracy(performance.correct, performance.total)} accuracy`
+                        : "— accuracy"}
                     </div>
                     <div className="font-semibold text-[#94A3B8]">
                       Attempts: {performance.attemptCount}
@@ -1669,7 +1660,8 @@ function StudentStrandDetail({
                               })}
                             </span>
                             <span className="font-bold text-slate-800">
-                              {attempt.correctCount}/{attempt.totalQuestions} · {attempt.scorePercent}%
+                              {attempt.correctCount}/{attempt.totalQuestions} ·{" "}
+                              {formatAccuracy(attempt.correctCount, attempt.totalQuestions)}
                             </span>
                             <span className={[
                               "rounded-md px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.06em]",

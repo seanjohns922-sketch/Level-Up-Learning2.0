@@ -9,6 +9,7 @@ import {
   type LiveStudentSnapshot,
 } from "@/lib/live-class";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
+import { calculateAccuracy } from "@/lib/learning-score";
 
 type LiveLearningEventInput = {
   eventType: LiveLearningEventType;
@@ -221,7 +222,9 @@ function buildNextActivityRow(
 
   const shouldClearQuestion = input.eventType === "lesson_completed" || input.eventType === "quiz_completed";
   const explicitAccuracy = normalizedCount(input.accuracyPercent);
-  const accuracyPercent = explicitAccuracy ?? (questionsAnswered > 0 ? Math.round((correctCount / questionsAnswered) * 100) : 0);
+  const accuracyPercent = questionsAnswered > 0
+    ? Math.round(calculateAccuracy(correctCount, questionsAnswered) ?? 0)
+    : explicitAccuracy ?? 0;
 
   const row: LiveStudentActivityRow = {
     ...(existing ?? {}),
