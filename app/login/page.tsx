@@ -13,7 +13,7 @@ import { activateDemoPreviewMode, deactivateDemoPreviewMode, isDemoAccessFeature
 import { resolveStudentDestination } from "@/lib/student-destination";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
-import { GraduationCap, Briefcase, KeyRound, User, Lock } from "lucide-react";
+import { GraduationCap, Briefcase, KeyRound, User, Lock, Users } from "lucide-react";
 
 type DemoAccessDebug = {
   featureEnabledRaw?: string | null;
@@ -81,7 +81,7 @@ function InputField({ icon, children }: { icon: React.ReactNode; children: React
 
 export default function LoginPage() {
   const router = useRouter();
-  const [tab, setTab] = useState<"student" | "teacher">("student");
+  const [tab, setTab] = useState<"student" | "teacher" | "parent">("student");
   const [teacherMode, setTeacherMode] = useState<"login" | "activate">("login");
   const [teacherEmail, setTeacherEmail] = useState("");
   const [teacherPassword, setTeacherPassword] = useState("");
@@ -89,6 +89,12 @@ export default function LoginPage() {
   const [teacherSchoolCode, setTeacherSchoolCode] = useState("");
   const [teacherResetNotice, setTeacherResetNotice] = useState<string | null>(null);
   const [teacherResetLoading, setTeacherResetLoading] = useState(false);
+  const [parentMode, setParentMode] = useState<"login" | "signup">("login");
+  const [parentEmail, setParentEmail] = useState("");
+  const [parentPassword, setParentPassword] = useState("");
+  const [parentError, setParentError] = useState<string | null>(null);
+  const [parentNotice, setParentNotice] = useState<string | null>(null);
+  const [parentLoading, setParentLoading] = useState(false);
   const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
   const [recoveryPassword, setRecoveryPassword] = useState("");
   const [recoveryConfirmPassword, setRecoveryConfirmPassword] = useState("");
@@ -286,6 +292,61 @@ export default function LoginPage() {
     }
 
     setTeacherResetNotice("Reset link sent. Check your email.");
+  }
+
+  async function handleParentAuthentication() {
+    const email = parentEmail.trim();
+    if (!email || !parentPassword) {
+      setParentError("Enter your parent email and password.");
+      return;
+    }
+
+    setParentError(null);
+    setParentNotice(null);
+    setParentLoading(true);
+
+    if (parentMode === "signup") {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: parentPassword,
+        options: { data: { role: "parent" } },
+      });
+
+      if (error) {
+        setParentError(error.message);
+        setParentLoading(false);
+        return;
+      }
+
+      if (!data.session) {
+        setParentMode("login");
+        setParentNotice("Check your email to verify your account, then log in.");
+        setParentLoading(false);
+        return;
+      }
+
+      router.push("/parent/link");
+      return;
+    }
+
+    let { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password: parentPassword,
+    });
+    if (error && recoverInvalidRefreshToken(error)) {
+      ({ data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password: parentPassword,
+      }));
+    }
+
+    if (error || !data.session) {
+      setParentError(error?.message ?? "Parent login failed.");
+      setParentLoading(false);
+      return;
+    }
+
+    router.push("/parent/link");
   }
 
   async function handleRecoveredPasswordUpdate() {
@@ -728,7 +789,18 @@ export default function LoginPage() {
                 color: tab === "teacher" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
               }}
             >
-              <Briefcase size={14} strokeWidth={2.2} /> Teacher / Parent
+              <Briefcase size={14} strokeWidth={2.2} /> Teacher
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("parent")}
+              className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-bold text-sm transition-all duration-200"
+              style={{
+                background: tab === "parent" ? "rgba(255,255,255,0.1)" : "transparent",
+                color: tab === "parent" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
+              }}
+            >
+              <Users size={14} strokeWidth={2.2} /> Parent
             </button>
           </div>
         </div>
@@ -789,6 +861,88 @@ export default function LoginPage() {
               type="button"
             >
               {studentBootstrapState === "loading" ? "Loading your progress..." : "Enter the Tower"}
+            </button>
+          </div>
+        ) : tab === "parent" ? (
+          /* ── Parent Form ── */
+          <div className="grid gap-4">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              {(["login", "signup"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => {
+                    setParentMode(mode);
+                    setParentError(null);
+                    setParentNotice(null);
+                  }}
+                  className="px-5 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider transition-all duration-200"
+                  style={{
+                    background: parentMode === mode ? "rgba(255,255,255,0.1)" : "transparent",
+                    color: parentMode === mode ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)",
+                    border: parentMode === mode ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
+                  }}
+                >
+                  {mode === "login" ? "Log In" : "Create Account"}
+                </button>
+              ))}
+            </div>
+
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Parent Email</span>
+              <InputField icon={<User size={15} />}>
+                <input
+                  value={parentEmail}
+                  onChange={(event) => setParentEmail(event.target.value)}
+                  placeholder="parent@example.com"
+                  type="email"
+                  autoComplete="email"
+                  className={inputCls}
+                />
+              </InputField>
+            </label>
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Password</span>
+              <InputField icon={<Lock size={15} />}>
+                <input
+                  value={parentPassword}
+                  onChange={(event) => setParentPassword(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") void handleParentAuthentication();
+                  }}
+                  placeholder="********"
+                  type="password"
+                  autoComplete={parentMode === "login" ? "current-password" : "new-password"}
+                  className={inputCls}
+                />
+              </InputField>
+            </label>
+
+            <p
+              className="rounded-xl px-4 py-3 text-xs font-semibold text-white/65"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+            >
+              After logging in, use the claim code from your child&apos;s teacher to connect their school learning.
+            </p>
+
+            {parentError && (
+              <p className="text-sm text-red-300 font-bold text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{parentError}</p>
+            )}
+            {parentNotice && (
+              <p className="text-sm text-emerald-200 font-bold text-center rounded-xl py-2" style={{ background: "rgba(40,180,100,0.12)" }}>{parentNotice}</p>
+            )}
+
+            <button
+              onClick={() => void handleParentAuthentication()}
+              disabled={parentLoading}
+              className="mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-[0.97] disabled:opacity-50 cursor-pointer"
+              style={{
+                background: "linear-gradient(135deg, hsl(0 0% 22%), hsl(0 0% 15%))",
+                boxShadow: "0 6px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+              }}
+              type="button"
+            >
+              {parentLoading ? "Please wait..." : parentMode === "signup" ? "Create Parent Account" : "Parent Log In"}
             </button>
           </div>
         ) : passwordRecoveryMode ? (
