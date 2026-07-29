@@ -342,6 +342,55 @@ export default function SchoolHomeClient({
       item.id !== "administration" ||
       snapshot.permissions.canViewAdministration,
   );
+  const homeStats = snapshot.permissions.canViewAdministration
+    ? [
+        {
+          label: "Active classes",
+          value: filteredClasses.length,
+          icon: BookOpen,
+        },
+        {
+          label: "Active students",
+          value:
+            snapshot.academicYears.find((year) => year.id === academicYearId)
+              ?.activeStudentCount ?? 0,
+          icon: GraduationCap,
+        },
+        {
+          label: "Active educators",
+          value: activeStaff.length,
+          icon: Users,
+        },
+        {
+          label: "Academic year",
+          value: selectedAcademicYear?.calendarYear ?? "Not set",
+          icon: School,
+        },
+        {
+          label: "Pending invitations",
+          value: snapshot.invitations.length,
+          icon: Mail,
+        },
+      ]
+    : [
+        {
+          label: "My classes",
+          value: myClasses.length,
+          icon: BookOpen,
+        },
+        {
+          label: "School classes",
+          value: filteredClasses.length,
+          icon: School,
+        },
+        {
+          label: "Active students",
+          value:
+            snapshot.academicYears.find((year) => year.id === academicYearId)
+              ?.activeStudentCount ?? 0,
+          icon: GraduationCap,
+        },
+      ];
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-950">
@@ -489,36 +538,7 @@ export default function SchoolHomeClient({
           {tab === "home" ? (
             <div className="space-y-8">
               <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                {[
-                  {
-                    label: "Active classes",
-                    value: filteredClasses.length,
-                    icon: BookOpen,
-                  },
-                  {
-                    label: "Active students",
-                    value:
-                      snapshot.academicYears.find(
-                        (year) => year.id === academicYearId,
-                      )?.activeStudentCount ?? 0,
-                    icon: GraduationCap,
-                  },
-                  {
-                    label: "Active educators",
-                    value: activeStaff.length,
-                    icon: Users,
-                  },
-                  {
-                    label: "Academic year",
-                    value: selectedAcademicYear?.calendarYear ?? "Not set",
-                    icon: School,
-                  },
-                  {
-                    label: "Pending invitations",
-                    value: snapshot.invitations.length,
-                    icon: Mail,
-                  },
-                ].map((stat) => {
+                {homeStats.map((stat) => {
                   const Icon = stat.icon;
                   return (
                     <div

@@ -18,6 +18,11 @@ const classAccessRoute = read(
 );
 const server = read("lib/school-platform-server.ts");
 const teacherDashboard = read("app/teacher/dashboard/page.tsx");
+const login = read("app/login/page.tsx");
+const sessionRoute = read("app/api/school-preview-session/route.ts");
+const finalLoginMigration = read(
+  "supabase/migrations/20260729123000_final_school_login_admin_model.sql",
+);
 
 const checks = [
   [
@@ -119,6 +124,31 @@ const checks = [
     "snapshot and commands require school permission",
     /not public\.can_view_school\(p_school_id\)/i.test(migration) &&
       /public\.can_manage_school/.test(migration),
+  ],
+  [
+    "educators land on School Home",
+    /const destination = `\/school\/\$\{preferredSchool\.id\}`/.test(
+      sessionRoute,
+    ) &&
+      /routeAuthenticatedEducator/.test(login),
+  ],
+  [
+    "first association requires invitation and School Code",
+    /activate_school_membership_with_code/.test(finalLoginMigration) &&
+      /lower\(invitation\.email\) = v_email/.test(finalLoginMigration) &&
+      /invitation\.status = 'pending'/.test(finalLoginMigration) &&
+      /teacherSchoolCode/.test(login),
+  ],
+  [
+    "open educator signup is replaced by invite activation",
+    /Activate Invite/.test(login) &&
+      !/m === "login" \? "Log In" : "Sign Up"/.test(login),
+  ],
+  [
+    "Cobram trial administrator is canonical",
+    /school_code = 'COB2026'/.test(finalLoginMigration) &&
+      /role = 'school_admin'/.test(finalLoginMigration) &&
+      /miranda\.johns/.test(finalLoginMigration),
   ],
 ];
 

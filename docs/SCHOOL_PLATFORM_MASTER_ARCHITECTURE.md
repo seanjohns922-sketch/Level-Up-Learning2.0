@@ -709,11 +709,12 @@ All helpers:
 
 ### 8.1 Educator Login
 
-1. Adult signs in through Supabase Auth.
+1. Returning educators sign in through Supabase Auth with email and password.
 2. Server loads `user_profiles`, active school memberships, and platform role.
-3. If no active relationship exists, show a controlled pending-access screen.
-4. If one school exists, enter it.
-5. If multiple schools exist, require explicit school selection.
+3. If no active relationship exists, show the invitation activation flow.
+4. If one school exists, open School Home.
+5. If multiple schools exist, prefer the educator's administered school and
+   retain an explicit school switcher.
 6. Server layout validates school access before rendering school routes.
 
 The browser may cache the selected school ID, but the URL and server
@@ -726,10 +727,17 @@ Open self-signup must not create an active school or privileged role.
 Preferred flow:
 
 1. School invitation is created by an authorised administrator.
-2. Recipient authenticates or creates an account.
-3. Server verifies the invitation email and one-time token.
+2. Recipient selects **Activate Invite** and enters their invited email,
+   password, display name, and the permanent School Code.
+3. Server verifies the signed-in email, School Code, active school, pending
+   invitation, and invitation expiry.
 4. Membership becomes active.
 5. Acceptance is audited.
+6. Returning educators use email and password only; School Code is never
+   required again.
+
+School Code identifies the school only during first educator association. It
+does not grant membership by itself and is not used for student login.
 
 An approved trial onboarding flow may create a trial school, but it must be a
 dedicated, rate-limited server operation with explicit trial entitlement.

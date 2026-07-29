@@ -101,10 +101,7 @@ export type SchoolHomeSnapshot = {
 };
 
 export function isSchoolPlatformPreviewEnabled() {
-  return (
-    process.env.NODE_ENV === "development" ||
-    process.env.SCHOOL_PLATFORM_PREVIEW_ENABLED === "true"
-  );
+  return process.env.SCHOOL_PLATFORM_PREVIEW_ENABLED !== "false";
 }
 
 async function supabaseRequest<T>(
@@ -193,6 +190,24 @@ export async function getMySchoolContexts(accessToken: string) {
   }
 }
 
+export async function canViewSchoolAdministration(
+  schoolId: string,
+  accessToken: string,
+) {
+  try {
+    return await supabaseRequest<boolean>(
+      "/rest/v1/rpc/can_view_school_administration",
+      accessToken,
+      {
+        method: "POST",
+        body: JSON.stringify({ p_school_id: schoolId }),
+      },
+    );
+  } catch {
+    return false;
+  }
+}
+
 async function recordSchoolPreviewAccess(
   schoolId: string,
   accessToken: string,
@@ -241,14 +256,7 @@ export async function loadSchoolHomePreview(schoolId: string) {
         },
       ),
       getMySchoolContexts(accessToken),
-      supabaseRequest<boolean>(
-        "/rest/v1/rpc/can_view_school_administration",
-        accessToken,
-        {
-          method: "POST",
-          body: JSON.stringify({ p_school_id: schoolId }),
-        },
-      ),
+      canViewSchoolAdministration(schoolId, accessToken),
     ]);
     return {
       ...access,

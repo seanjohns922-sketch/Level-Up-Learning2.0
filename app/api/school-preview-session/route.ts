@@ -33,7 +33,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const response = NextResponse.json({ authenticated: true, schools });
+  const preferredSchool =
+    schools.find((school) =>
+      ["school_admin", "principal"].includes(school.role),
+    ) ?? schools[0];
+  const destination = `/school/${preferredSchool.id}`;
+
+  const response = NextResponse.json({
+    authenticated: true,
+    schools,
+    destination,
+  });
   response.cookies.set(SCHOOL_PREVIEW_COOKIE, accessToken, {
     httpOnly: true,
     sameSite: "strict",

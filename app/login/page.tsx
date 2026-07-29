@@ -82,10 +82,11 @@ function InputField({ icon, children }: { icon: React.ReactNode; children: React
 export default function LoginPage() {
   const router = useRouter();
   const [tab, setTab] = useState<"student" | "teacher">("student");
-  const [teacherMode, setTeacherMode] = useState<"login" | "signup">("login");
+  const [teacherMode, setTeacherMode] = useState<"login" | "activate">("login");
   const [teacherEmail, setTeacherEmail] = useState("");
   const [teacherPassword, setTeacherPassword] = useState("");
   const [teacherName, setTeacherName] = useState("");
+  const [teacherSchoolCode, setTeacherSchoolCode] = useState("");
   const [teacherResetNotice, setTeacherResetNotice] = useState<string | null>(null);
   const [teacherResetLoading, setTeacherResetLoading] = useState(false);
   const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
@@ -157,8 +158,19 @@ export default function LoginPage() {
   }, []);
 
   async function handleTeacherSignup() {
-    if (!teacherEmail || !teacherPassword) return;
+    if (
+      !teacherEmail ||
+      !teacherPassword ||
+      !teacherName.trim() ||
+      !teacherSchoolCode.trim()
+    ) {
+      setTeacherError(
+        "Enter your name, invited email, password and School Code.",
+      );
+      return;
+    }
     setTeacherError(null);
+    setTeacherResetNotice(null);
     setTeacherLoading(true);
     const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
       email: teacherEmail,
@@ -167,12 +179,64 @@ export default function LoginPage() {
     });
     if (signUpErr) { setTeacherError(signUpErr.message); setTeacherLoading(false); return; }
     const userId = signUpData.user?.id;
-    if (!userId) { setTeacherError("Sign up failed. Please try again."); setTeacherLoading(false); return; }
-    await supabase.from("teachers").upsert({ id: userId, email: teacherEmail, display_name: teacherName.trim() || teacherEmail });
-    // A new educator account is intentionally unscoped. School membership and
-    // class creation are completed by an authorised school or platform admin.
+    if (!userId) { setTeacherError("Account activation failed. Please try again."); setTeacherLoading(false); return; }
+
+    if (!signUpData.session?.access_token) {
+      setTeacherMode("login");
+      setTeacherResetNotice(
+        "Check your email to verify the account, then log in with the same School Code.",
+      );
+      setTeacherLoading(false);
+      return;
+    }
+
+    const activated = await activateSchoolMembership();
+    if (!activated) {
+      setTeacherLoading(false);
+      return;
+    }
+    await routeAuthenticatedEducator(signUpData.session.access_token);
+  }
+
+  async function routeAuthenticatedEducator(accessToken: string) {
+    try {
+      const response = await fetch("/api/school-preview-session", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { destination?: string; error?: string }
+        | null;
+      if (response.ok && result?.destination) {
+        window.location.assign(result.destination);
+        return true;
+      }
+      setTeacherError(
+        result?.error ??
+          "No active school membership was found. Use Activate Invite if this is your first login.",
+      );
+    } catch {
+      setTeacherError("School access could not be verified. Please try again.");
+    }
     setTeacherLoading(false);
-    router.push("/teacher/dashboard");
+    return false;
+  }
+
+  async function activateSchoolMembership() {
+    const schoolCode = teacherSchoolCode.trim().toUpperCase();
+    if (!schoolCode) {
+      setTeacherError("Enter the School Code from your invitation.");
+      return false;
+    }
+    const { error } = await supabase.rpc(
+      "activate_school_membership_with_code",
+      { p_school_code: schoolCode },
+    );
+    if (error) {
+      setTeacherError(error.message);
+      return false;
+    }
+    return true;
   }
 
   async function handleTeacherLogin() {
@@ -184,7 +248,17 @@ export default function LoginPage() {
       ({ data, error: signInErr } = await supabase.auth.signInWithPassword({ email: teacherEmail, password: teacherPassword }));
     }
     if (signInErr) { setTeacherError(signInErr.message); setTeacherLoading(false); return; }
-    if (data?.user) { setTeacherLoading(false); router.push("/teacher/dashboard"); return; }
+    if (data?.user && data.session?.access_token) {
+      if (teacherSchoolCode.trim()) {
+        const activated = await activateSchoolMembership();
+        if (!activated) {
+          setTeacherLoading(false);
+          return;
+        }
+      }
+      await routeAuthenticatedEducator(data.session.access_token);
+      return;
+    }
     setTeacherError("Login failed.");
     setTeacherLoading(false);
   }
@@ -775,7 +849,7 @@ export default function LoginPage() {
           /* ── Teacher Form ── */
           <div className="grid gap-4">
             <div className="flex items-center justify-center gap-2 mb-1">
-              {(["login", "signup"] as const).map((m) => (
+              {(["login", "activate"] as const).map((m) => (
                 <button
                   key={m}
                   type="button"
@@ -787,7 +861,7 @@ export default function LoginPage() {
                     border: teacherMode === m ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
                   }}
                 >
-                  {m === "login" ? "Log In" : "Sign Up"}
+                  {m === "login" ? "Log In" : "Activate Invite"}
                 </button>
               ))}
             </div>
@@ -818,16 +892,33 @@ export default function LoginPage() {
               </div>
             )}
 
-            {teacherMode === "signup" && (
+            {teacherMode === "activate" && (
               <>
                 <label className="grid gap-1.5">
-                  <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Teacher Name</span>
+                  <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Educator Name</span>
                   <InputField icon={<User size={15} />}>
                     <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} />
                   </InputField>
                 </label>
               </>
             )}
+
+            <label className="grid gap-1.5">
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">
+                School Code {teacherMode === "login" ? "(first login only)" : ""}
+              </span>
+              <InputField icon={<KeyRound size={15} />}>
+                <input
+                  value={teacherSchoolCode}
+                  onChange={(event) =>
+                    setTeacherSchoolCode(event.target.value.toUpperCase())
+                  }
+                  placeholder="COB2026"
+                  autoCapitalize="characters"
+                  className={inputCls}
+                />
+              </InputField>
+            </label>
 
             {teacherError && (
               <p className="text-sm text-red-300 font-bold text-center rounded-xl py-2" style={{ background: "rgba(220,50,50,0.12)" }}>{teacherError}</p>
@@ -837,7 +928,7 @@ export default function LoginPage() {
             )}
 
             <button
-              onClick={teacherMode === "signup" ? handleTeacherSignup : handleTeacherLogin}
+              onClick={teacherMode === "activate" ? handleTeacherSignup : handleTeacherLogin}
               disabled={teacherLoading}
               className="mt-1 w-full py-4 rounded-2xl font-black text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-[0.97] disabled:opacity-50 cursor-pointer"
               style={{
@@ -846,7 +937,7 @@ export default function LoginPage() {
               }}
               type="button"
             >
-              {teacherLoading ? "Please wait..." : teacherMode === "signup" ? "Sign Up" : "Log In"}
+              {teacherLoading ? "Please wait..." : teacherMode === "activate" ? "Activate School Account" : "Log In"}
             </button>
 
           </div>
