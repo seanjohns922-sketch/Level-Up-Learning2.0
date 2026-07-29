@@ -9,7 +9,13 @@ import { buildGroundWeek5VoyageQuiz } from "@/data/activities/starpath/ground/we
 import { buildGroundWeek6VoyageQuiz } from "@/data/activities/starpath/ground/week6Quiz";
 import { buildGroundWeek7VoyageQuiz } from "@/data/activities/starpath/ground/week7Quiz";
 import { buildLevelOneWeek1VoyageQuiz } from "@/data/activities/starpath/level1/week1Quiz";
+import { buildLevelTwoWeek1VoyageQuiz } from "@/data/activities/starpath/level2/week1Quiz";
+import { buildLevelTwoWeek2VoyageQuiz } from "@/data/activities/starpath/level2/week2Quiz";
+import { buildLevelTwoWeek3VoyageQuiz } from "@/data/activities/starpath/level2/week3Quiz";
 import { buildLevelTwoWeek4VoyageQuiz } from "@/data/activities/starpath/level2/week4Quiz";
+import { buildLevelTwoWeek5VoyageQuiz } from "@/data/activities/starpath/level2/week5Quiz";
+import { buildLevelTwoWeek6VoyageQuiz } from "@/data/activities/starpath/level2/week6Quiz";
+import { buildLevelTwoWeek7VoyageQuiz } from "@/data/activities/starpath/level2/week7Quiz";
 import { buildLevelOneWeek2VoyageQuiz } from "@/data/activities/starpath/level1/week2Quiz";
 import { buildLevelOneWeek3VoyageQuiz } from "@/data/activities/starpath/level1/week3Quiz";
 import { buildLevelOneWeek4VoyageQuiz } from "@/data/activities/starpath/level1/week4Quiz";
@@ -63,7 +69,13 @@ const STARPATH_QUIZ_BUILDERS: Record<string, () => PracticeTask[]> = {
   "level-1-w5": buildLevelOneWeek5VoyageQuiz,
   "level-1-w6": buildLevelOneWeek6VoyageQuiz,
   "level-1-w7": buildLevelOneWeek7VoyageQuiz,
+  "level-2-w1": buildLevelTwoWeek1VoyageQuiz,
+  "level-2-w2": buildLevelTwoWeek2VoyageQuiz,
+  "level-2-w3": buildLevelTwoWeek3VoyageQuiz,
   "level-2-w4": buildLevelTwoWeek4VoyageQuiz,
+  "level-2-w5": buildLevelTwoWeek5VoyageQuiz,
+  "level-2-w6": buildLevelTwoWeek6VoyageQuiz,
+  "level-2-w7": buildLevelTwoWeek7VoyageQuiz,
   // Week 8 has no weekly quiz — its assessment is the Post-Test.
 };
 

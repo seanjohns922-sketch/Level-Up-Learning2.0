@@ -2269,6 +2269,20 @@ export type PracticeTask = (
       heading?: string;
     }
   | {
+      // Level 2 · W1-4 — Shape Feature. Year 2 shape reasoning: straight vs
+      // curved edges, number of sides, parallel/opposite sides, and comparing
+      // two shapes. Shapes/options carry level-2 shape ids (rendered as polygons).
+      kind: "starpathShapeFeature";
+      mode: "edge" | "sides" | "parallel" | "compare";
+      prompt: string;
+      speakText: string;
+      target: number;
+      shapes: Array<{ id: string; colour?: string }>;
+      options: Array<{ id: string; label: string; shapeId?: string }>;
+      correctOptionId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 2 · W4 — Map Reader. Locate landmarks on a simple 2D star map:
       // tap a named landmark, name what sits at a highlighted spot, or reason
       // about a landmark's position relative to another.
@@ -2288,6 +2302,31 @@ export type PracticeTask = (
       /** whatIsHere / relative: multiple-choice options. */
       options?: Array<{ id: string; label: string }>;
       correctOptionId?: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 2 · W6-7 — Map Route. Navigate a rover across the star map between
+      // named places: follow a path, choose the first move, or give the route.
+      kind: "starpathMapRoute";
+      mode: "follow" | "choose" | "give";
+      prompt: string;
+      speakText: string;
+      target: number;
+      mapId: string;
+      cols: number;
+      rows: number;
+      landmarks: Array<{ id: string; label: string; object: string; r: number; c: number }>;
+      object: string;
+      start: { r: number; c: number };
+      goal: { r: number; c: number; object: string; label: string };
+      /** follow: the ordered moves to make. */
+      steps?: Array<{ direction: "up" | "down" | "left" | "right"; instruction: string; speakText: string }>;
+      /** choose: candidate first moves. */
+      options?: Array<{ id: string; direction: "up" | "down" | "left" | "right" }>;
+      correctOptionId?: string;
+      /** give: movement palette and the exact number of moves needed. */
+      palette?: Array<"up" | "down" | "left" | "right">;
+      maxSteps?: number;
       feedback: { correct: string; wrong: string };
     }
   | {

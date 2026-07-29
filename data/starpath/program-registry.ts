@@ -451,15 +451,43 @@ const IMPLEMENTED_LEVEL_ONE_LESSONS: Record<
   "y1-space-w8-l3": { learningIntention: "I can give and explain a clear route.", mechanics: L1_EXPLAIN_PATH_MECHANICS },
 };
 
+const L2_EDGE_MECHANICS = ["straight-curved", "edge-sort", "edge-challenge"] as const;
+const L2_SIDES_MECHANICS = ["count-sides", "sides-sort", "sides-challenge"] as const;
+const L2_PARALLEL_MECHANICS = ["opposite-sides", "parallel-tracks", "parallel-challenge"] as const;
+const L2_COMPARE_MECHANICS = ["same-feature", "what-different", "compare-challenge"] as const;
 const L2_STAR_MAPS_MECHANICS = ["read-the-map", "what-is-here", "map-explorer"] as const;
+const L2_PATHWAYS_MECHANICS = ["follow-path", "choose-route", "space-maze"] as const;
+const L2_NAV_MECHANICS = ["guide-rover", "move-geospin", "mission-control"] as const;
+const L2_MASTER_MECHANICS = ["shape-and-map", "pathway-master", "master-mission"] as const;
 
 const IMPLEMENTED_LEVEL_TWO_LESSONS: Record<
   string,
   { learningIntention: string; mechanics: readonly [string, string, string] }
 > = {
-  "y2-space-w4-l1": { learningIntention: "I can read a star map and find a place.", mechanics: L2_STAR_MAPS_MECHANICS },
-  "y2-space-w4-l2": { learningIntention: "I can say what is at a spot on the map.", mechanics: L2_STAR_MAPS_MECHANICS },
-  "y2-space-w4-l3": { learningIntention: "I can work out which place is next to another.", mechanics: L2_STAR_MAPS_MECHANICS },
+  "y2-space-w1-l1": { learningIntention: "I can tell straight sides from curved edges.", mechanics: L2_EDGE_MECHANICS },
+  "y2-space-w1-l2": { learningIntention: "I can find shapes with straight or curved edges.", mechanics: L2_EDGE_MECHANICS },
+  "y2-space-w1-l3": { learningIntention: "I can tell straight and curved apart.", mechanics: L2_EDGE_MECHANICS },
+  "y2-space-w2-l1": { learningIntention: "I can count the sides of a shape.", mechanics: L2_SIDES_MECHANICS },
+  "y2-space-w2-l2": { learningIntention: "I can find a shape by its number of sides.", mechanics: L2_SIDES_MECHANICS },
+  "y2-space-w2-l3": { learningIntention: "I can classify shapes by their sides.", mechanics: L2_SIDES_MECHANICS },
+  "y2-space-w3-l1": { learningIntention: "I can tell if a shape has parallel sides.", mechanics: L2_PARALLEL_MECHANICS },
+  "y2-space-w3-l2": { learningIntention: "I can find shapes with parallel sides.", mechanics: L2_PARALLEL_MECHANICS },
+  "y2-space-w3-l3": { learningIntention: "I can reason about parallel sides.", mechanics: L2_PARALLEL_MECHANICS },
+  "y2-space-w4-l1": { learningIntention: "I can say what is the same about two shapes.", mechanics: L2_COMPARE_MECHANICS },
+  "y2-space-w4-l2": { learningIntention: "I can say what is different about two shapes.", mechanics: L2_COMPARE_MECHANICS },
+  "y2-space-w4-l3": { learningIntention: "I can compare two shapes by their features.", mechanics: L2_COMPARE_MECHANICS },
+  "y2-space-w5-l1": { learningIntention: "I can read a star map and find a place.", mechanics: L2_STAR_MAPS_MECHANICS },
+  "y2-space-w5-l2": { learningIntention: "I can say what is at a spot on the map.", mechanics: L2_STAR_MAPS_MECHANICS },
+  "y2-space-w5-l3": { learningIntention: "I can work out which place is next to another.", mechanics: L2_STAR_MAPS_MECHANICS },
+  "y2-space-w6-l1": { learningIntention: "I can follow a path to a place on the map.", mechanics: L2_PATHWAYS_MECHANICS },
+  "y2-space-w6-l2": { learningIntention: "I can choose the first move toward a place.", mechanics: L2_PATHWAYS_MECHANICS },
+  "y2-space-w6-l3": { learningIntention: "I can navigate the map to a place.", mechanics: L2_PATHWAYS_MECHANICS },
+  "y2-space-w7-l1": { learningIntention: "I can guide the rover by following directions.", mechanics: L2_NAV_MECHANICS },
+  "y2-space-w7-l2": { learningIntention: "I can give a route to a place on the map.", mechanics: L2_NAV_MECHANICS },
+  "y2-space-w7-l3": { learningIntention: "I can plan and give routes on the map.", mechanics: L2_NAV_MECHANICS },
+  "y2-space-w8-l1": { learningIntention: "I can use shape and map skills together.", mechanics: L2_MASTER_MECHANICS },
+  "y2-space-w8-l2": { learningIntention: "I can read, follow and give pathways.", mechanics: L2_MASTER_MECHANICS },
+  "y2-space-w8-l3": { learningIntention: "I can combine shapes, maps and pathways.", mechanics: L2_MASTER_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
@@ -521,7 +549,7 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
     weeks,
     assessments: {
       preTest: definition.level === "ground" ? null : { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: STARPATH_PROGRAM_STATUS },
-      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" ? "implemented" : STARPATH_PROGRAM_STATUS },
+      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" ? "implemented" : STARPATH_PROGRAM_STATUS },
     },
     status: STARPATH_PROGRAM_STATUS,
   };

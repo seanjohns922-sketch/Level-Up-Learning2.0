@@ -1,0 +1,84 @@
+"use client";
+
+import { useMemo } from "react";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
+import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
+import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { getL2Shape, l2ShapeSvg } from "@/data/activities/starpath/level2/l2-shapes";
+
+type FeatureTask = Extract<PracticeTask, { kind: "starpathShapeFeature" }>;
+
+function L2Shape({ id, colour, className }: { id: string; colour?: string; className?: string }) {
+  const markup = useMemo(() => l2ShapeSvg(getL2Shape(id), { size: 120, colour }), [id, colour]);
+  return (
+    <span
+      className={className ?? "block h-24 w-24"}
+      role="img"
+      aria-label={getL2Shape(id).label}
+      dangerouslySetInnerHTML={{ __html: markup }}
+    />
+  );
+}
+
+export function StarpathShapeFeatureCard({
+  task,
+  onCorrect,
+  onWrong,
+}: {
+  task: FeatureTask;
+  onCorrect: () => void;
+  onWrong: () => void;
+}) {
+  const twoUp = task.mode === "compare" && task.shapes.length === 2;
+  const iconOptions = task.options.some((option) => option.shapeId);
+
+  return (
+    <div>
+      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+
+      {task.shapes.length > 0 ? (
+        <div className={["mx-auto mb-5 flex items-center justify-center gap-6"].join(" ")}>
+          {task.shapes.map((shape, index) => (
+            <div
+              key={`${shape.id}-${index}`}
+              className="flex flex-col items-center gap-2 rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm"
+            >
+              {twoUp ? (
+                <span className="text-xs font-black uppercase tracking-[0.16em] text-violet-700">
+                  {index === 0 ? "Shape A" : "Shape B"}
+                </span>
+              ) : null}
+              <L2Shape id={shape.id} colour={shape.colour} className="block h-28 w-28 sm:h-32 sm:w-32" />
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <div
+        className={[
+          "mx-auto grid max-w-lg gap-3",
+          iconOptions ? "grid-cols-2 sm:grid-cols-3" : task.options.length <= 2 ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-3",
+        ].join(" ")}
+      >
+        {task.options.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className={[
+              "relative flex items-center justify-center rounded-2xl border-2 border-violet-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]",
+              option.shapeId ? "min-h-28 p-3" : "min-h-16 px-4",
+            ].join(" ")}
+          >
+            <OptionReadAloudButton text={option.label} className="absolute right-2 top-2" />
+            {option.shapeId ? (
+              <L2Shape id={option.shapeId} className="block h-20 w-20" />
+            ) : (
+              <span className="text-lg font-black text-indigo-950">{option.label}</span>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

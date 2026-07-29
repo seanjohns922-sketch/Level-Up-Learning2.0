@@ -187,6 +187,8 @@ import {
   StarpathObjectSpotterCard,
 } from "@/components/starpath/StarpathWorldObjectCards";
 import { StarpathMapCard } from "@/components/starpath/StarpathMapCard";
+import { StarpathMapRouteCard } from "@/components/starpath/StarpathMapRouteCard";
+import { StarpathShapeFeatureCard } from "@/components/starpath/StarpathShapeFeatureCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -660,6 +662,10 @@ function TaskRendererInner({
       return <StarpathObjectMatchCard key={k} task={t} onComplete={onC} />;
     case "starpathMapLocate":
       return <StarpathMapCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathShapeFeature":
+      return <StarpathShapeFeatureCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathMapRoute":
+      return <StarpathMapRouteCard key={k} task={t} onCorrect={onC} onWrong={onW} onComplete={onC} />;
     default:
       return <TaskRecoveryCard onRecover={onW} />;
   }
