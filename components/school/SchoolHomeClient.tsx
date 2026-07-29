@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Activity,
   BarChart3,
   BookOpen,
   CheckCircle2,
@@ -91,13 +90,6 @@ const CLASS_ROLE_LABELS: Record<string, string> = {
 function roleLabel(role: string | null) {
   if (!role) return "School-wide view";
   return CLASS_ROLE_LABELS[role] ?? SCHOOL_ROLE_LABELS[role] ?? role;
-}
-
-function formatAction(action: string) {
-  return action
-    .replace(/^school_/, "")
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 const SCHOOL_DATE_FORMATTER = new Intl.DateTimeFormat("en-AU", {
@@ -704,45 +696,6 @@ export default function SchoolHomeClient({
                   />
                 </section>
 
-                <section>
-                  <div className="mb-3">
-                    <h2 className="text-lg font-bold">Recent activity</h2>
-                    <p className="text-sm text-slate-500">
-                      Audited school administration activity.
-                    </p>
-                  </div>
-                  {snapshot.recentActivity.length ? (
-                    <div className="divide-y divide-slate-100 border border-slate-200 bg-white">
-                      {snapshot.recentActivity.map((activity) => (
-                        <div
-                          key={activity.id}
-                          className="flex items-center justify-between gap-4 px-5 py-4"
-                        >
-                          <div className="flex items-center gap-3">
-                            <Activity className="h-4 w-4 text-slate-400" />
-                            <div>
-                              <p className="text-sm font-bold text-slate-800">
-                                {formatAction(activity.action)}
-                              </p>
-                              <p className="text-xs text-slate-500">
-                                {activity.actorName}
-                              </p>
-                            </div>
-                          </div>
-                          <time className="text-xs text-slate-400">
-                            {formatSchoolDate(activity.createdAt)}
-                          </time>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <EmptyState
-                      icon={Activity}
-                      title="No recent administration activity"
-                      detail="Audited school actions will appear here."
-                    />
-                  )}
-                </section>
               </div>
             ) : (
               <div className="space-y-8">

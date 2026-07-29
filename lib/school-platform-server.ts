@@ -91,13 +91,6 @@ export type SchoolHomeSnapshot = {
     requestedClassId: string | null;
     createdAt: string;
   }>;
-  recentActivity: Array<{
-    id: number;
-    action: string;
-    targetType: string;
-    createdAt: string;
-    actorName: string;
-  }>;
 };
 
 export function isSchoolPlatformPreviewEnabled() {
