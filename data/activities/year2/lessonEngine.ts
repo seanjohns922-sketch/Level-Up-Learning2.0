@@ -2678,15 +2678,15 @@ function year5MultiStepCalculationTemplates(mode: string | undefined): MixedOper
 
 function year5EstimateReasonablenessTemplates(mode: string | undefined): ReasonablenessChoiceTemplate[] {
   const yesNo: ReasonablenessChoiceTemplate[] = [
-    { prompt: "398 + 204 = 602. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "398 + 204 = 602. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Yes. 398 + 200 is 598, then 4 more is 602." },
     { prompt: "999 + 246 = 1,145. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
-    { prompt: "602 - 198 = 404. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "602 - 198 = 404. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Yes. Subtract 200 to get 402, then add back 2 to get 404." },
     { prompt: "6.02 - 1.98 = 5.04. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
-    { prompt: "49 × 6 = 294. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "49 × 6 = 294. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Yes. 50 × 6 is 300, and one group of 6 less is 294." },
     { prompt: "25 × 48 = 2,400. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
-    { prompt: "450 ÷ 6 = 75. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "450 ÷ 6 = 75. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Yes. 6 × 75 is 450, so 450 ÷ 6 is 75." },
     { prompt: "1,000 ÷ 8 = 80. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
-    { prompt: "5.98 + 2.4 = 8.38. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Nice — that makes sense." },
+    { prompt: "5.98 + 2.4 = 8.38. Does it make sense?", answer: "Yes", options: ["Yes", "No"], helper: "Yes. Write 2.4 as 2.40, then 5.98 + 2.40 is 8.38." },
     { prompt: "12.4 - 0.99 = 10.41. Does it make sense?", answer: "No", options: ["Yes", "No"], helper: "Check your estimate — is that too big or too small?" },
   ];
 

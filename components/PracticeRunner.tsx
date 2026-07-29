@@ -14,6 +14,7 @@ import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import LessonReflection from "@/components/lesson/LessonReflection";
 import LessonCoachReview from "@/components/lesson/LessonCoachReview";
 import { buildCoachReview } from "@/lib/lesson-coach";
+import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
 import LessonResumeGate from "@/components/lesson/LessonResumeGate";
 import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import {
@@ -1303,6 +1304,12 @@ export function PracticeRunner({
   const statusMotion = status === "wrong" ? "animate-[shake_0.35s_ease-in-out]" : "";
   const currentCorrectAnswer = currentWrongFeedback?.correctAnswer ?? getPracticeTaskCorrectAnswer(task);
   const currentWrongExplanation = currentWrongFeedback?.explanation ?? getPracticeTaskWrongExplanation(task);
+  const incorrectFeedbackSpeech = buildIncorrectFeedbackSpeech({
+    prompt: currentWrongFeedback?.prompt ?? getPracticeTaskPrompt(task),
+    studentAnswer: currentWrongFeedback?.studentAnswer,
+    correctAnswer: currentCorrectAnswer,
+    explanation: currentWrongExplanation,
+  });
   const hudLessonNumber = Number(liveContext?.lessonId.match(/-l(\d+)$/)?.[1] ?? NaN);
   const taskSurfaceStyle = isMeasurement
     ? {
@@ -1401,7 +1408,15 @@ export function PracticeRunner({
 
           {awaitingWrongNext && currentWrongFeedback ? (
             <div className="rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-800 shadow-sm">
-              <div>Not quite.</div>
+              <div className="flex items-center justify-between gap-3">
+                <div>Not quite.</div>
+                <ReadAloudBtn
+                  text={incorrectFeedbackSpeech}
+                  speechKey={`incorrect-feedback:${currentWrongFeedback.id}`}
+                  label="Read feedback"
+                  className="shrink-0 border-red-200 bg-white text-red-800"
+                />
+              </div>
               <div className="mt-1">
                 Your answer: <span className="font-black">{currentWrongFeedback.studentAnswer || "Incorrect attempt"}</span>
               </div>

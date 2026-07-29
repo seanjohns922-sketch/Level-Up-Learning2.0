@@ -23,6 +23,7 @@ import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { buildAssessmentQuestionSnapshots, type ReplayQuestionSource } from "@/lib/assessment-replay";
+import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
 
 export type StarpathVoyageQuizMeta = {
   level: RealmLevelId;
@@ -523,8 +524,21 @@ export default function StarpathVoyageQuiz({
                   const reviewTask = orderedTasks[questionIndex]!;
                   return (
                     <div key={questionIndex} className="rounded-lg border-2 border-rose-200 bg-rose-50 p-4">
-                      <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-rose-700">
-                        Question {questionIndex + 1}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-rose-700">
+                          Question {questionIndex + 1}
+                        </div>
+                        <ReadAloudBtn
+                          text={buildIncorrectFeedbackSpeech({
+                            prompt: taskPrompt(reviewTask),
+                            explanation:
+                              taskFeedback(reviewTask)?.wrong ??
+                              "Review this question and try the quiz again.",
+                          })}
+                          speechKey={`starpath-quiz-review:${quiz.level}:${quiz.week}:${questionIndex}`}
+                          label="Read feedback"
+                          className="shrink-0 border-rose-200 bg-white text-rose-800"
+                        />
                       </div>
                       <div className="mt-2 text-lg font-black text-slate-950">{taskPrompt(reviewTask)}</div>
                       <div className="mt-2 font-semibold text-rose-900">

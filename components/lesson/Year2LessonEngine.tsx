@@ -39,6 +39,8 @@ import {
 import { pickWeightedIndex } from "@/lib/weightedRandom";
 import type { Lesson } from "@/data/programs/year1";
 import { isLessonQuestionSafe } from "@/lib/task-safety";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
 
 function getWorkingLevelForLesson(lesson: Lesson) {
   const yearMatch = lesson.id.match(/^y(\d+)-/);
@@ -1613,7 +1615,20 @@ export function Year2LessonEngine({
                 </fieldset>
                 {status === "wrong" && wrongFeedback ? (
                   <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-slate-900" role="status">
-                    <div className="text-lg font-black text-red-800">Not quite.</div>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-lg font-black text-red-800">Not quite.</div>
+                      <ReadAloudBtn
+                        text={buildIncorrectFeedbackSpeech({
+                          prompt: currentQuestion?.prompt,
+                          studentAnswer: wrongFeedback.studentAnswer,
+                          correctAnswer: wrongFeedback.correctAnswer,
+                          explanation: wrongFeedback.explanation,
+                        })}
+                        speechKey={`incorrect-feedback:${resumeLessonKey}:${currentQuestionSequence}`}
+                        label="Read feedback"
+                        className="shrink-0 border-red-200 bg-white text-red-800"
+                      />
+                    </div>
                     <div className="mt-3 grid gap-2 sm:grid-cols-2">
                       <div className="rounded-xl border border-red-200 bg-white px-3 py-2 text-sm font-bold text-red-800">
                         <span className="font-black">You entered:</span> {wrongFeedback.studentAnswer}

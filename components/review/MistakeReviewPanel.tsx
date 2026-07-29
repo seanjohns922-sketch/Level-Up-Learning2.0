@@ -1,6 +1,8 @@
 "use client";
 
 import { BookOpen, CheckCircle2, Lightbulb, XCircle } from "lucide-react";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
 
 export type ReviewMode = "lesson" | "quiz" | "pretest" | "posttest";
 
@@ -131,7 +133,19 @@ export default function MistakeReviewPanel({
                     </div>
                     <h2 className={`mt-1 text-lg font-black leading-tight ${accent.heading}`}>{item.prompt}</h2>
                   </div>
-                  <XCircle className="h-6 w-6 shrink-0 text-red-500" />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <ReadAloudBtn
+                      text={buildIncorrectFeedbackSpeech({
+                        prompt: item.prompt,
+                        studentAnswer: copy.showAnswers ? item.studentAnswer : null,
+                        correctAnswer: copy.showAnswers ? item.correctAnswer : null,
+                        explanation: item.explanation || copy.explanation,
+                      })}
+                      speechKey={`mistake-review:${mode}:${item.id}`}
+                      label="Read feedback"
+                    />
+                    <XCircle className="h-6 w-6 text-red-500" />
+                  </div>
                 </div>
 
                 <div className="mt-4 grid gap-2">

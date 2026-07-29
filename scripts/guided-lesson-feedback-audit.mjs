@@ -13,6 +13,9 @@ const sessionPage = read("app/session/page.tsx");
 const typed = read("components/activities/TypedResponseActivity.tsx");
 const multipleChoice = read("components/activities/MultipleChoiceActivity.tsx");
 const benchmarkSort = read("components/activities/BenchmarkSort.tsx");
+const mistakeReview = read("components/review/MistakeReviewPanel.tsx");
+const starpathQuiz = read("components/starpath/StarpathVoyageQuiz.tsx");
+const numberLessonData = read("data/activities/year2/lessonEngine.ts");
 const wrongHandler = engine.slice(
   engine.indexOf("function handleWrong"),
   engine.indexOf("function handleNextQuestion")
@@ -148,8 +151,28 @@ check(
   practiceRunner.includes("setAwaitingWrongNext(true)") &&
     practiceRunner.includes("onClick={continueAfterWrong}") &&
     practiceRunner.includes("Next Question") &&
-    practiceRunner.includes('status === "wrong" ? s : s - 1') &&
+    practiceRunner.includes("pauseLessonClockRef.current") &&
     practiceRunner.includes("taskData: task")
+);
+check(
+  "Every shared lesson runner offers read aloud for held incorrect feedback",
+  practiceRunner.includes('label="Read feedback"') &&
+    practiceRunner.includes("buildIncorrectFeedbackSpeech") &&
+    engine.includes('label="Read feedback"') &&
+    engine.includes("buildIncorrectFeedbackSpeech")
+);
+check(
+  "Shared mistake review and Starpath quiz review offer read aloud",
+  mistakeReview.includes('label="Read feedback"') &&
+    mistakeReview.includes("buildIncorrectFeedbackSpeech") &&
+    starpathQuiz.includes('label="Read feedback"') &&
+    starpathQuiz.includes("buildIncorrectFeedbackSpeech")
+);
+check(
+  "Number Nexus incorrect explanations do not reuse success-only placeholder feedback",
+  !numberLessonData.includes('helper: "Nice — that makes sense."') &&
+    numberLessonData.includes("398 + 200 is 598, then 4 more is 602") &&
+    numberLessonData.includes("6 × 75 is 450")
 );
 check(
   "Configured lessons (including Levels 3 and 6) use the corrected shared engine",
