@@ -7,7 +7,9 @@ import {
   CheckCircle2,
   ChevronDown,
   GraduationCap,
+  HelpCircle,
   LayoutDashboard,
+  LogOut,
   Mail,
   Plus,
   School,
@@ -23,6 +25,7 @@ import type {
   SchoolHomeSnapshot,
   SchoolSwitcherItem,
 } from "@/lib/school-platform-server";
+import { supabase } from "@/lib/supabase";
 
 type TabId =
   | "home"
@@ -30,19 +33,34 @@ type TabId =
   | "students"
   | "staff"
   | "insights"
-  | "administration";
+  | "administration"
+  | "licence"
+  | "settings"
+  | "support";
 
-const NAV_ITEMS: Array<{
+type NavItem = {
   id: TabId;
   label: string;
   icon: typeof LayoutDashboard;
-}> = [
+};
+
+const TEACHER_NAV_ITEMS: NavItem[] = [
   { id: "home", label: "Home", icon: LayoutDashboard },
   { id: "classes", label: "Classes", icon: BookOpen },
-  { id: "students", label: "Students", icon: GraduationCap },
-  { id: "staff", label: "Staff", icon: Users },
   { id: "insights", label: "Insights", icon: BarChart3 },
+  { id: "settings", label: "Settings", icon: Settings },
+  { id: "support", label: "Support", icon: HelpCircle },
+];
+
+const ADMIN_NAV_ITEMS: NavItem[] = [
+  { id: "home", label: "Home", icon: LayoutDashboard },
+  { id: "classes", label: "Classes", icon: BookOpen },
+  { id: "staff", label: "Staff", icon: Users },
+  { id: "students", label: "Students", icon: GraduationCap },
+  { id: "insights", label: "School Analytics", icon: BarChart3 },
   { id: "administration", label: "Administration", icon: Settings },
+  { id: "licence", label: "Licence", icon: ShieldCheck },
+  { id: "support", label: "Support", icon: HelpCircle },
 ];
 
 const YEAR_LEVELS = [
@@ -272,6 +290,113 @@ function ClassTable({
   );
 }
 
+function TeacherClassCards({
+  classes,
+  schoolId,
+}: {
+  classes: SchoolHomeSnapshot["classes"];
+  schoolId: string;
+}) {
+  if (classes.length === 0) {
+    return (
+      <EmptyState
+        icon={BookOpen}
+        title="No assigned classes"
+        detail="Your school administrator can add you to a class."
+      />
+    );
+  }
+
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      {classes.map((classRow) => (
+        <article
+          key={classRow.id}
+          className="flex min-h-40 flex-col justify-between rounded-md border border-slate-200 bg-white p-5"
+        >
+          <div>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-bold text-slate-950">
+                  {classRow.name}
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  {classRow.yearLevels.join(", ") || "Year level not set"}
+                </p>
+              </div>
+              <span className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-800">
+                {roleLabel(classRow.myRole)}
+              </span>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-600">
+              <span>{classRow.studentCount} students</span>
+              <span>{classRow.leadTeacher ?? "Teacher not assigned"}</span>
+            </div>
+          </div>
+          <a
+            href={`/school/${schoolId}/classes/${classRow.id}`}
+            className="mt-5 inline-flex min-h-10 w-fit items-center rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900"
+          >
+            Open Class
+          </a>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function OtherSchoolClasses({
+  classes,
+  schoolId,
+}: {
+  classes: SchoolHomeSnapshot["classes"];
+  schoolId: string;
+}) {
+  if (classes.length === 0) {
+    return (
+      <p className="border-t border-slate-200 py-5 text-sm text-slate-500">
+        No other classes are listed for this academic year.
+      </p>
+    );
+  }
+
+  return (
+    <div className="divide-y divide-slate-200 border-y border-slate-200">
+      {classes.map((classRow) => (
+        <div
+          key={classRow.id}
+          className="grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+        >
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 className="font-bold text-slate-950">{classRow.name}</h3>
+              <span className="text-sm text-slate-500">
+                {classRow.yearLevels.join(", ") || "Year level not set"}
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-slate-500">
+              {classRow.leadTeacher ?? "Teacher not assigned"} ·{" "}
+              {classRow.studentCount} students
+            </p>
+          </div>
+          {classRow.canOpen ? (
+            <a
+              href={`/school/${schoolId}/classes/${classRow.id}`}
+              className="inline-flex min-h-9 w-fit items-center rounded-md border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700 hover:border-emerald-700 hover:text-emerald-800"
+            >
+              View
+            </a>
+          ) : (
+            <span className="text-xs font-semibold text-slate-400">
+              Not assigned
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function SchoolHomeClient({
   initialSnapshot,
   schools,
@@ -306,14 +431,29 @@ export default function SchoolHomeClient({
     [snapshot.classes, academicYearId],
   );
   const myClasses = filteredClasses.filter((classRow) => classRow.myRole);
+  const otherClasses = filteredClasses.filter((classRow) => !classRow.myRole);
   const activeStaff = snapshot.staff.filter(
     (staff) => staff.status === "active",
+  );
+  const isAdministrator = snapshot.permissions.canViewAdministration;
+  const navigationItems = isAdministrator
+    ? ADMIN_NAV_ITEMS
+    : TEACHER_NAV_ITEMS;
+  const myStudentCount = myClasses.reduce(
+    (total, classRow) => total + classRow.studentCount,
+    0,
   );
 
   function notify(text: string) {
     setMessage(text);
     setError("");
     window.setTimeout(() => setMessage(""), 3000);
+  }
+
+  async function signOut() {
+    await fetch("/api/school-preview-session", { method: "DELETE" });
+    await supabase.auth.signOut();
+    router.replace("/login");
   }
 
   async function command(
@@ -337,60 +477,35 @@ export default function SchoolHomeClient({
     }
   }
 
-  const visibleNav = NAV_ITEMS.filter(
-    (item) =>
-      item.id !== "administration" ||
-      snapshot.permissions.canViewAdministration,
-  );
-  const homeStats = snapshot.permissions.canViewAdministration
-    ? [
-        {
-          label: "Active classes",
-          value: filteredClasses.length,
-          icon: BookOpen,
-        },
-        {
-          label: "Active students",
-          value:
-            snapshot.academicYears.find((year) => year.id === academicYearId)
-              ?.activeStudentCount ?? 0,
-          icon: GraduationCap,
-        },
-        {
-          label: "Active educators",
-          value: activeStaff.length,
-          icon: Users,
-        },
-        {
-          label: "Academic year",
-          value: selectedAcademicYear?.calendarYear ?? "Not set",
-          icon: School,
-        },
-        {
-          label: "Pending invitations",
-          value: snapshot.invitations.length,
-          icon: Mail,
-        },
-      ]
-    : [
-        {
-          label: "My classes",
-          value: myClasses.length,
-          icon: BookOpen,
-        },
-        {
-          label: "School classes",
-          value: filteredClasses.length,
-          icon: School,
-        },
-        {
-          label: "Active students",
-          value:
-            snapshot.academicYears.find((year) => year.id === academicYearId)
-              ?.activeStudentCount ?? 0,
-          icon: GraduationCap,
-        },
-      ];
+  const homeStats = [
+    {
+      label: "Active classes",
+      value: filteredClasses.length,
+      icon: BookOpen,
+    },
+    {
+      label: "Active students",
+      value:
+        snapshot.academicYears.find((year) => year.id === academicYearId)
+          ?.activeStudentCount ?? 0,
+      icon: GraduationCap,
+    },
+    {
+      label: "Active educators",
+      value: activeStaff.length,
+      icon: Users,
+    },
+    {
+      label: "Academic year",
+      value: selectedAcademicYear?.calendarYear ?? "Not set",
+      icon: School,
+    },
+    {
+      label: "Pending invitations",
+      value: snapshot.invitations.length,
+      icon: Mail,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-950">
@@ -405,7 +520,9 @@ export default function SchoolHomeClient({
                 {snapshot.school.name}
               </p>
               <p className="text-xs font-semibold text-slate-500">
-                School platform preview
+                {isAdministrator
+                  ? "School administration"
+                  : "Teacher workspace"}
               </p>
             </div>
           </div>
@@ -442,6 +559,15 @@ export default function SchoolHomeClient({
             <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-900 text-sm font-bold text-white">
               {snapshot.actor.name.slice(0, 1).toUpperCase()}
             </div>
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-950 lg:hidden"
+              aria-label="Sign out"
+              title="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </header>
@@ -449,7 +575,7 @@ export default function SchoolHomeClient({
       <div className="mx-auto grid max-w-[1500px] lg:grid-cols-[220px_1fr]">
         <aside className="border-r border-slate-200 bg-white px-3 py-5">
           <nav className="flex gap-2 overflow-x-auto lg:flex-col">
-            {visibleNav.map((item) => {
+            {navigationItems.map((item) => {
               const Icon = item.icon;
               const selected = tab === item.id;
               return (
@@ -465,7 +591,7 @@ export default function SchoolHomeClient({
                 >
                   <Icon className="h-4 w-4" />
                   {item.label}
-                  {item.id === "insights" ? (
+                  {item.id === "insights" && isAdministrator ? (
                     <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-500">
                       Soon
                     </span>
@@ -474,24 +600,30 @@ export default function SchoolHomeClient({
               );
             })}
           </nav>
-          <a
-            href="/teacher/dashboard"
-            className="mt-6 hidden border-t border-slate-200 px-3 pt-5 text-sm font-bold text-slate-500 hover:text-slate-950 lg:block"
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            className="mt-6 hidden w-full items-center gap-3 border-t border-slate-200 px-3 pt-5 text-left text-sm font-bold text-slate-500 hover:text-slate-950 lg:flex"
           >
-            Current dashboard
-          </a>
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </button>
         </aside>
 
         <main className="min-w-0 px-5 py-7 lg:px-8">
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-xs font-bold uppercase text-emerald-700">
-                {tab === "home" ? "School overview" : tab}
+                {tab === "home"
+                  ? isAdministrator
+                    ? "School overview"
+                    : "Teacher home"
+                  : tab}
               </p>
               <h1 className="mt-1 text-2xl font-bold tracking-tight">
                 {tab === "home"
                   ? `Welcome, ${snapshot.actor.name.split(" ")[0]}`
-                  : NAV_ITEMS.find((item) => item.id === tab)?.label}
+                  : navigationItems.find((item) => item.id === tab)?.label}
               </h1>
             </div>
             <div className="flex items-center gap-2">
@@ -510,7 +642,7 @@ export default function SchoolHomeClient({
                   ))}
                 </select>
               </label>
-              {snapshot.permissions.canCreateClass ? (
+              {isAdministrator && snapshot.permissions.canCreateClass ? (
                 <button
                   type="button"
                   onClick={() => setCreateOpen(true)}
@@ -536,107 +668,155 @@ export default function SchoolHomeClient({
           ) : null}
 
           {tab === "home" ? (
-            <div className="space-y-8">
-              <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                {homeStats.map((stat) => {
-                  const Icon = stat.icon;
-                  return (
-                    <div
-                      key={stat.label}
-                      className="rounded-md border border-slate-200 bg-white p-5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-semibold text-slate-500">
-                          {stat.label}
-                        </p>
-                        <Icon className="h-4 w-4 text-emerald-700" />
+            isAdministrator ? (
+              <div className="space-y-8">
+                <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                  {homeStats.map((stat) => {
+                    const Icon = stat.icon;
+                    return (
+                      <div
+                        key={stat.label}
+                        className="rounded-md border border-slate-200 bg-white p-5"
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold text-slate-500">
+                            {stat.label}
+                          </p>
+                          <Icon className="h-4 w-4 text-emerald-700" />
+                        </div>
+                        <p className="mt-3 text-3xl font-bold">{stat.value}</p>
                       </div>
-                      <p className="mt-3 text-3xl font-bold">{stat.value}</p>
-                    </div>
-                  );
-                })}
-              </section>
+                    );
+                  })}
+                </section>
 
-              <section>
-                <div className="mb-3 flex items-center justify-between">
-                  <div>
-                    <h2 className="text-lg font-bold">My Classes</h2>
+                <section>
+                  <div className="mb-3">
+                    <h2 className="text-lg font-bold">All Classes</h2>
                     <p className="text-sm text-slate-500">
-                      Classes where you have an active staff assignment.
+                      All active classes for the selected academic year.
                     </p>
                   </div>
-                </div>
-                <ClassTable
-                  classes={myClasses}
-                  schoolId={snapshot.school.id}
-                  onAssign={setAssignClass}
-                />
-              </section>
+                  <ClassTable
+                    classes={filteredClasses}
+                    schoolId={snapshot.school.id}
+                    onAssign={setAssignClass}
+                  />
+                </section>
 
-              <section>
-                <div className="mb-3">
-                  <h2 className="text-lg font-bold">All Classes</h2>
-                  <p className="text-sm text-slate-500">
-                    All active classes for the selected academic year.
+                <section>
+                  <div className="mb-3">
+                    <h2 className="text-lg font-bold">Recent activity</h2>
+                    <p className="text-sm text-slate-500">
+                      Audited school administration activity.
+                    </p>
+                  </div>
+                  {snapshot.recentActivity.length ? (
+                    <div className="divide-y divide-slate-100 border border-slate-200 bg-white">
+                      {snapshot.recentActivity.map((activity) => (
+                        <div
+                          key={activity.id}
+                          className="flex items-center justify-between gap-4 px-5 py-4"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Activity className="h-4 w-4 text-slate-400" />
+                            <div>
+                              <p className="text-sm font-bold text-slate-800">
+                                {formatAction(activity.action)}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                {activity.actorName}
+                              </p>
+                            </div>
+                          </div>
+                          <time className="text-xs text-slate-400">
+                            {formatSchoolDate(activity.createdAt)}
+                          </time>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon={Activity}
+                      title="No recent administration activity"
+                      detail="Audited school actions will appear here."
+                    />
+                  )}
+                </section>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <section className="border-y border-slate-200 py-4">
+                  <p className="text-sm font-semibold text-slate-500">
+                    {snapshot.school.name} ·{" "}
+                    {selectedAcademicYear?.name ?? "Academic year not set"}
                   </p>
-                </div>
+                  <p className="mt-1 text-sm text-slate-700">
+                    {myClasses.length}{" "}
+                    {myClasses.length === 1 ? "class" : "classes"} ·{" "}
+                    {myStudentCount} students
+                  </p>
+                </section>
+
+                <section>
+                  <div className="mb-3">
+                    <h2 className="text-lg font-bold">My Classes</h2>
+                    <p className="text-sm text-slate-500">
+                      Open your classroom to teach, monitor progress and support
+                      students.
+                    </p>
+                  </div>
+                  <TeacherClassCards
+                    classes={myClasses}
+                    schoolId={snapshot.school.id}
+                  />
+                </section>
+
+                <section>
+                  <div className="mb-1">
+                    <h2 className="text-lg font-bold">Other School Classes</h2>
+                    <p className="text-sm text-slate-500">
+                      Classes across {snapshot.school.name}.
+                    </p>
+                  </div>
+                  <OtherSchoolClasses
+                    classes={otherClasses}
+                    schoolId={snapshot.school.id}
+                  />
+                </section>
+              </div>
+            )
+          ) : null}
+
+          {tab === "classes" ? (
+            isAdministrator ? (
+              <section>
                 <ClassTable
                   classes={filteredClasses}
                   schoolId={snapshot.school.id}
                   onAssign={setAssignClass}
                 />
               </section>
-
-              <section>
-                <div className="mb-3">
-                  <h2 className="text-lg font-bold">Recent activity</h2>
-                  <p className="text-sm text-slate-500">
-                    Audited school administration activity.
-                  </p>
-                </div>
-                {snapshot.recentActivity.length ? (
-                  <div className="divide-y divide-slate-100 border border-slate-200 bg-white">
-                    {snapshot.recentActivity.map((activity) => (
-                      <div
-                        key={activity.id}
-                        className="flex items-center justify-between gap-4 px-5 py-4"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Activity className="h-4 w-4 text-slate-400" />
-                          <div>
-                            <p className="text-sm font-bold text-slate-800">
-                              {formatAction(activity.action)}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              {activity.actorName}
-                            </p>
-                          </div>
-                        </div>
-                        <time className="text-xs text-slate-400">
-                          {formatSchoolDate(activity.createdAt)}
-                        </time>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <EmptyState
-                    icon={Activity}
-                    title="No recent administration activity"
-                    detail="Audited school actions will appear here."
+            ) : (
+              <div className="space-y-8">
+                <section>
+                  <h2 className="mb-3 text-lg font-bold">My Classes</h2>
+                  <TeacherClassCards
+                    classes={myClasses}
+                    schoolId={snapshot.school.id}
                   />
-                )}
-              </section>
-            </div>
-          ) : null}
-
-          {tab === "classes" ? (
-            <section>
-              <ClassTable
-                classes={filteredClasses}
-                schoolId={snapshot.school.id}
-                onAssign={setAssignClass}
-              />
-            </section>
+                </section>
+                <section>
+                  <h2 className="mb-1 text-lg font-bold">
+                    Other School Classes
+                  </h2>
+                  <OtherSchoolClasses
+                    classes={otherClasses}
+                    schoolId={snapshot.school.id}
+                  />
+                </section>
+              </div>
+            )
           ) : null}
 
           {tab === "students" ? (
@@ -824,8 +1004,16 @@ export default function SchoolHomeClient({
           {tab === "insights" ? (
             <EmptyState
               icon={BarChart3}
-              title="Whole-school insights are coming soon"
-              detail="This phase does not invent analytics. Existing class learning data remains in the class dashboard."
+              title={
+                isAdministrator
+                  ? "Whole-school insights are coming soon"
+                  : "Class insights are available inside each class"
+              }
+              detail={
+                isAdministrator
+                  ? "This phase does not invent analytics. Existing class learning data remains in the class dashboard."
+                  : "Open a class to view learning trends, assessment summaries and student insights."
+              }
             />
           ) : null}
 
@@ -834,6 +1022,30 @@ export default function SchoolHomeClient({
               icon={ShieldCheck}
               title="Administration foundation is ready"
               detail="Imports, rollover, licences and advanced school settings are intentionally reserved for later phases."
+            />
+          ) : null}
+
+          {tab === "licence" ? (
+            <EmptyState
+              icon={ShieldCheck}
+              title="Licence management is coming later"
+              detail="School licensing is reserved for the subscription phase and is not represented with placeholder data."
+            />
+          ) : null}
+
+          {tab === "settings" ? (
+            <EmptyState
+              icon={Settings}
+              title="Teacher settings are coming soon"
+              detail="Account settings will appear here. Class settings remain inside each class."
+            />
+          ) : null}
+
+          {tab === "support" ? (
+            <EmptyState
+              icon={HelpCircle}
+              title="Support"
+              detail="Level Up Learning support options will appear here. No classroom data is changed from this page."
             />
           ) : null}
         </main>

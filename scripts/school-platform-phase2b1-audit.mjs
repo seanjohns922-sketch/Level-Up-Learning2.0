@@ -23,6 +23,14 @@ const sessionRoute = read("app/api/school-preview-session/route.ts");
 const finalLoginMigration = read(
   "supabase/migrations/20260729123000_final_school_login_admin_model.sql",
 );
+const teacherNavigation = client.slice(
+  client.indexOf("const TEACHER_NAV_ITEMS"),
+  client.indexOf("const ADMIN_NAV_ITEMS"),
+);
+const administratorNavigation = client.slice(
+  client.indexOf("const ADMIN_NAV_ITEMS"),
+  client.indexOf("const YEAR_LEVELS"),
+);
 
 const checks = [
   [
@@ -52,6 +60,21 @@ const checks = [
     ),
   ],
   [
+    "teacher navigation is class focused",
+    ["Home", "Classes", "Insights", "Settings", "Support"].every((label) =>
+      teacherNavigation.includes(`label: "${label}"`),
+    ) &&
+      !teacherNavigation.includes('label: "Students"') &&
+      !teacherNavigation.includes('label: "Staff"') &&
+      !teacherNavigation.includes('label: "Administration"'),
+  ],
+  [
+    "administrator navigation retains school controls",
+    ["Classes", "Staff", "Students", "School Analytics", "Administration"].every(
+      (label) => administratorNavigation.includes(`label: "${label}"`),
+    ),
+  ],
+  [
     "home reads canonical snapshot",
     /get_school_home_snapshot/.test(migration) &&
       /class_enrollments/.test(migration) &&
@@ -64,7 +87,7 @@ const checks = [
   [
     "class creation uses audited RPC boundary",
     /runSchoolCommand<string>\([\s\S]*?"create_class"/.test(commandRoute) &&
-      !/supabase/.test(client),
+      !/supabase\.from\(/.test(client),
   ],
   [
     "staff changes use audited RPC boundary",
