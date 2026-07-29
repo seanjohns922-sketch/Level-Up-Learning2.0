@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Star, Check, X, Lock, LockOpen, KeyRound, Trophy, Brain, Building2 } from "lucide-react";
+import { ArrowLeft, Star, Check, X, Lock, LockOpen, KeyRound, Trophy, Brain, Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
@@ -262,6 +262,9 @@ export default function TeacherDashboardPage() {
   const [schoolPreviewClassId, setSchoolPreviewClassId] = useState<
     string | null
   >(null);
+  const [schoolPreviewSchoolId, setSchoolPreviewSchoolId] = useState<
+    string | null
+  >(null);
   const isSchoolPreview = Boolean(schoolPreviewClassId);
   const [loading, setLoading] = useState(true);
   const [classes, setClasses] = useState<ClassRow[]>([]);
@@ -319,6 +322,7 @@ export default function TeacherDashboardPage() {
       ? previewParams.get("schoolId")
       : null;
     setSchoolPreviewClassId(requestedClassId);
+    setSchoolPreviewSchoolId(requestedSchoolId);
     loadClasses(authUser.id, requestedClassId, requestedSchoolId);
   }, [authLoading, authUser]);
 
@@ -1048,6 +1052,19 @@ export default function TeacherDashboardPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
+              {isSchoolPreview && schoolPreviewSchoolId ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    router.push(`/school/${schoolPreviewSchoolId}`)
+                  }
+                  className="mr-1 inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-sm font-bold text-[#334155] transition hover:border-[#00C2A8] hover:bg-[#F0FDFA] hover:text-[#0F766E] active:scale-[0.98]"
+                  aria-label="Back to all classes"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  All Classes
+                </button>
+              ) : null}
               <div className="h-7 w-7 rounded-lg bg-[#0A2F2A] ring-1 ring-[#00C2A8]/40 shadow-[0_0_12px_-2px_rgba(0,229,195,0.55)] flex items-center justify-center">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M3 12l9-9 9 9M5 10v10h14V10" />
