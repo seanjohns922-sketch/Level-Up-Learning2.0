@@ -8,6 +8,7 @@ import {
   aggregateLearningScores,
   calculateAccuracy,
   formatAccuracy,
+  formatPercentage,
   normalizeLearningScore,
 } from "@/lib/learning-score";
 import {
@@ -1060,7 +1061,7 @@ export default function LiveClassPanel({
                 <span className="h-2 w-2 rounded-full bg-rose-500" />{statusCounts.needs_support} need help
               </span>
               <span className="text-slate-300">·</span>
-              <span className="text-slate-600">{classAccuracy == null ? "—" : `${classAccuracy}%`} class accuracy</span>
+              <span className="text-slate-600">{formatPercentage(classAccuracy, "—", 0)} class accuracy</span>
               <span className="text-slate-300">·</span>
               <span className="text-slate-500">{statusCounts.idle} idle</span>
             </div>
@@ -1167,7 +1168,7 @@ export default function LiveClassPanel({
                     : accuracy >= 50 ? "text-amber-700"
                     : "text-rose-700"
                   }`}>
-                    {formatAccuracy(correct, answered)}
+                    {formatAccuracy(correct, answered, "—", 0)}
                   </span>
                   {/* last active */}
                   <span className="text-right text-[11px] font-semibold text-slate-400">

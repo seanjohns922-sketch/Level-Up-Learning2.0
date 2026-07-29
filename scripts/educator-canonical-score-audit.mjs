@@ -12,6 +12,7 @@ assert.equal(calculateAccuracy(34, 40), 85);
 assert.equal(calculateAccuracy(18, 20), 90);
 assert.equal(calculateAccuracy(13, 15), 86.67);
 assert.equal(formatAccuracy(13, 15), "86.67%");
+assert.equal(formatAccuracy(13, 15, "—", 0), "87%");
 assert.deepEqual(
   aggregateLearningScores([
     { correct: 9, total: 13 },

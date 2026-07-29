@@ -59,7 +59,17 @@ export function formatAccuracy(
   correct: number | null | undefined,
   total: number | null | undefined,
   fallback = "—",
+  precision = 2,
 ) {
-  const accuracy = calculateAccuracy(correct, total);
-  return accuracy == null ? fallback : `${accuracy}%`;
+  return formatPercentage(calculateAccuracy(correct, total), fallback, precision);
+}
+
+export function formatPercentage(
+  value: number | null | undefined,
+  fallback = "—",
+  precision = 2,
+) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
+  const factor = 10 ** Math.max(0, precision);
+  return `${Math.round(value * factor) / factor}%`;
 }

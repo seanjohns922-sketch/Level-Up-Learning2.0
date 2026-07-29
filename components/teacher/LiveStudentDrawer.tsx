@@ -247,7 +247,7 @@ export function LiveStudentDrawer({
                   </span>
                   <span>
                     {student.scoreSource === "canonical" ? "Final accuracy" : "Current lesson accuracy"}:{" "}
-                    {formatAccuracy(student.correctCount, student.questionsAnswered)}
+                    {formatAccuracy(student.correctCount, student.questionsAnswered, "—", 0)}
                   </span>
                 </div>
               ) : null}
