@@ -77,6 +77,13 @@ const year4Rows: ProgramRow[] = [
     activity: "Read and write large numbers in words and match them to numerals, for example one hundred and eighty-six thousand.",
     curriculum: ["AC9M4N01"],
     activities: [
+      makeActivity("place_value_builder", 1, {
+        min: 10000,
+        max: 999999,
+        placeValues: ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"],
+        visualMode: "mab",
+        mode: "identify_number",
+      }),
       makeActivity("multiple_choice", 2, {
         min: 10000,
         max: 999999,
@@ -98,6 +105,12 @@ const year4Rows: ProgramRow[] = [
     activity: "Read, represent, and identify tenths as place value using decimal models and charts",
     curriculum: ["AC9M4N01"],
     activities: [
+      makeActivity("number_line", 1, {
+        min: 0,
+        max: 1,
+        step: 0.1,
+        mode: "placement",
+      }),
       makeActivity("multiple_choice", 2, {
         mode: "tenths_place_value",
       }),
@@ -114,6 +127,12 @@ const year4Rows: ProgramRow[] = [
     activity: "Read, represent, and identify hundredths as place value using decimal models and charts",
     curriculum: ["AC9M4N01"],
     activities: [
+      makeActivity("number_line", 1, {
+        min: 0,
+        max: 1,
+        step: 0.01,
+        mode: "placement",
+      }),
       makeActivity("multiple_choice", 2, {
         mode: "hundredths_place_value",
       }),
@@ -130,6 +149,12 @@ const year4Rows: ProgramRow[] = [
     activity: "Represent decimals with place value charts, digit cards, and decimal models",
     curriculum: ["AC9M4N01"],
     activities: [
+      makeActivity("number_line", 1, {
+        min: 0,
+        max: 1,
+        step: 0.1,
+        mode: "placement",
+      }),
       makeActivity("multiple_choice", 2, {
         mode: "represent_decimals",
       }),
@@ -147,6 +172,14 @@ const year4Rows: ProgramRow[] = [
     activity: "Compare decimals using place value reasoning and symbols",
     curriculum: ["AC9M4N01"],
     activities: [
+      makeActivity("number_order", 1, {
+        min: 0.1,
+        max: 9.99,
+        count: 4,
+        ascending: true,
+        step: 0.1,
+        mode: "decimal_order",
+      }),
       makeActivity("multiple_choice", 2, {
         mode: "decimal_compare",
       }),
@@ -230,6 +263,12 @@ const year4Rows: ProgramRow[] = [
     activity: "Compare 4-, 5-, and 6-digit whole numbers using <, >, and =",
     curriculum: ["AC9M4N01"],
     activities: [
+      makeActivity("number_order", 1, {
+        min: 1000,
+        max: 999999,
+        count: 5,
+        ascending: true,
+      }),
       makeActivity("multiple_choice", 2, {
         mode: "compare_symbols",
         min: 1000,
@@ -494,6 +533,13 @@ const year4Rows: ProgramRow[] = [
     activity: "Break numbers into tens and ones to multiply",
     curriculum: ["AC9M4N06"],
     activities: [
+      makeActivity("arrays", 1, {
+        minRows: 2,
+        maxRows: 9,
+        minColumns: 2,
+        maxColumns: 9,
+        mode: "arrays",
+      }),
       makeActivity("typed_response", 4, {
         mode: "box_method_total",
       }),
@@ -588,6 +634,10 @@ const year4Rows: ProgramRow[] = [
     activity: "Link tenths fractions to decimals and match fraction, model, and decimal forms",
     curriculum: ["AC9M4N03"],
     activities: [
+      makeActivity("area_model_select", 1, {
+        mode: "pick_model",
+        denominators: [2, 4, 5, 10],
+      }),
       makeActivity("multiple_choice", 2, {
         mode: "fraction_decimal_match",
         allowedPairs: [
@@ -691,6 +741,10 @@ const year4Rows: ProgramRow[] = [
     activity: "Combine unit fractions with the same denominator to build totals and simple fraction additions",
     curriculum: ["AC9M4N03", "AC9M4N04"],
     activities: [
+      makeActivity("number_line_place", 1, {
+        mode: "place_fraction",
+        denominators: [2, 3, 4, 5, 6, 8],
+      }),
       makeActivity("typed_response", 2, {
         mode: "same_denominator_combine",
         denominators: [2, 3, 4, 5, 6, 8],
@@ -744,6 +798,9 @@ const year4Rows: ProgramRow[] = [
     activity: "Find fractions of quantities using grouping, visual models, and number connections in real contexts",
     curriculum: ["AC9M4N05"],
     activities: [
+      makeActivity("set_model_select", 1, {
+        mode: "tap_fraction",
+      }),
       makeActivity("typed_response", 2, {
         mode: "fraction_of_quantity",
       }),
@@ -763,6 +820,10 @@ const year4Rows: ProgramRow[] = [
     activity: "Choose operations and combine division and fraction reasoning across multi-step problems",
     curriculum: ["AC9M4N03", "AC9M4N05", "AC9M4N06"],
     activities: [
+      makeActivity("number_line_place", 1, {
+        mode: "place_fraction",
+        denominators: [2, 3, 4, 5, 6, 8],
+      }),
       makeActivity("mixed_word_problem", 2, {
         mode: "division_fraction_multistep",
       }),
@@ -805,6 +866,10 @@ const year4Rows: ProgramRow[] = [
     activity: "Connect simple fractions to decimals and familiar money values using models and matching tasks",
     curriculum: ["AC9M4N05", "AC9M4N07"],
     activities: [
+      makeActivity("area_model_select", 1, {
+        mode: "pick_model",
+        denominators: [2, 4, 5, 10],
+      }),
       makeActivity("multiple_choice", 2, {
         mode: "fraction_decimal_match",
       }),
