@@ -8708,6 +8708,49 @@ function randomReviewConfig(
   }
 }
 
+// Some y6 "mixed" modes hold templates of both kinds (multiple_choice +
+// typed_response) so a lesson can vary its questions. The slot that renders
+// them declares exactly one activityType, so we must return a template whose
+// kind matches — otherwise the post-generate alignment check throws and the
+// student sees a recovery card. Pick only from templates of the declared kind.
+function pickTemplateForActivityType<T extends { kind: string }>(
+  templates: T[],
+  activityType: "multiple_choice" | "typed_response"
+): T {
+  const matching = templates.filter((template) => template.kind === activityType);
+  const pool = matching.length > 0 ? matching : templates;
+  return pool[randInt(0, pool.length - 1)] ?? pool[0]!;
+}
+
+// Collect `count` distinct positive integers from a generator, excluding a set
+// of values. Used to build 4-option MC questions with verified distractors.
+function distinctInts(
+  count: number,
+  gen: () => number,
+  exclude: Set<number>
+): number[] {
+  const out = new Set<number>();
+  let guard = 0;
+  while (out.size < count && guard < 500) {
+    const value = gen();
+    if (value > 0 && !exclude.has(value) && !out.has(value)) out.add(value);
+    guard += 1;
+  }
+  return [...out];
+}
+
+// Same kind guarantee as above, but honouring a caller-provided index so
+// deterministic template selection still works.
+function pickTemplateOfKindAtIndex<T extends { kind: string }>(
+  templates: T[],
+  activityType: "multiple_choice" | "typed_response",
+  index: number
+): T {
+  const matching = templates.filter((template) => template.kind === activityType);
+  const pool = matching.length > 0 ? matching : templates;
+  return pool[index % pool.length] ?? pool[0]!;
+}
+
 function generateGenericQuestion(
   level: SupportedMathLevel,
   activityType: "multiple_choice" | "typed_response",
@@ -10565,7 +10608,7 @@ function generateGenericQuestion(
         inputType: "integer",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_fraction_quantity_nonclean") {
@@ -10573,7 +10616,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "3/5 of 28 = ?",
-        answer: "84/5",
+        answer: "16 4/5",
         helper: "Not every scaled result is a whole number.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10589,7 +10632,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "5/8 of 30 = ?",
-        answer: "75/4",
+        answer: "18 3/4",
         helper: "A non-clean result can still be expressed exactly.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10612,7 +10655,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "5/6 of 22 = ?",
-        answer: "55/3",
+        answer: "18 1/3",
         helper: "Keep the result exact even when it is not whole.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10620,7 +10663,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "7/12 of 54 = ?",
-        answer: "63/2",
+        answer: "31 1/2",
         helper: "Use twelfths, then simplify only if helpful.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10636,7 +10679,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "4/9 of 25 = ?",
-        answer: "100/9",
+        answer: "11 1/9",
         helper: "Scale exactly, then express the result clearly.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10644,7 +10687,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "3/8 of 50 = ?",
-        answer: "75/4",
+        answer: "18 3/4",
         helper: "A fraction of a quantity can be a mixed number.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10659,7 +10702,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "9/10 of 26 = ?",
-        answer: "117/5",
+        answer: "23 2/5",
         helper: "Use exact fraction scaling, not rounding.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10675,7 +10718,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "5/12 of 38 = ?",
-        answer: "95/6",
+        answer: "15 5/6",
         helper: "Keep the answer exact in fractional form.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10690,7 +10733,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "2/7 of 31 = ?",
-        answer: "62/7",
+        answer: "8 6/7",
         helper: "Exact answers can stay as improper fractions.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10698,7 +10741,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "13/20 of 48 = ?",
-        answer: "156/5",
+        answer: "31 1/5",
         helper: "Think multiplicatively, not just by repeated subtraction.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10714,7 +10757,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "5/9 of 32 = ?",
-        answer: "160/9",
+        answer: "17 7/9",
         helper: "Use exact fraction scaling when the parts do not divide evenly.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10727,7 +10770,7 @@ function generateGenericQuestion(
         helper: "Compare the exact scaled amounts.",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_fraction_quantity_multistep") {
@@ -10802,7 +10845,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "A runner completes 5/8 of a 40 km trail, then 1/4 of the remaining distance. How far has the runner completed in total?",
-        answer: "115/4",
+        answer: "28 3/4",
         helper: "First find the main fraction, then take a fraction of what is left.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10844,7 +10887,7 @@ function generateGenericQuestion(
       {
         kind: "typed_response",
         prompt: "A fuel tank holds 90 L. It is filled to 7/9 capacity. Then 1/3 of the fuel in the tank is used. How much fuel is left?",
-        answer: "140/3",
+        answer: "46 2/3",
         helper: "Find the fuel in the tank first, then take a fraction away.",
         placeholder: "Type a fraction or mixed number",
         inputType: "flexible_fraction",
@@ -10981,7 +11024,7 @@ function generateGenericQuestion(
         inputType: "integer",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_percent_benchmark") {
@@ -11147,7 +11190,7 @@ function generateGenericQuestion(
         inputType: "integer",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_percent_break_apart") {
@@ -11304,25 +11347,25 @@ function generateGenericQuestion(
         placeholder: "Type the answer",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_percent_real_multistep") {
     const templates: Array<TypedResponseQuestion | MultipleChoiceQuestion> = [
       {
         kind: "typed_response",
-        prompt: "A player scores 80 points. They achieved 75% of the total possible score. What was the full score?",
-        answer: "106.67",
-        acceptedAnswers: ["320/3"],
+        prompt: "A player scores 60 points. They achieved 75% of the total possible score. What was the full score?",
+        answer: "80",
         helper: "Work backwards from the percentage of the total.",
-        placeholder: "Type a decimal or fraction",
+        placeholder: "Type the answer",
+        inputType: "integer",
         visual: {
           type: "multi_step_method",
           title: "Reverse percentage",
           contextLabel: "Find the whole when a percentage of it is known.",
           steps: [
-            { prompt: "What is 25% if 75% is 80?", answer: "26.67" },
-            { prompt: "What is 100% of the total?", answer: "106.67" },
+            { prompt: "If 75% is 60, what is 25%?", answer: "20" },
+            { prompt: "What is 100% of the total?", answer: "80" },
           ],
         },
       },
@@ -11503,7 +11546,7 @@ function generateGenericQuestion(
         helper: "Equivalent fractions can make scaling simpler.",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "tenths_place_value") {
@@ -14230,32 +14273,54 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "y6_factor_quick_recognition") {
-    const templates = [
-      { prompt: "Is 6 a factor of 42?", answer: "Yes", options: ["Yes", "No"] },
-      { prompt: "Is 7 a factor of 45?", answer: "No", options: ["Yes", "No"] },
-      { prompt: "Which is a multiple of 8?", answer: "32", options: ["32", "30", "34"] },
-      { prompt: "Which is NOT a multiple of 5?", answer: "42", options: ["25", "40", "42"] },
-      { prompt: "Is 24 a multiple of 6?", answer: "Yes", options: ["Yes", "No"] },
-      { prompt: "Is 9 a factor of 54?", answer: "Yes", options: ["Yes", "No"] },
-      { prompt: "Which is a multiple of 9?", answer: "63", options: ["61", "63", "67"] },
-      { prompt: "Is 11 a factor of 88?", answer: "Yes", options: ["Yes", "No"] },
-      { prompt: "Which is NOT a multiple of 4?", answer: "26", options: ["20", "24", "26"] },
-      { prompt: "Is 8 a factor of 54?", answer: "No", options: ["Yes", "No"] },
-      { prompt: "Which is a multiple of 12?", answer: "84", options: ["82", "84", "86"] },
-      { prompt: "Is 15 a factor of 90?", answer: "Yes", options: ["Yes", "No"] },
-      { prompt: "Which is NOT a multiple of 3?", answer: "44", options: ["39", "42", "44"] },
-      { prompt: "Is 14 a factor of 98?", answer: "Yes", options: ["Yes", "No"] },
-      { prompt: "Which is a multiple of 7?", answer: "56", options: ["54", "56", "58"] },
-      { prompt: "Is 5 a factor of 62?", answer: "No", options: ["Yes", "No"] },
-      { prompt: "Which is NOT a multiple of 6?", answer: "50", options: ["42", "48", "50"] },
-      { prompt: "Is 13 a factor of 91?", answer: "Yes", options: ["Yes", "No"] },
-    ] as const;
-    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const variant = randInt(0, 3);
+    let prompt = "";
+    let correct = 0;
+    let distractors: number[] = [];
+
+    if (variant === 0 || variant === 1) {
+      // Factor questions. Pick a number with plenty of factors.
+      const bases = [24, 36, 40, 48, 54, 60, 72, 84, 90, 96];
+      const n = bases[randInt(0, bases.length - 1)]!;
+      const factors: number[] = [];
+      for (let i = 2; i < n; i += 1) if (n % i === 0) factors.push(i);
+      if (variant === 0) {
+        prompt = `Which of these is a factor of ${n}?`;
+        correct = factors[randInt(0, factors.length - 1)]!;
+        distractors = distinctInts(3, () => randInt(2, 20), new Set(factors));
+      } else {
+        prompt = `Which of these is NOT a factor of ${n}?`;
+        correct = distinctInts(1, () => randInt(2, 20), new Set(factors))[0]!;
+        distractors = shuffle(factors).slice(0, 3);
+      }
+    } else {
+      // Multiple questions.
+      const k = randInt(3, 12);
+      if (variant === 2) {
+        prompt = `Which of these is a multiple of ${k}?`;
+        correct = k * randInt(3, 12);
+        distractors = distinctInts(
+          3,
+          () => correct + randInt(-6, 6),
+          new Set([correct, ...Array.from({ length: 40 }, (_, i) => k * (i + 1))])
+        );
+      } else {
+        prompt = `Which of these is NOT a multiple of ${k}?`;
+        const base = k * randInt(3, 10);
+        correct = distinctInts(
+          1,
+          () => base + randInt(-6, 6),
+          new Set(Array.from({ length: 40 }, (_, i) => k * (i + 1)))
+        )[0]!;
+        distractors = distinctInts(3, () => k * randInt(2, 14), new Set([correct]));
+      }
+    }
+
     return {
       kind: "multiple_choice",
-      prompt: chosen.prompt,
-      options: shuffle([...chosen.options]),
-      answer: chosen.answer,
+      prompt,
+      options: shuffle([correct, ...distractors].map(String)),
+      answer: String(correct),
       helper: "Use a quick factor or multiple check.",
     };
   }
@@ -14950,32 +15015,46 @@ function generateGenericQuestion(
   }
 
   if (explicitMode === "y6_square_recognition") {
-    const templates = [
-      { prompt: "Which is a square number?", answer: "36", options: ["36", "35", "38"] },
-      { prompt: "Is 49 a square number?", answer: "Yes", options: ["Yes", "No"] },
-      { prompt: "Which is NOT a square number?", answer: "30", options: ["25", "30", "64"] },
-      { prompt: "What is 9²?", answer: "81", options: ["72", "81", "90"] },
-      { prompt: "What is √64?", answer: "8", options: ["6", "8", "10"] },
-      { prompt: "Which is a square number?", answer: "121", options: ["118", "121", "124"] },
-      { prompt: "Is 72 a square number?", answer: "No", options: ["Yes", "No"] },
-      { prompt: "What is 12²?", answer: "144", options: ["124", "142", "144"] },
-      { prompt: "Which is NOT a square number?", answer: "50", options: ["49", "50", "64"] },
-      { prompt: "What is √81?", answer: "9", options: ["8", "9", "10"] },
-      { prompt: "Which is a square number?", answer: "100", options: ["96", "100", "104"] },
-      { prompt: "Is 1 a square number?", answer: "Yes", options: ["Yes", "No"] },
-      { prompt: "What is 6²?", answer: "36", options: ["30", "36", "42"] },
-      { prompt: "Which is NOT a square number?", answer: "63", options: ["49", "63", "81"] },
-      { prompt: "What is √121?", answer: "11", options: ["10", "11", "12"] },
-      { prompt: "Which is a square number?", answer: "16", options: ["14", "15", "16"] },
-      { prompt: "Is 144 a square number?", answer: "Yes", options: ["Yes", "No"] },
-      { prompt: "What is 5²?", answer: "25", options: ["20", "25", "30"] },
-    ] as const;
-    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const squares = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225];
+    const squareSet = new Set(squares);
+    const variant = randInt(0, 3);
+    let prompt = "";
+    let correct = 0;
+    let distractors: number[] = [];
+
+    if (variant === 0) {
+      prompt = "Which of these is a square number?";
+      correct = squares[randInt(2, 12)]!;
+      distractors = distinctInts(3, () => correct + randInt(-5, 5), squareSet);
+    } else if (variant === 1) {
+      prompt = "Which of these is NOT a square number?";
+      const anchor = squares[randInt(2, 12)]!;
+      correct = distinctInts(1, () => anchor + randInt(-5, 5), squareSet)[0]!;
+      distractors = shuffle(squares.filter((value) => value > 4)).slice(0, 3);
+    } else if (variant === 2) {
+      const n = randInt(4, 14);
+      prompt = `What is ${n}²?`;
+      correct = n * n;
+      distractors = distinctInts(
+        3,
+        () => {
+          const pick = randInt(0, 2);
+          return pick === 0 ? (n - 1) * (n - 1) : pick === 1 ? (n + 1) * (n + 1) : correct + randInt(-9, 9);
+        },
+        new Set([correct])
+      );
+    } else {
+      const n = randInt(4, 14);
+      prompt = `What is √${n * n}?`;
+      correct = n;
+      distractors = distinctInts(3, () => n + randInt(-3, 3), new Set([correct, 0]));
+    }
+
     return {
       kind: "multiple_choice",
-      prompt: chosen.prompt,
-      options: shuffle([...chosen.options]),
-      answer: chosen.answer,
+      prompt,
+      options: shuffle([correct, ...distractors].map(String)),
+      answer: String(correct),
       helper: "Recognise the square number pattern quickly.",
     };
   }
@@ -16607,7 +16686,7 @@ function generateGenericQuestion(
         visual: patternSequenceStrip("Find the Rule", [40, 20, 10, 5, "?"], ["?", "?", "?", null]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_pattern_visual_numeric") {
@@ -16733,7 +16812,7 @@ function generateGenericQuestion(
         visual: growingPatternVisual("Growing Dots", [5, 8, 11, 14, 17], "dots"),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_pattern_generalise") {
@@ -16833,7 +16912,7 @@ function generateGenericQuestion(
         visual: patternSequenceStrip("Square Pattern", [1, 4, 9, 16, "..."], [null, null, null, null]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   const ruleBuilderVisual = (
@@ -16958,7 +17037,7 @@ function generateGenericQuestion(
         visual: ruleBuilderVisual("Rule Builder", [34, 18, 10, 6, "?"], "Rule"),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_pattern_position_generalise") {
@@ -17100,7 +17179,7 @@ function generateGenericQuestion(
         visual: functionMachineVisual("Reverse Function Machine", "?", "×3 + 5", 41),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_pattern_function_machine") {
@@ -17224,7 +17303,7 @@ function generateGenericQuestion(
         visual: functionMachineVisual("Function Machine", 67, "×3 + 1", "?"),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_function_apply_rule") {
@@ -17280,7 +17359,7 @@ function generateGenericQuestion(
         visual: functionMachineVisual("Function Machine", 4, "×3 + 2", "?"),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_function_find_rule") {
@@ -17342,7 +17421,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_function_reverse_generalise") {
@@ -17402,7 +17481,7 @@ function generateGenericQuestion(
         visual: functionMachineVisual("Repeat the Machine", 4, "×2 + 3", "?"),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_rule_build") {
@@ -17464,7 +17543,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_rule_match_test") {
@@ -17564,7 +17643,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_rule_explain_generalise") {
@@ -17626,7 +17705,7 @@ function generateGenericQuestion(
         visual: reverseMachineVisual("Reverse the Rule", "×2 + 1", 41),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_tables_read_complete") {
@@ -17707,7 +17786,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_tables_build_pairs") {
@@ -17771,7 +17850,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_tables_points_preview") {
@@ -17828,7 +17907,7 @@ function generateGenericQuestion(
         visual: miniCoordinatePreviewVisual("Mini Coordinate Preview", 3, 7, "y = 2x + 1"),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_cartesian_find_plot") {
@@ -17883,7 +17962,7 @@ function generateGenericQuestion(
         }),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_cartesian_read_match") {
@@ -17947,7 +18026,7 @@ function generateGenericQuestion(
         }),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_cartesian_follow_origin") {
@@ -18008,7 +18087,7 @@ function generateGenericQuestion(
         }),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_cartesian_move_interpret") {
@@ -18079,7 +18158,7 @@ function generateGenericQuestion(
         }),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   const termPredictorVisual = (
@@ -18147,7 +18226,7 @@ function generateGenericQuestion(
         visual: patternSequenceStrip("Find and Apply", [6, 13, 27, 55, "?"], [null, null, null, null]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_sequence_extend_reverse") {
@@ -18201,7 +18280,7 @@ function generateGenericQuestion(
         visual: patternSequenceStrip("Challenge Pattern", [2, 7, 22, 67, "?"], [null, null, null, null]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_sequence_generalise_predict") {
@@ -18247,7 +18326,7 @@ function generateGenericQuestion(
         visual: patternSequenceStrip("Generalise and Predict", [1, 3, 6, 10, 15, "?"], ["+2", "+3", "+4", "+5", null]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "pattern_sequence") {
@@ -20430,7 +20509,7 @@ function generateGenericQuestion(
         helper: "Choose the form that makes the number easier.",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_fdp_use_form") {
@@ -20611,7 +20690,7 @@ function generateGenericQuestion(
         helper: "Think about the fraction equivalent.",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_fdp_justify_decide") {
@@ -20757,7 +20836,7 @@ function generateGenericQuestion(
         helper: "Think about the fraction equivalent.",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_discount_compare_deals") {
@@ -20903,7 +20982,7 @@ function generateGenericQuestion(
         helper: "A larger discount on a slightly higher price can still be cheaper.",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_discount_stacked") {
@@ -21055,7 +21134,7 @@ function generateGenericQuestion(
         placeholder: "Type the answer",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_discount_budget_decide") {
@@ -21221,7 +21300,7 @@ function generateGenericQuestion(
         helper: "Good decisions come from comparing the actual outcomes.",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_unit_rate_build") {
@@ -21512,7 +21591,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_unit_rate_compare") {
@@ -21698,7 +21777,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_unit_rate_decide") {
@@ -21948,7 +22027,7 @@ function generateGenericQuestion(
         helper: "Unit rates make value comparisons fair.",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   const bestBuyVisual = (
@@ -22025,7 +22104,7 @@ function generateGenericQuestion(
         helper: "Look for the principle that always gives a fair comparison.",
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_interpret_explain") {
@@ -22091,7 +22170,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_interpret_decide") {
@@ -22163,7 +22242,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (
@@ -22821,7 +22900,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_order_ops_brackets") {
@@ -22910,7 +22989,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_order_ops_apply") {
@@ -23025,7 +23104,7 @@ function generateGenericQuestion(
         ]),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "simple_equations") {
@@ -23107,7 +23186,7 @@ function generateGenericQuestion(
         visual: unknownTileEquationVisual("Mystery Tile Equation", "□ + 8", "23"),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_equation_two_step") {
@@ -23163,7 +23242,7 @@ function generateGenericQuestion(
         visual: balanceEquationVisual("Two-step Equation", "5x + 9", "44"),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_equation_brackets_check") {
@@ -23209,7 +23288,7 @@ function generateGenericQuestion(
         visual: inverseStepVisual("Inverse Step", "x + 12 = 31", "Undo +12 with −12", "First step"),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "equations_real_context") {
@@ -23301,7 +23380,7 @@ function generateGenericQuestion(
         }),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_coord4q_read_quadrants") {
@@ -23381,7 +23460,7 @@ function generateGenericQuestion(
         ),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_coord4q_movement") {
@@ -23441,7 +23520,7 @@ function generateGenericQuestion(
         }),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_mixed_ops_fluency_mix") {
@@ -23522,7 +23601,7 @@ function generateGenericQuestion(
         ),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_mixed_ops_strategy_choice") {
@@ -23606,7 +23685,7 @@ function generateGenericQuestion(
         ),
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_mixed_ops_application_mix") {
@@ -23698,7 +23777,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return pickTemplateForActivityType(templates, activityType);
   }
 
   if (explicitMode === "y6_modelling_choose_strategy") {
@@ -23777,7 +23856,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[templateIndex % templates.length] ?? templates[0]!;
+    return pickTemplateOfKindAtIndex(templates, activityType, templateIndex);
   }
 
   if (explicitMode === "y6_modelling_best_value") {
@@ -23882,7 +23961,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[templateIndex % templates.length] ?? templates[0]!;
+    return pickTemplateOfKindAtIndex(templates, activityType, templateIndex);
   }
 
   if (explicitMode === "y6_modelling_mini_project") {
@@ -23963,7 +24042,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[templateIndex % templates.length] ?? templates[0]!;
+    return pickTemplateOfKindAtIndex(templates, activityType, templateIndex);
   }
 
   if (explicitMode === "y6_final_review_core") {
@@ -24046,7 +24125,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[templateIndex % templates.length] ?? templates[0]!;
+    return pickTemplateOfKindAtIndex(templates, activityType, templateIndex);
   }
 
   if (explicitMode === "y6_final_review_equations_patterns") {
@@ -24114,7 +24193,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[templateIndex % templates.length] ?? templates[0]!;
+    return pickTemplateOfKindAtIndex(templates, activityType, templateIndex);
   }
 
   if (explicitMode === "y6_final_review_coordinates_application") {
@@ -24194,7 +24273,7 @@ function generateGenericQuestion(
         },
       },
     ];
-    return templates[templateIndex % templates.length] ?? templates[0]!;
+    return pickTemplateOfKindAtIndex(templates, activityType, templateIndex);
   }
 
   if (

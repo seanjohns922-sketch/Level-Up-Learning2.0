@@ -261,7 +261,7 @@ const year6Rows: ProgramRow[] = [
     curriculum: ["AC9M6N04"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_equivalent_build_strict" }),
-      makeActivity("multiple_choice", 1, { mode: "y6_equivalent_identify_strict" }),
+      makeActivity("equivalent_fraction_match", 1, {}),
       makeActivity("equivalent_fraction_yes_no", 1, { mode: "y6_equivalent_visual_strict" }),
     ],
   },
@@ -273,7 +273,7 @@ const year6Rows: ProgramRow[] = [
     activity: "Compare and order fractions using visual models, equivalence, and benchmark values.",
     curriculum: ["AC9M6N04"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "y6_fraction_order_fluency" }),
+      makeActivity("fraction_compare", 1, {}),
       makeActivity("multiple_choice", 1, { mode: "y6_fraction_order_strategy" }),
       makeActivity("number_order", 1, { mode: "y6_fraction_order_reasoning" }),
     ],
@@ -366,7 +366,7 @@ const year6Rows: ProgramRow[] = [
     activity: "Choose the most efficient form before solving, then convert only if it helps.",
     curriculum: ["AC9M6N05"],
     activities: [
-      makeActivity("multiple_choice", 1, { mode: "y6_fdp_choose_form" }),
+      makeActivity("fraction_decimal_percent_match", 1, {}),
       makeActivity("typed_response", 1, { mode: "y6_fdp_use_form" }),
       makeActivity("multiple_choice", 1, { mode: "y6_fdp_justify_decide" }),
     ],
@@ -418,7 +418,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Explore Number Patterns",
     activity: "Spot structure quickly in visual and numeric patterns.",
-    curriculum: ["AC9M6N07"],
+    curriculum: ["AC9M6A01"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "y6_pattern_find_rule" }),
       makeActivity("typed_response", 1, { mode: "y6_pattern_visual_numeric" }),
@@ -431,7 +431,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Describe Patterns & Relationships",
     activity: "Explain what stays the same, what changes, and how each pattern grows.",
-    curriculum: ["AC9M6N07"],
+    curriculum: ["AC9M6A01", "AC9M6A02"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "y6_pattern_describe_rule" }),
       makeActivity("typed_response", 1, { mode: "y6_pattern_position_generalise" }),
@@ -444,7 +444,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Extend & Predict Sequences",
     activity: "Continue, predict, and justify visual and numeric sequences.",
-    curriculum: ["AC9M6N07"],
+    curriculum: ["AC9M6A01", "AC9M6A02"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "y6_sequence_find_apply" }),
       makeActivity("typed_response", 1, { mode: "y6_sequence_extend_reverse" }),
@@ -458,7 +458,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Function Machines",
     activity: "Apply rules to inputs, outputs, and missing values in function-machine style tasks.",
-    curriculum: ["AC9M6N07", "AC9M6N08"],
+    curriculum: ["AC9M6A01"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_function_apply_rule" }),
       makeActivity("multiple_choice", 1, { mode: "y6_function_find_rule" }),
@@ -471,7 +471,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Tables & Ordered Pairs",
     activity: "Read tables, complete outputs, and turn rows into ordered pairs that prepare for graphing.",
-    curriculum: ["AC9M6N07", "AC9M6N08"],
+    curriculum: ["AC9M6A01"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_tables_read_complete" }),
       makeActivity("multiple_choice", 1, { mode: "y6_tables_build_pairs" }),
@@ -484,7 +484,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Tables to Graphs (Cartesian Plane Intro)",
     activity: "Plot points, read coordinates, and follow simple directions from the origin on a 4-quadrant grid.",
-    curriculum: ["AC9M6N07", "AC9M6N08"],
+    curriculum: ["AC9M6A01", "AC9M6N01"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_cartesian_find_plot" }),
       makeActivity("multiple_choice", 1, { mode: "y6_cartesian_read_match" }),
@@ -498,7 +498,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Evaluate Expressions",
     activity: "Use operation order and brackets correctly to evaluate expressions.",
-    curriculum: ["AC9M6N08"],
+    curriculum: ["AC9M6A03"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_order_ops_spot",
@@ -520,7 +520,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Solve Simple Equations",
     activity: "Balance inverse operations to solve simple one-step and two-step unknowns.",
-    curriculum: ["AC9M6N08"],
+    curriculum: ["AC9M6A03"],
     activities: [
       makeActivity("typed_response", 1, {
         mode: "y6_equation_one_step",
@@ -542,7 +542,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Coordinates & Movement (4 Quadrants)",
     activity: "Read, plot, and interpret coordinate positions and movements across the Cartesian plane.",
-    curriculum: ["AC9M6N08"],
+    curriculum: ["AC9M6N01"],
     activities: [
       makeActivity("typed_response", 1, {
         mode: "y6_coord4q_find_plot",
@@ -565,7 +565,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Mixed Operations Challenge",
     activity: "Apply mixed Level 6 number strategies across operations, percentages, equations, money, and coordinates.",
-    curriculum: ["AC9M6N01", "AC9M6N04", "AC9M6N05", "AC9M6N06", "AC9M6N08"],
+    curriculum: ["AC9M6N01", "AC9M6N04", "AC9M6N05", "AC9M6A03"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_mixed_ops_fluency_mix",
@@ -587,7 +587,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Real-World Modelling Project",
     activity: "Combine percentage, rate, and multi-step reasoning in short realistic modelling problems.",
-    curriculum: ["AC9M6N05", "AC9M6N06", "AC9M6N08"],
+    curriculum: ["AC9M6N05", "AC9M6N06", "AC9M6A03"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_modelling_choose_strategy",
@@ -609,7 +609,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Final Review & Readiness",
     activity: "Tune up fluency, estimation, and mixed calculations before the post-test.",
-    curriculum: ["AC9M6N01", "AC9M6N03", "AC9M6N04", "AC9M6N05", "AC9M6N06", "AC9M6N08"],
+    curriculum: ["AC9M6N01", "AC9M6N04", "AC9M6N05", "AC9M6A01", "AC9M6A03"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_final_review_core",
