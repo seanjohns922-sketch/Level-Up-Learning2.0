@@ -472,11 +472,11 @@ const year5Rows: ProgramRow[] = [
     activity: "Work out percentages quickly in real-life situations like money, discounts, and quantities.",
     curriculum: ["AC9M5N04", "AC9M5N09"],
     activities: [
-      makeActivity("multiple_choice", 1, {
-        mode: "percent_quick_find",
+      makeActivity("fraction_decimal_percent_match", 1, {
+        mode: "fdp_match_representations",
         rotationRole: "fast_thinking",
-        rotationLabel: "Quick Find",
-        rotationPurpose: "Build speed and confidence finding benchmark percentages mentally.",
+        rotationLabel: "Percent Match",
+        rotationPurpose: "Match a percentage to its fraction and decimal before finding it of an amount.",
       }),
       makeActivity("typed_response", 1, {
         mode: "percent_structured_method",
@@ -501,11 +501,11 @@ const year5Rows: ProgramRow[] = [
     activity: "Use percentages to work out discounts and final prices.",
     curriculum: ["AC9M5N04", "AC9M5N09"],
     activities: [
-      makeActivity("multiple_choice", 1, {
-        mode: "discount_quick_find",
+      makeActivity("fraction_decimal_percent_match", 1, {
+        mode: "fdp_match_representations",
         rotationRole: "fast_thinking",
-        rotationLabel: "Quick Discount",
-        rotationPurpose: "Use price tags and sale badges to quickly find discounts or final prices.",
+        rotationLabel: "Percent Match",
+        rotationPurpose: "Match a percentage to its fraction and decimal before working out discounts.",
       }),
       makeActivity("typed_response", 1, {
         mode: "discount_step_method",
@@ -530,11 +530,11 @@ const year5Rows: ProgramRow[] = [
     activity: "Break percentage problems into clear steps and carry results forward.",
     curriculum: ["AC9M5N08", "AC9M5N09"],
     activities: [
-      makeActivity("multiple_choice", 1, {
-        mode: "percent_step_selection",
+      makeActivity("fraction_decimal_percent_match", 1, {
+        mode: "fdp_match_representations",
         rotationRole: "fast_thinking",
-        rotationLabel: "Quick Multi-Step",
-        rotationPurpose: "Solve short numerical percentage problems with more than one step.",
+        rotationLabel: "Percent Match",
+        rotationPurpose: "Match percentages to fractions and decimals to support multi-step percentage work.",
       }),
       makeActivity("typed_response", 1, {
         mode: "percent_multi_step_method",
