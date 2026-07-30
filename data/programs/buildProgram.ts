@@ -52,6 +52,7 @@ const FAST_ACTIVITY_TYPES = new Set<ActivityType>([
   "arrays",
   "skip_count",
   "speed_round",
+  "column_method",
 ]);
 
 const REASONING_ACTIVITY_TYPES = new Set<ActivityType>([

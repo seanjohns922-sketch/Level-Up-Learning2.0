@@ -457,6 +457,11 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
           "Mix 2-digit and selected 3-digit additions that require regrouping"
         ),
         activities: [
+          makeActivity("column_method", 2, {
+            mode: "add",
+            min: 100,
+            max: 999,
+          }),
           makeActivity("typed_response", 2, {
             min: 20,
             max: 99,
@@ -489,6 +494,11 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
           "Mix 2-digit and selected 3-digit subtractions that require regrouping"
         ),
         activities: [
+          makeActivity("column_method", 2, {
+            mode: "subtract",
+            min: 100,
+            max: 999,
+          }),
           makeActivity("typed_response", 2, {
             min: 20,
             max: 99,
@@ -521,6 +531,10 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
           "Check each answer by adding it back to the number taken away"
         ),
         activities: [
+          makeActivity("column_method", 2, {
+            mode: "subtract",
+            acrossZeros: true,
+          }),
           makeActivity("typed_response", 2, {
             min: 100,
             max: 999,

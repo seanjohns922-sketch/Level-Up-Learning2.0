@@ -25,6 +25,7 @@ export type ActivityType =
   | "review_quiz"
   | "multiple_choice"
   | "typed_response"
+  | "column_method"
   | "speed_round";
 
 export type LessonActivity = {

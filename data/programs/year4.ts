@@ -495,6 +495,16 @@ const year4Rows: ProgramRow[] = [
     activity: "Use column methods with larger numbers",
     curriculum: ["AC9M4N06"],
     activities: [
+      makeActivity("column_method", 2, {
+        mode: "add",
+        min: 1000,
+        max: 9999,
+      }),
+      makeActivity("column_method", 1, {
+        mode: "subtract",
+        min: 1000,
+        max: 9999,
+      }),
       makeActivity("typed_response", 2, {
         mode: "column_add_sub_solve",
       }),
