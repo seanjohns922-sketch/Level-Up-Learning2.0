@@ -3874,7 +3874,9 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     maxByContract: { maxTotal: "divisionTotalMax" },
   },
   mixed_word_problem: {
-    allowedModes: ["choose_operation", "two_step_add_sub", "two_step_problem", "mult_div_problems", "division_fraction_multistep"],
+    // "budgeting" / "shop_transactions" are generated only for Year 4 Week 8
+    // (isYear4Week8), so allowing them here cannot loosen any other level/week.
+    allowedModes: ["choose_operation", "two_step_add_sub", "two_step_problem", "mult_div_problems", "division_fraction_multistep", "budgeting", "shop_transactions"],
     maxByContract: { max: "wordProblemMax" },
   },
   review_quiz: {},
@@ -4945,7 +4947,16 @@ function formatWeek8ItemLabel(
 ) {
   const label = item.label.toLowerCase();
   const detail = item.detail?.trim();
-  const plural = quantity === 1 ? "" : "s";
+  // Correct English pluralisation: already-plural labels (pads, socks) get
+  // nothing; -ch/-sh/-x/-z/-s get "es" (sandwich -> sandwiches); else "s".
+  const plural =
+    quantity === 1
+      ? ""
+      : /s$/i.test(label)
+      ? ""
+      : /(ch|sh|x|z)$/i.test(label)
+      ? "es"
+      : "s";
 
   if (!detail || detail.toLowerCase() === "standard") {
     return `${quantity} ${label}${plural}`;

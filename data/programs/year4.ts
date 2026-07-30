@@ -787,11 +787,11 @@ const year4Rows: ProgramRow[] = [
     curriculum: ["AC9M4N03", "AC9M4N06", "AC9M4N08"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
-        mode: "advanced_two_step_problem",
-        operations: ["addition", "subtraction", "multiplication", "division"],
+        mode: "choose_operation",
+        operations: ["+", "-", "x", "/"],
       }),
       makeActivity("typed_response", 1, {
-        mode: "advanced_two_step_problem",
+        mode: "choose_operation",
         sourceActivityType: "mixed_word_problem",
       }),
     ],
@@ -823,11 +823,11 @@ const year4Rows: ProgramRow[] = [
     curriculum: ["AC9M4N06", "AC9M4N07", "AC9M4N08"],
     activities: [
       makeActivity("mixed_word_problem", 2, {
-        mode: "reasonableness_check",
-        operations: ["addition", "subtraction", "multiplication", "division"],
+        mode: "two_step_add_sub",
+        operations: ["+", "-"],
       }),
       makeActivity("multiple_choice", 1, {
-        mode: "reasonableness_check",
+        mode: "two_step_add_sub",
         sourceActivityType: "mixed_word_problem",
       }),
     ],
