@@ -19,6 +19,7 @@ const year5Rows: ProgramRow[] = [
     activity: "Read decimals to thousandths, rename them, and expand or recombine place value parts.",
     curriculum: ["AC9M5N01"],
     activities: [
+      makeActivity("number_line", 1, { min: 0, max: 1, step: 0.01, mode: "placement", displayStyle: "full_range" }),
       makeActivity("multiple_choice", 2, { mode: "read_write_rename_decimals" }),
       makeActivity("typed_response", 2, { mode: "read_write_rename_decimals" }),
     ],
@@ -74,6 +75,7 @@ const year5Rows: ProgramRow[] = [
     activity: "Use money contexts to add decimal amounts and compare prices accurately.",
     curriculum: ["AC9M5N01"],
     activities: [
+      makeActivity("number_line", 1, { min: 0, max: 10, step: 0.01, mode: "placement" }),
       makeActivity("multiple_choice", 1, { mode: "decimal_context" }),
       makeActivity("typed_response", 4, { mode: "decimal_context" }),
     ],
@@ -86,6 +88,7 @@ const year5Rows: ProgramRow[] = [
     activity: "Round decimals to the nearest hundredth or thousandth and estimate sensible answers.",
     curriculum: ["AC9M5N08"],
     activities: [
+      makeActivity("number_line", 1, { min: 0, max: 1, step: 0.01, mode: "placement", displayStyle: "full_range" }),
       makeActivity("multiple_choice", 2, { mode: "decimal_rounding_estimation" }),
       makeActivity("typed_response", 2, { mode: "decimal_rounding_estimation" }),
     ],
@@ -98,6 +101,7 @@ const year5Rows: ProgramRow[] = [
     activity: "Estimate, judge whether decimal answers make sense, and check financial totals in context.",
     curriculum: ["AC9M5N08", "AC9M5N09"],
     activities: [
+      makeActivity("number_line", 1, { min: 0, max: 10, step: 0.01, mode: "placement" }),
       makeActivity("multiple_choice", 2, { mode: "decimal_reasonableness" }),
       makeActivity("typed_response", 1, { mode: "decimal_reasonableness" }),
     ],
@@ -111,6 +115,7 @@ const year5Rows: ProgramRow[] = [
     activity: "Find factor pairs, identify multiples, and compare factor and multiple patterns.",
     curriculum: ["AC9M5N02"],
     activities: [
+      makeActivity("arrays", 1, { minRows: 2, maxRows: 12, minColumns: 2, maxColumns: 12, mode: "arrays" }),
       makeActivity("multiple_choice", 2, { mode: "factors_multiples" }),
       makeActivity("typed_response", 2, { mode: "factors_multiples" }),
     ],
@@ -325,8 +330,8 @@ const year5Rows: ProgramRow[] = [
     activity: "Use matching fraction pieces to add and subtract quickly.",
     curriculum: ["AC9M5N05"],
     activities: [
-      makeActivity("multiple_choice", 1, {
-        mode: "same_denominator_visual",
+      makeActivity("number_line_place", 1, {
+        mode: "place_fraction_number_line",
         rotationRole: "fast_thinking",
       }),
       makeActivity("multiple_choice", 1, {
@@ -347,8 +352,8 @@ const year5Rows: ProgramRow[] = [
     activity: "Match the pieces, then combine.",
     curriculum: ["AC9M5N05"],
     activities: [
-      makeActivity("multiple_choice", 1, {
-        mode: "related_denominator_visual",
+      makeActivity("number_line_place", 1, {
+        mode: "place_fraction_number_line",
         rotationRole: "fast_thinking",
       }),
       makeActivity("multiple_choice", 1, {
@@ -369,8 +374,8 @@ const year5Rows: ProgramRow[] = [
     activity: "Choose the operation, match denominators, and solve.",
     curriculum: ["AC9M5N05"],
     activities: [
-      makeActivity("multiple_choice", 1, {
-        mode: "real_world_fraction_context",
+      makeActivity("number_line_place", 1, {
+        mode: "place_fraction_number_line",
         rotationRole: "fast_thinking",
       }),
       makeActivity("typed_response", 1, {
@@ -438,11 +443,11 @@ const year5Rows: ProgramRow[] = [
     activity: "Use what you know to solve real-world problems with confidence.",
     curriculum: ["AC9M5N04"],
     activities: [
-      makeActivity("multiple_choice", 1, {
-        mode: "real_world_quick_apply",
+      makeActivity("fraction_decimal_percent_match", 1, {
+        mode: "fdp_match_representations",
         rotationRole: "fast_thinking",
-        rotationLabel: "Quick Apply",
-        rotationPurpose: "Use short real-world contexts to combine fractions, decimals, and percentages quickly.",
+        rotationLabel: "Quick Match",
+        rotationPurpose: "Match equivalent fraction, decimal, and percentage forms.",
       }),
       makeActivity("typed_response", 1, {
         mode: "real_world_structured_solve",
