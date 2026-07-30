@@ -5150,6 +5150,7 @@ function buildYear4Week8BudgetingQuestion(config: GenericConfig): MixedWordProbl
     operationLabel: "Multiply and add costs",
     helper: picked.helper,
     mode: "budgeting",
+    optionPrefix: "$",
     showStrategyClue: false,
     visual: {
       type: "shopping_list",
@@ -5237,6 +5238,7 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
     operationLabel: "Multiply in a shopping context",
     helper: picked.helper,
     mode: "shop_transactions",
+    optionPrefix: "$",
     showStrategyClue: false,
     visual: {
       ...picked.visual,
@@ -5300,6 +5302,7 @@ function buildYear4Week8TwoStepQuestion(config: GenericConfig): MixedWordProblem
     operationLabel: "Multiply, then combine totals",
     helper: picked.helper,
     mode: "two_step_problem",
+    optionPrefix: "$",
     showStrategyClue: false,
     visual: {
       type: "receipt",
