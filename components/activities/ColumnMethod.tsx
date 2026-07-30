@@ -83,12 +83,6 @@ export default function ColumnMethod({
     return { steps: list, workTop: work, revealAt: reveal };
   }, [isAdd, columns, topD, botD]);
 
-  const stepByCol = useMemo(() => {
-    const m: Record<number, Step> = {};
-    steps.forEach((s) => { m[s.col] = s; });
-    return m;
-  }, [steps]);
-
   const [stepIdx, setStepIdx] = useState(0);
   const [placed, setPlaced] = useState<Record<number, number>>({});
   const [carriesShown, setCarriesShown] = useState<Record<number, number>>({});
@@ -100,7 +94,6 @@ export default function ColumnMethod({
 
   const step = steps[stepIdx];
   const placeName = (col: number) => ["ones", "tens", "hundreds", "thousands", "ten thousands"][columns - 1 - col] ?? "column";
-  const subValue = (col: number) => (stepIdx >= revealAt[col] ? workTop[col]! : topD[col]!); // regrouped value once revealed
 
   useEffect(() => { inputRef.current?.focus(); }, [stepIdx]);
 
