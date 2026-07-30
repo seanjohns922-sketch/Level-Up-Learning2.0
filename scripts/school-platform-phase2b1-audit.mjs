@@ -133,10 +133,15 @@ const checks = [
     ),
   ],
   [
-    "preview dashboard heading uses class name",
-    /isSchoolPreview && selectedClass[\s\S]*?selectedClass\.name/.test(
-      teacherDashboard,
-    ),
+    "every class dashboard heading uses class name",
+    /\{selectedClass\?\.name \?\? "Class Dashboard"\}/.test(teacherDashboard),
+  ],
+  [
+    "School Home refreshes the authenticated school session",
+    /openSchoolPreview\(schoolHomeId\)/.test(teacherDashboard) &&
+      /destinationSchoolId[\s\S]*?result\.schools\.find/.test(
+        teacherDashboard,
+      ),
   ],
   [
     "student identity directory and insights scope",

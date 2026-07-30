@@ -1047,7 +1047,7 @@ export default function TeacherDashboardPage() {
   );
   const isDev = process.env.NODE_ENV !== "production";
 
-  async function openSchoolPreview() {
+  async function openSchoolPreview(destinationSchoolId?: string | null) {
     setOpeningSchoolPreview(true);
     setSchoolPreviewError(null);
 
@@ -1078,7 +1078,11 @@ export default function TeacherDashboardPage() {
         return;
       }
 
-      window.location.assign(`/school/${result.schools[0].id}`);
+      const destinationSchool =
+        (destinationSchoolId
+          ? result.schools.find((school) => school.id === destinationSchoolId)
+          : null) ?? result.schools[0];
+      window.location.assign(`/school/${destinationSchool.id}`);
     } catch {
       setSchoolPreviewError(
         "School Home could not be opened. Please try again.",
@@ -1096,12 +1100,13 @@ export default function TeacherDashboardPage() {
           {schoolHomeId ? (
             <button
               type="button"
-              onClick={() => router.push(`/school/${schoolHomeId}`)}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-sm font-bold text-[#334155] transition hover:border-[#00C2A8] hover:bg-[#F0FDFA] hover:text-[#0F766E] active:scale-[0.98]"
+              onClick={() => void openSchoolPreview(schoolHomeId)}
+              disabled={openingSchoolPreview}
+              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-sm font-bold text-[#334155] transition hover:border-[#00C2A8] hover:bg-[#F0FDFA] hover:text-[#0F766E] active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
               aria-label="Back to School Home"
             >
               <ArrowLeft className="h-4 w-4" />
-              School Home
+              {openingSchoolPreview ? "Opening..." : "School Home"}
             </button>
           ) : null}
 
@@ -1123,9 +1128,7 @@ export default function TeacherDashboardPage() {
           )}
 
           <h1 className="shrink-0 text-xl font-black tracking-tight text-[#0F172A]">
-            {isSchoolPreview && selectedClass
-              ? selectedClass.name
-              : "Teacher Dashboard"}
+            {selectedClass?.name ?? "Class Dashboard"}
           </h1>
 
           {selectedClass ? (
