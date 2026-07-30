@@ -68,35 +68,62 @@ function schoolLogoFor(name: string) {
     : null;
 }
 
-function educatorFirstName(name: string, email: string | null) {
-  const titles = new Set([
-    "mr",
-    "mrs",
-    "ms",
-    "miss",
-    "mx",
-    "dr",
-    "prof",
-    "sir",
-    "dame",
-  ]);
+const EDUCATOR_TITLES = new Set([
+  "mr",
+  "mrs",
+  "ms",
+  "miss",
+  "mx",
+  "dr",
+  "prof",
+  "sir",
+  "dame",
+]);
+
+function inferredEmailNameParts(email: string | null) {
+  return (
+    email
+      ?.split("@")[0]
+      ?.split(/[._+-]+/)
+      .map((part) => part.replace(/[^a-zA-Z'-]/g, ""))
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()) ??
+    []
+  );
+}
+
+function educatorFullName(name: string, email: string | null) {
   const nameParts = name.trim().split(/\s+/).filter(Boolean);
   const startsWithTitle =
     nameParts.length > 0 &&
-    titles.has(nameParts[0].replace(/\./g, "").toLowerCase());
+    EDUCATOR_TITLES.has(nameParts[0].replace(/\./g, "").toLowerCase());
   const personalNameParts = startsWithTitle ? nameParts.slice(1) : nameParts;
 
-  if (!startsWithTitle || personalNameParts.length > 1) {
-    return personalNameParts[0] ?? "Educator";
+  if (personalNameParts.length > 1 && !personalNameParts[0].includes("@")) {
+    return personalNameParts.join(" ");
   }
 
-  const emailFirstName = email
-    ?.split("@")[0]
-    ?.split(/[._+-]/)[0]
-    ?.replace(/[^a-zA-Z'-]/g, "");
-  if (!emailFirstName) return personalNameParts[0] ?? "Educator";
+  const emailNameParts = inferredEmailNameParts(email);
+  const storedSurname =
+    personalNameParts.length === 1 && !personalNameParts[0].includes("@")
+      ? personalNameParts[0]
+      : null;
 
-  return emailFirstName.charAt(0).toUpperCase() + emailFirstName.slice(1);
+  if (emailNameParts[0] && storedSurname) {
+    return emailNameParts[0].toLowerCase() === storedSurname.toLowerCase()
+      ? storedSurname
+      : `${emailNameParts[0]} ${storedSurname}`;
+  }
+
+  if (emailNameParts.length > 1) {
+    return `${emailNameParts[0]} ${emailNameParts[1]}`;
+  }
+
+  return storedSurname ?? emailNameParts[0] ?? "Educator";
+}
+
+function educatorFirstName(name: string, email: string | null) {
+  return educatorFullName(name, email).split(/\s+/)[0] ?? "Educator";
 }
 
 const ADMIN_NAV_ITEMS: NavItem[] = [
@@ -1214,6 +1241,10 @@ export default function SchoolHomeClient({
     snapshot.actor.name,
     snapshot.actor.email,
   );
+  const actorFullName = educatorFullName(
+    snapshot.actor.name,
+    snapshot.actor.email,
+  );
   const navigationItems = isAdministrator
     ? ADMIN_NAV_ITEMS
     : TEACHER_NAV_ITEMS;
@@ -1383,7 +1414,7 @@ export default function SchoolHomeClient({
               </label>
             ) : null}
             <div className="hidden text-right md:block">
-              <p className="text-sm font-bold">{snapshot.actor.name}</p>
+              <p className="text-sm font-bold">{actorFullName}</p>
               <p className="text-xs text-slate-500">
                 {snapshot.permissions.isLeadingTeacher
                   ? "Leading teacher"
@@ -1392,7 +1423,7 @@ export default function SchoolHomeClient({
               </p>
             </div>
             <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-900 text-sm font-bold text-white">
-              {snapshot.actor.name.slice(0, 1).toUpperCase()}
+              {actorFullName.slice(0, 1).toUpperCase()}
             </div>
             <button
               type="button"
