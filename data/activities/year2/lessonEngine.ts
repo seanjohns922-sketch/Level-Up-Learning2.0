@@ -5567,11 +5567,11 @@ function roundingWordProblem(
   // Style pools by context
   const style1Templates = [
     {
-      prompt: `A school is ordering pencils. They need ${fmt(value)} pencils. Pencils come in boxes of ${fmt(targetUnit)}. How many pencils should they order (rounded to the nearest ${unitLabel})?`,
+      prompt: `A school has ${fmt(value)} pencils. About how many is that, to the nearest ${unitLabel}?`,
       helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
     },
     {
-      prompt: `A factory made ${fmt(value)} toys. They pack them in crates of ${fmt(targetUnit)}. How many toys should they report (rounded to the nearest ${unitLabel})?`,
+      prompt: `A factory made ${fmt(value)} toys. About how many is that, to the nearest ${unitLabel}?`,
       helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
     },
     {
@@ -25254,7 +25254,6 @@ function generateGenericQuestion(
     const target = randInt(Math.max(100, min), Math.max(150, max || 999));
     const standard = partitionNumber(target);
     const thousandsValue = standard.thousands ?? 0;
-    const hundredsCount = standard.hundreds / 100;
     const tensCount = standard.tens / 10;
     const answerText = formatExpandedPartition(target);
     const altText =
@@ -25286,7 +25285,7 @@ function generateGenericQuestion(
           }
         : {
             kind: "typed_response",
-            prompt: `${target} = ${answerText}. ${target} has ${hundredsCount} ${hundredsCount === 1 ? "hundred" : "hundreds"} and ${tensCount} ${tensCount === 1 ? "ten" : "tens"}. If 1 hundred is regrouped into 10 tens, how many tens are there altogether?`,
+            prompt: `${target} has ${tensCount} ${tensCount === 1 ? "ten" : "tens"}. Regroup 1 hundred into 10 more tens. How many tens now?`,
             answer: String(tensCount + 10),
             helper: "1 hundred is the same as 10 tens, so add 10 to the tens already there.",
             placeholder: "Type the total number of tens",

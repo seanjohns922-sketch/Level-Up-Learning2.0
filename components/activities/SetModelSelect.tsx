@@ -24,27 +24,32 @@ function CounterGrid({
   const active = interactive
     ? new Set(selected ?? [])
     : new Set(Array.from({ length: highlightedCount ?? 0 }, (_, index) => index));
+  // Display counters (non-interactive) render as divs, not disabled buttons —
+  // a disabled <button> swallows the tap and blocks selecting a "pick a set"
+  // option card (and nested buttons are invalid HTML).
+  function Counter({ index }: { index: number }) {
+    const cls = [
+      "h-10 w-10 rounded-full border-2 transition",
+      active.has(index) ? "border-sky-500 bg-sky-400" : "border-slate-300 bg-slate-100",
+    ].join(" ");
+    if (!interactive) return <div key={index} aria-hidden className={cls} />;
+    return (
+      <button
+        key={index}
+        type="button"
+        onClick={() => onToggle?.(index)}
+        className={`${cls} cursor-pointer hover:border-sky-400`}
+      />
+    );
+  }
   if (groupCount && groupSize) {
     return (
       <div className="grid gap-3">
         {Array.from({ length: groupCount }).map((_, groupIndex) => (
           <div key={groupIndex} className="flex flex-wrap gap-2 rounded-2xl bg-white p-3 shadow-sm">
-            {Array.from({ length: groupSize }).map((__, itemIndex) => {
-              const index = groupIndex * groupSize + itemIndex;
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => onToggle?.(index)}
-                  disabled={!interactive}
-                  className={[
-                    "h-10 w-10 rounded-full border-2 transition",
-                    active.has(index) ? "border-sky-500 bg-sky-400" : "border-slate-300 bg-slate-100",
-                    interactive ? "cursor-pointer hover:border-sky-400" : "cursor-default",
-                  ].join(" ")}
-                />
-              );
-            })}
+            {Array.from({ length: groupSize }).map((__, itemIndex) => (
+              <Counter key={groupIndex * groupSize + itemIndex} index={groupIndex * groupSize + itemIndex} />
+            ))}
           </div>
         ))}
       </div>
@@ -53,17 +58,7 @@ function CounterGrid({
   return (
     <div className="grid grid-cols-4 gap-2 rounded-2xl bg-white p-3 shadow-sm">
       {Array.from({ length: total }).map((_, index) => (
-        <button
-          key={index}
-          type="button"
-          onClick={() => onToggle?.(index)}
-          disabled={!interactive}
-          className={[
-            "h-10 w-10 rounded-full border-2 transition",
-            active.has(index) ? "border-sky-500 bg-sky-400" : "border-slate-300 bg-slate-100",
-            interactive ? "cursor-pointer hover:border-sky-400" : "cursor-default",
-          ].join(" ")}
-        />
+        <Counter key={index} index={index} />
       ))}
     </div>
   );

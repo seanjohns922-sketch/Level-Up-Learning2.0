@@ -23,15 +23,15 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y3-w1",
     week: 1,
-    topic: "Place Value, Partitioning & Comparing to 10,000",
-    curriculum: ["ALL"],
+    topic: "Place Value, Partitioning & Comparing beyond 10,000",
+    curriculum: ["AC9M3N01"],
     lessons: [
       {
         id: "y3-w1-l1",
         week: 1,
         lesson: 1,
-        title: "Place Value to 10,000",
-        focus: "Represent numbers to 10,000 with place value charts and number lines",
+        title: "Place Value beyond 10,000",
+        focus: "Represent numbers beyond 10,000 with place value charts and number lines",
         activityIdeas: lessonIdeas(
           "Represent numbers to 10,000 using MAB/place-value chart and place on 0-10,000 number line",
           "Model numbers used in real contexts such as population or distances"
@@ -60,7 +60,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             rotationRole: "apply_create",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N01"],
       },
       {
         id: "y3-w1-l2",
@@ -90,7 +90,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "partition_expand",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N01"],
       },
       {
         id: "y3-w1-l3",
@@ -122,7 +122,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "number_order",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N01"],
       },
     ],
   },
@@ -130,7 +130,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w2",
     week: 2,
     topic: "Rounding & Reasoning",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3N05"],
     lessons: [
       {
         id: "y3-w2-l1",
@@ -165,7 +165,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "number_line",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N05"],
       },
       {
         id: "y3-w2-l2",
@@ -200,7 +200,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "number_line",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N05"],
       },
       {
         id: "y3-w2-l3",
@@ -235,7 +235,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "number_line",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N05"],
       },
     ],
   },
@@ -243,7 +243,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w3",
     week: 3,
     topic: "Addition Strategies",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3N03", "AC9M3A02"],
     lessons: [
       {
         id: "y3-w3-l1",
@@ -273,7 +273,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "addition_strategy",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03", "AC9M3A02"],
       },
       {
         id: "y3-w3-l2",
@@ -304,7 +304,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "addition_strategy",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03", "AC9M3A02"],
       },
       {
         id: "y3-w3-l3",
@@ -335,7 +335,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "addition_strategy",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03", "AC9M3A02"],
       },
     ],
   },
@@ -343,7 +343,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w4",
     week: 4,
     topic: "Subtraction Strategies",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3N03", "AC9M3A02"],
     lessons: [
       {
         id: "y3-w4-l1",
@@ -374,7 +374,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "subtraction_strategy",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03", "AC9M3A02"],
       },
       {
         id: "y3-w4-l2",
@@ -405,7 +405,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "subtraction_strategy",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03", "AC9M3A02"],
       },
       {
         id: "y3-w4-l3",
@@ -436,7 +436,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "subtraction_strategy",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03", "AC9M3A02"],
       },
     ],
   },
@@ -444,7 +444,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w5",
     week: 5,
     topic: "Written Addition & Subtraction",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3N03"],
     lessons: [
       {
         id: "y3-w5-l1",
@@ -476,7 +476,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "addition_strategy",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03"],
       },
       {
         id: "y3-w5-l2",
@@ -508,39 +508,39 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "subtraction_strategy",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03"],
       },
       {
         id: "y3-w5-l3",
         week: 5,
         lesson: 3,
-        title: "Long Subtraction (With Regrouping)",
-        focus: "Continue long subtraction with regrouping using the written method",
+        title: "Subtraction Across Zeros",
+        focus: "Subtract from numbers with zeros using the written method, then check",
         activityIdeas: lessonIdeas(
-          "Continue vertical subtraction with borrowing",
-          "Mix moderate and harder regrouping examples, including selected 3-digit subtraction"
+          "Regroup across zeros in the standard written subtraction method",
+          "Check each answer by adding it back to the number taken away"
         ),
         activities: [
           makeActivity("typed_response", 2, {
-            min: 20,
-            max: 99,
-            mode: "split",
-            sourceActivityType: "subtraction_strategy",
-          }),
-          makeActivity("typed_response", 1, {
-            min: 140,
+            min: 100,
             max: 999,
             mode: "split",
             sourceActivityType: "subtraction_strategy",
           }),
           makeActivity("typed_response", 1, {
-            min: 20,
+            min: 200,
+            max: 999,
+            mode: "split",
+            sourceActivityType: "subtraction_strategy",
+          }),
+          makeActivity("typed_response", 1, {
+            min: 100,
             max: 999,
             mode: "split",
             sourceActivityType: "subtraction_strategy",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03"],
       },
     ],
   },
@@ -548,7 +548,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w6",
     week: 6,
     topic: "Problem Solving",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3N03", "AC9M3N04"],
     lessons: [
       {
         id: "y3-w6-l1",
@@ -580,7 +580,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             operations: ["+", "-"],
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03", "AC9M3N04"],
       },
       {
         id: "y3-w6-l2",
@@ -612,7 +612,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             operations: ["+", "-"],
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03", "AC9M3N04"],
       },
       {
         id: "y3-w6-l3",
@@ -644,7 +644,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             operations: ["+", "-"],
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N03", "AC9M3N04"],
       },
     ],
   },
@@ -652,7 +652,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w7",
     week: 7,
     topic: "Multiplication - Intro",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3N04"],
     lessons: [
       {
         id: "y3-w7-l1",
@@ -688,7 +688,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "equal_groups",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N04"],
       },
       {
         id: "y3-w7-l2",
@@ -724,7 +724,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "arrays",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N04"],
       },
       {
         id: "y3-w7-l3",
@@ -756,7 +756,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "division_groups",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N04"],
       },
     ],
   },
@@ -764,7 +764,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w8",
     week: 8,
     topic: "Multiplication & Division Facts",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3N04"],
     lessons: [
       {
         id: "y3-w8-l1",
@@ -793,7 +793,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             mode: "write_sentences",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N04"],
       },
       {
         id: "y3-w8-l2",
@@ -823,13 +823,13 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "fact_family",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N04"],
       },
       {
         id: "y3-w8-l3",
         week: 8,
         lesson: 3,
-        title: "Mixed Practice",
+        title: "Multiplication & Division Problems",
         focus: "Mixed multiplication and division practice",
         activityIdeas: lessonIdeas(
           "Mix multiplication and division fact practice with strong 3s and 4s coverage",
@@ -855,7 +855,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "mixed_word_problem",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N04"],
       },
     ],
   },
@@ -863,7 +863,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w9",
     week: 9,
     topic: "Skip Counting, Patterns & Estimation",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3A02", "AC9M3N05"],
     lessons: [
       {
         id: "y3-w9-l1",
@@ -896,7 +896,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "skip_count",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3A02", "AC9M3N05"],
       },
       {
         id: "y3-w9-l2",
@@ -928,7 +928,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "number_order",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3A02", "AC9M3N05"],
       },
       {
         id: "y3-w9-l3",
@@ -962,7 +962,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "mixed_word_problem",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3A02", "AC9M3N05"],
       },
     ],
   },
@@ -970,7 +970,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w10",
     week: 10,
     topic: "Fact Families & Number Relationships",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3A01"],
     lessons: [
       {
         id: "y3-w10-l1",
@@ -1000,7 +1000,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "fact_family",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3A01"],
       },
       {
         id: "y3-w10-l2",
@@ -1032,7 +1032,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "mixed_word_problem",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3A01"],
       },
       {
         id: "y3-w10-l3",
@@ -1064,7 +1064,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "number_order",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3A01"],
       },
     ],
   },
@@ -1072,7 +1072,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w11",
     week: 11,
     topic: "Fractions Foundations",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3N02"],
     lessons: [
       {
         id: "y3-w11-l1",
@@ -1095,7 +1095,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             mode: "match_model",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N02"],
       },
       {
         id: "y3-w11-l2",
@@ -1118,7 +1118,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             mode: "label_shared_group",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N02"],
       },
       {
         id: "y3-w11-l3",
@@ -1141,7 +1141,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             mode: "pick_whole",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N02"],
       },
     ],
   },
@@ -1149,27 +1149,29 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w12",
     week: 12,
     topic: "Fraction Reasoning",
-    curriculum: ["ALL"],
+    curriculum: ["AC9M3N02"],
     lessons: [
       {
         id: "y3-w12-l1",
         week: 12,
         lesson: 1,
-        title: "Equivalent Fractions",
-        focus: "Recognise and build equivalent fractions visually",
+        title: "Make One Whole",
+        focus: "Combine unit fractions with the same denominator to make one whole",
         activityIdeas: lessonIdeas(
-          "Match simple equivalent fractions using visual bars and parts",
-          "Build the same fraction value using more pieces"
+          "Count how many equal parts make one whole",
+          "Combine same-denominator parts and compare unit fractions"
         ),
         activities: [
-          makeActivity("equivalent_fraction_match", 2, {
+          makeActivity("build_the_whole", 2, {
+            mode: "build_whole",
           }),
-          makeActivity("equivalent_fraction_build", 1, {
+          makeActivity("area_model_select", 1, {
+            mode: "pick_model",
           }),
-          makeActivity("equivalent_fraction_yes_no", 1, {
+          makeActivity("fraction_compare", 1, {
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N02"],
       },
       {
         id: "y3-w12-l2",
@@ -1195,7 +1197,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             denominators: [2, 3, 4, 5, 10],
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N02"],
       },
       {
         id: "y3-w12-l3",
@@ -1218,7 +1220,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             mode: "true_false",
           }),
         ],
-        curriculum: ["ALL"],
+        curriculum: ["AC9M3N02"],
       },
     ],
   },
