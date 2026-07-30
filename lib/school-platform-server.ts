@@ -224,9 +224,14 @@ async function getSchoolStudentDirectory(
         body: JSON.stringify({ p_school_id: schoolId }),
       },
     );
-  } catch {
-    // The School Home remains available while the additive migration deploys,
-    // and ordinary teachers do not have school-directory permission.
+  } catch (error) {
+    console.error(
+      "[SchoolHome] Unable to load the canonical student directory",
+      error,
+    );
+    // ordinary teachers do not have school-directory permission. School
+    // administrators still retain the rest of School Home if the additive RPC
+    // is temporarily unavailable, while the server log preserves the cause.
     return [];
   }
 }

@@ -21,6 +21,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type {
@@ -53,6 +54,13 @@ const TEACHER_NAV_ITEMS: NavItem[] = [
   { id: "settings", label: "Settings", icon: Settings },
   { id: "support", label: "Support", icon: HelpCircle },
 ];
+
+function schoolLogoFor(name: string) {
+  const key = name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  return key === "cobramprimary" || key === "cobramprimaryschool"
+    ? "/schools/cobram-primary-logo.png"
+    : null;
+}
 
 const ADMIN_NAV_ITEMS: NavItem[] = [
   { id: "home", label: "Home", icon: LayoutDashboard },
@@ -683,6 +691,7 @@ export default function SchoolHomeClient({
     (staff) => staff.status === "active",
   );
   const isAdministrator = snapshot.permissions.canViewAdministration;
+  const schoolLogo = schoolLogoFor(snapshot.school.name);
   const navigationItems = isAdministrator
     ? ADMIN_NAV_ITEMS
     : TEACHER_NAV_ITEMS;
@@ -771,9 +780,20 @@ export default function SchoolHomeClient({
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-5 px-5 py-4 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-emerald-900 text-white">
-              <School className="h-5 w-5" />
-            </div>
+            {schoolLogo ? (
+              <Image
+                src={schoolLogo}
+                alt={`${snapshot.school.name} logo`}
+                width={44}
+                height={44}
+                priority
+                className="h-11 w-11 shrink-0 rounded-md object-cover"
+              />
+            ) : (
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-emerald-900 text-white">
+                <School className="h-5 w-5" />
+              </div>
+            )}
             <div className="min-w-0">
               <p className="truncate text-lg font-bold">
                 {snapshot.school.name}

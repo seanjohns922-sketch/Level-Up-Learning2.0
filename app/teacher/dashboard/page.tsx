@@ -20,7 +20,14 @@ import {
 import { formatAccuracy } from "@/lib/learning-score";
 
 /* ── types ─────────────────────────────────────────── */
-type ClassRow = { id: string; class_code: string; name: string; year_level: string; brain_break_frequency?: string | null };
+type ClassRow = {
+  id: string;
+  class_code: string;
+  name: string;
+  year_level: string;
+  school_id?: string | null;
+  brain_break_frequency?: string | null;
+};
 type StudentRow = { id: string; display_name: string; username?: string | null; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null; school_year_level?: string | null; working_level?: string | null; year_level?: string | null; brain_break_frequency?: string | null };
 type ProgressRow = {
   student_id: string;
@@ -502,6 +509,8 @@ export default function TeacherDashboardPage() {
   }
 
   const selectedClass = classes.find((c) => c.id === selectedClassId);
+  const schoolHomeId =
+    schoolPreviewSchoolId ?? selectedClass?.school_id ?? null;
   const classStudents = students.filter((s) => s.class_id === selectedClassId);
 
   function getStudentProgress(studentId: string, year: string): ProgressRow | undefined {
@@ -1052,17 +1061,15 @@ export default function TeacherDashboardPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              {isSchoolPreview && schoolPreviewSchoolId ? (
+              {schoolHomeId ? (
                 <button
                   type="button"
-                  onClick={() =>
-                    router.push(`/school/${schoolPreviewSchoolId}`)
-                  }
+                  onClick={() => router.push(`/school/${schoolHomeId}`)}
                   className="mr-1 inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-sm font-bold text-[#334155] transition hover:border-[#00C2A8] hover:bg-[#F0FDFA] hover:text-[#0F766E] active:scale-[0.98]"
-                  aria-label="Back to all classes"
+                  aria-label="Back to School Home"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  All Classes
+                  School Home
                 </button>
               ) : null}
               <div className="h-7 w-7 rounded-lg bg-[#0A2F2A] ring-1 ring-[#00C2A8]/40 shadow-[0_0_12px_-2px_rgba(0,229,195,0.55)] flex items-center justify-center">
