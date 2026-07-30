@@ -26,7 +26,16 @@ const HEADER_ALIASES = {
   lastName: ["last", "last name", "lastname", "surname", "family name", "family"],
   fullName: ["name", "full name", "student", "student name", "student full name"],
   schoolYear: ["year", "year level", "school year", "school year level", "grade", "grade level"],
-  username: ["username", "user name", "student id", "student identifier", "login", "login id"],
+  username: [
+    "username",
+    "user name",
+    "student id",
+    "student identifier",
+    "student code",
+    "student code / id",
+    "login",
+    "login id",
+  ],
   pin: ["pin", "access code", "password", "passcode"],
 } as const;
 

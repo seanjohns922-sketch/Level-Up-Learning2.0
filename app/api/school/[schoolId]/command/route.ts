@@ -23,6 +23,15 @@ function stringArray(value: unknown) {
     : [];
 }
 
+function objectArray(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter(
+        (item): item is Record<string, unknown> =>
+          typeof item === "object" && item !== null && !Array.isArray(item),
+      )
+    : [];
+}
+
 export async function POST(
   request: Request,
   context: { params: Promise<{ schoolId: string }> },
@@ -159,6 +168,48 @@ export async function POST(
           },
         );
         return NextResponse.json({ explorerCode });
+      }
+
+      case "createStudents": {
+        const students = objectArray(payload.students).slice(0, 100);
+        if (students.length === 0) {
+          return errorResponse("At least one student is required");
+        }
+
+        const created: Array<Record<string, unknown>> = [];
+        const errors: Array<{ row: number; name: string; message: string }> = [];
+
+        for (const [index, student] of students.entries()) {
+          const firstName = stringValue(student.firstName);
+          const lastName = stringValue(student.lastName);
+          try {
+            const result = await runSchoolCommand<Record<string, unknown>>(
+              schoolId,
+              "create_school_student",
+              {
+                p_school_id: schoolId,
+                p_class_id: stringValue(student.classId),
+                p_first_name: firstName,
+                p_last_name: lastName,
+                p_school_year_level: stringValue(student.schoolYear),
+                p_username: stringValue(student.username) || null,
+                p_pin: stringValue(student.pin) || null,
+                p_idempotency_key:
+                  stringValue(student.idempotencyKey) || crypto.randomUUID(),
+              },
+            );
+            created.push(result);
+          } catch (error) {
+            errors.push({
+              row: index + 1,
+              name: [firstName, lastName].filter(Boolean).join(" "),
+              message:
+                error instanceof Error ? error.message : "Student creation failed",
+            });
+          }
+        }
+
+        return NextResponse.json({ created, errors });
       }
 
       default:

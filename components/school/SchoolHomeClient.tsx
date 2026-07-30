@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Copy,
+  FileSpreadsheet,
   GraduationCap,
   HelpCircle,
   LayoutDashboard,
@@ -19,16 +20,21 @@ import {
   ShieldCheck,
   UserPlus,
   Users,
+  Upload,
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { ChangeEvent, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type {
   SchoolHomeSnapshot,
   SchoolSwitcherItem,
 } from "@/lib/school-platform-server";
 import { supabase } from "@/lib/supabase";
+import {
+  parseRosterWorkbook,
+  type RosterDraft,
+} from "@/lib/roster-import";
 
 type TabId =
   | "home"
@@ -60,6 +66,37 @@ function schoolLogoFor(name: string) {
   return key === "cobramprimary" || key === "cobramprimaryschool"
     ? "/schools/cobram-primary-logo.png"
     : null;
+}
+
+function educatorFirstName(name: string, email: string | null) {
+  const titles = new Set([
+    "mr",
+    "mrs",
+    "ms",
+    "miss",
+    "mx",
+    "dr",
+    "prof",
+    "sir",
+    "dame",
+  ]);
+  const nameParts = name.trim().split(/\s+/).filter(Boolean);
+  const startsWithTitle =
+    nameParts.length > 0 &&
+    titles.has(nameParts[0].replace(/\./g, "").toLowerCase());
+  const personalNameParts = startsWithTitle ? nameParts.slice(1) : nameParts;
+
+  if (!startsWithTitle || personalNameParts.length > 1) {
+    return personalNameParts[0] ?? "Educator";
+  }
+
+  const emailFirstName = email
+    ?.split("@")[0]
+    ?.split(/[._+-]/)[0]
+    ?.replace(/[^a-zA-Z'-]/g, "");
+  if (!emailFirstName) return personalNameParts[0] ?? "Educator";
+
+  return emailFirstName.charAt(0).toUpperCase() + emailFirstName.slice(1);
 }
 
 const ADMIN_NAV_ITEMS: NavItem[] = [
@@ -134,6 +171,8 @@ async function sendCommand(
     error?: string;
     classId?: string;
     explorerCode?: string;
+    created?: Array<Record<string, unknown>>;
+    errors?: Array<{ row: number; name: string; message: string }>;
   };
   if (!response.ok) throw new Error(result.error ?? "Action failed");
   return result;
@@ -401,29 +440,75 @@ function OtherSchoolClasses({
   );
 }
 
+type SchoolStudentDraft = {
+  firstName: string;
+  lastName: string;
+  schoolYear: string;
+  username: string;
+  pin: string;
+  classId: string;
+  idempotencyKey: string;
+};
+
+type StudentCreateResult = {
+  created: Array<Record<string, unknown>>;
+  errors: Array<{ row: number; name: string; message: string }>;
+};
+
+function emptyStudentDraft(classId = ""): SchoolStudentDraft {
+  return {
+    firstName: "",
+    lastName: "",
+    schoolYear: "",
+    username: "",
+    pin: "",
+    classId,
+    idempotencyKey: crypto.randomUUID(),
+  };
+}
+
 function StudentDirectory({
   students,
+  classes,
   busy,
   onReset,
+  onCreate,
 }: {
   students: SchoolHomeSnapshot["students"];
+  classes: SchoolHomeSnapshot["classes"];
   busy: boolean;
   onReset: (studentId: string, reason: string) => Promise<boolean>;
+  onCreate: (students: SchoolStudentDraft[]) => Promise<StudentCreateResult>;
 }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
+  const [classFilter, setClassFilter] = useState("");
   const [copiedCode, setCopiedCode] = useState("");
+  const [createMode, setCreateMode] = useState<"manual" | "import" | null>(
+    null,
+  );
+  const [manualDraft, setManualDraft] = useState<SchoolStudentDraft>(
+    emptyStudentDraft(classes[0]?.id),
+  );
+  const [importClassId, setImportClassId] = useState(classes[0]?.id ?? "");
+  const [importRows, setImportRows] = useState<RosterDraft[]>([]);
+  const [importFileName, setImportFileName] = useState("");
+  const [importMessage, setImportMessage] = useState("");
+  const [readingFile, setReadingFile] = useState(false);
   const [resetStudent, setResetStudent] = useState<
     SchoolHomeSnapshot["students"][number] | null
   >(null);
   const [resetReason, setResetReason] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
-  const filteredStudents = students.filter((student) =>
-    [
-      student.name,
-      student.username ?? "",
-      student.explorerCode,
-      ...student.classes,
-    ].some((value) => value.toLowerCase().includes(normalizedQuery)),
+  const filteredStudents = students.filter(
+    (student) =>
+      (!classFilter || student.classes.includes(classFilter)) &&
+      [
+        student.name,
+        student.username ?? "",
+        student.explorerCode ?? "",
+        ...student.classes,
+      ].some((value) => value.toLowerCase().includes(normalizedQuery)),
   );
 
   async function copyCode(code: string) {
@@ -441,13 +526,92 @@ function StudentDirectory({
     }
   }
 
-  if (students.length === 0) {
-    return (
-      <EmptyState
-        icon={GraduationCap}
-        title="No students found"
-        detail="Students assigned to this school will appear here with their Explorer Code."
-      />
+  function closeCreate() {
+    setCreateMode(null);
+    setImportRows([]);
+    setImportFileName("");
+    setImportMessage("");
+    setManualDraft(emptyStudentDraft(classes[0]?.id));
+  }
+
+  async function submitManualStudent() {
+    const result = await onCreate([manualDraft]);
+    if (result.errors.length === 0) {
+      closeCreate();
+      return;
+    }
+    setImportMessage(result.errors[0]?.message ?? "Student could not be added.");
+  }
+
+  async function handleRosterFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setReadingFile(true);
+    setImportMessage("");
+    setImportFileName(file.name);
+    try {
+      const targetClass = classes.find(
+        (classRow) => classRow.id === importClassId,
+      );
+      const rows = await parseRosterWorkbook(
+        file,
+        targetClass?.yearLevels.length === 1
+          ? targetClass.yearLevels[0]
+          : "",
+      );
+      setImportRows(rows);
+      setImportMessage(
+        rows.length
+          ? "Review the students before adding them."
+          : "No student names were found in that file.",
+      );
+    } catch (error) {
+      setImportRows([]);
+      setImportMessage(
+        error instanceof Error ? error.message : "Could not read that file.",
+      );
+    } finally {
+      setReadingFile(false);
+    }
+  }
+
+  function updateImportRow(
+    id: string,
+    field: keyof RosterDraft,
+    value: string,
+  ) {
+    setImportRows((current) =>
+      current.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
+    );
+  }
+
+  async function submitImport() {
+    const validRows = importRows.filter(
+      (row) =>
+        row.firstName.trim() &&
+        YEAR_LEVELS.includes(row.schoolYear) &&
+        (!row.pin || /^\d{4}$/.test(row.pin)),
+    );
+    const result = await onCreate(
+      validRows.map((row) => ({
+        firstName: row.firstName,
+        lastName: row.lastName,
+        schoolYear: row.schoolYear,
+        username: row.username,
+        pin: row.pin,
+        classId: importClassId,
+        idempotencyKey: row.id,
+      })),
+    );
+    if (result.errors.length === 0) {
+      closeCreate();
+      return;
+    }
+    setImportMessage(
+      `${result.created.length} added. ${result.errors.length} could not be added: ${result.errors
+        .map((error) => `${error.name || `row ${error.row}`}: ${error.message}`)
+        .join("; ")}`,
     );
   }
 
@@ -457,22 +621,71 @@ function StudentDirectory({
         <div>
           <h2 className="text-lg font-bold">School Students</h2>
           <p className="text-sm text-slate-500">
-            Explorer Codes are public linking identifiers, not passwords.
+            {classes.length} active classes · {students.length} students.
+            Explorer Codes are generated automatically.
           </p>
         </div>
-        <label className="relative block w-full max-w-sm">
-          <span className="sr-only">Search students</span>
-          <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search name, username, class or code"
-            className="w-full rounded-md border border-slate-300 bg-white py-2.5 pl-9 pr-3 text-sm"
-          />
-        </label>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            disabled={classes.length === 0}
+            onClick={() => setCreateMode("import")}
+            className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 disabled:opacity-50"
+          >
+            <Upload className="h-4 w-4" />
+            Import spreadsheet
+          </button>
+          <button
+            type="button"
+            disabled={classes.length === 0}
+            onClick={() => setCreateMode("manual")}
+            className="inline-flex min-h-10 items-center gap-2 rounded-md bg-emerald-800 px-4 text-sm font-bold text-white disabled:opacity-50"
+          >
+            <UserPlus className="h-4 w-4" />
+            Add student
+          </button>
+        </div>
       </div>
 
+      {students.length > 0 ? (
+        <div className="mb-4 flex flex-wrap gap-2">
+          <label className="relative block w-full max-w-sm">
+            <span className="sr-only">Search students</span>
+            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search name, student code or Explorer Code"
+              className="w-full rounded-md border border-slate-300 bg-white py-2.5 pl-9 pr-3 text-sm"
+            />
+          </label>
+          <label>
+            <span className="sr-only">Filter by class</span>
+            <select
+              value={classFilter}
+              onChange={(event) => setClassFilter(event.target.value)}
+              className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700"
+            >
+              <option value="">All classes</option>
+              {classes.map((classRow) => (
+                <option key={classRow.id} value={classRow.name}>
+                  {classRow.name} · {classRow.studentCount} students
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      ) : (
+        <EmptyState
+          icon={GraduationCap}
+          title="No students found"
+          detail="Import a school roster or add a student manually. Students already assigned to these classes will appear after the directory repair migration is applied."
+        />
+      )}
+
+      {students.length > 0 ? (
+        <>
       <div className="hidden overflow-x-auto border border-slate-200 bg-white md:block">
         <table className="min-w-full divide-y divide-slate-200 text-left">
           <thead className="bg-slate-50 text-xs font-bold uppercase text-slate-500">
@@ -504,7 +717,7 @@ function StudentDirectory({
                 </td>
                 <td className="px-4 py-4">
                   <span className="font-mono font-bold text-slate-900">
-                    {student.explorerCode}
+                    {student.explorerCode ?? "Pending"}
                   </span>
                 </td>
                 <td className="px-4 py-4 text-slate-600">
@@ -519,7 +732,12 @@ function StudentDirectory({
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"
-                      onClick={() => void copyCode(student.explorerCode)}
+                      disabled={!student.explorerCode}
+                      onClick={() =>
+                        student.explorerCode
+                          ? void copyCode(student.explorerCode)
+                          : undefined
+                      }
                       className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-2 text-xs font-bold"
                     >
                       <Copy className="h-3.5 w-3.5" />
@@ -548,7 +766,7 @@ function StudentDirectory({
               <span>
                 <span className="block text-sm font-bold">{student.name}</span>
                 <span className="font-mono text-xs text-slate-500">
-                  {student.explorerCode}
+                  {student.explorerCode ?? "Code pending"}
                 </span>
               </span>
               <ChevronDown className="h-4 w-4 text-slate-400 group-open:rotate-180" />
@@ -574,7 +792,12 @@ function StudentDirectory({
             <div className="mt-4 flex gap-2">
               <button
                 type="button"
-                onClick={() => void copyCode(student.explorerCode)}
+                disabled={!student.explorerCode}
+                onClick={() =>
+                  student.explorerCode
+                    ? void copyCode(student.explorerCode)
+                    : undefined
+                }
                 className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-3 py-2 text-xs font-bold"
               >
                 <Copy className="h-3.5 w-3.5" />
@@ -597,6 +820,320 @@ function StudentDirectory({
         <p className="border border-slate-200 bg-white px-5 py-8 text-center text-sm text-slate-500">
           No students match this search.
         </p>
+      ) : null}
+        </>
+      ) : null}
+
+      {createMode === "manual" ? (
+        <Modal title="Add student" onClose={closeCreate}>
+          <div className="grid gap-4 p-6 sm:grid-cols-2">
+            <label className="text-sm font-bold text-slate-700">
+              First name *
+              <input
+                value={manualDraft.firstName}
+                onChange={(event) =>
+                  setManualDraft((current) => ({
+                    ...current,
+                    firstName: event.target.value,
+                  }))
+                }
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+              />
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              Last name
+              <input
+                value={manualDraft.lastName}
+                onChange={(event) =>
+                  setManualDraft((current) => ({
+                    ...current,
+                    lastName: event.target.value,
+                  }))
+                }
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+              />
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              Year level *
+              <select
+                value={manualDraft.schoolYear}
+                onChange={(event) =>
+                  setManualDraft((current) => ({
+                    ...current,
+                    schoolYear: event.target.value,
+                  }))
+                }
+                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+              >
+                <option value="">Choose year</option>
+                {YEAR_LEVELS.map((year) => (
+                  <option key={year}>{year}</option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              Class *
+              <select
+                value={manualDraft.classId}
+                onChange={(event) =>
+                  setManualDraft((current) => ({
+                    ...current,
+                    classId: event.target.value,
+                  }))
+                }
+                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+              >
+                {classes.map((classRow) => (
+                  <option key={classRow.id} value={classRow.id}>
+                    {classRow.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              Student code / username
+              <input
+                value={manualDraft.username}
+                onChange={(event) =>
+                  setManualDraft((current) => ({
+                    ...current,
+                    username: event.target.value,
+                  }))
+                }
+                placeholder="Generated from name if blank"
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+              />
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              4-digit access code
+              <input
+                inputMode="numeric"
+                maxLength={4}
+                value={manualDraft.pin}
+                onChange={(event) =>
+                  setManualDraft((current) => ({
+                    ...current,
+                    pin: event.target.value.replace(/\D/g, "").slice(0, 4),
+                  }))
+                }
+                placeholder="Generated if blank"
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+              />
+            </label>
+            {importMessage ? (
+              <p className="text-sm font-semibold text-red-700 sm:col-span-2">
+                {importMessage}
+              </p>
+            ) : null}
+            <div className="flex justify-end gap-2 sm:col-span-2">
+              <button
+                type="button"
+                onClick={closeCreate}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={
+                  busy ||
+                  !manualDraft.firstName.trim() ||
+                  !manualDraft.schoolYear ||
+                  !manualDraft.classId ||
+                  Boolean(manualDraft.pin && manualDraft.pin.length !== 4)
+                }
+                onClick={() => void submitManualStudent()}
+                className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                {busy ? "Adding..." : "Add student"}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
+
+      {createMode === "import" ? (
+        <Modal title="Import students" onClose={closeCreate}>
+          <div className="space-y-5 p-6">
+            <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+              <label className="text-sm font-bold text-slate-700">
+                Add students to class *
+                <select
+                  value={importClassId}
+                  onChange={(event) => setImportClassId(event.target.value)}
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+                >
+                  {classes.map((classRow) => (
+                    <option key={classRow.id} value={classRow.id}>
+                      {classRow.name} · {classRow.yearLevels.join(", ")}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,.tsv,.xlsx"
+                onChange={handleRosterFile}
+                className="hidden"
+              />
+              <button
+                type="button"
+                disabled={readingFile || !importClassId}
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-emerald-800 px-4 text-sm font-bold text-white disabled:opacity-50"
+              >
+                <FileSpreadsheet className="h-4 w-4" />
+                {readingFile ? "Reading..." : "Choose CSV or Excel"}
+              </button>
+            </div>
+            <p className="text-xs text-slate-500">
+              Use columns: First Name, Last Name, Year Level, Student Code, and
+              Access Code. Student and access codes may be blank and will be
+              generated. Explorer Codes are always generated by Level Up Learning.
+            </p>
+            {importFileName ? (
+              <p className="text-xs font-bold text-slate-600">
+                {importFileName}
+              </p>
+            ) : null}
+            {importMessage ? (
+              <p className="text-sm font-semibold text-slate-700" role="status">
+                {importMessage}
+              </p>
+            ) : null}
+            {importRows.length > 0 ? (
+              <div className="overflow-x-auto border border-slate-200">
+                <table className="min-w-[760px] divide-y divide-slate-200 text-left text-xs">
+                  <thead className="bg-slate-50 font-bold uppercase text-slate-500">
+                    <tr>
+                      <th className="px-2 py-2">First name *</th>
+                      <th className="px-2 py-2">Last name</th>
+                      <th className="px-2 py-2">Year *</th>
+                      <th className="px-2 py-2">Student code</th>
+                      <th className="px-2 py-2">Access code</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {importRows.map((row) => (
+                      <tr key={row.id}>
+                        <td className="p-1.5">
+                          <input
+                            value={row.firstName}
+                            onChange={(event) =>
+                              updateImportRow(
+                                row.id,
+                                "firstName",
+                                event.target.value,
+                              )
+                            }
+                            className="w-full rounded-md border border-slate-300 px-2 py-1.5"
+                          />
+                        </td>
+                        <td className="p-1.5">
+                          <input
+                            value={row.lastName}
+                            onChange={(event) =>
+                              updateImportRow(
+                                row.id,
+                                "lastName",
+                                event.target.value,
+                              )
+                            }
+                            className="w-full rounded-md border border-slate-300 px-2 py-1.5"
+                          />
+                        </td>
+                        <td className="p-1.5">
+                          <select
+                            value={row.schoolYear}
+                            onChange={(event) =>
+                              updateImportRow(
+                                row.id,
+                                "schoolYear",
+                                event.target.value,
+                              )
+                            }
+                            className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5"
+                          >
+                            <option value="">Choose year</option>
+                            {YEAR_LEVELS.map((year) => (
+                              <option key={year}>{year}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="p-1.5">
+                          <input
+                            value={row.username}
+                            onChange={(event) =>
+                              updateImportRow(
+                                row.id,
+                                "username",
+                                event.target.value,
+                              )
+                            }
+                            className="w-full rounded-md border border-slate-300 px-2 py-1.5"
+                          />
+                        </td>
+                        <td className="p-1.5">
+                          <input
+                            inputMode="numeric"
+                            maxLength={4}
+                            value={row.pin}
+                            onChange={(event) =>
+                              updateImportRow(
+                                row.id,
+                                "pin",
+                                event.target.value
+                                  .replace(/\D/g, "")
+                                  .slice(0, 4),
+                              )
+                            }
+                            className="w-full rounded-md border border-slate-300 px-2 py-1.5"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeCreate}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={
+                  busy ||
+                  !importClassId ||
+                  !importRows.some(
+                    (row) =>
+                      row.firstName.trim() &&
+                      YEAR_LEVELS.includes(row.schoolYear) &&
+                      (!row.pin || row.pin.length === 4),
+                  )
+                }
+                onClick={() => void submitImport()}
+                className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                {busy
+                  ? "Adding..."
+                  : `Add ${
+                      importRows.filter(
+                        (row) =>
+                          row.firstName.trim() &&
+                          YEAR_LEVELS.includes(row.schoolYear) &&
+                          (!row.pin || row.pin.length === 4),
+                      ).length
+                    } students`}
+              </button>
+            </div>
+          </div>
+        </Modal>
       ) : null}
 
       {resetStudent ? (
@@ -692,6 +1229,10 @@ export default function SchoolHomeClient({
   );
   const isAdministrator = snapshot.permissions.canViewAdministration;
   const schoolLogo = schoolLogoFor(snapshot.school.name);
+  const actorFirstName = educatorFirstName(
+    snapshot.actor.name,
+    snapshot.actor.email,
+  );
   const navigationItems = isAdministrator
     ? ADMIN_NAV_ITEMS
     : TEACHER_NAV_ITEMS;
@@ -743,6 +1284,40 @@ export default function SchoolHomeClient({
       "Explorer Code reset",
     );
     return Boolean(result?.explorerCode);
+  }
+
+  async function createSchoolStudents(
+    students: SchoolStudentDraft[],
+  ): Promise<StudentCreateResult> {
+    setBusy(true);
+    setError("");
+    try {
+      const result = await sendCommand(snapshot.school.id, {
+        action: "createStudents",
+        students,
+      });
+      const created = result.created ?? [];
+      const errors = result.errors ?? [];
+      if (created.length > 0) {
+        notify(
+          `${created.length} student${created.length === 1 ? "" : "s"} added`,
+        );
+        router.refresh();
+      }
+      return { created, errors };
+    } catch (createError) {
+      const message =
+        createError instanceof Error
+          ? createError.message
+          : "Students could not be added";
+      setError(message);
+      return {
+        created: [],
+        errors: [{ row: 1, name: "", message }],
+      };
+    } finally {
+      setBusy(false);
+    }
   }
 
   const homeStats = [
@@ -901,7 +1476,7 @@ export default function SchoolHomeClient({
               </p>
               <h1 className="mt-1 text-2xl font-bold tracking-tight">
                 {tab === "home"
-                  ? `Welcome, ${snapshot.actor.name.split(" ")[0]}`
+                  ? `Welcome, ${actorFirstName}`
                   : navigationItems.find((item) => item.id === tab)?.label}
               </h1>
             </div>
@@ -1062,8 +1637,10 @@ export default function SchoolHomeClient({
           {tab === "students" ? (
             <StudentDirectory
               students={snapshot.students}
+              classes={filteredClasses}
               busy={busy}
               onReset={resetExplorerCode}
+              onCreate={createSchoolStudents}
             />
           ) : null}
 

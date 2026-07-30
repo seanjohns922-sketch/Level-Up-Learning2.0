@@ -97,7 +97,7 @@ export type SchoolHomeSnapshot = {
     yearLevel: string | null;
     username: string | null;
     pinStatus: "set" | "not_set";
-    explorerCode: string;
+    explorerCode: string | null;
     classes: string[];
     status: "active" | "archived";
   }>;
