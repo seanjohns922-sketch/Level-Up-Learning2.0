@@ -2084,7 +2084,7 @@ function year5PercentRealWorldMultiTemplates(): PercentAmountChoiceTemplate[] {
 function year5MultiStepDecideTemplates(): MultiStepChoiceTemplate[] {
   return [
     {
-      prompt: "A jacket costs $200. It is 15% off, then a $10 fee is added. Which quantity is needed before the fee?",
+      prompt: "A jacket costs $200. It is 15% off, then a $10 fee is added. Which amount do you need to work out first?",
       answer: "$170 sale price",
       options: ["$170 sale price", "$30 final fee", "$210 starting cost", "$15 final price"],
       helper: "Find the discount and sale price before adding the fee.",
@@ -13134,8 +13134,9 @@ function generateGenericQuestion(
         helper: "Estimate with $13 + $25.",
       },
       {
-        prompt: "Use the prices. Type the better estimate for the total of the diary and folder.",
+        prompt: "Use the prices. Which is the better estimate for the total of the diary and folder?",
         answer: "$17",
+        options: ["$17", "$16", "$27", "$10"],
         helper: "Round $9.45 to about $9 or $10 and $7.35 to about $7.",
         visual: {
           type: "shopping_list" as const,
@@ -19145,7 +19146,7 @@ function generateGenericQuestion(
         options: ["6 buses", "6 r2 buses", "7 buses", "5 buses"],
       },
       {
-        prompt: "How many bags are filled and how many apples are left over when 26 apples are packed into bags of 4?",
+        prompt: "26 apples are packed into bags of 4. How many full bags, and how many are left over?",
         answer: "6 bags, 2 left over",
         options: ["6 bags", "7 bags", "6 bags, 2 left over", "Ignore the 2 left over"],
       },
@@ -19160,7 +19161,7 @@ function generateGenericQuestion(
         options: ["6 teams", "6 r4 teams", "7 teams", "5 teams"],
       },
       {
-        prompt: "How many boxes are filled and how many cupcakes are left over when 34 cupcakes are packed into boxes of 5?",
+        prompt: "34 cupcakes are packed into boxes of 5. How many full boxes, and how many are left over?",
         answer: "6 boxes, 4 left over",
         options: ["6 boxes", "7 boxes", "6 boxes, 4 left over", "Ignore the 4 left over"],
       },
@@ -19170,7 +19171,7 @@ function generateGenericQuestion(
         options: ["7 rows", "7 r5 rows", "8 rows", "6 rows"],
       },
       {
-        prompt: "How many crates are filled and how many oranges are left over when 68 oranges are packed into crates of 6?",
+        prompt: "68 oranges are packed into crates of 6. How many full crates, and how many are left over?",
         answer: "11 crates, 2 left over",
         options: ["11 crates", "12 crates", "11 crates, 2 left over", "Ignore the 2 left over"],
       },
@@ -19214,7 +19215,7 @@ function generateGenericQuestion(
         visual: { type: "array" as const, rows: 6, columns: 5 },
       },
       {
-        prompt: "How many bags are filled and how many apples are left over when 34 apples are packed into bags of 5?",
+        prompt: "34 apples are packed into bags of 5. How many full bags, and how many are left over?",
         answer: "6 bags, 4 left over",
         options: [
           "6 bags",
@@ -19247,7 +19248,7 @@ function generateGenericQuestion(
         visual: { type: "array" as const, rows: 7, columns: 6 },
       },
       {
-        prompt: "How many crates are filled and how many oranges are left over when 68 oranges are packed into crates of 6?",
+        prompt: "68 oranges are packed into crates of 6. How many full crates, and how many are left over?",
         answer: "11 crates, 2 left over",
         options: [
           "11 crates",
