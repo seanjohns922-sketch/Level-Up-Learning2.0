@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Star, Check, X, Lock, LockOpen, KeyRound, Trophy, Brain, Building2 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
@@ -78,6 +79,13 @@ function parseCompletedLessons(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw as string[];
   if (typeof raw === "string") try { return JSON.parse(raw); } catch { return []; }
   return [];
+}
+
+function schoolLogoFor(name: string | null) {
+  const key = (name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+  return key === "cobramprimary" || key === "cobramprimaryschool"
+    ? "/schools/cobram-primary-logo.png"
+    : null;
 }
 function parseUnlockedLegends(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw as string[];
@@ -272,6 +280,7 @@ export default function TeacherDashboardPage() {
   const [schoolPreviewSchoolId, setSchoolPreviewSchoolId] = useState<
     string | null
   >(null);
+  const [schoolName, setSchoolName] = useState<string | null>(null);
   const isSchoolPreview = Boolean(schoolPreviewClassId);
   const [loading, setLoading] = useState(true);
   const [classes, setClasses] = useState<ClassRow[]>([]);
@@ -511,7 +520,32 @@ export default function TeacherDashboardPage() {
   const selectedClass = classes.find((c) => c.id === selectedClassId);
   const schoolHomeId =
     schoolPreviewSchoolId ?? selectedClass?.school_id ?? null;
+  const schoolLogo = schoolLogoFor(schoolName);
   const classStudents = students.filter((s) => s.class_id === selectedClassId);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!schoolHomeId) {
+      setSchoolName(null);
+      return;
+    }
+
+    void supabase
+      .from("schools")
+      .select("name")
+      .eq("id", schoolHomeId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) {
+          setSchoolName(typeof data?.name === "string" ? data.name : null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [schoolHomeId]);
 
   function getStudentProgress(studentId: string, year: string): ProgressRow | undefined {
     return progress.find((p) => p.student_id === studentId && p.year === year);
@@ -1057,70 +1091,84 @@ export default function TeacherDashboardPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#E2E8F0] via-[#DEE5EC] to-[#D6DEE6]">
       {/* Header */}
-      <header className="bg-white border-b border-[#E6E8EC] px-6 py-4 sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              {schoolHomeId ? (
-                <button
-                  type="button"
-                  onClick={() => router.push(`/school/${schoolHomeId}`)}
-                  className="mr-1 inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-sm font-bold text-[#334155] transition hover:border-[#00C2A8] hover:bg-[#F0FDFA] hover:text-[#0F766E] active:scale-[0.98]"
-                  aria-label="Back to School Home"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  School Home
-                </button>
-              ) : null}
-              <div className="h-7 w-7 rounded-lg bg-[#0A2F2A] ring-1 ring-[#00C2A8]/40 shadow-[0_0_12px_-2px_rgba(0,229,195,0.55)] flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M3 12l9-9 9 9M5 10v10h14V10" />
-                </svg>
-              </div>
-              <h1 className="text-xl font-black text-[#0F172A] tracking-tight">
-                {isSchoolPreview && selectedClass
-                  ? selectedClass.name
-                  : "Teacher Dashboard"}
-              </h1>
-            </div>
-            {selectedClass && (
-              <div className="flex items-center gap-2 mt-1.5 ml-9">
-                <span className="text-sm font-semibold text-[#475569]">
-                  {isSchoolPreview ? "Class dashboard" : selectedClass.name}
-                </span>
-                <span className="h-1 w-1 rounded-full bg-[#CBD5E1]" />
-                <button
-                  onClick={copyCode}
-                  className="inline-flex items-center gap-1.5 text-[11px] font-mono font-extrabold text-[#0A2F2A] bg-white border border-[#00C2A8]/40 px-2 py-0.5 rounded-md hover:border-[#00C2A8] hover:shadow-[0_0_0_3px_rgba(0,194,168,0.12)] transition"
-                >
-                  {copiedCode ? "Copied!" : selectedClass.class_code}
-                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2" />
-                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                  </svg>
-                </button>
-                <span className="text-[11px] font-semibold text-[#94A3B8]">· {classStudents.length} student{classStudents.length === 1 ? "" : "s"}</span>
-                <span className="h-1 w-1 rounded-full bg-[#CBD5E1]" />
-                <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#475569]">
-                  <span className="inline-flex items-center gap-1.5" title="Mid-lesson mini-game frequency. Override per student in their card."><Brain className="h-3.5 w-3.5" /> Brain breaks</span>
-                  <select
-                    value={isBrainBreakFrequency(selectedClass.brain_break_frequency) ? selectedClass.brain_break_frequency : "normal"}
-                    onChange={(e) => { if (isBrainBreakFrequency(e.target.value)) void setClassBrainBreak(e.target.value); }}
-                    className="rounded-md border border-[#E6E8EC] bg-white px-2 py-0.5 text-[11px] font-bold text-[#0F172A] hover:border-[#CBD5E1] transition"
-                  >
-                    {BRAIN_BREAK_FREQUENCIES.map((f) => (
-                      <option key={f} value={f}>{BRAIN_BREAK_FREQUENCY_LABEL[f]}</option>
-                    ))}
-                  </select>
-                </label>
-                {isDev && (
-                  <span className="ml-2 text-[10px] font-mono text-[#94A3B8]">id:{selectedClass.id.slice(0, 8)}</span>
-                )}
-              </div>
-            )}
-          </div>
+      <header className="sticky top-0 z-20 border-b border-[#E6E8EC] bg-white px-6 py-3">
+        <div className="mx-auto flex max-w-[1800px] items-center gap-2 overflow-x-auto">
+          {schoolHomeId ? (
+            <button
+              type="button"
+              onClick={() => router.push(`/school/${schoolHomeId}`)}
+              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-sm font-bold text-[#334155] transition hover:border-[#00C2A8] hover:bg-[#F0FDFA] hover:text-[#0F766E] active:scale-[0.98]"
+              aria-label="Back to School Home"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              School Home
+            </button>
+          ) : null}
 
-          <div className="flex items-center gap-2">
+          {schoolLogo ? (
+            <Image
+              src={schoolLogo}
+              alt={`${schoolName} logo`}
+              width={36}
+              height={36}
+              priority
+              className="h-9 w-9 shrink-0 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0A2F2A] shadow-[0_0_12px_-2px_rgba(0,229,195,0.55)] ring-1 ring-[#00C2A8]/40">
+              <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M3 12l9-9 9 9M5 10v10h14V10" />
+              </svg>
+            </div>
+          )}
+
+          <h1 className="shrink-0 text-xl font-black tracking-tight text-[#0F172A]">
+            {isSchoolPreview && selectedClass
+              ? selectedClass.name
+              : "Teacher Dashboard"}
+          </h1>
+
+          {selectedClass ? (
+            <>
+              <span className="h-1 w-1 shrink-0 rounded-full bg-[#CBD5E1]" />
+              <button
+                onClick={copyCode}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-[#00C2A8]/40 bg-white px-2 py-0.5 font-mono text-[11px] font-extrabold text-[#0A2F2A] transition hover:border-[#00C2A8] hover:shadow-[0_0_0_3px_rgba(0,194,168,0.12)]"
+              >
+                {copiedCode ? "Copied!" : selectedClass.class_code}
+                <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                </svg>
+              </button>
+              <span className="shrink-0 text-[11px] font-semibold text-[#94A3B8]">
+                {classStudents.length} student{classStudents.length === 1 ? "" : "s"}
+              </span>
+              <span className="h-1 w-1 shrink-0 rounded-full bg-[#CBD5E1]" />
+              <label className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-semibold text-[#475569]">
+                <span className="inline-flex items-center gap-1.5" title="Mid-lesson mini-game frequency. Override per student in their card.">
+                  <Brain className="h-3.5 w-3.5" />
+                  Brain breaks
+                </span>
+                <select
+                  value={isBrainBreakFrequency(selectedClass.brain_break_frequency) ? selectedClass.brain_break_frequency : "normal"}
+                  onChange={(e) => { if (isBrainBreakFrequency(e.target.value)) void setClassBrainBreak(e.target.value); }}
+                  className="rounded-md border border-[#E6E8EC] bg-white px-2 py-1 text-[11px] font-bold text-[#0F172A] transition hover:border-[#CBD5E1]"
+                >
+                  {BRAIN_BREAK_FREQUENCIES.map((f) => (
+                    <option key={f} value={f}>{BRAIN_BREAK_FREQUENCY_LABEL[f]}</option>
+                  ))}
+                </select>
+              </label>
+              {isDev ? (
+                <span className="shrink-0 font-mono text-[10px] text-[#94A3B8]">
+                  id:{selectedClass.id.slice(0, 8)}
+                </span>
+              ) : null}
+            </>
+          ) : null}
+
+          <div className="ml-auto flex shrink-0 items-center gap-2">
             {isDev && !isSchoolPreview && (
               <button
                 onClick={() => void openSchoolPreview()}
@@ -1196,14 +1244,6 @@ export default function TeacherDashboardPage() {
                 Manage Placements
               </button>
             ) : null}
-            <button
-              onClick={() => router.push("/teacher/classes/new")}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0F172A] text-white font-bold text-sm hover:bg-[#1E293B] transition active:scale-[0.98]"
-            >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
-              New Class
-            </button>
-
             {/* Settings gear */}
             <div className="relative">
               <button
