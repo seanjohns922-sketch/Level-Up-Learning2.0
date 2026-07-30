@@ -497,6 +497,8 @@ export type MixedWordProblemQuestion = {
   correctOperation?: "+" | "-" | "x" | "/";
   operationChoices?: Array<"+" | "-" | "x" | "/">;
   helper: string;
+  /** Prefix shown before each answer option, e.g. "$" for money questions. */
+  optionPrefix?: string;
   mode:
     | "choose_operation"
     | "two_step_add_sub"
@@ -5029,14 +5031,12 @@ function buildYear2MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
       correctOperation: "+",
       helper: "Add the two prices together.",
       mode: "choose_operation",
+      optionPrefix: "$",
       visual: {
-        type: "receipt",
-        title: "Shop",
-        lines: [
-          { label: itemA ?? "pencil", price: a },
-          { label: itemB ?? "apple", price: b },
-        ],
-        hideComputedTotals: true,
+        type: "australian_money",
+        title: "Money",
+        pieces: [...buildAustralianMoneyPieces(a), ...buildAustralianMoneyPieces(b)],
+        hideTotal: true,
       },
     };
   }
@@ -5055,12 +5055,12 @@ function buildYear2MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
       correctOperation: "-",
       helper: "Take the cost away from the money you paid.",
       mode: "choose_operation",
+      optionPrefix: "$",
       visual: {
-        type: "receipt",
-        title: "Shop",
-        lines: [{ label: item, price: cost }],
-        payment,
-        hideComputedTotals: true,
+        type: "australian_money",
+        title: `Money you pay with ($${payment})`,
+        pieces: buildAustralianMoneyPieces(payment),
+        hideTotal: true,
       },
     };
   }
@@ -5075,6 +5075,7 @@ function buildYear2MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
     operationLabel: "Count the money",
     helper: "Count the notes and coins together.",
     mode: "choose_operation",
+    optionPrefix: "$",
     visual: {
       type: "australian_money",
       title: "Money",
@@ -8483,8 +8484,8 @@ function generateInteractiveQuestion(
         ? shuffle([
             "Even + even = even, odd + odd = even, and odd + even = odd.",
             "Odd + odd is always odd.",
-            "Even + odd is always odd.",
-            "Adding any two odd numbers gives an odd answer.",
+            "Even + odd is always even.",
+            "Even + even is always odd.",
           ])
         : mode === "odd_even_products"
         ? shuffle([

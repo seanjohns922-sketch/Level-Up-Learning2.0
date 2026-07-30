@@ -135,7 +135,7 @@ export default function MixedWordProblem({
             ].join(" ")}
             disabled={!operationReady}
           >
-            {option}
+            {questionData.optionPrefix ?? ""}{option}
           </button>
         ))}
       </div>

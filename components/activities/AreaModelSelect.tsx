@@ -22,17 +22,22 @@ function FractionGrid({
     <div className="grid grid-cols-2 gap-2 rounded-2xl bg-white p-3 shadow-sm">
       {Array.from({ length: denominator }).map((_, index) => {
         const filled = active.includes(index);
+        const cellClass = [
+          "h-16 rounded-xl border-2 transition",
+          filled ? "border-emerald-500 bg-emerald-400" : "border-slate-300 bg-slate-100",
+        ].join(" ");
+        // Display cells are plain divs so a tap falls through to the parent
+        // model button — a disabled <button> would swallow the click (and nested
+        // buttons are invalid), which blocked selecting a fraction picture.
+        if (!interactive) {
+          return <div key={index} aria-hidden className={cellClass} />;
+        }
         return (
           <button
             key={index}
             type="button"
             onClick={() => onToggle?.(index)}
-            disabled={!interactive}
-            className={[
-              "h-16 rounded-xl border-2 transition",
-              filled ? "border-emerald-500 bg-emerald-400" : "border-slate-300 bg-slate-100",
-              interactive ? "cursor-pointer hover:border-emerald-400" : "cursor-default",
-            ].join(" ")}
+            className={`${cellClass} cursor-pointer hover:border-emerald-400`}
           />
         );
       })}
