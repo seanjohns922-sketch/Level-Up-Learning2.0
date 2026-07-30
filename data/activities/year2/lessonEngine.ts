@@ -5513,6 +5513,12 @@ function formatExpandedPartition(value: number) {
     .join(" + ");
 }
 
+function formatPartitionComponents(parts: Array<number | undefined>) {
+  return parts
+    .filter((part): part is number => typeof part === "number" && part > 0)
+    .join(" + ");
+}
+
 function placeMultiplier(place: PlaceValueName) {
   if (place === "hundred_thousands") return 100000;
   if (place === "ten_thousands") return 10000;
@@ -25256,31 +25262,43 @@ function generateGenericQuestion(
     const thousandsValue = standard.thousands ?? 0;
     const tensCount = standard.tens / 10;
     const answerText = formatExpandedPartition(target);
-    const altText =
+    const regroupedText =
       standard.hundreds >= 100
-        ? formatExpandedPartition(
-            thousandsValue + (standard.hundreds - 100) + (standard.tens + 100) + standard.ones
-          )
-        : formatExpandedPartition(
-            thousandsValue +
-              standard.hundreds +
-              Math.max(0, standard.tens - 10) +
-              (standard.ones + 10)
-          );
+        ? formatPartitionComponents([
+            thousandsValue,
+            standard.hundreds - 100,
+            standard.tens + 100,
+            standard.ones,
+          ])
+        : standard.tens >= 10
+          ? formatPartitionComponents([
+              thousandsValue,
+              standard.hundreds,
+              standard.tens - 10,
+              standard.ones + 10,
+            ])
+          : formatPartitionComponents([
+              Math.max(0, thousandsValue - 1000),
+              standard.hundreds + 1000,
+              standard.tens,
+              standard.ones,
+            ]);
+    const altText =
+      regroupedText === answerText
+        ? formatPartitionComponents([target - 10, 10])
+        : regroupedText;
 
     if (config.mode === "flexible_partition") {
+      const incorrectOptions = [
+        formatExpandedPartition(target + 1),
+        formatExpandedPartition(Math.max(1, target - 10)),
+        formatExpandedPartition(target + 100),
+      ];
       return asMultipleChoice
         ? {
             kind: "multiple_choice",
             prompt: `Which is a different way to partition ${target}?`,
-            options: shuffle([
-              altText,
-              answerText,
-              formatExpandedPartition(
-                thousandsValue + (standard.hundreds + 100) + Math.max(0, standard.tens - 100) + standard.ones
-              ),
-              `${target - 1} + 0 + 1`,
-            ]),
+            options: shuffle([altText, ...incorrectOptions]),
             answer: altText,
           }
         : {
@@ -25292,20 +25310,16 @@ function generateGenericQuestion(
           };
     }
 
+    const incorrectOptions = [
+      formatExpandedPartition(target + 1),
+      formatExpandedPartition(Math.max(1, target - 10)),
+      formatExpandedPartition(target + 100),
+    ];
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
           prompt: `Which expanded form matches ${target}?`,
-          options: shuffle([
-            answerText,
-            formatExpandedPartition(
-              thousandsValue + standard.hundreds + (standard.tens + 10) + Math.max(0, standard.ones - 10)
-            ),
-            formatExpandedPartition(
-              thousandsValue + (standard.hundreds - 100) + (standard.tens + 100) + standard.ones
-            ),
-            `${target - 10} + 10 + 0`,
-          ]),
+          options: shuffle([answerText, ...incorrectOptions]),
           answer: answerText,
         }
       : {

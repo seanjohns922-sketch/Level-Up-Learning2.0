@@ -57,7 +57,8 @@
     "qa:avatar-consistency": "node scripts/avatar-consistency-audit.mjs",
     "qa:school-platform-phase2a": "node scripts/school-platform-phase2a-audit.mjs",
     "qa:school-platform-phase2b1": "node scripts/school-platform-phase2b1-audit.mjs",
-    "qa:explorer-codes": "node scripts/explorer-code-foundation-audit.mjs"
+    "qa:explorer-codes": "node scripts/explorer-code-foundation-audit.mjs",
+    "qa:quiz-math-integrity": "node --no-warnings --experimental-strip-types scripts/quiz-math-answer-integrity-audit.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

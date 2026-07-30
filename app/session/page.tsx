@@ -49,6 +49,10 @@ import { Volume2, Sparkles, Zap, Check, PartyPopper, SkipForward } from "lucide-
 import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
 import type { TeacherAttemptQuestion } from "@/lib/teacher-insights";
 import { buildAssessmentQuestionSnapshots, type ReplayQuestionSource } from "@/lib/assessment-replay";
+import {
+  additiveAnswerMatchesTarget,
+  expectedPartitionTarget,
+} from "@/lib/math-answer-equivalence";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
@@ -206,6 +210,7 @@ type QuizQuestion = {
   prompt: string;
   options?: string[];
   correctIndex?: number;
+  expectedNumericValue?: number;
   correctValue?: string;
   feedbackCorrect?: string;
   feedbackIncorrect?: string;
@@ -281,13 +286,28 @@ type QuizQuestion = {
 };
 
 function isQuizChoiceQuestionSafe(question: QuizQuestion) {
-  return (
+  const structurallySafe =
     Array.isArray(question.options) &&
     question.options.length >= 2 &&
     typeof question.correctIndex === "number" &&
     question.correctIndex >= 0 &&
-    question.correctIndex < question.options.length
-  );
+    question.correctIndex < question.options.length;
+  if (!structurallySafe) return false;
+
+  if (typeof question.expectedNumericValue === "number") {
+    const matchingOptions = question.options!.filter((option) =>
+      additiveAnswerMatchesTarget(option, question.expectedNumericValue)
+    );
+    return (
+      matchingOptions.length === 1 &&
+      additiveAnswerMatchesTarget(
+        question.options![question.correctIndex!],
+        question.expectedNumericValue
+      )
+    );
+  }
+
+  return true;
 }
 
 function isQuizQuestionSafe(question: QuizQuestion | null | undefined): boolean {
@@ -406,6 +426,7 @@ function toYear2QuizQuestion(
   index: number
 ): QuizQuestion {
   if (question.kind === "multiple_choice") {
+    const expectedNumericValue = expectedPartitionTarget(question.prompt);
     return {
       id: `q${index}`,
       lessonNumber,
@@ -414,6 +435,7 @@ function toYear2QuizQuestion(
       prompt: question.prompt,
       options: question.options,
       correctIndex: question.options.findIndex((option) => option === question.answer),
+      expectedNumericValue: expectedNumericValue ?? undefined,
     };
   }
 
@@ -837,21 +859,59 @@ function placeValueSummary(question: Year2PlaceValueBuilderQuestion) {
     .join(", ");
 }
 
+function formatPartitionParts(parts: Array<number | undefined>) {
+  return parts
+    .filter((part): part is number => typeof part === "number" && part > 0)
+    .join(" + ");
+}
+
 function buildAlternativePartition(question: Year2PartitionExpandQuestion) {
   const { standard } = question;
+  let alternative: string;
   if (standard.hundreds >= 100) {
-    return {
-      hundreds: standard.hundreds - 100,
-      tens: standard.tens + 100,
-      ones: standard.ones,
-    };
+    alternative = formatPartitionParts([
+      standard.thousands,
+      standard.hundreds - 100,
+      standard.tens + 100,
+      standard.ones,
+    ]);
+  } else if (standard.tens >= 10) {
+    alternative = formatPartitionParts([
+      standard.thousands,
+      standard.hundreds,
+      standard.tens - 10,
+      standard.ones + 10,
+    ]);
+  } else {
+    alternative = formatPartitionParts([
+      Math.max(0, (standard.thousands ?? 0) - 1000),
+      standard.hundreds + 1000,
+      standard.tens,
+      standard.ones,
+    ]);
   }
 
-  return {
-    hundreds: standard.hundreds,
-    tens: Math.max(0, standard.tens - 10),
-    ones: standard.ones + 10,
-  };
+  const standardPartition = formatPartitionParts([
+    standard.thousands,
+    standard.hundreds,
+    standard.tens,
+    standard.ones,
+  ]);
+  return alternative === standardPartition
+    ? formatPartitionParts([question.target - 10, 10])
+    : alternative;
+}
+
+function buildIncorrectPartitionOptions(target: number) {
+  const offsets = [1, 10, 100];
+  return offsets.map((offset, index) => {
+    const incorrectTarget = index % 2 === 0 ? target + offset : Math.max(0, target - offset);
+    const thousands = Math.floor(incorrectTarget / 1000) * 1000;
+    const hundreds = Math.floor((incorrectTarget % 1000) / 100) * 100;
+    const tens = Math.floor((incorrectTarget % 100) / 10) * 10;
+    const ones = incorrectTarget % 10;
+    return formatPartitionParts([thousands, hundreds, tens, ones]);
+  });
 }
 
 function buildStructuredQuizSources(lesson: Lesson): LessonActivity[] {
@@ -5726,15 +5786,14 @@ function toQuizQuestionFromYear2Data(
 
   if (questionData.kind === "partition_expand") {
     if (questionData.mode === "partition" || questionData.mode === "expand") {
-      const target =
-        questionData.standard.hundreds + questionData.standard.tens + questionData.standard.ones;
-      const answerText = `${questionData.standard.hundreds} + ${questionData.standard.tens} + ${questionData.standard.ones}`;
-      const options = shuffle([
-        answerText,
-        `${questionData.standard.hundreds + 100} + ${Math.max(0, questionData.standard.tens - 100)} + ${questionData.standard.ones}`,
-        `${target - 10} + 10 + 0`,
-        `${questionData.standard.hundreds} + ${questionData.standard.tens + 10} + ${Math.max(0, questionData.standard.ones - 10)}`,
+      const target = questionData.target;
+      const answerText = formatPartitionParts([
+        questionData.standard.thousands,
+        questionData.standard.hundreds,
+        questionData.standard.tens,
+        questionData.standard.ones,
       ]);
+      const options = shuffle([answerText, ...buildIncorrectPartitionOptions(target)]);
       return useTyped
         ? {
             id: `q${index}`,
@@ -5754,18 +5813,13 @@ function toQuizQuestionFromYear2Data(
             prompt: `Which expanded form matches ${target}?`,
             options,
             correctIndex: options.findIndex((option) => option === answerText),
+            expectedNumericValue: target,
           };
     }
 
     if (questionData.mode === "flexible_partition") {
-      const alternative = buildAlternativePartition(questionData);
-      const answer = `${alternative.hundreds} + ${alternative.tens} + ${alternative.ones}`;
-      const options = shuffle([
-        answer,
-        `${questionData.standard.hundreds} + ${questionData.standard.tens} + ${questionData.standard.ones}`,
-        `${questionData.target - 10} + 10 + 0`,
-        `${questionData.target - 1} + 0 + 1`,
-      ]);
+      const answer = buildAlternativePartition(questionData);
+      const options = shuffle([answer, ...buildIncorrectPartitionOptions(questionData.target)]);
       return {
         id: `q${index}`,
         lessonNumber,
@@ -5774,6 +5828,7 @@ function toQuizQuestionFromYear2Data(
         prompt: `Which is a different way to partition ${questionData.target}?`,
         options,
         correctIndex: options.findIndex((option) => option === answer),
+        expectedNumericValue: questionData.target,
       };
     }
   }
@@ -6110,6 +6165,13 @@ function isQuizQuestionCorrect(
     return quizMoneyAnswers[q.id]?.correct === true;
   }
   const chosen = quizAnswers[q.id];
+  if (
+    typeof chosen === "number" &&
+    Array.isArray(q.options) &&
+    typeof q.expectedNumericValue === "number"
+  ) {
+    return additiveAnswerMatchesTarget(q.options[chosen], q.expectedNumericValue);
+  }
   return chosen === q.correctIndex;
 }
 
@@ -6216,6 +6278,25 @@ function buildQuizQuestionResults(
       correctAnswer = "correct";
     }
 
+    const correct = isQuizQuestionCorrect(
+      q,
+      quizAnswers,
+      quizTyped,
+      quizLineAnswers,
+      quizChartDone,
+      quizMabAnswers,
+      quizMoneyAnswers,
+      quizLessonActivityResults
+    );
+    if (
+      correct &&
+      typeof q.expectedNumericValue === "number" &&
+      selectedAnswer !== null &&
+      additiveAnswerMatchesTarget(selectedAnswer, q.expectedNumericValue)
+    ) {
+      correctAnswer = selectedAnswer;
+    }
+
     return {
       questionId: q.id,
       prompt: q.prompt,
@@ -6223,16 +6304,7 @@ function buildQuizQuestionResults(
       skillTag: q.skill ?? q.quizMeta?.type ?? null,
       selectedAnswer,
       correctAnswer,
-      correct: isQuizQuestionCorrect(
-        q,
-        quizAnswers,
-        quizTyped,
-        quizLineAnswers,
-        quizChartDone,
-        quizMabAnswers,
-        quizMoneyAnswers,
-        quizLessonActivityResults
-      ),
+      correct,
     };
   });
 }
