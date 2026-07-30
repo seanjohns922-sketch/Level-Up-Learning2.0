@@ -191,6 +191,138 @@ function PositionTeachGrid({ items }: { items: PositionTeach[] }) {
   );
 }
 
+// Week 8 (Master Mapper) teaching — a small map that mirrors the real practice
+// grid, so the explanation looks like what the child is about to do.
+type MiniMarker = { r: number; c: number; object: string };
+type MiniArrow = { r: number; c: number; dir: "up" | "down" | "left" | "right" };
+const MINI_ARROW_ICON = { up: ArrowUp, down: ArrowDown, left: ArrowLeft, right: ArrowRight } as const;
+
+function MiniMap({ markers, arrows = [] }: { markers: MiniMarker[]; arrows?: MiniArrow[] }) {
+  const cols = 3;
+  const rows = 3;
+  const place = (r: number, c: number) => ({
+    left: `${((c + 0.5) / cols) * 100}%`,
+    top: `${((r + 0.5) / rows) * 100}%`,
+    transform: "translate(-50%,-50%)",
+  });
+  return (
+    <div
+      className="relative mx-auto w-full max-w-[9.5rem] overflow-hidden rounded-xl border-2 border-violet-200 bg-gradient-to-b from-indigo-950 to-violet-900 shadow-inner"
+      style={{ aspectRatio: "1 / 1" }}
+    >
+      <div className="grid h-full w-full" style={{ gridTemplateColumns: "repeat(3,1fr)", gridTemplateRows: "repeat(3,1fr)" }}>
+        {Array.from({ length: cols * rows }).map((_, index) => (
+          <div key={index} className="border border-cyan-200/15" />
+        ))}
+      </div>
+      {arrows.map((arrow, index) => {
+        const Icon = MINI_ARROW_ICON[arrow.dir];
+        return (
+          <span key={`arrow-${index}`} className="absolute flex h-5 w-5 items-center justify-center text-cyan-300" style={place(arrow.r, arrow.c)}>
+            <Icon className="h-4 w-4" strokeWidth={3} />
+          </span>
+        );
+      })}
+      {markers.map((marker) => (
+        <span key={`${marker.object}-${marker.r}-${marker.c}`} className="absolute" style={place(marker.r, marker.c)}>
+          <PositionObjectVisual objectId={marker.object} className="h-7 w-7 sm:h-8 sm:w-8" />
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function TeachCard({ readAloud, title, tip, children }: { readAloud: string; title: string; tip: string; children: React.ReactNode }) {
+  return (
+    <div className="relative flex min-h-52 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">
+      <OptionReadAloudButton text={readAloud} className="absolute right-2 top-2" />
+      <div className="flex flex-1 items-center justify-center">{children}</div>
+      <div className="mt-2 text-base font-black text-indigo-950">{title}</div>
+      <div className="mt-1 text-xs font-semibold leading-5 text-slate-600">{tip}</div>
+    </div>
+  );
+}
+
+// A square with each of its 4 sides drawn as a bright segment and numbered, so
+// "a side" is concrete for the child: one straight edge, counted 1-2-3-4.
+function SidesTeachShape() {
+  const badges = [
+    { n: 1, x: 60, y: 22 },
+    { n: 2, x: 98, y: 60 },
+    { n: 3, x: 60, y: 98 },
+    { n: 4, x: 22, y: 60 },
+  ];
+  return (
+    <svg viewBox="0 0 120 120" className="h-24 w-24" aria-hidden="true">
+      <rect x="22" y="22" width="76" height="76" rx="3" fill="#ecfeff" />
+      <path d="M22 22H98M98 22V98M22 98H98M22 22V98" fill="none" stroke="#0891b2" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+      {badges.map((badge) => (
+        <g key={badge.n}>
+          <circle cx={badge.x} cy={badge.y} r="11" fill="#7c3aed" stroke="#fff" strokeWidth="2.5" />
+          <text x={badge.x} y={badge.y} textAnchor="middle" dominantBaseline="central" fontSize="13" fontWeight="900" fill="#fff">
+            {badge.n}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathway" | "masterMission" }) {
+  if (variant === "masterShapeMap") {
+    return (
+      <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+        <TeachCard readAloud="Shape skills. A side is one straight edge. This square has 4 sides. Count them: 1, 2, 3, 4." title="Shape skills" tip="A side is one straight edge. This square has 4 sides.">
+          <SidesTeachShape />
+        </TeachCard>
+        <TeachCard readAloud="Map skills. The star is a place on the map. Find it." title="Map skills" tip="The star is a place. Find it on the map.">
+          <MiniMap markers={[{ r: 0, c: 2, object: "star" }]} />
+        </TeachCard>
+      </div>
+    );
+  }
+  if (variant === "masterPathway") {
+    return (
+      <div className="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
+        <TeachCard readAloud="Read the map. The rocket is you. The star is where to go." title="Read" tip="The rocket is you. The star is where to go.">
+          <MiniMap markers={[{ r: 2, c: 0, object: "rocket" }, { r: 0, c: 2, object: "star" }]} />
+        </TeachCard>
+        <TeachCard readAloud="Follow the path. Each arrow is one move. Follow the moves to the star." title="Follow" tip="Each arrow is one move. Follow them to the star.">
+          <MiniMap markers={[{ r: 2, c: 0, object: "rocket" }, { r: 0, c: 2, object: "star" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
+        </TeachCard>
+        <TeachCard readAloud="Give your own route. A route is moves in order. Build it, then run it." title="Give" tip="A route is moves in order. Build it, then run it.">
+          <div className="flex items-center gap-1.5">
+            {(["right", "right", "up"] as const).map((dir, index) => {
+              const Icon = MINI_ARROW_ICON[dir];
+              return (
+                <span key={index} className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-b from-indigo-950 to-violet-900 text-cyan-200">
+                  <Icon className="h-5 w-5" strokeWidth={3} />
+                </span>
+              );
+            })}
+          </div>
+        </TeachCard>
+      </div>
+    );
+  }
+  return (
+    <div className="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
+      <TeachCard readAloud="Compare shapes. Look at the sides and corners. What is the same? What is different?" title="Compare shapes" tip="Look at the sides and corners. Same or different?">
+        <div className="flex items-center gap-1.5">
+          <ShapeVisual shape="square" colour="#86efac" className="h-16 w-16" />
+          <ShapeVisual shape="rectangle" colour="#f9a8d4" className="h-14 w-20" />
+        </div>
+      </TeachCard>
+      <TeachCard readAloud="Read the map. The star is the place. Find it on the map." title="Read the map" tip="The star is the place. Find it.">
+        <MiniMap markers={[{ r: 0, c: 2, object: "star" }]} />
+      </TeachCard>
+      <TeachCard readAloud="Navigate. A route is moves in order to reach the star." title="Navigate" tip="A route is moves in order to reach the star.">
+        <MiniMap markers={[{ r: 2, c: 0, object: "rocket" }, { r: 0, c: 2, object: "star" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
+      </TeachCard>
+    </div>
+  );
+}
+
 export function StarpathShapeIntroCard({
   task,
   onContinue,
@@ -211,13 +343,21 @@ export function StarpathShapeIntroCard({
             ? "Where is it?"
             : variant === "directions"
               ? "Which way?"
-              : "Meet the cosmic shapes");
+              : variant === "masterShapeMap"
+                ? "Shape skills and map skills"
+                : variant === "masterPathway"
+                  ? "Read, follow, give a route"
+                  : variant === "masterMission"
+                    ? "Put every skill together"
+                    : "Meet the cosmic shapes");
 
   return (
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-5 sm:p-7">
       <TaskHeading prompt={heading} speech={task.speakText} />
 
-      {variant === "builders" ? (
+      {variant === "masterShapeMap" || variant === "masterPathway" || variant === "masterMission" ? (
+        <MasterTeachGrid variant={variant} />
+      ) : variant === "builders" ? (
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3">
           {[
             { shape: "rectangle" as const, colour: "#67e8f9", label: "Rocket body" },

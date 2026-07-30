@@ -9,10 +9,15 @@ import { chooseMapTask, followMapTask, giveMapTask } from "./navWeeks";
 // Level 2 · Week 8 — Master Mapper. Cumulative: shape features, map reading and
 // map navigation together. Completion unlocks the Year 2 Post-Test.
 
-function teaching(heading: string, prompt: string, speakText: string) {
+function teaching(
+  variant: "masterShapeMap" | "masterPathway" | "masterMission",
+  heading: string,
+  prompt: string,
+  speakText: string
+) {
   let target = 0;
   return () =>
-    ({ kind: "starpathShapeIntro", scene: "intro", variant: "maps", heading, prompt, speakText, target: ++target }) satisfies PracticeTask;
+    ({ kind: "starpathShapeIntro", scene: "intro", variant, heading, prompt, speakText, target: ++target }) satisfies PracticeTask;
 }
 
 export function createShapeAndMapTaskSet(): RealmLessonTaskSet {
@@ -21,7 +26,7 @@ export function createShapeAndMapTaskSet(): RealmLessonTaskSet {
   let b = 0;
   let c = 0;
   return {
-    teaching: teaching("Shape and Map", "Shapes and maps together.", "Use your shape skills and your map skills together in one mission."),
+    teaching: teaching("masterShapeMap", "Shape and Map", "Shapes and maps together.", "Use your shape skills and your map skills together in one mission."),
     activities: [
       () => edgeTask(a++, ++target),
       () => sidesCountTask(b++ + 1, ++target),
@@ -36,7 +41,7 @@ export function createPathwayMasterTaskSet(): RealmLessonTaskSet {
   let b = 0;
   let c = 0;
   return {
-    teaching: teaching("Pathway Master", "Follow and give pathways.", "Read the map, follow a path, and give your own route to a place."),
+    teaching: teaching("masterPathway", "Pathway Master", "Follow and give pathways.", "Read the map, follow a path, and give your own route to a place."),
     activities: [
       () => whatIsHereTask(a++, ++target),
       () => followMapTask(b++ + 1, ++target),
@@ -51,7 +56,7 @@ export function createMasterMissionTaskSet(): RealmLessonTaskSet {
   let b = 0;
   let c = 0;
   return {
-    teaching: teaching("Master Mission", "Everything together.", "The final Space Mapper mission: compare shapes, read the map and navigate to the goal."),
+    teaching: teaching("masterMission", "Master Mission", "Everything together.", "The final Space Mapper mission: compare shapes, read the map and navigate to the goal."),
     activities: [
       () => (a % 2 === 0 ? compareTask(a++, ++target, "same") : parallelYesNoTask(a++, ++target)),
       () => chooseMapTask(b++ + 1, ++target),
