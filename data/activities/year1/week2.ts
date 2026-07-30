@@ -53,7 +53,7 @@ function genAudioPick(d: Difficulty, min = 0, max = 120): PracticeTask {
   const target = randInt(lo, hi);
   const distractors = uniqueInts(5, lo, hi, [target]);
   const cards = shuffle([target, ...distractors]);
-  return { kind: "audioPick", prompt: "Tap the speaker. Listen. Then tap the correct number.", targetNumber: target, cards, speechText: String(target), difficulty: d };
+  return { kind: "audioPick", prompt: "Listen, then tap the number.", targetNumber: target, cards, speechText: String(target), difficulty: d };
 }
 
 function genNumberHunt(d: Difficulty, min = 0, max = 120, tilesCount = 24): PracticeTask {
@@ -106,7 +106,7 @@ function genNumberLadder(d: Difficulty, min = 0, max = 120): PracticeTask {
 function genTypeNumber(d: Difficulty, min = 0, max = 120): PracticeTask {
   const [lo, hi] = diffRange(d, [0, 50], [0, 80], [min, max]);
   const answer = randInt(lo, hi);
-  return { kind: "typeNumber", prompt: "Type the numeral for the number word.", answer, min: lo, max: hi, difficulty: d };
+  return { kind: "typeNumber", prompt: "Type the number in digits.", answer, min: lo, max: hi, difficulty: d };
 }
 
 function genNumberLineTap(d: Difficulty, min = 0, max = 120): PracticeTask {

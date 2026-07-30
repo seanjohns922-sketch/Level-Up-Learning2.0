@@ -73,7 +73,7 @@ export function generateWeek8Task(lessonId: string, d: Difficulty = "easy"): Pra
     if (modePick === 0) {
       const [lo, hi] = diffRange(d, [3, 6], [5, 10], [5, 12]);
       const a = randInt(lo, hi); const b = randInt(lo, Math.min(10, 20 - a));
-      return { kind: "ppw", prompt: "Fill the missing whole", mode: "missingWhole", a, b, whole: a + b, difficulty: d };
+      return { kind: "ppw", prompt: "Fill in the missing whole.", mode: "missingWhole", a, b, whole: a + b, difficulty: d };
     }
     if (modePick === 1) {
       const [lo, hi] = diffRange(d, [8, 14], [12, 18], [12, 20]);

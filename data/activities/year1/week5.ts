@@ -105,15 +105,15 @@ export function generateWeek5Task(
 ): PracticeTask {
   if (lessonId === "y1-w5-l1") {
     const { a, b, maxDots } = makeAddends(d);
-    return { kind: "addDots", prompt: "Show each addend with dots.", a, b, maxDots, difficulty: d };
+    return { kind: "addDots", prompt: "Show each number with dots.", a, b, maxDots, difficulty: d };
   }
   if (lessonId === "y1-w5-l2") {
     const { a, b, whole } = makeParts(d);
     const modePick = randInt(0, 2);
-    if (modePick === 0) return { kind: "ppw", prompt: "What is the WHOLE?", mode: "missingWhole", a, b, whole, difficulty: d };
+    if (modePick === 0) return { kind: "ppw", prompt: "What is the whole?", mode: "missingWhole", a, b, whole, difficulty: d };
     if (modePick === 1) {
       const missing = Math.random() < 0.5 ? "a" : "b";
-      return { kind: "ppw", prompt: "What is the missing PART?", mode: "missingPart", a, b, whole, missing, difficulty: d };
+      return { kind: "ppw", prompt: "What is the missing part?", mode: "missingPart", a, b, whole, missing, difficulty: d };
     }
     return { kind: "ppw", prompt: "Build the two parts with dots.", mode: "build", a, b, whole, difficulty: d };
   }
@@ -123,5 +123,5 @@ export function generateWeek5Task(
   }
 
   const { a, b } = makeParts(d);
-  return { kind: "addDots", prompt: "Show each addend with dots.", a, b, maxDots: 10, difficulty: d };
+  return { kind: "addDots", prompt: "Show each number with dots.", a, b, maxDots: 10, difficulty: d };
 }

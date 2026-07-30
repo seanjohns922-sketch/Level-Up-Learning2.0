@@ -239,7 +239,7 @@ function getPracticeTaskWrongExplanation(task: PracticeTask) {
     const wrong = task.feedback.wrong;
     if (typeof wrong === "string" && wrong.trim()) return wrong;
   }
-  return "Compare your answer with the correct one and focus on the key clue in the question.";
+  return "Look at the clue in the question, then try again.";
 }
 
 function normalizeScalar(value: unknown): Scalar | undefined {

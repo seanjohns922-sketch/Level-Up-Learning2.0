@@ -95,7 +95,7 @@ function genMissingGroupSize(d: Difficulty): PracticeTask {
   const perGroup = randInt(pLo, pHi);
   const total = groups * perGroup;
   const options = shuffle(uniqueInts(3, 2, 6, [perGroup]).concat(perGroup)).map(String);
-  return { kind: "mcq", prompt: `${groups} groups of __ makes ${total}`, options, answer: String(perGroup), difficulty: d };
+  return { kind: "mcq", prompt: `${groups} groups of __ make ${total}`, options, answer: String(perGroup), difficulty: d };
 }
 
 function genSkipCountMissing(d: Difficulty, config?: { step: number; start: number; length: number; minOption: number; maxOption: number }): PracticeTask {

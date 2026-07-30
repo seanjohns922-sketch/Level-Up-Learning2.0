@@ -14,9 +14,21 @@ function shuffle<T>(arr: T[]) {
   return a;
 }
 
-const ADD_WORDS = ["got more", "bought", "joined", "got"];
-const SUB_WORDS = ["gave away", "lost", "ate"];
 const NAMES = ["Tom", "Mia", "Ava", "Leo", "Noah", "Zoe"];
+
+// Each scenario pairs a verb with a noun that actually fits it, so the stories
+// genuinely vary AND always make sense — no "ate stickers" or "stickers + friends".
+const ADD_STORIES: { noun: string; clause: (b: number) => string; people?: boolean }[] = [
+  { noun: "stickers", clause: (b) => `got ${b} more` },
+  { noun: "marbles", clause: (b) => `bought ${b} more` },
+  { noun: "shells", clause: (b) => `found ${b} more` },
+  { noun: "friends", clause: (b) => `${b} more friends joined`, people: true },
+];
+const SUB_STORIES: { noun: string; clause: (b: number) => string }[] = [
+  { noun: "stickers", clause: (b) => `gave away ${b}` },
+  { noun: "marbles", clause: (b) => `lost ${b}` },
+  { noun: "grapes", clause: (b) => `ate ${b}` },
+];
 
 function makeStory(op: "add" | "subtract", d: Difficulty) {
   const [aLo, aHi] = diffRange(d, [2, 8], [3, 12], [3, 15]);
@@ -31,16 +43,14 @@ function makeStory(op: "add" | "subtract", d: Difficulty) {
   }
   const name = NAMES[randInt(0, NAMES.length - 1)];
   if (op === "add") {
-    const word = ADD_WORDS[randInt(0, ADD_WORDS.length - 1)];
-    const verb = word === "joined" ? `${b} friends joined` : `got ${b} more`;
-    const story = word === "joined"
-      ? `${name} had ${a} stickers. ${b} friends joined. How many altogether?`
-      : `${name} had ${a} stickers. ${name} ${verb}. How many altogether?`;
+    const s = ADD_STORIES[randInt(0, ADD_STORIES.length - 1)];
+    const story = s.people
+      ? `${name} was playing with ${a} ${s.noun}. ${s.clause(b)}. How many now?`
+      : `${name} had ${a} ${s.noun}. ${name} ${s.clause(b)}. How many altogether?`;
     return { story, a, b, op, answer: a + b };
   }
-  const word = SUB_WORDS[randInt(0, SUB_WORDS.length - 1)];
-  const verb = word === "gave away" ? `gave away ${b}` : word === "lost" ? `lost ${b}` : `ate ${b}`;
-  return { story: `${name} had ${a} stickers. ${name} ${verb}. How many left?`, a, b, op, answer: a - b };
+  const s = SUB_STORIES[randInt(0, SUB_STORIES.length - 1)];
+  return { story: `${name} had ${a} ${s.noun}. ${name} ${s.clause(b)}. How many left?`, a, b, op, answer: a - b };
 }
 
 function makeStoryOptions(answer: number) {

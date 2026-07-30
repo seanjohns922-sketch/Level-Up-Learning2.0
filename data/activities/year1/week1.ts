@@ -67,7 +67,7 @@ export function genY1W1L1_AudioPick(d: Difficulty): PracticeTask {
 
   return {
     kind: "audioPick",
-    prompt: "Tap the speaker. Listen. Then tap the correct number.",
+    prompt: "Listen, then tap the number.",
     targetNumber: target,
     cards,
     speechText: String(target),
@@ -114,7 +114,7 @@ export function genY1W1L3_TypeNumber(d: Difficulty): PracticeTask {
   const answer = randInt(lo, hi);
   return {
     kind: "typeNumber",
-    prompt: "Type the numeral for the number word.",
+    prompt: "Type the number in digits.",
     answer,
     min: lo,
     max: hi,
