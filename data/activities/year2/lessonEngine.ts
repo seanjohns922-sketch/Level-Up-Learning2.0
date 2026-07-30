@@ -5004,6 +5004,11 @@ function pickYear2MoneyItems(count: number) {
   return shuffle([...YEAR2_MONEY_ITEMS]).slice(0, count);
 }
 
+function moneyArticle(word: string, capital = false) {
+  const art = /^[aeiou]/i.test(word) ? "an" : "a";
+  return capital ? `${art[0]!.toUpperCase()}${art.slice(1)}` : art;
+}
+
 // Year 2 money (AC9M2N06): count collections of coins/notes, total two prices,
 // and give change — all in whole dollars, using the coin/note artwork. The
 // question style is chosen by lesson: L1 count, L2 totals, L3 change.
@@ -5017,7 +5022,7 @@ function buildYear2MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
     const answer = a + b;
     return {
       kind: "mixed_word_problem",
-      prompt: `A ${itemA} costs $${a}. A ${itemB} costs $${b}. How much do they cost altogether?`,
+      prompt: `${moneyArticle(itemA ?? "pencil", true)} ${itemA} costs $${a}. ${moneyArticle(itemB ?? "apple", true)} ${itemB} costs $${b}. How much do they cost altogether?`,
       answer,
       options: uniqueNumberOptions(answer, 6).map(Number),
       operationLabel: "Add the prices",
@@ -5043,7 +5048,7 @@ function buildYear2MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
     const answer = payment - cost;
     return {
       kind: "mixed_word_problem",
-      prompt: `You buy a ${item} for $${cost}. You pay with $${payment}. How much change do you get?`,
+      prompt: `You buy ${moneyArticle(item)} ${item} for $${cost}. You pay with $${payment}. How much change do you get?`,
       answer,
       options: uniqueNumberOptions(answer, 5).map(Number),
       operationLabel: "Find the change",
