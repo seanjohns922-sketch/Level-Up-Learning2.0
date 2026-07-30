@@ -444,15 +444,6 @@ export type BenchmarkSortQuestion = {
   }>;
 };
 
-export type ColumnMethodQuestion = {
-  kind: "column_method";
-  prompt: string;
-  operation: "add" | "subtract";
-  operands: [number, number];
-  answer: number;
-  helper?: string;
-};
-
 export type AdditionStrategyQuestion = {
   kind: "addition_strategy";
   prompt: string;
@@ -3570,7 +3561,6 @@ export type Year2QuestionData =
   | EquivalentFractionMatchQuestion
   | FractionDecimalPercentMatchQuestion
   | BenchmarkSortQuestion
-  | ColumnMethodQuestion
   | EquivalentFractionBuildQuestion
   | EquivalentFractionYesNoQuestion
   | AdditionStrategyQuestion
@@ -3833,9 +3823,6 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   },
   benchmark_sort: {
     requiresVisual: true,
-  },
-  column_method: {
-    allowedModes: ["add", "subtract"],
   },
   equivalent_fraction_build: {
     requiresVisual: true,
@@ -6225,8 +6212,7 @@ export function validateLessonActivityIntentForLevel(
   if (isYear3Week5Lesson(level, lesson)) {
     if (lesson.lesson === 1) {
       const isWrittenAdditionActivity =
-        (activity.activityType === "typed_response" && sourceActivityType === "addition_strategy") ||
-        activity.activityType === "column_method";
+        activity.activityType === "typed_response" && sourceActivityType === "addition_strategy";
       if (!isWrittenAdditionActivity) {
         addViolation(
           violations,
@@ -6238,8 +6224,7 @@ export function validateLessonActivityIntentForLevel(
       }
     } else {
       const isWrittenSubtractionActivity =
-        (activity.activityType === "typed_response" && sourceActivityType === "subtraction_strategy") ||
-        activity.activityType === "column_method";
+        activity.activityType === "typed_response" && sourceActivityType === "subtraction_strategy";
       if (!isWrittenSubtractionActivity) {
         addViolation(
           violations,
@@ -7685,68 +7670,6 @@ function generateInteractiveQuestion(
       prompt: "Match each fraction, decimal and percentage.",
       helper: "Tap one fraction, one decimal and one percentage with the same value.",
       sets,
-    };
-  }
-
-  if (activityType === "column_method") {
-    const mode = config.mode === "subtract" ? "subtract" : "add";
-    const min = typeof config.min === "number" ? config.min : 100;
-    const max = typeof config.max === "number" ? Math.max(config.max, min + 10) : 999;
-    const acrossZeros = config.acrossZeros === true;
-    const digit = (n: number, place: number) => Math.floor(n / place) % 10;
-    const carries = (a: number, b: number) =>
-      digit(a, 1) + digit(b, 1) >= 10 ||
-      digit(a, 10) + digit(b, 10) >= 10 ||
-      digit(a, 100) + digit(b, 100) >= 10;
-    const borrows = (a: number, b: number) =>
-      digit(a, 1) < digit(b, 1) || digit(a, 10) < digit(b, 10) || digit(a, 100) < digit(b, 100);
-
-    if (mode === "add") {
-      let a = randInt(min, max);
-      let b = randInt(min, max);
-      for (let i = 0; i < 40 && !carries(a, b); i += 1) {
-        a = randInt(min, max);
-        b = randInt(min, max);
-      }
-      return {
-        kind: "column_method",
-        prompt: `Work out ${a} + ${b} using the column method.`,
-        operation: "add",
-        operands: [a, b] as [number, number],
-        answer: a + b,
-        helper: "Add each column from the right. When a column reaches 10 or more, carry to the next column.",
-      };
-    }
-
-    // subtract: minuend >= subtrahend, force a regroup
-    let a = 0;
-    let b = 0;
-    for (let i = 0; i < 60; i += 1) {
-      if (acrossZeros) {
-        a = randInt(3, 9) * 100 + randInt(1, 9); // tens digit is 0
-        b = randInt(120, Math.max(140, a - 30));
-      } else {
-        a = randInt(min, max);
-        b = randInt(min, max);
-      }
-      if (a < b) {
-        const t = a;
-        a = b;
-        b = t;
-      }
-      if (a > b && borrows(a, b)) break;
-    }
-    if (a <= b) {
-      a = 405;
-      b = 187;
-    }
-    return {
-      kind: "column_method",
-      prompt: `Work out ${a} - ${b} using the column method.`,
-      operation: "subtract",
-      operands: [a, b] as [number, number],
-      answer: a - b,
-      helper: "Subtract each column from the right. When the top digit is smaller, regroup from the next column.",
     };
   }
 
@@ -25987,7 +25910,6 @@ export function generateQuestion(
     activity.activityType === "equivalent_fraction_match" ||
     activity.activityType === "fraction_decimal_percent_match" ||
     activity.activityType === "benchmark_sort" ||
-    activity.activityType === "column_method" ||
     activity.activityType === "equivalent_fraction_build" ||
     activity.activityType === "equivalent_fraction_yes_no" ||
     activity.activityType === "addition_strategy" ||

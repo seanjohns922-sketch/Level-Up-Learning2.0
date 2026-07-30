@@ -19,7 +19,6 @@ import FractionCompare from "@/components/activities/FractionCompare";
 import EquivalentFractionBar from "@/components/activities/EquivalentFractionBar";
 import FractionDecimalPercentMatch from "@/components/activities/FractionDecimalPercentMatch";
 import BenchmarkSort from "@/components/activities/BenchmarkSort";
-import ColumnMethod from "@/components/activities/ColumnMethod";
 import OddEvenSort from "@/components/activities/OddEvenSort";
 import PartitionExpand from "@/components/activities/PartitionExpand";
 import PlaceValueBuilder from "@/components/activities/PlaceValueBuilder";
@@ -40,7 +39,6 @@ import type {
   EquivalentFractionMatchQuestion,
   FractionDecimalPercentMatchQuestion,
   BenchmarkSortQuestion,
-  ColumnMethodQuestion,
   EquivalentFractionBuildQuestion,
   EquivalentFractionYesNoQuestion,
   DivisionGroupsQuestion,
@@ -427,19 +425,6 @@ export function LessonRenderer({
       return (
         <BenchmarkSort
           questionData={safeQuestion as BenchmarkSortQuestion}
-          onCorrect={onCorrect}
-          onWrong={onWrong}
-        />
-      );
-    }
-    case "column_method": {
-      const safeQuestion = getSafeQuestion(activity, questionData, prompt);
-      if (safeQuestion.kind !== "column_method") {
-        return <RecoveryCard message="Column method question failed to load." onRecover={onWrong} />;
-      }
-      return (
-        <ColumnMethod
-          questionData={safeQuestion as ColumnMethodQuestion}
           onCorrect={onCorrect}
           onWrong={onWrong}
         />

@@ -50,8 +50,6 @@ export function isLessonQuestionSafe(
       return questionData.kind === "fraction_decimal_percent_match";
     case "benchmark_sort":
       return questionData.kind === "benchmark_sort";
-    case "column_method":
-      return questionData.kind === "column_method";
     case "equivalent_fraction_build":
       return questionData.kind === "equivalent_fraction_build";
     case "equivalent_fraction_yes_no":
