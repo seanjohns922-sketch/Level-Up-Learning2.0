@@ -188,7 +188,7 @@ export async function POST(
               "create_school_student",
               {
                 p_school_id: schoolId,
-                p_class_id: stringValue(student.classId),
+                p_class_id: stringValue(student.classId) || null,
                 p_first_name: firstName,
                 p_last_name: lastName,
                 p_school_year_level: stringValue(student.schoolYear),
@@ -210,6 +210,39 @@ export async function POST(
         }
 
         return NextResponse.json({ created, errors });
+      }
+
+      case "assignStudentsToClass": {
+        const classId = stringValue(payload.classId);
+        const studentIds = stringArray(payload.studentIds).slice(0, 100);
+        if (!classId || studentIds.length === 0) {
+          return errorResponse("A class and at least one student are required");
+        }
+
+        const assigned: string[] = [];
+        const errors: Array<{ studentId: string; message: string }> = [];
+        for (const studentId of studentIds) {
+          try {
+            await runSchoolCommand<Record<string, unknown>>(
+              schoolId,
+              "assign_school_student_to_class",
+              {
+                p_school_id: schoolId,
+                p_class_id: classId,
+                p_student_id: studentId,
+                p_idempotency_key: `${stringValue(payload.idempotencyKey) || crypto.randomUUID()}:${studentId}`,
+              },
+            );
+            assigned.push(studentId);
+          } catch (error) {
+            errors.push({
+              studentId,
+              message:
+                error instanceof Error ? error.message : "Assignment failed",
+            });
+          }
+        }
+        return NextResponse.json({ assigned, errors });
       }
 
       default:

@@ -470,27 +470,28 @@ function emptyStudentDraft(classId = ""): SchoolStudentDraft {
 function StudentDirectory({
   students,
   classes,
+  directoryError,
   busy,
   onReset,
   onCreate,
 }: {
   students: SchoolHomeSnapshot["students"];
   classes: SchoolHomeSnapshot["classes"];
+  directoryError: string | null;
   busy: boolean;
   onReset: (studentId: string, reason: string) => Promise<boolean>;
   onCreate: (students: SchoolStudentDraft[]) => Promise<StudentCreateResult>;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
-  const [classFilter, setClassFilter] = useState("");
+  const [yearFilter, setYearFilter] = useState("");
   const [copiedCode, setCopiedCode] = useState("");
   const [createMode, setCreateMode] = useState<"manual" | "import" | null>(
     null,
   );
   const [manualDraft, setManualDraft] = useState<SchoolStudentDraft>(
-    emptyStudentDraft(classes[0]?.id),
+    emptyStudentDraft(),
   );
-  const [importClassId, setImportClassId] = useState(classes[0]?.id ?? "");
   const [importRows, setImportRows] = useState<RosterDraft[]>([]);
   const [importFileName, setImportFileName] = useState("");
   const [importMessage, setImportMessage] = useState("");
@@ -500,16 +501,26 @@ function StudentDirectory({
   >(null);
   const [resetReason, setResetReason] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
-  const filteredStudents = students.filter(
-    (student) =>
-      (!classFilter || student.classes.includes(classFilter)) &&
-      [
+  const yearRank = (yearLevel: string | null) => {
+    const index = yearLevel ? YEAR_LEVELS.indexOf(yearLevel) : -1;
+    return index === -1 ? YEAR_LEVELS.length : index;
+  };
+  const filteredStudents = students
+    .filter(
+      (student) =>
+        (!yearFilter || student.yearLevel === yearFilter) &&
+        [
         student.name,
         student.username ?? "",
         student.explorerCode ?? "",
         ...student.classes,
-      ].some((value) => value.toLowerCase().includes(normalizedQuery)),
-  );
+        ].some((value) => value.toLowerCase().includes(normalizedQuery)),
+    )
+    .sort(
+      (left, right) =>
+        yearRank(left.yearLevel) - yearRank(right.yearLevel) ||
+        left.name.localeCompare(right.name),
+    );
 
   async function copyCode(code: string) {
     await navigator.clipboard.writeText(code);
@@ -531,7 +542,7 @@ function StudentDirectory({
     setImportRows([]);
     setImportFileName("");
     setImportMessage("");
-    setManualDraft(emptyStudentDraft(classes[0]?.id));
+    setManualDraft(emptyStudentDraft());
   }
 
   async function submitManualStudent() {
@@ -551,15 +562,7 @@ function StudentDirectory({
     setImportMessage("");
     setImportFileName(file.name);
     try {
-      const targetClass = classes.find(
-        (classRow) => classRow.id === importClassId,
-      );
-      const rows = await parseRosterWorkbook(
-        file,
-        targetClass?.yearLevels.length === 1
-          ? targetClass.yearLevels[0]
-          : "",
-      );
+      const rows = await parseRosterWorkbook(file, "");
       setImportRows(rows);
       setImportMessage(
         rows.length
@@ -600,7 +603,7 @@ function StudentDirectory({
         schoolYear: row.schoolYear,
         username: row.username,
         pin: row.pin,
-        classId: importClassId,
+        classId: "",
         idempotencyKey: row.id,
       })),
     );
@@ -628,18 +631,16 @@ function StudentDirectory({
         <div className="flex flex-wrap items-center justify-end gap-2">
           <button
             type="button"
-            disabled={classes.length === 0}
             onClick={() => setCreateMode("import")}
-            className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 disabled:opacity-50"
+            className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700"
           >
             <Upload className="h-4 w-4" />
             Import spreadsheet
           </button>
           <button
             type="button"
-            disabled={classes.length === 0}
             onClick={() => setCreateMode("manual")}
-            className="inline-flex min-h-10 items-center gap-2 rounded-md bg-emerald-800 px-4 text-sm font-bold text-white disabled:opacity-50"
+            className="inline-flex min-h-10 items-center gap-2 rounded-md bg-emerald-800 px-4 text-sm font-bold text-white"
           >
             <UserPlus className="h-4 w-4" />
             Add student
@@ -647,42 +648,57 @@ function StudentDirectory({
         </div>
       </div>
 
-      {students.length > 0 ? (
-        <div className="mb-4 flex flex-wrap gap-2">
-          <label className="relative block w-full max-w-sm">
+      {directoryError ? (
+        <div className="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+          Student directory could not be loaded: {directoryError}
+        </div>
+      ) : null}
+
+      <div className="mb-4 border-b border-slate-200">
+        <div className="flex overflow-x-auto" role="tablist" aria-label="Year level">
+          {[{ value: "", label: "All" }, ...YEAR_LEVELS.map((year, index) => ({
+            value: year,
+            label: index === 0 ? "F" : String(index),
+          }))].map((year) => (
+            <button
+              key={year.value || "all"}
+              type="button"
+              role="tab"
+              aria-selected={yearFilter === year.value}
+              onClick={() => setYearFilter(year.value)}
+              className={`min-w-14 border-b-2 px-4 py-3 text-sm font-bold ${
+                yearFilter === year.value
+                  ? "border-emerald-700 text-emerald-800"
+                  : "border-transparent text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              {year.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-5">
+          <label className="relative block w-full max-w-lg">
             <span className="sr-only">Search students</span>
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
             <input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search name, student code or Explorer Code"
+              placeholder="Find student by name or code"
               className="w-full rounded-md border border-slate-300 bg-white py-2.5 pl-9 pr-3 text-sm"
             />
           </label>
-          <label>
-            <span className="sr-only">Filter by class</span>
-            <select
-              value={classFilter}
-              onChange={(event) => setClassFilter(event.target.value)}
-              className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700"
-            >
-              <option value="">All classes</option>
-              {classes.map((classRow) => (
-                <option key={classRow.id} value={classRow.name}>
-                  {classRow.name} · {classRow.studentCount} students
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      ) : (
+      </div>
+
+      {students.length === 0 && !directoryError ? (
         <EmptyState
           icon={GraduationCap}
           title="No students found"
-          detail="Import a school roster or add a student manually. Students already assigned to these classes will appear after the directory repair migration is applied."
+          detail="Import the school roster or add a student manually. Students can be placed into classes after they are in the directory."
         />
-      )}
+      ) : null}
 
       {students.length > 0 ? (
         <>
@@ -872,25 +888,6 @@ function StudentDirectory({
               </select>
             </label>
             <label className="text-sm font-bold text-slate-700">
-              Class *
-              <select
-                value={manualDraft.classId}
-                onChange={(event) =>
-                  setManualDraft((current) => ({
-                    ...current,
-                    classId: event.target.value,
-                  }))
-                }
-                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
-              >
-                {classes.map((classRow) => (
-                  <option key={classRow.id} value={classRow.id}>
-                    {classRow.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm font-bold text-slate-700">
               Student code / username
               <input
                 value={manualDraft.username}
@@ -939,7 +936,6 @@ function StudentDirectory({
                   busy ||
                   !manualDraft.firstName.trim() ||
                   !manualDraft.schoolYear ||
-                  !manualDraft.classId ||
                   Boolean(manualDraft.pin && manualDraft.pin.length !== 4)
                 }
                 onClick={() => void submitManualStudent()}
@@ -955,21 +951,7 @@ function StudentDirectory({
       {createMode === "import" ? (
         <Modal title="Import students" onClose={closeCreate}>
           <div className="space-y-5 p-6">
-            <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-              <label className="text-sm font-bold text-slate-700">
-                Add students to class *
-                <select
-                  value={importClassId}
-                  onChange={(event) => setImportClassId(event.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
-                >
-                  {classes.map((classRow) => (
-                    <option key={classRow.id} value={classRow.id}>
-                      {classRow.name} · {classRow.yearLevels.join(", ")}
-                    </option>
-                  ))}
-                </select>
-              </label>
+            <div className="flex justify-end">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -979,7 +961,7 @@ function StudentDirectory({
               />
               <button
                 type="button"
-                disabled={readingFile || !importClassId}
+                disabled={readingFile}
                 onClick={() => fileInputRef.current?.click()}
                 className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-emerald-800 px-4 text-sm font-bold text-white disabled:opacity-50"
               >
@@ -1109,7 +1091,6 @@ function StudentDirectory({
                 type="button"
                 disabled={
                   busy ||
-                  !importClassId ||
                   !importRows.some(
                     (row) =>
                       row.firstName.trim() &&
@@ -1496,7 +1477,9 @@ export default function SchoolHomeClient({
                   ))}
                 </select>
               </label>
-              {isAdministrator && snapshot.permissions.canCreateClass ? (
+              {tab !== "students" &&
+              isAdministrator &&
+              snapshot.permissions.canCreateClass ? (
                 <button
                   type="button"
                   onClick={() => setCreateOpen(true)}
@@ -1638,6 +1621,7 @@ export default function SchoolHomeClient({
             <StudentDirectory
               students={snapshot.students}
               classes={filteredClasses}
+              directoryError={snapshot.studentDirectoryError}
               busy={busy}
               onReset={resetExplorerCode}
               onCreate={createSchoolStudents}

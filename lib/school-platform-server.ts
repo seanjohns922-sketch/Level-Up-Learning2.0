@@ -98,9 +98,11 @@ export type SchoolHomeSnapshot = {
     username: string | null;
     pinStatus: "set" | "not_set";
     explorerCode: string | null;
+    classIds: string[];
     classes: string[];
     status: "active" | "archived";
   }>;
+  studentDirectoryError: string | null;
 };
 
 export function isSchoolPlatformPreviewEnabled() {
@@ -215,25 +217,14 @@ async function getSchoolStudentDirectory(
   schoolId: string,
   accessToken: string,
 ) {
-  try {
-    return await supabaseRequest<SchoolHomeSnapshot["students"]>(
-      "/rest/v1/rpc/get_school_student_directory",
-      accessToken,
-      {
-        method: "POST",
-        body: JSON.stringify({ p_school_id: schoolId }),
-      },
-    );
-  } catch (error) {
-    console.error(
-      "[SchoolHome] Unable to load the canonical student directory",
-      error,
-    );
-    // ordinary teachers do not have school-directory permission. School
-    // administrators still retain the rest of School Home if the additive RPC
-    // is temporarily unavailable, while the server log preserves the cause.
-    return [];
-  }
+  return supabaseRequest<SchoolHomeSnapshot["students"]>(
+    "/rest/v1/rpc/get_school_student_directory",
+    accessToken,
+    {
+      method: "POST",
+      body: JSON.stringify({ p_school_id: schoolId }),
+    },
+  );
 }
 
 async function recordSchoolPreviewAccess(
@@ -274,8 +265,7 @@ export async function loadSchoolHomePreview(schoolId: string) {
 
   const accessToken = await getSchoolPreviewToken();
   try {
-    const [snapshot, schools, canViewAdministration, students] =
-      await Promise.all([
+    const [snapshot, schools, canViewAdministration] = await Promise.all([
       supabaseRequest<SchoolHomeSnapshot>(
         "/rest/v1/rpc/get_school_home_snapshot",
         accessToken,
@@ -286,8 +276,21 @@ export async function loadSchoolHomePreview(schoolId: string) {
       ),
       getMySchoolContexts(accessToken),
       canViewSchoolAdministration(schoolId, accessToken),
-      getSchoolStudentDirectory(schoolId, accessToken),
     ]);
+    let students: SchoolHomeSnapshot["students"] = [];
+    let studentDirectoryError: string | null = null;
+    try {
+      students = await getSchoolStudentDirectory(schoolId, accessToken);
+    } catch (error) {
+      studentDirectoryError =
+        error instanceof Error
+          ? error.message
+          : "The school student directory could not be loaded.";
+      console.error(
+        "[SchoolHome] Unable to load the canonical student directory",
+        error,
+      );
+    }
     return {
       ...access,
       snapshot: {
@@ -299,6 +302,7 @@ export async function loadSchoolHomePreview(schoolId: string) {
             snapshot.actor.role === "teacher" && canViewAdministration,
         },
         students,
+        studentDirectoryError,
       },
       schools,
     };
