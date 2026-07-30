@@ -233,7 +233,7 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 3,
-    focus: "Number Lines & Rounding",
+    focus: "Number Lines & Estimation",
     lesson: 1,
     topic: "Place numbers on a number line",
     activity: scopedActivity(
@@ -266,36 +266,36 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 3,
-    focus: "Number Lines & Rounding",
+    focus: "Number Lines & Estimation",
     lesson: 2,
-    topic: "Round to the nearest 10 and 100",
+    topic: "Find the nearest ten on a number line",
     activity: scopedActivity(
-      "Round numbers to nearest 10 and 100 using number-line reasoning.",
-      "Rapid round-to-10 and round-to-100 drills.",
-      "Explain why this rounded value is reasonable."
+      "Use a number line to find the ten a number is closest to (informal estimation).",
+      "Which ten is this number closest to?",
+      "How do you know which ten is closer?"
     ),
     activities: interactiveActivities(
       "number_line",
       {
         min: 0,
-        max: 1000,
+        max: 100,
         step: 10,
         mode: "rounding",
-        targets: [10, 100],
+        targets: [10],
       },
       genericActivities("number_line", {
         min: 0,
-        max: 1000,
+        max: 100,
         step: 10,
         mode: "rounding",
-        targets: [10, 100],
+        targets: [10],
       })
     ),
     curriculum: ["AC9M2N01", "AC9M2N02"],
   },
   {
     week: 3,
-    focus: "Number Lines & Rounding",
+    focus: "Number Lines & Estimation",
     lesson: 3,
     topic: "Estimate numbers on number lines",
     activity: scopedActivity(
@@ -350,7 +350,7 @@ export const year2NumberRows: ProgramRow[] = [
         sourceActivityType: "odd_even_sort",
       }),
     ],
-    curriculum: ["AC9M2N03"],
+    curriculum: ["AC9M2A02"],
   },
   {
     week: 4,
@@ -382,7 +382,7 @@ export const year2NumberRows: ProgramRow[] = [
         sourceActivityType: "odd_even_sort",
       }),
     ],
-    curriculum: ["AC9M2N03"],
+    curriculum: ["AC9M2A02"],
   },
   {
     week: 4,
@@ -414,7 +414,7 @@ export const year2NumberRows: ProgramRow[] = [
         sourceActivityType: "odd_even_sort",
       }),
     ],
-    curriculum: ["AC9M2N03"],
+    curriculum: ["AC9M2A02"],
   },
   {
     week: 5,
@@ -594,7 +594,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "recognise",
       })
     ),
-    curriculum: ["AC9M2N05"],
+    curriculum: ["AC9M2N04", "AC9M2A02"],
   },
   {
     week: 7,
@@ -619,7 +619,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "write_sentences",
       })
     ),
-    curriculum: ["AC9M2N05"],
+    curriculum: ["AC9M2N04", "AC9M2A02"],
   },
   {
     week: 7,
@@ -644,7 +644,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "word_problems",
       })
     ),
-    curriculum: ["AC9M2N05"],
+    curriculum: ["AC9M2N04", "AC9M2A02"],
   },
   {
     week: 8,
@@ -679,7 +679,7 @@ export const year2NumberRows: ProgramRow[] = [
         }),
       ]
     ),
-    curriculum: ["AC9M2N03"],
+    curriculum: ["AC9M2A01", "AC9M2N05"],
   },
   {
     week: 8,
@@ -714,7 +714,7 @@ export const year2NumberRows: ProgramRow[] = [
         }),
       ]
     ),
-    curriculum: ["AC9M2N03"],
+    curriculum: ["AC9M2A01", "AC9M2N05"],
   },
   {
     week: 8,
@@ -749,7 +749,7 @@ export const year2NumberRows: ProgramRow[] = [
         }),
       ]
     ),
-    curriculum: ["AC9M2N03"],
+    curriculum: ["AC9M2A01", "AC9M2N05"],
   },
   {
     week: 9,
@@ -858,7 +858,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "sharing",
       }),
     ],
-    curriculum: ["AC9M2N06"],
+    curriculum: ["AC9M2N05"],
   },
   {
     week: 10,
@@ -888,7 +888,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "grouping",
       }),
     ],
-    curriculum: ["AC9M2N06"],
+    curriculum: ["AC9M2N05"],
   },
   {
     week: 10,
@@ -919,7 +919,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "inverse_link",
       }),
     ],
-    curriculum: ["AC9M2N06"],
+    curriculum: ["AC9M2N05"],
   },
   {
     week: 11,
@@ -1019,115 +1019,80 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 12,
-    focus: "Review & Quiz",
+    focus: "Fractions",
     lesson: 1,
-    topic: "Revision stations",
+    topic: "Halves and quarters",
     activity: scopedActivity(
-      "Rotate through mixed revision stations.",
-      "Mixed fluency block across core facts.",
-      "Explain one strategy you used successfully."
+      "Recognise one-half and one-quarter as equal parts of a whole shape.",
+      "Which picture shows one-half? Which shows one-quarter?",
+      "How do you know the parts are equal?"
     ),
     activities: [
-      makeActivity("review_quiz", 2, {
-        mode: "revision_stations",
-        reviewActivities: [
-          "skip_count",
-          "arrays",
-          "fact_family",
-          "number_line",
-        ],
+      makeActivity("area_model_select", 2, {
+        mode: "pick_model",
+        denominators: [2, 4],
       }),
-      makeActivity("skip_count", 1, {
-        min: 0,
-        max: 100,
-        step: 5,
-        mode: "forward",
+      makeActivity("area_model_select", 2, {
+        mode: "shade_fraction",
+        denominators: [2, 4],
       }),
-      makeActivity("arrays", 1, {
-        minRows: 2,
-        maxRows: 5,
-        minColumns: 2,
-        maxColumns: 5,
-        mode: "arrays",
+      makeActivity("area_model_select", 1, {
+        mode: "match_model",
+        denominators: [2, 4],
       }),
     ],
-    curriculum: ["AC9M2N06"],
+    curriculum: ["AC9M2N03"],
   },
   {
     week: 12,
-    focus: "Review & Quiz",
+    focus: "Fractions",
     lesson: 2,
-    topic: "Math games and group challenges",
+    topic: "Eighths by halving",
     activity: scopedActivity(
-      "Collaborative revision through team math challenges.",
-      "Mixed fluency sprint across prior skills.",
-      "How do you know your team strategy works?"
+      "Halve again to make eighths; connect halves, quarters and eighths.",
+      "Which picture shows one-eighth?",
+      "What happens to the parts each time you halve?"
     ),
     activities: [
-      makeActivity("speed_round", 3, {
-        durationSeconds: 30,
+      makeActivity("area_model_select", 2, {
+        mode: "pick_model",
+        denominators: [2, 4, 8],
       }),
-      makeActivity("review_quiz", 1, {
-        mode: "team_challenges",
-        reviewActivities: [
-          "addition_strategy",
-          "subtraction_strategy",
-          "fact_family",
-        ],
+      makeActivity("area_model_select", 2, {
+        mode: "shade_fraction",
+        denominators: [4, 8],
+      }),
+      makeActivity("area_model_select", 1, {
+        mode: "match_model",
+        denominators: [2, 4, 8],
       }),
     ],
-    curriculum: ["AC9M2N06"],
+    curriculum: ["AC9M2N03"],
   },
   {
     week: 12,
-    focus: "Final Practice",
+    focus: "Fractions",
     lesson: 3,
-    topic: "Post-test preparation",
+    topic: "Match the fraction",
     activity: scopedActivity(
-      "Mixed practice across all topics to build confidence before the post-test.",
-      "Quick addition & subtraction facts within 20.",
-      "Explain: how do you know your answer is correct?"
+      "Match halves, quarters and eighths to the correct picture.",
+      "Match each fraction to its shape.",
+      "Which is bigger: one-half or one-quarter? How do you know?"
     ),
     activities: [
-      makeActivity("addition_strategy", 2, {
-        min: 2,
-        max: 50,
-        strategies: ["jump", "split", "friendly"],
+      makeActivity("area_model_select", 2, {
+        mode: "match_model",
+        denominators: [2, 4, 8],
       }),
-      makeActivity("subtraction_strategy", 2, {
-        min: 2,
-        max: 50,
-        strategies: ["jump", "split", "friendly"],
+      makeActivity("area_model_select", 2, {
+        mode: "pick_model",
+        denominators: [2, 4, 8],
       }),
-      makeActivity("place_value_builder", 1, {
-        min: 10,
-        max: 500,
-      }),
-      makeActivity("number_line", 1, {
-        min: 0,
-        max: 100,
-        step: 5,
-      }),
-      makeActivity("skip_count", 1, {
-        countBy: [2, 3, 5, 10],
-        maxStart: 30,
-      }),
-      makeActivity("equal_groups", 1, {
-        allowedGroupSizes: [2, 5, 10],
-        maxTotal: 30,
-      }),
-      makeActivity("mixed_word_problem", 1, {
-        min: 0,
-        max: 50,
-        mode: "choose_operation",
-        operations: ["+", "-"],
-      }),
-      makeActivity("multiple_choice", 1, {
-        sourceActivityType: "addition_strategy",
-        min: 2,
-        max: 50,
+      makeActivity("area_model_select", 1, {
+        mode: "shade_fraction",
+        denominators: [2, 4, 8],
       }),
     ],
-    curriculum: ["AC9M2N06"],
+    curriculum: ["AC9M2N03"],
   },
 ];

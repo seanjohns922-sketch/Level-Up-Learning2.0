@@ -5497,15 +5497,15 @@ function roundingWordProblem(
 
   const style3Templates = [
     {
-      prompt: `You're buying tickets for a school event. ${fmt(value)} tickets have been sold. The organiser says: "We've sold about ${fmt(rounded - targetUnit)} tickets." 🎯 Is that a good estimate? Round to the nearest ${unitLabel}.`,
+      prompt: `You're buying tickets for a school event. ${fmt(value)} tickets have been sold. The organiser says: "We've sold about ${fmt(rounded - targetUnit)} tickets." Is that a good estimate? Round to the nearest ${unitLabel}.`,
       helper: `Think about whether ${fmt(rounded - targetUnit)} or ${fmt(rounded)} is closer.`,
     },
     {
-      prompt: `A charity walk had ${fmt(value)} participants. The news report says "about ${fmt(rounded + targetUnit)} people joined." 🎯 Is that the best estimate? Round to the nearest ${unitLabel}.`,
+      prompt: `A charity walk had ${fmt(value)} participants. The news report says "about ${fmt(rounded + targetUnit)} people joined." Is that the best estimate? Round to the nearest ${unitLabel}.`,
       helper: `Is ${fmt(rounded + targetUnit)} really the closest?`,
     },
     {
-      prompt: `The school tuckshop sold ${fmt(value)} sausage rolls this term. The report says "approximately ${fmt(rounded - targetUnit)}." 🎯 Is that right? What should it say, rounded to the nearest ${unitLabel}?`,
+      prompt: `The school tuckshop sold ${fmt(value)} sausage rolls this term. The report says "approximately ${fmt(rounded - targetUnit)}." Is that right? What should it say, rounded to the nearest ${unitLabel}?`,
       helper: `Check which multiple of ${unitLabel} is closest to ${fmt(value)}.`,
     },
   ];
