@@ -43,10 +43,16 @@ function MoneyPiece({
           50: "/coins/note-50.png",
           100: "/coins/note-100.png",
         }[value]
-      : {
-          1: "/coins/coin-1.png",
-          2: "/coins/coin-2.png",
-        }[value];
+      : (
+          {
+            2: "/coins/coin-2.png",
+            1: "/coins/coin-1.png",
+            0.5: "/coins/coin-50c.png",
+            0.2: "/coins/coin-20c.png",
+            0.1: "/coins/coin-10c.png",
+            0.05: "/coins/coin-5c.png",
+          } as Record<number, string>
+        )[value];
 
   if (src) {
     return (
@@ -119,20 +125,23 @@ export default function MoneyContextVisual({
   }
 
   if (visual.type === "australian_money") {
+    const showItem = Boolean(visual.itemLabel);
     return (
       <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
         <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
           {visual.boardLabel ? `${visual.title} Shop Board` : visual.title}
         </div>
-        <div className="mt-3 grid gap-4 md:grid-cols-[1.2fr_0.9fr]">
-          <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <div className="text-sm font-bold text-slate-600">Shop item</div>
-            <div className="mt-2 text-xl font-black text-slate-900">{visual.itemLabel}</div>
-            <div className="mt-1 text-sm text-slate-500">
-              {visual.itemDetail ? `${visual.itemDetail} • ` : ""}
-              {visual.quantity ? `${visual.quantity} × ${formatDollars(visual.itemPrice ?? 0)}` : formatDollars(visual.itemPrice ?? 0)}
+        <div className={`mt-3 grid gap-4 ${showItem ? "md:grid-cols-[1.2fr_0.9fr]" : ""}`}>
+          {showItem ? (
+            <div className="rounded-2xl bg-white p-4 shadow-sm">
+              <div className="text-sm font-bold text-slate-600">Shop item</div>
+              <div className="mt-2 text-xl font-black text-slate-900">{visual.itemLabel}</div>
+              <div className="mt-1 text-sm text-slate-500">
+                {visual.itemDetail ? `${visual.itemDetail} • ` : ""}
+                {visual.quantity ? `${visual.quantity} × ${formatDollars(visual.itemPrice ?? 0)}` : formatDollars(visual.itemPrice ?? 0)}
+              </div>
             </div>
-          </div>
+          ) : null}
           <div className="rounded-2xl bg-white p-4 shadow-sm">
             <div className="text-sm font-bold text-slate-600">Money shown</div>
             <div className="mt-3 flex flex-wrap gap-3">
@@ -145,9 +154,11 @@ export default function MoneyContextVisual({
                 />
               ))}
             </div>
-            <div className="mt-3 text-sm font-semibold text-slate-500">
-              Total shown: {formatDollars(sumMoneyPieces(visual.pieces))}
-            </div>
+            {visual.hideTotal ? null : (
+              <div className="mt-3 text-sm font-semibold text-slate-500">
+                Total shown: {formatDollars(sumMoneyPieces(visual.pieces))}
+              </div>
+            )}
           </div>
         </div>
       </div>

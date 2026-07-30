@@ -923,96 +923,96 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 11,
-    focus: "Mixed Operations",
+    focus: "Money",
     lesson: 1,
-    topic: "Choose operation to solve problem",
+    topic: "Count coins and notes",
     activity: scopedActivity(
-      "Choose the correct operation for word problems.",
-      "Quick operation-selection fluency.",
-      "Estimate first: does your chosen operation make sense?"
+      "Count collections of coins and notes to find the total amount.",
+      "How much money is shown?",
+      "Which notes and coins did you count?"
     ),
     activities: [
       makeActivity("mixed_word_problem", 2, {
-        min: 0,
-        max: 100,
+        min: 1,
+        max: 30,
         mode: "choose_operation",
-        operations: ["+", "-", "x", "/"],
+        operations: ["+", "-"],
       }),
-      makeActivity("addition_strategy", 1, {
-        min: 0,
-        max: 100,
-        mode: "jump",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 0,
-        max: 100,
+      makeActivity("mixed_word_problem", 1, {
+        min: 1,
+        max: 30,
         mode: "choose_operation",
-        operations: ["+", "-", "x", "/"],
-        sourceActivityType: "mixed_word_problem",
+        operations: ["+", "-"],
+      }),
+      makeActivity("mixed_word_problem", 1, {
+        min: 1,
+        max: 30,
+        mode: "choose_operation",
+        operations: ["+", "-"],
       }),
     ],
     curriculum: ["AC9M2N06"],
   },
   {
     week: 11,
-    focus: "Mixed Operations",
+    focus: "Money",
     lesson: 2,
-    topic: "Solve 2-step problems with + and -",
+    topic: "Money totals",
     activity: scopedActivity(
-      "Solve two-step add/subtract problems.",
-      "Rapid two-step structure drills.",
-      "Estimate before solving and check if your answer is reasonable."
+      "Add two prices to find the total cost.",
+      "How much do both items cost altogether?",
+      "How did you add the two prices?"
     ),
     activities: [
       makeActivity("mixed_word_problem", 2, {
-        min: 0,
-        max: 100,
-        mode: "two_step_add_sub",
-        operations: ["+", "-"],
+        min: 1,
+        max: 20,
+        mode: "choose_operation",
+        operations: ["+"],
       }),
-      makeActivity("subtraction_strategy", 1, {
-        min: 0,
-        max: 100,
-        mode: "jump",
+      makeActivity("mixed_word_problem", 1, {
+        min: 1,
+        max: 20,
+        mode: "choose_operation",
+        operations: ["+"],
       }),
-      makeActivity("typed_response", 1, {
-        min: 0,
-        max: 100,
-        mode: "two_step_add_sub",
-        operations: ["+", "-"],
-        sourceActivityType: "mixed_word_problem",
+      makeActivity("mixed_word_problem", 1, {
+        min: 1,
+        max: 20,
+        mode: "choose_operation",
+        operations: ["+"],
       }),
     ],
     curriculum: ["AC9M2N06"],
   },
   {
     week: 11,
-    focus: "Mixed Operations",
+    focus: "Money",
     lesson: 3,
-    topic: "Solve problems with x and /",
+    topic: "Giving change",
     activity: scopedActivity(
-      "Solve mixed multiplication/division problems.",
-      "Fast mult/div recall and inverse checks.",
-      "Does your final answer make sense in the context?"
+      "Work out the change from a payment.",
+      "How much change do you get?",
+      "How did you work out the change?"
     ),
     activities: [
       makeActivity("mixed_word_problem", 2, {
-        min: 0,
-        max: 50,
-        mode: "mult_div_problems",
-        operations: ["x", "/"],
+        min: 1,
+        max: 20,
+        mode: "choose_operation",
+        operations: ["-"],
       }),
-      makeActivity("division_groups", 1, {
-        minTotal: 6,
-        maxTotal: 24,
-        mode: "inverse_link",
+      makeActivity("mixed_word_problem", 1, {
+        min: 1,
+        max: 20,
+        mode: "choose_operation",
+        operations: ["-"],
       }),
-      makeActivity("multiple_choice", 1, {
-        min: 0,
-        max: 50,
-        mode: "mult_div_problems",
-        operations: ["x", "/"],
-        sourceActivityType: "mixed_word_problem",
+      makeActivity("mixed_word_problem", 1, {
+        min: 1,
+        max: 20,
+        mode: "choose_operation",
+        operations: ["-"],
       }),
     ],
     curriculum: ["AC9M2N06"],

@@ -63,6 +63,8 @@ export type MoneyVisualData =
       itemDetail?: string;
       itemPrice?: number;
       quantity?: number;
+      /** Hide the auto-computed "Total shown" line (so counting questions don't reveal the answer). */
+      hideTotal?: boolean;
       pieces: Array<{
         label: string;
         kind: "coin" | "note";
@@ -4981,6 +4983,102 @@ function buildAustralianMoneyPieces(amount: number) {
   return pieces;
 }
 
+function isYear2Week11(level: SupportedMathLevel, lesson: Lesson) {
+  return level === 2 && lesson.week === 11;
+}
+
+const YEAR2_MONEY_ITEMS = [
+  "pencil",
+  "apple",
+  "drink",
+  "muffin",
+  "ball",
+  "book",
+  "sticker pack",
+  "toy car",
+  "banana",
+  "cupcake",
+] as const;
+
+function pickYear2MoneyItems(count: number) {
+  return shuffle([...YEAR2_MONEY_ITEMS]).slice(0, count);
+}
+
+// Year 2 money (AC9M2N06): count collections of coins/notes, total two prices,
+// and give change — all in whole dollars, using the coin/note artwork. The
+// question style is chosen by lesson: L1 count, L2 totals, L3 change.
+function buildYear2MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
+  const style = lesson.lesson === 2 ? "total" : lesson.lesson === 3 ? "change" : "count";
+
+  if (style === "total") {
+    const [itemA, itemB] = pickYear2MoneyItems(2);
+    const a = randInt(2, 9);
+    const b = randInt(2, 9);
+    const answer = a + b;
+    return {
+      kind: "mixed_word_problem",
+      prompt: `A ${itemA} costs $${a}. A ${itemB} costs $${b}. How much do they cost altogether?`,
+      answer,
+      options: uniqueNumberOptions(answer, 6).map(Number),
+      operationLabel: "Add the prices",
+      correctOperation: "+",
+      helper: "Add the two prices together.",
+      mode: "choose_operation",
+      visual: {
+        type: "receipt",
+        title: "Shop",
+        lines: [
+          { label: itemA ?? "pencil", price: a },
+          { label: itemB ?? "apple", price: b },
+        ],
+        hideComputedTotals: true,
+      },
+    };
+  }
+
+  if (style === "change") {
+    const item = pickYear2MoneyItems(1)[0] ?? "toy car";
+    const cost = randInt(3, 9);
+    const payment = [5, 10, 20].find((p) => p > cost) ?? 10;
+    const answer = payment - cost;
+    return {
+      kind: "mixed_word_problem",
+      prompt: `You buy a ${item} for $${cost}. You pay with $${payment}. How much change do you get?`,
+      answer,
+      options: uniqueNumberOptions(answer, 5).map(Number),
+      operationLabel: "Find the change",
+      correctOperation: "-",
+      helper: "Take the cost away from the money you paid.",
+      mode: "choose_operation",
+      visual: {
+        type: "receipt",
+        title: "Shop",
+        lines: [{ label: item, price: cost }],
+        payment,
+        hideComputedTotals: true,
+      },
+    };
+  }
+
+  const amount = randInt(6, 30);
+  const pieces = buildAustralianMoneyPieces(amount);
+  return {
+    kind: "mixed_word_problem",
+    prompt: "How much money is shown?",
+    answer: amount,
+    options: uniqueNumberOptions(amount, 6).map(Number),
+    operationLabel: "Count the money",
+    helper: "Count the notes and coins together.",
+    mode: "choose_operation",
+    visual: {
+      type: "australian_money",
+      title: "Money",
+      pieces,
+      hideTotal: true,
+    },
+  };
+}
+
 function buildYear4Week8BudgetingQuestion(config: GenericConfig): MixedWordProblemQuestion {
   const board = getWeek8Board(config);
   const items = board.items;
@@ -7833,6 +7931,9 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "mixed_word_problem") {
+    if (isYear2Week11(level, lesson)) {
+      return buildYear2MoneyQuestion(lesson);
+    }
     if (isYear4Week8(level, lesson)) {
       const explicitMode = typeof config.mode === "string" ? config.mode : "";
       if (explicitMode === "budgeting") {
