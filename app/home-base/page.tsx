@@ -11,6 +11,7 @@ import {
   PawPrint,
   Pencil,
   Sparkles,
+  ToyBrick,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -285,6 +286,23 @@ export default function HomeBasePage() {
 
       <section className="border-t border-white/10 bg-[#0b0d10] px-5 py-6 lg:px-8" aria-label="Hall of Legends">
         <div className="mx-auto max-w-[1440px]">
+          <button
+            type="button"
+            onClick={() => router.push("/my-realmies")}
+            className="mb-5 flex w-full items-center justify-between gap-4 rounded-md border border-cyan-300/25 bg-[linear-gradient(100deg,rgba(14,116,144,.22),rgba(124,58,237,.18))] px-5 py-4 text-left transition hover:border-cyan-200/50 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70"
+          >
+            <span className="flex min-w-0 items-center gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-cyan-200/25 bg-black/25 text-cyan-200">
+                <ToyBrick className="h-6 w-6" aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-cyan-200">Digital collection</span>
+                <span className="mt-1 block text-xl font-black text-white">My Realmies</span>
+                <span className="mt-1 block text-sm font-semibold text-white/60">Visit your Numbot, Meazurex and unlocked Realmie figures.</span>
+              </span>
+            </span>
+            <ArrowRight className="h-5 w-5 shrink-0 text-cyan-200" aria-hidden="true" />
+          </button>
           <HallOfLegendsWidget />
         </div>
       </section>
