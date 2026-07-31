@@ -2,139 +2,173 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
-const foundationPath = path.join(
-  root,
-  "supabase/migrations/20260731100000_realmies_secure_data_foundation.sql",
-);
-const integrationPath = path.join(
-  root,
+const read = (relativePath) =>
+  fs.readFileSync(path.join(root, relativePath), "utf8");
+
+const correctionPath =
+  "supabase/migrations/20260731103000_correct_realmies_to_discovery_model.sql";
+const correction = read(correctionPath);
+const integration = read(
   "supabase/migrations/20260731101000_integrate_realmie_posttest_unlocks.sql",
 );
-const testPath = path.join(root, "supabase/tests/realmies_r2.sql");
+const test = read("supabase/tests/realmies_r2.sql");
+const header = read("components/economy/EconomyHeader.tsx");
+const home = read("app/home-base/page.tsx");
 
-const foundation = fs.readFileSync(foundationPath, "utf8");
-const integration = fs.readFileSync(integrationPath, "utf8");
-const tests = fs.readFileSync(testPath, "utf8");
-
-const expectedKeys = [
-  "number-nexus-numbot-counter-standard",
-  "number-nexus-numbot-builder-standard",
-  "number-nexus-numbot-processor-standard",
-  "number-nexus-numbot-solver-standard",
-  "number-nexus-numbot-calculator-standard",
-  "number-nexus-numbot-equationator-standard",
-  "measurelands-meazurex-ticklet-standard",
-  "measurelands-meazurex-measurer-standard",
-  "measurelands-meazurex-tracker-standard",
-  "measurelands-meazurex-balancer-standard",
-  "measurelands-meazurex-calibrator-standard",
-  "measurelands-meazurex-timewielder-standard",
-  "starpath-geospin-roller-standard",
-  "starpath-geospin-mapper-standard",
-  "starpath-geospin-navigator-standard",
-  "starpath-geospin-shapeshifter-standard",
-  "starpath-geospin-galaxycrafter-standard",
-  "starpath-geospin-starweaver-standard",
+const expectedRealmies = [
+  "number-nexus-bitling-standard",
+  "number-nexus-carrybot-standard",
+  "number-nexus-codekeeper-standard",
+  "number-nexus-neon-sentinel-standard",
+  "measurelands-gaugekin-standard",
+  "measurelands-ruleroot-standard",
+  "measurelands-compass-keeper-standard",
+  "measurelands-golden-surveyor-standard",
+  "starpath-orbitling-standard",
+  "starpath-prism-scout-standard",
+  "starpath-constellation-keeper-standard",
+  "starpath-aurora-guardian-standard",
+  "global-fogling-standard",
+  "global-mist-mischief-standard",
+  "global-shadow-of-forgetfulness-standard",
 ];
 
-const failures = [];
-const assert = (condition, message) => {
-  if (!condition) failures.push(message);
-};
+const checks = [];
+const check = (label, condition) => checks.push({ label, condition });
 
-for (const key of expectedKeys) {
-  assert(foundation.includes(`'${key}'`), `Missing catalogue key: ${key}`);
+for (const realmieKey of expectedRealmies) {
+  check(`catalogue seeds ${realmieKey}`, correction.includes(`'${realmieKey}'`));
 }
 
-const seededKeys = [
-  ...foundation.matchAll(
-    /\('((?:number-nexus|measurelands|starpath)-[^']+-standard)'/g,
+check(
+  "retires Legend catalogue rows without deleting history",
+  correction.includes("category = 'legend'") &&
+    correction.includes("is_collectible = false") &&
+    !correction.includes("delete from public.student_realmies"),
+);
+check(
+  "retires every unapproved catalogue row",
+  correction.includes("where realmie_key not in ("),
+);
+check(
+  "enforces exact 15-item 4/4/4/3 distribution",
+  correction.includes("Realmies correction invariant failed") &&
+    correction.includes("v_collectible_count <> 15") &&
+    correction.includes("v_number_count <> 4") &&
+    correction.includes("v_measurement_count <> 4") &&
+    correction.includes("v_space_count <> 4") &&
+    correction.includes("v_global_count <> 3"),
+);
+check(
+  "forbids pets and main Legends",
+  correction.includes("category in ('legend', 'pet')") &&
+    correction.includes(
+      "lower(character_key) in ('numbot', 'meazurex', 'geospin', 'datara')",
+    ),
+);
+check(
+  "uses canonical lesson and quiz evidence",
+  correction.includes("student_lesson_attempts") &&
+    correction.includes("student_weekly_quiz_attempts"),
+);
+check(
+  "uses unique lesson identity",
+  correction.includes(
+    "select distinct attempt.realm_id, attempt.working_level, attempt.week, attempt.lesson",
   ),
-].map((match) => match[1]);
+);
+check(
+  "uses unique weekly quiz identity and 80 percent pass rule",
+  correction.includes(
+    "select distinct attempt.realm_id, attempt.working_level, attempt.week",
+  ) && correction.includes("attempt.accuracy_percent >= 80"),
+);
+check(
+  "reuses the existing canonical streak source",
+  correction.includes("from public.student_activity_daily activity") &&
+    correction.includes(
+      "'streak_evidence_uses_existing_canonical_activity_daily', true",
+    ) &&
+    !correction.includes("with active_days as ("),
+);
+check(
+  "excludes demo review and teacher-advanced evidence",
+  ["demo_mode", "review_mode", "teacher_advanced"].every((token) =>
+    correction.includes(token),
+  ),
+);
+check(
+  "uses deferred canonical-save triggers",
+  correction.includes("deferrable initially deferred") &&
+    correction.includes("trg_evaluate_realmie_lesson_discoveries") &&
+    correction.includes("trg_evaluate_realmie_quiz_discoveries"),
+);
+check(
+  "supports idempotent backfill",
+  correction.includes("backfill_realmie_discoveries_internal") &&
+    correction.includes("on conflict (student_id, realmie_id) do nothing"),
+);
+check(
+  "removes post-test Realmie grants",
+  correction.includes(
+    "drop function if exists public.grant_standard_realmie_for_canonical_posttest",
+  ) &&
+    correction.includes(
+      "drop function if exists public.backfill_standard_realmies_internal",
+    ),
+);
+check(
+  "preserves assessment advisory lock",
+  correction.includes("pg_advisory_xact_lock"),
+);
+check(
+  "filters student teacher and parent reads",
+  (correction.match(/catalogue\.is_collectible/g) ?? []).length >= 12 &&
+    correction.includes("get_teacher_student_realmie_summary_secure") &&
+    correction.includes("get_parent_student_realmie_summary_secure"),
+);
+check(
+  "keeps internal evaluator client-inaccessible",
+  correction.includes(
+    "revoke all on function public.evaluate_realmie_discoveries_internal",
+  ),
+);
+check(
+  "records a correction report",
+  correction.includes("realmie_architecture_correction_reports") &&
+    correction.includes("historical_ownership_rows_preserved"),
+);
+check(
+  "old integration is explicitly superseded",
+  integration.includes("grant_standard_realmie_for_canonical_posttest") &&
+    correction.includes("posttest_grants_removed"),
+);
+check(
+  "premature My Realmies navigation is withdrawn",
+  !header.includes("My Realmies") && !home.includes("/my-realmies"),
+);
+check(
+  "premature My Realmies route is absent",
+  !fs.existsSync(path.join(root, "app/my-realmies/page.tsx")),
+);
+check(
+  "SQL regression covers architecture correction",
+  [
+    "exactly 15 active collectible standard Realmies",
+    "main Legends are not collectible Realmies",
+    "post-tests do not grant Realmies",
+    "backfill is idempotent",
+  ].every((label) => test.includes(label)),
+);
 
-assert(seededKeys.length === 18, `Expected 18 seeded keys, found ${seededKeys.length}`);
-assert(new Set(seededKeys).size === 18, "Seeded Realmie keys are not unique");
-assert(!foundation.toLowerCase().includes("'datara'"), "Datara must remain unseeded");
-assert(!foundation.includes("'pet'"), "Pet Realmies must remain unseeded");
-assert(
-  foundation.includes("asset_path ~ '^/realmies/"),
-  "Catalogue asset paths are not constrained to the Realmies namespace",
-);
-assert(
-  foundation.includes("public.request_student_session_token() is null"),
-  "Student Realmies access does not require an opaque student session",
-);
-assert(
-  !foundation.includes("student.user_id"),
-  "Realmies must not depend on the removed students.user_id identity model",
-);
-assert(
-  foundation.includes("'collection_filter', v_context->'collection_filter'"),
-  "Realmies telemetry does not use an explicit context allowlist",
-);
-
-for (const table of [
-  "realmie_catalogue",
-  "student_realmies",
-  "realmie_unlock_receipts",
-  "student_realmie_favourites",
-  "student_realmie_display_slots",
-  "student_realmie_backfill_state",
-  "realmie_product_events",
-]) {
-  assert(
-    foundation.includes(`alter table public.${table} enable row level security`),
-    `RLS is not enabled for ${table}`,
-  );
-  assert(
-    foundation.includes(`revoke all on table public.${table}`),
-    `Direct table privileges are not revoked for ${table}`,
-  );
+const failed = checks.filter(({ condition }) => !condition);
+for (const { label, condition } of checks) {
+  console.log(`${condition ? "PASS" : "FAIL"} ${label}`);
 }
 
-assert(
-  integration.includes("create or replace function public.complete_realm_assessment"),
-  "Canonical assessment command is not integrated",
-);
-assert(
-  integration.includes("if p_assessment_type = 'posttest' then"),
-  "Realmie evaluation is not post-test scoped",
-);
-assert(
-  integration.includes("grant_standard_realmie_for_canonical_posttest"),
-  "Canonical post-test does not invoke the server-only grant evaluator",
-);
-assert(
-  !integration.includes("weekly_quiz"),
-  "Weekly quiz logic must not grant standard Realmies",
-);
-assert(
-  integration.includes("backfill_standard_realmies_internal"),
-  "Canonical historical backfill is missing",
-);
-
-for (const requiredTest of [
-  "84 percent post-test does not grant",
-  "pre-test cannot grant a standard Realmie",
-  "weekly quiz cannot grant a standard Realmie",
-  "forced Realmie failure rolls back assessment attempt",
-  "backfill does not change XP",
-  "backfill does not award Gems",
-  "backfill does not alter Hall of Legends state",
-  "student cannot read another collection",
-  "parent cannot write Realmie state",
-]) {
-  assert(tests.includes(requiredTest), `Missing R2 test: ${requiredTest}`);
-}
-
-if (failures.length > 0) {
-  console.error("Realmies R2 audit failed:");
-  for (const failure of failures) console.error(`- ${failure}`);
+if (failed.length > 0) {
+  console.error(`\n${failed.length} Realmies R2 audit check(s) failed.`);
   process.exit(1);
 }
 
-console.log("Realmies R2 audit passed.");
-console.log("- 18 stable standard Legend keys");
-console.log("- server-only atomic post-test integration");
-console.log("- isolated ownership, receipts, favourites and six display slots");
-console.log("- RLS/direct-grant controls and canonical backfill coverage");
+console.log(`\nRealmies R2 correction audit passed (${checks.length} checks).`);
