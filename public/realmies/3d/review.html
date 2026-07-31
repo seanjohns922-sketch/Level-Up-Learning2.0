@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Number Nexus Realmies 3D Review</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #07162e;
+        color: #f8fbff;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+
+      header {
+        padding: 28px 32px 22px;
+        border-bottom: 1px solid #214573;
+        background: #091d3b;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: 28px;
+      }
+
+      p {
+        margin: 0;
+        color: #9fc3e8;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        padding: 24px;
+      }
+
+      article {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid #2c5c91;
+        border-radius: 8px;
+        background: #0b2347;
+      }
+
+      .model {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      h2 {
+        margin: 0;
+        padding: 14px 18px 4px;
+        font-size: 19px;
+      }
+
+      article p {
+        padding: 0 18px 16px;
+        font-size: 13px;
+      }
+
+      @media (max-width: 760px) {
+        main {
+          grid-template-columns: 1fr;
+          padding: 14px;
+        }
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "three/addons/": "/node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>Number Nexus Realmies</h1>
+      <p>Phase 2 digital 3D prototype review. Drag to rotate; scroll to zoom.</p>
+    </header>
+    <main id="models"></main>
+    <script type="module">
+      import * as THREE from "three";
+      import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      const models = [
+        ["number-nexus-bitling", "Bitling", "Repairs lost numbers travelling through Number Nexus."],
+        ["number-nexus-carrybot", "CarryBot", "Moves regrouped numbers between place-value towers."],
+        ["number-nexus-codekeeper", "Codekeeper", "Protects forgotten equations in the digital archives."],
+        ["number-nexus-neon-sentinel", "Neon Sentinel", "Watches the deepest gateway into Number Nexus."],
+      ];
+
+      const loader = new GLTFLoader();
+      const root = document.querySelector("#models");
+
+      for (const [key, name, description] of models) {
+        const article = document.createElement("article");
+        article.innerHTML = `
+          <div class="model" aria-label="${name} interactive 3D model"></div>
+          <h2>${name}</h2>
+          <p>${description}</p>
+        `;
+        root.append(article);
+
+        const host = article.querySelector(".model");
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xdcecff);
+
+        const camera = new THREE.PerspectiveCamera(32, 4 / 3, 0.1, 100);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.shadowMap.enabled = true;
+        host.append(renderer.domElement);
+
+        scene.add(new THREE.HemisphereLight(0xffffff, 0x406080, 2.2));
+        const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
+        keyLight.position.set(4, 7, 6);
+        keyLight.castShadow = true;
+        scene.add(keyLight);
+
+        const fill = new THREE.DirectionalLight(0x79d9ff, 1.4);
+        fill.position.set(-4, 3, 2);
+        scene.add(fill);
+
+        const gltf = await loader.loadAsync(`./${key}/${key}.glb`);
+        scene.add(gltf.scene);
+
+        const bounds = new THREE.Box3().setFromObject(gltf.scene);
+        const size = bounds.getSize(new THREE.Vector3());
+        const center = bounds.getCenter(new THREE.Vector3());
+        const largest = Math.max(size.x, size.y, size.z);
+        camera.position.set(center.x + largest * 1.15, center.y + largest * 0.2, center.z + largest * 1.65);
+        camera.lookAt(center);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.copy(center);
+        controls.enableDamping = true;
+        controls.minDistance = largest * 0.9;
+        controls.maxDistance = largest * 3;
+
+        const resize = () => {
+          const width = host.clientWidth;
+          const height = host.clientHeight;
+          renderer.setSize(width, height, false);
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+        };
+        new ResizeObserver(resize).observe(host);
+        resize();
+
+        const animate = () => {
+          controls.update();
+          renderer.render(scene, camera);
+          requestAnimationFrame(animate);
+        };
+        animate();
+      }
+    </script>
+  </body>
+</html>

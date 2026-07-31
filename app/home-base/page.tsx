@@ -8,6 +8,7 @@ import {
   Gem,
   Library,
   Lock,
+  Orbit,
   PawPrint,
   Pencil,
   Sparkles,
@@ -20,6 +21,7 @@ import HallOfLegendsWidget from "@/components/home/HallOfLegendsWidget";
 import GemIcon, { cutForGem } from "@/components/gems/GemIcon";
 import { awardAndReveal } from "@/lib/gem-reveal";
 import { fetchGemVault, type GemVault } from "@/lib/gems";
+import { fetchRealmieCollection, type RealmieCollection } from "@/lib/realmies";
 import {
   economyErrorMessage,
   equipEconomyItem,
@@ -42,6 +44,7 @@ export default function HomeBasePage() {
   const [roomPickerOpen, setRoomPickerOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [gemVault, setGemVault] = useState<GemVault | null>(null);
+  const [realmies, setRealmies] = useState<RealmieCollection | null>(null);
   const sessionError = student?.studentId ? null : "Log in as a student to visit My Home.";
 
   useEffect(() => {
@@ -60,6 +63,22 @@ export default function HomeBasePage() {
         setError(economyErrorMessage(nextError));
       });
 
+    return () => {
+      cancelled = true;
+    };
+  }, [student?.studentId]);
+
+  useEffect(() => {
+    const sid = student?.studentId;
+    if (!sid) return;
+    let cancelled = false;
+    void fetchRealmieCollection(sid)
+      .then((nextCollection) => {
+        if (!cancelled) setRealmies(nextCollection);
+      })
+      .catch((nextError) => {
+        console.warn("[HomeBase] My Realmies preview could not be loaded", nextError);
+      });
     return () => {
       cancelled = true;
     };
@@ -279,6 +298,24 @@ export default function HomeBasePage() {
                 </button>
               );
             })()}
+
+            <button
+              type="button"
+              onClick={() => router.push("/my-realmies")}
+              className="flex w-full items-center gap-3 rounded-md border border-cyan-200/20 bg-[linear-gradient(110deg,rgba(8,47,57,.78),rgba(24,20,58,.78))] p-3 text-left backdrop-blur-sm transition hover:border-cyan-200/45 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/60"
+            >
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md border border-cyan-200/20 bg-cyan-300/10 text-cyan-200">
+                <Orbit className="h-7 w-7" aria-hidden="true" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[10px] font-black uppercase tracking-[0.16em] text-cyan-200/80">My Realmies</span>
+                <span className="mt-1 block text-sm font-black">Meet your realm friends</span>
+                <span className="mt-0.5 block text-[11px] font-bold text-white/55">
+                  {realmies ? `${realmies.totals.collected} of 8 discovered` : "Open your collection"}
+                </span>
+              </span>
+              <ArrowRight className="h-5 w-5 shrink-0 text-cyan-100" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </section>

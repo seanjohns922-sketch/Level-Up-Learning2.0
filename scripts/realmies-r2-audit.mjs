@@ -14,6 +14,11 @@ const integration = read(
 const test = read("supabase/tests/realmies_r2.sql");
 const header = read("components/economy/EconomyHeader.tsx");
 const home = read("app/home-base/page.tsx");
+const collectionPage = read("app/my-realmies/page.tsx");
+const collectionService = read("lib/realmies.ts");
+const release = read(
+  "supabase/migrations/20260731120000_release_live_realmie_collection_assets.sql",
+);
 
 const expectedRealmies = [
   "number-nexus-bitling-standard",
@@ -144,12 +149,38 @@ check(
     correction.includes("posttest_grants_removed"),
 );
 check(
-  "premature My Realmies navigation is withdrawn",
-  !header.includes("My Realmies") && !home.includes("/my-realmies"),
+  "My Realmies navigation is released",
+  header.includes("My Realmies") &&
+    header.includes("/my-realmies") &&
+    home.includes("/my-realmies"),
 );
 check(
-  "premature My Realmies route is absent",
-  !fs.existsSync(path.join(root, "app/my-realmies/page.tsx")),
+  "collection route contains the two released realms",
+  collectionPage.includes("Number Nexus") &&
+    collectionPage.includes("Measurelands") &&
+    collectionPage.includes("Starpath Realmies") &&
+    collectionPage.includes("Coming Soon") &&
+    !collectionPage.includes("Fog Collection"),
+);
+check(
+  "collection uses canonical production RPCs and isolated demo preferences",
+  collectionService.includes("get_student_realmies_secure") &&
+    collectionService.includes("set_student_realmie_favourite_secure") &&
+    collectionService.includes("set_student_realmie_display_slot_secure") &&
+    collectionService.includes("isDemoPreviewMode"),
+);
+check(
+  "release migration exposes exactly eight finished digital assets",
+  release.includes("v_ready_count <> 8") &&
+    release.includes("realm_id in ('number', 'measurement')") &&
+    release.includes("'asset_status', 'ready'"),
+);
+check(
+  "release migration keeps Starpath coming soon and Fog hidden",
+  release.includes("realm_id = 'space'") &&
+    release.includes("'collection_status', 'coming_soon'") &&
+    release.includes("realm_id = 'global'") &&
+    release.includes("'student_visible', false"),
 );
 check(
   "SQL regression covers architecture correction",

@@ -1,0 +1,16 @@
+{
+  "key": "number-nexus-carrybot",
+  "format_version": 1,
+  "units": "design units; scale to specification height before fabrication",
+  "dimensions": {
+    "width": 3.91,
+    "height": 4.3,
+    "depth": 3.085
+  },
+  "files": [
+    "number-nexus-carrybot.glb",
+    "number-nexus-carrybot.stl"
+  ],
+  "status": "digital_prototype",
+  "manufacturing_status": "requires professional sculpt, wall-thickness, tolerance and safety review"
+}

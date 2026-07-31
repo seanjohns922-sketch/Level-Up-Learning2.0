@@ -1,0 +1,16 @@
+{
+  "key": "measurelands-ruleroot",
+  "format_version": 1,
+  "units": "design units; scale to specification height before fabrication",
+  "dimensions": {
+    "width": 3.8,
+    "height": 4.978,
+    "depth": 2.65
+  },
+  "files": [
+    "measurelands-ruleroot.glb",
+    "measurelands-ruleroot.stl"
+  ],
+  "status": "digital_prototype",
+  "manufacturing_status": "requires professional sculpt, wall-thickness, tolerance and safety review"
+}

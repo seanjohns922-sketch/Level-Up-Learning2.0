@@ -1,0 +1,16 @@
+{
+  "key": "number-nexus-neon-sentinel",
+  "format_version": 1,
+  "units": "design units; scale to specification height before fabrication",
+  "dimensions": {
+    "width": 4.825,
+    "height": 5.41,
+    "depth": 3.592
+  },
+  "files": [
+    "number-nexus-neon-sentinel.glb",
+    "number-nexus-neon-sentinel.stl"
+  ],
+  "status": "digital_prototype",
+  "manufacturing_status": "requires professional sculpt, wall-thickness, tolerance and safety review"
+}

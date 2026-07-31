@@ -117,8 +117,13 @@ Parent summaries expose the same read-only fields for an actively linked child.
 
 ## UI release boundary
 
-The earlier Legend-based My Realmies interface is withdrawn. The polished
-collection UI must not return until the 15 production renders are approved.
-When released, it will provide realm shelves, locked silhouettes, detail views,
-favourites, six display slots and discovery celebrations without changing this
-server architecture.
+The earlier Legend-based My Realmies interface remains retired. The corrected
+supporting-creature collection is released for the eight completed Number Nexus
+and Measurelands digital assets. It provides realm shelves, locked silhouettes,
+detail views, favourites, six display slots and discovery celebrations without
+changing this server architecture.
+
+Starpath remains visible only as a generic, non-interactive Coming Soon section
+until its realm and Realmies are released to students. Fog Realmies remain hidden.
+Demo Mode unlocks the eight released digital Realmies but does not reveal
+unreleased Starpath or Fog characters.

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Realmie Render</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: transparent;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "three/addons/": "/node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from "three";
+      import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+      const params = new URLSearchParams(location.search);
+      const model = params.get("model") || "number-nexus-bitling";
+      const view = params.get("view") || "three-quarter";
+      const treatment = params.get("treatment") || "colour";
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+      const renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: true,
+        preserveDrawingBuffer: true,
+      });
+      renderer.setSize(innerWidth, innerHeight, false);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.setClearColor(0x000000, 0);
+      document.body.append(renderer.domElement);
+
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x5a6d82, 2.4));
+      const key = new THREE.DirectionalLight(0xffffff, 3.3);
+      key.position.set(4, 7, 6);
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0x7fe4ff, 1.25);
+      fill.position.set(-4, 3, 4);
+      scene.add(fill);
+
+      const gltf = await new GLTFLoader().loadAsync(`./${model}/${model}.glb`);
+      scene.add(gltf.scene);
+
+      if (treatment === "grey") {
+        const grey = new THREE.MeshStandardMaterial({
+          color: 0xaab3bd,
+          roughness: 0.55,
+          metalness: 0,
+        });
+        gltf.scene.traverse((node) => {
+          if (node.isMesh) node.material = grey;
+        });
+      } else if (treatment === "silhouette") {
+        const black = new THREE.MeshBasicMaterial({ color: 0x111827 });
+        gltf.scene.traverse((node) => {
+          if (node.isMesh) node.material = black;
+        });
+      }
+
+      const bounds = new THREE.Box3().setFromObject(gltf.scene);
+      const size = bounds.getSize(new THREE.Vector3());
+      const center = bounds.getCenter(new THREE.Vector3());
+      const largest = Math.max(size.x, size.y, size.z);
+      const distance = largest * 2.25;
+      const positions = {
+        front: [center.x, center.y + largest * 0.04, center.z + distance],
+        "three-quarter": [
+          center.x + distance * 0.72,
+          center.y + largest * 0.08,
+          center.z + distance,
+        ],
+        left: [center.x - distance, center.y + largest * 0.04, center.z],
+        right: [center.x + distance, center.y + largest * 0.04, center.z],
+        back: [center.x, center.y + largest * 0.04, center.z - distance],
+      };
+      camera.position.set(...(positions[view] || positions["three-quarter"]));
+      camera.lookAt(center);
+      renderer.render(scene, camera);
+      document.documentElement.dataset.ready = "true";
+    </script>
+  </body>
+</html>

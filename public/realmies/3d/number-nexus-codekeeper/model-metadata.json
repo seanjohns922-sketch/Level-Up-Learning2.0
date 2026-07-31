@@ -1,0 +1,16 @@
+{
+  "key": "number-nexus-codekeeper",
+  "format_version": 1,
+  "units": "design units; scale to specification height before fabrication",
+  "dimensions": {
+    "width": 3.81,
+    "height": 4.89,
+    "depth": 3.007
+  },
+  "files": [
+    "number-nexus-codekeeper.glb",
+    "number-nexus-codekeeper.stl"
+  ],
+  "status": "digital_prototype",
+  "manufacturing_status": "requires professional sculpt, wall-thickness, tolerance and safety review"
+}

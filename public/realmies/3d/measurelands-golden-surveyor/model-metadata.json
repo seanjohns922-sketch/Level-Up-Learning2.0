@@ -1,0 +1,16 @@
+{
+  "key": "measurelands-golden-surveyor",
+  "format_version": 1,
+  "units": "design units; scale to specification height before fabrication",
+  "dimensions": {
+    "width": 4.35,
+    "height": 4.925,
+    "depth": 3.734
+  },
+  "files": [
+    "measurelands-golden-surveyor.glb",
+    "measurelands-golden-surveyor.stl"
+  ],
+  "status": "digital_prototype",
+  "manufacturing_status": "requires professional sculpt, wall-thickness, tolerance and safety review"
+}

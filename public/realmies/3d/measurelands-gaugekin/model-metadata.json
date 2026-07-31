@@ -1,0 +1,16 @@
+{
+  "key": "measurelands-gaugekin",
+  "format_version": 1,
+  "units": "design units; scale to specification height before fabrication",
+  "dimensions": {
+    "width": 3.4,
+    "height": 3.97,
+    "depth": 2.65
+  },
+  "files": [
+    "measurelands-gaugekin.glb",
+    "measurelands-gaugekin.stl"
+  ],
+  "status": "digital_prototype",
+  "manufacturing_status": "requires professional sculpt, wall-thickness, tolerance and safety review"
+}

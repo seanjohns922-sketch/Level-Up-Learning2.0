@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "phase": "R3A",
+  "status_note": "Number Nexus Phase 2 and Measurelands Phase 3 digital prototype packages are complete and pending owner approval. The remaining seven Realmies are paused. No entry is manufacturing-ready.",
+  "family_decisions": {
+    "visible_universal_signature": "none",
+    "design_language": "locked",
+    "mouth_treatment": "simple_friendly_smile_locked",
+    "eye_construction": "inset_oval_single_upper_left_highlight_locked",
+    "feet": "broad_stable_plus_7_percent_locked",
+    "finish": "opaque_satin_plastic_locked",
+    "evolution": "never",
+    "hidden_details": "optional_shallow_relief_locked",
+    "realm_specific_bases": "concept_approved_engineering_pending",
+    "connector_geometry": "not_approved"
+  },
+  "concept_sheets": [
+    {
+      "stable_key": "number-nexus-family-mouths",
+      "scope": [
+        "number-nexus-bitling-standard",
+        "number-nexus-carrybot-standard",
+        "number-nexus-codekeeper-standard",
+        "number-nexus-neon-sentinel-standard"
+      ],
+      "face_variant": "expressive_eyes_with_simple_smile",
+      "asset": "/realmies/concepts/number-nexus-family-mouths.png",
+      "generator": "OpenAI image generation",
+      "status": "pending_owner_review",
+      "production_asset": false
+    },
+    {
+      "stable_key": "number-nexus-family-eyes-only",
+      "scope": [
+        "number-nexus-bitling-standard",
+        "number-nexus-carrybot-standard",
+        "number-nexus-codekeeper-standard",
+        "number-nexus-neon-sentinel-standard"
+      ],
+      "face_variant": "expressive_eyes_no_mouth",
+      "asset": "/realmies/concepts/number-nexus-family-eyes-only.png",
+      "generator": "OpenAI image generation",
+      "status": "pending_owner_review",
+      "production_asset": false
+    },
+    {
+      "stable_key": "number-nexus-family-refined-mouths",
+      "scope": [
+        "number-nexus-bitling-standard",
+        "number-nexus-carrybot-standard",
+        "number-nexus-codekeeper-standard",
+        "number-nexus-neon-sentinel-standard"
+      ],
+      "face_variant": "expressive_eyes_with_simple_smile",
+      "asset": "/realmies/concepts/number-nexus-family-refined-mouths.png",
+      "generator": "OpenAI image generation",
+      "review_role": "preferred_refinement_candidate",
+      "status": "pending_owner_review",
+      "production_asset": false
+    },
+    {
+      "stable_key": "number-nexus-family-style-lock",
+      "scope": [
+        "number-nexus-bitling-standard",
+        "number-nexus-carrybot-standard",
+        "number-nexus-codekeeper-standard",
+        "number-nexus-neon-sentinel-standard"
+      ],
+      "face_variant": "expressive_eyes_with_simple_smile",
+      "asset": "/realmies/concepts/number-nexus-family-style-lock.png",
+      "generator": "OpenAI image generation",
+      "review_role": "official_family_style_reference",
+      "status": "style_reference_approved",
+      "production_asset": false
+    },
+    {
+      "stable_key": "measurelands-family-concept",
+      "scope": [
+        "measurelands-gaugekin-standard",
+        "measurelands-ruleroot-standard",
+        "measurelands-compass-keeper-standard",
+        "measurelands-golden-surveyor-standard"
+      ],
+      "face_variant": "locked_realmies_family_face",
+      "asset": "/realmies/concepts/measurelands-family-concept.png",
+      "generator": "OpenAI image generation",
+      "review_role": "phase_3_family_source",
+      "status": "pending_owner_review",
+      "production_asset": false
+    }
+  ],
+  "collection_experience_concepts": [
+    {
+      "stable_key": "number-nexus-collection-detail-concept",
+      "asset": "/realmies/concepts/number-nexus-collection-detail-concept.png",
+      "purpose": "child_desirability_and_discovery_name_reveal_review",
+      "status": "pending_owner_review",
+      "production_asset": false
+    }
+  ],
+  "realmies": [
+    {"stable_key":"number-nexus-bitling-standard","concept_status":"digital_3d_prototype_complete","design_status":"phase_2_package_complete","turnaround_sheet_asset":"/realmies/turnarounds/number-nexus-bitling-turnaround-concept.png","hero_transparent_asset":"/realmies/number-nexus-bitling-standard/hero-transparent.png","front_asset":"/realmies/number-nexus-bitling-standard/front.png","three_quarter_asset":"/realmies/number-nexus-bitling-standard/three-quarter.png","left_asset":"/realmies/number-nexus-bitling-standard/left.png","right_asset":"/realmies/number-nexus-bitling-standard/right.png","back_asset":"/realmies/number-nexus-bitling-standard/back.png","silhouette_asset":"/realmies/number-nexus-bitling-standard/silhouette.png","grey_prototype_asset":"/realmies/number-nexus-bitling-standard/prototype-grey.png","colour_zone_asset":"/realmies/number-nexus-bitling-standard/colour-zones.png","digital_3d_glb_asset":"/realmies/3d/number-nexus-bitling/number-nexus-bitling.glb","digital_3d_stl_asset":"/realmies/3d/number-nexus-bitling/number-nexus-bitling.stl","digital_3d_metadata_asset":"/realmies/3d/number-nexus-bitling/model-metadata.json","specification_asset":"/realmies/number-nexus-bitling-standard/specification.md","manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"number-nexus-carrybot-standard","concept_status":"digital_3d_prototype_complete","design_status":"phase_2_package_complete","turnaround_sheet_asset":"/realmies/turnarounds/number-nexus-carrybot-turnaround-concept.png","hero_transparent_asset":"/realmies/number-nexus-carrybot-standard/hero-transparent.png","front_asset":"/realmies/number-nexus-carrybot-standard/front.png","three_quarter_asset":"/realmies/number-nexus-carrybot-standard/three-quarter.png","left_asset":"/realmies/number-nexus-carrybot-standard/left.png","right_asset":"/realmies/number-nexus-carrybot-standard/right.png","back_asset":"/realmies/number-nexus-carrybot-standard/back.png","silhouette_asset":"/realmies/number-nexus-carrybot-standard/silhouette.png","grey_prototype_asset":"/realmies/number-nexus-carrybot-standard/prototype-grey.png","colour_zone_asset":"/realmies/number-nexus-carrybot-standard/colour-zones.png","digital_3d_glb_asset":"/realmies/3d/number-nexus-carrybot/number-nexus-carrybot.glb","digital_3d_stl_asset":"/realmies/3d/number-nexus-carrybot/number-nexus-carrybot.stl","digital_3d_metadata_asset":"/realmies/3d/number-nexus-carrybot/model-metadata.json","specification_asset":"/realmies/number-nexus-carrybot-standard/specification.md","manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"number-nexus-codekeeper-standard","concept_status":"digital_3d_prototype_complete","design_status":"phase_2_package_complete","turnaround_sheet_asset":"/realmies/turnarounds/number-nexus-codekeeper-turnaround-concept.png","hero_transparent_asset":"/realmies/number-nexus-codekeeper-standard/hero-transparent.png","front_asset":"/realmies/number-nexus-codekeeper-standard/front.png","three_quarter_asset":"/realmies/number-nexus-codekeeper-standard/three-quarter.png","left_asset":"/realmies/number-nexus-codekeeper-standard/left.png","right_asset":"/realmies/number-nexus-codekeeper-standard/right.png","back_asset":"/realmies/number-nexus-codekeeper-standard/back.png","silhouette_asset":"/realmies/number-nexus-codekeeper-standard/silhouette.png","grey_prototype_asset":"/realmies/number-nexus-codekeeper-standard/prototype-grey.png","colour_zone_asset":"/realmies/number-nexus-codekeeper-standard/colour-zones.png","digital_3d_glb_asset":"/realmies/3d/number-nexus-codekeeper/number-nexus-codekeeper.glb","digital_3d_stl_asset":"/realmies/3d/number-nexus-codekeeper/number-nexus-codekeeper.stl","digital_3d_metadata_asset":"/realmies/3d/number-nexus-codekeeper/model-metadata.json","specification_asset":"/realmies/number-nexus-codekeeper-standard/specification.md","manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"number-nexus-neon-sentinel-standard","concept_status":"digital_3d_prototype_complete","design_status":"phase_2_package_complete","turnaround_sheet_asset":"/realmies/turnarounds/number-nexus-neon-sentinel-turnaround-concept.png","hero_transparent_asset":"/realmies/number-nexus-neon-sentinel-standard/hero-transparent.png","front_asset":"/realmies/number-nexus-neon-sentinel-standard/front.png","three_quarter_asset":"/realmies/number-nexus-neon-sentinel-standard/three-quarter.png","left_asset":"/realmies/number-nexus-neon-sentinel-standard/left.png","right_asset":"/realmies/number-nexus-neon-sentinel-standard/right.png","back_asset":"/realmies/number-nexus-neon-sentinel-standard/back.png","silhouette_asset":"/realmies/number-nexus-neon-sentinel-standard/silhouette.png","grey_prototype_asset":"/realmies/number-nexus-neon-sentinel-standard/prototype-grey.png","colour_zone_asset":"/realmies/number-nexus-neon-sentinel-standard/colour-zones.png","digital_3d_glb_asset":"/realmies/3d/number-nexus-neon-sentinel/number-nexus-neon-sentinel.glb","digital_3d_stl_asset":"/realmies/3d/number-nexus-neon-sentinel/number-nexus-neon-sentinel.stl","digital_3d_metadata_asset":"/realmies/3d/number-nexus-neon-sentinel/model-metadata.json","specification_asset":"/realmies/number-nexus-neon-sentinel-standard/specification.md","manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"measurelands-gaugekin-standard","concept_status":"digital_3d_prototype_complete","design_status":"phase_3_package_complete","turnaround_sheet_asset":"/realmies/concepts/measurelands-family-concept.png","hero_transparent_asset":"/realmies/measurelands-gaugekin-standard/hero-transparent.png","front_asset":"/realmies/measurelands-gaugekin-standard/front.png","three_quarter_asset":"/realmies/measurelands-gaugekin-standard/three-quarter.png","left_asset":"/realmies/measurelands-gaugekin-standard/left.png","right_asset":"/realmies/measurelands-gaugekin-standard/right.png","back_asset":"/realmies/measurelands-gaugekin-standard/back.png","silhouette_asset":"/realmies/measurelands-gaugekin-standard/silhouette.png","grey_prototype_asset":"/realmies/measurelands-gaugekin-standard/prototype-grey.png","colour_zone_asset":"/realmies/measurelands-gaugekin-standard/colour-zones.png","digital_3d_glb_asset":"/realmies/3d/measurelands-gaugekin/measurelands-gaugekin.glb","digital_3d_stl_asset":"/realmies/3d/measurelands-gaugekin/measurelands-gaugekin.stl","digital_3d_metadata_asset":"/realmies/3d/measurelands-gaugekin/model-metadata.json","specification_asset":"/realmies/measurelands-gaugekin-standard/specification.md","manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"measurelands-ruleroot-standard","concept_status":"digital_3d_prototype_complete","design_status":"phase_3_package_complete","turnaround_sheet_asset":"/realmies/concepts/measurelands-family-concept.png","hero_transparent_asset":"/realmies/measurelands-ruleroot-standard/hero-transparent.png","front_asset":"/realmies/measurelands-ruleroot-standard/front.png","three_quarter_asset":"/realmies/measurelands-ruleroot-standard/three-quarter.png","left_asset":"/realmies/measurelands-ruleroot-standard/left.png","right_asset":"/realmies/measurelands-ruleroot-standard/right.png","back_asset":"/realmies/measurelands-ruleroot-standard/back.png","silhouette_asset":"/realmies/measurelands-ruleroot-standard/silhouette.png","grey_prototype_asset":"/realmies/measurelands-ruleroot-standard/prototype-grey.png","colour_zone_asset":"/realmies/measurelands-ruleroot-standard/colour-zones.png","digital_3d_glb_asset":"/realmies/3d/measurelands-ruleroot/measurelands-ruleroot.glb","digital_3d_stl_asset":"/realmies/3d/measurelands-ruleroot/measurelands-ruleroot.stl","digital_3d_metadata_asset":"/realmies/3d/measurelands-ruleroot/model-metadata.json","specification_asset":"/realmies/measurelands-ruleroot-standard/specification.md","manufacturing_risk":"moderate","approval_status":"pending"},
+    {"stable_key":"measurelands-compass-keeper-standard","concept_status":"digital_3d_prototype_complete","design_status":"phase_3_package_complete","turnaround_sheet_asset":"/realmies/concepts/measurelands-family-concept.png","hero_transparent_asset":"/realmies/measurelands-compass-keeper-standard/hero-transparent.png","front_asset":"/realmies/measurelands-compass-keeper-standard/front.png","three_quarter_asset":"/realmies/measurelands-compass-keeper-standard/three-quarter.png","left_asset":"/realmies/measurelands-compass-keeper-standard/left.png","right_asset":"/realmies/measurelands-compass-keeper-standard/right.png","back_asset":"/realmies/measurelands-compass-keeper-standard/back.png","silhouette_asset":"/realmies/measurelands-compass-keeper-standard/silhouette.png","grey_prototype_asset":"/realmies/measurelands-compass-keeper-standard/prototype-grey.png","colour_zone_asset":"/realmies/measurelands-compass-keeper-standard/colour-zones.png","digital_3d_glb_asset":"/realmies/3d/measurelands-compass-keeper/measurelands-compass-keeper.glb","digital_3d_stl_asset":"/realmies/3d/measurelands-compass-keeper/measurelands-compass-keeper.stl","digital_3d_metadata_asset":"/realmies/3d/measurelands-compass-keeper/model-metadata.json","specification_asset":"/realmies/measurelands-compass-keeper-standard/specification.md","manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"measurelands-golden-surveyor-standard","concept_status":"digital_3d_prototype_complete","design_status":"phase_3_package_complete","turnaround_sheet_asset":"/realmies/concepts/measurelands-family-concept.png","hero_transparent_asset":"/realmies/measurelands-golden-surveyor-standard/hero-transparent.png","front_asset":"/realmies/measurelands-golden-surveyor-standard/front.png","three_quarter_asset":"/realmies/measurelands-golden-surveyor-standard/three-quarter.png","left_asset":"/realmies/measurelands-golden-surveyor-standard/left.png","right_asset":"/realmies/measurelands-golden-surveyor-standard/right.png","back_asset":"/realmies/measurelands-golden-surveyor-standard/back.png","silhouette_asset":"/realmies/measurelands-golden-surveyor-standard/silhouette.png","grey_prototype_asset":"/realmies/measurelands-golden-surveyor-standard/prototype-grey.png","colour_zone_asset":"/realmies/measurelands-golden-surveyor-standard/colour-zones.png","digital_3d_glb_asset":"/realmies/3d/measurelands-golden-surveyor/measurelands-golden-surveyor.glb","digital_3d_stl_asset":"/realmies/3d/measurelands-golden-surveyor/measurelands-golden-surveyor.stl","digital_3d_metadata_asset":"/realmies/3d/measurelands-golden-surveyor/model-metadata.json","specification_asset":"/realmies/measurelands-golden-surveyor-standard/specification.md","manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"starpath-orbitling-standard","concept_status":"awaiting_first_batch_review","design_status":"constraints_defined","front_asset":null,"three_quarter_asset":null,"side_asset":null,"back_asset":null,"silhouette_asset":null,"grey_prototype_asset":null,"colour_zone_asset":null,"manufacturing_risk":"moderate","approval_status":"pending"},
+    {"stable_key":"starpath-prism-scout-standard","concept_status":"awaiting_first_batch_review","design_status":"constraints_defined","front_asset":null,"three_quarter_asset":null,"side_asset":null,"back_asset":null,"silhouette_asset":null,"grey_prototype_asset":null,"colour_zone_asset":null,"manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"starpath-constellation-keeper-standard","concept_status":"awaiting_first_batch_review","design_status":"constraints_defined","front_asset":null,"three_quarter_asset":null,"side_asset":null,"back_asset":null,"silhouette_asset":null,"grey_prototype_asset":null,"colour_zone_asset":null,"manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"starpath-aurora-guardian-standard","concept_status":"awaiting_first_batch_review","design_status":"constraints_defined","front_asset":null,"three_quarter_asset":null,"side_asset":null,"back_asset":null,"silhouette_asset":null,"grey_prototype_asset":null,"colour_zone_asset":null,"manufacturing_risk":"moderate","approval_status":"pending"},
+    {"stable_key":"global-fogling-standard","concept_status":"awaiting_first_batch_review","design_status":"constraints_defined","front_asset":null,"three_quarter_asset":null,"side_asset":null,"back_asset":null,"silhouette_asset":null,"grey_prototype_asset":null,"colour_zone_asset":null,"manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"global-mist-mischief-standard","concept_status":"awaiting_first_batch_review","design_status":"constraints_defined","front_asset":null,"three_quarter_asset":null,"side_asset":null,"back_asset":null,"silhouette_asset":null,"grey_prototype_asset":null,"colour_zone_asset":null,"manufacturing_risk":"low","approval_status":"pending"},
+    {"stable_key":"global-shadow-of-forgetfulness-standard","concept_status":"awaiting_first_batch_review","design_status":"constraints_defined","front_asset":null,"three_quarter_asset":null,"side_asset":null,"back_asset":null,"silhouette_asset":null,"grey_prototype_asset":null,"colour_zone_asset":null,"manufacturing_risk":"moderate","approval_status":"pending"}
+  ]
+}

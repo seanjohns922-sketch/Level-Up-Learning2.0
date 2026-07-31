@@ -1,0 +1,16 @@
+{
+  "key": "measurelands-compass-keeper",
+  "format_version": 1,
+  "units": "design units; scale to specification height before fabrication",
+  "dimensions": {
+    "width": 4,
+    "height": 4.754,
+    "depth": 2.65
+  },
+  "files": [
+    "measurelands-compass-keeper.glb",
+    "measurelands-compass-keeper.stl"
+  ],
+  "status": "digital_prototype",
+  "manufacturing_status": "requires professional sculpt, wall-thickness, tolerance and safety review"
+}

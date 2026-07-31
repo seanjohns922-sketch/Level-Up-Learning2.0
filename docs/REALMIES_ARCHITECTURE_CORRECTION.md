@@ -44,6 +44,7 @@ Only the Realmie post-test side effect is removed.
 
 ## UI correction
 
-The premature Legend-based My Realmies route, navigation item and My Home call
-to action are removed. A new UI will be built only after the supporting-creature
-art pack is available.
+The premature Legend-based My Realmies implementation remains removed. The
+corrected route, navigation and My Home call to action now use the finished
+supporting-creature assets for Number Nexus and Measurelands. Starpath is shown
+only as Coming Soon and Fog remains hidden.
