@@ -669,17 +669,10 @@ export default function LoginPage() {
     <main className="min-h-screen relative overflow-hidden flex">
       {/* ── Full-screen background ── */}
       <div className="absolute inset-0 bg-[#17130f]">
-        {/* Fill any letterbox space without cropping the visible artwork. */}
         <img
           src="/images/Gemini_Generated_Image_1fyweu1fyweu1fyw.png"
           alt=""
-          aria-hidden="true"
-          className="hidden h-full w-full scale-110 object-cover blur-2xl md:block"
-        />
-        <img
-          src="/images/Gemini_Generated_Image_1fyweu1fyweu1fyw.png"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover object-center md:object-contain"
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
         {/* Vignette */}
         <div
