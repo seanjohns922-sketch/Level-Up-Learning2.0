@@ -56,8 +56,12 @@ export function StarpathShapeFeatureCard({
 
       <div
         className={[
-          "mx-auto grid max-w-lg gap-3",
-          iconOptions ? "grid-cols-2 sm:grid-cols-3" : task.options.length <= 2 ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-3",
+          "mx-auto grid gap-3",
+          iconOptions
+            ? "max-w-lg grid-cols-2 sm:grid-cols-3"
+            : task.options.length <= 2
+              ? "max-w-xl grid-cols-2"
+              : "max-w-3xl grid-cols-1 sm:grid-cols-3",
         ].join(" ")}
       >
         {task.options.map((option) => (
@@ -67,14 +71,19 @@ export function StarpathShapeFeatureCard({
             onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
             className={[
               "relative flex items-center justify-center rounded-2xl border-2 border-violet-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]",
-              option.shapeId ? "min-h-28 p-3" : "min-h-16 px-4",
+              option.shapeId ? "min-h-28 p-3" : "min-h-24 px-4 py-3",
             ].join(" ")}
           >
-            <OptionReadAloudButton text={option.label} className="absolute right-2 top-2" />
             {option.shapeId ? (
-              <L2Shape id={option.shapeId} className="block h-20 w-20" />
+              <>
+                <OptionReadAloudButton text={option.label} className="absolute right-2 top-2" />
+                <L2Shape id={option.shapeId} className="block h-20 w-20" />
+              </>
             ) : (
-              <span className="text-lg font-black text-indigo-950">{option.label}</span>
+              <span className="flex flex-col items-center gap-2">
+                <span className="text-lg font-black leading-snug text-indigo-950 sm:text-xl">{option.label}</span>
+                <OptionReadAloudButton text={option.label} />
+              </span>
             )}
           </button>
         ))}
