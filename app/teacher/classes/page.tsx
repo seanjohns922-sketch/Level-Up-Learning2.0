@@ -271,6 +271,57 @@ export default function TeacherClassesPage() {
     if (pin && !/^\d{4}$/.test(pin)) throw new Error("Access code must be 4 digits");
     if (pin && reservedPins.has(pin)) throw new Error("Access code is already used in this class");
 
+    const targetClass = classes.find((classRow) => classRow.id === classId);
+    if (targetClass?.school_id) {
+      const response = await fetch(`/api/school/${targetClass.school_id}/command`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "createStudents",
+          students: [
+            {
+              firstName,
+              lastName,
+              schoolYear,
+              username,
+              pin: pin || null,
+              classId,
+              idempotencyKey: crypto.randomUUID(),
+            },
+          ],
+        }),
+      });
+      const payload = (await response.json()) as {
+        created?: Array<{
+          studentId?: string;
+          name?: string;
+          username?: string;
+          pin?: string;
+        }>;
+        errors?: Array<{ message: string }>;
+        error?: string;
+      };
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Student could not be added");
+      }
+      if (payload.errors?.length) {
+        throw new Error(payload.errors.map((entry) => entry.message).join("; "));
+      }
+      const createdStudent = payload.created?.[0];
+      if (!createdStudent?.studentId) {
+        throw new Error("Student creation did not return a student record");
+      }
+      const createdPin = createdStudent.pin ?? pin;
+      if (createdPin) reservedPins.add(createdPin);
+      return {
+        classId,
+        name: createdStudent.name ?? name,
+        username: createdStudent.username ?? username,
+        pin: createdPin,
+        claimCode: "",
+      };
+    }
+
     const { data, error } = await supabase.rpc("create_student_for_class", {
       class_uuid: classId,
       display_name_input: name,
@@ -614,6 +665,10 @@ export default function TeacherClassesPage() {
       void openSchoolDirectory(targetClass);
       return;
     }
+    openNewStudent(classId);
+  }
+
+  function openNewStudent(classId: string) {
     setOpenClassId(classId);
     setRosterImportClassId(null);
     window.setTimeout(() => {
@@ -875,6 +930,11 @@ export default function TeacherClassesPage() {
                         {!isClassArchived ? (
                           <button type="button" onClick={() => openAddStudent(cls.id)} className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700">
                             <UserPlus size={14} /> {cls.school_id ? "Add existing students" : "Add student"}
+                          </button>
+                        ) : null}
+                        {!isClassArchived && cls.school_id ? (
+                          <button type="button" onClick={() => openNewStudent(cls.id)} className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100">
+                            <UserPlus size={14} /> Add new student
                           </button>
                         ) : null}
                         {!isClassArchived && !cls.school_id ? (
