@@ -102,7 +102,7 @@ export function giveMapTask(round: number, target: number): PracticeTask {
 function teaching(heading: string, prompt: string, speakText: string) {
   let target = 0;
   return () =>
-    ({ kind: "starpathShapeIntro", scene: "intro", variant: "maps", heading, prompt, speakText, target: ++target }) satisfies PracticeTask;
+    ({ kind: "starpathShapeIntro", scene: "intro", variant: "mapRoute", heading, prompt, speakText, target: ++target }) satisfies PracticeTask;
 }
 
 function set(gens: Array<(round: number, target: number) => PracticeTask>, teach: () => PracticeTask): RealmLessonTaskSet {

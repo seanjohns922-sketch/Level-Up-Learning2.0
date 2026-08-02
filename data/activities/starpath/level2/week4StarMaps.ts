@@ -126,7 +126,7 @@ function teaching(heading: string, prompt: string, speakText: string) {
     ({
       kind: "starpathShapeIntro",
       scene: "intro",
-      variant: "maps",
+      variant: "mapLocate",
       heading,
       prompt,
       speakText,

@@ -20,13 +20,18 @@ const FOUR_SIDED: L2ShapeId[] = ["square", "rectangle", "trapezoid"];
 const HAS_PARALLEL: L2ShapeId[] = ["square", "rectangle", "hexagon", "trapezoid"];
 const NO_PARALLEL: L2ShapeId[] = ["triangle", "pentagon"];
 
-function teaching(heading: string, prompt: string, speakText: string) {
+function teaching(
+  variant: "featureEdges" | "featureSides" | "featureParallel" | "featureCompare",
+  heading: string,
+  prompt: string,
+  speakText: string
+) {
   let target = 0;
   return () =>
     ({
       kind: "starpathShapeIntro",
       scene: "intro",
-      variant: "levelOneShapes",
+      variant,
       heading,
       prompt,
       speakText,
@@ -237,32 +242,32 @@ function set(start: number, gens: Array<(round: number, target: number) => Pract
 }
 
 export const createStraightOrCurvedTaskSet = (): RealmLessonTaskSet =>
-  set(0, [edgeTask, edgeTask, edgeTask], teaching("Straight or Curved?", "Sides can be straight or curved.", "Some shapes have straight sides. Some have curved edges that go round and round. Decide which each shape has."));
+  set(0, [edgeTask, edgeTask, edgeTask], teaching("featureEdges", "Straight or Curved?", "Sides can be straight or curved.", "Some shapes have straight sides. Some have curved edges that go round and round. Decide which each shape has."));
 export const createSortByEdgeTaskSet = (): RealmLessonTaskSet =>
-  set(0, [(r, t) => whichEdgeTask(r, t, "curved"), (r, t) => whichEdgeTask(r, t, "straight"), (r, t) => whichEdgeTask(r, t, "curved")], teaching("Sort by Edge", "Find shapes by their edges.", "Find the shapes with curved edges and the shapes with straight sides."));
+  set(0, [(r, t) => whichEdgeTask(r, t, "curved"), (r, t) => whichEdgeTask(r, t, "straight"), (r, t) => whichEdgeTask(r, t, "curved")], teaching("featureEdges", "Sort by Edge", "Find shapes by their edges.", "Find the shapes with curved edges and the shapes with straight sides."));
 export const createEdgeChallengeTaskSet = (): RealmLessonTaskSet =>
-  set(0, [edgeTask, (r, t) => whichEdgeTask(r, t, "straight"), edgeTask], teaching("Edge Challenge", "Straight and curved, mixed.", "Show what you know about straight sides and curved edges."));
+  set(0, [edgeTask, (r, t) => whichEdgeTask(r, t, "straight"), edgeTask], teaching("featureEdges", "Edge Challenge", "Straight and curved, mixed.", "Show what you know about straight sides and curved edges."));
 
 export const createCountTheSidesTaskSet = (): RealmLessonTaskSet =>
-  set(0, [sidesCountTask, sidesCountTask, sidesCountTask], teaching("Count the Sides", "Count how many sides a shape has.", "Count each straight side once. Every shape has its own number of sides."));
+  set(0, [sidesCountTask, sidesCountTask, sidesCountTask], teaching("featureSides", "Count the Sides", "Count how many sides a shape has.", "Count each straight side once. Every shape has its own number of sides."));
 export const createSidesSortTaskSet = (): RealmLessonTaskSet =>
-  set(0, [whichSidesTask, whichSidesTask, whichSidesTask], teaching("Sides Sort", "Find shapes by their number of sides.", "Find the shape with the number of sides asked for."));
+  set(0, [whichSidesTask, whichSidesTask, whichSidesTask], teaching("featureSides", "Sides Sort", "Find shapes by their number of sides.", "Find the shape with the number of sides asked for."));
 export const createSidesChallengeTaskSet = (): RealmLessonTaskSet =>
-  set(0, [sidesCountTask, whichSidesTask, sidesCountTask], teaching("Sides Challenge", "Number of sides, mixed.", "Show what you know about counting the sides of shapes."));
+  set(0, [sidesCountTask, whichSidesTask, sidesCountTask], teaching("featureSides", "Sides Challenge", "Number of sides, mixed.", "Show what you know about counting the sides of shapes."));
 
 export const createOppositeSidesTaskSet = (): RealmLessonTaskSet =>
-  set(0, [parallelYesNoTask, parallelYesNoTask, parallelYesNoTask], teaching("Opposite Sides", "Some shapes have parallel sides.", "Parallel sides run alongside each other like train tracks and never meet. Decide if each shape has any."));
+  set(0, [parallelYesNoTask, parallelYesNoTask, parallelYesNoTask], teaching("featureParallel", "Opposite Sides", "Some shapes have parallel sides.", "Parallel sides run alongside each other like train tracks and never meet. Decide if each shape has any."));
 export const createParallelTracksTaskSet = (): RealmLessonTaskSet =>
-  set(0, [whichParallelTask, whichParallelTask, whichParallelTask], teaching("Parallel Tracks", "Find shapes with parallel sides.", "Find the shape that has parallel sides."));
+  set(0, [whichParallelTask, whichParallelTask, whichParallelTask], teaching("featureParallel", "Parallel Tracks", "Find shapes with parallel sides.", "Find the shape that has parallel sides."));
 export const createParallelChallengeTaskSet = (): RealmLessonTaskSet =>
-  set(0, [parallelYesNoTask, whichParallelTask, parallelYesNoTask], teaching("Parallel Challenge", "Parallel sides, mixed.", "Show what you know about parallel sides."));
+  set(0, [parallelYesNoTask, whichParallelTask, parallelYesNoTask], teaching("featureParallel", "Parallel Challenge", "Parallel sides, mixed.", "Show what you know about parallel sides."));
 
 export const createSameFeatureTaskSet = (): RealmLessonTaskSet =>
-  set(0, [(r, t) => compareTask(r, t, "same"), (r, t) => compareTask(r, t, "same"), (r, t) => compareTask(r, t, "diff")], teaching("Same or Different", "Compare two shapes.", "Look at two shapes. Work out what is the same and what is different about them."));
+  set(0, [(r, t) => compareTask(r, t, "same"), (r, t) => compareTask(r, t, "same"), (r, t) => compareTask(r, t, "diff")], teaching("featureCompare", "Same or Different", "Compare two shapes.", "Look at two shapes. Work out what is the same and what is different about them."));
 export const createWhatIsDifferentTaskSet = (): RealmLessonTaskSet =>
-  set(0, [(r, t) => compareTask(r, t, "diff"), (r, t) => compareTask(r, t, "diff"), (r, t) => compareTask(r, t, "same")], teaching("What Is Different?", "Find the difference.", "Compare two shapes and find what is different about them."));
+  set(0, [(r, t) => compareTask(r, t, "diff"), (r, t) => compareTask(r, t, "diff"), (r, t) => compareTask(r, t, "same")], teaching("featureCompare", "What Is Different?", "Find the difference.", "Compare two shapes and find what is different about them."));
 export const createCompareChallengeTaskSet = (): RealmLessonTaskSet =>
-  set(0, [(r, t) => compareTask(r, t, "same"), (r, t) => compareTask(r, t, "diff"), (r, t) => compareTask(r, t, "same")], teaching("Compare Challenge", "Same and different, mixed.", "Show what you know about comparing shapes."));
+  set(0, [(r, t) => compareTask(r, t, "same"), (r, t) => compareTask(r, t, "diff"), (r, t) => compareTask(r, t, "same")], teaching("featureCompare", "Compare Challenge", "Same and different, mixed.", "Show what you know about comparing shapes."));
 
 // ── Lesson content ───────────────────────────────────────────────────────────
 function content(title: string, brief: string, criteria: [string, string, string], acts: [string, string, string], reflectPrompt: string, reflectOpts: [string, string, string], skills: [string, string, string], nextUp: string, createTaskSet: () => RealmLessonTaskSet): StarpathLessonContent {

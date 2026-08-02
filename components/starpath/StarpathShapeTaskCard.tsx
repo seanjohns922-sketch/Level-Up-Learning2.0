@@ -243,20 +243,32 @@ function TeachCard({ readAloud, title, tip, children }: { readAloud: string; tit
   );
 }
 
-// A square with each of its 4 sides drawn as a bright segment and numbered, so
-// "a side" is concrete for the child: one straight edge, counted 1-2-3-4.
-function SidesTeachShape() {
-  const badges = [
+// A shape with each of its straight sides drawn as a bright segment and
+// numbered, so "a side" is concrete for the child: one straight edge, counted.
+const SIDE_BADGES: Record<"square" | "triangle", Array<{ n: number; x: number; y: number }>> = {
+  square: [
     { n: 1, x: 60, y: 22 },
     { n: 2, x: 98, y: 60 },
     { n: 3, x: 60, y: 98 },
     { n: 4, x: 22, y: 60 },
-  ];
+  ],
+  triangle: [
+    { n: 1, x: 37, y: 57 },
+    { n: 2, x: 83, y: 57 },
+    { n: 3, x: 60, y: 100 },
+  ],
+};
+function NumberedSidesShape({ shape = "square" }: { shape?: "square" | "triangle" }) {
+  const outline = shape === "square" ? "M22 22H98M98 22V98M22 98H98M22 22V98" : "M60 16 102 100 18 100Z";
   return (
     <svg viewBox="0 0 120 120" className="h-24 w-24" aria-hidden="true">
-      <rect x="22" y="22" width="76" height="76" rx="3" fill="#ecfeff" />
-      <path d="M22 22H98M98 22V98M22 98H98M22 22V98" fill="none" stroke="#0891b2" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-      {badges.map((badge) => (
+      {shape === "square" ? (
+        <rect x="22" y="22" width="76" height="76" rx="3" fill="#ecfeff" />
+      ) : (
+        <path d="M60 16 102 100 18 100Z" fill="#ecfeff" />
+      )}
+      <path d={outline} fill="none" stroke="#0891b2" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+      {SIDE_BADGES[shape].map((badge) => (
         <g key={badge.n}>
           <circle cx={badge.x} cy={badge.y} r="11" fill="#7c3aed" stroke="#fff" strokeWidth="2.5" />
           <text x={badge.x} y={badge.y} textAnchor="middle" dominantBaseline="central" fontSize="13" fontWeight="900" fill="#fff">
@@ -268,12 +280,44 @@ function SidesTeachShape() {
   );
 }
 
+// A triangle with its three straight sides traced bright — "straight" made visible.
+function StraightEdgeShape() {
+  return (
+    <svg viewBox="0 0 120 120" className="h-24 w-24" aria-hidden="true">
+      <path d="M60 16 102 100 18 100Z" fill="#ecfeff" stroke="#0891b2" strokeWidth="7" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// A circle with its one curved edge traced bright — "curved" made visible.
+function CurvedEdgeShape() {
+  return (
+    <svg viewBox="0 0 120 120" className="h-24 w-24" aria-hidden="true">
+      <circle cx="60" cy="60" r="40" fill="#ecfeff" stroke="#d946ef" strokeWidth="7" />
+      <path d="M60 20a40 40 0 0 1 34 20" fill="none" stroke="#a21caf" strokeWidth="6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// A rectangle with its top and bottom sides highlighted as a matching pair with
+// arrows the same way — parallel sides "run alongside and never meet".
+function ParallelSidesShape() {
+  return (
+    <svg viewBox="0 0 120 120" className="h-24 w-24" aria-hidden="true">
+      <rect x="16" y="34" width="88" height="52" rx="3" fill="#ecfeff" stroke="#c7d2fe" strokeWidth="4" />
+      <path d="M22 40H98M22 80H98" fill="none" stroke="#0891b2" strokeWidth="7" strokeLinecap="round" />
+      <path d="M84 40l8 0M84 80l8 0" fill="none" stroke="#0891b2" strokeWidth="7" strokeLinecap="round" />
+      <path d="M60 46v28" fill="none" stroke="#94a3b8" strokeWidth="3" strokeDasharray="4 5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathway" | "masterMission" }) {
   if (variant === "masterShapeMap") {
     return (
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
         <TeachCard readAloud="Shape skills. A side is one straight edge. This square has 4 sides. Count them: 1, 2, 3, 4." title="Shape skills" tip="A side is one straight edge. This square has 4 sides.">
-          <SidesTeachShape />
+          <NumberedSidesShape shape="square" />
         </TeachCard>
         <TeachCard readAloud="Map skills. The star is a place on the map. Find it." title="Map skills" tip="The star is a place. Find it on the map.">
           <MiniMap markers={[{ r: 0, c: 2, object: "star" }]} />
@@ -323,6 +367,94 @@ function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathw
   );
 }
 
+// Weeks 1-7 concept explainers — each defines its skill with a visual before
+// practice, matching the Week 8 treatment.
+function ConceptTeachGrid({
+  variant,
+}: {
+  variant: "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapRoute";
+}) {
+  if (variant === "featureEdges") {
+    return (
+      <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+        <TeachCard readAloud="Straight sides. A straight side is a flat line. It does not bend. A triangle has straight sides." title="Straight sides" tip="A straight side is a flat line. It does not bend.">
+          <StraightEdgeShape />
+        </TeachCard>
+        <TeachCard readAloud="Curved edges. A curved edge bends round and round. A circle has one curved edge." title="Curved edges" tip="A curved edge bends round and round.">
+          <CurvedEdgeShape />
+        </TeachCard>
+      </div>
+    );
+  }
+  if (variant === "featureSides") {
+    return (
+      <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+        <TeachCard readAloud="A side is one straight edge. Count each side once. A triangle has 3 sides." title="3 sides" tip="A side is one straight edge. A triangle has 3 sides.">
+          <NumberedSidesShape shape="triangle" />
+        </TeachCard>
+        <TeachCard readAloud="Count each side once. A square has 4 sides." title="4 sides" tip="Count each side once. A square has 4 sides.">
+          <NumberedSidesShape shape="square" />
+        </TeachCard>
+      </div>
+    );
+  }
+  if (variant === "featureParallel") {
+    return (
+      <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+        <TeachCard readAloud="Parallel sides run alongside each other like train tracks and never meet." title="Parallel sides" tip="They run alongside like train tracks and never meet.">
+          <ParallelSidesShape />
+        </TeachCard>
+        <TeachCard readAloud="A triangle has no parallel sides. Its sides all lean toward each other." title="No parallel sides" tip="A triangle has none — its sides lean together.">
+          <StraightEdgeShape />
+        </TeachCard>
+      </div>
+    );
+  }
+  if (variant === "featureCompare") {
+    return (
+      <div className="mx-auto grid max-w-xl grid-cols-1 gap-3">
+        <TeachCard readAloud="Compare two shapes. Look at the sides and corners. What is the same? What is different?" title="Compare two shapes" tip="Look at the sides and corners: what is the same, what is different?">
+          <div className="flex items-center gap-3">
+            <ShapeVisual shape="square" colour="#86efac" className="h-16 w-16" />
+            <ShapeVisual shape="triangle" colour="#fde047" className="h-16 w-16" />
+          </div>
+        </TeachCard>
+      </div>
+    );
+  }
+  if (variant === "mapLocate") {
+    return (
+      <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+        <TeachCard readAloud="A map shows places from above. Each picture is a place." title="A map shows places" tip="Each picture on the map is a place.">
+          <MiniMap markers={[{ r: 0, c: 2, object: "star" }, { r: 2, c: 1, object: "planet" }]} />
+        </TeachCard>
+        <TeachCard readAloud="Find the place you are looking for on the map." title="Find the place" tip="Look for the place you need, then tap it.">
+          <MiniMap markers={[{ r: 0, c: 2, object: "star" }]} />
+        </TeachCard>
+      </div>
+    );
+  }
+  return (
+    <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+      <TeachCard readAloud="A route is moves in order. Follow each arrow to move the rocket to the star." title="Follow a route" tip="Each arrow is one move. Follow them to the star.">
+        <MiniMap markers={[{ r: 2, c: 0, object: "rocket" }, { r: 0, c: 2, object: "star" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
+      </TeachCard>
+      <TeachCard readAloud="Give your own route. Put the moves in order, then run it." title="Give a route" tip="Put the moves in order, then run it.">
+        <div className="flex items-center gap-1.5">
+          {(["right", "right", "up"] as const).map((dir, index) => {
+            const Icon = MINI_ARROW_ICON[dir];
+            return (
+              <span key={index} className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-b from-indigo-950 to-violet-900 text-cyan-200">
+                <Icon className="h-5 w-5" strokeWidth={3} />
+              </span>
+            );
+          })}
+        </div>
+      </TeachCard>
+    </div>
+  );
+}
+
 export function StarpathShapeIntroCard({
   task,
   onContinue,
@@ -349,7 +481,19 @@ export function StarpathShapeIntroCard({
                   ? "Read, follow, give a route"
                   : variant === "masterMission"
                     ? "Put every skill together"
-                    : "Meet the cosmic shapes");
+                    : variant === "featureEdges"
+                      ? "Straight or curved?"
+                      : variant === "featureSides"
+                        ? "What is a side?"
+                        : variant === "featureParallel"
+                          ? "What are parallel sides?"
+                          : variant === "featureCompare"
+                            ? "Comparing shapes"
+                            : variant === "mapLocate"
+                              ? "Reading a map"
+                              : variant === "mapRoute"
+                                ? "Following a route"
+                                : "Meet the cosmic shapes");
 
   return (
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-5 sm:p-7">
@@ -357,6 +501,8 @@ export function StarpathShapeIntroCard({
 
       {variant === "masterShapeMap" || variant === "masterPathway" || variant === "masterMission" ? (
         <MasterTeachGrid variant={variant} />
+      ) : variant === "featureEdges" || variant === "featureSides" || variant === "featureParallel" || variant === "featureCompare" || variant === "mapLocate" || variant === "mapRoute" ? (
+        <ConceptTeachGrid variant={variant} />
       ) : variant === "builders" ? (
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3">
           {[
