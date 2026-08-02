@@ -273,41 +273,32 @@ export default function TeacherClassesPage() {
 
     const targetClass = classes.find((classRow) => classRow.id === classId);
     if (targetClass?.school_id) {
-      const response = await fetch(`/api/school/${targetClass.school_id}/command`, {
+      const response = await fetch(`/api/teacher/classes/${classId}/students`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: "createStudents",
-          students: [
-            {
-              firstName,
-              lastName,
-              schoolYear,
-              username,
-              pin: pin || null,
-              classId,
-              idempotencyKey: crypto.randomUUID(),
-            },
-          ],
+          schoolId: targetClass.school_id,
+          firstName,
+          lastName,
+          schoolYear,
+          username,
+          pin: pin || null,
+          idempotencyKey: crypto.randomUUID(),
         }),
       });
       const payload = (await response.json()) as {
-        created?: Array<{
+        student?: {
           studentId?: string;
           name?: string;
           username?: string;
           pin?: string;
-        }>;
-        errors?: Array<{ message: string }>;
+        };
         error?: string;
       };
       if (!response.ok) {
         throw new Error(payload.error ?? "Student could not be added");
       }
-      if (payload.errors?.length) {
-        throw new Error(payload.errors.map((entry) => entry.message).join("; "));
-      }
-      const createdStudent = payload.created?.[0];
+      const createdStudent = payload.student;
       if (!createdStudent?.studentId) {
         throw new Error("Student creation did not return a student record");
       }

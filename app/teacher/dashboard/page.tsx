@@ -297,7 +297,6 @@ export default function TeacherDashboardPage() {
   const [showPlacements, setShowPlacements] = useState(false);
   const [pinToast, setPinToast] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
-  const [showLoginMenu, setShowLoginMenu] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -577,18 +576,30 @@ export default function TeacherDashboardPage() {
 
   async function printAllLoginCards() {
     if (!selectedClass || classStudents.length === 0) return;
-    setShowLoginMenu(false);
 
-    const websiteUrl = window.location.origin;
+    // Open synchronously from the click event so browsers do not block the
+    // window after the asynchronous QR-code generation has completed.
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      setPinToast("Allow pop-ups to open student login details.");
+      window.setTimeout(() => setPinToast(null), 3200);
+      return;
+    }
 
-    const QRCode = await import("qrcode");
-    const classQrUrl = `${window.location.origin}/login?code=${selectedClass.class_code}`;
-    const classQrSrc = await QRCode.toDataURL(classQrUrl, { width: 220, margin: 1 });
-    const cards = classStudents.map((s) => ({ ...s, qrSrc: classQrSrc }));
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>Preparing student login details</title></head><body style="font-family:system-ui,sans-serif;padding:32px;color:#0f172a"><strong>Preparing student login details...</strong></body></html>`);
+    printWindow.document.close();
 
-    const cardHtml = cards
-      .map(
-        (s) => `
+    try {
+      const websiteUrl = window.location.origin;
+
+      const QRCode = await import("qrcode");
+      const classQrUrl = `${window.location.origin}/login?code=${selectedClass.class_code}`;
+      const classQrSrc = await QRCode.toDataURL(classQrUrl, { width: 220, margin: 1 });
+      const cards = classStudents.map((s) => ({ ...s, qrSrc: classQrSrc }));
+
+      const cardHtml = cards
+        .map(
+          (s) => `
       <div class="card">
         <div class="brand">Level Up Learning</div>
         <div class="student-name">${s.display_name}</div>
@@ -602,10 +613,10 @@ export default function TeacherDashboardPage() {
           <div class="cred"><div class="cred-label">Password</div><div class="cred-value">${s.pin ?? "—"}</div></div>
         </div>
       </div>`
-      )
-      .join("");
+        )
+        .join("");
 
-    const html = `<!DOCTYPE html><html><head>
+      const html = `<!DOCTYPE html><html><head>
       <meta charset="utf-8"/>
       <title>Student Login Cards — ${selectedClass.name}</title>
       <style>
@@ -638,12 +649,17 @@ export default function TeacherDashboardPage() {
       <div class="subtitle">Class Code: ${selectedClass.class_code} · ${classStudents.length} student${classStudents.length !== 1 ? "s" : ""} · Level Up Learning</div>
       <div class="grid">${cardHtml}</div>
       <script>window.onload = function(){ window.print(); }</script>
-    </body></html>`;
+      </body></html>`;
 
-    const w = window.open("", "_blank");
-    if (!w) return;
-    w.document.write(html);
-    w.document.close();
+      printWindow.document.open();
+      printWindow.document.write(html);
+      printWindow.document.close();
+    } catch (error) {
+      console.error("Unable to prepare student login details", error);
+      printWindow.close();
+      setPinToast("Student login details could not be prepared. Please try again.");
+      window.setTimeout(() => setPinToast(null), 3200);
+    }
   }
 
   async function handleResetPin(student: StudentRow) {
@@ -1197,38 +1213,16 @@ export default function TeacherDashboardPage() {
 
             {/* Student Login Details */}
             {selectedClass && classStudents.length > 0 && (
-              <div className="relative">
-                <button
-                  onClick={() => setShowLoginMenu((v) => !v)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E6E8EC] bg-white text-[#0F172A] font-bold text-sm hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition active:scale-[0.98]"
-                >
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25">
-                    <path d="M16 2H8a2 2 0 00-2 2v16a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z" />
-                    <path d="M12 18h.01M8 6h8M8 10h8M8 14h4" />
-                  </svg>
-                  Student Login Details
-                  <svg viewBox="0 0 24 24" className="h-3 w-3 text-[#94A3B8]" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </button>
-                {showLoginMenu && (
-                  <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl border border-[#E6E8EC] shadow-lg z-30 py-1">
-                    <button
-                      onClick={printAllLoginCards}
-                      className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] flex items-center gap-2"
-                    >
-                      <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#64748B]" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
-                        <rect x="6" y="14" width="12" height="8" />
-                      </svg>
-                      PDF Version
-                    </button>
-                  </div>
-                )}
-                {showLoginMenu && (
-                  <div className="fixed inset-0 z-20" onClick={() => setShowLoginMenu(false)} />
-                )}
-              </div>
+              <button
+                onClick={() => void printAllLoginCards()}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E6E8EC] bg-white text-[#0F172A] font-bold text-sm hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition active:scale-[0.98]"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25">
+                  <path d="M16 2H8a2 2 0 00-2 2v16a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z" />
+                  <path d="M12 18h.01M8 6h8M8 10h8M8 14h4" />
+                </svg>
+                Student Login Details
+              </button>
             )}
 
             <button

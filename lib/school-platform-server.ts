@@ -332,3 +332,21 @@ export async function runSchoolCommand<T>(
     body: JSON.stringify(body),
   });
 }
+
+export async function runAuthenticatedCommand<T>(
+  rpc: string,
+  body: Record<string, unknown>,
+) {
+  if (!isSchoolPlatformPreviewEnabled()) {
+    throw new Error("School platform preview is disabled");
+  }
+
+  const accessToken = await getSchoolPreviewToken();
+  const user = await verifyAdultAccessToken(accessToken);
+  if (!user) throw new Error("Active adult account required");
+
+  return supabaseRequest<T>(`/rest/v1/rpc/${rpc}`, accessToken, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
