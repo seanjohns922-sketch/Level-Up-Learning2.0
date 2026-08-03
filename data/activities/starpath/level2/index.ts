@@ -14,7 +14,7 @@ import {
   WHAT_IS_DIFFERENT_CONTENT,
 } from "./shapeWeeks";
 import {
-  FIND_THE_PLACE_CONTENT,
+  ABOVE_BELOW_CONTENT,
   MAP_READING_CHALLENGE_CONTENT,
   NEXT_TO_CONTENT,
   POSITION_CHALLENGE_CONTENT,
@@ -50,13 +50,13 @@ export const LEVEL_TWO_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y2-space-w4-l1": SAME_FEATURE_CONTENT,
   "y2-space-w4-l2": WHAT_IS_DIFFERENT_CONTENT,
   "y2-space-w4-l3": COMPARE_CHALLENGE_CONTENT,
-  // W5 Reading a Map (locate named places)
+  // W5 Reading a Map (find a place / name a spot / mixed)
   "y2-space-w5-l1": READING_A_MAP_CONTENT,
-  "y2-space-w5-l2": FIND_THE_PLACE_CONTENT,
+  "y2-space-w5-l2": WHAT_IS_HERE_CONTENT,
   "y2-space-w5-l3": MAP_READING_CHALLENGE_CONTENT,
-  // W6 Positions on a Map (what is here / next to)
-  "y2-space-w6-l1": WHAT_IS_HERE_CONTENT,
-  "y2-space-w6-l2": NEXT_TO_CONTENT,
+  // W6 Positions on a Map (next to / above-below / mixed)
+  "y2-space-w6-l1": NEXT_TO_CONTENT,
+  "y2-space-w6-l2": ABOVE_BELOW_CONTENT,
   "y2-space-w6-l3": POSITION_CHALLENGE_CONTENT,
   // W7 Pathways on a Map (follow / choose / give)
   "y2-space-w7-l1": FOLLOW_THE_PATH_CONTENT,
