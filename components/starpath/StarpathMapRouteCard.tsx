@@ -152,7 +152,7 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
     return (
       <div>
         <TaskHeading prompt={task.prompt} speech={task.speakText} />
-        <div className="mx-auto max-w-md"><MapBase task={task} rover={rover} reached={reached} /></div>
+        <div className="mx-auto max-w-3xl"><MapBase task={task} rover={rover} reached={reached} /></div>
         <div className="mx-auto mt-6 grid max-w-lg grid-cols-2 gap-3 sm:grid-cols-4">
           {(task.options ?? []).map((option) => {
             const Icon = ARROW_ICON[option.direction];
@@ -175,7 +175,7 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
     return (
       <div>
         <TaskHeading prompt={task.prompt} speech={task.speakText} />
-        <div className="mx-auto max-w-md"><MapBase task={task} rover={rover} reached={reached} /></div>
+        <div className="mx-auto max-w-3xl"><MapBase task={task} rover={rover} reached={reached} /></div>
         <div className="mx-auto mt-4 max-w-xl">
           <div className="mb-3 flex min-h-12 flex-wrap items-center gap-2 rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50/60 p-2">
             {moves.length === 0 ? <span className="px-2 text-sm font-semibold text-slate-500">Add moves to guide the rover.</span> : moves.map((d, i) => { const Icon = ARROW_ICON[d]; return <span key={i} className="flex items-center gap-1 rounded-xl border-2 border-violet-200 bg-white px-2.5 py-1.5 text-sm font-black text-indigo-950"><span className="text-xs text-violet-500">{i + 1}</span><Icon className="h-4 w-4" strokeWidth={2.75} /></span>; })}
@@ -208,7 +208,7 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
         </div>
         {step && !reached ? <ReadAloudBtn text={step.speakText} size="md" label="Read" className="shrink-0" /> : null}
       </div>
-      <div className="mx-auto max-w-md"><MapBase task={task} rover={rover} reached={reached} /></div>
+      <div className="mx-auto max-w-3xl"><MapBase task={task} rover={rover} reached={reached} /></div>
       <ArrowPad onPick={follow} wrong={wrong} />
       <p className="mt-3 text-center text-sm font-semibold text-slate-600">Step {Math.min(stepIndex + 1, task.steps?.length ?? 1)} of {task.steps?.length ?? 1}</p>
       {ROUTE_STYLE}

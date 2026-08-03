@@ -36,45 +36,53 @@ export type StarMap = {
   placements: StarMapPlacement[];
 };
 
+// Maps use a wide 8x4 grid so they read like a real map (landscape, like the
+// Level 1 mission grid) rather than a square. Landmarks are spread across the
+// width, always with at least one same-row and one same-column pair so the
+// "relative position" tasks (left/right, above/below) have aligned pairs to
+// reason about. Placements are kept within reach of the bottom-left start
+// (route length <= 7 moves) so Week 7 path lessons stay Year-2 friendly.
 const STAR_MAPS: Record<string, StarMap> = {
   "sector-1": {
     id: "sector-1",
     label: "Sector 1",
-    cols: 4,
+    cols: 8,
     rows: 4,
     placements: [
       { id: "crystal-caves", r: 0, c: 0 },
-      { id: "planet-plaza", r: 0, c: 3 },
-      { id: "moon-maze", r: 3, c: 0 },
+      { id: "planet-plaza", r: 0, c: 4 },
       { id: "constellation-crossing", r: 1, c: 2 },
-      { id: "nebula-station", r: 3, c: 3 },
+      { id: "nebula-station", r: 1, c: 5 },
+      { id: "moon-maze", r: 3, c: 4 },
+      { id: "rocket-base", r: 2, c: 6 },
     ],
   },
   "sector-2": {
     id: "sector-2",
     label: "Sector 2",
-    cols: 4,
+    cols: 8,
     rows: 4,
     placements: [
       { id: "rocket-base", r: 0, c: 1 },
-      { id: "asteroid-pass", r: 1, c: 3 },
+      { id: "flag-point", r: 0, c: 4 },
+      { id: "moon-maze", r: 1, c: 1 },
       { id: "planet-plaza", r: 2, c: 0 },
-      { id: "constellation-crossing", r: 3, c: 2 },
-      { id: "flag-point", r: 0, c: 3 },
+      { id: "asteroid-pass", r: 2, c: 6 },
+      { id: "constellation-crossing", r: 3, c: 4 },
     ],
   },
   "sector-3": {
     id: "sector-3",
     label: "Sector 3",
-    cols: 4,
+    cols: 8,
     rows: 4,
     placements: [
       { id: "moon-maze", r: 0, c: 0 },
-      { id: "alien-outpost", r: 0, c: 2 },
-      { id: "crystal-caves", r: 2, c: 3 },
-      { id: "nebula-station", r: 3, c: 1 },
-      { id: "planet-plaza", r: 1, c: 1 },
-      { id: "flag-point", r: 3, c: 3 },
+      { id: "alien-outpost", r: 0, c: 4 },
+      { id: "planet-plaza", r: 1, c: 2 },
+      { id: "crystal-caves", r: 2, c: 6 },
+      { id: "flag-point", r: 2, c: 2 },
+      { id: "nebula-station", r: 3, c: 2 },
     ],
   },
 };

@@ -201,8 +201,10 @@ const MINI_ARROW_ICON = { up: ArrowUp, down: ArrowDown, left: ArrowLeft, right: 
 // background so it always renders as a clear dark map (never collapses inside a
 // flex card), with big place markers and labels.
 function MiniMap({ markers, arrows = [] }: { markers: MiniMarker[]; arrows?: MiniArrow[] }) {
-  const cols = 3;
-  const rows = 3;
+  // Landscape 4x2 frame — same wide "map" proportion as the real 8x4 practice
+  // grid, kept coarse so teaching markers stay big and legible.
+  const cols = 4;
+  const rows = 2;
   const place = (r: number, c: number) => ({
     left: `${((c + 0.5) / cols) * 100}%`,
     top: `${((r + 0.5) / rows) * 100}%`,
@@ -210,14 +212,20 @@ function MiniMap({ markers, arrows = [] }: { markers: MiniMarker[]; arrows?: Min
   });
   return (
     <div
-      className="relative h-40 w-40 shrink-0 overflow-hidden rounded-2xl border-2 border-violet-200 shadow-inner sm:h-48 sm:w-48"
+      className="relative h-24 w-48 shrink-0 overflow-hidden rounded-2xl border-2 border-violet-200 shadow-inner sm:h-28 sm:w-56"
       style={{ background: "linear-gradient(to bottom, #1e1b4b, #4c1d95 55%, #020617)" }}
     >
-      <div className="absolute inset-0 grid" style={{ gridTemplateColumns: "repeat(3,1fr)", gridTemplateRows: "repeat(3,1fr)" }}>
+      <div className="absolute inset-0 grid" style={{ gridTemplateColumns: "repeat(4,1fr)", gridTemplateRows: "repeat(2,1fr)" }}>
         {Array.from({ length: cols * rows }).map((_, index) => (
           <div key={index} style={{ borderRight: "1px solid rgba(103,232,249,0.16)", borderBottom: "1px solid rgba(103,232,249,0.16)" }} />
         ))}
       </div>
+      <span
+        aria-hidden="true"
+        className="absolute right-1 top-1 flex h-4 w-4 flex-col items-center justify-center rounded-full border border-cyan-200/40 bg-slate-900/40"
+      >
+        <span className="text-[5px] font-black leading-none text-amber-300">N</span>
+      </span>
       {arrows.map((arrow, index) => {
         const Icon = MINI_ARROW_ICON[arrow.dir];
         return (
@@ -333,10 +341,10 @@ function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathw
     return (
       <div className="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
         <TeachCard readAloud="Read the map. The rocket is you. The star is where to go." title="Read" tip="The rocket is you. The star is where to go.">
-          <MiniMap markers={[{ r: 2, c: 0, object: "rocket", label: "You" }, { r: 0, c: 2, object: "star", label: "Goal" }]} />
+          <MiniMap markers={[{ r: 1, c: 0, object: "rocket", label: "You" }, { r: 0, c: 3, object: "star", label: "Goal" }]} />
         </TeachCard>
         <TeachCard readAloud="Follow the path. Each arrow is one move. Follow the moves to the star." title="Follow" tip="Each arrow is one move. Follow them to the star.">
-          <MiniMap markers={[{ r: 2, c: 0, object: "rocket", label: "You" }, { r: 0, c: 2, object: "star", label: "Goal" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
+          <MiniMap markers={[{ r: 1, c: 0, object: "rocket", label: "You" }, { r: 0, c: 3, object: "star", label: "Goal" }]} arrows={[{ r: 1, c: 1, dir: "right" }, { r: 0, c: 2, dir: "up" }]} />
         </TeachCard>
         <TeachCard readAloud="Give your own route. A route is moves in order. Build it, then run it." title="Give" tip="A route is moves in order. Build it, then run it.">
           <div className="flex items-center gap-1.5">
@@ -365,7 +373,7 @@ function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathw
         <MiniMap markers={[{ r: 0, c: 2, object: "star", label: "Star" }, { r: 1, c: 1, object: "moon", label: "Moon" }]} />
       </TeachCard>
       <TeachCard readAloud="Navigate. A route is moves in order to reach the star." title="Navigate" tip="A route is moves in order to reach the star.">
-        <MiniMap markers={[{ r: 2, c: 0, object: "rocket", label: "You" }, { r: 0, c: 2, object: "star", label: "Goal" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
+        <MiniMap markers={[{ r: 1, c: 0, object: "rocket", label: "You" }, { r: 0, c: 3, object: "star", label: "Goal" }]} arrows={[{ r: 1, c: 1, dir: "right" }, { r: 0, c: 2, dir: "up" }]} />
       </TeachCard>
     </div>
   );
@@ -442,7 +450,7 @@ function ConceptTeachGrid({
     return (
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
         <TeachCard readAloud="A map shows places from above. Each picture is a place." title="A map shows places" tip="Each picture on the map is a place.">
-          <MiniMap markers={[{ r: 0, c: 2, object: "star", label: "Star" }, { r: 2, c: 1, object: "planet", label: "Planet" }]} />
+          <MiniMap markers={[{ r: 0, c: 3, object: "star", label: "Star" }, { r: 1, c: 1, object: "planet", label: "Planet" }]} />
         </TeachCard>
         <TeachCard readAloud="Find the place you are looking for on the map." title="Find the place" tip="Look for the place you need, then tap it.">
           <MiniMap markers={[{ r: 0, c: 2, object: "star", label: "Star" }, { r: 1, c: 1, object: "moon", label: "Moon" }]} />
@@ -453,7 +461,7 @@ function ConceptTeachGrid({
   return (
     <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
       <TeachCard readAloud="A route is moves in order. Follow each arrow to move the rocket to the star." title="Follow a route" tip="Each arrow is one move. Follow them to the star.">
-        <MiniMap markers={[{ r: 2, c: 0, object: "rocket", label: "You" }, { r: 0, c: 2, object: "star", label: "Goal" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
+        <MiniMap markers={[{ r: 1, c: 0, object: "rocket", label: "You" }, { r: 0, c: 3, object: "star", label: "Goal" }]} arrows={[{ r: 1, c: 1, dir: "right" }, { r: 0, c: 2, dir: "up" }]} />
       </TeachCard>
       <TeachCard readAloud="Give your own route. Put the moves in order, then run it." title="Give a route" tip="Put the moves in order, then run it.">
         <div className="flex items-center gap-1.5">
