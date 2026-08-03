@@ -26,12 +26,18 @@ import LessonPreviewDrawer from "./LessonPreviewDrawer";
 import type { TeacherInsight, TeacherInsightStatus } from "@/lib/teacher-insights";
 import {
   teacherAdvanceStudentWeek,
+  type CompatProgressRow,
   type NormalizedWeeklyQuizAttempt,
-  type StudentProgressOverrideRow,
   type TeacherProgressOverrideReason,
 } from "@/lib/realm-progress-compat";
 import AssessmentReplay from "./AssessmentReplay";
 import { calculateAccuracy, formatAccuracy } from "@/lib/learning-score";
+import {
+  getRealmDefinition,
+  requireCanonicalRealmId,
+  tryCanonicalRealmId,
+} from "@/lib/realms/realm-registry";
+import { buildTeacherStudentSnapshot } from "@/lib/teacher/teacher-student-snapshot";
 
 type StudentRow = {
   id: string;
@@ -76,27 +82,7 @@ type InsightCarrier = {
   } | null;
   attempts?: unknown[] | null;
 };
-type ProgressRow = {
-  student_id: string;
-  realm_id?: string;
-  year: string;
-  week: number | null;
-  status: string;
-  pretest_score: number | null;
-  placement_complete?: boolean | null;
-  required_weeks?: unknown;
-  completed_lesson_ids: unknown;
-  unlocked_legends: unknown;
-  quiz_scores: unknown;
-  lesson_attempts?: unknown;
-  weekly_quiz_attempts?: NormalizedWeeklyQuizAttempt[];
-  pretest_profile?: {
-    completedAt?: string | null;
-  } | null;
-  teacher_advanced_weeks?: number[];
-  teacher_overrides?: StudentProgressOverrideRow[];
-  updated_at?: string;
-};
+type ProgressRow = CompatProgressRow;
 
 type LiveStudentActivityRow = {
   student_id: string;
@@ -163,6 +149,7 @@ type Props = {
   liveEvents: LiveActivityEventRow[];
   onRealmChange?: (realmId: "number" | "measurement") => void;
   onProgressChanged?: () => Promise<void> | void;
+  progressAvailable?: boolean;
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
@@ -265,7 +252,7 @@ function countCompletedQuizzes(raw: unknown): number {
 }
 
 function totalProgramActivities(plan: ReturnType<typeof getCurriculumPlan>): number {
-  if (plan.length === 0) return 48;
+  if (plan.length === 0) return 0;
   return plan.reduce((sum, week) => sum + week.lessons.length + 1, 0);
 }
 
@@ -295,6 +282,7 @@ const ASSESSMENT_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 // Teacher-facing placement status for the overview column. Never surfaces the
 // internal `placement_complete` flag — only these plain-language stages.
 type PlacementStatus =
+  | "Progress Unavailable"
   | "Not Placed"
   | "Ready for Pre-Test"
   | "Full Program"
@@ -303,6 +291,7 @@ type PlacementStatus =
   | "Complete";
 
 const PLACEMENT_STATUS_RANK: Record<PlacementStatus, number> = {
+  "Progress Unavailable": -1,
   "Not Placed": 0,
   "Ready for Pre-Test": 1,
   "Full Program": 2,
@@ -312,6 +301,7 @@ const PLACEMENT_STATUS_RANK: Record<PlacementStatus, number> = {
 };
 
 const PLACEMENT_STATUS_STYLE: Record<PlacementStatus, string> = {
+  "Progress Unavailable": "bg-[#FFF1F2] text-[#BE123C]",
   "Not Placed": "bg-[#F1F5F9] text-[#64748B]",
   "Ready for Pre-Test": "bg-[#FEF3C7] text-[#B45309]",
   "Full Program": "bg-[#E0F2FE] text-[#0369A1]",
@@ -829,7 +819,8 @@ function timeAgo(iso?: string): string {
 }
 
 function pretestCompletedAt(row?: ProgressRow): string | undefined {
-  return row?.pretest_profile?.completedAt ?? row?.updated_at;
+  const completedAt = row?.pretest_profile?.completedAt;
+  return typeof completedAt === "string" ? completedAt : row?.updated_at ?? undefined;
 }
 
 function formatDuration(seconds?: number | null) {
@@ -841,22 +832,10 @@ function formatDuration(seconds?: number | null) {
 }
 
 const YEAR_ORDER = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
-function yearOrdinal(label: string): number {
+function yearOrdinal(label: string | null): number {
+  if (!label) return -1;
   const i = YEAR_ORDER.indexOf(label);
-  return i === -1 ? 0 : i;
-}
-
-/** Pick the most relevant year for a student from their progress rows. */
-function pickStudentYear(rows: ProgressRow[], fallback: string): string {
-  if (rows.length === 0) return fallback;
-  // Prefer the most recently updated row; otherwise highest year ordinal.
-  const sorted = [...rows].sort((a, b) => {
-    const tA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
-    const tB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
-    if (tA !== tB) return tB - tA;
-    return yearOrdinal(b.year) - yearOrdinal(a.year);
-  });
-  return sorted[0].year;
+  return i;
 }
 
 function liveRowToStatus(row?: LiveStudentActivityRow | undefined): StrandStatus {
@@ -869,7 +848,7 @@ function resolveDisplayedWeek(prog?: ProgressRow) {
   return prog?.week ?? null;
 }
 
-export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, onRealmChange, onProgressChanged }: Props) {
+export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, onRealmChange, onProgressChanged, progressAvailable = true }: Props) {
   const genres = getGenresForYear(yearLabel);
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvail.id);
@@ -904,18 +883,16 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
   const genre = genres.find((g) => g.id === genreId)!;
   const isPlaceholder = !genre.available;
-  const selectedRealmId = genreId === "measurement" ? "measurement" : "number";
+  const canonicalGenreRealmId = tryCanonicalRealmId(genreId);
+  const selectedRealmId = genre.available ? canonicalGenreRealmId : null;
   useEffect(() => {
-    onRealmChange?.(selectedRealmId);
+    if (selectedRealmId === "number" || selectedRealmId === "measurement") {
+      onRealmChange?.(selectedRealmId);
+    }
   }, [onRealmChange, selectedRealmId]);
 
   function matchesSelectedRealm(realmId?: string | null) {
-    const normalized = realmId?.trim().toLowerCase();
-    return (normalized === "measurement" || normalized === "measurelands" ? "measurement" : "number") === selectedRealmId;
-  }
-
-  function getProg(studentId: string, year: string) {
-    return progress.find((p) => p.student_id === studentId && p.year === year && matchesSelectedRealm(p.realm_id));
+    return selectedRealmId != null && realmId != null && tryCanonicalRealmId(realmId) === selectedRealmId;
   }
 
   function getStudentProgressRows(studentId: string) {
@@ -938,14 +915,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
     return liveRows.find((row) => row.student_id === studentId);
   }
 
-  function getWorkingYear(student: StudentRow): string {
-    const rows = progress.filter(
-      (p) => p.student_id === student.id && matchesSelectedRealm(p.realm_id)
-    );
-    if (rows.length > 0) return pickStudentYear(rows, normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? yearLabel);
-    return normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? yearLabel;
-  }
-
   function getSchoolYear(student: StudentRow): string {
     return normalizeSchoolYearLabel(student.school_year_level) ?? formatSchoolYearDisplayLabel(yearLabel);
   }
@@ -954,34 +923,47 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
     .map((s) => {
       const nameParts = resolveStudentNameParts(s);
       const schoolYear = getSchoolYear(s);
-      const workingYear = getWorkingYear(s);
-      const prog = isPlaceholder ? undefined : getProg(s.id, workingYear);
+      const snapshot = selectedRealmId
+        ? buildTeacherStudentSnapshot({
+            studentId: s.id,
+            realmId: selectedRealmId,
+            progressRows: progress,
+            sourceAvailable: progressAvailable,
+          })
+        : null;
+      const prog = snapshot?.progress ?? null;
+      const workingYear = snapshot?.currentLevel ?? null;
       const liveRow = getLiveRow(s.id);
       const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
       const ids = persistedIds;
-      const sPrefix = genreId === "measurement" ? `${lessonIdPrefix(workingYear)}measurement-` : lessonIdPrefix(workingYear);
+      const sPrefix = workingYear
+        ? genreId === "measurement" ? `${lessonIdPrefix(workingYear)}measurement-` : lessonIdPrefix(workingYear)
+        : "";
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
-      const planForStudentYear = getCurriculumPlan(workingYear, genreId);
+      const planForStudentYear = workingYear ? getCurriculumPlan(workingYear, genreId) : [];
       const completedQuizzes = prog ? countCompletedQuizzes(prog.quiz_scores) : 0;
-      const pct = isPlaceholder ? 0 : overallProgramPercent(strandIds.length, completedQuizzes, planForStudentYear);
-      const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog, strandIds.length, pct);
+      const pct = !prog || !workingYear || isPlaceholder ? null : overallProgramPercent(strandIds.length, completedQuizzes, planForStudentYear);
+      const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog ?? undefined, strandIds.length, pct ?? 0);
       const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
-      const placementStatus = computePlacementStatus(
-        prog,
-        pct,
-        isPlaceholder,
-        planForStudentYear.length || (selectedRealmId === "measurement" ? 8 : 12),
-      );
-      const week = isPlaceholder ? null : resolveDisplayedWeek(prog);
-      const activeWeek = week ?? 1;
-      const activeWeekPlan = planForStudentYear.find((entry) => entry.week === activeWeek);
+      const placementStatus = !snapshot || snapshot.placementState === "unavailable"
+        ? "Progress Unavailable"
+        : snapshot.placementState === "not_placed"
+          ? "Not Placed"
+          : computePlacementStatus(
+              prog ?? undefined,
+              pct ?? 0,
+              isPlaceholder,
+              snapshot.realm.totalWeeks ?? planForStudentYear.length,
+            );
+      const week = snapshot?.currentWeek ?? null;
+      const activeWeekPlan = week == null ? undefined : planForStudentYear.find((entry) => entry.week === week);
       const activeLessonIds = activeWeekPlan?.lessons.map((lesson) => lesson.id) ?? [];
-      const weekInsights = getWeekInsightList(prog, activeWeek, activeLessonIds);
+      const weekInsights = prog && week != null ? getWeekInsightList(prog, week, activeLessonIds) : [];
       const summary = buildWeekSummary(weekInsights, status, liveRow);
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
       const latestPretest = getLatestPretestProgress(s.id);
 
-      return { s, prog, liveRow, pct, status, placementStatus, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
+      return { s, snapshot, prog, liveRow, pct, status, placementStatus, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
     })
     .sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;
@@ -1005,15 +987,15 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
         case "status":
           return dir * (PLACEMENT_STATUS_RANK[a.placementStatus] - PLACEMENT_STATUS_RANK[b.placementStatus]) || lastNameCmp;
         case "tower":
-          return dir * (a.pct - b.pct) || lastNameCmp;
+          return dir * ((a.pct ?? -1) - (b.pct ?? -1)) || lastNameCmp;
       }
     });
 
-  const classInsight = buildClassInsight(studentRows.map((row) => ({
+  const classInsight = buildClassInsight(studentRows.filter((row) => row.prog && row.workingYear).map((row) => ({
     studentId: row.s.id,
     studentName: row.nameParts.displayName,
-    prog: row.prog,
-    workingYear: row.workingYear,
+    prog: row.prog!,
+    workingYear: row.workingYear!,
     flag: row.flag,
   })));
 
@@ -1163,7 +1145,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             No students enrolled yet.
           </div>
         ) : (
-          studentRows.map(({ s, prog, liveRow, pct, placementStatus, week, schoolYear, workingYear, latestPretest }) => {
+          studentRows.map(({ s, snapshot, prog, liveRow, pct, placementStatus, week, schoolYear, workingYear, latestPretest }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -1184,7 +1166,13 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     </div>
                   </div>
                   <span className="text-xs font-bold text-[#475569]">{schoolYear}</span>
-                  <span className="text-xs font-bold text-[#475569]">{yearToLevelLabel(workingYear)}</span>
+                  <span className="text-xs font-bold text-[#475569]">
+                    {workingYear
+                      ? yearToLevelLabel(workingYear)
+                      : !snapshot || snapshot.placementState === "unavailable"
+                        ? "Unavailable"
+                        : "Not placed"}
+                  </span>
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
                     {week ? `W${week}` : "—"}
                   </span>
@@ -1195,13 +1183,13 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full bg-[#00C2A8] shadow-[0_0_8px_rgba(0,229,195,0.55)] transition-all" style={{ width: `${pct}%` }} />
+                      <div className="h-full bg-[#00C2A8] shadow-[0_0_8px_rgba(0,229,195,0.55)] transition-all" style={{ width: `${pct ?? 0}%` }} />
                     </div>
-                    <span className="text-[11px] font-bold text-[#475569] tabular-nums w-9 text-right">{pct}%</span>
+                    <span className="text-[11px] font-bold text-[#475569] tabular-nums w-9 text-right">{pct == null ? "—" : `${pct}%`}</span>
                   </div>
                 </button>
 
-                {isOpen && (
+                {isOpen && prog && workingYear && week != null ? (
                   <StudentStrandDetail
                     student={s}
                     schoolYearLabel={schoolYear}
@@ -1215,7 +1203,13 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     prefix={lessonIdPrefix(workingYear)}
                     onProgressChanged={onProgressChanged}
                   />
-                )}
+                ) : isOpen ? (
+                  <div className="border-t border-[#E6E8EC] bg-[#F8FAFC] px-5 py-8 text-sm font-semibold text-[#64748B]">
+                    {!snapshot || snapshot.placementState === "unavailable"
+                      ? "Progress is temporarily unavailable. No placement or week has been inferred."
+                      : `This student is not placed in ${snapshot.realm.name}.`}
+                  </div>
+                ) : null}
               </div>
             );
           })
@@ -1234,7 +1228,7 @@ function StudentStrandDetail({
   schoolYearLabel: string;
   yearLabel: string;
   genre: Genre;
-  prog: ProgressRow | undefined;
+  prog: ProgressRow;
   liveRow?: LiveStudentActivityRow | undefined;
   latestPretest?: ProgressRow | undefined;
   pathwayStatus: PlacementStatus;
@@ -1242,10 +1236,15 @@ function StudentStrandDetail({
   prefix: string;
   onProgressChanged?: () => Promise<void> | void;
 }) {
+  const realmId = requireCanonicalRealmId(genre.id);
+  if (realmId !== "number" && realmId !== "measurement") {
+    throw new Error(`Student detail is unavailable for unsupported teacher realm: ${realmId}`);
+  }
+  const supportedRealmId: "number" | "measurement" = realmId;
   const plan = useMemo(() => getCurriculumPlan(yearLabel, genre.id), [yearLabel, genre.id]);
-  const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
+  const persistedIds = parseCompleted(prog.completed_lesson_ids);
   const ids = persistedIds;
-  const currentWeek = resolveDisplayedWeek(prog) ?? 1;
+  const currentWeek = resolveDisplayedWeek(prog)!;
   const [selectedWeek, setSelectedWeek] = useState<number>(currentWeek);
   const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
@@ -1257,13 +1256,18 @@ function StudentStrandDetail({
   const [showQuizAttempts, setShowQuizAttempts] = useState(false);
   const [selectedQuizAttempt, setSelectedQuizAttempt] = useState<NormalizedWeeklyQuizAttempt | null>(null);
 
-  const quizScores = parseQuizScores(prog?.quiz_scores);
-  const lessonAttempts = parseLessonAttempts(prog?.lesson_attempts);
-  const latestPost = getLatestPosttestProfile(prog?.quiz_scores);
-  const teacherAdvancedWeeks = prog?.teacher_advanced_weeks ?? [];
-  const teacherOverrides = prog?.teacher_overrides ?? [];
-  const maxWeek = plan.length;
+  const quizScores = parseQuizScores(prog.quiz_scores);
+  const lessonAttempts = parseLessonAttempts(prog.lesson_attempts);
+  const latestPost = getLatestPosttestProfile(prog.quiz_scores);
+  const teacherAdvancedWeeks = prog.teacher_advanced_weeks ?? [];
+  const teacherOverrides = prog.teacher_overrides ?? [];
+  const maxWeek = getRealmDefinition(supportedRealmId).totalWeeks ?? plan.length;
   const studentName = resolveStudentNameParts(student).displayName;
+
+  useEffect(() => {
+    setSelectedWeek(currentWeek);
+    setExpandedWeek(null);
+  }, [student.id, currentWeek]);
 
   async function advanceStudent() {
     if (!advanceReason || selectedWeek !== currentWeek || selectedWeek >= maxWeek) return;
@@ -1272,7 +1276,7 @@ function StudentStrandDetail({
     try {
       await teacherAdvanceStudentWeek({
         studentId: student.id,
-        realmId: genre.id === "measurement" ? "measurement" : "number",
+        realmId: supportedRealmId,
         workingLevel: yearLabel,
         week: selectedWeek,
         reason: advanceReason,
@@ -1293,32 +1297,40 @@ function StudentStrandDetail({
   function weekStatus(w: number): "Complete" | "Quiz Pending" | "In Progress" | "Not Started" | "Struggled" {
     if (isPlaceholder) return "Not Started";
     const done = weekLessonsDone(ids, w);
+    const expectedLessons = plan.find((entry) => entry.week === w)?.lessons.length ?? 0;
     const q = quizScores[String(w)];
     if (q && !getQuizPassed(q)) return "Struggled";
-    if (done >= 3 && q && getQuizPassed(q)) return "Complete";
-    if (done >= 3) return "Quiz Pending";
+    if (expectedLessons > 0 && done >= expectedLessons && q && getQuizPassed(q)) return "Complete";
+    if (expectedLessons > 0 && done >= expectedLessons) return "Quiz Pending";
     if (done > 0 || w === currentWeek) return "In Progress";
     return "Not Started";
   }
 
-  const week = plan.find((p) => p.week === selectedWeek) ?? plan[0];
-  const weekQuiz = quizScores[String(week?.week ?? 1)];
-  const canonicalWeekQuizAttempts = (prog?.weekly_quiz_attempts ?? [])
-    .filter((attempt) => attempt.week === (week?.week ?? 1) && attempt.workingLevel === yearLabel)
+  const week = plan.find((p) => p.week === selectedWeek);
+  if (!week) {
+    return (
+      <div className="border-t border-[#E6E8EC] bg-[#F8FAFC] px-5 py-8 text-sm font-semibold text-[#64748B]">
+        Curriculum details are unavailable for {yearToLevelLabel(yearLabel)}, Week {selectedWeek}.
+      </div>
+    );
+  }
+  const weekQuiz = quizScores[String(week.week)];
+  const canonicalWeekQuizAttempts = (prog.weekly_quiz_attempts ?? [])
+    .filter((attempt) => attempt.week === week.week && attempt.workingLevel === yearLabel)
     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
   const weekQuizAttempts = canonicalWeekQuizAttempts.length || getQuizAttemptsCount(weekQuiz);
-  const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;  const overallPct = overallProgramPercent(ids.filter((id) => id.startsWith(prefix)).length, countCompletedQuizzes(prog?.quiz_scores), plan);
+  const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;  const overallPct = overallProgramPercent(ids.filter((id) => id.startsWith(prefix)).length, countCompletedQuizzes(prog.quiz_scores), plan);
   const summaryStatus = computeStatus(prog, ids.filter((id) => id.startsWith(prefix)).length, overallPct);
   const weekPerformance = buildStudentWeeklyPerformanceSummary({
-    weekNumber: week?.week ?? 1,
-    lessons: week?.lessons ?? [],
+    weekNumber: week.week,
+    lessons: week.lessons,
     completedIds: ids,
     lessonAttempts,
     weekQuiz,
     fallbackStatus: summaryStatus,
     liveRow,
   });
-  const currentPretestScore = prog?.pretest_score ?? null;
+  const currentPretestScore = prog.pretest_score ?? null;
   const previousPretest =
     latestPretest && latestPretest.year !== yearLabel ? latestPretest : undefined;
   const pretestSub =
@@ -1334,10 +1346,10 @@ function StudentStrandDetail({
     console.debug("[StudentsTabDebug]", {
       student_id: student.id,
       working_level: yearLabel,
-      week: week?.week ?? 1,
-      expected_lesson_ids: (week?.lessons ?? []).map((lesson) => lesson.id),
+      week: week.week,
+      expected_lesson_ids: week.lessons.map((lesson) => lesson.id),
       saved_completed_lesson_ids: ids,
-      matched_attempt_count: Object.keys(lessonAttempts).filter((key) => (week?.lessons ?? []).some((lesson) => lesson.id === key)).length,
+      matched_attempt_count: Object.keys(lessonAttempts).filter((key) => week.lessons.some((lesson) => lesson.id === key)).length,
     });
   }
 
@@ -1345,7 +1357,7 @@ function StudentStrandDetail({
     <div className="bg-[#F8FAFC] border-t border-[#E6E8EC] px-5 py-5 space-y-5">
       <div className="flex justify-end">
         <a
-          href={`/teacher/student-insights?studentId=${student.id}&realm_id=${encodeURIComponent(genre.id === "measurement" ? "measurement" : "number")}`}
+          href={`/teacher/student-insights?studentId=${student.id}&realm_id=${encodeURIComponent(supportedRealmId)}`}
           className="inline-flex items-center gap-2 rounded-xl border border-[#E6E8EC] bg-white px-3.5 py-2 text-sm font-bold text-[#0F172A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
         >
           <BarChart3 className="h-4 w-4" aria-hidden />
@@ -1376,7 +1388,7 @@ function StudentStrandDetail({
         <SnapshotTile
           label="Last Post-test"
           value={latestPost ? `${latestPost.percentage}%` : "—"}
-          sub={latestPost ? (latestPost.passed ? "Pass" : "Needs review") : `Last active ${timeAgo(prog?.updated_at)}`}
+          sub={latestPost ? (latestPost.passed ? "Pass" : "Needs review") : `Last active ${timeAgo(prog.updated_at ?? undefined)}`}
         />
       </div>
 

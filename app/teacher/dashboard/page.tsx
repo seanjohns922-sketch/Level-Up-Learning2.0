@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Star, Check, X, Lock, LockOpen, KeyRound, Trophy, Brain, Building2, Download, Printer } from "lucide-react";
+import { ArrowLeft, Check, X, KeyRound, Brain, Building2, Download, Printer, Lock, LockOpen } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
-import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 import LiveClassPanel from "@/components/teacher/LiveClassPanel";
 import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
@@ -19,6 +18,8 @@ import {
   type BrainBreakFrequency,
 } from "@/lib/brain-break-settings";
 import { formatAccuracy } from "@/lib/learning-score";
+import { getRealmDefinition, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
+import { getRealmWeekNumbers, selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = {
@@ -71,7 +72,6 @@ type LiveActivityEventRow = {
 };
 
 const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
-const WEEKS = Array.from({ length: 12 }, (_, i) => i + 1);
 
 /* ── helpers ───────────────────────────────────────── */
 type JsonObject = Record<string, unknown>;
@@ -87,11 +87,6 @@ function schoolLogoFor(name: string | null) {
   return key === "cobramprimary" || key === "cobramprimaryschool"
     ? "/schools/cobram-primary-logo.png"
     : null;
-}
-function parseUnlockedLegends(raw: unknown): string[] {
-  if (Array.isArray(raw)) return raw as string[];
-  if (typeof raw === "string") try { return JSON.parse(raw); } catch { return []; }
-  return [];
 }
 function parseQuizScores(raw: unknown): Record<string, JsonObject> {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) return raw as Record<string, JsonObject>;
@@ -548,10 +543,6 @@ export default function TeacherDashboardPage() {
     };
   }, [schoolHomeId]);
 
-  function getStudentProgress(studentId: string, year: string): ProgressRow | undefined {
-    return progress.find((p) => p.student_id === studentId && p.year === year);
-  }
-
   function copyCode() {
     if (!selectedClass) return;
     navigator.clipboard.writeText(selectedClass.class_code);
@@ -783,19 +774,26 @@ export default function TeacherDashboardPage() {
 
   /* ── segment bar for a student's level ─── */
   function renderWeekBar(prog: ProgressRow | undefined) {
+    const realmDefinition = getRealmDefinition(analyticsRealmId);
+    const realmWeeks = getRealmWeekNumbers(analyticsRealmId);
+    const lessonsPerWeek = realmDefinition.lessonsPerWeek;
+    if (!prog || lessonsPerWeek == null || realmWeeks.length === 0) {
+      return <span className="text-xs font-semibold text-slate-400">Progress unavailable</span>;
+    }
     const completedIds = prog ? parseCompletedLessons(prog.completed_lesson_ids) : [];
-    const currentWeek = prog?.week ?? 1;
-    const legends = prog ? parseUnlockedLegends(prog.unlocked_legends) : [];
-    const hasLegend = legends.length > 0;
-    const totalLessons = WEEKS.reduce((s, w) => s + Math.min(3, weekCompletionCount(completedIds, w)), 0);
-    const overallPct = Math.round((totalLessons / (12 * 3)) * 100);
+    const currentWeek = prog.week;
+    const totalLessons = realmWeeks.reduce(
+      (sum, week) => sum + Math.min(lessonsPerWeek, weekCompletionCount(completedIds, week)),
+      0,
+    );
+    const overallPct = Math.round((totalLessons / (realmWeeks.length * lessonsPerWeek)) * 100);
 
     return (
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-[3px] flex-1">
-          {WEEKS.map((w) => {
+          {realmWeeks.map((w) => {
             const lessonsCompleted = weekCompletionCount(completedIds, w);
-            const isComplete = lessonsCompleted >= 3;
+            const isComplete = lessonsCompleted >= lessonsPerWeek;
             const isCurrent = w === currentWeek && !isComplete;
 
             let bg = "bg-slate-200/70"; // locked
@@ -810,7 +808,7 @@ export default function TeacherDashboardPage() {
               <div
                 key={w}
                 className={`h-2 flex-1 rounded-full ${bg} transition-colors relative`}
-                title={`Week ${w}: ${isComplete ? "Complete" : isCurrent ? `${lessonsCompleted}/3 lessons` : "Locked"}`}
+                title={`Week ${w}: ${isComplete ? "Complete" : isCurrent ? `${lessonsCompleted}/${lessonsPerWeek} lessons` : "Locked"}`}
               >
                 {isCurrent && (
                   <div className="absolute -inset-y-1 inset-x-0 rounded-full ring-2 ring-amber-500/60" />
@@ -821,11 +819,6 @@ export default function TeacherDashboardPage() {
         </div>
         <div className="flex items-center gap-2 min-w-[88px] justify-end">
           <span className="tabular-nums text-xs font-bold text-slate-700">{overallPct}%</span>
-          {hasLegend && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-teal-700 bg-teal-50 border border-teal-100 px-1.5 py-0.5 rounded-md whitespace-nowrap">
-              <Star className="h-3 w-3" fill="currentColor" /> Legend
-            </span>
-          )}
         </div>
       </div>
     );
@@ -833,18 +826,33 @@ export default function TeacherDashboardPage() {
 
   /* ── expanded student detail panel ─── */
   function renderExpandedPanel(student: StudentRow) {
-    const prog = getStudentProgress(student.id, activeYear);
+    if (progressLoadError) {
+      return (
+        <div className="border-t border-gray-100 bg-gray-50 px-6 py-5 text-sm font-semibold text-slate-500">
+          Progress unavailable for {getRealmDefinition(analyticsRealmId).name}.
+        </div>
+      );
+    }
+
+    const prog = selectCanonicalTeacherProgressRow(student.id, analyticsRealmId, progress);
+    if (!prog || prog.week == null) {
+      return (
+        <div className="border-t border-gray-100 bg-gray-50 px-6 py-5 text-sm font-semibold text-slate-500">
+          Not placed in {getRealmDefinition(analyticsRealmId).name}.
+        </div>
+      );
+    }
     const completedIds = prog ? parseCompletedLessons(prog.completed_lesson_ids) : [];
-    const currentWeek = prog?.week ?? 1;
-    const legends = prog ? parseUnlockedLegends(prog.unlocked_legends) : [];
+    const currentWeek = prog.week;
+    const realmDefinition = getRealmDefinition(analyticsRealmId);
+    const lessonsPerWeek = realmDefinition.lessonsPerWeek ?? 0;
 
     const lessonsThisWeek = weekCompletionCount(completedIds, currentWeek);
     const l1 = lessonsThisWeek >= 1;
     const l2 = lessonsThisWeek >= 2;
-    const l3 = lessonsThisWeek >= 3;
-    const quizUnlocked = l3;
+    const l3 = lessonsThisWeek >= Math.min(3, lessonsPerWeek);
+    const quizUnlocked = lessonsThisWeek >= lessonsPerWeek;
     const pretestScore = prog?.pretest_score;
-    const posttestProfile = getLatestPosttestProfile(prog?.quiz_scores);
 
     return (
       <div
@@ -857,11 +865,11 @@ export default function TeacherDashboardPage() {
           <div className="grid gap-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-500">Level</span>
-              <span className="font-bold text-gray-900">{activeYear}</span>
+              <span className="font-bold text-gray-900">{prog.year}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Week</span>
-              <span className="font-bold text-gray-900">{currentWeek} / 12</span>
+              <span className="font-bold text-gray-900">{currentWeek} / {realmDefinition.totalWeeks ?? "—"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Pre-test</span>
@@ -927,32 +935,6 @@ export default function TeacherDashboardPage() {
             </span>
           </div>
 
-          {legends.length > 0 && (
-            <div className="mt-4 flex items-center gap-2 text-sm">
-              <span className="inline-flex items-center gap-1.5 text-teal-600 font-bold"><Trophy className="h-4 w-4" /> Legend Unlocked</span>
-            </div>
-          )}
-
-          {posttestProfile ? (
-            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3">
-              <div className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Post-Test</div>
-              <div className="text-sm font-bold text-gray-900">
-                {posttestProfile.percentage}% ({posttestProfile.score}/{posttestProfile.total}) {posttestProfile.passed ? "• Pass" : "• Needs Review"}
-              </div>
-              {!posttestProfile.passed && (prog?.week ?? posttestProfile.assignedWeek) ? (
-                <div className="mt-2">
-                  <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-bold text-blue-700">
-                    Assigned: Week {prog?.week ?? posttestProfile.assignedWeek}
-                  </span>
-                </div>
-              ) : null}
-              {posttestProfile.weakAreas.slice(0, 3).map((item) => (
-                <div key={item.skillId} className="mt-2 text-xs text-gray-600">
-                  {item.skillLabel} ({item.incorrectCount}/{item.total} incorrect) → Week{item.linkedWeeks.length > 1 ? "s" : ""} {item.linkedWeeks.join(", ")}
-                </div>
-              ))}
-            </div>
-          ) : null}
         </div>
 
         {/* Login Details - QR + PIN */}
@@ -1059,11 +1041,9 @@ export default function TeacherDashboardPage() {
 
   // Whole-class KPI strip — never filter by active year/strand/tab.
   const classStudentIds = new Set(classStudents.map((student) => student.id));
-  const classProgressRows = progress.filter((row) => {
-    const realm = row.realm_id?.trim().toLowerCase();
-    const normalizedRealm = realm === "measurement" || realm === "measurelands" ? "measurement" : "number";
-    return classStudentIds.has(row.student_id) && normalizedRealm === analyticsRealmId;
-  });
+  const classProgressRows = classStudents
+    .map((student) => selectCanonicalTeacherProgressRow(student.id, analyticsRealmId, progress))
+    .filter((row): row is ProgressRow => row != null);
   const sevenDaysAgoMs = Date.now() - (7 * 24 * 60 * 60 * 1000);
   const activeStudentsThisWeek = new Set<string>();
 
@@ -1101,8 +1081,8 @@ export default function TeacherDashboardPage() {
   });
 
   liveEvents.forEach((event) => {
-    const strand = typeof event.payload?.strand === "string" ? event.payload.strand.trim().toLowerCase() : "number";
-    const eventRealm = strand === "measurement" || strand === "measurelands" ? "measurement" : "number";
+    const strand = typeof event.payload?.strand === "string" ? event.payload.strand : null;
+    const eventRealm = tryCanonicalRealmId(strand);
     if (eventRealm === analyticsRealmId && classStudentIds.has(event.student_id) && isRecentIso(event.created_at, sevenDaysAgoMs)) {
       activeStudentsThisWeek.add(event.student_id);
     }
@@ -1135,10 +1115,14 @@ export default function TeacherDashboardPage() {
     : "—";
 
   const weeksPassed = classProgressRows.reduce((sum, row) => {
+    const realmDefinition = getRealmDefinition(analyticsRealmId);
+    const realmWeeks = getRealmWeekNumbers(analyticsRealmId);
+    const lessonsPerWeek = realmDefinition.lessonsPerWeek;
+    if (lessonsPerWeek == null) return sum;
     const completedIds = parseCompletedLessons(row.completed_lesson_ids);
     const quizScores = parseQuizScores(row.quiz_scores);
-    const passedWeeks = WEEKS.filter((week) => {
-      return weekCompletedLessons(completedIds, week) >= 3 && weekQuizPassed(quizScores[String(week)]);
+    const passedWeeks = realmWeeks.filter((week) => {
+      return weekCompletedLessons(completedIds, week) >= lessonsPerWeek && weekQuizPassed(quizScores[String(week)]);
     }).length;
     return sum + passedWeeks;
   }, 0);
@@ -1482,7 +1466,9 @@ export default function TeacherDashboardPage() {
               <CurriculumExplorer
                 yearLabel={activeYear}
                 studentCount={classStudents.length}
+                studentIds={classStudents.map((student) => student.id)}
                 progress={progress as any}
+                progressAvailable={!progressLoadError}
               />
             ) : (
               <StrandStudentsPanel
@@ -1493,6 +1479,7 @@ export default function TeacherDashboardPage() {
                 liveEvents={liveEvents as any}
                 onRealmChange={setAnalyticsRealmId}
                 onProgressChanged={() => selectedClassId ? loadClassData(selectedClassId, false) : undefined}
+                progressAvailable={!progressLoadError}
               />
             )}
             {/* eslint-enable @typescript-eslint/no-explicit-any */}

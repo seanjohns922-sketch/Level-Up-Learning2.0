@@ -11,11 +11,15 @@ import {
 import type { Lesson } from "@/data/programs/year1";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
 import { calculateAccuracy } from "@/lib/learning-score";
+import { getRealmDefinition, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
+import { selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
 type ProgressLike = {
   student_id: string;
   realm_id?: string;
   year: string;
+  is_current?: boolean | null;
+  updated_at?: string | null;
   week: number | null;
   completed_lesson_ids: string[] | null;
   quiz_scores?: unknown;
@@ -41,7 +45,9 @@ type QuizScoreLike = {
 type Props = {
   yearLabel: string;
   studentCount: number;
+  studentIds: string[];
   progress: ProgressLike[];
+  progressAvailable?: boolean;
 };
 
 function parseCompleted(raw: unknown): string[] {
@@ -55,7 +61,9 @@ function parseCompleted(raw: unknown): string[] {
 export default function CurriculumExplorer({
   yearLabel,
   studentCount,
+  studentIds,
   progress,
+  progressAvailable = true,
 }: Props) {
   const genres = getGenresForYear(yearLabel);
   const firstAvailable = genres.find((g) => g.available) ?? genres[0];
@@ -68,14 +76,21 @@ export default function CurriculumExplorer({
     () => getCurriculumPlan(yearLabel, genreId),
     [yearLabel, genreId]
   );
-  const selectedRealmId = genreId === "measurement" ? "measurement" : "number";
+  const selectedRealmId = tryCanonicalRealmId(genreId);
+  const realmDefinition = selectedRealmId ? getRealmDefinition(selectedRealmId) : null;
 
   const week = plan.find((w) => w.week === weekNum) ?? plan[0];
-  const yearProgress = progress.filter((p) => {
-    const realm = p.realm_id?.trim().toLowerCase();
-    const normalizedRealm = realm === "measurement" || realm === "measurelands" ? "measurement" : "number";
-    return p.year === yearLabel && normalizedRealm === selectedRealmId;
-  });
+  const selectedWeekNumber = week?.week ?? null;
+  const yearProgress =
+    progressAvailable && selectedRealmId
+      ? studentIds
+          .map((studentId) =>
+            selectCanonicalTeacherProgressRow(studentId, selectedRealmId, progress),
+          )
+          .filter(
+            (row): row is ProgressLike => row != null && row.year === yearLabel,
+          )
+      : [];
   const isPlaceholder = !genre?.available;
   const prefix = genreId === "measurement" ? `${lessonIdPrefix(yearLabel)}measurement-` : lessonIdPrefix(yearLabel);
 
@@ -89,17 +104,21 @@ export default function CurriculumExplorer({
     for (const p of yearProgress) {
       const ids = parseCompleted(p.completed_lesson_ids);
       if (ids.includes(lessonId)) completed += 1;
-      else if ((p.week ?? 0) >= (week?.week ?? 1)) inProgress += 1;
+      else if (selectedWeekNumber != null && (p.week ?? 0) >= selectedWeekNumber) inProgress += 1;
     }
     const notStarted = Math.max(0, studentCount - completed - inProgress);
     return { completed, inProgress, notStarted, struggling: 0 };
   }
 
   /** Class average completion % for a given week. */
-  function weekAvgPct(w: number) {
+  function weekAvgPct(w: number | null) {
     if (isPlaceholder) return 0;
+    if (w == null) return 0;
     if (yearProgress.length === 0 || studentCount === 0) return 0;
-    const lessonsInWeek = plan.find((x) => x.week === w)?.lessons.length ?? 3;
+    const lessonsInWeek =
+      plan.find((x) => x.week === w)?.lessons.length ??
+      realmDefinition?.lessonsPerWeek ??
+      0;
     const total = lessonsInWeek * studentCount;
     let done = 0;
     const wantPrefix = `-w${w}-`;
@@ -145,8 +164,9 @@ export default function CurriculumExplorer({
   }
 
   /** Class average quiz accuracy % for a week (across all students who attempted). */
-  function weekAvgAccuracy(w: number): { avg: number; attempts: number } {
+  function weekAvgAccuracy(w: number | null): { avg: number; attempts: number } {
     if (isPlaceholder) return { avg: 0, attempts: 0 };
+    if (w == null) return { avg: 0, attempts: 0 };
     let correct = 0;
     let total = 0;
     let n = 0;
@@ -164,8 +184,9 @@ export default function CurriculumExplorer({
   }
 
   /** Class average per-lesson accuracy from weekly quiz lessonBreakdown. */
-  function lessonAvgAccuracy(w: number, lessonNumber: number): { avg: number; attempts: number } {
+  function lessonAvgAccuracy(w: number | null, lessonNumber: number): { avg: number; attempts: number } {
     if (isPlaceholder) return { avg: 0, attempts: 0 };
+    if (w == null) return { avg: 0, attempts: 0 };
     let sumCorrect = 0;
     let sumTotal = 0;
     let n = 0;
@@ -333,9 +354,9 @@ export default function CurriculumExplorer({
                 </h2>
                 <div className="text-xs font-semibold text-[#64748B] mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span>{yearLabel} · {studentCount} student{studentCount === 1 ? "" : "s"}</span>
-                  <span>· class avg <b className="text-[#0F172A]">{weekAvgPct(week?.week ?? 1)}%</b> done</span>
+                  <span>· class avg <b className="text-[#0F172A]">{weekAvgPct(selectedWeekNumber)}%</b> done</span>
                   {(() => {
-                    const acc = weekAvgAccuracy(week?.week ?? 1);
+                    const acc = weekAvgAccuracy(selectedWeekNumber);
                     return (
                       <span>
                         · quiz avg{" "}
@@ -367,7 +388,7 @@ export default function CurriculumExplorer({
           <div className="grid md:grid-cols-3 gap-3">
             {(week?.lessons ?? []).map((lsn) => {
               const counts = lessonStatusCounts(lsn.id);
-              const lacc = lessonAvgAccuracy(week?.week ?? 1, lsn.lesson);
+              const lacc = lessonAvgAccuracy(selectedWeekNumber, lsn.lesson);
               return (
                 <button
                   key={lsn.id}
@@ -462,7 +483,7 @@ export default function CurriculumExplorer({
         isPlaceholder={isPlaceholder}
         classStats={previewLesson ? (() => {
           const c = lessonStatusCounts(previewLesson.id);
-          const a = lessonAvgAccuracy(week?.week ?? 1, previewLesson.lesson);
+          const a = lessonAvgAccuracy(selectedWeekNumber, previewLesson.lesson);
           return {
             studentCount,
             completed: c.completed,

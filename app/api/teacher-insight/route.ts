@@ -20,6 +20,8 @@ function cleanInsight(candidate: Partial<TeacherInsight>, fallback: TeacherInsig
 
   return {
     status,
+    confidence: fallback.confidence,
+    evidenceCount: fallback.evidenceCount,
     strongestSkill: pick(candidate.strongestSkill, fallback.strongestSkill),
     needsSupport: pick(candidate.needsSupport, fallback.needsSupport),
     teacherAction: pick(candidate.teacherAction, fallback.teacherAction),

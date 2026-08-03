@@ -19,6 +19,8 @@ import {
   type LiveStudentStatus,
 } from "@/lib/live-class";
 import { LiveStudentDrawer, type LiveStudentDrawerData, type LiveStudentEventRow } from "@/components/teacher/LiveStudentDrawer";
+import { tryCanonicalRealmId } from "@/lib/realms/realm-registry";
+import { selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
 type ClassRow = {
   id: string;
@@ -300,15 +302,18 @@ function selectCanonicalProgress(
   progressRows: CanonicalProgressRow[],
   realmHint?: string | null,
 ) {
-  const realm = realmHint ? normalizeAttemptRealm(realmHint) : null;
+  const realm = realmHint ? tryCanonicalRealmId(realmHint) : null;
+  if (realmHint && !realm) return null;
+
+  if (realm) {
+    return selectCanonicalTeacherProgressRow(studentId, realm, progressRows);
+  }
+
   const currentRows = progressRows.filter(
     (progress) => progress.student_id === studentId && progress.is_current !== false,
   );
-  const realmRows = realm
-    ? currentRows.filter((progress) => normalizeAttemptRealm(progress.realm_id) === realm)
-    : [];
 
-  return [...(realmRows.length > 0 ? realmRows : currentRows)].sort(
+  return [...currentRows].sort(
     (left, right) => timestampMs(right.updated_at) - timestampMs(left.updated_at),
   )[0] ?? null;
 }
@@ -334,7 +339,16 @@ function alignCompletedActivityWithCanonicalProgress(
   progressRows: CanonicalProgressRow[],
 ) {
   const canonical = selectCanonicalProgress(student.id, progressRows, row?.current_strand);
-  if (!canonical) return row;
+  if (!canonical) {
+    return row
+      ? {
+          ...row,
+          current_level: null,
+          current_week: null,
+          progress_label: "Progress unavailable",
+        }
+      : null;
+  }
   if (!row) return canonicalProgressActivityRow(student, canonical);
 
   const activityCompleted =
@@ -343,7 +357,9 @@ function alignCompletedActivityWithCanonicalProgress(
     row.latest_event_type === "quiz_completed";
   if (!activityCompleted) return row;
 
-  const sameRealm = normalizeAttemptRealm(row.current_strand) === normalizeAttemptRealm(canonical.realm_id);
+  const activityRealm = normalizeAttemptRealm(row.current_strand);
+  const canonicalRealm = normalizeAttemptRealm(canonical.realm_id);
+  const sameRealm = Boolean(activityRealm && canonicalRealm && activityRealm === canonicalRealm);
   const sameLevel = normalizeWorkingLevelLabel(row.current_level) === normalizeWorkingLevelLabel(canonical.year);
   const sameWeek = row.current_week == null || canonical.week == null || row.current_week === canonical.week;
 
@@ -381,20 +397,24 @@ function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEv
 
 function normalizeAttemptRealm(value?: string | null) {
   const normalized = value?.trim().toLowerCase();
+  if (normalized === "number" || normalized === "number-nexus" || normalized === "nn") {
+    return "number";
+  }
   if (normalized === "measurement" || normalized === "measurelands" || normalized === "ml") {
     return "measurement";
   }
   if (normalized === "space" || normalized === "starpath" || normalized === "sp") {
     return "space";
   }
-  return "number";
+  return null;
 }
 
 function formatRealmBadge(realm?: string | null) {
   const normalized = normalizeAttemptRealm(realm);
   if (normalized === "measurement") return "ML";
   if (normalized === "space") return "SP";
-  return "NN";
+  if (normalized === "number") return "NN";
+  return "—";
 }
 
 function compareNullableNumbers(left: number | null, right: number | null, direction: LiveSortDirection) {
@@ -518,7 +538,9 @@ function isQuizActivity(row: LiveStudentActivityRow) {
 
 function matchesCompletedAttempt(row: LiveStudentActivityRow, attempt: CompletedActivityAttemptRow) {
   if (attempt.student_id !== row.student_id) return false;
-  if (normalizeAttemptRealm(attempt.realm_id) !== normalizeAttemptRealm(row.current_strand)) return false;
+  const attemptRealm = normalizeAttemptRealm(attempt.realm_id);
+  const activityRealm = normalizeAttemptRealm(row.current_strand);
+  if (!attemptRealm || !activityRealm || attemptRealm !== activityRealm) return false;
   if (row.current_level && attempt.working_level !== row.current_level) return false;
   if (row.current_week != null && attempt.week !== row.current_week) return false;
 

@@ -24,7 +24,7 @@ const checks = [
   ["duplicate session progress store is removed", !session.includes("session_program_progress_v1")],
   ["lesson entry restores canonical state", lesson.includes("restoreStudentStateFromServer(studentId, lessonRealmId)")],
   ["program entry restores canonical state", program.includes("restoreStudentStateFromServer(studentId, canonicalRealmId)")],
-  ["Number Nexus entry restores canonical state", numberNexus.includes('restoreStudentStateFromServer(studentId, "number")')],
+  ["Number Nexus entry restores canonical state", /restoreStudentStateFromServer\(studentId!?,\s*["']number["']\)/.test(numberNexus)],
   ["real Number Nexus level selection cannot overwrite placement", /preview &&[\s\S]*validLevel[\s\S]*updateProgress/.test(numberNexus)],
   ["real lesson completion refreshes server cache", /previewMode[\s\S]*markLessonComplete[\s\S]*else[\s\S]*restoreStudentStateFromServer/.test(lesson)],
   ["real quiz completion refreshes server cache", /persistProgramQuizComplete\(year, Number\(week\), percent[\s\S]*else[\s\S]*restoreStudentStateFromServer/.test(session)],

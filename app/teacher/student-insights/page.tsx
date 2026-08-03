@@ -8,9 +8,13 @@ import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import { YEAR_ORDER } from "@/data/yearOrder";
-import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { buildHeuristicTeacherInsight, type TeacherAttemptTopicSummary } from "@/lib/teacher-insights";
-import { fetchRealmCompatProgressForStudent } from "@/lib/realm-progress-compat";
+import { fetchRealmCompatProgressForStudent, type CompatProgressRow } from "@/lib/realm-progress-compat";
+import {
+  buildTeacherStudentSnapshot,
+  getRealmWeekNumbers,
+} from "@/lib/teacher/teacher-student-snapshot";
+import { tryCanonicalRealmId } from "@/lib/realms/realm-registry";
 import AssessmentReplay, {
   type TeacherAssessmentAttempt,
 } from "@/components/teacher/AssessmentReplay";
@@ -23,21 +27,6 @@ type StudentRow = {
   school_year_level?: string | null;
   working_level?: string | null;
   year_level?: string | null;
-};
-
-type ProgressRow = {
-  student_id: string;
-  realm_id?: string;
-  year: string;
-  week: number | null;
-  status: string;
-  pretest_score: number | null;
-  completed_lesson_ids: unknown;
-  unlocked_legends: unknown;
-  quiz_scores: unknown;
-  lesson_attempts?: unknown;
-  assessment_attempts?: TeacherAssessmentAttempt[];
-  updated_at?: string | null;
 };
 
 type LessonReflectionRow = {
@@ -137,25 +126,6 @@ function yearOrdinal(year: string | null | undefined) {
   return YEAR_ORDER.indexOf(year);
 }
 
-function chooseCurrentRow(rows: ProgressRow[], fallbackYear?: string | null) {
-  const fallback = fallbackYear ? rows.find((row) => row.year === fallbackYear) : null;
-  if (fallback) return fallback;
-  return [...rows].sort((a, b) => {
-    const yearGap = yearOrdinal(b.year) - yearOrdinal(a.year);
-    if (yearGap !== 0) return yearGap;
-    const aTime = a.updated_at ? Date.parse(a.updated_at) : 0;
-    const bTime = b.updated_at ? Date.parse(b.updated_at) : 0;
-    return bTime - aTime;
-  })[0] ?? null;
-}
-
-function strandLabelForRealm(realmId: string | undefined | null) {
-  const normalized = realmId?.trim().toLowerCase();
-  if (normalized === "measurement" || normalized === "measurelands") return "Measurement";
-  if (normalized === "space" || normalized === "starpath") return "Space";
-  return "Number";
-}
-
 function toIsoOrNull(value: unknown) {
   return typeof value === "string" && value ? value : null;
 }
@@ -236,25 +206,24 @@ type FlattenedQuiz = {
 function StudentInsightsPageInner() {
   const searchParams = useSearchParams();
   const studentId = searchParams.get("studentId");
-  const requestedRealm = searchParams.get("realm_id")?.trim().toLowerCase();
-  const selectedRealmId =
-    requestedRealm === "measurement" || requestedRealm === "measurelands"
-      ? "measurement"
-      : requestedRealm === "space" || requestedRealm === "starpath"
-        ? "space"
-        : "number";
+  const selectedRealmId = tryCanonicalRealmId(searchParams.get("realm_id"));
   const { user, loading: authLoading } = useAuthGuard();
   const [loading, setLoading] = useState(true);
   const [student, setStudent] = useState<StudentRow | null>(null);
   const [className, setClassName] = useState<string>("");
-  const [progressRows, setProgressRows] = useState<ProgressRow[]>([]);
+  const [progressRows, setProgressRows] = useState<CompatProgressRow[]>([]);
   const [reflections, setReflections] = useState<LessonReflectionRow[]>([]);
   const [tab, setTab] = useState<"overview" | "progress" | "assessments" | "reflections" | "mastery">("overview");
   const [selectedAssessment, setSelectedAssessment] = useState<TeacherAssessmentAttempt | null>(null);
 
   useEffect(() => {
-    if (authLoading || !user || !studentId) return;
+    if (authLoading) return;
+    if (!user || !studentId || !selectedRealmId) {
+      setLoading(false);
+      return;
+    }
     const activeStudentId = studentId;
+    const activeRealmId = selectedRealmId;
 
     let cancelled = false;
 
@@ -284,7 +253,7 @@ function StudentInsightsPageInner() {
         .eq("id", studentRow.class_id)
         .maybeSingle();
 
-      const realmProgress = await fetchRealmCompatProgressForStudent(selectedRealmId, activeStudentId);
+      const realmProgress = await fetchRealmCompatProgressForStudent(activeRealmId, activeStudentId);
 
       let nextReflections: LessonReflectionRow[] = [];
       const { data: reflectionRows, error: reflectionError } = await supabase
@@ -312,10 +281,15 @@ function StudentInsightsPageInner() {
   }, [authLoading, selectedRealmId, studentId, user]);
 
   const derived = useMemo(() => {
-    if (!student) return null;
+    if (!student || !selectedRealmId) return null;
 
-    const currentWorkingLevel = normalizeWorkingLevelLabel(student.working_level ?? student.year_level) ?? "Year 1";
-    const currentRow = chooseCurrentRow(progressRows, currentWorkingLevel);
+    const snapshot = buildTeacherStudentSnapshot({
+      studentId: student.id,
+      realmId: selectedRealmId,
+      progressRows,
+    });
+    const currentWorkingLevel = snapshot.currentLevel;
+    const currentRow = snapshot.progress;
 
     const completedAttempts: FlattenedAttempt[] = [];
     const quizAttempts: FlattenedQuiz[] = [];
@@ -396,12 +370,14 @@ function StudentInsightsPageInner() {
     const currentAccuracy = calculateAccuracy(totalCorrect, totalQuestions);
     const lessonsCompleted = completedAttempts.length;
 
-    const weeksPassed = progressRows.reduce((sum, row) => {
+    const weekNumbers = getRealmWeekNumbers(snapshot.realmId);
+    const lessonsPerWeek = snapshot.realm.lessonsPerWeek;
+    const weeksPassed = lessonsPerWeek == null ? 0 : progressRows.reduce((sum, row) => {
       const completedIds = parseCompleted(row.completed_lesson_ids);
       const quizScores = parseQuizScores(row.quiz_scores);
-      const passedWeeks = Array.from({ length: 12 }, (_, index) => index + 1).filter((week) => {
+      const passedWeeks = weekNumbers.filter((week) => {
         const lessonCount = completedIds.filter((id) => id.includes(`-w${week}-`)).length;
-        return lessonCount >= 3 && weekQuizPassed(quizScores[String(week)]);
+        return lessonCount >= lessonsPerWeek && weekQuizPassed(quizScores[String(week)]);
       }).length;
       return sum + passedWeeks;
     }, 0);
@@ -424,9 +400,9 @@ function StudentInsightsPageInner() {
 
     const heuristicInsight = buildHeuristicTeacherInsight({
       studentId: student.id,
-      level: currentWorkingLevel,
-      strand: strandLabelForRealm(currentRow?.realm_id),
-      week: currentRow?.week ?? 1,
+      level: currentWorkingLevel ?? "",
+      strand: snapshot.realm.strand,
+      week: currentRow?.week ?? 0,
       accuracy: currentAccuracy ?? 0,
       questionsAnswered: totalQuestions,
       topicSummaries: aggregatedTopics,
@@ -478,7 +454,7 @@ function StudentInsightsPageInner() {
         enteredAt,
         completedAt,
         weeksSpent: formatRelativeWeeks(enteredAt, next?.updated_at ?? completedAt ?? new Date().toISOString()),
-        current: row.year === currentWorkingLevel,
+        current: row === currentRow,
       };
     });
 
@@ -518,8 +494,9 @@ function StudentInsightsPageInner() {
       }));
 
     return {
+      snapshot,
       currentWorkingLevel,
-      currentWeek: currentRow?.week ?? 1,
+      currentWeek: snapshot.currentWeek,
       currentAccuracy,
       lessonsCompleted,
       weeksPassed,
@@ -532,12 +509,22 @@ function StudentInsightsPageInner() {
       assessmentAttempts,
       masterySkills,
     };
-  }, [progressRows, student]);
+  }, [progressRows, selectedRealmId, student]);
 
   if (authLoading || loading) {
     return (
       <main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center">
         <div className="text-sm font-semibold text-slate-500">Loading learning insights…</div>
+      </main>
+    );
+  }
+
+  if (!selectedRealmId) {
+    return (
+      <main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center">
+        <div className="text-sm font-semibold text-slate-500">
+          Select a valid realm to view learning insights.
+        </div>
       </main>
     );
   }
@@ -569,9 +556,18 @@ function StudentInsightsPageInner() {
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm font-semibold text-[#64748B]">
                 <span>{className || "Class"}</span>
                 <span>·</span>
-                <span>{derived.currentWorkingLevel}</span>
-                <span>·</span>
-                <span>Week {derived.currentWeek}</span>
+                <span>
+                  {derived.currentWorkingLevel ??
+                    (derived.snapshot.placementState === "unavailable"
+                      ? "Progress unavailable"
+                      : "Not placed")}
+                </span>
+                {derived.currentWeek != null ? (
+                  <>
+                    <span>·</span>
+                    <span>Week {derived.currentWeek}</span>
+                  </>
+                ) : null}
               </div>
             </div>
             <div className="rounded-2xl border border-teal-100 bg-teal-50 px-4 py-3">
@@ -580,6 +576,9 @@ function StudentInsightsPageInner() {
               </div>
               <div className="mt-1 max-w-sm text-sm font-semibold text-teal-900">
                 {derived.heuristicInsight.teacherAction}
+              </div>
+              <div className="mt-2 text-[10px] font-extrabold uppercase tracking-[0.14em] text-teal-700">
+                Confidence: {derived.heuristicInsight.confidence} · {derived.heuristicInsight.evidenceCount} responses
               </div>
             </div>
           </div>
@@ -615,7 +614,11 @@ function StudentInsightsPageInner() {
               <InsightStatCard label="Current Accuracy" value={derived.currentAccuracy != null ? `${derived.currentAccuracy}%` : "—"} />
               <InsightStatCard label="Lessons Completed" value={derived.lessonsCompleted} />
               <InsightStatCard label="Weeks Passed" value={derived.weeksPassed} />
-              <InsightStatCard label="Current Working Level" value={derived.currentWorkingLevel} sub={`Current week: ${derived.currentWeek}`} />
+              <InsightStatCard
+                label="Current Working Level"
+                value={derived.currentWorkingLevel ?? (derived.snapshot.placementState === "unavailable" ? "Progress unavailable" : "Not placed")}
+                sub={derived.currentWeek != null ? `Current week: ${derived.currentWeek}` : undefined}
+              />
             </div>
 
             <div className="grid gap-4 lg:grid-cols-3">
@@ -721,8 +724,8 @@ function StudentInsightsPageInner() {
         ) : null}
 
         {tab === "mastery" ? (
-          <div className="grid gap-5 lg:grid-cols-2">
-            <HistoryCard title="Number Mastery">
+          <div>
+            <HistoryCard title={`${derived.snapshot.realm.strand} Mastery`}>
               {derived.masterySkills.length > 0 ? derived.masterySkills.map((item) => (
                 <MasteryRow
                   key={item.skill}
@@ -731,20 +734,6 @@ function StudentInsightsPageInner() {
                   detail={`${item.accuracy}% accuracy`}
                 />
               )) : <EmptyState text="No mastery data yet." />}
-            </HistoryCard>
-            <HistoryCard title="Future Domains">
-              {[
-                "Measurement",
-                "Space",
-                "Algebra",
-                "Statistics",
-                "Probability",
-                "Reading",
-                "Writing",
-                "Grammar",
-              ].map((domain) => (
-                <MasteryRow key={domain} label={domain} status="not_yet" detail="Future-ready placeholder" />
-              ))}
             </HistoryCard>
           </div>
         ) : null}

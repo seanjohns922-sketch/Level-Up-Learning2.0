@@ -19,12 +19,25 @@ export type RealmRegistryEntry = {
   status: RealmLifecycle;
   isSelectable: boolean;
   totalWeeks: number | null;
+  lessonsPerWeek: number | null;
+  hasWeeklyQuiz: boolean;
+  levelLabels: readonly string[];
   legendCount: number;
   legendCollectionName: string;
   iconKey: string;
   themeKey: string;
   displayOrder: number;
 };
+
+const SCHOOL_LEVEL_LABELS = [
+  "Prep",
+  "Year 1",
+  "Year 2",
+  "Year 3",
+  "Year 4",
+  "Year 5",
+  "Year 6",
+] as const;
 
 export const REALM_REGISTRY = {
   number: {
@@ -37,6 +50,9 @@ export const REALM_REGISTRY = {
     status: "live",
     isSelectable: true,
     totalWeeks: 12,
+    lessonsPerWeek: 3,
+    hasWeeklyQuiz: true,
+    levelLabels: SCHOOL_LEVEL_LABELS,
     legendCount: 7,
     legendCollectionName: "Numbot Collection",
     iconKey: "Zap",
@@ -53,6 +69,9 @@ export const REALM_REGISTRY = {
     status: "live",
     isSelectable: true,
     totalWeeks: 8,
+    lessonsPerWeek: 3,
+    hasWeeklyQuiz: true,
+    levelLabels: SCHOOL_LEVEL_LABELS,
     legendCount: 7,
     legendCollectionName: "Meazurex Collection",
     iconKey: "Ruler",
@@ -69,6 +88,9 @@ export const REALM_REGISTRY = {
     status: "coming_soon",
     isSelectable: false,
     totalWeeks: null,
+    lessonsPerWeek: null,
+    hasWeeklyQuiz: false,
+    levelLabels: SCHOOL_LEVEL_LABELS,
     legendCount: 7,
     legendCollectionName: "Pattern Weavers",
     iconKey: "Triangle",
@@ -85,6 +107,9 @@ export const REALM_REGISTRY = {
     status: "coming_soon",
     isSelectable: false,
     totalWeeks: null,
+    lessonsPerWeek: null,
+    hasWeeklyQuiz: false,
+    levelLabels: SCHOOL_LEVEL_LABELS,
     legendCount: 7,
     legendCollectionName: "Data Guardians",
     iconKey: "BarChart3",
@@ -101,6 +126,9 @@ export const REALM_REGISTRY = {
     status: "coming_soon",
     isSelectable: false,
     totalWeeks: null,
+    lessonsPerWeek: null,
+    hasWeeklyQuiz: false,
+    levelLabels: SCHOOL_LEVEL_LABELS,
     legendCount: 7,
     legendCollectionName: "Fortune Seekers",
     iconKey: "Dices",
@@ -117,6 +145,9 @@ export const REALM_REGISTRY = {
     status: "coming_soon",
     isSelectable: false,
     totalWeeks: 8,
+    lessonsPerWeek: 3,
+    hasWeeklyQuiz: true,
+    levelLabels: SCHOOL_LEVEL_LABELS,
     legendCount: 7,
     legendCollectionName: "Star Navigators",
     iconKey: "Compass",
@@ -133,6 +164,9 @@ export const REALM_REGISTRY = {
     status: "coming_soon",
     isSelectable: false,
     totalWeeks: null,
+    lessonsPerWeek: null,
+    hasWeeklyQuiz: false,
+    levelLabels: SCHOOL_LEVEL_LABELS,
     legendCount: 7,
     legendCollectionName: "Time Keepers",
     iconKey: "Clock",
@@ -148,6 +182,7 @@ const REALM_ALIASES = new Map<string, CanonicalRealmId>(
     [realm.realmId, realm.realmId],
     [realm.portalId, realm.realmId],
     [realm.slug, realm.realmId],
+    [realm.realmId === "number" ? "nn" : realm.realmId === "measurement" ? "ml" : realm.realmId, realm.realmId],
   ]),
 );
 
@@ -165,4 +200,3 @@ export function requireCanonicalRealmId(value: string): CanonicalRealmId {
 export function getRealmDefinition(value: string): RealmRegistryEntry {
   return REALM_REGISTRY[requireCanonicalRealmId(value)];
 }
-

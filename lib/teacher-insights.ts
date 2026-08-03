@@ -6,11 +6,15 @@ export type TeacherInsightStatus =
   | "Needs Support"
   | "Ready to Move On";
 
+export type TeacherInsightConfidence = "Low" | "Medium" | "High";
+
 export type TeacherInsight = {
   status: TeacherInsightStatus;
   strongestSkill: string;
   needsSupport: string;
   teacherAction: string;
+  confidence: TeacherInsightConfidence;
+  evidenceCount: number;
   misconception?: string;
   suggestedPractice?: string;
 };
@@ -83,6 +87,13 @@ export function buildHeuristicTeacherInsight(input: TeacherInsightInput): Teache
       topicLabels: (input.topicSummaries ?? []).map((topic) => topic.label),
     }),
   );
+  const topicEvidence = (input.topicSummaries ?? []).reduce(
+    (sum, topic) => sum + Math.max(0, topic.total),
+    0,
+  );
+  const evidenceCount = Math.max(0, input.questionsAnswered ?? topicEvidence);
+  const confidence: TeacherInsightConfidence =
+    evidenceCount >= 15 ? "High" : evidenceCount >= 5 ? "Medium" : "Low";
 
   let status: TeacherInsightStatus = "On Track";
   if (input.accuracy >= 90) status = "Ready to Move On";
@@ -97,15 +108,28 @@ export function buildHeuristicTeacherInsight(input: TeacherInsightInput): Teache
       ? "Applying strategies consistently"
       : "Accessing direct question formats";
 
+  const hasPriorityGap =
+    (weakestTopic != null && weakestTopic.accuracy < 75) ||
+    (breakdownWeakest != null && breakdownWeakest.percent < 75) ||
+    input.accuracy < 75;
+
   const needsSupport =
-    weakestTopic
+    confidence === "Low"
+      ? "Not enough evidence yet"
+      : !hasPriorityGap
+      ? "No priority gap identified"
+      : weakestTopic
       ? weakestTopic.label
       : breakdownWeakest
       ? `Lesson ${breakdownWeakest.lessonNumber} questions`
       : "Choosing strategies independently";
 
   const teacherAction =
-    coaching.teacherAction
+    confidence === "Low"
+      ? "Continue learning before making a teaching recommendation."
+      : !hasPriorityGap
+      ? "Confirm the skill with one varied example, then continue or extend the learning."
+      : coaching.teacherAction
       ? coaching.teacherAction
       : weakestTopic
       ? `Show one worked example on ${weakestTopic.label.toLowerCase()}, then ask the student to solve a similar problem aloud.`
@@ -118,6 +142,8 @@ export function buildHeuristicTeacherInsight(input: TeacherInsightInput): Teache
     strongestSkill,
     needsSupport,
     teacherAction,
+    confidence,
+    evidenceCount,
     misconception: coaching.misconception,
     suggestedPractice: coaching.suggestedPractice,
   };
