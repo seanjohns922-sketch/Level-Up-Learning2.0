@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Star, Check, X, Lock, LockOpen, KeyRound, Trophy, Brain, Building2 } from "lucide-react";
+import { ArrowLeft, Star, Check, X, Lock, LockOpen, KeyRound, Trophy, Brain, Building2, Download, Printer } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -297,6 +297,7 @@ export default function TeacherDashboardPage() {
   const [showPlacements, setShowPlacements] = useState(false);
   const [pinToast, setPinToast] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [showLoginDetailsActions, setShowLoginDetailsActions] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -658,6 +659,89 @@ export default function TeacherDashboardPage() {
       console.error("Unable to prepare student login details", error);
       printWindow.close();
       setPinToast("Student login details could not be prepared. Please try again.");
+      window.setTimeout(() => setPinToast(null), 3200);
+    }
+  }
+
+  async function downloadLoginCardsPdf() {
+    if (!selectedClass || classStudents.length === 0) return;
+
+    const classRow = selectedClass;
+    const studentsForCards = [...classStudents];
+
+    try {
+      const [{ jsPDF }, QRCode] = await Promise.all([
+        import("jspdf"),
+        import("qrcode"),
+      ]);
+      const classQrUrl = `${window.location.origin}/login?code=${classRow.class_code}`;
+      const classQrSrc = await QRCode.toDataURL(classQrUrl, { width: 220, margin: 1 });
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const margin = 10;
+      const columnGap = 6;
+      const rowGap = 6;
+      const cardWidth = (210 - margin * 2 - columnGap) / 2;
+      const cardHeight = 86;
+
+      studentsForCards.forEach((student, index) => {
+        const pageIndex = Math.floor(index / 6);
+        const position = index % 6;
+        if (pageIndex > 0 && position === 0) pdf.addPage();
+
+        const column = position % 2;
+        const row = Math.floor(position / 2);
+        const x = margin + column * (cardWidth + columnGap);
+        const y = margin + row * (cardHeight + rowGap);
+        const centreX = x + cardWidth / 2;
+
+        pdf.setDrawColor(226, 232, 240);
+        pdf.setLineWidth(0.6);
+        pdf.roundedRect(x, y, cardWidth, cardHeight, 4, 4);
+
+        pdf.setTextColor(0, 151, 136);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(8);
+        pdf.text("LEVEL UP LEARNING", centreX, y + 8, { align: "center" });
+
+        pdf.setTextColor(15, 23, 42);
+        pdf.setFontSize(14);
+        const studentName = pdf.splitTextToSize(student.display_name, cardWidth - 12)[0];
+        pdf.text(studentName, centreX, y + 16, { align: "center" });
+
+        pdf.setTextColor(100, 116, 139);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(8);
+        pdf.text(
+          `${classRow.name} | Class code: ${classRow.class_code}`,
+          centreX,
+          y + 22,
+          { align: "center" },
+        );
+
+        pdf.addImage(classQrSrc, "PNG", centreX - 17, y + 26, 34, 34);
+        pdf.setFontSize(7);
+        pdf.text("Scan to open the login page", centreX, y + 64, { align: "center" });
+
+        pdf.setFillColor(248, 250, 252);
+        pdf.roundedRect(x + 6, y + 68, cardWidth - 12, 13, 2, 2, "F");
+        pdf.setTextColor(100, 116, 139);
+        pdf.setFontSize(6);
+        pdf.text("USERNAME", x + 10, y + 73);
+        pdf.text("PASSWORD", centreX + 3, y + 73);
+        pdf.setTextColor(15, 23, 42);
+        pdf.setFont("courier", "bold");
+        pdf.setFontSize(10);
+        pdf.text(student.username ?? student.display_name, x + 10, y + 78);
+        pdf.text(student.pin ?? "-", centreX + 3, y + 78);
+      });
+
+      const fileName = `${classRow.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "class"}-student-login-details.pdf`;
+      pdf.save(fileName);
+      setPinToast("Student login details PDF downloaded.");
+      window.setTimeout(() => setPinToast(null), 2600);
+    } catch (error) {
+      console.error("Unable to create student login details PDF", error);
+      setPinToast("Student login details PDF could not be created. Please try again.");
       window.setTimeout(() => setPinToast(null), 3200);
     }
   }
@@ -1214,7 +1298,7 @@ export default function TeacherDashboardPage() {
             {/* Student Login Details */}
             {selectedClass && classStudents.length > 0 && (
               <button
-                onClick={() => void printAllLoginCards()}
+                onClick={() => setShowLoginDetailsActions(true)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E6E8EC] bg-white text-[#0F172A] font-bold text-sm hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition active:scale-[0.98]"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25">
@@ -1488,6 +1572,70 @@ export default function TeacherDashboardPage() {
           students={classStudents}
           onClose={() => setShowPlacements(false)}
         />
+      )}
+
+      {showLoginDetailsActions && selectedClass && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#0F172A]/45 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="student-login-details-title"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setShowLoginDetailsActions(false);
+          }}
+        >
+          <div className="w-full max-w-md rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-[0_24px_70px_-24px_rgba(15,23,42,0.55)]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="student-login-details-title" className="text-xl font-black text-[#0F172A]">
+                  Student Login Details
+                </h2>
+                <p className="mt-1 text-sm text-[#64748B]">
+                  {selectedClass.name} · {classStudents.length} students
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowLoginDetailsActions(false)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]"
+                aria-label="Close student login details"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLoginDetailsActions(false);
+                  void downloadLoginCardsPdf();
+                }}
+                className="flex min-h-28 flex-col items-start justify-between rounded-xl border border-[#CBD5E1] bg-white p-4 text-left hover:border-[#009688] hover:bg-[#F0FDFA]"
+              >
+                <Download className="h-6 w-6 text-[#009688]" />
+                <span>
+                  <span className="block font-black text-[#0F172A]">Download PDF</span>
+                  <span className="mt-1 block text-xs text-[#64748B]">Save login cards as a PDF file.</span>
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLoginDetailsActions(false);
+                  void printAllLoginCards();
+                }}
+                className="flex min-h-28 flex-col items-start justify-between rounded-xl border border-[#CBD5E1] bg-white p-4 text-left hover:border-[#009688] hover:bg-[#F0FDFA]"
+              >
+                <Printer className="h-6 w-6 text-[#009688]" />
+                <span>
+                  <span className="block font-black text-[#0F172A]">Print</span>
+                  <span className="mt-1 block text-xs text-[#64748B]">Open the printable login cards.</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {pinToast && (
