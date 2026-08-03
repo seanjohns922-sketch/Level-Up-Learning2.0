@@ -1,6 +1,6 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { fifteenFrom } from "@/data/activities/starpath/level1/quizUtils";
-import { createGuideTheRoverTaskSet, createMoveGeospinTaskSet, createMissionControlTaskSet } from "./navWeeks";
+import { createFollowThePathTaskSet, createChooseTheRouteTaskSet, createGiveARouteTaskSet } from "./navWeeks";
 export function buildLevelTwoWeek7VoyageQuiz(): PracticeTask[] {
-  return fifteenFrom(createGuideTheRoverTaskSet(), createMoveGeospinTaskSet(), createMissionControlTaskSet());
+  return fifteenFrom(createFollowThePathTaskSet(), createChooseTheRouteTaskSet(), createGiveARouteTaskSet());
 }

@@ -3,9 +3,9 @@ import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-bl
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { LEVEL_TWO_ARTWORK, getStarMap, listStarMaps, mapLandmarks } from "./star-maps";
 
-// Level 2 · Weeks 6-7 — Navigate the star map (AC9M2SP02). Follow a path to a
-// named place, choose the first move, and give the full route. Uses the
-// starpathMapRoute mechanic so navigation happens on the labelled map.
+// Level 2 · Week 7 — Pathways on the star map (AC9M2SP02). Follow a path to a
+// named place, choose the first move, then give the full route yourself. Uses
+// the starpathMapRoute mechanic so navigation happens on the labelled map.
 
 type Dir = "up" | "down" | "left" | "right";
 const WORD: Record<Dir, string> = { up: "up", down: "down", left: "left", right: "right" };
@@ -124,16 +124,9 @@ function set(gens: Array<(round: number, target: number) => PracticeTask>, teach
 export const createFollowThePathTaskSet = (): RealmLessonTaskSet =>
   set([followMapTask, followMapTask, followMapTask], teaching("Follow the Path", "Follow directions across the map.", "Follow each direction to move the rover along the path to the place."));
 export const createChooseTheRouteTaskSet = (): RealmLessonTaskSet =>
-  set([chooseMapTask, chooseMapTask, chooseMapTask], teaching("Choose the Correct Route", "Choose the first move.", "Look at where the place is, then choose the first move that heads toward it."));
-export const createSpaceMazeTaskSet = (): RealmLessonTaskSet =>
-  set([followMapTask, chooseMapTask, followMapTask], teaching("Space Maze", "Navigate the map to the place.", "Follow the path and choose moves to navigate the rover to the place."));
-
-export const createGuideTheRoverTaskSet = (): RealmLessonTaskSet =>
-  set([followMapTask, followMapTask, chooseMapTask], teaching("Guide the Rover", "Follow directions to a place.", "Guide the rover by following each direction to the place on the map."));
-export const createMoveGeospinTaskSet = (): RealmLessonTaskSet =>
-  set([giveMapTask, giveMapTask, giveMapTask], teaching("Move Geospin", "Give the route yourself.", "Now you give the directions. Build a route to move the rover to the place, then run it."));
-export const createMissionControlTaskSet = (): RealmLessonTaskSet =>
-  set([giveMapTask, chooseMapTask, giveMapTask], teaching("Mission Control", "Plan and give routes.", "Complete the navigation mission: choose moves and give routes to reach each place."));
+  set([chooseMapTask, chooseMapTask, chooseMapTask], teaching("Choose the Route", "Choose the first move.", "Look at where the place is, then choose the first move that heads toward it."));
+export const createGiveARouteTaskSet = (): RealmLessonTaskSet =>
+  set([giveMapTask, giveMapTask, giveMapTask], teaching("Give a Route", "Give the route yourself.", "Now you give the directions. Build a route to move the rover to the place, then run it."));
 
 function content(title: string, brief: string, criteria: [string, string, string], acts: [string, string, string], reflectPrompt: string, reflectOpts: [string, string, string], skills: [string, string, string], nextUp: string, kind: string, createTaskSet: () => RealmLessonTaskSet): StarpathLessonContent {
   return {
@@ -153,10 +146,6 @@ function content(title: string, brief: string, criteria: [string, string, string
   } satisfies StarpathLessonContent;
 }
 
-export const FOLLOW_THE_PATH_CONTENT = content("Follow the Path", "Follow the directions to move the rover along the path to each place on the map.", ["read each direction", "move the rover", "reach the place"], ["Follow the Path", "Path Check", "Path Master"], "How did you follow the path?", ["I read each direction", "I moved one step at a time", "I reached the place"], ["Follow a map path", "Move step by step", "Reach a place"], "Choose the Correct Route", "starpathMapRoute", createFollowThePathTaskSet);
-export const CHOOSE_THE_ROUTE_CONTENT = content("Choose the Correct Route", "Look at where the place is and choose the first move that heads toward it.", ["see where the place is", "choose the first move", "head the right way"], ["Choose the Route", "Route Check", "Route Master"], "How did you choose?", ["I looked where the place was", "I chose the first move", "I headed the right way"], ["Choose a direction", "Read a map", "Plan a first move"], "Space Maze", "starpathMapRoute", createChooseTheRouteTaskSet);
-export const SPACE_MAZE_CONTENT = content("Space Maze", "Navigate the rover through the map to reach each place.", ["follow the path", "choose moves", "reach the place"], ["Enter the Maze", "Maze Check", "Maze Master"], "How did you get through?", ["I followed the path", "I chose the right moves", "I reached the place"], ["Navigate a map", "Follow and choose", "Reach a place"], "Week 6 Voyage Quiz", "starpathMapRoute", createSpaceMazeTaskSet);
-
-export const GUIDE_THE_ROVER_CONTENT = content("Guide the Rover", "Guide the rover by following each direction to the place on the map.", ["follow directions", "move the rover", "reach the place"], ["Guide the Rover", "Guide Check", "Guide Master"], "How did you guide it?", ["I followed the directions", "I moved carefully", "I reached the place"], ["Follow directions", "Guide a rover", "Reach a place"], "Move Geospin", "starpathMapRoute", createGuideTheRoverTaskSet);
-export const MOVE_GEOSPIN_CONTENT = content("Move Geospin", "Now you give the directions. Build a route to move the rover to the place, then run it.", ["choose moves in order", "reach the place", "run the route"], ["Give a Route", "Route Orders", "Route Master"], "How did you give the route?", ["I chose moves in order", "I ran it to test", "I reached the place"], ["Give a route", "Order moves", "Reach a place"], "Mission Control", "starpathMapRoute", createMoveGeospinTaskSet);
-export const MISSION_CONTROL_CONTENT = content("Mission Control", "Complete the navigation mission — choose moves and give routes to reach each place.", ["plan a route", "give directions", "reach the place"], ["Mission Start", "Mission Check", "Mission Master"], "You are Mission Control! What did you do?", ["I planned routes", "I gave directions", "I reached the places"], ["Plan a route", "Give directions", "Complete a mission"], "Week 7 Voyage Quiz", "starpathMapRoute", createMissionControlTaskSet);
+export const FOLLOW_THE_PATH_CONTENT = content("Follow the Path", "Follow the directions to move the rover along the path to each place on the map.", ["read each direction", "move the rover", "reach the place"], ["Follow the Path", "Path Check", "Path Master"], "How did you follow the path?", ["I read each direction", "I moved one step at a time", "I reached the place"], ["Follow a map path", "Move step by step", "Reach a place"], "Choose the Route", "starpathMapRoute", createFollowThePathTaskSet);
+export const CHOOSE_THE_ROUTE_CONTENT = content("Choose the Route", "Look at where the place is and choose the first move that heads toward it.", ["see where the place is", "choose the first move", "head the right way"], ["Choose the Route", "Route Check", "Route Master"], "How did you choose?", ["I looked where the place was", "I chose the first move", "I headed the right way"], ["Choose a direction", "Read a map", "Plan a first move"], "Give a Route", "starpathMapRoute", createChooseTheRouteTaskSet);
+export const GIVE_A_ROUTE_CONTENT = content("Give a Route", "Now you give the directions. Build a route to move the rover to the place, then run it.", ["choose moves in order", "run the route", "reach the place"], ["Give a Route", "Route Orders", "Route Master"], "How did you give the route?", ["I chose moves in order", "I ran it to test", "I reached the place"], ["Give a route", "Order moves", "Reach a place"], "Week 7 Voyage Quiz", "starpathMapRoute", createGiveARouteTaskSet);

@@ -120,13 +120,18 @@ export function relativeTask(round: number, target: number): PracticeTask {
   };
 }
 
-function teaching(heading: string, prompt: string, speakText: string) {
+function teaching(
+  variant: "mapLocate" | "mapPositions",
+  heading: string,
+  prompt: string,
+  speakText: string
+) {
   let target = 0;
   return () =>
     ({
       kind: "starpathShapeIntro",
       scene: "intro",
-      variant: "mapLocate",
+      variant,
       heading,
       prompt,
       speakText,
@@ -134,6 +139,7 @@ function teaching(heading: string, prompt: string, speakText: string) {
     }) satisfies PracticeTask;
 }
 
+// ── W5 · Reading a Map — locate named places on the star map ─────────────────
 export function createReadingAMapTaskSet(): RealmLessonTaskSet {
   let target = 10;
   let a = 0;
@@ -141,6 +147,7 @@ export function createReadingAMapTaskSet(): RealmLessonTaskSet {
   let c = 0;
   return {
     teaching: teaching(
+      "mapLocate",
       "Reading a Space Map",
       "A star map shows where places are.",
       "A star map is a picture from above that shows where places are. Find each place by reading its label."
@@ -153,40 +160,103 @@ export function createReadingAMapTaskSet(): RealmLessonTaskSet {
   };
 }
 
-export function createFindThePlanetTaskSet(): RealmLessonTaskSet {
+export function createFindThePlaceTaskSet(): RealmLessonTaskSet {
   let target = 20;
   let a = 0;
   let b = 0;
   let c = 0;
   return {
     teaching: teaching(
-      "Find the Planet",
+      "mapLocate",
+      "Find the Place",
       "Every place has its own spot on the map.",
-      "Each place sits in its own square on the map. Find the place, and say what is at a marked spot."
+      "Each place sits in its own square on the map. Read the label and find each place on the map."
     ),
     activities: [
-      () => whatIsHereTask(a++, ++target),
-      () => findTask(b++ + 2, ++target),
-      () => whatIsHereTask(c++ + 1, ++target),
+      () => findTask(a++ + 3, ++target),
+      () => findTask(b++ + 4, ++target),
+      () => findTask(c++ + 5, ++target),
     ],
   };
 }
 
-export function createMapExplorerTaskSet(): RealmLessonTaskSet {
+export function createMapReadingChallengeTaskSet(): RealmLessonTaskSet {
   let target = 30;
   let a = 0;
   let b = 0;
   let c = 0;
   return {
     teaching: teaching(
-      "Map Explorer",
-      "Places on a map have positions next to each other.",
-      "Explore the map. Find places, name what is at a spot, and work out which place is next to another."
+      "mapLocate",
+      "Map Reading Challenge",
+      "Show what you know about reading the map.",
+      "Find each place on the star map on your own."
+    ),
+    activities: [
+      () => findTask(a++ + 6, ++target),
+      () => findTask(b++ + 7, ++target),
+      () => findTask(c++ + 8, ++target),
+    ],
+  };
+}
+
+// ── W6 · Positions on a Map — name what is here and what is next to what ──────
+export function createWhatIsHereTaskSet(): RealmLessonTaskSet {
+  let target = 10;
+  let a = 0;
+  let b = 0;
+  let c = 0;
+  return {
+    teaching: teaching(
+      "mapPositions",
+      "What Is Here?",
+      "Each spot on the map has a place.",
+      "Look at the marked spot on the map and say which place is there."
+    ),
+    activities: [
+      () => whatIsHereTask(a++, ++target),
+      () => whatIsHereTask(b++ + 1, ++target),
+      () => whatIsHereTask(c++ + 2, ++target),
+    ],
+  };
+}
+
+export function createNextToTaskSet(): RealmLessonTaskSet {
+  let target = 20;
+  let a = 0;
+  let b = 0;
+  let c = 0;
+  return {
+    teaching: teaching(
+      "mapPositions",
+      "Next To and Nearby",
+      "Places sit next to, above and below each other.",
+      "Use the map to work out which place is next to, above or below another place."
     ),
     activities: [
       () => relativeTask(a++, ++target),
-      () => whatIsHereTask(b++ + 2, ++target),
-      () => relativeTask(c++ + 1, ++target),
+      () => relativeTask(b++ + 1, ++target),
+      () => relativeTask(c++ + 2, ++target),
+    ],
+  };
+}
+
+export function createPositionChallengeTaskSet(): RealmLessonTaskSet {
+  let target = 30;
+  let a = 0;
+  let b = 0;
+  let c = 0;
+  return {
+    teaching: teaching(
+      "mapPositions",
+      "Position Challenge",
+      "Show what you know about positions on the map.",
+      "Name what is at a spot, and work out which place is next to another."
+    ),
+    activities: [
+      () => whatIsHereTask(a++ + 1, ++target),
+      () => relativeTask(b++, ++target),
+      () => relativeTask(c++ + 2, ++target),
     ],
   };
 }
@@ -207,46 +277,107 @@ export const READING_A_MAP_CONTENT = {
     options: ["I read the map labels", "I looked from above", "I found its square"],
   },
   practisedSkills: ["Read a 2D map", "Locate a named place", "Use map labels"],
-  nextUpLabel: "Find the Planet",
+  nextUpLabel: "Find the Place",
   createTaskSet: createReadingAMapTaskSet,
 } satisfies StarpathLessonContent;
 
-export const FIND_THE_PLANET_CONTENT = {
+export const FIND_THE_PLACE_CONTENT = {
   missionBrief:
-    "Locate places on the star map. Say what sits at a marked spot, and find places by name.",
-  successCriteria: ["read a marked spot", "name the place there", "find places by name"],
+    "Every place has its own square on the star map. Read the labels and find each place by name.",
+  successCriteria: ["read the map labels", "find a place by name", "locate places quickly"],
   artworkSrc: LEVEL_TWO_ARTWORK,
-  teaching: { title: "Find the Planet", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Find the Place", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  activities: [
+    { key: "find-1", title: "Find the Place", description: "Find a place by name.", taskKinds: ["starpathMapLocate"] },
+    { key: "find-2", title: "Find Another", description: "Find the next place.", taskKinds: ["starpathMapLocate"] },
+    { key: "find-3", title: "Place Finder", description: "Find places quickly.", taskKinds: ["starpathMapLocate"] },
+  ],
+  reflection: {
+    prompt: "How did you find each place?",
+    options: ["I read the labels", "I looked square by square", "I found it by name"],
+  },
+  practisedSkills: ["Locate a named place", "Read map labels", "Find places quickly"],
+  nextUpLabel: "Map Reading Challenge",
+  createTaskSet: createFindThePlaceTaskSet,
+} satisfies StarpathLessonContent;
+
+export const MAP_READING_CHALLENGE_CONTENT = {
+  missionBrief:
+    "Mixed review — find each place on the star map on your own.",
+  successCriteria: ["read the map", "find places independently", "answer on your own"],
+  artworkSrc: LEVEL_TWO_ARTWORK,
+  teaching: { title: "Map Reading Challenge", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  activities: [
+    { key: "find-1", title: "Map Quiz", description: "Find a place on the map.", taskKinds: ["starpathMapLocate"] },
+    { key: "find-2", title: "Map Hunt", description: "Find another place.", taskKinds: ["starpathMapLocate"] },
+    { key: "find-3", title: "Map Champion", description: "Find places independently.", taskKinds: ["starpathMapLocate"] },
+  ],
+  reflection: {
+    prompt: "What did you learn about reading a map?",
+    options: ["A map shows places from above", "I can find a place by its label", "Every place has its own square"],
+  },
+  practisedSkills: ["Read a 2D map", "Locate named places", "Work independently"],
+  nextUpLabel: "Week 5 Voyage Quiz",
+  createTaskSet: createMapReadingChallengeTaskSet,
+} satisfies StarpathLessonContent;
+
+// ── W6 · Positions on a Map ──────────────────────────────────────────────────
+export const WHAT_IS_HERE_CONTENT = {
+  missionBrief:
+    "Each spot on the star map has a place. Look at a marked spot and say which place is there.",
+  successCriteria: ["read a marked spot", "name the place there", "use the map labels"],
+  artworkSrc: LEVEL_TWO_ARTWORK,
+  teaching: { title: "What Is Here?", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
     { key: "here-1", title: "What Is Here?", description: "Name what is at a marked spot.", taskKinds: ["starpathMapLocate"] },
-    { key: "find-1", title: "Find It", description: "Find a place by name.", taskKinds: ["starpathMapLocate"] },
-    { key: "here-2", title: "Spot Master", description: "Name spots independently.", taskKinds: ["starpathMapLocate"] },
+    { key: "here-2", title: "Spot Check", description: "Name another marked spot.", taskKinds: ["starpathMapLocate"] },
+    { key: "here-3", title: "Spot Master", description: "Name spots independently.", taskKinds: ["starpathMapLocate"] },
   ],
   reflection: {
     prompt: "How did you name a spot?",
     options: ["I read the label at the square", "I matched the spot to a place", "I looked carefully at the map"],
   },
-  practisedSkills: ["Locate positions on a map", "Name a marked position", "Find places by name"],
-  nextUpLabel: "Map Explorer",
-  createTaskSet: createFindThePlanetTaskSet,
+  practisedSkills: ["Name a marked position", "Read a spot on a map", "Use map labels"],
+  nextUpLabel: "Next To and Nearby",
+  createTaskSet: createWhatIsHereTaskSet,
 } satisfies StarpathLessonContent;
 
-export const MAP_EXPLORER_CONTENT = {
+export const NEXT_TO_CONTENT = {
   missionBrief:
-    "Explore Sector by Sector. Find places, name what is at a spot, and work out which place is next to another.",
-  successCriteria: ["read positions on a map", "compare landmark positions", "reason about the map"],
+    "Places sit next to, above and below each other. Work out which place is next to another.",
+  successCriteria: ["find the reference place", "look next to it", "name the place there"],
   artworkSrc: LEVEL_TWO_ARTWORK,
-  teaching: { title: "Map Explorer", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Next To and Nearby", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
     { key: "relative-1", title: "Next To", description: "Find the place next to another.", taskKinds: ["starpathMapLocate"] },
-    { key: "here-1", title: "Spot Check", description: "Name a marked spot.", taskKinds: ["starpathMapLocate"] },
-    { key: "relative-2", title: "Explorer Master", description: "Reason about positions.", taskKinds: ["starpathMapLocate"] },
+    { key: "relative-2", title: "Above and Below", description: "Find the place above or below another.", taskKinds: ["starpathMapLocate"] },
+    { key: "relative-3", title: "Nearby Master", description: "Reason about nearby places.", taskKinds: ["starpathMapLocate"] },
   ],
   reflection: {
-    prompt: "What did you learn about the map?",
+    prompt: "How did you find the place?",
+    options: ["I found the first place", "I looked next to it", "I named the place there"],
+  },
+  practisedSkills: ["Reason about relative position", "Use above, below and beside", "Compare positions"],
+  nextUpLabel: "Position Challenge",
+  createTaskSet: createNextToTaskSet,
+} satisfies StarpathLessonContent;
+
+export const POSITION_CHALLENGE_CONTENT = {
+  missionBrief:
+    "Mixed review — name what is at a spot and work out which place is next to another.",
+  successCriteria: ["name a spot", "reason about position", "answer on your own"],
+  artworkSrc: LEVEL_TWO_ARTWORK,
+  teaching: { title: "Position Challenge", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  activities: [
+    { key: "here-1", title: "Position Quiz", description: "Name what is at a spot.", taskKinds: ["starpathMapLocate"] },
+    { key: "relative-1", title: "Position Hunt", description: "Find the place next to another.", taskKinds: ["starpathMapLocate"] },
+    { key: "relative-2", title: "Position Champion", description: "Reason about positions.", taskKinds: ["starpathMapLocate"] },
+  ],
+  reflection: {
+    prompt: "What did you learn about positions?",
     options: ["Places have positions next to each other", "I can say what is above or beside a place", "A map shows where everything is"],
   },
-  practisedSkills: ["Reason about relative position", "Read a map", "Compare landmark positions"],
-  nextUpLabel: "Week 4 Voyage Quiz",
-  createTaskSet: createMapExplorerTaskSet,
+  practisedSkills: ["Name a position", "Reason about relative position", "Work independently"],
+  nextUpLabel: "Week 6 Voyage Quiz",
+  createTaskSet: createPositionChallengeTaskSet,
 } satisfies StarpathLessonContent;

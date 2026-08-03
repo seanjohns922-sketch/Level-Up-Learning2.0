@@ -193,10 +193,13 @@ function PositionTeachGrid({ items }: { items: PositionTeach[] }) {
 
 // Week 8 (Master Mapper) teaching — a small map that mirrors the real practice
 // grid, so the explanation looks like what the child is about to do.
-type MiniMarker = { r: number; c: number; object: string };
+type MiniMarker = { r: number; c: number; object: string; label?: string };
 type MiniArrow = { r: number; c: number; dir: "up" | "down" | "left" | "right" };
 const MINI_ARROW_ICON = { up: ArrowUp, down: ArrowDown, left: ArrowLeft, right: ArrowRight } as const;
 
+// Explainer map, styled to mirror the real practice grid. Fixed size + inline
+// background so it always renders as a clear dark map (never collapses inside a
+// flex card), with big place markers and labels.
 function MiniMap({ markers, arrows = [] }: { markers: MiniMarker[]; arrows?: MiniArrow[] }) {
   const cols = 3;
   const rows = 3;
@@ -207,25 +210,26 @@ function MiniMap({ markers, arrows = [] }: { markers: MiniMarker[]; arrows?: Min
   });
   return (
     <div
-      className="relative mx-auto w-full max-w-[9.5rem] overflow-hidden rounded-xl border-2 border-violet-200 bg-gradient-to-b from-indigo-950 to-violet-900 shadow-inner"
-      style={{ aspectRatio: "1 / 1" }}
+      className="relative h-40 w-40 shrink-0 overflow-hidden rounded-2xl border-2 border-violet-200 shadow-inner sm:h-48 sm:w-48"
+      style={{ background: "linear-gradient(to bottom, #1e1b4b, #4c1d95 55%, #020617)" }}
     >
-      <div className="grid h-full w-full" style={{ gridTemplateColumns: "repeat(3,1fr)", gridTemplateRows: "repeat(3,1fr)" }}>
+      <div className="absolute inset-0 grid" style={{ gridTemplateColumns: "repeat(3,1fr)", gridTemplateRows: "repeat(3,1fr)" }}>
         {Array.from({ length: cols * rows }).map((_, index) => (
-          <div key={index} className="border border-cyan-200/15" />
+          <div key={index} style={{ borderRight: "1px solid rgba(103,232,249,0.16)", borderBottom: "1px solid rgba(103,232,249,0.16)" }} />
         ))}
       </div>
       {arrows.map((arrow, index) => {
         const Icon = MINI_ARROW_ICON[arrow.dir];
         return (
-          <span key={`arrow-${index}`} className="absolute flex h-5 w-5 items-center justify-center text-cyan-300" style={place(arrow.r, arrow.c)}>
-            <Icon className="h-4 w-4" strokeWidth={3} />
+          <span key={`arrow-${index}`} className="absolute flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-cyan-300" style={place(arrow.r, arrow.c)}>
+            <Icon className="h-5 w-5" strokeWidth={3} />
           </span>
         );
       })}
       {markers.map((marker) => (
-        <span key={`${marker.object}-${marker.r}-${marker.c}`} className="absolute" style={place(marker.r, marker.c)}>
-          <PositionObjectVisual objectId={marker.object} className="h-7 w-7 sm:h-8 sm:w-8" />
+        <span key={`${marker.object}-${marker.r}-${marker.c}`} className="absolute flex flex-col items-center gap-0.5" style={place(marker.r, marker.c)}>
+          <PositionObjectVisual objectId={marker.object} className="h-11 w-11 sm:h-12 sm:w-12" />
+          {marker.label ? <span className="rounded bg-black/30 px-1 text-[9px] font-black leading-tight text-cyan-100 sm:text-[10px]">{marker.label}</span> : null}
         </span>
       ))}
     </div>
@@ -320,7 +324,7 @@ function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathw
           <NumberedSidesShape shape="square" />
         </TeachCard>
         <TeachCard readAloud="Map skills. The star is a place on the map. Find it." title="Map skills" tip="The star is a place. Find it on the map.">
-          <MiniMap markers={[{ r: 0, c: 2, object: "star" }]} />
+          <MiniMap markers={[{ r: 0, c: 2, object: "star", label: "Star" }, { r: 1, c: 1, object: "moon", label: "Moon" }]} />
         </TeachCard>
       </div>
     );
@@ -329,17 +333,17 @@ function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathw
     return (
       <div className="mx-auto grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
         <TeachCard readAloud="Read the map. The rocket is you. The star is where to go." title="Read" tip="The rocket is you. The star is where to go.">
-          <MiniMap markers={[{ r: 2, c: 0, object: "rocket" }, { r: 0, c: 2, object: "star" }]} />
+          <MiniMap markers={[{ r: 2, c: 0, object: "rocket", label: "You" }, { r: 0, c: 2, object: "star", label: "Goal" }]} />
         </TeachCard>
         <TeachCard readAloud="Follow the path. Each arrow is one move. Follow the moves to the star." title="Follow" tip="Each arrow is one move. Follow them to the star.">
-          <MiniMap markers={[{ r: 2, c: 0, object: "rocket" }, { r: 0, c: 2, object: "star" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
+          <MiniMap markers={[{ r: 2, c: 0, object: "rocket", label: "You" }, { r: 0, c: 2, object: "star", label: "Goal" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
         </TeachCard>
         <TeachCard readAloud="Give your own route. A route is moves in order. Build it, then run it." title="Give" tip="A route is moves in order. Build it, then run it.">
           <div className="flex items-center gap-1.5">
             {(["right", "right", "up"] as const).map((dir, index) => {
               const Icon = MINI_ARROW_ICON[dir];
               return (
-                <span key={index} className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-b from-indigo-950 to-violet-900 text-cyan-200">
+                <span key={index} className="flex h-10 w-10 items-center justify-center rounded-xl text-cyan-200" style={{ background: "linear-gradient(to bottom, #1e1b4b, #4c1d95)" }}>
                   <Icon className="h-5 w-5" strokeWidth={3} />
                 </span>
               );
@@ -358,10 +362,10 @@ function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathw
         </div>
       </TeachCard>
       <TeachCard readAloud="Read the map. The star is the place. Find it on the map." title="Read the map" tip="The star is the place. Find it.">
-        <MiniMap markers={[{ r: 0, c: 2, object: "star" }]} />
+        <MiniMap markers={[{ r: 0, c: 2, object: "star", label: "Star" }, { r: 1, c: 1, object: "moon", label: "Moon" }]} />
       </TeachCard>
       <TeachCard readAloud="Navigate. A route is moves in order to reach the star." title="Navigate" tip="A route is moves in order to reach the star.">
-        <MiniMap markers={[{ r: 2, c: 0, object: "rocket" }, { r: 0, c: 2, object: "star" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
+        <MiniMap markers={[{ r: 2, c: 0, object: "rocket", label: "You" }, { r: 0, c: 2, object: "star", label: "Goal" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
       </TeachCard>
     </div>
   );
@@ -372,8 +376,20 @@ function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathw
 function ConceptTeachGrid({
   variant,
 }: {
-  variant: "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapRoute";
+  variant: "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute";
 }) {
+  if (variant === "mapPositions") {
+    return (
+      <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+        <TeachCard readAloud="What is here? Look at a spot on the map and say which place is there." title="What is here?" tip="Look at a spot and say which place is there.">
+          <MiniMap markers={[{ r: 1, c: 1, object: "star", label: "Star" }]} />
+        </TeachCard>
+        <TeachCard readAloud="Next to. Work out which place is next to, above or below another." title="Next to" tip="Which place is next to, above or below another?">
+          <MiniMap markers={[{ r: 1, c: 0, object: "planet", label: "Planet" }, { r: 1, c: 2, object: "star", label: "Star" }]} />
+        </TeachCard>
+      </div>
+    );
+  }
   if (variant === "featureEdges") {
     return (
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
@@ -426,10 +442,10 @@ function ConceptTeachGrid({
     return (
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
         <TeachCard readAloud="A map shows places from above. Each picture is a place." title="A map shows places" tip="Each picture on the map is a place.">
-          <MiniMap markers={[{ r: 0, c: 2, object: "star" }, { r: 2, c: 1, object: "planet" }]} />
+          <MiniMap markers={[{ r: 0, c: 2, object: "star", label: "Star" }, { r: 2, c: 1, object: "planet", label: "Planet" }]} />
         </TeachCard>
         <TeachCard readAloud="Find the place you are looking for on the map." title="Find the place" tip="Look for the place you need, then tap it.">
-          <MiniMap markers={[{ r: 0, c: 2, object: "star" }]} />
+          <MiniMap markers={[{ r: 0, c: 2, object: "star", label: "Star" }, { r: 1, c: 1, object: "moon", label: "Moon" }]} />
         </TeachCard>
       </div>
     );
@@ -437,14 +453,14 @@ function ConceptTeachGrid({
   return (
     <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
       <TeachCard readAloud="A route is moves in order. Follow each arrow to move the rocket to the star." title="Follow a route" tip="Each arrow is one move. Follow them to the star.">
-        <MiniMap markers={[{ r: 2, c: 0, object: "rocket" }, { r: 0, c: 2, object: "star" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
+        <MiniMap markers={[{ r: 2, c: 0, object: "rocket", label: "You" }, { r: 0, c: 2, object: "star", label: "Goal" }]} arrows={[{ r: 2, c: 1, dir: "right" }, { r: 1, c: 2, dir: "up" }]} />
       </TeachCard>
       <TeachCard readAloud="Give your own route. Put the moves in order, then run it." title="Give a route" tip="Put the moves in order, then run it.">
         <div className="flex items-center gap-1.5">
           {(["right", "right", "up"] as const).map((dir, index) => {
             const Icon = MINI_ARROW_ICON[dir];
             return (
-              <span key={index} className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-b from-indigo-950 to-violet-900 text-cyan-200">
+              <span key={index} className="flex h-10 w-10 items-center justify-center rounded-xl text-cyan-200" style={{ background: "linear-gradient(to bottom, #1e1b4b, #4c1d95)" }}>
                 <Icon className="h-5 w-5" strokeWidth={3} />
               </span>
             );
@@ -491,9 +507,11 @@ export function StarpathShapeIntroCard({
                             ? "Comparing shapes"
                             : variant === "mapLocate"
                               ? "Reading a map"
-                              : variant === "mapRoute"
-                                ? "Following a route"
-                                : "Meet the cosmic shapes");
+                              : variant === "mapPositions"
+                                ? "Positions on a map"
+                                : variant === "mapRoute"
+                                  ? "Following a route"
+                                  : "Meet the cosmic shapes");
 
   return (
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-5 sm:p-7">
@@ -501,7 +519,7 @@ export function StarpathShapeIntroCard({
 
       {variant === "masterShapeMap" || variant === "masterPathway" || variant === "masterMission" ? (
         <MasterTeachGrid variant={variant} />
-      ) : variant === "featureEdges" || variant === "featureSides" || variant === "featureParallel" || variant === "featureCompare" || variant === "mapLocate" || variant === "mapRoute" ? (
+      ) : variant === "featureEdges" || variant === "featureSides" || variant === "featureParallel" || variant === "featureCompare" || variant === "mapLocate" || variant === "mapPositions" || variant === "mapRoute" ? (
         <ConceptTeachGrid variant={variant} />
       ) : variant === "builders" ? (
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3">

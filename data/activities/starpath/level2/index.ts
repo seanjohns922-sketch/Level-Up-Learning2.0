@@ -14,17 +14,17 @@ import {
   WHAT_IS_DIFFERENT_CONTENT,
 } from "./shapeWeeks";
 import {
-  FIND_THE_PLANET_CONTENT,
-  MAP_EXPLORER_CONTENT,
+  FIND_THE_PLACE_CONTENT,
+  MAP_READING_CHALLENGE_CONTENT,
+  NEXT_TO_CONTENT,
+  POSITION_CHALLENGE_CONTENT,
   READING_A_MAP_CONTENT,
+  WHAT_IS_HERE_CONTENT,
 } from "./week4StarMaps";
 import {
   CHOOSE_THE_ROUTE_CONTENT,
   FOLLOW_THE_PATH_CONTENT,
-  GUIDE_THE_ROVER_CONTENT,
-  MISSION_CONTROL_CONTENT,
-  MOVE_GEOSPIN_CONTENT,
-  SPACE_MAZE_CONTENT,
+  GIVE_A_ROUTE_CONTENT,
 } from "./navWeeks";
 import {
   MASTER_MISSION_CONTENT,
@@ -50,18 +50,18 @@ export const LEVEL_TWO_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y2-space-w4-l1": SAME_FEATURE_CONTENT,
   "y2-space-w4-l2": WHAT_IS_DIFFERENT_CONTENT,
   "y2-space-w4-l3": COMPARE_CHALLENGE_CONTENT,
-  // W5 Star Maps
+  // W5 Reading a Map (locate named places)
   "y2-space-w5-l1": READING_A_MAP_CONTENT,
-  "y2-space-w5-l2": FIND_THE_PLANET_CONTENT,
-  "y2-space-w5-l3": MAP_EXPLORER_CONTENT,
-  // W6 Space Pathways
-  "y2-space-w6-l1": FOLLOW_THE_PATH_CONTENT,
-  "y2-space-w6-l2": CHOOSE_THE_ROUTE_CONTENT,
-  "y2-space-w6-l3": SPACE_MAZE_CONTENT,
-  // W7 Navigation Missions
-  "y2-space-w7-l1": GUIDE_THE_ROVER_CONTENT,
-  "y2-space-w7-l2": MOVE_GEOSPIN_CONTENT,
-  "y2-space-w7-l3": MISSION_CONTROL_CONTENT,
+  "y2-space-w5-l2": FIND_THE_PLACE_CONTENT,
+  "y2-space-w5-l3": MAP_READING_CHALLENGE_CONTENT,
+  // W6 Positions on a Map (what is here / next to)
+  "y2-space-w6-l1": WHAT_IS_HERE_CONTENT,
+  "y2-space-w6-l2": NEXT_TO_CONTENT,
+  "y2-space-w6-l3": POSITION_CHALLENGE_CONTENT,
+  // W7 Pathways on a Map (follow / choose / give)
+  "y2-space-w7-l1": FOLLOW_THE_PATH_CONTENT,
+  "y2-space-w7-l2": CHOOSE_THE_ROUTE_CONTENT,
+  "y2-space-w7-l3": GIVE_A_ROUTE_CONTENT,
   // W8 Master Mapper
   "y2-space-w8-l1": SHAPE_AND_MAP_CONTENT,
   "y2-space-w8-l2": PATHWAY_MASTER_CONTENT,
