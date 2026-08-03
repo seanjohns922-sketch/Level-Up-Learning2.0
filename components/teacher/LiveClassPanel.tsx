@@ -35,6 +35,15 @@ type StudentRow = {
   working_level?: string | null;
 };
 
+type CanonicalProgressRow = {
+  student_id: string;
+  realm_id?: string | null;
+  year: string;
+  is_current?: boolean | null;
+  week: number | null;
+  updated_at?: string | null;
+};
+
 type LiveStudentActivityRow = {
   id?: string;
   student_id: string;
@@ -286,6 +295,63 @@ function resolveCurrentActivityRow(
   return resolved;
 }
 
+function selectCanonicalProgress(
+  studentId: string,
+  progressRows: CanonicalProgressRow[],
+  realmHint?: string | null,
+) {
+  const realm = realmHint ? normalizeAttemptRealm(realmHint) : null;
+  const currentRows = progressRows.filter(
+    (progress) => progress.student_id === studentId && progress.is_current !== false,
+  );
+  const realmRows = realm
+    ? currentRows.filter((progress) => normalizeAttemptRealm(progress.realm_id) === realm)
+    : [];
+
+  return [...(realmRows.length > 0 ? realmRows : currentRows)].sort(
+    (left, right) => timestampMs(right.updated_at) - timestampMs(left.updated_at),
+  )[0] ?? null;
+}
+
+function canonicalProgressActivityRow(
+  student: StudentRow,
+  progress: CanonicalProgressRow,
+): LiveStudentActivityRow {
+  return {
+    student_id: student.id,
+    class_id: student.class_id,
+    current_level: progress.year,
+    current_strand: progress.realm_id ?? null,
+    current_week: progress.week,
+    progress_percent: 0,
+    progress_label: "Waiting to start",
+  };
+}
+
+function alignCompletedActivityWithCanonicalProgress(
+  student: StudentRow,
+  row: LiveStudentActivityRow | null,
+  progressRows: CanonicalProgressRow[],
+) {
+  const canonical = selectCanonicalProgress(student.id, progressRows, row?.current_strand);
+  if (!canonical) return row;
+  if (!row) return canonicalProgressActivityRow(student, canonical);
+
+  const activityCompleted =
+    row.current_lesson_status === "completed" ||
+    row.latest_event_type === "lesson_completed" ||
+    row.latest_event_type === "quiz_completed";
+  if (!activityCompleted) return row;
+
+  const sameRealm = normalizeAttemptRealm(row.current_strand) === normalizeAttemptRealm(canonical.realm_id);
+  const sameLevel = normalizeWorkingLevelLabel(row.current_level) === normalizeWorkingLevelLabel(canonical.year);
+  const sameWeek = row.current_week == null || canonical.week == null || row.current_week === canonical.week;
+
+  return sameRealm && sameLevel && sameWeek
+    ? row
+    : canonicalProgressActivityRow(student, canonical);
+}
+
 function getQuestionKey(event: LiveActivityEventRow, index: number) {
   const payload = parseEventPayload(event.payload);
   const questionId = typeof payload.questionId === "string" ? payload.questionId.trim() : "";
@@ -315,11 +381,20 @@ function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEv
 
 function normalizeAttemptRealm(value?: string | null) {
   const normalized = value?.trim().toLowerCase();
-  return normalized === "measurement" || normalized === "measurelands" ? "measurement" : "number";
+  if (normalized === "measurement" || normalized === "measurelands" || normalized === "ml") {
+    return "measurement";
+  }
+  if (normalized === "space" || normalized === "starpath" || normalized === "sp") {
+    return "space";
+  }
+  return "number";
 }
 
 function formatRealmBadge(realm?: string | null) {
-  return normalizeAttemptRealm(realm) === "measurement" ? "ML" : "NN";
+  const normalized = normalizeAttemptRealm(realm);
+  if (normalized === "measurement") return "ML";
+  if (normalized === "space") return "SP";
+  return "NN";
 }
 
 function compareNullableNumbers(left: number | null, right: number | null, direction: LiveSortDirection) {
@@ -616,7 +691,7 @@ function toLiveCard(
   return {
     id: student.id,
     displayName: student.display_name,
-    workingLevelBadge: formatWorkingLevelBadge(student.working_level),
+    workingLevelBadge: formatWorkingLevelBadge(row?.current_level ?? student.working_level),
     status: insight?.status ?? row?.ai_status ?? "idle",
     currentLevel: row?.current_level ?? null,
     currentRealm: row?.current_strand ?? null,
@@ -718,9 +793,11 @@ function statusFilterLabel(filter: LiveStatusFilter) {
 export default function LiveClassPanel({
   selectedClass,
   students,
+  progressRows,
 }: {
   selectedClass: ClassRow | null;
   students: StudentRow[];
+  progressRows: CanonicalProgressRow[];
 }) {
   const [rows, setRows] = useState<LiveStudentActivityRow[]>([]);
   const [events, setEvents] = useState<LiveActivityEventRow[]>([]);
@@ -915,17 +992,18 @@ export default function LiveClassPanel({
     });
     return students.map((student) => {
       const studentEvents = eventMap.get(student.id) ?? [];
-      const row = resolveCurrentActivityRow(
+      const resolvedRow = resolveCurrentActivityRow(
         student,
         rowMap.get(student.id),
         studentEvents,
         completedAttempts,
       );
+      const row = alignCompletedActivityWithCanonicalProgress(student, resolvedRow, progressRows);
       const lessonPerformance = buildCurrentLessonPerformance(row, studentEvents);
       const completedAttemptSummary = buildCompletedActivityAttemptSummary(row, completedAttempts);
       return toLiveCard(student, row, lessonPerformance, completedAttemptSummary);
     });
-  }, [completedAttempts, events, rows, students]);
+  }, [completedAttempts, events, progressRows, rows, students]);
 
   const filteredCards = useMemo(() => {
     let base = filter === "all" ? cards : cards.filter((card) => getCardDisplayGroup(card) === filter);
@@ -1134,8 +1212,8 @@ export default function LiveClassPanel({
               const correct = Math.max(0, card.correctCount ?? 0);
               const accuracy = calculateAccuracy(correct, answered);
               const notStarted = displayGroup === "waiting_to_start";
-              const levelTag = notStarted ? "—" : (card.workingLevelBadge ?? "—");
-              const weekTag = notStarted ? "—" : (card.currentWeek ? `W${card.currentWeek}` : "—");
+              const levelTag = card.workingLevelBadge ?? "—";
+              const weekTag = card.currentWeek ? `W${card.currentWeek}` : "—";
               const lessonTag = notStarted ? "—" : (card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : "—");
               return (
                 <button

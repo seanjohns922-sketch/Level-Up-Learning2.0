@@ -34,6 +34,7 @@ type ProgressRow = {
   student_id: string;
   realm_id?: string;
   year: string;
+  is_current?: boolean | null;
   week: number | null;
   status: string;
   pretest_score: number | null;
@@ -1475,6 +1476,7 @@ export default function TeacherDashboardPage() {
               <LiveClassPanel
                 selectedClass={selectedClass ?? null}
                 students={classStudents as any}
+                progressRows={progress}
               />
             ) : activeTab === "curriculum" ? (
               <CurriculumExplorer
