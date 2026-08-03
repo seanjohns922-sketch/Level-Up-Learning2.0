@@ -2265,7 +2265,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug";
       heading?: string;
     }
   | {
@@ -2287,7 +2287,7 @@ export type PracticeTask = (
       // tap a named landmark, name what sits at a highlighted spot, or reason
       // about a landmark's position relative to another.
       kind: "starpathMapLocate";
-      mode: "find" | "whatIsHere" | "relative";
+      mode: "find" | "whatIsHere" | "relative" | "clues";
       prompt: string;
       speakText: string;
       target: number;
@@ -2299,16 +2299,19 @@ export type PracticeTask = (
       correctLandmarkId?: string;
       /** whatIsHere: the highlighted cell. */
       highlight?: { r: number; c: number };
-      /** whatIsHere / relative: multiple-choice options. */
+      /** whatIsHere / relative / clues: multiple-choice options. */
       options?: Array<{ id: string; label: string }>;
       correctOptionId?: string;
+      /** clues: two or more position clues that together identify one place. */
+      clues?: string[];
       feedback: { correct: string; wrong: string };
     }
   | {
-      // Level 2 · W6-7 — Map Route. Navigate a rover across the star map between
-      // named places: follow a path, choose the first move, or give the route.
+      // Level 2 · W7 — Map Route. Navigate a rover across the star map between
+      // named places: follow a path, plan a constrained mission, or find and fix
+      // the broken step in a route.
       kind: "starpathMapRoute";
-      mode: "follow" | "choose" | "give";
+      mode: "follow" | "choose" | "give" | "mission" | "debug";
       prompt: string;
       speakText: string;
       target: number;
@@ -2324,9 +2327,17 @@ export type PracticeTask = (
       /** choose: candidate first moves. */
       options?: Array<{ id: string; direction: "up" | "down" | "left" | "right" }>;
       correctOptionId?: string;
-      /** give: movement palette and the exact number of moves needed. */
+      /** give / mission: movement palette and the maximum number of moves. */
       palette?: Array<"up" | "down" | "left" | "right">;
       maxSteps?: number;
+      /** mission: cells to avoid, places to visit first, and the plain-language rule. */
+      blocked?: Array<{ r: number; c: number }>;
+      checkpoints?: Array<{ r: number; c: number; object: string; label?: string }>;
+      missionRule?: string;
+      singleAttempt?: boolean;
+      /** debug: an ordered route with one wrong step to find. */
+      debugSteps?: Array<{ id: string; direction: "up" | "down" | "left" | "right" }>;
+      wrongStepId?: string;
       feedback: { correct: string; wrong: string };
     }
   | {

@@ -17,14 +17,14 @@ import {
   ABOVE_BELOW_CONTENT,
   MAP_READING_CHALLENGE_CONTENT,
   NEXT_TO_CONTENT,
-  POSITION_CHALLENGE_CONTENT,
+  POSITION_DETECTIVE_CONTENT,
   READING_A_MAP_CONTENT,
   WHAT_IS_HERE_CONTENT,
 } from "./week4StarMaps";
 import {
-  CHOOSE_THE_ROUTE_CONTENT,
   FOLLOW_THE_PATH_CONTENT,
-  GIVE_A_ROUTE_CONTENT,
+  PLAN_A_MISSION_CONTENT,
+  TEST_AND_FIX_CONTENT,
 } from "./navWeeks";
 import {
   MASTER_MISSION_CONTENT,
@@ -54,14 +54,14 @@ export const LEVEL_TWO_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y2-space-w5-l1": READING_A_MAP_CONTENT,
   "y2-space-w5-l2": WHAT_IS_HERE_CONTENT,
   "y2-space-w5-l3": MAP_READING_CHALLENGE_CONTENT,
-  // W6 Positions on a Map (next to / above-below / mixed)
+  // W6 Positions on a Map (next to / above-below / detective)
   "y2-space-w6-l1": NEXT_TO_CONTENT,
   "y2-space-w6-l2": ABOVE_BELOW_CONTENT,
-  "y2-space-w6-l3": POSITION_CHALLENGE_CONTENT,
-  // W7 Pathways on a Map (follow / choose / give)
+  "y2-space-w6-l3": POSITION_DETECTIVE_CONTENT,
+  // W7 Pathways on a Map (follow / plan a mission / test and fix)
   "y2-space-w7-l1": FOLLOW_THE_PATH_CONTENT,
-  "y2-space-w7-l2": CHOOSE_THE_ROUTE_CONTENT,
-  "y2-space-w7-l3": GIVE_A_ROUTE_CONTENT,
+  "y2-space-w7-l2": PLAN_A_MISSION_CONTENT,
+  "y2-space-w7-l3": TEST_AND_FIX_CONTENT,
   // W8 Master Mapper
   "y2-space-w8-l1": SHAPE_AND_MAP_CONTENT,
   "y2-space-w8-l2": PATHWAY_MASTER_CONTENT,

@@ -130,6 +130,53 @@ export function relativeTask(
   };
 }
 
+// L3 (W6) — Position Detective. Two clues that together identify one place: a
+// row clue that leaves two candidates, then a relative clue that disambiguates.
+// Static, hand-checked specs so the answer is always exactly one landmark.
+type DetectiveSpec = {
+  mapId: string;
+  targetId: string;
+  clues: [string, string];
+  optionIds: [string, string, string, string];
+};
+const DETECTIVES: DetectiveSpec[] = [
+  { mapId: "sector-1", targetId: "planet-plaza", clues: ["It is in the top row.", "It is to the right of Crystal Caves."], optionIds: ["planet-plaza", "crystal-caves", "constellation-crossing", "moon-maze"] },
+  { mapId: "sector-2", targetId: "flag-point", clues: ["It is in the top row.", "It is to the right of Rocket Base."], optionIds: ["flag-point", "rocket-base", "moon-maze", "constellation-crossing"] },
+  { mapId: "sector-3", targetId: "alien-outpost", clues: ["It is in the top row.", "It is to the right of Moon Maze."], optionIds: ["alien-outpost", "moon-maze", "planet-plaza", "crystal-caves"] },
+  { mapId: "sector-1", targetId: "crystal-caves", clues: ["It is in the top row.", "It is to the left of Planet Plaza."], optionIds: ["crystal-caves", "planet-plaza", "moon-maze", "rocket-base"] },
+  { mapId: "sector-2", targetId: "rocket-base", clues: ["It is in the top row.", "It is to the left of Flag Point."], optionIds: ["rocket-base", "flag-point", "planet-plaza", "asteroid-pass"] },
+  { mapId: "sector-3", targetId: "moon-maze", clues: ["It is in the top row.", "It is to the left of Alien Outpost."], optionIds: ["moon-maze", "alien-outpost", "planet-plaza", "nebula-station"] },
+];
+
+export function positionDetectiveTask(round: number, target: number): PracticeTask {
+  const spec = DETECTIVES[round % DETECTIVES.length]!;
+  const map = getStarMap(spec.mapId);
+  const landmarks = mapLandmarks(map);
+  const byId = (id: string) => landmarks.find((l) => l.id === id)!;
+  const options = rotate(
+    spec.optionIds.map((id) => ({ id, label: byId(id).label })),
+    round
+  );
+  return {
+    kind: "starpathMapLocate",
+    mode: "clues",
+    prompt: "Which place do both clues point to?",
+    speakText: `Use both clues to find the place. ${spec.clues[0]} ${spec.clues[1]}`,
+    target,
+    mapId: map.id,
+    cols: map.cols,
+    rows: map.rows,
+    landmarks,
+    clues: spec.clues,
+    options,
+    correctOptionId: spec.targetId,
+    feedback: {
+      correct: `Yes — ${byId(spec.targetId).label} fits both clues.`,
+      wrong: "Read both clues. The place must match the first clue and the second clue.",
+    },
+  };
+}
+
 function teaching(
   variant: "mapLocate" | "mapPositions",
   heading: string,
@@ -255,7 +302,7 @@ export function createAboveBelowTaskSet(): RealmLessonTaskSet {
   };
 }
 
-export function createPositionChallengeTaskSet(): RealmLessonTaskSet {
+export function createPositionDetectiveTaskSet(): RealmLessonTaskSet {
   let target = 30;
   let a = 0;
   let b = 0;
@@ -263,14 +310,14 @@ export function createPositionChallengeTaskSet(): RealmLessonTaskSet {
   return {
     teaching: teaching(
       "mapPositions",
-      "Position Challenge",
-      "Show what you know about positions on the map.",
-      "Work out which place is next to, above or below another place."
+      "Position Detective",
+      "Use two clues to find one place.",
+      "Now use two clues together. The place must match the first clue and the second clue. Find the one place that fits both."
     ),
     activities: [
-      () => relativeTask(a++, ++target, "horizontal"),
-      () => relativeTask(b++ + 1, ++target, "vertical"),
-      () => relativeTask(c++ + 2, ++target, "both"),
+      () => positionDetectiveTask(a++, ++target),
+      () => positionDetectiveTask(b++ + 1, ++target),
+      () => positionDetectiveTask(c++ + 2, ++target),
     ],
   };
 }
@@ -377,22 +424,22 @@ export const ABOVE_BELOW_CONTENT = {
   createTaskSet: createAboveBelowTaskSet,
 } satisfies StarpathLessonContent;
 
-export const POSITION_CHALLENGE_CONTENT = {
+export const POSITION_DETECTIVE_CONTENT = {
   missionBrief:
-    "Mixed review — work out which place is next to, above or below another place, on your own.",
-  successCriteria: ["reason left and right", "reason above and below", "answer on your own"],
+    "Be a Position Detective. Use two clues together — the place must match both — to find the one place they point to.",
+  successCriteria: ["read both clues", "use them together", "find the one place"],
   artworkSrc: LEVEL_TWO_ARTWORK,
-  teaching: { title: "Position Challenge", durationMinutes: 1, taskKind: "starpathShapeIntro" },
+  teaching: { title: "Position Detective", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "relative-1", title: "Beside", description: "Find the place beside another.", taskKinds: ["starpathMapLocate"] },
-    { key: "relative-2", title: "Above or Below", description: "Find the place above or below another.", taskKinds: ["starpathMapLocate"] },
-    { key: "relative-3", title: "Position Champion", description: "Reason about any position.", taskKinds: ["starpathMapLocate"] },
+    { key: "clues-1", title: "Two Clues", description: "Use two clues to find one place.", taskKinds: ["starpathMapLocate"] },
+    { key: "clues-2", title: "Detective Check", description: "Match both clues to a place.", taskKinds: ["starpathMapLocate"] },
+    { key: "clues-3", title: "Master Detective", description: "Solve a two-clue position puzzle.", taskKinds: ["starpathMapLocate"] },
   ],
   reflection: {
-    prompt: "What did you learn about positions?",
-    options: ["Places sit next to each other", "I can say what is above or below a place", "A map shows where everything is"],
+    prompt: "How did you find the place?",
+    options: ["I used the first clue", "I used the second clue too", "I found the place that fit both"],
   },
-  practisedSkills: ["Reason about beside", "Reason about above and below", "Work independently"],
+  practisedSkills: ["Combine two position clues", "Narrow down to one place", "Reason about position"],
   nextUpLabel: "Week 6 Voyage Quiz",
-  createTaskSet: createPositionChallengeTaskSet,
+  createTaskSet: createPositionDetectiveTaskSet,
 } satisfies StarpathLessonContent;

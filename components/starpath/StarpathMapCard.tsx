@@ -122,13 +122,24 @@ export function StarpathMapCard({
     );
   }
 
-  // What-is-here / relative: read the map, then choose from options.
+  // What-is-here / relative / clues: read the map, then choose from options.
   return (
     <div>
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
       <div className="mx-auto max-w-3xl">
         <MapView task={task} />
       </div>
+      {task.clues && task.clues.length > 0 ? (
+        <div className="mx-auto mt-5 grid max-w-lg gap-2">
+          {task.clues.map((clue, index) => (
+            <div key={index} className="relative flex items-center gap-2 rounded-2xl border-2 border-cyan-200 bg-cyan-50 px-4 py-2.5">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500 text-xs font-black text-white">{index + 1}</span>
+              <span className="flex-1 text-sm font-bold text-indigo-950 sm:text-base">{clue}</span>
+              <OptionReadAloudButton text={clue} />
+            </div>
+          ))}
+        </div>
+      ) : null}
       <div className="mx-auto mt-5 grid max-w-lg grid-cols-1 gap-3 sm:grid-cols-2">
         {(task.options ?? []).map((option) => (
           <button

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, X } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask, StarpathShape } from "@/data/activities/year1/practice-task";
@@ -200,7 +200,7 @@ const MINI_ARROW_ICON = { up: ArrowUp, down: ArrowDown, left: ArrowLeft, right: 
 // Explainer map, styled to mirror the real practice grid. Fixed size + inline
 // background so it always renders as a clear dark map (never collapses inside a
 // flex card), with big place markers and labels.
-function MiniMap({ markers, arrows = [] }: { markers: MiniMarker[]; arrows?: MiniArrow[] }) {
+function MiniMap({ markers, arrows = [], blocks = [] }: { markers: MiniMarker[]; arrows?: MiniArrow[]; blocks?: Array<{ r: number; c: number }> }) {
   // Landscape 4x2 frame — same wide "map" proportion as the real 8x4 practice
   // grid, kept coarse so teaching markers stay big and legible.
   const cols = 4;
@@ -226,6 +226,11 @@ function MiniMap({ markers, arrows = [] }: { markers: MiniMarker[]; arrows?: Min
       >
         <span className="text-[5px] font-black leading-none text-amber-300">N</span>
       </span>
+      {blocks.map((b, index) => (
+        <span key={`block-${index}`} className="absolute flex h-8 w-8 items-center justify-center rounded-lg border border-rose-300/70 bg-rose-950/80 text-rose-200" style={place(b.r, b.c)}>
+          <X className="h-5 w-5" strokeWidth={3} />
+        </span>
+      ))}
       {arrows.map((arrow, index) => {
         const Icon = MINI_ARROW_ICON[arrow.dir];
         return (
@@ -384,8 +389,50 @@ function MasterTeachGrid({ variant }: { variant: "masterShapeMap" | "masterPathw
 function ConceptTeachGrid({
   variant,
 }: {
-  variant: "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute";
+  variant: "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug";
 }) {
+  if (variant === "mapMission") {
+    return (
+      <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+        <TeachCard readAloud="A mission has rules. Visit the checkpoint, dodge the asteroids, then reach the goal." title="Follow the rules" tip="Visit the checkpoint and dodge the asteroids on the way to the goal.">
+          <MiniMap markers={[{ r: 1, c: 0, object: "rocket", label: "You" }, { r: 1, c: 1, object: "star", label: "Check" }, { r: 0, c: 3, object: "flag", label: "Goal" }]} blocks={[{ r: 1, c: 2 }]} />
+        </TeachCard>
+        <TeachCard readAloud="Build your route in order, then run it to test it." title="Build, then run" tip="Put the moves in order, then run it to test your plan.">
+          <div className="flex items-center gap-1.5">
+            {(["right", "up", "right", "right"] as const).map((dir, index) => {
+              const Icon = MINI_ARROW_ICON[dir];
+              return (
+                <span key={index} className="flex h-10 w-10 items-center justify-center rounded-xl text-cyan-200" style={{ background: "linear-gradient(to bottom, #1e1b4b, #4c1d95)" }}>
+                  <Icon className="h-5 w-5" strokeWidth={3} />
+                </span>
+              );
+            })}
+          </div>
+        </TeachCard>
+      </div>
+    );
+  }
+  if (variant === "mapDebug") {
+    return (
+      <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+        <TeachCard readAloud="Follow each step from the rover, one at a time." title="Follow each step" tip="Follow the steps from the rover, one at a time.">
+          <MiniMap markers={[{ r: 1, c: 0, object: "rocket", label: "You" }, { r: 0, c: 3, object: "star", label: "Goal" }]} arrows={[{ r: 1, c: 1, dir: "right" }, { r: 0, c: 2, dir: "up" }]} />
+        </TeachCard>
+        <TeachCard readAloud="One step goes the wrong way. Find and tap the step that breaks the route." title="Find the wrong step" tip="One step heads the wrong way. Tap the step that breaks the route.">
+          <div className="flex items-center gap-1.5">
+            {([{ dir: "right", bad: false }, { dir: "up", bad: false }, { dir: "down", bad: true }, { dir: "right", bad: false }] as const).map((s, index) => {
+              const Icon = MINI_ARROW_ICON[s.dir];
+              return (
+                <span key={index} className={["flex h-10 w-10 items-center justify-center rounded-xl border-2", s.bad ? "border-rose-400 bg-rose-100 text-rose-600" : "border-violet-200 bg-white text-indigo-900"].join(" ")}>
+                  <Icon className="h-5 w-5" strokeWidth={3} />
+                </span>
+              );
+            })}
+          </div>
+        </TeachCard>
+      </div>
+    );
+  }
   if (variant === "mapPositions") {
     return (
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
@@ -519,7 +566,11 @@ export function StarpathShapeIntroCard({
                                 ? "Positions on a map"
                                 : variant === "mapRoute"
                                   ? "Following a route"
-                                  : "Meet the cosmic shapes");
+                                  : variant === "mapMission"
+                                    ? "Plan a mission"
+                                    : variant === "mapDebug"
+                                      ? "Test and fix a route"
+                                      : "Meet the cosmic shapes");
 
   return (
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-5 sm:p-7">
@@ -527,7 +578,7 @@ export function StarpathShapeIntroCard({
 
       {variant === "masterShapeMap" || variant === "masterPathway" || variant === "masterMission" ? (
         <MasterTeachGrid variant={variant} />
-      ) : variant === "featureEdges" || variant === "featureSides" || variant === "featureParallel" || variant === "featureCompare" || variant === "mapLocate" || variant === "mapPositions" || variant === "mapRoute" ? (
+      ) : variant === "featureEdges" || variant === "featureSides" || variant === "featureParallel" || variant === "featureCompare" || variant === "mapLocate" || variant === "mapPositions" || variant === "mapRoute" || variant === "mapMission" || variant === "mapDebug" ? (
         <ConceptTeachGrid variant={variant} />
       ) : variant === "builders" ? (
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3">
