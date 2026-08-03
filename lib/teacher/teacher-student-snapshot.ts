@@ -9,7 +9,7 @@ import {
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 
 export type TeacherPlacementState = "placed" | "not_placed" | "unavailable";
-export type TeacherPathway = "placement_pending" | "full" | "targeted" | "complete";
+export type TeacherPathway = "placement_pending" | "full" | "targeted" | "level_complete";
 
 export type TeacherStudentSnapshot = {
   studentId: string;
@@ -89,7 +89,7 @@ function resolvePathway(
 ): TeacherPathway {
   const status = (progress.status ?? "").trim().toUpperCase();
   if (status === "PASSED" || status === "COMPLETED" || status === "COMPLETE") {
-    return "complete";
+    return "level_complete";
   }
   if (progress.placement_complete === false && progress.week == null) {
     return "placement_pending";

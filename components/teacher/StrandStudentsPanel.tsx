@@ -288,7 +288,7 @@ type PlacementStatus =
   | "Full Program"
   | "Targeted Program"
   | "Post-Test Ready"
-  | "Complete";
+  | "Level Complete";
 
 const PLACEMENT_STATUS_RANK: Record<PlacementStatus, number> = {
   "Progress Unavailable": -1,
@@ -297,7 +297,7 @@ const PLACEMENT_STATUS_RANK: Record<PlacementStatus, number> = {
   "Full Program": 2,
   "Targeted Program": 3,
   "Post-Test Ready": 4,
-  "Complete": 5,
+  "Level Complete": 5,
 };
 
 const PLACEMENT_STATUS_STYLE: Record<PlacementStatus, string> = {
@@ -307,7 +307,7 @@ const PLACEMENT_STATUS_STYLE: Record<PlacementStatus, string> = {
   "Full Program": "bg-[#E0F2FE] text-[#0369A1]",
   "Targeted Program": "bg-[#EDE9FE] text-[#6D28D9]",
   "Post-Test Ready": "bg-[#DCFCE7] text-[#15803D]",
-  "Complete": "bg-[#D1FAE5] text-[#047857]",
+  "Level Complete": "bg-[#D1FAE5] text-[#047857]",
 };
 
 function computePlacementStatus(
@@ -318,7 +318,7 @@ function computePlacementStatus(
 ): PlacementStatus {
   if (isPlaceholder || !prog) return "Not Placed";
   const latestPost = getLatestPosttestProfile(prog.quiz_scores);
-  if (latestPost?.passed) return "Complete";
+  if (latestPost?.passed) return "Level Complete";
   if (prog.placement_complete !== true) {
     return "Ready for Pre-Test";
   }
@@ -326,7 +326,9 @@ function computePlacementStatus(
 
   if (prog.pretest_score != null) {
     const pathway = pretestPathwayForPercent(prog.pretest_score);
-    if (pathway === "pass") return "Complete";
+    // A pre-test pass may advance the student, but it does not mean the
+    // currently displayed level has been completed through its program.
+    if (pathway === "pass") return "Full Program";
     return pathway === "targeted" ? "Targeted Program" : "Full Program";
   }
 
@@ -1377,7 +1379,9 @@ function StudentStrandDetail({
             ? `All ${maxWeek} weeks required`
             : pathwayStatus === "Targeted Program"
               ? `Starts at Week ${currentWeek}`
-              : "Canonical placement"}
+              : pathwayStatus === "Level Complete"
+                ? "Post-test passed"
+                : "Canonical placement"}
         />
         <SnapshotTile label="Current Plan" value={`${yearToLevelLabel(yearLabel)} ${genre.realm}`} sub={week?.topic ?? `Week ${currentWeek}`} />
         <SnapshotTile
