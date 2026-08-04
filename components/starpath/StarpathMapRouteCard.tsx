@@ -171,7 +171,7 @@ function DebugRoute({ task, onCorrect, onWrong }: { task: MapRouteTask; onCorrec
   );
 }
 
-export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () => void; onWrong: () => void; onComplete: () => void }) {
+export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () => void; onWrong: (studentAnswer?: string) => void; onComplete: () => void }) {
   const { task } = props;
   const [rover, setRover] = useState<Cell>(task.start);
   const [stepIndex, setStepIndex] = useState(0);
@@ -179,6 +179,7 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
   const [reached, setReached] = useState(false);
   const [moves, setMoves] = useState<Direction[]>([]);
   const [status, setStatus] = useState<"editing" | "running" | "fail" | "done">("editing");
+  const [settled, setSettled] = useState(false);
   const doneRef = useRef(false);
 
   const clamp = (c: Cell, d: Direction): Cell => {
@@ -226,13 +227,18 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
       if (!d) {
         window.clearInterval(timer);
         const ok = !leftGrid && !hitBlocked && visited.size === checkpointKeys.size && pos.r === task.goal.r && pos.c === task.goal.c;
-        if (ok && !doneRef.current) {
-          doneRef.current = true;
+        if (doneRef.current) return;
+        doneRef.current = true;
+        setSettled(true);
+        if (ok) {
           setReached(true);
           setStatus("done");
           setTimeout(props.onComplete, 1000);
         } else {
+          // A wrong run is the answer: record it and move on, like every other
+          // task — no reset-and-retry on the same question.
           setStatus("fail");
+          setTimeout(() => props.onWrong(moves.join(", ")), 950);
         }
         return;
       }
@@ -283,7 +289,7 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
 
   // give + mission (build a route, then run it)
   if (task.mode === "give" || task.mode === "mission") {
-    const disabled = status === "running" || status === "done";
+    const disabled = status === "running" || settled;
     return (
       <div>
         <TaskHeading prompt={task.prompt} speech={task.speakText} />
@@ -305,12 +311,12 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
             <button type="button" disabled={disabled} onClick={() => { setMoves([]); setStatus("editing"); setRover(task.start); }} className="flex min-h-11 items-center gap-1.5 rounded-xl border-2 border-slate-200 bg-white px-4 font-black text-slate-700 transition active:scale-95 disabled:opacity-30"><RotateCcw className="h-4 w-4" strokeWidth={3} /> Reset</button>
             <button type="button" disabled={disabled || moves.length === 0} onClick={run} className="flex min-h-11 items-center gap-1.5 rounded-xl bg-violet-700 px-6 font-black text-white shadow-lg transition hover:bg-violet-600 active:scale-95 disabled:opacity-40"><Play className="h-4 w-4 fill-white" strokeWidth={3} /> Run</button>
           </div>
-          {isMission ? (
+          {isMission && !settled ? (
             <p className="mt-2 text-center text-xs font-semibold text-slate-500">
-              Visit the checkpoint, dodge the asteroids, and reach the goal. Adjust and run again if you need to.
+              Visit the checkpoint, dodge the asteroids, and reach the goal. Plan carefully — you get one run.
             </p>
           ) : null}
-          {status === "fail" ? <p className="sp-mroute-shake mt-3 flex items-center justify-center gap-1.5 text-center text-sm font-black text-rose-600"><X className="h-4 w-4" strokeWidth={3} /> {isMission ? "Mission not complete — check every rule." : "Not there yet — adjust and run again."}</p> : null}
+          {status === "fail" ? <p className="sp-mroute-shake mt-3 flex items-center justify-center gap-1.5 text-center text-sm font-black text-rose-600"><X className="h-4 w-4" strokeWidth={3} /> {isMission ? "Mission not complete — moving on." : "Not there yet — moving on."}</p> : null}
           {status === "done" ? <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-sm font-black text-emerald-600"><Check className="h-4 w-4" strokeWidth={3} /> {task.feedback.correct}</p> : null}
         </div>
         {ROUTE_STYLE}
