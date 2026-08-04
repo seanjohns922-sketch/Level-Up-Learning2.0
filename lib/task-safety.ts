@@ -316,18 +316,20 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
 
   if (objectTask.mode !== "build") return false;
 
-  const pieceIds = new Set(objectTask.pieces.map((piece) => piece.id));
+  const paletteIds = new Set(objectTask.palette.map((piece) => piece.id));
   const slotIds = new Set(objectTask.slots.map((slot) => slot.id));
-  const availableByObject = new Map<string, number>();
-  const requiredByObject = new Map<string, number>();
-  objectTask.pieces.forEach((piece) => availableByObject.set(piece.objectId, (availableByObject.get(piece.objectId) ?? 0) + 1));
-  objectTask.slots.forEach((slot) => requiredByObject.set(slot.correctObjectId, (requiredByObject.get(slot.correctObjectId) ?? 0) + 1));
+  const availableByShape = new Map<string, number>();
+  const requiredByShape = new Map<string, number>();
+  objectTask.palette.forEach((piece) => availableByShape.set(piece.shape, (availableByShape.get(piece.shape) ?? 0) + 1));
+  objectTask.slots.forEach((slot) => requiredByShape.set(slot.shape, (requiredByShape.get(slot.shape) ?? 0) + 1));
   return (
     hasText(objectTask.modelName) &&
-    objectTask.pieces.length >= objectTask.slots.length &&
+    hasText(objectTask.viewBox) &&
+    objectTask.palette.length >= objectTask.slots.length &&
     objectTask.slots.length >= 2 &&
-    pieceIds.size === objectTask.pieces.length &&
+    paletteIds.size === objectTask.palette.length &&
     slotIds.size === objectTask.slots.length &&
-    [...requiredByObject].every(([objectId, count]) => (availableByObject.get(objectId) ?? 0) >= count)
+    // every part has enough palette pieces of its shape to fill it
+    [...requiredByShape].every(([shape, count]) => (availableByShape.get(shape) ?? 0) >= count)
   );
 }

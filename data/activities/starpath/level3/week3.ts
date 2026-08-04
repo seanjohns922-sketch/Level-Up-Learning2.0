@@ -2,6 +2,7 @@ import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprin
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { getL3Object, l3ObjectSvg, type L3ObjectId } from "./l3-objects";
+import { getL3Model, shapeIconSvg, shapeWord } from "./l3-models";
 import { LEVEL_THREE_ARTWORK } from "./week1";
 
 // Level 3 · Week 3 — Building Starpath (AC9M3SP01). Construct models from
@@ -17,47 +18,17 @@ function optionOf(id: L3ObjectId, reason?: string) {
   return { id: o.id, svg: l3ObjectSvg(o, { size: 120 }), label: o.label, spaceName: o.spaceName, reason };
 }
 
-type ModelPart = { id: string; label: string; objectId: L3ObjectId };
-type Model = { name: string; prompt: string; parts: ModelPart[] };
-
-const MODELS: Model[] = [
-  {
-    name: "Moon Rover",
-    prompt: "Build the Moon Rover from four 3D objects.",
-    parts: [
-      { id: "chassis", label: "Long chassis", objectId: "prism" },
-      { id: "cabin", label: "Driver cabin", objectId: "cube" },
-      { id: "wheel-left", label: "Left wheel", objectId: "cylinder" },
-      { id: "wheel-right", label: "Right wheel", objectId: "cylinder" },
-    ],
-  },
-  {
-    name: "Supply Rocket",
-    prompt: "Build the Supply Rocket from three 3D objects.",
-    parts: [
-      { id: "nose", label: "Pointed nose", objectId: "cone" },
-      { id: "body", label: "Long body", objectId: "cylinder" },
-      { id: "cargo", label: "Cargo module", objectId: "cube" },
-    ],
-  },
-  {
-    name: "Signal Beacon",
-    prompt: "Build the Signal Beacon from three 3D objects.",
-    parts: [
-      { id: "base", label: "Stable base", objectId: "prism" },
-      { id: "mast", label: "Tall mast", objectId: "cylinder" },
-      { id: "light", label: "Signal light", objectId: "sphere" },
-    ],
-  },
-];
-
+// Build the model — the child places 2D shapes and 3D objects into a connected
+// model that assembles visibly into a recognisable vehicle (see l3-models.ts).
+// Palette pieces match a part by shape.
 export function buildRoverTask(round: number, target: number): PracticeTask {
-  const model = MODELS[round % MODELS.length]!;
-  const pieces = rotate(
+  const model = getL3Model(round);
+  const palette = rotate(
     model.parts.map((part, index) => ({
-      ...optionOf(part.objectId),
-      id: `${model.name}-${part.id}-${index}`,
-      objectId: part.objectId,
+      id: `${model.id}-piece-${index}`,
+      shape: part.shape as string,
+      svg: shapeIconSvg(part.shape),
+      label: shapeWord(part.shape),
     })),
     round + 1
   );
@@ -65,12 +36,14 @@ export function buildRoverTask(round: number, target: number): PracticeTask {
     kind: "starpathObject",
     mode: "build",
     prompt: model.prompt,
-    speakText: `${model.prompt} Choose each object, then place it in the part it suits.`,
+    speakText: `${model.prompt} Choose a shape or object, then place it in the glowing part it matches.`,
     target,
     modelName: model.name,
-    pieces,
-    slots: model.parts.map((part) => ({ id: part.id, label: part.label, correctObjectId: part.objectId })),
-    feedback: { correct: `${model.name} complete! Every object suits its job.`, wrong: "Think about the part's job and the object's useful features." },
+    viewBox: model.viewBox,
+    defs: model.defs,
+    palette,
+    slots: model.parts.map((part) => ({ id: part.id, label: part.label, shape: part.shape as string, solid: part.solid, ghost: part.ghost, hit: part.hit })),
+    feedback: { correct: `${model.name} complete!`, wrong: "Choose the shape or object that matches the glowing part." },
   };
 }
 

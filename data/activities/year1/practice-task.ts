@@ -38,9 +38,13 @@ export type StarpathObjectTask =
   | (StarpathObjectTaskBase & {
       mode: "build";
       modelName: string;
-      pieces: Array<StarpathObjectSceneItem & { objectId: string }>;
-      /** x/y are the slot's centre on the 0-100 build stage; w is its width %. */
-      slots: Array<{ id: string; label: string; correctObjectId: string; x?: number; y?: number; w?: number }>;
+      /** the connected model is drawn as one SVG in this viewBox with these defs. */
+      viewBox: string;
+      defs: string;
+      /** shapes/objects the child taps; place one into the part it matches. */
+      palette: Array<{ id: string; shape: string; svg: string; label: string }>;
+      /** the model's parts; each carries a solid fragment, a socket fragment and a hit-box. */
+      slots: Array<{ id: string; label: string; shape: string; solid: string; ghost: string; hit: { x: number; y: number; w: number; h: number } }>;
     });
 
 /** Time-based difficulty gates (strict) */

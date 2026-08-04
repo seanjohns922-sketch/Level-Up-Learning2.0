@@ -60,18 +60,21 @@ classificationTasks.forEach((task) => {
 });
 
 const constructionTasks = generatedTasks(createBuildTheRoverTaskSet(), 12) as StarpathObjectTask[];
-let rectangularPrismUsed = false;
+const THREE_D_SHAPES = new Set(["cone", "cylinder", "cube", "sphere", "prism"]);
 constructionTasks.forEach((task) => {
   assert.equal(task.kind, "starpathObject");
   assert.equal(task.mode, "build", "Week 3 Lesson 1 must assemble a complete model");
   if (task.mode !== "build") return;
   assert(task.slots.length >= 3, "A model build must require at least three placed parts");
-  rectangularPrismUsed ||= task.slots.some((slot) => slot.correctObjectId === "prism");
-  task.slots
-    .filter((slot) => slot.id.includes("wheel"))
-    .forEach((slot) => assert.equal(slot.correctObjectId, "cylinder", "Rover wheels must be cylinders"));
+  // Every part needs a palette piece of the same shape to fill it.
+  task.slots.forEach((slot) =>
+    assert(task.palette.some((piece) => piece.shape === slot.shape), `A palette piece must match part "${slot.id}"`)
+  );
+  // The build combines 2D shapes and 3D objects (the Week 3 pedagogy).
+  const shapes = task.slots.map((slot) => slot.shape);
+  assert(shapes.some((s) => THREE_D_SHAPES.has(s)), "A model must use at least one 3D object");
+  assert(shapes.some((s) => !THREE_D_SHAPES.has(s)), "A model must use at least one 2D shape");
 });
-assert.equal(rectangularPrismUsed, true, "Week 3 construction must use a rectangular prism");
 
 const quizzes = [
   ["Week 1 quiz", buildLevelThreeWeek1VoyageQuiz()],
