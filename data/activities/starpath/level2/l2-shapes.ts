@@ -32,7 +32,7 @@ export type L2Shape = {
 };
 
 export const L2_SHAPES: Record<L2ShapeId, L2Shape> = {
-  circle: { id: "circle", label: "circle", sides: 0, curved: true, parallelPairs: 0, colour: "#67e8f9", render: { kind: "ellipse", x: 6, y: 6, w: 36, h: 36 } },
+  circle: { id: "circle", label: "circle", sides: 0, curved: true, parallelPairs: 0, colour: "#67e8f9", render: { kind: "ellipse", x: 7, y: 7, w: 34, h: 34 } },
   oval: { id: "oval", label: "oval", sides: 0, curved: true, parallelPairs: 0, colour: "#c4b5fd", render: { kind: "ellipse", x: 4, y: 14, w: 40, h: 20 } },
   triangle: { id: "triangle", label: "triangle", sides: 3, curved: false, parallelPairs: 0, colour: "#fde047", render: { kind: "poly", n: 3, rot: -90, r: 21 } },
   square: { id: "square", label: "square", sides: 4, curved: false, parallelPairs: 2, colour: "#86efac", render: { kind: "rect", x: 8, y: 8, w: 32, h: 32 } },
@@ -59,6 +59,25 @@ function polyPoints(cx: number, cy: number, r: number, n: number, rotDeg: number
   return pts.join(" ");
 }
 
+// Re-centre a polygon's bounding box on the viewBox centre and scale it to a
+// consistent visual footprint, so shapes with different geometries (triangle,
+// pentagon, hexagon, trapezoid) line up and read at the same size next to each
+// other and next to the rect/ellipse shapes.
+const CENTRE = 24;
+const POLY_EXTENT = 34;
+function normalizePoints(pointsStr: string, extent = POLY_EXTENT): string {
+  const pts = pointsStr.split(" ").map((p) => p.split(",").map(Number) as [number, number]);
+  const xs = pts.map((p) => p[0]);
+  const ys = pts.map((p) => p[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  const scale = extent / Math.max(maxX - minX, maxY - minY);
+  return pts
+    .map(([x, y]) => `${(CENTRE + (x - cx) * scale).toFixed(2)},${(CENTRE + (y - cy) * scale).toFixed(2)}`)
+    .join(" ");
+}
+
 export function l2ShapeInner(shape: L2Shape, opts?: { colour?: string; strokeWidth?: number }): string {
   const fill = opts?.colour ?? shape.colour;
   const sw = opts?.strokeWidth ?? 1.4;
@@ -71,9 +90,9 @@ export function l2ShapeInner(shape: L2Shape, opts?: { colour?: string; strokeWid
     return `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="2" ${common} />`;
   }
   if (r.kind === "points") {
-    return `<polygon points="${r.points}" ${common} />`;
+    return `<polygon points="${normalizePoints(r.points)}" ${common} />`;
   }
-  return `<polygon points="${polyPoints(24, 24, r.r, r.n, r.rot)}" ${common} />`;
+  return `<polygon points="${normalizePoints(polyPoints(24, 24, r.r, r.n, r.rot))}" ${common} />`;
 }
 
 export function l2ShapeSvg(shape: L2Shape, opts?: { size?: number; colour?: string }): string {
