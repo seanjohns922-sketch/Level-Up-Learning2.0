@@ -129,7 +129,39 @@ const ROBOT: L3Model = {
   ],
 };
 
-export const L3_MODELS: L3Model[] = [ROCKET, ROVER, ROBOT];
+const SATELLITE: L3Model = {
+  id: "satellite",
+  name: "Star Satellite",
+  prompt: "Build the Star Satellite.",
+  viewBox: "0 0 260 200",
+  defs: `<defs>
+    <linearGradient id="sat-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bae6fd"/><stop offset="1" stop-color="#0369a1"/></linearGradient>
+    <linearGradient id="sat-top" x1="0" x2="1"><stop offset="0" stop-color="#e0f2fe"/><stop offset="1" stop-color="#7dd3fc"/></linearGradient>
+    <linearGradient id="sat-side" x1="0" x2="1"><stop offset="0" stop-color="#0ea5e9"/><stop offset="1" stop-color="#075985"/></linearGradient>
+    <linearGradient id="sat-panel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#1e3a8a"/></linearGradient>
+    <linearGradient id="sat-mast" x1="0" x2="1"><stop offset="0" stop-color="#cbd5e1"/><stop offset="0.5" stop-color="#94a3b8"/><stop offset="1" stop-color="#475569"/></linearGradient>
+    <radialGradient id="sat-dish" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#f0f9ff"/><stop offset="0.6" stop-color="#a5b4fc"/><stop offset="1" stop-color="#4338ca"/></radialGradient>
+  </defs>`,
+  parts: [
+    { id: "panel-left", label: "Left panel", shape: "rectangle", hit: { x: 20, y: 90, w: 88, h: 44 },
+      solid: `<rect x="24" y="94" width="80" height="36" rx="4" fill="url(#sat-panel)" stroke="#0c1e57" stroke-width="3"/><path d="M50 94 V130 M77 94 V130 M24 112 H104" stroke="#93c5fd" stroke-width="1.5" opacity="0.7"/>`,
+      ghost: `<rect x="24" y="94" width="80" height="36" rx="4" ${G}/>` },
+    { id: "panel-right", label: "Right panel", shape: "rectangle", hit: { x: 152, y: 90, w: 88, h: 44 },
+      solid: `<rect x="156" y="94" width="80" height="36" rx="4" fill="url(#sat-panel)" stroke="#0c1e57" stroke-width="3"/><path d="M182 94 V130 M209 94 V130 M156 112 H236" stroke="#93c5fd" stroke-width="1.5" opacity="0.7"/>`,
+      ghost: `<rect x="156" y="94" width="80" height="36" rx="4" ${G}/>` },
+    { id: "body", label: "Body", shape: "cube", hit: { x: 104, y: 70, w: 66, h: 70 },
+      solid: `<path d="M106 86 L120 72 L168 72 L154 86 Z" fill="url(#sat-top)" stroke="#075985" stroke-width="3" stroke-linejoin="round"/><path d="M154 86 L168 72 L168 124 L154 138 Z" fill="url(#sat-side)" stroke="#075985" stroke-width="3" stroke-linejoin="round"/><rect x="106" y="86" width="48" height="52" rx="3" fill="url(#sat-body)" stroke="#075985" stroke-width="3"/>`,
+      ghost: `<rect x="106" y="86" width="48" height="52" rx="3" ${G}/>` },
+    { id: "mast", label: "Antenna mast", shape: "cylinder", hit: { x: 116, y: 44, w: 28, h: 34 },
+      solid: `<path d="M122 50 V72 A8 4 0 0 0 138 72 V50 Z" fill="url(#sat-mast)" stroke="#334155" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="130" cy="50" rx="8" ry="4" fill="#e2e8f0" stroke="#334155" stroke-width="2.5"/>`,
+      ghost: `<path d="M122 50 V72 A8 4 0 0 0 138 72 V50 Z" ${G}/>` },
+    { id: "dish", label: "Dish", shape: "circle", hit: { x: 110, y: 16, w: 40, h: 40 },
+      solid: `<circle cx="130" cy="36" r="16" fill="url(#sat-dish)" stroke="#3730a3" stroke-width="3"/><circle cx="130" cy="36" r="5" fill="#eef2ff" stroke="#3730a3" stroke-width="2"/>`,
+      ghost: `<circle cx="130" cy="36" r="16" ${G}/>` },
+  ],
+};
+
+export const L3_MODELS: L3Model[] = [ROCKET, ROVER, ROBOT, SATELLITE];
 
 export function getL3Model(round: number): L3Model {
   return L3_MODELS[round % L3_MODELS.length]!;

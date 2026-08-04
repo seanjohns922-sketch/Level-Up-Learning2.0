@@ -20,8 +20,11 @@ const BUILD_STYLE = (
     .sp-build-pad{position:absolute;left:50%;bottom:7%;width:64%;height:9%;transform:translateX(-50%);background:radial-gradient(ellipse at center, rgba(103,232,249,.45), rgba(103,232,249,.04) 70%);border-radius:50%;}
     .sp-build-exhaust{position:absolute;left:50%;bottom:9%;width:11%;height:18%;transform:translateX(-50%);background:radial-gradient(ellipse at top, rgba(253,224,71,.9), rgba(249,115,22,.5) 42%, transparent 72%);filter:blur(2px);border-radius:0 0 50% 50%;animation:sp-build-flare .5s ease-in-out infinite;}
     @keyframes sp-build-flare{0%,100%{opacity:.7;transform:translateX(-50%) scaleY(.9)}50%{opacity:1;transform:translateX(-50%) scaleY(1.12)}}
+    /* Centering is handled by Tailwind's -translate-x/y-1/2 (the CSS 'translate'
+       property in v4); the bob must animate 'transform' ONLY, or the two
+       compound and the finished model launches out of the frame. */
     .sp-build-float{animation:sp-build-bob 3.6s ease-in-out infinite;}
-    @keyframes sp-build-bob{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-53%)}}
+    @keyframes sp-build-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4%)}}
     .sp-build-badge{position:absolute;left:50%;top:5%;transform:translateX(-50%);background:rgba(16,185,129,.94);color:#fff;font-weight:900;font-size:.78rem;padding:5px 13px;border-radius:999px;z-index:6;box-shadow:0 6px 16px -4px rgba(16,185,129,.6);}
     @media (prefers-reduced-motion: reduce){.sp-build-float,.sp-build-exhaust{animation:none;}}
   `}</style>
