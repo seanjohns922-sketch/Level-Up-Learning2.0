@@ -273,6 +273,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "starpathMapLocate",
   "starpathShapeFeature",
   "starpathMapRoute",
+  "starpathObject",
   "mcq",
   "count",
   "order3",

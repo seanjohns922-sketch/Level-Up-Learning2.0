@@ -9,6 +9,7 @@ import { SHAPE_FACTS, type FoundationShape } from "@/data/activities/starpath/gr
 import { SHAPE_OBJECTS, type ShapeObjectId } from "@/data/activities/starpath/ground/shape-objects";
 import { PositionObjectVisual } from "@/components/starpath/StarpathPositionCards";
 import type { PositionRelation } from "@/data/activities/starpath/ground/position-objects";
+import { listL3Objects, getL3Object, l3ObjectSvg } from "@/data/activities/starpath/level3/l3-objects";
 
 type ShapeIntroTask = Extract<PracticeTask, { kind: "starpathShapeIntro" }>;
 type ShapeMatchTask = Extract<PracticeTask, { kind: "starpathShapeMatch" }>;
@@ -526,6 +527,46 @@ function ConceptTeachGrid({
   );
 }
 
+// Level 3 · W1 — meet the five 3D objects (recognise by name + Starpath name).
+function ObjectsTeachGrid() {
+  return (
+    <div className="mx-auto grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-5">
+      {listL3Objects().map((obj) => (
+        <div key={obj.id} className="relative flex flex-col items-center justify-between gap-1 rounded-2xl border-2 border-white bg-white/90 p-3 text-center shadow-sm">
+          <OptionReadAloudButton text={`${obj.spaceName}. This is a ${obj.label}.`} className="absolute right-1.5 top-1.5" />
+          <span className="flex h-16 w-16 items-center justify-center [&>svg]:h-full [&>svg]:w-full" aria-hidden="true" dangerouslySetInnerHTML={{ __html: l3ObjectSvg(obj, { size: 72 }) }} />
+          <span className="mt-1 text-xs font-black text-indigo-950">{obj.spaceName}</span>
+          <span className="text-[11px] font-bold capitalize text-slate-500">{obj.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Level 3 · W2 — the three informal features (rolls / stacks / slides).
+function ObjectFeaturesTeachGrid() {
+  const cards: Array<{ id: string; title: string; tip: string }> = [
+    { id: "sphere", title: "Rolls", tip: "Round objects roll — they have a curved surface." },
+    { id: "cube", title: "Stacks", tip: "Flat-topped objects stack on top of each other." },
+    { id: "prism", title: "Slides", tip: "Objects with flat sides slide along a surface." },
+  ];
+  return (
+    <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
+      {cards.map((c) => {
+        const obj = getL3Object(c.id);
+        return (
+          <div key={c.id} className="relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-white bg-white/90 p-4 text-center shadow-sm">
+            <OptionReadAloudButton text={`${c.title}. ${c.tip}`} className="absolute right-2 top-2" />
+            <span className="flex h-16 w-16 items-center justify-center [&>svg]:h-full [&>svg]:w-full" aria-hidden="true" dangerouslySetInnerHTML={{ __html: l3ObjectSvg(obj, { size: 72 }) }} />
+            <span className="text-base font-black text-indigo-950">{c.title}</span>
+            <span className="text-xs font-semibold leading-5 text-slate-600">{c.tip}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function StarpathShapeIntroCard({
   task,
   onContinue,
@@ -570,13 +611,21 @@ export function StarpathShapeIntroCard({
                                     ? "Plan a mission"
                                     : variant === "mapDebug"
                                       ? "Test and fix a route"
-                                      : "Meet the cosmic shapes");
+                                      : variant === "objects3d"
+                                        ? "Meet the space objects"
+                                        : variant === "objectFeatures"
+                                          ? "Rolls, stacks and slides"
+                                          : "Meet the cosmic shapes");
 
   return (
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-5 sm:p-7">
       <TaskHeading prompt={heading} speech={task.speakText} />
 
-      {variant === "masterShapeMap" || variant === "masterPathway" || variant === "masterMission" ? (
+      {variant === "objects3d" ? (
+        <ObjectsTeachGrid />
+      ) : variant === "objectFeatures" ? (
+        <ObjectFeaturesTeachGrid />
+      ) : variant === "masterShapeMap" || variant === "masterPathway" || variant === "masterMission" ? (
         <MasterTeachGrid variant={variant} />
       ) : variant === "featureEdges" || variant === "featureSides" || variant === "featureParallel" || variant === "featureCompare" || variant === "mapLocate" || variant === "mapPositions" || variant === "mapRoute" || variant === "mapMission" || variant === "mapDebug" ? (
         <ConceptTeachGrid variant={variant} />

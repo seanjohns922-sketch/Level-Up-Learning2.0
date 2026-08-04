@@ -2265,7 +2265,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures";
       heading?: string;
     }
   | {
@@ -2338,6 +2338,24 @@ export type PracticeTask = (
       /** debug: an ordered route with one wrong step to find. */
       debugSteps?: Array<{ id: string; direction: "up" | "down" | "left" | "right" }>;
       wrongStepId?: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 3 · W1 — 3D Object Explorer. Recognise and find common 3D objects
+      // (cube, sphere, cylinder, cone, rectangular prism) shown as pre-rendered
+      // SVG so the card stays decoupled from the Level 3 object catalogue.
+      kind: "starpathObject";
+      mode: "name" | "find" | "compare";
+      prompt: string;
+      speakText: string;
+      target: number;
+      /** objects to display; find shows several (tappable), name/compare show them for reference. */
+      scene: Array<{ id: string; svg: string; label: string; spaceName?: string; reason?: string }>;
+      /** name / compare mode: text options + the correct one. */
+      options?: Array<{ id: string; label: string }>;
+      correctOptionId?: string;
+      /** find mode: which object in the scene to tap. */
+      correctObjectId?: string;
       feedback: { correct: string; wrong: string };
     }
   | {
