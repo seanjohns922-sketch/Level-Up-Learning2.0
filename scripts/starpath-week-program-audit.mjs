@@ -13,15 +13,16 @@ const programs = registry.STARPATH_PROGRAMS;
 assert.equal(programs.length, 7, "Starpath must define Ground and Levels 1-6");
 assert.equal(programs.reduce((total, program) => total + program.weeks.length, 0), 56, "Starpath must define 56 level-weeks");
 assert.equal(programs.reduce((total, program) => total + program.weeks.flatMap((week) => week.lessons).length, 0), 168, "Starpath must define 168 lesson slots");
-assert.equal(programs.reduce((total, program) => total + program.weeks.filter((week) => week.quiz).length, 0), 56, "Every Starpath week needs a quiz");
+assert.equal(programs.reduce((total, program) => total + program.weeks.filter((week) => week.quiz).length, 0), 49, "Each Starpath level needs seven weekly quizzes");
 
 for (const program of programs) {
   assert.equal(program.realmId, "space");
   assert.equal(program.weeks.length, 8);
-  for (const week of program.weeks) {
+  for (const week of program.weeks.slice(0, 7)) {
     assert.equal(week.lessons.length, 3);
     assert.equal(week.quiz?.questionCount, 15);
   }
+  assert.equal(program.weeks[7]?.quiz, null, "Week 8 must lead to the post-test instead of a weekly quiz");
 }
 
 const dashboard = read("components/world/StarpathMap.tsx");
@@ -52,7 +53,7 @@ assert.match(quizPage, /realmId !== STARPATH_REALM_ID/);
 for (const fixture of [
   ["ground", 1],
   ["level-3", 1],
-  ["level-6", 8],
+  ["level-6", 7],
 ]) {
   const [level, week] = fixture;
   const program = registry.getStarpathProgram(level);
@@ -60,4 +61,4 @@ for (const fixture of [
   assert.ok(program.weeks[week - 1].quiz);
 }
 
-console.log("Starpath week program audit passed: 7 levels, 8 weeks each, 168 lessons, 56 quizzes, isolated space routing.");
+console.log("Starpath week program audit passed: 7 levels, 8 weeks each, 168 lessons, 49 weekly quizzes, and final-week post-tests.");

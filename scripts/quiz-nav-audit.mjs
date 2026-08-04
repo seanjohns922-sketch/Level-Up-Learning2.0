@@ -92,10 +92,10 @@ has(
 );
 
 // The quiz builder must be stable across renders. Questions are initialized from
-// this callback once; refresh persistence is intentionally a separate concern.
+// the safe callback once by the lazy useState initializer.
 has(
   "Quiz questions are generated from stable inputs (not regenerated every render)",
-  /\[isMeasurementRealm, quizConfig, quizWeekPlan, week, year\]/
+  /useState<QuizQuestion\[\]>\(\(\) => buildSafeQuizQuestions\(\)\)/
 );
 check(
   "Quiz questions memo does NOT depend on the re-created buildQuizQuestions function",

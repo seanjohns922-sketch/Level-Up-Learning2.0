@@ -3,7 +3,7 @@ import type { StarpathLevelId } from "@/lib/starpath-levels";
 export const STARPATH_PROGRAM_STATUS = "planned" as const;
 export const STARPATH_WEEK_COUNT = 8 as const;
 export const STARPATH_LESSONS_PER_WEEK = 3 as const;
-export const STARPATH_QUIZ_WEEKS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
+export const STARPATH_QUIZ_WEEKS = [1, 2, 3, 4, 5, 6, 7] as const;
 export const STARPATH_ASSESSMENT_QUESTION_COUNT = 20 as const;
 export const STARPATH_QUIZ_QUESTIONS_PER_LESSON = 5 as const;
 
@@ -493,6 +493,11 @@ const IMPLEMENTED_LEVEL_TWO_LESSONS: Record<
 const L3_OBJECT_RECOGNITION_MECHANICS = ["meet-the-objects", "find-the-object", "object-challenge"] as const;
 const L3_OBJECT_FEATURES_MECHANICS = ["which-object", "compare-objects", "object-sort"] as const;
 const L3_OBJECT_DESIGN_MECHANICS = ["build-the-rover", "choose-best-shape", "space-engineering"] as const;
+const L3_MAP_READING_MECHANICS = ["map-symbols", "find-landmark", "map-explorer"] as const;
+const L3_MAP_CREATION_MECHANICS = ["draw-camp", "place-landmarks", "map-builder"] as const;
+const L3_NAVIGATION_MECHANICS = ["treasure-hunt", "find-observatory", "mission-control"] as const;
+const L3_MISSION_MECHANICS = ["explorer-challenge", "rescue-mission", "navigator-challenge"] as const;
+const L3_GRADUATION_MECHANICS = ["objects-review", "map-master", "final-mission"] as const;
 
 // Level 3 lessons with real, playable content (keyed by registry id). Weeks fill
 // in as they are built; unlisted lessons render the in-development screen.
@@ -509,6 +514,21 @@ const IMPLEMENTED_LEVEL_THREE_LESSONS: Record<
   "y3-space-w3-l1": { learningIntention: "I can choose the right object for each part.", mechanics: L3_OBJECT_DESIGN_MECHANICS },
   "y3-space-w3-l2": { learningIntention: "I can choose the best object for a job and say why.", mechanics: L3_OBJECT_DESIGN_MECHANICS },
   "y3-space-w3-l3": { learningIntention: "I can choose and justify objects for a design.", mechanics: L3_OBJECT_DESIGN_MECHANICS },
+  "y3-space-w4-l1": { learningIntention: "I can use a key to explain what map symbols mean.", mechanics: L3_MAP_READING_MECHANICS },
+  "y3-space-w4-l2": { learningIntention: "I can locate landmarks and describe what is near them.", mechanics: L3_MAP_READING_MECHANICS },
+  "y3-space-w4-l3": { learningIntention: "I can interpret a map using symbols, positions and clues.", mechanics: L3_MAP_READING_MECHANICS },
+  "y3-space-w5-l1": { learningIntention: "I can place landmarks to show a described layout.", mechanics: L3_MAP_CREATION_MECHANICS },
+  "y3-space-w5-l2": { learningIntention: "I can create a map from relative position clues.", mechanics: L3_MAP_CREATION_MECHANICS },
+  "y3-space-w5-l3": { learningIntention: "I can build a readable map that meets every condition.", mechanics: L3_MAP_CREATION_MECHANICS },
+  "y3-space-w6-l1": { learningIntention: "I can follow a route between landmarks.", mechanics: L3_NAVIGATION_MECHANICS },
+  "y3-space-w6-l2": { learningIntention: "I can plan a route to a named landmark.", mechanics: L3_NAVIGATION_MECHANICS },
+  "y3-space-w6-l3": { learningIntention: "I can locate, route and fix a navigation mission.", mechanics: L3_NAVIGATION_MECHANICS },
+  "y3-space-w7-l1": { learningIntention: "I can choose an object and navigate to use it.", mechanics: L3_MISSION_MECHANICS },
+  "y3-space-w7-l2": { learningIntention: "I can choose equipment and plan a rescue route.", mechanics: L3_MISSION_MECHANICS },
+  "y3-space-w7-l3": { learningIntention: "I can combine object, map and route reasoning.", mechanics: L3_MISSION_MECHANICS },
+  "y3-space-w8-l1": { learningIntention: "I can recognise, classify, build and choose 3D objects.", mechanics: L3_GRADUATION_MECHANICS },
+  "y3-space-w8-l2": { learningIntention: "I can read, create and navigate maps.", mechanics: L3_GRADUATION_MECHANICS },
+  "y3-space-w8-l3": { learningIntention: "I can complete a full Cosmic Navigator mission.", mechanics: L3_GRADUATION_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
@@ -543,15 +563,15 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
       vocabulary: week.vocabulary,
       skillIds: [week.skill.id],
       misconceptions: week.misconceptions,
-      quiz: {
+      quiz: weekNumber === 8 ? null : {
         id: `${definition.prefix}-space-w${weekNumber}-quiz`,
         coverage: week.quiz,
         questionCount: STARPATH_QUIZ_QUESTIONS_PER_LESSON * STARPATH_LESSONS_PER_WEEK as 15,
-        status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2"
+        status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || (definition.prefix === "y3" && weekNumber < 8)
           ? "implemented"
           : STARPATH_PROGRAM_STATUS,
       },
-      status: STARPATH_PROGRAM_STATUS,
+      status: definition.prefix === "y3" ? "implemented" : STARPATH_PROGRAM_STATUS,
     };
   });
 
@@ -567,13 +587,13 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
     prerequisites: definition.prerequisites,
     likelyMisconceptions: definition.likelyMisconceptions,
     progressionRationale: definition.progressionRationale,
-    skills: definition.weeks.map((week, index) => ({ ...week.skill, level: definition.level, weeks: [index + 1], status: STARPATH_PROGRAM_STATUS })),
+    skills: definition.weeks.map((week, index) => ({ ...week.skill, level: definition.level, weeks: [index + 1], status: definition.prefix === "y3" ? "implemented" : STARPATH_PROGRAM_STATUS })),
     weeks,
     assessments: {
       preTest: definition.level === "ground" ? null : { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: STARPATH_PROGRAM_STATUS },
-      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" ? "implemented" : STARPATH_PROGRAM_STATUS },
+      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" ? "implemented" : STARPATH_PROGRAM_STATUS },
     },
-    status: STARPATH_PROGRAM_STATUS,
+    status: definition.prefix === "y3" ? "implemented" : STARPATH_PROGRAM_STATUS,
   };
 }
 

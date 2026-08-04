@@ -4,6 +4,7 @@ import { getMeasurelandsPosttestForYear, getMeasurelandsPretestForYear } from ".
 import { getStarpathPosttestForYear } from "@/data/activities/starpath/ground/groundPostTest";
 import { getLevelOnePosttest } from "@/data/activities/starpath/level1/level1PostTest";
 import { getLevelTwoPosttest } from "@/data/activities/starpath/level2/level2PostTest";
+import { getLevelThreePosttest } from "@/data/activities/starpath/level3/level3PostTest";
 import type { SupportedMathLevel } from "@/data/activities/year2/lessonEngine";
 import {
   buildLevel3PosttestFormB,
@@ -19,6 +20,7 @@ export type AssessmentRealmId = "number" | "measurement" | "space";
 function getStarpathPosttest(yearLabel: string): PostTest | undefined {
   if (yearLabel === "Year 1") return getLevelOnePosttest();
   if (yearLabel === "Year 2") return getLevelTwoPosttest();
+  if (yearLabel === "Year 3") return getLevelThreePosttest();
   return getStarpathPosttestForYear(yearLabel);
 }
 

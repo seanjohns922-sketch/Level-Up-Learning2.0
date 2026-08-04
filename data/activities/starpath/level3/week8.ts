@@ -1,0 +1,18 @@
+import { debugMapTask, missionMapTask } from "@/data/activities/starpath/level2/navWeeks";
+import { nameObjectTask } from "./week1";
+import { compareObjectsTask, objectSortTask } from "./week2";
+import { buildRoverTask, chooseBestShapeTask } from "./week3";
+import { mapExplorerTask } from "./week4";
+import { mapBuilderTask } from "./week5";
+import { lessonContent, taskSet, teaching } from "./lessonUtils";
+
+const compareAndClassifyReview = (round: number, target: number) => round % 2 ? objectSortTask(round, target) : compareObjectsTask(round, target);
+const buildAndChooseReview = (round: number, target: number) => round % 2 ? chooseBestShapeTask(round, target) : buildRoverTask(round, target);
+
+export const createObjectsReviewTaskSet = () => taskSet([nameObjectTask, compareAndClassifyReview, buildAndChooseReview], teaching("objectFeatures", "3D Objects Review", "Recognise, compare, classify, build and choose 3D objects.", "Review object names and informal features, classify and compare them, then build with objects suited to each purpose."));
+export const createMapMasterTaskSet = () => taskSet([mapExplorerTask, mapBuilderTask, missionMapTask], teaching("mapMission", "Map Master Challenge", "Read, create and navigate maps.", "Interpret the map, create a correct landmark layout and plan a route across it."), 20);
+export const createFinalMissionTaskSet = () => taskSet([chooseBestShapeTask, mapBuilderTask, debugMapTask], teaching("mapDebug", "Final Navigation Mission", "Put every Cosmic Navigator skill together.", "Choose suitable equipment, create the mission map and fix the final navigation route."), 30);
+
+export const OBJECTS_REVIEW_CONTENT = lessonContent({ title: "3D Objects Review", brief: "Review recognition, comparison, classification, construction and purpose across the five 3D objects.", criteria: ["recognise objects", "classify by feature", "choose for a purpose"], activities: ["Recognise", "Classify", "Choose and Build"], kinds: ["starpathObject", "starpathObject", "starpathObject"], reflection: "What can you explain about 3D objects?", reflectionOptions: ["Their names", "How they move and stack", "Why they suit a use"], skills: ["Recognise objects", "Classify features", "Choose for purpose"], next: "Map Master Challenge", createTaskSet: createObjectsReviewTaskSet });
+export const MAP_MASTER_CONTENT = lessonContent({ title: "Map Master Challenge", brief: "Demonstrate map interpretation, creation and landmark navigation in one challenge.", criteria: ["interpret the map", "create a layout", "navigate accurately"], activities: ["Read", "Create", "Navigate"], kinds: ["starpathMapLocate", "starpathMapCreate", "starpathMapRoute"], reflection: "What makes a useful map?", reflectionOptions: ["A clear key", "Correct positions", "Readable routes"], skills: ["Interpret maps", "Create maps", "Navigate maps"], next: "Final Navigation Mission", createTaskSet: createMapMasterTaskSet });
+export const FINAL_MISSION_CONTENT = lessonContent({ title: "Final Navigation Mission", brief: "Integrate object reasoning, map creation and route debugging to complete Cosmic Navigator training.", criteria: ["choose equipment", "create the map", "complete the route"], activities: ["Equipment", "Mission Map", "Final Route"], kinds: ["starpathObject", "starpathMapCreate", "starpathMapRoute"], reflection: "Are you ready for the Post-Test?", reflectionOptions: ["I can reason about objects", "I can create maps", "I can navigate and debug"], skills: ["Integrate both descriptors", "Solve a cumulative mission", "Explain spatial choices"], next: "Cosmic Navigator Post-Test", createTaskSet: createFinalMissionTaskSet });

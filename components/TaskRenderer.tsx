@@ -187,6 +187,7 @@ import {
   StarpathObjectSpotterCard,
 } from "@/components/starpath/StarpathWorldObjectCards";
 import { StarpathMapCard } from "@/components/starpath/StarpathMapCard";
+import { StarpathMapCreateCard } from "@/components/starpath/StarpathMapCreateCard";
 import { StarpathMapRouteCard } from "@/components/starpath/StarpathMapRouteCard";
 import { StarpathObjectCard } from "@/components/starpath/StarpathObjectCard";
 import { StarpathShapeFeatureCard } from "@/components/starpath/StarpathShapeFeatureCard";
@@ -663,6 +664,8 @@ function TaskRendererInner({
       return <StarpathObjectMatchCard key={k} task={t} onComplete={onC} />;
     case "starpathMapLocate":
       return <StarpathMapCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathMapCreate":
+      return <StarpathMapCreateCard key={k} task={t} onComplete={onC} onWrong={onW} />;
     case "starpathShapeFeature":
       return <StarpathShapeFeatureCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathMapRoute":

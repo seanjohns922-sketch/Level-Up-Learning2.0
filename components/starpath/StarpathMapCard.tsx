@@ -53,12 +53,14 @@ function MapView({
       ) : null}
       {task.landmarks.map((landmark) => {
         const tappable = Boolean(onLandmarkTap);
+        const symbol = task.legend?.find((item) => item.landmarkId === landmark.id)?.symbol;
         const inner = (
           <div className="flex h-full w-full flex-col items-center justify-center gap-0.5">
-            <PositionObjectVisual objectId={landmark.object} className="h-3/5 w-3/5" />
-            <span className="max-w-full truncate px-0.5 text-[7px] font-black leading-tight text-cyan-100 sm:text-[8px]">
-              {landmark.label}
-            </span>
+            {task.mode === "symbol" && symbol ? (
+              <span className="text-xl font-black text-amber-200 sm:text-2xl" aria-label="Map symbol">{symbol}</span>
+            ) : (
+              <><PositionObjectVisual objectId={landmark.object} className="h-3/5 w-3/5" /><span className="max-w-full truncate px-0.5 text-[7px] font-black leading-tight text-cyan-100 sm:text-[8px]">{landmark.label}</span></>
+            )}
           </div>
         );
         return (
@@ -84,6 +86,23 @@ function MapView({
         );
       })}
     </DirectionGrid>
+  );
+}
+
+function MapKey({ task }: { task: MapTask }) {
+  if (!task.legend?.length) return null;
+  return (
+    <div className="mx-auto mb-3 max-w-3xl border-2 border-cyan-200 bg-cyan-50 px-3 py-2 shadow-sm">
+      <div className="mb-1 text-xs font-black uppercase text-cyan-900">Map key</div>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-4">
+        {task.legend.map((item) => (
+          <div key={item.landmarkId} className="flex min-w-0 items-center gap-2">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-cyan-300 bg-white text-lg" aria-hidden="true">{item.symbol}</span>
+            <span className="truncate text-xs font-bold text-indigo-950">{item.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -113,6 +132,7 @@ export function StarpathMapCard({
     return (
       <div>
         <TaskHeading prompt={task.prompt} speech={task.speakText} />
+        <MapKey task={task} />
         <div className="mx-auto max-w-3xl">
           <MapView task={task} onLandmarkTap={tapLandmark} wrongId={wrongId} />
         </div>
@@ -126,6 +146,7 @@ export function StarpathMapCard({
   return (
     <div>
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <MapKey task={task} />
       <div className="mx-auto max-w-3xl">
         <MapView task={task} />
       </div>

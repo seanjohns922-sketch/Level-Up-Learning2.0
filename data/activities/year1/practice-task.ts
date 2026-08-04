@@ -2328,7 +2328,7 @@ export type PracticeTask = (
       // tap a named landmark, name what sits at a highlighted spot, or reason
       // about a landmark's position relative to another.
       kind: "starpathMapLocate";
-      mode: "find" | "whatIsHere" | "relative" | "clues";
+      mode: "find" | "whatIsHere" | "relative" | "clues" | "symbol";
       prompt: string;
       speakText: string;
       target: number;
@@ -2336,6 +2336,8 @@ export type PracticeTask = (
       cols: number;
       rows: number;
       landmarks: Array<{ id: string; label: string; object: string; r: number; c: number }>;
+      /** Level 3: the symbol convention used to represent each landmark. */
+      legend?: Array<{ symbol: string; landmarkId: string; label: string }>;
       /** find: the landmark to tap. */
       correctLandmarkId?: string;
       /** whatIsHere: the highlighted cell. */
@@ -2379,6 +2381,25 @@ export type PracticeTask = (
       /** debug: an ordered route with one wrong step to find. */
       debugSteps?: Array<{ id: string; direction: "up" | "down" | "left" | "right" }>;
       wrongStepId?: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 3 · W5 — Map Creator. Place named landmarks on a top-view grid
+      // so every stated relative-position condition is true.
+      kind: "starpathMapCreate";
+      prompt: string;
+      speakText: string;
+      target: number;
+      mapId: string;
+      cols: number;
+      rows: number;
+      landmarks: Array<{ id: string; label: string; object: string; symbol: string }>;
+      constraints: Array<{
+        subjectId: string;
+        relation: "above" | "below" | "leftOf" | "rightOf";
+        referenceId: string;
+        text: string;
+      }>;
       feedback: { correct: string; wrong: string };
     }
   | StarpathObjectTask
