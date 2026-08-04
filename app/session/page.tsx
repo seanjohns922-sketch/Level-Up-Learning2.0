@@ -53,6 +53,10 @@ import {
   additiveAnswerMatchesTarget,
   expectedPartitionTarget,
 } from "@/lib/math-answer-equivalence";
+import {
+  assertWeeklyQuizQuestionCount,
+  WEEKLY_QUIZ_QUESTIONS_PER_LESSON,
+} from "@/lib/weekly-quiz-contract";
 import { ClickableDotGrid, ClickableDotRows } from "@/components/ClickableDots";
 import { StaticDotGrid, StaticDotRow, StaticDotRows } from "@/components/StaticDots";
 import {
@@ -8091,8 +8095,7 @@ function SessionPage({
   // Uses YEAR1_WEEKLY_QUIZZES config: 5 questions per lesson, 80% pass
   // ---------------------------
   const buildQuizQuestions = useCallback(() => {
-    const qConfig = quizConfig;
-    const questionsPerLesson = qConfig?.questionsPerLesson ?? 5;
+    const questionsPerLesson = WEEKLY_QUIZ_QUESTIONS_PER_LESSON;
     const weekPlan = quizWeekPlan;
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 1) {
@@ -8569,24 +8572,33 @@ function SessionPage({
     }
 
     return base;
-  }, [isMeasurementRealm, quizConfig, quizWeekPlan, week, year]);
+  }, [isMeasurementRealm, quizWeekPlan, week, year]);
 
   const buildSafeQuizQuestions = useCallback(() => {
     for (let attempt = 0; attempt < 3; attempt += 1) {
-      const questions = buildQuizQuestions();
-      if (questions.length > 0 && questions.every((question) => isQuizQuestionSafe(question))) {
+      const questions = assertWeeklyQuizQuestionCount(
+        buildQuizQuestions(),
+        `${quizRealmId} ${year} Week ${week}`
+      );
+      if (questions.every((question) => isQuizQuestionSafe(question))) {
         return questions;
       }
     }
 
-    const recovered = buildQuizQuestions().map((question, index) =>
+    const recovered = assertWeeklyQuizQuestionCount(
+      buildQuizQuestions(),
+      `${quizRealmId} ${year} Week ${week}`
+    ).map((question, index) =>
       isQuizQuestionSafe(question) ? question : buildQuizRecoveryQuestion(question, index + 1)
     );
 
-    return recovered;
-  }, [buildQuizQuestions]);
+    return assertWeeklyQuizQuestionCount(
+      recovered,
+      `${quizRealmId} ${year} Week ${week} recovery`
+    );
+  }, [buildQuizQuestions, quizRealmId, week, year]);
 
-  const quizAttemptKey = `${type}|${realmId}|${year}|${week}|${quizConfig?.questionsPerLesson ?? 5}`;
+  const quizAttemptKey = `${type}|${realmId}|${year}|${week}|${WEEKLY_QUIZ_QUESTIONS_PER_LESSON}`;
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => buildSafeQuizQuestions());
 
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
@@ -8763,13 +8775,12 @@ function SessionPage({
         quizMabAnswers,
         quizMoneyAnswers,
         quizLessonActivityResults,
-        quizConfig?.questionsPerLesson ?? 5,
+        WEEKLY_QUIZ_QUESTIONS_PER_LESSON,
         lessonTitleLookup
       ),
     [
       quizAnswers,
       quizChartDone,
-      quizConfig?.questionsPerLesson,
       quizLineAnswers,
       quizMabAnswers,
       quizMoneyAnswers,

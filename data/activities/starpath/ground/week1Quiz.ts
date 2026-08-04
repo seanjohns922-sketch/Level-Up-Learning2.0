@@ -1,4 +1,5 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { assertWeeklyQuizQuestionCount } from "@/lib/weekly-quiz-contract";
 import { shapeMatchTask, shapeNameTask } from "@/data/activities/starpath/ground/week1Lesson1";
 import { objectMatchTask, shapeExplorerTask } from "@/data/activities/starpath/ground/week1Lesson2";
 import { oddOneOutTask } from "@/data/activities/starpath/ground/week1Lesson3";
@@ -87,5 +88,10 @@ const STARPATH_QUIZ_BUILDERS: Record<string, () => PracticeTask[]> = {
 
 export function getStarpathQuizTasks(levelPrefix: string, week: number): PracticeTask[] | null {
   const builder = STARPATH_QUIZ_BUILDERS[`${levelPrefix}-w${week}`];
-  return builder ? builder() : null;
+  if (!builder) return null;
+
+  return assertWeeklyQuizQuestionCount(
+    builder(),
+    `Starpath ${levelPrefix} Week ${week}`
+  );
 }

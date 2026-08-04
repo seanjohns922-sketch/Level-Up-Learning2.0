@@ -1,7 +1,7 @@
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { getL3Object, l3ObjectSvg, listL3Objects, type L3Object } from "./l3-objects";
+import { getL3Object, l3ObjectSvg, listL3Objects, type L3Object, type L3ObjectId } from "./l3-objects";
 import { LEVEL_THREE_ARTWORK } from "./week1";
 
 // Level 3 · Week 2 — Object Detectives (AC9M3SP01). Compare and classify objects
@@ -67,10 +67,10 @@ export function whichObjectTask(round: number, target: number): PracticeTask {
 }
 
 // L2 — compare TWO objects and choose the true statement about them.
-type CompareCase = { a: string; b: string; prompt: string; correct: string; wrong: [string, string] };
+type CompareCase = { a: L3ObjectId; b: L3ObjectId; prompt: string; correct: string; wrong: [string, string] };
 const COMPARE_CASES: CompareCase[] = [
   { a: "cube", b: "cylinder", prompt: "What is the same about these two?", correct: "They both stack", wrong: ["They both roll", "They both have a point"] },
-  { a: "sphere", b: "cone", prompt: "What is the same about these two?", correct: "They both roll", wrong: ["They both stack", "They both have flat sides"] },
+  { a: "sphere", b: "cone", prompt: "What is the same about these two?", correct: "They both roll", wrong: ["They both stack", "They only have flat surfaces"] },
   { a: "sphere", b: "cube", prompt: "What is different about these two?", correct: "One rolls and one does not", wrong: ["They both roll", "They both have a point"] },
   { a: "cone", b: "cylinder", prompt: "What is different about these two?", correct: "One has a point and one does not", wrong: ["Neither of them rolls", "They both stack"] },
   { a: "cube", b: "prism", prompt: "What is the same about these two?", correct: "Neither of them rolls", wrong: ["They both roll", "They both have a point"] },
@@ -98,16 +98,81 @@ export function compareObjectsTask(round: number, target: number): PracticeTask 
   };
 }
 
-// L3 — sort by a COMPOUND rule (two conditions at once).
+// Quiz-sized compound classification questions retain a single answer.
 type FeatureCase = { prompt: string; speak: string; pred: Pred; word: string };
 const SORT_CASES: FeatureCase[] = [
   { prompt: "Which object rolls but does NOT stack?", speak: "Which object rolls but cannot stack? Tap it.", pred: (o) => o.rolls && !o.stacks, word: "rolls but does not stack" },
   { prompt: "Which object can roll AND stack?", speak: "Which object can both roll and stack? Tap it.", pred: (o) => o.rolls && o.stacks, word: "rolls and stacks" },
-  { prompt: "Which object has flat sides but does NOT roll?", speak: "Which object has flat sides and does not roll? Tap it.", pred: (o) => !o.rolls && o.surface === "flat", word: "has flat sides and does not roll" },
+  { prompt: "Which object has only flat surfaces and does NOT roll?", speak: "Which object has only flat surfaces and does not roll? Tap it.", pred: (o) => !o.rolls && o.surface === "flat", word: "has only flat surfaces and does not roll" },
 ];
-export function objectSortTask(round: number, target: number): PracticeTask {
+export function objectSortQuizTask(round: number, target: number): PracticeTask {
   const c = SORT_CASES[round % SORT_CASES.length]!;
   return featureFind(round, target, c.prompt, c.speak, c.pred, (o) => `Yes — the ${o.spaceName} ${c.word}.`, `Look for the object that ${c.word}.`);
+}
+
+type ClassificationCase = {
+  prompt: string;
+  speak: string;
+  groups: [{ id: string; label: string; speakText: string }, { id: string; label: string; speakText: string }];
+  groupFor: (object: L3Object) => string;
+};
+
+const CLASSIFICATIONS: ClassificationCase[] = [
+  {
+    prompt: "Sort every object by whether it rolls.",
+    speak: "Sort every object. Put objects that roll in Rolls, and the others in Does not roll.",
+    groups: [
+      { id: "rolls", label: "Rolls", speakText: "Rolls" },
+      { id: "not-roll", label: "Does not roll", speakText: "Does not roll" },
+    ],
+    groupFor: (object) => (object.rolls ? "rolls" : "not-roll"),
+  },
+  {
+    prompt: "Sort every object by whether it stacks.",
+    speak: "Sort every object. Put objects that stack in Stacks, and the others in Does not stack.",
+    groups: [
+      { id: "stacks", label: "Stacks", speakText: "Stacks" },
+      { id: "not-stack", label: "Does not stack", speakText: "Does not stack" },
+    ],
+    groupFor: (object) => (object.stacks ? "stacks" : "not-stack"),
+  },
+  {
+    prompt: "Sort every object by its surfaces.",
+    speak: "Sort every object. Put objects with a curved surface in Curved surface. Put the others in Only flat surfaces.",
+    groups: [
+      { id: "curved", label: "Curved surface", speakText: "Has a curved surface" },
+      { id: "flat", label: "Only flat surfaces", speakText: "Has only flat surfaces" },
+    ],
+    groupFor: (object) => (object.surface === "flat" ? "flat" : "curved"),
+  },
+  {
+    prompt: "Sort every object by whether it has a point.",
+    speak: "Sort every object. Put objects with a point in Has a point, and the others in No point.",
+    groups: [
+      { id: "point", label: "Has a point", speakText: "Has a point" },
+      { id: "no-point", label: "No point", speakText: "Does not have a point" },
+    ],
+    groupFor: (object) => (object.point ? "point" : "no-point"),
+  },
+];
+
+export function objectSortTask(round: number, target: number): PracticeTask {
+  const classification = CLASSIFICATIONS[round % CLASSIFICATIONS.length]!;
+  const objects = rotate(listL3Objects(), round + 1);
+  return {
+    kind: "starpathObject",
+    mode: "classify",
+    prompt: classification.prompt,
+    speakText: classification.speak,
+    target,
+    scene: objects.map(sceneOf),
+    groups: classification.groups,
+    assignments: Object.fromEntries(objects.map((object) => [object.id, classification.groupFor(object)])),
+    feedback: {
+      correct: "Excellent sorting — every object is in the group that matches its features.",
+      wrong: "Check what the selected object does, then try its group again.",
+    },
+  };
 }
 
 function teaching(heading: string, prompt: string, speakText: string) {
@@ -118,7 +183,7 @@ function teaching(heading: string, prompt: string, speakText: string) {
 const INTRO = teaching(
   "Rolls, stacks and slides",
   "Objects behave in different ways.",
-  "Some objects roll because they are round. Some stack because they have a flat top. Some slide along on their flat sides. Use these clues to tell objects apart."
+  "Some objects roll because they have a curved surface. Flat surfaces can help objects stack or slide. A cylinder has one curved surface and two flat ends. Use these clues to compare and classify objects."
 );
 
 function makeSet(start: number, gen: (round: number, target: number) => PracticeTask): RealmLessonTaskSet {
@@ -139,6 +204,7 @@ function makeSet(start: number, gen: (round: number, target: number) => Practice
 export const createWhichObjectTaskSet = (): RealmLessonTaskSet => makeSet(10, whichObjectTask);
 export const createCompareObjectsTaskSet = (): RealmLessonTaskSet => makeSet(20, compareObjectsTask);
 export const createObjectSortTaskSet = (): RealmLessonTaskSet => makeSet(30, objectSortTask);
+export const createObjectSortQuizTaskSet = (): RealmLessonTaskSet => makeSet(40, objectSortQuizTask);
 
 function content(title: string, brief: string, criteria: [string, string, string], acts: [string, string, string], reflectPrompt: string, reflectOpts: [string, string, string], skills: [string, string, string], nextUp: string, createTaskSet: () => RealmLessonTaskSet): StarpathLessonContent {
   return {
@@ -160,4 +226,4 @@ function content(title: string, brief: string, criteria: [string, string, string
 
 export const WHICH_OBJECT_CONTENT = content("Which Object Is It?", "Be an Object Detective. Use a feature clue to work out which 3D object it is.", ["read the clue", "check the features", "find the object"], ["Clue 1", "Clue 2", "Detective"], "How did you solve the clue?", ["I read the features", "I checked each object", "I matched the clue"], ["Use feature clues", "Reason about objects", "Identify an object"], "Compare Space Objects", createWhichObjectTaskSet);
 export const COMPARE_OBJECTS_CONTENT = content("Compare Space Objects", "Compare the objects by what they do — which one rolls, stacks or has a point.", ["look at what each does", "roll, stack or point", "choose the object"], ["Rolls", "Stacks", "Compare"], "How did you compare?", ["I saw what each object does", "I looked for rolling or stacking", "I compared the features"], ["Compare by feature", "Use roll, stack, slide", "Reason about objects"], "Space Object Sort", createCompareObjectsTaskSet);
-export const OBJECT_SORT_CONTENT = content("Space Object Sort", "Sort the objects — find the one that does or does not do something.", ["read the rule", "sort by the feature", "find the object"], ["Sort 1", "Sort 2", "Sorter"], "What did you learn about objects?", ["Objects roll, stack or slide", "One object can do more than one thing", "I can sort by a feature"], ["Classify by feature", "Sort objects", "Work independently"], "Week 2 Voyage Quiz", createObjectSortTaskSet);
+export const OBJECT_SORT_CONTENT = content("Space Object Sort", "Classify every space object into groups using one shared feature.", ["read the sorting rule", "check every object", "classify the whole set"], ["Roll Sort", "Surface Sort", "Object Classifier"], "What helped you classify the objects?", ["I tested the same feature each time", "I checked every object", "I noticed one object can have several features"], ["Classify a complete set", "Sort by one feature", "Explain a classification"], "Week 2 Voyage Quiz", createObjectSortTaskSet);

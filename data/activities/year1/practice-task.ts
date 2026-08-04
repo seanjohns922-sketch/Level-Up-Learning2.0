@@ -1,6 +1,47 @@
 export type Difficulty = "easy" | "medium" | "hard";
 export type StarpathShape = "circle" | "oval" | "triangle" | "square" | "rectangle";
 
+export type StarpathObjectSceneItem = {
+  id: string;
+  svg: string;
+  label: string;
+  spaceName?: string;
+  reason?: string;
+};
+
+type StarpathObjectTaskBase = {
+  kind: "starpathObject";
+  prompt: string;
+  speakText: string;
+  target: number;
+  feedback: { correct: string; wrong: string };
+};
+
+export type StarpathObjectTask =
+  | (StarpathObjectTaskBase & {
+      mode: "name" | "compare";
+      scene: StarpathObjectSceneItem[];
+      options: Array<{ id: string; label: string }>;
+      correctOptionId: string;
+    })
+  | (StarpathObjectTaskBase & {
+      mode: "find";
+      scene: StarpathObjectSceneItem[];
+      correctObjectId: string;
+    })
+  | (StarpathObjectTaskBase & {
+      mode: "classify";
+      scene: StarpathObjectSceneItem[];
+      groups: Array<{ id: string; label: string; speakText: string }>;
+      assignments: Record<string, string>;
+    })
+  | (StarpathObjectTaskBase & {
+      mode: "build";
+      modelName: string;
+      pieces: Array<StarpathObjectSceneItem & { objectId: string }>;
+      slots: Array<{ id: string; label: string; correctObjectId: string }>;
+    });
+
 /** Time-based difficulty gates (strict) */
 export function getDifficultyFromTime(elapsedSeconds: number): Difficulty {
   if (elapsedSeconds < 270) return "easy";   // 0:00–4:30
@@ -2340,24 +2381,7 @@ export type PracticeTask = (
       wrongStepId?: string;
       feedback: { correct: string; wrong: string };
     }
-  | {
-      // Level 3 · W1 — 3D Object Explorer. Recognise and find common 3D objects
-      // (cube, sphere, cylinder, cone, rectangular prism) shown as pre-rendered
-      // SVG so the card stays decoupled from the Level 3 object catalogue.
-      kind: "starpathObject";
-      mode: "name" | "find" | "compare";
-      prompt: string;
-      speakText: string;
-      target: number;
-      /** objects to display; find shows several (tappable), name/compare show them for reference. */
-      scene: Array<{ id: string; svg: string; label: string; spaceName?: string; reason?: string }>;
-      /** name / compare mode: text options + the correct one. */
-      options?: Array<{ id: string; label: string }>;
-      correctOptionId?: string;
-      /** find mode: which object in the scene to tap. */
-      correctObjectId?: string;
-      feedback: { correct: string; wrong: string };
-    }
+  | StarpathObjectTask
   | {
       kind: "starpathShapeMatch";
       prompt: string;

@@ -13,7 +13,7 @@ export type L3Object = {
   colour: string; // representative swatch colour
   rolls: boolean;
   stacks: boolean;
-  slides: boolean; // has at least one flat face it can slide on
+  slides: boolean; // has at least one flat surface it can slide on
   surface: "flat" | "curved" | "both";
   point: boolean; // has a single point (cone)
   inner: string; // SVG inner markup for viewBox 0 0 120 120
@@ -39,8 +39,8 @@ export const L3_OBJECTS: Record<L3ObjectId, L3Object> = {
 
 export const L3_OBJECT_IDS: L3ObjectId[] = ["cube", "sphere", "cylinder", "cone", "prism"];
 
-export function getL3Object(id: string): L3Object {
-  return L3_OBJECTS[id as L3ObjectId] ?? L3_OBJECTS.cube;
+export function getL3Object(id: L3ObjectId): L3Object {
+  return L3_OBJECTS[id];
 }
 
 export function listL3Objects(): L3Object[] {

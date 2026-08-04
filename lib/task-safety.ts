@@ -1,4 +1,4 @@
-import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import type { PracticeTask, StarpathObjectTask } from "@/data/activities/year1/practice-task";
 import type { LessonActivity } from "@/data/programs/types";
 import type { Year2QuestionData } from "@/data/activities/year2/lessonEngine";
 
@@ -283,5 +283,50 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
-  return !!task && hasText(task.kind) && SUPPORTED_PRACTICE_TASK_KINDS.has(task.kind);
+  if (!task || !hasText(task.kind) || !SUPPORTED_PRACTICE_TASK_KINDS.has(task.kind)) return false;
+  if (task.kind !== "starpathObject") return true;
+  const objectTask = task as StarpathObjectTask;
+
+  if (!hasText(objectTask.prompt) || !hasText(objectTask.speakText) || !hasText(objectTask.feedback.correct) || !hasText(objectTask.feedback.wrong)) {
+    return false;
+  }
+
+  if (objectTask.mode === "name" || objectTask.mode === "compare") {
+    const optionIds = new Set(objectTask.options.map((option) => option.id));
+    return objectTask.scene.length > 0 && objectTask.options.length >= 2 && optionIds.size === objectTask.options.length && optionIds.has(objectTask.correctOptionId);
+  }
+
+  if (objectTask.mode === "find") {
+    const sceneIds = new Set(objectTask.scene.map((item) => item.id));
+    return objectTask.scene.length >= 2 && sceneIds.size === objectTask.scene.length && sceneIds.has(objectTask.correctObjectId);
+  }
+
+  if (objectTask.mode === "classify") {
+    const sceneIds = new Set(objectTask.scene.map((item) => item.id));
+    const groupIds = new Set(objectTask.groups.map((group) => group.id));
+    return (
+      objectTask.scene.length >= 2 &&
+      objectTask.groups.length >= 2 &&
+      sceneIds.size === objectTask.scene.length &&
+      groupIds.size === objectTask.groups.length &&
+      objectTask.scene.every((item) => groupIds.has(objectTask.assignments[item.id]))
+    );
+  }
+
+  if (objectTask.mode !== "build") return false;
+
+  const pieceIds = new Set(objectTask.pieces.map((piece) => piece.id));
+  const slotIds = new Set(objectTask.slots.map((slot) => slot.id));
+  const availableByObject = new Map<string, number>();
+  const requiredByObject = new Map<string, number>();
+  objectTask.pieces.forEach((piece) => availableByObject.set(piece.objectId, (availableByObject.get(piece.objectId) ?? 0) + 1));
+  objectTask.slots.forEach((slot) => requiredByObject.set(slot.correctObjectId, (requiredByObject.get(slot.correctObjectId) ?? 0) + 1));
+  return (
+    hasText(objectTask.modelName) &&
+    objectTask.pieces.length >= objectTask.slots.length &&
+    objectTask.slots.length >= 2 &&
+    pieceIds.size === objectTask.pieces.length &&
+    slotIds.size === objectTask.slots.length &&
+    [...requiredByObject].every(([objectId, count]) => (availableByObject.get(objectId) ?? 0) >= count)
+  );
 }

@@ -9,7 +9,7 @@ import { SHAPE_FACTS, type FoundationShape } from "@/data/activities/starpath/gr
 import { SHAPE_OBJECTS, type ShapeObjectId } from "@/data/activities/starpath/ground/shape-objects";
 import { PositionObjectVisual } from "@/components/starpath/StarpathPositionCards";
 import type { PositionRelation } from "@/data/activities/starpath/ground/position-objects";
-import { listL3Objects, getL3Object, l3ObjectSvg } from "@/data/activities/starpath/level3/l3-objects";
+import { listL3Objects, getL3Object, l3ObjectSvg, type L3ObjectId } from "@/data/activities/starpath/level3/l3-objects";
 
 type ShapeIntroTask = Extract<PracticeTask, { kind: "starpathShapeIntro" }>;
 type ShapeMatchTask = Extract<PracticeTask, { kind: "starpathShapeMatch" }>;
@@ -545,10 +545,10 @@ function ObjectsTeachGrid() {
 
 // Level 3 · W2 — the three informal features (rolls / stacks / slides).
 function ObjectFeaturesTeachGrid() {
-  const cards: Array<{ id: string; title: string; tip: string }> = [
+  const cards: Array<{ id: L3ObjectId; title: string; tip: string }> = [
     { id: "sphere", title: "Rolls", tip: "Round objects roll — they have a curved surface." },
     { id: "cube", title: "Stacks", tip: "Flat-topped objects stack on top of each other." },
-    { id: "prism", title: "Slides", tip: "Objects with flat sides slide along a surface." },
+    { id: "prism", title: "Slides", tip: "Objects with flat surfaces slide along a surface." },
   ];
   return (
     <div className="mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">

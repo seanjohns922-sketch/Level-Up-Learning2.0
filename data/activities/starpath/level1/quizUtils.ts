@@ -1,5 +1,6 @@
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { assertWeeklyQuizQuestionCount } from "@/lib/weekly-quiz-contract";
 
 // Draw five questions from a lesson's activity generators, cycling through them.
 // Matches the Level 1 Week 1 quiz pattern so every week is graded 5 + 5 + 5.
@@ -16,5 +17,8 @@ export function fifteenFrom(
   b: RealmLessonTaskSet,
   c: RealmLessonTaskSet
 ): PracticeTask[] {
-  return [...fiveFrom(a), ...fiveFrom(b), ...fiveFrom(c)];
+  return assertWeeklyQuizQuestionCount(
+    [...fiveFrom(a), ...fiveFrom(b), ...fiveFrom(c)],
+    "Starpath lesson quiz composition"
+  );
 }

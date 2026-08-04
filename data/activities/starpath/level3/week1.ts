@@ -1,7 +1,7 @@
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { L3_OBJECT_IDS, getL3Object, l3ObjectSvg, type L3Object } from "./l3-objects";
+import { L3_OBJECT_IDS, getL3Object, l3ObjectSvg, type L3Object, type L3ObjectId } from "./l3-objects";
 
 // Level 3 · Week 1 — 3D Discoveries (AC9M3SP01). Recognise and name the five
 // Starpath 3D objects: cube, sphere, cylinder, cone, rectangular prism.
@@ -35,21 +35,47 @@ export function nameObjectTask(round: number, target: number): PracticeTask {
   };
 }
 
-// L2 — a scene of objects; find and tap the named one.
-export function findObjectTask(round: number, target: number): PracticeTask {
-  const wanted = getL3Object(L3_OBJECT_IDS[round % L3_OBJECT_IDS.length]!);
+type ObjectClue = { objectId: L3ObjectId; prompt: string; speakText: string };
+const CONTEXT_CLUES: ObjectClue[] = [
+  { objectId: "cube", prompt: "Find the object shaped like a cargo crate.", speakText: "Find the solid block shaped like a cargo crate." },
+  { objectId: "sphere", prompt: "Find the object shaped like a planet.", speakText: "Find the object that is round all over, like a planet." },
+  { objectId: "cylinder", prompt: "Find the object shaped like a fuel tank.", speakText: "Find the object shaped like a fuel tank, with a curved surface and two flat ends." },
+  { objectId: "cone", prompt: "Find the object shaped like a rocket nose.", speakText: "Find the object shaped like a rocket nose, with one point." },
+  { objectId: "prism", prompt: "Find the object shaped like a long supply box.", speakText: "Find the long box-shaped object used for supplies." },
+];
+
+const FEATURE_CLUES: ObjectClue[] = [
+  { objectId: "cube", prompt: "Find the equal block with only flat surfaces.", speakText: "Find the equal block with only flat surfaces." },
+  { objectId: "sphere", prompt: "Find the object that is curved all over.", speakText: "Find the object that is curved all over and can roll in every direction." },
+  { objectId: "cylinder", prompt: "Find the object that can roll and stack.", speakText: "Find the object with one curved surface and two flat ends. It can roll and stack." },
+  { objectId: "cone", prompt: "Find the object with one point and one flat end.", speakText: "Find the object with one point, one curved surface and one flat end." },
+  { objectId: "prism", prompt: "Find the long box with only flat surfaces.", speakText: "Find the long box-shaped object with only flat surfaces." },
+];
+
+function clueObjectTask(round: number, target: number, clues: readonly ObjectClue[]): PracticeTask {
+  const clue = clues[round % clues.length]!;
+  const wanted = getL3Object(clue.objectId);
   const others = rotate(L3_OBJECT_IDS.filter((id) => id !== wanted.id), round).slice(0, 3).map(getL3Object);
-  const scene = rotate([wanted, ...others], round + 2).map(sceneOf);
   return {
     kind: "starpathObject",
     mode: "find",
-    prompt: `Find the ${wanted.spaceName}.`,
-    speakText: `Find the ${wanted.spaceName} — a ${wanted.label}. Tap it.`,
+    prompt: clue.prompt,
+    speakText: clue.speakText,
     target,
-    scene,
+    scene: rotate([wanted, ...others], round + 2).map(sceneOf),
     correctObjectId: wanted.id,
-    feedback: { correct: `That is the ${wanted.spaceName}.`, wrong: `Look for the ${wanted.label}.` },
+    feedback: { correct: `Yes — that is the ${wanted.spaceName}, a ${wanted.label}.`, wrong: "Listen to the clue and compare every object's shape." },
   };
+}
+
+// L2 — identify familiar 3D objects from their use and environmental context.
+export function findObjectTask(round: number, target: number): PracticeTask {
+  return clueObjectTask(round, target, CONTEXT_CLUES);
+}
+
+// L3 — identify objects independently from informal geometric features.
+export function featureObjectTask(round: number, target: number): PracticeTask {
+  return clueObjectTask(round, target, FEATURE_CLUES);
 }
 
 function teaching(heading: string, prompt: string, speakText: string) {
@@ -102,9 +128,9 @@ export function create3DObjectChallengeTaskSet(): RealmLessonTaskSet {
   return {
     teaching: INTRO,
     activities: [
-      () => nameObjectTask(a++ + 3, ++target),
+      () => featureObjectTask(a++ + 3, ++target),
       () => findObjectTask(b++ + 3, ++target),
-      () => nameObjectTask(c++ + 4, ++target),
+      () => featureObjectTask(c++ + 4, ++target),
     ],
   };
 }
@@ -131,40 +157,40 @@ export const MEET_THE_OBJECTS_CONTENT = {
 
 export const FIND_THE_OBJECT_CONTENT = {
   missionBrief:
-    "Each space object is somewhere in Starpath. Read the name and find that object.",
-  successCriteria: ["read the object name", "find it in the scene", "tap the right object"],
+    "Recognise familiar 3D objects in Starpath by what they resemble and how they are used.",
+  successCriteria: ["listen to an object clue", "connect an object to its use", "find it in the scene"],
   artworkSrc: LEVEL_THREE_ARTWORK,
   teaching: { title: "Find the Space Object", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "find-1", title: "Find It", description: "Find the named object.", taskKinds: ["starpathObject"] },
-    { key: "find-2", title: "Find Another", description: "Find the next object.", taskKinds: ["starpathObject"] },
-    { key: "find-3", title: "Object Finder", description: "Find objects on your own.", taskKinds: ["starpathObject"] },
+    { key: "find-1", title: "Object Clues", description: "Find an object from a familiar use.", taskKinds: ["starpathObject"] },
+    { key: "find-2", title: "Space Equipment", description: "Connect objects to Starpath equipment.", taskKinds: ["starpathObject"] },
+    { key: "find-3", title: "Object Finder", description: "Recognise objects in context.", taskKinds: ["starpathObject"] },
   ],
   reflection: {
     prompt: "How did you find the object?",
-    options: ["I read the name", "I looked at each object", "I matched the shape"],
+    options: ["I listened to the clue", "I thought about the object's use", "I matched the shape"],
   },
-  practisedSkills: ["Recognise a named object", "Find an object in a scene", "Match name to object"],
+  practisedSkills: ["Recognise an object in context", "Connect shape and use", "Find an object from a clue"],
   nextUpLabel: "3D Object Challenge",
   createTaskSet: createFindTheObjectTaskSet,
 } satisfies StarpathLessonContent;
 
 export const OBJECT_CHALLENGE_CONTENT = {
   missionBrief:
-    "Mixed review — name objects and find them on your own.",
-  successCriteria: ["name any object", "find any object", "answer on your own"],
+    "Use informal feature clues to distinguish the five Starpath 3D objects.",
+  successCriteria: ["notice flat and curved surfaces", "recognise a feature clue", "identify the object independently"],
   artworkSrc: LEVEL_THREE_ARTWORK,
   teaching: { title: "3D Object Challenge", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "name-1", title: "Name It", description: "Name a 3D object.", taskKinds: ["starpathObject"] },
-    { key: "find-1", title: "Find It", description: "Find a named object.", taskKinds: ["starpathObject"] },
-    { key: "name-2", title: "Object Champion", description: "Recognise objects independently.", taskKinds: ["starpathObject"] },
+    { key: "name-1", title: "Surface Clues", description: "Identify objects by flat and curved surfaces.", taskKinds: ["starpathObject"] },
+    { key: "find-1", title: "Object in Context", description: "Recognise an object by its use.", taskKinds: ["starpathObject"] },
+    { key: "name-2", title: "Object Detective", description: "Combine context and feature clues.", taskKinds: ["starpathObject"] },
   ],
   reflection: {
     prompt: "What did you learn about 3D objects?",
-    options: ["Each object has a name", "I can find an object by its name", "Objects have different shapes"],
+    options: ["I noticed its surfaces", "I thought about what it does", "I compared it with other objects"],
   },
-  practisedSkills: ["Recognise 3D objects", "Name and find objects", "Work independently"],
+  practisedSkills: ["Recognise 3D objects", "Use informal feature clues", "Explain how objects differ"],
   nextUpLabel: "Week 1 Voyage Quiz",
   createTaskSet: create3DObjectChallengeTaskSet,
 } satisfies StarpathLessonContent;
