@@ -7,6 +7,7 @@ import {
 import { getPretestForYearLabel, getPosttestForYearLabel } from "../data/assessments/api";
 import fs from "node:fs";
 import path from "node:path";
+import { MEASURELANDS_ASSESSMENT_BLUEPRINTS } from "../data/assessments/measurelandsAssessmentBlueprint";
 
 // ── Measurelands Assessment Audit ─────────────────────────────────────────────
 // Validates MEANING, not just structure. Every Measurelands bank must contain
@@ -21,6 +22,15 @@ type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" |
 const YEARS: YearLabel[] = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
 const MEASURELANDS_FINAL_WEEK: number = 8; // Measurelands = 8 weeks; Number Nexus = 12.
 const NUMBER_FINAL_WEEK: number = 12;
+const REQUIRED_ASSESSED_WEEKS: Record<YearLabel, number[]> = {
+  Prep: [1, 2, 3, 4, 5, 6, 7, 8],
+  "Year 1": [1, 2, 3, 4, 5, 6, 7, 8],
+  "Year 2": [1, 2, 3, 4, 5, 6, 7],
+  "Year 3": [1, 2, 3, 4, 5, 6, 7],
+  "Year 4": [1, 2, 3, 4, 5, 6, 7],
+  "Year 5": [1, 2, 3, 4, 5, 6, 7],
+  "Year 6": [1, 2, 4, 5, 6],
+};
 
 const EXPECTED_COUNT: Record<YearLabel, Partial<Record<AssessmentType, number>>> = {
   Prep: { posttest: 20 },
@@ -69,6 +79,30 @@ type Question = {
   visual?: { kind?: string } | unknown;
   practiceTask?: { kind?: string } | unknown;
 };
+
+function inferDescriptor(year: YearLabel, question: Question): string {
+  const week = question.linkedWeeks?.[0] ?? 0;
+  const skill = question.skillId ?? "";
+  if (year === "Prep") return /day|time|calendar/.test(skill) ? "AC9MFM02" : "AC9MFM01";
+  if (year === "Year 1") return week === 1 ? "AC9M1M02" : week <= 4 ? "AC9M1M01" : "AC9M1M03";
+  if (year === "Year 2") {
+    if (/fraction/.test(skill)) return "AC9M2M02";
+    if (/calendar/.test(skill)) return "AC9M2M03";
+    if (/clock/.test(skill)) return "AC9M2M04";
+    if (/turn/.test(skill)) return "AC9M2M05";
+    return "AC9M2M01";
+  }
+  if (year === "Year 3") {
+    if (/angle/.test(skill)) return "AC9M3M05";
+    if (/duration|time_unit_relationship/.test(skill)) return "AC9M3M03";
+    if (/time|minute/.test(skill)) return "AC9M3M04";
+    if (["metre_benchmark", "estimate_length", "choose_g_or_kg", "choose_ml_or_l"].includes(skill)) return "AC9M3M01";
+    return "AC9M3M02";
+  }
+  if (year === "Year 4") return week <= 3 ? "AC9M4M01" : week <= 5 ? "AC9M4M02" : week === 6 ? "AC9M4M03" : "AC9M4M04";
+  if (year === "Year 5") return week <= 2 ? "AC9M5M01" : week <= 5 ? "AC9M5M02" : week === 6 ? "AC9M5M03" : "AC9M5M04";
+  return week <= 3 ? "AC9M6M02" : week === 4 ? "AC9M6M01" : week === 5 ? "AC9M6M03" : "AC9M6M04";
+}
 
 // Every Measurelands assessment question must carry a rendered visual.
 const KNOWN_VISUAL_KINDS = new Set([
@@ -183,6 +217,16 @@ for (const year of YEARS) {
     const weeks = questions.flatMap((q) => q.linkedWeeks ?? []);
     const uniqueWeeks = [...new Set(weeks)].sort((a, b) => a - b);
     const scope = `${year} ${type}`;
+    const blueprint = MEASURELANDS_ASSESSMENT_BLUEPRINTS.find((item) =>
+      item.yearLabel === (year === "Prep" ? "Ground" : year),
+    );
+    const descriptorCounts = tally(questions.map((question) => inferDescriptor(year, question)));
+    for (const descriptor of blueprint?.descriptors ?? []) {
+      const expectedAllocation = descriptor.allocation[type];
+      if ((descriptorCounts[descriptor.code] ?? 0) !== expectedAllocation) {
+        fail(`${scope} allocates ${descriptorCounts[descriptor.code] ?? 0} questions to ${descriptor.code}, expected ${expectedAllocation}.`);
+      }
+    }
 
     // Count expectation.
     const expected = EXPECTED_COUNT[year][type];
@@ -195,10 +239,9 @@ for (const year of YEARS) {
 
     // Level 6 Week 8 is a multi-step master project, so its single-question
     // assessments cover taught Weeks 1–7 and deliberately exclude Week 8 tasks.
-    const finalAssessedWeek = year === "Year 6" ? 7 : MEASURELANDS_FINAL_WEEK;
-    const missingWeeks = Array.from({ length: finalAssessedWeek }, (_, i) => i + 1).filter((w) => !uniqueWeeks.includes(w));
+    const missingWeeks = REQUIRED_ASSESSED_WEEKS[year].filter((w) => !uniqueWeeks.includes(w));
     if (missingWeeks.length) fail(`${scope} is missing week coverage: ${missingWeeks.join(", ")}.`);
-    const extraWeeks = uniqueWeeks.filter((w) => w < 1 || w > finalAssessedWeek);
+    const extraWeeks = uniqueWeeks.filter((w) => w < 1 || w > MEASURELANDS_FINAL_WEEK);
     if (extraWeeks.length) fail(`${scope} references excluded assessment weeks: ${extraWeeks.join(", ")}.`);
 
     for (const q of questions) {

@@ -98,11 +98,11 @@ const YEAR4_MEASURELANDS_RAW: WeekPlan[] = [
     id: "y4-measurement-w6",
     week: 6,
     topic: "Time Problems",
-    curriculum: ["AC9M4M02"],
+    curriculum: ["AC9M4M03"],
     lessons: [
-      buildLesson(6, 1, "Convert Time Units", "Time: convert between common units of time.", ["Time units", "Conversions", "Equivalent durations"], ["AC9M4M02"]),
-      buildLesson(6, 2, "Elapsed Time", "Time: work out how much time has passed.", ["Start time", "End time", "Elapsed duration"], ["AC9M4M02"]),
-      buildLesson(6, 3, "Solve Time Problems", "Time: solve real-world duration and am/pm problems.", ["Duration problems", "am and pm", "Time reasoning"], ["AC9M4M02"]),
+      buildLesson(6, 1, "Convert Time Units", "Time: convert between common units of time.", ["Time units", "Conversions", "Equivalent durations"], ["AC9M4M03"]),
+      buildLesson(6, 2, "Elapsed Time", "Time: work out how much time has passed.", ["Start time", "End time", "Elapsed duration"], ["AC9M4M03"]),
+      buildLesson(6, 3, "Solve Time Problems", "Time: solve real-world duration and am/pm problems.", ["Duration problems", "am and pm", "Time reasoning"], ["AC9M4M03"]),
     ],
   },
   {

@@ -23,8 +23,6 @@ const PRETEST_SELECTIONS: TaskSelection[] = [
   { week: 1, lesson: 2, index: 0, skillId: "measurement_accuracy", skillLabel: "Choose Units for Accuracy" },
   { week: 2, lesson: 1, index: 0, skillId: "read_decimal_length", skillLabel: "Read a Decimal Length" },
   { week: 2, lesson: 2, index: 0, skillId: "read_decimal_mass_capacity", skillLabel: "Read Decimal Mass and Capacity" },
-  { week: 2, lesson: 3, index: 0, skillId: "compare_decimal_measure", skillLabel: "Compare Decimal Measurements" },
-  { week: 3, lesson: 1, index: 0, skillId: "efficient_perimeter", skillLabel: "Calculate Perimeter Efficiently" },
   { week: 3, lesson: 2, index: 0, skillId: "irregular_perimeter", skillLabel: "Find an Irregular Perimeter" },
   {
     week: 3,
@@ -34,7 +32,6 @@ const PRETEST_SELECTIONS: TaskSelection[] = [
     skillId: "perimeter_problem",
     skillLabel: "Solve a Perimeter Problem",
   },
-  { week: 4, lesson: 1, index: 0, skillId: "rectangle_area", skillLabel: "Calculate Rectangle Area" },
   { week: 4, lesson: 2, index: 0, skillId: "irregular_area", skillLabel: "Find an Irregular Area" },
   {
     week: 4,
@@ -44,7 +41,6 @@ const PRETEST_SELECTIONS: TaskSelection[] = [
     skillId: "area_design",
     skillLabel: "Solve an Area Design Problem",
   },
-  { week: 5, lesson: 1, index: 0, skillId: "area_or_perimeter", skillLabel: "Choose Area or Perimeter" },
   { week: 5, lesson: 2, index: 0, skillId: "same_area_perimeter", skillLabel: "Reason About Area and Perimeter" },
   {
     week: 5,
@@ -55,18 +51,22 @@ const PRETEST_SELECTIONS: TaskSelection[] = [
     skillLabel: "Apply Area and Perimeter",
   },
   { week: 6, lesson: 1, index: 0, skillId: "time_24_hour", skillLabel: "Read and Convert 24-Hour Time" },
-  { week: 6, lesson: 2, index: 0, skillId: "timetable", skillLabel: "Read a Timetable" },
+  { week: 6, lesson: 2, index: 0, skillId: "compare_time_systems", skillLabel: "Compare 12-Hour and 24-Hour Time" },
   {
     week: 6,
     lesson: 3,
     index: 0,
     linkedWeeks: [6, 8],
-    skillId: "timetable_problem",
-    skillLabel: "Solve a Timetable Problem",
+    skillId: "time_conversion_context",
+    skillLabel: "Solve a Time Conversion Problem",
   },
+  { week: 6, lesson: 3, index: 1, skillId: "time_conversion_problem", skillLabel: "Solve a Practical Time Conversion" },
   { week: 7, lesson: 1, index: 0, skillId: "measure_angle", skillLabel: "Read an Angle" },
+  { week: 7, lesson: 1, index: 1, skillId: "measure_angle_scale", skillLabel: "Select the Protractor Scale" },
   { week: 7, lesson: 2, index: 0, skillId: "construct_angle", skillLabel: "Construct an Angle" },
+  { week: 7, lesson: 2, index: 1, skillId: "construct_angle_check", skillLabel: "Check a Constructed Angle" },
   { week: 7, lesson: 3, index: 0, skillId: "estimate_angle", skillLabel: "Estimate an Angle" },
+  { week: 7, lesson: 3, index: 1, skillId: "angle_name_measure", skillLabel: "Relate Angle Measure and Name" },
 ];
 
 // The post-test assesses the same curriculum through later, more applied variants.
@@ -75,8 +75,6 @@ const POSTTEST_SELECTIONS: TaskSelection[] = [
   { week: 1, lesson: 2, index: 4, skillId: "measurement_accuracy", skillLabel: "Choose Units for Accuracy" },
   { week: 2, lesson: 1, index: 4, skillId: "read_decimal_length", skillLabel: "Read a Decimal Length" },
   { week: 2, lesson: 2, index: 4, skillId: "read_decimal_mass_capacity", skillLabel: "Read Decimal Mass and Capacity" },
-  { week: 2, lesson: 3, index: 4, skillId: "compare_decimal_measure", skillLabel: "Compare Decimal Measurements" },
-  { week: 3, lesson: 1, index: 4, skillId: "efficient_perimeter", skillLabel: "Calculate Perimeter Efficiently" },
   { week: 3, lesson: 2, index: 4, skillId: "irregular_perimeter", skillLabel: "Find an Irregular Perimeter" },
   {
     week: 3,
@@ -86,7 +84,6 @@ const POSTTEST_SELECTIONS: TaskSelection[] = [
     skillId: "perimeter_problem",
     skillLabel: "Solve a Perimeter Problem",
   },
-  { week: 4, lesson: 1, index: 4, skillId: "rectangle_area", skillLabel: "Calculate Rectangle Area" },
   { week: 4, lesson: 2, index: 4, skillId: "irregular_area", skillLabel: "Find an Irregular Area" },
   {
     week: 4,
@@ -96,7 +93,6 @@ const POSTTEST_SELECTIONS: TaskSelection[] = [
     skillId: "area_design",
     skillLabel: "Solve an Area Design Problem",
   },
-  { week: 5, lesson: 1, index: 4, skillId: "area_or_perimeter", skillLabel: "Choose Area or Perimeter" },
   { week: 5, lesson: 2, index: 4, skillId: "same_area_perimeter", skillLabel: "Reason About Area and Perimeter" },
   {
     week: 5,
@@ -107,18 +103,22 @@ const POSTTEST_SELECTIONS: TaskSelection[] = [
     skillLabel: "Apply Area and Perimeter",
   },
   { week: 6, lesson: 1, index: 4, skillId: "time_24_hour", skillLabel: "Read and Convert 24-Hour Time" },
-  { week: 6, lesson: 2, index: 4, skillId: "timetable", skillLabel: "Read a Timetable" },
+  { week: 6, lesson: 2, index: 4, skillId: "compare_time_systems", skillLabel: "Compare 12-Hour and 24-Hour Time" },
   {
     week: 6,
     lesson: 3,
     index: 4,
     linkedWeeks: [6, 8],
-    skillId: "timetable_problem",
-    skillLabel: "Solve a Timetable Problem",
+    skillId: "time_conversion_context",
+    skillLabel: "Solve a Time Conversion Problem",
   },
+  { week: 6, lesson: 3, index: 3, skillId: "time_conversion_problem", skillLabel: "Solve a Practical Time Conversion" },
   { week: 7, lesson: 1, index: 4, skillId: "measure_angle", skillLabel: "Read an Angle" },
+  { week: 7, lesson: 1, index: 3, skillId: "measure_angle_scale", skillLabel: "Select the Protractor Scale" },
   { week: 7, lesson: 2, index: 4, skillId: "construct_angle", skillLabel: "Construct an Angle" },
+  { week: 7, lesson: 2, index: 3, skillId: "construct_angle_check", skillLabel: "Check a Constructed Angle" },
   { week: 7, lesson: 3, index: 4, skillId: "estimate_angle", skillLabel: "Estimate an Angle" },
+  { week: 7, lesson: 3, index: 3, skillId: "angle_name_measure", skillLabel: "Relate Angle Measure and Name" },
 ];
 
 function createSeededRandom(seed: number) {

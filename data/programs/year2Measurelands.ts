@@ -3,11 +3,14 @@ import type { CurriculumCode, Lesson, WeekPlan } from "./year1";
 
 // Measurelands Level 2 (Year 2) — Measurement. See MEASURELANDS_LEVEL2_PLAN.md.
 // AC9M2M01 (length/mass/capacity, uniform units + smaller units for accuracy),
-// AC9M2M02 (read analog clock to hour/half/quarter), AC9M2M03 (date + days between).
+// AC9M2M02 (halves, quarters and eighths), AC9M2M03 (date + days between),
+// AC9M2M04 (analog time), AC9M2M05 (fractional turns).
 const YEAR2_MEASURELANDS_CURRICULUM: CurriculumCode[] = [
   "AC9M2M01",
   "AC9M2M02",
   "AC9M2M03",
+  "AC9M2M04",
+  "AC9M2M05",
 ];
 
 function buildLesson(
@@ -78,22 +81,22 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     id: "y2-measurement-w5",
     week: 5,
     topic: "Clock Tower I",
-    curriculum: ["AC9M2M02"],
+    curriculum: ["AC9M2M02", "AC9M2M04"],
     lessons: [
-      buildLesson(5, 1, "O'Clock Time", "Time: read o'clock on an analog clock using the minute hand at 12 and the hour hand.", ["O'clock time", "Minute hand at 12", "Hour hand names the time"], ["AC9M2M02"]),
-      buildLesson(5, 2, "Half Past Time", "Time: read half past, with the minute hand at 6 and the hour hand between numbers.", ["Half past time", "Minute hand at 6", "Hour hand halfway"], ["AC9M2M02"]),
-      buildLesson(5, 3, "Build the Time", "Time: build o'clock and half past times using large snapped hour and minute choices.", ["Build the time", "Choose the hour", "Choose o'clock or half past"], ["AC9M2M02"]),
+      buildLesson(5, 1, "O'Clock Time", "Time: read o'clock on an analog clock using the minute hand at 12 and the hour hand.", ["O'clock time", "Minute hand at 12", "Hour hand names the time"], ["AC9M2M04"]),
+      buildLesson(5, 2, "Half Past Time", "Time: read half past, with the minute hand at 6 and the hour hand between numbers.", ["Half past time", "Minute hand at 6", "Hour hand halfway"], ["AC9M2M04"]),
+      buildLesson(5, 3, "Equal Parts", "Fractions in measurement: recognise equal halves, quarters and eighths in shapes, objects and events.", ["Equal parts", "Halves and quarters", "Eighths"], ["AC9M2M02"]),
     ],
   },
   {
     id: "y2-measurement-w6",
     week: 6,
     topic: "Clock Tower II",
-    curriculum: ["AC9M2M02"],
+    curriculum: ["AC9M2M04", "AC9M2M05"],
     lessons: [
-      buildLesson(6, 1, "Quarter Past Time", "Time: read quarter past, with the minute hand at 3.", ["Quarter past", "Minute hand at 3", "Fifteen minutes past"], ["AC9M2M02"]),
-      buildLesson(6, 2, "Quarter To Time", "Time: read quarter to, with the minute hand at 9 and the hour hand nearly at the next number.", ["Quarter to", "Minute hand at 9", "Names the next hour"], ["AC9M2M02"]),
-      buildLesson(6, 3, "Build Any Time", "Time: build o'clock, half past, quarter past and quarter to using large snapped choices.", ["Build any time", "Mixed times", "Snapped clock controls"], ["AC9M2M02"]),
+      buildLesson(6, 1, "Quarter Past Time", "Time: read quarter past, with the minute hand at 3.", ["Quarter past", "Minute hand at 3", "Fifteen minutes past"], ["AC9M2M04"]),
+      buildLesson(6, 2, "Quarter To Time", "Time: read quarter to, with the minute hand at 9 and the hour hand nearly at the next number.", ["Quarter to", "Minute hand at 9", "Names the next hour"], ["AC9M2M04"]),
+      buildLesson(6, 3, "Fractional Turns", "Turn: identify and demonstrate quarter, half, three-quarter and full turns from a starting direction.", ["Quarter turns", "Half and full turns", "Clockwise and anticlockwise"], ["AC9M2M05"]),
     ],
   },
   {
@@ -111,11 +114,11 @@ const YEAR2_MEASURELANDS_RAW: WeekPlan[] = [
     id: "y2-measurement-w8",
     week: 8,
     topic: "Master Measurer's Quest",
-    curriculum: ["AC9M2M01", "AC9M2M02", "AC9M2M03"],
+    curriculum: YEAR2_MEASURELANDS_CURRICULUM,
     lessons: [
-      buildLesson(8, 1, "Measurement Mission", "Capstone mission: choose the right measurement skill, pick the best strategy, and solve mixed mini challenges.", ["Choose the skill", "Best strategy", "Mixed measurement mission"], ["AC9M2M01", "AC9M2M02", "AC9M2M03"]),
-      buildLesson(8, 2, "Measurement Missions", "Capstone missions: read real-world problems, choose the right measurement strategy, and solve mixed challenges.", ["Real-world missions", "Choose the strategy", "Solve mixed challenges"], ["AC9M2M01", "AC9M2M02", "AC9M2M03"]),
-      buildLesson(8, 3, "Master Measurer Trial", "Final capstone trial: complete length, mass, capacity, clock and calendar challenges before the post-test.", ["Final trial", "Mixed challenges", "Post-test ready"], ["AC9M2M01", "AC9M2M02", "AC9M2M03"]),
+      buildLesson(8, 1, "Measurement Mission", "Capstone mission: choose the right measurement skill, pick the best strategy, and solve mixed mini challenges.", ["Choose the skill", "Best strategy", "Mixed measurement mission"], YEAR2_MEASURELANDS_CURRICULUM),
+      buildLesson(8, 2, "Measurement Missions", "Capstone missions: read real-world problems, choose the right measurement strategy, and solve mixed challenges.", ["Real-world missions", "Choose the strategy", "Solve mixed challenges"], YEAR2_MEASURELANDS_CURRICULUM),
+      buildLesson(8, 3, "Master Measurer Trial", "Final capstone trial: complete measurement, fractions, clock, calendar and turn challenges before the post-test.", ["Final trial", "Mixed challenges", "Post-test ready"], YEAR2_MEASURELANDS_CURRICULUM),
     ],
   },
 ];

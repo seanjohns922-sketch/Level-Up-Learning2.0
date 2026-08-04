@@ -126,6 +126,7 @@ import { MeasurelandsTemperatureCard } from "@/components/measurelands/Measurela
 import { MeasurelandsSurveyorCard } from "@/components/measurelands/MeasurelandsSurveyorCard";
 import { MeasurelandsTimeQuestCard } from "@/components/measurelands/MeasurelandsTimeQuestCard";
 import { MeasurelandsAngleCard } from "@/components/measurelands/MeasurelandsAngleCard";
+import { MeasurelandsFractionTurnCard } from "@/components/measurelands/MeasurelandsFractionTurnCard";
 import { MeasurelandsMetricUnitCard } from "@/components/measurelands/MeasurelandsMetricUnitCard";
 import { MeasurelandsPrecisionCard } from "@/components/measurelands/MeasurelandsPrecisionCard";
 import { MeasurelandsTime24Card } from "@/components/measurelands/MeasurelandsTime24Card";
@@ -520,6 +521,8 @@ function TaskRendererInner({
       return wrapMeasurelands(<MeasurelandsSurveyorCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "timeQuest":
       return wrapMeasurelands(<MeasurelandsTimeQuestCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />);
+    case "fractionTurn":
+      return wrapMeasurelands(<MeasurelandsFractionTurnCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "angleQuest":
       return wrapMeasurelands(<MeasurelandsAngleCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
     case "metricUnit":

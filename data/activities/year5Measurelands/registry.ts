@@ -333,11 +333,11 @@ const BUILT_LESSONS: Record<
     reset: resetY5MeasurelandsWeek6Lesson2TaskSessionState,
     quizContributionBuilder: buildY5MeasurelandsWeek6Lesson2QuizTasks,
     practisedSkills: [
-      "Find a service in a timetable",
-      "Compare departure and arrival times",
-      "Work out how long a journey takes",
+      "Compare 12-hour and 24-hour times",
+      "Match equivalent time notation",
+      "Distinguish am and pm",
     ],
-    completionTitle: "Read Timetables Complete!",
+    completionTitle: "Compare Time Systems Complete!",
     unlockMessage: "Lesson 3 unlocked.",
   },
   "y5-measurement-w6-l3": {
@@ -345,11 +345,11 @@ const BUILT_LESSONS: Record<
     reset: resetY5MeasurelandsWeek6Lesson3TaskSessionState,
     quizContributionBuilder: buildY5MeasurelandsWeek6Lesson3QuizTasks,
     practisedSkills: [
-      "Choose the service that arrives in time",
-      "Plan a journey using a timetable",
-      "Combine 24-hour time with elapsed time",
+      "Solve practical time conversions",
+      "Handle midday and midnight",
+      "Explain equivalent time notation",
     ],
-    completionTitle: "Plan the Journey Complete!",
+    completionTitle: "Time Conversion Problems Complete!",
     unlockMessage: "Weekly Quiz unlocked.",
   },
   "y5-measurement-w7-l1": {

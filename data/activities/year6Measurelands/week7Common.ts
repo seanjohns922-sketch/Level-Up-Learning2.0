@@ -22,7 +22,6 @@ type Opt = { id: string; label: string; iconKey: string; imageSrc?: string; focu
 const S: Record<string, Opt> = {
   perimeter: { id: "perimeter", label: "Perimeter", iconKey: "m-perimeter", focus: "distance around" },
   area: { id: "area", label: "Area", iconKey: "m-area", focus: "surface inside" },
-  volume: { id: "volume", label: "Volume", iconKey: "m-volume", focus: "space inside" },
   length: { id: "length", label: "Length", iconKey: "m-length", focus: "how long" },
   mass: { id: "mass", label: "Mass", iconKey: "m-mass", focus: "how heavy" },
   capacity: { id: "capacity", label: "Capacity", iconKey: "m-capacity", focus: "how much it holds" },
@@ -38,14 +37,14 @@ const TOOL: Record<string, Opt> = {
 };
 
 const STRAT_SCENARIOS = [
-  { p: "A gardener wants to fence around a rectangular garden. What should they work out?", c: "perimeter", d: ["area", "volume"], why: "Fencing goes around the edge — that's perimeter, not the space inside." },
+  { p: "A gardener wants to fence around a rectangular garden. What should they work out?", c: "perimeter", d: ["area", "length"], why: "Fencing goes around the edge, so the complete perimeter is required." },
   { p: "You want new carpet to cover the classroom floor. What should you work out?", c: "area", d: ["perimeter", "length"], why: "Carpet covers a surface — that's area, not the distance around." },
-  { p: "How much sand fills a rectangular sandpit box?", c: "volume", d: ["area", "perimeter"], why: "Filling a box is three-dimensional — that's volume, not a flat area." },
+  { p: "A garden plan gives lengths in metres but the supplier quotes centimetres. What should you do first?", c: "convert", d: ["area", "perimeter"], why: "The measurements need compatible metric units before they can be compared." },
   { p: "How much water does the fish tank hold?", c: "capacity", d: ["mass", "area"], why: "How much liquid a container holds is capacity, not weight." },
   { p: "You're planning a bus trip. When will you arrive?", c: "time", d: ["length", "angle"], why: "Arrival is a time calculation, not a length." },
   { p: "What is the slope (pitch) of the roof?", c: "angle", d: ["length", "area"], why: "A slope is an angle, not a length." },
   { p: "The plan is in metres but your ruler shows centimetres. What must you do first?", c: "convert", d: ["area", "time"], why: "Different units must be converted before you calculate." },
-  { p: "How heavy is the bag of soil?", c: "mass", d: ["capacity", "volume"], why: "Heaviness is mass, measured in kilograms." },
+  { p: "How heavy is the bag of soil?", c: "mass", d: ["capacity", "length"], why: "Heaviness is mass, measured in kilograms." },
 ];
 const TOOL_SCENARIOS = [
   { p: "You need to measure the length of the playground.", c: "tape", d: ["protractor", "jug"] },
@@ -109,15 +108,15 @@ export function optimiseWhyBad(): ToolTask {
 // ── L3 bespoke investigations ─────────────────────────────────────────────────
 export function playgroundInvestigation(): InvestigationTask {
   const L = choose([10, 12, 14]), W = choose([6, 8]), area = L * W, per = 2 * (L + W);
-  const sh = choose([1, 2]), svol = 3 * 2 * sh;
+  const pathKm = choose([2, 3]), pathM = pathKm * 1000;
   return {
     kind: "investigation", title: "Design the Community Playground", emoji: "🛝", badgeLabel: "Master Engineer Challenge",
     prompt: "Design the community playground.",
-    facts: [`Play area: ${L} m × ${W} m rectangle`, `Sandpit box: 3 m × 2 m × ${sh} m`, "The play area needs a fence and soft-fall surface."],
+    facts: [`Play area: ${L} m × ${W} m rectangle`, `Walking path: ${pathKm} km`, "The play area needs a fence and soft-fall surface."],
     parts: [
       { q: "How much soft-fall covers the play area?", strategy: "Area", options: shuffle([`${area} m²`, `${per} m`, `${L + W} m`]), answer: `${area} m²` },
       { q: "How much fencing goes around the play area?", strategy: "Perimeter", options: shuffle([`${per} m`, `${area} m²`, `${L} m`]), answer: `${per} m` },
-      { q: "How much sand fills the sandpit?", strategy: "Volume", options: shuffle([`${svol} m³`, `${3 * 2} m²`, `${svol + 2} m³`]), answer: `${svol} m³` },
+      { q: `How many metres long is the ${pathKm} km walking path?`, strategy: "Convert", options: shuffle([`${pathM} m`, `${pathKm * 100} m`, `${pathKm * 10} m`]), answer: `${pathM} m` },
     ],
     feedback: { correct: "Playground designed!", wrong: "Choose the right maths for each part." },
   };
@@ -138,15 +137,15 @@ export function campInvestigation(): InvestigationTask {
   };
 }
 export function towerInvestigation(): InvestigationTask {
-  const base = choose([5, 6]), barea = base * base, known = choose([120, 130, 140]), missing = 180 - known, h = choose([3, 4]), vol = barea * h;
+  const base = choose([5, 6]), barea = base * base, known = choose([120, 130, 140]), missing = 180 - known;
   return {
     kind: "investigation", title: "Build the Observation Tower", emoji: "🗼", badgeLabel: "Master Engineer Challenge",
     prompt: "Build the observation tower.",
-    facts: [`Square base: ${base} m × ${base} m`, `A support brace and the deck meet on a straight line; one angle is ${known}°`, `The base block is ${h} m tall`],
+    facts: [`Square base: ${base} m × ${base} m`, `A support brace and the deck meet on a straight line; one angle is ${known}°`, "The square base needs a border on all four sides."],
     parts: [
       { q: "What is the area of the square base?", strategy: "Area", options: shuffle([`${barea} m²`, `${base * 4} m`, `${base * 2} m²`]), answer: `${barea} m²` },
       { q: "What is the missing angle of the brace?", strategy: "Angle", options: shuffle([`${missing}°`, `${360 - known}°`, `${known}°`]), answer: `${missing}°` },
-      { q: "What is the volume of the base block?", strategy: "Volume", options: shuffle([`${vol} m³`, `${barea} m²`, `${vol + base} m³`]), answer: `${vol} m³` },
+      { q: "How much border goes around the square base?", strategy: "Perimeter", options: shuffle([`${base * 4} m`, `${barea} m²`, `${base * 2} m`]), answer: `${base * 4} m` },
     ],
     feedback: { correct: "Tower complete — you're a Master of Measurelands!", wrong: "Choose the right maths for each part." },
   };

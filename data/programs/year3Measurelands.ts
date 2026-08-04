@@ -10,13 +10,14 @@ import type { CurriculumCode, Lesson, WeekPlan } from "./year1";
 // AC9M3M03 — estimate and compare duration using days, hours, minutes and seconds.
 // AC9M3M04 — connect analog/digital time and read to the nearest minute.
 //
-// Week 7/8 are intentionally light perimeter/area exposure weeks to prepare for
-// Year 4, not mastery units. No formulas or multiplication expectations.
+// Money is owned by Number Nexus. Measurelands remains focused on physical
+// measurement and includes angles as measures of turn in Week 7.
 const YEAR3_MEASURELANDS_CURRICULUM: CurriculumCode[] = [
   "AC9M3M01",
   "AC9M3M02",
   "AC9M3M03",
   "AC9M3M04",
+  "AC9M3M05",
 ];
 
 function buildLesson(
@@ -108,23 +109,23 @@ const YEAR3_MEASURELANDS_RAW: WeekPlan[] = [
   {
     id: "y3-measurement-w7",
     week: 7,
-    topic: "Perimeter Preview",
-    curriculum: ["AC9M3M01", "AC9M3M02"],
+    topic: "Angle Turns",
+    curriculum: ["AC9M3M05"],
     lessons: [
-      buildLesson(7, 1, "Around the Edge", "Preview: recognise that some measurements go around the outside edge of a shape or space.", ["Around the edge", "Boundary", "Measure around"], ["AC9M3M01", "AC9M3M02"]),
-      buildLesson(7, 2, "Trace the Boundary", "Preview: follow and count simple boundary lengths using familiar units.", ["Trace the outside", "Boundary count", "No formulas"], ["AC9M3M02"]),
-      buildLesson(7, 3, "Perimeter Explorer", "Preview: solve simple edge-measuring challenges to prepare for Level 4 perimeter.", ["Edge challenge", "Measure around", "Prepare for Level 4"], ["AC9M3M02"]),
+      buildLesson(7, 1, "Angles as Turns", "Recognise an angle as a measure of turn in objects and movement.", ["Recognise turns", "Find angles", "Ignore arm length"], ["AC9M3M05"]),
+      buildLesson(7, 2, "Compare with a Right Angle", "Compare angle sizes using a right angle as a benchmark.", ["Smaller than a right angle", "Equal to a right angle", "Larger than a right angle"], ["AC9M3M05"]),
+      buildLesson(7, 3, "Angle Explorer", "Compare angles in everyday situations regardless of their orientation or arm length.", ["Everyday angles", "Compare turn size", "Explain the benchmark"], ["AC9M3M05"]),
     ],
   },
   {
     id: "y3-measurement-w8",
     week: 8,
-    topic: "Area Preview",
-    curriculum: ["AC9M3M01", "AC9M3M02"],
+    topic: "Measurement Mastery",
+    curriculum: YEAR3_MEASURELANDS_CURRICULUM,
     lessons: [
-      buildLesson(8, 1, "Cover the Space", "Preview: recognise that area is about covering a space with equal squares.", ["Cover a space", "Equal squares", "No gaps"], ["AC9M3M01", "AC9M3M02"]),
-      buildLesson(8, 2, "Count the Squares", "Preview: compare simple covered spaces by counting equal square units.", ["Count squares", "Compare covered spaces", "No formulas"], ["AC9M3M02"]),
-      buildLesson(8, 3, "Area Explorer", "Preview: build and compare simple square-tile shapes to prepare for Level 4 area.", ["Build with squares", "Compare area", "Prepare for Level 4"], ["AC9M3M02"]),
+      buildLesson(8, 1, "Estimate and Check", "Cumulative mission: choose a metric unit, estimate, then check the measurement.", ["Metric benchmarks", "Estimate and check", "Reasonable measures"], ["AC9M3M01", "AC9M3M02"]),
+      buildLesson(8, 2, "Time Reasoning", "Cumulative mission: compare durations using relationships between formal time units.", ["Duration units", "Compare times", "Explain reasoning"], ["AC9M3M03"]),
+      buildLesson(8, 3, "Angle Mission", "Cumulative mission: compare everyday angles with a right-angle benchmark.", ["Angles as turns", "Right-angle benchmark", "Everyday angles"], ["AC9M3M05"]),
     ],
   },
 ];

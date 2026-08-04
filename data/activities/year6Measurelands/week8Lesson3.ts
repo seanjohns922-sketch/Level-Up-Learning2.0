@@ -1,17 +1,13 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
-import { outdoorCentreMission, sportsFacilityMission, adventureCampMission } from "@/data/activities/year6Measurelands/week8Common";
+import { campInvestigation, playgroundInvestigation, towerInvestigation } from "@/data/activities/year6Measurelands/week7Common";
 
 // ── Measurelands · Level 6 · Week 8 · Lesson 3 — "Master Measurelands Mission" ─
-// Justify: one coherent brief across every strand (area, perimeter, convert,
-// volume, angle, time), carried forward, closing with the graduation reflection
-// that unlocks the Level 6 Post-Test. Three rotating flagship projects.
-//   A. Outdoor Learning Centre.
-//   B. Sports Facility.
-//   C. Adventure Camp.
+// Justify a coherent solution across the Year 6 Measurement descriptors before
+// the Level 6 Post-Test unlocks.
 
 type LessonMemory = { cursor: number };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<() => PracticeTask> = [outdoorCentreMission, sportsFacilityMission, adventureCampMission];
+const ROTATION: Array<() => PracticeTask> = [playgroundInvestigation, campInvestigation, towerInvestigation];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);

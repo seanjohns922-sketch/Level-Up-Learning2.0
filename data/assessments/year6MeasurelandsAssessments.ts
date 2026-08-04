@@ -24,29 +24,27 @@ const PRETEST_SELECTIONS: TaskSelection[] = [
   { week: 1, lesson: 3, index: 0, skillId: "area_investigation", skillLabel: "Apply the Area Formula" },
   { week: 2, lesson: 1, index: 0, skillId: "split_composite_shape", skillLabel: "Split a Composite Shape" },
   { week: 2, lesson: 2, index: 0, skillId: "calculate_composite_area", skillLabel: "Calculate Composite Area" },
-  { week: 2, lesson: 3, index: 0, skillId: "composite_area_problem", skillLabel: "Solve a Composite Area Problem" },
-  { week: 3, lesson: 1, index: 0, skillId: "count_cubic_units", skillLabel: "Count Cubic Units" },
-  { week: 3, lesson: 2, index: 0, skillId: "volume_layers", skillLabel: "Calculate Volume in Layers" },
-  { week: 3, lesson: 3, index: 0, skillId: "volume_problem", skillLabel: "Solve a Volume Problem" },
   { week: 4, lesson: 1, index: 0, skillId: "convert_length", skillLabel: "Convert Metric Length" },
   { week: 4, lesson: 2, index: 0, skillId: "convert_mass_capacity", skillLabel: "Convert Mass and Capacity" },
   { week: 4, lesson: 3, index: 0, skillId: "decimal_conversion", skillLabel: "Solve Decimal Conversions" },
+  { week: 4, lesson: 3, index: 1, skillId: "decimal_conversion_context", skillLabel: "Choose a Decimal Conversion" },
+  { week: 4, lesson: 3, index: 2, skillId: "conversion_reasoning", skillLabel: "Reason About Metric Conversion" },
   { week: 5, lesson: 1, index: 0, skillId: "interpret_timetable", skillLabel: "Interpret a Timetable" },
   { week: 5, lesson: 2, index: 0, skillId: "elapsed_time", skillLabel: "Solve Elapsed-Time Problems" },
   { week: 5, lesson: 3, index: 0, skillId: "advanced_time", skillLabel: "Solve Advanced Time Problems" },
+  { week: 5, lesson: 3, index: 1, skillId: "itinerary_plan", skillLabel: "Plan an Itinerary" },
+  { week: 5, lesson: 3, index: 2, skillId: "journey_duration", skillLabel: "Determine Journey Duration" },
   { week: 6, lesson: 1, index: 0, skillId: "straight_line_angles", skillLabel: "Angles on a Straight Line" },
   { week: 6, lesson: 2, index: 0, skillId: "angles_around_point", skillLabel: "Angles Around a Point" },
-  { week: 7, lesson: 1, index: 0, skillId: "choose_measurement_strategy", skillLabel: "Choose a Measurement Strategy" },
-  { week: 7, lesson: 2, index: 0, skillId: "optimise_measurement_solution", skillLabel: "Optimise a Measurement Solution" },
   { week: 6, lesson: 3, index: 0, skillId: "mixed_angle_reasoning", skillLabel: "Investigate Missing Angles" },
+  { week: 6, lesson: 3, index: 1, skillId: "vertical_angles", skillLabel: "Use Vertically Opposite Angles" },
+  { week: 6, lesson: 3, index: 2, skillId: "angle_reasoning_chain", skillLabel: "Complete an Angle Reasoning Chain" },
 ];
 
 // The post-test assesses the same curriculum through later, more applied variants.
 const POSTTEST_SELECTIONS: TaskSelection[] = PRETEST_SELECTIONS.map((selection) => ({
   ...selection,
-  // The capacity variant states its volume before asking for the answer. Use the
-  // packing calculation instead so the assessment never gives the answer away.
-  index: selection.week === 3 && selection.lesson === 3 ? 1 : 4,
+  index: 4,
 }));
 
 function createSeededRandom(seed: number) {

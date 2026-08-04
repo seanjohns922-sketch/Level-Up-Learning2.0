@@ -1,11 +1,11 @@
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import path from "node:path";
 
 const repoRoot = process.cwd();
 
 function withExtension(candidate) {
-  if (existsSync(candidate)) return candidate;
+  if (existsSync(candidate) && statSync(candidate).isFile()) return candidate;
   for (const extension of [".ts", ".tsx", ".js", ".jsx", "/index.ts", "/index.tsx", "/index.js"]) {
     if (existsSync(`${candidate}${extension}`)) return `${candidate}${extension}`;
   }

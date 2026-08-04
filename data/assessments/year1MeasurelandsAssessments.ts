@@ -116,10 +116,11 @@ function buildTaskSpecs(mode: "pre" | "post"): AssessmentTaskSpec[] {
   if (mode === "pre") {
     return [
       selectTask(weeks[0]!, 0, 1, 1, "length_measure", "Measure Length with Equal Units"),
+      selectTask(weeks[0]!, 1, 1, 1, "length_measure", "Build an Equal-Unit Measurement"),
+      selectTask(weeks[0]!, 2, 1, 1, "length_measure", "Count Equal Length Units"),
       selectTask(weeks[0]!, 5, 1, 2, "length_compare", "Compare Measured Lengths"),
       selectTask(weeks[0]!, 10, 1, 3, "length_fair_units", "Measure with No Gaps or Overlaps"),
       selectTask(weeks[1]!, 0, 2, 1, "mass_measure", "Measure Mass with Balance Cubes"),
-      selectTask(weeks[1]!, 5, 2, 2, "mass_compare", "Compare Measured Mass"),
       selectTask(weeks[1]!, 10, 2, 3, "mass_fair_units", "Use Equal Mass Units"),
       selectTask(weeks[2]!, 0, 3, 1, "capacity_measure", "Measure Capacity with Cups"),
       selectTask(weeks[2]!, 5, 3, 2, "capacity_compare", "Compare Measured Capacity"),
@@ -132,17 +133,17 @@ function buildTaskSpecs(mode: "pre" | "post"): AssessmentTaskSpec[] {
       selectTask(weeks[5]!, 0, 6, 1, "calendar_dates", "Find Dates on a Calendar"),
       selectTask(weeks[5]!, 5, 6, 2, "calendar_navigation", "Navigate Calendar Dates"),
       selectTask(weeks[6]!, 0, 7, 1, "yesterday", "Recognise Yesterday"),
-      selectTask(weeks[6]!, 10, 7, 3, "tomorrow_sequence", "Predict What Happens Tomorrow"),
       ...buildWeek8Tasks("pre"),
     ];
   }
 
   return [
     selectTask(weeks[0]!, 4, 1, 1, "length_measure", "Measure Length with Equal Units"),
+    selectTask(weeks[0]!, 3, 1, 1, "length_measure", "Build an Equal-Unit Measurement"),
+    selectTask(weeks[0]!, 2, 1, 1, "length_measure", "Count Equal Length Units"),
     selectTask(weeks[0]!, 7, 1, 2, "length_order", "Order Measured Lengths"),
     selectTask(weeks[0]!, 12, 1, 3, "length_fair_units", "Diagnose Gaps and Overlaps"),
     selectTask(weeks[1]!, 2, 2, 1, "mass_measure", "Read a Balance-Cube Measurement"),
-    selectTask(weeks[1]!, 7, 2, 2, "mass_order", "Order Measured Masses"),
     selectTask(weeks[1]!, 12, 2, 3, "mass_fair_units", "Judge Fair Mass Measurement"),
     selectTask(weeks[2]!, 2, 3, 1, "capacity_measure", "Read a Cup Measurement"),
     selectTask(weeks[2]!, 7, 3, 2, "capacity_order", "Order Measured Capacities"),
@@ -155,7 +156,6 @@ function buildTaskSpecs(mode: "pre" | "post"): AssessmentTaskSpec[] {
     selectTask(weeks[5]!, 2, 6, 1, "calendar_dates", "Read a Date on a Calendar"),
     selectTask(weeks[5]!, 12, 6, 3, "calendar_events", "Compare Calendar Events"),
     selectTask(weeks[6]!, 3, 7, 1, "yesterday_sequence", "Build a Yesterday Sequence"),
-    selectTask(weeks[6]!, 12, 7, 3, "tomorrow_sequence", "Predict What Happens Tomorrow"),
     ...buildWeek8Tasks("post"),
   ];
 }

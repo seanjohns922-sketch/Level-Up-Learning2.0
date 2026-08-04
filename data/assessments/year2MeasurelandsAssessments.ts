@@ -8,18 +8,6 @@ import { buildY2MeasurelandsWeek4Lesson3QuizTasks } from "@/data/activities/year
 import { buildY2MeasurelandsWeek5QuizTasks } from "@/data/activities/year2Measurelands/week5Quiz";
 import { buildY2MeasurelandsWeek6QuizTasks } from "@/data/activities/year2Measurelands/week6Quiz";
 import { buildY2MeasurelandsWeek7QuizTasks } from "@/data/activities/year2Measurelands/week7Quiz";
-import {
-  generateY2MeasurelandsWeek8Lesson1Task,
-  resetY2MeasurelandsWeek8Lesson1TaskSessionState,
-} from "@/data/activities/year2Measurelands/week8Lesson1";
-import {
-  generateY2MeasurelandsWeek8Lesson2Task,
-  resetY2MeasurelandsWeek8Lesson2TaskSessionState,
-} from "@/data/activities/year2Measurelands/week8Lesson2";
-import {
-  generateY2MeasurelandsWeek8Lesson3Task,
-  resetY2MeasurelandsWeek8Lesson3TaskSessionState,
-} from "@/data/activities/year2Measurelands/week8Lesson3";
 import type { Question } from "@/data/assessments/posttests";
 
 const CORRECT_TOKEN = "__measurelands_task_correct__";
@@ -77,44 +65,6 @@ function buildWeek4Tasks(): PracticeTask[] {
   ];
 }
 
-function buildWeek8Tasks(mode: "pre" | "post"): AssessmentTaskSpec[] {
-  resetY2MeasurelandsWeek8Lesson1TaskSessionState();
-  resetY2MeasurelandsWeek8Lesson2TaskSessionState();
-  resetY2MeasurelandsWeek8Lesson3TaskSessionState();
-
-  const l1Id = `y2-measurement-${mode}-w8-l1`;
-  const l2Id = `y2-measurement-${mode}-w8-l2`;
-  const l3Id = `y2-measurement-${mode}-w8-l3`;
-
-  // Consume each teaching scene, then use only interactions already practised
-  // in the Level 2 capstone lessons.
-  generateY2MeasurelandsWeek8Lesson1Task(l1Id, "easy");
-  const identifySkill = generateY2MeasurelandsWeek8Lesson1Task(l1Id, "easy");
-
-  generateY2MeasurelandsWeek8Lesson2Task(l2Id, "easy");
-  const chooseStrategy = generateY2MeasurelandsWeek8Lesson2Task(l2Id, "easy");
-
-  generateY2MeasurelandsWeek8Lesson3Task(l3Id, "easy");
-  const lengthGate = generateY2MeasurelandsWeek8Lesson3Task(l3Id, "medium");
-  const timeTower = generateY2MeasurelandsWeek8Lesson3Task(l3Id, "medium");
-
-  resetY2MeasurelandsWeek8Lesson1TaskSessionState();
-  resetY2MeasurelandsWeek8Lesson2TaskSessionState();
-  resetY2MeasurelandsWeek8Lesson3TaskSessionState();
-
-  if (mode === "pre") {
-    return [
-      { task: identifySkill, week: 8, lesson: 1, skillId: "measurement_skill", skillLabel: "Identify a Measurement Skill" },
-      { task: chooseStrategy, week: 8, lesson: 2, skillId: "measurement_strategy", skillLabel: "Choose a Measurement Strategy" },
-    ];
-  }
-
-  return [
-    { task: lengthGate, week: 8, lesson: 3, skillId: "measurement_mission", skillLabel: "Solve a Length Mission" },
-    { task: timeTower, week: 8, lesson: 3, skillId: "measurement_mission", skillLabel: "Solve a Time Mission" },
-  ];
-}
-
 function buildTaskSpecs(mode: "pre" | "post"): AssessmentTaskSpec[] {
   const weeks = [
     buildY2MeasurelandsWeek1QuizTasks(),
@@ -129,47 +79,49 @@ function buildTaskSpecs(mode: "pre" | "post"): AssessmentTaskSpec[] {
   if (mode === "pre") {
     return [
       selectTask(weeks[0]!, 0, 1, 1, "length_difference", "Compare Measured Lengths"),
-      selectTask(weeks[0]!, 5, 1, 2, "length_order", "Order Measured Lengths"),
-      selectTask(weeks[0]!, 10, 1, 3, "length_tool", "Choose a Length Tool"),
       selectTask(weeks[1]!, 0, 2, 1, "mass_measure", "Read an Informal Mass Measurement"),
-      selectTask(weeks[1]!, 5, 2, 2, "mass_compare", "Compare Measured Masses"),
-      selectTask(weeks[1]!, 10, 2, 3, "mass_reasoning", "Reason About Mass"),
       selectTask(weeks[2]!, 0, 3, 1, "capacity_measure", "Read a Capacity Measurement"),
-      selectTask(weeks[2]!, 5, 3, 2, "capacity_order", "Order Measured Capacities"),
-      selectTask(weeks[2]!, 10, 3, 3, "capacity_unit", "Choose a Capacity Unit"),
       selectTask(weeks[3]!, 0, 4, 1, "measurement_accuracy", "Recognise Accurate Measurement"),
       selectTask(weeks[3]!, 5, 4, 2, "measurement_accuracy", "Measure More Accurately"),
       selectTask(weeks[3]!, 11, 4, 3, "informal_units", "Measure with an Informal Unit"),
+      selectTask(weeks[4]!, 10, 5, 3, "fraction_half", "Recognise One Half"),
+      selectTask(weeks[4]!, 11, 5, 3, "fraction_quarter", "Recognise One Quarter"),
+      selectTask(weeks[4]!, 12, 5, 3, "fraction_eighth", "Recognise One Eighth"),
       selectTask(weeks[4]!, 0, 5, 1, "clock_oclock", "Read O'Clock Time"),
       selectTask(weeks[4]!, 5, 5, 2, "clock_half_past", "Read Half-Past Time"),
       selectTask(weeks[5]!, 0, 6, 1, "clock_quarter_past", "Read Quarter-Past Time"),
       selectTask(weeks[5]!, 5, 6, 2, "clock_quarter_to", "Read Quarter-To Time"),
       selectTask(weeks[6]!, 0, 7, 1, "calendar_read", "Read a Calendar"),
       selectTask(weeks[6]!, 5, 7, 2, "calendar_count", "Count Days to an Event"),
-      ...buildWeek8Tasks("pre"),
+      selectTask(weeks[6]!, 10, 7, 3, "calendar_problem", "Solve a Calendar Problem"),
+      selectTask(weeks[6]!, 14, 7, 3, "calendar_problem", "Reason About Calendar Days"),
+      selectTask(weeks[5]!, 10, 6, 3, "quarter_turn", "Recognise a Quarter Turn"),
+      selectTask(weeks[5]!, 11, 6, 3, "half_turn", "Recognise a Half Turn"),
+      selectTask(weeks[5]!, 12, 6, 3, "three_quarter_turn", "Recognise a Three-Quarter Turn"),
     ];
   }
 
   return [
     selectTask(weeks[0]!, 4, 1, 1, "length_difference", "Find a Length Difference"),
-    selectTask(weeks[0]!, 9, 1, 2, "length_order", "Order Measured Lengths"),
-    selectTask(weeks[0]!, 13, 1, 3, "length_tool", "Choose a Length Tool"),
     selectTask(weeks[1]!, 4, 2, 1, "mass_measure", "Read an Informal Mass Measurement"),
-    selectTask(weeks[1]!, 9, 2, 2, "mass_difference", "Compare Measured Masses"),
-    selectTask(weeks[1]!, 14, 2, 3, "mass_reasoning", "Predict and Check Mass"),
     selectTask(weeks[2]!, 4, 3, 1, "capacity_measure", "Read a Capacity Measurement"),
-    selectTask(weeks[2]!, 9, 3, 2, "capacity_equivalence", "Compare and Match Capacities"),
-    selectTask(weeks[2]!, 14, 3, 3, "capacity_unit", "Justify a Capacity Unit"),
     selectTask(weeks[3]!, 4, 4, 1, "measurement_accuracy", "Choose an Accurate Measurement"),
     selectTask(weeks[3]!, 9, 4, 2, "measurement_accuracy", "Measure More Accurately"),
     selectTask(weeks[3]!, 13, 4, 3, "informal_units", "Measure with an Informal Unit"),
+    selectTask(weeks[4]!, 10, 5, 3, "fraction_half", "Reason About Equal Halves"),
+    selectTask(weeks[4]!, 11, 5, 3, "fraction_quarter", "Reason About Equal Quarters"),
+    selectTask(weeks[4]!, 12, 5, 3, "fraction_eighth", "Reason About Equal Eighths"),
     selectTask(weeks[4]!, 4, 5, 1, "clock_oclock", "Read O'Clock Time"),
     selectTask(weeks[4]!, 9, 5, 2, "clock_half_past", "Read Half-Past Time"),
     selectTask(weeks[5]!, 4, 6, 1, "clock_quarter_past", "Build Quarter-Past Time"),
     selectTask(weeks[5]!, 9, 6, 2, "clock_quarter_to", "Reason About Quarter-To Time"),
+    selectTask(weeks[6]!, 0, 7, 1, "calendar_read", "Read a Calendar"),
     selectTask(weeks[6]!, 9, 7, 2, "calendar_count", "Count Days to an Event"),
+    selectTask(weeks[6]!, 10, 7, 3, "calendar_problem", "Solve a Calendar Problem"),
     selectTask(weeks[6]!, 14, 7, 3, "calendar_problem", "Solve a Calendar Problem"),
-    ...buildWeek8Tasks("post"),
+    selectTask(weeks[5]!, 12, 6, 3, "three_quarter_turn", "Apply a Three-Quarter Turn"),
+    selectTask(weeks[5]!, 13, 6, 3, "full_turn", "Apply a Full Turn"),
+    selectTask(weeks[5]!, 14, 6, 3, "quarter_turn", "Track a Quarter Turn"),
   ];
 }
 

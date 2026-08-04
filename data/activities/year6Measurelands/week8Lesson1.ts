@@ -1,16 +1,15 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
-import { parkPlan, sportsGroundPlan, communityGardenPlan } from "@/data/activities/year6Measurelands/week8Common";
+import { parkPlan, communityGardenPlan } from "@/data/activities/year6Measurelands/week8Common";
 
 // ── Measurelands · Level 6 · Week 8 · Lesson 1 — "Design the Community Park" ──
 // Plan: identify the right measurement for each need, then calculate it. Three
 // rotating civic projects, answers carried forward.
 //   A. Community Park   — plan → area, plan → perimeter.
-//   B. Sports Ground    — plan → area, plan → volume.
-//   C. Community Garden — plan → perimeter, plan → convert.
+//   B. Community Garden — plan → perimeter, plan → convert.
 
 type LessonMemory = { cursor: number };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<() => PracticeTask> = [parkPlan, sportsGroundPlan, communityGardenPlan];
+const ROTATION: Array<() => PracticeTask> = [parkPlan, communityGardenPlan];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);

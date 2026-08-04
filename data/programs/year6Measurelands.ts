@@ -1,12 +1,19 @@
 import { normalizeWeekPlans } from "./buildProgram";
 import type { CurriculumCode, Lesson, WeekPlan } from "./year1";
 
-// Measurelands Level 6 (Year 6) — program plan shell only.
-//
-// This stores the 8-week "Master Measurement" flow without implementing lesson
-// generators yet. Placeholder lessons still resolve safely inside
-// realm_id=measurement and record no progress until real generators replace them.
-const YEAR6_MEASURELANDS_CURRICULUM: CurriculumCode[] = ["ALL"];
+// Measurelands Level 6 (Year 6) — AC v9 physical measurement.
+const YEAR6_MEASURELANDS_CURRICULUM: CurriculumCode[] = [
+  "AC9M6M01",
+  "AC9M6M02",
+  "AC9M6M03",
+  "AC9M6M04",
+];
+
+const WEEK_CURRICULUM: readonly CurriculumCode[][] = [
+  ["AC9M6M02"], ["AC9M6M02"], ["AC9M6M02"], ["AC9M6M01"],
+  ["AC9M6M03"], ["AC9M6M04"], YEAR6_MEASURELANDS_CURRICULUM,
+  YEAR6_MEASURELANDS_CURRICULUM,
+];
 
 const WEEK_PLANS = [
   {
@@ -28,12 +35,12 @@ const WEEK_PLANS = [
     ],
   },
   {
-    topic: "Volume",
-    focus: "Understand volume using cubic units and cube arrays.",
+    topic: "Area Design Lab",
+    focus: "Apply the rectangle area formula to practical designs and constraints.",
     lessons: [
-      ["Meet Volume", "Introduce cubic units as 3D measurement."],
-      ["Build Volume", "Build and count cube arrays."],
-      ["Volume Problems", "Solve box, storage and container problems."],
+      ["Area Design Choices", "Choose dimensions and apply the rectangle area formula."],
+      ["Composite Area", "Combine rectangle areas in practical layouts."],
+      ["Area Constraints", "Compare valid designs and justify the best solution."],
     ],
   },
   {
@@ -77,7 +84,7 @@ const WEEK_PLANS = [
     focus: "Use everything you've learned to complete authentic engineering projects.",
     lessons: [
       ["Design the Community Park", "Plan a real project — choose the right measurement for each need."],
-      ["Engineer the School", "Combine area, perimeter and volume to design real spaces."],
+      ["Engineer the School", "Combine area, conversions, time and angles to design real spaces."],
       ["Master Measurelands Mission", "One coherent project across every strand — then graduate."],
     ],
   },
@@ -97,7 +104,7 @@ function buildLesson(week: number, lesson: number): Lesson {
       "Choose an efficient strategy.",
       "Solve and justify the measurement decision.",
     ],
-    curriculum: YEAR6_MEASURELANDS_CURRICULUM,
+    curriculum: WEEK_CURRICULUM[week - 1]!,
   };
 }
 
@@ -109,7 +116,7 @@ const YEAR6_MEASURELANDS_RAW: WeekPlan[] = Array.from({ length: 8 }, (_, index) 
     week,
     topic: weekPlan.topic,
     focus: weekPlan.focus,
-    curriculum: YEAR6_MEASURELANDS_CURRICULUM,
+    curriculum: WEEK_CURRICULUM[index]!,
     lessons: [1, 2, 3].map((lesson) => buildLesson(week, lesson)),
   };
 });

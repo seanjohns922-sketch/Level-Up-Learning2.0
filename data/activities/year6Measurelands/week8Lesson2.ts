@@ -1,16 +1,12 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
-import { classroomEngineer, libraryEngineer, hallEngineer } from "@/data/activities/year6Measurelands/week8Common";
+import { campInvestigation, playgroundInvestigation, towerInvestigation } from "@/data/activities/year6Measurelands/week7Common";
 
 // ── Measurelands · Level 6 · Week 8 · Lesson 2 — "Engineer the School" ────────
-// Design: flooring (area) → border (perimeter) → storage (volume) in one space,
-// carried forward. Three rotating school spaces.
-//   A. Classroom — vinyl, skirting, cupboard.
-//   B. Library   — carpet, display rail, shelf.
-//   C. Hall      — floor polish, safety line, equipment store.
+// Design across area, perimeter, conversions, timetables and angle reasoning.
 
 type LessonMemory = { cursor: number };
 const lessonMemory = new Map<string, LessonMemory>();
-const ROTATION: Array<() => PracticeTask> = [classroomEngineer, libraryEngineer, hallEngineer];
+const ROTATION: Array<() => PracticeTask> = [playgroundInvestigation, campInvestigation, towerInvestigation];
 
 function getMemory(lessonId: string): LessonMemory {
   const existing = lessonMemory.get(lessonId);

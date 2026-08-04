@@ -3,9 +3,9 @@ import { playgroundInvestigation, campInvestigation, towerInvestigation } from "
 
 // ── Measurelands · Level 6 · Week 7 · Lesson 3 — "Master Engineer Challenge" ──
 // Bespoke multi-part investigations that combine strands, solved directly.
-//   A. Community Playground — area, perimeter, volume.
+//   A. Community Playground — area, perimeter, conversion.
 //   B. School Camp          — time, capacity, conversion.
-//   C. Observation Tower    — area, angle, volume.
+//   C. Observation Tower    — area, angle, perimeter.
 
 type LessonMemory = { cursor: number };
 const lessonMemory = new Map<string, LessonMemory>();

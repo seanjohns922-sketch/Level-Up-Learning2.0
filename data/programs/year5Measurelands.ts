@@ -97,8 +97,8 @@ const YEAR5_MEASURELANDS_RAW: WeekPlan[] = [
     curriculum: ["AC9M5M03"],
     lessons: [
       buildLesson(6, 1, "24-Hour Time", "Time: read and convert between 12-hour and 24-hour time.", ["24-hour time", "Convert", "am and pm"], ["AC9M5M03"]),
-      buildLesson(6, 2, "Read Timetables", "Time: interpret departures, arrivals and journeys in a timetable.", ["Timetables", "Departures", "Journey time"], ["AC9M5M03"]),
-      buildLesson(6, 3, "Plan the Journey", "Time: plan journeys using timetables, 24-hour time and elapsed time.", ["Plan journeys", "Choose services", "Elapsed time"], ["AC9M5M03"]),
+      buildLesson(6, 2, "Compare Time Systems", "Time: compare equivalent times written in 12-hour and 24-hour notation.", ["Compare formats", "am and pm", "Equivalent times"], ["AC9M5M03"]),
+      buildLesson(6, 3, "Time Conversion Problems", "Time: solve practical 12-hour and 24-hour conversion problems, including midday and midnight.", ["Practical conversions", "Midday and midnight", "Explain the notation"], ["AC9M5M03"]),
     ],
   },
   {

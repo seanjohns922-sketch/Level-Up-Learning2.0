@@ -39,7 +39,8 @@ export type StarpathObjectTask =
       mode: "build";
       modelName: string;
       pieces: Array<StarpathObjectSceneItem & { objectId: string }>;
-      slots: Array<{ id: string; label: string; correctObjectId: string }>;
+      /** x/y are the slot's centre on the 0-100 build stage; w is its width %. */
+      slots: Array<{ id: string; label: string; correctObjectId: string; x?: number; y?: number; w?: number }>;
     });
 
 /** Time-based difficulty gates (strict) */
@@ -1564,6 +1565,22 @@ export type PracticeTask = (
       events?: Array<{ id: string; label: string; emoji?: string; startMin?: number; finishMin?: number; min?: number }>;
       correctId?: string;
       orderedIds?: string[];
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
+      // Measurelands Year 2 equal fractional parts and fractional turns.
+      kind: "fractionTurn";
+      prompt: string;
+      speakText?: string;
+      badgeLabel?: string;
+      scene: "fraction" | "turn";
+      parts?: 2 | 4 | 8;
+      shadedParts?: number;
+      turnFraction?: "quarter" | "half" | "three-quarter" | "full";
+      clockwise?: boolean;
+      startDirection?: "up" | "right" | "down" | "left";
+      options: string[];
+      correctOption: string;
       feedback?: { correct: string; wrong: string };
     }
   | {
