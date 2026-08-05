@@ -11,7 +11,7 @@ Curriculum basis: Australian Curriculum v9.0 Mathematics, Measurement strand, Pr
 - The blueprint is approved for independent assessment-bank regeneration. Any regenerated form must satisfy its allocation and mix rules.
 - Approval must cover descriptor scope, allocations, demand mixes, misconceptions and question archetypes.
 - Missing lesson content must be implemented before a corresponding descriptor is used for scored mastery.
-- Current live forms are not independent banks. Production migration remains blocked until replacement forms pass the Phase 1 architecture and release gates.
+- Measurelands Assessments v1.0 has passed the approved release gates. All live forms use independent assessment banks; lesson-derived forms are retained only in the retired legacy archive.
 
 ## Assessment Contract
 

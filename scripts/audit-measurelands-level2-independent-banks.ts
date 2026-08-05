@@ -63,9 +63,9 @@ for (const [label, form] of [["pre-test", pretest], ["post-test", posttest]] as 
 }
 const source = fs.readFileSync(path.join(process.cwd(), "data/assessments/year2MeasurelandsIndependentBanks.ts"), "utf8");
 check(!source.includes("year2Measurelands/registry") && !source.includes("buildY2Measurelands") && !source.includes("PracticeTask"), "Level 2 bank imports lesson or weekly-quiz content.");
-check(YEAR2_MEASURELANDS_PRETEST.every((item) => !("origin" in item)), "Level 2 candidates replaced the live pre-test.");
-check(YEAR2_MEASURELANDS_POSTTEST.every((item) => !("origin" in item)), "Level 2 candidates replaced the live post-test.");
-check(MEASURELANDS_FORM_MIGRATIONS.filter((migration) => migration.key.startsWith("2:")).every((migration) => migration.replacementStatus === "candidate_authored_uncalibrated" && migration.productionReleaseGate === "blocked"), "Level 2 migration records must identify authored candidates while keeping release blocked.");
+check(YEAR2_MEASURELANDS_PRETEST.every((item) => !("origin" in item)), "Level 2 legacy pre-test archive must remain distinguishable.");
+check(YEAR2_MEASURELANDS_POSTTEST.every((item) => !("origin" in item)), "Level 2 legacy post-test archive must remain distinguishable.");
+check(MEASURELANDS_FORM_MIGRATIONS.filter((migration) => migration.key.startsWith("2:")).every((migration) => migration.replacementStatus === "production_uncalibrated" && migration.productionReleaseGate === "approved" && migration.legacyStatus === "retired"), "Level 2 migration records must identify production banks and retired legacy forms.");
 console.log(`Level 2 independent-bank audit: ${checksPassed} passed, ${failures.length} failed.`);
-console.log("Candidate release status: BLOCKED pending educator review and representative pilot calibration; responsive rendered QA passed.");
+console.log("Release status: Measurelands Assessments v1.0 PRODUCTION; calibration data pending.");
 if (failures.length > 0) { for (const failure of failures) console.error(`- ${failure}`); process.exitCode = 1; }

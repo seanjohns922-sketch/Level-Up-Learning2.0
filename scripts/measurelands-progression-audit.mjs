@@ -28,9 +28,10 @@ check(
 );
 check(
   "Measurelands correct answers wait for Next Challenge",
-  runner.includes('isMeasurement && status === "correct"') &&
+  runner.includes('isStructuredRealm && status === "correct"') &&
+    runner.includes('const isStructuredRealm = isMeasurement || realmId === "space"') &&
     runner.includes("onClick={continueAfterCorrect}") &&
-    markCorrectBody.includes("if (!isMeasurement)"),
+    markCorrectBody.includes("if (!isStructuredRealm)"),
 );
 check(
   "Wrong answers retain an explicit next action",

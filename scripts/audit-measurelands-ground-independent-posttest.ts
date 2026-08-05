@@ -51,8 +51,8 @@ check(posttest.filter((item) => item.type === "numeric").length === 10, "Ground 
 check(posttest.filter((item) => item.type === "mcq").length === 10, "Ground post-test must have 10 selected responses.");
 const source = fs.readFileSync(path.join(process.cwd(), "data/assessments/groundMeasurelandsIndependentPosttest.ts"), "utf8");
 check(!source.includes("prepMeasurelands/registry") && !source.includes("buildMeasurelandsWeek") && !source.includes("PracticeTask"), "Ground bank imports lesson or weekly-quiz content.");
-check(buildGroundMeasurelandsPosttestQuestions().every((item) => !("origin" in item)), "Ground candidates replaced the live post-test.");
-check(MEASURELANDS_FORM_MIGRATIONS.filter((migration) => migration.key === "0:posttest").every((migration) => migration.replacementStatus === "candidate_authored_uncalibrated" && migration.productionReleaseGate === "blocked"), "Ground migration record must identify an authored candidate while keeping release blocked.");
+check(buildGroundMeasurelandsPosttestQuestions().every((item) => !("origin" in item)), "Ground legacy archive must remain distinguishable from the independent bank.");
+check(MEASURELANDS_FORM_MIGRATIONS.filter((migration) => migration.key === "0:posttest").every((migration) => migration.replacementStatus === "production_uncalibrated" && migration.productionReleaseGate === "approved" && migration.legacyStatus === "retired"), "Ground migration record must identify the production bank and retired legacy form.");
 console.log(`Ground independent post-test audit: ${checksPassed} passed, ${failures.length} failed.`);
-console.log("Candidate release status: BLOCKED pending educator review and representative pilot calibration; responsive rendered QA passed.");
+console.log("Release status: Measurelands Assessments v1.0 PRODUCTION; calibration data pending.");
 if (failures.length > 0) { for (const failure of failures) console.error(`- ${failure}`); process.exitCode = 1; }

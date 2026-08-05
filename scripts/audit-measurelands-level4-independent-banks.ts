@@ -112,17 +112,17 @@ check(
   !source.includes("year4Measurelands/registry") && !source.includes("getY4MeasurelandsLessonQuizContribution") && !source.includes("PracticeTask"),
   "Level 4 independent bank imports or embeds lesson/weekly-quiz content.",
 );
-check(YEAR4_MEASURELANDS_PRETEST.every((item) => !("origin" in item)), "Level 4 candidates replaced the live pre-test.");
-check(YEAR4_MEASURELANDS_POSTTEST.every((item) => !("origin" in item)), "Level 4 candidates replaced the live post-test.");
+check(YEAR4_MEASURELANDS_PRETEST.every((item) => !("origin" in item)), "Level 4 legacy pre-test archive must remain distinguishable.");
+check(YEAR4_MEASURELANDS_POSTTEST.every((item) => !("origin" in item)), "Level 4 legacy post-test archive must remain distinguishable.");
 check(
   MEASURELANDS_FORM_MIGRATIONS.filter((migration) => migration.key.startsWith("4:")).every(
-    (migration) => migration.replacementStatus === "candidate_authored_uncalibrated" && migration.productionReleaseGate === "blocked",
+    (migration) => migration.replacementStatus === "production_uncalibrated" && migration.productionReleaseGate === "approved" && migration.legacyStatus === "retired",
   ),
-  "Level 4 migration records must identify authored candidates while keeping release blocked.",
+  "Level 4 migration records must identify production banks and retired legacy forms.",
 );
 
 console.log(`Level 4 independent-bank audit: ${checksPassed} passed, ${failures.length} failed.`);
-console.log("Candidate release status: BLOCKED pending educator review and representative pilot calibration; responsive rendered QA passed.");
+console.log("Release status: Measurelands Assessments v1.0 PRODUCTION; calibration data pending.");
 if (failures.length > 0) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;

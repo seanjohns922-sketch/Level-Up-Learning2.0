@@ -45,6 +45,7 @@
     "qa:measurelands-progression": "node scripts/measurelands-progression-audit.mjs",
     "qa:level-integrity": "node scripts/level-integrity-audit.mjs",
     "qa:measurelands-assessments": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-measurelands-assessments.ts",
+    "qa:measurelands-production": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-measurelands-production-resolution.ts",
     "qa:measurelands-blueprint": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-measurelands-assessment-blueprint.mjs",
     "qa:measurelands-phase1": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-measurelands-phase1-architecture.ts",
     "qa:measurelands-level5-bank": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-measurelands-level5-independent-banks.ts",

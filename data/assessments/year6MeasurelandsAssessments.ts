@@ -1,3 +1,4 @@
+/** @deprecated Legacy Measurelands banks. Retired; not used by production routes. */
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { getY6MeasurelandsLessonQuizContribution } from "@/data/activities/year6Measurelands/registry";
 import type { Question } from "@/data/assessments/posttests";

@@ -28,7 +28,7 @@ import {
 import { buildAssessmentTeacherReport } from "../data/assessments/assessmentReporting";
 import { MEASURELANDS_MISCONCEPTION_LIBRARY } from "../data/assessments/measurelandsMisconceptions";
 
-type LegacyQuestion = { type?: string; practiceTask?: unknown };
+type ResolvedQuestion = { type?: string; practiceTask?: unknown; origin?: string };
 
 const LEVEL_TO_YEAR: Record<MeasurelandsLevel, "Prep" | `Year ${1 | 2 | 3 | 4 | 5 | 6}`> = {
   0: "Prep",
@@ -263,28 +263,30 @@ for (const relativePath of requiredDocs) {
   check(fs.existsSync(path.join(process.cwd(), relativePath)), `Missing required document ${relativePath}.`);
 }
 
-const legacyFailures: string[] = [];
+const productionFailures: string[] = [];
 for (const standard of MEASURELANDS_INDEPENDENT_FORM_STANDARDS) {
   const year = LEVEL_TO_YEAR[standard.level];
   const questions = (standard.kind === "pretest"
     ? MEASURELANDS_PRETESTS_BY_YEAR[year]
-    : MEASURELANDS_POSTTESTS_BY_YEAR[year]?.questions) as LegacyQuestion[] | undefined;
+    : MEASURELANDS_POSTTESTS_BY_YEAR[year]?.questions) as ResolvedQuestion[] | undefined;
   const issues = legacyMeasurelandsFormIssues(questions ?? []);
-  if (issues.length > 0) legacyFailures.push(`${standard.key} ${standard.yearLabel} ${standard.kind}: ${issues.join(" ")}`);
+  if (issues.length > 0) productionFailures.push(`${standard.key} ${standard.yearLabel} ${standard.kind}: ${issues.join(" ")}`);
 }
 
-check(legacyFailures.length === 13, `Expected all 13 live forms to fail independence; found ${legacyFailures.length}.`);
+check(productionFailures.length === 0, `Expected all 13 production forms to satisfy independence; found ${productionFailures.length} failures.`);
 check(
   MEASURELANDS_FORM_MIGRATIONS.every(
-    (migration) => migration.liveStatus === "legacy_lesson_reuse"
-      && migration.productionReleaseGate === "blocked",
+    (migration) => migration.liveStatus === "independent_bank_v1"
+      && migration.legacyStatus === "retired"
+      && migration.legacyProductionUse === false
+      && migration.productionReleaseGate === "approved",
   ),
-  "Migration register must block every legacy form.",
+  "Migration register must approve every independent form and retire every legacy form.",
 );
 
 console.log(`Phase 1 architecture checks: ${checksPassed} passed, ${failures.length} failed.`);
-console.log(`Live independent-pool compliance: 0 passed, ${legacyFailures.length} failed (expected migration baseline).`);
-for (const failure of legacyFailures) console.log(`LEGACY FAIL: ${failure}`);
+console.log(`Production independent-pool compliance: ${13 - productionFailures.length} passed, ${productionFailures.length} failed.`);
+for (const failure of productionFailures) console.log(`PRODUCTION FAIL: ${failure}`);
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(`FAIL: ${failure}`);

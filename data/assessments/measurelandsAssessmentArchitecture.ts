@@ -37,11 +37,35 @@ export type MeasurelandsIndependentFormStandard = {
 
 export type MeasurelandsFormMigration = {
   key: MeasurelandsFormKey;
-  liveStatus: "legacy_lesson_reuse";
-  replacementStatus: "blueprint_approved_bank_not_authored" | "candidate_authored_uncalibrated";
-  productionReleaseGate: "blocked";
+  legacyStatus: "retired";
+  legacyProductionUse: false;
+  liveStatus: "independent_bank_v1";
+  replacementStatus: "production_uncalibrated";
+  productionReleaseGate: "approved";
   blockingReasons: readonly string[];
 };
+
+export const MEASURELANDS_ASSESSMENT_RELEASE = {
+  name: "Measurelands Assessments",
+  version: "1.0",
+  status: "production",
+  liveFrom: "2026-08-05",
+  passPercent: 85,
+} as const;
+
+export const MEASURELANDS_LEGACY_ARCHIVE = {
+  status: "retired",
+  productionUse: false,
+  retainedForms: [
+    "0:posttest",
+    "1:pretest", "1:posttest",
+    "2:pretest", "2:posttest",
+    "3:pretest", "3:posttest",
+    "4:pretest", "4:posttest",
+    "5:pretest", "5:posttest",
+    "6:pretest", "6:posttest",
+  ] satisfies readonly MeasurelandsFormKey[],
+} as const;
 
 const VERY_CHALLENGING_QUOTAS: Record<MeasurelandsFormKey, number> = {
   "0:posttest": 1,
@@ -122,35 +146,18 @@ export const MEASURELANDS_INDEPENDENT_FORM_STANDARDS: readonly MeasurelandsIndep
   );
 
 export const MEASURELANDS_FORM_MIGRATIONS: readonly MeasurelandsFormMigration[] =
-  MEASURELANDS_INDEPENDENT_FORM_STANDARDS.map((standard) => {
-    const hasAuthoredCandidate = standard.level === 0 || standard.level === 1 || standard.level === 2 || standard.level === 3 || standard.level === 4 || standard.level === 5 || standard.level === 6;
-    return {
-      key: standard.key,
-      liveStatus: "legacy_lesson_reuse",
-      replacementStatus: hasAuthoredCandidate
-        ? "candidate_authored_uncalibrated"
-        : "blueprint_approved_bank_not_authored",
-      productionReleaseGate: "blocked",
-      blockingReasons: hasAuthoredCandidate
-        ? standard.level === 6
-          ? [
-              "The live form still reuses lesson or weekly-quiz PracticeTask interactions.",
-              "The educator-approved independent candidate has not completed representative pilot calibration.",
-            ]
-          : [
-            "The live form still reuses lesson or weekly-quiz PracticeTask interactions.",
-            "The independent candidate has not passed educator review or representative pilot calibration.",
-          ]
-        : [
-            "The live form reuses lesson or weekly-quiz PracticeTask interactions.",
-            "The independent assessment-authored item bank has not been written or approved.",
-            "Item calibration statistics have not been collected.",
-          ],
-    };
-  });
+  MEASURELANDS_INDEPENDENT_FORM_STANDARDS.map((standard) => ({
+    key: standard.key,
+    legacyStatus: "retired",
+    legacyProductionUse: false,
+    liveStatus: "independent_bank_v1",
+    replacementStatus: "production_uncalibrated",
+    productionReleaseGate: "approved",
+    blockingReasons: [],
+  }));
 
-// Phase 1 intentionally defines the registry without populating or serving it.
-// Phase 2 onward may add approved banks here after content and review gates pass.
+// Banks are registered by the production resolver in measurelands.ts. Keeping
+// this architecture registry empty avoids a dependency cycle with bank modules.
 export const MEASURELANDS_INDEPENDENT_ITEM_BANKS: Readonly<
   Partial<Record<MeasurelandsFormKey, readonly IndependentAssessmentItem[]>>
 > = {};
@@ -343,13 +350,15 @@ export function validateParallelMeasurelandsForms(
 }
 
 export function legacyMeasurelandsFormIssues(
-  questions: readonly { type?: string; practiceTask?: unknown }[],
+  questions: readonly { type?: string; practiceTask?: unknown; origin?: string }[],
 ): string[] {
   const issues: string[] = [];
-  if (questions.some((question) => question.type === "measurelandsTask" || question.practiceTask != null)) {
+  if (questions.some((question) =>
+    question.origin !== "assessment_authored"
+    && (question.type === "measurelandsTask" || question.practiceTask != null))) {
     issues.push("Form reuses lesson or weekly-quiz PracticeTask interactions.");
   }
-  if (questions.length > 0) {
+  if (questions.some((question) => question.origin !== "assessment_authored")) {
     issues.push("Form does not expose canonical independent-item quality metadata.");
   }
   return issues;

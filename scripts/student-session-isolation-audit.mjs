@@ -62,8 +62,9 @@ check(
 );
 check(
   "Login does not seed progress before the server restore finishes",
-  login.indexOf("restoreStudentStateFromServer(student.student_id, \"number\")") <
-    login.indexOf("persistResolvedStudentProgress(progress)")
+  login.includes('restoreStudentStateFromServer(student.student_id, "number")') &&
+    !login.includes("persistResolvedStudentProgress(") &&
+    login.indexOf("writeProgress(") > login.indexOf('restoreStudentStateFromServer(student.student_id, "number")')
 );
 check(
   "Late restore responses verify the active student before committing",
@@ -92,9 +93,10 @@ check(
 );
 check(
   "Anonymous cache data cannot create a student route",
-  rootRoute.includes("let progress = activeStudentId ? readProgress() : null") &&
+  rootRoute.includes("let progress = null") &&
     rootRoute.includes("if (activeStudentId) {") &&
-    !rootRoute.includes("if (activeStudentId || progress)")
+    !rootRoute.includes("if (activeStudentId || progress)") &&
+    !rootRoute.includes("readProgress(")
 );
 check(
   "Student authorization does not reference the missing legacy students.user_id",

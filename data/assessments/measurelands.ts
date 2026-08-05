@@ -1,30 +1,30 @@
 import type { PostTest, Question } from "./posttests";
 import { deriveMeasurelandsAssessmentVisual } from "./measurelandsVisuals";
-import { buildGroundMeasurelandsPosttestQuestions } from "./groundMeasurelandsPosttest";
+import { GROUND_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS } from "./groundMeasurelandsIndependentPosttest";
 import {
-  YEAR1_MEASURELANDS_POSTTEST,
-  YEAR1_MEASURELANDS_PRETEST,
-} from "./year1MeasurelandsAssessments";
+  YEAR1_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS,
+  YEAR1_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS,
+} from "./year1MeasurelandsIndependentBanks";
 import {
-  YEAR2_MEASURELANDS_POSTTEST,
-  YEAR2_MEASURELANDS_PRETEST,
-} from "./year2MeasurelandsAssessments";
+  YEAR2_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS,
+  YEAR2_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS,
+} from "./year2MeasurelandsIndependentBanks";
 import {
-  YEAR3_MEASURELANDS_POSTTEST,
-  YEAR3_MEASURELANDS_PRETEST,
-} from "./year3MeasurelandsAssessments";
+  YEAR3_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS,
+  YEAR3_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS,
+} from "./year3MeasurelandsIndependentBanks";
 import {
-  YEAR4_MEASURELANDS_POSTTEST,
-  YEAR4_MEASURELANDS_PRETEST,
-} from "./year4MeasurelandsAssessments";
+  YEAR4_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS,
+  YEAR4_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS,
+} from "./year4MeasurelandsIndependentBanks";
 import {
-  YEAR5_MEASURELANDS_POSTTEST,
-  YEAR5_MEASURELANDS_PRETEST,
-} from "./year5MeasurelandsAssessments";
+  YEAR5_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS,
+  YEAR5_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS,
+} from "./year5MeasurelandsIndependentBanks";
 import {
-  YEAR6_MEASURELANDS_POSTTEST,
-  YEAR6_MEASURELANDS_PRETEST,
-} from "./year6MeasurelandsAssessments";
+  YEAR6_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS,
+  YEAR6_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS,
+} from "./year6MeasurelandsIndependentBanks";
 
 type YearLabel = "Prep" | "Year 1" | "Year 2" | "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -64,8 +64,8 @@ function buildQuestion(
   return { ...base, visual: deriveMeasurelandsAssessmentVisual(base) };
 }
 
-function buildPostTest(yearLabel: YearLabel, questions: Question[]): PostTest {
-  return { yearLabel, questions };
+function buildPostTest(yearLabel: YearLabel, questions: readonly Question[]): PostTest {
+  return { yearLabel, questions: [...questions] };
 }
 
 // ═══════════════════════ PREP — Ground Measurelands ═══════════════════════════
@@ -95,16 +95,11 @@ export const LEGACY_PREP_POSTTEST: Question[] = [
   buildQuestion("y0-measurement-pt-20", "Which order makes sense for a day?", ["wake up, eat lunch, go to bed", "go to bed, wake up, eat lunch", "eat lunch, go to bed, wake up", "go to bed, eat lunch, wake up"], "wake up, eat lunch, go to bed", "sequencing_events", "Sequencing", [6, 8], "prep-measurement"),
 ];
 
-// Ground assessment tasks use the same premium interactions students practised
-// in lessons. The exported legacy bank is retained only for migration audits;
-// no assessment route reads it.
-const PREP_POSTTEST: Question[] = buildGroundMeasurelandsPosttestQuestions();
-
 // ═══════════════════════ YEAR 2 ══════════════════════════════════════════════
 // W1 Units & Length · W2 Mass · W3 Capacity · W4 Accuracy · W5 Clock I
 // (o'clock/half past) · W6 Clock II (quarter past/to) · W7 Calendar · W8 Mixed.
 // NOTE: Year 2 does NOT teach perimeter/area (that is Year 3+).
-const LEGACY_YEAR2_PRETEST: Question[] = [
+export const LEGACY_YEAR2_PRETEST: Question[] = [
   buildQuestion("y2-measurement-pre-01", "A rope is 8 blocks and a stick is 5 blocks. How many more blocks is the rope?", ["2", "3", "4", "5"], "3", "length_difference", "Measured Length", [1], "year2-measurement-pre"),
   buildQuestion("y2-measurement-pre-02", "Which tool is best for measuring a pencil?", ["ruler", "trundle wheel", "footsteps", "a playground tape"], "ruler", "choose_length_tool", "Measuring Tools", [1], "year2-measurement-pre"),
   buildQuestion("y2-measurement-pre-03", "If a smaller unit is used, the count usually gets ...", ["smaller", "bigger", "the same number", "zero"], "bigger", "informal_units", "Different Units", [1], "year2-measurement-pre"),
@@ -126,7 +121,7 @@ const LEGACY_YEAR2_PRETEST: Question[] = [
   buildQuestion("y2-measurement-pre-19", "Which measurement would you use for how heavy a bag is?", ["balance cubes", "a clock", "a calendar", "cups"], "balance cubes", "mass_units_informal", "Review", [8], "year2-measurement-pre"),
   buildQuestion("y2-measurement-pre-20", "Which tool measures how much water a bucket holds?", ["cups", "a ruler", "balance cubes", "a calendar"], "cups", "capacity_better_unit", "Review", [8], "year2-measurement-pre"),
 ];
-const LEGACY_YEAR2_POSTTEST: Question[] = [
+export const LEGACY_YEAR2_POSTTEST: Question[] = [
   buildQuestion("y2-measurement-pt-01", "A rope is 9 blocks and a vine is 6 blocks. How many more blocks is the rope?", ["2", "3", "4", "5"], "3", "length_difference", "Measured Length", [1], "year2-measurement-post"),
   buildQuestion("y2-measurement-pt-02", "Which is the best tool for measuring a classroom?", ["ruler", "cubes", "tape measure", "paper clips"], "tape measure", "choose_length_tool", "Measuring Tools", [1], "year2-measurement-post"),
   buildQuestion("y2-measurement-pt-03", "A pencil measures 6 blocks or 12 paper clips. Why are the numbers different?", ["the pencil changed", "paper clips are smaller", "blocks are heavier", "the ruler is broken"], "paper clips are smaller", "informal_units", "Different Units", [1], "year2-measurement-post"),
@@ -204,7 +199,7 @@ const YEAR4_POSTTEST: Question[] = [
 // W1 Metric units · W2 Decimals/precision · W3 Perimeter · W4 Area ·
 // W5 Area vs Perimeter · W6 12 & 24-hour time / timetables · W7 Angles ·
 // W8 Master missions.
-const YEAR5_PRETEST: Question[] = [
+export const LEGACY_YEAR5_PRETEST: Question[] = [
   buildQuestion("y5-measurement-pre-01", "Which unit is most suitable for the height of a tree?", ["mm", "cm", "m", "km"], "m", "best_length_unit", "Metric Mastery", [1], "year5-measurement-pre"),
   buildQuestion("y5-measurement-pre-02", "Which unit best measures a pencil width?", ["m", "cm", "mm", "km"], "mm", "best_length_unit", "Metric Mastery", [1], "year5-measurement-pre"),
   buildQuestion("y5-measurement-pre-03", "Which unit best measures the mass of a car?", ["g", "kg", "mL", "cm"], "kg", "best_mass_unit", "Metric Mastery", [1], "year5-measurement-pre"),
@@ -226,7 +221,7 @@ const YEAR5_PRETEST: Question[] = [
   buildQuestion("y5-measurement-pre-19", "A sports carnival plan needs time, length and area. This is a ...", ["measurement project", "spelling task", "money-only task", "calendar-only task"], "measurement project", "measurement_project", "Master Missions", [8], "year5-measurement-pre"),
   buildQuestion("y5-measurement-pre-20", "An irregular garden has sides 4 m, 6 m, 3 m and 5 m. What is its perimeter?", ["16 m", "18 m", "20 m", "22 m"], "18 m", "irregular_perimeter", "Perimeter", [3], "year5-measurement-pre"),
 ];
-const YEAR5_POSTTEST: Question[] = [
+export const LEGACY_YEAR5_POSTTEST: Question[] = [
   buildQuestion("y5-measurement-pt-01", "Which is the best unit for the length of a fingernail?", ["m", "cm", "mm", "km"], "mm", "best_length_unit", "Metric Mastery", [1], "year5-measurement-post"),
   buildQuestion("y5-measurement-pt-02", "Which unit is best for the mass of a suitcase?", ["g", "kg", "cm", "mL"], "kg", "best_mass_unit", "Metric Mastery", [1], "year5-measurement-post"),
   buildQuestion("y5-measurement-pt-03", "Which unit is best for the capacity of a swimming pool?", ["mL", "L", "g", "cm"], "L", "best_capacity_unit", "Metric Mastery", [1], "year5-measurement-post"),
@@ -250,22 +245,22 @@ const YEAR5_POSTTEST: Question[] = [
 ];
 
 export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]>> = {
-  "Year 1": YEAR1_MEASURELANDS_PRETEST,
-  "Year 2": YEAR2_MEASURELANDS_PRETEST,
-  "Year 3": YEAR3_MEASURELANDS_PRETEST,
-  "Year 4": YEAR4_MEASURELANDS_PRETEST,
-  "Year 5": YEAR5_MEASURELANDS_PRETEST,
-  "Year 6": YEAR6_MEASURELANDS_PRETEST,
+  "Year 1": [...YEAR1_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
+  "Year 2": [...YEAR2_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
+  "Year 3": [...YEAR3_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
+  "Year 4": [...YEAR4_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
+  "Year 5": [...YEAR5_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
+  "Year 6": [...YEAR6_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
 };
 
 export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {
-  Prep: buildPostTest("Prep", PREP_POSTTEST),
-  "Year 1": buildPostTest("Year 1", YEAR1_MEASURELANDS_POSTTEST),
-  "Year 2": buildPostTest("Year 2", YEAR2_MEASURELANDS_POSTTEST),
-  "Year 3": buildPostTest("Year 3", YEAR3_MEASURELANDS_POSTTEST),
-  "Year 4": buildPostTest("Year 4", YEAR4_MEASURELANDS_POSTTEST),
-  "Year 5": buildPostTest("Year 5", YEAR5_MEASURELANDS_POSTTEST),
-  "Year 6": buildPostTest("Year 6", YEAR6_MEASURELANDS_POSTTEST),
+  Prep: buildPostTest("Prep", GROUND_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS),
+  "Year 1": buildPostTest("Year 1", YEAR1_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS),
+  "Year 2": buildPostTest("Year 2", YEAR2_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS),
+  "Year 3": buildPostTest("Year 3", YEAR3_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS),
+  "Year 4": buildPostTest("Year 4", YEAR4_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS),
+  "Year 5": buildPostTest("Year 5", YEAR5_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS),
+  "Year 6": buildPostTest("Year 6", YEAR6_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS),
 };
 
 export function getMeasurelandsPretestForYear(yearLabel: string): Question[] {

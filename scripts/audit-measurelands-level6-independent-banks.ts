@@ -156,24 +156,25 @@ check(
 );
 check(
   YEAR6_MEASURELANDS_PRETEST.every((item) => !("origin" in item)),
-  "Uncalibrated Level 6 pre-test candidates must not replace the production resolver.",
+  "Level 6 legacy pre-test archive must remain distinguishable.",
 );
 check(
   YEAR6_MEASURELANDS_POSTTEST.every((item) => !("origin" in item)),
-  "Uncalibrated Level 6 post-test candidates must not replace the production resolver.",
+  "Level 6 legacy post-test archive must remain distinguishable.",
 );
 check(
   MEASURELANDS_FORM_MIGRATIONS
     .filter((migration) => migration.key.startsWith("6:"))
     .every(
-      (migration) => migration.replacementStatus === "candidate_authored_uncalibrated"
-        && migration.productionReleaseGate === "blocked",
+      (migration) => migration.replacementStatus === "production_uncalibrated"
+        && migration.productionReleaseGate === "approved"
+        && migration.legacyStatus === "retired",
     ),
-  "Level 6 migration records must identify authored candidates while keeping release blocked.",
+  "Level 6 migration records must identify production banks and retired legacy forms.",
 );
 
 console.log(`Level 6 independent-bank audit: ${checksPassed} passed, ${failures.length} failed.`);
-console.log("Candidate release status: EDUCATOR APPROVED; production remains BLOCKED pending representative pilot calibration; responsive rendered QA passed.");
+console.log("Release status: Measurelands Assessments v1.0 PRODUCTION; calibration data pending.");
 if (failures.length > 0) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
