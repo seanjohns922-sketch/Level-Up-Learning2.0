@@ -51,13 +51,13 @@ function ChoiceButton({
         type="button"
         onClick={onClick}
         className={[
-          "flex min-h-16 w-full items-center justify-center rounded-2xl border-2 px-12 text-center shadow-sm transition active:scale-[0.98]",
+          "flex min-h-16 w-full items-center justify-center rounded-2xl border-2 py-3 pl-4 pr-10 text-center shadow-sm transition active:scale-[0.98]",
           wrongId === id
             ? "sp-obj-shake border-rose-400 bg-rose-50"
             : "border-violet-200 bg-white hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg",
         ].join(" ")}
       >
-        <span className="text-base font-black text-indigo-950">{label}</span>
+        <span className="text-base font-black leading-snug text-balance text-indigo-950">{label}</span>
       </button>
       <OptionReadAloudButton text={label} className="absolute right-2 top-1/2 -translate-y-1/2" />
     </div>
@@ -99,6 +99,15 @@ export function StarpathObjectCard({
   }
 
   if (task.mode === "name" || task.mode === "compare") {
+    // Long, sentence-length options (the Week 3 "justify" task) need to stack
+    // full-width; short single-word object names read best in three columns.
+    const longOption = task.options.some((option) => option.label.length > 18);
+    const optionGridClass =
+      task.mode !== "name"
+        ? "mx-auto grid max-w-lg grid-cols-1 gap-3"
+        : longOption
+          ? "mx-auto grid max-w-xl grid-cols-1 gap-3"
+          : "mx-auto grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3";
     return (
       <div>
         <TaskHeading prompt={task.prompt} speech={task.speakText} />
@@ -109,7 +118,7 @@ export function StarpathObjectCard({
             </div>
           ))}
         </div>
-        <div className={task.mode === "name" ? "mx-auto grid max-w-lg grid-cols-1 gap-3 sm:grid-cols-3" : "mx-auto grid max-w-lg grid-cols-1 gap-3"}>
+        <div className={optionGridClass}>
           {task.options.map((option) => (
             <ChoiceButton
               key={option.id}
