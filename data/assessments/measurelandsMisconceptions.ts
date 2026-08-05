@@ -55,6 +55,12 @@ export const MEASURELANDS_MISCONCEPTION_LIBRARY: readonly MeasurelandsMisconcept
     descriptorCodes: ["AC9M3M01", "AC9M5M01", "AC9M6M01"],
   },
   {
+    id: "estimate-vs-exact-reading",
+    label: "Estimate versus exact reading",
+    description: "Treats a benchmark estimate as an exact instrument reading or rejects a reasonable estimate for not being exact.",
+    descriptorCodes: ["AC9M3M01"],
+  },
+  {
     id: "perimeter-vs-area",
     label: "Perimeter versus area",
     description: "Uses a boundary measure when surface coverage is required, or the reverse.",
@@ -83,6 +89,12 @@ export const MEASURELANDS_MISCONCEPTION_LIBRARY: readonly MeasurelandsMisconcept
     label: "Duration versus clock time",
     description: "Treats a displayed clock time as an elapsed duration.",
     descriptorCodes: ["AC9M1M03", "AC9M3M03", "AC9M4M03"],
+  },
+  {
+    id: "duration-unit-scale",
+    label: "Duration unit scale",
+    description: "Compares duration numerals without accounting for relationships among days, hours, minutes and seconds.",
+    descriptorCodes: ["AC9M3M03"],
   },
   {
     id: "elapsed-time-base-ten",
@@ -115,10 +127,22 @@ export const MEASURELANDS_MISCONCEPTION_LIBRARY: readonly MeasurelandsMisconcept
     descriptorCodes: ["AC9M2M04", "AC9M3M04"],
   },
   {
+    id: "minute-mark-counting",
+    label: "Minute-mark counting",
+    description: "Counts minute marks from one instead of zero or skips a mark when reading to the nearest minute.",
+    descriptorCodes: ["AC9M3M04"],
+  },
+  {
     id: "turn-size-vs-direction",
     label: "Turn size versus direction",
     description: "Changes turn size when clockwise direction or starting orientation changes.",
     descriptorCodes: ["AC9M2M05", "AC9M3M05"],
+  },
+  {
+    id: "right-angle-orientation",
+    label: "Right-angle orientation",
+    description: "Assumes rotating a right-angle benchmark changes its size or classification.",
+    descriptorCodes: ["AC9M3M05"],
   },
   {
     id: "angle-arm-length",

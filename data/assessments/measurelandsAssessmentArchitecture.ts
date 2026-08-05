@@ -123,7 +123,7 @@ export const MEASURELANDS_INDEPENDENT_FORM_STANDARDS: readonly MeasurelandsIndep
 
 export const MEASURELANDS_FORM_MIGRATIONS: readonly MeasurelandsFormMigration[] =
   MEASURELANDS_INDEPENDENT_FORM_STANDARDS.map((standard) => {
-    const hasAuthoredCandidate = standard.level === 4 || standard.level === 5 || standard.level === 6;
+    const hasAuthoredCandidate = standard.level === 3 || standard.level === 4 || standard.level === 5 || standard.level === 6;
     return {
       key: standard.key,
       liveStatus: "legacy_lesson_reuse",
