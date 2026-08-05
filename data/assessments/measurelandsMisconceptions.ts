@@ -22,7 +22,19 @@ export const MEASURELANDS_MISCONCEPTION_LIBRARY: readonly MeasurelandsMisconcept
     id: "duration-comparison-evidence",
     label: "Duration comparison evidence",
     description: "Uses event appearance or familiarity instead of consistent duration evidence when comparing how long events last.",
-    descriptorCodes: ["AC9M1M01"],
+    descriptorCodes: ["AC9MFM01", "AC9M1M01"],
+  },
+  {
+    id: "visual-position-length",
+    label: "Visual position and length",
+    description: "Judges length from where an object is placed instead of aligning both objects at the same starting point.",
+    descriptorCodes: ["AC9MFM01"],
+  },
+  {
+    id: "day-part-sequence",
+    label: "Day-part sequence",
+    description: "Confuses the order or meaning of morning, lunchtime, afternoon and night time.",
+    descriptorCodes: ["AC9MFM02"],
   },
   {
     id: "non-uniform-units",
