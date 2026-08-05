@@ -2425,6 +2425,32 @@ export type PracticeTask = (
       }>;
       feedback: { correct: string; wrong: string };
     }
+  | {
+      // Level 3 · W6 — Egocentric Steering. Drive a rover that has a HEADING using
+      // turn-left / turn-right / go-forward. Left/right are relative to the rover's
+      // current facing (not map-north), and each turn changes the heading to track.
+      kind: "starpathSteer";
+      mode: "heading" | "firstMove" | "drive";
+      prompt: string;
+      speakText: string;
+      target: number;
+      mapId: string;
+      cols: number;
+      rows: number;
+      landmarks: Array<{ id: string; label: string; object: string; r: number; c: number }>;
+      object: string;
+      start: { r: number; c: number; facing: "N" | "E" | "S" | "W" };
+      goal?: { r: number; c: number; object: string; label: string };
+      /** heading: the turns applied in order; the answer is the final facing. */
+      turns?: Array<"left" | "right">;
+      /** heading / firstMove: multiple-choice options. */
+      options?: Array<{ id: string; label: string }>;
+      correctOptionId?: string;
+      /** drive: the command palette and a move budget. */
+      palette?: Array<"left" | "right" | "forward">;
+      maxSteps?: number;
+      feedback: { correct: string; wrong: string };
+    }
   | StarpathObjectTask
   | {
       kind: "starpathShapeMatch";

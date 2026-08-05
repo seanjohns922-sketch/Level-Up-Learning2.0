@@ -1,35 +1,16 @@
-import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { debugMapTask, followMapTask, missionMapTask } from "@/data/activities/starpath/level2/navWeeks";
+import { steerHeadingTask, steerFirstMoveTask, steerDriveTask } from "./mapSteer";
 import { lessonContent, taskSet, teaching } from "./lessonUtils";
 
-export const treasureHuntTask = (round: number, target: number): PracticeTask => {
-  const task = followMapTask(round, target);
-  return task.kind === "starpathMapRoute" ? { ...task, prompt: `Treasure hunt: ${task.prompt}`, speakText: `Treasure hunt. ${task.speakText}` } : task;
-};
-export const observatoryMissionTask = (round: number, target: number): PracticeTask => {
-  const task = missionMapTask(round, target);
-  if (task.kind !== "starpathMapRoute") return task;
-  const landmarks = task.landmarks.map((landmark) => landmark.r === task.goal.r && landmark.c === task.goal.c
-    ? { ...landmark, id: "observatory", label: "Observatory", object: "satellite" }
-    : landmark);
-  const checkpoint = task.checkpoints?.[0]?.label ?? "the checkpoint";
-  const missionRule = `Visit ${checkpoint}, avoid the asteroids, then reach the Observatory.`;
-  return {
-    ...task,
-    prompt: "Plan a route to the Observatory.",
-    speakText: `Plan a landmark route. ${missionRule}`,
-    landmarks,
-    goal: { ...task.goal, object: "satellite", label: "Observatory" },
-    missionRule,
-    feedback: { ...task.feedback, correct: "Mission complete — you reached the Observatory!" },
-  };
-};
-export const missionControlTask = (round: number, target: number): PracticeTask => round % 2 ? debugMapTask(round, target) : missionMapTask(round, target);
+// Level 3 · Week 6 — "Landmark Navigation" reworked to EGOCENTRIC STEERING. The
+// rover has a heading; it is driven with turn-left / turn-right / go-forward, and
+// left/right are relative to the current facing (not map-north). The movement
+// sequel to Week 4's Explorer's View. Three lessons escalate: track the heading
+// through turns → choose the first steer toward a goal → plan and drive a route.
 
-export const createTreasureHuntTaskSet = () => taskSet([treasureHuntTask, treasureHuntTask, treasureHuntTask], teaching("mapRoute", "Treasure Hunt", "Follow a landmark-anchored route.", "Start at the rover and follow each ordered direction until you reach the named landmark."));
-export const createObservatoryMissionTaskSet = () => taskSet([observatoryMissionTask, observatoryMissionTask, observatoryMissionTask], teaching("mapMission", "Find the Observatory", "Plan a route to a named landmark.", "Use the landmark positions to build a route that follows every mission rule."), 20);
-export const createMissionControlTaskSet = () => taskSet([missionControlTask, missionControlTask, missionControlTask], teaching("mapDebug", "Mission Control", "Plan, test and fix landmark routes.", "Locate the mission landmarks, run the route, and identify any step that sends the rover off course."), 30);
+export const createWhichWayTaskSet = () => taskSet([steerHeadingTask, steerHeadingTask, steerHeadingTask], teaching("mapRoute", "Which Way Now?", "Turns change the rover's heading.", "The rover has a heading. Each turn changes the way it faces. Follow the turns and work out the new heading."));
+export const createFirstMoveTaskSet = () => taskSet([steerFirstMoveTask, steerFirstMoveTask, steerFirstMoveTask], teaching("mapRoute", "First Move", "Steer toward a landmark.", "The rover faces a direction. Decide the first steer — turn left, turn right, or go forward — to head for the landmark."), 20);
+export const createDriveRoverTaskSet = () => taskSet([steerDriveTask, steerDriveTask, steerDriveTask], teaching("mapMission", "Drive the Rover", "Plan and drive a full route.", "Plan a route with turns and forward moves, tracking the heading after each turn, then run it to reach the landmark."), 30);
 
-export const TREASURE_HUNT_CONTENT = lessonContent({ title: "Treasure Hunt", brief: "Follow ordered directions from a known landmark to reach the treasure location.", criteria: ["find the start", "follow moves in order", "reach the landmark"], activities: ["Route One", "Route Check", "Treasure Route"], kinds: ["starpathMapRoute", "starpathMapRoute", "starpathMapRoute"], reflection: "How did you follow the route?", reflectionOptions: ["I found the start", "I moved one step at a time", "I checked the landmark"], skills: ["Follow a route", "Use landmarks", "Navigate in order"], next: "Find the Observatory", createTaskSet: createTreasureHuntTaskSet });
-export const FIND_OBSERVATORY_CONTENT = lessonContent({ title: "Find the Observatory", brief: "Plan your own route to a named landmark while satisfying the mission rules.", criteria: ["locate the goal", "plan the route", "obey every rule"], activities: ["Locate the Goal", "Plan the Route", "Run the Mission"], kinds: ["starpathMapRoute", "starpathMapRoute", "starpathMapRoute"], reflection: "How did you plan the mission?", reflectionOptions: ["I located the landmarks", "I avoided hazards", "I tested my route"], skills: ["Plan a route", "Navigate to a landmark", "Meet route constraints"], next: "Mission Control", createTaskSet: createObservatoryMissionTaskSet });
-export const MISSION_CONTROL_CONTENT = lessonContent({ title: "Mission Control", brief: "Complete multi-step missions by locating landmarks, planning routes and fixing broken directions.", criteria: ["locate first", "route second", "test and fix"], activities: ["Mission Plan", "Route Debug", "Control Check"], kinds: ["starpathMapRoute", "starpathMapRoute", "starpathMapRoute"], reflection: "What did Mission Control require?", reflectionOptions: ["I read the map", "I planned in order", "I fixed the wrong step"], skills: ["Combine location and route", "Debug navigation", "Complete a mission"], next: "Week 6 Voyage Quiz", createTaskSet: createMissionControlTaskSet });
+export const WHICH_WAY_CONTENT = lessonContent({ title: "Which Way Now?", brief: "The rover has a heading. Follow its turns and work out which way it ends up facing.", criteria: ["start from the facing", "turn one quarter at a time", "name the new heading"], activities: ["Turn Once", "Turn Again", "Track the Turns"], kinds: ["starpathSteer", "starpathSteer", "starpathSteer"], reflection: "How did you find the new heading?", reflectionOptions: ["I started from the facing", "I turned one quarter at a time", "Each turn changed the heading"], skills: ["Track a heading", "Turn left and right", "Read the new facing"], next: "First Move", createTaskSet: createWhichWayTaskSet });
+export const FIRST_MOVE_CONTENT = lessonContent({ title: "First Move", brief: "The rover faces a direction. Choose the first steer — turn or forward — to head toward the landmark.", criteria: ["read the rover's facing", "find the landmark", "choose turn or forward"], activities: ["Ahead or Turn?", "Left or Right?", "First Steer"], kinds: ["starpathSteer", "starpathSteer", "starpathSteer"], reflection: "How did you choose the first move?", reflectionOptions: ["I used the rover's facing", "I checked its left and right", "I looked straight ahead"], skills: ["Steer from a facing", "Choose a turn", "Head toward a goal"], next: "Drive the Rover", createTaskSet: createFirstMoveTaskSet });
+export const DRIVE_ROVER_CONTENT = lessonContent({ title: "Drive the Rover", brief: "Plan a route of turns and forward moves — tracking the heading — then run it to reach the landmark.", criteria: ["plan turns and forwards", "track the heading", "reach the landmark"], activities: ["Plan the Route", "Track the Heading", "Run the Drive"], kinds: ["starpathSteer", "starpathSteer", "starpathSteer"], reflection: "What made driving work?", reflectionOptions: ["I turned, then went forward", "I tracked the heading", "I planned before running"], skills: ["Plan an egocentric route", "Track heading through turns", "Drive to a landmark"], next: "Week 6 Voyage Quiz", createTaskSet: createDriveRoverTaskSet });

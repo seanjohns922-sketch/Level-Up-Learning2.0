@@ -5,7 +5,8 @@ import { LEVEL_THREE_LESSON_CONTENT } from "@/data/activities/starpath/level3/in
 import { fiveFrom } from "@/data/activities/starpath/level1/quizUtils";
 import { createExplorerViewTaskSet, createMapExplorerTaskSet, createMapSymbolsTaskSet } from "@/data/activities/starpath/level3/week4";
 import { createDrawCampTaskSet, createMapBuilderTaskSet, createPlaceLandmarksTaskSet } from "@/data/activities/starpath/level3/week5";
-import { createMissionControlTaskSet, createObservatoryMissionTaskSet, createTreasureHuntTaskSet } from "@/data/activities/starpath/level3/week6";
+import { createWhichWayTaskSet, createFirstMoveTaskSet, createDriveRoverTaskSet } from "@/data/activities/starpath/level3/week6";
+import { runSteer } from "@/data/activities/starpath/level3/mapSteer";
 import { createExplorerChallengeTaskSet, createNavigatorChallengeTaskSet, createRescueMissionTaskSet } from "@/data/activities/starpath/level3/week7";
 import { createFinalMissionTaskSet, createMapMasterTaskSet, createObjectsReviewTaskSet } from "@/data/activities/starpath/level3/week8";
 import { buildLevelThreeWeek4VoyageQuiz } from "@/data/activities/starpath/level3/week4Quiz";
@@ -34,6 +35,30 @@ function assertValid(task: PracticeTask, label: string) {
   }
   if (task.kind === "starpathMapRoute" && task.mode === "debug") {
     assert(task.debugSteps?.some((step) => step.id === task.wrongStepId), `${label} has an invalid debug answer`);
+  }
+  if (task.kind === "starpathSteer") {
+    if (task.mode === "drive") {
+      assert(task.goal && (task.palette?.length ?? 0) >= 3 && (task.maxSteps ?? 0) >= 3, `${label} drive task is missing goal/palette/budget`);
+      // A minimal turn-then-forward route must reach the goal within the budget.
+      const ORDER = ["N", "E", "S", "W"] as const;
+      const faceTo = (cmds: Array<"left" | "right" | "forward">, from: string, want: string) => {
+        const d = (ORDER.indexOf(want as "N") - ORDER.indexOf(from as "N") + 4) % 4;
+        if (d === 1) cmds.push("right");
+        else if (d === 3) cmds.push("left");
+        else if (d === 2) cmds.push("right", "right");
+        return want;
+      };
+      const cmds: Array<"left" | "right" | "forward"> = [];
+      let f: string = task.start.facing;
+      let { r, c } = task.start;
+      if (task.goal!.r !== r) { f = faceTo(cmds, f, task.goal!.r < r ? "N" : "S"); while (r !== task.goal!.r) { cmds.push("forward"); r += task.goal!.r < r ? -1 : 1; } }
+      if (task.goal!.c !== c) { f = faceTo(cmds, f, task.goal!.c < c ? "W" : "E"); while (c !== task.goal!.c) { cmds.push("forward"); c += task.goal!.c < c ? -1 : 1; } }
+      assert(cmds.length <= task.maxSteps!, `${label} drive task cannot be solved within its move budget`);
+      const end = runSteer(task.start, cmds, task.cols, task.rows);
+      assert(!end.offGrid && end.r === task.goal!.r && end.c === task.goal!.c, `${label} drive task is not solvable`);
+    } else {
+      assert(task.options?.some((o) => o.id === task.correctOptionId), `${label} has an invalid steer option answer`);
+    }
   }
 }
 
@@ -69,7 +94,7 @@ function assertMapCreateSolvable(task: MapCreateTask, label: string) {
 const lessonFactories: Array<[string, Factory]> = [
   ["W4 L1", createMapSymbolsTaskSet], ["W4 L2", createExplorerViewTaskSet], ["W4 L3", createMapExplorerTaskSet],
   ["W5 L1", createDrawCampTaskSet], ["W5 L2", createPlaceLandmarksTaskSet], ["W5 L3", createMapBuilderTaskSet],
-  ["W6 L1", createTreasureHuntTaskSet], ["W6 L2", createObservatoryMissionTaskSet], ["W6 L3", createMissionControlTaskSet],
+  ["W6 L1", createWhichWayTaskSet], ["W6 L2", createFirstMoveTaskSet], ["W6 L3", createDriveRoverTaskSet],
   ["W7 L1", createExplorerChallengeTaskSet], ["W7 L2", createRescueMissionTaskSet], ["W7 L3", createNavigatorChallengeTaskSet],
   ["W8 L1", createObjectsReviewTaskSet], ["W8 L2", createMapMasterTaskSet], ["W8 L3", createFinalMissionTaskSet],
 ];
@@ -79,9 +104,14 @@ lessonFactories.forEach(([label, factory]) => generated(factory).forEach((task, 
   if (task.kind === "starpathMapCreate") assertMapCreateSolvable(task, `${label} task ${index + 1}`);
 }));
 
-generated(createObservatoryMissionTaskSet).forEach((task) => {
-  assert(task.kind === "starpathMapRoute" && task.goal.label === "Observatory", "Week 6 Lesson 2 must route to the Observatory");
-});
+const week6Modes = new Set(
+  [createWhichWayTaskSet, createFirstMoveTaskSet, createDriveRoverTaskSet].flatMap((factory) =>
+    generated(factory).filter((task) => task.kind === "starpathSteer").map((task) => task.mode),
+  ),
+);
+for (const mode of ["heading", "firstMove", "drive"] as const) {
+  assert(week6Modes.has(mode), `Week 6 must include ${mode} steering tasks`);
+}
 const objectReviewModes = generated(createObjectsReviewTaskSet)
   .filter((task) => task.kind === "starpathObject")
   .map((task) => task.mode);
@@ -92,7 +122,7 @@ for (const mode of ["name", "compare", "classify", "build", "find"] as const) {
 const quizSpecs: Array<[number, () => PracticeTask[], [Factory, Factory, Factory]]> = [
   [4, buildLevelThreeWeek4VoyageQuiz, [createMapSymbolsTaskSet, createExplorerViewTaskSet, createMapExplorerTaskSet]],
   [5, buildLevelThreeWeek5VoyageQuiz, [createDrawCampTaskSet, createPlaceLandmarksTaskSet, createMapBuilderTaskSet]],
-  [6, buildLevelThreeWeek6VoyageQuiz, [createTreasureHuntTaskSet, createObservatoryMissionTaskSet, createMissionControlTaskSet]],
+  [6, buildLevelThreeWeek6VoyageQuiz, [createWhichWayTaskSet, createFirstMoveTaskSet, createDriveRoverTaskSet]],
   [7, buildLevelThreeWeek7VoyageQuiz, [createExplorerChallengeTaskSet, createRescueMissionTaskSet, createNavigatorChallengeTaskSet]],
 ];
 
