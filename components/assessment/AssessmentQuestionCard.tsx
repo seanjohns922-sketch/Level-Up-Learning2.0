@@ -12,6 +12,8 @@ import InputOutputTableVisual from "@/components/activities/InputOutputTableVisu
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
 import { BalanceEquationCardVisual } from "@/components/activities/EquationVisualCards";
 import MeasurelandsAssessmentVisual from "@/components/assessment/MeasurelandsAssessmentVisual";
+import MeasurelandsAnswerWidget from "@/components/assessment/MeasurelandsAnswerWidget";
+import type { MeasurelandsAnswerFormat } from "@/data/assessments/measurelandsPresentation";
 import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObjectArt";
 import type { MzVisual } from "@/data/assessments/measurelandsVisuals";
 import {
@@ -22,11 +24,13 @@ import {
 import { getRealmTheme } from "@/lib/useRealmTheme";
 
 type GenericQuestion = {
+  id?: string;
   type?: string;
   prompt: string;
   options?: unknown[];
   visual?: unknown;
   inputMode?: "decimal" | "text";
+  answerFormat?: MeasurelandsAnswerFormat;
 };
 
 function parseFraction(label: string) {
@@ -676,14 +680,7 @@ export default function AssessmentQuestionCard({
     return (
       <div className="mt-6">
         {renderedVisual}
-        <input
-          type="text"
-          inputMode={question.inputMode ?? "decimal"}
-          value={value ?? ""}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder="Enter your answer"
-          className={`w-full rounded-2xl border border-slate-600 bg-slate-700/50 px-5 py-4 text-2xl font-black text-white outline-none transition placeholder:text-slate-400 ${focusBorder} focus:bg-slate-700`}
-        />
+        {theme.isMeasurement && question.answerFormat ? <MeasurelandsAnswerWidget key={question.id} format={question.answerFormat} value={value} onChange={onChange} inputMode={question.inputMode} /> : <input type="text" inputMode={question.inputMode ?? "decimal"} value={value ?? ""} onChange={(event) => onChange(event.target.value)} placeholder="Enter your answer" className={`w-full rounded-2xl border border-slate-600 bg-slate-700/50 px-5 py-4 text-2xl font-black text-white outline-none transition placeholder:text-slate-400 ${focusBorder} focus:bg-slate-700`} />}
       </div>
     );
   }

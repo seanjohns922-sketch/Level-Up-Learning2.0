@@ -238,6 +238,20 @@ check(
   "Level 5 independent bank imports lesson or weekly-quiz content.",
 );
 
+const protractorCardSource = fs.readFileSync(
+  path.join(process.cwd(), "components/measurelands/MeasurelandsProtractorCard.tsx"),
+  "utf8",
+);
+const protractorSource = fs.readFileSync(
+  path.join(process.cwd(), "components/measurelands/MeasurelandsProtractor.tsx"),
+  "utf8",
+);
+check(
+  protractorCardSource.includes("showInteractiveReading={!assessmentMode}")
+    && protractorSource.includes("interactive && showInteractiveReading"),
+  "Assessment protractor construction must hide the live numerical angle readout.",
+);
+
 check(
   YEAR5_MEASURELANDS_PRETEST.every((item) => !("origin" in item)),
   "Level 5 legacy pre-test archive must remain distinguishable.",

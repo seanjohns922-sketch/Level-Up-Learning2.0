@@ -12,8 +12,8 @@ import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObj
 import { RulerWithObject } from "@/components/measurelands/MeasurelandsRulerCard";
 
 // Assessment visuals REUSE the real Measurelands lesson instruments so pre/post
-// tests look and feel exactly like the lessons — on a parchment panel (the lesson
-// surface). Golden rule: show only what the question GIVES, never the answer.
+// tests retain familiar instruments on a parchment panel. Assessment labels are
+// deliberately neutral: the visual supplies data, never a method or answer cue.
 
 const INK = "#4a3611";
 const GOLD_DEEP = "#9a7328";
@@ -114,7 +114,7 @@ export default function MeasurelandsAssessmentVisual({ visual }: { visual: MzVis
   switch (visual.kind) {
     case "ruler":
       return (
-        <Panel label="Measure the length">
+        <Panel label="Ruler">
           <RulerWithObject
             rulerCm={Math.max(10, Math.ceil(visual.toCm) + 2)}
             object={{ label: "pencil", icon: "✏️", lengthCm: visual.toCm, startCm: 0 }}
@@ -124,30 +124,30 @@ export default function MeasurelandsAssessmentVisual({ visual }: { visual: MzVis
       );
     case "scaleDial": {
       const s = scaleSteps(visual.unit, visual.max);
-      return <Panel label="Read the scale"><MeasurelandsScale value={visual.value} unit={visual.unit} max={visual.max} majorStep={s.majorStep} minorStep={s.minorStep} size={230} /></Panel>;
+      return <Panel label="Scale"><MeasurelandsScale value={visual.value} unit={visual.unit} max={visual.max} majorStep={s.majorStep} minorStep={s.minorStep} size={230} /></Panel>;
     }
     case "jug": {
       const s = jugSteps(visual.unit);
-      return <Panel label="Read the jug"><MeasurelandsJug value={visual.value} unit={visual.unit} max={visual.max} majorStep={s.majorStep} minorStep={s.minorStep} size={210} /></Panel>;
+      return <Panel label="Measuring jug"><MeasurelandsJug value={visual.value} unit={visual.unit} max={visual.max} majorStep={s.majorStep} minorStep={s.minorStep} size={210} /></Panel>;
     }
     case "thermometer":
-      return <Panel label="Read the temperature"><MeasurelandsThermometer value={visual.value} max={Math.max(50, Math.ceil((visual.value + 5) / 10) * 10)} size={150} /></Panel>;
+      return <Panel label="Thermometer"><MeasurelandsThermometer value={visual.value} max={Math.max(50, Math.ceil((visual.value + 5) / 10) * 10)} size={150} /></Panel>;
     case "clock":
-      return <Panel label="Read the clock"><ClockFace hour={visual.hour} minute={visual.minute} size={220} /></Panel>;
+      return <Panel label="Clock"><ClockFace hour={visual.hour} minute={visual.minute} size={220} /></Panel>;
     case "angle": {
       const known = visual.known ?? visual.single ?? 45;
       // The given angle as two rays + shaded turn-arc, sitting on a horizontal
       // base (reads as "on a straight line"). The unknown stays unshown.
-      return <Panel label="Angle reasoning"><MeasurelandsAngle kind="angle" turn={known} rot={0} rightMark={visual.single === 90} size={240} /></Panel>;
+      return <Panel label="Angle diagram"><MeasurelandsAngle kind="angle" turn={known} rot={0} rightMark={visual.single === 90} size={240} /></Panel>;
     }
     case "cubes":
-      return <Panel label="Picture the prism"><MeasurelandsVolumeBuilder dims={{ l: visual.l, w: visual.w, h: visual.h }} cubes={[]} outline size={240} /></Panel>;
+      return <Panel label="Prism model"><MeasurelandsVolumeBuilder dims={{ l: visual.l, w: visual.w, h: visual.h }} cubes={[]} outline size={240} /></Panel>;
     case "rectangle":
-      return <Panel label={visual.mode === "perimeter" ? "Distance around the edge" : "Space inside"}><RectShape w={visual.w} h={visual.h} mode={visual.mode} unit={visual.unit} sample={visual.sample} /></Panel>;
+      return <Panel label="Diagram"><RectShape w={visual.w} h={visual.h} mode={visual.mode} unit={visual.unit} sample={visual.sample} /></Panel>;
     case "convert":
       return <Panel label="Convert the unit"><Convert fromValue={visual.fromValue} fromUnit={visual.fromUnit} toUnit={visual.toUnit} /></Panel>;
     case "objects":
-      return <Panel label={visual.caption ?? "Look at each one"}><Objects items={visual.items} /></Panel>;
+      return <Panel><Objects items={visual.items} /></Panel>;
     case "concept":
       return <Panel><Concept icon={visual.icon} label={visual.label} /></Panel>;
     default:

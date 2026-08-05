@@ -1,5 +1,6 @@
 import type { PostTest, Question } from "./posttests";
 import { deriveMeasurelandsAssessmentVisual } from "./measurelandsVisuals";
+import { prepareMeasurelandsAssessmentPresentation } from "./measurelandsPresentation";
 import { GROUND_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS } from "./groundMeasurelandsIndependentPosttest";
 import {
   YEAR1_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS,
@@ -64,8 +65,41 @@ function buildQuestion(
   return { ...base, visual: deriveMeasurelandsAssessmentVisual(base) };
 }
 
+function presentQuestion(question: Question): Question {
+  const renderer = "renderer" in question
+    ? (question as Question & { renderer?: { type?: string; payload?: Record<string, unknown> } }).renderer
+    : undefined;
+  const domain = typeof renderer?.payload?.domain === "string" ? renderer.payload.domain : undefined;
+  const selected = question.type !== "numeric";
+  const presentation = prepareMeasurelandsAssessmentPresentation({
+    prompt: question.prompt,
+    correctAnswer: question.correctAnswer,
+    domain,
+    visual: question.visual,
+    inputMode: question.inputMode,
+    selected,
+  });
+  return {
+    ...question,
+    prompt: presentation.prompt,
+    visual: presentation.visual,
+    inputMode: presentation.inputMode,
+    answerFormat: presentation.answerFormat,
+    ...(renderer ? {
+      renderer: {
+        ...renderer,
+        payload: {
+          ...renderer.payload,
+          prompt: presentation.prompt,
+          visual: presentation.visual,
+        },
+      },
+    } : {}),
+  };
+}
+
 function buildPostTest(yearLabel: YearLabel, questions: readonly Question[]): PostTest {
-  return { yearLabel, questions: [...questions] };
+  return { yearLabel, questions: questions.map(presentQuestion) };
 }
 
 // ═══════════════════════ PREP — Ground Measurelands ═══════════════════════════
@@ -245,12 +279,12 @@ export const LEGACY_YEAR5_POSTTEST: Question[] = [
 ];
 
 export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]>> = {
-  "Year 1": [...YEAR1_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
-  "Year 2": [...YEAR2_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
-  "Year 3": [...YEAR3_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
-  "Year 4": [...YEAR4_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
-  "Year 5": [...YEAR5_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
-  "Year 6": [...YEAR6_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS],
+  "Year 1": YEAR1_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
+  "Year 2": YEAR2_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
+  "Year 3": YEAR3_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
+  "Year 4": YEAR4_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
+  "Year 5": YEAR5_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
+  "Year 6": YEAR6_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
 };
 
 export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {

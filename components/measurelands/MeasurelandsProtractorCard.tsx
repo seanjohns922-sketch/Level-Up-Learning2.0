@@ -88,27 +88,28 @@ function GuessScene({ task, onCorrect, onWrong }: { task: ProtractorTask; onCorr
 }
 
 /* ── L2 Measure (protractor) ── */
-function ReadScene({ task, onCorrect, onWrong, badge }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void; badge: string }) {
+function ReadScene({ task, onCorrect, onWrong, badge, assessmentMode }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void; badge: string; assessmentMode: boolean }) {
   const [revealed, setRevealed] = useState(false);
-  const guidance = revealed ? "full" : task.guidance ?? "full";
+  const guidance = assessmentMode ? "none" : revealed ? "full" : task.guidance ?? "full";
   return (
     <Shell badge={task.badgeLabel ?? badge} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="flex flex-col items-center gap-1 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-2">
         <ContextLine task={task} />
         <MeasurelandsProtractor angle={task.angle ?? 60} baselineSide={task.baselineSide ?? "right"} guidance={guidance} />
-        {revealed ? <p className="text-center text-[13px] font-bold text-[#b45309]">Start at the glowing 0° and read that scale.</p> : <p className="text-center text-[12px] font-bold text-[#a98b52]">Read from the 0° on your baseline arm.</p>}
+        {!assessmentMode && revealed ? <p className="text-center text-[13px] font-bold text-[#b45309]">Start at the glowing 0° and read that scale.</p> : null}
+        {!assessmentMode && !revealed ? <p className="text-center text-[12px] font-bold text-[#a98b52]">Read from the 0° on your baseline arm.</p> : null}
       </div>
       <DegRow options={task.options ?? []} correct={task.correctOption ?? 0} onCorrect={onCorrect} onWrong={onWrong} onWrongPick={() => setRevealed(true)} />
     </Shell>
   );
 }
 
-function MistakeScene({ task, onCorrect, onWrong }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void }) {
+function MistakeScene({ task, onCorrect, onWrong, assessmentMode }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void; assessmentMode: boolean }) {
   const [wrong, setWrong] = useState<string | null>(null);
   return (
     <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="flex flex-col items-center gap-1 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-2">
-        <MeasurelandsProtractor angle={task.angle ?? 60} baselineSide={task.baselineSide ?? "right"} guidance="baseline" />
+        <MeasurelandsProtractor angle={task.angle ?? 60} baselineSide={task.baselineSide ?? "right"} guidance={assessmentMode ? "none" : "baseline"} />
         {task.statement ? <div className="rounded-full border-2 border-[rgba(192,86,78,0.5)] bg-[rgba(252,224,224,0.5)] px-4 py-1.5 text-lg font-black text-[#8a2b24]">{task.statement}</div> : null}
       </div>
       <div className="grid gap-3">
@@ -150,7 +151,7 @@ function ConstructScene({
     <Shell badge={task.badgeLabel ?? "Build the Angle"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="flex flex-col items-center gap-1 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-2">
         <ContextLine task={task} />
-        <MeasurelandsProtractor interactive baselineSide="right" targetDeg={assessmentMode ? undefined : target} currentDeg={deg} onDeg={handleDegreeChange} guidance="none" />
+        <MeasurelandsProtractor interactive baselineSide="right" targetDeg={assessmentMode ? undefined : target} currentDeg={deg} onDeg={handleDegreeChange} guidance="none" showInteractiveReading={!assessmentMode} />
         {!assessmentMode ? <p className="text-center text-[13px] font-black text-[#5b21b6]">Target: {target}° — drag the purple arm to build it.</p> : null}
       </div>
       {assessmentMode ? (
@@ -301,9 +302,9 @@ export function MeasurelandsProtractorCard({ task, onCorrect, onWrong, assessmen
     case "estimate": return <EstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Estimate the Angle" />;
     case "closest": return <EstimateScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Which Is Closest?" />;
     case "guess": return <GuessScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-    case "read": return <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Read the Protractor" />;
-    case "whichScale": return <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Which Scale?" />;
-    case "mistake": return <MistakeScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+    case "read": return <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Read the Protractor" assessmentMode={assessmentMode} />;
+    case "whichScale": return <ReadScene task={task} onCorrect={onCorrect} onWrong={onWrong} badge="Which Scale?" assessmentMode={assessmentMode} />;
+    case "mistake": return <MistakeScene task={task} onCorrect={onCorrect} onWrong={onWrong} assessmentMode={assessmentMode} />;
     default: return <ConstructScene task={task} onCorrect={onCorrect} onWrong={onWrong} assessmentMode={assessmentMode} />;
   }
 }

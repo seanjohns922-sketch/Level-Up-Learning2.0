@@ -24,6 +24,7 @@ export function MeasurelandsProtractor({
   onDeg,
   highlightCentre = false,
   showReading = false,
+  showInteractiveReading = true,
   size = 460,
 }: {
   angle?: number;
@@ -35,6 +36,7 @@ export function MeasurelandsProtractor({
   onDeg?: (deg: number) => void;
   highlightCentre?: boolean;
   showReading?: boolean;
+  showInteractiveReading?: boolean;
   size?: number;
 }) {
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -121,7 +123,7 @@ export function MeasurelandsProtractor({
           <text x={pt(armDeg, R - 44)[0]} y={pt(armDeg, R - 44)[1] + 4} textAnchor="middle" fontSize={17} fontWeight={900} fill="#fff">{shownAngle}°</text>
         </g>
       ) : null}
-      {interactive ? (
+      {interactive && showInteractiveReading ? (
         <g>
           <rect x={VX - 44} y={VY + 14} width={88} height={34} rx={10} fill={atTarget ? "#16a34a" : "#5b21b6"} />
           <text x={VX} y={VY + 37} textAnchor="middle" fontSize={22} fontWeight={900} fill="#fff">{shownAngle}°{atTarget ? " ✓" : ""}</text>

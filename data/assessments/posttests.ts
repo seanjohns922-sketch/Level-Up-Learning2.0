@@ -21,6 +21,7 @@ export type Question = {
   reviewFeedback?: string;
   visual?: unknown;
   inputMode?: "decimal" | "text";
+  answerFormat?: import("@/data/assessments/measurelandsPresentation").MeasurelandsAnswerFormat;
   /** Existing lesson interaction reused in assessment mode. */
   practiceTask?: import("@/data/activities/year1/practice-task").PracticeTask;
 };
