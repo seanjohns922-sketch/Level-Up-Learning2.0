@@ -4,10 +4,13 @@ export type StarpathMapCreateTask = Extract<PracticeTask, { kind: "starpathMapCr
 export type StarpathMapPlacement = { r: number; c: number };
 
 function satisfies(subject: StarpathMapPlacement, reference: StarpathMapPlacement, relation: StarpathMapCreateTask["constraints"][number]["relation"]): boolean {
-  if (relation === "above") return subject.c === reference.c && subject.r === reference.r - 1;
-  if (relation === "below") return subject.c === reference.c && subject.r === reference.r + 1;
-  if (relation === "leftOf") return subject.r === reference.r && subject.c === reference.c - 1;
-  return subject.r === reference.r && subject.c === reference.c + 1;
+  // "above/below/left/right of" means anywhere along that axis, not exactly one
+  // cell away. The condition wording ("above") never promises adjacency, and a
+  // map-creation task should accept every layout that reads as correct.
+  if (relation === "above") return subject.c === reference.c && subject.r < reference.r;
+  if (relation === "below") return subject.c === reference.c && subject.r > reference.r;
+  if (relation === "leftOf") return subject.r === reference.r && subject.c < reference.c;
+  return subject.r === reference.r && subject.c > reference.c;
 }
 
 export function isStarpathMapCreationValid(task: StarpathMapCreateTask, placements: Record<string, StarpathMapPlacement>): boolean {
