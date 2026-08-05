@@ -19,6 +19,12 @@ export const MEASURELANDS_MISCONCEPTION_LIBRARY: readonly MeasurelandsMisconcept
     descriptorCodes: ["AC9MFM01", "AC9M1M01"],
   },
   {
+    id: "duration-comparison-evidence",
+    label: "Duration comparison evidence",
+    description: "Uses event appearance or familiarity instead of consistent duration evidence when comparing how long events last.",
+    descriptorCodes: ["AC9M1M01"],
+  },
+  {
     id: "non-uniform-units",
     label: "Non-uniform units",
     description: "Treats differently sized informal units as a fair measurement.",
@@ -101,6 +107,18 @@ export const MEASURELANDS_MISCONCEPTION_LIBRARY: readonly MeasurelandsMisconcept
     label: "Duration versus clock time",
     description: "Treats a displayed clock time as an elapsed duration.",
     descriptorCodes: ["AC9M1M03", "AC9M3M03", "AC9M4M03"],
+  },
+  {
+    id: "duration-unit-choice",
+    label: "Duration unit choice",
+    description: "Chooses a duration unit that is implausibly short or long for a familiar event.",
+    descriptorCodes: ["AC9M1M03"],
+  },
+  {
+    id: "calendar-date-vs-duration",
+    label: "Calendar date versus duration",
+    description: "Treats a calendar date as an amount of elapsed time rather than a location in a calendar sequence.",
+    descriptorCodes: ["AC9M1M03"],
   },
   {
     id: "duration-unit-scale",
