@@ -27,6 +27,7 @@
     "qa:global-xp": "node scripts/global-xp-foundation-audit.mjs",
     "qa:completion-rewards": "node scripts/completion-reward-integrity-audit.mjs",
     "qa:demo-rewards": "node scripts/demo-reward-showcase-audit.mjs",
+    "qa:demo-review": "node scripts/demo-review-panel-audit.mjs",
     "qa:starpath-activation": "node scripts/starpath-activation-audit.mjs",
     "qa:starpath-demo-access": "node scripts/audit-starpath-demo-access.mjs",
     "qa:starpath-home": "node scripts/audit-starpath-home.mjs",

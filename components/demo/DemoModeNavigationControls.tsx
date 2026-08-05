@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { ClipboardCheck } from "lucide-react";
 import { clearScopedProgress } from "@/data/progress";
 import { deactivateDemoPreviewMode, isDemoPreviewMode } from "@/lib/demo-mode";
 import { clearScopedProgramStore } from "@/lib/program-progress";
@@ -50,6 +51,15 @@ export default function DemoModeNavigationControls({
         <span className="realm-demo-long-label">Demo Mode</span>
         <span className="realm-demo-short-label">Demo</span>
       </span>
+      <button
+        type="button"
+        onClick={() => router.push("/demo-review")}
+        title="Open Demo Review"
+        aria-label="Open Demo Review"
+        style={{ ...base, width: 30, padding: 0, cursor: "pointer", color: text, background, border: border ?? `1px solid ${accent}44` }}
+      >
+        <ClipboardCheck size={14} aria-hidden="true" />
+      </button>
       <button
         type="button"
         onClick={exitDemoMode}

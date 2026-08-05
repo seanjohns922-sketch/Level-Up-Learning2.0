@@ -24,6 +24,7 @@ import {
   type RealmieRealm,
 } from "@/lib/realmies";
 import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/studentIdentity";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 
 const REALM_STYLES: Record<
   RealmieRealm,
@@ -129,7 +130,18 @@ export default function MyRealmiesPage() {
         setEconomy(nextEconomy);
         void recordRealmieEvent(requestedStudentId, "realmie_collection_opened");
 
-        if (typeof window === "undefined" || requestedStudentId === "demo-preview") return;
+        if (typeof window === "undefined") return;
+        if (requestedStudentId === "demo-preview") {
+          const reviewReveal = isDemoPreviewMode()
+            && new URLSearchParams(window.location.search).get("review_reveal") === "1";
+          if (reviewReveal) {
+            const newest = [...nextCollection.catalogue]
+              .filter((item) => item.owned)
+              .sort((a, b) => (b.earned_at ?? "").localeCompare(a.earned_at ?? ""))[0];
+            if (newest) setCelebration(newest);
+          }
+          return;
+        }
         const seenKey = `lul:realmies:seen:${requestedStudentId}`;
         const ownedKeys = nextCollection.catalogue.filter((item) => item.owned).map((item) => item.realmie_key);
         const stored = window.localStorage.getItem(seenKey);

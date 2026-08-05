@@ -45,3 +45,8 @@ export function markLegendUnlockVideoSeen(legendId: string) {
   if (seen.includes(legendId)) return;
   writeSeenLegendVideoIds([...seen, legendId]);
 }
+
+export function resetLegendUnlockVideosForCurrentScope() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(getScopedLegendVideoKey());
+}
