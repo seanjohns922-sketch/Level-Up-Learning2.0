@@ -26,6 +26,7 @@ type GenericQuestion = {
   prompt: string;
   options?: unknown[];
   visual?: unknown;
+  inputMode?: "decimal" | "text";
 };
 
 function parseFraction(label: string) {
@@ -677,7 +678,7 @@ export default function AssessmentQuestionCard({
         {renderedVisual}
         <input
           type="text"
-          inputMode="decimal"
+          inputMode={question.inputMode ?? "decimal"}
           value={value ?? ""}
           onChange={(event) => onChange(event.target.value)}
           placeholder="Enter your answer"

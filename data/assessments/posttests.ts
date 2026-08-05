@@ -20,6 +20,7 @@ export type Question = {
   difficultyBand?: string;
   reviewFeedback?: string;
   visual?: unknown;
+  inputMode?: "decimal" | "text";
   /** Existing lesson interaction reused in assessment mode. */
   practiceTask?: import("@/data/activities/year1/practice-task").PracticeTask;
 };

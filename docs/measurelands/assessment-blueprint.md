@@ -1,17 +1,17 @@
 # Measurelands Assessment Blueprint
 
-Status: **Approved and implemented**
+Status: **Approved; independent-bank rebuild pending**
 
-This document defines the implemented assessment design. The typed source of truth is `data/assessments/measurelandsAssessmentBlueprint.ts`, and executable audits enforce its descriptor allocations against the live banks.
+This document defines the approved assessment design. The typed source of truth is `data/assessments/measurelandsAssessmentBlueprint.ts`. The live banks satisfy its descriptor allocations, but still reuse lesson-native interactions and therefore remain a legacy migration baseline under `docs/LEVEL_UP_LEARNING_ASSESSMENT_FRAMEWORK.md`.
 
 Curriculum basis: Australian Curriculum v9.0 Mathematics, Measurement strand, Prep-Year 6 sequence of content descriptions.
 
 ## Approval Gate
 
-- The blueprint is approved for live assessment regeneration. Any regenerated form must satisfy its allocation and mix rules.
+- The blueprint is approved for independent assessment-bank regeneration. Any regenerated form must satisfy its allocation and mix rules.
 - Approval must cover descriptor scope, allocations, demand mixes, misconceptions and question archetypes.
 - Missing lesson content must be implemented before a corresponding descriptor is used for scored mastery.
-- Live question generation is validated against this approved blueprint by the Measurelands assessment audits.
+- Current live forms are not independent banks. Production migration remains blocked until replacement forms pass the Phase 1 architecture and release gates.
 
 ## Assessment Contract
 
@@ -34,19 +34,19 @@ R/U/A/G means Recall / Understanding / Application / Reasoning.
 
 | Form | Difficulty: accessible/moderate/challenging | R/U/A/G | Selected response max | Constructed/manipulated min |
 |---|---:|---:|---:|---:|
-| Ground Post | 8 / 8 / 4 | 2 / 7 / 7 / 4 | 16 | 4 |
-| Level 1 Pre | 10 / 8 / 2 | 3 / 7 / 8 / 2 | 16 | 4 |
-| Level 1 Post | 6 / 9 / 5 | 1 / 5 / 9 / 5 | 13 | 7 |
-| Level 2 Pre | 8 / 9 / 3 | 2 / 6 / 9 / 3 | 15 | 5 |
-| Level 2 Post | 5 / 10 / 5 | 1 / 4 / 10 / 5 | 12 | 8 |
-| Level 3 Pre | 7 / 9 / 4 | 1 / 5 / 10 / 4 | 14 | 6 |
-| Level 3 Post | 4 / 10 / 6 | 0 / 4 / 10 / 6 | 10 | 10 |
-| Level 4 Pre | 6 / 10 / 4 | 1 / 4 / 10 / 5 | 13 | 7 |
-| Level 4 Post | 3 / 10 / 7 | 0 / 3 / 9 / 8 | 9 | 11 |
-| Level 5 Pre | 5 / 10 / 5 | 0 / 4 / 10 / 6 | 12 | 8 |
-| Level 5 Post | 2 / 10 / 8 | 0 / 2 / 9 / 9 | 8 | 12 |
-| Level 6 Pre | 4 / 10 / 6 | 0 / 3 / 9 / 8 | 10 | 10 |
-| Level 6 Post | 1 / 9 / 10 | 0 / 1 / 8 / 11 | 6 | 14 |
+| Ground Post | 8 / 8 / 4 | 2 / 7 / 7 / 4 | 10 | 10 |
+| Level 1 Pre | 10 / 8 / 2 | 3 / 7 / 8 / 2 | 8 | 12 |
+| Level 1 Post | 6 / 9 / 5 | 1 / 5 / 9 / 5 | 8 | 12 |
+| Level 2 Pre | 8 / 9 / 3 | 2 / 6 / 9 / 3 | 6 | 14 |
+| Level 2 Post | 5 / 10 / 5 | 1 / 4 / 10 / 5 | 6 | 14 |
+| Level 3 Pre | 7 / 9 / 4 | 1 / 5 / 10 / 4 | 4 | 16 |
+| Level 3 Post | 4 / 10 / 6 | 0 / 4 / 10 / 6 | 4 | 16 |
+| Level 4 Pre | 6 / 10 / 4 | 1 / 4 / 10 / 5 | 3 | 17 |
+| Level 4 Post | 3 / 10 / 7 | 0 / 3 / 9 / 8 | 3 | 17 |
+| Level 5 Pre | 5 / 10 / 5 | 0 / 4 / 10 / 6 | 2 | 18 |
+| Level 5 Post | 2 / 10 / 8 | 0 / 2 / 9 / 9 | 2 | 18 |
+| Level 6 Pre | 4 / 10 / 6 | 0 / 3 / 9 / 8 | 1 | 19 |
+| Level 6 Post | 1 / 9 / 10 | 0 / 1 / 8 / 11 | 1 | 19 |
 
 ## Ground Post-Test
 

@@ -165,7 +165,7 @@ export const MEASURELANDS_ASSESSMENT_BLUEPRINTS: readonly MeasurelandsLevelAsses
         ["Complete a day/week sequence.", "Place a familiar event in a routine and justify its position."],
       ),
     ],
-    forms: [form("posttest", { accessible: 8, moderate: 8, challenging: 4 }, { recall: 2, understanding: 7, application: 7, reasoning: 4 }, 16, 4)],
+    forms: [form("posttest", { accessible: 8, moderate: 8, challenging: 4 }, { recall: 2, understanding: 7, application: 7, reasoning: 4 }, 10, 10)],
   },
   {
     level: 1,
@@ -220,8 +220,8 @@ export const MEASURELANDS_ASSESSMENT_BLUEPRINTS: readonly MeasurelandsLevelAsses
       ),
     ],
     forms: [
-      form("pretest", { accessible: 10, moderate: 8, challenging: 2 }, { recall: 3, understanding: 7, application: 8, reasoning: 2 }, 16, 4),
-      form("posttest", { accessible: 6, moderate: 9, challenging: 5 }, { recall: 1, understanding: 5, application: 9, reasoning: 5 }, 13, 7),
+      form("pretest", { accessible: 10, moderate: 8, challenging: 2 }, { recall: 3, understanding: 7, application: 8, reasoning: 2 }, 8, 12),
+      form("posttest", { accessible: 6, moderate: 9, challenging: 5 }, { recall: 1, understanding: 5, application: 9, reasoning: 5 }, 8, 12),
     ],
   },
   {
@@ -307,8 +307,8 @@ export const MEASURELANDS_ASSESSMENT_BLUEPRINTS: readonly MeasurelandsLevelAsses
       ),
     ],
     forms: [
-      form("pretest", { accessible: 8, moderate: 9, challenging: 3 }, { recall: 2, understanding: 6, application: 9, reasoning: 3 }, 15, 5),
-      form("posttest", { accessible: 5, moderate: 10, challenging: 5 }, { recall: 1, understanding: 4, application: 10, reasoning: 5 }, 12, 8),
+      form("pretest", { accessible: 8, moderate: 9, challenging: 3 }, { recall: 2, understanding: 6, application: 9, reasoning: 3 }, 6, 14),
+      form("posttest", { accessible: 5, moderate: 10, challenging: 5 }, { recall: 1, understanding: 4, application: 10, reasoning: 5 }, 6, 14),
     ],
   },
   {
@@ -405,8 +405,8 @@ export const MEASURELANDS_ASSESSMENT_BLUEPRINTS: readonly MeasurelandsLevelAsses
       },
     ],
     forms: [
-      form("pretest", { accessible: 7, moderate: 9, challenging: 4 }, { recall: 1, understanding: 5, application: 10, reasoning: 4 }, 14, 6),
-      form("posttest", { accessible: 4, moderate: 10, challenging: 6 }, { recall: 0, understanding: 4, application: 10, reasoning: 6 }, 10, 10),
+      form("pretest", { accessible: 7, moderate: 9, challenging: 4 }, { recall: 1, understanding: 5, application: 10, reasoning: 4 }, 4, 16),
+      form("posttest", { accessible: 4, moderate: 10, challenging: 6 }, { recall: 0, understanding: 4, application: 10, reasoning: 6 }, 4, 16),
     ],
   },
   {
@@ -477,8 +477,8 @@ export const MEASURELANDS_ASSESSMENT_BLUEPRINTS: readonly MeasurelandsLevelAsses
       ),
     ],
     forms: [
-      form("pretest", { accessible: 6, moderate: 10, challenging: 4 }, { recall: 1, understanding: 4, application: 10, reasoning: 5 }, 13, 7),
-      form("posttest", { accessible: 3, moderate: 10, challenging: 7 }, { recall: 0, understanding: 3, application: 9, reasoning: 8 }, 9, 11),
+      form("pretest", { accessible: 6, moderate: 10, challenging: 4 }, { recall: 1, understanding: 4, application: 10, reasoning: 5 }, 3, 17),
+      form("posttest", { accessible: 3, moderate: 10, challenging: 7 }, { recall: 0, understanding: 3, application: 9, reasoning: 8 }, 3, 17),
     ],
   },
   {
@@ -549,8 +549,8 @@ export const MEASURELANDS_ASSESSMENT_BLUEPRINTS: readonly MeasurelandsLevelAsses
       ),
     ],
     forms: [
-      form("pretest", { accessible: 5, moderate: 10, challenging: 5 }, { recall: 0, understanding: 4, application: 10, reasoning: 6 }, 12, 8),
-      form("posttest", { accessible: 2, moderate: 10, challenging: 8 }, { recall: 0, understanding: 2, application: 9, reasoning: 9 }, 8, 12),
+      form("pretest", { accessible: 5, moderate: 10, challenging: 5 }, { recall: 0, understanding: 4, application: 10, reasoning: 6 }, 2, 18),
+      form("posttest", { accessible: 2, moderate: 10, challenging: 8 }, { recall: 0, understanding: 2, application: 9, reasoning: 9 }, 2, 18),
     ],
   },
   {
@@ -621,8 +621,8 @@ export const MEASURELANDS_ASSESSMENT_BLUEPRINTS: readonly MeasurelandsLevelAsses
       ),
     ],
     forms: [
-      form("pretest", { accessible: 4, moderate: 10, challenging: 6 }, { recall: 0, understanding: 3, application: 9, reasoning: 8 }, 10, 10),
-      form("posttest", { accessible: 1, moderate: 9, challenging: 10 }, { recall: 0, understanding: 1, application: 8, reasoning: 11 }, 6, 14),
+      form("pretest", { accessible: 4, moderate: 10, challenging: 6 }, { recall: 0, understanding: 3, application: 9, reasoning: 8 }, 1, 19),
+      form("posttest", { accessible: 1, moderate: 9, challenging: 10 }, { recall: 0, understanding: 1, application: 8, reasoning: 11 }, 1, 19),
     ],
   },
 ] as const;

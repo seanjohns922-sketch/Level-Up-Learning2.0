@@ -23,7 +23,8 @@ const approvalDocument = fs.readFileSync(
   new URL("../docs/measurelands/assessment-blueprint.md", import.meta.url),
   "utf8",
 );
-assert.match(approvalDocument, /Draft - awaiting explicit approval/);
+assert.match(approvalDocument, /Status: \*\*Approved; independent-bank rebuild pending\*\*/);
+assert.doesNotMatch(approvalDocument, /Draft - awaiting explicit approval/);
 
 for (const blueprint of MEASURELANDS_ASSESSMENT_BLUEPRINTS) {
   assert.deepEqual(
