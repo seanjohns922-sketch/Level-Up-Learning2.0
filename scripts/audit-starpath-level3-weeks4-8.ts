@@ -3,7 +3,7 @@ import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprin
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { LEVEL_THREE_LESSON_CONTENT } from "@/data/activities/starpath/level3/index";
 import { fiveFrom } from "@/data/activities/starpath/level1/quizUtils";
-import { createFindLandmarkTaskSet, createMapExplorerTaskSet, createMapSymbolsTaskSet } from "@/data/activities/starpath/level3/week4";
+import { createExplorerViewTaskSet, createMapExplorerTaskSet, createMapSymbolsTaskSet } from "@/data/activities/starpath/level3/week4";
 import { createDrawCampTaskSet, createMapBuilderTaskSet, createPlaceLandmarksTaskSet } from "@/data/activities/starpath/level3/week5";
 import { createMissionControlTaskSet, createObservatoryMissionTaskSet, createTreasureHuntTaskSet } from "@/data/activities/starpath/level3/week6";
 import { createExplorerChallengeTaskSet, createNavigatorChallengeTaskSet, createRescueMissionTaskSet } from "@/data/activities/starpath/level3/week7";
@@ -67,7 +67,7 @@ function assertMapCreateSolvable(task: MapCreateTask, label: string) {
 }
 
 const lessonFactories: Array<[string, Factory]> = [
-  ["W4 L1", createMapSymbolsTaskSet], ["W4 L2", createFindLandmarkTaskSet], ["W4 L3", createMapExplorerTaskSet],
+  ["W4 L1", createMapSymbolsTaskSet], ["W4 L2", createExplorerViewTaskSet], ["W4 L3", createMapExplorerTaskSet],
   ["W5 L1", createDrawCampTaskSet], ["W5 L2", createPlaceLandmarksTaskSet], ["W5 L3", createMapBuilderTaskSet],
   ["W6 L1", createTreasureHuntTaskSet], ["W6 L2", createObservatoryMissionTaskSet], ["W6 L3", createMissionControlTaskSet],
   ["W7 L1", createExplorerChallengeTaskSet], ["W7 L2", createRescueMissionTaskSet], ["W7 L3", createNavigatorChallengeTaskSet],
@@ -90,7 +90,7 @@ for (const mode of ["name", "compare", "classify", "build", "find"] as const) {
 }
 
 const quizSpecs: Array<[number, () => PracticeTask[], [Factory, Factory, Factory]]> = [
-  [4, buildLevelThreeWeek4VoyageQuiz, [createMapSymbolsTaskSet, createFindLandmarkTaskSet, createMapExplorerTaskSet]],
+  [4, buildLevelThreeWeek4VoyageQuiz, [createMapSymbolsTaskSet, createExplorerViewTaskSet, createMapExplorerTaskSet]],
   [5, buildLevelThreeWeek5VoyageQuiz, [createDrawCampTaskSet, createPlaceLandmarksTaskSet, createMapBuilderTaskSet]],
   [6, buildLevelThreeWeek6VoyageQuiz, [createTreasureHuntTaskSet, createObservatoryMissionTaskSet, createMissionControlTaskSet]],
   [7, buildLevelThreeWeek7VoyageQuiz, [createExplorerChallengeTaskSet, createRescueMissionTaskSet, createNavigatorChallengeTaskSet]],

@@ -9,6 +9,9 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type MapTask = Extract<PracticeTask, { kind: "starpathMapLocate" }>;
 
+// Explorer facing → rotation of an up-pointing arrow toward that map edge.
+const FACING_ROTATION: Record<"N" | "E" | "S" | "W", number> = { N: 0, E: 90, S: 180, W: 270 };
+
 const MAP_STYLE = (
   <style>{`
     @keyframes sp-map-shake { 0%,100%{transform:translate(-50%,-50%)} 25%{transform:translate(calc(-50% - 4px),-50%)} 75%{transform:translate(calc(-50% + 4px),-50%)} }
@@ -49,6 +52,26 @@ function MapView({
       {task.highlight ? (
         <GridMarker cell={task.highlight} cols={task.cols} rows={task.rows} z={4}>
           <span className="h-4/5 w-4/5 rounded-xl border-2 border-dashed border-amber-300 bg-amber-300/20" />
+        </GridMarker>
+      ) : null}
+      {task.explorer ? (
+        <GridMarker cell={task.explorer} cols={task.cols} rows={task.rows} z={20}>
+          <div className="relative flex h-[94%] w-[94%] items-center justify-center rounded-xl border-2 border-amber-300/80 bg-amber-400/15">
+            {task.explorer.facing ? (
+              // Inline transform only (no Tailwind translate) so the rotate never
+              // collides with a translate on the CSS `translate` property.
+              <svg
+                viewBox="0 0 40 40"
+                className="pointer-events-none absolute inset-0 h-full w-full"
+                style={{ transform: `rotate(${FACING_ROTATION[task.explorer.facing]}deg)` }}
+                aria-hidden="true"
+              >
+                <path d="M20 1.5 L27 13 L20 9.5 L13 13 Z" fill="#fde047" stroke="#a16207" strokeWidth="1.4" strokeLinejoin="round" />
+              </svg>
+            ) : null}
+            <PositionObjectVisual objectId="rocket" className="h-1/2 w-1/2" />
+            <span className="pointer-events-none absolute bottom-0.5 rounded bg-slate-900/75 px-1 text-[7px] font-black leading-tight text-amber-200">YOU</span>
+          </div>
         </GridMarker>
       ) : null}
       {task.landmarks.map((landmark) => {

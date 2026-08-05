@@ -2349,7 +2349,7 @@ export type PracticeTask = (
       // tap a named landmark, name what sits at a highlighted spot, or reason
       // about a landmark's position relative to another.
       kind: "starpathMapLocate";
-      mode: "find" | "whatIsHere" | "relative" | "clues" | "symbol";
+      mode: "find" | "whatIsHere" | "relative" | "clues" | "symbol" | "viewpoint";
       prompt: string;
       speakText: string;
       target: number;
@@ -2363,6 +2363,8 @@ export type PracticeTask = (
       correctLandmarkId?: string;
       /** whatIsHere: the highlighted cell. */
       highlight?: { r: number; c: number };
+      /** viewpoint: the explorer's tile, and the facing to show (omit facing to hide it when facing is the answer). Egocentric ahead/left/right are read from this facing, not map-north. */
+      explorer?: { r: number; c: number; facing?: "N" | "E" | "S" | "W" };
       /** whatIsHere / relative / clues: multiple-choice options. */
       options?: Array<{ id: string; label: string }>;
       correctOptionId?: string;
