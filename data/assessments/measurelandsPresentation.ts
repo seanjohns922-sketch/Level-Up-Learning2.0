@@ -58,6 +58,7 @@ type PresentationInput = {
   inputMode?: Question["inputMode"];
   skillId?: string;
   questionType?: string;
+  sourceTask?: unknown;
   selected: boolean;
 };
 
@@ -140,9 +141,25 @@ function requiredVisual(prompt: string, visual?: Question["visual"]): Question["
     return /\b(?:read|shown|show)\b/i.test(prompt) ? visual : undefined;
   }
   if (kind === "clock") return /(?:read|shown|show).{0,30}clock|clock.{0,30}(?:shown|show)/i.test(prompt) ? visual : undefined;
-  if (kind === "rectangle") return /\b(?:this|shown|diagram|plan|outline)\b/i.test(prompt) ? visual : undefined;
+  if (kind === "rectangle") {
+    return /\b(?:area|perimeter|boundary|fencing|frame|surface|painted|cover|diagram|plan|outline|shown)\b/i.test(prompt)
+      ? visual
+      : undefined;
+  }
   if (kind === "angle") return /\b(?:read|shown|estimate|protractor)\b/i.test(prompt) ? visual : undefined;
   return visual;
+}
+
+function perimeterSourceVisual(sourceTask: unknown): Question["visual"] {
+  if (typeof sourceTask !== "object" || sourceTask === null) return undefined;
+  const task = sourceTask as { kind?: unknown; poly?: unknown; sideLabels?: unknown; unit?: unknown };
+  if (task.kind !== "perimeterCalc" || !Array.isArray(task.poly) || !Array.isArray(task.sideLabels)) return undefined;
+  const points = task.poly.filter((point): point is [number, number] => (
+    Array.isArray(point) && point.length === 2 && point.every((value) => typeof value === "number" && Number.isFinite(value))
+  ));
+  const sideLabels = task.sideLabels.filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+  if (points.length < 3 || sideLabels.length !== points.length) return undefined;
+  return { kind: "perimeterShape", points, sideLabels, unit: typeof task.unit === "string" ? task.unit : "" };
 }
 
 export function conciseMeasurelandsPrompt(prompt: string, domain?: string, visual?: Question["visual"]): string {
@@ -180,6 +197,7 @@ export function prepareMeasurelandsAssessmentPresentation(input: PresentationInp
 } {
   const prompt = conciseMeasurelandsPrompt(input.prompt, input.domain, input.visual);
   const visual = requiredVisual(input.prompt, input.visual)
+    ?? perimeterSourceVisual(input.sourceTask)
     ?? (input.selected ? deriveMeasurelandsContextVisual({ prompt: input.prompt, skillId: input.skillId, type: input.questionType }) : undefined);
   if (input.selected) return { prompt, visual, inputMode: input.inputMode };
 

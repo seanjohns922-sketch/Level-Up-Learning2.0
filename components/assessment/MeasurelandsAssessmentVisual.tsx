@@ -49,6 +49,30 @@ function RectShape({ w, h, mode, unit = "", sample = false }: { w: number; h: nu
   );
 }
 
+function PerimeterShape({ points, sideLabels, unit }: { points: Array<[number, number]>; sideLabels: number[]; unit: string }) {
+  const xs = points.map(([x]) => x);
+  const ys = points.map(([, y]) => y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const width = Math.max(1, maxX - minX), height = Math.max(1, maxY - minY);
+  const scale = Math.min(230 / width, 105 / height);
+  const mapped = points.map(([x, y]) => [65 + (x - minX) * scale, 32 + (y - minY) * scale] as [number, number]);
+  const centre = mapped.reduce(([sx, sy], [x, y]) => [sx + x / mapped.length, sy + y / mapped.length], [0, 0]);
+  const suffix = unit ? ` ${unit}` : "";
+  return (
+    <svg viewBox="0 0 360 175" className="w-full" style={{ maxHeight: 175 }} aria-label="Labelled boundary plan">
+      <polygon points={mapped.map(([x, y]) => `${x},${y}`).join(" ")} fill="rgba(199,154,62,0.18)" stroke={GOLD_DEEP} strokeWidth={4} strokeLinejoin="round" />
+      {mapped.map(([x1, y1], index) => {
+        const [x2, y2] = mapped[(index + 1) % mapped.length]!;
+        const midX = (x1 + x2) / 2, midY = (y1 + y2) / 2;
+        const dx = midX - centre[0], dy = midY - centre[1];
+        const distance = Math.max(1, Math.hypot(dx, dy));
+        const x = midX + (dx / distance) * 18, y = midY + (dy / distance) * 18;
+        return <text key={index} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize={13} fontWeight={900} fill={INK} stroke="#fff8e8" strokeWidth={6} paintOrder="stroke">{sideLabels[index]}{suffix}</text>;
+      })}
+    </svg>
+  );
+}
+
 // ── Metric conversion — GIVEN value → target unit as "?" (no answer) ───────────
 function Convert({ fromValue, fromUnit, toUnit }: { fromValue: number; fromUnit: string; toUnit: string }) {
   const chip = (main: string, sub: string, strong: boolean) => (
@@ -152,6 +176,8 @@ export default function MeasurelandsAssessmentVisual({ visual }: { visual: MzVis
       return <Panel label="Prism model"><MeasurelandsVolumeBuilder dims={{ l: visual.l, w: visual.w, h: visual.h }} cubes={[]} outline size={240} /></Panel>;
     case "rectangle":
       return <Panel label="Diagram"><RectShape w={visual.w} h={visual.h} mode={visual.mode} unit={visual.unit} sample={visual.sample} /></Panel>;
+    case "perimeterShape":
+      return <Panel label="Boundary plan"><PerimeterShape points={visual.points} sideLabels={visual.sideLabels} unit={visual.unit} /></Panel>;
     case "convert":
       return <Panel label="Convert the unit"><Convert fromValue={visual.fromValue} fromUnit={visual.fromUnit} toUnit={visual.toUnit} /></Panel>;
     case "objects":

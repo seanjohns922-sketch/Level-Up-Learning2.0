@@ -79,6 +79,7 @@ function presentQuestion(question: Question): Question {
     inputMode: question.inputMode,
     skillId: question.skillId,
     questionType: question.type,
+    sourceTask: renderer?.payload?.sourceTask,
     selected,
   });
   return {

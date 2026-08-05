@@ -59,7 +59,8 @@ for (const form of forms) {
       check(/\b(?:read|shown|show)\b/i.test(question.prompt), `${prefix} includes an instrument that is not required by its prompt.`);
     }
     if (kind === "clock") check(/clock/i.test(question.prompt), `${prefix} includes a clock that is not required by its prompt.`);
-    if (kind === "rectangle") check(/\b(?:this|shown|diagram|plan|outline)\b/i.test(question.prompt), `${prefix} includes a duplicate rectangle diagram.`);
+    if (kind === "rectangle") check(/\b(?:area|perimeter|boundary|fencing|frame|surface|painted|cover|diagram|plan|outline|shown)\b/i.test(question.prompt), `${prefix} includes an unrelated rectangle diagram.`);
+    if (kind === "perimeterShape") check(/\b(?:perimeter|boundary|outside edge|rail)\b/i.test(question.prompt), `${prefix} includes an unrelated boundary plan.`);
     if (kind === "angle") check(/\b(?:read|shown|estimate|protractor)\b/i.test(question.prompt), `${prefix} includes an angle diagram that is not required by its prompt.`);
 
     if (question.type !== "numeric") continue;
@@ -104,6 +105,11 @@ check(protractorCardSource.includes('guidance={assessmentMode ? "none"'), "Asses
 check(!protractorCardSource.includes("Target: {target}° — drag") || protractorCardSource.includes("!assessmentMode ?"), "Assessment construction protractor exposes a target hint.");
 check(metricUnitCardSource.includes('<MeasurelandsObjectArt name={o.label}'), "Metric-unit assessment tasks still render object emoji instead of commissioned art.");
 check(fs.existsSync(path.join(root, "public/images/measurelands/week2-3d/parcel.png")), "The Level 5 parcel unit-choice task has no commissioned art asset.");
+
+for (const id of ["y5-measurement-post-06-v2", "y5-measurement-post-12-v2", "y5-measurement-pre-16-v2"]) {
+  const question = forms.flatMap((form) => form.questions).find((item) => item.id === id);
+  check((question?.visual as { kind?: unknown } | undefined)?.kind === "perimeterShape", `${id} does not expose its labelled boundary plan.`);
+}
 check(toMeasurelandsTimeResponse("7", "25", "12h_meridiem", "AM") === "0725", "7:25 AM is not accepted as canonical 0725.");
 check(toMeasurelandsTimeResponse("7", "15", "12h_meridiem", "PM") === "1915", "7:15 PM is not accepted as canonical 1915.");
 check(toMeasurelandsTimeResponse("12", "20", "12h_meridiem", "AM") === "0020", "12:20 AM is not converted to canonical midnight time.");
