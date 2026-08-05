@@ -161,7 +161,96 @@ const SATELLITE: L3Model = {
   ],
 };
 
-export const L3_MODELS: L3Model[] = [ROCKET, ROVER, ROBOT, SATELLITE];
+const SHUTTLE: L3Model = {
+  id: "shuttle",
+  name: "Space Shuttle",
+  prompt: "Build the Space Shuttle.",
+  viewBox: "0 0 280 180",
+  defs: `<defs>
+    <linearGradient id="sh-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8fafc"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
+    <linearGradient id="sh-nose" x1="0" x2="1"><stop offset="0" stop-color="#fecaca"/><stop offset="1" stop-color="#dc2626"/></linearGradient>
+    <linearGradient id="sh-wing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cbd5e1"/><stop offset="1" stop-color="#475569"/></linearGradient>
+    <linearGradient id="sh-fin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fca5a5"/><stop offset="1" stop-color="#b91c1c"/></linearGradient>
+    <radialGradient id="sh-win" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#ecfeff"/><stop offset="0.5" stop-color="#67e8f9"/><stop offset="1" stop-color="#0891b2"/></radialGradient>
+  </defs>`,
+  parts: [
+    { id: "wing", label: "Wing", shape: "triangle", hit: { x: 150, y: 106, w: 92, h: 46 },
+      solid: `<path d="M150 108 L240 150 L240 108 Z" fill="url(#sh-wing)" stroke="#334155" stroke-width="3" stroke-linejoin="round"/>`,
+      ghost: `<path d="M150 108 L240 150 L240 108 Z" ${G}/>` },
+    { id: "body", label: "Body", shape: "cylinder", hit: { x: 78, y: 64, w: 150, h: 52 },
+      solid: `<path d="M80 66 H224 A10 24 0 0 1 224 114 H80 Z" fill="url(#sh-body)" stroke="#475569" stroke-width="3" stroke-linejoin="round"/><ellipse cx="224" cy="90" rx="10" ry="24" fill="#e2e8f0" stroke="#475569" stroke-width="3"/>`,
+      ghost: `<path d="M80 66 H224 A10 24 0 0 1 224 114 H80 Z" ${G}/>` },
+    { id: "nose", label: "Nose", shape: "cone", hit: { x: 40, y: 64, w: 44, h: 52 },
+      solid: `<path d="M44 90 L80 66 A8 24 0 0 0 80 114 Z" fill="url(#sh-nose)" stroke="#7f1d1d" stroke-width="3" stroke-linejoin="round"/>`,
+      ghost: `<path d="M44 90 L80 66 A8 24 0 0 0 80 114 Z" ${G}/>` },
+    { id: "fin", label: "Tail fin", shape: "triangle", hit: { x: 194, y: 28, w: 34, h: 40 },
+      solid: `<path d="M196 66 L222 30 L224 66 Z" fill="url(#sh-fin)" stroke="#7f1d1d" stroke-width="3" stroke-linejoin="round"/>`,
+      ghost: `<path d="M196 66 L222 30 L224 66 Z" ${G}/>` },
+    { id: "window", label: "Window", shape: "circle", hit: { x: 88, y: 70, w: 32, h: 32 },
+      solid: `<circle cx="104" cy="86" r="10" fill="url(#sh-win)" stroke="#155e75" stroke-width="3"/><ellipse cx="100" cy="82" rx="3" ry="2" fill="#fff" opacity="0.6"/>`,
+      ghost: `<circle cx="104" cy="86" r="10" ${G}/>` },
+  ],
+};
+
+const TELESCOPE: L3Model = {
+  id: "telescope",
+  name: "Star Telescope",
+  prompt: "Build the Star Telescope.",
+  viewBox: "0 0 220 250",
+  defs: `<defs>
+    <linearGradient id="tp-tube" x1="0" x2="1"><stop offset="0" stop-color="#ddd6fe"/><stop offset="0.5" stop-color="#8b5cf6"/><stop offset="1" stop-color="#5b21b6"/></linearGradient>
+    <radialGradient id="tp-lens" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#cffafe"/><stop offset="0.5" stop-color="#22d3ee"/><stop offset="1" stop-color="#0e7490"/></radialGradient>
+    <linearGradient id="tp-leg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cbd5e1"/><stop offset="1" stop-color="#475569"/></linearGradient>
+  </defs>`,
+  parts: [
+    { id: "leg-left", label: "Left leg", shape: "rectangle", hit: { x: 48, y: 150, w: 54, h: 84 },
+      solid: `<path d="M96 152 L110 152 L64 230 L50 230 Z" fill="url(#tp-leg)" stroke="#334155" stroke-width="3" stroke-linejoin="round"/>`,
+      ghost: `<path d="M96 152 L110 152 L64 230 L50 230 Z" ${G}/>` },
+    { id: "leg-mid", label: "Middle leg", shape: "rectangle", hit: { x: 100, y: 150, w: 20, h: 86 },
+      solid: `<rect x="102" y="150" width="16" height="82" rx="4" fill="url(#tp-leg)" stroke="#334155" stroke-width="3"/>`,
+      ghost: `<rect x="102" y="150" width="16" height="82" rx="4" ${G}/>` },
+    { id: "leg-right", label: "Right leg", shape: "rectangle", hit: { x: 118, y: 150, w: 54, h: 84 },
+      solid: `<path d="M110 152 L124 152 L170 230 L156 230 Z" fill="url(#tp-leg)" stroke="#334155" stroke-width="3" stroke-linejoin="round"/>`,
+      ghost: `<path d="M110 152 L124 152 L170 230 L156 230 Z" ${G}/>` },
+    { id: "tube", label: "Tube", shape: "cylinder", hit: { x: 82, y: 46, w: 56, h: 110 },
+      solid: `<path d="M84 50 V152 A26 10 0 0 0 136 152 V50 Z" fill="url(#tp-tube)" stroke="#4c1d95" stroke-width="3" stroke-linejoin="round"/><ellipse cx="110" cy="50" rx="26" ry="10" fill="#ddd6fe" stroke="#4c1d95" stroke-width="3"/>`,
+      ghost: `<path d="M84 50 V152 A26 10 0 0 0 136 152 V50 Z" ${G}/>` },
+    { id: "lens", label: "Lens", shape: "circle", hit: { x: 88, y: 26, w: 44, h: 44 },
+      solid: `<circle cx="110" cy="48" r="19" fill="url(#tp-lens)" stroke="#0e7490" stroke-width="3"/><ellipse cx="103" cy="42" rx="6" ry="3.5" fill="#fff" opacity="0.6"/>`,
+      ghost: `<circle cx="110" cy="48" r="19" ${G}/>` },
+  ],
+};
+
+const STATION: L3Model = {
+  id: "station",
+  name: "Space Station",
+  prompt: "Build the Space Station.",
+  viewBox: "0 0 290 180",
+  defs: `<defs>
+    <linearGradient id="st-core" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e8f0"/><stop offset="1" stop-color="#64748b"/></linearGradient>
+    <radialGradient id="st-pod" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#fde68a"/><stop offset="0.4" stop-color="#f59e0b"/><stop offset="1" stop-color="#b45309"/></radialGradient>
+    <linearGradient id="st-panel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#1e3a8a"/></linearGradient>
+  </defs>`,
+  parts: [
+    { id: "panel-top", label: "Top panel", shape: "rectangle", hit: { x: 116, y: 18, w: 58, h: 54 },
+      solid: `<rect x="118" y="22" width="54" height="48" rx="4" fill="url(#st-panel)" stroke="#0c1e57" stroke-width="3"/><path d="M145 22 V70 M118 46 H172" stroke="#93c5fd" stroke-width="1.5" opacity="0.7"/>`,
+      ghost: `<rect x="118" y="22" width="54" height="48" rx="4" ${G}/>` },
+    { id: "panel-bottom", label: "Bottom panel", shape: "rectangle", hit: { x: 116, y: 108, w: 58, h: 54 },
+      solid: `<rect x="118" y="110" width="54" height="48" rx="4" fill="url(#st-panel)" stroke="#0c1e57" stroke-width="3"/><path d="M145 110 V158 M118 134 H172" stroke="#93c5fd" stroke-width="1.5" opacity="0.7"/>`,
+      ghost: `<rect x="118" y="110" width="54" height="48" rx="4" ${G}/>` },
+    { id: "core", label: "Core module", shape: "cylinder", hit: { x: 114, y: 70, w: 62, h: 40 },
+      solid: `<rect x="108" y="70" width="74" height="40" fill="url(#st-core)" stroke="#475569" stroke-width="3"/><ellipse cx="108" cy="90" rx="10" ry="20" fill="#cbd5e1" stroke="#475569" stroke-width="3"/><ellipse cx="182" cy="90" rx="10" ry="20" fill="#f1f5f9" stroke="#475569" stroke-width="3"/>`,
+      ghost: `<rect x="108" y="70" width="74" height="40" ${G}/>` },
+    { id: "pod-left", label: "Left pod", shape: "sphere", hit: { x: 72, y: 64, w: 44, h: 52 },
+      solid: `<circle cx="100" cy="90" r="26" fill="url(#st-pod)" stroke="#7c2d12" stroke-width="3"/><ellipse cx="90" cy="80" rx="8" ry="5" fill="#fff7ed" opacity="0.5"/>`,
+      ghost: `<circle cx="100" cy="90" r="26" ${G}/>` },
+    { id: "pod-right", label: "Right pod", shape: "sphere", hit: { x: 174, y: 64, w: 44, h: 52 },
+      solid: `<circle cx="190" cy="90" r="26" fill="url(#st-pod)" stroke="#7c2d12" stroke-width="3"/><ellipse cx="180" cy="80" rx="8" ry="5" fill="#fff7ed" opacity="0.5"/>`,
+      ghost: `<circle cx="190" cy="90" r="26" ${G}/>` },
+  ],
+};
+
+export const L3_MODELS: L3Model[] = [ROCKET, ROVER, ROBOT, SATELLITE, SHUTTLE, TELESCOPE, STATION];
 
 export function getL3Model(round: number): L3Model {
   return L3_MODELS[round % L3_MODELS.length]!;
