@@ -2,8 +2,52 @@ import type { Question } from "@/data/assessments/posttests";
 
 export type MeasurelandsAnswerFormat =
   | { kind: "number"; unit?: string; ariaLabel: string }
-  | { kind: "time"; ariaLabel: string; storage: "hhmm" }
+  | { kind: "time"; ariaLabel: string; storage: "hhmm"; mode: "12h_meridiem" | "12h" | "24h" }
   | { kind: "pair"; labels: [string, string]; separator: string; ariaLabel: string };
+
+export type MeasurelandsMeridiem = "AM" | "PM";
+
+export function toMeasurelandsTimeResponse(
+  hourText: string,
+  minuteText: string,
+  mode: Extract<MeasurelandsAnswerFormat, { kind: "time" }>["mode"],
+  meridiem?: MeasurelandsMeridiem | null,
+): string {
+  if (!/^\d{1,2}$/.test(hourText) || !/^\d{2}$/.test(minuteText)) return "";
+  const hour = Number(hourText);
+  const minute = Number(minuteText);
+  if (minute < 0 || minute > 59) return "";
+
+  if (mode === "24h") {
+    if (hour < 0 || hour > 23) return "";
+    return `${String(hour).padStart(2, "0")}${String(minute).padStart(2, "0")}`;
+  }
+
+  if (hour < 1 || hour > 12) return "";
+  if (mode === "12h") return `${String(hour).padStart(2, "0")}${String(minute).padStart(2, "0")}`;
+  if (!meridiem) return "";
+  const hour24 = meridiem === "AM"
+    ? hour === 12 ? 0 : hour
+    : hour === 12 ? 12 : hour + 12;
+  return `${String(hour24).padStart(2, "0")}${String(minute).padStart(2, "0")}`;
+}
+
+export function fromMeasurelandsTimeResponse(
+  value: string,
+  mode: Extract<MeasurelandsAnswerFormat, { kind: "time" }>["mode"],
+): { hour: string; minute: string; meridiem: MeasurelandsMeridiem | null } {
+  if (!/^\d{1,4}$/.test(value)) return { hour: "", minute: "", meridiem: null };
+  const canonical = value.padStart(4, "0");
+  const hour24 = Number(canonical.slice(0, 2));
+  const minute = canonical.slice(2, 4);
+  if (mode === "24h") return { hour: canonical.slice(0, 2), minute, meridiem: null };
+  if (mode === "12h") return { hour: String(hour24 || 12), minute, meridiem: null };
+  return {
+    hour: String(hour24 % 12 || 12),
+    minute,
+    meridiem: hour24 < 12 ? "AM" : "PM",
+  };
+}
 
 type PresentationInput = {
   prompt: string;
@@ -138,7 +182,15 @@ export function prepareMeasurelandsAssessmentPresentation(input: PresentationInp
   const isTime = (/four digits|24-hour time|time as/i.test(input.prompt) || input.domain === "clock" || input.domain === "time24")
     && /^\d{1,4}$/.test(input.correctAnswer);
   const isPair = input.inputMode === "text" && input.correctAnswer.includes(",");
-  if (isTime) return { prompt, visual, inputMode: "text", answerFormat: { kind: "time", storage: "hhmm", ariaLabel: "Time" } };
+  if (isTime) {
+    const visualKind = typeof input.visual === "object" && input.visual !== null && "kind" in input.visual
+      ? String((input.visual as { kind?: unknown }).kind)
+      : "";
+    const explicit24Hour = /24-hour time/i.test(input.prompt) || input.domain === "time24";
+    const hasTimeOfDayContext = visualKind === "clock" || /\b(?:am|pm|morning|afternoon|evening|midday|midnight|breakfast|lunch)\b/i.test(input.prompt);
+    const mode = explicit24Hour ? "24h" : hasTimeOfDayContext ? "12h_meridiem" : "12h";
+    return { prompt, visual, inputMode: "text", answerFormat: { kind: "time", storage: "hhmm", mode, ariaLabel: mode === "24h" ? "24-hour time" : "Time" } };
+  }
   if (isPair) {
     const labels: [string, string] = input.domain === "angle" ? ["x", "y"] : ["Length", "Width"];
     const pairPrompt = input.domain === "angle"

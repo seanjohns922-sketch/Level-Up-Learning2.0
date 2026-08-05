@@ -30,7 +30,7 @@ type ClassRow = {
   school_id?: string | null;
   brain_break_frequency?: string | null;
 };
-type StudentRow = { id: string; display_name: string; username?: string | null; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null; school_year_level?: string | null; working_level?: string | null; year_level?: string | null; brain_break_frequency?: string | null };
+type StudentRow = { id: string; display_name: string; username?: string | null; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null; school_year_level?: string | null; working_level?: string | null; year_level?: string | null; brain_break_frequency?: string | null; archived_at?: string | null };
 type ProgressRow = {
   student_id: string;
   realm_id?: string;
@@ -441,7 +441,8 @@ export default function TeacherDashboardPage() {
       const { data: studs, error: studErr } = await supabase
         .from("students")
         .select("*")
-        .eq("class_id", classId);
+        .eq("class_id", classId)
+        .is("archived_at", null);
       if (studErr) throw studErr;
       const newStuds = studs ?? [];
       console.log("[TeacherDashboard] students fetched for selectedClassId:", classId, "count:", newStuds.length);
@@ -517,7 +518,9 @@ export default function TeacherDashboardPage() {
   const schoolHomeId =
     schoolPreviewSchoolId ?? selectedClass?.school_id ?? null;
   const schoolLogo = schoolLogoFor(schoolName);
-  const classStudents = students.filter((s) => s.class_id === selectedClassId);
+  const classStudents = students.filter(
+    (student) => student.class_id === selectedClassId && !student.archived_at,
+  );
 
   useEffect(() => {
     let cancelled = false;

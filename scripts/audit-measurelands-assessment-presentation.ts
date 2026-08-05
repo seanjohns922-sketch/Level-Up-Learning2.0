@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { isAssessmentAnswerCorrect } from "../data/assessments/analysis";
 import { getMeasurelandsPosttestForYear, getMeasurelandsPretestForYear } from "../data/assessments/measurelands";
+import { fromMeasurelandsTimeResponse, toMeasurelandsTimeResponse } from "../data/assessments/measurelandsPresentation";
 import type { Question } from "../data/assessments/posttests";
 
 type Form = { key: string; questions: Question[] };
@@ -53,6 +54,14 @@ for (const form of forms) {
       const response = question.correctAnswer.padStart(4, "0");
       check(/^\d{4}$/.test(response), `${prefix} cannot be represented by the HH:MM widget.`);
       check(isAssessmentAnswerCorrect(question, response), `${prefix} rejects the HH:MM widget's canonical response.`);
+      const fields = fromMeasurelandsTimeResponse(question.correctAnswer, question.answerFormat.mode);
+      const widgetResponse = toMeasurelandsTimeResponse(fields.hour, fields.minute, question.answerFormat.mode, fields.meridiem);
+      check(widgetResponse === response, `${prefix} cannot round-trip through its ${question.answerFormat.mode} widget.`);
+      check(isAssessmentAnswerCorrect(question, widgetResponse), `${prefix} rejects the displayed time response.`);
+      if (question.answerFormat.mode === "12h_meridiem") {
+        check(fields.hour.length === 1 || fields.hour.length === 2, `${prefix} does not expose a natural 12-hour value.`);
+        check(fields.meridiem === "AM" || fields.meridiem === "PM", `${prefix} has no canonical AM/PM response.`);
+      }
     }
     if (question.answerFormat?.kind === "pair") {
       check(question.correctAnswer.includes(question.answerFormat.separator), `${prefix} pair format does not match its canonical answer.`);
@@ -74,9 +83,16 @@ const widgetSource = fs.readFileSync(path.join(root, "components/assessment/Meas
 const protractorCardSource = fs.readFileSync(path.join(root, "components/measurelands/MeasurelandsProtractorCard.tsx"), "utf8");
 check(cardSource.includes("<MeasurelandsAnswerWidget"), "AssessmentQuestionCard does not route Measurelands numeric items to the dedicated widget.");
 check(widgetSource.includes("format.unit") && widgetSource.includes('label="Hour"') && widgetSource.includes('label="Minutes"'), "Measurelands answer widget does not render fixed units and structured time fields.");
+check(widgetSource.includes('(["AM", "PM"] as const)') && widgetSource.includes('aria-label="Choose AM or PM"'), "Contextual 12-hour questions do not render the AM/PM chooser.");
 check(protractorCardSource.includes("showInteractiveReading={!assessmentMode}"), "Assessment construction protractor exposes its live numerical reading.");
 check(protractorCardSource.includes('guidance={assessmentMode ? "none"'), "Assessment protractor read/misconception scenes expose guidance.");
 check(!protractorCardSource.includes("Target: {target}° — drag") || protractorCardSource.includes("!assessmentMode ?"), "Assessment construction protractor exposes a target hint.");
+check(toMeasurelandsTimeResponse("7", "25", "12h_meridiem", "AM") === "0725", "7:25 AM is not accepted as canonical 0725.");
+check(toMeasurelandsTimeResponse("7", "15", "12h_meridiem", "PM") === "1915", "7:15 PM is not accepted as canonical 1915.");
+check(toMeasurelandsTimeResponse("12", "20", "12h_meridiem", "AM") === "0020", "12:20 AM is not converted to canonical midnight time.");
+check(toMeasurelandsTimeResponse("12", "13", "12h_meridiem", "PM") === "1213", "12:13 PM is not converted to canonical midday time.");
+check(toMeasurelandsTimeResponse("0", "20", "12h_meridiem", "AM") === "", "12-hour inputs accept hour zero.");
+check(toMeasurelandsTimeResponse("7", "5", "12h_meridiem", "AM") === "", "Time inputs accept an incomplete minute value.");
 
 console.log(`Measurelands assessment-presentation audit: ${passed} passed, ${failures.length} failed across ${forms.length} production forms.`);
 if (failures.length > 0) {
