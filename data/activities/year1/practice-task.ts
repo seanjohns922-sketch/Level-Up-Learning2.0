@@ -2451,6 +2451,110 @@ export type PracticeTask = (
       maxSteps?: number;
       feedback: { correct: string; wrong: string };
     }
+  | {
+      // Level 4 · W4 — Grid References. Create and interpret cell-based grid
+      // reference systems. These are letter-number cell references, not Year 5
+      // coordinate pairs or Cartesian axes.
+      kind: "starpathGridReference";
+      mode:
+        | "referenceToCell"
+        | "cellToReference"
+        | "referenceToLandmark"
+        | "landmarkToReference"
+        | "placeAtReference"
+        | "labelGrid"
+        | "debug"
+        | "typeReference"
+        | "repairLabels";
+      prompt: string;
+      speakText: string;
+      target: number;
+      mapId: string;
+      cols: number;
+      rows: number;
+      columnLabels: string[];
+      rowLabels: string[];
+      landmarks: Array<{ id: string; label: string; object: string; r: number; c: number }>;
+      reference?: string;
+      highlight?: { r: number; c: number };
+      correctCell?: { r: number; c: number };
+      correctLandmarkId?: string;
+      options?: Array<{ id: string; label: string }>;
+      correctOptionId?: string;
+      expectedReference?: string;
+      faultyColumnLabels?: string[];
+      faultyRowLabels?: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 4 · W5 — author and test pathways on a labelled cell grid.
+      kind: "starpathGridRoute";
+      mode: "trace" | "missingReference" | "author" | "checkpoint" | "debug" | "compare";
+      prompt: string;
+      speakText: string;
+      target: number;
+      mapId: string;
+      cols: number;
+      rows: number;
+      columnLabels: string[];
+      rowLabels: string[];
+      start: { r: number; c: number };
+      goal: { r: number; c: number; label: string };
+      blocked?: Array<{ r: number; c: number }>;
+      checkpoints?: Array<{ r: number; c: number; label: string }>;
+      route?: Array<"up" | "down" | "left" | "right">;
+      routeOptions?: Array<{ id: string; label: string; route: Array<"up" | "down" | "left" | "right"> }>;
+      correctOptionId?: string;
+      referenceOptions?: Array<{ id: string; label: string }>;
+      expectedReference?: string;
+      maxSteps: number;
+      rule: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 4 · W1–3 — open, bounded composite construction and model evaluation.
+      kind: "starpathComposite";
+      mode: "scan" | "construct" | "alternate" | "solid" | "views" | "hidden" | "simplify" | "model" | "evaluate";
+      prompt: string;
+      speakText: string;
+      target: number;
+      boardId: string;
+      cols: number;
+      rows: number;
+      palette: Array<{ id: string; label: string; colour: string }>;
+      targetCells: Array<{ r: number; c: number }>;
+      fixedCells?: Array<{ r: number; c: number; pieceId: string }>;
+      validSolutions: Array<Array<{ r: number; c: number; pieceId: string }>>;
+      requiredPieceIds?: string[];
+      maxPieces?: number;
+      viewLabels?: { front: number[]; side: number[]; top: number };
+      options?: Array<{ id: string; label: string }>;
+      correctOptionId?: string;
+      reasonOptions?: Array<{ id: string; label: string }>;
+      correctReasonId?: string;
+      designBrief: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 4 · W6–7 — construct and test line or rotational symmetry.
+      kind: "starpathSymmetry";
+      mode: "test" | "complete" | "create" | "repair" | "record";
+      prompt: string;
+      speakText: string;
+      target: number;
+      boardId: string;
+      size: number;
+      line?: "vertical" | "horizontal" | "diagonal";
+      rotation?: 90 | 180;
+      centre?: { r: number; c: number };
+      seedCells: Array<{ r: number; c: number; colour: string }>;
+      editableCells?: Array<{ r: number; c: number }>;
+      expectedCells: Array<{ r: number; c: number; colour: string }>;
+      options?: Array<{ id: string; label: string }>;
+      correctOptionIds?: string[];
+      minSeedCells?: number;
+      feedback: { correct: string; wrong: string };
+    }
   | StarpathObjectTask
   | {
       kind: "starpathShapeMatch";

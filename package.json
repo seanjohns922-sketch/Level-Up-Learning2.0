@@ -42,6 +42,8 @@
     "qa:starpath-coaching": "node scripts/starpath-coaching-insights-audit.mjs",
     "qa:starpath-level3-objects": "node --no-warnings --experimental-strip-types --loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-level3-objects.ts",
     "qa:starpath-level3-weeks4-8": "node --no-warnings --experimental-strip-types --loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-level3-weeks4-8.ts",
+    "qa:starpath-level4-week4": "node --no-warnings --experimental-strip-types --loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-level4-week4.ts",
+    "qa:starpath-level4": "node --no-warnings --experimental-strip-types --loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-level4.ts",
     "generate:starpath-curriculum": "node scripts/generate-starpath-curriculum-map.mjs",
     "qa:measurelands-progression": "node scripts/measurelands-progression-audit.mjs",
     "qa:level-integrity": "node scripts/level-integrity-audit.mjs",

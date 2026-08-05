@@ -30,6 +30,10 @@ import { buildLevelThreeWeek4VoyageQuiz } from "@/data/activities/starpath/level
 import { buildLevelThreeWeek5VoyageQuiz } from "@/data/activities/starpath/level3/week5Quiz";
 import { buildLevelThreeWeek6VoyageQuiz } from "@/data/activities/starpath/level3/week6Quiz";
 import { buildLevelThreeWeek7VoyageQuiz } from "@/data/activities/starpath/level3/week7Quiz";
+import { buildLevelFourWeek4VoyageQuiz } from "@/data/activities/starpath/level4/week4Quiz";
+import { buildLevelFourWeek1VoyageQuiz, buildLevelFourWeek2VoyageQuiz, buildLevelFourWeek3VoyageQuiz } from "@/data/activities/starpath/level4/compositeQuizzes";
+import { buildLevelFourWeek5VoyageQuiz } from "@/data/activities/starpath/level4/week5Quiz";
+import { buildLevelFourWeek6VoyageQuiz, buildLevelFourWeek7VoyageQuiz } from "@/data/activities/starpath/level4/symmetryQuizzes";
 
 // Ground Level · Week 1 Voyage Quiz — 15 questions, 5 from each lesson, using
 // single-answer shape tasks only (so every question is graded pass/fail).
@@ -91,6 +95,13 @@ const STARPATH_QUIZ_BUILDERS: Record<string, () => PracticeTask[]> = {
   "level-3-w5": buildLevelThreeWeek5VoyageQuiz,
   "level-3-w6": buildLevelThreeWeek6VoyageQuiz,
   "level-3-w7": buildLevelThreeWeek7VoyageQuiz,
+  "level-4-w4": buildLevelFourWeek4VoyageQuiz,
+  "level-4-w1": buildLevelFourWeek1VoyageQuiz,
+  "level-4-w2": buildLevelFourWeek2VoyageQuiz,
+  "level-4-w3": buildLevelFourWeek3VoyageQuiz,
+  "level-4-w5": buildLevelFourWeek5VoyageQuiz,
+  "level-4-w6": buildLevelFourWeek6VoyageQuiz,
+  "level-4-w7": buildLevelFourWeek7VoyageQuiz,
   // Week 8 has no weekly quiz — its assessment is the Post-Test.
 };
 

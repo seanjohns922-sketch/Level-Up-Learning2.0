@@ -223,13 +223,13 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
     likelyMisconceptions: ["Composite figures have one decomposition.", "Grid references identify lines rather than cells.", "Rotational symmetry means any rotation."],
     progressionRationale: "Construction becomes representational and approximate, maps become indexed grid systems, and visual invariance is formalised through two forms of symmetry.",
     weeks: [
-      W("Composite Shapes", "Compose, decompose and represent complex two-dimensional shapes.", ["AC9M4SP01"], skill("space-l4-composite-shapes", "Build composite shapes", "Represents composite shapes using combinations of familiar shapes and compares decompositions.", ["AC9M4SP01"], "construction-and-visualisation", ["space-l2-multi-feature-classification"]), [["Shapes Within Shapes", "Identify familiar components in a composite."], ["Build the Outline", "Compose a target using selected shapes."], ["Compare Decompositions", "Explain two representations of the same composite."]], ["composite-highlighter", "shape-composer", "decomposition-compare"], ["composite", "component", "outline", "overlap", "represent"], ["Components cannot overlap.", "A composite has one exact decomposition."], "Composite construction and equivalent representations."),
-      W("Composite Objects", "Represent three-dimensional objects with combinations and simple views.", ["AC9M4SP01"], skill("space-l4-composite-objects", "Represent composite objects", "Builds and represents composite objects from familiar solids, including partially hidden components.", ["AC9M4SP01"], "construction-and-visualisation", ["space-l3-spatial-construction", "space-l3-object-views"]), [["Combine the Solids", "Construct an object from specified components."], ["Match Build and View", "Connect a composite object with a two-dimensional view."], ["Hidden Block Reasoning", "Infer components needed to support a visible structure."]], ["solid-composer", "build-view-match", "hidden-block-inference"], ["solid", "layer", "view", "hidden", "support"], ["Only visible components exist.", "A single view uniquely determines every object."], "Composite objects, views and hidden structure."),
-      W("Approximate and Represent", "Choose familiar components to approximate real forms.", ["AC9M4SP01"], skill("space-l4-spatial-approximation", "Approximate a complex form", "Selects and combines familiar shapes or objects to make a useful approximation and explains limitations.", ["AC9M4SP01"], "spatial-representation", ["space-l4-composite-shapes", "space-l4-composite-objects"]), [["Simplify the Form", "Identify useful familiar components in a complex object."], ["Create an Approximation", "Build a representation that preserves key spatial features."], ["Evaluate the Model", "Explain what the approximation captures and omits."]], ["form-simplifier", "approximation-builder", "model-evaluator"], ["approximate", "model", "feature", "accurate", "limitation"], ["Approximate means careless or incorrect.", "A more detailed model is always more useful."], "Purposeful approximation and model evaluation."),
+      W("Composite Shapes", "Compose, decompose and represent complex two-dimensional shapes.", ["AC9M4SP01"], skill("space-l4-composite-shapes", "Build composite shapes", "Represents composite shapes using combinations of familiar shapes and compares decompositions.", ["AC9M4SP01"], "construction-and-visualisation", ["space-l2-multi-feature-classification"]), [["Shapes Within Shapes", "Identify familiar components in a composite."], ["Build the Outline", "Compose a target using selected shapes."], ["Different Builds, Same Shape", "Create and compare different representations of the same composite."]], ["composite-highlighter", "shape-composer", "decomposition-compare"], ["composite", "component", "outline", "overlap", "represent"], ["Components cannot overlap.", "A composite has one exact decomposition."], "Composite construction and equivalent representations."),
+      W("Composite Objects", "Represent three-dimensional objects with combinations and simple views.", ["AC9M4SP01"], skill("space-l4-composite-objects", "Represent composite objects", "Builds and represents composite objects from familiar solids, including partially hidden components.", ["AC9M4SP01"], "construction-and-visualisation", ["space-l3-spatial-construction", "space-l3-object-views"]), [["Combine the Solids", "Construct an object from specified components."], ["Build from a View", "Connect a composite object with front, side and top views."], ["Hidden Structure", "Infer components needed to support a visible structure."]], ["solid-composer", "build-view-match", "hidden-block-inference"], ["solid", "layer", "view", "hidden", "support"], ["Only visible components exist.", "A single view uniquely determines every object."], "Composite objects, views and hidden structure."),
+      W("Approximate and Represent", "Choose familiar components to approximate real forms.", ["AC9M4SP01"], skill("space-l4-spatial-approximation", "Approximate a complex form", "Selects and combines familiar shapes or objects to make a useful approximation and explains limitations.", ["AC9M4SP01"], "spatial-representation", ["space-l4-composite-shapes", "space-l4-composite-objects"]), [["Simplify the Form", "Identify useful familiar components in a complex object."], ["Create the Model", "Build a representation that preserves key spatial features."], ["Evaluate the Representation", "Judge and improve what an approximation communicates."]], ["form-simplifier", "approximation-builder", "model-evaluator"], ["approximate", "model", "feature", "accurate", "limitation"], ["Approximate means careless or incorrect.", "A more detailed model is always more useful."], "Purposeful approximation and model evaluation."),
       W("Grid Reference Systems", "Understand and create labelled grid reference systems.", ["AC9M4SP02"], skill("space-l4-grid-references", "Use grid references", "Creates and interprets a consistent labelled grid system to identify cells and features.", ["AC9M4SP02"], "position-and-navigation", ["space-l3-map-interpretation"]), [["Read the Grid", "Use row and column labels in the agreed order."], ["Locate the Feature", "Assign and interpret grid references."], ["Build a Grid Key", "Create a consistent reference system for a map."]], ["grid-reference-reader", "grid-locator", "grid-system-builder"], ["grid", "row", "column", "reference", "cell"], ["Row and column order can change mid-map.", "A reference names a grid line rather than a cell."], "Grid conventions and precise location."),
       W("Pathways on Grids", "Describe and compare routes using grids, references and directions.", ["AC9M4SP02"], skill("space-l4-grid-navigation", "Navigate a grid", "Uses references and directional sequences to locate, trace and compare pathways on a grid.", ["AC9M4SP02"], "position-and-navigation", ["space-l4-grid-references"]), [["Reference to Reference", "Trace a route between labelled cells."], ["Write the Path", "Create directions using references and movement language."], ["Route Under Constraints", "Compare pathways that satisfy spatial constraints."]], ["grid-route-runner", "grid-direction-builder", "constrained-route-planner"], ["pathway", "reference", "direction", "route", "constraint"], ["A sequence of references automatically describes the moves between them.", "The fewest cells is always the best route."], "Grid pathways, directions and route constraints."),
-      W("Line Symmetry", "Recognise and construct line-symmetric figures.", ["AC9M4SP03"], skill("space-l4-line-symmetry", "Find line symmetry", "Identifies lines of symmetry and completes figures by matching corresponding positions and features.", ["AC9M4SP03"], "symmetry-and-transformation", ["space-l2-one-step-transformations"]), [["Mirror Match", "Test whether two halves correspond across a line."], ["Complete the Reflection", "Construct the missing half on a grid."], ["How Many Lines?", "Compare possible symmetry lines and justify counts."]], ["symmetry-test", "mirror-grid-builder", "symmetry-line-counter"], ["symmetry", "line of symmetry", "mirror", "corresponding", "equal distance"], ["Any line through the centre is a symmetry line.", "Matching colour alone proves symmetry."], "Line symmetry, corresponding points and construction."),
-      W("Rotational Symmetry", "Recognise and create figures that match after rotation.", ["AC9M4SP03"], skill("space-l4-rotational-symmetry", "Find rotational symmetry", "Recognises rotational symmetry and describes matching positions within one full turn.", ["AC9M4SP03"], "symmetry-and-transformation", ["space-l4-line-symmetry"]), [["Turn and Match", "Test a figure at marked rotations."], ["Count the Matches", "Determine the number of matching positions in a full turn."], ["Create a Turning Pattern", "Construct and justify a rotationally symmetric design."]], ["rotation-tester", "rotational-order-counter", "radial-pattern-builder"], ["rotational symmetry", "centre", "full turn", "match", "order"], ["A full turn is the only matching turn.", "Line symmetry guarantees rotational symmetry."], "Rotational invariance and pattern construction."),
+      W("Line Symmetry", "Recognise and construct line-symmetric figures.", ["AC9M4SP03"], skill("space-l4-line-symmetry", "Find line symmetry", "Identifies lines of symmetry and completes figures by matching corresponding positions and features.", ["AC9M4SP03"], "symmetry-and-transformation", ["space-l2-one-step-transformations"]), [["Mirror Match", "Test whether two halves correspond across a line."], ["Complete the Reflection", "Construct the missing half on a grid."], ["Create a Symmetric Picture", "Create and audit an original line-symmetric design."]], ["symmetry-test", "mirror-grid-builder", "symmetry-line-counter"], ["symmetry", "line of symmetry", "mirror", "corresponding", "equal distance"], ["Any line through the centre is a symmetry line.", "Matching colour alone proves symmetry."], "Line symmetry, corresponding points and construction."),
+      W("Rotational Symmetry", "Recognise and create figures that match after rotation.", ["AC9M4SP03"], skill("space-l4-rotational-symmetry", "Find rotational symmetry", "Recognises rotational symmetry and describes matching positions within one full turn.", ["AC9M4SP03"], "symmetry-and-transformation", ["space-l4-line-symmetry"]), [["Turn and Test", "Test a figure at marked rotations."], ["Record the Matches", "Test and record matching positions in a full turn."], ["Create a Turning Pattern", "Construct and justify a rotationally symmetric design."]], ["rotation-tester", "rotational-order-counter", "radial-pattern-builder"], ["rotational symmetry", "centre", "full turn", "match", "order"], ["A full turn is the only matching turn.", "Line symmetry guarantees rotational symmetry."], "Rotational invariance and pattern construction."),
       W("Symmetric Grid World", "Integrate composite representation, grids and symmetry.", ["AC9M4SP01", "AC9M4SP02", "AC9M4SP03"], skill("space-l4-symmetric-grid-design", "Design a symmetric grid world", "Uses composite forms, grid references and symmetry constraints to create and explain a spatial design.", ["AC9M4SP01", "AC9M4SP02", "AC9M4SP03"], "construction-and-visualisation", ["space-l4-spatial-approximation", "space-l4-grid-navigation", "space-l4-rotational-symmetry"]), [["Decode the Design Brief", "Identify composite, grid and symmetry constraints."], ["Build the World", "Construct a referenced symmetrical grid design."], ["Audit and Explain", "Check constraints and justify representational choices."]], ["constraint-decoder", "symmetric-map-builder", "design-auditor"], ["composite", "grid reference", "symmetry", "constraint", "justify"], ["Meeting one constraint compensates for missing another.", "Visual balance always proves mathematical symmetry."], "Cumulative composite, grid and symmetry reasoning."),
     ],
   },
@@ -498,6 +498,14 @@ const L3_MAP_CREATION_MECHANICS = ["draw-camp", "place-landmarks", "map-builder"
 const L3_NAVIGATION_MECHANICS = ["treasure-hunt", "find-observatory", "mission-control"] as const;
 const L3_MISSION_MECHANICS = ["explorer-challenge", "rescue-mission", "navigator-challenge"] as const;
 const L3_GRADUATION_MECHANICS = ["objects-review", "map-master", "final-mission"] as const;
+const L4_GRID_REFERENCE_MECHANICS = ["read-grid", "locate-feature", "build-grid-system"] as const;
+const L4_COMPOSITE_SHAPE_MECHANICS = ["analyse-components", "open-composite-canvas", "compare-decompositions"] as const;
+const L4_COMPOSITE_OBJECT_MECHANICS = ["solid-assembly", "multi-view-build", "hidden-structure"] as const;
+const L4_APPROXIMATION_MECHANICS = ["feature-simplifier", "model-builder", "model-evaluator"] as const;
+const L4_GRID_ROUTE_MECHANICS = ["trace-references", "author-route", "route-audit"] as const;
+const L4_LINE_SYMMETRY_MECHANICS = ["line-test", "reflection-builder", "line-design"] as const;
+const L4_ROTATION_MECHANICS = ["turn-test", "turn-recorder", "rotation-builder"] as const;
+const L4_INTEGRATION_MECHANICS = ["decode-brief", "build-world", "audit-world"] as const;
 
 // Level 3 lessons with real, playable content (keyed by registry id). Weeks fill
 // in as they are built; unlisted lessons render the in-development screen.
@@ -505,6 +513,15 @@ const IMPLEMENTED_LEVEL_THREE_LESSONS: Record<
   string,
   { learningIntention: string; mechanics: readonly [string, string, string] }
 > = {
+  "y4-space-w1-l1": { learningIntention: "I can identify useful familiar components in a composite shape.", mechanics: L4_COMPOSITE_SHAPE_MECHANICS },
+  "y4-space-w1-l2": { learningIntention: "I can choose and arrange components to construct a target outline.", mechanics: L4_COMPOSITE_SHAPE_MECHANICS },
+  "y4-space-w1-l3": { learningIntention: "I can create different valid decompositions of the same shape.", mechanics: L4_COMPOSITE_SHAPE_MECHANICS },
+  "y4-space-w2-l1": { learningIntention: "I can combine familiar solids to meet a design brief.", mechanics: L4_COMPOSITE_OBJECT_MECHANICS },
+  "y4-space-w2-l2": { learningIntention: "I can build a composite object from more than one view.", mechanics: L4_COMPOSITE_OBJECT_MECHANICS },
+  "y4-space-w2-l3": { learningIntention: "I can infer hidden components using views and support rules.", mechanics: L4_COMPOSITE_OBJECT_MECHANICS },
+  "y4-space-w3-l1": { learningIntention: "I can preserve defining features when I simplify a form.", mechanics: L4_APPROXIMATION_MECHANICS },
+  "y4-space-w3-l2": { learningIntention: "I can construct a useful approximation from a brief.", mechanics: L4_APPROXIMATION_MECHANICS },
+  "y4-space-w3-l3": { learningIntention: "I can evaluate and improve a representation using spatial evidence.", mechanics: L4_APPROXIMATION_MECHANICS },
   "y3-space-w1-l1": { learningIntention: "I can name the five 3D objects.", mechanics: L3_OBJECT_RECOGNITION_MECHANICS },
   "y3-space-w1-l2": { learningIntention: "I can find a named 3D object in a scene.", mechanics: L3_OBJECT_RECOGNITION_MECHANICS },
   "y3-space-w1-l3": { learningIntention: "I can recognise and find 3D objects on my own.", mechanics: L3_OBJECT_RECOGNITION_MECHANICS },
@@ -531,6 +548,27 @@ const IMPLEMENTED_LEVEL_THREE_LESSONS: Record<
   "y3-space-w8-l3": { learningIntention: "I can complete a full Cosmic Navigator mission.", mechanics: L3_GRADUATION_MECHANICS },
 };
 
+const IMPLEMENTED_LEVEL_FOUR_LESSONS: Record<
+  string,
+  { learningIntention: string; mechanics: readonly [string, string, string] }
+> = {
+  "y4-space-w4-l1": { learningIntention: "I can read a grid reference in both directions.", mechanics: L4_GRID_REFERENCE_MECHANICS },
+  "y4-space-w4-l2": { learningIntention: "I can use grid references to find, report and place map features.", mechanics: L4_GRID_REFERENCE_MECHANICS },
+  "y4-space-w4-l3": { learningIntention: "I can create and repair a consistent grid reference system.", mechanics: L4_GRID_REFERENCE_MECHANICS },
+  "y4-space-w5-l1": { learningIntention: "I can trace movement between referenced cells.", mechanics: L4_GRID_ROUTE_MECHANICS },
+  "y4-space-w5-l2": { learningIntention: "I can author precise grid-referenced directions.", mechanics: L4_GRID_ROUTE_MECHANICS },
+  "y4-space-w5-l3": { learningIntention: "I can test and improve routes against constraints.", mechanics: L4_GRID_ROUTE_MECHANICS },
+  "y4-space-w6-l1": { learningIntention: "I can test corresponding features across a line of symmetry.", mechanics: L4_LINE_SYMMETRY_MECHANICS },
+  "y4-space-w6-l2": { learningIntention: "I can complete vertical, horizontal and diagonal reflections.", mechanics: L4_LINE_SYMMETRY_MECHANICS },
+  "y4-space-w6-l3": { learningIntention: "I can create and test an original line-symmetric picture.", mechanics: L4_LINE_SYMMETRY_MECHANICS },
+  "y4-space-w7-l1": { learningIntention: "I can test a design after a stated rotation about a centre.", mechanics: L4_ROTATION_MECHANICS },
+  "y4-space-w7-l2": { learningIntention: "I can test and record which rotations reproduce a design.", mechanics: L4_ROTATION_MECHANICS },
+  "y4-space-w7-l3": { learningIntention: "I can create, test and repair a rotationally symmetric pattern.", mechanics: L4_ROTATION_MECHANICS },
+  "y4-space-w8-l1": { learningIntention: "I can translate an integrated design brief into testable constraints.", mechanics: L4_INTEGRATION_MECHANICS },
+  "y4-space-w8-l2": { learningIntention: "I can build a connected composite, grid and symmetry world.", mechanics: L4_INTEGRATION_MECHANICS },
+  "y4-space-w8-l3": { learningIntention: "I can audit and repair a complete spatial design.", mechanics: L4_INTEGRATION_MECHANICS },
+};
+
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
   const weeks = definition.weeks.map((week, index): StarpathWeekPlan => {
     const weekNumber = index + 1;
@@ -540,7 +578,8 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
         IMPLEMENTED_GROUND_LESSONS[lessonId] ??
         IMPLEMENTED_LEVEL_ONE_LESSONS[lessonId] ??
         IMPLEMENTED_LEVEL_TWO_LESSONS[lessonId] ??
-        IMPLEMENTED_LEVEL_THREE_LESSONS[lessonId];
+        IMPLEMENTED_LEVEL_THREE_LESSONS[lessonId] ??
+        IMPLEMENTED_LEVEL_FOUR_LESSONS[lessonId];
       return {
         id: lessonId,
         title,
@@ -567,11 +606,11 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
         id: `${definition.prefix}-space-w${weekNumber}-quiz`,
         coverage: week.quiz,
         questionCount: STARPATH_QUIZ_QUESTIONS_PER_LESSON * STARPATH_LESSONS_PER_WEEK as 15,
-        status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || (definition.prefix === "y3" && weekNumber < 8)
+        status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || (definition.prefix === "y3" && weekNumber < 8) || definition.prefix === "y4"
           ? "implemented"
           : STARPATH_PROGRAM_STATUS,
       },
-      status: definition.prefix === "y3" ? "implemented" : STARPATH_PROGRAM_STATUS,
+      status: definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
     };
   });
 
@@ -587,13 +626,18 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
     prerequisites: definition.prerequisites,
     likelyMisconceptions: definition.likelyMisconceptions,
     progressionRationale: definition.progressionRationale,
-    skills: definition.weeks.map((week, index) => ({ ...week.skill, level: definition.level, weeks: [index + 1], status: definition.prefix === "y3" ? "implemented" : STARPATH_PROGRAM_STATUS })),
+    skills: definition.weeks.map((week, index) => ({
+      ...week.skill,
+      level: definition.level,
+      weeks: [index + 1],
+      status: definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
+    })),
     weeks,
     assessments: {
       preTest: definition.level === "ground" ? null : { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: STARPATH_PROGRAM_STATUS },
       postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" ? "implemented" : STARPATH_PROGRAM_STATUS },
     },
-    status: definition.prefix === "y3" ? "implemented" : STARPATH_PROGRAM_STATUS,
+    status: definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
   };
 }
 
