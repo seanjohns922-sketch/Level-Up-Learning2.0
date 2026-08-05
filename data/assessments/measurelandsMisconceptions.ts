@@ -31,6 +31,18 @@ export const MEASURELANDS_MISCONCEPTION_LIBRARY: readonly MeasurelandsMisconcept
     descriptorCodes: ["AC9M1M02", "AC9M2M01"],
   },
   {
+    id: "informal-unit-size-count",
+    label: "Informal unit size and count",
+    description: "Assumes a smaller informal unit produces a smaller count when measuring the same attribute.",
+    descriptorCodes: ["AC9M2M01"],
+  },
+  {
+    id: "cross-unit-count-comparison",
+    label: "Cross-unit count comparison",
+    description: "Compares informal measurement counts without checking whether the same-sized unit was used.",
+    descriptorCodes: ["AC9M2M01"],
+  },
+  {
     id: "ruler-starting-point",
     label: "Ruler starting point",
     description: "Starts at the ruler edge or another mark instead of accounting for the zero point.",
@@ -115,6 +127,12 @@ export const MEASURELANDS_MISCONCEPTION_LIBRARY: readonly MeasurelandsMisconcept
     descriptorCodes: ["AC9M2M03"],
   },
   {
+    id: "calendar-month-length",
+    label: "Calendar month length",
+    description: "Assumes every month has the same number of days when counting across a month boundary.",
+    descriptorCodes: ["AC9M2M03"],
+  },
+  {
     id: "unequal-fractional-parts",
     label: "Unequal fractional parts",
     description: "Names halves, quarters or eighths without checking that the whole is divided into equal parts.",
@@ -125,6 +143,12 @@ export const MEASURELANDS_MISCONCEPTION_LIBRARY: readonly MeasurelandsMisconcept
     label: "Analog clock hand roles",
     description: "Interchanges the hour and minute hands or ignores hour-hand movement.",
     descriptorCodes: ["AC9M2M04", "AC9M3M04"],
+  },
+  {
+    id: "quarter-to-hour-name",
+    label: "Quarter-to hour name",
+    description: "Names the hour just passed instead of the approaching hour when reading quarter-to time.",
+    descriptorCodes: ["AC9M2M04"],
   },
   {
     id: "minute-mark-counting",
