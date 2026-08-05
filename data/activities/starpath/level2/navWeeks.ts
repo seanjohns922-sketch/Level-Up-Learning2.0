@@ -136,7 +136,11 @@ export function debugMapTask(round: number, target: number): PracticeTask {
     goal: { r: goalLm.r, c: goalLm.c, object: goalLm.object, label: goalLm.label },
     debugSteps,
     wrongStepId: `dstep-${target}-${spec.corruptIndex}`,
-    feedback: { correct: "You found the broken step!", wrong: "Follow each step from the rover and find the one heading the wrong way." },
+    feedback: {
+      correct: "You found the broken step!",
+      // A wrong answer should name the broken step, not just hint at it.
+      wrong: `Step ${spec.corruptIndex + 1} is the broken one — it heads ${WORD[spec.corruptDir]}, but should head ${WORD[spec.steps[spec.corruptIndex]!]}.`,
+    },
   };
 }
 
