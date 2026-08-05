@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 /* Renders a Measurelands object as its commissioned PNG art when available,
  * falling back to the emoji until the file is dropped into
@@ -17,9 +17,11 @@ function objectArtSources(name: string): string[] {
   return [
     `/measurelands/objects/${file}.png`,
     `/images/measurelands/week2-3d/${file}.png`,
+    `/images/measurelands/week1-3d/${file}.png`,
     `/images/measurelands/measure-objects-3d/${file}.png`,
     `/images/measurelands/containers-3d/${file}.png`,
     `/images/measurelands/duration-3d/${file}.png`,
+    `/images/measurelands/timeofday-3d/${file}.png`,
     `/images/measurelands/everyday-3d/object-${file}.png`,
   ];
 }
@@ -35,12 +37,22 @@ export function MeasurelandsObjectArt({
   size?: number;
   className?: string;
 }) {
+  return <MeasurelandsObjectArtSource key={name} name={name} emoji={emoji} size={size} className={className} />;
+}
+
+function MeasurelandsObjectArtSource({
+  name,
+  emoji,
+  size,
+  className,
+}: {
+  name: string;
+  emoji?: string;
+  size: number;
+  className?: string;
+}) {
   const [sourceIndex, setSourceIndex] = useState(0);
   const sources = objectArtSources(name);
-
-  useEffect(() => {
-    setSourceIndex(0);
-  }, [name]);
 
   if (sourceIndex >= sources.length || !name) {
     return (

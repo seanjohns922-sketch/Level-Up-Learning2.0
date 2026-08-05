@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
+import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObjectArt";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type MetricTask = Extract<PracticeTask, { kind: "metricUnit" }>;
@@ -36,7 +37,7 @@ function ObjectPanel({ task }: { task: MetricTask }) {
   return (
     <div className="flex flex-col items-center rounded-[26px] border border-[rgba(214,184,108,0.4)] p-4" style={{ background: ATTR_TINT[task.attribute ?? "length"] ?? "rgba(255,252,245,0.96)" }}>
       {o.context ? <div className="mb-1 text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{o.context}</div> : null}
-      <div className="text-6xl leading-none">{o.emoji}</div>
+      <MeasurelandsObjectArt name={o.label} emoji={o.emoji} size={112} />
       <div className="mt-2 text-xl font-black text-[#2c1c07]">{o.label}</div>
       {task.statement ? <div className="mt-2 rounded-full border border-[rgba(192,86,78,0.5)] bg-[rgba(252,224,224,0.5)] px-3 py-1 text-sm font-bold text-[#8a2b24]">“{task.statement}”</div> : null}
       {task.note ? <div className="mt-2 text-center text-sm font-semibold text-[#5a4423]">{task.note}</div> : null}

@@ -27,6 +27,11 @@ function check(condition: unknown, message: string) {
 
 check(forms.length === 13, `Expected 13 production forms; found ${forms.length}.`);
 
+const expectedContextAssets = new Map([
+  ["y3-measurement-pre-01-v2", "backpack"],
+  ["y3-measurement-post-01-v2", "drink-bottle"],
+]);
+
 for (const form of forms) {
   check(form.questions.length === 20, `${form.key} has ${form.questions.length} items instead of 20.`);
   for (const question of form.questions) {
@@ -37,10 +42,19 @@ for (const form of forms) {
     check(!/What is the metres|How long it is|What is (?:x,y|length,width)/i.test(question.prompt), `${prefix} has awkward generated wording: ${question.prompt}`);
 
     const visual = typeof question.visual === "object" && question.visual !== null && "kind" in question.visual
-      ? question.visual as { kind?: unknown }
+      ? question.visual as { kind?: unknown; assetName?: unknown; label?: unknown }
       : undefined;
     const kind = visual?.kind ? String(visual.kind) : undefined;
     check(kind !== "convert" && kind !== "concept", `${prefix} uses a redundant ${kind} visual.`);
+    if (kind === "contextObject") {
+      check(question.type === "mcq", `${prefix} adds contextual art to a non-MCQ assessment task.`);
+      check(typeof visual?.assetName === "string" && !/\d|cm|mm|kg|gram|litre|meter|metre/i.test(String(visual.assetName)), `${prefix} contextual art exposes measurement data.`);
+    }
+    const expectedAsset = expectedContextAssets.get(question.id);
+    if (expectedAsset) {
+      check(kind === "contextObject", `${prefix} is missing its reviewed contextual visual.`);
+      check(visual?.assetName === expectedAsset, `${prefix} uses ${String(visual?.assetName)} instead of ${expectedAsset}.`);
+    }
     if (["ruler", "scaleDial", "jug", "thermometer"].includes(kind ?? "")) {
       check(/\b(?:read|shown|show)\b/i.test(question.prompt), `${prefix} includes an instrument that is not required by its prompt.`);
     }
@@ -81,12 +95,15 @@ const root = process.cwd();
 const cardSource = fs.readFileSync(path.join(root, "components/assessment/AssessmentQuestionCard.tsx"), "utf8");
 const widgetSource = fs.readFileSync(path.join(root, "components/assessment/MeasurelandsAnswerWidget.tsx"), "utf8");
 const protractorCardSource = fs.readFileSync(path.join(root, "components/measurelands/MeasurelandsProtractorCard.tsx"), "utf8");
+const metricUnitCardSource = fs.readFileSync(path.join(root, "components/measurelands/MeasurelandsMetricUnitCard.tsx"), "utf8");
 check(cardSource.includes("<MeasurelandsAnswerWidget"), "AssessmentQuestionCard does not route Measurelands numeric items to the dedicated widget.");
 check(widgetSource.includes("format.unit") && widgetSource.includes('label="Hour"') && widgetSource.includes('label="Minutes"'), "Measurelands answer widget does not render fixed units and structured time fields.");
 check(widgetSource.includes('(["AM", "PM"] as const)') && widgetSource.includes('aria-label="Choose AM or PM"'), "Contextual 12-hour questions do not render the AM/PM chooser.");
 check(protractorCardSource.includes("showInteractiveReading={!assessmentMode}"), "Assessment construction protractor exposes its live numerical reading.");
 check(protractorCardSource.includes('guidance={assessmentMode ? "none"'), "Assessment protractor read/misconception scenes expose guidance.");
 check(!protractorCardSource.includes("Target: {target}° — drag") || protractorCardSource.includes("!assessmentMode ?"), "Assessment construction protractor exposes a target hint.");
+check(metricUnitCardSource.includes('<MeasurelandsObjectArt name={o.label}'), "Metric-unit assessment tasks still render object emoji instead of commissioned art.");
+check(fs.existsSync(path.join(root, "public/images/measurelands/week2-3d/parcel.png")), "The Level 5 parcel unit-choice task has no commissioned art asset.");
 check(toMeasurelandsTimeResponse("7", "25", "12h_meridiem", "AM") === "0725", "7:25 AM is not accepted as canonical 0725.");
 check(toMeasurelandsTimeResponse("7", "15", "12h_meridiem", "PM") === "1915", "7:15 PM is not accepted as canonical 1915.");
 check(toMeasurelandsTimeResponse("12", "20", "12h_meridiem", "AM") === "0020", "12:20 AM is not converted to canonical midnight time.");

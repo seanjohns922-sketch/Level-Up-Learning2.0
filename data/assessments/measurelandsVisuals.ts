@@ -28,6 +28,7 @@ export type MzVisual =
   | { kind: "angle"; single?: number; known?: number; unknown?: number; total?: 180 | 360 }
   | { kind: "convert"; fromValue: number; fromUnit: string; toValue: number; toUnit: string }
   | { kind: "objects"; items: Array<{ label: string; emoji: string }>; caption?: string }
+  | { kind: "contextObject"; label: string; assetName: string; emoji: string }
   | { kind: "concept"; icon: string; label: string; sub?: string };
 
 const DESCRIPTOR_PREFIXES = [
@@ -72,6 +73,35 @@ type Q = {
   skillId?: string;
   skillLabel?: string;
 };
+
+type ContextQuestion = Pick<Q, "prompt" | "skillId"> & { type?: string };
+
+const CONTEXT_OBJECTS: Array<{
+  prompt: RegExp;
+  label: string;
+  assetName: string;
+  emoji: string;
+}> = [
+  { prompt: /school bag|backpack/i, label: "school bag", assetName: "backpack", emoji: "🎒" },
+  { prompt: /school water bottle|drink bottle/i, label: "school water bottle", assetName: "drink-bottle", emoji: "🍼" },
+  { prompt: /parcel/i, label: "parcel", assetName: "parcel", emoji: "📦" },
+  { prompt: /book(?:'s)? (?:length|fairly)|measures? a book/i, label: "book", assetName: "book", emoji: "📚" },
+  { prompt: /one night's sleep/i, label: "sleep", assetName: "sleeping", emoji: "😴" },
+  { prompt: /school day/i, label: "school day", assetName: "school-day", emoji: "🏫" },
+  { prompt: /tree takes to grow/i, label: "tree", assetName: "tree", emoji: "🌳" },
+  { prompt: /desk (?:as|became|with|fairly)/i, label: "desk", assetName: "desk", emoji: "🪑" },
+  { prompt: /picture makes Pencil|pencil's length/i, label: "pencil", assetName: "pencil", emoji: "✏️" },
+  { prompt: /robot (?:starts|faces|makes|turns)/i, label: "robot", assetName: "robot", emoji: "🤖" },
+  { prompt: /door opens/i, label: "door", assetName: "door", emoji: "🚪" },
+  { prompt: /eat breakfast/i, label: "breakfast", assetName: "breakfast", emoji: "🍽️" },
+];
+
+/** Data-neutral context art for reviewed selected-response items only. */
+export function deriveMeasurelandsContextVisual(q: ContextQuestion): MzVisual | undefined {
+  if (q.type && q.type !== "mcq") return undefined;
+  const match = CONTEXT_OBJECTS.find((candidate) => candidate.prompt.test(q.prompt));
+  return match ? { kind: "contextObject", label: match.label, assetName: match.assetName, emoji: match.emoji } : undefined;
+}
 
 // ── parsing helpers ───────────────────────────────────────────────────────────
 function nums(s: string): number[] {

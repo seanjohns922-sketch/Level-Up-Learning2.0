@@ -77,6 +77,8 @@ function presentQuestion(question: Question): Question {
     domain,
     visual: question.visual,
     inputMode: question.inputMode,
+    skillId: question.skillId,
+    questionType: question.type,
     selected,
   });
   return {

@@ -1,4 +1,5 @@
 import type { Question } from "@/data/assessments/posttests";
+import { deriveMeasurelandsContextVisual } from "@/data/assessments/measurelandsVisuals";
 
 export type MeasurelandsAnswerFormat =
   | { kind: "number"; unit?: string; ariaLabel: string }
@@ -55,6 +56,8 @@ type PresentationInput = {
   domain?: string;
   visual?: Question["visual"];
   inputMode?: Question["inputMode"];
+  skillId?: string;
+  questionType?: string;
   selected: boolean;
 };
 
@@ -176,7 +179,8 @@ export function prepareMeasurelandsAssessmentPresentation(input: PresentationInp
   inputMode?: Question["inputMode"];
 } {
   const prompt = conciseMeasurelandsPrompt(input.prompt, input.domain, input.visual);
-  const visual = requiredVisual(input.prompt, input.visual);
+  const visual = requiredVisual(input.prompt, input.visual)
+    ?? (input.selected ? deriveMeasurelandsContextVisual({ prompt: input.prompt, skillId: input.skillId, type: input.questionType }) : undefined);
   if (input.selected) return { prompt, visual, inputMode: input.inputMode };
 
   const isTime = (/four digits|24-hour time|time as/i.test(input.prompt) || input.domain === "clock" || input.domain === "time24")

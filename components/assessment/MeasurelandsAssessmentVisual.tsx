@@ -84,6 +84,14 @@ function Objects({ items }: { items: Array<{ label: string; emoji: string }> }) 
   );
 }
 
+function ContextObject({ label, assetName, emoji }: { label: string; assetName: string; emoji: string }) {
+  return (
+    <div className="flex h-[150px] w-full items-center justify-center" role="img" aria-label={label}>
+      <MeasurelandsObjectArt name={assetName} emoji={emoji} size={140} />
+    </div>
+  );
+}
+
 const CONCEPT_ICON: Record<string, string> = {
   ruler: "📏", scale: "⚖️", jug: "🧪", thermometer: "🌡️", clock: "🕐", calendar: "📅",
   duration: "⏱️", convert: "🔁", tools: "🛠️", angle: "📐", area: "▦", volume: "🧊", perimeter: "🔲",
@@ -148,6 +156,8 @@ export default function MeasurelandsAssessmentVisual({ visual }: { visual: MzVis
       return <Panel label="Convert the unit"><Convert fromValue={visual.fromValue} fromUnit={visual.fromUnit} toUnit={visual.toUnit} /></Panel>;
     case "objects":
       return <Panel><Objects items={visual.items} /></Panel>;
+    case "contextObject":
+      return <Panel><ContextObject label={visual.label} assetName={visual.assetName} emoji={visual.emoji} /></Panel>;
     case "concept":
       return <Panel><Concept icon={visual.icon} label={visual.label} /></Panel>;
     default:
