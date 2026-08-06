@@ -37,14 +37,32 @@ function assertTask(task: PracticeTask, label: string) {
     return;
   }
   if (task.kind === "starpathComposite") {
-    assert(task.validSolutions.length > 0, `${label} must declare at least one solution`);
-    assertInBounds(task.rows, task.cols, task.targetCells, label);
-    task.validSolutions.forEach((solution, index) => {
-      assertInBounds(task.rows, task.cols, solution, `${label} solution ${index + 1}`);
+    if (task.figure) {
+      // Figure build: every socket must be fillable from the shape palette.
+      assert(task.figure.parts.length >= 3, `${label} composite figure needs at least three parts`);
+      const palette = new Set(task.buildPalette ?? []);
+      assert(palette.size >= 2, `${label} composite build needs a shape palette`);
+      task.figure.parts.forEach((part) => assert(palette.has(part.shape), `${label} part "${part.id}" shape must be offered in the palette`));
+      return;
+    }
+    if (task.figureOptions?.length) {
+      assert.equal(task.figureOptions.length, 2, `${label} compare must show two figures`);
+      assert(task.figureOptions.some((option) => option.id === task.correctOptionId), `${label} correct figure must be one of the options`);
+      assert(task.correctReasonId && (task.reasonOptions ?? []).some((reason) => reason.id === task.correctReasonId), `${label} compare requires a linked reason`);
+      return;
+    }
+    if (task.figureSvg) {
+      assert((task.options ?? []).some((option) => option.id === task.correctOptionId), `${label} scan requires a correct option`);
+      return;
+    }
+    // Legacy cube board (Week 2 solid / views / hidden).
+    const solutions = task.validSolutions ?? [];
+    assert(solutions.length > 0, `${label} must declare at least one solution`);
+    assertInBounds(task.rows ?? 0, task.cols ?? 0, task.targetCells ?? [], label);
+    solutions.forEach((solution, index) => {
+      assertInBounds(task.rows ?? 0, task.cols ?? 0, solution, `${label} solution ${index + 1}`);
       assert.equal(isCompositeSolution(task, solution), true, `${label} declared solution ${index + 1} must validate`);
     });
-    if (task.mode === "alternate" || task.mode === "construct") assert(task.validSolutions.length >= 2, `${label} open construction needs multiple accepted decompositions`);
-    if (task.options) assert(task.correctOptionId && task.correctReasonId, `${label} judgment requires both a spatial choice and linked reason`);
     return;
   }
   if (task.kind === "starpathSymmetry") {
@@ -83,7 +101,7 @@ for (let week = 1; week <= 7; week += 1) {
   assert.equal(quiz.length, 15, `Level 4 Week ${week} quiz must contain exactly 15 questions`);
   assert.deepEqual(quiz.map((task) => "target" in task ? task.target : null), Array.from({ length: 15 }, (_, index) => index + 1), `Level 4 Week ${week} must retain the 5-5-5 target allocation`);
   quiz.forEach((task, index) => assertTask(task, `Week ${week} quiz question ${index + 1}`));
-  const identities = quiz.map((task) => task.kind === "starpathGridReference" || task.kind === "starpathGridRoute" ? task.mapId : task.kind === "starpathComposite" || task.kind === "starpathSymmetry" ? task.boardId : `${task.kind}-${"target" in task ? task.target : 0}`);
+  const identities = quiz.map((task) => task.kind === "starpathGridReference" || task.kind === "starpathGridRoute" ? task.mapId : task.kind === "starpathComposite" ? `comp-${task.mode}-${task.target}` : task.kind === "starpathSymmetry" ? task.boardId : `${task.kind}-${"target" in task ? task.target : 0}`);
   assert.equal(new Set(identities).size, 15, `Level 4 Week ${week} quiz item identities must be unique`);
 }
 

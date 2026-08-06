@@ -2512,19 +2512,28 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
-      // Level 4 · W1–3 — open, bounded composite construction and model evaluation.
+      // Level 4 · W1–3 — composite shapes/objects and model evaluation.
       kind: "starpathComposite";
       mode: "scan" | "construct" | "alternate" | "solid" | "views" | "hidden" | "simplify" | "model" | "evaluate";
       prompt: string;
       speakText: string;
       target: number;
-      boardId: string;
-      cols: number;
-      rows: number;
-      palette: Array<{ id: string; label: string; colour: string }>;
-      targetCells: Array<{ r: number; c: number }>;
+      designBrief: string;
+      feedback: { correct: string; wrong: string };
+      boardId?: string;
+      // Figure-based build (W1/W3): assemble a composite figure from familiar shapes.
+      figure?: { id: string; name: string; viewBox: string; parts: Array<{ id: string; label: string; shape: string; solid: string; ghost: string; hit: { x: number; y: number; w: number; h: number } }> };
+      buildPalette?: string[];
+      // Figure-based judgment: a rendered figure to analyse, or rendered figures to compare.
+      figureSvg?: string;
+      figureOptions?: Array<{ id: string; svg: string }>;
+      // Legacy cube/cell board (W2 solid/views/hidden).
+      cols?: number;
+      rows?: number;
+      palette?: Array<{ id: string; label: string; colour: string }>;
+      targetCells?: Array<{ r: number; c: number }>;
       fixedCells?: Array<{ r: number; c: number; pieceId: string }>;
-      validSolutions: Array<Array<{ r: number; c: number; pieceId: string }>>;
+      validSolutions?: Array<Array<{ r: number; c: number; pieceId: string }>>;
       requiredPieceIds?: string[];
       maxPieces?: number;
       viewLabels?: { front: number[]; side: number[]; top: number };
@@ -2532,8 +2541,6 @@ export type PracticeTask = (
       correctOptionId?: string;
       reasonOptions?: Array<{ id: string; label: string }>;
       correctReasonId?: string;
-      designBrief: string;
-      feedback: { correct: string; wrong: string };
     }
   | {
       // Level 4 · W6–7 — construct and test line or rotational symmetry.
