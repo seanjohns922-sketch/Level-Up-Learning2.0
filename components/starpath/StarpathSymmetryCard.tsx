@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, RotateCcw } from "lucide-react";
+import { Check, RotateCcw, RotateCw } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { isSymmetricDesign, transformCell, type SymmetryCell } from "@/data/activities/starpath/level4/symmetry";
@@ -31,11 +31,36 @@ function MirrorLine({ task }: { task: Task }) {
   return null;
 }
 
+// The turn made visible: a pin on the centre and an arc arrow showing how far the
+// pattern spins (a quarter or a half turn), so rotational symmetry is concrete.
+function RotationGuide({ task }: { task: Task }) {
+  if (task.rotation === undefined) return null;
+  const R = 27;
+  const half = task.rotation === 180;
+  const end = half ? { x: 50, y: 50 + R } : { x: 50 + R, y: 50 };
+  const arc = `M 50 ${50 - R} A ${R} ${R} 0 0 1 ${end.x} ${end.y}`;
+  return (
+    <svg aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" className="pointer-events-none absolute inset-0 h-full w-full">
+      <defs>
+        <marker id="l4turn-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="#67e8f9" />
+        </marker>
+      </defs>
+      <path d={arc} fill="none" stroke="#67e8f9" strokeWidth="2.4" strokeLinecap="round" markerEnd="url(#l4turn-arrow)" style={{ filter: "drop-shadow(0 0 3px #67e8f9)" }} />
+      <circle cx="50" cy="50" r="3.6" fill="#0b0a24" stroke="#fcd34d" strokeWidth="2" />
+    </svg>
+  );
+}
+
 export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
   const [cells, setCells] = useState<SymmetryCell[]>(task.seedCells);
   const [colour, setColour] = useState(COLOURS[0]!);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [settled, setSettled] = useState(false);
+  // Digital "tracing paper": a translucent copy of the pattern the child can turn
+  // around the centre to see whether it lands back on itself — how rotational
+  // symmetry is taught with real tracing paper.
+  const [turned, setTurned] = useState(false);
   const optionsMode = Boolean(task.options?.length);
   const placed = new Map(cells.map((cell) => [key(cell), cell]));
 
@@ -57,6 +82,16 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
     const expected = new Map(task.expectedCells.map((cell) => [key(cell), cell.colour]));
     for (const cell of cells) if (expected.get(key(cell)) !== cell.colour) mismatched.add(key(cell));
   }
+
+  const isTurn = task.rotation !== undefined;
+  const turnLabel = task.rotation === 90 ? "quarter turn" : "half turn";
+  const helperText = task.mode === "repair"
+    ? isTurn
+      ? "One tile does not match the turn. Tap it, then choose the colour its turn-partners show."
+      : "One tile does not match its mirror. Tap it, then choose the colour its partner shows."
+    : isTurn
+      ? `Place tiles — the glow shows where each one lands after a ${turnLabel} around the centre.`
+      : "Place tiles — the mirror shows where each one must be matched.";
 
   // Tap an empty cell to place the chosen colour; tap a tile of the same colour to
   // clear it; tap a tile of a different colour to recolour it — so a mismatch is
@@ -87,7 +122,12 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
   return (
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
-      {!optionsMode ? <p className="text-center text-sm font-bold text-slate-500">{task.mode === "repair" ? "One tile does not match its mirror. Tap it, then choose the colour its partner shows." : "Place tiles — the mirror shows where each one must be matched."}</p> : null}
+      {isTurn ? (
+        <div className="mx-auto flex w-fit items-center gap-2 rounded-full border border-cyan-300/50 bg-cyan-50 px-3 py-1 text-xs font-black text-cyan-700">
+          <RotateCw className="h-4 w-4" aria-hidden /> {task.rotation === 90 ? "Quarter turn · 90°" : "Half turn · 180°"} around the centre
+        </div>
+      ) : null}
+      {!optionsMode ? <p className="text-center text-sm font-bold text-slate-500">{helperText}</p> : isTurn ? <p className="text-center text-sm font-bold text-slate-500">Use Turn it to see whether the pattern lands back on itself, then choose.</p> : null}
       <div className="l4sym-stage mx-auto max-w-sm rounded-3xl p-4">
         <div className="relative">
           <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${task.size}, minmax(0, 1fr))` }}>
@@ -119,8 +159,42 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
             })}
           </div>
           <MirrorLine task={task} />
+          <RotationGuide task={task} />
+          {isTurn ? (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 grid gap-1.5"
+              style={{
+                gridTemplateColumns: `repeat(${task.size}, minmax(0, 1fr))`,
+                transformOrigin: "50% 50%",
+                transform: turned ? `rotate(${task.rotation}deg)` : "none",
+                opacity: turned ? 1 : 0,
+                transition: "transform 800ms cubic-bezier(0.34, 1.1, 0.64, 1), opacity 250ms ease",
+              }}
+            >
+              {Array.from({ length: task.size * task.size }, (_, index) => {
+                const it = placed.get(`${Math.floor(index / task.size)}:${index % task.size}`);
+                return (
+                  <div key={index} className="relative aspect-square">
+                    {it ? <span className="absolute inset-[12%] rounded-md border-2 border-white/80" style={{ backgroundColor: `${it.colour}99` }} /> : null}
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
       </div>
+      {isTurn ? (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setTurned((value) => !value)}
+            className="flex items-center gap-2 rounded-full border border-cyan-300/60 bg-white px-4 py-2 text-sm font-black text-cyan-700 shadow-sm transition hover:bg-cyan-50 active:scale-95"
+          >
+            <RotateCw className={`h-4 w-4 ${turned ? "-scale-x-100" : ""}`} aria-hidden /> {turned ? "Turn back" : `Turn it a ${turnLabel}`}
+          </button>
+        </div>
+      ) : null}
 
       {optionsMode ? (
         <div className="mx-auto grid max-w-md gap-2 sm:grid-cols-2">

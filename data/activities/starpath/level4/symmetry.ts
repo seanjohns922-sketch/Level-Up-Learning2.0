@@ -60,7 +60,9 @@ function rotationTask(round: number, mode: SymmetryTask["mode"], target: number,
   const spec = { size, rotation, centre };
   const expectedCells = closure(spec, seeds);
   const valid = mode !== "test" || round % 2 === 0;
-  const shown = mode === "complete" ? seeds : mode === "repair" ? expectedCells.slice(0, -1) : mode === "create" ? [] : valid ? expectedCells : expectedCells.slice(0, -1);
+  // Repair: recolour one tile of the finished pattern so a single tile no longer
+  // matches its turn-partners — the same one-clear-fix model as the line repair.
+  const shown = mode === "complete" ? seeds : mode === "repair" ? expectedCells.map((cell, index) => index === expectedCells.length - 1 ? { ...cell, colour: COLOURS[(COLOURS.indexOf(cell.colour) + 1) % COLOURS.length]! } : cell) : mode === "create" ? [] : valid ? expectedCells : expectedCells.slice(0, -1);
   const options = mode === "test" ? [{ id: "match", label: `Matches after ${rotation}°` }, { id: "fail", label: `Does not match after ${rotation}°` }] : mode === "record" ? [{ id: "90", label: "Quarter-turn, 90°" }, { id: "180", label: "Half-turn, 180°" }, { id: "360", label: "Full turn only" }] : undefined;
   return { kind: "starpathSymmetry", mode, prompt: mode === "record" ? "Record the smallest tested turn that matches." : mode === "test" ? `Test the design after a ${rotation}° turn.` : mode === "create" ? `Create a pattern that matches after a ${rotation}° turn.` : mode === "repair" ? "Repair the rotational pattern." : "Complete the turning pattern.", speakText: `Rotate every feature ${rotation} degrees around the marked centre. A match must preserve position and colour.`, target, boardId: `l4-rotation-${mode}-${rotation}-${round}`, size, rotation, centre, seedCells: shown, expectedCells, minSeedCells: rotation === 90 ? 4 : 2, options, correctOptionIds: mode === "test" ? [valid ? "match" : "fail"] : mode === "record" ? [String(rotation)] : undefined, feedback: { correct: "The rotation test preserves every feature around the stated centre.", wrong: "Track the turn amount, centre, corresponding position and colour." } };
 }
