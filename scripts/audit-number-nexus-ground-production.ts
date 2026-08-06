@@ -15,15 +15,20 @@ function check(condition: boolean, message: string): void {
 }
 
 const production = getPosttestForYearLabel("Prep", "number")?.questions ?? [];
+const productionAliases = ["Foundation", "Ground", "Ground Level"].map(
+  (label) => getPosttestForYearLabel(label, "number")?.questions ?? [],
+);
 const approved = GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS;
 const legacy = buildPrepPosttest().questions;
 
 check(production.length === 20, "Ground production route must resolve 20 items.");
 check(production.every((item, index) => item.id === approved[index]?.id), "Ground production route does not resolve the approved bank in order.");
+check(productionAliases.every((form) => form.every((item, index) => item.id === approved[index]?.id)), "A Ground year-label alias does not resolve the approved bank.");
 check(production.every((item) => "origin" in item && item.origin === "assessment_authored"), "Ground production contains a non-independent item.");
 check(new Set(production.map((item) => item.id)).size === 20, "Ground production IDs are not unique.");
 check(legacy.every((legacyItem) => !production.some((item) => item.id === legacyItem.id)), "A legacy Ground item remains reachable in production.");
 check(POSTTESTS.Prep === undefined, "The general post-test registry still exposes the legacy Prep form.");
+check(production.every((item) => item.strand === "Number and Algebra"), "Ground production contains a non-Number Nexus strand item.");
 check(ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Ground post-test threshold changed from 85%.");
 
 const questions = production as Question[];

@@ -6,7 +6,7 @@ export type StudentRealmId = "number" | "measurement" | "space";
 export function normalizeStudentYearLabel(yearLabel: string): string {
   const trimmed = yearLabel.trim();
   const lowered = trimmed.toLowerCase();
-  if (lowered === "prep" || lowered === "foundation" || lowered === "ground level") {
+  if (lowered === "prep" || lowered === "foundation" || lowered === "ground" || lowered === "ground level") {
     return "Prep";
   }
   return trimmed;

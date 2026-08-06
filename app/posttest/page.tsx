@@ -798,14 +798,8 @@ function PostTestPage() {
         totalQuestions={questions.length}
         subtitle={`Complete all ${questions.length} questions to unlock your Legend (${PASS_THRESHOLD}%+)`}
         questionPrompt={q.prompt}
-        questionContent={isInteractiveTask ? questionContent : (
-          <div>
-            <div className="flex justify-end mb-3">
-              <ReadAloudBtn text={q.prompt} />
-            </div>
-            {questionContent}
-          </div>
-        )}
+        promptAction={isInteractiveTask ? undefined : <ReadAloudBtn text={q.prompt} />}
+        questionContent={questionContent}
         hasAnswer={hasAnswer}
         isLast={idx === questions.length - 1}
         submitted={submitted}

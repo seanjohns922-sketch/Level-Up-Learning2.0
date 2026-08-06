@@ -727,6 +727,23 @@ export default function AssessmentQuestionCard({
   }
 
   if (type === "numeric") {
+    if (isGroundNumberVisual) {
+      return (
+        <div className="mt-3 space-y-4">
+          {renderedVisual}
+          <div className="flex justify-center">
+            <input
+              type="text"
+              inputMode={question.inputMode ?? "decimal"}
+              value={value ?? ""}
+              onChange={(event) => onChange(event.target.value)}
+              aria-label="Answer"
+              className="h-20 w-36 rounded-lg border-2 border-cyan-700 bg-[#f8fbfc] px-3 text-center text-4xl font-black text-slate-950 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
+            />
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="mt-6">
         {renderedVisual}
@@ -743,6 +760,45 @@ export default function AssessmentQuestionCard({
       const label = typeof option === "string" ? option : option.label ?? option.id ?? "";
       return isMeasurelandsVisualOption(String(label));
     });
+
+  if (isGroundNumberVisual) {
+    const gridClass = options.length === 2
+      ? "sm:grid-cols-2"
+      : options.length === 3
+        ? "sm:grid-cols-3"
+        : "sm:grid-cols-2 lg:grid-cols-4";
+    return (
+      <div className="mt-3 space-y-4">
+        {renderedVisual}
+        <div className={`grid gap-3 ${gridClass}`}>
+          {options.map((option) => {
+            const label = String(typeof option === "string" ? option : option.label ?? option.id ?? "");
+            const optionId = typeof option === "string" ? undefined : option.id;
+            const isSelected = value === label || value === optionId;
+            const isToken = label === "star" || label === "robot" || label === "crystal";
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => onChange(String(optionId ?? label))}
+                className={[
+                  "flex min-h-20 items-center justify-between gap-3 rounded-lg border-2 bg-[#f8fbfc] px-4 py-3 text-left text-slate-950 shadow-sm transition",
+                  isSelected
+                    ? "border-cyan-500 ring-4 ring-cyan-500/15"
+                    : "border-slate-300 hover:border-cyan-600 hover:bg-white",
+                ].join(" ")}
+              >
+                <span className={isToken ? "" : "text-xl font-black sm:text-2xl"}>
+                  {isToken ? <GroundAssessmentToken token={label} /> : <MathFormattedText text={label} compactFractions />}
+                </span>
+                <OptionReadAloudButton text={label} className="shrink-0" />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   if (useMeasurelandsVisualOptions) {
     return (

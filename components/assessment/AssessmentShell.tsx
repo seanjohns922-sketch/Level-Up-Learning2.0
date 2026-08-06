@@ -7,6 +7,7 @@ import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
+import { isGroundLevelYear } from "@/lib/lesson-routing";
 
 interface AssessmentShellProps {
   /** "Pre-Test" or "Post-Test" */
@@ -16,6 +17,7 @@ interface AssessmentShellProps {
   totalQuestions: number;
   subtitle?: string;
   questionPrompt: string;
+  promptAction?: ReactNode;
   questionContent: ReactNode;
   hasAnswer: boolean;
   isLast: boolean;
@@ -50,6 +52,7 @@ export default function AssessmentShell({
   totalQuestions,
   subtitle,
   questionPrompt,
+  promptAction,
   questionContent,
   hasAnswer,
   isLast,
@@ -84,6 +87,8 @@ export default function AssessmentShell({
   const studentLevelLabel = formatStudentLevelLabel(year);
   const theme = getRealmTheme(realmId);
   const isSpace = realmId === "space";
+  const isGroundNumber = !theme.isMeasurement && !isSpace && isGroundLevelYear(year);
+  const contentWidth = wideContent || isGroundNumber ? "max-w-6xl" : "max-w-2xl";
   const progressTrack = theme.isMeasurement
     ? "rgba(214,184,108,0.22)"
     : isSpace
@@ -122,7 +127,7 @@ export default function AssessmentShell({
       )}
 
       {/* ── Mission Header ── */}
-      <div className={`assessment-header relative z-10 w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} mb-6`}>
+      <div className={`assessment-header relative z-10 w-full ${contentWidth} ${isGroundNumber ? "mb-4" : "mb-6"}`}>
         {/* Top bar */}
         <div className="assessment-top-bar flex items-center justify-between mb-4">
           {hasExitMenu ? (
@@ -193,7 +198,7 @@ export default function AssessmentShell({
         </div>
 
         {/* Title block */}
-        <div className="assessment-title-block mb-1">
+        <div className={`assessment-title-block mb-1 ${isGroundNumber ? "hidden sm:block" : ""}`}>
           <div
             className="text-[11px] font-black uppercase tracking-[0.22em]"
             style={{ color: theme.accentText }}
@@ -273,10 +278,11 @@ export default function AssessmentShell({
       </div>
 
       {/* ── Question Card ── */}
-      <div className={`assessment-content relative z-10 w-full ${wideContent ? "max-w-6xl" : "max-w-2xl"} flex-1`}>
+      <div className={`assessment-content relative z-10 w-full ${contentWidth} flex-1`}>
         <div
           className={[
-            "assessment-question-card rounded-3xl border backdrop-blur-sm shadow-2xl shadow-black/30 p-6 md:p-8",
+            "assessment-question-card rounded-lg border backdrop-blur-sm shadow-2xl shadow-black/30",
+            isGroundNumber ? "p-4 sm:p-5 md:p-6" : "p-6 md:p-8",
             isSpace ? "border-cyan-200/25 bg-[#150f38]/80" : "border-slate-700/60 bg-slate-800/80",
           ].join(" ")}
         >
@@ -297,10 +303,13 @@ export default function AssessmentShell({
 
           {/* Prompt zone */}
           {!hidePrompt && (
-            <div className="mb-6">
-              <h2 className="text-lg md:text-xl font-extrabold text-white leading-snug">
-                <MathFormattedText text={questionPrompt} />
-              </h2>
+            <div className={isGroundNumber ? "mb-4" : "mb-6"}>
+              <div className="flex items-start justify-between gap-3">
+                <h2 className="text-lg md:text-xl font-extrabold text-white leading-snug">
+                  <MathFormattedText text={questionPrompt} />
+                </h2>
+                {promptAction ? <div className="shrink-0">{promptAction}</div> : null}
+              </div>
             </div>
           )}
 
@@ -325,9 +334,9 @@ export default function AssessmentShell({
 
         {/* ── Navigation ── */}
         <div
-          className="assessment-navigation sticky z-20 mt-5 flex items-center justify-between gap-3"
+          className={`assessment-navigation z-20 mt-5 flex items-center justify-between gap-3 ${isGroundNumber ? "relative" : "sticky"}`}
           style={{
-            bottom: "max(5rem, calc(env(safe-area-inset-bottom) + 4rem))",
+            bottom: isGroundNumber ? undefined : "max(5rem, calc(env(safe-area-inset-bottom) + 4rem))",
           }}
         >
           <button

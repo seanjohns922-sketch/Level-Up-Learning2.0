@@ -7,6 +7,7 @@ import { getLevelOnePosttest } from "@/data/activities/starpath/level1/level1Pos
 import { getLevelTwoPosttest } from "@/data/activities/starpath/level2/level2PostTest";
 import { getLevelThreePosttest } from "@/data/activities/starpath/level3/level3PostTest";
 import type { SupportedMathLevel } from "@/data/activities/year2/lessonEngine";
+import { isGroundLevelYear } from "@/lib/lesson-routing";
 import {
   buildLevel3PosttestFormB,
   buildLevel3PretestFormA,
@@ -79,7 +80,7 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
   if (realmId === "measurement") {
     return getMeasurelandsPosttestForYear(yearLabel);
   }
-  if (yearLabel === "Prep") {
+  if (isGroundLevelYear(yearLabel)) {
     return {
       yearLabel: "Prep",
       questions: [...GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS],

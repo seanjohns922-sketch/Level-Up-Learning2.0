@@ -937,14 +937,8 @@ function PretestPage() {
         currentIndex={index}
         totalQuestions={questions.length}
         questionPrompt={question.prompt}
-        questionContent={isMeasurelandsTask ? questionContent :
-          <div>
-            <div className="flex justify-end mb-3">
-              <ReadAloudBtn text={question.prompt} />
-            </div>
-            {questionContent}
-          </div>
-        }
+        promptAction={isMeasurelandsTask ? undefined : <ReadAloudBtn text={question.prompt} />}
+        questionContent={questionContent}
         hasAnswer={isReady}
         isLast={index === questions.length - 1}
         submitted={submitting}
