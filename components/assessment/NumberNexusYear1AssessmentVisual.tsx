@@ -1,7 +1,8 @@
 "use client";
 
-import { BookOpen, Circle, Sprout } from "lucide-react";
+import { BookOpen, Circle, CircleDot, Gamepad2, Puzzle, Sprout, WalletCards, Wind } from "lucide-react";
 import { GroundAssessmentToken } from "@/components/assessment/NumberNexusGroundAssessmentVisual";
+import { renderCoins } from "@/components/week7/moneyAssets";
 
 type Visual = Record<string, unknown>;
 
@@ -39,6 +40,20 @@ function NumberTile({ children, muted = false }: { children: React.ReactNode; mu
   );
 }
 
+function MoneyItemIcon({ label }: { label: string }) {
+  const normalized = label.toLowerCase();
+  const Icon = normalized.includes("puzzle")
+    ? Puzzle
+    : normalized.includes("kite")
+      ? Wind
+      : normalized.includes("game")
+        ? Gamepad2
+        : normalized.includes("ball")
+          ? CircleDot
+          : WalletCards;
+  return <Icon className="h-8 w-8" aria-hidden />;
+}
+
 export default function NumberNexusYear1AssessmentVisual({ visual }: { visual: Visual }) {
   const type = String(visual.type ?? "");
 
@@ -50,12 +65,24 @@ export default function NumberNexusYear1AssessmentVisual({ visual }: { visual: V
     const ones = Number(visual.ones ?? 0);
     return (
       <Surface>
-        <div className="flex flex-wrap items-end justify-center gap-5">
-          <div className="flex gap-2" aria-label={`${tens} tens blocks`}>
-            {Array.from({ length: tens }, (_, index) => <span key={index} className="h-24 w-5 rounded-sm border border-cyan-700/30 bg-cyan-100" />)}
+        <div className="flex flex-wrap items-start justify-center gap-8 sm:gap-12">
+          <div className="flex flex-col items-center gap-3">
+            <div className="text-sm font-black text-cyan-900">Tens</div>
+            <div className="flex items-end gap-2" aria-label={`${tens} tens blocks, worth ${tens * 10}`}>
+              {Array.from({ length: tens }, (_, rodIndex) => (
+                <span key={rodIndex} className="grid overflow-hidden rounded-sm border-2 border-cyan-700 bg-cyan-100 shadow-sm">
+                  {Array.from({ length: 10 }, (__, unitIndex) => (
+                    <span key={unitIndex} className="h-2.5 w-7 border-b border-cyan-700/35 last:border-b-0" />
+                  ))}
+                </span>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-5 gap-2" aria-label={`${ones} ones blocks`}>
-            {Array.from({ length: ones }, (_, index) => <span key={index} className="h-5 w-5 rounded-sm border border-amber-600/35 bg-amber-100" />)}
+          <div className="flex flex-col items-center gap-3">
+            <div className="text-sm font-black text-amber-900">Ones</div>
+            <div className="grid grid-cols-5 gap-2" aria-label={`${ones} ones blocks`}>
+              {Array.from({ length: ones }, (_, index) => <span key={index} className="h-7 w-7 rounded-sm border-2 border-amber-600/55 bg-amber-100 shadow-sm" />)}
+            </div>
           </div>
         </div>
       </Surface>
@@ -142,11 +169,18 @@ export default function NumberNexusYear1AssessmentVisual({ visual }: { visual: V
   if (type === "number_y1_money") {
     const amounts = (visual.amounts as number[] | undefined) ?? [];
     const roles = (visual.roles as string[] | undefined) ?? [];
+    const labels = (visual.labels as string[] | undefined) ?? [];
     return (
       <Surface>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className={`grid gap-4 ${amounts.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
           {amounts.map((amount, index) => (
-            <div key={index} className={`grid h-20 min-w-24 place-items-center rounded-lg border px-4 text-3xl font-black ${roles[index] === "spend" ? "border-rose-700/25 bg-rose-50" : "border-amber-700/25 bg-amber-50"}`}>${amount}</div>
+            <div key={index} className={`flex min-h-32 flex-col items-center justify-center gap-3 rounded-lg border p-4 ${roles[index] === "spend" ? "border-rose-700/20 bg-rose-50" : "border-amber-700/20 bg-amber-50"}`}>
+              <div className="flex items-center gap-2 text-sm font-black text-slate-700">
+                <MoneyItemIcon label={labels[index] ?? roles[index] ?? "Money"} />
+                <span>{labels[index] ?? (roles[index] === "spend" ? "Item" : "Money")}</span>
+              </div>
+              <div className="flex min-h-12 items-center justify-center">{renderCoins(amount)}</div>
+            </div>
           ))}
         </div>
       </Surface>
@@ -155,10 +189,18 @@ export default function NumberNexusYear1AssessmentVisual({ visual }: { visual: V
 
   if (type === "number_y1_money_compare") {
     const groups = (visual.groups as number[][] | undefined) ?? [];
+    const labels = (visual.labels as string[] | undefined) ?? ["Mia", "Sam"];
     return (
       <Surface>
         <div className="grid gap-4 sm:grid-cols-2">
-          {groups.map((coins, groupIndex) => <div key={groupIndex} className="flex min-h-24 flex-wrap items-center justify-center gap-2 rounded-lg border border-amber-800/20 bg-white p-3">{coins.map((coin, index) => <span key={index} className="grid h-12 w-12 place-items-center rounded-full border-2 border-amber-600 bg-amber-100 text-sm font-black">{coin}c</span>)}</div>)}
+          {groups.map((coins, groupIndex) => (
+            <div key={groupIndex} className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-lg border border-amber-800/20 bg-white p-4">
+              <div className="text-sm font-black text-slate-700">{labels[groupIndex]}</div>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {coins.map((coin, index) => <div key={index}>{renderCoins(coin)}</div>)}
+              </div>
+            </div>
+          ))}
         </div>
       </Surface>
     );

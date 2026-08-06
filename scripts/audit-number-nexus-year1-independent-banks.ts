@@ -114,6 +114,7 @@ const bankSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/ye
 const apiSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/api.ts"), "utf8");
 const shellSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/AssessmentShell.tsx"), "utf8");
 const cardSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/AssessmentQuestionCard.tsx"), "utf8");
+const year1VisualSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/NumberNexusYear1AssessmentVisual.tsx"), "utf8");
 check(!/data\/activities|data\/quizzes/.test(bankSource), "Candidate banks import lesson or weekly-quiz content.");
 check(apiSource.includes("YEAR1_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS") && apiSource.includes("YEAR1_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS"), "Production resolver does not import both approved Year 1 banks.");
 check(getPretestForYearLabel("Year 1", "number").every((item, index) => item.id === YEAR1_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS[index]?.id), "Year 1 Pre-Test production route does not resolve the independent bank.");
@@ -121,6 +122,17 @@ check(getPosttestForYearLabel("Year 1", "number")?.questions.every((item, index)
 check(allItems.every((item) => typeof (item.visual as { type?: unknown })?.type === "string" && String((item.visual as { type: string }).type).startsWith("number_y1_")), "A Year 1 production item does not use the modern Year 1 visual system.");
 check(shellSource.includes('isGroundNumber || year === "Year 1"') && shellSource.includes("max-w-6xl"), "Year 1 assessments do not use the modern wide Number Nexus shell.");
 check(cardSource.includes('visual.type.startsWith("number_y1_")') && cardSource.includes("isEarlyNumberVisual"), "Year 1 assessments do not use modern light answer controls.");
+const moneyItems = allItems.filter((item) => String((item.visual as { type?: unknown })?.type).startsWith("number_y1_money"));
+check(moneyItems.length === 4, "Year 1 assessment money-item coverage changed unexpectedly.");
+check(moneyItems.every((item) => {
+  const visual = item.visual as { type: string; labels?: string[]; groups?: number[][] };
+  if (visual.type === "number_y1_money_compare") return visual.groups?.flat().every((value) => [1, 2, 5, 10].includes(value)) === true;
+  return Array.isArray(visual.labels) && visual.labels.length > 0;
+}), "A Year 1 money item lacks item labels or uses an unsupported denomination.");
+check(year1VisualSource.includes('renderCoins } from "@/components/week7/moneyAssets"') && year1VisualSource.includes("renderCoins(amount)"), "Year 1 assessment money visuals do not use the canonical coin and note artwork.");
+const mabItems = allItems.filter((item) => (item.visual as { type?: unknown })?.type === "number_y1_place_value" && typeof (item.visual as { tens?: unknown }).tens === "number");
+check(mabItems.length === 2 && mabItems.every((item) => item.prompt.includes("10") && item.prompt.includes("small block is 1")), "A Year 1 MAB item does not explain the ten and one convention in read-aloud text.");
+check(year1VisualSource.includes('aria-label={`${tens} tens blocks, worth ${tens * 10}`}') && year1VisualSource.includes("Array.from({ length: 10 }"), "Year 1 MAB rods are not visibly segmented into ten units.");
 
 if (failures.length > 0) {
   console.error(`Year 1 Number Nexus bank audit failed: ${failures.length} failure(s), ${passed} checks passed.`);
