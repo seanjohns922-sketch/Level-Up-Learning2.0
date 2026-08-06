@@ -37,7 +37,7 @@ const ALL_GENRES: GenreCatalogEntry[] = [
   { id: "grammar",     strand: "Grammar",     realm: "Runehaven Peaks", unlocksFromLevel: 0 },
   // Future strands — appear from Year 3+, always placeholder for now.
   { id: "statistics",  strand: "Statistics",  realm: "Datara",          unlocksFromLevel: 3 },
-  { id: "algebra",     strand: "Algebra",     realm: "Patternox",       unlocksFromLevel: 3 },
+  { id: "algebra",     strand: "Algebra",     realm: "Pattern Peaks",   unlocksFromLevel: 3 },
   { id: "probability", strand: "Probability", realm: "Chanzia",         unlocksFromLevel: 3 },
 ];
 

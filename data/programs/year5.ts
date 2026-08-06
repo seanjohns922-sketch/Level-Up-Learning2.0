@@ -138,7 +138,7 @@ const year5Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Algorithms with Factors & Multiples",
     activity: "Follow and use simple step-based rules to test factors, multiples, and divisibility.",
-    curriculum: ["AC9M5N02"],
+    curriculum: ["AC9M5N02", "AC9M5N10"],
     activities: [
       makeActivity("multiple_choice", 2, { mode: "factor_multiple_algorithm" }),
       makeActivity("typed_response", 1, { mode: "factor_multiple_algorithm" }),
@@ -151,7 +151,7 @@ const year5Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Spot the Pattern",
     activity: "Solve structured pattern puzzles by spotting odd-one-out numbers, explaining divisibility rules, completing missing terms, and sorting numbers by shared properties.",
-    curriculum: ["AC9M5N02"],
+    curriculum: ["AC9M5N02", "AC9M5N10"],
     activities: [
       makeActivity("multiple_choice", 3, { mode: "spot_pattern_reasoning" }),
       makeActivity("multiple_choice", 2, { mode: "spot_pattern_reasoning" }),
@@ -163,7 +163,7 @@ const year5Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Divisibility Decisions",
     activity: "Move between quick rule checks, student-claim reasoning, and written justifications about divisibility.",
-    curriculum: ["AC9M5N02"],
+    curriculum: ["AC9M5N02", "AC9M5N10"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "divisibility_quick_decision" }),
       makeActivity("multiple_choice", 1, { mode: "divisibility_whos_right" }),
@@ -176,7 +176,7 @@ const year5Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Explain Patterns and Rules",
     activity: "Move from spotting number patterns quickly to explaining why they work and creating your own clear pattern rules.",
-    curriculum: ["AC9M5N02"],
+    curriculum: ["AC9M5N02", "AC9M5N10"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "pattern_fast_thinking" }),
       makeActivity("multiple_choice", 1, { mode: "pattern_reasoning" }),

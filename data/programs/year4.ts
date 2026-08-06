@@ -17,7 +17,7 @@ const year4Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Place Value Using Larger Numbers",
     activity: "Identify value of digits in 5- and 6-digit numbers using MAB blocks and charts",
-    curriculum: ["AC9M4N01"],
+    curriculum: ["AC9M3N01"],
     activities: [
       makeActivity("place_value_builder", 2, {
         min: 10000,
@@ -54,7 +54,7 @@ const year4Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Expanded & Standard Form (Larger Numbers)",
     activity: "Convert between standard and expanded form using digit cards",
-    curriculum: ["AC9M4N01"],
+    curriculum: ["AC9M3N01"],
     activities: [
       makeActivity("partition_expand", 2, {
         min: 10000,
@@ -75,7 +75,7 @@ const year4Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Word Form & Numerals (Larger Numbers)",
     activity: "Read and write large numbers in words and match them to numerals, for example one hundred and eighty-six thousand.",
-    curriculum: ["AC9M4N01"],
+    curriculum: ["AC9M3N01"],
     activities: [
       makeActivity("place_value_builder", 1, {
         min: 10000,

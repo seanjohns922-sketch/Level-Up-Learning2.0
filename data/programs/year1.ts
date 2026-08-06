@@ -5,6 +5,10 @@ export type CurriculumCode =
   | "AC9MFN01"
   | "AC9MFN02"
   | "AC9MFN03"
+  | "AC9MFN04"
+  | "AC9MFN05"
+  | "AC9MFN06"
+  | "AC9MFA01"
   | "AC9MFSP02"
   | "AC9MFM01"
   | "AC9MFM02"
@@ -40,6 +44,8 @@ export type CurriculumCode =
   | "AC9M1N04"
   | "AC9M1N05"
   | "AC9M1N06"
+  | "AC9M1A01"
+  | "AC9M1A02"
   | "AC9M2N01"
   | "AC9M2N02"
   | "AC9M2N03"
@@ -48,6 +54,7 @@ export type CurriculumCode =
   | "AC9M2N06"
   | "AC9M2A01"
   | "AC9M2A02"
+  | "AC9M2A03"
   | "AC9M3N01"
   | "AC9M3N02"
   | "AC9M3N03"
@@ -55,6 +62,7 @@ export type CurriculumCode =
   | "AC9M3N05"
   | "AC9M3A01"
   | "AC9M3A02"
+  | "AC9M3A03"
   | "AC9M4N01"
   | "AC9M4N02"
   | "AC9M4N03"
@@ -64,6 +72,8 @@ export type CurriculumCode =
   | "AC9M4N07"
   | "AC9M4N08"
   | "AC9M4N09"
+  | "AC9M4A01"
+  | "AC9M4A02"
   | "AC9M5N01"
   | "AC9M5N02"
   | "AC9M5N03"
@@ -74,6 +84,8 @@ export type CurriculumCode =
   | "AC9M5N08"
   | "AC9M5N09"
   | "AC9M5N10"
+  | "AC9M5A01"
+  | "AC9M5A02"
   | "AC9M6N01"
   | "AC9M6N02"
   | "AC9M6N03"
@@ -83,7 +95,6 @@ export type CurriculumCode =
   | "AC9M6N07"
   | "AC9M6N08"
   | "AC9M6N09"
-  | "AC9M6N10"
   | "AC9M6A01"
   | "AC9M6A02"
   | "AC9M6A03"
@@ -262,7 +273,7 @@ const YEAR1_PROGRAM_RAW: WeekPlan[] = [
     id: "y1-w4",
     week: 4,
     topic: "Grouping & Skip Counting",
-    curriculum: ["AC9M1N03"],
+    curriculum: ["AC9M1N03", "AC9M1A01"],
     lessons: [
       {
         id: "y1-w4-l1",
@@ -279,7 +290,7 @@ const YEAR1_PROGRAM_RAW: WeekPlan[] = [
         title: "Skip count by 2s, 5s and 10s",
         focus: "Skip count by 2s, 5s and 10s",
         activityIdeas: ["Skip count jump mats", "Singing games"],
-        curriculum: ["AC9M1N03"],
+        curriculum: ["AC9M1N03", "AC9M1A01"],
         activities: [sc(2, 20), sc(5, 50), sc(10, 100)],
       },
       {
@@ -472,7 +483,7 @@ const YEAR1_PROGRAM_RAW: WeekPlan[] = [
     id: "y1-w10",
     week: 10,
     topic: "Grouping Strategies",
-    curriculum: ["AC9M1N03", "AC9M1N06"],
+    curriculum: ["AC9M1N03", "AC9M1N06", "AC9M1A01"],
     lessons: [
       {
         id: "y1-w10-l1",
@@ -480,7 +491,7 @@ const YEAR1_PROGRAM_RAW: WeekPlan[] = [
         title: "Group using skip counting",
         focus: "Group using skip counting",
         activityIdeas: ["Skip count puzzles", "Group jumping game"],
-        curriculum: ["AC9M1N03", "AC9M1N06"],
+        curriculum: ["AC9M1N03", "AC9M1N06", "AC9M1A01"],
         activities: [sc(2, 20), eg(5, 5), tr({ min: 4, max: 25 })],
       },
       {

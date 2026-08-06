@@ -17,7 +17,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Decimal Place Value to Thousandths",
     activity: "Decimals are precise numbers. Read, build, and compare decimals to thousandths.",
-    curriculum: ["AC9M6N01"],
+    curriculum: ["AC9M6N04"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_decimal_place_value_fluency",
@@ -39,7 +39,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Add & Subtract Decimals",
     activity: "Not all decimals should be solved the same way. Add and subtract decimals accurately while choosing efficient strategies.",
-    curriculum: ["AC9M6N01", "AC9M6N02"],
+    curriculum: ["AC9M6N04"],
     activities: [
       makeActivity("typed_response", 1, {
         mode: "y6_decimal_direct_calculation",
@@ -61,7 +61,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Estimate & Check with Decimals",
     activity: "You do not need to redo every calculation. Estimate quickly, check answers, and catch decimal mistakes fast.",
-    curriculum: ["AC9M6N01", "AC9M6N02"],
+    curriculum: ["AC9M6N04", "AC9M6N08"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_decimal_quick_estimate",
@@ -84,7 +84,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Prime vs Composite Numbers",
     activity: "Some numbers break down easily. Others do not. Identify prime and composite numbers using smart checks.",
-    curriculum: ["AC9M6N03"],
+    curriculum: ["AC9M6N02"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_prime_quick_classify",
@@ -106,7 +106,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Factors & Multiples",
     activity: "Factors and multiples reveal patterns. Use them to solve problems faster, not list them out.",
-    curriculum: ["AC9M6N03"],
+    curriculum: ["AC9M6N02"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_factor_quick_recognition",
@@ -128,7 +128,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Square Numbers & Patterns",
     activity: "Square numbers follow patterns. Spot them instantly and predict what comes next.",
-    curriculum: ["AC9M6N03"],
+    curriculum: ["AC9M6N02"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_square_recognition",
@@ -151,7 +151,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Multiply Decimals by 10, 100, 1000",
     activity: "Multiplying by 10, 100, and 1000 scales numbers. Watch what happens to the digits.",
-    curriculum: ["AC9M6N01", "AC9M6N02"],
+    curriculum: ["AC9M6N06"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_decimal_scale_quick",
@@ -173,7 +173,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Divide Decimals by 10, 100, 1000",
     activity: "Dividing by 10, 100, and 1000 scales numbers down. Watch what happens to the digits.",
-    curriculum: ["AC9M6N01", "AC9M6N02"],
+    curriculum: ["AC9M6N06"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_decimal_divide_quick",
@@ -195,7 +195,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Mixed Decimal Scaling Problems",
     activity: "Sometimes numbers scale up. Sometimes they scale down. Decide what to do and check if it makes sense.",
-    curriculum: ["AC9M6N01", "AC9M6N02"],
+    curriculum: ["AC9M6N06", "AC9M6N08"],
     activities: [
       makeActivity("multiple_choice", 1, {
         mode: "y6_decimal_mixed_choose",
@@ -258,7 +258,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Equivalent Fractions",
     activity: "Build, identify, and justify equivalent fractions without comparing their size.",
-    curriculum: ["AC9M6N04"],
+    curriculum: ["AC9M6N03"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_equivalent_build_strict" }),
       makeActivity("equivalent_fraction_match", 1, {}),
@@ -271,7 +271,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Ordering Fractions",
     activity: "Compare and order fractions using visual models, equivalence, and benchmark values.",
-    curriculum: ["AC9M6N04"],
+    curriculum: ["AC9M6N03"],
     activities: [
       makeActivity("fraction_compare", 1, {}),
       makeActivity("multiple_choice", 1, { mode: "y6_fraction_order_strategy" }),
@@ -284,7 +284,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Mixed Numbers & Improper Fractions",
     activity: "Convert between mixed numbers and improper fractions and compare their size.",
-    curriculum: ["AC9M6N04"],
+    curriculum: ["AC9M6N03"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_mixed_improper_convert" }),
       makeActivity("number_order", 1, { mode: "y6_mixed_improper_compare" }),
@@ -298,7 +298,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Common Denominators (Efficient Strategies)",
     activity: "A common denominator is any shared multiple, but the smartest choice is usually the lowest common multiple.",
-    curriculum: ["AC9M6N04"],
+    curriculum: ["AC9M6N05"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_common_denominator_find_smart" }),
       makeActivity("typed_response", 1, { mode: "y6_common_denominator_build_equivalents" }),
@@ -311,7 +311,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Add & Subtract Fractions",
     activity: "Choose efficient denominators, solve accurately, and decide which fraction strategies are worth using.",
-    curriculum: ["AC9M6N04"],
+    curriculum: ["AC9M6N05"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_fraction_add_subtract_core" }),
       makeActivity("typed_response", 1, { mode: "y6_fraction_add_subtract_mixed" }),
@@ -324,7 +324,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Fraction Word Problems",
     activity: "Read the context, choose the operation, solve efficiently, and check whether the result makes sense.",
-    curriculum: ["AC9M6N04"],
+    curriculum: ["AC9M6N05"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_fraction_word_problem_single" }),
       makeActivity("typed_response", 1, { mode: "y6_fraction_word_problem_multi" }),
@@ -338,7 +338,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Find a Fraction of a Quantity",
     activity: "Scale quantities forward, backward, and across multi-step situations using fractions.",
-    curriculum: ["AC9M6N05"],
+    curriculum: ["AC9M6N07"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_fraction_quantity_structure" }),
       makeActivity("typed_response", 1, { mode: "y6_fraction_quantity_nonclean" }),
@@ -351,7 +351,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Find a Percentage of a Quantity",
     activity: "Use benchmark fractions, 10% thinking, and efficient part-building to calculate percentages of quantities.",
-    curriculum: ["AC9M6N05"],
+    curriculum: ["AC9M6N07"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_percent_benchmark" }),
       makeActivity("typed_response", 1, { mode: "y6_percent_break_apart" }),
@@ -364,7 +364,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Choose Efficient Forms",
     activity: "Choose the most efficient form before solving, then convert only if it helps.",
-    curriculum: ["AC9M6N05"],
+    curriculum: ["AC9M6N07"],
     activities: [
       makeActivity("fraction_decimal_percent_match", 1, {}),
       makeActivity("typed_response", 1, { mode: "y6_fdp_use_form" }),
@@ -378,7 +378,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 1,
     topic: "Sales & Discounts — Making Smart Decisions",
     activity: "Compare real discounts, handle stacked percentage deals, and decide which option is actually better value.",
-    curriculum: ["AC9M6N05", "AC9M6N06"],
+    curriculum: ["AC9M6N07", "AC9M6N08", "AC9M6N09"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "y6_discount_compare_deals" }),
       makeActivity("typed_response", 1, { mode: "y6_discount_stacked" }),
@@ -391,7 +391,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 2,
     topic: "Best-Buy & Unit Rate Decisions",
     activity: "Compare packs, rates, and offers to decide which option gives better value.",
-    curriculum: ["AC9M6N06"],
+    curriculum: ["AC9M6N08", "AC9M6N09"],
     activities: [
       makeActivity("typed_response", 1, { mode: "y6_unit_rate_build" }),
       makeActivity("multiple_choice", 1, { mode: "y6_unit_rate_compare" }),
@@ -404,7 +404,7 @@ const year6Rows: ProgramRow[] = [
     lesson: 3,
     topic: "Interpret & Communicate Solutions",
     activity: "Work through short modelling tasks and explain which result or option makes most sense.",
-    curriculum: ["AC9M6N06"],
+    curriculum: ["AC9M6N09"],
     activities: [
       makeActivity("multiple_choice", 1, { mode: "y6_interpret_spot" }),
       makeActivity("multiple_choice", 1, { mode: "y6_interpret_decide" }),

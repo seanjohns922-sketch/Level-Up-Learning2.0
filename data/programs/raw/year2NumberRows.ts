@@ -679,7 +679,7 @@ export const year2NumberRows: ProgramRow[] = [
         }),
       ]
     ),
-    curriculum: ["AC9M2A01", "AC9M2N05"],
+    curriculum: ["AC9M2A01", "AC9M2A03", "AC9M2N05"],
   },
   {
     week: 8,
@@ -919,7 +919,7 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "inverse_link",
       }),
     ],
-    curriculum: ["AC9M2N05"],
+    curriculum: ["AC9M2N05", "AC9M2A03"],
   },
   {
     week: 11,

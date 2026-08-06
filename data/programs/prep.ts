@@ -227,14 +227,14 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
     id: "y0-w6",
     week: 6,
     topic: "Building Numbers to 10",
-    curriculum: ["AC9MFN02", "AC9MFN03"],
+    curriculum: ["AC9MFN02", "AC9MFN03", "AC9MFN04"],
     lessons: [
       buildLesson(
         6, 1,
         "Make Numbers in Different Ways",
         "Build the same number using different groups.",
         ["Make it another way", "Build and swap", "Show the same number"],
-        ["AC9MFN02", "AC9MFN03"],
+        ["AC9MFN02", "AC9MFN03", "AC9MFN04"],
         "Number Builder Lab",
         [mc({ min: 1, max: 10, mode: "flexible_make" }), mc({ min: 1, max: 10, mode: "show_same_number" }), tr({ min: 1, max: 10 })]
       ),
@@ -243,7 +243,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Ways to Make 10",
         "Build and recognise combinations that make 10 using visual part-part-whole groups.",
         ["Make 10 builder", "Fill the ten frame", "Find another way to make 10"],
-        ["AC9MFN02", "AC9MFN03"],
+        ["AC9MFN02", "AC9MFN03", "AC9MFN04"],
         "Make 10 Lab",
         [pe(0, 10), mc({ min: 1, max: 10, mode: "make_10" }), tr({ min: 1, max: 10, mode: "make_10" })]
       ),
@@ -252,7 +252,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Part-Part-Whole to 10",
         "Understand that numbers can be split into parts and recombined into a whole using visual groups to 10.",
         ["Split the number", "Match the parts", "Quick split builder"],
-        ["AC9MFN02", "AC9MFN03"],
+        ["AC9MFN02", "AC9MFN03", "AC9MFN04"],
         "Number Split Mission",
         [pe(1, 10), mc({ min: 1, max: 10, mode: "missing_part" }), tr({ min: 1, max: 10 })]
       ),
@@ -392,7 +392,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Build & Compare",
         "Build, compare, and match quantities using counting, teen-number understanding, ordering, more or less, same or different, and flexible quantity building in creative Number Nexus lab challenges.",
         ["Build the number", "Make the groups equal", "Sort the groups"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFN04"],
         "Nexus Builder Lab",
         [no(1, 20, 4, true), mc({ min: 1, max: 20, mode: "build_compare" }), tr({ min: 1, max: 20 })]
       ),
@@ -418,7 +418,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Subitising & Number Building",
         "Rapidly recognise, partition, build and compare quantities using subitising, double ten-frame structure, missing-part-to-10 reasoning and flexible visual number thinking.",
         ["Quick image flash", "Build 10 with two parts", "How many more to make 10?"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFN04"],
         "Nexus Speed Builder",
         [mc({ min: 1, max: 10, mode: "subitise_flash" }), pe(1, 10), tr({ min: 1, max: 10 })]
       ),
@@ -453,7 +453,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Flexible Number Building",
         "Strengthen final flexible number thinking through rebuilding wholes, finding missing parts, making 10 and 20, and comparing same-whole structures with reduced support.",
         ["Flexible builder", "Missing-part challenge", "Make 10 / Make 20"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFN04"],
         "Nexus Number Forge",
         [pe(1, 10), mc({ min: 1, max: 10, mode: "flexible_build" }), tr({ min: 1, max: 10 })]
       ),
