@@ -652,9 +652,9 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 1,
     topic: "Recall and skip count by 2s",
     activity: scopedActivity(
-      "Skip count by 2s with fluency and pattern recognition.",
-      "Rapid recall drills by 2s.",
-      "What pattern do you notice in the ones digits?"
+      "Recall twos facts, then use doubling and halving to derive a related division fact.",
+      "Connect a double to 2 equal groups.",
+      "How does halving the double reveal the related division fact?"
     ),
     activities: interactiveActivities(
       "skip_count",
@@ -665,11 +665,12 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "forward",
       },
       [
-        makeActivity("skip_count", 1, {
-          min: 0,
-          max: 100,
-          step: 2,
-          mode: "forward",
+        makeActivity("fact_family", 1, {
+          min: 4,
+          max: 20,
+          mode: "derive_twos",
+          familyType: "mult_div",
+          allowedGroupSizes: [2],
         }),
         makeActivity("skip_count", 1, {
           min: 0,
@@ -896,9 +897,9 @@ export const year2NumberRows: ProgramRow[] = [
     lesson: 3,
     topic: "Link division to multiplication",
     activity: scopedActivity(
-      "Link division to multiplication using inverse facts.",
-      "Rapid inverse fact recall.",
-      "Which multiplication fact checks this division result?"
+      "Use a known twos fact and halving to derive its related division fact.",
+      "Link doubles to division into 2 equal groups.",
+      "How does the double help you check the division result?"
     ),
     activities: [
       makeActivity("division_groups", 2, {
@@ -908,9 +909,11 @@ export const year2NumberRows: ProgramRow[] = [
         mode: "inverse_link",
       }),
       makeActivity("fact_family", 1, {
-        min: 0,
+        min: 4,
         max: 20,
-        mode: "recognise",
+        mode: "derive_twos",
+        familyType: "mult_div",
+        allowedGroupSizes: [2],
       }),
       makeActivity("division_groups", 1, {
         minTotal: 6,

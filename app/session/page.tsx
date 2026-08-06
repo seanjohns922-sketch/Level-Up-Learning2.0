@@ -83,6 +83,7 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { Year1PatternToken } from "@/data/activities/year1/practice-task";
 import { buildYear1Week11PatternQuizItems } from "@/data/quizzes/year1Week11Patterns";
 import { buildYear1NumberNexusWeeklyQuiz } from "@/data/quizzes/year1NumberNexus";
+import { buildYear2NumberNexusWeeklyQuiz } from "@/data/quizzes/year2NumberNexus";
 import { RepeatingPatternStrip } from "@/components/number-nexus/RepeatingPatternVisual";
 import { generatePrepWeek8TaskByKind } from "@/data/activities/prep/week8";
 import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
@@ -8324,6 +8325,10 @@ function SessionPage({
         : buildYear1NumberNexusWeeklyQuiz(Number(week)) as QuizQuestion[];
     }
 
+    if (!isMeasurementRealm && year === "Year 2") {
+      return buildYear2NumberNexusWeeklyQuiz(Number(week)) as QuizQuestion[];
+    }
+
     // Level 4 Measurelands weekly quizzes. Built weeks return their 15-question
     // quiz; unbuilt weeks return no questions rather than falling through to the
     // Number Nexus structured quiz below — Level 4 Measurement must never render
@@ -8388,7 +8393,6 @@ function SessionPage({
     }
 
     if (
-      year === "Year 2" ||
       year === "Year 3" ||
       year === "Year 4" ||
       year === "Year 5" ||

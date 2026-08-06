@@ -5,6 +5,10 @@ import {
   YEAR1_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS,
   YEAR1_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS,
 } from "./year1NumberNexusIndependentBanks";
+import {
+  YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS,
+  YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS,
+} from "./year2NumberNexusIndependentBanks";
 import { getMeasurelandsPosttestForYear, getMeasurelandsPretestForYear } from "./measurelands";
 import { getStarpathPosttestForYear } from "@/data/activities/starpath/ground/groundPostTest";
 import { getLevelOnePosttest } from "@/data/activities/starpath/level1/level1PostTest";
@@ -44,6 +48,9 @@ export function getPretestForLevel(level: SupportedMathLevel, realmId: Assessmen
   if (level === 3) {
     return buildLevel3PretestFormA();
   }
+  if (level === 2) {
+    return [...YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
+  }
   return getPretestForYear(yearLabelForLevel(level));
 }
 
@@ -56,6 +63,9 @@ export function getPosttestForLevel(level: SupportedMathLevel, realmId: Assessme
   }
   if (level === 3) {
     return buildLevel3PosttestFormB();
+  }
+  if (level === 2) {
+    return { yearLabel: "Year 2", questions: [...YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] };
   }
   return POSTTESTS[yearLabelForLevel(level)];
 }
@@ -77,6 +87,9 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
   if (yearLabel === "Year 1") {
     return [...YEAR1_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   }
+  if (yearLabel === "Year 2") {
+    return [...YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
+  }
   return getPretestForYear(yearLabel);
 }
 
@@ -97,6 +110,12 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
     return {
       yearLabel: "Year 1",
       questions: [...YEAR1_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS],
+    };
+  }
+  if (yearLabel === "Year 2") {
+    return {
+      yearLabel: "Year 2",
+      questions: [...YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS],
     };
   }
   if (yearLabel === "Year 3") {

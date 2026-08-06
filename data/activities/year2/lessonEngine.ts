@@ -569,7 +569,7 @@ export type FactFamilyQuestion = {
   family: [number, number, number];
   options: string[];
   answers: string[];
-  mode: "recognise" | "write_sentences" | "word_problems";
+  mode: "recognise" | "write_sentences" | "word_problems" | "derive_twos";
   familyType?: "add_sub" | "mult_div";
   visual?: {
     type: "array";
@@ -3845,7 +3845,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     blockedFocusKeywords: ["odd & even"],
   },
   fact_family: {
-    allowedModes: ["recognise", "write_sentences", "word_problems"],
+    allowedModes: ["recognise", "write_sentences", "word_problems", "derive_twos"],
     maxFactValue: 25,
   },
   equal_groups: {
@@ -8184,9 +8184,36 @@ function generateInteractiveQuestion(
         ? Math.min(config.max, profile.factFamilyMax)
         : profile.factFamilyMax;
     const mode =
-      config.mode === "write_sentences" || config.mode === "word_problems"
+      config.mode === "write_sentences" ||
+      config.mode === "word_problems" ||
+      config.mode === "derive_twos"
         ? config.mode
         : "recognise";
+
+    if (mode === "derive_twos") {
+      const factorMin = Math.max(2, Math.ceil(configuredMin / 2));
+      const factorMax = Math.max(factorMin, Math.min(10, Math.floor(configuredMax / 2)));
+      const factor = randInt(factorMin, factorMax);
+      const total = factor * 2;
+      const answer = `${total} ÷ 2 = ${factor}`;
+      const distractors = [
+        `${total} ÷ ${factor} = ${factor}`,
+        `${total} ÷ 2 = ${Math.max(1, factor - 1)}`,
+        `${total} ÷ 2 = ${factor + 1}`,
+        `${factor} ÷ 2 = ${total}`,
+      ].filter((value, index, values) => value !== answer && values.indexOf(value) === index);
+
+      return {
+        kind: "fact_family",
+        prompt: `Double ${factor} is ${total}. Halve ${total} into 2 equal groups. Which division fact matches?`,
+        family: [2, factor, total],
+        options: shuffle([answer, ...distractors.slice(0, 3)]),
+        answers: [answer],
+        mode,
+        familyType: "mult_div",
+        visual: { type: "array", rows: 2, columns: factor },
+      };
+    }
 
     if (restrictedFactors) {
       const a = restrictedFactors[randInt(0, restrictedFactors.length - 1)] ?? 2;
