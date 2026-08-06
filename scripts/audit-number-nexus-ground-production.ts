@@ -25,6 +25,13 @@ check(production.length === 20, "Ground production route must resolve 20 items."
 check(production.every((item, index) => item.id === approved[index]?.id), "Ground production route does not resolve the approved bank in order.");
 check(productionAliases.every((form) => form.every((item, index) => item.id === approved[index]?.id)), "A Ground year-label alias does not resolve the approved bank.");
 check(production.every((item) => "origin" in item && item.origin === "assessment_authored"), "Ground production contains a non-independent item.");
+check(production.every((item) => {
+  const visual = item.visual;
+  return typeof visual === "object"
+    && visual !== null
+    && typeof (visual as { type?: unknown }).type === "string"
+    && (visual as { type: string }).type.startsWith("number_ground_");
+}), "Ground production contains a legacy or unsupported visual renderer.");
 check(new Set(production.map((item) => item.id)).size === 20, "Ground production IDs are not unique.");
 check(legacy.every((legacyItem) => !production.some((item) => item.id === legacyItem.id)), "A legacy Ground item remains reachable in production.");
 check(POSTTESTS.Prep === undefined, "The general post-test registry still exposes the legacy Prep form.");

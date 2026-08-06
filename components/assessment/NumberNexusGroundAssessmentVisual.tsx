@@ -77,14 +77,20 @@ export default function NumberNexusGroundAssessmentVisual({ visual }: { visual: 
     const parts = Array.isArray(visual.parts) ? visual.parts : [];
     return (
       <Surface>
-        <div className="mx-auto grid max-w-md grid-cols-2 gap-4">
+        <div className="mx-auto grid max-w-md gap-4" style={{ gridTemplateColumns: `repeat(${Math.max(parts.length, 1)}, minmax(0, 1fr))` }}>
           {parts.map((part, index) => (
-            <div key={index} className="grid min-h-24 place-items-center rounded-lg border-2 border-cyan-600 bg-white text-4xl font-black text-slate-900">
-              {part === null ? "?" : String(part)}
+            <div key={index}>
+              <div className="mb-1 text-center text-[11px] font-black uppercase tracking-wide text-cyan-900/65">Part</div>
+              <div className="grid min-h-24 place-items-center rounded-lg border-2 border-cyan-600 bg-white text-4xl font-black text-slate-900">
+                {part === null ? "?" : String(part)}
+              </div>
             </div>
           ))}
-          <div className="col-span-2 mx-auto grid h-24 w-40 place-items-center rounded-lg border-2 border-emerald-700 bg-emerald-50 text-4xl font-black text-slate-900">
-            {whole === null ? "?" : whole}
+          <div className="mx-auto w-40" style={{ gridColumn: "1 / -1" }}>
+            <div className="mb-1 text-center text-[11px] font-black uppercase tracking-wide text-emerald-900/65">Whole</div>
+            <div className="grid h-24 place-items-center rounded-lg border-2 border-emerald-700 bg-emerald-50 text-4xl font-black text-slate-900">
+              {whole === null ? "?" : whole}
+            </div>
           </div>
         </div>
       </Surface>

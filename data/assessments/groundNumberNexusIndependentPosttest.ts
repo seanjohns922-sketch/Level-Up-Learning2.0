@@ -127,7 +127,7 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
     descriptor: "AC9MFN04", week: 6, lesson: 1, skillId: "missing_part", skillLabel: "Find a Missing Part",
     difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response",
     misconceptionTags: ["part-whole-conservation"], contextKey: "ground-seven-split", structureKey: "ground-enter-missing-part",
-    prompt: "What is the missing part?", correctAnswer: "4", type: "numeric",
+    prompt: "The whole is 7. One part is 3. What is the missing part?", correctAnswer: "4", type: "numeric",
     visual: { type: "number_ground_part_whole", whole: 7, parts: [3, null] },
   },
   {
@@ -169,7 +169,7 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
     descriptor: "AC9MFN04", week: 6, lesson: 2, skillId: "combine_parts", skillLabel: "Combine Parts",
     difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response",
     misconceptionTags: ["part-whole-conservation"], contextKey: "ground-two-six-combine", structureKey: "ground-enter-combined-whole",
-    prompt: "What is the whole?", correctAnswer: "8", type: "numeric",
+    prompt: "The parts are 2 and 6. What is the whole?", correctAnswer: "8", type: "numeric",
     visual: { type: "number_ground_part_whole", whole: null, parts: [2, 6] },
   },
   {
