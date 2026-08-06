@@ -5,7 +5,7 @@
 // reads as a real object. Every part carries a solid fragment, a dashed socket
 // (ghost) fragment, its familiar-shape id, and a click hit-box in viewBox coords.
 
-export type FigureShape = "triangle" | "square" | "rectangle" | "circle";
+export type FigureShape = "triangle" | "square" | "rectangle" | "circle" | "cube" | "cylinder" | "cone" | "sphere" | "prism";
 
 export type FigurePart = {
   id: string;
