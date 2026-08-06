@@ -29,7 +29,11 @@ function TokenCollection({ count, token = "crystal", mutedFrom, layout }: { coun
 }
 
 function Surface({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-lg border-2 border-cyan-800/25 bg-[#f8fbfc] p-5 shadow-sm">{children}</div>;
+  return (
+    <div className="rounded-lg border border-cyan-900/12 bg-[#f8fbfc] p-5 shadow-[0_1px_2px_rgba(8,47,73,0.05),0_12px_30px_-20px_rgba(8,47,73,0.28)]">
+      {children}
+    </div>
+  );
 }
 
 export default function NumberNexusGroundAssessmentVisual({ visual }: { visual: Visual }) {

@@ -356,18 +356,18 @@ export default function AssessmentQuestionCard({
     const built = value ? value.split(ORDER_SEPARATOR).filter(Boolean) : [];
     const slots = Number(visual?.answerSlots ?? 2);
     return (
-      <div className="mt-6 space-y-5">
+      <div className="mt-3 space-y-4">
         {renderedVisual}
-        <div className="rounded-lg border-2 border-dashed border-slate-600 bg-slate-800/50 p-4">
+        <div className="rounded-lg border-2 border-dashed border-cyan-900/20 bg-[#f8fbfc] p-4">
           <div className="flex min-h-16 flex-wrap justify-center gap-3">
             {Array.from({ length: slots }, (_, index) => built[index]
               ? <GroundAssessmentToken key={index} token={built[index]!} />
-              : <span key={index} className="h-11 w-11 rounded-lg border-2 border-dashed border-slate-500" />)}
+              : <span key={index} className="h-11 w-11 rounded-lg border-2 border-dashed border-cyan-900/25" />)}
           </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {tokens.map((token) => (
-            <div key={token} className="flex items-center justify-between rounded-lg border border-slate-600 bg-slate-700/50 p-3">
+            <div key={token} className="flex items-center justify-between rounded-lg border-2 border-slate-300 bg-[#f8fbfc] p-3 shadow-sm">
               <button type="button" disabled={built.length >= slots} onClick={() => onChange([...built, token].join(ORDER_SEPARATOR))} className="rounded-lg p-1 disabled:opacity-40" aria-label={`Place ${token}`}>
                 <GroundAssessmentToken token={token} />
               </button>
@@ -379,7 +379,7 @@ export default function AssessmentQuestionCard({
           type="button"
           onClick={() => onChange("")}
           disabled={built.length === 0}
-          className="grid h-11 w-11 place-items-center rounded-lg border border-slate-600 bg-slate-700/50 text-slate-200 disabled:opacity-40"
+          className="grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40"
           aria-label="Clear pattern"
           title="Clear pattern"
         >
@@ -415,16 +415,18 @@ export default function AssessmentQuestionCard({
     }
 
     return (
-      <div className="mt-6">
+      <div className={isGroundNumberVisual ? "mt-3" : "mt-6"}>
         {renderedVisual}
         <div className="grid gap-4 md:grid-cols-3">
           {numbers.map((num) => (
-            <div key={num} className="flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-700/50 p-2">
+            <div key={num} className={isGroundNumberVisual ? "flex items-center gap-2 rounded-lg border-2 border-slate-300 bg-[#f8fbfc] p-2 shadow-sm" : "flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-700/50 p-2"}>
               <button
                 type="button"
                 onClick={() => addNumber(num)}
                 disabled={order.includes(num)}
-                className="min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className={isGroundNumberVisual
+                  ? "min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-slate-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                  : "min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"}
               >
                 {num}
               </button>
@@ -432,7 +434,7 @@ export default function AssessmentQuestionCard({
             </div>
           ))}
         </div>
-        <div className="mt-5 rounded-lg border border-dashed border-slate-600 bg-slate-800/50 p-4">
+        <div className={isGroundNumberVisual ? "mt-5 rounded-lg border-2 border-dashed border-cyan-900/20 bg-[#f8fbfc] p-4" : "mt-5 rounded-lg border border-dashed border-slate-600 bg-slate-800/50 p-4"}>
           {!isGroundNumberVisual ? <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div> : null}
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             {order.length > 0 ? (
@@ -443,14 +445,16 @@ export default function AssessmentQuestionCard({
                   onDragStart={() => setDraggedIndex(index)}
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={() => moveDragged(index)}
-                  className="cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-2xl font-black text-white shadow-sm"
+                  className={isGroundNumberVisual
+                    ? "cursor-move rounded-lg border-2 border-cyan-600 bg-white p-4 text-center text-2xl font-black text-slate-950 shadow-sm"
+                    : "cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-2xl font-black text-white shadow-sm"}
                 >
                   {num}
                 </div>
               ))
             ) : (
               isGroundNumberVisual
-                ? Array.from({ length: numbers.length }, (_, index) => <div key={index} className="h-14 rounded-lg border-2 border-dashed border-slate-600" />)
+                ? Array.from({ length: numbers.length }, (_, index) => <div key={index} className="h-14 rounded-lg border-2 border-dashed border-cyan-900/25" />)
                 : <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">Tap the numbers in order, then drag to adjust if needed.</div>
             )}
           </div>
@@ -460,7 +464,7 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={undoLast}
             disabled={order.length === 0}
-            className={isGroundNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border border-slate-600 bg-slate-700/50 text-slate-300 disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
+            className={isGroundNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
             aria-label="Undo last number"
             title="Undo last number"
           >
@@ -470,7 +474,7 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={clear}
             disabled={order.length === 0}
-            className={isGroundNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border border-slate-600 bg-slate-700/50 text-slate-300 disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
+            className={isGroundNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
             aria-label="Clear order"
             title="Clear order"
           >

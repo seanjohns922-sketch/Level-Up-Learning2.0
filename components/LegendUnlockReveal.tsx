@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Star } from "lucide-react";
+import { ArrowRight, Library, Star } from "lucide-react";
 import type { Legend } from "@/data/legends";
 import { markLegendUnlockVideoSeen } from "@/lib/legend-video-state";
 
@@ -130,7 +130,7 @@ export default function LegendUnlockReveal({
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto px-4 py-5 sm:py-7 lg:items-center">
       {/* Backdrop */}
       <div
         className="absolute inset-0 transition-all duration-700"
@@ -241,7 +241,7 @@ export default function LegendUnlockReveal({
       )}
 
       {/* Content */}
-      <div className="relative z-10 flex w-full max-w-[400px] flex-col items-center px-4 lg:max-w-[960px]">
+      <div className="relative z-10 flex w-full max-w-[400px] flex-col items-center lg:max-w-[900px]">
         {/* "LEGEND UNLOCKED" header text */}
         {showBurst && (
           <div
@@ -252,7 +252,7 @@ export default function LegendUnlockReveal({
             }}
           >
             <div
-              className="text-sm font-black tracking-[0.3em] mb-6"
+                className="mb-4 text-xs font-black tracking-[0.26em] sm:text-sm"
               style={{
                 color: "hsl(42, 95%, 55%)",
                 textShadow: "0 0 30px hsla(42, 95%, 55%, 0.5)",
@@ -268,7 +268,7 @@ export default function LegendUnlockReveal({
         )}
 
         {/* Card + details — two columns on iPad landscape */}
-        <div className="flex w-full flex-col items-center lg:flex-row lg:items-center lg:justify-center lg:gap-10">
+        <div className="flex w-full flex-col items-center lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:items-center lg:gap-7">
         {/* Card — silhouette then reveal */}
         {showSilhouette && (
           <div
@@ -284,7 +284,7 @@ export default function LegendUnlockReveal({
           >
             {/* Glow ring behind card */}
             <div
-              className="absolute -inset-6 rounded-3xl"
+              className="absolute -inset-4 rounded-lg"
               style={{
                 background: showReveal
                   ? "linear-gradient(135deg, hsla(42, 95%, 55%, 0.4), hsla(145, 65%, 42%, 0.3), hsla(270, 60%, 60%, 0.3))"
@@ -297,10 +297,8 @@ export default function LegendUnlockReveal({
 
             {/* Card image */}
             <div
-              className="relative rounded-2xl overflow-hidden shadow-2xl"
+              className="relative h-[264px] w-[190px] overflow-hidden rounded-lg shadow-2xl sm:h-[306px] sm:w-[220px]"
               style={{
-                width: "260px",
-                height: "360px",
                 animation: showSilhouette && !showReveal
                   ? "silhouetteFloat 2s ease-in-out infinite alternate"
                   : showReveal
@@ -359,10 +357,10 @@ export default function LegendUnlockReveal({
         )}
 
         {/* RIGHT column: details + cinematic + actions */}
-        <div className="flex w-full flex-col items-center lg:max-w-[460px] lg:items-stretch">
+        <div className="flex w-full flex-col items-center lg:items-stretch">
         {/* Legend name + score + message */}
         <div
-          className="text-center mt-8 lg:mt-0 lg:text-left transition-all duration-600"
+          className="mt-5 text-center transition-all duration-600 lg:mt-0 lg:text-left"
           style={{
             opacity: showInfo ? 1 : 0,
             transform: showInfo ? "translateY(0)" : "translateY(20px)",
@@ -370,19 +368,19 @@ export default function LegendUnlockReveal({
           }}
         >
           <p
-            className="text-xs font-bold tracking-[0.2em] mb-2"
+            className="mb-1 text-[11px] font-bold tracking-[0.2em]"
             style={{ color: "hsla(42, 95%, 55%, 0.8)" }}
           >
             YOU UNLOCKED
           </p>
           <h2
-            className="text-3xl font-black mb-2"
+            className="mb-1 text-2xl font-black sm:text-3xl"
             style={{ color: "hsl(0 0% 100%)" }}
           >
             {legend.name}
           </h2>
           <p
-            className="text-sm font-semibold mb-4"
+            className="mb-3 text-sm font-semibold"
             style={{ color: "hsla(0, 0%, 100%, 0.5)" }}
           >
             {legend.strand} · {legend.yearLabel}
@@ -391,14 +389,14 @@ export default function LegendUnlockReveal({
           {/* Score badge */}
           {scorePercent !== undefined && (
             <div
-              className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full mb-3"
+              className="mb-3 inline-flex items-center gap-3 rounded-lg px-4 py-2"
               style={{
                 background: "hsla(42, 95%, 55%, 0.12)",
                 border: "1px solid hsla(42, 95%, 55%, 0.25)",
               }}
             >
               <span
-                className="text-2xl font-black"
+                className="text-3xl font-black"
                 style={{ color: "hsl(42, 95%, 55%)" }}
               >
                 {scorePercent}%
@@ -413,18 +411,18 @@ export default function LegendUnlockReveal({
           )}
 
           <p
-            className="text-sm leading-relaxed max-w-xs mx-auto lg:mx-0"
+            className="mx-auto max-w-md text-sm leading-relaxed lg:mx-0"
             style={{ color: "hsla(0, 0%, 100%, 0.6)" }}
           >
             {legend.description}
           </p>
 
           {showInfo && hasUnlockVideo ? (
-            <div className="mt-6 w-full max-w-[420px] rounded-2xl border border-white/12 bg-black/30 p-3 backdrop-blur-sm">
+            <div className="mt-4 w-full rounded-lg border border-white/12 bg-black/30 p-2 backdrop-blur-sm">
               <div className="mb-2 text-[11px] font-bold tracking-[0.22em]" style={{ color: "hsla(42, 95%, 55%, 0.86)" }}>
                 LEGEND CINEMATIC
               </div>
-              <div className="overflow-hidden rounded-xl bg-black shadow-2xl">
+              <div className="overflow-hidden rounded-lg bg-black shadow-2xl">
                 <div className="aspect-video w-full">
                   {videoFailed ? (
                     <div className="flex h-full items-center justify-center px-5 text-center text-sm text-white/75">
@@ -453,39 +451,25 @@ export default function LegendUnlockReveal({
 
         {/* Action buttons */}
         <div
-          className="w-full grid gap-3 mt-6 transition-all duration-500"
+          className="mt-4 grid w-full gap-3 transition-all duration-500 sm:grid-cols-2"
           style={{
             opacity: showButtons ? 1 : 0,
             transform: showButtons ? "translateY(0)" : "translateY(16px)",
           }}
         >
-          {hasUnlockVideo && !videoComplete && !videoFailed ? (
-            <button
-              onClick={() => {
-                finishUnlockVideo();
-                onContinue();
-              }}
-              className="w-full py-4 rounded-2xl font-bold text-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                background: "hsla(0, 0%, 100%, 0.1)",
-                color: "hsla(0, 0%, 100%, 0.9)",
-                border: "1px solid hsla(0, 0%, 100%, 0.15)",
-              }}
-            >
-              Skip Video
-            </button>
-          ) : null}
           <button
-            onClick={onViewLegends}
-            className="w-full py-4 rounded-2xl font-bold text-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            onClick={() => {
+              if (hasUnlockVideo) finishUnlockVideo();
+              onViewLegends();
+            }}
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg px-4 py-3 font-bold transition-all duration-200 hover:brightness-110 active:scale-[0.98]"
             style={{
               background: "linear-gradient(135deg, hsl(42, 95%, 55%), hsl(35, 95%, 50%))",
               color: "hsl(30, 50%, 12%)",
               boxShadow: "0 4px 24px hsla(42, 95%, 55%, 0.5)",
-              opacity: hasUnlockVideo && !videoComplete && !videoFailed ? 0.75 : 1,
             }}
-            disabled={hasUnlockVideo && !videoComplete && !videoFailed}
           >
+            <Library className="h-5 w-5" aria-hidden />
             View My Legends
           </button>
           <button
@@ -493,16 +477,13 @@ export default function LegendUnlockReveal({
               if (hasUnlockVideo) finishUnlockVideo();
               onContinue();
             }}
-            className="w-full py-4 rounded-2xl font-bold text-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/10 px-4 py-3 font-bold text-white/90 transition-all duration-200 hover:bg-white/15 active:scale-[0.98]"
             style={{
-              background: "hsla(0, 0%, 100%, 0.1)",
-              color: "hsla(0, 0%, 100%, 0.9)",
-              border: "1px solid hsla(0, 0%, 100%, 0.15)",
-              opacity: hasUnlockVideo && !videoComplete && !videoFailed ? 0.75 : 1,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
             }}
-            disabled={hasUnlockVideo && !videoComplete && !videoFailed}
           >
-            Continue →
+            Continue
+            <ArrowRight className="h-5 w-5" aria-hidden />
           </button>
         </div>
         </div>{/* right column */}
