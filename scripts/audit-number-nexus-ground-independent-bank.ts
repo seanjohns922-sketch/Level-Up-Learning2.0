@@ -3,6 +3,7 @@ import path from "node:path";
 import { isAssessmentAnswerCorrect } from "../data/assessments/analysis";
 import type { IndependentAssessmentItem } from "../data/assessments/assessmentItemStandard";
 import { GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "../data/assessments/groundNumberNexusIndependentPosttest";
+import { getPosttestForYearLabel } from "../data/assessments/api";
 import { NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS } from "../data/assessments/numberNexusAssessmentBlueprint";
 import { NUMBER_NEXUS_MISCONCEPTION_LIBRARY } from "../data/assessments/numberNexusMisconceptions";
 import type { Question } from "../data/assessments/posttests";
@@ -90,15 +91,17 @@ const apiSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/api
 const cardSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/AssessmentQuestionCard.tsx"), "utf8");
 const posttestSource = fs.readFileSync(path.join(process.cwd(), "app/posttest/page.tsx"), "utf8");
 check(!/activities\/prep|programs\/prep|weekly|lessonEngine|PracticeTask/.test(bankSource), "Ground bank imports lesson or weekly-quiz content.");
-check(!apiSource.includes("groundNumberNexusIndependentPosttest"), "Candidate bank must remain unreachable from the production resolver before educator approval.");
+const production = getPosttestForYearLabel("Prep", "number")?.questions ?? [];
+check(apiSource.includes("groundNumberNexusIndependentPosttest"), "Production resolver does not import the approved Ground bank.");
+check(production.length === 20, "Production resolver does not return 20 Ground questions.");
+check(production.every((item, index) => item.id === bank[index]?.id), "Production resolver does not preserve the approved bank order.");
 check(cardSource.includes("OptionReadAloudButton") && cardSource.includes('type === "pattern_build"'), "Ground response controls do not provide answer-option read aloud.");
 check(posttestSource.includes("<ReadAloudBtn text={q.prompt}"), "Post-test prompt read aloud is missing.");
 
 console.log(`Ground Number Nexus independent-bank audit: ${checksPassed} passed, ${failures.length} failed.`);
-console.log(`Candidate form: ${bank.length} items; ${generatedCount} constructed/manipulated; ${selectedCount} selected.`);
-console.log("Release status: EDUCATOR REVIEW REQUIRED; production resolver unchanged.");
+console.log(`Production form: ${bank.length} items; ${generatedCount} constructed/manipulated; ${selectedCount} selected.`);
+console.log("Release status: Number Nexus Ground Assessment v1.0 PRODUCTION; calibration data pending.");
 if (failures.length > 0) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 }
-

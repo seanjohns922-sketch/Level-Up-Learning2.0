@@ -1,5 +1,6 @@
 import { getPretestForYear, type Question as PretestQuestion } from "./pretests";
-import { POSTTESTS, buildPrepPosttest, type PostTest, type Question as PosttestQuestion } from "./posttests";
+import { POSTTESTS, type PostTest, type Question as PosttestQuestion } from "./posttests";
+import { GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "./groundNumberNexusIndependentPosttest";
 import { getMeasurelandsPosttestForYear, getMeasurelandsPretestForYear } from "./measurelands";
 import { getStarpathPosttestForYear } from "@/data/activities/starpath/ground/groundPostTest";
 import { getLevelOnePosttest } from "@/data/activities/starpath/level1/level1PostTest";
@@ -79,7 +80,10 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
     return getMeasurelandsPosttestForYear(yearLabel);
   }
   if (yearLabel === "Prep") {
-    return buildPrepPosttest();
+    return {
+      yearLabel: "Prep",
+      questions: [...GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS],
+    };
   }
   if (yearLabel === "Year 3") {
     return buildLevel3PosttestFormB();

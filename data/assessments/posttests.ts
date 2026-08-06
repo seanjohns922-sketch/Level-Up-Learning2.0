@@ -852,6 +852,10 @@ function nearbyNumberOptions(target: number, min: number, max: number, extra: nu
   return shufflePostItems([...set].slice(0, 4)).map(String);
 }
 
+/**
+ * @deprecated Legacy Ground Number Nexus form retained for historical replay
+ * reference only. Production resolves the independent v1 bank through api.ts.
+ */
 export function buildPrepPosttest(): PostTest {
   const countTarget = pickPostItem([12, 13, 14, 15]);
   const matchTarget = pickPostItem([16, 17, 18]);
@@ -1016,7 +1020,6 @@ export function buildPrepPosttest(): PostTest {
 }
 
 export const POSTTESTS: Record<string, PostTest> = {
-  Prep: buildPrepPosttest(),
   "Year 1": {
     yearLabel: "Year 1",
     questions: YEAR1_POSTTEST_QUESTIONS,

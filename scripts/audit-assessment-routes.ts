@@ -7,7 +7,7 @@ import { getLastProgramWeek } from "../lib/program-weeks";
 // CORRECT realm:
 //
 //   Measurelands (Ground → Level 6) → Week 8, realm_id=measurement
-//   Number Nexus  (Year 1 → Year 6) → Week 12, number realm
+//   Number Nexus  (Ground → Year 6) → Week 12, number realm
 //
 // A route that leaks Week 12 into Measurelands, drops to Ground/Number, or flips
 // the realm is a FAIL — this catches the previously-shipped Week 12 bug forever.
@@ -21,7 +21,7 @@ type Case = {
 };
 
 const MEASURELANDS_YEARS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
-const NUMBER_YEARS = ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+const NUMBER_YEARS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
 
 const cases: Case[] = [
   // Ground = Prep Measurelands. "Ground → Ground": stays in measurement at Week 8.
