@@ -951,16 +951,37 @@ function generateLesson1Task(lessonId: string, difficulty: Difficulty, kind: Les
 
 export function generatePrepWeek11Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
+  nextKind(memory, lessonId === "y0-w11-l3" ? LESSON3_ROTATION : lessonId === "y0-w11-l2" ? LESSON2_ROTATION : ROTATION);
+  const units = lessonId === "y0-w11-l1"
+    ? [["star", "crystal"], ["robot", "star"]]
+    : difficulty === "easy"
+      ? [["star", "crystal"], ["robot", "crystal"]]
+      : [["star", "star", "crystal"], ["robot", "crystal", "crystal"], ["star", "robot", "crystal"]];
+  const repeatUnit = units[memory.cursor % units.length]!;
+
   if (lessonId === "y0-w11-l3") {
-    const kind = nextKind(memory, LESSON3_ROTATION);
-    return createLesson3Task(lessonId, difficulty, kind);
+    return {
+      kind: "groundFoundation",
+      mode: "create_pattern",
+      prompt: `Create a repeating ${repeatUnit.join("-then-")} pattern.`,
+      speakText: `Create a repeating ${repeatUnit.join(" then ")} pattern.`,
+      repeatUnit,
+      repeats: difficulty === "hard" ? 3 : 2,
+    };
   }
-  if (lessonId === "y0-w11-l2") {
-    const kind = nextKind(memory, LESSON2_ROTATION);
-    return createLesson2Task(lessonId, difficulty, kind);
-  }
-  const kind = nextKind(memory, ROTATION);
-  return generateLesson1Task(lessonId, difficulty, kind);
+
+  const complete = Array.from({ length: difficulty === "hard" ? 3 : 2 }, () => repeatUnit).flat();
+  const answer = complete.at(-1)!;
+  const sequence = [...complete.slice(0, -1), "?"];
+  return {
+    kind: "groundFoundation",
+    mode: "continue_pattern",
+    prompt: "What comes next in the repeating pattern?",
+    speakText: "What comes next in the repeating pattern?",
+    sequence,
+    options: shuffle(["star", "crystal", "robot"]),
+    answer,
+  };
 }
 
 export function generatePrepWeek11TaskByKind(

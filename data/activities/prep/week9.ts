@@ -2,6 +2,7 @@ import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-
 
 type GroundOrdinalTask = Extract<PracticeTask, { kind: "groundOrdinal" }>;
 type GroundSpatialTask = Extract<PracticeTask, { kind: "groundSpatial" }>;
+type GroundFoundationTask = Extract<PracticeTask, { kind: "groundFoundation" }>;
 
 type OrdinalCharacter = GroundOrdinalTask["characters"][number];
 type SpatialSlot = GroundSpatialTask["slots"][number];
@@ -1113,16 +1114,40 @@ function generateLesson3Task(lessonId: string, _difficulty: Difficulty, kind: Le
 
 export function generatePrepWeek9Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  if (lessonId === "y0-w9-l3") {
-    const kind = nextLesson3Kind(memory);
-    return generateLesson3Task(lessonId, difficulty, kind);
+  if (lessonId === "y0-w9-l3") nextLesson3Kind(memory);
+  else if (lessonId === "y0-w9-l2") nextLesson2Kind(memory);
+  else nextLesson1Kind(memory);
+  const limit = difficulty === "easy" ? 6 : difficulty === "medium" ? 8 : 10;
+  const object = chooseRecentSafe(["crystals", "robots", "stars"] as const, memory.recentRelations) as "crystals" | "robots" | "stars";
+  const useAddition = lessonId === "y0-w9-l1" || (lessonId === "y0-w9-l3" && memory.cursor % 2 === 0);
+
+  if (useAddition) {
+    const start = randInt(1, Math.max(2, limit - 3));
+    const change = randInt(1, Math.max(1, limit - start));
+    const label = object === "robots" ? "robots" : object;
+    return {
+      kind: "groundFoundation",
+      mode: "add_to",
+      prompt: `${start} ${label} are here. ${change} more arrive. Show what happens.`,
+      speakText: `${start} ${label} are here. ${change} more arrive. Show what happens.`,
+      start,
+      change,
+      object,
+    } satisfies GroundFoundationTask;
   }
-  if (lessonId === "y0-w9-l2") {
-    const kind = nextLesson2Kind(memory);
-    return generateLesson2Task(lessonId, difficulty, kind);
-  }
-  const kind = nextLesson1Kind(memory);
-  return generateLesson1Task(lessonId, difficulty, kind);
+
+  const total = randInt(3, limit);
+  const change = randInt(1, total - 1);
+  const label = object === "robots" ? "robots" : object;
+  return {
+    kind: "groundFoundation",
+    mode: "take_away",
+    prompt: `${total} ${label} are here. ${change} leave. Show what happens.`,
+    speakText: `${total} ${label} are here. ${change} leave. Show what happens.`,
+    total,
+    change,
+    object,
+  } satisfies GroundFoundationTask;
 }
 
 export function generatePrepWeek9TaskByKind(

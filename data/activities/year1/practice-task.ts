@@ -501,6 +501,57 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
     }
   | {
+      kind: "groundFoundation";
+      mode: "add_to";
+      prompt: string;
+      speakText?: string;
+      start: number;
+      change: number;
+      object: "crystals" | "robots" | "stars";
+    }
+  | {
+      kind: "groundFoundation";
+      mode: "take_away";
+      prompt: string;
+      speakText?: string;
+      total: number;
+      change: number;
+      object: "crystals" | "robots" | "stars";
+    }
+  | {
+      kind: "groundFoundation";
+      mode: "equal_share";
+      prompt: string;
+      speakText?: string;
+      total: number;
+      groups: number;
+    }
+  | {
+      kind: "groundFoundation";
+      mode: "equal_group";
+      prompt: string;
+      speakText?: string;
+      total: number;
+      groupSize: number;
+    }
+  | {
+      kind: "groundFoundation";
+      mode: "continue_pattern";
+      prompt: string;
+      speakText?: string;
+      sequence: string[];
+      options: string[];
+      answer: string;
+    }
+  | {
+      kind: "groundFoundation";
+      mode: "create_pattern";
+      prompt: string;
+      speakText?: string;
+      repeatUnit: string[];
+      repeats: number;
+    }
+  | {
       kind: "measurementCompare";
       prompt: string;
       speakText?: string;

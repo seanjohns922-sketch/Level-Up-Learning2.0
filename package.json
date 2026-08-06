@@ -25,6 +25,7 @@
     "qa:number-nexus-shared-preview": "node scripts/number-nexus-shared-preview-audit.mjs",
     "qa:number-nexus-blueprint": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-assessment-blueprint.ts",
     "qa:number-nexus-curriculum": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-curriculum.ts",
+    "qa:number-nexus-ground-curriculum": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-ground-curriculum.ts",
     "generate:number-nexus-blueprint": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/generate-number-nexus-assessment-blueprint-review.ts",
     "qa:my-home-shell": "node scripts/my-home-shell-audit.mjs",
     "qa:global-xp": "node scripts/global-xp-foundation-audit.mjs",

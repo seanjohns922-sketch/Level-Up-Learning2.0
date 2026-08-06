@@ -51,7 +51,7 @@ The blueprint design is approved. No Number Nexus assessment questions may be re
 
 **Misconceptions:** `numeral-quantity-disconnect`
 
-**Curriculum Mapping:** **aligned**; weeks 1, 2, 3, 7, 8, 10, 11, 12. Strong coverage; remove Space-based ordinal assessment contexts from the Number Nexus form.
+**Curriculum Mapping:** **aligned**; weeks 1, 2, 3, 7, 8, 12. Strong coverage; assessment must remain within Number rather than reuse retired Space contexts.
 
 **Question Blueprint**
 
@@ -80,7 +80,7 @@ The blueprint design is approved. No Number Nexus assessment questions may be re
 
 **Misconceptions:** `subitising-vs-counting`
 
-**Curriculum Mapping:** **partial**; weeks 4, 6, 7, 10, 11, 12. Lessons extend subitising to 10; the descriptor-specific boundary to 5 is not preserved in metadata or assessment design.
+**Curriculum Mapping:** **aligned**; weeks 4, 6, 7, 12. Week 4 now preserves the curriculum boundary by restricting instant-recognition tasks to collections of 1-5.
 
 **Question Blueprint**
 
@@ -109,7 +109,7 @@ The blueprint design is approved. No Number Nexus assessment questions may be re
 
 **Misconceptions:** `counting-one-to-one`, `cardinality-and-arrangement`
 
-**Curriculum Mapping:** **aligned**; weeks 2, 3, 4, 5, 7, 8, 10, 11, 12. Coverage is broad; assessment must require count evidence rather than visual-size guessing.
+**Curriculum Mapping:** **aligned**; weeks 2, 3, 4, 5, 7, 8, 12. Coverage is broad; assessment must require count evidence rather than visual-size guessing.
 
 **Question Blueprint**
 
@@ -140,7 +140,7 @@ The blueprint design is approved. No Number Nexus assessment questions may be re
 
 **Misconceptions:** `part-whole-conservation`, `subitising-vs-counting`
 
-**Curriculum Mapping:** **aligned**; weeks 6, 10, 11, 12. Lesson metadata now identifies the existing part-part-whole sequence explicitly.
+**Curriculum Mapping:** **aligned**; weeks 6, 12. Lesson metadata identifies the dedicated part-part-whole sequence explicitly.
 
 **Question Blueprint**
 
@@ -171,7 +171,7 @@ The blueprint design is approved. No Number Nexus assessment questions may be re
 
 **Misconceptions:** `operation-story-structure`
 
-**Curriculum Mapping:** **missing**; weeks none. No dedicated addition/subtraction situation sequence is present in the 12-week program.
+**Curriculum Mapping:** **aligned**; weeks 9. Week 9 now provides a dedicated construction sequence for adding to, taking away and mixed collection changes.
 
 **Question Blueprint**
 
@@ -200,7 +200,7 @@ The blueprint design is approved. No Number Nexus assessment questions may be re
 
 **Misconceptions:** `equal-sharing-vs-grouping`
 
-**Curriculum Mapping:** **partial**; weeks 5, 12. Equal groups appear, but explicit equal-sharing and grouping problem structures are not taught systematically.
+**Curriculum Mapping:** **aligned**; weeks 10. Week 10 now teaches equal sharing and equal grouping as distinct practical structures through student-built distributions.
 
 **Question Blueprint**
 
@@ -229,7 +229,7 @@ The blueprint design is approved. No Number Nexus assessment questions may be re
 
 **Misconceptions:** `repeating-unit`
 
-**Curriculum Mapping:** **missing**; weeks none. Current Number Patterns work is number ordering, not repeating-pattern structure.
+**Curriculum Mapping:** **aligned**; weeks 11. Week 11 now progresses from recognising the repeat to continuing and constructing repeating patterns.
 
 **Question Blueprint**
 

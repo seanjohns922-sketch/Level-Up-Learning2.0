@@ -1115,16 +1115,32 @@ function generateLesson2Task(lessonId: string, difficulty: Difficulty, kind: Les
 
 export function generatePrepWeek10Task(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  if (lessonId === "y0-w10-l3") {
-    const kind = nextKind(memory, LESSON3_ROTATION);
-    return generateLesson3Task(lessonId, difficulty, kind);
+  nextKind(memory, lessonId === "y0-w10-l3" ? LESSON3_ROTATION : lessonId === "y0-w10-l2" ? LESSON2_ROTATION : LESSON1_ROTATION);
+  const useSharing = lessonId === "y0-w10-l1" || (lessonId === "y0-w10-l3" && memory.cursor % 2 === 0);
+  const choices = difficulty === "easy" ? [2] : [2, 3];
+  const structure = choices[randInt(0, choices.length - 1)]!;
+  const amount = randInt(1, difficulty === "hard" ? 4 : 3);
+  if (useSharing) {
+    const total = structure * amount;
+    return {
+      kind: "groundFoundation",
+      mode: "equal_share",
+      prompt: `Share ${total} crystals fairly between ${structure} teams.`,
+      speakText: `Share ${total} crystals fairly between ${structure} teams.`,
+      total,
+      groups: structure,
+    };
   }
-  if (lessonId === "y0-w10-l2") {
-    const kind = nextKind(memory, LESSON2_ROTATION);
-    return generateLesson2Task(lessonId, difficulty, kind);
-  }
-  const kind = nextKind(memory, LESSON1_ROTATION);
-  return generateLesson1Task(lessonId, difficulty, kind);
+
+  const total = structure * amount;
+  return {
+    kind: "groundFoundation",
+    mode: "equal_group",
+    prompt: `Pack ${total} crystals into groups of ${structure}.`,
+    speakText: `Pack ${total} crystals into groups of ${structure}.`,
+    total,
+    groupSize: structure,
+  };
 }
 
 export function generatePrepWeek10TaskByKind(

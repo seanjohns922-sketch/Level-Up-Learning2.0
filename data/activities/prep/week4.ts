@@ -30,10 +30,10 @@ type Week4Memory = {
   recentLayouts: GroundPatternLayout[];
 };
 
-const TARGETS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+const TARGETS = [1, 2, 3, 4, 5] as const;
 const LOW_TARGETS = [1, 2, 3, 4, 5] as const;
-const MID_TARGETS = [4, 5, 6, 7, 8] as const;
-const TEN_FRAME_TARGETS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+const MID_TARGETS = [2, 3, 4, 5] as const;
+const TEN_FRAME_TARGETS = [1, 2, 3, 4, 5] as const;
 const REAL_WORLD_OBJECTS: GroundObjectType[] = ["stars", "planets", "energy_orbs", "robot_tokens", "crystals", "gems"];
 const FAST_OBJECTS: GroundObjectType[] = ["dots", "stars", "gems", "number_orbs", "crystals"];
 const OBJECT_GROUP_OBJECTS: GroundObjectType[] = ["stars", "crystals", "blocks", "robot_tokens", "planets", "energy_orbs", "futuristic_coins", "gems"];

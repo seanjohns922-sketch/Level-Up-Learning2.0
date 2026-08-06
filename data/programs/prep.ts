@@ -156,26 +156,26 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y0-w4",
     week: 4,
-    topic: "Subitising 1–10",
+    topic: "Subitising Collections to 5",
     curriculum: ["AC9MFN02", "AC9MFN03"],
     lessons: [
       buildLesson(
         4, 1,
-        "Recognise Dot Patterns 1–10",
-        "Instantly recognise structured quantities to 10 without counting one-by-one.",
+        "Recognise Dot Patterns to 5",
+        "Instantly recognise structured quantities to 5 without counting one-by-one.",
         ["Flash reveal", "Ten-frame quick look", "Pattern memory sprint"],
         ["AC9MFN02", "AC9MFN03"],
         "Quick Number Eyes",
-        [mc({ min: 1, max: 10, mode: "subitise_dots" }), mc({ min: 1, max: 10, mode: "ten_frame_flash" }), tr({ min: 1, max: 10 })]
+        [mc({ min: 1, max: 5, mode: "subitise_dots" }), mc({ min: 1, max: 5, mode: "ten_frame_flash" }), tr({ min: 1, max: 5 })]
       ),
       buildLesson(
         4, 2,
         "Recognise Object Groups",
-        "Instantly recognise structured object groups to 10 without counting one-by-one.",
+        "Instantly recognise structured object groups to 5 without counting one-by-one.",
         ["Quick group flash", "Object-frame match", "Real-world memory groups"],
         ["AC9MFN02", "AC9MFN03"],
         "Quick Group Spotter",
-        [mc({ min: 1, max: 10, mode: "subitise_objects" }), mc({ min: 1, max: 10, mode: "group_flash" }), tr({ min: 1, max: 10 })]
+        [mc({ min: 1, max: 5, mode: "subitise_objects" }), mc({ min: 1, max: 5, mode: "group_flash" }), tr({ min: 1, max: 5 })]
       ),
       buildLesson(
         4, 3,
@@ -184,7 +184,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         ["Pattern to numeral match", "Match all three", "Fast pattern memory"],
         ["AC9MFN02", "AC9MFN03"],
         "Pattern Match Mission",
-        [mc({ min: 1, max: 10, mode: "pattern_to_numeral" }), mc({ min: 1, max: 10, mode: "match_all_three" }), tr({ min: 1, max: 10 })]
+        [mc({ min: 1, max: 5, mode: "pattern_to_numeral" }), mc({ min: 1, max: 5, mode: "match_all_three" }), tr({ min: 1, max: 5 })]
       ),
     ],
   },
@@ -331,105 +331,105 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y0-w9",
     week: 9,
-    topic: "Ordinal Numbers & Position",
-    curriculum: ["AC9MFN01", "AC9MFN03"],
+    topic: "Adding To and Taking Away",
+    curriculum: ["AC9MFN05"],
     lessons: [
       buildLesson(
         9, 1,
-        "First, Second, Third",
-        "Recognise and use first, second, third, fourth, fifth, last, before, and after in familiar ordered situations like races, queues, podiums, trains, and line-ups.",
-        ["Who is first?", "Race track positions", "Place Numbot second"],
-        ["AC9MFN01", "AC9MFN03"],
-        "Position Explorer Mission",
-        [mc({ min: 1, max: 10, mode: "ordinal_position" }), mc({ min: 1, max: 10, mode: "race_positions" }), tr({ min: 1, max: 5, mode: "ordinal_identify" })]
+        "Add to a Collection",
+        "Represent practical adding-to situations with objects, then quantify the resulting collection.",
+        ["Start with a collection", "Add arriving objects", "Count the resulting whole"],
+        ["AC9MFN05"],
+        "Arrival Dock",
+        [mc({ min: 1, max: 10, mode: "practical_add_to" }), tr({ min: 1, max: 10, mode: "practical_add_to" })]
       ),
       buildLesson(
         9, 2,
-        "Ordinals in Games",
-        "Use ordinal language in dynamic race, game, leaderboard, and podium contexts where positions change and students track first, second, third, before, after, and last.",
-        ["Who won the race?", "Race track order", "Champion ceremony"],
-        ["AC9MFN01", "AC9MFN03"],
-        "Nexus Race Arena",
-        [mc({ min: 1, max: 10, mode: "ordinal_game" }), mc({ min: 1, max: 10, mode: "race_order" }), tr({ min: 1, max: 5, mode: "podium" })]
+        "Take from a Collection",
+        "Represent practical taking-away situations by removing objects, then quantify what remains.",
+        ["Start with the whole", "Remove the leaving objects", "Count what remains"],
+        ["AC9MFN05"],
+        "Departure Bay",
+        [mc({ min: 1, max: 10, mode: "practical_take_away" }), tr({ min: 1, max: 10, mode: "practical_take_away" })]
       ),
       buildLesson(
         9, 3,
-        "Position Challenges",
-        "Use spatial language such as beside, between, next to, above, below, left, right, in front, and behind while placing and navigating objects in futuristic maps, rooms, and obstacle scenes.",
-        ["Who is between?", "Place Numbot beside the crystal", "Position maze"],
-        ["AC9MFN03", "AC9MFSP02"],
-        "Nexus Position Lab",
-        [mc({ min: 1, max: 10, mode: "position_language" }), mc({ min: 1, max: 10, mode: "spatial_position" }), tr({ min: 1, max: 10, mode: "place_numbot" })]
+        "What Changed?",
+        "Choose and represent whether a practical situation adds to or takes from a collection.",
+        ["Read the situation", "Represent the change", "Explain the resulting quantity"],
+        ["AC9MFN05"],
+        "Change Mission",
+        [mc({ min: 1, max: 10, mode: "choose_collection_change" }), tr({ min: 1, max: 10, mode: "represent_collection_change" })]
       ),
     ],
   },
   {
     id: "y0-w10",
     week: 10,
-    topic: "Mixed Number Fluency",
-    curriculum: ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+    topic: "Equal Sharing and Grouping",
+    curriculum: ["AC9MFN06"],
     lessons: [
       buildLesson(
         10, 1,
-        "Number Arcade",
-        "Review counting fluency, numeral recognition, matching quantities, teen numbers, ordering, positional understanding, and number relationships through fast arcade-style mini games.",
-        ["Tap the number", "Quick count flash", "Teen number match"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
-        "Nexus Number Arcade",
-        [no(1, 20, 4, true), mc({ min: 1, max: 20, mode: "mixed_review" }), tr({ min: 1, max: 20 })]
+        "Share Fairly",
+        "Represent equal-sharing situations by distributing one collection fairly between a known number of groups.",
+        ["Deal one at a time", "Compare every share", "Confirm equal groups"],
+        ["AC9MFN06"],
+        "Crystal Sharing Station",
+        [eg(3, 4), mc({ min: 2, max: 12, mode: "equal_sharing" }), tr({ min: 2, max: 12, mode: "share_fairly" })]
       ),
       buildLesson(
         10, 2,
-        "Numbot Boss Battles",
-        "Apply counting, teen numbers, comparing, ordering, ordinals, positional language, missing numbers, number paths, and quantity matching in playful boss-battle style challenge rounds.",
-        ["Count Bot", "Teen Titan", "Final Boss Round"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
-        "Numbot Boss Arena",
-        [mc({ min: 1, max: 20, mode: "teen_number" }), no(1, 20, 4, true), tr({ min: 1, max: 20 })]
+        "Make Equal Groups",
+        "Represent grouping situations by making groups of a stated size and determining how many groups are formed.",
+        ["Use every object", "Keep each group the same size", "Count the completed groups"],
+        ["AC9MFN06"],
+        "Crystal Packing Bay",
+        [eg(4, 3), mc({ min: 2, max: 12, mode: "equal_grouping" }), tr({ min: 2, max: 12, mode: "make_equal_groups" })]
       ),
       buildLesson(
         10, 3,
-        "Build & Compare",
-        "Build, compare, and match quantities using counting, teen-number understanding, ordering, more or less, same or different, and flexible quantity building in creative Number Nexus lab challenges.",
-        ["Build the number", "Make the groups equal", "Sort the groups"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFN04"],
-        "Nexus Builder Lab",
-        [no(1, 20, 4, true), mc({ min: 1, max: 20, mode: "build_compare" }), tr({ min: 1, max: 20 })]
+        "Share or Group?",
+        "Represent mixed practical situations as equal sharing or grouping and verify that every object is used fairly.",
+        ["Interpret the situation", "Build the equal structure", "Check every group"],
+        ["AC9MFN06"],
+        "Fairness Control Room",
+        [eg(4, 4), mc({ min: 2, max: 12, mode: "sharing_or_grouping" }), tr({ min: 2, max: 12, mode: "verify_equal_groups" })]
       ),
     ],
   },
   {
     id: "y0-w11",
     week: 11,
-    topic: "Review & Readiness",
-    curriculum: ["ALL"],
+    topic: "Repeating Patterns",
+    curriculum: ["AC9MFA01"],
     lessons: [
       buildLesson(
         11, 1,
-        "Counting Review",
-        "Review counting to 20, number sequencing, teen numbers, numeral recognition, quantity matching, forward and backward counting, and number order fluency through varied mixed review mini-games.",
-        ["Tap the number", "Quick count flash", "Teen number match"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
-        "Nexus Review Run",
-        [no(1, 20, 5, true), mc({ min: 1, max: 20, mode: "counting_review" }), tr({ min: 1, max: 20 })]
+        "Find the Repeat",
+        "Recognise the repeating unit in visual patterns and use it to predict what comes next.",
+        ["Notice what repeats", "Name the repeating unit", "Predict the next element"],
+        ["AC9MFA01"],
+        "Pattern Signal Lab",
+        [mc({ min: 1, max: 3, mode: "recognise_repeating_pattern" }), tr({ min: 1, max: 3, mode: "name_repeat_unit" })]
       ),
       buildLesson(
         11, 2,
-        "Subitising & Number Building",
-        "Rapidly recognise, partition, build and compare quantities using subitising, double ten-frame structure, missing-part-to-10 reasoning and flexible visual number thinking.",
-        ["Quick image flash", "Build 10 with two parts", "How many more to make 10?"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFN04"],
-        "Nexus Speed Builder",
-        [mc({ min: 1, max: 10, mode: "subitise_flash" }), pe(1, 10), tr({ min: 1, max: 10 })]
+        "Continue the Pattern",
+        "Continue AB, AAB, ABB and ABC repeating patterns by applying the whole repeating unit.",
+        ["Track the repeat", "Fill the missing element", "Continue beyond one step"],
+        ["AC9MFA01"],
+        "Pattern Relay",
+        [mc({ min: 1, max: 3, mode: "continue_repeating_pattern" }), tr({ min: 1, max: 3, mode: "complete_pattern" })]
       ),
       buildLesson(
         11, 3,
-        "Ground Level Challenge Tower",
-        "Apply counting, teen numbers, ordering, comparing, positional language, paths, subitising and reasoning through escalating challenge tower floors with reduced support.",
-        ["Multi-missing paths", "Challenge reactor", "Race track analysis"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFSP02"],
-        "Nexus Challenge Tower",
-        [no(1, 20, 5, true), mc({ min: 1, max: 20, mode: "challenge_tower" }), tr({ min: 1, max: 20 })]
+        "Create a Repeating Pattern",
+        "Create and check a visual repeating pattern from a stated repeating unit.",
+        ["Use the stated unit", "Repeat it without changing the order", "Check the complete pattern"],
+        ["AC9MFA01"],
+        "Pattern Forge",
+        [mc({ min: 1, max: 3, mode: "check_created_pattern" }), tr({ min: 1, max: 3, mode: "create_repeating_pattern" })]
       ),
     ],
   },
