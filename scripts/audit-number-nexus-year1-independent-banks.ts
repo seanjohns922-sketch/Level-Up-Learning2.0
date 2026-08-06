@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { isAssessmentAnswerCorrect } from "../data/assessments/analysis";
+import { getPosttestForYearLabel, getPretestForYearLabel } from "../data/assessments/api";
 import type { IndependentAssessmentItem } from "../data/assessments/assessmentItemStandard";
 import { NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS } from "../data/assessments/numberNexusAssessmentBlueprint";
 import { NUMBER_NEXUS_MISCONCEPTION_LIBRARY } from "../data/assessments/numberNexusMisconceptions";
@@ -111,8 +112,15 @@ for (const form of forms) {
 
 const bankSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/year1NumberNexusIndependentBanks.ts"), "utf8");
 const apiSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/api.ts"), "utf8");
+const shellSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/AssessmentShell.tsx"), "utf8");
+const cardSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/AssessmentQuestionCard.tsx"), "utf8");
 check(!/data\/activities|data\/quizzes/.test(bankSource), "Candidate banks import lesson or weekly-quiz content.");
-check(!apiSource.includes("YEAR1_NUMBER_NEXUS_INDEPENDENT_"), "Year 1 candidates were promoted before educator approval.");
+check(apiSource.includes("YEAR1_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS") && apiSource.includes("YEAR1_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS"), "Production resolver does not import both approved Year 1 banks.");
+check(getPretestForYearLabel("Year 1", "number").every((item, index) => item.id === YEAR1_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS[index]?.id), "Year 1 Pre-Test production route does not resolve the independent bank.");
+check(getPosttestForYearLabel("Year 1", "number")?.questions.every((item, index) => item.id === YEAR1_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS[index]?.id) === true, "Year 1 Post-Test production route does not resolve the independent bank.");
+check(allItems.every((item) => typeof (item.visual as { type?: unknown })?.type === "string" && String((item.visual as { type: string }).type).startsWith("number_y1_")), "A Year 1 production item does not use the modern Year 1 visual system.");
+check(shellSource.includes('isGroundNumber || year === "Year 1"') && shellSource.includes("max-w-6xl"), "Year 1 assessments do not use the modern wide Number Nexus shell.");
+check(cardSource.includes('visual.type.startsWith("number_y1_")') && cardSource.includes("isEarlyNumberVisual"), "Year 1 assessments do not use modern light answer controls.");
 
 if (failures.length > 0) {
   console.error(`Year 1 Number Nexus bank audit failed: ${failures.length} failure(s), ${passed} checks passed.`);
@@ -120,4 +128,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Year 1 Number Nexus bank audit passed: 40/40 items across 2 forms; ${passed} validation checks passed. Production remains unchanged pending educator review.`);
+console.log(`Year 1 Number Nexus production bank audit passed: 40/40 items across 2 forms; ${passed} validation checks passed.`);

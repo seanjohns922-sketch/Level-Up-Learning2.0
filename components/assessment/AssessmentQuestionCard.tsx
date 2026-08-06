@@ -303,7 +303,6 @@ export default function AssessmentQuestionCard({
     typeof question.visual === "object" && question.visual !== null
       ? (question.visual as Record<string, unknown>)
       : undefined;
-  const isGroundNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_ground_");
   const isEarlyNumberVisual = typeof visual?.type === "string" && (visual.type.startsWith("number_ground_") || visual.type.startsWith("number_y1_"));
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
@@ -469,21 +468,21 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={undoLast}
             disabled={order.length === 0}
-            className={isGroundNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
+            className={isEarlyNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
             aria-label="Undo last number"
             title="Undo last number"
           >
-            {isGroundNumberVisual ? <Undo2 className="h-5 w-5" aria-hidden /> : "Undo last"}
+            {isEarlyNumberVisual ? <Undo2 className="h-5 w-5" aria-hidden /> : "Undo last"}
           </button>
           <button
             type="button"
             onClick={clear}
             disabled={order.length === 0}
-            className={isGroundNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
+            className={isEarlyNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
             aria-label="Clear order"
             title="Clear order"
           >
-            {isGroundNumberVisual ? <Trash2 className="h-5 w-5" aria-hidden /> : "Clear order"}
+            {isEarlyNumberVisual ? <Trash2 className="h-5 w-5" aria-hidden /> : "Clear order"}
           </button>
         </div>
       </div>
@@ -736,7 +735,7 @@ export default function AssessmentQuestionCard({
   }
 
   if (type === "numeric") {
-    if (isGroundNumberVisual) {
+    if (isEarlyNumberVisual) {
       return (
         <div className="mt-3 space-y-4">
           {renderedVisual}
@@ -756,7 +755,7 @@ export default function AssessmentQuestionCard({
     return (
       <div className="mt-6">
         {renderedVisual}
-        {theme.isMeasurement && question.answerFormat ? <MeasurelandsAnswerWidget key={question.id} format={question.answerFormat} value={value} onChange={onChange} inputMode={question.inputMode} /> : <input type="text" inputMode={question.inputMode ?? "decimal"} value={value ?? ""} onChange={(event) => onChange(event.target.value)} placeholder={isGroundNumberVisual ? undefined : "Enter your answer"} aria-label="Answer" className={`w-full rounded-2xl border border-slate-600 bg-slate-700/50 px-5 py-4 text-2xl font-black text-white outline-none transition placeholder:text-slate-400 ${focusBorder} focus:bg-slate-700`} />}
+        {theme.isMeasurement && question.answerFormat ? <MeasurelandsAnswerWidget key={question.id} format={question.answerFormat} value={value} onChange={onChange} inputMode={question.inputMode} /> : <input type="text" inputMode={question.inputMode ?? "decimal"} value={value ?? ""} onChange={(event) => onChange(event.target.value)} placeholder="Enter your answer" aria-label="Answer" className={`w-full rounded-2xl border border-slate-600 bg-slate-700/50 px-5 py-4 text-2xl font-black text-white outline-none transition placeholder:text-slate-400 ${focusBorder} focus:bg-slate-700`} />}
       </div>
     );
   }
@@ -770,7 +769,7 @@ export default function AssessmentQuestionCard({
       return isMeasurelandsVisualOption(String(label));
     });
 
-  if (isGroundNumberVisual) {
+  if (isEarlyNumberVisual) {
     const gridClass = options.length === 2
       ? "sm:grid-cols-2"
       : options.length === 3

@@ -76,4 +76,4 @@ assert(sessionSource.includes("buildYear1Week11PatternQuizQuestions"));
 assert(sessionSource.includes("buildYear1NumberNexusWeeklyQuiz(Number(week))"));
 assert(!assessmentApi.includes("year1Week11Patterns"), "Weekly quiz bank leaked into the assessment resolver.");
 
-console.log("Number Nexus Year 1 Curriculum Completion passed: AC9M1A02 is taught through identify, continue and create lessons; the independent Week 11 quiz contains 15 valid questions in a 5-5-5 split. Production assessment promotion remains blocked pending educator approval.");
+console.log("Number Nexus Year 1 Curriculum Completion passed: AC9M1A02 is taught through identify, continue and create lessons; the independent Week 11 quiz contains 15 valid questions in a 5-5-5 split. Independent Year 1 assessment banks are live in production.");

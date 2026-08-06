@@ -66,7 +66,7 @@ assert(!bankSource.includes("data/activities/year1/week"), "Year 1 quiz bank imp
 assert(!bankSource.includes("generateWeek"), "Year 1 quiz bank calls lesson generation.");
 assert(!patternBankSource.includes("generateWeek"), "Week 11 quiz bank calls lesson generation.");
 assert(sessionSource.includes('year === "Year 1"') && sessionSource.includes("buildYear1NumberNexusWeeklyQuiz(Number(week))"), "Live Year 1 quiz routes do not dispatch to the independent bank.");
-assert(!assessmentApi.includes("year1NumberNexus") && !assessmentApi.includes("year1Week11Patterns"), "A weekly quiz bank leaked into assessment resolution.");
+assert(!assessmentApi.includes("data/quizzes/year1NumberNexus") && !assessmentApi.includes("year1Week11Patterns"), "A weekly quiz bank leaked into assessment resolution.");
 assert(sessionSource.includes('isFinalQuizWeek ? "Continue to Post-Test"'), "Final-week quiz does not present the Post-Test action.");
 assert(sessionSource.includes("`/posttest?year=${encodeURIComponent(year)}${realmParam}`"), "Final-week quiz does not route to the Post-Test.");
 assert(!sessionSource.includes("Math.min(12, Number(week) + 1)"), "Final-week quiz still loops to the final week.");

@@ -88,7 +88,8 @@ export default function AssessmentShell({
   const theme = getRealmTheme(realmId);
   const isSpace = realmId === "space";
   const isGroundNumber = !theme.isMeasurement && !isSpace && isGroundLevelYear(year);
-  const contentWidth = wideContent || isGroundNumber ? "max-w-6xl" : "max-w-2xl";
+  const isModernNumber = !theme.isMeasurement && !isSpace && (isGroundNumber || year === "Year 1");
+  const contentWidth = wideContent || isModernNumber ? "max-w-6xl" : "max-w-2xl";
   const progressTrack = theme.isMeasurement
     ? "rgba(214,184,108,0.22)"
     : isSpace
@@ -105,7 +106,13 @@ export default function AssessmentShell({
           ? "linear-gradient(180deg, #140d04 0%, #2a1a06 40%, #120b03 100%)"
           : isSpace
             ? "#070a1b"
+            : isModernNumber
+              ? "#001b18"
             : "linear-gradient(to bottom, rgb(2 6 23), rgb(15 23 42), rgb(2 6 23))",
+        backgroundImage: isModernNumber
+          ? "linear-gradient(rgba(45,212,191,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(45,212,191,0.035) 1px, transparent 1px)"
+          : undefined,
+        backgroundSize: isModernNumber ? "48px 48px" : undefined,
         paddingBottom: "max(7rem, calc(env(safe-area-inset-bottom) + 6rem))",
       }}
     >
@@ -127,7 +134,7 @@ export default function AssessmentShell({
       )}
 
       {/* ── Mission Header ── */}
-      <div className={`assessment-header relative z-10 w-full ${contentWidth} ${isGroundNumber ? "mb-4" : "mb-6"}`}>
+      <div className={`assessment-header relative z-10 w-full ${contentWidth} ${isModernNumber ? "mb-4" : "mb-6"}`}>
         {/* Top bar */}
         <div className="assessment-top-bar flex items-center justify-between mb-4">
           {hasExitMenu ? (
@@ -136,7 +143,7 @@ export default function AssessmentShell({
                 <button
                   onClick={onHome}
                   title="Save & go Home"
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 bg-slate-800/80 border border-slate-700/60 hover:bg-slate-700 hover:text-white transition"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 bg-slate-800/80 border border-slate-700/60 hover:bg-slate-700 hover:text-white transition"
                 >
                   <Home className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Home</span>
@@ -146,7 +153,7 @@ export default function AssessmentShell({
                 <button
                   onClick={onExitAssessment}
                   title="Save & exit assessment"
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 bg-slate-800/80 border border-slate-700/60 hover:bg-slate-700 hover:text-white transition"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 bg-slate-800/80 border border-slate-700/60 hover:bg-slate-700 hover:text-white transition"
                 >
                   <DoorOpen className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Exit</span>
@@ -156,7 +163,7 @@ export default function AssessmentShell({
                 <button
                   onClick={onLogout}
                   title="Save & log out"
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-300 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 hover:text-rose-200 transition"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-rose-300 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 hover:text-rose-200 transition"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Logout</span>
@@ -175,7 +182,7 @@ export default function AssessmentShell({
 
           <div className="flex items-center gap-2">
             <span
-              className="px-3 py-1 rounded-full text-xs font-bold"
+              className="px-3 py-1 rounded-lg text-xs font-bold"
               style={{
                 background: theme.chipBg,
                 color: theme.chipText,
@@ -185,7 +192,7 @@ export default function AssessmentShell({
               {studentLevelLabel}
             </span>
             <span
-              className="px-3 py-1 rounded-full text-xs font-bold"
+              className="px-3 py-1 rounded-lg text-xs font-bold"
               style={{
                 background: theme.chipBg,
                 color: theme.chipText,
@@ -282,8 +289,12 @@ export default function AssessmentShell({
         <div
           className={[
             "assessment-question-card rounded-lg border backdrop-blur-sm shadow-2xl shadow-black/30",
-            isGroundNumber ? "p-4 sm:p-5 md:p-6" : "p-6 md:p-8",
-            isSpace ? "border-cyan-200/25 bg-[#150f38]/80" : "border-slate-700/60 bg-slate-800/80",
+            isModernNumber ? "p-4 sm:p-5 md:p-6" : "p-6 md:p-8",
+            isSpace
+              ? "border-cyan-200/25 bg-[#150f38]/80"
+              : isModernNumber
+                ? "border-teal-300/20 bg-[#032521]/95"
+                : "border-slate-700/60 bg-slate-800/80",
           ].join(" ")}
         >
           {/* Question number chip */}
@@ -303,7 +314,7 @@ export default function AssessmentShell({
 
           {/* Prompt zone */}
           {!hidePrompt && (
-            <div className={isGroundNumber ? "mb-4" : "mb-6"}>
+            <div className={isModernNumber ? "mb-4" : "mb-6"}>
               <div className="flex items-start justify-between gap-3">
                 <h2 className="text-lg md:text-xl font-extrabold text-white leading-snug">
                   <MathFormattedText text={questionPrompt} />
@@ -323,7 +334,7 @@ export default function AssessmentShell({
             <div className="mt-6 flex justify-center">
               <button
                 onClick={onIdk}
-                className="flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold text-slate-300 bg-slate-700/40 border border-slate-600/60 hover:bg-slate-700/70 hover:text-white transition active:scale-[0.98]"
+                className="flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-bold text-slate-300 bg-slate-700/40 border border-slate-600/60 hover:bg-slate-700/70 hover:text-white transition active:scale-[0.98]"
               >
                 <HelpCircle className="h-5 w-5" />
                 I Don&apos;t Know — Skip This Question
@@ -334,16 +345,16 @@ export default function AssessmentShell({
 
         {/* ── Navigation ── */}
         <div
-          className={`assessment-navigation z-20 mt-5 flex items-center justify-between gap-3 ${isGroundNumber ? "relative" : "sticky"}`}
+          className={`assessment-navigation z-20 mt-5 flex items-center justify-between gap-3 ${isModernNumber ? "relative" : "sticky"}`}
           style={{
-            bottom: isGroundNumber ? undefined : "max(5rem, calc(env(safe-area-inset-bottom) + 4rem))",
+            bottom: isModernNumber ? undefined : "max(5rem, calc(env(safe-area-inset-bottom) + 4rem))",
           }}
         >
           <button
             onClick={onBack}
             disabled={currentIndex === 0}
             className={[
-              "px-5 py-3 rounded-2xl font-bold text-sm transition",
+              "px-5 py-3 rounded-lg font-bold text-sm transition",
               currentIndex === 0
                 ? "bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700/50"
                 : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700/50 hover:text-white",
@@ -357,7 +368,7 @@ export default function AssessmentShell({
               onClick={onSubmit}
               disabled={!hasAnswer || submitted}
               className={[
-                "px-8 py-3 rounded-2xl font-extrabold text-sm transition shadow-lg",
+                "px-8 py-3 rounded-lg font-extrabold text-sm transition shadow-lg",
                 hasAnswer && !submitted
                   ? `${theme.ctaGradientClass} ${theme.ctaHoverGradientClass} text-white`
                   : "bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700/50 shadow-none",
@@ -371,7 +382,7 @@ export default function AssessmentShell({
               onClick={onNext}
               disabled={!hasAnswer}
               className={[
-                "px-8 py-3 rounded-2xl font-extrabold text-sm transition shadow-lg",
+                "px-8 py-3 rounded-lg font-extrabold text-sm transition shadow-lg",
                 hasAnswer
                   ? `${theme.ctaGradientClass} ${theme.ctaHoverGradientClass} text-white`
                   : "bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700/50 shadow-none",
