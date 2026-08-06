@@ -4,7 +4,7 @@ import { gridReferenceForCell } from "@/lib/starpath-grid-reference";
 export type GridRouteTask = Extract<PracticeTask, { kind: "starpathGridRoute" }>;
 export type GridMove = NonNullable<GridRouteTask["route"]>[number];
 
-const COLUMNS = ["A", "B", "C", "D", "E", "F"];
+const COLUMNS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 const ROWS = ["1", "2", "3", "4", "5"];
 const DELTA: Record<GridMove, { r: number; c: number }> = {
   up: { r: -1, c: 0 }, down: { r: 1, c: 0 }, left: { r: 0, c: -1 }, right: { r: 0, c: 1 },
@@ -43,8 +43,8 @@ function ref(rows: number, cols: number, cell: { r: number; c: number }) {
 }
 
 function make(round: number, mode: GridRouteTask["mode"], target: number): GridRouteTask {
-  const cols = round % 2 ? 6 : 5;
-  const rows = round % 3 ? 5 : 4;
+  const cols = 8;
+  const rows = 4;
   const start = { r: round % 2, c: 0 };
   const checkpoint = { r: 1 + (round % (rows - 2)), c: 2, label: "Signal relay" };
   const goal = { r: rows - 1 - (round % 2), c: cols - 1, label: "Research base" };
