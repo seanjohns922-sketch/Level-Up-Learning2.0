@@ -10,6 +10,10 @@ import { SHAPE_OBJECTS, type ShapeObjectId } from "@/data/activities/starpath/gr
 import { PositionObjectVisual } from "@/components/starpath/StarpathPositionCards";
 import type { PositionRelation } from "@/data/activities/starpath/ground/position-objects";
 import { listL3Objects, getL3Object, l3ObjectSvg, type L3ObjectId } from "@/data/activities/starpath/level3/l3-objects";
+import L4TeachGrid, { L4_TEACH_HEADING, type L4TeachVariant } from "@/components/starpath/L4TeachGrid";
+
+const L4_TEACH_VARIANTS: L4TeachVariant[] = ["l4Composite", "l4Solids", "l4Model", "l4GridRef", "l4GridRoute", "l4LineSym", "l4RotSym", "l4Integrate"];
+const isL4Teach = (variant: string): variant is L4TeachVariant => (L4_TEACH_VARIANTS as string[]).includes(variant);
 
 type ShapeIntroTask = Extract<PracticeTask, { kind: "starpathShapeIntro" }>;
 type ShapeMatchTask = Extract<PracticeTask, { kind: "starpathShapeMatch" }>;
@@ -577,7 +581,9 @@ export function StarpathShapeIntroCard({
   const variant = task.variant ?? "shapes";
   const heading =
     task.heading ??
-    (variant === "objects"
+    (isL4Teach(variant)
+      ? L4_TEACH_HEADING[variant]
+      : variant === "objects"
       ? "Shapes are everywhere"
       : variant === "clues"
         ? "Look for the clues"
@@ -621,7 +627,9 @@ export function StarpathShapeIntroCard({
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-b from-violet-50 to-cyan-50 p-5 sm:p-7">
       <TaskHeading prompt={heading} speech={task.speakText} />
 
-      {variant === "objects3d" ? (
+      {isL4Teach(variant) ? (
+        <L4TeachGrid variant={variant} />
+      ) : variant === "objects3d" ? (
         <ObjectsTeachGrid />
       ) : variant === "objectFeatures" ? (
         <ObjectFeaturesTeachGrid />

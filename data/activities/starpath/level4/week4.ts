@@ -12,18 +12,18 @@ import {
 
 export const createReadGridTaskSet = () => taskSet(
   [referenceToCellTask, cellToReferenceTask, referenceDebugTask],
-  teaching("Read the Grid", "A grid reference names one cell.", "Read the column letter first, then the row number. B3 means column B and row 3. A grid reference names a cell, not the lines around it."),
+  teaching("Read the Grid", "A grid reference names one cell.", "Read the column letter first, then the row number. B3 means column B and row 3. A grid reference names a cell, not the lines around it.", "l4GridRef"),
 );
 
 export const createLocateFeatureTaskSet = () => taskSet(
   [referenceToLandmarkTask, landmarkToReferenceTask, placeAtReferenceTask],
-  teaching("Locate the Feature", "References make crowded maps precise.", "Use a reference to find a landmark, report a landmark's reference, and place a new feature in an exact cell."),
+  teaching("Locate the Feature", "References make crowded maps precise.", "Use a reference to find a landmark, report a landmark's reference, and place a new feature in an exact cell.", "l4GridRef"),
   20,
 );
 
 export const createBuildGridTaskSet = () => taskSet(
   [labelGridTask, placeAtReferenceTask, repairLabelsTask],
-  teaching("Build the Grid System", "A useful system labels every row and column consistently.", "Build the labels in order, use the finished system to place a feature, then repair any missing or repeated label."),
+  teaching("Build the Grid System", "A useful system labels every row and column consistently.", "Build the labels in order, use the finished system to place a feature, then repair any missing or repeated label.", "l4GridRef"),
   30,
 );
 
