@@ -4,8 +4,11 @@ import { useState } from "react";
 import { Check, RotateCcw } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import { getL2Shape, l2ShapeSvg } from "@/data/activities/starpath/level2/l2-shapes";
+import { getL3Object, l3ObjectSvg, type L3ObjectId } from "@/data/activities/starpath/level3/l3-objects";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { isCompositeSolution, type CompositePlacement } from "@/data/activities/starpath/level4/composite";
+
+const SOLID_IDS = new Set(["cube", "cylinder", "cone", "sphere", "prism"]);
 
 type Task = Extract<PracticeTask, { kind: "starpathComposite" }>;
 type Figure = NonNullable<Task["figure"]>;
@@ -24,6 +27,7 @@ function Svg({ svg, className, style }: { svg: string; className?: string; style
   return <span className={className} style={style} aria-hidden="true" dangerouslySetInnerHTML={{ __html: svg }} />;
 }
 function shapeIcon(shape: string, size = 34) {
+  if (SOLID_IDS.has(shape)) return l3ObjectSvg(getL3Object(shape as L3ObjectId), { size });
   return l2ShapeSvg(getL2Shape(shape), { size });
 }
 

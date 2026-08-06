@@ -1,5 +1,6 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { getL4Figure, figureSvg, type CompositeFigure } from "./composite-figures";
+import { getL4Object } from "./composite-objects";
 
 export type CompositeTask = Extract<PracticeTask, { kind: "starpathComposite" }>;
 export type CompositePlacement = { r: number; c: number; pieceId: string };
@@ -145,6 +146,24 @@ function solid(round: number, mode: CompositeTask["mode"], targetNumber: number)
   };
 }
 
-export const solidAssemblyTask = (round: number, targetNumber: number) => solid(round, "solid", targetNumber);
+// "Combine the Solids" builds a composite OBJECT from familiar solids (same
+// figure-build card, 3D-solid palette). Views/hidden keep the cube-evidence board.
+const SOLID_SHAPES = ["cube", "cylinder", "cone", "sphere", "prism"];
+function objectBuild(round: number, targetNumber: number): CompositeTask {
+  const obj = getL4Object(round);
+  return {
+    kind: "starpathComposite",
+    mode: "solid",
+    target: targetNumber,
+    prompt: `Build the ${obj.name} from familiar solids.`,
+    speakText: `Pick a familiar solid, then tap the glowing socket it fits. Build the ${obj.name}.`,
+    designBrief: `A composite object is made from familiar solids. Fill each glowing socket with the solid that matches it to build the ${obj.name}.`,
+    figure: { id: obj.id, name: obj.name, viewBox: obj.viewBox, parts: obj.parts.map((p) => ({ id: p.id, label: p.label, shape: p.shape, solid: p.solid, ghost: p.ghost, hit: p.hit })) },
+    buildPalette: SOLID_SHAPES,
+    feedback: { correct: `The ${obj.name} is complete!`, wrong: "Each glowing socket needs the familiar solid that matches its outline." },
+  };
+}
+
+export const solidAssemblyTask = (round: number, targetNumber: number) => objectBuild(round, targetNumber);
 export const viewBuildTask = (round: number, targetNumber: number) => solid(round + 2, "views", targetNumber);
 export const hiddenStructureTask = (round: number, targetNumber: number) => solid(round + 4, "hidden", targetNumber);
