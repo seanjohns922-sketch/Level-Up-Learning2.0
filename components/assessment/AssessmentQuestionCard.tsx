@@ -14,6 +14,7 @@ import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCa
 import { BalanceEquationCardVisual } from "@/components/activities/EquationVisualCards";
 import MeasurelandsAssessmentVisual from "@/components/assessment/MeasurelandsAssessmentVisual";
 import NumberNexusGroundAssessmentVisual, { GroundAssessmentToken } from "@/components/assessment/NumberNexusGroundAssessmentVisual";
+import NumberNexusYear1AssessmentVisual from "@/components/assessment/NumberNexusYear1AssessmentVisual";
 import MeasurelandsAnswerWidget from "@/components/assessment/MeasurelandsAnswerWidget";
 import type { MeasurelandsAnswerFormat } from "@/data/assessments/measurelandsPresentation";
 import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObjectArt";
@@ -303,6 +304,7 @@ export default function AssessmentQuestionCard({
       ? (question.visual as Record<string, unknown>)
       : undefined;
   const isGroundNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_ground_");
+  const isEarlyNumberVisual = typeof visual?.type === "string" && (visual.type.startsWith("number_ground_") || visual.type.startsWith("number_y1_"));
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
@@ -347,6 +349,9 @@ export default function AssessmentQuestionCard({
       ) : null}
       {typeof visual.type === "string" && visual.type.startsWith("number_ground_") ? (
         <NumberNexusGroundAssessmentVisual visual={visual} />
+      ) : null}
+      {typeof visual.type === "string" && visual.type.startsWith("number_y1_") ? (
+        <NumberNexusYear1AssessmentVisual visual={visual} />
       ) : null}
     </>
   ) : null;
@@ -415,16 +420,16 @@ export default function AssessmentQuestionCard({
     }
 
     return (
-      <div className={isGroundNumberVisual ? "mt-3" : "mt-6"}>
+      <div className={isEarlyNumberVisual ? "mt-3" : "mt-6"}>
         {renderedVisual}
         <div className="grid gap-4 md:grid-cols-3">
           {numbers.map((num) => (
-            <div key={num} className={isGroundNumberVisual ? "flex items-center gap-2 rounded-lg border-2 border-slate-300 bg-[#f8fbfc] p-2 shadow-sm" : "flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-700/50 p-2"}>
+            <div key={num} className={isEarlyNumberVisual ? "flex items-center gap-2 rounded-lg border-2 border-slate-300 bg-[#f8fbfc] p-2 shadow-sm" : "flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-700/50 p-2"}>
               <button
                 type="button"
                 onClick={() => addNumber(num)}
                 disabled={order.includes(num)}
-                className={isGroundNumberVisual
+                className={isEarlyNumberVisual
                   ? "min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-slate-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
                   : "min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"}
               >
@@ -434,8 +439,8 @@ export default function AssessmentQuestionCard({
             </div>
           ))}
         </div>
-        <div className={isGroundNumberVisual ? "mt-5 rounded-lg border-2 border-dashed border-cyan-900/20 bg-[#f8fbfc] p-4" : "mt-5 rounded-lg border border-dashed border-slate-600 bg-slate-800/50 p-4"}>
-          {!isGroundNumberVisual ? <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div> : null}
+        <div className={isEarlyNumberVisual ? "mt-5 rounded-lg border-2 border-dashed border-cyan-900/20 bg-[#f8fbfc] p-4" : "mt-5 rounded-lg border border-dashed border-slate-600 bg-slate-800/50 p-4"}>
+          {!isEarlyNumberVisual ? <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div> : null}
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             {order.length > 0 ? (
               order.map((num, index) => (
@@ -445,7 +450,7 @@ export default function AssessmentQuestionCard({
                   onDragStart={() => setDraggedIndex(index)}
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={() => moveDragged(index)}
-                  className={isGroundNumberVisual
+                  className={isEarlyNumberVisual
                     ? "cursor-move rounded-lg border-2 border-cyan-600 bg-white p-4 text-center text-2xl font-black text-slate-950 shadow-sm"
                     : "cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-2xl font-black text-white shadow-sm"}
                 >
@@ -453,7 +458,7 @@ export default function AssessmentQuestionCard({
                 </div>
               ))
             ) : (
-              isGroundNumberVisual
+              isEarlyNumberVisual
                 ? Array.from({ length: numbers.length }, (_, index) => <div key={index} className="h-14 rounded-lg border-2 border-dashed border-cyan-900/25" />)
                 : <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">Tap the numbers in order, then drag to adjust if needed.</div>
             )}

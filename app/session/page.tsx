@@ -47,6 +47,7 @@ import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
 import { Volume2, Sparkles, Zap, Check, PartyPopper, SkipForward } from "lucide-react";
 import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
+import { getLastProgramWeek } from "@/lib/program-weeks";
 import type { TeacherAttemptQuestion } from "@/lib/teacher-insights";
 import { buildAssessmentQuestionSnapshots, type ReplayQuestionSource } from "@/lib/assessment-replay";
 import {
@@ -81,6 +82,7 @@ import type { LessonActivity } from "@/data/programs/types";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { Year1PatternToken } from "@/data/activities/year1/practice-task";
 import { buildYear1Week11PatternQuizItems } from "@/data/quizzes/year1Week11Patterns";
+import { buildYear1NumberNexusWeeklyQuiz } from "@/data/quizzes/year1NumberNexus";
 import { RepeatingPatternStrip } from "@/components/number-nexus/RepeatingPatternVisual";
 import { generatePrepWeek8TaskByKind } from "@/data/activities/prep/week8";
 import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
@@ -7940,6 +7942,8 @@ function SessionPage({
   const router = useRouter();
   const isMeasurementRealm = realmId === "measurement";
   const quizRealmId = isMeasurementRealm ? "measurement" : "number";
+  const finalProgramWeek = getLastProgramWeek(quizRealmId);
+  const isFinalQuizWeek = Number(week) >= finalProgramWeek;
   const quizStrand = isMeasurementRealm ? "Measurement" : "Number";
   const quizLessonId = `${year}-${quizRealmId}-w${week}-weekly-quiz`;
   const studentLevelLabel = formatStudentLevelLabel(year);
@@ -8314,8 +8318,10 @@ function SessionPage({
       return buildPrepWeek11WeeklyQuizQuestions(questionsPerLesson);
     }
 
-    if (!isMeasurementRealm && year === "Year 1" && Number(week) === 11) {
-      return buildYear1Week11PatternQuizQuestions(questionsPerLesson);
+    if (!isMeasurementRealm && year === "Year 1") {
+      return Number(week) === 11
+        ? buildYear1Week11PatternQuizQuestions(questionsPerLesson)
+        : buildYear1NumberNexusWeeklyQuiz(Number(week)) as QuizQuestion[];
     }
 
     // Level 4 Measurelands weekly quizzes. Built weeks return their 15-question
@@ -10123,11 +10129,13 @@ function SessionPage({
                   {finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
                     <button
                       onClick={() =>
-                        router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Math.min(12, Number(week) + 1)))}&legacy=1${realmParam}`)
+                        router.push(isFinalQuizWeek
+                          ? `/posttest?year=${encodeURIComponent(year)}${realmParam}`
+                          : `/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Number(week) + 1))}&legacy=1${realmParam}`)
                       }
                       className={`px-5 py-3 rounded-2xl font-bold transition ${quizTheme.goToWeek}`}
                     >
-                      Go to Week {Math.min(12, Number(week) + 1)}
+                      {isFinalQuizWeek ? "Continue to Post-Test" : `Go to Week ${Number(week) + 1}`}
                     </button>
                   ) : null}
                 </div>
@@ -10190,9 +10198,13 @@ function SessionPage({
                       "inset 0 1px 0 rgba(251,191,36,0.2), inset 0 -10px 20px rgba(0,0,0,0.45)",
                   }}
                 >
-                  <span className="inline-flex items-center gap-1.5"><PartyPopper className="h-4 w-4" /> You passed! Week {Math.min(12, Number(week) + 1)} is unlocked.</span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <PartyPopper className="h-4 w-4" />
+                    {isFinalQuizWeek ? "You passed the final weekly quiz!" : `You passed! Week ${Number(week) + 1} is unlocked.`}
+                  </span>
                   <div className="mt-1 inline-flex items-center gap-1.5 font-semibold text-amber-100/80">
-                    <SkipForward className="h-4 w-4" /> Next up: tap “Go to Week {Math.min(12, Number(week) + 1)}” below.
+                    <SkipForward className="h-4 w-4" />
+                    {isFinalQuizWeek ? "Next up: the Post-Test." : `Next up: tap “Go to Week ${Number(week) + 1}” below.`}
                   </div>
                 </div>
               </div>

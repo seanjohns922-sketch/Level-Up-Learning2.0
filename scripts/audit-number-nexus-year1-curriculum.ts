@@ -70,8 +70,10 @@ for (const item of quiz) {
 
 const sessionSource = fs.readFileSync(path.join(process.cwd(), "app/session/page.tsx"), "utf8");
 const assessmentApi = fs.readFileSync(path.join(process.cwd(), "data/assessments/api.ts"), "utf8");
-assert(sessionSource.includes('year === "Year 1" && Number(week) === 11'));
+assert(sessionSource.includes('year === "Year 1"'));
+assert(sessionSource.includes('Number(week) === 11'));
 assert(sessionSource.includes("buildYear1Week11PatternQuizQuestions"));
+assert(sessionSource.includes("buildYear1NumberNexusWeeklyQuiz(Number(week))"));
 assert(!assessmentApi.includes("year1Week11Patterns"), "Weekly quiz bank leaked into the assessment resolver.");
 
-console.log("Number Nexus Year 1 Curriculum Completion passed: AC9M1A02 is taught through identify, continue and create lessons; the independent Week 11 quiz contains 15 valid questions in a 5-5-5 split. Assessment generation remains blocked pending phase approval.");
+console.log("Number Nexus Year 1 Curriculum Completion passed: AC9M1A02 is taught through identify, continue and create lessons; the independent Week 11 quiz contains 15 valid questions in a 5-5-5 split. Production assessment promotion remains blocked pending educator approval.");
