@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { RotateCcw, Trash2, Undo2 } from "lucide-react";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import DecimalModelVisual from "@/components/activities/DecimalModelVisual";
@@ -12,6 +13,7 @@ import InputOutputTableVisual from "@/components/activities/InputOutputTableVisu
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
 import { BalanceEquationCardVisual } from "@/components/activities/EquationVisualCards";
 import MeasurelandsAssessmentVisual from "@/components/assessment/MeasurelandsAssessmentVisual";
+import NumberNexusGroundAssessmentVisual, { GroundAssessmentToken } from "@/components/assessment/NumberNexusGroundAssessmentVisual";
 import MeasurelandsAnswerWidget from "@/components/assessment/MeasurelandsAnswerWidget";
 import type { MeasurelandsAnswerFormat } from "@/data/assessments/measurelandsPresentation";
 import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObjectArt";
@@ -300,6 +302,7 @@ export default function AssessmentQuestionCard({
     typeof question.visual === "object" && question.visual !== null
       ? (question.visual as Record<string, unknown>)
       : undefined;
+  const isGroundNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_ground_");
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
@@ -342,8 +345,49 @@ export default function AssessmentQuestionCard({
           items={Array.isArray(visual.items) ? (visual.items as Array<{ row: number; col: number; label: string; icon: string }>) : []}
         />
       ) : null}
+      {typeof visual.type === "string" && visual.type.startsWith("number_ground_") ? (
+        <NumberNexusGroundAssessmentVisual visual={visual} />
+      ) : null}
     </>
   ) : null;
+
+  if (type === "pattern_build") {
+    const tokens = ((question.options ?? []) as string[]).map(String);
+    const built = value ? value.split(ORDER_SEPARATOR).filter(Boolean) : [];
+    const slots = Number(visual?.answerSlots ?? 2);
+    return (
+      <div className="mt-6 space-y-5">
+        {renderedVisual}
+        <div className="rounded-lg border-2 border-dashed border-slate-600 bg-slate-800/50 p-4">
+          <div className="flex min-h-16 flex-wrap justify-center gap-3">
+            {Array.from({ length: slots }, (_, index) => built[index]
+              ? <GroundAssessmentToken key={index} token={built[index]!} />
+              : <span key={index} className="h-11 w-11 rounded-lg border-2 border-dashed border-slate-500" />)}
+          </div>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {tokens.map((token) => (
+            <div key={token} className="flex items-center justify-between rounded-lg border border-slate-600 bg-slate-700/50 p-3">
+              <button type="button" disabled={built.length >= slots} onClick={() => onChange([...built, token].join(ORDER_SEPARATOR))} className="rounded-lg p-1 disabled:opacity-40" aria-label={`Place ${token}`}>
+                <GroundAssessmentToken token={token} />
+              </button>
+              <OptionReadAloudButton text={token} />
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          disabled={built.length === 0}
+          className="grid h-11 w-11 place-items-center rounded-lg border border-slate-600 bg-slate-700/50 text-slate-200 disabled:opacity-40"
+          aria-label="Clear pattern"
+          title="Clear pattern"
+        >
+          <RotateCcw className="h-5 w-5" aria-hidden />
+        </button>
+      </div>
+    );
+  }
 
   if (type === "number_order") {
     const numbers = ((question.options as string[] | undefined) ?? []).map(String);
@@ -375,19 +419,21 @@ export default function AssessmentQuestionCard({
         {renderedVisual}
         <div className="grid gap-4 md:grid-cols-3">
           {numbers.map((num) => (
-            <button
-              key={num}
-              type="button"
-              onClick={() => addNumber(num)}
-              disabled={order.includes(num)}
-              className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5 text-left text-3xl font-black text-white shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {num}
-            </button>
+            <div key={num} className="flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-700/50 p-2">
+              <button
+                type="button"
+                onClick={() => addNumber(num)}
+                disabled={order.includes(num)}
+                className="min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {num}
+              </button>
+              <OptionReadAloudButton text={num} className="shrink-0" />
+            </div>
           ))}
         </div>
-        <div className="mt-5 rounded-2xl border border-dashed border-slate-600 bg-slate-800/50 p-4">
-          <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div>
+        <div className="mt-5 rounded-lg border border-dashed border-slate-600 bg-slate-800/50 p-4">
+          {!isGroundNumberVisual ? <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div> : null}
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             {order.length > 0 ? (
               order.map((num, index) => (
@@ -403,9 +449,9 @@ export default function AssessmentQuestionCard({
                 </div>
               ))
             ) : (
-              <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">
-                Tap the numbers in order, then drag to adjust if needed.
-              </div>
+              isGroundNumberVisual
+                ? Array.from({ length: numbers.length }, (_, index) => <div key={index} className="h-14 rounded-lg border-2 border-dashed border-slate-600" />)
+                : <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">Tap the numbers in order, then drag to adjust if needed.</div>
             )}
           </div>
         </div>
@@ -414,17 +460,21 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={undoLast}
             disabled={order.length === 0}
-            className="rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"
+            className={isGroundNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border border-slate-600 bg-slate-700/50 text-slate-300 disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
+            aria-label="Undo last number"
+            title="Undo last number"
           >
-            Undo last
+            {isGroundNumberVisual ? <Undo2 className="h-5 w-5" aria-hidden /> : "Undo last"}
           </button>
           <button
             type="button"
             onClick={clear}
             disabled={order.length === 0}
-            className="rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"
+            className={isGroundNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border border-slate-600 bg-slate-700/50 text-slate-300 disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
+            aria-label="Clear order"
+            title="Clear order"
           >
-            Clear order
+            {isGroundNumberVisual ? <Trash2 className="h-5 w-5" aria-hidden /> : "Clear order"}
           </button>
         </div>
       </div>
@@ -680,7 +730,7 @@ export default function AssessmentQuestionCard({
     return (
       <div className="mt-6">
         {renderedVisual}
-        {theme.isMeasurement && question.answerFormat ? <MeasurelandsAnswerWidget key={question.id} format={question.answerFormat} value={value} onChange={onChange} inputMode={question.inputMode} /> : <input type="text" inputMode={question.inputMode ?? "decimal"} value={value ?? ""} onChange={(event) => onChange(event.target.value)} placeholder="Enter your answer" className={`w-full rounded-2xl border border-slate-600 bg-slate-700/50 px-5 py-4 text-2xl font-black text-white outline-none transition placeholder:text-slate-400 ${focusBorder} focus:bg-slate-700`} />}
+        {theme.isMeasurement && question.answerFormat ? <MeasurelandsAnswerWidget key={question.id} format={question.answerFormat} value={value} onChange={onChange} inputMode={question.inputMode} /> : <input type="text" inputMode={question.inputMode ?? "decimal"} value={value ?? ""} onChange={(event) => onChange(event.target.value)} placeholder={isGroundNumberVisual ? undefined : "Enter your answer"} aria-label="Answer" className={`w-full rounded-2xl border border-slate-600 bg-slate-700/50 px-5 py-4 text-2xl font-black text-white outline-none transition placeholder:text-slate-400 ${focusBorder} focus:bg-slate-700`} />}
       </div>
     );
   }

@@ -94,4 +94,4 @@ for (const lesson of [1, 2, 3]) {
   }
 }
 
-console.log("Number Nexus Curriculum Completion Phase N1 passed: AC9MFN02, AC9MFN05, AC9MFN06 and AC9MFA01 lesson coverage is aligned, bounded and repeatedly solvable. Weekly quizzes and assessment generation remain out of scope.");
+console.log("Number Nexus Curriculum Completion Phase N1 passed and remains frozen: AC9MFN02, AC9MFN05, AC9MFN06 and AC9MFA01 lesson coverage is aligned, bounded and repeatedly solvable. Weekly quizzes remain outside this audit.");
