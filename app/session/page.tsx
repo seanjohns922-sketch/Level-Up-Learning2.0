@@ -79,6 +79,9 @@ import {
 import type { Lesson, WeekPlan } from "@/data/programs/year1";
 import type { LessonActivity } from "@/data/programs/types";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import type { Year1PatternToken } from "@/data/activities/year1/practice-task";
+import { buildYear1Week11PatternQuizItems } from "@/data/quizzes/year1Week11Patterns";
+import { RepeatingPatternStrip } from "@/components/number-nexus/RepeatingPatternVisual";
 import { generatePrepWeek8TaskByKind } from "@/data/activities/prep/week8";
 import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
 import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
@@ -245,6 +248,9 @@ type QuizQuestion = {
       image: string;
       kind: "coin" | "note";
     }[];
+  } | {
+    type: "repeating_pattern";
+    sequence: Year1PatternToken[];
   };
   line?: {
     min: number;
@@ -288,6 +294,22 @@ type QuizQuestion = {
     difficulty?: "early" | "middle" | "late";
   };
 };
+
+const YEAR1_PATTERN_TOKENS = new Set<Year1PatternToken>([
+  "amber-star",
+  "cyan-gem",
+  "rose-robot",
+  "blue-circle",
+  "green-square",
+  "violet-triangle",
+]);
+
+function patternTokensFromQuizOption(option: string): Year1PatternToken[] {
+  return option
+    .split("·")
+    .map((part) => part.trim().replace(" ", "-") as Year1PatternToken)
+    .filter((token) => YEAR1_PATTERN_TOKENS.has(token));
+}
 
 function isQuizChoiceQuestionSafe(question: QuizQuestion) {
   const structurallySafe =
@@ -1487,6 +1509,45 @@ function buildLessonBucketQuizQuestions(
   }
 
   return { questions, selectedKinds };
+}
+
+function buildYear1Week11PatternQuizQuestions(questionsPerLesson: number): QuizQuestion[] {
+  if (questionsPerLesson !== 5) {
+    throw new Error(`[Year1PatternQuiz] Expected 5 questions per lesson, received ${questionsPerLesson}.`);
+  }
+  const questions = buildYear1Week11PatternQuizItems().map((item) => ({
+    id: item.id,
+    lessonNumber: item.lessonTag,
+    lessonTag: item.lessonTag,
+    skill: "repeating_patterns",
+    activityType: "multiple_choice" as const,
+    kind: "mcq" as const,
+    prompt: item.prompt,
+    options: item.options,
+    correctIndex: item.options.indexOf(item.answer),
+    visual: { type: "repeating_pattern" as const, sequence: item.sequence },
+  }));
+  validateStructuredWeeklyQuizQuestions(
+    {
+      id: "y1-w11",
+      week: 11,
+      topic: "Repeating Pattern Laboratory",
+      curriculum: ["AC9M1A02"],
+      lessons: [1, 2, 3].map((lesson) => ({
+        id: `y1-w11-l${lesson}`,
+        week: 11,
+        lesson,
+        title: `Pattern Lesson ${lesson}`,
+        focus: "Repeating patterns",
+        activityIdeas: [],
+        curriculum: ["AC9M1A02"],
+        activities: [],
+      })),
+    },
+    questions,
+    questionsPerLesson,
+  );
+  return questions;
 }
 
 type GroundWord = NonNullable<Extract<PracticeTask, { kind: "groundMatch" }>["targetNumberName"]>;
@@ -8253,6 +8314,10 @@ function SessionPage({
       return buildPrepWeek11WeeklyQuizQuestions(questionsPerLesson);
     }
 
+    if (!isMeasurementRealm && year === "Year 1" && Number(week) === 11) {
+      return buildYear1Week11PatternQuizQuestions(questionsPerLesson);
+    }
+
     // Level 4 Measurelands weekly quizzes. Built weeks return their 15-question
     // quiz; unbuilt weeks return no questions rather than falling through to the
     // Number Nexus structured quiz below — Level 4 Measurement must never render
@@ -8334,20 +8399,13 @@ function SessionPage({
     const isWeek8 = weekNum === 8;
     const isWeek9 = weekNum === 9;
     const isWeek10 = weekNum === 10;
-    const isWeek11 = weekNum === 11;
     const isWeek2 = weekNum === 2;
     const isWeek3 = weekNum === 3;
     const isWeek4 = weekNum === 4;
     const isWeek5 = weekNum === 5;
     const isWeek6 = weekNum === 6;
     const rangeMax = isWeek2 ? 120 : 50;
-    const lesson1Generators = isWeek11
-      ? [
-          () => makeAdditionQuestion(20),
-          () => makeSubtractionQuestion(20),
-          () => makeMake10Question(),
-        ]
-      : isWeek10
+    const lesson1Generators = isWeek10
       ? [
           () => makeWeek10TapGroupsQuestion(),
           () => makeWeek10BuildGroupsQuestion(),
@@ -8400,13 +8458,7 @@ function SessionPage({
           () => makeBeforeAfterQuestion(0, rangeMax),
           () => makeLargestQuestion(0, rangeMax),
         ];
-    const lesson2Generators = isWeek11
-      ? [
-          () => makeDoublesQuestion(),
-          () => makeNearDoublesQuestion(),
-          () => makeDoublesQuestion(),
-        ]
-      : isWeek10
+    const lesson2Generators = isWeek10
       ? [
           () => makeWeek10ArrayQuestion(),
           () => makeWeek10BarGroupQuestion(),
@@ -8465,13 +8517,7 @@ function SessionPage({
           () => makeCountDotsQuestion(10, 20),
           () => makeCountDotsQuestion(15, 25),
         ];
-    const lesson3Generators = isWeek11
-      ? [
-          () => makeAdditionQuestion(20),
-          () => makeSubtractionQuestion(20),
-          () => makeNearDoublesQuestion(),
-        ]
-      : isWeek10
+    const lesson3Generators = isWeek10
       ? [
           () => makeWeek10StoryTotalQuestion(),
           () => makeWeek10HowManyGroupsStoryQuestion(),
@@ -9667,6 +9713,11 @@ function SessionPage({
                       )}
                     </div>
                   ) : null}
+                  {currentQuiz?.visual?.type === "repeating_pattern" ? (
+                    <div className="mb-3 rounded-lg border-2 border-cyan-800/20 bg-white p-4">
+                      <RepeatingPatternStrip sequence={currentQuiz.visual.sequence} />
+                    </div>
+                  ) : null}
                   {currentQuiz?.visual?.type === "rows" ? (
                     <div className="rounded-2xl border bg-white p-4 mb-3">
                       <div className="mx-auto" style={{ maxWidth: 520 }}>
@@ -9994,7 +10045,11 @@ function SessionPage({
                                 : "border-border bg-card hover:border-trust-blue/40 text-foreground",
                             ].join(" ")}
                           >
-                            <MathFormattedText text={opt} compactFractions />
+                            {currentQuiz.visual?.type === "repeating_pattern" ? (
+                              <RepeatingPatternStrip sequence={patternTokensFromQuizOption(opt)} compact />
+                            ) : (
+                              <MathFormattedText text={opt} compactFractions />
+                            )}
                           </button>
                         );
                       })}

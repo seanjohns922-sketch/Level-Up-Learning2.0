@@ -9,7 +9,7 @@ const lines: string[] = [
   "",
   "This document defines assessment content only. The assessment engine, routing, persistence, progression, replay, reporting, rewards, placement and database schema remain frozen.",
   "",
-  "The blueprint design is approved. No Number Nexus assessment questions may be regenerated until Ground curriculum coverage is complete, metadata is verified and Pattern Peaks lesson ownership is finalised.",
+  "The blueprint design is approved. Assessment generation proceeds level by level only after that level's curriculum coverage and metadata are verified; later blocked levels must not be bypassed.",
   "",
   "## Curriculum Ownership",
   "",

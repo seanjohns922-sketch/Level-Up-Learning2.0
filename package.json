@@ -28,6 +28,7 @@
     "qa:number-nexus-ground-curriculum": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-ground-curriculum.ts",
     "qa:number-nexus-ground-bank": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-ground-independent-bank.ts",
     "qa:number-nexus-ground-production": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-ground-production.ts",
+    "qa:number-nexus-year1-curriculum": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-year1-curriculum.ts",
     "generate:number-nexus-blueprint": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/generate-number-nexus-assessment-blueprint-review.ts",
     "generate:number-nexus-ground-review": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/generate-number-nexus-ground-educator-review.ts",
     "qa:my-home-shell": "node scripts/my-home-shell-audit.mjs",

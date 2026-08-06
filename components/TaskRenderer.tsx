@@ -80,6 +80,7 @@ import TargetedRevision from "@/components/week12/TargetedRevision";
 import FunGames from "@/components/week12/FunGames";
 import GroundMatchTaskCard from "@/components/ground/GroundMatchTaskCard";
 import GroundFoundationTaskCard from "@/components/ground/GroundFoundationTaskCard";
+import RepeatingPatternTaskCard from "@/components/number-nexus/RepeatingPatternTaskCard";
 import { GroundOrdinalTaskCard } from "@/components/ground/GroundOrdinalTaskCard";
 import { GroundSpatialTaskCard } from "@/components/ground/GroundSpatialTaskCard";
 import {
@@ -489,6 +490,8 @@ function TaskRendererInner({
       return <GroundMatchTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundFoundation":
       return <GroundFoundationTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "repeatingPattern":
+      return <RepeatingPatternTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundOrdinal":
       return <GroundOrdinalTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "groundSpatial":

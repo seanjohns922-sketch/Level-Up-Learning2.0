@@ -1,5 +1,12 @@
 export type Difficulty = "easy" | "medium" | "hard";
 export type StarpathShape = "circle" | "oval" | "triangle" | "square" | "rectangle";
+export type Year1PatternToken =
+  | "amber-star"
+  | "cyan-gem"
+  | "rose-robot"
+  | "blue-circle"
+  | "green-square"
+  | "violet-triangle";
 
 export type StarpathObjectSceneItem = {
   id: string;
@@ -79,6 +86,33 @@ export function diffPick(
 }
 
 export type PracticeTask = (
+  | {
+      kind: "repeatingPattern";
+      mode: "identify_unit";
+      prompt: string;
+      speakText: string;
+      sequence: Year1PatternToken[];
+      unitOptions: Year1PatternToken[][];
+      answerUnit: Year1PatternToken[];
+    }
+  | {
+      kind: "repeatingPattern";
+      mode: "continue";
+      prompt: string;
+      speakText: string;
+      sequence: Year1PatternToken[];
+      palette: Year1PatternToken[];
+      answer: Year1PatternToken[];
+    }
+  | {
+      kind: "repeatingPattern";
+      mode: "create";
+      prompt: string;
+      speakText: string;
+      repeatUnit: Year1PatternToken[];
+      repeats: number;
+      palette: Year1PatternToken[];
+    }
   | {
       kind: "mcq";
       prompt: string;

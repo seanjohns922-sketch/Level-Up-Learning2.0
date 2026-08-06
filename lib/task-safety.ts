@@ -181,6 +181,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "groundMatch",
   "groundOrdinal",
   "groundSpatial",
+  "repeatingPattern",
   "measurementCompare",
   "measurePath",
   "measureValidity",

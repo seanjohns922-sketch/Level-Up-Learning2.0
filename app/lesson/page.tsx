@@ -17,7 +17,7 @@ import { generateWeek8Task } from "@/data/activities/year1/week8";
 import { generateWeek9Task } from "@/data/activities/year1/week9";
 import { generateWeek10Task } from "@/data/activities/year1/week10";
 import { generateWeek12Task } from "@/data/activities/year1/week12";
-import { generateWeek11Task } from "@/data/activities/year1/week11";
+import { generateWeek11Task, resetWeek11TaskSessionState } from "@/data/activities/year1/week11";
 import { resetWeek1TaskSessionState } from "@/data/activities/year1/week1";
 import { resetWeek2TaskSessionState } from "@/data/activities/year1/week2";
 import { resetWeek3TaskSessionState } from "@/data/activities/year1/week3";
@@ -1133,6 +1133,7 @@ function LessonPage() {
     resetWeek2TaskSessionState();
     resetWeek3TaskSessionState();
     resetWeek4TaskSessionState();
+    resetWeek11TaskSessionState();
   }
 
   function resetPrepSessionTaskState() {

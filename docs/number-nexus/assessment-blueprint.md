@@ -4,7 +4,7 @@ Status: **Conditionally approved - assessment generation remains blocked**
 
 This document defines assessment content only. The assessment engine, routing, persistence, progression, replay, reporting, rewards, placement and database schema remain frozen.
 
-The blueprint design is approved. No Number Nexus assessment questions may be regenerated until Ground curriculum coverage is complete, metadata is verified and Pattern Peaks lesson ownership is finalised.
+The blueprint design is approved. Assessment generation proceeds level by level only after that level's curriculum coverage and metadata are verified; later blocked levels must not be bypassed.
 
 ## Curriculum Ownership
 
@@ -354,7 +354,7 @@ The blueprint design is approved. No Number Nexus assessment questions may be re
 
 **Misconceptions:** `operation-story-structure`
 
-**Curriculum Mapping:** **aligned**; weeks 5, 6, 7, 11. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 5, 6, 7. Aligned; Week 12 provides cumulative review without replacing the dedicated teaching sequence.
 
 **Question Blueprint**
 
@@ -466,11 +466,12 @@ The blueprint design is approved. No Number Nexus assessment questions may be re
 
 **Misconceptions:** `repeating-unit`
 
-**Curriculum Mapping:** **missing**; weeks none. No explicit repeating-pattern sequence exists.
+**Curriculum Mapping:** **aligned**; weeks 11, 12. Week 11 now provides a dedicated identify, continue and construct sequence; Week 12 carries explicit cumulative review metadata.
 
 **Question Blueprint**
 
-- Pre-Test: Blocked until curriculum coverage exists
+- Pre-Test: Identify the complete repeating unit.
+- Pre-Test: Continue an unfamiliar repeating pattern.
 - Post-Test: Construct a repeating pattern and identify its unit.
 
 ## Year 2
