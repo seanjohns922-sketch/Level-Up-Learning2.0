@@ -50,10 +50,26 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
     }
   }
 
+  // Repair mode: flag the tile whose colour no longer matches its mirror partner,
+  // so the "unmatched tile" is unmistakable. Checked against the target design.
+  const mismatched = new Set<string>();
+  if (task.mode === "repair" && !optionsMode) {
+    const expected = new Map(task.expectedCells.map((cell) => [key(cell), cell.colour]));
+    for (const cell of cells) if (expected.get(key(cell)) !== cell.colour) mismatched.add(key(cell));
+  }
+
+  // Tap an empty cell to place the chosen colour; tap a tile of the same colour to
+  // clear it; tap a tile of a different colour to recolour it — so a mismatch is
+  // repaired in a single tap once the right colour is chosen.
   function toggle(r: number, c: number) {
     if (settled || optionsMode) return;
     const k = `${r}:${c}`;
-    setCells((current) => (current.some((cell) => key(cell) === k) ? current.filter((cell) => key(cell) !== k) : [...current, { r, c, colour }]));
+    setCells((current) => {
+      const existing = current.find((cell) => key(cell) === k);
+      if (!existing) return [...current, { r, c, colour }];
+      if (existing.colour === colour) return current.filter((cell) => key(cell) !== k);
+      return current.map((cell) => (key(cell) === k ? { ...cell, colour } : cell));
+    });
   }
   function pick(id: string) {
     setSelectedOptions((current) => (current.includes(id) ? current.filter((value) => value !== id) : [...current, id]));
@@ -71,7 +87,7 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
   return (
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
-      {!optionsMode ? <p className="text-center text-sm font-bold text-slate-500">Place tiles — the mirror shows where each one must be matched.</p> : null}
+      {!optionsMode ? <p className="text-center text-sm font-bold text-slate-500">{task.mode === "repair" ? "One tile does not match its mirror. Tap it, then choose the colour its partner shows." : "Place tiles — the mirror shows where each one must be matched."}</p> : null}
       <div className="l4sym-stage mx-auto max-w-sm rounded-3xl p-4">
         <div className="relative">
           <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${task.size}, minmax(0, 1fr))` }}>
@@ -81,13 +97,14 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
               const k = `${r}:${c}`;
               const item = placed.get(k);
               const ghost = ghosts.get(k);
+              const bad = mismatched.has(k);
               const centre = task.centre?.r === r && task.centre.c === c;
               return (
                 <button
                   type="button"
                   key={k}
                   onClick={() => toggle(r, c)}
-                  aria-label={`Symmetry grid row ${r + 1}, column ${c + 1}`}
+                  aria-label={`Symmetry grid row ${r + 1}, column ${c + 1}${bad ? ", does not match its mirror" : ""}`}
                   className="relative flex aspect-square items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] transition hover:bg-white/[0.09]"
                 >
                   {item ? (
@@ -95,6 +112,7 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
                   ) : ghost ? (
                     <span className="absolute inset-[12%] rounded-md border-2 border-dashed" style={{ borderColor: ghost, backgroundColor: `${ghost}22` }} />
                   ) : null}
+                  {bad ? <span className="pointer-events-none absolute inset-0 rounded-lg ring-2 ring-rose-400 animate-pulse" /> : null}
                   {centre ? <span className="absolute inset-0 m-auto h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.9)]" /> : null}
                 </button>
               );

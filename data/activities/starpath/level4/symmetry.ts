@@ -43,7 +43,11 @@ function lineTask(round: number, mode: SymmetryTask["mode"], target: number, for
   const seeds = line === "vertical" ? [{ r: 1, c: 1, colour: COLOURS[round % 3]! }, { r: 3, c: 0, colour: COLOURS[(round + 1) % 3]! }] : line === "horizontal" ? [{ r: 0, c: 1, colour: COLOURS[round % 3]! }, { r: 1, c: 3, colour: COLOURS[(round + 1) % 3]! }] : [{ r: 0, c: 2, colour: COLOURS[round % 3]! }, { r: 1, c: 3, colour: COLOURS[(round + 1) % 3]! }];
   const spec = { size, line };
   const expectedCells = closure(spec, seeds);
-  const shown = mode === "complete" ? seeds : mode === "repair" ? expectedCells.map((cell, index) => index === expectedCells.length - 1 ? { ...cell, c: Math.max(0, cell.c - 1) } : cell) : expectedCells;
+  // Repair: keep the full symmetric layout but recolour exactly one off-axis
+  // tile. That leaves a single, unambiguous mismatch across the line — the tile
+  // whose colour no longer matches its mirror partner — so the fix is to recolour
+  // it back, not to add or move tiles.
+  const shown = mode === "complete" ? seeds : mode === "repair" ? expectedCells.map((cell, index) => index === expectedCells.length - 1 ? { ...cell, colour: COLOURS[(COLOURS.indexOf(cell.colour) + 1) % COLOURS.length]! } : cell) : expectedCells;
   const valid = mode !== "test" || round % 2 === 0;
   const testCells = valid ? expectedCells : expectedCells.slice(0, -1);
   return { kind: "starpathSymmetry", mode, prompt: mode === "test" ? `Does this design have ${line} line symmetry?` : mode === "complete" ? `Complete the ${line} reflection.` : mode === "create" ? `Create a design with ${line} line symmetry.` : "Repair the unmatched tile.", speakText: "Use corresponding positions at equal distances from the stated symmetry line. Test every colour and tile, not just the overall balance.", target, boardId: `l4-line-${mode}-${line}-${round}`, size, line, seedCells: mode === "test" ? testCells : mode === "create" ? [] : shown, expectedCells, minSeedCells: 4, options: mode === "test" ? [{ id: "yes", label: "Yes, every tile has a matching partner" }, { id: "no", label: "No, at least one corresponding tile fails" }] : undefined, correctOptionIds: mode === "test" ? [valid ? "yes" : "no"] : undefined, feedback: { correct: "The reflection test passes for every corresponding position.", wrong: "Check equal distance, corresponding position and colour across the line." } };
