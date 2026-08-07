@@ -16,6 +16,7 @@ import MeasurelandsAssessmentVisual from "@/components/assessment/MeasurelandsAs
 import NumberNexusGroundAssessmentVisual, { GroundAssessmentToken } from "@/components/assessment/NumberNexusGroundAssessmentVisual";
 import NumberNexusYear1AssessmentVisual from "@/components/assessment/NumberNexusYear1AssessmentVisual";
 import NumberNexusYear2AssessmentVisual from "@/components/assessment/NumberNexusYear2AssessmentVisual";
+import NumberNexusYear4AssessmentVisual from "@/components/assessment/NumberNexusYear4AssessmentVisual";
 import MeasurelandsAnswerWidget from "@/components/assessment/MeasurelandsAnswerWidget";
 import type { MeasurelandsAnswerFormat } from "@/data/assessments/measurelandsPresentation";
 import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObjectArt";
@@ -304,7 +305,7 @@ export default function AssessmentQuestionCard({
     typeof question.visual === "object" && question.visual !== null
       ? (question.visual as Record<string, unknown>)
       : undefined;
-  const isEarlyNumberVisual = typeof visual?.type === "string" && (visual.type.startsWith("number_ground_") || visual.type.startsWith("number_y1_") || visual.type.startsWith("number_y2_"));
+  const isEarlyNumberVisual = typeof visual?.type === "string" && (visual.type.startsWith("number_ground_") || visual.type.startsWith("number_y1_") || visual.type.startsWith("number_y2_") || visual.type.startsWith("number_y4_"));
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
@@ -355,6 +356,9 @@ export default function AssessmentQuestionCard({
       ) : null}
       {typeof visual.type === "string" && visual.type.startsWith("number_y2_") ? (
         <NumberNexusYear2AssessmentVisual visual={visual} />
+      ) : null}
+      {typeof visual.type === "string" && visual.type.startsWith("number_y4_") ? (
+        <NumberNexusYear4AssessmentVisual visual={visual} />
       ) : null}
     </>
   ) : null;

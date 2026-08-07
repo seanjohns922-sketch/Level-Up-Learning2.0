@@ -9,6 +9,10 @@ import {
   YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS,
   YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS,
 } from "./year2NumberNexusIndependentBanks";
+import {
+  YEAR4_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS,
+  YEAR4_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS,
+} from "./year4NumberNexusIndependentBanks";
 import { getMeasurelandsPosttestForYear, getMeasurelandsPretestForYear } from "./measurelands";
 import { getStarpathPosttestForYear } from "@/data/activities/starpath/ground/groundPostTest";
 import { getLevelOnePosttest } from "@/data/activities/starpath/level1/level1PostTest";
@@ -51,6 +55,9 @@ export function getPretestForLevel(level: SupportedMathLevel, realmId: Assessmen
   if (level === 2) {
     return [...YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   }
+  if (level === 4) {
+    return [...YEAR4_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
+  }
   return getPretestForYear(yearLabelForLevel(level));
 }
 
@@ -66,6 +73,9 @@ export function getPosttestForLevel(level: SupportedMathLevel, realmId: Assessme
   }
   if (level === 2) {
     return { yearLabel: "Year 2", questions: [...YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] };
+  }
+  if (level === 4) {
+    return { yearLabel: "Year 4", questions: [...YEAR4_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] };
   }
   return POSTTESTS[yearLabelForLevel(level)];
 }
@@ -89,6 +99,9 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
   }
   if (yearLabel === "Year 2") {
     return [...YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
+  }
+  if (yearLabel === "Year 4") {
+    return [...YEAR4_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   }
   return getPretestForYear(yearLabel);
 }
@@ -120,6 +133,12 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
   }
   if (yearLabel === "Year 3") {
     return buildLevel3PosttestFormB();
+  }
+  if (yearLabel === "Year 4") {
+    return {
+      yearLabel: "Year 4",
+      questions: [...YEAR4_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS],
+    };
   }
   return POSTTESTS[yearLabel];
 }
