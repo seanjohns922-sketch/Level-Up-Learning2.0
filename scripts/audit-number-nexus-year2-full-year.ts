@@ -145,6 +145,7 @@ for (let week = 1; week <= 12; week += 1) {
   }
   if (week === 5) {
     assert(quiz.filter((item) => item.lessonTag === 1).every((item) => item.visual?.type === "jump_line"), "Week 5 Lesson 1 quiz drops the taught open number line.");
+    assert(quiz.filter((item) => item.lessonTag === 2).every((item) => /^Add: \d+ \+ \d+\.$/.test(item.prompt)), "Week 5 Lesson 2 quiz prompts must state only the addition calculation.");
   }
   if (week === 6) {
     assert(quiz.filter((item) => item.lessonTag === 1).every((item) => item.visual?.type === "jump_line"), "Week 6 Lesson 1 quiz drops the taught open number line.");

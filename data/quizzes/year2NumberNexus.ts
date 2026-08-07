@@ -244,7 +244,7 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 5 && lesson === 2) {
       const a = [32, 45, 56, 63, 74][index]!;
       const b = [24, 33, 27, 36, 18][index]!;
-      return typed(questionId, lesson, `Add the tens and ones: ${a} + ${b}.`, a + b);
+      return typed(questionId, lesson, `Add: ${a} + ${b}.`, a + b);
     }
     if (week === 5 && lesson === 3) {
       const a = [38, 49, 57, 68, 76][index]!;
