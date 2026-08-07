@@ -45,6 +45,38 @@ function FractionGrid({
   );
 }
 
+function RepeatedHalvingWhole({ parts }: { parts: number }) {
+  const columns = parts === 1 ? 1 : parts === 2 || parts === 4 ? 2 : 4;
+  const rows = parts <= 2 ? 1 : 2;
+
+  return (
+    <div
+      className="grid h-64 w-full overflow-hidden rounded-lg border-2 border-slate-400 bg-slate-100 shadow-sm"
+      style={{
+        gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+      }}
+      role="img"
+      aria-label={`The same whole divided into ${parts} equal part${parts === 1 ? "" : "s"}`}
+    >
+      {Array.from({ length: parts }, (_, index) => {
+        const column = index % columns;
+        const row = Math.floor(index / columns);
+        return (
+          <div
+            key={`${parts}-${index}`}
+            className={[
+              "bg-slate-100 transition-colors duration-300",
+              column > 0 ? "border-l-2 border-slate-400" : "",
+              row > 0 ? "border-t-2 border-slate-400" : "",
+            ].join(" ")}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AreaModelSelect({
   questionData,
   onCorrect,
@@ -109,7 +141,7 @@ export default function AreaModelSelect({
         <div className="mt-5 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
           <div className="text-center text-sm font-black text-emerald-900">{stageLabel}</div>
           <div className="mx-auto mt-3 max-w-md">
-            <FractionGrid denominator={halvingParts} shadedParts={[]} />
+            <RepeatedHalvingWhole parts={halvingParts} />
           </div>
           {halvingParts < target ? (
             <button
