@@ -613,6 +613,7 @@ export function Year2LessonEngine({
   brainBreakFrequency?: BrainBreakFrequency;
 }) {
   const isMeasurement = realmId === "measurement";
+  const isLevelTwoNumber = !isMeasurement && levelNumber === 2;
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
   const workingLevel = useMemo(() => getWorkingLevelForLesson(lesson), [lesson]);
@@ -1404,7 +1405,10 @@ export function Year2LessonEngine({
   const statusMotion = status === "wrong" ? "animate-[shake_0.35s_ease-in-out]" : "";
 
   return (
-    <div className="relative">
+    <div
+      className={isLevelTwoNumber ? "number-nexus-level-two relative" : "relative"}
+      data-number-nexus-level={isLevelTwoNumber ? "2" : undefined}
+    >
       {showLessonResume && (
         <LessonResumeGate
           lessonTitle={liveContext?.lessonTitle ?? lesson.title}
@@ -1547,10 +1551,17 @@ export function Year2LessonEngine({
           {currentTurnSafe && currentActivity && currentQuestion ? (
             <ComboMilestonePop comboCount={comboCount}>
               <div
-                className={`rounded-[1.75rem] border-2 p-4 shadow-lg transition-all duration-500 sm:p-6 ${statusBorder} ${statusMotion}`}
+                className={`${
+                  isLevelTwoNumber
+                    ? "rounded-lg border shadow-sm"
+                    : "rounded-[1.75rem] border-2 shadow-lg"
+                } p-4 transition-all duration-500 sm:p-6 ${statusBorder} ${statusMotion}`}
                 style={isMeasurement ? {
                   background: "linear-gradient(180deg, #fffdf7 0%, #fff7e6 100%)",
                   boxShadow: "0 18px 45px rgba(92,56,10,0.10)",
+                } : isLevelTwoNumber ? {
+                  background: "#f8fbfc",
+                  boxShadow: "0 8px 24px rgba(15,118,110,0.08)",
                 } : {
                   background: "linear-gradient(180deg, #fbfffe 0%, #effcf9 100%)",
                   boxShadow: "0 18px 45px rgba(4,78,70,0.10)",

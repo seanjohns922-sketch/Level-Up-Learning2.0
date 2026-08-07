@@ -26,6 +26,22 @@
   --trust-blue-light: hsl(215 50% 95%);
 }
 
+/* Level 2 Number Nexus still uses several shared activity renderers from the
+   original lesson system. Keep their geometry consistent with the current
+   lesson UI without changing the same renderers in later levels. */
+.number-nexus-level-two .rounded-2xl,
+.number-nexus-level-two .rounded-3xl,
+.number-nexus-level-two .rounded-\[1\.75rem\],
+.number-nexus-level-two .rounded-\[24px\],
+.number-nexus-level-two .rounded-\[28px\] {
+  border-radius: 0.5rem !important;
+}
+
+.number-nexus-level-two .bg-gradient-to-br {
+  background-color: rgb(240 253 250) !important;
+  background-image: none !important;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

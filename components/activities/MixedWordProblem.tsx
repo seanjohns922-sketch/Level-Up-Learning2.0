@@ -56,7 +56,9 @@ export default function MixedWordProblem({
           <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
           <ReadAloudBtn text={questionData.prompt} />
         </div>
-        <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
+        {questionData.mode === "choose_operation" ? null : (
+          <p className="mt-2 text-sm text-gray-600">{questionData.helper}</p>
+        )}
       </div>
 
       {questionData.visual?.type === "array" ? (

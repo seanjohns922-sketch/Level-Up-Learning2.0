@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { restoreStudentStateFromServer, saveRealmLessonAttempt, saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
@@ -7946,6 +7947,8 @@ function SessionPage({
   const isMeasurementRealm = realmId === "measurement";
   const quizRealmId = isMeasurementRealm ? "measurement" : "number";
   const isGroundNumberQuiz = quizRealmId === "number" && year === "Prep";
+  const isLevelTwoNumberQuiz = quizRealmId === "number" && year === "Year 2";
+  const isModernNumberQuiz = isGroundNumberQuiz || isLevelTwoNumberQuiz;
   const finalProgramWeek = getLastProgramWeek(quizRealmId);
   const isFinalQuizWeek = Number(week) >= finalProgramWeek;
   const quizStrand = isMeasurementRealm ? "Measurement" : "Number";
@@ -9695,6 +9698,22 @@ function SessionPage({
                   {currentQuiz?.visual?.type.startsWith("ground_quiz_") ? (
                     <GroundNumberNexusQuizVisual visual={currentQuiz.visual as PrepNumberNexusQuizVisual} />
                   ) : null}
+                  {currentQuiz?.visual?.type === "money" ? (
+                    <div className="mb-3 rounded-lg border border-teal-200 bg-[#f8fbfc] p-4 shadow-sm">
+                      <div className="flex min-h-20 flex-wrap items-center justify-center gap-4">
+                        {currentQuiz.visual.items.map((item, index) => (
+                          <Image
+                            key={`${currentQuiz.id}-${item.label}-${index}`}
+                            src={item.image}
+                            alt={item.label}
+                            width={item.kind === "note" ? 112 : 64}
+                            height={64}
+                            className={item.kind === "note" ? "h-16 w-auto object-contain" : "h-16 w-16 object-contain"}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                   {currentQuiz?.visual?.type === "rows" ? (
                     <div className="rounded-2xl border bg-white p-4 mb-3">
                       <div className="mx-auto" style={{ maxWidth: 520 }}>
@@ -9988,8 +10007,8 @@ function SessionPage({
                         }))
                       }
                       inputMode={quizQuestionExpectsNumeric(currentQuiz) ? "decimal" : "text"}
-                      className={isGroundNumberQuiz
-                        ? "mx-auto block h-20 w-full max-w-xs rounded-lg border-2 border-cyan-600 bg-white px-4 text-center text-3xl font-black text-slate-950 shadow-sm outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20"
+                      className={isModernNumberQuiz
+                        ? "mx-auto block h-20 w-full max-w-xs rounded-lg border-2 border-teal-600 bg-white px-4 text-center text-3xl font-black text-slate-950 shadow-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/20"
                         : "w-full rounded-xl border px-4 py-4 text-xl font-bold"}
                       placeholder={
                         currentQuiz.placeholder ??
@@ -10000,13 +10019,13 @@ function SessionPage({
                     />
                   ) : currentQuiz?.kind === "audio" ||
                     currentQuiz?.kind === "mcq" ? (
-                    <div className={isGroundNumberQuiz ? "grid gap-3 sm:grid-cols-2" : "grid gap-2"}>
+                    <div className={isModernNumberQuiz ? "grid gap-3 sm:grid-cols-2" : "grid gap-2"}>
                       {currentQuiz.kind === "audio" ? (
                         <button
                           type="button"
                           onClick={() => speak(currentQuiz.audioText ?? "")}
-                          className={isGroundNumberQuiz
-                            ? "mb-1 inline-flex min-h-14 items-center justify-center rounded-lg border border-cyan-400/40 bg-cyan-700 px-4 py-3 font-bold text-white transition hover:bg-cyan-600 sm:col-span-2"
+                          className={isModernNumberQuiz
+                            ? "mb-1 inline-flex min-h-14 items-center justify-center rounded-lg border border-teal-400/40 bg-teal-700 px-4 py-3 font-bold text-white transition hover:bg-teal-600 sm:col-span-2"
                             : "mb-2 w-full rounded-2xl bg-trust-blue px-4 py-3 font-bold text-white transition hover:opacity-90"}
                         >
                           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span>
@@ -10015,11 +10034,11 @@ function SessionPage({
 
                       {currentQuiz.options?.map((opt, oi) => {
                         const selected = quizAnswers[currentQuiz.id] === oi;
-                        if (isGroundNumberQuiz) {
+                        if (isModernNumberQuiz) {
                           return (
                             <div
                               key={`${currentQuiz.id}-${oi}`}
-                              className={`flex min-h-16 items-stretch overflow-hidden rounded-lg border-2 bg-white shadow-sm transition ${selected ? "border-cyan-500 ring-4 ring-cyan-500/15" : "border-slate-200 hover:border-cyan-400"}`}
+                              className={`flex min-h-16 items-stretch overflow-hidden rounded-lg border-2 bg-white shadow-sm transition ${selected ? "border-teal-500 ring-4 ring-teal-500/15" : "border-slate-200 hover:border-teal-400"}`}
                             >
                               <button
                                 type="button"
@@ -10035,7 +10054,7 @@ function SessionPage({
                               <button
                                 type="button"
                                 onClick={() => speak(String(opt))}
-                                className="grid w-14 shrink-0 place-items-center border-l border-slate-200 text-slate-600 transition hover:bg-cyan-50 hover:text-cyan-800"
+                                className="grid w-14 shrink-0 place-items-center border-l border-slate-200 text-slate-600 transition hover:bg-teal-50 hover:text-teal-800"
                                 aria-label={`Read ${opt} aloud`}
                               >
                                 <Volume2 className="h-5 w-5" />

@@ -315,9 +315,12 @@ export type AreaModelSelectQuestion = {
   fractionLabel: string;
   denominator: number;
   numerator: number;
-  mode: "shade_fraction" | "pick_model" | "match_model" | "match_equivalent";
+  mode: "shade_fraction" | "pick_model" | "match_model" | "match_equivalent" | "repeated_halving";
   models?: FractionModel[];
   correctModelId?: string;
+  halvingTarget?: 4 | 8;
+  connectionOptions?: string[];
+  connectionAnswer?: string;
 };
 
 export type SetModelSelectQuestion = {
@@ -3070,8 +3073,10 @@ export type SkipCountQuestion = {
   answer: number;
   options: number[];
   step: number;
-  mode: "forward";
+  mode: "forward" | "backward" | "missing" | "create";
   visualGroups?: number[];
+  expectedSequence?: number[];
+  representation?: "numbers" | "shapes" | "objects";
 };
 
 export type SameDenominatorOperationVisualData = {
@@ -3779,7 +3784,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     requiresVisual: true,
   },
   area_model_select: {
-    allowedModes: ["shade_fraction", "pick_model", "match_model", "match_equivalent", "skip_count_fraction"],
+    allowedModes: ["shade_fraction", "pick_model", "match_model", "match_equivalent", "repeated_halving", "skip_count_fraction"],
     requiresVisual: true,
   },
   set_model_select: {
@@ -3865,7 +3870,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     },
   },
   skip_count: {
-    allowedModes: ["forward"],
+    allowedModes: ["forward", "backward", "missing", "create"],
     blockedFocusKeywords: ["division - equal groups"],
   },
   division_groups: {
@@ -5029,6 +5034,35 @@ function buildYear2MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
   const style = lesson.lesson === 2 ? "total" : lesson.lesson === 3 ? "change" : "count";
 
   if (style === "total") {
+    if (Math.random() < 0.4) {
+      const item = pickYear2MoneyItems(1)[0] ?? "pencil";
+      const price = randInt(2, 5);
+      const quantity = randInt(2, 5);
+      const answer = price * quantity;
+      return {
+        kind: "mixed_word_problem",
+        prompt: `${moneyArticle(item, true)} ${item} costs $${price}. You buy ${quantity}. How much do they cost altogether?`,
+        answer,
+        options: uniqueNumberOptions(answer, 6).map(Number),
+        operationLabel: "Multiply the price by the quantity",
+        correctOperation: "x",
+        operationChoices: ["+", "-", "x"],
+        helper: "Use equal groups: the same price is repeated for every item.",
+        mode: "choose_operation",
+        optionPrefix: "$",
+        showStrategyClue: false,
+        visual: {
+          type: "australian_money",
+          title: "Price for one",
+          itemLabel: item,
+          itemPrice: price,
+          quantity,
+          pieces: buildAustralianMoneyPieces(price),
+          hideTotal: true,
+        },
+      };
+    }
+
     const [itemA, itemB] = pickYear2MoneyItems(2);
     const a = randInt(2, 9);
     const b = randInt(2, 9);
@@ -5040,9 +5074,11 @@ function buildYear2MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
       options: uniqueNumberOptions(answer, 6).map(Number),
       operationLabel: "Add the prices",
       correctOperation: "+",
+      operationChoices: ["+", "-", "x"],
       helper: "Add the two prices together.",
       mode: "choose_operation",
       optionPrefix: "$",
+      showStrategyClue: false,
       visual: {
         type: "australian_money",
         title: "Money",
@@ -5064,9 +5100,11 @@ function buildYear2MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
       options: uniqueNumberOptions(answer, 5).map(Number),
       operationLabel: "Find the change",
       correctOperation: "-",
+      operationChoices: ["+", "-", "x"],
       helper: "Take the cost away from the money you paid.",
       mode: "choose_operation",
       optionPrefix: "$",
+      showStrategyClue: false,
       visual: {
         type: "australian_money",
         title: `Money you pay with ($${payment})`,
@@ -5734,8 +5772,11 @@ function generateAdditionStrategyQuestion(
       ? config.mode
       : "jump";
 
-  let a = randInt(min, Math.max(min, max - 10));
   let b = randInt(2, 18);
+  let a = randInt(
+    min,
+    Math.max(min, Math.min(max - 10, profile.addSubExtensionMax - b))
+  );
   let prompt = "";
   let hint = `Start at ${a} and jump ${b} more.`;
 
@@ -5753,8 +5794,11 @@ function generateAdditionStrategyQuestion(
       : `Split and double: double ${tens} = ${tens * 2}, double ${ones} = ${ones * 2}, then add them.`;
   } else if (mode === "near_doubles") {
     const lower = Math.max(20, min, 2);
-    const upper = Math.max(lower + 2, Math.min(100, max, profile.addSubExtensionMax - 1));
     const difference = Math.random() < 0.7 ? 1 : 2;
+    const upper = Math.max(
+      lower + 2,
+      Math.min(100, max, Math.floor((profile.addSubExtensionMax - difference) / 2))
+    );
     const nearTenCandidates = Array.from(
       { length: Math.max(0, upper - lower - difference + 1) },
       (_, offset) => lower + offset
@@ -5776,11 +5820,17 @@ function generateAdditionStrategyQuestion(
         ? `Use a near double: double ${a}, then add 1.`
         : `Use a near double: double ${a}, then add 2.`;
   } else if (mode === "split") {
-    a = randInt(18, Math.max(30, Math.min(99, max)));
     b = randInt(12, Math.min(39, Math.max(12, profile.addSubMax / 3)));
+    a = randInt(
+      18,
+      Math.max(18, Math.min(99, max, profile.addSubExtensionMax - b))
+    );
     hint = `Split ${b} into tens and ones.`;
   } else if (mode === "friendly_numbers") {
-    a = randInt(20, Math.max(29, Math.min(profile.addSubExtensionMax, 189)));
+    a = randInt(
+      20,
+      Math.max(20, Math.min(max, profile.addSubExtensionMax - 21, 189))
+    );
     const bridge = 10 - (a % 10 || 10);
     b = bridge + randInt(2, 12);
     hint = "Make a friendly ten first, then add the rest.";
@@ -6084,7 +6134,15 @@ function validateQuestionAgainstPolicy(
   }
 
   if (requiresVisualMultiplicativeSupport(level, lesson.week)) {
-    if (question.kind === "skip_count" && (!question.visualGroups || question.visualGroups.length === 0)) {
+    const hasPatternCreationRepresentation =
+      question.kind === "skip_count" &&
+      question.mode === "create" &&
+      (question.representation === "numbers" || question.representation === "shapes" || question.representation === "objects");
+    if (
+      question.kind === "skip_count" &&
+      !hasPatternCreationRepresentation &&
+      (!question.visualGroups || question.visualGroups.length === 0)
+    ) {
       addViolation(
         violations,
         "visual_missing",
@@ -6940,7 +6998,8 @@ function generateInteractiveQuestion(
     const mode =
       config.mode === "pick_model" ||
       config.mode === "match_model" ||
-      config.mode === "match_equivalent"
+      config.mode === "match_equivalent" ||
+      config.mode === "repeated_halving"
         ? config.mode
         : "shade_fraction";
 
@@ -6948,6 +7007,56 @@ function generateInteractiveQuestion(
       Array.isArray(config.denominators) && config.denominators.every((value) => typeof value === "number")
         ? (config.denominators as number[])
         : undefined;
+
+    if (mode === "repeated_halving") {
+      const configuredTargets = allowedDenominators?.filter(
+        (value): value is 4 | 8 => value === 4 || value === 8
+      ) ?? [4, 8];
+      const halvingTarget = configuredTargets[randInt(0, configuredTargets.length - 1)] ?? 8;
+      const asksForLargerUnit = config.connectionDirection === "larger_from_smaller";
+      const connectionAnswer = asksForLargerUnit
+        ? halvingTarget === 8
+          ? "One quarter is twice one eighth."
+          : "One half is twice one quarter."
+        : halvingTarget === 8
+          ? "One eighth is half of one quarter."
+          : "One quarter is half of one half.";
+      const connectionOptions = asksForLargerUnit
+        ? shuffle([
+            connectionAnswer,
+            halvingTarget === 8
+              ? "One quarter is half of one eighth."
+              : "One half is half of one quarter.",
+            halvingTarget === 8
+              ? "One eighth is twice one quarter."
+              : "One quarter is twice one half.",
+          ])
+        : shuffle([
+            connectionAnswer,
+            halvingTarget === 8
+              ? "One eighth is twice one quarter."
+              : "One quarter is twice one half.",
+            halvingTarget === 8
+              ? "One quarter is half of one eighth."
+              : "One half is half of one quarter.",
+          ]);
+      return {
+        kind: "area_model_select",
+        prompt:
+          asksForLargerUnit
+            ? "Build eighths by repeated halving, then choose how one quarter is connected to one eighth."
+            : halvingTarget === 8
+            ? "Start with one whole. Halve every part until you make eighths, then choose the true connection."
+            : "Start with one whole. Halve every part until you make quarters, then choose the true connection.",
+        fractionLabel: fractionLabel(1, halvingTarget),
+        numerator: 1,
+        denominator: halvingTarget,
+        mode,
+        halvingTarget,
+        connectionOptions,
+        connectionAnswer,
+      };
+    }
 
     if (mode === "match_equivalent") {
       const equivalentSets = [
@@ -8587,15 +8696,61 @@ function generateInteractiveQuestion(
       return buildYear3Week9SkipCountQuestion(step);
     }
 
+    const configMin = typeof config.min === "number" ? config.min : 0;
     const configMax = typeof config.max === "number" ? config.max : 100;
-    const maxStart = Math.max(0, Math.floor(configMax / step) - 6);
-    const startMultiplier = randInt(0, maxStart);
+    const requestedMode =
+      config.mode === "backward" || config.mode === "missing" || config.mode === "create"
+        ? config.mode
+        : "forward";
+    if (requestedMode === "create") {
+      const representation =
+        config.representation === "shapes" || config.representation === "objects"
+          ? config.representation
+          : "numbers";
+      const direction = config.direction === "decrease" ? -1 : 1;
+      const minimum = Math.max(0, typeof config.min === "number" ? config.min : step);
+      const maximum = Math.max(minimum + step * 3, typeof config.max === "number" ? config.max : 30);
+      const startLow = direction === -1 ? minimum + step * 3 : minimum;
+      const startHigh = direction === -1 ? maximum : maximum - step * 3;
+      const startMultiplier = randInt(
+        Math.ceil(startLow / step),
+        Math.max(Math.ceil(startLow / step), Math.floor(startHigh / step))
+      );
+      const start = startMultiplier * step;
+      const expectedSequence = [1, 2, 3].map((offset) => start + direction * step * offset);
+      const distractors = [
+        start - direction * step,
+        start + direction * step * 4,
+        start + direction * (step + 1),
+      ].filter((value) => value >= 0);
+      const options = shuffle(
+        [...new Set([...expectedSequence, ...distractors])]
+      ).slice(0, 6);
+      return {
+        kind: "skip_count",
+        prompt: `Create the pattern. Start at ${start} and ${direction === -1 ? "subtract" : "add"} ${step} each time. Build the next 3 terms.`,
+        sequence: [start],
+        answer: expectedSequence[expectedSequence.length - 1]!,
+        options,
+        step,
+        mode: "create",
+        expectedSequence,
+        representation,
+      };
+    }
+    const direction = requestedMode === "backward" || (requestedMode === "missing" && Math.random() < 0.5)
+      ? -1
+      : 1;
+    const minStart = direction === -1 ? Math.ceil((configMin + step * 4) / step) : Math.ceil(configMin / step);
+    const maxStart = direction === -1
+      ? Math.floor(configMax / step)
+      : Math.max(minStart, Math.floor(configMax / step) - 6);
+    const startMultiplier = randInt(minStart, Math.max(minStart, maxStart));
     const start = startMultiplier * step;
-    const sequence = [start, start + step, start + step * 2, start + step * 3];
-    const answer = start + step * 4;
+    const sequence = [start, start + direction * step, start + direction * step * 2, start + direction * step * 3];
+    const answer = start + direction * step * 4;
 
-    // Occasionally present a missing-in-middle challenge
-    const missingMiddle = randInt(0, 3) === 0 && sequence.length >= 4;
+    const missingMiddle = requestedMode === "missing" || randInt(0, 3) === 0;
     if (missingMiddle) {
       const gapIndex = randInt(1, 2); // remove 2nd or 3rd element
       const missingValue = sequence[gapIndex];
@@ -8603,24 +8758,24 @@ function generateInteractiveQuestion(
       displaySeq[gapIndex] = -1; // sentinel for "?"
       return {
         kind: "skip_count" as const,
-        prompt: `Fill in the missing number. Skip count by ${step}.`,
+        prompt: `Fill in the missing number. The pattern changes by ${step} each time.`,
         sequence: displaySeq,
         answer: missingValue,
         options: uniqueNumberOptions(missingValue, step * 3).map(Number),
         step,
-        mode: "forward" as const,
+        mode: requestedMode,
         visualGroups: restrictedFactors ? [step, step, step, step, step] : undefined,
       };
     }
 
     return {
       kind: "skip_count",
-      prompt: `Keep skip counting by ${step}.`,
+      prompt: direction === -1 ? `Keep counting back by ${step}.` : `Keep skip counting by ${step}.`,
       sequence,
       answer,
       options: uniqueNumberOptions(answer, step * 3).map(Number),
       step,
-      mode: "forward",
+      mode: requestedMode,
       visualGroups: restrictedFactors ? [step, step, step, step, step] : undefined,
     };
   }

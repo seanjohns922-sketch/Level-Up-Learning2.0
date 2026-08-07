@@ -23,6 +23,14 @@ export type Year2NumberNexusQuizQuestion = {
     dotSize: number;
     gap: number;
     rowGap: number;
+  } | {
+    type: "money";
+    items: Array<{
+      value: number;
+      label: string;
+      image: string;
+      kind: "coin" | "note";
+    }>;
   };
 };
 
@@ -67,6 +75,25 @@ function audio(questionId: string, lessonTag: Lesson, answer: number, distractor
 
 function rows(groupCount: number, groupSize: number): Year2NumberNexusQuizQuestion["visual"] {
   return { type: "rows", rows: Array.from({ length: groupCount }, () => groupSize), dotSize: 18, gap: 6, rowGap: 9 };
+}
+
+function money(amount: number): Year2NumberNexusQuizQuestion["visual"] {
+  const denominations = [20, 10, 5, 2, 1] as const;
+  const items: Array<{ value: number; label: string; image: string; kind: "coin" | "note" }> = [];
+  let remaining = amount;
+  for (const value of denominations) {
+    while (remaining >= value) {
+      const kind = value >= 5 ? "note" : "coin";
+      items.push({
+        value,
+        label: `$${value}`,
+        image: kind === "note" ? `/coins/note-${value}.png` : `/coins/coin-${value}.png`,
+        kind,
+      });
+      remaining -= value;
+    }
+  }
+  return { type: "money", items };
 }
 
 function descriptorsFor(week: number, lesson: Lesson): string[] {
@@ -209,11 +236,35 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     }
     if (week === 8 && lesson === 2) {
       const start = [10, 20, 35, 45, 60][index]!;
-      return typed(questionId, lesson, `Count forward three steps by 5 from ${start}.`, start + 15);
+      return index % 2 === 0
+        ? typed(questionId, lesson, `Count forward three steps by 5 from ${start}.`, start + 15)
+        : typed(questionId, lesson, `Count back three steps by 5 from ${start}.`, start - 15);
     }
     if (week === 8 && lesson === 3) {
-      const start = [20, 40, 70, 100, 130][index]!;
-      return typed(questionId, lesson, `Count forward four steps by 10 from ${start}.`, start + 40);
+      const step = [2, 5, 10, 5, 10][index]!;
+      const start = [4, 35, 20, 45, 30][index]!;
+      const direction = index % 2 === 0 ? 1 : -1;
+      const thirdNewTerm = start + direction * step * 3;
+      if (index < 3) {
+        return typed(
+          questionId,
+          lesson,
+          `A pattern starts at ${start} and ${direction === 1 ? "adds" : "subtracts"} ${step} each time. What is the third new term?`,
+          thirdNewTerm,
+        );
+      }
+      const answer = `${start}, ${start + direction * step}, ${start + direction * step * 2}, ${thirdNewTerm}`;
+      return choice(
+        questionId,
+        lesson,
+        `Which pattern follows the rule: start at ${start} and ${direction === 1 ? "add" : "subtract"} ${step}?`,
+        answer,
+        [
+          `${start}, ${start + direction * (step + 1)}, ${start + direction * (step + 1) * 2}, ${start + direction * (step + 1) * 3}`,
+          `${start}, ${start - direction * step}, ${start - direction * step * 2}, ${start - direction * step * 3}`,
+          `${start}, ${start + direction * step}, ${start + direction * step * 3}, ${start + direction * step * 4}`,
+        ],
+      );
     }
 
     if (week === 9 && lesson === 1) {
@@ -250,18 +301,23 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     }
 
     if (week === 11 && lesson === 1) {
-      const amounts = [135, 220, 375, 460, 585][index]!;
-      return typed(questionId, lesson, `A money collection has ${Math.floor(amounts / 100)} dollars and ${amounts % 100} cents. Enter its value in cents.`, amounts);
+      const amount = [6, 8, 12, 17, 24][index]!;
+      return { ...typed(questionId, lesson, "How much money is shown? Enter the amount in dollars.", amount), visual: money(amount) };
     }
     if (week === 11 && lesson === 2) {
-      const first = [125, 240, 315, 450, 575][index]!;
-      const second = [70, 135, 220, 145, 310][index]!;
-      return typed(questionId, lesson, `One item costs ${first} cents and another costs ${second} cents. What is the total in cents?`, first + second);
+      if (index >= 3) {
+        const price = [2, 3][index - 3]!;
+        const quantity = [4, 5][index - 3]!;
+        return { ...typed(questionId, lesson, `One item costs $${price}. You buy ${quantity}. What is the total cost in dollars?`, price * quantity), visual: money(price) };
+      }
+      const first = [3, 5, 7][index]!;
+      const second = [4, 6, 8][index]!;
+      return { ...typed(questionId, lesson, `One item costs $${first} and another costs $${second}. What is the total in dollars?`, first + second), visual: money(first + second) };
     }
     if (week === 11 && lesson === 3) {
-      const paid = [500, 1000, 1000, 2000, 2000][index]!;
-      const cost = [365, 640, 725, 1350, 1485][index]!;
-      return typed(questionId, lesson, `You pay ${paid} cents for an item costing ${cost} cents. How many cents change should you receive?`, paid - cost);
+      const paid = [5, 10, 10, 20, 20][index]!;
+      const cost = [3, 6, 7, 13, 15][index]!;
+      return { ...typed(questionId, lesson, `You pay $${paid} for an item costing $${cost}. How many dollars change should you receive?`, paid - cost), visual: money(paid) };
     }
 
     if (week === 12 && lesson === 1) {
@@ -270,8 +326,19 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
       return choice(questionId, lesson, `Which fraction names ${numerator} of ${denominator} equal parts?`, `${numerator}/${denominator}`, [`${denominator}/${numerator}`, `${numerator}/${denominator + 1}`, `${Math.min(denominator, numerator + 1)}/${denominator}`]);
     }
     if (week === 12 && lesson === 2) {
-      const eighths = [2, 4, 6, 1, 3][index]!;
-      return choice(questionId, lesson, `${eighths} of 8 equal parts are selected. Which fraction is shown?`, `${eighths}/8`, [`8/${eighths}`, `${eighths}/4`, `${Math.min(8, eighths + 1)}/8`]);
+      if (index === 0) {
+        return typed(questionId, lesson, "Halve one whole once. How many equal parts are made?", 2);
+      }
+      if (index === 1) {
+        return typed(questionId, lesson, "Halve both halves. How many equal parts are made now?", 4);
+      }
+      if (index === 2) {
+        return typed(questionId, lesson, "Halve all 4 quarters. How many equal parts are made now?", 8);
+      }
+      if (index === 3) {
+        return choice(questionId, lesson, "Which statement is true after quarters are halved?", "One eighth is half of one quarter.", ["One eighth is twice one quarter.", "One quarter is half of one eighth."]);
+      }
+      return typed(questionId, lesson, "A whole is halved 3 times. How many equal parts are made?", 8);
     }
     if (week === 12 && lesson === 3) {
       const pair = [[1, 2, 4, 8], [1, 4, 2, 8], [2, 4, 4, 8], [3, 4, 6, 8], [1, 2, 2, 4]][index]!;

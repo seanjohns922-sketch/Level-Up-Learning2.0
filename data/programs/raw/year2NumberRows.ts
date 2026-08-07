@@ -648,7 +648,7 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 8,
-    focus: "Multiplication Fluency",
+    focus: "Multiplication Facts & Additive Patterns",
     lesson: 1,
     topic: "Recall and skip count by 2s",
     activity: scopedActivity(
@@ -684,13 +684,13 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 8,
-    focus: "Multiplication Fluency",
+    focus: "Multiplication Facts & Additive Patterns",
     lesson: 2,
-    topic: "Recall and skip count by 5s",
+    topic: "Increase and decrease by 5s",
     activity: scopedActivity(
-      "Skip count by 5s with fluency and pattern recognition.",
-      "Rapid recall drills by 5s.",
-      "How do number endings help you predict the next term?"
+      "Continue additive patterns that increase or decrease by 5.",
+      "Find missing terms in patterns that change by 5.",
+      "How does the fixed change help you predict a missing term?"
     ),
     activities: interactiveActivities(
       "skip_count",
@@ -705,13 +705,13 @@ export const year2NumberRows: ProgramRow[] = [
           min: 0,
           max: 100,
           step: 5,
-          mode: "forward",
+          mode: "backward",
         }),
         makeActivity("skip_count", 1, {
           min: 0,
           max: 100,
           step: 5,
-          mode: "forward",
+          mode: "missing",
         }),
       ]
     ),
@@ -719,37 +719,40 @@ export const year2NumberRows: ProgramRow[] = [
   },
   {
     week: 8,
-    focus: "Multiplication Fluency",
+    focus: "Multiplication Facts & Additive Patterns",
     lesson: 3,
-    topic: "Recall and skip count by 10s",
+    topic: "Create additive patterns in different ways",
     activity: scopedActivity(
-      "Skip count by 10s with fluency and pattern recognition.",
-      "Rapid recall drills by 10s.",
-      "Explain why this pattern grows predictably."
+      "Create increasing and decreasing additive patterns using numbers, shapes and objects.",
+      "Build the next 3 terms while keeping the constant change.",
+      "How can someone check that every term follows your rule?"
     ),
-    activities: interactiveActivities(
-      "skip_count",
-      {
-        min: 0,
-        max: 200,
-        step: 10,
-        mode: "forward",
-      },
-      [
-        makeActivity("skip_count", 1, {
-          min: 0,
-          max: 200,
-          step: 10,
-          mode: "forward",
-        }),
-        makeActivity("skip_count", 1, {
-          min: 0,
-          max: 200,
-          step: 10,
-          mode: "forward",
-        }),
-      ]
-    ),
+    activities: [
+      makeActivity("skip_count", 2, {
+        min: 5,
+        max: 30,
+        step: 5,
+        mode: "create",
+        representation: "numbers",
+        direction: "decrease",
+      }),
+      makeActivity("skip_count", 1, {
+        min: 2,
+        max: 8,
+        step: 2,
+        mode: "create",
+        representation: "shapes",
+        direction: "increase",
+      }),
+      makeActivity("skip_count", 1, {
+        min: 2,
+        max: 8,
+        step: 2,
+        mode: "create",
+        representation: "objects",
+        direction: "decrease",
+      }),
+    ],
     curriculum: ["AC9M2A01", "AC9M2N05"],
   },
   {
@@ -960,30 +963,30 @@ export const year2NumberRows: ProgramRow[] = [
     week: 11,
     focus: "Money",
     lesson: 2,
-    topic: "Money totals",
+    topic: "Model money totals",
     activity: scopedActivity(
-      "Add two prices to find the total cost.",
-      "How much do both items cost altogether?",
-      "How did you add the two prices?"
+      "Choose addition or multiplication to model a money total.",
+      "How much does the purchase cost altogether?",
+      "Why does your operation match the purchase?"
     ),
     activities: [
       makeActivity("mixed_word_problem", 2, {
         min: 1,
         max: 20,
         mode: "choose_operation",
-        operations: ["+"],
+        operations: ["+", "x"],
       }),
       makeActivity("mixed_word_problem", 1, {
         min: 1,
         max: 20,
         mode: "choose_operation",
-        operations: ["+"],
+        operations: ["+", "x"],
       }),
       makeActivity("mixed_word_problem", 1, {
         min: 1,
         max: 20,
         mode: "choose_operation",
-        operations: ["+"],
+        operations: ["+", "x"],
       }),
     ],
     curriculum: ["AC9M2N06"],
@@ -1050,24 +1053,25 @@ export const year2NumberRows: ProgramRow[] = [
     week: 12,
     focus: "Fractions",
     lesson: 2,
-    topic: "Eighths by halving",
+    topic: "Build quarters and eighths by repeated halving",
     activity: scopedActivity(
-      "Halve again to make eighths; connect halves, quarters and eighths.",
-      "Which picture shows one-eighth?",
-      "What happens to the parts each time you halve?"
+      "Halve a whole, halve each half to make quarters, then halve each quarter to make eighths.",
+      "Build quarters and eighths through successive equal splits.",
+      "How is one eighth connected to one quarter?"
     ),
     activities: [
       makeActivity("area_model_select", 2, {
-        mode: "pick_model",
-        denominators: [2, 4, 8],
+        mode: "repeated_halving",
+        denominators: [4],
       }),
       makeActivity("area_model_select", 2, {
-        mode: "shade_fraction",
-        denominators: [4, 8],
+        mode: "repeated_halving",
+        denominators: [8],
       }),
       makeActivity("area_model_select", 1, {
-        mode: "match_model",
-        denominators: [2, 4, 8],
+        mode: "repeated_halving",
+        denominators: [8],
+        connectionDirection: "larger_from_smaller",
       }),
     ],
     curriculum: ["AC9M2N03"],

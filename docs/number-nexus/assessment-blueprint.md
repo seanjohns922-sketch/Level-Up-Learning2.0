@@ -2,6 +2,8 @@
 
 Status: **Conditionally approved - assessment generation remains blocked**
 
+Canonical curriculum source: **Australian Curriculum: Mathematics - Curriculum content F-6, Version 9.0 (ACARA)**. Descriptor wording and coverage decisions must be checked against the project owner's supplied PDF before any curriculum audit, lesson change, quiz change or assessment-bank change is approved.
+
 This document defines assessment content only. The assessment engine, routing, persistence, progression, replay, reporting, rewards, placement and database schema remain frozen.
 
 The blueprint design is approved. Assessment generation proceeds level by level only after that level's curriculum coverage and metadata are verified; later blocked levels must not be bypassed.
@@ -541,7 +543,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### AC9M2N03
 
-**Descriptor:** Recognise one-half as one of 2 equal parts and connect halves, quarters and eighths through repeated halving.
+**Descriptor:** Recognise and describe one-half as one of 2 equal parts of a whole and connect halves, quarters and eighths through repeated halving.
 
 **Learning Intentions**
 
@@ -561,7 +563,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `unequal-fraction-parts`, `denominator-size`, `fraction-whole`
 
-**Curriculum Mapping:** **aligned**; weeks 12. Aligned but compressed into one week.
+**Curriculum Mapping:** **aligned**; weeks 12. Week 12 includes a dedicated repeated-halving construction lab: whole to halves, quarters and eighths, followed by an explicit fraction-connection decision.
 
 **Question Blueprint**
 
@@ -644,7 +646,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `operation-story-structure`, `financial-operation-choice`, `additive-vs-multiplicative`
 
-**Curriculum Mapping:** **aligned**; weeks 11. Money is explicit; broader modelling evidence should be strengthened.
+**Curriculum Mapping:** **aligned**; weeks 11. Week 11 now requires operation selection across additive, multiplicative and change situations using Australian money models.
 
 **Question Blueprint**
 
@@ -653,16 +655,18 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### AC9M2A01
 
-**Descriptor:** Recognise, describe and create additive patterns with a constant increase or decrease and identify missing elements.
+**Descriptor:** Recognise, describe and create additive patterns that increase or decrease by a constant amount, using numbers, shapes and objects, and identify missing elements in the pattern.
 
 **Learning Intentions**
 
 - Determine a constant additive rule.
-- Use it to find missing or future terms.
+- Create increasing and decreasing patterns using numbers, shapes and objects.
+- Use the rule to identify missing elements.
 
 **Success Criteria**
 
 - I state the rule and preserve it in both directions.
+- I create a valid pattern in more than one representation.
 
 **Question Allocation:** Pre-Test 2; Post-Test 2
 
@@ -672,7 +676,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `pattern-rule-vs-example`
 
-**Curriculum Mapping:** **aligned**; weeks 8. Current multiplication-fluency work supplies constant additive sequences; explicit rule language needs confirmation.
+**Curriculum Mapping:** **aligned**; weeks 8. Week 8 covers increasing, decreasing and missing-element patterns, then requires genuine pattern creation using numbers, shapes and objects.
 
 **Question Blueprint**
 
@@ -1790,4 +1794,3 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 ## Approval Gate
 
 Approval must confirm descriptor ownership, lesson coverage status, allocations, response quotas, misconception coverage and question archetypes. Approval does not switch production banks. Independent item authoring and educator review remain separate later phases.
-

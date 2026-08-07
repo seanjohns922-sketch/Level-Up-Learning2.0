@@ -19,7 +19,7 @@ function FractionGrid({
 }) {
   const active = interactive ? selectedParts ?? [] : shadedParts;
   return (
-    <div className="grid grid-cols-2 gap-2 rounded-2xl bg-white p-3 shadow-sm">
+    <div className={`grid gap-2 rounded-lg bg-white p-3 shadow-sm ${denominator === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
       {Array.from({ length: denominator }).map((_, index) => {
         const filled = active.includes(index);
         const cellClass = [
@@ -56,6 +56,8 @@ export default function AreaModelSelect({
 }) {
   const [selectedParts, setSelectedParts] = useState<number[]>([]);
   const [pickedModelId, setPickedModelId] = useState<string | null>(null);
+  const [halvingParts, setHalvingParts] = useState(1);
+  const [pickedConnection, setPickedConnection] = useState<string | null>(null);
 
   function togglePart(index: number) {
     setSelectedParts((current) =>
@@ -76,6 +78,81 @@ export default function AreaModelSelect({
     if (!pickedModelId) return;
     if (pickedModelId === questionData.correctModelId) onCorrect?.();
     else onWrong?.(pickedModelId);
+  }
+
+  function checkHalvingConnection() {
+    if (!pickedConnection) return;
+    if (pickedConnection === questionData.connectionAnswer) onCorrect?.();
+    else onWrong?.(pickedConnection);
+  }
+
+  if (questionData.mode === "repeated_halving") {
+    const target = questionData.halvingTarget ?? questionData.denominator;
+    const stageLabel =
+      halvingParts === 1
+        ? "One whole"
+        : halvingParts === 2
+          ? "2 equal parts: halves"
+          : halvingParts === 4
+            ? "4 equal parts: quarters"
+            : "8 equal parts: eighths";
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">Repeated Halving Lab</div>
+            <h2 className="mt-2 text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+          </div>
+          <ReadAloudBtn text={questionData.prompt} />
+        </div>
+
+        <div className="mt-5 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
+          <div className="text-center text-sm font-black text-emerald-900">{stageLabel}</div>
+          <div className="mx-auto mt-3 max-w-md">
+            <FractionGrid denominator={halvingParts} shadedParts={[]} />
+          </div>
+          {halvingParts < target ? (
+            <button
+              type="button"
+              onClick={() => setHalvingParts((current) => Math.min(target, current * 2))}
+              className="mt-4 w-full rounded-lg bg-emerald-700 px-5 py-3 font-black text-white transition hover:bg-emerald-800"
+            >
+              Halve every part
+            </button>
+          ) : null}
+        </div>
+
+        {halvingParts === target ? (
+          <div className="mt-5">
+            <div className="text-sm font-black text-slate-800">Which connection is true?</div>
+            <div className="mt-3 grid gap-2">
+              {questionData.connectionOptions?.map((option) => (
+                <div key={option} className={`flex min-h-16 items-stretch overflow-hidden rounded-lg border-2 bg-white ${pickedConnection === option ? "border-emerald-500" : "border-slate-200"}`}>
+                  <button
+                    type="button"
+                    onClick={() => setPickedConnection(option)}
+                    className="min-w-0 flex-1 px-4 py-3 text-left font-bold text-slate-900"
+                  >
+                    {option}
+                  </button>
+                  <div className="grid w-14 place-items-center border-l border-slate-200">
+                    <ReadAloudBtn text={option} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={checkHalvingConnection}
+              disabled={!pickedConnection}
+              className="mt-4 w-full rounded-lg bg-emerald-700 px-5 py-3 font-black text-white transition hover:bg-emerald-800 disabled:opacity-40"
+            >
+              Check connection
+            </button>
+          </div>
+        ) : null}
+      </div>
+    );
   }
 
   const needsModelPick = questionData.mode !== "shade_fraction";
