@@ -270,6 +270,22 @@ type QuizQuestion = {
     marker: number;
     ticks: number[];
   } | {
+    type: "number_chart";
+    values: Array<number | null>;
+  } | {
+    type: "place_value";
+    tens: number;
+    ones: number;
+  } | {
+    type: "part_whole";
+    whole: number;
+    knownPart: number;
+  } | {
+    type: "collection_change";
+    start: number;
+    change: number;
+    action: "add" | "remove";
+  } | {
     type: "additive_pattern";
     terms: number[];
     token: "shape" | "object";
@@ -9790,6 +9806,106 @@ function SessionPage({
                           <div className="h-11 w-1 rounded bg-teal-500" />
                           <div className="mx-[-0.4rem] mt-[-0.15rem] h-4 w-4 rounded-full border-2 border-white bg-teal-500 shadow" />
                         </div>
+                      </div>
+                    </div>
+                  ) : null}
+                  {currentQuiz?.visual?.type === "number_chart" ? (
+                    <div className="mb-3 rounded-lg border border-teal-200 bg-[#f8fbfc] p-5 shadow-sm">
+                      <div
+                        className="mx-auto grid max-w-md grid-cols-3 gap-2"
+                        role="img"
+                        aria-label="A number chart with one empty cell"
+                      >
+                        {currentQuiz.visual.values.map((value, index) => (
+                          <div
+                            key={`${currentQuiz.id}-chart-${index}`}
+                            className={[
+                              "grid min-h-16 place-items-center rounded-lg border text-2xl font-extrabold",
+                              value === null
+                                ? "border-2 border-dashed border-teal-500 bg-teal-50 text-teal-800"
+                                : "border-slate-200 bg-white text-slate-900",
+                            ].join(" ")}
+                          >
+                            {value ?? "?"}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  {currentQuiz?.visual?.type === "place_value" ? (
+                    <div className="mb-3 rounded-lg border border-teal-200 bg-[#f8fbfc] p-5 shadow-sm">
+                      <div className="mx-auto flex max-w-3xl flex-wrap items-end justify-center gap-10" role="img" aria-label={`${currentQuiz.visual.tens} tens rods and ${currentQuiz.visual.ones} ones blocks`}>
+                        <div className="text-center">
+                          <div className="mb-3 flex min-h-36 flex-wrap items-end justify-center gap-2">
+                            {Array.from({ length: currentQuiz.visual.tens }, (_, index) => (
+                              <div key={`${currentQuiz.id}-ten-${index}`} className="grid h-32 w-8 grid-rows-10 overflow-hidden rounded border border-cyan-500 bg-cyan-100 shadow-sm">
+                                {Array.from({ length: 10 }, (_, unitIndex) => (
+                                  <div key={`${currentQuiz.id}-ten-${index}-unit-${unitIndex}`} className={unitIndex > 0 ? "border-t border-cyan-400" : ""} />
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="text-sm font-bold uppercase text-slate-600">Tens</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="mb-3 flex min-h-36 max-w-48 flex-wrap content-end justify-center gap-2">
+                            {Array.from({ length: currentQuiz.visual.ones }, (_, index) => (
+                              <div key={`${currentQuiz.id}-one-${index}`} className="h-8 w-8 rounded border border-amber-500 bg-amber-100 shadow-sm" />
+                            ))}
+                          </div>
+                          <div className="text-sm font-bold uppercase text-slate-600">Ones</div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                  {currentQuiz?.visual?.type === "part_whole" ? (
+                    <div className="mb-3 rounded-lg border border-teal-200 bg-[#f8fbfc] p-5 shadow-sm">
+                      <div className="mx-auto grid max-w-lg grid-cols-2 gap-3 text-center" role="img" aria-label={`Part-whole model with a whole of ${currentQuiz.visual.whole}, one part of ${currentQuiz.visual.knownPart}, and one missing part`}>
+                        <div className="grid min-h-24 place-items-center rounded-lg border-2 border-cyan-500 bg-white text-3xl font-extrabold text-slate-900">
+                          {currentQuiz.visual.knownPart}
+                        </div>
+                        <div className="grid min-h-24 place-items-center rounded-lg border-2 border-dashed border-cyan-500 bg-white text-3xl font-extrabold text-slate-900">?</div>
+                        <div className="col-span-2 mx-auto grid min-h-24 w-2/3 place-items-center rounded-lg border-2 border-emerald-600 bg-emerald-50 text-3xl font-extrabold text-slate-900">
+                          {currentQuiz.visual.whole}
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                  {currentQuiz?.visual?.type === "collection_change" ? (
+                    <div className="mb-3 rounded-lg border border-teal-200 bg-[#f8fbfc] p-5 shadow-sm">
+                      <div
+                        className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-5"
+                        role="img"
+                        aria-label={currentQuiz.visual.action === "add" ? `${currentQuiz.visual.start} objects and ${currentQuiz.visual.change} more objects` : `${currentQuiz.visual.start} objects with ${currentQuiz.visual.change} crossed out`}
+                      >
+                        <div className="flex max-w-sm flex-wrap justify-center gap-2">
+                          {Array.from({ length: currentQuiz.visual.start }, (_, index) => {
+                            const removed = currentQuiz.visual?.type === "collection_change"
+                              && currentQuiz.visual.action === "remove"
+                              && index >= currentQuiz.visual.start - currentQuiz.visual.change;
+                            return (
+                              <div
+                                key={`${currentQuiz.id}-start-${index}`}
+                                className={[
+                                  "relative h-10 w-10 rounded-full border-2 shadow-sm",
+                                  removed ? "border-rose-400 bg-rose-100" : "border-cyan-500 bg-cyan-200",
+                                ].join(" ")}
+                              >
+                                {removed ? <span className="absolute inset-0 grid place-items-center text-2xl font-black text-rose-600" aria-hidden>×</span> : null}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {currentQuiz.visual.action === "add" ? (
+                          <>
+                            <div className="text-4xl font-bold text-teal-700" aria-hidden>+</div>
+                            <div className="flex max-w-xs flex-wrap justify-center gap-2">
+                              {Array.from({ length: currentQuiz.visual.change }, (_, index) => (
+                                <div key={`${currentQuiz.id}-change-${index}`} className="h-10 w-10 rounded-full border-2 border-emerald-500 bg-emerald-200 shadow-sm" />
+                              ))}
+                            </div>
+                          </>
+                        ) : null}
                       </div>
                     </div>
                   ) : null}

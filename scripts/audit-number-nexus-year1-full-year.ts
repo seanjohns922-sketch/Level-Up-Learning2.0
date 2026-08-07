@@ -114,6 +114,44 @@ for (let week = 1; week <= 12; week += 1) {
     assert(item.prompt.trim().length > 0, `${item.id} has no prompt.`);
     quizChecks += 1;
   }
+
+  const lessonItems = (lesson: 1 | 2 | 3) => quiz.filter((item) => item.lessonTag === lesson);
+  const visualType = (item: (typeof quiz)[number]) => (item as { visual?: { type?: string } }).visual?.type;
+  const itemKind = (item: (typeof quiz)[number]) => (item as { kind?: string }).kind;
+  if (week === 1) {
+    assert.equal(lessonItems(3).filter((item) => itemKind(item) === "typed").length, 2, "Week 1 Lesson 3 must assess independently writing numerals as well as ordering them.");
+  }
+  if (week === 2) {
+    assert.equal(lessonItems(3).filter((item) => visualType(item) === "number_line").length, 3, "Week 2 Lesson 3 must include three number-line questions.");
+    assert.equal(lessonItems(3).filter((item) => visualType(item) === "number_chart").length, 2, "Week 2 Lesson 3 must include two number-chart questions.");
+  }
+  if (week === 3) {
+    assert(lessonItems(1).every((item) => visualType(item) === "place_value"), "Week 3 Lesson 1 must assess base-ten materials visually.");
+    assert(lessonItems(3).every((item) => visualType(item) === "place_value"), "Week 3 Lesson 3 must assess base-ten construction visually.");
+    assert.equal(lessonItems(2).filter((item) => item.prompt.toLowerCase().includes("flexible")).length, 2, "Week 3 Lesson 2 must include two flexible partition questions.");
+  }
+  if (week === 5) {
+    assert(lessonItems(1).every((item) => visualType(item) === "collection_change"), "Week 5 Lesson 1 must model joining collections.");
+    assert(lessonItems(2).every((item) => visualType(item) === "part_whole"), "Week 5 Lesson 2 must use part-whole models.");
+  }
+  if (week === 6) {
+    assert(lessonItems(1).every((item) => visualType(item) === "collection_change"), "Week 6 Lesson 1 must model removing from a collection.");
+    assert(lessonItems(2).every((item) => visualType(item) === "part_whole"), "Week 6 Lesson 2 must use part-whole models.");
+  }
+  if (week === 7) {
+    assert(lessonItems(3).every((item) => visualType(item) === "money"), "Week 7 Lesson 3 must retain the taught money representation.");
+  }
+  if (week === 8) {
+    assert(lessonItems(1).every((item) => visualType(item) === "collection_change"), "Week 8 Lesson 1 must assess additive situation models.");
+    assert(lessonItems(2).every((item) => visualType(item) === "part_whole"), "Week 8 Lesson 2 must assess part-whole diagrams.");
+    assert(lessonItems(3).every((item) => visualType(item) === "money"), "Week 8 Lesson 3 must retain the taught money representation.");
+  }
+  if (week === 9 || week === 10) {
+    assert(quiz.every((item) => visualType(item) === "rows"), `Week ${week} must assess sharing and grouping with visible equal-group models.`);
+  }
+  if (week === 11) {
+    assert(quiz.every((item) => "sequence" in item && Array.isArray(item.sequence) && item.sequence.length >= 2), "Week 11 must assess patterns with visible repeating sequences.");
+  }
 }
 
 const blueprint = NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS.find((item) => item.level === 1);

@@ -23,6 +23,31 @@ export type Year1NumberNexusQuizQuestion = {
     dotSize: number;
     gap: number;
     rowGap: number;
+  } | {
+    type: "number_line";
+    min: number;
+    max: number;
+    marker: number;
+    ticks: number[];
+  } | {
+    type: "number_chart";
+    values: Array<number | null>;
+  } | {
+    type: "place_value";
+    tens: number;
+    ones: number;
+  } | {
+    type: "part_whole";
+    whole: number;
+    knownPart: number;
+  } | {
+    type: "collection_change";
+    start: number;
+    change: number;
+    action: "add" | "remove";
+  } | {
+    type: "money";
+    items: Array<{ value: number; label: string; image: string; kind: "coin" | "note" }>;
   };
 };
 
@@ -47,8 +72,8 @@ function choice(
   return { id, lessonTag, kind: "mcq", prompt, options, correctIndex: options.indexOf(correct), ...(visual ? { visual } : {}) };
 }
 
-function typed(id: string, lessonTag: Lesson, prompt: string, answer: number): DraftQuestion {
-  return { id, lessonTag, kind: "typed", prompt, correctValue: String(answer), responseType: "number" };
+function typed(id: string, lessonTag: Lesson, prompt: string, answer: number, visual?: Year1NumberNexusQuizQuestion["visual"]): DraftQuestion {
+  return { id, lessonTag, kind: "typed", prompt, correctValue: String(answer), responseType: "number", ...(visual ? { visual } : {}) };
 }
 
 function audio(id: string, lessonTag: Lesson, answer: number, distractors: number[]): DraftQuestion {
@@ -62,6 +87,20 @@ function dots(count: number): Year1NumberNexusQuizQuestion["visual"] {
 
 function rows(groupCount: number, groupSize: number): Year1NumberNexusQuizQuestion["visual"] {
   return { type: "rows", rows: Array.from({ length: groupCount }, () => groupSize), dotSize: 20, gap: 7, rowGap: 10 };
+}
+
+function money(amount: number): Year1NumberNexusQuizQuestion["visual"] {
+  const denominations = [20, 10, 5, 2, 1] as const;
+  const items: Array<{ value: number; label: string; image: string; kind: "coin" | "note" }> = [];
+  let remaining = amount;
+  for (const value of denominations) {
+    while (remaining >= value) {
+      const kind = value >= 5 ? "note" : "coin";
+      items.push({ value, label: `$${value}`, image: kind === "note" ? `/coins/note-${value}.png` : `/coins/coin-${value}.png`, kind });
+      remaining -= value;
+    }
+  }
+  return { type: "money", items };
 }
 
 function id(week: number, lesson: Lesson, index: number) {
@@ -99,7 +138,9 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     }
     if (week === 1 && lesson === 3) {
       const a = 8 + offset * 7;
-      return choice(questionId, lesson, "Which list is ordered from smallest to largest?", `${a}, ${a + 3}, ${a + 7}`, [`${a + 7}, ${a + 3}, ${a}`, `${a}, ${a + 7}, ${a + 3}`, `${a + 3}, ${a}, ${a + 7}`]);
+      return index < 3
+        ? choice(questionId, lesson, "Which list is ordered from smallest to largest?", `${a}, ${a + 3}, ${a + 7}`, [`${a + 7}, ${a + 3}, ${a}`, `${a}, ${a + 7}, ${a + 3}`, `${a + 3}, ${a}, ${a + 7}`])
+        : typed(questionId, lesson, `Write the numeral between ${a + 2} and ${a + 4}.`, a + 3);
     }
 
     if (week === 2 && lesson === 1) {
@@ -113,26 +154,33 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     }
     if (week === 2 && lesson === 3) {
       const target = [36, 54, 68, 91, 108][index]!;
-      return choice(questionId, lesson, `A number chart has ${target - 1}, __, ${target + 1}. Which number is missing?`, target, [target - 2, target + 2, target + 10]);
+      if (index < 3) {
+        const lower = Math.floor(target / 10) * 10;
+        const upper = lower + 10;
+        return choice(questionId, lesson, "Which number is marked on the number line?", target, [target - 1, target + 1, upper], { type: "number_line", min: lower, max: upper, marker: target, ticks: [lower, lower + 5, upper] });
+      }
+      return choice(questionId, lesson, "Which number belongs in the empty chart cell?", target, [target - 1, target + 1, target + 10], { type: "number_chart", values: [target - 10, target - 9, target - 8, target - 1, null, target + 1, target + 10, target + 11, target + 12] });
     }
 
     if (week === 3 && lesson === 1) {
       const target = [34, 52, 67, 81, 95][index]!;
       const tens = Math.floor(target / 10);
       const ones = target % 10;
-      return choice(questionId, lesson, `How many tens and ones are in ${target}?`, `${tens} tens and ${ones} ones`, [`${ones} tens and ${tens} ones`, `${tens - 1} tens and ${ones} ones`, `${tens} tens and ${Math.min(9, ones + 1)} ones`]);
+      return choice(questionId, lesson, "How many tens and ones are shown?", `${tens} tens and ${ones} ones`, [`${ones} tens and ${tens} ones`, `${tens - 1} tens and ${ones} ones`, `${tens} tens and ${Math.min(9, ones + 1)} ones`], { type: "place_value", tens, ones });
     }
     if (week === 3 && lesson === 2) {
       const target = [24, 37, 46, 63, 78][index]!;
       const tens = Math.floor(target / 10) * 10;
       const ones = target - tens;
-      return choice(questionId, lesson, `Which partition makes ${target}?`, `${tens} + ${ones}`, [`${tens - 10} + ${ones}`, `${tens} + ${Math.min(9, ones + 1)}`, `${tens + 10} + ${ones}`]);
+      if (index < 3) return choice(questionId, lesson, `Which partition makes ${target}?`, `${tens} + ${ones}`, [`${tens - 10} + ${ones}`, `${tens} + ${Math.min(9, ones + 1)}`, `${tens + 10} + ${ones}`]);
+      const first = tens - 10;
+      return typed(questionId, lesson, `${target} = ${first} + __. Enter the missing flexible part.`, target - first);
     }
     if (week === 3 && lesson === 3) {
       const tens = [2, 4, 5, 7, 8][index]!;
       const ones = [6, 3, 8, 1, 5][index]!;
       const target = tens * 10 + ones;
-      return choice(questionId, lesson, `${tens} tens blocks and ${ones} ones blocks make which number?`, target, [ones * 10 + tens, target - 10, target + 1]);
+      return choice(questionId, lesson, "Which number is built with these materials?", target, [ones * 10 + tens, target - 10, target + 1], { type: "place_value", tens, ones });
     }
 
     if (week === 4 && lesson === 1) {
@@ -156,12 +204,12 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 5 && lesson === 1) {
       const left = 4 + offset;
       const right = 3 + (index % 3);
-      return typed(questionId, lesson, `${left} robots join ${right} robots. How many robots are there now?`, left + right);
+      return typed(questionId, lesson, "How many objects are there after the new group joins?", left + right, { type: "collection_change", start: left, change: right, action: "add" });
     }
     if (week === 5 && lesson === 2) {
       const whole = 11 + offset * 2;
       const part = 3 + offset;
-      return typed(questionId, lesson, `The whole is ${whole}. One part is ${part}. What is the missing part?`, whole - part);
+      return typed(questionId, lesson, "What is the missing part?", whole - part, { type: "part_whole", whole, knownPart: part });
     }
     if (week === 5 && lesson === 3) {
       const base = 4 + offset;
@@ -172,12 +220,12 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 6 && lesson === 1) {
       const start = 12 + offset * 2;
       const remove = 3 + (index % 4);
-      return typed(questionId, lesson, `${start} crystals are shown. ${remove} are removed. How many remain?`, start - remove);
+      return typed(questionId, lesson, "How many objects remain after the crossed group is removed?", start - remove, { type: "collection_change", start, change: remove, action: "remove" });
     }
     if (week === 6 && lesson === 2) {
       const whole = 13 + offset;
       const known = 5 + (index % 3);
-      return typed(questionId, lesson, `The whole is ${whole}. One part is ${known}. Find the other part.`, whole - known);
+      return typed(questionId, lesson, "Find the missing part in the model.", whole - known, { type: "part_whole", whole, knownPart: known });
     }
     if (week === 6 && lesson === 3) {
       const whole = 10 + offset * 2;
@@ -199,30 +247,30 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 7 && lesson === 3) {
       const first = 4 + offset;
       const second = 2 + (index % 4);
-      return typed(questionId, lesson, `A badge costs $${first} and a map costs $${second}. What is the total cost?`, first + second);
+      return typed(questionId, lesson, `A badge costs $${first} and a map costs $${second}. What is the total cost?`, first + second, money(first + second));
     }
 
     if (week === 8 && lesson === 1) {
       const first = 5 + offset;
       const second = 3 + (index % 3);
       const total = first + second;
-      return choice(questionId, lesson, `${first} stars and ${second} stars are combined. Which equation models the story?`, `${first} + ${second} = ${total}`, [`${total} - ${first} = ${total}`, `${first} - ${second} = ${total}`, `${first} + ${total} = ${second}`]);
+      return choice(questionId, lesson, "Which equation models the two groups?", `${first} + ${second} = ${total}`, [`${total} - ${first} = ${total}`, `${first} - ${second} = ${total}`, `${first} + ${total} = ${second}`], { type: "collection_change", start: first, change: second, action: "add" });
     }
     if (week === 8 && lesson === 2) {
       const whole = 14 + offset;
       const known = 6 + (index % 3);
-      return typed(questionId, lesson, `A bar shows a whole of ${whole} and one part of ${known}. What is the other part?`, whole - known);
+      return typed(questionId, lesson, "What is the missing part in the diagram?", whole - known, { type: "part_whole", whole, knownPart: known });
     }
     if (week === 8 && lesson === 3) {
       const paid = 12 + offset * 2;
       const cost = 5 + offset;
-      return typed(questionId, lesson, `You have $${paid}. You spend $${cost}. How many dollars remain?`, paid - cost);
+      return typed(questionId, lesson, `You have $${paid}. You spend $${cost}. How many dollars remain?`, paid - cost, money(paid));
     }
 
     if (week === 9 && lesson === 1) {
       const bins = 2 + (index % 3);
       const each = 2 + offset;
-      return typed(questionId, lesson, `Share ${bins * each} counters equally into ${bins} groups. How many go in each group?`, each);
+      return typed(questionId, lesson, `The model shares ${bins * each} counters into ${bins} equal groups. How many are in each group?`, each, rows(bins, each));
     }
     if (week === 9 && lesson === 2) {
       const bins = 2 + (index % 3);
@@ -232,13 +280,13 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 9 && lesson === 3) {
       const bins = 3 + (index % 3);
       const each = 2 + (index % 4);
-      return choice(questionId, lesson, `Which total can be shared into ${bins} equal groups of ${each}?`, bins * each, [bins * each - 1, bins + each, bins * each + each]);
+      return choice(questionId, lesson, "Which total is shown by the equal-sharing model?", bins * each, [bins * each - 1, bins + each, bins * each + each], rows(bins, each));
     }
 
     if (week === 10 && lesson === 1) {
       const step = [2, 5, 10, 2, 5][index]!;
       const groups = 3 + offset;
-      return typed(questionId, lesson, `${groups} groups of ${step} are counted by ${step}s. How many altogether?`, groups * step);
+      return typed(questionId, lesson, `${groups} groups are counted by ${step}s. How many altogether?`, groups * step, rows(groups, step));
     }
     if (week === 10 && lesson === 2) {
       const groupCount = 3 + (index % 3);
@@ -248,7 +296,7 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 10 && lesson === 3) {
       const each = 3 + (index % 3);
       const total = each * (2 + offset);
-      return typed(questionId, lesson, `${total} supplies are packed with ${each} in each box. How many boxes are needed?`, total / each);
+      return typed(questionId, lesson, `${total} supplies are packed with ${each} in each box. How many boxes are needed?`, total / each, rows(total / each, each));
     }
 
     if (week === 12 && lesson === 1) {
