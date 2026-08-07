@@ -128,8 +128,33 @@ for (let week = 1; week <= 12; week += 1) {
   }
 
   if (week === 8) {
-    assert(quiz.some((item) => item.prompt.includes("Count back")), "Week 8 quiz does not assess decreasing patterns.");
-    assert(quiz.some((item) => item.prompt.includes("Which pattern follows the rule")), "Week 8 quiz does not independently assess pattern creation from a rule.");
+    const weekEightSkills = new Set(quiz.map((item) => item.skillId));
+    for (const skill of ["skip-by-2", "missing-by-2", "double", "inverse-double", "forward-by-5", "backward-by-5", "missing-by-5", "create-number-increase", "create-number-decrease", "create-shape-increase", "create-object-decrease", "identify-object-rule"]) {
+      assert(weekEightSkills.has(skill), `Week 8 quiz omits taught skill: ${skill}.`);
+    }
+    assert.equal(quiz.filter((item) => item.skillId === "inverse-double").length, 1, "Week 8 Lesson 1 overweights the single inverse-link activity.");
+    assert.equal(quiz.filter((item) => item.visual?.type === "additive_pattern" && item.visual.token === "shape").length, 1, "Week 8 quiz omits the taught shape representation.");
+    assert.equal(quiz.filter((item) => item.visual?.type === "additive_pattern" && item.visual.token === "object").length, 2, "Week 8 quiz omits the taught object representation.");
+  }
+  if (week === 3) {
+    assert(quiz.every((item) => item.visual?.type === "number_line"), "Week 3 quiz must preserve the taught number-line representation in all 15 questions.");
+    assert(quiz.every((item) => !item.prompt.includes("on a line ending at")), "Week 3 quiz still verbalises a missing number line.");
+  }
+  if (week === 4) {
+    assert(quiz.filter((item) => item.lessonTag === 2).every((item) => item.prompt.includes("pattern")), "Week 4 Lesson 2 quiz does not assess the taught parity patterns.");
+  }
+  if (week === 5) {
+    assert(quiz.filter((item) => item.lessonTag === 1).every((item) => item.visual?.type === "jump_line"), "Week 5 Lesson 1 quiz drops the taught open number line.");
+  }
+  if (week === 6) {
+    assert(quiz.filter((item) => item.lessonTag === 1).every((item) => item.visual?.type === "jump_line"), "Week 6 Lesson 1 quiz drops the taught open number line.");
+  }
+  if (week === 7) {
+    assert(quiz.filter((item) => item.lessonTag === 3 && item.kind === "mcq").length >= 2, "Week 7 Lesson 3 quiz omits explicit inverse checks.");
+  }
+  if (week === 9 || week === 10) {
+    assert(quiz.every((item) => item.visual?.type === "rows"), `Week ${week} quiz drops the taught group and array models.`);
+    assert(quiz.every((item) => item.visual?.type !== "rows" || [2, 5, 10].includes(item.visual.rows.length) || [2, 5, 10].includes(item.visual.rows[0] ?? 0)), `Week ${week} quiz uses a group structure outside the taught 2s, 5s and 10s facts.`);
   }
   if (week === 11) {
     assert(quiz.every((item) => item.visual?.type === "money"), "Week 11 quiz questions must use the Australian money visual.");
@@ -137,8 +162,10 @@ for (let week = 1; week <= 12; week += 1) {
     assert(quiz.some((item) => item.prompt.includes("You buy")), "Week 11 quiz does not assess a multiplicative money situation.");
   }
   if (week === 12) {
+    assert(quiz.every((item) => item.visual?.type === "fraction"), "Week 12 quiz drops the taught fraction pictures.");
+    assert(!quiz.some((item) => item.prompt.includes("same amount")), "Week 12 quiz assesses unsupported equivalent fractions.");
     assert(quiz.some((item) => item.prompt.includes("Halve all 4 quarters")), "Week 12 quiz does not assess construction of eighths through repeated halving.");
-    assert(quiz.some((item) => item.prompt.includes("Which statement is true after quarters are halved")), "Week 12 quiz does not assess the halves-quarters-eighths connection.");
+    assert(quiz.some((item) => item.prompt.includes("after every quarter is halved") && item.options?.includes("One eighth is half of one quarter.")), "Week 12 quiz does not assess the halves-quarters-eighths connection.");
   }
 }
 
@@ -162,7 +189,7 @@ const sessionSource = fs.readFileSync(path.join(process.cwd(), "app/session/page
 const curriculumSourceRule = fs.readFileSync(path.join(process.cwd(), "docs/CURRICULUM_SOURCE_OF_TRUTH.md"), "utf8");
 assert(curriculumSourceRule.includes("Australian Curriculum: Mathematics - Curriculum content F-6, Version 9.0 (ACARA)"), "The canonical ACARA PDF source rule is missing.");
 assert(curriculumSourceRule.includes("mathematics-curriculum-content-f-6-v9 (4).pdf"), "The project owner's canonical curriculum PDF is not recorded.");
-assert(engineSource.includes('data-number-nexus-level={isLevelTwoNumber ? "2" : undefined}'), "Level 2 lessons do not expose the modern presentation scope.");
+assert(engineSource.includes('data-number-nexus-level={isModernNumber ? String(levelNumber) : undefined}') && engineSource.includes("const isModernNumber = isLevelTwoNumber || isLevelThreeNumber"), "Level 2 lessons do not expose the modern presentation scope.");
 assert(engineSource.includes('background: "#f8fbfc"'), "Level 2 lessons do not use the modern solid workspace surface.");
 assert(globalStyles.includes(".number-nexus-level-two .rounded-2xl") && globalStyles.includes("border-radius: 0.5rem !important"), "Level 2 legacy activity cards are not normalized to the modern radius system.");
 assert(assessmentSource.includes("number_y2_") || assessmentSource.includes("renderCoins"), "Level 2 assessment visuals are not available.");

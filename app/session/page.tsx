@@ -46,7 +46,7 @@ import {
 } from "@/lib/resume-state";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { prepareSpeechText, speak, useAutoReadSetting, useSpeakState, useSpeechInteractionReady } from "@/lib/speak";
-import { Volume2, Sparkles, Zap, Check, PartyPopper, SkipForward } from "lucide-react";
+import { Volume2, Sparkles, Zap, Check, PartyPopper, SkipForward, Gem, Square, ArrowRight } from "lucide-react";
 import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
 import { getLastProgramWeek } from "@/lib/program-weeks";
 import type { TeacherAttemptQuestion } from "@/lib/teacher-insights";
@@ -263,6 +263,20 @@ type QuizQuestion = {
     parts: number;
     selected: number;
     label?: string;
+  } | {
+    type: "number_line";
+    min: number;
+    max: number;
+    marker: number;
+    ticks: number[];
+  } | {
+    type: "additive_pattern";
+    terms: number[];
+    token: "shape" | "object";
+  } | {
+    type: "jump_line";
+    start: number;
+    jumps: number[];
   } | PrepNumberNexusQuizVisual;
   line?: {
     min: number;
@@ -9742,6 +9756,76 @@ function SessionPage({
                             ].join(" ")}
                           />
                         ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  {currentQuiz?.visual?.type === "number_line" ? (
+                    <div className="mb-3 rounded-lg border border-teal-200 bg-[#f8fbfc] px-6 py-5 shadow-sm">
+                      <div
+                        className="relative mx-auto h-28 max-w-4xl"
+                        role="img"
+                        aria-label={`Number line from ${currentQuiz.visual.min} to ${currentQuiz.visual.max} with one marked position`}
+                      >
+                        <div className="absolute left-0 right-0 top-10 h-1 rounded bg-slate-600" />
+                        {currentQuiz.visual.ticks.map((tick) => {
+                          const line = currentQuiz.visual as { type: "number_line"; min: number; max: number };
+                          const position = ((tick - line.min) / (line.max - line.min)) * 100;
+                          return (
+                            <div
+                              key={`${currentQuiz.id}-tick-${tick}`}
+                              className="absolute top-7 -translate-x-1/2 text-center"
+                              style={{ left: `${position}%` }}
+                            >
+                              <div className="mx-auto h-7 w-0.5 bg-slate-600" />
+                              <div className="mt-2 text-base font-bold text-slate-700">{tick}</div>
+                            </div>
+                          );
+                        })}
+                        <div
+                          className="absolute top-[1.15rem] -translate-x-1/2"
+                          style={{
+                            left: `${((currentQuiz.visual.marker - currentQuiz.visual.min) / (currentQuiz.visual.max - currentQuiz.visual.min)) * 100}%`,
+                          }}
+                        >
+                          <div className="h-11 w-1 rounded bg-teal-500" />
+                          <div className="mx-[-0.4rem] mt-[-0.15rem] h-4 w-4 rounded-full border-2 border-white bg-teal-500 shadow" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                  {currentQuiz?.visual?.type === "additive_pattern" ? (
+                    <div className="mb-3 rounded-lg border border-teal-200 bg-[#f8fbfc] p-5 shadow-sm">
+                      <div className="flex flex-wrap items-end justify-center gap-5">
+                        {currentQuiz.visual.terms.map((term, termIndex) => {
+                          const pattern = currentQuiz.visual as { type: "additive_pattern"; token: "shape" | "object" };
+                          const Icon = pattern.token === "object" ? Gem : Square;
+                          return (
+                            <div key={`${currentQuiz.id}-term-${termIndex}`} className="min-w-28 rounded-lg border border-slate-200 bg-white p-3 text-center shadow-sm">
+                              <div className="mb-2 text-xs font-bold uppercase text-slate-500">Term {termIndex + 1}</div>
+                              <div className="flex max-w-40 flex-wrap justify-center gap-1.5" aria-label={`${term} ${pattern.token}s`}>
+                                {Array.from({ length: term }, (_, iconIndex) => (
+                                  <Icon key={`${currentQuiz.id}-term-${termIndex}-icon-${iconIndex}`} className="h-6 w-6 text-teal-600" aria-hidden />
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
+                  {currentQuiz?.visual?.type === "jump_line" ? (
+                    <div className="mb-3 rounded-lg border border-teal-200 bg-[#f8fbfc] p-5 shadow-sm">
+                      <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-3" role="img" aria-label={`Open number line starting at ${currentQuiz.visual.start} with ${currentQuiz.visual.jumps.length} jumps`}>
+                        <div className="grid h-16 min-w-24 place-items-center rounded-lg border-2 border-slate-600 bg-white text-2xl font-extrabold text-slate-900">
+                          {currentQuiz.visual.start}
+                        </div>
+                        {currentQuiz.visual.jumps.map((jump, index) => (
+                          <div key={`${currentQuiz.id}-jump-${index}`} className="flex items-center gap-3">
+                            <div className="rounded-lg border border-teal-300 bg-teal-50 px-4 py-2 text-xl font-bold text-teal-900">{jump > 0 ? `+${jump}` : jump}</div>
+                            <ArrowRight className="h-7 w-7 text-teal-600" aria-hidden />
+                          </div>
+                        ))}
+                        <div className="grid h-16 min-w-24 place-items-center rounded-lg border-2 border-dashed border-teal-500 bg-white text-3xl font-extrabold text-teal-700">?</div>
                       </div>
                     </div>
                   ) : null}

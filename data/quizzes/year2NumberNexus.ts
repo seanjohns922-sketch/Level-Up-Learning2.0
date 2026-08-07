@@ -31,6 +31,25 @@ export type Year2NumberNexusQuizQuestion = {
       image: string;
       kind: "coin" | "note";
     }>;
+  } | {
+    type: "number_line";
+    min: number;
+    max: number;
+    marker: number;
+    ticks: number[];
+  } | {
+    type: "additive_pattern";
+    terms: number[];
+    token: "shape" | "object";
+  } | {
+    type: "jump_line";
+    start: number;
+    jumps: number[];
+  } | {
+    type: "fraction";
+    parts: number;
+    selected: number;
+    label?: string;
   };
 };
 
@@ -65,8 +84,8 @@ function choice(
   };
 }
 
-function typed(questionId: string, lessonTag: Lesson, prompt: string, answer: number): DraftQuestion {
-  return { id: questionId, lessonTag, kind: "typed", prompt, correctValue: String(answer), responseType: "number" };
+function typed(questionId: string, lessonTag: Lesson, prompt: string, answer: number, visual?: Year2NumberNexusQuizQuestion["visual"]): DraftQuestion {
+  return { id: questionId, lessonTag, kind: "typed", prompt, correctValue: String(answer), responseType: "number", ...(visual ? { visual } : {}) };
 }
 
 function audio(questionId: string, lessonTag: Lesson, answer: number, distractors: number[]): DraftQuestion {
@@ -75,6 +94,10 @@ function audio(questionId: string, lessonTag: Lesson, answer: number, distractor
 
 function rows(groupCount: number, groupSize: number): Year2NumberNexusQuizQuestion["visual"] {
   return { type: "rows", rows: Array.from({ length: groupCount }, () => groupSize), dotSize: 18, gap: 6, rowGap: 9 };
+}
+
+function numberLine(min: number, max: number, marker: number, ticks: number[]): Year2NumberNexusQuizQuestion["visual"] {
+  return { type: "number_line", min, max, marker, ticks };
 }
 
 function money(amount: number): Year2NumberNexusQuizQuestion["visual"] {
@@ -149,19 +172,44 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     }
 
     if (week === 3 && lesson === 1) {
-      const lower = [100, 250, 400, 600, 800][index]!;
-      const target = lower + [40, 75, 120, 165, 90][index]!;
-      return choice(questionId, lesson, `A number line runs from ${lower} to ${lower + 200}. Which number is ${target - lower} after ${lower}?`, target, [target - 10, target + 10, lower + 200]);
+      const lower = [100, 200, 400, 600, 800][index]!;
+      const target = lower + [40, 70, 120, 160, 90][index]!;
+      const upper = lower + 200;
+      return choice(
+        questionId,
+        lesson,
+        "Which number is marked on the number line?",
+        target,
+        [target - 20, target + 20, upper],
+        numberLine(lower, upper, target, [lower, lower + 50, lower + 100, lower + 150, upper]),
+      );
     }
     if (week === 3 && lesson === 2) {
       const target = [134, 267, 482, 715, 946][index]!;
       const nearest = Math.round(target / 10) * 10;
-      return choice(questionId, lesson, `Which multiple of 10 is nearest to ${target}?`, nearest, [nearest - 10, nearest + 10, target]);
+      const lower = Math.floor(target / 10) * 10;
+      const upper = lower + 10;
+      return choice(
+        questionId,
+        lesson,
+        "Which multiple of 10 is the marker closest to?",
+        nearest,
+        [nearest === lower ? upper : lower, target, nearest + (nearest === lower ? -10 : 10)],
+        numberLine(lower, upper, target, [lower, lower + 5, upper]),
+      );
     }
     if (week === 3 && lesson === 3) {
       const lower = [0, 200, 400, 600, 800][index]!;
       const estimate = lower + [60, 130, 80, 150, 40][index]!;
-      return choice(questionId, lesson, `A mark is about ${estimate - lower} past ${lower} on a line ending at ${lower + 200}. What is the best estimate?`, estimate, [estimate - 30, estimate + 30, lower + 200]);
+      const upper = lower + 200;
+      return choice(
+        questionId,
+        lesson,
+        "What is the best estimate for the marker?",
+        estimate,
+        [estimate - 30, estimate + 30, upper],
+        numberLine(lower, upper, estimate, [lower, lower + 50, lower + 100, lower + 150, upper]),
+      );
     }
 
     if (week === 4 && lesson === 1) {
@@ -169,9 +217,15 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
       return choice(questionId, lesson, `Is ${value} odd or even?`, value % 2 === 0 ? "even" : "odd", [value % 2 === 0 ? "odd" : "even", "both"]);
     }
     if (week === 4 && lesson === 2) {
-      const value = [46, 73, 98, 121, 154][index]!;
-      const answer = value % 2 === 0 ? "It can be paired with none left over." : "One is left after making pairs.";
-      return choice(questionId, lesson, `Which statement explains whether ${value} is odd or even?`, answer, [value % 2 === 0 ? "One is left after making pairs." : "It can be paired with none left over.", "Its tens digit decides."]);
+      const starts = [3, 8, 15, 22, 31][index]!;
+      const answer = starts + 6;
+      return choice(
+        questionId,
+        lesson,
+        `The pattern keeps the same parity: ${starts}, ${starts + 2}, ${starts + 4}, __. Which number comes next?`,
+        answer,
+        [answer - 1, answer + 1, answer + 2],
+      );
     }
     if (week === 4 && lesson === 3) {
       const a = [13, 18, 27, 32, 45][index]!;
@@ -183,7 +237,9 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 5 && lesson === 1) {
       const a = [26, 34, 47, 58, 63][index]!;
       const b = [18, 27, 35, 24, 29][index]!;
-      return typed(questionId, lesson, `Start at ${a}. Jump forward ${b}. Where do you land?`, a + b);
+      const tens = Math.floor(b / 10) * 10;
+      const ones = b - tens;
+      return typed(questionId, lesson, "Where does the open number-line path finish?", a + b, { type: "jump_line", start: a, jumps: [tens, ones] });
     }
     if (week === 5 && lesson === 2) {
       const a = [32, 45, 56, 63, 74][index]!;
@@ -199,7 +255,9 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 6 && lesson === 1) {
       const a = [64, 73, 85, 92, 108][index]!;
       const b = [18, 26, 37, 45, 29][index]!;
-      return typed(questionId, lesson, `Start at ${a}. Jump back ${b}. Where do you land?`, a - b);
+      const tens = Math.floor(b / 10) * -10;
+      const ones = -(b % 10);
+      return typed(questionId, lesson, "Where does the open number-line path finish?", a - b, { type: "jump_line", start: a, jumps: [tens, ones] });
     }
     if (week === 6 && lesson === 2) {
       const a = [76, 84, 93, 105, 117][index]!;
@@ -226,78 +284,96 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 7 && lesson === 3) {
       const total = [24, 31, 38, 42, 49][index]!;
       const known = [9, 14, 16, 18, 21][index]!;
-      return typed(questionId, lesson, `${total} game pieces include ${known} blue pieces. How many are another colour?`, total - known);
+      const answer = total - known;
+      return index < 3
+        ? typed(questionId, lesson, `${total} game pieces include ${known} blue pieces. How many are another colour?`, answer)
+        : choice(questionId, lesson, `${total} game pieces include ${known} blue pieces and ${answer} another colour. Which inverse fact checks the missing part?`, `${known} + ${answer} = ${total}`, [`${total} + ${known} = ${answer}`, `${known} - ${answer} = ${total}`, `${total} - ${answer} = ${answer}`]);
     }
 
     if (week === 8 && lesson === 1) {
-      const factor = [3, 5, 7, 9, 10][index]!;
-      const total = factor * 2;
-      return choice(questionId, lesson, `Double ${factor} is ${total}. Which related division fact is true?`, `${total} ÷ 2 = ${factor}`, [`${total} ÷ ${factor} = ${factor}`, `${total} ÷ 2 = ${factor + 1}`, `${factor} ÷ 2 = ${total}`]);
-    }
-    if (week === 8 && lesson === 2) {
-      const start = [10, 20, 35, 45, 60][index]!;
-      return index % 2 === 0
-        ? typed(questionId, lesson, `Count forward three steps by 5 from ${start}.`, start + 15)
-        : typed(questionId, lesson, `Count back three steps by 5 from ${start}.`, start - 15);
-    }
-    if (week === 8 && lesson === 3) {
-      const step = [2, 5, 10, 5, 10][index]!;
-      const start = [4, 35, 20, 45, 30][index]!;
-      const direction = index % 2 === 0 ? 1 : -1;
-      const thirdNewTerm = start + direction * step * 3;
-      if (index < 3) {
-        return typed(
-          questionId,
-          lesson,
-          `A pattern starts at ${start} and ${direction === 1 ? "adds" : "subtracts"} ${step} each time. What is the third new term?`,
-          thirdNewTerm,
-        );
+      if (index < 2) {
+        const start = [8, 22][index]!;
+        return typed(questionId, lesson, `Count forward 4 steps by 2 from ${start}.`, start + 8);
       }
-      const answer = `${start}, ${start + direction * step}, ${start + direction * step * 2}, ${thirdNewTerm}`;
+      if (index === 2) {
+        return typed(questionId, lesson, "Enter the missing number: 34, 36, __, 40, 42.", 38);
+      }
+      if (index === 3) {
+        const factor = 9;
+        return typed(questionId, lesson, `What is double ${factor}?`, factor * 2, rows(2, factor));
+      }
+      const factor = 7;
+      const total = factor * 2;
       return choice(
         questionId,
         lesson,
-        `Which pattern follows the rule: start at ${start} and ${direction === 1 ? "add" : "subtract"} ${step}?`,
-        answer,
-        [
-          `${start}, ${start + direction * (step + 1)}, ${start + direction * (step + 1) * 2}, ${start + direction * (step + 1) * 3}`,
-          `${start}, ${start - direction * step}, ${start - direction * step * 2}, ${start - direction * step * 3}`,
-          `${start}, ${start + direction * step}, ${start + direction * step * 3}, ${start + direction * step * 4}`,
-        ],
+        `The model shows double ${factor}. Which division fact reverses the double?`,
+        `${total} ÷ 2 = ${factor}`,
+        [`${total} ÷ ${factor} = ${factor}`, `${total} ÷ 2 = ${factor + 1}`, `${factor} ÷ 2 = ${total}`],
+        rows(2, factor),
+      );
+    }
+    if (week === 8 && lesson === 2) {
+      if (index < 2) {
+        const start = [10, 35][index]!;
+        return typed(questionId, lesson, `Count forward 3 steps by 5 from ${start}.`, start + 15);
+      }
+      if (index < 4) {
+        const start = [60, 85][index - 2]!;
+        return typed(questionId, lesson, `Count back 3 steps by 5 from ${start}.`, start - 15);
+      }
+      return typed(questionId, lesson, "Enter the missing number: 70, 65, __, 55, 50.", 60);
+    }
+    if (week === 8 && lesson === 3) {
+      if (index === 0) return typed(questionId, lesson, "Create the next term: 6, 8, 10, 12, __.", 14);
+      if (index === 1) return typed(questionId, lesson, "Create the next term: 25, 20, 15, 10, __.", 5);
+      if (index === 2) {
+        return typed(questionId, lesson, "A shape pattern has 2, then 4, then 6 shapes. How many shapes belong in the next term?", 8, { type: "additive_pattern", terms: [2, 4, 6], token: "shape" });
+      }
+      if (index === 3) {
+        return typed(questionId, lesson, "An object pattern has 8, then 6, then 4 objects. How many objects belong in the next term?", 2, { type: "additive_pattern", terms: [8, 6, 4], token: "object" });
+      }
+      return choice(
+        questionId,
+        lesson,
+        "Which rule creates the object pattern shown?",
+        "Add 2 each time.",
+        ["Subtract 2 each time.", "Add 1 each time.", "Double each time."],
+        { type: "additive_pattern", terms: [3, 5, 7], token: "object" },
       );
     }
 
     if (week === 9 && lesson === 1) {
       const groups = [2, 3, 4, 5, 6][index]!;
-      const each = [5, 4, 3, 2, 5][index]!;
-      return typed(questionId, lesson, `${groups} equal groups have ${each} counters in each group. How many counters altogether?`, groups * each);
+      const each = [2, 5, 10, 2, 5][index]!;
+      return typed(questionId, lesson, "How many counters are shown in the equal groups?", groups * each, rows(groups, each));
     }
     if (week === 9 && lesson === 2) {
       const groupCount = [2, 3, 4, 5, 3][index]!;
-      const groupSize = [6, 5, 4, 3, 8][index]!;
+      const groupSize = [2, 5, 10, 2, 5][index]!;
       return choice(questionId, lesson, "Which multiplication sentence matches the array?", `${groupCount} × ${groupSize} = ${groupCount * groupSize}`, [`${groupCount} + ${groupSize} = ${groupCount * groupSize}`, `${groupCount * groupSize} ÷ ${groupSize} = ${groupSize}`, `${groupCount} × ${groupCount} = ${groupCount * groupSize}`], rows(groupCount, groupSize));
     }
     if (week === 9 && lesson === 3) {
       const groups = [3, 4, 5, 6, 4][index]!;
-      const each = [4, 5, 3, 2, 7][index]!;
+      const each = [2, 5, 10, 2, 5][index]!;
       const repeated = Array.from({ length: groups }, () => each).join(" + ");
-      return choice(questionId, lesson, `Which multiplication sentence has the same value as ${repeated}?`, `${groups} × ${each} = ${groups * each}`, [`${groups} + ${each} = ${groups * each}`, `${each} × ${each} = ${groups * each}`, `${groups * each} ÷ ${groups} = ${groups}`]);
+      return choice(questionId, lesson, `Which multiplication sentence matches ${repeated}?`, `${groups} × ${each} = ${groups * each}`, [`${groups} + ${each} = ${groups * each}`, `${each} × ${each} = ${groups * each}`, `${groups * each} ÷ ${groups} = ${groups}`], rows(groups, each));
     }
 
     if (week === 10 && lesson === 1) {
-      const groups = [2, 3, 4, 5, 6][index]!;
-      const each = [6, 5, 4, 3, 5][index]!;
-      return typed(questionId, lesson, `Share ${groups * each} counters equally among ${groups} students. How many does each student get?`, each);
+      const groups = [2, 5, 10, 2, 5][index]!;
+      const each = [6, 4, 3, 8, 6][index]!;
+      return typed(questionId, lesson, `The model shares ${groups * each} counters equally into ${groups} rows. How many are in each row?`, each, rows(groups, each));
     }
     if (week === 10 && lesson === 2) {
       const groupSize = [2, 5, 10, 2, 5][index]!;
       const groupCount = [7, 4, 3, 9, 6][index]!;
-      return typed(questionId, lesson, `Put ${groupSize * groupCount} counters into groups of ${groupSize}. How many groups are made?`, groupCount);
+      return typed(questionId, lesson, `The model has groups of ${groupSize}. How many groups are shown?`, groupCount, rows(groupCount, groupSize));
     }
     if (week === 10 && lesson === 3) {
       const factor = [4, 6, 7, 8, 9][index]!;
       const total = factor * 2;
-      return choice(questionId, lesson, `Use 2 × ${factor} = ${total}. Which division fact checks it?`, `${total} ÷ 2 = ${factor}`, [`${total} ÷ ${factor} = ${factor}`, `${total} ÷ 2 = ${factor - 1}`, `${factor} ÷ 2 = ${total}`]);
+      return choice(questionId, lesson, `The model shows 2 × ${factor} = ${total}. Which division fact checks it?`, `${total} ÷ 2 = ${factor}`, [`${total} ÷ ${factor} = ${factor}`, `${total} ÷ 2 = ${factor - 1}`, `${factor} ÷ 2 = ${total}`], rows(2, factor));
     }
 
     if (week === 11 && lesson === 1) {
@@ -323,26 +399,26 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
     if (week === 12 && lesson === 1) {
       const numerator = [1, 2, 1, 3, 2][index]!;
       const denominator = [2, 4, 2, 4, 4][index]!;
-      return choice(questionId, lesson, `Which fraction names ${numerator} of ${denominator} equal parts?`, `${numerator}/${denominator}`, [`${denominator}/${numerator}`, `${numerator}/${denominator + 1}`, `${Math.min(denominator, numerator + 1)}/${denominator}`]);
+      return choice(questionId, lesson, "Which fraction names the shaded part of the whole?", `${numerator}/${denominator}`, [`${denominator}/${numerator}`, `${numerator}/${denominator + 1}`, `${Math.min(denominator, numerator + 1)}/${denominator}`], { type: "fraction", parts: denominator, selected: numerator });
     }
     if (week === 12 && lesson === 2) {
       if (index === 0) {
-        return typed(questionId, lesson, "Halve one whole once. How many equal parts are made?", 2);
+        return typed(questionId, lesson, "Halve this whole once. How many equal parts will there be?", 2, { type: "fraction", parts: 1, selected: 1 });
       }
       if (index === 1) {
-        return typed(questionId, lesson, "Halve both halves. How many equal parts are made now?", 4);
+        return typed(questionId, lesson, "Halve both halves. How many equal parts will there be?", 4, { type: "fraction", parts: 2, selected: 1 });
       }
       if (index === 2) {
-        return typed(questionId, lesson, "Halve all 4 quarters. How many equal parts are made now?", 8);
+        return typed(questionId, lesson, "Halve all 4 quarters. How many equal parts will there be?", 8, { type: "fraction", parts: 4, selected: 1 });
       }
       if (index === 3) {
-        return choice(questionId, lesson, "Which statement is true after quarters are halved?", "One eighth is half of one quarter.", ["One eighth is twice one quarter.", "One quarter is half of one eighth."]);
+        return choice(questionId, lesson, "This whole is split into quarters. Which statement is true after every quarter is halved?", "One eighth is half of one quarter.", ["One eighth is twice one quarter.", "One quarter is half of one eighth."], { type: "fraction", parts: 4, selected: 1 });
       }
-      return typed(questionId, lesson, "A whole is halved 3 times. How many equal parts are made?", 8);
+      return typed(questionId, lesson, "A whole is halved 3 times. How many equal parts are made?", 8, { type: "fraction", parts: 2, selected: 1 });
     }
     if (week === 12 && lesson === 3) {
-      const pair = [[1, 2, 4, 8], [1, 4, 2, 8], [2, 4, 4, 8], [3, 4, 6, 8], [1, 2, 2, 4]][index]!;
-      return choice(questionId, lesson, "Which two fractions represent the same amount?", `${pair[0]}/${pair[1]} and ${pair[2]}/${pair[3]}`, [`${pair[0]}/${pair[1]} and ${pair[2] - 1}/${pair[3]}`, `${pair[0]}/${pair[1]} and ${pair[2] + 1}/${pair[3]}`, `${pair[1]}/${pair[0]} and ${pair[2]}/${pair[3]}`]);
+      const denominator = [2, 4, 8, 4, 8][index]!;
+      return choice(questionId, lesson, "Which fraction matches the shaded picture?", `1/${denominator}`, [`${denominator}/1`, `1/${denominator === 2 ? 4 : 2}`, `${Math.min(denominator, 2)}/${denominator}`], { type: "fraction", parts: denominator, selected: 1 });
     }
 
     throw new Error(`No independent Year 2 quiz bank for Week ${week}, Lesson ${lesson}.`);
@@ -352,10 +428,16 @@ function buildLesson(week: number, lesson: Lesson): DraftQuestion[] {
 export function buildYear2NumberNexusWeeklyQuiz(week: number): Year2NumberNexusQuizQuestion[] {
   if (!Number.isInteger(week) || week < 1 || week > 12) throw new Error(`Unsupported Year 2 quiz week: ${week}`);
   return ([1, 2, 3] as const).flatMap((lesson) =>
-    buildLesson(week, lesson).map((question) => ({
+    buildLesson(week, lesson).map((question, index) => ({
       ...question,
       descriptorCodes: descriptorsFor(week, lesson),
-      skillId: `y2-number-w${week}-l${lesson}`,
+      skillId: week === 8
+        ? [
+            ["skip-by-2", "skip-by-2", "missing-by-2", "double", "inverse-double"],
+            ["forward-by-5", "forward-by-5", "backward-by-5", "backward-by-5", "missing-by-5"],
+            ["create-number-increase", "create-number-decrease", "create-shape-increase", "create-object-decrease", "identify-object-rule"],
+          ][lesson - 1]![index]!
+        : `y2-number-w${week}-l${lesson}`,
     })),
   );
 }
