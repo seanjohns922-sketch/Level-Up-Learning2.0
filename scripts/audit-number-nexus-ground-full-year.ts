@@ -19,6 +19,7 @@ import { NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS } from "../data/assessments/numberNe
 import { buildPrepNumberNexusWeeklyQuiz } from "../data/quizzes/prepNumberNexus";
 import { PREP_PROGRAM } from "../data/programs/prep";
 import { ASSESSMENT_THRESHOLDS } from "../lib/assessment-rules";
+import { isPracticeTaskSafe } from "../lib/task-safety";
 
 type Generator = (lessonId: string, difficulty: "hard") => { kind: string; prompt: string; mode?: string };
 
@@ -78,6 +79,7 @@ for (let week = 1; week <= 12; week += 1) {
       const task = entry.generate(`y0-w${week}-l${lesson}`, "hard");
       assert(task && typeof task.kind === "string" && task.kind.length > 0, `Week ${week} Lesson ${lesson} produced an invalid task.`);
       assert(typeof task.prompt === "string" && task.prompt.trim().length > 0, `Week ${week} Lesson ${lesson} produced a task without a prompt.`);
+      assert(isPracticeTaskSafe(task as Parameters<typeof isPracticeTaskSafe>[0]), `Week ${week} Lesson ${lesson} produced a task rejected by the production safety gate: ${task.kind}.`);
       lessonSamples += 1;
     }
   }

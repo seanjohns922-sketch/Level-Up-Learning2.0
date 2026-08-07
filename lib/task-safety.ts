@@ -179,6 +179,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "targetedRevision",
   "funGames",
   "groundMatch",
+  "groundFoundation",
   "groundOrdinal",
   "groundSpatial",
   "repeatingPattern",
