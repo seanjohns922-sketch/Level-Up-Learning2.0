@@ -25835,10 +25835,9 @@ function generateGenericQuestion(
           }
         : {
             kind: "typed_response",
-            prompt: `${target} has ${tensCount} ${tensCount === 1 ? "ten" : "tens"}. Regroup 1 hundred into 10 more tens. How many tens now?`,
+            prompt: `Regroup 1 hundred as 10 tens in ${formatMathNumber(target)}. How many tens now?`,
             answer: String(tensCount + 10),
-            helper: "1 hundred is the same as 10 tens, so add 10 to the tens already there.",
-            placeholder: "Type the total number of tens",
+            placeholder: "Type the number of tens",
           };
     }
 

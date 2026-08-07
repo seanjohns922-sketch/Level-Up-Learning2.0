@@ -49,6 +49,10 @@ for (const week of YEAR3_PROGRAM) {
         if (week.week === 1 && "target" in question && typeof question.target === "number") {
           assert(question.target > 10_000, `${lesson.id} generated ${question.target}, which is not beyond 10 000.`);
         }
+        if (lesson.id === "y3-w1-l2" && activity.activityType === "typed_response" && question.kind === "typed_response") {
+          assert.match(question.prompt, /^Regroup 1 hundred as 10 tens in [\d,]+\. How many tens now\?$/);
+          assert.equal(question.helper, undefined, `${lesson.id} reveals the regrouping calculation before the student answers.`);
+        }
         if (week.week === 9 && question.kind === "mixed_word_problem") {
           assert(question.visual, `${lesson.id} generated a money task without a visual.`);
           assert.equal(question.showStrategyClue, false, `${lesson.id} reveals a strategy clue.`);
@@ -101,6 +105,11 @@ for (let week = 1; week <= 12; week += 1) {
   }
 
   if (week === 2) assert(quiz.slice(0, 5).every((item) => item.visual?.type === "dots"), "Week 2 collection-estimation quiz items require collection visuals.");
+  if (week === 1) {
+    const numeralWritingItems = quiz.filter((item) => item.lessonTag === 1);
+    assert(numeralWritingItems.every((item) => item.kind === "typed"), "Week 1 Lesson 1 must require independently written numerals.");
+    assert(numeralWritingItems.every((item) => !/\d/.test(item.prompt)), "Week 1 Lesson 1 must show the complete number in words without numeral clues.");
+  }
   if (week === 9) assert(quiz.some((item) => item.visual?.type === "money"), "Week 9 quiz omits Australian money visuals.");
   if (week === 10) assert(quiz.some((item) => item.prompt.includes("If the input is even")), "Week 10 quiz omits decision algorithms.");
   if (week === 11 || week === 12) assert(quiz.some((item) => item.visual?.type === "fraction"), `Week ${week} quiz omits fraction visuals.`);

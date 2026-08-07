@@ -88,8 +88,18 @@ function buildLesson(week: number, lesson: Lesson): Draft[] {
     const qid = id(week, lesson, index);
 
     if (week === 1) {
+      if (lesson === 1) {
+        const numberNames = [
+          { value: 22_345, words: "twenty-two thousand three hundred and forty-five" },
+          { value: 25_562, words: "twenty-five thousand five hundred and sixty-two" },
+          { value: 28_779, words: "twenty-eight thousand seven hundred and seventy-nine" },
+          { value: 31_996, words: "thirty-one thousand nine hundred and ninety-six" },
+          { value: 35_213, words: "thirty-five thousand two hundred and thirteen" },
+        ] as const;
+        const item = numberNames[index]!;
+        return typed(qid, lesson, `Write the numeral: ${item.words}.`, item.value);
+      }
       const n = 12_345 + lesson * 10_000 + index * 3_217;
-      if (lesson === 1) return typed(qid, lesson, `Write the numeral: ${Math.floor(n / 1000)} thousand, ${n % 1000}.`, n);
       if (lesson === 2) {
         const missing = Math.floor((n % 10_000) / 1000) * 1000;
         return typed(qid, lesson, `${n} = ${Math.floor(n / 10_000) * 10_000} + ___ + ${n % 1000}. Enter the missing part.`, missing);
