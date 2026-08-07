@@ -82,7 +82,11 @@ for (const lesson of [1, 2, 3]) {
   for (let index = 0; index < 60; index += 1) {
     const task = generatePrepWeek11Task(`y0-w11-l${lesson}`, "hard");
     assert.equal(task.kind, "groundFoundation");
-    if (lesson < 3) {
+    if (lesson === 1) {
+      assert.equal(task.mode, "identify_pattern");
+      assert(task.options.some((option) => option.join("|") === task.answer.join("|")));
+      assert(task.sequence.length > task.answer.length);
+    } else if (lesson === 2) {
       assert.equal(task.mode, "continue_pattern");
       assert.equal(task.sequence.at(-1), "?");
       assert(task.options.includes(task.answer));

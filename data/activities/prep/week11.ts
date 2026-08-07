@@ -970,6 +970,20 @@ export function generatePrepWeek11Task(lessonId: string, difficulty: Difficulty)
     };
   }
 
+  if (lessonId === "y0-w11-l1") {
+    const shortened = repeatUnit.slice(0, -1);
+    const reversed = [...repeatUnit].reverse();
+    return {
+      kind: "groundFoundation",
+      mode: "identify_pattern",
+      prompt: "Which group is the repeating unit?",
+      speakText: "Which group is the repeating unit?",
+      sequence: Array.from({ length: 3 }, () => repeatUnit).flat(),
+      options: shuffle([repeatUnit, shortened, reversed]),
+      answer: repeatUnit,
+    };
+  }
+
   const complete = Array.from({ length: difficulty === "hard" ? 3 : 2 }, () => repeatUnit).flat();
   const answer = complete.at(-1)!;
   const sequence = [...complete.slice(0, -1), "?"];

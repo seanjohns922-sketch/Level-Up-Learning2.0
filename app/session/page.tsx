@@ -84,6 +84,8 @@ import type { Year1PatternToken } from "@/data/activities/year1/practice-task";
 import { buildYear1Week11PatternQuizItems } from "@/data/quizzes/year1Week11Patterns";
 import { buildYear1NumberNexusWeeklyQuiz } from "@/data/quizzes/year1NumberNexus";
 import { buildYear2NumberNexusWeeklyQuiz } from "@/data/quizzes/year2NumberNexus";
+import { buildPrepNumberNexusWeeklyQuiz, type PrepNumberNexusQuizVisual } from "@/data/quizzes/prepNumberNexus";
+import GroundNumberNexusQuizVisual from "@/components/quiz/GroundNumberNexusQuizVisual";
 import { RepeatingPatternStrip } from "@/components/number-nexus/RepeatingPatternVisual";
 import { generatePrepWeek8TaskByKind } from "@/data/activities/prep/week8";
 import { generatePrepWeek9TaskByKind } from "@/data/activities/prep/week9";
@@ -254,7 +256,7 @@ type QuizQuestion = {
   } | {
     type: "repeating_pattern";
     sequence: Year1PatternToken[];
-  };
+  } | PrepNumberNexusQuizVisual;
   line?: {
     min: number;
     max: number;
@@ -7943,6 +7945,7 @@ function SessionPage({
   const router = useRouter();
   const isMeasurementRealm = realmId === "measurement";
   const quizRealmId = isMeasurementRealm ? "measurement" : "number";
+  const isGroundNumberQuiz = quizRealmId === "number" && year === "Prep";
   const finalProgramWeek = getLastProgramWeek(quizRealmId);
   const isFinalQuizWeek = Number(week) >= finalProgramWeek;
   const quizStrand = isMeasurementRealm ? "Measurement" : "Number";
@@ -8276,47 +8279,8 @@ function SessionPage({
       return buildMeasurelandsWeek8WeeklyQuizQuestions(questionsPerLesson);
     }
 
-    if (year === "Prep" && Number(week) === 1) {
-      return buildPrepWeek1WeeklyQuizQuestions(questionsPerLesson);
-    }
-
-    if (year === "Prep" && Number(week) === 2) {
-      return buildPrepWeek2WeeklyQuizQuestions(questionsPerLesson);
-    }
-
-    if (year === "Prep" && Number(week) === 3) {
-      return buildPrepWeek3WeeklyQuizQuestions(questionsPerLesson);
-    }
-
-    if (year === "Prep" && Number(week) === 4) {
-      return buildPrepWeek4WeeklyQuizQuestions(questionsPerLesson);
-    }
-
-    if (year === "Prep" && Number(week) === 5) {
-      return buildPrepWeek5WeeklyQuizQuestions(questionsPerLesson);
-    }
-
-    if (year === "Prep" && Number(week) === 6) {
-      return buildPrepWeek6WeeklyQuizQuestions(questionsPerLesson);
-    }
-
-    if (year === "Prep" && Number(week) === 7) {
-      return buildPrepWeek7WeeklyQuizQuestions(questionsPerLesson);
-    }
-
-    if (year === "Prep" && Number(week) === 8) {
-      return buildPrepWeek8WeeklyQuizQuestions(questionsPerLesson);
-    }
-
-    if (year === "Prep" && Number(week) === 9) {
-      return buildPrepWeek9WeeklyQuizQuestions(questionsPerLesson);
-    }
-
-    if (year === "Prep" && Number(week) === 10) {
-      return buildPrepWeek10WeeklyQuizQuestions(questionsPerLesson);
-    }
-    if (year === "Prep" && Number(week) === 11) {
-      return buildPrepWeek11WeeklyQuizQuestions(questionsPerLesson);
+    if (!isMeasurementRealm && year === "Prep") {
+      return buildPrepNumberNexusWeeklyQuiz(Number(week)) as QuizQuestion[];
     }
 
     if (!isMeasurementRealm && year === "Year 1") {
@@ -9728,6 +9692,9 @@ function SessionPage({
                       <RepeatingPatternStrip sequence={currentQuiz.visual.sequence} />
                     </div>
                   ) : null}
+                  {currentQuiz?.visual?.type.startsWith("ground_quiz_") ? (
+                    <GroundNumberNexusQuizVisual visual={currentQuiz.visual as PrepNumberNexusQuizVisual} />
+                  ) : null}
                   {currentQuiz?.visual?.type === "rows" ? (
                     <div className="rounded-2xl border bg-white p-4 mb-3">
                       <div className="mx-auto" style={{ maxWidth: 520 }}>
@@ -10021,7 +9988,9 @@ function SessionPage({
                         }))
                       }
                       inputMode={quizQuestionExpectsNumeric(currentQuiz) ? "decimal" : "text"}
-                      className="w-full px-4 py-4 rounded-xl border text-xl font-bold"
+                      className={isGroundNumberQuiz
+                        ? "mx-auto block h-20 w-full max-w-xs rounded-lg border-2 border-cyan-600 bg-white px-4 text-center text-3xl font-black text-slate-950 shadow-sm outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20"
+                        : "w-full rounded-xl border px-4 py-4 text-xl font-bold"}
                       placeholder={
                         currentQuiz.placeholder ??
                         (quizQuestionExpectsNumeric(currentQuiz)
@@ -10031,12 +10000,14 @@ function SessionPage({
                     />
                   ) : currentQuiz?.kind === "audio" ||
                     currentQuiz?.kind === "mcq" ? (
-                    <div className="grid gap-2">
+                    <div className={isGroundNumberQuiz ? "grid gap-3 sm:grid-cols-2" : "grid gap-2"}>
                       {currentQuiz.kind === "audio" ? (
                         <button
                           type="button"
                           onClick={() => speak(currentQuiz.audioText ?? "")}
-                          className="mb-2 px-4 py-3 rounded-2xl bg-trust-blue text-white font-bold hover:opacity-90 transition w-full"
+                          className={isGroundNumberQuiz
+                            ? "mb-1 inline-flex min-h-14 items-center justify-center rounded-lg border border-cyan-400/40 bg-cyan-700 px-4 py-3 font-bold text-white transition hover:bg-cyan-600 sm:col-span-2"
+                            : "mb-2 w-full rounded-2xl bg-trust-blue px-4 py-3 font-bold text-white transition hover:opacity-90"}
                         >
                           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span>
                         </button>
@@ -10044,6 +10015,34 @@ function SessionPage({
 
                       {currentQuiz.options?.map((opt, oi) => {
                         const selected = quizAnswers[currentQuiz.id] === oi;
+                        if (isGroundNumberQuiz) {
+                          return (
+                            <div
+                              key={`${currentQuiz.id}-${oi}`}
+                              className={`flex min-h-16 items-stretch overflow-hidden rounded-lg border-2 bg-white shadow-sm transition ${selected ? "border-cyan-500 ring-4 ring-cyan-500/15" : "border-slate-200 hover:border-cyan-400"}`}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => chooseQuiz(quizIndex, oi)}
+                                className="flex min-w-0 flex-1 items-center px-5 py-3 text-left text-xl font-extrabold text-slate-950"
+                              >
+                                {currentQuiz.visual?.type === "repeating_pattern" ? (
+                                  <RepeatingPatternStrip sequence={patternTokensFromQuizOption(opt)} compact />
+                                ) : (
+                                  <MathFormattedText text={opt} compactFractions />
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => speak(String(opt))}
+                                className="grid w-14 shrink-0 place-items-center border-l border-slate-200 text-slate-600 transition hover:bg-cyan-50 hover:text-cyan-800"
+                                aria-label={`Read ${opt} aloud`}
+                              >
+                                <Volume2 className="h-5 w-5" />
+                              </button>
+                            </div>
+                          );
+                        }
                         return (
                           <button
                             key={`${currentQuiz.id}-${oi}`}

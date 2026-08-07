@@ -54,6 +54,7 @@ export default function GroundFoundationTaskCard({
   const [removed, setRemoved] = useState<number[]>([]);
   const [assignments, setAssignments] = useState<number[]>([]);
   const [boxCount, setBoxCount] = useState(1);
+  const [selectedPatternUnit, setSelectedPatternUnit] = useState<string[] | null>(null);
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
   const [builtPattern, setBuiltPattern] = useState<string[]>([]);
 
@@ -67,6 +68,7 @@ export default function GroundFoundationTaskCard({
     setRemoved([]);
     setAssignments([]);
     setBoxCount(1);
+    setSelectedPatternUnit(null);
     setSelectedPattern(null);
     setBuiltPattern([]);
   }
@@ -81,6 +83,9 @@ export default function GroundFoundationTaskCard({
     if (task.mode === "equal_group") {
       const totals = Array.from({ length: boxCount }, (_, group) => assignments.filter((value) => value === group).length);
       return assignments.length === task.total && totals.every((value) => value === task.groupSize) ? onCorrect?.() : onWrong?.();
+    }
+    if (task.mode === "identify_pattern") {
+      return selectedPatternUnit?.join("|") === task.answer.join("|") ? onCorrect?.() : onWrong?.();
     }
     if (task.mode === "continue_pattern") return selectedPattern === task.answer ? onCorrect?.() : onWrong?.();
     return builtPattern.length === expectedPattern.length && builtPattern.every((token, index) => token === expectedPattern[index])
@@ -150,6 +155,33 @@ export default function GroundFoundationTaskCard({
                 <Plus className="h-5 w-5" /> New group
               </button>
             ) : null}
+          </div>
+        ) : null}
+
+        {task.mode === "identify_pattern" ? (
+          <div className="space-y-5">
+            <Frame>
+              <div className="flex min-h-20 flex-wrap items-center justify-center gap-3">
+                {task.sequence.map((token, index) => <PatternToken key={index} token={token} />)}
+              </div>
+            </Frame>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {task.options.map((option) => {
+                const optionKey = option.join("|");
+                const selected = selectedPatternUnit?.join("|") === optionKey;
+                return (
+                  <button
+                    key={optionKey}
+                    type="button"
+                    onClick={() => setSelectedPatternUnit(option)}
+                    className={`flex min-h-20 items-center justify-center gap-2 rounded-lg border-2 bg-white p-3 ${selected ? "border-cyan-600 outline outline-2 outline-cyan-200" : "border-slate-300"}`}
+                    aria-label={`Choose ${option.join(" then ")}`}
+                  >
+                    {option.map((token, index) => <PatternToken key={`${token}-${index}`} token={token} />)}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         ) : null}
 

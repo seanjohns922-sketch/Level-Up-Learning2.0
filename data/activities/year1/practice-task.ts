@@ -570,6 +570,15 @@ export type PracticeTask = (
     }
   | {
       kind: "groundFoundation";
+      mode: "identify_pattern";
+      prompt: string;
+      speakText?: string;
+      sequence: string[];
+      options: string[][];
+      answer: string[];
+    }
+  | {
+      kind: "groundFoundation";
       mode: "continue_pattern";
       prompt: string;
       speakText?: string;

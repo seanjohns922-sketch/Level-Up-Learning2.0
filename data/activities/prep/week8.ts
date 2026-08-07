@@ -730,7 +730,7 @@ function createAudioMoveTask(lessonId: string, difficulty: Difficulty): Practice
   const startNumber = moveBackward ? pickBackwardStart(memory, difficulty, steps) : pickForwardStart(memory, difficulty, steps);
   pushRecent(memory.recentStarts, startNumber, 6);
   const target = moveBackward ? startNumber - steps : startNumber + steps;
-  const options = buildMovementOptions(startNumber, 1, moveBackward ? "DESC" : "ASC", difficulty, memory);
+  const options = buildMovementOptions(startNumber, steps, moveBackward ? "DESC" : "ASC", difficulty, memory);
   return makeMatchTask({
     prompt: "Follow Numbot's instruction.",
     speakText: moveBackward

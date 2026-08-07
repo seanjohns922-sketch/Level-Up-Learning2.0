@@ -122,14 +122,14 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
     id: "y0-w3",
     week: 3,
     topic: "Counting Forward & Backward",
-    curriculum: ["AC9MFN01", "AC9MFN03"],
+    curriculum: ["AC9MFN01"],
     lessons: [
       buildLesson(
         3, 1,
         "Rocket Count to 10",
         "Count forward fluently to 10 and complete number paths in order.",
         ["Count along the rocket path", "Find the missing number", "Tap numbers in order"],
-        ["AC9MFN01", "AC9MFN03"],
+        ["AC9MFN01"],
         undefined,
         [no(1, 10, 5, true), mc({ min: 1, max: 10, mode: "next_number" }), tr({ min: 1, max: 10, mode: "missing_number" })]
       ),
@@ -138,7 +138,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Blast Off Countdown",
         "Count backward from 10 to 1 and build reverse number order.",
         ["Countdown blastoff", "What comes before", "Backward number paths"],
-        ["AC9MFN01", "AC9MFN03"],
+        ["AC9MFN01"],
         undefined,
         [no(1, 10, 5, false), mc({ min: 1, max: 10, mode: "before_number" }), tr({ min: 1, max: 10 })]
       ),
@@ -147,7 +147,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Number Match Mission",
         "Connect spoken number names, numerals, quantities, and counting order to 10.",
         ["Listen and tap", "Match the group", "Sequence builder"],
-        ["AC9MFN01", "AC9MFN03"],
+        ["AC9MFN01"],
         undefined,
         [mc({ min: 1, max: 10, mode: "sequence_order" }), no(1, 10, 4, true), tr({ min: 1, max: 10 })]
       ),
@@ -192,7 +192,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
     id: "y0-w5",
     week: 5,
     topic: "Comparing & Sorting Quantities",
-    curriculum: ["AC9MFN02", "AC9MFN03"],
+    curriculum: ["AC9MFN03"],
     lessons: [
       buildLesson(
         5, 1,
@@ -227,14 +227,14 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
     id: "y0-w6",
     week: 6,
     topic: "Building Numbers to 10",
-    curriculum: ["AC9MFN02", "AC9MFN03", "AC9MFN04"],
+    curriculum: ["AC9MFN04"],
     lessons: [
       buildLesson(
         6, 1,
         "Make Numbers in Different Ways",
         "Build the same number using different groups.",
         ["Make it another way", "Build and swap", "Show the same number"],
-        ["AC9MFN02", "AC9MFN03", "AC9MFN04"],
+        ["AC9MFN04"],
         "Number Builder Lab",
         [mc({ min: 1, max: 10, mode: "flexible_make" }), mc({ min: 1, max: 10, mode: "show_same_number" }), tr({ min: 1, max: 10 })]
       ),
@@ -243,7 +243,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Ways to Make 10",
         "Build and recognise combinations that make 10 using visual part-part-whole groups.",
         ["Make 10 builder", "Fill the ten frame", "Find another way to make 10"],
-        ["AC9MFN02", "AC9MFN03", "AC9MFN04"],
+        ["AC9MFN04"],
         "Make 10 Lab",
         [pe(0, 10), mc({ min: 1, max: 10, mode: "make_10" }), tr({ min: 1, max: 10, mode: "make_10" })]
       ),
@@ -252,7 +252,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Part-Part-Whole to 10",
         "Understand that numbers can be split into parts and recombined into a whole using visual groups to 10.",
         ["Split the number", "Match the parts", "Quick split builder"],
-        ["AC9MFN02", "AC9MFN03", "AC9MFN04"],
+        ["AC9MFN04"],
         "Number Split Mission",
         [pe(1, 10), mc({ min: 1, max: 10, mode: "missing_part" }), tr({ min: 1, max: 10 })]
       ),
@@ -262,14 +262,14 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
     id: "y0-w7",
     week: 7,
     topic: "Teen Numbers & Collections to 20",
-    curriculum: ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+    curriculum: ["AC9MFN01", "AC9MFN03"],
     lessons: [
       buildLesson(
         7, 1,
         "Count Collections to 20",
         "Count larger collections accurately using one-to-one correspondence, organised counting, and visual groups to 20.",
         ["Count bigger groups", "Touch and count to 20", "Collection count challenge"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        ["AC9MFN01", "AC9MFN03"],
         "Collection Counter Mission",
         [mc({ min: 11, max: 20, mode: "count_objects" }), tr({ min: 11, max: 20 }), no(1, 20, 4, true)]
       ),
@@ -278,7 +278,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Teen Numbers 11–20",
         "Recognise, build, and match teen numbers as 10 and some more using structured visuals.",
         ["Build 10 and extras", "Teen number match", "Find the teen collection"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        ["AC9MFN01", "AC9MFN03"],
         "Teen Number Mission",
         [pvb(11, 20), mc({ min: 11, max: 20, mode: "teen_structure" }), tr({ min: 11, max: 20 })]
       ),
@@ -287,7 +287,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Organise Collections to 20",
         "Organise, sort, and build collections up to 20 using grouped structures, teen-number visuals, and efficient counting strategies.",
         ["Organise the collection", "Sort into groups", "Collection station"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03"],
+        ["AC9MFN01", "AC9MFN03"],
         "Collection Sorting Station",
         [no(1, 20, 4, true), mc({ min: 11, max: 20, mode: "collection_sort" }), tr({ min: 11, max: 20 })]
       ),
@@ -297,14 +297,14 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
     id: "y0-w8",
     week: 8,
     topic: "Number Patterns & Ordering",
-    curriculum: ["AC9MFN01", "AC9MFN03"],
+    curriculum: ["AC9MFN01"],
     lessons: [
       buildLesson(
         8, 1,
         "Missing Numbers",
         "Identify missing numbers in forward and backward sequences to 20 using number paths, neighbours, and counting patterns.",
         ["Missing number trail", "Fill the gap", "Pattern path"],
-        ["AC9MFN01", "AC9MFN03"],
+        ["AC9MFN01"],
         "Number Detective Mission",
         [no(1, 20, 5, true), mc({ min: 1, max: 20, mode: "missing_number" }), tr({ min: 1, max: 20 })]
       ),
@@ -313,7 +313,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Number Paths",
         "Navigate forward and backward through connected number trails to 20 using stepping stones, portals, number hops, and movement-based path choices.",
         ["Move Numbot", "Countdown portal", "Number line hops"],
-        ["AC9MFN01", "AC9MFN03"],
+        ["AC9MFN01"],
         "Number Trail Adventure",
         [nl(0, 20, 1), mc({ min: 1, max: 20, mode: "number_path" }), tr({ min: 1, max: 20 })]
       ),
@@ -322,7 +322,7 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Order Numbers to 20",
         "Compare and sort numbers to 20 from least to greatest and greatest to least using sorting trays, ladders, race tracks, and quick ordering challenges.",
         ["Order the numbers", "Number podium", "Which number is biggest?"],
-        ["AC9MFN01", "AC9MFN03"],
+        ["AC9MFN01"],
         "Number Order Arena",
         [no(1, 20, 5, true), no(1, 20, 5, false), tr({ min: 1, max: 20 })]
       ),
@@ -437,14 +437,14 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
     id: "y0-w12",
     week: 12,
     topic: "Final Mastery Week",
-    curriculum: ["ALL"],
+    curriculum: ["AC9MFN01", "AC9MFN03", "AC9MFN04", "AC9MFN05", "AC9MFN06", "AC9MFA01"],
     lessons: [
       buildLesson(
         12, 1,
         "Legend Training",
         "Strengthen final Ground Level fluency through quick image flashes, representation switching, teen-number building and number-image memory using structured visual number systems.",
         ["Quick image flash", "Representation switch", "Number image memory"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFSP02"],
+        ["AC9MFN01", "AC9MFN03"],
         "Legend Training Arena",
         [no(1, 20, 4, true), mc({ min: 1, max: 20, mode: "legend_training" }), tr({ min: 1, max: 20 })]
       ),
@@ -453,16 +453,16 @@ const PREP_PROGRAM_RAW: WeekPlan[] = [
         "Flexible Number Building",
         "Strengthen final flexible number thinking through rebuilding wholes, finding missing parts, making 10 and 20, and comparing same-whole structures with reduced support.",
         ["Flexible builder", "Missing-part challenge", "Make 10 / Make 20"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFN04"],
+        ["AC9MFN04"],
         "Nexus Number Forge",
         [pe(1, 10), mc({ min: 1, max: 10, mode: "flexible_build" }), tr({ min: 1, max: 10 })]
       ),
       buildLesson(
         12, 3,
         "Final Mastery Application",
-        "Apply Ground Level skills independently through ordering mastery, multi-missing reasoning, flexible number building, and practical challenge rooms with minimal support.",
-        ["Ordering mastery", "Multi-missing reasoning", "Practical challenge rooms"],
-        ["AC9MFN01", "AC9MFN02", "AC9MFN03", "AC9MFSP02"],
+        "Apply Ground Level skills independently through practical collection changes, equal sharing or grouping, repeating patterns and number ordering.",
+        ["Collection change challenge", "Equal structure challenge", "Repeating pattern challenge"],
+        ["AC9MFN01", "AC9MFN05", "AC9MFN06", "AC9MFA01"],
         "Legend Mastery Trial",
         [no(1, 20, 5, true), mc({ min: 1, max: 20, mode: "mastery_application" }), tr({ min: 1, max: 20 })]
       ),

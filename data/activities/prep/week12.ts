@@ -1,6 +1,7 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
-import { generatePrepWeek10TaskByKind } from "@/data/activities/prep/week10";
-import { generatePrepWeek11TaskByKind } from "@/data/activities/prep/week11";
+import { generatePrepWeek9Task } from "@/data/activities/prep/week9";
+import { generatePrepWeek10TaskByKind, generatePrepWeek10Task } from "@/data/activities/prep/week10";
+import { generatePrepWeek11TaskByKind, generatePrepWeek11Task } from "@/data/activities/prep/week11";
 import { generatePrepWeek6TaskByKind } from "@/data/activities/prep/week6";
 
 type GroundObjectType = Extract<PracticeTask, { kind: "groundBuild" }>["objectType"];
@@ -23,9 +24,9 @@ type Lesson2Kind =
 
 type Lesson3Kind =
   | "ordering_mastery"
-  | "multi_missing_reasoning"
-  | "flexible_number_building"
-  | "practical_application";
+  | "collection_change"
+  | "equal_structure"
+  | "repeating_pattern";
 
 type Week12Memory = {
   cursor: number;
@@ -55,11 +56,11 @@ const LESSON2_ROTATION: Lesson2Kind[] = [
 
 const LESSON3_ROTATION: Lesson3Kind[] = [
   "ordering_mastery",
-  "multi_missing_reasoning",
-  "flexible_number_building",
-  "practical_application",
-  "ordering_mastery",
-  "multi_missing_reasoning",
+  "collection_change",
+  "equal_structure",
+  "repeating_pattern",
+  "collection_change",
+  "equal_structure",
 ];
 
 const OBJECTS: GroundObjectType[] = [
@@ -632,12 +633,12 @@ function createLesson3Task(lessonId: string, difficulty: Difficulty, kind: Lesso
   switch (kind) {
     case "ordering_mastery":
       return createOrderingMasteryTask(lessonId);
-    case "multi_missing_reasoning":
-      return createMultiMissingReasoningTask(lessonId, difficulty);
-    case "flexible_number_building":
-      return createFlexibleNumberBuildingMasteryTask(lessonId, difficulty);
-    case "practical_application":
-      return createPracticalApplicationTask(lessonId, difficulty);
+    case "collection_change":
+      return generatePrepWeek9Task("y0-w9-l3", difficulty);
+    case "equal_structure":
+      return generatePrepWeek10Task("y0-w10-l3", difficulty);
+    case "repeating_pattern":
+      return generatePrepWeek11Task("y0-w11-l3", difficulty);
   }
 }
 

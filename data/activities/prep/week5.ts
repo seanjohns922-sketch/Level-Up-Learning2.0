@@ -656,7 +656,8 @@ function createGroupSwapTask(lessonId: string, difficulty: Difficulty): Practice
 function createWhichIsNotEqualTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
   const target = pickTarget(memory, difficulty);
-  const differentQuantity = Math.max(1, Math.min(10, target + (Math.random() < 0.5 ? -1 : 1)));
+  const difference = target <= 1 ? 1 : target >= 10 ? -1 : Math.random() < 0.5 ? -1 : 1;
+  const differentQuantity = target + difference;
   const referenceGroup = {
     quantity: target,
     objectType: pickObject(memory),
