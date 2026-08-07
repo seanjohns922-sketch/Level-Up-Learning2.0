@@ -38,8 +38,8 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
         ),
         activities: [
           makeActivity("place_value_builder", 2, {
-            min: 1000,
-            max: 10000,
+            min: 10001,
+            max: 99999,
             placeValues: ["ten_thousands", "thousands", "hundreds", "tens", "ones"],
             visualMode: "mab",
             mode: "identify_number",
@@ -47,14 +47,14 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
           }),
           makeActivity("number_line", 1, {
             min: 0,
-            max: 10000,
-            step: 500,
+            max: 100000,
+            step: 5000,
             mode: "placement",
             rotationRole: "reasoning",
           }),
           makeActivity("typed_response", 1, {
-            min: 1000,
-            max: 10000,
+            min: 10001,
+            max: 99999,
             mode: "identify_number",
             sourceActivityType: "place_value_builder",
             rotationRole: "apply_create",
@@ -74,18 +74,18 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
         ),
         activities: [
           makeActivity("partition_expand", 2, {
-            min: 1000,
-            max: 10000,
+            min: 10001,
+            max: 99999,
             mode: "expand",
           }),
           makeActivity("partition_expand", 1, {
-            min: 1000,
-            max: 10000,
+            min: 10001,
+            max: 99999,
             mode: "flexible_partition",
           }),
           makeActivity("typed_response", 1, {
-            min: 1000,
-            max: 10000,
+            min: 10001,
+            max: 99999,
             mode: "flexible_partition",
             sourceActivityType: "partition_expand",
           }),
@@ -104,20 +104,20 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
         ),
         activities: [
           makeActivity("number_order", 2, {
-            min: 1000,
-            max: 10000,
+            min: 10001,
+            max: 99999,
             count: 5,
             ascending: true,
           }),
           makeActivity("number_line", 1, {
             min: 0,
-            max: 10000,
-            step: 500,
+            max: 100000,
+            step: 5000,
             mode: "estimate",
           }),
           makeActivity("typed_response", 1, {
-            min: 1000,
-            max: 10000,
+            min: 10001,
+            max: 99999,
             count: 5,
             sourceActivityType: "number_order",
           }),
@@ -136,33 +136,30 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
         id: "y3-w2-l1",
         week: 2,
         lesson: 1,
-        title: "Rounding to Nearest 10",
-        focus: "Use number lines and place value to round to nearest 10",
+        title: "Estimate Collections",
+        focus: "Estimate quantities in collections using benchmarks",
         activityIdeas: lessonIdeas(
-          "Round to nearest 10 and justify decisions on a number line",
-          "Use rounded values in quick estimation scenarios"
+          "Estimate a collection before checking its exact quantity",
+          "Use groups of about 10 as a visual benchmark"
         ),
         activities: [
-          makeActivity("number_line", 2, {
-            min: 0,
-            max: 10000,
-            step: 10,
-            mode: "rounding",
-            targets: [10],
+          makeActivity("mixed_word_problem", 2, {
+            min: 20,
+            max: 100,
+            mode: "quantity_estimation",
+            collectionEstimate: true,
           }),
-          makeActivity("number_line", 1, {
-            min: 0,
-            max: 10000,
-            step: 10,
-            mode: "placement",
+          makeActivity("mixed_word_problem", 1, {
+            min: 20,
+            max: 100,
+            mode: "quantity_estimation",
+            collectionEstimate: true,
           }),
-          makeActivity("typed_response", 1, {
-            min: 0,
-            max: 10000,
-            step: 10,
-            mode: "rounding",
-            targets: [10],
-            sourceActivityType: "number_line",
+          makeActivity("multiple_choice", 1, {
+            min: 20,
+            max: 100,
+            mode: "quantity_estimation",
+            sourceActivityType: "mixed_word_problem",
           }),
         ],
         curriculum: ["AC9M3N05"],
@@ -243,7 +240,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w3",
     week: 3,
     topic: "Addition Strategies",
-    curriculum: ["AC9M3N03", "AC9M3A02"],
+    curriculum: ["AC9M3N03"],
     lessons: [
       {
         id: "y3-w3-l1",
@@ -273,7 +270,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "addition_strategy",
           }),
         ],
-        curriculum: ["AC9M3N03", "AC9M3A02"],
+        curriculum: ["AC9M3N03"],
       },
       {
         id: "y3-w3-l2",
@@ -304,7 +301,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "addition_strategy",
           }),
         ],
-        curriculum: ["AC9M3N03", "AC9M3A02"],
+        curriculum: ["AC9M3N03"],
       },
       {
         id: "y3-w3-l3",
@@ -335,7 +332,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "addition_strategy",
           }),
         ],
-        curriculum: ["AC9M3N03", "AC9M3A02"],
+        curriculum: ["AC9M3N03"],
       },
     ],
   },
@@ -343,7 +340,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w4",
     week: 4,
     topic: "Subtraction Strategies",
-    curriculum: ["AC9M3N03", "AC9M3A02"],
+    curriculum: ["AC9M3N03"],
     lessons: [
       {
         id: "y3-w4-l1",
@@ -374,7 +371,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "subtraction_strategy",
           }),
         ],
-        curriculum: ["AC9M3N03", "AC9M3A02"],
+        curriculum: ["AC9M3N03"],
       },
       {
         id: "y3-w4-l2",
@@ -405,7 +402,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "subtraction_strategy",
           }),
         ],
-        curriculum: ["AC9M3N03", "AC9M3A02"],
+        curriculum: ["AC9M3N03"],
       },
       {
         id: "y3-w4-l3",
@@ -436,7 +433,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             sourceActivityType: "subtraction_strategy",
           }),
         ],
-        curriculum: ["AC9M3N03", "AC9M3A02"],
+        curriculum: ["AC9M3N03"],
       },
     ],
   },
@@ -548,7 +545,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
     id: "y3-w6",
     week: 6,
     topic: "Problem Solving",
-    curriculum: ["AC9M3N03", "AC9M3N04"],
+    curriculum: ["AC9M3N03", "AC9M3N05", "AC9M3N06"],
     lessons: [
       {
         id: "y3-w6-l1",
@@ -580,7 +577,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             operations: ["+", "-"],
           }),
         ],
-        curriculum: ["AC9M3N03", "AC9M3N04"],
+        curriculum: ["AC9M3N03", "AC9M3N06"],
       },
       {
         id: "y3-w6-l2",
@@ -612,7 +609,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             operations: ["+", "-"],
           }),
         ],
-        curriculum: ["AC9M3N03", "AC9M3N04"],
+        curriculum: ["AC9M3N03", "AC9M3N06"],
       },
       {
         id: "y3-w6-l3",
@@ -644,7 +641,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
             operations: ["+", "-"],
           }),
         ],
-        curriculum: ["AC9M3N03", "AC9M3N04"],
+        curriculum: ["AC9M3N03", "AC9M3N05", "AC9M3N06"],
       },
     ],
   },
@@ -763,14 +760,14 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y3-w8",
     week: 8,
-    topic: "Multiplication & Division Facts",
+    topic: "Multiplication & Division Strategies",
     curriculum: ["AC9M3N04"],
     lessons: [
       {
         id: "y3-w8-l1",
         week: 8,
         lesson: 1,
-        title: "Division with 2s, 3s, 4s, 5s & 10s",
+        title: "Division Models and Related Facts",
         focus: "Use sharing, grouping, and fact families to solve division facts",
         activityIdeas: lessonIdeas(
           "Solve division using sharing and grouping models",
@@ -799,7 +796,7 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
         id: "y3-w8-l2",
         week: 8,
         lesson: 2,
-        title: "Apply Multiplication & Division Facts (2–5, 10)",
+        title: "Apply Multiplication & Division Relationships",
         focus: "Use inverse relationships and missing numbers to apply multiplication and division facts",
         activityIdeas: lessonIdeas(
           "Switch between multiplication and division using the same fact set",
@@ -862,209 +859,160 @@ const YEAR3_PROGRAM_RAW: WeekPlan[] = [
   {
     id: "y3-w9",
     week: 9,
-    topic: "Skip Counting, Patterns & Estimation",
-    curriculum: ["AC9M3A02", "AC9M3N05"],
+    topic: "Money Representation & Financial Modelling",
+    curriculum: ["AC9M3N06", "AC9M3M06"],
     lessons: [
       {
         id: "y3-w9-l1",
         week: 9,
         lesson: 1,
-        title: "Skip Counting (100s, 1000s)",
-        focus: "Skip count by 100s and 1000s from non-friendly starts",
+        title: "Dollars and Cents Lab",
+        focus: "Connect dollars and cents and represent the same value in different ways",
         activityIdeas: lessonIdeas(
-          "Skip count from non-friendly numbers such as 340 and 2,450",
-          "Apply jumps to distance/population-style contexts"
+          "Use 100 cents = 1 dollar and decode Australian money collections",
+          "Represent one amount with different combinations of notes and coins"
         ),
         activities: [
-          makeActivity("skip_count", 2, {
-            min: 340,
-            max: 20000,
-            step: 100,
-            mode: "forward",
+          makeActivity("mixed_word_problem", 2, {
+            mode: "money_equivalence",
           }),
-          makeActivity("skip_count", 1, {
-            min: 2450,
-            max: 50000,
-            step: 1000,
-            mode: "forward",
+          makeActivity("mixed_word_problem", 1, {
+            mode: "money_equivalence",
           }),
-          makeActivity("typed_response", 1, {
-            min: 340,
-            max: 20000,
-            step: 100,
-            mode: "forward",
-            sourceActivityType: "skip_count",
+          makeActivity("mixed_word_problem", 1, {
+            mode: "money_equivalence",
           }),
         ],
-        curriculum: ["AC9M3A02", "AC9M3N05"],
+        curriculum: ["AC9M3M06"],
       },
       {
         id: "y3-w9-l2",
         week: 9,
         lesson: 2,
-        title: "Patterns",
-        focus: "Create, extend, and justify number patterns",
+        title: "Model a Purchase",
+        focus: "Formulate and solve additive financial situations",
         activityIdeas: lessonIdeas(
-          "Build and complete additive/multiplicative patterns",
-          "Explain pattern rule and predict future terms"
+          "Choose addition or subtraction from the relationships in a purchase",
+          "Write a matching number sentence and interpret the total or change"
         ),
         activities: [
-          makeActivity("number_order", 2, {
-            min: 1000,
-            max: 50000,
-            count: 5,
-            ascending: true,
+          makeActivity("mixed_word_problem", 2, {
+            mode: "financial_additive_model",
+            operations: ["+", "-"],
           }),
-          makeActivity("skip_count", 1, {
-            min: 400,
-            max: 12000,
-            step: 100,
-            mode: "forward",
+          makeActivity("mixed_word_problem", 1, {
+            mode: "financial_additive_model",
+            operations: ["+", "-"],
           }),
-          makeActivity("multiple_choice", 1, {
-            min: 1000,
-            max: 50000,
-            count: 5,
-            sourceActivityType: "number_order",
+          makeActivity("mixed_word_problem", 1, {
+            mode: "financial_additive_model",
+            operations: ["+", "-"],
           }),
         ],
-        curriculum: ["AC9M3A02", "AC9M3N05"],
+        curriculum: ["AC9M3N06", "AC9M3M06"],
       },
       {
         id: "y3-w9-l3",
         week: 9,
         lesson: 3,
-        title: "Estimating Totals",
-        focus: "Use rounding and estimation in real contexts",
+        title: "Financial Mission",
+        focus: "Model multiplicative purchases and communicate a contextual solution",
         activityIdeas: lessonIdeas(
-          "Estimate totals using rounding strategies",
-          "Check reasonableness of estimated and exact answers"
+          "Use equal groups to calculate repeated prices and compare with a payment",
+          "Explain what the calculated result means in the purchase situation"
         ),
         activities: [
-          makeActivity("number_line", 1, {
-            min: 0,
-            max: 10000,
-            step: 1000,
-            mode: "rounding",
-            targets: [100, 1000],
-          }),
           makeActivity("mixed_word_problem", 2, {
-            min: 200,
-            max: 500,
-            mode: "choose_operation",
-            operations: ["+"],
+            mode: "financial_multiplicative_model",
+            operations: ["x", "-"],
           }),
-          makeActivity("multiple_choice", 1, {
-            min: 200,
-            max: 500,
-            mode: "choose_operation",
-            operations: ["+"],
-            sourceActivityType: "mixed_word_problem",
+          makeActivity("mixed_word_problem", 1, {
+            mode: "financial_multiplicative_model",
+            operations: ["x", "-"],
+          }),
+          makeActivity("mixed_word_problem", 1, {
+            mode: "financial_multiplicative_model",
+            operations: ["x", "-"],
           }),
         ],
-        curriculum: ["AC9M3A02", "AC9M3N05"],
+        curriculum: ["AC9M3N06", "AC9M3M06"],
       },
     ],
   },
   {
     id: "y3-w10",
     week: 10,
-    topic: "Fact Families & Number Relationships",
-    curriculum: ["AC9M3A01"],
+    topic: "Number Algorithms",
+    curriculum: ["AC9M3N07"],
     lessons: [
       {
         id: "y3-w10-l1",
         week: 10,
         lesson: 1,
-        title: "Fact Families",
-        focus: "Build full multiplication/division fact-family sets",
+        title: "Follow the Number Machine",
+        focus: "Follow a sequence of number steps and describe the outputs",
         activityIdeas: lessonIdeas(
-          "Generate full fact-family sets (e.g. 3x5, 5x3, 15/3, 15/5)",
-          "Use inverse relationships to verify answers"
+          "Run doubling, halving and additive algorithms in the correct order",
+          "Describe the pattern produced by repeated runs"
         ),
         activities: [
-          makeActivity("fact_family", 2, {
-            min: 12,
-            max: 48,
-            mode: "write_sentences",
+          makeActivity("skip_count", 2, {
+            mode: "algorithm_follow",
           }),
-          makeActivity("division_groups", 1, {
-            minTotal: 12,
-            maxTotal: 60,
-            mode: "inverse_link",
+          makeActivity("skip_count", 1, {
+            mode: "algorithm_follow",
           }),
-          makeActivity("multiple_choice", 1, {
-            min: 12,
-            max: 48,
-            mode: "recognise",
-            sourceActivityType: "fact_family",
+          makeActivity("skip_count", 1, {
+            mode: "algorithm_follow",
           }),
         ],
-        curriculum: ["AC9M3A01"],
+        curriculum: ["AC9M3N07"],
       },
       {
         id: "y3-w10-l2",
         week: 10,
         lesson: 2,
-        title: "Mixed Problems",
-        focus: "Apply number relationships across mixed operations",
+        title: "Decision Paths",
+        focus: "Follow algorithm decisions to sort and transform numbers",
         activityIdeas: lessonIdeas(
-          "Solve mixed-operation problems using known relationships",
-          "Choose strategy and justify operation choice"
+          "Apply yes/no decisions for multiples of 2, 5 and 10",
+          "Track the branch taken and explain the emerging classifications"
         ),
         activities: [
-          makeActivity("mixed_word_problem", 2, {
-            min: 40,
-            max: 220,
-            mode: "choose_operation",
-            operations: ["+", "-", "x", "/"],
+          makeActivity("skip_count", 2, {
+            mode: "algorithm_decision",
           }),
-          makeActivity("fact_family", 1, {
-            min: 12,
-            max: 48,
-            mode: "word_problems",
+          makeActivity("skip_count", 1, {
+            mode: "algorithm_decision",
           }),
-          makeActivity("typed_response", 1, {
-            min: 40,
-            max: 220,
-            mode: "choose_operation",
-            operations: ["+", "-", "x", "/"],
-            sourceActivityType: "mixed_word_problem",
+          makeActivity("skip_count", 1, {
+            mode: "algorithm_decision",
           }),
         ],
-        curriculum: ["AC9M3A01"],
+        curriculum: ["AC9M3N07"],
       },
       {
         id: "y3-w10-l3",
         week: 10,
         lesson: 3,
-        title: "Ordering & Reasoning",
-        focus: "Order numbers and justify with place-value reasoning",
+        title: "Algorithm Builder",
+        focus: "Create, test and explain a number-generating algorithm",
         activityIdeas: lessonIdeas(
-          "Order values and compare magnitude efficiently",
-          "Provide evidence-based ordering justifications"
+          "Arrange precise instructions so another student can generate a number pattern",
+          "Test the algorithm and describe the pattern in its outputs"
         ),
         activities: [
-          makeActivity("number_order", 2, {
-            min: 1000,
-            max: 10000,
-            count: 5,
-            ascending: true,
+          makeActivity("skip_count", 2, {
+            mode: "algorithm_create",
           }),
-          makeActivity("number_line", 1, {
-            min: 0,
-            max: 10000,
-            step: 500,
-            mode: "estimate",
+          makeActivity("skip_count", 1, {
+            mode: "algorithm_create",
           }),
-          makeActivity("typed_response", 1, {
-            min: 1000,
-            max: 10000,
-            count: 5,
-            sourceActivityType: "number_order",
+          makeActivity("skip_count", 1, {
+            mode: "algorithm_create",
           }),
         ],
-        curriculum: ["AC9M3A01"],
+        curriculum: ["AC9M3N07"],
       },
     ],
   },

@@ -504,6 +504,8 @@ export type MixedWordProblemQuestion = {
   optionPrefix?: string;
   mode:
     | "choose_operation"
+    | "money_equivalence"
+    | "quantity_estimation"
     | "two_step_add_sub"
     | "mult_div_problems"
     | "budgeting"
@@ -3073,10 +3075,24 @@ export type SkipCountQuestion = {
   answer: number;
   options: number[];
   step: number;
-  mode: "forward" | "backward" | "missing" | "create";
+  mode:
+    | "forward"
+    | "backward"
+    | "missing"
+    | "create"
+    | "algorithm_follow"
+    | "algorithm_decision"
+    | "algorithm_create";
   visualGroups?: number[];
   expectedSequence?: number[];
   representation?: "numbers" | "shapes" | "objects";
+  algorithmSteps?: string[];
+  algorithmStart?: number;
+  algorithmPattern?: number[];
+  instructionOptions?: string[];
+  expectedInstructions?: string[];
+  patternDescription?: string;
+  patternOptions?: string[];
 };
 
 export type SameDenominatorOperationVisualData = {
@@ -3870,7 +3886,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
     },
   },
   skip_count: {
-    allowedModes: ["forward", "backward", "missing", "create"],
+    allowedModes: ["forward", "backward", "missing", "create", "algorithm_follow", "algorithm_decision", "algorithm_create"],
     blockedFocusKeywords: ["division - equal groups"],
   },
   division_groups: {
@@ -3881,7 +3897,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   mixed_word_problem: {
     // "budgeting" / "shop_transactions" are generated only for Year 4 Week 8
     // (isYear4Week8), so allowing them here cannot loosen any other level/week.
-    allowedModes: ["choose_operation", "two_step_add_sub", "two_step_problem", "mult_div_problems", "division_fraction_multistep", "budgeting", "shop_transactions"],
+    allowedModes: ["choose_operation", "money_equivalence", "quantity_estimation", "financial_additive_model", "financial_multiplicative_model", "two_step_add_sub", "two_step_problem", "mult_div_problems", "division_fraction_multistep", "budgeting", "shop_transactions"],
     maxByContract: { max: "wordProblemMax" },
   },
   review_quiz: {},
@@ -4705,6 +4721,93 @@ function isYear3Week11Lesson2FractionsOfSets(
   return level === 3 && lesson.week === 11 && lesson.lesson === 2;
 }
 
+function buildYear3AlgorithmQuestion(lesson: Lesson): SkipCountQuestion {
+  if (lesson.lesson === 1) {
+    const step = [2, 3, 4, 5][randInt(0, 3)] ?? 3;
+    const start = randInt(1, 6);
+    const pattern = [start, start + step, start + step * 2, start + step * 3];
+    const answer = pattern[pattern.length - 1] ?? start;
+    return {
+      kind: "skip_count",
+      prompt: "Follow the algorithm exactly. What is the fourth recorded number?",
+      sequence: pattern.slice(0, 3),
+      answer,
+      options: uniqueNumberOptions(answer, step * 3).map(Number),
+      step,
+      mode: "algorithm_follow",
+      algorithmStart: start,
+      algorithmSteps: ["Record the current number.", `Add ${step}.`, "Repeat from step 1 until 4 numbers are recorded."],
+      algorithmPattern: pattern,
+      patternDescription: `The outputs increase by ${step} each time.`,
+      patternOptions: shuffle([
+        `The outputs increase by ${step} each time.`,
+        `The outputs decrease by ${step} each time.`,
+        "The outputs do not follow a constant pattern.",
+      ]),
+    };
+  }
+
+  if (lesson.lesson === 2) {
+    const category = [10, 2, 5, 0][randInt(0, 3)] ?? 10;
+    const value =
+      category === 10
+        ? randInt(2, 12) * 10
+        : category === 2
+          ? randInt(1, 12) * 10 + ([2, 4, 6, 8][randInt(0, 3)] ?? 2)
+          : category === 5
+            ? randInt(1, 15) * 10 + 5
+            : randInt(1, 15) * 10 + [1, 3, 7, 9][randInt(0, 3)]!;
+    return {
+      kind: "skip_count",
+      prompt: `Send ${value} through the decision algorithm. Which output code is produced?`,
+      sequence: [value],
+      answer: category,
+      options: [0, 2, 5, 10],
+      step: 1,
+      mode: "algorithm_decision",
+      algorithmStart: value,
+      algorithmSteps: [
+        "If the number ends in 0, output 10.",
+        "Otherwise, if it is even, output 2.",
+        "Otherwise, if it ends in 5, output 5. If none apply, output 0.",
+      ],
+      algorithmPattern: [category],
+      patternDescription: "The outputs sort numbers by whether they are multiples of 10, 2 or 5.",
+      patternOptions: shuffle([
+        "The outputs sort numbers by whether they are multiples of 10, 2 or 5.",
+        "The outputs always give the original number.",
+        "The outputs sort numbers from smallest to largest.",
+      ]),
+    };
+  }
+
+  const step = [3, 4, 5][randInt(0, 2)] ?? 3;
+  const expectedInstructions = [
+    `Start at ${step}.`,
+    "Record the current number.",
+    `Add ${step}, then repeat from step 2.`,
+  ];
+  return {
+    kind: "skip_count",
+    prompt: `Build an algorithm that generates the multiples of ${step} in order.`,
+    sequence: [step, step * 2, step * 3, step * 4],
+    answer: step * 4,
+    options: [],
+    step,
+    mode: "algorithm_create",
+    algorithmStart: step,
+    algorithmSteps: expectedInstructions,
+    algorithmPattern: [step, step * 2, step * 3, step * 4],
+    expectedInstructions,
+    instructionOptions: shuffle([
+      ...expectedInstructions,
+      `Subtract ${step}, then repeat from step 2.`,
+      "Record only the first number.",
+    ]),
+    patternDescription: `The outputs are the multiples of ${step}.`,
+  };
+}
+
 function buildYear3Week9SkipCountSequence(step: number) {
   const friendly = randInt(0, 9) < 6;
   const useLargeNumber = randInt(0, 9) < 4;
@@ -4979,22 +5082,22 @@ function formatWeek8ItemLabel(
 }
 
 function buildAustralianMoneyPieces(amount: number) {
-  const denominations = [100, 50, 20, 10, 5, 2, 1] as const;
+  const denominations = [100, 50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05] as const;
   const pieces: Array<{
     label: string;
     kind: "coin" | "note";
     value: number;
   }> = [];
-  let remaining = amount;
+  let remaining = Number(amount.toFixed(2));
 
   for (const value of denominations) {
-    while (remaining >= value) {
+    while (remaining >= value - 0.001) {
       pieces.push({
-        label: `$${value}`,
+        label: value < 1 ? `${Math.round(value * 100)}c` : `$${value}`,
         kind: value >= 5 ? "note" : "coin",
         value,
       });
-      remaining -= value;
+      remaining = Number((remaining - value).toFixed(2));
     }
   }
 
@@ -5003,6 +5106,144 @@ function buildAustralianMoneyPieces(amount: number) {
 
 function isYear2Week11(level: SupportedMathLevel, lesson: Lesson) {
   return level === 2 && lesson.week === 11;
+}
+
+function isYear3Week9Money(level: SupportedMathLevel, lesson: Lesson) {
+  return level === 3 && lesson.week === 9;
+}
+
+function isYear3CollectionEstimate(level: SupportedMathLevel, lesson: Lesson) {
+  return level === 3 && lesson.week === 2 && lesson.lesson === 1;
+}
+
+function buildYear3CollectionEstimateQuestion(): MixedWordProblemQuestion {
+  const rows = randInt(5, 9);
+  const columns = randInt(5, 9);
+  const exact = rows * columns;
+  const answer = Math.round(exact / 10) * 10;
+  return {
+    kind: "mixed_word_problem",
+    prompt: "About how many counters are in this collection? Choose the nearest 10.",
+    answer,
+    options: moneyOptions(answer, [-20, -10, 10, 20]),
+    operationLabel: "Estimate the collection",
+    helper: "Use the rows as a visual benchmark.",
+    mode: "quantity_estimation",
+    showStrategyClue: false,
+    visual: { type: "array", rows, columns },
+  };
+}
+
+function moneyOptions(answer: number, offsets: number[]) {
+  const distractors = [...new Set(offsets
+    .map((offset) => Number(Math.max(0, answer + offset).toFixed(2)))
+    .filter((value) => value !== answer))];
+  return shuffle([answer, ...shuffle(distractors).slice(0, 3)]);
+}
+
+function buildYear3MoneyQuestion(lesson: Lesson): MixedWordProblemQuestion {
+  if (lesson.lesson === 1) {
+    const cents = [135, 185, 240, 275, 320, 365][randInt(0, 5)] ?? 185;
+    const dollars = cents / 100;
+    return {
+      kind: "mixed_word_problem",
+      prompt: "The notes and coins show one money value. How many cents is the same value?",
+      answer: cents,
+      options: moneyOptions(cents, [-100, -50, 50, 100]),
+      operationLabel: "Represent the same value in cents",
+      helper: "Use 100 cents = 1 dollar.",
+      mode: "money_equivalence",
+      showStrategyClue: false,
+      visual: {
+        type: "australian_money",
+        title: "Money representation",
+        pieces: shuffle(buildAustralianMoneyPieces(dollars)),
+        hideTotal: true,
+      },
+    };
+  }
+
+  const items = ["puzzle", "kite", "book", "ball", "paint set", "game"];
+  const itemA = items[randInt(0, items.length - 1)] ?? "puzzle";
+  const itemB = items.filter((item) => item !== itemA)[randInt(0, items.length - 2)] ?? "kite";
+
+  if (lesson.lesson === 2) {
+    const asksForChange = randInt(0, 1) === 1;
+    if (asksForChange) {
+      const payment = [5, 10, 20][randInt(0, 2)] ?? 10;
+      const price = Number((randInt(4, payment * 4 - 2) * 0.25).toFixed(2));
+      const answer = Number((payment - price).toFixed(2));
+      return {
+        kind: "mixed_word_problem",
+        prompt: `A ${itemA} costs $${price.toFixed(2)}. You pay $${payment.toFixed(2)}. How much change should you receive?`,
+        answer,
+        options: moneyOptions(answer, [-1, -0.5, 0.5, 1]),
+        operationLabel: "Choose the operation that matches the transaction",
+        correctOperation: "-",
+        operationChoices: ["+", "-"],
+        helper: "Model the transaction with a number sentence.",
+        mode: "choose_operation",
+        optionPrefix: "$",
+        showStrategyClue: false,
+        visual: {
+          type: "australian_money",
+          title: "Payment",
+          itemLabel: itemA,
+          itemPrice: price,
+          pieces: buildAustralianMoneyPieces(payment),
+          hideTotal: true,
+        },
+      };
+    }
+
+    const first = Number((randInt(4, 16) * 0.25).toFixed(2));
+    const second = Number((randInt(4, 16) * 0.25).toFixed(2));
+    const answer = Number((first + second).toFixed(2));
+    return {
+      kind: "mixed_word_problem",
+      prompt: `A ${itemA} costs $${first.toFixed(2)} and a ${itemB} costs $${second.toFixed(2)}. What is the total cost?`,
+      answer,
+      options: moneyOptions(answer, [-1, -0.5, 0.5, 1]),
+      operationLabel: "Choose the operation that matches the purchase",
+      correctOperation: "+",
+      operationChoices: ["+", "-"],
+      helper: "Model the purchase with a number sentence.",
+      mode: "choose_operation",
+      optionPrefix: "$",
+      showStrategyClue: false,
+      visual: {
+        type: "shopping_list",
+        title: "School shop",
+        items: [
+          { label: itemA, price: first },
+          { label: itemB, price: second },
+        ],
+      },
+    };
+  }
+
+  const quantity = randInt(2, 5);
+  const unitPrice = Number((randInt(2, 12) * 0.5).toFixed(2));
+  const answer = Number((quantity * unitPrice).toFixed(2));
+  return {
+    kind: "mixed_word_problem",
+    prompt: `One ${itemA} costs $${unitPrice.toFixed(2)}. You buy ${quantity}. What is the total cost?`,
+    answer,
+    options: moneyOptions(answer, [-unitPrice, -0.5, 0.5, unitPrice]),
+    operationLabel: "Choose the operation for equal prices",
+    correctOperation: "x",
+    operationChoices: ["+", "-", "x"],
+    helper: "Represent the repeated price with a number sentence.",
+    mode: "choose_operation",
+    optionPrefix: "$",
+    showStrategyClue: false,
+    visual: {
+      type: "receipt",
+      title: "Purchase record",
+      lines: [{ label: itemA, price: unitPrice, quantity }],
+      hideComputedTotals: true,
+    },
+  };
 }
 
 const YEAR2_MONEY_ITEMS = [
@@ -6123,7 +6364,11 @@ function validateQuestionAgainstPolicy(
     );
   }
 
-  if (question.kind === "skip_count" && !profile.skipCountExtraSteps.includes(question.step)) {
+  if (
+    question.kind === "skip_count" &&
+    !question.mode.startsWith("algorithm_") &&
+    !profile.skipCountExtraSteps.includes(question.step)
+  ) {
     addViolation(
       violations,
       "difficulty",
@@ -8066,6 +8311,12 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "mixed_word_problem") {
+    if (isYear3CollectionEstimate(level, lesson)) {
+      return buildYear3CollectionEstimateQuestion();
+    }
+    if (isYear3Week9Money(level, lesson)) {
+      return buildYear3MoneyQuestion(lesson);
+    }
     if (isYear2Week11(level, lesson)) {
       return buildYear2MoneyQuestion(lesson);
     }
@@ -8682,6 +8933,9 @@ function generateInteractiveQuestion(
   }
 
   if (activityType === "skip_count") {
+    if (level === 3 && lesson.week === 10) {
+      return buildYear3AlgorithmQuestion(lesson);
+    }
     const restrictedFactors = getRestrictedFactors(level, lesson.week);
     const step =
       restrictedFactors

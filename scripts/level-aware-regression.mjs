@@ -170,7 +170,7 @@ function checkYear3MultiplicativeRestriction(lesson) {
       }
     }
 
-    if (question.kind === "skip_count") {
+    if (question.kind === "skip_count" && !question.mode.startsWith("algorithm_")) {
       if (!YEAR3_ALLOWED_FACTORS.has(question.step)) {
         addFinding(`Year 3 ${lesson.id} factor_check`, `skip_count used step ${question.step}.`);
       }
@@ -333,11 +333,7 @@ function checkYear3FractionLessonAlignment(lesson) {
     "y3-w11-l1": ["area_model_select"],
     "y3-w11-l2": ["set_model_select"],
     "y3-w11-l3": ["build_the_whole"],
-    "y3-w12-l1": [
-      "equivalent_fraction_match",
-      "equivalent_fraction_build",
-      "equivalent_fraction_yes_no",
-    ],
+    "y3-w12-l1": ["build_the_whole", "area_model_select", "fraction_compare"],
     "y3-w12-l2": ["number_line_place"],
     "y3-w12-l3": ["fraction_compare"],
   };
@@ -547,7 +543,7 @@ if (!year3Week6?.lessons?.length) {
   }
 }
 
-for (const week of [7, 8, 10]) {
+for (const week of [7, 8]) {
   const weekPlan = YEAR3_PROGRAM.find((item) => item.week === week);
   if (!weekPlan?.lessons?.length) {
     addFinding(`Year 3 W${week}`, "Missing multiplicative lessons for regression target.");
@@ -559,24 +555,11 @@ for (const week of [7, 8, 10]) {
   }
 }
 
-const year3Week9Lesson1 = YEAR3_PROGRAM.find((item) => item.week === 9)?.lessons?.find(
-  (lesson) => lesson.lesson === 1
-);
-if (!year3Week9Lesson1) {
-  addFinding("Year 3 W9 L1", "Missing skip-count lesson for regression target.");
+const year3Week9 = YEAR3_PROGRAM.find((item) => item.week === 9);
+if (!year3Week9?.lessons?.length) {
+  addFinding("Year 3 W9", "Missing financial modelling lessons for regression target.");
 } else {
-  checkLesson("Year 3", year3Week9Lesson1);
-  checkYear3Week9SkipCounting(year3Week9Lesson1);
-}
-
-const year3Week9Lesson3 = YEAR3_PROGRAM.find((item) => item.week === 9)?.lessons?.find(
-  (lesson) => lesson.lesson === 3
-);
-if (!year3Week9Lesson3) {
-  addFinding("Year 3 W9 L3", "Missing estimation lesson for regression target.");
-} else {
-  checkLesson("Year 3", year3Week9Lesson3);
-  checkYear3Week9Lesson3Estimation(year3Week9Lesson3);
+  for (const lesson of year3Week9.lessons) checkLesson("Year 3", lesson);
 }
 
 for (const week of [11, 12]) {

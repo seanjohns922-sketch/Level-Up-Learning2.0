@@ -614,6 +614,8 @@ export function Year2LessonEngine({
 }) {
   const isMeasurement = realmId === "measurement";
   const isLevelTwoNumber = !isMeasurement && levelNumber === 2;
+  const isLevelThreeNumber = !isMeasurement && levelNumber === 3;
+  const isModernNumber = isLevelTwoNumber || isLevelThreeNumber;
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
   const workingLevel = useMemo(() => getWorkingLevelForLesson(lesson), [lesson]);
@@ -1406,8 +1408,8 @@ export function Year2LessonEngine({
 
   return (
     <div
-      className={isLevelTwoNumber ? "number-nexus-level-two relative" : "relative"}
-      data-number-nexus-level={isLevelTwoNumber ? "2" : undefined}
+      className={isLevelTwoNumber ? "number-nexus-level-two relative" : isLevelThreeNumber ? "number-nexus-level-three relative" : "relative"}
+      data-number-nexus-level={isModernNumber ? String(levelNumber) : undefined}
     >
       {showLessonResume && (
         <LessonResumeGate
@@ -1552,14 +1554,14 @@ export function Year2LessonEngine({
             <ComboMilestonePop comboCount={comboCount}>
               <div
                 className={`${
-                  isLevelTwoNumber
+                  isModernNumber
                     ? "rounded-lg border shadow-sm"
                     : "rounded-[1.75rem] border-2 shadow-lg"
                 } p-4 transition-all duration-500 sm:p-6 ${statusBorder} ${statusMotion}`}
                 style={isMeasurement ? {
                   background: "linear-gradient(180deg, #fffdf7 0%, #fff7e6 100%)",
                   boxShadow: "0 18px 45px rgba(92,56,10,0.10)",
-                } : isLevelTwoNumber ? {
+                } : isModernNumber ? {
                   background: "#f8fbfc",
                   boxShadow: "0 8px 24px rgba(15,118,110,0.08)",
                 } : {

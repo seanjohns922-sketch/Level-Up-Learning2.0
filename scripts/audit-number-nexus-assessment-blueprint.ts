@@ -48,7 +48,8 @@ for (const blueprint of NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS) {
 
 const year3 = NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS.find((blueprint) => blueprint.level === 3);
 assert(year3?.descriptors.some((item) => item.code === "AC9M3M06"));
-assert.equal(year3?.descriptors.find((item) => item.code === "AC9M3M06")?.curriculumMapping.implementationStatus, "missing");
+assert.equal(year3?.descriptors.find((item) => item.code === "AC9M3M06")?.curriculumMapping.implementationStatus, "aligned");
+assert(year3?.descriptors.every((item) => item.curriculumMapping.implementationStatus === "aligned"), "Year 3 curriculum must be complete before assessment generation.");
 assert.equal(NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS[0]?.descriptors.some((item) => item.code.includes("SP")), false, "Ground Number Nexus blueprint contains Space content.");
 
 const rows = NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS.flatMap((blueprint) => blueprint.forms.map((form) => ({

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Diamond, RotateCcw, Undo2 } from "lucide-react";
+import { Box, Diamond, GitBranch, Play, RotateCcw, Undo2, Workflow } from "lucide-react";
 import type { SkipCountQuestion } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
@@ -16,6 +16,9 @@ export default function SkipCount({
 }) {
   const [picked, setPicked] = useState<number | null>(null);
   const [builtTerms, setBuiltTerms] = useState<number[]>([]);
+  const [builtInstructions, setBuiltInstructions] = useState<string[]>([]);
+  const [algorithmOutputCorrect, setAlgorithmOutputCorrect] = useState(false);
+  const [pickedPattern, setPickedPattern] = useState<string | null>(null);
 
   function choose(option: number) {
     setPicked(option);
@@ -32,6 +35,30 @@ export default function SkipCount({
     else onWrong?.(builtTerms.join(", "));
   }
 
+  function checkCreatedAlgorithm() {
+    const expected = questionData.expectedInstructions ?? [];
+    const correct =
+      builtInstructions.length === expected.length &&
+      builtInstructions.every((instruction, index) => instruction === expected[index]);
+    if (correct) onCorrect?.();
+    else onWrong?.(builtInstructions.join(" -> "));
+  }
+
+  function chooseAlgorithmOutput(option: number) {
+    setPicked(option);
+    if (option === questionData.answer) {
+      setAlgorithmOutputCorrect(true);
+      return;
+    }
+    onWrong?.(String(option));
+  }
+
+  function checkAlgorithmPattern() {
+    if (!pickedPattern) return;
+    if (pickedPattern === questionData.patternDescription) onCorrect?.();
+    else onWrong?.(pickedPattern);
+  }
+
   function renderTerm(value: number, compact = false) {
     if (questionData.representation === "numbers") {
       return <span className={compact ? "text-xl font-black" : "text-3xl font-black"}>{value}</span>;
@@ -44,6 +71,161 @@ export default function SkipCount({
           <Icon key={index} className={compact ? "h-4 w-4 text-teal-700" : "h-5 w-5 text-teal-700"} aria-hidden="true" />
         ))}
       </span>
+    );
+  }
+
+  if (questionData.mode === "algorithm_create") {
+    const expectedLength = questionData.expectedInstructions?.length ?? 3;
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-indigo-700">
+              <Workflow className="h-4 w-4" aria-hidden="true" /> Algorithm Builder
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+          </div>
+          <ReadAloudBtn text={questionData.prompt} />
+        </div>
+
+        <div className="mt-5 rounded-lg border border-indigo-100 bg-indigo-50 p-4">
+          <div className="text-xs font-bold uppercase tracking-wide text-indigo-700">Your instructions</div>
+          <div className="mt-3 grid gap-2">
+            {Array.from({ length: expectedLength }).map((_, index) => (
+              <div key={index} className="flex min-h-16 items-center gap-3 rounded-lg border border-indigo-200 bg-white px-3 py-2">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-indigo-100 text-sm font-black text-indigo-700">{index + 1}</span>
+                <span className="font-bold text-slate-800">{builtInstructions[index] ?? "Choose an instruction"}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setBuiltInstructions((current) => current.slice(0, -1))}
+              disabled={builtInstructions.length === 0}
+              className="grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40"
+              title="Undo last instruction"
+              aria-label="Undo last instruction"
+            >
+              <Undo2 className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setBuiltInstructions([])}
+              disabled={builtInstructions.length === 0}
+              className="grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40"
+              title="Clear algorithm"
+              aria-label="Clear algorithm"
+            >
+              <RotateCcw className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-2">
+          {questionData.instructionOptions?.map((instruction) => {
+            const alreadyUsed = builtInstructions.includes(instruction);
+            return (
+              <div key={instruction} className="flex min-h-14 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setBuiltInstructions((current) => current.length < expectedLength && !current.includes(instruction) ? [...current, instruction] : current)}
+                  disabled={alreadyUsed}
+                  className="min-w-0 flex-1 px-4 py-3 text-left font-bold text-slate-900 transition hover:bg-indigo-50 disabled:opacity-40"
+                >
+                  {instruction}
+                </button>
+                <div className="grid w-14 place-items-center border-l border-slate-200">
+                  <ReadAloudBtn text={instruction} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <button
+          type="button"
+          onClick={checkCreatedAlgorithm}
+          disabled={builtInstructions.length !== expectedLength}
+          className="mt-5 w-full rounded-lg bg-indigo-700 px-5 py-3 font-black text-white transition hover:bg-indigo-800 disabled:opacity-40"
+        >
+          Test algorithm
+        </button>
+      </div>
+    );
+  }
+
+  if (questionData.mode === "algorithm_follow" || questionData.mode === "algorithm_decision") {
+    const isDecision = questionData.mode === "algorithm_decision";
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-indigo-700">
+              {isDecision ? <GitBranch className="h-4 w-4" aria-hidden="true" /> : <Play className="h-4 w-4" aria-hidden="true" />}
+              {isDecision ? "Decision Algorithm" : "Run the Algorithm"}
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-gray-900">{questionData.prompt}</h2>
+          </div>
+          <ReadAloudBtn text={questionData.prompt} />
+        </div>
+
+        <div className="mt-5 rounded-lg border border-indigo-100 bg-indigo-50 p-4">
+          <div className="text-sm font-black text-indigo-950">Start: {questionData.algorithmStart}</div>
+          <div className="mt-3 grid gap-2">
+            {questionData.algorithmSteps?.map((step, index) => (
+              <div key={`${step}-${index}`} className="flex min-h-14 items-center gap-3 rounded-lg border border-indigo-100 bg-white px-3 py-2">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-indigo-100 text-sm font-black text-indigo-700">{index + 1}</span>
+                <span className="min-w-0 flex-1 font-bold text-slate-800">{step}</span>
+                <ReadAloudBtn text={step} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {questionData.options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => chooseAlgorithmOutput(option)}
+              className={`min-h-16 rounded-lg border px-4 py-3 text-2xl font-black transition ${picked === option ? "border-indigo-500 bg-indigo-50 text-indigo-900" : "border-slate-200 bg-white text-slate-900 hover:border-indigo-300"}`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+
+        {algorithmOutputCorrect ? (
+          <div className="mt-5 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
+            <div className="text-sm font-black text-emerald-950">Which statement describes the pattern?</div>
+            <div className="mt-3 grid gap-2">
+              {questionData.patternOptions?.map((option) => (
+                <div key={option} className={`flex min-h-14 overflow-hidden rounded-lg border bg-white ${pickedPattern === option ? "border-emerald-500" : "border-slate-200"}`}>
+                  <button
+                    type="button"
+                    onClick={() => setPickedPattern(option)}
+                    className="min-w-0 flex-1 px-4 py-3 text-left font-bold text-slate-900"
+                  >
+                    {option}
+                  </button>
+                  <div className="grid w-14 place-items-center border-l border-slate-200">
+                    <ReadAloudBtn text={option} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={checkAlgorithmPattern}
+              disabled={!pickedPattern}
+              className="mt-4 w-full rounded-lg bg-emerald-700 px-5 py-3 font-black text-white disabled:opacity-40"
+            >
+              Check pattern
+            </button>
+          </div>
+        ) : null}
+      </div>
     );
   }
 

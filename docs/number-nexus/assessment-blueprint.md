@@ -749,7 +749,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### AC9M3N01
 
-**Descriptor:** Recognise, represent and order natural numbers beyond 10,000 using naming and writing conventions.
+**Descriptor:** Recognise, represent and order natural numbers using naming and writing conventions for numerals beyond 10 000.
 
 **Learning Intentions**
 
@@ -776,7 +776,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### AC9M3N02
 
-**Descriptor:** Represent and compare unit fractions and their multiples, and combine fractions with the same denominator to complete the whole.
+**Descriptor:** Recognise and represent unit fractions including 1/2, 1/3, 1/4, 1/5 and 1/10 and their multiples in different ways; combine fractions with the same denominator to complete the whole.
 
 **Learning Intentions**
 
@@ -805,7 +805,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### AC9M3N03
 
-**Descriptor:** Add and subtract two- and three-digit numbers using place-value partitioning, rearranging and regrouping.
+**Descriptor:** Add and subtract two- and three-digit numbers using place value to partition, rearrange and regroup numbers to assist in calculations without a calculator.
 
 **Learning Intentions**
 
@@ -832,7 +832,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### AC9M3N04
 
-**Descriptor:** Multiply and divide one- and two-digit numbers using number sentences, diagrams, arrays and varied strategies.
+**Descriptor:** Multiply and divide one- and two-digit numbers, representing problems using number sentences, diagrams and arrays, and using a variety of calculation strategies.
 
 **Learning Intentions**
 
@@ -850,7 +850,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `additive-vs-multiplicative`, `equal-sharing-vs-grouping`
 
-**Curriculum Mapping:** **aligned**; weeks 6, 7, 8. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 7, 8. Weeks 7-8 explicitly connect arrays, groups, number sentences and inverse relationships.
 
 **Question Blueprint**
 
@@ -859,7 +859,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### AC9M3N05
 
-**Descriptor:** Estimate quantities and solutions to determine the reasonableness of calculations.
+**Descriptor:** Estimate the quantity of objects in collections and make estimates when solving problems to determine the reasonableness of calculations.
 
 **Learning Intentions**
 
@@ -878,7 +878,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `estimation-vs-exact`, `reasonableness-no-reference`
 
-**Curriculum Mapping:** **aligned**; weeks 2, 9. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 2, 6. Week 2 estimates collections and calculations; Week 6 applies reasonableness checks.
 
 **Question Blueprint**
 
@@ -887,7 +887,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### AC9M3N06
 
-**Descriptor:** Use mathematical modelling for additive and multiplicative problems including financial contexts.
+**Descriptor:** Use mathematical modelling to solve practical problems involving additive and multiplicative situations including financial contexts; formulate problems using number sentences and choose calculation strategies, using digital tools where appropriate; interpret and communicate solutions in terms of the situation.
 
 **Learning Intentions**
 
@@ -907,7 +907,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `operation-story-structure`, `financial-operation-choice`, `additive-vs-multiplicative`
 
-**Curriculum Mapping:** **partial**; weeks 6. General problems are taught, but financial modelling and explicit AC9M3N06 mapping are absent.
+**Curriculum Mapping:** **aligned**; weeks 6, 9. Week 6 covers additive modelling; Week 9 covers additive and multiplicative financial modelling.
 
 **Question Blueprint**
 
@@ -916,7 +916,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### AC9M3N07
 
-**Descriptor:** Follow and create algorithms with steps and decisions to investigate numbers and describe emerging patterns.
+**Descriptor:** Follow and create algorithms involving a sequence of steps and decisions to investigate numbers; describe any emerging patterns.
 
 **Learning Intentions**
 
@@ -936,16 +936,16 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `algorithm-step-order`, `pattern-rule-vs-example`
 
-**Curriculum Mapping:** **missing**; weeks none. No number-algorithm sequence is present.
+**Curriculum Mapping:** **aligned**; weeks 10. Week 10 progresses from following to decisions and algorithm creation.
 
 **Question Blueprint**
 
-- Pre-Test: Blocked until curriculum coverage exists
+- Pre-Test: Follow a number algorithm and determine its output.
 - Post-Test: Create, test and explain a number algorithm.
 
 ### AC9M3M06
 
-**Descriptor:** Recognise relationships between dollars and cents and represent money values in different ways.
+**Descriptor:** Recognise the relationships between dollars and cents and represent money values in different ways.
 
 **Learning Intentions**
 
@@ -965,16 +965,16 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `coin-count-vs-value`, `dollar-cent-equivalence`
 
-**Curriculum Mapping:** **missing**; weeks none. Intentionally owned by Number Nexus, but not currently taught or assessed at Year 3.
+**Curriculum Mapping:** **aligned**; weeks 9. Intentionally owned by Number Nexus and taught with Australian money representations in Week 9.
 
 **Question Blueprint**
 
-- Pre-Test: Blocked until curriculum coverage exists
+- Pre-Test: Enter an equivalent dollar-cent value.
 - Post-Test: Construct equivalent dollar-cent representations and diagnose a non-equivalent value.
 
 ### Cross-Realm Boundary
 
-- **AC9M3A01, AC9M3A02, AC9M3A03 -> Pattern Peaks (Algebra):** Level 3 Algebra is owned by the separate Algebra realm. Existing Number Nexus Weeks 3-4, 7-10 contain Algebra-coded content that must be relocated or remapped during the curriculum overhaul.
+- **AC9M3A01, AC9M3A02, AC9M3A03 -> Pattern Peaks (Algebra):** From Level 3 onward, Algebra is exclusively owned by Pattern Peaks; Number Nexus contains no AC9M3A-coded lessons or quizzes.
 
 ## Year 4
 

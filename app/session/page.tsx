@@ -85,6 +85,7 @@ import type { Year1PatternToken } from "@/data/activities/year1/practice-task";
 import { buildYear1Week11PatternQuizItems } from "@/data/quizzes/year1Week11Patterns";
 import { buildYear1NumberNexusWeeklyQuiz } from "@/data/quizzes/year1NumberNexus";
 import { buildYear2NumberNexusWeeklyQuiz } from "@/data/quizzes/year2NumberNexus";
+import { buildYear3NumberNexusWeeklyQuiz } from "@/data/quizzes/year3NumberNexus";
 import { buildPrepNumberNexusWeeklyQuiz, type PrepNumberNexusQuizVisual } from "@/data/quizzes/prepNumberNexus";
 import GroundNumberNexusQuizVisual from "@/components/quiz/GroundNumberNexusQuizVisual";
 import { RepeatingPatternStrip } from "@/components/number-nexus/RepeatingPatternVisual";
@@ -257,6 +258,11 @@ type QuizQuestion = {
   } | {
     type: "repeating_pattern";
     sequence: Year1PatternToken[];
+  } | {
+    type: "fraction";
+    parts: number;
+    selected: number;
+    label?: string;
   } | PrepNumberNexusQuizVisual;
   line?: {
     min: number;
@@ -7948,7 +7954,8 @@ function SessionPage({
   const quizRealmId = isMeasurementRealm ? "measurement" : "number";
   const isGroundNumberQuiz = quizRealmId === "number" && year === "Prep";
   const isLevelTwoNumberQuiz = quizRealmId === "number" && year === "Year 2";
-  const isModernNumberQuiz = isGroundNumberQuiz || isLevelTwoNumberQuiz;
+  const isLevelThreeNumberQuiz = quizRealmId === "number" && year === "Year 3";
+  const isModernNumberQuiz = isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz;
   const finalProgramWeek = getLastProgramWeek(quizRealmId);
   const isFinalQuizWeek = Number(week) >= finalProgramWeek;
   const quizStrand = isMeasurementRealm ? "Measurement" : "Number";
@@ -8294,6 +8301,10 @@ function SessionPage({
 
     if (!isMeasurementRealm && year === "Year 2") {
       return buildYear2NumberNexusWeeklyQuiz(Number(week)) as QuizQuestion[];
+    }
+
+    if (!isMeasurementRealm && year === "Year 3") {
+      return buildYear3NumberNexusWeeklyQuiz(Number(week)) as QuizQuestion[];
     }
 
     // Level 4 Measurelands weekly quizzes. Built weeks return their 15-question
@@ -9709,6 +9720,26 @@ function SessionPage({
                             width={item.kind === "note" ? 112 : 64}
                             height={64}
                             className={item.kind === "note" ? "h-16 w-auto object-contain" : "h-16 w-16 object-contain"}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  {currentQuiz?.visual?.type === "fraction" ? (
+                    <div className="mb-3 rounded-lg border border-teal-200 bg-[#f8fbfc] p-5 shadow-sm">
+                      <div
+                        className="mx-auto grid h-20 max-w-xl overflow-hidden rounded-lg border-2 border-slate-700 bg-white"
+                        style={{ gridTemplateColumns: `repeat(${currentQuiz.visual.parts}, minmax(0, 1fr))` }}
+                        role="img"
+                        aria-label={currentQuiz.visual.label ?? `${currentQuiz.visual.selected} of ${currentQuiz.visual.parts} equal parts shaded`}
+                      >
+                        {Array.from({ length: currentQuiz.visual.parts }, (_, index) => (
+                          <div
+                            key={`${currentQuiz.id}-fraction-${index}`}
+                            className={[
+                              index < (currentQuiz.visual as { type: "fraction"; selected: number }).selected ? "bg-teal-400" : "bg-white",
+                              index > 0 ? "border-l-2 border-slate-700" : "",
+                            ].join(" ")}
                           />
                         ))}
                       </div>
