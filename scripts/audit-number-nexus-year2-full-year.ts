@@ -64,10 +64,14 @@ for (const week of year2Number) {
         assert("prompt" in question && question.prompt.trim().length > 0, `${lesson.id} generated a question without a prompt.`);
         if (lesson.week === 8 && question.kind === "skip_count") {
           weekEightPatternModes.add(question.mode);
+          assert(!question.visualGroups?.length, `${lesson.id} adds unnecessary dot bundles to a Week 8 pattern task.`);
           if (question.mode === "create" && question.representation) {
             weekEightCreationRepresentations.add(question.representation);
             assert.equal(question.expectedSequence?.length, 3, `${lesson.id} does not require construction of 3 new pattern terms.`);
           }
+        }
+        if (lesson.week === 8 && question.kind === "fact_family") {
+          assert.equal(question.visual, undefined, `${lesson.id} adds an unnecessary dot array to a Week 8 recall task.`);
         }
         if (lesson.week === 12 && question.kind === "area_model_select" && question.mode === "repeated_halving") {
           weekTwelveHalvingTargets.add(question.halvingTarget ?? question.denominator);

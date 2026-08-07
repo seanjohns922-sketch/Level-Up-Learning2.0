@@ -5716,7 +5716,7 @@ function restrictFactors(candidates: number[] | undefined, fallback: number[]): 
 }
 
 function requiresVisualMultiplicativeSupport(level: SupportedMathLevel, week: number): boolean {
-  return level === 2 && week >= 8 && week <= 10;
+  return level === 2 && week >= 9 && week <= 10;
 }
 
 function uniqueNumberOptions(answer: number, spread = 12) {
@@ -8571,7 +8571,9 @@ function generateInteractiveQuestion(
         answers: [answer],
         mode,
         familyType: "mult_div",
-        visual: { type: "array", rows: 2, columns: factor },
+        ...(requiresVisualMultiplicativeSupport(level, lesson.week)
+          ? { visual: { type: "array" as const, rows: 2, columns: factor } }
+          : {}),
       };
     }
 
@@ -9018,7 +9020,7 @@ function generateInteractiveQuestion(
         options: uniqueNumberOptions(missingValue, step * 3).map(Number),
         step,
         mode: requestedMode,
-        visualGroups: restrictedFactors ? [step, step, step, step, step] : undefined,
+        visualGroups: requiresVisualMultiplicativeSupport(level, lesson.week) ? [step, step, step, step, step] : undefined,
       };
     }
 
@@ -9030,7 +9032,7 @@ function generateInteractiveQuestion(
       options: uniqueNumberOptions(answer, step * 3).map(Number),
       step,
       mode: requestedMode,
-      visualGroups: restrictedFactors ? [step, step, step, step, step] : undefined,
+      visualGroups: requiresVisualMultiplicativeSupport(level, lesson.week) ? [step, step, step, step, step] : undefined,
     };
   }
 

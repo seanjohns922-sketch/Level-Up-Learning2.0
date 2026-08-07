@@ -37,12 +37,16 @@ for (const lesson of targetLessons) {
     assert.equal(question.answers.length, 1);
     assert(question.options.includes(question.answers[0]));
     assert.equal(new Set(question.options).size, question.options.length);
-    assert.equal(question.visual?.rows, 2);
-    assert.equal(question.visual?.columns, question.family[1]);
+    if (lesson.week === 8) {
+      assert.equal(question.visual, undefined, "Week 8 recall tasks must not add a dot array.");
+    } else {
+      assert.equal(question.visual?.rows, 2);
+      assert.equal(question.visual?.columns, question.family[1]);
+    }
     assert.equal(question.family[0] * question.family[1], question.family[2]);
   }
 }
 
 console.log(
-  "Number Nexus Year 2 Curriculum Completion passed: all 9 descriptors are aligned; Weeks 8 and 10 explicitly derive related twos division facts through doubling and halving; 200 generated tasks were valid.",
+  "Number Nexus Year 2 Curriculum Completion passed: all 9 descriptors are aligned; Weeks 8 and 10 explicitly derive related twos division facts through doubling and halving; Week 8 remains recall-focused while Week 10 retains its array model; 200 generated tasks were valid.",
 );
