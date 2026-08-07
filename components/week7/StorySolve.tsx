@@ -46,19 +46,19 @@ export default function StorySolve({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="text-sm font-bold text-gray-600">Solve the story</div>
+        <div className="text-sm font-bold text-slate-600">Solve the story</div>
         <button
           onClick={() => speak(story)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
           type="button"
         >
           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
         </button>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-gray-800">
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-800">
         {story}
       </div>
 
@@ -67,10 +67,10 @@ export default function StorySolve({
           <button
             onClick={() => chooseOp("add")}
             className={[
-              "px-5 py-4 rounded-2xl border text-lg font-black transition",
+              "px-5 py-4 rounded-lg border text-lg font-black transition",
               pickedOp === "add"
                 ? "border-emerald-500 bg-emerald-50"
-                : "border-gray-200 hover:bg-gray-50",
+                : "border-slate-200 hover:bg-slate-50",
             ].join(" ")}
             type="button"
           >
@@ -79,10 +79,10 @@ export default function StorySolve({
           <button
             onClick={() => chooseOp("subtract")}
             className={[
-              "px-5 py-4 rounded-2xl border text-lg font-black transition",
+              "px-5 py-4 rounded-lg border text-lg font-black transition",
               pickedOp === "subtract"
                 ? "border-rose-500 bg-rose-50"
-                : "border-gray-200 hover:bg-gray-50",
+                : "border-slate-200 hover:bg-slate-50",
             ].join(" ")}
             type="button"
           >
@@ -93,25 +93,25 @@ export default function StorySolve({
 
       <div className="mt-4">
         {!hideEquation && pickedOp ? (
-          <div className="text-3xl font-black text-gray-900 text-center mb-3">
+          <div className="text-3xl font-black text-slate-900 text-center mb-3">
             {a} {pickedOp === "add" ? "+" : "-"} {b}
           </div>
         ) : null}
         {allowEquationInput && pickedOp ? (
           <div className="mb-3">
-            <label className="text-sm font-bold text-gray-600 block mb-2">
+            <label className="text-sm font-bold text-slate-600 block mb-2">
               Type the equation (optional)
             </label>
             <input
               value={equationText}
               onChange={(e) => setEquationText(e.target.value)}
               placeholder="e.g., 10 + 7"
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 text-lg font-bold"
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 text-lg font-bold"
             />
           </div>
         ) : null}
         {requireOpChoice && !pickedOp ? (
-          <div className="text-sm text-gray-500 mb-2">
+          <div className="text-sm text-slate-500 mb-2">
             Choose + or −, then answer the question.
           </div>
         ) : null}
@@ -126,10 +126,10 @@ export default function StorySolve({
               key={`${opt}-${i}`}
               onClick={() => chooseAnswer(opt)}
               className={[
-                "w-full text-left px-5 py-4 rounded-2xl border text-2xl font-black transition",
+                "w-full text-left px-5 py-4 rounded-lg border text-2xl font-black transition",
                 picked === opt
                   ? "border-teal-600 bg-teal-50"
-                  : "border-gray-200 hover:bg-gray-50",
+                  : "border-slate-200 hover:bg-slate-50",
               ].join(" ")}
               type="button"
             >

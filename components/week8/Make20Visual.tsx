@@ -8,7 +8,7 @@ function TenFrame({ filled }: { filled: number }) {
           key={i}
           className={[
             "h-6 w-6 rounded-full border",
-            i < filled ? "bg-teal-500 border-teal-600" : "bg-white border-gray-200",
+            i < filled ? "bg-teal-500 border-teal-600" : "bg-white border-slate-200",
           ].join(" ")}
         />
       ))}
@@ -40,26 +40,26 @@ export default function Make20Visual({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-3">
         Make 20 using a visual.
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-        <div className="text-sm font-bold text-gray-600 mb-3">
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <div className="text-sm font-bold text-slate-600 mb-3">
           {a} + {b}
         </div>
         <div className="grid md:grid-cols-3 gap-4 items-center">
-          <div className="rounded-xl border border-gray-200 bg-white p-3">
-            <div className="text-xs font-bold text-gray-600 mb-2">First number</div>
+          <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <div className="text-xs font-bold text-slate-600 mb-2">First number</div>
             <div className="grid gap-3">
               <TenFrame filled={firstFrame} />
               <TenFrame filled={secondFrame} />
             </div>
           </div>
-          <div className="text-4xl font-black text-gray-600 text-center">+</div>
-          <div className="rounded-xl border border-gray-200 bg-white p-3">
-            <div className="text-xs font-bold text-gray-600 mb-2">Second number</div>
+          <div className="text-4xl font-black text-slate-600 text-center">+</div>
+          <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <div className="text-xs font-bold text-slate-600 mb-2">Second number</div>
             <div className="flex flex-wrap gap-2">
               {Array.from({ length: b }).map((_, i) => (
                 <span
@@ -77,7 +77,7 @@ export default function Make20Visual({
           <button
             key={`${opt}-${i}`}
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
             type="button"
           >
             {opt}

@@ -39,15 +39,15 @@ export default function ShareDeal({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-3">
         Tap “Deal” to share {total} counters among {groups} children.
       </div>
 
       <div className="grid md:grid-cols-3 gap-4 mb-4">
         {counts.map((count, i) => (
-          <div key={i} className="rounded-2xl border border-gray-200 bg-gray-50 p-3">
-            <div className="text-xs font-bold text-gray-600 mb-2">Child {i + 1}</div>
+          <div key={i} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="text-xs font-bold text-slate-600 mb-2">Child {i + 1}</div>
             <div className="min-h-[40px]">
               <ClickableDotRow count={count} dotSize={20} gap={6} />
             </div>
@@ -64,7 +64,7 @@ export default function ShareDeal({
       </button>
 
       {dealt ? (
-        <div className="mt-3 text-sm font-bold text-gray-700">
+        <div className="mt-3 text-sm font-bold text-slate-700">
           {counts.every((c) => c === counts[0])
             ? `Fair share! Each child gets ${counts[0]}.`
             : "Not fair — choose the button."}

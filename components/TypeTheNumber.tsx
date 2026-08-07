@@ -116,7 +116,7 @@ export default function TypeTheNumber({
 
   return (
     <div>
-      <div className="mb-4 text-sm text-gray-600">
+      <div className="mb-4 text-sm text-slate-600">
         Type the Number • Round {round}/{rounds}
       </div>
 

@@ -1,10 +1,8 @@
 "use client";
 
 import { RotateCw } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { speak } from "@/lib/speak";
-
-type Pair = { a: number; b: number };
 
 type MatchConfig = {
   min?: number;
@@ -124,7 +122,7 @@ export default function MatchThePair({
     [cards]
   );
 
-  function newRound(nextIndex: number) {
+  const newRound = useCallback((nextIndex: number) => {
     const newVals = buildPairs(min, max, pairsCount);
     setValues(newVals);
     setCards(buildCards(newVals, mode));
@@ -132,7 +130,7 @@ export default function MatchThePair({
     setPickedRight(null);
     setLocked(false);
     setRoundIndex(nextIndex);
-  }
+  }, [max, min, mode, pairsCount]);
 
   useEffect(() => {
     if (matchedCount === pairsCount) {
@@ -150,7 +148,7 @@ export default function MatchThePair({
       }, 550);
       return () => clearTimeout(timeout);
     }
-  }, [matchedCount, pairsCount, roundIndex, rounds, onComplete, correctMatches, attempts]);
+  }, [matchedCount, pairsCount, roundIndex, rounds, onComplete, correctMatches, attempts, newRound]);
 
   function pick(card: Card) {
     if (locked || card.matched) return;
@@ -205,9 +203,9 @@ export default function MatchThePair({
       pickedLeft.pairId === pickedRight.pairId;
 
     return [
-      "w-full rounded-2xl border px-4 py-5 text-left font-extrabold text-lg sm:text-xl",
+      "w-full rounded-lg border px-4 py-5 text-left font-extrabold text-lg sm:text-xl",
       "transition active:scale-[0.98]",
-      c.matched ? "bg-green-50 border-green-300 text-green-900" : "bg-white border-gray-200 hover:bg-gray-50",
+      c.matched ? "bg-green-50 border-green-300 text-green-900" : "bg-white border-slate-200 hover:bg-slate-50",
       picked ? "ring-2 ring-teal-400 border-teal-400" : "",
       mismatch ? "bg-red-50 border-red-300 ring-red-300" : "",
       matchFlash ? "bg-green-50 border-green-300 ring-green-300" : "",
@@ -218,22 +216,22 @@ export default function MatchThePair({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-slate-500">
           Match the Pair • Round {Math.min(roundIndex + 1, rounds)}/{rounds}
         </div>
-        <div className="text-sm font-semibold text-gray-700">
+        <div className="text-sm font-semibold text-slate-700">
           Matched: {matchedCount}/{pairsCount}
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-white p-5 mb-4">
-        <div className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+      <div className="rounded-lg border bg-white p-5 mb-4">
+        <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
           Match the Pair
         </div>
-        <div className="text-sm text-gray-500 mt-1">
+        <div className="text-sm text-slate-500 mt-1">
           Tap one card on the left, then its matching card on the right.
         </div>
-        <div className="mt-3 text-sm text-gray-700">
+        <div className="mt-3 text-sm text-slate-700">
           Attempts: <span className="font-bold">{attempts}</span>
         </div>
       </div>
@@ -259,7 +257,7 @@ export default function MatchThePair({
       <div className="mt-5 flex items-center justify-between">
         <button
           onClick={() => newRound(roundIndex)}
-          className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
+          className="px-4 py-3 rounded-xl bg-slate-100 text-slate-800 font-bold hover:bg-slate-200 transition"
           title="Regenerate this round"
         >
           New set <RotateCw className="inline-block h-4 w-4 align-[-3px]" />
@@ -270,7 +268,7 @@ export default function MatchThePair({
             const next = roundIndex + 1;
             if (next < rounds) newRound(next);
           }}
-          className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
+          className="px-4 py-3 rounded-xl bg-slate-100 text-slate-800 font-bold hover:bg-slate-200 transition"
           title="Skip (testing)"
         >
           Next →

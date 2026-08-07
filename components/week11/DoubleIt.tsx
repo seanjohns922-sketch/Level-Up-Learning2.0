@@ -44,30 +44,30 @@ export default function DoubleIt({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="text-lg font-extrabold text-gray-900">Double It</div>
+        <div className="text-lg font-extrabold text-slate-900">Double It</div>
         <button
           type="button"
           onClick={() => speak(prompt)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
         >
           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
         </button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4 mb-3">
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
-          <div className="text-sm font-bold text-gray-700 mb-2">First group</div>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <div className="text-sm font-bold text-slate-700 mb-2">First group</div>
           <StaticDotGrid count={a} rows={1} cols={a} dotSize={18} gap={6} />
         </div>
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
-          <div className="text-sm font-bold text-gray-700 mb-2">Second group</div>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <div className="text-sm font-bold text-slate-700 mb-2">Second group</div>
           <StaticDotGrid count={a} rows={1} cols={a} dotSize={18} gap={6} />
         </div>
       </div>
 
-      <div className="text-2xl font-extrabold text-gray-900 mb-3 text-center">
+      <div className="text-2xl font-extrabold text-slate-900 mb-3 text-center">
         {prompt}
       </div>
 
@@ -77,7 +77,7 @@ export default function DoubleIt({
             key={opt}
             type="button"
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
           >
             {opt}
           </button>

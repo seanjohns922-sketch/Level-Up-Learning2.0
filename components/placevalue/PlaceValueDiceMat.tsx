@@ -27,20 +27,20 @@ function DiceFace({ value, label }: { value: number; label: string }) {
   const pips = dicePips(value);
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className="text-xs font-bold text-gray-500">{label}</div>
-      <div className="w-14 h-14 rounded-xl border-2 border-gray-300 bg-white grid grid-cols-3 grid-rows-3 p-2">
+      <div className="text-xs font-bold text-slate-500">{label}</div>
+      <div className="w-14 h-14 rounded-xl border-2 border-slate-300 bg-white grid grid-cols-3 grid-rows-3 p-2">
         {Array.from({ length: 9 }).map((_, i) => (
           <div key={i} className="flex items-center justify-center">
             <div
               className={[
                 "h-2.5 w-2.5 rounded-full",
-                pips.includes(i) ? "bg-gray-800" : "bg-transparent",
+                pips.includes(i) ? "bg-slate-800" : "bg-transparent",
               ].join(" ")}
             />
           </div>
         ))}
       </div>
-      {value === 0 && <div className="text-[10px] font-bold text-gray-400">0</div>}
+      {value === 0 && <div className="text-[10px] font-bold text-slate-400">0</div>}
     </div>
   );
 }
@@ -53,6 +53,7 @@ export default function PlaceValueDiceMat({
   const [seed, setSeed] = useState(0);
 
   const roll = useMemo(() => {
+    void seed;
     const tens = randInt(1, 9);
     const ones = randInt(0, 9);
     return { tens, ones, target: tens * 10 + ones };
@@ -77,15 +78,15 @@ export default function PlaceValueDiceMat({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm text-gray-600 mb-2">Dice Place Value</div>
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm text-slate-600 mb-2">Dice Place Value</div>
 
       <div className="flex items-center justify-between gap-4 mb-4">
         <div>
-          <div className="text-2xl font-extrabold text-gray-900">
+          <div className="text-2xl font-extrabold text-slate-900">
             Make: {roll.target}
           </div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-slate-500">
             Rolled dice:
           </div>
           <div className="mt-2 flex items-center gap-4">
@@ -96,7 +97,7 @@ export default function PlaceValueDiceMat({
 
         <button
           onClick={resetRound}
-          className="px-4 py-2 rounded-xl bg-gray-100 font-bold hover:bg-gray-200"
+          className="px-4 py-2 rounded-xl bg-slate-100 font-bold hover:bg-slate-200"
           type="button"
         >
           Re-roll
@@ -104,12 +105,12 @@ export default function PlaceValueDiceMat({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-gray-200 p-4">
+        <div className="rounded-lg border border-slate-200 p-4">
           <div className="font-bold mb-2">Tens</div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setTensPick((v) => Math.max(0, v - 1))}
-              className="w-10 h-10 rounded-xl bg-gray-100 font-extrabold"
+              className="w-10 h-10 rounded-xl bg-slate-100 font-extrabold"
               type="button"
             >
               –
@@ -119,7 +120,7 @@ export default function PlaceValueDiceMat({
             </div>
             <button
               onClick={() => setTensPick((v) => Math.min(9, v + 1))}
-              className="w-10 h-10 rounded-xl bg-gray-100 font-extrabold"
+              className="w-10 h-10 rounded-xl bg-slate-100 font-extrabold"
               type="button"
             >
               +
@@ -127,12 +128,12 @@ export default function PlaceValueDiceMat({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 p-4">
+        <div className="rounded-lg border border-slate-200 p-4">
           <div className="font-bold mb-2">Ones</div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setOnesPick((v) => Math.max(0, v - 1))}
-              className="w-10 h-10 rounded-xl bg-gray-100 font-extrabold"
+              className="w-10 h-10 rounded-xl bg-slate-100 font-extrabold"
               type="button"
             >
               –
@@ -142,7 +143,7 @@ export default function PlaceValueDiceMat({
             </div>
             <button
               onClick={() => setOnesPick((v) => Math.min(9, v + 1))}
-              className="w-10 h-10 rounded-xl bg-gray-100 font-extrabold"
+              className="w-10 h-10 rounded-xl bg-slate-100 font-extrabold"
               type="button"
             >
               +
@@ -166,7 +167,7 @@ export default function PlaceValueDiceMat({
           ) : status === "wrong" ? (
             <span className="text-red-700">Try again.</span>
           ) : (
-            <span className="text-gray-500">Set tens and ones.</span>
+            <span className="text-slate-500">Set tens and ones.</span>
           )}
         </div>
       </div>

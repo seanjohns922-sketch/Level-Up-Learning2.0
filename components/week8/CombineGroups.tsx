@@ -23,13 +23,13 @@ export default function CombineGroups({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-3">
         Combine the two groups. How many altogether?
       </div>
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 grid gap-3">
-        <div className="rounded-xl border border-gray-200 bg-white p-3">
-          <div className="text-xs font-bold text-gray-600 mb-2">Red dots</div>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 grid gap-3">
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <div className="text-xs font-bold text-slate-600 mb-2">Red dots</div>
           <StaticDotRow
             count={a}
             dotSize={20}
@@ -38,8 +38,8 @@ export default function CombineGroups({
             borderClassName="border border-rose-600"
           />
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-3">
-          <div className="text-xs font-bold text-gray-600 mb-2">Blue dots</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <div className="text-xs font-bold text-slate-600 mb-2">Blue dots</div>
           <StaticDotRow
             count={b}
             dotSize={20}
@@ -55,7 +55,7 @@ export default function CombineGroups({
           <button
             key={`${opt}-${i}`}
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
             type="button"
           >
             {opt}

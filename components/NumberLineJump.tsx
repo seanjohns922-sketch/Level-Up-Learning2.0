@@ -32,13 +32,13 @@ export default function NumberLineJump({
 
   return (
     <div className="w-full">
-      <div className="text-sm text-gray-600 mb-3">
+      <div className="text-sm text-slate-600 mb-3">
         Start at {start}. Land exactly on {target}.
       </div>
 
-      <div className="rounded-2xl border bg-white p-4 mb-4">
+      <div className="rounded-lg border bg-white p-4 mb-4">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-500">Current</div>
+          <div className="text-sm text-slate-500">Current</div>
           <div className="text-3xl font-extrabold text-teal-700">{pos}</div>
         </div>
       </div>

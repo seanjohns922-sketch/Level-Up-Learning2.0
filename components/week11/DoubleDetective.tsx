@@ -42,23 +42,23 @@ export default function DoubleDetective({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="text-lg font-extrabold text-gray-900">Double Detective</div>
+        <div className="text-lg font-extrabold text-slate-900">Double Detective</div>
         <button
           type="button"
           onClick={() => speak(prompt)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
         >
           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
         </button>
       </div>
 
-      <div className="text-2xl font-extrabold text-gray-900 mb-3 text-center">
+      <div className="text-2xl font-extrabold text-slate-900 mb-3 text-center">
         {prompt}
       </div>
 
-      <div className="text-sm text-gray-600 mb-3">
+      <div className="text-sm text-slate-600 mb-3">
         Choose the best strategy.
       </div>
 
@@ -68,7 +68,7 @@ export default function DoubleDetective({
             key={opt}
             type="button"
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
           >
             {opt}
           </button>

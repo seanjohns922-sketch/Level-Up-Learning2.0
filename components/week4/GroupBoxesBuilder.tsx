@@ -48,12 +48,12 @@ export default function GroupBoxesBuilder({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm text-gray-600 mb-2">Build by grouping</div>
-      <div className="text-2xl font-extrabold text-gray-900 mb-2">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm text-slate-600 mb-2">Build by grouping</div>
+      <div className="text-2xl font-extrabold text-slate-900 mb-2">
         Make {groups} groups of {perGroup}
       </div>
-      <div className="text-sm text-gray-500 mb-4">
+      <div className="text-sm text-slate-500 mb-4">
         Remaining counters: <span className="font-bold">{remaining}</span>
       </div>
 
@@ -61,7 +61,7 @@ export default function GroupBoxesBuilder({
         {counts.map((count, i) => (
           <div
             key={i}
-            className="rounded-2xl border border-gray-200 bg-gray-50 p-3"
+            className="rounded-lg border border-slate-200 bg-slate-50 p-3"
           >
             <div className="flex items-center justify-between mb-2">
               <div className="font-bold">Group {i + 1}</div>
@@ -78,7 +78,7 @@ export default function GroupBoxesBuilder({
             <div className="flex gap-2">
               <button
                 onClick={() => removeFrom(i)}
-                className="px-3 py-2 rounded-xl bg-white border border-gray-200 font-bold"
+                className="px-3 py-2 rounded-xl bg-white border border-slate-200 font-bold"
                 type="button"
               >
                 −
@@ -109,7 +109,7 @@ export default function GroupBoxesBuilder({
           ) : status === "wrong" ? (
             <span className="text-red-700">Try again.</span>
           ) : (
-            <span className="text-gray-500">Fill every group equally.</span>
+            <span className="text-slate-500">Fill every group equally.</span>
           )}
         </div>
       </div>

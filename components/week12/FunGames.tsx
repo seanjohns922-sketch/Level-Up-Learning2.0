@@ -146,7 +146,10 @@ export default function FunGames({
 
   // Boss Level
   const [bossIdx, setBossIdx] = useState(0);
-  const bossQ = useMemo(() => makeBossQuestion(), [bossIdx]);
+  const bossQ = useMemo(() => {
+    void bossIdx;
+    return makeBossQuestion();
+  }, [bossIdx]);
 
   function chooseBoss(opt: number) {
     if (opt === bossQ.answer) {
@@ -158,23 +161,23 @@ export default function FunGames({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       {stage === "tournament" && (
         <>
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>
-              <div className="text-lg font-extrabold text-gray-900">Fluency Tournament</div>
-              <div className="text-sm text-gray-600">Question {tCount + 1} of {totalTournament}</div>
+              <div className="text-lg font-extrabold text-slate-900">Fluency Tournament</div>
+              <div className="text-sm text-slate-600">Question {tCount + 1} of {totalTournament}</div>
             </div>
             <button
               type="button"
               onClick={() => speak(`${tEq.a} ${tEq.op} ${tEq.b} = ?`)}
-              className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+              className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
             >
               <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
             </button>
           </div>
-          <div className="text-2xl font-extrabold text-gray-900 mb-3 text-center">
+          <div className="text-2xl font-extrabold text-slate-900 mb-3 text-center">
             {tEq.a} {tEq.op} {tEq.b} = ?
           </div>
           <div className="grid gap-2">
@@ -183,13 +186,13 @@ export default function FunGames({
                 key={opt}
                 type="button"
                 onClick={() => chooseTournament(opt)}
-                className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+                className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
               >
                 {opt}
               </button>
             ))}
           </div>
-          <div className="mt-3 text-xs text-gray-500">Points: {tScore}</div>
+          <div className="mt-3 text-xs text-slate-500">Points: {tScore}</div>
         </>
       )}
 
@@ -197,18 +200,18 @@ export default function FunGames({
         <>
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>
-              <div className="text-lg font-extrabold text-gray-900">Grid Challenge</div>
-              <div className="text-sm text-gray-600">Clear 5 tiles</div>
+              <div className="text-lg font-extrabold text-slate-900">Grid Challenge</div>
+              <div className="text-sm text-slate-600">Clear 5 tiles</div>
             </div>
             <button
               type="button"
               onClick={() => speak(`${gEq.a} ${gEq.op} ${gEq.b} = ?`)}
-              className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+              className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
             >
               <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
             </button>
           </div>
-          <div className="text-2xl font-extrabold text-gray-900 mb-3 text-center">
+          <div className="text-2xl font-extrabold text-slate-900 mb-3 text-center">
             {gEq.a} {gEq.op} {gEq.b} = ?
           </div>
           <div
@@ -224,7 +227,7 @@ export default function FunGames({
                   "px-2 py-3 rounded-xl border font-bold",
                   cleared.has(i)
                     ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                    : "border-gray-200 hover:bg-gray-50",
+                    : "border-slate-200 hover:bg-slate-50",
                 ].join(" ")}
                 disabled={cleared.has(i)}
               >
@@ -232,7 +235,7 @@ export default function FunGames({
               </button>
             ))}
           </div>
-          <div className="mt-3 text-xs text-gray-500">Cleared: {cleared.size} / 5</div>
+          <div className="mt-3 text-xs text-slate-500">Cleared: {cleared.size} / 5</div>
         </>
       )}
 
@@ -240,25 +243,25 @@ export default function FunGames({
         <>
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>
-              <div className="text-lg font-extrabold text-gray-900">Boss Level</div>
-              <div className="text-sm text-gray-600">Question {bossIdx + 1} of 3</div>
+              <div className="text-lg font-extrabold text-slate-900">Boss Level</div>
+              <div className="text-sm text-slate-600">Question {bossIdx + 1} of 3</div>
             </div>
             <button
               type="button"
               onClick={() => speak(bossQ.prompt)}
-              className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+              className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
             >
               <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
             </button>
           </div>
-          <div className="text-lg font-extrabold text-gray-900 mb-3">{bossQ.prompt}</div>
+          <div className="text-lg font-extrabold text-slate-900 mb-3">{bossQ.prompt}</div>
           <div className="grid gap-2">
             {bossQ.options.map((opt) => (
               <button
                 key={opt}
                 type="button"
                 onClick={() => chooseBoss(opt)}
-                className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+                className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
               >
                 {opt}
               </button>

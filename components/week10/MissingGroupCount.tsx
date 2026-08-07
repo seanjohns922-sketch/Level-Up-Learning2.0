@@ -23,12 +23,12 @@ export default function MissingGroupCount({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-2">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-2">
         ___ groups of {perGroup} = {total}
       </div>
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 mb-3">
-        <div className="text-xs font-bold text-gray-600 mb-2">One group</div>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 mb-3">
+        <div className="text-xs font-bold text-slate-600 mb-2">One group</div>
         <StaticDotRow count={perGroup} dotSize={18} gap={6} />
       </div>
       <div className="grid gap-2">
@@ -37,7 +37,7 @@ export default function MissingGroupCount({
             key={`${opt}-${i}`}
             type="button"
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
           >
             {opt}
           </button>

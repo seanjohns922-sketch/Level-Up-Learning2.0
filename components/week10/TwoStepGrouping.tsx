@@ -31,15 +31,15 @@ export default function TwoStepGrouping({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-3">
         {groups} {containerLabel}. {perGroup} {itemLabel} in each. {broken} {itemLabel} break. How many left?
       </div>
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 mb-3">
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 mb-3">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: groups }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-gray-200 bg-white p-3">
-              <div className="text-xs font-bold text-gray-600 mb-2">
+            <div key={i} className="rounded-xl border border-slate-200 bg-white p-3">
+              <div className="text-xs font-bold text-slate-600 mb-2">
                 {containerLabel.slice(0, 1).toUpperCase() + containerLabel.slice(1)} {i + 1}
               </div>
               <StaticDotRow count={perGroup} dotSize={18} gap={6} />
@@ -56,7 +56,7 @@ export default function TwoStepGrouping({
           activeClassName="bg-rose-500"
           borderClassName="border border-rose-400"
         />
-        <div className="mt-2 text-xs text-gray-500">
+        <div className="mt-2 text-xs text-slate-500">
           Total: {total}
         </div>
       </div>
@@ -66,7 +66,7 @@ export default function TwoStepGrouping({
             key={`${opt}-${i}`}
             type="button"
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
           >
             {opt}
           </button>

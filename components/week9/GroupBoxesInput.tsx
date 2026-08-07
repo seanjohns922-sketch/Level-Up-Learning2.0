@@ -26,14 +26,14 @@ export default function GroupBoxesInput({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-3">
         {total} shared into {groups} groups (diagram).
       </div>
       <div className="grid md:grid-cols-3 gap-4">
         {Array.from({ length: groups }).map((_, i) => (
-          <div key={i} className="rounded-2xl border border-gray-200 bg-gray-50 p-3">
-            <div className="text-xs font-bold text-gray-600 mb-2">Group {i + 1}</div>
+          <div key={i} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="text-xs font-bold text-slate-600 mb-2">Group {i + 1}</div>
             <ClickableDotRow count={answer} dotSize={16} gap={6} />
           </div>
         ))}
@@ -58,7 +58,7 @@ export default function GroupBoxesInput({
           onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))}
           inputMode="numeric"
           placeholder="How many in each?"
-          className="w-full max-w-xs px-4 py-3 rounded-xl border border-gray-300 text-lg font-bold"
+          className="w-full max-w-xs px-4 py-3 rounded-xl border border-slate-300 text-lg font-bold"
         />
         <button
           onClick={check}

@@ -35,7 +35,10 @@ export default function EqualGroupsMaker({
   onCorrect?: () => void;
 }) {
   const [seed, setSeed] = useState(0);
-  const prompt = useMemo(() => makePrompt(), [seed]);
+  const prompt = useMemo(() => {
+    void seed;
+    return makePrompt();
+  }, [seed]);
 
   const [assign, setAssign] = useState<number[]>(
     () => Array(prompt.total).fill(-1)
@@ -73,20 +76,20 @@ export default function EqualGroupsMaker({
   }
 
   return (
-    <div className="rounded-3xl border border-gray-200 bg-white p-6">
+    <div className="rounded-lg border border-slate-200 bg-white p-6">
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
-          <div className="text-2xl font-extrabold text-gray-900">
+          <div className="text-2xl font-extrabold text-slate-900">
             You have {prompt.total} counters
           </div>
-          <div className="text-sm text-gray-600 mt-1 font-semibold">
+          <div className="text-sm text-slate-600 mt-1 font-semibold">
             Divide them evenly into {prompt.groups} colors.
           </div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-xs text-slate-500 mt-1">
             Tap a color, then tap counters to color them.
           </div>
         </div>
-        <div className="text-xs font-bold text-gray-500">
+        <div className="text-xs font-bold text-slate-500">
           Total: {prompt.total}
         </div>
       </div>
@@ -100,10 +103,10 @@ export default function EqualGroupsMaker({
               key={i}
               onClick={() => setActiveGroup(i)}
               className={[
-                "rounded-2xl border px-3 py-3 text-left transition",
+                "rounded-lg border px-3 py-3 text-left transition",
                 activeGroup === i
-                  ? "bg-gray-900 text-white border-gray-900 shadow-sm"
-                  : "bg-white text-gray-800 border-gray-200 hover:bg-gray-50",
+                  ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                  : "bg-white text-slate-800 border-slate-200 hover:bg-slate-50",
               ].join(" ")}
               type="button"
             >
@@ -119,7 +122,7 @@ export default function EqualGroupsMaker({
         })}
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-3">
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
         <div className="grid grid-cols-6 gap-2">
           {assign.map((g, i) => {
             const c = g === -1 ? null : COLORS[g];
@@ -128,10 +131,10 @@ export default function EqualGroupsMaker({
                 key={i}
                 onClick={() => toggleCounter(i)}
                 className={[
-                  "h-11 rounded-2xl border font-extrabold transition flex items-center justify-center",
+                  "h-11 rounded-lg border font-extrabold transition flex items-center justify-center",
                   g === -1
-                    ? "bg-white border-gray-200 hover:bg-gray-100"
-                    : `${c?.soft ?? "bg-gray-100"} ${c?.border ?? "border-gray-300"}`,
+                    ? "bg-white border-slate-200 hover:bg-slate-100"
+                    : `${c?.soft ?? "bg-slate-100"} ${c?.border ?? "border-slate-300"}`,
                 ].join(" ")}
                 title={g === -1 ? "Unassigned" : c?.name ?? `Color ${g + 1}`}
                 type="button"
@@ -139,7 +142,7 @@ export default function EqualGroupsMaker({
                 <span
                   className={[
                     "h-3.5 w-3.5 rounded-full",
-                    c?.bg ?? "bg-gray-300",
+                    c?.bg ?? "bg-slate-300",
                   ].join(" ")}
                 />
               </button>
@@ -151,14 +154,14 @@ export default function EqualGroupsMaker({
       <div className="mt-5 flex items-center gap-3">
         <button
           onClick={check}
-          className="px-5 py-3 rounded-2xl bg-teal-600 text-white font-extrabold hover:bg-teal-700"
+          className="px-5 py-3 rounded-lg bg-teal-600 text-white font-extrabold hover:bg-teal-700"
           type="button"
         >
           Check
         </button>
         <button
           onClick={reset}
-          className="px-5 py-3 rounded-2xl bg-gray-100 font-extrabold hover:bg-gray-200"
+          className="px-5 py-3 rounded-lg bg-slate-100 font-extrabold hover:bg-slate-200"
           type="button"
         >
           New
@@ -170,7 +173,7 @@ export default function EqualGroupsMaker({
           ) : status === "wrong" ? (
             <span className="text-red-700">Not quite — try again.</span>
           ) : (
-            <span className="text-gray-500">Make them equal.</span>
+            <span className="text-slate-500">Make them equal.</span>
           )}
         </div>
       </div>

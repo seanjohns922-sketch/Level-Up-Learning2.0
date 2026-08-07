@@ -31,28 +31,28 @@ export default function MoneyAddPrices({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="text-lg font-extrabold text-gray-900">{prompt}</div>
+        <div className="text-lg font-extrabold text-slate-900">{prompt}</div>
         <button
           type="button"
           onClick={() => speak(prompt)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
         >
           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
         </button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
-          <div className="text-xs font-bold text-gray-600 mb-2">{itemA}</div>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <div className="text-xs font-bold text-slate-600 mb-2">{itemA}</div>
           <div className="flex items-center gap-3">
             {renderCoins(priceA)}
             <span className="text-lg font-black">${priceA}</span>
           </div>
         </div>
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
-          <div className="text-xs font-bold text-gray-600 mb-2">{itemB}</div>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <div className="text-xs font-bold text-slate-600 mb-2">{itemB}</div>
           <div className="flex items-center gap-3">
             {renderCoins(priceB)}
             <span className="text-lg font-black">${priceB}</span>
@@ -65,7 +65,7 @@ export default function MoneyAddPrices({
           <button
             key={`${opt}-${i}`}
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
             type="button"
           >
             ${opt}

@@ -94,25 +94,25 @@ export default function FillTheJar({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-slate-500">
           Fill the Jar • Round {round}/{rounds}
         </div>
-        <div className="text-sm font-semibold text-gray-700">
+        <div className="text-sm font-semibold text-slate-700">
           Success: {successes}/{rounds}
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-white p-5 mb-4">
-        <div className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+      <div className="rounded-lg border bg-white p-5 mb-4">
+        <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
           Fill the jar to <span className="text-teal-600">{target}</span>
         </div>
-        <div className="text-sm text-gray-500 mt-1">
+        <div className="text-sm text-slate-500 mt-1">
           Tap buttons to add counters. Don’t go over!
         </div>
 
         <div className="mt-3 flex items-center gap-3">
-          <div className="text-sm font-bold text-gray-700">
-            Current: <span className="text-gray-900">{current}</span>
+          <div className="text-sm font-bold text-slate-700">
+            Current: <span className="text-slate-900">{current}</span>
           </div>
 
           {status === "correct" ? (
@@ -124,14 +124,14 @@ export default function FillTheJar({
               <X className="h-4 w-4" /> Too high — reset!
             </div>
           ) : (
-            <div className="text-sm text-gray-400"> </div>
+            <div className="text-sm text-slate-400"> </div>
           )}
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-white p-5 mb-4">
+      <div className="rounded-lg border bg-white p-5 mb-4">
         <div className="mx-auto max-w-[520px]">
-          <div className="rounded-2xl border-2 border-gray-200 bg-gray-50 p-4">
+          <div className="rounded-lg border-2 border-slate-200 bg-slate-50 p-4">
             <div
               style={{
                 display: "grid",
@@ -149,7 +149,7 @@ export default function FillTheJar({
             </div>
 
             {current === 0 && (
-              <div className="text-sm text-gray-500 font-semibold text-center py-6">
+              <div className="text-sm text-slate-500 font-semibold text-center py-6">
                 Jar is empty — start filling!
               </div>
             )}
@@ -162,7 +162,7 @@ export default function FillTheJar({
           <button
             key={inc}
             onClick={() => add(inc)}
-            className="rounded-2xl bg-teal-600 text-white px-4 py-4 text-xl font-extrabold hover:bg-teal-700 transition active:scale-[0.98]"
+            className="rounded-lg bg-teal-600 text-white px-4 py-4 text-xl font-extrabold hover:bg-teal-700 transition active:scale-[0.98]"
           >
             +{inc}
           </button>
@@ -175,14 +175,14 @@ export default function FillTheJar({
             setCurrent(0);
             setStatus("idle");
           }}
-          className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
+          className="px-4 py-3 rounded-xl bg-slate-100 text-slate-800 font-bold hover:bg-slate-200 transition"
         >
           Reset
         </button>
 
         <button
           onClick={() => newRound(round)}
-          className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
+          className="px-4 py-3 rounded-xl bg-slate-100 text-slate-800 font-bold hover:bg-slate-200 transition"
           title="New target (testing)"
         >
           <span className="inline-flex items-center gap-1.5">New target <RotateCw className="h-4 w-4" /></span>
@@ -190,7 +190,7 @@ export default function FillTheJar({
 
         <button
           onClick={() => newRound(Math.min(round + 1, rounds))}
-          className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
+          className="px-4 py-3 rounded-xl bg-slate-100 text-slate-800 font-bold hover:bg-slate-200 transition"
           title="Skip (testing)"
         >
           Skip →

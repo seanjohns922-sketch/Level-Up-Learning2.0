@@ -77,11 +77,6 @@ export default function TargetedRevision({
     }
   }
 
-  function chooseBooster(_opt: number) {
-    // booster rendering is handled by renderBooster() which uses advanceBooster directly
-    advanceBooster();
-  }
-
   function chooseFix(choice: "correct" | "incorrect") {
     if ((choice === "correct") === fixIsCorrect) {
       if (fixIsCorrect) setStep("missing");
@@ -302,10 +297,10 @@ export default function TargetedRevision({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       {step === "select" && (
         <>
-          <div className="text-lg font-extrabold text-gray-900 mb-2">
+          <div className="text-lg font-extrabold text-slate-900 mb-2">
             Choose your Practise Area
           </div>
           <div className="grid md:grid-cols-2 gap-3">
@@ -317,7 +312,7 @@ export default function TargetedRevision({
                   setArea(a);
                   setStep("booster");
                 }}
-                className="px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+                className="px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
               >
                 {a}
               </button>
@@ -329,18 +324,18 @@ export default function TargetedRevision({
       {step === "booster" && area && (
         <>
           <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="text-lg font-extrabold text-gray-900">
+            <div className="text-lg font-extrabold text-slate-900">
               Weak Spot Booster • {area}
             </div>
             <button
               type="button"
               onClick={() => speak(`Practise ${area}`)}
-              className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+              className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
             >
               <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
             </button>
           </div>
-          <div className="text-sm text-gray-600 mb-2">
+          <div className="text-sm text-slate-600 mb-2">
             Question {boosterIdx + 1} of {boosterCount}
           </div>
           {renderBooster()}
@@ -350,16 +345,16 @@ export default function TargetedRevision({
       {step === "fix" && (
         <>
           <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="text-lg font-extrabold text-gray-900">Fix the Mistake</div>
+            <div className="text-lg font-extrabold text-slate-900">Fix the Mistake</div>
             <button
               type="button"
               onClick={() => speak(`Is this correct? ${fixPrompt}`)}
-              className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+              className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
             >
               <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
             </button>
           </div>
-          <div className="text-2xl font-extrabold text-gray-900 mb-3 text-center">
+          <div className="text-2xl font-extrabold text-slate-900 mb-3 text-center">
             {fixPrompt}
           </div>
 
@@ -368,28 +363,28 @@ export default function TargetedRevision({
               <button
                 type="button"
                 onClick={() => chooseFix("correct")}
-                className="px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+                className="px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
               >
                 Correct
               </button>
               <button
                 type="button"
                 onClick={() => chooseFix("incorrect")}
-                className="px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+                className="px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
               >
                 Not correct
               </button>
             </div>
           ) : (
             <>
-              <div className="text-sm text-gray-600 mb-2">Solve it:</div>
+              <div className="text-sm text-slate-600 mb-2">Solve it:</div>
               <div className="grid gap-2">
                 {fixOptions.map((opt) => (
                   <button
                     key={opt}
                     type="button"
                     onClick={() => chooseFixSolve(opt)}
-                    className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+                    className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
                   >
                     {opt}
                   </button>
@@ -403,30 +398,30 @@ export default function TargetedRevision({
       {step === "missing" && (
         <>
           <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="text-lg font-extrabold text-gray-900">Missing Step</div>
+            <div className="text-lg font-extrabold text-slate-900">Missing Step</div>
             <button
               type="button"
               onClick={() => speak(`For ${missPrompt}, jump back to 10. What was the first jump?`)}
-              className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+              className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
             >
               <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
             </button>
           </div>
-          <div className="text-sm text-gray-600 mb-2">Problem:</div>
-          <div className="text-2xl font-extrabold text-gray-900 mb-2 text-center">
+          <div className="text-sm text-slate-600 mb-2">Problem:</div>
+          <div className="text-2xl font-extrabold text-slate-900 mb-2 text-center">
             {missPrompt}
           </div>
-          <div className="text-sm text-gray-600 mb-3 text-center">
+          <div className="text-sm text-slate-600 mb-3 text-center">
             Jump back to 10 (−5), then −2
           </div>
-          <div className="text-sm font-bold text-gray-700 mb-2">What was the first jump?</div>
+          <div className="text-sm font-bold text-slate-700 mb-2">What was the first jump?</div>
           <div className="grid gap-2">
             {missOptions.map((opt) => (
               <button
                 key={opt}
                 type="button"
                 onClick={() => chooseMissing(opt)}
-                className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+                className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
               >
                 {opt}
               </button>

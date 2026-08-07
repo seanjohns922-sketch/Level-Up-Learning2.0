@@ -32,23 +32,23 @@ export default function PackBoxes({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-2">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-2">
         {total} apples. Pack into boxes of {perBox}.
       </div>
-      <div className="text-xs text-gray-500 mb-3">Remaining: {remaining}</div>
+      <div className="text-xs text-slate-500 mb-3">Remaining: {remaining}</div>
 
       <div className="grid md:grid-cols-3 gap-4">
         {counts.map((count, i) => (
-          <div key={i} className="rounded-2xl border border-gray-200 bg-gray-50 p-3">
-            <div className="text-xs font-bold text-gray-600 mb-2">Box {i + 1}</div>
+          <div key={i} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="text-xs font-bold text-slate-600 mb-2">Box {i + 1}</div>
             <div className="min-h-[30px]">
               <ClickableDotRow count={count} dotSize={18} gap={6} />
             </div>
             <button
               type="button"
               onClick={() => add(i)}
-              className="mt-2 px-3 py-2 rounded-lg bg-gray-100 font-bold"
+              className="mt-2 px-3 py-2 rounded-lg bg-slate-100 font-bold"
             >
               Add apple
             </button>

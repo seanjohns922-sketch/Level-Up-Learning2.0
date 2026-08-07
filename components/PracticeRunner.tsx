@@ -365,7 +365,7 @@ type GroundFeedbackTask = Extract<
 
 function Dots({ count }: { count: number }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-card p-4">
+    <div className="rounded-lg border border-gray-200 bg-card p-4">
       <div className="flex flex-wrap gap-2 justify-center">
         {Array.from({ length: count }).map((_, i) => (
           <span
@@ -433,6 +433,7 @@ export function PracticeRunner({
 }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
+  const isNumberNexus = !isMeasurement && !isStarpath;
   const isStructuredRealm = isMeasurement || realmId === "space";
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
@@ -1175,7 +1176,7 @@ export function PracticeRunner({
       return (
         <main className="min-h-screen bg-slate-950 px-4 py-8">
           <div className="mx-auto flex min-h-[70vh] max-w-2xl items-center justify-center">
-            <div className="w-full rounded-3xl border border-white/10 bg-white p-6 text-center shadow-xl">
+            <div className="w-full rounded-lg border border-white/10 bg-white p-6 text-center shadow-xl">
               <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
                 Lesson Complete
               </div>
@@ -1187,14 +1188,14 @@ export function PracticeRunner({
                 <button
                   type="button"
                   onClick={() => setShowLessonMistakeReview(true)}
-                  className="rounded-2xl bg-trust-blue px-5 py-3 font-black text-white transition hover:opacity-90"
+                  className="rounded-lg bg-trust-blue px-5 py-3 font-black text-white transition hover:opacity-90"
                 >
                   Review My Mistakes
                 </button>
                 <button
                   type="button"
                   onClick={() => setLessonMistakeReviewDone(true)}
-                  className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3 font-black text-slate-700 transition hover:bg-slate-100"
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-5 py-3 font-black text-slate-700 transition hover:bg-slate-100"
                 >
                   Finish Lesson
                 </button>
@@ -1260,7 +1261,7 @@ export function PracticeRunner({
       return <TaskTransitionComponent transition={pendingTaskTransition.transition} onBegin={beginPendingTask} />;
     }
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-lg">
+      <div className="rounded-lg border border-slate-200 bg-white p-6 text-center shadow-lg">
         <div className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
           {pendingTaskTransition.transition.eyebrow}
         </div>
@@ -1323,12 +1324,15 @@ export function PracticeRunner({
           boxShadow: "0 18px 45px rgba(76,29,149,0.10)",
         }
       : {
-          background: "linear-gradient(180deg, #fbfffe 0%, #effcf9 100%)",
-          boxShadow: "0 18px 45px rgba(4,78,70,0.10)",
+          background: "#f8fbfc",
+          boxShadow: "0 8px 24px rgba(15, 118, 110, 0.08)",
         };
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      data-number-nexus-level={isNumberNexus && levelNumber === 1 ? "1" : undefined}
+    >
       {showLessonResume && (
         <LessonResumeGate
           lessonTitle={lessonTitle ?? liveContext?.lessonTitle}
@@ -1408,7 +1412,7 @@ export function PracticeRunner({
           )}
 
           {awaitingWrongNext && currentWrongFeedback ? (
-            <div className="rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-800 shadow-sm">
+            <div className="rounded-lg border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-800 shadow-sm">
               <div className="flex items-center justify-between gap-3">
                 <div>Not quite.</div>
                 <ReadAloudBtn
@@ -1431,13 +1435,13 @@ export function PracticeRunner({
           ) : null}
 
           {transitionError ? (
-            <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 px-4 py-4 text-center text-amber-950 shadow-sm">
+            <div className="rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-4 text-center text-amber-950 shadow-sm">
               <p className="font-black">{transitionError}</p>
               <button
                 type="button"
                 onClick={nextTask}
                 disabled={isAdvancingTask}
-                className="mt-3 rounded-2xl bg-[#8a6422] px-5 py-3 text-base font-black text-white transition hover:bg-[#a2732e] disabled:cursor-wait disabled:opacity-60"
+                className="mt-3 rounded-lg bg-[#8a6422] px-5 py-3 text-base font-black text-white transition hover:bg-[#a2732e] disabled:cursor-wait disabled:opacity-60"
               >
                 {isAdvancingTask ? "Loading..." : "Try Again"}
               </button>
@@ -1446,7 +1450,7 @@ export function PracticeRunner({
 
           {/* Main task card */}
           <div
-            className={`rounded-[1.75rem] border-2 p-4 shadow-lg transition-all duration-300 sm:p-6 ${statusBorder} ${statusMotion}`}
+            className={`rounded-lg border p-4 shadow-sm transition-all duration-300 sm:p-6 ${statusBorder} ${statusMotion}`}
             style={taskSurfaceStyle}
           >
         {/* Activity type label */}
@@ -1484,7 +1488,7 @@ export function PracticeRunner({
                 key={`${opt}-${idx}`}
                 onClick={() => opt === (task as McqTask).answer ? markCorrect() : markWrong(opt)}
                 className={[
-                  "w-full text-left px-5 py-4 rounded-2xl border transition text-xl font-bold",
+                  "w-full text-left px-5 py-4 rounded-lg border transition text-xl font-bold",
                   awaitingWrongNext && opt === currentWrongFeedback?.studentAnswer
                     ? "border-red-400 bg-red-50 text-red-800"
                     : awaitingWrongNext && opt === (task as McqTask).answer
@@ -1502,7 +1506,7 @@ export function PracticeRunner({
           const t = task as GroupCountVisualTask;
           return (
             <div className="grid gap-4">
-              <div className="rounded-2xl border border-border bg-card p-4">
+              <div className="rounded-lg border border-border bg-card p-4">
                 <div className="grid gap-3">
                   {Array.from({ length: t.groups }).map((_: unknown, gi: number) => (
                     <div key={gi} className="flex items-center gap-2">
@@ -1516,7 +1520,7 @@ export function PracticeRunner({
               <div className="grid gap-3">
                 {t.options.map((opt: string, idx: number) => (
                   <button key={`${opt}-${idx}`} onClick={() => opt === t.answer ? markCorrect() : markWrong(opt)} className={[
-                    "w-full text-left px-5 py-4 rounded-2xl border transition text-xl font-bold",
+                    "w-full text-left px-5 py-4 rounded-lg border transition text-xl font-bold",
                     awaitingWrongNext && opt === currentWrongFeedback?.studentAnswer
                       ? "border-red-400 bg-red-50 text-red-800"
                       : awaitingWrongNext && opt === t.answer
@@ -1537,8 +1541,8 @@ export function PracticeRunner({
           <div className="grid gap-4">
             <Dots count={(task as CountTask).count} />
             <div className="flex items-center gap-3">
-              <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-2xl border border-border text-xl font-bold bg-card" />
-              <button onClick={check} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
+              <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-lg border border-border text-xl font-bold bg-card" />
+              <button onClick={check} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
             </div>
           </div>
         )}
@@ -1551,17 +1555,17 @@ export function PracticeRunner({
                 {t.numbers.map((n: number) => {
                   const used = order.includes(n);
                   return (
-                    <button key={n} onClick={() => !used && setOrder((prev) => [...prev, n])} className={["px-6 py-4 rounded-2xl border text-xl font-extrabold transition", used ? "border-border bg-muted text-muted-foreground" : "border-border bg-card hover:bg-muted"].join(" ")}>{n}</button>
+                    <button key={n} onClick={() => !used && setOrder((prev) => [...prev, n])} className={["px-6 py-4 rounded-lg border text-xl font-extrabold transition", used ? "border-border bg-muted text-muted-foreground" : "border-border bg-card hover:bg-muted"].join(" ")}>{n}</button>
                   );
                 })}
               </div>
-              <div className="rounded-2xl border border-border bg-muted p-4">
+              <div className="rounded-lg border border-border bg-muted p-4">
                 <div className="text-sm font-bold text-muted-foreground mb-2">Your order</div>
                 <div className="text-2xl font-extrabold text-foreground">{order.length ? order.join(" , ") : "—"}</div>
               </div>
               <div className="flex items-center gap-3">
-                <button onClick={() => setOrder([])} className="px-5 py-3 rounded-2xl bg-muted text-foreground font-extrabold text-xl hover:bg-muted/80 transition">Reset</button>
-                <button onClick={check} className={`flex-1 px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
+                <button onClick={() => setOrder([])} className="px-5 py-3 rounded-lg bg-muted text-foreground font-extrabold text-xl hover:bg-muted/80 transition">Reset</button>
+                <button onClick={check} className={`flex-1 px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
               </div>
             </div>
           );
@@ -1572,12 +1576,12 @@ export function PracticeRunner({
           return (
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
-                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-2xl text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span></button>
+                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span></button>
                 <div className="text-sm font-bold text-muted-foreground">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {t.cards.map((n: number) => (
-                  <button key={n} type="button" onClick={() => { if (!hasPlayed) return; if (n === t.targetNumber) { markCorrect(); } else { markWrong(n); } }} className="px-4 py-6 rounded-2xl border border-border bg-card hover:bg-muted transition text-3xl font-extrabold">{n}</button>
+                  <button key={n} type="button" onClick={() => { if (!hasPlayed) return; if (n === t.targetNumber) { markCorrect(); } else { markWrong(n); } }} className="px-4 py-6 rounded-lg border border-border bg-card hover:bg-muted transition text-3xl font-extrabold">{n}</button>
                 ))}
               </div>
               {!hasPlayed && <div className="text-sm text-muted-foreground">Tip: On iPads, audio will only play after a button tap (that&apos;s normal).</div>}
@@ -1595,7 +1599,7 @@ export function PracticeRunner({
               </div>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
                 {t.tiles.map((n: number) => (
-                  <button key={n} type="button" onClick={() => n === t.targetNumber ? markCorrect() : markWrong(n)} className="rounded-2xl border border-border bg-card hover:bg-muted transition text-lg sm:text-xl font-extrabold py-4 sm:py-5">{n}</button>
+                  <button key={n} type="button" onClick={() => n === t.targetNumber ? markCorrect() : markWrong(n)} className="rounded-lg border border-border bg-card hover:bg-muted transition text-lg sm:text-xl font-extrabold py-4 sm:py-5">{n}</button>
                 ))}
               </div>
             </div>
@@ -1611,7 +1615,7 @@ export function PracticeRunner({
             <button
               type="button"
               onClick={continueAfterWrong}
-              className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition hover:brightness-105 ${
+              className={`rounded-lg px-5 py-3 text-lg font-black text-white transition hover:brightness-105 ${
                 isMeasurement ? "bg-[#8a6422]" : realmId === "space" ? "bg-violet-700" : "bg-teal-700"
               }`}
             >
@@ -1625,7 +1629,7 @@ export function PracticeRunner({
               type="button"
               onClick={continueAfterCorrect}
               disabled={isAdvancingTask}
-              className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition disabled:cursor-wait disabled:opacity-60 ${
+              className={`rounded-lg px-5 py-3 text-lg font-black text-white transition disabled:cursor-wait disabled:opacity-60 ${
                 isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-violet-700 hover:bg-violet-600"
               }`}
             >

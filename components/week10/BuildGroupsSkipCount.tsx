@@ -37,12 +37,12 @@ export default function BuildGroupsSkipCount({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-2">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-2">
         Make groups of {perGroup} using {total} counters.
       </div>
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 mb-3">
-        <div className="text-xs font-bold text-gray-600 mb-2">Counters left</div>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 mb-3">
+        <div className="text-xs font-bold text-slate-600 mb-2">Counters left</div>
         <StaticDotRow count={remaining} dotSize={18} gap={6} />
       </div>
 
@@ -54,31 +54,31 @@ export default function BuildGroupsSkipCount({
         >
           Make a group of {perGroup}
         </button>
-        <div className="text-sm font-bold text-gray-700">
+        <div className="text-sm font-bold text-slate-700">
           Groups made: {groupsMade}/{groups}
         </div>
       </div>
 
       {groupsMade > 0 ? (
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 mb-3">
-          <div className="text-xs font-bold text-gray-600 mb-2">Groups</div>
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 mb-3">
+          <div className="text-xs font-bold text-slate-600 mb-2">Groups</div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: groupsMade }).map((_, i) => (
-              <div key={i} className="rounded-xl border border-gray-200 bg-white p-3">
-                <div className="text-xs font-semibold text-gray-500 mb-2">
+              <div key={i} className="rounded-xl border border-slate-200 bg-white p-3">
+                <div className="text-xs font-semibold text-slate-500 mb-2">
                   Group {i + 1}
                 </div>
                 <StaticDotRow count={perGroup} dotSize={18} gap={6} />
               </div>
             ))}
           </div>
-          <div className="mt-3 text-sm font-bold text-gray-700">
+          <div className="mt-3 text-sm font-bold text-slate-700">
             Skip count: {sequence.join(" → ")}
           </div>
         </div>
       ) : null}
 
-      <div className="text-sm font-bold text-gray-700 mb-2">
+      <div className="text-sm font-bold text-slate-700 mb-2">
         How many altogether?
       </div>
       <div className="grid gap-2">
@@ -91,8 +91,8 @@ export default function BuildGroupsSkipCount({
             className={[
               "w-full text-left px-4 py-3 rounded-xl border font-bold",
               groupsMade !== groups
-                ? "border-gray-200 text-gray-400"
-                : "border-gray-200 hover:bg-gray-50",
+                ? "border-slate-200 text-slate-400"
+                : "border-slate-200 hover:bg-slate-50",
             ].join(" ")}
           >
             {opt}

@@ -70,18 +70,23 @@ function genEqualGroupsMcq(d: Difficulty): PracticeTask {
   const total = groups * perGroup;
   const correct = Array.from({ length: groups }, () => perGroup);
 
-  const options: { groups: number[] }[] = [{ groups: correct }];
-  while (options.length < 4) {
-    const arr = Array.from({ length: groups }, () => perGroup);
-    const i = randInt(0, groups - 1);
-    const j = randInt(0, groups - 1);
-    if (i === j) continue;
-    arr[i] = Math.max(1, arr[i] + 1);
-    arr[j] = Math.max(1, arr[j] - 1);
-    const sum = arr.reduce((a, b) => a + b, 0);
-    if (sum !== total) continue;
-    const dup = options.some((o) => JSON.stringify(o.groups) === JSON.stringify(arr));
-    if (!dup) options.push({ groups: arr });
+  const unequal = new Map<string, number[]>();
+  for (let from = 0; from < groups; from += 1) {
+    for (let to = 0; to < groups; to += 1) {
+      if (from === to) continue;
+      for (let moved = 1; moved <= perGroup; moved += 1) {
+        const arrangement = [...correct];
+        arrangement[from] -= moved;
+        arrangement[to] += moved;
+        if (arrangement.some((count) => count < 0)) continue;
+        unequal.set(arrangement.join("|"), arrangement);
+      }
+    }
+  }
+  const distractors = shuffle([...unequal.values()]).slice(0, 3);
+  const options: { groups: number[] }[] = [correct, ...distractors].map((arrangement) => ({ groups: arrangement }));
+  if (options.length !== 4 || options.some((option) => option.groups.reduce((sum, count) => sum + count, 0) !== total)) {
+    throw new Error("Unable to build four valid equal-groups options.");
   }
   const shuffled = shuffle(options);
   const correctIndex = shuffled.findIndex((o) => JSON.stringify(o.groups) === JSON.stringify(correct));

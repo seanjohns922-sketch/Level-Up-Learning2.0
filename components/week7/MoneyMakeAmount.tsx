@@ -3,7 +3,7 @@
 import { Volume2 } from "lucide-react";
 import { useEffect, useState } from "react";
 /* eslint-disable @next/next/no-img-element */
-import { COINS, renderCoins } from "./moneyAssets";
+import { COINS } from "./moneyAssets";
 import { speak } from "@/lib/speak";
 
 export default function MoneyMakeAmount({
@@ -64,12 +64,12 @@ export default function MoneyMakeAmount({
   const prompt = `Show me $${target} using the money below.`;
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="text-3xl font-black text-gray-900">{prompt}</div>
+        <div className="text-3xl font-black text-slate-900">{prompt}</div>
         <button
           onClick={() => speak(prompt)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
           type="button"
         >
           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
@@ -77,16 +77,16 @@ export default function MoneyMakeAmount({
       </div>
 
       {!hideTotal ? (
-        <div className="mt-2 text-sm font-bold text-gray-600">
-          Total: <span className="text-gray-900">${total}</span>
+        <div className="mt-2 text-sm font-bold text-slate-600">
+          Total: <span className="text-slate-900">${total}</span>
         </div>
       ) : null}
-      <div className="text-xs text-gray-500 mt-1">
+      <div className="text-xs text-slate-500 mt-1">
         {allowTen ? "Use $10, $5, $2, and $1 coins." : "Use $5, $2, and $1 coins."}
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {pickedCoins.length === 0 ? (
-          <div className="text-sm text-gray-500">$0</div>
+          <div className="text-sm text-slate-500">$0</div>
         ) : (
           pickedCoins.map((v, i) => {
             const coin = COINS.find((c) => c.value === v);
@@ -112,7 +112,7 @@ export default function MoneyMakeAmount({
           <button
             key={coin.value}
             onClick={() => add(coin.value)}
-            className="px-4 py-3 rounded-2xl border hover:bg-gray-50 flex items-center gap-3 justify-center"
+            className="px-4 py-3 rounded-lg border hover:bg-slate-50 flex items-center gap-3 justify-center"
             type="button"
           >
             <img
@@ -137,13 +137,13 @@ export default function MoneyMakeAmount({
         ) : null}
         <button
           onClick={reset}
-          className="px-5 py-3 rounded-xl bg-gray-100 font-extrabold hover:bg-gray-200"
+          className="px-5 py-3 rounded-xl bg-slate-100 font-extrabold hover:bg-slate-200"
           type="button"
         >
           Reset
         </button>
         {last ? (
-          <div className="text-sm text-gray-500">Last coin: ${last}</div>
+          <div className="text-sm text-slate-500">Last coin: ${last}</div>
         ) : null}
       </div>
     </div>

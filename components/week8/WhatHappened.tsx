@@ -36,15 +36,15 @@ export default function WhatHappened({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-3">What happened?</div>
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 grid gap-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-3">What happened?</div>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 grid gap-3">
         <div>
-          <div className="text-xs font-bold text-gray-600 mb-2">Before</div>
+          <div className="text-xs font-bold text-slate-600 mb-2">Before</div>
           <StaticDotRow count={before} dotSize={20} gap={6} />
         </div>
         <div>
-          <div className="text-xs font-bold text-gray-600 mb-2">After</div>
+          <div className="text-xs font-bold text-slate-600 mb-2">After</div>
           <StaticDotRow count={after} dotSize={20} gap={6} />
         </div>
       </div>
@@ -53,26 +53,26 @@ export default function WhatHappened({
         <button
           type="button"
           onClick={() => chooseOp("add")}
-          className="px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-extrabold"
+          className="px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-extrabold"
         >
           <span className="inline-flex items-center gap-1.5"><Plus className="h-5 w-5" /> Added</span>
         </button>
         <button
           type="button"
           onClick={() => chooseOp("subtract")}
-          className="px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-extrabold"
+          className="px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-extrabold"
         >
           <span className="inline-flex items-center gap-1.5"><Minus className="h-5 w-5" /> Taken away</span>
         </button>
       </div>
 
-      <div className="mt-4 text-sm font-bold text-gray-700">How many are there now?</div>
+      <div className="mt-4 text-sm font-bold text-slate-700">How many are there now?</div>
       <div className="mt-2 grid gap-2">
         {options.map((opt, i) => (
           <button
             key={`${opt}-${i}`}
             onClick={() => chooseAnswer(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
             type="button"
             disabled={!pickedOp}
           >

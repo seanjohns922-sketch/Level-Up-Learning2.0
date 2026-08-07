@@ -23,7 +23,7 @@ function DotRow({
               "w-9 h-9 rounded-full border-2 transition",
               on
                 ? "border-teal-600 bg-teal-100"
-                : "border-gray-300 bg-white hover:bg-gray-50",
+                : "border-slate-300 bg-white hover:bg-slate-50",
             ].join(" ")}
             type="button"
           />
@@ -77,15 +77,15 @@ export default function PartPartWhole({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm text-gray-600 font-bold mb-2">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm text-slate-600 font-bold mb-2">
         {mode === "missingWhole"
           ? "What is the WHOLE?"
           : mode === "missingPart"
           ? "What is the missing PART?"
           : "Build the two parts with dots."}
       </div>
-      <label className="mb-4 inline-flex items-center gap-2 text-sm text-gray-600">
+      <label className="mb-4 inline-flex items-center gap-2 text-sm text-slate-600">
         <input
           type="checkbox"
           checked={showDots}
@@ -95,9 +95,9 @@ export default function PartPartWhole({
       </label>
 
       <div className="grid grid-cols-2 gap-4 max-w-xl">
-        <div className="rounded-2xl border-2 border-gray-200 p-5 text-center">
-          <div className="text-xs font-bold text-gray-500 mb-2">Part</div>
-          <div className="text-4xl font-black text-gray-900">
+        <div className="rounded-lg border-2 border-slate-200 p-5 text-center">
+          <div className="text-xs font-bold text-slate-500 mb-2">Part</div>
+          <div className="text-4xl font-black text-slate-900">
             {mode === "missingPart" && missing === "a" ? "?" : a}
           </div>
           {showDots && showA ? (
@@ -112,9 +112,9 @@ export default function PartPartWhole({
           ) : null}
         </div>
 
-        <div className="rounded-2xl border-2 border-gray-200 p-5 text-center">
-          <div className="text-xs font-bold text-gray-500 mb-2">Part</div>
-          <div className="text-4xl font-black text-gray-900">
+        <div className="rounded-lg border-2 border-slate-200 p-5 text-center">
+          <div className="text-xs font-bold text-slate-500 mb-2">Part</div>
+          <div className="text-4xl font-black text-slate-900">
             {mode === "missingPart" && missing === "b" ? "?" : b}
           </div>
           {showDots && showB ? (
@@ -129,7 +129,7 @@ export default function PartPartWhole({
           ) : null}
         </div>
 
-        <div className="col-span-2 rounded-2xl border-2 border-teal-200 bg-teal-50 p-5 text-center">
+        <div className="col-span-2 rounded-lg border-2 border-teal-200 bg-teal-50 p-5 text-center">
           <div className="text-xs font-bold text-teal-700 mb-2">Whole</div>
           <div className="text-5xl font-black text-teal-900">
             {mode === "missingWhole" ? "?" : whole}
@@ -149,24 +149,24 @@ export default function PartPartWhole({
 
       {mode === "build" ? (
         <div className="mt-6 grid md:grid-cols-3 gap-4 items-center">
-          <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-            <div className="text-xs font-bold text-gray-600 mb-3 text-center">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="text-xs font-bold text-slate-600 mb-3 text-center">
               Left dots (0–10)
             </div>
             <DotRow count={10} selectedCount={leftSel} setSelectedCount={setLeftSel} />
-            <div className="mt-3 text-center font-extrabold text-gray-800">
+            <div className="mt-3 text-center font-extrabold text-slate-800">
               Selected: {leftSel}
             </div>
           </div>
 
-          <div className="text-center text-5xl font-black text-gray-700">+</div>
+          <div className="text-center text-5xl font-black text-slate-700">+</div>
 
-          <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-            <div className="text-xs font-bold text-gray-600 mb-3 text-center">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="text-xs font-bold text-slate-600 mb-3 text-center">
               Right dots (0–10)
             </div>
             <DotRow count={10} selectedCount={rightSel} setSelectedCount={setRightSel} />
-            <div className="mt-3 text-center font-extrabold text-gray-800">
+            <div className="mt-3 text-center font-extrabold text-slate-800">
               Selected: {rightSel}
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function PartPartWhole({
             onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))}
             inputMode="numeric"
             placeholder="Type the missing number"
-            className="w-full max-w-xs px-4 py-3 rounded-xl border border-gray-300 text-lg font-bold"
+            className="w-full max-w-xs px-4 py-3 rounded-xl border border-slate-300 text-lg font-bold"
           />
           <button
             onClick={checkTyped}

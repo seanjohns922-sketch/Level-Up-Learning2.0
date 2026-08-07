@@ -23,17 +23,17 @@ export default function CompareGroups({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-3">
         How many more does the top row have?
       </div>
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 grid gap-3">
-        <div className="rounded-xl border border-gray-200 bg-white p-3">
-          <div className="text-xs font-bold text-gray-600 mb-2">Top</div>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 grid gap-3">
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <div className="text-xs font-bold text-slate-600 mb-2">Top</div>
           <StaticDotRow count={a} dotSize={20} gap={6} />
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-3">
-          <div className="text-xs font-bold text-gray-600 mb-2">Bottom</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3">
+          <div className="text-xs font-bold text-slate-600 mb-2">Bottom</div>
           <StaticDotRow count={b} dotSize={20} gap={6} />
         </div>
       </div>
@@ -43,7 +43,7 @@ export default function CompareGroups({
           <button
             key={`${opt}-${i}`}
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
             type="button"
           >
             {opt}

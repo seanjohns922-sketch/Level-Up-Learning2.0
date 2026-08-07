@@ -67,16 +67,16 @@ export default function ClimbLadder({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div>
-          <div className="text-lg font-extrabold text-gray-900">Climb the Ladder</div>
-          <div className="text-sm text-gray-600">Correct = climb up!</div>
+          <div className="text-lg font-extrabold text-slate-900">Climb the Ladder</div>
+          <div className="text-sm text-slate-600">Correct = climb up!</div>
         </div>
         <button
           type="button"
           onClick={() => speak(prompt)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
         >
           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
         </button>
@@ -88,7 +88,7 @@ export default function ClimbLadder({
             key={i}
             className={[
               "inline-flex items-center justify-center rounded-full text-xs font-bold",
-              i <= pos ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-500",
+              i <= pos ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-500",
             ].join(" ")}
             style={{ width: 26, height: 26 }}
           >
@@ -97,7 +97,7 @@ export default function ClimbLadder({
         ))}
       </div>
 
-      <div className="text-2xl font-extrabold text-gray-900 mb-3 text-center">
+      <div className="text-2xl font-extrabold text-slate-900 mb-3 text-center">
         {prompt}
       </div>
 
@@ -107,7 +107,7 @@ export default function ClimbLadder({
             key={opt}
             type="button"
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
           >
             {opt}
           </button>

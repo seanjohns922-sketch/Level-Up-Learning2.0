@@ -16,13 +16,13 @@ export default function GroupingEstimate({
   onWrong?: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm text-gray-600 mb-2">Fast grouping</div>
-      <div className="text-2xl font-extrabold text-gray-900 mb-4">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm text-slate-600 mb-2">Fast grouping</div>
+      <div className="text-2xl font-extrabold text-slate-900 mb-4">
         What number is shown?
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 mb-4">
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 mb-4">
         <div className="grid gap-2 mb-3">
           {Array.from({ length: tensGroups }).map((_, gi) => (
             <div key={gi} className="flex gap-1">
@@ -53,7 +53,7 @@ export default function GroupingEstimate({
               if (opt === answer) onCorrect?.();
               else onWrong?.();
             }}
-            className="w-full text-left px-5 py-4 rounded-2xl border border-gray-200 hover:bg-gray-50 transition text-xl font-bold"
+            className="w-full text-left px-5 py-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition text-xl font-bold"
             type="button"
           >
             {opt}

@@ -98,7 +98,7 @@ export default function NumberLineTap({
       </div>
 
       <div
-        className="relative select-none rounded-2xl border border-border bg-muted/30 px-6"
+        className="relative select-none rounded-lg border border-border bg-muted/30 px-6"
         style={{ height: 100 }}
       >
         {/* Base line */}

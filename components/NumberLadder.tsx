@@ -33,10 +33,10 @@ export default function NumberLadder({
 
   return (
     <div className="w-full">
-      <div className="mb-4 text-sm text-gray-600">Number Ladder</div>
+      <div className="mb-4 text-sm text-slate-600">Number Ladder</div>
 
       <div className="text-2xl font-extrabold mb-2">
-        Climb from <span className="text-gray-900">{start}</span> to{" "}
+        Climb from <span className="text-slate-900">{start}</span> to{" "}
         <span className="text-teal-600">{target}</span>
       </div>
 
@@ -59,7 +59,7 @@ export default function NumberLadder({
       <div className="flex gap-4">
         <button
           onClick={() => step(-1)}
-          className="flex-1 py-4 bg-gray-200 rounded-xl font-extrabold"
+          className="flex-1 py-4 bg-slate-200 rounded-xl font-extrabold"
           type="button"
         >
           −1

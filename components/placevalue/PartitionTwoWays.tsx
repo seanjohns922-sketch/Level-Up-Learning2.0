@@ -59,9 +59,9 @@ export default function PartitionTwoWays({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm text-gray-600 mb-2">Partition</div>
-      <div className="text-2xl font-extrabold text-gray-900 mb-4">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm text-slate-600 mb-2">Partition</div>
+      <div className="text-2xl font-extrabold text-slate-900 mb-4">
         Partition {target}
       </div>
 
@@ -73,12 +73,12 @@ export default function PartitionTwoWays({
               key={i}
               onClick={() => choose(p)}
               className={[
-                "w-full text-left rounded-2xl border px-4 py-4 font-bold transition",
+                "w-full text-left rounded-lg border px-4 py-4 font-bold transition",
                 isPicked
                   ? status === "correct"
                     ? "border-green-400 bg-green-50"
                     : "border-red-300 bg-red-50"
-                  : "border-gray-200 bg-white hover:bg-gray-50",
+                  : "border-slate-200 bg-white hover:bg-slate-50",
               ].join(" ")}
             >
               {p.a} + {p.b}
@@ -93,7 +93,7 @@ export default function PartitionTwoWays({
         ) : status === "wrong" ? (
           <span className="text-red-700">Not quite — try again.</span>
         ) : (
-          <span className="text-gray-500">Pick a partition.</span>
+          <span className="text-slate-500">Pick a partition.</span>
         )}
       </div>
     </div>

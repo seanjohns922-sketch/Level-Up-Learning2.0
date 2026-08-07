@@ -41,39 +41,39 @@ export default function TwoMats({
   const total = mode === "add" ? left + right : remaining;
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm font-bold text-gray-600 mb-2">{story}</div>
-      <div className="text-lg font-extrabold text-gray-900 mb-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm font-bold text-slate-600 mb-2">{story}</div>
+      <div className="text-lg font-extrabold text-slate-900 mb-3">
         {mode === "add" ? "Act it out: Join the two groups." : "Act it out: Take some away."}
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-3">
-          <div className="text-xs font-bold text-gray-600 mb-2">
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <div className="text-xs font-bold text-slate-600 mb-2">
             {mode === "add" ? "Group A" : "Remaining"}
           </div>
           <StaticDotRow count={mode === "add" ? left : remaining} dotSize={20} gap={6} />
           {mode === "add" ? (
             <div className="mt-3 flex items-center gap-2">
-              <button type="button" onClick={() => setLeft((v) => Math.max(0, v - 1))} className="px-3 py-2 rounded-lg bg-gray-100 font-bold">−</button>
-              <div className="text-sm font-bold text-gray-700">{left}/{a}</div>
-              <button type="button" onClick={() => setLeft((v) => Math.min(a, v + 1))} className="px-3 py-2 rounded-lg bg-gray-100 font-bold">+</button>
+              <button type="button" onClick={() => setLeft((v) => Math.max(0, v - 1))} className="px-3 py-2 rounded-lg bg-slate-100 font-bold">−</button>
+              <div className="text-sm font-bold text-slate-700">{left}/{a}</div>
+              <button type="button" onClick={() => setLeft((v) => Math.min(a, v + 1))} className="px-3 py-2 rounded-lg bg-slate-100 font-bold">+</button>
             </div>
           ) : (
-            <div className="mt-3 text-sm font-bold text-gray-700">
+            <div className="mt-3 text-sm font-bold text-slate-700">
               Start: {a} · Left: {remaining}
             </div>
           )}
         </div>
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-3">
-          <div className="text-xs font-bold text-gray-600 mb-2">
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <div className="text-xs font-bold text-slate-600 mb-2">
             {mode === "add" ? "Group B" : "Taken away"}
           </div>
           <StaticDotRow count={right} dotSize={20} gap={6} />
           <div className="mt-3 flex items-center gap-2">
-            <button type="button" onClick={() => setRight((v) => Math.max(0, v - 1))} className="px-3 py-2 rounded-lg bg-gray-100 font-bold">−</button>
-            <div className="text-sm font-bold text-gray-700">{right}/{b}</div>
-            <button type="button" onClick={() => setRight((v) => Math.min(b, v + 1))} className="px-3 py-2 rounded-lg bg-gray-100 font-bold">+</button>
+            <button type="button" onClick={() => setRight((v) => Math.max(0, v - 1))} className="px-3 py-2 rounded-lg bg-slate-100 font-bold">−</button>
+            <div className="text-sm font-bold text-slate-700">{right}/{b}</div>
+            <button type="button" onClick={() => setRight((v) => Math.min(b, v + 1))} className="px-3 py-2 rounded-lg bg-slate-100 font-bold">+</button>
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function TwoMats({
         </div>
       ) : null}
 
-      <div className="mt-4 text-sm font-bold text-gray-700">
+      <div className="mt-4 text-sm font-bold text-slate-700">
         {mode === "add" ? "How many now?" : "How many left?"}
       </div>
       <div className="mt-2 grid gap-2">
@@ -99,7 +99,7 @@ export default function TwoMats({
           <button
             key={`${opt}-${i}`}
             onClick={() => choose(opt)}
-            className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 font-bold"
+            className="w-full text-left px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold"
             type="button"
             disabled={mode === "add" ? !joined : right !== b}
           >
@@ -111,11 +111,11 @@ export default function TwoMats({
         <button
           type="button"
           onClick={reset}
-          className="px-4 py-2 rounded-lg bg-gray-100 font-bold"
+          className="px-4 py-2 rounded-lg bg-slate-100 font-bold"
         >
           Reset
         </button>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-slate-500">
           {mode === "add"
             ? `Built: ${left} + ${right} = ${total}`
             : `Remaining: ${a} − ${right} = ${total}`}

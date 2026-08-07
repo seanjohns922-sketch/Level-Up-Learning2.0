@@ -23,7 +23,7 @@ function DotRow({
               "w-9 h-9 rounded-full border-2 transition",
               on
                 ? "border-teal-600 bg-teal-100"
-                : "border-gray-300 bg-white hover:bg-gray-50",
+                : "border-slate-300 bg-white hover:bg-slate-50",
             ].join(" ")}
             aria-label={`dot ${i + 1}`}
             type="button"
@@ -57,15 +57,15 @@ export default function AddDotsMatch({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm text-gray-500 font-bold">Make this addition:</div>
-      <div className="mt-2 text-4xl font-extrabold text-gray-900 text-center">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm text-slate-500 font-bold">Make this addition:</div>
+      <div className="mt-2 text-4xl font-extrabold text-slate-900 text-center">
         {a} + {b}
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-4 items-center">
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-          <div className="text-xs font-bold text-gray-600 mb-3 text-center">
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div className="text-xs font-bold text-slate-600 mb-3 text-center">
             Left dots (0–{maxDots})
           </div>
           <DotRow
@@ -73,15 +73,15 @@ export default function AddDotsMatch({
             selectedCount={leftSel}
             setSelectedCount={setLeftSel}
           />
-          <div className="mt-3 text-center font-extrabold text-gray-800">
+          <div className="mt-3 text-center font-extrabold text-slate-800">
             Selected: {leftSel}
           </div>
         </div>
 
-        <div className="text-center text-5xl font-black text-gray-700">+</div>
+        <div className="text-center text-5xl font-black text-slate-700">+</div>
 
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-          <div className="text-xs font-bold text-gray-600 mb-3 text-center">
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div className="text-xs font-bold text-slate-600 mb-3 text-center">
             Right dots (0–{maxDots})
           </div>
           <DotRow
@@ -89,7 +89,7 @@ export default function AddDotsMatch({
             selectedCount={rightSel}
             setSelectedCount={setRightSel}
           />
-          <div className="mt-3 text-center font-extrabold text-gray-800">
+          <div className="mt-3 text-center font-extrabold text-slate-800">
             Selected: {rightSel}
           </div>
         </div>
@@ -97,8 +97,8 @@ export default function AddDotsMatch({
 
       <div className="mt-6 flex items-center justify-between gap-6">
         <div className="flex-1">
-          <div className="text-lg font-bold text-gray-700">
-            Total: <span className="text-gray-900">{total}</span>
+          <div className="text-lg font-bold text-slate-700">
+            Total: <span className="text-slate-900">{total}</span>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {Array.from({ length: total }).map((_, i) => (

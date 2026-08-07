@@ -33,24 +33,24 @@ export default function SplitStepper({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm text-gray-600 mb-2">Split</div>
-      <div className="text-2xl font-extrabold text-gray-900 mb-4">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm text-slate-600 mb-2">Split</div>
+      <div className="text-2xl font-extrabold text-slate-900 mb-4">
         Make {target}
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         {[{ label: "A", value: a, set: setA }, { label: "B", value: b, set: setB }].map(
           (item) => (
-            <div key={item.label} className="rounded-xl border border-gray-200 p-4">
-              <div className="text-sm text-gray-500 mb-2">{item.label}</div>
-              <div className="text-3xl font-extrabold text-gray-900 mb-3">
+            <div key={item.label} className="rounded-xl border border-slate-200 p-4">
+              <div className="text-sm text-slate-500 mb-2">{item.label}</div>
+              <div className="text-3xl font-extrabold text-slate-900 mb-3">
                 {item.value}
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => item.set((v: number) => clamp(v - 1))}
-                  className="rounded-lg bg-gray-100 px-3 py-2 font-bold"
+                  className="rounded-lg bg-slate-100 px-3 py-2 font-bold"
                 >
                   −1
                 </button>
@@ -66,8 +66,8 @@ export default function SplitStepper({
         )}
       </div>
 
-      <div className="text-sm text-gray-600 mb-3">
-        {a} + {b} = <span className="font-bold text-gray-900">{sum}</span>
+      <div className="text-sm text-slate-600 mb-3">
+        {a} + {b} = <span className="font-bold text-slate-900">{sum}</span>
       </div>
 
       <button
@@ -83,7 +83,7 @@ export default function SplitStepper({
         ) : status === "wrong" ? (
           <span className="text-red-700">Not quite — try again.</span>
         ) : (
-          <span className="text-gray-500">Adjust and check.</span>
+          <span className="text-slate-500">Adjust and check.</span>
         )}
       </div>
     </div>

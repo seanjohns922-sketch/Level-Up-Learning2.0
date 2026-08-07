@@ -23,7 +23,7 @@ export function renderCoins(amount: number) {
       remaining -= coin.value;
     }
   }
-  if (picks.length === 0) return <div className="text-sm text-gray-500">$0</div>;
+  if (picks.length === 0) return <div className="text-sm text-slate-500">$0</div>;
 
   return (
     <div className="flex flex-wrap items-center gap-2">

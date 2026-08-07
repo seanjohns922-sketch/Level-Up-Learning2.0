@@ -26,21 +26,21 @@ export default function StoryOpChoice({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="text-sm font-bold text-gray-600">
+        <div className="text-sm font-bold text-slate-600">
           {variant === "sort" ? "Sort the story" : "Choose the operation"}
         </div>
         <button
           onClick={() => speak(story)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50"
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50"
           type="button"
         >
           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
         </button>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-gray-800">
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-800">
         {story}
       </div>
 
@@ -48,10 +48,10 @@ export default function StoryOpChoice({
         <button
           onClick={() => choose("add")}
           className={[
-            "px-5 py-4 rounded-2xl border text-lg font-black transition",
+            "px-5 py-4 rounded-lg border text-lg font-black transition",
             picked === "add"
               ? "border-emerald-500 bg-emerald-50"
-              : "border-gray-200 hover:bg-gray-50",
+              : "border-slate-200 hover:bg-slate-50",
           ].join(" ")}
           type="button"
         >
@@ -60,10 +60,10 @@ export default function StoryOpChoice({
         <button
           onClick={() => choose("subtract")}
           className={[
-            "px-5 py-4 rounded-2xl border text-lg font-black transition",
+            "px-5 py-4 rounded-lg border text-lg font-black transition",
             picked === "subtract"
               ? "border-rose-500 bg-rose-50"
-              : "border-gray-200 hover:bg-gray-50",
+              : "border-slate-200 hover:bg-slate-50",
           ].join(" ")}
           type="button"
         >

@@ -34,17 +34,17 @@ export default function SubtractMoveToTaken({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-3xl font-black text-gray-900 text-center mb-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-3xl font-black text-slate-900 text-center mb-3">
         {total} - {remove}
       </div>
-      <div className="text-sm font-bold text-gray-600 mb-2">
+      <div className="text-sm font-bold text-slate-600 mb-2">
         Move {remove} dots into the “taken away” box.
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-          <div className="text-xs font-bold text-gray-600 mb-3 text-center">
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div className="text-xs font-bold text-slate-600 mb-3 text-center">
             Remaining
           </div>
           <div className="flex flex-wrap gap-2 justify-center">
@@ -61,8 +61,8 @@ export default function SubtractMoveToTaken({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-          <div className="text-xs font-bold text-gray-600 mb-3 text-center">
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div className="text-xs font-bold text-slate-600 mb-3 text-center">
             Taken Away
           </div>
           <div className="flex flex-wrap gap-2 justify-center">
@@ -81,8 +81,8 @@ export default function SubtractMoveToTaken({
       </div>
 
       <div className="mt-4 flex items-center justify-between">
-        <div className="text-sm font-bold text-gray-700">
-          Remaining: <span className="text-gray-900">{remaining}</span>
+        <div className="text-sm font-bold text-slate-700">
+          Remaining: <span className="text-slate-900">{remaining}</span>
         </div>
         <button
           onClick={check}

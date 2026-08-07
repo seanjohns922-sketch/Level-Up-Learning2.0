@@ -108,26 +108,26 @@ export default function CountObjects({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-slate-500">
           Count Objects • Round {round}/{rounds}
         </div>
-        <div className="text-sm font-semibold text-gray-700">
+        <div className="text-sm font-semibold text-slate-700">
           Score: {correctTotal}/{rounds}
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-white p-5 mb-4">
-        <div className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+      <div className="rounded-lg border bg-white p-5 mb-4">
+        <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
           How many counters?
         </div>
         {config?.showRangeLabel !== false && (
-          <div className="text-sm text-gray-500 mt-1">
+          <div className="text-sm text-slate-500 mt-1">
             Counting within {min}-{max}
           </div>
         )}
       </div>
 
-      <div className="rounded-2xl border bg-white p-5 mb-4">
+      <div className="rounded-lg border bg-white p-5 mb-4">
         <div
           className="mx-auto"
           style={{
@@ -144,7 +144,7 @@ export default function CountObjects({
                 key={i}
                 className={[
                   "rounded-full border",
-                  filled ? "bg-teal-600 border-teal-700" : "bg-white border-gray-200",
+                  filled ? "bg-teal-600 border-teal-700" : "bg-white border-slate-200",
                 ].join(" ")}
                 style={{
                   width: layout.dotSize,
@@ -156,7 +156,7 @@ export default function CountObjects({
           })}
         </div>
 
-        <div className="mt-4 text-sm text-gray-500">
+        <div className="mt-4 text-sm text-slate-500">
           Tip: you can count by making groups (like 5s or 10s).
         </div>
       </div>
@@ -173,12 +173,12 @@ export default function CountObjects({
               onClick={() => choose(v)}
               disabled={locked}
               className={[
-                "rounded-2xl border px-4 py-4 text-lg font-extrabold transition",
+                "rounded-lg border px-4 py-4 text-lg font-extrabold transition",
                 "active:scale-[0.98]",
-                locked ? "cursor-not-allowed" : "hover:bg-gray-50",
+                locked ? "cursor-not-allowed" : "hover:bg-slate-50",
                 showRight
                   ? "bg-green-50 border-green-300 text-green-900"
-                  : "bg-white border-gray-200 text-gray-900",
+                  : "bg-white border-slate-200 text-slate-900",
                 showWrong ? "bg-red-50 border-red-300 text-red-900" : "",
               ].join(" ")}
             >
@@ -195,14 +195,14 @@ export default function CountObjects({
             setPicked(null);
             setLocked(false);
           }}
-          className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
+          className="px-4 py-3 rounded-xl bg-slate-100 text-slate-800 font-bold hover:bg-slate-200 transition"
         >
           New counters <RotateCw className="inline-block h-4 w-4 align-[-3px]" />
         </button>
 
         <button
           onClick={() => nextRound()}
-          className="px-4 py-3 rounded-xl bg-gray-100 text-gray-800 font-bold hover:bg-gray-200 transition"
+          className="px-4 py-3 rounded-xl bg-slate-100 text-slate-800 font-bold hover:bg-slate-200 transition"
         >
           Skip →
         </button>

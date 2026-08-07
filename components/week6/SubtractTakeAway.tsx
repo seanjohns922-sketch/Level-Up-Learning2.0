@@ -44,12 +44,12 @@ export default function SubtractTakeAway({
   const cols = total <= 10 ? 5 : total <= 15 ? 6 : 7;
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-4xl font-black text-gray-900 text-center mb-2">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-4xl font-black text-slate-900 text-center mb-2">
         {total} - {remove}
       </div>
       {prompt ? (
-        <div className="text-sm font-bold text-gray-600 mb-2">{prompt}</div>
+        <div className="text-sm font-bold text-slate-600 mb-2">{prompt}</div>
       ) : null}
       <div
         className="grid gap-2 justify-center"
@@ -62,7 +62,7 @@ export default function SubtractTakeAway({
             className={[
               "h-9 w-9 rounded-full border-2 transition",
               isRemoved
-                ? "border-gray-300 bg-gray-100 opacity-40"
+                ? "border-slate-300 bg-slate-100 opacity-40"
                 : "border-teal-600 bg-teal-100",
             ].join(" ")}
             type="button"
@@ -70,8 +70,8 @@ export default function SubtractTakeAway({
         ))}
       </div>
       <div className="mt-4 flex items-center justify-between">
-        <div className="text-sm font-bold text-gray-700">
-          Remaining: <span className="text-gray-900">{remaining}</span>
+        <div className="text-sm font-bold text-slate-700">
+          Remaining: <span className="text-slate-900">{remaining}</span>
         </div>
         <button
           onClick={check}

@@ -62,14 +62,14 @@ export default function MabBuild({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm text-gray-600 mb-2">Build the number</div>
-      <div className="text-2xl font-extrabold text-gray-900 mb-4">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm text-slate-600 mb-2">Build the number</div>
+      <div className="text-2xl font-extrabold text-slate-900 mb-4">
         Target: {target}
       </div>
 
       <div className="mb-5">
-        <div className="text-sm font-bold text-gray-700 mb-2">Tens</div>
+        <div className="text-sm font-bold text-slate-700 mb-2">Tens</div>
         <div className="flex flex-wrap gap-2">
           {Array.from({ length: safeMaxTens }).map((_, i) => {
             const selected = i < value.tens;
@@ -82,7 +82,7 @@ export default function MabBuild({
                   "w-10 h-20 rounded-xl border-2 transition",
                   selected
                     ? "border-teal-600 bg-teal-50"
-                    : "border-gray-200 bg-white hover:bg-gray-50",
+                    : "border-slate-200 bg-white hover:bg-slate-50",
                 ].join(" ")}
               >
                 <div className="h-full w-full flex flex-col justify-between p-2">
@@ -91,7 +91,7 @@ export default function MabBuild({
                       key={k}
                       className={[
                         "h-2 rounded",
-                        selected ? "bg-teal-600/60" : "bg-gray-200",
+                        selected ? "bg-teal-600/60" : "bg-slate-200",
                       ].join(" ")}
                     />
                   ))}
@@ -103,7 +103,7 @@ export default function MabBuild({
       </div>
 
       <div>
-        <div className="text-sm font-bold text-gray-700 mb-2">Ones</div>
+        <div className="text-sm font-bold text-slate-700 mb-2">Ones</div>
         <div className="flex flex-wrap gap-2">
           {Array.from({ length: safeMaxOnes }).map((_, i) => {
             const selected = i < value.ones;
@@ -116,7 +116,7 @@ export default function MabBuild({
                   "w-10 h-10 rounded-lg border-2 transition",
                   selected
                     ? "border-teal-600 bg-teal-50"
-                    : "border-gray-200 bg-white hover:bg-gray-50",
+                    : "border-slate-200 bg-white hover:bg-slate-50",
                 ].join(" ")}
               />
             );
@@ -124,9 +124,9 @@ export default function MabBuild({
         </div>
       </div>
 
-      <div className="mt-4 text-sm text-gray-600">
+      <div className="mt-4 text-sm text-slate-600">
         {value.tens} tens + {value.ones} ones ={" "}
-        <span className="font-bold text-gray-900">{total}</span>
+        <span className="font-bold text-slate-900">{total}</span>
       </div>
     </div>
   );

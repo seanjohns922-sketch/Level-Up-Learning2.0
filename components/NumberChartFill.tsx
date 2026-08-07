@@ -18,7 +18,6 @@ export default function NumberChartFill({
 
   const total = max - min + 1;
   const cols = max >= 120 ? 10 : 10;
-  const rows = Math.ceil(total / cols);
 
   const missingSet = useMemo(() => new Set(missing), [missing]);
   const filledSet = useMemo(() => new Set(filled), [filled]);
@@ -42,7 +41,7 @@ export default function NumberChartFill({
 
   return (
     <div className="w-full">
-      <div className="text-sm text-gray-600 mb-3">
+      <div className="text-sm text-slate-600 mb-3">
         Tap a number, then tap the matching blank in the chart.
       </div>
 
@@ -60,10 +59,10 @@ export default function NumberChartFill({
               className={[
                 "px-3 py-2 rounded-lg border text-sm font-bold",
                 isDone
-                  ? "bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed"
+                  ? "bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed"
                   : isActive
                   ? "bg-teal-100 text-teal-800 border-teal-300"
-                  : "bg-white text-gray-800 border-gray-300 hover:bg-gray-50",
+                  : "bg-white text-slate-800 border-slate-300 hover:bg-slate-50",
               ].join(" ")}
             >
               {n}
@@ -81,7 +80,6 @@ export default function NumberChartFill({
         {numbers.map((n) => {
           const isMissing = missingSet.has(n);
           const isFilled = filledSet.has(n);
-          const canPlace = isMissing && !isFilled && active === n;
           return (
             <button
               key={n}
@@ -91,8 +89,8 @@ export default function NumberChartFill({
                 isMissing
                   ? isFilled
                     ? "bg-teal-600 text-white border-teal-700"
-                    : "bg-white border-gray-300 hover:bg-gray-50"
-                  : "bg-gray-50 text-gray-600 border-gray-200",
+                    : "bg-white border-slate-300 hover:bg-slate-50"
+                  : "bg-slate-50 text-slate-600 border-slate-200",
               ].join(" ")}
             >
               {isMissing && !isFilled ? "?" : n}

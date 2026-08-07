@@ -28,11 +28,11 @@ export default function ChooseSkipCount({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-lg font-extrabold text-gray-900 mb-3">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-lg font-extrabold text-slate-900 mb-3">
         Choose the skip count.
       </div>
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 mb-3">
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 mb-3">
         <StaticDotRows
           rows={Array.from({ length: groups }, () => perGroup)}
           dotSize={18}
@@ -51,7 +51,7 @@ export default function ChooseSkipCount({
             onClick={() => choose(opt)}
             className={[
               "w-full text-left px-4 py-3 rounded-xl border font-bold",
-              picked === opt ? "border-teal-500 bg-teal-50" : "border-gray-200 hover:bg-gray-50",
+              picked === opt ? "border-teal-500 bg-teal-50" : "border-slate-200 hover:bg-slate-50",
             ].join(" ")}
           >
             {opt}
@@ -60,7 +60,7 @@ export default function ChooseSkipCount({
       </div>
 
       {picked ? (
-        <div className="mt-3 text-sm font-bold text-gray-700">
+        <div className="mt-3 text-sm font-bold text-slate-700">
           Skip count: {sequence.join(" → ")}
         </div>
       ) : null}

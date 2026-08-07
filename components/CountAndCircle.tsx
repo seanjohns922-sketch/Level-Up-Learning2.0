@@ -73,7 +73,7 @@ export default function CountAndCircle({
 
   return (
     <div className="w-full">
-      <div className="flex justify-between mb-4 text-sm text-gray-600">
+      <div className="flex justify-between mb-4 text-sm text-slate-600">
         <div>
           Count & Circle • Round {round}/{rounds}
         </div>
@@ -82,8 +82,8 @@ export default function CountAndCircle({
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-white p-5 mb-4">
-        <div className="text-2xl font-extrabold text-gray-900">
+      <div className="rounded-lg border bg-white p-5 mb-4">
+        <div className="text-2xl font-extrabold text-slate-900">
           Circle <span className="text-teal-600">{target}</span> counters
         </div>
 
@@ -95,7 +95,7 @@ export default function CountAndCircle({
         )}
       </div>
 
-      <div className="rounded-2xl border bg-white p-5 mb-4">
+      <div className="rounded-lg border bg-white p-5 mb-4">
         <div className="grid grid-cols-6 gap-3 max-w-[420px] mx-auto">
           {selected.map((on, i) => (
             <button
@@ -105,7 +105,7 @@ export default function CountAndCircle({
                 "w-10 h-10 rounded-full border-2 transition",
                 on
                   ? "bg-teal-600 border-teal-700"
-                  : "bg-white border-gray-300 hover:bg-gray-50",
+                  : "bg-white border-slate-300 hover:bg-slate-50",
               ].join(" ")}
               type="button"
             />
@@ -119,7 +119,7 @@ export default function CountAndCircle({
             setSelected(Array(totalDots).fill(false));
             setStatus("idle");
           }}
-          className="px-4 py-3 rounded-xl bg-gray-100 font-bold"
+          className="px-4 py-3 rounded-xl bg-slate-100 font-bold"
         >
           Reset
         </button>

@@ -55,9 +55,9 @@ export default function TensOnesMCQ({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="text-sm text-gray-600 mb-2">Tens & Ones</div>
-      <div className="text-2xl font-extrabold text-gray-900 mb-4">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="text-sm text-slate-600 mb-2">Tens & Ones</div>
+      <div className="text-2xl font-extrabold text-slate-900 mb-4">
         {target} = ?
       </div>
 
@@ -69,12 +69,12 @@ export default function TensOnesMCQ({
               key={idx}
               onClick={() => choose(o)}
               className={[
-                "w-full text-left rounded-2xl border px-4 py-4 font-bold transition",
+                "w-full text-left rounded-lg border px-4 py-4 font-bold transition",
                 isPicked
                   ? status === "correct"
                     ? "border-green-400 bg-green-50"
                     : "border-red-300 bg-red-50"
-                  : "border-gray-200 bg-white hover:bg-gray-50",
+                  : "border-slate-200 bg-white hover:bg-slate-50",
               ].join(" ")}
             >
               {o.tens} tens, {o.ones} ones
@@ -89,7 +89,7 @@ export default function TensOnesMCQ({
         ) : status === "wrong" ? (
           <span className="text-red-700">Try again.</span>
         ) : (
-          <span className="text-gray-500">Choose an option.</span>
+          <span className="text-slate-500">Choose an option.</span>
         )}
       </div>
     </div>
