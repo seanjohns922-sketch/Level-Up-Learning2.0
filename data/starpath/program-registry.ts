@@ -569,6 +569,24 @@ const IMPLEMENTED_LEVEL_FOUR_LESSONS: Record<
   "y4-space-w8-l3": { learningIntention: "I can audit and repair a complete spatial design.", mechanics: L4_INTEGRATION_MECHANICS },
 };
 
+const L5_NET_W1_MECHANICS = ["net-unfolder", "fold-predictor", "net-reasoning"] as const;
+const L5_NET_W2_MECHANICS = ["face-tracker", "fold-simulator", "face-relations"] as const;
+const L5_NET_W3_MECHANICS = ["net-builder", "fold-fault-finder", "net-comparer"] as const;
+const IMPLEMENTED_LEVEL_FIVE_LESSONS: Record<
+  string,
+  { learningIntention: string; mechanics: readonly [string, string, string] }
+> = {
+  "y5-space-w1-l1": { learningIntention: "I can match a cube to the flat net it unfolds into.", mechanics: L5_NET_W1_MECHANICS },
+  "y5-space-w1-l2": { learningIntention: "I can predict whether a net folds into a cube.", mechanics: L5_NET_W1_MECHANICS },
+  "y5-space-w1-l3": { learningIntention: "I can explain why a net folds into a cube.", mechanics: L5_NET_W1_MECHANICS },
+  "y5-space-w2-l1": { learningIntention: "I can track a face through a fold and find its opposite.", mechanics: L5_NET_W2_MECHANICS },
+  "y5-space-w2-l2": { learningIntention: "I can fold a net and work out which faces touch.", mechanics: L5_NET_W2_MECHANICS },
+  "y5-space-w2-l3": { learningIntention: "I can tell whether two faces end up opposite or adjacent.", mechanics: L5_NET_W2_MECHANICS },
+  "y5-space-w3-l1": { learningIntention: "I can build a net that folds into a cube.", mechanics: L5_NET_W3_MECHANICS },
+  "y5-space-w3-l2": { learningIntention: "I can test a net for overlaps and gaps.", mechanics: L5_NET_W3_MECHANICS },
+  "y5-space-w3-l3": { learningIntention: "I can find several different nets that fold into the same cube.", mechanics: L5_NET_W3_MECHANICS },
+};
+
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
   const weeks = definition.weeks.map((week, index): StarpathWeekPlan => {
     const weekNumber = index + 1;
@@ -579,7 +597,8 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
         IMPLEMENTED_LEVEL_ONE_LESSONS[lessonId] ??
         IMPLEMENTED_LEVEL_TWO_LESSONS[lessonId] ??
         IMPLEMENTED_LEVEL_THREE_LESSONS[lessonId] ??
-        IMPLEMENTED_LEVEL_FOUR_LESSONS[lessonId];
+        IMPLEMENTED_LEVEL_FOUR_LESSONS[lessonId] ??
+        IMPLEMENTED_LEVEL_FIVE_LESSONS[lessonId];
       return {
         id: lessonId,
         title,

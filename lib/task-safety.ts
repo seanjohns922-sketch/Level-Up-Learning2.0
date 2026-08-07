@@ -281,6 +281,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "starpathGridRoute",
   "starpathComposite",
   "starpathSymmetry",
+  "starpathNet",
   "starpathObject",
   "mcq",
   "count",

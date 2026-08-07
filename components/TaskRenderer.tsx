@@ -199,6 +199,7 @@ import { StarpathGridReferenceCard } from "@/components/starpath/StarpathGridRef
 import StarpathGridRouteCard from "@/components/starpath/StarpathGridRouteCard";
 import StarpathCompositeCard from "@/components/starpath/StarpathCompositeCard";
 import StarpathSymmetryCard from "@/components/starpath/StarpathSymmetryCard";
+import StarpathNetCard from "@/components/starpath/StarpathNetCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -694,6 +695,8 @@ function TaskRendererInner({
       return <StarpathCompositeCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathSymmetry":
       return <StarpathSymmetryCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathNet":
+      return <StarpathNetCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathObject":
       return <StarpathObjectCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     default:

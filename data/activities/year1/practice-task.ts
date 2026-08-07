@@ -2421,7 +2421,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets";
       heading?: string;
     }
   | {
@@ -2654,6 +2654,30 @@ export type PracticeTask = (
       options?: Array<{ id: string; label: string }>;
       correctOptionIds?: string[];
       minSeedCells?: number;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 5 · W1-3 — Nets. A cube net (hexomino) that folds into a cube. The
+      // card renders the net and can hinge-fold it; interactions cover choosing a
+      // net, predicting/justifying a fold, tracking faces, and building/testing nets.
+      kind: "starpathNet";
+      mode: "chooseNet" | "foldPredict" | "reason" | "trackCell" | "count" | "relation" | "build" | "classify" | "selectValid";
+      render: "options" | "single" | "build";
+      prompt: string;
+      speakText: string;
+      target: number;
+      netId: string;
+      cells?: Array<{ r: number; c: number }>;
+      coloured?: boolean;
+      focusKeys?: string[];
+      fold?: boolean;
+      showCube?: boolean;
+      netOptions?: Array<{ id: string; cells: Array<{ r: number; c: number }> }>;
+      correctOptionIds?: string[];
+      textOptions?: Array<{ id: string; label: string }>;
+      answerCells?: string[];
+      multi?: boolean;
+      buildFaces?: number;
       feedback: { correct: string; wrong: string };
     }
   | StarpathObjectTask
