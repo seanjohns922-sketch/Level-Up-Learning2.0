@@ -1,15 +1,15 @@
 "use client";
 
-import { Bot, Gem, Minus, Plus, Star } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import type { PrepNumberNexusQuizVisual } from "@/data/quizzes/prepNumberNexus";
+import GroundObjectToken from "@/components/ground/GroundObjectToken";
 
 function Surface({ children }: { children: React.ReactNode }) {
   return <div className="mb-4 rounded-lg border border-cyan-900/15 bg-[#f8fbfc] p-4 text-slate-950 shadow-[0_8px_24px_rgba(15,23,42,0.08)] sm:p-5">{children}</div>;
 }
 
 function Token({ token = "crystal", muted = false }: { token?: string; muted?: boolean }) {
-  const Icon = token === "star" ? Star : token === "robot" ? Bot : Gem;
-  return <span className={`grid h-10 w-10 place-items-center rounded-lg border ${muted ? "border-slate-300 bg-slate-100 text-slate-400" : "border-cyan-700/30 bg-cyan-100 text-cyan-900"}`}><Icon className="h-5 w-5" aria-hidden /></span>;
+  return <GroundObjectToken objectType={token} size="sm" muted={muted} />;
 }
 
 function Tokens({ count, structured = false }: { count: number; structured?: boolean }) {

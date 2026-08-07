@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Volume2 } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import GroundObjectToken from "@/components/ground/GroundObjectToken";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -80,7 +81,7 @@ function getPatternGrid(layout: GroundPatternLayout, quantity: number) {
 
 function GroundNumberCard({ value }: { value: number }) {
   return (
-    <div className="mx-auto flex h-24 w-full max-w-[168px] items-center justify-center rounded-[24px] border-2 border-cyan-300/70 bg-gradient-to-br from-cyan-100 via-white to-teal-100 text-5xl font-black text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.18)] sm:h-28 sm:text-6xl">
+    <div className="mx-auto flex h-24 w-full max-w-[168px] items-center justify-center rounded-lg border-2 border-cyan-300/70 bg-cyan-50 text-5xl font-black text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.18)] sm:h-28 sm:text-6xl">
       {value}
     </div>
   );
@@ -88,7 +89,7 @@ function GroundNumberCard({ value }: { value: number }) {
 
 function GroundWordCard({ word }: { word: string }) {
   return (
-    <div className="mx-auto flex min-h-[96px] w-full max-w-[188px] items-center justify-center rounded-[24px] border-2 border-cyan-300/70 bg-gradient-to-br from-cyan-100 via-white to-teal-100 px-4 text-3xl font-black lowercase text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.18)] sm:min-h-[108px] sm:text-4xl">
+    <div className="mx-auto flex min-h-[96px] w-full max-w-[188px] items-center justify-center rounded-lg border-2 border-cyan-300/70 bg-cyan-50 px-4 text-3xl font-black lowercase text-teal-900 shadow-[0_0_18px_rgba(45,212,191,0.18)] sm:min-h-[108px] sm:text-4xl">
       {word}
     </div>
   );
@@ -106,14 +107,13 @@ function GroundQuantityCard({
   patternLayout?: GroundPatternLayout;
 }) {
   const meta = OBJECT_META[objectType ?? "dots"];
-  const baseSize = compact ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl";
   const bubbleSize = compact ? "h-8 w-8 sm:h-9 sm:w-9" : "h-9 w-9 sm:h-10 sm:w-10";
   const minHeight = compact ? "min-h-[64px]" : "min-h-[92px] sm:min-h-[104px]";
 
   const grid = patternLayout ? getPatternGrid(patternLayout, quantity) : null;
 
   return (
-    <div className={`rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3 shadow-[0_0_14px_rgba(45,212,191,0.12)] ${minHeight}`}>
+    <div className={`rounded-lg border-2 border-cyan-200 bg-white/95 px-3 py-3 shadow-[0_0_14px_rgba(45,212,191,0.12)] ${minHeight}`}>
       {grid ? (
         <div
           className="mx-auto grid max-w-[240px] justify-center gap-2 sm:gap-3"
@@ -122,24 +122,16 @@ function GroundQuantityCard({
           {Array.from({ length: grid.slots }).map((_, index) => {
             const filled = grid.filled.includes(index);
             return (
-              <span
-                key={`${meta.label}-${index}`}
-                className={`${baseSize} ${bubbleSize} inline-flex items-center justify-center rounded-full ${filled ? "bg-cyan-50 text-teal-700 shadow-sm" : "bg-transparent text-transparent"}`}
-              >
-                {meta.emoji}
-              </span>
+              filled
+                ? <GroundObjectToken key={`${meta.label}-${index}`} objectType={objectType ?? "dots"} size={compact ? "sm" : "md"} />
+                : <span key={`${meta.label}-${index}`} className={`${bubbleSize} rounded-lg border border-dashed border-slate-200 bg-white/60`} />
             );
           })}
         </div>
       ) : (
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
           {Array.from({ length: quantity }).map((_, index) => (
-            <span
-              key={`${meta.label}-${index}`}
-              className={`${baseSize} ${bubbleSize} inline-flex items-center justify-center rounded-full bg-cyan-50 text-teal-700 shadow-sm`}
-            >
-              {meta.emoji}
-            </span>
+            <GroundObjectToken key={`${meta.label}-${index}`} objectType={objectType ?? "dots"} size={compact ? "sm" : "md"} />
           ))}
         </div>
       )}
@@ -159,10 +151,10 @@ function GroundPartsCard({
   partLayouts?: GroundOption["pairPartLayouts"];
 }) {
   return (
-    <div className="w-full rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3 shadow-[0_0_14px_rgba(45,212,191,0.12)]">
+    <div className="w-full rounded-lg border-2 border-cyan-200 bg-white/95 px-3 py-3 shadow-[0_0_14px_rgba(45,212,191,0.12)]">
       <div className="mb-3 flex items-center justify-center gap-2 rounded-full bg-cyan-50 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] text-teal-800">
         <span>Make</span>
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-100 to-teal-100 text-lg text-teal-900">{numeral}</span>
+        <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-cyan-50 text-lg text-teal-900">{numeral}</span>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
         {parts.map((part, index) => (
@@ -195,12 +187,12 @@ function GroundPairCard({
   patternLayout?: GroundPatternLayout;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-3 rounded-[20px] border-2 border-cyan-200 bg-white/95 px-3 py-3">
-      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-gradient-to-br from-cyan-100 to-teal-100 text-3xl font-black text-teal-900 sm:h-16 sm:w-16 sm:text-4xl">
+    <div className="flex flex-wrap items-center justify-center gap-3 rounded-lg border-2 border-cyan-200 bg-white/95 px-3 py-3">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-3xl font-black text-teal-900 sm:h-16 sm:w-16 sm:text-4xl">
         {numeral}
       </div>
       {word ? (
-        <div className="rounded-[18px] border-2 border-cyan-200 bg-cyan-50 px-4 py-3 text-2xl font-black lowercase text-teal-900 sm:text-3xl">
+        <div className="rounded-lg border-2 border-cyan-200 bg-cyan-50 px-4 py-3 text-2xl font-black lowercase text-teal-900 sm:text-3xl">
           {word}
         </div>
       ) : null}
@@ -222,7 +214,7 @@ function GroundOptionButton({
     <button
       type="button"
       onClick={onClick}
-      className="relative flex min-h-[132px] w-full items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white px-3 py-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:min-h-[148px] sm:px-4 sm:py-4"
+      className="relative flex min-h-[132px] w-full items-center justify-center rounded-lg border-2 border-cyan-200 bg-white px-3 py-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:min-h-[148px] sm:px-4 sm:py-4"
     >
       {speakText ? (
         <span className="absolute right-3 top-3 z-10">
@@ -264,7 +256,7 @@ function renderQuestionVisual(task: GroundMatchTask) {
         {task.shownSequence.map((value, index) => (
           <div
             key={`${task.targetNumber}-seq-${index}`}
-            className={`flex h-16 min-w-[72px] items-center justify-center rounded-[20px] border-2 px-4 text-3xl font-black shadow-sm sm:h-20 sm:min-w-[88px] sm:text-4xl ${
+            className={`flex h-16 min-w-[72px] items-center justify-center rounded-lg border-2 px-4 text-3xl font-black shadow-sm sm:h-20 sm:min-w-[88px] sm:text-4xl ${
               value === "__"
                 ? "border-dashed border-cyan-300 bg-cyan-50 text-cyan-500"
                 : "border-cyan-200 bg-white text-teal-900"
@@ -303,8 +295,8 @@ function renderQuestionVisual(task: GroundMatchTask) {
 function renderHelperVisual(task: GroundMatchTask) {
   if (task.helperVariant === "numbot") {
     return (
-      <div className="mt-4 flex items-center justify-center gap-3 rounded-[22px] border border-cyan-200 bg-white/90 px-4 py-3 shadow-sm">
-        <div className="text-5xl">🤖</div>
+      <div className="mt-4 flex items-center justify-center gap-3 rounded-lg border border-cyan-200 bg-white/90 px-4 py-3 shadow-sm">
+        <GroundObjectToken objectType="robots" size="lg" />
         <div className="rounded-full bg-cyan-50 px-4 py-2 text-sm font-black uppercase tracking-[0.16em] text-teal-800">
           Numbot says
         </div>
@@ -314,7 +306,7 @@ function renderHelperVisual(task: GroundMatchTask) {
   if (task.helperVariant === "speech_bubble") {
     return (
       <div className="mt-4 flex justify-center">
-        <div className="rounded-[22px] border border-cyan-200 bg-white/90 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-teal-800 shadow-sm">
+        <div className="rounded-lg border border-cyan-200 bg-white/90 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-teal-800 shadow-sm">
           <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Number bubble</span>
         </div>
       </div>
@@ -323,7 +315,7 @@ function renderHelperVisual(task: GroundMatchTask) {
   if (task.helperVariant === "memory") {
     return (
       <div className="mt-4 flex justify-center">
-        <div className="rounded-[22px] border border-cyan-200 bg-white/90 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-teal-800 shadow-sm">
+        <div className="rounded-lg border border-cyan-200 bg-white/90 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-teal-800 shadow-sm">
           Listen, then remember
         </div>
       </div>
@@ -389,7 +381,7 @@ export default function GroundMatchTaskCard({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-[28px] border border-cyan-200/70 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-5 shadow-[0_6px_18px_rgba(13,148,136,0.08)]">
+      <div className="rounded-lg border border-cyan-200/70 bg-slate-50 p-5 shadow-[0_6px_18px_rgba(13,148,136,0.08)]">
         <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-teal-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-teal-800">
           Ground Explorer
         </div>

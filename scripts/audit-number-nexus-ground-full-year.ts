@@ -128,6 +128,10 @@ for (let week = 1; week <= 12; week += 1) {
 
 const bankSource = fs.readFileSync(path.join(process.cwd(), "data/quizzes/prepNumberNexus.ts"), "utf8");
 const visualSource = fs.readFileSync(path.join(process.cwd(), "components/quiz/GroundNumberNexusQuizVisual.tsx"), "utf8");
+const foundationVisualSource = fs.readFileSync(path.join(process.cwd(), "components/ground/GroundFoundationTaskCard.tsx"), "utf8");
+const miniGameVisualSource = fs.readFileSync(path.join(process.cwd(), "components/ground/GroundMiniGameTask.tsx"), "utf8");
+const matchVisualSource = fs.readFileSync(path.join(process.cwd(), "components/ground/GroundMatchTaskCard.tsx"), "utf8");
+const tokenVisualSource = fs.readFileSync(path.join(process.cwd(), "components/ground/GroundObjectToken.tsx"), "utf8");
 const sessionSource = fs.readFileSync(path.join(process.cwd(), "app/session/page.tsx"), "utf8");
 assert(!/activities\/prep|programs\/prep|generatePrepWeek/.test(bankSource), "Ground weekly bank reuses lesson-native content.");
 assert(sessionSource.includes('if (!isMeasurementRealm && year === "Prep")') && sessionSource.includes("buildPrepNumberNexusWeeklyQuiz(Number(week))"), "Ground production quiz routes do not use the independent bank.");
@@ -137,7 +141,12 @@ assert(sessionSource.includes('isFinalQuizWeek ? "Continue to Post-Test"'), "The
 assert(sessionSource.includes("`/posttest?year=${encodeURIComponent(year)}${realmParam}`"), "The final Ground quiz does not route to the Post-Test.");
 assert(!sessionSource.includes("Math.min(12, Number(week) + 1)"), "The final Ground quiz still attempts to unlock a non-existent week.");
 assert(!visualSource.includes("rounded-2xl") && !visualSource.includes("rounded-3xl"), "Ground quiz visuals use legacy excessive rounding.");
-assert(visualSource.includes("Star") && visualSource.includes("Bot") && visualSource.includes("Gem"), "Ground quiz visuals are missing the modern token system.");
+const productionVisualSources = [foundationVisualSource, miniGameVisualSource, matchVisualSource, visualSource];
+assert(productionVisualSources.every((source) => source.includes("GroundObjectToken")), "A production Ground surface is not using the shared manipulative token system.");
+assert(productionVisualSources.every((source) => !/rounded-\[(?:12|14|16|18|20|22|24|28)px\]|rounded-2xl|rounded-3xl/.test(source)), "A production Ground surface uses legacy oversized corner radii.");
+assert(productionVisualSources.every((source) => !/bg-gradient-to-(?:br|r)/.test(source)), "A production Ground surface uses the retired gradient-heavy card treatment.");
+assert(!/[🤖🚀🛸🪐⭐💎🏁✨]/u.test(productionVisualSources.join("\n")), "A production Ground surface renders platform-dependent emoji artwork.");
+assert(tokenVisualSource.includes("lucide-react") && tokenVisualSource.includes("TOKEN_TONES"), "The shared Ground token renderer is not using the premium icon and colour system.");
 
 const blueprint = NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS.find((item) => item.level === 0);
 const posttest = getPosttestForYearLabel("Prep", "number")?.questions ?? [];

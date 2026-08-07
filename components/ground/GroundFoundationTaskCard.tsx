@@ -1,44 +1,24 @@
 "use client";
 
-import { Bot, Check, Gem, Plus, RotateCcw, Star, Volume2 } from "lucide-react";
+import { Check, Plus, RotateCcw, Volume2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { speak } from "@/lib/speak";
+import GroundObjectToken from "@/components/ground/GroundObjectToken";
 
 type GroundFoundationTask = Extract<PracticeTask, { kind: "groundFoundation" }>;
 type ObjectName = Extract<GroundFoundationTask, { mode: "add_to" }> ["object"];
 
-const PATTERN_STYLES: Record<string, string> = {
-  star: "bg-amber-300 text-amber-950 border-amber-500",
-  crystal: "bg-cyan-300 text-cyan-950 border-cyan-500",
-  robot: "bg-rose-300 text-rose-950 border-rose-500",
-};
-
-function ObjectIcon({ object, className = "h-7 w-7" }: { object: ObjectName; className?: string }) {
-  if (object === "robots") return <Bot className={className} />;
-  if (object === "stars") return <Star className={className} />;
-  return <Gem className={className} />;
-}
-
-function Token({ object, muted = false }: { object: ObjectName; muted?: boolean }) {
-  return (
-    <span className={`grid h-12 w-12 place-items-center rounded-lg border-2 ${muted ? "border-slate-300 bg-slate-100 text-slate-400" : "border-cyan-500 bg-cyan-100 text-cyan-900"}`}>
-      <ObjectIcon object={object} />
-    </span>
-  );
+function Token({ object, muted = false, newlyAdded = false }: { object: ObjectName; muted?: boolean; newlyAdded?: boolean }) {
+  return <GroundObjectToken objectType={object} size="lg" muted={muted} newlyAdded={newlyAdded} />;
 }
 
 function PatternToken({ token }: { token: string }) {
-  const Icon = token === "star" ? Star : token === "robot" ? Bot : Gem;
-  return (
-    <span className={`grid h-14 w-14 place-items-center rounded-lg border-2 ${PATTERN_STYLES[token] ?? PATTERN_STYLES.crystal}`}>
-      <Icon className="h-7 w-7" />
-    </span>
-  );
+  return <GroundObjectToken objectType={token} size="md" />;
 }
 
 function Frame({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-lg border-2 border-slate-200 bg-white p-4 shadow-sm">{children}</div>;
+  return <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.08)]">{children}</div>;
 }
 
 export default function GroundFoundationTaskCard({
@@ -96,7 +76,7 @@ export default function GroundFoundationTaskCard({
   const canAssign = (task.mode === "equal_share" || task.mode === "equal_group") && assignments.length < task.total;
 
   return (
-    <div className="mx-auto w-full max-w-4xl rounded-lg border border-slate-300 bg-slate-50 p-5 text-slate-950 shadow-lg">
+    <div className="mx-auto w-full max-w-4xl rounded-lg border border-slate-200 bg-white p-5 text-slate-950 shadow-[0_12px_32px_rgba(15,23,42,0.10)]">
       <div className="flex items-start justify-between gap-4">
         <h2 className="text-2xl font-extrabold leading-tight">{task.prompt}</h2>
         {task.speakText ? (
@@ -109,21 +89,24 @@ export default function GroundFoundationTaskCard({
       <div className="mt-5">
         {task.mode === "add_to" ? (
           <Frame>
-            <div className="flex min-h-28 flex-wrap items-center justify-center gap-3">
-              {Array.from({ length: task.start }, (_, index) => <Token key={`start-${index}`} object={task.object} />)}
-              {Array.from({ length: count }, (_, index) => <Token key={`added-${index}`} object={task.object} />)}
-            </div>
-            <div className="mt-4 flex justify-center">
-              <button type="button" onClick={() => setCount((value) => Math.min(value + 1, task.change + 2))} className="inline-flex h-12 items-center gap-2 rounded-lg bg-cyan-700 px-5 font-bold text-white">
-                <Plus className="h-5 w-5" /> Add one
-              </button>
+            <div className="grid gap-4 sm:grid-cols-[1fr_136px]">
+              <div className="flex min-h-36 flex-wrap content-center items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white p-4">
+                {Array.from({ length: task.start }, (_, index) => <Token key={`start-${index}`} object={task.object} />)}
+                {Array.from({ length: count }, (_, index) => <Token key={`added-${index}`} object={task.object} newlyAdded={index === count - 1} />)}
+              </div>
+              <div className="flex min-h-36 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-cyan-300 bg-cyan-50/60 p-3">
+                <GroundObjectToken objectType={task.object} size="md" />
+                <button type="button" onClick={() => setCount((value) => Math.min(value + 1, task.change + 2))} className="inline-flex h-11 items-center gap-2 rounded-lg bg-cyan-700 px-4 font-bold text-white shadow-sm transition hover:bg-cyan-600 active:scale-[0.98]">
+                  <Plus className="h-5 w-5" /> Add {task.object.slice(0, -1)}
+                </button>
+              </div>
             </div>
           </Frame>
         ) : null}
 
         {task.mode === "take_away" ? (
           <Frame>
-            <div className="flex min-h-28 flex-wrap items-center justify-center gap-3">
+            <div className="flex min-h-36 flex-wrap content-center items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white p-4">
               {Array.from({ length: task.total }, (_, index) => (
                 <button key={index} type="button" onClick={() => setRemoved((values) => values.includes(index) ? values.filter((value) => value !== index) : [...values, index])} aria-label={`${removed.includes(index) ? "Restore" : "Remove"} ${task.object.slice(0, -1)} ${index + 1}`}>
                   <Token object={task.object} muted={removed.includes(index)} />
@@ -136,16 +119,16 @@ export default function GroundFoundationTaskCard({
         {task.mode === "equal_share" || task.mode === "equal_group" ? (
           <div className="space-y-4">
             <Frame>
-              <div className="flex min-h-16 flex-wrap justify-center gap-2">
-                {Array.from({ length: task.total - assignments.length }, (_, index) => <Token key={index} object="crystals" />)}
+              <div className="flex min-h-24 flex-wrap content-center justify-center gap-2 rounded-lg border border-slate-200 bg-white p-3">
+                {Array.from({ length: task.total - assignments.length }, (_, index) => <GroundObjectToken key={index} objectType="crystals" />)}
               </div>
             </Frame>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {Array.from({ length: task.mode === "equal_share" ? task.groups : boxCount }, (_, group) => (
                 <button key={group} type="button" disabled={!canAssign} onClick={() => setAssignments((values) => [...values, group])} className="min-h-32 rounded-lg border-2 border-cyan-500 bg-white p-3 disabled:opacity-60">
                   <span className="text-sm font-bold text-slate-600">Group {group + 1}</span>
-                  <span className="mt-3 flex flex-wrap justify-center gap-1">
-                    {assignments.filter((value) => value === group).map((_, index) => <Gem key={index} className="h-7 w-7 text-cyan-700" />)}
+                  <span className="mt-3 flex flex-wrap justify-center gap-2">
+                    {assignments.filter((value) => value === group).map((_, index) => <GroundObjectToken key={index} objectType="crystals" size="sm" />)}
                   </span>
                 </button>
               ))}

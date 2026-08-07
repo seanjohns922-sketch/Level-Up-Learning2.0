@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Bot, Check, Flag } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import GroundObjectToken from "@/components/ground/GroundObjectToken";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -18,21 +20,7 @@ type GroundFeedTask = Extract<PracticeTask, { kind: "groundFeed" }>;
 type GroundSoundCountTask = Extract<PracticeTask, { kind: "groundSoundCount" }>;
 type GroundOrderTapTask = Extract<PracticeTask, { kind: "groundOrderTap" }>;
 type GroundGrowingCountTask = Extract<PracticeTask, { kind: "groundGrowingCount" }>;
-
-const OBJECT_META = {
-  dots: { label: "dots", emoji: "●" },
-  gems: { label: "gems", emoji: "◆" },
-  stars: { label: "stars", emoji: "★" },
-  blocks: { label: "blocks", emoji: "■" },
-  robot_tokens: { label: "robot tokens", emoji: "⬢" },
-  energy_orbs: { label: "energy orbs", emoji: "⬤" },
-  crystals: { label: "crystals", emoji: "✦" },
-  bolts: { label: "bolts", emoji: "⚡︎" },
-  futuristic_coins: { label: "coins", emoji: "◉" },
-  planets: { label: "planets", emoji: "◍" },
-  rockets: { label: "rockets", emoji: "▲" },
-  number_orbs: { label: "number orbs", emoji: "◎" },
-} as const;
+type GroundObjectType = GroundCollectTask["objectType"];
 
 type GroundPatternLayout = GroundFlashTask["patternLayout"];
 type BuildVisualStyle = GroundBuildTask["visualStyle"];
@@ -94,36 +82,34 @@ function StructuredFrame({
   filled,
 }: {
   quantity: number;
-  objectType: keyof typeof OBJECT_META;
+  objectType: GroundObjectType;
   columns: number;
   slots: number;
   filled: number[];
 }) {
-  const meta = OBJECT_META[objectType];
   return (
     <div className="mx-auto grid justify-center gap-3" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
       {Array.from({ length: slots }).map((_, index) => {
         const isFilled = filled.includes(index);
         return (
-          <span key={`${objectType}-${quantity}-${index}`} className={`inline-flex h-10 w-10 items-center justify-center rounded-full text-3xl ${isFilled ? "bg-white text-teal-700 shadow-sm" : "bg-transparent text-transparent"}`}>
-            {meta.emoji}
-          </span>
+          isFilled
+            ? <GroundObjectToken key={`${objectType}-${quantity}-${index}`} objectType={objectType} size="sm" />
+            : <span key={`${objectType}-${quantity}-${index}`} className="h-9 w-9 rounded-lg border border-dashed border-slate-200 bg-white/60" />
         );
       })}
     </div>
   );
 }
 
-function StructuredReveal({ quantity, objectType, patternLayout }: { quantity: number; objectType: keyof typeof OBJECT_META; patternLayout?: GroundPatternLayout }) {
-  const meta = OBJECT_META[objectType];
+function StructuredReveal({ quantity, objectType, patternLayout }: { quantity: number; objectType: GroundObjectType; patternLayout?: GroundPatternLayout }) {
   if (patternLayout === "ten_frame" && quantity > 10) {
     return (
       <div className="mx-auto flex max-w-[260px] flex-col gap-3">
-        <div className="rounded-[18px] border border-cyan-200 bg-white p-2 shadow-sm">
+        <div className="rounded-lg border border-cyan-200 bg-white p-2 shadow-sm">
           <div className="mb-2 text-center text-[10px] font-black uppercase tracking-[0.16em] text-teal-700">Full 10</div>
           <StructuredFrame quantity={10} objectType={objectType} columns={5} slots={10} filled={Array.from({ length: 10 }, (_, index) => index)} />
         </div>
-        <div className="rounded-[18px] border border-cyan-200 bg-white p-2 shadow-sm">
+        <div className="rounded-lg border border-cyan-200 bg-white p-2 shadow-sm">
           <div className="mb-2 text-center text-[10px] font-black uppercase tracking-[0.16em] text-teal-700">Extras</div>
           <StructuredFrame quantity={quantity - 10} objectType={objectType} columns={5} slots={10} filled={Array.from({ length: quantity - 10 }, (_, index) => index)} />
         </div>
@@ -135,9 +121,7 @@ function StructuredReveal({ quantity, objectType, patternLayout }: { quantity: n
     return (
       <div className="flex flex-wrap justify-center gap-3">
         {Array.from({ length: quantity }).map((_, index) => (
-          <span key={`${objectType}-${index}`} className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-3xl text-teal-700 shadow-sm">
-            {meta.emoji}
-          </span>
+          <GroundObjectToken key={`${objectType}-${index}`} objectType={objectType} size="sm" />
         ))}
       </div>
     );
@@ -158,7 +142,7 @@ function GroundMiniShell({
 }) {
   return (
     <div className="space-y-4">
-      <div className="rounded-[28px] border border-cyan-200/70 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-5 shadow-[0_6px_18px_rgba(13,148,136,0.08)]">
+      <div className="rounded-lg border border-cyan-200/70 bg-slate-50 p-5 shadow-[0_6px_18px_rgba(13,148,136,0.08)]">
         <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-teal-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-teal-800">
           {badge}
         </div>
@@ -179,23 +163,18 @@ function GroundToken({
   selected = false,
   onClick,
 }: {
-  objectType: keyof typeof OBJECT_META;
+  objectType: GroundObjectType;
   selected?: boolean;
   onClick?: () => void;
 }) {
-  const meta = OBJECT_META[objectType];
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={!onClick}
-      className={`inline-flex h-14 w-14 items-center justify-center rounded-full border-2 text-3xl transition sm:h-16 sm:w-16 ${
-        selected
-          ? "border-teal-400 bg-teal-100 text-teal-800 shadow-[0_0_18px_rgba(45,212,191,0.25)]"
-          : "border-cyan-200 bg-white text-teal-700 hover:border-cyan-300 hover:bg-cyan-50"
-      }`}
+      className="inline-flex rounded-lg transition hover:-translate-y-0.5 active:scale-[0.98]"
     >
-      {meta.emoji}
+      <GroundObjectToken objectType={objectType} size="lg" selected={selected} />
     </button>
   );
 }
@@ -213,7 +192,7 @@ function GroundNumeralOption({
     <button
       type="button"
       onClick={onClick}
-      className="relative flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98]"
+      className="relative flex min-h-[112px] items-center justify-center rounded-lg border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98]"
     >
       {speakText ? (
         <span className="absolute right-3 top-3 z-10">
@@ -236,19 +215,19 @@ function getCompareVisualStyle(task: GroundCompareTask): NonNullable<CompareVisu
 function getBoardConfig(style: BuildVisualStyle | CompareVisualStyle | undefined) {
   switch (style) {
     case "crate_system":
-      return { columns: 4, sectionSize: 4, panelClass: "rounded-[24px] border border-amber-200 bg-amber-50/60 p-3 shadow-sm", cellClass: "rounded-[14px] border-2 border-amber-200 bg-white" };
+      return { columns: 4, sectionSize: 4, panelClass: "rounded-lg border border-amber-200 bg-amber-50/60 p-3 shadow-sm", cellClass: "rounded-lg border-2 border-amber-200 bg-white" };
     case "collection_shelves":
-      return { columns: 5, sectionSize: 5, panelClass: "rounded-[24px] border border-cyan-200 bg-slate-50/80 p-3 shadow-sm", cellClass: "rounded-[12px] border-2 border-cyan-200 bg-white" };
+      return { columns: 5, sectionSize: 5, panelClass: "rounded-lg border border-cyan-200 bg-slate-50/80 p-3 shadow-sm", cellClass: "rounded-lg border-2 border-cyan-200 bg-white" };
     case "reactor_cells":
-      return { columns: 5, sectionSize: 10, panelClass: "rounded-[24px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-3 shadow-[0_0_20px_rgba(34,211,238,0.1)]", cellClass: "rounded-[16px] border-2 border-cyan-200 bg-slate-900/5" };
+      return { columns: 5, sectionSize: 10, panelClass: "rounded-lg border border-cyan-200 bg-slate-50 p-3 shadow-[0_0_20px_rgba(34,211,238,0.1)]", cellClass: "rounded-lg border-2 border-cyan-200 bg-slate-900/5" };
     case "stacked_groups":
-      return { columns: 5, sectionSize: 5, panelClass: "rounded-[24px] border border-cyan-200 bg-white p-3 shadow-sm", cellClass: "rounded-full border-2 border-cyan-200 bg-cyan-50" };
+      return { columns: 5, sectionSize: 5, panelClass: "rounded-lg border border-cyan-200 bg-white p-3 shadow-sm", cellClass: "rounded-full border-2 border-cyan-200 bg-cyan-50" };
     case "energy_cell_grid":
-      return { columns: 5, sectionSize: 10, panelClass: "rounded-[24px] border border-cyan-200 bg-cyan-50/70 p-3 shadow-sm", cellClass: "rounded-[14px] border-2 border-cyan-200 bg-white" };
+      return { columns: 5, sectionSize: 10, panelClass: "rounded-lg border border-cyan-200 bg-cyan-50/70 p-3 shadow-sm", cellClass: "rounded-lg border-2 border-cyan-200 bg-white" };
     case "double_ten_frame":
-      return { columns: 5, sectionSize: 10, panelClass: "rounded-[24px] border border-cyan-200 bg-white p-3 shadow-sm", cellClass: "rounded-full border-2 border-cyan-200 bg-cyan-50" };
+      return { columns: 5, sectionSize: 10, panelClass: "rounded-lg border border-cyan-200 bg-white p-3 shadow-sm", cellClass: "rounded-full border-2 border-cyan-200 bg-cyan-50" };
     default:
-      return { columns: 5, sectionSize: 5, panelClass: "rounded-[24px] border border-cyan-200 bg-cyan-50/40 p-3 shadow-sm", cellClass: "rounded-[16px] border-2 border-dashed border-cyan-200 bg-white" };
+      return { columns: 5, sectionSize: 5, panelClass: "rounded-lg border border-cyan-200 bg-cyan-50/40 p-3 shadow-sm", cellClass: "rounded-lg border-2 border-dashed border-cyan-200 bg-white" };
   }
 }
 
@@ -259,14 +238,13 @@ function QuantityBoard({
   style,
   onCellClick,
 }: {
-  objectType: keyof typeof OBJECT_META;
+  objectType: GroundObjectType;
   totalSlots: number;
   filledStates: Array<"empty" | "filled" | "left" | "right">;
   style?: BuildVisualStyle | CompareVisualStyle;
   onCellClick?: (index: number) => void;
 }) {
   const config = getBoardConfig(style);
-  const meta = OBJECT_META[objectType];
   const sections = [];
   for (let start = 0; start < totalSlots; start += config.sectionSize) sections.push(start);
   return (
@@ -306,7 +284,7 @@ function QuantityBoard({
                     className={`flex h-12 w-full items-center justify-center border-2 text-2xl transition sm:h-14 ${config.cellClass} ${tone}`}
                   >
                     {filled ? (
-                      <span className={`flex h-7 w-7 items-center justify-center rounded-full text-lg ${contentClass}`}>{meta.emoji}</span>
+                      <GroundObjectToken objectType={objectType} size="sm" className={contentClass} />
                     ) : (
                       <span className="h-6 w-6 rounded-full border border-cyan-200 bg-cyan-50" />
                     )}
@@ -323,7 +301,7 @@ function QuantityBoard({
 
 function GroundCountBadge({ count, target }: { count: number; target?: number }) {
   return (
-    <div className="mb-3 flex items-center justify-between rounded-2xl bg-cyan-50 px-4 py-2">
+    <div className="mb-3 flex items-center justify-between rounded-lg bg-cyan-50 px-4 py-2">
       <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">Count</div>
       <div className="text-2xl font-black text-teal-900">
         {count}
@@ -357,8 +335,8 @@ export function GroundCollectTaskCard({
 
   return (
     <GroundMiniShell badge="Collect Game" prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
-        <div className="mb-3 flex items-center justify-between rounded-2xl bg-cyan-50 px-4 py-2">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between rounded-lg bg-cyan-50 px-4 py-2">
           <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">Collected</div>
           <div className="text-2xl font-black text-teal-900">
             {selectedIds.length} / {task.targetNumber}
@@ -380,14 +358,14 @@ export function GroundCollectTaskCard({
         <button
           type="button"
           onClick={() => setSelectedIds([])}
-          className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-base font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-base font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           Reset
         </button>
         <button
           type="button"
           onClick={check}
-          className="rounded-[22px] bg-gradient-to-r from-teal-600 to-cyan-500 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
+          className="rounded-lg bg-teal-700 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
         >
           Done
         </button>
@@ -410,14 +388,14 @@ function SplitBuildZone({
   canRemove: boolean;
 }) {
   return (
-    <div className="rounded-[18px] border border-cyan-200 bg-white px-3 py-2 shadow-sm">
+    <div className="rounded-lg border border-cyan-200 bg-white px-3 py-2 shadow-sm">
       <div className="mb-1 text-center text-3xl font-black text-teal-900">{count}</div>
       <div className="grid grid-cols-[44px_1fr_44px] items-center gap-2">
         <button
           type="button"
           onClick={onRemove}
           disabled={!canRemove}
-          className="rounded-[14px] border-2 border-cyan-200 bg-white px-2 py-2 text-lg font-black text-slate-700 transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-45"
+          className="rounded-lg border-2 border-cyan-200 bg-white px-2 py-2 text-lg font-black text-slate-700 transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-45"
         >
           −
         </button>
@@ -428,7 +406,7 @@ function SplitBuildZone({
           type="button"
           onClick={onAdd}
           disabled={!canAdd}
-          className="rounded-[14px] border-2 border-cyan-200 bg-white px-2 py-2 text-lg font-black text-slate-700 transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-45"
+          className="rounded-lg border-2 border-cyan-200 bg-white px-2 py-2 text-lg font-black text-slate-700 transition enabled:hover:border-cyan-300 enabled:hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-45"
         >
           +
         </button>
@@ -468,7 +446,7 @@ function TenFrameBuilder({
   leftCount: number;
   rightCount: number;
   activePart: "left" | "right";
-  objectType: keyof typeof OBJECT_META;
+  objectType: GroundObjectType;
   visualStyle?: BuildVisualStyle;
   onSelectPart: (part: "left" | "right") => void;
   onToggleDot: (index: number) => void;
@@ -487,7 +465,7 @@ function TenFrameBuilder({
         <button
           type="button"
           onClick={() => onSelectPart("left")}
-          className={`rounded-[16px] border-2 px-3 py-2 text-sm font-black transition ${
+          className={`rounded-lg border-2 px-3 py-2 text-sm font-black transition ${
             activePart === "left"
               ? "border-teal-400 bg-teal-100 text-teal-900 shadow-[0_0_16px_rgba(20,184,166,0.16)]"
               : "border-cyan-200 bg-white text-slate-700"
@@ -498,7 +476,7 @@ function TenFrameBuilder({
         <button
           type="button"
           onClick={() => onSelectPart("right")}
-          className={`rounded-[16px] border-2 px-3 py-2 text-sm font-black transition ${
+          className={`rounded-lg border-2 px-3 py-2 text-sm font-black transition ${
             activePart === "right"
               ? "border-orange-300 bg-orange-100 text-orange-900 shadow-[0_0_16px_rgba(251,146,60,0.16)]"
               : "border-cyan-200 bg-white text-slate-700"
@@ -595,14 +573,14 @@ export function GroundBuildTaskCard({
   if (buildMode === "split") {
     return (
       <GroundMiniShell badge="Build Game" prompt={task.prompt} speakText={task.speakText}>
-        <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-4 shadow-sm">
+        <div className="rounded-lg border border-cyan-200 bg-slate-50 p-4 shadow-sm">
           <div className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[20px] border border-cyan-200 bg-white px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-cyan-200 bg-white px-4 py-3">
               <div>
                 <div className="text-xs font-black uppercase tracking-[0.16em] text-teal-700">Target</div>
                 <div className={`mt-1 text-4xl font-black transition ${splitValid ? "scale-105 text-emerald-700" : "text-teal-900"}`}>{task.targetNumber}</div>
               </div>
-              <div className={`rounded-[18px] border-2 px-3 py-2 transition ${splitValid ? "border-emerald-300 bg-emerald-50 shadow-[0_0_20px_rgba(16,185,129,0.18)]" : "border-teal-300 bg-white shadow-[0_0_16px_rgba(45,212,191,0.12)]"}`}>
+              <div className={`rounded-lg border-2 px-3 py-2 transition ${splitValid ? "border-emerald-300 bg-emerald-50 shadow-[0_0_20px_rgba(16,185,129,0.18)]" : "border-teal-300 bg-white shadow-[0_0_16px_rgba(45,212,191,0.12)]"}`}>
                 <StructuredReveal
                   quantity={task.targetNumber}
                   objectType={task.referenceGroup?.objectType ?? task.objectType}
@@ -612,7 +590,7 @@ export function GroundBuildTaskCard({
             </div>
 
             {task.showExample !== false && task.exampleParts && task.exampleParts.length === 2 ? (
-              <div className="rounded-[18px] border border-cyan-200 bg-white px-3 py-2 shadow-sm">
+              <div className="rounded-lg border border-cyan-200 bg-white px-3 py-2 shadow-sm">
                 <ExampleBuildRow parts={task.exampleParts} />
               </div>
             ) : null}
@@ -670,7 +648,7 @@ export function GroundBuildTaskCard({
                         setRightBuilt(0);
                         setActivePart("left");
                       }}
-                      className="rounded-[18px] border-2 border-cyan-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+                      className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
                     >
                       Clear
                     </button>
@@ -678,7 +656,7 @@ export function GroundBuildTaskCard({
                       type="button"
                       onClick={check}
                       disabled={!hasInteracted}
-                      className="rounded-[18px] bg-gradient-to-r from-teal-600 to-cyan-500 px-5 py-3 text-sm font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
+                      className="rounded-lg bg-teal-700 px-5 py-3 text-sm font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
                     >
                       Done
                     </button>
@@ -694,7 +672,7 @@ export function GroundBuildTaskCard({
                     setRightBuilt(0);
                     setActivePart("left");
                   }}
-                  className="rounded-[18px] border-2 border-cyan-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+                  className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
                 >
                   Clear
                 </button>
@@ -702,7 +680,7 @@ export function GroundBuildTaskCard({
                   type="button"
                   onClick={check}
                   disabled={!hasInteracted}
-                  className="rounded-[18px] bg-gradient-to-r from-teal-600 to-cyan-500 px-5 py-3 text-sm font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
+                  className="rounded-lg bg-teal-700 px-5 py-3 text-sm font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   Done
                 </button>
@@ -716,13 +694,13 @@ export function GroundBuildTaskCard({
 
   return (
     <GroundMiniShell badge="Build Game" prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
-        <div className="mb-3 flex items-center justify-between rounded-2xl bg-cyan-50 px-4 py-2">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between rounded-lg bg-cyan-50 px-4 py-2">
           <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">Your Build</div>
           <div className="text-sm font-black uppercase tracking-[0.16em] text-cyan-600">Count with your eyes</div>
         </div>
         {task.referenceGroup ? (
-          <div className="mb-4 rounded-[22px] border-2 border-cyan-200 bg-cyan-50 p-3">
+          <div className="mb-4 rounded-lg border-2 border-cyan-200 bg-cyan-50 p-3">
             <div className="mb-2 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">Match this group</div>
             <CompareGroupCard
               quantity={task.referenceGroup.quantity}
@@ -749,21 +727,21 @@ export function GroundBuildTaskCard({
         <button
           type="button"
           onClick={() => { markInteracted(); setBuilt((current) => Math.max(0, current - 1)); }}
-          className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           −
         </button>
         <button
           type="button"
           onClick={() => { markInteracted(); setBuilt((current) => Math.min(traySize, current + 1)); }}
-          className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           +
         </button>
         <button
           type="button"
           onClick={check}
-          className="rounded-[22px] bg-gradient-to-r from-teal-600 to-cyan-500 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
+          className="rounded-lg bg-teal-700 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
         >
           Done
         </button>
@@ -781,7 +759,7 @@ function CompareGroupCard(
   visualStyle,
 }: {
   quantity: number;
-  objectType: keyof typeof OBJECT_META;
+  objectType: GroundObjectType;
   patternLayout?: GroundPatternLayout;
   emphasized?: boolean;
   orderIndex?: number;
@@ -791,14 +769,14 @@ function CompareGroupCard(
   const cardTone = visualStyle === "balance_panels"
     ? emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-cyan-50/60"
     : visualStyle === "reactor_cells"
-      ? emphasized ? "border-teal-300 bg-teal-50 shadow-[0_0_18px_rgba(45,212,191,0.12)]" : "border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50"
+      ? emphasized ? "border-teal-300 bg-teal-50 shadow-[0_0_18px_rgba(45,212,191,0.12)]" : "border-cyan-200 bg-slate-50"
       : visualStyle === "collection_shelves"
         ? emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-slate-50"
         : visualStyle === "crate_system"
           ? emphasized ? "border-amber-300 bg-amber-50" : "border-amber-200 bg-white"
           : emphasized ? "border-teal-300 bg-teal-50" : "border-cyan-200 bg-white";
   return (
-    <div className={`relative rounded-[22px] border-2 px-3 py-3 shadow-sm transition ${cardTone}`}>
+    <div className={`relative rounded-lg border-2 px-3 py-3 shadow-sm transition ${cardTone}`}>
       {typeof orderIndex === "number" ? (
         <div className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border-2 border-teal-300 bg-white text-xl font-black text-teal-800 shadow-sm">
           {orderIndex + 1}
@@ -836,15 +814,15 @@ export function MemoryChallengeBox({
 }) {
   if (phase === "ready") {
     return (
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col items-center justify-center gap-3 rounded-[20px] bg-cyan-50 px-4 py-6 text-center">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-lg bg-cyan-50 px-4 py-6 text-center">
           <div className="text-5xl" aria-hidden>👀</div>
           <div className="text-lg font-black uppercase tracking-[0.16em] text-teal-800">Memory Challenge</div>
           <div className="text-sm font-bold text-slate-500">Press when ready.</div>
           <button
             type="button"
             onClick={onReveal}
-            className="mt-1 rounded-full bg-gradient-to-r from-teal-600 to-cyan-500 px-8 py-3 text-lg font-black uppercase tracking-[0.12em] text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)] transition hover:-translate-y-0.5 active:scale-[0.98]"
+            className="mt-1 rounded-full bg-teal-700 px-8 py-3 text-lg font-black uppercase tracking-[0.12em] text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)] transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
             Reveal
           </button>
@@ -854,11 +832,11 @@ export function MemoryChallengeBox({
   }
 
   return (
-    <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+    <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
       <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
         {phase === "revealed" ? studyLabel : hiddenLabel}
       </div>
-      <div className="flex min-h-[108px] items-center justify-center rounded-[20px] bg-cyan-50 px-4 py-4">
+      <div className="flex min-h-[108px] items-center justify-center rounded-lg bg-cyan-50 px-4 py-4">
         {phase === "revealed" ? children : hiddenPlaceholder}
       </div>
       {phase === "revealed" ? (
@@ -866,7 +844,7 @@ export function MemoryChallengeBox({
           <button
             type="button"
             onClick={onHide}
-            className="rounded-full bg-gradient-to-r from-teal-600 to-cyan-500 px-8 py-3 text-base font-black uppercase tracking-[0.12em] text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)] transition hover:-translate-y-0.5 active:scale-[0.98]"
+            className="rounded-full bg-teal-700 px-8 py-3 text-base font-black uppercase tracking-[0.12em] text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)] transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
             I&apos;ve Seen It
           </button>
@@ -952,7 +930,7 @@ export function GroundCompareTaskCard({
 
   return (
     <GroundMiniShell badge={badge} prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         {task.referenceGroup ? (
           <div className="mb-4">
             <MemoryChallengeBox
@@ -981,7 +959,7 @@ export function GroundCompareTaskCard({
             <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
               {task.orderDirection === "DESC" ? "Tap from biggest to smallest" : "Tap from smallest to biggest"}
             </div>
-            <div className="mb-4 rounded-[20px] border border-cyan-200 bg-cyan-50 px-4 py-3">
+            <div className="mb-4 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3">
               <div className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.16em] text-teal-800">
                 {orderDirectionLabel}
               </div>
@@ -992,7 +970,7 @@ export function GroundCompareTaskCard({
                   return (
                     <div
                       key={`slot-${index}`}
-                      className={`flex min-h-[52px] min-w-[72px] items-center justify-center rounded-[18px] border-2 px-3 text-sm font-black shadow-sm ${
+                      className={`flex min-h-[52px] min-w-[72px] items-center justify-center rounded-lg border-2 px-3 text-sm font-black shadow-sm ${
                         chosenGroup ? "border-teal-300 bg-white text-teal-900" : "border-dashed border-cyan-300 bg-white/70 text-cyan-400"
                       }`}
                     >
@@ -1036,7 +1014,7 @@ export function GroundCompareTaskCard({
             type="button"
             onClick={() => answerYesNo(true)}
             disabled={!answersEnabled}
-            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-cyan-200 disabled:hover:bg-white"
+            className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-cyan-200 disabled:hover:bg-white"
           >
             Yes
           </button>
@@ -1044,7 +1022,7 @@ export function GroundCompareTaskCard({
             type="button"
             onClick={() => answerYesNo(false)}
             disabled={!answersEnabled}
-            className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-cyan-200 disabled:hover:bg-white"
+            className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-cyan-200 disabled:hover:bg-white"
           >
             No
           </button>
@@ -1094,7 +1072,7 @@ export function GroundFlashTaskCard({
             type="button"
             disabled={!answerEnabled}
             onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="relative flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:border-cyan-200 disabled:hover:shadow-sm"
+            className="relative flex min-h-[112px] items-center justify-center rounded-lg border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:border-cyan-200 disabled:hover:shadow-sm"
           >
             <span className="absolute right-3 top-3 z-10">
               <OptionReadAloudButton text={String(option.numeral ?? "")} />
@@ -1136,7 +1114,7 @@ export function GroundHuntTaskCard({
 
   return (
     <GroundMiniShell badge="Number Hunt" prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <GroundCountBadge count={selectedIds.length} target={task.tiles.filter((tile) => tile.isTarget).length} />
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
           {task.tiles.map((tile) => (
@@ -1144,7 +1122,7 @@ export function GroundHuntTaskCard({
               key={tile.id}
               type="button"
               onClick={() => tapTile(tile.id, tile.isTarget)}
-              className={`flex min-h-[88px] items-center justify-center rounded-[22px] border-2 text-4xl font-black shadow-sm transition ${
+              className={`flex min-h-[88px] items-center justify-center rounded-lg border-2 text-4xl font-black shadow-sm transition ${
                 selectedIds.includes(tile.id)
                   ? "border-teal-400 bg-teal-100 text-teal-900"
                   : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
@@ -1170,12 +1148,12 @@ export function GroundSequenceTaskCard({
 }) {
   return (
     <GroundMiniShell badge="Missing Number" prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
           {task.sequence.map((value, index) => (
             <div
               key={`${task.targetNumber}-seq-${index}`}
-              className={`flex h-16 min-w-[72px] items-center justify-center rounded-[20px] border-2 px-4 text-3xl font-black shadow-sm sm:h-20 sm:min-w-[88px] sm:text-4xl ${
+              className={`flex h-16 min-w-[72px] items-center justify-center rounded-lg border-2 px-4 text-3xl font-black shadow-sm sm:h-20 sm:min-w-[88px] sm:text-4xl ${
                 value === "__"
                   ? "border-dashed border-cyan-300 bg-cyan-50 text-cyan-500"
                   : "border-cyan-200 bg-white text-teal-900"
@@ -1195,7 +1173,7 @@ export function GroundSequenceTaskCard({
               key={option.id}
               type="button"
               onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
-              className="relative flex min-h-[112px] items-center justify-center rounded-[24px] border-2 border-cyan-200 bg-white px-3 text-center text-3xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:text-4xl"
+              className="relative flex min-h-[112px] items-center justify-center rounded-lg border-2 border-cyan-200 bg-white px-3 text-center text-3xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:text-4xl"
             >
               <span className="absolute right-3 top-3 z-10">
                 <OptionReadAloudButton text={label} />
@@ -1228,7 +1206,7 @@ export function GroundTapCountTaskCard({
 
   return (
     <GroundMiniShell badge="Tap Count" prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <GroundCountBadge count={tappedIds.length} target={task.targetNumber} />
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
           {Array.from({ length: task.targetNumber }).map((_, index) => (
@@ -1242,7 +1220,7 @@ export function GroundTapCountTaskCard({
         </div>
       </div>
 
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
           {allTapped ? "How many?" : "Tap each one first"}
         </div>
@@ -1288,7 +1266,7 @@ export function GroundMoveCountTaskCard({
   return (
     <GroundMiniShell badge="Move To Count" prompt={task.prompt} speakText={task.speakText}>
       <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
-        <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
           <GroundCountBadge count={movedIds.length} target={task.targetNumber} />
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
             {Array.from({ length: task.targetNumber }).map((_, index) => (
@@ -1301,7 +1279,7 @@ export function GroundMoveCountTaskCard({
             ))}
           </div>
         </div>
-        <div className="rounded-[24px] border-2 border-dashed border-cyan-300 bg-cyan-50/70 p-4 shadow-sm">
+        <div className="rounded-lg border-2 border-dashed border-cyan-300 bg-cyan-50/70 p-4 shadow-sm">
           <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
             Counting Zone
           </div>
@@ -1311,14 +1289,14 @@ export function GroundMoveCountTaskCard({
                 key={`moved-${index}`}
                 className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl text-teal-700 shadow-sm"
               >
-                {OBJECT_META[task.objectType].emoji}
+                <GroundObjectToken objectType={task.objectType} size="md" />
               </span>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
           {allMoved ? "How many?" : "Move each one first"}
         </div>
@@ -1367,7 +1345,7 @@ export function GroundFeedTaskCard({
   return (
     <GroundMiniShell badge="Feed Numbot" prompt={task.prompt} speakText={task.speakText}>
       <div className="grid gap-4 lg:grid-cols-[1fr_240px]">
-        <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+        <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
           <GroundCountBadge count={fedIds.length} target={task.targetNumber} />
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
             {Array.from({ length: task.totalObjects }).map((_, index) => (
@@ -1380,11 +1358,11 @@ export function GroundFeedTaskCard({
             ))}
           </div>
         </div>
-        <div className="rounded-[24px] border border-cyan-200 bg-gradient-to-br from-teal-100 via-cyan-50 to-white p-4 shadow-sm">
+        <div className="rounded-lg border border-cyan-200 bg-cyan-50 p-4 shadow-sm">
           <div className="mb-2 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
             Numbot Bouncer
           </div>
-          <div className="mb-3 flex justify-center text-6xl">🤖</div>
+          <div className="mb-3 flex justify-center"><GroundObjectToken objectType="robots" size="lg" /></div>
           <div className="rounded-full bg-white px-4 py-2 text-center text-xl font-black text-teal-900 shadow-sm">
             {fedIds.length} / {task.targetNumber}
           </div>
@@ -1395,14 +1373,14 @@ export function GroundFeedTaskCard({
         <button
           type="button"
           onClick={() => setFedIds([])}
-          className="rounded-[22px] border-2 border-cyan-200 bg-white px-4 py-4 text-base font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-base font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           Reset
         </button>
         <button
           type="button"
           onClick={check}
-          className="rounded-[22px] bg-gradient-to-r from-teal-600 to-cyan-500 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
+          className="rounded-lg bg-teal-700 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
         >
           Feed
         </button>
@@ -1439,7 +1417,7 @@ export function GroundSoundCountTaskCard({
 
   return (
     <GroundMiniShell badge="Sound Count" prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <div className="mb-4 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
           Listen and watch
         </div>
@@ -1461,7 +1439,7 @@ export function GroundSoundCountTaskCard({
           <button
             type="button"
             onClick={replayPulses}
-            className="rounded-[20px] border-2 border-cyan-200 bg-white px-5 py-3 text-base font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+            className="rounded-lg border-2 border-cyan-200 bg-white px-5 py-3 text-base font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
           >
             Replay
           </button>
@@ -1520,12 +1498,12 @@ export function GroundOrderTapTaskCard({
 
   return (
     <GroundMiniShell badge={task.badgeLabel ?? (isOrderMode ? "Number Order" : "Number Path")} prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <GroundCountBadge count={progressIndex} target={orderedNumerals.length} />
-        <div className="mb-4 rounded-[20px] border border-cyan-200 bg-cyan-50 px-4 py-3 text-center shadow-sm">
+        <div className="mb-4 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-center shadow-sm">
           <div className="text-[11px] font-black uppercase tracking-[0.18em] text-teal-700">{isOrderMode ? "Sorting Tray" : "Numbot Trail"}</div>
           <div className="mt-2 flex items-center justify-center gap-3 text-base font-black text-teal-900 sm:text-lg">
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-teal-300 bg-white text-2xl shadow-sm">{isOrderMode ? "🏁" : "🤖"}</span>
+            <span className="grid h-11 w-11 place-items-center rounded-lg border-2 border-teal-300 bg-white text-teal-800 shadow-sm">{isOrderMode ? <Flag className="h-6 w-6" /> : <Bot className="h-6 w-6" />}</span>
             <span>{isOrderMode ? `Placed ${progressIndex}` : `On ${currentNumeral}`}</span>
             <span className="text-cyan-400">→</span>
             <span className="rounded-full bg-white px-4 py-2 text-cyan-700 shadow-sm">{isOrderMode ? "Keep sorting" : "Keep moving"}</span>
@@ -1540,13 +1518,13 @@ export function GroundOrderTapTaskCard({
                 key={tile.id}
                 type="button"
                 onClick={() => tapTile(tile.numeral)}
-                className={`relative flex min-h-[88px] items-center justify-center rounded-[22px] border-2 text-4xl font-black shadow-sm transition ${
+                className={`relative flex min-h-[88px] items-center justify-center rounded-lg border-2 text-4xl font-black shadow-sm transition ${
                   isCompleted
                     ? "border-teal-400 bg-teal-100 text-teal-900"
                     : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
                 }`}
               >
-                {isCompleted ? <span className="absolute -top-2 right-2 text-lg">✨</span> : null}
+                {isCompleted ? <span className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-emerald-600 text-white"><Check className="h-4 w-4" /></span> : null}
                 {tile.numeral}
               </button>
             );
@@ -1580,17 +1558,17 @@ export function GroundGrowingCountTaskCard({
 
   return (
     <GroundMiniShell badge="Rocket Count" prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-[24px] border border-cyan-200 bg-white p-4 shadow-sm">
+      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
           Count as they appear
         </div>
-        <div className="flex min-h-[120px] flex-wrap justify-center gap-3 rounded-[20px] bg-cyan-50 px-4 py-4">
+        <div className="flex min-h-[120px] flex-wrap justify-center gap-3 rounded-lg bg-cyan-50 px-4 py-4">
           {Array.from({ length: visibleCount }).map((_, index) => (
             <span
               key={`${task.objectType}-${index}`}
               className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-3xl text-teal-700 shadow-sm"
             >
-              {OBJECT_META[task.objectType].emoji}
+              <GroundObjectToken objectType={task.objectType} size="md" />
             </span>
           ))}
         </div>
