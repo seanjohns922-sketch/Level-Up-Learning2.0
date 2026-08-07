@@ -586,7 +586,7 @@ checkQuiz(
 checkQuiz("Year 3", YEAR3_PROGRAM.find((item) => item.week === 6)?.lessons?.[0]);
 checkStructuredWeeklyQuiz("Year 3", YEAR3_PROGRAM.find((item) => item.week === 1));
 checkStructuredWeeklyQuiz("Year 4", YEAR4_PROGRAM.find((item) => item.week === 1));
-checkStructuredWeeklyQuiz("Year 4", YEAR4_PROGRAM.find((item) => item.week === 8), "quizSafe=false");
+checkStructuredWeeklyQuiz("Year 4", YEAR4_PROGRAM.find((item) => item.week === 8));
 
 const year2Pretest = getPretestForLevel(2);
 const year3Pretest = getPretestForLevel(3);

@@ -38,12 +38,18 @@
 .number-nexus-level-three .rounded-3xl,
 .number-nexus-level-three .rounded-\[1\.75rem\],
 .number-nexus-level-three .rounded-\[24px\],
-.number-nexus-level-three .rounded-\[28px\] {
+.number-nexus-level-three .rounded-\[28px\],
+.number-nexus-level-four .rounded-2xl,
+.number-nexus-level-four .rounded-3xl,
+.number-nexus-level-four .rounded-\[1\.75rem\],
+.number-nexus-level-four .rounded-\[24px\],
+.number-nexus-level-four .rounded-\[28px\] {
   border-radius: 0.5rem !important;
 }
 
 .number-nexus-level-two .bg-gradient-to-br,
-.number-nexus-level-three .bg-gradient-to-br {
+.number-nexus-level-three .bg-gradient-to-br,
+.number-nexus-level-four .bg-gradient-to-br {
   background-color: rgb(240 253 250) !important;
   background-image: none !important;
 }

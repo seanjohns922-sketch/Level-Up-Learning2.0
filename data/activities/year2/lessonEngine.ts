@@ -3853,7 +3853,7 @@ const BASE_ACTIVITY_POLICY: Record<ActivityType, ActivityPolicy> = {
   },
   odd_even_sort: {
     allowedModes: ["identify", "pattern", "odd_even_sums", "odd_even_products"],
-    blockedFocusKeywords: ["addition", "subtraction", "division"],
+    blockedFocusKeywords: ["subtraction", "division"],
   },
   addition_strategy: {
     allowedModes: ["jump", "split", "friendly_numbers", "doubles", "near_doubles"],
@@ -4805,6 +4805,92 @@ function buildYear3AlgorithmQuestion(lesson: Lesson): SkipCountQuestion {
       "Record only the first number.",
     ]),
     patternDescription: `The outputs are the multiples of ${step}.`,
+  };
+}
+
+function buildYear4AlgorithmQuestion(
+  lesson: Lesson,
+  config: Record<string, unknown>
+): SkipCountQuestion {
+  const configuredOperation =
+    config.operation === "multiplication" || config.operation === "addition"
+      ? config.operation
+      : randInt(0, 1) === 0
+        ? "addition"
+        : "multiplication";
+  const operation = lesson.lesson === 1
+    ? "addition"
+    : lesson.lesson === 2
+      ? "multiplication"
+      : configuredOperation;
+  const createMode = lesson.lesson === 3 || config.mode === "algorithm_create";
+
+  if (operation === "multiplication") {
+    const factor = [2, 3][randInt(0, 1)] ?? 2;
+    const start = randInt(1, 5);
+    const pattern = [start, start * factor, start * factor ** 2, start * factor ** 3];
+    const expectedInstructions = [
+      `Start at ${start}.`,
+      "Record the current number.",
+      `Multiply by ${factor}, then repeat from step 2.`,
+    ];
+    return {
+      kind: "skip_count",
+      prompt: createMode
+        ? `Build an algorithm that starts at ${start} and multiplies each output by ${factor}.`
+        : "Follow the algorithm. What is the fourth output?",
+      sequence: createMode ? pattern : pattern.slice(0, 3),
+      answer: pattern[3]!,
+      options: createMode ? [] : uniqueNumberOptions(pattern[3]!, factor * 4).map(Number),
+      step: factor,
+      mode: createMode ? "algorithm_create" : "algorithm_follow",
+      algorithmStart: start,
+      algorithmSteps: expectedInstructions,
+      algorithmPattern: pattern,
+      expectedInstructions: createMode ? expectedInstructions : undefined,
+      instructionOptions: createMode
+        ? shuffle([...expectedInstructions, `Add ${factor}, then repeat from step 2.`, "Stop after the first output."])
+        : undefined,
+      patternDescription: `Each output is ${factor} times the previous output.`,
+      patternOptions: shuffle([
+        `Each output is ${factor} times the previous output.`,
+        `Each output is ${factor} more than the previous output.`,
+        "The outputs have no consistent rule.",
+      ]),
+    };
+  }
+
+  const addend = [4, 5, 10, 25, 50][randInt(0, 4)] ?? 10;
+  const start = randInt(1, 20);
+  const pattern = [start, start + addend, start + addend * 2, start + addend * 3];
+  const expectedInstructions = [
+    `Start at ${start}.`,
+    "Record the current number.",
+    `Add ${addend}, then repeat from step 2.`,
+  ];
+  return {
+    kind: "skip_count",
+    prompt: createMode
+      ? `Build an algorithm that starts at ${start} and adds ${addend} each time.`
+      : "Follow the algorithm. What is the fourth output?",
+    sequence: createMode ? pattern : pattern.slice(0, 3),
+    answer: pattern[3]!,
+    options: createMode ? [] : uniqueNumberOptions(pattern[3]!, addend * 3).map(Number),
+    step: addend,
+    mode: createMode ? "algorithm_create" : "algorithm_follow",
+    algorithmStart: start,
+    algorithmSteps: expectedInstructions,
+    algorithmPattern: pattern,
+    expectedInstructions: createMode ? expectedInstructions : undefined,
+    instructionOptions: createMode
+      ? shuffle([...expectedInstructions, `Subtract ${addend}, then repeat from step 2.`, "Stop after the first output."])
+      : undefined,
+    patternDescription: `Each output is ${addend} more than the previous output.`,
+    patternOptions: shuffle([
+      `Each output is ${addend} more than the previous output.`,
+      `Each output is ${addend} times the previous output.`,
+      "The outputs have no consistent rule.",
+    ]),
   };
 }
 
@@ -8937,6 +9023,9 @@ function generateInteractiveQuestion(
   if (activityType === "skip_count") {
     if (level === 3 && lesson.week === 10) {
       return buildYear3AlgorithmQuestion(lesson);
+    }
+    if (level === 4 && (lesson.week === 11 || (lesson.week === 12 && lesson.lesson === 3))) {
+      return buildYear4AlgorithmQuestion(lesson, config);
     }
     const restrictedFactors = getRestrictedFactors(level, lesson.week);
     const step =
@@ -24839,8 +24928,9 @@ function generateGenericQuestion(
         options: ["Use a friendly factor strategy", "Count by ones", "Repeated subtraction", "Draw a tally"],
       },
       {
-        prompt: "Type the best operation to start with: A tray holds 8 muffins. There are 6 trays. How many muffins altogether?",
+        prompt: "A tray holds 8 muffins. There are 6 trays. Which operation finds the total?",
         answer: "×",
+        options: ["×", "+", "−", "÷"],
       },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
@@ -24873,6 +24963,29 @@ function generateGenericQuestion(
           options: ["Yes", "No", "Maybe", "Not sure"],
           answer: chosen.answer,
           helper: "Estimate mentally first, then decide whether the result fits.",
+        }
+      : {
+          kind: "typed_response",
+          prompt: chosen.prompt,
+          answer: chosen.answer,
+          placeholder: "Type Yes or No",
+        };
+  }
+
+  if (explicitMode === "financial_reasonableness") {
+    const templates = [
+      { prompt: "$48 + $31 was recorded as $790. Is this reasonable?", answer: "No" },
+      { prompt: "Six $19 tickets were estimated to cost about $120. Is this reasonable?", answer: "Yes" },
+      { prompt: "A $250 budget paid for three $62 items. The change was recorded as $20. Is this reasonable?", answer: "No" },
+      { prompt: "$97 - $42 was estimated as about $60. Is this reasonable?", answer: "Yes" },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return asMultipleChoice
+      ? {
+          kind: "multiple_choice",
+          prompt: chosen.prompt,
+          options: ["Yes", "No"],
+          answer: chosen.answer,
         }
       : {
           kind: "typed_response",

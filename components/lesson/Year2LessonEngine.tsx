@@ -615,7 +615,8 @@ export function Year2LessonEngine({
   const isMeasurement = realmId === "measurement";
   const isLevelTwoNumber = !isMeasurement && levelNumber === 2;
   const isLevelThreeNumber = !isMeasurement && levelNumber === 3;
-  const isModernNumber = isLevelTwoNumber || isLevelThreeNumber;
+  const isLevelFourNumber = !isMeasurement && levelNumber === 4;
+  const isModernNumber = isLevelTwoNumber || isLevelThreeNumber || isLevelFourNumber;
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
   const workingLevel = useMemo(() => getWorkingLevelForLesson(lesson), [lesson]);
@@ -1408,7 +1409,13 @@ export function Year2LessonEngine({
 
   return (
     <div
-      className={isLevelTwoNumber ? "number-nexus-level-two relative" : isLevelThreeNumber ? "number-nexus-level-three relative" : "relative"}
+      className={isLevelTwoNumber
+        ? "number-nexus-level-two relative"
+        : isLevelThreeNumber
+          ? "number-nexus-level-three relative"
+          : isLevelFourNumber
+            ? "number-nexus-level-four relative"
+            : "relative"}
       data-number-nexus-level={isModernNumber ? String(levelNumber) : undefined}
     >
       {showLessonResume && (

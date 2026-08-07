@@ -1,902 +1,216 @@
 import { buildProgram, type ProgramRow } from "./buildProgram";
+import type { CurriculumCode } from "./year1";
 import type { LessonActivity } from "./types";
 
-function makeActivity(
-  activityType: LessonActivity["activityType"],
-  weight: number,
-  config: Record<string, unknown>
-): LessonActivity {
-  return { activityType, weight, config };
+function activity(activityType: LessonActivity["activityType"], mode: string, config: Record<string, unknown> = {}): LessonActivity {
+  return { activityType, weight: 1, config: { ...config, mode } };
+}
+
+function row(
+  week: number,
+  lesson: number,
+  weekTopic: string,
+  topic: string,
+  focus: string,
+  description: string,
+  curriculum: CurriculumCode[],
+  activities: LessonActivity[],
+): ProgramRow {
+  return { week, lesson, weekTopic, topic, focus, activity: description, curriculum, activities };
 }
 
 const year4Rows: ProgramRow[] = [
-  {
-    week: 1,
-    weekTopic: "Place Value with Larger Numbers",
-    focus: "Read, build, and identify digit values in large numbers",
-    lesson: 1,
-    topic: "Place Value Using Larger Numbers",
-    activity: "Identify value of digits in 5- and 6-digit numbers using MAB blocks and charts",
-    curriculum: ["AC9M3N01"],
-    activities: [
-      makeActivity("place_value_builder", 2, {
-        min: 10000,
-        max: 999999,
-        placeValues: ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"],
-        visualMode: "mab",
-        mode: "identify_number",
-      }),
-      makeActivity("place_value_builder", 2, {
-        min: 10000,
-        max: 999999,
-        placeValues: ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"],
-        visualMode: "mab",
-        mode: "identify_place",
-      }),
-      makeActivity("place_value_builder", 1, {
-        min: 10000,
-        max: 999999,
-        placeValues: ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"],
-        visualMode: "mab",
-        hideOnePlaceValue: true,
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 10000,
-        max: 999999,
-        mode: "identify_place",
-        sourceActivityType: "place_value_builder",
-      }),
-    ],
-  },
-  {
-    week: 1,
-    focus: "Convert between expanded and standard form with large numbers",
-    lesson: 2,
-    topic: "Expanded & Standard Form (Larger Numbers)",
-    activity: "Convert between standard and expanded form using digit cards",
-    curriculum: ["AC9M3N01"],
-    activities: [
-      makeActivity("partition_expand", 2, {
-        min: 10000,
-        max: 999999,
-        mode: "expand",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 10000,
-        max: 999999,
-        mode: "expand",
-        sourceActivityType: "partition_expand",
-      }),
-    ],
-  },
-  {
-    week: 1,
-    focus: "Read and write large numbers in words and numerals",
-    lesson: 3,
-    topic: "Word Form & Numerals (Larger Numbers)",
-    activity: "Read and write large numbers in words and match them to numerals, for example one hundred and eighty-six thousand.",
-    curriculum: ["AC9M3N01"],
-    activities: [
-      makeActivity("place_value_builder", 1, {
-        min: 10000,
-        max: 999999,
-        placeValues: ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"],
-        visualMode: "mab",
-        mode: "identify_number",
-      }),
-      makeActivity("multiple_choice", 2, {
-        min: 10000,
-        max: 999999,
-        mode: "word_form_match",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 10000,
-        max: 999999,
-        mode: "write_numeral",
-      }),
-    ],
-  },
-  {
-    week: 2,
-    weekTopic: "Decimal Place Value",
-    focus: "Decimal Place Value (Core)",
-    lesson: 1,
-    topic: "Tenths as Place Value",
-    activity: "Read, represent, and identify tenths as place value using decimal models and charts",
-    curriculum: ["AC9M4N01"],
-    activities: [
-      makeActivity("number_line", 1, {
-        min: 0,
-        max: 1,
-        step: 0.1,
-        mode: "placement",
-      }),
-      makeActivity("multiple_choice", 2, {
-        mode: "tenths_place_value",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "tenths_place_value",
-      }),
-    ],
-  },
-  {
-    week: 2,
-    focus: "Decimal Place Value (Core)",
-    lesson: 2,
-    topic: "Hundredths as Place Value",
-    activity: "Read, represent, and identify hundredths as place value using decimal models and charts",
-    curriculum: ["AC9M4N01"],
-    activities: [
-      makeActivity("number_line", 1, {
-        min: 0,
-        max: 1,
-        step: 0.01,
-        mode: "placement",
-      }),
-      makeActivity("multiple_choice", 2, {
-        mode: "hundredths_place_value",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "hundredths_place_value",
-      }),
-    ],
-  },
-  {
-    week: 2,
-    focus: "Decimal Place Value (Core)",
-    lesson: 3,
-    topic: "Representing Decimals",
-    activity: "Represent decimals with place value charts, digit cards, and decimal models",
-    curriculum: ["AC9M4N01"],
-    activities: [
-      makeActivity("number_line", 1, {
-        min: 0,
-        max: 1,
-        step: 0.1,
-        mode: "placement",
-      }),
-      makeActivity("multiple_choice", 2, {
-        mode: "represent_decimals",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "represent_decimals",
-      }),
-    ],
-  },
-  {
-    week: 3,
-    weekTopic: "Decimal Reasoning",
-    focus: "Decimal Reasoning",
-    lesson: 1,
-    topic: "Comparing Decimals",
-    activity: "Compare decimals using place value reasoning and symbols",
-    curriculum: ["AC9M4N01"],
-    activities: [
-      makeActivity("number_order", 1, {
-        min: 0.1,
-        max: 9.99,
-        count: 4,
-        ascending: true,
-        step: 0.1,
-        mode: "decimal_order",
-      }),
-      makeActivity("multiple_choice", 2, {
-        mode: "decimal_compare",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "decimal_compare",
-      }),
-    ],
-  },
-  {
-    week: 3,
-    focus: "Decimal Reasoning",
-    lesson: 2,
-    topic: "Ordering Decimals",
-    activity: "Order decimals from smallest to largest using place value understanding",
-    curriculum: ["AC9M4N01"],
-    activities: [
-      makeActivity("number_order", 2, {
-        min: 0.1,
-        max: 9.99,
-        count: 4,
-        ascending: true,
-        step: 0.1,
-        mode: "decimal_order",
-      }),
-      makeActivity("number_order", 1, {
-        min: 0.1,
-        max: 9.99,
-        count: 4,
-        ascending: false,
-        step: 0.01,
-        mode: "decimal_order",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 0.1,
-        max: 9.99,
-        count: 4,
-        ascending: true,
-        step: 0.1,
-        mode: "decimal_order",
-        sourceActivityType: "number_order",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 0.1,
-        max: 9.99,
-        count: 4,
-        ascending: false,
-        step: 0.01,
-        mode: "decimal_order",
-        sourceActivityType: "number_order",
-      }),
-    ],
-  },
-  {
-    week: 3,
-    focus: "Decimal Reasoning",
-    lesson: 3,
-    topic: "Decimals on Number Lines",
-    activity: "Place tenths and hundredths accurately on number lines after comparing and ordering decimals",
-    curriculum: ["AC9M4N01"],
-    activities: [
-      makeActivity("number_line", 2, {
-        min: 0,
-        max: 1,
-        step: 0.1,
-        mode: "placement",
-      }),
-      makeActivity("number_line", 1, {
-        min: 0,
-        max: 1,
-        step: 0.01,
-        mode: "placement",
-      }),
-    ],
-  },
-  {
-    week: 4,
-    weekTopic: "Comparing, Ordering & Number Lines",
-    focus: "Comparing & Ordering Numbers",
-    lesson: 1,
-    topic: "Compare with < > =",
-    activity: "Compare 4-, 5-, and 6-digit whole numbers using <, >, and =",
-    curriculum: ["AC9M4N01"],
-    activities: [
-      makeActivity("number_order", 1, {
-        min: 1000,
-        max: 999999,
-        count: 5,
-        ascending: true,
-      }),
-      makeActivity("multiple_choice", 2, {
-        mode: "compare_symbols",
-        min: 1000,
-        max: 999999,
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "compare_symbols",
-        min: 1000,
-        max: 999999,
-      }),
-    ],
-  },
-  {
-    week: 4,
-    focus: "Comparing & Ordering Numbers",
-    lesson: 2,
-    topic: "Ordering Numbers",
-    activity: "Sort numbers in ascending/descending order",
-    curriculum: ["AC9M4N01"],
-    activities: [
-      makeActivity("number_order", 2, {
-        min: 1000,
-        max: 999999,
-        count: 5,
-        ascending: true,
-      }),
-      makeActivity("number_order", 1, {
-        min: 1000,
-        max: 999999,
-        count: 5,
-        ascending: false,
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 1000,
-        max: 999999,
-        count: 5,
-        ascending: true,
-        sourceActivityType: "number_order",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 1000,
-        max: 999999,
-        count: 5,
-        ascending: false,
-        sourceActivityType: "number_order",
-      }),
-    ],
-  },
-  {
-    week: 4,
-    focus: "Comparing & Ordering Numbers",
-    lesson: 3,
-    topic: "Number Line Placement",
-    activity: "Place numbers accurately on large number lines",
-    curriculum: ["AC9M4N01"],
-    activities: [
-      makeActivity("number_line", 2, {
-        min: 1000,
-        max: 999999,
-        step: 1000,
-        mode: "placement",
-      }),
-      makeActivity("number_line", 1, {
-        min: 1000,
-        max: 999999,
-        step: 10000,
-        mode: "placement",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 1000,
-        max: 999999,
-        step: 100000,
-        mode: "placement",
-        sourceActivityType: "number_line",
-      }),
-    ],
-  },
-  {
-    week: 5,
-    weekTopic: "Odd & Even Numbers",
-    focus: "Odd & Even Numbers",
-    lesson: 1,
-    topic: "Classifying Odd & Even",
-    activity: "Sort and classify odd/even numbers using counters",
-    curriculum: ["AC9M4N02"],
-    activities: [
-      makeActivity("odd_even_sort", 2, {
-        min: 1000,
-        max: 999999,
-        count: 6,
-        mode: "identify",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 1000,
-        max: 999999,
-        mode: "identify",
-        sourceActivityType: "odd_even_sort",
-      }),
-    ],
-  },
-  {
-    week: 5,
-    focus: "Odd & Even Numbers",
-    lesson: 2,
-    topic: "Odd/Even Addition",
-    activity: "Investigate patterns in adding odd and even numbers",
-    curriculum: ["AC9M4N02"],
-    activities: [
-      makeActivity("odd_even_sort", 2, {
-        min: 1,
-        max: 50,
-        count: 6,
-        mode: "odd_even_sums",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 1,
-        max: 50,
-        mode: "sum_rule",
-        sourceActivityType: "odd_even_sort",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 1,
-        max: 50,
-        mode: "sum_rule",
-        sourceActivityType: "odd_even_sort",
-      }),
-    ],
-  },
-  {
-    week: 5,
-    focus: "Odd & Even Numbers",
-    lesson: 3,
-    topic: "Odd/Even Multiplication",
-    activity: "Explore multiplication of odd/even numbers and outcomes",
-    curriculum: ["AC9M4N02"],
-    activities: [
-      makeActivity("odd_even_sort", 2, {
-        min: 1,
-        max: 12,
-        count: 6,
-        mode: "odd_even_products",
-      }),
-      makeActivity("multiple_choice", 1, {
-        min: 1,
-        max: 12,
-        mode: "product_rule",
-        sourceActivityType: "odd_even_sort",
-      }),
-      makeActivity("typed_response", 1, {
-        min: 1,
-        max: 12,
-        mode: "product_rule",
-        sourceActivityType: "odd_even_sort",
-      }),
-    ],
-  },
-  {
-    week: 6,
-    weekTopic: "Multiplying & Dividing by 10, 100, 1000",
-    focus: "Multiplying & Dividing by 10, 100, 1000",
-    lesson: 1,
-    topic: "Multiplying by 10, 100 & 1000",
-    activity: "Use place value shifts to multiply by 10, 100, and 1000",
-    curriculum: ["AC9M4N05"],
-    activities: [
-      makeActivity("typed_response", 2, {
-        mode: "multiply_by_powers_recall",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "multiply_by_powers_shift",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "multiply_by_powers_missing",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "multiply_by_powers_error",
-      }),
-    ],
-  },
-  {
-    week: 6,
-    focus: "Multiplying & Dividing by 10, 100, 1000",
-    lesson: 2,
-    topic: "Dividing by 10, 100 & 1000",
-    activity: "Use place value shifts to divide by 10, 100, and 1000",
-    curriculum: ["AC9M4N05"],
-    activities: [
-      makeActivity("typed_response", 2, {
-        mode: "divide_by_powers_recall",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "divide_by_powers_shift",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "divide_by_powers_missing",
-      }),
-    ],
-  },
-  {
-    week: 6,
-    focus: "Multiplying & Dividing by 10, 100, 1000",
-    lesson: 3,
-    topic: "Mixed Operations",
-    activity: "Apply multiplying and dividing by 10, 100, and 1000",
-    curriculum: ["AC9M4N05"],
-    activities: [
-      makeActivity("typed_response", 2, {
-        mode: "powers_of_ten_mixed",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "powers_of_ten_compare",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "powers_of_ten_word",
-      }),
-    ],
-  },
-  {
-    week: 7,
-    weekTopic: "Multi-Digit Operations & Multiplication",
-    focus: "Multi-Digit Operations & Multiplication Strategies",
-    lesson: 1,
-    topic: "Column Addition & Subtraction",
-    activity: "Use column methods with larger numbers",
-    curriculum: ["AC9M4N06"],
-    activities: [
-      makeActivity("typed_response", 2, {
-        mode: "column_add_sub_solve",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "column_add_sub_missing",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "column_add_sub_error",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "column_add_sub_mixed",
-      }),
-    ],
-  },
-  {
-    week: 7,
-    focus: "Multi-Digit Operations & Multiplication Strategies",
-    lesson: 2,
-    topic: "Column Multiplication",
-    activity: "Use an efficient written method for multiplication",
-    curriculum: ["AC9M4N06"],
-    activities: [
-      makeActivity("typed_response", 4, {
-        mode: "column_multiplication_solve",
-      }),
-      makeActivity("typed_response", 2, {
-        mode: "column_multiplication_partial",
-      }),
-    ],
-  },
-  {
-    week: 7,
-    focus: "Multi-Digit Operations & Multiplication Strategies",
-    lesson: 3,
-    topic: "Box Method (Area Model)",
-    activity: "Break numbers into tens and ones to multiply",
-    curriculum: ["AC9M4N06"],
-    activities: [
-      makeActivity("arrays", 1, {
-        minRows: 2,
-        maxRows: 9,
-        minColumns: 2,
-        maxColumns: 9,
-        mode: "arrays",
-      }),
-      makeActivity("typed_response", 4, {
-        mode: "box_method_total",
-      }),
-      makeActivity("typed_response", 2, {
-        mode: "box_method_partial_typed",
-      }),
-    ],
-  },
-  {
-    week: 8,
-    weekTopic: "Problem Solving with Money & Multiplication",
-    focus: "Problem Solving with Money & Multiplication",
-    lesson: 1,
-    topic: "Budgeting Problems",
-    activity: "Use multiplication to calculate total costs and compare spending",
-    curriculum: ["AC9M4N06", "AC9M4N08"],
-    activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "budgeting",
-        operations: ["multiplication", "addition", "subtraction"],
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "budgeting",
-        sourceActivityType: "mixed_word_problem",
-      }),
-    ],
-  },
-  {
-    week: 8,
-    focus: "Problem Solving with Money & Multiplication",
-    lesson: 2,
-    topic: "Shop Role-Plays",
-    activity: "Apply multiplication in shopping scenarios to find totals and make decisions",
-    curriculum: ["AC9M4N06", "AC9M4N08"],
-    activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "shop_transactions",
-        operations: ["multiplication", "subtraction"],
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "shop_transactions",
-        sourceActivityType: "mixed_word_problem",
-      }),
-    ],
-  },
-  {
-    week: 8,
-    focus: "Problem Solving with Money & Multiplication",
-    lesson: 3,
-    quizSafe: false,
-    topic: "Multi-Step Problems",
-    activity: "Solve problems that require multiplication followed by addition or subtraction",
-    curriculum: ["AC9M4N06", "AC9M4N08"],
-    activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "two_step_problem",
-        operations: ["multiplication", "addition", "subtraction"],
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "two_step_problem",
-        sourceActivityType: "mixed_word_problem",
-      }),
-    ],
-  },
-  {
-    week: 9,
-    weekTopic: "Fractions & Decimals",
-    focus: "Fractions & Decimals",
-    lesson: 1,
-    topic: "Fraction Walls",
-    activity: "Explore fraction walls, build fractions, and recognise equivalent fractions visually",
-    curriculum: ["AC9M4N03", "AC9M4N04"],
-    activities: [
-      makeActivity("area_model_select", 2, {
-        mode: "pick_model",
-        denominators: [2, 4, 8],
-      }),
-      makeActivity("area_model_select", 1, {
-        mode: "match_equivalent",
-        denominators: [2, 4, 8, 10],
-      }),
-      makeActivity("equivalent_fraction_build", 1, {
-        denominators: [2, 4, 8, 10],
-      }),
-    ],
-  },
-  {
-    week: 9,
-    focus: "Fractions & Decimals",
-    lesson: 2,
-    topic: "Fractions to Decimals",
-    activity: "Link tenths fractions to decimals and match fraction, model, and decimal forms",
-    curriculum: ["AC9M4N03"],
-    activities: [
-      makeActivity("area_model_select", 1, {
-        mode: "pick_model",
-        denominators: [2, 4, 5, 10],
-      }),
-      makeActivity("multiple_choice", 2, {
-        mode: "fraction_decimal_match",
-        allowedPairs: [
-          ["1/10", "0.1"],
-          ["2/10", "0.2"],
-          ["3/10", "0.3"],
-          ["4/10", "0.4"],
-          ["5/10", "0.5"],
-          ["6/10", "0.6"],
-          ["7/10", "0.7"],
-          ["8/10", "0.8"],
-          ["9/10", "0.9"],
-        ],
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "fraction_decimal_match",
-        allowedPairs: [
-          ["1/10", "0.1"],
-          ["2/10", "0.2"],
-          ["3/10", "0.3"],
-          ["4/10", "0.4"],
-          ["5/10", "0.5"],
-          ["6/10", "0.6"],
-          ["7/10", "0.7"],
-          ["8/10", "0.8"],
-          ["9/10", "0.9"],
-        ],
-      }),
-    ],
-  },
-  {
-    week: 9,
-    focus: "Fractions & Decimals",
-    lesson: 3,
-    topic: "Fractions on Number Lines",
-    activity: "Place fractions on number lines, compare sizes, and identify missing fraction positions",
-    curriculum: ["AC9M4N04"],
-    activities: [
-      makeActivity("number_line_place", 2, {
-        mode: "place_fraction",
-        denominators: [2, 4, 8, 10],
-      }),
-      makeActivity("number_line_place", 1, {
-        mode: "pick_point",
-        denominators: [2, 4, 8, 10],
-      }),
-      makeActivity("number_line_place", 1, {
-        mode: "order_fractions",
-        denominators: [2, 4, 8, 10],
-      }),
-    ],
-  },
-  {
-    week: 10,
-    weekTopic: "Counting by Fractions & Mixed Numerals",
-    focus: "Counting by Fractions & Mixed Numerals",
-    lesson: 1,
-    topic: "Skip Counting Fractions",
-    activity: "Count in fractions on number lines, complete fraction sequences, and see when fractions make one whole",
-    curriculum: ["AC9M4N04"],
-    activities: [
-      makeActivity("number_line_place", 2, {
-        mode: "skip_count_fraction",
-        denominators: [2, 3, 4, 5, 6, 8],
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "skip_count_fraction",
-        denominators: [2, 3, 4, 5, 6, 8],
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "skip_count_fraction",
-        denominators: [2, 3, 4, 5, 6, 8],
-      }),
-    ],
-  },
-  {
-    week: 10,
-    focus: "Counting by Fractions & Mixed Numerals",
-    lesson: 2,
-    topic: "Mixed Numerals",
-    activity: "Represent mixed numerals, connect them to fractions greater than one, and place them on number lines",
-    curriculum: ["AC9M4N04"],
-    activities: [
-      makeActivity("number_line_place", 2, {
-        mode: "mixed_numerals",
-        denominators: [2, 3, 4, 5, 6, 8],
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "mixed_numerals",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "mixed_numerals",
-      }),
-    ],
-  },
-  {
-    week: 10,
-    focus: "Counting by Fractions & Mixed Numerals",
-    lesson: 3,
-    topic: "Combining Unit Fractions",
-    activity: "Combine unit fractions with the same denominator to build totals and simple fraction additions",
-    curriculum: ["AC9M4N03", "AC9M4N04"],
-    activities: [
-      makeActivity("number_line_place", 1, {
-        mode: "place_fraction",
-        denominators: [2, 3, 4, 5, 6, 8],
-      }),
-      makeActivity("typed_response", 2, {
-        mode: "same_denominator_combine",
-        denominators: [2, 3, 4, 5, 6, 8],
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "same_denominator_combine",
-        denominators: [2, 3, 4, 5, 6, 8],
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "same_denominator_combine",
-        denominators: [2, 3, 4, 5, 6, 8],
-      }),
-    ],
-  },
-  {
-    week: 11,
-    weekTopic: "Division, Fractions & Multi-Step Problem Solving",
-    focus: "Division Strategies & Fluency",
-    lesson: 1,
-    topic: "Division Strategies",
-    activity: "Use sharing and grouping strategies, link division to multiplication, and build fluency with inverse thinking",
-    curriculum: ["AC9M4N03", "AC9M4N06"],
-    activities: [
-      makeActivity("division_groups", 2, {
-        mode: "sharing",
-        maxGroups: 12,
-        maxItemsPerGroup: 12,
-        allowedGroupSizes: [3, 4, 5, 6, 7, 8],
-      }),
-      makeActivity("division_groups", 1, {
-        mode: "grouping",
-        maxGroups: 12,
-        maxItemsPerGroup: 12,
-        allowedGroupSizes: [3, 4, 5, 6, 7, 8],
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "division_inverse",
-        factors: [3, 4, 5, 6, 7, 8],
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "division_inverse",
-        factors: [3, 4, 5, 6, 7, 8],
-      }),
-    ],
-  },
-  {
-    week: 11,
-    focus: "Fractions of Quantities",
-    lesson: 2,
-    topic: "Fractions of Quantities",
-    activity: "Find fractions of quantities using grouping, visual models, and number connections in real contexts",
-    curriculum: ["AC9M4N05"],
-    activities: [
-      makeActivity("set_model_select", 1, {
-        mode: "tap_fraction",
-      }),
-      makeActivity("typed_response", 2, {
-        mode: "fraction_of_quantity",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "fraction_of_quantity",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "fraction_of_quantity",
-      }),
-    ],
-  },
-  {
-    week: 11,
-    focus: "Division + Fractions Combined",
-    lesson: 3,
-    topic: "Multi-Step Problem Solving",
-    activity: "Choose operations and combine division and fraction reasoning across multi-step problems",
-    curriculum: ["AC9M4N03", "AC9M4N05", "AC9M4N06"],
-    activities: [
-      makeActivity("number_line_place", 1, {
-        mode: "place_fraction",
-        denominators: [2, 3, 4, 5, 6, 8],
-      }),
-      makeActivity("mixed_word_problem", 2, {
-        mode: "division_fraction_multistep",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "division_fraction_multistep",
-        sourceActivityType: "mixed_word_problem",
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "division_fraction_multistep",
-        sourceActivityType: "mixed_word_problem",
-      }),
-    ],
-  },
-  {
-    week: 12,
-    weekTopic: "Mixed Operations, Fractions & Reasonableness",
-    focus: "Mixed Operations, Fractions & Reasonableness",
-    lesson: 1,
-    quizSafe: false,
-    topic: "Mixed Operations",
-    activity: "Use all four operations in mixed problems and choose an efficient strategy for each one",
-    curriculum: ["AC9M4N03", "AC9M4N06", "AC9M4N08"],
-    activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "choose_operation",
-        operations: ["+", "-", "x", "/"],
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "choose_operation",
-        sourceActivityType: "mixed_word_problem",
-      }),
-    ],
-  },
-  {
-    week: 12,
-    focus: "Mixed Operations, Fractions & Reasonableness",
-    lesson: 2,
-    quizSafe: false,
-    topic: "Fractions + Decimals Connection",
-    activity: "Connect simple fractions to decimals and familiar money values using models and matching tasks",
-    curriculum: ["AC9M4N05", "AC9M4N07"],
-    activities: [
-      makeActivity("area_model_select", 1, {
-        mode: "pick_model",
-        denominators: [2, 4, 5, 10],
-      }),
-      makeActivity("multiple_choice", 2, {
-        mode: "fraction_decimal_match",
-      }),
-      makeActivity("typed_response", 1, {
-        mode: "fraction_decimal_match",
-      }),
-    ],
-  },
-  {
-    week: 12,
-    focus: "Mixed Operations, Fractions & Reasonableness",
-    lesson: 3,
-    quizSafe: false,
-    topic: "Strategy & Reasonableness",
-    activity: "Choose a sensible method, solve, and check whether the answer is reasonable",
-    curriculum: ["AC9M4N06", "AC9M4N07", "AC9M4N08"],
-    activities: [
-      makeActivity("mixed_word_problem", 2, {
-        mode: "two_step_add_sub",
-        operations: ["+", "-"],
-      }),
-      makeActivity("multiple_choice", 1, {
-        mode: "two_step_add_sub",
-        sourceActivityType: "mixed_word_problem",
-      }),
-    ],
-  },
+  row(1, 1, "Decimal Place Value", "Tenths", "Name and represent tenths using decimal notation", "Build, read and locate tenths.", ["AC9M4N01"], [
+    activity("number_line", "placement", { min: 0, max: 1, step: 0.1 }),
+    activity("multiple_choice", "tenths_place_value"),
+    activity("typed_response", "tenths_place_value"),
+  ]),
+  row(1, 2, "Decimal Place Value", "Hundredths", "Name and represent hundredths using decimal notation", "Build, read and locate hundredths.", ["AC9M4N01"], [
+    activity("number_line", "placement", { min: 0, max: 1, step: 0.01 }),
+    activity("multiple_choice", "hundredths_place_value"),
+    activity("typed_response", "hundredths_place_value"),
+  ]),
+  row(1, 3, "Decimal Place Value", "Representing Decimals", "Connect decimal notation, place-value charts and models", "Represent tenths and hundredths in different ways.", ["AC9M4N01"], [
+    activity("number_line", "placement", { min: 0, max: 2, step: 0.1 }),
+    activity("multiple_choice", "represent_decimals"),
+    activity("typed_response", "represent_decimals"),
+  ]),
+
+  row(2, 1, "Decimal Reasoning", "Comparing Decimals", "Compare decimals using place value", "Compare from the highest place value first.", ["AC9M4N01"], [
+    activity("number_order", "decimal_order", { min: 0.1, max: 9.99, count: 4, ascending: true, step: 0.01 }),
+    activity("multiple_choice", "decimal_compare"),
+    activity("typed_response", "decimal_compare"),
+  ]),
+  row(2, 2, "Decimal Reasoning", "Ordering Decimals", "Order decimals to hundredths", "Arrange decimal values and explain their order.", ["AC9M4N01"], [
+    activity("number_order", "decimal_order", { min: 0.1, max: 9.99, count: 5, ascending: true, step: 0.01 }),
+    activity("multiple_choice", "decimal_order"),
+    activity("typed_response", "decimal_order"),
+  ]),
+  row(2, 3, "Decimal Reasoning", "Decimals on Number Lines", "Locate tenths and hundredths on number lines", "Use equal intervals to place decimal values.", ["AC9M4N01"], [
+    activity("number_line", "placement", { min: 0, max: 1, step: 0.1 }),
+    activity("number_line", "placement", { min: 0, max: 1, step: 0.01 }),
+    activity("number_line", "placement", { min: 1, max: 2, step: 0.1 }),
+  ]),
+
+  row(3, 1, "Odd and Even Properties", "Classifying Odd and Even", "Classify natural numbers as odd or even", "Use number structure to classify values.", ["AC9M4N02"], [
+    activity("odd_even_sort", "identify", { min: 0, max: 10000 }),
+    activity("multiple_choice", "identify", { sourceActivityType: "odd_even_sort" }),
+    activity("multiple_choice", "identify", { sourceActivityType: "odd_even_sort" }),
+  ]),
+  row(3, 2, "Odd and Even Properties", "Parity of Sums", "Explain odd and even addition properties", "Predict and justify the parity of sums.", ["AC9M4N02"], [
+    activity("odd_even_sort", "odd_even_sums", { min: 0, max: 1000 }),
+    activity("multiple_choice", "sum_rule", { sourceActivityType: "odd_even_sort" }),
+    activity("typed_response", "sum_rule", { sourceActivityType: "odd_even_sort" }),
+  ]),
+  row(3, 3, "Odd and Even Properties", "Parity of Products", "Explain odd and even multiplication properties", "Predict and justify the parity of products.", ["AC9M4N02"], [
+    activity("odd_even_sort", "odd_even_products", { min: 0, max: 1000 }),
+    activity("multiple_choice", "product_rule", { sourceActivityType: "odd_even_sort" }),
+    activity("typed_response", "product_rule", { sourceActivityType: "odd_even_sort" }),
+  ]),
+
+  row(4, 1, "Multiplicative Place Value", "Multiplying by 10, 100 and 1000", "Use place value to multiply natural numbers by powers of 10", "Predict the size, calculate and explain the place-value shift.", ["AC9M4N05"], [
+    activity("multiple_choice", "multiply_by_powers_shift"),
+    activity("multiple_choice", "multiply_by_powers_error"),
+    activity("typed_response", "multiply_by_powers_recall"),
+  ]),
+  row(4, 2, "Multiplicative Place Value", "Dividing by 10, 100 and 1000", "Use place value to divide natural numbers by powers of 10", "Predict the size and divide using place-value relationships.", ["AC9M4N05"], [
+    activity("multiple_choice", "divide_by_powers_shift"),
+    activity("typed_response", "divide_by_powers_recall"),
+    activity("typed_response", "divide_by_powers_missing"),
+  ]),
+  row(4, 3, "Multiplicative Place Value", "Powers of 10 Reasoning", "Choose and explain multiplication or division by a power of 10", "Compare results and diagnose direction errors.", ["AC9M4N05"], [
+    activity("multiple_choice", "powers_of_ten_compare"),
+    activity("typed_response", "powers_of_ten_mixed"),
+    activity("typed_response", "powers_of_ten_word"),
+  ]),
+
+  row(5, 1, "Efficient Addition and Subtraction", "Written Addition and Subtraction", "Use efficient written strategies for addition and subtraction", "Solve and complete written calculations accurately.", ["AC9M4N06"], [
+    activity("multiple_choice", "column_add_sub_missing"),
+    activity("multiple_choice", "column_add_sub_error"),
+    activity("typed_response", "column_add_sub_solve"),
+  ]),
+  row(5, 2, "Efficient Addition and Subtraction", "Partition and Compensate", "Use partitioning and compensation efficiently", "Select and apply a strategy that fits the numbers.", ["AC9M4N06"], [
+    activity("addition_strategy", "friendly_numbers", { min: 100, max: 10000 }),
+    activity("subtraction_strategy", "split", { min: 100, max: 10000 }),
+    activity("typed_response", "friendly_numbers", { min: 100, max: 10000, sourceActivityType: "addition_strategy" }),
+  ]),
+  row(5, 3, "Efficient Addition and Subtraction", "Choosing an Efficient Strategy", "Compare strategies and check additive calculations", "Choose, solve and justify an efficient method.", ["AC9M4N06"], [
+    activity("multiple_choice", "strategy_selection"),
+    activity("addition_strategy", "split", { min: 100, max: 10000 }),
+    activity("subtraction_strategy", "fact_strategy", { min: 100, max: 10000 }),
+  ]),
+
+  row(6, 1, "Efficient Multiplication and Division", "Written Multiplication", "Multiply natural numbers using efficient written strategies", "Use partial products and a written method.", ["AC9M4N06"], [
+    activity("typed_response", "column_multiplication_solve"),
+    activity("typed_response", "column_multiplication_partial"),
+    activity("multiple_choice", "column_multiplication_error"),
+  ]),
+  row(6, 2, "Efficient Multiplication and Division", "Area and Box Methods", "Use partitioning to multiply natural numbers", "Connect an area model to partial products and the total.", ["AC9M4N06"], [
+    activity("arrays", "arrays", { minRows: 2, maxRows: 9, minColumns: 2, maxColumns: 12 }),
+    activity("typed_response", "box_method_total"),
+    activity("typed_response", "box_method_partial_typed"),
+  ]),
+  row(6, 3, "Efficient Multiplication and Division", "Division without Remainders", "Divide natural numbers with no remainder", "Use grouping, inverse facts and efficient written thinking.", ["AC9M4N06"], [
+    activity("division_groups", "grouping", { minTotal: 24, maxTotal: 144 }),
+    activity("multiple_choice", "division_inverse", { min: 24, max: 144 }),
+    activity("typed_response", "division_inverse", { min: 24, max: 144 }),
+  ]),
+
+  row(7, 1, "Estimation and Reasonableness", "Rounding for Estimation", "Round natural numbers to useful benchmarks", "Choose a benchmark and produce a useful estimate.", ["AC9M4N07"], [
+    activity("number_line", "rounding", { min: 0, max: 100000, step: 100, targets: [10, 100, 1000] }),
+    activity("multiple_choice", "quick_estimate"),
+    activity("multiple_choice", "estimate_closer"),
+  ]),
+  row(7, 2, "Estimation and Reasonableness", "Checking Calculations", "Use estimates to check operation results", "Judge whether addition, subtraction, multiplication and division results are reasonable.", ["AC9M4N07"], [
+    activity("multiple_choice", "multiplication_estimation_check"),
+    activity("multiple_choice", "division_estimate_check"),
+    activity("multiple_choice", "problem_reasonableness"),
+  ]),
+  row(7, 3, "Estimation and Reasonableness", "Checking Financial Transactions", "Use rounding to check financial calculations", "Estimate a transaction and explain whether a reported result is reasonable.", ["AC9M4N07"], [
+    activity("multiple_choice", "financial_reasonableness"),
+    activity("typed_response", "financial_reasonableness"),
+    activity("multiple_choice", "financial_reasonableness"),
+  ]),
+
+  row(8, 1, "Mathematical Modelling", "Budgeting Problems", "Model practical additive and multiplicative budget problems", "Choose operations, solve and interpret a budget result.", ["AC9M4N08"], [
+    activity("mixed_word_problem", "budgeting", { operations: ["+", "-", "x"] }),
+    activity("typed_response", "budgeting", { sourceActivityType: "mixed_word_problem" }),
+    activity("typed_response", "budgeting", { sourceActivityType: "mixed_word_problem" }),
+  ]),
+  row(8, 2, "Mathematical Modelling", "Shop Transactions", "Model financial transactions", "Choose an operation and solve an unfamiliar shop problem.", ["AC9M4N08"], [
+    activity("multiple_choice", "shop_transactions", { sourceActivityType: "mixed_word_problem" }),
+    activity("mixed_word_problem", "shop_transactions", { operations: ["+", "-", "x"] }),
+    activity("multiple_choice", "shop_transactions", { sourceActivityType: "mixed_word_problem" }),
+  ]),
+  row(8, 3, "Mathematical Modelling", "Multi-Step Models", "Formulate and solve multi-step practical problems", "Represent, solve and communicate a contextual conclusion.", ["AC9M4N08"], [
+    activity("mixed_word_problem", "two_step_problem", { operations: ["+", "-", "x"] }),
+    activity("typed_response", "two_step_problem", { sourceActivityType: "mixed_word_problem" }),
+    activity("typed_response", "two_step_problem", { sourceActivityType: "mixed_word_problem" }),
+  ]),
+
+  row(9, 1, "Equivalent Fractions and Decimals", "Building Equivalent Fractions", "Find equivalent fractions with related denominators", "Build and verify equivalent fractions by scaling both parts.", ["AC9M4N03"], [
+    activity("area_model_select", "match_equivalent", { denominators: [2, 3, 4, 5, 6, 8, 10, 12] }),
+    activity("equivalent_fraction_build", "build", { denominators: [2, 3, 4, 5, 6, 8, 10, 12] }),
+    activity("multiple_choice", "equivalent_fraction_reasoning"),
+  ]),
+  row(9, 2, "Equivalent Fractions and Decimals", "Fractions and Decimal Notation", "Connect familiar fractions with decimal notation", "Match and generate equivalent fraction and decimal representations.", ["AC9M4N03"], [
+    activity("area_model_select", "pick_model", { denominators: [2, 4, 5, 10] }),
+    activity("multiple_choice", "fraction_decimal_match"),
+    activity("typed_response", "fraction_decimal_match"),
+  ]),
+  row(9, 3, "Equivalent Fractions and Decimals", "Reasoning about Equivalence", "Explain and diagnose fraction equivalence", "Use related denominators and models to justify equivalence.", ["AC9M4N03"], [
+    activity("equivalent_fraction_yes_no", "equivalent_fraction_reasoning"),
+    activity("multiple_choice", "equivalent_fraction_reasoning"),
+    activity("equivalent_fraction_build", "build", { denominators: [2, 3, 4, 5, 6, 8, 10, 12] }),
+  ]),
+
+  row(10, 1, "Fraction Sequences", "Counting by Fractions", "Count by fractions using a constant fractional step", "Continue and explain fraction sequences.", ["AC9M4N04"], [
+    activity("number_line_place", "skip_count_fraction", { denominators: [2, 3, 4, 5, 8, 10] }),
+    activity("multiple_choice", "skip_count_fraction"),
+    activity("typed_response", "skip_count_fraction"),
+  ]),
+  row(10, 2, "Fraction Sequences", "Mixed Numerals", "Count through whole numbers using mixed numerals", "Read, write and continue mixed-numeral sequences.", ["AC9M4N04"], [
+    activity("number_line_place", "mixed_numerals", { denominators: [2, 3, 4, 5] }),
+    activity("multiple_choice", "mixed_numerals"),
+    activity("typed_response", "mixed_numerals"),
+  ]),
+  row(10, 3, "Fraction Sequences", "Fractions on Number Lines", "Locate and represent proper and mixed fractions", "Use equal intervals to place fractions accurately.", ["AC9M4N04"], [
+    activity("number_line_place", "place_fraction", { denominators: [2, 3, 4, 5, 8, 10] }),
+    activity("number_line_place", "pick_point", { denominators: [2, 3, 4, 5, 8, 10] }),
+    activity("number_line_place", "order_fractions", { denominators: [2, 3, 4, 5, 8, 10] }),
+  ]),
+
+  row(11, 1, "Number Algorithms", "Addition Algorithms", "Follow addition algorithms to generate sets", "Run precise addition steps and describe the emerging pattern.", ["AC9M4N09"], [
+    activity("skip_count", "algorithm_follow", { operation: "addition" }),
+    activity("skip_count", "algorithm_follow", { operation: "addition" }),
+    activity("skip_count", "algorithm_follow", { operation: "addition" }),
+  ]),
+  row(11, 2, "Number Algorithms", "Multiplication Algorithms", "Follow multiplication algorithms to generate sets", "Run precise multiplication steps and describe the emerging pattern.", ["AC9M4N09"], [
+    activity("skip_count", "algorithm_follow", { operation: "multiplication" }),
+    activity("skip_count", "algorithm_follow", { operation: "multiplication" }),
+    activity("skip_count", "algorithm_follow", { operation: "multiplication" }),
+  ]),
+  row(11, 3, "Number Algorithms", "Algorithm Builder", "Create and test addition or multiplication algorithms", "Write an algorithm, test its outputs and state the pattern.", ["AC9M4N09"], [
+    activity("skip_count", "algorithm_create", { operation: "addition" }),
+    activity("skip_count", "algorithm_create", { operation: "multiplication" }),
+    activity("skip_count", "algorithm_create", { operation: "mixed" }),
+  ]),
+
+  row(12, 1, "Level 4 Integration", "Fraction and Decimal Connections", "Integrate equivalent fractions, decimals and number lines", "Translate and reason across fraction and decimal representations.", ["AC9M4N03", "AC9M4N04"], [
+    activity("area_model_select", "match_equivalent", { denominators: [2, 4, 5, 8, 10] }),
+    activity("multiple_choice", "fraction_decimal_match"),
+    activity("number_line_place", "mixed_numerals", { denominators: [2, 4, 5] }),
+  ]),
+  row(12, 2, "Level 4 Integration", "Model, Solve and Check", "Model practical problems and check solutions", "Choose efficient operations and use estimation to verify the conclusion.", ["AC9M4N06", "AC9M4N07", "AC9M4N08"], [
+    activity("mixed_word_problem", "two_step_add_sub", { operations: ["+", "-"] }),
+    activity("multiple_choice", "problem_reasonableness"),
+    activity("multiple_choice", "financial_reasonableness"),
+  ]),
+  row(12, 3, "Level 4 Integration", "Algorithm and Place-Value Challenge", "Integrate powers of 10 with number-generating algorithms", "Create, test and explain an algorithm using addition or multiplication.", ["AC9M4N05", "AC9M4N09"], [
+    activity("skip_count", "algorithm_create", { operation: "multiplication" }),
+    activity("typed_response", "powers_of_ten_mixed"),
+    activity("multiple_choice", "powers_of_ten_compare"),
+  ]),
 ];
 
 export const YEAR4_PROGRAM = buildProgram(4, "Number", year4Rows);
