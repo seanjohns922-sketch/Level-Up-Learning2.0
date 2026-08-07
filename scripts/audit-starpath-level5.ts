@@ -47,7 +47,7 @@ for (const [lessonId, content] of Object.entries(LEVEL_FIVE_LESSON_CONTENT)) {
   const set = content.createTaskSet();
 
   const week = Number(lessonId.match(/-w(\d)-/)?.[1] ?? 0);
-  const expectVariant = week <= 3 ? "l5Nets" : week <= 5 ? "l5Coord" : "l5Trans";
+  const expectVariant = week <= 3 ? "l5Nets" : week <= 5 ? "l5Coord" : week <= 7 ? "l5Trans" : "l5Integrate";
   const intro = set.teaching() as PracticeTask;
   check(intro.kind === "starpathShapeIntro" && (intro as { variant?: string }).variant === expectVariant, `${lessonId}: intro must use the ${expectVariant} teach variant`);
 
@@ -134,7 +134,7 @@ for (const [lessonId, content] of Object.entries(LEVEL_FIVE_LESSON_CONTENT)) {
 
 // Registry: the nine W1-3 lessons must be flagged implemented.
 const program = getStarpathProgram("level-5");
-for (let week = 1; week <= 7; week += 1) {
+for (let week = 1; week <= 8; week += 1) {
   for (let lesson = 1; lesson <= 3; lesson += 1) {
     const plan = program.weeks[week - 1]?.lessons[lesson - 1];
     check(plan?.status === "implemented", `registry y5-w${week}-l${lesson} should be implemented`);
@@ -142,7 +142,7 @@ for (let week = 1; week <= 7; week += 1) {
 }
 
 if (failures === 0) {
-  console.log(`Starpath Level 5 audit passed: ${lessons} lessons, ${generators} generated tasks validated across Weeks 1-7 (nets, coordinates, transformations).`);
+  console.log(`Starpath Level 5 audit passed: ${lessons} lessons, ${generators} generated tasks validated across Weeks 1-8 (nets, coordinates, transformations, integration).`);
 } else {
   console.error(`Starpath Level 5 audit failed with ${failures} problem(s).`);
   process.exit(1);

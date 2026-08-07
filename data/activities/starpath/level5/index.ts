@@ -6,6 +6,7 @@ import { BUILD_AXES_CONTENT, COORD_ERROR_CONTENT, PLOT_READ_CONTENT } from "./we
 import { FOLLOW_COMMANDS_CONTENT, MOVE_AXIS_CONTENT, PLAN_ROUTE_CONTENT } from "./week5";
 import { CHECK_IMAGE_CONTENT, DESCRIBE_CONTENT, SLIDE_CONTENT } from "./week6";
 import { COMPARE_TRANSFORMS_CONTENT, REFLECT_CONTENT, ROTATE_CONTENT } from "./week7";
+import { BUILD_TRANSFORM_CONTENT, INTERPRET_BRIEF_CONTENT, TEST_DEFEND_CONTENT } from "./week8";
 
 export const LEVEL_FIVE_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y5-space-w1-l1": UNFOLD_CONTENT,
@@ -29,4 +30,7 @@ export const LEVEL_FIVE_LESSON_CONTENT: Record<string, StarpathLessonContent> = 
   "y5-space-w7-l1": REFLECT_CONTENT,
   "y5-space-w7-l2": ROTATE_CONTENT,
   "y5-space-w7-l3": COMPARE_TRANSFORMS_CONTENT,
+  "y5-space-w8-l1": INTERPRET_BRIEF_CONTENT,
+  "y5-space-w8-l2": BUILD_TRANSFORM_CONTENT,
+  "y5-space-w8-l3": TEST_DEFEND_CONTENT,
 };

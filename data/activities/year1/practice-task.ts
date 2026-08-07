@@ -2421,7 +2421,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets" | "l5Coord" | "l5Trans";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets" | "l5Coord" | "l5Trans" | "l5Integrate";
       heading?: string;
     }
   | {

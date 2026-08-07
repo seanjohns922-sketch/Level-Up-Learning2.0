@@ -576,6 +576,7 @@ const L5_COORD_W4_MECHANICS = ["coordinate-system-builder", "coordinate-plotter"
 const L5_COORD_W5_MECHANICS = ["coordinate-mover", "coordinate-command-runner", "coordinate-route-planner"] as const;
 const L5_TRANS_W6_MECHANICS = ["point-translation-simulator", "translation-describer", "transform-validator"] as const;
 const L5_TRANS_W7_MECHANICS = ["reflection-builder", "rotation-simulator", "transformation-classifier"] as const;
+const L5_INTEGRATE_W8_MECHANICS = ["design-constraint-decoder", "coordinate-transform-builder", "spatial-design-auditor"] as const;
 const IMPLEMENTED_LEVEL_FIVE_LESSONS: Record<
   string,
   { learningIntention: string; mechanics: readonly [string, string, string] }
@@ -601,6 +602,9 @@ const IMPLEMENTED_LEVEL_FIVE_LESSONS: Record<
   "y5-space-w7-l1": { learningIntention: "I can reflect a figure across a mirror line.", mechanics: L5_TRANS_W7_MECHANICS },
   "y5-space-w7-l2": { learningIntention: "I can rotate a figure about a centre by a stated turn.", mechanics: L5_TRANS_W7_MECHANICS },
   "y5-space-w7-l3": { learningIntention: "I can identify a translation, reflection or rotation.", mechanics: L5_TRANS_W7_MECHANICS },
+  "y5-space-w8-l1": { learningIntention: "I can read a brief's object, location and movement constraints.", mechanics: L5_INTEGRATE_W8_MECHANICS },
+  "y5-space-w8-l2": { learningIntention: "I can build an object, place it and transform it together.", mechanics: L5_INTEGRATE_W8_MECHANICS },
+  "y5-space-w8-l3": { learningIntention: "I can test and defend every part of a spatial design.", mechanics: L5_INTEGRATE_W8_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
