@@ -4,6 +4,8 @@ import { FOLD_NET_CONTENT, RELATION_CONTENT, TRACK_FACE_CONTENT } from "./week2"
 import { ARRANGE_CONTENT, COMPARE_NETS_CONTENT, TEST_FOLD_CONTENT } from "./week3";
 import { BUILD_AXES_CONTENT, COORD_ERROR_CONTENT, PLOT_READ_CONTENT } from "./week4";
 import { FOLLOW_COMMANDS_CONTENT, MOVE_AXIS_CONTENT, PLAN_ROUTE_CONTENT } from "./week5";
+import { CHECK_IMAGE_CONTENT, DESCRIBE_CONTENT, SLIDE_CONTENT } from "./week6";
+import { COMPARE_TRANSFORMS_CONTENT, REFLECT_CONTENT, ROTATE_CONTENT } from "./week7";
 
 export const LEVEL_FIVE_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y5-space-w1-l1": UNFOLD_CONTENT,
@@ -21,4 +23,10 @@ export const LEVEL_FIVE_LESSON_CONTENT: Record<string, StarpathLessonContent> = 
   "y5-space-w5-l1": MOVE_AXIS_CONTENT,
   "y5-space-w5-l2": FOLLOW_COMMANDS_CONTENT,
   "y5-space-w5-l3": PLAN_ROUTE_CONTENT,
+  "y5-space-w6-l1": SLIDE_CONTENT,
+  "y5-space-w6-l2": DESCRIBE_CONTENT,
+  "y5-space-w6-l3": CHECK_IMAGE_CONTENT,
+  "y5-space-w7-l1": REFLECT_CONTENT,
+  "y5-space-w7-l2": ROTATE_CONTENT,
+  "y5-space-w7-l3": COMPARE_TRANSFORMS_CONTENT,
 };

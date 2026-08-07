@@ -574,6 +574,8 @@ const L5_NET_W2_MECHANICS = ["face-tracker", "fold-simulator", "face-relations"]
 const L5_NET_W3_MECHANICS = ["net-builder", "fold-fault-finder", "net-comparer"] as const;
 const L5_COORD_W4_MECHANICS = ["coordinate-system-builder", "coordinate-plotter", "coordinate-debugger"] as const;
 const L5_COORD_W5_MECHANICS = ["coordinate-mover", "coordinate-command-runner", "coordinate-route-planner"] as const;
+const L5_TRANS_W6_MECHANICS = ["point-translation-simulator", "translation-describer", "transform-validator"] as const;
+const L5_TRANS_W7_MECHANICS = ["reflection-builder", "rotation-simulator", "transformation-classifier"] as const;
 const IMPLEMENTED_LEVEL_FIVE_LESSONS: Record<
   string,
   { learningIntention: string; mechanics: readonly [string, string, string] }
@@ -593,6 +595,12 @@ const IMPLEMENTED_LEVEL_FIVE_LESSONS: Record<
   "y5-space-w5-l1": { learningIntention: "I can move along an axis and say which coordinate changed.", mechanics: L5_COORD_W5_MECHANICS },
   "y5-space-w5-l2": { learningIntention: "I can follow and build coordinate command sequences.", mechanics: L5_COORD_W5_MECHANICS },
   "y5-space-w5-l3": { learningIntention: "I can plan the shortest valid route to a goal.", mechanics: L5_COORD_W5_MECHANICS },
+  "y5-space-w6-l1": { learningIntention: "I can translate a figure so every point moves the same.", mechanics: L5_TRANS_W6_MECHANICS },
+  "y5-space-w6-l2": { learningIntention: "I can describe a translation using across-and-up movement.", mechanics: L5_TRANS_W6_MECHANICS },
+  "y5-space-w6-l3": { learningIntention: "I can check an image against the invariants of a translation.", mechanics: L5_TRANS_W6_MECHANICS },
+  "y5-space-w7-l1": { learningIntention: "I can reflect a figure across a mirror line.", mechanics: L5_TRANS_W7_MECHANICS },
+  "y5-space-w7-l2": { learningIntention: "I can rotate a figure about a centre by a stated turn.", mechanics: L5_TRANS_W7_MECHANICS },
+  "y5-space-w7-l3": { learningIntention: "I can identify a translation, reflection or rotation.", mechanics: L5_TRANS_W7_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {

@@ -6,7 +6,7 @@ export const LEVEL_FIVE_ARTWORK = "/images/starpath-home-bg-y5.png";
 
 type TaskGenerator = (round: number, target: number) => PracticeTask;
 
-type L5Variant = "l5Nets" | "l5Coord";
+type L5Variant = "l5Nets" | "l5Coord" | "l5Trans";
 
 export function teaching(heading: string, prompt: string, speakText: string, variant: L5Variant = "l5Nets") {
   let target = 0;
