@@ -2421,7 +2421,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets" | "l5Coord";
       heading?: string;
     }
   | {
@@ -2678,6 +2678,28 @@ export type PracticeTask = (
       answerCells?: string[];
       multi?: boolean;
       buildFaces?: number;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 5 · W4-5 — Coordinates. A first-quadrant plane (origin bottom-left,
+      // x across then y up). Plot/read ordered pairs, diagnose coordinate errors,
+      // and move a rover with coordinate changes or command sequences.
+      kind: "starpathCoordinate";
+      mode: "order" | "origin" | "plot" | "read" | "error" | "move" | "moveAxis" | "follow" | "commands" | "route";
+      render: "tap" | "options" | "commands";
+      prompt: string;
+      speakText: string;
+      target: number;
+      bounds: { x: number; y: number };
+      points?: Array<{ id: string; x: number; y: number; kind: "star" | "rover" | "goal" | "dot"; label?: string }>;
+      answer?: { x: number; y: number };
+      options?: Array<{ id: string; label: string }>;
+      correctOptionIds?: string[];
+      start?: { x: number; y: number };
+      goal?: { x: number; y: number };
+      blocked?: Array<{ x: number; y: number }>;
+      givenCommands?: Array<"right" | "left" | "up" | "down">;
+      maxSteps?: number;
       feedback: { correct: string; wrong: string };
     }
   | StarpathObjectTask

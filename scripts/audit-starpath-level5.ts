@@ -1,5 +1,6 @@
 import { LEVEL_FIVE_LESSON_CONTENT } from "@/data/activities/starpath/level5";
 import { foldNet } from "@/data/activities/starpath/level5/nets";
+import { shortestSteps, type Point } from "@/data/activities/starpath/level5/coordinates";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -8,7 +9,32 @@ const fail = (message: string) => { console.error("FAIL:", message); failures +=
 const check = (condition: boolean, message: string) => { if (!condition) fail(message); };
 
 type NetTask = Extract<PracticeTask, { kind: "starpathNet" }>;
+type CoordTask = Extract<PracticeTask, { kind: "starpathCoordinate" }>;
 const key = (cell: { r: number; c: number }) => `${cell.r}:${cell.c}`;
+
+// Can the rover reach the goal within maxSteps, on the grid and off blocked cells?
+function routeSolvable(task: CoordTask): boolean {
+  if (!task.start || !task.goal) return false;
+  const blocked = new Set((task.blocked ?? []).map((c) => `${c.x}:${c.y}`));
+  const budget = task.maxSteps ?? task.bounds.x + task.bounds.y;
+  const seen = new Set<string>();
+  let frontier: Point[] = [task.start];
+  seen.add(`${task.start.x}:${task.start.y}`);
+  for (let step = 0; step <= budget; step += 1) {
+    if (frontier.some((p) => p.x === task.goal!.x && p.y === task.goal!.y)) return true;
+    const next: Point[] = [];
+    for (const p of frontier) {
+      for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const q = { x: p.x + d[0]!, y: p.y + d[1]! };
+        const k = `${q.x}:${q.y}`;
+        if (q.x < 0 || q.y < 0 || q.x > task.bounds.x || q.y > task.bounds.y || blocked.has(k) || seen.has(k)) continue;
+        seen.add(k); next.push(q);
+      }
+    }
+    frontier = next;
+  }
+  return false;
+}
 
 let lessons = 0;
 let generators = 0;
@@ -18,14 +44,35 @@ for (const [lessonId, content] of Object.entries(LEVEL_FIVE_LESSON_CONTENT)) {
   check(content.teaching.taskKind === "starpathShapeIntro", `${lessonId}: teaching should be starpathShapeIntro`);
   const set = content.createTaskSet();
 
+  const week = Number(lessonId.match(/-w(\d)-/)?.[1] ?? 0);
+  const expectVariant = week <= 3 ? "l5Nets" : "l5Coord";
   const intro = set.teaching() as PracticeTask;
-  check(intro.kind === "starpathShapeIntro" && (intro as { variant?: string }).variant === "l5Nets", `${lessonId}: intro must use the l5Nets teach variant`);
+  check(intro.kind === "starpathShapeIntro" && (intro as { variant?: string }).variant === expectVariant, `${lessonId}: intro must use the ${expectVariant} teach variant`);
 
   for (const activity of set.activities) {
     for (let round = 0; round < 4; round += 1) {
       const task = activity() as PracticeTask;
       generators += 1;
-      if (task.kind !== "starpathNet") { fail(`${lessonId}: expected starpathNet, got ${task.kind}`); continue; }
+
+      if (task.kind === "starpathCoordinate") {
+        const coord = task as CoordTask;
+        check(coord.prompt.length > 0 && coord.speakText.length > 0, `${lessonId}: prompt/speakText required`);
+        const within = (p?: Point) => Boolean(p && p.x >= 0 && p.y >= 0 && p.x <= coord.bounds.x && p.y <= coord.bounds.y);
+        if (coord.render === "tap") {
+          check(within(coord.answer), `${lessonId}: tap answer must be on the grid`);
+        } else if (coord.render === "options") {
+          const ids = new Set((coord.options ?? []).map((o) => o.id));
+          check(ids.size >= 2, `${lessonId}: options needed`);
+          check((coord.correctOptionIds ?? []).length === 1 && ids.has((coord.correctOptionIds ?? [])[0]!), `${lessonId}: one valid option answer`);
+        } else {
+          check(within(coord.start) && within(coord.goal), `${lessonId}: commands need start and goal on the grid`);
+          check(routeSolvable(coord), `${lessonId}: route must be solvable within maxSteps`);
+          if (coord.mode === "route") check(coord.maxSteps === shortestSteps(coord.start!, coord.goal!), `${lessonId}: route maxSteps should be the shortest distance`);
+        }
+        continue;
+      }
+
+      if (task.kind !== "starpathNet") { fail(`${lessonId}: expected starpathNet/Coordinate, got ${task.kind}`); continue; }
       const net = task as NetTask;
       check(net.prompt.length > 0 && net.speakText.length > 0, `${lessonId}: prompt/speakText required`);
       check(Boolean(net.feedback?.correct && net.feedback?.wrong), `${lessonId}: feedback required`);
@@ -66,7 +113,7 @@ for (const [lessonId, content] of Object.entries(LEVEL_FIVE_LESSON_CONTENT)) {
 
 // Registry: the nine W1-3 lessons must be flagged implemented.
 const program = getStarpathProgram("level-5");
-for (let week = 1; week <= 3; week += 1) {
+for (let week = 1; week <= 5; week += 1) {
   for (let lesson = 1; lesson <= 3; lesson += 1) {
     const plan = program.weeks[week - 1]?.lessons[lesson - 1];
     check(plan?.status === "implemented", `registry y5-w${week}-l${lesson} should be implemented`);
@@ -74,7 +121,7 @@ for (let week = 1; week <= 3; week += 1) {
 }
 
 if (failures === 0) {
-  console.log(`Starpath Level 5 nets audit passed: ${lessons} lessons, ${generators} generated tasks validated across Weeks 1-3.`);
+  console.log(`Starpath Level 5 audit passed: ${lessons} lessons, ${generators} generated tasks validated across Weeks 1-5 (nets + coordinates).`);
 } else {
   console.error(`Starpath Level 5 audit failed with ${failures} problem(s).`);
   process.exit(1);

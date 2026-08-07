@@ -12,6 +12,7 @@ import type { PositionRelation } from "@/data/activities/starpath/ground/positio
 import { listL3Objects, getL3Object, l3ObjectSvg, type L3ObjectId } from "@/data/activities/starpath/level3/l3-objects";
 import L4TeachGrid, { L4_TEACH_HEADING, type L4TeachVariant } from "@/components/starpath/L4TeachGrid";
 import L5NetsTeachGrid from "@/components/starpath/L5NetsTeachGrid";
+import L5CoordTeachGrid from "@/components/starpath/L5CoordTeachGrid";
 
 const L4_TEACH_VARIANTS: L4TeachVariant[] = ["l4Composite", "l4Solids", "l4Model", "l4GridRef", "l4GridRoute", "l4LineSym", "l4RotSym", "l4Integrate"];
 const isL4Teach = (variant: string): variant is L4TeachVariant => (L4_TEACH_VARIANTS as string[]).includes(variant);
@@ -584,6 +585,8 @@ export function StarpathShapeIntroCard({
     task.heading ??
     (variant === "l5Nets"
       ? "Objects and Nets"
+      : variant === "l5Coord"
+      ? "Coordinates"
       : isL4Teach(variant)
       ? L4_TEACH_HEADING[variant]
       : variant === "objects"
@@ -632,6 +635,8 @@ export function StarpathShapeIntroCard({
 
       {variant === "l5Nets" ? (
         <L5NetsTeachGrid />
+      ) : variant === "l5Coord" ? (
+        <L5CoordTeachGrid />
       ) : isL4Teach(variant) ? (
         <L4TeachGrid variant={variant} />
       ) : variant === "objects3d" ? (

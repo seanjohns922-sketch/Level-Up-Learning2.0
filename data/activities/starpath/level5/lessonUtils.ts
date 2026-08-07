@@ -6,9 +6,11 @@ export const LEVEL_FIVE_ARTWORK = "/images/starpath-home-bg-y5.png";
 
 type TaskGenerator = (round: number, target: number) => PracticeTask;
 
-export function teaching(heading: string, prompt: string, speakText: string) {
+type L5Variant = "l5Nets" | "l5Coord";
+
+export function teaching(heading: string, prompt: string, speakText: string, variant: L5Variant = "l5Nets") {
   let target = 0;
-  return () => ({ kind: "starpathShapeIntro", scene: "intro", variant: "l5Nets", heading, prompt, speakText, target: ++target }) satisfies PracticeTask;
+  return () => ({ kind: "starpathShapeIntro", scene: "intro", variant, heading, prompt, speakText, target: ++target }) satisfies PracticeTask;
 }
 
 export function taskSet(generators: [TaskGenerator, TaskGenerator, TaskGenerator], teach: () => PracticeTask, start = 10): RealmLessonTaskSet {

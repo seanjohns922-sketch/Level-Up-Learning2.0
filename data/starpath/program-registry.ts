@@ -572,6 +572,8 @@ const IMPLEMENTED_LEVEL_FOUR_LESSONS: Record<
 const L5_NET_W1_MECHANICS = ["net-unfolder", "fold-predictor", "net-reasoning"] as const;
 const L5_NET_W2_MECHANICS = ["face-tracker", "fold-simulator", "face-relations"] as const;
 const L5_NET_W3_MECHANICS = ["net-builder", "fold-fault-finder", "net-comparer"] as const;
+const L5_COORD_W4_MECHANICS = ["coordinate-system-builder", "coordinate-plotter", "coordinate-debugger"] as const;
+const L5_COORD_W5_MECHANICS = ["coordinate-mover", "coordinate-command-runner", "coordinate-route-planner"] as const;
 const IMPLEMENTED_LEVEL_FIVE_LESSONS: Record<
   string,
   { learningIntention: string; mechanics: readonly [string, string, string] }
@@ -585,6 +587,12 @@ const IMPLEMENTED_LEVEL_FIVE_LESSONS: Record<
   "y5-space-w3-l1": { learningIntention: "I can build a net that folds into a cube.", mechanics: L5_NET_W3_MECHANICS },
   "y5-space-w3-l2": { learningIntention: "I can test a net for overlaps and gaps.", mechanics: L5_NET_W3_MECHANICS },
   "y5-space-w3-l3": { learningIntention: "I can find several different nets that fold into the same cube.", mechanics: L5_NET_W3_MECHANICS },
+  "y5-space-w4-l1": { learningIntention: "I can set up axes and read a coordinate across then up.", mechanics: L5_COORD_W4_MECHANICS },
+  "y5-space-w4-l2": { learningIntention: "I can plot points and read their coordinates.", mechanics: L5_COORD_W4_MECHANICS },
+  "y5-space-w4-l3": { learningIntention: "I can find and fix a swapped or mis-scaled coordinate.", mechanics: L5_COORD_W4_MECHANICS },
+  "y5-space-w5-l1": { learningIntention: "I can move along an axis and say which coordinate changed.", mechanics: L5_COORD_W5_MECHANICS },
+  "y5-space-w5-l2": { learningIntention: "I can follow and build coordinate command sequences.", mechanics: L5_COORD_W5_MECHANICS },
+  "y5-space-w5-l3": { learningIntention: "I can plan the shortest valid route to a goal.", mechanics: L5_COORD_W5_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
