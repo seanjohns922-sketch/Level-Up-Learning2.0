@@ -124,12 +124,18 @@ assert.equal(blueprint.crossRealmCoverage?.[0]?.implementationStatus, "owned-by-
 const sessionSource = fs.readFileSync(path.join(process.cwd(), "app/session/page.tsx"), "utf8");
 const engineSource = fs.readFileSync(path.join(process.cwd(), "components/lesson/Year2LessonEngine.tsx"), "utf8");
 const globalStyles = fs.readFileSync(path.join(process.cwd(), "app/globals.css"), "utf8");
+const assessmentShellSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/AssessmentShell.tsx"), "utf8");
+const assessmentQuestionSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/AssessmentQuestionCard.tsx"), "utf8");
 assert(sessionSource.includes("buildYear3NumberNexusWeeklyQuiz"), "Level 3 quiz route does not use the independent bank.");
 assert(sessionSource.includes("isLevelThreeNumberQuiz"), "Level 3 quiz route does not use modern presentation.");
 assert(sessionSource.includes('isFinalQuizWeek ? "Continue to Post-Test"'), "Final-week quiz does not use the Post-Test action.");
 assert(!sessionSource.includes("Math.min(12, Number(week) + 1)"), "Final-week quiz can attempt to unlock Week 13.");
 assert(engineSource.includes("number-nexus-level-three"), "Level 3 lesson engine does not expose modern presentation scope.");
 assert(globalStyles.includes(".number-nexus-level-three .rounded-2xl"), "Level 3 legacy cards are not normalised to the modern radius system.");
+assert(assessmentShellSource.includes('year === "Year 3"'), "Level 3 assessments do not use the modern Number Nexus shell.");
+assert(assessmentQuestionSource.includes('question.id?.startsWith("y3-a-")'), "Level 3 Pre-Test items do not use modern response controls.");
+assert(assessmentQuestionSource.includes('question.id?.startsWith("y3-b-")'), "Level 3 Post-Test items do not use modern response controls.");
+assert(assessmentQuestionSource.includes('aria-label="Clear fraction order"'), "Level 3 fraction ordering has not been modernised.");
 
 console.log("Level 3 Number Nexus full-year audit passed.");
 console.log("Curriculum: 12/12 weeks and 36/36 lessons aligned; Algebra owned by Pattern Peaks.");

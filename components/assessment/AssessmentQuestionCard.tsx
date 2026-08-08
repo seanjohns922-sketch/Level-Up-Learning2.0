@@ -305,7 +305,14 @@ export default function AssessmentQuestionCard({
     typeof question.visual === "object" && question.visual !== null
       ? (question.visual as Record<string, unknown>)
       : undefined;
-  const isEarlyNumberVisual = typeof visual?.type === "string" && (visual.type.startsWith("number_ground_") || visual.type.startsWith("number_y1_") || visual.type.startsWith("number_y2_") || visual.type.startsWith("number_y4_"));
+  const isEarlyNumberVisual =
+    question.id?.startsWith("y3-a-") ||
+    question.id?.startsWith("y3-b-") ||
+    (typeof visual?.type === "string" &&
+      (visual.type.startsWith("number_ground_") ||
+        visual.type.startsWith("number_y1_") ||
+        visual.type.startsWith("number_y2_") ||
+        visual.type.startsWith("number_y4_")));
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
@@ -523,7 +530,7 @@ export default function AssessmentQuestionCard({
     }
 
     return (
-      <div className="mt-6">
+      <div className={isEarlyNumberVisual ? "mt-3" : "mt-6"}>
         {renderedVisual}
         <div className="grid gap-4 md:grid-cols-3">
           {fractions.map((fraction) => (
@@ -532,9 +539,11 @@ export default function AssessmentQuestionCard({
               type="button"
               onClick={() => addFraction(fraction)}
               disabled={order.includes(fraction)}
-              className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-left shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className={isEarlyNumberVisual
+                ? "rounded-lg border-2 border-slate-300 bg-[#f8fbfc] p-4 text-left shadow-sm transition hover:border-cyan-600 hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                : "rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-left shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"}
             >
-              <div className="text-lg font-black text-white">
+              <div className={isEarlyNumberVisual ? "text-lg font-black text-slate-950" : "text-lg font-black text-white"}>
                 <FractionText value={fraction} />
               </div>
               <div className="mt-3">
@@ -543,8 +552,8 @@ export default function AssessmentQuestionCard({
             </button>
           ))}
         </div>
-        <div className="mt-5 rounded-2xl border border-dashed border-slate-600 bg-slate-800/50 p-4">
-          <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div>
+        <div className={isEarlyNumberVisual ? "mt-5 rounded-lg border-2 border-dashed border-cyan-900/20 bg-[#f8fbfc] p-4" : "mt-5 rounded-2xl border border-dashed border-slate-600 bg-slate-800/50 p-4"}>
+          {!isEarlyNumberVisual ? <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div> : null}
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             {order.length > 0 ? (
               order.map((fraction, index) => (
@@ -554,9 +563,9 @@ export default function AssessmentQuestionCard({
                   onDragStart={() => setDraggedIndex(index)}
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={() => moveDragged(index)}
-                  className="cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-3 shadow-sm"
+                  className={isEarlyNumberVisual ? "cursor-move rounded-lg border-2 border-cyan-600 bg-white p-3 shadow-sm" : "cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-3 shadow-sm"}
                 >
-                  <div className="text-sm font-black text-white">
+                  <div className={isEarlyNumberVisual ? "text-sm font-black text-slate-950" : "text-sm font-black text-white"}>
                     <FractionText value={fraction} compact />
                   </div>
                   <div className="mt-2">
@@ -565,9 +574,9 @@ export default function AssessmentQuestionCard({
                 </div>
               ))
             ) : (
-              <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">
-                Tap the fractions in order, then drag to adjust if needed.
-              </div>
+              isEarlyNumberVisual
+                ? Array.from({ length: fractions.length }, (_, index) => <div key={index} className="h-16 rounded-lg border-2 border-dashed border-cyan-900/25" />)
+                : <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">Tap the fractions in order, then drag to adjust if needed.</div>
             )}
           </div>
         </div>
@@ -576,17 +585,21 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={undoLast}
             disabled={order.length === 0}
-            className="rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"
+            className={isEarlyNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
+            aria-label="Undo last fraction"
+            title="Undo last fraction"
           >
-            Undo last
+            {isEarlyNumberVisual ? <Undo2 className="h-5 w-5" aria-hidden /> : "Undo last"}
           </button>
           <button
             type="button"
             onClick={clear}
             disabled={order.length === 0}
-            className="rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"
+            className={isEarlyNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
+            aria-label="Clear fraction order"
+            title="Clear fraction order"
           >
-            Clear
+            {isEarlyNumberVisual ? <Trash2 className="h-5 w-5" aria-hidden /> : "Clear"}
           </button>
         </div>
       </div>
@@ -602,7 +615,7 @@ export default function AssessmentQuestionCard({
     }> | undefined) ?? [];
 
     return (
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <div className={isEarlyNumberVisual ? "mt-3 grid gap-3 md:grid-cols-2" : "mt-6 grid gap-4 md:grid-cols-2"}>
         {renderedVisual ? <div className="md:col-span-2">{renderedVisual}</div> : null}
         {options.map((option) => (
           <button
@@ -610,10 +623,10 @@ export default function AssessmentQuestionCard({
             type="button"
             onClick={() => onChange(option.id)}
             className={[
-              "rounded-2xl border p-4 text-left shadow-sm transition",
+              isEarlyNumberVisual ? "rounded-lg border-2 bg-[#f8fbfc] p-4 text-left shadow-sm transition" : "rounded-2xl border p-4 text-left shadow-sm transition",
               value === option.id
-                ? selectedSoft
-                : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
+                ? isEarlyNumberVisual ? "border-cyan-500 ring-4 ring-cyan-500/15" : selectedSoft
+                : isEarlyNumberVisual ? "border-slate-300 hover:border-cyan-600 hover:bg-white" : "border-slate-600 bg-slate-700/50 hover:bg-slate-700",
             ].join(" ")}
           >
             <div className="mt-1">
@@ -631,19 +644,19 @@ export default function AssessmentQuestionCard({
     const options = (question.options as Array<{ id: string; parts: number }> | undefined) ?? [];
 
     return (
-      <div className="mt-6 space-y-5">
+      <div className={isEarlyNumberVisual ? "mt-3 space-y-4" : "mt-6 space-y-5"}>
         {renderedVisual}
-        <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Given Part</div>
+        <div className={isEarlyNumberVisual ? "rounded-lg border border-cyan-900/15 bg-[#f8fbfc] p-5 text-slate-950 shadow-sm" : "rounded-2xl border border-slate-600 bg-slate-700/50 p-5"}>
+          <div className={isEarlyNumberVisual ? "text-xs font-bold uppercase text-cyan-900" : "text-xs font-bold uppercase tracking-wide text-teal-400"}>Given Part</div>
           <div className="mt-3">
-            <div className="inline-flex rounded-xl border border-slate-600 bg-slate-800/50 p-3">
+            <div className={isEarlyNumberVisual ? "inline-flex rounded-lg border border-cyan-900/20 bg-white p-3" : "inline-flex rounded-xl border border-slate-600 bg-slate-800/50 p-3"}>
               <div className="h-14 w-12 rounded-[6px] bg-teal-500" />
             </div>
           </div>
-          <div className="mt-3 text-lg font-black text-white">
+          <div className={isEarlyNumberVisual ? "mt-3 text-lg font-black text-slate-950" : "mt-3 text-lg font-black text-white"}>
             <FractionText value={fractionLabel} />
           </div>
-          <div className="mt-2 text-sm font-semibold text-slate-300">
+          <div className={isEarlyNumberVisual ? "mt-2 text-sm font-semibold text-slate-600" : "mt-2 text-sm font-semibold text-slate-300"}>
             This block is 1 of {denominator} equal parts.
           </div>
         </div>
@@ -653,7 +666,7 @@ export default function AssessmentQuestionCard({
               key={option.id}
               type="button"
               onClick={() => onChange(option.id)}
-              className="rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-left shadow-sm transition hover:bg-slate-700"
+              className={isEarlyNumberVisual ? "rounded-lg border-2 border-slate-300 bg-[#f8fbfc] p-4 text-left shadow-sm transition hover:border-cyan-600 hover:bg-white" : "rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-left shadow-sm transition hover:bg-slate-700"}
             >
               <WholeOption parts={option.parts} selected={value === option.id} />
             </button>
@@ -682,19 +695,19 @@ export default function AssessmentQuestionCard({
     }
 
     return (
-      <div className="mt-6 space-y-5">
+      <div className={isEarlyNumberVisual ? "mt-3 space-y-4" : "mt-6 space-y-5"}>
         {renderedVisual}
-        <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
-          <div className="text-xs font-bold uppercase tracking-wide text-teal-400">Model</div>
-          <div className="mt-2 text-lg font-black text-white">
+        <div className={isEarlyNumberVisual ? "rounded-lg border border-cyan-900/15 bg-[#f8fbfc] p-5 text-slate-950 shadow-sm" : "rounded-2xl border border-slate-600 bg-slate-700/50 p-5"}>
+          <div className={isEarlyNumberVisual ? "text-xs font-bold uppercase text-cyan-900" : "text-xs font-bold uppercase tracking-wide text-teal-400"}>Model</div>
+          <div className={isEarlyNumberVisual ? "mt-2 text-lg font-black text-slate-950" : "mt-2 text-lg font-black text-white"}>
             <FractionText value={targetFraction} />
           </div>
           <div className="mt-3 max-w-md">
             <FractionBar fraction={targetFraction} large />
           </div>
         </div>
-        <div className="rounded-2xl border border-slate-600 bg-slate-700/50 p-5">
-          <div className="mb-3 text-sm font-bold text-teal-400">{denominator} equal jumps from 0 to 1</div>
+        <div className={isEarlyNumberVisual ? "rounded-lg border border-cyan-900/15 bg-[#f8fbfc] p-5 text-slate-950 shadow-sm" : "rounded-2xl border border-slate-600 bg-slate-700/50 p-5"}>
+          <div className={isEarlyNumberVisual ? "mb-3 text-sm font-bold text-cyan-900" : "mb-3 text-sm font-bold text-teal-400"}>{denominator} equal jumps from 0 to 1</div>
           <div
             ref={lineRef}
             className="relative mx-3 h-16 cursor-pointer"
@@ -733,7 +746,7 @@ export default function AssessmentQuestionCard({
               </div>
             ) : null}
           </div>
-          <div className="mt-2 flex justify-between text-sm font-bold text-slate-400">
+          <div className={isEarlyNumberVisual ? "mt-2 flex justify-between text-sm font-bold text-slate-600" : "mt-2 flex justify-between text-sm font-bold text-slate-400"}>
             <span>0</span>
             <span>1</span>
           </div>
