@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPosttestForYearLabel } from "@/data/assessments/api";
+import { YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/year6NumberNexusIndependentBanks";
 import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -340,10 +341,21 @@ function PostTestPage() {
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
+  const candidateReviewRequested =
+    params.get("review_bank") === "year6-number-v1" &&
+    progressRealmId === "number" &&
+    year === "Year 6";
+  const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
+
+  useEffect(() => {
+    setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
+  }, [candidateReviewRequested]);
 
   const questions = useMemo<Question[]>(
-    () => getPosttestForYearLabel(year, progressRealmId)?.questions ?? [],
-    [year, progressRealmId],
+    () => candidateReviewEnabled
+      ? [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
+      : getPosttestForYearLabel(year, progressRealmId)?.questions ?? [],
+    [candidateReviewEnabled, year, progressRealmId],
   );
 
   const [idx, setIdx] = useState(0);
@@ -365,6 +377,15 @@ function PostTestPage() {
   const q = questions[idx];
   const picked = answers[q?.id ?? ""] ?? "";
   const mabHasSelection = mab.tens > 0 || mab.ones > 0;
+
+  useEffect(() => {
+    if (!candidateReviewEnabled) return;
+    setIdx(0);
+    setAnswers({});
+    setSubmitted(false);
+    setPosttestReviewItems([]);
+    setPendingResultsUrl(null);
+  }, [candidateReviewEnabled]);
 
   useEffect(() => {
     if (previewMode) {

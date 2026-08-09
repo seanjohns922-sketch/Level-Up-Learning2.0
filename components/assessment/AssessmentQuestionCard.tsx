@@ -771,6 +771,36 @@ export default function AssessmentQuestionCard({
 
   if (type === "numeric") {
     if (isEarlyNumberVisual) {
+      if (visual?.type === "number_y6_coordinate") {
+        const [xValue = "", yValue = ""] = (value ?? "").split(",");
+        const updateCoordinate = (index: 0 | 1, nextValue: string) => {
+          const next = [xValue, yValue];
+          next[index] = nextValue.replace(/[^\d.-]/g, "");
+          onChange(next.every((part) => !part) ? "" : next.join(","));
+        };
+        return (
+          <div className="mt-3 space-y-4">
+            {renderedVisual}
+            <div className="flex flex-wrap items-end justify-center gap-3" aria-label="Coordinate answer">
+              <span className="pb-4 text-3xl font-black text-slate-700" aria-hidden>(</span>
+              {(["x", "y"] as const).map((axis, index) => (
+                <label key={axis} className="grid gap-2 text-center">
+                  <span className="text-xs font-black uppercase text-cyan-900">{axis}</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={index === 0 ? xValue : yValue}
+                    onChange={(event) => updateCoordinate(index as 0 | 1, event.target.value)}
+                    aria-label={`${axis} coordinate`}
+                    className="h-20 w-28 rounded-lg border-2 border-cyan-700 bg-[#f8fbfc] px-3 text-center text-4xl font-black text-slate-950 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
+                  />
+                </label>
+              ))}
+              <span className="pb-4 text-3xl font-black text-slate-700" aria-hidden>)</span>
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="mt-3 space-y-4">
           {renderedVisual}

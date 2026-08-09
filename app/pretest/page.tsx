@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { Pin, PartyPopper } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getPretestForYearLabel } from "@/data/assessments/api";
+import { YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS } from "@/data/assessments/year6NumberNexusIndependentBanks";
 import type { Question } from "@/data/assessments/pretests";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
@@ -369,6 +370,11 @@ function PretestPage() {
   const progressRealmId = realmId === "measurement" ? "measurement" : "number";
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
+  const candidateReviewRequested =
+    searchParams.get("review_bank") === "year6-number-v1" &&
+    progressRealmId === "number" &&
+    year === "Year 6";
+  const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {
     if (year === "Prep") {
@@ -376,9 +382,15 @@ function PretestPage() {
     }
   }, [realmId, router, year]);
 
+  useEffect(() => {
+    setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
+  }, [candidateReviewRequested]);
+
   const questions: Question[] = useMemo(
-    () => getPretestForYearLabel(year, progressRealmId),
-    [year, progressRealmId]
+    () => candidateReviewEnabled
+      ? [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
+      : getPretestForYearLabel(year, progressRealmId),
+    [candidateReviewEnabled, year, progressRealmId]
   );
 
   const [index, setIndex] = useState(0);
@@ -410,6 +422,14 @@ function PretestPage() {
 
   const question = questions[index];
   const selected = answers[index];
+
+  useEffect(() => {
+    if (!candidateReviewEnabled) return;
+    setIndex(0);
+    setAnswers(Array(YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS.length).fill(null));
+    setIdkResponses([]);
+    setShowResumePrompt(false);
+  }, [candidateReviewEnabled]);
 
   useEffect(() => {
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() : null;

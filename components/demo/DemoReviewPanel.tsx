@@ -42,6 +42,9 @@ const REALMS: readonly { id: ReviewRealm; label: string; accent: string }[] = [
 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
   const params = new URLSearchParams({ year, realm_id: realm });
+  if (realm === "number" && year === "Year 6") {
+    params.set("review_bank", "year6-number-v1");
+  }
   return `/${kind}?${params.toString()}`;
 }
 
@@ -233,6 +236,9 @@ export default function DemoReviewPanel() {
 
         <section className="py-6">
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">Live Assessments</h2></div>
+          {realm === "number" && year === "Year 6" ? (
+            <p className="mb-3 text-xs font-bold text-amber-200">Level 6 opens the independent V1 candidate banks for review. Production remains unchanged.</p>
+          ) : null}
           <div className="grid gap-3 sm:grid-cols-2">
             <button type="button" disabled={!pretestAvailable} onClick={() => pretestAvailable && open(assessmentHref(realm, year, "pretest"))} className={actionClass(pretestAvailable)}>
               <Route size={17} /> {pretestAvailable ? "Open Pre-Test" : "Pre-Test not available"}

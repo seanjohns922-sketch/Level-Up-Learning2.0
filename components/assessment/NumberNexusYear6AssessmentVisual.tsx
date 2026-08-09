@@ -18,13 +18,29 @@ function ReadableVisual({ text, children }: { text: string; children: React.Reac
   return <div className="space-y-2"><div className="flex justify-end"><OptionReadAloudButton text={text} /></div>{children}</div>;
 }
 
+function mappedVisualReadAloud(type: string, visual: Visual) {
+  if (type === "number_y6_integer_set" || type === "number_y6_fraction_set") {
+    return `Values: ${((visual.values as Array<string | number> | undefined) ?? []).join(", ")}.`;
+  }
+  if (type === "number_y6_number_card") return `Number: ${String(visual.number ?? "")}.`;
+  if (type === "number_y6_constraint") {
+    return `Conditions: ${((visual.rules as string[] | undefined) ?? []).join(", ")}.`;
+  }
+  if (type === "number_y6_number_line") {
+    return `Number line from ${String(visual.min ?? 0)} to ${String(visual.max ?? 1)}, divided into ${String(visual.divisions ?? "")} equal intervals. A point is marked on the line.`;
+  }
+  if (type === "number_y6_claim") return `Claim: ${String(visual.statement ?? "")}.`;
+  return String(visual.expression ?? "");
+}
+
 export default function NumberNexusYear6AssessmentVisual({ visual }: { visual: Visual }) {
   const type = String(visual.type ?? "");
 
   if (type === "number_y6_coordinate") {
     const points = (visual.points as Array<{ x: number; y: number; label: string }> | undefined) ?? [];
     const spoken = points.map((point) => `Point ${point.label} is at ${point.x}, ${point.y}.`).join(" ");
-    return <ReadableVisual text={spoken}><Surface><div className="relative mx-auto aspect-square w-full max-w-[340px] overflow-hidden rounded-lg border border-cyan-900/20 bg-[linear-gradient(to_right,rgba(8,145,178,.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(8,145,178,.12)_1px,transparent_1px)] bg-[size:10%_10%]"><span className="absolute left-1/2 top-0 h-full w-px bg-slate-700" /><span className="absolute left-0 top-1/2 h-px w-full bg-slate-700" />{points.map((point) => <span key={point.label} className="absolute grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-cyan-700 text-sm font-black text-white shadow" style={{ left: `${50 + point.x * 10}%`, top: `${50 - point.y * 10}%` }}>{point.label}</span>)}</div></Surface></ReadableVisual>;
+    const scale = [-4, -3, -2, -1, 1, 2, 3, 4];
+    return <ReadableVisual text={spoken}><Surface><div className="relative mx-auto aspect-square w-full max-w-[340px] overflow-hidden rounded-lg border border-cyan-900/20 bg-[linear-gradient(to_right,rgba(8,145,178,.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(8,145,178,.12)_1px,transparent_1px)] bg-[size:10%_10%]"><span className="absolute left-1/2 top-0 h-full w-px bg-slate-700" /><span className="absolute left-0 top-1/2 h-px w-full bg-slate-700" />{scale.map((value) => <span key={`x-${value}`} aria-hidden className="absolute top-[52%] -translate-x-1/2 text-[10px] font-bold text-slate-500" style={{ left: `${50 + value * 10}%` }}>{value}</span>)}{scale.map((value) => <span key={`y-${value}`} aria-hidden className="absolute left-[52%] -translate-y-1/2 text-[10px] font-bold text-slate-500" style={{ top: `${50 - value * 10}%` }}>{value}</span>)}<span aria-hidden className="absolute right-2 top-[45%] text-xs font-black text-slate-600">x</span><span aria-hidden className="absolute left-[52%] top-2 text-xs font-black text-slate-600">y</span>{points.map((point) => <span key={point.label} className="absolute grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-cyan-700 text-sm font-black text-white shadow" style={{ left: `${50 + point.x * 10}%`, top: `${50 - point.y * 10}%` }}>{point.label}</span>)}</div></Surface></ReadableVisual>;
   }
 
   if (type === "number_y6_quantity") {
@@ -60,6 +76,6 @@ export default function NumberNexusYear6AssessmentVisual({ visual }: { visual: V
     number_y6_estimate: "number_y5_estimate",
   };
   const mapped = mappedType[type];
-  const spoken = Object.entries(visual).filter(([key]) => key !== "type").map(([key, value]) => `${key.replaceAll("_", " ")}: ${Array.isArray(value) ? value.join(", ") : String(value)}.`).join(" ");
+  const spoken = mappedVisualReadAloud(type, visual);
   return mapped ? <ReadableVisual text={spoken}><NumberNexusYear5AssessmentVisual visual={{ ...visual, type: mapped }} /></ReadableVisual> : null;
 }

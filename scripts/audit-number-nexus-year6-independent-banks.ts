@@ -108,6 +108,8 @@ check(!/\b(hint|helper|solution|worked step)\b/i.test(bankSource), "Assessment b
 check(cardSource.includes("NumberNexusYear6AssessmentVisual") && cardSource.includes('visual.type.startsWith("number_y6_")'), "Level 6 visual dispatch is missing.");
 check(visualSource.includes("rounded-lg") && !visualSource.includes("rounded-2xl"), "Level 6 visuals do not follow the modern radius system.");
 check(visualSource.includes("OptionReadAloudButton") && visualSource.includes("ReadableVisual"), "Level 6 visual wording is missing read-aloud support.");
+check(!visualSource.includes("Object.entries(visual)"), "Level 6 read-aloud infers text from hidden visual data and may expose an answer.");
+check(visualSource.includes("A point is marked on the line."), "Level 6 number-line read-aloud does not use an answer-neutral description.");
 check(shellSource.includes('year === "Year 6"') && shellSource.includes("max-w-6xl"), "Level 6 does not use the modern wide assessment shell.");
 check(!apiSource.includes("YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS"), "Release candidate was routed to production before educator approval.");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "The 85% assessment threshold changed.");
