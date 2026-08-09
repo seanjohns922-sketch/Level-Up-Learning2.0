@@ -27,5 +27,9 @@ export default async function StarpathPostTestPage({
 
   if (program.assessments.postTest?.status !== "implemented") notFound();
 
-  redirect(`/posttest?year=${encodeURIComponent(definition.yearLabel)}&realm_id=${STARPATH_REALM_ID}`);
+  const target = new URLSearchParams({ year: definition.yearLabel, realm_id: STARPATH_REALM_ID });
+  if (query.review_bank === "ground-starpath-rc1" && level === "ground") {
+    target.set("review_bank", "ground-starpath-rc1");
+  }
+  redirect(`/posttest?${target.toString()}`);
 }

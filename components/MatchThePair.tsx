@@ -1,6 +1,8 @@
 "use client";
 
 import { RotateCw } from "lucide-react";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { speak } from "@/lib/speak";
 
@@ -203,7 +205,7 @@ export default function MatchThePair({
       pickedLeft.pairId === pickedRight.pairId;
 
     return [
-      "w-full rounded-lg border px-4 py-5 text-left font-extrabold text-lg sm:text-xl",
+      "flex w-full items-stretch overflow-hidden rounded-lg border font-extrabold text-lg sm:text-xl",
       "transition active:scale-[0.98]",
       c.matched ? "bg-green-50 border-green-300 text-green-900" : "bg-white border-slate-200 hover:bg-slate-50",
       picked ? "ring-2 ring-teal-400 border-teal-400" : "",
@@ -225,11 +227,21 @@ export default function MatchThePair({
       </div>
 
       <div className="rounded-lg border bg-white p-5 mb-4">
-        <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-          Match the Pair
-        </div>
-        <div className="text-sm text-slate-500 mt-1">
-          Tap one card on the left, then its matching card on the right.
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              Match the Pair
+            </div>
+            <div className="text-sm text-slate-500 mt-1">
+              Tap one card on the left, then its matching card on the right.
+            </div>
+          </div>
+          <ReadAloudBtn
+            text="Match the pair. Tap one card on the left, then its matching card on the right."
+            speechKey="match-the-pair-instructions"
+            size="md"
+            label="Read"
+          />
         </div>
         <div className="mt-3 text-sm text-slate-700">
           Attempts: <span className="font-bold">{attempts}</span>
@@ -239,17 +251,39 @@ export default function MatchThePair({
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2 sm:space-y-3">
           {leftCards.map((c) => (
-            <button key={c.id} onClick={() => pick(c)} className={cardClass(c, "left")}>
-              {c.label}
-            </button>
+            <div key={c.id} className={cardClass(c, "left")}>
+              <button
+                type="button"
+                onClick={() => pick(c)}
+                disabled={locked || c.matched}
+                className="min-w-0 flex-1 px-4 py-5 text-left"
+              >
+                {c.label}
+              </button>
+              <OptionReadAloudButton
+                text={String(c.label)}
+                className="flex shrink-0 items-center border-l border-slate-200 px-3"
+              />
+            </div>
           ))}
         </div>
 
         <div className="space-y-2 sm:space-y-3">
           {rightCards.map((c) => (
-            <button key={c.id} onClick={() => pick(c)} className={cardClass(c, "right")}>
-              {c.label}
-            </button>
+            <div key={c.id} className={cardClass(c, "right")}>
+              <button
+                type="button"
+                onClick={() => pick(c)}
+                disabled={locked || c.matched}
+                className="min-w-0 flex-1 px-4 py-5 text-left"
+              >
+                {c.label}
+              </button>
+              <OptionReadAloudButton
+                text={String(c.label)}
+                className="flex shrink-0 items-center border-l border-slate-200 px-3"
+              />
+            </div>
           ))}
         </div>
       </div>

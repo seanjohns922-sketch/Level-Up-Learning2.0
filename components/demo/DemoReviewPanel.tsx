@@ -217,7 +217,10 @@ export default function DemoReviewPanel() {
   }
 
   function posttestHref() {
-    if (realm === "space") return buildStarpathPostTestPageHref({ selectedLevel: getStarpathLevelForYear(year).id });
+    if (realm === "space") {
+      const href = buildStarpathPostTestPageHref({ selectedLevel: getStarpathLevelForYear(year).id });
+      return year === "Prep" ? `${href}&review_bank=ground-starpath-rc1` : href;
+    }
     return assessmentHref(realm, year, "posttest");
   }
 
@@ -289,6 +292,9 @@ export default function DemoReviewPanel() {
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">Live Assessments</h2></div>
           {realm === "number" && year === "Year 6" ? (
             <p className="mb-3 text-xs font-bold text-amber-200">Level 6 opens the independent V1 candidate banks for review. Production remains unchanged.</p>
+          ) : null}
+          {realm === "space" && year === "Prep" ? (
+            <p className="mb-3 text-xs font-bold text-amber-200">Ground opens the independent Starpath RC1 bank for review. Production remains unchanged.</p>
           ) : null}
           <div className="grid gap-3 sm:grid-cols-2">
             <button type="button" disabled={!pretestAvailable} onClick={() => pretestAvailable && open(assessmentHref(realm, year, "pretest"))} className={actionClass(pretestAvailable)}>

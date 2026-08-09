@@ -9,12 +9,14 @@ export default function ReadAloudBtn({
   size = "sm",
   label,
   className = "",
+  kind = "prompt",
 }: {
   text: string;
   speechKey?: string;
   size?: "sm" | "md";
   label?: string;
   className?: string;
+  kind?: "prompt" | "option";
 }) {
   const px = label
     ? size === "md" ? "px-3 py-2" : "px-2.5 py-1.5"
@@ -27,6 +29,8 @@ export default function ReadAloudBtn({
   return (
     <button
       type="button"
+      data-read-aloud-button="true"
+      data-read-aloud-kind={kind}
       onClick={(e) => {
         e.stopPropagation();
         if (isCurrentSpeech) {

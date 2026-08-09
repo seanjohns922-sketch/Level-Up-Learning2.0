@@ -17,8 +17,8 @@ assert.deepEqual(
     "Shape Spotters",
     "Shape Builders",
     "Shape Sorters",
-    "Shapes Around Us",
     "Space Positions",
+    "Space Directions",
     "Space Adventures",
     "Build Starpath",
     "Space Graduation",
@@ -29,10 +29,10 @@ assert.deepEqual(
   [
     ["Meet the Shapes", "Shape Detectives", "Shape Masters"],
     ["Build with Shapes", "Shape Creators", "Space Builders"],
-    ["Sort by Shape", "What's Different?", "Shape Families"],
-    ["Space Objects", "Home Objects", "Treasure Hunt"],
-    ["Above, Below, Beside", "In, On, Under, Behind", "Move the Object"],
-    ["Guide the Rocket", "Help Geospin", "Hidden Treasure"],
+    ["Shape Families", "Same or Different?", "Shape Challenge"],
+    ["Where Is It?", "Around Starpath", "Position Challenge"],
+    ["Move It There", "Which Way?", "Direction Mission"],
+    ["Guide the Rover", "Help Geospin", "Hidden Treasure"],
     ["Build a Planet", "Create a Space Scene", "Describe Your Picture"],
     ["Shape Explorer Challenge", "Position Explorer Challenge", "Geospin's Final Mission"],
   ],
@@ -42,7 +42,7 @@ assert.match(groundProgram.progressionRationale, /Ground Level Starpath Graduate
 const ids = new Set();
 for (const program of registry.STARPATH_PROGRAMS) {
   assert.equal(program.realmId, "space");
-  assert.equal(program.status, "planned");
+  assert.equal(program.status, ["level-3", "level-4"].includes(program.level) ? "implemented" : "planned");
   assert.equal(program.weeks.length, 8, `${program.level} must have exactly 8 weeks`);
   assert.equal(program.skills.length, 8, `${program.level} must expose one stable reporting skill per week`);
   assert.equal(program.assessments.preTest === null, program.level === "ground");
@@ -52,8 +52,12 @@ for (const program of registry.STARPATH_PROGRAMS) {
   for (const week of program.weeks) {
     assert.equal(week.lessons.length, 3);
     assert.deepEqual(week.lessons.map((lesson) => lesson.sequenceRole), ["build", "develop", "apply"]);
-    assert.ok(week.quiz, `${program.level} week ${week.week} must have a weekly quiz`);
-    assert.equal(week.quiz.questionCount, 15);
+    if (week.week === 8) {
+      assert.equal(week.quiz, null, `${program.level} week 8 must use the Post-Test instead of a weekly quiz`);
+    } else {
+      assert.ok(week.quiz, `${program.level} week ${week.week} must have a weekly quiz`);
+      assert.equal(week.quiz.questionCount, 15);
+    }
     for (const lesson of week.lessons) {
       assert.equal(lesson.activityMechanics.length, 3, `${lesson.id} must plan exactly three activities`);
       assert.match(lesson.id, /^(ground|y[1-6])-space-w[1-8]-l[1-3]$/);
@@ -95,4 +99,4 @@ for (const file of ["lib/program-progress.ts", "lib/program-weeks.ts", "lib/asse
   assert.equal(source.includes("STARPATH_PROGRAMS"), false, `${file} must not consume Starpath until it explicitly supports space`);
 }
 
-console.log("Starpath curriculum audit passed: 7 levels, 56 weeks, 168 planned lessons, 56 quizzes, 56 skills, and isolated 8-week access rules.");
+console.log("Starpath curriculum audit passed: 7 levels, 56 weeks, 168 planned lessons, 49 quizzes, 56 skills, and isolated 8-week access rules.");

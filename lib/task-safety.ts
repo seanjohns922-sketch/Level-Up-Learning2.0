@@ -1,4 +1,4 @@
-import type { PracticeTask, StarpathObjectTask } from "@/data/activities/year1/practice-task";
+import type { PracticeTask, StarpathGroundAssessmentTask, StarpathObjectTask } from "@/data/activities/year1/practice-task";
 import type { LessonActivity } from "@/data/programs/types";
 import type { Year2QuestionData } from "@/data/activities/year2/lessonEngine";
 
@@ -238,6 +238,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "groundFeed",
   "groundSoundCount",
   "starpathShapeIntro",
+  "starpathGroundAssessment",
   "starpathShapeMatch",
   "starpathShapeSort",
   "starpathShapeScene",
@@ -299,6 +300,17 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
   if (!task || !hasText(task.kind) || !SUPPORTED_PRACTICE_TASK_KINDS.has(task.kind)) return false;
+  if (task.kind === "starpathGroundAssessment") {
+    const assessmentTask = task as StarpathGroundAssessmentTask;
+    if (!hasText(assessmentTask.prompt) || !hasText(assessmentTask.speakText)) return false;
+    if (assessmentTask.rows < 2 || assessmentTask.cols < 2) return false;
+    if (assessmentTask.mode === "route") return assessmentTask.answerMoves.length > 0;
+    const tokenIds = new Set(assessmentTask.tokens.map((token) => token.id));
+    return assessmentTask.tokens.length > 0
+      && tokenIds.size === assessmentTask.tokens.length
+      && assessmentTask.answer.length === assessmentTask.tokens.length
+      && assessmentTask.answer.every((answer) => tokenIds.has(answer.tokenId));
+  }
   if (task.kind !== "starpathObject") return true;
   const objectTask = task as StarpathObjectTask;
 

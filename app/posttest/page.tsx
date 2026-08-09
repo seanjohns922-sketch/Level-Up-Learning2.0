@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPosttestForYearLabel } from "@/data/assessments/api";
 import { YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/year6NumberNexusIndependentBanks";
+import { GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/groundStarpathIndependentPosttest";
 import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -341,7 +342,12 @@ function PostTestPage() {
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
-  const candidateReviewRequested = progressRealmId === "number" && year === "Year 6";
+  const reviewBank = params.get("review_bank");
+  const starpathCandidateReviewRequested = progressRealmId === "space"
+    && year === "Prep"
+    && reviewBank === "ground-starpath-rc1";
+  const candidateReviewRequested = (progressRealmId === "number" && year === "Year 6")
+    || starpathCandidateReviewRequested;
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {
@@ -350,9 +356,11 @@ function PostTestPage() {
 
   const questions = useMemo<Question[]>(
     () => candidateReviewEnabled
-      ? [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
+      ? starpathCandidateReviewRequested
+        ? [...GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
+        : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
       : getPosttestForYearLabel(year, progressRealmId)?.questions ?? [],
-    [candidateReviewEnabled, year, progressRealmId],
+    [candidateReviewEnabled, starpathCandidateReviewRequested, year, progressRealmId],
   );
 
   const [idx, setIdx] = useState(0);

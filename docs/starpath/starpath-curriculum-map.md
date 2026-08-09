@@ -41,7 +41,7 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 - Size or colour determines a shape.
 - Position words have a fixed viewpoint.
 
-**Progression rationale:** The sequence deliberately moves from recognise to create, sort, describe and apply. Changing the context from shape spotting to building, environmental searches, navigation and a final Space Graduation keeps Foundation practice varied while remaining aligned to AC9MFSP01 and AC9MFSP02. Completion is planned to unlock the Ground Level Starpath Graduate title.
+**Progression rationale:** The sequence runs shapes first, then space. Weeks 1-3 recognise, create, sort and compare familiar shapes (AC9MFSP01). Weeks 4-6 then move into position, direction and movement using those same shapes as context (AC9MFSP02): describe where objects are, follow and give directions, then navigate a pathway. Weeks 7-8 combine both descriptors to build and describe a space scene and complete a cumulative Space Graduation. Completion is planned to unlock the Ground Level Starpath Graduate title.
 
 ### Assessment Metadata
 
@@ -54,12 +54,12 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 | --- | --- | --- | ---: | --- | --- |
 | `space-ground-shape-recognition` | Spot familiar shapes | Recognises and names circles, squares, triangles and rectangles despite changes in size, colour or orientation. | 1 | shape-and-object-reasoning | None |
 | `space-ground-shape-creation` | Build with shapes | Creates familiar shape pictures, recognises the shapes within completed objects and explains simple visual reasoning. | 2 | construction-and-visualisation | `space-ground-shape-recognition` |
-| `space-ground-shape-sorting` | Sort shapes with a reason | Sorts and compares familiar shapes using corners, sides and round or not-round language. | 3 | shape-and-object-reasoning | `space-ground-shape-recognition` |
-| `space-ground-shapes-in-objects` | Find shapes in objects | Identifies familiar shapes within environmental objects and gives a simple reason for the match. | 4 | spatial-representation | `space-ground-shape-recognition` |
-| `space-ground-position-language` | Say where things are | Uses above, below, beside, in, on, under and behind from a clear viewpoint. | 5 | position-and-navigation | None |
-| `space-ground-movement-pathways` | Follow space clues | Follows positional clues to move through a familiar space and locate hidden objects. | 6 | position-and-navigation | `space-ground-position-language` |
-| `space-ground-shape-position-composition` | Build and describe a space scene | Combines familiar shapes in a space scene and describes where objects are using simple positional language. | 7 | construction-and-visualisation | `space-ground-shape-creation`, `space-ground-position-language` |
-| `space-ground-spatial-mission` | Complete Space Graduation | Integrates shape recognition, creation, sorting and positional language to solve a cumulative Starpath mission. | 8 | spatial-representation | `space-ground-shape-sorting`, `space-ground-shapes-in-objects`, `space-ground-movement-pathways`, `space-ground-shape-position-composition` |
+| `space-ground-shape-sorting` | Sort shapes with a reason | Sorts and compares familiar shapes despite changes in colour and size, then gives a simple reason for a choice. | 3 | shape-and-object-reasoning | `space-ground-shape-recognition` |
+| `space-ground-describe-position` | Say where things are | Describes the position and location of objects in relation to other objects using above, below, beside, behind, in front and inside. | 4 | position-and-navigation | `space-ground-shape-recognition` |
+| `space-ground-follow-directions` | Follow and give directions | Follows and gives simple directions — up, down, left, right and next to — to move and place objects within a familiar space. | 5 | position-and-navigation | `space-ground-describe-position` |
+| `space-ground-movement-pathways` | Follow space clues | Follows positional clues to move through a familiar space and locate hidden objects. | 6 | position-and-navigation | `space-ground-follow-directions` |
+| `space-ground-shape-position-composition` | Build and describe a space scene | Combines familiar shapes in a space scene and describes where objects are using simple positional language. | 7 | construction-and-visualisation | `space-ground-shape-creation`, `space-ground-describe-position` |
+| `space-ground-spatial-mission` | Complete Space Graduation | Integrates shape recognition, creation, sorting and positional language to solve a cumulative Starpath mission. | 8 | spatial-representation | `space-ground-shape-sorting`, `space-ground-describe-position`, `space-ground-movement-pathways`, `space-ground-shape-position-composition` |
 
 ### Eight-Week Sequence
 
@@ -107,66 +107,66 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 
 #### Week 3: Shape Sorters
 
-**Central concept:** Sort and compare familiar shapes using Foundation language.
+**Central concept:** Sort and compare familiar shapes by noticing simple visual similarities and differences.
 **Curriculum alignment:** AC9MFSP01
 **Practised skills:** `space-ground-shape-sorting`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Sort by Shape (`ground-space-w3-l1`) | build | Group familiar shapes by their names. | We are learning to group familiar shapes by their names. | drag-shape-sort, feature-compare, shape-family-builder |
-| 2. What's Different? (`ground-space-w3-l2`) | develop | Compare corners, sides and whether shapes are round or not round. | We are learning to compare corners, sides and whether shapes are round or not round. | drag-shape-sort, feature-compare, shape-family-builder |
-| 3. Shape Families (`ground-space-w3-l3`) | apply | Group similar shapes and explain what belongs together. | We are learning to group similar shapes and explain what belongs together. | drag-shape-sort, feature-compare, shape-family-builder |
+| 1. Shape Families (`ground-space-w3-l1`) | build | Sort familiar shapes into matching groups. | I can sort shapes into groups. | sorting-station, collect-the-family, find-the-odd-shape |
+| 2. Same or Different? (`ground-space-w3-l2`) | develop | Compare familiar shapes despite changes in colour and size. | I can compare familiar shapes. | same-or-different, twins-in-disguise, what-changed |
+| 3. Shape Challenge (`ground-space-w3-l3`) | apply | Apply shape recognition, sorting and comparing together. | I can recognise, sort and compare familiar shapes. | mixed-shape-hunt, same-or-different-recap, shape-sprint |
 
-**Vocabulary:** sort, same, different, corner, round
-
-**Common misconceptions**
-
-- There is only one way to sort a group of shapes.
-- Shapes that look different cannot belong to the same family.
-
-**Weekly quiz:** `ground-space-w3-quiz` - Sorting, visible-feature comparison and simple explanations. (15 questions; planned)
-
-#### Week 4: Shapes Around Us
-
-**Central concept:** Recognise familiar shapes within space and everyday objects.
-**Curriculum alignment:** AC9MFSP01
-**Practised skills:** `space-ground-shapes-in-objects`
-
-| Lesson | Role | Focus | Learning intention | Activity mechanic families |
-| --- | --- | --- | --- | --- |
-| 1. Space Objects (`ground-space-w4-l1`) | build | Find familiar shapes in rockets, planets and satellites. | We are learning to find familiar shapes in rockets, planets and satellites. | space-object-hotspot, home-shape-match, target-shape-hunt |
-| 2. Home Objects (`ground-space-w4-l2`) | develop | Find familiar shapes in everyday environments. | We are learning to find familiar shapes in everyday environments. | space-object-hotspot, home-shape-match, target-shape-hunt |
-| 3. Treasure Hunt (`ground-space-w4-l3`) | apply | Find every object that matches a chosen shape. | We are learning to find every object that matches a chosen shape. | space-object-hotspot, home-shape-match, target-shape-hunt |
-
-**Vocabulary:** object, rocket, planet, match, find
+**Vocabulary:** sort, same, different, family, belong
 
 **Common misconceptions**
 
-- An object must be exactly one shape.
-- Only space objects contain useful shapes.
+- Colour changes the name of a shape.
+- Size changes the name of a shape.
 
-**Weekly quiz:** `ground-space-w4-quiz` - Environmental shape recognition across space and familiar contexts. (15 questions; planned)
+**Weekly quiz:** `ground-space-w3-quiz` - Shape-family sorting, visual comparison and simple explanations. (15 questions; planned)
 
-#### Week 5: Space Positions
+#### Week 4: Space Positions
 
-**Central concept:** Use positional language to describe where objects are.
+**Central concept:** Describe where objects are using simple positional language within a familiar space.
 **Curriculum alignment:** AC9MFSP02
-**Practised skills:** `space-ground-position-language`
+**Practised skills:** `space-ground-describe-position`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Above, Below, Beside (`ground-space-w5-l1`) | build | Identify and describe simple relative positions. | We are learning to identify and describe simple relative positions. | position-word-match, position-scene-choice, drag-to-position |
-| 2. In, On, Under, Behind (`ground-space-w5-l2`) | develop | Use containment and relative position words in familiar scenes. | We are learning to use containment and relative position words in familiar scenes. | position-word-match, position-scene-choice, drag-to-position |
-| 3. Move the Object (`ground-space-w5-l3`) | apply | Drag an object to a location described by a positional clue. | We are learning to drag an object to a location described by a positional clue. | position-word-match, position-scene-choice, drag-to-position |
+| 1. Where Is It? (`ground-space-w4-l1`) | build | Describe where objects are using above, below and beside. | I can describe where objects are. | find-it, place-it, which-picture |
+| 2. Around Starpath (`ground-space-w4-l2`) | develop | Describe where objects are using behind, in front and inside. | I can describe where objects are in space. | hide-and-seek, space-explorer, match-the-position |
+| 3. Position Challenge (`ground-space-w4-l3`) | apply | Follow positional clues to complete a space mission. | I can use positional language to complete a mission. | follow-the-clues, space-map, explorer-mission |
 
-**Vocabulary:** above, below, beside, in, under
+**Vocabulary:** above, below, beside, behind, inside
 
 **Common misconceptions**
 
 - A position word describes an object without a reference object.
-- On and above always mean the same thing.
+- Above and on always mean the same thing.
 
-**Weekly quiz:** `ground-space-w5-quiz` - Relational position vocabulary and interactive placement. (15 questions; planned)
+**Weekly quiz:** `ground-space-w4-quiz` - Positional language: above, below, beside, behind, in front and inside. (15 questions; planned)
+
+#### Week 5: Space Directions
+
+**Central concept:** Follow and give simple directions to move objects around a familiar space.
+**Curriculum alignment:** AC9MFSP02
+**Practised skills:** `space-ground-follow-directions`
+
+| Lesson | Role | Focus | Learning intention | Activity mechanic families |
+| --- | --- | --- | --- | --- |
+| 1. Move It There (`ground-space-w5-l1`) | build | Move an object up, down, left or right on request. | I can move objects up, down, left and right. | move-one-step, move-two-steps, which-way |
+| 2. Which Way? (`ground-space-w5-l2`) | develop | Choose the direction that describes how an object moved. | I can say which way something moved. | which-way-moved, which-way-goal, move-there |
+| 3. Direction Mission (`ground-space-w5-l3`) | apply | Follow a short set of directions to place several objects. | I can follow directions to complete a mission. | two-steps, which-way, direction-mission |
+
+**Vocabulary:** up, down, left, right, next to
+
+**Common misconceptions**
+
+- Left and right stay the same when you turn to face the other way.
+- A direction does not need a starting point.
+
+**Weekly quiz:** `ground-space-w5-quiz` - Following and giving simple directions to move objects. (15 questions; planned)
 
 #### Week 6: Space Adventures
 
@@ -176,9 +176,9 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Guide the Rocket (`ground-space-w6-l1`) | build | Move a rocket by following simple positional directions. | We are learning to move a rocket by following simple positional directions. | rocket-position-guide, character-clue-path, hidden-object-clues |
-| 2. Help Geospin (`ground-space-w6-l2`) | develop | Follow positional clues to help Geospin reach a destination. | We are learning to follow positional clues to help Geospin reach a destination. | rocket-position-guide, character-clue-path, hidden-object-clues |
-| 3. Hidden Treasure (`ground-space-w6-l3`) | apply | Find an object by applying a sequence of location clues. | We are learning to find an object by applying a sequence of location clues. | rocket-position-guide, character-clue-path, hidden-object-clues |
+| 1. Guide the Rover (`ground-space-w6-l1`) | build | Move a rover across a planet map by following simple positional directions. | I can guide an object along a path of directions. | guide-to-star, which-way-goal, guide-the-path |
+| 2. Help Geospin (`ground-space-w6-l2`) | develop | Follow positional clues to help Geospin reach a destination. | I can follow clues to reach a destination. | reach-the-flag, which-way-goal, reach-destination |
+| 3. Hidden Treasure (`ground-space-w6-l3`) | apply | Find an object by applying a sequence of location clues. | I can follow a sequence of clues to find a hidden object. | find-treasure, which-way-goal, treasure-mission |
 
 **Vocabulary:** move, clue, location, next, behind
 
@@ -197,9 +197,9 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Build a Planet (`ground-space-w7-l1`) | build | Combine familiar shapes to create a planet design. | We are learning to combine familiar shapes to create a planet design. | planet-shape-builder, space-scene-composer, oral-scene-description |
-| 2. Create a Space Scene (`ground-space-w7-l2`) | develop | Arrange shape-built objects in a Starpath scene. | We are learning to arrange shape-built objects in a Starpath scene. | planet-shape-builder, space-scene-composer, oral-scene-description |
-| 3. Describe Your Picture (`ground-space-w7-l3`) | apply | Use simple oral positional language to describe the scene. | We are learning to use simple oral positional language to describe the scene. | planet-shape-builder, space-scene-composer, oral-scene-description |
+| 1. Build a Planet (`ground-space-w7-l1`) | build | Combine familiar shapes to create a planet design. | I can build pictures using shapes. | build-object, finish-picture, name-the-shapes |
+| 2. Create a Space Scene (`ground-space-w7-l2`) | develop | Arrange shape-built objects in a Starpath scene. | I can build objects and arrange them in a scene. | build-for-scene, place-in-scene, which-scene |
+| 3. Describe Your Picture (`ground-space-w7-l3`) | apply | Use simple oral positional language to describe the scene. | I can describe where objects are in my scene. | say-where, find-in-scene, scene-reasoning |
 
 **Vocabulary:** create, planet, scene, beside, describe
 
@@ -218,9 +218,9 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Shape Explorer Challenge (`ground-space-w8-l1`) | build | Recognise, create and sort familiar shapes in a cumulative challenge. | We are learning to recognise, create and sort familiar shapes in a cumulative challenge. | shape-explorer-challenge, position-explorer-challenge, geospin-final-mission |
-| 2. Position Explorer Challenge (`ground-space-w8-l2`) | develop | Describe positions and follow location clues in a cumulative challenge. | We are learning to describe positions and follow location clues in a cumulative challenge. | shape-explorer-challenge, position-explorer-challenge, geospin-final-mission |
-| 3. Geospin's Final Mission (`ground-space-w8-l3`) | apply | Help Geospin complete an adventure combining all Ground Level skills. | We are learning to help Geospin complete an adventure combining all Ground Level skills. | shape-explorer-challenge, position-explorer-challenge, geospin-final-mission |
+| 1. Shape Explorer Challenge (`ground-space-w8-l1`) | build | Recognise, create and sort familiar shapes in a cumulative challenge. | I can recognise, sort and compare shapes. | recognise, odd-one-out, compare |
+| 2. Position Explorer Challenge (`ground-space-w8-l2`) | develop | Describe positions and follow location clues in a cumulative challenge. | I can find, describe and travel by position. | find-by-position, say-where, which-way |
+| 3. Geospin's Final Mission (`ground-space-w8-l3`) | apply | Help Geospin complete an adventure combining all Ground Level skills. | I can combine all my skills to complete a mission. | sort-shapes, which-picture, final-path |
 
 **Vocabulary:** shape, sort, position, mission, explorer
 
@@ -229,7 +229,7 @@ Young Space Explorers recognise, create, sort and find familiar shapes, then des
 - Only one type of shape or position clue can appear in a mission.
 - A successful answer does not need a reason or description.
 
-**Weekly quiz:** `ground-space-w8-quiz` - Cumulative Ground Level learning; completion is planned to unlock the Ground Level Starpath Graduate title. (15 questions; planned)
+**Weekly quiz:** none. Week 8 Lesson 3 unlocks `ground-space-post-01`.
 
 ## Starpath Level 1: Shape Makers and Pathfinders
 
@@ -268,37 +268,37 @@ Students compare and classify familiar shapes and objects, then give and follow 
 
 | Skill ID | Student name | Teacher description | Week | Category | Prerequisites |
 | --- | --- | --- | ---: | --- | --- |
-| `space-l1-shape-features` | Compare shape features | Compares familiar shapes using sides, corners, curved surfaces and straight edges. | 1 | shape-and-object-reasoning | `space-ground-shape-recognition` |
+| `space-l1-shape-features` | Become a shape expert | Recognises and compares familiar shapes in varied forms, identifying simple similarities and differences. | 1 | shape-and-object-reasoning | `space-ground-shape-recognition` |
 | `space-l1-shape-classification` | Build shape families | Classifies familiar shapes and objects and explains the shared feature. | 2 | shape-and-object-reasoning | `space-l1-shape-features` |
-| `space-l1-shape-composition` | Build shapes from parts | Composes and decomposes familiar shapes while describing constituent parts. | 3 | construction-and-visualisation | `space-l1-shape-classification` |
-| `space-l1-objects-and-views` | Match objects and views | Recognises shape features in simple pictures and views of familiar objects. | 4 | spatial-representation | `space-l1-shape-features` |
-| `space-l1-direction-language` | Use direction words | Uses forward, backward, left, right and turn language from a stated orientation. | 5 | position-and-navigation | `space-ground-movement-pathways` |
-| `space-l1-follow-directions` | Follow a route | Follows multi-step directions from a specified start and orientation. | 6 | position-and-navigation | `space-l1-direction-language` |
-| `space-l1-give-directions` | Give clear directions | Creates and checks ordered directions that move a person or object to a location. | 7 | position-and-navigation | `space-l1-follow-directions` |
+| `space-l1-shape-composition` | Find shapes in pictures | Decomposes a picture into its familiar shapes and finds and counts every shape of each kind. | 3 | construction-and-visualisation | `space-l1-shape-classification` |
+| `space-l1-objects-and-views` | Find shapes in the world | Recognises familiar shapes in everyday objects and identifies similarities and differences between them. | 4 | shape-and-object-reasoning | `space-l1-shape-features` |
+| `space-l1-make-shapes` | Construct and compare shapes | Makes familiar shapes by joining points, repairs incomplete shapes and compares completed constructions. | 5 | construction-and-visualisation | `space-l1-shape-features` |
+| `space-l1-give-directions` | Build and plan routes | Creates ordered routes and plans pathways that satisfy checkpoints, obstacles and destinations across familiar grids. | 6 | position-and-navigation | `space-ground-follow-directions` |
+| `space-l1-fix-routes` | Test and fix a route | Runs a route, diagnoses an incorrect step and revises a route until it reaches the goal. | 7 | position-and-navigation | `space-l1-give-directions` |
 | `space-l1-pathfinder-reasoning` | Solve a pathfinder challenge | Uses shape information and directions together to solve and explain spatial problems. | 8 | spatial-representation | `space-l1-objects-and-views`, `space-l1-give-directions` |
 
 ### Eight-Week Sequence
 
-#### Week 1: Shape Features
+#### Week 1: Shape Experts
 
-**Central concept:** Compare familiar shapes using observable features.
+**Central concept:** Recognise and compare familiar shapes despite changes in colour, size and orientation.
 **Curriculum alignment:** AC9M1SP01
 **Practised skills:** `space-l1-shape-features`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Feature Detectives (`y1-space-w1-l1`) | build | Notice sides, corners, straight and curved boundaries. | We are learning to notice sides, corners, straight and curved boundaries. | feature-hotspot, compare-panel, odd-one-out |
-| 2. Compare Two Shapes (`y1-space-w1-l2`) | develop | State a similarity and a difference. | We are learning to state a similarity and a difference. | feature-hotspot, compare-panel, odd-one-out |
-| 3. Which One Belongs? (`y1-space-w1-l3`) | apply | Justify a choice using shape features. | We are learning to justify a choice using shape features. | feature-hotspot, compare-panel, odd-one-out |
+| 1. Shape Disguise Mission (`y1-space-w1-l1`) | build | Recognise familiar shapes after changes in colour, size or orientation. | I can recognise familiar shapes even when they look different. | hologram-stabiliser, turntable-scanner, disguise-match |
+| 2. Shape Face-Off (`y1-space-w1-l2`) | develop | Compare close shape pairs and identify similarities and differences. | I can compare familiar shapes and explain what is the same or different. | close-pair, similarity-scan, difference-scan |
+| 3. Mystery Shape Rescue (`y1-space-w1-l3`) | apply | Use several visual clues to identify and check familiar shapes. | I can use shape clues to solve a shape challenge. | clue-decoder, shape-elimination, label-repair |
 
-**Vocabulary:** side, corner, straight, curved, feature
+**Vocabulary:** shape, same, different, compare, clue
 
 **Common misconceptions**
 
-- Size is a defining feature.
-- Curved shapes cannot have corners.
+- Colour or size changes a shape's identity.
+- A small turn makes a familiar shape into a new shape.
 
-**Weekly quiz:** `y1-space-w1-quiz` - Observable features, similarities and differences. (15 questions; planned)
+**Weekly quiz:** `y1-space-w1-quiz` - Shape invariance, close-shape comparison and visual clue reasoning. (15 questions; planned)
 
 #### Week 2: Shape Families
 
@@ -308,9 +308,9 @@ Students compare and classify familiar shapes and objects, then give and follow 
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Meet the Families (`y1-space-w2-l1`) | build | Group shapes by a given feature. | We are learning to group shapes by a given feature. | guided-sort, open-sort, reclassify-challenge |
-| 2. Make Your Own Rule (`y1-space-w2-l2`) | develop | Classify a mixed collection in a useful way. | We are learning to classify a mixed collection in a useful way. | guided-sort, open-sort, reclassify-challenge |
-| 3. Two Ways to Sort (`y1-space-w2-l3`) | apply | Reclassify the same set and compare rules. | We are learning to reclassify the same set and compare rules. | guided-sort, open-sort, reclassify-challenge |
+| 1. Meet the Families (`y1-space-w2-l1`) | build | Group shapes by a given feature. | I can sort shapes into families by their features. | meet-the-families, family-check, family-mastery |
+| 2. Make Your Own Rule (`y1-space-w2-l2`) | develop | Classify a mixed collection in a useful way. | I can work out the rule behind a group of shapes. | find-the-rule, rule-check, rule-mastery |
+| 3. Two Ways to Sort (`y1-space-w2-l3`) | apply | Reclassify the same set and compare rules. | I can sort the same shapes in more than one way. | another-way, another-way-2, rule-recap |
 
 **Vocabulary:** classify, family, rule, similar, different
 
@@ -321,110 +321,110 @@ Students compare and classify familiar shapes and objects, then give and follow 
 
 **Weekly quiz:** `y1-space-w2-quiz` - Classification rules and flexible grouping. (15 questions; planned)
 
-#### Week 3: Build and Take Apart
+#### Week 3: Shape Detectives
 
-**Central concept:** Make shapes and identify parts within composites.
+**Central concept:** Take pictures apart into their familiar shapes and count each kind.
 **Curriculum alignment:** AC9M1SP01
 **Practised skills:** `space-l1-shape-composition`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Build the Target (`y1-space-w3-l1`) | build | Compose a target from familiar shapes. | We are learning to compose a target from familiar shapes. | shape-composer, decompose-overlay, design-builder |
-| 2. Find the Hidden Parts (`y1-space-w3-l2`) | develop | Decompose a composite into familiar shapes. | We are learning to decompose a composite into familiar shapes. | shape-composer, decompose-overlay, design-builder |
-| 3. Design Two Ways (`y1-space-w3-l3`) | apply | Create and compare two valid constructions. | We are learning to create and compare two valid constructions. | shape-composer, decompose-overlay, design-builder |
+| 1. Shape Detectives (`y1-space-w3-l1`) | build | Find and count every familiar shape in a picture. | I can find and count the shapes hidden in a picture. | hunt-1, hunt-2, hunt-3 |
+| 2. Hidden Shape Hunt (`y1-space-w3-l2`) | develop | Find every hidden shape in busier pictures. | I can find every shape hidden in a busier picture. | hunt-1, hunt-2, hunt-3 |
+| 3. Master Detective (`y1-space-w3-l3`) | apply | Find every shape in the busiest pictures. | I can find every shape in the busiest pictures. | hunt-1, hunt-2, hunt-3 |
 
-**Vocabulary:** compose, decompose, part, whole, overlap
+**Vocabulary:** find, count, shape, how many, hidden
 
 **Common misconceptions**
 
-- Parts cannot overlap.
-- A composite has only one decomposition.
+- A shape stops being that shape inside a picture.
+- You can stop before finding every shape.
 
-**Weekly quiz:** `y1-space-w3-quiz` - Composition, decomposition and multiple solutions. (15 questions; planned)
+**Weekly quiz:** `y1-space-w3-quiz` - Finding and counting familiar shapes hidden in pictures. (15 questions; planned)
 
-#### Week 4: Objects and Views
+#### Week 4: Shapes in the World
 
-**Central concept:** Connect familiar objects with simple shape representations.
+**Central concept:** Recognise familiar shapes in everyday objects and compare their similarities and differences.
 **Curriculum alignment:** AC9M1SP01
 **Practised skills:** `space-l1-objects-and-views`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Object or Picture? (`y1-space-w4-l1`) | build | Match familiar objects to simple representations. | We are learning to match familiar objects to simple representations. | object-picture-match, viewpoint-toggle, view-reasoning |
-| 2. Look from Here (`y1-space-w4-l2`) | develop | Compare how one object appears from two viewpoints. | We are learning to compare how one object appears from two viewpoints. | object-picture-match, viewpoint-toggle, view-reasoning |
-| 3. Choose the Best View (`y1-space-w4-l3`) | apply | Select and explain a useful representation. | We are learning to select and explain a useful representation. | object-picture-match, viewpoint-toggle, view-reasoning |
+| 1. Shapes Around Us (`y1-space-w4-l1`) | build | Spot the familiar shapes in everyday objects. | I can spot the familiar shapes in everyday objects. | spot-1, spot-2, spot-3 |
+| 2. Same or Different? (`y1-space-w4-l2`) | develop | Compare two objects and say what is the same or different. | I can compare two objects and say what is the same or different. | compare-1, compare-2, compare-3 |
+| 3. Shape Match (`y1-space-w4-l3`) | apply | Pair up objects that share a shape. | I can pair up objects that share a shape. | match-1, match-2, match-3 |
 
-**Vocabulary:** object, picture, view, front, top
+**Vocabulary:** object, shape, same, different, match
 
 **Common misconceptions**
 
-- An object looks identical from every viewpoint.
-- A picture is the object itself.
+- Everyday objects have no shape.
+- Two different objects cannot share a shape.
 
-**Weekly quiz:** `y1-space-w4-quiz` - Object-shape connections and simple viewpoints. (15 questions; planned)
+**Weekly quiz:** `y1-space-w4-quiz` - Recognising shapes in objects and comparing similarities and differences. (15 questions; planned)
 
-#### Week 5: Direction Words
+#### Week 5: Shape Workshop
 
-**Central concept:** Use precise movement and turn language.
-**Curriculum alignment:** AC9M1SP02
-**Practised skills:** `space-l1-direction-language`
+**Central concept:** Construct, repair and compare familiar shapes using points and line segments.
+**Curriculum alignment:** AC9M1SP01
+**Practised skills:** `space-l1-make-shapes`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Face and Move (`y1-space-w5-l1`) | build | Connect orientation with forward and backward. | We are learning to connect orientation with forward and backward. | orientation-mover, turn-simulator, movement-describer |
-| 2. Left and Right Turns (`y1-space-w5-l2`) | develop | Follow turns from a visible viewpoint. | We are learning to follow turns from a visible viewpoint. | orientation-mover, turn-simulator, movement-describer |
-| 3. Say the Move (`y1-space-w5-l3`) | apply | Describe a demonstrated movement precisely. | We are learning to describe a demonstrated movement precisely. | orientation-mover, turn-simulator, movement-describer |
+| 1. Connect the Stars (`y1-space-w5-l1`) | build | Construct familiar shapes by joining points in order. | I can make familiar shapes by joining points. | construct-1, construct-2, construct-3 |
+| 2. Shape Repair Crew (`y1-space-w5-l2`) | develop | Find and repair a missing side in an incomplete shape. | I can find and repair a missing side. | repair-1, repair-2, repair-3 |
+| 3. Build and Compare (`y1-space-w5-l3`) | apply | Compare completed shape constructions and explain similarities and differences. | I can construct and compare familiar shapes. | compare-build-1, compare-build-2, compare-build-3 |
 
-**Vocabulary:** forward, backward, left, right, turn
-
-**Common misconceptions**
-
-- Left and right are fixed on the screen.
-- A turn and a step are the same action.
-
-**Weekly quiz:** `y1-space-w5-quiz` - Orientation-aware directional language. (15 questions; planned)
-
-#### Week 6: Follow the Route
-
-**Central concept:** Follow ordered directions to reach locations.
-**Curriculum alignment:** AC9M1SP02
-**Practised skills:** `space-l1-follow-directions`
-
-| Lesson | Role | Focus | Learning intention | Activity mechanic families |
-| --- | --- | --- | --- | --- |
-| 1. Start Here (`y1-space-w6-l1`) | build | Identify start, destination and facing direction. | We are learning to identify start, destination and facing direction. | start-state-match, route-runner, route-debugger |
-| 2. Mission Route (`y1-space-w6-l2`) | develop | Follow a sequence of moves in order. | We are learning to follow a sequence of moves in order. | start-state-match, route-runner, route-debugger |
-| 3. Find the Error (`y1-space-w6-l3`) | apply | Diagnose an incorrect route and repair it. | We are learning to diagnose an incorrect route and repair it. | start-state-match, route-runner, route-debugger |
-
-**Vocabulary:** start, finish, order, route, step
+**Vocabulary:** construct, corner, side, repair, compare
 
 **Common misconceptions**
 
-- Directions can be followed in any order.
-- The destination alone determines the route.
+- A shape does not need to be closed.
+- Changing size or orientation creates a new shape.
 
-**Weekly quiz:** `y1-space-w6-quiz` - Following and debugging ordered directions. (15 questions; planned)
+**Weekly quiz:** `y1-space-w5-quiz` - Deliberate construction, repair and comparison of familiar shapes. (15 questions; planned)
 
-#### Week 7: Give the Route
+#### Week 6: Build a Route
 
-**Central concept:** Create unambiguous directions for others.
+**Central concept:** Create routes, then plan increasingly complex missions that follow spatial rules.
 **Curriculum alignment:** AC9M1SP02
 **Practised skills:** `space-l1-give-directions`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Build a Route (`y1-space-w7-l1`) | build | Choose moves that connect a start and destination. | We are learning to choose moves that connect a start and destination. | route-builder, direction-sequencer, route-test-lab |
-| 2. Directions for a Friend (`y1-space-w7-l2`) | develop | Record an ordered route another character can follow. | We are learning to record an ordered route another character can follow. | route-builder, direction-sequencer, route-test-lab |
-| 3. Test and Improve (`y1-space-w7-l3`) | apply | Run, revise and explain a route. | We are learning to run, revise and explain a route. | route-builder, direction-sequencer, route-test-lab |
+| 1. Build a Route (`y1-space-w6-l1`) | build | Choose any valid sequence of moves that reaches the goal. | I can build a route to reach a goal. | build-1, build-2, build-3 |
+| 2. Mission Routes (`y1-space-w6-l2`) | develop | Plan routes on a 4 by 4 grid that follow one mission rule. | I can plan a route that follows a mission rule. | mission-1, mission-2, mission-3 |
+| 3. Wide Grid Route Designer (`y1-space-w6-l3`) | apply | Plan longer routes across an 8 by 4 grid with multiple constraints. | I can plan a longer route that follows several mission rules. | design-1, design-2, design-3 |
 
-**Vocabulary:** instruction, sequence, destination, check, improve
+**Vocabulary:** build, order, route, checkpoint, obstacle
 
 **Common misconceptions**
 
-- The route is clear without a start or facing direction.
-- A failed route must be discarded rather than revised.
+- Only the shortest route can be correct.
+- Reaching the goal is enough even when a mission rule was missed.
 
-**Weekly quiz:** `y1-space-w7-quiz` - Creating, testing and communicating routes. (15 questions; planned)
+**Weekly quiz:** `y1-space-w6-quiz` - Creating routes, applying one constraint, then combining constraints across a wider grid. (15 questions; planned)
+
+#### Week 7: Test & Fix
+
+**Central concept:** Test a route, find the broken step and improve it.
+**Curriculum alignment:** AC9M1SP02
+**Practised skills:** `space-l1-fix-routes`
+
+| Lesson | Role | Focus | Learning intention | Activity mechanic families |
+| --- | --- | --- | --- | --- |
+| 1. Find the Error (`y1-space-w7-l1`) | build | Diagnose the wrong step in a route. | I can find the wrong step in a route. | debug-1, debug-2, debug-3 |
+| 2. Fix the Route (`y1-space-w7-l2`) | develop | Finish a started route across an 8 by 4 grid. | I can finish a route so it reaches the goal. | fix-1, fix-2, fix-3 |
+| 3. Test and Improve (`y1-space-w7-l3`) | apply | Run, repair and improve routes across an 8 by 4 grid. | I can test a route and improve it. | improve-1, improve-2, improve-3 |
+
+**Vocabulary:** test, wrong, fix, improve, route
+
+**Common misconceptions**
+
+- A failed route must be thrown away rather than fixed.
+- A route only ever has one thing wrong.
+
+**Weekly quiz:** `y1-space-w7-quiz` - Testing, debugging and improving routes. (15 questions; planned)
 
 #### Week 8: Pathfinder Challenge
 
@@ -434,9 +434,9 @@ Students compare and classify familiar shapes and objects, then give and follow 
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Find the Shape Landmark (`y1-space-w8-l1`) | build | Use shape clues to identify route landmarks. | We are learning to use shape clues to identify route landmarks. | landmark-clue-match, obstacle-route-planner, route-compare |
-| 2. Plan Around Obstacles (`y1-space-w8-l2`) | develop | Create a valid pathway through a familiar space. | We are learning to create a valid pathway through a familiar space. | landmark-clue-match, obstacle-route-planner, route-compare |
-| 3. Explain Your Path (`y1-space-w8-l3`) | apply | Compare routes and justify a solution. | We are learning to compare routes and justify a solution. | landmark-clue-match, obstacle-route-planner, route-compare |
+| 1. Find the Shape Landmark (`y1-space-w8-l1`) | build | Use shape clues to identify route landmarks. | I can use shapes and views to find landmarks. | landmark-classify, landmark-view, landmark-match |
+| 2. Plan Around Obstacles (`y1-space-w8-l2`) | develop | Create a valid pathway through a familiar space. | I can plan and repair a route. | plan-build, plan-repair, plan-follow |
+| 3. Explain Your Path (`y1-space-w8-l3`) | apply | Compare routes and justify a solution. | I can give and explain a clear route. | explain-route, explain-move, explain-shape |
 
 **Vocabulary:** landmark, obstacle, path, compare, explain
 
@@ -445,22 +445,22 @@ Students compare and classify familiar shapes and objects, then give and follow 
 - The shortest-looking route always works.
 - Different valid routes cannot share a destination.
 
-**Weekly quiz:** `y1-space-w8-quiz` - Cumulative shape classification and route reasoning. (15 questions; planned)
+**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y1-space-post-01`.
 
-## Starpath Level 2: Shape Systems and Map Missions
+## Starpath Level 2: Space Mapper
 
 **Canonical level:** `level-2`
 **Program ID:** `y2-space`
 **Status:** planned
 
-Students classify regular and irregular shapes and objects, use two-dimensional representations, and reason about one-step transformations.
+Space Mappers recognise shape features using number of sides and spatial terms, then read two-dimensional maps and follow and give pathways across Starpath.
 
 ### Curriculum Alignment
 
 - **AC9M2SP01:** Recognise, compare and classify shapes, referencing the number of sides and using spatial terms such as opposite, parallel, curved and straight.
 - **AC9M2SP02:** Locate and identify positions of features in two-dimensional representations and move position by following directions and pathways.
 
-**Achievement-standard connection:** Students compare and classify shapes using formal spatial terms, locate features in two-dimensional representations and follow directions and pathways.
+**Achievement-standard connection:** Students compare and classify shapes using number of sides and spatial terms, locate positions in two-dimensional representations and follow and give directions and pathways.
 
 **Prerequisite knowledge**
 
@@ -469,11 +469,11 @@ Students classify regular and irregular shapes and objects, use two-dimensional 
 
 **Likely level misconceptions**
 
-- Regular means common.
-- Parallel lines must be horizontal.
-- A transformation changes size or shape.
+- A curved edge counts as a straight side.
+- Turning a shape changes its number of sides.
+- Places have no fixed position on a map.
 
-**Progression rationale:** Feature language becomes more precise, maps become representational rather than pictorial, and movement reasoning extends from paths to transformations.
+**Progression rationale:** Weeks 1-4 sharpen shape features (straight/curved, number of sides, opposite/parallel, and comparing two shapes) using simple Year 2 language. Weeks 5-7 build two-dimensional map skills in a clear progression: reading a map to find named places (W5), identifying and describing positions on it (W6), then following and giving ordered routes (W7) - foregrounding the new Year-2 map-reading skill rather than repeating Year-1 direction-following. Week 8 combines shapes, maps and pathways in a Space Mapper mission before the Post-Test.
 
 ### Assessment Metadata
 
@@ -484,192 +484,192 @@ Students classify regular and irregular shapes and objects, use two-dimensional 
 
 | Skill ID | Student name | Teacher description | Week | Category | Prerequisites |
 | --- | --- | --- | ---: | --- | --- |
-| `space-l2-regular-irregular-shapes` | Compare regular and irregular shapes | Recognises and compares regular and irregular shapes using visible properties rather than orientation. | 1 | shape-and-object-reasoning | `space-l1-shape-classification` |
-| `space-l2-shape-properties` | Describe shape properties | Uses sides, curves, vertices and parallel relationships to describe and distinguish shapes. | 2 | shape-and-object-reasoning | `space-l2-regular-irregular-shapes` |
-| `space-l2-multi-feature-classification` | Classify with several clues | Classifies shapes and objects using more than one property and tests borderline examples. | 3 | shape-and-object-reasoning | `space-l2-shape-properties` |
-| `space-l2-map-representations` | Read a simple map | Connects features and relative positions in a familiar space with a two-dimensional representation. | 4 | spatial-representation | `space-l1-objects-and-views` |
-| `space-l2-relative-map-position` | Locate features on a map | Identifies map features using relative position and landmark language. | 5 | position-and-navigation | `space-l2-map-representations` |
-| `space-l2-map-pathways` | Navigate a map pathway | Follows, records and compares pathways on a simple two-dimensional representation. | 6 | position-and-navigation | `space-l2-relative-map-position` |
-| `space-l2-route-reasoning` | Compare map routes | Creates and checks pathways, comparing routes against stated location and movement constraints. | 7 | position-and-navigation | `space-l2-map-pathways` |
-| `space-l2-spatial-systems` | Solve a spatial systems mission | Integrates shape properties, map locations and pathways to solve and explain spatial problems. | 8 | spatial-representation | `space-l2-multi-feature-classification`, `space-l2-route-reasoning` |
+| `space-l2-straight-curved` | Tell straight from curved | Identifies whether a familiar shape has straight sides or curved edges. | 1 | shape-and-object-reasoning | `space-l1-shape-features` |
+| `space-l2-count-sides` | Count and classify sides | Classifies familiar shapes by counting the number of sides. | 2 | shape-and-object-reasoning | `space-l2-straight-curved` |
+| `space-l2-parallel-opposite` | Find parallel and opposite sides | Recognises opposite sides and parallel sides on familiar shapes. | 3 | shape-and-object-reasoning | `space-l2-count-sides` |
+| `space-l2-compare` | Compare two shapes | Compares two familiar shapes and identifies what is the same and what is different about their features. | 4 | shape-and-object-reasoning | `space-l2-parallel-opposite` |
+| `space-l2-map-reading` | Read a star map | Locates a named place on a simple two-dimensional map, and names the place at a marked spot. | 5 | spatial-representation | `space-l2-compare` |
+| `space-l2-positions` | Describe positions on a map | Describes which place is next to, above or below another, and combines two position clues to identify a single place on a two-dimensional map. | 6 | spatial-representation | `space-l2-map-reading` |
+| `space-l2-navigation` | Plan and debug routes | Follows a pathway to a named place, plans a route that visits a checkpoint and avoids hazards, and finds the broken step in a faulty route on a two-dimensional map. | 7 | position-and-navigation | `space-l2-positions` |
+| `space-l2-master-mapper` | Become a Master Mapper | Combines shape features, map reading and pathway following to complete a cumulative mission. | 8 | spatial-representation | `space-l2-compare`, `space-l2-navigation` |
 
 ### Eight-Week Sequence
 
-#### Week 1: Regular and Irregular
+#### Week 1: Straight and Curved
 
-**Central concept:** Recognise regular and irregular shapes in varied orientations.
+**Central concept:** Tell straight sides from curved edges.
 **Curriculum alignment:** AC9M2SP01
-**Practised skills:** `space-l2-regular-irregular-shapes`
+**Practised skills:** `space-l2-straight-curved`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. What Makes It Regular? (`y2-space-w1-l1`) | build | Compare equal and unequal side or angle appearances. | We are learning to compare equal and unequal side or angle appearances. | regularity-sort, orientation-classifier, classification-reasoning |
-| 2. Turn and Compare (`y2-space-w1-l2`) | develop | Classify examples shown in varied orientations. | We are learning to classify examples shown in varied orientations. | regularity-sort, orientation-classifier, classification-reasoning |
-| 3. Defend the Group (`y2-space-w1-l3`) | apply | Explain why a shape belongs in a chosen group. | We are learning to explain why a shape belongs in a chosen group. | regularity-sort, orientation-classifier, classification-reasoning |
+| 1. Straight or Curved? (`y2-space-w1-l1`) | build | Decide if a shape has straight sides or curved edges. | I can tell straight sides from curved edges. | straight-curved, edge-sort, edge-challenge |
+| 2. Sort by Edge (`y2-space-w1-l2`) | develop | Group shapes by straight or curved edges. | I can find shapes with straight or curved edges. | straight-curved, edge-sort, edge-challenge |
+| 3. Edge Challenge (`y2-space-w1-l3`) | apply | Mixed straight and curved review. | I can tell straight and curved apart. | straight-curved, edge-sort, edge-challenge |
 
-**Vocabulary:** regular, irregular, equal, property, orientation
+**Vocabulary:** straight, curved, side, edge, shape
 
 **Common misconceptions**
 
-- Regular means upright.
-- All familiar shapes are regular.
+- A curved edge is a straight side.
+- Turning a shape changes its edges.
 
-**Weekly quiz:** `y2-space-w1-quiz` - Regularity, orientation and justified classification. (15 questions; planned)
+**Weekly quiz:** `y2-space-w1-quiz` - Straight sides versus curved edges. (15 questions; planned)
 
-#### Week 2: Sides and Boundaries
+#### Week 2: Count the Sides
 
-**Central concept:** Describe shapes with straight, curved and parallel boundaries.
+**Central concept:** Classify shapes by the number of sides.
 **Curriculum alignment:** AC9M2SP01
-**Practised skills:** `space-l2-shape-properties`
+**Practised skills:** `space-l2-count-sides`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Boundary Lab (`y2-space-w2-l1`) | build | Identify straight and curved boundaries and vertices. | We are learning to identify straight and curved boundaries and vertices. | boundary-highlighter, parallel-detector, property-riddle |
-| 2. Parallel Trackers (`y2-space-w2-l2`) | develop | Recognise parallel sides in different orientations. | We are learning to recognise parallel sides in different orientations. | boundary-highlighter, parallel-detector, property-riddle |
-| 3. Property Riddles (`y2-space-w2-l3`) | apply | Identify a shape from a set of property clues. | We are learning to identify a shape from a set of property clues. | boundary-highlighter, parallel-detector, property-riddle |
+| 1. Count the Sides (`y2-space-w2-l1`) | build | Count how many sides a shape has. | I can count the sides of a shape. | count-sides, sides-sort, sides-challenge |
+| 2. Sides Sort (`y2-space-w2-l2`) | develop | Group shapes by their number of sides. | I can find a shape by its number of sides. | count-sides, sides-sort, sides-challenge |
+| 3. Sides Challenge (`y2-space-w2-l3`) | apply | Mixed side-counting review. | I can classify shapes by their sides. | count-sides, sides-sort, sides-challenge |
 
-**Vocabulary:** boundary, vertex, straight, curved, parallel
+**Vocabulary:** side, count, three, four, classify
 
 **Common misconceptions**
 
-- Parallel lines must be vertical.
-- Curved boundaries count as straight sides.
+- A turned shape has fewer sides.
+- Bigger shapes have more sides.
 
-**Weekly quiz:** `y2-space-w2-quiz` - Precise shape properties and spatial terms. (15 questions; planned)
+**Weekly quiz:** `y2-space-w2-quiz` - Classifying shapes by number of sides. (15 questions; planned)
 
-#### Week 3: Classification Rules
+#### Week 3: Parallel and Opposite
 
-**Central concept:** Build and test multi-feature classification rules.
+**Central concept:** Recognise opposite and parallel sides.
 **Curriculum alignment:** AC9M2SP01
-**Practised skills:** `space-l2-multi-feature-classification`
+**Practised skills:** `space-l2-parallel-opposite`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Two-Clue Sort (`y2-space-w3-l1`) | build | Classify using two stated properties. | We are learning to classify using two stated properties. | multi-rule-sort, decision-machine, counterexample-tester |
-| 2. Sorting Machine (`y2-space-w3-l2`) | develop | Create a decision rule for a mixed set. | We are learning to create a decision rule for a mixed set. | multi-rule-sort, decision-machine, counterexample-tester |
-| 3. Challenge the Rule (`y2-space-w3-l3`) | apply | Test exceptions and refine a classification. | We are learning to test exceptions and refine a classification. | multi-rule-sort, decision-machine, counterexample-tester |
+| 1. Opposite Sides (`y2-space-w3-l1`) | build | Find the sides across from each other. | I can tell if a shape has parallel sides. | opposite-sides, parallel-tracks, parallel-challenge |
+| 2. Parallel Tracks (`y2-space-w3-l2`) | develop | Recognise parallel sides like train tracks. | I can find shapes with parallel sides. | opposite-sides, parallel-tracks, parallel-challenge |
+| 3. Parallel Challenge (`y2-space-w3-l3`) | apply | Mixed opposite and parallel review. | I can reason about parallel sides. | opposite-sides, parallel-tracks, parallel-challenge |
 
-**Vocabulary:** property, rule, belongs, exception, classify
+**Vocabulary:** opposite, parallel, side, across, tracks
 
 **Common misconceptions**
 
-- One matching feature is always enough.
-- A counterexample proves all classification is impossible.
+- Parallel sides must be flat or horizontal.
+- Opposite sides always touch.
 
-**Weekly quiz:** `y2-space-w3-quiz` - Multi-property classification and counterexamples. (15 questions; planned)
+**Weekly quiz:** `y2-space-w3-quiz` - Opposite and parallel sides. (15 questions; planned)
 
-#### Week 4: Map Representations
+#### Week 4: Compare Shapes
 
-**Central concept:** Connect familiar spaces with two-dimensional representations.
+**Central concept:** Compare two shapes by their features and say what is the same and what is different.
+**Curriculum alignment:** AC9M2SP01
+**Practised skills:** `space-l2-compare`
+
+| Lesson | Role | Focus | Learning intention | Activity mechanic families |
+| --- | --- | --- | --- | --- |
+| 1. What Is the Same? (`y2-space-w4-l1`) | build | Find what is the same about two shapes. | I can say what is the same about two shapes. | same-feature, what-different, compare-challenge |
+| 2. What Is Different? (`y2-space-w4-l2`) | develop | Find what is different about two shapes. | I can say what is different about two shapes. | same-feature, what-different, compare-challenge |
+| 3. Compare Challenge (`y2-space-w4-l3`) | apply | Mixed same and different review. | I can compare two shapes by their features. | same-feature, what-different, compare-challenge |
+
+**Vocabulary:** compare, same, different, feature, side
+
+**Common misconceptions**
+
+- Two different shapes cannot share a feature.
+- Comparing only means finding differences.
+
+**Weekly quiz:** `y2-space-w4-quiz` - Comparing two shapes by same and different features. (15 questions; planned)
+
+#### Week 5: Star Maps
+
+**Central concept:** Read a two-dimensional map both ways: find a named place, and name the place at a spot.
 **Curriculum alignment:** AC9M2SP02
-**Practised skills:** `space-l2-map-representations`
+**Practised skills:** `space-l2-map-reading`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Space to Map (`y2-space-w4-l1`) | build | Match a familiar scene to a top-view representation. | We are learning to match a familiar scene to a top-view representation. | scene-map-match, symbol-key-match, representation-compare |
-| 2. Map Symbols (`y2-space-w4-l2`) | develop | Interpret symbols for key features and landmarks. | We are learning to interpret symbols for key features and landmarks. | scene-map-match, symbol-key-match, representation-compare |
-| 3. Which Map Works? (`y2-space-w4-l3`) | apply | Select and explain an accurate representation. | We are learning to select and explain an accurate representation. | scene-map-match, symbol-key-match, representation-compare |
+| 1. Find the Place (`y2-space-w5-l1`) | build | Read a name and tap that place on the map. | I can find a named place on the star map. | find-a-place, what-is-here, map-reading-challenge |
+| 2. What Is Here? (`y2-space-w5-l2`) | develop | Name the place at a marked spot. | I can name the place at a marked spot. | find-a-place, what-is-here, map-reading-challenge |
+| 3. Map Reading Challenge (`y2-space-w5-l3`) | apply | Find places and name spots on your own. | I can find places and name spots on my own. | find-a-place, what-is-here, map-reading-challenge |
 
-**Vocabulary:** map, symbol, key, feature, top view
+**Vocabulary:** map, place, find, label, above
 
 **Common misconceptions**
 
-- A map must be a realistic picture.
-- Symbols must have the same size as features.
+- A map shows things from the side.
+- Places have no fixed position on a map.
 
-**Weekly quiz:** `y2-space-w4-quiz` - Two-dimensional representation, symbols and relative position. (15 questions; planned)
+**Weekly quiz:** `y2-space-w5-quiz` - Reading a two-dimensional map: locating named places and naming marked spots. (15 questions; planned)
 
-#### Week 5: Locate the Feature
+#### Week 6: Positions on a Map
 
-**Central concept:** Use relative positions to locate map features.
+**Central concept:** Describe how places sit next to, above and below each other, then combine clues to pin down one place.
 **Curriculum alignment:** AC9M2SP02
-**Practised skills:** `space-l2-relative-map-position`
+**Practised skills:** `space-l2-positions`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Landmark Language (`y2-space-w5-l1`) | build | Describe features relative to a shared landmark. | We are learning to describe features relative to a shared landmark. | landmark-match, map-symbol-placement, location-deduction |
-| 2. Place the Features (`y2-space-w5-l2`) | develop | Position symbols from relational clues. | We are learning to position symbols from relational clues. | landmark-match, map-symbol-placement, location-deduction |
-| 3. Mystery Location (`y2-space-w5-l3`) | apply | Combine several clues to identify one location. | We are learning to combine several clues to identify one location. | landmark-match, map-symbol-placement, location-deduction |
+| 1. Next To and Beside (`y2-space-w6-l1`) | build | Find the place to the left or right of another. | I can find the place next to another, left or right. | next-to, above-below, position-detective |
+| 2. Above and Below (`y2-space-w6-l2`) | develop | Find the place above or below another. | I can find the place above or below another. | next-to, above-below, position-detective |
+| 3. Position Detective (`y2-space-w6-l3`) | apply | Combine two clues to find the one place that fits both. | I can combine two clues to find one place. | next-to, above-below, position-detective |
 
-**Vocabulary:** landmark, relative, between, opposite, next to
+**Vocabulary:** position, next to, above, below, clue
 
 **Common misconceptions**
 
-- One clue always identifies a unique location.
-- Relative position does not depend on a reference.
+- Position words need no reference place.
+- One clue is always enough to find a place.
 
-**Weekly quiz:** `y2-space-w5-quiz` - Landmarks, relative position and location deduction. (15 questions; planned)
+**Weekly quiz:** `y2-space-w6-quiz` - Describing positions and combining position clues to locate a place on a map. (15 questions; planned)
 
-#### Week 6: Pathways on Maps
+#### Week 7: Pathways on a Map
 
-**Central concept:** Follow and compare pathways on two-dimensional maps.
+**Central concept:** Follow a route, plan a route that obeys mission rules, then test a route and fix the broken step.
 **Curriculum alignment:** AC9M2SP02
-**Practised skills:** `space-l2-map-pathways`
+**Practised skills:** `space-l2-navigation`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Trace the Path (`y2-space-w6-l1`) | build | Follow a route using map directions. | We are learning to follow a route using map directions. | map-route-runner, path-compare, map-direction-builder |
-| 2. Choose a Pathway (`y2-space-w6-l2`) | develop | Compare valid pathways around obstacles. | We are learning to compare valid pathways around obstacles. | map-route-runner, path-compare, map-direction-builder |
-| 3. Write the Route (`y2-space-w6-l3`) | apply | Record and check directions for a map pathway. | We are learning to record and check directions for a map pathway. | map-route-runner, path-compare, map-direction-builder |
+| 1. Follow the Path (`y2-space-w7-l1`) | build | Follow directions to a place. | I can follow a path to a place on the map. | follow-path, plan-a-mission, test-and-fix |
+| 2. Plan a Mission (`y2-space-w7-l2`) | develop | Plan a route that visits a checkpoint and dodges hazards. | I can plan a route that visits a checkpoint and avoids hazards. | follow-path, plan-a-mission, test-and-fix |
+| 3. Test and Fix (`y2-space-w7-l3`) | apply | Find the step that breaks a route and fix it. | I can test a route and fix the step that breaks it. | follow-path, plan-a-mission, test-and-fix |
 
-**Vocabulary:** pathway, route, landmark, direction, obstacle
-
-**Common misconceptions**
-
-- A visually direct path can cross obstacles.
-- A route needs no ordered directions.
-
-**Weekly quiz:** `y2-space-w6-quiz` - Map navigation, pathway comparison and communication. (15 questions; planned)
-
-#### Week 7: Create and Compare Routes
-
-**Central concept:** Create, test and compare pathways on two-dimensional representations.
-**Curriculum alignment:** AC9M2SP02
-**Practised skills:** `space-l2-route-reasoning`
-
-| Lesson | Role | Focus | Learning intention | Activity mechanic families |
-| --- | --- | --- | --- | --- |
-| 1. Create the Path (`y2-space-w7-l1`) | build | Build an ordered pathway between two map positions. | We are learning to build an ordered pathway between two map positions. | map-route-builder, direction-debugger, route-constraint-compare |
-| 2. Test the Directions (`y2-space-w7-l2`) | develop | Follow another route and identify ambiguous or missing steps. | We are learning to follow another route and identify ambiguous or missing steps. | map-route-builder, direction-debugger, route-constraint-compare |
-| 3. Compare Two Routes (`y2-space-w7-l3`) | apply | Choose and justify a route for a stated constraint. | We are learning to choose and justify a route for a stated constraint. | map-route-builder, direction-debugger, route-constraint-compare |
-
-**Vocabulary:** pathway, direction, position, constraint, compare
+**Vocabulary:** path, route, plan, mission, fix
 
 **Common misconceptions**
 
-- A route is clear without a start position.
-- The shortest route is always the most suitable.
+- Any path reaches any place.
+- A route needs no order.
 
-**Weekly quiz:** `y2-space-w7-quiz` - Creating, testing and comparing map pathways. (15 questions; planned)
+**Weekly quiz:** `y2-space-w7-quiz` - Following, planning under rules, and debugging ordered routes on a map. (15 questions; planned)
 
-#### Week 8: Shape and Map Mission
+#### Week 8: Master Mapper
 
-**Central concept:** Apply shape classification, map location and pathway reasoning together.
+**Central concept:** Combine shapes, maps and pathways.
 **Curriculum alignment:** AC9M2SP01, AC9M2SP02
-**Practised skills:** `space-l2-spatial-systems`
+**Practised skills:** `space-l2-master-mapper`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Decode the Map (`y2-space-w8-l1`) | build | Use property clues to locate shape landmarks. | We are learning to use property clues to locate shape landmarks. | map-code-decoder, constraint-route-planner, spatial-solution-compare |
-| 2. Plan the Cargo Route (`y2-space-w8-l2`) | develop | Build a pathway that satisfies map constraints. | We are learning to build a pathway that satisfies map constraints. | map-code-decoder, constraint-route-planner, spatial-solution-compare |
-| 3. Justify the Solution (`y2-space-w8-l3`) | apply | Compare solutions and explain spatial decisions. | We are learning to compare solutions and explain spatial decisions. | map-code-decoder, constraint-route-planner, spatial-solution-compare |
+| 1. Shape and Map (`y2-space-w8-l1`) | build | Combine shape features and map reading. | I can use shape and map skills together. | shape-and-map, pathway-master, master-mission |
+| 2. Pathway Master (`y2-space-w8-l2`) | develop | Follow and give pathways. | I can read, follow and give pathways. | shape-and-map, pathway-master, master-mission |
+| 3. Master Mission (`y2-space-w8-l3`) | apply | Complete the final Space Mapper mission. | I can combine shapes, maps and pathways. | shape-and-map, pathway-master, master-mission |
 
-**Vocabulary:** property, representation, pathway, location, justify
+**Vocabulary:** shape, map, pathway, position, mission
 
 **Common misconceptions**
 
-- Shape clues and map clues are unrelated.
-- Only one pathway can solve a spatial task.
+- Shapes and maps are unrelated.
+- Only one route can solve a mission.
 
-**Weekly quiz:** `y2-space-w8-quiz` - Cumulative classification, maps, locations and pathway reasoning. (15 questions; planned)
+**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y2-space-post-01`.
 
-## Starpath Level 3: Object Design and Mapmaking
+## Starpath Level 3: Cosmic Navigator
 
 **Canonical level:** `level-3`
 **Program ID:** `y3-space`
-**Status:** planned
+**Status:** implemented
 
-Students compare and classify objects for purpose and interpret and create two-dimensional representations of familiar environments.
+Students become Cosmic Navigators — making, comparing and classifying 3D objects, then moving from following maps to creating and navigating them.
 
 ### Curriculum Alignment
 
@@ -680,16 +680,16 @@ Students compare and classify objects for purpose and interpret and create two-d
 
 **Prerequisite knowledge**
 
-- Classify shapes and objects using several properties.
-- Read simple maps and follow pathways.
+- Recognise and compare familiar shapes by their features.
+- Read a simple map and follow pathways.
 
 **Likely level misconceptions**
 
 - Objects with the same use must have the same form.
-- A map has one correct scale or orientation.
-- A useful view must show every feature.
+- A place can go anywhere on a map.
+- Any path is as good as any other.
 
-**Progression rationale:** Students move from describing features to reasoning about function, then from reading simple maps to selecting, creating and evaluating representations.
+**Progression rationale:** Students move from recognising 3D objects to comparing and choosing them for a purpose, then from reading maps to creating and navigating their own — object features are kept informal (rolls, stacks, slides); faces, edges, vertices and object views are reserved for Level 4.
 
 ### Assessment Metadata
 
@@ -700,190 +700,190 @@ Students compare and classify objects for purpose and interpret and create two-d
 
 | Skill ID | Student name | Teacher description | Week | Category | Prerequisites |
 | --- | --- | --- | ---: | --- | --- |
-| `space-l3-object-features` | Describe object features | Identifies faces, edges, vertices and surfaces and uses them to compare objects. | 1 | shape-and-object-reasoning | `space-l2-shape-properties` |
-| `space-l3-object-purpose` | Match objects to their purpose | Explains why structural features make an object suited or unsuited to a purpose. | 2 | shape-and-object-reasoning | `space-l3-object-features` |
-| `space-l3-spatial-construction` | Build and improve an object | Constructs and revises objects to satisfy stated spatial and functional criteria. | 3 | construction-and-visualisation | `space-l3-object-purpose` |
-| `space-l3-object-views` | Connect objects and views | Interprets and selects front, side and top views that communicate object features. | 4 | spatial-representation | `space-l3-object-features` |
-| `space-l3-map-interpretation` | Interpret a familiar map | Interprets a two-dimensional representation using its key, orientation and relative landmark positions. | 5 | spatial-representation | `space-l2-map-representations` |
-| `space-l3-map-creation` | Create a useful map | Creates a two-dimensional representation with selected features, landmarks, relative positions and a key. | 6 | spatial-representation | `space-l3-map-interpretation` |
-| `space-l3-landmark-navigation` | Navigate with landmarks | Uses relative landmark positions to create, follow and compare routes on a map. | 7 | position-and-navigation | `space-l3-map-creation` |
-| `space-l3-spatial-design` | Design and represent a space | Integrates suitable object features and a coherent two-dimensional representation to communicate a spatial design. | 8 | construction-and-visualisation | `space-l3-spatial-construction`, `space-l3-object-views`, `space-l3-landmark-navigation` |
+| `space-l3-object-recognition` | Recognise 3D objects | Recognises cubes, spheres, cylinders, cones and rectangular prisms from their form, context and informal features. | 1 | shape-and-object-reasoning | `space-l2-compare` |
+| `space-l3-object-features` | Compare 3D objects | Compares and classifies 3D objects by informal features — whether they roll, stack or slide, and flat versus curved surfaces. | 2 | shape-and-object-reasoning | `space-l3-object-recognition` |
+| `space-l3-object-design` | Build and choose objects for a purpose | Constructs models from familiar objects, chooses features suited to a stated purpose and explains why they are suitable. | 3 | construction-and-visualisation | `space-l3-object-features` |
+| `space-l3-map-reading` | Read a space map | Interprets a two-dimensional map using a key, symbols and the relative positions of landmarks. | 4 | spatial-representation | `space-l2-navigation` |
+| `space-l3-map-creation` | Create a space map | Creates a two-dimensional map by placing landmarks in correct positions relative to each other. | 5 | spatial-representation | `space-l3-map-reading` |
+| `space-l3-navigation` | Navigate by landmarks | Uses landmarks on a map to follow directions, plan routes and complete navigation missions. | 6 | position-and-navigation | `space-l3-map-creation` |
+| `space-l3-missions` | Complete cosmic missions | Combines object knowledge, map reading and navigation to complete multi-step explorer missions. | 7 | position-and-navigation | `space-l3-object-design`, `space-l3-navigation` |
+| `space-l3-cosmic-navigator` | Become a Cosmic Navigator | Integrates object reasoning, map creation and navigation to complete a cumulative graduation mission. | 8 | spatial-representation | `space-l3-missions` |
 
 ### Eight-Week Sequence
 
-#### Week 1: Object Features
+#### Week 1: 3D Discoveries
 
-**Central concept:** Identify and compare structural features of three-dimensional objects.
+**Central concept:** Recognise common three-dimensional objects and connect them with familiar uses and informal features.
+**Curriculum alignment:** AC9M3SP01
+**Practised skills:** `space-l3-object-recognition`
+
+| Lesson | Role | Focus | Learning intention | Activity mechanic families |
+| --- | --- | --- | --- | --- |
+| 1. Meet the Space Objects (`y3-space-w1-l1`) | build | Recognise and name the five 3D objects. | I can name the five 3D objects. | meet-the-objects, find-the-object, object-challenge |
+| 2. Objects at Work (`y3-space-w1-l2`) | develop | Use context and purpose to find familiar 3D objects. | I can find a named 3D object in a scene. | meet-the-objects, find-the-object, object-challenge |
+| 3. 3D Object Challenge (`y3-space-w1-l3`) | apply | Use feature clues to recognise objects independently. | I can recognise and find 3D objects on my own. | meet-the-objects, find-the-object, object-challenge |
+
+**Vocabulary:** 3D object, cube, sphere, cylinder, cone, rectangular prism
+
+**Common misconceptions**
+
+- A cube and a rectangular prism are the same object.
+- Turning an object changes what it is.
+
+**Weekly quiz:** `y3-space-w1-quiz` - Recognition progressing from names to context, use and informal feature clues. (15 questions; planned)
+
+#### Week 2: Object Detectives
+
+**Central concept:** Compare and classify 3D objects using informal features.
 **Curriculum alignment:** AC9M3SP01
 **Practised skills:** `space-l3-object-features`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Explore the Object (`y3-space-w1-l1`) | build | Identify faces, edges, vertices and curved surfaces. | We are learning to identify faces, edges, vertices and curved surfaces. | object-inspector, object-compare, feature-riddle |
-| 2. Compare Objects (`y3-space-w1-l2`) | develop | Compare shared and different structural features. | We are learning to compare shared and different structural features. | object-inspector, object-compare, feature-riddle |
-| 3. Object Riddles (`y3-space-w1-l3`) | apply | Identify and justify an object from feature clues. | We are learning to identify and justify an object from feature clues. | object-inspector, object-compare, feature-riddle |
+| 1. Which Object Is It? (`y3-space-w2-l1`) | build | Name an object from a feature clue. | I can name an object from a feature clue. | which-object, compare-objects, object-sort |
+| 2. Compare Space Objects (`y3-space-w2-l2`) | develop | Compare objects by what they do — roll, stack, slide. | I can compare objects by what they do. | which-object, compare-objects, object-sort |
+| 3. Space Object Sort (`y3-space-w2-l3`) | apply | Sort objects by a feature. | I can sort objects by a feature. | which-object, compare-objects, object-sort |
 
-**Vocabulary:** face, edge, vertex, surface, object
+**Vocabulary:** roll, stack, slide, flat, curved
 
 **Common misconceptions**
 
-- A face means only the front.
-- Curved surfaces contain straight edges.
+- All objects roll.
+- An object can only do one thing.
 
-**Weekly quiz:** `y3-space-w1-quiz` - Three-dimensional object features and comparison. (15 questions; planned)
+**Weekly quiz:** `y3-space-w2-quiz` - Comparing and classifying objects by informal features. (15 questions; planned)
 
-#### Week 2: Classify for Purpose
+#### Week 3: Building Starpath
 
-**Central concept:** Connect object features to uses and constraints.
+**Central concept:** Construct models, choose objects whose features suit a purpose, and explain why.
 **Curriculum alignment:** AC9M3SP01
-**Practised skills:** `space-l3-object-purpose`
+**Practised skills:** `space-l3-object-design`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Feature and Function (`y3-space-w2-l1`) | build | Match structural features with practical effects. | We are learning to match structural features with practical effects. | feature-function-match, design-choice, design-argument |
-| 2. Best Object for the Job (`y3-space-w2-l2`) | develop | Choose an object for a stated use. | We are learning to choose an object for a stated use. | feature-function-match, design-choice, design-argument |
-| 3. Defend the Design (`y3-space-w2-l3`) | apply | Justify a choice and reject a less suitable alternative. | We are learning to justify a choice and reject a less suitable alternative. | feature-function-match, design-choice, design-argument |
+| 1. Build Starpath Models (`y3-space-w3-l1`) | build | Construct complete models from several 3D objects. | I can choose the right object for each part. | build-the-rover, choose-best-shape, space-engineering |
+| 2. Choose the Best Shape (`y3-space-w3-l2`) | develop | Decode a design requirement and choose the object whose features fit. | I can choose the best object for a job and say why. | build-the-rover, choose-best-shape, space-engineering |
+| 3. Space Engineering (`y3-space-w3-l3`) | apply | Justify design choices using feature-to-purpose reasons. | I can choose and justify objects for a design. | build-the-rover, choose-best-shape, space-engineering |
 
-**Vocabulary:** purpose, suitable, stable, roll, stack
-
-**Common misconceptions**
-
-- Appearance alone determines suitability.
-- There is always one universally best object.
-
-**Weekly quiz:** `y3-space-w2-quiz` - Feature-function relationships and design reasoning. (15 questions; planned)
-
-#### Week 3: Build and Improve
-
-**Central concept:** Construct objects and refine designs against spatial criteria.
-**Curriculum alignment:** AC9M3SP01
-**Practised skills:** `space-l3-spatial-construction`
-
-| Lesson | Role | Focus | Learning intention | Activity mechanic families |
-| --- | --- | --- | --- | --- |
-| 1. Build from Solids (`y3-space-w3-l1`) | build | Combine objects to meet one design criterion. | We are learning to combine objects to meet one design criterion. | solid-object-builder, virtual-design-test, constraint-redesign |
-| 2. Test the Structure (`y3-space-w3-l2`) | develop | Evaluate stability, rolling or stacking behaviour. | We are learning to evaluate stability, rolling or stacking behaviour. | solid-object-builder, virtual-design-test, constraint-redesign |
-| 3. Improve the Design (`y3-space-w3-l3`) | apply | Revise and explain a construction against criteria. | We are learning to revise and explain a construction against criteria. | solid-object-builder, virtual-design-test, constraint-redesign |
-
-**Vocabulary:** construct, combine, criterion, test, revise
+**Vocabulary:** purpose, suitable, because, stable, construct
 
 **Common misconceptions**
 
-- A first design cannot be changed.
-- Adding more pieces always improves a structure.
+- The best-looking object is the best.
+- Anything that rolls makes a useful wheel.
 
-**Weekly quiz:** `y3-space-w3-quiz` - Spatial construction, testing and iterative design. (15 questions; planned)
+**Weekly quiz:** `y3-space-w3-quiz` - Construction, requirement decoding and explicit feature-to-purpose justification. (15 questions; planned)
 
-#### Week 4: Views of Objects
+#### Week 4: Reading Space Maps
 
-**Central concept:** Represent three-dimensional objects in useful two-dimensional views.
-**Curriculum alignment:** AC9M3SP01, AC9M3SP02
-**Practised skills:** `space-l3-object-views`
-
-| Lesson | Role | Focus | Learning intention | Activity mechanic families |
-| --- | --- | --- | --- | --- |
-| 1. Front, Side, Top (`y3-space-w4-l1`) | build | Match an object to views from stated viewpoints. | We are learning to match an object to views from stated viewpoints. | view-matcher, hidden-feature-reasoning, view-selection |
-| 2. Hidden Features (`y3-space-w4-l2`) | develop | Reason about features visible or hidden in a view. | We are learning to reason about features visible or hidden in a view. | view-matcher, hidden-feature-reasoning, view-selection |
-| 3. Choose a Useful View (`y3-space-w4-l3`) | apply | Select and justify a representation for a purpose. | We are learning to select and justify a representation for a purpose. | view-matcher, hidden-feature-reasoning, view-selection |
-
-**Vocabulary:** front view, side view, top view, visible, hidden
-
-**Common misconceptions**
-
-- Every view shows all features.
-- Rotating an object changes its structure.
-
-**Weekly quiz:** `y3-space-w4-quiz` - Object views, visibility and representational purpose. (15 questions; planned)
-
-#### Week 5: Read Familiar Maps
-
-**Central concept:** Interpret symbols, landmarks and relative locations in maps.
+**Central concept:** Interpret a top-view map using its symbols, key and landmarks.
 **Curriculum alignment:** AC9M3SP02
-**Practised skills:** `space-l3-map-interpretation`
+**Practised skills:** `space-l3-map-reading`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Read the Key (`y3-space-w5-l1`) | build | Interpret symbols and map conventions. | We are learning to interpret symbols and map conventions. | map-key-decoder, relative-location-builder, map-claim-checker |
-| 2. Landmarks in Relation (`y3-space-w5-l2`) | develop | Describe locations relative to multiple landmarks. | We are learning to describe locations relative to multiple landmarks. | map-key-decoder, relative-location-builder, map-claim-checker |
-| 3. Map Evidence (`y3-space-w5-l3`) | apply | Use map evidence to evaluate location claims. | We are learning to use map evidence to evaluate location claims. | map-key-decoder, relative-location-builder, map-claim-checker |
+| 1. Map Symbols (`y3-space-w4-l1`) | build | Read what a symbol stands for using the key. | I can use a key to explain what map symbols mean. | map-symbols, find-landmark, map-explorer |
+| 2. Explorer's View (`y3-space-w4-l2`) | develop | Read directions from the explorer's point of view. | I can locate landmarks and describe what is near them. | map-symbols, find-landmark, map-explorer |
+| 3. Map Explorer (`y3-space-w4-l3`) | apply | Read a map to answer questions about places. | I can interpret a map using symbols, positions and clues. | map-symbols, find-landmark, map-explorer |
 
-**Vocabulary:** key, symbol, landmark, relative, orientation
+**Vocabulary:** map, key, symbol, landmark, relative
 
 **Common misconceptions**
 
-- A map symbol has a fixed universal meaning.
-- Map orientation never changes.
+- A map shows things from the side.
+- A symbol means whatever it looks like.
 
-**Weekly quiz:** `y3-space-w5-quiz` - Map conventions, relative location and evidence. (15 questions; planned)
+**Weekly quiz:** `y3-space-w4-quiz` - Interpreting map symbols, keys and relative landmark positions. (15 questions; planned)
 
-#### Week 6: Create a Map
+#### Week 5: Creating Maps
 
-**Central concept:** Create a coherent two-dimensional representation of a familiar environment.
+**Central concept:** Create a top-view map by placing landmarks in the right positions.
 **Curriculum alignment:** AC9M3SP02
 **Practised skills:** `space-l3-map-creation`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Select the Features (`y3-space-w6-l1`) | build | Choose important features for a map purpose. | We are learning to choose important features for a map purpose. | feature-selector, map-maker, map-usability-test |
-| 2. Place and Symbolise (`y3-space-w6-l2`) | develop | Position landmarks and create a consistent key. | We are learning to position landmarks and create a consistent key. | feature-selector, map-maker, map-usability-test |
-| 3. Check the Map (`y3-space-w6-l3`) | apply | Test whether another user can interpret the representation. | We are learning to test whether another user can interpret the representation. | feature-selector, map-maker, map-usability-test |
+| 1. Draw My Space Camp (`y3-space-w5-l1`) | build | Place landmarks to make a simple map. | I can place landmarks to show a described layout. | draw-camp, place-landmarks, map-builder |
+| 2. Place the Landmarks (`y3-space-w5-l2`) | develop | Place landmarks relative to each other. | I can create a map from relative position clues. | draw-camp, place-landmarks, map-builder |
+| 3. Map Builder (`y3-space-w5-l3`) | apply | Build a complete map others could read. | I can build a readable map that meets every condition. | draw-camp, place-landmarks, map-builder |
 
-**Vocabulary:** represent, feature, landmark, key, accurate
+**Vocabulary:** create, place, position, relative, accurate
 
 **Common misconceptions**
 
-- A useful map includes every real detail.
-- Decorative accuracy matters more than relative position.
+- A place can go anywhere on a map.
+- A map only needs to make sense to me.
 
-**Weekly quiz:** `y3-space-w6-quiz` - Purposeful map creation and usability. (15 questions; planned)
+**Weekly quiz:** `y3-space-w5-quiz` - Creating a two-dimensional map with correct relative positions. (15 questions; planned)
 
-#### Week 7: Routes and Landmarks
+#### Week 6: Landmark Navigation
 
-**Central concept:** Use created maps to communicate and compare routes.
+**Central concept:** Use a map and its landmarks to navigate to places.
 **Curriculum alignment:** AC9M3SP02
-**Practised skills:** `space-l3-landmark-navigation`
+**Practised skills:** `space-l3-navigation`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Route from Landmarks (`y3-space-w7-l1`) | build | Follow directions anchored to map features. | We are learning to follow directions anchored to map features. | landmark-route-runner, multi-route-builder, route-constraint-choice |
-| 2. Create Two Routes (`y3-space-w7-l2`) | develop | Plan alternative pathways between locations. | We are learning to plan alternative pathways between locations. | landmark-route-runner, multi-route-builder, route-constraint-choice |
-| 3. Which Route Fits? (`y3-space-w7-l3`) | apply | Choose and justify a route for stated constraints. | We are learning to choose and justify a route for stated constraints. | landmark-route-runner, multi-route-builder, route-constraint-choice |
+| 1. Which Way Now? (`y3-space-w6-l1`) | build | Track the rover's heading through turns. | I can follow a route between landmarks. | treasure-hunt, find-observatory, mission-control |
+| 2. First Move (`y3-space-w6-l2`) | develop | Choose the first steer toward a landmark. | I can plan a route to a named landmark. | treasure-hunt, find-observatory, mission-control |
+| 3. Drive the Rover (`y3-space-w6-l3`) | apply | Plan and drive a route by turning and moving forward. | I can locate, route and fix a navigation mission. | treasure-hunt, find-observatory, mission-control |
 
-**Vocabulary:** route, landmark, relative, direct, constraint
+**Vocabulary:** heading, turn, forward, steer, route
 
 **Common misconceptions**
 
-- Shortest distance is always the best route.
-- Landmark directions need no sequence.
+- Left and right stay the same when the rover turns.
+- Forward always goes the same way.
 
-**Weekly quiz:** `y3-space-w7-quiz` - Landmark navigation and route comparison. (15 questions; planned)
+**Weekly quiz:** `y3-space-w6-quiz` - Steering a rover by its heading: turn left or right, then go forward to reach a landmark. (15 questions; planned)
 
-#### Week 8: Design a Star Base
+#### Week 7: Cosmic Missions
 
-**Central concept:** Integrate object design, views and mapmaking.
+**Central concept:** Combine 3D-object reasoning with mapping and navigation.
 **Curriculum alignment:** AC9M3SP01, AC9M3SP02
-**Practised skills:** `space-l3-spatial-design`
+**Practised skills:** `space-l3-missions`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Choose the Structures (`y3-space-w8-l1`) | build | Select objects whose features suit base functions. | We are learning to select objects whose features suit base functions. | constraint-object-selector, environment-map-builder, design-presentation |
-| 2. Map the Base (`y3-space-w8-l2`) | develop | Create a representation with landmarks and routes. | We are learning to create a representation with landmarks and routes. | constraint-object-selector, environment-map-builder, design-presentation |
-| 3. Present the Design (`y3-space-w8-l3`) | apply | Use views and map evidence to justify decisions. | We are learning to use views and map evidence to justify decisions. | constraint-object-selector, environment-map-builder, design-presentation |
+| 1. Explorer Challenge (`y3-space-w7-l1`) | build | Use object and map skills together. | I can choose an object and navigate to use it. | explorer-challenge, rescue-mission, navigator-challenge |
+| 2. Rescue Mission (`y3-space-w7-l2`) | develop | Plan a mission using objects and a map. | I can choose equipment and plan a rescue route. | explorer-challenge, rescue-mission, navigator-challenge |
+| 3. Navigator Challenge (`y3-space-w7-l3`) | apply | Complete a full explorer mission. | I can combine object, map and route reasoning. | explorer-challenge, rescue-mission, navigator-challenge |
 
-**Vocabulary:** design, structure, representation, route, justify
+**Vocabulary:** object, map, route, mission, plan
 
 **Common misconceptions**
 
-- Object design and map design can be considered separately.
-- One representation communicates every purpose equally well.
+- Object skills and map skills are separate.
+- One route always fits a mission.
 
-**Weekly quiz:** `y3-space-w8-quiz` - Cumulative object, view, map and design reasoning. (15 questions; planned)
+**Weekly quiz:** `y3-space-w7-quiz` - Integrating object, map and navigation skills in missions. (15 questions; planned)
+
+#### Week 8: Cosmic Navigator Graduation
+
+**Central concept:** Demonstrate mastery across both descriptors.
+**Curriculum alignment:** AC9M3SP01, AC9M3SP02
+**Practised skills:** `space-l3-cosmic-navigator`
+
+| Lesson | Role | Focus | Learning intention | Activity mechanic families |
+| --- | --- | --- | --- | --- |
+| 1. 3D Objects Review (`y3-space-w8-l1`) | build | Recognise, compare and choose objects. | I can recognise, classify, build and choose 3D objects. | objects-review, map-master, final-mission |
+| 2. Map Master Challenge (`y3-space-w8-l2`) | develop | Read, create and navigate maps. | I can read, create and navigate maps. | objects-review, map-master, final-mission |
+| 3. Final Navigation Mission (`y3-space-w8-l3`) | apply | Put every skill together. | I can complete a full Cosmic Navigator mission. | objects-review, map-master, final-mission |
+
+**Vocabulary:** object, map, navigate, mission, master
+
+**Common misconceptions**
+
+- Objects and maps are unrelated.
+- Only one route can solve a mission.
+
+**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y3-space-post-01`.
 
 ## Starpath Level 4: Composite Worlds and Symmetry Systems
 
 **Canonical level:** `level-4`
 **Program ID:** `y4-space`
-**Status:** planned
+**Status:** implemented
 
 Students represent composite shapes and objects, create and interpret grid references, and reason about line and rotational symmetry.
 
@@ -936,9 +936,9 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Shapes Within Shapes (`y4-space-w1-l1`) | build | Identify familiar components in a composite. | We are learning to identify familiar components in a composite. | composite-highlighter, shape-composer, decomposition-compare |
-| 2. Build the Outline (`y4-space-w1-l2`) | develop | Compose a target using selected shapes. | We are learning to compose a target using selected shapes. | composite-highlighter, shape-composer, decomposition-compare |
-| 3. Compare Decompositions (`y4-space-w1-l3`) | apply | Explain two representations of the same composite. | We are learning to explain two representations of the same composite. | composite-highlighter, shape-composer, decomposition-compare |
+| 1. Shapes Within Shapes (`y4-space-w1-l1`) | build | Identify familiar components in a composite. | I can identify useful familiar components in a composite shape. | analyse-components, open-composite-canvas, compare-decompositions |
+| 2. Build the Outline (`y4-space-w1-l2`) | develop | Compose a target using selected shapes. | I can choose and arrange components to construct a target outline. | analyse-components, open-composite-canvas, compare-decompositions |
+| 3. Different Builds, Same Shape (`y4-space-w1-l3`) | apply | Create and compare different representations of the same composite. | I can create different valid decompositions of the same shape. | analyse-components, open-composite-canvas, compare-decompositions |
 
 **Vocabulary:** composite, component, outline, overlap, represent
 
@@ -957,9 +957,9 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Combine the Solids (`y4-space-w2-l1`) | build | Construct an object from specified components. | We are learning to construct an object from specified components. | solid-composer, build-view-match, hidden-block-inference |
-| 2. Match Build and View (`y4-space-w2-l2`) | develop | Connect a composite object with a two-dimensional view. | We are learning to connect a composite object with a two-dimensional view. | solid-composer, build-view-match, hidden-block-inference |
-| 3. Hidden Block Reasoning (`y4-space-w2-l3`) | apply | Infer components needed to support a visible structure. | We are learning to infer components needed to support a visible structure. | solid-composer, build-view-match, hidden-block-inference |
+| 1. Combine the Solids (`y4-space-w2-l1`) | build | Construct an object from specified components. | I can combine familiar solids to meet a design brief. | solid-assembly, multi-view-build, hidden-structure |
+| 2. Build from a View (`y4-space-w2-l2`) | develop | Connect a composite object with front, side and top views. | I can build a composite object from more than one view. | solid-assembly, multi-view-build, hidden-structure |
+| 3. Hidden Structure (`y4-space-w2-l3`) | apply | Infer components needed to support a visible structure. | I can infer hidden components using views and support rules. | solid-assembly, multi-view-build, hidden-structure |
 
 **Vocabulary:** solid, layer, view, hidden, support
 
@@ -978,9 +978,9 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Simplify the Form (`y4-space-w3-l1`) | build | Identify useful familiar components in a complex object. | We are learning to identify useful familiar components in a complex object. | form-simplifier, approximation-builder, model-evaluator |
-| 2. Create an Approximation (`y4-space-w3-l2`) | develop | Build a representation that preserves key spatial features. | We are learning to build a representation that preserves key spatial features. | form-simplifier, approximation-builder, model-evaluator |
-| 3. Evaluate the Model (`y4-space-w3-l3`) | apply | Explain what the approximation captures and omits. | We are learning to explain what the approximation captures and omits. | form-simplifier, approximation-builder, model-evaluator |
+| 1. Simplify the Form (`y4-space-w3-l1`) | build | Identify useful familiar components in a complex object. | I can preserve defining features when I simplify a form. | feature-simplifier, model-builder, model-evaluator |
+| 2. Create the Model (`y4-space-w3-l2`) | develop | Build a representation that preserves key spatial features. | I can construct a useful approximation from a brief. | feature-simplifier, model-builder, model-evaluator |
+| 3. Evaluate the Representation (`y4-space-w3-l3`) | apply | Judge and improve what an approximation communicates. | I can evaluate and improve a representation using spatial evidence. | feature-simplifier, model-builder, model-evaluator |
 
 **Vocabulary:** approximate, model, feature, accurate, limitation
 
@@ -999,9 +999,9 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Read the Grid (`y4-space-w4-l1`) | build | Use row and column labels in the agreed order. | We are learning to use row and column labels in the agreed order. | grid-reference-reader, grid-locator, grid-system-builder |
-| 2. Locate the Feature (`y4-space-w4-l2`) | develop | Assign and interpret grid references. | We are learning to assign and interpret grid references. | grid-reference-reader, grid-locator, grid-system-builder |
-| 3. Build a Grid Key (`y4-space-w4-l3`) | apply | Create a consistent reference system for a map. | We are learning to create a consistent reference system for a map. | grid-reference-reader, grid-locator, grid-system-builder |
+| 1. Read the Grid (`y4-space-w4-l1`) | build | Use row and column labels in the agreed order. | I can read a grid reference in both directions. | read-grid, locate-feature, build-grid-system |
+| 2. Locate the Feature (`y4-space-w4-l2`) | develop | Assign and interpret grid references. | I can use grid references to find, report and place map features. | read-grid, locate-feature, build-grid-system |
+| 3. Build a Grid Key (`y4-space-w4-l3`) | apply | Create a consistent reference system for a map. | I can create and repair a consistent grid reference system. | read-grid, locate-feature, build-grid-system |
 
 **Vocabulary:** grid, row, column, reference, cell
 
@@ -1020,9 +1020,9 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Reference to Reference (`y4-space-w5-l1`) | build | Trace a route between labelled cells. | We are learning to trace a route between labelled cells. | grid-route-runner, grid-direction-builder, constrained-route-planner |
-| 2. Write the Path (`y4-space-w5-l2`) | develop | Create directions using references and movement language. | We are learning to create directions using references and movement language. | grid-route-runner, grid-direction-builder, constrained-route-planner |
-| 3. Route Under Constraints (`y4-space-w5-l3`) | apply | Compare pathways that satisfy spatial constraints. | We are learning to compare pathways that satisfy spatial constraints. | grid-route-runner, grid-direction-builder, constrained-route-planner |
+| 1. Reference to Reference (`y4-space-w5-l1`) | build | Trace a route between labelled cells. | I can trace movement between referenced cells. | trace-references, author-route, route-audit |
+| 2. Write the Path (`y4-space-w5-l2`) | develop | Create directions using references and movement language. | I can author precise grid-referenced directions. | trace-references, author-route, route-audit |
+| 3. Route Under Constraints (`y4-space-w5-l3`) | apply | Compare pathways that satisfy spatial constraints. | I can test and improve routes against constraints. | trace-references, author-route, route-audit |
 
 **Vocabulary:** pathway, reference, direction, route, constraint
 
@@ -1041,9 +1041,9 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Mirror Match (`y4-space-w6-l1`) | build | Test whether two halves correspond across a line. | We are learning to test whether two halves correspond across a line. | symmetry-test, mirror-grid-builder, symmetry-line-counter |
-| 2. Complete the Reflection (`y4-space-w6-l2`) | develop | Construct the missing half on a grid. | We are learning to construct the missing half on a grid. | symmetry-test, mirror-grid-builder, symmetry-line-counter |
-| 3. How Many Lines? (`y4-space-w6-l3`) | apply | Compare possible symmetry lines and justify counts. | We are learning to compare possible symmetry lines and justify counts. | symmetry-test, mirror-grid-builder, symmetry-line-counter |
+| 1. Mirror Match (`y4-space-w6-l1`) | build | Test whether two halves correspond across a line. | I can test corresponding features across a line of symmetry. | line-test, reflection-builder, line-design |
+| 2. Complete the Reflection (`y4-space-w6-l2`) | develop | Construct the missing half on a grid. | I can complete vertical, horizontal and diagonal reflections. | line-test, reflection-builder, line-design |
+| 3. Create a Symmetric Picture (`y4-space-w6-l3`) | apply | Create and audit an original line-symmetric design. | I can create and test an original line-symmetric picture. | line-test, reflection-builder, line-design |
 
 **Vocabulary:** symmetry, line of symmetry, mirror, corresponding, equal distance
 
@@ -1062,9 +1062,9 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Turn and Match (`y4-space-w7-l1`) | build | Test a figure at marked rotations. | We are learning to test a figure at marked rotations. | rotation-tester, rotational-order-counter, radial-pattern-builder |
-| 2. Count the Matches (`y4-space-w7-l2`) | develop | Determine the number of matching positions in a full turn. | We are learning to determine the number of matching positions in a full turn. | rotation-tester, rotational-order-counter, radial-pattern-builder |
-| 3. Create a Turning Pattern (`y4-space-w7-l3`) | apply | Construct and justify a rotationally symmetric design. | We are learning to construct and justify a rotationally symmetric design. | rotation-tester, rotational-order-counter, radial-pattern-builder |
+| 1. Turn and Test (`y4-space-w7-l1`) | build | Test a figure at marked rotations. | I can test a design after a stated rotation about a centre. | turn-test, turn-recorder, rotation-builder |
+| 2. Record the Matches (`y4-space-w7-l2`) | develop | Test and record matching positions in a full turn. | I can test and record which rotations reproduce a design. | turn-test, turn-recorder, rotation-builder |
+| 3. Create a Turning Pattern (`y4-space-w7-l3`) | apply | Construct and justify a rotationally symmetric design. | I can create, test and repair a rotationally symmetric pattern. | turn-test, turn-recorder, rotation-builder |
 
 **Vocabulary:** rotational symmetry, centre, full turn, match, order
 
@@ -1083,9 +1083,9 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Decode the Design Brief (`y4-space-w8-l1`) | build | Identify composite, grid and symmetry constraints. | We are learning to identify composite, grid and symmetry constraints. | constraint-decoder, symmetric-map-builder, design-auditor |
-| 2. Build the World (`y4-space-w8-l2`) | develop | Construct a referenced symmetrical grid design. | We are learning to construct a referenced symmetrical grid design. | constraint-decoder, symmetric-map-builder, design-auditor |
-| 3. Audit and Explain (`y4-space-w8-l3`) | apply | Check constraints and justify representational choices. | We are learning to check constraints and justify representational choices. | constraint-decoder, symmetric-map-builder, design-auditor |
+| 1. Decode the Design Brief (`y4-space-w8-l1`) | build | Identify composite, grid and symmetry constraints. | I can translate an integrated design brief into testable constraints. | decode-brief, build-world, audit-world |
+| 2. Build the World (`y4-space-w8-l2`) | develop | Construct a referenced symmetrical grid design. | I can build a connected composite, grid and symmetry world. | decode-brief, build-world, audit-world |
+| 3. Audit and Explain (`y4-space-w8-l3`) | apply | Check constraints and justify representational choices. | I can audit and repair a complete spatial design. | decode-brief, build-world, audit-world |
 
 **Vocabulary:** composite, grid reference, symmetry, constraint, justify
 
@@ -1094,7 +1094,7 @@ Students represent composite shapes and objects, create and interpret grid refer
 - Meeting one constraint compensates for missing another.
 - Visual balance always proves mathematical symmetry.
 
-**Weekly quiz:** `y4-space-w8-quiz` - Cumulative composite, grid and symmetry reasoning. (15 questions; planned)
+**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y4-space-post-01`.
 
 ## Starpath Level 5: Nets, Coordinates and Transformations
 
@@ -1154,9 +1154,9 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Unfold the Object (`y5-space-w1-l1`) | build | Relate object faces to a flattened arrangement. | We are learning to relate object faces to a flattened arrangement. | virtual-unfolder, net-validity-predictor, net-evidence-reasoning |
-| 2. Which Net Folds? (`y5-space-w1-l2`) | develop | Predict whether a candidate net forms the target object. | We are learning to predict whether a candidate net forms the target object. | virtual-unfolder, net-validity-predictor, net-evidence-reasoning |
-| 3. Explain the Match (`y5-space-w1-l3`) | apply | Use face and adjacency evidence to justify a net. | We are learning to use face and adjacency evidence to justify a net. | virtual-unfolder, net-validity-predictor, net-evidence-reasoning |
+| 1. Unfold the Object (`y5-space-w1-l1`) | build | Relate object faces to a flattened arrangement. | I can match a cube to the flat net it unfolds into. | net-unfolder, fold-predictor, net-reasoning |
+| 2. Which Net Folds? (`y5-space-w1-l2`) | develop | Predict whether a candidate net forms the target object. | I can predict whether a net folds into a cube. | net-unfolder, fold-predictor, net-reasoning |
+| 3. Explain the Match (`y5-space-w1-l3`) | apply | Use face and adjacency evidence to justify a net. | I can explain why a net folds into a cube. | net-unfolder, fold-predictor, net-reasoning |
 
 **Vocabulary:** net, face, fold, edge, adjacent
 
@@ -1175,9 +1175,9 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Track a Face (`y5-space-w2-l1`) | build | Follow one labelled face through a virtual fold. | We are learning to follow one labelled face through a virtual fold. | face-tracker, net-fold-simulator, folded-relation-challenge |
-| 2. Fold the Net (`y5-space-w2-l2`) | develop | Sequence folds to form an object. | We are learning to sequence folds to form an object. | face-tracker, net-fold-simulator, folded-relation-challenge |
-| 3. Opposite and Adjacent (`y5-space-w2-l3`) | apply | Determine face relationships after construction. | We are learning to determine face relationships after construction. | face-tracker, net-fold-simulator, folded-relation-challenge |
+| 1. Track a Face (`y5-space-w2-l1`) | build | Follow one labelled face through a virtual fold. | I can track a face through a fold and find its opposite. | face-tracker, fold-simulator, face-relations |
+| 2. Fold the Net (`y5-space-w2-l2`) | develop | Sequence folds to form an object. | I can fold a net and work out which faces touch. | face-tracker, fold-simulator, face-relations |
+| 3. Opposite and Adjacent (`y5-space-w2-l3`) | apply | Determine face relationships after construction. | I can tell whether two faces end up opposite or adjacent. | face-tracker, fold-simulator, face-relations |
 
 **Vocabulary:** fold, adjacent, opposite, orientation, construct
 
@@ -1196,9 +1196,9 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Arrange the Faces (`y5-space-w3-l1`) | build | Build a candidate net from required faces. | We are learning to build a candidate net from required faces. | net-builder, fold-test-lab, net-compare |
-| 2. Test the Fold (`y5-space-w3-l2`) | develop | Identify overlap, gaps or incorrect adjacency. | We are learning to identify overlap, gaps or incorrect adjacency. | net-builder, fold-test-lab, net-compare |
-| 3. Compare Valid Nets (`y5-space-w3-l3`) | apply | Explain how different nets can form the same object. | We are learning to explain how different nets can form the same object. | net-builder, fold-test-lab, net-compare |
+| 1. Arrange the Faces (`y5-space-w3-l1`) | build | Build a candidate net from required faces. | I can build a net that folds into a cube. | net-builder, fold-fault-finder, net-comparer |
+| 2. Test the Fold (`y5-space-w3-l2`) | develop | Identify overlap, gaps or incorrect adjacency. | I can test a net for overlaps and gaps. | net-builder, fold-fault-finder, net-comparer |
+| 3. Compare Valid Nets (`y5-space-w3-l3`) | apply | Explain how different nets can form the same object. | I can find several different nets that fold into the same cube. | net-builder, fold-fault-finder, net-comparer |
 
 **Vocabulary:** layout, overlap, gap, valid, revise
 
@@ -1217,9 +1217,9 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Build the Axes (`y5-space-w4-l1`) | build | Establish origin, axes, scale and coordinate order. | We are learning to establish origin, axes, scale and coordinate order. | coordinate-system-builder, coordinate-plotter, coordinate-debugger |
-| 2. Plot and Read (`y5-space-w4-l2`) | develop | Locate and identify positions from ordered pairs. | We are learning to locate and identify positions from ordered pairs. | coordinate-system-builder, coordinate-plotter, coordinate-debugger |
-| 3. Find the Coordinate Error (`y5-space-w4-l3`) | apply | Diagnose swapped or mis-scaled coordinates. | We are learning to diagnose swapped or mis-scaled coordinates. | coordinate-system-builder, coordinate-plotter, coordinate-debugger |
+| 1. Build the Axes (`y5-space-w4-l1`) | build | Establish origin, axes, scale and coordinate order. | I can set up axes and read a coordinate across then up. | coordinate-system-builder, coordinate-plotter, coordinate-debugger |
+| 2. Plot and Read (`y5-space-w4-l2`) | develop | Locate and identify positions from ordered pairs. | I can plot points and read their coordinates. | coordinate-system-builder, coordinate-plotter, coordinate-debugger |
+| 3. Find the Coordinate Error (`y5-space-w4-l3`) | apply | Diagnose swapped or mis-scaled coordinates. | I can find and fix a swapped or mis-scaled coordinate. | coordinate-system-builder, coordinate-plotter, coordinate-debugger |
 
 **Vocabulary:** coordinate, ordered pair, origin, axis, scale
 
@@ -1238,9 +1238,9 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Move Along an Axis (`y5-space-w5-l1`) | build | Relate horizontal and vertical moves to coordinate changes. | We are learning to relate horizontal and vertical moves to coordinate changes. | coordinate-mover, coordinate-command-runner, coordinate-route-planner |
-| 2. Follow Coordinate Commands (`y5-space-w5-l2`) | develop | Apply an ordered sequence of position changes. | We are learning to apply an ordered sequence of position changes. | coordinate-mover, coordinate-command-runner, coordinate-route-planner |
-| 3. Plan an Efficient Route (`y5-space-w5-l3`) | apply | Compare coordinate pathways under constraints. | We are learning to compare coordinate pathways under constraints. | coordinate-mover, coordinate-command-runner, coordinate-route-planner |
+| 1. Move Along an Axis (`y5-space-w5-l1`) | build | Relate horizontal and vertical moves to coordinate changes. | I can move along an axis and say which coordinate changed. | coordinate-mover, coordinate-command-runner, coordinate-route-planner |
+| 2. Follow Coordinate Commands (`y5-space-w5-l2`) | develop | Apply an ordered sequence of position changes. | I can follow and build coordinate command sequences. | coordinate-mover, coordinate-command-runner, coordinate-route-planner |
+| 3. Plan an Efficient Route (`y5-space-w5-l3`) | apply | Compare coordinate pathways under constraints. | I can plan the shortest valid route to a goal. | coordinate-mover, coordinate-command-runner, coordinate-route-planner |
 
 **Vocabulary:** horizontal, vertical, increase, decrease, movement
 
@@ -1259,9 +1259,9 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Slide Every Point (`y5-space-w6-l1`) | build | Apply a common horizontal and vertical movement. | We are learning to apply a common horizontal and vertical movement. | point-translation-simulator, translation-describer, transform-validator |
-| 2. Describe the Translation (`y5-space-w6-l2`) | develop | Express movement using directional or coordinate language. | We are learning to express movement using directional or coordinate language. | point-translation-simulator, translation-describer, transform-validator |
-| 3. Check the Image (`y5-space-w6-l3`) | apply | Use invariants to evaluate a claimed translation. | We are learning to use invariants to evaluate a claimed translation. | point-translation-simulator, translation-describer, transform-validator |
+| 1. Slide Every Point (`y5-space-w6-l1`) | build | Apply a common horizontal and vertical movement. | I can translate a figure so every point moves the same. | point-translation-simulator, translation-describer, transform-validator |
+| 2. Describe the Translation (`y5-space-w6-l2`) | develop | Express movement using directional or coordinate language. | I can describe a translation using across-and-up movement. | point-translation-simulator, translation-describer, transform-validator |
+| 3. Check the Image (`y5-space-w6-l3`) | apply | Use invariants to evaluate a claimed translation. | I can check an image against the invariants of a translation. | point-translation-simulator, translation-describer, transform-validator |
 
 **Vocabulary:** translation, image, horizontal, vertical, invariant
 
@@ -1280,9 +1280,9 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Reflect Across a Line (`y5-space-w7-l1`) | build | Place corresponding points at equal perpendicular distances. | We are learning to place corresponding points at equal perpendicular distances. | reflection-builder, rotation-simulator, transformation-classifier |
-| 2. Rotate About a Point (`y5-space-w7-l2`) | develop | Turn a figure around a stated centre and amount. | We are learning to turn a figure around a stated centre and amount. | reflection-builder, rotation-simulator, transformation-classifier |
-| 3. Compare the Transformations (`y5-space-w7-l3`) | apply | Identify action, changes and invariants from image pairs. | We are learning to identify action, changes and invariants from image pairs. | reflection-builder, rotation-simulator, transformation-classifier |
+| 1. Reflect Across a Line (`y5-space-w7-l1`) | build | Place corresponding points at equal perpendicular distances. | I can reflect a figure across a mirror line. | reflection-builder, rotation-simulator, transformation-classifier |
+| 2. Rotate About a Point (`y5-space-w7-l2`) | develop | Turn a figure around a stated centre and amount. | I can rotate a figure about a centre by a stated turn. | reflection-builder, rotation-simulator, transformation-classifier |
+| 3. Compare the Transformations (`y5-space-w7-l3`) | apply | Identify action, changes and invariants from image pairs. | I can identify a translation, reflection or rotation. | reflection-builder, rotation-simulator, transformation-classifier |
 
 **Vocabulary:** reflection, rotation, line, centre, corresponding
 
@@ -1301,9 +1301,9 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Interpret the Brief (`y5-space-w8-l1`) | build | Connect net, coordinate and transformation constraints. | We are learning to connect net, coordinate and transformation constraints. | design-constraint-decoder, coordinate-transform-builder, spatial-design-auditor |
-| 2. Build and Transform (`y5-space-w8-l2`) | develop | Create a valid object representation and position its transformed images. | We are learning to create a valid object representation and position its transformed images. | design-constraint-decoder, coordinate-transform-builder, spatial-design-auditor |
-| 3. Test and Defend (`y5-space-w8-l3`) | apply | Check invariants and justify each spatial decision. | We are learning to check invariants and justify each spatial decision. | design-constraint-decoder, coordinate-transform-builder, spatial-design-auditor |
+| 1. Interpret the Brief (`y5-space-w8-l1`) | build | Connect net, coordinate and transformation constraints. | I can read a brief's object, location and movement constraints. | design-constraint-decoder, coordinate-transform-builder, spatial-design-auditor |
+| 2. Build and Transform (`y5-space-w8-l2`) | develop | Create a valid object representation and position its transformed images. | I can build an object, place it and transform it together. | design-constraint-decoder, coordinate-transform-builder, spatial-design-auditor |
+| 3. Test and Defend (`y5-space-w8-l3`) | apply | Check invariants and justify each spatial decision. | I can test and defend every part of a spatial design. | design-constraint-decoder, coordinate-transform-builder, spatial-design-auditor |
 
 **Vocabulary:** net, coordinate, transformation, invariant, justify
 
@@ -1312,7 +1312,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 - Each representation can be solved independently.
 - A visually plausible design needs no spatial evidence.
 
-**Weekly quiz:** `y5-space-w8-quiz` - Cumulative nets, coordinates, transformations and reasoning. (15 questions; planned)
+**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y5-space-post-01`.
 
 ## Starpath Level 6: Cross-sections, Cartesian Space and Tessellations
 
@@ -1530,4 +1530,4 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 - Each representation can be interpreted independently.
 - A visually plausible solution needs no mathematical evidence.
 
-**Weekly quiz:** `y6-space-w8-quiz` - Cumulative spatial visualisation, coordinate and transformation reasoning. (15 questions; planned)
+**Weekly quiz:** none. Week 8 Lesson 3 unlocks `y6-space-post-01`.

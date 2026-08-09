@@ -9533,7 +9533,7 @@ function SessionPage({
                     </div>
                     <button
                       type="button"
-                      onClick={() => speak(currentQuiz?.prompt ?? "")}
+                      onClick={() => speak(currentQuizPrompt)}
                       aria-label="Read question aloud"
                       className={[
                         "rounded-full border px-3 py-1 text-[11px] font-bold transition",

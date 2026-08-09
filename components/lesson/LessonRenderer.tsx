@@ -57,6 +57,7 @@ import type {
 } from "@/data/activities/year2/lessonEngine";
 import type { LessonActivity } from "@/data/programs/types";
 import { canRenderByGeneratedKind, isLessonQuestionSafe } from "@/lib/task-safety";
+import QuestionReadAloudBoundary from "@/components/QuestionReadAloudBoundary";
 
 type LessonRendererProps = {
   activity: LessonActivity;
@@ -258,7 +259,7 @@ function renderNestedActivity({
   );
 }
 
-export function LessonRenderer({
+function LessonRendererInner({
   activity,
   prompt,
   questionData,
@@ -660,4 +661,19 @@ export function LessonRenderer({
     default:
       return <RecoveryCard message="This activity is not available yet." onRecover={onWrong} />;
   }
+}
+
+export function LessonRenderer(props: LessonRendererProps) {
+  const questionText = typeof props.questionData.prompt === "string" && props.questionData.prompt.trim()
+    ? props.questionData.prompt
+    : props.prompt;
+
+  return (
+    <QuestionReadAloudBoundary
+      text={questionText}
+      speechKey={`lesson-question-${props.activity.activityType}`}
+    >
+      <LessonRendererInner {...props} />
+    </QuestionReadAloudBoundary>
+  );
 }

@@ -16,6 +16,39 @@ export type StarpathObjectSceneItem = {
   reason?: string;
 };
 
+export type StarpathGroundAssessmentToken = {
+  id: string;
+  label: string;
+  visual:
+    | { kind: "shape"; shape: StarpathShape; colour: string; rotation?: number }
+    | { kind: "object"; objectId: string };
+};
+
+type StarpathGroundAssessmentTaskBase = {
+  kind: "starpathGroundAssessment";
+  prompt: string;
+  speakText: string;
+  target: number;
+  rows: number;
+  cols: number;
+  feedback: { correct: string; wrong: string };
+};
+
+export type StarpathGroundAssessmentTask =
+  | (StarpathGroundAssessmentTaskBase & {
+      mode: "placement";
+      tokens: StarpathGroundAssessmentToken[];
+      fixed?: Array<{ token: StarpathGroundAssessmentToken; r: number; c: number }>;
+      answer: Array<{ tokenId: string; r: number; c: number }>;
+    })
+  | (StarpathGroundAssessmentTaskBase & {
+      mode: "route";
+      traveller: string;
+      start: { r: number; c: number };
+      goal?: { r: number; c: number; objectId: string };
+      answerMoves: Array<"up" | "down" | "left" | "right">;
+    });
+
 type StarpathObjectTaskBase = {
   kind: "starpathObject";
   prompt: string;
@@ -2725,6 +2758,7 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | StarpathObjectTask
+  | StarpathGroundAssessmentTask
   | {
       kind: "starpathShapeMatch";
       prompt: string;

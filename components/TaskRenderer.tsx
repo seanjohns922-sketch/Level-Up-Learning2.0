@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef, type ReactNode } from "react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import QuestionReadAloudBoundary from "@/components/QuestionReadAloudBoundary";
 import MatchThePair from "@/components/MatchThePair";
 import CountObjects from "@/components/CountObjects";
 import FillTheJar from "@/components/FillTheJar";
@@ -202,6 +203,7 @@ import StarpathSymmetryCard from "@/components/starpath/StarpathSymmetryCard";
 import StarpathNetCard from "@/components/starpath/StarpathNetCard";
 import StarpathCoordinateCard from "@/components/starpath/StarpathCoordinateCard";
 import StarpathTransformCard from "@/components/starpath/StarpathTransformCard";
+import { StarpathGroundAssessmentCard } from "@/components/starpath/StarpathGroundAssessmentCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -603,6 +605,8 @@ function TaskRendererInner({
       return <GroundSoundCountTaskCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathShapeIntro":
       return <StarpathShapeIntroCard key={k} task={t} onContinue={onC} />;
+    case "starpathGroundAssessment":
+      return <StarpathGroundAssessmentCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathShapeMatch":
       return <StarpathShapeMatchCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathShapeCompare":
@@ -710,4 +714,28 @@ function TaskRendererInner({
   }
 }
 
-export const TaskRenderer = memo(TaskRendererInner);
+function getTaskReadAloudText(task: PracticeTask): string {
+  if ("speakText" in task && typeof task.speakText === "string" && task.speakText.trim()) {
+    return task.speakText;
+  }
+  if ("speechText" in task && typeof task.speechText === "string" && task.speechText.trim()) {
+    return task.speechText;
+  }
+  if ("prompt" in task && typeof task.prompt === "string" && task.prompt.trim()) {
+    return task.prompt;
+  }
+  return "Listen to the question, then complete the activity.";
+}
+
+function AccessibleTaskRenderer(props: Parameters<typeof TaskRendererInner>[0]) {
+  return (
+    <QuestionReadAloudBoundary
+      text={getTaskReadAloudText(props.task)}
+      speechKey={`lesson-question-${props.task.kind}`}
+    >
+      <TaskRendererInner {...props} />
+    </QuestionReadAloudBoundary>
+  );
+}
+
+export const TaskRenderer = memo(AccessibleTaskRenderer);

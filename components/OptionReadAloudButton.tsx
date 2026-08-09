@@ -17,7 +17,7 @@ export default function OptionReadAloudButton({
       onMouseDown={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
     >
-      <ReadAloudBtn text={text} />
+      <ReadAloudBtn text={text} kind="option" />
     </span>
   );
 }
