@@ -806,18 +806,19 @@ export default function AssessmentQuestionCard({
         return (
           <div className="mt-3 space-y-4">
             {renderedVisual}
-            <label className="mx-auto grid w-36 grid-rows-[1fr_auto_1fr] text-center" aria-label="Fraction answer">
+            <div className="mx-auto grid w-36 grid-rows-[auto_1fr_auto_1fr] rounded-lg border border-cyan-900/20 bg-[#f8fbfc] px-4 py-3 text-center shadow-sm" aria-label="Fraction answer">
+              <span className="mb-2 text-xs font-black uppercase text-cyan-900">Answer</span>
               <input
                 type="text"
                 inputMode="numeric"
                 value={value ?? ""}
                 onChange={(event) => onChange(event.target.value.replace(/[^\d-]/g, ""))}
                 aria-label="Numerator"
-                className="h-16 rounded-lg border-2 border-cyan-700 bg-[#f8fbfc] px-3 text-center text-4xl font-black text-slate-950 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
+                className="h-14 w-full rounded-md border-2 border-cyan-700 bg-white px-2 text-center text-3xl font-black text-slate-950 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
               />
-              <span className="my-2 h-1 rounded-full bg-slate-900" aria-hidden />
-              <span className="grid h-16 place-items-center rounded-lg border border-cyan-900/15 bg-white text-4xl font-black text-slate-950 shadow-sm">{answerDenominator}</span>
-            </label>
+              <span className="my-2 h-1 rounded-full bg-slate-950" aria-hidden />
+              <span className="grid h-12 place-items-center text-3xl font-black text-slate-950">{answerDenominator}</span>
+            </div>
           </div>
         );
       }

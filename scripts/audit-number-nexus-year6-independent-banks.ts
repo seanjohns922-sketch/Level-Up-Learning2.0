@@ -121,6 +121,7 @@ check(cardSource.includes("NumberNexusYear6AssessmentVisual") && cardSource.incl
 check(visualSource.includes("rounded-lg") && !visualSource.includes("rounded-2xl"), "Level 6 visuals do not follow the modern radius system.");
 check(visualSource.includes("OptionReadAloudButton") && visualSource.includes("ReadableVisual"), "Level 6 visual wording is missing read-aloud support.");
 check(visualSource.includes("absolute right-3 top-3"), "Level 6 visual read-aloud is not anchored inside its visual.");
+check(visualSource.includes("FractionExpression") && cardSource.includes('aria-label="Fraction answer"'), "Level 6 fraction tasks do not use mathematical fraction presentation.");
 check(!visualSource.includes("Object.entries(visual)"), "Level 6 read-aloud infers text from hidden visual data and may expose an answer.");
 check(visualSource.includes("A point is marked on the line."), "Level 6 number-line read-aloud does not use an answer-neutral description.");
 check(shellSource.includes('year === "Year 6"') && shellSource.includes("max-w-6xl"), "Level 6 does not use the modern wide assessment shell.");

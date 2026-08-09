@@ -3,6 +3,7 @@
 import { BadgePercent, Landmark, Scale } from "lucide-react";
 import NumberNexusYear5AssessmentVisual from "@/components/assessment/NumberNexusYear5AssessmentVisual";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
+import { Fraction } from "@/components/FractionText";
 
 type Visual = Record<string, unknown>;
 
@@ -16,6 +17,19 @@ function Rows({ rows }: { rows: Array<[string, string]> }) {
 
 function ReadableVisual({ text, children }: { text: string; children: React.ReactNode }) {
   return <div className="relative"><div className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={text} /></div>{children}</div>;
+}
+
+function FractionExpression({ expression }: { expression: string }) {
+  return (
+    <span className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-3">
+      {expression.split(/(\?\/\d+|\d+\/\d+)/g).map((part, index) => {
+        const match = part.match(/^(\?|\d+)\/(\d+)$/);
+        return match
+          ? <Fraction key={`${part}-${index}`} numerator={match[1]} denominator={match[2]} size="lg" />
+          : <span key={`${part}-${index}`}>{part}</span>;
+      })}
+    </span>
+  );
 }
 
 function mappedVisualReadAloud(type: string, visual: Visual) {
@@ -67,7 +81,12 @@ export default function NumberNexusYear6AssessmentVisual({ visual }: { visual: V
   if (type === "number_y6_claim") {
     const label = String(visual.label ?? "Student's result");
     const statement = String(visual.statement ?? "");
-    return <ReadableVisual text={`${label}: ${statement}.`}><Surface><div className="mx-auto max-w-3xl pr-12 text-center"><div className="text-xs font-black uppercase text-amber-700">{label}</div><div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-5 py-4 text-2xl font-black sm:text-3xl">{statement}</div></div></Surface></ReadableVisual>;
+    return <ReadableVisual text={`${label}: ${statement}.`}><Surface><div className="mx-auto max-w-3xl pr-12 text-center"><div className="text-xs font-black uppercase text-amber-700">{label}</div><div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-5 py-4 text-2xl font-black sm:text-3xl"><FractionExpression expression={statement} /></div></div></Surface></ReadableVisual>;
+  }
+
+  if (type === "number_y6_fraction_equation") {
+    const expression = String(visual.expression ?? "");
+    return <ReadableVisual text={expression}><Surface><div className="pr-12 text-center text-3xl font-black sm:text-4xl"><FractionExpression expression={expression} /></div></Surface></ReadableVisual>;
   }
 
   const mappedType: Record<string, string> = {
@@ -77,7 +96,6 @@ export default function NumberNexusYear6AssessmentVisual({ visual }: { visual: V
     number_y6_fraction_set: "number_y5_fraction_set",
     number_y6_number_line: "number_y5_number_line",
     number_y6_calculation: "number_y5_calculation",
-    number_y6_fraction_equation: "number_y5_fraction_equation",
     number_y6_estimate: "number_y5_estimate",
   };
   const mapped = mappedType[type];
