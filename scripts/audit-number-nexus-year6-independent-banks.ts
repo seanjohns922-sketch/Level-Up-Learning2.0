@@ -94,6 +94,16 @@ for (const form of forms) {
     check(isAssessmentAnswerCorrect(item, item.correctAnswer), `${item.id} rejects its expected answer.`);
     check(!isAssessmentAnswerCorrect(item, wrongAnswer(item)), `${item.id} accepts a known wrong answer.`);
     check(String((item.visual as { type?: unknown })?.type).startsWith("number_y6_"), `${item.id} does not use the Level 6 visual system.`);
+    const visual = item.visual as { type?: string; answerDenominator?: number; answerSymbol?: string; label?: string };
+    if (["fraction_addition", "fraction_subtraction", "fraction_correction", "fraction_diagnosis"].includes(String(item.skillId))) {
+      check(Number.isInteger(visual.answerDenominator) && Number(visual.answerDenominator) > 0, `${item.id} is missing its fixed-denominator answer widget.`);
+    }
+    if (item.skillId === "rational_estimate" || item.skillId === "decimal_reasoning") {
+      check(visual.answerSymbol === "≈" && item.prompt.startsWith("Estimate "), `${item.id} does not present estimation explicitly.`);
+    }
+    if (visual.type === "number_y6_claim") {
+      check(Boolean(visual.label), `${item.id} does not identify the displayed claim.`);
+    }
   }
 }
 
@@ -110,6 +120,7 @@ check(!/\b(hint|helper|solution|worked step)\b/i.test(bankSource), "Assessment b
 check(cardSource.includes("NumberNexusYear6AssessmentVisual") && cardSource.includes('visual.type.startsWith("number_y6_")'), "Level 6 visual dispatch is missing.");
 check(visualSource.includes("rounded-lg") && !visualSource.includes("rounded-2xl"), "Level 6 visuals do not follow the modern radius system.");
 check(visualSource.includes("OptionReadAloudButton") && visualSource.includes("ReadableVisual"), "Level 6 visual wording is missing read-aloud support.");
+check(visualSource.includes("absolute right-3 top-3"), "Level 6 visual read-aloud is not anchored inside its visual.");
 check(!visualSource.includes("Object.entries(visual)"), "Level 6 read-aloud infers text from hidden visual data and may expose an answer.");
 check(visualSource.includes("A point is marked on the line."), "Level 6 number-line read-aloud does not use an answer-neutral description.");
 check(shellSource.includes('year === "Year 6"') && shellSource.includes("max-w-6xl"), "Level 6 does not use the modern wide assessment shell.");

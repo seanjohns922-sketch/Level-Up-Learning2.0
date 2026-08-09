@@ -15,7 +15,7 @@ function Rows({ rows }: { rows: Array<[string, string]> }) {
 }
 
 function ReadableVisual({ text, children }: { text: string; children: React.ReactNode }) {
-  return <div className="space-y-2"><div className="flex justify-end"><OptionReadAloudButton text={text} /></div>{children}</div>;
+  return <div className="relative"><div className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={text} /></div>{children}</div>;
 }
 
 function mappedVisualReadAloud(type: string, visual: Visual) {
@@ -29,7 +29,7 @@ function mappedVisualReadAloud(type: string, visual: Visual) {
   if (type === "number_y6_number_line") {
     return `Number line from ${String(visual.min ?? 0)} to ${String(visual.max ?? 1)}, divided into ${String(visual.divisions ?? "")} equal intervals. A point is marked on the line.`;
   }
-  if (type === "number_y6_claim") return `Claim: ${String(visual.statement ?? "")}.`;
+  if (type === "number_y6_claim") return `${String(visual.label ?? "Student's result")}: ${String(visual.statement ?? "")}.`;
   return String(visual.expression ?? "");
 }
 
@@ -64,6 +64,12 @@ export default function NumberNexusYear6AssessmentVisual({ visual }: { visual: V
     return <ReadableVisual text={allRows.map(([label, value]) => `${label}: ${value}.`).join(" ")}><Surface><Landmark className="mx-auto mb-3 h-8 w-8 text-cyan-800" aria-hidden /><Rows rows={allRows} /></Surface></ReadableVisual>;
   }
 
+  if (type === "number_y6_claim") {
+    const label = String(visual.label ?? "Student's result");
+    const statement = String(visual.statement ?? "");
+    return <ReadableVisual text={`${label}: ${statement}.`}><Surface><div className="mx-auto max-w-3xl pr-12 text-center"><div className="text-xs font-black uppercase text-amber-700">{label}</div><div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-5 py-4 text-2xl font-black sm:text-3xl">{statement}</div></div></Surface></ReadableVisual>;
+  }
+
   const mappedType: Record<string, string> = {
     number_y6_integer_set: "number_y5_decimal_set",
     number_y6_number_card: "number_y5_factor_card",
@@ -71,7 +77,6 @@ export default function NumberNexusYear6AssessmentVisual({ visual }: { visual: V
     number_y6_fraction_set: "number_y5_fraction_set",
     number_y6_number_line: "number_y5_number_line",
     number_y6_calculation: "number_y5_calculation",
-    number_y6_claim: "number_y5_claim",
     number_y6_fraction_equation: "number_y5_fraction_equation",
     number_y6_estimate: "number_y5_estimate",
   };

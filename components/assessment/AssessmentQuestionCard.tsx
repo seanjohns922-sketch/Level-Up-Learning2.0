@@ -801,6 +801,48 @@ export default function AssessmentQuestionCard({
           </div>
         );
       }
+      const answerDenominator = Number(visual?.answerDenominator);
+      if (Number.isInteger(answerDenominator) && answerDenominator > 0) {
+        return (
+          <div className="mt-3 space-y-4">
+            {renderedVisual}
+            <label className="mx-auto grid w-36 grid-rows-[1fr_auto_1fr] text-center" aria-label="Fraction answer">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={value ?? ""}
+                onChange={(event) => onChange(event.target.value.replace(/[^\d-]/g, ""))}
+                aria-label="Numerator"
+                className="h-16 rounded-lg border-2 border-cyan-700 bg-[#f8fbfc] px-3 text-center text-4xl font-black text-slate-950 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
+              />
+              <span className="my-2 h-1 rounded-full bg-slate-900" aria-hidden />
+              <span className="grid h-16 place-items-center rounded-lg border border-cyan-900/15 bg-white text-4xl font-black text-slate-950 shadow-sm">{answerDenominator}</span>
+            </label>
+          </div>
+        );
+      }
+      const correctionPrefix = typeof visual?.correctionPrefix === "string" ? visual.correctionPrefix : "";
+      const answerSymbol = typeof visual?.answerSymbol === "string" ? visual.answerSymbol : "";
+      const answerPrefix = typeof visual?.answerPrefix === "string" ? visual.answerPrefix : "";
+      if (correctionPrefix || answerSymbol || answerPrefix) {
+        return (
+          <div className="mt-3 space-y-4">
+            {renderedVisual}
+            <div className="flex flex-wrap items-center justify-center gap-3" aria-label="Answer">
+              {correctionPrefix ? <span className="text-2xl font-black text-white"><MathFormattedText text={correctionPrefix} /></span> : null}
+              {answerSymbol || answerPrefix ? <span className="text-3xl font-black text-white" aria-hidden>{answerSymbol || answerPrefix}</span> : null}
+              <input
+                type="text"
+                inputMode={question.inputMode ?? "decimal"}
+                value={value ?? ""}
+                onChange={(event) => onChange(event.target.value)}
+                aria-label={correctionPrefix ? "Correct result" : "Estimate"}
+                className="h-20 w-44 rounded-lg border-2 border-cyan-700 bg-[#f8fbfc] px-3 text-center text-4xl font-black text-slate-950 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
+              />
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="mt-3 space-y-4">
           {renderedVisual}
