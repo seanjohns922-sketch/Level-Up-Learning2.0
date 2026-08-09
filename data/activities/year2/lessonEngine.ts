@@ -16411,7 +16411,7 @@ function generateGenericQuestion(
       answer: string;
       options: string[];
       helper: string;
-      visual?: {
+      visual?: PatternSequenceStripVisualData | {
         type: "rule_box";
         title: string;
         steps: string[];
@@ -16441,7 +16441,7 @@ function generateGenericQuestion(
         helper: "Every number in the list must fit the same rule.",
       },
       {
-        prompt: "Which pattern increases by 5 each time?",
+        prompt: "Which list increases by 5 each time?",
         answer: "35, 40, 45, 50",
         options: [
           "35, 40, 45, 50",
@@ -16473,6 +16473,11 @@ function generateGenericQuestion(
         answer: "Add 15 each time",
         options: ["Add 15 each time", "Add 10 each time", "Multiply by 2 each time", "Add 5 each time"],
         helper: "Check the change from one term to the next.",
+        visual: {
+          type: "pattern_sequence_strip",
+          title: "Number sequence",
+          terms: ["45", "60", "75", "90"],
+        },
       },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
@@ -16492,7 +16497,7 @@ function generateGenericQuestion(
       answer: string;
       options: string[];
       helper: string;
-      visual?: {
+      visual?: PatternSequenceStripVisualData | {
         type: "rule_box";
         title: string;
         steps: string[];
@@ -16547,6 +16552,11 @@ function generateGenericQuestion(
           "Add 6 each time, so every term is a multiple of 6 only",
         ],
         helper: "Choose the rule that explains both the step and the pattern property.",
+        visual: {
+          type: "pattern_sequence_strip",
+          title: "Number sequence",
+          terms: ["12", "24", "36", "48", "60"],
+        },
       },
       {
         prompt: "Multiples of 6\nWhich statement is true?",
@@ -16593,7 +16603,7 @@ function generateGenericQuestion(
       answer: string;
       helper: string;
       placeholder?: string;
-      visual?: {
+      visual?: PatternSequenceStripVisualData | {
         type: "rule_box";
         title: string;
         steps: string[];
@@ -16633,6 +16643,11 @@ function generateGenericQuestion(
         answer: "10",
         helper: "Compare two consecutive terms.",
         placeholder: "Type the increase",
+        visual: {
+          type: "pattern_sequence_strip",
+          title: "Number sequence",
+          terms: ["30", "40", "50", "60"],
+        },
       },
       {
         prompt: "What number comes next: 18, 36, 54, 72, __?",
@@ -16658,6 +16673,7 @@ function generateGenericQuestion(
       answer: string;
       options: string[];
       helper: string;
+      visual?: PatternSequenceStripVisualData;
     }> = [
       {
         prompt: "Which number does not belong?\n18, 24, 30, 35, 42",
@@ -16691,6 +16707,11 @@ function generateGenericQuestion(
           "Add 6 each time",
         ],
         helper: "Check the difference between each pair of numbers.",
+        visual: {
+          type: "pattern_sequence_strip",
+          title: "Number sequence",
+          terms: ["24", "36", "48", "60", "72"],
+        },
       },
       {
         prompt: "135, 150, 165, 180, 195\nWhat is the rule?",
@@ -16702,6 +16723,11 @@ function generateGenericQuestion(
           "Add 5 each time",
         ],
         helper: "Test both the step size and the divisibility pattern.",
+        visual: {
+          type: "pattern_sequence_strip",
+          title: "Number sequence",
+          terms: ["135", "150", "165", "180", "195"],
+        },
       },
       {
         prompt: "Which statement is true?",
@@ -16798,12 +16824,18 @@ function generateGenericQuestion(
       answer: string;
       helper: string;
       placeholder?: string;
+      visual?: PatternSequenceStripVisualData;
     }> = [
       {
         prompt: "Type the missing number in the pattern 36, 48, __, 72, 84.",
         answer: "60",
         helper: "The numbers increase by 12 each time.",
         placeholder: "Type the missing number",
+        visual: {
+          type: "pattern_sequence_strip",
+          title: "Complete the sequence",
+          terms: ["36", "48", "?", "72", "84"],
+        },
       },
       {
         prompt: "Type the smallest number greater than 100 divisible by both 3 and 5.",
@@ -16816,6 +16848,11 @@ function generateGenericQuestion(
         answer: "185",
         helper: "The pattern increases by 15 each time.",
         placeholder: "Type the next number",
+        visual: {
+          type: "pattern_sequence_strip",
+          title: "Complete the sequence",
+          terms: ["125", "140", "155", "170", "?"],
+        },
       },
     ];
 
@@ -16828,6 +16865,7 @@ function generateGenericQuestion(
         options: shuffle(chosen.options),
         answer: chosen.answer,
         helper: chosen.helper,
+        visual: chosen.visual,
       };
     }
 
@@ -16838,6 +16876,7 @@ function generateGenericQuestion(
       answer: chosen.answer,
       helper: chosen.helper,
       placeholder: chosen.placeholder ?? "Type the answer",
+      visual: chosen.visual,
     };
   }
 

@@ -44,6 +44,7 @@ import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVi
 import ReversePatternCardVisual from "@/components/activities/ReversePatternCardVisual";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
 import { getRealmTheme } from "@/lib/useRealmTheme";
+import { hasRequiredRelationshipVisual } from "@/lib/relationship-visual";
 
 function FractionBar({
   numerator,
@@ -135,59 +136,6 @@ function SameDenominatorOperationVisual({
   );
 }
 
-function promptNeedsRelationshipVisual(prompt: string) {
-  const lower = prompt.toLowerCase();
-  return (
-    lower.includes("what is x") ||
-    lower.includes("solve the equation") ||
-    lower.includes("bracket equation") ||
-    lower.includes("find the rule") ||
-    lower.includes("which rule") ||
-    lower.includes("what is the rule") ||
-    lower.includes("find the output") ||
-    lower.includes("what is the output") ||
-    lower.includes("find the input") ||
-    lower.includes("what is the input") ||
-    lower.includes("which coordinate") ||
-    lower.includes("new coordinate") ||
-    lower.includes("quadrant") ||
-    lower.includes("moves to") ||
-    lower.includes("moves right") ||
-    lower.includes("moves left") ||
-    lower.includes("moves up") ||
-    lower.includes("moves down") ||
-    lower.includes("pattern") ||
-    lower.includes("sequence")
-  );
-}
-
-function hasRelationshipVisual(visualType: string | undefined) {
-  return (
-    visualType === "pattern_sequence_strip" ||
-    visualType === "growing_pattern" ||
-    visualType === "error_pattern" ||
-    visualType === "function_machine_card" ||
-    visualType === "input_output_table" ||
-    visualType === "missing_rule_machine" ||
-    visualType === "reverse_machine_card" ||
-    visualType === "rule_match_cards" ||
-    visualType === "ordered_pair_builder" ||
-    visualType === "table_to_pair_cards" ||
-    visualType === "mini_coordinate_preview" ||
-    visualType === "cartesian_grid" ||
-    visualType === "expression_flow" ||
-    visualType === "balance_equation_card" ||
-    visualType === "inverse_step_card" ||
-    visualType === "unknown_tile_equation" ||
-    visualType === "bracket_equation_card" ||
-    visualType === "check_substitution_card" ||
-    visualType === "rule_builder_card" ||
-    visualType === "term_position_card" ||
-    visualType === "term_predictor_card" ||
-    visualType === "reverse_pattern_card"
-  );
-}
-
 export default function MultipleChoiceActivity({
   questionData,
   onCorrect,
@@ -211,9 +159,11 @@ export default function MultipleChoiceActivity({
 
   const isMultiSelect =
     Array.isArray(questionData.correctAnswers) && questionData.correctAnswers.length > 0;
-  const missingRelationshipVisual =
-    promptNeedsRelationshipVisual(questionData.prompt) &&
-    !hasRelationshipVisual(questionData.visual?.type);
+  const missingRelationshipVisual = !hasRequiredRelationshipVisual(
+    questionData.prompt,
+    questionData.visual?.type,
+    "multiple_choice",
+  );
 
   useEffect(() => {
     if (missingRelationshipVisual && process.env.NODE_ENV !== "production") {

@@ -7,6 +7,7 @@ import { NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS } from "../data/assessments/numberNe
 import { buildYear5NumberNexusWeeklyQuiz } from "../data/quizzes/year5NumberNexus";
 import { YEAR5_PROGRAM } from "../data/programs/year5";
 import { isLessonQuestionSafe } from "../lib/task-safety";
+import { hasRequiredRelationshipVisual } from "../lib/relationship-visual";
 
 const expectedWeekCodes: Record<number, readonly string[]> = {
   1: ["AC9M5N01", "AC9M5N08", "AC9M5N09"],
@@ -47,6 +48,12 @@ for (const week of YEAR5_PROGRAM) {
         const question = generateQuestion(5, lesson, activity);
         assert(isLessonQuestionSafe(activity, question), `${lesson.id} generated an unsafe ${activity.activityType} question.`);
         assert("prompt" in question && question.prompt.trim().length > 0, `${lesson.id} generated a blank prompt.`);
+        if (question.kind === "multiple_choice" || question.kind === "typed_response") {
+          assert(
+            hasRequiredRelationshipVisual(question.prompt, question.visual?.type, question.kind),
+            `${lesson.id} generated a question rejected by the live relationship-visual gate: ${question.prompt}`,
+          );
+        }
         assert((question.prompt.match(/\?/g) ?? []).length <= 1, `${lesson.id} generated more than one question in a prompt: ${question.prompt}`);
         assert(question.prompt.trim().split(/\s+/).length <= 34, `${lesson.id} generated an overly long prompt: ${question.prompt}`);
         if (question.kind === "multiple_choice") {
@@ -80,6 +87,12 @@ for (const lesson of weekFour.lessons) {
   for (const activity of lesson.activities ?? []) {
     for (let sample = 0; sample < 60; sample += 1) {
       const question = generateQuestion(5, lesson, activity);
+      if (question.kind === "multiple_choice" || question.kind === "typed_response") {
+        assert(
+          hasRequiredRelationshipVisual(question.prompt, question.visual?.type, question.kind),
+          `${lesson.id} generated a Week 4 question rejected by the live renderer: ${question.prompt}`,
+        );
+      }
       if (question.kind === "typed_response") {
         assert(
           !/\b(type one|explain why|write a multiples pattern|type your explanation)\b/i.test(question.prompt),
