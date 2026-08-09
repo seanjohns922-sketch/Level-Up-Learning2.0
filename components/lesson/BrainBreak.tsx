@@ -44,7 +44,7 @@ export default function BrainBreak({
   const xpIdRef = useRef(0);
   const [earnedXp, setEarnedXp] = useState(0);
 
-  const isCountGame = villain.game === "whack" || villain.game === "slash" || villain.game === "keepuppy" || villain.game === "popwall" || villain.game === "trickshot";
+  const isCountGame = villain.game === "whack" || villain.game === "slash" || villain.game === "keepuppy" || villain.game === "popwall" || villain.game === "trickshot" || villain.game === "brickbuster" || villain.game === "glowsnake" || villain.game === "gobbleglow" || villain.game === "bumperblast";
 
   const finish = useCallback(() => {
     if (doneRef.current) return;
@@ -146,6 +146,10 @@ export default function BrainBreak({
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.05); }
         }
+        @keyframes bbPulse {
+          0%, 100% { transform: scale(1); opacity: 0.85; }
+          50% { transform: scale(1.35); opacity: 1; }
+        }
       `}</style>
 
       {/* ── INTRO ── */}
@@ -238,6 +242,10 @@ export default function BrainBreak({
           {villain.game === "trace" && <TraceGame villain={villain} onWin={finish} />}
           {villain.game === "popwall" && <PopWallGame villain={villain} onHit={onHit} />}
           {villain.game === "trickshot" && <TrickShotGame villain={villain} onHit={onHit} />}
+          {villain.game === "brickbuster" && <BrickBusterGame villain={villain} onHit={onHit} />}
+          {villain.game === "glowsnake" && <GlowSnakeGame villain={villain} onHit={onHit} />}
+          {villain.game === "gobbleglow" && <GobbleGlowGame villain={villain} onHit={onHit} />}
+          {villain.game === "bumperblast" && <BumperBlastGame villain={villain} onHit={onHit} />}
 
           {/* "+1 XP" reward pops at each hit */}
           {xpFloats.map((f) => (
@@ -306,6 +314,10 @@ function playHint(game: Villain["game"]): string {
     case "keepuppy": return "Tap to keep it up!";
     case "popwall": return "Tap a matching orb to pop the cluster!";
     case "trickshot": return "Flick the ball into the hoop!";
+    case "brickbuster": return "Slide the paddle — smash the wall!";
+    case "glowsnake": return "Steer to the orbs — don't cross your trail!";
+    case "gobbleglow": return "Munch every dot — dodge the villain!";
+    case "bumperblast": return "Tap the flippers — hit the bumpers!";
     case "duel": return "Tap to win the tug-of-war!";
     case "dodge": return "Drag to dodge!";
     case "copyme": return "Watch, then copy!";
@@ -863,6 +875,351 @@ function TrickShotGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { x
       {/* ball */}
       <div className="absolute" style={{ left: `${disp.bx * 100}%`, top: `${disp.by * 100}%`, width: 44, height: 44, transform: "translate(-50%, -50%)", borderRadius: 999, background: "radial-gradient(circle at 35% 30%, #ffd7a0, #f59e0b 60%, #b45309)", boxShadow: "0 0 14px rgba(245,158,11,0.6)" }} />
       <div className="absolute inset-x-0 bottom-6 text-center font-sans font-bold text-white/70" style={{ fontSize: "clamp(0.85rem,2vw,1.1rem)" }}>Flick the ball up — the dots show your aim</div>
+    </div>
+  );
+}
+
+// ── BRICK BUSTER (Breakout — slide the paddle, smash the wall) ──────────────
+const BB_COLS = 7, BB_ROWS = 4, BB_BW = 0.84 / BB_COLS, BB_BH = 0.05, BB_BGAP = 0.014;
+function bbBrickRect(col: number, row: number) {
+  const x0 = 0.08 + col * BB_BW;
+  const y0 = 0.13 + row * (BB_BH + BB_BGAP);
+  return { x0, y0, x1: x0 + BB_BW - 0.012, y1: y0 + BB_BH };
+}
+function BrickBusterGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { xPct: number; yPct: number }) => void }) {
+  const bricks = useRef(Array.from({ length: BB_ROWS * BB_COLS }, (_, i) => ({ col: i % BB_COLS, row: Math.floor(i / BB_COLS), alive: true })));
+  const paddle = useRef(0.5);
+  const ball = useRef({ x: 0.5, y: 0.82, vx: 0.005, vy: -0.0065, live: false });
+  const raf = useRef(0);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [view, setView] = useState({ bx: 0.5, by: 0.82, px: 0.5, alive: Array.from({ length: BB_ROWS * BB_COLS }, () => true) });
+
+  useEffect(() => {
+    const launch = window.setTimeout(() => { ball.current.live = true; }, 750);
+    const R = 0.017;
+    const loop = () => {
+      const b = ball.current;
+      if (b.live) {
+        b.x += b.vx; b.y += b.vy;
+        if (b.x < 0.03) { b.x = 0.03; b.vx = Math.abs(b.vx); }
+        if (b.x > 0.97) { b.x = 0.97; b.vx = -Math.abs(b.vx); }
+        if (b.y < 0.05) { b.y = 0.05; b.vy = Math.abs(b.vy); }
+        if (b.vy > 0 && b.y > 0.85 && b.y < 0.92 && Math.abs(b.x - paddle.current) < 0.14) {
+          b.vy = -Math.abs(b.vy);
+          b.vx += (b.x - paddle.current) * 0.025;
+        }
+        if (b.y > 0.99) { b.x = paddle.current; b.y = 0.82; b.vx = (Math.random() < 0.5 ? -1 : 1) * 0.005; b.vy = -0.0065; }
+        for (const brick of bricks.current) {
+          if (!brick.alive) continue;
+          const r = bbBrickRect(brick.col, brick.row);
+          if (b.x > r.x0 - R && b.x < r.x1 + R && b.y > r.y0 - R && b.y < r.y1 + R) {
+            brick.alive = false;
+            b.vy = -b.vy; b.vx *= 1.02; b.vy *= 1.02;
+            onHit({ xPct: ((r.x0 + r.x1) / 2) * 100, yPct: ((r.y0 + r.y1) / 2) * 100 });
+            break;
+          }
+        }
+      } else {
+        b.x = paddle.current; b.y = 0.82;
+      }
+      setView({ bx: b.x, by: b.y, px: paddle.current, alive: bricks.current.map((br) => br.alive) });
+      raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    return () => { cancelAnimationFrame(raf.current); window.clearTimeout(launch); };
+  }, [onHit]);
+
+  function movePaddle(e: React.PointerEvent) {
+    const el = wrapRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    paddle.current = Math.max(0.12, Math.min(0.88, (e.clientX - r.left) / r.width));
+  }
+  return (
+    <div ref={wrapRef} className="absolute inset-0" style={{ touchAction: "none", cursor: "ew-resize" }} onPointerDown={movePaddle} onPointerMove={(e) => { if (e.buttons > 0 || e.pointerType !== "mouse") movePaddle(e); }}>
+      {view.alive.map((alive, i) => {
+        if (!alive) return null;
+        const r = bbBrickRect(i % BB_COLS, Math.floor(i / BB_COLS));
+        return <div key={i} className="absolute rounded-sm" style={{ left: `${r.x0 * 100}%`, top: `${r.y0 * 100}%`, width: `${(BB_BW - 0.012) * 100}%`, height: `${BB_BH * 100}%`, background: `linear-gradient(${villain.color}, ${villain.color}bb)`, boxShadow: `0 0 8px ${villain.glow}` }} />;
+      })}
+      <div className="absolute" style={{ left: `${view.bx * 100}%`, top: `${view.by * 100}%`, width: 20, height: 20, transform: "translate(-50%,-50%)", borderRadius: 999, background: "radial-gradient(circle at 35% 30%, #fff, #dbe4ee 60%, #9fb0c3)", boxShadow: "0 0 12px #ffffffcc" }} />
+      <div className="absolute" style={{ left: `${view.px * 100}%`, top: "89%", width: "27%", maxWidth: 190, height: 15, transform: "translate(-50%,-50%)", borderRadius: 999, background: `linear-gradient(${villain.color}, ${villain.color}aa)`, boxShadow: `0 0 16px ${villain.glow}` }} />
+      <div className="absolute inset-x-0 bottom-4 text-center font-sans font-bold text-white/70" style={{ fontSize: "clamp(0.85rem,2vw,1.1rem)" }}>Slide to move the paddle</div>
+    </div>
+  );
+}
+
+// ── GLOW SNAKE (Snake — steer a growing trail to eat orbs) ──────────────────
+const SNAKE_N = 13;
+function GlowSnakeGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { xPct: number; yPct: number }) => void }) {
+  const dir = useRef({ x: 1, y: 0 });
+  const nextDir = useRef({ x: 1, y: 0 });
+  const snake = useRef<Array<{ x: number; y: number }>>([{ x: 6, y: 6 }, { x: 5, y: 6 }, { x: 4, y: 6 }]);
+  const orb = useRef({ x: 9, y: 6 });
+  const traps = useRef<Array<{ x: number; y: number }>>([]);
+  const speed = useRef(190);
+  const raf = useRef(0);
+  const ptr = useRef<{ x: number; y: number } | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [view, setView] = useState<{ snake: Array<{ x: number; y: number }>; orb: { x: number; y: number }; traps: Array<{ x: number; y: number }> }>(() => ({ snake: [{ x: 6, y: 6 }, { x: 5, y: 6 }, { x: 4, y: 6 }], orb: { x: 9, y: 6 }, traps: [] }));
+
+  useEffect(() => {
+    const occupied = (x: number, y: number) => snake.current.some((s) => s.x === x && s.y === y) || traps.current.some((t) => t.x === x && t.y === y) || (orb.current.x === x && orb.current.y === y);
+    const freeCell = () => { let x = 0, y = 0, tries = 0; do { x = Math.floor(Math.random() * SNAKE_N); y = Math.floor(Math.random() * SNAKE_N); tries += 1; } while (occupied(x, y) && tries < 80); return { x, y }; };
+    let last = 0, acc = 0;
+    const step = () => {
+      const nd = nextDir.current;
+      if (nd.x !== -dir.current.x || nd.y !== -dir.current.y) dir.current = nd;
+      const head = snake.current[0]!;
+      const nx = (head.x + dir.current.x + SNAKE_N) % SNAKE_N;
+      const ny = (head.y + dir.current.y + SNAKE_N) % SNAKE_N;
+      const trapIdx = traps.current.findIndex((t) => t.x === nx && t.y === ny);
+      const hitsSelf = snake.current.some((s) => s.x === nx && s.y === ny);
+      const ate = orb.current.x === nx && orb.current.y === ny;
+      let body = [{ x: nx, y: ny }, ...snake.current];
+      if (ate) {
+        const el = wrapRef.current;
+        if (el) {
+          const r = el.getBoundingClientRect();
+          const px = r.left + ((nx + 0.5) / SNAKE_N) * r.width;
+          const py = r.top + ((ny + 0.5) / SNAKE_N) * r.height;
+          onHit({ xPct: (px / window.innerWidth) * 100, yPct: (py / window.innerHeight) * 100 });
+        } else { onHit(); }
+        orb.current = freeCell();
+        speed.current = Math.max(110, speed.current - 7);
+      } else {
+        body.pop();
+      }
+      if (trapIdx >= 0) { traps.current = traps.current.filter((_, i) => i !== trapIdx); body = body.slice(0, Math.max(3, body.length - 2)); }
+      if (hitsSelf) body = body.slice(0, 3);
+      snake.current = body;
+      setView({ snake: body, orb: orb.current, traps: traps.current });
+    };
+    const loop = (t: number) => {
+      if (!last) last = t;
+      acc += Math.min(60, t - last); last = t;
+      while (acc >= speed.current) { acc -= speed.current; step(); }
+      raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    const trapTimer = window.setInterval(() => { if (traps.current.length < 4) traps.current = [...traps.current, freeCell()]; }, 3800);
+    return () => { cancelAnimationFrame(raf.current); window.clearInterval(trapTimer); };
+  }, [onHit]);
+
+  function steer(e: React.PointerEvent) {
+    const p = { x: e.clientX, y: e.clientY };
+    if (ptr.current) {
+      const dx = p.x - ptr.current.x, dy = p.y - ptr.current.y;
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+        if (Math.abs(dx) > Math.abs(dy)) nextDir.current = { x: dx > 0 ? 1 : -1, y: 0 };
+        else nextDir.current = { x: 0, y: dy > 0 ? 1 : -1 };
+        ptr.current = p;
+      }
+    } else { ptr.current = p; }
+  }
+  const cell = 100 / SNAKE_N;
+  return (
+    <div className="absolute inset-0 flex items-center justify-center" style={{ touchAction: "none", cursor: "grab" }} onPointerDown={(e) => { ptr.current = { x: e.clientX, y: e.clientY }; }} onPointerMove={steer} onPointerUp={() => { ptr.current = null; }}>
+      <div ref={wrapRef} className="relative" style={{ width: "min(80vw, 380px)", height: "min(80vw, 380px)", background: "rgba(255,255,255,0.03)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.08)" }}>
+        {view.traps.map((t, i) => (<div key={`t${i}`} className="absolute" style={{ left: `${t.x * cell}%`, top: `${t.y * cell}%`, width: `${cell}%`, height: `${cell}%`, padding: 2 }}><div className="h-full w-full rounded" style={{ background: "rgba(239,68,68,0.22)", border: "1px solid rgba(239,68,68,0.6)" }} /></div>))}
+        <div className="absolute" style={{ left: `${view.orb.x * cell}%`, top: `${view.orb.y * cell}%`, width: `${cell}%`, height: `${cell}%`, padding: 3 }}><div className="h-full w-full rounded-full" style={{ background: "#fde047", boxShadow: "0 0 10px #fde047" }} /></div>
+        {view.snake.map((s, i) => (<div key={`s${i}`} className="absolute" style={{ left: `${s.x * cell}%`, top: `${s.y * cell}%`, width: `${cell}%`, height: `${cell}%`, padding: 1.5 }}><div className="h-full w-full rounded" style={{ background: i === 0 ? villain.color : `${villain.color}cc`, boxShadow: i === 0 ? `0 0 10px ${villain.glow}` : "none" }} /></div>))}
+      </div>
+    </div>
+  );
+}
+
+// ── GOBBLE GLOW (Pac-Man — munch the maze, dodge the villain) ───────────────
+const GG_MAZE = [
+  "###########",
+  "#.........#",
+  "#.#.#.#.#.#",
+  "#.........#",
+  "#.#.#.#.#.#",
+  "#.........#",
+  "#.#.#.#.#.#",
+  "#.........#",
+  "#.#.#.#.#.#",
+  "#.........#",
+  "###########",
+];
+const GG_N = 11;
+const GG_START = { x: 1, y: 9 };
+const GG_HOME = { x: 5, y: 5 };
+const GG_POWER = { x: 9, y: 1 };
+function ggWall(x: number, y: number) { return x < 0 || y < 0 || x >= GG_N || y >= GG_N || GG_MAZE[y]![x] === "#"; }
+function ggInitialDots(): string[] {
+  const keys: string[] = [];
+  for (let y = 0; y < GG_N; y += 1) for (let x = 0; x < GG_N; x += 1) if (!ggWall(x, y)) keys.push(`${x},${y}`);
+  return keys.filter((k) => k !== `${GG_START.x},${GG_START.y}` && k !== `${GG_POWER.x},${GG_POWER.y}`);
+}
+function GobbleGlowGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { xPct: number; yPct: number }) => void }) {
+  const player = useRef({ ...GG_START });
+  const pdir = useRef({ x: 0, y: 0 });
+  const pnext = useRef({ x: 0, y: 0 });
+  const ghost = useRef({ ...GG_HOME });
+  const fright = useRef(0);
+  const dots = useRef<Set<string>>(new Set(ggInitialDots()));
+  const power = useRef<{ x: number; y: number } | null>({ ...GG_POWER });
+  const raf = useRef(0);
+  const ptr = useRef<{ x: number; y: number } | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [view, setView] = useState(() => ({ px: GG_START.x, py: GG_START.y, gx: GG_HOME.x, gy: GG_HOME.y, dots: ggInitialDots(), power: true, fright: false }));
+
+  useEffect(() => {
+    let last = 0, pAcc = 0, gAcc = 0;
+    const hitAt = (x: number, y: number) => {
+      const el = wrapRef.current;
+      if (!el) { onHit(); return; }
+      const r = el.getBoundingClientRect();
+      const px = r.left + ((x + 0.5) / GG_N) * r.width;
+      const py = r.top + ((y + 0.5) / GG_N) * r.height;
+      onHit({ xPct: (px / window.innerWidth) * 100, yPct: (py / window.innerHeight) * 100 });
+    };
+    const checkCatch = () => {
+      if (ghost.current.x === player.current.x && ghost.current.y === player.current.y) {
+        if (fright.current > 0) { ghost.current = { ...GG_HOME }; fright.current = Math.max(0, fright.current - 1500); }
+        else { player.current = { ...GG_START }; pdir.current = { x: 0, y: 0 }; pnext.current = { x: 0, y: 0 }; ghost.current = { ...GG_HOME }; }
+      }
+    };
+    const moveGhost = () => {
+      const g = ghost.current;
+      const dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+      const scored = dirs.filter((d) => !ggWall(g.x + d.x, g.y + d.y)).map((d) => ({ d, dist: Math.abs(g.x + d.x - player.current.x) + Math.abs(g.y + d.y - player.current.y) }));
+      if (scored.length === 0) return;
+      scored.sort((a, b) => (fright.current > 0 ? b.dist - a.dist : a.dist - b.dist));
+      const best = scored[0]!.dist;
+      const pool = scored.filter((s) => s.dist === best);
+      const choice = pool[Math.floor(Math.random() * pool.length)]!.d;
+      ghost.current = { x: g.x + choice.x, y: g.y + choice.y };
+    };
+    const stepPlayer = () => {
+      const tx = player.current.x + pnext.current.x, ty = player.current.y + pnext.current.y;
+      if ((pnext.current.x || pnext.current.y) && !ggWall(tx, ty)) pdir.current = { ...pnext.current };
+      const nx = player.current.x + pdir.current.x, ny = player.current.y + pdir.current.y;
+      if (!ggWall(nx, ny)) { player.current = { x: nx, y: ny }; }
+      const key = `${player.current.x},${player.current.y}`;
+      if (dots.current.has(key)) { dots.current.delete(key); hitAt(player.current.x, player.current.y); }
+      if (power.current && power.current.x === player.current.x && power.current.y === player.current.y) { power.current = null; fright.current = 5000; }
+      checkCatch();
+    };
+    const loop = (t: number) => {
+      if (!last) last = t;
+      const dt = Math.min(60, t - last); last = t;
+      if (fright.current > 0) fright.current = Math.max(0, fright.current - dt);
+      pAcc += dt; gAcc += dt;
+      while (pAcc >= 150) { pAcc -= 150; stepPlayer(); }
+      const gStep = fright.current > 0 ? 240 : 170;
+      while (gAcc >= gStep) { gAcc -= gStep; moveGhost(); checkCatch(); }
+      setView({ px: player.current.x, py: player.current.y, gx: ghost.current.x, gy: ghost.current.y, dots: [...dots.current], power: power.current !== null, fright: fright.current > 0 });
+      raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf.current);
+  }, [onHit]);
+
+  function steer(e: React.PointerEvent) {
+    const p = { x: e.clientX, y: e.clientY };
+    if (ptr.current) {
+      const dx = p.x - ptr.current.x, dy = p.y - ptr.current.y;
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+        if (Math.abs(dx) > Math.abs(dy)) pnext.current = { x: dx > 0 ? 1 : -1, y: 0 };
+        else pnext.current = { x: 0, y: dy > 0 ? 1 : -1 };
+        ptr.current = p;
+      }
+    } else { ptr.current = p; }
+  }
+  const cell = 100 / GG_N;
+  return (
+    <div className="absolute inset-0 flex items-center justify-center" style={{ touchAction: "none", cursor: "grab" }} onPointerDown={(e) => { ptr.current = { x: e.clientX, y: e.clientY }; }} onPointerMove={steer} onPointerUp={() => { ptr.current = null; }}>
+      <div ref={wrapRef} className="relative" style={{ width: "min(82vw, 400px)", height: "min(82vw, 400px)" }}>
+        {GG_MAZE.flatMap((row, y) => row.split("").map((ch, x) => ch === "#" ? (
+          <div key={`w${x},${y}`} className="absolute rounded-sm" style={{ left: `${x * cell}%`, top: `${y * cell}%`, width: `${cell}%`, height: `${cell}%`, padding: 1 }}><div className="h-full w-full rounded-sm" style={{ background: "rgba(99,102,241,0.16)", border: "1px solid rgba(129,140,248,0.28)" }} /></div>
+        ) : null))}
+        {view.dots.map((k) => { const [x, y] = k.split(",").map(Number); return (<div key={`d${k}`} className="absolute grid place-items-center" style={{ left: `${x * cell}%`, top: `${y * cell}%`, width: `${cell}%`, height: `${cell}%` }}><span className="rounded-full" style={{ width: 6, height: 6, background: "#fde047", boxShadow: "0 0 5px #fde04799" }} /></div>); })}
+        {view.power ? (<div className="absolute grid place-items-center" style={{ left: `${GG_POWER.x * cell}%`, top: `${GG_POWER.y * cell}%`, width: `${cell}%`, height: `${cell}%` }}><span className="rounded-full" style={{ width: 14, height: 14, background: "#fef08a", boxShadow: "0 0 12px #fde047", animation: "bbPulse 0.8s ease-in-out infinite" }} /></div>) : null}
+        <div className="absolute grid place-items-center" style={{ left: `${view.px * cell}%`, top: `${view.py * cell}%`, width: `${cell}%`, height: `${cell}%` }}><span className="rounded-full" style={{ width: "78%", height: "78%", background: "radial-gradient(circle at 35% 30%, #fff6b0, #facc15 65%, #ca8a04)", boxShadow: "0 0 10px #facc1599" }} /></div>
+        <div className="absolute grid place-items-center transition-transform" style={{ left: `${view.gx * cell}%`, top: `${view.gy * cell}%`, width: `${cell}%`, height: `${cell}%`, fontSize: `${cell * 0.16}vw` }}><span style={{ fontSize: "min(6vw, 26px)", filter: view.fright ? "grayscale(1) brightness(1.6)" : "none", opacity: view.fright ? 0.8 : 1 }}>{villain.face}</span></div>
+      </div>
+    </div>
+  );
+}
+
+// ── BUMPER BLAST (Pinball — flip to keep the ball alive off the bumpers) ────
+const BB_BUMPERS = [
+  { x: 0.3, y: 0.3 },
+  { x: 0.7, y: 0.3 },
+  { x: 0.5, y: 0.46 },
+  { x: 0.28, y: 0.6 },
+  { x: 0.72, y: 0.6 },
+];
+function BumperBlastGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { xPct: number; yPct: number }) => void }) {
+  const ball = useRef({ x: 0.5, y: 0.25, vx: 0.004, vy: 0 });
+  const lit = useRef(BB_BUMPERS.map(() => 0));
+  const flip = useRef({ l: 0, r: 0 });
+  const raf = useRef(0);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [view, setView] = useState({ bx: 0.5, by: 0.25, lit: BB_BUMPERS.map(() => 0), fl: 0, fr: 0 });
+
+  useEffect(() => {
+    const G = 0.00035, R = 0.085, BR = 0.028;
+    let last = 0;
+    const loop = (t: number) => {
+      if (!last) last = t;
+      const dt = Math.min(40, t - last); last = t;
+      const b = ball.current;
+      b.vy += G;
+      b.x += b.vx; b.y += b.vy;
+      if (b.x < 0.05) { b.x = 0.05; b.vx = Math.abs(b.vx); }
+      if (b.x > 0.95) { b.x = 0.95; b.vx = -Math.abs(b.vx); }
+      if (b.y < 0.06) { b.y = 0.06; b.vy = Math.abs(b.vy) * 0.9; }
+      BB_BUMPERS.forEach((bp, i) => {
+        const dx = b.x - bp.x, dy = b.y - bp.y, d = Math.hypot(dx, dy);
+        if (d < R + BR && d > 0.0001) {
+          const nx = dx / d, ny = dy / d;
+          const speed = Math.hypot(b.vx, b.vy);
+          b.vx = nx * (speed + 0.004); b.vy = ny * (speed + 0.004);
+          b.x = bp.x + nx * (R + BR); b.y = bp.y + ny * (R + BR);
+          lit.current[i] = 280;
+          onHit({ xPct: bp.x * 100, yPct: bp.y * 100 });
+        }
+        if (lit.current[i]! > 0) lit.current[i] = Math.max(0, lit.current[i]! - dt);
+      });
+      if (flip.current.l > 0) flip.current.l = Math.max(0, flip.current.l - dt);
+      if (flip.current.r > 0) flip.current.r = Math.max(0, flip.current.r - dt);
+      if (b.y > 0.9) {
+        const leftSide = b.x < 0.5;
+        const active = leftSide ? flip.current.l > 0 : flip.current.r > 0;
+        b.y = 0.9;
+        b.vy = -Math.abs(b.vy) - (active ? 0.009 : 0.0045);
+        b.vx += (0.5 - b.x) * (active ? 0.02 : 0.006) + (leftSide ? 0.0015 : -0.0015);
+      }
+      const sp = Math.hypot(b.vx, b.vy);
+      if (sp > 0.02) { b.vx *= 0.02 / sp; b.vy *= 0.02 / sp; }
+      setView({ bx: b.x, by: b.y, lit: [...lit.current], fl: flip.current.l, fr: flip.current.r });
+      raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf.current);
+  }, [onHit]);
+
+  function tapSide(e: React.PointerEvent) {
+    const el = wrapRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if ((e.clientX - r.left) / r.width < 0.5) flip.current.l = 170; else flip.current.r = 170;
+  }
+  return (
+    <div ref={wrapRef} className="absolute inset-0" style={{ touchAction: "none", cursor: "pointer" }} onPointerDown={tapSide}>
+      {BB_BUMPERS.map((bp, i) => (
+        <div key={i} className="absolute grid place-items-center rounded-full" style={{ left: `${bp.x * 100}%`, top: `${bp.y * 100}%`, width: 92, height: 92, transform: "translate(-50%,-50%)", background: `radial-gradient(circle, ${villain.color}${view.lit[i]! > 0 ? "" : "44"} 0%, transparent 70%)`, border: `3px solid ${villain.color}`, boxShadow: view.lit[i]! > 0 ? `0 0 28px ${villain.glow}` : `0 0 10px ${villain.glow}` }}>
+          <span style={{ fontSize: "1.7rem" }}>{villain.targetEmoji}</span>
+        </div>
+      ))}
+      <div className="absolute" style={{ left: `${view.bx * 100}%`, top: `${view.by * 100}%`, width: 26, height: 26, transform: "translate(-50%,-50%)", borderRadius: 999, background: "radial-gradient(circle at 35% 30%, #fff, #cbd5e1 60%, #94a3b8)", boxShadow: "0 0 14px #ffffffe6" }} />
+      <div className="absolute" style={{ left: "34%", bottom: "8%", width: 72, height: 14, transformOrigin: "left center", transform: `translate(-50%,0) rotate(${view.fl > 0 ? -30 : 10}deg)`, borderRadius: 999, background: villain.color, boxShadow: `0 0 12px ${villain.glow}` }} />
+      <div className="absolute" style={{ right: "34%", bottom: "8%", width: 72, height: 14, transformOrigin: "right center", transform: `translate(50%,0) rotate(${view.fr > 0 ? 30 : -10}deg)`, borderRadius: 999, background: villain.color, boxShadow: `0 0 12px ${villain.glow}` }} />
+      <div className="absolute inset-x-0 bottom-1.5 text-center font-sans font-bold text-white/70" style={{ fontSize: "clamp(0.8rem,1.8vw,1rem)" }}>Tap left / right to flip</div>
     </div>
   );
 }

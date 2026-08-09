@@ -60,6 +60,10 @@ const BRAIN_BREAK_GAME_LABELS: Record<BrainBreakGame, string> = {
   trace: "Trace",
   popwall: "Pop Wall",
   trickshot: "Trick Shot",
+  brickbuster: "Brick Buster",
+  glowsnake: "Glow Snake",
+  gobbleglow: "Gobble Glow",
+  bumperblast: "Bumper Blast",
 };
 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {

@@ -21,7 +21,12 @@ export type BrainBreakGame =
   | "trace" // trace a glowing path
   // Arcade P1 — lightweight new cartridges:
   | "popwall" // aim + launch to pop matching clusters (bubble shooter)
-  | "trickshot"; // flick a ball into a moving hoop
+  | "trickshot" // flick a ball into a moving hoop
+  // Arcade P2 — senior physics flagships:
+  | "brickbuster" // paddle + ball smash the brick wall (Breakout)
+  | "glowsnake" // steer a growing trail to eat orbs (Snake)
+  | "gobbleglow" // clear a maze while the villain chases (Pac-Man)
+  | "bumperblast"; // flippers keep the ball alive off the bumpers (Pinball)
 export type VillainBand = "junior" | "senior";
 
 export type Villain = {
@@ -153,7 +158,7 @@ export const VILLAINS: Villain[] = [
     name: "Doom Scroller",
     face: "📱",
     band: "senior",
-    game: "dodge",
+    game: "glowsnake",
     targetEmoji: "📲",
     taunt: "Keep scrolling… one more… one more… one more…",
     victory: "Screen down. Focus up. The scroll is broken!",
@@ -168,7 +173,7 @@ export const VILLAINS: Villain[] = [
     name: "Overthink Owl",
     face: "🦉",
     band: "senior",
-    game: "copyme",
+    game: "gobbleglow",
     targetEmoji: "💭",
     taunt: "But what if… but what if… but WHAT IF…?",
     victory: "Spiral broken! One clear thought at a time.",
@@ -183,7 +188,7 @@ export const VILLAINS: Villain[] = [
     name: "Hype Beast",
     face: "🔔",
     band: "senior",
-    game: "whack",
+    game: "bumperblast",
     targetEmoji: "🔔",
     taunt: "Ping! Ping! You're missing out! Check it NOW!",
     victory: "Notifications silenced — you're not missing a thing.",
@@ -198,7 +203,7 @@ export const VILLAINS: Villain[] = [
     name: "Perfecto",
     face: "💎",
     band: "senior",
-    game: "trace",
+    game: "brickbuster",
     targetEmoji: "⭐",
     taunt: "It must be PERFECT… or don't even try…",
     victory: "Done beats perfect! You kept going anyway.",
@@ -250,6 +255,11 @@ export const GAMES: GameDef[] = [
   { id: "duel", band: "both", durationSec: 46, win: { junior: 100, senior: 100 } },
   { id: "popwall", band: "both", durationSec: 50, win: { junior: 10, senior: 16 } },
   { id: "trickshot", band: "both", durationSec: 50, win: { junior: 5, senior: 8 } },
+  // Senior physics flagships (Level 3+ only).
+  { id: "brickbuster", band: "senior", durationSec: 54, win: { junior: 12, senior: 16 } },
+  { id: "glowsnake", band: "senior", durationSec: 56, win: { junior: 6, senior: 8 } },
+  { id: "gobbleglow", band: "senior", durationSec: 54, win: { junior: 10, senior: 14 } },
+  { id: "bumperblast", band: "senior", durationSec: 52, win: { junior: 10, senior: 14 } },
 ];
 
 /** Games a student of this level may see: their own band plus "both". */
