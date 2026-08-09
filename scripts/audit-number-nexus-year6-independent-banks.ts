@@ -102,6 +102,8 @@ const cardSource = fs.readFileSync(path.join(process.cwd(), "components/assessme
 const visualSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/NumberNexusYear6AssessmentVisual.tsx"), "utf8");
 const shellSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/AssessmentShell.tsx"), "utf8");
 const apiSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/api.ts"), "utf8");
+const pretestPageSource = fs.readFileSync(path.join(process.cwd(), "app/pretest/page.tsx"), "utf8");
+const posttestPageSource = fs.readFileSync(path.join(process.cwd(), "app/posttest/page.tsx"), "utf8");
 check(!/data\/activities|data\/quizzes/.test(bankSource), "Banks import lesson or weekly-quiz content.");
 check(!/\breported\s*:|Recorded answer|Recorded decimal/.test(bankSource), "Assessment visuals expose an answer banner.");
 check(!/\b(hint|helper|solution|worked step)\b/i.test(bankSource), "Assessment banks contain prohibited instructional scaffolding.");
@@ -111,6 +113,8 @@ check(visualSource.includes("OptionReadAloudButton") && visualSource.includes("R
 check(!visualSource.includes("Object.entries(visual)"), "Level 6 read-aloud infers text from hidden visual data and may expose an answer.");
 check(visualSource.includes("A point is marked on the line."), "Level 6 number-line read-aloud does not use an answer-neutral description.");
 check(shellSource.includes('year === "Year 6"') && shellSource.includes("max-w-6xl"), "Level 6 does not use the modern wide assessment shell.");
+check(pretestPageSource.includes("candidateReviewRequested = progressRealmId === \"number\" && year === \"Year 6\"") && pretestPageSource.includes("isDemoPreviewMode()"), "Level 6 candidate Pre-Test is not available throughout demo review mode.");
+check(posttestPageSource.includes("candidateReviewRequested = progressRealmId === \"number\" && year === \"Year 6\"") && posttestPageSource.includes("isDemoPreviewMode()"), "Level 6 candidate Post-Test is not available throughout demo review mode.");
 check(!apiSource.includes("YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS"), "Release candidate was routed to production before educator approval.");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "The 85% assessment threshold changed.");
 

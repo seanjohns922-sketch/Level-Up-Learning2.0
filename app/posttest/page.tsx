@@ -341,10 +341,7 @@ function PostTestPage() {
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
-  const candidateReviewRequested =
-    params.get("review_bank") === "year6-number-v1" &&
-    progressRealmId === "number" &&
-    year === "Year 6";
+  const candidateReviewRequested = progressRealmId === "number" && year === "Year 6";
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {

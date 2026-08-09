@@ -370,10 +370,7 @@ function PretestPage() {
   const progressRealmId = realmId === "measurement" ? "measurement" : "number";
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
-  const candidateReviewRequested =
-    searchParams.get("review_bank") === "year6-number-v1" &&
-    progressRealmId === "number" &&
-    year === "Year 6";
+  const candidateReviewRequested = progressRealmId === "number" && year === "Year 6";
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {
