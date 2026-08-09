@@ -180,17 +180,17 @@ const year4Rows: ProgramRow[] = [
     activity("number_line_place", "order_fractions", { denominators: [2, 3, 4, 5, 8, 10] }),
   ]),
 
-  row(11, 1, "Number Algorithms", "Addition Algorithms", "Follow addition algorithms to generate sets", "Run precise addition steps and describe the emerging pattern.", ["AC9M4N09"], [
+  row(11, 1, "Number Algorithms", "Addition Algorithms", "Use the starting number as output 1, then follow repeated addition steps", "Generate four outputs and describe how they change.", ["AC9M4N09"], [
     activity("skip_count", "algorithm_follow", { operation: "addition" }),
     activity("skip_count", "algorithm_follow", { operation: "addition" }),
     activity("skip_count", "algorithm_follow", { operation: "addition" }),
   ]),
-  row(11, 2, "Number Algorithms", "Multiplication Algorithms", "Follow multiplication algorithms to generate sets", "Run precise multiplication steps and describe the emerging pattern.", ["AC9M4N09"], [
+  row(11, 2, "Number Algorithms", "Multiplication Algorithms", "Use the starting number as output 1, then follow repeated multiplication steps", "Generate four outputs and describe how they change.", ["AC9M4N09"], [
     activity("skip_count", "algorithm_follow", { operation: "multiplication" }),
     activity("skip_count", "algorithm_follow", { operation: "multiplication" }),
     activity("skip_count", "algorithm_follow", { operation: "multiplication" }),
   ]),
-  row(11, 3, "Number Algorithms", "Algorithm Builder", "Create and test addition or multiplication algorithms", "Write an algorithm, test its outputs and state the pattern.", ["AC9M4N09"], [
+  row(11, 3, "Number Algorithms", "Algorithm Builder", "Arrange instructions that generate four outputs", "Build a rule, test its four outputs and describe the pattern.", ["AC9M4N09"], [
     activity("skip_count", "algorithm_create", { operation: "addition" }),
     activity("skip_count", "algorithm_create", { operation: "multiplication" }),
     activity("skip_count", "algorithm_create", { operation: "mixed" }),

@@ -4729,14 +4729,14 @@ function buildYear3AlgorithmQuestion(lesson: Lesson): SkipCountQuestion {
     const answer = pattern[pattern.length - 1] ?? start;
     return {
       kind: "skip_count",
-      prompt: "Follow the algorithm exactly. What is the fourth recorded number?",
+      prompt: "Count the starting number as output 1. What is output 4?",
       sequence: pattern.slice(0, 3),
       answer,
       options: uniqueNumberOptions(answer, step * 3).map(Number),
       step,
       mode: "algorithm_follow",
       algorithmStart: start,
-      algorithmSteps: ["Record the current number.", `Add ${step}.`, "Repeat from step 1 until 4 numbers are recorded."],
+      algorithmSteps: ["Record the starting number as output 1.", `Add ${step} to make the next output.`, "Repeat step 2 until you have 4 outputs."],
       algorithmPattern: pattern,
       patternDescription: `The outputs increase by ${step} each time.`,
       patternOptions: shuffle([
@@ -4759,7 +4759,7 @@ function buildYear3AlgorithmQuestion(lesson: Lesson): SkipCountQuestion {
             : randInt(1, 15) * 10 + [1, 3, 7, 9][randInt(0, 3)]!;
     return {
       kind: "skip_count",
-      prompt: `Send ${value} through the decision algorithm. Which output code is produced?`,
+      prompt: `Use the rules in order. What code does ${value} output?`,
       sequence: [value],
       answer: category,
       options: [0, 2, 5, 10],
@@ -4767,9 +4767,10 @@ function buildYear3AlgorithmQuestion(lesson: Lesson): SkipCountQuestion {
       mode: "algorithm_decision",
       algorithmStart: value,
       algorithmSteps: [
-        "If the number ends in 0, output 10.",
-        "Otherwise, if it is even, output 2.",
-        "Otherwise, if it ends in 5, output 5. If none apply, output 0.",
+        "If the number ends in 0, output 10 and stop.",
+        "If it is even, output 2 and stop.",
+        "If it ends in 5, output 5 and stop.",
+        "Otherwise, output 0.",
       ],
       algorithmPattern: [category],
       patternDescription: "The outputs sort numbers by whether they are multiples of 10, 2 or 5.",
@@ -4783,9 +4784,9 @@ function buildYear3AlgorithmQuestion(lesson: Lesson): SkipCountQuestion {
 
   const step = [3, 4, 5][randInt(0, 2)] ?? 3;
   const expectedInstructions = [
-    `Start at ${step}.`,
-    "Record the current number.",
-    `Add ${step}, then repeat from step 2.`,
+    `Record ${step} as output 1.`,
+    `Add ${step} to make the next output.`,
+    "Repeat step 2 until you have 4 outputs.",
   ];
   return {
     kind: "skip_count",
@@ -4801,8 +4802,8 @@ function buildYear3AlgorithmQuestion(lesson: Lesson): SkipCountQuestion {
     expectedInstructions,
     instructionOptions: shuffle([
       ...expectedInstructions,
-      `Subtract ${step}, then repeat from step 2.`,
-      "Record only the first number.",
+      `Subtract ${step} to make the next output.`,
+      "Stop after output 1.",
     ]),
     patternDescription: `The outputs are the multiples of ${step}.`,
   };
@@ -4830,15 +4831,15 @@ function buildYear4AlgorithmQuestion(
     const start = randInt(1, 5);
     const pattern = [start, start * factor, start * factor ** 2, start * factor ** 3];
     const expectedInstructions = [
-      `Start at ${start}.`,
-      "Record the current number.",
-      `Multiply by ${factor}, then repeat from step 2.`,
+      "Record the starting number as output 1.",
+      `Multiply by ${factor} to make the next output.`,
+      "Repeat step 2 until you have 4 outputs.",
     ];
     return {
       kind: "skip_count",
       prompt: createMode
         ? `Build an algorithm that starts at ${start} and multiplies each output by ${factor}.`
-        : "Follow the algorithm. What is the fourth output?",
+        : "Count the starting number as output 1. What is output 4?",
       sequence: createMode ? pattern : pattern.slice(0, 3),
       answer: pattern[3]!,
       options: createMode ? [] : uniqueNumberOptions(pattern[3]!, factor * 4).map(Number),
@@ -4849,7 +4850,7 @@ function buildYear4AlgorithmQuestion(
       algorithmPattern: pattern,
       expectedInstructions: createMode ? expectedInstructions : undefined,
       instructionOptions: createMode
-        ? shuffle([...expectedInstructions, `Add ${factor}, then repeat from step 2.`, "Stop after the first output."])
+        ? shuffle([...expectedInstructions, `Add ${factor} to make the next output.`, "Stop after output 1."])
         : undefined,
       patternDescription: `Each output is ${factor} times the previous output.`,
       patternOptions: shuffle([
@@ -4864,15 +4865,15 @@ function buildYear4AlgorithmQuestion(
   const start = randInt(1, 20);
   const pattern = [start, start + addend, start + addend * 2, start + addend * 3];
   const expectedInstructions = [
-    `Start at ${start}.`,
-    "Record the current number.",
-    `Add ${addend}, then repeat from step 2.`,
+    "Record the starting number as output 1.",
+    `Add ${addend} to make the next output.`,
+    "Repeat step 2 until you have 4 outputs.",
   ];
   return {
     kind: "skip_count",
     prompt: createMode
       ? `Build an algorithm that starts at ${start} and adds ${addend} each time.`
-      : "Follow the algorithm. What is the fourth output?",
+      : "Count the starting number as output 1. What is output 4?",
     sequence: createMode ? pattern : pattern.slice(0, 3),
     answer: pattern[3]!,
     options: createMode ? [] : uniqueNumberOptions(pattern[3]!, addend * 3).map(Number),
@@ -4883,7 +4884,7 @@ function buildYear4AlgorithmQuestion(
     algorithmPattern: pattern,
     expectedInstructions: createMode ? expectedInstructions : undefined,
     instructionOptions: createMode
-      ? shuffle([...expectedInstructions, `Subtract ${addend}, then repeat from step 2.`, "Stop after the first output."])
+      ? shuffle([...expectedInstructions, `Subtract ${addend} to make the next output.`, "Stop after output 1."])
       : undefined,
     patternDescription: `Each output is ${addend} more than the previous output.`,
     patternOptions: shuffle([
@@ -5948,6 +5949,8 @@ function roundingWordProblem(
     targetUnit >= 1000
       ? `${fmt(targetUnit)}`
       : targetUnit.toString();
+  const lowerAlternative = rounded >= targetUnit ? rounded - targetUnit : rounded + targetUnit;
+  const upperAlternative = rounded + targetUnit;
 
   // Style pools by context
   const style1Templates = [
@@ -5971,31 +5974,31 @@ function roundingWordProblem(
 
   const style2Templates = [
     {
-      prompt: `A school fundraiser raised $${fmt(value)}. The teacher says, "That's about $${fmt(rounded - targetUnit)}." Do you agree? What should it be rounded to the nearest ${unitLabel}?`,
-      helper: `Think carefully — is $${fmt(rounded - targetUnit)} the best estimate?`,
+      prompt: `A fundraiser raised $${fmt(value)}. A report says about $${fmt(lowerAlternative)}. What is $${fmt(value)} rounded to the nearest ${unitLabel}?`,
+      helper: `Round $${fmt(value)} to the nearest ${unitLabel}.`,
     },
     {
-      prompt: `${fmt(value)} students signed up for sports day. The principal says, "That's roughly ${fmt(rounded + targetUnit)}." Is that right? Round to the nearest ${unitLabel}.`,
-      helper: `Check — is ${fmt(rounded + targetUnit)} the closest multiple of ${unitLabel}?`,
+      prompt: `Sports day has ${fmt(value)} students. A report says about ${fmt(upperAlternative)}. What is ${fmt(value)} rounded to the nearest ${unitLabel}?`,
+      helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
     },
     {
-      prompt: `A baker made ${fmt(value)} cupcakes. She told her boss, "I made about ${fmt(rounded - targetUnit)}." Is she correct? Round to the nearest ${unitLabel}.`,
-      helper: `Is ${fmt(rounded - targetUnit)} the nearest multiple of ${unitLabel}?`,
+      prompt: `A baker made ${fmt(value)} cupcakes. A report says about ${fmt(lowerAlternative)}. What is ${fmt(value)} rounded to the nearest ${unitLabel}?`,
+      helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
     },
   ];
 
   const style3Templates = [
     {
-      prompt: `You're buying tickets for a school event. ${fmt(value)} tickets have been sold. The organiser says: "We've sold about ${fmt(rounded - targetUnit)} tickets." Is that a good estimate? Round to the nearest ${unitLabel}.`,
-      helper: `Think about whether ${fmt(rounded - targetUnit)} or ${fmt(rounded)} is closer.`,
+      prompt: `An event sold ${fmt(value)} tickets. A report says about ${fmt(lowerAlternative)}. What is ${fmt(value)} rounded to the nearest ${unitLabel}?`,
+      helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
     },
     {
-      prompt: `A charity walk had ${fmt(value)} participants. The news report says "about ${fmt(rounded + targetUnit)} people joined." Is that the best estimate? Round to the nearest ${unitLabel}.`,
-      helper: `Is ${fmt(rounded + targetUnit)} really the closest?`,
+      prompt: `A charity walk had ${fmt(value)} participants. A report says about ${fmt(upperAlternative)}. What is ${fmt(value)} rounded to the nearest ${unitLabel}?`,
+      helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
     },
     {
-      prompt: `The school tuckshop sold ${fmt(value)} sausage rolls this term. The report says "approximately ${fmt(rounded - targetUnit)}." Is that right? What should it say, rounded to the nearest ${unitLabel}?`,
-      helper: `Check which multiple of ${unitLabel} is closest to ${fmt(value)}.`,
+      prompt: `A tuckshop sold ${fmt(value)} items. A report says about ${fmt(lowerAlternative)}. What is ${fmt(value)} rounded to the nearest ${unitLabel}?`,
+      helper: `Round ${fmt(value)} to the nearest ${unitLabel}.`,
     },
   ];
 
@@ -8384,7 +8387,7 @@ function generateInteractiveQuestion(
         mode === "grouping"
           ? `${total} objects are put into groups of ${groupSize}. How many groups are there?`
           : mode === "inverse_link"
-          ? `${total} divided into groups of ${groupSize} gives how many groups? Which multiplication fact checks it?`
+          ? `How many groups of ${groupSize} can be made from ${total} objects?`
           : `${total} objects are shared equally into ${groups} groups. How many are in each group?`,
       total,
       groups,

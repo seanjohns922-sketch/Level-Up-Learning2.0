@@ -44,10 +44,18 @@ for (const week of YEAR4_PROGRAM) {
         const question = generateQuestion(4, lesson, activity);
         assert(isLessonQuestionSafe(activity, question), `${lesson.id} generated an unsafe ${activity.activityType} question.`);
         assert("prompt" in question && question.prompt.trim().length > 0, `${lesson.id} generated a blank prompt.`);
+        assert((question.prompt.match(/\?/g) ?? []).length <= 1, `${lesson.id} generated more than one question in a prompt.`);
+        assert(question.prompt.trim().split(/\s+/).length <= 32, `${lesson.id} generated an overly long prompt.`);
+        assert(!/about -/.test(question.prompt), `${lesson.id} generated a negative estimate.`);
         if ("mode" in question && typeof question.mode === "string") generatedModes.add(question.mode);
         if (week.week === 11 && question.kind === "skip_count") {
           assert(question.algorithmSteps?.length === 3, `${lesson.id} did not generate a complete algorithm.`);
           assert(question.algorithmPattern?.length === 4, `${lesson.id} did not generate four outputs.`);
+          assert(question.algorithmSteps.every((step) => !/current number|repeat from step/i.test(step)), `${lesson.id} generated ambiguous algorithm wording.`);
+          assert(question.algorithmSteps[0]?.toLowerCase().includes("output 1"), `${lesson.id} does not define output 1.`);
+          if (question.mode === "algorithm_follow") {
+            assert(question.prompt.includes("starting number as output 1"), `${lesson.id} does not explain how the starting number is counted.`);
+          }
         }
         generated += 1;
       }
@@ -74,6 +82,15 @@ for (let week = 1; week <= 12; week += 1) {
     assert.equal(items.length, 5, `Week ${week} Lesson ${lessonTag} did not contribute 5 questions.`);
     for (const item of items) {
       assert(item.descriptorCodes.every((code) => lesson.curriculum.some((lessonCode) => lessonCode === code)), `${item.id} is not aligned with ${lesson.id}.`);
+      if (week === 11 && lessonTag <= 2) {
+        assert(item.prompt.includes("Output 1 is"), `${item.id} does not define the starting output.`);
+      }
+      if (week === 11 && lessonTag === 3) {
+        assert(item.options?.every((option) => option.includes("output 1")), `${item.id} contains an unclear algorithm rule.`);
+      }
+      if (week === 12 && lessonTag === 3) {
+        assert(item.prompt.includes("Output 1 is"), `${item.id} does not define the starting output.`);
+      }
     }
   }
 
@@ -115,4 +132,5 @@ console.log("Level 4 Number Nexus full-year audit passed.");
 console.log("Curriculum: 12/12 weeks and 36/36 lessons aligned to AC9M4N01-AC9M4N09; Algebra owned by Pattern Peaks.");
 console.log(`Lesson experience: ${generated}/${generated} generated questions valid.`);
 console.log(`Weekly quizzes: 12/12 routes and ${quizItems}/180 questions valid; exact 5-5-5; 80% pass threshold; no Week 13.`);
+console.log("Week 11 clarity: 3/3 lessons and 15/15 quiz items define output 1 explicitly.");
 console.log("Assessment blueprint: curriculum-ready; independent Pre/Post validation runs in the dedicated bank audit.");

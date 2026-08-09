@@ -46,6 +46,9 @@ for (const week of YEAR3_PROGRAM) {
         const question = generateQuestion(3, lesson, activity);
         assert(isLessonQuestionSafe(activity, question), `${lesson.id} generated an unsafe ${activity.activityType} question.`);
         assert("prompt" in question && question.prompt.trim().length > 0, `${lesson.id} generated a blank prompt.`);
+        assert((question.prompt.match(/\?/g) ?? []).length <= 1, `${lesson.id} generated more than one question in a prompt.`);
+        assert(question.prompt.trim().split(/\s+/).length <= 32, `${lesson.id} generated an overly long prompt.`);
+        assert(!/about -/.test(question.prompt), `${lesson.id} generated a negative estimate.`);
         if ("mode" in question && typeof question.mode === "string") generatedModes.add(question.mode);
         if (week.week === 1 && "target" in question && typeof question.target === "number") {
           assert(question.target > 10_000, `${lesson.id} generated ${question.target}, which is not beyond 10 000.`);
@@ -57,6 +60,20 @@ for (const week of YEAR3_PROGRAM) {
         if (week.week === 9 && question.kind === "mixed_word_problem") {
           assert(question.visual, `${lesson.id} generated a money task without a visual.`);
           assert.equal(question.showStrategyClue, false, `${lesson.id} reveals a strategy clue.`);
+        }
+        if (week.week === 10 && question.kind === "skip_count") {
+          const algorithmSteps = question.algorithmSteps ?? [];
+          if (question.mode === "algorithm_follow") {
+            assert(question.prompt.includes("starting number as output 1"), `${lesson.id} does not explain how the starting number is counted.`);
+          }
+          if (question.mode === "algorithm_follow" || question.mode === "algorithm_create") {
+            assert(algorithmSteps[0]?.toLowerCase().includes("output 1"), `${lesson.id} does not define output 1.`);
+            assert(algorithmSteps.every((step) => !/current number|repeat from step/i.test(step)), `${lesson.id} generated ambiguous algorithm wording.`);
+          }
+          if (question.mode === "algorithm_decision") {
+            assert(algorithmSteps.length === 4, `${lesson.id} does not show each decision as a separate step.`);
+            assert(algorithmSteps.slice(0, 3).every((step) => step.endsWith("and stop.")), `${lesson.id} does not make decision priority clear.`);
+          }
         }
         if ((week.week === 11 || week.week === 12) && "denominator" in question && typeof question.denominator === "number") {
           fractionDenominators.add(question.denominator);

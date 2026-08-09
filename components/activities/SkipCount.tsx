@@ -171,7 +171,9 @@ export default function SkipCount({
         </div>
 
         <div className="mt-5 rounded-lg border border-indigo-100 bg-indigo-50 p-4">
-          <div className="text-sm font-black text-indigo-950">Start: {questionData.algorithmStart}</div>
+          <div className="text-sm font-black text-indigo-950">
+            {isDecision ? "Input number" : "Starting number"}: {questionData.algorithmStart}
+          </div>
           <div className="mt-3 grid gap-2">
             {questionData.algorithmSteps?.map((step, index) => (
               <div key={`${step}-${index}`} className="flex min-h-14 items-center gap-3 rounded-lg border border-indigo-100 bg-white px-3 py-2">

@@ -177,14 +177,14 @@ function buildLesson(week: number, lesson: Lesson): Draft[] {
       const start = 2 + index;
       if (lesson === 1) {
         const step = 5 + index;
-        return typed(id, lesson, `Start at ${start}. Add ${step} three times. What is the fourth output?`, start + step * 3);
+        return typed(id, lesson, `Output 1 is ${start}. Add ${step} to make each next output. Enter output 4.`, start + step * 3);
       }
       if (lesson === 2) {
         const factor = index % 2 === 0 ? 2 : 3;
-        return typed(id, lesson, `Start at ${start}. Multiply by ${factor} three times. What is the fourth output?`, start * factor ** 3);
+        return typed(id, lesson, `Output 1 is ${start}. Multiply by ${factor} to make each next output. Enter output 4.`, start * factor ** 3);
       }
       const step = 4 + index;
-      return choice(id, lesson, `Which instruction generates ${start}, ${start + step}, ${start + step * 2}, ${start + step * 3}?`, `Start at ${start}; add ${step} each time.`, [`Start at ${step}; add ${start} each time.`, `Start at ${start}; multiply by ${step}.`, `Start at ${start}; subtract ${step}.`]);
+      return choice(id, lesson, `Which rule generates these outputs: ${start}, ${start + step}, ${start + step * 2}, ${start + step * 3}?`, `Record ${start} as output 1; add ${step} each time.`, [`Record ${step} as output 1; add ${start} each time.`, `Record ${start} as output 1; multiply by ${step}.`, `Record ${start} as output 1; subtract ${step}.`]);
     }
 
     if (lesson === 1) {
@@ -199,7 +199,7 @@ function buildLesson(week: number, lesson: Lesson): Draft[] {
     }
     const start = 3 + index;
     const factor = index % 2 === 0 ? 10 : 2;
-    return typed(id, lesson, `Start at ${start}. Multiply by ${factor} twice. What is the third output?`, start * factor ** 2);
+    return typed(id, lesson, `Output 1 is ${start}. Multiply by ${factor} to make each next output. Enter output 3.`, start * factor ** 2);
   });
 }
 
