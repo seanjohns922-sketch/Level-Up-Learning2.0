@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Shield, Sparkles, Lightbulb } from "lucide-react";
 import type { Villain } from "@/lib/brain-break";
+import { awardBrainBreakXp, BRAIN_BREAK_XP_CAP } from "@/lib/brain-break-xp";
+
+/** Every completed break rewards at least this much (participation), capped above. */
+const BRAIN_BREAK_XP_FLOOR = 5;
 
 /**
  * Full-screen mid-lesson brain break. A villain swoops in, the student plays a
@@ -25,30 +29,47 @@ type Phase = "intro" | "play" | "victory";
 export default function BrainBreak({
   villain,
   onComplete,
+  sourceKey,
 }: {
   villain: Villain;
   onComplete: () => void;
+  /** Stable per-lesson-break key so the capped XP reward is idempotent (no farming). */
+  sourceKey?: string;
 }) {
   const [phase, setPhase] = useState<Phase>("intro");
   const [score, setScore] = useState(0);
   const scoreRef = useRef(0);
   const doneRef = useRef(false);
+  // "+1 XP" reward pops at each hit — motivational, separate from the graded score.
+  const [xpFloats, setXpFloats] = useState<{ id: number; xPct: number; yPct: number }[]>([]);
+  const xpIdRef = useRef(0);
+  const [earnedXp, setEarnedXp] = useState(0);
 
   const isCountGame = villain.game === "whack" || villain.game === "slash" || villain.game === "keepuppy";
 
   const finish = useCallback(() => {
     if (doneRef.current) return;
     doneRef.current = true;
+    // Capped, farm-safe reward: your hits this break, floored so every break pays
+    // out and capped so it can't be farmed. Credited to the Explorer wallet only.
+    const earned = Math.min(BRAIN_BREAK_XP_CAP, Math.max(BRAIN_BREAK_XP_FLOOR, scoreRef.current));
+    setEarnedXp(earned);
+    if (sourceKey) void awardBrainBreakXp({ xp: earned, sourceKey });
     setPhase("victory");
     try {
-      window.dispatchEvent(new CustomEvent("lul:villain-defeated", { detail: { id: villain.id } }));
+      window.dispatchEvent(new CustomEvent("lul:villain-defeated", { detail: { id: villain.id, xp: earned } }));
     } catch {}
     window.setTimeout(onComplete, 2600);
-  }, [onComplete, villain.id]);
+  }, [onComplete, villain.id, sourceKey]);
 
-  const onHit = useCallback(() => {
+  const onHit = useCallback((pos?: { xPct: number; yPct: number }) => {
     scoreRef.current += 1;
     setScore(scoreRef.current);
+    xpIdRef.current += 1;
+    const id = xpIdRef.current;
+    const p = pos ?? { xPct: 50, yPct: 32 };
+    setXpFloats((f) => [...f, { id, xPct: p.xPct, yPct: p.yPct }]);
+    window.setTimeout(() => setXpFloats((f) => f.filter((x) => x.id !== id)), 850);
     if (scoreRef.current >= villain.winCount) finish();
   }, [finish, villain.winCount]);
 
@@ -93,6 +114,11 @@ export default function BrainBreak({
         @keyframes bbTextIn {
           0% { opacity: 0; transform: translate(-50%, 0) translateY(14px); }
           100% { opacity: 1; transform: translate(-50%, 0) translateY(0); }
+        }
+        @keyframes bbXpFloat {
+          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+          25% { opacity: 1; transform: translate(-50%, -90%) scale(1.15); }
+          100% { opacity: 0; transform: translate(-50%, -220%) scale(1); }
         }
         @keyframes bbWhackIn {
           0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
@@ -212,6 +238,17 @@ export default function BrainBreak({
           {villain.game === "dodge" && <DodgeGame villain={villain} onWin={finish} />}
           {villain.game === "copyme" && <CopyMeGame villain={villain} onWin={finish} />}
           {villain.game === "trace" && <TraceGame villain={villain} onWin={finish} />}
+
+          {/* "+1 XP" reward pops at each hit */}
+          {xpFloats.map((f) => (
+            <div
+              key={f.id}
+              className="pointer-events-none absolute z-10 font-mono font-black"
+              style={{ left: `${f.xPct}%`, top: `${f.yPct}%`, transform: "translate(-50%, -50%)", fontSize: "clamp(0.9rem, 2.6vw, 1.25rem)", color: "#fde047", textShadow: "0 0 12px rgba(250,204,21,0.8), 0 1px 3px rgba(0,0,0,0.6)", animation: "bbXpFloat 0.85s ease-out forwards" }}
+            >
+              +1 XP
+            </div>
+          ))}
         </>
       )}
 
@@ -245,7 +282,7 @@ export default function BrainBreak({
               className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-400/15 px-4 py-1.5 font-mono font-black uppercase tracking-[0.16em] text-emerald-100"
               style={{ fontSize: "clamp(0.75rem, 1.8vw, 1rem)" }}
             >
-              <span className="inline-flex items-center justify-center gap-1.5"><Shield className="h-4 w-4" /> XP defended!</span>
+              <span className="inline-flex items-center justify-center gap-1.5"><Shield className="h-4 w-4" /> +{earnedXp} XP earned!</span>
             </div>
             <div
               className="mx-auto mt-4 rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 font-sans font-semibold text-white/80"
@@ -265,7 +302,7 @@ export default function BrainBreak({
 
 function playHint(game: Villain["game"]): string {
   switch (game) {
-    case "slash": return "Slash them away!";
+    case "slash": return "Swipe your blade through them!";
     case "keepuppy": return "Tap to keep it up!";
     case "charge": return "Tap fast to shine!";
     case "duel": return "Tap to win the tug-of-war!";
@@ -277,7 +314,7 @@ function playHint(game: Villain["game"]): string {
 }
 
 // ── WHACK ───────────────────────────────────────────────────────────────────
-function WhackGame({ villain, onHit }: { villain: Villain; onHit: () => void }) {
+function WhackGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { xPct: number; yPct: number }) => void }) {
   const [targets, setTargets] = useState<{ id: number; xPct: number; yPct: number }[]>([]);
   const idRef = useRef(0);
   useEffect(() => {
@@ -298,7 +335,7 @@ function WhackGame({ villain, onHit }: { villain: Villain; onHit: () => void }) 
         <button
           key={t.id}
           type="button"
-          onPointerDown={() => { setTargets((p) => p.filter((x) => x.id !== t.id)); onHit(); }}
+          onPointerDown={() => { setTargets((p) => p.filter((x) => x.id !== t.id)); onHit({ xPct: t.xPct, yPct: t.yPct }); }}
           className="absolute"
           style={{
             left: `${t.xPct}%`, top: `${t.yPct}%`, transform: "translate(-50%, -50%)",
@@ -314,69 +351,89 @@ function WhackGame({ villain, onHit }: { villain: Villain; onHit: () => void }) 
   );
 }
 
-// ── SLASH ───────────────────────────────────────────────────────────────────
-function SlashGame({ villain, onHit }: { villain: Villain; onHit: () => void }) {
+// ── SLASH (true swipe — drag a blade THROUGH the targets) ───────────────────
+function SlashGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { xPct: number; yPct: number }) => void }) {
   const [targets, setTargets] = useState<{ id: number; xPct: number; drift: number; dur: number }[]>([]);
-  const [fx, setFx] = useState<{ id: number; xPct: number }[]>([]);
+  const [fx, setFx] = useState<{ id: number; xPct: number; yPct: number }[]>([]);
+  const [trail, setTrail] = useState<{ id: number; xPct: number; yPct: number }[]>([]);
   const idRef = useRef(0);
+  const downRef = useRef(false);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const elRefs = useRef<Map<number, HTMLElement>>(new Map());
   useEffect(() => {
     const spawn = window.setInterval(() => {
       setTargets((prev) => {
         if (prev.length >= 3) return prev;
         idRef.current += 1;
         const id = idRef.current;
-        // Gentler pacing: targets float for longer so they're catchable, not a blur.
         const dur = 3000 + Math.random() * 800;
-        window.setTimeout(() => setTargets((c) => c.filter((x) => x.id !== id)), dur);
+        window.setTimeout(() => { setTargets((c) => c.filter((x) => x.id !== id)); elRefs.current.delete(id); }, dur);
         return [...prev, { id, xPct: 12 + Math.random() * 76, drift: (Math.random() - 0.5) * 140, dur }];
       });
     }, 900);
     return () => window.clearInterval(spawn);
   }, []);
-  function hit(t: { id: number; xPct: number }) {
-    setTargets((p) => p.filter((x) => x.id !== t.id));
-    const fxId = idRef.current + 10000;
-    setFx((p) => [...p, { id: fxId, xPct: t.xPct }]);
-    window.setTimeout(() => setFx((c) => c.filter((f) => f.id !== fxId)), 400);
-    onHit();
+
+  // The blade follows the finger; any target it passes through is sliced.
+  function slashAt(clientX: number, clientY: number) {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+    const wr = wrap.getBoundingClientRect();
+    const tid = idRef.current * 1000 + Math.round(clientX) + Math.round(clientY);
+    setTrail((p) => [...p.slice(-6), { id: tid, xPct: ((clientX - wr.left) / wr.width) * 100, yPct: ((clientY - wr.top) / wr.height) * 100 }]);
+    window.setTimeout(() => setTrail((c) => c.filter((t) => t.id !== tid)), 200);
+    elRefs.current.forEach((el, id) => {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = clientX - cx;
+      const dy = clientY - cy;
+      if (dx * dx + dy * dy < 46 * 46) {
+        elRefs.current.delete(id);
+        setTargets((p) => p.filter((x) => x.id !== id));
+        const hx = ((cx - wr.left) / wr.width) * 100;
+        const hy = ((cy - wr.top) / wr.height) * 100;
+        const fxId = 90000 + id;
+        setFx((p) => [...p, { id: fxId, xPct: hx, yPct: hy }]);
+        window.setTimeout(() => setFx((c) => c.filter((f) => f.id !== fxId)), 400);
+        onHit({ xPct: hx, yPct: hy });
+      }
+    });
   }
+
   return (
-    <>
+    <div
+      ref={wrapRef}
+      className="absolute inset-0"
+      style={{ touchAction: "none", cursor: "crosshair" }}
+      onPointerDown={(e) => { downRef.current = true; slashAt(e.clientX, e.clientY); }}
+      onPointerMove={(e) => { if (downRef.current) slashAt(e.clientX, e.clientY); }}
+      onPointerUp={() => { downRef.current = false; }}
+      onPointerLeave={() => { downRef.current = false; }}
+    >
       {targets.map((t) => (
         <button
           key={t.id}
           type="button"
-          onPointerDown={() => hit(t)}
-          className="absolute bottom-0"
-          style={
-            {
-              left: `${t.xPct}%`, fontSize: "clamp(2.6rem, 8vw, 4rem)", lineHeight: 1,
-              filter: `drop-shadow(0 0 16px ${villain.glow})`,
-              "--drift": `${t.drift}px`,
-              animation: `bbSlashArc ${t.dur}ms linear forwards`, cursor: "pointer",
-            } as React.CSSProperties
-          }
+          ref={(el) => { if (el) elRefs.current.set(t.id, el); else elRefs.current.delete(t.id); }}
+          className="pointer-events-none absolute bottom-0"
+          style={{ left: `${t.xPct}%`, fontSize: "clamp(2.6rem, 8vw, 4rem)", lineHeight: 1, filter: `drop-shadow(0 0 16px ${villain.glow})`, "--drift": `${t.drift}px`, animation: `bbSlashArc ${t.dur}ms linear forwards` } as React.CSSProperties}
         >
           {villain.targetEmoji}
         </button>
       ))}
-      {fx.map((f) => (
-        <div
-          key={f.id}
-          className="absolute"
-          style={{
-            left: `${f.xPct}%`, top: "50%", width: 90, height: 6, borderRadius: 999,
-            background: "linear-gradient(90deg, transparent, #fff, transparent)",
-            boxShadow: `0 0 16px ${villain.glow}`, animation: "bbSlashFx 0.4s ease-out forwards",
-          }}
-        />
+      {trail.map((p) => (
+        <div key={p.id} className="pointer-events-none absolute" style={{ left: `${p.xPct}%`, top: `${p.yPct}%`, width: 18, height: 18, transform: "translate(-50%,-50%)", borderRadius: 999, background: "#fff", opacity: 0.75, filter: `blur(2px) drop-shadow(0 0 8px ${villain.glow})` }} />
       ))}
-    </>
+      {fx.map((f) => (
+        <div key={f.id} className="pointer-events-none absolute" style={{ left: `${f.xPct}%`, top: `${f.yPct}%`, width: 96, height: 6, transform: "translate(-50%,-50%)", borderRadius: 999, background: "linear-gradient(90deg, transparent, #fff, transparent)", boxShadow: `0 0 16px ${villain.glow}`, animation: "bbSlashFx 0.4s ease-out forwards" }} />
+      ))}
+    </div>
   );
 }
 
 // ── KEEP-UPPY ───────────────────────────────────────────────────────────────
-function KeepUppyGame({ villain, onHit }: { villain: Villain; onHit: () => void }) {
+function KeepUppyGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { xPct: number; yPct: number }) => void }) {
   const [pos, setPos] = useState({ x: 50, y: 30 });
   const phys = useRef({ x: 50, y: 30, vx: 0.4, vy: 0 });
   const raf = useRef<number>(0);
@@ -405,7 +462,7 @@ function KeepUppyGame({ villain, onHit }: { villain: Villain; onHit: () => void 
     const p = phys.current;
     p.vy = -3.0;
     p.vx += (Math.random() - 0.5) * 0.8;
-    onHit();
+    onHit({ xPct: p.x, yPct: p.y });
   }
 
   return (

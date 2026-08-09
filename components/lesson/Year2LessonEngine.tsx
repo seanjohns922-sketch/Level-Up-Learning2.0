@@ -24,7 +24,7 @@ import {
   startNewLessonSession,
 } from "@/lib/resume-state";
 import BrainBreak from "@/components/lesson/BrainBreak";
-import { pickVillain, type Villain } from "@/lib/brain-break";
+import { pickBreak, type Villain } from "@/lib/brain-break";
 import { getBrainBreakSchedule, type BrainBreakFrequency } from "@/lib/brain-break-settings";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import { readBestChain, writeBestChain } from "@/lib/best-chain";
@@ -627,6 +627,7 @@ export function Year2LessonEngine({
   const initialTurn = useMemo(() => buildInitialTurn(lesson, activities), [activities, lesson]);
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const [brainBreakVillain, setBrainBreakVillain] = useState<Villain | null>(null);
+  const [brainBreakKey, setBrainBreakKey] = useState<string | null>(null);
   const brainBreakSchedule = useMemo(
     () => getBrainBreakSchedule(levelNumber, brainBreakFrequency),
     [levelNumber, brainBreakFrequency]
@@ -997,15 +998,16 @@ export function Year2LessonEngine({
     if (secondsLeft <= threshold && secondsLeft > 0) {
       nextBreakIdxRef.current = idx + 1;
       brainBreakActiveRef.current = true;
-      const villain = pickVillain(levelNumber ?? 2, {
+      const villain = pickBreak(levelNumber ?? 2, {
         excludeId: lastVillainIdRef.current ?? undefined,
         excludeGame: lastVillainGameRef.current ?? undefined,
       });
       lastVillainIdRef.current = villain.id;
       lastVillainGameRef.current = villain.game;
+      setBrainBreakKey(`bb:${levelNumber ?? 0}:${resumeLessonKey}:${idx}`);
       setBrainBreakVillain(villain);
     }
-  }, [secondsLeft, finished, levelNumber, brainBreakSchedule]);
+  }, [secondsLeft, finished, levelNumber, brainBreakSchedule, resumeLessonKey]);
 
   useEffect(() => {
     if (!finished || emittedSummaryRef.current) return;
@@ -1472,6 +1474,7 @@ export function Year2LessonEngine({
       {brainBreakVillain && (
         <BrainBreak
           villain={brainBreakVillain}
+          sourceKey={brainBreakKey ?? undefined}
           onComplete={() => {
             brainBreakActiveRef.current = false;
             setBrainBreakVillain(null);

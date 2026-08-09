@@ -224,6 +224,37 @@ export const VILLAINS: Villain[] = [
   },
 ];
 
+// ── Game registry (banded independently of villains) ────────────────────────
+// The roster itself varies by age: a junior lesson draws from {junior, both}
+// games, a senior lesson from {senior, both}. Each game defines its own 45-60s
+// safety ceiling and its win target per band, so any villain can dress any game
+// with sensible tuning (the villain's own game/winCount are treated as defaults).
+export type GameBand = "junior" | "senior" | "both";
+export type GameDef = {
+  id: BrainBreakGame;
+  band: GameBand;
+  /** Safety auto-win ceiling, normalised to the 45-60s spec. */
+  durationSec: number;
+  /** Win target per band (used by count/meter games; survival games ignore it). */
+  win: { junior: number; senior: number };
+};
+
+export const GAMES: GameDef[] = [
+  { id: "whack", band: "junior", durationSec: 48, win: { junior: 14, senior: 18 } },
+  { id: "keepuppy", band: "junior", durationSec: 50, win: { junior: 14, senior: 18 } },
+  { id: "trace", band: "junior", durationSec: 46, win: { junior: 24, senior: 24 } },
+  { id: "charge", band: "junior", durationSec: 46, win: { junior: 40, senior: 44 } },
+  { id: "slash", band: "both", durationSec: 50, win: { junior: 14, senior: 20 } },
+  { id: "dodge", band: "both", durationSec: 46, win: { junior: 1, senior: 1 } },
+  { id: "copyme", band: "both", durationSec: 52, win: { junior: 1, senior: 1 } },
+  { id: "duel", band: "both", durationSec: 46, win: { junior: 100, senior: 100 } },
+];
+
+/** Games a student of this level may see: their own band plus "both". */
+export function gamesForBand(band: VillainBand): GameDef[] {
+  return GAMES.filter((g) => g.band === "both" || g.band === band);
+}
+
 // Two brain breaks per 9-minute (540s) lesson:
 //   Break 1 ≈ 3 minutes in  (360s left)
 //   Break 2 ≈ 6 minutes in  (180s left)
@@ -236,29 +267,37 @@ export function bandForLevel(levelNumber: number): VillainBand {
 }
 
 /**
- * Pick a villain appropriate for the student's level (varied each time).
+ * Pick a brain break — a (game, villain) pair — for the student's level.
  *
- * Archetype rotation: pass the previous break's `excludeGame` so the two brain
- * breaks in a lesson are always DIFFERENT gameplay loops (a different villain
- * alone is not enough). `excludeId` additionally avoids the same villain.
+ * The GAME is chosen first from the level's band-filtered pool (so the roster
+ * itself varies by age), rotating the archetype so two breaks in a lesson are
+ * never the same loop (`excludeGame`). A band-appropriate villain then dresses
+ * it (`excludeId` avoids repeating the exact villain). The returned villain is
+ * dressed with the chosen game's mechanic, 45-60s ceiling and win target.
  */
-export function pickVillain(
+export function pickBreak(
   levelNumber: number,
   opts?: { excludeId?: string; excludeGame?: BrainBreakGame },
 ): Villain {
   const band = bandForLevel(levelNumber);
-  let pool = VILLAINS.filter((v) => v.band === band);
-  if (pool.length === 0) pool = VILLAINS;
 
-  // 1) Rotate the archetype first — never the same game back-to-back.
-  let choices = opts?.excludeGame ? pool.filter((v) => v.game !== opts.excludeGame) : pool;
-  if (choices.length === 0) choices = pool;
+  // 1) Choose the game from the band pool, rotating the archetype.
+  const gamePool = gamesForBand(band);
+  let gameChoices = opts?.excludeGame ? gamePool.filter((g) => g.id !== opts.excludeGame) : gamePool;
+  if (gameChoices.length === 0) gameChoices = gamePool;
+  const game = gameChoices[Math.floor(Math.random() * gameChoices.length)]!;
 
-  // 2) Then avoid repeating the exact same villain, if possible.
+  // 2) Dress it with a band-appropriate villain, avoiding an exact repeat.
+  let villainPool = VILLAINS.filter((v) => v.band === band);
+  if (villainPool.length === 0) villainPool = VILLAINS;
   if (opts?.excludeId) {
-    const noRepeat = choices.filter((v) => v.id !== opts.excludeId);
-    if (noRepeat.length > 0) choices = noRepeat;
+    const noRepeat = villainPool.filter((v) => v.id !== opts.excludeId);
+    if (noRepeat.length > 0) villainPool = noRepeat;
   }
+  const villain = villainPool[Math.floor(Math.random() * villainPool.length)]!;
 
-  return choices[Math.floor(Math.random() * choices.length)];
+  return { ...villain, game: game.id, durationSec: game.durationSec, winCount: band === "senior" ? game.win.senior : game.win.junior };
 }
+
+/** @deprecated Use {@link pickBreak}, which bands the game as well as the villain. */
+export const pickVillain = pickBreak;

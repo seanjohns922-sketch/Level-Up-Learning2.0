@@ -27,7 +27,7 @@ import SurgeAmbience from "@/components/lesson/SurgeAmbience";
 import NexusActivation from "@/components/lesson/NexusActivation";
 import ComboActivation from "@/components/lesson/ComboActivation";
 import BrainBreak from "@/components/lesson/BrainBreak";
-import { pickVillain, type Villain } from "@/lib/brain-break";
+import { pickBreak, type Villain } from "@/lib/brain-break";
 import { getBrainBreakSchedule, type BrainBreakFrequency } from "@/lib/brain-break-settings";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
@@ -444,6 +444,7 @@ export function PracticeRunner({
 
   // ── Brain breaks (teacher-configurable frequency → 0/1/2 mid-lesson villains) ──
   const [brainBreakVillain, setBrainBreakVillain] = useState<Villain | null>(null);
+  const [brainBreakKey, setBrainBreakKey] = useState<string | null>(null);
   const brainBreakSchedule = useMemo(
     () => getBrainBreakSchedule(levelNumber, brainBreakFrequency),
     [levelNumber, brainBreakFrequency]
@@ -715,15 +716,17 @@ export function PracticeRunner({
     if (secondsLeft <= threshold && secondsLeft > 0) {
       nextBreakIdxRef.current = idx + 1;
       brainBreakActiveRef.current = true;
-      const villain = pickVillain(levelNumber ?? 1, {
+      const villain = pickBreak(levelNumber ?? 1, {
         excludeId: lastVillainIdRef.current ?? undefined,
         excludeGame: lastVillainGameRef.current ?? undefined,
       });
       lastVillainIdRef.current = villain.id;
       lastVillainGameRef.current = villain.game;
+      const keyBase = resumeLessonKey ?? (lessonTitle ?? "session").toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 48);
+      setBrainBreakKey(`bb:${levelNumber ?? 0}:${keyBase}:${idx}`);
       setBrainBreakVillain(villain);
     }
-  }, [secondsLeft, finished, levelNumber, brainBreakSchedule]);
+  }, [secondsLeft, finished, levelNumber, brainBreakSchedule, lessonTitle, resumeLessonKey]);
 
   useEffect(() => {
     if (!finished || emittedSummaryRef.current) return;
@@ -1362,6 +1365,7 @@ export function PracticeRunner({
       {brainBreakVillain && (
         <BrainBreak
           villain={brainBreakVillain}
+          sourceKey={brainBreakKey ?? undefined}
           onComplete={() => {
             brainBreakActiveRef.current = false;
             setBrainBreakVillain(null);
