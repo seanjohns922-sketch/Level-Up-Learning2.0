@@ -14401,7 +14401,7 @@ function generateGenericQuestion(
       };
     }> = [
       {
-        prompt: "245 divisible by 3 because it ends in 5?\nCorrect?",
+        prompt: "A student says 245 is divisible by 3 because it ends in 5. Is the claim correct?",
         answer: "No — use the digit sum",
         options: [
           "No — use the digit sum",
@@ -14416,7 +14416,7 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "312 divisible by 4 because it is even?\nCorrect?",
+        prompt: "A student says 312 is divisible by 4 because it is even. Is the claim correct?",
         answer: "Partly — 312 works, but even is not enough",
         options: [
           "Partly — 312 works, but even is not enough",
@@ -14431,7 +14431,7 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "450 divisible by both 3 and 5?\nCorrect?",
+        prompt: "A student says 450 is divisible by both 3 and 5. Is the claim correct?",
         answer: "Yes — digit sum 9 and ends in 0",
         options: [
           "Yes — digit sum 9 and ends in 0",
@@ -14447,7 +14447,7 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "1,218 not divisible by 6 because it is too big?\nCorrect?",
+        prompt: "A student says 1,218 is too large to be divisible by 6. Is the claim correct?",
         answer: "No — it is even and digit sum is 12",
         options: [
           "No — it is even and digit sum is 12",
@@ -14462,7 +14462,7 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "372 divisible by 3 because 3 + 7 + 2 = 12?\nCorrect?",
+        prompt: "A student says 372 is divisible by 3 because its digits total 12. Is the claim correct?",
         answer: "Yes — 12 is divisible by 3",
         options: [
           "Yes — 12 is divisible by 3",
@@ -14477,7 +14477,7 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "630 divisible by 10, so also divisible by 5?\nCorrect?",
+        prompt: "A student says 630 is divisible by 5 because it is divisible by 10. Is the claim correct?",
         answer: "Yes — numbers ending in 0 are divisible by 5",
         options: [
           "Yes — numbers ending in 0 are divisible by 5",
@@ -14492,7 +14492,7 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "248 divisible by 8 because it ends in 8?\nCorrect?",
+        prompt: "A student says 248 is divisible by 8 because it ends in 8. Is the claim correct?",
         answer: "Partly — check the last three digits",
         options: [
           "Partly — check the last three digits",
@@ -14507,7 +14507,7 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "555 divisible by both 3 and 5?\nCorrect?",
+        prompt: "A student says 555 is divisible by both 3 and 5. Is the claim correct?",
         answer: "Yes — digit sum 15 and ends in 5",
         options: [
           "Yes — digit sum 15 and ends in 5",
@@ -16550,7 +16550,7 @@ function generateGenericQuestion(
       },
       {
         prompt: "Multiples of 6\nWhich statement is true?",
-        answer: "Only Ella is correct",
+        answer: "Only “all are even” is correct",
         options: [
           "Only “all are even” is correct",
           "Only “digit sum is 6” is correct",

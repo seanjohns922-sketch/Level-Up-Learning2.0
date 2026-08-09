@@ -2,8 +2,6 @@
 
 Status: **Conditionally approved - assessment generation remains blocked**
 
-Canonical curriculum source: **Australian Curriculum: Mathematics - Curriculum content F-6, Version 9.0 (ACARA)**. Descriptor wording and coverage decisions must be checked against the project owner's supplied PDF before any curriculum audit, lesson change, quiz change or assessment-bank change is approved.
-
 This document defines assessment content only. The assessment engine, routing, persistence, progression, replay, reporting, rewards, placement and database schema remain frozen.
 
 The blueprint design is approved. Assessment generation proceeds level by level only after that level's curriculum coverage and metadata are verified; later blocked levels must not be bypassed.
@@ -82,7 +80,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `subitising-vs-counting`
 
-**Curriculum Mapping:** **aligned**; weeks 4, 6, 7, 12. Week 4 now preserves the curriculum boundary by restricting instant-recognition tasks to collections of 1-5.
+**Curriculum Mapping:** **aligned**; weeks 4. Week 4 is the dedicated subitising sequence and restricts instant-recognition tasks to collections of 1-5.
 
 **Question Blueprint**
 
@@ -111,7 +109,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `counting-one-to-one`, `cardinality-and-arrangement`
 
-**Curriculum Mapping:** **aligned**; weeks 2, 3, 4, 5, 7, 8, 12. Coverage is broad; assessment must require count evidence rather than visual-size guessing.
+**Curriculum Mapping:** **aligned**; weeks 2, 4, 5, 7, 12. Coverage is broad; assessment must require count evidence rather than visual-size guessing.
 
 **Question Blueprint**
 
@@ -142,7 +140,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `part-whole-conservation`, `subitising-vs-counting`
 
-**Curriculum Mapping:** **aligned**; weeks 6, 12. Lesson metadata identifies the dedicated part-part-whole sequence explicitly.
+**Curriculum Mapping:** **aligned**; weeks 6, 12. Week 6 teaches the dedicated part-part-whole sequence; Week 12 independently reviews missing and flexible parts.
 
 **Question Blueprint**
 
@@ -173,7 +171,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `operation-story-structure`
 
-**Curriculum Mapping:** **aligned**; weeks 9. Week 9 now provides a dedicated construction sequence for adding to, taking away and mixed collection changes.
+**Curriculum Mapping:** **aligned**; weeks 9, 12. Week 9 provides the dedicated construction sequence; Week 12 reviews practical collection changes independently.
 
 **Question Blueprint**
 
@@ -202,7 +200,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `equal-sharing-vs-grouping`
 
-**Curriculum Mapping:** **aligned**; weeks 10. Week 10 now teaches equal sharing and equal grouping as distinct practical structures through student-built distributions.
+**Curriculum Mapping:** **aligned**; weeks 10, 12. Week 10 teaches sharing and grouping as distinct structures; Week 12 reviews an unfamiliar equal structure.
 
 **Question Blueprint**
 
@@ -231,7 +229,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `repeating-unit`
 
-**Curriculum Mapping:** **aligned**; weeks 11. Week 11 now progresses from recognising the repeat to continuing and constructing repeating patterns.
+**Curriculum Mapping:** **aligned**; weeks 11, 12. Week 11 progresses from recognising to continuing and constructing; Week 12 includes independent pattern transfer.
 
 **Question Blueprint**
 
@@ -659,7 +657,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Learning Intentions**
 
-- Determine a constant additive rule.
+- Determine and describe a constant additive rule.
 - Create increasing and decreasing patterns using numbers, shapes and objects.
 - Use the rule to identify missing elements.
 
@@ -680,7 +678,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Question Blueprint**
 
-- Pre-Test: Complete an additive pattern.
+- Pre-Test: Complete or interpret an additive pattern.
 - Post-Test: Create a pattern from a rule and explain a missing term.
 
 ### AC9M2A02
@@ -731,7 +729,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `fact-recall-transfer`, `equal-sharing-vs-grouping`
 
-**Curriculum Mapping:** **partial**; weeks 8, 10. Twos recall and inverse facts are now tagged correctly; explicit derivation through doubling and halving still needs strengthening.
+**Curriculum Mapping:** **aligned**; weeks 8, 10. Weeks 8 and 10 explicitly connect a known double to halving into 2 equal groups and the related division fact.
 
 **Question Blueprint**
 
@@ -753,7 +751,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Learning Intentions**
 
-- Read, write, partition, compare and order natural numbers beyond 10,000.
+- Read, write, partition, compare and order natural numbers beyond 10 000.
 
 **Success Criteria**
 
@@ -767,7 +765,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `place-value-position`, `zero-placeholder`
 
-**Curriculum Mapping:** **aligned**; weeks 1. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 1. Week 1 now works beyond 10 000 throughout.
 
 **Question Blueprint**
 
@@ -780,7 +778,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Learning Intentions**
 
-- Represent and compare specified unit fractions and multiples.
+- Represent specified unit fractions and their multiples.
 - Combine same-denominator fractions to make a whole.
 
 **Success Criteria**
@@ -796,7 +794,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `unequal-fraction-parts`, `denominator-size`, `fraction-whole`
 
-**Curriculum Mapping:** **aligned**; weeks 11, 12. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 11, 12. Weeks 11-12 include every required denominator and completing wholes.
 
 **Question Blueprint**
 
@@ -823,7 +821,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `operation-story-structure`, `reasonableness-no-reference`
 
-**Curriculum Mapping:** **aligned**; weeks 3, 4, 5, 6. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 3, 4, 5, 6. Weeks 3-6 provide strategy, regrouping and application evidence.
 
 **Question Blueprint**
 
@@ -863,11 +861,12 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Learning Intentions**
 
-- Make benchmark estimates.
+- Estimate quantities using visual benchmarks.
 - Use estimates to judge calculated results.
 
 **Success Criteria**
 
+- I make a defensible collection estimate.
 - I explain why an estimate or result is reasonable.
 
 **Question Allocation:** Pre-Test 2; Post-Test 2
@@ -1005,7 +1004,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `decimal-place-value`, `decimal-length`
 
-**Curriculum Mapping:** **aligned**; weeks 2, 3, 4. Weeks 2-4 align. Week 1 is now accurately marked as Year 3 large-number consolidation and remains a curriculum-design replacement candidate.
+**Curriculum Mapping:** **aligned**; weeks 1, 2. Dedicated decimal place-value and reasoning sequences.
 
 **Question Blueprint**
 
@@ -1032,7 +1031,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `odd-even-properties`
 
-**Curriculum Mapping:** **aligned**; weeks 5. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 3. Dedicated parity sequence covering classification, sums and products.
 
 **Question Blueprint**
 
@@ -1061,7 +1060,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `equivalent-fraction-scale`, `fraction-decimal-connection`
 
-**Curriculum Mapping:** **partial**; weeks 9, 11, 12. Content is present but distributed and lightly weighted.
+**Curriculum Mapping:** **aligned**; weeks 9, 12. Dedicated equivalence sequence with cumulative integration.
 
 **Question Blueprint**
 
@@ -1089,7 +1088,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `fraction-number-line`, `mixed-number-whole`
 
-**Curriculum Mapping:** **aligned**; weeks 9, 10. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 10, 12. Dedicated fraction-sequence and number-line sequence with cumulative integration.
 
 **Question Blueprint**
 
@@ -1116,7 +1115,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `powers-ten-direction`
 
-**Curriculum Mapping:** **aligned**; weeks 6, 11, 12. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 4, 12. Dedicated multiplicative place-value sequence with cumulative integration.
 
 **Question Blueprint**
 
@@ -1143,7 +1142,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `operation-story-structure`, `additive-vs-multiplicative`
 
-**Curriculum Mapping:** **aligned**; weeks 7, 8, 11, 12. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 5, 6, 12. Dedicated additive and multiplicative strategy sequences with cumulative integration.
 
 **Question Blueprint**
 
@@ -1171,7 +1170,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `estimation-vs-exact`, `reasonableness-no-reference`, `financial-operation-choice`
 
-**Curriculum Mapping:** **partial**; weeks 12. Explicit coverage appears only in the final review; it requires a dedicated learning sequence.
+**Curriculum Mapping:** **aligned**; weeks 7, 12. Dedicated estimation sequence includes operation checks and financial transactions.
 
 **Question Blueprint**
 
@@ -1198,7 +1197,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `operation-story-structure`, `financial-operation-choice`, `additive-vs-multiplicative`
 
-**Curriculum Mapping:** **aligned**; weeks 8, 11, 12. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 8, 12. Dedicated budgeting, transaction and multi-step modelling sequence.
 
 **Question Blueprint**
 
@@ -1227,16 +1226,16 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `algorithm-step-order`, `pattern-rule-vs-example`
 
-**Curriculum Mapping:** **missing**; weeks none. No explicit number-algorithm sequence is present.
+**Curriculum Mapping:** **aligned**; weeks 11, 12. Dedicated addition, multiplication and algorithm-creation sequence.
 
 **Question Blueprint**
 
-- Pre-Test: Blocked until curriculum coverage exists
+- Pre-Test: Follow an algorithm and produce its outputs.
 - Post-Test: Create, test and explain an addition or multiplication algorithm.
 
 ### Cross-Realm Boundary
 
-- **AC9M4A01, AC9M4A02 -> Pattern Peaks (Algebra):** Level 4 Algebra belongs to Pattern Peaks. Any equation or fact-generalisation content in Number Nexus must be reviewed for relocation rather than assessed here.
+- **AC9M4A01, AC9M4A02 -> Pattern Peaks (Algebra):** Level 4 Algebra belongs to Pattern Peaks and is intentionally excluded from Number Nexus lessons, quizzes and assessments.
 
 ## Year 5
 
@@ -1349,7 +1348,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `percentage-whole`, `fraction-decimal-connection`
 
-**Curriculum Mapping:** **partial**; weeks 9, 10, 12. Core equivalence is taught, but percentage-of-amount and discount work in Week 10 belongs to Year 6 AC9M6N07 and must not enter the Year 5 assessment.
+**Curriculum Mapping:** **aligned**; weeks 9, 10, 12. Weeks 9, 10 and 12 remain within Year 5 equivalence and whole-part reasoning; percentage-of-quantity and discount content is excluded.
 
 **Question Blueprint**
 
@@ -1459,7 +1458,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `estimation-vs-exact`, `reasonableness-no-reference`, `financial-operation-choice`
 
-**Curriculum Mapping:** **aligned**; weeks 1, 2, 5, 6, 10, 11, 12. Aligned.
+**Curriculum Mapping:** **aligned**; weeks 1, 2, 5, 6, 11, 12. Aligned.
 
 **Question Blueprint**
 
@@ -1486,7 +1485,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `operation-story-structure`, `financial-operation-choice`, `additive-vs-multiplicative`
 
-**Curriculum Mapping:** **aligned**; weeks 1, 2, 10, 11, 12. Aligned, excluding Year 6 percentage-of-quantity content.
+**Curriculum Mapping:** **aligned**; weeks 1, 2, 11, 12. Aligned; Year 6 percentage-of-quantity content is excluded.
 
 **Question Blueprint**
 
@@ -1514,7 +1513,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `algorithm-step-order`, `pattern-rule-vs-example`, `factor-vs-multiple`
 
-**Curriculum Mapping:** **aligned**; weeks 3, 4. Algorithm and divisibility-pattern lessons now carry AC9M5N10 explicitly.
+**Curriculum Mapping:** **aligned**; weeks 3, 4, 12. Algorithm and divisibility-pattern lessons carry AC9M5N10 explicitly, including cumulative review.
 
 **Question Blueprint**
 
@@ -1523,7 +1522,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### Cross-Realm Boundary
 
-- **AC9M5A01, AC9M5A02 -> Pattern Peaks (Algebra):** Level 5 Algebra belongs to Pattern Peaks. Number Nexus assessment allocation excludes inverse-operation families and unknown-value equations as Algebra outcomes.
+- **AC9M5A01, AC9M5A02 -> Pattern Peaks (Algebra):** Level 5 Algebra belongs exclusively to Pattern Peaks. Number Nexus lessons, quizzes and assessments contain only AC9M5N-coded outcomes.
 
 ## Year 6
 

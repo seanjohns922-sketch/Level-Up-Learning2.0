@@ -87,6 +87,7 @@ import { buildYear1NumberNexusWeeklyQuiz } from "@/data/quizzes/year1NumberNexus
 import { buildYear2NumberNexusWeeklyQuiz } from "@/data/quizzes/year2NumberNexus";
 import { buildYear3NumberNexusWeeklyQuiz } from "@/data/quizzes/year3NumberNexus";
 import { buildYear4NumberNexusWeeklyQuiz } from "@/data/quizzes/year4NumberNexus";
+import { buildYear5NumberNexusWeeklyQuiz } from "@/data/quizzes/year5NumberNexus";
 import { buildPrepNumberNexusWeeklyQuiz, type PrepNumberNexusQuizVisual } from "@/data/quizzes/prepNumberNexus";
 import GroundNumberNexusQuizVisual from "@/components/quiz/GroundNumberNexusQuizVisual";
 import { RepeatingPatternStrip } from "@/components/number-nexus/RepeatingPatternVisual";
@@ -7987,7 +7988,8 @@ function SessionPage({
   const isLevelTwoNumberQuiz = quizRealmId === "number" && year === "Year 2";
   const isLevelThreeNumberQuiz = quizRealmId === "number" && year === "Year 3";
   const isLevelFourNumberQuiz = quizRealmId === "number" && year === "Year 4";
-  const isModernNumberQuiz = isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz || isLevelFourNumberQuiz;
+  const isLevelFiveNumberQuiz = quizRealmId === "number" && year === "Year 5";
+  const isModernNumberQuiz = isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz || isLevelFourNumberQuiz || isLevelFiveNumberQuiz;
   const finalProgramWeek = getLastProgramWeek(quizRealmId);
   const isFinalQuizWeek = Number(week) >= finalProgramWeek;
   const quizStrand = isMeasurementRealm ? "Measurement" : "Number";
@@ -8341,6 +8343,10 @@ function SessionPage({
 
     if (!isMeasurementRealm && year === "Year 4") {
       return buildYear4NumberNexusWeeklyQuiz(Number(week)) as QuizQuestion[];
+    }
+
+    if (!isMeasurementRealm && year === "Year 5") {
+      return buildYear5NumberNexusWeeklyQuiz(Number(week)) as QuizQuestion[];
     }
 
     // Level 4 Measurelands weekly quizzes. Built weeks return their 15-question
