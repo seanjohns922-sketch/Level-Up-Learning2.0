@@ -8,13 +8,23 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Eye,
+  Gamepad2,
   Gem,
   GraduationCap,
   RotateCcw,
   Route,
   Sparkles,
+  X,
   XCircle,
 } from "lucide-react";
+import BrainBreak from "@/components/lesson/BrainBreak";
+import {
+  GAMES,
+  bandForLevel,
+  pickBreak,
+  type BrainBreakGame,
+  type Villain,
+} from "@/lib/brain-break";
 import { ACTIVE_STUDENT_KEY, clearScopedProgress, writeProgress } from "@/data/progress";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
@@ -39,6 +49,18 @@ const REALMS: readonly { id: ReviewRealm; label: string; accent: string }[] = [
   { id: "measurement", label: "Measurelands", accent: "#d6a63a" },
   { id: "space", label: "Starpath", accent: "#a78bfa" },
 ];
+
+const BRAIN_BREAK_GAME_LABELS: Record<BrainBreakGame, string> = {
+  whack: "Whack",
+  slash: "Slash (swipe)",
+  keepuppy: "Keep-Uppy",
+  duel: "Duel",
+  dodge: "Dodge",
+  copyme: "Copy Me",
+  trace: "Trace",
+  popwall: "Pop Wall",
+  trickshot: "Trick Shot",
+};
 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
   const params = new URLSearchParams({ year, realm_id: realm });
@@ -71,6 +93,8 @@ export default function DemoReviewPanel() {
   const [lesson, setLesson] = useState(1);
   const [resetDone, setResetDone] = useState(false);
   const [gemLoading, setGemLoading] = useState(false);
+  const [breakGame, setBreakGame] = useState<BrainBreakGame | "random">("random");
+  const [activeBreak, setActiveBreak] = useState<Villain | null>(null);
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
   const maxWeek = realm === "number" ? 12 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
@@ -193,6 +217,29 @@ export default function DemoReviewPanel() {
     return assessmentHref(realm, year, "posttest");
   }
 
+  // Brain breaks: build a (game, villain) pair matching the picker's real
+  // behaviour, but let the reviewer force a specific game to test each one.
+  // No sourceKey → the visual "+N XP" still shows but nothing writes to a wallet.
+  function playBrainBreak() {
+    const base = pickBreak(levelNumber);
+    if (breakGame === "random") {
+      setActiveBreak(base);
+      return;
+    }
+    const def = GAMES.find((game) => game.id === breakGame);
+    if (!def) {
+      setActiveBreak(base);
+      return;
+    }
+    const band = bandForLevel(levelNumber);
+    setActiveBreak({
+      ...base,
+      game: def.id,
+      durationSec: def.durationSec,
+      winCount: band === "senior" ? def.win.senior : def.win.junior,
+    });
+  }
+
   return (
     <main className="min-h-screen bg-[#0b0d12] text-white">
       <header className="border-b border-white/10 bg-[#11141b] px-4 py-3 sm:px-6">
@@ -271,6 +318,20 @@ export default function DemoReviewPanel() {
         </section>
 
         <section className="border-t border-white/10 py-6">
+          <div className="mb-4 flex items-center gap-2"><Gamepad2 size={18} className="text-emerald-300" /><h2 className="text-base font-black">Brain Breaks</h2></div>
+          <p className="mb-3 text-xs text-white/50">Plays the real mid-lesson mini-game overlay. Villain matches the selected Level&apos;s age band; pick a game or leave it random. No XP is written in demo.</p>
+          <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
+            <label className="text-xs font-bold text-white/60">Game
+              <select value={breakGame} onChange={(event) => setBreakGame(event.target.value as BrainBreakGame | "random")} className="mt-2 h-11 w-full border border-white/15 bg-[#171a22] px-3 text-sm font-bold text-white">
+                <option value="random">Random (matches level band)</option>
+                {GAMES.map((game) => <option key={game.id} value={game.id}>{BRAIN_BREAK_GAME_LABELS[game.id]}</option>)}
+              </select>
+            </label>
+            <button type="button" onClick={playBrainBreak} className={`${actionClass()} md:self-end`}><Gamepad2 size={16} /> Play Brain Break</button>
+          </div>
+        </section>
+
+        <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><Sparkles size={18} className="text-violet-300" /><h2 className="text-base font-black">Results and Reveals</h2></div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <button type="button" disabled={!pretestAvailable} onClick={() => pretestAvailable && openResult("pre-pass")} className={actionClass(pretestAvailable)}><CheckCircle2 size={16} /> Pre 85%</button>
@@ -290,6 +351,21 @@ export default function DemoReviewPanel() {
           Preview actions use the real student components with demo-scoped local state. Use a mock student to validate database saving, teacher reporting, replay, progression and awarded rewards.
         </footer>
       </div>
+
+      {activeBreak ? (
+        <>
+          <BrainBreak key={activeBreak.id + Date.now()} villain={activeBreak} onComplete={() => setActiveBreak(null)} />
+          <button
+            type="button"
+            onClick={() => setActiveBreak(null)}
+            className="fixed right-4 top-4 z-[80] grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/50 text-white backdrop-blur hover:bg-black/70"
+            title="Exit brain break"
+            aria-label="Exit brain break"
+          >
+            <X size={20} />
+          </button>
+        </>
+      ) : null}
     </main>
   );
 }
