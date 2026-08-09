@@ -17,6 +17,7 @@ import NumberNexusGroundAssessmentVisual, { GroundAssessmentToken } from "@/comp
 import NumberNexusYear1AssessmentVisual from "@/components/assessment/NumberNexusYear1AssessmentVisual";
 import NumberNexusYear2AssessmentVisual from "@/components/assessment/NumberNexusYear2AssessmentVisual";
 import NumberNexusYear4AssessmentVisual from "@/components/assessment/NumberNexusYear4AssessmentVisual";
+import NumberNexusYear5AssessmentVisual from "@/components/assessment/NumberNexusYear5AssessmentVisual";
 import MeasurelandsAnswerWidget from "@/components/assessment/MeasurelandsAnswerWidget";
 import type { MeasurelandsAnswerFormat } from "@/data/assessments/measurelandsPresentation";
 import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObjectArt";
@@ -305,6 +306,7 @@ export default function AssessmentQuestionCard({
     typeof question.visual === "object" && question.visual !== null
       ? (question.visual as Record<string, unknown>)
       : undefined;
+  const isYearFiveNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_y5_");
   const isEarlyNumberVisual =
     question.id?.startsWith("y3-a-") ||
     question.id?.startsWith("y3-b-") ||
@@ -312,7 +314,8 @@ export default function AssessmentQuestionCard({
       (visual.type.startsWith("number_ground_") ||
         visual.type.startsWith("number_y1_") ||
         visual.type.startsWith("number_y2_") ||
-        visual.type.startsWith("number_y4_")));
+        visual.type.startsWith("number_y4_") ||
+        visual.type.startsWith("number_y5_")));
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
@@ -366,6 +369,9 @@ export default function AssessmentQuestionCard({
       ) : null}
       {typeof visual.type === "string" && visual.type.startsWith("number_y4_") ? (
         <NumberNexusYear4AssessmentVisual visual={visual} />
+      ) : null}
+      {typeof visual.type === "string" && visual.type.startsWith("number_y5_") ? (
+        <NumberNexusYear5AssessmentVisual visual={visual} />
       ) : null}
     </>
   ) : null;
@@ -546,9 +552,7 @@ export default function AssessmentQuestionCard({
               <div className={isEarlyNumberVisual ? "text-lg font-black text-slate-950" : "text-lg font-black text-white"}>
                 <FractionText value={fraction} />
               </div>
-              <div className="mt-3">
-                <FractionBar fraction={fraction} large />
-              </div>
+              {!isYearFiveNumberVisual ? <div className="mt-3"><FractionBar fraction={fraction} large /></div> : null}
             </button>
           ))}
         </div>
@@ -568,9 +572,7 @@ export default function AssessmentQuestionCard({
                   <div className={isEarlyNumberVisual ? "text-sm font-black text-slate-950" : "text-sm font-black text-white"}>
                     <FractionText value={fraction} compact />
                   </div>
-                  <div className="mt-2">
-                    <FractionBar fraction={fraction} />
-                  </div>
+                  {!isYearFiveNumberVisual ? <div className="mt-2"><FractionBar fraction={fraction} /></div> : null}
                 </div>
               ))
             ) : (

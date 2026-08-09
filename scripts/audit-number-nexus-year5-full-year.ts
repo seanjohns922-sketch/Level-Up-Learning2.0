@@ -132,4 +132,4 @@ console.log("Curriculum: 12/12 weeks and 36/36 lessons aligned to AC9M5N01-AC9M5
 console.log(`Lesson experience: ${generated}/${generated} generated questions valid.`);
 console.log(`Weekly quizzes: 12/12 routes and ${quizItems}/180 questions valid; exact 5-5-5; 80% pass threshold; no Week 13.`);
 console.log("Presentation: Level 5 lessons and weekly quizzes use the modern Number Nexus scope.");
-console.log("Assessment blueprint: curriculum-ready; independent Pre/Post bank remains the next phase.");
+console.log("Assessment blueprint: curriculum-ready; independent Pre/Post bank validated separately and awaiting educator approval.");
