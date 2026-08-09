@@ -1,0 +1,72 @@
+begin;
+
+-- Future maths-realm Gems remain visible only as inactive catalogue
+-- placeholders. Realm IDs use the canonical progression identifiers so a
+-- later launch cannot silently miss awards because it used a portal slug.
+insert into public.gem_definitions as existing
+  (slug, name, description, rarity, category, milestone_type, threshold, realm_id,
+   asset_key, silhouette_asset_key, display_order, is_active,
+   active_for_completion, metadata)
+values
+  ('pattern-rune-gem', 'Pattern Rune Gem',
+   'Complete your first Pattern Peaks level', 'rare', 'realm',
+   'realm_levels_completed', 1, 'pattern', 'pattern-rune-gem', 'sil-rare',
+   50, false, false, '{"placeholder":true,"activation":"realm_lifecycle_live"}'::jsonb),
+  ('infinite-pattern-crystal', 'Infinite Pattern Crystal',
+   'Collect every Pattern Peaks Legend', 'legendary', 'realm',
+   'realm_legends_completed', 7, 'pattern', 'infinite-pattern-crystal',
+   'sil-legendary', 60, false, false,
+   '{"placeholder":true,"activation":"realm_lifecycle_live"}'::jsonb),
+  ('data-prism', 'Data Prism',
+   'Complete your first Statistica level', 'rare', 'realm',
+   'realm_levels_completed', 1, 'statistics', 'data-prism', 'sil-rare',
+   70, false, false, '{"placeholder":true,"activation":"realm_lifecycle_live"}'::jsonb),
+  ('grand-analyst-crystal', 'Grand Analyst Crystal',
+   'Collect every Statistica Legend', 'legendary', 'realm',
+   'realm_legends_completed', 7, 'statistics', 'grand-analyst-crystal',
+   'sil-legendary', 80, false, false,
+   '{"placeholder":true,"activation":"realm_lifecycle_live"}'::jsonb),
+  ('fortune-stone', 'Fortune Stone',
+   'Complete your first Chance Hollow level', 'rare', 'realm',
+   'realm_levels_completed', 1, 'chance', 'fortune-stone', 'sil-rare',
+   90, false, false, '{"placeholder":true,"activation":"realm_lifecycle_live"}'::jsonb),
+  ('probability-pearl', 'Probability Pearl',
+   'Collect every Chance Hollow Legend', 'legendary', 'realm',
+   'realm_legends_completed', 7, 'chance', 'probability-pearl',
+   'sil-legendary', 100, false, false,
+   '{"placeholder":true,"activation":"realm_lifecycle_live"}'::jsonb),
+  ('starstone', 'Starstone',
+   'Complete your first Starpath level', 'rare', 'realm',
+   'realm_levels_completed', 1, 'space', 'starstone', 'sil-rare',
+   110, false, false, '{"placeholder":true,"activation":"realm_lifecycle_live"}'::jsonb),
+  ('celestial-navigator-crystal', 'Celestial Navigator Crystal',
+   'Collect every Starpath Legend', 'legendary', 'realm',
+   'realm_legends_completed', 7, 'space', 'celestial-navigator-crystal',
+   'sil-legendary', 120, false, false,
+   '{"placeholder":true,"activation":"realm_lifecycle_live"}'::jsonb),
+  ('time-fragment', 'Time Fragment',
+   'Unlock Chronoscape through sustained learning', 'rare', 'realm',
+   'chronoscape_learning_days', 1, 'time', 'time-fragment', 'sil-rare',
+   130, false, false, '{"placeholder":true,"activation":"chronoscape_rules_pending"}'::jsonb),
+  ('eternal-time-crystal', 'Eternal Time Crystal',
+   'Complete the Chronoscape game collection', 'legendary', 'realm',
+   'chronoscape_games_completed', 1, 'time', 'eternal-time-crystal',
+   'sil-legendary', 140, false, false,
+   '{"placeholder":true,"activation":"chronoscape_rules_pending"}'::jsonb)
+on conflict (slug) do update set
+  name = excluded.name,
+  description = excluded.description,
+  rarity = excluded.rarity,
+  category = excluded.category,
+  milestone_type = excluded.milestone_type,
+  threshold = excluded.threshold,
+  realm_id = excluded.realm_id,
+  asset_key = excluded.asset_key,
+  silhouette_asset_key = excluded.silhouette_asset_key,
+  display_order = excluded.display_order,
+  is_active = false,
+  active_for_completion = false,
+  metadata = existing.metadata || excluded.metadata,
+  updated_at = now();
+
+commit;
