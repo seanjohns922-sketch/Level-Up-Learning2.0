@@ -416,6 +416,11 @@ export default function AssessmentQuestionCard({
 
   if (type === "number_order") {
     const numbers = ((question.options as string[] | undefined) ?? []).map(String);
+    const visualValues = Array.isArray(visual?.values) ? visual.values.map(String) : [];
+    const numberLabels = visual?.type === "number_y5_decimal_set" && visualValues.length === numbers.length
+      ? visualValues
+      : numbers;
+    const showOrderVisual = visual?.type !== "number_y5_decimal_set";
 
     function addNumber(num: string) {
       if (order.includes(num)) return;
@@ -441,9 +446,9 @@ export default function AssessmentQuestionCard({
 
     return (
       <div className={isEarlyNumberVisual ? "mt-3" : "mt-6"}>
-        {renderedVisual}
+        {showOrderVisual ? renderedVisual : null}
         <div className="grid gap-4 md:grid-cols-3">
-          {numbers.map((num) => (
+          {numbers.map((num, index) => (
             <div key={num} className={isEarlyNumberVisual ? "flex items-center gap-2 rounded-lg border-2 border-slate-300 bg-[#f8fbfc] p-2 shadow-sm" : "flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-700/50 p-2"}>
               <button
                 type="button"
@@ -453,9 +458,9 @@ export default function AssessmentQuestionCard({
                   ? "min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-slate-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
                   : "min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"}
               >
-                {num}
+                {numberLabels[index] ?? num}
               </button>
-              <OptionReadAloudButton text={num} className="shrink-0" />
+              <OptionReadAloudButton text={numberLabels[index] ?? num} className="shrink-0" />
             </div>
           ))}
         </div>
@@ -474,7 +479,7 @@ export default function AssessmentQuestionCard({
                     ? "cursor-move rounded-lg border-2 border-cyan-600 bg-white p-4 text-center text-2xl font-black text-slate-950 shadow-sm"
                     : "cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-2xl font-black text-white shadow-sm"}
                 >
-                  {num}
+                  {numberLabels[numbers.indexOf(num)] ?? num}
                 </div>
               ))
             ) : (
@@ -512,6 +517,7 @@ export default function AssessmentQuestionCard({
 
   if (type === "fraction_order") {
     const fractions = (question.options as string[] | undefined) ?? [];
+    const showOrderVisual = visual?.type !== "number_y5_fraction_set";
 
     function addFraction(fraction: string) {
       if (order.includes(fraction)) return;
@@ -537,7 +543,7 @@ export default function AssessmentQuestionCard({
 
     return (
       <div className={isEarlyNumberVisual ? "mt-3" : "mt-6"}>
-        {renderedVisual}
+        {showOrderVisual ? renderedVisual : null}
         <div className="grid gap-4 md:grid-cols-3">
           {fractions.map((fraction) => (
             <button

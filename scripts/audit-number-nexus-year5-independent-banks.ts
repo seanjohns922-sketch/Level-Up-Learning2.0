@@ -116,6 +116,9 @@ const visualSource = fs.readFileSync(path.join(process.cwd(), "components/assess
 const pretestSource = fs.readFileSync(path.join(process.cwd(), "app/pretest/page.tsx"), "utf8");
 const posttestSource = fs.readFileSync(path.join(process.cwd(), "app/posttest/page.tsx"), "utf8");
 check(!/data\/activities|data\/quizzes/.test(bankSource), "Banks import lesson or weekly-quiz content.");
+check(!/\breported\s*:/.test(bankSource), "Year 5 assessment visuals still use ambiguous recorded-answer banners.");
+check(!visualSource.includes("Recorded decimal:") && !visualSource.includes("Recorded answer:"), "Year 5 visuals still label values as recorded answers.");
+check(cardSource.includes('visual?.type !== "number_y5_decimal_set"') && cardSource.includes('visual?.type !== "number_y5_fraction_set"'), "Year 5 ordering items still duplicate static and interactive values.");
 check(apiSource.includes("YEAR5_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS") && apiSource.includes("YEAR5_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS"), "Production resolver does not import both Year 5 banks.");
 check(getPretestForYearLabel("Year 5", "number").every((item, index) => item.id === YEAR5_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS[index]?.id), "Year-label Pre-Test route is wrong.");
 check(getPretestForLevel(5, "number").every((item, index) => item.id === YEAR5_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS[index]?.id), "Level Pre-Test route is wrong.");

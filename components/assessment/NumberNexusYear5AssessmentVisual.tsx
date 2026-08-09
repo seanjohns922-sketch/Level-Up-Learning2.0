@@ -49,7 +49,7 @@ export default function NumberNexusYear5AssessmentVisual({ visual }: { visual: V
 
   if (type === "number_y5_decimal_words") {
     const rows: Array<[string, string]> = [["Ones", String(visual.whole ?? 0)], ["Tenths", String(visual.tenths ?? 0)], ["Hundredths", String(visual.hundredths ?? 0)], ["Thousandths", String(visual.thousandths ?? 0)]];
-    return <Surface><Rows rows={rows} />{visual.reported ? <div className="mx-auto mt-4 max-w-xl rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-center font-bold">Recorded decimal: {String(visual.reported)}</div> : null}</Surface>;
+    return <Surface><Rows rows={rows} /></Surface>;
   }
 
   if (type === "number_y5_decimal_set" || type === "number_y5_fraction_set") {
@@ -83,7 +83,7 @@ export default function NumberNexusYear5AssessmentVisual({ visual }: { visual: V
   }
 
   if (type === "number_y5_fraction_equation" || type === "number_y5_calculation" || type === "number_y5_estimate") {
-    return <Surface><div className="text-center text-4xl font-black">{String(visual.expression ?? "")}</div>{visual.reported ? <div className="mx-auto mt-4 max-w-md rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-center font-bold">Recorded answer: {String(visual.reported)}</div> : null}</Surface>;
+    return <Surface><div className="text-center text-4xl font-black">{String(visual.expression ?? "")}</div></Surface>;
   }
 
   if (type === "number_y5_division") {
@@ -97,7 +97,7 @@ export default function NumberNexusYear5AssessmentVisual({ visual }: { visual: V
 
   if (type === "number_y5_receipt") {
     const rows = ((visual.rows as Array<[string, string]> | undefined) ?? []).map(([label, value]) => [String(label), String(value)] as [string, string]);
-    return <Surface><ReceiptText className="mx-auto mb-3 h-8 w-8 text-cyan-800" aria-hidden /><Rows rows={rows} />{visual.reported ? <div className="mt-4 text-center text-lg font-black text-slate-700">Estimate: {String(visual.reported)}</div> : null}</Surface>;
+    return <Surface><ReceiptText className="mx-auto mb-3 h-8 w-8 text-cyan-800" aria-hidden /><Rows rows={rows} /></Surface>;
   }
 
   if (type === "number_y5_budget") {
