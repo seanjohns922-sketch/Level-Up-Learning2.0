@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { YEAR1_WEEKLY_QUIZZES } from "../app/config/lesson-config";
 import { buildLessonActivityPool, generateQuestion } from "../data/activities/year2/lessonEngine";
+import { buildLevel3AssessmentQuestions, validateLevel3AssessmentForms } from "../data/assessments/level3Blueprint";
 import { NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS } from "../data/assessments/numberNexusAssessmentBlueprint";
 import { buildYear3NumberNexusWeeklyQuiz } from "../data/quizzes/year3NumberNexus";
 import { YEAR3_PROGRAM } from "../data/programs/year3";
@@ -121,6 +122,14 @@ assert(blueprint.descriptors.every((item) => item.curriculumMapping.implementati
 assert.equal(blueprint.releaseBlocked, true, "Assessment generation must remain blocked until the independent bank phase.");
 assert.equal(blueprint.crossRealmCoverage?.[0]?.implementationStatus, "owned-by-pattern-peaks", "The Algebra boundary is not finalised.");
 
+assert.deepEqual(validateLevel3AssessmentForms(), [], "Level 3 assessment forms failed validation.");
+for (const form of ["A", "B"] as const) {
+  const questions = buildLevel3AssessmentQuestions(form);
+  const constructedTypes = new Set(["numeric", "number_order", "fraction_order", "fraction_number_line"]);
+  assert.equal(questions.filter((question) => constructedTypes.has(question.type)).length, 16, `Form ${form} must contain 16 independent responses.`);
+  assert.equal(questions.filter((question) => !constructedTypes.has(question.type)).length, 4, `Form ${form} must contain only 4 selected responses.`);
+}
+
 const sessionSource = fs.readFileSync(path.join(process.cwd(), "app/session/page.tsx"), "utf8");
 const engineSource = fs.readFileSync(path.join(process.cwd(), "components/lesson/Year2LessonEngine.tsx"), "utf8");
 const globalStyles = fs.readFileSync(path.join(process.cwd(), "app/globals.css"), "utf8");
@@ -141,4 +150,5 @@ console.log("Level 3 Number Nexus full-year audit passed.");
 console.log("Curriculum: 12/12 weeks and 36/36 lessons aligned; Algebra owned by Pattern Peaks.");
 console.log(`Lesson experience: ${generated}/${generated} generated questions valid.`);
 console.log(`Weekly quizzes: 12/12 routes and ${quizItems}/180 questions valid; exact 5-5-5; 80% pass threshold.`);
+console.log("Assessments: 2/2 forms use 16 constructed/manipulated and 4 selected responses.");
 console.log("Assessment blueprint: curriculum-ready; independent Pre/Post bank intentionally remains blocked for the next phase.");
