@@ -29,6 +29,7 @@ import {
   buildLevel3PretestFormA,
   validateLevel3AssessmentForms,
 } from "./level3Blueprint";
+import { validateStarpathAssessmentBlueprintForLevel } from "./starpathAssessmentBlueprint";
 
 export type AssessmentQuestion = PretestQuestion | PosttestQuestion;
 export type AssessmentRealmId = "number" | "measurement" | "space";
@@ -164,7 +165,7 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
 
 export function validateAssessmentBlueprintForLevel(level: SupportedMathLevel, realmId: AssessmentRealmId = "number"): string[] {
   if (realmId === "space") {
-    return [];
+    return validateStarpathAssessmentBlueprintForLevel(level);
   }
   if (realmId === "measurement") {
     return [];
