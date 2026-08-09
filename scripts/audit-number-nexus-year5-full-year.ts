@@ -69,6 +69,27 @@ assert.deepEqual(
   "Level 5 does not cover every official Year 5 Number descriptor.",
 );
 
+const weekFour = YEAR5_PROGRAM[3]!;
+const weekFourLessonOne = weekFour.lessons[0]!;
+assert.deepEqual(
+  (weekFourLessonOne.activities ?? []).map((activity) => activity.activityType),
+  ["multiple_choice", "multiple_choice", "typed_response"],
+  "Week 4 Lesson 1 must finish with a genuine constructed-response rotation.",
+);
+for (const lesson of weekFour.lessons) {
+  for (const activity of lesson.activities ?? []) {
+    for (let sample = 0; sample < 60; sample += 1) {
+      const question = generateQuestion(5, lesson, activity);
+      if (question.kind === "typed_response") {
+        assert(
+          !/\b(type one|explain why|write a multiples pattern|type your explanation)\b/i.test(question.prompt),
+          `${lesson.id} asks for an open response but stores only one exact answer: ${question.prompt}`,
+        );
+      }
+    }
+  }
+}
+
 for (let week = 1; week <= 12; week += 1) {
   const quiz = buildYear5NumberNexusWeeklyQuiz(week);
   const config = YEAR1_WEEKLY_QUIZZES.find((item) => item.week === week);
@@ -85,6 +106,9 @@ for (let week = 1; week <= 12; week += 1) {
     assert.equal(items.length, 5, `Week ${week} Lesson ${lessonTag} did not contribute 5 questions.`);
     for (const item of items) {
       assert(item.descriptorCodes.every((code) => lesson.curriculum.some((lessonCode) => lessonCode === code)), `${item.id} is not aligned with ${lesson.id}.`);
+      if (week === 4 && lessonTag === 3) {
+        assert(item.prompt.includes("fifth output"), `${item.id} does not define how outputs are counted.`);
+      }
     }
   }
 

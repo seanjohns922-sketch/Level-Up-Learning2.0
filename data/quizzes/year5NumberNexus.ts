@@ -108,7 +108,7 @@ function buildLesson(week: number, lesson: Lesson): Draft[] {
         return choice(id, lesson, `Which test proves ${value} is divisible by 5?`, "It ends in 0 or 5", ["Its digits add to 5", "It is even", "It has two digits"]);
       }
       const step = 6 + index;
-      return typed(id, lesson, `Start at ${step}. Add ${step} each time. What is output 5?`, step * 5);
+      return typed(id, lesson, `The first output is ${step}. Add ${step} each time. What is the fifth output?`, step * 5);
     }
 
     if (week === 5) {

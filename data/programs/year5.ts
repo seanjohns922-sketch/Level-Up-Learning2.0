@@ -153,8 +153,9 @@ const year5Rows: ProgramRow[] = [
     activity: "Solve structured pattern puzzles by spotting odd-one-out numbers, explaining divisibility rules, completing missing terms, and sorting numbers by shared properties.",
     curriculum: ["AC9M5N02", "AC9M5N10"],
     activities: [
-      makeActivity("multiple_choice", 3, { mode: "spot_pattern_reasoning" }),
-      makeActivity("multiple_choice", 2, { mode: "spot_pattern_reasoning" }),
+      makeActivity("multiple_choice", 1, { mode: "spot_pattern_reasoning", rotationRole: "fast_thinking" }),
+      makeActivity("multiple_choice", 1, { mode: "spot_pattern_reasoning", rotationRole: "reasoning" }),
+      makeActivity("typed_response", 1, { mode: "spot_pattern_reasoning", rotationRole: "apply_create" }),
     ],
   },
   {

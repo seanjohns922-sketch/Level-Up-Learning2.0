@@ -14492,13 +14492,13 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "A student says 248 is divisible by 8 because it ends in 8. Is the claim correct?",
-        answer: "Partly — check the last three digits",
+        prompt: "A student says any number ending in 8 is divisible by 8. Is the rule correct?",
+        answer: "No — the last three digits must be tested",
         options: [
-          "Partly — check the last three digits",
-          "Yes — any number ending in 8 is divisible by 8",
-          "No — 248 is odd",
-          "No — use the digit sum",
+          "No — the last three digits must be tested",
+          "Yes — every number ending in 8 is divisible by 8",
+          "No — only even numbers above 1,000 are divisible by 8",
+          "No — the digit sum must be divisible by 8",
         ],
         visual: {
           type: "rule_box",
@@ -14547,9 +14547,9 @@ function generateGenericQuestion(
       };
     }> = [
       {
-        prompt: "Type one 3-digit number that is divisible by both 3 and 5.",
-        answer: "135",
-        helper: "A correct answer must end in 0 or 5 and have a digit sum divisible by 3.",
+        prompt: "Type the smallest 3-digit number divisible by both 3 and 5.",
+        answer: "105",
+        helper: "Check multiples of 15 from the start of the 3-digit numbers.",
         placeholder: "Type a 3-digit number",
         visual: {
           type: "rule_box",
@@ -14558,9 +14558,9 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "Type one 2-digit number that is divisible by 6 but not by 5.",
-        answer: "42",
-        helper: "A correct answer must be even, have a digit sum divisible by 3, and not end in 0 or 5.",
+        prompt: "Type the greatest 2-digit number divisible by 6 but not by 5.",
+        answer: "96",
+        helper: "Work backward through the largest 2-digit multiples of 6.",
         placeholder: "Type a 2-digit number",
         visual: {
           type: "rule_box",
@@ -14580,9 +14580,9 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "Type one number greater than 200 that is divisible by 9.",
-        answer: "216",
-        helper: "A correct answer must have a digit sum that is a multiple of 9.",
+        prompt: "Type the smallest whole number greater than 200 that is divisible by 9.",
+        answer: "207",
+        helper: "Find the first multiple of 9 after 200.",
         placeholder: "Type a number",
         visual: {
           type: "rule_box",
@@ -16601,10 +16601,10 @@ function generateGenericQuestion(
       };
     }> = [
       {
-        prompt: "Type the next 3 numbers in this pattern: 14, 21, 28, __, __, __.",
-        answer: "35, 42, 49",
-        helper: "The pattern adds 7 each time because these are multiples of 7.",
-        placeholder: "Type the next 3 numbers",
+        prompt: "What number comes next: 14, 21, 28, __?",
+        answer: "35",
+        helper: "The pattern increases by 7 each time.",
+        placeholder: "Type the next number",
         visual: {
           type: "rule_box",
           title: "Create the Pattern",
@@ -16612,16 +16612,16 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "Explain why multiples of 5 always end in 0 or 5.",
-        answer: "Adding 5 each time makes the ones digit alternate between 0 and 5",
-        helper: "A strong answer explains what keeps happening to the ones digit.",
-        placeholder: "Type your explanation",
+        prompt: "The ones digits of consecutive multiples of 5 alternate between 5 and what digit?",
+        answer: "0",
+        helper: "Continue the ones-digit pattern: 5, 0, 5, 0.",
+        placeholder: "Type the digit",
       },
       {
-        prompt: "Write a multiples pattern of 8 using the first 4 terms.",
-        answer: "8, 16, 24, 32",
-        helper: "List 4 numbers that increase by 8 each time.",
-        placeholder: "Type 4 terms",
+        prompt: "What is the fourth positive multiple of 8?",
+        answer: "32",
+        helper: "Count four equal jumps of 8.",
+        placeholder: "Type the number",
         visual: {
           type: "rule_box",
           title: "Build a Pattern",
@@ -16629,16 +16629,16 @@ function generateGenericQuestion(
         },
       },
       {
-        prompt: "Type the rule for this pattern: 30, 40, 50, 60.",
-        answer: "Add 10 each time",
-        helper: "Describe the repeated change clearly.",
-        placeholder: "Type the rule",
+        prompt: "How much does this pattern increase each time: 30, 40, 50, 60?",
+        answer: "10",
+        helper: "Compare two consecutive terms.",
+        placeholder: "Type the increase",
       },
       {
-        prompt: "Explain why 18, 36, 54, and 72 all belong in the same pattern.",
-        answer: "They are all multiples of 18 and increase by 18 each time",
-        helper: "A strong answer names both the rule and the shared multiple pattern.",
-        placeholder: "Type your explanation",
+        prompt: "What number comes next: 18, 36, 54, 72, __?",
+        answer: "90",
+        helper: "The terms increase by the same amount each time.",
+        placeholder: "Type the next number",
       },
     ];
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
@@ -16806,9 +16806,9 @@ function generateGenericQuestion(
         placeholder: "Type the missing number",
       },
       {
-        prompt: "Type one number greater than 100 that is divisible by both 3 and 5.",
-        answer: "120",
-        helper: "A number divisible by both 3 and 5 must be a multiple of 15.",
+        prompt: "Type the smallest number greater than 100 divisible by both 3 and 5.",
+        answer: "105",
+        helper: "Find the first multiple of 15 after 100.",
         placeholder: "Type a number",
       },
       {
