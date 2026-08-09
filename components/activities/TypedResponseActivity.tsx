@@ -439,6 +439,7 @@ function StrategyOwnershipInput({
   onStrategySelect,
   onAnswerChange,
   onReflectionSelect,
+  onSubmit,
 }: {
   visual: Extract<NonNullable<TypedResponseQuestion["visual"]>, { type: "strategy_ownership" }>;
   selectedStrategy: string | null;
@@ -449,6 +450,7 @@ function StrategyOwnershipInput({
   onStrategySelect: (strategy: string) => void;
   onAnswerChange: (value: string) => void;
   onReflectionSelect: (value: string) => void;
+  onSubmit: () => void;
 }) {
   const selectedStrategyData = visual.strategies.find((strategy) => strategy.label === selectedStrategy);
 
@@ -512,14 +514,35 @@ function StrategyOwnershipInput({
         <div className="text-xs font-black uppercase tracking-[0.18em] text-teal-700">
           Step C: Solve
         </div>
-        <input
-          value={answerValue}
-          onChange={(event) => onAnswerChange(event.target.value)}
-          disabled={solved}
-          placeholder="Type your answer"
-          className="mt-3 w-full max-w-md rounded-xl border border-teal-300 bg-white px-4 py-3 text-lg font-black text-slate-900 outline-none focus:border-teal-500 disabled:bg-emerald-50"
-          style={{ WebkitTextFillColor: "#0f172a" }}
-        />
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <input
+            value={answerValue}
+            onChange={(event) => onAnswerChange(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && answerValue.trim()) onSubmit();
+            }}
+            disabled={solved}
+            inputMode="decimal"
+            placeholder="Type your answer"
+            className="min-w-0 flex-1 rounded-xl border border-teal-300 bg-white px-4 py-3 text-lg font-black text-slate-900 outline-none focus:border-teal-500 disabled:bg-emerald-50"
+            style={{ WebkitTextFillColor: "#0f172a" }}
+          />
+          {!solved ? (
+            <button
+              type="button"
+              onClick={onSubmit}
+              disabled={!answerValue.trim()}
+              className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Check answer
+            </button>
+          ) : null}
+        </div>
+        {feedback ? (
+          <p className={["mt-3 text-sm font-bold", solved ? "text-emerald-700" : "text-rose-600"].join(" ")}>
+            {feedback}
+          </p>
+        ) : null}
       </div>
 
       {solved && visual.reflectionPrompt && visual.reflectionOptions?.length ? (
@@ -548,13 +571,15 @@ function StrategyOwnershipInput({
               );
             })}
           </div>
+          <button
+            type="button"
+            onClick={onSubmit}
+            disabled={!reflectionValue}
+            className="mt-4 rounded-xl bg-emerald-600 px-5 py-3 font-black text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Finish and continue
+          </button>
         </div>
-      ) : null}
-
-      {feedback ? (
-        <p className={["text-sm font-bold", solved ? "text-emerald-700" : "text-rose-600"].join(" ")}>
-          {feedback}
-        </p>
       ) : null}
     </div>
   );
@@ -2243,12 +2268,19 @@ export default function TypedResponseActivity({
 
       if (!ownershipSolved) {
         if (numericInputsMatch(typed, questionData.answer)) {
+          const requiresReflection = Boolean(
+            strategyOwnershipVisual.reflectionPrompt &&
+              strategyOwnershipVisual.reflectionOptions?.length
+          );
           setOwnershipSolved(true);
           setOwnershipFeedback(
-            selectedStrategyData
+            requiresReflection && selectedStrategyData
               ? `Correct answer. ${selectedStrategyData.feedback} Now reflect on how it worked for you.`
-              : "Correct answer. Now reflect on how your strategy worked for you."
+              : requiresReflection
+                ? "Correct answer. Now reflect on how your strategy worked for you."
+                : "Correct answer."
           );
+          if (!requiresReflection) onCorrect?.();
           return;
         }
 
@@ -3544,6 +3576,7 @@ export default function TypedResponseActivity({
                 setOwnershipReflection(value);
                 setOwnershipFeedback("");
               }}
+              onSubmit={check}
             />
           ) : isMultiStepMethod && multiStepMethodVisual ? (
             <MultiStepMethodInput
@@ -3797,7 +3830,7 @@ export default function TypedResponseActivity({
               className="w-full max-w-md rounded-xl border border-gray-300 px-4 py-3 text-lg font-bold text-gray-900 outline-none focus:border-teal-500"
             />
           )}
-          {isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
+          {isColumnMultiplication || isStrategyOwnership || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
             <button
               type="button"
               onClick={check}

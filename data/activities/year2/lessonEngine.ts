@@ -13183,6 +13183,8 @@ function generateGenericQuestion(
         supportText: "Good mathematicians choose a strategy that matches the numbers.",
         problemLabel: chosen.prompt,
         strategies: [...chosen.strategies],
+        reflectionPrompt: chosen.reflectionPrompt,
+        reflectionOptions: ["Fast", "Clear", "Accurate", "I would try another strategy"],
       },
     };
   }
