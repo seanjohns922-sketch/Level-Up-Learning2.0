@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Shield, Sparkles, Lightbulb } from "lucide-react";
+import { Shield, Sparkles, Lightbulb, SkipForward } from "lucide-react";
 import type { Villain } from "@/lib/brain-break";
 import { awardBrainBreakXp, BRAIN_BREAK_XP_CAP } from "@/lib/brain-break-xp";
 
@@ -60,6 +60,14 @@ export default function BrainBreak({
     } catch {}
     window.setTimeout(onComplete, 2600);
   }, [onComplete, villain.id, sourceKey]);
+
+  // Skip: bail straight back to the lesson. No XP is awarded (you didn't play),
+  // which also keeps the reward farm-safe.
+  const skip = useCallback(() => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    onComplete();
+  }, [onComplete]);
 
   const onHit = useCallback((pos?: { xPct: number; yPct: number }) => {
     scoreRef.current += 1;
@@ -151,6 +159,18 @@ export default function BrainBreak({
           50% { transform: scale(1.35); opacity: 1; }
         }
       `}</style>
+
+      {/* Skip — bail back to the lesson (no XP). Hidden once you've won. */}
+      {phase !== "victory" && (
+        <button
+          type="button"
+          onClick={skip}
+          className="absolute right-3 top-3 z-30 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-2 font-sans text-xs font-bold text-white/80 backdrop-blur transition hover:border-white/40 hover:bg-white/20 hover:text-white sm:right-4 sm:top-4"
+          style={{ touchAction: "manipulation" }}
+        >
+          Skip <SkipForward className="h-3.5 w-3.5" />
+        </button>
+      )}
 
       {/* ── INTRO ── */}
       {phase === "intro" && (
