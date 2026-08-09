@@ -617,7 +617,8 @@ export function Year2LessonEngine({
   const isLevelThreeNumber = !isMeasurement && levelNumber === 3;
   const isLevelFourNumber = !isMeasurement && levelNumber === 4;
   const isLevelFiveNumber = !isMeasurement && levelNumber === 5;
-  const isModernNumber = isLevelTwoNumber || isLevelThreeNumber || isLevelFourNumber || isLevelFiveNumber;
+  const isLevelSixNumber = !isMeasurement && levelNumber === 6;
+  const isModernNumber = isLevelTwoNumber || isLevelThreeNumber || isLevelFourNumber || isLevelFiveNumber || isLevelSixNumber;
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
   const workingLevel = useMemo(() => getWorkingLevelForLesson(lesson), [lesson]);
@@ -1418,6 +1419,8 @@ export function Year2LessonEngine({
             ? "number-nexus-level-four relative"
             : isLevelFiveNumber
               ? "number-nexus-level-five relative"
+              : isLevelSixNumber
+                ? "number-nexus-level-six relative"
             : "relative"}
       data-number-nexus-level={isModernNumber ? String(levelNumber) : undefined}
     >

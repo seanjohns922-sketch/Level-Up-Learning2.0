@@ -18,6 +18,7 @@ import NumberNexusYear1AssessmentVisual from "@/components/assessment/NumberNexu
 import NumberNexusYear2AssessmentVisual from "@/components/assessment/NumberNexusYear2AssessmentVisual";
 import NumberNexusYear4AssessmentVisual from "@/components/assessment/NumberNexusYear4AssessmentVisual";
 import NumberNexusYear5AssessmentVisual from "@/components/assessment/NumberNexusYear5AssessmentVisual";
+import NumberNexusYear6AssessmentVisual from "@/components/assessment/NumberNexusYear6AssessmentVisual";
 import MeasurelandsAnswerWidget from "@/components/assessment/MeasurelandsAnswerWidget";
 import type { MeasurelandsAnswerFormat } from "@/data/assessments/measurelandsPresentation";
 import { MeasurelandsObjectArt } from "@/components/measurelands/MeasurelandsObjectArt";
@@ -307,6 +308,7 @@ export default function AssessmentQuestionCard({
       ? (question.visual as Record<string, unknown>)
       : undefined;
   const isYearFiveNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_y5_");
+  const isYearSixNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_y6_");
   const isEarlyNumberVisual =
     question.id?.startsWith("y3-a-") ||
     question.id?.startsWith("y3-b-") ||
@@ -315,7 +317,8 @@ export default function AssessmentQuestionCard({
         visual.type.startsWith("number_y1_") ||
         visual.type.startsWith("number_y2_") ||
         visual.type.startsWith("number_y4_") ||
-        visual.type.startsWith("number_y5_")));
+        visual.type.startsWith("number_y5_") ||
+        visual.type.startsWith("number_y6_")));
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
@@ -373,6 +376,9 @@ export default function AssessmentQuestionCard({
       {typeof visual.type === "string" && visual.type.startsWith("number_y5_") ? (
         <NumberNexusYear5AssessmentVisual visual={visual} />
       ) : null}
+      {typeof visual.type === "string" && visual.type.startsWith("number_y6_") ? (
+        <NumberNexusYear6AssessmentVisual visual={visual} />
+      ) : null}
     </>
   ) : null;
 
@@ -417,10 +423,10 @@ export default function AssessmentQuestionCard({
   if (type === "number_order") {
     const numbers = ((question.options as string[] | undefined) ?? []).map(String);
     const visualValues = Array.isArray(visual?.values) ? visual.values.map(String) : [];
-    const numberLabels = visual?.type === "number_y5_decimal_set" && visualValues.length === numbers.length
+    const numberLabels = (visual?.type === "number_y5_decimal_set" || visual?.type === "number_y6_integer_set") && visualValues.length === numbers.length
       ? visualValues
       : numbers;
-    const showOrderVisual = visual?.type !== "number_y5_decimal_set";
+    const showOrderVisual = visual?.type !== "number_y5_decimal_set" && visual?.type !== "number_y6_integer_set";
 
     function addNumber(num: string) {
       if (order.includes(num)) return;
@@ -517,7 +523,7 @@ export default function AssessmentQuestionCard({
 
   if (type === "fraction_order") {
     const fractions = (question.options as string[] | undefined) ?? [];
-    const showOrderVisual = visual?.type !== "number_y5_fraction_set";
+    const showOrderVisual = visual?.type !== "number_y5_fraction_set" && visual?.type !== "number_y6_fraction_set";
 
     function addFraction(fraction: string) {
       if (order.includes(fraction)) return;
@@ -558,7 +564,7 @@ export default function AssessmentQuestionCard({
               <div className={isEarlyNumberVisual ? "text-lg font-black text-slate-950" : "text-lg font-black text-white"}>
                 <FractionText value={fraction} />
               </div>
-              {!isYearFiveNumberVisual ? <div className="mt-3"><FractionBar fraction={fraction} large /></div> : null}
+              {!isYearFiveNumberVisual && !isYearSixNumberVisual ? <div className="mt-3"><FractionBar fraction={fraction} large /></div> : null}
             </button>
           ))}
         </div>
@@ -578,7 +584,7 @@ export default function AssessmentQuestionCard({
                   <div className={isEarlyNumberVisual ? "text-sm font-black text-slate-950" : "text-sm font-black text-white"}>
                     <FractionText value={fraction} compact />
                   </div>
-                  {!isYearFiveNumberVisual ? <div className="mt-2"><FractionBar fraction={fraction} /></div> : null}
+                  {!isYearFiveNumberVisual && !isYearSixNumberVisual ? <div className="mt-2"><FractionBar fraction={fraction} /></div> : null}
                 </div>
               ))
             ) : (

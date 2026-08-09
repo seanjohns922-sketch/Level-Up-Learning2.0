@@ -1105,9 +1105,9 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
     weekNumber: 5,
     quizTitle: "Week 5 Quiz — Fractions & Equivalence",
     weeklyFocus: "Fractions & Equivalence",
-    lesson1Title: "Using Equivalent Fractions",
+    lesson1Title: "Equivalent Fractions",
     lesson2Title: "Ordering Fractions",
-    lesson3Title: "Mixed & Improper Fractions",
+    lesson3Title: "Mixed Numbers & Improper Fractions",
     questions: [
       {
         id: "y6w5q1",
@@ -1274,7 +1274,7 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
     weekNumber: 6,
     quizTitle: "Week 6 Quiz — Fraction Operations",
     weeklyFocus: "Common denominators, fraction operations, and real-world fraction problems",
-    lesson1Title: "Common Denominators",
+    lesson1Title: "Common Denominators (Efficient Strategies)",
     lesson2Title: "Add & Subtract Fractions",
     lesson3Title: "Fraction Word Problems",
     questions: [
@@ -1477,9 +1477,9 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
     weekNumber: 7,
     quizTitle: "Weekly Quiz",
     weeklyFocus: "Fraction Operations",
-    lesson1Title: "Fraction of a Quantity",
-    lesson2Title: "Percentage of a Quantity",
-    lesson3Title: "Choosing Efficient Forms",
+    lesson1Title: "Find a Fraction of a Quantity",
+    lesson2Title: "Find a Percentage of a Quantity",
+    lesson3Title: "Choose Efficient Forms",
     questions: [
       {
         id: "y6w7q1",
@@ -1644,7 +1644,7 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
     weekNumber: 8,
     quizTitle: "Weekly Quiz",
     weeklyFocus: "Mathematical Modelling",
-    lesson1Title: "Sales, Discounts & Budgets",
+    lesson1Title: "Sales & Discounts — Making Smart Decisions",
     lesson2Title: "Best-Buy & Unit Rate Decisions",
     lesson3Title: "Interpret & Communicate Solutions",
     questions: [
@@ -2661,8 +2661,165 @@ const year6WeeklyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
   },
 };
 
+function consolidationNumeric(
+  id: string,
+  lessonTag: 1 | 2 | 3,
+  questionText: string,
+  correctAnswer: string
+): Year6WeeklyQuizQuestion {
+  return {
+    id,
+    lessonTag,
+    questionText,
+    answerType: "numeric",
+    correctAnswer,
+    placeholder: "Type the answer",
+    feedbackCorrect: "Correct.",
+    feedbackIncorrect: "Check the values and try again.",
+  };
+}
+
+function consolidationMcq(
+  id: string,
+  lessonTag: 1 | 2 | 3,
+  questionText: string,
+  options: string[],
+  correctAnswer: string,
+  visual?: Year6WeeklyQuizVisual
+): Year6WeeklyQuizQuestion {
+  return {
+    id,
+    lessonTag,
+    questionText,
+    answerType: "multipleChoice",
+    options,
+    correctAnswer,
+    visual,
+    feedbackCorrect: "Correct.",
+    feedbackIncorrect: "Compare each option carefully.",
+  };
+}
+
+function coordinateVisual(points: Array<{ x: number; y: number; label: string }>): Year6WeeklyQuizVisual {
+  return {
+    kind: "cartesianGrid",
+    cartesianGrid: {
+      type: "cartesian_grid",
+      title: "Coordinate Grid",
+      xMin: -6,
+      xMax: 6,
+      yMin: -6,
+      yMax: 6,
+      points,
+    },
+  };
+}
+
+const year6NumberOnlyQuizWeeks: Record<number, Year6WeeklyQuizWeek> = {
+  9: {
+    weekNumber: 9,
+    quizTitle: "Week 9 Quiz — Rational Number Connections",
+    weeklyFocus: "Compare rational numbers, find parts of quantities, and estimate results",
+    lesson1Title: "Compare Fractions and Decimals",
+    lesson2Title: "Find Parts of Quantities",
+    lesson3Title: "Approximate and Check",
+    questions: [
+      consolidationNumeric("y6w9nq1", 1, "Enter the larger decimal: 0.62 or 0.602.", "0.62"),
+      consolidationMcq("y6w9nq2", 1, "Which fraction is greatest?", ["5/8", "2/3", "3/5"], "2/3"),
+      consolidationNumeric("y6w9nq3", 1, "Write 3/5 as a decimal.", "0.6"),
+      consolidationMcq("y6w9nq4", 1, "Which value is smallest?", ["0.7", "3/4", "2/3"], "2/3"),
+      consolidationMcq("y6w9nq5", 1, "Which order is correct from least to greatest?", ["0.45, 1/2, 0.55", "1/2, 0.45, 0.55", "0.55, 1/2, 0.45"], "0.45, 1/2, 0.55"),
+      consolidationNumeric("y6w9nq6", 2, "Find 25% of 180.", "45"),
+      consolidationNumeric("y6w9nq7", 2, "Find 3/8 of 160.", "60"),
+      consolidationNumeric("y6w9nq8", 2, "Find 0.4 of 250.", "100"),
+      consolidationNumeric("y6w9nq9", 2, "Find 15% of 320.", "48"),
+      consolidationMcq("y6w9nq10", 2, "Which form is most efficient for finding 12.5% of 96?", ["1/8", "1/4", "1/10"], "1/8"),
+      consolidationMcq("y6w9nq11", 3, "Which is the best estimate for 19.8 + 31.2?", ["50", "40", "60"], "50"),
+      consolidationMcq("y6w9nq12", 3, "Which is the best estimate for 48% of 198?", ["100", "50", "150"], "100"),
+      consolidationNumeric("y6w9nq13", 3, "Estimate 6.02 × 49 using 6 × 50.", "300"),
+      consolidationMcq("y6w9nq14", 3, "Is 4.83 + 7.19 = 120.2 reasonable?", ["No, the sum is about 12", "Yes, the sum is about 120", "No, the sum is below 5"], "No, the sum is about 12"),
+      consolidationMcq("y6w9nq15", 3, "Which result is reasonable for 72.4 − 28.7?", ["43.7", "101.1", "4.37"], "43.7"),
+    ],
+  },
+  10: {
+    weekNumber: 10,
+    quizTitle: "Week 10 Quiz — Integers & Coordinates",
+    weeklyFocus: "Order integers, interpret signed contexts, and use four-quadrant coordinates",
+    lesson1Title: "Order Integers",
+    lesson2Title: "Integers in Context",
+    lesson3Title: "Coordinates & Movement",
+    questions: [
+      consolidationMcq("y6w10nq1", 1, "Which integer is smallest?", ["-9", "-4", "0", "6"], "-9"),
+      consolidationMcq("y6w10nq2", 1, "Which order is correct from least to greatest?", ["-7, -2, 1, 5", "-2, -7, 1, 5", "5, 1, -2, -7"], "-7, -2, 1, 5"),
+      consolidationNumeric("y6w10nq3", 1, "Enter the integer halfway between -8 and 2.", "-3"),
+      consolidationMcq("y6w10nq4", 1, "Which integer is closest to zero?", ["-6", "4", "-2", "5"], "-2"),
+      consolidationNumeric("y6w10nq5", 1, "Enter the integer 7 less than 3.", "-4"),
+      consolidationNumeric("y6w10nq6", 2, "The temperature is 4°C and falls 9°C. Enter the new temperature.", "-5"),
+      consolidationNumeric("y6w10nq7", 2, "A diver is at -18 m and rises 7 m. Enter the new depth.", "-11"),
+      consolidationNumeric("y6w10nq8", 2, "An account balance is -$35. A $50 deposit is made. Enter the new balance.", "15"),
+      consolidationNumeric("y6w10nq9", 2, "A lift moves from level -3 to level 5. How many levels does it move?", "8"),
+      consolidationMcq("y6w10nq10", 2, "Which situation represents -12?", ["12 m below sea level", "12 m above sea level", "A gain of $12"], "12 m below sea level"),
+      consolidationMcq("y6w10nq11", 3, "Which coordinate is shown at point A?", ["(-4, 3)", "(4, -3)", "(-3, 4)"], "(-4, 3)", coordinateVisual([{ x: -4, y: 3, label: "A" }])),
+      consolidationMcq("y6w10nq12", 3, "Which point lies in Quadrant IV?", ["A", "B", "C"], "B", coordinateVisual([{ x: -3, y: 2, label: "A" }, { x: 4, y: -2, label: "B" }, { x: -2, y: -4, label: "C" }])),
+      consolidationMcq("y6w10nq13", 3, "Point A moves right 5 units. Which coordinate is its new position?", ["(3, 1)", "(-2, 6)", "(-7, 1)"], "(3, 1)", coordinateVisual([{ x: -2, y: 1, label: "A" }])),
+      consolidationMcq("y6w10nq14", 3, "Which coordinate lies on the y-axis?", ["(0, -5)", "(-5, 0)", "(2, -5)"], "(0, -5)", coordinateVisual([{ x: 0, y: -5, label: "A" }, { x: -5, y: 0, label: "B" }, { x: 2, y: -5, label: "C" }])),
+      consolidationMcq("y6w10nq15", 3, "Point A moves down 4 and left 2. Which coordinate is its new position?", ["(1, -2)", "(5, 6)", "(1, 6)"], "(1, -2)", coordinateVisual([{ x: 3, y: 2, label: "A" }])),
+    ],
+  },
+  11: {
+    weekNumber: 11,
+    quizTitle: "Week 11 Quiz — Financial Decisions",
+    weeklyFocus: "Calculate discounts, compare unit rates, and justify financial decisions",
+    lesson1Title: "Discount Decisions",
+    lesson2Title: "Unit Rates & Best Buys",
+    lesson3Title: "Justify a Financial Decision",
+    questions: [
+      consolidationNumeric("y6w11nq1", 1, "A $160 item is 25% off. Enter the sale price.", "120"),
+      consolidationNumeric("y6w11nq2", 1, "A $90 item is 30% off. Enter the discount amount.", "27"),
+      consolidationNumeric("y6w11nq3", 1, "A $240 item is reduced by 15%. Enter the sale price.", "204"),
+      consolidationMcq("y6w11nq4", 1, "Which discount saves more on a $200 item?", ["20% off", "$35 off", "They save the same"], "20% off"),
+      consolidationNumeric("y6w11nq5", 1, "A $100 item is reduced by 20%, then 10%. Enter the final price.", "72"),
+      consolidationNumeric("y6w11nq6", 2, "$42 buys 6 notebooks. Enter the cost per notebook.", "7"),
+      consolidationNumeric("y6w11nq7", 2, "$18 buys 750 g. Enter the cost per 250 g.", "6"),
+      consolidationMcq("y6w11nq8", 2, "Which is better value?", ["8 items for $28", "12 items for $39", "Same value"], "12 items for $39"),
+      consolidationNumeric("y6w11nq9", 2, "A car travels 360 km in 4 hours. Enter the kilometres per hour.", "90"),
+      consolidationMcq("y6w11nq10", 2, "Which comparison is fairest for different pack sizes?", ["Cost per item", "Total price", "Package height"], "Cost per item"),
+      consolidationNumeric("y6w11nq11", 3, "A $900 budget pays $525 and $168. Enter the amount remaining.", "207"),
+      consolidationNumeric("y6w11nq12", 3, "Thirty tickets cost $14 each. Enter the total ticket cost.", "420"),
+      consolidationMcq("y6w11nq13", 3, "A plan costs $612 from a $600 budget. Which conclusion is correct?", ["The plan is $12 over budget", "The plan leaves $12", "The plan is exactly on budget"], "The plan is $12 over budget"),
+      consolidationMcq("y6w11nq14", 3, "Option A costs $4 each. Option B costs $4.50 each. Which should be chosen on price alone?", ["Option A", "Option B", "Either costs the same"], "Option A"),
+      consolidationNumeric("y6w11nq15", 3, "A $480 budget must keep $75 in reserve. Enter the most that can be spent.", "405"),
+    ],
+  },
+  12: {
+    weekNumber: 12,
+    quizTitle: "Week 12 Quiz — Number Mastery",
+    weeklyFocus: "Apply and integrate the complete Year 6 Number curriculum",
+    lesson1Title: "Mixed Operations Challenge",
+    lesson2Title: "Real-World Modelling Project",
+    lesson3Title: "Final Review & Readiness",
+    questions: [
+      consolidationNumeric("y6w12nq1", 1, "Calculate 18.75 + 6.408.", "25.158"),
+      consolidationNumeric("y6w12nq2", 1, "Calculate 5/6 − 1/4. Enter the numerator over 12.", "7"),
+      consolidationNumeric("y6w12nq3", 1, "Find 35% of 260.", "91"),
+      consolidationNumeric("y6w12nq4", 1, "Calculate 0.084 × 1000.", "84"),
+      consolidationNumeric("y6w12nq5", 1, "The temperature is -7°C and rises 13°C. Enter the new temperature.", "6"),
+      consolidationNumeric("y6w12nq6", 2, "A $750 budget pays for 18 tickets at $27 each. Enter the amount remaining.", "264"),
+      consolidationNumeric("y6w12nq7", 2, "A $320 item is discounted by 15%. Enter the sale price.", "272"),
+      consolidationMcq("y6w12nq8", 2, "Which pack is better value?", ["15 items for $48", "20 items for $62", "Same value"], "20 items for $62"),
+      consolidationNumeric("y6w12nq9", 2, "A trip costs $684 for 24 students. Enter the cost per student.", "28.5"),
+      consolidationMcq("y6w12nq10", 2, "A result of $9 for 30% of $300 is:", ["Unreasonable; it should be $90", "Reasonable", "Unreasonable; it should be $900"], "Unreasonable; it should be $90"),
+      consolidationMcq("y6w12nq11", 3, "Which number is prime?", ["51", "53", "57", "63"], "53"),
+      consolidationMcq("y6w12nq12", 3, "Which order is correct from least to greatest?", ["-4, -1, 0, 3", "-1, -4, 0, 3", "3, 0, -1, -4"], "-4, -1, 0, 3"),
+      consolidationMcq("y6w12nq13", 3, "Which fraction is greatest?", ["5/6", "7/9", "4/5"], "5/6"),
+      consolidationMcq("y6w12nq14", 3, "Which coordinate is shown at point P?", ["(-3, -4)", "(3, 4)", "(-4, -3)"], "(-3, -4)", coordinateVisual([{ x: -3, y: -4, label: "P" }])),
+      consolidationMcq("y6w12nq15", 3, "Which estimate is best for 39.7% of 503?", ["200", "20", "2,000"], "200"),
+    ],
+  },
+};
+
 export function getYear6WeeklyQuiz(weekNumber: number): Year6WeeklyQuizWeek | null {
-  const quiz = year6WeeklyQuizWeeks[weekNumber] ?? null;
+  const quiz = year6NumberOnlyQuizWeeks[weekNumber] ?? year6WeeklyQuizWeeks[weekNumber] ?? null;
   if (quiz) validateYear6WeeklyQuizWeek(quiz);
   return quiz;
 }

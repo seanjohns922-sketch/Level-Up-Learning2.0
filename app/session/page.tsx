@@ -7989,7 +7989,8 @@ function SessionPage({
   const isLevelThreeNumberQuiz = quizRealmId === "number" && year === "Year 3";
   const isLevelFourNumberQuiz = quizRealmId === "number" && year === "Year 4";
   const isLevelFiveNumberQuiz = quizRealmId === "number" && year === "Year 5";
-  const isModernNumberQuiz = isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz || isLevelFourNumberQuiz || isLevelFiveNumberQuiz;
+  const isLevelSixNumberQuiz = quizRealmId === "number" && year === "Year 6";
+  const isModernNumberQuiz = isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz || isLevelFourNumberQuiz || isLevelFiveNumberQuiz || isLevelSixNumberQuiz;
   const finalProgramWeek = getLastProgramWeek(quizRealmId);
   const isFinalQuizWeek = Number(week) >= finalProgramWeek;
   const quizStrand = isMeasurementRealm ? "Measurement" : "Number";

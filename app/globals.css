@@ -48,14 +48,20 @@
 .number-nexus-level-five .rounded-3xl,
 .number-nexus-level-five .rounded-\[1\.75rem\],
 .number-nexus-level-five .rounded-\[24px\],
-.number-nexus-level-five .rounded-\[28px\] {
+.number-nexus-level-five .rounded-\[28px\],
+.number-nexus-level-six .rounded-2xl,
+.number-nexus-level-six .rounded-3xl,
+.number-nexus-level-six .rounded-\[1\.75rem\],
+.number-nexus-level-six .rounded-\[24px\],
+.number-nexus-level-six .rounded-\[28px\] {
   border-radius: 0.5rem !important;
 }
 
 .number-nexus-level-two .bg-gradient-to-br,
 .number-nexus-level-three .bg-gradient-to-br,
 .number-nexus-level-four .bg-gradient-to-br,
-.number-nexus-level-five .bg-gradient-to-br {
+.number-nexus-level-five .bg-gradient-to-br,
+.number-nexus-level-six .bg-gradient-to-br {
   background-color: rgb(240 253 250) !important;
   background-image: none !important;
 }

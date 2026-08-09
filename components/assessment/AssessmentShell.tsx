@@ -88,7 +88,7 @@ export default function AssessmentShell({
   const theme = getRealmTheme(realmId);
   const isSpace = realmId === "space";
   const isGroundNumber = !theme.isMeasurement && !isSpace && isGroundLevelYear(year);
-  const isModernNumber = !theme.isMeasurement && !isSpace && (isGroundNumber || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5");
+  const isModernNumber = !theme.isMeasurement && !isSpace && (isGroundNumber || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6");
   const contentWidth = wideContent || isModernNumber ? "max-w-6xl" : "max-w-2xl";
   const progressTrack = theme.isMeasurement
     ? "rgba(214,184,108,0.22)"

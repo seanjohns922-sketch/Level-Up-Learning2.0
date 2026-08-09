@@ -10052,7 +10052,7 @@ function generateGenericQuestion(
       {
         prompt: "Which is larger: 11/6 or 1 5/6?",
         answer: "They are equal",
-        options: ["11/6", "1 5/6", "11/6 is smaller"],
+        options: ["11/6", "1 5/6", "They are equal"],
         helper: "Improper and mixed forms can name the same value.",
       },
       {
@@ -13215,6 +13215,69 @@ function generateGenericQuestion(
     };
   }
 
+  if (explicitMode === "y6_number_operations_fluency") {
+    const templates: TypedResponseQuestion[] = [
+      { kind: "typed_response", prompt: "Calculate 18.75 + 6.408.", answer: "25.158", helper: "Align decimal places.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Calculate 0.084 × 1000.", answer: "84", helper: "Use place value to scale the number.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Calculate 42.6 − 7.085.", answer: "35.515", helper: "Align decimal places.", placeholder: "Type the answer" },
+      { kind: "typed_response", prompt: "Calculate 53.2 ÷ 100.", answer: "0.532", helper: "Use place value to scale the number.", placeholder: "Type the answer" },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_number_operations_reasoning") {
+    const templates: TypedResponseQuestion[] = [
+      { kind: "typed_response", prompt: "Enter the numerator: 5/6 − 1/4 = ?/12.", answer: "7", helper: "Rename both fractions in twelfths.", placeholder: "Type the numerator", inputType: "integer" },
+      { kind: "typed_response", prompt: "Enter the numerator: 3/5 + 1/4 = ?/20.", answer: "17", helper: "Rename both fractions in twentieths.", placeholder: "Type the numerator", inputType: "integer" },
+      { kind: "typed_response", prompt: "The temperature is −7°C and rises 13°C. What is it now?", answer: "6", helper: "A rise moves right on the number line.", placeholder: "Type the temperature", inputType: "integer" },
+      { kind: "typed_response", prompt: "A diver is at −18 m and rises 11 m. Enter the new elevation.", answer: "-7", helper: "A rise moves toward zero.", placeholder: "Type the elevation", inputType: "integer" },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_number_operations_application") {
+    const templates: TypedResponseQuestion[] = [
+      { kind: "typed_response", prompt: "Find 35% of 260.", answer: "91", helper: "Break 35% into useful benchmark percentages.", placeholder: "Type the amount" },
+      { kind: "typed_response", prompt: "A $320 item is discounted by 15%. Enter the sale price.", answer: "272", helper: "Find the discount, then subtract it.", placeholder: "Type the sale price" },
+      { kind: "typed_response", prompt: "Find 12.5% of 480.", answer: "60", helper: "12.5% is one eighth.", placeholder: "Type the amount" },
+      { kind: "typed_response", prompt: "A $750 budget pays for 18 tickets at $27 each. Enter the amount left.", answer: "264", helper: "Find the ticket cost before subtracting it.", placeholder: "Type the amount" },
+    ];
+    return templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+  }
+
+  if (explicitMode === "y6_number_review_fluency") {
+    const templates = [
+      { prompt: "Which number is prime?", answer: "53", options: ["51", "53", "57", "63"] },
+      { prompt: "Which integer is least?", answer: "-12", options: ["-5", "0", "-12", "7"] },
+      { prompt: "Which number is composite?", answer: "91", options: ["83", "89", "91", "97"] },
+      { prompt: "Which order is correct from least to greatest?", answer: "-4, -1, 0, 3", options: ["-4, -1, 0, 3", "-1, -4, 0, 3", "3, 0, -1, -4"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return { kind: "multiple_choice", prompt: chosen.prompt, answer: chosen.answer, options: shuffle([...chosen.options]), helper: "Use number properties or integer order." };
+  }
+
+  if (explicitMode === "y6_number_review_reasoning") {
+    const templates: MultipleChoiceQuestion[] = [
+      { kind: "multiple_choice", prompt: "Which fraction is greatest?", answer: "5/6", options: ["5/6", "7/9", "4/5"], helper: "Use equivalent fractions or benchmarks." },
+      { kind: "multiple_choice", prompt: "Which fraction is least?", answer: "7/12", options: ["7/12", "3/5", "5/8"], helper: "Compare the fractions on a common scale." },
+      { kind: "multiple_choice", prompt: "Which coordinate is point P?", answer: "(-3, -4)", options: ["(-3, -4)", "(3, 4)", "(-4, -3)"], helper: "Read x first, then y.", visual: { type: "cartesian_grid", title: "Point P", xMin: -5, xMax: 5, yMin: -5, yMax: 5, points: [{ x: -3, y: -4, label: "P" }] } },
+      { kind: "multiple_choice", prompt: "Point Q is (2, −3). It moves 4 left. Where is it now?", answer: "(-2, -3)", options: ["(-2, -3)", "(6, -3)", "(2, 1)"], helper: "A horizontal move changes x only.", visual: { type: "cartesian_grid", title: "Point Q", xMin: -5, xMax: 5, yMin: -5, yMax: 5, points: [{ x: 2, y: -3, label: "Q" }] } },
+    ];
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return { ...chosen, options: shuffle([...chosen.options]) };
+  }
+
+  if (explicitMode === "y6_number_review_application") {
+    const templates = [
+      { prompt: "Which estimate is best for 39.7% of 503?", answer: "200", options: ["20", "200", "2,000"] },
+      { prompt: "Which estimate is best for 0.748 × 796?", answer: "600", options: ["60", "600", "6,000"] },
+      { prompt: "A result of $9 for 30% of $300 is:", answer: "Unreasonable; it should be $90", options: ["Unreasonable; it should be $90", "Reasonable", "Unreasonable; it should be $900"] },
+      { prompt: "Which is the best estimate for 5/8 of 402?", answer: "250", options: ["25", "250", "2,500"] },
+    ] as const;
+    const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    return { kind: "multiple_choice", prompt: chosen.prompt, answer: chosen.answer, options: shuffle([...chosen.options]), helper: "Use a nearby benchmark before deciding." };
+  }
+
   if (explicitMode === "y6_decimal_quick_estimate") {
     const templates = [
       { prompt: "3.456 + 5.678 ≈ ?", answer: "9", options: ["8", "9", "10"] },
@@ -15149,20 +15212,20 @@ function generateGenericQuestion(
       { prompt: "You start at -1 and move 7 spaces right. Where are you?", answer: "6", visual: { type: "integer_number_line", min: -6, max: 6, start: -1, end: 6, jump: 7, showArrow: true, emphasis: "movement" } },
       { prompt: "Which integer is further from zero: -7 or 4? Type the integer.", answer: "-7", visual: { type: "integer_number_line", min: -8, max: 6, highlights: [-7, 0, 4], emphasis: "distance" } },
       { prompt: "Which integer is closer to zero: -2 or -8? Type the integer.", answer: "-2", visual: { type: "integer_number_line", min: -8, max: 2, highlights: [-8, -2, 0], emphasis: "distance" } },
-      { prompt: "Complete the pattern: -5, -4, __, -2, -1", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 1, highlights: [-5, -4, -3, -2, -1], emphasis: "position" } },
+      { prompt: "Enter the missing number: -5, -4, __, -2, -1", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 1, highlights: [-5, -4, -3, -2, -1], emphasis: "position" } },
       { prompt: "You start at 2 and move 6 spaces left. Where are you?", answer: "-4", visual: { type: "integer_number_line", min: -6, max: 6, start: 2, end: -4, jump: -6, showArrow: true, emphasis: "movement" } },
       { prompt: "You start at -6 and move 3 spaces right. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: -6, end: -3, jump: 3, showArrow: true, emphasis: "movement" } },
       { prompt: "How far is -9 from zero?", answer: "9", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-9, 0], emphasis: "distance" } },
       { prompt: "Which integer is 5 spaces to the right of -2?", answer: "3", visual: { type: "integer_number_line", min: -6, max: 6, start: -2, end: 3, jump: 5, showArrow: true, emphasis: "movement" } },
       { prompt: "Which integer is 4 spaces to the left of 1?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 1, end: -3, jump: -4, showArrow: true, emphasis: "movement" } },
-      { prompt: "Complete the sequence: -1, 0, 1, __, 3", answer: "2", visual: { type: "integer_number_line", min: -2, max: 4, highlights: [-1, 0, 1, 2, 3], emphasis: "position" } },
+      { prompt: "Enter the missing number: -1, 0, 1, __, 3", answer: "2", visual: { type: "integer_number_line", min: -2, max: 4, highlights: [-1, 0, 1, 2, 3], emphasis: "position" } },
       { prompt: "How far is 7 from zero?", answer: "7", visual: { type: "integer_number_line", min: -2, max: 8, highlights: [0, 7], emphasis: "distance" } },
       { prompt: "You start at -1 and move 4 spaces left. Where are you?", answer: "-5", visual: { type: "integer_number_line", min: -6, max: 4, start: -1, end: -5, jump: -4, showArrow: true, emphasis: "movement" } },
       { prompt: "You start at 5 and move 8 spaces left. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 5, end: -3, jump: -8, showArrow: true, emphasis: "movement" } },
       { prompt: "Which integer is greater, -3 or 1? Type the greater integer.", answer: "1", visual: { type: "integer_number_line", min: -4, max: 2, highlights: [-3, 1], emphasis: "compare" } },
       { prompt: "Which integer is smaller, -6 or -2? Type the smaller integer.", answer: "-6", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-6, -2], emphasis: "compare" } },
       { prompt: "What number is 3 spaces from zero on the left?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 0, end: -3, jump: -3, showArrow: true, emphasis: "movement" } },
-      { prompt: "Complete the pattern: 2, 1, 0, __, -2", answer: "-1", visual: { type: "integer_number_line", min: -3, max: 3, highlights: [2, 1, 0, -1, -2], emphasis: "position" } },
+      { prompt: "Enter the missing number: 2, 1, 0, __, -2", answer: "-1", visual: { type: "integer_number_line", min: -3, max: 3, highlights: [2, 1, 0, -1, -2], emphasis: "position" } },
     ] as const;
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
     return {
@@ -15611,12 +15674,21 @@ function generateGenericQuestion(
       { prompt: "What is the next square after 9²?", answer: "100", options: ["90", "99", "100"] },
     ] as const;
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+    const needsPatternStrip = /pattern|increase|comes next/i.test(chosen.prompt);
     return {
       kind: "multiple_choice",
       prompt: chosen.prompt,
       options: shuffle([...chosen.options]),
       answer: chosen.answer,
       helper: "Look for how square numbers grow from one to the next.",
+      visual: needsPatternStrip
+        ? {
+            type: "pattern_sequence_strip",
+            title: "Square numbers",
+            terms: ["1", "4", "9", "16"],
+            arrowLabels: ["+3", "+5", "+7"],
+          }
+        : undefined,
     };
   }
 
