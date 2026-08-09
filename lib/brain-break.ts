@@ -15,12 +15,13 @@ export type BrainBreakGame =
   | "whack"
   | "slash"
   | "keepuppy"
-  | "charge"
   | "duel"
-  // Phase 1 variety expansion — distinct verbs/cognition:
   | "dodge" // drag to avoid projectiles
   | "copyme" // tap-back a flashing sequence (memory)
-  | "trace"; // trace a glowing path
+  | "trace" // trace a glowing path
+  // Arcade P1 — lightweight new cartridges:
+  | "popwall" // aim + launch to pop matching clusters (bubble shooter)
+  | "trickshot"; // flick a ball into a moving hoop
 export type VillainBand = "junior" | "senior";
 
 export type Villain = {
@@ -120,7 +121,7 @@ export const VILLAINS: Villain[] = [
     name: "Worry Wasp",
     face: "🐝",
     band: "junior",
-    game: "charge",
+    game: "popwall",
     targetEmoji: "✨",
     taunt: "Bzzz… you can't do this… you're not good enough…",
     victory: "You believed in yourself — and the worry buzzed away!",
@@ -243,11 +244,12 @@ export const GAMES: GameDef[] = [
   { id: "whack", band: "junior", durationSec: 48, win: { junior: 14, senior: 18 } },
   { id: "keepuppy", band: "junior", durationSec: 50, win: { junior: 14, senior: 18 } },
   { id: "trace", band: "junior", durationSec: 46, win: { junior: 24, senior: 24 } },
-  { id: "charge", band: "junior", durationSec: 46, win: { junior: 40, senior: 44 } },
   { id: "slash", band: "both", durationSec: 50, win: { junior: 14, senior: 20 } },
   { id: "dodge", band: "both", durationSec: 46, win: { junior: 1, senior: 1 } },
   { id: "copyme", band: "both", durationSec: 52, win: { junior: 1, senior: 1 } },
   { id: "duel", band: "both", durationSec: 46, win: { junior: 100, senior: 100 } },
+  { id: "popwall", band: "both", durationSec: 50, win: { junior: 10, senior: 16 } },
+  { id: "trickshot", band: "both", durationSec: 50, win: { junior: 5, senior: 8 } },
 ];
 
 /** Games a student of this level may see: their own band plus "both". */

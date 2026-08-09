@@ -16,12 +16,11 @@ const BRAIN_BREAK_XP_FLOOR = 5;
  * Phases: intro (villain + taunt) → play (mini-game) → victory (defeat + tip).
  * Always winnable — if the timer runs out the villain is defeated anyway.
  *
- * Five shared mechanics, picked per villain via `villain.game`:
- *   whack    — tap pop-up targets
- *   slash    — tap arcing targets
- *   keepuppy — bop a falling orb, count the bops
- *   charge   — tap fast to fill a confidence meter (SEL, always wins)
- *   duel     — tug-of-war clicker race vs the villain
+ * Shared arcade mechanics, chosen per break by `villain.game` (a band-appropriate
+ * game dressed with a villain — see pickBreak): whack, slash (true swipe),
+ * keepuppy, duel, dodge, copyme, trace, popwall and
+ * trickshot. Count games award "+1 XP" per hit; completing any
+ * break credits a small capped reward to the Explorer wallet.
  */
 
 type Phase = "intro" | "play" | "victory";
@@ -45,7 +44,7 @@ export default function BrainBreak({
   const xpIdRef = useRef(0);
   const [earnedXp, setEarnedXp] = useState(0);
 
-  const isCountGame = villain.game === "whack" || villain.game === "slash" || villain.game === "keepuppy";
+  const isCountGame = villain.game === "whack" || villain.game === "slash" || villain.game === "keepuppy" || villain.game === "popwall" || villain.game === "trickshot";
 
   const finish = useCallback(() => {
     if (doneRef.current) return;
@@ -233,11 +232,12 @@ export default function BrainBreak({
           {villain.game === "whack" && <WhackGame villain={villain} onHit={onHit} />}
           {villain.game === "slash" && <SlashGame villain={villain} onHit={onHit} />}
           {villain.game === "keepuppy" && <KeepUppyGame villain={villain} onHit={onHit} />}
-          {villain.game === "charge" && <ChargeGame villain={villain} onWin={finish} />}
           {villain.game === "duel" && <DuelGame villain={villain} onWin={finish} />}
           {villain.game === "dodge" && <DodgeGame villain={villain} onWin={finish} />}
           {villain.game === "copyme" && <CopyMeGame villain={villain} onWin={finish} />}
           {villain.game === "trace" && <TraceGame villain={villain} onWin={finish} />}
+          {villain.game === "popwall" && <PopWallGame villain={villain} onHit={onHit} />}
+          {villain.game === "trickshot" && <TrickShotGame villain={villain} onHit={onHit} />}
 
           {/* "+1 XP" reward pops at each hit */}
           {xpFloats.map((f) => (
@@ -304,7 +304,8 @@ function playHint(game: Villain["game"]): string {
   switch (game) {
     case "slash": return "Swipe your blade through them!";
     case "keepuppy": return "Tap to keep it up!";
-    case "charge": return "Tap fast to shine!";
+    case "popwall": return "Tap a matching orb to pop the cluster!";
+    case "trickshot": return "Flick the ball into the hoop!";
     case "duel": return "Tap to win the tug-of-war!";
     case "dodge": return "Drag to dodge!";
     case "copyme": return "Watch, then copy!";
@@ -477,60 +478,6 @@ function KeepUppyGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { xP
       }}
     >
       {villain.targetEmoji}
-    </button>
-  );
-}
-
-// ── CHARGE-THE-LIGHT (SEL — always wins) ────────────────────────────────────
-function ChargeGame({ villain, onWin }: { villain: Villain; onWin: () => void }) {
-  const [meter, setMeter] = useState(0);
-  const meterRef = useRef(0);
-  const wonRef = useRef(false);
-  const max = villain.winCount;
-
-  useEffect(() => {
-    const decay = window.setInterval(() => {
-      meterRef.current = Math.max(0, meterRef.current - 0.3);
-      setMeter(meterRef.current);
-    }, 100);
-    return () => window.clearInterval(decay);
-  }, []);
-
-  function tap() {
-    meterRef.current = Math.min(max, meterRef.current + 1.5);
-    setMeter(meterRef.current);
-    if (meterRef.current >= max && !wonRef.current) {
-      wonRef.current = true;
-      onWin();
-    }
-  }
-
-  const frac = Math.min(1, meter / max);
-
-  return (
-    <button type="button" onPointerDown={tap} className="absolute inset-0 flex flex-col items-center justify-center" style={{ cursor: "pointer" }}>
-      {/* brightening hero */}
-      <div
-        style={{
-          fontSize: "clamp(5rem, 16vw, 9rem)", lineHeight: 1,
-          opacity: 0.25 + frac * 0.75,
-          transform: `scale(${0.8 + frac * 0.4})`,
-          filter: `drop-shadow(0 0 ${10 + frac * 50}px ${villain.glow}) brightness(${0.7 + frac * 0.8})`,
-          transition: "transform 0.12s ease-out",
-        }}
-      >
-        {frac >= 1 ? "🌟" : villain.targetEmoji}
-      </div>
-      {/* confidence meter */}
-      <div className="mt-8 h-4 w-[min(70vw,360px)] overflow-hidden rounded-full bg-white/10 ring-1 ring-white/15">
-        <div
-          className="h-full rounded-full transition-all duration-100"
-          style={{ width: `${frac * 100}%`, background: `linear-gradient(90deg, ${villain.color}, #fff8e8)`, boxShadow: `0 0 14px ${villain.glow}` }}
-        />
-      </div>
-      <div className="mt-4 font-sans font-extrabold text-white/90" style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)" }}>
-        {frac < 0.4 ? "You can do this…" : frac < 0.8 ? "Keep going — you're doing it!" : "Almost there — shine bright!"}
-      </div>
     </button>
   );
 }
@@ -788,6 +735,134 @@ function TraceGame({ villain, onWin }: { villain: Villain; onWin: () => void }) 
         <div className="h-full rounded-full transition-all" style={{ width: `${progress * 100}%`, background: `linear-gradient(90deg, ${villain.color}, #fff8e8)`, boxShadow: `0 0 10px ${villain.glow}` }} />
       </div>
       <div className="absolute inset-x-0 bottom-6 text-center font-sans font-bold text-white/70" style={{ fontSize: "clamp(0.85rem,2vw,1.1rem)" }}>Trace the glowing path with your finger</div>
+    </div>
+  );
+}
+
+// ── POP WALL (tap a matching cluster to pop it — collapse & refill) ──────────
+const PW_PAL = ["#a78bfa", "#22d3ee", "#fcd34d", "#fb7185"];
+function PopWallGame({ onHit }: { villain: Villain; onHit: (pos?: { xPct: number; yPct: number }) => void }) {
+  const COLS = 6, ROWS = 6;
+  const rand = () => Math.floor(Math.random() * PW_PAL.length);
+  const [grid, setGrid] = useState<number[][]>(() => Array.from({ length: ROWS }, () => Array.from({ length: COLS }, rand)));
+
+  function flood(g: number[][], r: number, c: number, colour: number, seen: Set<string>): Array<{ r: number; c: number }> {
+    if (r < 0 || c < 0 || r >= ROWS || c >= COLS || seen.has(`${r}:${c}`) || g[r]![c] !== colour) return [];
+    seen.add(`${r}:${c}`);
+    return [{ r, c }, ...flood(g, r - 1, c, colour, seen), ...flood(g, r + 1, c, colour, seen), ...flood(g, r, c - 1, colour, seen), ...flood(g, r, c + 1, colour, seen)];
+  }
+  function tap(r: number, c: number, e: React.PointerEvent) {
+    const colour = grid[r]![c]!;
+    const group = flood(grid, r, c, colour, new Set());
+    if (group.length < 2) return;
+    const ng = grid.map((row) => [...row]);
+    group.forEach(({ r, c }) => { ng[r]![c] = -1; });
+    for (let col = 0; col < COLS; col += 1) {
+      const kept: number[] = [];
+      for (let row = ROWS - 1; row >= 0; row -= 1) if (ng[row]![col] !== -1) kept.push(ng[row]![col]!);
+      for (let row = ROWS - 1, k = 0; row >= 0; row -= 1, k += 1) ng[row]![col] = k < kept.length ? kept[k]! : rand();
+    }
+    setGrid(ng);
+    const baseX = (e.clientX / window.innerWidth) * 100;
+    const baseY = (e.clientY / window.innerHeight) * 100;
+    group.forEach((_, i) => window.setTimeout(() => onHit({ xPct: baseX + (Math.random() - 0.5) * 8, yPct: baseY + (Math.random() - 0.5) * 8 }), i * 45));
+  }
+  return (
+    <div className="absolute inset-0 flex items-center justify-center px-5">
+      <div className="grid w-full max-w-sm gap-1.5" style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0,1fr))` }}>
+        {grid.flatMap((row, r) => row.map((colour, c) => (
+          <button
+            key={`${r}:${c}`}
+            type="button"
+            onPointerDown={(e) => tap(r, c, e)}
+            className="aspect-square rounded-full transition active:scale-90"
+            style={{ background: `radial-gradient(circle at 35% 30%, #ffffffcc, ${PW_PAL[colour]} 55%, ${PW_PAL[colour]})`, boxShadow: `0 0 10px ${PW_PAL[colour]}66`, cursor: "pointer" }}
+          />
+        )))}
+      </div>
+    </div>
+  );
+}
+
+// ── TRICK SHOT (flick the ball into the moving hoop — with an aim preview) ──
+const TS_GRAV = 0.00085;
+function tsSimulate(vx: number, vy: number): Array<{ x: number; y: number }> {
+  const pts: Array<{ x: number; y: number }> = [];
+  const sx = vx;
+  let x = 0.5, y = 0.84, sy = vy;
+  for (let i = 0; i < 80; i += 1) {
+    x += sx; y += sy; sy += TS_GRAV;
+    if (i % 7 === 0) pts.push({ x, y });
+    if (y > 1.02 || x < -0.05 || x > 1.05) break;
+  }
+  return pts;
+}
+function TrickShotGame({ villain, onHit }: { villain: Villain; onHit: (pos?: { xPct: number; yPct: number }) => void }) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const ball = useRef({ x: 0.5, y: 0.84, vx: 0, vy: 0, flying: false });
+  const hoop = useRef({ x: 0.5, dir: 1 });
+  const drag = useRef<{ x: number; y: number } | null>(null);
+  const raf = useRef(0);
+  const [disp, setDisp] = useState({ bx: 0.5, by: 0.84, hx: 0.5 });
+  const [aim, setAim] = useState<Array<{ x: number; y: number }>>([]);
+
+  useEffect(() => {
+    const loop = () => {
+      const h = hoop.current;
+      h.x += h.dir * 0.003; // slower — easier to time
+      if (h.x > 0.8) h.dir = -1;
+      if (h.x < 0.2) h.dir = 1;
+      const b = ball.current;
+      if (b.flying) {
+        b.x += b.vx; b.y += b.vy; b.vy += TS_GRAV;
+        // forgiving catch: descending through a generous band around the rim
+        if (b.vy > 0 && b.y >= 0.19 && b.y <= 0.34 && Math.abs(b.x - h.x) < 0.12) {
+          onHit({ xPct: h.x * 100, yPct: 24 });
+          ball.current = { x: 0.5, y: 0.84, vx: 0, vy: 0, flying: false };
+        } else if (b.y > 1.05 || b.x < -0.1 || b.x > 1.1) {
+          ball.current = { x: 0.5, y: 0.84, vx: 0, vy: 0, flying: false };
+        }
+      }
+      setDisp({ bx: ball.current.x, by: ball.current.y, hx: hoop.current.x });
+      raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf.current);
+  }, [onHit]);
+
+  function velFrom(e: React.PointerEvent) {
+    const rect = wrapRef.current!.getBoundingClientRect();
+    const dx = (e.clientX - drag.current!.x) / rect.width;
+    const dy = (e.clientY - drag.current!.y) / rect.height;
+    return { vx: dx * 0.058, vy: dy * 0.06, dy };
+  }
+  function down(e: React.PointerEvent) { if (!ball.current.flying) drag.current = { x: e.clientX, y: e.clientY }; }
+  function move(e: React.PointerEvent) {
+    if (!drag.current || ball.current.flying || !wrapRef.current) return;
+    const { vx, vy, dy } = velFrom(e);
+    setAim(dy < -0.03 ? tsSimulate(vx, vy) : []);
+  }
+  function up(e: React.PointerEvent) {
+    if (!drag.current || ball.current.flying || !wrapRef.current) { drag.current = null; setAim([]); return; }
+    const { vx, vy, dy } = velFrom(e);
+    if (dy < -0.05) { ball.current.vx = vx; ball.current.vy = vy; ball.current.flying = true; }
+    drag.current = null; setAim([]);
+  }
+
+  return (
+    <div ref={wrapRef} className="absolute inset-0" style={{ touchAction: "none", cursor: "grab" }} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerLeave={up}>
+      {/* aim preview */}
+      {aim.map((p, i) => (
+        <div key={i} className="absolute rounded-full" style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%`, width: 8, height: 8, transform: "translate(-50%,-50%)", background: "#fff", opacity: 0.5 - i * 0.03 }} />
+      ))}
+      {/* hoop */}
+      <div className="absolute" style={{ left: `${disp.hx * 100}%`, top: "24%", transform: "translate(-50%, -50%)" }}>
+        <div style={{ width: 88, height: 18, borderRadius: 999, border: `5px solid ${villain.color}`, boxShadow: `0 0 18px ${villain.glow}` }} />
+        <div style={{ width: 88, height: 22, marginTop: -2, background: `linear-gradient(${villain.color}66, transparent)`, clipPath: "polygon(8% 0, 92% 0, 78% 100%, 22% 100%)" }} />
+      </div>
+      {/* ball */}
+      <div className="absolute" style={{ left: `${disp.bx * 100}%`, top: `${disp.by * 100}%`, width: 44, height: 44, transform: "translate(-50%, -50%)", borderRadius: 999, background: "radial-gradient(circle at 35% 30%, #ffd7a0, #f59e0b 60%, #b45309)", boxShadow: "0 0 14px rgba(245,158,11,0.6)" }} />
+      <div className="absolute inset-x-0 bottom-6 text-center font-sans font-bold text-white/70" style={{ fontSize: "clamp(0.85rem,2vw,1.1rem)" }}>Flick the ball up — the dots show your aim</div>
     </div>
   );
 }
