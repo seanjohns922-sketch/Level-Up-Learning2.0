@@ -71,6 +71,33 @@ type LiveActivityEventRow = {
   payload: Record<string, unknown> | null;
 };
 
+function TeacherDashboardSkeleton() {
+  return (
+    <main className="min-h-screen bg-gradient-to-b from-[#E2E8F0] via-[#DEE5EC] to-[#D6DEE6]" aria-busy="true" aria-label="Loading class dashboard">
+      <header className="border-b border-[#E6E8EC] bg-white px-6 py-3">
+        <div className="mx-auto flex max-w-[1800px] items-center gap-3">
+          <div className="h-9 w-9 animate-pulse rounded-lg bg-[#0A2F2A]/15" />
+          <div className="h-6 w-48 animate-pulse rounded bg-slate-200" />
+          <div className="h-5 w-20 animate-pulse rounded bg-slate-100" />
+          <div className="ml-auto h-9 w-40 animate-pulse rounded-lg bg-slate-100" />
+        </div>
+      </header>
+      <div className="mx-auto max-w-[1800px] px-6 py-8">
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
+          {Array.from({ length: 5 }, (_, index) => (
+            <div key={index} className="h-40 animate-pulse rounded-lg border border-slate-200 bg-white/90" />
+          ))}
+        </div>
+        <div className="mt-8 grid gap-5 xl:grid-cols-[1.6fr_1fr]">
+          <div className="h-72 animate-pulse rounded-lg border border-slate-200 bg-white/90" />
+          <div className="h-72 animate-pulse rounded-lg border border-slate-200 bg-white/90" />
+        </div>
+      </div>
+      <span className="sr-only">Loading dashboard</span>
+    </main>
+  );
+}
+
 const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
 
 /* ── helpers ───────────────────────────────────────── */
@@ -450,6 +477,10 @@ export default function TeacherDashboardPage() {
       const newStuds = studs ?? [];
       console.log("[TeacherDashboard] students fetched for selectedClassId:", classId, "count:", newStuds.length);
 
+      // The roster drives the visible class shell and is useful without the
+      // heavier canonical-progress and activity history payloads.
+      if (!diffOnly) setStudents(newStuds);
+
       let newProg: ProgressRow[] = [];
       let newLiveRows: LiveStudentActivityRow[] = [];
       let newLiveEvents: LiveActivityEventRow[] = [];
@@ -503,7 +534,6 @@ export default function TeacherDashboardPage() {
         setLiveRows((prev) => JSON.stringify(prev) === liveJson ? prev : newLiveRows);
         setLiveEvents((prev) => JSON.stringify(prev) === eventsJson ? prev : newLiveEvents);
       } else {
-        setStudents(newStuds);
         setProgress(newProg);
         setLiveRows(newLiveRows);
         setLiveEvents(newLiveEvents);
@@ -1049,14 +1079,7 @@ export default function TeacherDashboardPage() {
   }
 
   if (loading) {
-    return (
-      <main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-500">
-          <div className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
-          <p className="text-sm font-semibold">Loading dashboard…</p>
-        </div>
-      </main>
-    );
+    return <TeacherDashboardSkeleton />;
   }
 
   // Whole-class KPI strip — never filter by active year/strand/tab.

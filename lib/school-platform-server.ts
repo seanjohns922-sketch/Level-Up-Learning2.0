@@ -261,12 +261,20 @@ export async function requireSchoolPreviewAccess(schoolId: string) {
 }
 
 export async function loadSchoolHomePreview(schoolId: string) {
-  const access = await requireSchoolPreviewAccess(schoolId);
-  if (!access) return null;
+  if (!isSchoolPlatformPreviewEnabled()) return null;
 
-  const { accessToken, ...accessContext } = access;
+  const accessToken = await getSchoolPreviewToken();
+  const [user, school] = await Promise.all([
+    verifyAdultAccessToken(accessToken),
+    getSchoolAccessContext(schoolId, accessToken),
+  ]);
+  if (!user || !school) return null;
+
   try {
-    const [snapshot, schools, canViewAdministration, studentDirectory] = await Promise.all([
+    // The audit write is still mandatory, but it does not need to form a
+    // separate network waterfall before the read-only home snapshot begins.
+    const [accessRecorded, snapshot, schools, canViewAdministration] = await Promise.all([
+      recordSchoolPreviewAccess(schoolId, accessToken),
       supabaseRequest<SchoolHomeSnapshot>(
         "/rest/v1/rpc/get_school_home_snapshot",
         accessToken,
@@ -277,22 +285,11 @@ export async function loadSchoolHomePreview(schoolId: string) {
       ),
       getMySchoolContexts(accessToken),
       canViewSchoolAdministration(schoolId, accessToken),
-      getSchoolStudentDirectory(schoolId, accessToken)
-        .then((students) => ({ students, error: null as string | null }))
-        .catch((error: unknown) => {
-          const message =
-            error instanceof Error
-              ? error.message
-              : "The school student directory could not be loaded.";
-          console.error(
-            "[SchoolHome] Unable to load the canonical student directory",
-            error,
-          );
-          return { students: [], error: message };
-        }),
     ]);
+    if (!accessRecorded) return null;
     return {
-      ...accessContext,
+      user,
+      school,
       snapshot: {
         ...snapshot,
         permissions: {
@@ -301,13 +298,31 @@ export async function loadSchoolHomePreview(schoolId: string) {
           isLeadingTeacher:
             snapshot.actor.role === "teacher" && canViewAdministration,
         },
-        students: studentDirectory.students,
-        studentDirectoryError: studentDirectory.error,
+        // The school-wide directory is only needed by the Students tab. It is
+        // loaded on demand so it cannot delay the School Home LCP.
+        students: [],
+        studentDirectoryError: null,
       },
       schools,
     };
   } catch {
     return null;
+  }
+}
+
+export async function loadSchoolStudentDirectoryPreview(schoolId: string) {
+  const access = await requireSchoolPreviewAccess(schoolId);
+  if (!access) return null;
+
+  try {
+    return await getSchoolStudentDirectory(schoolId, access.accessToken);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "The school student directory could not be loaded.";
+    console.error("[SchoolHome] Unable to load the canonical student directory", error);
+    throw new Error(message);
   }
 }
 

@@ -24,7 +24,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { ChangeEvent, useMemo, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type {
   SchoolHomeSnapshot,
@@ -498,6 +498,7 @@ function StudentDirectory({
   students,
   classes,
   directoryError,
+  directoryLoading,
   busy,
   onReset,
   onCreate,
@@ -505,6 +506,7 @@ function StudentDirectory({
   students: SchoolHomeSnapshot["students"];
   classes: SchoolHomeSnapshot["classes"];
   directoryError: string | null;
+  directoryLoading: boolean;
   busy: boolean;
   onReset: (studentId: string, reason: string) => Promise<boolean>;
   onCreate: (students: SchoolStudentDraft[]) => Promise<StudentCreateResult>;
@@ -561,6 +563,31 @@ function StudentDirectory({
         yearRank(left.yearLevel) - yearRank(right.yearLevel) ||
         left.name.localeCompare(right.name),
     );
+
+  if (directoryLoading) {
+    return (
+      <section aria-busy="true" aria-label="Loading school students">
+        <div className="mb-4 flex items-end justify-between gap-3">
+          <div className="space-y-2">
+            <div className="h-6 w-40 animate-pulse rounded bg-slate-200" />
+            <div className="h-4 w-72 animate-pulse rounded bg-slate-100" />
+          </div>
+          <div className="h-10 w-36 animate-pulse rounded-md bg-slate-200" />
+        </div>
+        <div className="overflow-hidden border border-slate-200 bg-white">
+          <div className="h-11 animate-pulse border-b border-slate-200 bg-slate-100" />
+          {Array.from({ length: 7 }, (_, index) => (
+            <div key={index} className="grid grid-cols-[1.2fr_0.6fr_1fr_1fr] gap-5 border-b border-slate-100 px-4 py-4 last:border-0">
+              <div className="h-4 animate-pulse rounded bg-slate-200" />
+              <div className="h-4 animate-pulse rounded bg-slate-100" />
+              <div className="h-4 animate-pulse rounded bg-slate-100" />
+              <div className="h-4 animate-pulse rounded bg-slate-100" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   async function copyCode(code: string) {
     await navigator.clipboard.writeText(code);
@@ -1253,7 +1280,19 @@ export default function SchoolHomeClient({
   schools: SchoolSwitcherItem[];
 }) {
   const router = useRouter();
-  const snapshot = initialSnapshot;
+  const [directoryStudents, setDirectoryStudents] = useState(initialSnapshot.students);
+  const [directoryError, setDirectoryError] = useState<string | null>(initialSnapshot.studentDirectoryError);
+  const [directoryState, setDirectoryState] = useState<"idle" | "loading" | "ready">(
+    initialSnapshot.students.length > 0 ? "ready" : "idle",
+  );
+  const snapshot = useMemo(
+    () => ({
+      ...initialSnapshot,
+      students: directoryStudents,
+      studentDirectoryError: directoryError,
+    }),
+    [directoryError, directoryStudents, initialSnapshot],
+  );
   const [tab, setTab] = useState<TabId>("home");
   const activeYear =
     snapshot.academicYears.find((year) => year.status === "active") ??
@@ -1270,6 +1309,37 @@ export default function SchoolHomeClient({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  const loadStudentDirectory = useCallback(async () => {
+    setDirectoryState("loading");
+    setDirectoryError(null);
+    try {
+      const response = await fetch(`/api/school/${initialSnapshot.school.id}/students`, {
+        cache: "no-store",
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { students?: SchoolHomeSnapshot["students"]; error?: string }
+        | null;
+      if (!response.ok || !result?.students) {
+        throw new Error(result?.error ?? "The school student directory could not be loaded.");
+      }
+      setDirectoryStudents(result.students);
+    } catch (loadError) {
+      setDirectoryError(
+        loadError instanceof Error
+          ? loadError.message
+          : "The school student directory could not be loaded.",
+      );
+    } finally {
+      setDirectoryState("ready");
+    }
+  }, [initialSnapshot.school.id]);
+
+  useEffect(() => {
+    if (tab === "students" && directoryState === "idle") {
+      void loadStudentDirectory();
+    }
+  }, [directoryState, loadStudentDirectory, tab]);
 
   const filteredClasses = useMemo(
     () =>
@@ -1343,6 +1413,7 @@ export default function SchoolHomeClient({
       },
       "Explorer Code reset",
     );
+    if (result?.explorerCode) await loadStudentDirectory();
     return Boolean(result?.explorerCode);
   }
 
@@ -1362,6 +1433,7 @@ export default function SchoolHomeClient({
         notify(
           `${created.length} student${created.length === 1 ? "" : "s"} added`,
         );
+        await loadStudentDirectory();
         router.refresh();
       }
       return { created, errors };
@@ -1701,6 +1773,7 @@ export default function SchoolHomeClient({
               students={snapshot.students}
               classes={filteredClasses}
               directoryError={snapshot.studentDirectoryError}
+              directoryLoading={directoryState !== "ready"}
               busy={busy}
               onReset={resetExplorerCode}
               onCreate={createSchoolStudents}

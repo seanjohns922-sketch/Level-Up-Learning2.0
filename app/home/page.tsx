@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { StudentProgress } from "@/data/progress";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
@@ -8,6 +9,24 @@ import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYe
 import { markStudentIntroSeen, restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
 import { resolveStudentDestination } from "@/lib/student-destination";
+
+function StudentHomeBackdrop() {
+  return (
+    <div className="fixed inset-0 z-0">
+      <Image
+        src="/images/dashboard-bg-lcp.webp"
+        alt=""
+        fill
+        priority
+        fetchPriority="high"
+        sizes="100vw"
+        className="object-cover"
+        style={{ objectPosition: "center 40%" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/40" />
+    </div>
+  );
+}
 
 export default function StudentHomePage() {
   const router = useRouter();
@@ -86,9 +105,22 @@ export default function StudentHomePage() {
 
   if (restoreState !== "ready") {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-[#fbf7f1] p-6">
-        <div className="max-w-md text-center">
-          <p className="font-bold text-slate-800">{restoreState === "loading" ? "Loading your journey..." : restoreError}</p>
+      <main className="relative flex min-h-screen items-end justify-center p-6 pb-10">
+        <StudentHomeBackdrop />
+        <div className="relative z-10 w-full max-w-3xl rounded-3xl border border-white/45 bg-white/90 p-8 text-center shadow-[0_20px_40px_rgba(0,0,0,0.18)] backdrop-blur-sm">
+          {restoreState === "loading" ? (
+            <div aria-busy="true" aria-label="Loading your journey">
+              <div className="mx-auto h-4 w-28 animate-pulse rounded bg-amber-800/15" />
+              <div className="mx-auto mt-4 h-12 w-full max-w-lg animate-pulse rounded-lg bg-slate-200" />
+              <div className="mx-auto mt-5 h-4 w-full max-w-xl animate-pulse rounded bg-slate-100" />
+              <div className="mx-auto mt-3 h-4 w-4/5 max-w-lg animate-pulse rounded bg-slate-100" />
+              <div className="mt-8 aspect-video w-full animate-pulse rounded-[22px] bg-slate-900/80" />
+              <div className="mx-auto mt-8 h-14 w-full max-w-md animate-pulse rounded-2xl bg-emerald-700/30" />
+              <span className="sr-only">Loading your journey</span>
+            </div>
+          ) : (
+            <p className="font-bold text-slate-800">{restoreError}</p>
+          )}
           {restoreState === "error" ? (
             <button type="button" onClick={() => window.location.reload()} className="mt-4 rounded-xl bg-teal-700 px-5 py-3 font-bold text-white">Retry</button>
           ) : null}
@@ -99,10 +131,7 @@ export default function StudentHomePage() {
 
   return (
     <main className="min-h-screen relative flex items-end justify-center p-6 pb-10">
-      <div className="fixed inset-0 z-0">
-        <img src="/images/dashboard-bg.jpg" alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 40%" }} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/40" />
-      </div>
+      <StudentHomeBackdrop />
 
       <div className="absolute top-6 right-6 z-20">
         <button

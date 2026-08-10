@@ -1,24 +1,27 @@
 import { NextResponse } from "next/server";
-import { loadSchoolHomePreview } from "@/lib/school-platform-server";
+import { loadSchoolStudentDirectoryPreview } from "@/lib/school-platform-server";
 
 export async function GET(
   _request: Request,
   context: { params: Promise<{ schoolId: string }> },
 ) {
   const { schoolId } = await context.params;
-  const schoolHome = await loadSchoolHomePreview(schoolId);
-  if (!schoolHome) {
-    return NextResponse.json({ error: "School access denied" }, { status: 403 });
-  }
-  if (schoolHome.snapshot.studentDirectoryError) {
+  try {
+    const students = await loadSchoolStudentDirectoryPreview(schoolId);
+    if (!students) {
+      return NextResponse.json({ error: "School access denied" }, { status: 403 });
+    }
+
+    return NextResponse.json({ students });
+  } catch (error) {
     return NextResponse.json(
-      { error: schoolHome.snapshot.studentDirectoryError },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "The school student directory could not be loaded.",
+      },
       { status: 503 },
     );
   }
-
-  return NextResponse.json({
-    students: schoolHome.snapshot.students,
-    classes: schoolHome.snapshot.classes,
-  });
 }
