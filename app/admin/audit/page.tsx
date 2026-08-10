@@ -1,0 +1,9 @@
+import { AdminPageHeading } from "@/components/admin/AdminPrimitives";
+import { loadPlatformAudit } from "@/lib/platform-admin-server";
+
+function label(value: string) { return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
+
+export default async function PlatformAuditPage() {
+  const data = await loadPlatformAudit();
+  return <><AdminPageHeading eyebrow="Audit" title="Administrative history" detail="Immutable owner actions across schools, seats, access dates and future billing classifications." /><div className="overflow-hidden border border-slate-200 bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[900px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-[0.1em] text-slate-500"><tr><th className="px-5 py-3">Date</th><th className="px-5 py-3">Action</th><th className="px-5 py-3">Entity</th><th className="px-5 py-3">Actor</th><th className="px-5 py-3">Reason</th></tr></thead><tbody className="divide-y divide-slate-100">{data?.audit.map((entry) => <tr key={entry.id}><td className="whitespace-nowrap px-5 py-4 text-slate-500">{new Intl.DateTimeFormat("en-AU", { dateStyle: "medium", timeStyle: "short" }).format(new Date(entry.createdAt))}</td><td className="px-5 py-4 font-semibold">{label(entry.action)}</td><td className="px-5 py-4"><span className="font-semibold">{label(entry.entityType)}</span><p className="mt-1 max-w-52 truncate text-xs text-slate-400">{entry.entityId}</p></td><td className="px-5 py-4 text-slate-500">{entry.actorUserId ?? "System"}</td><td className="px-5 py-4 text-slate-500">{entry.reason ?? "—"}</td></tr>)}{!data?.audit.length ? <tr><td colSpan={5} className="px-6 py-16 text-center text-slate-500">No Platform Admin actions have been recorded yet.</td></tr> : null}</tbody></table></div></div></>;
+}

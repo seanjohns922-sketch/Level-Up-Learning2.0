@@ -210,6 +210,15 @@ export default function LoginPage() {
 
   async function routeAuthenticatedEducator(accessToken: string) {
     try {
+      const adminResponse = await fetch("/api/admin-session", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (adminResponse.ok) {
+        window.location.assign("/admin");
+        return true;
+      }
+
       const response = await fetch("/api/school-preview-session", {
         method: "POST",
         headers: { Authorization: `Bearer ${accessToken}` },
