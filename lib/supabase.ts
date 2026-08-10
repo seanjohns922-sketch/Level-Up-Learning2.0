@@ -66,6 +66,20 @@ export function isOpaqueAuthError(error: unknown) {
   return !message || message === "{}" || message === "[object Object]";
 }
 
+export function isServiceUnavailableError(error: unknown) {
+  const message =
+    typeof error === "string"
+      ? error.trim()
+      : error instanceof Error
+        ? error.message.trim()
+        : error && typeof error === "object" && "message" in error &&
+            typeof error.message === "string"
+          ? error.message.trim()
+          : "";
+
+  return /failed to fetch|network request failed|connection (?:terminated|timed out)|connection timeout|timeout|fetch failed/i.test(message);
+}
+
 export function getAuthErrorMessage(error: unknown, fallback: string) {
   const message =
     typeof error === "string"
@@ -86,8 +100,8 @@ export function getAuthErrorMessage(error: unknown, fallback: string) {
   if (/email not confirmed/i.test(message)) {
     return "Verify your email before logging in.";
   }
-  if (/failed to fetch|network request failed/i.test(message)) {
-    return "The login service could not be reached. Check your connection and try again.";
+  if (isServiceUnavailableError(error)) {
+    return "The login service is temporarily unavailable. Please try again shortly.";
   }
   return message;
 }

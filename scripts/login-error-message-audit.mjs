@@ -7,7 +7,11 @@ const checks = [
   ["empty object errors use a fallback", /message === "\{\}"/.test(helper)],
   ["object string errors use a fallback", /message === "\[object Object\]"/.test(helper)],
   ["invalid credentials are explained", /Email or password is incorrect\./.test(helper)],
-  ["network failures are explained", /login service could not be reached/.test(helper)],
+  ["network failures are explained", /login service is temporarily unavailable/.test(helper)],
+  [
+    "service outages are distinguished from invalid class codes",
+    /if \(classLookupError\)[\s\S]*?temporarily unavailable[\s\S]*?if \(!cls\)[\s\S]*?Class code not found/.test(login),
+  ],
   [
     "auth requests do not depend on student session storage",
     /!requestUrl\.includes\("\/auth\/v1\/"\)/.test(helper),

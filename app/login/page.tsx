@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAuthErrorMessage, recoverAuthSessionError, supabase } from "@/lib/supabase";
+import { getAuthErrorMessage, isServiceUnavailableError, recoverAuthSessionError, supabase } from "@/lib/supabase";
 import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile, setStudentSessionToken } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
@@ -418,7 +418,15 @@ export default function LoginPage() {
     const cls = Array.isArray(lookupRows) ? lookupRows[0] ?? null : null;
 
     if (!isCurrentAttempt()) return;
-    if (classLookupError || !cls) {
+    if (classLookupError) {
+      failCurrentAttempt(
+        isServiceUnavailableError(classLookupError)
+          ? "The login service is temporarily unavailable. Please try again shortly."
+          : "The class could not be checked. Please try again.",
+      );
+      return;
+    }
+    if (!cls) {
       failCurrentAttempt("Class code not found.");
       return;
     }
@@ -432,7 +440,15 @@ export default function LoginPage() {
 
     const student = Array.isArray(studentRows) ? studentRows[0] : studentRows;
     if (!isCurrentAttempt()) return;
-    if (studentErr || !student?.student_id) {
+    if (studentErr) {
+      failCurrentAttempt(
+        isServiceUnavailableError(studentErr)
+          ? "The login service is temporarily unavailable. Please try again shortly."
+          : "Your login details could not be checked. Please try again.",
+      );
+      return;
+    }
+    if (!student?.student_id) {
       failCurrentAttempt("Username or password not recognised. Ask your teacher to check your details.");
       return;
     }
