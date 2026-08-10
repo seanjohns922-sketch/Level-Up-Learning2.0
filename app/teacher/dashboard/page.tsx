@@ -1223,14 +1223,14 @@ export default function TeacherDashboardPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#E2E8F0] via-[#DEE5EC] to-[#D6DEE6]">
       {/* Header */}
-      <header className="sticky top-0 z-20 border-b border-[#E6E8EC] bg-white px-6 py-3">
-        <div className="mx-auto flex max-w-[1800px] items-center gap-2 overflow-x-auto">
+      <header className="sticky top-0 z-20 border-b border-[#E6E8EC] bg-white px-3 py-3 xl:px-5">
+        <div className="mx-auto flex w-full min-w-0 items-center gap-1.5 overflow-x-auto 2xl:overflow-visible">
           {schoolHomeId ? (
             <button
               type="button"
               onClick={() => void openSchoolPreview(schoolHomeId)}
               disabled={openingSchoolPreview}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-sm font-bold text-[#334155] transition hover:border-[#00C2A8] hover:bg-[#F0FDFA] hover:text-[#0F766E] active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
+              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-2 text-sm font-bold text-[#334155] transition hover:border-[#00C2A8] hover:bg-[#F0FDFA] hover:text-[#0F766E] active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
               aria-label="Back to School Home"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -1255,7 +1255,7 @@ export default function TeacherDashboardPage() {
             </div>
           )}
 
-          <h1 className="shrink-0 text-xl font-black tracking-tight text-[#0F172A]">
+          <h1 className="max-w-56 shrink truncate text-lg font-black tracking-tight text-[#0F172A] min-[1500px]:max-w-72 min-[1500px]:text-xl min-[1900px]:max-w-none">
             {selectedClass?.name ?? "Class Dashboard"}
           </h1>
 
@@ -1272,14 +1272,14 @@ export default function TeacherDashboardPage() {
                   <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
                 </svg>
               </button>
-              <span className="shrink-0 text-[11px] font-semibold text-[#94A3B8]">
+              <span className="hidden shrink-0 text-[11px] font-semibold text-[#94A3B8] min-[1450px]:inline">
                 {classStudents.length} student{classStudents.length === 1 ? "" : "s"}
               </span>
               <span className="h-1 w-1 shrink-0 rounded-full bg-[#CBD5E1]" />
               <label className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-semibold text-[#475569]">
                 <span className="inline-flex items-center gap-1.5" title="Mid-lesson mini-game frequency. Override per student in their card.">
                   <Brain className="h-3.5 w-3.5" />
-                  Brain breaks
+                  <span className="hidden min-[1650px]:inline">Brain breaks</span>
                 </span>
                 <select
                   value={isBrainBreakFrequency(selectedClass.brain_break_frequency) ? selectedClass.brain_break_frequency : "normal"}
@@ -1299,7 +1299,7 @@ export default function TeacherDashboardPage() {
             </>
           ) : null}
 
-          <div className="ml-auto flex shrink-0 items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5">
             {isDev && !isSchoolPreview && (
               <button
                 onClick={() => void openSchoolPreview()}
@@ -1327,30 +1327,39 @@ export default function TeacherDashboardPage() {
             {selectedClass && classStudents.length > 0 && (
               <button
                 onClick={() => setShowLoginDetailsActions(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E6E8EC] bg-white text-[#0F172A] font-bold text-sm hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition active:scale-[0.98]"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-2 text-sm font-bold text-[#0F172A] transition hover:border-[#CBD5E1] hover:bg-[#F8FAFC] active:scale-[0.98] min-[1850px]:px-3.5"
+                aria-label="Student Login Details"
+                title="Student Login Details"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25">
                   <path d="M16 2H8a2 2 0 00-2 2v16a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z" />
                   <path d="M12 18h.01M8 6h8M8 10h8M8 14h4" />
                 </svg>
-                Student Login Details
+                <span className="min-[1850px]:hidden">Login details</span>
+                <span className="hidden min-[1850px]:inline">Student Login Details</span>
               </button>
             )}
 
             <button
               onClick={() => router.push("/teacher/classes")}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E6E8EC] bg-white text-[#0F172A] font-bold text-sm hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-2 text-sm font-bold text-[#0F172A] transition hover:border-[#CBD5E1] hover:bg-[#F8FAFC] active:scale-[0.98] min-[1850px]:px-3.5"
+              aria-label="Add or edit students"
+              title="Add or edit students"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25"><path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" /><circle cx="10" cy="7" r="4" /><path d="M19 8v6M16 11h6" /></svg>
-              Add / Edit Students
+              <span className="min-[1850px]:hidden">Students</span>
+              <span className="hidden min-[1850px]:inline">Add / Edit Students</span>
             </button>
             {selectedClass && classStudents.length > 0 ? (
               <button
                 onClick={() => setShowPlacements(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#0EA5A4]/40 bg-[#0EA5A4]/10 text-[#0F766E] font-bold text-sm hover:bg-[#0EA5A4]/15 transition active:scale-[0.98]"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#0EA5A4]/40 bg-[#0EA5A4]/10 px-2.5 py-2 text-sm font-bold text-[#0F766E] transition hover:bg-[#0EA5A4]/15 active:scale-[0.98] min-[1850px]:px-3.5"
+                aria-label="Manage placements"
+                title="Manage placements"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
-                Manage Placements
+                <span className="min-[1850px]:hidden">Placements</span>
+                <span className="hidden min-[1850px]:inline">Manage Placements</span>
               </button>
             ) : null}
             {/* Settings gear */}
