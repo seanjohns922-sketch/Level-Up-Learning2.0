@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ChevronRight, Lock, MoreHorizontal, Users, X } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, ArrowUpDown, ChevronRight, Lock, MoreHorizontal, Users, X } from "lucide-react";
 import { getAllRealms } from "@/data/programs/genres";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import {
@@ -23,6 +23,8 @@ import { normalizeSchoolYearLabel } from "@/lib/studentLevelLabel";
 type PMStudent = {
   id: string;
   display_name: string;
+  first_name?: string | null;
+  last_name?: string | null;
   school_year_level?: string | null;
   working_level?: string | null;
   year_level?: string | null;
@@ -44,12 +46,21 @@ const ENTRY_MODES: { value: PlacementEntryMode; label: string }[] = [
 ];
 
 const YEAR_ORDER = LEVEL_CATALOG.map((l) => l.id);
+const NAME_COLLATOR = new Intl.Collator("en-AU", { sensitivity: "base", numeric: true });
+type PlacementSortKey = "surname" | "schoolYear" | "assignedStart" | "currentProgress";
+type SortDirection = "asc" | "desc";
 
 function levelLabel(year?: string | null) {
   return LEVEL_CATALOG.find((l) => l.id === year)?.label ?? (year ?? "—");
 }
 function schoolYearOf(s: PMStudent) {
   return normalizeSchoolYearLabel(s.school_year_level ?? s.year_level) ?? "Year 1";
+}
+function surnameOf(s: PMStudent) {
+  const savedSurname = s.last_name?.trim();
+  if (savedSurname) return savedSurname;
+  const nameParts = s.display_name.trim().split(/\s+/).filter(Boolean);
+  return nameParts.at(-1) ?? s.display_name;
 }
 
 export default function PlacementManager({
@@ -71,6 +82,8 @@ export default function PlacementManager({
   const [saveMessage, setSaveMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const [filter, setFilter] = useState<"all" | "needs">("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
+  const [sortKey, setSortKey] = useState<PlacementSortKey>("surname");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const load = useCallback(async () => {
     if (!selectedClass?.id) return;
@@ -134,14 +147,83 @@ export default function PlacementManager({
     return savedPlacement(realm, s.id)?.assigned_start_level ?? currentProgress(realm, s.id)?.year ?? schoolYearOf(s);
   }
 
+  // A newly enrolled student has neither teacher placement nor realm progress.
+  // Make the school-year default a real pending save, not a visual-only fallback.
+  useEffect(() => {
+    if (!realmId || loading) return;
+    setPending((previous) => {
+      const next = { ...previous };
+      let changed = false;
+      for (const student of students) {
+        const hasSavedPlacement = placementByStudentRealm.has(`${realmId}:${student.id}`);
+        const hasRealmProgress = (progressByRealm[realmId] ?? []).some(
+          (row) => row.student_id === student.id,
+        );
+        if (hasSavedPlacement || hasRealmProgress || next[student.id]) continue;
+        next[student.id] = {
+          level: schoolYearOf(student),
+          entry: "pretest",
+        };
+        changed = true;
+      }
+      return changed ? next : previous;
+    });
+  }, [loading, placementByStudentRealm, progressByRealm, realmId, students]);
+
+  function toggleSort(nextKey: PlacementSortKey) {
+    if (sortKey === nextKey) {
+      setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
+      return;
+    }
+    setSortKey(nextKey);
+    setSortDirection("asc");
+  }
+
   const visibleStudents = useMemo(() => {
     if (!realmId) return [];
-    return students.filter((s) => {
+    const filtered = students.filter((s) => {
       if (yearFilter !== "all" && schoolYearOf(s) !== yearFilter) return false;
       if (filter === "needs" && placedIdsByRealm[realmId]?.has(s.id)) return false;
       return true;
     });
-  }, [students, realmId, filter, yearFilter, placedIdsByRealm]);
+
+    return filtered.sort((a, b) => {
+      const progressFor = (student: PMStudent) => {
+        const rows = (progressByRealm[realmId] ?? []).filter(
+          (row) => row.student_id === student.id,
+        );
+        return rows.reduce<CompatProgressRow | null>((best, row) => {
+          if (!best) return row;
+          return YEAR_ORDER.indexOf(row.year) > YEAR_ORDER.indexOf(best.year) ? row : best;
+        }, null);
+      };
+      const assignedFor = (student: PMStudent) =>
+        pending[student.id]?.level ??
+        placementByStudentRealm.get(`${realmId}:${student.id}`)?.assigned_start_level ??
+        progressFor(student)?.year ??
+        schoolYearOf(student);
+
+      let comparison = 0;
+      if (sortKey === "surname") {
+        comparison = NAME_COLLATOR.compare(surnameOf(a), surnameOf(b));
+      } else if (sortKey === "schoolYear") {
+        comparison = YEAR_ORDER.indexOf(schoolYearOf(a)) - YEAR_ORDER.indexOf(schoolYearOf(b));
+      } else if (sortKey === "assignedStart") {
+        comparison = YEAR_ORDER.indexOf(assignedFor(a)) - YEAR_ORDER.indexOf(assignedFor(b));
+      } else {
+        const aProgress = progressFor(a);
+        const bProgress = progressFor(b);
+        const aLevel = aProgress ? YEAR_ORDER.indexOf(aProgress.year) : -1;
+        const bLevel = bProgress ? YEAR_ORDER.indexOf(bProgress.year) : -1;
+        comparison = aLevel - bLevel || (aProgress?.week ?? 0) - (bProgress?.week ?? 0);
+      }
+
+      if (comparison === 0) {
+        comparison = NAME_COLLATOR.compare(surnameOf(a), surnameOf(b));
+      }
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [filter, pending, placedIdsByRealm, placementByStudentRealm, progressByRealm, realmId, sortDirection, sortKey, students, yearFilter]);
 
   const pendingCount = Object.keys(pending).length;
 
@@ -397,16 +479,27 @@ export default function PlacementManager({
                   <option key={y} value={y}>{y}</option>
                 ))}
               </select>
+              <span className="ml-auto text-xs font-semibold text-[#64748B]">
+                Sorted by {sortKey === "surname" ? "surname" : sortKey === "schoolYear" ? "school year" : sortKey === "assignedStart" ? "assigned start" : "current progress"}
+              </span>
             </div>
 
             {/* Table */}
             <div className="overflow-hidden rounded-2xl border border-[#E6E8EC] bg-white">
               <div className="grid grid-cols-[1.6fr_0.7fr_1.1fr_1.2fr_1.2fr_0.4fr] gap-3 border-b border-[#E6E8EC] bg-[#F8FAFC] px-5 py-3 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#94A3B8]">
-                <span>Student</span>
-                <span>School Year</span>
-                <span>Assigned Start</span>
+                <button type="button" onClick={() => toggleSort("surname")} className="inline-flex items-center gap-1 text-left hover:text-[#475569]" title="Sort by surname">
+                  Student {sortKey === "surname" ? (sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3" />}
+                </button>
+                <button type="button" onClick={() => toggleSort("schoolYear")} className="inline-flex items-center gap-1 text-left hover:text-[#475569]">
+                  School Year {sortKey === "schoolYear" ? (sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3" />}
+                </button>
+                <button type="button" onClick={() => toggleSort("assignedStart")} className="inline-flex items-center gap-1 text-left hover:text-[#475569]">
+                  Assigned Start {sortKey === "assignedStart" ? (sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3" />}
+                </button>
                 <span>Entry Method</span>
-                <span>Current Progress</span>
+                <button type="button" onClick={() => toggleSort("currentProgress")} className="inline-flex items-center gap-1 text-left hover:text-[#475569]">
+                  Current Progress {sortKey === "currentProgress" ? (sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3" />}
+                </button>
                 <span className="text-right">Actions</span>
               </div>
               {visibleStudents.length === 0 ? (
