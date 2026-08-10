@@ -41,6 +41,8 @@ type GenericAssessmentQuestion = AssessmentQuestionMetadata & {
   correctAnswer?: string | number;
   answer?: unknown;
   answerOptionId?: string;
+  prompt?: string;
+  visual?: unknown;
 };
 
 function parseNumericAssessmentValue(value: unknown): number | null {
@@ -65,6 +67,43 @@ function parseCoordinateAssessmentValue(
   return { x, y };
 }
 
+function fractionAnswerParts(value: unknown): { numerator: number; denominator: number } | null {
+  if (typeof value !== "string") return null;
+  const match = value.trim().match(/^(-?\d+)\s*\/\s*(\d+)$/);
+  if (!match) return null;
+  const numerator = Number(match[1]);
+  const denominator = Number(match[2]);
+  if (!Number.isFinite(numerator) || !Number.isInteger(denominator) || denominator <= 0) return null;
+  return { numerator, denominator };
+}
+
+function missingNumeratorDenominator(question: GenericAssessmentQuestion): number | null {
+  const visual = question.visual;
+  if (!visual || typeof visual !== "object" || Array.isArray(visual)) return null;
+  const record = visual as Record<string, unknown>;
+
+  if (typeof record.answerDenominator === "number" && Number.isInteger(record.answerDenominator) && record.answerDenominator > 0) {
+    return record.answerDenominator;
+  }
+
+  const strings = [record.expression, record.statement]
+    .concat(Array.isArray(record.values) ? record.values : [])
+    .filter((value): value is string => typeof value === "string");
+  for (const value of strings) {
+    const match = value.match(/[?□]\s*\/\s*(\d+)/);
+    if (match) return Number(match[1]);
+  }
+
+  if (record.type === "number_y4_fraction_equivalence" && Array.isArray(record.right)) {
+    const [numerator, denominator] = record.right;
+    if (numerator == null && typeof denominator === "number" && Number.isInteger(denominator) && denominator > 0) {
+      return denominator;
+    }
+  }
+
+  return null;
+}
+
 export function isAssessmentAnswerCorrect(
   question: GenericAssessmentQuestion,
   chosen: string | undefined
@@ -77,6 +116,15 @@ export function isAssessmentAnswerCorrect(
     const chosenValue = parseNumericAssessmentValue(chosen);
     if (expectedValue != null && chosenValue != null) {
       return Math.abs(expectedValue - chosenValue) < 1e-9;
+    }
+
+    const chosenFraction = fractionAnswerParts(chosen);
+    const expectedDenominator = missingNumeratorDenominator(question);
+    if (expectedValue != null && chosenFraction && expectedDenominator != null) {
+      return (
+        Math.abs(expectedValue - chosenFraction.numerator) < 1e-9 &&
+        chosenFraction.denominator === expectedDenominator
+      );
     }
 
     const expectedCoordinate = parseCoordinateAssessmentValue(expected);

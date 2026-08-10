@@ -123,7 +123,7 @@ check(getPosttestForLevel(4, "number")?.questions.every((item, index) => item.id
 check(allItems.every((item) => String((item.visual as { type?: unknown })?.type).startsWith("number_y4_")), "A production item does not use the Year 4 visual system.");
 check(shellSource.includes('year === "Year 4"') && shellSource.includes("max-w-6xl"), "Year 4 does not use the modern wide shell.");
 check(cardSource.includes('visual.type.startsWith("number_y4_")') && cardSource.includes("NumberNexusYear4AssessmentVisual"), "Year 4 visuals are not dispatched by the assessment card.");
-check(cardSource.includes('visual.type.startsWith("number_y2_") || visual.type.startsWith("number_y4_")'), "Year 4 does not use the modern answer widgets.");
+check(/visual\.type\.startsWith\("number_y2_"\)\s*\|\|\s*visual\.type\.startsWith\("number_y4_"\)/.test(cardSource), "Year 4 does not use the modern answer widgets.");
 check(visualSource.includes('renderCoins } from "@/components/week7/moneyAssets"') && visualSource.includes("renderCoins(item.price)"), "Financial visuals do not use canonical artwork.");
 check(visualSource.includes("rounded-lg") && !visualSource.includes("rounded-2xl"), "Year 4 visuals do not follow the modern radius system.");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "The 85% assessment threshold changed.");

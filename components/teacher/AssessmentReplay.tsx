@@ -18,6 +18,7 @@ import {
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import { TaskRenderer } from "@/components/TaskRenderer";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 
 export type TeacherAssessmentAttempt = {
   id: string;
@@ -36,6 +37,30 @@ export type TeacherAssessmentAttempt = {
 };
 
 type ReplayFilter = "all" | AssessmentReplayStatus;
+
+function normalizedReplayQuestion(question: AssessmentQuestionSnapshot): AssessmentQuestionSnapshot {
+  if (question.response_status !== "incorrect" || typeof question.student_answer !== "string") return question;
+  const correct = isAssessmentAnswerCorrect(
+    {
+      id: question.question_id,
+      type: question.question_type,
+      prompt: question.question_text,
+      correctAnswer: typeof question.correct_answer === "number" || typeof question.correct_answer === "string"
+        ? question.correct_answer
+        : undefined,
+      visual: question.visual,
+    },
+    question.student_answer,
+  );
+  return correct
+    ? {
+        ...question,
+        correct: true,
+        response_status: "correct",
+        explanation: "This response gives the correct numerator using the denominator shown.",
+      }
+    : question;
+}
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined || value === "") return "No answer";
@@ -258,7 +283,7 @@ export default function AssessmentReplay({
   backLabel?: string;
 }) {
   const questions = useMemo(
-    () => attempt.questionResults.filter(isAssessmentQuestionSnapshot),
+    () => attempt.questionResults.filter(isAssessmentQuestionSnapshot).map(normalizedReplayQuestion),
     [attempt.questionResults],
   );
   const [filter, setFilter] = useState<ReplayFilter>("all");
