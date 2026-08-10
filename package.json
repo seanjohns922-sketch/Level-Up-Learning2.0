@@ -18,6 +18,7 @@
     "qa:realm-lesson-home": "node scripts/realm-lesson-home-audit.mjs",
     "qa:realm-active-lesson": "node scripts/realm-active-lesson-shell-audit.mjs",
     "qa:student-session-isolation": "node scripts/student-session-isolation-audit.mjs",
+    "qa:login-errors": "node scripts/login-error-message-audit.mjs",
     "qa:realm-availability": "node scripts/realm-availability-audit.mjs",
     "qa:realm-dashboard-navigation": "node scripts/realm-dashboard-navigation-audit.mjs",
     "qa:realm-dashboard-framework": "node scripts/realm-dashboard-framework-audit.mjs",

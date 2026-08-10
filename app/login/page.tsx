@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
+import { getAuthErrorMessage, recoverAuthSessionError, supabase } from "@/lib/supabase";
 import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile, setStudentSessionToken } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
@@ -183,7 +183,11 @@ export default function LoginPage() {
       password: teacherPassword,
       options: { data: { display_name: teacherName || teacherEmail, role: "teacher" } },
     });
-    if (signUpErr) { setTeacherError(signUpErr.message); setTeacherLoading(false); return; }
+    if (signUpErr) {
+      setTeacherError(getAuthErrorMessage(signUpErr, "Account activation failed. Please try again."));
+      setTeacherLoading(false);
+      return;
+    }
     const userId = signUpData.user?.id;
     if (!userId) { setTeacherError("Account activation failed. Please try again."); setTeacherLoading(false); return; }
 
@@ -211,16 +215,16 @@ export default function LoginPage() {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const result = (await response.json().catch(() => null)) as
-        | { destination?: string; error?: string }
+        | { destination?: string; error?: unknown }
         | null;
       if (response.ok && result?.destination) {
         window.location.assign(result.destination);
         return true;
       }
-      setTeacherError(
-        result?.error ??
-          "No active school membership was found. Use Activate Invite if this is your first login.",
-      );
+      setTeacherError(getAuthErrorMessage(
+        result?.error,
+        "No active school membership was found. Use Activate Invite if this is your first login.",
+      ));
     } catch {
       setTeacherError("School access could not be verified. Please try again.");
     }
@@ -239,7 +243,7 @@ export default function LoginPage() {
       { p_school_code: schoolCode },
     );
     if (error) {
-      setTeacherError(error.message);
+      setTeacherError(getAuthErrorMessage(error, "School activation failed. Check the School Code and try again."));
       return false;
     }
     return true;
@@ -250,10 +254,14 @@ export default function LoginPage() {
     setTeacherError(null);
     setTeacherLoading(true);
     let { data, error: signInErr } = await supabase.auth.signInWithPassword({ email: teacherEmail, password: teacherPassword });
-    if (signInErr && recoverInvalidRefreshToken(signInErr)) {
+    if (signInErr && recoverAuthSessionError(signInErr)) {
       ({ data, error: signInErr } = await supabase.auth.signInWithPassword({ email: teacherEmail, password: teacherPassword }));
     }
-    if (signInErr) { setTeacherError(signInErr.message); setTeacherLoading(false); return; }
+    if (signInErr) {
+      setTeacherError(getAuthErrorMessage(signInErr, "Login could not be completed. Please try again."));
+      setTeacherLoading(false);
+      return;
+    }
     if (data?.user && data.session?.access_token) {
       if (teacherSchoolCode.trim()) {
         const activated = await activateSchoolMembership();
@@ -287,7 +295,7 @@ export default function LoginPage() {
     setTeacherResetLoading(false);
 
     if (error) {
-      setTeacherError(error.message);
+      setTeacherError(getAuthErrorMessage(error, "The reset link could not be sent. Please try again."));
       return;
     }
 
@@ -313,7 +321,7 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setParentError(error.message);
+        setParentError(getAuthErrorMessage(error, "Parent account creation failed. Please try again."));
         setParentLoading(false);
         return;
       }
@@ -333,7 +341,7 @@ export default function LoginPage() {
       email,
       password: parentPassword,
     });
-    if (error && recoverInvalidRefreshToken(error)) {
+    if (error && recoverAuthSessionError(error)) {
       ({ data, error } = await supabase.auth.signInWithPassword({
         email,
         password: parentPassword,
@@ -341,7 +349,7 @@ export default function LoginPage() {
     }
 
     if (error || !data.session) {
-      setParentError(error?.message ?? "Parent login failed.");
+      setParentError(getAuthErrorMessage(error, "Parent login failed. Please try again."));
       setParentLoading(false);
       return;
     }
@@ -368,7 +376,7 @@ export default function LoginPage() {
     setRecoverySaving(false);
 
     if (error) {
-      setRecoveryError(error.message);
+      setRecoveryError(getAuthErrorMessage(error, "Password update failed. Please try again."));
       return;
     }
 
