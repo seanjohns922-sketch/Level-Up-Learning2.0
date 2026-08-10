@@ -476,10 +476,16 @@ export default function TeacherDashboardPage() {
             ])
             .order("created_at", { ascending: true }),
         ]);
-        if (liveError) throw liveError;
-        if (eventsError) throw eventsError;
-        newLiveRows = (live ?? []) as LiveStudentActivityRow[];
-        newLiveEvents = (events ?? []) as LiveActivityEventRow[];
+        if (liveError) {
+          console.warn("[TeacherDashboard] live student activity unavailable", liveError);
+        } else {
+          newLiveRows = (live ?? []) as LiveStudentActivityRow[];
+        }
+        if (eventsError) {
+          console.warn("[TeacherDashboard] live activity events unavailable", eventsError);
+        } else {
+          newLiveEvents = (events ?? []) as LiveActivityEventRow[];
+        }
       }
 
       if (diffOnly) {
@@ -499,7 +505,13 @@ export default function TeacherDashboardPage() {
       }
       setProgressLoadError(null);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Canonical student progress could not be loaded.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : error && typeof error === "object" && "message" in error &&
+              typeof error.message === "string"
+            ? error.message
+            : "Canonical student progress could not be loaded.";
       console.error("[TeacherDashboard] canonical progress load failed", error);
       setProgressLoadError(message);
     }

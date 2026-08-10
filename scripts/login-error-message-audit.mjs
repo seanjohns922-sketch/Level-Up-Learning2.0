@@ -13,6 +13,11 @@ const checks = [
     /!requestUrl\.includes\("\/auth\/v1\/"\)/.test(helper),
   ],
   [
+    "authenticated adult requests cannot inherit student credentials",
+    /hasAuthenticatedUserToken/.test(helper) &&
+      /!hasAuthenticatedUserToken/.test(helper),
+  ],
+  [
     "student session storage failures cannot abort requests",
     /localStorage\.getItem\(STUDENT_SESSION_TOKEN_KEY\)[\s\S]*?catch \{/.test(helper),
   ],

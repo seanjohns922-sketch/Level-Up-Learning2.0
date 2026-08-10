@@ -18,10 +18,18 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
           : input instanceof URL
             ? input.href
             : input.url;
+      const authorization = headers.get("authorization")?.trim() ?? "";
+      const bearerToken = authorization.replace(/^Bearer\s+/i, "");
+      const hasAuthenticatedUserToken = bearerToken.split(".").length === 3;
 
       // Student RPCs need this header, but Supabase Auth requests must remain
-      // independent of stale or unavailable student browser storage.
-      if (typeof window !== "undefined" && !requestUrl.includes("/auth/v1/")) {
+      // independent of stale browser storage. Adult JWT requests must also
+      // never inherit a student credential from a previously shared session.
+      if (
+        typeof window !== "undefined" &&
+        !requestUrl.includes("/auth/v1/") &&
+        !hasAuthenticatedUserToken
+      ) {
         try {
           const studentSession = window.localStorage.getItem(STUDENT_SESSION_TOKEN_KEY)?.trim();
           if (studentSession) headers.set("x-student-session", studentSession);
