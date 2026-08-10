@@ -7,6 +7,7 @@ export type RosterDraft = {
   firstName: string;
   lastName: string;
   schoolYear: string;
+  className: string;
   username: string;
   pin: string;
   source: RosterImportSource;
@@ -17,6 +18,7 @@ type RawRosterStudent = Partial<{
   lastName: unknown;
   fullName: unknown;
   schoolYear: unknown;
+  className: unknown;
   username: unknown;
   pin: unknown;
 }>;
@@ -26,6 +28,7 @@ const HEADER_ALIASES = {
   lastName: ["last", "last name", "lastname", "surname", "family name", "family"],
   fullName: ["name", "full name", "student", "student name", "student full name"],
   schoolYear: ["year", "year level", "school year", "school year level", "grade", "grade level"],
+  className: ["class", "class name", "home class", "homeroom", "home room"],
   username: [
     "username",
     "user name",
@@ -79,6 +82,7 @@ function makeDraft(student: RawRosterStudent, source: RosterImportSource, defaul
     firstName,
     lastName,
     schoolYear: normalizeImportedYear(student.schoolYear, defaultYear),
+    className: cleanCell(student.className),
     username: cleanCell(student.username),
     pin: cleanCell(student.pin).replace(/\D/g, "").slice(0, 4),
     source,
@@ -177,6 +181,7 @@ export async function parseRosterWorkbook(file: File, defaultYear = "") {
         lastName: valueAt("lastName"),
         fullName: valueAt("fullName"),
         schoolYear: valueAt("schoolYear"),
+        className: valueAt("className"),
         username: valueAt("username"),
         pin: valueAt("pin"),
       };

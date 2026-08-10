@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Copy,
+  Download,
   FileSpreadsheet,
   GraduationCap,
   HelpCircle,
@@ -35,6 +36,7 @@ import {
   parseRosterWorkbook,
   type RosterDraft,
 } from "@/lib/roster-import";
+import { downloadStudentRosterTemplate } from "@/lib/student-roster-template";
 
 type TabId =
   | "home"
@@ -525,22 +527,28 @@ function StudentDirectory({
   const [importFileName, setImportFileName] = useState("");
   const [importMessage, setImportMessage] = useState("");
   const [readingFile, setReadingFile] = useState(false);
+  const [downloadingTemplate, setDownloadingTemplate] = useState(false);
   const [resetStudent, setResetStudent] = useState<
     SchoolHomeSnapshot["students"][number] | null
   >(null);
   const [resetReason, setResetReason] = useState("");
-  const compatibleClasses = useMemo(
+  const activeClasses = useMemo(
     () =>
       classes
+        .filter((classRow) => classRow.status === "active")
+        .sort((left, right) => left.name.localeCompare(right.name)),
+    [classes],
+  );
+  const compatibleClasses = useMemo(
+    () =>
+      activeClasses
         .filter(
           (classRow) =>
-            classRow.status === "active" &&
             (!manualDraft.schoolYear ||
               classRow.yearLevels.length === 0 ||
               classRow.yearLevels.includes(manualDraft.schoolYear)),
-        )
-        .sort((left, right) => left.name.localeCompare(right.name)),
-    [classes, manualDraft.schoolYear],
+        ),
+    [activeClasses, manualDraft.schoolYear],
   );
   const normalizedQuery = query.trim().toLowerCase();
   const yearRank = (yearLevel: string | null) => {
@@ -656,13 +664,44 @@ function StudentDirectory({
     );
   }
 
+  function classForImportRow(row: RosterDraft) {
+    const className = row.className.trim().toLowerCase();
+    if (!className) return null;
+    return activeClasses.find(
+      (classRow) => classRow.name.trim().toLowerCase() === className,
+    ) ?? null;
+  }
+
+  function importRowIssue(row: RosterDraft) {
+    if (!row.firstName.trim()) return "First name is required";
+    if (!YEAR_LEVELS.includes(row.schoolYear)) return "Choose a valid year";
+    if (row.pin && !/^\d{4}$/.test(row.pin)) return "Access code must be 4 digits";
+    if (row.className.trim()) {
+      const classRow = classForImportRow(row);
+      if (!classRow) return "Choose an existing class";
+      if (classRow.yearLevels.length > 0 && !classRow.yearLevels.includes(row.schoolYear)) {
+        return "Class does not include this year level";
+      }
+    }
+    return null;
+  }
+
+  async function downloadImportTemplate() {
+    setDownloadingTemplate(true);
+    setImportMessage("");
+    try {
+      await downloadStudentRosterTemplate(activeClasses);
+    } catch (error) {
+      setImportMessage(
+        error instanceof Error ? error.message : "Could not create the template.",
+      );
+    } finally {
+      setDownloadingTemplate(false);
+    }
+  }
+
   async function submitImport() {
-    const validRows = importRows.filter(
-      (row) =>
-        row.firstName.trim() &&
-        YEAR_LEVELS.includes(row.schoolYear) &&
-        (!row.pin || /^\d{4}$/.test(row.pin)),
-    );
+    const validRows = importRows.filter((row) => !importRowIssue(row));
     const result = await onCreate(
       validRows.map((row) => ({
         firstName: row.firstName,
@@ -670,7 +709,7 @@ function StudentDirectory({
         schoolYear: row.schoolYear,
         username: row.username,
         pin: row.pin,
-        classId: "",
+        classId: classForImportRow(row)?.id ?? "",
         idempotencyKey: row.id,
       })),
     );
@@ -1053,7 +1092,7 @@ function StudentDirectory({
       {createMode === "import" ? (
         <Modal title="Import students" onClose={closeCreate}>
           <div className="space-y-5 p-6">
-            <div className="flex justify-end">
+            <div className="flex flex-wrap justify-end gap-2">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -1061,6 +1100,15 @@ function StudentDirectory({
                 onChange={handleRosterFile}
                 className="hidden"
               />
+              <button
+                type="button"
+                disabled={downloadingTemplate}
+                onClick={() => void downloadImportTemplate()}
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-emerald-700 bg-white px-4 text-sm font-bold text-emerald-800 disabled:opacity-50"
+              >
+                <Download className="h-4 w-4" />
+                {downloadingTemplate ? "Creating..." : "Download template"}
+              </button>
               <button
                 type="button"
                 disabled={readingFile}
@@ -1072,9 +1120,9 @@ function StudentDirectory({
               </button>
             </div>
             <p className="text-xs text-slate-500">
-              Use columns: First Name, Last Name, Year Level, Student Code, and
-              Access Code. Student and access codes may be blank and will be
-              generated. Explorer Codes are always generated by Level Up Learning.
+              Required columns are First Name and Year Level. Last Name, Class,
+              Student Code and Access Code are optional. Blank student and access
+              codes are generated automatically.
             </p>
             {importFileName ? (
               <p className="text-xs font-bold text-slate-600">
@@ -1088,19 +1136,33 @@ function StudentDirectory({
             ) : null}
             {importRows.length > 0 ? (
               <div className="overflow-x-auto border border-slate-200">
-                <table className="min-w-[760px] divide-y divide-slate-200 text-left text-xs">
+                <table className="min-w-[980px] divide-y divide-slate-200 text-left text-xs">
                   <thead className="bg-slate-50 font-bold uppercase text-slate-500">
                     <tr>
                       <th className="px-2 py-2">First name *</th>
                       <th className="px-2 py-2">Last name</th>
                       <th className="px-2 py-2">Year *</th>
+                      <th className="px-2 py-2">Class</th>
                       <th className="px-2 py-2">Student code</th>
                       <th className="px-2 py-2">Access code</th>
+                      <th className="px-2 py-2">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {importRows.map((row) => (
-                      <tr key={row.id}>
+                    {importRows.map((row) => {
+                      const issue = importRowIssue(row);
+                      const availableClasses = activeClasses.filter(
+                        (classRow) =>
+                          !row.schoolYear ||
+                          classRow.yearLevels.length === 0 ||
+                          classRow.yearLevels.includes(row.schoolYear),
+                      );
+                      const importedClassIsAvailable = availableClasses.some(
+                        (classRow) =>
+                          classRow.name.trim().toLowerCase() === row.className.trim().toLowerCase(),
+                      );
+                      return (
+                        <tr key={row.id} className={issue ? "bg-red-50/60" : undefined}>
                         <td className="p-1.5">
                           <input
                             value={row.firstName}
@@ -1146,6 +1208,25 @@ function StudentDirectory({
                           </select>
                         </td>
                         <td className="p-1.5">
+                          <select
+                            value={row.className}
+                            onChange={(event) =>
+                              updateImportRow(row.id, "className", event.target.value)
+                            }
+                            className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5"
+                          >
+                            <option value="">No class</option>
+                            {row.className && !importedClassIsAvailable ? (
+                              <option value={row.className}>{row.className} (unavailable)</option>
+                            ) : null}
+                            {availableClasses.map((classRow) => (
+                              <option key={classRow.id} value={classRow.name}>
+                                {classRow.name}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="p-1.5">
                           <input
                             value={row.username}
                             onChange={(event) =>
@@ -1175,8 +1256,12 @@ function StudentDirectory({
                             className="w-full rounded-md border border-slate-300 px-2 py-1.5"
                           />
                         </td>
-                      </tr>
-                    ))}
+                        <td className={`p-2 font-semibold ${issue ? "text-red-700" : "text-emerald-700"}`}>
+                          {issue ?? "Ready"}
+                        </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -1193,12 +1278,7 @@ function StudentDirectory({
                 type="button"
                 disabled={
                   busy ||
-                  !importRows.some(
-                    (row) =>
-                      row.firstName.trim() &&
-                      YEAR_LEVELS.includes(row.schoolYear) &&
-                      (!row.pin || row.pin.length === 4),
-                  )
+                  !importRows.some((row) => !importRowIssue(row))
                 }
                 onClick={() => void submitImport()}
                 className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
@@ -1208,9 +1288,7 @@ function StudentDirectory({
                   : `Add ${
                       importRows.filter(
                         (row) =>
-                          row.firstName.trim() &&
-                          YEAR_LEVELS.includes(row.schoolYear) &&
-                          (!row.pin || row.pin.length === 4),
+                          !importRowIssue(row),
                       ).length
                     } students`}
               </button>
