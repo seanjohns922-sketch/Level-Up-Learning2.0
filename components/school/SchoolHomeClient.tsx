@@ -527,6 +527,19 @@ function StudentDirectory({
     SchoolHomeSnapshot["students"][number] | null
   >(null);
   const [resetReason, setResetReason] = useState("");
+  const compatibleClasses = useMemo(
+    () =>
+      classes
+        .filter(
+          (classRow) =>
+            classRow.status === "active" &&
+            (!manualDraft.schoolYear ||
+              classRow.yearLevels.length === 0 ||
+              classRow.yearLevels.includes(manualDraft.schoolYear)),
+        )
+        .sort((left, right) => left.name.localeCompare(right.name)),
+    [classes, manualDraft.schoolYear],
+  );
   const normalizedQuery = query.trim().toLowerCase();
   const yearRank = (yearLevel: string | null) => {
     const index = yearLevel ? YEAR_LEVELS.indexOf(yearLevel) : -1;
@@ -900,12 +913,24 @@ function StudentDirectory({
               Year level *
               <select
                 value={manualDraft.schoolYear}
-                onChange={(event) =>
-                  setManualDraft((current) => ({
-                    ...current,
-                    schoolYear: event.target.value,
-                  }))
-                }
+                onChange={(event) => {
+                  const schoolYear = event.target.value;
+                  setManualDraft((current) => {
+                    const selectedClass = classes.find(
+                      (classRow) => classRow.id === current.classId,
+                    );
+                    const classStillMatches =
+                      !selectedClass ||
+                      !schoolYear ||
+                      selectedClass.yearLevels.length === 0 ||
+                      selectedClass.yearLevels.includes(schoolYear);
+                    return {
+                      ...current,
+                      schoolYear,
+                      classId: classStillMatches ? current.classId : "",
+                    };
+                  });
+                }}
                 className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
               >
                 <option value="">Choose year</option>
@@ -943,6 +968,29 @@ function StudentDirectory({
                 placeholder="Generated if blank"
                 className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
               />
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              Class (optional)
+              <select
+                value={manualDraft.classId}
+                onChange={(event) =>
+                  setManualDraft((current) => ({
+                    ...current,
+                    classId: event.target.value,
+                  }))
+                }
+                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+              >
+                <option value="">No class yet</option>
+                {compatibleClasses.map((classRow) => (
+                  <option key={classRow.id} value={classRow.id}>
+                    {classRow.name}
+                    {classRow.yearLevels.length
+                      ? ` · ${classRow.yearLevels.join(", ")}`
+                      : ""}
+                  </option>
+                ))}
+              </select>
             </label>
             {importMessage ? (
               <p className="text-sm font-semibold text-red-700 sm:col-span-2">

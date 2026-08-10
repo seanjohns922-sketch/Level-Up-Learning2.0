@@ -150,6 +150,13 @@ const checks = [
       /Whole-school insights are coming soon/.test(client),
   ],
   [
+    "administrators can assign a new student to an active school class",
+    /Class \(optional\)/.test(client) &&
+      /value=\{manualDraft\.classId\}/.test(client) &&
+      /classRow\.status === "active"/.test(client) &&
+      /p_class_id: stringValue\(student\.classId\) \|\| null/.test(commandRoute),
+  ],
+  [
     "snapshot and commands require school permission",
     /not public\.can_view_school\(p_school_id\)/i.test(migration) &&
       /public\.can_manage_school/.test(migration),
