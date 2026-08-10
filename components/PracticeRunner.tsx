@@ -400,6 +400,7 @@ export function PracticeRunner({
   showCoachReview = true,
   showMistakeReview = true,
   activityNoun = "Question",
+  requireManualCorrectAdvance = false,
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -430,6 +431,7 @@ export function PracticeRunner({
   showCoachReview?: boolean;
   showMistakeReview?: boolean;
   activityNoun?: string;
+  requireManualCorrectAdvance?: boolean;
 }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
@@ -1032,7 +1034,7 @@ export function PracticeRunner({
     }
     bumpSessionCounters(true);
     clearPendingTimeout();
-    if (!isStructuredRealm) {
+    if (!isStructuredRealm && !requireManualCorrectAdvance) {
       timeoutRef.current = setTimeout(() => nextTask(), 600);
     }
   }
@@ -1627,17 +1629,25 @@ export function PracticeRunner({
             </button>
           </div>
         ) : null}
-        {isStructuredRealm && status === "correct" && !transitionError ? (
+        {(isStructuredRealm || requireManualCorrectAdvance) && status === "correct" && !transitionError ? (
           <div className="mt-5 flex justify-end">
             <button
               type="button"
               onClick={continueAfterCorrect}
               disabled={isAdvancingTask}
               className={`rounded-lg px-5 py-3 text-lg font-black text-white transition disabled:cursor-wait disabled:opacity-60 ${
-                isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-violet-700 hover:bg-violet-600"
+                isMeasurement
+                  ? "bg-[#8a6422] hover:bg-[#a2732e]"
+                  : isStarpath
+                    ? "bg-violet-700 hover:bg-violet-600"
+                    : "bg-teal-700 hover:bg-teal-600"
               }`}
             >
-              {isAdvancingTask ? "Loading..." : "Next Challenge"}
+              {isAdvancingTask
+                ? "Loading..."
+                : requireManualCorrectAdvance
+                  ? "Next Question"
+                  : "Next Challenge"}
             </button>
           </div>
         ) : null}

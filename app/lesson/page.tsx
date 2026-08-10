@@ -1002,6 +1002,7 @@ function LessonPage() {
               practisedSkills={getLessonPractisedSkills(effectiveLessonId)}
               nextUpLabel={nextUpLabel}
               brainBreakFrequency={brainBreakFrequency}
+              requireManualCorrectAdvance={isGroundCustomLesson && realmId !== "measurement"}
               renderCompletionCard={
                 isMeasurement
                   ? undefined // Measurelands uses the realm-aware Meazurex reflection screen

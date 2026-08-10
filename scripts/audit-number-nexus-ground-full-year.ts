@@ -133,6 +133,8 @@ const miniGameVisualSource = fs.readFileSync(path.join(process.cwd(), "component
 const matchVisualSource = fs.readFileSync(path.join(process.cwd(), "components/ground/GroundMatchTaskCard.tsx"), "utf8");
 const tokenVisualSource = fs.readFileSync(path.join(process.cwd(), "components/ground/GroundObjectToken.tsx"), "utf8");
 const sessionSource = fs.readFileSync(path.join(process.cwd(), "app/session/page.tsx"), "utf8");
+const lessonSource = fs.readFileSync(path.join(process.cwd(), "app/lesson/page.tsx"), "utf8");
+const practiceRunnerSource = fs.readFileSync(path.join(process.cwd(), "components/PracticeRunner.tsx"), "utf8");
 assert(!/activities\/prep|programs\/prep|generatePrepWeek/.test(bankSource), "Ground weekly bank reuses lesson-native content.");
 assert(sessionSource.includes('if (!isMeasurementRealm && year === "Prep")') && sessionSource.includes("buildPrepNumberNexusWeeklyQuiz(Number(week))"), "Ground production quiz routes do not use the independent bank.");
 assert(sessionSource.includes("saveNumberWeeklyQuizAttempt(") && sessionSource.includes("questionResults: replayQuestionResults"), "Ground weekly quizzes do not use canonical attempt saving and replay snapshots.");
@@ -147,6 +149,15 @@ assert(productionVisualSources.every((source) => !/rounded-\[(?:12|14|16|18|20|2
 assert(productionVisualSources.every((source) => !/bg-gradient-to-(?:br|r)/.test(source)), "A production Ground surface uses the retired gradient-heavy card treatment.");
 assert(!/[🤖🚀🛸🪐⭐💎🏁✨]/u.test(productionVisualSources.join("\n")), "A production Ground surface renders platform-dependent emoji artwork.");
 assert(tokenVisualSource.includes("lucide-react") && tokenVisualSource.includes("TOKEN_TONES"), "The shared Ground token renderer is not using the premium icon and colour system.");
+assert(
+  lessonSource.includes('requireManualCorrectAdvance={isGroundCustomLesson && realmId !== "measurement"}'),
+  "Ground Number Nexus lessons do not require students to confirm a correct answer before advancing.",
+);
+assert(
+  practiceRunnerSource.includes("if (!isStructuredRealm && !requireManualCorrectAdvance)") &&
+    practiceRunnerSource.includes('? "Next Question"'),
+  "The lesson runner can auto-advance Ground Number Nexus after a correct answer.",
+);
 
 const blueprint = NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS.find((item) => item.level === 0);
 const posttest = getPosttestForYearLabel("Prep", "number")?.questions ?? [];
@@ -159,5 +170,6 @@ assert.equal(ASSESSMENT_THRESHOLDS.posttestPassPercent, 85, "Ground Post-Test th
 console.log("Ground Number Nexus full-year audit passed.");
 console.log(`Curriculum: 12/12 weeks, ${curriculumChecks}/36 lessons aligned.`);
 console.log(`Lesson generation: ${lessonSamples}/${lessonSamples} sampled tasks valid.`);
+console.log("Lesson interaction: correct feedback waits for an explicit Next Question action.");
 console.log(`Weekly quizzes: 12/12 routes, ${quizChecks}/180 questions valid, exact 5-5-5, 80% pass threshold.`);
 console.log(`Post-Test: ${posttest.length}/20 production questions valid, Number and Algebra only, 85% pass threshold.`);
