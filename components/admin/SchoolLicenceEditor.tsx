@@ -15,7 +15,7 @@ export default function SchoolLicenceEditor({ detail }: { detail: PlatformSchool
       body: JSON.stringify({
         action: "updateLicence", schoolId: detail.school.id,
         academicYearId: detail.licence.academicYearId,
-        seatLimit: Number(formData.get("seatLimit")), status: formData.get("status"),
+        seatLimit: Number(formData.get("seatLimit")),
         startDate: formData.get("startDate"), endDate: formData.get("endDate"),
         billingStatus: formData.get("billingStatus"), notes: formData.get("notes"),
         reason: formData.get("reason"),
@@ -33,7 +33,6 @@ export default function SchoolLicenceEditor({ detail }: { detail: PlatformSchool
   return (
     <form action={save} className="mt-5 grid gap-4 border-t border-slate-200 pt-5 sm:grid-cols-2">
       <label className="text-sm font-semibold">Seat entitlement<input name="seatLimit" type="number" min={detail.licence.used} defaultValue={detail.licence.seatLimit} required className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 font-normal" /><span className="mt-1 block text-xs font-normal text-slate-500">Cannot be below {detail.licence.used} active students.</span></label>
-      <label className="text-sm font-semibold">Access status<select name="status" defaultValue={detail.licence.status} className="mt-2 h-11 w-full rounded-md border border-slate-300 bg-white px-3 font-normal"><option value="trial">Trial</option><option value="active">Active</option><option value="paused">Paused</option><option value="archived">Archived</option><option value="expired">Expired</option></select></label>
       <label className="text-sm font-semibold">Start date<input name="startDate" type="date" defaultValue={detail.licence.startDate} required className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 font-normal" /></label>
       <label className="text-sm font-semibold">End date<input name="endDate" type="date" defaultValue={detail.licence.endDate} required className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 font-normal" /></label>
       <label className="text-sm font-semibold">Billing classification<select name="billingStatus" defaultValue={detail.licence.billingStatus} className="mt-2 h-11 w-full rounded-md border border-slate-300 bg-white px-3 font-normal"><option value="free">Free</option><option value="trial">Trial</option><option value="complimentary">Complimentary</option><option value="paid">Paid</option><option value="expired">Expired</option></select></label>

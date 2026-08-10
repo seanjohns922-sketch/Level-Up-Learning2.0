@@ -91,11 +91,11 @@ select throws_ok($$ select public.get_platform_admin_overview() $$, '42501', 'Pl
 
 select set_config('request.jwt.claim.sub', 'a1000000-0000-0000-0000-000000000003', true);
 select throws_ok($$ select public.get_platform_admin_school_summaries() $$, '42501', 'Platform owner access required', 'school admin is denied');
-select throws_ok($$ select public.platform_owner_update_school_licence('a2000000-0000-0000-0000-000000000001', 'a3000000-0000-0000-0000-000000000001', 5, 'active', current_date - 1, current_date + 365, 'free', null, null) $$, '42501', 'Platform owner access required', 'school admin cannot change seats');
+select throws_ok($$ select public.platform_owner_update_school_access('a2000000-0000-0000-0000-000000000001', 'a3000000-0000-0000-0000-000000000001', 5, current_date - 1, current_date + 365, 'free', null, null) $$, '42501', 'Platform owner access required', 'school admin cannot change seats');
 
 select set_config('request.jwt.claim.sub', 'a1000000-0000-0000-0000-000000000004', true);
 select throws_ok($$ select public.get_platform_admin_overview() $$, '42501', 'Platform owner access required', 'teacher is denied');
-select throws_ok($$ select public.platform_owner_update_school_licence('a2000000-0000-0000-0000-000000000001', 'a3000000-0000-0000-0000-000000000001', 5, 'active', current_date - 1, current_date + 365, 'free', null, null) $$, '42501', 'Platform owner access required', 'teacher cannot change seats');
+select throws_ok($$ select public.platform_owner_update_school_access('a2000000-0000-0000-0000-000000000001', 'a3000000-0000-0000-0000-000000000001', 5, current_date - 1, current_date + 365, 'free', null, null) $$, '42501', 'Platform owner access required', 'teacher cannot change seats');
 
 select set_config('request.jwt.claim.sub', 'a1000000-0000-0000-0000-000000000005', true);
 select throws_ok($$ select public.get_platform_admin_overview() $$, '42501', 'Platform owner access required', 'parent is denied');
@@ -110,14 +110,14 @@ select set_config('request.jwt.claim.sub', '', true);
 select ok(not public.is_platform_owner(), 'forged unauthenticated URL has no Platform Owner access');
 
 select set_config('request.jwt.claim.sub', 'a1000000-0000-0000-0000-000000000001', true);
-select lives_ok($$ select public.platform_owner_update_school_licence('a2000000-0000-0000-0000-000000000001', 'a3000000-0000-0000-0000-000000000001', 6, 'active', current_date - 1, current_date + 365, 'free', 'PA1 test', 'Approved capacity increase') $$, 'Platform Owner changes the seat entitlement');
+select lives_ok($$ select public.platform_owner_update_school_access('a2000000-0000-0000-0000-000000000001', 'a3000000-0000-0000-0000-000000000001', 6, current_date - 1, current_date + 365, 'free', 'PA1 test', 'Approved capacity increase') $$, 'Platform Owner changes the seat entitlement');
 select is((public.get_platform_admin_school_detail('a2000000-0000-0000-0000-000000000001')->'licence'->>'seatLimit')::integer, 6, 'seat entitlement is updated');
-select throws_ok($$ select public.platform_owner_update_school_licence('a2000000-0000-0000-0000-000000000001', 'a3000000-0000-0000-0000-000000000001', 1, 'active', current_date - 1, current_date + 365, 'free', null, null) $$, 'P0001', 'Cannot reduce this school''s seat entitlement to 1. 2 active students currently use school access.', 'unsafe seat reduction is blocked');
+select throws_ok($$ select public.platform_owner_update_school_access('a2000000-0000-0000-0000-000000000001', 'a3000000-0000-0000-0000-000000000001', 1, current_date - 1, current_date + 365, 'free', null, null) $$, 'P0001', 'Cannot reduce this school''s seat entitlement to 1. 2 active students currently use school access.', 'unsafe seat reduction is blocked');
 select ok(
   exists (
     select 1
     from jsonb_array_elements(public.get_platform_admin_audit(50)) entry
-    where entry->>'action' = 'school_seat_limit_changed'
+    where entry->>'action' = 'seat_limit_changed'
   ),
   'seat change creates an audit record'
 );

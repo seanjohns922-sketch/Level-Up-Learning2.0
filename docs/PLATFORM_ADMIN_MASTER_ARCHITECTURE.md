@@ -113,3 +113,7 @@ Platform overview and school list are separate server-side aggregate RPCs and lo
 ## Future Extension
 
 The same identity and entitlement records support delegated platform admins, paid home subscriptions, paid school classifications, conversion reporting and aggregate home-to-school opportunities. These additions must not migrate student IDs or convert billing into an access identity.
+
+## PA2 School Lifecycle
+
+PA2 adds canonical school provisioning and lifecycle commands. Trial and Active are licence states on an operational school; Paused and Archived stop ordinary school access. Archive preserves all identities, history, parent relationships and Home access while placing only school entitlements and that school's memberships on reversible holds. Archived schools are hidden from the default Platform Admin list and remain available through the dedicated Archived filter and historical detail route.

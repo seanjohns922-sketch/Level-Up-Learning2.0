@@ -1,8 +1,9 @@
-import { Activity, GraduationCap, Link2, UserCog, Users } from "lucide-react";
+import { Activity, Archive, GraduationCap, Link2, UserCog, Users } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminPageHeading, Metric } from "@/components/admin/AdminPrimitives";
 import SchoolLicenceEditor from "@/components/admin/SchoolLicenceEditor";
+import SchoolLifecycleManager from "@/components/admin/SchoolLifecycleManager";
 import { loadPlatformSchoolDetail } from "@/lib/platform-admin-server";
 
 function formatDate(value: string | null) {
@@ -15,14 +16,17 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
   const data = await loadPlatformSchoolDetail(schoolId).catch(() => null);
   if (!data) notFound();
   const { detail } = data;
+  const archived = detail.school.status === "archived";
   return (
     <>
       <Link href="/admin/schools" className="mb-5 inline-flex text-sm font-bold text-emerald-800 hover:underline">← Back to schools</Link>
       <AdminPageHeading eyebrow={`${detail.school.code} · ${detail.licence.academicYear}`} title={detail.school.name} detail={`${detail.school.state ?? "State not set"} · ${detail.school.sector ?? "Sector not set"} · ${detail.licence.billingStatus === "free" ? "Free 2026 rollout access" : detail.licence.billingStatus}`} />
 
+      {archived ? <section className="mb-7 border border-slate-300 bg-slate-100 p-5"><div className="flex items-start gap-3"><Archive className="mt-0.5 h-5 w-5 text-slate-700" /><div><p className="font-bold uppercase tracking-[0.12em] text-slate-900">Archived school</p><p className="mt-1 text-sm text-slate-600">Archived {detail.school.archivedAt ? formatDate(detail.school.archivedAt) : "date not recorded"}. {detail.school.archiveReason ?? "No archival reason was recorded."} This view is historical and read-only until restored.</p></div></div></section> : null}
+
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Metric label="Students" value={detail.people.students} icon={GraduationCap} />
-        <Metric label="Educators" value={detail.people.educators} icon={Users} tone="blue" />
+        <Metric label={archived ? "Historical students" : "Students"} value={archived ? detail.people.historicalStudents : detail.people.students} icon={GraduationCap} />
+        <Metric label={archived ? "Historical educators" : "Educators"} value={archived ? detail.people.historicalEducators : detail.people.educators} icon={Users} tone="blue" />
         <Metric label="School admins" value={detail.people.schoolAdmins} icon={UserCog} tone="violet" />
         <Metric label="Linked parents" value={detail.people.parentsLinked} icon={Link2} tone="amber" />
       </section>
@@ -31,7 +35,7 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
         <div className="border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Access</p><h2 className="mt-2 text-xl font-bold">School licence entitlement</h2></div>
-            <SchoolLicenceEditor detail={detail} />
+            {!archived ? <SchoolLicenceEditor detail={detail} /> : null}
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <div className="bg-slate-50 p-4"><p className="text-xs font-bold uppercase text-slate-500">Seat limit</p><p className="mt-2 text-3xl font-bold">{detail.licence.seatLimit}</p></div>
@@ -57,6 +61,16 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
           {[['Active today', detail.activity.activeToday],['Active this week', detail.activity.activeThisWeek],['Lessons this week', detail.activity.lessonsThisWeek],['Quizzes this week', detail.activity.quizzesThisWeek],['Assessments this week', detail.activity.assessmentsThisWeek]].map(([label,value]) => <div key={String(label)} className="border-l-4 border-emerald-500 bg-slate-50 p-4"><p className="text-xs font-bold uppercase text-slate-500">{label}</p><p className="mt-2 text-2xl font-bold">{value}</p></div>)}
         </div>
         <p className="mt-5 text-sm text-slate-500">Last active: <span className="font-semibold text-slate-700">{formatDate(detail.activity.lastActive)}</span></p>
+      </section>
+
+      <div className="mt-7"><SchoolLifecycleManager detail={detail} /></div>
+
+      <section className="mt-7 border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-bold">Lifecycle audit history</h2>
+        <div className="mt-5 divide-y divide-slate-100 border border-slate-200">
+          {detail.audit.map((entry) => <div key={entry.id} className="grid gap-1 p-4 text-sm sm:grid-cols-[1fr_auto]"><div><p className="font-bold">{entry.action.replaceAll("_", " ")}</p>{entry.reason ? <p className="mt-1 text-slate-500">{entry.reason}</p> : null}</div><time className="text-slate-500">{formatDate(entry.createdAt)}</time></div>)}
+          {!detail.audit.length ? <p className="p-4 text-sm text-slate-500">No Platform Admin lifecycle changes recorded.</p> : null}
+        </div>
       </section>
     </>
   );

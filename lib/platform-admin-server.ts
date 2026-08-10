@@ -48,12 +48,15 @@ export type PlatformSchoolSummary = {
   available: number;
   students: number;
   educators: number;
+  schoolAdmins: number;
   parentsLinked: number;
   homeUsers: number;
   homeActivationPercent: number;
   utilisationPercent: number;
   lastActive: string | null;
   billingStatus: string;
+  licenceEndDate: string | null;
+  attention: string[];
 };
 
 export type PlatformSchoolDetail = {
@@ -64,6 +67,13 @@ export type PlatformSchoolDetail = {
     state: string | null;
     sector: string | null;
     status: string;
+    operationalStatus: string;
+    archivedAt: string | null;
+    archivedBy: string | null;
+    archiveReason: string | null;
+    pausedAt: string | null;
+    pauseReason: string | null;
+    previousLicenceStatus: string | null;
   };
   licence: {
     id: string;
@@ -84,7 +94,9 @@ export type PlatformSchoolDetail = {
   };
   people: {
     students: number;
+    historicalStudents: number;
     educators: number;
+    historicalEducators: number;
     schoolAdmins: number;
     parentsLinked: number;
   };
@@ -102,6 +114,30 @@ export type PlatformSchoolDetail = {
     assessmentsThisWeek: number;
     lastActive: string | null;
   };
+  administrators: Array<{
+    userId: string;
+    name: string;
+    email: string | null;
+    role: "school_admin" | "principal";
+    status: "invited" | "active" | "inactive" | "revoked";
+    acceptedAt: string | null;
+    endedAt: string | null;
+  }>;
+  adminInvitations: Array<{
+    id: string;
+    email: string;
+    role: string;
+    status: "pending" | "accepted" | "expired" | "revoked";
+    expiresAt: string;
+    createdAt: string;
+  }>;
+  audit: Array<{
+    id: number;
+    action: string;
+    reason: string | null;
+    createdAt: string;
+    actorUserId: string | null;
+  }>;
 };
 
 export type PlatformAuditEntry = {
@@ -174,7 +210,7 @@ export async function loadPlatformOverview() {
   const [overview, schools] = await Promise.all([
     adminRequest<PlatformOverview>("get_platform_admin_overview", access.accessToken),
     adminRequest<PlatformSchoolSummary[]>(
-      "get_platform_admin_school_summaries",
+      "get_platform_admin_school_summaries_pa2",
       access.accessToken,
     ),
   ]);
@@ -185,7 +221,7 @@ export async function loadPlatformSchools() {
   const access = await requirePlatformOwner();
   if (!access) return null;
   const schools = await adminRequest<PlatformSchoolSummary[]>(
-    "get_platform_admin_school_summaries",
+    "get_platform_admin_school_summaries_pa2",
     access.accessToken,
   );
   return { access, schools };

@@ -7,7 +7,7 @@ export default async function PlatformSchoolsPage() {
   return (
     <>
       <AdminPageHeading eyebrow="Schools" title="School access and seats" detail="Manage free rollout access, annual seat entitlements and school → home activation without loading individual student records." />
-      <SchoolsAdminClient schools={data?.schools ?? []} asOf={new Date().toISOString()} />
+      <SchoolsAdminClient schools={data?.schools ?? []} />
     </>
   );
 }
