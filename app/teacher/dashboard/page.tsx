@@ -413,7 +413,10 @@ export default function TeacherDashboardPage() {
         setSelectedClassId(firstClassId);
         selectedClassRef.current = firstClassId;
         setActiveYear(cls[0].year_level ?? "Year 1");
-        await loadClassData(firstClassId, false);
+        // The class shell can render immediately. Historical attempts and live
+        // telemetry hydrate in the background instead of delaying first paint.
+        setLoading(false);
+        void loadClassData(firstClassId, false);
       } else {
         setSelectedClassId(null);
         selectedClassRef.current = null;
@@ -452,13 +455,14 @@ export default function TeacherDashboardPage() {
       let newLiveEvents: LiveActivityEventRow[] = [];
       if (newStuds.length > 0) {
         const ids = newStuds.map((s) => s.id);
-        const [numberProgress, measurementProgress] = await Promise.all([
+        const [
+          numberProgress,
+          measurementProgress,
+          { data: live, error: liveError },
+          { data: events, error: eventsError },
+        ] = await Promise.all([
           fetchRealmCompatProgressForClass("number", classId, ids),
           fetchRealmCompatProgressForClass("measurement", classId, ids),
-        ]);
-        newProg = [...numberProgress, ...measurementProgress];
-
-        const [{ data: live, error: liveError }, { data: events, error: eventsError }] = await Promise.all([
           supabase.from("live_student_activity").select("*").in("student_id", ids).eq("class_id", classId),
           supabase
             .from("live_activity_events")
@@ -476,6 +480,7 @@ export default function TeacherDashboardPage() {
             ])
             .order("created_at", { ascending: true }),
         ]);
+        newProg = [...numberProgress, ...measurementProgress];
         if (liveError) {
           console.warn("[TeacherDashboard] live student activity unavailable", liveError);
         } else {
