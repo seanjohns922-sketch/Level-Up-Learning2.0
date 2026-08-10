@@ -11,6 +11,11 @@ const source = fs.readFileSync(
   "utf8",
 );
 
+assert.match(
+  source,
+  /if \(row\) return row;[\s\S]*canonicalProgressActivityRow/,
+  "Live telemetry must be preserved ahead of canonical waiting placeholders.",
+);
 assert.match(source, /if \(event\.student_id !== row\.student_id\) return false/);
 assert.match(
   source,

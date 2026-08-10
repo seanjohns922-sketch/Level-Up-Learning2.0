@@ -338,34 +338,12 @@ function alignCompletedActivityWithCanonicalProgress(
   row: LiveStudentActivityRow | null,
   progressRows: CanonicalProgressRow[],
 ) {
-  const canonical = selectCanonicalProgress(student.id, progressRows, row?.current_strand);
-  if (!canonical) {
-    return row
-      ? {
-          ...row,
-          current_level: null,
-          current_week: null,
-          progress_label: "Progress unavailable",
-        }
-      : null;
-  }
-  if (!row) return canonicalProgressActivityRow(student, canonical);
+  // Live Class reports observed activity. Placement changes and realm resets
+  // must not rewrite that history as a waiting placeholder from another realm.
+  if (row) return row;
 
-  const activityCompleted =
-    row.current_lesson_status === "completed" ||
-    row.latest_event_type === "lesson_completed" ||
-    row.latest_event_type === "quiz_completed";
-  if (!activityCompleted) return row;
-
-  const activityRealm = normalizeAttemptRealm(row.current_strand);
-  const canonicalRealm = normalizeAttemptRealm(canonical.realm_id);
-  const sameRealm = Boolean(activityRealm && canonicalRealm && activityRealm === canonicalRealm);
-  const sameLevel = normalizeWorkingLevelLabel(row.current_level) === normalizeWorkingLevelLabel(canonical.year);
-  const sameWeek = row.current_week == null || canonical.week == null || row.current_week === canonical.week;
-
-  return sameRealm && sameLevel && sameWeek
-    ? row
-    : canonicalProgressActivityRow(student, canonical);
+  const canonical = selectCanonicalProgress(student.id, progressRows);
+  return canonical ? canonicalProgressActivityRow(student, canonical) : null;
 }
 
 function getQuestionKey(event: LiveActivityEventRow, index: number) {
