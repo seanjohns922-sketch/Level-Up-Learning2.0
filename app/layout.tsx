@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -31,6 +32,7 @@ export default function RootLayout({
           </Suspense>
           {children}
           <GemRevealHost />
+          <Analytics />
           <SpeedInsights />
         </ErrorBoundary>
       </body>
