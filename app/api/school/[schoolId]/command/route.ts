@@ -176,6 +176,24 @@ export async function POST(
         return NextResponse.json({ explorerCode });
       }
 
+      case "updateStudent": {
+        const result = await runSchoolCommand<Record<string, unknown>>(
+          schoolId,
+          "update_school_student",
+          {
+            p_school_id: schoolId,
+            p_student_id: stringValue(payload.studentId),
+            p_first_name: stringValue(payload.firstName),
+            p_last_name: stringValue(payload.lastName),
+            p_school_year_level: stringValue(payload.schoolYear),
+            p_username: stringValue(payload.username) || null,
+            p_class_id: stringValue(payload.classId) || null,
+          },
+          accessToken,
+        );
+        return NextResponse.json(result);
+      }
+
       case "archiveStudent": {
         const result = await runSchoolCommand<Record<string, unknown>>(
           schoolId,

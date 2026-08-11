@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   LogOut,
   Mail,
+  Pencil,
   Plus,
   RotateCcw,
   School,
@@ -205,6 +206,7 @@ async function sendCommand(
     explorerCode?: string;
     status?: "active" | "archived";
     deleted?: boolean;
+    updated?: boolean;
     created?: Array<Record<string, unknown>>;
     errors?: Array<{ row: number; name: string; message: string }>;
   };
@@ -484,6 +486,8 @@ type SchoolStudentDraft = {
   idempotencyKey: string;
 };
 
+type SchoolStudentEditDraft = Omit<SchoolStudentDraft, "pin" | "idempotencyKey">;
+
 type StudentCreateResult = {
   created: Array<Record<string, unknown>>;
   errors: Array<{ row: number; name: string; message: string }>;
@@ -511,6 +515,7 @@ function StudentDirectory({
   onArchive,
   onRestore,
   onDelete,
+  onUpdate,
   onCreate,
 }: {
   students: SchoolHomeSnapshot["students"];
@@ -525,6 +530,10 @@ function StudentDirectory({
     studentId: string,
     confirmation: string,
     reason: string,
+  ) => Promise<boolean>;
+  onUpdate: (
+    studentId: string,
+    draft: SchoolStudentEditDraft,
   ) => Promise<boolean>;
   onCreate: (students: SchoolStudentDraft[]) => Promise<StudentCreateResult>;
 }) {
@@ -547,6 +556,16 @@ function StudentDirectory({
   const [resetStudent, setResetStudent] = useState<
     SchoolHomeSnapshot["students"][number] | null
   >(null);
+  const [editStudent, setEditStudent] = useState<
+    SchoolHomeSnapshot["students"][number] | null
+  >(null);
+  const [editDraft, setEditDraft] = useState<SchoolStudentEditDraft>({
+    firstName: "",
+    lastName: "",
+    schoolYear: "",
+    username: "",
+    classId: "",
+  });
   const [resetReason, setResetReason] = useState("");
   const [archiveStudent, setArchiveStudent] = useState<
     SchoolHomeSnapshot["students"][number] | null
@@ -635,6 +654,24 @@ function StudentDirectory({
       setResetStudent(null);
       setResetReason("");
     }
+  }
+
+  function openEdit(student: SchoolHomeSnapshot["students"][number]) {
+    const [firstName = "", ...lastNameParts] = student.name.trim().split(/\s+/);
+    setEditStudent(student);
+    setEditDraft({
+      firstName,
+      lastName: lastNameParts.join(" "),
+      schoolYear: student.yearLevel ?? "",
+      username: student.username ?? "",
+      classId: student.classIds[0] ?? "",
+    });
+  }
+
+  async function submitEdit() {
+    if (!editStudent || !editDraft.firstName.trim() || !editDraft.schoolYear) return;
+    const completed = await onUpdate(editStudent.id, editDraft);
+    if (completed) setEditStudent(null);
   }
 
   async function submitArchive() {
@@ -910,6 +947,14 @@ function StudentDirectory({
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"
+                      onClick={() => openEdit(student)}
+                      className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-2 text-xs font-bold text-slate-700"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
                       disabled={!student.explorerCode}
                       onClick={() =>
                         student.explorerCode
@@ -995,7 +1040,15 @@ function StudentDirectory({
                 <dd>{student.classes.join(", ") || "Not assigned"}</dd>
               </div>
             </dl>
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => openEdit(student)}
+                className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Edit
+              </button>
               <button
                 type="button"
                 disabled={!student.explorerCode}
@@ -1459,6 +1512,109 @@ function StudentDirectory({
         </Modal>
       ) : null}
 
+      {editStudent ? (
+        <Modal title={`Edit ${editStudent.name}`} onClose={() => setEditStudent(null)}>
+          <div className="grid gap-4 p-6 sm:grid-cols-2">
+            <label className="text-sm font-bold text-slate-700">
+              First name *
+              <input
+                value={editDraft.firstName}
+                onChange={(event) =>
+                  setEditDraft((current) => ({ ...current, firstName: event.target.value }))
+                }
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+              />
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              Last name
+              <input
+                value={editDraft.lastName}
+                onChange={(event) =>
+                  setEditDraft((current) => ({ ...current, lastName: event.target.value }))
+                }
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+              />
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              Year level *
+              <select
+                value={editDraft.schoolYear}
+                onChange={(event) => {
+                  const schoolYear = event.target.value;
+                  setEditDraft((current) => {
+                    const selectedClass = classes.find((row) => row.id === current.classId);
+                    const classStillMatches =
+                      !selectedClass ||
+                      selectedClass.yearLevels.length === 0 ||
+                      selectedClass.yearLevels.includes(schoolYear);
+                    return {
+                      ...current,
+                      schoolYear,
+                      classId: classStillMatches ? current.classId : "",
+                    };
+                  });
+                }}
+                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+              >
+                <option value="">Choose year</option>
+                {YEAR_LEVELS.map((year) => <option key={year}>{year}</option>)}
+              </select>
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              Student code / username
+              <input
+                value={editDraft.username}
+                onChange={(event) =>
+                  setEditDraft((current) => ({ ...current, username: event.target.value }))
+                }
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+              />
+            </label>
+            <label className="text-sm font-bold text-slate-700 sm:col-span-2">
+              Current class
+              <select
+                value={editDraft.classId}
+                onChange={(event) =>
+                  setEditDraft((current) => ({ ...current, classId: event.target.value }))
+                }
+                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+              >
+                <option value="">Not assigned</option>
+                {activeClasses
+                  .filter(
+                    (row) =>
+                      row.yearLevels.length === 0 ||
+                      row.yearLevels.includes(editDraft.schoolYear),
+                  )
+                  .map((row) => (
+                    <option key={row.id} value={row.id}>{row.name}</option>
+                  ))}
+              </select>
+            </label>
+            <p className="text-xs text-slate-500 sm:col-span-2">
+              Explorer Code and PIN are unchanged. Use their separate controls when they need resetting.
+            </p>
+            <div className="flex justify-end gap-2 sm:col-span-2">
+              <button
+                type="button"
+                onClick={() => setEditStudent(null)}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={busy || !editDraft.firstName.trim() || !editDraft.schoolYear}
+                onClick={() => void submitEdit()}
+                className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                {busy ? "Saving..." : "Save changes"}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
+
       {archiveStudent ? (
         <Modal
           title={`Archive ${archiveStudent.name}?`}
@@ -1752,6 +1908,21 @@ export default function SchoolHomeClient({
     );
     if (result?.status === "archived") {
       await refreshStudentLifecycleData();
+      return true;
+    }
+    return false;
+  }
+
+  async function updateSchoolStudent(
+    studentId: string,
+    draft: SchoolStudentEditDraft,
+  ) {
+    const result = await command(
+      { action: "updateStudent", studentId, ...draft },
+      "Student updated",
+    );
+    if (result?.updated === true) {
+      await loadStudentDirectory();
       return true;
     }
     return false;
@@ -2147,6 +2318,7 @@ export default function SchoolHomeClient({
               onArchive={archiveSchoolStudent}
               onRestore={restoreSchoolStudent}
               onDelete={deleteSchoolStudent}
+              onUpdate={updateSchoolStudent}
               onCreate={createSchoolStudents}
             />
           ) : null}
