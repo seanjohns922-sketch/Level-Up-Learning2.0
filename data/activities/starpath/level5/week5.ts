@@ -1,12 +1,25 @@
-import { moveTask, moveAxisTask, followTask, commandsTask, routeTask } from "./coordinateTasks";
+import { moveTask, moveAxisTask, followTask, commandsTask, routeTask, GRID_8 } from "./coordinateTasks";
 import { lessonContent, taskSet, teaching } from "./lessonUtils";
 
 const kinds = ["starpathCoordinate", "starpathCoordinate", "starpathCoordinate"] as const;
 const teach = (heading: string, prompt: string, speakText: string) => teaching(heading, prompt, speakText, "l5Coord");
 
-export const createMoveAxisTaskSet = () => taskSet([moveTask, moveAxisTask, moveTask], teach("Move Along an Axis", "A move along one direction changes one number.", "Moving up or down changes only the up number. Moving left or right changes only the across number."));
-export const createFollowCommandsTaskSet = () => taskSet([followTask, commandsTask, followTask], teach("Follow Coordinate Commands", "Apply moves in order to reach a position.", "Each command moves the rover one square. Follow them in order, one at a time, to find where it ends."), 20);
-export const createPlanRouteTaskSet = () => taskSet([routeTask, routeTask, commandsTask], teach("Plan an Efficient Route", "The best route uses the fewest moves.", "Plan a path that reaches the goal, stays on the grid, avoids blocked sectors and uses as few moves as possible."), 30);
+// Week 5 onward uses the standard 8x8 grid (Week 4 keeps the 6x6 intro grid).
+export const createMoveAxisTaskSet = () => taskSet([
+  (r, t) => moveTask(r, t, GRID_8),
+  (r, t) => moveAxisTask(r, t, GRID_8),
+  (r, t) => moveTask(r, t, GRID_8),
+], teach("Move Along an Axis", "A move along one direction changes one number.", "Moving up or down changes only the up number. Moving left or right changes only the across number."));
+export const createFollowCommandsTaskSet = () => taskSet([
+  (r, t) => followTask(r, t, GRID_8),
+  (r, t) => commandsTask(r, t, GRID_8),
+  (r, t) => followTask(r, t, GRID_8),
+], teach("Follow Coordinate Commands", "Apply moves in order to reach a position.", "Each command moves the rover one square. Follow them in order, one at a time, to find where it ends."), 20);
+export const createPlanRouteTaskSet = () => taskSet([
+  (r, t) => routeTask(r, t, GRID_8),
+  (r, t) => routeTask(r, t, GRID_8),
+  (r, t) => commandsTask(r, t, GRID_8),
+], teach("Plan an Efficient Route", "The best route uses the fewest moves.", "Plan a path that reaches the goal, stays on the grid, avoids blocked sectors and uses as few moves as possible."), 30);
 
 export const MOVE_AXIS_CONTENT = lessonContent({
   title: "Move Along an Axis",

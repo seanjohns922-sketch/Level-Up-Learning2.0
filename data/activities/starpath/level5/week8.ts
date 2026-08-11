@@ -1,5 +1,5 @@
 import { chooseNetTask, buildTask, classifyTask } from "./netTasks";
-import { readTask, plotTask, errorTask } from "./coordinateTasks";
+import { readTask, plotTask, errorTask, GRID_8 } from "./coordinateTasks";
 import { compareTask, translateTapTask, checkTask } from "./transformTasks";
 import { lessonContent, taskSet, teaching } from "./lessonUtils";
 
@@ -7,10 +7,11 @@ const kinds = ["starpathNet", "starpathCoordinate", "starpathTransform"] as cons
 const teach = (heading: string, prompt: string, speakText: string) => teaching(heading, prompt, speakText, "l5Integrate");
 
 // Each integration lesson touches all three strands: an object (net), a location
-// (coordinate) and a movement (transformation).
-export const createInterpretBriefTaskSet = () => taskSet([chooseNetTask, readTask, compareTask], teach("Interpret the Brief", "One mission joins objects, locations and movements.", "A design brief names an object to build, a place to put it and a way to move it. Read each part: which net, which coordinate, which transformation."));
-export const createBuildTransformTaskSet = () => taskSet([buildTask, plotTask, translateTapTask], teach("Build and Transform", "Build the object, place it, then transform it.", "Construct a valid net, plot its position with coordinates, then slide it to its transformed image. Every part must be correct."), 20);
-export const createTestDefendTaskSet = () => taskSet([classifyTask, errorTask, checkTask], teach("Test and Defend", "Prove every part of the design works.", "Audit each part with evidence: test the fold, fix the coordinate, and check the image against the invariants. Only submit when all three pass."), 30);
+// (coordinate) and a movement (transformation). Coordinate tasks use the 8x8 grid
+// (transform tasks already do); nets are grid-independent.
+export const createInterpretBriefTaskSet = () => taskSet([chooseNetTask, (r, t) => readTask(r, t, GRID_8), compareTask], teach("Interpret the Brief", "One mission joins objects, locations and movements.", "A design brief names an object to build, a place to put it and a way to move it. Read each part: which net, which coordinate, which transformation."));
+export const createBuildTransformTaskSet = () => taskSet([buildTask, (r, t) => plotTask(r, t, GRID_8), translateTapTask], teach("Build and Transform", "Build the object, place it, then transform it.", "Construct a valid net, plot its position with coordinates, then slide it to its transformed image. Every part must be correct."), 20);
+export const createTestDefendTaskSet = () => taskSet([classifyTask, (r, t) => errorTask(r, t, GRID_8), checkTask], teach("Test and Defend", "Prove every part of the design works.", "Audit each part with evidence: test the fold, fix the coordinate, and check the image against the invariants. Only submit when all three pass."), 30);
 
 export const INTERPRET_BRIEF_CONTENT = lessonContent({
   title: "Interpret the Brief",

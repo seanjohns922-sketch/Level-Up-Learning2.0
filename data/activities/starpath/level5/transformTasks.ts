@@ -3,7 +3,8 @@ import type { Point } from "./coordinates";
 import { SHAPES, SHAPE_IDS, translate, translatePoint, reflect, reflectPoint, rotate, rotatePoint, type MirrorLine, type Shape } from "./transforms";
 
 type TransformTask = Extract<PracticeTask, { kind: "starpathTransform" }>;
-const BOUNDS = { x: 6, y: 6 };
+// Standard 8x8 grid from Week 5 on (transformations, integration and Level 6).
+const BOUNDS = { x: 8, y: 8 };
 // Width-1 figures sit cleanly to the left of a mirror at x=3 and reflect onto the grid.
 const REFLECT_SHAPES = ["ell", "corner", "boot"];
 const order = <T,>(items: T[], round: number) => (round % 2 ? [...items].reverse() : items);
