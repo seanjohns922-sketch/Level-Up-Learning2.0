@@ -289,7 +289,7 @@ assert.match(insightsSource, /Progress unavailable/);
 assert.match(insightsSource, /Not placed/);
 
 const liveSource = fs.readFileSync(path.join(root, "components/teacher/LiveClassPanel.tsx"), "utf8");
-assert.match(liveSource, /Progress unavailable/);
+assert.match(liveSource, /Waiting to start/);
 assert.match(liveSource, /Current accuracy/);
 assert.doesNotMatch(liveSource, /realm.*\?\?.*["']number["']/i);
 

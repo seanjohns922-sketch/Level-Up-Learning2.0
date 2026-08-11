@@ -14,6 +14,7 @@ const economy = read("lib/economy.ts");
 const progressSync = read("lib/student-progress-sync.ts");
 const numberMap = read("components/world/NumberNexusMap.tsx");
 const measurelandsMap = read("components/world/MeasurelandsMap.tsx");
+const realmDashboard = read("components/realms/dashboard/RealmDashboardShell.tsx");
 const walletDefinition = foundation.slice(
   foundation.indexOf("create table if not exists public.student_economy_wallets"),
   foundation.indexOf("create table if not exists public.student_economy_transactions"),
@@ -44,9 +45,10 @@ check(
     !economy.includes('supabase.rpc("get_student_activity_daily_secure"'),
 );
 check(
-  "Both live realm maps consume the same global XP reader",
+  "All live realm maps consume the same global XP reader",
   numberMap.includes("fetchGlobalXp(studentId)") &&
-    measurelandsMap.includes("fetchGlobalXp(studentId)"),
+    measurelandsMap.includes("RealmDashboardShell") &&
+    realmDashboard.includes("fetchGlobalXp(studentId)"),
 );
 check(
   "Lesson and quiz awards use immutable completion receipt keys",

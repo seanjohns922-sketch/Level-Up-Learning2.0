@@ -134,9 +134,11 @@ const checks = [
       /p_school_id: schoolId/.test(commandRoute),
   ],
   [
-    "school snapshot has additive deployment fallback",
+    "school directory uses canonical permission boundary",
     /getSchoolStudentDirectory/.test(server) &&
-      /ordinary teachers do not have school-directory permission/.test(server),
+      /loadSchoolStudentDirectoryPreview/.test(server) &&
+      /requireSchoolPreviewAccess/.test(server) &&
+      !/ordinary teachers do not have school-directory permission/.test(server),
   ],
   ["100k generated test codes are unique", generated.size === 100_000],
   [

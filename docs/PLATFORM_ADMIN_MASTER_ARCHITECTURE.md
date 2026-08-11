@@ -117,3 +117,8 @@ The same identity and entitlement records support delegated platform admins, pai
 ## PA2 School Lifecycle
 
 PA2 adds canonical school provisioning and lifecycle commands. Trial and Active are licence states on an operational school; Paused and Archived stop ordinary school access. Archive preserves all identities, history, parent relationships and Home access while placing only school entitlements and that school's memberships on reversible holds. Archived schools are hidden from the default Platform Admin list and remain available through the dedicated Archived filter and historical detail route.
+# PA3 operational intelligence
+
+PA3 is the read-only operational layer above PA1 access foundations and PA2 school lifecycle management. Its canonical activity definition, aggregate snapshot architecture, User Explorer, growth denominators, attention rules and performance boundaries are defined in `PLATFORM_ADMIN_PHASE_PA3_OPERATIONS_GROWTH.md`.
+
+The PA3 layer must remain platform-owner only. It must not introduce billing, marketing automation, exports, impersonation, progression controls or reward mutation paths.

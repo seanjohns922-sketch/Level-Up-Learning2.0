@@ -152,6 +152,54 @@ export type PlatformAuditEntry = {
   createdAt: string;
 };
 
+export type PlatformOperationsSnapshot = {
+  generatedAt: string;
+  timezone: "Australia/Melbourne";
+  scale: { schools: number; students: number; educators: number; parents: number; schoolSeats: number; seatsUsed: number };
+  userMix: { schoolOnly: number; schoolAndHome: number; homeOnly: number; inactive: number };
+  growth: { schoolStudents: number; parentLinked: number; homeActivated: number; parentLinkedNoHome: number };
+  activity: { activeToday: number; active7d: number; active30d: number; previous7d: number; previous30d: number; lessonsToday: number; lessons7d: number; quizzes7d: number; assessments30d: number; newStudents7d: number; newStudents30d: number; newParentLinks7d: number; newHomeActivations7d: number };
+  attention: Array<{ schoolId: string; schoolName: string; severity: "critical" | "attention" | "positive" | "information"; category: string; detail: string }>;
+  recentChanges: Array<{ createdAt: string; title: string; source: string; entityId: string | null; reason: string | null }>;
+};
+
+export type PlatformGrowthSnapshot = {
+  generatedAt: string;
+  timezone: string;
+  funnel: { schoolStudents: number; parentLinked: number; homeActivated: number; parentLinkRate: number; homeActivationRate: number; parentLinkedNoHome: number; homeOnly: number };
+  schools: Array<{ schoolId: string; schoolName: string; schoolStudents: number; parentLinked: number; homeActivated: number; parentLinkedNoHome: number; schoolOnly: number; parentLinkRate: number; homeActivationRate: number }>;
+};
+
+export type PlatformEngagementSnapshot = {
+  generatedAt: string;
+  timezone: string;
+  thresholds: { strong: number; healthy: number; low: number; inactiveDays: number };
+  schools: Array<{ schoolId: string; schoolName: string; students: number; active7d: number; activePercent: number; lessons7d: number; quizzes7d: number; assessments30d: number; lessonsPerActive: number; lastActivity: string | null; status: "Strong" | "Healthy" | "Low" | "Inactive" }>;
+};
+
+export type PlatformHomeOnlySnapshot = { generatedAt: string; timezone: string; students: number; active7d: number; parents: number; events7d: number; averageActivity7d: number };
+
+export type PlatformUserSearch = {
+  items: Array<{ id: string; userType: "student" | "parent" | "educator"; name: string; identifier: string | null; explorerCode: string | null; detail: string | null; schoolName: string | null; className: string | null; segment: string; parentLinked: boolean; active: boolean; lastActivity: string | null }>;
+  schools: Array<{ id: string; name: string }>;
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
+export type PlatformStudentDetail = {
+  id: string; name: string; username: string | null; explorerCode: string | null; yearLevel: string | null; status: string;
+  createdAt: string; segment: string;
+  school: { id: string; name: string } | null;
+  classes: Array<{ id: string; name: string; primary: boolean; status: string; academicYear: string | null }>;
+  entitlements: Array<{ source: "school" | "home"; status: string; billingStatus: string; startsAt: string; endsAt: string | null; schoolId: string | null; academicYearId: string | null }>;
+  parents: Array<{ id: string; name: string | null; email: string | null; relationship: string; linkedAt: string }>;
+  realms: Array<{ realmId: string; programKey: string; workingLevel: string | null; currentWeek: number | null; pathway: string; placementComplete: boolean; requiredWeeks: number[]; updatedAt: string; lastActivity: string | null }>;
+  activity: { lastActive: string | null; lessons7d: number; quizzes7d: number; assessments30d: number };
+};
+
+export type PlatformAdultDetail = { id: string; name: string | null; email: string | null; status: string; createdAt: string; lastActive: string | null; schools: Array<{ id: string; name: string; role: string; status: string }>; children: Array<{ id: string; name: string; relationship: string; status: string; schoolName: string | null; homeActive: boolean }> };
+
 async function adminRequest<T>(
   rpc: string,
   accessToken: string,
@@ -215,6 +263,52 @@ export async function loadPlatformOverview() {
     ),
   ]);
   return { access, overview, schools };
+}
+
+export async function loadPlatformOperations() {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  const snapshot = await adminRequest<PlatformOperationsSnapshot>("get_platform_admin_operations_snapshot", access.accessToken);
+  return { access, snapshot };
+}
+
+export async function loadPlatformGrowth() {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  return { access, snapshot: await adminRequest<PlatformGrowthSnapshot>("get_platform_admin_growth_snapshot", access.accessToken) };
+}
+
+export async function loadPlatformEngagement() {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  return { access, snapshot: await adminRequest<PlatformEngagementSnapshot>("get_platform_admin_engagement_snapshot", access.accessToken) };
+}
+
+export async function loadPlatformHomeOnly() {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  return { access, snapshot: await adminRequest<PlatformHomeOnlySnapshot>("get_platform_admin_home_only_snapshot", access.accessToken) };
+}
+
+export async function searchPlatformAdminUsers(params: { query?: string; userType?: string; segment?: string; activity?: string; schoolId?: string; page?: number; pageSize?: number }) {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  const results = await adminRequest<PlatformUserSearch>("search_platform_admin_users", access.accessToken, {
+    p_query: params.query ?? "", p_user_type: params.userType ?? "all", p_segment: params.segment ?? "all", p_activity: params.activity ?? "all", p_school_id: params.schoolId || null, p_page: params.page ?? 1, p_page_size: params.pageSize ?? 25,
+  });
+  return { access, results };
+}
+
+export async function loadPlatformStudentDetail(studentId: string) {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  return { access, detail: await adminRequest<PlatformStudentDetail>("get_platform_admin_student_detail", access.accessToken, { p_student_id: studentId }) };
+}
+
+export async function loadPlatformAdultDetail(userId: string) {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  return { access, detail: await adminRequest<PlatformAdultDetail>("get_platform_admin_adult_detail", access.accessToken, { p_user_id: userId }) };
 }
 
 export async function loadPlatformSchools() {
