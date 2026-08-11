@@ -204,6 +204,12 @@ async function sendCommand(
     error?: string;
     classId?: string;
     explorerCode?: string;
+    studentId?: string;
+    firstName?: string;
+    lastInitial?: string | null;
+    yearLevel?: string | null;
+    alreadyAtSchool?: boolean;
+    hasHomeAccess?: boolean;
     status?: "active" | "archived";
     deleted?: boolean;
     updated?: boolean;
@@ -484,13 +490,47 @@ type SchoolStudentDraft = {
   pin: string;
   classId: string;
   idempotencyKey: string;
+  confirmCreateNew?: boolean;
+  duplicateRequestId?: string;
 };
 
 type SchoolStudentEditDraft = Omit<SchoolStudentDraft, "pin" | "idempotencyKey">;
 
 type StudentCreateResult = {
   created: Array<Record<string, unknown>>;
-  errors: Array<{ row: number; name: string; message: string }>;
+  errors: Array<{
+    row: number;
+    name: string;
+    message: string;
+    code?: string;
+    requestId?: string;
+    candidates?: DuplicateCandidate[];
+  }>;
+};
+
+type DuplicateCandidate = {
+  studentId: string;
+  firstName: string;
+  lastInitial: string | null;
+  yearLevel: string | null;
+  schoolName: string | null;
+  hasHomeAccess: boolean;
+};
+
+type ExistingStudentPreview = {
+  studentId: string;
+  firstName: string;
+  lastInitial: string | null;
+  yearLevel: string | null;
+  alreadyAtSchool: boolean;
+  hasHomeAccess: boolean;
+};
+
+type ExistingStudentLinkDraft = {
+  studentId: string;
+  schoolYear: string;
+  classId: string;
+  reason: string;
 };
 
 function emptyStudentDraft(classId = ""): SchoolStudentDraft {
@@ -517,6 +557,8 @@ function StudentDirectory({
   onDelete,
   onUpdate,
   onCreate,
+  onPreviewExisting,
+  onLinkExisting,
 }: {
   students: SchoolHomeSnapshot["students"];
   classes: SchoolHomeSnapshot["classes"];
@@ -536,21 +578,35 @@ function StudentDirectory({
     draft: SchoolStudentEditDraft,
   ) => Promise<boolean>;
   onCreate: (students: SchoolStudentDraft[]) => Promise<StudentCreateResult>;
+  onPreviewExisting: (
+    explorerCode: string,
+  ) => Promise<ExistingStudentPreview | null>;
+  onLinkExisting: (draft: ExistingStudentLinkDraft) => Promise<boolean>;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [yearFilter, setYearFilter] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const [copiedCode, setCopiedCode] = useState("");
-  const [createMode, setCreateMode] = useState<"manual" | "import" | null>(
+  const [createMode, setCreateMode] = useState<"manual" | "link" | "import" | null>(
     null,
   );
   const [manualDraft, setManualDraft] = useState<SchoolStudentDraft>(
     emptyStudentDraft(),
   );
+  const [duplicateReview, setDuplicateReview] = useState<{
+    requestId: string;
+    candidates: DuplicateCandidate[];
+  } | null>(null);
   const [importRows, setImportRows] = useState<RosterDraft[]>([]);
   const [importFileName, setImportFileName] = useState("");
   const [importMessage, setImportMessage] = useState("");
+  const [linkCode, setLinkCode] = useState("");
+  const [linkPreview, setLinkPreview] = useState<ExistingStudentPreview | null>(null);
+  const [linkSchoolYear, setLinkSchoolYear] = useState("");
+  const [linkClassId, setLinkClassId] = useState("");
+  const [linkReason, setLinkReason] = useState("School enrolment");
+  const [linkMessage, setLinkMessage] = useState("");
   const [readingFile, setReadingFile] = useState(false);
   const [downloadingTemplate, setDownloadingTemplate] = useState(false);
   const [resetStudent, setResetStudent] = useState<
@@ -592,6 +648,16 @@ function StudentDirectory({
               classRow.yearLevels.includes(manualDraft.schoolYear)),
         ),
     [activeClasses, manualDraft.schoolYear],
+  );
+  const compatibleLinkClasses = useMemo(
+    () =>
+      activeClasses.filter(
+        (classRow) =>
+          !linkSchoolYear ||
+          classRow.yearLevels.length === 0 ||
+          classRow.yearLevels.includes(linkSchoolYear),
+      ),
+    [activeClasses, linkSchoolYear],
   );
   const normalizedQuery = query.trim().toLowerCase();
   const yearRank = (yearLevel: string | null) => {
@@ -702,6 +768,13 @@ function StudentDirectory({
     setImportFileName("");
     setImportMessage("");
     setManualDraft(emptyStudentDraft());
+    setDuplicateReview(null);
+    setLinkCode("");
+    setLinkPreview(null);
+    setLinkSchoolYear("");
+    setLinkClassId("");
+    setLinkReason("School enrolment");
+    setLinkMessage("");
   }
 
   async function submitManualStudent() {
@@ -710,7 +783,60 @@ function StudentDirectory({
       closeCreate();
       return;
     }
+    const error = result.errors[0];
+    if (error?.code === "potential_duplicate" && error.requestId) {
+      setDuplicateReview({
+        requestId: error.requestId,
+        candidates: error.candidates ?? [],
+      });
+    }
+    setImportMessage(error?.message ?? "Student could not be added.");
+  }
+
+  async function confirmSeparateStudent() {
+    if (!duplicateReview) return;
+    const result = await onCreate([
+      {
+        ...manualDraft,
+        confirmCreateNew: true,
+        duplicateRequestId: duplicateReview.requestId,
+      },
+    ]);
+    if (result.errors.length === 0) {
+      closeCreate();
+      return;
+    }
     setImportMessage(result.errors[0]?.message ?? "Student could not be added.");
+  }
+
+  async function previewExistingStudent() {
+    if (!linkCode.trim()) return;
+    setLinkMessage("");
+    const preview = await onPreviewExisting(linkCode.trim());
+    if (!preview) {
+      setLinkMessage(
+        "We could not verify that Explorer Code. Check the code and try again.",
+      );
+      return;
+    }
+    setLinkPreview(preview);
+    setLinkSchoolYear(
+      preview.yearLevel && YEAR_LEVELS.includes(preview.yearLevel)
+        ? preview.yearLevel
+        : "",
+    );
+    setLinkClassId("");
+  }
+
+  async function submitExistingStudentLink() {
+    if (!linkPreview || !linkSchoolYear) return;
+    const completed = await onLinkExisting({
+      studentId: linkPreview.studentId,
+      schoolYear: linkSchoolYear,
+      classId: linkClassId,
+      reason: linkReason.trim() || "School enrolment",
+    });
+    if (completed) closeCreate();
   }
 
   async function handleRosterFile(event: ChangeEvent<HTMLInputElement>) {
@@ -1114,6 +1240,24 @@ function StudentDirectory({
       {createMode === "manual" ? (
         <Modal title="Add student" onClose={closeCreate}>
           <div className="grid gap-4 p-6 sm:grid-cols-2">
+            <div className="flex gap-2 border-b border-slate-200 pb-4 sm:col-span-2">
+              <button
+                type="button"
+                className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white"
+              >
+                Create new
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setImportMessage("");
+                  setCreateMode("link");
+                }}
+                className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700"
+              >
+                Link existing
+              </button>
+            </div>
             <label className="text-sm font-bold text-slate-700">
               First name *
               <input
@@ -1228,7 +1372,206 @@ function StudentDirectory({
                 {importMessage}
               </p>
             ) : null}
+            {duplicateReview ? (
+              <div className="space-y-3 rounded-md border border-amber-300 bg-amber-50 p-4 sm:col-span-2">
+                <div>
+                  <p className="font-bold text-amber-950">Check for an existing account</p>
+                  <p className="mt-1 text-sm text-amber-900">
+                    A matching name already exists. Link the existing account with its Explorer Code when it is the same child.
+                  </p>
+                </div>
+                <div className="divide-y divide-amber-200 rounded-md border border-amber-200 bg-white">
+                  {duplicateReview.candidates.map((candidate) => (
+                    <div key={candidate.studentId} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
+                      <span className="font-bold text-slate-900">
+                        {candidate.firstName} {candidate.lastInitial ?? ""}
+                      </span>
+                      <span className="text-slate-600">
+                        {[candidate.yearLevel, candidate.schoolName].filter(Boolean).join(" · ") || "No school details"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImportMessage("");
+                      setCreateMode("link");
+                    }}
+                    className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white"
+                  >
+                    Link existing account
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void confirmSeparateStudent()}
+                    className="rounded-md border border-amber-600 bg-white px-4 py-2 text-sm font-bold text-amber-900 disabled:opacity-50"
+                  >
+                    This is a different child - create new
+                  </button>
+                </div>
+              </div>
+            ) : null}
             <div className="flex justify-end gap-2 sm:col-span-2">
+              {!duplicateReview ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={closeCreate}
+                    className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={
+                      busy ||
+                      !manualDraft.firstName.trim() ||
+                      !manualDraft.schoolYear ||
+                      Boolean(manualDraft.pin && manualDraft.pin.length !== 4)
+                    }
+                    onClick={() => void submitManualStudent()}
+                    className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                  >
+                    {busy ? "Adding..." : "Add student"}
+                  </button>
+                </>
+              ) : null}
+            </div>
+          </div>
+        </Modal>
+      ) : null}
+
+      {createMode === "link" ? (
+        <Modal title="Add student" onClose={closeCreate}>
+          <div className="space-y-5 p-6">
+            <div className="flex gap-2 border-b border-slate-200 pb-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setLinkMessage("");
+                  setCreateMode("manual");
+                }}
+                className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700"
+              >
+                Create new
+              </button>
+              <button
+                type="button"
+                className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white"
+              >
+                Link existing
+              </button>
+            </div>
+
+            <div>
+              <h3 className="font-bold text-slate-900">Find their existing account</h3>
+              <p className="mt-1 text-sm text-slate-600">
+                Enter the student&apos;s Level Up Learning Explorer Code. Their
+                progress, rewards and home access will stay with them.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <label className="flex-1 text-sm font-bold text-slate-700">
+                Explorer Code
+                <input
+                  value={linkCode}
+                  onChange={(event) => {
+                    setLinkCode(event.target.value.toUpperCase());
+                    setLinkPreview(null);
+                    setLinkMessage("");
+                  }}
+                  placeholder="LUL-AB12-CD34"
+                  autoComplete="off"
+                  className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal uppercase"
+                />
+              </label>
+              <button
+                type="button"
+                disabled={busy || !linkCode.trim()}
+                onClick={() => void previewExistingStudent()}
+                className="self-end rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                {busy ? "Checking..." : "Check code"}
+              </button>
+            </div>
+
+            {linkMessage ? (
+              <p className="border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+                {linkMessage}
+              </p>
+            ) : null}
+
+            {linkPreview ? (
+              <>
+                <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4">
+                  <p className="text-xs font-bold uppercase text-emerald-800">
+                    Account found
+                  </p>
+                  <p className="mt-1 text-lg font-bold text-slate-900">
+                    {linkPreview.firstName}
+                    {linkPreview.lastInitial ? ` ${linkPreview.lastInitial}.` : ""}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-600">
+                    {linkPreview.yearLevel ?? "Year level not set"}
+                    {linkPreview.hasHomeAccess ? " · Home access active" : ""}
+                  </p>
+                  {linkPreview.alreadyAtSchool ? (
+                    <p className="mt-2 text-sm font-semibold text-emerald-900">
+                      This student is already linked to this school. You can
+                      update their class below.
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="text-sm font-bold text-slate-700">
+                    Year level *
+                    <select
+                      value={linkSchoolYear}
+                      onChange={(event) => {
+                        setLinkSchoolYear(event.target.value);
+                        setLinkClassId("");
+                      }}
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+                    >
+                      <option value="">Choose year</option>
+                      {YEAR_LEVELS.map((year) => (
+                        <option key={year}>{year}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="text-sm font-bold text-slate-700">
+                    Class (optional)
+                    <select
+                      value={linkClassId}
+                      onChange={(event) => setLinkClassId(event.target.value)}
+                      className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-normal"
+                    >
+                      <option value="">No class yet</option>
+                      {compatibleLinkClasses.map((classRow) => (
+                        <option key={classRow.id} value={classRow.id}>
+                          {classRow.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                <label className="block text-sm font-bold text-slate-700">
+                  Reason
+                  <input
+                    value={linkReason}
+                    onChange={(event) => setLinkReason(event.target.value)}
+                    className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+                  />
+                </label>
+              </>
+            ) : null}
+
+            <div className="flex justify-end gap-2 border-t border-slate-200 pt-4">
               <button
                 type="button"
                 onClick={closeCreate}
@@ -1236,19 +1579,16 @@ function StudentDirectory({
               >
                 Cancel
               </button>
-              <button
-                type="button"
-                disabled={
-                  busy ||
-                  !manualDraft.firstName.trim() ||
-                  !manualDraft.schoolYear ||
-                  Boolean(manualDraft.pin && manualDraft.pin.length !== 4)
-                }
-                onClick={() => void submitManualStudent()}
-                className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
-              >
-                {busy ? "Adding..." : "Add student"}
-              </button>
+              {linkPreview ? (
+                <button
+                  type="button"
+                  disabled={busy || !linkSchoolYear}
+                  onClick={() => void submitExistingStudentLink()}
+                  className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                >
+                  {busy ? "Linking..." : "Link student"}
+                </button>
+              ) : null}
             </div>
           </div>
         </Modal>
@@ -1991,6 +2331,42 @@ export default function SchoolHomeClient({
     }
   }
 
+  async function previewExistingSchoolStudent(
+    explorerCode: string,
+  ): Promise<ExistingStudentPreview | null> {
+    const result = await command(
+      { action: "previewExistingStudent", explorerCode },
+      "Student account verified",
+    );
+    if (!result?.studentId) return null;
+    return {
+      studentId: String(result.studentId),
+      firstName: String(result.firstName ?? "Student"),
+      lastInitial:
+        typeof result.lastInitial === "string" && result.lastInitial
+          ? result.lastInitial
+          : null,
+      yearLevel:
+        typeof result.yearLevel === "string" && result.yearLevel
+          ? result.yearLevel
+          : null,
+      alreadyAtSchool: result.alreadyAtSchool === true,
+      hasHomeAccess: result.hasHomeAccess === true,
+    };
+  }
+
+  async function linkExistingSchoolStudent(
+    draft: ExistingStudentLinkDraft,
+  ) {
+    const result = await command(
+      { action: "linkExistingStudent", ...draft },
+      "Existing student linked",
+    );
+    if (!result?.studentId) return false;
+    await refreshStudentLifecycleData();
+    return true;
+  }
+
   const homeStats = [
     {
       label: "Active classes",
@@ -2320,6 +2696,8 @@ export default function SchoolHomeClient({
               onDelete={deleteSchoolStudent}
               onUpdate={updateSchoolStudent}
               onCreate={createSchoolStudents}
+              onPreviewExisting={previewExistingSchoolStudent}
+              onLinkExisting={linkExistingSchoolStudent}
             />
           ) : null}
 

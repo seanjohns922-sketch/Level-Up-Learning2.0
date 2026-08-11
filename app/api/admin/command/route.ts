@@ -65,6 +65,38 @@ export async function POST(request: Request) {
       });
       return NextResponse.json({ administrator });
     }
+    if (payload.action === "searchIdentityStudents") {
+      const results = await runPlatformOwnerCommand<Record<string, unknown>>(
+        "search_platform_admin_users",
+        {
+          p_query: text(payload.query), p_user_type: "student", p_segment: "all",
+          p_activity: "all", p_school_id: null, p_page: 1, p_page_size: 10,
+        },
+      );
+      return NextResponse.json(results);
+    }
+    if (payload.action === "requestIdentityMerge") {
+      const result = await runPlatformOwnerCommand<Record<string, unknown>>(
+        "request_student_identity_merge",
+        {
+          p_survivor_student_id: text(payload.survivorStudentId),
+          p_duplicate_student_id: text(payload.duplicateStudentId),
+          p_reason: text(payload.reason),
+        },
+      );
+      return NextResponse.json(result);
+    }
+    if (payload.action === "resolveIdentityMerge") {
+      const result = await runPlatformOwnerCommand<Record<string, unknown>>(
+        "resolve_student_identity_merge",
+        {
+          p_request_id: text(payload.requestId),
+          p_approve: payload.approve === true,
+          p_reason: text(payload.reason),
+        },
+      );
+      return NextResponse.json(result);
+    }
     return NextResponse.json({ error: "Unknown Platform Admin command" }, { status: 400 });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Platform Admin command failed" }, { status: 403 });

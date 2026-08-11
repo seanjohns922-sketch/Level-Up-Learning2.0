@@ -342,7 +342,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/parent/link");
+      router.push("/parent");
       return;
     }
 
@@ -363,7 +363,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/parent/link");
+    router.push("/parent");
   }
 
   async function handleRecoveredPasswordUpdate() {

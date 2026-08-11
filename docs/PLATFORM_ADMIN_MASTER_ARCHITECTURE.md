@@ -122,3 +122,13 @@ PA2 adds canonical school provisioning and lifecycle commands. Trial and Active 
 PA3 is the read-only operational layer above PA1 access foundations and PA2 school lifecycle management. Its canonical activity definition, aggregate snapshot architecture, User Explorer, growth denominators, attention rules and performance boundaries are defined in `PLATFORM_ADMIN_PHASE_PA3_OPERATIONS_GROWTH.md`.
 
 The PA3 layer must remain platform-owner only. It must not introduce billing, marketing automation, exports, impersonation, progression controls or reward mutation paths.
+
+## PA4 Identity, Parent and Home Access
+
+PA4 makes `students.id` the permanent child identity across Home access, parent relationships, school links and school transfers. Access and relationships may change; learning history, Explorer Code continuity, assessments and rewards remain attached to the canonical child.
+
+Parents receive read-only access to actively linked children. Schools explicitly choose between creating a new identity and linking an existing identity. Duplicate candidates are blocked from silent creation, and only the platform owner can merge confirmed duplicates through a previewed and audited workflow.
+
+Historical school reporting follows the school and class relationships active when each event occurred. Transfers preserve prior evidence and do not grant the previous school access to future learning.
+
+The full identity invariant, Home entitlement rules, parent security boundary, transfer behavior, merge recovery process and release checks are defined in `PLATFORM_ADMIN_PHASE_PA4_IDENTITY_PARENT_HOME.md`.

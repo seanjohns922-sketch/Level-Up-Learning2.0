@@ -200,6 +200,13 @@ export type PlatformStudentDetail = {
 
 export type PlatformAdultDetail = { id: string; name: string | null; email: string | null; status: string; createdAt: string; lastActive: string | null; schools: Array<{ id: string; name: string; role: string; status: string }>; children: Array<{ id: string; name: string; relationship: string; status: string; schoolName: string | null; homeActive: boolean }> };
 
+export type PlatformIdentityCentre = {
+  pendingLinks: Array<{ id: string; requestType: string; studentId: string | null; studentName: string | null; schoolId: string | null; schoolName: string | null; reason: string | null; metadata: Record<string, unknown>; createdAt: string }>;
+  mergeRequests: Array<{ id: string; survivorStudentId: string; survivorName: string; duplicateStudentId: string; duplicateName: string; reason: string; preview: Record<string, unknown>; createdAt: string }>;
+  retiredIdentities: Array<{ studentId: string; displayName: string; mergedInto: string; mergedAt: string }>;
+  recentTransfers: Array<{ id: string; studentId: string; studentName: string; fromSchoolId: string | null; fromSchoolName: string | null; toSchoolId: string; toSchoolName: string; reason: string | null; createdAt: string }>;
+};
+
 async function adminRequest<T>(
   rpc: string,
   accessToken: string,
@@ -350,6 +357,16 @@ export async function loadPlatformAudit() {
     { p_limit: 100 },
   );
   return { access, audit };
+}
+
+export async function loadPlatformIdentityCentre() {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  const snapshot = await adminRequest<PlatformIdentityCentre>(
+    "get_platform_identity_centre",
+    access.accessToken,
+  );
+  return { access, snapshot };
 }
 
 export async function runPlatformOwnerCommand<T>(

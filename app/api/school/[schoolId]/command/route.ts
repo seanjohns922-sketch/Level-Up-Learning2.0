@@ -243,6 +243,56 @@ export async function POST(
         return NextResponse.json(result);
       }
 
+      case "previewExistingStudent": {
+        const explorerCode = stringValue(payload.explorerCode);
+        if (!explorerCode) return errorResponse("Explorer Code is required");
+        const result = await runSchoolCommand<Record<string, unknown>>(
+          schoolId,
+          "preview_school_student_link",
+          { p_school_id: schoolId, p_explorer_code: explorerCode },
+          accessToken,
+        );
+        return NextResponse.json(result);
+      }
+
+      case "linkExistingStudent": {
+        const studentId = stringValue(payload.studentId);
+        const schoolYear = stringValue(payload.schoolYear);
+        if (!studentId || !schoolYear) {
+          return errorResponse("Student and school year are required");
+        }
+        const result = await runSchoolCommand<Record<string, unknown>>(
+          schoolId,
+          "link_existing_student_to_school",
+          {
+            p_school_id: schoolId,
+            p_student_id: studentId,
+            p_school_year_level: schoolYear,
+            p_class_id: stringValue(payload.classId) || null,
+            p_reason:
+              stringValue(payload.reason) ||
+              "Linked existing Level Up Learning identity",
+          },
+          accessToken,
+        );
+        return NextResponse.json(result);
+      }
+
+      case "previewStudentCreation": {
+        const result = await runSchoolCommand<Record<string, unknown>>(
+          schoolId,
+          "preview_school_student_creation",
+          {
+            p_school_id: schoolId,
+            p_first_name: stringValue(payload.firstName),
+            p_last_name: stringValue(payload.lastName),
+            p_school_year_level: stringValue(payload.schoolYear),
+          },
+          accessToken,
+        );
+        return NextResponse.json(result);
+      }
+
       case "createStudents": {
         const students = objectArray(payload.students).slice(0, 100);
         if (students.length === 0) {
@@ -250,12 +300,63 @@ export async function POST(
         }
 
         const created: Array<Record<string, unknown>> = [];
-        const errors: Array<{ row: number; name: string; message: string }> = [];
+        const errors: Array<{
+          row: number;
+          name: string;
+          message: string;
+          code?: string;
+          requestId?: string;
+          candidates?: Array<Record<string, unknown>>;
+        }> = [];
 
         for (const [index, student] of students.entries()) {
           const firstName = stringValue(student.firstName);
           const lastName = stringValue(student.lastName);
           try {
+            const confirmedDuplicateReview = student.confirmCreateNew === true;
+            const duplicateRequestId = stringValue(student.duplicateRequestId);
+            if (confirmedDuplicateReview) {
+              if (!duplicateRequestId) {
+                throw new Error("Duplicate review confirmation is required");
+              }
+              await runSchoolCommand<Record<string, unknown>>(
+                schoolId,
+                "approve_school_student_creation_override",
+                {
+                  p_school_id: schoolId,
+                  p_request_id: duplicateRequestId,
+                  p_reason: "School confirmed this is a separate student",
+                },
+                accessToken,
+              );
+            } else {
+              const duplicateReview = await runSchoolCommand<{
+                potentialDuplicate?: boolean;
+                requestId?: string;
+                candidates?: Array<Record<string, unknown>>;
+              }>(
+                schoolId,
+                "preview_school_student_creation",
+                {
+                  p_school_id: schoolId,
+                  p_first_name: firstName,
+                  p_last_name: lastName,
+                  p_school_year_level: stringValue(student.schoolYear),
+                },
+                accessToken,
+              );
+              if (duplicateReview.potentialDuplicate) {
+                errors.push({
+                  row: index + 1,
+                  name: [firstName, lastName].filter(Boolean).join(" "),
+                  message: "Potential existing student found. Review before creating a new identity.",
+                  code: "potential_duplicate",
+                  requestId: duplicateReview.requestId ?? "",
+                  candidates: duplicateReview.candidates ?? [],
+                });
+                continue;
+              }
+            }
             const result = await runSchoolCommand<Record<string, unknown>>(
               schoolId,
               "create_school_student",

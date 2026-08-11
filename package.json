@@ -122,6 +122,7 @@
     "qa:platform-admin-pa1": "node scripts/platform-admin-pa1-audit.mjs",
     "qa:platform-admin-pa2": "node scripts/platform-admin-pa2-audit.mjs",
     "qa:platform-admin-pa3": "node scripts/platform-admin-pa3-audit.mjs",
+    "qa:platform-admin-pa4": "node scripts/platform-admin-pa4-audit.mjs",
     "qa:explorer-codes": "node scripts/explorer-code-foundation-audit.mjs",
     "qa:quiz-math-integrity": "node --no-warnings --experimental-strip-types scripts/quiz-math-answer-integrity-audit.mjs",
     "qa:realmies-r2": "node scripts/realmies-r2-audit.mjs",
