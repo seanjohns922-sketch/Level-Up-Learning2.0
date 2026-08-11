@@ -170,6 +170,52 @@ export async function POST(
         return NextResponse.json({ explorerCode });
       }
 
+      case "archiveStudent": {
+        const result = await runSchoolCommand<Record<string, unknown>>(
+          schoolId,
+          "archive_school_student",
+          {
+            p_school_id: schoolId,
+            p_student_id: stringValue(payload.studentId),
+          },
+        );
+        return NextResponse.json(result);
+      }
+
+      case "restoreStudent": {
+        const result = await runSchoolCommand<Record<string, unknown>>(
+          schoolId,
+          "restore_school_student",
+          {
+            p_school_id: schoolId,
+            p_student_id: stringValue(payload.studentId),
+          },
+        );
+        return NextResponse.json(result);
+      }
+
+      case "deleteStudent": {
+        const confirmation = stringValue(payload.confirmation);
+        const reason = stringValue(payload.reason);
+        if (confirmation !== "DELETE") {
+          return errorResponse("Type DELETE to confirm permanent deletion");
+        }
+        if (!reason) {
+          return errorResponse("A deletion reason is required");
+        }
+        const result = await runSchoolCommand<Record<string, unknown>>(
+          schoolId,
+          "delete_school_student",
+          {
+            p_school_id: schoolId,
+            p_student_id: stringValue(payload.studentId),
+            p_confirmation: confirmation,
+            p_reason: reason,
+          },
+        );
+        return NextResponse.json(result);
+      }
+
       case "createStudents": {
         const students = objectArray(payload.students).slice(0, 100);
         if (students.length === 0) {

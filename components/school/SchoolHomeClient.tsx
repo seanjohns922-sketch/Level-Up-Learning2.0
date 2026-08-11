@@ -2,6 +2,7 @@
 
 import {
   BarChart3,
+  Archive,
   BookOpen,
   CheckCircle2,
   ChevronDown,
@@ -22,6 +23,7 @@ import {
   UserPlus,
   Users,
   Upload,
+  Trash2,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -201,6 +203,8 @@ async function sendCommand(
     error?: string;
     classId?: string;
     explorerCode?: string;
+    status?: "active" | "archived";
+    deleted?: boolean;
     created?: Array<Record<string, unknown>>;
     errors?: Array<{ row: number; name: string; message: string }>;
   };
@@ -504,6 +508,9 @@ function StudentDirectory({
   directoryLoading,
   busy,
   onReset,
+  onArchive,
+  onRestore,
+  onDelete,
   onCreate,
 }: {
   students: SchoolHomeSnapshot["students"];
@@ -512,11 +519,19 @@ function StudentDirectory({
   directoryLoading: boolean;
   busy: boolean;
   onReset: (studentId: string, reason: string) => Promise<boolean>;
+  onArchive: (studentId: string) => Promise<boolean>;
+  onRestore: (studentId: string) => Promise<boolean>;
+  onDelete: (
+    studentId: string,
+    confirmation: string,
+    reason: string,
+  ) => Promise<boolean>;
   onCreate: (students: SchoolStudentDraft[]) => Promise<StudentCreateResult>;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [yearFilter, setYearFilter] = useState("");
+  const [showArchived, setShowArchived] = useState(false);
   const [copiedCode, setCopiedCode] = useState("");
   const [createMode, setCreateMode] = useState<"manual" | "import" | null>(
     null,
@@ -533,6 +548,14 @@ function StudentDirectory({
     SchoolHomeSnapshot["students"][number] | null
   >(null);
   const [resetReason, setResetReason] = useState("");
+  const [archiveStudent, setArchiveStudent] = useState<
+    SchoolHomeSnapshot["students"][number] | null
+  >(null);
+  const [deleteStudent, setDeleteStudent] = useState<
+    SchoolHomeSnapshot["students"][number] | null
+  >(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deleteReason, setDeleteReason] = useState("");
   const activeClasses = useMemo(
     () =>
       classes
@@ -559,6 +582,7 @@ function StudentDirectory({
   const filteredStudents = students
     .filter(
       (student) =>
+        (showArchived || student.status === "active") &&
         (!yearFilter || student.yearLevel === yearFilter) &&
         [
         student.name,
@@ -610,6 +634,28 @@ function StudentDirectory({
     if (completed) {
       setResetStudent(null);
       setResetReason("");
+    }
+  }
+
+  async function submitArchive() {
+    if (!archiveStudent) return;
+    const completed = await onArchive(archiveStudent.id);
+    if (completed) setArchiveStudent(null);
+  }
+
+  async function submitDelete() {
+    if (!deleteStudent || deleteConfirmation !== "DELETE" || !deleteReason.trim()) {
+      return;
+    }
+    const completed = await onDelete(
+      deleteStudent.id,
+      deleteConfirmation,
+      deleteReason.trim(),
+    );
+    if (completed) {
+      setDeleteStudent(null);
+      setDeleteConfirmation("");
+      setDeleteReason("");
     }
   }
 
@@ -731,7 +777,7 @@ function StudentDirectory({
         <div>
           <h2 className="text-lg font-bold">School Students</h2>
           <p className="text-sm text-slate-500">
-            {classes.length} active classes · {students.length} students.
+            {classes.length} active classes · {students.filter((student) => student.status === "active").length} active students.
             Explorer Codes are generated automatically.
           </p>
         </div>
@@ -785,7 +831,7 @@ function StudentDirectory({
         </div>
       </div>
 
-      <div className="mb-5">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <label className="relative block w-full max-w-lg">
             <span className="sr-only">Search students</span>
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
@@ -796,6 +842,15 @@ function StudentDirectory({
               placeholder="Find student by name or code"
               className="w-full rounded-md border border-slate-300 bg-white py-2.5 pl-9 pr-3 text-sm"
             />
+          </label>
+          <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700">
+            <input
+              type="checkbox"
+              checked={showArchived}
+              onChange={(event) => setShowArchived(event.target.checked)}
+              className="h-4 w-4 accent-emerald-700"
+            />
+            Show archived
           </label>
       </div>
 
@@ -874,6 +929,34 @@ function StudentDirectory({
                       <RotateCcw className="h-3.5 w-3.5" />
                       Reset
                     </button>
+                    {student.status === "active" ? (
+                      <button
+                        type="button"
+                        onClick={() => setArchiveStudent(student)}
+                        className="inline-flex items-center gap-1 rounded-md border border-amber-300 px-2.5 py-2 text-xs font-bold text-amber-800"
+                      >
+                        <Archive className="h-3.5 w-3.5" />
+                        Archive
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void onRestore(student.id)}
+                        className="inline-flex items-center gap-1 rounded-md border border-emerald-300 px-2.5 py-2 text-xs font-bold text-emerald-800 disabled:opacity-50"
+                      >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        Restore
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setDeleteStudent(student)}
+                      className="inline-flex items-center gap-1 rounded-md border border-red-300 px-2.5 py-2 text-xs font-bold text-red-700"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -933,6 +1016,34 @@ function StudentDirectory({
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Reset
+              </button>
+              {student.status === "active" ? (
+                <button
+                  type="button"
+                  onClick={() => setArchiveStudent(student)}
+                  className="inline-flex items-center gap-1 rounded-md border border-amber-300 px-3 py-2 text-xs font-bold text-amber-800"
+                >
+                  <Archive className="h-3.5 w-3.5" />
+                  Archive
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void onRestore(student.id)}
+                  className="inline-flex items-center gap-1 rounded-md border border-emerald-300 px-3 py-2 text-xs font-bold text-emerald-800 disabled:opacity-50"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Restore
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setDeleteStudent(student)}
+                className="inline-flex items-center gap-1 rounded-md border border-red-300 px-3 py-2 text-xs font-bold text-red-700"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Delete
               </button>
             </div>
           </details>
@@ -1347,6 +1458,96 @@ function StudentDirectory({
           </div>
         </Modal>
       ) : null}
+
+      {archiveStudent ? (
+        <Modal
+          title={`Archive ${archiveStudent.name}?`}
+          onClose={() => setArchiveStudent(null)}
+        >
+          <div className="space-y-5 p-6">
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+              The student will be removed from active classes and school access, but their progress and history will be preserved. You can restore them later.
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setArchiveStudent(null)}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void submitArchive()}
+                className="rounded-md bg-amber-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                {busy ? "Archiving..." : "Archive student"}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
+
+      {deleteStudent ? (
+        <Modal
+          title={`Permanently delete ${deleteStudent.name}?`}
+          onClose={() => {
+            setDeleteStudent(null);
+            setDeleteConfirmation("");
+            setDeleteReason("");
+          }}
+        >
+          <div className="space-y-5 p-6">
+            <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-900">
+              This permanently removes the student, login identity, progress, rewards, assessment history, and reports. This cannot be undone.
+            </div>
+            <label className="block text-sm font-bold text-slate-700">
+              Reason for deletion
+              <input
+                value={deleteReason}
+                onChange={(event) => setDeleteReason(event.target.value)}
+                placeholder="For example: duplicate student record"
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal"
+              />
+            </label>
+            <label className="block text-sm font-bold text-slate-700">
+              Type DELETE to confirm
+              <input
+                value={deleteConfirmation}
+                onChange={(event) => setDeleteConfirmation(event.target.value)}
+                autoComplete="off"
+                className="mt-1 w-full rounded-md border border-red-300 px-3 py-2 font-mono font-bold"
+              />
+            </label>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteStudent(null);
+                  setDeleteConfirmation("");
+                  setDeleteReason("");
+                }}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={
+                  busy ||
+                  deleteConfirmation !== "DELETE" ||
+                  !deleteReason.trim()
+                }
+                onClick={() => void submitDelete()}
+                className="rounded-md bg-red-700 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {busy ? "Deleting..." : "Delete permanently"}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
     </>
   );
 }
@@ -1535,6 +1736,53 @@ export default function SchoolHomeClient({
     );
     if (result?.explorerCode) await loadStudentDirectory();
     return Boolean(result?.explorerCode);
+  }
+
+  async function refreshStudentLifecycleData() {
+    await Promise.all([
+      loadStudentDirectory(),
+      licenceState === "ready" ? loadLicenceSummaries() : Promise.resolve(),
+    ]);
+  }
+
+  async function archiveSchoolStudent(studentId: string) {
+    const result = await command(
+      { action: "archiveStudent", studentId },
+      "Student archived",
+    );
+    if (result?.status === "archived") {
+      await refreshStudentLifecycleData();
+      return true;
+    }
+    return false;
+  }
+
+  async function restoreSchoolStudent(studentId: string) {
+    const result = await command(
+      { action: "restoreStudent", studentId },
+      "Student restored",
+    );
+    if (result?.status === "active") {
+      await refreshStudentLifecycleData();
+      return true;
+    }
+    return false;
+  }
+
+  async function deleteSchoolStudent(
+    studentId: string,
+    confirmation: string,
+    reason: string,
+  ) {
+    const result = await command(
+      { action: "deleteStudent", studentId, confirmation, reason },
+      "Student permanently deleted",
+    );
+    if (result?.deleted === true) {
+      await refreshStudentLifecycleData();
+      return true;
+    }
+    return false;
   }
 
   async function createSchoolStudents(
@@ -1896,6 +2144,9 @@ export default function SchoolHomeClient({
               directoryLoading={directoryState !== "ready"}
               busy={busy}
               onReset={resetExplorerCode}
+              onArchive={archiveSchoolStudent}
+              onRestore={restoreSchoolStudent}
+              onDelete={deleteSchoolStudent}
               onCreate={createSchoolStudents}
             />
           ) : null}
