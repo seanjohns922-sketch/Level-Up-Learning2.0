@@ -115,14 +115,28 @@ export default function PlacementManager({
     void load();
   }, [load]);
 
+  const rosterStudentIds = useMemo(
+    () => new Set(students.map((student) => student.id)),
+    [students],
+  );
+
   const placedIdsByRealm = useMemo(() => {
     const out: Record<string, Set<string>> = {};
     for (const id of ACTIVE_REALM_IDS) {
-      out[id] = new Set((progressByRealm[id] ?? []).map((r) => r.student_id));
-      placements.filter((placement) => placement.realm_id === id).forEach((placement) => out[id].add(placement.student_id));
+      out[id] = new Set(
+        (progressByRealm[id] ?? [])
+          .map((row) => row.student_id)
+          .filter((studentId) => rosterStudentIds.has(studentId)),
+      );
+      placements
+        .filter(
+          (placement) =>
+            placement.realm_id === id && rosterStudentIds.has(placement.student_id),
+        )
+        .forEach((placement) => out[id].add(placement.student_id));
     }
     return out;
-  }, [placements, progressByRealm]);
+  }, [placements, progressByRealm, rosterStudentIds]);
 
   const placementByStudentRealm = useMemo(
     () => new Map(placements.map((placement) => [`${placement.realm_id}:${placement.student_id}`, placement])),
@@ -417,7 +431,7 @@ export default function PlacementManager({
                 );
               }
               const placed = placedIdsByRealm[realm.id]?.size ?? 0;
-              const need = students.length - placed;
+              const need = Math.max(0, rosterStudentIds.size - placed);
               return (
                 <button
                   key={realm.id}
@@ -441,7 +455,7 @@ export default function PlacementManager({
                     </div>
                     <div className="ml-auto flex items-center gap-1.5 text-[#94A3B8]">
                       <Users className="h-4 w-4" />
-                      <span className="text-sm font-bold">{students.length}</span>
+                      <span className="text-sm font-bold">{rosterStudentIds.size}</span>
                     </div>
                   </div>
                 </button>
