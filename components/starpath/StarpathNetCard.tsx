@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, type CSSProperties } from "react";
-import { Check, RotateCcw } from "lucide-react";
+import { Check, RotateCcw, Star } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { foldTree, foldNet, normalise, faceColour, type Cell, type FoldNode } from "@/data/activities/starpath/level5/nets";
@@ -56,7 +56,18 @@ function NetFaces({
       style={style}
       onClick={tappable && onTap ? (event) => { event.stopPropagation(); onTap(node.key); } : undefined}
     >
-      {isFocus ? <span className="pointer-events-none absolute inset-1 rounded-[4px] ring-[3px] ring-white ring-offset-0" style={{ boxShadow: "0 0 8px rgba(255,255,255,0.7)" }} /> : null}
+      {isFocus ? (
+        <span
+          className="pointer-events-none absolute inset-0 grid place-items-center rounded-[4px]"
+          style={{
+            background: "rgba(251,191,36,0.16)",
+            boxShadow: "inset 0 0 0 3px #fbbf24, 0 0 14px 3px rgba(251,191,36,0.85)",
+            animation: "netMark 1.2s ease-in-out infinite",
+          }}
+        >
+          <Star className="h-1/2 w-1/2" style={{ color: "#fff", fill: "#fbbf24", filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.55))" }} aria-label="marked face" />
+        </span>
+      ) : null}
       {node.children.map((child) => (
         <NetFaces key={child.key} node={child} folded={folded} size={size} coloured={coloured} focus={focus} tappable={tappable} selected={selected} onTap={onTap} />
       ))}
@@ -241,7 +252,7 @@ export default function StarpathNetCard({ task, onCorrect, onWrong }: { task: Ta
           <div className="flex justify-center"><SubmitButton disabled={settled || !chosen.length} onClick={submitText} /></div>
         </>
       )}
-      <style>{`.l4sym-stage{background:radial-gradient(120% 90% at 50% 2%, #2a2a6e 0%, #16123f 45%, #0b0a24 100%);box-shadow:0 14px 34px -16px rgba(10,8,40,.6), inset 0 0 0 1px rgba(148,163,255,.14);}`}</style>
+      <style>{`.l4sym-stage{background:radial-gradient(120% 90% at 50% 2%, #2a2a6e 0%, #16123f 45%, #0b0a24 100%);box-shadow:0 14px 34px -16px rgba(10,8,40,.6), inset 0 0 0 1px rgba(148,163,255,.14);}@keyframes netMark{0%,100%{box-shadow:inset 0 0 0 3px #fbbf24, 0 0 10px 2px rgba(251,191,36,.7);}50%{box-shadow:inset 0 0 0 3px #fde68a, 0 0 20px 6px rgba(251,191,36,.95);}}`}</style>
     </div>
   );
 }
