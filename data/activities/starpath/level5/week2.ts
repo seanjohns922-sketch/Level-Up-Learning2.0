@@ -21,7 +21,7 @@ export const TRACK_FACE_CONTENT = lessonContent({
   reflection: "Where does the opposite face end up?",
   reflectionOptions: ["Across the cube, never touching", "Right next to it", "In the same place"],
   skills: ["Track faces through a fold", "Locate opposite faces", "Reason about a cube"],
-  next: "Parts of a Solid",
+  next: "Opposite and Adjacent",
   createTaskSet: createTrackFaceTaskSet,
 });
 
@@ -34,7 +34,7 @@ export const FOLD_NET_CONTENT = lessonContent({
   reflection: "What are the parts of a net?",
   reflectionOptions: ["The flat faces of the solid", "Only squares", "The solid's shadow"],
   skills: ["Identify faces in a net", "Name flat shapes", "Count a solid's faces"],
-  next: "Opposite and Adjacent",
+  next: "Track a Face",
   createTaskSet: createFoldNetTaskSet,
 });
 

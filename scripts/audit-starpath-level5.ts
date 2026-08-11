@@ -110,6 +110,13 @@ for (const [lessonId, content] of Object.entries(LEVEL_FIVE_LESSON_CONTENT)) {
         }
       } else if (net.render === "build") {
         check((net.buildFaces ?? 0) === 6, `${lessonId}: build needs six faces`);
+      } else if (net.render === "solid") {
+        // Authored 3D solid (cuboid / triangular prism / square pyramid): named
+        // solid + a single-answer MCQ, no cube-net cells.
+        check(Boolean(net.solid), `${lessonId}: solid render needs a solid`);
+        const ids = new Set((net.textOptions ?? []).map((option) => option.id));
+        check(ids.size >= 2, `${lessonId}: solid MCQ needs options`);
+        check((net.correctOptionIds ?? []).length === 1 && ids.has((net.correctOptionIds ?? [])[0]!), `${lessonId}: solid MCQ needs one valid answer`);
       } else {
         // single
         check(Array.isArray(net.cells) && net.cells!.length >= 5, `${lessonId}: single render needs a net`);
