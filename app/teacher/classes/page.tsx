@@ -118,6 +118,15 @@ export default function TeacherClassesPage() {
     pin: string;
     claimCode: string;
   } | null>(null);
+
+  async function getTeacherAccessToken() {
+    const { data, error } = await supabase.auth.getSession();
+    const accessToken = data.session?.access_token;
+    if (error || !accessToken) {
+      throw new Error("Your session has expired. Please sign in again.");
+    }
+    return accessToken;
+  }
   // Student edit/archive state
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
   const [pinCopied, setPinCopied] = useState(false);
@@ -273,9 +282,13 @@ export default function TeacherClassesPage() {
 
     const targetClass = classes.find((classRow) => classRow.id === classId);
     if (targetClass?.school_id) {
+      const accessToken = await getTeacherAccessToken();
       const response = await fetch(`/api/teacher/classes/${classId}/students`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           schoolId: targetClass.school_id,
           firstName,
@@ -677,8 +690,10 @@ export default function TeacherClassesPage() {
     setDirectoryError("");
     setDirectoryLoading(true);
     try {
+      const accessToken = await getTeacherAccessToken();
       const response = await fetch(`/api/school/${classRow.school_id}/students`, {
         cache: "no-store",
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       const payload = (await response.json()) as {
         students?: SchoolDirectoryStudent[];
@@ -702,11 +717,15 @@ export default function TeacherClassesPage() {
     setDirectoryLoading(true);
     setDirectoryError("");
     try {
+      const accessToken = await getTeacherAccessToken();
       const response = await fetch(
         `/api/school/${directoryClass.school_id}/command`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             action: "assignStudentsToClass",
             classId: directoryClass.id,

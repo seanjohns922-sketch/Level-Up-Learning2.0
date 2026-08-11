@@ -37,7 +37,11 @@ export async function POST(
   context: { params: Promise<{ schoolId: string }> },
 ) {
   const { schoolId } = await context.params;
-  const access = await requireSchoolPreviewAccess(schoolId);
+  const accessToken = request.headers
+    .get("authorization")
+    ?.replace(/^Bearer\s+/i, "")
+    .trim() ?? "";
+  const access = await requireSchoolPreviewAccess(schoolId, accessToken);
   if (!access) return errorResponse("School access denied", 403);
 
   let payload: CommandRequest;
@@ -72,6 +76,7 @@ export async function POST(
             p_year_levels: stringArray(payload.yearLevels),
             p_idempotency_key: idempotencyKey,
           },
+          accessToken,
         );
 
         if (leadTeacherId !== access.user.id) {
@@ -79,14 +84,14 @@ export async function POST(
             p_class_id: classId,
             p_user_id: leadTeacherId,
             p_role: "lead_teacher",
-          });
+          }, accessToken);
         }
         for (const userId of coTeacherIds) {
           await runSchoolCommand<string>(schoolId, "assign_class_staff", {
             p_class_id: classId,
             p_user_id: userId,
             p_role: "teacher",
-          });
+          }, accessToken);
         }
         if (
           leadTeacherId !== access.user.id &&
@@ -95,7 +100,7 @@ export async function POST(
           await runSchoolCommand<void>(schoolId, "revoke_class_staff", {
             p_class_id: classId,
             p_user_id: access.user.id,
-          });
+          }, accessToken);
         }
 
         return NextResponse.json({ classId });
@@ -106,7 +111,7 @@ export async function POST(
           p_class_id: stringValue(payload.classId),
           p_user_id: stringValue(payload.userId),
           p_role: stringValue(payload.role),
-        });
+        }, accessToken);
         return NextResponse.json({ success: true });
 
       case "inviteStaff": {
@@ -123,7 +128,7 @@ export async function POST(
           p_class_id: stringValue(payload.classId) || null,
           p_idempotency_key:
             stringValue(payload.idempotencyKey) || crypto.randomUUID(),
-        });
+        }, accessToken);
         return NextResponse.json({
           invitationId: result[0]?.invitation_id,
           repeatedRequest: result[0]?.repeated_request ?? false,
@@ -133,13 +138,13 @@ export async function POST(
       case "resendInvitation":
         await runSchoolCommand<string>(schoolId, "resend_school_invitation", {
           p_invitation_id: stringValue(payload.invitationId),
-        });
+        }, accessToken);
         return NextResponse.json({ success: true });
 
       case "revokeInvitation":
         await runSchoolCommand<void>(schoolId, "revoke_school_invitation", {
           p_invitation_id: stringValue(payload.invitationId),
-        });
+        }, accessToken);
         return NextResponse.json({ success: true });
 
       case "changeMemberRole":
@@ -147,14 +152,14 @@ export async function POST(
           p_school_id: schoolId,
           p_user_id: stringValue(payload.userId),
           p_role: stringValue(payload.role),
-        });
+        }, accessToken);
         return NextResponse.json({ success: true });
 
       case "deactivateMember":
         await runSchoolCommand<void>(schoolId, "deactivate_school_member", {
           p_school_id: schoolId,
           p_user_id: stringValue(payload.userId),
-        });
+        }, accessToken);
         return NextResponse.json({ success: true });
 
       case "resetExplorerCode": {
@@ -166,6 +171,7 @@ export async function POST(
             p_student_id: stringValue(payload.studentId),
             p_reason: stringValue(payload.reason),
           },
+          accessToken,
         );
         return NextResponse.json({ explorerCode });
       }
@@ -178,6 +184,7 @@ export async function POST(
             p_school_id: schoolId,
             p_student_id: stringValue(payload.studentId),
           },
+          accessToken,
         );
         return NextResponse.json(result);
       }
@@ -190,6 +197,7 @@ export async function POST(
             p_school_id: schoolId,
             p_student_id: stringValue(payload.studentId),
           },
+          accessToken,
         );
         return NextResponse.json(result);
       }
@@ -212,6 +220,7 @@ export async function POST(
             p_confirmation: confirmation,
             p_reason: reason,
           },
+          accessToken,
         );
         return NextResponse.json(result);
       }
@@ -243,6 +252,7 @@ export async function POST(
                 p_idempotency_key:
                   stringValue(student.idempotencyKey) || crypto.randomUUID(),
               },
+              accessToken,
             );
             created.push(result);
           } catch (error) {
@@ -278,6 +288,7 @@ export async function POST(
                 p_student_id: studentId,
                 p_idempotency_key: `${stringValue(payload.idempotencyKey) || crypto.randomUUID()}:${studentId}`,
               },
+              accessToken,
             );
             assigned.push(studentId);
           } catch (error) {

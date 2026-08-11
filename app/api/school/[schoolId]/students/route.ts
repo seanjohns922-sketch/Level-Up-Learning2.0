@@ -2,12 +2,19 @@ import { NextResponse } from "next/server";
 import { loadSchoolStudentDirectoryPreview } from "@/lib/school-platform-server";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ schoolId: string }> },
 ) {
   const { schoolId } = await context.params;
+  const accessToken = request.headers
+    .get("authorization")
+    ?.replace(/^Bearer\s+/i, "")
+    .trim() ?? "";
   try {
-    const students = await loadSchoolStudentDirectoryPreview(schoolId);
+    const students = await loadSchoolStudentDirectoryPreview(
+      schoolId,
+      accessToken,
+    );
     if (!students) {
       return NextResponse.json({ error: "School access denied" }, { status: 403 });
     }

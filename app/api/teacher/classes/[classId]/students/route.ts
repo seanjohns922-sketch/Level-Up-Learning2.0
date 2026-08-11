@@ -20,6 +20,10 @@ export async function POST(
   context: { params: Promise<{ classId: string }> },
 ) {
   const { classId } = await context.params;
+  const accessToken = request.headers
+    .get("authorization")
+    ?.replace(/^Bearer\s+/i, "")
+    .trim() ?? "";
 
   let payload: CreateClassStudentRequest;
   try {
@@ -50,6 +54,7 @@ export async function POST(
         p_idempotency_key:
           value(payload.idempotencyKey) || crypto.randomUUID(),
       },
+      accessToken,
     );
     return NextResponse.json({ student });
   } catch (error) {

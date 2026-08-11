@@ -260,10 +260,13 @@ async function recordSchoolPreviewAccess(
   }
 }
 
-export async function requireSchoolPreviewAccess(schoolId: string) {
+export async function requireSchoolPreviewAccess(
+  schoolId: string,
+  providedAccessToken = "",
+) {
   if (!isSchoolPlatformPreviewEnabled()) return null;
 
-  const accessToken = await getSchoolPreviewToken();
+  const accessToken = providedAccessToken.trim() || (await getSchoolPreviewToken());
   const [user, school] = await Promise.all([
     verifyAdultAccessToken(accessToken),
     getSchoolAccessContext(schoolId, accessToken),
@@ -325,8 +328,11 @@ export async function loadSchoolHomePreview(schoolId: string) {
   }
 }
 
-export async function loadSchoolStudentDirectoryPreview(schoolId: string) {
-  const access = await requireSchoolPreviewAccess(schoolId);
+export async function loadSchoolStudentDirectoryPreview(
+  schoolId: string,
+  accessToken = "",
+) {
+  const access = await requireSchoolPreviewAccess(schoolId, accessToken);
   if (!access) return null;
 
   try {
@@ -359,12 +365,13 @@ export async function runSchoolCommand<T>(
   schoolId: string,
   rpc: string,
   body: Record<string, unknown>,
+  providedAccessToken = "",
 ) {
   if (!isSchoolPlatformPreviewEnabled()) {
     throw new Error("School platform preview is disabled");
   }
 
-  const accessToken = await getSchoolPreviewToken();
+  const accessToken = providedAccessToken.trim() || (await getSchoolPreviewToken());
   const user = await verifyAdultAccessToken(accessToken);
   if (!user) throw new Error("Active adult account required");
 
@@ -380,12 +387,13 @@ export async function runSchoolCommand<T>(
 export async function runAuthenticatedCommand<T>(
   rpc: string,
   body: Record<string, unknown>,
+  providedAccessToken = "",
 ) {
   if (!isSchoolPlatformPreviewEnabled()) {
     throw new Error("School platform preview is disabled");
   }
 
-  const accessToken = await getSchoolPreviewToken();
+  const accessToken = providedAccessToken.trim() || (await getSchoolPreviewToken());
   const user = await verifyAdultAccessToken(accessToken);
   if (!user) throw new Error("Active adult account required");
 
