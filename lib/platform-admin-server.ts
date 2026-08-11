@@ -268,8 +268,17 @@ export async function loadPlatformOverview() {
 export async function loadPlatformOperations() {
   const access = await requirePlatformOwner();
   if (!access) return null;
-  const snapshot = await adminRequest<PlatformOperationsSnapshot>("get_platform_admin_operations_snapshot", access.accessToken);
-  return { access, snapshot };
+  const [snapshot, schools] = await Promise.all([
+    adminRequest<PlatformOperationsSnapshot>(
+      "get_platform_admin_operations_snapshot",
+      access.accessToken,
+    ),
+    adminRequest<PlatformSchoolSummary[]>(
+      "get_platform_admin_school_summaries_pa2",
+      access.accessToken,
+    ),
+  ]);
+  return { access, snapshot, schools };
 }
 
 export async function loadPlatformGrowth() {

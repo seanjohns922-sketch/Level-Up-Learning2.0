@@ -1,44 +1,172 @@
-import { Activity, Building2, GraduationCap, Home, Link2, ShieldAlert, Users } from "lucide-react";
+import {
+  Activity,
+  Building2,
+  GraduationCap,
+  ShieldAlert,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminPageHeading, Metric } from "@/components/admin/AdminPrimitives";
 import { loadPlatformOperations } from "@/lib/platform-admin-server";
-import type { LucideIcon } from "lucide-react";
 
-function trend(current: number, previous: number) {
-  if (previous === 0) return current === 0 ? "No change" : "New activity";
-  const value = Math.round(((current - previous) / previous) * 100);
-  return `${value >= 0 ? "+" : ""}${value}% vs previous period`;
+const MELBOURNE_TIME = new Intl.DateTimeFormat("en-AU", {
+  timeZone: "Australia/Melbourne",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
+function statusClasses(status: string) {
+  if (status === "active") return "bg-emerald-50 text-emerald-700";
+  if (status === "trial") return "bg-sky-50 text-sky-700";
+  return "bg-slate-100 text-slate-600";
 }
 
 export default async function PlatformAdminOverviewPage() {
   const data = await loadPlatformOperations();
   if (!data) redirect("/login");
-  const { snapshot } = data;
-  return <>
-    <AdminPageHeading eyebrow="Overview" title="Platform operations" detail="Canonical scale, meaningful learning activity, school-to-home growth and operational attention. Reporting windows use Australia/Melbourne time." action={<Link href="/admin/users" className="rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white">Explore users</Link>} />
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Platform scale">
-      <Metric label="Schools" value={snapshot.scale.schools} icon={Building2} />
-      <Metric label="Students" value={snapshot.scale.students} icon={GraduationCap} tone="blue" />
-      <Metric label="Educators" value={snapshot.scale.educators} icon={Users} tone="violet" />
-      <Metric label="Parents" value={snapshot.scale.parents} icon={Users} tone="amber" />
-    </section>
-    <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Platform activity">
-      <Metric label="Active today" value={snapshot.activity.activeToday} icon={Activity} />
-      <Metric label="Active 7 days" value={snapshot.activity.active7d} detail={trend(snapshot.activity.active7d,snapshot.activity.previous7d)} icon={Activity} tone="blue" />
-      <Metric label="Active 30 days" value={snapshot.activity.active30d} detail={trend(snapshot.activity.active30d,snapshot.activity.previous30d)} icon={Activity} tone="violet" />
-      <Metric label="Seats used" value={`${snapshot.scale.seatsUsed}/${snapshot.scale.schoolSeats}`} icon={ShieldAlert} tone="amber" />
-    </section>
-    <section className="mt-7 grid gap-6 xl:grid-cols-[1.15fr_1fr]">
-      <div className="border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-bold">User mix and growth</h2>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          {([["School only",snapshot.userMix.schoolOnly,Building2],["School + Home",snapshot.userMix.schoolAndHome,Link2],["Home only",snapshot.userMix.homeOnly,Home],["Parent linked / no home",snapshot.growth.parentLinkedNoHome,Users]] as Array<[string,number,LucideIcon]>).map(([label,value,Icon])=><div key={label} className="flex items-center gap-3 border border-slate-200 p-4"><Icon className="h-5 w-5 text-emerald-700"/><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</p><p className="text-2xl font-bold tabular-nums">{value}</p></div></div>)}
+
+  const { snapshot, schools } = data;
+  const actionableAttention = snapshot.attention.filter(
+    (item) => item.severity === "critical" || item.severity === "attention",
+  );
+  const recentSchools = schools
+    .filter((school) => school.status !== "archived")
+    .sort((a, b) => {
+      if (!a.lastActive) return 1;
+      if (!b.lastActive) return -1;
+      return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
+    })
+    .slice(0, 5);
+
+  return (
+    <>
+      <AdminPageHeading
+        eyebrow="Overview"
+        title="Platform overview"
+        detail="Monitor platform scale, weekly activity and schools requiring action."
+        action={
+          <Link
+            href="/admin/users"
+            className="rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white"
+          >
+            Explore users
+          </Link>
+        }
+      />
+
+      <section
+        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+        aria-label="Platform summary"
+      >
+        <Metric label="Schools" value={snapshot.scale.schools} icon={Building2} />
+        <Metric
+          label="Students"
+          value={snapshot.scale.students}
+          icon={GraduationCap}
+          tone="blue"
+        />
+        <Metric
+          label="Educators"
+          value={snapshot.scale.educators}
+          icon={Users}
+          tone="violet"
+        />
+        <Metric
+          label="Seats used"
+          value={`${snapshot.scale.seatsUsed}/${snapshot.scale.schoolSeats}`}
+          icon={ShieldAlert}
+          tone="amber"
+        />
+        <Metric
+          label="Active this week"
+          value={snapshot.activity.active7d}
+          icon={Activity}
+        />
+      </section>
+
+      <section className="mt-7 grid gap-6 xl:grid-cols-2">
+        <div className="border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">Needs attention</h2>
+              <p className="mt-1 text-sm text-slate-500">Issues requiring an operational decision.</p>
+            </div>
+          </div>
+          <div className="mt-4 divide-y divide-slate-100">
+            {actionableAttention.slice(0, 6).map((item, index) => (
+              <Link
+                key={`${item.schoolId}-${item.category}-${index}`}
+                href={`/admin/schools/${item.schoolId}`}
+                className="block py-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{item.schoolName}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">{item.detail}</p>
+                  </div>
+                  <span
+                    className={`shrink-0 rounded px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${
+                      item.severity === "critical"
+                        ? "bg-red-50 text-red-700"
+                        : "bg-amber-50 text-amber-700"
+                    }`}
+                  >
+                    {item.category}
+                  </span>
+                </div>
+              </Link>
+            ))}
+            {actionableAttention.length === 0 ? (
+              <p className="py-8 text-sm text-slate-500">No schools currently require attention.</p>
+            ) : null}
+          </div>
         </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-4 text-sm"><p><b>{snapshot.activity.lessonsToday}</b><br/><span className="text-slate-500">Lessons · today</span></p><p><b>{snapshot.activity.lessons7d}</b><br/><span className="text-slate-500">Lessons · 7d</span></p><p><b>{snapshot.activity.quizzes7d}</b><br/><span className="text-slate-500">Quizzes · 7d</span></p><p><b>{snapshot.activity.assessments30d}</b><br/><span className="text-slate-500">Assessments · 30d</span></p></div>
-      </div>
-      <div className="border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-lg font-bold">Needs attention</h2><div className="mt-4 divide-y divide-slate-100">{snapshot.attention.slice(0,7).map((item,index)=><Link key={`${item.schoolId}-${item.category}-${index}`} href={`/admin/schools/${item.schoolId}`} className="block py-3"><div className="flex justify-between gap-3"><p className="text-sm font-semibold">{item.schoolName}</p><span className="text-xs font-bold uppercase text-slate-500">{item.severity}</span></div><p className="mt-1 text-xs text-slate-500">{item.category}: {item.detail}</p></Link>)}{snapshot.attention.length===0?<p className="py-5 text-sm text-slate-500">No current operational alerts.</p>:null}</div></div>
-    </section>
-    <section className="mt-7 grid gap-6 xl:grid-cols-[1fr_1.5fr]"><div className="border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-lg font-bold">Growth this period</h2><dl className="mt-4 grid grid-cols-2 gap-4 text-sm"><div><dt className="text-slate-500">New students · 7d</dt><dd className="text-2xl font-bold">{snapshot.activity.newStudents7d}</dd></div><div><dt className="text-slate-500">New students · 30d</dt><dd className="text-2xl font-bold">{snapshot.activity.newStudents30d}</dd></div><div><dt className="text-slate-500">Parent links · 7d</dt><dd className="text-2xl font-bold">{snapshot.activity.newParentLinks7d}</dd></div><div><dt className="text-slate-500">Home activations · 7d</dt><dd className="text-2xl font-bold">{snapshot.activity.newHomeActivations7d}</dd></div></dl></div><div className="border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-lg font-bold">Recent platform changes</h2><div className="mt-4 divide-y divide-slate-100">{snapshot.recentChanges.map((change)=><div key={`${change.source}-${change.entityId}-${change.createdAt}`} className="flex items-center justify-between gap-4 py-3 text-sm"><div><p className="font-semibold">{change.title.replaceAll("_"," ")}</p><p className="text-xs text-slate-500">{change.source}{change.reason?` · ${change.reason}`:""}</p></div><time className="text-xs text-slate-500">{new Date(change.createdAt).toLocaleString("en-AU",{timeZone:"Australia/Melbourne"})}</time></div>)}{snapshot.recentChanges.length === 0 ? <p className="py-5 text-sm text-slate-500">No recent administrative changes.</p> : null}</div></div></section>
-  </>;
+
+        <div className="border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">Recent schools</h2>
+              <p className="mt-1 text-sm text-slate-500">Licence use and latest learning activity.</p>
+            </div>
+            <Link href="/admin/schools" className="text-sm font-bold text-emerald-700">
+              View schools
+            </Link>
+          </div>
+          <div className="mt-4 divide-y divide-slate-100">
+            {recentSchools.map((school) => (
+              <Link
+                key={school.id}
+                href={`/admin/schools/${school.id}`}
+                className="grid gap-3 py-4 sm:grid-cols-[1fr_auto] sm:items-center"
+              >
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-semibold text-slate-900">{school.name}</p>
+                    <span
+                      className={`rounded px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${statusClasses(school.status)}`}
+                    >
+                      {school.status}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {school.used} of {school.seatLimit} seats used
+                  </p>
+                </div>
+                <p className="text-xs text-slate-500 sm:text-right">
+                  {school.lastActive
+                    ? `Last active ${MELBOURNE_TIME.format(new Date(school.lastActive))}`
+                    : "No learning activity yet"}
+                </p>
+              </Link>
+            ))}
+            {recentSchools.length === 0 ? (
+              <p className="py-8 text-sm text-slate-500">No active or trial schools yet.</p>
+            ) : null}
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
