@@ -2,7 +2,10 @@ import {
   Activity,
   Building2,
   GraduationCap,
+  Home,
   ShieldAlert,
+  TrendingUp,
+  UserMinus,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -30,6 +33,17 @@ export default async function PlatformAdminOverviewPage() {
   const { snapshot, schools } = data;
   const actionableAttention = snapshot.attention.filter(
     (item) => item.severity === "critical" || item.severity === "attention",
+  );
+  const homeUsers = snapshot.userMix.schoolAndHome + snapshot.userMix.homeOnly;
+  const schoolToHomeConversion =
+    snapshot.growth.schoolStudents === 0
+      ? 0
+      : Math.round(
+          (snapshot.growth.homeActivated / snapshot.growth.schoolStudents) * 1000,
+        ) / 10;
+  const inactive30d = Math.max(
+    0,
+    snapshot.scale.students - snapshot.activity.active30d,
   );
   const recentSchools = schools
     .filter((school) => school.status !== "archived")
@@ -84,6 +98,57 @@ export default async function PlatformAdminOverviewPage() {
           value={snapshot.activity.active7d}
           icon={Activity}
         />
+      </section>
+
+      <section
+        className="mt-4 grid overflow-hidden border border-slate-200 bg-white shadow-sm sm:grid-cols-3"
+        aria-label="Home growth summary"
+      >
+        <Link
+          href="/admin/home"
+          className="flex items-center gap-4 border-b border-slate-200 p-4 sm:border-b-0 sm:border-r"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
+            <Home className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <span>
+            <span className="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+              Home users
+            </span>
+            <span className="mt-1 block text-2xl font-bold tabular-nums text-slate-950">
+              {homeUsers}
+            </span>
+          </span>
+        </Link>
+        <Link
+          href="/admin/growth"
+          className="flex items-center gap-4 border-b border-slate-200 p-4 sm:border-b-0 sm:border-r"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-sky-50 text-sky-700">
+            <TrendingUp className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <span>
+            <span className="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+              School-to-home conversion
+            </span>
+            <span className="mt-1 block text-2xl font-bold tabular-nums text-slate-950">
+              {schoolToHomeConversion}%
+            </span>
+          </span>
+        </Link>
+        <Link href="/admin/analytics" className="flex items-center gap-4 p-4">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-amber-50 text-amber-700">
+            <UserMinus className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <span>
+            <span className="block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+              Inactive 30 days
+            </span>
+            <span className="mt-1 block text-2xl font-bold tabular-nums text-slate-950">
+              {inactive30d}
+            </span>
+          </span>
+        </Link>
       </section>
 
       <section className="mt-7 grid gap-6 xl:grid-cols-2">
