@@ -2694,12 +2694,14 @@ export type PracticeTask = (
       // card renders the net and can hinge-fold it; interactions cover choosing a
       // net, predicting/justifying a fold, tracking faces, and building/testing nets.
       kind: "starpathNet";
-      mode: "chooseNet" | "foldPredict" | "reason" | "trackCell" | "count" | "relation" | "build" | "classify" | "selectValid";
-      render: "options" | "single" | "build";
+      mode: "chooseNet" | "foldPredict" | "reason" | "trackCell" | "count" | "relation" | "build" | "classify" | "selectValid" | "nameSolid" | "solidFaces" | "solidParts";
+      render: "options" | "single" | "build" | "solid";
       prompt: string;
       speakText: string;
       target: number;
       netId: string;
+      /** For render "solid": which 3D solid the authored net folds into. */
+      solid?: "cube" | "cuboid" | "triPrism" | "pyramid";
       cells?: Array<{ r: number; c: number }>;
       coloured?: boolean;
       focusKeys?: string[];

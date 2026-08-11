@@ -1,21 +1,26 @@
 import { chooseNetTask, foldPredictTask, reasonTask } from "./netTasks";
+import { nameSolidTask } from "./solidTasks";
 import { lessonContent, taskSet, teaching } from "./lessonUtils";
 
 const kinds = ["starpathNet", "starpathNet", "starpathNet"] as const;
 
-export const createUnfoldTaskSet = () => taskSet([chooseNetTask, foldPredictTask, chooseNetTask], teaching("Objects and Nets", "A net is a flat shape that folds into a solid.", "A cube has six square faces. When you unfold it you get a flat net of six squares joined edge to edge. Fold a net back up and the squares close into the cube."));
+export const createUnfoldTaskSet = () => taskSet([
+  (r, t) => nameSolidTask(r, t, "cuboid"),
+  (r, t) => nameSolidTask(r, t, "triPrism"),
+  (r, t) => nameSolidTask(r, t, "pyramid"),
+], teaching("Objects and Nets", "A net is a flat shape that folds into a solid.", "Different solids have different nets. A cube unfolds into six squares, but a triangular prism, a pyramid and a rectangular prism each unfold into their own flat net. Fold a net up to see which solid it makes."));
 export const createWhichNetTaskSet = () => taskSet([foldPredictTask, foldPredictTask, chooseNetTask], teaching("Which Net Folds?", "Only some flat shapes fold into a cube.", "Six squares are not enough on their own — they must fold up without two faces landing on the same spot. Fold it to test."), 20);
 export const createExplainMatchTaskSet = () => taskSet([reasonTask, foldPredictTask, reasonTask], teaching("Explain the Match", "Use folding evidence to explain why a net works.", "A net folds into a cube when its six faces meet edge to edge and close with no gaps and no overlaps."), 30);
 
 export const UNFOLD_CONTENT = lessonContent({
   title: "Unfold the Object",
-  brief: "Match cubes to the flat nets they unfold into and learn what a net is.",
-  criteria: ["see a net as an unfolded object", "match a cube to a valid net", "reject shapes that cannot fold"],
-  activities: ["Meet the Net", "Fold to Test", "Match the Cube"],
+  brief: "Fold different nets and name the 3D solids they make — cube, prism and pyramid.",
+  criteria: ["see a net as an unfolded object", "fold a net into its solid", "name cubes, prisms and pyramids"],
+  activities: ["Meet the Solids", "Fold and Name", "Prism or Pyramid?"],
   kinds,
   reflection: "What is a net?",
   reflectionOptions: ["A flat shape that folds into a solid", "Any six squares joined together", "A picture of a cube"],
-  skills: ["Recognise a net", "Connect a net to its object", "Test a fold"],
+  skills: ["Recognise a net", "Connect a net to its solid", "Name 3D solids"],
   next: "Which Net Folds?",
   createTaskSet: createUnfoldTaskSet,
 });

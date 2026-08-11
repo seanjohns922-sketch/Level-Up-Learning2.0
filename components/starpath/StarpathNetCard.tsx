@@ -5,6 +5,7 @@ import { Check, RotateCcw, Star } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { foldTree, foldNet, normalise, faceColour, type Cell, type FoldNode } from "@/data/activities/starpath/level5/nets";
+import { buildSolid, SOLID_META, type SolidFace, type HingeDir } from "@/data/activities/starpath/level5/solids";
 
 type Task = Extract<PracticeTask, { kind: "starpathNet" }>;
 const CRATE = "#c8a273";
@@ -94,6 +95,62 @@ function FoldStage({
         style={{ transformStyle: "preserve-3d", transform: `translate(-50%,-50%) ${folded ? "rotateX(-24deg) rotateY(-30deg)" : "rotateX(0deg) rotateY(0deg)"}`, transition: "transform 0.85s ease" }}
       >
         <NetFaces node={tree} folded={folded} size={size} coloured={coloured} focus={new Set(focus)} tappable={tappable} selected={new Set(selected)} onTap={onTap} />
+      </div>
+    </div>
+  );
+}
+
+// ── Authored 3D solids (cuboid / triangular prism / square pyramid) ──────────
+// Same nested-hinge fold as the cube stage, generalised to non-square faces and
+// non-90° fold angles. Each face nests inside its parent so a parent's fold
+// carries its children (preserve-3d), matching the cube card's mechanic.
+function foldTransform(dir: HingeDir, mag: number) {
+  switch (dir) {
+    case "N": return `rotateX(${-mag}deg)`;
+    case "S": return `rotateX(${mag}deg)`;
+    case "E": return `rotateY(${-mag}deg)`;
+    case "W": return `rotateY(${mag}deg)`;
+  }
+}
+
+function SolidFaceNode({ node, folded, parent }: { node: SolidFace; folded: boolean; parent: SolidFace | null }) {
+  const style: CSSProperties = {
+    position: "absolute", width: node.w, height: node.h, boxSizing: "border-box",
+    background: node.color, borderRadius: node.clip ? 0 : 3,
+    boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,0.5), inset 0 0 12px rgba(0,0,0,0.18)",
+    transformStyle: "preserve-3d", transition: "transform 0.85s cubic-bezier(0.62,0.03,0.3,1)",
+    backfaceVisibility: "visible",
+  };
+  if (node.clip) style.clipPath = node.clip;
+  if (!parent || !node.hinge) {
+    style.left = "50%"; style.top = "50%"; style.margin = `${-node.h / 2}px 0 0 ${-node.w / 2}px`;
+  } else {
+    const { dir, mag } = node.hinge;
+    if (dir === "N") { style.left = 0; style.top = -node.h; style.transformOrigin = "50% 100%"; }
+    if (dir === "S") { style.left = 0; style.top = parent.h; style.transformOrigin = "50% 0%"; }
+    if (dir === "E") { style.left = parent.w; style.top = 0; style.transformOrigin = "0% 50%"; }
+    if (dir === "W") { style.left = -node.w; style.top = 0; style.transformOrigin = "100% 50%"; }
+    style.transform = folded ? foldTransform(dir, mag) : "none";
+  }
+  return (
+    <div style={style}>
+      {node.children.map((child) => (
+        <SolidFaceNode key={child.id} node={child} folded={folded} parent={node} />
+      ))}
+    </div>
+  );
+}
+
+function SolidFoldStage({ kind, folded }: { kind: NonNullable<Task["solid"]>; folded: boolean }) {
+  const solid = useMemo(() => buildSolid(kind), [kind]);
+  const tilt = SOLID_META[kind].tilt;
+  return (
+    <div className="relative mx-auto" style={{ perspective: 1000, perspectiveOrigin: "50% 44%", width: "100%", height: 220 }}>
+      <div
+        className="absolute left-1/2 top-1/2"
+        style={{ transformStyle: "preserve-3d", transition: "transform 0.85s ease", transform: `translate(-50%,-50%) ${folded ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` : "rotateX(0deg) rotateY(0deg)"}` }}
+      >
+        <SolidFaceNode node={solid} folded={folded} parent={null} />
       </div>
     </div>
   );
@@ -216,6 +273,26 @@ export default function StarpathNetCard({ task, onCorrect, onWrong }: { task: Ta
           <FoldButton folded={folded} onClick={() => setFolded((v) => !v)} disabled={!ready} />
           <SubmitButton disabled={settled || !ready} onClick={submitBuild} />
         </div>
+      </div>
+    );
+  }
+
+  // ── Authored 3D solid + Fold it + text options ──
+  if (task.render === "solid") {
+    return (
+      <div className="space-y-4">
+        <TaskHeading prompt={task.prompt} speech={task.speakText} />
+        <div className="l4sym-stage mx-auto max-w-sm rounded-3xl p-4">
+          <SolidFoldStage kind={task.solid ?? "cube"} folded={folded} />
+        </div>
+        {task.fold ? <div className="flex justify-center"><FoldButton folded={folded} onClick={() => setFolded((v) => !v)} /></div> : null}
+        <div className="mx-auto grid max-w-md gap-2 sm:grid-cols-2">
+          {task.textOptions?.map((option) => (
+            <OptionButton key={option.id} selected={chosen.includes(option.id)} onClick={() => toggleChoice(option.id)}>{option.label}</OptionButton>
+          ))}
+        </div>
+        <div className="flex justify-center"><SubmitButton disabled={settled || !chosen.length} onClick={submitText} /></div>
+        <style>{`.l4sym-stage{background:radial-gradient(120% 90% at 50% 2%, #2a2a6e 0%, #16123f 45%, #0b0a24 100%);box-shadow:0 14px 34px -16px rgba(10,8,40,.6), inset 0 0 0 1px rgba(148,163,255,.14);}`}</style>
       </div>
     );
   }

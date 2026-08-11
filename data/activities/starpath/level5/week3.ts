@@ -1,11 +1,16 @@
 import { buildTask, classifyTask, selectValidTask } from "./netTasks";
+import { nameSolidTask, solidFacesTask } from "./solidTasks";
 import { lessonContent, taskSet, teaching } from "./lessonUtils";
 
 const kinds = ["starpathNet", "starpathNet", "starpathNet"] as const;
 
 export const createArrangeTaskSet = () => taskSet([buildTask, classifyTask, buildTask], teaching("Arrange the Faces", "Build your own net that folds into a cube.", "Place six faces edge to edge so they fold up into a cube with no overlaps. Use Fold it to test your net and fix it if two faces clash."));
 export const createTestFoldTaskSet = () => taskSet([classifyTask, classifyTask, selectValidTask], teaching("Test the Fold", "Test a net for overlaps and gaps.", "A net fails if two faces overlap, or if a face is missing. Fold it up and watch what happens."), 20);
-export const createCompareNetsTaskSet = () => taskSet([selectValidTask, buildTask, selectValidTask], teaching("Compare Valid Nets", "Many different nets fold into the same cube.", "A cube has eleven different nets. Choose every flat shape that folds into a cube — more than one works."), 30);
+export const createCompareNetsTaskSet = () => taskSet([
+  (r, t) => nameSolidTask(r, t, "pyramid"),
+  (r, t) => solidFacesTask(r, t, "triPrism"),
+  (r, t) => nameSolidTask(r, t, "cube"),
+], teaching("Name the Solid", "Tell the solids apart by their nets.", "Cubes and rectangular prisms have six faces; a triangular prism and a square pyramid have five. Fold each net and name the solid it makes."), 30);
 
 export const ARRANGE_CONTENT = lessonContent({
   title: "Arrange the Faces",
@@ -29,19 +34,19 @@ export const TEST_FOLD_CONTENT = lessonContent({
   reflection: "What can go wrong when a net folds?",
   reflectionOptions: ["Overlap or a missing face", "The colour changes", "Nothing ever goes wrong"],
   skills: ["Diagnose fold faults", "Confirm valid nets", "Sort nets"],
-  next: "Compare Valid Nets",
+  next: "Name the Solid",
   createTaskSet: createTestFoldTaskSet,
 });
 
 export const COMPARE_NETS_CONTENT = lessonContent({
-  title: "Compare Valid Nets",
-  brief: "Show that different nets can fold into the same cube.",
-  criteria: ["find several valid nets", "compare different layouts", "build one of your own"],
-  activities: ["Choose the Valid Nets", "Build One", "Find Them All"],
+  title: "Name the Solid",
+  brief: "Tell cubes, prisms and pyramids apart by folding their nets.",
+  criteria: ["fold a net into its solid", "compare face counts", "name each 3D solid"],
+  activities: ["Prism or Pyramid?", "Count the Faces", "Name the Cube"],
   kinds,
-  reflection: "How many nets fold into a cube?",
-  reflectionOptions: ["Many different ones (eleven)", "Only one", "Exactly six"],
-  skills: ["Compare valid nets", "Recognise many solutions", "Construct a net"],
+  reflection: "Which solids have five faces?",
+  reflectionOptions: ["A triangular prism and a square pyramid", "A cube and a cuboid", "Only a cube"],
+  skills: ["Name 3D solids", "Compare face counts", "Match a net to its solid"],
   next: "Week 3 Voyage Quiz",
   createTaskSet: createCompareNetsTaskSet,
 });
