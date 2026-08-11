@@ -29,6 +29,21 @@ export type SchoolSwitcherItem = {
   role: string;
 };
 
+export type SchoolLicenceSummary = {
+  id: string;
+  academicYearId: string;
+  academicYear: string;
+  calendarYear: number;
+  status: string;
+  seatLimit: number;
+  used: number;
+  available: number;
+  utilisationPercent: number;
+  startDate: string;
+  endDate: string;
+  billingStatus: string;
+};
+
 export type SchoolHomeSnapshot = {
   school: {
     id: string;
@@ -324,6 +339,20 @@ export async function loadSchoolStudentDirectoryPreview(schoolId: string) {
     console.error("[SchoolHome] Unable to load the canonical student directory", error);
     throw new Error(message);
   }
+}
+
+export async function loadSchoolLicenceSummaries(schoolId: string) {
+  const access = await requireSchoolPreviewAccess(schoolId);
+  if (!access) return null;
+
+  return supabaseRequest<SchoolLicenceSummary[]>(
+    "/rest/v1/rpc/get_school_licence_summaries",
+    access.accessToken,
+    {
+      method: "POST",
+      body: JSON.stringify({ p_school_id: schoolId }),
+    },
+  );
 }
 
 export async function runSchoolCommand<T>(

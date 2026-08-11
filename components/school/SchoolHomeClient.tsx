@@ -29,6 +29,7 @@ import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "
 import { useRouter } from "next/navigation";
 import type {
   SchoolHomeSnapshot,
+  SchoolLicenceSummary,
   SchoolSwitcherItem,
 } from "@/lib/school-platform-server";
 import { supabase } from "@/lib/supabase";
@@ -1363,6 +1364,9 @@ export default function SchoolHomeClient({
   const [directoryState, setDirectoryState] = useState<"idle" | "loading" | "ready">(
     initialSnapshot.students.length > 0 ? "ready" : "idle",
   );
+  const [licences, setLicences] = useState<SchoolLicenceSummary[]>([]);
+  const [licenceState, setLicenceState] = useState<"idle" | "loading" | "ready">("idle");
+  const [licenceError, setLicenceError] = useState<string | null>(null);
   const snapshot = useMemo(
     () => ({
       ...initialSnapshot,
@@ -1419,6 +1423,37 @@ export default function SchoolHomeClient({
     }
   }, [directoryState, loadStudentDirectory, tab]);
 
+  const loadLicenceSummaries = useCallback(async () => {
+    setLicenceState("loading");
+    setLicenceError(null);
+    try {
+      const response = await fetch(`/api/school/${initialSnapshot.school.id}/licence`, {
+        cache: "no-store",
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { licences?: SchoolLicenceSummary[]; error?: string }
+        | null;
+      if (!response.ok || !result?.licences) {
+        throw new Error(result?.error ?? "Licence information could not be loaded.");
+      }
+      setLicences(result.licences);
+    } catch (loadError) {
+      setLicenceError(
+        loadError instanceof Error
+          ? loadError.message
+          : "Licence information could not be loaded.",
+      );
+    } finally {
+      setLicenceState("ready");
+    }
+  }, [initialSnapshot.school.id]);
+
+  useEffect(() => {
+    if (tab === "licence" && licenceState === "idle") {
+      void loadLicenceSummaries();
+    }
+  }, [licenceState, loadLicenceSummaries, tab]);
+
   const filteredClasses = useMemo(
     () =>
       snapshot.classes.filter(
@@ -1448,6 +1483,13 @@ export default function SchoolHomeClient({
     (total, classRow) => total + classRow.studentCount,
     0,
   );
+  const selectedLicence = licences.find(
+    (licence) => licence.academicYearId === academicYearId,
+  );
+  const selectedYearEnrolments = selectedAcademicYear?.activeStudentCount ?? 0;
+  const unlicensedEnrolments = selectedLicence
+    ? Math.max(selectedYearEnrolments - selectedLicence.used, 0)
+    : 0;
 
   function notify(text: string) {
     setMessage(text);
@@ -2057,11 +2099,93 @@ export default function SchoolHomeClient({
           ) : null}
 
           {tab === "licence" ? (
-            <EmptyState
-              icon={ShieldCheck}
-              title="Licence management is coming later"
-              detail="School licensing is reserved for the subscription phase and is not represented with placeholder data."
-            />
+            licenceState !== "ready" ? (
+              <div className="space-y-5" aria-busy="true" aria-label="Loading licence information">
+                <div className="h-28 animate-pulse rounded-md border border-slate-200 bg-white" />
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {Array.from({ length: 3 }, (_, index) => (
+                    <div key={index} className="h-32 animate-pulse rounded-md border border-slate-200 bg-white" />
+                  ))}
+                </div>
+              </div>
+            ) : licenceError ? (
+              <div className="rounded-md border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-800" role="alert">
+                {licenceError}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLicenceState("idle");
+                    setLicenceError(null);
+                  }}
+                  className="ml-3 underline"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : selectedLicence ? (
+              <section className="space-y-5">
+                <div className="flex flex-col justify-between gap-4 border border-slate-200 bg-white p-5 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
+                      <ShieldCheck className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">School access</p>
+                      <h2 className="mt-1 text-xl font-bold text-slate-950">{selectedLicence.academicYear} licence</h2>
+                    </div>
+                  </div>
+                  <span className={`w-fit rounded-md px-3 py-1.5 text-sm font-bold capitalize ${selectedLicence.status === "trial" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>
+                    {selectedLicence.status}
+                  </span>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {[
+                    { label: "Student licences", value: selectedLicence.seatLimit },
+                    { label: "Licences in use", value: selectedLicence.used },
+                    { label: "Available", value: selectedLicence.available },
+                  ].map((item) => (
+                    <div key={item.label} className="border border-slate-200 bg-white p-5">
+                      <p className="text-sm font-semibold text-slate-500">{item.label}</p>
+                      <p className="mt-3 text-4xl font-black tracking-tight text-slate-950">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border border-slate-200 bg-white p-5">
+                  <div className="flex items-center justify-between gap-4 text-sm font-bold text-slate-700">
+                    <span>Licence utilisation</span>
+                    <span>{selectedLicence.utilisationPercent}%</span>
+                  </div>
+                  <div className="mt-3 h-3 overflow-hidden rounded-sm bg-slate-200">
+                    <div
+                      className="h-full bg-emerald-600"
+                      style={{ width: `${Math.min(selectedLicence.utilisationPercent, 100)}%` }}
+                    />
+                  </div>
+                  <dl className="mt-5 grid gap-4 border-t border-slate-200 pt-5 text-sm sm:grid-cols-3">
+                    <div><dt className="text-slate-500">Starts</dt><dd className="mt-1 font-bold">{formatSchoolDate(selectedLicence.startDate)}</dd></div>
+                    <div><dt className="text-slate-500">Ends</dt><dd className="mt-1 font-bold">{formatSchoolDate(selectedLicence.endDate)}</dd></div>
+                    <div><dt className="text-slate-500">Access type</dt><dd className="mt-1 font-bold capitalize">{selectedLicence.billingStatus}</dd></div>
+                  </dl>
+                </div>
+
+                {unlicensedEnrolments > 0 ? (
+                  <div className="border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
+                    <p className="font-bold">Licence reconciliation required</p>
+                    <p className="mt-1">
+                      {unlicensedEnrolments} enrolled student{unlicensedEnrolments === 1 ? " does" : "s do"} not currently hold an active school licence. Licence totals shown here match Platform Admin.
+                    </p>
+                  </div>
+                ) : null}
+              </section>
+            ) : (
+              <EmptyState
+                icon={ShieldCheck}
+                title="No licence for this academic year"
+                detail="Contact Level Up Learning to configure school access for the selected academic year."
+              />
+            )
           ) : null}
 
           {tab === "settings" ? (
