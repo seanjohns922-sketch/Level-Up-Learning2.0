@@ -82,6 +82,10 @@ check("Home access is not required for parent linking", !functionBody("confirm_p
 check("parent portal has no direct table writes", !parent.match(/insert\(|update\(|delete\(|\.from\([^)]*\)\.upsert/i));
 check("parent route is selected after login", login.includes('role: "parent"') && /router\.(push|replace)\("\/parent"\)/.test(login));
 check("parent supports child linking", has(parent, "Link a child", "preview_parent_child_link", "confirm_parent_child_link"));
+check("parent signup offers optional existing-student linking", has(login, "Link an existing student account", "parentLinkExisting", "Explorer Code", "Child’s 4-digit PIN"));
+check("parent signup linking uses both PA4 verification steps", has(login, 'supabase.rpc("preview_parent_child_link"', 'supabase.rpc("confirm_parent_child_link"', "p_student_pin: parentStudentPin"));
+check("parent signup never retains the child PIN", has(login, "retainPendingParentExplorerCode", 'setParentStudentPin("")') && !login.includes("sessionStorage.setItem(PENDING_PARENT_EXPLORER_CODE_KEY, parentStudentPin)"));
+check("parent signup linking does not create a duplicate student", !login.match(/parentLinkExisting[\s\S]{0,3000}create_home_student_for_parent/));
 check("parent client requires explicit link success", has(parent, "data.linked !== true", "child details could not be verified"));
 check("parent client requires explicit preview success", has(parent, "data.matched !== true", "Explorer Code could not be verified"));
 check("parent supports multiple child cards", parent.includes("visibleChildren.map"));

@@ -432,7 +432,10 @@ export function HomeChildSettings({ studentId }: { studentId: string }) {
 
 export function LinkChild() {
   const router = useRouter();
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return window.sessionStorage.getItem("lul_pending_parent_explorer_code_v1") ?? "";
+  });
   const [relationship, setRelationship] = useState("guardian");
   const [studentPin, setStudentPin] = useState("");
   const [preview, setPreview] = useState<{ firstName: string; lastInitial: string | null; yearLevel: string | null; schoolName: string | null; alreadyLinked: boolean } | null>(null);
@@ -451,6 +454,7 @@ export function LinkChild() {
 
   async function confirm() {
     if (preview?.alreadyLinked) {
+      window.sessionStorage.removeItem("lul_pending_parent_explorer_code_v1");
       router.replace("/parent");
       return;
     }
@@ -466,6 +470,8 @@ export function LinkChild() {
       setWorking(false);
       return;
     }
+    window.sessionStorage.removeItem("lul_pending_parent_explorer_code_v1");
+    setStudentPin("");
     router.replace("/parent");
     router.refresh();
   }
@@ -504,7 +510,7 @@ export function LinkChild() {
           </label> : null}
           <div className="mt-5 flex flex-wrap gap-3">
             <button type="button" onClick={confirm} disabled={working || (!preview.alreadyLinked && studentPin.length !== 4)} className="min-h-11 rounded-md bg-emerald-700 px-5 font-bold text-white disabled:bg-slate-300">{working ? "Linking…" : preview.alreadyLinked ? "Return to Parent Home" : "Confirm link"}</button>
-            <button type="button" onClick={() => { setPreview(null); setStudentPin(""); }} className="min-h-11 rounded-md border border-slate-300 px-5 font-bold">Use another code</button>
+            <button type="button" onClick={() => { window.sessionStorage.removeItem("lul_pending_parent_explorer_code_v1"); setCode(""); setPreview(null); setStudentPin(""); }} className="min-h-11 rounded-md border border-slate-300 px-5 font-bold">Use another code</button>
           </div>
         </div>
       )}

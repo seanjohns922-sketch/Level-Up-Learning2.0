@@ -33,6 +33,23 @@ function normalizeClassCode(code: string) {
   return code.replace(/\s+/g, "").trim().toUpperCase();
 }
 
+const PENDING_PARENT_EXPLORER_CODE_KEY = "lul_pending_parent_explorer_code_v1";
+
+function normalizeExplorerCode(code: string) {
+  return code.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 13);
+}
+
+function retainPendingParentExplorerCode(code: string) {
+  if (typeof window === "undefined") return;
+  const normalized = normalizeExplorerCode(code);
+  if (normalized) window.sessionStorage.setItem(PENDING_PARENT_EXPLORER_CODE_KEY, normalized);
+}
+
+function hasPendingParentExplorerCode() {
+  if (typeof window === "undefined") return false;
+  return Boolean(window.sessionStorage.getItem(PENDING_PARENT_EXPLORER_CODE_KEY)?.trim());
+}
+
 function persistStudentIdentity(args: {
   studentId: string;
   classId: string | null;
@@ -95,6 +112,9 @@ export default function LoginPage() {
   const [parentError, setParentError] = useState<string | null>(null);
   const [parentNotice, setParentNotice] = useState<string | null>(null);
   const [parentLoading, setParentLoading] = useState(false);
+  const [parentLinkExisting, setParentLinkExisting] = useState(false);
+  const [parentExplorerCode, setParentExplorerCode] = useState("");
+  const [parentStudentPin, setParentStudentPin] = useState("");
   const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
   const [recoveryPassword, setRecoveryPassword] = useState("");
   const [recoveryConfirmPassword, setRecoveryConfirmPassword] = useState("");
@@ -318,6 +338,14 @@ export default function LoginPage() {
       setParentError("Enter your parent email and password.");
       return;
     }
+    if (
+      parentMode === "signup" &&
+      parentLinkExisting &&
+      (parentExplorerCode.replace(/-/g, "").length !== 11 || parentStudentPin.length !== 4)
+    ) {
+      setParentError("Enter the child’s complete Explorer Code and 4-digit PIN.");
+      return;
+    }
 
     setParentError(null);
     setParentNotice(null);
@@ -337,10 +365,46 @@ export default function LoginPage() {
       }
 
       if (!data.session) {
+        if (parentLinkExisting) {
+          retainPendingParentExplorerCode(parentExplorerCode);
+          setParentStudentPin("");
+        }
         setParentMode("login");
-        setParentNotice("Check your email to verify your account, then log in.");
+        setParentNotice(
+          parentLinkExisting
+            ? "Check your email to verify your account, then log in. You’ll re-enter the child’s PIN to finish linking."
+            : "Check your email to verify your account, then log in."
+        );
         setParentLoading(false);
         return;
+      }
+
+      if (parentLinkExisting) {
+        const { data: preview, error: previewError } = await supabase.rpc("preview_parent_child_link", {
+          p_explorer_code: parentExplorerCode,
+        });
+        if (previewError || !preview || preview.matched !== true) {
+          retainPendingParentExplorerCode(parentExplorerCode);
+          setParentStudentPin("");
+          router.push("/parent/link");
+          return;
+        }
+
+        if (preview.alreadyLinked !== true) {
+          const { data: linked, error: linkError } = await supabase.rpc("confirm_parent_child_link", {
+            p_explorer_code: parentExplorerCode,
+            p_student_pin: parentStudentPin,
+            p_relationship: "guardian",
+          });
+          if (linkError || !linked || linked.linked !== true) {
+            retainPendingParentExplorerCode(parentExplorerCode);
+            setParentStudentPin("");
+            router.push("/parent/link");
+            return;
+          }
+        }
+        window.sessionStorage.removeItem(PENDING_PARENT_EXPLORER_CODE_KEY);
+        setParentStudentPin("");
       }
 
       router.push("/parent");
@@ -364,7 +428,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/parent");
+    router.push(hasPendingParentExplorerCode() ? "/parent/link" : "/parent");
   }
 
   async function handleRecoveredPasswordUpdate() {
@@ -955,11 +1019,67 @@ export default function LoginPage() {
               </InputField>
             </label>
 
+            {parentMode === "signup" ? (
+              <div className="rounded-xl border border-white/10 bg-black/10 p-3">
+                <label className="flex cursor-pointer items-center gap-3 text-sm font-bold text-white/85">
+                  <input
+                    type="checkbox"
+                    checked={parentLinkExisting}
+                    onChange={(event) => {
+                      setParentLinkExisting(event.target.checked);
+                      setParentError(null);
+                      if (!event.target.checked) {
+                        setParentExplorerCode("");
+                        setParentStudentPin("");
+                      }
+                    }}
+                    className="h-5 w-5 accent-emerald-400"
+                  />
+                  Link an existing student account
+                </label>
+                {parentLinkExisting ? (
+                  <div className="mt-4 grid gap-3">
+                    <label className="grid gap-1.5">
+                      <span className="pl-1 text-[11px] font-bold uppercase tracking-widest text-white/50">Explorer Code</span>
+                      <InputField icon={<KeyRound size={15} />}>
+                        <input
+                          value={parentExplorerCode}
+                          onChange={(event) => setParentExplorerCode(normalizeExplorerCode(event.target.value))}
+                          placeholder="LUL-ABCD-2345"
+                          autoComplete="off"
+                          className={`${inputCls} font-mono font-bold uppercase tracking-wider`}
+                        />
+                      </InputField>
+                    </label>
+                    <label className="grid gap-1.5">
+                      <span className="pl-1 text-[11px] font-bold uppercase tracking-widest text-white/50">Child’s 4-digit PIN</span>
+                      <InputField icon={<Lock size={15} />}>
+                        <input
+                          value={parentStudentPin}
+                          onChange={(event) => setParentStudentPin(event.target.value.replace(/\D/g, "").slice(0, 4))}
+                          placeholder="----"
+                          type="password"
+                          inputMode="numeric"
+                          autoComplete="off"
+                          className={`${inputCls} text-center font-mono font-bold tracking-[0.45em]`}
+                        />
+                      </InputField>
+                    </label>
+                    <p className="px-1 text-xs font-semibold leading-5 text-white/55">
+                      This connects the parent to the child’s existing learning history. It does not create another student account.
+                    </p>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
             <p
               className="rounded-xl px-4 py-3 text-xs font-semibold text-white/65"
               style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
-              After logging in, add a new Home learner or link an existing school learner with their Explorer Code and PIN.
+              {parentMode === "signup" && parentLinkExisting
+                ? "The Explorer Code identifies the student. Their PIN provides the required second security check."
+                : "After logging in, add a new Home learner or link an existing school learner with their Explorer Code and PIN."}
             </p>
 
             {parentError && (
