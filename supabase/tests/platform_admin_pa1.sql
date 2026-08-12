@@ -1,8 +1,10 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
+set local search_path = public, extensions;
 select plan(29);
 
+set local role postgres;
 insert into auth.users (id, email, aud, role)
 values
   ('a1000000-0000-0000-0000-000000000001', 'owner@pa1.test', 'authenticated', 'authenticated'),

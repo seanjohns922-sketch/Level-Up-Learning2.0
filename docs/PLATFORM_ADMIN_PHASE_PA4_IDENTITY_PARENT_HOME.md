@@ -17,7 +17,7 @@ A school transfer, parent link or access change must not create a replacement ch
 
 ## Parent linking
 
-Parents and schools link an existing child through the permanent Explorer Code. Preview responses reveal only the minimum confirmation details: first name, last initial, year level and school. Invalid and unknown codes use the same response, attempts are rate limited and audited, and clients cannot enumerate student records.
+Parents preview an existing child through the permanent Explorer Code, then confirm the link with the child's current 4-digit access PIN. Preview responses reveal only the minimum confirmation details: first name, last initial, year level and school. Invalid codes, unknown codes and incorrect PINs use neutral responses, attempts are rate limited and audited, and clients cannot enumerate student records.
 
 Verified links complete automatically. Manual queues are reserved for recovery or duplicate cases that cannot be resolved safely from the verified code.
 
@@ -41,13 +41,13 @@ Linking an existing child records membership and transfer history while preservi
 - current progression and targeted weeks
 - XP, Gems, Cards, Realmies, inventory and avatar state
 
-Historical reporting belongs to the school and class relationship active when the learning event occurred. A transfer changes current access; it does not rewrite prior class IDs, attempt timestamps or historical membership dates. The previous school retains its authorised historical reporting boundary and cannot see learning completed under the new school.
+Historical reporting belongs to the school and class relationship active when the learning event occurred. A transfer changes current access; it does not rewrite prior class IDs, attempt timestamps or historical membership dates. Reporting resolves school ownership from the event's class enrolment or school membership dates, so the previous school retains its authorised history and cannot see learning completed under the new school.
 
 ## Duplicate handling
 
 Similar names are never auto-merged. Only the platform owner can merge confirmed duplicate identities. The Identity Centre exposes pending parent/recovery links, potential duplicates, pending school links, pending merges, retired identities and recent transfers.
 
-A merge requires a selected survivor, selected duplicate, reason, record-count preview and separate final review reason. Attempts and assessments are preserved under the survivor, unique rewards are deduplicated, access and relationships are retained, and the duplicate becomes an auditable retired record pointing to the survivor.
+A merge requires a selected survivor, selected duplicate, reason, conflict preview and separate final review reason. Automatic approval is allowed only when each protected domain is populated on one identity at most. If both identities contain learning, economy, rewards, parent links, Home access, school access, school membership or class-enrolment state, the request fails closed until a Platform Owner resolves that domain explicitly. Successful one-sided merges revoke every duplicate student session and credential before the duplicate remains as an auditable retired record pointing to the survivor.
 
 ## Merge recovery
 
@@ -71,7 +71,13 @@ Merges are not reversible in the interface:
 
 ## Release and Manual QA
 
-Apply `supabase/migrations/20260812100000_platform_admin_pa4_identity_parent_home.sql`, then run:
+Apply these migrations in order:
+
+1. `supabase/migrations/20260812100000_platform_admin_pa4_identity_parent_home.sql`
+2. `supabase/migrations/20260812110000_platform_admin_pa4_safety_hardening.sql`
+3. `supabase/migrations/20260812120000_platform_admin_pa4_parent_read_write_boundary.sql`
+
+Then run:
 
 ```bash
 npx tsc --noEmit
@@ -80,6 +86,7 @@ npm run qa:platform-admin-pa1
 npm run qa:platform-admin-pa2
 npm run qa:platform-admin-pa3
 npm run qa:platform-admin-pa4
+npx supabase test db supabase/tests/platform_admin_pa4_safety.sql
 ```
 
 ### Manual QA
@@ -91,7 +98,10 @@ npm run qa:platform-admin-pa4
 | Multiple parents | Both authorised parents independently see the same child. |
 | Multiple children | A parent switches children without data crossing between them. |
 | Duplicate prevention | A plausible match blocks silent creation and requires link-existing or explicit override. |
-| Merge integrity | Learning evidence, access, relationships and rewards resolve under the survivor. |
+| Merge integrity | Protected-domain conflicts fail closed; an approved one-sided merge preserves canonical state and retires all duplicate access. |
+| Conflicting duplicate | Approval is unavailable and the RPC rejects the merge without changing either identity. |
+| One-sided duplicate | State moves to the survivor, all duplicate sessions and credentials are revoked, and the duplicate is retired. |
+| Parent verification | Explorer Code preview alone does not link a child; the current 4-digit PIN is also required. |
 | Mobile parent portal | Child cards and realm details fit at 375px and 768px without horizontal scrolling. |
 
 Also verify parent route tampering, direct parent write denial and neutral empty states.

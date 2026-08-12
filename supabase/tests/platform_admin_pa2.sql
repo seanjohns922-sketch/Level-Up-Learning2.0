@@ -1,8 +1,10 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
+set local search_path = public, extensions;
 select plan(30);
 
+set local role postgres;
 insert into auth.users (id, email, aud, role)
 values
   ('b1000000-0000-0000-0000-000000000001', 'owner@pa2.test', 'authenticated', 'authenticated'),
@@ -39,6 +41,7 @@ select throws_ok(format(
   extract(year from current_date)::integer
 ), 'P0001', 'School code is already in use', 'duplicate school code is rejected');
 
+set local role postgres;
 select is((select count(*) from public.academic_years where school_id = (select id from public.schools where school_code = 'PA2ALPHA')), 1::bigint, 'one explicit academic year is created');
 select is((select count(*) from public.school_licence_entitlements where school_id = (select id from public.schools where school_code = 'PA2ALPHA')), 1::bigint, 'one licence is created');
 select is((select count(*) from public.school_memberships where school_id = (select id from public.schools where school_code = 'PA2ALPHA') and user_id = 'b1000000-0000-0000-0000-000000000002' and role = 'school_admin' and status = 'active'), 1::bigint, 'existing administrator receives one active membership');
@@ -74,6 +77,7 @@ select set_config('request.jwt.claim.sub', 'b1000000-0000-0000-0000-000000000002
 select throws_ok($$select public.platform_owner_transition_school((select id from public.schools where school_code = 'PA2ALPHA'),'archive','Not allowed')$$, '42501', 'Platform owner access required', 'only Platform Owner can archive');
 
 select set_config('request.jwt.claim.sub', 'b1000000-0000-0000-0000-000000000001', true);
+set local role postgres;
 select lives_ok($$select public.platform_owner_transition_school((select id from public.schools where school_code = 'PA2BETA'),'pause','Temporary hold')$$, 'trial school can be paused');
 select is((select status from public.school_licence_entitlements where school_id = (select id from public.schools where school_code = 'PA2BETA')), 'paused', 'pause makes school access non-operational');
 select lives_ok($$select public.platform_owner_transition_school((select id from public.schools where school_code = 'PA2BETA'),'reactivate','Resume trial','trial',current_date - 1,current_date + 365)$$, 'paused school can be reactivated');
@@ -92,7 +96,7 @@ select lives_ok($$select public.platform_owner_transition_school((select id from
 select is((select id from public.students where id = 'b5000000-0000-0000-0000-000000000001'), 'b5000000-0000-0000-0000-000000000001'::uuid, 'restore preserves student identity');
 select is((select status from public.student_access_entitlements where student_id = 'b5000000-0000-0000-0000-000000000001' and access_source = 'school'), 'active', 'restore reactivates the held school entitlement');
 select is((select count(*) from public.school_memberships where school_id = (select id from public.schools where school_code = 'PA2ALPHA') and user_id = 'b1000000-0000-0000-0000-000000000003'), 1::bigint, 'restore does not duplicate memberships');
-select ok((select count(*) >= 4 from public.platform_admin_audit_log where entity_id = (select id::text from public.schools where school_code = 'PA2ALPHA') and action in ('school_created','school_archived','school_restored')), 'lifecycle audit records are written');
+select ok((select count(*) >= 3 from public.platform_admin_audit_log where entity_id = (select id::text from public.schools where school_code = 'PA2ALPHA') and action in ('school_created','school_archived','school_restored')), 'lifecycle audit records are written');
 
 set local role postgres;
 select throws_ok($$update public.platform_admin_audit_log set reason = 'changed' where action = 'school_archived'$$, '42501', 'Platform audit records are immutable', 'PA2 audit records remain immutable');

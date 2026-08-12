@@ -1,7 +1,10 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
+set local search_path = public, extensions;
 select plan(25);
+
+set local role postgres;
 
 select is(
   (
@@ -161,7 +164,7 @@ select ok(
   'legacy post-test Realmie backfill is removed'
 );
 
-select unlike(
+select unalike(
   pg_get_functiondef(
     'public.complete_realm_assessment(uuid,uuid,text,text,text,text,text,uuid,jsonb,jsonb)'::regprocedure
   ),
@@ -169,7 +172,7 @@ select unlike(
   'assessment completion has no Realmie side effect'
 );
 
-select like(
+select alike(
   pg_get_functiondef(
     'public.complete_realm_assessment(uuid,uuid,text,text,text,text,text,uuid,jsonb,jsonb)'::regprocedure
   ),

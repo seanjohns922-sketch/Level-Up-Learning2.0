@@ -303,6 +303,7 @@ export function LinkChild() {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [relationship, setRelationship] = useState("guardian");
+  const [studentPin, setStudentPin] = useState("");
   const [preview, setPreview] = useState<{ firstName: string; lastInitial: string | null; yearLevel: string | null; schoolName: string | null; alreadyLinked: boolean } | null>(null);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -312,7 +313,7 @@ export function LinkChild() {
     setError(null);
     setPreview(null);
     const { data, error: rpcError } = await supabase.rpc("preview_parent_child_link", { p_explorer_code: code });
-    if (rpcError) setError("That Explorer Code could not be verified. Check the code and try again.");
+    if (rpcError || !data || data.matched !== true) setError("That Explorer Code could not be verified. Check the code and try again.");
     else setPreview(data as typeof preview);
     setWorking(false);
   }
@@ -324,9 +325,13 @@ export function LinkChild() {
     }
     setWorking(true);
     setError(null);
-    const { error: rpcError } = await supabase.rpc("confirm_parent_child_link", { p_explorer_code: code, p_relationship: relationship });
-    if (rpcError) {
-      setError("The child could not be linked. Please try again.");
+    const { data, error: rpcError } = await supabase.rpc("confirm_parent_child_link", {
+      p_explorer_code: code,
+      p_student_pin: studentPin,
+      p_relationship: relationship,
+    });
+    if (rpcError || !data || data.linked !== true) {
+      setError("The child details could not be verified. Check the PIN and try again.");
       setWorking(false);
       return;
     }
@@ -361,9 +366,14 @@ export function LinkChild() {
               <option value="guardian">Parent or guardian</option><option value="carer">Carer</option><option value="family">Family member</option>
             </select>
           </label>
+          {!preview.alreadyLinked ? <label className="mt-4 block">
+            <span className="text-sm font-bold">Child&apos;s 4-digit access code</span>
+            <span className="mt-1 block text-sm text-slate-600">This second check protects the child if an Explorer Code is shared or seen by someone else.</span>
+            <input inputMode="numeric" autoComplete="one-time-code" value={studentPin} onChange={(event) => setStudentPin(event.target.value.replace(/\D/g, "").slice(0, 4))} className="mt-2 h-12 w-full rounded-md border border-slate-300 bg-white px-4 text-center font-mono text-xl font-black tracking-[0.3em] outline-none focus:border-emerald-600" aria-label="Child's 4-digit access code" />
+          </label> : null}
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" onClick={confirm} disabled={working} className="min-h-11 rounded-md bg-emerald-700 px-5 font-bold text-white">{working ? "Linking…" : preview.alreadyLinked ? "Return to Parent Home" : "Confirm link"}</button>
-            <button type="button" onClick={() => setPreview(null)} className="min-h-11 rounded-md border border-slate-300 px-5 font-bold">Use another code</button>
+            <button type="button" onClick={confirm} disabled={working || (!preview.alreadyLinked && studentPin.length !== 4)} className="min-h-11 rounded-md bg-emerald-700 px-5 font-bold text-white disabled:bg-slate-300">{working ? "Linking…" : preview.alreadyLinked ? "Return to Parent Home" : "Confirm link"}</button>
+            <button type="button" onClick={() => { setPreview(null); setStudentPin(""); }} className="min-h-11 rounded-md border border-slate-300 px-5 font-bold">Use another code</button>
           </div>
         </div>
       )}

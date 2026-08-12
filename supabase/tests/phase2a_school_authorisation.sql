@@ -1,8 +1,10 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
+set local search_path = public, extensions;
 select plan(36);
 
+set local role postgres;
 insert into auth.users (id, email, aud, role)
 values
   ('10000000-0000-0000-0000-000000000001', 'admin-a@example.test', 'authenticated', 'authenticated'),
@@ -39,6 +41,13 @@ insert into public.academic_years (
 values
   ('30000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', '2026', 2026, '2026-01-01', '2026-12-31', 'active'),
   ('30000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000002', '2026', 2026, '2026-01-01', '2026-12-31', 'active');
+
+insert into public.school_licence_entitlements (
+  school_id, academic_year_id, status, seat_limit, start_date, end_date, billing_status
+)
+values
+  ('20000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', 'active', 100, '2026-01-01', '2026-12-31', 'free'),
+  ('20000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000002', 'active', 100, '2026-01-01', '2026-12-31', 'free');
 
 insert into public.classes (
   id, name, class_code, teacher_id, school_id, academic_year,
