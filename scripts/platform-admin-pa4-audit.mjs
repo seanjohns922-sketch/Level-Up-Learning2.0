@@ -91,13 +91,16 @@ check("parent signup linking does not create a duplicate student", !login.match(
 check("parent client requires explicit link success", has(parent, "data.linked !== true", "child details could not be verified"));
 check("parent client requires explicit preview success", has(parent, "data.matched !== true", "Explorer Code could not be verified"));
 check("parent supports multiple-child selection", has(parent, "children.map", "activeStudentId", "setActiveStudentId"));
-check("parent has neutral empty states", has(parent, "Learning hasn’t started yet.", "No assessments completed yet.", "Not Attempted"));
+check("parent has neutral empty states", has(parent, "Learning hasn’t started yet.", "No assessments completed yet.", "Not started"));
 check("parent has responsive child layout", parent.includes("md:grid-cols-2"));
-check("parent detail has compact mobile metrics", parent.includes("sm:grid-cols-2 lg:grid-cols-4"));
+check("parent detail has compact metrics", parent.includes("sm:grid-cols-3"));
 check("parent snapshot returns canonical Gem identity", has(parentGemArtwork, "'gemId', definition.id", "student_gems", "gem_definitions"));
 check("parent achievements use canonical Gem artwork", has(parent, "GemIcon", "cutForGem(item.gemId, item.rarity)"));
 check("parent weekly journey includes saved activity weeks", has(parentWeeklyJourney, "student_lesson_attempts lesson", "student_weekly_quiz_attempts quiz", "union all"));
-check("parent weekly journey uses canonical curriculum labels", has(parent, "curriculumWeek", "plannedLesson?.title", "plan?.title"));
+check("parent weekly journey uses canonical curriculum labels", has(parent, "curriculumWeek", "planned?.title", "plan?.title"));
+check("parent realm detail lists the complete canonical level", has(parent, "curriculumWeeks", "allWeeks", '"Not started"'));
+check("parent realm detail removes required pathway metric", !parent.includes('<SummaryMetric label="Required pathway"'));
+check("parent assessments include the working level", parent.includes("{levelLabel} {assessmentName(item.type)}"));
 check("parent signup captures a full name", has(login, "parentFirstName", "parentLastName", "first_name: firstName", "display_name: `${firstName} ${lastName}`"));
 
 // Curriculum progress and assessment reporting.

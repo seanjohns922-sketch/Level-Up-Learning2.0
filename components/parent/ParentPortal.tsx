@@ -30,7 +30,7 @@ import { getCurriculumPlan } from "@/data/programs/genres";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import type { GemRarity } from "@/lib/gems";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
-import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
+import { formatStudentLevelLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { supabase } from "@/lib/supabase";
 
 export type ParentRealm = {
@@ -159,6 +159,28 @@ function curriculumWeek(realmId: string, workingLevel: string, weekNumber: numbe
     title: week.topic,
     lessons: week.lessons.map((lesson) => ({ lesson: lesson.lesson, title: lesson.title, focus: lesson.focus })),
   } : null;
+}
+
+function curriculumWeeks(realmId: string, workingLevel: string) {
+  if (realmId === "space" || realmId === "starpath") {
+    const level = tryNormalizeStarpathLevel(workingLevel);
+    return level ? getStarpathProgram(level).weeks.map((week) => ({
+      week: week.week,
+      title: week.title,
+      lessons: week.lessons.map((lesson, index) => ({ lesson: index + 1, title: lesson.title, focus: lesson.focus })),
+    })) : [];
+  }
+
+  const yearLabel = normalizeWorkingLevelLabel(workingLevel) ?? workingLevel;
+  return getCurriculumPlan(yearLabel, realmId).map((week) => ({
+    week: week.week,
+    title: week.topic,
+    lessons: week.lessons.map((lesson) => ({ lesson: lesson.lesson, title: lesson.title, focus: lesson.focus })),
+  }));
+}
+
+function displayLevel(workingLevel: string) {
+  return formatStudentLevelLabel(normalizeWorkingLevelLabel(workingLevel) ?? workingLevel);
 }
 
 function formatLastActive(value: string | null) {
@@ -593,8 +615,18 @@ export function ParentRealmDetail({ studentId, realmId }: { studentId: string; r
     return <div className="space-y-4"><h1 className="text-3xl font-black">{realmName(realmId)}</h1><div className="border border-slate-200 bg-white p-6"><p className="text-lg font-bold">Not placed</p><p className="mt-2 text-slate-600">No progress is available for this child in this realm.</p></div></div>;
   }
 
-  const completedRequired = data.weeks.filter((week) => week.required && (week.quiz?.status === "Completed" || week.lessons.some((lesson) => lesson.status === "Completed"))).length;
   const currentWeekPlan = data.current.currentWeek ? curriculumWeek(realmId, data.current.workingLevel, data.current.currentWeek) : null;
+  const plannedWeeks = curriculumWeeks(realmId, data.current.workingLevel);
+  const allWeeks = plannedWeeks.length
+    ? plannedWeeks.map((planned) => data.weeks.find((week) => week.week === planned.week) ?? {
+      week: planned.week,
+      required: data.current?.requiredWeeks.includes(planned.week) ?? false,
+      focus: planned.title,
+      lessons: [],
+      quiz: null,
+    })
+    : data.weeks;
+  const levelLabel = displayLevel(data.current.workingLevel);
   return (
     <div className="space-y-6">
       <div>
@@ -602,17 +634,16 @@ export function ParentRealmDetail({ studentId, realmId }: { studentId: string; r
         <h1 className="mt-1 text-3xl font-black">{realmName(realmId)}</h1>
         <p className="mt-2 text-slate-600">Read-only progress. Level mastery uses the same {data.passThreshold}% threshold as the learning program.</p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryMetric label="Current level" value={data.current.workingLevel} />
+      <div className="grid gap-3 sm:grid-cols-3">
+        <SummaryMetric label="Current level" value={levelLabel} />
         <SummaryMetric label="Current week" value={data.current.currentWeek ? `Week ${data.current.currentWeek}` : "Not started"} />
         <SummaryMetric label="Current focus" value={currentWeekPlan?.title ?? data.current.currentFocus ?? "Not available"} />
-        <SummaryMetric label="Required pathway" value={data.current.requiredWeeks.length ? `${completedRequired} of ${data.current.requiredWeeks.length} weeks` : "Pathway being prepared"} />
       </div>
 
       <section className="border border-slate-200 bg-white p-5">
         <h2 className="flex items-center gap-2 text-xl font-black"><BookOpen className="h-5 w-5 text-emerald-700" /> Weekly Journey</h2>
         <div className="mt-4 space-y-3">
-          {data.weeks.length ? data.weeks.map((week) => <WeekCard key={week.week} week={week} currentWeek={data.current?.currentWeek ?? null} realmId={realmId} workingLevel={data.current?.workingLevel ?? ""} />) : <p className="text-slate-500">No weekly learning results have been recorded yet.</p>}
+          {allWeeks.length ? allWeeks.map((week) => <WeekCard key={week.week} week={week} currentWeek={data.current?.currentWeek ?? null} realmId={realmId} workingLevel={data.current?.workingLevel ?? ""} />) : <p className="text-slate-500">No weekly curriculum is available for this level yet.</p>}
         </div>
       </section>
 
@@ -621,7 +652,7 @@ export function ParentRealmDetail({ studentId, realmId }: { studentId: string; r
         <div className="mt-4 space-y-2">
           {data.assessments.length ? data.assessments.map((item) => (
             <div key={item.id} className="grid gap-2 border-b border-slate-100 py-3 text-sm sm:grid-cols-[1fr_auto_auto] sm:items-center">
-              <span className="font-bold">{assessmentName(item.type)}</span>
+              <span className="font-bold">{levelLabel} {assessmentName(item.type)}</span>
               <span>{item.correct} / {item.attempted} · {item.score}%</span>
               <span className="font-bold text-emerald-800">{item.status}</span>
             </div>
@@ -637,9 +668,14 @@ function SummaryMetric({ label, value }: { label: string; value: string }) {
 }
 
 function WeekCard({ week, currentWeek, realmId, workingLevel }: { week: WeekResult; currentWeek: number | null; realmId: string; workingLevel: string }) {
-  const completed = week.quiz?.status === "Completed" || week.lessons.some((lesson) => lesson.status === "Completed");
-  const label = completed ? "Completed" : week.week === currentWeek ? "Current" : week.required ? "Required" : "Additional";
   const plan = curriculumWeek(realmId, workingLevel, week.week);
+  const plannedLessons = plan?.lessons ?? [];
+  const hasActivity = Boolean(week.quiz || week.lessons.length);
+  const completed = week.quiz?.status === "Completed" || (plannedLessons.length > 0 && plannedLessons.every((planned) => week.lessons.some((lesson) => lesson.lesson === planned.lesson && lesson.status === "Completed")));
+  const label = completed ? "Completed" : hasActivity ? "In progress" : week.week === currentWeek ? "Current" : "Not started";
+  const lessons = plannedLessons.length
+    ? plannedLessons.map((planned) => ({ planned, result: week.lessons.find((lesson) => lesson.lesson === planned.lesson) }))
+    : week.lessons.map((result) => ({ planned: null, result }));
   return (
     <details className="rounded-md border border-slate-200">
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
@@ -647,17 +683,16 @@ function WeekCard({ week, currentWeek, realmId, workingLevel }: { week: WeekResu
         <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700">{label}</span>
       </summary>
       <div className="space-y-3 border-t border-slate-100 p-4">
-        {week.lessons.map((lesson) => {
-          const plannedLesson = plan?.lessons.find((item) => item.lesson === lesson.lesson);
+        {lessons.map(({ planned, result }) => {
+          const lessonNumber = planned?.lesson ?? result?.lesson ?? 0;
           return (
-          <div key={lesson.lesson} className="rounded-md bg-slate-50 p-3 text-sm">
-            <div className="flex flex-wrap justify-between gap-2"><span className="font-bold">Lesson {lesson.lesson}: {plannedLesson?.title ?? lesson.lessonName}</span><span className="font-bold text-slate-700">{lesson.status}</span></div>
-            {plannedLesson?.focus || lesson.focus ? <p className="mt-1 text-slate-600">{plannedLesson?.focus ?? lesson.focus}</p> : null}
-            <p className="mt-2">{lesson.correct} / {lesson.attempted} correct · {lesson.accuracy}% accuracy · {lesson.attempts} {lesson.attempts === 1 ? "attempt" : "attempts"}</p>
+          <div key={lessonNumber} className="rounded-md bg-slate-50 p-3 text-sm">
+            <div className="flex flex-wrap justify-between gap-2"><span className="font-bold">Lesson {lessonNumber}: {planned?.title ?? result?.lessonName ?? `Lesson ${lessonNumber}`}</span><span className={`font-bold ${result ? "text-slate-700" : "text-slate-400"}`}>{result?.status ?? "Not started"}</span></div>
+            {planned?.focus || result?.focus ? <p className="mt-1 text-slate-600">{planned?.focus ?? result?.focus}</p> : null}
+            {result ? <p className="mt-2">{result.correct} / {result.attempted} correct · {result.accuracy}% accuracy · {result.attempts} {result.attempts === 1 ? "attempt" : "attempts"}</p> : null}
           </div>
         )})}
         {week.quiz ? <div className="rounded-md border border-emerald-100 bg-emerald-50 p-3 text-sm"><div className="flex flex-wrap justify-between gap-2"><span className="font-bold">Weekly Quiz</span><span className="font-bold text-emerald-900">{week.quiz.status}</span></div><p className="mt-2">{week.quiz.correct} / {week.quiz.attempted} correct · {week.quiz.accuracy}% · {week.quiz.attempts} {week.quiz.attempts === 1 ? "attempt" : "attempts"}</p></div> : null}
-        {!week.lessons.length && !week.quiz ? <p className="text-sm text-slate-500">Not Attempted</p> : null}
       </div>
     </details>
   );
