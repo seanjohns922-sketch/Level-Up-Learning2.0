@@ -20,8 +20,8 @@ import {
   School,
   Settings,
   ShieldCheck,
-  Sparkles,
   Target,
+  Trophy,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -244,6 +244,7 @@ export function ParentShell({ children }: { children: ReactNode }) {
         <nav className="mt-10 space-y-2" aria-label="Parent navigation">
           <ParentNavLink href="/parent" active={pathname === "/parent"} icon={<LayoutDashboard className="h-5 w-5" />} label="Overview" />
           <ParentNavLink href="/parent/children" active={pathname.startsWith("/parent/children")} icon={<Users className="h-5 w-5" />} label="My children" />
+          <ParentNavLink href="/parent/rewards" active={pathname === "/parent/rewards"} icon={<Trophy className="h-5 w-5" />} label="Rewards" />
           <ParentNavLink href="/parent/add-child" active={pathname === "/parent/add-child"} icon={<Plus className="h-5 w-5" />} label="Add a child" />
           <ParentNavLink href="/parent/link-child" active={pathname === "/parent/link-child"} icon={<UserPlus className="h-5 w-5" />} label="Link a child" />
         </nav>
@@ -261,11 +262,12 @@ export function ParentShell({ children }: { children: ReactNode }) {
           <nav className="flex gap-1 overflow-x-auto border-t border-slate-100 px-3 py-2" aria-label="Parent navigation">
             <ParentMobileNav href="/parent" label="Overview" active={pathname === "/parent"} />
             <ParentMobileNav href="/parent/children" label="Children" active={pathname.startsWith("/parent/children")} />
+            <ParentMobileNav href="/parent/rewards" label="Rewards" active={pathname === "/parent/rewards"} />
             <ParentMobileNav href="/parent/add-child" label="Add child" active={pathname === "/parent/add-child"} />
             <ParentMobileNav href="/parent/link-child" label="Link child" active={pathname === "/parent/link-child"} />
           </nav>
         </header>
-        {pathname !== "/parent" && pathname !== "/parent/children" ? <div className="mx-auto max-w-[1320px] px-4 pt-4 sm:px-6"><Link href="/parent" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-emerald-800"><ArrowLeft className="h-4 w-4" /> Parent Home</Link></div> : null}
+        {pathname !== "/parent" && pathname !== "/parent/children" && pathname !== "/parent/rewards" ? <div className="mx-auto max-w-[1320px] px-4 pt-4 sm:px-6"><Link href="/parent" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-emerald-800"><ArrowLeft className="h-4 w-4" /> Parent Home</Link></div> : null}
         <main className="mx-auto max-w-[1320px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">{children}</main>
       </div>
     </div>
@@ -383,8 +385,7 @@ function SelectedChildDashboard({ child, onActivated }: { child: ParentChild; on
   const completedLessons = child.realms.reduce((total, realm) => total + (realm.completedLessons ?? 0), 0);
 
   return (
-    <div className="space-y-7">
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
+    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
         <div className="space-y-5">
         <section className="relative min-h-[230px] overflow-hidden rounded-lg border border-slate-200 bg-[#11243c] text-white shadow-sm"><div className="absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: "url('/images/realm-select-bg.jpg')" }} /><div className="absolute inset-0 bg-gradient-to-r from-[#102239] via-[#102239]/90 to-[#102239]/45" /><div className="relative flex h-full min-h-[230px] flex-col justify-between p-6 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">Child overview</p><h2 className="mt-2 text-3xl font-black">{child.displayName}</h2><p className="mt-2 flex items-center gap-2 text-sm text-white/70"><School className="h-4 w-4" /> {child.yearLevel ?? "Year level not set"} · {child.schoolName ?? "Home learner"}</p></div><span className={`rounded-md px-3 py-1.5 text-xs font-black ${child.homeAccess ? "bg-emerald-300 text-emerald-950" : "bg-white/15 text-white"}`}>{child.homeAccess ? "Active — Free Access" : "Home Access inactive"}</span></div><div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4"><HeroMetric label="Realms" value={String(child.realms.length)} /><HeroMetric label="Current week" value={focusRealm?.currentWeek ? `Week ${focusRealm.currentWeek}` : "Not started"} /><HeroMetric label="Lessons completed" value={String(completedLessons)} /><HeroMetric label="Activity" value={child.lastActiveAt ? formatLastActive(child.lastActiveAt).replace("Last active ", "") : "Not started"} /></div></div></section>
 
@@ -394,18 +395,68 @@ function SelectedChildDashboard({ child, onActivated }: { child: ParentChild; on
         <div className="space-y-5">
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-rose-50 text-rose-600"><Target className="h-5 w-5" /></span><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">This week&apos;s focus</p><h3 className="font-black">{focusRealm ? realmName(focusRealm.realmId) : "Journey not started"}</h3></div></div><p className="mt-4 text-lg font-black leading-snug">{currentFocus ?? "A learning focus will appear when the weekly journey begins."}</p>{focusRealm ? <><p className="mt-2 text-sm text-slate-500">{focusRealm.workingLevel}{focusRealm.currentWeek ? ` · Week ${focusRealm.currentWeek}` : ""}</p><Link href={`/parent/children/${child.studentId}/realm/${focusRealm.realmId}`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-800">View realm progress <ChevronRight className="h-4 w-4" /></Link></> : null}</section>
 
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Sparkles className="h-5 w-5 text-amber-500" /></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.gemId ?? item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-slate-50">{item.gemId && isGemRarity(item.rarity) ? <GemIcon rarity={item.rarity} cut={cutForGem(item.gemId, item.rarity)} size={42} /> : <Gem className="h-5 w-5 text-violet-600" />}</span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between gap-3"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Link href="/parent/rewards" className="shrink-0 text-sm font-bold text-violet-700">View all</Link></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.gemId ?? item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-slate-50">{item.gemId && isGemRarity(item.rarity) ? <GemIcon rarity={item.rarity} cut={cutForGem(item.gemId, item.rarity)} size={42} /> : <Gem className="h-5 w-5 text-violet-600" />}</span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
 
         <section className={`rounded-lg border p-5 shadow-sm ${child.homeAccess ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">Home access</p><h3 className="mt-1 text-lg font-black">{child.homeAccess ? "Active — Free Access" : "Not active"}</h3></div><Home className={`h-5 w-5 ${child.homeAccess ? "text-emerald-700" : "text-amber-700"}`} /></div>{!child.homeAccess ? <><p className="mt-2 text-sm text-amber-900">Activate free Home access for the 2026 rollout.</p><button type="button" disabled={activating} onClick={activate} className="mt-3 min-h-11 rounded-md bg-emerald-700 px-4 font-bold text-white disabled:opacity-50">{activating ? "Activating…" : "Activate Home access"}</button>{activationError ? <p className="mt-2 text-sm font-bold text-red-700">{activationError}</p> : null}</> : <p className="mt-2 text-sm text-emerald-900">Learning access is available outside school as part of the 2026 rollout.</p>}<Link href={`/parent/children/${child.studentId}/settings`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-900"><Settings className="h-4 w-4" /> Login &amp; placement</Link></section>
         </div>
-      </div>
-
-      <UnlockedCollection child={child} />
     </div>
   );
 }
 
-function UnlockedCollection({ child }: { child: ParentChild }) {
+export function ParentRewards() {
+  const router = useRouter();
+  const [children, setChildren] = useState<ParentChild[]>([]);
+  const [activeStudentId, setActiveStudentId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) {
+        router.replace("/login");
+        return;
+      }
+      const { data, error: loadError } = await supabase.rpc("get_parent_home_snapshot");
+      if (loadError) setError("Rewards could not be loaded. Please try again.");
+      else {
+        const loadedChildren = (data as { children?: ParentChild[] } | null)?.children ?? [];
+        setChildren(loadedChildren);
+        setActiveStudentId(loadedChildren[0]?.studentId ?? "");
+      }
+      setLoading(false);
+    })();
+  }, [router]);
+
+  if (loading) return <ParentSkeleton />;
+  if (error) return <Notice message={error} />;
+
+  const activeChild = children.find((child) => child.studentId === activeStudentId) ?? children[0] ?? null;
+
+  return (
+    <div className="space-y-7">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Rewards</p>
+        <h1 className="mt-1 text-3xl font-black sm:text-4xl">Unlocked collection</h1>
+        <p className="mt-2 text-slate-600">See the Gems and Legend Cards each child has earned.</p>
+      </div>
+
+      {children.length ? (
+        <>
+          <section aria-label="Choose a child">
+            <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-black">Your children</h2><span className="text-sm font-semibold text-slate-500">{children.length} linked</span></div>
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {children.map((child) => <button type="button" key={child.studentId} onClick={() => setActiveStudentId(child.studentId)} className={`flex min-w-[230px] items-center gap-3 rounded-lg border bg-white p-3 text-left shadow-sm transition ${activeChild?.studentId === child.studentId ? "border-violet-500 ring-2 ring-violet-100" : "border-slate-200 hover:border-slate-300"}`}><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-violet-100 text-lg font-black text-violet-900">{child.firstName.slice(0, 1).toUpperCase()}</span><span className="min-w-0 flex-1"><span className="block truncate font-black">{child.displayName}</span><span className="block truncate text-xs text-slate-500">{child.yearLevel ?? "Year not set"} · {child.schoolName ?? "Home learner"}</span></span></button>)}
+            </div>
+          </section>
+          {activeChild ? <UnlockedCollection child={activeChild} compactHeading /> : null}
+        </>
+      ) : <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm"><Trophy className="h-8 w-8 text-violet-600" /><h2 className="mt-4 text-xl font-black">No child linked yet</h2><p className="mt-2 text-slate-600">Add or link a child before viewing rewards.</p></section>}
+    </div>
+  );
+}
+
+function UnlockedCollection({ child, compactHeading = false }: { child: ParentChild; compactHeading?: boolean }) {
   const gems = child.gems ?? child.recentAchievements;
   const legendIds = new Set(
     child.realms.flatMap((realm) =>
@@ -420,11 +471,11 @@ function UnlockedCollection({ child }: { child: ParentChild }) {
 
   return (
     <section aria-labelledby="unlocked-collection-title">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-slate-200 pb-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Rewards</p>
-          <h3 id="unlocked-collection-title" className="mt-1 text-xl font-black">Unlocked collection</h3>
-          <p className="mt-1 text-sm text-slate-600">Gems and Legend Cards {child.firstName} has earned.</p>
+          {!compactHeading ? <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Rewards</p> : null}
+          <h3 id="unlocked-collection-title" className="text-xl font-black">{child.displayName}&apos;s collection</h3>
+          <p className="mt-1 text-sm text-slate-600">Gems and Legend Cards earned through learning.</p>
         </div>
         <p className="text-sm font-bold text-slate-500">{gems.length} Gems · {legends.length} Cards</p>
       </div>

@@ -12,6 +12,7 @@ const parentRealmProgress = read("supabase/migrations/20260813100000_parent_real
 const parentUnlockedCollection = read("supabase/migrations/20260813110000_parent_unlocked_collection.sql");
 const safetyTests = read("supabase/tests/platform_admin_pa4_safety.sql");
 const parent = read("components/parent/ParentPortal.tsx");
+const parentRewardsRoute = read("app/parent/rewards/page.tsx");
 const login = read("app/login/page.tsx");
 const schoolApi = read("app/api/school/[schoolId]/command/route.ts");
 const schoolUi = read("components/school/SchoolHomeClient.tsx");
@@ -111,6 +112,12 @@ check("parent collection returns canonical Legend unlock ids", has(parentUnlocke
 check("parent collection uses the Hall of Legends rules", has(parent, "getEffectiveUnlockedLegendIds", "normalizeLegendRealmId"));
 check("parent collection renders real card fronts without cropping", has(parent, "LegendCardArtwork", "legend.images.cardFront", "object-contain") || has(read("components/legends/LegendCardArtwork.tsx"), "object-contain"));
 check("parent collection remains read-only", !parent.match(/buy|purchase|checkout|order card/i));
+check("parent rewards use a dedicated navigation tab", has(parent, 'href="/parent/rewards"', 'label="Rewards"') && parentRewardsRoute.includes("ParentRewards"));
+const parentOverviewBody = parent.slice(
+  parent.indexOf("function SelectedChildDashboard"),
+  parent.indexOf("export function ParentRewards"),
+);
+check("parent overview does not render the full collection", !parentOverviewBody.includes("<UnlockedCollection"));
 check("parent signup captures a full name", has(login, "parentFirstName", "parentLastName", "first_name: firstName", "display_name: `${firstName} ${lastName}`"));
 
 // Curriculum progress and assessment reporting.
