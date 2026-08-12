@@ -8,6 +8,7 @@ const safety = read("supabase/migrations/20260812110000_platform_admin_pa4_safet
 const parentBoundary = read("supabase/migrations/20260812120000_platform_admin_pa4_parent_read_write_boundary.sql");
 const parentGemArtwork = read("supabase/migrations/20260813080000_parent_achievement_gem_artwork.sql");
 const parentWeeklyJourney = read("supabase/migrations/20260813090000_parent_weekly_journey_activity.sql");
+const parentRealmProgress = read("supabase/migrations/20260813100000_parent_realm_lesson_progress.sql");
 const safetyTests = read("supabase/tests/platform_admin_pa4_safety.sql");
 const parent = read("components/parent/ParentPortal.tsx");
 const login = read("app/login/page.tsx");
@@ -101,6 +102,8 @@ check("parent weekly journey uses canonical curriculum labels", has(parent, "cur
 check("parent realm detail lists the complete canonical level", has(parent, "curriculumWeeks", "allWeeks", '"Not started"'));
 check("parent realm detail removes required pathway metric", !parent.includes('<SummaryMetric label="Required pathway"'));
 check("parent assessments include the working level", parent.includes("{levelLabel} {assessmentName(item.type)}"));
+check("parent realm progress counts unique completed lessons", has(parentRealmProgress, "'completedLessons'", "select distinct attempt.week, attempt.lesson", "attempt.completed=true"));
+check("parent realm percentage uses complete level lessons", has(parent, "completedLessons / totalLessons", "of {totalLessons} lessons completed"));
 check("parent signup captures a full name", has(login, "parentFirstName", "parentLastName", "first_name: firstName", "display_name: `${firstName} ${lastName}`"));
 
 // Curriculum progress and assessment reporting.
