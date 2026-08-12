@@ -306,13 +306,37 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
   if (task.kind === "starpathGroundAssessment") {
     const assessmentTask = task as StarpathGroundAssessmentTask;
     if (!hasText(assessmentTask.prompt) || !hasText(assessmentTask.speakText)) return false;
-    if (assessmentTask.rows < 2 || assessmentTask.cols < 2) return false;
+    if (
+      !Number.isInteger(assessmentTask.rows)
+      || !Number.isInteger(assessmentTask.cols)
+      || assessmentTask.rows < 1
+      || assessmentTask.cols < 1
+      || assessmentTask.rows > 12
+      || assessmentTask.cols > 12
+    ) return false;
+    const isBoardCell = (r: number, c: number) => (
+      Number.isInteger(r)
+      && Number.isInteger(c)
+      && r >= 0
+      && r < assessmentTask.rows
+      && c >= 0
+      && c < assessmentTask.cols
+    );
     if (assessmentTask.mode === "route") return assessmentTask.answerMoves.length > 0;
     const tokenIds = new Set(assessmentTask.tokens.map((token) => token.id));
+    const answerCells = new Set(assessmentTask.answer.map((answer) => `${answer.r}:${answer.c}`));
+    const fixedCells = new Set((assessmentTask.fixed ?? []).map((item) => `${item.r}:${item.c}`));
     return assessmentTask.tokens.length > 0
       && tokenIds.size === assessmentTask.tokens.length
       && assessmentTask.answer.length === assessmentTask.tokens.length
-      && assessmentTask.answer.every((answer) => tokenIds.has(answer.tokenId));
+      && answerCells.size === assessmentTask.answer.length
+      && fixedCells.size === (assessmentTask.fixed ?? []).length
+      && assessmentTask.answer.every((answer) => (
+        tokenIds.has(answer.tokenId)
+        && isBoardCell(answer.r, answer.c)
+        && !fixedCells.has(`${answer.r}:${answer.c}`)
+      ))
+      && (assessmentTask.fixed ?? []).every((item) => isBoardCell(item.r, item.c));
   }
   if (task.kind !== "starpathObject") return true;
   const objectTask = task as StarpathObjectTask;

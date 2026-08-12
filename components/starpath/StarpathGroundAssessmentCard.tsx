@@ -120,10 +120,10 @@ export function StarpathGroundAssessmentCard({
       </header>
 
       {task.mode === "placement" ? (
-        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(180px,0.42fr)_minmax(300px,1fr)]">
+        <div className="mt-5 space-y-4">
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-teal-800">Choose a piece</div>
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="text-center text-xs font-bold uppercase tracking-widest text-teal-800">Choose a shape, then tap a space</div>
+            <div className="mt-2 flex flex-wrap justify-center gap-2">
               {task.tokens.map((token) => {
                 const placed = placements.some((item) => item.tokenId === token.id);
                 const selected = selectedTokenId === token.id;
@@ -134,7 +134,7 @@ export function StarpathGroundAssessmentCard({
                     disabled={placed}
                     onClick={() => setSelectedTokenId(token.id)}
                     aria-label={token.label}
-                    className={`relative flex min-h-24 items-center justify-center rounded-lg border bg-white p-2 transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
+                    className={`relative flex h-24 w-28 items-center justify-center rounded-lg border bg-white p-2 transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
                       selected ? "border-cyan-500 ring-4 ring-cyan-100" : "border-slate-200 hover:border-cyan-300"
                     } disabled:opacity-35`}
                   >
@@ -147,8 +147,12 @@ export function StarpathGroundAssessmentCard({
           </div>
 
           <div
-            className="grid aspect-square max-h-[430px] w-full max-w-[520px] justify-self-center overflow-hidden rounded-lg border border-cyan-200 bg-white shadow-inner"
-            style={{ gridTemplateColumns: `repeat(${task.cols}, minmax(0, 1fr))` }}
+            className="mx-auto grid overflow-hidden rounded-lg border-2 border-cyan-200 bg-white shadow-[0_10px_30px_rgba(8,145,178,0.10)]"
+            style={{
+              gridTemplateColumns: `repeat(${task.cols}, minmax(0, 1fr))`,
+              width: `min(100%, ${Math.max(170, task.cols * 170)}px)`,
+              aspectRatio: `${task.cols} / ${task.rows}`,
+            }}
           >
             {Array.from({ length: task.rows * task.cols }, (_, index) => {
               const r = Math.floor(index / task.cols);
@@ -163,7 +167,7 @@ export function StarpathGroundAssessmentCard({
                   onClick={() => chooseCell(r, c)}
                   disabled={Boolean(fixed)}
                   aria-label={`Row ${r + 1}, column ${c + 1}${token ? `: ${token.label}` : ""}`}
-                  className="flex min-h-20 items-center justify-center border-b border-r border-cyan-100 bg-white transition hover:bg-cyan-50 focus-visible:z-10 focus-visible:outline focus-visible:outline-4 focus-visible:outline-cyan-500 disabled:cursor-default"
+                  className="flex min-h-24 items-center justify-center border-b border-r border-cyan-100 bg-white transition hover:bg-cyan-50 focus-visible:z-10 focus-visible:outline focus-visible:outline-4 focus-visible:outline-cyan-500 disabled:cursor-default"
                 >
                   {token ? <TokenVisual token={token} compact /> : null}
                 </button>

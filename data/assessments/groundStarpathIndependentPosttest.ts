@@ -57,7 +57,7 @@ function candidate(index: number, spec: ItemSpec): CandidateQuestion {
   return {
     schemaVersion: 1,
     id: `y0-starpath-post-${String(index + 1).padStart(2, "0")}-v1`,
-    version: "1.0.0",
+    version: "1.0.1",
     realm: "space",
     level: 0,
     form: "posttest",
@@ -177,15 +177,15 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
   {
     descriptor: "AC9MFSP01", week: 2, lesson: 2, skillId: "create_shape_picture", skillLabel: "Create a Shape Picture",
     difficulty: "easy", cognitiveCategory: "application", responseMode: "manipulated_response",
-    misconceptionTags: ["shape-in-object"], contextKey: "triangle-rectangle-circle-rocket", structureKey: "build-three-part-vertical-picture",
+    misconceptionTags: ["shape-in-object"], contextKey: "triangle-rectangle-circle-shape-row", structureKey: "arrange-three-shapes-left-to-right",
     task: {
-      kind: "starpathGroundAssessment", mode: "placement", prompt: "Build a rocket: triangle, rectangle, then circle.", speakText: "Build a rocket. Put the triangle above the rectangle, and the circle below.", target: 1, rows: 3, cols: 3,
+      kind: "starpathGroundAssessment", mode: "placement", prompt: "Make the row: triangle, rectangle, circle.", speakText: "Make the shape row. Put the triangle first, the rectangle next, and the circle last.", target: 1, rows: 1, cols: 3,
       tokens: [
-        shapeToken("nose", "triangle", "triangle", "#fde047"),
-        shapeToken("body", "rectangle", "rectangle", "#67e8f9"),
-        shapeToken("window", "circle", "circle", "#f9a8d4"),
+        shapeToken("triangle", "triangle", "triangle", "#fde047"),
+        shapeToken("rectangle", "rectangle", "rectangle", "#67e8f9"),
+        shapeToken("circle", "circle", "circle", "#f9a8d4"),
       ],
-      answer: [{ tokenId: "nose", r: 0, c: 1 }, { tokenId: "body", r: 1, c: 1 }, { tokenId: "window", r: 2, c: 1 }], feedback: FEEDBACK,
+      answer: [{ tokenId: "triangle", r: 0, c: 0 }, { tokenId: "rectangle", r: 0, c: 1 }, { tokenId: "circle", r: 0, c: 2 }], feedback: FEEDBACK,
     },
   },
   {
@@ -193,9 +193,9 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
     difficulty: "moderate", cognitiveCategory: "application", responseMode: "manipulated_response",
     misconceptionTags: ["shape-in-object"], contextKey: "triangle-square-house", structureKey: "build-two-part-house-picture",
     task: {
-      kind: "starpathGroundAssessment", mode: "placement", prompt: "Build a house with a triangle above a square.", speakText: "Build a house with a triangle above a square.", target: 1, rows: 3, cols: 3,
+      kind: "starpathGroundAssessment", mode: "placement", prompt: "Make a house: triangle above square.", speakText: "Make a house. Put the triangle above the square.", target: 1, rows: 2, cols: 1,
       tokens: [shapeToken("roof", "triangle", "triangle", "#f97316"), shapeToken("room", "square", "square", "#86efac")],
-      answer: [{ tokenId: "roof", r: 0, c: 1 }, { tokenId: "room", r: 1, c: 1 }], feedback: FEEDBACK,
+      answer: [{ tokenId: "roof", r: 0, c: 0 }, { tokenId: "room", r: 1, c: 0 }], feedback: FEEDBACK,
     },
   },
   {
@@ -203,7 +203,7 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
     difficulty: "moderate", cognitiveCategory: "application", responseMode: "manipulated_response",
     misconceptionTags: ["shape-orientation-invariance"], contextKey: "circle-left-square-triangle-above", structureKey: "place-three-shapes-by-position",
     task: {
-      kind: "starpathGroundAssessment", mode: "placement", prompt: "Put the circle left and the triangle above the square.", speakText: "Put the circle to the left of the square. Put the triangle above the square.", target: 1, rows: 3, cols: 3,
+      kind: "starpathGroundAssessment", mode: "placement", prompt: "Put triangle above square. Put circle left of square.", speakText: "Put the triangle above the square. Put the circle to the left of the square.", target: 1, rows: 2, cols: 2,
       tokens: [
         shapeToken("circle", "circle", "circle", "#67e8f9"),
         shapeToken("square", "square", "square", "#86efac"),
@@ -215,12 +215,12 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
   {
     descriptor: "AC9MFSP01", week: 7, lesson: 2, skillId: "repair_shape_picture", skillLabel: "Repair a Shape Picture",
     difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "manipulated_response", misconceptionDiagnosis: true,
-    misconceptionTags: ["shape-in-object"], contextKey: "flag-square-fixed-rectangle-pole", structureKey: "repair-picture-with-missing-shape",
+    misconceptionTags: ["shape-in-object"], contextKey: "fixed-square-rectangle-below", structureKey: "complete-two-shape-stack",
     task: {
-      kind: "starpathGroundAssessment", mode: "placement", prompt: "Finish the flag with a rectangle below the square.", speakText: "Finish the flag. Put the rectangle below the square.", target: 1, rows: 3, cols: 3,
-      tokens: [shapeToken("pole", "rectangle", "rectangle", "#f97316", 90)],
-      fixed: [{ token: shapeToken("flag", "square", "square", "#67e8f9"), r: 0, c: 1 }],
-      answer: [{ tokenId: "pole", r: 1, c: 1 }], feedback: FEEDBACK,
+      kind: "starpathGroundAssessment", mode: "placement", prompt: "Put the rectangle below the square.", speakText: "Put the rectangle below the square.", target: 1, rows: 2, cols: 1,
+      tokens: [shapeToken("rectangle", "rectangle", "rectangle", "#f97316")],
+      fixed: [{ token: shapeToken("square", "square", "square", "#67e8f9"), r: 0, c: 0 }],
+      answer: [{ tokenId: "rectangle", r: 1, c: 0 }], feedback: FEEDBACK,
     },
   },
   {
@@ -228,7 +228,7 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
     difficulty: "challenging", cognitiveCategory: "transfer", responseMode: "manipulated_response", misconceptionDiagnosis: true,
     misconceptionTags: ["classification-single-rule"], contextKey: "triangle-above-two-different-round-shapes", structureKey: "build-picture-meeting-two-conditions",
     task: {
-      kind: "starpathGroundAssessment", mode: "placement", prompt: "Put a triangle above a circle and an oval.", speakText: "Put a triangle above a circle and an oval. Put the circle on the left.", target: 1, rows: 3, cols: 3,
+      kind: "starpathGroundAssessment", mode: "placement", prompt: "Put triangle above both shapes. Put circle left of oval.", speakText: "Put the triangle above the circle and the oval. Put the circle to the left of the oval.", target: 1, rows: 2, cols: 3,
       tokens: [
         shapeToken("triangle", "triangle", "triangle", "#fde047"),
         shapeToken("circle", "circle", "circle", "#67e8f9"),

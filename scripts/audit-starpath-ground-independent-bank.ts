@@ -98,7 +98,7 @@ check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_respo
 check(bank.every((item) => item.prompt.trim().split(/\s+/).length <= 14), "A prompt exceeds the Foundation 14-word reading ceiling.");
 
 for (const item of bank) {
-  check(item.schemaVersion === 1 && item.version === "1.0.0", `${item.id} has incorrect version metadata.`);
+  check(item.schemaVersion === 1 && item.version === "1.0.1", `${item.id} has incorrect version metadata.`);
   check(item.realm === "space" && item.level === 0 && item.form === "posttest", `${item.id} targets the wrong assessment form.`);
   check(item.origin === "assessment_authored" && item.sourcePool === "posttest", `${item.id} is not independent assessment content.`);
   check(item.bankId === "starpath-level-0-posttest-v1", `${item.id} has the wrong bank ID.`);
@@ -131,6 +131,22 @@ for (const item of bank) {
     check(task.answer.every((answer) => !task.fixed?.some((fixed) => fixed.r === answer.r && fixed.c === answer.c)), `${item.id} overlaps a fixed reference object.`);
   }
 
+}
+
+const compactPlacementBoards = new Map([
+  ["y0-starpath-post-06-v1", "1x3"],
+  ["y0-starpath-post-07-v1", "2x1"],
+  ["y0-starpath-post-08-v1", "2x2"],
+  ["y0-starpath-post-09-v1", "2x1"],
+  ["y0-starpath-post-10-v1", "2x3"],
+]);
+for (const [itemId, expectedSize] of compactPlacementBoards) {
+  const item = bank.find((candidateItem) => candidateItem.id === itemId);
+  const task = item?.practiceTask;
+  const actualSize = task?.kind === "starpathGroundAssessment" && task.mode === "placement"
+    ? `${task.rows}x${task.cols}`
+    : "not-placement";
+  check(actualSize === expectedSize, `${itemId} must keep its compact ${expectedSize} placement board.`);
 }
 
 const bankSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/groundStarpathIndependentPosttest.ts"), "utf8");
