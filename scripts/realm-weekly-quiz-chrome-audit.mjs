@@ -8,6 +8,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const chrome = read("components/quiz/RealmWeeklyQuizChrome.tsx");
 const session = read("app/session/page.tsx");
 const starpath = read("components/starpath/StarpathDevelopmentQuiz.tsx");
+const starpathVoyage = read("components/starpath/StarpathVoyageQuiz.tsx");
 
 for (const realm of ["number", "measurement", "space"]) {
   assert.ok(chrome.includes(`${realm}: {`), `Missing ${realm} quiz theme`);
@@ -36,4 +37,9 @@ assert.match(starpath, /<RealmWeeklyQuizChrome/);
 assert.match(starpath, /realm="space"/);
 assert.match(starpath, /preserves Starpath routing/);
 
-console.log("Realm weekly quiz chrome audit passed: all current realms share modern quiz presentation without replacing quiz mechanics.");
+assert.match(starpathVoyage, /if \(!task \|\| currentAnswer !== undefined\) return;/);
+assert.match(starpathVoyage, /Answer submitted/);
+assert.doesNotMatch(starpathVoyage, /changeAnswer|Change Answer/);
+assert.doesNotMatch(starpathVoyage, /delete next\[String\(index\)\]/);
+
+console.log("Realm weekly quiz audit passed: shared presentation is intact and submitted Starpath answers are immutable.");

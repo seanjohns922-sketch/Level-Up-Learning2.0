@@ -153,15 +153,6 @@ export default function StarpathVoyageQuiz({
     setAnswers((current) => ({ ...current, [String(index)]: ok }));
   }
 
-  function changeAnswer() {
-    setAnswers((current) => {
-      const next = { ...current };
-      delete next[String(index)];
-      return next;
-    });
-    setNonce((value) => value + 1);
-  }
-
   function beginQuiz() {
     if (!hasResume) {
       setOrder(lessonOrder(tasks.length));
@@ -371,18 +362,9 @@ export default function StarpathVoyageQuiz({
               ) : null}
 
               {currentAnswer !== undefined ? (
-                <div className="mt-5 flex items-center justify-between gap-3 rounded-lg border-2 border-cyan-200 bg-cyan-50 px-4 py-3">
-                  <div className="flex items-center gap-2 font-bold text-cyan-950">
-                    <Check className="h-5 w-5 text-cyan-600" />
-                    Answer saved
-                  </div>
-                  <button
-                    type="button"
-                    onClick={changeAnswer}
-                    className="rounded-lg border border-violet-300 bg-white px-4 py-2 text-sm font-black text-violet-800 transition hover:bg-violet-50"
-                  >
-                    Change Answer
-                  </button>
+                <div className="mt-5 flex items-center gap-2 rounded-lg border-2 border-cyan-200 bg-cyan-50 px-4 py-3 font-bold text-cyan-950">
+                  <Check className="h-5 w-5 text-cyan-600" />
+                  Answer submitted
                 </div>
               ) : null}
 
