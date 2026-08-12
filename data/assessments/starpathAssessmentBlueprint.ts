@@ -117,9 +117,11 @@ function descriptor(
     reasoningMix: "Selected items diagnose misconceptions; manipulated items require the student to construct, place, move, transform or explain spatial evidence independently.",
     misconceptionIds,
     curriculumMapping: {
-      implementationStatus: "mapped-unverified",
+      implementationStatus: level === 2 ? "aligned" : "mapped-unverified",
       currentWeeks,
-      note: `Mapped to Starpath Weeks ${currentWeeks.join(", ")}; full lesson and weekly-quiz coverage must pass before independent-bank authoring.`,
+      note: level === 2
+        ? `Aligned to audited Starpath Weeks ${currentWeeks.join(", ")}; all 24 lessons and seven independent weekly quizzes passed Level 2 curriculum validation.`
+        : `Mapped to Starpath Weeks ${currentWeeks.join(", ")}; full lesson and weekly-quiz coverage must pass before independent-bank authoring.`,
     },
     questionBlueprint: { pretestArchetypes: level === 0 ? [] : pretestArchetypes, posttestArchetypes },
   };

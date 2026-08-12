@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import { isAssessmentAnswerCorrect } from "../data/assessments/analysis";
+import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "../data/assessments/analysis";
+import {
+  getPosttestForYearLabel,
+  getPretestForYearLabel,
+} from "../data/assessments/api";
 import type { IndependentAssessmentItem } from "../data/assessments/assessmentItemStandard";
 import {
   LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS,
@@ -11,6 +15,7 @@ import { STARPATH_MISCONCEPTION_LIBRARY } from "../data/assessments/starpathMisc
 import type { Question } from "../data/assessments/posttests";
 import { isPracticeTaskSafe } from "../lib/task-safety";
 import { ASSESSMENT_THRESHOLDS } from "../lib/assessment-rules";
+import { buildAssessmentQuestionSnapshots, isAssessmentQuestionSnapshot } from "../lib/assessment-replay";
 
 type Candidate = Question & IndependentAssessmentItem;
 type Direction = "up" | "down" | "left" | "right";
@@ -55,8 +60,8 @@ const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [
 check(Boolean(blueprint), "Year 1 Starpath blueprint is missing.");
 
 const forms = [
-  { kind: "pretest", bank: LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS, difficulty: { easy: 10, moderate: 8, challenging: 2 }, cognitive: { recall: 4, understanding: 7, application: 6, reasoning: 3 }, bankId: "starpath-level-1-pretest-rc1" },
-  { kind: "posttest", bank: LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS, difficulty: { easy: 7, moderate: 8, challenging: 5 }, cognitive: { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, bankId: "starpath-level-1-posttest-rc1" },
+  { kind: "pretest", bank: LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS, difficulty: { easy: 10, moderate: 8, challenging: 2 }, cognitive: { recall: 4, understanding: 7, application: 6, reasoning: 3 }, bankId: "starpath-level-1-pretest-v1" },
+  { kind: "posttest", bank: LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS, difficulty: { easy: 7, moderate: 8, challenging: 5 }, cognitive: { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, bankId: "starpath-level-1-posttest-v1" },
 ] as const;
 
 for (const form of forms) {
@@ -75,7 +80,7 @@ for (const form of forms) {
   check(bank.every((item) => item.prompt.trim().split(/\s+/).length <= 12), `${form.kind} contains a prompt above the 12-word Year 1 ceiling.`);
 
   for (const item of bank) {
-    check(item.version === "1.0.0-rc1" && item.bankId === form.bankId, `${item.id} has incorrect release metadata.`);
+    check(item.version === "1.0.0" && item.bankId === form.bankId, `${item.id} has incorrect production metadata.`);
     check(item.realm === "space" && item.level === 1 && item.form === form.kind, `${item.id} targets the wrong form.`);
     check(item.origin === "assessment_authored" && item.sourcePool === form.kind, `${item.id} is not independent assessment content.`);
     check(item.renderer.type === "starpath_assessment_task" && item.type === "starpathTask", `${item.id} is not a launchable Starpath task.`);
@@ -111,27 +116,74 @@ for (const form of forms) {
       check(task.steps.some((step) => step.id === task.wrongStepId), `${item.id} missing its marked incorrect route step.`);
     }
   }
+
+  const snapshots = buildAssessmentQuestionSnapshots(
+    [...bank],
+    (question) => String(question.correctAnswer ?? ""),
+    (question, answer) => {
+      const item = bank.find((candidateItem) => candidateItem.id === question.id);
+      return item ? isAssessmentAnswerCorrect(item, String(answer)) : false;
+    },
+    new Date(0).toISOString(),
+  );
+  check(snapshots.length === 20 && snapshots.every(isAssessmentQuestionSnapshot), `${form.kind} cannot create canonical replay snapshots.`);
+  check(snapshots.every((snapshot) => snapshot.correct), `${form.kind} replay scoring rejects an approved answer.`);
+
+  const buildBoundaryAnswers = (correctCount: number): Record<string, string> =>
+    Object.fromEntries(
+      bank.map((item, index) => [
+        item.id,
+        index < correctCount ? String(item.correctAnswer) : `__incorrect__:${item.id}`,
+      ]),
+    );
+  const passingBoundary = analyzeAssessmentResult({
+    questions: [...bank],
+    answers: buildBoundaryAnswers(17),
+    yearLevel: 1,
+    testType: form.kind === "pretest" ? "pre" : "post",
+    passThreshold: form.kind === "pretest"
+      ? ASSESSMENT_THRESHOLDS.pretestPassPercent
+      : ASSESSMENT_THRESHOLDS.posttestPassPercent,
+  });
+  const failingBoundary = analyzeAssessmentResult({
+    questions: [...bank],
+    answers: buildBoundaryAnswers(16),
+    yearLevel: 1,
+    testType: form.kind === "pretest" ? "pre" : "post",
+    passThreshold: form.kind === "pretest"
+      ? ASSESSMENT_THRESHOLDS.pretestPassPercent
+      : ASSESSMENT_THRESHOLDS.posttestPassPercent,
+  });
+  check(passingBoundary.percentage === 85 && passingBoundary.passed, `${form.kind} must pass at 17/20.`);
+  check(failingBoundary.percentage === 80 && !failingBoundary.passed, `${form.kind} must fail at 16/20.`);
 }
 
 const prePrompts = new Set(LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) => item.prompt));
 check(LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS.every((item) => !prePrompts.has(item.prompt)), "Pre-Test and Post-Test reuse prompt wording.");
+const expectedPreIds = LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) => item.id);
+const expectedPostIds = LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS.map((item) => item.id);
+const productionPreIds = getPretestForYearLabel("Year 1", "space").map((item) => item.id);
+const productionPostIds = getPosttestForYearLabel("Year 1", "space")?.questions.map((item) => item.id) ?? [];
+check(JSON.stringify(productionPreIds) === JSON.stringify(expectedPreIds), "Production Pre-Test resolver does not return the independent bank.");
+check(JSON.stringify(productionPostIds) === JSON.stringify(expectedPostIds), "Production Post-Test resolver does not return the independent bank.");
 const source = fs.readFileSync(path.join(process.cwd(), "data/assessments/level1StarpathIndependentAssessments.ts"), "utf8");
 const apiSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/api.ts"), "utf8");
 const pretestPageSource = fs.readFileSync(path.join(process.cwd(), "app/pretest/page.tsx"), "utf8");
 const posttestPageSource = fs.readFileSync(path.join(process.cwd(), "app/posttest/page.tsx"), "utf8");
 const demoPanelSource = fs.readFileSync(path.join(process.cwd(), "components/demo/DemoReviewPanel.tsx"), "utf8");
 check(!/activities\/starpath\/level1\/(week|quizTasks|level1PostTest)/.test(source), "Candidate banks import lesson, quiz or legacy assessment content.");
-check(!apiSource.includes("level1StarpathIndependentAssessments"), "RC1 banks must not be reachable through the production resolver.");
-check(pretestPageSource.includes('reviewBank === "level1-starpath-pre-rc1"') && pretestPageSource.includes("isDemoPreviewMode()"), "Pre-Test RC1 lacks its demo-only review gate.");
-check(posttestPageSource.includes('reviewBank === "level1-starpath-post-rc1"') && posttestPageSource.includes("isDemoPreviewMode()"), "Post-Test RC1 lacks its demo-only review gate.");
-check(demoPanelSource.includes('params.set("review_bank", "level1-starpath-pre-rc1")'), "Demo panel does not launch the Year 1 Pre-Test RC1 bank.");
-check(demoPanelSource.includes("review_bank=level1-starpath-post-rc1"), "Demo panel does not launch the Year 1 Post-Test RC1 bank.");
+check(apiSource.includes("level1StarpathIndependentAssessments"), "Production API does not import the Year 1 independent banks.");
+check(!apiSource.includes("level1/level1PostTest"), "Production API can still resolve the retired legacy Year 1 post-test.");
+check(pretestPageSource.includes('reviewBank === "level1-starpath-pre-rc1"') && pretestPageSource.includes("isDemoPreviewMode()"), "Pre-Test review route lacks its demo-only gate.");
+check(posttestPageSource.includes('reviewBank === "level1-starpath-post-rc1"') && posttestPageSource.includes("isDemoPreviewMode()"), "Post-Test review route lacks its demo-only gate.");
+check(demoPanelSource.includes('params.set("review_bank", "level1-starpath-pre-rc1")'), "Demo panel does not launch the Year 1 Pre-Test review bank.");
+check(demoPanelSource.includes("review_bank=level1-starpath-post-rc1"), "Demo panel does not launch the Year 1 Post-Test review bank.");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85, "Pre-Test threshold must remain 85%.");
 check(ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Post-Test threshold must remain 85%.");
 
 console.log(`Year 1 Starpath independent-bank audit: ${passed} passed, ${failures.length} failed.`);
-console.log("Forms: 40 items; each 12 manipulated / 8 selected; production resolver unchanged.");
-console.log("Release status: RC1 BLOCKED pending educator review and production approval.");
+console.log("Production forms: 40 items; each 12 manipulated / 8 selected; independent resolvers active.");
+console.log("Release status: Version 1.0 PRODUCTION.");
 if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exitCode = 1;

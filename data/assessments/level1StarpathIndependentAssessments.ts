@@ -118,14 +118,14 @@ function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion
   const formLabel = form === "pretest" ? "pre" : "post";
   return {
     schemaVersion: 1,
-    id: `y1-starpath-${formLabel}-${String(index + 1).padStart(2, "0")}-rc1`,
-    version: "1.0.0-rc1",
+    id: `y1-starpath-${formLabel}-${String(index + 1).padStart(2, "0")}-v1`,
+    version: "1.0.0",
     realm: "space",
     level: 1,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `starpath-level-1-${form}-rc1`,
+    bankId: `starpath-level-1-${form}-v1`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],

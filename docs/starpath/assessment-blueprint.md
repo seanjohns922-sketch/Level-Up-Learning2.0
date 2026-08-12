@@ -41,7 +41,7 @@ This blueprint defines Starpath assessment content only. The assessment engine, 
 
 ### AC9MFSP01
 
-**Descriptor:** Sort, name and create familiar shapes; recognise and describe familiar shapes within objects in the environment, giving reasons.
+**Descriptor:** sort, name and create familiar shapes; recognise and describe familiar shapes within objects in the environment, giving reasons
 
 **Learning Intentions**
 
@@ -77,17 +77,17 @@ This blueprint defines Starpath assessment content only. The assessment engine, 
 
 ### AC9MFSP02
 
-**Descriptor:** Describe position and movement of self and objects in relation to other objects and locations within a familiar space.
+**Descriptor:** describe the position and location of themselves and objects in relation to other people and objects within a familiar space
 
 **Learning Intentions**
 
-- Describe an object's position relative to a named reference.
-- Place and move objects using familiar positional and directional language.
+- Describe the position and location of themselves and objects relative to named people and objects.
+- Interpret and create relative positions within familiar spaces.
 
 **Success Criteria**
 
-- I can place an object where a direction says.
-- I can describe where an object is and how it moved.
+- I can say where a person or object is using a clear reference.
+- I can place a person or object in a stated relative position.
 
 **Question Allocation:** Pre-Test 0; Post-Test 10
 
@@ -99,16 +99,15 @@ This blueprint defines Starpath assessment content only. The assessment engine, 
 
 - `position-without-reference`: Position without a reference - Uses a position word without identifying the object or location it is relative to.
 - `viewpoint-left-right`: Viewpoint and left-right - Assumes left and right remain fixed when the viewpoint changes.
-- `route-start-order`: Route start and order - Follows or gives correct-looking moves without preserving the starting point and instruction order.
 
 **Curriculum Mapping:** **mapped-unverified**; weeks 4, 5, 6, 7, 8. Mapped to Starpath Weeks 4, 5, 6, 7, 8; full lesson and weekly-quiz coverage must pass before independent-bank authoring.
 
 **Question Blueprint**
 
 - Pre-Test: Not applicable for Foundation.
-- Post-Test: Build a small scene from positional instructions.
+- Post-Test: Build a small scene from relative-position instructions.
 - Post-Test: Record a position using a word or oral choice after constructing it.
-- Post-Test: Carry out and check an ordered movement sequence.
+- Post-Test: Interpret several location clues that use named references.
 
 ## Year 1
 
@@ -204,7 +203,7 @@ This blueprint defines Starpath assessment content only. The assessment engine, 
 
 ### AC9M2SP01
 
-**Descriptor:** Recognise, compare and classify shapes, referencing the number of sides and using spatial terms such as opposite, parallel, curved and straight.
+**Descriptor:** recognise, compare and classify shapes, referencing the number of sides and using spatial terms such as opposite, parallel, curved and straight
 
 **Learning Intentions**
 
@@ -230,7 +229,7 @@ This blueprint defines Starpath assessment content only. The assessment engine, 
 - `straight-curved-boundary`: Straight and curved boundaries - Treats a curved boundary as a straight side or ignores mixed boundary types.
 - `parallel-opposite-confusion`: Parallel and opposite confusion - Interchanges parallel sides with opposite sides or assumes every opposite pair is parallel.
 
-**Curriculum Mapping:** **mapped-unverified**; weeks 1, 2, 3, 4, 8. Mapped to Starpath Weeks 1, 2, 3, 4, 8; full lesson and weekly-quiz coverage must pass before independent-bank authoring.
+**Curriculum Mapping:** **aligned**; weeks 1, 2, 3, 4, 8. Aligned to audited Starpath Weeks 1, 2, 3, 4, 8; all 24 lessons and seven independent weekly quizzes passed Level 2 curriculum validation.
 
 **Question Blueprint**
 
@@ -242,7 +241,7 @@ This blueprint defines Starpath assessment content only. The assessment engine, 
 
 ### AC9M2SP02
 
-**Descriptor:** Locate and identify positions of features in two-dimensional representations and move position by following directions and pathways.
+**Descriptor:** locate positions in two-dimensional representations of a familiar space; move positions by following directions and pathways
 
 **Learning Intentions**
 
@@ -269,7 +268,7 @@ This blueprint defines Starpath assessment content only. The assessment engine, 
 - `map-viewpoint`: Map viewpoint - Interprets a top-view representation as though it were a front-view scene.
 - `map-relative-location`: Relative landmark location - Locates a landmark without preserving its stated relationship to another landmark.
 
-**Curriculum Mapping:** **mapped-unverified**; weeks 5, 6, 7, 8. Mapped to Starpath Weeks 5, 6, 7, 8; full lesson and weekly-quiz coverage must pass before independent-bank authoring.
+**Curriculum Mapping:** **aligned**; weeks 5, 6, 7, 8. Aligned to audited Starpath Weeks 5, 6, 7, 8; all 24 lessons and seven independent weekly quizzes passed Level 2 curriculum validation.
 
 **Question Blueprint**
 

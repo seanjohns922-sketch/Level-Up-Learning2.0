@@ -261,7 +261,7 @@ Students compare and classify familiar shapes and objects, then give and follow 
 
 ### Assessment Metadata
 
-- Pre-test: `y1-space-pre-01` (20 questions; planned)
+- Pre-test: `y1-space-pre-01` (20 questions; implemented)
 - Post-test: `y1-space-post-01` (20 questions; unlocks after `y1-space-w8-l3`; implemented)
 
 ### Skill Taxonomy
@@ -451,14 +451,14 @@ Students compare and classify familiar shapes and objects, then give and follow 
 
 **Canonical level:** `level-2`
 **Program ID:** `y2-space`
-**Status:** planned
+**Status:** implemented
 
 Space Mappers recognise shape features using number of sides and spatial terms, then read two-dimensional maps and follow and give pathways across Starpath.
 
 ### Curriculum Alignment
 
-- **AC9M2SP01:** Recognise, compare and classify shapes, referencing the number of sides and using spatial terms such as opposite, parallel, curved and straight.
-- **AC9M2SP02:** Locate and identify positions of features in two-dimensional representations and move position by following directions and pathways.
+- **AC9M2SP01:** recognise, compare and classify shapes, referencing the number of sides and using spatial terms such as opposite, parallel, curved and straight
+- **AC9M2SP02:** locate positions in two-dimensional representations of a familiar space; move positions by following directions and pathways
 
 **Achievement-standard connection:** Students compare and classify shapes using number of sides and spatial terms, locate positions in two-dimensional representations and follow and give directions and pathways.
 
@@ -477,7 +477,7 @@ Space Mappers recognise shape features using number of sides and spatial terms, 
 
 ### Assessment Metadata
 
-- Pre-test: `y2-space-pre-01` (20 questions; planned)
+- Pre-test: `y2-space-pre-01` (20 questions; implemented)
 - Post-test: `y2-space-post-01` (20 questions; unlocks after `y2-space-w8-l3`; implemented)
 
 ### Skill Taxonomy

@@ -179,7 +179,7 @@ const LEVEL_DEFINITIONS: LevelDefinition[] = [
   {
     level: "level-2", yearLabel: "Year 2", prefix: "y2", title: "Starpath Level 2: Space Mapper",
     summary: "Space Mappers recognise shape features using number of sides and spatial terms, then read two-dimensional maps and follow and give pathways across Starpath.",
-    descriptors: [descriptor("AC9M2SP01", "Recognise, compare and classify shapes, referencing the number of sides and using spatial terms such as opposite, parallel, curved and straight."), descriptor("AC9M2SP02", "Locate and identify positions of features in two-dimensional representations and move position by following directions and pathways.")],
+    descriptors: [descriptor("AC9M2SP01", "recognise, compare and classify shapes, referencing the number of sides and using spatial terms such as opposite, parallel, curved and straight"), descriptor("AC9M2SP02", "locate positions in two-dimensional representations of a familiar space; move positions by following directions and pathways")],
     achievementStandardConnection: "Students compare and classify shapes using number of sides and spatial terms, locate positions in two-dimensional representations and follow and give directions and pathways.",
     prerequisites: ["Compare and classify familiar shapes.", "Give and follow ordered directions."],
     likelyMisconceptions: ["A curved edge counts as a straight side.", "Turning a shape changes its number of sides.", "Places have no fixed position on a map."],
@@ -691,7 +691,7 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
           ? "implemented"
           : STARPATH_PROGRAM_STATUS,
       },
-      status: definition.prefix === "ground" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
+      status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
     };
   });
 
@@ -711,14 +711,14 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
       ...week.skill,
       level: definition.level,
       weeks: [index + 1],
-      status: definition.prefix === "ground" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
+      status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
     })),
     weeks,
     assessments: {
-      preTest: definition.level === "ground" ? null : { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: STARPATH_PROGRAM_STATUS },
+      preTest: definition.level === "ground" ? null : { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: definition.prefix === "y1" || definition.prefix === "y2" ? "implemented" : STARPATH_PROGRAM_STATUS },
       postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" ? "implemented" : STARPATH_PROGRAM_STATUS },
     },
-    status: definition.prefix === "ground" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
+    status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
   };
 }
 
