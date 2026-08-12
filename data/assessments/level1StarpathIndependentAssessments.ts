@@ -116,6 +116,7 @@ function routeDebug(prompt: string, start: Cell, correctRoute: Direction[], wron
 
 function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion {
   const formLabel = form === "pretest" ? "pre" : "post";
+  const task = { ...spec.task, presentation: "assessment" as const };
   return {
     schemaVersion: 1,
     id: `y1-starpath-${formLabel}-${String(index + 1).padStart(2, "0")}-v1`,
@@ -138,8 +139,8 @@ function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion
     misconceptionTags: spec.misconceptionTags,
     contextKey: spec.contextKey,
     structureKey: spec.structureKey,
-    prompt: spec.task.prompt,
-    renderer: { type: "starpath_assessment_task", payload: spec.task },
+    prompt: task.prompt,
+    renderer: { type: "starpath_assessment_task", payload: task },
     scoring: { kind: "interaction", correctResponse: CORRECT_TOKEN },
     statistics: createUncalibratedItemStatistics(spec.difficulty),
     type: "starpathTask",
@@ -152,8 +153,8 @@ function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion
     strand: "Space",
     curriculumCodes: [spec.descriptor],
     difficultyBand: "level-1-starpath",
-    visual: { type: "starpath_level1_assessment", taskKind: spec.task.kind },
-    practiceTask: spec.task,
+    visual: { type: "starpath_level1_assessment", taskKind: task.kind },
+    practiceTask: task,
   };
 }
 
@@ -161,9 +162,9 @@ const PRETEST_SPECS: readonly ItemSpec[] = [
   { descriptor: "AC9M1SP01", week: 1, lesson: 1, skillId: "compare_shape_features", skillLabel: "Compare Shape Features", difficulty: "easy", cognitiveCategory: "recall", responseMode: "selected_response", misconceptionTags: ["shape-feature-count"], contextKey: "pre-triangle-three-sides", structureKey: "select-feature-from-one-shape", task: selectedShape("Which statement is true?", [{ id: "t", shape: "triangle", colour: "#22d3ee", scale: 1 }], [{ id: "three", label: "It has 3 straight sides." }, { id: "four", label: "It has 4 straight sides." }, { id: "round", label: "It is round." }], "three") },
   { descriptor: "AC9M1SP01", week: 1, lesson: 2, skillId: "recognise_turned_shapes", skillLabel: "Recognise Turned Shapes", difficulty: "easy", cognitiveCategory: "recall", responseMode: "selected_response", misconceptionTags: ["shape-orientation-invariance"], contextKey: "pre-turned-square", structureKey: "identify-shape-after-turn", task: selectedShape("Which name matches this shape?", [{ id: "s", shape: "square", colour: "#f472b6", scale: 1 }], [{ id: "square", label: "Square" }, { id: "triangle", label: "Triangle" }, { id: "circle", label: "Circle" }], "square") },
   { descriptor: "AC9M1SP01", week: 2, lesson: 1, skillId: "classify_shapes", skillLabel: "Classify Shapes", difficulty: "easy", cognitiveCategory: "recall", responseMode: "selected_response", misconceptionTags: ["classification-single-rule"], contextKey: "pre-round-pair", structureKey: "name-shared-feature", task: selectedShape("Why do these belong together?", [{ id: "c", shape: "circle", colour: "#fde047", scale: 1 }, { id: "o", shape: "oval", colour: "#67e8f9", scale: 1 }], [{ id: "round", label: "Both are round." }, { id: "colour", label: "Both are the same colour." }, { id: "corners", label: "Both have corners." }], "round") },
-  { descriptor: "AC9M1SP01", week: 4, lesson: 1, skillId: "compare_objects", skillLabel: "Compare Everyday Objects", difficulty: "easy", cognitiveCategory: "recall", responseMode: "selected_response", misconceptionTags: ["shape-in-object"], contextKey: "pre-clock-ball", structureKey: "compare-object-outline", task: objectCompare("What is the same about these objects?", "clock", "ball", [{ id: "round", label: "Both are round." }, { id: "corners", label: "Both have 4 corners." }, { id: "triangle", label: "Both are triangles." }], "round") },
-  { descriptor: "AC9M1SP01", week: 2, lesson: 2, skillId: "classify_by_sides", skillLabel: "Classify by Sides", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "selected_response", misconceptionTags: ["shape-colour-size"], contextKey: "pre-different-colour-four-sides", structureKey: "ignore-colour-use-sides", task: selectedShape("Which shape belongs with the square?", [{ id: "s", shape: "square", colour: "#22d3ee", scale: 0.9 }], [{ id: "rect", label: "The rectangle with 4 straight sides" }, { id: "circle", label: "The circle with no sides" }, { id: "tri", label: "The triangle with 3 sides" }], "rect", "belongs") },
-  { descriptor: "AC9M1SP01", week: 3, lesson: 1, skillId: "find_shapes_in_objects", skillLabel: "Find Shapes in Objects", difficulty: "moderate", cognitiveCategory: "understanding", responseMode: "selected_response", misconceptionTags: ["shape-in-object"], contextKey: "pre-window-door", structureKey: "compare-object-parts", task: objectCompare("What shape can you find in both objects?", "window", "door", [{ id: "rectangle", label: "Rectangle" }, { id: "circle", label: "Circle" }, { id: "triangle", label: "Triangle" }], "rectangle") },
+  { descriptor: "AC9M1SP01", week: 4, lesson: 1, skillId: "compare_objects", skillLabel: "Compare Everyday Objects", difficulty: "easy", cognitiveCategory: "recall", responseMode: "selected_response", misconceptionTags: ["shape-in-object"], contextKey: "pre-clock-ball", structureKey: "compare-object-outline", task: objectCompare("How are the clock and ball alike?", "clock", "ball", [{ id: "round", label: "Both are round." }, { id: "corners", label: "Both have 4 corners." }, { id: "triangle", label: "Both are triangles." }], "round") },
+  { descriptor: "AC9M1SP01", week: 2, lesson: 2, skillId: "classify_by_sides", skillLabel: "Classify by Sides", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "selected_response", misconceptionTags: ["shape-colour-size"], contextKey: "pre-different-colour-four-sides", structureKey: "ignore-colour-use-sides", task: selectedShape("Which shape belongs with the square?", [{ id: "s", shape: "square", colour: "#22d3ee", scale: 0.9 }], [{ id: "rect", label: "Rectangle: 4 straight sides" }, { id: "circle", label: "Circle: no straight sides" }, { id: "tri", label: "Triangle: 3 straight sides" }], "rect", "belongs") },
+  { descriptor: "AC9M1SP01", week: 3, lesson: 1, skillId: "find_shapes_in_objects", skillLabel: "Find Shapes in Objects", difficulty: "moderate", cognitiveCategory: "understanding", responseMode: "selected_response", misconceptionTags: ["shape-in-object"], contextKey: "pre-window-door", structureKey: "compare-object-parts", task: objectCompare("Which shape matches the window and door?", "window", "door", [{ id: "rectangle", label: "Rectangle" }, { id: "circle", label: "Circle" }, { id: "triangle", label: "Triangle" }], "rectangle") },
   { descriptor: "AC9M1SP01", week: 5, lesson: 1, skillId: "construct_shapes", skillLabel: "Construct Familiar Shapes", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "manipulated_response", misconceptionTags: ["shape-feature-count"], contextKey: "pre-build-triangle", structureKey: "construct-three-sided-shape", task: workshop("construct", "triangle", [...SHAPES.triangle]) },
   { descriptor: "AC9M1SP01", week: 5, lesson: 2, skillId: "repair_shapes", skillLabel: "Repair Familiar Shapes", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "manipulated_response", misconceptionTags: ["shape-feature-count"], contextKey: "pre-repair-square", structureKey: "repair-one-missing-edge", task: workshop("repair", "square", [...SHAPES.square], 2) },
   { descriptor: "AC9M1SP01", week: 4, lesson: 3, skillId: "match_objects_by_shape", skillLabel: "Match Objects by Shape", difficulty: "moderate", cognitiveCategory: "understanding", responseMode: "manipulated_response", misconceptionTags: ["shape-in-object"], contextKey: "pre-object-pairs-a", structureKey: "pair-four-objects-by-outline", task: objectMatch("Match objects with the same outline.", [{ id: "clock", objectId: "clock" }, { id: "ball", objectId: "ball" }, { id: "door", objectId: "door" }, { id: "book", objectId: "book" }]) },
@@ -185,8 +186,8 @@ const POSTTEST_TASKS: readonly StarpathAssessmentTask[] = [
   selectedShape("What is the name of this four-sided shape?", [{ id: "s", shape: "square", colour: "#a78bfa", scale: 0.75 }], [{ id: "triangle", label: "Triangle" }, { id: "circle", label: "Circle" }, { id: "square", label: "Square" }], "square"),
   selectedShape("What feature do these shapes share?", [{ id: "o", shape: "oval", colour: "#f472b6", scale: 0.85 }, { id: "c", shape: "circle", colour: "#34d399", scale: 0.7 }], [{ id: "corners", label: "They have corners." }, { id: "round", label: "They are round." }, { id: "colour", label: "They are the same colour." }], "round"),
   objectCompare("How are the wheel and clock alike?", "wheel", "clock", [{ id: "four", label: "Both have 4 corners." }, { id: "round", label: "Both are round." }, { id: "triangle", label: "Both are triangles." }], "round"),
-  selectedShape("Which shape joins this four-sided group?", [{ id: "s", shape: "square", colour: "#fde047", scale: 0.8 }], [{ id: "rect", label: "A blue rectangle" }, { id: "circle", label: "A yellow circle" }, { id: "tri", label: "A green triangle" }], "rect", "belongs"),
-  objectCompare("Which main shape appears in both objects?", "book", "tv", [{ id: "circle", label: "Circle" }, { id: "rectangle", label: "Rectangle" }, { id: "triangle", label: "Triangle" }], "rectangle"),
+  selectedShape("Which shape joins this four-sided group?", [{ id: "s", shape: "square", colour: "#fde047", scale: 0.8 }], [{ id: "rect", label: "Rectangle" }, { id: "circle", label: "Circle" }, { id: "tri", label: "Triangle" }], "rect", "belongs"),
+  objectCompare("Which shape matches the book and TV?", "book", "tv", [{ id: "circle", label: "Circle" }, { id: "rectangle", label: "Rectangle" }, { id: "triangle", label: "Triangle" }], "rectangle"),
   { ...workshop("construct", "triangle", [{ r: 4, c: 0 }, { r: 1, c: 2 }, { r: 4, c: 4 }]), prompt: "Build a three-sided shape." },
   { ...workshop("repair", "square", [{ r: 0, c: 0 }, { r: 0, c: 4 }, { r: 4, c: 4 }, { r: 4, c: 0 }], 1), prompt: "Add the missing side to finish the square." },
   objectMatch("Pair every object with a shape partner.", [{ id: "wheel", objectId: "wheel" }, { id: "clock", objectId: "clock" }, { id: "present", objectId: "present" }, { id: "frame", objectId: "frame" }]),

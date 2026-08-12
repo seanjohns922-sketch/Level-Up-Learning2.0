@@ -170,22 +170,41 @@ export function StarpathObjectCompareCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  const isAssessment = task.presentation === "assessment";
   return (
     <div>
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
-      <div className="mx-auto mb-5 grid max-w-md grid-cols-2 gap-4">
+      <div className={isAssessment ? "mx-auto mb-5 grid max-w-lg grid-cols-2 gap-3 sm:gap-4" : "mx-auto mb-5 grid max-w-md grid-cols-2 gap-4"}>
         {[task.left, task.right].map((objectId, index) => (
           <div
             key={`${objectId}-${index}`}
-            className="flex min-h-40 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm"
+            className={isAssessment
+              ? "flex min-h-36 flex-col items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+              : "flex min-h-40 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm"}
           >
-            <WorldObjectVisual objectId={objectId} className="block h-24 w-24" />
+            <WorldObjectVisual objectId={objectId} className={isAssessment ? "block h-20 w-20 sm:h-24 sm:w-24" : "block h-24 w-24"} />
             <span className="text-sm font-black capitalize text-indigo-950">{getWorldObject(objectId).label}</span>
           </div>
         ))}
       </div>
-      <div className={["mx-auto grid max-w-lg gap-3", task.options.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"].join(" ")}>
-        {task.options.map((option) => (
+      <div className={isAssessment
+        ? ["mx-auto grid gap-3", task.options.length === 2 ? "max-w-lg grid-cols-2" : "max-w-2xl grid-cols-1 sm:grid-cols-3"].join(" ")
+        : ["mx-auto grid max-w-lg gap-3", task.options.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"].join(" ")}>
+        {task.options.map((option) => isAssessment ? (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="grid min-h-16 grid-cols-[minmax(0,1fr)_48px] items-stretch overflow-hidden rounded-lg border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+          >
+            <span className="flex min-w-0 items-center justify-center px-3 py-3 text-center text-base font-black text-indigo-950 sm:text-lg">
+              {option.label}
+            </span>
+            <span className="flex items-center justify-center border-l border-slate-200">
+              <OptionReadAloudButton text={option.label} />
+            </span>
+          </button>
+        ) : (
           <button
             key={option.id}
             type="button"

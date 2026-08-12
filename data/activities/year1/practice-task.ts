@@ -3221,6 +3221,7 @@ export type PracticeTask = (
       };
       options?: Array<{ id: string; label: string }>;
       correctOptionId?: string;
+      presentation?: "assessment";
       feedback: { correct: string; wrong: string };
     }
   | {
@@ -3245,6 +3246,7 @@ export type PracticeTask = (
       right: string;
       options: Array<{ id: string; label: string }>;
       correctOptionId: string;
+      presentation?: "assessment";
       feedback: { correct: string; wrong: string };
     }
   | {
@@ -3256,6 +3258,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       objects: Array<{ id: string; objectId: string }>;
+      presentation?: "assessment";
       feedback: { correct: string; wrong: string };
     }
   | {
@@ -3281,6 +3284,7 @@ export type PracticeTask = (
       specimens: Array<{ id: string; shape: StarpathShape; colour: string; scale: number }>;
       options: Array<{ id: string; label: string }>;
       correctOptionId: string;
+      presentation?: "assessment";
       feedback: { correct: string; wrong: string };
     }
   | {

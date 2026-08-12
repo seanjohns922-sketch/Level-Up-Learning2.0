@@ -303,6 +303,7 @@ export function StarpathShapeClassifyCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  const isAssessment = task.presentation === "assessment";
   const caption =
     task.mode === "belongs"
       ? "Which family does it join?"
@@ -312,9 +313,12 @@ export function StarpathShapeClassifyCard({
   return (
     <div>
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
-      <div className="mx-auto mb-5 flex w-full max-w-md flex-col items-center rounded-2xl border-2 border-cyan-300 bg-cyan-50 p-4">
-        <span className="text-xs font-black uppercase tracking-[0.16em] text-cyan-800">{caption}</span>
-        <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
+      <div className={[
+        "mx-auto mb-5 flex w-full max-w-md flex-col items-center border bg-cyan-50 p-4",
+        isAssessment ? "rounded-lg border-cyan-200" : "rounded-2xl border-2 border-cyan-300",
+      ].join(" ")}>
+        {!isAssessment ? <span className="text-xs font-black uppercase tracking-[0.16em] text-cyan-800">{caption}</span> : null}
+        <div className={isAssessment ? "flex flex-wrap items-center justify-center gap-3" : "mt-2 flex flex-wrap items-center justify-center gap-3"}>
           {task.specimens.map((specimen) => (
             <div
               key={specimen.id}
@@ -325,8 +329,24 @@ export function StarpathShapeClassifyCard({
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {task.options.map((option) => (
+      <div className={isAssessment
+        ? ["mx-auto grid gap-3", task.options.length === 3 ? "max-w-3xl grid-cols-1 sm:grid-cols-3" : "max-w-2xl grid-cols-1 sm:grid-cols-2"].join(" ")
+        : "grid grid-cols-1 gap-3 sm:grid-cols-2"}>
+        {task.options.map((option) => isAssessment ? (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            className="grid min-h-16 grid-cols-[minmax(0,1fr)_48px] items-stretch overflow-hidden rounded-lg border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+          >
+            <span className="flex min-w-0 items-center justify-center px-3 py-3 text-center text-base font-black text-indigo-950 sm:text-lg">
+              {option.label}
+            </span>
+            <span className="flex items-center justify-center border-l border-slate-200">
+              <OptionReadAloudButton text={option.label} />
+            </span>
+          </button>
+        ) : (
           <button
             key={option.id}
             type="button"
