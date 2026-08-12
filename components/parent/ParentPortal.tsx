@@ -5,12 +5,15 @@ import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
 import {
+  Activity,
   ArrowLeft,
   BookOpen,
   ChevronRight,
   Copy,
+  Gem,
   Home,
   KeyRound,
+  LayoutDashboard,
   LogOut,
   Plus,
   RotateCcw,
@@ -18,7 +21,9 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Target,
   UserPlus,
+  Users,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -146,6 +151,19 @@ function assessmentName(type: string) {
   return normalised.replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+const realmPresentation: Record<string, { image: string; accent: string; surface: string }> = {
+  number: { image: "/images/number-nexus-home-bg-y4.jpg", accent: "#0f9f88", surface: "#ecfdf8" },
+  measurement: { image: "/images/measurelands-home-bg.png", accent: "#c98218", surface: "#fff8e8" },
+  space: { image: "/images/starpath-home-bg-y4.png", accent: "#7255c7", surface: "#f4f0ff" },
+  starpath: { image: "/images/starpath-home-bg-y4.png", accent: "#7255c7", surface: "#f4f0ff" },
+};
+
+function formatAchievementDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Recently";
+  return new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short" }).format(date);
+}
+
 export function ParentShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -156,38 +174,56 @@ export function ParentShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f7f6] text-slate-950">
-      <header className="border-b border-emerald-950/10 bg-[#083c35] text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link href="/parent" className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-md bg-emerald-300 text-emerald-950">
-              <Home className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block text-xs font-bold uppercase tracking-[0.16em] text-emerald-200">Level Up Learning</span>
-              <span className="font-bold">Parent Home</span>
-            </span>
-          </Link>
-          <button type="button" onClick={signOut} className="grid h-11 w-11 place-items-center rounded-md border border-white/20" aria-label="Sign out">
-            <LogOut className="h-5 w-5" />
-          </button>
+    <div className="min-h-screen bg-[#f5f7f8] text-slate-950 lg:grid lg:grid-cols-[244px_minmax(0,1fr)]">
+      <aside className="hidden min-h-screen flex-col bg-[#092f35] px-4 py-6 text-white lg:flex">
+        <Link href="/parent" className="flex items-center gap-3 px-2">
+          <span className="grid h-11 w-11 place-items-center rounded-md bg-[#62dfb5] text-[#07362f]"><Home className="h-6 w-6" /></span>
+          <span><span className="block text-xs font-bold uppercase tracking-[0.18em] text-[#80e7c5]">Level Up Learning</span><span className="text-lg font-black">Parent Home</span></span>
+        </Link>
+        <nav className="mt-10 space-y-2" aria-label="Parent navigation">
+          <ParentNavLink href="/parent" active={pathname === "/parent"} icon={<LayoutDashboard className="h-5 w-5" />} label="Overview" />
+          <ParentNavLink href="/parent/children" active={pathname.startsWith("/parent/children")} icon={<Users className="h-5 w-5" />} label="My children" />
+          <ParentNavLink href="/parent/add-child" active={pathname === "/parent/add-child"} icon={<Plus className="h-5 w-5" />} label="Add a child" />
+          <ParentNavLink href="/parent/link-child" active={pathname === "/parent/link-child"} icon={<UserPlus className="h-5 w-5" />} label="Link a child" />
+        </nav>
+        <div className="mt-auto border-t border-white/10 pt-5">
+          <div className="mb-4 rounded-md border border-white/10 bg-white/[0.05] p-4"><p className="text-xs font-bold uppercase tracking-wider text-[#80e7c5]">Home Access</p><p className="mt-2 font-black">2026 Free Access</p><p className="mt-1 text-xs text-white/60">Access status appears for each child.</p></div>
+          <button type="button" onClick={signOut} className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 font-bold text-white/75 hover:bg-white/10 hover:text-white"><LogOut className="h-5 w-5" /> Sign out</button>
         </div>
-      </header>
-      {pathname !== "/parent" && pathname !== "/parent/children" ? (
-        <div className="mx-auto max-w-6xl px-4 pt-5 sm:px-6">
-          <Link href="/parent" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-emerald-800">
-            <ArrowLeft className="h-4 w-4" /> Parent Home
-          </Link>
-        </div>
-      ) : null}
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+      </aside>
+      <div className="min-w-0">
+        <header className="border-b border-slate-200 bg-white lg:hidden">
+          <div className="flex items-center justify-between px-4 py-3">
+            <Link href="/parent" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-emerald-200 text-emerald-950"><Home className="h-5 w-5" /></span><span className="font-black">Parent Home</span></Link>
+            <button type="button" onClick={signOut} className="grid h-10 w-10 place-items-center rounded-md border border-slate-200" aria-label="Sign out"><LogOut className="h-5 w-5" /></button>
+          </div>
+          <nav className="flex gap-1 overflow-x-auto border-t border-slate-100 px-3 py-2" aria-label="Parent navigation">
+            <ParentMobileNav href="/parent" label="Overview" active={pathname === "/parent"} />
+            <ParentMobileNav href="/parent/children" label="Children" active={pathname.startsWith("/parent/children")} />
+            <ParentMobileNav href="/parent/add-child" label="Add child" active={pathname === "/parent/add-child"} />
+            <ParentMobileNav href="/parent/link-child" label="Link child" active={pathname === "/parent/link-child"} />
+          </nav>
+        </header>
+        {pathname !== "/parent" && pathname !== "/parent/children" ? <div className="mx-auto max-w-[1320px] px-4 pt-4 sm:px-6"><Link href="/parent" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-emerald-800"><ArrowLeft className="h-4 w-4" /> Parent Home</Link></div> : null}
+        <main className="mx-auto max-w-[1320px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">{children}</main>
+      </div>
     </div>
   );
+}
+
+function ParentNavLink({ href, active, icon, label }: { href: string; active: boolean; icon: ReactNode; label: string }) {
+  return <Link href={href} className={`flex min-h-12 items-center gap-3 rounded-md px-4 font-bold transition ${active ? "bg-[#62dfb5] text-[#07362f]" : "text-white/70 hover:bg-white/10 hover:text-white"}`}>{icon}{label}</Link>;
+}
+
+function ParentMobileNav({ href, label, active }: { href: string; label: string; active: boolean }) {
+  return <Link href={href} className={`shrink-0 rounded-md px-3 py-2 text-sm font-bold ${active ? "bg-emerald-100 text-emerald-900" : "text-slate-600"}`}>{label}</Link>;
 }
 
 export function ParentHome({ selectedStudentId }: { selectedStudentId?: string }) {
   const router = useRouter();
   const [children, setChildren] = useState<ParentChild[]>([]);
+  const [activeStudentId, setActiveStudentId] = useState(selectedStudentId ?? "");
+  const [parentName, setParentName] = useState("there");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -199,11 +235,20 @@ export function ParentHome({ selectedStudentId }: { selectedStudentId?: string }
       router.replace("/login");
       return;
     }
+    const displayName = typeof auth.user.user_metadata?.display_name === "string"
+      ? auth.user.user_metadata.display_name.trim()
+      : "";
+    const emailName = auth.user.email?.split("@")[0]?.split(/[._-]/)[0] ?? "";
+    setParentName(displayName.split(" ")[0] || (emailName ? emailName.charAt(0).toUpperCase() + emailName.slice(1) : "there"));
     const { data, error: loadError } = await supabase.rpc("get_parent_home_snapshot");
     if (loadError) setError("Parent Home could not be loaded. Please try again.");
-    else setChildren((data as { children?: ParentChild[] } | null)?.children ?? []);
+    else {
+      const loadedChildren = (data as { children?: ParentChild[] } | null)?.children ?? [];
+      setChildren(loadedChildren);
+      setActiveStudentId((current) => selectedStudentId ?? (current || loadedChildren[0]?.studentId || ""));
+    }
     setLoading(false);
-  }, [router]);
+  }, [router, selectedStudentId]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => void load(), 0);
@@ -213,27 +258,25 @@ export function ParentHome({ selectedStudentId }: { selectedStudentId?: string }
   if (loading) return <ParentSkeleton />;
   if (error) return <Notice message={error} />;
 
-  const visibleChildren = selectedStudentId
-    ? children.filter((child) => child.studentId === selectedStudentId)
-    : children;
-  if (selectedStudentId && visibleChildren.length === 0) {
+  const activeChild = children.find((child) => child.studentId === activeStudentId) ?? children[0] ?? null;
+  if (selectedStudentId && !activeChild) {
     return <Notice message="This child is not linked to your Parent account." />;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-7">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Parent overview</p>
-          <h1 className="mt-1 text-3xl font-black">{selectedStudentId ? visibleChildren[0]?.displayName : "Your children"}</h1>
-          <p className="mt-2 text-slate-600">Clear, read-only progress from the child’s learning record.</p>
+          <p className="text-sm font-semibold text-slate-500">Welcome back,</p>
+          <h1 className="mt-1 text-3xl font-black sm:text-4xl">{parentName}</h1>
+          <p className="mt-2 text-slate-600">Here&apos;s how your {children.length === 1 ? "child is" : "children are"} progressing.</p>
         </div>
         {!selectedStudentId ? (
           <div className="flex flex-wrap gap-2">
-            <Link href="/parent/add-child" className="inline-flex min-h-11 items-center gap-2 rounded-md bg-emerald-700 px-4 font-bold text-white">
+            <Link href="/parent/add-child" className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#087d61] px-4 font-bold text-white shadow-sm hover:bg-[#06684f]">
               <Plus className="h-5 w-5" /> Add new child
             </Link>
-            <Link href="/parent/link-child" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 font-bold text-slate-800">
+            <Link href="/parent/link-child" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 font-bold text-slate-800 shadow-sm hover:border-emerald-500">
               <UserPlus className="h-5 w-5" /> Link existing child
             </Link>
           </div>
@@ -241,7 +284,7 @@ export function ParentHome({ selectedStudentId }: { selectedStudentId?: string }
       </div>
 
       {children.length === 0 ? (
-        <section className="border border-slate-200 bg-white p-7 shadow-sm">
+        <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
           <KeyRound className="h-8 w-8 text-emerald-700" />
           <h2 className="mt-4 text-xl font-black">Add your child to get started</h2>
           <p className="mt-2 max-w-xl text-slate-600">Create a new Home learner, or link a child who already uses Level Up Learning at school.</p>
@@ -251,15 +294,16 @@ export function ParentHome({ selectedStudentId }: { selectedStudentId?: string }
           </div>
         </section>
       ) : (
-        <div className={selectedStudentId ? "max-w-3xl" : "grid gap-5 md:grid-cols-2"}>
-          {visibleChildren.map((child) => <ChildCard key={child.studentId} child={child} onActivated={load} showOpen={!selectedStudentId} />)}
-        </div>
+        <>
+          {!selectedStudentId ? <section><div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-black">Your children</h2><span className="text-sm font-semibold text-slate-500">{children.length} linked</span></div><div className="flex gap-3 overflow-x-auto pb-2">{children.map((child) => <button type="button" key={child.studentId} onClick={() => setActiveStudentId(child.studentId)} className={`flex min-w-[230px] items-center gap-3 rounded-lg border bg-white p-3 text-left shadow-sm transition ${activeChild?.studentId === child.studentId ? "border-emerald-500 ring-2 ring-emerald-100" : "border-slate-200 hover:border-slate-300"}`}><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-emerald-100 text-lg font-black text-emerald-900">{child.firstName.slice(0, 1).toUpperCase()}</span><span className="min-w-0 flex-1"><span className="block truncate font-black">{child.displayName}</span><span className="block truncate text-xs text-slate-500">{child.yearLevel ?? "Year not set"} · {child.schoolName ?? "Home learner"}</span></span><ChevronRight className="h-4 w-4 text-slate-400" /></button>)}</div></section> : null}
+          {activeChild ? <SelectedChildDashboard child={activeChild} onActivated={load} /> : null}
+        </>
       )}
     </div>
   );
 }
 
-function ChildCard({ child, onActivated, showOpen }: { child: ParentChild; onActivated: () => Promise<void>; showOpen: boolean }) {
+function SelectedChildDashboard({ child, onActivated }: { child: ParentChild; onActivated: () => Promise<void> }) {
   const [activating, setActivating] = useState(false);
   const [activationError, setActivationError] = useState<string | null>(null);
 
@@ -272,60 +316,36 @@ function ChildCard({ child, onActivated, showOpen }: { child: ParentChild; onAct
     setActivating(false);
   }
 
+  const focusRealm = child.realms.find((realm) => realm.currentFocus) ?? child.realms[0] ?? null;
+
   return (
-    <article className="border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-100 text-lg font-black text-emerald-900" aria-hidden="true">
-            {child.firstName.slice(0, 1).toUpperCase()}
-          </span>
-          <div className="min-w-0">
-            <h2 className="truncate text-xl font-black">{child.displayName}</h2>
-            <p className="mt-1 flex items-center gap-1 text-sm text-slate-500"><School className="h-4 w-4" /> {child.schoolName ?? "Home learner"}</p>
-            <p className="text-sm text-slate-500">{child.yearLevel ?? "Year level not set"} · {formatLastActive(child.lastActiveAt)}</p>
-          </div>
-        </div>
-        <span className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-bold ${child.homeAccess ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-700"}`}>
-          {child.homeAccess ? "Active — Free Access" : "Home Access not active"}
-        </span>
+    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
+      <div className="space-y-5">
+        <section className="relative min-h-[230px] overflow-hidden rounded-lg border border-slate-200 bg-[#11243c] text-white shadow-sm"><div className="absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: "url('/images/realm-select-bg.jpg')" }} /><div className="absolute inset-0 bg-gradient-to-r from-[#102239] via-[#102239]/90 to-[#102239]/45" /><div className="relative flex h-full min-h-[230px] flex-col justify-between p-6 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">Child overview</p><h2 className="mt-2 text-3xl font-black">{child.displayName}</h2><p className="mt-2 flex items-center gap-2 text-sm text-white/70"><School className="h-4 w-4" /> {child.yearLevel ?? "Year level not set"} · {child.schoolName ?? "Home learner"}</p></div><span className={`rounded-md px-3 py-1.5 text-xs font-black ${child.homeAccess ? "bg-emerald-300 text-emerald-950" : "bg-white/15 text-white"}`}>{child.homeAccess ? "Active — Free Access" : "Home Access inactive"}</span></div><div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4"><HeroMetric label="Realms" value={String(child.realms.length)} /><HeroMetric label="Current week" value={focusRealm?.currentWeek ? `Week ${focusRealm.currentWeek}` : "Not started"} /><HeroMetric label="Pathway" value={focusRealm ? `${focusRealm.requiredCompleted}/${focusRealm.requiredWeeks.length}` : "—"} /><HeroMetric label="Activity" value={child.lastActiveAt ? formatLastActive(child.lastActiveAt).replace("Last active ", "") : "Not started"} /></div></div></section>
+
+        <section><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Learning journey</p><h3 className="mt-1 text-xl font-black">Progress by realm</h3></div><Activity className="h-6 w-6 text-emerald-600" /></div><div className="mt-4 grid gap-3 md:grid-cols-3">{child.realms.length ? child.realms.map((realm) => <RealmProgressCard key={realm.realmId} studentId={child.studentId} realm={realm} />) : <p className="rounded-md bg-white p-4 text-sm text-slate-600 shadow-sm">Learning hasn’t started yet.</p>}</div></section>
       </div>
 
-      {!child.homeAccess ? (
-        <div className="mt-4 border-l-4 border-amber-400 bg-amber-50 p-3 text-sm">
-          <p className="font-bold text-amber-950">Home Access is not active.</p>
-          <p className="mt-1 text-amber-900">Parent linking is complete. Free Home access can be activated separately during the 2026 rollout.</p>
-          <button type="button" disabled={activating} onClick={activate} className="mt-2 min-h-11 font-bold text-emerald-800 underline">
-            {activating ? "Activating…" : "Activate free 2026 Home access"}
-          </button>
-          {activationError ? <p className="mt-2 font-bold text-red-700">{activationError}</p> : null}
-        </div>
-      ) : null}
+      <div className="space-y-5">
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-rose-50 text-rose-600"><Target className="h-5 w-5" /></span><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">This week&apos;s focus</p><h3 className="font-black">{focusRealm ? realmName(focusRealm.realmId) : "Journey not started"}</h3></div></div><p className="mt-4 text-lg font-black leading-snug">{focusRealm?.currentFocus ?? "A learning focus will appear after the first activity."}</p>{focusRealm ? <><p className="mt-2 text-sm text-slate-500">{focusRealm.workingLevel}{focusRealm.currentWeek ? ` · Week ${focusRealm.currentWeek}` : ""}</p><Link href={`/parent/children/${child.studentId}/realm/${focusRealm.realmId}`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-800">View realm progress <ChevronRight className="h-4 w-4" /></Link></> : null}</section>
 
-      <div className="mt-5 space-y-2">
-        {child.realms.length ? child.realms.map((realm) => (
-          <Link key={realm.realmId} href={`/parent/children/${child.studentId}/realm/${realm.realmId}`} className="flex min-h-16 items-center justify-between rounded-md border border-slate-200 px-3 hover:border-emerald-400">
-            <span>
-              <span className="block font-bold">{realmName(realm.realmId)}</span>
-              <span className="text-sm text-slate-500">{realm.workingLevel}{realm.currentWeek ? ` · Week ${realm.currentWeek}` : ""}</span>
-              <span className="mt-1 block text-sm text-slate-600">{realm.currentFocus ?? "Current focus not available"} · {realm.requiredCompleted} required weeks completed</span>
-            </span>
-            <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
-          </Link>
-        )) : <p className="rounded-md bg-slate-50 p-4 text-sm text-slate-600">Learning hasn’t started yet.</p>}
-      </div>
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Sparkles className="h-5 w-5 text-amber-500" /></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-violet-50 text-violet-600"><Gem className="h-5 w-5" /></span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
 
-      <div className="mt-4 border-t border-slate-100 pt-4">
-        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500"><Sparkles className="h-4 w-4" /> Recent achievements</p>
-        <p className="mt-2 text-sm font-semibold text-slate-700">
-          {child.recentAchievements.length ? child.recentAchievements.map((item) => item.name).join(" · ") : "No recent achievements yet."}
-        </p>
+        <section className={`rounded-lg border p-5 shadow-sm ${child.homeAccess ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">Home access</p><h3 className="mt-1 text-lg font-black">{child.homeAccess ? "Active — Free Access" : "Not active"}</h3></div><Home className={`h-5 w-5 ${child.homeAccess ? "text-emerald-700" : "text-amber-700"}`} /></div>{!child.homeAccess ? <><p className="mt-2 text-sm text-amber-900">Activate free Home access for the 2026 rollout.</p><button type="button" disabled={activating} onClick={activate} className="mt-3 min-h-11 rounded-md bg-emerald-700 px-4 font-bold text-white disabled:opacity-50">{activating ? "Activating…" : "Activate Home access"}</button>{activationError ? <p className="mt-2 text-sm font-bold text-red-700">{activationError}</p> : null}</> : <p className="mt-2 text-sm text-emerald-900">Learning access is available outside school as part of the 2026 rollout.</p>}<Link href={`/parent/children/${child.studentId}/settings`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-900"><Settings className="h-4 w-4" /> Login &amp; placement</Link></section>
       </div>
-      <Link href={`/parent/children/${child.studentId}/settings`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-800">
-        <Settings className="h-4 w-4" /> Login &amp; placement
-      </Link>
-      {showOpen ? <Link href={`/parent/children/${child.studentId}`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-800">Open child overview <ChevronRight className="h-4 w-4" /></Link> : null}
-    </article>
+    </div>
   );
+}
+
+function HeroMetric({ label, value }: { label: string; value: string }) {
+  return <div className="border-l-2 border-cyan-300/60 pl-3"><p className="text-[10px] font-bold uppercase tracking-wider text-white/55">{label}</p><p className="mt-1 truncate font-black text-white">{value}</p></div>;
+}
+
+function RealmProgressCard({ studentId, realm }: { studentId: string; realm: ParentRealm }) {
+  const presentation = realmPresentation[realm.realmId] ?? realmPresentation.number;
+  const totalRequired = realm.requiredWeeks.length;
+  const progress = totalRequired > 0 ? Math.min(100, Math.round((realm.requiredCompleted / totalRequired) * 100)) : 0;
+  return <Link href={`/parent/children/${studentId}/realm/${realm.realmId}`} className="group overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:shadow-md"><div className="h-20 bg-cover bg-center" style={{ backgroundImage: `linear-gradient(90deg, rgba(8,21,35,.18), rgba(8,21,35,.5)), url('${presentation.image}')` }} /><div className="p-4"><div className="flex items-start justify-between gap-3"><div><h4 className="font-black">{realmName(realm.realmId)}</h4><p className="mt-1 text-sm text-slate-500">{realm.workingLevel}{realm.currentWeek ? ` · Week ${realm.currentWeek}` : ""}</p></div><ChevronRight className="h-5 w-5 text-slate-400 transition group-hover:translate-x-0.5" /></div><div className="mt-4 flex items-center gap-3"><div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full" style={{ width: `${progress}%`, backgroundColor: presentation.accent }} /></div><span className="w-9 text-right text-xs font-black text-slate-600">{progress}%</span></div><p className="mt-3 line-clamp-2 text-sm text-slate-600">{realm.currentFocus ?? "Current focus will appear after learning begins."}</p></div></Link>;
 }
 
 export function AddHomeChild() {

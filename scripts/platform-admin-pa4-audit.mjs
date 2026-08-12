@@ -88,7 +88,7 @@ check("parent signup never retains the child PIN", has(login, "retainPendingPare
 check("parent signup linking does not create a duplicate student", !login.match(/parentLinkExisting[\s\S]{0,3000}create_home_student_for_parent/));
 check("parent client requires explicit link success", has(parent, "data.linked !== true", "child details could not be verified"));
 check("parent client requires explicit preview success", has(parent, "data.matched !== true", "Explorer Code could not be verified"));
-check("parent supports multiple child cards", parent.includes("visibleChildren.map"));
+check("parent supports multiple-child selection", has(parent, "children.map", "activeStudentId", "setActiveStudentId"));
 check("parent has neutral empty states", has(parent, "Learning hasn’t started yet.", "No assessments completed yet.", "Not Attempted"));
 check("parent has responsive child layout", parent.includes("md:grid-cols-2"));
 check("parent detail has compact mobile metrics", parent.includes("sm:grid-cols-2 lg:grid-cols-4"));
