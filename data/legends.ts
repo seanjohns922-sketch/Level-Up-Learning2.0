@@ -120,6 +120,7 @@ function starpathLegend(
   stats: LegendStats,
   front: string,
   back: string,
+  videoSlug: string,
 ): Legend {
   return {
     id,
@@ -135,6 +136,8 @@ function starpathLegend(
       cardFront: front,
       cardBack: back,
     },
+    unlockVideoUrl: legendVideoUrl(videoSlug),
+    showcaseVideoUrl: legendVideoUrl(videoSlug),
   };
 }
 
@@ -302,6 +305,7 @@ const LEGENDS: Legend[] = [
     { calculation: 35, speed: 30, accuracy: 40 },
     "/cards/geospin-explorer-y0-front.png",
     "/cards/geospin-explorer-y0-back.png",
+    "geospin-explorer",
   ),
   starpathLegend(
     "geospin-roller-y1",
@@ -312,6 +316,7 @@ const LEGENDS: Legend[] = [
     { calculation: 40, speed: 42, accuracy: 48 },
     "/cards/geospin-roller-y1-front.png",
     "/cards/geospin-roller-y1-back.png",
+    "geospin-roller",
   ),
   starpathLegend(
     "geospin-mapper-y2",
@@ -322,6 +327,7 @@ const LEGENDS: Legend[] = [
     { calculation: 50, speed: 48, accuracy: 55 },
     "/cards/geospin-mapper-y2-front.png",
     "/cards/geospin-mapper-y2-back.png",
+    "geospin-mapper",
   ),
   starpathLegend(
     "geospin-navigator-y3",
@@ -332,6 +338,7 @@ const LEGENDS: Legend[] = [
     { calculation: 58, speed: 56, accuracy: 60 },
     "/cards/geospin-navigator-y3-front.png",
     "/cards/geospin-navigator-y3-back.png",
+    "geospin-navigator",
   ),
   starpathLegend(
     "geospin-shapeshifter-y4",
@@ -342,6 +349,7 @@ const LEGENDS: Legend[] = [
     { calculation: 66, speed: 62, accuracy: 68 },
     "/cards/geospin-shapeshifter-y4-front.png",
     "/cards/geospin-shapeshifter-y4-back.png",
+    "geospin-shapeshifter",
   ),
   starpathLegend(
     "geospin-galaxycrafter-y5",
@@ -352,6 +360,7 @@ const LEGENDS: Legend[] = [
     { calculation: 76, speed: 70, accuracy: 78 },
     "/cards/geospin-galaxycrafter-y5-front.png",
     "/cards/geospin-galaxycrafter-y5-back.png",
+    "geospin-galaxycrafter",
   ),
   starpathLegend(
     "geospin-starweaver-y6",
@@ -362,6 +371,7 @@ const LEGENDS: Legend[] = [
     { calculation: 84, speed: 78, accuracy: 86 },
     "/cards/geospin-starweaver-y6-front.png",
     "/cards/geospin-starweaver-y6-back.png",
+    "geospin-starweaver",
   ),
 ];
 
