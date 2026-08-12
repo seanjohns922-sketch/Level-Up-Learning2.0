@@ -25,6 +25,8 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
+import GemIcon, { cutForGem, GEM_RARITY } from "@/components/gems/GemIcon";
+import type { GemRarity } from "@/lib/gems";
 import { supabase } from "@/lib/supabase";
 
 export type ParentRealm = {
@@ -49,8 +51,12 @@ export type ParentChild = {
   homeAccess: boolean;
   billingStatus: string | null;
   realms: ParentRealm[];
-  recentAchievements: Array<{ name: string; earnedAt: string; rarity: string }>;
+  recentAchievements: Array<{ gemId?: string; name: string; earnedAt: string; rarity: string }>;
 };
+
+function isGemRarity(value: string): value is GemRarity {
+  return value in GEM_RARITY;
+}
 
 type HomeManagement = {
   studentId: string;
@@ -329,7 +335,7 @@ function SelectedChildDashboard({ child, onActivated }: { child: ParentChild; on
       <div className="space-y-5">
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-rose-50 text-rose-600"><Target className="h-5 w-5" /></span><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">This week&apos;s focus</p><h3 className="font-black">{focusRealm ? realmName(focusRealm.realmId) : "Journey not started"}</h3></div></div><p className="mt-4 text-lg font-black leading-snug">{focusRealm?.currentFocus ?? "A learning focus will appear after the first activity."}</p>{focusRealm ? <><p className="mt-2 text-sm text-slate-500">{focusRealm.workingLevel}{focusRealm.currentWeek ? ` · Week ${focusRealm.currentWeek}` : ""}</p><Link href={`/parent/children/${child.studentId}/realm/${focusRealm.realmId}`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-800">View realm progress <ChevronRight className="h-4 w-4" /></Link></> : null}</section>
 
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Sparkles className="h-5 w-5 text-amber-500" /></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-violet-50 text-violet-600"><Gem className="h-5 w-5" /></span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Sparkles className="h-5 w-5 text-amber-500" /></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.gemId ?? item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-slate-50">{item.gemId && isGemRarity(item.rarity) ? <GemIcon rarity={item.rarity} cut={cutForGem(item.gemId, item.rarity)} size={42} /> : <Gem className="h-5 w-5 text-violet-600" />}</span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
 
         <section className={`rounded-lg border p-5 shadow-sm ${child.homeAccess ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">Home access</p><h3 className="mt-1 text-lg font-black">{child.homeAccess ? "Active — Free Access" : "Not active"}</h3></div><Home className={`h-5 w-5 ${child.homeAccess ? "text-emerald-700" : "text-amber-700"}`} /></div>{!child.homeAccess ? <><p className="mt-2 text-sm text-amber-900">Activate free Home access for the 2026 rollout.</p><button type="button" disabled={activating} onClick={activate} className="mt-3 min-h-11 rounded-md bg-emerald-700 px-4 font-bold text-white disabled:opacity-50">{activating ? "Activating…" : "Activate Home access"}</button>{activationError ? <p className="mt-2 text-sm font-bold text-red-700">{activationError}</p> : null}</> : <p className="mt-2 text-sm text-emerald-900">Learning access is available outside school as part of the 2026 rollout.</p>}<Link href={`/parent/children/${child.studentId}/settings`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-900"><Settings className="h-4 w-4" /> Login &amp; placement</Link></section>
       </div>

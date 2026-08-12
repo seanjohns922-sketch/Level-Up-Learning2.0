@@ -6,6 +6,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const migration = read("supabase/migrations/20260812100000_platform_admin_pa4_identity_parent_home.sql");
 const safety = read("supabase/migrations/20260812110000_platform_admin_pa4_safety_hardening.sql");
 const parentBoundary = read("supabase/migrations/20260812120000_platform_admin_pa4_parent_read_write_boundary.sql");
+const parentGemArtwork = read("supabase/migrations/20260813080000_parent_achievement_gem_artwork.sql");
 const safetyTests = read("supabase/tests/platform_admin_pa4_safety.sql");
 const parent = read("components/parent/ParentPortal.tsx");
 const login = read("app/login/page.tsx");
@@ -92,6 +93,8 @@ check("parent supports multiple-child selection", has(parent, "children.map", "a
 check("parent has neutral empty states", has(parent, "Learning hasn’t started yet.", "No assessments completed yet.", "Not Attempted"));
 check("parent has responsive child layout", parent.includes("md:grid-cols-2"));
 check("parent detail has compact mobile metrics", parent.includes("sm:grid-cols-2 lg:grid-cols-4"));
+check("parent snapshot returns canonical Gem identity", has(parentGemArtwork, "'gemId', definition.id", "student_gems", "gem_definitions"));
+check("parent achievements use canonical Gem artwork", has(parent, "GemIcon", "cutForGem(item.gemId, item.rarity)"));
 
 // Curriculum progress and assessment reporting.
 for (const realm of ["Number Nexus", "Measurelands", "Starpath"]) check(`parent realm label ${realm}`, parent.includes(realm));
