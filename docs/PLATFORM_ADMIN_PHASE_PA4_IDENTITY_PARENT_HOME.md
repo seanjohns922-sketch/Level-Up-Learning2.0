@@ -27,7 +27,15 @@ Multiple parents can link to one child and one parent can link to multiple child
 
 Parent relationship and Home entitlement are separate facts. Free 2026 Home access is an active `student_access_entitlements` row with `access_source = home` and `billing_status = free`. No payment provider, checkout or subscription is implemented in PA4.
 
-The parent portal is read-only. It displays canonical progression, lesson attempts, weekly quizzes and assessments for each linked child. Number Nexus, Measurelands and Starpath use the same canonical data and 85% mastery threshold as the student program. Required weeks come from `student_realm_progress`; the parent UI does not hardcode realm lengths.
+Ordinary parent learning access is read-only. It displays canonical progression, lesson attempts, weekly quizzes and assessments for each linked child. Number Nexus, Measurelands and Starpath use the same canonical data and 85% mastery threshold as the student program. Required weeks come from `student_realm_progress`; the parent UI does not hardcode realm lengths.
+
+### New Home families
+
+An authenticated parent can create a Home-only learner through one audited server transaction. The command creates one canonical student identity, the parent relationship, free 2026 Home entitlement, permanent Explorer Code, generated username, PIN credential and initial realm placement. The parent supplies the school year and a guided starting working level. Year 1-6 learners enter the pre-test; Prep learners enter Ground Level.
+
+Home-only parents can view login details, reset the PIN, adjust a starting level before canonical learning begins and reopen a pre-test before lessons, quizzes or a post-test exist. PIN reset revokes existing student sessions. Pre-test reopening records an append-only event and preserves previous assessment snapshots; superseded attempts no longer control the active journey.
+
+These management permissions end automatically when an active school entitlement, school membership or class enrolment exists. The authorised teacher or school then controls PIN resets, placement and assessment resets. The parent retains read access and the independent Home entitlement. Home students sign in with username and PIN without a class code; that Home login remains available after school linkage.
 
 ## School transfer
 

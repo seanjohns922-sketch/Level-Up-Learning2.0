@@ -16,6 +16,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  Copy,
   Clock,
   Flame,
   Lock,
@@ -252,6 +253,8 @@ export default function ProfilePage() {
   const [activityRows, setActivityRows] = useState<StudentActivityDailyRow[]>([]);
   const [persistedAccuracy, setPersistedAccuracy] = useState<number | null>(null);
   const [globalXp, setGlobalXp] = useState<{ balance: number; lifetime: number } | null>(null);
+  const [explorerCode, setExplorerCode] = useState<string | null>(null);
+  const [explorerCodeCopied, setExplorerCodeCopied] = useState(false);
   const [openTooltip, setOpenTooltip] = useState<string | null>(null);
   // Resolved after mount to avoid an SSR/client hydration mismatch on localStorage.
   const [lastRealm, setLastRealmState] = useState("number-nexus");
@@ -283,12 +286,24 @@ export default function ProfilePage() {
 
     void (async () => {
       try {
-        const fullName = await fetchStudentDisplayName(profile.studentId);
+        const [fullName, explorerCodeResponse] = await Promise.all([
+          fetchStudentDisplayName(profile.studentId),
+          supabase.rpc("get_student_explorer_code_secure", {
+            p_student_id: profile.studentId,
+          }),
+        ]);
         if (!cancelled && fullName) {
           setStudentName(fullName);
         }
+        if (!cancelled && !explorerCodeResponse.error) {
+          setExplorerCode(
+            typeof explorerCodeResponse.data === "string"
+              ? explorerCodeResponse.data
+              : null
+          );
+        }
       } catch (error) {
-        console.warn("[Profile] Failed to load student name:", error);
+        console.warn("[Profile] Failed to load student identity details:", error);
       }
     })();
 
@@ -524,6 +539,35 @@ export default function ProfilePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section>
+          <div className="rounded-xl border border-[#E6E8EC] bg-white p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-bold text-[#0F172A]">Explorer Code</h3>
+                <p className="mt-1 font-mono text-lg font-black tracking-wider text-[#0F172A]">
+                  {explorerCode ?? "Unavailable"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!explorerCode) return;
+                  void navigator.clipboard.writeText(explorerCode).then(() => {
+                    setExplorerCodeCopied(true);
+                    window.setTimeout(() => setExplorerCodeCopied(false), 1500);
+                  });
+                }}
+                disabled={!explorerCode}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#E6E8EC] text-[#64748B] transition hover:bg-[#F1F5F9] hover:text-[#0F172A] disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Copy Explorer Code"
+                title={explorerCodeCopied ? "Copied" : "Copy Explorer Code"}
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </section>
 

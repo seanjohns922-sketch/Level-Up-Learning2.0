@@ -106,6 +106,7 @@ export default function LoginPage() {
     if (typeof window === "undefined") return "";
     return new URLSearchParams(window.location.search).get("code") ?? "";
   });
+  const [studentLoginMode, setStudentLoginMode] = useState<"school" | "home">("school");
   const [studentName, setStudentName] = useState("");
   const [studentPin, setStudentPin] = useState("");
   const [studentError, setStudentError] = useState<string | null>(null);
@@ -417,35 +418,36 @@ export default function LoginPage() {
     const name = displayName;
     const pin = studentPin.trim();
 
-    if (!normalizedCode || !name || pin.length !== 4) {
-      failCurrentAttempt("Please enter class code, username, and password.");
+    if ((studentLoginMode === "school" && !normalizedCode) || !name || pin.length !== 4) {
+      failCurrentAttempt(studentLoginMode === "school" ? "Please enter class code, username, and password." : "Please enter username and password.");
       return;
     }
 
-    const { data: lookupRows, error: classLookupError } = await supabase
-      .rpc("find_class_by_code", { input_code: normalizedCode });
-    const cls = Array.isArray(lookupRows) ? lookupRows[0] ?? null : null;
-
-    if (!isCurrentAttempt()) return;
-    if (classLookupError) {
-      failCurrentAttempt(
-        isServiceUnavailableError(classLookupError)
-          ? "The login service is temporarily unavailable. Please try again shortly."
-          : "The class could not be checked. Please try again.",
-      );
-      return;
+    let studentRows;
+    let studentErr;
+    if (studentLoginMode === "home") {
+      ({ data: studentRows, error: studentErr } = await supabase.rpc("home_student_login_lookup", {
+        p_username: displayName.trim(),
+        p_pin: pin,
+      }));
+    } else {
+      const { data: lookupRows, error: classLookupError } = await supabase.rpc("find_class_by_code", { input_code: normalizedCode });
+      const cls = Array.isArray(lookupRows) ? lookupRows[0] ?? null : null;
+      if (!isCurrentAttempt()) return;
+      if (classLookupError) {
+        failCurrentAttempt(isServiceUnavailableError(classLookupError) ? "The login service is temporarily unavailable. Please try again shortly." : "The class could not be checked. Please try again.");
+        return;
+      }
+      if (!cls) {
+        failCurrentAttempt("Class code not found.");
+        return;
+      }
+      ({ data: studentRows, error: studentErr } = await supabase.rpc("student_login_lookup", {
+        p_class_id: cls.id,
+        p_display_name: displayName.trim(),
+        p_pin: pin,
+      }));
     }
-    if (!cls) {
-      failCurrentAttempt("Class code not found.");
-      return;
-    }
-
-    // Look up student server-side — SECURITY DEFINER bypasses RLS entirely, no auth needed
-    const { data: studentRows, error: studentErr } = await supabase.rpc("student_login_lookup", {
-      p_class_id: cls.id,
-      p_display_name: displayName.trim(),
-      p_pin: pin,
-    });
 
     const student = Array.isArray(studentRows) ? studentRows[0] : studentRows;
     if (!isCurrentAttempt()) return;
@@ -458,7 +460,7 @@ export default function LoginPage() {
       return;
     }
     if (!student?.student_id) {
-      failCurrentAttempt("Username or password not recognised. Ask your teacher to check your details.");
+      failCurrentAttempt(studentLoginMode === "home" ? "Username or password not recognised. Ask your parent to check your login details." : "Username or password not recognised. Ask your teacher to check your details.");
       return;
     }
     if (!student.session_token) {
@@ -840,12 +842,15 @@ export default function LoginPage() {
         {/* ── Student Form ── */}
         {tab === "student" ? (
           <div className="grid gap-4">
-            <label className="grid gap-1.5">
+            <div className="grid grid-cols-2 gap-1 rounded-xl border border-white/10 bg-black/10 p-1">
+              {(["school", "home"] as const).map((mode) => <button key={mode} type="button" onClick={() => { setStudentLoginMode(mode); setStudentError(null); }} className="rounded-lg py-2 text-xs font-bold uppercase transition" style={{ background: studentLoginMode === mode ? "rgba(255,255,255,0.12)" : "transparent", color: studentLoginMode === mode ? "white" : "rgba(255,255,255,0.45)" }}>{mode}</button>)}
+            </div>
+            {studentLoginMode === "school" ? <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Class Code</span>
               <InputField icon={<KeyRound size={15} />}>
                 <input disabled={studentBootstrapState === "loading"} value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold disabled:opacity-60`} />
               </InputField>
-            </label>
+            </label> : null}
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Username</span>
               <InputField icon={<User size={15} />}>
@@ -954,7 +959,7 @@ export default function LoginPage() {
               className="rounded-xl px-4 py-3 text-xs font-semibold text-white/65"
               style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
-              After logging in, use the claim code from your child&apos;s teacher to connect their school learning.
+              After logging in, add a new Home learner or link an existing school learner with their Explorer Code and PIN.
             </p>
 
             {parentError && (

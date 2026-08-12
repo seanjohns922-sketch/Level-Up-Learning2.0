@@ -79,7 +79,7 @@ check("one parent can link multiple children", migration.includes("unique(parent
 check("Home activation is free for 2026", has(functionBody("activate_free_home_access"), "'free'", "2026"));
 check("Home activation has no payment provider", !functionBody("activate_free_home_access").match(/stripe|checkout|card|payment_method/i));
 check("Home access is not required for parent linking", !functionBody("confirm_parent_child_link").includes("activate_free_home_access"));
-check("parent portal is read only", !parent.match(/insert\(|update\(|delete\(|\.from\([^)]*\)\.upsert/i));
+check("parent portal has no direct table writes", !parent.match(/insert\(|update\(|delete\(|\.from\([^)]*\)\.upsert/i));
 check("parent route is selected after login", login.includes('role: "parent"') && /router\.(push|replace)\("\/parent"\)/.test(login));
 check("parent supports child linking", has(parent, "Link a child", "preview_parent_child_link", "confirm_parent_child_link"));
 check("parent client requires explicit link success", has(parent, "data.linked !== true", "child details could not be verified"));
