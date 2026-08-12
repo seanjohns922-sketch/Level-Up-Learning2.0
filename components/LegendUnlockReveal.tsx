@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Library, Star } from "lucide-react";
+import LegendCardArtwork from "@/components/legends/LegendCardArtwork";
 import type { Legend } from "@/data/legends";
 import { markLegendUnlockVideoSeen } from "@/lib/legend-video-state";
 
@@ -297,7 +298,7 @@ export default function LegendUnlockReveal({
 
             {/* Card image */}
             <div
-              className="relative h-[264px] w-[190px] overflow-hidden rounded-lg shadow-2xl sm:h-[306px] sm:w-[220px]"
+              className="relative aspect-[2/3] w-[190px] overflow-hidden rounded-lg shadow-2xl sm:w-[220px]"
               style={{
                 animation: showSilhouette && !showReveal
                   ? "silhouetteFloat 2s ease-in-out infinite alternate"
@@ -306,10 +307,10 @@ export default function LegendUnlockReveal({
                   : "none",
               }}
             >
-              <img
+              <LegendCardArtwork
                 src={legend.images.cardFront}
                 alt={legend.name}
-                className="w-full h-full object-cover"
+                className="h-full w-full"
                 style={{
                   filter: showReveal ? "brightness(1) saturate(1)" : "brightness(0) saturate(0)",
                   transition: "filter 0.8s ease-out",

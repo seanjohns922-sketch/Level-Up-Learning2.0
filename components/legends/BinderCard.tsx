@@ -1,6 +1,7 @@
 "use client";
 
 import { Lock } from "lucide-react";
+import LegendCardArtwork from "@/components/legends/LegendCardArtwork";
 import type { Legend } from "@/data/legends";
 
 export default function BinderCard({
@@ -63,10 +64,10 @@ export default function BinderCard({
       >
         {/* Card artwork */}
         <div className="absolute inset-0">
-          <img
+          <LegendCardArtwork
             src={legend.images.cardFront}
             alt={legend.name}
-            className="h-full w-full object-contain transition-all duration-300"
+            className="h-full w-full transition-all duration-300"
             style={{
               filter: isUnlocked ? "none" : "blur(2px) grayscale(60%)",
               opacity: isUnlocked ? 1 : 0.5,

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Lock, Trophy } from "lucide-react";
+import LegendCardArtwork from "@/components/legends/LegendCardArtwork";
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
 import { readProgress } from "@/data/progress";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
@@ -55,7 +56,7 @@ export default function HallOfLegendsWidget() {
   const renderFan = (mirror: boolean) => (
     <>
       {previewUnlocked.map((legend, index) => (
-        <img
+        <LegendCardArtwork
           key={legend.id}
           src={legend.images.cardFront}
           alt={legend.name}

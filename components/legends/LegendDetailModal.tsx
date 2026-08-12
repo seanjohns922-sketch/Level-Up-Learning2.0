@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Maximize2, Play, Star, X } from "lucide-react";
+import LegendCardArtwork from "@/components/legends/LegendCardArtwork";
 import type { Legend } from "@/data/legends";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 
@@ -144,10 +145,10 @@ export default function LegendDetailModal({
               className="relative block rounded-xl focus:outline-none"
               aria-label={showBack ? `Show ${legend.name} card front` : `Show ${legend.name} card back`}
             >
-              <img
+              <LegendCardArtwork
                 src={showBack ? backImage : frontImage}
                 alt={showBack ? `${legend.name} card back` : `${legend.name} card front`}
-                className="relative h-56 w-auto rounded-xl shadow-lg border-2 border-white/60"
+                className="relative h-56 max-w-full rounded-xl border-2 border-white/60 shadow-lg"
               />
             </button>
             <button
@@ -271,11 +272,11 @@ export default function LegendDetailModal({
         >
           <X className="h-6 w-6" />
         </button>
-        <img
+        <LegendCardArtwork
           src={showBack ? backImage : frontImage}
           alt={showBack ? `${legend.name} card back` : `${legend.name} card front`}
           onClick={(e) => { e.stopPropagation(); setShowBack((c) => !c); }}
-          className="max-h-[90vh] w-auto cursor-pointer rounded-2xl border-2 border-white/40 shadow-2xl"
+          className="max-h-[90vh] max-w-[calc(100vw-2rem)] cursor-pointer rounded-2xl border-2 border-white/40 shadow-2xl"
         />
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-xs font-bold text-white/80">
           Tap the card to flip &middot; Tap anywhere to close
