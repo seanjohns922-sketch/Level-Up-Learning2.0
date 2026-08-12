@@ -26,8 +26,11 @@ import {
   LEVEL2_STARPATH_INDEPENDENT_POSTTEST_ITEMS,
   LEVEL2_STARPATH_INDEPENDENT_PRETEST_ITEMS,
 } from "./level2StarpathIndependentAssessments";
+import {
+  LEVEL3_STARPATH_INDEPENDENT_POSTTEST_ITEMS,
+  LEVEL3_STARPATH_INDEPENDENT_PRETEST_ITEMS,
+} from "./level3StarpathIndependentAssessments";
 import { getStarpathPosttestForYear } from "@/data/activities/starpath/ground/groundPostTest";
-import { getLevelThreePosttest } from "@/data/activities/starpath/level3/level3PostTest";
 import type { SupportedMathLevel } from "@/data/activities/year2/lessonEngine";
 import { isGroundLevelYear } from "@/lib/lesson-routing";
 import {
@@ -55,7 +58,12 @@ function getStarpathPosttest(yearLabel: string): PostTest | undefined {
       questions: [...LEVEL2_STARPATH_INDEPENDENT_POSTTEST_ITEMS],
     };
   }
-  if (yearLabel === "Year 3") return getLevelThreePosttest();
+  if (yearLabel === "Year 3") {
+    return {
+      yearLabel: "Year 3",
+      questions: [...LEVEL3_STARPATH_INDEPENDENT_POSTTEST_ITEMS],
+    };
+  }
   return getStarpathPosttestForYear(yearLabel);
 }
 
@@ -65,6 +73,9 @@ function getStarpathPretest(yearLabel: string): PretestQuestion[] {
   }
   if (yearLabel === "Year 2") {
     return [...LEVEL2_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
+  }
+  if (yearLabel === "Year 3") {
+    return [...LEVEL3_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   }
   return [];
 }

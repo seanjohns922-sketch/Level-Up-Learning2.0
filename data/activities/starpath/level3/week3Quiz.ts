@@ -1,7 +1,6 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { fifteenFrom } from "@/data/activities/starpath/level1/quizUtils";
-import { createBuildModelsQuizTaskSet, createChooseBestShapeTaskSet, createSpaceEngineeringTaskSet } from "./week3";
+import { buildLevelThreeWeek3IndependentQuiz } from "./weeklyQuizBank";
 
 export function buildLevelThreeWeek3VoyageQuiz(): PracticeTask[] {
-  return fifteenFrom(createBuildModelsQuizTaskSet(), createChooseBestShapeTaskSet(), createSpaceEngineeringTaskSet());
+  return buildLevelThreeWeek3IndependentQuiz();
 }

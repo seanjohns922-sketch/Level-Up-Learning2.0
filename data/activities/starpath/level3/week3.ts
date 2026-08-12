@@ -56,6 +56,7 @@ const BUILD_DECISIONS: BuildDecision[] = [
   { prompt: "Which object should make the Supply Rocket's pointed nose?", correct: "cone", distractors: ["cube", "cylinder"] },
   { prompt: "Which object should make the Signal Beacon's tall mast?", correct: "cylinder", distractors: ["cube", "sphere"] },
   { prompt: "Which object should make the Signal Beacon's stable base?", correct: "prism", distractors: ["sphere", "cone"] },
+  { prompt: "Which object should make a beacon with triangular faces meeting at one top vertex?", correct: "pyramid", distractors: ["cylinder", "sphere"] },
 ];
 function buildModelQuizTask(round: number, target: number): PracticeTask {
   const decision = BUILD_DECISIONS[round % BUILD_DECISIONS.length]!;
@@ -83,6 +84,7 @@ const NEEDS: Need[] = [
   { prompt: "The tip of the rocket must come to a point. Which object is best?", speak: "The tip of the rocket must come to a point. Which object is best?", correct: "cone", distractors: ["cube", "cylinder"] },
   { prompt: "Cargo boxes must stack neatly without rolling. Which object is best?", speak: "Cargo boxes must stack neatly without rolling. Which object is best?", correct: "cube", distractors: ["sphere", "cone"] },
   { prompt: "A signal light should look round from every direction. Which object is best?", speak: "A signal light should look round from every direction. Which object is best?", correct: "sphere", distractors: ["cube", "prism"] },
+  { prompt: "A beacon needs a square base and triangular faces that meet at the top. Which object is best?", speak: "A beacon needs a square base and four triangular faces that meet at the top. Which object is best?", correct: "pyramid", distractors: ["sphere", "cylinder"] },
 ];
 export function chooseBestShapeTask(round: number, target: number): PracticeTask {
   const n = NEEDS[round % NEEDS.length]!;
@@ -109,6 +111,7 @@ const JUSTIFY: Justify[] = [
   { objectId: "cylinder", prompt: "Why can the Fuel Tank roll and stack?", correct: "It has one curved surface and two flat ends", wrong: ["It has only flat surfaces", "It has a pointed end"] },
   { objectId: "prism", prompt: "Why is the long Supply Block useful as a platform?", correct: "It is long, flat and stable", wrong: ["It rolls in every direction", "It has a pointed end"] },
   { objectId: "sphere", prompt: "Why is the Planet Ball useful as a signal globe?", correct: "It looks round from every direction", wrong: ["It stacks neatly", "It has a long flat surface"] },
+  { objectId: "pyramid", prompt: "Why is the Beacon Pyramid useful for a pointed marker?", correct: "Its triangular faces meet at a top vertex", wrong: ["It has one curved surface", "It has no edges"] },
 ];
 export function spaceEngineeringTask(round: number, target: number): PracticeTask {
   const j = JUSTIFY[round % JUSTIFY.length]!;
@@ -142,7 +145,7 @@ const INTRO = teaching(
   "objectFeatures",
   "Choose the best object for the job",
   "Every part needs the right object.",
-  "Every part needs the right object. A rover wheel needs a cylinder because its curved surface rolls and its flat ends keep it steady. A rocket nose needs a cone because it comes to a point. Choose objects whose features suit each job, then explain why."
+  "Every part needs the right object. Compare faces, surfaces, edges and vertices, then choose the object whose features suit the job and explain why."
 );
 
 function makeSet(start: number, gen: (round: number, target: number) => PracticeTask): RealmLessonTaskSet {

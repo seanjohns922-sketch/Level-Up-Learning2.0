@@ -3,8 +3,8 @@ import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-bl
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { L3_OBJECT_IDS, getL3Object, l3ObjectSvg, type L3Object, type L3ObjectId } from "./l3-objects";
 
-// Level 3 · Week 1 — 3D Discoveries (AC9M3SP01). Recognise and name the five
-// Starpath 3D objects: cube, sphere, cylinder, cone, rectangular prism.
+// Level 3 · Week 1 — 3D Discoveries (AC9M3SP01). Recognise and name objects,
+// then identify their faces/surfaces, edges and vertices.
 
 export const LEVEL_THREE_ARTWORK = "/images/starpath-home-bg-y3.png";
 
@@ -42,14 +42,16 @@ const CONTEXT_CLUES: ObjectClue[] = [
   { objectId: "cylinder", prompt: "Find the object shaped like a fuel tank.", speakText: "Find the object shaped like a fuel tank, with a curved surface and two flat ends." },
   { objectId: "cone", prompt: "Find the object shaped like a rocket nose.", speakText: "Find the object shaped like a rocket nose, with one point." },
   { objectId: "prism", prompt: "Find the object shaped like a long supply box.", speakText: "Find the long box-shaped object used for supplies." },
+  { objectId: "pyramid", prompt: "Find the object shaped like a pyramid beacon.", speakText: "Find the object with a square base and triangular faces that meet at the top." },
 ];
 
 const FEATURE_CLUES: ObjectClue[] = [
-  { objectId: "cube", prompt: "Find the equal block with only flat surfaces.", speakText: "Find the equal block with only flat surfaces." },
-  { objectId: "sphere", prompt: "Find the object that is curved all over.", speakText: "Find the object that is curved all over and can roll in every direction." },
-  { objectId: "cylinder", prompt: "Find the object that can roll and stack.", speakText: "Find the object with one curved surface and two flat ends. It can roll and stack." },
-  { objectId: "cone", prompt: "Find the object with one point and one flat end.", speakText: "Find the object with one point, one curved surface and one flat end." },
-  { objectId: "prism", prompt: "Find the long box with only flat surfaces.", speakText: "Find the long box-shaped object with only flat surfaces." },
+  { objectId: "cube", prompt: "Find the object with six equal square faces.", speakText: "Find the object with six equal square faces, twelve edges and eight vertices." },
+  { objectId: "sphere", prompt: "Find the object with no edges or vertices.", speakText: "Find the object with one curved surface and no edges or vertices." },
+  { objectId: "cylinder", prompt: "Find the object with two flat faces and no vertices.", speakText: "Find the object with two flat circular faces, one curved surface and no vertices." },
+  { objectId: "cone", prompt: "Find the object with one vertex and one circular edge.", speakText: "Find the object with one vertex, one circular edge, one flat face and one curved surface." },
+  { objectId: "prism", prompt: "Find the object with six rectangular faces.", speakText: "Find the object with six rectangular faces, twelve edges and eight vertices." },
+  { objectId: "pyramid", prompt: "Find the object with five faces and five vertices.", speakText: "Find the object with five flat faces, eight edges and five vertices." },
 ];
 
 function clueObjectTask(round: number, target: number, clues: readonly ObjectClue[]): PracticeTask {
@@ -73,7 +75,7 @@ export function findObjectTask(round: number, target: number): PracticeTask {
   return clueObjectTask(round, target, CONTEXT_CLUES);
 }
 
-// L3 — identify objects independently from informal geometric features.
+// L3 — identify objects independently from formal geometric features.
 export function featureObjectTask(round: number, target: number): PracticeTask {
   return clueObjectTask(round, target, FEATURE_CLUES);
 }
@@ -86,8 +88,8 @@ function teaching(heading: string, prompt: string, speakText: string) {
 
 const INTRO = teaching(
   "Meet the space objects",
-  "These are the five Starpath 3D objects.",
-  "Meet the five space objects: the Cargo Crate is a cube, the Planet Ball is a sphere, the Fuel Tank is a cylinder, the Rocket Nose is a cone, and the Supply Box is a rectangular prism."
+  "Meet six 3D objects and examine their features.",
+  "Meet the cube, sphere, cylinder, cone, rectangular prism and square pyramid. We can compare their flat faces, curved surfaces, edges and vertices."
 );
 
 export function createMeetTheObjectsTaskSet(): RealmLessonTaskSet {
@@ -137,8 +139,8 @@ export function create3DObjectChallengeTaskSet(): RealmLessonTaskSet {
 
 export const MEET_THE_OBJECTS_CONTENT = {
   missionBrief:
-    "Welcome, Cosmic Navigator. Starpath is full of 3D objects. Meet the five and learn their names.",
-  successCriteria: ["name the five 3D objects", "recognise each object", "tell objects apart"],
+    "Meet six Starpath objects. Name each object and notice the features that make it distinct.",
+  successCriteria: ["name six 3D objects", "recognise each object", "notice key features"],
   artworkSrc: LEVEL_THREE_ARTWORK,
   teaching: { title: "Meet the Space Objects", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
@@ -150,7 +152,7 @@ export const MEET_THE_OBJECTS_CONTENT = {
     prompt: "How did you know the object?",
     options: ["I looked at its shape", "I remembered its name", "I told it from the others"],
   },
-  practisedSkills: ["Recognise 3D objects", "Name 3D objects", "Tell objects apart"],
+  practisedSkills: ["Recognise 3D objects", "Name 3D objects", "Notice object features"],
   nextUpLabel: "Find the Space Object",
   createTaskSet: createMeetTheObjectsTaskSet,
 } satisfies StarpathLessonContent;
@@ -177,20 +179,20 @@ export const FIND_THE_OBJECT_CONTENT = {
 
 export const OBJECT_CHALLENGE_CONTENT = {
   missionBrief:
-    "Use informal feature clues to distinguish the five Starpath 3D objects.",
-  successCriteria: ["notice flat and curved surfaces", "recognise a feature clue", "identify the object independently"],
+    "Use faces, surfaces, edges and vertices to distinguish the six Starpath objects.",
+  successCriteria: ["identify faces and curved surfaces", "count edges and vertices", "identify the object independently"],
   artworkSrc: LEVEL_THREE_ARTWORK,
   teaching: { title: "3D Object Challenge", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
-    { key: "name-1", title: "Surface Clues", description: "Identify objects by flat and curved surfaces.", taskKinds: ["starpathObject"] },
+    { key: "name-1", title: "Feature Clues", description: "Identify objects by faces, surfaces, edges and vertices.", taskKinds: ["starpathObject"] },
     { key: "find-1", title: "Object in Context", description: "Recognise an object by its use.", taskKinds: ["starpathObject"] },
     { key: "name-2", title: "Object Detective", description: "Combine context and feature clues.", taskKinds: ["starpathObject"] },
   ],
   reflection: {
     prompt: "What did you learn about 3D objects?",
-    options: ["I noticed its surfaces", "I thought about what it does", "I compared it with other objects"],
+    options: ["I counted faces", "I checked edges and vertices", "I compared it with other objects"],
   },
-  practisedSkills: ["Recognise 3D objects", "Use informal feature clues", "Explain how objects differ"],
+  practisedSkills: ["Recognise 3D objects", "Use key feature clues", "Explain how objects differ"],
   nextUpLabel: "Week 1 Voyage Quiz",
   createTaskSet: create3DObjectChallengeTaskSet,
 } satisfies StarpathLessonContent;

@@ -5,7 +5,7 @@ import { getL3Object, l3ObjectSvg, listL3Objects, type L3Object, type L3ObjectId
 import { LEVEL_THREE_ARTWORK } from "./week1";
 
 // Level 3 · Week 2 — Object Detectives (AC9M3SP01). Compare and classify objects
-// by informal feature: rolls / stacks / slides, flat vs curved. Every task shows
+// by faces/surfaces, edges and vertices. Every task shows
 // a scene with exactly one object satisfying the target rule (unique by
 // construction), so the question is always well-posed.
 
@@ -49,9 +49,10 @@ function featureFind(
 // L1 — clue that identifies exactly one object across the whole set.
 type Clue = { prompt: string; speak: string; pred: Pred };
 const CLUES: Clue[] = [
-  { prompt: "Which object rolls and has one point?", speak: "Which object rolls and has one point? Tap it.", pred: (o) => o.rolls && o.point },
-  { prompt: "Which object is round all over?", speak: "Which object is round all over, with no flat side? Tap it.", pred: (o) => o.surface === "curved" },
-  { prompt: "Which object rolls and stacks, like a can?", speak: "Which object rolls and also stacks, like a can? Tap it.", pred: (o) => o.rolls && o.stacks },
+  { prompt: "Which object has five faces and five vertices?", speak: "Which object has five flat faces, eight edges and five vertices?", pred: (o) => o.flatFaces === 5 && o.vertices === 5 },
+  { prompt: "Which object has no edges or vertices?", speak: "Which object has one curved surface and no edges or vertices?", pred: (o) => o.edges === 0 && o.vertices === 0 },
+  { prompt: "Which object has two flat faces and no vertices?", speak: "Which object has two flat circular faces, two edges and no vertices?", pred: (o) => o.flatFaces === 2 && o.vertices === 0 },
+  { prompt: "Which object has one vertex and one edge?", speak: "Which object has one vertex and one circular edge?", pred: (o) => o.vertices === 1 && o.edges === 1 },
 ];
 export function whichObjectTask(round: number, target: number): PracticeTask {
   const clue = CLUES[round % CLUES.length]!;
@@ -69,11 +70,11 @@ export function whichObjectTask(round: number, target: number): PracticeTask {
 // L2 — compare TWO objects and choose the true statement about them.
 type CompareCase = { a: L3ObjectId; b: L3ObjectId; prompt: string; correct: string; wrong: [string, string] };
 const COMPARE_CASES: CompareCase[] = [
-  { a: "cube", b: "cylinder", prompt: "What is the same about these two?", correct: "They both stack", wrong: ["They both roll", "They both have a point"] },
-  { a: "sphere", b: "cone", prompt: "What is the same about these two?", correct: "They both roll", wrong: ["They both stack", "They only have flat surfaces"] },
-  { a: "sphere", b: "cube", prompt: "What is different about these two?", correct: "One rolls and one does not", wrong: ["They both roll", "They both have a point"] },
-  { a: "cone", b: "cylinder", prompt: "What is different about these two?", correct: "One has a point and one does not", wrong: ["Neither of them rolls", "They both stack"] },
-  { a: "cube", b: "prism", prompt: "What is the same about these two?", correct: "Neither of them rolls", wrong: ["They both roll", "They both have a point"] },
+  { a: "cube", b: "prism", prompt: "What is the same about these two?", correct: "Both have 12 edges and 8 vertices", wrong: ["Both have a curved surface", "Both have 5 faces"] },
+  { a: "sphere", b: "cylinder", prompt: "What is different about these two?", correct: "The cylinder has two flat faces", wrong: ["The sphere has two edges", "Both have vertices"] },
+  { a: "cone", b: "pyramid", prompt: "What is the same about these two?", correct: "Both have at least one vertex", wrong: ["Both have a curved surface", "Both have 5 faces"] },
+  { a: "cylinder", b: "cone", prompt: "What is different about these two?", correct: "The cone has one vertex", wrong: ["The cylinder has 8 vertices", "The cone has no edge"] },
+  { a: "cube", b: "pyramid", prompt: "What is different about these two?", correct: "They have different numbers of faces", wrong: ["Both have 8 vertices", "Both have a curved surface"] },
 ];
 export function compareObjectsTask(round: number, target: number): PracticeTask {
   const c = COMPARE_CASES[round % COMPARE_CASES.length]!;
@@ -94,16 +95,16 @@ export function compareObjectsTask(round: number, target: number): PracticeTask 
     scene: [sceneOf(getL3Object(c.a)), sceneOf(getL3Object(c.b))],
     options,
     correctOptionId: "correct",
-    feedback: { correct: `Yes — ${c.correct.toLowerCase()}.`, wrong: "Look at what each object does — roll, stack or slide." },
+    feedback: { correct: `Yes — ${c.correct.toLowerCase()}.`, wrong: "Compare the faces, surfaces, edges and vertices of both objects." },
   };
 }
 
 // Quiz-sized compound classification questions retain a single answer.
 type FeatureCase = { prompt: string; speak: string; pred: Pred; word: string };
 const SORT_CASES: FeatureCase[] = [
-  { prompt: "Which object rolls but does NOT stack?", speak: "Which object rolls but cannot stack? Tap it.", pred: (o) => o.rolls && !o.stacks, word: "rolls but does not stack" },
-  { prompt: "Which object can roll AND stack?", speak: "Which object can both roll and stack? Tap it.", pred: (o) => o.rolls && o.stacks, word: "rolls and stacks" },
-  { prompt: "Which object has only flat surfaces and does NOT roll?", speak: "Which object has only flat surfaces and does not roll? Tap it.", pred: (o) => !o.rolls && o.surface === "flat", word: "has only flat surfaces and does not roll" },
+  { prompt: "Which object has exactly five flat faces?", speak: "Which object has exactly five flat faces?", pred: (o) => o.flatFaces === 5, word: "has exactly five flat faces" },
+  { prompt: "Which object has two edges and no vertices?", speak: "Which object has two circular edges and no vertices?", pred: (o) => o.edges === 2 && o.vertices === 0, word: "has two edges and no vertices" },
+  { prompt: "Which object has one curved surface and no flat faces?", speak: "Which object has one curved surface and no flat faces?", pred: (o) => o.curvedSurfaces === 1 && o.flatFaces === 0, word: "has one curved surface and no flat faces" },
 ];
 export function objectSortQuizTask(round: number, target: number): PracticeTask {
   const c = SORT_CASES[round % SORT_CASES.length]!;
@@ -119,40 +120,40 @@ type ClassificationCase = {
 
 const CLASSIFICATIONS: ClassificationCase[] = [
   {
-    prompt: "Sort every object by whether it rolls.",
-    speak: "Sort every object. Put objects that roll in Rolls, and the others in Does not roll.",
-    groups: [
-      { id: "rolls", label: "Rolls", speakText: "Rolls" },
-      { id: "not-roll", label: "Does not roll", speakText: "Does not roll" },
-    ],
-    groupFor: (object) => (object.rolls ? "rolls" : "not-roll"),
-  },
-  {
-    prompt: "Sort every object by whether it stacks.",
-    speak: "Sort every object. Put objects that stack in Stacks, and the others in Does not stack.",
-    groups: [
-      { id: "stacks", label: "Stacks", speakText: "Stacks" },
-      { id: "not-stack", label: "Does not stack", speakText: "Does not stack" },
-    ],
-    groupFor: (object) => (object.stacks ? "stacks" : "not-stack"),
-  },
-  {
-    prompt: "Sort every object by its surfaces.",
-    speak: "Sort every object. Put objects with a curved surface in Curved surface. Put the others in Only flat surfaces.",
+    prompt: "Sort every object by whether it has a curved surface.",
+    speak: "Sort every object. Put objects with a curved surface in Curved surface. Put the others in Flat faces only.",
     groups: [
       { id: "curved", label: "Curved surface", speakText: "Has a curved surface" },
-      { id: "flat", label: "Only flat surfaces", speakText: "Has only flat surfaces" },
+      { id: "flat", label: "Flat faces only", speakText: "Has flat faces only" },
     ],
-    groupFor: (object) => (object.surface === "flat" ? "flat" : "curved"),
+    groupFor: (object) => (object.curvedSurfaces ? "curved" : "flat"),
   },
   {
-    prompt: "Sort every object by whether it has a point.",
-    speak: "Sort every object. Put objects with a point in Has a point, and the others in No point.",
+    prompt: "Sort every object by whether it has vertices.",
+    speak: "Sort every object. Put objects with one or more vertices in Has vertices. Put the others in No vertices.",
     groups: [
-      { id: "point", label: "Has a point", speakText: "Has a point" },
-      { id: "no-point", label: "No point", speakText: "Does not have a point" },
+      { id: "vertices", label: "Has vertices", speakText: "Has vertices" },
+      { id: "no-vertices", label: "No vertices", speakText: "Has no vertices" },
     ],
-    groupFor: (object) => (object.point ? "point" : "no-point"),
+    groupFor: (object) => (object.vertices ? "vertices" : "no-vertices"),
+  },
+  {
+    prompt: "Sort every object by whether it has eight vertices.",
+    speak: "Sort every object. Put objects with eight vertices in Eight vertices. Put the others in Not eight vertices.",
+    groups: [
+      { id: "eight", label: "8 vertices", speakText: "Eight vertices" },
+      { id: "not-eight", label: "Not 8 vertices", speakText: "Not eight vertices" },
+    ],
+    groupFor: (object) => (object.vertices === 8 ? "eight" : "not-eight"),
+  },
+  {
+    prompt: "Sort every object by whether it has six flat faces.",
+    speak: "Sort every object. Put objects with six flat faces in Six faces. Put the others in Not six faces.",
+    groups: [
+      { id: "six", label: "6 flat faces", speakText: "Six flat faces" },
+      { id: "not-six", label: "Not 6 flat faces", speakText: "Not six flat faces" },
+    ],
+    groupFor: (object) => (object.flatFaces === 6 ? "six" : "not-six"),
   },
 ];
 
@@ -181,9 +182,9 @@ function teaching(heading: string, prompt: string, speakText: string) {
     ({ kind: "starpathShapeIntro", scene: "intro", variant: "objectFeatures", heading, prompt, speakText, target: ++t }) satisfies PracticeTask;
 }
 const INTRO = teaching(
-  "Rolls, stacks and slides",
-  "Objects behave in different ways.",
-  "Some objects roll because they have a curved surface. Flat surfaces can help objects stack or slide. A cylinder has one curved surface and two flat ends. Use these clues to compare and classify objects."
+  "Compare object features",
+  "Classify objects using their key features.",
+  "Count flat faces, curved surfaces, edges and vertices. Use the same feature rule for every object when you compare and classify them."
 );
 
 function makeSet(start: number, gen: (round: number, target: number) => PracticeTask): RealmLessonTaskSet {
@@ -225,5 +226,5 @@ function content(title: string, brief: string, criteria: [string, string, string
 }
 
 export const WHICH_OBJECT_CONTENT = content("Which Object Is It?", "Be an Object Detective. Use a feature clue to work out which 3D object it is.", ["read the clue", "check the features", "find the object"], ["Clue 1", "Clue 2", "Detective"], "How did you solve the clue?", ["I read the features", "I checked each object", "I matched the clue"], ["Use feature clues", "Reason about objects", "Identify an object"], "Compare Space Objects", createWhichObjectTaskSet);
-export const COMPARE_OBJECTS_CONTENT = content("Compare Space Objects", "Compare the objects by what they do — which one rolls, stacks or has a point.", ["look at what each does", "roll, stack or point", "choose the object"], ["Rolls", "Stacks", "Compare"], "How did you compare?", ["I saw what each object does", "I looked for rolling or stacking", "I compared the features"], ["Compare by feature", "Use roll, stack, slide", "Reason about objects"], "Space Object Sort", createCompareObjectsTaskSet);
+export const COMPARE_OBJECTS_CONTENT = content("Compare Space Objects", "Compare objects by their faces, surfaces, edges and vertices.", ["examine both objects", "count key features", "choose the true comparison"], ["Compare Faces", "Compare Edges", "Compare Vertices"], "How did you compare?", ["I counted faces", "I counted edges and vertices", "I compared the features"], ["Compare key features", "Use precise geometry words", "Reason about objects"], "Space Object Sort", createCompareObjectsTaskSet);
 export const OBJECT_SORT_CONTENT = content("Space Object Sort", "Classify every space object into groups using one shared feature.", ["read the sorting rule", "check every object", "classify the whole set"], ["Roll Sort", "Surface Sort", "Object Classifier"], "What helped you classify the objects?", ["I tested the same feature each time", "I checked every object", "I noticed one object can have several features"], ["Classify a complete set", "Sort by one feature", "Explain a classification"], "Week 2 Voyage Quiz", createObjectSortTaskSet);

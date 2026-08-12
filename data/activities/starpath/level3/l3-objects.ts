@@ -1,10 +1,8 @@
-// Level 3 (Year 3, AC9M3SP01) — the five Starpath 3D objects, rendered as
-// procedural 3-tone SVG (viewBox 0 0 120 120). Features are informal for Year 3
-// — rolls / stacks / slides, and flat vs curved surfaces — never faces / edges /
-// vertices (reserved for Level 4). Kept local to Level 3 so it doesn't ripple
-// the global task unions.
+// Level 3 (Year 3, AC9M3SP01) objects rendered as procedural SVG. The Australian
+// Curriculum explicitly expects students to classify prisms, pyramids, cylinders
+// and spheres using faces/surfaces, edges and vertices at this level.
 
-export type L3ObjectId = "cube" | "sphere" | "cylinder" | "cone" | "prism";
+export type L3ObjectId = "cube" | "sphere" | "cylinder" | "cone" | "prism" | "pyramid";
 
 export type L3Object = {
   id: L3ObjectId;
@@ -16,6 +14,11 @@ export type L3Object = {
   slides: boolean; // has at least one flat surface it can slide on
   surface: "flat" | "curved" | "both";
   point: boolean; // has a single point (cone)
+  flatFaces: number;
+  curvedSurfaces: number;
+  edges: number;
+  vertices: number;
+  faceDescription: string;
   inner: string; // SVG inner markup for viewBox 0 0 120 120
 };
 
@@ -29,15 +32,18 @@ const CONE = `<defs><linearGradient id="l3con" x1="0" y1="0" x2="1" y2="0"><stop
 
 const PRISM = `<defs><linearGradient id="l3pT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#99f6e4"/><stop offset="1" stop-color="#5eead4"/></linearGradient><linearGradient id="l3pL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#14b8a6"/></linearGradient><linearGradient id="l3pR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#0f766e"/></linearGradient></defs><polygon points="27,42 69,63 69,91 27,70" fill="url(#l3pL)" stroke="#134e4a" stroke-width="2" stroke-linejoin="round"/><polygon points="93,51 69,63 69,91 93,79" fill="url(#l3pR)" stroke="#134e4a" stroke-width="2" stroke-linejoin="round"/><polygon points="51,30 93,51 69,63 27,42" fill="url(#l3pT)" stroke="#134e4a" stroke-width="2" stroke-linejoin="round"/>`;
 
+const PYRAMID = `<defs><linearGradient id="l3pyL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fef3c7"/><stop offset="1" stop-color="#f59e0b"/></linearGradient><linearGradient id="l3pyR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#b45309"/></linearGradient></defs><polygon points="60,20 27,84 60,101" fill="url(#l3pyL)" stroke="#78350f" stroke-width="2" stroke-linejoin="round"/><polygon points="60,20 94,84 60,101" fill="url(#l3pyR)" stroke="#78350f" stroke-width="2" stroke-linejoin="round"/><polygon points="27,84 60,68 94,84 60,101" fill="#fcd34d" stroke="#78350f" stroke-width="2" stroke-linejoin="round"/><path d="M60 20V68" stroke="#78350f" stroke-width="2"/>`;
+
 export const L3_OBJECTS: Record<L3ObjectId, L3Object> = {
-  cube: { id: "cube", label: "cube", spaceName: "Cargo Crate", colour: "#f59e0b", rolls: false, stacks: true, slides: true, surface: "flat", point: false, inner: CUBE },
-  sphere: { id: "sphere", label: "sphere", spaceName: "Planet Ball", colour: "#38bdf8", rolls: true, stacks: false, slides: false, surface: "curved", point: false, inner: SPHERE },
-  cylinder: { id: "cylinder", label: "cylinder", spaceName: "Fuel Tank", colour: "#8b5cf6", rolls: true, stacks: true, slides: true, surface: "both", point: false, inner: CYLINDER },
-  cone: { id: "cone", label: "cone", spaceName: "Rocket Nose", colour: "#f43f5e", rolls: true, stacks: false, slides: true, surface: "both", point: true, inner: CONE },
-  prism: { id: "prism", label: "rectangular prism", spaceName: "Supply Box", colour: "#14b8a6", rolls: false, stacks: true, slides: true, surface: "flat", point: false, inner: PRISM },
+  cube: { id: "cube", label: "cube", spaceName: "Cargo Crate", colour: "#f59e0b", rolls: false, stacks: true, slides: true, surface: "flat", point: false, flatFaces: 6, curvedSurfaces: 0, edges: 12, vertices: 8, faceDescription: "six equal square faces", inner: CUBE },
+  sphere: { id: "sphere", label: "sphere", spaceName: "Planet Ball", colour: "#38bdf8", rolls: true, stacks: false, slides: false, surface: "curved", point: false, flatFaces: 0, curvedSurfaces: 1, edges: 0, vertices: 0, faceDescription: "one curved surface", inner: SPHERE },
+  cylinder: { id: "cylinder", label: "cylinder", spaceName: "Fuel Tank", colour: "#8b5cf6", rolls: true, stacks: true, slides: true, surface: "both", point: false, flatFaces: 2, curvedSurfaces: 1, edges: 2, vertices: 0, faceDescription: "two flat circular faces and one curved surface", inner: CYLINDER },
+  cone: { id: "cone", label: "cone", spaceName: "Rocket Nose", colour: "#f43f5e", rolls: true, stacks: false, slides: true, surface: "both", point: true, flatFaces: 1, curvedSurfaces: 1, edges: 1, vertices: 1, faceDescription: "one flat circular face and one curved surface", inner: CONE },
+  prism: { id: "prism", label: "rectangular prism", spaceName: "Supply Box", colour: "#14b8a6", rolls: false, stacks: true, slides: true, surface: "flat", point: false, flatFaces: 6, curvedSurfaces: 0, edges: 12, vertices: 8, faceDescription: "six rectangular faces", inner: PRISM },
+  pyramid: { id: "pyramid", label: "square pyramid", spaceName: "Beacon Pyramid", colour: "#fbbf24", rolls: false, stacks: false, slides: true, surface: "flat", point: true, flatFaces: 5, curvedSurfaces: 0, edges: 8, vertices: 5, faceDescription: "one square face and four triangular faces", inner: PYRAMID },
 };
 
-export const L3_OBJECT_IDS: L3ObjectId[] = ["cube", "sphere", "cylinder", "cone", "prism"];
+export const L3_OBJECT_IDS: L3ObjectId[] = ["cube", "sphere", "cylinder", "cone", "prism", "pyramid"];
 
 export function getL3Object(id: L3ObjectId): L3Object {
   return L3_OBJECTS[id];
@@ -62,4 +68,11 @@ export function l3FeaturePhrase(obj: L3Object): string {
   if (bits.length === 0) return "sits flat";
   if (bits.length === 1) return `it ${bits[0]}`;
   return `it ${bits.slice(0, -1).join(", ")} and ${bits[bits.length - 1]}`;
+}
+
+export function l3FormalFeaturePhrase(obj: L3Object): string {
+  const surface = obj.curvedSurfaces
+    ? `${obj.flatFaces} flat ${obj.flatFaces === 1 ? "face" : "faces"} and ${obj.curvedSurfaces} curved surface`
+    : `${obj.flatFaces} flat faces`;
+  return `${surface}, ${obj.edges} ${obj.edges === 1 ? "edge" : "edges"}, and ${obj.vertices} ${obj.vertices === 1 ? "vertex" : "vertices"}`;
 }

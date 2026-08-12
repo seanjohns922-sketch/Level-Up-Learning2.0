@@ -107,6 +107,7 @@ function descriptor(
   const source = program.descriptors.find((item) => item.code === code);
   if (!source) throw new Error(`${program.yearLabel} is missing ${code}.`);
   const currentWeeks = program.weeks.filter((week) => week.descriptorCodes.includes(code)).map((week) => week.week);
+  const curriculumAudited = level === 2 || level === 3;
   return {
     code,
     descriptor: source.text,
@@ -117,10 +118,10 @@ function descriptor(
     reasoningMix: "Selected items diagnose misconceptions; manipulated items require the student to construct, place, move, transform or explain spatial evidence independently.",
     misconceptionIds,
     curriculumMapping: {
-      implementationStatus: level === 2 ? "aligned" : "mapped-unverified",
+      implementationStatus: curriculumAudited ? "aligned" : "mapped-unverified",
       currentWeeks,
-      note: level === 2
-        ? `Aligned to audited Starpath Weeks ${currentWeeks.join(", ")}; all 24 lessons and seven independent weekly quizzes passed Level 2 curriculum validation.`
+      note: curriculumAudited
+        ? `Aligned to audited Starpath Weeks ${currentWeeks.join(", ")}; all 24 lessons and seven independent weekly quizzes passed Level ${level} curriculum validation.`
         : `Mapped to Starpath Weeks ${currentWeeks.join(", ")}; full lesson and weekly-quiz coverage must pass before independent-bank authoring.`,
     },
     questionBlueprint: { pretestArchetypes: level === 0 ? [] : pretestArchetypes, posttestArchetypes },
@@ -154,7 +155,7 @@ const BLUEPRINT_DEFINITIONS: Array<{
     ["AC9M2SP02", 10, ["Locate features in two-dimensional representations of familiar spaces.", "Follow and give pathways using map evidence."], ["I can locate a feature from a map and describe its position.", "I can construct or record a pathway that another person can follow."], ["viewpoint-left-right", "route-start-order", "route-destination-only", "map-symbol-representation", "map-viewpoint", "map-relative-location"], ["Locate a named feature using an unfamiliar map key.", "Follow a pathway and place the endpoint."], ["Author a route between two landmarks.", "Place a missing landmark from two clues.", "Diagnose a route that reaches the goal but breaks a condition."]],
   ] },
   { level: 3, allocations: [
-    ["AC9M3SP01", 8, ["Make, compare and classify objects by key spatial features.", "Connect faces, edges and vertices with suitability for use."], ["I can build or classify an object from feature constraints.", "I can justify why an object's features suit a purpose."], ["object-feature-vocabulary", "object-use-without-features", "object-view-consistency"], ["Build or select an object from feature information.", "Compare two objects using faces, edges and vertices."], ["Construct an object meeting several feature constraints.", "Choose an object for a purpose and record the spatial reason.", "Infer a hidden feature from consistent views."]],
+    ["AC9M3SP01", 8, ["Make, compare and classify objects by key spatial features.", "Connect faces, edges and vertices with suitability for use."], ["I can build or classify an object from feature constraints.", "I can justify why an object's features suit a purpose."], ["object-feature-vocabulary", "object-use-without-features"], ["Build or select an object from feature information.", "Compare two objects using faces, edges and vertices."], ["Construct an object meeting several feature constraints.", "Choose an object for a purpose and record the spatial reason.", "Compare possible objects and justify which spatial features best suit a purpose."]],
     ["AC9M3SP02", 12, ["Interpret and create two-dimensional representations of familiar environments.", "Locate landmarks relative to one another and make a readable map."], ["I can use a key to interpret an unfamiliar map.", "I can create a map satisfying relative-location clues and use it to navigate."], ["map-symbol-representation", "map-viewpoint", "map-relative-location", "route-start-order"], ["Interpret a map key and locate related landmarks.", "Place landmarks from simple relative clues."], ["Create a readable map from several constraints.", "Navigate between landmarks using the completed representation.", "Diagnose and repair a map that violates one clue."]],
   ] },
   { level: 4, allocations: [

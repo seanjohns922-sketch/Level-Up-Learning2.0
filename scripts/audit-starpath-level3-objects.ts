@@ -21,6 +21,7 @@ import { buildLevelThreeWeek2VoyageQuiz } from "@/data/activities/starpath/level
 import { buildLevelThreeWeek3VoyageQuiz } from "@/data/activities/starpath/level3/week3Quiz";
 import type { PracticeTask, StarpathObjectTask } from "@/data/activities/year1/practice-task";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
+import { L3_OBJECTS, L3_OBJECT_IDS } from "@/data/activities/starpath/level3/l3-objects";
 
 function generatedTasks(taskSet: RealmLessonTaskSet, count = 18): PracticeTask[] {
   return Array.from({ length: count }, (_, index) => {
@@ -55,12 +56,12 @@ classificationTasks.forEach((task) => {
   assert.equal(task.kind, "starpathObject");
   assert.equal(task.mode, "classify", "Week 2 Lesson 3 must classify the complete set");
   if (task.mode !== "classify") return;
-  assert.equal(task.scene.length, 5, "Classification should include all five familiar 3D objects");
+  assert.equal(task.scene.length, 6, "Classification should include all six Year 3 object families");
   assert.equal(Object.keys(task.assignments).length, task.scene.length, "Every object needs one classification");
 });
 
 const constructionTasks = generatedTasks(createBuildTheRoverTaskSet(), 12) as StarpathObjectTask[];
-const THREE_D_SHAPES = new Set(["cone", "cylinder", "cube", "sphere", "prism"]);
+const THREE_D_SHAPES = new Set(["cone", "cylinder", "cube", "sphere", "prism", "pyramid"]);
 constructionTasks.forEach((task) => {
   assert.equal(task.kind, "starpathObject");
   assert.equal(task.mode, "build", "Week 3 Lesson 1 must assemble a complete model");
@@ -85,6 +86,20 @@ const quizzes = [
 quizzes.forEach(([label, questions]) => {
   assert.equal(questions.length, 15, `${label} must contain exactly 15 questions`);
   assertSafe(questions, label);
+});
+
+assert.deepEqual(
+  [...L3_OBJECT_IDS].sort(),
+  ["cone", "cube", "cylinder", "prism", "pyramid", "sphere"],
+  "AC9M3SP01 requires prisms, pyramids, cylinders and spheres alongside familiar cubes and cones",
+);
+L3_OBJECT_IDS.forEach((id) => {
+  const object = L3_OBJECTS[id];
+  assert(Number.isInteger(object.flatFaces) && object.flatFaces >= 0, `${id} needs a canonical flat-face count`);
+  assert(Number.isInteger(object.curvedSurfaces) && object.curvedSurfaces >= 0, `${id} needs a canonical curved-surface count`);
+  assert(Number.isInteger(object.edges) && object.edges >= 0, `${id} needs a canonical edge count`);
+  assert(Number.isInteger(object.vertices) && object.vertices >= 0, `${id} needs a canonical vertex count`);
+  assert(object.faceDescription.trim(), `${id} needs a read-aloud face description`);
 });
 
 assert.equal(

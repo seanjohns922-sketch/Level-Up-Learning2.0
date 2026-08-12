@@ -1,5 +1,8 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { PostTest, Question } from "@/data/assessments/posttests";
+
+// Legacy Level 3 Starpath form. Retained for historical replay only; production
+// resolves the independent Version 1.0 banks from data/assessments/api.ts.
 import { fiveFrom } from "@/data/activities/starpath/level1/quizUtils";
 import { buildLevelThreeWeek1VoyageQuiz } from "./week1Quiz";
 import { buildLevelThreeWeek2VoyageQuiz } from "./week2Quiz";
