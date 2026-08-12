@@ -601,6 +601,8 @@ set search_path = public
 as $$
 declare
   v_result jsonb;
+  v_today_start timestamptz := date_trunc('day', timezone('Australia/Melbourne', now())) at time zone 'Australia/Melbourne';
+  v_week_start timestamptz := date_trunc('week', timezone('Australia/Melbourne', now())) at time zone 'Australia/Melbourne';
 begin
   if not public.is_platform_owner() then raise exception 'Platform owner access required' using errcode = '42501'; end if;
   with licence as (
@@ -626,9 +628,9 @@ begin
     from current_students
   ),
   activity as (
-    select count(distinct attempt.student_id) filter (where attempt.completed_at >= current_date)::integer as active_today,
-      count(distinct attempt.student_id) filter (where attempt.completed_at >= date_trunc('week', now()))::integer as active_this_week,
-      count(*) filter (where attempt.completed_at >= date_trunc('week', now()))::integer as lessons_this_week,
+    select count(distinct attempt.student_id) filter (where attempt.completed_at >= v_today_start)::integer as active_today,
+      count(distinct attempt.student_id) filter (where attempt.completed_at >= v_week_start)::integer as active_this_week,
+      count(*) filter (where attempt.completed_at >= v_week_start)::integer as lessons_this_week,
       max(attempt.completed_at) as last_active
     from public.student_lesson_attempts attempt join public.students student on student.id = attempt.student_id where student.school_id = p_school_id
   )
@@ -664,8 +666,8 @@ begin
     ),
     'activity', jsonb_build_object(
       'activeToday', activity.active_today, 'activeThisWeek', activity.active_this_week, 'lessonsThisWeek', activity.lessons_this_week,
-      'quizzesThisWeek', (select count(*) from public.student_weekly_quiz_attempts attempt join public.students student on student.id = attempt.student_id where student.school_id = p_school_id and attempt.completed_at >= date_trunc('week', now())),
-      'assessmentsThisWeek', (select count(*) from public.student_realm_assessments assessment join public.students student on student.id = assessment.student_id where student.school_id = p_school_id and assessment.completed_at >= date_trunc('week', now())),
+      'quizzesThisWeek', (select count(*) from public.student_weekly_quiz_attempts attempt join public.students student on student.id = attempt.student_id where student.school_id = p_school_id and attempt.completed_at >= v_week_start),
+      'assessmentsThisWeek', (select count(*) from public.student_realm_assessments assessment join public.students student on student.id = assessment.student_id where student.school_id = p_school_id and assessment.completed_at >= v_week_start),
       'lastActive', activity.last_active
     ),
     'administrators', (select coalesce(jsonb_agg(jsonb_build_object(

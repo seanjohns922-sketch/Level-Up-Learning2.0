@@ -8,7 +8,11 @@ import { loadPlatformSchoolDetail } from "@/lib/platform-admin-server";
 
 function formatDate(value: string | null) {
   if (!value) return "No recorded activity";
-  return new Intl.DateTimeFormat("en-AU", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-AU", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Australia/Melbourne",
+  }).format(new Date(value));
 }
 
 export default async function PlatformSchoolDetailPage({ params }: { params: Promise<{ schoolId: string }> }) {
