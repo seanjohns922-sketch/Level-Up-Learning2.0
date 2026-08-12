@@ -1,4 +1,4 @@
-import type { FoundationShape } from "@/data/activities/starpath/ground/week1Lesson1";
+import type { FoundationShape } from "@/data/activities/starpath/ground/types";
 
 // Starpath's cosmic objects and the familiar shape each one is built around.
 // Two objects per shape gives scenes real visual variety across lessons.

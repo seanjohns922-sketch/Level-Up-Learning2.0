@@ -1,8 +1,9 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-blueprint";
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
+import type { FoundationShape } from "@/data/activities/starpath/ground/types";
 
-export type FoundationShape = "circle" | "triangle" | "square" | "rectangle";
+export type { FoundationShape } from "@/data/activities/starpath/ground/types";
 
 const SHAPE_FACTS: Record<FoundationShape, string> = {
   circle: "A circle is round.",

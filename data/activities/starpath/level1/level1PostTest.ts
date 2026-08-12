@@ -1,13 +1,42 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { PostTest, Question } from "@/data/assessments/posttests";
-import { buildLevelOneWeek1VoyageQuiz } from "./week1Quiz";
-import { buildLevelOneWeek2VoyageQuiz } from "./week2Quiz";
-import { buildLevelOneWeek3VoyageQuiz } from "./week3Quiz";
-import { buildLevelOneWeek4VoyageQuiz } from "./week4Quiz";
-import { buildLevelOneWeek5VoyageQuiz } from "./week5Quiz";
-import { buildLevelOneWeek6VoyageQuiz } from "./week6Quiz";
-import { buildLevelOneWeek7VoyageQuiz } from "./week7Quiz";
-import { belongsTask } from "./week2Lessons";
+import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
+import {
+  createCompareTheShapesTaskSet,
+  createShapeDetectiveChallengeTaskSet,
+  createShapeReviewMissionTaskSet,
+} from "./week1Lessons";
+import {
+  belongsTask,
+  createMakeYourOwnRuleTaskSet,
+  createMeetTheFamiliesTaskSet,
+  createTwoWaysToSortTaskSet,
+} from "./week2Lessons";
+import {
+  createHiddenShapeHuntTaskSet,
+  createMasterDetectiveTaskSet,
+  createShapeDetectivesPictureTaskSet,
+} from "./week3ShapeHunt";
+import {
+  createSameOrDifferentTaskSet,
+  createShapeMatchTaskSet,
+  createShapeSpotterTaskSet,
+} from "./week4WorldObjects";
+import {
+  createBuildAndCompareTaskSet,
+  createConnectTheStarsTaskSet,
+  createShapeRepairTaskSet,
+} from "./week5MakeShape";
+import {
+  createBuildARouteTaskSet,
+  createMissionRoutesTaskSet,
+  createRouteDesignerTaskSet,
+} from "./week6Lessons";
+import {
+  createFindTheErrorTaskSet,
+  createFixTheRouteTaskSet,
+  createTestAndImproveTaskSet,
+} from "./week7Lessons";
 import { routeBuildTask } from "./route-tasks";
 
 export const STARPATH_LEVEL_ONE_POSTTEST_ID = "y1-space-post-01";
@@ -23,14 +52,72 @@ type TaskSelection = {
   indices: number[];
 };
 
+function fiveFrom(taskSet: RealmLessonTaskSet): PracticeTask[] {
+  return Array.from({ length: 5 }, (_, index) => {
+    const activity = taskSet.activities[index % taskSet.activities.length];
+    if (!activity) throw new Error("Starpath Level 1 legacy assessment activity is missing");
+    return activity();
+  });
+}
+
+function legacyWeeklyTasks(
+  first: RealmLessonTaskSet,
+  second: RealmLessonTaskSet,
+  third: RealmLessonTaskSet,
+): PracticeTask[] {
+  return [...fiveFrom(first), ...fiveFrom(second), ...fiveFrom(third)];
+}
+
 const TASK_SELECTIONS: TaskSelection[] = [
-  { week: 1, skillId: "shape_recognition", skillLabel: "Recognise and Compare Shapes", build: buildLevelOneWeek1VoyageQuiz, indices: [0, 6] },
-  { week: 2, skillId: "shape_classification", skillLabel: "Classify Shapes into Families", build: buildLevelOneWeek2VoyageQuiz, indices: [0, 5, 10] },
-  { week: 3, skillId: "shape_decomposition", skillLabel: "Find Shapes in Pictures", build: buildLevelOneWeek3VoyageQuiz, indices: [0, 5, 10] },
-  { week: 4, skillId: "shapes_in_world", skillLabel: "Shapes in the World", build: buildLevelOneWeek4VoyageQuiz, indices: [0, 5, 10] },
-  { week: 5, skillId: "shape_composition", skillLabel: "Make Shapes from Parts", build: buildLevelOneWeek5VoyageQuiz, indices: [0, 5, 10] },
-  { week: 6, skillId: "give_directions", skillLabel: "Build a Route", build: buildLevelOneWeek6VoyageQuiz, indices: [0, 10] },
-  { week: 7, skillId: "fix_routes", skillLabel: "Test and Fix Routes", build: buildLevelOneWeek7VoyageQuiz, indices: [0, 10] },
+  {
+    week: 1,
+    skillId: "shape_recognition",
+    skillLabel: "Recognise and Compare Shapes",
+    build: () => legacyWeeklyTasks(createShapeReviewMissionTaskSet(), createCompareTheShapesTaskSet(), createShapeDetectiveChallengeTaskSet()),
+    indices: [0, 6],
+  },
+  {
+    week: 2,
+    skillId: "shape_classification",
+    skillLabel: "Classify Shapes into Families",
+    build: () => legacyWeeklyTasks(createMeetTheFamiliesTaskSet(), createMakeYourOwnRuleTaskSet(), createTwoWaysToSortTaskSet()),
+    indices: [0, 5, 10],
+  },
+  {
+    week: 3,
+    skillId: "shape_decomposition",
+    skillLabel: "Find Shapes in Pictures",
+    build: () => legacyWeeklyTasks(createShapeDetectivesPictureTaskSet(), createHiddenShapeHuntTaskSet(), createMasterDetectiveTaskSet()),
+    indices: [0, 5, 10],
+  },
+  {
+    week: 4,
+    skillId: "shapes_in_world",
+    skillLabel: "Shapes in the World",
+    build: () => legacyWeeklyTasks(createShapeSpotterTaskSet(), createSameOrDifferentTaskSet(), createShapeMatchTaskSet()),
+    indices: [0, 5, 10],
+  },
+  {
+    week: 5,
+    skillId: "shape_composition",
+    skillLabel: "Make Shapes from Parts",
+    build: () => legacyWeeklyTasks(createConnectTheStarsTaskSet(), createShapeRepairTaskSet(), createBuildAndCompareTaskSet()),
+    indices: [0, 5, 10],
+  },
+  {
+    week: 6,
+    skillId: "give_directions",
+    skillLabel: "Build a Route",
+    build: () => legacyWeeklyTasks(createBuildARouteTaskSet(), createMissionRoutesTaskSet(), createRouteDesignerTaskSet()),
+    indices: [0, 10],
+  },
+  {
+    week: 7,
+    skillId: "fix_routes",
+    skillLabel: "Test and Fix Routes",
+    build: () => legacyWeeklyTasks(createFindTheErrorTaskSet(), createFixTheRouteTaskSet(), createTestAndImproveTaskSet()),
+    indices: [0, 10],
+  },
   {
     week: 8,
     skillId: "pathfinder_reasoning",

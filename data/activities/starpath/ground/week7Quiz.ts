@@ -1,11 +1,12 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import type { StarpathBuildObjectId } from "@/data/activities/starpath/ground/shape-builds";
 import {
-  buildMatchTask,
-  finishPictureTask,
-  identifyBuildShapesTask,
-} from "@/data/activities/starpath/ground/week2Tasks";
-import { findItTask, sayWhereTask, whichPictureTask } from "@/data/activities/starpath/ground/week4Tasks";
+  quizBuildMatchTask,
+  quizBuildShapesTask,
+  quizPositionFindTask,
+  quizPositionPictureTask,
+  quizPositionWordTask,
+} from "@/data/activities/starpath/ground/quizTasks";
+import type { StarpathBuildObjectId } from "@/data/activities/starpath/ground/shape-builds";
 import type { PositionRelation } from "@/data/activities/starpath/ground/position-objects";
 
 const BUILD_OBJECTS: StarpathBuildObjectId[] = [
@@ -38,17 +39,21 @@ export function buildGroundWeek7VoyageQuiz(): PracticeTask[] {
 
   for (let i = 0; i < 5; i += 1) {
     n += 1;
-    tasks.push(i % 2 === 0 ? finishPictureTask(BUILD_OBJECTS, i, n) : identifyBuildShapesTask(BUILD_OBJECTS, i, n));
+    tasks.push(i % 2 === 0 ? quizBuildShapesTask(i, n, BUILD_OBJECTS) : quizBuildMatchTask(i, n, BUILD_OBJECTS));
   }
   for (let i = 0; i < 5; i += 1) {
     n += 1;
-    tasks.push(i % 2 === 0 ? whichPictureTask(i, n, RELATIONS) : buildMatchTask(BUILD_OBJECTS, i, n));
+    tasks.push(i % 2 === 0 ? quizPositionPictureTask(i, n, RELATIONS) : quizBuildMatchTask(i + 5, n, BUILD_OBJECTS));
   }
   for (let i = 0; i < 5; i += 1) {
     n += 1;
     const step = i % 3;
     tasks.push(
-      step === 0 ? sayWhereTask(i, n, RELATIONS, POOL) : step === 1 ? findItTask(i, n, RELATIONS) : whichPictureTask(i + 2, n, RELATIONS)
+      step === 0
+        ? quizPositionWordTask(i, n, POOL)
+        : step === 1
+          ? quizPositionFindTask(i, n, RELATIONS)
+          : quizPositionPictureTask(i + 2, n, RELATIONS)
     );
   }
 

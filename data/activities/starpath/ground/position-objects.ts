@@ -10,6 +10,8 @@ export type PositionObjectId =
   | "star"
   | "crystal"
   | "alien"
+  | "explorer"
+  | "geospin"
   | "satellite"
   | "cave";
 
@@ -23,6 +25,8 @@ export const POSITION_OBJECTS: Record<PositionObjectId, { label: string }> = {
   star: { label: "star" },
   crystal: { label: "crystal" },
   alien: { label: "alien" },
+  explorer: { label: "explorer" },
+  geospin: { label: "Geospin" },
   satellite: { label: "satellite" },
   cave: { label: "cave" },
 };

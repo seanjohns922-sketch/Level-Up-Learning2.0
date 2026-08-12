@@ -172,6 +172,18 @@ export function PositionObjectVisual({
           <ellipse cx="47" cy="42" rx="8" ry="4" fill="#fff" opacity="0.24" transform="rotate(-22 47 42)" />
         </>
       ) : null}
+      {objectId === "explorer" || objectId === "geospin" ? (
+        <>
+          <circle cx="60" cy="34" r="21" fill={objectId === "geospin" ? gradient("violet") : gradient("gold")} stroke="#312e81" strokeWidth="5" />
+          <path d="M37 31c8-11 38-11 46 0" fill="none" stroke="#e0f2fe" strokeWidth="6" strokeLinecap="round" opacity="0.9" />
+          <rect x="31" y="53" width="58" height="48" rx="18" fill={objectId === "geospin" ? gradient("cyan") : gradient("green")} stroke="#312e81" strokeWidth="5" />
+          <path d="M31 66 16 84M89 66l15 18M44 100l-7 13M76 100l7 13" fill="none" stroke="#312e81" strokeWidth="7" strokeLinecap="round" />
+          <circle cx="53" cy="33" r="3" fill="#1e1b4b" />
+          <circle cx="67" cy="33" r="3" fill="#1e1b4b" />
+          <path d="M53 42c5 4 9 4 14 0" fill="none" stroke="#1e1b4b" strokeWidth="3" strokeLinecap="round" />
+          {objectId === "geospin" ? <path d="m60 63 5 10 11 1-8 7 2 11-10-5-10 5 2-11-8-7 11-1Z" fill="#fde047" /> : null}
+        </>
+      ) : null}
       {objectId === "satellite" ? (
         <>
           <rect x="7" y="49" width="34" height="23" rx="3" fill={gradient("cyan")} stroke="#312e81" strokeWidth="4" />

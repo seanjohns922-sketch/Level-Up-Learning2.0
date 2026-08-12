@@ -1,4 +1,4 @@
-import type { FoundationShape } from "@/data/activities/starpath/ground/week1Lesson1";
+import type { FoundationShape } from "@/data/activities/starpath/ground/types";
 
 export type StarpathBuildObjectId =
   | "rocket"

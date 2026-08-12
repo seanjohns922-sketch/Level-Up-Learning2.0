@@ -1,8 +1,12 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { assertWeeklyQuizQuestionCount } from "@/lib/weekly-quiz-contract";
-import { shapeMatchTask, shapeNameTask } from "@/data/activities/starpath/ground/week1Lesson1";
-import { objectMatchTask, shapeExplorerTask } from "@/data/activities/starpath/ground/week1Lesson2";
-import { oddOneOutTask } from "@/data/activities/starpath/ground/week1Lesson3";
+import {
+  quizObjectShapeTask,
+  quizOddShapeTask,
+  quizShapeFeatureTask,
+  quizShapeNameTask,
+  quizShapeSceneTask,
+} from "@/data/activities/starpath/ground/quizTasks";
 import { buildGroundWeek2VoyageQuiz } from "@/data/activities/starpath/ground/week2Quiz";
 import { buildGroundWeek3VoyageQuiz } from "@/data/activities/starpath/ground/week3Quiz";
 import { buildGroundWeek4VoyageQuiz } from "@/data/activities/starpath/ground/week4Quiz";
@@ -47,19 +51,19 @@ export function buildGroundWeek1VoyageQuiz(): PracticeTask[] {
   // Lesson 1 — 5 questions (alternating recognise / name)
   for (let i = 0; i < 5; i += 1) {
     n += 1;
-    tasks.push(i % 2 === 0 ? shapeMatchTask(i, n) : shapeNameTask(i, n));
+    tasks.push(i % 2 === 0 ? quizShapeFeatureTask(i, n) : quizShapeNameTask(i, n));
   }
 
   // Lesson 2 — 5 questions (alternating object-shape / find-in-scene)
   for (let i = 0; i < 5; i += 1) {
     n += 1;
-    tasks.push(i % 2 === 0 ? objectMatchTask(i, n) : shapeExplorerTask(i, n));
+    tasks.push(i % 2 === 0 ? quizObjectShapeTask(i, n) : quizShapeSceneTask(i, n));
   }
 
   // Lesson 3 — 5 questions (which one doesn't belong)
   for (let i = 0; i < 5; i += 1) {
     n += 1;
-    tasks.push(oddOneOutTask(i, n));
+    tasks.push(quizOddShapeTask(i, n));
   }
 
   return tasks;

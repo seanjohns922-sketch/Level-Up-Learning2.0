@@ -31,7 +31,7 @@ export function createAroundStarpathTaskSet(): RealmLessonTaskSet {
 
 export const AROUND_STARPATH_CONTENT = {
   missionBrief: "Explore every corner of Starpath. Say where things are and find objects that are behind, in front of and inside other objects.",
-  successCriteria: ["use positional words", "follow directions", "find objects"],
+  successCriteria: ["use positional words", "name the reference", "find objects"],
   artworkSrc: "/images/starpath-home-bg-ground.png",
   teaching: { title: "Around Starpath", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [

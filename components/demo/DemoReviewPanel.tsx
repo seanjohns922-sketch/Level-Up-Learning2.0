@@ -71,6 +71,9 @@ function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "
   if (realm === "number" && year === "Year 6") {
     params.set("review_bank", "year6-number-v1");
   }
+  if (realm === "space" && year === "Year 1" && kind === "pretest") {
+    params.set("review_bank", "level1-starpath-pre-rc1");
+  }
   return `/${kind}?${params.toString()}`;
 }
 
@@ -219,7 +222,9 @@ export default function DemoReviewPanel() {
   function posttestHref() {
     if (realm === "space") {
       const href = buildStarpathPostTestPageHref({ selectedLevel: getStarpathLevelForYear(year).id });
-      return year === "Prep" ? `${href}&review_bank=ground-starpath-rc1` : href;
+      if (year === "Prep") return `${href}&review_bank=ground-starpath-rc1`;
+      if (year === "Year 1") return `${href}&review_bank=level1-starpath-post-rc1`;
+      return href;
     }
     return assessmentHref(realm, year, "posttest");
   }

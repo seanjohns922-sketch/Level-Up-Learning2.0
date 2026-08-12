@@ -13,16 +13,11 @@ const allLessons = registry.STARPATH_PROGRAMS.flatMap((program) =>
   program.weeks.flatMap((week) => week.lessons)
 );
 const implemented = allLessons.filter((lesson) => lesson.status === "implemented");
+const groundLessons = allLessons.filter((lesson) => lesson.id.startsWith("ground-space-"));
 
 assert.equal(allLessons.length, 7 * 8 * 3, "Starpath must expose 168 canonical lesson routes");
-assert.deepEqual(implemented.map((lesson) => lesson.id), [
-  "ground-space-w1-l1",
-  "ground-space-w1-l2",
-  "ground-space-w1-l3",
-  "ground-space-w2-l1",
-  "ground-space-w2-l2",
-  "ground-space-w2-l3",
-]);
+assert.equal(groundLessons.length, 24, "Ground Starpath must expose 24 lessons");
+assert.ok(groundLessons.every((lesson) => lesson.status === "implemented"), "Every Ground Starpath lesson must be implemented");
 
 const route = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
 assert.match(route, /StarpathGroundLesson/);
@@ -53,7 +48,7 @@ for (const required of [
   "PracticeRunner",
   'brainBreakFrequency="normal"',
   "showResultsAfterReflection",
-  "showCoachReview={false}",
+  "showCoachReview",
   "showMistakeReview={false}",
   "Mission Log",
   "Mission Complete!",
@@ -109,4 +104,4 @@ assert.match(runner, /pendingTaskTransition/);
 assert.match(runner, /showResultsAfterReflection/);
 assert.match(runner, /pauseLessonClockRef\.current[\s\S]*pendingTaskTransition/);
 
-console.log(`Starpath lesson experience audit passed: shared platform blueprint, dedicated Starpath shell, ${allLessons.length} mission-home routes, ${implemented.length} implemented mission, ${allLessons.length - implemented.length} safely unavailable mission engines.`);
+console.log(`Starpath lesson experience audit passed: shared platform blueprint, dedicated Starpath shell, ${allLessons.length} mission-home routes, ${implemented.length} implemented missions, including all ${groundLessons.length} Ground missions.`);

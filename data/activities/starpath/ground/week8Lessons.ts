@@ -2,11 +2,12 @@ import type { StarpathLessonContent } from "@/data/activities/starpath/lesson-bl
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 import { shapeMatchTask } from "./week1Lesson1";
 import { compareShapeTask, familyStationTask, oddShapeTask } from "./week3Tasks";
-import { findItTask, sayWhereTask, whichPictureTask } from "./week4Tasks";
-import { directionChoiceTask, directionPathTask } from "./directionTasks";
-import type { PositionRelation } from "./position-objects";
+import { findItTask, followCluesTask, placeItTask, sayWhereTask, whichPictureTask } from "./week4Tasks";
+import type { PositionObjectId, PositionRelation } from "./position-objects";
 
 const ALL_RELATIONS: PositionRelation[] = ["above", "below", "beside", "behind", "in-front", "inside"];
+const PEOPLE: PositionObjectId[] = ["explorer", "geospin"];
+const REFERENCES: PositionObjectId[] = ["flag", "rocket", "planet", "cave", ...PEOPLE];
 
 // ── Lesson 1 — Shape Explorer Challenge ──────────────────────────────────────
 export function createShapeExplorerChallengeTaskSet(): RealmLessonTaskSet {
@@ -61,29 +62,29 @@ export function createPositionExplorerChallengeTaskSet(): RealmLessonTaskSet {
       variant: "positions",
       heading: "Position Explorer challenge",
       prompt: "Show everything you know about position.",
-      speakText: "Now show what you know about space! Find objects by position, say where things are and choose the right direction.",
+      speakText: "Now show what you know about position. Find people and objects, describe where they are and place them from a clue.",
       target: ++target,
     }),
     activities: [
       () => findItTask(a++, ++target, ALL_RELATIONS),
       () => sayWhereTask(b++, ++target, ALL_RELATIONS, ALL_RELATIONS),
-      () => directionChoiceTask(c++, ++target, "goal"),
+      () => placeItTask(c++, ++target, { anchors: REFERENCES, subjects: PEOPLE }),
     ],
   };
 }
 
 export const POSITION_EXPLORER_CHALLENGE_CONTENT = {
-  missionBrief: "Continue your Space Graduation. Find objects by position, describe where things are and choose the right way to travel.",
-  successCriteria: ["find by position", "say where things are", "choose the direction"],
+  missionBrief: "Continue your Space Graduation. Find, describe and place people and objects using relative-position clues.",
+  successCriteria: ["find by position", "say where things are", "place from a clue"],
   artworkSrc: "/images/starpath-home-bg-ground.png",
   teaching: { title: "Position Explorer Challenge", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
     { key: "find-by-position", title: "Find It", description: "Find the object a position clue describes.", taskKinds: ["starpathPositionFind"] },
     { key: "say-where", title: "Say Where", description: "Choose the word for where an object is.", taskKinds: ["starpathPositionWord"] },
-    { key: "which-way", title: "Which Way?", description: "Choose the direction toward the goal.", taskKinds: ["starpathDirectionChoice"] },
+    { key: "place-person", title: "Place the Explorer", description: "Place a person relative to a named reference.", taskKinds: ["starpathPositionPlace"] },
   ],
-  reflection: { prompt: "Which space skill felt strongest?", options: ["Finding by position", "Saying where", "Choosing directions"] },
-  practisedSkills: ["Find an object by position", "Describe an object's position", "Choose the direction toward a goal"],
+  reflection: { prompt: "Which space skill felt strongest?", options: ["Finding by position", "Saying where", "Placing from clues"] },
+  practisedSkills: ["Find an object by position", "Describe an object's position", "Place a person relative to a reference"],
   nextUpLabel: "Geospin's Final Mission",
   createTaskSet: createPositionExplorerChallengeTaskSet,
 } satisfies StarpathLessonContent;
@@ -99,34 +100,34 @@ export function createFinalMissionTaskSet(): RealmLessonTaskSet {
     teaching: () => ({
       kind: "starpathShapeIntro",
       scene: "intro",
-      variant: "directions",
+      variant: "positions",
       heading: "Geospin's final mission",
       prompt: "Bring every skill together.",
-      speakText: "This is the final mission! Bring together everything you know about shapes, position and directions to help Geospin graduate.",
+      speakText: "This is the final mission. Bring together everything you know about shapes and relative position to help Geospin graduate.",
       target: ++target,
     }),
     activities: [
       () => familyStationTask(a++, ++target),
       () => whichPictureTask(b++, ++target, ALL_RELATIONS),
       () => compareShapeTask(c++, ++target),
-      () => directionPathTask(d++, ++target, { steps: 3, goalObject: "star", prompt: "Complete the final mission path." }),
+      () => followCluesTask(d++, ++target, "mission"),
     ],
   };
 }
 
 export const FINAL_MISSION_CONTENT = {
-  missionBrief: "Complete Geospin's final mission. Combine shape sorting, position, comparison and directions to graduate from Ground Level.",
-  successCriteria: ["sort shapes", "use position", "follow directions"],
+  missionBrief: "Complete Geospin's final mission. Combine shape sorting, comparison and relative-position clues to graduate from Ground Level.",
+  successCriteria: ["sort shapes", "use position", "follow location clues"],
   artworkSrc: "/images/starpath-home-bg-ground.png",
   teaching: { title: "Geospin's Final Mission", durationMinutes: 1, taskKind: "starpathShapeIntro" },
   activities: [
     { key: "sort-shapes", title: "Sort the Shapes", description: "Sort each shape into its family.", taskKinds: ["starpathFamilySort"] },
     { key: "which-picture", title: "Which Picture?", description: "Choose the scene that matches the position.", taskKinds: ["starpathPositionPicture"] },
     { key: "compare", title: "Compare", description: "Decide if two shapes are the same.", taskKinds: ["starpathShapeCompare"] },
-    { key: "final-path", title: "Final Path", description: "Follow the directions to finish the mission.", taskKinds: ["starpathDirectionPath"] },
+    { key: "final-clues", title: "Final Clues", description: "Use several relative-position clues to finish the mission.", taskKinds: ["starpathPositionSequence"] },
   ],
-  reflection: { prompt: "You did it! What are you proudest of?", options: ["My shape skills", "My position skills", "My direction skills"] },
-  practisedSkills: ["Sort shapes into families", "Apply position and comparison", "Follow a direction path to finish"],
+  reflection: { prompt: "You did it! What are you proudest of?", options: ["My shape skills", "My position skills", "My clue skills"] },
+  practisedSkills: ["Sort shapes into families", "Apply position and comparison", "Interpret several relative-position clues"],
   nextUpLabel: "Ground Graduate",
   createTaskSet: createFinalMissionTaskSet,
 } satisfies StarpathLessonContent;

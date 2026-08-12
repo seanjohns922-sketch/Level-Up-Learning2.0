@@ -1,28 +1,15 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { directionChoiceTask } from "@/data/activities/starpath/ground/directionTasks";
+import { quizPositionFindTask, quizPositionPictureTask, quizPositionWordTask } from "@/data/activities/starpath/ground/quizTasks";
+import type { PositionRelation } from "./position-objects";
 
-// Ground Level · Week 5 Voyage Quiz — 15 questions, 5 from each lesson, using
-// the single-answer "Which Way?" task (Move It There and Direction Mission are
-// completion-style paths, so the quiz assesses direction identification).
-//   L1 Move It There     : which way did it move
-//   L2 Which Way?         : which way to reach the goal
-//   L3 Direction Mission  : mixed moved / goal
+const RELATIONS: PositionRelation[] = ["above", "below", "beside", "behind", "in-front"];
+
+// Independent 5-5-5 quiz bank matching Where Am I, Where Are We and Position Mission.
 export function buildGroundWeek5VoyageQuiz(): PracticeTask[] {
   const tasks: PracticeTask[] = [];
-  let n = 0;
-
-  for (let i = 0; i < 5; i += 1) {
-    n += 1;
-    tasks.push(directionChoiceTask(i, n, "moved"));
-  }
-  for (let i = 0; i < 5; i += 1) {
-    n += 1;
-    tasks.push(directionChoiceTask(i + 2, n, "goal"));
-  }
-  for (let i = 0; i < 5; i += 1) {
-    n += 1;
-    tasks.push(directionChoiceTask(i + 4, n, i % 2 === 0 ? "moved" : "goal"));
-  }
-
+  let target = 0;
+  for (let i = 0; i < 5; i += 1) tasks.push(quizPositionWordTask(i, ++target, RELATIONS));
+  for (let i = 0; i < 5; i += 1) tasks.push(quizPositionPictureTask(i + 2, ++target, RELATIONS));
+  for (let i = 0; i < 5; i += 1) tasks.push(quizPositionFindTask(i + 4, ++target, RELATIONS));
   return tasks;
 }

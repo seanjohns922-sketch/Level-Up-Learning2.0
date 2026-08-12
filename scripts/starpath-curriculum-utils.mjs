@@ -21,9 +21,9 @@ export function renderStarpathCurriculumMap() {
   const lines = [
     "# Starpath Curriculum Map",
     "",
-    "> Status: In development. Ground Level Weeks 1-2 lessons and the Week 1 quiz are implemented for Demo Mode; remaining lessons, quiz banks and assessment banks are planned.",
+    "> Status: In development. All 24 Ground Level lessons and seven independent weekly quiz banks are implemented for Demo Mode. The independent Ground Post-Test remains an RC1 candidate pending educator approval.",
     "",
-    "Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Every week has a 15-question weekly quiz (5 questions per lesson). Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test, and post-test metadata remains planned for the later assessment phase.",
+    "Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Weeks 1-7 have a 15-question weekly quiz (5 questions per lesson); Week 8 uses the Post-Test. Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test.",
     "",
     "## Pathway Rules",
     "",
@@ -67,9 +67,9 @@ export function renderStarpathCurriculumMap() {
       "### Assessment Metadata",
       "",
       program.assessments.preTest
-        ? `- Pre-test: \`${program.assessments.preTest.id}\` (${program.assessments.preTest.questionCount} questions; planned)`
+        ? `- Pre-test: \`${program.assessments.preTest.id}\` (${program.assessments.preTest.questionCount} questions; ${program.assessments.preTest.status})`
         : "- Pre-test: not required",
-      `- Post-test: \`${program.assessments.postTest.id}\` (${program.assessments.postTest.questionCount} questions; unlocks after \`${program.assessments.postTest.unlockAfterLessonId}\`; planned)`,
+      `- Post-test: \`${program.assessments.postTest.id}\` (${program.assessments.postTest.questionCount} questions; unlocks after \`${program.assessments.postTest.unlockAfterLessonId}\`; ${program.assessments.postTest.status})`,
       "",
       "### Skill Taxonomy",
       "",
@@ -100,7 +100,7 @@ export function renderStarpathCurriculumMap() {
         bullets(week.misconceptions),
         "",
         week.quiz
-          ? `**Weekly quiz:** \`${week.quiz.id}\` - ${week.quiz.coverage} (${week.quiz.questionCount} questions; planned)`
+          ? `**Weekly quiz:** \`${week.quiz.id}\` - ${week.quiz.coverage} (${week.quiz.questionCount} questions; ${week.quiz.status})`
           : `**Weekly quiz:** none. Week 8 Lesson 3 unlocks \`${program.assessments.postTest.id}\`.`,
         "",
       );

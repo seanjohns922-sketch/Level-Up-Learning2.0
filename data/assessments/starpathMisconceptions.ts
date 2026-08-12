@@ -24,7 +24,7 @@ export const STARPATH_MISCONCEPTION_LIBRARY: readonly StarpathMisconception[] = 
   misconception("parallel-opposite-confusion", "Parallel and opposite confusion", "Interchanges parallel sides with opposite sides or assumes every opposite pair is parallel.", ["AC9M2SP01"]),
   misconception("position-without-reference", "Position without a reference", "Uses a position word without identifying the object or location it is relative to.", ["AC9MFSP02"]),
   misconception("viewpoint-left-right", "Viewpoint and left-right", "Assumes left and right remain fixed when the viewpoint changes.", ["AC9MFSP02", "AC9M1SP02", "AC9M2SP02"]),
-  misconception("route-start-order", "Route start and order", "Follows or gives correct-looking moves without preserving the starting point and instruction order.", ["AC9MFSP02", "AC9M1SP02", "AC9M2SP02", "AC9M3SP02"]),
+  misconception("route-start-order", "Route start and order", "Follows or gives correct-looking moves without preserving the starting point and instruction order.", ["AC9M1SP02", "AC9M2SP02", "AC9M3SP02"]),
   misconception("route-destination-only", "Destination-only route", "Treats reaching the destination as sufficient when a route misses required checkpoints or constraints.", ["AC9M1SP02", "AC9M2SP02", "AC9M4SP02", "AC9M5SP02"]),
   misconception("map-symbol-representation", "Map symbol representation", "Treats a map symbol as the real object or cannot connect symbols and landmarks through a key.", ["AC9M2SP02", "AC9M3SP02"]),
   misconception("map-viewpoint", "Map viewpoint", "Interprets a top-view representation as though it were a front-view scene.", ["AC9M2SP02", "AC9M3SP02"]),

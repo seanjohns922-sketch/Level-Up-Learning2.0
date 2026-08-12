@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getPosttestForYearLabel } from "@/data/assessments/api";
 import { YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/year6NumberNexusIndependentBanks";
 import { GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/groundStarpathIndependentPosttest";
+import { LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/level1StarpathIndependentAssessments";
 import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -346,8 +347,12 @@ function PostTestPage() {
   const starpathCandidateReviewRequested = progressRealmId === "space"
     && year === "Prep"
     && reviewBank === "ground-starpath-rc1";
+  const starpathLevel1CandidateRequested = progressRealmId === "space"
+    && year === "Year 1"
+    && reviewBank === "level1-starpath-post-rc1";
   const candidateReviewRequested = (progressRealmId === "number" && year === "Year 6")
-    || starpathCandidateReviewRequested;
+    || starpathCandidateReviewRequested
+    || starpathLevel1CandidateRequested;
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {
@@ -358,9 +363,11 @@ function PostTestPage() {
     () => candidateReviewEnabled
       ? starpathCandidateReviewRequested
         ? [...GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
+        : starpathLevel1CandidateRequested
+          ? [...LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
       : getPosttestForYearLabel(year, progressRealmId)?.questions ?? [],
-    [candidateReviewEnabled, starpathCandidateReviewRequested, year, progressRealmId],
+    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId],
   );
 
   const [idx, setIdx] = useState(0);

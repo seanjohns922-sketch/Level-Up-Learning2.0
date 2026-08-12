@@ -11,6 +11,8 @@ assert.equal(registry.STARPATH_WEEK_COUNT, 8);
 
 const groundProgram = registry.STARPATH_PROGRAM_BY_LEVEL.ground;
 assert.equal(groundProgram.assessments.preTest, null);
+assert.equal(groundProgram.descriptors.find((item) => item.code === "AC9MFSP01")?.text, "sort, name and create familiar shapes; recognise and describe familiar shapes within objects in the environment, giving reasons");
+assert.equal(groundProgram.descriptors.find((item) => item.code === "AC9MFSP02")?.text, "describe the position and location of themselves and objects in relation to other people and objects within a familiar space");
 assert.deepEqual(
   groundProgram.weeks.map((week) => week.title),
   [
@@ -18,8 +20,8 @@ assert.deepEqual(
     "Shape Builders",
     "Shape Sorters",
     "Space Positions",
-    "Space Directions",
-    "Space Adventures",
+    "People and Positions",
+    "Location Clues",
     "Build Starpath",
     "Space Graduation",
   ],
@@ -31,18 +33,29 @@ assert.deepEqual(
     ["Build with Shapes", "Shape Creators", "Space Builders"],
     ["Shape Families", "Same or Different?", "Shape Challenge"],
     ["Where Is It?", "Around Starpath", "Position Challenge"],
-    ["Move It There", "Which Way?", "Direction Mission"],
-    ["Guide the Rover", "Help Geospin", "Hidden Treasure"],
+    ["Where Am I?", "Where Are We?", "Position Mission"],
+    ["Find the Explorer", "Help Geospin", "Hidden Treasure"],
     ["Build a Planet", "Create a Space Scene", "Describe Your Picture"],
     ["Shape Explorer Challenge", "Position Explorer Challenge", "Geospin's Final Mission"],
   ],
 );
 assert.match(groundProgram.progressionRationale, /Ground Level Starpath Graduate title/);
 
+for (const relativePath of [
+  "data/activities/starpath/ground/week5Lessons.ts",
+  "data/activities/starpath/ground/week5Quiz.ts",
+  "data/activities/starpath/ground/week6Lessons.ts",
+  "data/activities/starpath/ground/week6Quiz.ts",
+  "data/activities/starpath/ground/week8Lessons.ts",
+]) {
+  const source = fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
+  assert.equal(/starpathDirection|directionPathTask|directionChoiceTask|mode:\s*["']route["']/.test(source), false, `${relativePath} leaks Year 1 direction or route work into Foundation.`);
+}
+
 const ids = new Set();
 for (const program of registry.STARPATH_PROGRAMS) {
   assert.equal(program.realmId, "space");
-  assert.equal(program.status, ["level-3", "level-4"].includes(program.level) ? "implemented" : "planned");
+  assert.equal(program.status, ["ground", "level-3", "level-4"].includes(program.level) ? "implemented" : "planned");
   assert.equal(program.weeks.length, 8, `${program.level} must have exactly 8 weeks`);
   assert.equal(program.skills.length, 8, `${program.level} must expose one stable reporting skill per week`);
   assert.equal(program.assessments.preTest === null, program.level === "ground");

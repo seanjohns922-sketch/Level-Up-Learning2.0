@@ -1,5 +1,9 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { findItTask, sayWhereTask, whichPictureTask } from "@/data/activities/starpath/ground/week4Tasks";
+import {
+  quizPositionFindTask,
+  quizPositionPictureTask,
+  quizPositionWordTask,
+} from "@/data/activities/starpath/ground/quizTasks";
 import type { PositionRelation } from "@/data/activities/starpath/ground/position-objects";
 
 const PLANAR: PositionRelation[] = ["above", "below", "beside"];
@@ -18,7 +22,7 @@ export function buildGroundWeek4VoyageQuiz(): PracticeTask[] {
   // Lesson 1 — 5 questions (find / which-picture alternating)
   for (let i = 0; i < 5; i += 1) {
     n += 1;
-    tasks.push(i % 2 === 0 ? findItTask(i, n, PLANAR) : whichPictureTask(i, n, PLANAR));
+    tasks.push(i % 2 === 0 ? quizPositionFindTask(i, n, PLANAR) : quizPositionPictureTask(i, n, PLANAR));
   }
 
   // Lesson 2 — 5 questions (say-where / find / which-picture cycling)
@@ -26,7 +30,11 @@ export function buildGroundWeek4VoyageQuiz(): PracticeTask[] {
     n += 1;
     const step = i % 3;
     tasks.push(
-      step === 0 ? sayWhereTask(i, n, DEPTH, ALL) : step === 1 ? findItTask(i, n, DEPTH) : whichPictureTask(i, n, DEPTH)
+      step === 0
+        ? quizPositionWordTask(i, n, DEPTH)
+        : step === 1
+          ? quizPositionFindTask(i, n, DEPTH)
+          : quizPositionPictureTask(i, n, DEPTH)
     );
   }
 
@@ -36,10 +44,10 @@ export function buildGroundWeek4VoyageQuiz(): PracticeTask[] {
     const step = i % 3;
     tasks.push(
       step === 0
-        ? findItTask(i + 5, n, ALL)
+        ? quizPositionFindTask(i + 5, n, ALL)
         : step === 1
-          ? sayWhereTask(i + 5, n, ALL, ALL)
-          : whichPictureTask(i + 5, n, ALL)
+          ? quizPositionWordTask(i + 5, n, ALL)
+          : quizPositionPictureTask(i + 5, n, ALL)
     );
   }
 

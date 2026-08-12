@@ -5,6 +5,7 @@ import { Pin, PartyPopper } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getPretestForYearLabel } from "@/data/assessments/api";
 import { YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS } from "@/data/assessments/year6NumberNexusIndependentBanks";
+import { LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS } from "@/data/assessments/level1StarpathIndependentAssessments";
 import type { Question } from "@/data/assessments/pretests";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
@@ -364,13 +365,18 @@ function PretestPage() {
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
   const realmId = searchParams.get("realm_id") ?? "number";
-  if (realmId !== "number" && realmId !== "measurement") {
+  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space") {
     throw new Error(`Unsupported pre-test realm: ${realmId}`);
   }
-  const progressRealmId = realmId === "measurement" ? "measurement" : "number";
+  const progressRealmId = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : "number";
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
-  const candidateReviewRequested = progressRealmId === "number" && year === "Year 6";
+  const reviewBank = searchParams.get("review_bank");
+  const starpathLevel1CandidateRequested = progressRealmId === "space"
+    && year === "Year 1"
+    && reviewBank === "level1-starpath-pre-rc1";
+  const candidateReviewRequested = (progressRealmId === "number" && year === "Year 6")
+    || starpathLevel1CandidateRequested;
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {
@@ -385,9 +391,11 @@ function PretestPage() {
 
   const questions: Question[] = useMemo(
     () => candidateReviewEnabled
-      ? [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
+      ? starpathLevel1CandidateRequested
+        ? [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
+        : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
       : getPretestForYearLabel(year, progressRealmId),
-    [candidateReviewEnabled, year, progressRealmId]
+    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId]
   );
 
   const [index, setIndex] = useState(0);

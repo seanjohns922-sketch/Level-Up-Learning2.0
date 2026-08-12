@@ -41,13 +41,13 @@ assert.match(programPage, /buildStarpathWeeklyQuizHref/);
 assert.match(programPage, /fetch\("\/api\/demo-access"/, "The shared Starpath week route must validate demo access");
 assert.match(programPage, /isStarpathRealm \? item\.type === "quiz" \? "START QUIZ" : "START MISSION"/);
 assert.match(programPage, /isStarpathRealm \? "Missions" : "Lessons"/);
-assert.match(programPage, /activityCardVariant: "standard" \| "portal-circle"/);
+assert.match(programPage, /borderRadius: isStarpathRealm \? 6/);
 assert.match(programPage, /isStarpathRealm \? null : readProgress\(canonicalRealmId\)/, "Starpath must not read another realm's placement state");
 assert.match(lessonPage, /buildStarpathProgramHref/);
 assert.match(quizPage, /buildStarpathProgramHref/);
 assert.match(lessonPlaceholder, /StarpathMissionHome/);
 assert.match(read("components/starpath/StarpathMissionHome.tsx"), /Back to Week/);
-assert.match(quizPlaceholder, /Back to Week/);
+assert.match(quizPlaceholder, /onBack=\{\(\) => router\.push\(quiz\.weekHref\)\}/);
 assert.match(quizPage, /realmId !== STARPATH_REALM_ID/);
 
 for (const fixture of [

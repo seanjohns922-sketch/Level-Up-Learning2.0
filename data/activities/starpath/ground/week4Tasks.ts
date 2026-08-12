@@ -19,6 +19,11 @@ const OBJECTS: PositionObjectId[] = [
   "flag",
 ];
 
+type PositionTaskOptions = {
+  anchors?: PositionObjectId[];
+  subjects?: PositionObjectId[];
+};
+
 function pickDistinct(round: number, count: number, avoid: PositionObjectId[]): PositionObjectId[] {
   const chosen: PositionObjectId[] = [];
   let step = 0;
@@ -104,12 +109,17 @@ export function sayWhereTask(
   round: number,
   target: number,
   correctRelations: PositionRelation[],
-  optionPool: PositionRelation[]
+  optionPool: PositionRelation[],
+  objectOptions?: PositionTaskOptions,
 ): PracticeTask {
   const relation = correctRelations[round % correctRelations.length]!;
   const side: "left" | "right" | undefined = relation === "beside" ? (round % 2 === 0 ? "left" : "right") : undefined;
-  const anchor: PositionObjectId = relation === "inside" ? "cave" : pickDistinct(round + 2, 1, [])[0]!;
-  const subject = pickDistinct(round + 4, 1, [anchor])[0]!;
+  const anchorPool = objectOptions?.anchors ?? OBJECTS;
+  const subjectPool = objectOptions?.subjects ?? OBJECTS;
+  const anchor: PositionObjectId = relation === "inside" ? "cave" : anchorPool[round % anchorPool.length]!;
+  const subject = subjectPool.find((candidate, index) => candidate !== anchor && index >= round % subjectPool.length)
+    ?? subjectPool.find((candidate) => candidate !== anchor)
+    ?? pickDistinct(round + 4, 1, [anchor])[0]!;
 
   const distractors = optionPool.filter((candidate) => candidate !== relation);
   const chosenDistractors = [distractors[round % distractors.length]!, distractors[(round + 1) % distractors.length]!]
@@ -145,10 +155,14 @@ export function sayWhereTask(
 }
 
 // ── Place It (planar: above / below / beside) ────────────────────────────────
-export function placeItTask(round: number, target: number): PracticeTask {
+export function placeItTask(round: number, target: number, objectOptions?: PositionTaskOptions): PracticeTask {
   const relation = (["above", "below", "beside"] as const)[round % 3]!;
-  const anchor = pickDistinct(round + 1, 1, [])[0]!;
-  const mover = pickDistinct(round + 4, 1, [anchor])[0]!;
+  const anchorPool = objectOptions?.anchors ?? OBJECTS;
+  const moverPool = objectOptions?.subjects ?? OBJECTS;
+  const anchor = anchorPool[round % anchorPool.length]!;
+  const mover = moverPool.find((candidate, index) => candidate !== anchor && index >= round % moverPool.length)
+    ?? moverPool.find((candidate) => candidate !== anchor)
+    ?? pickDistinct(round + 4, 1, [anchor])[0]!;
   const phrase = `${positionObjectLabel(mover)} ${RELATION_PHRASE[relation]} the ${positionObjectLabel(anchor)}`;
   return {
     kind: "starpathPositionPlace",
@@ -167,11 +181,20 @@ export function placeItTask(round: number, target: number): PracticeTask {
 }
 
 // ── Which Picture ────────────────────────────────────────────────────────────
-export function whichPictureTask(round: number, target: number, relations: PositionRelation[]): PracticeTask {
+export function whichPictureTask(
+  round: number,
+  target: number,
+  relations: PositionRelation[],
+  objectOptions?: PositionTaskOptions,
+): PracticeTask {
   const relation = relations[round % relations.length]!;
   const side: "left" | "right" | undefined = relation === "beside" ? "right" : undefined;
-  const anchor: PositionObjectId = relation === "inside" ? "cave" : pickDistinct(round + 1, 1, [])[0]!;
-  const subject = pickDistinct(round + 3, 1, [anchor])[0]!;
+  const anchorPool = objectOptions?.anchors ?? OBJECTS;
+  const subjectPool = objectOptions?.subjects ?? OBJECTS;
+  const anchor: PositionObjectId = relation === "inside" ? "cave" : anchorPool[round % anchorPool.length]!;
+  const subject = subjectPool.find((candidate, index) => candidate !== anchor && index >= round % subjectPool.length)
+    ?? subjectPool.find((candidate) => candidate !== anchor)
+    ?? pickDistinct(round + 3, 1, [anchor])[0]!;
   const distractRels = relations.filter((candidate) => candidate !== relation);
   const wrongRels = [distractRels[round % distractRels.length]!, distractRels[(round + 1) % distractRels.length]!];
   const scenes = [

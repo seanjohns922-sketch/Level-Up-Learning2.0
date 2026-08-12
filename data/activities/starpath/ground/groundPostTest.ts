@@ -63,8 +63,8 @@ const TASK_SELECTIONS: TaskSelection[] = [
   },
   {
     week: 5,
-    skillId: "location_movement",
-    skillLabel: "Locate and Move Objects",
+    skillId: "people_positions",
+    skillLabel: "Describe People and Object Positions",
     build: buildGroundWeek5VoyageQuiz,
     indices: [0, 5, 10],
   },

@@ -69,6 +69,8 @@ for (const item of bank) {
   check(!isAssessmentAnswerCorrect(item, `__measurelands_task_incorrect__:${item.id}`), `${item.id} runtime scoring accepts an incorrect token.`);
 
   const task = item.practiceTask;
+  check(task?.kind !== "starpathDirectionChoice" && task?.kind !== "starpathDirectionPath", `${item.id} leaks Year 1 direction work into Foundation.`);
+  check(!(task?.kind === "starpathGroundAssessment" && task.mode === "route"), `${item.id} leaks Year 1 route work into Foundation.`);
   check(Boolean(task && "speakText" in task && task.speakText), `${item.id} has no task read-aloud text.`);
   const feedback = task && "feedback" in task ? task.feedback : undefined;
   check(Boolean(feedback && feedback.correct === feedback.wrong), `${item.id} feedback could reveal correctness during assessment.`);
@@ -81,17 +83,6 @@ for (const item of bank) {
     check(task.answer.every((answer) => !task.fixed?.some((fixed) => fixed.r === answer.r && fixed.c === answer.c)), `${item.id} overlaps a fixed reference object.`);
   }
 
-  if (task?.kind === "starpathGroundAssessment" && task.mode === "route") {
-    let position = { ...task.start };
-    for (const move of task.answerMoves) {
-      if (move === "up") position.r -= 1;
-      if (move === "down") position.r += 1;
-      if (move === "left") position.c -= 1;
-      if (move === "right") position.c += 1;
-      check(position.r >= 0 && position.r < task.rows && position.c >= 0 && position.c < task.cols, `${item.id} route leaves the grid.`);
-    }
-    check(!task.goal || (position.r === task.goal.r && position.c === task.goal.c), `${item.id} route does not reach its displayed goal.`);
-  }
 }
 
 const bankSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/groundStarpathIndependentPosttest.ts"), "utf8");

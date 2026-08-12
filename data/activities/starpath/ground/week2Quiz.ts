@@ -1,10 +1,9 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import {
-  buildMatchTask,
-  finishPictureTask,
-  identifyBuildShapesTask,
-  spaceMuseumTask,
-} from "@/data/activities/starpath/ground/week2Tasks";
+  quizBuildMatchTask,
+  quizBuildShapesTask,
+  quizShapeReasonTask,
+} from "@/data/activities/starpath/ground/quizTasks";
 
 // Ground Level · Week 2 Voyage Quiz — 15 questions, 5 from each lesson.
 //   L1 Build with Shapes : finish pictures + identify their shapes
@@ -18,8 +17,8 @@ export function buildGroundWeek2VoyageQuiz(): PracticeTask[] {
     target += 1;
     tasks.push(
       round < 3
-        ? finishPictureTask(["rocket", "house", "tree", "robot", "moon-buggy"], round, target)
-        : identifyBuildShapesTask(["rocket", "house"], round, target)
+        ? quizBuildShapesTask(round, target, ["rocket", "house", "tree", "robot", "moon-buggy"])
+        : quizBuildMatchTask(round, target, ["rocket", "house", "tree", "robot", "moon-buggy"])
     );
   }
 
@@ -27,8 +26,8 @@ export function buildGroundWeek2VoyageQuiz(): PracticeTask[] {
     target += 1;
     tasks.push(
       round < 3
-        ? finishPictureTask(["cat", "rocket", "house"], round, target)
-        : buildMatchTask(["cat", "space-station"], round, target)
+        ? quizBuildMatchTask(round + 3, target, ["cat", "rocket", "house", "space-station"])
+        : quizBuildShapesTask(round + 3, target, ["cat", "rocket", "house", "space-station"])
     );
   }
 
@@ -36,8 +35,8 @@ export function buildGroundWeek2VoyageQuiz(): PracticeTask[] {
     target += 1;
     tasks.push(
       round < 3
-        ? spaceMuseumTask(round, target)
-        : buildMatchTask(["satellite", "alien"], round, target)
+        ? quizShapeReasonTask(round, target)
+        : quizBuildMatchTask(round + 7, target, ["satellite", "alien", "ufo", "telescope"])
     );
   }
 
