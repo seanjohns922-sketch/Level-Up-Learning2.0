@@ -26,6 +26,13 @@ import {
   Users,
 } from "lucide-react";
 import GemIcon, { cutForGem, GEM_RARITY } from "@/components/gems/GemIcon";
+import LegendCardArtwork from "@/components/legends/LegendCardArtwork";
+import {
+  getAllLegends,
+  getEffectiveUnlockedLegendIds,
+  normalizeLegendRealmId,
+  type Legend,
+} from "@/data/legends";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import type { GemRarity } from "@/lib/gems";
@@ -42,7 +49,10 @@ export type ParentRealm = {
   status: string;
   currentFocus: string | null;
   completedLessons?: number;
+  unlockedLegends?: string[];
 };
+
+type ParentGem = { gemId: string; name: string; earnedAt: string; rarity: string };
 
 export type ParentChild = {
   studentId: string;
@@ -56,6 +66,7 @@ export type ParentChild = {
   billingStatus: string | null;
   realms: ParentRealm[];
   recentAchievements: Array<{ gemId?: string; name: string; earnedAt: string; rarity: string }>;
+  gems?: ParentGem[];
 };
 
 function isGemRarity(value: string): value is GemRarity {
@@ -372,20 +383,84 @@ function SelectedChildDashboard({ child, onActivated }: { child: ParentChild; on
   const completedLessons = child.realms.reduce((total, realm) => total + (realm.completedLessons ?? 0), 0);
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
-      <div className="space-y-5">
+    <div className="space-y-7">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
+        <div className="space-y-5">
         <section className="relative min-h-[230px] overflow-hidden rounded-lg border border-slate-200 bg-[#11243c] text-white shadow-sm"><div className="absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: "url('/images/realm-select-bg.jpg')" }} /><div className="absolute inset-0 bg-gradient-to-r from-[#102239] via-[#102239]/90 to-[#102239]/45" /><div className="relative flex h-full min-h-[230px] flex-col justify-between p-6 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">Child overview</p><h2 className="mt-2 text-3xl font-black">{child.displayName}</h2><p className="mt-2 flex items-center gap-2 text-sm text-white/70"><School className="h-4 w-4" /> {child.yearLevel ?? "Year level not set"} · {child.schoolName ?? "Home learner"}</p></div><span className={`rounded-md px-3 py-1.5 text-xs font-black ${child.homeAccess ? "bg-emerald-300 text-emerald-950" : "bg-white/15 text-white"}`}>{child.homeAccess ? "Active — Free Access" : "Home Access inactive"}</span></div><div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4"><HeroMetric label="Realms" value={String(child.realms.length)} /><HeroMetric label="Current week" value={focusRealm?.currentWeek ? `Week ${focusRealm.currentWeek}` : "Not started"} /><HeroMetric label="Lessons completed" value={String(completedLessons)} /><HeroMetric label="Activity" value={child.lastActiveAt ? formatLastActive(child.lastActiveAt).replace("Last active ", "") : "Not started"} /></div></div></section>
 
         <section><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Learning journey</p><h3 className="mt-1 text-xl font-black">Progress by realm</h3></div><Activity className="h-6 w-6 text-emerald-600" /></div><div className="mt-4 grid gap-3 md:grid-cols-3">{child.realms.length ? child.realms.map((realm) => <RealmProgressCard key={realm.realmId} studentId={child.studentId} realm={realm} />) : <p className="rounded-md bg-white p-4 text-sm text-slate-600 shadow-sm">Learning hasn’t started yet.</p>}</div></section>
-      </div>
+        </div>
 
-      <div className="space-y-5">
+        <div className="space-y-5">
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-rose-50 text-rose-600"><Target className="h-5 w-5" /></span><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">This week&apos;s focus</p><h3 className="font-black">{focusRealm ? realmName(focusRealm.realmId) : "Journey not started"}</h3></div></div><p className="mt-4 text-lg font-black leading-snug">{currentFocus ?? "A learning focus will appear when the weekly journey begins."}</p>{focusRealm ? <><p className="mt-2 text-sm text-slate-500">{focusRealm.workingLevel}{focusRealm.currentWeek ? ` · Week ${focusRealm.currentWeek}` : ""}</p><Link href={`/parent/children/${child.studentId}/realm/${focusRealm.realmId}`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-800">View realm progress <ChevronRight className="h-4 w-4" /></Link></> : null}</section>
 
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Sparkles className="h-5 w-5 text-amber-500" /></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.gemId ?? item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-slate-50">{item.gemId && isGemRarity(item.rarity) ? <GemIcon rarity={item.rarity} cut={cutForGem(item.gemId, item.rarity)} size={42} /> : <Gem className="h-5 w-5 text-violet-600" />}</span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
 
         <section className={`rounded-lg border p-5 shadow-sm ${child.homeAccess ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">Home access</p><h3 className="mt-1 text-lg font-black">{child.homeAccess ? "Active — Free Access" : "Not active"}</h3></div><Home className={`h-5 w-5 ${child.homeAccess ? "text-emerald-700" : "text-amber-700"}`} /></div>{!child.homeAccess ? <><p className="mt-2 text-sm text-amber-900">Activate free Home access for the 2026 rollout.</p><button type="button" disabled={activating} onClick={activate} className="mt-3 min-h-11 rounded-md bg-emerald-700 px-4 font-bold text-white disabled:opacity-50">{activating ? "Activating…" : "Activate Home access"}</button>{activationError ? <p className="mt-2 text-sm font-bold text-red-700">{activationError}</p> : null}</> : <p className="mt-2 text-sm text-emerald-900">Learning access is available outside school as part of the 2026 rollout.</p>}<Link href={`/parent/children/${child.studentId}/settings`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-emerald-900"><Settings className="h-4 w-4" /> Login &amp; placement</Link></section>
+        </div>
       </div>
+
+      <UnlockedCollection child={child} />
+    </div>
+  );
+}
+
+function UnlockedCollection({ child }: { child: ParentChild }) {
+  const gems = child.gems ?? child.recentAchievements;
+  const legendIds = new Set(
+    child.realms.flatMap((realm) =>
+      getEffectiveUnlockedLegendIds(
+        normalizeWorkingLevelLabel(realm.workingLevel),
+        realm.unlockedLegends,
+        normalizeLegendRealmId(realm.realmId),
+      ),
+    ),
+  );
+  const legends = getAllLegends().filter((legend) => legendIds.has(legend.id));
+
+  return (
+    <section aria-labelledby="unlocked-collection-title">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Rewards</p>
+          <h3 id="unlocked-collection-title" className="mt-1 text-xl font-black">Unlocked collection</h3>
+          <p className="mt-1 text-sm text-slate-600">Gems and Legend Cards {child.firstName} has earned.</p>
+        </div>
+        <p className="text-sm font-bold text-slate-500">{gems.length} Gems · {legends.length} Cards</p>
+      </div>
+
+      <div className="mt-4 grid gap-6 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+        <CollectionGroup title="Gems" emptyText="No Gems unlocked yet.">
+          {gems.map((gem) => (
+            <div key={`${gem.gemId ?? gem.name}-${gem.earnedAt}`} className="flex min-w-0 items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-md bg-violet-50">
+                {gem.gemId && isGemRarity(gem.rarity) ? <GemIcon rarity={gem.rarity} cut={cutForGem(gem.gemId, gem.rarity)} size={48} /> : <Gem className="h-6 w-6 text-violet-600" />}
+              </span>
+              <span className="min-w-0"><span className="block truncate font-black">{gem.name}</span><span className="text-xs capitalize text-slate-500">{gem.rarity}</span></span>
+            </div>
+          ))}
+        </CollectionGroup>
+
+        <CollectionGroup title="Legend Cards" emptyText="No Legend Cards unlocked yet.">
+          {legends.map((legend) => <ParentLegendCard key={legend.id} legend={legend} />)}
+        </CollectionGroup>
+      </div>
+    </section>
+  );
+}
+
+function CollectionGroup({ title, emptyText, children }: { title: string; emptyText: string; children: ReactNode }) {
+  const items = Array.isArray(children) ? children : children ? [children] : [];
+  return <div><h4 className="font-black text-slate-800">{title}</h4>{items.length ? <div className="mt-3 grid gap-3 sm:grid-cols-2">{children}</div> : <p className="mt-3 rounded-lg border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">{emptyText}</p>}</div>;
+}
+
+function ParentLegendCard({ legend }: { legend: Legend }) {
+  return (
+    <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-3 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+      <div className="flex aspect-[2/3] items-center justify-center overflow-hidden rounded-md bg-slate-950 p-1.5">
+        <LegendCardArtwork src={legend.images.cardFront} alt={`${legend.name} Legend Card`} className="h-full w-full" />
+      </div>
+      <div className="min-w-0 self-center"><p className="font-black leading-snug">{legend.name}</p><p className="mt-1 text-xs font-semibold text-slate-500">{realmName(legend.realmId)}</p><p className="mt-1 text-xs text-slate-500">{legend.yearLabel}</p></div>
     </div>
   );
 }

@@ -9,6 +9,7 @@ const parentBoundary = read("supabase/migrations/20260812120000_platform_admin_p
 const parentGemArtwork = read("supabase/migrations/20260813080000_parent_achievement_gem_artwork.sql");
 const parentWeeklyJourney = read("supabase/migrations/20260813090000_parent_weekly_journey_activity.sql");
 const parentRealmProgress = read("supabase/migrations/20260813100000_parent_realm_lesson_progress.sql");
+const parentUnlockedCollection = read("supabase/migrations/20260813110000_parent_unlocked_collection.sql");
 const safetyTests = read("supabase/tests/platform_admin_pa4_safety.sql");
 const parent = read("components/parent/ParentPortal.tsx");
 const login = read("app/login/page.tsx");
@@ -104,6 +105,12 @@ check("parent realm detail removes required pathway metric", !parent.includes('<
 check("parent assessments include the working level", parent.includes("{levelLabel} {assessmentName(item.type)}"));
 check("parent realm progress counts unique completed lessons", has(parentRealmProgress, "'completedLessons'", "select distinct attempt.week, attempt.lesson", "attempt.completed=true"));
 check("parent realm percentage uses complete level lessons", has(parent, "completedLessons / totalLessons", "of {totalLessons} lessons completed"));
+check("parent overview removes pathway metric", !parent.includes('<HeroMetric label="Pathway"'));
+check("parent collection returns every active earned Gem", has(parentUnlockedCollection, "'gems'", "student_gems gem", "definition.is_active"));
+check("parent collection returns canonical Legend unlock ids", has(parentUnlockedCollection, "'unlockedLegends'", "progress.unlocked_legends"));
+check("parent collection uses the Hall of Legends rules", has(parent, "getEffectiveUnlockedLegendIds", "normalizeLegendRealmId"));
+check("parent collection renders real card fronts without cropping", has(parent, "LegendCardArtwork", "legend.images.cardFront", "object-contain") || has(read("components/legends/LegendCardArtwork.tsx"), "object-contain"));
+check("parent collection remains read-only", !parent.match(/buy|purchase|checkout|order card/i));
 check("parent signup captures a full name", has(login, "parentFirstName", "parentLastName", "first_name: firstName", "display_name: `${firstName} ${lastName}`"));
 
 // Curriculum progress and assessment reporting.
