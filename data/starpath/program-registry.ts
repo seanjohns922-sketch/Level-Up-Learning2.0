@@ -614,9 +614,10 @@ const L6_COORD_W4_MECHANICS = ["coordinate-change-simulator", "axis-crossing-run
 const L6_TRANS_W5_MECHANICS = ["transform-chain-runner", "order-comparison-lab", "transform-sequence-inference"] as const;
 const L6_TRANS_W6_MECHANICS = ["tessellation-tester", "pattern-transform-builder", "tessellation-reasoning"] as const;
 const L6_TRANS_W7_MECHANICS = ["pattern-rule-detector", "transform-experiment-lab", "pattern-evidence-reasoning"] as const;
+const L6_INTEGRATE_W8_MECHANICS = ["multi-representation-analyser", "spatial-model-lab", "evidence-presentation"] as const;
 
-// Level 6 · Weeks 1-2 cross-sections (SP01), 3-4 four-quadrant coordinates (SP02)
-// and 5-7 combined transformations + tessellations (SP03). W8 integration next.
+// Level 6 · all 24 lessons: W1-2 cross-sections (SP01), W3-4 four-quadrant
+// coordinates (SP02), W5-7 transformations + tessellations (SP03), W8 integration.
 const IMPLEMENTED_LEVEL_SIX_LESSONS: Record<
   string,
   { learningIntention: string; mechanics: readonly [string, string, string] }
@@ -642,6 +643,9 @@ const IMPLEMENTED_LEVEL_SIX_LESSONS: Record<
   "y6-space-w7-l1": { learningIntention: "I can notice the transformation rule in a pattern.", mechanics: L6_TRANS_W7_MECHANICS },
   "y6-space-w7-l2": { learningIntention: "I can predict how changing a transformation changes a pattern.", mechanics: L6_TRANS_W7_MECHANICS },
   "y6-space-w7-l3": { learningIntention: "I can justify a tessellation with evidence.", mechanics: L6_TRANS_W7_MECHANICS },
+  "y6-space-w8-l1": { learningIntention: "I can interpret an object, a coordinate and a pattern together.", mechanics: L6_INTEGRATE_W8_MECHANICS },
+  "y6-space-w8-l2": { learningIntention: "I can build a model across object, coordinate and transformation.", mechanics: L6_INTEGRATE_W8_MECHANICS },
+  "y6-space-w8-l3": { learningIntention: "I can defend a spatial model with evidence from every strand.", mechanics: L6_INTEGRATE_W8_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {

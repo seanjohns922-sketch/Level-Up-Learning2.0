@@ -6,8 +6,7 @@ export const LEVEL_SIX_ARTWORK = "/images/starpath-home-bg-y6.png";
 
 type TaskGenerator = (round: number, target: number) => PracticeTask;
 
-// Expands as later Level 6 blocks land (integration).
-type L6Variant = "l6Cross" | "l6Coord" | "l6Trans";
+type L6Variant = "l6Cross" | "l6Coord" | "l6Trans" | "l6Integrate";
 
 export function teaching(heading: string, prompt: string, speakText: string, variant: L6Variant = "l6Cross") {
   let target = 0;

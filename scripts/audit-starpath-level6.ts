@@ -25,6 +25,8 @@ const CROSS_LESSONS = ["y6-space-w1-l1", "y6-space-w1-l2", "y6-space-w1-l3", "y6
 const CART_LESSONS = ["y6-space-w3-l1", "y6-space-w3-l2", "y6-space-w3-l3", "y6-space-w4-l1", "y6-space-w4-l2", "y6-space-w4-l3"];
 const TRANS_LESSONS = ["y6-space-w5-l1", "y6-space-w5-l2", "y6-space-w5-l3"];
 const TESS_LESSONS = ["y6-space-w6-l1", "y6-space-w6-l2", "y6-space-w6-l3", "y6-space-w7-l1", "y6-space-w7-l2", "y6-space-w7-l3"];
+// W8 integration lessons mix all three strands (each dispatched by kind below).
+const INTEGRATE_LESSONS = ["y6-space-w8-l1", "y6-space-w8-l2", "y6-space-w8-l3"];
 
 let taskCount = 0;
 
@@ -99,7 +101,7 @@ function auditCart(lessonId: string, t: CartTask) {
   check(Boolean(t.feedback?.correct && t.feedback?.wrong), `${lessonId}: feedback required`);
 }
 
-for (const lessonId of [...CROSS_LESSONS, ...CART_LESSONS, ...TRANS_LESSONS, ...TESS_LESSONS]) {
+for (const lessonId of [...CROSS_LESSONS, ...CART_LESSONS, ...TRANS_LESSONS, ...TESS_LESSONS, ...INTEGRATE_LESSONS]) {
   const content = LEVEL_SIX_LESSON_CONTENT[lessonId];
   check(Boolean(content), `${lessonId}: missing lesson content`);
   if (!content) continue;
@@ -115,9 +117,9 @@ for (const lessonId of [...CROSS_LESSONS, ...CART_LESSONS, ...TRANS_LESSONS, ...
   }
 }
 
-// Registry: the twenty-one W1-7 lessons must be flagged implemented.
+// Registry: all twenty-four lessons must be flagged implemented.
 const program = getStarpathProgram("level-6");
-for (let week = 1; week <= 7; week += 1) {
+for (let week = 1; week <= 8; week += 1) {
   for (let lesson = 1; lesson <= 3; lesson += 1) {
     const plan = program.weeks[week - 1]?.lessons[lesson - 1];
     check(plan?.status === "implemented", `registry y6-w${week}-l${lesson} should be implemented`);
@@ -128,4 +130,4 @@ if (problems > 0) {
   console.error(`\nStarpath Level 6 audit failed with ${problems} problem(s).`);
   process.exit(1);
 }
-console.log(`Starpath Level 6 audit passed: 21 lessons, ${taskCount} generated tasks validated (Weeks 1-7: cross-sections, coordinates, transformations + tessellations).`);
+console.log(`Starpath Level 6 audit passed: 24 lessons, ${taskCount} generated tasks validated (Weeks 1-8: cross-sections, coordinates, transformations, tessellations + integration).`);

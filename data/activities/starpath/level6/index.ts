@@ -6,10 +6,11 @@ import { CHANGE_COORD_CONTENT, CROSS_AXES_CONTENT, REVERSE_MOVE_CONTENT } from "
 import { FIND_CHAIN_CONTENT, ORDER_MATTERS_CONTENT, TRANSFORM_ORDER_CONTENT } from "./week5";
 import { EXPLAIN_FIT_CONTENT, PATTERN_RULE_CONTENT, WILL_TESSELLATE_CONTENT } from "./week6";
 import { EVIDENCE_CONTENT, NOTICE_RULE_CONTENT, VARY_CONTENT } from "./week7";
+import { ANALYSE_CONTENT, BUILD_TEST_CONTENT, DEFEND_CONTENT } from "./week8";
 
 // Level 6 (Year 6) — Cross-sections, Cartesian Space and Tessellations.
-// Weeks 1-2 (cross-sections, SP01), 3-4 (four-quadrant coordinates, SP02) and
-// 5-7 (combined transformations + tessellations, SP03) are built; W8 next.
+// All 24 lessons built: W1-2 cross-sections (SP01), W3-4 four-quadrant
+// coordinates (SP02), W5-7 transformations + tessellations (SP03), W8 integration.
 export const LEVEL_SIX_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y6-space-w1-l1": SLICE_SEE_CONTENT,
   "y6-space-w1-l2": SLICE_SEQUENCE_CONTENT,
@@ -32,4 +33,7 @@ export const LEVEL_SIX_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y6-space-w7-l1": NOTICE_RULE_CONTENT,
   "y6-space-w7-l2": VARY_CONTENT,
   "y6-space-w7-l3": EVIDENCE_CONTENT,
+  "y6-space-w8-l1": ANALYSE_CONTENT,
+  "y6-space-w8-l2": BUILD_TEST_CONTENT,
+  "y6-space-w8-l3": DEFEND_CONTENT,
 };
