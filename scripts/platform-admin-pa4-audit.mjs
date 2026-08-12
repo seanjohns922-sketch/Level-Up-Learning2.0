@@ -7,6 +7,7 @@ const migration = read("supabase/migrations/20260812100000_platform_admin_pa4_id
 const safety = read("supabase/migrations/20260812110000_platform_admin_pa4_safety_hardening.sql");
 const parentBoundary = read("supabase/migrations/20260812120000_platform_admin_pa4_parent_read_write_boundary.sql");
 const parentGemArtwork = read("supabase/migrations/20260813080000_parent_achievement_gem_artwork.sql");
+const parentWeeklyJourney = read("supabase/migrations/20260813090000_parent_weekly_journey_activity.sql");
 const safetyTests = read("supabase/tests/platform_admin_pa4_safety.sql");
 const parent = read("components/parent/ParentPortal.tsx");
 const login = read("app/login/page.tsx");
@@ -95,6 +96,9 @@ check("parent has responsive child layout", parent.includes("md:grid-cols-2"));
 check("parent detail has compact mobile metrics", parent.includes("sm:grid-cols-2 lg:grid-cols-4"));
 check("parent snapshot returns canonical Gem identity", has(parentGemArtwork, "'gemId', definition.id", "student_gems", "gem_definitions"));
 check("parent achievements use canonical Gem artwork", has(parent, "GemIcon", "cutForGem(item.gemId, item.rarity)"));
+check("parent weekly journey includes saved activity weeks", has(parentWeeklyJourney, "student_lesson_attempts lesson", "student_weekly_quiz_attempts quiz", "union all"));
+check("parent weekly journey uses canonical curriculum labels", has(parent, "curriculumWeek", "plannedLesson?.title", "plan?.title"));
+check("parent signup captures a full name", has(login, "parentFirstName", "parentLastName", "first_name: firstName", "display_name: `${firstName} ${lastName}`"));
 
 // Curriculum progress and assessment reporting.
 for (const realm of ["Number Nexus", "Measurelands", "Starpath"]) check(`parent realm label ${realm}`, parent.includes(realm));

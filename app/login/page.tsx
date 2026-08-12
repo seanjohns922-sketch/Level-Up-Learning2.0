@@ -107,6 +107,8 @@ export default function LoginPage() {
   const [teacherResetNotice, setTeacherResetNotice] = useState<string | null>(null);
   const [teacherResetLoading, setTeacherResetLoading] = useState(false);
   const [parentMode, setParentMode] = useState<"login" | "signup">("login");
+  const [parentFirstName, setParentFirstName] = useState("");
+  const [parentLastName, setParentLastName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [parentPassword, setParentPassword] = useState("");
   const [parentError, setParentError] = useState<string | null>(null);
@@ -334,8 +336,14 @@ export default function LoginPage() {
 
   async function handleParentAuthentication() {
     const email = parentEmail.trim();
+    const firstName = parentFirstName.trim();
+    const lastName = parentLastName.trim();
     if (!email || !parentPassword) {
       setParentError("Enter your parent email and password.");
+      return;
+    }
+    if (parentMode === "signup" && (!firstName || !lastName)) {
+      setParentError("Enter your first and last name.");
       return;
     }
     if (
@@ -355,7 +363,14 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password: parentPassword,
-        options: { data: { role: "parent" } },
+        options: {
+          data: {
+            role: "parent",
+            first_name: firstName,
+            last_name: lastName,
+            display_name: `${firstName} ${lastName}`,
+          },
+        },
       });
 
       if (error) {
@@ -988,6 +1003,35 @@ export default function LoginPage() {
                 </button>
               ))}
             </div>
+
+            {parentMode === "signup" ? (
+              <div className="grid grid-cols-2 gap-3">
+                <label className="grid min-w-0 gap-1.5">
+                  <span className="pl-1 text-[11px] font-bold uppercase tracking-widest text-white/50">First name</span>
+                  <InputField icon={<User size={15} />}>
+                    <input
+                      value={parentFirstName}
+                      onChange={(event) => setParentFirstName(event.target.value)}
+                      placeholder="Sean"
+                      autoComplete="given-name"
+                      className={inputCls}
+                    />
+                  </InputField>
+                </label>
+                <label className="grid min-w-0 gap-1.5">
+                  <span className="pl-1 text-[11px] font-bold uppercase tracking-widest text-white/50">Last name</span>
+                  <InputField icon={<User size={15} />}>
+                    <input
+                      value={parentLastName}
+                      onChange={(event) => setParentLastName(event.target.value)}
+                      placeholder="Johns"
+                      autoComplete="family-name"
+                      className={inputCls}
+                    />
+                  </InputField>
+                </label>
+              </div>
+            ) : null}
 
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Parent Email</span>
