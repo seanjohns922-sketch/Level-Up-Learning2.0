@@ -203,6 +203,7 @@ import StarpathSymmetryCard from "@/components/starpath/StarpathSymmetryCard";
 import StarpathNetCard from "@/components/starpath/StarpathNetCard";
 import StarpathCrossSectionCard from "@/components/starpath/StarpathCrossSectionCard";
 import StarpathCartesianCard from "@/components/starpath/StarpathCartesianCard";
+import StarpathTessellationCard from "@/components/starpath/StarpathTessellationCard";
 import StarpathCoordinateCard from "@/components/starpath/StarpathCoordinateCard";
 import StarpathTransformCard from "@/components/starpath/StarpathTransformCard";
 import { StarpathGroundAssessmentCard } from "@/components/starpath/StarpathGroundAssessmentCard";
@@ -709,6 +710,8 @@ function TaskRendererInner({
       return <StarpathCrossSectionCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathCartesian":
       return <StarpathCartesianCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathTessellation":
+      return <StarpathTessellationCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathCoordinate":
       return <StarpathCoordinateCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathTransform":

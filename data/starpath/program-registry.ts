@@ -611,9 +611,12 @@ const L6_CROSS_W1_MECHANICS = ["cross-section-slicer", "slice-sequence-viewer", 
 const L6_CROSS_W2_MECHANICS = ["section-prism-classifier", "section-change-grapher", "object-inference"] as const;
 const L6_COORD_W3_MECHANICS = ["four-quadrant-builder", "cartesian-plotter", "coordinate-deduction"] as const;
 const L6_COORD_W4_MECHANICS = ["coordinate-change-simulator", "axis-crossing-runner", "movement-rule-inference"] as const;
+const L6_TRANS_W5_MECHANICS = ["transform-chain-runner", "order-comparison-lab", "transform-sequence-inference"] as const;
+const L6_TRANS_W6_MECHANICS = ["tessellation-tester", "pattern-transform-builder", "tessellation-reasoning"] as const;
+const L6_TRANS_W7_MECHANICS = ["pattern-rule-detector", "transform-experiment-lab", "pattern-evidence-reasoning"] as const;
 
-// Level 6 · Weeks 1-2 cross-sections (SP01) and 3-4 four-quadrant coordinates
-// (SP02). Later blocks (W5-8) land next.
+// Level 6 · Weeks 1-2 cross-sections (SP01), 3-4 four-quadrant coordinates (SP02)
+// and 5-7 combined transformations + tessellations (SP03). W8 integration next.
 const IMPLEMENTED_LEVEL_SIX_LESSONS: Record<
   string,
   { learningIntention: string; mechanics: readonly [string, string, string] }
@@ -630,6 +633,15 @@ const IMPLEMENTED_LEVEL_SIX_LESSONS: Record<
   "y6-space-w4-l1": { learningIntention: "I can say which coordinate changes when a point moves along an axis.", mechanics: L6_COORD_W4_MECHANICS },
   "y6-space-w4-l2": { learningIntention: "I can move a point across an axis and flip a coordinate's sign.", mechanics: L6_COORD_W4_MECHANICS },
   "y6-space-w4-l3": { learningIntention: "I can describe the move that takes a point to its image.", mechanics: L6_COORD_W4_MECHANICS },
+  "y6-space-w5-l1": { learningIntention: "I can apply two transformations in order and find the result.", mechanics: L6_TRANS_W5_MECHANICS },
+  "y6-space-w5-l2": { learningIntention: "I can decide whether the order of two transformations changes the result.", mechanics: L6_TRANS_W5_MECHANICS },
+  "y6-space-w5-l3": { learningIntention: "I can work out the sequence of transformations from an image.", mechanics: L6_TRANS_W5_MECHANICS },
+  "y6-space-w6-l1": { learningIntention: "I can decide whether a shape tessellates.", mechanics: L6_TRANS_W6_MECHANICS },
+  "y6-space-w6-l2": { learningIntention: "I can name the transformation rule that makes a tessellation.", mechanics: L6_TRANS_W6_MECHANICS },
+  "y6-space-w6-l3": { learningIntention: "I can explain why tiles fit using angles at a corner.", mechanics: L6_TRANS_W6_MECHANICS },
+  "y6-space-w7-l1": { learningIntention: "I can notice the transformation rule in a pattern.", mechanics: L6_TRANS_W7_MECHANICS },
+  "y6-space-w7-l2": { learningIntention: "I can predict how changing a transformation changes a pattern.", mechanics: L6_TRANS_W7_MECHANICS },
+  "y6-space-w7-l3": { learningIntention: "I can justify a tessellation with evidence.", mechanics: L6_TRANS_W7_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {

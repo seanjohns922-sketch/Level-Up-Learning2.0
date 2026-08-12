@@ -2454,7 +2454,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets" | "l5Coord" | "l5Trans" | "l5Integrate" | "l6Cross" | "l6Coord";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets" | "l5Coord" | "l5Trans" | "l5Integrate" | "l6Cross" | "l6Coord" | "l6Trans";
       heading?: string;
     }
   | {
@@ -2730,6 +2730,20 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Level 6 · W6-7 — Tessellations (AC9M6SP03). The card tiles a shape by a
+      // transformation rule; students judge whether it tessellates, name the rule
+      // and explain the fit (angles at a shared corner sum to 360 degrees).
+      kind: "starpathTessellation";
+      mode: "will" | "rule" | "explain" | "notice" | "vary" | "evidence";
+      prompt: string;
+      speakText: string;
+      target: number;
+      tileId: string;
+      options: Array<{ id: string; label: string }>;
+      correctOptionIds: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 6 · W3-4 — Four-quadrant Cartesian plane (AC9M6SP02). Signed ordered
       // pairs on an 8x8 grid (-4..4 each axis), origin centred. Plot/read points,
       // name quadrants, and reason about how coordinates change across the axes.
@@ -2773,7 +2787,7 @@ export type PracticeTask = (
       // reflected across a line, or rotated about a centre. Interactions: tap
       // where a marked point maps to, or judge/describe/classify a transformation.
       kind: "starpathTransform";
-      mode: "translate" | "describe" | "check" | "reflect" | "rotate" | "compare";
+      mode: "translate" | "describe" | "check" | "reflect" | "rotate" | "compare" | "sequence" | "order" | "chain";
       render: "tap" | "options";
       prompt: string;
       speakText: string;

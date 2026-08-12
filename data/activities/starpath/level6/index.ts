@@ -3,10 +3,13 @@ import { PREDICT_CONTENT, SLICE_SEE_CONTENT, SLICE_SEQUENCE_CONTENT } from "./we
 import { CONSTANT_CHANGING_CONTENT, EXPLAIN_STRUCTURE_CONTENT, PRISM_OR_NOT_CONTENT } from "./week2";
 import { COORD_REASONING_CONTENT, EXTEND_AXES_CONTENT, PLOT_QUADRANTS_CONTENT } from "./week3";
 import { CHANGE_COORD_CONTENT, CROSS_AXES_CONTENT, REVERSE_MOVE_CONTENT } from "./week4";
+import { FIND_CHAIN_CONTENT, ORDER_MATTERS_CONTENT, TRANSFORM_ORDER_CONTENT } from "./week5";
+import { EXPLAIN_FIT_CONTENT, PATTERN_RULE_CONTENT, WILL_TESSELLATE_CONTENT } from "./week6";
+import { EVIDENCE_CONTENT, NOTICE_RULE_CONTENT, VARY_CONTENT } from "./week7";
 
 // Level 6 (Year 6) — Cross-sections, Cartesian Space and Tessellations.
-// Weeks 1-2 (cross-sections, SP01) and 3-4 (four-quadrant coordinates, SP02)
-// are built; W5-8 land in later blocks.
+// Weeks 1-2 (cross-sections, SP01), 3-4 (four-quadrant coordinates, SP02) and
+// 5-7 (combined transformations + tessellations, SP03) are built; W8 next.
 export const LEVEL_SIX_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y6-space-w1-l1": SLICE_SEE_CONTENT,
   "y6-space-w1-l2": SLICE_SEQUENCE_CONTENT,
@@ -20,4 +23,13 @@ export const LEVEL_SIX_LESSON_CONTENT: Record<string, StarpathLessonContent> = {
   "y6-space-w4-l1": CHANGE_COORD_CONTENT,
   "y6-space-w4-l2": CROSS_AXES_CONTENT,
   "y6-space-w4-l3": REVERSE_MOVE_CONTENT,
+  "y6-space-w5-l1": TRANSFORM_ORDER_CONTENT,
+  "y6-space-w5-l2": ORDER_MATTERS_CONTENT,
+  "y6-space-w5-l3": FIND_CHAIN_CONTENT,
+  "y6-space-w6-l1": WILL_TESSELLATE_CONTENT,
+  "y6-space-w6-l2": PATTERN_RULE_CONTENT,
+  "y6-space-w6-l3": EXPLAIN_FIT_CONTENT,
+  "y6-space-w7-l1": NOTICE_RULE_CONTENT,
+  "y6-space-w7-l2": VARY_CONTENT,
+  "y6-space-w7-l3": EVIDENCE_CONTENT,
 };
