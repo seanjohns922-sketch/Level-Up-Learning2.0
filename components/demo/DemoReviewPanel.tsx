@@ -299,7 +299,7 @@ export default function DemoReviewPanel() {
             <p className="mb-3 text-xs font-bold text-amber-200">Level 6 opens the independent V1 candidate banks for review. Production remains unchanged.</p>
           ) : null}
           {realm === "space" && year === "Prep" ? (
-            <p className="mb-3 text-xs font-bold text-amber-200">Ground opens the independent Starpath RC1 bank for review. Production remains unchanged.</p>
+            <p className="mb-3 text-xs font-bold text-amber-200">Ground opens the independent Starpath Version 1.0 production bank for review.</p>
           ) : null}
           <div className="grid gap-3 sm:grid-cols-2">
             <button type="button" disabled={!pretestAvailable} onClick={() => pretestAvailable && open(assessmentHref(realm, year, "pretest"))} className={actionClass(pretestAvailable)}>

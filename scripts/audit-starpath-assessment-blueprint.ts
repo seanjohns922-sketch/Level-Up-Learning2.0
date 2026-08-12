@@ -36,7 +36,7 @@ assert(STARPATH_MISCONCEPTION_LIBRARY.length >= 30);
 const review = fs.readFileSync(new URL("../docs/starpath/assessment-blueprint.md", import.meta.url), "utf8");
 assert.match(review, /Conditionally approved - assessment generation remains blocked/);
 assert.match(review, /mathematics-curriculum-content-f-6-v9 \(4\)\.pdf/);
-assert.match(review, /existing Ground Starpath post-test remains a legacy implementation/);
+assert.match(review, /former Ground Starpath lesson-reuse post-test is retained as a retired legacy implementation/);
 
 for (const blueprint of STARPATH_ASSESSMENT_BLUEPRINTS) {
   assert.deepEqual(blueprint.descriptors.map((item) => item.code), EXPECTED_CODES[blueprint.yearLabel]);

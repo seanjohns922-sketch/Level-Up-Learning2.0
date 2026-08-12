@@ -56,14 +56,14 @@ function candidate(index: number, spec: ItemSpec): CandidateQuestion {
   }
   return {
     schemaVersion: 1,
-    id: `y0-starpath-post-${String(index + 1).padStart(2, "0")}-rc1`,
-    version: "1.0.0-rc1",
+    id: `y0-starpath-post-${String(index + 1).padStart(2, "0")}-v1`,
+    version: "1.0.0",
     realm: "space",
     level: 0,
     form: "posttest",
     origin: "assessment_authored",
     sourcePool: "posttest",
-    bankId: "starpath-level-0-posttest-rc1",
+    bankId: "starpath-level-0-posttest-v1",
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],

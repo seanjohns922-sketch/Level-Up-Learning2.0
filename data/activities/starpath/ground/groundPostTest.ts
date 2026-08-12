@@ -1,5 +1,6 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { PostTest, Question } from "@/data/assessments/posttests";
+import { GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/groundStarpathIndependentPosttest";
 import { buildGroundWeek1VoyageQuiz } from "@/data/activities/starpath/ground/week1Quiz";
 import { buildGroundWeek2VoyageQuiz } from "@/data/activities/starpath/ground/week2Quiz";
 import { buildGroundWeek3VoyageQuiz } from "@/data/activities/starpath/ground/week3Quiz";
@@ -123,6 +124,8 @@ function getReviewFeedback(task: PracticeTask, skillLabel: string): string {
   return `Review ${skillLabel.toLowerCase()} and try again.`;
 }
 
+// Legacy lesson-reuse form retained for historical replay and audit only.
+// Production resolution must use GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS.
 export function buildGroundPostTestQuestions(): Question[] {
   let questionNumber = 0;
 
@@ -155,7 +158,7 @@ export function buildGroundPostTestQuestions(): Question[] {
 }
 
 export function buildGroundPostTest(): PracticeTask[] {
-  return buildGroundPostTestQuestions().flatMap((question) =>
+  return GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS.flatMap((question) =>
     question.practiceTask ? [question.practiceTask] : []
   );
 }
@@ -164,7 +167,7 @@ export function getStarpathPosttestForYear(yearLabel: string): PostTest | undefi
   if (yearLabel !== "Prep") return undefined;
   return {
     yearLabel: "Prep",
-    questions: buildGroundPostTestQuestions(),
+    questions: [...GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS],
   };
 }
 

@@ -1,11 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
-import { isAssessmentAnswerCorrect } from "../data/assessments/analysis";
+import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "../data/assessments/analysis";
+import { getPosttestForYearLabel } from "../data/assessments/api";
 import type { IndependentAssessmentItem } from "../data/assessments/assessmentItemStandard";
 import { GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS } from "../data/assessments/groundStarpathIndependentPosttest";
 import { STARPATH_ASSESSMENT_BLUEPRINTS } from "../data/assessments/starpathAssessmentBlueprint";
 import { STARPATH_MISCONCEPTION_LIBRARY } from "../data/assessments/starpathMisconceptions";
 import type { Question } from "../data/assessments/posttests";
+import { buildGroundPostTestQuestions, getStarpathPosttestForYear } from "../data/activities/starpath/ground/groundPostTest";
+import { ASSESSMENT_THRESHOLDS } from "../lib/assessment-rules";
+import { buildAssessmentQuestionSnapshots, isAssessmentQuestionSnapshot } from "../lib/assessment-replay";
 import { isPracticeTaskSafe } from "../lib/task-safety";
 
 type CandidateItem = Question & IndependentAssessmentItem;
@@ -29,6 +33,10 @@ function sameCounts(actual: Record<string, number>, expected: Record<string, num
 }
 
 const bank = GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS as readonly CandidateItem[];
+const expectedIds = bank.map((item) => item.id);
+const directProduction = getStarpathPosttestForYear("Prep")?.questions ?? [];
+const apiProduction = getPosttestForYearLabel("Prep", "space")?.questions ?? [];
+const legacyIds = new Set(buildGroundPostTestQuestions().map((item) => item.id));
 const blueprint = STARPATH_ASSESSMENT_BLUEPRINTS.find((item) => item.level === 0);
 const form = blueprint?.forms.find((item) => item.kind === "posttest");
 const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [item.id, item]));
@@ -39,6 +47,46 @@ check(new Set(bank.map((item) => item.id)).size === 20, "Candidate IDs must be u
 check(new Set(bank.map((item) => item.contextKey)).size === 20, "Candidate contexts must be unique.");
 check(new Set(bank.map((item) => item.structureKey)).size === 20, "Candidate structures must be unique.");
 check(new Set(bank.map((item) => item.prompt)).size === 20, "Candidate prompts must be unique.");
+check(JSON.stringify(directProduction.map((item) => item.id)) === JSON.stringify(expectedIds), "Direct production resolver does not return the independent bank.");
+check(JSON.stringify(apiProduction.map((item) => item.id)) === JSON.stringify(expectedIds), "Assessment API does not return the independent bank.");
+check(directProduction.every((item) => !legacyIds.has(item.id)), "Production resolves a retired lesson-reuse item.");
+check(ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Runtime post-test threshold changed from 85%.");
+
+const snapshots = buildAssessmentQuestionSnapshots(
+  [...bank],
+  (question) => String(question.correctAnswer ?? ""),
+  (question, answer) => {
+    const item = bank.find((candidateItem) => candidateItem.id === question.id);
+    return item ? isAssessmentAnswerCorrect(item, String(answer)) : false;
+  },
+  new Date(0).toISOString(),
+);
+check(snapshots.length === 20 && snapshots.every(isAssessmentQuestionSnapshot), "Production bank cannot create canonical replay snapshots.");
+check(snapshots.every((snapshot) => snapshot.correct), "Canonical replay scoring rejects an approved answer.");
+
+const buildBoundaryAnswers = (correctCount: number): Record<string, string> =>
+  Object.fromEntries(
+    bank.map((item, index) => [
+      item.id,
+      index < correctCount ? String(item.correctAnswer) : `__incorrect__:${item.id}`,
+    ]),
+  );
+const passingBoundary = analyzeAssessmentResult({
+  questions: [...bank],
+  answers: buildBoundaryAnswers(17),
+  yearLevel: 0,
+  testType: "post",
+  passThreshold: ASSESSMENT_THRESHOLDS.posttestPassPercent,
+});
+const failingBoundary = analyzeAssessmentResult({
+  questions: [...bank],
+  answers: buildBoundaryAnswers(16),
+  yearLevel: 0,
+  testType: "post",
+  passThreshold: ASSESSMENT_THRESHOLDS.posttestPassPercent,
+});
+check(passingBoundary.percentage === 85 && passingBoundary.passed, "17/20 must pass the production post-test.");
+check(failingBoundary.percentage === 80 && !failingBoundary.passed, "16/20 must fail the production post-test.");
 
 const expectedDescriptors = Object.fromEntries(
   (blueprint?.descriptors ?? []).map((item) => [item.code, item.allocation.posttest]),
@@ -50,10 +98,10 @@ check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_respo
 check(bank.every((item) => item.prompt.trim().split(/\s+/).length <= 14), "A prompt exceeds the Foundation 14-word reading ceiling.");
 
 for (const item of bank) {
-  check(item.schemaVersion === 1 && item.version === "1.0.0-rc1", `${item.id} has incorrect version metadata.`);
+  check(item.schemaVersion === 1 && item.version === "1.0.0", `${item.id} has incorrect version metadata.`);
   check(item.realm === "space" && item.level === 0 && item.form === "posttest", `${item.id} targets the wrong assessment form.`);
   check(item.origin === "assessment_authored" && item.sourcePool === "posttest", `${item.id} is not independent assessment content.`);
-  check(item.bankId === "starpath-level-0-posttest-rc1", `${item.id} has the wrong bank ID.`);
+  check(item.bankId === "starpath-level-0-posttest-v1", `${item.id} has the wrong bank ID.`);
   check(item.type === "starpathTask" && Boolean(item.practiceTask), `${item.id} is not a launchable Starpath task.`);
   check(isPracticeTaskSafe(item.practiceTask), `${item.id} is blocked by the task-safety gate.`);
   check(item.renderer.type === "starpath_assessment_task", `${item.id} has the wrong renderer metadata.`);
@@ -90,13 +138,16 @@ const apiSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/api
 const posttestSource = fs.readFileSync(path.join(process.cwd(), "app/posttest/page.tsx"), "utf8");
 const demoReviewSource = fs.readFileSync(path.join(process.cwd(), "components/demo/DemoReviewPanel.tsx"), "utf8");
 check(!/activities\/starpath\/ground\/(week|groundPostTest)|week\dQuiz/.test(bankSource), "Candidate bank imports lesson or weekly-quiz content.");
-check(!apiSource.includes("groundStarpathIndependentPosttest"), "Release candidate must not be reachable through the production resolver.");
+check(apiSource.includes("groundPostTest"), "Production API does not use the Ground Starpath resolver.");
+const productionResolverSource = fs.readFileSync(path.join(process.cwd(), "data/activities/starpath/ground/groundPostTest.ts"), "utf8");
+check(productionResolverSource.includes("GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS"), "Production resolver does not reference the independent bank.");
+check(productionResolverSource.includes("questions: [...GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS]"), "Production resolver does not return the independent bank.");
 check(posttestSource.includes('reviewBank === "ground-starpath-rc1"') && posttestSource.includes("isDemoPreviewMode"), "Candidate bank is not protected by the demo review gate.");
 check(demoReviewSource.includes("ground-starpath-rc1"), "Demo Review does not expose the candidate bank.");
 
 console.log(`Ground Starpath independent-bank audit: ${checksPassed} passed, ${failures.length} failed.`);
-console.log("Candidate form: 20 items; 10 manipulated; 10 selected; resolver unchanged.");
-console.log("Release status: RC1 BLOCKED pending educator review and production approval.");
+console.log("Production form: 20 items; 10 manipulated; 10 selected; independent resolver active.");
+console.log("Release status: Version 1.0 PRODUCTION.");
 if (failures.length > 0) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;

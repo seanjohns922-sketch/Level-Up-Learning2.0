@@ -714,6 +714,6 @@ This blueprint defines Starpath assessment content only. The assessment engine, 
 
 ## Current Production Blocker
 
-The existing Ground Starpath post-test remains a legacy implementation. It reuses lesson and weekly-quiz generators, contains no qualifying constructed or manipulated responses under this framework, and includes read-aloud or visual cues that can disclose target information. It is not an approved Starpath Assessment Bank and must not be treated as blueprint-compliant.
+The former Ground Starpath lesson-reuse post-test is retained as a retired legacy implementation and is not reachable through production resolution. Ground Starpath Post-Test Version 1.0 uses the approved independent 20-item Assessment Bank.
 
 All Starpath levels remain release-blocked until the required audits and independent item reviews are complete.

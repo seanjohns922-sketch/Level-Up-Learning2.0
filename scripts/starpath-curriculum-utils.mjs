@@ -21,7 +21,7 @@ export function renderStarpathCurriculumMap() {
   const lines = [
     "# Starpath Curriculum Map",
     "",
-    "> Status: In development. All 24 Ground Level lessons and seven independent weekly quiz banks are implemented for Demo Mode. The independent Ground Post-Test remains an RC1 candidate pending educator approval.",
+    "> Status: In development. All 24 Ground Level lessons and seven independent weekly quiz banks are implemented for Demo Mode. The independent Ground Post-Test is Version 1.0 Production.",
     "",
     "Starpath uses the canonical realm ID `space`. Every level has exactly 8 weeks and 3 lessons per week. Weeks 1-7 have a 15-question weekly quiz (5 questions per lesson); Week 8 uses the Post-Test. Ground Level has no pre-test. Levels 1-6 use a 20-question pre-test.",
     "",
