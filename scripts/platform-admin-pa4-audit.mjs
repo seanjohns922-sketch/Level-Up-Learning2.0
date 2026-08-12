@@ -118,6 +118,8 @@ const parentOverviewBody = parent.slice(
   parent.indexOf("export function ParentRewards"),
 );
 check("parent overview does not render the full collection", !parentOverviewBody.includes("<UnlockedCollection"));
+check("parent shell uses a distinct navy and sky theme", has(parent, "bg-[#10243e]", "bg-[#dceeff]", "bg-blue-600"));
+check("parent green is reserved for positive status", has(parent, "Active — Free Access", "border-emerald-200 bg-emerald-50", "text-emerald-900"));
 check("parent signup captures a full name", has(login, "parentFirstName", "parentLastName", "first_name: firstName", "display_name: `${firstName} ${lastName}`"));
 
 // Curriculum progress and assessment reporting.
