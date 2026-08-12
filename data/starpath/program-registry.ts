@@ -607,6 +607,22 @@ const IMPLEMENTED_LEVEL_FIVE_LESSONS: Record<
   "y5-space-w8-l3": { learningIntention: "I can test and defend every part of a spatial design.", mechanics: L5_INTEGRATE_W8_MECHANICS },
 };
 
+const L6_CROSS_W1_MECHANICS = ["cross-section-slicer", "slice-sequence-viewer", "cross-section-predictor"] as const;
+const L6_CROSS_W2_MECHANICS = ["section-prism-classifier", "section-change-grapher", "object-inference"] as const;
+
+// Level 6 · Weeks 1-2 — Cross-sections (AC9M6SP01). Later blocks (W3-8) land next.
+const IMPLEMENTED_LEVEL_SIX_LESSONS: Record<
+  string,
+  { learningIntention: string; mechanics: readonly [string, string, string] }
+> = {
+  "y6-space-w1-l1": { learningIntention: "I can slice an object and name its cross-section.", mechanics: L6_CROSS_W1_MECHANICS },
+  "y6-space-w1-l2": { learningIntention: "I can compare parallel slices and see whether they stay the same.", mechanics: L6_CROSS_W1_MECHANICS },
+  "y6-space-w1-l3": { learningIntention: "I can predict a cross-section from an object's base.", mechanics: L6_CROSS_W1_MECHANICS },
+  "y6-space-w2-l1": { learningIntention: "I can use cross-sections to decide whether an object is a prism.", mechanics: L6_CROSS_W2_MECHANICS },
+  "y6-space-w2-l2": { learningIntention: "I can classify cross-sections as constant or shrinking.", mechanics: L6_CROSS_W2_MECHANICS },
+  "y6-space-w2-l3": { learningIntention: "I can explain an object's structure from its cross-sections.", mechanics: L6_CROSS_W2_MECHANICS },
+};
+
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
   const weeks = definition.weeks.map((week, index): StarpathWeekPlan => {
     const weekNumber = index + 1;
@@ -618,7 +634,8 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
         IMPLEMENTED_LEVEL_TWO_LESSONS[lessonId] ??
         IMPLEMENTED_LEVEL_THREE_LESSONS[lessonId] ??
         IMPLEMENTED_LEVEL_FOUR_LESSONS[lessonId] ??
-        IMPLEMENTED_LEVEL_FIVE_LESSONS[lessonId];
+        IMPLEMENTED_LEVEL_FIVE_LESSONS[lessonId] ??
+        IMPLEMENTED_LEVEL_SIX_LESSONS[lessonId];
       return {
         id: lessonId,
         title,

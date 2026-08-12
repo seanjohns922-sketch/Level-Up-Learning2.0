@@ -2454,7 +2454,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets" | "l5Coord" | "l5Trans" | "l5Integrate";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets" | "l5Coord" | "l5Trans" | "l5Integrate" | "l6Cross";
       heading?: string;
     }
   | {
@@ -2713,6 +2713,20 @@ export type PracticeTask = (
       answerCells?: string[];
       multi?: boolean;
       buildFaces?: number;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 6 · W1-2 — Cross-sections (AC9M6SP01). A standing object is sliced by
+      // a horizontal plane; the card renders the body, a draggable cut plane and the
+      // resulting 2D section, and asks about the slice shape or prism/pyramid behaviour.
+      kind: "starpathCrossSection";
+      mode: "sliceShape" | "sliceChange" | "predict" | "prism" | "constant" | "explain";
+      prompt: string;
+      speakText: string;
+      target: number;
+      objectId: string;
+      options: Array<{ id: string; label: string }>;
+      correctOptionIds: string[];
       feedback: { correct: string; wrong: string };
     }
   | {

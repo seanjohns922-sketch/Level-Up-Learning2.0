@@ -201,6 +201,7 @@ import StarpathGridRouteCard from "@/components/starpath/StarpathGridRouteCard";
 import StarpathCompositeCard from "@/components/starpath/StarpathCompositeCard";
 import StarpathSymmetryCard from "@/components/starpath/StarpathSymmetryCard";
 import StarpathNetCard from "@/components/starpath/StarpathNetCard";
+import StarpathCrossSectionCard from "@/components/starpath/StarpathCrossSectionCard";
 import StarpathCoordinateCard from "@/components/starpath/StarpathCoordinateCard";
 import StarpathTransformCard from "@/components/starpath/StarpathTransformCard";
 import { StarpathGroundAssessmentCard } from "@/components/starpath/StarpathGroundAssessmentCard";
@@ -703,6 +704,8 @@ function TaskRendererInner({
       return <StarpathSymmetryCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathNet":
       return <StarpathNetCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathCrossSection":
+      return <StarpathCrossSectionCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathCoordinate":
       return <StarpathCoordinateCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathTransform":

@@ -6,12 +6,14 @@ import StarpathLevelTwoLesson from "@/components/starpath/StarpathLevelTwoLesson
 import StarpathLevelThreeLesson from "@/components/starpath/StarpathLevelThreeLesson";
 import StarpathLevelFourLesson from "@/components/starpath/StarpathLevelFourLesson";
 import StarpathLevelFiveLesson from "@/components/starpath/StarpathLevelFiveLesson";
+import StarpathLevelSixLesson from "@/components/starpath/StarpathLevelSixLesson";
 import { GROUND_LESSON_CONTENT } from "@/data/activities/starpath/ground";
 import { LEVEL_ONE_LESSON_CONTENT } from "@/data/activities/starpath/level1";
 import { LEVEL_TWO_LESSON_CONTENT } from "@/data/activities/starpath/level2";
 import { LEVEL_THREE_LESSON_CONTENT } from "@/data/activities/starpath/level3";
 import { LEVEL_FOUR_LESSON_CONTENT } from "@/data/activities/starpath/level4";
 import { LEVEL_FIVE_LESSON_CONTENT } from "@/data/activities/starpath/level5";
+import { LEVEL_SIX_LESSON_CONTENT } from "@/data/activities/starpath/level6";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getServerStarpathAccess } from "@/lib/demo-session-server";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
@@ -85,6 +87,10 @@ export default async function StarpathLessonPage({
 
   if (LEVEL_FIVE_LESSON_CONTENT[lesson.id]) {
     return <StarpathLevelFiveLesson lesson={lessonMetadata} />;
+  }
+
+  if (LEVEL_SIX_LESSON_CONTENT[lesson.id]) {
+    return <StarpathLevelSixLesson lesson={lessonMetadata} />;
   }
 
   return (

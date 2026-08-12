@@ -287,6 +287,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "starpathComposite",
   "starpathSymmetry",
   "starpathNet",
+  "starpathCrossSection",
   "starpathCoordinate",
   "starpathTransform",
   "starpathObject",

@@ -15,6 +15,7 @@ import L5NetsTeachGrid from "@/components/starpath/L5NetsTeachGrid";
 import L5CoordTeachGrid from "@/components/starpath/L5CoordTeachGrid";
 import L5TransformTeachGrid from "@/components/starpath/L5TransformTeachGrid";
 import L5IntegrateTeachGrid from "@/components/starpath/L5IntegrateTeachGrid";
+import L6CrossTeachGrid from "@/components/starpath/L6CrossTeachGrid";
 
 const L4_TEACH_VARIANTS: L4TeachVariant[] = ["l4Composite", "l4Solids", "l4Model", "l4GridRef", "l4GridRoute", "l4LineSym", "l4RotSym", "l4Integrate"];
 const isL4Teach = (variant: string): variant is L4TeachVariant => (L4_TEACH_VARIANTS as string[]).includes(variant);
@@ -593,6 +594,8 @@ export function StarpathShapeIntroCard({
       ? "Transformations"
       : variant === "l5Integrate"
       ? "Spatial Design Challenge"
+      : variant === "l6Cross"
+      ? "Cross-sections"
       : isL4Teach(variant)
       ? L4_TEACH_HEADING[variant]
       : variant === "objects"
@@ -647,6 +650,8 @@ export function StarpathShapeIntroCard({
         <L5TransformTeachGrid />
       ) : variant === "l5Integrate" ? (
         <L5IntegrateTeachGrid />
+      ) : variant === "l6Cross" ? (
+        <L6CrossTeachGrid />
       ) : isL4Teach(variant) ? (
         <L4TeachGrid variant={variant} />
       ) : variant === "objects3d" ? (
