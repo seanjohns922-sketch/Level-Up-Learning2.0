@@ -144,6 +144,8 @@ function buildNextActivityRow(
   classId: string,
   timestamp: string
 ): LiveStudentActivityRow {
+  const isAssessmentStart = input.eventType === "activity_started" &&
+    (input.activityId === "pretest" || input.activityId === "posttest");
   const sameQuestion = existing?.current_question_id && input.questionId
     ? existing.current_question_id === input.questionId
     : false;
@@ -201,7 +203,7 @@ function buildNextActivityRow(
     input.eventType === "question_loaded" ||
     input.eventType === "answer_correct" ||
     input.eventType === "answer_incorrect"
-  ) {
+) {
     currentLessonStatus = "active";
     completedAt = null;
   }
@@ -232,22 +234,22 @@ function buildNextActivityRow(
     class_id: classId,
     current_level: input.level ?? existing?.current_level ?? null,
     current_strand: input.strand ?? existing?.current_strand ?? null,
-    current_week: input.week ?? existing?.current_week ?? null,
+    current_week: isAssessmentStart ? null : (input.week ?? existing?.current_week ?? null),
     current_lesson: input.lessonId ?? existing?.current_lesson ?? null,
     current_lesson_title: input.lessonTitle ?? existing?.current_lesson_title ?? null,
     current_activity_id: shouldClearQuestion ? null : (input.activityId ?? existing?.current_activity_id ?? null),
     current_activity_label: shouldClearQuestion ? `${input.lessonTitle ?? existing?.current_lesson_title ?? "Lesson"} complete` : (input.activityLabel ?? existing?.current_activity_label ?? null),
-    current_question_id: shouldClearQuestion ? null : (input.questionId ?? existing?.current_question_id ?? null),
-    current_question_text: shouldClearQuestion ? null : (input.questionText ?? existing?.current_question_text ?? null),
-    current_question_type: shouldClearQuestion ? null : (input.questionType ?? existing?.current_question_type ?? null),
-    current_question_options: shouldClearQuestion ? [] : (input.questionOptions ?? existing?.current_question_options ?? []),
-    current_step_label: shouldClearQuestion ? null : (input.currentStepLabel ?? existing?.current_step_label ?? null),
-    progress_percent: input.progressPercent ?? existing?.progress_percent ?? null,
+    current_question_id: shouldClearQuestion || isAssessmentStart ? null : (input.questionId ?? existing?.current_question_id ?? null),
+    current_question_text: shouldClearQuestion || isAssessmentStart ? null : (input.questionText ?? existing?.current_question_text ?? null),
+    current_question_type: shouldClearQuestion || isAssessmentStart ? null : (input.questionType ?? existing?.current_question_type ?? null),
+    current_question_options: shouldClearQuestion || isAssessmentStart ? [] : (input.questionOptions ?? existing?.current_question_options ?? []),
+    current_step_label: shouldClearQuestion || isAssessmentStart ? null : (input.currentStepLabel ?? existing?.current_step_label ?? null),
+    progress_percent: isAssessmentStart ? 0 : (input.progressPercent ?? existing?.progress_percent ?? null),
     progress_label: input.progressLabel ?? existing?.progress_label ?? null,
     latest_event_type: input.eventType,
-    latest_answer_correct: input.isCorrect ?? existing?.latest_answer_correct ?? null,
-    latest_selected_answer: input.selectedAnswer ?? existing?.latest_selected_answer ?? null,
-    latest_correct_answer: input.correctAnswer ?? existing?.latest_correct_answer ?? null,
+    latest_answer_correct: isAssessmentStart ? null : (input.isCorrect ?? existing?.latest_answer_correct ?? null),
+    latest_selected_answer: isAssessmentStart ? null : (input.selectedAnswer ?? existing?.latest_selected_answer ?? null),
+    latest_correct_answer: isAssessmentStart ? null : (input.correctAnswer ?? existing?.latest_correct_answer ?? null),
     last_event_text: buildLastEventText(input.eventType, {
       isCorrect: input.isCorrect,
       timeOnQuestion: input.timeOnQuestion,
@@ -255,15 +257,15 @@ function buildNextActivityRow(
     }),
     time_on_current_question: input.timeOnQuestion ?? existing?.time_on_current_question ?? 0,
     current_question_attempts: shouldClearQuestion ? 0 : currentQuestionAttempts,
-    questions_answered: questionsAnswered,
-    correct_count: correctCount,
-    accuracy_percent: accuracyPercent,
+    questions_answered: isAssessmentStart ? 0 : questionsAnswered,
+    correct_count: isAssessmentStart ? 0 : correctCount,
+    accuracy_percent: isAssessmentStart ? 0 : accuracyPercent,
     current_lesson_status: currentLessonStatus,
     completed_at: completedAt,
     session_incorrect_count: sessionIncorrectCount,
     consecutive_incorrect_count: consecutiveIncorrectCount,
     session_hint_count: sessionHintCount,
-    attempt_number: input.attemptNumber ?? existing?.attempt_number ?? null,
+    attempt_number: isAssessmentStart ? null : (input.attemptNumber ?? existing?.attempt_number ?? null),
     skill_tag: input.skillTag ?? existing?.skill_tag ?? null,
     misconception_tag: input.misconceptionTag ?? existing?.misconception_tag ?? null,
     lesson_started_at: lessonStartedAt,

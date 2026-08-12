@@ -124,6 +124,14 @@ type CompletedActivityAttemptSummary = {
   accuracy?: number | null;
 };
 
+type DailyClassActivityRow = {
+  student_id: string;
+  class_id: string;
+  activity_date: string;
+  seconds_active: number;
+  updated_at: string;
+};
+
 type LiveStudentCard = {
   id: string;
   displayName: string;
@@ -214,6 +222,7 @@ function resolveCurrentActivityRow(
   row: LiveStudentActivityRow | null | undefined,
   events: LiveActivityEventRow[],
   attempts: CompletedActivityAttemptRow[],
+  dailyActivity?: DailyClassActivityRow | null,
 ): LiveStudentActivityRow | null {
   const latestEvent = [...events]
     .filter((event) => {
@@ -229,7 +238,7 @@ function resolveCurrentActivityRow(
     .filter((attempt) => attempt.student_id === student.id && attempt.completed !== false)
     .sort((left, right) => timestampMs(right.completed_at) - timestampMs(left.completed_at))[0] ?? null;
 
-  if (!row && !latestEvent && !latestAttempt) return null;
+  if (!row && !latestEvent && !latestAttempt && !dailyActivity) return null;
 
   let resolved: LiveStudentActivityRow = row
     ? { ...row }
@@ -291,6 +300,16 @@ function resolveCurrentActivityRow(
       attempt_number: latestAttempt.attempt_no,
       last_active_at: latestAttempt.completed_at,
       updated_at: latestAttempt.completed_at,
+    };
+  }
+
+  if (dailyActivity && timestampMs(dailyActivity.updated_at) > resolvedAt) {
+    resolved = {
+      ...resolved,
+      last_active_at: dailyActivity.updated_at,
+      updated_at: dailyActivity.updated_at,
+      progress_label: resolved.progress_label ?? "Active today",
+      last_event_text: resolved.last_event_text ?? "Active in Level Up Learning today",
     };
   }
 
@@ -802,6 +821,7 @@ export default function LiveClassPanel({
   const [rows, setRows] = useState<LiveStudentActivityRow[]>([]);
   const [events, setEvents] = useState<LiveActivityEventRow[]>([]);
   const [completedAttempts, setCompletedAttempts] = useState<CompletedActivityAttemptRow[]>([]);
+  const [dailyActivity, setDailyActivity] = useState<DailyClassActivityRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<LiveStatusFilter>("all");
   const [spotlightMode, setSpotlightMode] = useState(false);
@@ -840,45 +860,53 @@ export default function LiveClassPanel({
           setRows([]);
           setEvents([]);
           setCompletedAttempts([]);
+          setDailyActivity([]);
           setLoading(false);
         }
         return;
       }
       // Note: don't flip `loading` on refreshes — only the initial load shows the
       // spinner, so periodic polls update in place without flashing the panel.
-      const { data, error } = await supabase
-        .from("live_student_activity")
-        .select("*")
-        .eq("class_id", selectedClass.id)
-        .order("last_active_at", { ascending: false });
-      const { data: eventData, error: eventError } = await supabase
-        .from("live_activity_events")
-        .select("id,student_id,class_id,event_type,created_at,payload")
-        .eq("class_id", selectedClass.id)
-        .in("event_type", [
-          "lesson_started",
-          "quiz_started",
-          "answer_correct",
-          "answer_incorrect",
-          "lesson_completed",
-          "quiz_completed",
-        ])
-        .order("created_at", { ascending: true });
-      const lessonAttemptResult = studentIds.length > 0
-        ? await supabase
+      const [activityResult, eventResult, lessonAttemptResult, quizAttemptResult, dailyActivityResult] = await Promise.all([
+        supabase
+          .from("live_student_activity")
+          .select("*")
+          .eq("class_id", selectedClass.id)
+          .order("last_active_at", { ascending: false }),
+        supabase
+          .from("live_activity_events")
+          .select("id,student_id,class_id,event_type,created_at,payload")
+          .eq("class_id", selectedClass.id)
+          .in("event_type", [
+            "activity_started",
+            "lesson_started",
+            "quiz_started",
+            "answer_correct",
+            "answer_incorrect",
+            "lesson_completed",
+            "quiz_completed",
+          ])
+          .order("created_at", { ascending: true }),
+        studentIds.length > 0
+          ? supabase
             .from("student_lesson_attempts")
             .select("student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at")
             .in("student_id", studentIds)
             .eq("completed", true)
-        : { data: [], error: null };
-      const quizAttemptResult = studentIds.length > 0
-        ? await supabase
+          : Promise.resolve({ data: [], error: null }),
+        studentIds.length > 0
+          ? supabase
             .from("student_weekly_quiz_attempts")
             .select("student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at")
             .in("student_id", studentIds)
-        : { data: [], error: null };
+          : Promise.resolve({ data: [], error: null }),
+        supabase.rpc("get_live_class_activity_today", { p_class_id: selectedClass.id }),
+      ]);
+      const { data, error } = activityResult;
+      const { data: eventData, error: eventError } = eventResult;
       const { data: lessonAttemptData, error: lessonAttemptError } = lessonAttemptResult;
       const { data: quizAttemptData, error: quizAttemptError } = quizAttemptResult;
+      const { data: dailyActivityData, error: dailyActivityError } = dailyActivityResult;
       if (error) {
         console.warn("[LiveClassPanel] Failed to load live student activity", error);
       }
@@ -890,6 +918,9 @@ export default function LiveClassPanel({
       }
       if (quizAttemptError) {
         console.warn("[LiveClassPanel] Failed to load completed quiz attempts", quizAttemptError);
+      }
+      if (dailyActivityError) {
+        console.warn("[LiveClassPanel] Failed to load today's class activity", dailyActivityError);
       }
       if (!cancelled) {
         setRows((data ?? []) as LiveStudentActivityRow[]);
@@ -907,6 +938,7 @@ export default function LiveClassPanel({
             activity_type: "quiz" as const,
           })),
         ]);
+        setDailyActivity((dailyActivityData ?? []) as DailyClassActivityRow[]);
         setLoading(false);
       }
     }
@@ -984,6 +1016,7 @@ export default function LiveClassPanel({
 
   const cards = useMemo(() => {
     const rowMap = new Map(rows.map((row) => [row.student_id, row]));
+    const dailyActivityMap = new Map(dailyActivity.map((row) => [row.student_id, row]));
     const eventMap = new Map<string, LiveActivityEventRow[]>();
     events.forEach((event) => {
       const current = eventMap.get(event.student_id);
@@ -997,13 +1030,14 @@ export default function LiveClassPanel({
         rowMap.get(student.id),
         studentEvents,
         completedAttempts,
+        dailyActivityMap.get(student.id),
       );
       const row = alignCompletedActivityWithCanonicalProgress(student, resolvedRow, progressRows);
       const lessonPerformance = buildCurrentLessonPerformance(row, studentEvents);
       const completedAttemptSummary = buildCompletedActivityAttemptSummary(row, completedAttempts);
       return toLiveCard(student, row, lessonPerformance, completedAttemptSummary);
     });
-  }, [completedAttempts, events, progressRows, rows, students]);
+  }, [completedAttempts, dailyActivity, events, progressRows, rows, students]);
 
   const filteredCards = useMemo(() => {
     let base = filter === "all" ? cards : cards.filter((card) => getCardDisplayGroup(card) === filter);
@@ -1062,6 +1096,9 @@ export default function LiveClassPanel({
   }, [cards]);
 
   const activeStudentCount = cards.filter((card) => getCardDisplayGroup(card) === "live").length;
+  const activeTodayCount = dailyActivity.filter((activity) =>
+    students.some((student) => student.id === activity.student_id)
+  ).length;
   const classAccuracy = useMemo(() => {
     return aggregateLearningScores(
       cards.map((card) => ({
@@ -1132,8 +1169,10 @@ export default function LiveClassPanel({
             {/* Compact class total — not another set of big widgets */}
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold">
               <span className="inline-flex items-center gap-1.5 text-emerald-700">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />{activeStudentCount} active
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />{activeStudentCount} active now
               </span>
+              <span className="text-slate-300">·</span>
+              <span className="text-teal-700">{activeTodayCount} active today</span>
               <span className="text-slate-300">·</span>
               <span className="inline-flex items-center gap-1.5 text-rose-700">
                 <span className="h-2 w-2 rounded-full bg-rose-500" />{statusCounts.needs_support} need help
@@ -1214,7 +1253,12 @@ export default function LiveClassPanel({
               const notStarted = displayGroup === "waiting_to_start";
               const levelTag = card.workingLevelBadge ?? "—";
               const weekTag = card.currentWeek ? `W${card.currentWeek}` : "—";
-              const lessonTag = notStarted ? "—" : (card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : "—");
+              const assessmentTitle = /^(pre-test|post-test)$/i.test(card.currentLessonTitle ?? "")
+                ? card.currentLessonTitle
+                : null;
+              const lessonTag = notStarted
+                ? "—"
+                : assessmentTitle ?? (card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : "—");
               return (
                 <button
                   key={card.id}

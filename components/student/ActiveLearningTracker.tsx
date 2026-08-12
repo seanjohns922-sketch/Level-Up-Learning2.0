@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { ensureStudentActivityDay, recordStudentActivityDelta } from "@/lib/student-activity";
 import { rememberActiveLearningDestination } from "@/lib/continue-learning";
+import { trackLiveLearningEvent } from "@/lib/live-class-client";
 
 type ActiveLearningTrackerProps = {
   context: "lesson" | "session" | "pretest" | "posttest";
@@ -19,6 +20,23 @@ export function ActiveLearningTracker({ context }: ActiveLearningTrackerProps) {
   useEffect(() => {
     rememberActiveLearningDestination(context);
     void ensureStudentActivityDay();
+
+    if (context === "pretest" || context === "posttest") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const year = searchParams.get("year");
+      const realmId = searchParams.get("realm_id");
+      const assessmentTitle = context === "pretest" ? "Pre-Test" : "Post-Test";
+      void trackLiveLearningEvent({
+        eventType: "activity_started",
+        level: year,
+        strand: realmId,
+        lessonId: `${context}:${realmId ?? "realm"}:${year ?? "level"}`,
+        lessonTitle: assessmentTitle,
+        activityId: context,
+        activityLabel: assessmentTitle,
+        progressLabel: `${assessmentTitle} in progress`,
+      });
+    }
 
     const markInteraction = () => {
       lastInteractionRef.current = Date.now();
