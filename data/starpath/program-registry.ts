@@ -609,8 +609,11 @@ const IMPLEMENTED_LEVEL_FIVE_LESSONS: Record<
 
 const L6_CROSS_W1_MECHANICS = ["cross-section-slicer", "slice-sequence-viewer", "cross-section-predictor"] as const;
 const L6_CROSS_W2_MECHANICS = ["section-prism-classifier", "section-change-grapher", "object-inference"] as const;
+const L6_COORD_W3_MECHANICS = ["four-quadrant-builder", "cartesian-plotter", "coordinate-deduction"] as const;
+const L6_COORD_W4_MECHANICS = ["coordinate-change-simulator", "axis-crossing-runner", "movement-rule-inference"] as const;
 
-// Level 6 · Weeks 1-2 — Cross-sections (AC9M6SP01). Later blocks (W3-8) land next.
+// Level 6 · Weeks 1-2 cross-sections (SP01) and 3-4 four-quadrant coordinates
+// (SP02). Later blocks (W5-8) land next.
 const IMPLEMENTED_LEVEL_SIX_LESSONS: Record<
   string,
   { learningIntention: string; mechanics: readonly [string, string, string] }
@@ -621,6 +624,12 @@ const IMPLEMENTED_LEVEL_SIX_LESSONS: Record<
   "y6-space-w2-l1": { learningIntention: "I can use cross-sections to decide whether an object is a prism.", mechanics: L6_CROSS_W2_MECHANICS },
   "y6-space-w2-l2": { learningIntention: "I can classify cross-sections as constant or shrinking.", mechanics: L6_CROSS_W2_MECHANICS },
   "y6-space-w2-l3": { learningIntention: "I can explain an object's structure from its cross-sections.", mechanics: L6_CROSS_W2_MECHANICS },
+  "y6-space-w3-l1": { learningIntention: "I can plot and read points with negative coordinates.", mechanics: L6_COORD_W3_MECHANICS },
+  "y6-space-w3-l2": { learningIntention: "I can plot ordered pairs in all four quadrants.", mechanics: L6_COORD_W3_MECHANICS },
+  "y6-space-w3-l3": { learningIntention: "I can name a point's quadrant from the signs of its coordinates.", mechanics: L6_COORD_W3_MECHANICS },
+  "y6-space-w4-l1": { learningIntention: "I can say which coordinate changes when a point moves along an axis.", mechanics: L6_COORD_W4_MECHANICS },
+  "y6-space-w4-l2": { learningIntention: "I can move a point across an axis and flip a coordinate's sign.", mechanics: L6_COORD_W4_MECHANICS },
+  "y6-space-w4-l3": { learningIntention: "I can describe the move that takes a point to its image.", mechanics: L6_COORD_W4_MECHANICS },
 };
 
 function buildLevel(definition: LevelDefinition): StarpathLevelProgram {

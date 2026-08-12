@@ -2454,7 +2454,7 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       /** Which teaching layout to render. Defaults to "shapes". */
-      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets" | "l5Coord" | "l5Trans" | "l5Integrate" | "l6Cross";
+      variant?: "shapes" | "objects" | "clues" | "levelOneShapes" | "builders" | "positions" | "positionsDepth" | "directions" | "maps" | "masterShapeMap" | "masterPathway" | "masterMission" | "featureEdges" | "featureSides" | "featureParallel" | "featureCompare" | "mapLocate" | "mapPositions" | "mapRoute" | "mapMission" | "mapDebug" | "objects3d" | "objectFeatures" | "l4Composite" | "l4Solids" | "l4Model" | "l4GridRef" | "l4GridRoute" | "l4LineSym" | "l4RotSym" | "l4Integrate" | "l5Nets" | "l5Coord" | "l5Trans" | "l5Integrate" | "l6Cross" | "l6Coord";
       heading?: string;
     }
   | {
@@ -2727,6 +2727,23 @@ export type PracticeTask = (
       objectId: string;
       options: Array<{ id: string; label: string }>;
       correctOptionIds: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Level 6 · W3-4 — Four-quadrant Cartesian plane (AC9M6SP02). Signed ordered
+      // pairs on an 8x8 grid (-4..4 each axis), origin centred. Plot/read points,
+      // name quadrants, and reason about how coordinates change across the axes.
+      kind: "starpathCartesian";
+      mode: "plot" | "read" | "quadrant" | "reason" | "changeWhich" | "crossAxis" | "reverse";
+      render: "tap" | "options";
+      prompt: string;
+      speakText: string;
+      target: number;
+      range: number;
+      points?: Array<{ id: string; x: number; y: number; kind: "star" | "rover" | "goal" | "dot" }>;
+      answer?: { x: number; y: number };
+      options?: Array<{ id: string; label: string }>;
+      correctOptionIds?: string[];
       feedback: { correct: string; wrong: string };
     }
   | {
