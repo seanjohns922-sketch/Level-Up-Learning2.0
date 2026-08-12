@@ -12,6 +12,7 @@ const checks = [
   ["Review panel also requires the isolated demo identity", panel.includes("isDemoPreviewMode()") && panel.includes('ACTIVE_STUDENT_KEY) !== "demo-preview"')],
   ["Demo navigation exposes the review workspace", navigation.includes('router.push("/demo-review")')],
   ["Pre-Test and Post-Test launchers use real assessment routes", panel.includes('`/${kind}?${params.toString()}`')],
+  ["Live Starpath Pre-Tests are available for Levels 1 and 2", panel.includes('year !== "Prep" && (realm !== "space" || levelNumber <= 2)')],
   ["Weekly lesson and quiz launchers use real runtime routes", panel.includes("buildLessonRoute") && panel.includes('type: "quiz"')],
   ["Result scenarios include pass, targeted, full and fail profiles", ["pre-pass", "pre-targeted", "pre-full", "post-pass", "post-fail"].every((scenario) => panel.includes(scenario))],
   ["Legend reveal state can be reset in the demo scope", panel.includes("resetLegendUnlockVideosForCurrentScope")],

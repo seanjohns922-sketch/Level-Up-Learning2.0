@@ -105,7 +105,7 @@ export default function DemoReviewPanel() {
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
   const maxWeek = realm === "number" ? 12 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
-  const pretestAvailable = realm !== "space" && year !== "Prep";
+  const pretestAvailable = year !== "Prep" && (realm !== "space" || levelNumber <= 2);
   const posttestAvailable = realm !== "space" || levelNumber <= 3;
   const weeklyContentAvailable = realm !== "space" || levelNumber <= 3;
 
