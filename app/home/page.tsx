@@ -9,6 +9,7 @@ import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYe
 import { markStudentIntroSeen, restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
 import { buildGroundFirstLessonRoute, resolveStudentDestination } from "@/lib/student-destination";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function StudentHomeBackdrop() {
   return (
@@ -36,6 +37,10 @@ export default function StudentHomePage() {
   const [restoreError, setRestoreError] = useState("");
   const placementYear = progress?.year ?? getPlacementEntryYear();
   const isGroundLevel = placementYear === "Prep";
+  const studentNamePrefix = studentProfile?.displayName ? `${studentProfile.displayName}, ` : "";
+  const welcomeMessage = isGroundLevel
+    ? `${studentNamePrefix}watch the welcome video, then begin Ground Level Week 1 in Number Nexus.`
+    : `${studentNamePrefix}your journey starts with a short skill check. We'll use your pre-test to place you at the right level, unlock the correct learning path, and guide you into the Tower.`;
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
@@ -153,11 +158,15 @@ export default function StudentHomePage() {
         <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3 uppercase tracking-wide">
           Tower of Knowledge
         </h1>
-        <p className="text-gray-700 max-w-2xl mx-auto mb-8">
-          {isGroundLevel
-            ? `${studentProfile?.displayName ? `${studentProfile.displayName}, ` : ""}watch the intro, then choose your first Ground Level adventure in Number Nexus or Measurelands.`
-            : `${studentProfile?.displayName ? `${studentProfile.displayName}, ` : ""}your journey starts with a short skill check. We&apos;ll use your pre-test to place you at the right level, unlock the correct learning path, and guide you into the Tower.`}
-        </p>
+        <div className="mb-8 flex items-start justify-center gap-2">
+          <p className="max-w-2xl text-gray-700">{welcomeMessage}</p>
+          <ReadAloudBtn
+            text={`Welcome to the Tower of Knowledge. ${welcomeMessage}`}
+            speechKey="student-welcome"
+            label="Read"
+            className="shrink-0 border-slate-300 bg-white text-slate-600"
+          />
+        </div>
 
         <div className="rounded-[28px] border border-dashed border-teal-300/90 bg-teal-50/70 p-5 md:p-6 mb-8">
           <div className="aspect-video w-full overflow-hidden rounded-[22px] border border-slate-700/60 bg-slate-950 shadow-[0_12px_28px_rgba(2,23,22,0.18)]">
