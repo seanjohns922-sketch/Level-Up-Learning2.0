@@ -4,6 +4,8 @@
  * engines, plus that the registry marks them implemented.
  * Run: npx tsx scripts/audit-starpath-level6.ts
  */
+import fs from "node:fs";
+import path from "node:path";
 import { LEVEL_SIX_LESSON_CONTENT } from "@/data/activities/starpath/level6";
 import { getStarpathQuizTasks } from "@/data/activities/starpath/ground/week1Quiz";
 import { getCrossObject } from "@/data/activities/starpath/level6/crossSections";
@@ -47,6 +49,15 @@ const TRANS_LESSONS = ["y6-space-w5-l1", "y6-space-w5-l2", "y6-space-w5-l3"];
 const TESS_LESSONS = ["y6-space-w6-l1", "y6-space-w6-l2", "y6-space-w6-l3", "y6-space-w7-l1", "y6-space-w7-l2", "y6-space-w7-l3"];
 // W8 integration lessons mix all three strands (each dispatched by kind below).
 const INTEGRATE_LESSONS = ["y6-space-w8-l1", "y6-space-w8-l2", "y6-space-w8-l3"];
+const WEEKLY_QUIZ_MODES = [
+  ["sliceShape", "sliceChange", "predict"],
+  ["prism", "constant", "explain"],
+  ["read", "quadrant", "reason"],
+  ["changeWhich", "crossAxis", "reverse"],
+  ["sequence", "order", "chain"],
+  ["will", "rule", "explain"],
+  ["notice", "vary", "evidence"],
+] as const;
 
 let taskCount = 0;
 
@@ -156,6 +167,10 @@ function auditAssessmentBank(
     check(item.curriculumCodes?.[0] === item.primaryDescriptorCode && item.descriptorCodes.includes(item.primaryDescriptorCode), `${item.id}: curriculum descriptor metadata mismatch`);
     check(item.misconceptionTags.length > 0 && item.misconceptionTags.every((tag) => misconceptionById.get(tag)?.descriptorCodes.includes(item.primaryDescriptorCode)), `${item.id}: misconception tag outside descriptor`);
     check(Boolean(item.practiceTask && "feedback" in item.practiceTask && item.practiceTask.feedback?.correct === item.practiceTask.feedback?.wrong), `${item.id}: feedback must not reveal correctness`);
+    const actualResponseMode = item.practiceTask && "render" in item.practiceTask && item.practiceTask.render === "tap"
+      ? "manipulated_response"
+      : "selected_response";
+    check(item.responseMode === actualResponseMode, `${item.id}: responseMode says ${item.responseMode}, but the rendered interaction is ${actualResponseMode}`);
     if (item.practiceTask) auditTask(item.id, item.practiceTask);
   }
 }
@@ -190,6 +205,9 @@ for (let week = 1; week <= 7; week += 1) {
   check(quiz?.length === 15, `Level 6 Week ${week} quiz must contain 15 questions`);
   quiz?.forEach((task, index) => {
     check("target" in task && task.target === index + 1, `Level 6 Week ${week} quiz question ${index + 1} must keep target order`);
+    const lessonIndex = Math.floor(index / 5);
+    const expectedMode = WEEKLY_QUIZ_MODES[week - 1]?.[lessonIndex];
+    check("mode" in task && task.mode === expectedMode, `Level 6 Week ${week} quiz question ${index + 1} must assess Lesson ${lessonIndex + 1} mode ${expectedMode}`);
     auditTask(`Level 6 Week ${week} quiz question ${index + 1}`, task);
   });
 }
@@ -215,7 +233,19 @@ check(JSON.stringify(getPretestForYearLabel("Year 6", "space").map((item) => ite
 check(JSON.stringify(getPretestForLevel(level6, "space").map((item) => item.id)) === JSON.stringify(expectedPreIds), "Level 6 Starpath Pre-Test must resolve through level API");
 check(JSON.stringify((getPosttestForYearLabel("Year 6", "space")?.questions ?? []).map((item) => item.id)) === JSON.stringify(expectedPostIds), "Year 6 Starpath Post-Test must resolve through year API");
 check(JSON.stringify((getPosttestForLevel(level6, "space")?.questions ?? []).map((item) => item.id)) === JSON.stringify(expectedPostIds), "Level 6 Starpath Post-Test must resolve through level API");
+check(ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent === 80, "Level 6 weekly quiz threshold must remain 80%");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Level 6 assessment thresholds must remain 85%");
+
+const voyageQuizSource = fs.readFileSync(path.join(process.cwd(), "components/starpath/StarpathVoyageQuiz.tsx"), "utf8");
+check(/function changeAnswer\(\)[\s\S]+delete next\[answerKey\][\s\S]+setNonce/.test(voyageQuizSource), "Level 6 weekly quizzes must reopen the current task when an answer is changed");
+check(/Correctness is shown after the quiz\.[\s\S]+Change answer/.test(voyageQuizSource), "Level 6 weekly quizzes must allow immediate answer changes without revealing correctness");
+
+const bankSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/level6StarpathIndependentAssessments.ts"), "utf8");
+check(
+  !bankSource.includes("LEVEL_SIX_LESSON_CONTENT") &&
+    !/weeklyQuizzes|getStarpathQuizTasks|level6\/(crossTasks|cartesianTasks|transformChainTasks|tessellationTasks)/.test(bankSource),
+  "Level 6 assessment banks must not import lesson or weekly quiz task factories",
+);
 
 if (problems > 0) {
   console.error(`\nStarpath Level 6 audit failed with ${problems} problem(s).`);

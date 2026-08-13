@@ -1,5 +1,5 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
-import { reasonTask as cartReasonTask, changeWhichTask, crossAxisTask, plotSignedTask, quadrantTask, readSignedTask, reverseTask } from "./cartesianTasks";
+import { reasonTask as cartReasonTask, changeWhichTask, crossAxisTask, quadrantTask, readSignedTask, reverseTask } from "./cartesianTasks";
 import { constantTask, explainTask, predictTask, prismTask, sliceChangeTask, sliceShapeTask } from "./crossTasks";
 import { evidenceTask, explainFitTask, noticeRuleTask, patternRuleTask, varyTask, willTessellateTask } from "./tessellationTasks";
 import { findChainTask, orderMattersTask, transformInOrderTask } from "./transformChainTasks";
@@ -20,7 +20,7 @@ function build(factories: readonly [TaskFactory, TaskFactory, TaskFactory], seed
 
 export const buildLevelSixWeek1VoyageQuiz = () => build([sliceShapeTask, sliceChangeTask, predictTask], 11);
 export const buildLevelSixWeek2VoyageQuiz = () => build([prismTask, constantTask, explainTask], 21);
-export const buildLevelSixWeek3VoyageQuiz = () => build([plotSignedTask, readSignedTask, quadrantTask], 31);
+export const buildLevelSixWeek3VoyageQuiz = () => build([readSignedTask, quadrantTask, cartReasonTask], 31);
 export const buildLevelSixWeek4VoyageQuiz = () => build([changeWhichTask, crossAxisTask, reverseTask], 41);
 export const buildLevelSixWeek5VoyageQuiz = () => build([transformInOrderTask, orderMattersTask, findChainTask], 51);
 export const buildLevelSixWeek6VoyageQuiz = () => build([willTessellateTask, patternRuleTask, explainFitTask], 61);
