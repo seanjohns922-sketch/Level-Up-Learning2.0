@@ -14,9 +14,12 @@ assert.match(
 );
 assert.match(
   source,
-  /level: schoolYearOf\(student\),[\s\S]*entry: "pretest"/,
+  /entry: schoolYearOf\(student\) === "Prep" \? "ground_week1" : "pretest"/,
   "New placement rows must persist the student's school-year default.",
 );
+assert.match(source, /if \(level === "Prep"\) return "ground_week1"/);
+assert.match(source, /entryModesForLevel\(level\)/);
+assert.match(source, /level !== "Prep" \? <button onClick=\{\(\) => onResetPretest\(s\)\}/);
 for (const key of ["surname", "schoolYear", "assignedStart", "currentProgress"]) {
   assert.match(source, new RegExp(`toggleSort\\("${key}"\\)`));
 }

@@ -11,6 +11,7 @@ const entryHandoff = read("lib/realm-entry-handoff.ts");
 const progressSync = read("lib/student-progress-sync.ts");
 const studentDestination = read("lib/student-destination.ts");
 const pretest = read("app/pretest/page.tsx");
+const home = read("app/home/page.tsx");
 
 const results = [];
 const check = (label, ok) => results.push({ label, ok });
@@ -49,6 +50,11 @@ check(
     studentDestination.includes("placementComplete: isGroundLevel"),
 );
 check(
+  "A new Ground Level learner starts Number Nexus Week 1 after the welcome video",
+  studentDestination.includes("buildGroundFirstLessonRoute") &&
+    studentDestination.includes('yearLabel: "Prep", week: 1, lessonNumber: 1, realmId: "number"'),
+);
+check(
   "A placed Week 2 student returns to Measurelands",
   resolveRealmEntryRoute({
     realmId: "measurement",
@@ -82,8 +88,7 @@ check(
 );
 check(
   "Explicit intro completion cannot race the server write and bounce back home",
-  progressSync.includes("hasActiveStudentSeenIntro(studentId)") &&
-    progressSync.includes("introSeenFromCurrentSession") &&
+  /await markStudentIntroSeen\(studentId\)[\s\S]*markActiveStudentIntroSeen\(studentId\)/.test(home) &&
     progressSync.includes("introSeenFromStudentFlag") &&
     progressSync.includes("introSeenFromHistoricalProgress"),
 );

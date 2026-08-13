@@ -8,7 +8,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYear, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { markStudentIntroSeen, restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
-import { resolveStudentDestination } from "@/lib/student-destination";
+import { buildGroundFirstLessonRoute, resolveStudentDestination } from "@/lib/student-destination";
 
 function StudentHomeBackdrop() {
   return (
@@ -91,11 +91,13 @@ export default function StudentHomePage() {
     try {
       await markStudentIntroSeen(studentId);
       markActiveStudentIntroSeen(studentId);
-      router.push(resolveStudentDestination({
-        progress,
-        introSeen: true,
-        fallbackYear: progress.year,
-      }));
+      router.push(isGroundLevel
+        ? buildGroundFirstLessonRoute()
+        : resolveStudentDestination({
+            progress,
+            introSeen: true,
+            fallbackYear: progress.year,
+          }));
     } catch (error) {
       console.warn("[Home] Could not persist intro state", error);
       setRestoreError("We could not save that you watched the intro. Please try again.");

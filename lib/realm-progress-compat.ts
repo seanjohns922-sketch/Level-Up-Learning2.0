@@ -583,11 +583,14 @@ export async function teacherChangeStartingLevel(
   assignedLevel: string,
   entryMode: PlacementEntryMode = "pretest",
 ) {
+  const normalizedEntryMode = assignedLevel === "Prep"
+    ? "ground_week1"
+    : entryMode === "ground_week1" ? "pretest" : entryMode;
   const { error } = await supabase.rpc("teacher_change_starting_level", {
     p_student_id: studentId,
     p_realm_id: realmId,
     p_assigned_level: assignedLevel,
-    p_entry_mode: entryMode,
+    p_entry_mode: normalizedEntryMode,
   });
   if (error) throw error;
 }
@@ -601,7 +604,9 @@ export async function teacherChangeStartingLevels(
     p_placements: placements.map((placement) => ({
       student_id: placement.studentId,
       assigned_level: placement.assignedLevel,
-      entry_mode: placement.entryMode,
+      entry_mode: placement.assignedLevel === "Prep"
+        ? "ground_week1"
+        : placement.entryMode === "ground_week1" ? "pretest" : placement.entryMode,
     })),
   });
   if (error) throw error;

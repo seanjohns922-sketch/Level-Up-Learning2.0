@@ -1,4 +1,9 @@
 import { type StudentProgress, isPlacementComplete } from "@/data/progress";
+import { buildLessonRoute } from "@/lib/lesson-routing";
+
+export function buildGroundFirstLessonRoute() {
+  return buildLessonRoute({ yearLabel: "Prep", week: 1, lessonNumber: 1, realmId: "number" });
+}
 
 export function buildDefaultStudentProgress(year: string): StudentProgress {
   const isGroundLevel = year.trim() === "Prep";

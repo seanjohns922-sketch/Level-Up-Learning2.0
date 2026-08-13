@@ -45,6 +45,17 @@ const ENTRY_MODES: { value: PlacementEntryMode; label: string }[] = [
   { value: "ground_week1", label: "Ground Level: Week 1" },
 ];
 
+function normalizeEntryMode(level: string, entry: PlacementEntryMode): PlacementEntryMode {
+  if (level === "Prep") return "ground_week1";
+  return entry === "ground_week1" ? "pretest" : entry;
+}
+
+function entryModesForLevel(level: string) {
+  return level === "Prep"
+    ? ENTRY_MODES.filter((mode) => mode.value === "ground_week1")
+    : ENTRY_MODES.filter((mode) => mode.value !== "ground_week1");
+}
+
 const YEAR_ORDER = LEVEL_CATALOG.map((l) => l.id);
 const NAME_COLLATOR = new Intl.Collator("en-AU", { sensitivity: "base", numeric: true });
 type PlacementSortKey = "surname" | "schoolYear" | "assignedStart" | "currentProgress";
@@ -176,7 +187,7 @@ export default function PlacementManager({
         if (hasSavedPlacement || hasRealmProgress || next[student.id]) continue;
         next[student.id] = {
           level: schoolYearOf(student),
-          entry: "pretest",
+          entry: schoolYearOf(student) === "Prep" ? "ground_week1" : "pretest",
         };
         changed = true;
       }
@@ -247,7 +258,10 @@ export default function PlacementManager({
       ...prev,
       [studentId]: {
         level,
-        entry: prev[studentId]?.entry ?? savedPlacement(realm, studentId)?.assigned_entry_mode ?? "pretest",
+        entry: normalizeEntryMode(
+          level,
+          prev[studentId]?.entry ?? savedPlacement(realm, studentId)?.assigned_entry_mode ?? "pretest",
+        ),
       },
     }));
   }
@@ -255,7 +269,10 @@ export default function PlacementManager({
     setSaveMessage(null);
     setPending((prev) => ({
       ...prev,
-      [studentId]: { level: prev[studentId]?.level ?? defaultLevel(realm, s), entry },
+      [studentId]: {
+        level: prev[studentId]?.level ?? defaultLevel(realm, s),
+        entry: normalizeEntryMode(prev[studentId]?.level ?? defaultLevel(realm, s), entry),
+      },
     }));
   }
 
@@ -269,7 +286,10 @@ export default function PlacementManager({
       for (const s of visibleStudents) {
         next[s.id] = {
           level: schoolYearOf(s),
-          entry: prev[s.id]?.entry ?? savedPlacement(realmId, s.id)?.assigned_entry_mode ?? "pretest",
+          entry: normalizeEntryMode(
+            schoolYearOf(s),
+            prev[s.id]?.entry ?? savedPlacement(realmId, s.id)?.assigned_entry_mode ?? "pretest",
+          ),
         };
       }
       return next;
@@ -288,7 +308,7 @@ export default function PlacementManager({
         edits.map(([studentId, edit]) => ({
           studentId,
           assignedLevel: edit.level,
-          entryMode: edit.entry,
+          entryMode: normalizeEntryMode(edit.level, edit.entry),
         }))
       );
 
@@ -522,7 +542,10 @@ export default function PlacementManager({
                 visibleStudents.map((s) => {
                   const cur = currentProgress(realmId, s.id);
                   const level = pending[s.id]?.level ?? defaultLevel(realmId, s);
-                  const entry = pending[s.id]?.entry ?? savedPlacement(realmId, s.id)?.assigned_entry_mode ?? "pretest";
+                  const entry = normalizeEntryMode(
+                    level,
+                    pending[s.id]?.entry ?? savedPlacement(realmId, s.id)?.assigned_entry_mode ?? "pretest",
+                  );
                   const changed = Boolean(pending[s.id]);
                   return (
                     <div
@@ -545,7 +568,7 @@ export default function PlacementManager({
                         onChange={(e) => setRowEntry(s.id, e.target.value as PlacementEntryMode, s, realmId)}
                         className="rounded-lg border border-[#E6E8EC] bg-white px-2 py-1.5 text-sm font-semibold text-[#0F172A]"
                       >
-                        {ENTRY_MODES.map((m) => (
+                        {entryModesForLevel(level).map((m) => (
                           <option key={m.value} value={m.value}>{m.label}</option>
                         ))}
                       </select>
@@ -565,7 +588,7 @@ export default function PlacementManager({
                           <>
                             <div className="fixed inset-0 z-10" onClick={() => setMenuFor(null)} />
                             <div className="absolute right-0 top-8 z-20 w-52 overflow-hidden rounded-xl border border-[#E6E8EC] bg-white py-1 shadow-[0_12px_32px_-12px_rgba(15,23,42,0.35)]">
-                              <button onClick={() => onResetPretest(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset pre-test</button>
+                              {level !== "Prep" ? <button onClick={() => onResetPretest(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset pre-test</button> : null}
                               <button onClick={() => onResetWeek(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset current week</button>
                               <div className="my-1 h-px bg-[#F1F5F9]" />
                               <button onClick={() => { setMenuFor(null); setResetRealmFor(s); setResetConfirmText(""); }} className="block w-full px-3 py-2 text-left text-sm font-bold text-[#DC2626] hover:bg-[#FEF2F2]">Reset this realm…</button>
