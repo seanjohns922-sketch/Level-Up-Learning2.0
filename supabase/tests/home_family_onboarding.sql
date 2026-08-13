@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(33);
+select plan(40);
 
 select has_function('public','create_home_student_for_parent',array['text','text','text','text','text'],
   'Home family onboarding exposes atomic child creation');
@@ -12,6 +12,8 @@ select has_function('public','parent_reset_home_student_pin',array['uuid','text'
   'Home parents can reset a student PIN');
 select has_function('public','parent_change_home_starting_level',array['uuid','text','text'],
   'Home parents can manage an initial working level');
+select has_function('public','parent_set_home_starting_levels',array['uuid','text','text','text'],
+  'Home parents can confirm realm-specific starting levels atomically');
 select has_function('public','parent_reset_home_pretest',array['uuid','text'],
   'Home parents can reopen a pre-test');
 select has_function('public','get_student_explorer_code_secure',array['uuid'],
@@ -69,6 +71,27 @@ select is((select count(*) from public.student_realm_progress progress join home
 set local role authenticated;
 select ok((public.get_parent_home_student_management((select student_id from home_ids))->>'parentManaged')::boolean,
   'Parent can manage the Home-only child');
+select lives_ok($$select public.parent_set_home_starting_levels(
+  (select student_id from home_ids),'Year 3','Year 2','Year 4'
+)$$, 'Parent can confirm a different starting level for every realm');
+select is((select working_level from public.student_realm_progress progress join home_ids ids on ids.student_id=progress.student_id
+  where progress.realm_id='number' and progress.is_current),'Year 3',
+  'Number Nexus receives its confirmed starting level');
+select is((select working_level from public.student_realm_progress progress join home_ids ids on ids.student_id=progress.student_id
+  where progress.realm_id='measurement' and progress.is_current),'Year 2',
+  'Measurelands receives its confirmed starting level');
+select is((select working_level from public.student_realm_progress progress join home_ids ids on ids.student_id=progress.student_id
+  where progress.realm_id='space' and progress.is_current),'Year 4',
+  'Starpath receives its confirmed starting level');
+select throws_ok($$select public.parent_set_home_starting_levels(
+  (select student_id from home_ids),'Year 5','Year 5','Invalid level'
+)$$, 'P0001','Invalid working level',
+  'An invalid realm level rejects the whole confirmation');
+select is((select jsonb_object_agg(progress.realm_id,progress.working_level order by progress.realm_id)
+  from public.student_realm_progress progress join home_ids ids on ids.student_id=progress.student_id
+  where progress.is_current),
+  '{"measurement":"Year 2","number":"Year 3","space":"Year 4"}'::jsonb,
+  'Failed confirmation leaves every prior realm level unchanged');
 select is((select count(*) from public.home_student_login_lookup((select username from home_ids),'2468')),1::bigint,
   'Home student can log in with generated username and PIN');
 select set_config(

@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   LogOut,
   Plus,
+  Printer,
   RotateCcw,
   School,
   Settings,
@@ -84,6 +85,8 @@ type HomeManagement = {
   schoolName: string | null;
   placements: Array<{ realmId: string; workingLevel: string; entryMode: string }>;
 };
+
+type CreatedHomeStudent = Pick<HomeManagement, "studentId" | "displayName" | "username" | "explorerCode" | "schoolYearLevel">;
 
 const yearLevels = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
 
@@ -536,11 +539,15 @@ export function AddHomeChild() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [schoolYear, setSchoolYear] = useState("Year 1");
-  const [workingLevel, setWorkingLevel] = useState("Year 1");
   const [pin, setPin] = useState("");
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [created, setCreated] = useState<HomeManagement | null>(null);
+  const [created, setCreated] = useState<CreatedHomeStudent | null>(null);
+  const [startingLevels, setStartingLevels] = useState<Record<"number" | "measurement" | "space", string>>({
+    number: "Year 1",
+    measurement: "Year 1",
+    space: "Year 1",
+  });
 
   async function createChild() {
     setWorking(true);
@@ -549,33 +556,69 @@ export function AddHomeChild() {
       p_first_name: firstName,
       p_last_name: lastName,
       p_school_year_level: schoolYear,
-      p_working_level: workingLevel,
+      // The existing atomic creation RPC needs a seed level. Realm-specific
+      // levels are confirmed in the next step before onboarding is complete.
+      p_working_level: schoolYear,
       p_pin: pin,
     });
     if (rpcError || !data?.studentId) setError(rpcError?.message ?? "The Home learner could not be created.");
-    else setCreated(data as HomeManagement);
+    else {
+      setCreated(data as CreatedHomeStudent);
+      setStartingLevels({ number: schoolYear, measurement: schoolYear, space: schoolYear });
+    }
     setWorking(false);
   }
 
+  async function confirmStartingLevels() {
+    if (!created) return;
+    setWorking(true);
+    setError(null);
+    const { error: rpcError } = await supabase.rpc("parent_set_home_starting_levels", {
+      p_student_id: created.studentId,
+      p_number_level: startingLevels.number,
+      p_measurement_level: startingLevels.measurement,
+      p_space_level: startingLevels.space,
+    });
+    if (rpcError) {
+      setError(rpcError.message);
+      setWorking(false);
+      return;
+    }
+    router.replace("/parent");
+    router.refresh();
+  }
+
   if (created) {
-    return <section className="mx-auto max-w-2xl border border-emerald-200 bg-white p-6 shadow-sm">
-      <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Home learner ready</p>
-      <h1 className="mt-2 text-3xl font-black">{created.displayName}</h1>
+    return <section className="mx-auto max-w-3xl border border-blue-200 bg-white p-5 shadow-sm sm:p-7">
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Step 2 of 2</p>
+      <h1 className="mt-2 text-3xl font-black">Set starting levels</h1>
+      <p className="mt-2 text-slate-600">Choose where {created.displayName} should begin in each realm. Each Year 1–6 journey starts with its own pre-test.</p>
       <dl className="mt-6 grid gap-4 sm:grid-cols-2"><LoginValue label="Username" value={created.username} /><LoginValue label="Explorer Code" value={created.explorerCode} /></dl>
-      <p className="mt-5 text-sm text-slate-600">Use the username and the 4-digit PIN you set to sign in under Student → Home. The Explorer Code remains with this child when they join a school.</p>
-      <button type="button" onClick={() => { router.replace("/parent"); router.refresh(); }} className="mt-6 min-h-11 rounded-md bg-blue-600 px-5 font-bold text-white">Open Parent Home</button>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <PrintHomeAccessCardButton displayName={created.displayName} username={created.username} explorerCode={created.explorerCode} />
+        <p className="text-sm text-slate-600">The student signs in with this username and the 4-digit PIN you set. Their Explorer Code remains with them if they join a school.</p>
+      </div>
+      <div className="mt-6 divide-y border-y border-slate-200">
+        {(["number", "measurement", "space"] as const).map((realmId) => (
+          <div key={realmId} className="grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
+            <div><p className="font-black">{realmName(realmId)}</p><p className="text-sm text-slate-500">Suggested from school year: {created.schoolYearLevel}</p></div>
+            <SelectLevel label={`${realmName(realmId)} starting level`} hideLabel value={startingLevels[realmId]} onChange={(value) => setStartingLevels((current) => ({ ...current, [realmId]: value }))} />
+          </div>
+        ))}
+      </div>
+      {error ? <p className="mt-4 border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-800">{error}</p> : null}
+      <button type="button" onClick={() => void confirmStartingLevels()} disabled={working} className="mt-6 min-h-11 rounded-md bg-blue-600 px-5 font-bold text-white disabled:bg-slate-300">{working ? "Saving…" : "Confirm starting levels"}</button>
     </section>;
   }
 
   return <section className="mx-auto max-w-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-    <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">New Home learner</p>
+    <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Step 1 of 2 · New Home learner</p>
     <h1 className="mt-2 text-3xl font-black">Add your child</h1>
-    <p className="mt-2 text-slate-600">Their permanent identity, Home access, login details and starting journey are created together.</p>
+    <p className="mt-2 text-slate-600">Create their permanent identity, Home access and login details. You will set each realm’s starting level next.</p>
     <div className="mt-6 grid gap-4 sm:grid-cols-2">
       <FormInput label="First name" value={firstName} onChange={setFirstName} />
       <FormInput label="Last name" value={lastName} onChange={setLastName} />
       <SelectLevel label="School year" value={schoolYear} onChange={setSchoolYear} />
-      <SelectLevel label="Suggested working level" value={workingLevel} onChange={setWorkingLevel} />
       <label className="sm:col-span-2"><span className="text-sm font-bold">Choose a 4-digit student PIN</span><input inputMode="numeric" value={pin} onChange={(event) => setPin(event.target.value.replace(/\D/g, "").slice(0, 4))} className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 font-mono text-lg tracking-[0.3em]" /></label>
     </div>
     <p className="mt-4 text-sm text-slate-600">Year 1–6 learners begin with a pre-test in each realm. Prep learners begin at Ground Level.</p>
@@ -588,12 +631,85 @@ function LoginValue({ label, value }: { label: string; value: string }) {
   return <div className="border border-slate-200 p-3"><p className="text-xs font-bold uppercase text-slate-500">{label}</p><div className="mt-1 flex items-center justify-between gap-2"><code className="break-all font-bold">{value}</code><button type="button" onClick={() => void navigator.clipboard.writeText(value)} className="grid h-10 w-10 shrink-0 place-items-center" title={`Copy ${label}`}><Copy className="h-4 w-4" /></button></div></div>;
 }
 
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[char] ?? char));
+}
+
+function printHomeAccessCard(details: { displayName: string; username: string; explorerCode: string }) {
+  const printWindow = window.open("", "_blank", "noopener,noreferrer");
+  if (!printWindow) return;
+  const websiteUrl = window.location.origin;
+  const safeName = escapeHtml(details.displayName);
+  const safeUsername = escapeHtml(details.username);
+  const safeExplorerCode = escapeHtml(details.explorerCode);
+  const safeWebsiteUrl = escapeHtml(websiteUrl);
+
+  printWindow.document.write(`<!DOCTYPE html>
+    <html>
+      <head>
+        <title>Home Access Card - ${safeName}</title>
+        <style>
+          * { box-sizing: border-box; }
+          body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f8fafc; font-family: "Nunito", "Avenir Next", "Trebuchet MS", Arial, sans-serif; color: #0f172a; }
+          .sheet { width: 210mm; min-height: 297mm; padding: 20mm; display: grid; place-items: start center; background: white; }
+          .card { width: 138mm; border: 2px solid #cbd5e1; padding: 12mm; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08); }
+          .eyebrow { color: #1d4ed8; font-size: 11px; font-weight: 900; letter-spacing: 0.16em; text-transform: uppercase; }
+          h1 { margin: 6px 0 2px; font-size: 28px; line-height: 1.1; }
+          .subtitle { margin: 0 0 18px; color: #475569; font-size: 14px; }
+          .row { border: 1px solid #dbe3ee; padding: 14px 16px; margin-top: 12px; }
+          .label { color: #64748b; font-size: 11px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+          .value { margin-top: 7px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 21px; font-weight: 900; letter-spacing: 0.03em; overflow-wrap: anywhere; }
+          .pin { display: flex; align-items: end; gap: 12px; }
+          .pin-line { flex: 1; border-bottom: 2px solid #0f172a; height: 26px; }
+          .instructions { margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 14px; color: #334155; font-size: 13px; line-height: 1.5; }
+          .footer { margin-top: 18px; color: #64748b; font-size: 11px; }
+          @media print {
+            body { background: white; }
+            .sheet { width: auto; min-height: auto; padding: 0; }
+            .card { box-shadow: none; break-inside: avoid; }
+          }
+        </style>
+      </head>
+      <body>
+        <main class="sheet">
+          <section class="card" aria-label="Level Up Learning home access card">
+            <div class="eyebrow">Level Up Learning · Home Access</div>
+            <h1>${safeName}</h1>
+            <p class="subtitle">Use these details to sign in from home.</p>
+            <div class="row"><div class="label">Website</div><div class="value">${safeWebsiteUrl}</div></div>
+            <div class="row"><div class="label">Username</div><div class="value">${safeUsername}</div></div>
+            <div class="row"><div class="label">Explorer Code</div><div class="value">${safeExplorerCode}</div></div>
+            <div class="row pin"><div><div class="label">Student PIN</div><div class="footer">Write the 4-digit PIN here after setting or resetting it.</div></div><div class="pin-line"></div></div>
+            <p class="instructions">Student login: open the website, choose Student, then Home. Enter the username and 4-digit PIN. Keep this card somewhere private.</p>
+            <p class="footer">Explorer Code helps link this learner if they later join a school.</p>
+          </section>
+        </main>
+        <script>window.onload = function(){ window.print(); };</script>
+      </body>
+    </html>`);
+  printWindow.document.close();
+}
+
+function PrintHomeAccessCardButton({ displayName, username, explorerCode, className = "" }: { displayName: string; username: string; explorerCode: string; className?: string }) {
+  return (
+    <button type="button" onClick={() => printHomeAccessCard({ displayName, username, explorerCode })} className={`inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 font-bold text-slate-800 shadow-sm hover:border-blue-500 ${className}`}>
+      <Printer className="h-4 w-4" /> Print home access card
+    </button>
+  );
+}
+
 function FormInput({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return <label><span className="text-sm font-bold">{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4" /></label>;
 }
 
-function SelectLevel({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return <label><span className="text-sm font-bold">{label}</span><select value={value} onChange={(event) => onChange(event.target.value)} className="mt-2 h-12 w-full rounded-md border border-slate-300 bg-white px-3">{yearLevels.map((level) => <option key={level}>{level}</option>)}</select></label>;
+function SelectLevel({ label, value, onChange, hideLabel = false }: { label: string; value: string; onChange: (value: string) => void; hideLabel?: boolean }) {
+  return <label><span className={hideLabel ? "sr-only" : "text-sm font-bold"}>{label}</span><select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)} className={`${hideLabel ? "" : "mt-2 "}h-12 w-full rounded-md border border-slate-300 bg-white px-3`}>{yearLevels.map((level) => <option key={level}>{level}</option>)}</select></label>;
 }
 
 export function HomeChildSettings({ studentId }: { studentId: string }) {
@@ -624,7 +740,13 @@ export function HomeChildSettings({ studentId }: { studentId: string }) {
   if (!data) return <ParentSkeleton />;
   return <div className="mx-auto max-w-3xl space-y-5">
     <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Child access</p><h1 className="mt-1 text-3xl font-black">Login &amp; placement</h1><p className="mt-2 text-slate-600">{data.displayName}</p></div>
-    <section className="border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-xl font-black">Login details</h2><div className="mt-4 grid gap-4 sm:grid-cols-2"><LoginValue label="Username" value={data.username} /><LoginValue label="Explorer Code" value={data.explorerCode} /></div></section>
+    <section className="border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-xl font-black">Login details</h2>
+        <PrintHomeAccessCardButton displayName={data.displayName} username={data.username} explorerCode={data.explorerCode} />
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2"><LoginValue label="Username" value={data.username} /><LoginValue label="Explorer Code" value={data.explorerCode} /></div>
+    </section>
     {!data.parentManaged ? <section className="border-l-4 border-blue-500 bg-blue-50 p-4"><p className="font-bold text-blue-950">School managed</p><p className="mt-1 text-sm text-blue-900">{data.schoolName ?? "The linked school"} now manages PIN resets, placement and assessment resets. Your Parent account remains read-only.</p></section> : <>
       <section className="border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-xl font-black">Reset student PIN</h2><div className="mt-4 flex flex-wrap gap-2"><input inputMode="numeric" value={newPin} onChange={(event) => setNewPin(event.target.value.replace(/\D/g, "").slice(0, 4))} className="h-11 w-40 rounded-md border border-slate-300 px-3 text-center font-mono tracking-[0.25em]" /><button type="button" disabled={busy || newPin.length !== 4} onClick={() => void command("parent_reset_home_student_pin", { p_student_id: studentId, p_new_pin: newPin }, "PIN reset. Existing student sessions were signed out.")} className="min-h-11 rounded-md bg-blue-600 px-4 font-bold text-white disabled:bg-slate-300">Reset PIN</button></div></section>
       <section className="border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-xl font-black">Starting levels</h2><p className="mt-1 text-sm text-slate-600">Changes stop once lessons, quizzes or a post-test have begun.</p><div className="mt-4 divide-y">{data.placements.map((placement) => <div key={placement.realmId} className="flex flex-wrap items-center justify-between gap-3 py-4"><div><p className="font-bold">{realmName(placement.realmId)}</p><p className="text-sm text-slate-500">{placement.entryMode === "pretest" ? "Pre-test entry" : "Ground Level entry"}</p></div><div className="flex gap-2"><select value={placement.workingLevel} onChange={(event) => void command("parent_change_home_starting_level", { p_student_id: studentId, p_realm_id: placement.realmId, p_assigned_level: event.target.value }, `${realmName(placement.realmId)} starting level updated.`)} disabled={busy} className="h-11 rounded-md border border-slate-300 bg-white px-3">{yearLevels.map((level) => <option key={level}>{level}</option>)}</select><button type="button" disabled={busy || placement.workingLevel === "Prep"} onClick={() => void command("parent_reset_home_pretest", { p_student_id: studentId, p_realm_id: placement.realmId }, `${realmName(placement.realmId)} pre-test reopened. Previous results remain in history.`)} className="grid h-11 w-11 place-items-center rounded-md border border-slate-300" title="Reopen pre-test"><RotateCcw className="h-4 w-4" /></button></div></div>)}</div></section>
