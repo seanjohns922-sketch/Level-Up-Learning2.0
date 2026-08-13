@@ -40,6 +40,7 @@ import {
   parseRosterWorkbook,
   type RosterDraft,
 } from "@/lib/roster-import";
+import { getSchoolLogo } from "@/lib/school-logos";
 import { downloadStudentRosterTemplate } from "@/lib/student-roster-template";
 
 type TabId =
@@ -66,13 +67,6 @@ const TEACHER_NAV_ITEMS: NavItem[] = [
   { id: "settings", label: "Settings", icon: Settings },
   { id: "support", label: "Support", icon: HelpCircle },
 ];
-
-function schoolLogoFor(name: string) {
-  const key = name.toLowerCase().replace(/[^a-z0-9]+/g, "");
-  return key === "cobramprimary" || key === "cobramprimaryschool"
-    ? "/schools/cobram-primary-logo.png"
-    : null;
-}
 
 const EDUCATOR_TITLES = new Set([
   "mr",
@@ -2164,7 +2158,7 @@ export default function SchoolHomeClient({
     (staff) => staff.status === "active",
   );
   const isAdministrator = snapshot.permissions.canViewAdministration;
-  const schoolLogo = schoolLogoFor(snapshot.school.name);
+  const schoolLogo = getSchoolLogo({ name: snapshot.school.name });
   const actorFirstName = educatorFirstName(
     snapshot.actor.name,
     snapshot.actor.email,
@@ -2404,8 +2398,8 @@ export default function SchoolHomeClient({
           <div className="flex min-w-0 items-center gap-3">
             {schoolLogo ? (
               <Image
-                src={schoolLogo}
-                alt={`${snapshot.school.name} logo`}
+                src={schoolLogo.src}
+                alt={schoolLogo.alt}
                 width={44}
                 height={44}
                 priority

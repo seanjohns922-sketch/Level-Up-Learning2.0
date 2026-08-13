@@ -19,6 +19,7 @@ import {
 } from "@/lib/brain-break-settings";
 import { formatAccuracy } from "@/lib/learning-score";
 import { getRealmDefinition, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
+import { getSchoolLogo } from "@/lib/school-logos";
 import { getRealmWeekNumbers, selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
 /* ── types ─────────────────────────────────────────── */
@@ -109,12 +110,6 @@ function parseCompletedLessons(raw: unknown): string[] {
   return [];
 }
 
-function schoolLogoFor(name: string | null) {
-  const key = (name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
-  return key === "cobramprimary" || key === "cobramprimaryschool"
-    ? "/schools/cobram-primary-logo.png"
-    : null;
-}
 function parseQuizScores(raw: unknown): Record<string, JsonObject> {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) return raw as Record<string, JsonObject>;
   if (typeof raw === "string") {
@@ -564,7 +559,7 @@ export default function TeacherDashboardPage() {
   const selectedClass = classes.find((c) => c.id === selectedClassId);
   const schoolHomeId =
     schoolPreviewSchoolId ?? selectedClass?.school_id ?? null;
-  const schoolLogo = schoolLogoFor(schoolName);
+  const schoolLogo = getSchoolLogo({ name: schoolName });
   const classStudents = students.filter(
     (student) => student.class_id === selectedClassId && !student.archived_at,
   );
@@ -1240,8 +1235,8 @@ export default function TeacherDashboardPage() {
 
           {schoolLogo ? (
             <Image
-              src={schoolLogo}
-              alt={`${schoolName} logo`}
+              src={schoolLogo.src}
+              alt={schoolLogo.alt}
               width={36}
               height={36}
               priority

@@ -1,10 +1,12 @@
 import { Activity, Archive, GraduationCap, Link2, UserCog, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminPageHeading, Metric } from "@/components/admin/AdminPrimitives";
 import SchoolLicenceEditor from "@/components/admin/SchoolLicenceEditor";
 import SchoolLifecycleManager from "@/components/admin/SchoolLifecycleManager";
 import { loadPlatformSchoolDetail } from "@/lib/platform-admin-server";
+import { getSchoolLogo } from "@/lib/school-logos";
 
 function formatDate(value: string | null) {
   if (!value) return "No recorded activity";
@@ -21,10 +23,20 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
   if (!data) notFound();
   const { detail } = data;
   const archived = detail.school.status === "archived";
+  const schoolLogo = getSchoolLogo({ name: detail.school.name, code: detail.school.code });
   return (
     <>
       <Link href="/admin/schools" className="mb-5 inline-flex text-sm font-bold text-emerald-800 hover:underline">← Back to schools</Link>
-      <AdminPageHeading eyebrow={`${detail.school.code} · ${detail.licence.academicYear}`} title={detail.school.name} detail={`${detail.school.state ?? "State not set"} · ${detail.school.sector ?? "Sector not set"} · ${detail.licence.billingStatus === "free" ? "Free 2026 rollout access" : detail.licence.billingStatus}`} />
+      <AdminPageHeading
+        eyebrow={`${detail.school.code} · ${detail.licence.academicYear}`}
+        title={detail.school.name}
+        detail={`${detail.school.state ?? "State not set"} · ${detail.school.sector ?? "Sector not set"} · ${detail.licence.billingStatus === "free" ? "Free 2026 rollout access" : detail.licence.billingStatus}`}
+        media={schoolLogo ? (
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center border border-slate-200 bg-white p-2 shadow-sm">
+            <Image src={schoolLogo.src} alt={schoolLogo.alt} width={88} height={88} priority className="max-h-20 w-auto object-contain" />
+          </div>
+        ) : null}
+      />
 
       {archived ? <section className="mb-7 border border-slate-300 bg-slate-100 p-5"><div className="flex items-start gap-3"><Archive className="mt-0.5 h-5 w-5 text-slate-700" /><div><p className="font-bold uppercase tracking-[0.12em] text-slate-900">Archived school</p><p className="mt-1 text-sm text-slate-600">Archived {detail.school.archivedAt ? formatDate(detail.school.archivedAt) : "date not recorded"}. {detail.school.archiveReason ?? "No archival reason was recorded."} This view is historical and read-only until restored.</p></div></div></section> : null}
 

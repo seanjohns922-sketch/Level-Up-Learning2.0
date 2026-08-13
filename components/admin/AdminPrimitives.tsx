@@ -6,18 +6,23 @@ export function AdminPageHeading({
   title,
   detail,
   action,
+  media,
 }: {
   eyebrow: string;
   title: string;
   detail: string;
   action?: ReactNode;
+  media?: ReactNode;
 }) {
   return (
     <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">{eyebrow}</p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-950">{title}</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{detail}</p>
+      <div className="flex min-w-0 items-start gap-4">
+        {media}
+        <div className="min-w-0">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">{eyebrow}</p>
+          <h1 className="mt-2 text-3xl font-bold text-slate-950">{title}</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{detail}</p>
+        </div>
       </div>
       {action}
     </div>
