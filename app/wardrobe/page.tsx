@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Lock, Plus, Shuffle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
@@ -130,17 +130,30 @@ export default function ExplorerOutfitPage() {
   const [celebrate, setCelebrate] = useState(0);
   const [busy, setBusy] = useState(false);
   const [presets, setPresets] = useState<OutfitPreset[]>([]);
+  const stateRef = useRef<EconomyState | null>(null);
+  const confirmedStateRef = useRef<EconomyState | null>(null);
+  const pendingBaseRef = useRef<AvatarOutfit | null>(null);
+  const baseSaveLoopRef = useRef<Promise<void> | null>(null);
   const sessionMessage = student?.studentId ? null : "Log in as a student to open your Explorer Outfit.";
   const firstName = student?.displayName?.trim().split(/\s+/)[0] ?? "Explorer";
 
   useEffect(() => {
     if (!student?.studentId) return;
+    let cancelled = false;
     fetchStudentEconomy(student.studentId)
       .then((next) => {
+        if (cancelled || stateRef.current) return;
+        stateRef.current = next;
+        confirmedStateRef.current = next;
         setState(next);
         persistCanonicalAvatarAppearance(student.studentId, next);
       })
-      .catch((error) => setMessage(economyErrorMessage(error)));
+      .catch((error) => {
+        if (!cancelled) setMessage(economyErrorMessage(error));
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [student?.studentId]);
 
   useEffect(() => {
@@ -172,20 +185,53 @@ export default function ExplorerOutfitPage() {
   }, [state?.items]);
 
   const bump = () => setCelebrate((c) => c + 1);
-  function commit(next: EconomyState) {
+  function showState(next: EconomyState) {
+    stateRef.current = next;
     setState(next);
+  }
+  function commit(next: EconomyState) {
+    confirmedStateRef.current = next;
+    showState(next);
     if (student?.studentId) persistCanonicalAvatarAppearance(student.studentId, next);
   }
-  async function updateBase(patch: Partial<AvatarOutfit>, celebrateChange = false) {
-    if (!student?.studentId || !state) return;
-    const nextBase = { ...base, ...patch };
-    setState({ ...state, avatarBase: nextBase }); // optimistic
+
+  function startBaseSaveLoop(studentId: string) {
+    if (baseSaveLoopRef.current) return;
+    baseSaveLoopRef.current = (async () => {
+      while (pendingBaseRef.current) {
+        const savingBase = pendingBaseRef.current;
+        pendingBaseRef.current = null;
+        try {
+          const saved = await saveAvatarBase(studentId, savingBase);
+          confirmedStateRef.current = saved;
+          const newerBase = pendingBaseRef.current;
+          if (newerBase) {
+            showState({ ...saved, avatarBase: newerBase });
+          } else {
+            commit(saved);
+          }
+        } catch (error) {
+          setMessage(economyErrorMessage(error));
+          if (!pendingBaseRef.current && confirmedStateRef.current) {
+            commit(confirmedStateRef.current);
+          }
+        }
+      }
+    })().finally(() => {
+      baseSaveLoopRef.current = null;
+      if (pendingBaseRef.current) startBaseSaveLoop(studentId);
+    });
+  }
+
+  function updateBase(patch: Partial<AvatarOutfit>, celebrateChange = false) {
+    if (!student?.studentId || !stateRef.current) return;
+    const current = stateRef.current;
+    const nextBase = { ...(pendingBaseRef.current ?? current.avatarBase), ...patch };
+    pendingBaseRef.current = nextBase;
+    showState({ ...current, avatarBase: nextBase });
+    setMessage(null);
     if (celebrateChange) bump();
-    try {
-      commit(await saveAvatarBase(student.studentId, nextBase));
-    } catch (error) {
-      setMessage(economyErrorMessage(error));
-    }
+    startBaseSaveLoop(student.studentId);
   }
   // Equip an earned garment (locked → Marketplace to buy it first).
   async function equipItem(item: EconomyItem) {
@@ -218,7 +264,7 @@ export default function ExplorerOutfitPage() {
         setBusy(false);
       }
     }
-    await updateBase(patch, true);
+    updateBase(patch, true);
   }
 
   // Take an accessory back off (Head / Face Accessory / Cape / Backpack).

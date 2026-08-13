@@ -59,6 +59,21 @@ rejectPattern(
   /function PlayerCharacter\(\{ gender|readGenderFromStorage/,
   "legacy page-specific Number Nexus character renderer remains",
 );
+requirePattern(
+  "app/wardrobe/page.tsx",
+  /pendingBaseRef[\s\S]+baseSaveLoopRef[\s\S]+while \(pendingBaseRef\.current\)/,
+  "avatar base saves must be serialised so stale responses cannot replace the latest choice",
+);
+requirePattern(
+  "app/wardrobe/page.tsx",
+  /showState\(\{ \.\.\.saved, avatarBase: newerBase \}\)/,
+  "a newer optimistic avatar must remain visible while an older save completes",
+);
+requirePattern(
+  "app/wardrobe/page.tsx",
+  /if \(cancelled \|\| stateRef\.current\) return;/,
+  "a delayed initial economy response must not overwrite an avatar selection",
+);
 
 const allowedDirectRenderers = new Set([
   "components/avatar/CanonicalStudentAvatar.tsx",
