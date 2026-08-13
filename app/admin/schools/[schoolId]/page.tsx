@@ -60,7 +60,7 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
       </section>
 
       <section className="mt-7 border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-3"><Activity className="h-5 w-5 text-emerald-700" /><div><h2 className="text-xl font-bold">Activity</h2><p className="text-sm text-slate-500">Trustworthy canonical attempts recorded this week.</p></div></div>
+        <div className="flex items-center gap-3"><Activity className="h-5 w-5 text-emerald-700" /><div><h2 className="text-xl font-bold">Activity</h2><p className="text-sm text-slate-500">Active counts include student sessions; work totals count submitted lessons, quizzes and assessments.</p></div></div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {[['Active today', detail.activity.activeToday],['Active this week', detail.activity.activeThisWeek],['Lessons this week', detail.activity.lessonsThisWeek],['Quizzes this week', detail.activity.quizzesThisWeek],['Assessments this week', detail.activity.assessmentsThisWeek]].map(([label,value]) => <div key={String(label)} className="border-l-4 border-emerald-500 bg-slate-50 p-4"><p className="text-xs font-bold uppercase text-slate-500">{label}</p><p className="mt-2 text-2xl font-bold">{value}</p></div>)}
         </div>
