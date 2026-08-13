@@ -114,6 +114,10 @@ function assertAssessmentBank(
   assertSameCounts(counts(bank.map((item) => item.difficulty)), expectedDifficulty, `Level 4 ${kind} difficulty mix`);
   assertSameCounts(counts(bank.map((item) => item.cognitiveCategory)), expectedCognitive, `Level 4 ${kind} cognitive mix`);
   assertSameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 3, manipulated_response: 17 }, `Level 4 ${kind} response mix`);
+  const openingItems = bank.slice(0, 8);
+  assert(openingItems.slice(0, 7).every((item) => item.practiceTask?.kind === "starpathComposite" && item.practiceTask.figureOptions?.length === 2 && (item.practiceTask.reasonOptions?.length ?? 0) >= 3 && item.practiceTask.correctReasonId), `Level 4 ${kind} Q1-Q7 must use choose-model-and-reason assessment tasks`);
+  assert(openingItems.slice(0, 7).every((item) => item.practiceTask?.kind === "starpathComposite" && !item.practiceTask.figure && !item.practiceTask.validSolutions), `Level 4 ${kind} Q1-Q7 must not use one-tap build or legacy board tasks`);
+  assert(openingItems[7]?.practiceTask?.kind === "starpathGridReference" && ["labelGrid", "repairLabels", "typeReference"].includes(openingItems[7].practiceTask.mode), `Level 4 ${kind} Q8 must use an explicit grid-system task`);
 
   const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [item.id, item]));
   for (const item of bank) {

@@ -1,19 +1,9 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import type { CompositeTask } from "@/data/activities/starpath/level4/composite";
+import { figureSvg, getL4Figure, type CompositeFigure } from "@/data/activities/starpath/level4/composite-figures";
+import { getL4Object } from "@/data/activities/starpath/level4/composite-objects";
 import {
-  alternateShapeTask,
-  componentScanTask,
-  constructShapeTask,
-  evaluateModelTask,
-  hiddenStructureTask,
-  modelTask,
-  simplifyTask,
-  solidAssemblyTask,
-  viewBuildTask,
-} from "@/data/activities/starpath/level4/composite";
-import {
-  cellToReferenceTask,
   labelGridTask,
-  landmarkToReferenceTask,
   placeAtReferenceTask,
   referenceToCellTask,
   repairLabelsTask,
@@ -103,6 +93,87 @@ function assessmentTask(task: PracticeTask, prompt: string): AssessmentTask {
   return { ...task, prompt, speakText, feedback: FEEDBACK } as AssessmentTask;
 }
 
+function rotate<T>(items: T[], by: number): T[] {
+  if (items.length === 0) return items;
+  const start = ((by % items.length) + items.length) % items.length;
+  return [...items.slice(start), ...items.slice(0, start)];
+}
+
+function completeSvg(figure: CompositeFigure) {
+  return figureSvg(figure, () => true);
+}
+
+function missingSvg(figure: CompositeFigure, missingPartId: string) {
+  return figureSvg(figure, (partId) => partId !== missingPartId);
+}
+
+function assessmentCompareTask(params: {
+  round: number;
+  target: number;
+  figure: CompositeFigure;
+  prompt: string;
+  correctReason: string;
+  distractorReasons: readonly string[];
+  missingPartIndex: number;
+  correctFirst?: boolean;
+}): CompositeTask {
+  const missing = params.figure.parts[params.missingPartIndex % params.figure.parts.length]!;
+  const correctId = params.correctFirst ? "a" : "b";
+  const incorrectId = params.correctFirst ? "b" : "a";
+  const options = params.correctFirst
+    ? [{ id: "a", svg: completeSvg(params.figure) }, { id: "b", svg: missingSvg(params.figure, missing.id) }]
+    : [{ id: "a", svg: missingSvg(params.figure, missing.id) }, { id: "b", svg: completeSvg(params.figure) }];
+  return {
+    kind: "starpathComposite",
+    mode: "evaluate",
+    target: params.target,
+    prompt: params.prompt,
+    speakText: `${params.prompt} Choose the better representation, choose the reason, then press Check.`,
+    designBrief: `A complete representation keeps the familiar components needed to show the ${params.figure.name}.`,
+    figureOptions: options,
+    correctOptionId: correctId,
+    reasonOptions: rotate([
+      { id: "evidence", label: params.correctReason },
+      { id: "missing", label: `It can leave out the ${missing.label.toLowerCase()} and still prove every part.` },
+      { id: "appearance", label: params.distractorReasons[0] ?? "It is correct because it looks brighter." },
+      { id: "size", label: params.distractorReasons[1] ?? "It is correct because it is the larger drawing." },
+    ], params.round),
+    correctReasonId: "evidence",
+    feedback: FEEDBACK,
+    boardId: `y4-assessment-compare-${params.figure.id}-${params.round}-${incorrectId}`,
+  };
+}
+
+function shapeRepresentationTask(round: number, target: number, prompt: string, missingPartIndex: number): AssessmentTask {
+  const figure = getL4Figure(round);
+  const resolvedPrompt = prompt.replace("{name}", figure.name);
+  return assessmentCompareTask({
+    round,
+    target,
+    figure,
+    prompt: resolvedPrompt,
+    missingPartIndex,
+    correctFirst: round % 2 === 0,
+    correctReason: `It keeps the familiar shapes needed to represent the ${figure.name}.`,
+    distractorReasons: ["It uses fewer shapes, so it must be a better model.", "It is correct because colour matters more than structure."],
+  });
+}
+
+function objectRepresentationTask(round: number, target: number, prompt: string, missingPartIndex: number): AssessmentTask {
+  const figure = getL4Object(round);
+  const resolvedPrompt = prompt.replace("{name}", figure.name);
+  return assessmentCompareTask({
+    round,
+    target,
+    figure,
+    prompt: resolvedPrompt,
+    missingPartIndex,
+    correctFirst: round % 2 === 1,
+    correctReason: `It keeps the familiar solids needed to represent the ${figure.name}.`,
+    distractorReasons: ["It is better because one hidden solid can be ignored.", "It is correct because a single solid can stand for the whole object."],
+  });
+}
+
 function descriptorForIndex(index: number): Descriptor {
   if (index < 7) return "AC9M4SP01";
   if (index < 13) return "AC9M4SP02";
@@ -126,14 +197,14 @@ function misconceptionFor(descriptor: Descriptor, index: number): readonly Misco
 }
 
 const PRE_TASKS: readonly AssessmentTask[] = [
-  assessmentTask(componentScanTask(31, 1), "Choose the familiar shapes inside the observatory badge."),
-  assessmentTask(constructShapeTask(32, 2), "Build the shuttle badge from familiar shapes."),
-  assessmentTask(alternateShapeTask(33, 3), "Build the rover sign another way."),
-  assessmentTask(solidAssemblyTask(34, 4), "Build the fuel station from familiar solids."),
-  assessmentTask(viewBuildTask(35, 5), "Build the tower to match both views."),
-  assessmentTask(hiddenStructureTask(36, 6), "Add the smallest hidden support for the tower."),
-  assessmentTask(simplifyTask(37, 7), "Make a simpler icon that still shows the station."),
-  assessmentTask(cellToReferenceTask(41, 8), "Choose the reference for the highlighted grid cell."),
+  shapeRepresentationTask(31, 1, "Which model best represents the composite {name}?", 2),
+  shapeRepresentationTask(32, 2, "Which {name} model keeps all essential parts?", 1),
+  shapeRepresentationTask(33, 3, "Which model is the stronger approximation of the {name}?", 3),
+  objectRepresentationTask(34, 4, "Which solid model best represents the {name}?", 2),
+  objectRepresentationTask(35, 5, "Which {name} model keeps the evidence from its parts?", 1),
+  objectRepresentationTask(36, 6, "Which representation avoids hiding an essential {name} part?", 3),
+  shapeRepresentationTask(37, 7, "Which simplified {name} icon still represents the original?", 0),
+  assessmentTask(repairLabelsTask(41, 8), "Repair the grid label so references stay consistent."),
   assessmentTask(referenceToCellTask(42, 9), "Tap the grid cell named by the reference."),
   assessmentTask(placeAtReferenceTask(43, 10), "Place the supply pod at the given reference."),
   assessmentTask(typeReferenceTask(44, 11, true), "Type the reference for the marked landmark."),
@@ -149,14 +220,14 @@ const PRE_TASKS: readonly AssessmentTask[] = [
 ];
 
 const POST_TASKS: readonly AssessmentTask[] = [
-  assessmentTask(evaluateModelTask(61, 1), "Choose the complete composite model and reason."),
-  assessmentTask(modelTask(62, 2), "Model the space port from familiar shapes."),
-  assessmentTask(alternateShapeTask(63, 3), "Build the satellite icon in another way."),
-  assessmentTask(solidAssemblyTask(64, 4), "Build the lunar lab from familiar solids."),
-  assessmentTask(viewBuildTask(65, 5), "Build the object that matches both camera views."),
-  assessmentTask(hiddenStructureTask(66, 6), "Add hidden supports using the fewest cubes."),
-  assessmentTask(simplifyTask(67, 7), "Simplify the composite mission icon."),
-  assessmentTask(landmarkToReferenceTask(71, 8), "Choose the reference for the named landmark."),
+  shapeRepresentationTask(61, 1, "Which representation proves the composite {name}?", 1),
+  shapeRepresentationTask(62, 2, "Which {name} model preserves the shape relationships?", 2),
+  shapeRepresentationTask(63, 3, "Which {name} approximation includes the necessary parts?", 0),
+  objectRepresentationTask(64, 4, "Which solid model is complete enough for the {name}?", 1),
+  objectRepresentationTask(65, 5, "Which {name} model keeps the key components?", 3),
+  objectRepresentationTask(66, 6, "Which representation best matches the {name} evidence?", 0),
+  shapeRepresentationTask(67, 7, "Which simplified {name} model still communicates the design?", 2),
+  assessmentTask(labelGridTask(71, 8), "Complete the grid labels so every cell has a reference."),
   assessmentTask(labelGridTask(72, 9), "Complete the grid reference labels."),
   assessmentTask(repairLabelsTask(73, 10), "Repair the incorrect row or column label."),
   assessmentTask(typeReferenceTask(74, 11, true), "Type the reference for the mission landmark."),
