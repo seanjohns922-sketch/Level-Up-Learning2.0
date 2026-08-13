@@ -59,6 +59,7 @@ export type ParentChild = {
   studentId: string;
   displayName: string;
   firstName: string;
+  username: string | null;
   yearLevel: string | null;
   explorerCode: string | null;
   schoolName: string | null;
@@ -339,6 +340,7 @@ export function ParentHome({ selectedStudentId }: { selectedStudentId?: string }
         </div>
         {!selectedStudentId ? (
           <div className="flex flex-wrap gap-2">
+            {children.length ? <PrintAllHomeAccessCardsButton children={children} /> : null}
             <Link href="/parent/add-child" className="inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-600 px-4 font-bold text-white shadow-sm hover:bg-blue-700">
               <Plus className="h-5 w-5" /> Add new child
             </Link>
@@ -641,23 +643,39 @@ function escapeHtml(value: string) {
   }[char] ?? char));
 }
 
-function printHomeAccessCard(details: { displayName: string; username: string; explorerCode: string }) {
+type HomeAccessCardDetails = { displayName: string; username: string | null; explorerCode: string | null };
+
+function printHomeAccessCards(cards: readonly HomeAccessCardDetails[]) {
+  if (!cards.length) return;
   const printWindow = window.open("", "_blank", "noopener,noreferrer");
   if (!printWindow) return;
   const websiteUrl = window.location.origin;
-  const safeName = escapeHtml(details.displayName);
-  const safeUsername = escapeHtml(details.username);
-  const safeExplorerCode = escapeHtml(details.explorerCode);
   const safeWebsiteUrl = escapeHtml(websiteUrl);
+  const cardHtml = cards.map((details) => {
+    const safeName = escapeHtml(details.displayName);
+    const safeUsername = escapeHtml(details.username || "Not available");
+    const safeExplorerCode = escapeHtml(details.explorerCode || "Not available");
+    return `<section class="card" aria-label="Level Up Learning home access card for ${safeName}">
+      <div class="eyebrow">Level Up Learning · Home Access</div>
+      <h1>${safeName}</h1>
+      <p class="subtitle">Use these details to sign in from home.</p>
+      <div class="row"><div class="label">Website</div><div class="value">${safeWebsiteUrl}</div></div>
+      <div class="row"><div class="label">Username</div><div class="value">${safeUsername}</div></div>
+      <div class="row"><div class="label">Explorer Code</div><div class="value">${safeExplorerCode}</div></div>
+      <div class="row pin"><div><div class="label">Student PIN</div><div class="footer">Write the 4-digit PIN here after setting or resetting it.</div></div><div class="pin-line"></div></div>
+      <p class="instructions">Student login: open the website, choose Student, then Home. Enter the username and 4-digit PIN. Keep this card somewhere private.</p>
+      <p class="footer">Explorer Code helps link this learner if they later join a school.</p>
+    </section>`;
+  }).join("");
 
   printWindow.document.write(`<!DOCTYPE html>
     <html>
       <head>
-        <title>Home Access Card - ${safeName}</title>
+        <title>Home Access Cards</title>
         <style>
           * { box-sizing: border-box; }
-          body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f8fafc; font-family: "Nunito", "Avenir Next", "Trebuchet MS", Arial, sans-serif; color: #0f172a; }
-          .sheet { width: 210mm; min-height: 297mm; padding: 20mm; display: grid; place-items: start center; background: white; }
+          body { margin: 0; background: #f8fafc; font-family: "Nunito", "Avenir Next", "Trebuchet MS", Arial, sans-serif; color: #0f172a; }
+          .sheet { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 14mm; display: grid; grid-template-columns: 1fr; gap: 10mm; align-content: start; background: white; }
           .card { width: 138mm; border: 2px solid #cbd5e1; padding: 12mm; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08); }
           .eyebrow { color: #1d4ed8; font-size: 11px; font-weight: 900; letter-spacing: 0.16em; text-transform: uppercase; }
           h1 { margin: 6px 0 2px; font-size: 28px; line-height: 1.1; }
@@ -671,24 +689,14 @@ function printHomeAccessCard(details: { displayName: string; username: string; e
           .footer { margin-top: 18px; color: #64748b; font-size: 11px; }
           @media print {
             body { background: white; }
-            .sheet { width: auto; min-height: auto; padding: 0; }
-            .card { box-shadow: none; break-inside: avoid; }
+            .sheet { width: auto; min-height: auto; margin: 0; padding: 0; gap: 8mm; }
+            .card { width: 100%; box-shadow: none; break-inside: avoid; page-break-inside: avoid; }
           }
         </style>
       </head>
       <body>
         <main class="sheet">
-          <section class="card" aria-label="Level Up Learning home access card">
-            <div class="eyebrow">Level Up Learning · Home Access</div>
-            <h1>${safeName}</h1>
-            <p class="subtitle">Use these details to sign in from home.</p>
-            <div class="row"><div class="label">Website</div><div class="value">${safeWebsiteUrl}</div></div>
-            <div class="row"><div class="label">Username</div><div class="value">${safeUsername}</div></div>
-            <div class="row"><div class="label">Explorer Code</div><div class="value">${safeExplorerCode}</div></div>
-            <div class="row pin"><div><div class="label">Student PIN</div><div class="footer">Write the 4-digit PIN here after setting or resetting it.</div></div><div class="pin-line"></div></div>
-            <p class="instructions">Student login: open the website, choose Student, then Home. Enter the username and 4-digit PIN. Keep this card somewhere private.</p>
-            <p class="footer">Explorer Code helps link this learner if they later join a school.</p>
-          </section>
+          ${cardHtml}
         </main>
         <script>window.onload = function(){ window.print(); };</script>
       </body>
@@ -698,8 +706,16 @@ function printHomeAccessCard(details: { displayName: string; username: string; e
 
 function PrintHomeAccessCardButton({ displayName, username, explorerCode, className = "" }: { displayName: string; username: string; explorerCode: string; className?: string }) {
   return (
-    <button type="button" onClick={() => printHomeAccessCard({ displayName, username, explorerCode })} className={`inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 font-bold text-slate-800 shadow-sm hover:border-blue-500 ${className}`}>
+    <button type="button" onClick={() => printHomeAccessCards([{ displayName, username, explorerCode }])} className={`inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 font-bold text-slate-800 shadow-sm hover:border-blue-500 ${className}`}>
       <Printer className="h-4 w-4" /> Print home access card
+    </button>
+  );
+}
+
+function PrintAllHomeAccessCardsButton({ children }: { children: readonly ParentChild[] }) {
+  return (
+    <button type="button" onClick={() => printHomeAccessCards(children.map((child) => ({ displayName: child.displayName, username: child.username, explorerCode: child.explorerCode })))} className="inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 font-bold text-slate-800 shadow-sm hover:border-blue-500">
+      <Printer className="h-5 w-5" /> Print all home access cards
     </button>
   );
 }

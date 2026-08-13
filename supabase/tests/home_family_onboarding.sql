@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(40);
+select plan(41);
 
 select has_function('public','create_home_student_for_parent',array['text','text','text','text','text'],
   'Home family onboarding exposes atomic child creation');
@@ -71,6 +71,8 @@ select is((select count(*) from public.student_realm_progress progress join home
 set local role authenticated;
 select ok((public.get_parent_home_student_management((select student_id from home_ids))->>'parentManaged')::boolean,
   'Parent can manage the Home-only child');
+select ok(pg_get_functiondef('public.get_parent_home_snapshot()'::regprocedure) like '%''username'', student.username%',
+  'Parent snapshot includes usernames for printable Home access cards');
 select lives_ok($$select public.parent_set_home_starting_levels(
   (select student_id from home_ids),'Year 3','Year 2','Year 4'
 )$$, 'Parent can confirm a different starting level for every realm');
