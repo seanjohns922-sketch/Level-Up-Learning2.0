@@ -689,7 +689,7 @@ Students become Cosmic Navigators — making, comparing and classifying 3D objec
 - A place can go anywhere on a map.
 - Any path is as good as any other.
 
-**Progression rationale:** Students move from recognising 3D objects to comparing and choosing them for a purpose, then from reading maps to creating and navigating their own — object features are kept informal (rolls, stacks, slides); faces, edges, vertices and object views are reserved for Level 4.
+**Progression rationale:** Students make, compare and classify 3D objects using faces, surfaces, edges and vertices, then explain how features suit a purpose. They then move from interpreting maps to creating and navigating their own. Composite objects and multiple object views are reserved for Level 4.
 
 ### Assessment Metadata
 
@@ -700,8 +700,8 @@ Students become Cosmic Navigators — making, comparing and classifying 3D objec
 
 | Skill ID | Student name | Teacher description | Week | Category | Prerequisites |
 | --- | --- | --- | ---: | --- | --- |
-| `space-l3-object-recognition` | Recognise 3D objects | Recognises cubes, spheres, cylinders, cones and rectangular prisms from their form, context and informal features. | 1 | shape-and-object-reasoning | `space-l2-compare` |
-| `space-l3-object-features` | Compare 3D objects | Compares and classifies 3D objects by informal features — whether they roll, stack or slide, and flat versus curved surfaces. | 2 | shape-and-object-reasoning | `space-l3-object-recognition` |
+| `space-l3-object-recognition` | Recognise 3D objects | Recognises cubes, spheres, cylinders, cones, rectangular prisms and pyramids using faces, surfaces, edges and vertices. | 1 | shape-and-object-reasoning | `space-l2-compare` |
+| `space-l3-object-features` | Compare 3D objects | Compares and classifies 3D objects using the number and type of faces or surfaces, edges and vertices. | 2 | shape-and-object-reasoning | `space-l3-object-recognition` |
 | `space-l3-object-design` | Build and choose objects for a purpose | Constructs models from familiar objects, chooses features suited to a stated purpose and explains why they are suitable. | 3 | construction-and-visualisation | `space-l3-object-features` |
 | `space-l3-map-reading` | Read a space map | Interprets a two-dimensional map using a key, symbols and the relative positions of landmarks. | 4 | spatial-representation | `space-l2-navigation` |
 | `space-l3-map-creation` | Create a space map | Creates a two-dimensional map by placing landmarks in correct positions relative to each other. | 5 | spatial-representation | `space-l3-map-reading` |
@@ -713,45 +713,45 @@ Students become Cosmic Navigators — making, comparing and classifying 3D objec
 
 #### Week 1: 3D Discoveries
 
-**Central concept:** Recognise common three-dimensional objects and connect them with familiar uses and informal features.
+**Central concept:** Recognise common three-dimensional objects and identify their key features.
 **Curriculum alignment:** AC9M3SP01
 **Practised skills:** `space-l3-object-recognition`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Meet the Space Objects (`y3-space-w1-l1`) | build | Recognise and name the five 3D objects. | I can name the five 3D objects. | meet-the-objects, find-the-object, object-challenge |
-| 2. Objects at Work (`y3-space-w1-l2`) | develop | Use context and purpose to find familiar 3D objects. | I can find a named 3D object in a scene. | meet-the-objects, find-the-object, object-challenge |
-| 3. 3D Object Challenge (`y3-space-w1-l3`) | apply | Use feature clues to recognise objects independently. | I can recognise and find 3D objects on my own. | meet-the-objects, find-the-object, object-challenge |
+| 1. Meet the Space Objects (`y3-space-w1-l1`) | build | Recognise and name six 3D objects. | I can name six familiar 3D objects. | meet-the-objects, find-the-object, object-challenge |
+| 2. Objects at Work (`y3-space-w1-l2`) | develop | Connect familiar objects with their geometric form. | I can find a named 3D object in a scene. | meet-the-objects, find-the-object, object-challenge |
+| 3. 3D Object Challenge (`y3-space-w1-l3`) | apply | Use key feature clues to recognise objects independently. | I can identify objects using faces, surfaces, edges and vertices. | meet-the-objects, find-the-object, object-challenge |
 
-**Vocabulary:** 3D object, cube, sphere, cylinder, cone, rectangular prism
+**Vocabulary:** 3D object, face, curved surface, edge, vertex, pyramid
 
 **Common misconceptions**
 
-- A cube and a rectangular prism are the same object.
-- Turning an object changes what it is.
+- Curved surfaces are flat faces.
+- Every 3D object has vertices.
 
-**Weekly quiz:** `y3-space-w1-quiz` - Recognition progressing from names to context, use and informal feature clues. (15 questions; implemented)
+**Weekly quiz:** `y3-space-w1-quiz` - Recognition progressing from names and context to precise feature clues. (15 questions; implemented)
 
 #### Week 2: Object Detectives
 
-**Central concept:** Compare and classify 3D objects using informal features.
+**Central concept:** Compare and classify 3D objects using key features.
 **Curriculum alignment:** AC9M3SP01
 **Practised skills:** `space-l3-object-features`
 
 | Lesson | Role | Focus | Learning intention | Activity mechanic families |
 | --- | --- | --- | --- | --- |
-| 1. Which Object Is It? (`y3-space-w2-l1`) | build | Name an object from a feature clue. | I can name an object from a feature clue. | which-object, compare-objects, object-sort |
-| 2. Compare Space Objects (`y3-space-w2-l2`) | develop | Compare objects by what they do — roll, stack, slide. | I can compare objects by what they do. | which-object, compare-objects, object-sort |
-| 3. Space Object Sort (`y3-space-w2-l3`) | apply | Sort objects by a feature. | I can sort objects by a feature. | which-object, compare-objects, object-sort |
+| 1. Which Object Is It? (`y3-space-w2-l1`) | build | Identify an object from precise feature clues. | I can identify an object from a precise feature clue. | which-object, compare-objects, object-sort |
+| 2. Compare Space Objects (`y3-space-w2-l2`) | develop | Compare faces, surfaces, edges and vertices. | I can compare objects using their key features. | which-object, compare-objects, object-sort |
+| 3. Space Object Sort (`y3-space-w2-l3`) | apply | Classify a complete set using one feature rule. | I can classify objects using one feature rule. | which-object, compare-objects, object-sort |
 
-**Vocabulary:** roll, stack, slide, flat, curved
+**Vocabulary:** face, surface, edge, vertex, classify
 
 **Common misconceptions**
 
-- All objects roll.
-- An object can only do one thing.
+- A curved surface is a face.
+- Objects in one group must look identical.
 
-**Weekly quiz:** `y3-space-w2-quiz` - Comparing and classifying objects by informal features. (15 questions; implemented)
+**Weekly quiz:** `y3-space-w2-quiz` - Comparing and classifying objects by precise geometric features. (15 questions; implemented)
 
 #### Week 3: Building Starpath
 
@@ -910,8 +910,8 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 ### Assessment Metadata
 
-- Pre-test: `y4-space-pre-01` (20 questions; planned)
-- Post-test: `y4-space-post-01` (20 questions; unlocks after `y4-space-w8-l3`; planned)
+- Pre-test: `y4-space-pre-01` (20 questions; implemented)
+- Post-test: `y4-space-post-01` (20 questions; unlocks after `y4-space-w8-l3`; implemented)
 
 ### Skill Taxonomy
 

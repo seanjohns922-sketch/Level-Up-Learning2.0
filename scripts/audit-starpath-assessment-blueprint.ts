@@ -50,7 +50,7 @@ for (const blueprint of STARPATH_ASSESSMENT_BLUEPRINTS) {
   }
   for (const item of blueprint.descriptors) {
     assert.match(review, new RegExp(`\\b${item.code}\\b`));
-    assert.equal(item.curriculumMapping.implementationStatus, blueprint.level === 2 ? "aligned" : "mapped-unverified");
+    assert.equal(item.curriculumMapping.implementationStatus, [2, 3, 4].includes(blueprint.level) ? "aligned" : "mapped-unverified");
   }
 }
 
