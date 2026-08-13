@@ -177,7 +177,8 @@ function auditAssessmentBank(
   check(sameCounts(counts(bank.map((item) => item.primaryDescriptorCode)), { AC9M6SP01: 6, AC9M6SP02: 6, AC9M6SP03: 8 }), `Level 6 ${kind} descriptor allocation must be 6/6/8`);
   check(sameCounts(counts(bank.map((item) => item.difficulty)), expectedDifficulty), `Level 6 ${kind} difficulty mix must match blueprint`);
   check(sameCounts(counts(bank.map((item) => item.cognitiveCategory)), expectedCognitive), `Level 6 ${kind} cognitive mix must match blueprint`);
-  check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 1, manipulated_response: 19 }), `Level 6 ${kind} response mix must be 1 selected and 19 manipulated`);
+  check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 17, manipulated_response: 3 }), `Level 6 ${kind} response mix must use the lesson-renderer visual mix`);
+  check(sameCounts(counts(bank.map((item) => item.practiceTask?.kind ?? "missing")), { starpathCrossSection: 6, starpathCartesian: 6, starpathTransform: 3, starpathTessellation: 5 }), `Level 6 ${kind} must borrow the proven lesson visual renderers across all strands`);
 
   const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [item.id, item]));
   for (const item of bank) {
@@ -265,11 +266,15 @@ check(/function changeAnswer\(\)[\s\S]+delete next\[answerKey\][\s\S]+setNonce/.
 check(/Correctness is shown after the quiz\.[\s\S]+Change answer/.test(voyageQuizSource), "Level 6 weekly quizzes must allow immediate answer changes without revealing correctness");
 
 const bankSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/level6StarpathIndependentAssessments.ts"), "utf8");
+check(!bankSource.includes("starpathLevel6Assessment"), "Level 6 assessments must not use the weak bespoke assessment renderer");
 check(
-  !bankSource.includes("LEVEL_SIX_LESSON_CONTENT") &&
-    !/weeklyQuizzes|getStarpathQuizTasks|level6\/(crossTasks|cartesianTasks|transformChainTasks|tessellationTasks)/.test(bankSource),
-  "Level 6 assessment banks must not import lesson or weekly quiz task factories",
+  /level6\/crossTasks/.test(bankSource) &&
+    /level6\/cartesianTasks/.test(bankSource) &&
+    /level6\/transformChainTasks/.test(bankSource) &&
+    /level6\/tessellationTasks/.test(bankSource),
+  "Level 6 assessments must borrow the proven lesson visual task factories",
 );
+check(!bankSource.includes("LEVEL_SIX_LESSON_CONTENT") && !/weeklyQuizzes|getStarpathQuizTasks/.test(bankSource), "Level 6 assessment banks must not depend on lesson registries or weekly quiz dispatchers");
 
 if (problems > 0) {
   console.error(`\nStarpath Level 6 audit failed with ${problems} problem(s).`);
