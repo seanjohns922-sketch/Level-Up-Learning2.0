@@ -16,6 +16,7 @@ type CreationResult = {
   seatLimit: number;
   billingStatus: string;
   initialAdminStatus: string;
+  initialAdminEmail: string | null;
   emailDelivery: string;
   similarSchools: Array<{ id: string; name: string; code: string }>;
 };
@@ -107,7 +108,7 @@ export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoo
       setSubmitting(false);
       return;
     }
-    setCreated(result);
+    setCreated({ ...result, initialAdminEmail: initialAdminEmail || null });
     setSubmitting(false);
   }
 
@@ -177,7 +178,17 @@ export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoo
                     <div><dt className="text-emerald-700">Billing</dt><dd className="font-bold capitalize">{created.billingStatus}</dd></div>
                     <div><dt className="text-emerald-700">Initial administrator</dt><dd className="font-bold">{created.initialAdminStatus.replaceAll("_", " ")}</dd></div>
                   </dl>
-                  {created.emailDelivery === "unavailable" ? <p className="mt-4 text-sm font-semibold text-amber-800">Invitation created. Email delivery is unavailable, so the administrator can activate with the school code.</p> : null}
+                  {created.emailDelivery === "unavailable" ? (
+                    <div className="mt-5 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+                      <p className="font-bold">Email is not sent automatically yet.</p>
+                      <p className="mt-2">Send the initial administrator these details manually:</p>
+                      <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+                        <div><dt className="text-xs font-bold uppercase text-amber-700">Email invited</dt><dd className="font-semibold">{created.initialAdminEmail ?? "Not recorded"}</dd></div>
+                        <div><dt className="text-xs font-bold uppercase text-amber-700">School code</dt><dd className="font-semibold tracking-wide">{created.schoolCode}</dd></div>
+                      </dl>
+                      <p className="mt-3 font-semibold">They sign up or log in with that email, choose Activate Invite, then enter the school code.</p>
+                    </div>
+                  ) : null}
                 </div>
                 {created.similarSchools.length ? <p className="mt-4 text-sm text-amber-800">Review recommended: a similarly named school already exists.</p> : null}
                 <div className="mt-6 flex flex-wrap justify-end gap-3">
