@@ -26,6 +26,7 @@ import {
   type Villain,
 } from "@/lib/brain-break";
 import { ACTIVE_STUDENT_KEY, clearScopedProgress, writeProgress } from "@/data/progress";
+import { getPosttestForYearLabel, getPretestForYearLabel } from "@/data/assessments/api";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
@@ -36,7 +37,6 @@ import { buildLessonRoute } from "@/lib/lesson-routing";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { getStarpathLevelForYear } from "@/lib/starpath-levels";
 import {
-  buildStarpathPostTestPageHref,
   buildStarpathProgramHref,
   buildStarpathWeeklyQuizHref,
 } from "@/lib/starpath-routes";
@@ -71,10 +71,17 @@ function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "
   if (realm === "number" && year === "Year 6") {
     params.set("review_bank", "year6-number-v1");
   }
-  if (realm === "space" && year === "Year 1" && kind === "pretest") {
-    params.set("review_bank", "level1-starpath-pre-rc1");
-  }
   return `/${kind}?${params.toString()}`;
+}
+
+function hasPretest(realm: ReviewRealm, year: YearLabel) {
+  if (realm === "space") return getPretestForYearLabel(year, "space").length > 0;
+  return year !== "Prep";
+}
+
+function hasPosttest(realm: ReviewRealm, year: YearLabel) {
+  if (realm === "space") return Boolean(getPosttestForYearLabel(year, "space")?.questions.length);
+  return true;
 }
 
 function resultsHref(realm: ReviewRealm, year: YearLabel, scenario: "pre-pass" | "pre-targeted" | "pre-full" | "post-pass" | "post-fail") {
@@ -105,8 +112,8 @@ export default function DemoReviewPanel() {
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
   const maxWeek = realm === "number" ? 12 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
-  const pretestAvailable = year !== "Prep" && (realm !== "space" || levelNumber <= 2);
-  const posttestAvailable = realm !== "space" || levelNumber <= 3;
+  const pretestAvailable = hasPretest(realm, year);
+  const posttestAvailable = hasPosttest(realm, year);
   const weeklyContentAvailable = realm !== "space" || levelNumber <= 3;
 
   useEffect(() => {
@@ -220,12 +227,6 @@ export default function DemoReviewPanel() {
   }
 
   function posttestHref() {
-    if (realm === "space") {
-      const href = buildStarpathPostTestPageHref({ selectedLevel: getStarpathLevelForYear(year).id });
-      if (year === "Prep") return `${href}&review_bank=ground-starpath-rc1`;
-      if (year === "Year 1") return `${href}&review_bank=level1-starpath-post-rc1`;
-      return href;
-    }
     return assessmentHref(realm, year, "posttest");
   }
 
