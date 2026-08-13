@@ -117,6 +117,17 @@ function assertAssessmentBank(
   const openingItems = bank.slice(0, 8);
   assert(openingItems.slice(0, 7).every((item) => item.practiceTask?.kind === "starpathComposite" && item.practiceTask.figureOptions?.length === 2 && (item.practiceTask.reasonOptions?.length ?? 0) >= 3 && item.practiceTask.correctReasonId), `Level 4 ${kind} Q1-Q7 must use choose-model-and-reason assessment tasks`);
   assert(openingItems.slice(0, 7).every((item) => item.practiceTask?.kind === "starpathComposite" && !item.practiceTask.figure && !item.practiceTask.validSolutions), `Level 4 ${kind} Q1-Q7 must not use one-tap build or legacy board tasks`);
+  const abstractOpeningLanguage = /\b(approximation|communicates?|components?|essential|evidence|preserves?|relationships?|representations?)\b/i;
+  openingItems.slice(0, 7).forEach((item) => {
+    const task = item.practiceTask;
+    assert(task?.kind === "starpathComposite", `${item.id} must use the composite task renderer`);
+    assert(task.prompt.trim().split(/\s+/).length <= 10, `${item.id} prompt is too wordy for a Level 4 assessment`);
+    assert(!abstractOpeningLanguage.test(task.prompt), `${item.id} prompt uses avoidable abstract language`);
+    (task.reasonOptions ?? []).forEach((reason) => {
+      assert(reason.label.trim().split(/\s+/).length <= 12, `${item.id} reason option is too wordy`);
+      assert(!abstractOpeningLanguage.test(reason.label), `${item.id} reason option uses avoidable abstract language`);
+    });
+  });
   assert(openingItems[7]?.practiceTask?.kind === "starpathGridReference" && ["labelGrid", "repairLabels", "typeReference"].includes(openingItems[7].practiceTask.mode), `Level 4 ${kind} Q8 must use an explicit grid-system task`);
 
   const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [item.id, item]));
