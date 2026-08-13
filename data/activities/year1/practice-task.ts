@@ -2805,6 +2805,28 @@ export type PracticeTask = (
       correctOptionIds?: string[];
       feedback: { correct: string; wrong: string };
     }
+  | {
+      // Level 6 independent assessment interaction. These payloads are authored
+      // separately from lesson and weekly-quiz generators.
+      kind: "starpathLevel6Assessment";
+      mode: "diagnose" | "crossSectionProfile" | "coordinatePlot" | "transformChain" | "tessellationRule";
+      prompt: string;
+      speakText: string;
+      target: number;
+      contextLabel: string;
+      range?: number;
+      start?: { x: number; y: number };
+      targetPoints?: Array<{ x: number; y: number }>;
+      operations?: Array<
+        | { kind: "translate"; label: string; dx: number; dy: number }
+        | { kind: "rotate90" | "reflectX" | "reflectY"; label: string }
+      >;
+      profileAnswer?: [number, number, number];
+      ruleAnswer?: { across: number; down: number; quarterTurns: number };
+      options?: Array<{ id: string; label: string }>;
+      correctOptionId?: string;
+      feedback: { correct: string; wrong: string };
+    }
   | StarpathObjectTask
   | StarpathGroundAssessmentTask
   | {

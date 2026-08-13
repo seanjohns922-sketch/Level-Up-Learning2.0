@@ -290,6 +290,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "starpathCrossSection",
   "starpathCartesian",
   "starpathTessellation",
+  "starpathLevel6Assessment",
   "starpathCoordinate",
   "starpathTransform",
   "starpathObject",
@@ -303,6 +304,47 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
   if (!task || !hasText(task.kind) || !SUPPORTED_PRACTICE_TASK_KINDS.has(task.kind)) return false;
+  if (task.kind === "starpathLevel6Assessment") {
+    if (!hasText(task.prompt) || !hasText(task.speakText) || !hasText(task.contextLabel)) return false;
+    if (!hasText(task.feedback.correct) || task.feedback.correct !== task.feedback.wrong) return false;
+    if (task.mode === "diagnose") {
+      const optionIds = new Set((task.options ?? []).map((option) => option.id));
+      return (task.options?.length ?? 0) >= 2
+        && optionIds.size === task.options?.length
+        && optionIds.has(task.correctOptionId ?? "");
+    }
+    if (task.mode === "crossSectionProfile") {
+      return task.profileAnswer?.length === 3
+        && task.profileAnswer.every((value) => Number.isInteger(value) && value >= 1 && value <= 6);
+    }
+    if (task.mode === "coordinatePlot") {
+      const range = task.range ?? 4;
+      const pointKeys = new Set((task.targetPoints ?? []).map((point) => `${point.x}:${point.y}`));
+      return Number.isInteger(range)
+        && range >= 3
+        && range <= 6
+        && (task.targetPoints?.length ?? 0) >= 1
+        && (task.targetPoints?.length ?? 0) <= 3
+        && pointKeys.size === task.targetPoints?.length
+        && (task.targetPoints ?? []).every((point) => Number.isInteger(point.x) && Number.isInteger(point.y) && Math.abs(point.x) <= range && Math.abs(point.y) <= range);
+    }
+    if (task.mode === "transformChain") {
+      return Boolean(task.start)
+        && Number.isInteger(task.start?.x)
+        && Number.isInteger(task.start?.y)
+        && (task.operations?.length ?? 0) >= 2
+        && (task.operations?.length ?? 0) <= 3
+        && (task.operations ?? []).every((operation) => hasText(operation.label) && (operation.kind !== "translate" || (Number.isInteger(operation.dx) && Number.isInteger(operation.dy))));
+    }
+    return Boolean(task.ruleAnswer)
+      && Number.isInteger(task.ruleAnswer?.across)
+      && Number.isInteger(task.ruleAnswer?.down)
+      && Number.isInteger(task.ruleAnswer?.quarterTurns)
+      && Math.abs(task.ruleAnswer?.across ?? 0) <= 6
+      && Math.abs(task.ruleAnswer?.down ?? 0) <= 6
+      && (task.ruleAnswer?.quarterTurns ?? -1) >= 0
+      && (task.ruleAnswer?.quarterTurns ?? 4) <= 3;
+  }
   if (task.kind === "starpathGroundAssessment") {
     const assessmentTask = task as StarpathGroundAssessmentTask;
     if (!hasText(assessmentTask.prompt) || !hasText(assessmentTask.speakText)) return false;

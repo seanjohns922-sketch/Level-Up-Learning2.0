@@ -206,6 +206,7 @@ import StarpathCartesianCard from "@/components/starpath/StarpathCartesianCard";
 import StarpathTessellationCard from "@/components/starpath/StarpathTessellationCard";
 import StarpathCoordinateCard from "@/components/starpath/StarpathCoordinateCard";
 import StarpathTransformCard from "@/components/starpath/StarpathTransformCard";
+import StarpathLevel6AssessmentCard from "@/components/starpath/StarpathLevel6AssessmentCard";
 import { StarpathGroundAssessmentCard } from "@/components/starpath/StarpathGroundAssessmentCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
@@ -721,6 +722,8 @@ function TaskRendererInner({
       return <StarpathCoordinateCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathTransform":
       return <StarpathTransformCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathLevel6Assessment":
+      return <StarpathLevel6AssessmentCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathObject":
       return <StarpathObjectCard key={k} task={t} onCorrect={onC} onWrong={onW} editableAssessmentMode={editableAssessmentMode} assessmentAnswer={assessmentAnswer} onAssessmentAnswer={recordAssessmentAnswer} />;
     default:

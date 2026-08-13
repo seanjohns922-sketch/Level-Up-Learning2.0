@@ -35,6 +35,7 @@ type CrossTask = Extract<PracticeTask, { kind: "starpathCrossSection" }>;
 type CartTask = Extract<PracticeTask, { kind: "starpathCartesian" }>;
 type TransformTask = Extract<PracticeTask, { kind: "starpathTransform" }>;
 type TessTask = Extract<PracticeTask, { kind: "starpathTessellation" }>;
+type AssessmentTask = Extract<PracticeTask, { kind: "starpathLevel6Assessment" }>;
 type Candidate = Question & IndependentAssessmentItem;
 const counts = (values: readonly string[]) => values.reduce<Record<string, number>>((result, value) => {
   result[value] = (result[value] ?? 0) + 1;
@@ -132,12 +133,33 @@ function auditCart(lessonId: string, t: CartTask) {
   check(Boolean(t.feedback?.correct && t.feedback?.wrong), `${lessonId}: feedback required`);
 }
 
+function auditIndependentAssessmentTask(label: string, task: AssessmentTask) {
+  check(task.feedback.correct === task.feedback.wrong, `${label}: assessment feedback must remain neutral`);
+  if (task.mode === "diagnose") {
+    const ids = new Set((task.options ?? []).map((option) => option.id));
+    check(ids.size === task.options?.length && ids.size >= 2, `${label}: diagnostic options must be unique`);
+    check(ids.has(task.correctOptionId ?? ""), `${label}: diagnostic answer must identify a valid option`);
+  } else if (task.mode === "crossSectionProfile") {
+    check(task.profileAnswer?.length === 3, `${label}: cross-section profile requires three section widths`);
+  } else if (task.mode === "coordinatePlot") {
+    const range = task.range ?? 4;
+    const keys = new Set((task.targetPoints ?? []).map((point) => `${point.x}:${point.y}`));
+    check(keys.size === task.targetPoints?.length && keys.size >= 1, `${label}: coordinate targets must be unique`);
+    check((task.targetPoints ?? []).every((point) => Math.abs(point.x) <= range && Math.abs(point.y) <= range), `${label}: coordinate target must be on the rendered plane`);
+  } else if (task.mode === "transformChain") {
+    check((task.operations?.length ?? 0) >= 2, `${label}: transformation chain requires at least two ordered operations`);
+  } else {
+    check(Boolean(task.ruleAnswer), `${label}: tessellation construction requires a repeat rule`);
+  }
+}
+
 function auditTask(label: string, task: PracticeTask) {
   check(isPracticeTaskSafe(task), `${label}: task must be supported by production renderer`);
   if (task.kind === "starpathCrossSection") auditCross(label, task as CrossTask);
   else if (task.kind === "starpathCartesian") auditCart(label, task as CartTask);
   else if (task.kind === "starpathTransform") auditTransform(label, task as TransformTask);
   else if (task.kind === "starpathTessellation") auditTess(label, task as TessTask);
+  else if (task.kind === "starpathLevel6Assessment") auditIndependentAssessmentTask(label, task as AssessmentTask);
   else check(false, `${label}: unsupported Level 6 task kind ${(task as PracticeTask).kind}`);
 }
 
@@ -167,9 +189,11 @@ function auditAssessmentBank(
     check(item.curriculumCodes?.[0] === item.primaryDescriptorCode && item.descriptorCodes.includes(item.primaryDescriptorCode), `${item.id}: curriculum descriptor metadata mismatch`);
     check(item.misconceptionTags.length > 0 && item.misconceptionTags.every((tag) => misconceptionById.get(tag)?.descriptorCodes.includes(item.primaryDescriptorCode)), `${item.id}: misconception tag outside descriptor`);
     check(Boolean(item.practiceTask && "feedback" in item.practiceTask && item.practiceTask.feedback?.correct === item.practiceTask.feedback?.wrong), `${item.id}: feedback must not reveal correctness`);
-    const actualResponseMode = item.practiceTask && "render" in item.practiceTask && item.practiceTask.render === "tap"
-      ? "manipulated_response"
-      : "selected_response";
+    const actualResponseMode = item.practiceTask?.kind === "starpathLevel6Assessment"
+      ? item.practiceTask.mode === "diagnose" ? "selected_response" : "manipulated_response"
+      : item.practiceTask && "render" in item.practiceTask && item.practiceTask.render === "tap"
+        ? "manipulated_response"
+        : "selected_response";
     check(item.responseMode === actualResponseMode, `${item.id}: responseMode says ${item.responseMode}, but the rendered interaction is ${actualResponseMode}`);
     if (item.practiceTask) auditTask(item.id, item.practiceTask);
   }
