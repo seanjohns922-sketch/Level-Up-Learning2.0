@@ -2666,6 +2666,7 @@ export type PracticeTask = (
       viewLabels?: { front: number[]; side: number[]; top: number };
       options?: Array<{ id: string; label: string }>;
       correctOptionId?: string;
+      evidenceClues?: string[];
       reasonOptions?: Array<{ id: string; label: string }>;
       correctReasonId?: string;
     }

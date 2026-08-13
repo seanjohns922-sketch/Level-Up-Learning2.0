@@ -1,7 +1,6 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { CompositeTask } from "@/data/activities/starpath/level4/composite";
 import { figureSvg, getL4Figure, type CompositeFigure, type FigureShape } from "@/data/activities/starpath/level4/composite-figures";
-import { getL4Object } from "@/data/activities/starpath/level4/composite-objects";
 import {
   labelGridTask,
   placeAtReferenceTask,
@@ -100,7 +99,6 @@ function rotate<T>(items: T[], by: number): T[] {
 }
 
 const SHAPE_PALETTE: FigureShape[] = ["triangle", "square", "rectangle", "circle"];
-const SOLID_PALETTE: FigureShape[] = ["cube", "cylinder", "cone", "sphere", "prism"];
 
 function assessmentScanTask(round: number, target: number): AssessmentTask {
   const figure = getL4Figure(round);
@@ -129,112 +127,174 @@ function assessmentScanTask(round: number, target: number): AssessmentTask {
   };
 }
 
-function assessmentBuildTask(round: number, target: number, object = false): AssessmentTask {
-  const figure = object ? getL4Object(round) : getL4Figure(round);
+const diagram = (body: string) => `<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><rect width="220" height="180" rx="14" fill="#f8fafc"/>${body}</svg>`;
+const rect = (x: number, y: number, w: number, h: number, fill: string) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${fill}" stroke="#312e81" stroke-width="3"/>`;
+const circle = (x: number, y: number, r: number, fill: string) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#312e81" stroke-width="3"/>`;
+const triangle = (points: string, fill: string) => `<polygon points="${points}" fill="${fill}" stroke="#312e81" stroke-width="3" stroke-linejoin="round"/>`;
+const line = (x1: number, y1: number, x2: number, y2: number) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#312e81" stroke-width="3"/>`;
+const label = (x: number, y: number, value: string) => `<text x="${x}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#312e81">${value}</text>`;
+
+function evidenceTask(params: {
+  target: number;
+  mode: CompositeTask["mode"];
+  prompt: string;
+  clues: string[];
+  correctSvg: string;
+  incorrectSvg: string;
+  correctReason: string;
+  wrongReasons: [string, string];
+  correctFirst: boolean;
+}): AssessmentTask {
   return {
     kind: "starpathComposite",
-    mode: object ? "solid" : "construct",
-    target,
-    prompt: `Build the ${figure.name}.`,
-    speakText: `Choose a ${object ? "solid" : "shape"}, then tap the matching space. Build the ${figure.name}.`,
-    designBrief: `Use the correct ${object ? "solids" : "shapes"} to complete every part.`,
-    figure: {
-      id: figure.id,
-      name: figure.name,
-      viewBox: figure.viewBox,
-      parts: figure.parts.map((part) => ({ ...part })),
-    },
-    buildPalette: object ? SOLID_PALETTE : SHAPE_PALETTE,
+    mode: params.mode,
+    target: params.target,
+    prompt: params.prompt,
+    speakText: `${params.prompt} Use every clue. Choose a model, then choose why.`,
+    designBrief: "Use every clue before choosing.",
+    evidenceClues: params.clues,
+    figureOptions: params.correctFirst
+      ? [{ id: "a", svg: params.correctSvg }, { id: "b", svg: params.incorrectSvg }]
+      : [{ id: "a", svg: params.incorrectSvg }, { id: "b", svg: params.correctSvg }],
+    correctOptionId: params.correctFirst ? "a" : "b",
+    reasonOptions: [
+      { id: "evidence", label: params.correctReason },
+      { id: "first", label: params.wrongReasons[0] },
+      { id: "second", label: params.wrongReasons[1] },
+    ],
+    correctReasonId: "evidence",
     feedback: FEEDBACK,
   };
 }
 
-function assessmentStructureTask(round: number, target: number, mode: "views" | "hidden"): AssessmentTask {
-  const cells = [{ r: 0, c: 1 }, { r: 1, c: 0 }, { r: 1, c: 1 }, { r: 1, c: 2 }];
-  const heights = [1 + (round % 2), 1, 2 + (round % 2), 1];
-  const solution = cells.map((cell, index) => ({ ...cell, pieceId: `cube-${heights[index]}` }));
-  const views = { front: [heights[1]!, heights[2]!, heights[3]!], side: [heights[2]!, heights[0]!], top: cells.length };
-  return {
-    kind: "starpathComposite",
-    mode,
+function equivalentDecompositionTask(form: Form, target: number): AssessmentTask {
+  const correct = form === "pretest"
+    ? diagram(`${rect(22, 35, 74, 96, "#a78bfa")}${line(59, 35, 59, 131)}${label(59, 153, "Build 1")}${rect(124, 35, 74, 96, "#67e8f9")}${line(124, 83, 198, 83)}${label(161, 153, "Build 2")}`)
+    : diagram(`${rect(24, 42, 82, 82, "#f9a8d4")}${line(24, 83, 106, 83)}${label(65, 148, "Build 1")}${rect(130, 42, 82, 82, "#fde68a")}${line(171, 42, 171, 124)}${label(171, 148, "Build 2")}`);
+  const wrong = form === "pretest"
+    ? diagram(`${rect(22, 35, 74, 96, "#a78bfa")}${line(59, 35, 59, 131)}${label(59, 153, "Build 1")}${rect(124, 45, 74, 76, "#67e8f9")}${line(124, 83, 198, 83)}${label(161, 153, "Build 2")}`)
+    : diagram(`${rect(24, 42, 82, 82, "#f9a8d4")}${line(24, 83, 106, 83)}${label(65, 148, "Build 1")}${rect(134, 34, 72, 98, "#fde68a")}${line(170, 34, 170, 132)}${label(170, 148, "Build 2")}`);
+  return evidenceTask({
     target,
-    prompt: mode === "hidden" ? "Build the smallest supported structure." : "Build the object from all three views.",
-    speakText: mode === "hidden" ? "Add the fewest cube stacks needed to support every part." : "Use the front, side and top views to build the object.",
-    boardId: `y4-assessment-${mode}-${round}`,
-    cols: 4,
-    rows: 3,
-    palette: [
-      { id: "cube-1", label: "1 cube high", colour: "#8b5cf6" },
-      { id: "cube-2", label: "2 cubes high", colour: "#0ea5e9" },
-      { id: "cube-3", label: "3 cubes high", colour: "#f97316" },
-    ],
-    targetCells: cells,
-    validSolutions: [solution],
-    maxPieces: cells.length,
-    viewLabels: views,
-    designBrief: mode === "hidden" ? "Every raised part needs support beneath it." : `Front ${views.front.join("-")}; side ${views.side.join("-")}; top ${views.top} cells.`,
-    feedback: FEEDBACK,
-  };
+    mode: "alternate",
+    prompt: "Which pair has the same outside shape?",
+    clues: ["The joins may be different.", "The outside size must stay the same."],
+    correctSvg: correct,
+    incorrectSvg: wrong,
+    correctReason: "Both outside shapes match exactly.",
+    wrongReasons: ["Both builds use the same join.", "The taller build has more pieces."],
+    correctFirst: form === "pretest",
+  });
+}
+
+function constraintModelTask(form: Form, target: number): AssessmentTask {
+  const correct = form === "pretest"
+    ? diagram(`${rect(62, 72, 96, 58, "#67e8f9")}${triangle("62,72 110,28 158,72", "#fca5a5")}${circle(110, 101, 14, "#fde68a")}${rect(100, 130, 20, 30, "#a78bfa")}`)
+    : diagram(`${rect(62, 66, 96, 68, "#a78bfa")}${circle(110, 42, 24, "#fde68a")}${rect(76, 134, 22, 30, "#67e8f9")}${rect(122, 134, 22, 30, "#67e8f9")}`);
+  const wrong = form === "pretest"
+    ? diagram(`${rect(62, 72, 96, 58, "#67e8f9")}${triangle("62,72 110,28 158,72", "#fca5a5")}${circle(110, 101, 14, "#fde68a")}${rect(138, 130, 20, 30, "#a78bfa")}`)
+    : diagram(`${rect(62, 66, 96, 68, "#a78bfa")}${circle(110, 42, 24, "#fde68a")}${rect(76, 134, 22, 30, "#67e8f9")}${rect(76, 104, 22, 30, "#67e8f9")}`);
+  return evidenceTask({
+    target,
+    mode: "model",
+    prompt: "Which model follows every clue?",
+    clues: form === "pretest"
+      ? ["The triangle is above the large rectangle.", "The circle is inside the rectangle.", "The small rectangle is centred below."]
+      : ["The circle is centred above the large rectangle.", "Two equal rectangles are below it.", "The two lower rectangles do not touch."],
+    correctSvg: correct,
+    incorrectSvg: wrong,
+    correctReason: "Every part has the stated position.",
+    wrongReasons: ["It uses the brightest colours.", "Its largest shape is a rectangle."],
+    correctFirst: form === "posttest",
+  });
+}
+
+function viewConsistencyTask(form: Form, target: number): AssessmentTask {
+  const towers = (heights: number[]) => heights.map((height, index) => `${rect(32 + index * 52, 145 - height * 30, 38, height * 30, ["#67e8f9", "#a78bfa", "#fbbf24"][index]!)}`).join("");
+  const correctHeights = form === "pretest" ? [1, 3, 2] : [2, 1, 3];
+  const wrongHeights = form === "pretest" ? [1, 2, 3] : [3, 1, 2];
+  return evidenceTask({
+    target,
+    mode: "views",
+    prompt: "Which build matches all three views?",
+    clues: form === "pretest"
+      ? ["Front heights: 1, 3, 2.", "Side view hides the short stack.", "Top view shows 3 spaces."]
+      : ["Front heights: 2, 1, 3.", "The tallest stack is on the right.", "Top view shows 3 spaces."],
+    correctSvg: diagram(`${towers(correctHeights)}${label(110, 168, "MODEL")}`),
+    incorrectSvg: diagram(`${towers(wrongHeights)}${label(110, 168, "MODEL")}`),
+    correctReason: "Its positions and heights match every view.",
+    wrongReasons: ["It has the tallest stack.", "It covers three top spaces."],
+    correctFirst: form === "pretest",
+  });
+}
+
+function hiddenSupportTask(form: Form, target: number): AssessmentTask {
+  const stack = (x: number, baseY: number, count: number, hidden: number) => Array.from({ length: count }, (_, index) => rect(x, baseY - (index + 1) * 30, 36, 30, index < hidden ? "#cbd5e1" : "#67e8f9")).join("");
+  const correct = form === "pretest"
+    ? `${stack(48, 152, 3, 2)}${stack(128, 152, 2, 1)}`
+    : `${stack(42, 152, 2, 1)}${stack(92, 152, 3, 2)}${stack(142, 152, 1, 0)}`;
+  const wrong = form === "pretest"
+    ? `${stack(48, 152, 4, 3)}${stack(128, 152, 2, 1)}`
+    : `${stack(42, 152, 2, 1)}${stack(92, 152, 4, 3)}${stack(142, 152, 1, 0)}`;
+  return evidenceTask({
+    target,
+    mode: "hidden",
+    prompt: "Which build uses the fewest hidden cubes?",
+    clues: ["Blue cubes must stay at their shown heights.", "Grey cubes are hidden supports.", "No cube may float."],
+    correctSvg: diagram(correct),
+    incorrectSvg: diagram(wrong),
+    correctReason: "It supports every blue cube with no extras.",
+    wrongReasons: ["It has the tallest tower.", "It uses more grey cubes."],
+    correctFirst: form === "posttest",
+  });
+}
+
+function approximationTask(form: Form, target: number): AssessmentTask {
+  const useful = form === "pretest"
+    ? diagram(`${rect(42, 82, 136, 42, "#67e8f9")}${circle(72, 132, 20, "#334155")}${circle(148, 132, 20, "#334155")}${rect(122, 52, 44, 30, "#fca5a5")}`)
+    : diagram(`${triangle("40,130 110,36 180,130", "#86efac")}${rect(100, 82, 20, 48, "#a78bfa")}${circle(110, 55, 10, "#fde68a")}`);
+  const weak = form === "pretest"
+    ? diagram(`${rect(42, 82, 136, 42, "#67e8f9")}${circle(72, 132, 20, "#334155")}${rect(122, 52, 44, 30, "#fca5a5")}`)
+    : diagram(`${triangle("40,130 110,36 180,130", "#86efac")}${circle(110, 55, 10, "#fde68a")}`);
+  return evidenceTask({
+    target,
+    mode: "simplify",
+    prompt: "Which simple icon keeps the useful information?",
+    clues: form === "pretest"
+      ? ["The icon is for a car park sign.", "People must recognise a car.", "Small decoration is not needed."]
+      : ["The icon marks a lookout tree.", "People must see the trunk and treetop.", "Small leaves are not needed."],
+    correctSvg: useful,
+    incorrectSvg: weak,
+    correctReason: "It keeps the parts needed to recognise it.",
+    wrongReasons: ["It includes every tiny detail.", "It uses more colour."],
+    correctFirst: form === "pretest",
+  });
+}
+
+function transferTask(form: Form, target: number): AssessmentTask {
+  const correct = form === "pretest"
+    ? diagram(`${circle(110, 82, 30, "#fde68a")}${triangle("80,112 50,152 92,138", "#67e8f9")}${triangle("140,112 170,152 128,138", "#67e8f9")}${rect(96, 112, 28, 42, "#a78bfa")}`)
+    : diagram(`${rect(78, 68, 64, 70, "#67e8f9")}${circle(110, 48, 20, "#fde68a")}${triangle("78,92 46,116 78,122", "#fca5a5")}${triangle("142,92 174,116 142,122", "#fca5a5")}`);
+  const wrong = form === "pretest"
+    ? diagram(`${circle(110, 82, 30, "#fde68a")}${triangle("80,112 50,152 92,138", "#67e8f9")}${triangle("140,112 170,152 128,138", "#67e8f9")}${rect(96, 40, 28, 42, "#a78bfa")}`)
+    : diagram(`${rect(78, 68, 64, 70, "#67e8f9")}${circle(110, 48, 20, "#fde68a")}${triangle("78,92 46,116 78,122", "#fca5a5")}${triangle("142,92 174,116 142,122", "#fca5a5")}${circle(110, 108, 12, "#fde68a")}`);
+  return evidenceTask({
+    target,
+    mode: "evaluate",
+    prompt: "Which design meets every rule?",
+    clues: form === "pretest"
+      ? ["Use exactly 4 familiar shapes.", "Matching triangles go on opposite sides.", "The rectangle is below the circle."]
+      : ["Use exactly 4 familiar shapes.", "Matching triangles go on opposite sides.", "Only one circle is used."],
+    correctSvg: correct,
+    incorrectSvg: wrong,
+    correctReason: "It meets the number, shape and position rules.",
+    wrongReasons: ["It is the most colourful design.", "Its circle is near the top."],
+    correctFirst: form === "posttest",
+  });
 }
 
 function completeSvg(figure: CompositeFigure) {
   return figureSvg(figure, () => true);
-}
-
-function missingSvg(figure: CompositeFigure, missingPartId: string) {
-  return figureSvg(figure, (partId) => partId !== missingPartId);
-}
-
-function assessmentCompareTask(params: {
-  round: number;
-  target: number;
-  figure: CompositeFigure;
-  prompt: string;
-  correctReason: string;
-  distractorReasons: readonly string[];
-  missingPartIndex: number;
-  correctFirst?: boolean;
-}): CompositeTask {
-  const missing = params.figure.parts[params.missingPartIndex % params.figure.parts.length]!;
-  const correctId = params.correctFirst ? "a" : "b";
-  const incorrectId = params.correctFirst ? "b" : "a";
-  const options = params.correctFirst
-    ? [{ id: "a", svg: completeSvg(params.figure) }, { id: "b", svg: missingSvg(params.figure, missing.id) }]
-    : [{ id: "a", svg: missingSvg(params.figure, missing.id) }, { id: "b", svg: completeSvg(params.figure) }];
-  return {
-    kind: "starpathComposite",
-    mode: "evaluate",
-    target: params.target,
-    prompt: params.prompt,
-    speakText: `${params.prompt} Choose a picture, then choose why.`,
-    designBrief: `The complete model has every part needed to make the ${params.figure.name}.`,
-    figureOptions: options,
-    correctOptionId: correctId,
-    reasonOptions: rotate([
-      { id: "evidence", label: params.correctReason },
-      { id: "missing", label: `It still works without the ${missing.label.toLowerCase()}.` },
-      { id: "appearance", label: params.distractorReasons[0] ?? "It uses brighter colours." },
-      { id: "size", label: params.distractorReasons[1] ?? "It is the bigger picture." },
-    ], params.round),
-    correctReasonId: "evidence",
-    feedback: FEEDBACK,
-    boardId: `y4-assessment-compare-${params.figure.id}-${params.round}-${incorrectId}`,
-  };
-}
-
-function shapeRepresentationTask(round: number, target: number, prompt: string, missingPartIndex: number): AssessmentTask {
-  const figure = getL4Figure(round);
-  const resolvedPrompt = prompt.replace("{name}", figure.name);
-  return assessmentCompareTask({
-    round,
-    target,
-    figure,
-    prompt: resolvedPrompt,
-    missingPartIndex,
-    correctFirst: round % 2 === 0,
-    correctReason: `It has every shape needed to make the ${figure.name}.`,
-    distractorReasons: ["It uses fewer shapes.", "It is the bigger picture."],
-  });
 }
 
 function descriptorForIndex(index: number): Descriptor {
@@ -261,12 +321,12 @@ function misconceptionFor(descriptor: Descriptor, index: number): readonly Misco
 
 const PRE_TASKS: readonly AssessmentTask[] = [
   assessmentScanTask(31, 1),
-  assessmentBuildTask(32, 2),
-  assessmentBuildTask(33, 3),
-  assessmentBuildTask(34, 4, true),
-  assessmentStructureTask(35, 5, "views"),
-  assessmentStructureTask(36, 6, "hidden"),
-  shapeRepresentationTask(37, 7, "Which simple picture still looks like the {name}?", 0),
+  equivalentDecompositionTask("pretest", 2),
+  constraintModelTask("pretest", 3),
+  viewConsistencyTask("pretest", 4),
+  hiddenSupportTask("pretest", 5),
+  approximationTask("pretest", 6),
+  transferTask("pretest", 7),
   assessmentTask(repairLabelsTask(41, 8), "Repair the grid label so references stay consistent."),
   assessmentTask(referenceToCellTask(42, 9), "Tap the grid cell named by the reference."),
   assessmentTask(placeAtReferenceTask(43, 10), "Place the supply pod at the given reference."),
@@ -284,12 +344,12 @@ const PRE_TASKS: readonly AssessmentTask[] = [
 
 const POST_TASKS: readonly AssessmentTask[] = [
   assessmentScanTask(61, 1),
-  assessmentBuildTask(62, 2),
-  assessmentBuildTask(63, 3),
-  assessmentBuildTask(64, 4, true),
-  assessmentStructureTask(65, 5, "views"),
-  assessmentStructureTask(66, 6, "hidden"),
-  shapeRepresentationTask(67, 7, "Which simple picture still looks like the {name}?", 2),
+  equivalentDecompositionTask("posttest", 2),
+  constraintModelTask("posttest", 3),
+  viewConsistencyTask("posttest", 4),
+  hiddenSupportTask("posttest", 5),
+  approximationTask("posttest", 6),
+  transferTask("posttest", 7),
   assessmentTask(labelGridTask(71, 8), "Complete the grid labels so every cell has a reference."),
   assessmentTask(labelGridTask(72, 9), "Complete the grid reference labels."),
   assessmentTask(repairLabelsTask(73, 10), "Repair the incorrect row or column label."),
@@ -332,14 +392,14 @@ function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion
   const skill = descriptorSkill(spec.descriptor);
   return {
     schemaVersion: 1,
-    id: `y4-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v2`,
-    version: "2.0.0",
+    id: `y4-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v3`,
+    version: "3.0.0",
     realm: "space",
     level: 4,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `starpath-level-4-${form}-v2`,
+    bankId: `starpath-level-4-${form}-v3`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],

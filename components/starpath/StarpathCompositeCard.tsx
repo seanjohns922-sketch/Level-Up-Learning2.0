@@ -159,6 +159,11 @@ function FigureCompare({ task, onCorrect, onWrong }: { task: Task; onCorrect: ()
   return (
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      {task.evidenceClues?.length ? (
+        <ul className="mx-auto grid max-w-xl gap-2 rounded-2xl border-2 border-cyan-200 bg-cyan-50 p-4 text-sm font-bold text-indigo-950 sm:grid-cols-2">
+          {task.evidenceClues.map((clue) => <li key={clue}>• {clue}</li>)}
+        </ul>
+      ) : null}
       <div className="mx-auto grid max-w-xl gap-3 sm:grid-cols-2">
         {(task.figureOptions ?? []).map((option) => (
           <button

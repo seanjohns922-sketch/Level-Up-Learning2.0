@@ -116,9 +116,15 @@ function assertAssessmentBank(
   assertSameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 3, manipulated_response: 17 }, `Level 4 ${kind} response mix`);
   const openingItems = bank.slice(0, 8);
   const openingModes = openingItems.slice(0, 7).map((item) => item.practiceTask?.kind === "starpathComposite" ? item.practiceTask.mode : null);
-  assert.deepEqual(openingModes, ["scan", "construct", "construct", "solid", "views", "hidden", "evaluate"], `Level 4 ${kind} Q1-Q7 must progress from identification to construction, views, hidden structure and evaluation`);
-  assert(openingItems.slice(1, 6).every((item) => item.responseMode === "manipulated_response"), `Level 4 ${kind} Q2-Q6 must require constructed responses`);
-  assert(openingItems[6]?.practiceTask?.kind === "starpathComposite" && openingItems[6].practiceTask.figureOptions?.length === 2 && (openingItems[6].practiceTask.reasonOptions?.length ?? 0) >= 3, `Level 4 ${kind} Q7 must retain model-and-reason evaluation`);
+  assert.deepEqual(openingModes, ["scan", "alternate", "model", "views", "hidden", "simplify", "evaluate"], `Level 4 ${kind} Q1-Q7 must progress from identification to decomposition, constraints, views, hidden structure, approximation and transfer`);
+  assert(openingItems.slice(1, 7).every((item) => item.responseMode === "manipulated_response"), `Level 4 ${kind} Q2-Q7 must require a two-part evidence response`);
+  openingItems.slice(1, 7).forEach((item) => {
+    const task = item.practiceTask;
+    assert(task?.kind === "starpathComposite" && task.figureOptions?.length === 2, `${item.id} must compare two plausible models`);
+    assert((task?.evidenceClues?.length ?? 0) >= 2, `${item.id} must require multiple clues`);
+    assert((task?.reasonOptions?.length ?? 0) >= 3, `${item.id} must require a reason as well as a model`);
+    assert(!task?.figure && !task?.validSolutions, `${item.id} must not expose matching sockets or an answer-shaped build board`);
+  });
   const abstractOpeningLanguage = /\b(approximation|communicates?|components?|essential|evidence|preserves?|relationships?|representations?)\b/i;
   openingItems.slice(0, 7).forEach((item) => {
     const task = item.practiceTask;
@@ -134,8 +140,8 @@ function assertAssessmentBank(
 
   const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [item.id, item]));
   for (const item of bank) {
-    assert.equal(item.version, "2.0.0", `${item.id} must declare release metadata`);
-    assert.equal(item.bankId, `starpath-level-4-${kind}-v2`, `${item.id} bank ID mismatch`);
+    assert.equal(item.version, "3.0.0", `${item.id} must declare release metadata`);
+    assert.equal(item.bankId, `starpath-level-4-${kind}-v3`, `${item.id} bank ID mismatch`);
     assert.equal(item.realm, "space", `${item.id} realm mismatch`);
     assert.equal(item.level, 4, `${item.id} level mismatch`);
     assert.equal(item.form, kind, `${item.id} form mismatch`);
