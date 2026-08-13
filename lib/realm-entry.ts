@@ -1,5 +1,6 @@
 import { isPlacementComplete, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
-import { STARPATH_REALM_ID, STARPATH_WORLD_ROUTE } from "@/lib/starpath-routes";
+import { getStarpathLevelForYear, type StarpathLevelDefinition } from "@/lib/starpath-levels";
+import { buildStarpathWorldHref, STARPATH_REALM_ID, STARPATH_WORLD_ROUTE } from "@/lib/starpath-routes";
 
 export type RealmCarouselId = "number-nexus" | "measurelands" | "starpath-realm";
 
@@ -10,14 +11,7 @@ type CurriculumRealmAvailability = {
   route: string;
 };
 
-type PendingRealmAvailability = {
-  enabled: false;
-  progressRealmId: null;
-  destinationRealmId: typeof STARPATH_REALM_ID;
-  route: string;
-};
-
-type RealmAvailability = CurriculumRealmAvailability | PendingRealmAvailability;
+type RealmAvailability = CurriculumRealmAvailability;
 
 const ENABLED_REALMS: Record<RealmCarouselId, RealmAvailability> = {
   "number-nexus": {
@@ -33,8 +27,8 @@ const ENABLED_REALMS: Record<RealmCarouselId, RealmAvailability> = {
     route: "/measurelands",
   },
   "starpath-realm": {
-    enabled: false,
-    progressRealmId: null,
+    enabled: true,
+    progressRealmId: STARPATH_REALM_ID,
     destinationRealmId: STARPATH_REALM_ID,
     route: STARPATH_WORLD_ROUTE,
   },
@@ -57,6 +51,15 @@ export function resolveRealmEntryRoute(args: {
   if (!args.introSeen) return "/home";
 
   const year = args.progress?.year?.trim() || args.fallbackYear.trim() || "Year 1";
+  if (args.realmId === STARPATH_REALM_ID) {
+    const starpathYear = (year === "Foundation" ? "Prep" : year) as StarpathLevelDefinition["yearLabel"];
+    const level = getStarpathLevelForYear(starpathYear);
+    if (year !== "Prep" && year !== "Foundation" && !isPlacementComplete(args.progress)) {
+      return `/pretest?year=${encodeURIComponent(level.yearLabel)}&realm_id=${STARPATH_REALM_ID}`;
+    }
+    return buildStarpathWorldHref({ selectedLevel: level.id });
+  }
+
   const route = args.realmId === "measurement" ? "/measurelands" : "/number-nexus";
 
   if (year === "Prep") return route;

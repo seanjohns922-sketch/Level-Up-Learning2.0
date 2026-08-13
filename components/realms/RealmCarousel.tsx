@@ -13,7 +13,7 @@ import { exitReviewMode } from "@/lib/review-mode";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
-import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
+import { buildStarpathWorldHref, STARPATH_REALM_ID, STARPATH_WORLD_ROUTE } from "@/lib/starpath-routes";
 import { markRealmEntryRestored } from "@/lib/realm-entry-handoff";
 import { useAuthorizedDemoSession } from "@/lib/use-authorized-demo-session";
 
@@ -99,7 +99,7 @@ export default function RealmCarousel() {
   const current = realms[currentIndex];
   const isStarpathRealm = current.id === "starpath-realm";
   const isStarpathPreview = isStarpathRealm && starpathDemoActive;
-  const isActive = isStarpathPreview || (!isStarpathRealm && (DEMO_MODE || isRealmEnabled(current.id)));
+  const isActive = DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview;
   const isPreviewRealm = previewMode && current.id === "measurelands";
   const prevIdx = (currentIndex - 1 + realms.length) % realms.length;
   const nextIdx = (currentIndex + 1) % realms.length;
@@ -112,8 +112,6 @@ export default function RealmCarousel() {
     ? requestedLevel
     : null;
   const profileLevel = getActiveStudentProfile()?.yearLevel ?? null;
-  const selectedStarpathLevel = tryNormalizeStarpathLevel(requestedLevel) ??
-    tryNormalizeStarpathLevel(profileLevel);
 
   // Only live curriculum realms may read scoped progress. Locked realms must
   // never borrow Number Nexus placement as their selected level.
@@ -121,11 +119,16 @@ export default function RealmCarousel() {
     ? "measurement"
     : current.id === "number-nexus"
       ? "number"
+      : current.id === "starpath-realm"
+        ? "space"
       : null;
   const focusedProgress = useMemo(
     () => focusedScope ? readScopedProgress(focusedScope) : null,
     [focusedScope]
   );
+  const selectedStarpathLevel = tryNormalizeStarpathLevel(requestedLevel) ??
+    tryNormalizeStarpathLevel(focusedProgress?.year) ??
+    tryNormalizeStarpathLevel(profileLevel);
   const displayedLevel = selectedLevel ?? focusedProgress?.year ?? profileLevel ?? "Year 1";
   const levelNumber = current.id === "starpath-realm" && selectedStarpathLevel
     ? getStarpathLevel(selectedStarpathLevel).levelNumber
@@ -143,12 +146,42 @@ export default function RealmCarousel() {
     exitReviewMode();
 
     if (availability.destinationRealmId === STARPATH_REALM_ID) {
-      if (!starpathDemoActive) return;
-      if (!selectedStarpathLevel) {
-        setEntryError("Select a valid Starpath level before entering this realm.");
+      if (previewMode && starpathDemoActive) {
+        if (!selectedStarpathLevel) {
+          setEntryError("Select a valid Starpath level before entering this realm.");
+          return;
+        }
+        router.push(buildStarpathWorldHref({ selectedLevel: selectedStarpathLevel }));
         return;
       }
-      router.push(buildStarpathWorldHref({ selectedLevel: selectedStarpathLevel }));
+
+      const identity = getActiveStudentIdentity();
+      if (!identity.studentId) {
+        router.push("/login");
+        return;
+      }
+
+      setEntryError(null);
+      setEnteringRealm(current.id);
+      try {
+        const restored = await restoreStudentStateFromServer(identity.studentId, availability.progressRealmId);
+        const profile = getActiveStudentProfile();
+        const route = resolveRealmEntryRoute({
+          realmId: availability.progressRealmId,
+          progress: restored.progress,
+          fallbackYear: profile?.yearLevel ?? "Year 1",
+          introSeen: restored.introSeen,
+        });
+        if (route.startsWith(STARPATH_WORLD_ROUTE)) {
+          markRealmEntryRestored(identity.studentId, availability.progressRealmId);
+        }
+        router.push(route);
+      } catch (error) {
+        if (error instanceof StudentRestoreSupersededError) return;
+        console.warn("[RealmCarousel] Could not resolve Starpath entry", error);
+        setEntryError("We could not load Starpath. Please try again.");
+        setEnteringRealm(null);
+      }
       return;
     }
 
@@ -455,7 +488,7 @@ export default function RealmCarousel() {
                   boxShadow: `0 6px 24px ${current.colorDim}`,
                 }}
               >
-                {enteringRealm === current.id ? "Loading..." : isPreviewRealm || isStarpathRealm ? "Preview Realm" : "Enter Realm"}
+                {enteringRealm === current.id ? "Loading..." : isPreviewRealm ? "Preview Realm" : "Enter Realm"}
               </button>
             ) : current.comingSoon ? (
               <span className="inline-block px-6 py-2.5 rounded-2xl text-sm font-bold text-amber-300/80 border border-amber-400/30" style={{ background: "rgba(251,191,36,0.1)" }}>
@@ -471,9 +504,9 @@ export default function RealmCarousel() {
               </span>
             )}
 
-            {isPreviewRealm || isStarpathPreview ? (
+            {isPreviewRealm ? (
               <div className="mt-3 inline-flex items-center rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-sky-100">
-                {isStarpathRealm ? "Demo · Preview" : "Preview"}
+                Preview
               </div>
             ) : null}
 

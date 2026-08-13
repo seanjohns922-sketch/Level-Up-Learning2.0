@@ -266,24 +266,21 @@ function ProgramPage() {
 
   const legacyProgramMode = sp.get("legacy") === "1";
   const previewMode = isDemoPreviewMode();
-  const canonicalRealmId = realmId === "measurement" ? "measurement" : "number";
+  const canonicalRealmId = realmId as "number" | "measurement" | "space";
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
     typeof window !== "undefined" ? readProgramStore() : {}
   );
   const [studentProgress, setStudentProgress] = useState(() =>
-    typeof window !== "undefined" && !isStarpathRealm ? readProgress(canonicalRealmId) : null
+    typeof window !== "undefined" ? readProgress(canonicalRealmId) : null
   );
   const [canonicalStatus, setCanonicalStatus] = useState<"loading" | "ready" | "error">(
-    isStarpathRealm || DEMO_MODE || previewMode ? "ready" : "loading",
+    DEMO_MODE || previewMode ? "ready" : "loading",
   );
   const [teacherMode, setTeacherMode] = useState(() =>
     typeof window !== "undefined" ? window.localStorage.getItem(TEACHER_MODE_KEY) === "true" : false
   );
   const [teacherToast, setTeacherToast] = useState("");
-  const [starpathAccess, setStarpathAccess] = useState<"checking" | "allowed" | "denied">(
-    isStarpathRealm ? "checking" : "allowed",
-  );
   const secretTapCountRef = useRef(0);
   const [weekMenuOpen, setWeekMenuOpen] = useState(false);
   const weekMenuRef = useRef<HTMLDivElement | null>(null);
@@ -293,10 +290,10 @@ function ProgramPage() {
     return window.sessionStorage.getItem(pathwayJournalStorageKey) === "true";
   });
 
-  const unrestrictedMode = DEMO_MODE || previewMode || teacherMode || isStarpathRealm;
+  const unrestrictedMode = DEMO_MODE || previewMode || teacherMode;
 
   useEffect(() => {
-    if (isStarpathRealm || DEMO_MODE || previewMode) return;
+    if (DEMO_MODE || previewMode) return;
     const studentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY);
     if (!studentId) {
       Promise.resolve().then(() => setCanonicalStatus("error"));
@@ -317,57 +314,33 @@ function ProgramPage() {
     return () => {
       cancelled = true;
     };
-  }, [canonicalRealmId, isStarpathRealm, previewMode]);
+  }, [canonicalRealmId, previewMode]);
 
   useEffect(() => {
-    if (!isStarpathRealm) return;
-    if (DEMO_MODE) {
-      Promise.resolve().then(() => setStarpathAccess("allowed"));
-      return;
-    }
-
-    let cancelled = false;
-    void fetch("/api/demo-access", { method: "GET", cache: "no-store" })
-      .then((response) => {
-        if (!cancelled) setStarpathAccess(response.ok ? "allowed" : "denied");
-      })
-      .catch(() => {
-        if (!cancelled) setStarpathAccess("denied");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [isStarpathRealm]);
-
-  useEffect(() => {
-    if (isStarpathRealm && starpathAccess === "denied") router.replace("/realms");
-  }, [isStarpathRealm, router, starpathAccess]);
-
-  useEffect(() => {
-    if (isStarpathRealm || canonicalStatus !== "ready") return;
+    if (canonicalStatus !== "ready") return;
     if (!previewMode && !isPlacementComplete(studentProgress)) {
-      router.replace("/home");
+      router.replace(isStarpathRealm ? `/pretest?year=${encodeURIComponent(year)}&realm_id=space` : "/home");
     }
-  }, [canonicalStatus, isStarpathRealm, previewMode, router, studentProgress]);
+  }, [canonicalStatus, isStarpathRealm, previewMode, router, studentProgress, year]);
 
   useEffect(() => {
-    if (isStarpathRealm || canonicalStatus !== "ready") return;
+    if (canonicalStatus !== "ready") return;
     if (!DEMO_MODE && !previewMode && studentProgress?.year && studentProgress.year !== year) {
       const targetWeek = Math.max(1, Math.min(lastWeek, studentProgress.assignedWeek ?? 1));
-      const realmParam = canonicalRealmId === "measurement" ? "&realm_id=measurement" : "";
+      const realmParam = canonicalRealmId === "number" ? "" : `&realm_id=${canonicalRealmId}`;
       router.replace(`/program?year=${encodeURIComponent(studentProgress.year)}&week=${targetWeek}&legacy=1${realmParam}`);
       return;
     }
-  }, [canonicalRealmId, canonicalStatus, isStarpathRealm, lastWeek, previewMode, router, studentProgress, year]);
+  }, [canonicalRealmId, canonicalStatus, lastWeek, previewMode, router, studentProgress, year]);
 
   useEffect(() => {
-    if (!isStarpathRealm || !starpathProgram) return;
+    if (!isStarpathRealm || !starpathProgram || !previewMode) return;
     const current = readStarpathDemoJourney(starpathProgram.definition.yearLabel as RealmLevelId);
     writeStarpathDemoJourney(starpathProgram.definition.yearLabel as RealmLevelId, {
       ...current,
       currentWeek: weekNum,
     });
-  }, [isStarpathRealm, starpathProgram, weekNum]);
+  }, [isStarpathRealm, previewMode, starpathProgram, weekNum]);
 
   useEffect(() => {
     if (!weekMenuOpen) return;
@@ -395,9 +368,9 @@ function ProgramPage() {
   // Rebuild the browser cache from canonical rows when returning from a lesson.
   useEffect(() => {
     async function onFocus() {
-      if (isStarpathRealm || DEMO_MODE || previewMode) {
+      if (DEMO_MODE || previewMode) {
         setStore(readProgramStore());
-        setStudentProgress(isStarpathRealm ? null : readProgress(canonicalRealmId));
+        setStudentProgress(readProgress(canonicalRealmId));
         return;
       }
       const studentId = window.localStorage.getItem(ACTIVE_STUDENT_KEY);
@@ -413,7 +386,7 @@ function ProgramPage() {
     }
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
-  }, [canonicalRealmId, isStarpathRealm, previewMode]);
+  }, [canonicalRealmId, previewMode]);
 
   const assignedProgram =
     studentProgress?.status === "ASSIGNED_PROGRAM" && studentProgress.year === curriculumYear
@@ -543,7 +516,7 @@ function ProgramPage() {
       }
     }
 
-    const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
+    const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
 
     if (item.type === "lesson") {
       router.push(
@@ -576,12 +549,14 @@ function ProgramPage() {
     if (!unrestrictedMode && hasAssignedWeekAccess && !playableWeeks.includes(clamped)) return;
     if (isStarpathRealm && starpathProgram) {
       const level = starpathProgram.definition.yearLabel as RealmLevelId;
-      const current = readStarpathDemoJourney(level);
-      writeStarpathDemoJourney(level, { ...current, currentWeek: clamped });
+      if (previewMode) {
+        const current = readStarpathDemoJourney(level);
+        writeStarpathDemoJourney(level, { ...current, currentWeek: clamped });
+      }
       router.push(buildStarpathProgramHref({ selectedLevel: starpathProgram.definition.id }, clamped));
       return;
     }
-    const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
+    const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
     router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1${realmParam}`);
   }
 
@@ -636,15 +611,7 @@ function ProgramPage() {
       ? `/measurelands?level=${encodeURIComponent(curriculumYear)}`
       : "/number-nexus";
 
-  if (isStarpathRealm && starpathAccess !== "allowed") {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#070a1b] text-cyan-100">
-        <p>{starpathAccess === "denied" ? "Returning to the Tower…" : "Opening Starpath…"}</p>
-      </main>
-    );
-  }
-
-  if (!isStarpathRealm && canonicalStatus !== "ready") {
+  if (canonicalStatus !== "ready") {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#f6f2ec] px-6 text-center">
         {canonicalStatus === "loading" ? (

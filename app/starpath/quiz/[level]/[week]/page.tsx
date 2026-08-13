@@ -1,9 +1,8 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import StarpathDevelopmentQuiz from "@/components/starpath/StarpathDevelopmentQuiz";
 import StarpathVoyageQuiz from "@/components/starpath/StarpathVoyageQuiz";
 import { getStarpathQuizTasks } from "@/data/activities/starpath/ground/week1Quiz";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
-import { getServerStarpathAccess } from "@/lib/demo-session-server";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathProgramHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 
@@ -22,9 +21,6 @@ export default async function StarpathQuizPage({
   params: Promise<{ level: string; week: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const access = await getServerStarpathAccess();
-  if (!access.allowed) redirect("/realms");
-
   const [route, query] = await Promise.all([params, searchParams]);
   const level = tryNormalizeStarpathLevel(route.level);
   const week = parseWeek(route.week);

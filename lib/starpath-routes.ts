@@ -50,7 +50,6 @@ export const buildStarpathProgramHref = (context: StarpathRouteContext, week = 1
     week: String(week),
     legacy: "1",
     realm_id: STARPATH_REALM_ID,
-    demo: "1",
   });
   if (context.placementLevel) params.set("placement_level", context.placementLevel);
   return `/program?${params.toString()}`;
@@ -60,17 +59,17 @@ export const buildStarpathLessonHref = (
   week: number,
   lesson: number,
 ) => {
-  const params = new URLSearchParams({ realm_id: STARPATH_REALM_ID, demo: "1" });
+  const params = new URLSearchParams({ realm_id: STARPATH_REALM_ID });
   return `/starpath/lesson/${encodeURIComponent(context.selectedLevel)}/${week}/${lesson}?${params.toString()}`;
 };
 export const buildStarpathWeeklyQuizHref = (context: StarpathRouteContext, week: number) => {
-  const params = new URLSearchParams({ realm_id: STARPATH_REALM_ID, demo: "1" });
+  const params = new URLSearchParams({ realm_id: STARPATH_REALM_ID });
   return `/starpath/quiz/${encodeURIComponent(context.selectedLevel)}/${week}?${params.toString()}`;
 };
 export const buildStarpathPostTestHref = (context: StarpathRouteContext) =>
   buildStarpathHref("post-test", context);
 export const buildStarpathPostTestPageHref = (context: StarpathRouteContext) => {
-  const params = new URLSearchParams({ realm_id: STARPATH_REALM_ID, demo: "1" });
+  const params = new URLSearchParams({ realm_id: STARPATH_REALM_ID });
   return `/starpath/posttest/${encodeURIComponent(context.selectedLevel)}?${params.toString()}`;
 };
 

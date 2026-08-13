@@ -54,8 +54,9 @@ for (const [index, href] of hrefs.entries()) {
   assert.equal(href.includes("number-nexus"), false);
   assert.equal(href.includes("measurelands"), false);
 }
-assert.equal(new URL(hrefs[5], "https://starpath.test").searchParams.get("demo"), "1");
-assert.equal(new URL(hrefs[6], "https://starpath.test").searchParams.get("demo"), "1");
+assert.equal(new URL(hrefs[4], "https://starpath.test").searchParams.get("demo"), null);
+assert.equal(new URL(hrefs[5], "https://starpath.test").searchParams.get("demo"), null);
+assert.equal(new URL(hrefs[6], "https://starpath.test").searchParams.get("demo"), null);
 assert.equal(new URL(hrefs[4], "https://starpath.test").searchParams.get("week"), "1");
 assert.throws(() => levels.normalizeStarpathLevel("Level 8"), /Unsupported Starpath level/);
 

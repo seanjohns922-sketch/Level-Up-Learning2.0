@@ -67,10 +67,22 @@ const BRAIN_BREAK_GAME_LABELS: Record<BrainBreakGame, string> = {
   bumperblast: "Bumper Blast",
 };
 
+const STARPATH_REVIEW_BANKS: Partial<Record<YearLabel, Partial<Record<"pretest" | "posttest", string>>>> = {
+  Prep: { posttest: "ground-starpath-rc1" },
+  "Year 1": {
+    pretest: "level1-starpath-pre-rc1",
+    posttest: "level1-starpath-post-rc1",
+  },
+};
+
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
   const params = new URLSearchParams({ year, realm_id: realm });
   if (realm === "number" && year === "Year 6") {
     params.set("review_bank", "year6-number-v1");
+  }
+  if (realm === "space") {
+    const reviewBank = STARPATH_REVIEW_BANKS[year]?.[kind];
+    if (reviewBank) params.set("review_bank", reviewBank);
   }
   return `/${kind}?${params.toString()}`;
 }

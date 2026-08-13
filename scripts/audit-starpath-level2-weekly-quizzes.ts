@@ -47,7 +47,7 @@ for (const { week, kind, build } of builders) {
 }
 
 const voyageQuizSource = fs.readFileSync(path.join(process.cwd(), "components/starpath/StarpathVoyageQuiz.tsx"), "utf8");
-check(voyageQuizSource.includes('const answersAreEditable = quiz.level === "Year 2";'), "Editable responses must be scoped to Level 2 weekly quizzes.");
+check(voyageQuizSource.includes("const answersAreEditable = true;"), "Editable responses must be enabled for every Starpath weekly quiz.");
 check(voyageQuizSource.includes("Answer recorded. You can change it before finishing the quiz."), "The quiz must explain that a recorded answer can still be changed.");
 check(voyageQuizSource.includes("!answersAreEditable && currentAnswer !== undefined"), "Non-editable quiz levels must retain their first-response lock.");
 check(voyageQuizSource.includes("responses?: Record<string, string>"), "Editable selections must persist across navigation and resume.");

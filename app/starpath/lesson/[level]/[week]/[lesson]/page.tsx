@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import StarpathDevelopmentLesson from "@/components/starpath/StarpathDevelopmentLesson";
 import StarpathGroundLesson from "@/components/starpath/StarpathGroundLesson";
 import StarpathLevelOneLesson from "@/components/starpath/StarpathLevelOneLesson";
@@ -15,7 +15,6 @@ import { LEVEL_FOUR_LESSON_CONTENT } from "@/data/activities/starpath/level4";
 import { LEVEL_FIVE_LESSON_CONTENT } from "@/data/activities/starpath/level5";
 import { LEVEL_SIX_LESSON_CONTENT } from "@/data/activities/starpath/level6";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
-import { getServerStarpathAccess } from "@/lib/demo-session-server";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import {
   buildStarpathProgramHref,
@@ -37,9 +36,6 @@ export default async function StarpathLessonPage({
   params: Promise<{ level: string; week: string; lesson: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const access = await getServerStarpathAccess();
-  if (!access.allowed) redirect("/realms");
-
   const [route, query] = await Promise.all([params, searchParams]);
   const level = tryNormalizeStarpathLevel(route.level);
   const week = parseBoundedInteger(route.week, 1, 8);

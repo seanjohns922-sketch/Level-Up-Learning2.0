@@ -24,8 +24,8 @@ check(
   (carousel.match(/id: "starpath-realm"/g) ?? []).length === 1,
 );
 check(
-  "Starpath remains disabled with an explicit space destination",
-  /"starpath-realm":\s*\{[\s\S]*?enabled:\s*false[\s\S]*?progressRealmId:\s*null[\s\S]*?destinationRealmId:\s*STARPATH_REALM_ID[\s\S]*?route:\s*STARPATH_WORLD_ROUTE/.test(availability),
+  "Starpath is live with explicit space progress and destination scopes",
+  /"starpath-realm":\s*\{[\s\S]*?enabled:\s*true[\s\S]*?progressRealmId:\s*STARPATH_REALM_ID[\s\S]*?destinationRealmId:\s*STARPATH_REALM_ID[\s\S]*?route:\s*STARPATH_WORLD_ROUTE/.test(availability),
 );
 check(
   "Number Nexus and Measurelands availability is unchanged",
@@ -38,9 +38,10 @@ check(
     routes.includes('export const STARPATH_WORLD_ROUTE = "/starpath"'),
 );
 check(
-  "Starpath entry bypasses live curriculum progress restoration",
-  carousel.indexOf("availability.destinationRealmId === STARPATH_REALM_ID") <
-    carousel.indexOf("restoreStudentStateFromServer("),
+  "Starpath entry restores canonical space progress before routing",
+  carousel.includes('restoreStudentStateFromServer(identity.studentId, availability.progressRealmId)') &&
+    carousel.includes('realmId: availability.progressRealmId') &&
+    carousel.includes('route.startsWith(STARPATH_WORLD_ROUTE)'),
 );
 check(
   "The Starpath world validates realm and selected-level context",
@@ -54,14 +55,14 @@ check(
     !starpathMap.includes("restoreStudentStateFromServer"),
 );
 check(
-  "The Starpath route checks authorised demo access before rendering its client shell",
-  starpathPage.includes("await getServerStarpathAccess()") &&
-    starpathPage.includes('redirect("/realms")') &&
-    starpathPage.indexOf("if (!access.allowed)") < starpathPage.indexOf("<StarpathMap"),
+  "The Starpath world is a live route and still validates realm and level",
+  !starpathPage.includes("getServerStarpathAccess") &&
+    starpathPage.includes("realmId !== STARPATH_REALM_ID") &&
+    starpathPage.includes("tryNormalizeStarpathLevel"),
 );
 check(
-  "Starpath lessons are demo guarded and fail closed on realm identity",
-  lessonPage.includes("await getServerStarpathAccess()") &&
+  "Starpath lessons are live and fail closed on realm identity",
+  !lessonPage.includes("getServerStarpathAccess") &&
     lessonPage.includes("realmId !== STARPATH_REALM_ID") &&
     lessonPage.includes("notFound()"),
 );

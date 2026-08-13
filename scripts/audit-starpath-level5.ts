@@ -269,7 +269,7 @@ check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.p
 
 const voyageQuizSource = fs.readFileSync(path.join(process.cwd(), "components/starpath/StarpathVoyageQuiz.tsx"), "utf8");
 check(/function changeAnswer\(\)[\s\S]+delete next\[answerKey\][\s\S]+setNonce/.test(voyageQuizSource), "Level 5 weekly quizzes must reopen the current task when an answer is changed");
-check(/Correctness is shown after the quiz\.[\s\S]+Change answer/.test(voyageQuizSource), "Level 5 weekly quizzes must offer immediate answer changes without revealing correctness");
+check(/Answer recorded\. You can change it before finishing the quiz\.[\s\S]+Change answer/.test(voyageQuizSource), "Level 5 weekly quizzes must offer immediate answer changes without revealing correctness");
 
 if (failures === 0) {
   console.log(`Starpath Level 5 audit passed: ${lessons} lessons, ${generators} generated lesson tasks, 105 weekly quiz questions and 40 independent assessment items validated.`);

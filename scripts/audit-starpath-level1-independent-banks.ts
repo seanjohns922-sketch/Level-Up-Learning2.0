@@ -176,8 +176,8 @@ check(apiSource.includes("level1StarpathIndependentAssessments"), "Production AP
 check(!apiSource.includes("level1/level1PostTest"), "Production API can still resolve the retired legacy Year 1 post-test.");
 check(pretestPageSource.includes('reviewBank === "level1-starpath-pre-rc1"') && pretestPageSource.includes("isDemoPreviewMode()"), "Pre-Test review route lacks its demo-only gate.");
 check(posttestPageSource.includes('reviewBank === "level1-starpath-post-rc1"') && posttestPageSource.includes("isDemoPreviewMode()"), "Post-Test review route lacks its demo-only gate.");
-check(demoPanelSource.includes('params.set("review_bank", "level1-starpath-pre-rc1")'), "Demo panel does not launch the Year 1 Pre-Test review bank.");
-check(demoPanelSource.includes("review_bank=level1-starpath-post-rc1"), "Demo panel does not launch the Year 1 Post-Test review bank.");
+check(demoPanelSource.includes('"level1-starpath-pre-rc1"'), "Demo panel does not launch the Year 1 Pre-Test review bank.");
+check(demoPanelSource.includes('"level1-starpath-post-rc1"'), "Demo panel does not launch the Year 1 Post-Test review bank.");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85, "Pre-Test threshold must remain 85%.");
 check(ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Post-Test threshold must remain 85%.");
 

@@ -392,7 +392,7 @@ export default function StarpathVoyageQuiz({
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border-2 border-cyan-200 bg-cyan-50 px-4 py-3">
                   <div className="flex items-center gap-2 font-bold text-cyan-950">
                     <Check className="h-5 w-5 text-cyan-600" />
-                    Answer recorded. Correctness is shown after the quiz.
+                    Answer recorded. You can change it before finishing the quiz.
                   </div>
                   <button
                     type="button"

@@ -12,6 +12,7 @@ import {
   readStarpathDemoJourney,
   writeStarpathDemoSelectedLevel,
 } from "@/lib/starpath-demo-state";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import {
   getStarpathLevelForYear,
   type StarpathLevelDefinition,
@@ -139,7 +140,6 @@ export const STARPATH_DASHBOARD_CONFIG = {
     floatAnimation: "realm-character-float 4.6s ease-in-out infinite",
   },
   demo: {
-    only: true,
     unlockAllDistricts: true,
     readJourney: readStarpathDemoJourney,
     buildLevelHref: (level: RealmLevelId) => buildStarpathWorldHref({ selectedLevel: starpathLevelId(level) }),
@@ -150,8 +150,8 @@ export const STARPATH_DASHBOARD_CONFIG = {
 
 export default function StarpathMap({ level }: { level: RealmLevelId }) {
   useEffect(() => {
-    writeStarpathDemoSelectedLevel(level);
+    if (isDemoPreviewMode()) writeStarpathDemoSelectedLevel(level);
   }, [level]);
 
-  return <RealmDashboardShell config={STARPATH_DASHBOARD_CONFIG} level={level} progress={null} />;
+  return <RealmDashboardShell config={STARPATH_DASHBOARD_CONFIG} level={level} />;
 }
