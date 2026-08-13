@@ -4,12 +4,14 @@ import path from "node:path";
 const root=process.cwd();
 const read=(file)=>fs.readFileSync(path.join(root,file),"utf8");
 const migration=read("supabase/migrations/20260811170000_platform_admin_pa3_operations_growth.sql");
+const homeUsersMigration=read("supabase/migrations/20260813143000_platform_admin_home_users.sql");
 const server=read("lib/platform-admin-server.ts");
 const layout=read("app/admin/layout.tsx");
 const users=read("app/admin/users/page.tsx");
 const controls=read("components/admin/UserExplorerControls.tsx");
 const studentDetail=read("app/admin/users/students/[studentId]/page.tsx");
 const homeOnly=read("app/admin/growth/home-only/page.tsx");
+const homeUsers=read("app/admin/home/users/page.tsx");
 const docs=read("docs/PLATFORM_ADMIN_PHASE_PA3_OPERATIONS_GROWTH.md");
 let passed=0,failed=0;const failures=[];
 function check(name,condition){if(condition){passed++;console.log(`PASS ${name}`)}else{failed++;failures.push(name);console.error(`FAIL ${name}`)}}
@@ -25,6 +27,7 @@ check("cross-school visibility is owner-only",has(layout,"requirePlatformOwner")
 check("User Explorer results are owner-authorised",new RegExp("function public\\.search_platform_admin_users[^]*?is_platform_owner\\(\\)").test(migration));
 check("revoked owner rejected by canonical role status",has(read("supabase/migrations/20260811100000_platform_admin_pa1.sql"),"role.status = 'active'","profile.status = 'active'"));
 for(const fn of ["get_platform_admin_operations_snapshot","get_platform_admin_growth_snapshot","get_platform_admin_engagement_snapshot","get_platform_admin_home_only_snapshot","search_platform_admin_users","get_platform_admin_student_detail","get_platform_admin_adult_detail"])check(`${fn} owner guard`,new RegExp(`function public\\.${fn}[^]*?is_platform_owner\\(\\)`).test(migration));
+check("get_platform_admin_home_users owner guard",new RegExp("function public\\.get_platform_admin_home_users[^]*?is_platform_owner\\(\\)").test(homeUsersMigration));
 check("anonymous execution revoked",(migration.match(/revoke all on function/g)??[]).length>=7);
 check("no credential table queried",!migration.includes("student_access_credentials"));
 check("no auth secrets exposed",!["encrypted_password","raw_app_meta_data","refresh_token","credential_secret"].some(v=>migration.includes(v)));
@@ -78,6 +81,9 @@ for(const segment of ["no_parent_linked","home_active","no_home_access"])check(`
 check("Home Only excluded from funnel",migration.includes("not exists(select 1 from school_students"));
 check("Home Only has a separate aggregate",server.includes("get_platform_admin_home_only_snapshot"));
 check("Home Only has a separate route",has(homeOnly,"loadPlatformHomeOnly","Home Only students","Active · 7 days"));
+check("Home users contact list has owner RPC",has(homeUsersMigration,"get_platform_admin_home_users","parentEmail","student_access_entitlements","parent_student_links"));
+check("Home users contact list has admin route",has(homeUsers,"loadPlatformHomeUsers","Parent emails","Contact-data note"));
+check("Home page links Home users route",read("app/admin/home/page.tsx").includes('href="/admin/home/users"'));
 check("multiple parents deduplicated",migration.includes("count(distinct link.student_id)"));
 check("one parent multiple children counted by child",migration.includes("count(distinct ss.student_id)"));
 check("archived schools excluded from growth",migration.includes("school.status <> 'archived'"));
@@ -93,6 +99,7 @@ check("overview is one snapshot read",server.includes("get_platform_admin_operat
 check("growth is one snapshot read",server.includes("get_platform_admin_growth_snapshot"));
 check("analytics is one snapshot read",server.includes("get_platform_admin_engagement_snapshot"));
 check("Home Only is one snapshot read",server.includes("loadPlatformHomeOnly"));
+check("Home users is one snapshot read",server.includes("loadPlatformHomeUsers"));
 check("User Explorer is one search read",server.includes("search_platform_admin_users"));
 check("no client-side full directory",!controls.match(/fetch\(|supabase|students\.filter/));
 for(const index of ["student_lesson_attempts_pa3_activity_idx","student_weekly_quiz_attempts_pa3_activity_idx","student_realm_assessments_pa3_activity_idx","parent_student_links_pa3_active_idx","user_profiles_pa3_email_idx","user_profiles_pa3_name_idx","students_pa3_name_idx","students_pa3_username_idx"])check(`index ${index}`,migration.includes(index));

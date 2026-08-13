@@ -179,6 +179,39 @@ export type PlatformEngagementSnapshot = {
 
 export type PlatformHomeOnlySnapshot = { generatedAt: string; timezone: string; students: number; active7d: number; parents: number; events7d: number; averageActivity7d: number };
 
+export type PlatformHomeUsersSnapshot = {
+  generatedAt: string;
+  timezone: string;
+  totals: {
+    homeUsers: number;
+    homeOnly: number;
+    schoolAndHome: number;
+    linkedParents: number;
+    parentEmails: number;
+    withoutParentEmail: number;
+  };
+  students: Array<{
+    studentId: string;
+    studentName: string;
+    username: string | null;
+    yearLevel: string | null;
+    explorerCode: string | null;
+    segment: "home_only" | "school_and_home";
+    schoolName: string | null;
+    billingStatus: string | null;
+    homeStartedAt: string | null;
+    homeEndsAt: string | null;
+    lastActiveAt: string | null;
+    parents: Array<{
+      parentUserId: string | null;
+      parentName: string | null;
+      parentEmail: string | null;
+      relationship: string | null;
+      linkedAt: string | null;
+    }>;
+  }>;
+};
+
 export type PlatformUserSearch = {
   items: Array<{ id: string; userType: "student" | "parent" | "educator"; name: string; identifier: string | null; explorerCode: string | null; detail: string | null; schoolName: string | null; className: string | null; segment: string; parentLinked: boolean; active: boolean; lastActivity: string | null }>;
   schools: Array<{ id: string; name: string }>;
@@ -304,6 +337,12 @@ export async function loadPlatformHomeOnly() {
   const access = await requirePlatformOwner();
   if (!access) return null;
   return { access, snapshot: await adminRequest<PlatformHomeOnlySnapshot>("get_platform_admin_home_only_snapshot", access.accessToken) };
+}
+
+export async function loadPlatformHomeUsers() {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  return { access, snapshot: await adminRequest<PlatformHomeUsersSnapshot>("get_platform_admin_home_users", access.accessToken) };
 }
 
 export async function searchPlatformAdminUsers(params: { query?: string; userType?: string; segment?: string; activity?: string; schoolId?: string; page?: number; pageSize?: number }) {
