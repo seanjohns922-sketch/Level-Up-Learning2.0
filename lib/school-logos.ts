@@ -30,5 +30,17 @@ export function getSchoolLogo(school: { name?: string | null; code?: string | nu
     };
   }
 
+  if (
+    codeKey === "stpatssta2026"
+    || nameKey === "stpatricksprimaryschoolstawell"
+    || nameKey === "stpatricksschoolstawell"
+    || nameKey === "stpatricksstawell"
+  ) {
+    return {
+      src: "/schools/st-patricks-stawell-logo.jpg",
+      alt: `${school.name ?? "St Patrick's Stawell"} logo`,
+    };
+  }
+
   return null;
 }
