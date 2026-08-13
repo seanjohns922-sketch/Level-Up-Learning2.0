@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useId, useRef } from "react";
+import { WeaponShapes, isWeaponKey } from "@/components/avatar/WeaponArt";
 
 // Every avatar instance gets a unique gradient-id prefix. Duplicate SVG ids
 // across the many avatars on a page (e.g. wardrobe thumbnails) are invalid and
@@ -81,6 +82,9 @@ export type AvatarOutfit = {
   capeColor?: string;
   backpack?: BackpackStyle;
   backpackColor?: string;
+  /** Held item (weapon) key from WEAPONS, or "none". */
+  held?: string;
+  heldColor?: string;
   /** @deprecated retained for older saved outfits — dedicated fields above supersede it. */
   accessory?: "none" | "backpack" | "glasses";
 };
@@ -108,6 +112,8 @@ export const DEFAULT_OUTFIT: Required<AvatarOutfit> = {
   capeColor: "#7c3aed",
   backpack: "none",
   backpackColor: "#f59e0b",
+  held: "none",
+  heldColor: "",
   accessory: "none",
 };
 
@@ -441,6 +447,16 @@ function BackpackStraps({ o }: { o: Outfit }) {
       <path d="M75 100 L71 152" stroke={o.backpackColor} strokeWidth="6" strokeLinecap="round" />
       <rect x="46" y="126" width="6" height="5" rx="1.5" fill="#000" opacity="0.3" />
       <rect x="68" y="126" width="6" height="5" rx="1.5" fill="#000" opacity="0.3" />
+    </g>
+  );
+}
+
+// ── Held item (weapon) — anchored to the right hand at (96,156) ─────────────
+function WeaponLayer({ o }: { o: Outfit }) {
+  if (!isWeaponKey(o.held)) return null;
+  return (
+    <g data-layer="held" transform="translate(96 156)">
+      <WeaponShapes held={o.held} color={o.heldColor || undefined} />
     </g>
   );
 }
@@ -1027,6 +1043,9 @@ export default function StudentAvatar({
         {IMAGE_HAIR_READY[o.hairStyle] ? <HairImageLayer style={o.hairStyle} /> : <HairLayer o={o} />}
         <HatLayer o={o} />
         <GlassesLayer o={o} />
+
+        {/* ── HELD ITEM (weapon) — topmost so flames/glow read ── */}
+        <WeaponLayer o={o} />
         </GradientIdContext.Provider>
       </svg>
 

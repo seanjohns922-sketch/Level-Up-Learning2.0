@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { EconomyItem } from "@/lib/economy";
+import { WeaponShapes } from "@/components/avatar/WeaponArt";
 
 type ItemMeta = Record<string, unknown>;
 
@@ -72,6 +73,12 @@ function BackpackArt({ meta }: { meta: ItemMeta }) {
   return <><rect x="44" y="28" width="72" height="82" rx="22" fill={color} stroke="#0f172a" strokeOpacity="0.48" strokeWidth="4" /><path d="M57 31q23-24 46 0M52 73h56v26H52Z" fill="none" stroke="#fde68a" strokeWidth="6" />{rocket ? <><path d="M45 63 28 77v33h17Zm70 0 17 14v33h-17Z" fill="#cbd5e1" stroke="#475569" strokeWidth="3" /><path d="m34 111 8 15 8-15m60 0 8 15 8-15" fill="#fb923c" /></> : <circle cx="80" cy="86" r="8" fill="#fde68a" />}</>;
 }
 
+function HandArt({ meta }: { meta: ItemMeta }) {
+  const held = value(meta, "held", "");
+  const color = typeof meta.heldColor === "string" ? meta.heldColor : undefined;
+  return <g transform="translate(80 118) scale(1.3)"><WeaponShapes held={held} color={color} /></g>;
+}
+
 function OutfitArt({ meta }: { meta: ItemMeta }) {
   return <><g transform="translate(0 -18) scale(1 .78)"><TopArt meta={meta} /></g><g transform="translate(0 68) scale(1 .55)"><BottomArt meta={meta} /></g><g transform="translate(28 119) scale(.65 .45)"><FootwearArt meta={meta} /></g></>;
 }
@@ -87,6 +94,7 @@ export default function MarketplaceAvatarItemArt({ item }: { item: EconomyItem }
   else if (slot === "avatar_glasses") artwork = <GlassesArt meta={meta} />;
   else if (slot === "avatar_cape") artwork = <CapeArt meta={meta} />;
   else if (slot === "avatar_backpack") artwork = <BackpackArt meta={meta} />;
+  else if (slot === "avatar_hand") artwork = <HandArt meta={meta} />;
   else artwork = <OutfitArt meta={meta} />;
 
   return <svg viewBox="0 0 160 140" className="h-full w-full" role="img" aria-label={`${item.name} product artwork`}>{artwork}</svg>;

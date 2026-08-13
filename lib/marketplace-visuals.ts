@@ -17,7 +17,7 @@ const LEGACY_PET_KEYS = new Set(["pet_circuit_owl", "pet_baby_turtle"]);
 
 const AVATAR_EQUIP_SLOTS = new Set([
   "avatar_outfit", "avatar_hat", "avatar_glasses", "avatar_cape",
-  "avatar_backpack", "top", "bottom", "footwear",
+  "avatar_backpack", "avatar_hand", "top", "bottom", "footwear",
 ]);
 
 function unavailable(item: EconomyItem): MarketplaceVisual {

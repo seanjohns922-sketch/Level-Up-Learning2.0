@@ -15,6 +15,7 @@ export const AVATAR_LAYER_SLOTS = [
   "avatar_glasses",
   "avatar_cape",
   "avatar_backpack",
+  "avatar_hand",
 ] as const;
 export type AvatarLayerSlot = (typeof AVATAR_LAYER_SLOTS)[number];
 
