@@ -45,6 +45,7 @@ type SavedVoyageQuiz = {
   order: number[];
   index: number;
   answers: Record<string, boolean>;
+  responses?: Record<string, string>;
 };
 
 const QUIZ_XP = 20;
@@ -75,12 +76,14 @@ export default function StarpathVoyageQuiz({
   const router = useRouter();
   const theme = REALM_QUIZ_THEMES.space;
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
+  const answersAreEditable = quiz.level === "Year 2";
   const storageKey = `starpath-voyage-quiz:v2:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
   const [order, setOrder] = useState<number[]>(() => tasks.map((_, index) => index));
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
+  const [responses, setResponses] = useState<Record<string, string>>({});
   const [nonce, setNonce] = useState(0);
   const [hasResume, setHasResume] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
@@ -135,6 +138,7 @@ export default function StarpathVoyageQuiz({
       setOrder(saved.order);
       setIndex(Math.min(saved.index, tasks.length - 1));
       setAnswers(saved.answers);
+      setResponses(saved.responses ?? {});
       setHasResume(Object.keys(saved.answers).length > 0);
     } catch {
       localStorage.removeItem(storageKey);
@@ -144,13 +148,16 @@ export default function StarpathVoyageQuiz({
 
   useEffect(() => {
     if (phase !== "quiz") return;
-    const saved: SavedVoyageQuiz = { version: 2, order, index, answers };
+    const saved: SavedVoyageQuiz = { version: 2, order, index, answers, responses };
     localStorage.setItem(storageKey, JSON.stringify(saved));
-  }, [answers, index, order, phase, storageKey]);
+  }, [answers, index, order, phase, responses, storageKey]);
 
-  function answer(ok: boolean) {
-    if (!task || currentAnswer !== undefined) return;
+  function answer(ok: boolean, response?: string) {
+    if (!task || (!answersAreEditable && currentAnswer !== undefined)) return;
     setAnswers((current) => ({ ...current, [String(index)]: ok }));
+    if (response) {
+      setResponses((current) => ({ ...current, [String(index)]: response }));
+    }
   }
 
   function beginQuiz() {
@@ -158,6 +165,7 @@ export default function StarpathVoyageQuiz({
       setOrder(lessonOrder(tasks.length));
       setIndex(0);
       setAnswers({});
+      setResponses({});
       localStorage.removeItem(storageKey);
     }
     setStartedAt((current) => current ?? Date.now());
@@ -248,6 +256,7 @@ export default function StarpathVoyageQuiz({
   function restart() {
     setOrder(lessonOrder(tasks.length));
     setAnswers({});
+    setResponses({});
     setIndex(0);
     setNonce((value) => value + 1);
     setFinalScore(0);
@@ -346,16 +355,19 @@ export default function StarpathVoyageQuiz({
               </div>
 
               {task ? (
-                <div className={currentAnswer !== undefined ? "pointer-events-none opacity-75" : ""}>
+                <div className={!answersAreEditable && currentAnswer !== undefined ? "pointer-events-none opacity-75" : ""}>
                   <TaskRenderer
                     key={`${index}-${nonce}`}
                     task={task}
                     taskNonce={nonce}
                     assessmentMode
+                    editableAssessmentMode={answersAreEditable}
+                    assessmentAnswer={responses[String(index)]}
                     callbacks={{
                       markCorrect: () => answer(true),
                       markCorrectSoft: () => answer(true),
                       markWrong: () => answer(false),
+                      recordAssessmentAnswer: (correct, response) => answer(correct, response),
                     }}
                   />
                 </div>
@@ -364,7 +376,9 @@ export default function StarpathVoyageQuiz({
               {currentAnswer !== undefined ? (
                 <div className="mt-5 flex items-center gap-2 rounded-lg border-2 border-cyan-200 bg-cyan-50 px-4 py-3 font-bold text-cyan-950">
                   <Check className="h-5 w-5 text-cyan-600" />
-                  Answer submitted
+                  {answersAreEditable && responses[String(index)]
+                    ? "Answer recorded. You can change it before finishing the quiz."
+                    : "Answer submitted"}
                 </div>
               ) : null}
 

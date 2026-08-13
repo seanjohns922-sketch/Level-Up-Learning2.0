@@ -46,6 +46,22 @@ for (const { week, kind, build } of builders) {
   check(!source.includes("LEVEL_TWO_LESSON_CONTENT") && !source.includes("level2PostTest"), `Week ${week} quiz imports a lesson registry or assessment.`);
 }
 
+const voyageQuizSource = fs.readFileSync(path.join(process.cwd(), "components/starpath/StarpathVoyageQuiz.tsx"), "utf8");
+check(voyageQuizSource.includes('const answersAreEditable = quiz.level === "Year 2";'), "Editable responses must be scoped to Level 2 weekly quizzes.");
+check(voyageQuizSource.includes("Answer recorded. You can change it before finishing the quiz."), "The quiz must explain that a recorded answer can still be changed.");
+check(voyageQuizSource.includes("!answersAreEditable && currentAnswer !== undefined"), "Non-editable quiz levels must retain their first-response lock.");
+check(voyageQuizSource.includes("responses?: Record<string, string>"), "Editable selections must persist across navigation and resume.");
+check(voyageQuizSource.includes("recordAssessmentAnswer"), "Replacement responses must update both selection and score.");
+
+for (const componentPath of [
+  "components/starpath/StarpathShapeFeatureCard.tsx",
+  "components/starpath/StarpathMapCard.tsx",
+  "components/starpath/StarpathMapRouteCard.tsx",
+]) {
+  const source = fs.readFileSync(path.join(process.cwd(), componentPath), "utf8");
+  check(source.includes("editableAssessmentMode"), `${componentPath} must support neutral editable assessment selection.`);
+}
+
 console.log(`Level 2 Starpath weekly-quiz audit: ${passed} passed, ${failures.length} failed.`);
 console.log("Routes: 7/7. Questions: 105/105. Allocation: 5-5-5 in every weekly quiz.");
 if (failures.length) {

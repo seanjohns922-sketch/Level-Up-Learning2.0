@@ -127,16 +127,22 @@ function ArrowPad({ onPick, wrong, disabled }: { onPick: (d: Direction) => void;
 }
 
 // ── Test & Fix: find the broken step in a route drawn across the map ──────────
-function DebugRoute({ task, onCorrect, onWrong }: { task: MapRouteTask; onCorrect: () => void; onWrong: () => void }) {
+function DebugRoute({ task, onCorrect, onWrong, editableAssessmentMode = false, assessmentAnswer, onAssessmentAnswer }: { task: MapRouteTask; onCorrect: () => void; onWrong: () => void; editableAssessmentMode?: boolean; assessmentAnswer?: string; onAssessmentAnswer?: (correct: boolean, response: string) => void }) {
   const [wrongTap, setWrongTap] = useState<string | null>(null);
   const steps = task.debugSteps ?? [];
 
   function tap(id: string) {
+    if (editableAssessmentMode && onAssessmentAnswer) {
+      onAssessmentAnswer(id === task.wrongStepId, id);
+      return;
+    }
     if (id === task.wrongStepId) {
       onCorrect();
     } else {
-      setWrongTap(id);
-      setTimeout(() => setWrongTap((v) => (v === id ? null : v)), 440);
+      if (!editableAssessmentMode) {
+        setWrongTap(id);
+        setTimeout(() => setWrongTap((v) => (v === id ? null : v)), 440);
+      }
       onWrong();
     }
   }
@@ -156,8 +162,9 @@ function DebugRoute({ task, onCorrect, onWrong }: { task: MapRouteTask; onCorrec
               key={step.id}
               type="button"
               aria-label={`Step ${index + 1}: ${DIRECTION_WORD[step.direction]}`}
+              aria-pressed={editableAssessmentMode ? assessmentAnswer === step.id : undefined}
               onClick={() => tap(step.id)}
-              className={["flex min-h-14 items-center gap-1.5 rounded-2xl border-2 px-3 py-2 font-black text-indigo-950 transition active:scale-95", wrongTap === step.id ? "sp-mroute-shake border-rose-400 bg-rose-100" : "border-violet-200 bg-white hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-md"].join(" ")}
+              className={["flex min-h-14 items-center gap-1.5 rounded-2xl border-2 px-3 py-2 font-black text-indigo-950 transition active:scale-95", wrongTap === step.id ? "sp-mroute-shake border-rose-400 bg-rose-100" : editableAssessmentMode && assessmentAnswer === step.id ? "border-cyan-600 bg-cyan-50 ring-4 ring-cyan-200" : "border-violet-200 bg-white hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-md"].join(" ")}
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-100 text-xs">{index + 1}</span>
               <Icon className="h-5 w-5" strokeWidth={2.75} />
@@ -171,7 +178,7 @@ function DebugRoute({ task, onCorrect, onWrong }: { task: MapRouteTask; onCorrec
   );
 }
 
-export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () => void; onWrong: (studentAnswer?: string) => void; onComplete: () => void }) {
+export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () => void; onWrong: (studentAnswer?: string) => void; onComplete: () => void; editableAssessmentMode?: boolean; assessmentAnswer?: string; onAssessmentAnswer?: (correct: boolean, response: string) => void }) {
   const { task } = props;
   const [rover, setRover] = useState<Cell>(task.start);
   const [stepIndex, setStepIndex] = useState(0);
@@ -262,7 +269,7 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
   }
 
   if (task.mode === "debug") {
-    return <DebugRoute task={task} onCorrect={props.onCorrect} onWrong={props.onWrong} />;
+    return <DebugRoute task={task} onCorrect={props.onCorrect} onWrong={props.onWrong} editableAssessmentMode={props.editableAssessmentMode} assessmentAnswer={props.assessmentAnswer} onAssessmentAnswer={props.onAssessmentAnswer} />;
   }
 
   if (task.mode === "choose") {
@@ -316,8 +323,8 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
               Visit the checkpoint, dodge the asteroids, and reach the goal. Plan carefully — you get one run.
             </p>
           ) : null}
-          {status === "fail" ? <p className="sp-mroute-shake mt-3 flex items-center justify-center gap-1.5 text-center text-sm font-black text-rose-600"><X className="h-4 w-4" strokeWidth={3} /> {isMission ? "Mission not complete — moving on." : "Not there yet — moving on."}</p> : null}
-          {status === "done" ? <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-sm font-black text-emerald-600"><Check className="h-4 w-4" strokeWidth={3} /> {task.feedback.correct}</p> : null}
+          {!props.editableAssessmentMode && status === "fail" ? <p className="sp-mroute-shake mt-3 flex items-center justify-center gap-1.5 text-center text-sm font-black text-rose-600"><X className="h-4 w-4" strokeWidth={3} /> {isMission ? "Mission not complete — moving on." : "Not there yet — moving on."}</p> : null}
+          {!props.editableAssessmentMode && status === "done" ? <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-sm font-black text-emerald-600"><Check className="h-4 w-4" strokeWidth={3} /> {task.feedback.correct}</p> : null}
         </div>
         {ROUTE_STYLE}
       </div>
@@ -337,7 +344,7 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
         {step && !reached ? <ReadAloudBtn text={step.speakText} size="md" label="Read" className="shrink-0" /> : null}
       </div>
       <div className="mx-auto max-w-3xl"><MapBase task={task} rover={rover} reached={reached} /></div>
-      <ArrowPad onPick={follow} wrong={wrong} />
+      <ArrowPad onPick={follow} wrong={props.editableAssessmentMode ? null : wrong} />
       <p className="mt-3 text-center text-sm font-semibold text-slate-600">Step {Math.min(stepIndex + 1, task.steps?.length ?? 1)} of {task.steps?.length ?? 1}</p>
       {ROUTE_STYLE}
     </div>

@@ -41,10 +41,12 @@ function MapView({
   task,
   onLandmarkTap,
   wrongId,
+  selectedId,
 }: {
   task: MapTask;
   onLandmarkTap?: (id: string) => void;
   wrongId?: string | null;
+  selectedId?: string | null;
 }) {
   return (
     <DirectionGrid cols={task.cols} rows={task.rows}>
@@ -97,6 +99,8 @@ function MapView({
                   "flex h-[92%] w-[92%] items-center justify-center rounded-xl border-2 transition active:scale-95",
                   wrongId === landmark.id
                     ? "sp-map-shake border-rose-400 bg-rose-500/20"
+                    : selectedId === landmark.id
+                      ? "border-cyan-300 bg-cyan-300/25 ring-2 ring-cyan-300"
                     : "border-white/20 bg-white/5 hover:border-cyan-300 hover:bg-white/15",
                 ].join(" ")}
               >
@@ -133,19 +137,31 @@ export function StarpathMapCard({
   task,
   onCorrect,
   onWrong,
+  editableAssessmentMode = false,
+  assessmentAnswer,
+  onAssessmentAnswer,
 }: {
   task: MapTask;
   onCorrect: () => void;
   onWrong: () => void;
+  editableAssessmentMode?: boolean;
+  assessmentAnswer?: string;
+  onAssessmentAnswer?: (correct: boolean, response: string) => void;
 }) {
   const [wrongId, setWrongId] = useState<string | null>(null);
 
   function tapLandmark(id: string) {
+    if (editableAssessmentMode && onAssessmentAnswer) {
+      onAssessmentAnswer(id === task.correctLandmarkId, id);
+      return;
+    }
     if (id === task.correctLandmarkId) {
       onCorrect();
     } else {
-      setWrongId(id);
-      setTimeout(() => setWrongId((v) => (v === id ? null : v)), 420);
+      if (!editableAssessmentMode) {
+        setWrongId(id);
+        setTimeout(() => setWrongId((v) => (v === id ? null : v)), 420);
+      }
       onWrong();
     }
   }
@@ -157,7 +173,7 @@ export function StarpathMapCard({
         <TaskHeading prompt={task.prompt} speech={task.speakText} />
         <MapKey task={task} />
         <div className="mx-auto max-w-3xl">
-          <MapView task={task} onLandmarkTap={tapLandmark} wrongId={wrongId} />
+          <MapView task={task} onLandmarkTap={tapLandmark} wrongId={wrongId} selectedId={assessmentAnswer} />
         </div>
         <p className="mt-3 text-center text-sm font-semibold text-slate-600">Tap the place on the map.</p>
         {MAP_STYLE}
@@ -189,8 +205,16 @@ export function StarpathMapCard({
           <button
             key={option.id}
             type="button"
-            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
-            className="relative flex min-h-14 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+            aria-pressed={editableAssessmentMode ? assessmentAnswer === option.id : undefined}
+            onClick={() => {
+              if (editableAssessmentMode && onAssessmentAnswer) {
+                onAssessmentAnswer(option.id === task.correctOptionId, option.id);
+                return;
+              }
+              if (option.id === task.correctOptionId) onCorrect();
+              else onWrong();
+            }}
+            className={`relative flex min-h-14 items-center justify-center rounded-2xl border-2 bg-white px-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98] ${editableAssessmentMode && assessmentAnswer === option.id ? "border-cyan-600 bg-cyan-50 ring-4 ring-cyan-200" : "border-violet-200"}`}
           >
             <span className="text-base font-black text-indigo-950">{option.label}</span>
             <OptionReadAloudButton text={option.label} className="absolute right-2 top-1/2 -translate-y-1/2" />

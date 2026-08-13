@@ -24,10 +24,16 @@ export function StarpathShapeFeatureCard({
   task,
   onCorrect,
   onWrong,
+  editableAssessmentMode = false,
+  assessmentAnswer,
+  onAssessmentAnswer,
 }: {
   task: FeatureTask;
   onCorrect: () => void;
   onWrong: () => void;
+  editableAssessmentMode?: boolean;
+  assessmentAnswer?: string;
+  onAssessmentAnswer?: (correct: boolean, response: string) => void;
 }) {
   const twoUp = task.mode === "compare" && task.shapes.length === 2;
   const iconOptions = task.options.some((option) => option.shapeId);
@@ -68,9 +74,20 @@ export function StarpathShapeFeatureCard({
           <button
             key={option.id}
             type="button"
-            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            aria-pressed={editableAssessmentMode ? assessmentAnswer === option.id : undefined}
+            onClick={() => {
+              if (editableAssessmentMode && onAssessmentAnswer) {
+                onAssessmentAnswer(option.id === task.correctOptionId, option.id);
+                return;
+              }
+              if (option.id === task.correctOptionId) onCorrect();
+              else onWrong();
+            }}
             className={[
               "relative flex items-center justify-center rounded-2xl border-2 border-violet-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]",
+              editableAssessmentMode && assessmentAnswer === option.id
+                ? "border-cyan-600 bg-cyan-50 ring-4 ring-cyan-200"
+                : "",
               option.shapeId ? "min-h-28 p-3" : "min-h-24 px-4 py-3",
             ].join(" ")}
           >

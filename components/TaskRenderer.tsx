@@ -215,6 +215,7 @@ type Callbacks = {
   markWrong: (studentAnswer?: string | number | null) => void;
   advanceIntro?: () => void;
   markAttempted?: () => void;
+  recordAssessmentAnswer?: (correct: boolean, response: string) => void;
 };
 
 function TaskRecoveryCard({
@@ -308,13 +309,17 @@ function TaskRendererInner({
   taskNonce,
   callbacks,
   assessmentMode = false,
+  editableAssessmentMode = false,
+  assessmentAnswer,
 }: {
   task: PracticeTask;
   taskNonce: number;
   callbacks: Callbacks;
   assessmentMode?: boolean;
+  editableAssessmentMode?: boolean;
+  assessmentAnswer?: string;
 }) {
-  const { markCorrect, markCorrectSoft, markWrong, advanceIntro, markAttempted } = callbacks;
+  const { markCorrect, markCorrectSoft, markWrong, advanceIntro, markAttempted, recordAssessmentAnswer } = callbacks;
   const isIntroTask = "scene" in task && task.scene === "intro";
   const onC = () => setTimeout(() => {
     if (isIntroTask && advanceIntro) {
@@ -687,13 +692,13 @@ function TaskRendererInner({
     case "starpathObjectMatch":
       return <StarpathObjectMatchCard key={k} task={t} onComplete={onC} />;
     case "starpathMapLocate":
-      return <StarpathMapCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathMapCard key={k} task={t} onCorrect={onC} onWrong={onW} editableAssessmentMode={editableAssessmentMode} assessmentAnswer={assessmentAnswer} onAssessmentAnswer={recordAssessmentAnswer} />;
     case "starpathMapCreate":
       return <StarpathMapCreateCard key={k} task={t} onComplete={onC} onWrong={onW} />;
     case "starpathShapeFeature":
-      return <StarpathShapeFeatureCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathShapeFeatureCard key={k} task={t} onCorrect={onC} onWrong={onW} editableAssessmentMode={editableAssessmentMode} assessmentAnswer={assessmentAnswer} onAssessmentAnswer={recordAssessmentAnswer} />;
     case "starpathMapRoute":
-      return <StarpathMapRouteCard key={k} task={t} onCorrect={onC} onWrong={onW} onComplete={onC} />;
+      return <StarpathMapRouteCard key={k} task={t} onCorrect={onC} onWrong={onW} onComplete={onC} editableAssessmentMode={editableAssessmentMode} assessmentAnswer={assessmentAnswer} onAssessmentAnswer={recordAssessmentAnswer} />;
     case "starpathSteer":
       return <StarpathSteerCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathGridReference":
