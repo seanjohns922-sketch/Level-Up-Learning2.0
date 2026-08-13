@@ -114,10 +114,12 @@ export default function LoginPage() {
   const [parentError, setParentError] = useState<string | null>(null);
   const [parentNotice, setParentNotice] = useState<string | null>(null);
   const [parentLoading, setParentLoading] = useState(false);
+  const [parentResetLoading, setParentResetLoading] = useState(false);
   const [parentLinkExisting, setParentLinkExisting] = useState(false);
   const [parentExplorerCode, setParentExplorerCode] = useState("");
   const [parentStudentPin, setParentStudentPin] = useState("");
   const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
+  const [recoveryAudience, setRecoveryAudience] = useState<"teacher" | "parent">("teacher");
   const [recoveryPassword, setRecoveryPassword] = useState("");
   const [recoveryConfirmPassword, setRecoveryConfirmPassword] = useState("");
   const [recoveryError, setRecoveryError] = useState<string | null>(null);
@@ -171,11 +173,23 @@ export default function LoginPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
-        setTab("teacher");
-        setTeacherMode("login");
+        const audience =
+          typeof window !== "undefined" &&
+          new URLSearchParams(window.location.search).get("recovery") === "parent"
+            ? "parent"
+            : "teacher";
+        setRecoveryAudience(audience);
+        setTab(audience);
+        if (audience === "parent") {
+          setParentMode("login");
+        } else {
+          setTeacherMode("login");
+        }
         setPasswordRecoveryMode(true);
         setTeacherError(null);
         setTeacherResetNotice(null);
+        setParentError(null);
+        setParentNotice(null);
         setRecoveryError(null);
         setRecoverySuccess(null);
       }
@@ -309,29 +323,63 @@ export default function LoginPage() {
     setTeacherLoading(false);
   }
 
-  async function handleTeacherPasswordReset() {
-    const email = teacherEmail.trim();
+  async function handlePasswordReset(audience: "teacher" | "parent") {
+    const email = (audience === "parent" ? parentEmail : teacherEmail).trim();
     if (!email) {
-      setTeacherError("Enter your email first.");
+      if (audience === "parent") {
+        setParentError("Enter your parent email first.");
+      } else {
+        setTeacherError("Enter your email first.");
+      }
       return;
     }
 
-    setTeacherError(null);
-    setTeacherResetNotice(null);
-    setTeacherResetLoading(true);
+    if (audience === "parent") {
+      setParentError(null);
+      setParentNotice(null);
+      setParentResetLoading(true);
+    } else {
+      setTeacherError(null);
+      setTeacherResetNotice(null);
+      setTeacherResetLoading(true);
+    }
     const redirectTo =
-      typeof window !== "undefined" ? `${window.location.origin}/login` : undefined;
+      typeof window !== "undefined"
+        ? `${window.location.origin}/login?recovery=${audience}`
+        : undefined;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo,
     });
-    setTeacherResetLoading(false);
+    if (audience === "parent") {
+      setParentResetLoading(false);
+    } else {
+      setTeacherResetLoading(false);
+    }
 
     if (error) {
-      setTeacherError(getAuthErrorMessage(error, "The reset link could not be sent. Please try again."));
+      const message = getAuthErrorMessage(error, "The reset link could not be sent. Please try again.");
+      if (audience === "parent") {
+        setParentError(message);
+      } else {
+        setTeacherError(message);
+      }
       return;
     }
 
-    setTeacherResetNotice("Reset link sent. Check your email.");
+    const notice = "If an account exists for that email, a reset link has been sent.";
+    if (audience === "parent") {
+      setParentNotice(notice);
+    } else {
+      setTeacherResetNotice(notice);
+    }
+  }
+
+  async function handleTeacherPasswordReset() {
+    await handlePasswordReset("teacher");
+  }
+
+  async function handleParentPasswordReset() {
+    await handlePasswordReset("parent");
   }
 
   async function handleParentAuthentication() {
@@ -469,12 +517,11 @@ export default function LoginPage() {
       return;
     }
 
-    setRecoverySuccess("Password updated. Redirecting…");
+    setRecoverySuccess("Password updated. Redirecting...");
     setRecoveryPassword("");
     setRecoveryConfirmPassword("");
-    setPasswordRecoveryMode(false);
     setTimeout(() => {
-      router.push("/teacher/dashboard");
+      router.replace(recoveryAudience === "parent" ? "/parent" : "/teacher/dashboard");
     }, 900);
   }
 
@@ -979,7 +1026,7 @@ export default function LoginPage() {
               {studentBootstrapState === "loading" ? "Loading your progress..." : "Enter the Tower"}
             </button>
           </div>
-        ) : tab === "parent" ? (
+        ) : tab === "parent" && !passwordRecoveryMode ? (
           /* ── Parent Form ── */
           <div className="grid gap-4">
             <div className="flex items-center justify-center gap-2 mb-1">
@@ -1062,6 +1109,19 @@ export default function LoginPage() {
                 />
               </InputField>
             </label>
+
+            {parentMode === "login" && (
+              <div className="flex justify-end -mt-1">
+                <button
+                  type="button"
+                  onClick={() => void handleParentPasswordReset()}
+                  disabled={parentResetLoading}
+                  className="text-xs font-bold tracking-wide text-sky-200/90 transition hover:text-sky-100 disabled:opacity-50"
+                >
+                  {parentResetLoading ? "Sending reset link..." : "Forgot password?"}
+                </button>
+              </div>
+            )}
 
             {parentMode === "signup" ? (
               <div className="rounded-xl border border-white/10 bg-black/10 p-3">

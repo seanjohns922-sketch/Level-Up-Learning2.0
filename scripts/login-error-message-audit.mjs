@@ -42,6 +42,17 @@ const checks = [
     "parent authentication errors are normalized",
     /setParentError\(getAuthErrorMessage\(error/.test(login),
   ],
+  [
+    "parents can request a password reset without account disclosure",
+    /handleParentPasswordReset/.test(login) &&
+      /handlePasswordReset\("parent"\)/.test(login) &&
+      /If an account exists for that email/.test(login),
+  ],
+  [
+    "password recovery preserves the parent or teacher destination",
+    /recovery=\$\{audience\}/.test(login) &&
+      /recoveryAudience === "parent" \? "\/parent" : "\/teacher\/dashboard"/.test(login),
+  ],
 ];
 
 const failures = checks.filter(([, passed]) => !passed);
