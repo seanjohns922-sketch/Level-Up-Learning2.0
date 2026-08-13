@@ -2140,7 +2140,7 @@ export default function SchoolHomeClient({
   }, [initialSnapshot.school.id]);
 
   useEffect(() => {
-    if (tab === "licence" && licenceState === "idle") {
+    if ((tab === "licence" || tab === "administration") && licenceState === "idle") {
       void loadLicenceSummaries();
     }
   }, [licenceState, loadLicenceSummaries, tab]);
@@ -2181,6 +2181,64 @@ export default function SchoolHomeClient({
   const unlicensedEnrolments = selectedLicence
     ? Math.max(selectedYearEnrolments - selectedLicence.used, 0)
     : 0;
+  const selectedYearInvitations = snapshot.invitations.filter(
+    (invitation) => invitation.status === "pending",
+  );
+  const administratorStaff = snapshot.staff.filter(
+    (staff) =>
+      staff.role === "school_admin" ||
+      staff.role === "principal" ||
+      staff.userId === snapshot.actor.id,
+  );
+  const administrationReadiness = [
+    {
+      label: "Classes",
+      value: filteredClasses.length,
+      detail:
+        filteredClasses.length === 0
+          ? "Create the first class for this academic year."
+          : `${filteredClasses.length} active ${filteredClasses.length === 1 ? "class" : "classes"}`,
+      icon: BookOpen,
+      state: filteredClasses.length > 0 ? "ready" : "attention",
+    },
+    {
+      label: "Students",
+      value: selectedYearEnrolments,
+      detail:
+        selectedYearEnrolments === 0
+          ? "Add or import student accounts."
+          : `${selectedYearEnrolments} enrolled ${selectedYearEnrolments === 1 ? "student" : "students"}`,
+      icon: GraduationCap,
+      state: selectedYearEnrolments > 0 ? "ready" : "attention",
+    },
+    {
+      label: "Staff",
+      value: activeStaff.length,
+      detail:
+        activeStaff.length === 0
+          ? "Invite teachers and support staff."
+          : `${activeStaff.length} active staff ${activeStaff.length === 1 ? "member" : "members"}`,
+      icon: Users,
+      state: activeStaff.length > 0 ? "ready" : "attention",
+    },
+    {
+      label: "Licence",
+      value:
+        licenceState !== "ready"
+          ? "..."
+          : selectedLicence
+            ? `${selectedLicence.available} free`
+            : "Missing",
+      detail:
+        licenceState !== "ready"
+          ? "Loading school access."
+          : selectedLicence
+            ? `${selectedLicence.used}/${selectedLicence.seatLimit} licences in use`
+            : "No licence for the selected academic year.",
+      icon: ShieldCheck,
+      state: selectedLicence ? "ready" : "attention",
+    },
+  ];
 
   function notify(text: string) {
     setMessage(text);
@@ -2886,11 +2944,241 @@ export default function SchoolHomeClient({
           ) : null}
 
           {tab === "administration" ? (
-            <EmptyState
-              icon={ShieldCheck}
-              title="Administration foundation is ready"
-              detail="Imports, rollover, licences and advanced school settings are intentionally reserved for later phases."
-            />
+            <section className="space-y-6">
+              <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+                <div className="border border-slate-200 bg-white p-5">
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex min-w-0 gap-4">
+                      {schoolLogo ? (
+                        <Image
+                          src={schoolLogo.src}
+                          alt={schoolLogo.alt}
+                          width={72}
+                          height={72}
+                          className="h-[72px] w-[72px] shrink-0 rounded-md object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-md bg-emerald-900 text-white">
+                          <School className="h-8 w-8" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">
+                          School profile
+                        </p>
+                        <h2 className="mt-1 truncate text-2xl font-bold text-slate-950">
+                          {snapshot.school.name}
+                        </h2>
+                        <p className="mt-2 text-sm text-slate-500">
+                          {[snapshot.school.state, snapshot.school.sector]
+                            .filter(Boolean)
+                            .join(" · ") || "School region not set"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="w-fit rounded-md bg-emerald-50 px-3 py-1.5 text-sm font-bold capitalize text-emerald-800">
+                      {snapshot.school.status}
+                    </span>
+                  </div>
+
+                  <dl className="mt-6 grid gap-4 border-t border-slate-200 pt-5 text-sm sm:grid-cols-3">
+                    <div>
+                      <dt className="text-slate-500">Academic year</dt>
+                      <dd className="mt-1 font-bold">
+                        {selectedAcademicYear?.name ?? "Not set"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Starts</dt>
+                      <dd className="mt-1 font-bold">
+                        {selectedAcademicYear
+                          ? formatSchoolDate(selectedAcademicYear.startsOn)
+                          : "Not set"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Ends</dt>
+                      <dd className="mt-1 font-bold">
+                        {selectedAcademicYear
+                          ? formatSchoolDate(selectedAcademicYear.endsOn)
+                          : "Not set"}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div className="border border-slate-200 bg-white p-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">
+                    Quick actions
+                  </p>
+                  <div className="mt-4 grid gap-3">
+                    {snapshot.permissions.canCreateClass ? (
+                      <button
+                        type="button"
+                        onClick={() => setCreateOpen(true)}
+                        className="flex items-center justify-between rounded-md border border-slate-200 px-4 py-3 text-left text-sm font-bold hover:border-emerald-300 hover:bg-emerald-50"
+                      >
+                        <span className="inline-flex items-center gap-3">
+                          <Plus className="h-4 w-4 text-emerald-700" />
+                          Create class
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          {selectedAcademicYear?.name ?? "Selected year"}
+                        </span>
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setTab("students")}
+                      className="flex items-center justify-between rounded-md border border-slate-200 px-4 py-3 text-left text-sm font-bold hover:border-emerald-300 hover:bg-emerald-50"
+                    >
+                      <span className="inline-flex items-center gap-3">
+                        <GraduationCap className="h-4 w-4 text-emerald-700" />
+                        Add or import students
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        Students tab
+                      </span>
+                    </button>
+                    {snapshot.permissions.canInviteStaff ? (
+                      <button
+                        type="button"
+                        onClick={() => setInviteOpen(true)}
+                        className="flex items-center justify-between rounded-md border border-slate-200 px-4 py-3 text-left text-sm font-bold hover:border-emerald-300 hover:bg-emerald-50"
+                      >
+                        <span className="inline-flex items-center gap-3">
+                          <UserPlus className="h-4 w-4 text-emerald-700" />
+                          Invite staff
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          {selectedYearInvitations.length} pending
+                        </span>
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setTab("licence")}
+                      className="flex items-center justify-between rounded-md border border-slate-200 px-4 py-3 text-left text-sm font-bold hover:border-emerald-300 hover:bg-emerald-50"
+                    >
+                      <span className="inline-flex items-center gap-3">
+                        <ShieldCheck className="h-4 w-4 text-emerald-700" />
+                        View licence
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        Access summary
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {administrationReadiness.map((item) => {
+                  const Icon = item.icon;
+                  const ready = item.state === "ready";
+                  return (
+                    <div
+                      key={item.label}
+                      className="border border-slate-200 bg-white p-5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-md ${ready ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <span className={`rounded-md px-2 py-1 text-xs font-bold ${ready ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800"}`}>
+                          {ready ? "Ready" : "Needs setup"}
+                        </span>
+                      </div>
+                      <p className="mt-4 text-sm font-semibold text-slate-500">
+                        {item.label}
+                      </p>
+                      <p className="mt-1 text-3xl font-black tracking-tight text-slate-950">
+                        {item.value}
+                      </p>
+                      <p className="mt-2 text-sm text-slate-500">{item.detail}</p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="grid gap-5 xl:grid-cols-2">
+                <div className="border border-slate-200 bg-white">
+                  <div className="border-b border-slate-200 px-5 py-4">
+                    <h2 className="font-bold">School administrators</h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                      People who can manage classes, staff and school setup.
+                    </p>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {administratorStaff.map((staff) => (
+                      <div
+                        key={staff.userId}
+                        className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"
+                      >
+                        <div>
+                          <p className="text-sm font-bold">{staff.name}</p>
+                          <p className="text-xs text-slate-500">
+                            {staff.email ?? "No email"} ·{" "}
+                            {SCHOOL_ROLE_LABELS[staff.role] ?? staff.role}
+                          </p>
+                        </div>
+                        <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold capitalize text-slate-600">
+                          {staff.status}
+                        </span>
+                      </div>
+                    ))}
+                    {administratorStaff.length === 0 ? (
+                      <p className="px-5 py-6 text-sm text-amber-800">
+                        No active school administrator is listed.
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 bg-white">
+                  <div className="border-b border-slate-200 px-5 py-4">
+                    <h2 className="font-bold">Pending staff invitations</h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Invitations that still need to be accepted.
+                    </p>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {selectedYearInvitations.slice(0, 5).map((invitation) => (
+                      <div
+                        key={invitation.id}
+                        className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"
+                      >
+                        <div>
+                          <p className="text-sm font-bold">
+                            {invitation.email}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {SCHOOL_ROLE_LABELS[invitation.role] ??
+                              invitation.role}{" "}
+                            · expires {formatSchoolDate(invitation.expiresAt)}
+                          </p>
+                        </div>
+                        <Mail className="h-4 w-4 text-slate-400" />
+                      </div>
+                    ))}
+                    {selectedYearInvitations.length === 0 ? (
+                      <p className="px-5 py-6 text-sm text-slate-500">
+                        No pending invitations.
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+
+              {unlicensedEnrolments > 0 ? (
+                <div className="border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
+                  <p className="font-bold">Licence reconciliation required</p>
+                  <p className="mt-1">
+                    {unlicensedEnrolments} enrolled student{unlicensedEnrolments === 1 ? " does" : "s do"} not currently hold an active school licence for {selectedAcademicYear?.name ?? "this academic year"}.
+                  </p>
+                </div>
+              ) : null}
+            </section>
           ) : null}
 
           {tab === "licence" ? (
