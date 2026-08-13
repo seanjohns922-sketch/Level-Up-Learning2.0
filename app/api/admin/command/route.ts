@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { runPlatformOwnerCommand } from "@/lib/platform-admin-server";
-import { sendSchoolAdminInviteEmail } from "@/lib/school-admin-invite-email";
+import { sendSchoolAdminAccessEmail, sendSchoolAdminInviteEmail } from "@/lib/school-admin-invite-email";
 
 function text(value: unknown) { return typeof value === "string" ? value.trim() : ""; }
 function number(value: unknown) { const parsed = Number(value); return Number.isFinite(parsed) ? parsed : 0; }
@@ -30,6 +30,12 @@ export async function POST(request: Request) {
           to: initialAdminEmail,
           schoolName: String(result.name ?? text(payload.name)),
           schoolCode: String(result.schoolCode ?? text(payload.schoolCode)),
+          baseUrl: baseUrl(request),
+        });
+      } else if (result.initialAdminStatus === "membership_added" && initialAdminEmail) {
+        result.emailDelivery = await sendSchoolAdminAccessEmail({
+          to: initialAdminEmail,
+          schoolName: String(result.name ?? text(payload.name)),
           baseUrl: baseUrl(request),
         });
       }
@@ -72,6 +78,12 @@ export async function POST(request: Request) {
           to: email,
           schoolName: text(payload.schoolName) || "your school",
           schoolCode: text(payload.schoolCode),
+          baseUrl: baseUrl(request),
+        });
+      } else if (administrator.status === "membership_added" && email) {
+        administrator.emailDelivery = await sendSchoolAdminAccessEmail({
+          to: email,
+          schoolName: text(payload.schoolName) || "your school",
           baseUrl: baseUrl(request),
         });
       }

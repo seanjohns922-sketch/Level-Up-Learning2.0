@@ -62,11 +62,17 @@ export default function SchoolLifecycleManager({ detail }: { detail: PlatformSch
       const delivery = result?.administrator?.emailDelivery;
       const adminStatus = result?.administrator?.status;
       const nextMessage = delivery === "sent"
-        ? `${success}. Invite email sent.`
+        ? adminStatus === "membership_added"
+          ? `${success}. Existing account linked directly. Access email sent.`
+          : `${success}. Invite email sent.`
         : delivery === "failed"
-          ? `${success}. Invite email could not be sent; use Draft email.`
+          ? adminStatus === "membership_added"
+            ? `${success}. Existing account linked directly. Access email could not be sent.`
+            : `${success}. Invite email could not be sent; use Draft email.`
           : delivery === "unconfigured"
-            ? `${success}. Email sending is not configured; use Draft email.`
+            ? adminStatus === "membership_added"
+              ? `${success}. Existing account linked directly. Email sending is not configured.`
+              : `${success}. Email sending is not configured; use Draft email.`
             : adminStatus === "membership_added"
               ? `${success}. Existing account linked directly; no invite email needed.`
               : success;

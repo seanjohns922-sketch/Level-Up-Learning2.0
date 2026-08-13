@@ -202,9 +202,9 @@ export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoo
                   {created.emailDelivery !== "not_required" ? (
                     <div className="mt-5 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
                       <p className="font-bold">
-                        {created.emailDelivery === "sent" ? "Invite email sent." : created.emailDelivery === "failed" ? "Invite email could not be sent." : "Email sending is not configured yet."}
+                        {created.emailDelivery === "sent" ? (created.initialAdminStatus === "membership_added" ? "Access email sent." : "Invite email sent.") : created.emailDelivery === "failed" ? "Email could not be sent." : "Email sending is not configured yet."}
                       </p>
-                      <p className="mt-2">{created.emailDelivery === "sent" ? "The initial administrator has also received these activation details:" : "Send the initial administrator these details manually:"}</p>
+                      <p className="mt-2">{created.emailDelivery === "sent" ? (created.initialAdminStatus === "membership_added" ? "The existing account has been told to log in with their current password." : "The initial administrator has also received these activation details:") : "Send the initial administrator these details manually:"}</p>
                       <dl className="mt-3 grid gap-2 sm:grid-cols-2">
                         <div><dt className="text-xs font-bold uppercase text-amber-700">Email invited</dt><dd className="font-semibold">{created.initialAdminEmail ?? "Not recorded"}</dd></div>
                         <div><dt className="text-xs font-bold uppercase text-amber-700">School code</dt><dd className="font-semibold tracking-wide">{created.schoolCode}</dd></div>
