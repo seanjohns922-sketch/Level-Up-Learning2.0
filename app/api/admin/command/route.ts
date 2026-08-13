@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { runPlatformOwnerCommand } from "@/lib/platform-admin-server";
+import { sendSchoolAdminInviteEmail } from "@/lib/school-admin-invite-email";
 
 function text(value: unknown) { return typeof value === "string" ? value.trim() : ""; }
 function number(value: unknown) { const parsed = Number(value); return Number.isFinite(parsed) ? parsed : 0; }
+function baseUrl(request: Request) { return new URL(request.url).origin; }
 
 export async function POST(request: Request) {
   let payload: Record<string, unknown>;
@@ -11,6 +13,7 @@ export async function POST(request: Request) {
 
   try {
     if (payload.action === "createSchool") {
+      const initialAdminEmail = text(payload.initialAdminEmail);
       const result = await runPlatformOwnerCommand<Record<string, unknown>>("platform_owner_provision_school", {
         p_name: text(payload.name), p_school_code: text(payload.schoolCode),
         p_state: text(payload.state), p_sector: text(payload.sector),
@@ -18,10 +21,18 @@ export async function POST(request: Request) {
         p_status: text(payload.status) || "trial",
         p_start_date: text(payload.startDate) || null, p_end_date: text(payload.endDate) || null,
         p_billing_status: text(payload.billingStatus) || "free",
-        p_initial_admin_email: text(payload.initialAdminEmail) || null,
+        p_initial_admin_email: initialAdminEmail || null,
         p_notes: text(payload.notes) || null,
         p_idempotency_key: text(payload.idempotencyKey) || crypto.randomUUID(),
       });
+      if (result.initialAdminStatus === "invitation_created" && initialAdminEmail) {
+        result.emailDelivery = await sendSchoolAdminInviteEmail({
+          to: initialAdminEmail,
+          schoolName: String(result.name ?? text(payload.name)),
+          schoolCode: String(result.schoolCode ?? text(payload.schoolCode)),
+          baseUrl: baseUrl(request),
+        });
+      }
       return NextResponse.json(result);
     }
     if (payload.action === "updateLicence") {
@@ -51,10 +62,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ lifecycle });
     }
     if (payload.action === "assignSchoolAdmin") {
+      const email = text(payload.email);
       const administrator = await runPlatformOwnerCommand<Record<string, unknown>>("platform_owner_assign_school_admin", {
-        p_school_id: text(payload.schoolId), p_email: text(payload.email),
+        p_school_id: text(payload.schoolId), p_email: email,
         p_idempotency_key: text(payload.idempotencyKey) || crypto.randomUUID(),
       });
+      if (administrator.status === "invitation_created" && email) {
+        administrator.emailDelivery = await sendSchoolAdminInviteEmail({
+          to: email,
+          schoolName: text(payload.schoolName) || "your school",
+          schoolCode: text(payload.schoolCode),
+          baseUrl: baseUrl(request),
+        });
+      }
       return NextResponse.json({ administrator });
     }
     if (payload.action === "manageSchoolAdmin") {
@@ -63,6 +83,14 @@ export async function POST(request: Request) {
         p_user_id: text(payload.userId) || null, p_invitation_id: text(payload.invitationId) || null,
         p_reason: text(payload.reason) || null, p_confirm_final_admin: payload.confirmFinalAdmin === true,
       });
+      if (text(payload.adminAction) === "resend_invitation" && text(payload.invitationEmail)) {
+        administrator.emailDelivery = await sendSchoolAdminInviteEmail({
+          to: text(payload.invitationEmail),
+          schoolName: text(payload.schoolName) || "your school",
+          schoolCode: text(payload.schoolCode),
+          baseUrl: baseUrl(request),
+        });
+      }
       return NextResponse.json({ administrator });
     }
     if (payload.action === "searchIdentityStudents") {

@@ -10,7 +10,10 @@ async function command(payload: Record<string, unknown>) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  const result = (await response.json().catch(() => null)) as { error?: string } | null;
+  const result = (await response.json().catch(() => null)) as {
+    error?: string;
+    administrator?: { emailDelivery?: string };
+  } | null;
   if (!response.ok) throw new Error(result?.error ?? "Platform Admin command failed");
   return result;
 }
@@ -46,8 +49,9 @@ export default function SchoolLifecycleManager({ detail }: { detail: PlatformSch
   async function run(payload: Record<string, unknown>, success: string) {
     setBusy(true); setError(null); setMessage(null);
     try {
-      await command(payload);
-      setMessage(success);
+      const result = await command(payload);
+      const delivery = result?.administrator?.emailDelivery;
+      setMessage(delivery === "sent" ? `${success}. Invite email sent.` : delivery === "failed" ? `${success}. Invite email could not be sent; use Draft email.` : delivery === "unconfigured" ? `${success}. Email sending is not configured; use Draft email.` : success);
       window.location.reload();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Command failed");
@@ -92,6 +96,7 @@ export default function SchoolLifecycleManager({ detail }: { detail: PlatformSch
     if (!window.confirm(`Assign or invite ${email} as a School Administrator for ${detail.school.name}?`)) return;
     await run({
       action: "assignSchoolAdmin", schoolId: detail.school.id, email,
+      schoolName: detail.school.name, schoolCode: detail.school.code,
       idempotencyKey: crypto.randomUUID(),
     }, "Administrator assignment recorded");
   }
@@ -105,6 +110,8 @@ export default function SchoolLifecycleManager({ detail }: { detail: PlatformSch
     await run({
       action: "manageSchoolAdmin", schoolId: detail.school.id, adminAction,
       userId: userId ?? null, invitationId: invitationId ?? null,
+      invitationEmail: adminAction === "resend_invitation" ? detail.adminInvitations.find((invitation) => invitation.id === invitationId)?.email ?? null : null,
+      schoolName: detail.school.name, schoolCode: detail.school.code,
       reason: `Platform Owner ${adminAction.replaceAll("_", " ")}`,
       confirmFinalAdmin,
     }, "Administrator record updated");
