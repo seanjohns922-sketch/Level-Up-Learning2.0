@@ -160,6 +160,21 @@ export default function StarpathVoyageQuiz({
     }
   }
 
+  function changeAnswer() {
+    const answerKey = String(index);
+    setAnswers((current) => {
+      const next = { ...current };
+      delete next[answerKey];
+      return next;
+    });
+    setResponses((current) => {
+      const next = { ...current };
+      delete next[answerKey];
+      return next;
+    });
+    setNonce((value) => value + 1);
+  }
+
   function beginQuiz() {
     if (!hasResume) {
       setOrder(lessonOrder(tasks.length));
@@ -374,9 +389,18 @@ export default function StarpathVoyageQuiz({
               ) : null}
 
               {currentAnswer !== undefined ? (
-                <div className="mt-5 flex items-center gap-2 rounded-lg border-2 border-cyan-200 bg-cyan-50 px-4 py-3 font-bold text-cyan-950">
-                  <Check className="h-5 w-5 text-cyan-600" />
-                  Answer recorded. You can change it before finishing the quiz.
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border-2 border-cyan-200 bg-cyan-50 px-4 py-3">
+                  <div className="flex items-center gap-2 font-bold text-cyan-950">
+                    <Check className="h-5 w-5 text-cyan-600" />
+                    Answer recorded. Correctness is shown after the quiz.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={changeAnswer}
+                    className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-violet-300 bg-white px-4 text-sm font-black text-violet-800 transition hover:bg-violet-50"
+                  >
+                    <RotateCcw className="h-4 w-4" /> Change answer
+                  </button>
                 </div>
               ) : null}
 

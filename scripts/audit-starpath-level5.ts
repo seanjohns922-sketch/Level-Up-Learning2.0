@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { LEVEL_FIVE_LESSON_CONTENT } from "@/data/activities/starpath/level5";
 import { getStarpathQuizTasks } from "@/data/activities/starpath/ground/week1Quiz";
 import { foldNet } from "@/data/activities/starpath/level5/nets";
@@ -264,6 +266,10 @@ check(JSON.stringify(getPretestForLevel(5, "space").map((item) => item.id)) === 
 check(JSON.stringify((getPosttestForYearLabel("Year 5", "space")?.questions ?? []).map((item) => item.id)) === JSON.stringify(expectedPostIds), "Year 5 Starpath Post-Test must resolve through year API");
 check(JSON.stringify((getPosttestForLevel(5, "space")?.questions ?? []).map((item) => item.id)) === JSON.stringify(expectedPostIds), "Level 5 Starpath Post-Test must resolve through level API");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Level 5 assessment thresholds must remain 85%");
+
+const voyageQuizSource = fs.readFileSync(path.join(process.cwd(), "components/starpath/StarpathVoyageQuiz.tsx"), "utf8");
+check(/function changeAnswer\(\)[\s\S]+delete next\[answerKey\][\s\S]+setNonce/.test(voyageQuizSource), "Level 5 weekly quizzes must reopen the current task when an answer is changed");
+check(/Correctness is shown after the quiz\.[\s\S]+Change answer/.test(voyageQuizSource), "Level 5 weekly quizzes must offer immediate answer changes without revealing correctness");
 
 if (failures === 0) {
   console.log(`Starpath Level 5 audit passed: ${lessons} lessons, ${generators} generated lesson tasks, 105 weekly quiz questions and 40 independent assessment items validated.`);
