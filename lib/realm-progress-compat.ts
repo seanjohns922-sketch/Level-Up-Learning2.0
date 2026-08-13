@@ -144,7 +144,7 @@ export type NormalizedWeeklyQuizAttempt = {
 export type StudentProgressOverrideRow = {
   id: string;
   student_id: string;
-  realm_id: "number" | "measurement";
+  realm_id: "number" | "measurement" | "space";
   working_level: string;
   week: number;
   advanced_to_week: number;
@@ -647,7 +647,7 @@ export type TeacherProgressOverrideReason =
 
 export async function teacherAdvanceStudentWeek(input: {
   studentId: string;
-  realmId: "number" | "measurement";
+  realmId: "number" | "measurement" | "space";
   workingLevel: string;
   week: number;
   reason: TeacherProgressOverrideReason;

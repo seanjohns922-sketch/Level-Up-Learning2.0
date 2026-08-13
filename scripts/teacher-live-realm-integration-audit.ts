@@ -63,6 +63,17 @@ for (const yearLabel of yearLabels) {
 const placementManager = read("components/teacher/PlacementManager.tsx");
 assert(!/filter\(\(realm\)\s*=>\s*realm\.id\s*!==\s*["']space["']\)/.test(placementManager), "Teacher placement manager must not exclude Starpath.");
 
+const starpathPlacementMigration = read("supabase/migrations/20260814143000_enable_starpath_teacher_placements.sql");
+assert(starpathPlacementMigration.includes("p_realm_id not in ('number', 'measurement', 'space')"), "Teacher placement RPC must allow Starpath realm_id=space.");
+assert(starpathPlacementMigration.includes("when p_realm_id = 'space' then 'starpath'"), "realm_program_key must map Starpath to starpath program keys.");
+assert(starpathPlacementMigration.includes("placement.realm_id in ('number', 'measurement', 'space')"), "Saved Starpath placements must be materialised as canonical progress rows.");
+assert(starpathPlacementMigration.includes("check (realm_id in ('number', 'measurement', 'space'))"), "Teacher progress override table must allow Starpath.");
+assert(starpathPlacementMigration.includes("p_realm_id in ('measurement', 'space') then 8"), "Teacher advancement must treat Starpath as an 8-week realm.");
+
+const realmProgressCompat = read("lib/realm-progress-compat.ts");
+assert(realmProgressCompat.includes('realm_id: "number" | "measurement" | "space"'), "Teacher override rows must type Starpath as a valid realm.");
+assert(realmProgressCompat.includes('realmId: "number" | "measurement" | "space"'), "Teacher week advancement client must allow Starpath.");
+
 const dashboard = read("app/teacher/dashboard/page.tsx");
 assert(dashboard.includes('Extract<CanonicalRealmId, "number" | "measurement" | "space">'), "Teacher dashboard analytics state must include Starpath.");
 
