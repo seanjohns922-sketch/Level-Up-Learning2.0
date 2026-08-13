@@ -1100,7 +1100,7 @@ Students represent composite shapes and objects, create and interpret grid refer
 
 **Canonical level:** `level-5`
 **Program ID:** `y5-space`
-**Status:** planned
+**Status:** implemented
 
 Students connect objects and nets, use grid coordinates, perform transformations and develop shape-classification algorithms.
 
@@ -1128,8 +1128,8 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 ### Assessment Metadata
 
-- Pre-test: `y5-space-pre-01` (20 questions; planned)
-- Post-test: `y5-space-post-01` (20 questions; unlocks after `y5-space-w8-l3`; planned)
+- Pre-test: `y5-space-pre-01` (20 questions; implemented)
+- Post-test: `y5-space-post-01` (20 questions; unlocks after `y5-space-w8-l3`; implemented)
 
 ### Skill Taxonomy
 
@@ -1165,7 +1165,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 - The same number of faces guarantees a valid net.
 - Faces that touch in a net always touch after folding.
 
-**Weekly quiz:** `y5-space-w1-quiz` - Object-net correspondence and folding prediction. (15 questions; planned)
+**Weekly quiz:** `y5-space-w1-quiz` - Object-net correspondence and folding prediction. (15 questions; implemented)
 
 #### Week 2: Construct from Nets
 
@@ -1186,7 +1186,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 - A face keeps the same screen orientation after folding.
 - Opposite faces are opposite in the flat net.
 
-**Weekly quiz:** `y5-space-w2-quiz` - Mental folding and face relationships. (15 questions; planned)
+**Weekly quiz:** `y5-space-w2-quiz` - Mental folding and face relationships. (15 questions; implemented)
 
 #### Week 3: Create and Test Nets
 
@@ -1207,7 +1207,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 - Each object has one net.
 - A connected arrangement always folds without overlap.
 
-**Weekly quiz:** `y5-space-w3-quiz` - Net creation, validation and multiple solutions. (15 questions; planned)
+**Weekly quiz:** `y5-space-w3-quiz` - Net creation, validation and multiple solutions. (15 questions; implemented)
 
 #### Week 4: Coordinate Systems
 
@@ -1228,7 +1228,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 - Coordinate order is interchangeable.
 - Axes can use inconsistent intervals.
 
-**Weekly quiz:** `y5-space-w4-quiz` - Coordinate conventions, plotting and error analysis. (15 questions; planned)
+**Weekly quiz:** `y5-space-w4-quiz` - Coordinate conventions, plotting and error analysis. (15 questions; implemented)
 
 #### Week 5: Coordinate Movement
 
@@ -1249,7 +1249,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 - Both coordinates change for every move.
 - Direction words can replace coordinate amounts.
 
-**Weekly quiz:** `y5-space-w5-quiz` - Coordinate changes, movement sequences and route planning. (15 questions; planned)
+**Weekly quiz:** `y5-space-w5-quiz` - Coordinate changes, movement sequences and route planning. (15 questions; implemented)
 
 #### Week 6: Translations
 
@@ -1270,7 +1270,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 - Different points can move different amounts.
 - Translation changes orientation.
 
-**Weekly quiz:** `y5-space-w6-quiz` - Translations, movement vectors and invariants. (15 questions; planned)
+**Weekly quiz:** `y5-space-w6-quiz` - Translations, movement vectors and invariants. (15 questions; implemented)
 
 #### Week 7: Reflections and Rotations
 
@@ -1291,7 +1291,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 - Reflection is a horizontal slide.
 - Rotation can use any centre without changing the image position.
 
-**Weekly quiz:** `y5-space-w7-quiz` - Reflections, rotations and transformation comparison. (15 questions; planned)
+**Weekly quiz:** `y5-space-w7-quiz` - Reflections, rotations and transformation comparison. (15 questions; implemented)
 
 #### Week 8: Spatial Design Challenge
 

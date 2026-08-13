@@ -687,11 +687,11 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
         id: `${definition.prefix}-space-w${weekNumber}-quiz`,
         coverage: week.quiz,
         questionCount: STARPATH_QUIZ_QUESTIONS_PER_LESSON * STARPATH_LESSONS_PER_WEEK as 15,
-        status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || (definition.prefix === "y3" && weekNumber < 8) || definition.prefix === "y4"
+        status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || (definition.prefix === "y3" && weekNumber < 8) || definition.prefix === "y4" || definition.prefix === "y5"
           ? "implemented"
           : STARPATH_PROGRAM_STATUS,
       },
-      status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
+      status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" ? "implemented" : STARPATH_PROGRAM_STATUS,
     };
   });
 
@@ -711,14 +711,14 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
       ...week.skill,
       level: definition.level,
       weeks: [index + 1],
-      status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
+      status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" ? "implemented" : STARPATH_PROGRAM_STATUS,
     })),
     weeks,
     assessments: {
-      preTest: definition.level === "ground" ? null : { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS },
-      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS },
+      preTest: definition.level === "ground" ? null : { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y4" || definition.prefix === "y5" ? "implemented" : STARPATH_PROGRAM_STATUS },
+      postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" ? "implemented" : STARPATH_PROGRAM_STATUS },
     },
-    status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" ? "implemented" : STARPATH_PROGRAM_STATUS,
+    status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" ? "implemented" : STARPATH_PROGRAM_STATUS,
   };
 }
 

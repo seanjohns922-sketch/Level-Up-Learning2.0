@@ -55,7 +55,7 @@ for (const relativePath of [
 const ids = new Set();
 for (const program of registry.STARPATH_PROGRAMS) {
   assert.equal(program.realmId, "space");
-  assert.equal(program.status, ["ground", "level-2", "level-3", "level-4"].includes(program.level) ? "implemented" : "planned");
+  assert.equal(program.status, ["ground", "level-2", "level-3", "level-4", "level-5"].includes(program.level) ? "implemented" : "planned");
   assert.equal(program.weeks.length, 8, `${program.level} must have exactly 8 weeks`);
   assert.equal(program.skills.length, 8, `${program.level} must expose one stable reporting skill per week`);
   assert.equal(program.assessments.preTest === null, program.level === "ground");

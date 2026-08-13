@@ -89,6 +89,7 @@
     "qa:starpath-level3-weeks4-8": "node --no-warnings --experimental-strip-types --loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-level3-weeks4-8.ts",
     "qa:starpath-level4-week4": "node --no-warnings --experimental-strip-types --loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-level4-week4.ts",
     "qa:starpath-level4": "node --no-warnings --experimental-strip-types --loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-level4.ts",
+    "qa:starpath-level5": "node --no-warnings --experimental-strip-types --loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-level5.ts",
     "generate:starpath-curriculum": "node scripts/generate-starpath-curriculum-map.mjs",
     "generate:starpath-assessment-blueprint": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/generate-starpath-assessment-blueprint.ts",
     "qa:measurelands-progression": "node scripts/measurelands-progression-audit.mjs",
