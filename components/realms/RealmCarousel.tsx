@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DEMO_MODE } from "@/data/config";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
@@ -226,10 +227,14 @@ export default function RealmCarousel() {
     <main className="min-h-screen relative overflow-hidden select-none">
       {/* Interior background — cathedral / tower interior */}
       <div className="fixed inset-0 z-0">
-        <img
+        <Image
           src="/images/realm-select-bg.jpg"
           alt=""
-          className="w-full h-full object-cover"
+          fill
+          priority
+          quality={90}
+          sizes="100vw"
+          className="object-cover"
           style={{
             objectPosition: `${50 + bgShift}% 40%`,
             transition: "object-position 0.5s cubic-bezier(0.4,0,0.2,1)",
