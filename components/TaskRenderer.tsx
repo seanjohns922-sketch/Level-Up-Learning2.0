@@ -700,7 +700,7 @@ function TaskRendererInner({
     case "starpathMapRoute":
       return <StarpathMapRouteCard key={k} task={t} onCorrect={onC} onWrong={onW} onComplete={onC} editableAssessmentMode={editableAssessmentMode} assessmentAnswer={assessmentAnswer} onAssessmentAnswer={recordAssessmentAnswer} />;
     case "starpathSteer":
-      return <StarpathSteerCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathSteerCard key={k} task={t} onCorrect={onC} onWrong={onW} editableAssessmentMode={editableAssessmentMode} assessmentAnswer={assessmentAnswer} onAssessmentAnswer={recordAssessmentAnswer} />;
     case "starpathGridReference":
       return <StarpathGridReferenceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathGridRoute":
@@ -722,7 +722,7 @@ function TaskRendererInner({
     case "starpathTransform":
       return <StarpathTransformCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathObject":
-      return <StarpathObjectCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathObjectCard key={k} task={t} onCorrect={onC} onWrong={onW} editableAssessmentMode={editableAssessmentMode} assessmentAnswer={assessmentAnswer} onAssessmentAnswer={recordAssessmentAnswer} />;
     default:
       return <TaskRecoveryCard onRecover={onW} />;
   }

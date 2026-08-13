@@ -76,7 +76,7 @@ export default function StarpathVoyageQuiz({
   const router = useRouter();
   const theme = REALM_QUIZ_THEMES.space;
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
-  const answersAreEditable = quiz.level === "Year 2";
+  const answersAreEditable = true;
   const storageKey = `starpath-voyage-quiz:v2:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
@@ -200,7 +200,7 @@ export default function StarpathVoyageQuiz({
       replaySources,
       (_question, questionIndex) =>
         answers[String(questionIndex)] === true ? "Correct response" : "Incorrect response",
-      (_question, _answer) => {
+      (_question) => {
         const questionIndex = replaySources.indexOf(_question);
         return answers[String(questionIndex)] === true;
       },
@@ -376,9 +376,7 @@ export default function StarpathVoyageQuiz({
               {currentAnswer !== undefined ? (
                 <div className="mt-5 flex items-center gap-2 rounded-lg border-2 border-cyan-200 bg-cyan-50 px-4 py-3 font-bold text-cyan-950">
                   <Check className="h-5 w-5 text-cyan-600" />
-                  {answersAreEditable && responses[String(index)]
-                    ? "Answer recorded. You can change it before finishing the quiz."
-                    : "Answer submitted"}
+                  Answer recorded. You can change it before finishing the quiz.
                 </div>
               ) : null}
 

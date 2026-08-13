@@ -80,7 +80,21 @@ function CmdIcon({ cmd }: { cmd: Command }) {
   return <svg {...common}><path d="M15 7l5 5-5 5M20 12H9a5 5 0 0 0-5 5v1" /></svg>;
 }
 
-export function StarpathSteerCard({ task, onCorrect, onWrong }: { task: SteerTask; onCorrect: () => void; onWrong: (studentAnswer?: string) => void }) {
+export function StarpathSteerCard({
+  task,
+  onCorrect,
+  onWrong,
+  editableAssessmentMode = false,
+  assessmentAnswer,
+  onAssessmentAnswer,
+}: {
+  task: SteerTask;
+  onCorrect: () => void;
+  onWrong: (studentAnswer?: string) => void;
+  editableAssessmentMode?: boolean;
+  assessmentAnswer?: string;
+  onAssessmentAnswer?: (correct: boolean, response: string) => void;
+}) {
   const [wrongId, setWrongId] = useState<string | null>(null);
   const [commands, setCommands] = useState<Command[]>([]);
   const [rover, setRover] = useState<{ r: number; c: number }>({ r: task.start.r, c: task.start.c });
@@ -97,6 +111,10 @@ export function StarpathSteerCard({ task, onCorrect, onWrong }: { task: SteerTas
   if (task.mode === "heading" || task.mode === "firstMove") {
     const choose = (id: string) => {
       if (settled.current) return;
+      if (editableAssessmentMode && onAssessmentAnswer) {
+        onAssessmentAnswer(id === task.correctOptionId, id);
+        return;
+      }
       if (id === task.correctOptionId) {
         settled.current = true;
         onCorrect();
@@ -128,8 +146,16 @@ export function StarpathSteerCard({ task, onCorrect, onWrong }: { task: SteerTas
             <div key={option.id} className="relative">
               <button
                 type="button"
+                aria-pressed={editableAssessmentMode ? assessmentAnswer === option.id : undefined}
                 onClick={() => choose(option.id)}
-                className={["flex min-h-14 w-full items-center justify-center rounded-2xl border-2 py-3 pl-4 pr-10 text-center shadow-sm transition active:scale-[0.98]", wrongId === option.id ? "sp-steer-shake border-rose-400 bg-rose-50" : "border-violet-200 bg-white hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg"].join(" ")}
+                className={[
+                  "flex min-h-14 w-full items-center justify-center rounded-2xl border-2 py-3 pl-4 pr-10 text-center shadow-sm transition active:scale-[0.98]",
+                  wrongId === option.id
+                    ? "sp-steer-shake border-rose-400 bg-rose-50"
+                    : editableAssessmentMode && assessmentAnswer === option.id
+                      ? "border-cyan-600 bg-cyan-50 ring-4 ring-cyan-200"
+                    : "border-violet-200 bg-white hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg",
+                ].join(" ")}
               >
                 <span className="text-base font-black leading-snug text-balance text-indigo-950">{option.label}</span>
               </button>

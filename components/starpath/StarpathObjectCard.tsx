@@ -38,11 +38,13 @@ function ChoiceButton({
   id,
   label,
   wrongId,
+  selected,
   onClick,
 }: {
   id: string;
   label: string;
   wrongId: string | null;
+  selected?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -54,6 +56,8 @@ function ChoiceButton({
           "flex min-h-16 w-full items-center justify-center rounded-2xl border-2 py-3 pl-4 pr-10 text-center shadow-sm transition active:scale-[0.98]",
           wrongId === id
             ? "sp-obj-shake border-rose-400 bg-rose-50"
+            : selected
+              ? "border-cyan-600 bg-cyan-50 ring-4 ring-cyan-200"
             : "border-violet-200 bg-white hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg",
         ].join(" ")}
       >
@@ -79,10 +83,16 @@ export function StarpathObjectCard({
   task,
   onCorrect,
   onWrong,
+  editableAssessmentMode = false,
+  assessmentAnswer,
+  onAssessmentAnswer,
 }: {
   task: StarpathObjectTask;
   onCorrect: () => void;
   onWrong: () => void;
+  editableAssessmentMode?: boolean;
+  assessmentAnswer?: string;
+  onAssessmentAnswer?: (correct: boolean, response: string) => void;
 }) {
   const [wrongId, setWrongId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -125,7 +135,15 @@ export function StarpathObjectCard({
               id={option.id}
               label={option.label}
               wrongId={wrongId}
-              onClick={() => (option.id === task.correctOptionId ? onCorrect() : miss(option.id))}
+              selected={editableAssessmentMode && assessmentAnswer === option.id}
+              onClick={() => {
+                if (editableAssessmentMode && onAssessmentAnswer) {
+                  onAssessmentAnswer(option.id === task.correctOptionId, option.id);
+                  return;
+                }
+                if (option.id === task.correctOptionId) onCorrect();
+                else miss(option.id);
+              }}
             />
           ))}
         </div>
@@ -305,11 +323,21 @@ export function StarpathObjectCard({
             <button
               type="button"
               aria-label={obj.label}
-              onClick={() => (obj.id === findTask.correctObjectId ? onCorrect() : miss(obj.id))}
+              aria-pressed={editableAssessmentMode ? assessmentAnswer === obj.id : undefined}
+              onClick={() => {
+                if (editableAssessmentMode && onAssessmentAnswer) {
+                  onAssessmentAnswer(obj.id === findTask.correctObjectId, obj.id);
+                  return;
+                }
+                if (obj.id === findTask.correctObjectId) onCorrect();
+                else miss(obj.id);
+              }}
               className={[
                 "flex min-h-32 w-full flex-col items-center justify-center gap-1 rounded-2xl border-2 bg-white p-3 shadow-sm transition active:scale-95",
                 wrongId === obj.id
                   ? "sp-obj-shake border-rose-400 bg-rose-50"
+                  : editableAssessmentMode && assessmentAnswer === obj.id
+                    ? "border-cyan-600 bg-cyan-50 ring-4 ring-cyan-200"
                   : "border-violet-200 hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg",
               ].join(" ")}
             >
