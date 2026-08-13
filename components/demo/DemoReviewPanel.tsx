@@ -36,6 +36,7 @@ import { fetchDemoGemVault } from "@/lib/gems";
 import { buildLessonRoute } from "@/lib/lesson-routing";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { getStarpathLevelForYear } from "@/lib/starpath-levels";
+import { getStarpathProgram } from "@/data/starpath/program-registry";
 import {
   buildStarpathProgramHref,
   buildStarpathWeeklyQuizHref,
@@ -112,9 +113,13 @@ export default function DemoReviewPanel() {
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
   const maxWeek = realm === "number" ? 12 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
+  const starpathLevel = getStarpathLevelForYear(year).id;
+  const starpathProgram = realm === "space" ? getStarpathProgram(starpathLevel) : null;
+  const selectedStarpathWeek = starpathProgram?.weeks[week - 1];
   const pretestAvailable = hasPretest(realm, year);
   const posttestAvailable = hasPosttest(realm, year);
-  const weeklyContentAvailable = realm !== "space" || levelNumber <= 3;
+  const weeklyContentAvailable = realm !== "space" || selectedStarpathWeek?.status === "implemented";
+  const weeklyQuizAvailable = realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented";
 
   useEffect(() => {
     if (!isDemoPreviewMode() || localStorage.getItem(ACTIVE_STUDENT_KEY) !== "demo-preview") {
@@ -128,10 +133,10 @@ export default function DemoReviewPanel() {
 
   const realmHome = useMemo(() => {
     if (realm === "space") {
-      return `/starpath?realm_id=space&level=${encodeURIComponent(getStarpathLevelForYear(year).id)}&destination=world`;
+      return `/starpath?realm_id=space&level=${encodeURIComponent(starpathLevel)}&destination=world`;
     }
     return `${realm === "measurement" ? "/measurelands" : "/number-nexus"}?level=${encodeURIComponent(year)}`;
-  }, [realm, year]);
+  }, [realm, starpathLevel, year]);
 
   function preparePreview(profile?: AssessmentResultProfile) {
     writeProgress({
@@ -211,7 +216,7 @@ export default function DemoReviewPanel() {
   }
 
   function programHref() {
-    if (realm === "space") return buildStarpathProgramHref({ selectedLevel: getStarpathLevelForYear(year).id }, week);
+    if (realm === "space") return buildStarpathProgramHref({ selectedLevel: starpathLevel }, week);
     const params = new URLSearchParams({ year, week: String(week), legacy: "1", realm_id: realm });
     return `/program?${params.toString()}`;
   }
@@ -221,7 +226,7 @@ export default function DemoReviewPanel() {
   }
 
   function quizHref() {
-    if (realm === "space") return buildStarpathWeeklyQuizHref({ selectedLevel: getStarpathLevelForYear(year).id }, week);
+    if (realm === "space") return buildStarpathWeeklyQuizHref({ selectedLevel: starpathLevel }, week);
     const params = new URLSearchParams({ year, week: String(week), type: "quiz", n: "1", realm_id: realm });
     return `/session?${params.toString()}`;
   }
@@ -328,7 +333,7 @@ export default function DemoReviewPanel() {
             <div className="grid gap-2 sm:grid-cols-3 md:self-end">
               <button type="button" disabled={!weeklyContentAvailable} onClick={() => weeklyContentAvailable && open(programHref())} className={actionClass(weeklyContentAvailable)}><Route size={16} /> Week</button>
               <button type="button" disabled={!weeklyContentAvailable} onClick={() => weeklyContentAvailable && open(lessonHref())} className={actionClass(weeklyContentAvailable)}><BookOpen size={16} /> Lesson</button>
-              <button type="button" disabled={!weeklyContentAvailable} onClick={() => weeklyContentAvailable && open(quizHref())} className={actionClass(weeklyContentAvailable)}><ClipboardCheck size={16} /> Quiz</button>
+              <button type="button" disabled={!weeklyQuizAvailable} onClick={() => weeklyQuizAvailable && open(quizHref())} className={actionClass(weeklyQuizAvailable)}><ClipboardCheck size={16} /> Quiz</button>
             </div>
           </div>
         </section>

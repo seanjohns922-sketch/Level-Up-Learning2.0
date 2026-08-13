@@ -19,6 +19,13 @@ const checks = [
       !panel.includes('pretestAvailable = year !== "Prep" && (realm !== "space" || levelNumber <= 2)') &&
       !panel.includes('posttestAvailable = realm !== "space" || levelNumber <= 3'),
   ],
+  [
+    "Starpath weekly content availability follows the program registry",
+    panel.includes("getStarpathProgram") &&
+      panel.includes('selectedStarpathWeek?.status === "implemented"') &&
+      panel.includes('selectedStarpathWeek?.quiz?.status === "implemented"') &&
+      !panel.includes("levelNumber <= 3"),
+  ],
   ["Weekly lesson and quiz launchers use real runtime routes", panel.includes("buildLessonRoute") && panel.includes('type: "quiz"')],
   ["Result scenarios include pass, targeted, full and fail profiles", ["pre-pass", "pre-targeted", "pre-full", "post-pass", "post-fail"].every((scenario) => panel.includes(scenario))],
   ["Legend reveal state can be reset in the demo scope", panel.includes("resetLegendUnlockVideosForCurrentScope")],
