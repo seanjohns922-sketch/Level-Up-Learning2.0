@@ -119,13 +119,21 @@ function MapView({
 function MapKey({ task }: { task: MapTask }) {
   if (!task.legend?.length) return null;
   return (
-    <div className="mx-auto mb-3 max-w-3xl border-2 border-cyan-200 bg-cyan-50 px-3 py-2 shadow-sm">
-      <div className="mb-1 text-xs font-black uppercase text-cyan-900">Map key</div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-4">
+    <div className="mx-auto mb-3 max-w-4xl border-2 border-cyan-200 bg-cyan-50 px-3 py-3 shadow-sm">
+      <div className="mb-2 text-xs font-black uppercase text-cyan-900">Map key</div>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {task.legend.map((item) => (
-          <div key={item.landmarkId} className="flex min-w-0 items-center gap-2">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-cyan-300 bg-white text-lg" aria-hidden="true">{item.symbol}</span>
-            <span className="truncate text-xs font-bold text-indigo-950">{item.label}</span>
+          <div
+            key={item.landmarkId}
+            className="flex min-w-0 items-center gap-2 rounded-lg border border-cyan-200 bg-white/75 px-2 py-1.5"
+          >
+            <span
+              className="flex min-h-8 min-w-24 shrink-0 items-center justify-center rounded-md border border-cyan-300 bg-white px-2 text-center text-sm font-black leading-tight text-indigo-950"
+              aria-hidden="true"
+            >
+              {item.symbol}
+            </span>
+            <span className="min-w-0 text-sm font-bold leading-snug text-indigo-950">{item.label}</span>
           </div>
         ))}
       </div>
