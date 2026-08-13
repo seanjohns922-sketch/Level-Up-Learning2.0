@@ -132,3 +132,7 @@ Parents receive read-only access to actively linked children. Schools explicitly
 Historical school reporting follows the school and class relationships active when each event occurred. Transfers preserve prior evidence and do not grant the previous school access to future learning.
 
 The full identity invariant, Home entitlement rules, parent security boundary, transfer behavior, merge recovery process and release checks are defined in `PLATFORM_ADMIN_PHASE_PA4_IDENTITY_PARENT_HOME.md`.
+
+## Deferred PA6 Home Subscriptions
+
+The approved household pricing, annual discount, subscription ownership and billing lifecycle decisions are recorded in `PLATFORM_ADMIN_PHASE_PA6_HOME_SUBSCRIPTION_DECISIONS.md`. They are decisions for later implementation only. PA4 and PA5 must not create checkout, provider subscriptions, webhooks or paid entitlements from that document.
