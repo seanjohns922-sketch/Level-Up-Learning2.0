@@ -1,6 +1,6 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { CompositeTask } from "@/data/activities/starpath/level4/composite";
-import { figureSvg, getL4Figure, type CompositeFigure } from "@/data/activities/starpath/level4/composite-figures";
+import { figureSvg, getL4Figure, type CompositeFigure, type FigureShape } from "@/data/activities/starpath/level4/composite-figures";
 import { getL4Object } from "@/data/activities/starpath/level4/composite-objects";
 import {
   labelGridTask,
@@ -99,6 +99,84 @@ function rotate<T>(items: T[], by: number): T[] {
   return [...items.slice(start), ...items.slice(0, start)];
 }
 
+const SHAPE_PALETTE: FigureShape[] = ["triangle", "square", "rectangle", "circle"];
+const SOLID_PALETTE: FigureShape[] = ["cube", "cylinder", "cone", "sphere", "prism"];
+
+function assessmentScanTask(round: number, target: number): AssessmentTask {
+  const figure = getL4Figure(round);
+  const shapes = [...new Set(figure.parts.map((part) => part.shape))];
+  const correct = shapes.join(" + ");
+  const unused = SHAPE_PALETTE.filter((shape) => !shapes.includes(shape));
+  const wrong = [
+    shapes.slice(1).join(" + ") || `${shapes[0]} + ${unused[0] ?? "circle"}`,
+    [...new Set([...shapes, unused[0] ?? "circle"])].join(" + "),
+  ].filter((option) => option !== correct);
+  return {
+    kind: "starpathComposite",
+    mode: "scan",
+    target,
+    prompt: `Which shapes make this ${figure.name}?`,
+    speakText: `Look closely at the ${figure.name}. Which familiar shapes make it?`,
+    designBrief: "Name every familiar shape used in the picture.",
+    figureSvg: completeSvg(figure),
+    options: rotate([
+      { id: "correct", label: correct },
+      { id: "missing", label: wrong[0] ?? "square + circle" },
+      { id: "extra", label: wrong[1] ?? "triangle + square + circle" },
+    ], round),
+    correctOptionId: "correct",
+    feedback: FEEDBACK,
+  };
+}
+
+function assessmentBuildTask(round: number, target: number, object = false): AssessmentTask {
+  const figure = object ? getL4Object(round) : getL4Figure(round);
+  return {
+    kind: "starpathComposite",
+    mode: object ? "solid" : "construct",
+    target,
+    prompt: `Build the ${figure.name}.`,
+    speakText: `Choose a ${object ? "solid" : "shape"}, then tap the matching space. Build the ${figure.name}.`,
+    designBrief: `Use the correct ${object ? "solids" : "shapes"} to complete every part.`,
+    figure: {
+      id: figure.id,
+      name: figure.name,
+      viewBox: figure.viewBox,
+      parts: figure.parts.map((part) => ({ ...part })),
+    },
+    buildPalette: object ? SOLID_PALETTE : SHAPE_PALETTE,
+    feedback: FEEDBACK,
+  };
+}
+
+function assessmentStructureTask(round: number, target: number, mode: "views" | "hidden"): AssessmentTask {
+  const cells = [{ r: 0, c: 1 }, { r: 1, c: 0 }, { r: 1, c: 1 }, { r: 1, c: 2 }];
+  const heights = [1 + (round % 2), 1, 2 + (round % 2), 1];
+  const solution = cells.map((cell, index) => ({ ...cell, pieceId: `cube-${heights[index]}` }));
+  const views = { front: [heights[1]!, heights[2]!, heights[3]!], side: [heights[2]!, heights[0]!], top: cells.length };
+  return {
+    kind: "starpathComposite",
+    mode,
+    target,
+    prompt: mode === "hidden" ? "Build the smallest supported structure." : "Build the object from all three views.",
+    speakText: mode === "hidden" ? "Add the fewest cube stacks needed to support every part." : "Use the front, side and top views to build the object.",
+    boardId: `y4-assessment-${mode}-${round}`,
+    cols: 4,
+    rows: 3,
+    palette: [
+      { id: "cube-1", label: "1 cube high", colour: "#8b5cf6" },
+      { id: "cube-2", label: "2 cubes high", colour: "#0ea5e9" },
+      { id: "cube-3", label: "3 cubes high", colour: "#f97316" },
+    ],
+    targetCells: cells,
+    validSolutions: [solution],
+    maxPieces: cells.length,
+    viewLabels: views,
+    designBrief: mode === "hidden" ? "Every raised part needs support beneath it." : `Front ${views.front.join("-")}; side ${views.side.join("-")}; top ${views.top} cells.`,
+    feedback: FEEDBACK,
+  };
+}
+
 function completeSvg(figure: CompositeFigure) {
   return figureSvg(figure, () => true);
 }
@@ -159,21 +237,6 @@ function shapeRepresentationTask(round: number, target: number, prompt: string, 
   });
 }
 
-function objectRepresentationTask(round: number, target: number, prompt: string, missingPartIndex: number): AssessmentTask {
-  const figure = getL4Object(round);
-  const resolvedPrompt = prompt.replace("{name}", figure.name);
-  return assessmentCompareTask({
-    round,
-    target,
-    figure,
-    prompt: resolvedPrompt,
-    missingPartIndex,
-    correctFirst: round % 2 === 1,
-    correctReason: `It has every solid needed to make the ${figure.name}.`,
-    distractorReasons: ["It uses fewer solids.", "It is the bigger picture."],
-  });
-}
-
 function descriptorForIndex(index: number): Descriptor {
   if (index < 7) return "AC9M4SP01";
   if (index < 13) return "AC9M4SP02";
@@ -197,12 +260,12 @@ function misconceptionFor(descriptor: Descriptor, index: number): readonly Misco
 }
 
 const PRE_TASKS: readonly AssessmentTask[] = [
-  shapeRepresentationTask(31, 1, "Which picture shows the whole {name}?", 2),
-  shapeRepresentationTask(32, 2, "Which {name} has all its parts?", 1),
-  shapeRepresentationTask(33, 3, "Which is the best simple model of the {name}?", 3),
-  objectRepresentationTask(34, 4, "Which model shows the whole {name}?", 2),
-  objectRepresentationTask(35, 5, "Which {name} has all its solids?", 1),
-  objectRepresentationTask(36, 6, "Which {name} is not missing a solid?", 3),
+  assessmentScanTask(31, 1),
+  assessmentBuildTask(32, 2),
+  assessmentBuildTask(33, 3),
+  assessmentBuildTask(34, 4, true),
+  assessmentStructureTask(35, 5, "views"),
+  assessmentStructureTask(36, 6, "hidden"),
   shapeRepresentationTask(37, 7, "Which simple picture still looks like the {name}?", 0),
   assessmentTask(repairLabelsTask(41, 8), "Repair the grid label so references stay consistent."),
   assessmentTask(referenceToCellTask(42, 9), "Tap the grid cell named by the reference."),
@@ -220,12 +283,12 @@ const PRE_TASKS: readonly AssessmentTask[] = [
 ];
 
 const POST_TASKS: readonly AssessmentTask[] = [
-  shapeRepresentationTask(61, 1, "Which picture shows the whole {name}?", 1),
-  shapeRepresentationTask(62, 2, "Which {name} has all its shapes?", 2),
-  shapeRepresentationTask(63, 3, "Which is the best simple model of the {name}?", 0),
-  objectRepresentationTask(64, 4, "Which model shows the whole {name}?", 1),
-  objectRepresentationTask(65, 5, "Which {name} has all its solids?", 3),
-  objectRepresentationTask(66, 6, "Which {name} is not missing a solid?", 0),
+  assessmentScanTask(61, 1),
+  assessmentBuildTask(62, 2),
+  assessmentBuildTask(63, 3),
+  assessmentBuildTask(64, 4, true),
+  assessmentStructureTask(65, 5, "views"),
+  assessmentStructureTask(66, 6, "hidden"),
   shapeRepresentationTask(67, 7, "Which simple picture still looks like the {name}?", 2),
   assessmentTask(labelGridTask(71, 8), "Complete the grid labels so every cell has a reference."),
   assessmentTask(labelGridTask(72, 9), "Complete the grid reference labels."),
@@ -269,14 +332,14 @@ function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion
   const skill = descriptorSkill(spec.descriptor);
   return {
     schemaVersion: 1,
-    id: `y4-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v1`,
-    version: "1.0.0",
+    id: `y4-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v2`,
+    version: "2.0.0",
     realm: "space",
     level: 4,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `starpath-level-4-${form}-v1`,
+    bankId: `starpath-level-4-${form}-v2`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
