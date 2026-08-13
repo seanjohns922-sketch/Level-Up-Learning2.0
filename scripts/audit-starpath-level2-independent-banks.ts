@@ -124,6 +124,8 @@ const prePrompts = new Set(LEVEL2_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) 
 check(LEVEL2_STARPATH_INDEPENDENT_POSTTEST_ITEMS.every((item) => !prePrompts.has(item.prompt)), "Pre-Test and Post-Test reuse prompt wording.");
 const source = fs.readFileSync(path.join(process.cwd(), "data/assessments/level2StarpathIndependentAssessments.ts"), "utf8");
 const apiSource = fs.readFileSync(path.join(process.cwd(), "data/assessments/api.ts"), "utf8");
+const workshopSource = fs.readFileSync(path.join(process.cwd(), "components/starpath/StarpathShapeWorkshopCard.tsx"), "utf8");
+const shapeFeatureSource = fs.readFileSync(path.join(process.cwd(), "components/starpath/StarpathShapeFeatureCard.tsx"), "utf8");
 const legacyIds = new Set((getLevelTwoPosttest().questions ?? []).map((item) => item.id));
 const productionPreByYear = getPretestForYearLabel("Year 2", "space");
 const productionPreByLevel = getPretestForLevel(2, "space");
@@ -139,6 +141,9 @@ check(JSON.stringify(productionPostByYear.map((item) => item.id)) === JSON.strin
 check(JSON.stringify(productionPostByLevel.map((item) => item.id)) === JSON.stringify(expectedPostIds), "Level Post-Test route is not live on the independent bank.");
 check(productionPostByYear.every((item) => !legacyIds.has(item.id)), "Production still resolves a retired quiz-derived Post-Test item.");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Assessment thresholds must remain 85%.");
+check(workshopSource.includes("AssessmentConstructionGrid") && workshopSource.includes('assessmentMode && task.mode === "construct"'), "Assessment constructions still expose the guided target shape.");
+check(workshopSource.includes("isSimplePolygon") && workshopSource.includes("parallelPairCount"), "Assessment construction does not validate genuine closed shapes and parallel-side requirements.");
+check(shapeFeatureSource.includes("[&>svg]:h-full") && shapeFeatureSource.includes("[&>svg]:w-full"), "Level 2 assessment shapes are not centred within their option widgets.");
 
 console.log(`Year 2 Starpath independent-bank audit: ${passed} passed, ${failures.length} failed.`);
 console.log("Forms: 40 items; each 14 manipulated / 6 selected; independent production resolver active.");

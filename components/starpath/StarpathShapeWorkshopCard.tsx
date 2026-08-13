@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Wrench } from "lucide-react";
+import { Check, RotateCcw, Undo2, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
@@ -22,6 +22,70 @@ function coordinate(point: Point) {
 
 function edgeKey(a: Point, b: Point) {
   return [`${a.r}:${a.c}`, `${b.r}:${b.c}`].sort().join("|");
+}
+
+function samePoint(a: Point, b: Point) {
+  return a.r === b.r && a.c === b.c;
+}
+
+function orientation(a: Point, b: Point, c: Point) {
+  return (b.c - a.c) * (c.r - a.r) - (b.r - a.r) * (c.c - a.c);
+}
+
+function liesOnSegment(a: Point, b: Point, point: Point) {
+  return orientation(a, b, point) === 0
+    && point.c >= Math.min(a.c, b.c)
+    && point.c <= Math.max(a.c, b.c)
+    && point.r >= Math.min(a.r, b.r)
+    && point.r <= Math.max(a.r, b.r);
+}
+
+function segmentsIntersect(a: Point, b: Point, c: Point, d: Point) {
+  const abC = orientation(a, b, c);
+  const abD = orientation(a, b, d);
+  const cdA = orientation(c, d, a);
+  const cdB = orientation(c, d, b);
+  return (abC * abD < 0 && cdA * cdB < 0)
+    || (abC === 0 && liesOnSegment(a, b, c))
+    || (abD === 0 && liesOnSegment(a, b, d))
+    || (cdA === 0 && liesOnSegment(c, d, a))
+    || (cdB === 0 && liesOnSegment(c, d, b));
+}
+
+function isSimplePolygon(points: Point[]) {
+  if (points.length < 3) return false;
+  if (points.some((point, index) => orientation(points[index - 1] ?? points.at(-1)!, point, points[(index + 1) % points.length]!) === 0)) {
+    return false;
+  }
+  for (let first = 0; first < points.length; first += 1) {
+    const firstNext = (first + 1) % points.length;
+    for (let second = first + 1; second < points.length; second += 1) {
+      const secondNext = (second + 1) % points.length;
+      if (first === second || firstNext === second || secondNext === first) continue;
+      if (segmentsIntersect(points[first]!, points[firstNext]!, points[second]!, points[secondNext]!)) return false;
+    }
+  }
+  return true;
+}
+
+function parallelPairCount(points: Point[]) {
+  const edges = points.map((point, index) => {
+    const next = points[(index + 1) % points.length]!;
+    return { x: next.c - point.c, y: next.r - point.r };
+  });
+  let pairs = 0;
+  for (let first = 0; first < edges.length; first += 1) {
+    for (let second = first + 1; second < edges.length; second += 1) {
+      if (edges[first]!.x * edges[second]!.y === edges[first]!.y * edges[second]!.x) pairs += 1;
+    }
+  }
+  return pairs;
+}
+
+function assessmentConstructionIsCorrect(task: WorkshopTask, points: Point[]) {
+  if (points.length !== task.points.length || !isSimplePolygon(points)) return false;
+  if (!task.prompt.toLowerCase().includes("parallel")) return true;
+  return parallelPairCount(points) >= parallelPairCount(task.points);
 }
 
 function ShapeGrid({
@@ -124,18 +188,62 @@ function ShapeGrid({
   );
 }
 
+function AssessmentConstructionGrid({
+  selectedPoints,
+  onPoint,
+  label,
+}: {
+  selectedPoints: Point[];
+  onPoint: (point: Point) => void;
+  label: string;
+}) {
+  const start = selectedPoints[0]!;
+  return (
+    <svg viewBox="0 0 100 100" className="mx-auto h-auto w-full max-w-[280px]" role="img" aria-label={`${label} construction grid`}>
+      {selectedPoints.slice(1).map((point, index) => {
+        const from = coordinate(selectedPoints[index]!);
+        const to = coordinate(point);
+        return <line key={`${index}-${point.r}-${point.c}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke="#4f46e5" strokeWidth="4" strokeLinecap="round" />;
+      })}
+      {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, index) => {
+        const point = { r: Math.floor(index / GRID_SIZE), c: index % GRID_SIZE };
+        const { x, y } = coordinate(point);
+        const selectedIndex = selectedPoints.findIndex((selected) => samePoint(selected, point));
+        const isStart = samePoint(start, point);
+        return (
+          <g key={index}>
+            <circle
+              cx={x}
+              cy={y}
+              r={isStart ? 5.5 : selectedIndex > 0 ? 4.5 : 1.8}
+              fill={isStart ? "#22d3ee" : selectedIndex > 0 ? "#ffffff" : "#c4b5fd"}
+              stroke={selectedIndex >= 0 ? "#312e81" : "transparent"}
+              strokeWidth={selectedIndex >= 0 ? 2.5 : 0}
+              opacity={selectedIndex >= 0 ? 1 : 0.55}
+            />
+            <circle cx={x} cy={y} r="8" fill="transparent" className="cursor-pointer" onClick={() => onPoint(point)} />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 export function StarpathShapeWorkshopCard({
   task,
   onCorrect,
   onWrong,
+  assessmentMode = false,
 }: {
   task: WorkshopTask;
   onCorrect: () => void;
   onWrong: (studentAnswer?: string) => void;
+  assessmentMode?: boolean;
 }) {
   const [constructStep, setConstructStep] = useState(1);
   const [repairPoints, setRepairPoints] = useState<number[]>([]);
   const [complete, setComplete] = useState(false);
+  const [assessmentPoints, setAssessmentPoints] = useState<Point[]>([task.points[0]!]);
 
   const missingPair = useMemo(() => {
     if (task.missingEdgeIndex === undefined) return null;
@@ -182,6 +290,22 @@ export function StarpathShapeWorkshopCard({
     onWrong(chosen.map((value) => `point ${value + 1}`).join(" and "));
   }
 
+  function chooseAssessmentPoint(point: Point) {
+    if (complete || task.mode !== "construct") return;
+    const start = assessmentPoints[0]!;
+    if (samePoint(point, start)) {
+      if (assessmentPoints.length !== task.points.length) return;
+      setComplete(true);
+      if (assessmentConstructionIsCorrect(task, assessmentPoints)) onCorrect();
+      else onWrong(assessmentPoints.map((item) => `${item.r}:${item.c}`).join(","));
+      return;
+    }
+    if (assessmentPoints.length >= task.points.length || assessmentPoints.some((selected) => samePoint(selected, point))) return;
+    setAssessmentPoints((current) => [...current, point]);
+  }
+
+  const assessmentConstruct = assessmentMode && task.mode === "construct";
+
   return (
     <div>
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
@@ -226,20 +350,48 @@ export function StarpathShapeWorkshopCard({
             {task.mode === "repair" ? <Wrench className="h-4 w-4" /> : null}
             {task.mode === "repair" ? "Shape repair grid" : "Connect the stars"}
           </div>
-          <ShapeGrid
-            points={task.points}
-            selectedCount={task.mode === "construct" ? constructStep : undefined}
-            missingEdgeIndex={complete ? undefined : task.missingEdgeIndex}
-            onPoint={task.mode === "construct" ? chooseConstructPoint : chooseRepairPoint}
-            selectedRepairPoints={repairPoints}
-            label={task.shapeLabel}
-          />
+          {assessmentConstruct ? (
+            <AssessmentConstructionGrid selectedPoints={assessmentPoints} onPoint={chooseAssessmentPoint} label={task.shapeLabel} />
+          ) : (
+            <ShapeGrid
+              points={task.points}
+              selectedCount={task.mode === "construct" ? constructStep : undefined}
+              missingEdgeIndex={complete ? undefined : task.missingEdgeIndex}
+              onPoint={task.mode === "construct" ? chooseConstructPoint : chooseRepairPoint}
+              selectedRepairPoints={repairPoints}
+              label={task.shapeLabel}
+            />
+          )}
+          {assessmentConstruct ? (
+            <div className="mt-3 flex justify-center gap-2">
+              <button
+                type="button"
+                disabled={assessmentPoints.length <= 1}
+                onClick={() => setAssessmentPoints((current) => current.slice(0, -1))}
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg border-2 border-violet-200 bg-white px-4 text-sm font-black text-indigo-950 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <Undo2 className="h-4 w-4" /> Undo
+              </button>
+              <button
+                type="button"
+                disabled={assessmentPoints.length <= 1}
+                onClick={() => setAssessmentPoints([task.points[0]!])}
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg border-2 border-violet-200 bg-white px-4 text-sm font-black text-indigo-950 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <RotateCcw className="h-4 w-4" /> Clear
+              </button>
+            </div>
+          ) : null}
           <p className="mt-2 text-center font-bold text-indigo-950">
             {complete ? (
               <span className="inline-flex items-center gap-2 text-emerald-700">
                 <Check className="h-5 w-5" />
                 {task.feedback.correct}
               </span>
+            ) : assessmentConstruct ? (
+              assessmentPoints.length === task.points.length
+                ? "Tap the blue starting point to close and submit your shape."
+                : `Choose ${task.points.length - assessmentPoints.length} more ${task.points.length - assessmentPoints.length === 1 ? "corner" : "corners"}.`
             ) : task.mode === "construct" ? (
               constructStep === 1
                 ? "The glowing star is your start. Tap the next corner."

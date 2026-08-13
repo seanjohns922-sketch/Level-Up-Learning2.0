@@ -684,7 +684,7 @@ function TaskRendererInner({
     case "starpathShapeHunt":
       return <StarpathShapeHuntCard key={k} task={t} onComplete={onC} />;
     case "starpathShapeWorkshop":
-      return <StarpathShapeWorkshopCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathShapeWorkshopCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />;
     case "starpathObjectSpotter":
       return <StarpathObjectSpotterCard key={k} task={t} onComplete={onC} />;
     case "starpathObjectCompare":

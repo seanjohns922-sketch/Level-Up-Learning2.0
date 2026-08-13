@@ -12,7 +12,7 @@ function L2Shape({ id, colour, className }: { id: string; colour?: string; class
   const markup = useMemo(() => l2ShapeSvg(getL2Shape(id), { size: 120, colour }), [id, colour]);
   return (
     <span
-      className={className ?? "block h-24 w-24"}
+      className={`${className ?? "h-24 w-24"} flex shrink-0 items-center justify-center [&>svg]:block [&>svg]:h-full [&>svg]:w-full`}
       role="img"
       aria-label={getL2Shape(id).label}
       dangerouslySetInnerHTML={{ __html: markup }}
