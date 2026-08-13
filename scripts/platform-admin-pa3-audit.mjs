@@ -4,7 +4,7 @@ import path from "node:path";
 const root=process.cwd();
 const read=(file)=>fs.readFileSync(path.join(root,file),"utf8");
 const migration=read("supabase/migrations/20260811170000_platform_admin_pa3_operations_growth.sql");
-const homeUsersMigration=read("supabase/migrations/20260813143000_platform_admin_home_users.sql");
+const homeUsersMigration=read("supabase/migrations/20260813171000_fix_platform_admin_home_users_parent_link_date.sql");
 const server=read("lib/platform-admin-server.ts");
 const layout=read("app/admin/layout.tsx");
 const users=read("app/admin/users/page.tsx");
@@ -82,6 +82,7 @@ check("Home Only excluded from funnel",migration.includes("not exists(select 1 f
 check("Home Only has a separate aggregate",server.includes("get_platform_admin_home_only_snapshot"));
 check("Home Only has a separate route",has(homeOnly,"loadPlatformHomeOnly","Home Only students","Active · 7 days"));
 check("Home users contact list has owner RPC",has(homeUsersMigration,"get_platform_admin_home_users","parentEmail","student_access_entitlements","parent_student_links"));
+check("Home users parent link date uses canonical linked_at",has(homeUsersMigration,"'linkedAt', link.linked_at")&&!homeUsersMigration.includes("link.created_at"));
 check("Home users contact list has admin route",has(homeUsers,"loadPlatformHomeUsers","Parent emails","Contact-data note"));
 check("Home page links Home users route",read("app/admin/home/page.tsx").includes('href="/admin/home/users"'));
 check("multiple parents deduplicated",migration.includes("count(distinct link.student_id)"));
