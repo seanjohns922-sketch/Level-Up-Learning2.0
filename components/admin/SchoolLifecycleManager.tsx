@@ -1,7 +1,7 @@
 "use client";
 
 import { Archive, Pause, Play, RotateCcw, UserPlus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { PlatformSchoolDetail } from "@/lib/platform-admin-server";
 
 async function command(payload: Record<string, unknown>) {
@@ -12,7 +12,7 @@ async function command(payload: Record<string, unknown>) {
   });
   const result = (await response.json().catch(() => null)) as {
     error?: string;
-    administrator?: { emailDelivery?: string };
+    administrator?: { emailDelivery?: string; status?: string };
   } | null;
   if (!response.ok) throw new Error(result?.error ?? "Platform Admin command failed");
   return result;
@@ -39,6 +39,7 @@ function schoolAdminInviteMailto(email: string, schoolName: string, schoolCode: 
 }
 
 export default function SchoolLifecycleManager({ detail }: { detail: PlatformSchoolDetail }) {
+  const messageKey = `lul-platform-school-admin-message:${detail.school.id}`;
   const archived = detail.school.status === "archived";
   const paused = detail.school.status === "paused";
   const [editing, setEditing] = useState(false);
@@ -46,12 +47,30 @@ export default function SchoolLifecycleManager({ detail }: { detail: PlatformSch
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    const saved = window.sessionStorage.getItem(messageKey);
+    if (saved) {
+      setMessage(saved);
+      window.sessionStorage.removeItem(messageKey);
+    }
+  }, [messageKey]);
+
   async function run(payload: Record<string, unknown>, success: string) {
     setBusy(true); setError(null); setMessage(null);
     try {
       const result = await command(payload);
       const delivery = result?.administrator?.emailDelivery;
-      setMessage(delivery === "sent" ? `${success}. Invite email sent.` : delivery === "failed" ? `${success}. Invite email could not be sent; use Draft email.` : delivery === "unconfigured" ? `${success}. Email sending is not configured; use Draft email.` : success);
+      const adminStatus = result?.administrator?.status;
+      const nextMessage = delivery === "sent"
+        ? `${success}. Invite email sent.`
+        : delivery === "failed"
+          ? `${success}. Invite email could not be sent; use Draft email.`
+          : delivery === "unconfigured"
+            ? `${success}. Email sending is not configured; use Draft email.`
+            : adminStatus === "membership_added"
+              ? `${success}. Existing account linked directly; no invite email needed.`
+              : success;
+      window.sessionStorage.setItem(messageKey, nextMessage);
       window.location.reload();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Command failed");
