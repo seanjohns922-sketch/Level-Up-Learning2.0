@@ -208,7 +208,7 @@ export default function LoginPage() {
       !teacherSchoolCode.trim()
     ) {
       setTeacherError(
-        "Enter your name, invited email, password and School Code.",
+        "Enter your name, invited email, new password and School Code.",
       );
       return;
     }
@@ -231,7 +231,7 @@ export default function LoginPage() {
     if (!signUpData.session?.access_token) {
       setTeacherMode("login");
       setTeacherResetNotice(
-        "Check your email to verify the account, then log in with the same School Code.",
+        "Check your email to verify the account, then log in with the password you created and the same School Code.",
       );
       setTeacherLoading(false);
       return;
@@ -1288,10 +1288,15 @@ export default function LoginPage() {
               </InputField>
             </label>
             <label className="grid gap-1.5">
-              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Password</span>
+              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">{teacherMode === "activate" ? "Create Password" : "Password"}</span>
               <InputField icon={<Lock size={15} />}>
                 <input value={teacherPassword} onChange={(e) => setTeacherPassword(e.target.value)} placeholder="********" type="password" className={inputCls} />
               </InputField>
+              {teacherMode === "activate" ? (
+                <span className="pl-1 text-[11px] font-semibold text-white/40">
+                  First time here? Make your own password for this account.
+                </span>
+              ) : null}
             </label>
 
             {teacherMode === "login" && (
@@ -1309,6 +1314,9 @@ export default function LoginPage() {
 
             {teacherMode === "activate" && (
               <>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left text-xs font-semibold leading-5 text-white/55">
+                  Use the exact invited email. The School Code connects that email to the school invite; it is not your password.
+                </div>
                 <label className="grid gap-1.5">
                   <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Educator Name</span>
                   <InputField icon={<User size={15} />}>

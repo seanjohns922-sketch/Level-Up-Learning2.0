@@ -37,6 +37,27 @@ function formatDate(value: string | null) {
     : new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short", year: "numeric" }).format(date);
 }
 
+function schoolAdminInviteMailto(email: string | null, schoolName: string, schoolCode: string) {
+  if (!email) return "#";
+  const loginUrl = typeof window === "undefined" ? "/login" : `${window.location.origin}/login`;
+  const subject = `Level Up Learning school admin access for ${schoolName}`;
+  const body = [
+    `Hi,`,
+    ``,
+    `Your Level Up Learning school administrator access is ready for ${schoolName}.`,
+    ``,
+    `Go to: ${loginUrl}`,
+    `Choose: Activate Invite`,
+    `Email: ${email}`,
+    `School Code: ${schoolCode}`,
+    ``,
+    `If this is your first time using Level Up Learning, create your own password on that screen. The School Code is only used to connect your invited email to the school.`,
+    ``,
+    `After activation, use Log In with the same email and password.`,
+  ].join("\n");
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoolSummary[] }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("current");
@@ -186,7 +207,12 @@ export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoo
                         <div><dt className="text-xs font-bold uppercase text-amber-700">Email invited</dt><dd className="font-semibold">{created.initialAdminEmail ?? "Not recorded"}</dd></div>
                         <div><dt className="text-xs font-bold uppercase text-amber-700">School code</dt><dd className="font-semibold tracking-wide">{created.schoolCode}</dd></div>
                       </dl>
-                      <p className="mt-3 font-semibold">They sign up or log in with that email, choose Activate Invite, then enter the school code.</p>
+                      <p className="mt-3 font-semibold">They choose Activate Invite, enter that email, create their own password, then enter the school code.</p>
+                      {created.initialAdminEmail ? (
+                        <a href={schoolAdminInviteMailto(created.initialAdminEmail, created.name, created.schoolCode)} className="mt-4 inline-flex rounded-md bg-amber-700 px-3 py-2 text-xs font-bold text-white">
+                          Draft email to admin
+                        </a>
+                      ) : null}
                     </div>
                   ) : null}
                 </div>
