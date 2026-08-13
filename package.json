@@ -130,6 +130,7 @@
     "qa:p0-lcp-loading": "node scripts/p0-lcp-loading-audit.mjs",
     "qa:teacher-canonical-snapshot": "node scripts/teacher-canonical-snapshot-audit.mjs",
     "qa:teacher-live-realms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/teacher-live-realm-integration-audit.ts",
+    "qa:teacher-real-activity-preview": "node scripts/teacher-real-activity-preview-audit.mjs",
     "qa:archived-student-roster": "node scripts/archived-student-roster-audit.mjs",
     "qa:pretest-pathway": "node --no-warnings --experimental-strip-types scripts/pretest-pathway-assignment-audit.mjs",
     "qa:early-years-inputs": "node scripts/early-years-answer-input-audit.mjs",

@@ -13,6 +13,9 @@ export function isDemoAccessFeatureEnabled() {
 export function isDemoPreviewMode() {
   if (DEMO_MODE) return true;
   if (typeof window === "undefined") return false;
+  if (new URLSearchParams(window.location.search).get("teacher_preview") === "1") {
+    return true;
+  }
   return isDemoAccessFeatureEnabled() &&
     window.localStorage.getItem(DEMO_PREVIEW_STORAGE_KEY) === "1" &&
     window.localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() === DEMO_PREVIEW_SCOPE;
