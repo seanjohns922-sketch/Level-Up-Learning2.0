@@ -36,6 +36,7 @@ import {
   getRealmDefinition,
   requireCanonicalRealmId,
   tryCanonicalRealmId,
+  type CanonicalRealmId,
 } from "@/lib/realms/realm-registry";
 import { buildTeacherStudentSnapshot } from "@/lib/teacher/teacher-student-snapshot";
 
@@ -147,7 +148,7 @@ type Props = {
   progress: ProgressRow[];
   liveRows: LiveStudentActivityRow[];
   liveEvents: LiveActivityEventRow[];
-  onRealmChange?: (realmId: "number" | "measurement") => void;
+  onRealmChange?: (realmId: Extract<CanonicalRealmId, "number" | "measurement" | "space">) => void;
   onProgressChanged?: () => Promise<void> | void;
   progressAvailable?: boolean;
 };
@@ -888,7 +889,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
   const canonicalGenreRealmId = tryCanonicalRealmId(genreId);
   const selectedRealmId = genre.available ? canonicalGenreRealmId : null;
   useEffect(() => {
-    if (selectedRealmId === "number" || selectedRealmId === "measurement") {
+    if (selectedRealmId === "number" || selectedRealmId === "measurement" || selectedRealmId === "space") {
       onRealmChange?.(selectedRealmId);
     }
   }, [onRealmChange, selectedRealmId]);
@@ -939,7 +940,11 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const persistedIds = prog ? parseCompleted(prog.completed_lesson_ids) : [];
       const ids = persistedIds;
       const sPrefix = workingYear
-        ? genreId === "measurement" ? `${lessonIdPrefix(workingYear)}measurement-` : lessonIdPrefix(workingYear)
+        ? genreId === "measurement"
+          ? `${lessonIdPrefix(workingYear)}measurement-`
+          : genreId === "space"
+            ? `${lessonIdPrefix(workingYear)}space-`
+            : lessonIdPrefix(workingYear)
         : "";
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
       const planForStudentYear = workingYear ? getCurriculumPlan(workingYear, genreId) : [];
@@ -1202,7 +1207,13 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     latestPretest={latestPretest}
                     pathwayStatus={placementStatus}
                     isPlaceholder={isPlaceholder}
-                    prefix={lessonIdPrefix(workingYear)}
+                    prefix={
+                      genre.id === "measurement"
+                        ? `${lessonIdPrefix(workingYear)}measurement-`
+                        : genre.id === "space"
+                          ? `${lessonIdPrefix(workingYear)}space-`
+                          : lessonIdPrefix(workingYear)
+                    }
                     onProgressChanged={onProgressChanged}
                   />
                 ) : isOpen ? (
@@ -1732,6 +1743,7 @@ function StudentStrandDetail({
         weekTopic={plan.find((p) => p.week === previewLesson?.week)?.topic}
         strand={genre.strand}
         realm={genre.realm}
+        realmId={tryCanonicalRealmId(genre.id) ?? undefined}
         yearLabel={yearLabel}
         isPlaceholder={isPlaceholder}
         student={previewLesson ? (() => {

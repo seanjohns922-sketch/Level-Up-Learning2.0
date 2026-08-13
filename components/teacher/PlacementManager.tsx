@@ -31,7 +31,6 @@ type PMStudent = {
 };
 
 const PLACEMENT_REALMS = getAllRealms()
-  .filter((realm) => realm.id !== "space")
   .map((realm) => ({
     id: realm.id,
     label: `${realm.realm} (${realm.strand})`,

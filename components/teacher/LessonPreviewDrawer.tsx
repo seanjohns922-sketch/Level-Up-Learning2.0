@@ -6,6 +6,7 @@ import type { Lesson } from "@/data/programs/year1";
 import { DEFAULT_LESSON_XP } from "@/data/programs/genres";
 import type { TeacherInsight } from "@/lib/teacher-insights";
 import type { LessonActivity, ActivityType } from "@/data/programs/types";
+import { buildLessonRoute } from "@/lib/lesson-routing";
 
 export type LessonPreviewStudent = {
   id: string;
@@ -36,6 +37,7 @@ type Props = {
   weekNumber?: number;
   strand?: string;
   realm?: string;
+  realmId?: string;
   yearLabel?: string;
   isPlaceholder?: boolean;
   /** Student-specific context (used in StrandStudentsPanel detail view). */
@@ -1078,7 +1080,7 @@ function statusTone(s: LessonPreviewStudent["status"]) {
 
 export default function LessonPreviewDrawer({
   open, onClose, lesson, weekTopic, weekNumber, strand, realm, yearLabel,
-  isPlaceholder, student, classStats,
+  realmId, isPlaceholder, student, classStats,
 }: Props) {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
@@ -1097,6 +1099,23 @@ export default function LessonPreviewDrawer({
 
   const ideas = (lesson.activityIdeas?.length ? lesson.activityIdeas : ["Activity 1", "Activity 2", "Activity 3"]).slice(0, 3);
   while (ideas.length < 3) ideas.push("Mixed practice");
+  const configuredPreviewHref =
+    lesson.config && typeof lesson.config.teacherPreviewHref === "string"
+      ? lesson.config.teacherPreviewHref
+      : null;
+  const generatedPreviewHref =
+    !isPlaceholder && yearLabel && weekNumber && realmId
+      ? buildLessonRoute({
+          yearLabel,
+          week: weekNumber,
+          lessonNumber: lesson.lesson,
+          realmId,
+        })
+      : null;
+  const previewHref = configuredPreviewHref ?? generatedPreviewHref;
+  const teacherPreviewHref = previewHref
+    ? `${previewHref}${previewHref.includes("?") ? "&" : "?"}teacher_preview=1`
+    : null;
 
   return (
     <div className="fixed inset-0 z-50 flex" role="dialog" aria-modal="true" aria-label="Lesson preview">
@@ -1349,9 +1368,18 @@ export default function LessonPreviewDrawer({
             Recommend revisit
           </button>
           <button
-            disabled
-            title="Coming soon"
-            className="px-3 py-1.5 rounded-lg bg-white border border-[#E6E8EC] text-[#64748B] text-xs font-bold cursor-not-allowed"
+            disabled={!teacherPreviewHref}
+            title={teacherPreviewHref ? "Open the live lesson in teacher preview mode" : "Preview is unavailable for this lesson"}
+            onClick={() => {
+              if (!teacherPreviewHref) return;
+              window.open(teacherPreviewHref, "_blank", "noopener,noreferrer");
+            }}
+            className={[
+              "px-3 py-1.5 rounded-lg bg-white border border-[#E6E8EC] text-xs font-bold",
+              teacherPreviewHref
+                ? "text-[#0F172A] hover:border-teal-300 hover:text-teal-700"
+                : "text-[#64748B] cursor-not-allowed",
+            ].join(" ")}
           >
             Preview student view
           </button>
@@ -1394,4 +1422,3 @@ function Bullet({ children }: { children: React.ReactNode }) {
     </li>
   );
 }
-

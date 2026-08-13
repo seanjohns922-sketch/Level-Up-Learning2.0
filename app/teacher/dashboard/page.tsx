@@ -18,7 +18,7 @@ import {
   type BrainBreakFrequency,
 } from "@/lib/brain-break-settings";
 import { formatAccuracy } from "@/lib/learning-score";
-import { getRealmDefinition, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
+import { getRealmDefinition, tryCanonicalRealmId, type CanonicalRealmId } from "@/lib/realms/realm-registry";
 import { getSchoolLogo } from "@/lib/school-logos";
 import { getRealmWeekNumbers, selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
@@ -47,6 +47,8 @@ type ProgressRow = {
   teacher_advanced_weeks?: number[];
   updated_at?: string | null;
 };
+
+type LiveMathRealmId = Extract<CanonicalRealmId, "number" | "measurement" | "space">;
 
 type LiveStudentActivityRow = {
   student_id: string;
@@ -311,7 +313,7 @@ export default function TeacherDashboardPage() {
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
-  const [analyticsRealmId, setAnalyticsRealmId] = useState<"number" | "measurement">("number");
+  const [analyticsRealmId, setAnalyticsRealmId] = useState<LiveMathRealmId>("number");
   const [showPlacements, setShowPlacements] = useState(false);
   const [pinToast, setPinToast] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);

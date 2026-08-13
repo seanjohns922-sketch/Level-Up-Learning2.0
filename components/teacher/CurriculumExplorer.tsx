@@ -92,7 +92,12 @@ export default function CurriculumExplorer({
           )
       : [];
   const isPlaceholder = !genre?.available;
-  const prefix = genreId === "measurement" ? `${lessonIdPrefix(yearLabel)}measurement-` : lessonIdPrefix(yearLabel);
+  const prefix =
+    genreId === "measurement"
+      ? `${lessonIdPrefix(yearLabel)}measurement-`
+      : genreId === "space"
+        ? `${lessonIdPrefix(yearLabel)}space-`
+        : lessonIdPrefix(yearLabel);
 
   /** Per-lesson status counts across loaded students. */
   function lessonStatusCounts(lessonId: string) {
@@ -479,6 +484,7 @@ export default function CurriculumExplorer({
         weekTopic={week?.topic}
         strand={genre?.strand}
         realm={genre?.realm}
+        realmId={selectedRealmId ?? undefined}
         yearLabel={yearLabel}
         isPlaceholder={isPlaceholder}
         classStats={previewLesson ? (() => {

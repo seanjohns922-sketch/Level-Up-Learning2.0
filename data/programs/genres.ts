@@ -7,6 +7,9 @@ import { YEAR3_MEASURELANDS_PROGRAM } from "./year3Measurelands";
 import { YEAR4_MEASURELANDS_PROGRAM } from "./year4Measurelands";
 import { YEAR5_MEASURELANDS_PROGRAM } from "./year5Measurelands";
 import { YEAR6_MEASURELANDS_PROGRAM } from "./year6Measurelands";
+import { getStarpathProgram } from "@/data/starpath/program-registry";
+import { getStarpathLevelForYear } from "@/lib/starpath-levels";
+import { buildLessonRoute } from "@/lib/lesson-routing";
 
 export type Genre = {
   id: string;
@@ -31,7 +34,7 @@ function yearOrdinal(yearLabel: string): number {
 const ALL_GENRES: GenreCatalogEntry[] = [
   { id: "number",      strand: "Number",      realm: "Number Nexus",    availableLevels: [0, 1, 2, 3, 4, 5, 6], unlocksFromLevel: 0 },
   { id: "measurement", strand: "Measurement", realm: "Measurelands",    availableLevels: [0, 1, 2, 3, 4, 5, 6], unlocksFromLevel: 0 },
-  { id: "space",       strand: "Space",       realm: "Geospin",         unlocksFromLevel: 0 },
+  { id: "space",       strand: "Space",       realm: "Starpath",        availableLevels: [0, 1, 2, 3, 4, 5, 6], unlocksFromLevel: 0 },
   { id: "reading",     strand: "Reading",     realm: "Reading Ridge",   unlocksFromLevel: 0 },
   { id: "writing",     strand: "Writing",     realm: "Inkwell Wilds",   unlocksFromLevel: 0 },
   { id: "grammar",     strand: "Grammar",     realm: "Runehaven Peaks", unlocksFromLevel: 0 },
@@ -117,6 +120,42 @@ function placeholderWeeks(yearLabel: string, genre: Genre): WeekPlan[] {
   });
 }
 
+function starpathWeeks(yearLabel: string): WeekPlan[] {
+  const normalizedYear = yearLabel === "Foundation" ? "Prep" : yearLabel;
+  const level = getStarpathLevelForYear(
+    normalizedYear as Parameters<typeof getStarpathLevelForYear>[0],
+  );
+  const program = getStarpathProgram(level.id);
+  return program.weeks.map((week): WeekPlan => ({
+    id: `${program.programId}-w${week.week}`,
+    week: week.week,
+    topic: week.title,
+    curriculum: week.descriptorCodes as WeekPlan["curriculum"],
+    lessons: week.lessons.map((lesson, index): Lesson => ({
+      id: lesson.id,
+      week: week.week,
+      lesson: index + 1,
+      title: lesson.title,
+      focus: lesson.learningIntention || lesson.focus,
+      activityIdeas: [...lesson.activityMechanics],
+      curriculum: week.descriptorCodes as Lesson["curriculum"],
+      activityType: "starpath",
+      config: {
+        realmId: "space",
+        starpathLevel: level.id,
+        sequenceRole: lesson.sequenceRole,
+        skillIds: lesson.skillIds,
+        teacherPreviewHref: buildLessonRoute({
+          yearLabel: normalizedYear,
+          week: week.week,
+          lessonNumber: index + 1,
+          realmId: "space",
+        }),
+      },
+    })),
+  }));
+}
+
 /**
  * Returns the 12-week curriculum plan for a (year, genre) combination.
  * Falls back to a 12-week placeholder scaffold when no real program exists.
@@ -131,6 +170,10 @@ export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[
     if (program) {
       return program;
     }
+  }
+
+  if (genre.available && genreId === "space") {
+    return starpathWeeks(yearLabel);
   }
 
   if (genre.available && genreId === "measurement" && yearLabel === "Prep") {
