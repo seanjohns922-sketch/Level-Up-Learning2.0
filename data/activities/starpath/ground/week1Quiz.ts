@@ -47,6 +47,15 @@ import {
   buildLevelFiveWeek6VoyageQuiz,
   buildLevelFiveWeek7VoyageQuiz,
 } from "@/data/activities/starpath/level5/weeklyQuizzes";
+import {
+  buildLevelSixWeek1VoyageQuiz,
+  buildLevelSixWeek2VoyageQuiz,
+  buildLevelSixWeek3VoyageQuiz,
+  buildLevelSixWeek4VoyageQuiz,
+  buildLevelSixWeek5VoyageQuiz,
+  buildLevelSixWeek6VoyageQuiz,
+  buildLevelSixWeek7VoyageQuiz,
+} from "@/data/activities/starpath/level6/weeklyQuizzes";
 
 // Ground Level · Week 1 Voyage Quiz — 15 questions, 5 from each lesson, using
 // single-answer shape tasks only (so every question is graded pass/fail).
@@ -122,6 +131,13 @@ const STARPATH_QUIZ_BUILDERS: Record<string, () => PracticeTask[]> = {
   "level-5-w5": buildLevelFiveWeek5VoyageQuiz,
   "level-5-w6": buildLevelFiveWeek6VoyageQuiz,
   "level-5-w7": buildLevelFiveWeek7VoyageQuiz,
+  "level-6-w1": buildLevelSixWeek1VoyageQuiz,
+  "level-6-w2": buildLevelSixWeek2VoyageQuiz,
+  "level-6-w3": buildLevelSixWeek3VoyageQuiz,
+  "level-6-w4": buildLevelSixWeek4VoyageQuiz,
+  "level-6-w5": buildLevelSixWeek5VoyageQuiz,
+  "level-6-w6": buildLevelSixWeek6VoyageQuiz,
+  "level-6-w7": buildLevelSixWeek7VoyageQuiz,
   // Week 8 has no weekly quiz — its assessment is the Post-Test.
 };
 

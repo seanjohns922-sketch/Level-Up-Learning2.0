@@ -38,6 +38,10 @@ import {
   LEVEL5_STARPATH_INDEPENDENT_POSTTEST_ITEMS,
   LEVEL5_STARPATH_INDEPENDENT_PRETEST_ITEMS,
 } from "./level5StarpathIndependentAssessments";
+import {
+  LEVEL6_STARPATH_INDEPENDENT_POSTTEST_ITEMS,
+  LEVEL6_STARPATH_INDEPENDENT_PRETEST_ITEMS,
+} from "./level6StarpathIndependentAssessments";
 import { getStarpathPosttestForYear } from "@/data/activities/starpath/ground/groundPostTest";
 import type { SupportedMathLevel } from "@/data/activities/year2/lessonEngine";
 import { isGroundLevelYear } from "@/lib/lesson-routing";
@@ -52,7 +56,7 @@ export type AssessmentQuestion = PretestQuestion | PosttestQuestion;
 export type AssessmentRealmId = "number" | "measurement" | "space";
 
 // Resolve the Starpath (space) post-test for a given year label. Ground Level
-// (Prep) and Levels 1-5 have full post-tests; later levels fall through.
+// (Prep) and Levels 1-6 have full post-tests; later levels fall through.
 function getStarpathPosttest(yearLabel: string): PostTest | undefined {
   if (yearLabel === "Year 1") {
     return {
@@ -84,6 +88,12 @@ function getStarpathPosttest(yearLabel: string): PostTest | undefined {
       questions: [...LEVEL5_STARPATH_INDEPENDENT_POSTTEST_ITEMS],
     };
   }
+  if (yearLabel === "Year 6") {
+    return {
+      yearLabel: "Year 6",
+      questions: [...LEVEL6_STARPATH_INDEPENDENT_POSTTEST_ITEMS],
+    };
+  }
   return getStarpathPosttestForYear(yearLabel);
 }
 
@@ -102,6 +112,9 @@ function getStarpathPretest(yearLabel: string): PretestQuestion[] {
   }
   if (yearLabel === "Year 5") {
     return [...LEVEL5_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
+  }
+  if (yearLabel === "Year 6") {
+    return [...LEVEL6_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   }
   return [];
 }

@@ -107,7 +107,7 @@ function descriptor(
   const source = program.descriptors.find((item) => item.code === code);
   if (!source) throw new Error(`${program.yearLabel} is missing ${code}.`);
   const currentWeeks = program.weeks.filter((week) => week.descriptorCodes.includes(code)).map((week) => week.week);
-  const curriculumAudited = level === 2 || level === 3 || level === 4 || level === 5;
+  const curriculumAudited = level === 2 || level === 3 || level === 4 || level === 5 || level === 6;
   return {
     code,
     descriptor: source.text,

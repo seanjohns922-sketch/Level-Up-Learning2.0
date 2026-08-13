@@ -1318,7 +1318,7 @@ Students connect objects and nets, use grid coordinates, perform transformations
 
 **Canonical level:** `level-6`
 **Program ID:** `y6-space`
-**Status:** planned
+**Status:** implemented
 
 Students reason about parallel cross-sections, four-quadrant coordinates and combined transformations used in tessellations and geometric investigations.
 
@@ -1346,8 +1346,8 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 
 ### Assessment Metadata
 
-- Pre-test: `y6-space-pre-01` (20 questions; planned)
-- Post-test: `y6-space-post-01` (20 questions; unlocks after `y6-space-w8-l3`; planned)
+- Pre-test: `y6-space-pre-01` (20 questions; implemented)
+- Post-test: `y6-space-post-01` (20 questions; unlocks after `y6-space-w8-l3`; implemented)
 
 ### Skill Taxonomy
 
@@ -1383,7 +1383,7 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 - A cross-section is always the same shape as a face.
 - Parallel cuts always produce congruent sections.
 
-**Weekly quiz:** `y6-space-w1-quiz` - Cross-section visualisation and parallel-cut comparison. (15 questions; planned)
+**Weekly quiz:** `y6-space-w1-quiz` - Cross-section visualisation and parallel-cut comparison. (15 questions; implemented)
 
 #### Week 2: Prisms and Changing Sections
 
@@ -1404,7 +1404,7 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 - Every object with one polygonal section is a prism.
 - All non-prism sections change in the same way.
 
-**Weekly quiz:** `y6-space-w2-quiz` - Prism relationships and structural inference. (15 questions; planned)
+**Weekly quiz:** `y6-space-w2-quiz` - Prism relationships and structural inference. (15 questions; implemented)
 
 #### Week 3: Four-Quadrant Coordinates
 
@@ -1425,7 +1425,7 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 - A negative coordinate is an impossible distance.
 - Points on axes belong to a quadrant.
 
-**Weekly quiz:** `y6-space-w3-quiz` - Four-quadrant conventions, signs and plotting. (15 questions; planned)
+**Weekly quiz:** `y6-space-w3-quiz` - Four-quadrant conventions, signs and plotting. (15 questions; implemented)
 
 #### Week 4: Coordinate Change
 
@@ -1446,7 +1446,7 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 - Crossing an axis swaps coordinate order.
 - A negative change always ends at a negative coordinate.
 
-**Weekly quiz:** `y6-space-w4-quiz` - Coordinate differences, axis crossing and inverse reasoning. (15 questions; planned)
+**Weekly quiz:** `y6-space-w4-quiz` - Coordinate differences, axis crossing and inverse reasoning. (15 questions; implemented)
 
 #### Week 5: Combined Transformations
 
@@ -1467,7 +1467,7 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 - Transformation order never matters.
 - Only the final position identifies the full sequence.
 
-**Weekly quiz:** `y6-space-w5-quiz` - Transformation composition, order and inverse inference. (15 questions; planned)
+**Weekly quiz:** `y6-space-w5-quiz` - Transformation composition, order and inverse inference. (15 questions; implemented)
 
 #### Week 6: Tessellation Design
 
@@ -1488,7 +1488,7 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 - Any repeated shape tessellates.
 - Decorative patterns are automatically tessellations.
 
-**Weekly quiz:** `y6-space-w6-quiz` - Tessellation conditions and transformation-generated patterns. (15 questions; planned)
+**Weekly quiz:** `y6-space-w6-quiz` - Tessellation conditions and transformation-generated patterns. (15 questions; implemented)
 
 #### Week 7: Transformation Investigations
 
@@ -1509,7 +1509,7 @@ Students reason about parallel cross-sections, four-quadrant coordinates and com
 - The same transformations always produce the same result in any order.
 - A visual pattern needs no stated transformation rule.
 
-**Weekly quiz:** `y6-space-w7-quiz` - Transformation combinations, geometric patterns and evidence. (15 questions; planned)
+**Weekly quiz:** `y6-space-w7-quiz` - Transformation combinations, geometric patterns and evidence. (15 questions; implemented)
 
 #### Week 8: Orbital Design Investigation
 
