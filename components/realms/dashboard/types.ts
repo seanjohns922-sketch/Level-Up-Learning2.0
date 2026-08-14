@@ -49,6 +49,7 @@ export type RealmDashboardWorld = {
 
 export type RealmDashboardTheme = {
   pageBackground: string;
+  backgroundFilter?: string;
   accent: string;
   accentRgb: string;
   secondaryAccent: string;
@@ -63,6 +64,7 @@ export type RealmDashboardTheme = {
   atmosphericOverlay: string;
   atmosphericGlow: string;
   sceneFocusOverlay: string;
+  centerStageOverlay?: string;
   focusGlow: string;
   transitionGlow: string;
   launchOverlay: string;
@@ -81,6 +83,9 @@ export type RealmDashboardTheme = {
   actionText: string;
   pulseRgb: string;
   particleColors: readonly string[];
+  fogOverlay?: string;
+  fogBadgeBackground?: string;
+  fogBadgeBorder?: string;
 };
 
 export type CanonicalRealmDashboardConfig = {

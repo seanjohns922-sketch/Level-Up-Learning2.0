@@ -47,15 +47,14 @@ export function RealmActiveLessonShell({
           src={artworkSrc}
           alt=""
           className="h-full w-full object-cover"
-          style={{ filter: "brightness(0.34) saturate(1.14)" }}
+          style={{ filter: realm === "statistics" ? "brightness(0.5) saturate(1.16)" : "brightness(0.34) saturate(1.14)" }}
         />
         <div className="absolute inset-0" style={{ background: theme.backdropOverlay }} />
         {realm === "number" || realm === "statistics" ? (
           <div
             className="absolute inset-0 opacity-25"
             style={{
-              backgroundImage:
-                "linear-gradient(rgba(94,234,212,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,0.12) 1px, transparent 1px)",
+              backgroundImage: `linear-gradient(${theme.gridColor} 1px, transparent 1px), linear-gradient(90deg, ${theme.gridColor} 1px, transparent 1px)`,
               backgroundSize: "44px 44px",
             }}
           />
@@ -117,7 +116,7 @@ export function RealmActiveLessonShell({
               realm === "measurement"
                 ? "linear-gradient(180deg, #fffaf0 0%, #f7eedc 100%)"
                 : realm === "statistics"
-                  ? "linear-gradient(180deg, #f2fffb 0%, #e6f7f5 100%)"
+                  ? "linear-gradient(180deg, #fffaf2 0%, #eef5e7 100%)"
                 : "linear-gradient(180deg, #f7fffe 0%, #eaf9f8 100%)",
           }}
         >

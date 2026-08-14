@@ -113,21 +113,21 @@ export const REALM_LESSON_THEMES = {
     legendLabel: "Realmie",
     intro:
       "Follow the data trail, look for patterns, and use evidence to explain what you discover.",
-    pageBg: "#06151a",
-    shellBg: "rgba(4, 18, 24, 0.96)",
-    panelBg: "rgba(7, 35, 42, 0.86)",
-    panelBorder: "rgba(94, 234, 212, 0.24)",
-    accent: "#5eead4",
-    accentSoft: "#ccfbf1",
-    secondary: "#fde68a",
+    pageBg: "#14231d",
+    shellBg: "rgba(18, 49, 42, 0.96)",
+    panelBg: "rgba(36, 70, 57, 0.86)",
+    panelBorder: "rgba(242, 188, 69, 0.3)",
+    accent: "#f06b64",
+    accentSoft: "#fff4df",
+    secondary: "#f2bc45",
     heroOverlay:
-      "linear-gradient(90deg, rgba(2,16,22,0.98) 0%, rgba(4,34,42,0.88) 48%, rgba(4,34,42,0.3) 100%)",
+      "linear-gradient(90deg, rgba(18,49,42,0.97) 0%, rgba(35,67,55,0.82) 48%, rgba(35,67,55,0.22) 100%)",
     backdropOverlay:
-      "linear-gradient(180deg, rgba(2,15,22,0.62), rgba(2,15,22,0.92))",
-    videoBg: "linear-gradient(135deg, #03161c 0%, #0f4c52 58%, #155e75 100%)",
-    buttonBg: "linear-gradient(90deg, #0f766e, #0891b2, #14b8a6)",
-    buttonShadow: "0 16px 40px rgba(45,212,191,0.25)",
-    gridColor: "rgba(94,234,212,0.34)",
+      "linear-gradient(180deg, rgba(18,49,42,0.38), rgba(20,35,29,0.78))",
+    videoBg: "linear-gradient(135deg, #163a32 0%, #345b45 52%, #7b3c43 100%)",
+    buttonBg: "linear-gradient(90deg, #a83e4b, #e85d63 58%, #f2bc45)",
+    buttonShadow: "0 16px 40px rgba(232,93,99,0.28)",
+    gridColor: "rgba(240,107,100,0.28)",
     ThemeIcon: ChartNoAxesColumnIncreasing,
   },
 } as const;
@@ -190,7 +190,7 @@ export function RealmLessonHome({
           src={artworkSrc}
           alt=""
           className="h-full w-full object-cover"
-          style={{ filter: "brightness(0.38) saturate(1.12)" }}
+          style={{ filter: realm === "statistics" ? "brightness(0.56) saturate(1.16)" : "brightness(0.38) saturate(1.12)" }}
         />
         <div className="absolute inset-0" style={{ background: theme.backdropOverlay }} />
         {realm === "number" || realm === "statistics" ? (
@@ -199,7 +199,7 @@ export function RealmLessonHome({
             style={{
               backgroundImage:
                 realm === "statistics"
-                  ? "linear-gradient(rgba(94,234,212,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(147,197,253,0.1) 1px, transparent 1px)"
+                  ? `linear-gradient(${theme.gridColor} 1px, transparent 1px), linear-gradient(90deg, ${theme.gridColor} 1px, transparent 1px)`
                   : "linear-gradient(rgba(94,234,212,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,0.12) 1px, transparent 1px)",
               backgroundSize: realm === "statistics" ? "36px 36px" : "44px 44px",
             }}

@@ -228,7 +228,7 @@ export default function RealmDashboardShell({
   avatar,
 }: RealmDashboardShellProps) {
   const router = useRouter();
-  const previewMode = isDemoPreviewMode();
+  const previewMode = config.demo?.only === true || isDemoPreviewMode();
   useEffect(() => {
     setLastRealm(config.slug);
   }, [config.slug]);
@@ -484,6 +484,9 @@ export default function RealmDashboardShell({
         accent={config.theme.accent}
         glow={config.theme.focusGlow}
         badgeClassName={isDistrictMode ? "bottom-6 left-4" : undefined}
+        fogOverlay={config.theme.fogOverlay}
+        badgeBackground={config.theme.fogBadgeBackground}
+        badgeBorder={config.theme.fogBadgeBorder}
       />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -498,7 +501,7 @@ export default function RealmDashboardShell({
           objectPosition: "center 42%",
           transform: launching ? "scale(1.35)" : "scale(1)",
           transition: "transform 0.9s cubic-bezier(0.5, 0, 0.75, 0)",
-          filter: "brightness(1.05) saturate(1.1)",
+          filter: config.theme.backgroundFilter ?? "brightness(1.05) saturate(1.1)",
         }}
       />
 
@@ -659,7 +662,9 @@ export default function RealmDashboardShell({
           style={{
             position: "absolute",
             inset: 0,
-            background: "radial-gradient(circle at 50% 50%, rgba(5,8,24,0.78) 0%, rgba(5,8,24,0.45) 50%, rgba(5,8,24,0) 100%)",
+            background:
+              config.theme.centerStageOverlay
+              ?? "radial-gradient(circle at 50% 50%, rgba(5,8,24,0.78) 0%, rgba(5,8,24,0.45) 50%, rgba(5,8,24,0) 100%)",
             pointerEvents: "none",
           }}
         />

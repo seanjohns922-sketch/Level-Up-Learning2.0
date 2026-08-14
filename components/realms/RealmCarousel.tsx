@@ -37,7 +37,7 @@ const ALL_REALMS = [
   { id: "number-nexus", name: "Number Nexus", symbol: "⚡", description: "Master numbers, operations & place value", color: "rgb(52,211,153)", colorDim: "rgba(52,211,153,0.25)" },
   { id: "pattern-peaks", name: "Pattern Peaks", symbol: "△", description: "Algebra and pattern recognition", color: "rgb(251,191,36)", colorDim: "rgba(251,191,36,0.2)" },
   { id: "measurelands", name: "Measurelands", symbol: "◈", description: "Length, mass, capacity & more", color: "rgb(96,165,250)", colorDim: "rgba(96,165,250,0.2)" },
-  { id: "statistica", name: "Statistica", symbol: "▣", description: "Data, graphs & interpretation", color: "rgb(167,139,250)", colorDim: "rgba(167,139,250,0.2)" },
+  { id: "statistica", name: "Statistica", symbol: "▣", description: "Data, graphs & interpretation", color: "rgb(240,107,100)", colorDim: "rgba(240,107,100,0.22)" },
   { id: "chance-hollow", name: "Chance Hollow", symbol: "◉", description: "Probability & chance", color: "rgb(251,113,133)", colorDim: "rgba(251,113,133,0.2)" },
   { id: "chronorok", name: "Chronorok", symbol: "⧖", description: "Time & duration", color: "rgb(103,232,249)", colorDim: "rgba(103,232,249,0.2)", comingSoon: true },
   { id: "starpath-realm", name: "Starpath Realm", symbol: "✦", description: "Space & spatial reasoning", color: "rgb(129,140,248)", colorDim: "rgba(129,140,248,0.2)" },

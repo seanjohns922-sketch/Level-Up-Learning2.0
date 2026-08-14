@@ -75,7 +75,7 @@ const REALM_VISUALS: Record<string, { accent: string; glow: string; emoji: strin
   reading:     { accent: "#86efac", glow: "rgba(134,239,172,0.5)",  emoji: "📖" },
   writing:     { accent: "#c4b5fd", glow: "rgba(196,181,253,0.5)",  emoji: "✒️" },
   grammar:     { accent: "#fda4af", glow: "rgba(253,164,175,0.5)",  emoji: "🔤" },
-  statistics:  { accent: "#67e8f9", glow: "rgba(103,232,249,0.5)",  emoji: "📊" },
+  statistics:  { accent: "#f06b64", glow: "rgba(240,107,100,0.5)",  emoji: "📊" },
   algebra:     { accent: "#fbbf24", glow: "rgba(251,191,36,0.5)",   emoji: "➗" },
   probability: { accent: "#f472b6", glow: "rgba(244,114,182,0.5)",  emoji: "🎲" },
 };

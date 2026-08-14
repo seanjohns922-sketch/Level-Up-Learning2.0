@@ -15,11 +15,17 @@ export default function FogOfForgetfulness({
   accent,
   glow,
   badgeClassName = "bottom-32 left-4",
+  fogOverlay,
+  badgeBackground,
+  badgeBorder,
 }: {
   progress: FogProgress;
   accent: string; // realm tint for the lit tower floors
   glow: string;
   badgeClassName?: string;
+  fogOverlay?: string;
+  badgeBackground?: string;
+  badgeBorder?: string;
 }) {
   const { floorsLit, totalFloors, fraction } = progress;
   const fogOpacity = Math.max(0, 1 - fraction); // 1 = full fog, 0 = clear
@@ -67,7 +73,8 @@ export default function FogOfForgetfulness({
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(40,44,60,0.55) 0%, rgba(30,32,46,0.32) 45%, rgba(22,24,38,0.6) 100%)",
+                fogOverlay
+                ?? "linear-gradient(180deg, rgba(40,44,60,0.55) 0%, rgba(30,32,46,0.32) 45%, rgba(22,24,38,0.6) 100%)",
             }}
           />
           {/* drifting cloud blobs */}
@@ -95,8 +102,8 @@ export default function FogOfForgetfulness({
         <div
           className="flex items-end gap-2.5 rounded-2xl px-3 py-2.5 backdrop-blur-md"
           style={{
-            background: "rgba(8,10,20,0.55)",
-            border: "1px solid rgba(255,255,255,0.12)",
+            background: badgeBackground ?? "rgba(8,10,20,0.55)",
+            border: badgeBorder ?? "1px solid rgba(255,255,255,0.12)",
             boxShadow: "0 6px 22px rgba(0,0,0,0.5)",
           }}
         >

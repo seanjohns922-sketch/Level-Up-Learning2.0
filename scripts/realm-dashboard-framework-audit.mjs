@@ -25,6 +25,14 @@ for (const file of fs.readdirSync(frameworkDirectory).filter((name) => name.ends
   assert.doesNotMatch(read(`components/realms/dashboard/${file}`), /MeasurelandsMap|NumberNexusMap|StarpathClient|StarpathLevelsDrawer/);
 }
 
+const dashboardShell = read("components/realms/dashboard/RealmDashboardShell.tsx");
+assert.match(dashboardShell, /config\.demo\?\.only === true \|\| isDemoPreviewMode\(\)/);
+
+const statistica = read("components/world/StatisticaMap.tsx");
+for (const marker of ["#f06b64", "#f2bc45", "#79b85a", "#59add1", "centerStageOverlay", "fogBadgeBackground"]) {
+  assert.ok(statistica.includes(marker), `Statistica theme is missing ${marker}`);
+}
+
 const registry = read("lib/realms/realm-registry.ts");
 for (const realmId of ["number", "measurement", "space", "pattern", "statistics", "chance", "time"]) {
   assert.match(registry, new RegExp(`\\b${realmId}: \\{`), `Missing canonical ${realmId} realm`);

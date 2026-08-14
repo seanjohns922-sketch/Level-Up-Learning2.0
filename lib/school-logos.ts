@@ -42,5 +42,18 @@ export function getSchoolLogo(school: { name?: string | null; code?: string | nu
     };
   }
 
+  if (
+    nameKey === "stmarysthornbury"
+    || nameKey === "stmarysschoolthornbury"
+    || nameKey === "stmarysprimaryschoolthornbury"
+    || nameKey === "stmarysthornburyprimaryschool"
+    || nameKey === "stmarysparishprimaryschoolthornbury"
+  ) {
+    return {
+      src: "/schools/st-marys-thornbury-logo.svg",
+      alt: `${school.name ?? "St Mary's Thornbury"} logo`,
+    };
+  }
+
   return null;
 }
