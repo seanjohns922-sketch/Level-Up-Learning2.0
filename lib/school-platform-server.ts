@@ -44,6 +44,13 @@ export type SchoolLicenceSummary = {
   billingStatus: string;
 };
 
+export type SchoolInviteEmailContext = {
+  schoolName: string;
+  schoolCode: string;
+  email?: string;
+  role?: string;
+};
+
 export type SchoolHomeSnapshot = {
   school: {
     id: string;
@@ -225,6 +232,42 @@ export async function canViewSchoolAdministration(
     );
   } catch {
     return false;
+  }
+}
+
+export async function getSchoolInviteEmailContext(
+  schoolId: string,
+  accessToken: string,
+  invitationId?: string,
+): Promise<SchoolInviteEmailContext | null> {
+  try {
+    const schools = await supabaseRequest<Array<{ name: string; school_code: string }>>(
+      `/rest/v1/schools?id=eq.${encodeURIComponent(schoolId)}&select=name,school_code`,
+      accessToken,
+    );
+    const school = schools[0];
+    if (!school) return null;
+
+    if (!invitationId) {
+      return { schoolName: school.name, schoolCode: school.school_code };
+    }
+
+    const invitations = await supabaseRequest<Array<{ email: string; role: string }>>(
+      `/rest/v1/school_invitations?id=eq.${encodeURIComponent(invitationId)}&school_id=eq.${encodeURIComponent(schoolId)}&status=eq.pending&select=email,role`,
+      accessToken,
+    );
+    const invitation = invitations[0];
+    if (!invitation) return null;
+
+    return {
+      schoolName: school.name,
+      schoolCode: school.school_code,
+      email: invitation.email,
+      role: invitation.role,
+    };
+  } catch (error) {
+    console.error("[school-staff-email] Could not load invitation context", error);
+    return null;
   }
 }
 

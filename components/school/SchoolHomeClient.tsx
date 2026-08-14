@@ -207,6 +207,9 @@ async function sendCommand(
     status?: "active" | "archived";
     deleted?: boolean;
     updated?: boolean;
+    invitationId?: string;
+    repeatedRequest?: boolean;
+    emailDelivery?: "sent" | "unconfigured" | "failed";
     created?: Array<Record<string, unknown>>;
     errors?: Array<{ row: number; name: string; message: string }>;
   };
@@ -2254,13 +2257,13 @@ export default function SchoolHomeClient({
 
   async function command(
     payload: Record<string, unknown>,
-    successMessage: string,
+    successMessage: string | ((result: Awaited<ReturnType<typeof sendCommand>>) => string),
   ) {
     setBusy(true);
     setError("");
     try {
       const result = await sendCommand(snapshot.school.id, payload);
-      notify(successMessage);
+      notify(typeof successMessage === "function" ? successMessage(result) : successMessage);
       router.refresh();
       return result;
     } catch (commandError) {
@@ -2888,7 +2891,11 @@ export default function SchoolHomeClient({
                                     action: "resendInvitation",
                                     invitationId: invitation.id,
                                   },
-                                  "Invitation refreshed",
+                                  (result) => result.emailDelivery === "sent"
+                                    ? "Invitation email resent"
+                                    : result.emailDelivery === "unconfigured"
+                                      ? "Invitation refreshed, but email sending is not configured"
+                                      : "Invitation refreshed, but the email could not be sent",
                                 )
                               }
                               className="rounded-md border border-slate-300 px-3 py-2 text-xs font-bold"
@@ -3319,7 +3326,11 @@ export default function SchoolHomeClient({
           onSubmit={async (form) => {
             const result = await command(
               { action: "inviteStaff", ...form },
-              "Staff invitation created",
+              (response) => response.emailDelivery === "sent"
+                ? "Staff invitation created and emailed"
+                : response.emailDelivery === "unconfigured"
+                  ? "Staff invitation created, but email sending is not configured"
+                  : "Staff invitation created, but the email could not be sent",
             );
             if (result) setInviteOpen(false);
           }}

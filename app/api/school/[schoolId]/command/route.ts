@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import {
+  getSchoolInviteEmailContext,
   requireSchoolPreviewAccess,
   runSchoolCommand,
 } from "@/lib/school-platform-server";
+import { sendSchoolStaffInviteEmail } from "@/lib/school-admin-invite-email";
 
 type CommandRequest = {
   action?: string;
@@ -115,6 +117,8 @@ export async function POST(
         return NextResponse.json({ success: true });
 
       case "inviteStaff": {
+        const email = stringValue(payload.email).toLowerCase();
+        const role = stringValue(payload.role);
         const result = await runSchoolCommand<
           Array<{
             invitation_id: string;
@@ -123,23 +127,50 @@ export async function POST(
           }>
         >(schoolId, "invite_school_staff_with_class", {
           p_school_id: schoolId,
-          p_email: stringValue(payload.email),
-          p_role: stringValue(payload.role),
+          p_email: email,
+          p_role: role,
           p_class_id: stringValue(payload.classId) || null,
           p_idempotency_key:
             stringValue(payload.idempotencyKey) || crypto.randomUUID(),
         }, accessToken);
+        const emailContext = await getSchoolInviteEmailContext(schoolId, accessToken);
+        const emailDelivery = emailContext
+          ? await sendSchoolStaffInviteEmail({
+              to: email,
+              schoolName: emailContext.schoolName,
+              schoolCode: emailContext.schoolCode,
+              role,
+              baseUrl: new URL(request.url).origin,
+            })
+          : "failed";
         return NextResponse.json({
           invitationId: result[0]?.invitation_id,
           repeatedRequest: result[0]?.repeated_request ?? false,
+          emailDelivery,
         });
       }
 
-      case "resendInvitation":
+      case "resendInvitation": {
+        const invitationId = stringValue(payload.invitationId);
         await runSchoolCommand<string>(schoolId, "resend_school_invitation", {
-          p_invitation_id: stringValue(payload.invitationId),
+          p_invitation_id: invitationId,
         }, accessToken);
-        return NextResponse.json({ success: true });
+        const emailContext = await getSchoolInviteEmailContext(
+          schoolId,
+          accessToken,
+          invitationId,
+        );
+        const emailDelivery = emailContext?.email && emailContext.role
+          ? await sendSchoolStaffInviteEmail({
+              to: emailContext.email,
+              schoolName: emailContext.schoolName,
+              schoolCode: emailContext.schoolCode,
+              role: emailContext.role,
+              baseUrl: new URL(request.url).origin,
+            })
+          : "failed";
+        return NextResponse.json({ success: true, emailDelivery });
+      }
 
       case "revokeInvitation":
         await runSchoolCommand<void>(schoolId, "revoke_school_invitation", {
