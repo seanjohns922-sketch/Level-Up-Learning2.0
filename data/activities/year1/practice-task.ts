@@ -2745,6 +2745,47 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica Level 1 — sort data into categories (AC9M1ST01/ST02). Tap an
+      // item, tap a category bin; correct when every item is in its category.
+      kind: "statisticaSort";
+      prompt: string;
+      speakText: string;
+      target: number;
+      items: Array<{ id: string; label: string; category: string }>;
+      categories: Array<{ id: string; label: string; color: string }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Statistica Level 1 — tally marks (AC9M1ST01). "record": tap to add tally
+      // marks up to a count. "read": read a shown tally and choose the number.
+      kind: "statisticaTally";
+      mode: "record" | "read";
+      prompt: string;
+      speakText: string;
+      target: number;
+      count: number;
+      label: string;
+      options?: Array<{ id: string; label: string }>;
+      correctOptionIds?: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Statistica Level 1 — one-to-one object displays and picture graphs
+      // (AC9M1ST02). "build": add one symbol per data point to each category
+      // column to match its count. "read"/"compare": answer a question about a
+      // completed display (how many, most/least, more/less/equal).
+      kind: "statisticaGraph";
+      mode: "build" | "read" | "compare";
+      prompt: string;
+      speakText: string;
+      target: number;
+      display: "objects" | "pictures";
+      categories: Array<{ id: string; label: string; color: string; count: number }>;
+      options?: Array<{ id: string; label: string }>;
+      correctOptionIds?: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 6 · W3-4 — Four-quadrant Cartesian plane (AC9M6SP02). Signed ordered
       // pairs on an 8x8 grid (-4..4 each axis), origin centred. Plot/read points,
       // name quadrants, and reason about how coordinates change across the axes.

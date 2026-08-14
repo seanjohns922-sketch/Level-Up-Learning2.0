@@ -1,0 +1,233 @@
+import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
+
+// ── Statistica Level 1 (Year 1) — playable activities on the blueprint ───────
+// Covers AC9M1ST01 (acquire & record data) and AC9M1ST02 (represent categorical
+// data with one-to-one displays and picture graphs, compare frequencies, discuss).
+// Three task kinds carry the level: statisticaSort, statisticaTally, statisticaGraph.
+
+type Cat = { id: string; label: string; color: string };
+
+const C = { red: "#ef4444", amber: "#f59e0b", orange: "#fb923c", blue: "#3b82f6", green: "#22c55e", purple: "#a855f7", teal: "#14b8a6", pink: "#ec4899" };
+
+// Survey topics for tally / graph tasks (favourite X, weather, travel…).
+type Survey = { id: string; title: string; question: string; unit: string; cats: Cat[] };
+const SURVEYS: Survey[] = [
+  { id: "fruit", title: "Favourite Fruit", question: "What is your favourite fruit?", unit: "children", cats: [{ id: "apple", label: "Apple", color: C.red }, { id: "banana", label: "Banana", color: C.amber }, { id: "orange", label: "Orange", color: C.orange }] },
+  { id: "pet", title: "Favourite Pet", question: "What is your favourite pet?", unit: "children", cats: [{ id: "dog", label: "Dog", color: C.orange }, { id: "cat", label: "Cat", color: C.purple }, { id: "fish", label: "Fish", color: C.blue }] },
+  { id: "colour", title: "Favourite Colour", question: "What is your favourite colour?", unit: "children", cats: [{ id: "red", label: "Red", color: C.red }, { id: "blue", label: "Blue", color: C.blue }, { id: "green", label: "Green", color: C.green }] },
+  { id: "weather", title: "Our Weather", question: "What was the weather each day?", unit: "days", cats: [{ id: "sunny", label: "Sunny", color: C.amber }, { id: "cloudy", label: "Cloudy", color: C.teal }, { id: "rainy", label: "Rainy", color: C.blue }] },
+  { id: "sport", title: "Favourite Sport", question: "What is your favourite sport?", unit: "children", cats: [{ id: "soccer", label: "Soccer", color: C.green }, { id: "swim", label: "Swimming", color: C.blue }, { id: "run", label: "Running", color: C.pink }] },
+  { id: "travel", title: "Getting to School", question: "How do you get to school?", unit: "children", cats: [{ id: "car", label: "Car", color: C.red }, { id: "bus", label: "Bus", color: C.amber }, { id: "walk", label: "Walk", color: C.green }] },
+];
+
+// Sorting topics (each item clearly belongs to one category).
+type SortSet = { id: string; prompt: string; cats: Cat[]; items: Array<{ label: string; category: string }> };
+const SORT_SETS: SortSet[] = [
+  { id: "animals", prompt: "Sort each animal into its group.", cats: [{ id: "pet", label: "Pets", color: C.orange }, { id: "farm", label: "Farm", color: C.green }, { id: "wild", label: "Wild", color: C.purple }], items: [{ label: "Dog", category: "pet" }, { label: "Cat", category: "pet" }, { label: "Cow", category: "farm" }, { label: "Sheep", category: "farm" }, { label: "Lion", category: "wild" }, { label: "Zebra", category: "wild" }] },
+  { id: "food", prompt: "Sort each one: fruit, vegetable or drink?", cats: [{ id: "fruit", label: "Fruit", color: C.red }, { id: "veg", label: "Vegetable", color: C.green }, { id: "drink", label: "Drink", color: C.blue }], items: [{ label: "Apple", category: "fruit" }, { label: "Banana", category: "fruit" }, { label: "Carrot", category: "veg" }, { label: "Peas", category: "veg" }, { label: "Milk", category: "drink" }, { label: "Juice", category: "drink" }] },
+  { id: "things", prompt: "Sort each thing into its group.", cats: [{ id: "toy", label: "Toys", color: C.pink }, { id: "clothes", label: "Clothes", color: C.teal }, { id: "food", label: "Food", color: C.amber }], items: [{ label: "Ball", category: "toy" }, { label: "Teddy", category: "toy" }, { label: "Hat", category: "clothes" }, { label: "Sock", category: "clothes" }, { label: "Bread", category: "food" }, { label: "Cheese", category: "food" }] },
+];
+
+const pick = <T,>(arr: T[], i: number) => arr[((i % arr.length) + arr.length) % arr.length]!;
+const order = <T,>(items: T[], round: number) => (round % 2 ? [...items].reverse() : items);
+
+// Three small, mostly-distinct counts (2..6) for a survey's categories.
+function countsFor(round: number, forceTie = false): number[] {
+  const base = [
+    [4, 2, 5], [3, 5, 2], [5, 3, 4], [2, 6, 3], [6, 4, 2], [3, 4, 6],
+  ];
+  const c = [...pick(base, round)];
+  if (forceTie) c[1] = c[0]; // make first two equal for "equal" questions
+  return c;
+}
+
+const numOptions = (correct: number, round: number) => {
+  const set = new Set<number>([correct]);
+  let d = 1;
+  while (set.size < 3) { set.add(Math.max(1, correct + (d % 2 ? d : -d))); d += 1; }
+  return order([...set].map((n) => ({ id: `n${n}`, label: String(n) })), round);
+};
+
+// ── Task generators ─────────────────────────────────────────────────────────
+export function sortTask(round: number, target: number): PracticeTask {
+  const set = pick(SORT_SETS, round);
+  const items = set.items.map((it, i) => ({ id: `i${i}`, label: it.label, category: it.category }));
+  return {
+    kind: "statisticaSort", target, prompt: set.prompt,
+    speakText: "Data can be sorted into groups called categories. Tap a card, then tap the group it belongs to.",
+    items, categories: set.cats,
+    feedback: { correct: "Sorted! Every card is in the right group.", wrong: "Look again — each card belongs to just one group." },
+  };
+}
+
+export function tallyRecordTask(round: number, target: number): PracticeTask {
+  const survey = pick(SURVEYS, round);
+  const cat = pick(survey.cats, round + 1);
+  const count = countsFor(round)[0]!;
+  return {
+    kind: "statisticaTally", mode: "record", target, count, label: cat.label.toLowerCase(),
+    prompt: `Make a tally to record ${count} for "${cat.label}".`,
+    speakText: "A tally records data with marks. Every fifth mark goes across the bundle so the marks are easy to count in fives.",
+    feedback: { correct: "Great tally — you recorded the data.", wrong: `Add or remove marks until there are ${count}.` },
+  };
+}
+
+export function tallyReadTask(round: number, target: number): PracticeTask {
+  const count = countsFor(round + 2)[1]! + 3; // 5..9 so a bundle shows
+  return {
+    kind: "statisticaTally", mode: "read", target, count, label: "votes",
+    prompt: "How many does this tally show?",
+    speakText: "Count the tally in fives, then add on the extra marks.",
+    options: numOptions(count, round), correctOptionIds: [`n${count}`],
+    feedback: { correct: "Right — count the fives, then the extras.", wrong: "Count each bundle as five, then add the leftover marks." },
+  };
+}
+
+function surveyCats(round: number, forceTie = false) {
+  const survey = pick(SURVEYS, round);
+  const counts = countsFor(round, forceTie);
+  const categories = survey.cats.map((c, i) => ({ ...c, count: counts[i]! }));
+  return { survey, categories };
+}
+
+export function buildTask(round: number, target: number, display: "objects" | "pictures"): PracticeTask {
+  const { survey, categories } = surveyCats(round);
+  return {
+    kind: "statisticaGraph", mode: "build", target, display, categories,
+    prompt: display === "objects" ? "Build the display: one object for each vote." : "Build the picture graph: one picture for each vote.",
+    speakText: `${survey.question} Add one ${display === "objects" ? "object" : "picture"} for every vote so each column matches its number.`,
+    feedback: { correct: "Your display matches the data exactly.", wrong: "Check each column — one symbol stands for one vote." },
+  };
+}
+
+export function readGraphTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = surveyCats(round + 1);
+  const askMost = round % 2 === 0;
+  const sorted = [...categories].sort((a, b) => b.count - a.count);
+  const answer = askMost ? sorted[0]! : sorted[sorted.length - 1]!;
+  const options = order(categories.map((c) => ({ id: c.id, label: c.label })), round);
+  return {
+    kind: "statisticaGraph", mode: "read", target, display: "pictures", categories,
+    prompt: askMost ? "Which had the MOST votes?" : "Which had the FEWEST votes?",
+    speakText: `${survey.question} Read the picture graph and find the ${askMost ? "tallest" : "shortest"} column.`,
+    options, correctOptionIds: [answer.id],
+    feedback: { correct: `Yes — ${answer.label} is the ${askMost ? "tallest" : "shortest"}.`, wrong: `Compare the columns and find the ${askMost ? "tallest" : "shortest"} one.` },
+  };
+}
+
+export function frequencyTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = surveyCats(round + 3);
+  const cat = pick(categories, round);
+  return {
+    kind: "statisticaGraph", mode: "read", target, display: "pictures", categories,
+    prompt: `How many chose ${cat.label}?`,
+    speakText: `${survey.question} Count the pictures in the ${cat.label} column.`,
+    options: numOptions(cat.count, round), correctOptionIds: [`n${cat.count}`],
+    feedback: { correct: `Right — ${cat.count} chose ${cat.label}.`, wrong: `Count the pictures in the ${cat.label} column.` },
+  };
+}
+
+export function compareTask(round: number, target: number): PracticeTask {
+  const forceTie = round % 3 === 2;
+  const { survey, categories } = surveyCats(round + 2, forceTie);
+  const a = categories[0]!, b = categories[1]!;
+  const correct = a.count > b.count ? "a" : a.count < b.count ? "b" : "eq";
+  const options = order([
+    { id: "a", label: `More chose ${a.label}` },
+    { id: "b", label: `More chose ${b.label}` },
+    { id: "eq", label: "They are equal" },
+  ], round);
+  return {
+    kind: "statisticaGraph", mode: "compare", target, display: "pictures", categories,
+    prompt: `Compare ${a.label} and ${b.label}. What does the data show?`,
+    speakText: `${survey.question} Compare the ${a.label} and ${b.label} columns — which is taller, or are they equal?`,
+    options, correctOptionIds: [correct],
+    feedback: { correct: "Correct — the taller column has more.", wrong: "Line the two columns up and compare their heights." },
+  };
+}
+
+export function interpretTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = surveyCats(round + 4);
+  const top = [...categories].sort((x, y) => y.count - x.count)[0]!;
+  const options = order(categories.map((c) => ({ id: c.id, label: c.label })), round);
+  return {
+    kind: "statisticaGraph", mode: "read", target, display: "pictures", categories,
+    prompt: `${survey.question} Which is the most popular answer?`,
+    speakText: "Use the data as evidence. The most popular answer is the one with the tallest column.",
+    options, correctOptionIds: [top.id],
+    feedback: { correct: `Yes — the data shows ${top.label} is most popular.`, wrong: "The most popular answer has the most votes — the tallest column." },
+  };
+}
+
+// A gentle worked example shown first (teaching moment): read the tallest column.
+function teachTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = surveyCats(round);
+  const top = [...categories].sort((x, y) => y.count - x.count)[0]!;
+  return {
+    kind: "statisticaGraph", mode: "read", target, display: "pictures", categories,
+    prompt: `Let's read the graph. ${survey.question} Which column is the tallest?`,
+    speakText: "This is a picture graph. Each picture stands for one vote. The tallest column had the most votes — tap it.",
+    options: order(categories.map((c) => ({ id: c.id, label: c.label })), round), correctOptionIds: [top.id],
+    feedback: { correct: "That's the tallest column — the most votes.", wrong: "The tallest column is the one with the most pictures." },
+  };
+}
+
+// ── Lesson content map (24 lessons) ─────────────────────────────────────────
+type Gen = (round: number, target: number) => PracticeTask;
+function taskSet(gens: [Gen, Gen, Gen]): RealmLessonTaskSet {
+  let t = 10;
+  const rounds = [0, 0, 0];
+  return {
+    teaching: () => teachTask(0, ++t),
+    activities: [
+      () => gens[0](rounds[0]++, ++t),
+      () => gens[1](rounds[1]++ + 1, ++t),
+      () => gens[2](rounds[2]++ + 2, ++t),
+    ],
+  };
+}
+const buildObjects: Gen = (r, t) => buildTask(r, t, "objects");
+const buildPics: Gen = (r, t) => buildTask(r, t, "pictures");
+
+const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
+  // W1 What is Data?
+  "y1-statistics-w1-l1": [sortTask, sortTask, readGraphTask],
+  "y1-statistics-w1-l2": [sortTask, sortTask, sortTask],
+  "y1-statistics-w1-l3": [readGraphTask, frequencyTask, readGraphTask],
+  // W2 Asking Questions
+  "y1-statistics-w2-l1": [sortTask, sortTask, readGraphTask],
+  "y1-statistics-w2-l2": [sortTask, sortTask, sortTask],
+  "y1-statistics-w2-l3": [tallyRecordTask, tallyRecordTask, tallyReadTask],
+  // W3 Recording Data
+  "y1-statistics-w3-l1": [tallyRecordTask, tallyRecordTask, tallyReadTask],
+  "y1-statistics-w3-l2": [tallyRecordTask, tallyRecordTask, tallyRecordTask],
+  "y1-statistics-w3-l3": [tallyReadTask, tallyReadTask, frequencyTask],
+  // W4 One-to-One Displays (concrete objects)
+  "y1-statistics-w4-l1": [buildObjects, buildObjects, readGraphTask],
+  "y1-statistics-w4-l2": [buildObjects, buildObjects, buildObjects],
+  "y1-statistics-w4-l3": [readGraphTask, frequencyTask, compareTask],
+  // W5 Picture Graphs (pictures / digital)
+  "y1-statistics-w5-l1": [readGraphTask, frequencyTask, readGraphTask],
+  "y1-statistics-w5-l2": [buildPics, buildPics, buildPics],
+  "y1-statistics-w5-l3": [readGraphTask, frequencyTask, compareTask],
+  // W6 Comparing Frequencies
+  "y1-statistics-w6-l1": [readGraphTask, readGraphTask, frequencyTask],
+  "y1-statistics-w6-l2": [compareTask, compareTask, compareTask],
+  "y1-statistics-w6-l3": [compareTask, readGraphTask, compareTask],
+  // W7 Interpreting Data
+  "y1-statistics-w7-l1": [frequencyTask, frequencyTask, readGraphTask],
+  "y1-statistics-w7-l2": [interpretTask, readGraphTask, interpretTask],
+  "y1-statistics-w7-l3": [interpretTask, compareTask, interpretTask],
+  // W8 Mini Investigation
+  "y1-statistics-w8-l1": [sortTask, tallyRecordTask, tallyReadTask],
+  "y1-statistics-w8-l2": [buildPics, buildObjects, buildPics],
+  "y1-statistics-w8-l3": [readGraphTask, compareTask, interpretTask],
+};
+
+export function getStatisticaLevel1TaskSet(lessonId: string): RealmLessonTaskSet | null {
+  const gens = LESSON_GENS[lessonId];
+  return gens ? taskSet(gens) : null;
+}
+
+export const STATISTICA_LEVEL1_LESSON_IDS = Object.keys(LESSON_GENS);

@@ -32,10 +32,10 @@ const LEVEL_SEEDS: Record<StatisticaLevel, StatisticaWeekSeed[]> = {
     { focus: "What is Data?", lessons: ["Data All Around Us", "Sort Into Categories", "What Does the Data Tell Us?"], curriculum: ["AC9M1ST01", "AC9M1ST02"] },
     { focus: "Asking Questions", lessons: ["Questions We Can Answer", "Choose the Categories", "Collect the Answers"], curriculum: ["AC9M1ST01"] },
     { focus: "Recording Data", lessons: ["Lists", "Tally Marks", "Read a Tally"], curriculum: ["AC9M1ST01"] },
-    { focus: "One-to-One Displays", lessons: ["One Object = One Vote", "Build a Display", "Read the Display"], curriculum: ["AC9M1ST02"] },
-    { focus: "Picture Graphs", lessons: ["Pictures Represent Data", "Build a Picture Graph", "Read a Picture Graph"], curriculum: ["AC9M1ST02"] },
+    { focus: "One-to-One Displays", lessons: ["One Object = One Vote", "Stack the Objects", "Read the Object Display"], curriculum: ["AC9M1ST02"] },
+    { focus: "Picture Graphs", lessons: ["Pictures Represent Data", "Build a Picture Graph on the Tablet", "Read a Picture Graph"], curriculum: ["AC9M1ST02"] },
     { focus: "Comparing Frequencies", lessons: ["Most & Least", "More, Less & Equal", "Compare Categories"], curriculum: ["AC9M1ST02"] },
-    { focus: "Interpreting Data", lessons: ["Find the Frequency", "What Can We Learn?", "Answer From the Data"], curriculum: ["AC9M1ST02"] },
+    { focus: "Interpreting Data", lessons: ["Find the Frequency", "What Can We Learn?", "Answer the Question From the Data"], curriculum: ["AC9M1ST02"] },
     { focus: "Mini Investigation", lessons: ["Ask & Collect", "Represent", "Interpret & Report"], curriculum: ["AC9M1ST01", "AC9M1ST02"] },
   ],
   2: [

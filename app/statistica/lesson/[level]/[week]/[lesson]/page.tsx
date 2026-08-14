@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import StatisticaLessonHome from "@/components/statistica/StatisticaLessonHome";
+import StatisticaLessonShell from "@/components/statistica/StatisticaLessonShell";
 import { getStatisticaProgramForYearLabel } from "@/data/programs/statistica";
 
 function parseInteger(value: string, minimum: number, maximum: number) {
@@ -45,11 +45,12 @@ export default async function StatisticaLessonPage({
   const weekConcept = weekPlan.topic.toLowerCase();
 
   return (
-    <StatisticaLessonHome
+    <StatisticaLessonShell
       level={level.label}
       levelNumber={level.number}
       week={week}
       lessonNumber={lessonNumber}
+      lessonId={lesson.id}
       lessonTitle={lesson.title}
       focus={`use ${lessonConcept} to explore ${weekConcept}`}
       successCriteria={[
