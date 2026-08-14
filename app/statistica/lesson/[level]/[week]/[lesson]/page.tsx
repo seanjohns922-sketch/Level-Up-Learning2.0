@@ -9,7 +9,13 @@ function parseInteger(value: string, minimum: number, maximum: number) {
 }
 
 function normalizeLevel(value: string) {
-  const match = /^Year ([1-6])$/.exec(value);
+  let decoded = value;
+  try {
+    decoded = decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+  const match = /^Year\s+([1-6])$/i.exec(decoded.replace(/\+/g, " ").trim());
   return match ? { label: `Year ${match[1]}`, number: Number(match[1]) } : null;
 }
 

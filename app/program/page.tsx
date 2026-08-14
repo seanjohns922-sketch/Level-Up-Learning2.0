@@ -35,6 +35,7 @@ import {
   buildStarpathWorldHref,
 } from "@/lib/starpath-routes";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
+import { getStatisticaBackground } from "@/lib/statistica-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -75,10 +76,11 @@ function ProgramPage() {
 
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 1");
   const realmId = sp.get("realm_id") ?? "number";
-  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space") {
+  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics") {
     throw new Error(`Unsupported program realm: ${realmId}`);
   }
   const isStarpathRealm = realmId === "space";
+  const isStatisticsRealm = realmId === "statistics";
   const starpathProgram = useMemo(
     () => (isStarpathRealm ? getStarpathWeekProgram(year) : null),
     [isStarpathRealm, year],
@@ -90,8 +92,10 @@ function ProgramPage() {
       ? starpathProgram?.weeks ?? []
       : realmId === "measurement"
         ? getCurriculumPlan(year, "measurement")
+        : isStatisticsRealm
+          ? getCurriculumPlan(year, "statistics")
         : getProgramForYear(year),
-    [isStarpathRealm, realmId, starpathProgram, year]
+    [isStarpathRealm, isStatisticsRealm, realmId, starpathProgram, year]
   );
   const curriculumYear = useMemo(() => {
     const selected = program;
@@ -152,6 +156,52 @@ function ProgramPage() {
     focusColor: "text-cyan-200",
     dividerColor: "border-cyan-300/20",
     xpLabelColor: "text-cyan-100/90",
+  } : isStatisticsRealm ? {
+    rounded: true,
+    scanline: false,
+    cardClip: undefined as string | undefined,
+    bezelClip: undefined as string | undefined,
+    badgeClip: undefined as string | undefined,
+    statusClip: undefined as string | undefined,
+    actionClip: undefined as string | undefined,
+    connClip: undefined as string | undefined,
+    cardActiveBg: "linear-gradient(145deg, rgba(18,49,42,0.97), rgba(36,70,57,0.96) 58%, rgba(72,61,40,0.94))",
+    cardCompletedBg: "linear-gradient(145deg, rgba(43,92,65,0.98), rgba(91,107,54,0.96))",
+    cardLockedBg: "linear-gradient(145deg, rgba(20,35,29,0.9), rgba(38,53,43,0.84))",
+    bezelActiveBg: "linear-gradient(145deg, rgba(240,107,100,0.66), rgba(242,188,69,0.24) 48%, rgba(121,184,90,0.52))",
+    bezelCompletedBg: "linear-gradient(145deg, rgba(121,184,90,0.62), rgba(242,188,69,0.46))",
+    bezelLockedBg: "linear-gradient(145deg, rgba(121,184,90,0.2), rgba(89,173,209,0.14))",
+    bezelPosttestBg: "linear-gradient(145deg, rgba(242,188,69,0.72), rgba(240,107,100,0.48))",
+    cardActiveShadow: "0 12px 30px rgba(8,27,22,0.56), 0 0 18px rgba(240,107,100,0.16), inset 0 1px 0 rgba(255,244,223,0.16)",
+    cardCompletedShadow: "0 12px 30px rgba(8,27,22,0.52), 0 0 18px rgba(121,184,90,0.2), inset 0 1px 0 rgba(255,244,223,0.2)",
+    cardLockedShadow: "0 8px 20px rgba(8,27,22,0.46)",
+    badgeActiveBg: "linear-gradient(135deg, #a83e4b, #e85d63 58%, #f2bc45)",
+    badgeCompletedBg: "linear-gradient(135deg, #477d42, #79b85a)",
+    badgeLockedBg: "linear-gradient(135deg, #253c32, #344f43)",
+    badgePosttestBg: "linear-gradient(135deg, #9a6818, #e85d63)",
+    badgeShadow: "inset 0 1px 0 rgba(255,244,223,0.28), 0 0 12px rgba(240,107,100,0.22)",
+    statusActiveBg: "linear-gradient(135deg, #7b3c43, #d8535b)",
+    statusCompletedBg: "linear-gradient(135deg, #477d42, #79b85a)",
+    statusLockedBg: "linear-gradient(135deg, #253c32, #344f43)",
+    statusPosttestBg: "linear-gradient(135deg, #9a6818, #e85d63)",
+    statusShadow: "0 0 12px rgba(240,107,100,0.28)",
+    dotClass: "bg-[#fff4df] shadow-[0_0_8px_rgba(242,188,69,0.9)]",
+    actionActiveBg: "linear-gradient(135deg, #a83e4b, #e85d63 58%, #f2bc45)",
+    actionCompletedBg: "linear-gradient(135deg, #477d42, #79b85a)",
+    actionPosttestBg: "linear-gradient(135deg, #9a6818, #e85d63)",
+    actionShadow: "0 0 18px rgba(240,107,100,0.3), 0 6px 16px rgba(8,27,22,0.5), inset 0 1px 0 rgba(255,244,223,0.28)",
+    connActiveBg: "radial-gradient(circle, #f2bc45, #e85d63 72%)",
+    connCompletedBg: "radial-gradient(circle, #fff4df, #79b85a 72%)",
+    connShadow: "0 0 14px rgba(242,188,69,0.5)",
+    xpBg: "linear-gradient(90deg, #f06b64, #f2bc45 58%, #fff4df)",
+    xpGlow: "0 0 14px rgba(242,188,69,0.58)",
+    pillBg: "linear-gradient(135deg, rgba(18,49,42,0.96), rgba(56,71,47,0.94), rgba(123,60,67,0.9))",
+    pillShadow: "inset 0 1px 0 rgba(255,244,223,0.22), 0 0 22px rgba(240,107,100,0.22)",
+    pillDot: "bg-[#f2bc45] shadow-[0_0_9px_rgba(242,188,69,0.9)]",
+    headingGlow: "drop-shadow-[0_2px_16px_rgba(240,107,100,0.3)]",
+    focusColor: "text-[#fff4df]",
+    dividerColor: "border-[#f2bc45]/20",
+    xpLabelColor: "text-[#fff4df]/90",
   } : isMeasurementRealm ? {
     rounded: true,
     scanline: false,
@@ -264,8 +314,15 @@ function ProgramPage() {
     boxShadow: "inset 0 1px 0 rgba(207,250,254,0.18), 0 8px 20px rgba(7,10,27,0.28)",
   } as const;
 
+  const statisticaNavWidgetStyle = {
+    borderRadius: 8,
+    border: "1px solid rgba(242,188,69,0.34)",
+    background: "linear-gradient(135deg, rgba(18,49,42,0.9), rgba(55,72,48,0.82), rgba(123,60,67,0.76))",
+    boxShadow: "inset 0 1px 0 rgba(255,244,223,0.16), 0 8px 20px rgba(8,27,22,0.3)",
+  } as const;
+
   const legacyProgramMode = sp.get("legacy") === "1";
-  const previewMode = isDemoPreviewMode();
+  const previewMode = isStatisticsRealm || isDemoPreviewMode();
   const canonicalRealmId = realmId as "number" | "measurement" | "space";
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
@@ -519,6 +576,10 @@ function ProgramPage() {
     const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
 
     if (item.type === "lesson") {
+      if (isStatisticsRealm) {
+        router.push(`/statistica/lesson/${encodeURIComponent(curriculumYear)}/${weekNum}/${item.n}?teacher_preview=1`);
+        return;
+      }
       router.push(
         buildLessonRoute({
           yearLabel: curriculumYear,
@@ -554,6 +615,10 @@ function ProgramPage() {
         writeStarpathDemoJourney(level, { ...current, currentWeek: clamped });
       }
       router.push(buildStarpathProgramHref({ selectedLevel: starpathProgram.definition.id }, clamped));
+      return;
+    }
+    if (isStatisticsRealm) {
+      router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1&realm_id=statistics&teacher_preview=1`);
       return;
     }
     const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
@@ -607,6 +672,8 @@ function ProgramPage() {
   const percent = Math.round((xp / totalXp) * 100);
   const realmHomeRoute = isStarpathRealm && starpathProgram
     ? buildStarpathWorldHref({ selectedLevel: starpathProgram.definition.id })
+    : isStatisticsRealm
+      ? `/statistica?teacher_preview=1&level=${encodeURIComponent(curriculumYear)}&week=${weekNum}`
     : isMeasurementRealm
       ? `/measurelands?level=${encodeURIComponent(curriculumYear)}`
       : "/number-nexus";
@@ -646,6 +713,8 @@ function ProgramPage() {
           src={
             isStarpathRealm
               ? getStarpathBackground(curriculumYear as RealmLevelId)
+              : isStatisticsRealm
+              ? getStatisticaBackground(curriculumYear as RealmLevelId)
               : isMeasurementRealm
               ? isPrep
                 ? "/images/measurelands-home-bg.png"
@@ -669,6 +738,8 @@ function ProgramPage() {
           style={{
             filter: isStarpathRealm
               ? "brightness(0.88) contrast(1.1) saturate(1.1)"
+              : isStatisticsRealm
+              ? "brightness(0.82) contrast(1.08) saturate(1.12)"
               : isMeasurementRealm
               ? levelNum === 4
                 ? "brightness(0.90) contrast(1.16) saturate(1.05)"
@@ -676,8 +747,8 @@ function ProgramPage() {
               : isPrep
               ? "brightness(1.22) contrast(1.05) saturate(1.18)"
               : getHomeBgFilter(levelNum),
-            imageRendering: isMeasurementRealm || isStarpathRealm ? "auto" : undefined,
-            WebkitBackfaceVisibility: isMeasurementRealm || isStarpathRealm ? "hidden" : undefined,
+            imageRendering: isMeasurementRealm || isStarpathRealm || isStatisticsRealm ? "auto" : undefined,
+            WebkitBackfaceVisibility: isMeasurementRealm || isStarpathRealm || isStatisticsRealm ? "hidden" : undefined,
           }}
         />
         <div
@@ -714,6 +785,15 @@ function ProgramPage() {
             }}
           />
         )}
+        {isStatisticsRealm && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 38%, rgba(242,188,69,0.16), transparent 36%), linear-gradient(180deg, rgba(18,49,42,0.36), rgba(35,67,55,0.12) 45%, rgba(20,35,29,0.58))",
+            }}
+          />
+        )}
         {/* Soft top glow for premium polish (dialled back on Level 4's brighter art) */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -721,6 +801,8 @@ function ProgramPage() {
             background:
               isStarpathRealm
                 ? "radial-gradient(circle at top, rgba(165,243,252,0.12), transparent 58%)"
+                : isStatisticsRealm
+                ? "radial-gradient(circle at top, rgba(255,244,223,0.14), transparent 58%)"
                 : isMeasurementRealm && levelNum === 4
                 ? "radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 60%)"
                 : "radial-gradient(circle at top, rgba(255,255,255,0.10), transparent 60%)",
@@ -772,6 +854,8 @@ function ProgramPage() {
           glowColor={
             isStarpathRealm
               ? "rgba(34,211,238,0.34)"
+              : isStatisticsRealm
+              ? "rgba(240,107,100,0.3)"
               : isMeasurementRealm
               ? "rgba(251,191,36,0.28)"
               : "rgba(94,234,212,0.30)"
@@ -789,11 +873,13 @@ function ProgramPage() {
                 className={`px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
                   isStarpathRealm
                     ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
+                    : isStatisticsRealm
+                    ? "text-[#fff4df] hover:brightness-110 focus:ring-2 focus:ring-[#f2bc45]/30"
                     : isMeasurementRealm
                     ? "text-yellow-100/85 hover:bg-yellow-950/30"
                     : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                 }`}
-                style={isStarpathRealm ? starpathNavWidgetStyle : isMeasurementRealm ? {
+                style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isMeasurementRealm ? {
                   borderRadius: 999,
                   border: "1px solid rgba(200,160,48,0.32)",
                   background: "rgba(22,14,4,0.65)",
@@ -814,11 +900,13 @@ function ProgramPage() {
                   className={`relative flex min-w-[170px] items-center justify-between gap-3 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
                     isStarpathRealm
                       ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
+                      : isStatisticsRealm
+                      ? "text-[#fff4df] hover:brightness-110 focus:ring-2 focus:ring-[#f2bc45]/30"
                       : isMeasurementRealm
                       ? "text-yellow-100/85 hover:bg-yellow-950/30"
                       : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                   }`}
-                  style={isStarpathRealm ? starpathNavWidgetStyle : isMeasurementRealm ? {
+                  style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isMeasurementRealm ? {
                     borderRadius: 999,
                     border: "1px solid rgba(200,160,48,0.32)",
                     background: "rgba(22,14,4,0.65)",
@@ -829,7 +917,7 @@ function ProgramPage() {
                   }}
                 >
                   <span className="flex items-center gap-2">
-                    <span className={`h-1.5 w-1.5 rounded-full ${isStarpathRealm ? "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]" : isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
+                    <span className={`h-1.5 w-1.5 rounded-full ${isStarpathRealm ? "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]" : isStatisticsRealm ? "bg-[#f2bc45] shadow-[0_0_8px_rgba(242,188,69,0.9)]" : isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
                     Week {weekNum}
                   </span>
                   <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition-transform ${isStarpathRealm ? "text-cyan-100/80" : isMeasurementRealm ? "text-yellow-200/60" : "text-teal-100/80"} ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -842,6 +930,8 @@ function ProgramPage() {
                     className={`absolute left-0 top-[calc(100%+6px)] z-50 max-h-[260px] w-[170px] overflow-y-auto backdrop-blur-xl ${
                       isStarpathRealm
                         ? "border border-cyan-300/30"
+                        : isStatisticsRealm
+                        ? "border border-[#f2bc45]/35"
                         : isMeasurementRealm
                         ? "border border-yellow-900/40"
                         : "border border-teal-300/30"
@@ -850,6 +940,10 @@ function ProgramPage() {
                       borderRadius: 8,
                       background: "rgba(15,17,45,0.95)",
                       boxShadow: "inset 0 1px 0 rgba(207,250,254,0.2), 0 14px 40px rgba(0,0,0,0.6), 0 0 24px rgba(124,58,237,0.18)",
+                    } : isStatisticsRealm ? {
+                      borderRadius: 8,
+                      background: "rgba(18,49,42,0.96)",
+                      boxShadow: "inset 0 1px 0 rgba(255,244,223,0.18), 0 14px 40px rgba(8,27,22,0.62), 0 0 24px rgba(240,107,100,0.18)",
                     } : isMeasurementRealm ? {
                       borderRadius: 14,
                       background: "rgba(22,14,4,0.94)",
@@ -861,7 +955,7 @@ function ProgramPage() {
                     }}
                   >
                     <div className={`px-3 py-1.5 border-b text-[9px] font-mono font-bold uppercase tracking-[0.2em] ${
-                      isStarpathRealm ? "border-cyan-300/15 text-cyan-300/80" : isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
+                      isStarpathRealm ? "border-cyan-300/15 text-cyan-300/80" : isStatisticsRealm ? "border-[#f2bc45]/20 text-[#f2bc45]/80" : isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
                     }`}>
                       Select Week
                     </div>
@@ -889,6 +983,12 @@ function ProgramPage() {
                                     : isUnlocked
                                     ? "text-cyan-50/85 hover:bg-cyan-400/10 hover:text-cyan-50"
                                     : "text-cyan-50/30 hover:bg-white/5"
+                                  : isStatisticsRealm
+                                  ? isCurrent
+                                    ? "bg-[#f06b64]/20 text-[#fff4df]"
+                                    : isUnlocked
+                                    ? "text-[#fff4df]/85 hover:bg-[#f06b64]/12 hover:text-[#fff4df]"
+                                    : "text-[#fff4df]/30 hover:bg-white/5"
                                   : isMeasurementRealm
                                   ? isCurrent
                                     ? "bg-yellow-900/20 text-yellow-100"
@@ -944,7 +1044,7 @@ function ProgramPage() {
             <button
               type="button"
               onClick={handleSecretTeacherToggle}
-              className={`inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isMeasurementRealm ? "text-yellow-50/95" : "text-teal-50"}`}
+              className={`inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isStatisticsRealm ? "text-[#fff4df]" : isMeasurementRealm ? "text-yellow-50/95" : "text-teal-50"}`}
               style={{
                 background: rt.pillBg,
                 clipPath: rt.rounded ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
@@ -953,10 +1053,10 @@ function ProgramPage() {
               }}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${rt.pillDot}`} />
-              {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : "Program"}
+              {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : isStatisticsRealm ? "Data Program" : "Program"}
             </button>
             <h1 className={`text-4xl md:text-5xl font-black text-white mt-3 tracking-tight ${rt.headingGlow}`}>Week {weekNum}</h1>
-            <p className={`text-base md:text-lg mt-2 font-semibold ${isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
+            <p className={`text-base md:text-lg mt-2 font-semibold ${isStatisticsRealm ? "text-[#fff4df]" : isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
               <span className={`${rt.focusColor} font-mono text-xs uppercase tracking-[0.18em] mr-2`}>Focus</span>
               {currentWeekPlan?.topic ?? "Your current focus"}
             </p>
@@ -1199,7 +1299,7 @@ function ProgramPage() {
       {/* ── Horizontal lesson dashboard ── */}
       <div
         className={`relative z-10 px-4 pb-16 md:px-6 ${
-          isMeasurementRealm ? "pt-16 md:pt-24" : "pt-10 md:pt-16"
+          isMeasurementRealm || isStatisticsRealm ? "pt-16 md:pt-24" : "pt-10 md:pt-16"
         }`}
       >
         <div className="max-w-6xl mx-auto">

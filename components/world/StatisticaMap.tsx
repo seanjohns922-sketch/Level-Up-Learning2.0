@@ -35,8 +35,8 @@ function buildStatisticaPreviewHref(level: RealmLevelId, week = 1) {
   return `/statistica?teacher_preview=1&level=${encodeURIComponent(level)}&week=${week}`;
 }
 
-function buildStatisticaLessonPreviewHref(level: RealmLevelId, week: number, lesson: number) {
-  return `/statistica/lesson/${encodeURIComponent(level)}/${week}/${lesson}?teacher_preview=1`;
+function buildStatisticaProgramPreviewHref(level: RealmLevelId, week: number) {
+  return `/program?year=${encodeURIComponent(level)}&week=${week}&legacy=1&realm_id=statistics&teacher_preview=1`;
 }
 
 function getStatisticaDistricts(level: RealmLevelId): readonly RealmDashboardDistrict[] {
@@ -144,7 +144,7 @@ export const STATISTICA_DASHBOARD_CONFIG = {
     unlockAllDistricts: true,
     readJourney: () => ({ currentWeek: 1, currentLesson: 1 }),
     buildLevelHref: (level: RealmLevelId) => buildStatisticaPreviewHref(level),
-    buildLessonHref: buildStatisticaLessonPreviewHref,
+    buildLessonHref: (level, week) => buildStatisticaProgramPreviewHref(level, week),
   },
 } satisfies CanonicalRealmDashboardConfig;
 
