@@ -273,9 +273,22 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
   // we fall through to the quality-ordered list below.
   const isAU = (v: SpeechSynthesisVoice) =>
     /en[-_]AU/i.test(v.lang ?? "") || /australian|matilda|karen|catherine/i.test(v.name ?? "");
+  const isGB = (v: SpeechSynthesisVoice) =>
+    /en[-_]GB/i.test(v.lang ?? "") || /daniel|arthur|sonia|libby|uk english/i.test(v.name ?? "");
+  const isUS = (v: SpeechSynthesisVoice) =>
+    /en[-_]US/i.test(v.lang ?? "") || /samantha|ava|allison|aria|jenny|us english/i.test(v.name ?? "");
   const naturalName = /natural|neural|premium|enhanced|siri|matilda|google australian/i;
-  const naturalAU = englishVoices.find((v) => isAU(v) && naturalName.test(v.name ?? ""));
+  const isNatural = (v: SpeechSynthesisVoice) => naturalName.test(v.name ?? "");
+
+  // 1) A natural-sounding Australian voice is ideal (e.g. Matilda, Google Australian).
+  const naturalAU = englishVoices.find((v) => isAU(v) && isNatural(v));
   if (naturalAU) return naturalAU;
+  // 2) Failing that, a natural American voice — most devices have one, and it's
+  //    what sounded good before. British "enhanced/Siri" voices must NOT win here.
+  const naturalUS = englishVoices.find((v) => isUS(v) && isNatural(v));
+  if (naturalUS) return naturalUS;
+  const plainUS = englishVoices.find((v) => isUS(v) && !isGB(v));
+  if (plainUS) return plainUS;
 
   // No natural AU voice available — pick the most natural voice regardless of
   // accent (quality first, so it never sounds "AI"). Premium AU names (Matilda,
