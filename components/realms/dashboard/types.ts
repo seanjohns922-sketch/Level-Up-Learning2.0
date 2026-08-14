@@ -84,7 +84,7 @@ export type RealmDashboardTheme = {
 };
 
 export type CanonicalRealmDashboardConfig = {
-  realmId: LegendRealmId | "starpath-realm";
+  realmId: LegendRealmId | "starpath-realm" | "statistica";
   storageRealmId: ProgramRealmId;
   slug: string;
   displayName: string;

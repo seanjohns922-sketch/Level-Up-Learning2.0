@@ -45,11 +45,11 @@ export default function DemoModeNavigationControls({
   return (
     <div className="realm-demo-controls" style={{ display: "flex", alignItems: "center", gap: 5 }}>
       <span
-        title="Demo Mode"
+        title="Preview Mode"
         style={{ ...base, padding: "0 9px", color: text, background, border: border ?? `1px solid ${accent}44` }}
       >
-        <span className="realm-demo-long-label">Demo Mode</span>
-        <span className="realm-demo-short-label">Demo</span>
+        <span className="realm-demo-long-label">Preview Mode</span>
+        <span className="realm-demo-short-label">Preview</span>
       </span>
       <button
         type="button"
@@ -63,10 +63,10 @@ export default function DemoModeNavigationControls({
       <button
         type="button"
         onClick={exitDemoMode}
-        title="Exit Demo Mode"
+        title="Exit Preview Mode"
         style={{ ...base, padding: "0 10px", cursor: "pointer", color: "#fff", background: accent, border: `1px solid ${accent}` }}
       >
-        <span className="realm-demo-long-label">Exit Demo</span>
+        <span className="realm-demo-long-label">Exit Preview</span>
         <span className="realm-demo-short-label">Exit</span>
       </button>
       <style jsx>{`

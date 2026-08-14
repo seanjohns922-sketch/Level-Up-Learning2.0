@@ -142,7 +142,7 @@ export default function RealmCarousel() {
     if (isStatisticaRealm) {
       setLastRealm(current.id);
       exitReviewMode();
-      router.push(`/statistica?level=${encodeURIComponent(displayedLevel)}`);
+      router.push(`/statistica?teacher_preview=1&level=${encodeURIComponent(displayedLevel)}`);
       return;
     }
 

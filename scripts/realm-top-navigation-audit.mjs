@@ -12,6 +12,7 @@ const number = read("components/world/NumberNexusMap.tsx");
 const starpath = read("components/world/StarpathMap.tsx");
 const levels = read("components/realms/LevelsDrawer.tsx");
 const demoBanner = read("components/demo/DemoPreviewBanner.tsx");
+const demoControls = read("components/demo/DemoModeNavigationControls.tsx");
 
 for (const source of [shell, number]) {
   assert.match(source, /<RealmTopNavigation/, "Realm must use the canonical top navigation");
@@ -24,7 +25,7 @@ for (const required of ["levelSelector", "Global XP", "progressLabel", "DemoMode
 
 assert.match(selector, /compactLabel/);
 assert.match(selector, /Level \$\{number\}/);
-assert.match(selector, /panelLabel/);
+assert.match(selector, /Choose realm level/);
 assert.match(selector, /position: "fixed"/);
 assert.match(selector, /visibility: open/);
 assert.match(selector, /pointerdown/);
@@ -38,6 +39,8 @@ assert.match(starpath, /districtModeLevels: \["Year 3", "Year 4", "Year 5", "Yea
 assert.ok(!fs.existsSync(path.join(root, "components/realms/StarpathLevelsDrawer.tsx")));
 
 assert.match(demoBanner, /usesRealmNavigation/);
+assert.match(demoControls, /Preview Mode/);
+assert.match(demoControls, /Exit Preview/);
 assert.doesNotMatch(starpath, /Demo · Preview/);
 assert.doesNotMatch(shell, /top: 61/);
 
