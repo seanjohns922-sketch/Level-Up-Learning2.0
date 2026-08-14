@@ -1,7 +1,20 @@
 "use client";
 
+import { createContext, useContext, type ReactNode } from "react";
 import { Square, Volume2 } from "lucide-react";
 import { prepareSpeechText, speak, stopSpeaking, useSpeakState } from "@/lib/speak";
+
+const ReadAloudRateContext = createContext<number | undefined>(undefined);
+
+export function ReadAloudRateProvider({
+  rate,
+  children,
+}: {
+  rate?: number;
+  children: ReactNode;
+}) {
+  return <ReadAloudRateContext.Provider value={rate}>{children}</ReadAloudRateContext.Provider>;
+}
 
 export default function ReadAloudBtn({
   text,
@@ -10,6 +23,7 @@ export default function ReadAloudBtn({
   label,
   className = "",
   kind = "prompt",
+  rate,
 }: {
   text: string;
   speechKey?: string;
@@ -17,7 +31,10 @@ export default function ReadAloudBtn({
   label?: string;
   className?: string;
   kind?: "prompt" | "option";
+  rate?: number;
 }) {
+  const inheritedRate = useContext(ReadAloudRateContext);
+  const speechRate = rate ?? inheritedRate;
   const px = label
     ? size === "md" ? "px-3 py-2" : "px-2.5 py-1.5"
     : size === "md" ? "p-2" : "p-1.5";
@@ -37,7 +54,7 @@ export default function ReadAloudBtn({
           stopSpeaking();
           return;
         }
-        void speak(text, speechKey);
+        void speak(text, speechKey, "manual", { rate: speechRate });
       }}
       aria-label={isCurrentSpeech ? "Stop read aloud" : "Read aloud"}
       title={isCurrentSpeech ? "Stop read aloud" : "Read aloud"}

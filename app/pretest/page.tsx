@@ -7,7 +7,7 @@ import { getPretestForYearLabel } from "@/data/assessments/api";
 import { YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS } from "@/data/assessments/year6NumberNexusIndependentBanks";
 import { LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS } from "@/data/assessments/level1StarpathIndependentAssessments";
 import type { Question } from "@/data/assessments/pretests";
-import ReadAloudBtn from "@/components/ReadAloudBtn";
+import ReadAloudBtn, { ReadAloudRateProvider } from "@/components/ReadAloudBtn";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { MeasurelandsAssessmentTask } from "@/components/assessment/MeasurelandsAssessmentTask";
@@ -956,32 +956,34 @@ function PretestPage() {
   return (
     <>
       <ActiveLearningTracker context="pretest" />
-      <AssessmentShell
-        testType="Pre-Test"
-        year={year}
-        currentIndex={index}
-        totalQuestions={questions.length}
-        questionPrompt={question.prompt}
-        promptAction={isMeasurelandsTask ? undefined : <ReadAloudBtn text={question.prompt} />}
-        questionContent={questionContent}
-        hasAnswer={isReady}
-        isLast={index === questions.length - 1}
-        submitted={submitting}
-        onBack={prevQuestion}
-        onNext={nextQuestion}
-        onSubmit={() => finish()}
-        onExit={exitToLevels}
-        onIdk={answerIdk}
-        onHome={exitToHome}
-        onExitAssessment={exitToLevels}
-        onLogout={exitLogout}
-        wideContent={isMeasurelandsTask}
-        hidePrompt={isMeasurelandsTask}
-        lightSurface={isMeasurelandsTask}
-        answeredFlags={answers.map((a) => a !== null && a !== undefined && a !== "")}
-        onJump={(i) => setIndex(i)}
-        realmId={realmId}
-      />
+      <ReadAloudRateProvider rate={realmId === "space" ? 0.85 : undefined}>
+        <AssessmentShell
+          testType="Pre-Test"
+          year={year}
+          currentIndex={index}
+          totalQuestions={questions.length}
+          questionPrompt={question.prompt}
+          promptAction={isMeasurelandsTask ? undefined : <ReadAloudBtn text={question.prompt} />}
+          questionContent={questionContent}
+          hasAnswer={isReady}
+          isLast={index === questions.length - 1}
+          submitted={submitting}
+          onBack={prevQuestion}
+          onNext={nextQuestion}
+          onSubmit={() => finish()}
+          onExit={exitToLevels}
+          onIdk={answerIdk}
+          onHome={exitToHome}
+          onExitAssessment={exitToLevels}
+          onLogout={exitLogout}
+          wideContent={isMeasurelandsTask}
+          hidePrompt={isMeasurelandsTask}
+          lightSurface={isMeasurelandsTask}
+          answeredFlags={answers.map((a) => a !== null && a !== undefined && a !== "")}
+          onJump={(i) => setIndex(i)}
+          realmId={realmId}
+        />
+      </ReadAloudRateProvider>
 
       {/* ── Save & Resume gate ── */}
       {showResumePrompt && (

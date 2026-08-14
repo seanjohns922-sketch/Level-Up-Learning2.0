@@ -305,7 +305,7 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
   return englishVoices[0];
 }
 
-function speakWithBrowser(text: string) {
+function speakWithBrowser(text: string, rate = 0.95) {
   if (typeof window === "undefined") return;
   const synth = window.speechSynthesis;
   if (!synth) return;
@@ -318,7 +318,7 @@ function speakWithBrowser(text: string) {
 
   utterance.lang = voice?.lang ?? "en-AU";
   if (voice) utterance.voice = voice;
-  utterance.rate = 0.95; // natural pace, not dragging
+  utterance.rate = Math.min(1.25, Math.max(0.6, rate));
   utterance.pitch = 1.05; // slightly warmer
   utterance.volume = 1.0;
   utterance.onend = () => {
@@ -360,7 +360,8 @@ function speakWithBrowser(text: string) {
 export async function speak(
   text: string,
   _speechKey?: string,
-  source: "manual" | "auto" = "manual"
+  source: "manual" | "auto" = "manual",
+  options?: { rate?: number },
 ) {
   if (typeof window === "undefined") return;
 
@@ -371,7 +372,7 @@ export async function speak(
   if (!normalized) return;
 
   stopSpeaking();
-  speakWithBrowser(normalized);
+  speakWithBrowser(normalized, options?.rate);
 }
 
 export function stopSpeaking() {

@@ -8,7 +8,7 @@ import { GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/g
 import { LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/level1StarpathIndependentAssessments";
 import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
-import ReadAloudBtn from "@/components/ReadAloudBtn";
+import ReadAloudBtn, { ReadAloudRateProvider } from "@/components/ReadAloudBtn";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress } from "@/data/progress";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
@@ -824,36 +824,38 @@ function PostTestPage() {
   return (
     <>
       <ActiveLearningTracker context="posttest" />
-      <AssessmentShell
-        testType="Post-Test"
-        year={year}
-        currentIndex={idx}
-        totalQuestions={questions.length}
-        subtitle={`Complete all ${questions.length} questions to unlock your Legend (${PASS_THRESHOLD}%+)`}
-        questionPrompt={q.prompt}
-        promptAction={isInteractiveTask ? undefined : <ReadAloudBtn text={q.prompt} />}
-        questionContent={questionContent}
-        hasAnswer={hasAnswer}
-        isLast={idx === questions.length - 1}
-        submitted={submitted}
-        onBack={back}
-        onNext={next}
-        onSubmit={() => submit()}
-        onIdk={answerIdk}
-        onExit={() => router.push(buildAssessmentReturnRoute({ year, realmId }))}
-        wideContent={isInteractiveTask}
-        hidePrompt={isInteractiveTask}
-        lightSurface={isInteractiveTask}
-        answeredFlags={questions.map((qq) => {
-          const a = answers[qq.id];
-          return a !== undefined && a !== "";
-        })}
-        onJump={(i) => {
-          setMab({ tens: 0, ones: 0 });
-          setIdx(i);
-        }}
-        realmId={realmId}
-      />
+      <ReadAloudRateProvider rate={realmId === "space" ? 0.85 : undefined}>
+        <AssessmentShell
+          testType="Post-Test"
+          year={year}
+          currentIndex={idx}
+          totalQuestions={questions.length}
+          subtitle={`Complete all ${questions.length} questions to unlock your Legend (${PASS_THRESHOLD}%+)`}
+          questionPrompt={q.prompt}
+          promptAction={isInteractiveTask ? undefined : <ReadAloudBtn text={q.prompt} />}
+          questionContent={questionContent}
+          hasAnswer={hasAnswer}
+          isLast={idx === questions.length - 1}
+          submitted={submitted}
+          onBack={back}
+          onNext={next}
+          onSubmit={() => submit()}
+          onIdk={answerIdk}
+          onExit={() => router.push(buildAssessmentReturnRoute({ year, realmId }))}
+          wideContent={isInteractiveTask}
+          hidePrompt={isInteractiveTask}
+          lightSurface={isInteractiveTask}
+          answeredFlags={questions.map((qq) => {
+            const a = answers[qq.id];
+            return a !== undefined && a !== "";
+          })}
+          onJump={(i) => {
+            setMab({ tens: 0, ones: 0 });
+            setIdx(i);
+          }}
+          realmId={realmId}
+        />
+      </ReadAloudRateProvider>
     </>
   );
 }

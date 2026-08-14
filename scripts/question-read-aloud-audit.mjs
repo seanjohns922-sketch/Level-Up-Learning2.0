@@ -39,12 +39,17 @@ const checks = [
   {
     name: "pre-tests expose prompt audio",
     file: "app/pretest/page.tsx",
-    patterns: ["promptAction=", "<ReadAloudBtn text={question.prompt}"],
+    patterns: ["promptAction=", "<ReadAloudBtn text={question.prompt}", 'rate={realmId === "space" ? 0.85 : undefined}'],
   },
   {
     name: "post-tests expose prompt audio",
     file: "app/posttest/page.tsx",
-    patterns: ["promptAction=", "<ReadAloudBtn text={q.prompt}"],
+    patterns: ["promptAction=", "<ReadAloudBtn text={q.prompt}", 'rate={realmId === "space" ? 0.85 : undefined}'],
+  },
+  {
+    name: "read-aloud controls support a scoped speech rate",
+    file: "components/ReadAloudBtn.tsx",
+    patterns: ["ReadAloudRateProvider", "ReadAloudRateContext", "rate: speechRate"],
   },
   {
     name: "Starpath quizzes use the shared task renderer",
