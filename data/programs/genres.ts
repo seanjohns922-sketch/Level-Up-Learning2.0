@@ -7,6 +7,7 @@ import { YEAR3_MEASURELANDS_PROGRAM } from "./year3Measurelands";
 import { YEAR4_MEASURELANDS_PROGRAM } from "./year4Measurelands";
 import { YEAR5_MEASURELANDS_PROGRAM } from "./year5Measurelands";
 import { YEAR6_MEASURELANDS_PROGRAM } from "./year6Measurelands";
+import { getStatisticaProgramForYearLabel } from "./statistica";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getStarpathLevelForYear } from "@/lib/starpath-levels";
 import { buildLessonRoute } from "@/lib/lesson-routing";
@@ -38,8 +39,8 @@ const ALL_GENRES: GenreCatalogEntry[] = [
   { id: "reading",     strand: "Reading",     realm: "Reading Ridge",   unlocksFromLevel: 0 },
   { id: "writing",     strand: "Writing",     realm: "Inkwell Wilds",   unlocksFromLevel: 0 },
   { id: "grammar",     strand: "Grammar",     realm: "Runehaven Peaks", unlocksFromLevel: 0 },
-  // Future strands — appear from Year 3+, always placeholder for now.
-  { id: "statistics",  strand: "Statistics",  realm: "Datara",          unlocksFromLevel: 3 },
+  // Blueprint-only until lesson activities, quizzes and assessments are built.
+  { id: "statistics",  strand: "Statistics",  realm: "Statistica",      unlocksFromLevel: 1 },
   { id: "algebra",     strand: "Algebra",     realm: "Pattern Peaks",   unlocksFromLevel: 3 },
   { id: "probability", strand: "Probability", realm: "Chanzia",         unlocksFromLevel: 3 },
 ];
@@ -204,6 +205,10 @@ export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[
 
   if (genreId === "measurement" && yearLabel === "Year 6") {
     return YEAR6_MEASURELANDS_PROGRAM;
+  }
+
+  if (genreId === "statistics") {
+    return getStatisticaProgramForYearLabel(yearLabel) ?? placeholderWeeks(yearLabel, genre);
   }
 
   return placeholderWeeks(yearLabel, genre);
