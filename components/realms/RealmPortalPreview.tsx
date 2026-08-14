@@ -36,7 +36,7 @@ function RealmPortalPreviewInner({
   const [hasVideoError, setHasVideoError] = useState(false);
 
   const videoSrc = REALM_PORTAL_VIDEOS[realmId];
-  const requiresLevel3Video = realmId === "pattern-peaks" || realmId === "statistica";
+  const requiresLevel3Video = realmId === "pattern-peaks";
   const isRealmVideoUnlocked =
     !requiresLevel3Video || (typeof levelNumber === "number" && levelNumber >= 3);
   const shouldShowVideo = isSelected && isRealmVideoUnlocked && Boolean(videoSrc) && !hasVideoError;
