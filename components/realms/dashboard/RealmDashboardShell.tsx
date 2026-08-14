@@ -32,6 +32,7 @@ import type {
   RealmDistrictState,
 } from "./types";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
+import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 
 function useWorldCanvas(colors: readonly string[], ringColor: string) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -261,7 +262,6 @@ export default function RealmDashboardShell({
     config.storageRealmId,
     progress?.teacherAdvancedWeeks,
   );
-  const currentLesson = demoJourney?.currentLesson ?? 1;
   const currentZone =
     world.zones.find((zone) => currentWeek >= zone.weekStart && currentWeek <= zone.weekEnd) ?? world.zones[0];
   const completedByWeek = useMemo(() => {
@@ -420,17 +420,20 @@ export default function RealmDashboardShell({
     if (previewMode && config.demo) {
       const continuingCurrentJourney = currentWeek >= weekStart && currentWeek <= weekEnd;
       const targetWeek = continuingCurrentJourney ? currentWeek : weekStart;
-      const targetLesson = continuingCurrentJourney ? currentLesson : 1;
-      router.push(config.demo.buildLessonHref(resolvedYear, targetWeek, targetLesson));
+      router.push(config.demo.buildProgramHref(resolvedYear, targetWeek));
       return;
     }
     for (let week = weekStart; week <= weekEnd; week += 1) {
       if (!completedByWeek[week]) {
-        router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${week}&legacy=1&realm_id=${config.storageRealmId}`);
+        router.push(buildRealmProgramHref({ realmId: config.storageRealmId, year: resolvedYear, week }));
         return;
       }
     }
-    router.push(`/program?year=${encodeURIComponent(resolvedYear)}&week=${Math.max(weekStart, Math.min(currentWeek, weekEnd))}&legacy=1&realm_id=${config.storageRealmId}`);
+    router.push(buildRealmProgramHref({
+      realmId: config.storageRealmId,
+      year: resolvedYear,
+      week: Math.max(weekStart, Math.min(currentWeek, weekEnd)),
+    }));
   }
 
   function openDistrict(district: RealmDashboardDistrict) {

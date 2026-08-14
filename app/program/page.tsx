@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Lock, LockOpen } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { DEMO_MODE } from "@/data/config";
@@ -37,6 +36,10 @@ import {
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import { getStatisticaBackground } from "@/lib/statistica-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
+import {
+  buildRealmProgramHref,
+  requireSharedWeeklyProgramRealm,
+} from "@/lib/realms/realm-journey";
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
@@ -75,10 +78,7 @@ function ProgramPage() {
   const sp = useSearchParams();
 
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 1");
-  const realmId = sp.get("realm_id") ?? "number";
-  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics") {
-    throw new Error(`Unsupported program realm: ${realmId}`);
-  }
+  const realmId = requireSharedWeeklyProgramRealm(sp.get("realm_id") ?? "number");
   const isStarpathRealm = realmId === "space";
   const isStatisticsRealm = realmId === "statistics";
   const starpathProgram = useMemo(
@@ -90,12 +90,8 @@ function ProgramPage() {
   const program = useMemo(
     () => isStarpathRealm
       ? starpathProgram?.weeks ?? []
-      : realmId === "measurement"
-        ? getCurriculumPlan(year, "measurement")
-        : isStatisticsRealm
-          ? getCurriculumPlan(year, "statistics")
-        : getProgramForYear(year),
-    [isStarpathRealm, isStatisticsRealm, realmId, starpathProgram, year]
+      : getCurriculumPlan(year, realmId),
+    [isStarpathRealm, realmId, starpathProgram, year]
   );
   const curriculumYear = useMemo(() => {
     const selected = program;
@@ -617,12 +613,7 @@ function ProgramPage() {
       router.push(buildStarpathProgramHref({ selectedLevel: starpathProgram.definition.id }, clamped));
       return;
     }
-    if (isStatisticsRealm) {
-      router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1&realm_id=statistics&teacher_preview=1`);
-      return;
-    }
-    const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${clamped}&legacy=1${realmParam}`);
+    router.push(buildRealmProgramHref({ realmId, year, week: clamped, preview: isStatisticsRealm }));
   }
 
   function setTeacherModeState(next: boolean) {

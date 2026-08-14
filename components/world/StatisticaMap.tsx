@@ -10,6 +10,7 @@ import { getCurriculumPlan } from "@/data/programs/genres";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { getStatisticaBackground } from "@/lib/statistica-visuals";
+import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 
 const STATISTICA_LEVELS = LEVEL_CATALOG.filter((level) => level.id !== "Prep") as Array<{
   id: RealmLevelId;
@@ -33,10 +34,6 @@ function levelLabel(level: RealmLevelId) {
 
 function buildStatisticaPreviewHref(level: RealmLevelId, week = 1) {
   return `/statistica?teacher_preview=1&level=${encodeURIComponent(level)}&week=${week}`;
-}
-
-function buildStatisticaProgramPreviewHref(level: RealmLevelId, week: number) {
-  return `/program?year=${encodeURIComponent(level)}&week=${week}&legacy=1&realm_id=statistics&teacher_preview=1`;
 }
 
 function getStatisticaDistricts(level: RealmLevelId): readonly RealmDashboardDistrict[] {
@@ -144,7 +141,12 @@ export const STATISTICA_DASHBOARD_CONFIG = {
     unlockAllDistricts: true,
     readJourney: () => ({ currentWeek: 1, currentLesson: 1 }),
     buildLevelHref: (level: RealmLevelId) => buildStatisticaPreviewHref(level),
-    buildLessonHref: (level, week) => buildStatisticaProgramPreviewHref(level, week),
+    buildProgramHref: (level, week) => buildRealmProgramHref({
+      realmId: "statistics",
+      year: level,
+      week,
+      preview: true,
+    }),
   },
 } satisfies CanonicalRealmDashboardConfig;
 

@@ -4,6 +4,10 @@ import path from "node:path";
 import { getPosttestForYearLabel, getPretestForYearLabel } from "@/data/assessments/api";
 import { getCurriculumPlan, getGenresForYear } from "@/data/programs/genres";
 import { getLiveRealmDefinitions, LIVE_REALM_IDS } from "@/lib/realms/realm-registry";
+import {
+  buildRealmProgramHref,
+  isSharedWeeklyProgramRealm,
+} from "@/lib/realms/realm-journey";
 
 const root = process.cwd();
 const read = (relativePath: string) => fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -32,6 +36,11 @@ for (const realm of liveRealms) {
   assert(realm.totalWeeks != null && realm.totalWeeks > 0, `${realm.name} needs a canonical week count.`);
   assert(realm.lessonsPerWeek != null && realm.lessonsPerWeek > 0, `${realm.name} needs a lessons-per-week contract.`);
   assert(realm.hasWeeklyQuiz, `${realm.name} must declare its weekly-quiz contract.`);
+  assert(isSharedWeeklyProgramRealm(realm.realmId), `${realm.name} is not connected to the shared weekly-program journey.`);
+  assert(
+    buildRealmProgramHref({ realmId: realm.realmId, year: realm.levelLabels[0], week: 1 }).startsWith("/program?"),
+    `${realm.name} does not build a shared weekly-program route.`,
+  );
   assert(fs.existsSync(path.join(root, "app", realm.slug, "page.tsx")), `${realm.name} is live but app/${realm.slug}/page.tsx is missing.`);
 
   for (const yearLabel of realm.levelLabels) {

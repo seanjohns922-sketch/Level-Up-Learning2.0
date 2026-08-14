@@ -125,7 +125,7 @@ export type CanonicalRealmDashboardConfig = {
     unlockAllDistricts?: boolean;
     readJourney: (level: RealmLevelId) => { currentWeek: number; currentLesson: number };
     buildLevelHref: (level: RealmLevelId) => string;
-    buildLessonHref: (level: RealmLevelId, week: number, lesson: number) => string;
+    buildProgramHref: (level: RealmLevelId, week: number) => string;
   };
   internalPreview?: {
     buildLevelHref: (level: RealmLevelId) => string;

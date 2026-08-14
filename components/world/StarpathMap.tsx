@@ -18,7 +18,8 @@ import {
   type StarpathLevelDefinition,
   type StarpathLevelId,
 } from "@/lib/starpath-levels";
-import { buildStarpathProgramHref, buildStarpathWorldHref } from "@/lib/starpath-routes";
+import { buildStarpathWorldHref } from "@/lib/starpath-routes";
+import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 
@@ -143,8 +144,8 @@ export const STARPATH_DASHBOARD_CONFIG = {
     unlockAllDistricts: true,
     readJourney: readStarpathDemoJourney,
     buildLevelHref: (level: RealmLevelId) => buildStarpathWorldHref({ selectedLevel: starpathLevelId(level) }),
-    buildLessonHref: (level: RealmLevelId, week: number) =>
-      buildStarpathProgramHref({ selectedLevel: starpathLevelId(level) }, week),
+    buildProgramHref: (level: RealmLevelId, week: number) =>
+      buildRealmProgramHref({ realmId: "space", year: level, week, preview: true }),
   },
 } satisfies CanonicalRealmDashboardConfig;
 

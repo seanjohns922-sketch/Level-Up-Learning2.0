@@ -42,12 +42,12 @@ const map = read("components/world/StatisticaMap.tsx");
 assert(map.includes("RealmDashboardShell"), "Statistica must use the shared realm dashboard shell");
 assert(map.includes('districtModeLevels: ["Year 3", "Year 4", "Year 5", "Year 6"]'), "Statistica must use Start Adventure for Level 1-2 and District World for Level 3-6");
 assert(map.includes('demo: {') && map.includes("only: true"), "Statistica must remain preview-only until production progression exists");
-assert(map.includes("buildStatisticaProgramPreviewHref"), "Statistica world must route entry through the shared weekly program");
-assert(map.includes("realm_id=statistics&teacher_preview=1"), "Statistica world must preserve its realm and preview scope");
+assert(map.includes("buildRealmProgramHref"), "Statistica world must route entry through the shared realm journey contract");
+assert(map.includes('realmId: "statistics"'), "Statistica world must preserve its canonical realm scope");
 
 const programRoute = read("app/program/page.tsx");
-assert(programRoute.includes('realmId !== "statistics"'), "Shared weekly program must accept Statistica");
-assert(programRoute.includes('getCurriculumPlan(year, "statistics")'), "Shared weekly program must load Statistica curriculum");
+assert(programRoute.includes("requireSharedWeeklyProgramRealm"), "Shared weekly program must discover supported realms from the registry contract");
+assert(programRoute.includes("getCurriculumPlan(year, realmId)"), "Shared weekly program must load curriculum by canonical realm");
 assert(programRoute.includes("getStatisticaBackground"), "Shared weekly program must use Statistica artwork");
 assert(programRoute.includes("isStatisticsRealm"), "Shared weekly program must apply the Statistica theme contract");
 for (const token of ['left: "4%"', 'top: "14%"', 'left: "5%"', 'top: "58%"', 'left: "68%"']) {

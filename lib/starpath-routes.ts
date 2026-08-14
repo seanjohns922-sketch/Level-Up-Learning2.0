@@ -1,4 +1,5 @@
 import { getStarpathLevel, type StarpathLevelId } from "@/lib/starpath-levels";
+import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 
 export const STARPATH_CAROUSEL_ID = "starpath-realm";
 export const STARPATH_REALM_ID = "space";
@@ -44,15 +45,15 @@ export const buildStarpathPreTestHref = (context: StarpathRouteContext) =>
   buildStarpathHref("pre-test", context);
 export const buildStarpathProgramHref = (context: StarpathRouteContext, week = 1) => {
   const definition = getStarpathLevel(context.selectedLevel);
-  const params = new URLSearchParams({
+  return buildRealmProgramHref({
+    realmId: STARPATH_REALM_ID,
     year: definition.yearLabel,
-    level: context.selectedLevel,
-    week: String(week),
-    legacy: "1",
-    realm_id: STARPATH_REALM_ID,
+    week,
+    extra: {
+      level: context.selectedLevel,
+      placement_level: context.placementLevel,
+    },
   });
-  if (context.placementLevel) params.set("placement_level", context.placementLevel);
-  return `/program?${params.toString()}`;
 };
 export const buildStarpathLessonHref = (
   context: StarpathRouteContext,
