@@ -13,6 +13,7 @@ const hud = read("components/lesson/LessonHUDRail.tsx");
 const graph = read("components/statistica/StatisticaGraphCard.tsx");
 const tally = read("components/statistica/StatisticaTallyCard.tsx");
 const sort = read("components/statistica/StatisticaSortCard.tsx");
+const statisticaShell = read("components/statistica/StatisticaLessonShell.tsx");
 
 assert.equal(
   (route.match(/<RealmActiveLessonShell/g) ?? []).length,
@@ -44,6 +45,24 @@ assert.match(practice, /linear-gradient\(180deg, #fffaf0 0%, #f1f5e8 100%\)/);
 assert.match(engine, /Activity: \{activityLabel\}/);
 assert.match(hud, /levelNumber === 0 \? "Ground"/);
 assert.match(hud, /"DATA STREAK"/);
+assert.match(practice, /hasStatisticaFeedback/);
+
+for (const marker of [
+  "RealmActiveLessonShell",
+  'realm="statistics"',
+  'completionMode="time_only"',
+  "liveContext={{",
+  'strand: "Statistics"',
+  "practisedSkills={[...successCriteria]}",
+  'activityNoun="Investigation"',
+]) {
+  assert.ok(statisticaShell.includes(marker), `Statistica active lesson is missing shared functionality: ${marker}`);
+}
+assert.match(
+  statisticaShell,
+  /<RealmActiveLessonShell[\s\S]*<PracticeRunner[\s\S]*<\/RealmActiveLessonShell>/,
+  "Statistica PracticeRunner must remain inside the shared active lesson shell"
+);
 
 for (const [name, source] of [["graph", graph], ["tally", tally], ["sort", sort]]) {
   assert.match(source, /#f06b64/, `Statistica ${name} activity must use the coral realm accent`);

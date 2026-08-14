@@ -1106,8 +1106,16 @@ export function PracticeRunner({
     task.kind === "starpathShapeDisguise" ||
     task.kind === "starpathShapeFaceOff" ||
     task.kind === "starpathMysteryShape";
+  const hasStatisticaFeedback =
+    task.kind === "statisticaSort" ||
+    task.kind === "statisticaTally" ||
+    task.kind === "statisticaGraph";
   const hint =
-    hasGroundFeedback
+    hasStatisticaFeedback
+      ? status === "correct"
+        ? ((task as GroundFeedbackTask).feedback?.correct ?? null)
+        : ((task as GroundFeedbackTask).feedback?.wrong ?? null)
+      : hasGroundFeedback
       ? status === "wrong"
         ? ((task as GroundFeedbackTask).feedback?.wrong ?? null)
         : ((task as GroundFeedbackTask).feedback?.correct ?? null)

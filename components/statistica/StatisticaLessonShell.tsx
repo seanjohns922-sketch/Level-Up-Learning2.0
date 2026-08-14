@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
 import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
 import { PracticeRunner } from "@/components/PracticeRunner";
 import { createRandomRealmLessonGenerator, type RealmLessonTaskGenerator } from "@/data/activities/realm-lesson-blueprint";
@@ -31,15 +32,41 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
   if (started && getTask) {
     return (
       <main className="min-h-screen bg-[#06151a] p-3 sm:p-5">
-        <PracticeRunner
-          minutes={9}
-          getTask={getTask}
-          onComplete={back}
-          lessonTitle={lessonTitle}
-          realmId="statistics"
-          levelNumber={levelNumber}
-          activityNoun="Question"
-        />
+        <div className="mx-auto w-full max-w-[1500px]">
+          <RealmActiveLessonShell
+            realm="statistics"
+            levelNumber={levelNumber}
+            levelLabel={`Level ${levelNumber}`}
+            year={level}
+            week={week}
+            lessonNumber={lessonNumber}
+            lessonTitle={lessonTitle}
+            focus={focus}
+            demoMode
+            onBack={back}
+          >
+            <PracticeRunner
+              minutes={9}
+              completionMode="time_only"
+              scoreCap={10}
+              getTask={getTask}
+              onComplete={back}
+              lessonTitle={lessonTitle}
+              liveContext={{
+                level,
+                strand: "Statistics",
+                week,
+                lessonId,
+                lessonTitle,
+              }}
+              realmId="statistics"
+              levelNumber={levelNumber}
+              practisedSkills={[...successCriteria]}
+              nextUpLabel={lessonNumber < 3 ? `Week ${week} lesson ${lessonNumber + 1}` : `Week ${week} quiz`}
+              activityNoun="Investigation"
+            />
+          </RealmActiveLessonShell>
+        </div>
       </main>
     );
   }

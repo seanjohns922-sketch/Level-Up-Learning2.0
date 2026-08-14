@@ -78,6 +78,7 @@ assert(lessonRoute.includes("StatisticaLessonShell"), "Statistica lesson route m
 const lessonAdapter = read("components/statistica/StatisticaLessonShell.tsx");
 assert(lessonAdapter.includes('realm="statistics"'), "Statistica lesson adapter must use the shared statistics theme");
 assert(lessonAdapter.includes('realmId="statistics"'), "Statistica active lesson must pass its canonical realm into the shared runner");
+assert(lessonAdapter.includes("RealmActiveLessonShell"), "Statistica active lesson must use the shared realm heading, navigation and content frame");
 assert(lessonAdapter.includes("getStatisticaLevel1TaskSet"), "Statistica Level 1 must use its real activity engine");
 assert(lessonAdapter.includes("startDisabled={!getTask}"), "Unimplemented Statistica levels must remain disabled");
 
