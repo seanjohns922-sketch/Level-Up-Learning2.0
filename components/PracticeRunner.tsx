@@ -435,8 +435,9 @@ export function PracticeRunner({
 }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
-  const isNumberNexus = !isMeasurement && !isStarpath;
-  const isStructuredRealm = isMeasurement || realmId === "space";
+  const isStatistics = realmId === "statistics";
+  const isNumberNexus = !isMeasurement && !isStarpath && !isStatistics;
+  const isStructuredRealm = isMeasurement || isStarpath || isStatistics;
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const completedRef = useRef(false);
@@ -564,7 +565,7 @@ export function PracticeRunner({
   const hudXPMax = isTimeOnlySession ? minutes : undefined;
   const hudXPLabel = isTimeOnlySession ? `${elapsedWholeMinutes} / ${minutes} MIN` : undefined;
   const hudXPRightLabel = isTimeOnlySession
-    ? (isMeasurement ? "Explorer Progress" : isStarpath ? "Mission Progress" : "Session Progress")
+    ? (isMeasurement ? "Explorer Progress" : isStarpath ? "Mission Progress" : isStatistics ? "Investigation Progress" : "Session Progress")
     : undefined;
   const accuracy =
     safeQuestionsAnswered > 0
@@ -1287,6 +1288,13 @@ export function PracticeRunner({
       if (count >= 3)  return "border-amber-600/40 shadow-[0_0_18px_rgba(180,120,20,0.28)]";
       return "border-amber-800/20";
     }
+    if (isStatistics) {
+      if (count >= 10) return "border-[#f2bc45] ring-2 ring-[#f06b64]/35 ring-offset-2 ring-offset-[#14231d] shadow-[0_0_30px_rgba(242,188,69,0.42)]";
+      if (count >= 8) return "border-[#f06b64]/70 shadow-[0_0_22px_rgba(240,107,100,0.34)]";
+      if (count >= 5) return "border-[#f2bc45]/70 shadow-[0_0_22px_rgba(242,188,69,0.32)]";
+      if (count >= 3) return "border-[#8fbf7f]/65 shadow-[0_0_18px_rgba(143,191,127,0.28)]";
+      return "border-[#b9caaa]/55";
+    }
     if (count >= 10) return "border-teal-300 shadow-[0_0_38px_rgba(45,212,191,0.65)] ring-2 ring-emerald-400/40 ring-offset-2 ring-offset-slate-950";
     if (count >= 8) return "border-orange-300/80 shadow-[0_0_22px_rgba(251,146,60,0.4)]";
     if (count >= 5) return "border-yellow-300/80 shadow-[0_0_22px_rgba(253,224,71,0.4)]";
@@ -1328,6 +1336,11 @@ export function PracticeRunner({
           background: "linear-gradient(180deg, #fbfaff 0%, #effcff 100%)",
           boxShadow: "0 18px 45px rgba(76,29,149,0.10)",
         }
+      : isStatistics
+        ? {
+            background: "linear-gradient(180deg, #fffaf0 0%, #f1f5e8 100%)",
+            boxShadow: "0 18px 45px rgba(20,35,29,0.16)",
+          }
       : {
           background: "#f8fbfc",
           boxShadow: "0 8px 24px rgba(15, 118, 110, 0.08)",
@@ -1361,7 +1374,7 @@ export function PracticeRunner({
         }`}
       />
 
-      <SurgeAmbience comboCount={comboCount} realmId={realmId} dimmed={status !== "correct"} />
+      {!isStatistics ? <SurgeAmbience comboCount={comboCount} realmId={realmId} dimmed={status !== "correct"} /> : null}
       <ComboActivation comboCount={comboCount} realmId={realmId} />
       <NexusActivation comboCount={comboCount} realmId={realmId} />
       {brainBreakVillain && (
@@ -1467,6 +1480,10 @@ export function PracticeRunner({
               background: "rgba(75,40,100,0.08)",
               border: "1px solid rgba(139,92,246,0.3)",
               color: "#5b21b6",
+            } : isStatistics ? {
+              background: "#fff0df",
+              border: "1px solid rgba(240,107,100,0.42)",
+              color: "#7d302e",
             } : {
               background: "#f0fdf4",
               color: "#15803d",
@@ -1517,7 +1534,7 @@ export function PracticeRunner({
                   {Array.from({ length: t.groups }).map((_: unknown, gi: number) => (
                     <div key={gi} className="flex items-center gap-2">
                       {Array.from({ length: t.perGroup }).map((__: unknown, di: number) => (
-                        <span key={di} className={`inline-block h-5 w-5 rounded-full ${isMeasurement ? "bg-amber-700" : "bg-teal-600"}`} />
+                        <span key={di} className={`inline-block h-5 w-5 rounded-full ${isMeasurement ? "bg-amber-700" : isStatistics ? "bg-[#f06b64]" : "bg-teal-600"}`} />
                       ))}
                     </div>
                   ))}
@@ -1533,6 +1550,8 @@ export function PracticeRunner({
                         ? "border-emerald-400 bg-emerald-50 text-emerald-800"
                         : isMeasurement
                           ? "border-amber-900/20 bg-[#fffaf0] hover:bg-[#fff4dd]"
+                          : isStatistics
+                            ? "border-[#b9caaa] bg-[#fffaf0] hover:bg-[#f4ead4]"
                           : "border-border bg-card hover:bg-muted",
                   ].join(" ")}>
                     {opt}
@@ -1548,7 +1567,7 @@ export function PracticeRunner({
             <Dots count={(task as CountTask).count} />
             <div className="flex items-center gap-3">
               <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-lg border border-border text-xl font-bold bg-card" />
-              <button onClick={check} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
+              <button onClick={check} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isStatistics ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
             </div>
           </div>
         )}
@@ -1571,7 +1590,7 @@ export function PracticeRunner({
               </div>
               <div className="flex items-center gap-3">
                 <button onClick={() => setOrder([])} className="px-5 py-3 rounded-lg bg-muted text-foreground font-extrabold text-xl hover:bg-muted/80 transition">Reset</button>
-                <button onClick={check} className={`flex-1 px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
+                <button onClick={check} className={`flex-1 px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isStatistics ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
               </div>
             </div>
           );
@@ -1582,7 +1601,7 @@ export function PracticeRunner({
           return (
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
-                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span></button>
+                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isStatistics ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span></button>
                 <div className="text-sm font-bold text-muted-foreground">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -1601,7 +1620,7 @@ export function PracticeRunner({
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm text-muted-foreground">Tap the correct number tile.</div>
-                <button type="button" onClick={() => speak(String(t.targetNumber))} className={`px-3 py-2 rounded-xl text-white font-bold transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Hear number</span></button>
+                <button type="button" onClick={() => speak(String(t.targetNumber))} className={`px-3 py-2 rounded-xl text-white font-bold transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isStatistics ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Hear number</span></button>
               </div>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
                 {t.tiles.map((n: number) => (
@@ -1622,7 +1641,7 @@ export function PracticeRunner({
               type="button"
               onClick={continueAfterWrong}
               className={`rounded-lg px-5 py-3 text-lg font-black text-white transition hover:brightness-105 ${
-                isMeasurement ? "bg-[#8a6422]" : realmId === "space" ? "bg-violet-700" : "bg-teal-700"
+                isMeasurement ? "bg-[#8a6422]" : isStarpath ? "bg-violet-700" : isStatistics ? "bg-[#c74f4b]" : "bg-teal-700"
               }`}
             >
               Next Question
@@ -1640,6 +1659,8 @@ export function PracticeRunner({
                   ? "bg-[#8a6422] hover:bg-[#a2732e]"
                   : isStarpath
                     ? "bg-violet-700 hover:bg-violet-600"
+                    : isStatistics
+                      ? "bg-[#c74f4b] hover:bg-[#a93f3c]"
                     : "bg-teal-700 hover:bg-teal-600"
               }`}
             >

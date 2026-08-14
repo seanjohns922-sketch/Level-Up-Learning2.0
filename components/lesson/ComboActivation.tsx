@@ -175,12 +175,50 @@ const STARPATH_TIERS: TierConfig[] = [
   },
 ];
 
+const STATISTICS_TIERS: TierConfig[] = [
+  {
+    threshold: 5,
+    title: "INSIGHT",
+    engaged: "DISCOVERED",
+    subtitle: "5 in a row — the data pattern is becoming clear!",
+    hues: [42, 105],
+    flashColor: "rgba(242,188,69,0.5)",
+    ringColor: "rgba(242,188,69,0.85)",
+    ringCount: 3,
+    particleCount: 26,
+    duration: 1.8,
+    cornerSize: 120,
+    titleGradient: "linear-gradient(180deg, #fff8e8 0%, #f2bc45 48%, #9a6524 100%)",
+    titleFilter: "drop-shadow(0 0 20px rgba(242,188,69,0.9)) drop-shadow(0 0 42px rgba(143,191,127,0.65))",
+    accentColor: "rgba(255,224,150,0.95)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(242,188,69,0.9), rgba(143,191,127,0.7), transparent)",
+  },
+  {
+    threshold: 8,
+    title: "DATA TRAIL",
+    engaged: "BLAZING",
+    subtitle: "8 in a row — you are reading the evidence brilliantly!",
+    hues: [4, 42],
+    flashColor: "rgba(240,107,100,0.52)",
+    ringColor: "rgba(240,107,100,0.86)",
+    ringCount: 4,
+    particleCount: 38,
+    duration: 2.2,
+    cornerSize: 140,
+    titleGradient: "linear-gradient(180deg, #fff7ed 0%, #f06b64 46%, #a93f3c 100%)",
+    titleFilter: "drop-shadow(0 0 22px rgba(240,107,100,0.92)) drop-shadow(0 0 46px rgba(242,188,69,0.68))",
+    accentColor: "rgba(255,189,182,0.96)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(240,107,100,0.9), rgba(242,188,69,0.7), transparent)",
+  },
+];
+
 type ActivationKey = { id: number; tier: TierConfig };
 
 export default function ComboActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
-  const tiers = isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : NEXUS_TIERS;
+  const isStatistics = realmId === "statistics";
+  const tiers = isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : isStatistics ? STATISTICS_TIERS : NEXUS_TIERS;
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);

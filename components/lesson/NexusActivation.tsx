@@ -125,13 +125,40 @@ const STARPATH_THEME: RealmTheme = {
   particleSplit: 0.6,
 };
 
+const STATISTICS_THEME: RealmTheme = {
+  flashBg: "radial-gradient(circle at 50% 50%, rgba(242,188,69,0.58) 0%, rgba(240,107,100,0.3) 40%, rgba(20,35,29,0) 75%)",
+  gridColor: "rgba(143,191,127,0.16)",
+  scanColor: "rgba(242,188,69,0.42)",
+  ringInner: "rgba(255,240,199,0.92)",
+  ringOuter: "rgba(240,107,100,0.62)",
+  ringShadow: "0 0 52px rgba(242,188,69,0.68), inset 0 0 24px rgba(143,191,127,0.42)",
+  cornerConic: "conic-gradient(from 45deg, rgba(242,188,69,0), rgba(242,188,69,0.72) 15%, rgba(240,107,100,0.54) 30%, rgba(143,191,127,0.34) 45%, rgba(242,188,69,0) 60%)",
+  titleGradient: "linear-gradient(180deg, #fffaf0 0%, #f2bc45 44%, #c74f4b 100%)",
+  titleFilter: "drop-shadow(0 0 24px rgba(242,188,69,0.95)) drop-shadow(0 0 48px rgba(240,107,100,0.68))",
+  title: "MASTER ANALYST",
+  engaged: "ACHIEVED",
+  engagedColor: "rgba(255,224,150,0.98)",
+  engagedShadow: "0 0 18px rgba(242,188,69,0.9), 0 0 36px rgba(240,107,100,0.64)",
+  dividerGradient: "linear-gradient(90deg, transparent, rgba(242,188,69,0.9), rgba(240,107,100,0.72), transparent)",
+  dividerShadow: "0 0 12px rgba(242,188,69,0.7)",
+  copy: "You followed the data trail to a powerful insight!",
+  copyColor: "rgba(255,240,199,0.94)",
+  copyShadow: "0 0 10px rgba(240,107,100,0.74)",
+  bottomText: "10 correct in a row — evidence mastered",
+  bottomColor: "rgba(143,191,127,0.94)",
+  bottomShadow: "0 0 12px rgba(143,191,127,0.72)",
+  particleHues: [42, 4],
+  particleSplit: 0.55,
+};
+
 const MEASURE_GLYPHS = [Hourglass, Cog, Timer, Scale, Ruler];
 const STARPATH_GLYPHS = [Star, Sparkles];
 
 export default function NexusActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
-  const t = isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : NEXUS_THEME;
+  const isStatistics = realmId === "statistics";
+  const t = isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : NEXUS_THEME;
   const glyphSet = isMeasurement ? MEASURE_GLYPHS : STARPATH_GLYPHS;
   const glyphColorRgb = isStarpath ? "196,181,253" : "200,160,48";
   const prevRef = useRef(comboCount);
@@ -146,11 +173,11 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
       setActive({ id: idRef.current });
       const timer = setTimeout(() => setActive(null), 2800);
       try {
-        window.dispatchEvent(new CustomEvent(isMeasurement ? "lul:legendary-activated" : "lul:nexus-activated"));
+        window.dispatchEvent(new CustomEvent(isMeasurement ? "lul:legendary-activated" : isStatistics ? "lul:master-analyst-activated" : "lul:nexus-activated"));
       } catch {}
       return () => clearTimeout(timer);
     }
-  }, [comboCount, isMeasurement]);
+  }, [comboCount, isMeasurement, isStatistics]);
 
   const particles = useMemo(() => {
     if (!active) return [];

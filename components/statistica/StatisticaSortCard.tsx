@@ -39,7 +39,7 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
       type="button"
       onClick={() => (inBin ? returnItem(it.id) : setSelected((s) => (s === it.id ? null : it.id)))}
       disabled={settled}
-      className={["rounded-xl border-2 px-3 py-1.5 text-sm font-black transition disabled:opacity-70", selected === it.id ? "border-cyan-400 bg-cyan-50 text-teal-950 ring-2 ring-cyan-300" : "border-teal-200 bg-white text-teal-900 hover:border-cyan-400"].join(" ")}
+      className={["rounded-lg border-2 px-3 py-1.5 text-sm font-black transition disabled:opacity-70", selected === it.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}
     >
       {it.label}
     </button>
@@ -50,7 +50,7 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
 
       {/* tray of items to sort */}
-      <div className="mx-auto flex min-h-[52px] max-w-md flex-wrap items-center justify-center gap-2 rounded-2xl border border-dashed border-cyan-300/30 bg-slate-950 p-3">
+      <div className="mx-auto flex min-h-[52px] max-w-md flex-wrap items-center justify-center gap-2 rounded-lg border border-dashed border-[#f2bc45]/45 bg-[#17281f] p-3">
         {tray.length ? tray.map((it) => chip(it, false)) : <span className="text-xs font-bold text-white/40">All sorted — tap Check!</span>}
       </div>
 
@@ -59,7 +59,7 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
         {task.categories.map((cat) => {
           const inThis = task.items.filter((it) => placement[it.id] === cat.id);
           return (
-            <button key={cat.id} type="button" onClick={() => pickBin(cat.id)} disabled={settled || !selected} className="min-h-[92px] rounded-2xl border-2 p-2 text-left transition disabled:cursor-default" style={{ borderColor: cat.color, background: `${cat.color}14` }}>
+            <button key={cat.id} type="button" onClick={() => pickBin(cat.id)} disabled={settled || !selected} className="min-h-[92px] rounded-lg border-2 p-2 text-left transition disabled:cursor-default" style={{ borderColor: cat.color, background: `${cat.color}14` }}>
               <div className="mb-1.5 text-center text-xs font-black uppercase tracking-wide" style={{ color: cat.color }}>{cat.label}</div>
               <div className="flex flex-wrap justify-center gap-1.5">{inThis.map((it) => chip(it, true))}</div>
             </button>
@@ -68,7 +68,7 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
       </div>
 
       <div className="flex justify-center">
-        <button type="button" onClick={submit} disabled={settled || tray.length > 0} className="flex h-12 items-center gap-2 rounded-2xl bg-emerald-600 px-7 font-black text-white shadow-md transition hover:bg-emerald-700 active:scale-95 disabled:opacity-40"><Check className="h-5 w-5" /> Check</button>
+        <button type="button" onClick={submit} disabled={settled || tray.length > 0} className="flex h-12 items-center gap-2 rounded-lg bg-[#c74f4b] px-7 font-black text-white shadow-md transition hover:bg-[#a93f3c] active:scale-95 disabled:opacity-40"><Check className="h-5 w-5" /> Check</button>
       </div>
     </div>
   );

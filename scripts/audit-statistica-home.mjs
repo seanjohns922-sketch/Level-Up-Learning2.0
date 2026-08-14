@@ -73,11 +73,13 @@ for (const widget of ["Data Briefing", "Today I am learning to...", "I can...", 
 const lessonRoute = read("app/statistica/lesson/[level]/[week]/[lesson]/page.tsx");
 assert(lessonRoute.includes("getStatisticaProgramForYearLabel"), "Statistica lesson home must read canonical curriculum data");
 assert(lessonRoute.includes('teacher_preview !== "1"'), "Statistica lesson home must remain preview-only");
-assert(lessonRoute.includes("StatisticaLessonHome"), "Statistica lesson route must render the shared lesson-home adapter");
+assert(lessonRoute.includes("StatisticaLessonShell"), "Statistica lesson route must render the shared lesson shell");
 
-const lessonAdapter = read("components/statistica/StatisticaLessonHome.tsx");
+const lessonAdapter = read("components/statistica/StatisticaLessonShell.tsx");
 assert(lessonAdapter.includes('realm="statistics"'), "Statistica lesson adapter must use the shared statistics theme");
-assert(lessonAdapter.includes("startDisabled"), "Statistica lesson activity must stay disabled until its real engine is implemented");
+assert(lessonAdapter.includes('realmId="statistics"'), "Statistica active lesson must pass its canonical realm into the shared runner");
+assert(lessonAdapter.includes("getStatisticaLevel1TaskSet"), "Statistica Level 1 must use its real activity engine");
+assert(lessonAdapter.includes("startDisabled={!getTask}"), "Unimplemented Statistica levels must remain disabled");
 
 const starpathVisuals = read("lib/starpath-visuals.ts");
 assert(!starpathVisuals.includes("statistica-home"), "Starpath visuals must not reference Statistica backgrounds");
