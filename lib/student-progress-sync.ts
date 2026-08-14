@@ -12,6 +12,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 import { awardAndReveal } from "@/lib/gem-reveal";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 export type StudentProgressSnapshotRow = {
   realm_id?: string | null;
@@ -44,7 +45,7 @@ type StudentRuntimeContextRow = {
   last_name?: string | null;
 };
 
-export type StudentProgressRealmId = "number" | "measurement" | "space";
+export type StudentProgressRealmId = LiveRealmId;
 
 const REALM_PROGRAM_SUFFIX: Record<StudentProgressRealmId, string> = {
   number: "number",

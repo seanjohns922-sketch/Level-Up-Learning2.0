@@ -1,6 +1,11 @@
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { DEMO_PREVIEW_SCOPE, isDemoPreviewMode } from "@/lib/demo-mode";
 import { isReviewMode } from "@/lib/review-mode";
+import {
+  getLiveRealmDefinitions,
+  isLiveRealmId,
+  type LiveRealmId,
+} from "@/lib/realms/realm-registry";
 
 export type StudentProgress = {
   year: string; // "Year 3"
@@ -21,7 +26,7 @@ export type StudentProgress = {
 
 export const STORAGE_KEY = "lul_student_progress_v1";
 export const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
-export type ProgressRealmScope = "number" | "measurement" | "space";
+export type ProgressRealmScope = LiveRealmId;
 
 type ProgressCacheEnvelope = {
   student_id: string;
@@ -34,11 +39,14 @@ type ProgressCacheEnvelope = {
 function getActiveRealmScope(): ProgressRealmScope {
   if (typeof window === "undefined") return "number";
   const searchRealm = new URLSearchParams(window.location.search).get("realm_id");
-  if (searchRealm === "measurement") return "measurement";
-  if (searchRealm === "space") return "space";
+  if (isLiveRealmId(searchRealm)) return searchRealm;
   const pathname = window.location.pathname.toLowerCase();
-  if (pathname.startsWith("/measurelands")) return "measurement";
-  if (pathname.startsWith("/starpath") || pathname.startsWith("/legends/starpath")) return "space";
+  const routeRealm = getLiveRealmDefinitions().find(
+    (realm) =>
+      pathname.startsWith(`/${realm.slug}`) ||
+      pathname.startsWith(`/legends/${realm.slug}`),
+  );
+  if (routeRealm) return routeRealm.realmId;
   return "number";
 }
 
@@ -100,9 +108,9 @@ export function clearScopedProgress(
     localStorage.removeItem(getScopedProgressKey(scope, realmId));
     return;
   }
-  localStorage.removeItem(getScopedProgressKey(scope, "number"));
-  localStorage.removeItem(getScopedProgressKey(scope, "measurement"));
-  localStorage.removeItem(getScopedProgressKey(scope, "space"));
+  getLiveRealmDefinitions().forEach((realm) => {
+    localStorage.removeItem(getScopedProgressKey(scope, realm.realmId));
+  });
 }
 
 export function updateProgress(

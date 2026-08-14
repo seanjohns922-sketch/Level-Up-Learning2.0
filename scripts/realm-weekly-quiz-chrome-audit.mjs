@@ -37,9 +37,10 @@ assert.match(starpath, /<RealmWeeklyQuizChrome/);
 assert.match(starpath, /realm="space"/);
 assert.match(starpath, /preserves Starpath routing/);
 
-assert.match(starpathVoyage, /if \(!task \|\| currentAnswer !== undefined\) return;/);
-assert.match(starpathVoyage, /Answer submitted/);
-assert.doesNotMatch(starpathVoyage, /changeAnswer|Change Answer/);
-assert.doesNotMatch(starpathVoyage, /delete next\[String\(index\)\]/);
+assert.match(starpathVoyage, /const answersAreEditable = true;/);
+assert.match(starpathVoyage, /if \(!task \|\| \(!answersAreEditable && currentAnswer !== undefined\)\) return;/);
+assert.match(starpathVoyage, /Answer recorded\. You can change it before finishing the quiz\./);
+assert.match(starpathVoyage, /changeAnswer|Change Answer/);
+assert.match(starpathVoyage, /delete next\[answerKey\]/);
 
-console.log("Realm weekly quiz audit passed: shared presentation is intact and submitted Starpath answers are immutable.");
+console.log("Realm weekly quiz audit passed: shared presentation is intact and Starpath answers remain editable before final submission.");

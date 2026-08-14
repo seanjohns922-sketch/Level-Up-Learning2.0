@@ -18,7 +18,12 @@ import {
   type BrainBreakFrequency,
 } from "@/lib/brain-break-settings";
 import { formatAccuracy } from "@/lib/learning-score";
-import { getRealmDefinition, tryCanonicalRealmId, type CanonicalRealmId } from "@/lib/realms/realm-registry";
+import {
+  getRealmDefinition,
+  LIVE_REALM_IDS,
+  tryCanonicalRealmId,
+  type LiveRealmId,
+} from "@/lib/realms/realm-registry";
 import { getSchoolLogo } from "@/lib/school-logos";
 import { getRealmWeekNumbers, selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
@@ -47,8 +52,6 @@ type ProgressRow = {
   teacher_advanced_weeks?: number[];
   updated_at?: string | null;
 };
-
-type LiveMathRealmId = Extract<CanonicalRealmId, "number" | "measurement" | "space">;
 
 type LiveStudentActivityRow = {
   student_id: string;
@@ -313,7 +316,7 @@ export default function TeacherDashboardPage() {
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
-  const [analyticsRealmId, setAnalyticsRealmId] = useState<LiveMathRealmId>("number");
+  const [analyticsRealmId, setAnalyticsRealmId] = useState<LiveRealmId>(LIVE_REALM_IDS[0] ?? "number");
   const [showPlacements, setShowPlacements] = useState(false);
   const [pinToast, setPinToast] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -484,15 +487,15 @@ export default function TeacherDashboardPage() {
       if (newStuds.length > 0) {
         const ids = newStuds.map((s) => s.id);
         const [
-          numberProgress,
-          measurementProgress,
-          spaceProgress,
+          realmProgress,
           { data: live, error: liveError },
           { data: events, error: eventsError },
         ] = await Promise.all([
-          fetchRealmCompatProgressForClass("number", classId, ids),
-          fetchRealmCompatProgressForClass("measurement", classId, ids),
-          fetchRealmCompatProgressForClass("space", classId, ids),
+          Promise.all(
+            LIVE_REALM_IDS.map((realmId) =>
+              fetchRealmCompatProgressForClass(realmId, classId, ids),
+            ),
+          ),
           supabase.from("live_student_activity").select("*").in("student_id", ids).eq("class_id", classId),
           supabase
             .from("live_activity_events")
@@ -510,7 +513,7 @@ export default function TeacherDashboardPage() {
             ])
             .order("created_at", { ascending: true }),
         ]);
-        newProg = [...numberProgress, ...measurementProgress, ...spaceProgress];
+        newProg = realmProgress.flat();
         if (liveError) {
           console.warn("[TeacherDashboard] live student activity unavailable", liveError);
         } else {

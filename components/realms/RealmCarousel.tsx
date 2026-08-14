@@ -17,6 +17,7 @@ import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-leve
 import { buildStarpathWorldHref, STARPATH_REALM_ID, STARPATH_WORLD_ROUTE } from "@/lib/starpath-routes";
 import { markRealmEntryRestored } from "@/lib/realm-entry-handoff";
 import { useAuthorizedDemoSession } from "@/lib/use-authorized-demo-session";
+import { isLiveRealmId, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
 
 // Read a specific realm's scoped progress (the carousel lives on /realms where
 // the default scope is "number", so the focused realm's scope is passed
@@ -118,13 +119,10 @@ export default function RealmCarousel() {
 
   // Only live curriculum realms may read scoped progress. Locked realms must
   // never borrow Number Nexus placement as their selected level.
-  const focusedScope: ProgressRealmScope | null = current.id === "measurelands"
-    ? "measurement"
-    : current.id === "number-nexus"
-      ? "number"
-      : current.id === "starpath-realm"
-        ? "space"
-      : null;
+  const focusedRealmId = tryCanonicalRealmId(current.id);
+  const focusedScope: ProgressRealmScope | null = isLiveRealmId(focusedRealmId)
+    ? focusedRealmId
+    : null;
   const focusedProgress = useMemo(
     () => focusedScope ? readScopedProgress(focusedScope) : null,
     [focusedScope]

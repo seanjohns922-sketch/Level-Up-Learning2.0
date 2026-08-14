@@ -25,13 +25,14 @@ function resolveRealmEntryRoute({ realmId, progress, fallbackYear, introSeen }) 
 }
 
 check(
-  "Number Nexus and Measurelands are enabled in shared configuration",
-  /"number-nexus":\s*\{[\s\S]*?enabled:\s*true/.test(availability) &&
-    /measurelands:\s*\{[\s\S]*?enabled:\s*true/.test(availability),
+  "Live realms are enabled from the shared registry",
+  availability.includes("getLiveRealmDefinitions()") &&
+    availability.includes("realm.portalId") &&
+    availability.includes("realm.realmId"),
 );
 check(
   "Unreleased realms are not implicitly enabled",
-  availability.includes("return ENABLED_REALMS[realmId as RealmCarouselId] ?? null"),
+  availability.includes("ENABLED_REALMS[realmId] ?? null"),
 );
 check(
   "A new Year 2 Measurelands student enters the measurement pre-test",

@@ -1,8 +1,10 @@
 import { isPlacementComplete, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import { getStarpathLevelForYear, type StarpathLevelDefinition } from "@/lib/starpath-levels";
-import { buildStarpathWorldHref, STARPATH_REALM_ID, STARPATH_WORLD_ROUTE } from "@/lib/starpath-routes";
-
-export type RealmCarouselId = "number-nexus" | "measurelands" | "starpath-realm";
+import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
+import {
+  getLiveRealmDefinitions,
+  getRealmDefinition,
+} from "@/lib/realms/realm-registry";
 
 type CurriculumRealmAvailability = {
   enabled: true;
@@ -13,29 +15,20 @@ type CurriculumRealmAvailability = {
 
 type RealmAvailability = CurriculumRealmAvailability;
 
-const ENABLED_REALMS: Record<RealmCarouselId, RealmAvailability> = {
-  "number-nexus": {
-    enabled: true,
-    progressRealmId: "number",
-    destinationRealmId: "number",
-    route: "/number-nexus",
-  },
-  measurelands: {
-    enabled: true,
-    progressRealmId: "measurement",
-    destinationRealmId: "measurement",
-    route: "/measurelands",
-  },
-  "starpath-realm": {
-    enabled: true,
-    progressRealmId: STARPATH_REALM_ID,
-    destinationRealmId: STARPATH_REALM_ID,
-    route: STARPATH_WORLD_ROUTE,
-  },
-};
+const ENABLED_REALMS = Object.fromEntries(
+  getLiveRealmDefinitions().map((realm) => [
+    realm.portalId,
+    {
+      enabled: true,
+      progressRealmId: realm.realmId,
+      destinationRealmId: realm.realmId,
+      route: `/${realm.slug}`,
+    } satisfies RealmAvailability,
+  ]),
+) as Record<string, RealmAvailability>;
 
 export function getRealmAvailability(realmId: string): RealmAvailability | null {
-  return ENABLED_REALMS[realmId as RealmCarouselId] ?? null;
+  return ENABLED_REALMS[realmId] ?? null;
 }
 
 export function isRealmEnabled(realmId: string) {
@@ -60,7 +53,7 @@ export function resolveRealmEntryRoute(args: {
     return buildStarpathWorldHref({ selectedLevel: level.id });
   }
 
-  const route = args.realmId === "measurement" ? "/measurelands" : "/number-nexus";
+  const route = `/${getRealmDefinition(args.realmId).slug}`;
 
   if (year === "Prep") return route;
   if (isPlacementComplete(args.progress)) return route;

@@ -11,6 +11,11 @@ import { getStatisticaProgramForYearLabel } from "./statistica";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getStarpathLevelForYear } from "@/lib/starpath-levels";
 import { buildLessonRoute } from "@/lib/lesson-routing";
+import {
+  getRealmDefinition,
+  isLiveRealmId,
+  tryCanonicalRealmId,
+} from "@/lib/realms/realm-registry";
 
 export type Genre = {
   id: string;
@@ -50,13 +55,21 @@ export function getGenresForYear(yearLabel: string): Genre[] {
   const ord = yearOrdinal(yearLabel);
   return ALL_GENRES
     .filter((g) => ord >= g.unlocksFromLevel)
-    .map((g) => ({
-      id: g.id,
-      strand: g.strand,
-      realm: g.realm,
-      unlocksFromLevel: g.unlocksFromLevel,
-      available: g.availableLevels?.includes(ord) ?? false,
-    }));
+    .map((g) => {
+      const canonicalRealmId = tryCanonicalRealmId(g.id);
+      const registryRealm = canonicalRealmId ? getRealmDefinition(canonicalRealmId) : null;
+      const registryAvailable =
+        registryRealm != null &&
+        isLiveRealmId(registryRealm.realmId) &&
+        registryRealm.levelLabels.includes(yearLabel);
+      return {
+        id: g.id,
+        strand: registryRealm?.strand ?? g.strand,
+        realm: registryRealm?.name ?? g.realm,
+        unlocksFromLevel: g.unlocksFromLevel,
+        available: canonicalRealmId ? registryAvailable : (g.availableLevels?.includes(ord) ?? false),
+      };
+    });
 }
 
 export type RealmInfo = {
@@ -70,13 +83,17 @@ export type RealmInfo = {
 
 /** Full catalogue of all nine realms (for the Tower of Knowledge hub). */
 export function getAllRealms(): RealmInfo[] {
-  return ALL_GENRES.map((g) => ({
-    id: g.id,
-    strand: g.strand,
-    realm: g.realm,
-    unlocksFromLevel: g.unlocksFromLevel,
-    hasContent: (g.availableLevels?.length ?? 0) > 0,
-  }));
+  return ALL_GENRES.map((g) => {
+    const canonicalRealmId = tryCanonicalRealmId(g.id);
+    const registryRealm = canonicalRealmId ? getRealmDefinition(canonicalRealmId) : null;
+    return {
+      id: g.id,
+      strand: registryRealm?.strand ?? g.strand,
+      realm: registryRealm?.name ?? g.realm,
+      unlocksFromLevel: g.unlocksFromLevel,
+      hasContent: canonicalRealmId ? isLiveRealmId(canonicalRealmId) : (g.availableLevels?.length ?? 0) > 0,
+    };
+  });
 }
 
 /** Year label → numeric key for the `programs` map (Prep = 0, Year 1..6 = 1..6). */

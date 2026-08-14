@@ -5,8 +5,9 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { getRealmLessonArtwork } from "@/components/lesson/RealmLessonHome";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
-export type RealmQuizThemeId = "number" | "measurement" | "space";
+export type RealmQuizThemeId = LiveRealmId;
 
 export const REALM_QUIZ_THEMES = {
   number: {
@@ -57,7 +58,7 @@ export const REALM_QUIZ_THEMES = {
     workspaceBg: "linear-gradient(180deg, #f8f7ff 0%, #eefcff 100%)",
     ThemeIcon: Orbit,
   },
-} as const;
+} as const satisfies Record<RealmQuizThemeId, object>;
 
 function getQuizArtwork(realm: RealmQuizThemeId, levelNumber: number, year: string) {
   if (realm === "space") return getStarpathBackground(year as RealmLevelId);

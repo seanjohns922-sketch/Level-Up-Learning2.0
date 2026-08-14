@@ -177,6 +177,26 @@ export const REALM_REGISTRY = {
 
 export const CANONICAL_REALM_IDS = Object.keys(REALM_REGISTRY) as CanonicalRealmId[];
 
+export type LiveRealmId = {
+  [RealmId in CanonicalRealmId]: (typeof REALM_REGISTRY)[RealmId]["status"] extends "live"
+    ? RealmId
+    : never;
+}[CanonicalRealmId];
+
+export const LIVE_REALM_IDS = CANONICAL_REALM_IDS.filter(
+  (realmId): realmId is LiveRealmId =>
+    REALM_REGISTRY[realmId].status === "live" && REALM_REGISTRY[realmId].isSelectable,
+);
+
+export function isLiveRealmId(value: string | null | undefined): value is LiveRealmId {
+  const realmId = tryCanonicalRealmId(value);
+  return realmId != null && LIVE_REALM_IDS.includes(realmId as LiveRealmId);
+}
+
+export function getLiveRealmDefinitions() {
+  return LIVE_REALM_IDS.map((realmId) => REALM_REGISTRY[realmId]);
+}
+
 const REALM_ALIASES = new Map<string, CanonicalRealmId>(
   Object.values(REALM_REGISTRY).flatMap((realm) => [
     [realm.realmId, realm.realmId],

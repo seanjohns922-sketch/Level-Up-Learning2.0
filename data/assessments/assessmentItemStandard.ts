@@ -1,4 +1,6 @@
-export type AssessmentRealm = "number" | "measurement" | "space";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
+
+export type AssessmentRealm = LiveRealmId;
 export type AssessmentPool = "lesson" | "weekly_quiz" | "pretest" | "posttest";
 export type AssessmentFormKind = "pretest" | "posttest";
 

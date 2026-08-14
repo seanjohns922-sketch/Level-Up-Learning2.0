@@ -51,9 +51,14 @@ import {
   validateLevel3AssessmentForms,
 } from "./level3Blueprint";
 import { validateStarpathAssessmentBlueprintForLevel } from "./starpathAssessmentBlueprint";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 export type AssessmentQuestion = PretestQuestion | PosttestQuestion;
-export type AssessmentRealmId = "number" | "measurement" | "space";
+export type AssessmentRealmId = LiveRealmId;
+
+function assertAssessmentRealmHandled(realmId: never): never {
+  throw new Error(`Assessment resolver is missing for live realm: ${realmId}`);
+}
 
 // Resolve the Starpath (space) post-test for a given year label. Ground Level
 // (Prep) and Levels 1-6 have full post-tests; later levels fall through.
@@ -124,11 +129,15 @@ function yearLabelForLevel(level: SupportedMathLevel): string {
 }
 
 export function getPretestForLevel(level: SupportedMathLevel, realmId: AssessmentRealmId = "number"): PretestQuestion[] {
-  if (realmId === "space") {
-    return getStarpathPretest(yearLabelForLevel(level));
-  }
-  if (realmId === "measurement") {
-    return getMeasurelandsPretestForYear(yearLabelForLevel(level)) as PretestQuestion[];
+  switch (realmId) {
+    case "space":
+      return getStarpathPretest(yearLabelForLevel(level));
+    case "measurement":
+      return getMeasurelandsPretestForYear(yearLabelForLevel(level)) as PretestQuestion[];
+    case "number":
+      break;
+    default:
+      return assertAssessmentRealmHandled(realmId);
   }
   if (level === 3) {
     return buildLevel3PretestFormA();
@@ -146,11 +155,15 @@ export function getPretestForLevel(level: SupportedMathLevel, realmId: Assessmen
 }
 
 export function getPosttestForLevel(level: SupportedMathLevel, realmId: AssessmentRealmId = "number"): PostTest | undefined {
-  if (realmId === "space") {
-    return getStarpathPosttest(yearLabelForLevel(level));
-  }
-  if (realmId === "measurement") {
-    return getMeasurelandsPosttestForYear(yearLabelForLevel(level));
+  switch (realmId) {
+    case "space":
+      return getStarpathPosttest(yearLabelForLevel(level));
+    case "measurement":
+      return getMeasurelandsPosttestForYear(yearLabelForLevel(level));
+    case "number":
+      break;
+    default:
+      return assertAssessmentRealmHandled(realmId);
   }
   if (level === 3) {
     return buildLevel3PosttestFormB();
@@ -172,11 +185,15 @@ export function getAssessmentYearLabel(level: SupportedMathLevel): string {
 }
 
 export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number"): PretestQuestion[] {
-  if (realmId === "space") {
-    return getStarpathPretest(yearLabel);
-  }
-  if (realmId === "measurement") {
-    return getMeasurelandsPretestForYear(yearLabel) as PretestQuestion[];
+  switch (realmId) {
+    case "space":
+      return getStarpathPretest(yearLabel);
+    case "measurement":
+      return getMeasurelandsPretestForYear(yearLabel) as PretestQuestion[];
+    case "number":
+      break;
+    default:
+      return assertAssessmentRealmHandled(realmId);
   }
   if (yearLabel === "Year 3") {
     return buildLevel3PretestFormA();
@@ -197,11 +214,15 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
 }
 
 export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number"): PostTest | undefined {
-  if (realmId === "space") {
-    return getStarpathPosttest(yearLabel);
-  }
-  if (realmId === "measurement") {
-    return getMeasurelandsPosttestForYear(yearLabel);
+  switch (realmId) {
+    case "space":
+      return getStarpathPosttest(yearLabel);
+    case "measurement":
+      return getMeasurelandsPosttestForYear(yearLabel);
+    case "number":
+      break;
+    default:
+      return assertAssessmentRealmHandled(realmId);
   }
   if (isGroundLevelYear(yearLabel)) {
     return {
@@ -240,11 +261,15 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
 }
 
 export function validateAssessmentBlueprintForLevel(level: SupportedMathLevel, realmId: AssessmentRealmId = "number"): string[] {
-  if (realmId === "space") {
-    return validateStarpathAssessmentBlueprintForLevel(level);
-  }
-  if (realmId === "measurement") {
-    return [];
+  switch (realmId) {
+    case "space":
+      return validateStarpathAssessmentBlueprintForLevel(level);
+    case "measurement":
+      return [];
+    case "number":
+      break;
+    default:
+      return assertAssessmentRealmHandled(realmId);
   }
   if (level === 3) {
     return validateLevel3AssessmentForms();

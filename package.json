@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run qa:realm-release-gate",
     "build": "next build",
     "build:dev": "next build",
     "start": "next start",
@@ -130,6 +131,7 @@
     "qa:p0-lcp-loading": "node scripts/p0-lcp-loading-audit.mjs",
     "qa:teacher-canonical-snapshot": "node scripts/teacher-canonical-snapshot-audit.mjs",
     "qa:teacher-live-realms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/teacher-live-realm-integration-audit.ts",
+    "qa:realm-release-gate": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/realm-release-gate-audit.ts",
     "qa:teacher-real-activity-preview": "node scripts/teacher-real-activity-preview-audit.mjs",
     "qa:statistica-blueprint": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-blueprint.ts",
     "qa:statistica-home": "node scripts/audit-statistica-home.mjs",

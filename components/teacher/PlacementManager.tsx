@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowLeft, ArrowUp, ArrowUpDown, ChevronRight, Lock, MoreHorizontal, Users, X } from "lucide-react";
-import { getAllRealms } from "@/data/programs/genres";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
+import { getLiveRealmDefinitions } from "@/lib/realms/realm-registry";
 import {
   fetchRealmCompatProgressForClass,
   fetchTeacherRealmPlacements,
@@ -30,11 +30,11 @@ type PMStudent = {
   year_level?: string | null;
 };
 
-const PLACEMENT_REALMS = getAllRealms()
+const PLACEMENT_REALMS = getLiveRealmDefinitions()
   .map((realm) => ({
-    id: realm.id,
-    label: `${realm.realm} (${realm.strand})`,
-    active: realm.hasContent,
+    id: realm.realmId,
+    label: `${realm.name} (${realm.strand})`,
+    active: true,
   }));
 const ACTIVE_REALM_IDS = PLACEMENT_REALMS.filter((r) => r.active).map((r) => r.id);
 

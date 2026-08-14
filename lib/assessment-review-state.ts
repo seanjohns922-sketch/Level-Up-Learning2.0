@@ -1,18 +1,18 @@
 import type { MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
+import { isLiveRealmId, type LiveRealmId } from "@/lib/realms/realm-registry";
 
 export type AssessmentReviewMode = "pretest" | "posttest";
 
 type AssessmentReviewState = {
   year: string;
-  realmId: "number" | "measurement" | "space";
+  realmId: LiveRealmId;
   mode: AssessmentReviewMode;
   items: MistakeReviewItem[];
 };
 
-function normalizeRealmId(realmId?: string | null): "number" | "measurement" | "space" {
-  if (realmId === "space") return "space";
-  return realmId === "measurement" ? "measurement" : "number";
+function normalizeRealmId(realmId?: string | null): LiveRealmId {
+  return isLiveRealmId(realmId) ? realmId : "number";
 }
 
 function storageKey(year: string, realmId: string | null | undefined, mode: AssessmentReviewMode) {

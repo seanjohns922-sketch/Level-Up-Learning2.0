@@ -34,9 +34,10 @@ import AssessmentReplay from "./AssessmentReplay";
 import { calculateAccuracy, formatAccuracy } from "@/lib/learning-score";
 import {
   getRealmDefinition,
+  isLiveRealmId,
   requireCanonicalRealmId,
   tryCanonicalRealmId,
-  type CanonicalRealmId,
+  type LiveRealmId,
 } from "@/lib/realms/realm-registry";
 import { buildTeacherStudentSnapshot } from "@/lib/teacher/teacher-student-snapshot";
 
@@ -148,7 +149,7 @@ type Props = {
   progress: ProgressRow[];
   liveRows: LiveStudentActivityRow[];
   liveEvents: LiveActivityEventRow[];
-  onRealmChange?: (realmId: Extract<CanonicalRealmId, "number" | "measurement" | "space">) => void;
+  onRealmChange?: (realmId: LiveRealmId) => void;
   onProgressChanged?: () => Promise<void> | void;
   progressAvailable?: boolean;
 };
@@ -889,7 +890,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
   const canonicalGenreRealmId = tryCanonicalRealmId(genreId);
   const selectedRealmId = genre.available ? canonicalGenreRealmId : null;
   useEffect(() => {
-    if (selectedRealmId === "number" || selectedRealmId === "measurement" || selectedRealmId === "space") {
+    if (isLiveRealmId(selectedRealmId)) {
       onRealmChange?.(selectedRealmId);
     }
   }, [onRealmChange, selectedRealmId]);
@@ -1250,10 +1251,10 @@ function StudentStrandDetail({
   onProgressChanged?: () => Promise<void> | void;
 }) {
   const realmId = requireCanonicalRealmId(genre.id);
-  if (realmId !== "number" && realmId !== "measurement") {
-    throw new Error(`Student detail is unavailable for unsupported teacher realm: ${realmId}`);
+  if (!isLiveRealmId(realmId)) {
+    throw new Error(`Student detail is unavailable for a realm that is not live: ${realmId}`);
   }
-  const supportedRealmId: "number" | "measurement" = realmId;
+  const supportedRealmId = realmId;
   const plan = useMemo(() => getCurriculumPlan(yearLabel, genre.id), [yearLabel, genre.id]);
   const persistedIds = parseCompleted(prog.completed_lesson_ids);
   const ids = persistedIds;

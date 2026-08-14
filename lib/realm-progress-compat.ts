@@ -2,6 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { calculateAccuracy } from "@/lib/learning-score";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 export type CompatProgressRow = {
   student_id: string;
@@ -144,7 +145,7 @@ export type NormalizedWeeklyQuizAttempt = {
 export type StudentProgressOverrideRow = {
   id: string;
   student_id: string;
-  realm_id: "number" | "measurement" | "space";
+  realm_id: LiveRealmId;
   working_level: string;
   week: number;
   advanced_to_week: number;
@@ -647,7 +648,7 @@ export type TeacherProgressOverrideReason =
 
 export async function teacherAdvanceStudentWeek(input: {
   studentId: string;
-  realmId: "number" | "measurement" | "space";
+  realmId: LiveRealmId;
   workingLevel: string;
   week: number;
   reason: TeacherProgressOverrideReason;
