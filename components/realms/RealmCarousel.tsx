@@ -100,8 +100,10 @@ export default function RealmCarousel() {
   const current = realms[currentIndex];
   const isStarpathRealm = current.id === "starpath-realm";
   const isStarpathPreview = isStarpathRealm && starpathDemoActive;
-  const isActive = DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview;
-  const isPreviewRealm = previewMode && current.id === "measurelands";
+  const isStatisticaRealm = current.id === "statistica";
+  const isStatisticaPreview = isStatisticaRealm && (previewMode || DEMO_MODE);
+  const isActive = DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview || isStatisticaPreview;
+  const isPreviewRealm = previewMode && (current.id === "measurelands" || isStatisticaRealm);
   const prevIdx = (currentIndex - 1 + realms.length) % realms.length;
   const nextIdx = (currentIndex + 1) % realms.length;
   const bgShift = -2 + (currentIndex / realms.length) * 4;
@@ -137,6 +139,13 @@ export default function RealmCarousel() {
 
   async function enterRealm() {
     if (!isActive || enteringRealm) return;
+    if (isStatisticaRealm) {
+      setLastRealm(current.id);
+      exitReviewMode();
+      router.push(`/statistica?level=${encodeURIComponent(displayedLevel)}`);
+      return;
+    }
+
     const availability = getRealmAvailability(current.id);
     if (!availability) return;
 
