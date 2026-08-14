@@ -36,7 +36,7 @@ export function RealmActiveLessonShell({
 }) {
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
-  const experienceNoun = realm === "measurement" ? "Quest" : "Mission";
+  const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : "Mission";
   const readText = `${lessonTitle}. ${focus ?? "Practise today's lesson skill."}`;
 
   return (
@@ -50,7 +50,7 @@ export function RealmActiveLessonShell({
           style={{ filter: "brightness(0.34) saturate(1.14)" }}
         />
         <div className="absolute inset-0" style={{ background: theme.backdropOverlay }} />
-        {realm === "number" ? (
+        {realm === "number" || realm === "statistics" ? (
           <div
             className="absolute inset-0 opacity-25"
             style={{
@@ -116,6 +116,8 @@ export function RealmActiveLessonShell({
             background:
               realm === "measurement"
                 ? "linear-gradient(180deg, #fffaf0 0%, #f7eedc 100%)"
+                : realm === "statistics"
+                  ? "linear-gradient(180deg, #f2fffb 0%, #e6f7f5 100%)"
                 : "linear-gradient(180deg, #f7fffe 0%, #eaf9f8 100%)",
           }}
         >

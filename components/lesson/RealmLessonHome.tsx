@@ -6,6 +6,7 @@ import {
   Clock3,
   Flame,
   Gem,
+  ChartNoAxesColumnIncreasing,
   Medal,
   Play,
   Ruler,
@@ -16,8 +17,10 @@ import {
 } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { getHomeBg } from "@/lib/levelBand";
+import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
+import { getStatisticaBackground } from "@/lib/statistica-visuals";
 
-export type RealmLessonThemeId = "number" | "measurement";
+export type RealmLessonThemeId = "number" | "measurement" | "statistics";
 
 type RealmLessonHomeProps = {
   realm: RealmLessonThemeId;
@@ -30,6 +33,8 @@ type RealmLessonHomeProps = {
   focus: string;
   successCriteria: readonly string[];
   embeddedVideoSrc?: string;
+  startDisabled?: boolean;
+  startDisabledLabel?: string;
   onBack: () => void;
   onStart: () => void;
 };
@@ -98,10 +103,38 @@ export const REALM_LESSON_THEMES = {
     gridColor: "rgba(214,166,74,0.30)",
     ThemeIcon: Ruler,
   },
+  statistics: {
+    realmName: "Statistica",
+    experienceLabel: "Data Investigation",
+    startLabel: "Start Lesson",
+    videoLabel: "Data Briefing",
+    rewardLabel: "Investigation Rewards",
+    completionLabel: "Investigation Complete",
+    legendLabel: "Realmie",
+    intro:
+      "Follow the data trail, look for patterns, and use evidence to explain what you discover.",
+    pageBg: "#06151a",
+    shellBg: "rgba(4, 18, 24, 0.96)",
+    panelBg: "rgba(7, 35, 42, 0.86)",
+    panelBorder: "rgba(94, 234, 212, 0.24)",
+    accent: "#5eead4",
+    accentSoft: "#ccfbf1",
+    secondary: "#fde68a",
+    heroOverlay:
+      "linear-gradient(90deg, rgba(2,16,22,0.98) 0%, rgba(4,34,42,0.88) 48%, rgba(4,34,42,0.3) 100%)",
+    backdropOverlay:
+      "linear-gradient(180deg, rgba(2,15,22,0.62), rgba(2,15,22,0.92))",
+    videoBg: "linear-gradient(135deg, #03161c 0%, #0f4c52 58%, #155e75 100%)",
+    buttonBg: "linear-gradient(90deg, #0f766e, #0891b2, #14b8a6)",
+    buttonShadow: "0 16px 40px rgba(45,212,191,0.25)",
+    gridColor: "rgba(94,234,212,0.34)",
+    ThemeIcon: ChartNoAxesColumnIncreasing,
+  },
 } as const;
 
 export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: number, year: string) {
   if (realm === "number") return getHomeBg(levelNumber, year === "Prep");
+  if (realm === "statistics") return getStatisticaBackground(`Year ${levelNumber}` as RealmLevelId);
   if (year === "Prep") return "/images/measurelands-home-bg.png";
   return MEASURELANDS_BACKGROUNDS[levelNumber] ?? "/images/measurelands-home-bg.png";
 }
@@ -137,6 +170,8 @@ export function RealmLessonHome({
   focus,
   successCriteria,
   embeddedVideoSrc,
+  startDisabled = false,
+  startDisabledLabel,
   onBack,
   onStart,
 }: RealmLessonHomeProps) {
@@ -158,13 +193,15 @@ export function RealmLessonHome({
           style={{ filter: "brightness(0.38) saturate(1.12)" }}
         />
         <div className="absolute inset-0" style={{ background: theme.backdropOverlay }} />
-        {realm === "number" ? (
+        {realm === "number" || realm === "statistics" ? (
           <div
             className="absolute inset-0 opacity-30"
             style={{
               backgroundImage:
-                "linear-gradient(rgba(94,234,212,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,0.12) 1px, transparent 1px)",
-              backgroundSize: "44px 44px",
+                realm === "statistics"
+                  ? "linear-gradient(rgba(94,234,212,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(147,197,253,0.1) 1px, transparent 1px)"
+                  : "linear-gradient(rgba(94,234,212,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,0.12) 1px, transparent 1px)",
+              backgroundSize: realm === "statistics" ? "36px 36px" : "44px 44px",
             }}
           />
         ) : (
@@ -321,10 +358,11 @@ export function RealmLessonHome({
                 <button
                   type="button"
                   onClick={onStart}
-                  className="flex min-h-14 w-full items-center justify-center gap-3 rounded-lg px-10 text-lg font-black text-white transition hover:brightness-110 active:scale-[0.99] sm:w-auto"
+                  disabled={startDisabled}
+                  className="flex min-h-14 w-full items-center justify-center gap-3 rounded-lg px-10 text-lg font-black text-white transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:saturate-50 disabled:opacity-65 sm:w-auto"
                   style={{ background: theme.buttonBg, boxShadow: theme.buttonShadow }}
                 >
-                  <Play className="h-6 w-6 fill-current" /> {theme.startLabel}
+                  <Play className="h-6 w-6 fill-current" /> {startDisabledLabel ?? theme.startLabel}
                 </button>
               </div>
             </div>

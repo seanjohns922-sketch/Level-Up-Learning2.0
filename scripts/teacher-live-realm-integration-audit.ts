@@ -76,6 +76,16 @@ assert(realmProgressCompat.includes('realmId: "number" | "measurement" | "space"
 
 const dashboard = read("app/teacher/dashboard/page.tsx");
 assert(dashboard.includes('Extract<CanonicalRealmId, "number" | "measurement" | "space">'), "Teacher dashboard analytics state must include Starpath.");
+for (const realm of liveRealms) {
+  assert(
+    dashboard.includes(`fetchRealmCompatProgressForClass("${realm.id}", classId, ids)`),
+    `Teacher dashboard must load canonical ${realm.name} progress for the selected class.`,
+  );
+}
+assert(
+  dashboard.includes("newProg = [...numberProgress, ...measurementProgress, ...spaceProgress]"),
+  "Teacher dashboard must merge Starpath progress into the rows used by the realm tabs.",
+);
 
 const strandStudents = read("components/teacher/StrandStudentsPanel.tsx");
 assert(strandStudents.includes('selectedRealmId === "space"'), "Students tab must notify the dashboard when Starpath is selected.");

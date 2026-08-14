@@ -486,11 +486,13 @@ export default function TeacherDashboardPage() {
         const [
           numberProgress,
           measurementProgress,
+          spaceProgress,
           { data: live, error: liveError },
           { data: events, error: eventsError },
         ] = await Promise.all([
           fetchRealmCompatProgressForClass("number", classId, ids),
           fetchRealmCompatProgressForClass("measurement", classId, ids),
+          fetchRealmCompatProgressForClass("space", classId, ids),
           supabase.from("live_student_activity").select("*").in("student_id", ids).eq("class_id", classId),
           supabase
             .from("live_activity_events")
@@ -508,7 +510,7 @@ export default function TeacherDashboardPage() {
             ])
             .order("created_at", { ascending: true }),
         ]);
-        newProg = [...numberProgress, ...measurementProgress];
+        newProg = [...numberProgress, ...measurementProgress, ...spaceProgress];
         if (liveError) {
           console.warn("[TeacherDashboard] live student activity unavailable", liveError);
         } else {
