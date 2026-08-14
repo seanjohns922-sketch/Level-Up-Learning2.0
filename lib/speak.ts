@@ -266,13 +266,21 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
   const englishVoices = voices.filter((v) => isEnglish(v) && !robotic.test(v.name ?? ""));
   if (englishVoices.length === 0) return null; // fall back to lang="en-AU" only
 
-  // Most natural / human-sounding first: neural & flagship voices, then nice
-  // named voices, then locale preferences.
+  // Australian voices FIRST (these are Aussie kids): the good named AU voices,
+  // then any en-AU locale voice (also catches neural AU voices), then generic
+  // "Australian" labels. Only where the device has no AU voice do we fall back
+  // to the most natural US/UK voices.
   const preferred = [
-    /Google US English/i,
+    /Matilda/i,           // Apple en-AU (premium, very natural)
+    /Karen/i,             // Apple en-AU
+    /Catherine/i,         // Windows en-AU
+    /Google Australian/i, // Chrome / Android en-AU
+    /en-AU/i,             // any en-AU locale voice, incl. neural
+    /Australian/i,
+    // ── Fallbacks: most natural US/UK voices when no AU voice exists ──
     /Google UK English Female/i,
     /Google UK English/i,
-    /Google Australian/i,
+    /Google US English/i,
     /Google/i,
     /Natural/i,
     /Neural/i,
@@ -280,9 +288,6 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
     /Enhanced/i,
     /Siri/i,
     /Samantha/i,
-    /Karen/i,
-    /Catherine/i,
-    /Matilda/i,
     /Aria/i,
     /Jenny/i,
     /Libby/i,
@@ -291,8 +296,6 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
     /Allison/i,
     /Daniel/i,
     /Arthur/i,
-    /en-AU/i,
-    /Australian/i,
     /en-GB/i,
     /en[-_]US/i,
   ];
