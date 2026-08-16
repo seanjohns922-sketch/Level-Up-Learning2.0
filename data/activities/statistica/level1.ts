@@ -160,8 +160,10 @@ export function interpretTask(round: number, target: number): PracticeTask {
   };
 }
 
-// A gentle worked example shown first (teaching moment): read the tallest column.
-function teachTask(round: number, target: number): PracticeTask {
+// ── Teaching cards (shown first) — one per skill so the opening matches the lesson.
+// Graph lessons open by reading the tallest column; sort lessons open by grouping;
+// tally lessons open by reading marks. The right teach card is chosen per lesson.
+function teachGraphTask(round: number, target: number): PracticeTask {
   const { survey, categories } = surveyCats(round);
   const top = [...categories].sort((x, y) => y.count - x.count)[0]!;
   return {
@@ -173,13 +175,56 @@ function teachTask(round: number, target: number): PracticeTask {
   };
 }
 
+function teachSortTask(round: number, target: number): PracticeTask {
+  // Use a different sort set from the activities so the teach card isn't a repeat.
+  const set = pick(SORT_SETS, round + 2);
+  const items = set.items.map((it, i) => ({ id: `i${i}`, label: it.label, category: it.category }));
+  return {
+    kind: "statisticaSort", target, prompt: `Let's start by sorting. ${set.prompt}`,
+    speakText: "Data is information we collect. We can put it into groups called categories. Tap a card, then tap the group it belongs in.",
+    items, categories: set.cats,
+    feedback: { correct: "Nice — sorting data into categories is the first step.", wrong: "Each card belongs in just one group. Try again." },
+  };
+}
+
+function teachTallyReadTask(round: number, target: number): PracticeTask {
+  const count = 3 + (round % 3); // 3..5 marks
+  return {
+    kind: "statisticaTally", mode: "read", target, count, label: "votes",
+    prompt: "Let's read a tally. How many marks are there?",
+    speakText: "A tally uses one mark for each thing we count. Count the marks one at a time to read the total.",
+    options: numOptions(count, round), correctOptionIds: [`n${count}`],
+    feedback: { correct: "Yes — one mark for each, counted up.", wrong: "Count each mark one at a time." },
+  };
+}
+
+function teachTallyRecordTask(round: number, target: number): PracticeTask {
+  const count = 3 + (round % 3); // 3..5 marks
+  return {
+    kind: "statisticaTally", mode: "record", target, count, label: "votes",
+    prompt: `Let's make a tally. Add marks until there are ${count}.`,
+    speakText: "To record data we make one tally mark for each thing we count. The fifth mark goes across the bundle. Add marks to match the number.",
+    feedback: { correct: "Great — one mark for each, bundled in fives.", wrong: `Add or remove marks until there are ${count}.` },
+  };
+}
+
+// Choose the teaching card that matches the lesson's lead skill (and mode).
+function teachFor(gens: [Gen, Gen, Gen], target: number): PracticeTask {
+  const probe = gens[0](0, 0);
+  if (probe.kind === "statisticaSort") return teachSortTask(0, target);
+  if (probe.kind === "statisticaTally") {
+    return probe.mode === "record" ? teachTallyRecordTask(0, target) : teachTallyReadTask(0, target);
+  }
+  return teachGraphTask(0, target);
+}
+
 // ── Lesson content map (24 lessons) ─────────────────────────────────────────
 type Gen = (round: number, target: number) => PracticeTask;
 function taskSet(gens: [Gen, Gen, Gen]): RealmLessonTaskSet {
   let t = 10;
   const rounds = [0, 0, 0];
   return {
-    teaching: () => teachTask(0, ++t),
+    teaching: () => teachFor(gens, ++t),
     activities: [
       () => gens[0](rounds[0]++, ++t),
       () => gens[1](rounds[1]++ + 1, ++t),
@@ -191,20 +236,26 @@ const buildObjects: Gen = (r, t) => buildTask(r, t, "objects");
 const buildPics: Gen = (r, t) => buildTask(r, t, "pictures");
 
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
-  // W1 What is Data?
-  "y1-statistics-w1-l1": [sortTask, sortTask, readGraphTask],
+  // W1 What is Data?  — three distinct shapes so the lessons don't blur together.
+  // l1 Data All Around Us: recognise data, then see what it shows (sort → read → count).
+  "y1-statistics-w1-l1": [sortTask, readGraphTask, frequencyTask],
+  // l2 Sort Into Categories: pure sorting mastery across all three sort sets.
   "y1-statistics-w1-l2": [sortTask, sortTask, sortTask],
-  "y1-statistics-w1-l3": [readGraphTask, frequencyTask, readGraphTask],
-  // W2 Asking Questions
-  "y1-statistics-w2-l1": [sortTask, sortTask, readGraphTask],
+  // l3 What Does the Data Tell Us?: read & interpret a simple display.
+  "y1-statistics-w1-l3": [readGraphTask, frequencyTask, compareTask],
+  // W2 Asking Questions — l1 varied (a question gives answers we sort, read, record),
+  // l2 pure sorting, l3 tally-led collection.
+  "y1-statistics-w2-l1": [sortTask, readGraphTask, tallyRecordTask],
   "y1-statistics-w2-l2": [sortTask, sortTask, sortTask],
   "y1-statistics-w2-l3": [tallyRecordTask, tallyRecordTask, tallyReadTask],
-  // W3 Recording Data
-  "y1-statistics-w3-l1": [tallyRecordTask, tallyRecordTask, tallyReadTask],
+  // W3 Recording Data — l1 Lists: make a list (sort) then record it; l2 pure recording;
+  // l3 reading tallies.
+  "y1-statistics-w3-l1": [sortTask, tallyRecordTask, tallyReadTask],
   "y1-statistics-w3-l2": [tallyRecordTask, tallyRecordTask, tallyRecordTask],
   "y1-statistics-w3-l3": [tallyReadTask, tallyReadTask, frequencyTask],
-  // W4 One-to-One Displays (concrete objects)
-  "y1-statistics-w4-l1": [buildObjects, buildObjects, readGraphTask],
+  // W4 One-to-One Displays (concrete objects) — l1 build & count what you built,
+  // l2 pure building, l3 reading the object display.
+  "y1-statistics-w4-l1": [buildObjects, frequencyTask, buildObjects],
   "y1-statistics-w4-l2": [buildObjects, buildObjects, buildObjects],
   "y1-statistics-w4-l3": [readGraphTask, frequencyTask, compareTask],
   // W5 Picture Graphs (pictures / digital)
@@ -216,7 +267,7 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y1-statistics-w6-l2": [compareTask, compareTask, compareTask],
   "y1-statistics-w6-l3": [compareTask, readGraphTask, compareTask],
   // W7 Interpreting Data
-  "y1-statistics-w7-l1": [frequencyTask, frequencyTask, readGraphTask],
+  "y1-statistics-w7-l1": [frequencyTask, frequencyTask, compareTask],
   "y1-statistics-w7-l2": [interpretTask, readGraphTask, interpretTask],
   "y1-statistics-w7-l3": [interpretTask, compareTask, interpretTask],
   // W8 Mini Investigation
