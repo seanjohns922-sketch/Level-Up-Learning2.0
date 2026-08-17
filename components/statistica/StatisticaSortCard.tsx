@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
+import DataIcon from "@/components/statistica/DataIcon";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "statisticaSort" }>;
@@ -33,17 +34,21 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
     if (ok) onCorrect(); else onWrong(task.items.map((it) => `${it.id}:${placement[it.id]}`).join(","));
   }
 
-  const chip = (it: { id: string; label: string }, inBin: boolean) => (
-    <button
-      key={it.id}
-      type="button"
-      onClick={() => (inBin ? returnItem(it.id) : setSelected((s) => (s === it.id ? null : it.id)))}
-      disabled={settled}
-      className={["rounded-lg border-2 px-3 py-1.5 text-sm font-black transition disabled:opacity-70", selected === it.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}
-    >
-      {it.label}
-    </button>
-  );
+  const chip = (it: { id: string; label: string; category: string }, inBin: boolean) => {
+    const color = task.categories.find((c) => c.id === it.category)?.color ?? "#c65b4e";
+    return (
+      <button
+        key={it.id}
+        type="button"
+        onClick={() => (inBin ? returnItem(it.id) : setSelected((s) => (s === it.id ? null : it.id)))}
+        disabled={settled}
+        className={["flex items-center gap-1.5 rounded-lg border-2 px-2.5 py-1.5 text-sm font-black transition disabled:opacity-70", selected === it.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}
+      >
+        <DataIcon name={it.label} color={color} size={20} />
+        {it.label}
+      </button>
+    );
+  };
 
   return (
     <div className="space-y-4">

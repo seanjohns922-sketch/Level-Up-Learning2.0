@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
+import DataIcon from "@/components/statistica/DataIcon";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "statisticaCollect" }>;
@@ -57,7 +58,8 @@ export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { ta
             const it = itemsById.get(id)!;
             const cat = task.categories.find((c) => c.id === it.category)!;
             return (
-              <button key={id} type="button" onClick={() => tap(id)} className="rounded-lg border-2 px-3 py-2 text-sm font-black text-[#244531] shadow-sm transition hover:-translate-y-0.5 active:scale-90" style={{ borderColor: cat.color, background: "#fffaf0" }}>
+              <button key={id} type="button" onClick={() => tap(id)} className="flex flex-col items-center gap-0.5 rounded-lg border-2 px-3 py-1.5 text-xs font-black text-[#244531] shadow-sm transition hover:-translate-y-0.5 active:scale-90" style={{ borderColor: cat.color, background: "#fffaf0" }}>
+                <DataIcon name={it.label} color={cat.color} size={26} />
                 {it.label}
               </button>
             );

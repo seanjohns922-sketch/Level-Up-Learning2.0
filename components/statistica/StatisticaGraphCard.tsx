@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Minus } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
+import DataIcon from "@/components/statistica/DataIcon";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "statisticaGraph" }>;
@@ -54,6 +55,9 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
                 <div className="relative flex flex-col-reverse gap-1" style={{ height: rows * 26 }}>
                   {Array.from({ length: rows }, (_, r) => {
                     const filled = r < value;
+                    if (task.display === "pictures" && filled) {
+                      return <div key={r} className="grid h-[22px] w-[22px] place-items-center"><DataIcon name={cat.label} color={cat.color} size={22} /></div>;
+                    }
                     return <div key={r} className={`h-[22px] w-[22px] ${cellShape} border`} style={filled ? { background: cat.color, borderColor: cat.color } : { borderColor: "rgba(242,188,69,0.22)", background: "rgba(255,244,223,0.04)" }} />;
                   })}
                 </div>
