@@ -362,7 +362,7 @@ export function RealmLessonHome({
                   className="flex min-h-14 w-full items-center justify-center gap-3 rounded-lg px-10 text-lg font-black text-white transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:saturate-50 disabled:opacity-65 sm:w-auto"
                   style={{ background: theme.buttonBg, boxShadow: theme.buttonShadow }}
                 >
-                  <Play className="h-6 w-6 fill-current" /> {startDisabledLabel ?? theme.startLabel}
+                  <Play className="h-6 w-6 fill-current" /> {startDisabled ? (startDisabledLabel ?? theme.startLabel) : theme.startLabel}
                 </button>
               </div>
             </div>

@@ -69,6 +69,7 @@ assert(lessonHome.includes("getStatisticaBackground"), "Statistica lesson home m
 for (const widget of ["Data Briefing", "Today I am learning to...", "I can...", "Investigation Rewards", "Approximately 9 minutes"]) {
   assert(lessonHome.includes(widget), `Statistica lesson home is missing shared widget copy: ${widget}`);
 }
+assert(lessonHome.includes("startDisabled ? (startDisabledLabel ?? theme.startLabel) : theme.startLabel"), "Playable lessons must show the live start label instead of disabled preview copy");
 
 const lessonRoute = read("app/statistica/lesson/[level]/[week]/[lesson]/page.tsx");
 assert(lessonRoute.includes("getStatisticaProgramForYearLabel"), "Statistica lesson home must read canonical curriculum data");
