@@ -290,6 +290,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "starpathCrossSection",
   "starpathCartesian",
   "starpathTessellation",
+  "statisticaCollect",
   "statisticaSort",
   "statisticaTally",
   "statisticaGraph",

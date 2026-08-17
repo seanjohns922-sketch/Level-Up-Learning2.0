@@ -12,12 +12,25 @@ const check = (cond: boolean, message: string) => { if (!cond) { problems += 1; 
 type SortT = Extract<PracticeTask, { kind: "statisticaSort" }>;
 type TallyT = Extract<PracticeTask, { kind: "statisticaTally" }>;
 type GraphT = Extract<PracticeTask, { kind: "statisticaGraph" }>;
+type CollectT = Extract<PracticeTask, { kind: "statisticaCollect" }>;
 
 function auditTask(lessonId: string, task: PracticeTask) {
   check(isPracticeTaskSafe(task), `${lessonId}: ${task.kind} must be renderable`);
   check(Boolean((task as { feedback?: { correct?: string; wrong?: string } }).feedback?.correct), `${lessonId}: ${task.kind} needs feedback`);
 
-  if (task.kind === "statisticaSort") {
+  if (task.kind === "statisticaCollect") {
+    const t = task as CollectT;
+    const catIds = new Set(t.categories.map((c) => c.id));
+    check(t.categories.length >= 2 && t.items.length >= 4, `${lessonId}: collect needs >= 2 categories and >= 4 items`);
+    check(t.items.every((it) => catIds.has(it.category)), `${lessonId}: every collect item must belong to a listed category`);
+    check(t.correctOptionIds.length === 1 && catIds.has(t.correctOptionIds[0]!), `${lessonId}: collect answer must be a real category`);
+    // The answer must actually be the most/fewest collected, per the question.
+    const counts = t.categories.map((c) => ({ id: c.id, n: t.items.filter((it) => it.category === c.id).length }));
+    const most = [...counts].sort((a, b) => b.n - a.n)[0]!.id;
+    const fewest = [...counts].sort((a, b) => a.n - b.n)[0]!.id;
+    const want = /MOST/.test(t.question) ? most : fewest;
+    check(t.correctOptionIds[0] === want, `${lessonId}: collect answer must match the counts for "${t.question}"`);
+  } else if (task.kind === "statisticaSort") {
     const t = task as SortT;
     const catIds = new Set(t.categories.map((c) => c.id));
     check(t.categories.length >= 2 && t.items.length >= 2, `${lessonId}: sort needs >= 2 categories and items`);

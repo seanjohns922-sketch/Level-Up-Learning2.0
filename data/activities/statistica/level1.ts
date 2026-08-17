@@ -52,6 +52,27 @@ const numOptions = (correct: number, round: number) => {
 };
 
 // ── Task generators ─────────────────────────────────────────────────────────
+// Collect the data: gather scattered items into live counters, then answer a
+// question about the counts. Built from a survey so the counts vary by round.
+function makeCollectTask(round: number, target: number, ask: "most" | "fewest"): PracticeTask {
+  const { survey, categories } = surveyCats(round);
+  const items = categories.flatMap((c, ci) => Array.from({ length: c.count }, (_, k) => ({ id: `c${ci}_${k}`, label: c.label, category: c.id })));
+  const sorted = [...categories].sort((a, b) => b.count - a.count);
+  const answer = ask === "most" ? sorted[0]! : sorted[sorted.length - 1]!;
+  return {
+    kind: "statisticaCollect", target,
+    prompt: `Collect the data — tap each one to count it. ${survey.question}`,
+    speakText: "Collecting data means gathering and counting every answer. Tap each picture to count it into its group, then read the counters.",
+    items, categories: categories.map(({ id, label, color }) => ({ id, label, color })),
+    question: ask === "most" ? "Which did you count the MOST of?" : "Which did you count the FEWEST of?",
+    correctOptionIds: [answer.id],
+    feedback: { correct: `Yes — you counted the ${ask} ${answer.label}.`, wrong: `Look at the counters — which number is the ${ask === "most" ? "biggest" : "smallest"}?` },
+  };
+}
+export function collectTask(round: number, target: number): PracticeTask {
+  return makeCollectTask(round, target, round % 2 === 0 ? "most" : "fewest");
+}
+
 function makeSortTask(round: number, target: number, size: number): PracticeTask {
   const set = pick(SORT_SETS, round);
   const items = set.items.slice(0, size).map((it, i) => ({ id: `i${i}`, label: it.label, category: it.category }));
@@ -260,9 +281,17 @@ function teachTallyRecordTask(round: number, target: number): PracticeTask {
   };
 }
 
+function teachCollectTask(round: number, target: number): PracticeTask {
+  // A gentle collect (small survey) framed as the intro to gathering data.
+  const base = makeCollectTask(round, target, "most");
+  if (base.kind === "statisticaCollect") base.speakText = "Let's collect some data. Tap each picture to count it into its group, then read the counters to answer.";
+  return base;
+}
+
 // Choose the teaching card that matches the lesson's lead skill (and mode).
 function teachFor(gens: [Gen, Gen, Gen], seed: number, target: number): PracticeTask {
   const probe = gens[0](0, 0);
+  if (probe.kind === "statisticaCollect") return teachCollectTask(seed, target);
   if (probe.kind === "statisticaSort") return teachSortTask(seed, target);
   if (probe.kind === "statisticaTally") {
     return probe.mode === "record" ? teachTallyRecordTask(seed, target) : teachTallyReadTask(seed, target);
@@ -289,32 +318,33 @@ function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {
 const buildObjects: Gen = (r, t) => buildTask(r, t, "objects");
 const buildPics: Gen = (r, t) => buildTask(r, t, "pictures");
 
+// Each WEEK has a signature mechanic so weeks look different from each other:
+// W1 collect/sort · W2 collect (surveys) · W3 tally · W4 build objects ·
+// W5 picture graphs · W6 compare · W7 interpret/claim · W8 investigation.
+// Tally is held back until W3 and building until W4 so those weeks feel NEW.
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
-  // W1 What is Data? — vary the interaction from the very first lesson so kids
-  // record, sort AND read within week one (not the same card twice).
-  // l1 Data All Around Us: count/record the data around us (tally-led).
-  "y1-statistics-w1-l1": [tallyRecordTask, sortTask, tallyReadTask],
+  // W1 What is Data? — meet data by COLLECTING and SORTING it (no tally/build yet).
+  // l1 Data All Around Us: collect the data around us (the new gather mini-game).
+  "y1-statistics-w1-l1": [collectTask, sortTask, collectTask],
   // l2 Sort Into Categories: pure sorting mastery across all three sort sets.
   "y1-statistics-w1-l2": [sortTask, sortTask, sortTask],
-  // l3 What Does the Data Tell Us?: three DIFFERENT interpretations — spot the most,
-  // judge a true/false claim, and compare two categories (not three passive reads).
+  // l3 What Does the Data Tell Us?: interpret — spot the most, judge a true/false
+  // claim, and compare two categories.
   "y1-statistics-w1-l3": [readGraphTask, claimTask, compareTask],
-  // W2 Asking Questions — introduces BUILDING a display early: l1 builds a display
-  // to answer a question, l2 sorts categories, l3 collects answers with tallies.
-  "y1-statistics-w2-l1": [buildObjects, readGraphTask, buildObjects],
+  // W2 Asking Questions — the SURVEY week: collect answers to questions.
+  // l1 Questions We Can Answer: collect a survey, then read/answer it.
+  "y1-statistics-w2-l1": [collectTask, readGraphTask, frequencyTask],
   // l2 Choose the Categories: harder 10-card sort (a step up from W1's 6-card sort).
   "y1-statistics-w2-l2": [sortTaskHard, sortTaskHard, sortTaskHard],
-  // l3 Collect the Answers: distinct from W1-l1's basic tally lesson — read the
-  // collected tally, record more, then BUILD a display to represent the answers
-  // (teach card is read, not record; adds the represent step).
-  "y1-statistics-w2-l3": [tallyReadTask, tallyRecordTask, buildObjects],
-  // W3 Recording Data — l1 Lists: make a list (sort) then record it; l2 pure recording;
-  // l3 reading tallies.
-  "y1-statistics-w3-l1": [sortTask, tallyRecordTask, tallyReadTask],
+  // l3 Collect the Answers: collect a survey, organise it, and read the result.
+  "y1-statistics-w2-l3": [collectTask, sortTask, readGraphTask],
+  // W3 Recording Data — TALLY debuts here (first time), so it feels brand new.
+  // l1 Lists: make a list (sort) then record it; l2 pure recording; l3 read tallies.
+  "y1-statistics-w3-l1": [tallyRecordTask, sortTask, tallyReadTask],
   "y1-statistics-w3-l2": [tallyRecordTask, tallyRecordTask, tallyRecordTask],
   "y1-statistics-w3-l3": [tallyReadTask, tallyReadTask, frequencyTask],
-  // W4 One-to-One Displays (concrete objects) — l1 build & count what you built,
-  // l2 pure building, l3 reading the object display.
+  // W4 One-to-One Displays (concrete objects) — BUILDING debuts here.
+  // l1 build & count what you built, l2 pure building, l3 reading the display.
   "y1-statistics-w4-l1": [buildObjects, frequencyTask, buildObjects],
   "y1-statistics-w4-l2": [buildObjects, buildObjects, buildObjects],
   "y1-statistics-w4-l3": [readGraphTask, frequencyTask, compareTask],
@@ -326,14 +356,14 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y1-statistics-w6-l1": [readGraphTask, readGraphTask, frequencyTask],
   "y1-statistics-w6-l2": [compareTask, compareTask, compareTask],
   "y1-statistics-w6-l3": [compareTask, readGraphTask, compareTask],
-  // W7 Interpreting Data
-  "y1-statistics-w7-l1": [frequencyTask, frequencyTask, compareTask],
+  // W7 Interpreting Data — reasoning about the data (claims + interpretation).
+  "y1-statistics-w7-l1": [frequencyTask, claimTask, compareTask],
   "y1-statistics-w7-l2": [interpretTask, readGraphTask, interpretTask],
-  "y1-statistics-w7-l3": [interpretTask, compareTask, interpretTask],
-  // W8 Mini Investigation
-  "y1-statistics-w8-l1": [sortTask, tallyRecordTask, tallyReadTask],
+  "y1-statistics-w7-l3": [interpretTask, claimTask, compareTask],
+  // W8 Mini Investigation — run the whole cycle: collect → record → represent → interpret.
+  "y1-statistics-w8-l1": [collectTask, tallyRecordTask, tallyReadTask],
   "y1-statistics-w8-l2": [buildPics, buildObjects, buildPics],
-  "y1-statistics-w8-l3": [readGraphTask, compareTask, interpretTask],
+  "y1-statistics-w8-l3": [readGraphTask, claimTask, interpretTask],
 };
 
 export function getStatisticaLevel1TaskSet(lessonId: string): RealmLessonTaskSet | null {

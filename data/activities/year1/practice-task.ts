@@ -2745,6 +2745,20 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica Level 1 — collect/gather data (AC9M1ST01). Scattered items are
+      // tapped one at a time to gather into live per-category counters; once all are
+      // collected the child answers a question about the counts (e.g. most/fewest).
+      kind: "statisticaCollect";
+      prompt: string;
+      speakText: string;
+      target: number;
+      items: Array<{ id: string; label: string; category: string }>;
+      categories: Array<{ id: string; label: string; color: string }>;
+      question: string;
+      correctOptionIds: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Statistica Level 1 — sort data into categories (AC9M1ST01/ST02). Tap an
       // item, tap a category bin; correct when every item is in its category.
       kind: "statisticaSort";
