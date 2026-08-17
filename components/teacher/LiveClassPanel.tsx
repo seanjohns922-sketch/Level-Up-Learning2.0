@@ -209,6 +209,11 @@ function stringOrNull(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value : null;
 }
 
+function stringArrayOrNull(value: unknown): string[] | null {
+  if (!Array.isArray(value)) return null;
+  return value.filter((item): item is string => typeof item === "string");
+}
+
 function timestampMs(...values: Array<string | null | undefined>) {
   return values.reduce((latest, value) => {
     if (!value) return latest;
@@ -250,26 +255,43 @@ function resolveCurrentActivityRow(
     const eventAt = latestEvent.created_at;
     const eventType = latestEvent.event_type;
     const completed = eventType === "lesson_completed" || eventType === "quiz_completed";
+    const nextLessonId = stringOrNull(payload.lessonId);
+    const changedLesson = Boolean(
+      nextLessonId && resolved.current_lesson && nextLessonId !== resolved.current_lesson,
+    );
     resolved = {
       ...resolved,
       current_level: stringOrNull(payload.level) ?? resolved.current_level ?? null,
       current_strand: stringOrNull(payload.strand) ?? resolved.current_strand ?? null,
       current_week: positiveNumberOrNull(payload.week) ?? resolved.current_week ?? null,
-      current_lesson: stringOrNull(payload.lessonId) ?? resolved.current_lesson ?? null,
-      current_lesson_title: stringOrNull(payload.lessonTitle) ?? resolved.current_lesson_title ?? null,
-      current_activity_id: stringOrNull(payload.activityId) ?? resolved.current_activity_id ?? null,
-      current_activity_label: stringOrNull(payload.activityLabel) ?? resolved.current_activity_label ?? null,
-      current_question_id: stringOrNull(payload.questionId) ?? resolved.current_question_id ?? null,
-      current_question_text: stringOrNull(payload.questionText) ?? resolved.current_question_text ?? null,
+      current_lesson: nextLessonId ?? resolved.current_lesson ?? null,
+      current_lesson_title: stringOrNull(payload.lessonTitle) ?? (changedLesson ? null : resolved.current_lesson_title ?? null),
+      current_activity_id: completed ? null : (stringOrNull(payload.activityId) ?? (changedLesson ? null : resolved.current_activity_id ?? null)),
+      current_activity_label: completed
+        ? `${stringOrNull(payload.lessonTitle) ?? "Lesson"} complete`
+        : (stringOrNull(payload.activityLabel) ?? (changedLesson ? null : resolved.current_activity_label ?? null)),
+      current_question_id: completed ? null : (stringOrNull(payload.questionId) ?? (changedLesson ? null : resolved.current_question_id ?? null)),
+      current_question_text: completed ? null : (stringOrNull(payload.questionText) ?? (changedLesson ? null : resolved.current_question_text ?? null)),
+      current_question_type: completed ? null : (stringOrNull(payload.questionType) ?? (changedLesson ? null : resolved.current_question_type ?? null)),
+      current_question_options: completed ? [] : (stringArrayOrNull(payload.questionOptions) ?? (changedLesson ? [] : resolved.current_question_options ?? [])),
+      current_step_label: completed ? null : (stringOrNull(payload.currentStepLabel) ?? (changedLesson ? null : resolved.current_step_label ?? null)),
       progress_percent: positiveNumberOrNull(payload.progressPercent) ?? resolved.progress_percent ?? null,
       progress_label: stringOrNull(payload.progressLabel) ?? resolved.progress_label ?? null,
       latest_event_type: eventType as LiveStudentActivityRow["latest_event_type"],
+      latest_answer_correct: typeof payload.isCorrect === "boolean"
+        ? payload.isCorrect
+        : (changedLesson ? null : resolved.latest_answer_correct ?? null),
+      latest_selected_answer: stringOrNull(payload.selectedAnswer) ?? (changedLesson ? null : resolved.latest_selected_answer ?? null),
+      latest_correct_answer: stringOrNull(payload.correctAnswer) ?? (changedLesson ? null : resolved.latest_correct_answer ?? null),
+      time_on_current_question: positiveNumberOrNull(payload.timeOnQuestion) ?? (changedLesson ? 0 : resolved.time_on_current_question ?? 0),
       questions_answered: positiveNumberOrNull(payload.questionsAnswered) ?? resolved.questions_answered ?? null,
       correct_count: positiveNumberOrNull(payload.correctCount) ?? resolved.correct_count ?? null,
       accuracy_percent: positiveNumberOrNull(payload.accuracyPercent) ?? resolved.accuracy_percent ?? null,
       current_lesson_status: stringOrNull(payload.currentLessonStatus) ?? (completed ? "completed" : resolved.current_lesson_status ?? "active"),
       completed_at: stringOrNull(payload.completedAt) ?? (completed ? eventAt : resolved.completed_at ?? null),
       attempt_number: positiveNumberOrNull(payload.attemptNumber) ?? resolved.attempt_number ?? null,
+      skill_tag: stringOrNull(payload.skillTag) ?? (changedLesson ? null : resolved.skill_tag ?? null),
+      misconception_tag: stringOrNull(payload.misconceptionTag) ?? (changedLesson ? null : resolved.misconception_tag ?? null),
       last_active_at: eventAt,
       updated_at: eventAt,
     };
@@ -289,6 +311,13 @@ function resolveCurrentActivityRow(
       current_lesson_title: latestAttempt.activity_type === "quiz"
         ? "Weekly Quiz"
         : `Lesson ${latestAttempt.lesson ?? ""}`.trim(),
+      current_activity_id: null,
+      current_activity_label: latestAttempt.activity_type === "quiz" ? "Weekly Quiz complete" : "Lesson complete",
+      current_question_id: null,
+      current_question_text: null,
+      current_question_type: null,
+      current_question_options: [],
+      current_step_label: null,
       progress_percent: 100,
       progress_label: latestAttempt.activity_type === "quiz" ? "Weekly quiz completed" : "Lesson completed",
       latest_event_type: latestAttempt.activity_type === "quiz" ? "quiz_completed" : "lesson_completed",
@@ -298,6 +327,18 @@ function resolveCurrentActivityRow(
       current_lesson_status: "completed",
       completed_at: latestAttempt.completed_at,
       attempt_number: latestAttempt.attempt_no,
+      latest_answer_correct: null,
+      latest_selected_answer: null,
+      latest_correct_answer: null,
+      time_on_current_question: 0,
+      current_question_attempts: 0,
+      consecutive_incorrect_count: 0,
+      skill_tag: null,
+      misconception_tag: null,
+      ai_status: null,
+      ai_issue: null,
+      ai_likely_gap: null,
+      ai_suggested_action: null,
       last_active_at: latestAttempt.completed_at,
       updated_at: latestAttempt.completed_at,
     };
@@ -661,12 +702,13 @@ function toLiveCard(
   lessonPerformance?: ReturnType<typeof buildCurrentLessonPerformance> | null,
   completedAttemptSummary?: CompletedActivityAttemptSummary | null,
 ): LiveStudentCard {
+  const isCompleted = row?.current_lesson_status === "completed" || lessonPerformance?.completed === true;
   const useCanonicalScore = Boolean(
     completedAttemptSummary &&
     (lessonPerformance?.completed || row?.current_lesson_status === "completed")
   );
   const displayedScore = useCanonicalScore ? completedAttemptSummary : lessonPerformance;
-  const insight = row
+  const insight = row && !isCompleted
     ? buildLiveStudentInsight({
         studentId: student.id,
         studentName: student.display_name,
@@ -711,7 +753,7 @@ function toLiveCard(
     id: student.id,
     displayName: student.display_name,
     workingLevelBadge: formatWorkingLevelBadge(row?.current_level ?? student.working_level),
-    status: insight?.status ?? row?.ai_status ?? "idle",
+    status: isCompleted ? "idle" : (insight?.status ?? row?.ai_status ?? "idle"),
     currentLevel: row?.current_level ?? null,
     currentRealm: row?.current_strand ?? null,
     currentWeek: row?.current_week ?? null,
@@ -739,9 +781,9 @@ function toLiveCard(
     currentLessonStatus: lessonPerformance?.completed ? "completed" : (row?.current_lesson_status ?? null),
     completedAt: row?.completed_at ?? null,
     lessonStartedAt: row?.lesson_started_at ?? null,
-    aiIssue: insight?.issue ?? row?.ai_issue ?? null,
-    aiLikelyGap: insight?.likelyGap ?? row?.ai_likely_gap ?? null,
-    aiSuggestedAction: insight?.suggestedTeacherAction ?? row?.ai_suggested_action ?? null,
+    aiIssue: isCompleted ? null : (insight?.issue ?? row?.ai_issue ?? null),
+    aiLikelyGap: isCompleted ? null : (insight?.likelyGap ?? row?.ai_likely_gap ?? null),
+    aiSuggestedAction: isCompleted ? null : (insight?.suggestedTeacherAction ?? row?.ai_suggested_action ?? null),
     skillTag: row?.skill_tag ?? null,
     misconceptionTag: row?.misconception_tag ?? null,
     learningState: insight?.learningState ?? null,
@@ -787,9 +829,9 @@ function getCardDisplayGroup(card: LiveStudentCard): LiveCardDisplayGroup {
 // grey idle — finer than the group by splitting the "live" group on card.status.
 function rowStatusMeta(card: LiveStudentCard, group: LiveCardDisplayGroup) {
   if (group === "needs_support") return { dot: "bg-rose-500", text: "text-rose-700", label: "Struggling" };
+  if (card.currentLessonStatus === "completed") return { dot: "bg-teal-500", text: "text-teal-700", label: "Completed" };
   if (group === "idle") return { dot: "bg-slate-400", text: "text-slate-500", label: "Idle" };
   if (group === "waiting_to_start") return { dot: "bg-slate-300", text: "text-slate-400", label: "Not started" };
-  if (card.currentLessonStatus === "completed") return { dot: "bg-teal-500", text: "text-teal-700", label: "Completed" };
   if (card.status === "check_in") return { dot: "bg-amber-500", text: "text-amber-700", label: "Needs attention" };
   return { dot: "bg-emerald-500", text: "text-emerald-700", label: "On track" };
 }
@@ -881,10 +923,13 @@ export default function LiveClassPanel({
             "activity_started",
             "lesson_started",
             "quiz_started",
+            "question_loaded",
             "answer_correct",
             "answer_incorrect",
+            "hint_used",
             "lesson_completed",
             "quiz_completed",
+            "idle_detected",
           ])
           .order("created_at", { ascending: true }),
         studentIds.length > 0

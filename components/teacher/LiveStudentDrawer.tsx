@@ -178,7 +178,7 @@ export function LiveStudentDrawer({
         <div className="space-y-4 p-5">
           <section className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
-              Current Activity
+              {student.currentLessonStatus === "completed" ? "Latest Activity" : "Current Activity"}
             </div>
             <div className="mt-2 text-sm text-slate-700">
               <div className="font-bold text-slate-900">
