@@ -304,7 +304,10 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y1-statistics-w2-l1": [buildObjects, readGraphTask, buildObjects],
   // l2 Choose the Categories: harder 10-card sort (a step up from W1's 6-card sort).
   "y1-statistics-w2-l2": [sortTaskHard, sortTaskHard, sortTaskHard],
-  "y1-statistics-w2-l3": [tallyRecordTask, tallyRecordTask, tallyReadTask],
+  // l3 Collect the Answers: distinct from W1-l1's basic tally lesson — read the
+  // collected tally, record more, then BUILD a display to represent the answers
+  // (teach card is read, not record; adds the represent step).
+  "y1-statistics-w2-l3": [tallyReadTask, tallyRecordTask, buildObjects],
   // W3 Recording Data — l1 Lists: make a list (sort) then record it; l2 pure recording;
   // l3 reading tallies.
   "y1-statistics-w3-l1": [sortTask, tallyRecordTask, tallyReadTask],
