@@ -23,10 +23,12 @@ const SURVEYS: Survey[] = [
 
 // Sorting topics (each item clearly belongs to one category).
 type SortSet = { id: string; prompt: string; cats: Cat[]; items: Array<{ label: string; category: string }> };
+// Items are interleaved by category so any prefix stays balanced: the first 6
+// give 2-per-group (easy) and the full 10 give 4/3/3 (hard).
 const SORT_SETS: SortSet[] = [
-  { id: "animals", prompt: "Sort each animal into its group.", cats: [{ id: "pet", label: "Pets", color: C.orange }, { id: "farm", label: "Farm", color: C.green }, { id: "wild", label: "Wild", color: C.purple }], items: [{ label: "Dog", category: "pet" }, { label: "Cat", category: "pet" }, { label: "Cow", category: "farm" }, { label: "Sheep", category: "farm" }, { label: "Lion", category: "wild" }, { label: "Zebra", category: "wild" }] },
-  { id: "food", prompt: "Sort each one: fruit, vegetable or drink?", cats: [{ id: "fruit", label: "Fruit", color: C.red }, { id: "veg", label: "Vegetable", color: C.green }, { id: "drink", label: "Drink", color: C.blue }], items: [{ label: "Apple", category: "fruit" }, { label: "Banana", category: "fruit" }, { label: "Carrot", category: "veg" }, { label: "Peas", category: "veg" }, { label: "Milk", category: "drink" }, { label: "Juice", category: "drink" }] },
-  { id: "things", prompt: "Sort each thing into its group.", cats: [{ id: "toy", label: "Toys", color: C.pink }, { id: "clothes", label: "Clothes", color: C.teal }, { id: "food", label: "Food", color: C.amber }], items: [{ label: "Ball", category: "toy" }, { label: "Teddy", category: "toy" }, { label: "Hat", category: "clothes" }, { label: "Sock", category: "clothes" }, { label: "Bread", category: "food" }, { label: "Cheese", category: "food" }] },
+  { id: "animals", prompt: "Sort each animal into its group.", cats: [{ id: "pet", label: "Pets", color: C.orange }, { id: "farm", label: "Farm", color: C.green }, { id: "wild", label: "Wild", color: C.purple }], items: [{ label: "Dog", category: "pet" }, { label: "Cow", category: "farm" }, { label: "Lion", category: "wild" }, { label: "Cat", category: "pet" }, { label: "Sheep", category: "farm" }, { label: "Zebra", category: "wild" }, { label: "Rabbit", category: "pet" }, { label: "Horse", category: "farm" }, { label: "Tiger", category: "wild" }, { label: "Hamster", category: "pet" }] },
+  { id: "food", prompt: "Sort each one: fruit, vegetable or drink?", cats: [{ id: "fruit", label: "Fruit", color: C.red }, { id: "veg", label: "Vegetable", color: C.green }, { id: "drink", label: "Drink", color: C.blue }], items: [{ label: "Apple", category: "fruit" }, { label: "Carrot", category: "veg" }, { label: "Milk", category: "drink" }, { label: "Banana", category: "fruit" }, { label: "Peas", category: "veg" }, { label: "Juice", category: "drink" }, { label: "Grapes", category: "fruit" }, { label: "Corn", category: "veg" }, { label: "Water", category: "drink" }, { label: "Pear", category: "fruit" }] },
+  { id: "things", prompt: "Sort each thing into its group.", cats: [{ id: "toy", label: "Toys", color: C.pink }, { id: "clothes", label: "Clothes", color: C.teal }, { id: "food", label: "Food", color: C.amber }], items: [{ label: "Ball", category: "toy" }, { label: "Hat", category: "clothes" }, { label: "Bread", category: "food" }, { label: "Teddy", category: "toy" }, { label: "Sock", category: "clothes" }, { label: "Cheese", category: "food" }, { label: "Kite", category: "toy" }, { label: "Shoe", category: "clothes" }, { label: "Egg", category: "food" }, { label: "Blocks", category: "toy" }] },
 ];
 
 const pick = <T,>(arr: T[], i: number) => arr[((i % arr.length) + arr.length) % arr.length]!;
@@ -50,15 +52,26 @@ const numOptions = (correct: number, round: number) => {
 };
 
 // ── Task generators ─────────────────────────────────────────────────────────
-export function sortTask(round: number, target: number): PracticeTask {
+function makeSortTask(round: number, target: number, size: number): PracticeTask {
   const set = pick(SORT_SETS, round);
-  const items = set.items.map((it, i) => ({ id: `i${i}`, label: it.label, category: it.category }));
+  const items = set.items.slice(0, size).map((it, i) => ({ id: `i${i}`, label: it.label, category: it.category }));
+  const hard = size >= 10;
   return {
-    kind: "statisticaSort", target, prompt: set.prompt,
+    kind: "statisticaSort", target, prompt: hard ? `${set.prompt} There are ${items.length} to sort!` : set.prompt,
     speakText: "Data can be sorted into groups called categories. Tap a card, then tap the group it belongs to.",
     items, categories: set.cats,
     feedback: { correct: "Sorted! Every card is in the right group.", wrong: "Look again — each card belongs to just one group." },
   };
+}
+
+// Easy sort (6 cards, 2 per group) — the default for intro lessons.
+export function sortTask(round: number, target: number): PracticeTask {
+  return makeSortTask(round, target, 6);
+}
+
+// Harder sort (all 10 cards, uneven groups) — for a step-up sorting lesson.
+export function sortTaskHard(round: number, target: number): PracticeTask {
+  return makeSortTask(round, target, 10);
 }
 
 export function tallyRecordTask(round: number, target: number): PracticeTask {
@@ -178,7 +191,7 @@ function teachGraphTask(round: number, target: number): PracticeTask {
 function teachSortTask(round: number, target: number): PracticeTask {
   // Use a different sort set from the activities so the teach card isn't a repeat.
   const set = pick(SORT_SETS, round + 2);
-  const items = set.items.map((it, i) => ({ id: `i${i}`, label: it.label, category: it.category }));
+  const items = set.items.slice(0, 6).map((it, i) => ({ id: `i${i}`, label: it.label, category: it.category }));
   return {
     kind: "statisticaSort", target, prompt: `Let's start by sorting. ${set.prompt}`,
     speakText: "Data is information we collect. We can put it into groups called categories. Tap a card, then tap the group it belongs in.",
@@ -249,7 +262,8 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   // W2 Asking Questions — introduces BUILDING a display early: l1 builds a display
   // to answer a question, l2 sorts categories, l3 collects answers with tallies.
   "y1-statistics-w2-l1": [buildObjects, readGraphTask, buildObjects],
-  "y1-statistics-w2-l2": [sortTask, sortTask, sortTask],
+  // l2 Choose the Categories: harder 10-card sort (a step up from W1's 6-card sort).
+  "y1-statistics-w2-l2": [sortTaskHard, sortTaskHard, sortTaskHard],
   "y1-statistics-w2-l3": [tallyRecordTask, tallyRecordTask, tallyReadTask],
   // W3 Recording Data — l1 Lists: make a list (sort) then record it; l2 pure recording;
   // l3 reading tallies.
