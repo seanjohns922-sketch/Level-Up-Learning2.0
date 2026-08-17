@@ -160,6 +160,45 @@ export function compareTask(round: number, target: number): PracticeTask {
   };
 }
 
+// Judge whether a statement about the data is TRUE or FALSE — active reasoning,
+// not just spotting the tallest column. The statement is generated from the real
+// counts and flipped on some rounds so the answer isn't always the same.
+export function claimTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = surveyCats(round + 1);
+  const top = [...categories].sort((a, b) => b.count - a.count);
+  const most = top[0]!, least = top[top.length - 1]!;
+  // Three claim shapes; pick one, then decide whether to state it truly or falsely.
+  const shape = round % 3;
+  const stateTrue = round % 2 === 0;
+  let statement: string;
+  let isActuallyTrue: boolean;
+  if (shape === 0) {
+    // "X got the most votes."
+    const subject = stateTrue ? most : least;
+    statement = `${survey.title}: ${subject.label} got the MOST votes.`;
+    isActuallyTrue = subject.id === most.id;
+  } else if (shape === 1) {
+    // "X got the fewest votes."
+    const subject = stateTrue ? least : most;
+    statement = `${survey.title}: ${subject.label} got the FEWEST votes.`;
+    isActuallyTrue = subject.id === least.id;
+  } else {
+    // "More chose A than B."
+    const a = categories[0]!, b = categories[1]!;
+    const [x, y] = stateTrue === a.count > b.count ? [a, b] : [b, a];
+    statement = `${survey.title}: more chose ${x.label} than ${y.label}.`;
+    isActuallyTrue = x.count > y.count;
+  }
+  return {
+    kind: "statisticaGraph", mode: "claim", target, display: "pictures", categories,
+    prompt: `${statement} Is that true or false?`,
+    speakText: "Read the graph, then decide: does the picture graph show that this is true, or false?",
+    options: [{ id: "t", label: "True" }, { id: "f", label: "False" }],
+    correctOptionIds: [isActuallyTrue ? "t" : "f"],
+    feedback: { correct: "Right — you checked the graph to judge the statement.", wrong: "Read the columns again and check what the data really shows." },
+  };
+}
+
 export function interpretTask(round: number, target: number): PracticeTask {
   const { survey, categories } = surveyCats(round + 4);
   const top = [...categories].sort((x, y) => y.count - x.count)[0]!;
@@ -257,8 +296,9 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y1-statistics-w1-l1": [tallyRecordTask, sortTask, tallyReadTask],
   // l2 Sort Into Categories: pure sorting mastery across all three sort sets.
   "y1-statistics-w1-l2": [sortTask, sortTask, sortTask],
-  // l3 What Does the Data Tell Us?: read & interpret a simple display.
-  "y1-statistics-w1-l3": [readGraphTask, frequencyTask, compareTask],
+  // l3 What Does the Data Tell Us?: three DIFFERENT interpretations — spot the most,
+  // judge a true/false claim, and compare two categories (not three passive reads).
+  "y1-statistics-w1-l3": [readGraphTask, claimTask, compareTask],
   // W2 Asking Questions — introduces BUILDING a display early: l1 builds a display
   // to answer a question, l2 sorts categories, l3 collects answers with tallies.
   "y1-statistics-w2-l1": [buildObjects, readGraphTask, buildObjects],

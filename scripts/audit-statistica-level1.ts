@@ -44,6 +44,9 @@ function auditTask(lessonId: string, task: PracticeTask) {
       const [a, b] = [t.categories[0]!, t.categories[1]!];
       const truth = a.count > b.count ? "a" : a.count < b.count ? "b" : "eq";
       check(answer === truth, `${lessonId}: compare answer must match the counts (${a.count} vs ${b.count})`);
+    } else if (t.mode === "claim") {
+      check(["t", "f"].includes(answer), `${lessonId}: claim answer must be true/false`);
+      check((t.options ?? []).length === 2, `${lessonId}: claim needs exactly True/False options`);
     } else if (t.options!.every((o) => t.categories.some((c) => c.id === o.id))) {
       // A "which category" question (most/least/most-popular): answer must be a real category.
       check(t.categories.some((c) => c.id === answer), `${lessonId}: category answer must be a real category`);

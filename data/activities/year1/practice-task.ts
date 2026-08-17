@@ -2773,9 +2773,10 @@ export type PracticeTask = (
       // Statistica Level 1 — one-to-one object displays and picture graphs
       // (AC9M1ST02). "build": add one symbol per data point to each category
       // column to match its count. "read"/"compare": answer a question about a
-      // completed display (how many, most/least, more/less/equal).
+      // completed display (how many, most/least, more/less/equal). "claim": judge
+      // whether a statement about the data is true or false.
       kind: "statisticaGraph";
-      mode: "build" | "read" | "compare";
+      mode: "build" | "read" | "compare" | "claim";
       prompt: string;
       speakText: string;
       target: number;
