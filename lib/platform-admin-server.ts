@@ -108,6 +108,10 @@ export type PlatformSchoolDetail = {
   };
   activity: {
     activeToday: number;
+    activeLast7Days?: number;
+    lessonsLast7Days?: number;
+    quizzesLast7Days?: number;
+    assessmentsLast7Days?: number;
     activeThisWeek: number;
     lessonsThisWeek: number;
     quizzesThisWeek: number;

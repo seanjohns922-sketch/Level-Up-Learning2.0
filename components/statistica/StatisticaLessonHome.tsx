@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
+import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 
 type StatisticaLessonHomeProps = {
   level: string;
@@ -23,6 +24,7 @@ export default function StatisticaLessonHome({
   successCriteria,
 }: StatisticaLessonHomeProps) {
   const router = useRouter();
+  const weekHref = buildRealmProgramHref({ realmId: "statistics", year: level, week, preview: true });
 
   return (
     <main className="min-h-screen bg-[#06151a] p-3 sm:p-5">
@@ -38,7 +40,7 @@ export default function StatisticaLessonHome({
         successCriteria={successCriteria}
         startDisabled
         startDisabledLabel="Activity Preview Coming Soon"
-        onBack={() => router.push(`/statistica?teacher_preview=1&level=${encodeURIComponent(level)}&week=${week}`)}
+        onBack={() => router.push(weekHref)}
         onStart={() => undefined}
       />
     </main>

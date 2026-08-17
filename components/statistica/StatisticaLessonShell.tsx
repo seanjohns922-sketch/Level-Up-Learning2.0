@@ -7,6 +7,7 @@ import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
 import { PracticeRunner } from "@/components/PracticeRunner";
 import { createRandomRealmLessonGenerator, type RealmLessonTaskGenerator } from "@/data/activities/realm-lesson-blueprint";
 import { getStatisticaLevel1TaskSet } from "@/data/activities/statistica/level1";
+import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 
 type Props = {
   level: string;
@@ -27,7 +28,8 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
     const taskSet = levelNumber === 1 ? getStatisticaLevel1TaskSet(lessonId) : null;
     return taskSet ? createRandomRealmLessonGenerator(taskSet) : null;
   });
-  const back = () => router.push(`/statistica?teacher_preview=1&level=${encodeURIComponent(level)}&week=${week}`);
+  const weekHref = buildRealmProgramHref({ realmId: "statistics", year: level, week, preview: true });
+  const back = () => router.push(weekHref);
 
   if (started && getTask) {
     return (

@@ -76,9 +76,16 @@ assert(lessonRoute.includes('teacher_preview !== "1"'), "Statistica lesson home 
 assert(lessonRoute.includes("StatisticaLessonShell"), "Statistica lesson route must render the shared lesson shell");
 
 const lessonAdapter = read("components/statistica/StatisticaLessonShell.tsx");
+const lessonHomeAdapter = read("components/statistica/StatisticaLessonHome.tsx");
 assert(lessonAdapter.includes('realm="statistics"'), "Statistica lesson adapter must use the shared statistics theme");
 assert(lessonAdapter.includes('realmId="statistics"'), "Statistica active lesson must pass its canonical realm into the shared runner");
 assert(lessonAdapter.includes("RealmActiveLessonShell"), "Statistica active lesson must use the shared realm heading, navigation and content frame");
+assert(lessonAdapter.includes("buildRealmProgramHref"), "Statistica lessons must return to the shared weekly-program home");
+assert(lessonAdapter.includes('realmId: "statistics", year: level, week, preview: true'), "Statistica lesson back navigation must preserve its level, week and preview context");
+assert(!lessonAdapter.includes("router.push(`/statistica?"), "Statistica active lessons must not return to the Start Adventure map");
+assert(lessonHomeAdapter.includes("buildRealmProgramHref"), "Statistica lesson introductions must return to the shared weekly-program home");
+assert(lessonHomeAdapter.includes('realmId: "statistics", year: level, week, preview: true'), "Statistica lesson introductions must preserve their level, week and preview context");
+assert(!lessonHomeAdapter.includes("router.push(`/statistica?"), "Statistica lesson introductions must not return to the Start Adventure map");
 assert(lessonAdapter.includes("getStatisticaLevel1TaskSet"), "Statistica Level 1 must use its real activity engine");
 assert(lessonAdapter.includes("startDisabled={!getTask}"), "Unimplemented Statistica levels must remain disabled");
 
