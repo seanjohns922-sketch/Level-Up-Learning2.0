@@ -238,16 +238,17 @@ const buildObjects: Gen = (r, t) => buildTask(r, t, "objects");
 const buildPics: Gen = (r, t) => buildTask(r, t, "pictures");
 
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
-  // W1 What is Data?  — three distinct shapes so the lessons don't blur together.
-  // l1 Data All Around Us: recognise data, then see what it shows (sort → read → count).
-  "y1-statistics-w1-l1": [sortTask, readGraphTask, frequencyTask],
+  // W1 What is Data? — vary the interaction from the very first lesson so kids
+  // record, sort AND read within week one (not the same card twice).
+  // l1 Data All Around Us: count/record the data around us (tally-led).
+  "y1-statistics-w1-l1": [tallyRecordTask, sortTask, tallyReadTask],
   // l2 Sort Into Categories: pure sorting mastery across all three sort sets.
   "y1-statistics-w1-l2": [sortTask, sortTask, sortTask],
   // l3 What Does the Data Tell Us?: read & interpret a simple display.
   "y1-statistics-w1-l3": [readGraphTask, frequencyTask, compareTask],
-  // W2 Asking Questions — l1 answers a question from data (read-led, unlike W1's
-  // sort-led l1), l2 chooses/sorts categories, l3 collects answers with tallies.
-  "y1-statistics-w2-l1": [readGraphTask, frequencyTask, sortTask],
+  // W2 Asking Questions — introduces BUILDING a display early: l1 builds a display
+  // to answer a question, l2 sorts categories, l3 collects answers with tallies.
+  "y1-statistics-w2-l1": [buildObjects, readGraphTask, buildObjects],
   "y1-statistics-w2-l2": [sortTask, sortTask, sortTask],
   "y1-statistics-w2-l3": [tallyRecordTask, tallyRecordTask, tallyReadTask],
   // W3 Recording Data — l1 Lists: make a list (sort) then record it; l2 pure recording;
