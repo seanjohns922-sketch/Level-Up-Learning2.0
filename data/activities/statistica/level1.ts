@@ -209,26 +209,28 @@ function teachTallyRecordTask(round: number, target: number): PracticeTask {
 }
 
 // Choose the teaching card that matches the lesson's lead skill (and mode).
-function teachFor(gens: [Gen, Gen, Gen], target: number): PracticeTask {
+function teachFor(gens: [Gen, Gen, Gen], seed: number, target: number): PracticeTask {
   const probe = gens[0](0, 0);
-  if (probe.kind === "statisticaSort") return teachSortTask(0, target);
+  if (probe.kind === "statisticaSort") return teachSortTask(seed, target);
   if (probe.kind === "statisticaTally") {
-    return probe.mode === "record" ? teachTallyRecordTask(0, target) : teachTallyReadTask(0, target);
+    return probe.mode === "record" ? teachTallyRecordTask(seed, target) : teachTallyReadTask(seed, target);
   }
-  return teachGraphTask(0, target);
+  return teachGraphTask(seed, target);
 }
 
 // ── Lesson content map (24 lessons) ─────────────────────────────────────────
 type Gen = (round: number, target: number) => PracticeTask;
-function taskSet(gens: [Gen, Gen, Gen]): RealmLessonTaskSet {
+// `seed` shifts which survey / sort set each lesson pulls, so the same task type
+// shows different subject matter from week to week (W1 fruit/pets vs W2 weather…).
+function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {
   let t = 10;
-  const rounds = [0, 0, 0];
+  const rounds = [seed, seed + 1, seed + 2];
   return {
-    teaching: () => teachFor(gens, ++t),
+    teaching: () => teachFor(gens, seed, ++t),
     activities: [
       () => gens[0](rounds[0]++, ++t),
-      () => gens[1](rounds[1]++ + 1, ++t),
-      () => gens[2](rounds[2]++ + 2, ++t),
+      () => gens[1](rounds[1]++, ++t),
+      () => gens[2](rounds[2]++, ++t),
     ],
   };
 }
@@ -243,9 +245,9 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y1-statistics-w1-l2": [sortTask, sortTask, sortTask],
   // l3 What Does the Data Tell Us?: read & interpret a simple display.
   "y1-statistics-w1-l3": [readGraphTask, frequencyTask, compareTask],
-  // W2 Asking Questions — l1 varied (a question gives answers we sort, read, record),
-  // l2 pure sorting, l3 tally-led collection.
-  "y1-statistics-w2-l1": [sortTask, readGraphTask, tallyRecordTask],
+  // W2 Asking Questions — l1 answers a question from data (read-led, unlike W1's
+  // sort-led l1), l2 chooses/sorts categories, l3 collects answers with tallies.
+  "y1-statistics-w2-l1": [readGraphTask, frequencyTask, sortTask],
   "y1-statistics-w2-l2": [sortTask, sortTask, sortTask],
   "y1-statistics-w2-l3": [tallyRecordTask, tallyRecordTask, tallyReadTask],
   // W3 Recording Data — l1 Lists: make a list (sort) then record it; l2 pure recording;
@@ -278,7 +280,13 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
 
 export function getStatisticaLevel1TaskSet(lessonId: string): RealmLessonTaskSet | null {
   const gens = LESSON_GENS[lessonId];
-  return gens ? taskSet(gens) : null;
+  if (!gens) return null;
+  const m = /-w(\d+)-l(\d+)$/.exec(lessonId);
+  const week = m ? Number(m[1]) : 1;
+  const lesson = m ? Number(m[2]) : 1;
+  // Spread topics across weeks/lessons so the same task type varies its subject.
+  const seed = (week - 1) * 2 + (lesson - 1);
+  return taskSet(gens, seed);
 }
 
 export const STATISTICA_LEVEL1_LESSON_IDS = Object.keys(LESSON_GENS);
