@@ -829,7 +829,7 @@ function getCardDisplayGroup(card: LiveStudentCard): LiveCardDisplayGroup {
 // grey idle — finer than the group by splitting the "live" group on card.status.
 function rowStatusMeta(card: LiveStudentCard, group: LiveCardDisplayGroup) {
   if (group === "needs_support") return { dot: "bg-rose-500", text: "text-rose-700", label: "Struggling" };
-  if (card.currentLessonStatus === "completed") return { dot: "bg-teal-500", text: "text-teal-700", label: "Completed" };
+  if (card.currentLessonStatus === "completed") return { dot: "bg-slate-300", text: "text-slate-500", label: "Completed" };
   if (group === "idle") return { dot: "bg-slate-400", text: "text-slate-500", label: "Idle" };
   if (group === "waiting_to_start") return { dot: "bg-slate-300", text: "text-slate-400", label: "Not started" };
   if (card.status === "check_in") return { dot: "bg-amber-500", text: "text-amber-700", label: "Needs attention" };
