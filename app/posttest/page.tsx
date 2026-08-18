@@ -823,7 +823,16 @@ function PostTestPage() {
 
   return (
     <>
-      <ActiveLearningTracker context="posttest" />
+      <ActiveLearningTracker
+        context="posttest"
+        level={year}
+        realmId={progressRealmId}
+        questionId={q?.id ?? null}
+        questionText={q?.prompt ?? null}
+        questionIndex={idx}
+        totalQuestions={questions.length}
+        questionsAnswered={Object.values(answers).filter((answer) => answer !== "").length}
+      />
       <ReadAloudRateProvider rate={realmId === "space" ? 0.85 : undefined}>
         <AssessmentShell
           testType="Post-Test"

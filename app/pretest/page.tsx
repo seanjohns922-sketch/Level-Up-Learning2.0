@@ -955,7 +955,16 @@ function PretestPage() {
 
   return (
     <>
-      <ActiveLearningTracker context="pretest" />
+      <ActiveLearningTracker
+        context="pretest"
+        level={year}
+        realmId={progressRealmId}
+        questionId={question?.id ?? null}
+        questionText={question?.prompt ?? null}
+        questionIndex={index}
+        totalQuestions={questions.length}
+        questionsAnswered={answers.filter((answer) => answer !== null && answer !== undefined && answer !== "").length}
+      />
       <ReadAloudRateProvider rate={realmId === "space" ? 0.85 : undefined}>
         <AssessmentShell
           testType="Pre-Test"

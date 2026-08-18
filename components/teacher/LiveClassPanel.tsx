@@ -104,7 +104,7 @@ type CompletedActivityAttemptRow = {
   student_id: string;
   realm_id: string;
   working_level: string;
-  week: number;
+  week: number | null;
   lesson?: number | null;
   lesson_id?: string | null;
   quiz_id?: string | null;
@@ -114,7 +114,7 @@ type CompletedActivityAttemptRow = {
   accuracy_percent: number;
   completed?: boolean | null;
   completed_at: string;
-  activity_type: "lesson" | "quiz";
+  activity_type: "lesson" | "quiz" | "pretest" | "posttest";
 };
 
 type CompletedActivityAttemptSummary = {
@@ -299,27 +299,34 @@ function resolveCurrentActivityRow(
   }
 
   if (latestAttempt && timestampMs(latestAttempt.completed_at) > resolvedAt) {
-    const lessonId = latestAttempt.activity_type === "quiz"
-      ? latestAttempt.quiz_id
-      : latestAttempt.lesson_id;
+    const isAssessment = latestAttempt.activity_type === "pretest" || latestAttempt.activity_type === "posttest";
+    const assessmentTitle = latestAttempt.activity_type === "pretest" ? "Pre-Test" : "Post-Test";
+    const lessonId = isAssessment
+      ? `${latestAttempt.activity_type}:${latestAttempt.realm_id}:${latestAttempt.working_level}`
+      : latestAttempt.activity_type === "quiz"
+        ? latestAttempt.quiz_id
+        : latestAttempt.lesson_id;
+    const activityTitle = isAssessment
+      ? assessmentTitle
+      : latestAttempt.activity_type === "quiz"
+        ? "Weekly Quiz"
+        : `Lesson ${latestAttempt.lesson ?? ""}`.trim();
     resolved = {
       ...resolved,
       current_level: latestAttempt.working_level,
       current_strand: latestAttempt.realm_id,
-      current_week: latestAttempt.week,
+      current_week: isAssessment ? null : latestAttempt.week,
       current_lesson: lessonId ?? resolved.current_lesson ?? null,
-      current_lesson_title: latestAttempt.activity_type === "quiz"
-        ? "Weekly Quiz"
-        : `Lesson ${latestAttempt.lesson ?? ""}`.trim(),
+      current_lesson_title: activityTitle,
       current_activity_id: null,
-      current_activity_label: latestAttempt.activity_type === "quiz" ? "Weekly Quiz complete" : "Lesson complete",
+      current_activity_label: `${activityTitle} complete`,
       current_question_id: null,
       current_question_text: null,
       current_question_type: null,
       current_question_options: [],
       current_step_label: null,
       progress_percent: 100,
-      progress_label: latestAttempt.activity_type === "quiz" ? "Weekly quiz completed" : "Lesson completed",
+      progress_label: `${activityTitle} completed`,
       latest_event_type: latestAttempt.activity_type === "quiz" ? "quiz_completed" : "lesson_completed",
       questions_answered: latestAttempt.total_questions,
       correct_count: latestAttempt.correct_count,
@@ -575,6 +582,7 @@ function isQuizActivity(row: LiveStudentActivityRow) {
 }
 
 function matchesCompletedAttempt(row: LiveStudentActivityRow, attempt: CompletedActivityAttemptRow) {
+  if (attempt.activity_type === "pretest" || attempt.activity_type === "posttest") return false;
   if (attempt.student_id !== row.student_id) return false;
   const attemptRealm = normalizeAttemptRealm(attempt.realm_id);
   const activityRealm = normalizeAttemptRealm(row.current_strand);
@@ -681,7 +689,7 @@ function buildCurrentLessonPerformance(
     correct = Math.min(payloadCorrect ?? correct, answered);
   }
 
-  if (lessonEvents.length === 0 && answered === 0) {
+  if (answered === 0 && rowAnswered > 0 && (lessonEvents.length === 0 || rowCompleted)) {
     answered = rowAnswered;
     correct = Math.min(rowCorrect, answered);
   }
@@ -918,7 +926,7 @@ export default function LiveClassPanel({
       }
       // Note: don't flip `loading` on refreshes — only the initial load shows the
       // spinner, so periodic polls update in place without flashing the panel.
-      const [activityResult, eventResult, lessonAttemptResult, quizAttemptResult, dailyActivityResult] = await Promise.all([
+      const [activityResult, eventResult, lessonAttemptResult, quizAttemptResult, assessmentResult, dailyActivityResult] = await Promise.all([
         supabase
           .from("live_student_activity")
           .select("*")
@@ -954,12 +962,19 @@ export default function LiveClassPanel({
             .select("student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at")
             .in("student_id", studentIds)
           : Promise.resolve({ data: [], error: null }),
+        studentIds.length > 0
+          ? supabase
+            .from("student_realm_assessments")
+            .select("student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,completed_at")
+            .in("student_id", studentIds)
+          : Promise.resolve({ data: [], error: null }),
         supabase.rpc("get_live_class_activity_today", { p_class_id: selectedClass.id }),
       ]);
       const { data, error } = activityResult;
       const { data: eventData, error: eventError } = eventResult;
       const { data: lessonAttemptData, error: lessonAttemptError } = lessonAttemptResult;
       const { data: quizAttemptData, error: quizAttemptError } = quizAttemptResult;
+      const { data: assessmentData, error: assessmentError } = assessmentResult;
       const { data: dailyActivityData, error: dailyActivityError } = dailyActivityResult;
       if (error) {
         console.warn("[LiveClassPanel] Failed to load live student activity", error);
@@ -972,6 +987,9 @@ export default function LiveClassPanel({
       }
       if (quizAttemptError) {
         console.warn("[LiveClassPanel] Failed to load completed quiz attempts", quizAttemptError);
+      }
+      if (assessmentError) {
+        console.warn("[LiveClassPanel] Failed to load completed assessments", assessmentError);
       }
       if (dailyActivityError) {
         console.warn("[LiveClassPanel] Failed to load today's class activity", dailyActivityError);
@@ -990,6 +1008,31 @@ export default function LiveClassPanel({
             lesson: null,
             lesson_id: null,
             activity_type: "quiz" as const,
+          })),
+          ...((assessmentData ?? []) as Array<{
+            student_id: string;
+            realm_id: string;
+            working_level: string;
+            assessment_type: "pretest" | "posttest";
+            correct_count: number;
+            total_questions: number;
+            score_percent: number;
+            completed_at: string;
+          }>).map((attempt) => ({
+            student_id: attempt.student_id,
+            realm_id: attempt.realm_id,
+            working_level: attempt.working_level,
+            week: null,
+            lesson: null,
+            lesson_id: null,
+            quiz_id: null,
+            attempt_no: 1,
+            correct_count: attempt.correct_count,
+            total_questions: attempt.total_questions,
+            accuracy_percent: attempt.score_percent,
+            completed: true,
+            completed_at: attempt.completed_at,
+            activity_type: attempt.assessment_type,
           })),
         ]);
         setDailyActivity((dailyActivityData ?? []) as DailyClassActivityRow[]);
@@ -1295,8 +1338,8 @@ export default function LiveClassPanel({
               <SortHeader sortKey="realm" sort={sort} onSort={updateSort}>Realm</SortHeader>
               <SortHeader sortKey="level" sort={sort} onSort={updateSort}>Level</SortHeader>
               <SortHeader sortKey="week" sort={sort} onSort={updateSort}>Week</SortHeader>
-              <SortHeader sortKey="lesson" sort={sort} onSort={updateSort}>Lesson</SortHeader>
-              <SortHeader sortKey="attempt" sort={sort} onSort={updateSort}>Lesson attempt</SortHeader>
+              <SortHeader sortKey="lesson" sort={sort} onSort={updateSort}>Activity</SortHeader>
+              <SortHeader sortKey="attempt" sort={sort} onSort={updateSort}>Attempt / progress</SortHeader>
               <SortHeader sortKey="score" sort={sort} onSort={updateSort} align="right">Current score</SortHeader>
               <SortHeader sortKey="percentage" sort={sort} onSort={updateSort} align="right">Current accuracy</SortHeader>
               <SortHeader sortKey="lastActive" sort={sort} onSort={updateSort} align="right">Last active</SortHeader>
@@ -1313,9 +1356,13 @@ export default function LiveClassPanel({
               const assessmentTitle = /^(pre-test|post-test)$/i.test(card.currentLessonTitle ?? "")
                 ? card.currentLessonTitle
                 : null;
+              const presenceOnly = !card.currentLesson && !card.currentActivityLabel && Boolean(card.lastActiveAt);
               const lessonTag = notStarted
                 ? "—"
-                : assessmentTitle ?? (card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : "—");
+                : assessmentTitle ?? (card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : presenceOnly ? "App open" : "—");
+              const assessmentProgress = assessmentTitle && card.currentStepLabel
+                ? card.currentStepLabel.replace(/^Question\s+/i, "Q")
+                : null;
               return (
                 <button
                   key={card.id}
@@ -1334,7 +1381,9 @@ export default function LiveClassPanel({
                   <span className="text-xs font-semibold text-slate-500 tabular-nums">{weekTag}</span>
                   <span className="truncate text-xs font-semibold text-slate-600">{lessonTag}</span>
                   <span className="truncate text-xs font-bold tabular-nums text-slate-500">
-                    {!notStarted && card.attemptNumber ? `Attempt ${card.attemptNumber}` : "—"}
+                    {presenceOnly
+                      ? "Activity unavailable"
+                      : assessmentProgress ?? (!notStarted && card.attemptNumber ? `Attempt ${card.attemptNumber}` : "—")}
                   </span>
                   {/* score */}
                   <span className="text-right text-sm font-bold tabular-nums text-slate-700">
