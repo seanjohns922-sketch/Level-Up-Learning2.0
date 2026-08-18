@@ -802,6 +802,14 @@ function hasLiveTelemetry(card: LiveStudentCard) {
   );
 }
 
+const ACTIVE_NOW_WINDOW_MS = 120_000;
+
+function isCardActiveNow(card: LiveStudentCard, now = Date.now()) {
+  if (!card.lastActiveAt) return false;
+  const lastActiveAt = new Date(card.lastActiveAt).getTime();
+  return Number.isFinite(lastActiveAt) && now - lastActiveAt <= ACTIVE_NOW_WINDOW_MS;
+}
+
 function getDisplayStatusSubtext(card: LiveStudentCard, group: LiveCardDisplayGroup) {
   if (group === "waiting_to_start") return "Waiting To Start";
   if (card.currentLessonStatus === "completed" && card.lastActiveAt) {
@@ -818,9 +826,9 @@ function getDisplayStatusSubtext(card: LiveStudentCard, group: LiveCardDisplayGr
 
 function getCardDisplayGroup(card: LiveStudentCard): LiveCardDisplayGroup {
   const hasTelemetry = hasLiveTelemetry(card);
-  if (card.status === "needs_support") return "needs_support";
   if (!hasTelemetry) return "waiting_to_start";
-  if (card.status === "idle") return "idle";
+  if (!isCardActiveNow(card)) return "idle";
+  if (card.status === "needs_support") return "needs_support";
   if (card.status === "check_in" || card.status === "on_track") return "live";
   return "live";
 }
@@ -829,11 +837,12 @@ function getCardDisplayGroup(card: LiveStudentCard): LiveCardDisplayGroup {
 // grey idle — finer than the group by splitting the "live" group on card.status.
 function rowStatusMeta(card: LiveStudentCard, group: LiveCardDisplayGroup) {
   if (group === "needs_support") return { dot: "bg-rose-500", text: "text-rose-700", label: "Struggling" };
+  if (group === "live") return { dot: "bg-emerald-500", text: "text-emerald-700", label: "Active now" };
   if (card.currentLessonStatus === "completed") return { dot: "bg-slate-300", text: "text-slate-500", label: "Completed" };
   if (group === "idle") return { dot: "bg-slate-400", text: "text-slate-500", label: "Idle" };
   if (group === "waiting_to_start") return { dot: "bg-slate-300", text: "text-slate-400", label: "Not started" };
   if (card.status === "check_in") return { dot: "bg-amber-500", text: "text-amber-700", label: "Needs attention" };
-  return { dot: "bg-emerald-500", text: "text-emerald-700", label: "On track" };
+  return { dot: "bg-emerald-500", text: "text-emerald-700", label: "Active now" };
 }
 
 function statusFilterLabel(filter: LiveStatusFilter) {
@@ -1085,12 +1094,15 @@ export default function LiveClassPanel({
   }, [completedAttempts, dailyActivity, events, progressRows, rows, students]);
 
   const filteredCards = useMemo(() => {
-    let base = filter === "all" ? cards : cards.filter((card) => getCardDisplayGroup(card) === filter);
+    let base = filter === "all"
+      ? cards
+      : filter === "live"
+        ? cards.filter((card) => isCardActiveNow(card))
+        : cards.filter((card) => getCardDisplayGroup(card) === filter);
     if (activeOnly) {
       // Hide idle / not-yet-started students during a live rotation.
       base = base.filter((card) => {
-        const g = getCardDisplayGroup(card);
-        return g === "live" || g === "needs_support";
+        return isCardActiveNow(card);
       });
     }
     const sorted = [...base].sort((left, right) => {
@@ -1140,7 +1152,7 @@ export default function LiveClassPanel({
     );
   }, [cards]);
 
-  const activeStudentCount = cards.filter((card) => getCardDisplayGroup(card) === "live").length;
+  const activeStudentCount = cards.filter((card) => isCardActiveNow(card)).length;
   const activeTodayCount = dailyActivity.filter((activity) =>
     students.some((student) => student.id === activity.student_id)
   ).length;

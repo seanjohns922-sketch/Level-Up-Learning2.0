@@ -123,6 +123,7 @@
     "qa:teacher-week-tally": "node scripts/teacher-week-tally-audit.mjs",
     "qa:live-quiz-score": "node scripts/live-quiz-score-audit.mjs",
     "qa:live-class-assessments": "node scripts/live-class-assessment-visibility-audit.mjs",
+    "qa:live-class-presence": "node scripts/live-class-presence-audit.mjs",
     "qa:educator-canonical-score": "node --no-warnings --experimental-strip-types scripts/educator-canonical-score-audit.mjs",
     "qa:canonical-progression": "node scripts/canonical-progression-audit.mjs",
     "qa:teacher-progress-overrides": "node scripts/teacher-progress-override-audit.mjs",

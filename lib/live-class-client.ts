@@ -342,6 +342,31 @@ export async function trackLiveLearningEvent(input: LiveLearningEventInput) {
   }
 }
 
+export async function touchLiveStudentPresence() {
+  if (typeof window === "undefined") return false;
+  if (isDemoPreviewMode()) return false;
+
+  const { studentId, classId } = getActiveStudentIdentity();
+  if (!studentId || !classId) return false;
+
+  try {
+    const { data, error } = await supabase.rpc("touch_live_student_presence_secure", {
+      p_student_id: studentId,
+      p_class_id: classId,
+    });
+
+    if (error) {
+      console.warn("[LiveClass] Presence heartbeat failed", error);
+      return false;
+    }
+
+    return data === true;
+  } catch (error) {
+    console.warn("[LiveClass] Presence heartbeat failed", error);
+    return false;
+  }
+}
+
 export function scheduleIdleLiveEvent(base: Omit<LiveLearningEventInput, "eventType">) {
   if (typeof window === "undefined") return;
   if (idleTimer) clearTimeout(idleTimer);

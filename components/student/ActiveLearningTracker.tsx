@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { ensureStudentActivityDay, recordStudentActivityDelta } from "@/lib/student-activity";
 import { rememberActiveLearningDestination } from "@/lib/continue-learning";
-import { trackLiveLearningEvent } from "@/lib/live-class-client";
+import { touchLiveStudentPresence, trackLiveLearningEvent } from "@/lib/live-class-client";
 
 type ActiveLearningTrackerProps = {
   context: "lesson" | "session" | "pretest" | "posttest";
@@ -16,6 +16,7 @@ export function ActiveLearningTracker({ context }: ActiveLearningTrackerProps) {
   const lastTickRef = useRef<number | null>(null);
   const lastInteractionRef = useRef<number>(0);
   const pendingSecondsRef = useRef(0);
+  const presenceRequestInFlightRef = useRef(false);
 
   useEffect(() => {
     rememberActiveLearningDestination(context);
@@ -67,6 +68,13 @@ export function ActiveLearningTracker({ context }: ActiveLearningTrackerProps) {
       lastTickRef.current = now;
       if (!isCountingTime()) return;
 
+      if (!presenceRequestInFlightRef.current) {
+        presenceRequestInFlightRef.current = true;
+        void touchLiveStudentPresence().finally(() => {
+          presenceRequestInFlightRef.current = false;
+        });
+      }
+
       pendingSecondsRef.current += elapsedSeconds;
       if (pendingSecondsRef.current >= HEARTBEAT_MS / 1000) {
         flushPending();
@@ -82,6 +90,7 @@ export function ActiveLearningTracker({ context }: ActiveLearningTrackerProps) {
 
     markInteraction();
     lastTickRef.current = Date.now();
+    void touchLiveStudentPresence();
 
     window.addEventListener("pointerdown", markInteraction, { passive: true });
     window.addEventListener("keydown", markInteraction);
