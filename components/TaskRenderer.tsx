@@ -208,6 +208,12 @@ import StatisticaCollectCard from "@/components/statistica/StatisticaCollectCard
 import StatisticaSortCard from "@/components/statistica/StatisticaSortCard";
 import StatisticaTallyCard from "@/components/statistica/StatisticaTallyCard";
 import StatisticaGraphCard from "@/components/statistica/StatisticaGraphCard";
+import {
+  StatisticaGapCard,
+  StatisticaRankCard,
+  StatisticaTableCard,
+  StatisticaTapGraphCard,
+} from "@/components/statistica/StatisticaActiveCards";
 import StarpathCoordinateCard from "@/components/starpath/StarpathCoordinateCard";
 import StarpathTransformCard from "@/components/starpath/StarpathTransformCard";
 import StarpathLevel6AssessmentCard from "@/components/starpath/StarpathLevel6AssessmentCard";
@@ -730,6 +736,14 @@ function TaskRendererInner({
       return <StatisticaTallyCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaGraph":
       return <StatisticaGraphCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "statisticaRank":
+      return <StatisticaRankCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "statisticaGap":
+      return <StatisticaGapCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "statisticaTapGraph":
+      return <StatisticaTapGraphCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "statisticaTable":
+      return <StatisticaTableCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathCoordinate":
       return <StarpathCoordinateCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathTransform":

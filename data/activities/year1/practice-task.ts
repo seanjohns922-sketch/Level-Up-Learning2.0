@@ -2801,6 +2801,56 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica Level 1 — order categories by frequency by tapping the
+      // displayed categories into rank slots (AC9M1ST02).
+      kind: "statisticaRank";
+      prompt: string;
+      speakText: string;
+      target: number;
+      direction: "most-to-least" | "least-to-most";
+      categories: Array<{ id: string; label: string; color: string; count: number }>;
+      correctOrderIds: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Statistica Level 1 — compare two frequencies and actively count the
+      // unmatched part of the taller one-to-one display (AC9M1ST02).
+      kind: "statisticaGap";
+      prompt: string;
+      speakText: string;
+      target: number;
+      categories: Array<{ id: string; label: string; color: string; count: number }>;
+      largerCategoryId: string;
+      difference: number;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Statistica Level 1 — answer by tapping a category column in the graph,
+      // rather than selecting a detached text option (AC9M1ST02).
+      kind: "statisticaTapGraph";
+      prompt: string;
+      speakText: string;
+      target: number;
+      ask: "most" | "fewest";
+      display: "objects" | "pictures";
+      categories: Array<{ id: string; label: string; color: string; count: number }>;
+      correctCategoryId: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Statistica Level 1 — read a frequency table by selecting a row or
+      // entering the frequency shown in a named row (AC9M1ST01/ST02).
+      kind: "statisticaTable";
+      mode: "select" | "count";
+      prompt: string;
+      speakText: string;
+      target: number;
+      rows: Array<{ id: string; label: string; color: string; count: number }>;
+      correctRowId?: string;
+      answerCount?: number;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 6 · W3-4 — Four-quadrant Cartesian plane (AC9M6SP02). Signed ordered
       // pairs on an 8x8 grid (-4..4 each axis), origin centred. Plot/read points,
       // name quadrants, and reason about how coordinates change across the axes.
