@@ -155,24 +155,48 @@ export function StarpathObjectCard({
   if (task.mode === "classify") {
     const classifyTask = task;
     const remaining = classifyTask.scene.filter((obj) => !classified[obj.id]);
+    const isEditableAssessment = editableAssessmentMode && Boolean(onAssessmentAnswer);
+    const isComplete = Object.keys(classified).length === classifyTask.scene.length;
 
     function classify(groupId: string) {
       if (!selectedId) return;
-      if (classifyTask.assignments[selectedId] !== groupId) {
+      if (!isEditableAssessment && classifyTask.assignments[selectedId] !== groupId) {
         miss(groupId);
         return;
       }
       const next = { ...classified, [selectedId]: groupId };
       setClassified(next);
       setSelectedId(null);
-      if (Object.keys(next).length === classifyTask.scene.length) onCorrect();
+      if (!isEditableAssessment && Object.keys(next).length === classifyTask.scene.length) onCorrect();
+    }
+
+    function moveAgain(objectId: string) {
+      if (!isEditableAssessment) return;
+      setClassified((current) => {
+        const next = { ...current };
+        delete next[objectId];
+        return next;
+      });
+      setSelectedId(objectId);
+    }
+
+    function recordClassification() {
+      if (!isEditableAssessment || !isComplete || !onAssessmentAnswer) return;
+      const correct = classifyTask.scene.every(
+        (object) => classified[object.id] === classifyTask.assignments[object.id]
+      );
+      onAssessmentAnswer(correct, JSON.stringify(classified));
     }
 
     return (
       <div>
         <TaskHeading prompt={task.prompt} speech={task.speakText} />
-        <p className="mb-3 text-center text-sm font-bold text-slate-600">Choose an object, then choose its group.</p>
-        <div className="mx-auto mb-6 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-5">
+        <p className="mb-4 text-center text-sm font-bold text-slate-600">
+          {isEditableAssessment
+            ? "Choose an object, then choose its group. You can move objects before recording your answer."
+            : "Choose an object, then choose its group."}
+        </p>
+        <div className="mx-auto mb-7 grid max-w-6xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {remaining.map((obj) => (
             <div key={obj.id} className="relative">
               <button
@@ -190,29 +214,64 @@ export function StarpathObjectCard({
             </div>
           ))}
         </div>
-        <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-5 sm:grid-cols-2">
           {classifyTask.groups.map((group) => {
             const members = classifyTask.scene.filter((obj) => classified[obj.id] === group.id);
             return (
-              <div key={group.id} className={wrongId === group.id ? "sp-obj-shake" : ""}>
+              <div
+                key={group.id}
+                className={[
+                  "relative overflow-hidden rounded-2xl border-2 border-cyan-300 bg-cyan-50/70 shadow-sm",
+                  wrongId === group.id ? "sp-obj-shake" : "",
+                  selectedId ? "ring-2 ring-cyan-100" : "",
+                ].join(" ")}
+              >
                 <button
                   type="button"
                   disabled={!selectedId}
                   onClick={() => classify(group.id)}
-                  className="min-h-20 w-full rounded-2xl border-2 border-cyan-300 bg-cyan-50 px-12 py-3 text-base font-black text-indigo-950 shadow-sm transition enabled:hover:border-violet-500 disabled:opacity-55"
+                  className="flex min-h-32 w-full items-center justify-center px-14 py-5 text-center text-lg font-black text-indigo-950 transition enabled:bg-cyan-100 enabled:hover:bg-cyan-200 disabled:cursor-default"
                 >
-                  {group.label}
+                  <span>
+                    {group.label}
+                    <span className="mt-2 block text-xs font-bold text-slate-500">
+                      {selectedId ? "Place selected object here" : members.length ? `${members.length} placed` : "Select an object above"}
+                    </span>
+                  </span>
                 </button>
-                <OptionReadAloudButton text={group.speakText} className="relative -mt-14 ml-auto mr-3 block" />
-                <div className="mt-3 flex min-h-16 flex-wrap justify-center gap-2 rounded-xl border border-dashed border-cyan-300 bg-white/70 p-2">
+                <OptionReadAloudButton text={group.speakText} className="absolute right-3 top-3" />
+                <div className="flex min-h-28 flex-wrap items-center justify-center gap-3 border-t-2 border-dashed border-cyan-300 bg-white/80 p-3">
                   {members.map((obj) => (
-                    <ObjectArt key={obj.id} svg={obj.svg} className="block h-14 w-14 [&>svg]:h-full [&>svg]:w-full" />
+                    <button
+                      key={obj.id}
+                      type="button"
+                      onClick={() => moveAgain(obj.id)}
+                      disabled={!isEditableAssessment}
+                      aria-label={isEditableAssessment ? `Move ${obj.spaceName ?? obj.label} to another group` : obj.spaceName ?? obj.label}
+                      className="flex min-h-24 w-24 flex-col items-center justify-center gap-1 rounded-xl border border-violet-200 bg-white p-2 text-center shadow-sm transition enabled:hover:border-violet-500 enabled:hover:shadow-md"
+                    >
+                      <ObjectArt svg={obj.svg} className="block h-14 w-14 [&>svg]:h-full [&>svg]:w-full" />
+                      <span className="text-[10px] font-bold leading-tight text-slate-600">{obj.spaceName ?? obj.label}</span>
+                    </button>
                   ))}
+                  {members.length === 0 ? <span className="text-sm font-bold text-slate-400">Objects placed here will appear in this box.</span> : null}
                 </div>
               </div>
             );
           })}
         </div>
+        {isEditableAssessment ? (
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              disabled={!isComplete}
+              onClick={recordClassification}
+              className="min-h-14 rounded-2xl bg-violet-700 px-8 py-3 text-base font-black text-white shadow-lg transition enabled:hover:bg-violet-600 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300"
+            >
+              {isComplete ? "Record answer" : `Place all ${classifyTask.scene.length} objects`}
+            </button>
+          </div>
+        ) : null}
         {OBJ_STYLE}
       </div>
     );

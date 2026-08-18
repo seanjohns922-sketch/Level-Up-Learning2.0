@@ -34,6 +34,7 @@ export function MeasurelandsAssessmentTask({
   };
 
   const hasRecordedAnswer = Boolean(value);
+  const usesEditableStarpathClassification = task.kind === "starpathObject" && task.mode === "classify";
 
   const changeAnswer = () => {
     recordedRef.current = false;
@@ -49,11 +50,15 @@ export function MeasurelandsAssessmentTask({
           task={task}
           taskNonce={taskNonce}
           assessmentMode
+          editableAssessmentMode={usesEditableStarpathClassification}
+          assessmentAnswer={value}
           callbacks={{
             markCorrect: () => record(correctToken),
             markCorrectSoft: () => record(correctToken),
             markWrong: () => record(`${WRONG_PREFIX}:${questionId}`),
             markAttempted: () => undefined,
+            recordAssessmentAnswer: (correct) =>
+              record(correct ? correctToken : `${WRONG_PREFIX}:${questionId}`),
           }}
         />
       </div>
