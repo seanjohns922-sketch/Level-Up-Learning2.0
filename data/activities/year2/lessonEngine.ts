@@ -5851,8 +5851,10 @@ function placeCountLabel(place: PlaceValueName, count: number | null) {
 }
 
 function relevantPlaceValues(places: PlaceValueName[], value: number) {
-  const nonZeroPlaces = places.filter((place) => digitForPlace(value, place) > 0);
-  return nonZeroPlaces.length > 0 ? nonZeroPlaces : [places[places.length - 1] ?? "ones"];
+  const highestUsedIndex = places.findIndex((place) => digitForPlace(value, place) > 0);
+  return highestUsedIndex >= 0
+    ? places.slice(highestUsedIndex)
+    : [places[places.length - 1] ?? "ones"];
 }
 
 function mabPlaceSummary(
@@ -6020,14 +6022,15 @@ function supportedPlaces(config: GenericConfig) {
   );
   if (candidates && candidates.length > 0) return candidates;
 
-  // Infer sensible place values from the minimum of the number range so that
-  // MAB visuals and generated answers are consistent (e.g. min:1000 needs
+  // Infer sensible place values from the configured number range so that
+  // MAB visuals and generated answers are consistent (e.g. a range reaching 1000 needs
   // "thousands" in the visual, otherwise the displayed blocks only show
   // hundreds/tens/ones but the answer is the full 4-digit target number).
   const min = typeof config.min === "number" ? config.min : 0;
-  if (min >= 100000) return ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"] as PlaceValueName[];
-  if (min >= 10000) return ["ten_thousands", "thousands", "hundreds", "tens", "ones"] as PlaceValueName[];
-  if (min >= 1000) return ["thousands", "hundreds", "tens", "ones"] as PlaceValueName[];
+  const max = typeof config.max === "number" ? config.max : min;
+  if (Math.max(min, max) >= 100000) return ["hundred_thousands", "ten_thousands", "thousands", "hundreds", "tens", "ones"] as PlaceValueName[];
+  if (Math.max(min, max) >= 10000) return ["ten_thousands", "thousands", "hundreds", "tens", "ones"] as PlaceValueName[];
+  if (Math.max(min, max) >= 1000) return ["thousands", "hundreds", "tens", "ones"] as PlaceValueName[];
   return ["hundreds", "tens", "ones"] as PlaceValueName[];
 }
 
@@ -25876,20 +25879,29 @@ function generateGenericQuestion(
         },
         place
       );
+      const missingPartVisual: MABVisualData = {
+        ...mabVisual,
+        hundredThousands: place === "hundred_thousands" ? null : hundredThousands,
+        tenThousands: place === "ten_thousands" ? null : tenThousands,
+        thousands: place === "thousands" ? null : thousands,
+        hundreds: place === "hundreds" ? null : hundreds,
+        tens: place === "tens" ? null : tens,
+        ones: place === "ones" ? null : ones,
+      };
       return asMultipleChoice
         ? {
             kind: "multiple_choice",
             prompt: `The number is ${target}. The MAB shows ${visibleSummary}. What is the missing value?`,
             options: uniqueNumberOptions(hiddenValue, Math.max(4, hiddenValue || 4)),
             answer: String(hiddenValue),
-            visual: mabVisual,
+            visual: missingPartVisual,
           }
         : {
             kind: "typed_response",
             prompt: `The number is ${target}. The MAB shows ${visibleSummary}. What is the missing value?`,
             answer: String(hiddenValue),
             placeholder: "Type the missing value",
-            visual: mabVisual,
+            visual: missingPartVisual,
           };
     }
 

@@ -43,8 +43,8 @@ const year4Rows: ProgramRow[] = [
   ]),
   row(2, 2, "Decimal Reasoning", "Ordering Decimals", "Order decimals to hundredths", "Arrange decimal values and explain their order.", ["AC9M4N01"], [
     activity("number_order", "decimal_order", { min: 0.1, max: 9.99, count: 5, ascending: true, step: 0.01 }),
-    activity("multiple_choice", "decimal_order"),
-    activity("typed_response", "decimal_order"),
+    activity("multiple_choice", "decimal_order", { sourceActivityType: "number_order", min: 0.1, max: 9.99, count: 5, ascending: true, step: 0.01 }),
+    activity("typed_response", "decimal_order", { sourceActivityType: "number_order", min: 0.1, max: 9.99, count: 5, ascending: true, step: 0.01 }),
   ]),
   row(2, 3, "Decimal Reasoning", "Decimals on Number Lines", "Locate tenths and hundredths on number lines", "Use equal intervals to place decimal values.", ["AC9M4N01"], [
     activity("number_line", "placement", { min: 0, max: 1, step: 0.1 }),

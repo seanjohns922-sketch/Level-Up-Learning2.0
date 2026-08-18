@@ -56,7 +56,7 @@ export const year2NumberRows: ProgramRow[] = [
       makeActivity("place_value_builder", 2, {
         min: 100,
         max: 1000,
-        placeValues: ["hundreds", "tens", "ones"],
+        placeValues: ["thousands", "hundreds", "tens", "ones"],
         visualMode: "mab",
         mode: "identify_number",
       }),
@@ -89,7 +89,7 @@ export const year2NumberRows: ProgramRow[] = [
       makeActivity("place_value_builder", 2, {
         min: 100,
         max: 1000,
-        placeValues: ["hundreds", "tens", "ones"],
+        placeValues: ["thousands", "hundreds", "tens", "ones"],
         visualMode: "mab",
         hideOnePlaceValue: true,
         mode: "missing_mab_part",

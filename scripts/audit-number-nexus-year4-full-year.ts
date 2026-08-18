@@ -47,6 +47,10 @@ for (const week of YEAR4_PROGRAM) {
         assert((question.prompt.match(/\?/g) ?? []).length <= 1, `${lesson.id} generated more than one question in a prompt.`);
         assert(question.prompt.trim().split(/\s+/).length <= 32, `${lesson.id} generated an overly long prompt.`);
         assert(!/about -/.test(question.prompt), `${lesson.id} generated a negative estimate.`);
+        if (week.week === 2 && lesson.lesson === 2) {
+          assert(!("visual" in question) || question.visual?.type !== "mab", `${lesson.id} generated an unrelated MAB model for decimal ordering.`);
+          assert(/decimal/i.test(question.prompt), `${lesson.id} did not ask a decimal-ordering question.`);
+        }
         if ("mode" in question && typeof question.mode === "string") generatedModes.add(question.mode);
         if (week.week === 11 && question.kind === "skip_count") {
           assert(question.algorithmSteps?.length === 3, `${lesson.id} did not generate a complete algorithm.`);

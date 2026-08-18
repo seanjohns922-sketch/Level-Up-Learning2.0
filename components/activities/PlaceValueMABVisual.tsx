@@ -30,11 +30,6 @@ function placeCount(questionData: MABVisualData, place: PlaceValueName) {
   return questionData.ones;
 }
 
-function shouldShowPlace(questionData: MABVisualData, place: PlaceValueName) {
-  const count = placeCount(questionData, place);
-  return count === null || count > 0;
-}
-
 function MABChipVisual({
   place,
   count,
@@ -122,7 +117,7 @@ export default function PlaceValueMABVisual({
   questionData: MABVisualData;
   title?: string;
 }) {
-  const visiblePlaces = questionData.placeValues.filter((place) => shouldShowPlace(questionData, place));
+  const visiblePlaces = questionData.placeValues;
 
   return (
     <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">

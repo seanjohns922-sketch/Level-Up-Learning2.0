@@ -38,6 +38,7 @@
     "qa:number-nexus-year1-bank": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-year1-independent-banks.ts",
     "qa:number-nexus-year2-curriculum": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-year2-curriculum.ts",
     "qa:number-nexus-year2-full-year": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-year2-full-year.ts",
+    "qa:number-nexus-mab": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-mab-integrity.ts",
     "qa:number-nexus-year2-quizzes": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-year2-weekly-quizzes.ts",
     "qa:number-nexus-year2-bank": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-year2-independent-banks.ts",
     "qa:number-nexus-year3-full-year": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-number-nexus-year3-full-year.ts",
