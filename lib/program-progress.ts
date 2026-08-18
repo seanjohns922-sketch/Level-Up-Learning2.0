@@ -16,6 +16,9 @@ export type WeekProgress = {
   lessonsCompleted: boolean[];   // [L1, L2, L3]
   quizCompleted: boolean;
   quizScore?: number;
+  quizBestScore?: number;
+  quizBestCorrect?: number;
+  quizTotal?: number;
 };
 
 export type ProgramProgressStore = Record<string, WeekProgress>;
@@ -107,7 +110,7 @@ export function getWeekProgress(
 }
 
 export function isWeekComplete(p: WeekProgress): boolean {
-  return weeklyQuizPassed(p.quizScore ?? 0);
+  return weeklyQuizPassed(p.quizBestScore ?? p.quizScore ?? 0);
 }
 
 export function normalizeWeekList(weeks: number[] | undefined | null, realmId?: string | null): number[] {
@@ -273,11 +276,27 @@ export function markLessonComplete(year: string, week: number, lessonNumber: num
 /**
  * Record a quiz score and mark quiz as complete.
  */
-export function markQuizComplete(year: string, week: number, score: number, realmId: string = "number") {
+export function markQuizComplete(
+  year: string,
+  week: number,
+  score: number,
+  realmId: string = "number",
+  correct?: number,
+  total?: number,
+) {
   const store = readProgramStore();
   const key = makeProgramProgressKey(year, week, realmId);
   const current = getWeekProgress(store, year, week, realmId);
-  store[key] = { ...current, quizCompleted: true, quizScore: score };
+  const previousBest = current.quizBestScore ?? current.quizScore ?? 0;
+  const isNewBest = score >= previousBest;
+  store[key] = {
+    ...current,
+    quizCompleted: true,
+    quizScore: score,
+    quizBestScore: Math.max(previousBest, score),
+    quizBestCorrect: isNewBest && Number.isFinite(correct) ? correct : current.quizBestCorrect,
+    quizTotal: isNewBest && Number.isFinite(total) ? total : current.quizTotal,
+  };
   writeProgramStore(store);
   return store;
 }

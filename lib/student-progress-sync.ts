@@ -154,6 +154,26 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[], realmId: Studen
       const score = Number(quiz.score);
       if (Number.isFinite(percent)) wp.quizScore = percent;
       else if (Number.isFinite(score)) wp.quizScore = score;
+
+      const attempts = Array.isArray(quiz.attempts)
+        ? quiz.attempts.map(parseRecord)
+        : [];
+      const candidates = [quiz, ...attempts]
+        .map((attempt) => ({
+          percent: Number(attempt.percent ?? attempt.accuracy ?? attempt.accuracy_percent),
+          correct: Number(attempt.score ?? attempt.correct ?? attempt.correctCount),
+          total: Number(attempt.total ?? attempt.totalQuestions),
+        }))
+        .filter((attempt) => Number.isFinite(attempt.percent));
+      const best = candidates.reduce<(typeof candidates)[number] | null>(
+        (currentBest, attempt) => !currentBest || attempt.percent > currentBest.percent ? attempt : currentBest,
+        null,
+      );
+      if (best) {
+        wp.quizBestScore = best.percent;
+        if (Number.isFinite(best.correct)) wp.quizBestCorrect = best.correct;
+        if (Number.isFinite(best.total)) wp.quizTotal = best.total;
+      }
     });
 
     if (Number.isInteger(row.week) && row.week! >= 1 && row.week! <= 12) {

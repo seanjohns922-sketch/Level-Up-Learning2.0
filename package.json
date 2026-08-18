@@ -68,6 +68,7 @@
     "qa:starpath-curriculum": "node scripts/audit-starpath-curriculum.mjs",
     "qa:starpath-assessment-blueprint": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-assessment-blueprint.ts",
     "qa:starpath-assessment-classification": "node scripts/starpath-assessment-classification-audit.mjs",
+    "qa:weekly-quiz-retry-state": "node scripts/weekly-quiz-retry-state-audit.mjs",
     "qa:starpath-ground-bank": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-ground-independent-bank.ts",
     "qa:starpath-ground-quizzes": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-ground-weekly-quizzes.ts",
     "qa:starpath-level1-quizzes": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-level1-weekly-quizzes.ts",

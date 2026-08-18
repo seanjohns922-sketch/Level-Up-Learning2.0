@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Check, Lock, LockOpen } from "lucide-react";
+import { Check, Lock, LockOpen, RotateCcw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
@@ -42,6 +42,7 @@ import {
 } from "@/lib/realms/realm-journey";
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { weeklyQuizMinimumCorrect, weeklyQuizPassed } from "@/lib/assessment-rules";
 
 const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
 const PATHWAY_JOURNAL_KEY_PREFIX = "lul:pathway-journal";
@@ -515,6 +516,13 @@ function ProgramPage() {
   }, [hasAssignedWeekAccess, lastWeek, realmId, store, unrestrictedMode, year]);
 
   const progress = getWeekProgress(store, year, week, realmId);
+  const previousQuizBestPercent = prevProgress.quizBestScore ?? prevProgress.quizScore ?? 0;
+  const previousQuizTotal = prevProgress.quizTotal ?? 15;
+  const previousQuizBestCorrect = prevProgress.quizBestCorrect
+    ?? Math.round((previousQuizBestPercent / 100) * previousQuizTotal);
+  const previousQuizNeedsRetry = weekNum > 1
+    && prevProgress.quizCompleted
+    && !weeklyQuizPassed(previousQuizBestPercent);
   const pathwayChipBase = isMeasurementRealm
     ? "border border-yellow-900/30 bg-[#2a1a06]/85 text-yellow-100"
     : "border border-teal-300/25 bg-black/35 text-teal-50";
@@ -1298,11 +1306,17 @@ function ProgramPage() {
             {items.map((item, idx) => {
               const isLesson = item.type === "lesson";
               const isPostTest = item.type === "posttest";
+              const quizBestPercent = progress.quizBestScore ?? progress.quizScore ?? 0;
+              const quizTotal = progress.quizTotal ?? 15;
+              const quizBestCorrect = progress.quizBestCorrect
+                ?? Math.round((quizBestPercent / 100) * quizTotal);
+              const quizPassed = item.type === "quiz" && weeklyQuizPassed(quizBestPercent);
+              const needsRetry = item.type === "quiz" && progress.quizCompleted && !quizPassed;
               const completed = isLesson
                 ? progress.lessonsCompleted[item.n - 1]
                 : isPostTest
                   ? false
-                  : progress.quizCompleted;
+                  : quizPassed;
 
               let locked = false;
               if (!unrestrictedMode) {
@@ -1333,6 +1347,8 @@ function ProgramPage() {
                       borderRadius: isStarpathRealm ? 12 : rt.rounded ? 28 : undefined,
                       background: locked
                         ? rt.bezelLockedBg
+                        : needsRetry
+                          ? "linear-gradient(145deg, rgba(251,191,36,0.82), rgba(180,83,9,0.72))"
                         : postTestReady
                           ? rt.bezelPosttestBg
                           : isActive
@@ -1361,11 +1377,15 @@ function ProgramPage() {
                       clipPath: rt.cardClip,
                       background: locked
                         ? rt.cardLockedBg
+                        : needsRetry
+                          ? "linear-gradient(145deg, rgba(69,36,5,0.98), rgba(120,53,15,0.96) 58%, rgba(92,45,8,0.98))"
                         : completed
                           ? rt.cardCompletedBg
                           : rt.cardActiveBg,
                       boxShadow: completed
                         ? rt.cardCompletedShadow
+                        : needsRetry
+                          ? "0 12px 30px rgba(38,18,2,0.58), 0 0 20px rgba(245,158,11,0.3), inset 0 1px 0 rgba(254,243,199,0.2)"
                         : isActive
                           ? rt.cardActiveShadow
                           : rt.cardLockedShadow,
@@ -1420,6 +1440,8 @@ function ProgramPage() {
                           borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
                           background: locked
                             ? rt.badgeLockedBg
+                            : needsRetry
+                              ? "linear-gradient(135deg, #92400e, #d97706)"
                             : postTestReady
                               ? rt.badgePosttestBg
                               : completed
@@ -1446,6 +1468,18 @@ function ProgramPage() {
                         >
                           <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5" /></svg>
                           DONE
+                        </span>
+                      ) : needsRetry ? (
+                        <span
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-amber-50"
+                          style={{
+                            clipPath: rt.statusClip,
+                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
+                            background: "linear-gradient(135deg, #b45309, #f59e0b)",
+                            boxShadow: "0 0 12px rgba(245,158,11,0.4)",
+                          }}
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" /> TRY AGAIN
                         </span>
                       ) : locked ? (
                         <span
@@ -1486,7 +1520,9 @@ function ProgramPage() {
                         />
                       </div>
                       <div className="mt-1.5 text-xs text-white/60 leading-snug line-clamp-2">
-                        {!weekUnlocked
+                        {needsRetry
+                          ? `Best score: ${quizBestCorrect}/${quizTotal}. You need ${weeklyQuizMinimumCorrect(quizTotal)}/${quizTotal} to unlock Week ${Math.min(lastWeek, weekNum + 1)}.`
+                          : !weekUnlocked
                           ? hasPersonalizedPlan
                             ? "Complete your current lesson to unlock this"
                             : "Complete previous weeks to unlock"
@@ -1515,13 +1551,15 @@ function ProgramPage() {
                             borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
                             background: postTestReady
                               ? rt.actionPosttestBg
+                              : needsRetry
+                                ? "linear-gradient(135deg, #b45309, #f59e0b 58%, #fbbf24)"
                               : completed
                                 ? rt.actionCompletedBg
                                 : rt.actionActiveBg,
                             boxShadow: locked ? undefined : rt.actionShadow,
                           }}
                         >
-                          {completed ? "REPLAY" : isStarpathRealm ? item.type === "quiz" ? "START QUIZ" : "START MISSION" : "START"}
+                          {needsRetry ? "TRY AGAIN" : completed ? "REPLAY" : isStarpathRealm ? item.type === "quiz" ? "START QUIZ" : "START MISSION" : "START"}
                         </span>
                       )}
                     </div>
@@ -1556,20 +1594,22 @@ function ProgramPage() {
                   <path d="M8 11V8a4 4 0 018 0v3" />
                 </svg>
               </div>
-              <h2 className="mt-4 text-2xl font-black text-white">Week {weekNum} Preview</h2>
+              <h2 className="mt-4 text-2xl font-black text-white">Week {weekNum} is locked</h2>
               <p className={`mt-2 text-sm font-semibold ${isMeasurementRealm ? "text-amber-50/80" : "text-teal-100/75"}`}>
-                Complete previous weeks to unlock
+                {previousQuizNeedsRetry
+                  ? `Pass the Week ${weekNum - 1} quiz with ${weeklyQuizMinimumCorrect(previousQuizTotal)}/${previousQuizTotal}. Your best is ${previousQuizBestCorrect}/${previousQuizTotal}.`
+                  : "Complete previous weeks to unlock"}
               </p>
               <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                 <button
-                  onClick={() => goToWeek(lastAllowedWeek)}
+                  onClick={() => goToWeek(previousQuizNeedsRetry ? weekNum - 1 : lastAllowedWeek)}
                   className={`rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 ${isMeasurementRealm ? "" : "bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-emerald-950/30"}`}
                   style={isMeasurementRealm ? {
                     background: "linear-gradient(135deg, #7c5a20 0%, #b8893a 55%, #d6b86c 100%)",
                     boxShadow: "0 10px 24px rgba(80,45,8,0.32)",
                   } : undefined}
                 >
-                  Go to Week {lastAllowedWeek}
+                  {previousQuizNeedsRetry ? `Return to Week ${weekNum - 1}` : `Go to Week ${lastAllowedWeek}`}
                 </button>
                 <button
                   onClick={() => router.push(realmHomeRoute)}

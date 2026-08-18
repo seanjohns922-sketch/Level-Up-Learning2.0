@@ -16,7 +16,7 @@ import {
 import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/RealmWeeklyQuizChrome";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskRenderer } from "@/components/TaskRenderer";
-import { weeklyQuizPassed, ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
+import { weeklyQuizMinimumCorrect, weeklyQuizPassed, ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
 import { saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
@@ -100,6 +100,7 @@ export default function StarpathVoyageQuiz({
   const total = orderedTasks.length;
   const percent = total > 0 ? Math.round((finalScore / total) * 100) : 0;
   const passed = weeklyQuizPassed(percent);
+  const requiredCorrect = weeklyQuizMinimumCorrect(total);
   const lessonScores = [0, 1, 2].map((lessonIndex) => {
     const start = lessonIndex * 5;
     const score = Array.from({ length: 5 }, (_, offset) => answers[String(start + offset)])
@@ -451,7 +452,7 @@ export default function StarpathVoyageQuiz({
               <div
                 className={[
                   "mx-auto mt-4 flex h-24 w-24 items-center justify-center rounded-full text-white shadow-lg",
-                  passed ? "bg-gradient-to-br from-violet-600 to-cyan-500" : "bg-gradient-to-br from-slate-500 to-slate-700",
+                  passed ? "bg-gradient-to-br from-violet-600 to-cyan-500" : "bg-gradient-to-br from-amber-500 to-amber-700",
                 ].join(" ")}
               >
                 <span className="text-3xl font-black">{percent}%</span>
@@ -463,8 +464,13 @@ export default function StarpathVoyageQuiz({
                 You answered {finalScore}/{total} correctly.
                 {passed
                   ? ` You passed the ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent}% mark and earned ${QUIZ_XP} XP.`
-                  : ` You need ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent}% to pass.`}
+                  : ` You need ${requiredCorrect}/${total} to pass and unlock Week ${quiz.week + 1}.`}
               </p>
+              {!passed ? (
+                <div className="mt-4 rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-3 font-bold text-amber-950">
+                  Week {quiz.week + 1} is not unlocked yet. Review a mission below, then try the quiz again.
+                </div>
+              ) : null}
               <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">
                 {lessonScores.map((result) => (
                   <div

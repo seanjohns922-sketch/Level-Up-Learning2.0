@@ -9007,7 +9007,7 @@ function SessionPage({
         studentId, year, Number(week), attempt, completionId, quizRealmId
       );
       if (previewMode) {
-        persistProgramQuizComplete(year, Number(week), percent, quizRealmId);
+        persistProgramQuizComplete(year, Number(week), percent, quizRealmId, score, total);
       } else {
         await restoreStudentStateFromServer(studentId, quizRealmId);
       }
@@ -10383,6 +10383,15 @@ function SessionPage({
                   >
                     Back to Week
                   </button>
+                  {finalScore < Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
+                    <button
+                      type="button"
+                      onClick={() => window.location.reload()}
+                      className="rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 px-5 py-3 font-bold text-white shadow-lg transition hover:brightness-110"
+                    >
+                      Try Quiz Again
+                    </button>
+                  ) : null}
                   {quizMistakeReviewItems.length > 0 ? (
                     <button
                       type="button"
@@ -10616,9 +10625,17 @@ function SessionPage({
                   }}
                 >
                   <div className="text-sm font-semibold text-amber-50">
-                    {weakestLessonBreakdown
-                      ? `You’re close. Practise Lesson ${weakestLessonBreakdown.lessonNumber}${weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""} next. You scored ${weakestLessonBreakdown.correct}/${weakestLessonBreakdown.total} there.`
-                      : "You’re close! Let’s try the lessons again to build confidence."}
+                    <div className="font-black text-amber-100">
+                      {isFinalQuizWeek ? "The Post-Test is not unlocked yet." : `Week ${Number(week) + 1} is not unlocked yet.`}
+                    </div>
+                    <div className="mt-1">
+                      You scored {finalScore}/{quizQuestions.length}. You need {Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100))}/{quizQuestions.length} to pass this quiz.
+                    </div>
+                    {weakestLessonBreakdown ? (
+                      <div className="mt-1 text-amber-50/85">
+                        Review Lesson {weakestLessonBreakdown.lessonNumber}{weakestLessonBreakdown.lessonTitle ? `: ${weakestLessonBreakdown.lessonTitle}` : ""}, then try again.
+                      </div>
+                    ) : null}
                   </div>
                   <button
                     onClick={() => {

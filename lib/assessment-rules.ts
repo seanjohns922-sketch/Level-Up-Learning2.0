@@ -27,6 +27,11 @@ export function weeklyQuizPassed(percent: number) {
   return percent >= ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent;
 }
 
+export function weeklyQuizMinimumCorrect(totalQuestions: number) {
+  if (!Number.isFinite(totalQuestions) || totalQuestions <= 0) return 0;
+  return Math.ceil(totalQuestions * (ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent / 100));
+}
+
 export function posttestPassed(percent: number) {
   return percent >= ASSESSMENT_THRESHOLDS.posttestPassPercent;
 }
