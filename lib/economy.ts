@@ -276,7 +276,9 @@ export async function saveAvatarBase(studentId: string, base: AvatarOutfit) {
     p_base: base,
   });
   if (error) throw error;
-  return normalizeEconomyState(data);
+  // Keep the submitted base authoritative for this save. This also prevents a
+  // malformed economy response from visually reverting a successful choice.
+  return { ...normalizeEconomyState(data), avatarBase: base };
 }
 
 export function economyErrorMessage(error: unknown) {

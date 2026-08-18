@@ -74,6 +74,29 @@ requirePattern(
   /if \(cancelled \|\| stateRef\.current\) return;/,
   "a delayed initial economy response must not overwrite an avatar selection",
 );
+requirePattern(
+  "lib/economy.ts",
+  /normalizeEconomyState\(data\), avatarBase: base/,
+  "avatar saves must retain the submitted base when rebuilding client state",
+);
+
+const migrationsDirectory = path.join(root, "supabase/migrations");
+const economyFunctionMigrations = fs.readdirSync(migrationsDirectory)
+  .filter((name) => name.endsWith(".sql"))
+  .sort()
+  .filter((name) => /create or replace function public\.get_student_economy_secure/.test(
+    fs.readFileSync(path.join(migrationsDirectory, name), "utf8"),
+  ));
+const latestEconomyFunctionMigration = economyFunctionMigrations.at(-1);
+if (!latestEconomyFunctionMigration) {
+  findings.push("supabase/migrations: canonical economy function is missing");
+} else {
+  requirePattern(
+    `supabase/migrations/${latestEconomyFunctionMigration}`,
+    /'avatar_base',[\s\S]+student_avatar_base/,
+    "latest canonical economy function must return the saved avatar base",
+  );
+}
 
 const allowedDirectRenderers = new Set([
   "components/avatar/CanonicalStudentAvatar.tsx",
