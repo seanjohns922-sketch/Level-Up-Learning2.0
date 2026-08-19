@@ -110,7 +110,7 @@ export const REALM_REGISTRY = {
     lessonsPerWeek: 3,
     hasWeeklyQuiz: true,
     levelLabels: SCHOOL_LEVEL_LABELS,
-    legendCount: 7,
+    legendCount: 6,
     legendCollectionName: "Data Guardians",
     iconKey: "BarChart3",
     themeKey: "statistica",

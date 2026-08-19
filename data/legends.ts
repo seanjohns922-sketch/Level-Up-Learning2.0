@@ -1,5 +1,5 @@
-export type LegendRealmId = "number-nexus" | "measurelands" | "starpath";
-export type LegendStrand = "Number" | "Measurement" | "Space";
+export type LegendRealmId = "number-nexus" | "measurelands" | "starpath" | "statistica";
+export type LegendStrand = "Number" | "Measurement" | "Space" | "Statistics";
 
 export type LegendStats = {
   calculation: number;
@@ -44,6 +44,11 @@ const DEFAULT_IMAGES: Record<LegendRealmId, LegendImages> = {
     avatar: "/cards/geospin-shapeshifter-y4-front.png",
     cardFront: "/cards/geospin-shapeshifter-y4-front.png",
     cardBack: "/cards/geospin-shapeshifter-y4-back.png",
+  },
+  statistica: {
+    avatar: "/cards/datara-analyst-y4-front.png",
+    cardFront: "/cards/datara-analyst-y4-front.png",
+    cardBack: "/cards/datara-analyst-y4-back.png",
   },
 };
 
@@ -138,6 +143,33 @@ function starpathLegend(
     },
     unlockVideoUrl: legendVideoUrl(videoSlug),
     showcaseVideoUrl: legendVideoUrl(videoSlug),
+  };
+}
+
+function statisticaLegend(
+  id: string,
+  yearLabel: string,
+  name: string,
+  description: string,
+  stars: number,
+  stats: LegendStats,
+  front: string,
+  back: string,
+): Legend {
+  return {
+    id,
+    realmId: "statistica",
+    yearLabel,
+    strand: "Statistics",
+    name,
+    description,
+    stars,
+    stats,
+    images: {
+      avatar: front,
+      cardFront: front,
+      cardBack: back,
+    },
   };
 }
 
@@ -373,11 +405,72 @@ const LEGENDS: Legend[] = [
     "/cards/geospin-starweaver-y6-back.png",
     "geospin-starweaver",
   ),
+  statisticaLegend(
+    "datara-picker-y1",
+    "Year 1",
+    "Datara Picker",
+    "Collects facts, observations, and details that begin every great discovery.",
+    1,
+    { calculation: 42, speed: 40, accuracy: 48 },
+    "/cards/datara-picker-y1-front.png",
+    "/cards/datara-picker-y1-back.png",
+  ),
+  statisticaLegend(
+    "datara-sorter-y2",
+    "Year 2",
+    "Datara Sorter",
+    "Sorts and organises information so useful patterns can emerge.",
+    2,
+    { calculation: 50, speed: 48, accuracy: 56 },
+    "/cards/datara-sorter-y2-front.png",
+    "/cards/datara-sorter-y2-back.png",
+  ),
+  statisticaLegend(
+    "datara-grapher-y3",
+    "Year 3",
+    "Datara Grapher",
+    "Turns collected information into clear displays that reveal a story.",
+    3,
+    { calculation: 58, speed: 55, accuracy: 62 },
+    "/cards/datara-grapher-y3-front.png",
+    "/cards/datara-grapher-y3-back.png",
+  ),
+  statisticaLegend(
+    "datara-analyst-y4",
+    "Year 4",
+    "Datara Analyst",
+    "Compares data displays and uses evidence to explain meaningful findings.",
+    4,
+    { calculation: 66, speed: 62, accuracy: 69 },
+    "/cards/datara-analyst-y4-front.png",
+    "/cards/datara-analyst-y4-back.png",
+  ),
+  statisticaLegend(
+    "datara-decoder-y5",
+    "Year 5",
+    "Datara Decoder",
+    "Decodes complex datasets and identifies the patterns hidden within them.",
+    5,
+    { calculation: 76, speed: 70, accuracy: 78 },
+    "/cards/datara-decoder-y5-front.png",
+    "/cards/datara-decoder-y5-back.png",
+  ),
+  statisticaLegend(
+    "datara-insightkeeper-y6",
+    "Year 6",
+    "Datara Insightkeeper",
+    "Evaluates data with expert judgement and protects the insights it reveals.",
+    6,
+    { calculation: 85, speed: 79, accuracy: 87 },
+    "/cards/datara-insightkeeper-y6-front.png",
+    "/cards/datara-insightkeeper-y6-back.png",
+  ),
 ];
 
 export function normalizeLegendRealmId(realmId?: string | null): LegendRealmId {
   if (realmId === "measurelands" || realmId === "measurement") return "measurelands";
   if (realmId === "starpath" || realmId === "starpath-realm" || realmId === "space") return "starpath";
+  if (realmId === "statistica" || realmId === "statistics") return "statistica";
   return "number-nexus";
 }
 
@@ -398,7 +491,14 @@ export function getLegendForYear(
       id: `unknown-legend-${realmId}-${yearLabel.toLowerCase().replace(/\s+/g, "-")}`,
       realmId,
       yearLabel,
-      strand: realmId === "measurelands" ? "Measurement" : realmId === "starpath" ? "Space" : "Number",
+      strand:
+        realmId === "measurelands"
+          ? "Measurement"
+          : realmId === "starpath"
+            ? "Space"
+            : realmId === "statistica"
+              ? "Statistics"
+              : "Number",
       name: "Unknown Legend",
       description: "Legend data missing for this year.",
       stars: 1,

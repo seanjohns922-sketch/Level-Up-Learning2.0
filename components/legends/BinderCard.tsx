@@ -20,7 +20,9 @@ export default function BinderCard({
       ? "Measurelands"
       : legend.realmId === "starpath"
         ? "Starpath"
-        : "Number";
+        : legend.realmId === "statistica"
+          ? "Statistica"
+          : "Number";
   return (
     <button
       onClick={isUnlocked ? onClick : undefined}

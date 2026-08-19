@@ -79,10 +79,11 @@ const REALMS: RealmDef[] = [
     name: "Statistica",
     legendLine: "Data Guardians",
     icon: <BarChart3 className="h-5 w-5" />,
-    totalLegends: 7,
+    totalLegends: 6,
     status: "locked",
-    glowColor: "transparent",
-    borderGlow: "rgba(255,255,255,0.15)",
+    route: "/legends/statistica",
+    glowColor: "rgba(255, 107, 103, 0.2)",
+    borderGlow: "rgba(213, 164, 47, 0.58)",
   },
   {
     id: "chance-hollow",
@@ -167,17 +168,22 @@ export default function LegendsPage() {
     return all.filter((legend) => visibleIds.includes(legend.id)).length;
   }, [demoPreview, spaceProgress]);
 
+  const statisticaCollected = useMemo(
+    () => (demoPreview ? getAllLegends("statistica").length : 0),
+    [demoPreview],
+  );
+
   const realms = useMemo(
     () =>
       REALMS.map((realm) =>
-        realm.id === "starpath-realm" && demoPreview
+        (realm.id === "starpath-realm" || realm.id === "statistica") && demoPreview
           ? { ...realm, status: "open" as const }
           : realm,
       ),
     [demoPreview],
   );
 
-  const totalCollected = numbotCollected + measurelandsCollected + starpathCollected;
+  const totalCollected = numbotCollected + measurelandsCollected + starpathCollected + statisticaCollected;
   const totalLegends = realms.reduce((sum, r) => sum + r.totalLegends, 0);
   const pct = totalLegends > 0 ? Math.round((totalCollected / totalLegends) * 100) : 0;
 
@@ -288,6 +294,8 @@ export default function LegendsPage() {
                       ? measurelandsCollected
                       : realm.id === "starpath-realm"
                         ? starpathCollected
+                      : realm.id === "statistica"
+                        ? statisticaCollected
                       : 0
                 }
                 onClick={realm.route ? () => router.push(realm.route!) : undefined}
