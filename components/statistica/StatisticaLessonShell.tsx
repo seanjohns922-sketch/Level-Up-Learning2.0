@@ -7,6 +7,7 @@ import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
 import { PracticeRunner } from "@/components/PracticeRunner";
 import { createRandomRealmLessonGenerator, type RealmLessonTaskGenerator } from "@/data/activities/realm-lesson-blueprint";
 import { getStatisticaLevel1TaskSet } from "@/data/activities/statistica/level1";
+import { getStatisticaLevel2TaskSet } from "@/data/activities/statistica/level2";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 
 type Props = {
@@ -23,9 +24,11 @@ type Props = {
 export default function StatisticaLessonShell({ level, levelNumber, week, lessonNumber, lessonId, lessonTitle, focus, successCriteria }: Props) {
   const router = useRouter();
   const [started, setStarted] = useState(false);
-  // Level 1 is built; other levels stay blueprint-only until they're coded.
+  // Levels 1-2 are built; other levels stay blueprint-only until they're coded.
   const [getTask] = useState<RealmLessonTaskGenerator | null>(() => {
-    const taskSet = levelNumber === 1 ? getStatisticaLevel1TaskSet(lessonId) : null;
+    const taskSet = levelNumber === 1 ? getStatisticaLevel1TaskSet(lessonId)
+      : levelNumber === 2 ? getStatisticaLevel2TaskSet(lessonId)
+      : null;
     return taskSet ? createRandomRealmLessonGenerator(taskSet) : null;
   });
   const weekHref = buildRealmProgramHref({ realmId: "statistics", year: level, week, preview: true });
