@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAuthErrorMessage, isServiceUnavailableError, recoverAuthSessionError, supabase } from "@/lib/supabase";
-import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, markActiveStudentIntroSeen, setActiveStudentProfile, setStudentSessionToken } from "@/lib/studentIdentity";
+import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, setActiveStudentProfile, setStudentSessionToken } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
-import { clearScopedProgress, isPlacementComplete, readProgress, writeProgress } from "@/data/progress";
+import { clearScopedProgress, isPlacementComplete, readProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { resolveStudentNameParts } from "@/lib/studentName";
 import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
-import { activateDemoPreviewMode, deactivateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
+import { deactivateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
+import { bootstrapDemoPreview } from "@/lib/demo-preview-bootstrap";
 import { resolveStudentDestination } from "@/lib/student-destination";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
@@ -309,6 +310,16 @@ export default function LoginPage() {
       return;
     }
     if (data?.user && data.session?.access_token) {
+      if (data.user.app_metadata?.demo_access === true) {
+        const activated = await activateDemoAccount(
+          data.session.access_token,
+          typeof data.user.user_metadata?.display_name === "string"
+            ? data.user.user_metadata.display_name
+            : "Demo Preview",
+        );
+        if (!activated) setTeacherLoading(false);
+        return;
+      }
       if (teacherSchoolCode.trim()) {
         const activated = await activateSchoolMembership();
         if (!activated) {
@@ -321,6 +332,35 @@ export default function LoginPage() {
     }
     setTeacherError("Login failed.");
     setTeacherLoading(false);
+  }
+
+  async function activateDemoAccount(accessToken: string, fallbackDisplayName: string) {
+    try {
+      const response = await fetch("/api/demo-access", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { displayName?: string; error?: unknown }
+        | null;
+      if (!response.ok) {
+        setTeacherError(getAuthErrorMessage(result?.error, "Demo access could not be verified."));
+        return false;
+      }
+
+      bootstrapDemoPreview(result?.displayName || fallbackDisplayName);
+      const { error: signOutError } = await supabase.auth.signOut({ scope: "local" });
+      if (signOutError) {
+        deactivateDemoPreviewMode();
+        setTeacherError("Demo access could not be isolated from the login session. Please try again.");
+        return false;
+      }
+      router.push("/realms");
+      return true;
+    } catch {
+      setTeacherError("Demo access could not be activated. Please try again.");
+      return false;
+    }
   }
 
   async function handlePasswordReset(audience: "teacher" | "parent") {
@@ -779,24 +819,7 @@ export default function LoginPage() {
         return;
       }
 
-      activateDemoPreviewMode();
-      setActiveStudentProfile("demo-preview", null, {
-        displayName: "Demo Preview",
-        yearLevel: "Prep",
-      });
-      markActiveStudentIntroSeen("demo-preview");
-      clearScopedProgress("demo-preview");
-      clearScopedProgramStore("demo-preview");
-      writeProgress({
-        year: "Prep",
-        scorePercent: 0,
-        status: "ASSIGNED_PROGRAM",
-        placementComplete: true,
-        assignedWeek: 1,
-        requiredWeeks: [],
-        optionalWeeks: [],
-        unlockedLegends: [],
-      });
+      bootstrapDemoPreview();
       setShowDemoModal(false);
       setDemoCode("");
       const search = new URLSearchParams(window.location.search);

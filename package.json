@@ -62,6 +62,7 @@
     "qa:demo-review": "node scripts/demo-review-panel-audit.mjs",
     "qa:starpath-activation": "node scripts/starpath-activation-audit.mjs",
     "qa:starpath-demo-access": "node scripts/audit-starpath-demo-access.mjs",
+    "qa:demo-account-access": "node scripts/demo-account-access-audit.mjs",
     "qa:starpath-home": "node scripts/audit-starpath-home.mjs",
     "qa:starpath-levels": "node scripts/audit-starpath-levels.mjs",
     "qa:starpath-placement-isolation": "node scripts/starpath-placement-isolation-audit.mjs",

@@ -5,6 +5,7 @@ import {
   DEMO_SESSION_MAX_AGE_SECONDS,
   getServerStarpathAccess,
 } from "@/lib/demo-session-server";
+import { verifyDemoAccountToken } from "@/lib/demo-account-server";
 
 export const runtime = "nodejs";
 
@@ -31,6 +32,35 @@ export async function POST(request: Request) {
     const featureEnabled = process.env.NEXT_PUBLIC_DEMO_ACCESS_ENABLED === "true";
     const expected = process.env.DEMO_ACCESS_CODE?.trim();
 
+    if (!featureEnabled) {
+      return NextResponse.json({ ok: false, error: "demo_access_disabled" }, { status: 404 });
+    }
+
+    const authorization = request.headers.get("authorization") ?? "";
+    const accessToken = authorization.startsWith("Bearer ")
+      ? authorization.slice("Bearer ".length).trim()
+      : "";
+    if (accessToken) {
+      const account = await verifyDemoAccountToken(accessToken);
+      if (!account) {
+        return NextResponse.json({ ok: false, error: "demo_account_required" }, { status: 403 });
+      }
+
+      const response = NextResponse.json({
+        ok: true,
+        mode: "demo_account",
+        displayName: account.displayName,
+      });
+      response.cookies.set(DEMO_SESSION_COOKIE, createDemoSessionToken(), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: DEMO_SESSION_MAX_AGE_SECONDS,
+      });
+      return response;
+    }
+
     let submittedCode = "";
     try {
       const body = (await request.json()) as { code?: unknown };
@@ -52,7 +82,7 @@ export async function POST(request: Request) {
 
     console.log("[DemoAccessRoute]", debug);
 
-    if (!featureEnabled || !expected) {
+    if (!expected) {
       return NextResponse.json({ ok: false, error: "missing_feature_or_code", debug }, { status: 404 });
     }
 
