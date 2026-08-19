@@ -24,12 +24,18 @@ function SubmitButton({ disabled, onClick }: { disabled: boolean; onClick: () =>
 }
 
 function MiniColumn({ label, color, count, selected = false }: { label: string; color: string; count: number; selected?: boolean }) {
+  const dense = count > 12;
+  const medium = count > 8;
+  const stackHeight = dense ? "h-52" : medium ? "h-48" : "h-40";
+  const markSize = dense ? "h-2 w-8" : medium ? "h-3 w-8" : "h-4 w-8";
+  const markGap = dense || medium ? "gap-0.5" : "gap-1";
+
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center justify-end gap-1">
       <div className="text-sm font-black text-[#fff0c7]">{count}</div>
-      <div className="flex h-40 flex-col-reverse gap-1 rounded-md border border-white/10 bg-black/15 p-2">
+      <div className={`flex ${stackHeight} flex-col-reverse ${markGap} rounded-md border border-white/10 bg-black/15 p-2`}>
         {Array.from({ length: count }, (_, index) => (
-          <span key={index} className="h-4 w-8 rounded-full border border-white/15" style={{ backgroundColor: color }} />
+          <span key={index} className={`${markSize} rounded-full border border-white/15`} style={{ backgroundColor: color }} />
         ))}
       </div>
       <div className={`mt-1 max-w-full truncate text-sm font-black ${selected ? "text-[#ff7b72]" : "text-white"}`}>{label}</div>
@@ -118,14 +124,16 @@ export function StatisticaGapCard({ task, onCorrect, onWrong }: { task: GapTask 
           <OptionReadAloudButton text="Tap every extra data mark, then check your count." />
         </div>
         <div className="grid grid-cols-2 gap-4 sm:gap-8">
-          {task.categories.map((category) => (
+          {task.categories.map((category) => {
+            const compact = category.count > 8;
+            return (
             <div key={category.id} className="flex flex-col items-center">
-              <div className="flex h-52 flex-col-reverse gap-1.5 rounded-lg border border-white/10 bg-black/15 p-3">
+              <div className={`flex h-52 flex-col-reverse rounded-lg border border-white/10 bg-black/15 p-3 ${compact ? "gap-1" : "gap-1.5"}`}>
                 {Array.from({ length: category.count }, (_, index) => {
                   const isExtra = category.id === task.largerCategoryId && index >= smaller;
                   const active = isExtra && selected.includes(index);
                   return (
-                    <button key={index} type="button" disabled={!isExtra || settled} onClick={() => toggle(index)} aria-label={isExtra ? `extra ${category.label} mark ${index - smaller + 1}` : undefined} className={`grid h-7 w-16 place-items-center rounded-md border transition ${isExtra ? "cursor-pointer border-[#f2bc45]" : "cursor-default border-white/10"} ${active ? "ring-4 ring-[#fff0c7]/70" : ""}`} style={{ backgroundColor: category.color }}>
+                    <button key={index} type="button" disabled={!isExtra || settled} onClick={() => toggle(index)} aria-label={isExtra ? `extra ${category.label} mark ${index - smaller + 1}` : undefined} className={`grid w-16 place-items-center rounded-md border transition ${compact ? "h-3.5" : "h-7"} ${isExtra ? "cursor-pointer border-[#f2bc45]" : "cursor-default border-white/10"} ${active ? "ring-4 ring-[#fff0c7]/70" : ""}`} style={{ backgroundColor: category.color }}>
                       {isExtra ? <span className="h-2 w-2 rounded-full bg-white/90" /> : null}
                     </button>
                   );
@@ -133,7 +141,7 @@ export function StatisticaGapCard({ task, onCorrect, onWrong }: { task: GapTask 
               </div>
               <div className="mt-2 flex items-center gap-1 text-sm font-black text-white">{category.label}<OptionReadAloudButton text={category.label} /></div>
             </div>
-          ))}
+          )})}
         </div>
         <div className="mt-4 flex items-center justify-center gap-2 text-xl font-black text-[#fff0c7]">
           <span>Extra marks counted: {selected.length}</span>
@@ -160,21 +168,29 @@ export function StatisticaTapGraphCard({ task, onCorrect, onWrong }: { task: Tap
       <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
       <div className={panel}>
         <div className="flex items-end justify-center gap-3 sm:gap-6">
-          {task.categories.map((category) => (
+          {task.categories.map((category) => {
+            const dense = category.count > 12;
+            const medium = category.count > 8;
+            const stackHeight = dense ? "h-52" : medium ? "h-48" : "h-44";
+            const stackGap = dense ? "gap-0" : medium ? "gap-0.5" : "gap-1.5";
+            const pictureSize = dense ? 14 : medium ? 17 : 27;
+            const pictureCell = dense ? "h-[10px] w-9" : medium ? "h-4 w-9" : "h-7 w-9";
+            const objectCell = dense ? "h-2.5 w-10" : medium ? "h-3 w-10" : "h-6 w-10";
+            return (
             <div key={category.id} className={`relative flex min-w-0 flex-1 rounded-lg border-2 transition ${chosen === category.id ? "border-[#ff7b72] bg-[#fff0c7]/15 ring-2 ring-[#f2bc45]/60" : "border-transparent hover:border-[#f2bc45]/55"}`}>
               <button type="button" disabled={settled} onClick={() => setChosen(category.id)} aria-pressed={chosen === category.id} className="flex min-w-0 flex-1 flex-col items-center p-2">
-                <div className="flex h-44 flex-col-reverse gap-1.5">
+                <div className={`flex ${stackHeight} flex-col-reverse ${stackGap}`}>
                   {Array.from({ length: category.count }, (_, index) => task.display === "pictures" ? (
-                    <span key={index} className="grid h-7 w-9 place-items-center"><DataIcon name={category.label} color={category.color} size={27} /></span>
+                    <span key={index} className={`grid ${pictureCell} place-items-center`}><DataIcon name={category.label} color={category.color} size={pictureSize} /></span>
                   ) : (
-                    <span key={index} className="h-6 w-10 rounded-md border border-white/15" style={{ backgroundColor: category.color }} />
+                    <span key={index} className={`${objectCell} rounded-md border border-white/15`} style={{ backgroundColor: category.color }} />
                   ))}
                 </div>
                 <span className="mt-2 max-w-full truncate pr-8 text-sm font-black text-white">{category.label}</span>
               </button>
               <OptionReadAloudButton text={category.label} className="absolute bottom-1 right-1" />
             </div>
-          ))}
+          )})}
         </div>
       </div>
       <div className="flex justify-center"><SubmitButton disabled={settled || !chosen} onClick={submit} /></div>
@@ -186,6 +202,7 @@ export function StatisticaTableCard({ task, onCorrect, onWrong }: { task: TableT
   const [chosen, setChosen] = useState<string | null>(null);
   const [count, setCount] = useState(0);
   const [settled, setSettled] = useState(false);
+  const maxCount = Math.max(...task.rows.map((row) => row.count));
 
   function submit() {
     if (settled) return;
@@ -216,7 +233,7 @@ export function StatisticaTableCard({ task, onCorrect, onWrong }: { task: TableT
           <div className="mt-4 flex items-center justify-center gap-4">
             <button type="button" onClick={() => setCount((value) => Math.max(0, value - 1))} disabled={settled} aria-label="decrease answer" className="h-12 w-12 rounded-lg border-2 border-[#f2bc45]/50 bg-white/5 text-2xl font-black text-white">−</button>
             <output className="grid h-14 min-w-20 place-items-center rounded-lg bg-[#fffaf0] text-2xl font-black text-[#244531]">{count}</output>
-            <button type="button" onClick={() => setCount((value) => Math.min(10, value + 1))} disabled={settled} aria-label="increase answer" className="h-12 w-12 rounded-lg border-2 border-[#f2bc45]/50 bg-white/5 text-2xl font-black text-white">+</button>
+            <button type="button" onClick={() => setCount((value) => Math.min(maxCount, value + 1))} disabled={settled} aria-label="increase answer" className="h-12 w-12 rounded-lg border-2 border-[#f2bc45]/50 bg-white/5 text-2xl font-black text-white">+</button>
             <OptionReadAloudButton text={`Current answer: ${count}`} />
           </div>
         ) : null}

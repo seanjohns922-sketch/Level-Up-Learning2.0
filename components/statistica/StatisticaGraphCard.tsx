@@ -14,7 +14,10 @@ type Task = Extract<PracticeTask, { kind: "statisticaGraph" }>;
 export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
   const isBuild = task.mode === "build";
   const maxCount = Math.max(1, ...task.categories.map((c) => c.count));
-  const rows = Math.max(maxCount, isBuild ? maxCount : maxCount);
+  const rows = maxCount;
+  const rowHeight = rows > 12 ? 12 : rows > 8 ? 18 : 26;
+  const cellSize = rows > 12 ? 10 : rows > 8 ? 15 : 22;
+  const cellGap = rows > 12 ? 2 : rows > 8 ? 3 : 4;
   const [built, setBuilt] = useState<number[]>(() => task.categories.map(() => 0));
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
@@ -44,7 +47,7 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
       <div className="mx-auto max-w-md rounded-lg border border-[#f2bc45]/45 bg-[#17281f] p-4 shadow-[inset_0_1px_0_rgba(255,240,199,0.12)]">
         <div className="flex items-end justify-center gap-3">
           {/* value axis */}
-          <div className="flex flex-col-reverse justify-between pb-8 pr-1 text-[10px] font-black text-[#f2bc45]/70" style={{ height: rows * 26 }}>
+          <div className="flex flex-col-reverse justify-between pb-8 pr-1 text-[10px] font-black text-[#f2bc45]/70" style={{ height: rows * rowHeight }}>
             {Array.from({ length: rows }, (_, r) => <span key={r} className="leading-none">{r + 1}</span>)}
           </div>
           {task.categories.map((cat, i) => {
@@ -53,13 +56,13 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
             return (
               <div key={cat.id} className="flex flex-col items-center">
                 {isBuild ? <div className={`mb-1 text-xs font-black ${matched ? "text-emerald-300" : "text-amber-300"}`}>aim: {cat.count}</div> : null}
-                <div className="relative flex flex-col-reverse gap-1" style={{ height: rows * 26 }}>
+                <div className="relative flex flex-col-reverse" style={{ height: rows * rowHeight, gap: cellGap }}>
                   {Array.from({ length: rows }, (_, r) => {
                     const filled = r < value;
                     if (task.display === "pictures" && filled) {
-                      return <div key={r} className="grid h-[22px] w-[22px] place-items-center"><DataIcon name={cat.label} color={cat.color} size={22} /></div>;
+                      return <div key={r} className="grid place-items-center" style={{ height: cellSize, width: cellSize }}><DataIcon name={cat.label} color={cat.color} size={cellSize} /></div>;
                     }
-                    return <div key={r} className={`h-[22px] w-[22px] ${cellShape} border`} style={filled ? { background: cat.color, borderColor: cat.color } : { borderColor: "rgba(242,188,69,0.22)", background: "rgba(255,244,223,0.04)" }} />;
+                    return <div key={r} className={`${cellShape} border`} style={filled ? { height: cellSize, width: cellSize, background: cat.color, borderColor: cat.color } : { height: cellSize, width: cellSize, borderColor: "rgba(242,188,69,0.22)", background: "rgba(255,244,223,0.04)" }} />;
                   })}
                 </div>
                 <div className="mt-2 flex max-w-[80px] items-center gap-1 text-center text-[11px] font-bold leading-tight text-white/85">

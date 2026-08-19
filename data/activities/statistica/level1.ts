@@ -37,11 +37,17 @@ const SORT_SETS: SortSet[] = [
 const pick = <T,>(arr: T[], i: number) => arr[((i % arr.length) + arr.length) % arr.length]!;
 const order = <T,>(items: T[], round: number) => (round % 2 ? [...items].reverse() : items);
 
-// Three small distinct counts (2..6). The 60 ordered combinations mean repeat
-// attempts receive substantially fresh data while staying Year 1 appropriate.
-function countsFor(round: number, forceTie = false): number[] {
-  const values = [2, 3, 4, 5, 6];
-  let index = ((round % 60) + 60) % 60;
+type CountPool = readonly number[];
+
+const BASE_COUNTS = [2, 3, 4, 5, 6] as const;
+const WEEK_6_COUNTS = [9, 10, 11, 12] as const;
+const WEEK_7_COUNTS = [15, 16, 17, 18, 19, 20] as const;
+
+// Distinct one-to-one frequencies from the requested lesson range. Repeated
+// attempts cycle ordered combinations while preserving the lesson's demand.
+function countsFor(round: number, forceTie = false, values: CountPool = BASE_COUNTS): number[] {
+  const combinations = values.length * (values.length - 1) * (values.length - 2);
+  let index = ((round % combinations) + combinations) % combinations;
   const firstIndex = index % values.length;
   const first = values[firstIndex]!;
   index = Math.floor(index / values.length);
@@ -132,15 +138,15 @@ export function tallyReadTask(round: number, target: number): PracticeTask {
   };
 }
 
-function surveyCats(round: number, forceTie = false) {
+function surveyCats(round: number, forceTie = false, countPool: CountPool = BASE_COUNTS) {
   const survey = pick(SURVEYS, round);
-  const counts = countsFor(round, forceTie);
+  const counts = countsFor(round, forceTie, countPool);
   const categories = survey.cats.map((c, i) => ({ ...c, count: counts[i]! }));
   return { survey, categories };
 }
 
-function makeTapGraphTask(round: number, target: number, display: "objects" | "pictures"): PracticeTask {
-  const { survey, categories } = surveyCats(round + 2);
+function makeTapGraphTask(round: number, target: number, display: "objects" | "pictures", countPool: CountPool = BASE_COUNTS): PracticeTask {
+  const { survey, categories } = surveyCats(round + 2, false, countPool);
   const ask = round % 2 === 0 ? "most" : "fewest";
   const ordered = [...categories].sort((a, b) => ask === "most" ? b.count - a.count : a.count - b.count);
   const answer = ordered[0]!;
@@ -167,8 +173,8 @@ export function tapPictureGraphTask(round: number, target: number): PracticeTask
   return makeTapGraphTask(round, target, "pictures");
 }
 
-export function rankTask(round: number, target: number): PracticeTask {
-  const { categories } = surveyCats(round + 3);
+function makeRankTask(round: number, target: number, countPool: CountPool = BASE_COUNTS): PracticeTask {
+  const { categories } = surveyCats(round + 3, false, countPool);
   const direction = round % 2 === 0 ? "most-to-least" : "least-to-most";
   const correctOrderIds = [...categories]
     .sort((a, b) => direction === "most-to-least" ? b.count - a.count : a.count - b.count)
@@ -181,8 +187,12 @@ export function rankTask(round: number, target: number): PracticeTask {
   };
 }
 
-export function gapTask(round: number, target: number): PracticeTask {
-  const { categories } = surveyCats(round + 1);
+export function rankTask(round: number, target: number): PracticeTask {
+  return makeRankTask(round, target);
+}
+
+function makeGapTask(round: number, target: number, countPool: CountPool = BASE_COUNTS): PracticeTask {
+  const { categories } = surveyCats(round + 1, false, countPool);
   const pair = categories.slice(0, 2);
   const larger = pair[0]!.count > pair[1]!.count ? pair[0]! : pair[1]!;
   const difference = Math.abs(pair[0]!.count - pair[1]!.count);
@@ -195,8 +205,12 @@ export function gapTask(round: number, target: number): PracticeTask {
   };
 }
 
-export function tableFrequencyTask(round: number, target: number): PracticeTask {
-  const { survey, categories } = surveyCats(round + 4);
+export function gapTask(round: number, target: number): PracticeTask {
+  return makeGapTask(round, target);
+}
+
+function makeTableFrequencyTask(round: number, target: number, countPool: CountPool = BASE_COUNTS): PracticeTask {
+  const { survey, categories } = surveyCats(round + 4, false, countPool);
   const row = pick(categories, round + 1);
   return {
     kind: "statisticaTable", mode: "count", target, rows: categories,
@@ -207,8 +221,12 @@ export function tableFrequencyTask(round: number, target: number): PracticeTask 
   };
 }
 
-export function tableSelectTask(round: number, target: number): PracticeTask {
-  const { survey, categories } = surveyCats(round + 5);
+export function tableFrequencyTask(round: number, target: number): PracticeTask {
+  return makeTableFrequencyTask(round, target);
+}
+
+function makeTableSelectTask(round: number, target: number, countPool: CountPool = BASE_COUNTS): PracticeTask {
+  const { survey, categories } = surveyCats(round + 5, false, countPool);
   const askMost = round % 2 === 0;
   const answer = [...categories].sort((a, b) => askMost ? b.count - a.count : a.count - b.count)[0]!;
   return {
@@ -218,6 +236,10 @@ export function tableSelectTask(round: number, target: number): PracticeTask {
     speakText: `${survey.question} Compare the frequencies in the table and tap the row with the ${askMost ? "largest" : "smallest"} number.`,
     feedback: { correct: `Yes — ${answer.label} has the ${askMost ? "largest" : "smallest"} frequency.`, wrong: `Compare the numbers in the frequency column and choose the ${askMost ? "largest" : "smallest"}.` },
   };
+}
+
+export function tableSelectTask(round: number, target: number): PracticeTask {
+  return makeTableSelectTask(round, target);
 }
 
 export function buildTask(round: number, target: number, display: "objects" | "pictures"): PracticeTask {
@@ -254,8 +276,8 @@ export function readObjectGraphTask(round: number, target: number): PracticeTask
   return makeReadGraphTask(round, target, "objects");
 }
 
-function makeFrequencyTask(round: number, target: number, display: "objects" | "pictures"): PracticeTask {
-  const { survey, categories } = surveyCats(round + 3);
+function makeFrequencyTask(round: number, target: number, display: "objects" | "pictures", countPool: CountPool = BASE_COUNTS): PracticeTask {
+  const { survey, categories } = surveyCats(round + 3, false, countPool);
   const cat = pick(categories, round);
   return {
     kind: "statisticaGraph", mode: "read", target, display, categories,
@@ -275,9 +297,9 @@ export function objectFrequencyTask(round: number, target: number): PracticeTask
   return makeFrequencyTask(round, target, "objects");
 }
 
-export function compareTask(round: number, target: number): PracticeTask {
+function makeCompareTask(round: number, target: number, countPool: CountPool = BASE_COUNTS): PracticeTask {
   const forceTie = round % 3 === 2;
-  const { survey, categories } = surveyCats(round + 2, forceTie);
+  const { survey, categories } = surveyCats(round + 2, forceTie, countPool);
   const a = categories[0]!, b = categories[1]!;
   const correct = a.count > b.count ? "a" : a.count < b.count ? "b" : "eq";
   const options = order([
@@ -294,11 +316,15 @@ export function compareTask(round: number, target: number): PracticeTask {
   };
 }
 
+export function compareTask(round: number, target: number): PracticeTask {
+  return makeCompareTask(round, target);
+}
+
 // Judge whether a statement about the data is TRUE or FALSE — active reasoning,
 // not just spotting the tallest column. The statement is generated from the real
 // counts and flipped on some rounds so the answer isn't always the same.
-function makeClaimTask(round: number, target: number, display: "objects" | "pictures"): PracticeTask {
-  const { survey, categories } = surveyCats(round + 1);
+function makeClaimTask(round: number, target: number, display: "objects" | "pictures", countPool: CountPool = BASE_COUNTS): PracticeTask {
+  const { survey, categories } = surveyCats(round + 1, false, countPool);
   const top = [...categories].sort((a, b) => b.count - a.count);
   const most = top[0]!, least = top[top.length - 1]!;
   // Three claim shapes; pick one, then decide whether to state it truly or falsely.
@@ -443,6 +469,16 @@ function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {
 }
 const buildObjects: Gen = (r, t) => buildTask(r, t, "objects");
 const buildPics: Gen = (r, t) => buildTask(r, t, "pictures");
+const week6TapGraph: Gen = (r, t) => makeTapGraphTask(r, t, r % 3 === 0 ? "objects" : "pictures", WEEK_6_COUNTS);
+const week6Rank: Gen = (r, t) => makeRankTask(r, t, WEEK_6_COUNTS);
+const week6Gap: Gen = (r, t) => makeGapTask(r, t, WEEK_6_COUNTS);
+const week6Compare: Gen = (r, t) => makeCompareTask(r, t, WEEK_6_COUNTS);
+const week7TableFrequency: Gen = (r, t) => makeTableFrequencyTask(r, t, WEEK_7_COUNTS);
+const week7TableSelect: Gen = (r, t) => makeTableSelectTask(r, t, WEEK_7_COUNTS);
+const week7TapGraph: Gen = (r, t) => makeTapGraphTask(r, t, r % 3 === 0 ? "objects" : "pictures", WEEK_7_COUNTS);
+const week7Frequency: Gen = (r, t) => makeFrequencyTask(r, t, "pictures", WEEK_7_COUNTS);
+const week7Claim: Gen = (r, t) => makeClaimTask(r, t, "pictures", WEEK_7_COUNTS);
+const week7Rank: Gen = (r, t) => makeRankTask(r, t, WEEK_7_COUNTS);
 
 // Week 1 remains the shipped introduction. Weeks 2-8 deliberately mix three
 // interaction families per lesson while preserving each week's curricular identity.
@@ -474,13 +510,13 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y1-statistics-w5-l2": [buildPics, frequencyTask, tapPictureGraphTask],
   "y1-statistics-w5-l3": [compareTask, claimTask, readGraphTask],
   // W6 Rank + compare + count the difference gap.
-  "y1-statistics-w6-l1": [tapGraphTask, rankTask, gapTask],
-  "y1-statistics-w6-l2": [rankTask, gapTask, compareTask],
-  "y1-statistics-w6-l3": [gapTask, rankTask, tapGraphTask],
+  "y1-statistics-w6-l1": [week6TapGraph, week6Rank, week6Gap],
+  "y1-statistics-w6-l2": [week6Rank, week6Gap, week6Compare],
+  "y1-statistics-w6-l3": [week6Gap, week6Rank, week6TapGraph],
   // W7 Table + graph + interpretation.
-  "y1-statistics-w7-l1": [tableFrequencyTask, tapGraphTask, frequencyTask],
-  "y1-statistics-w7-l2": [tableSelectTask, claimTask, tapGraphTask],
-  "y1-statistics-w7-l3": [tableSelectTask, rankTask, claimTask],
+  "y1-statistics-w7-l1": [week7TableFrequency, week7TapGraph, week7Frequency],
+  "y1-statistics-w7-l2": [week7TableSelect, week7Claim, week7TapGraph],
+  "y1-statistics-w7-l3": [week7TableSelect, week7Rank, week7Claim],
   // W8 cumulative investigation: collect -> represent -> interpret.
   "y1-statistics-w8-l1": [collectTask, sortTask, tallyRecordTask],
   "y1-statistics-w8-l2": [buildPics, tableFrequencyTask, tapGraphTask],

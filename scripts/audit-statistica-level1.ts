@@ -18,8 +18,20 @@ function unique<T>(values: T[]) {
   return new Set(values).size === values.length;
 }
 
+function frequencyRangeForWeek(week: number): readonly [number, number] {
+  if (week === 6) return [9, 12];
+  if (week === 7) return [15, 20];
+  return [1, 8];
+}
+
+function frequenciesMatchWeek(values: number[], week: number) {
+  const [minimum, maximum] = frequencyRangeForWeek(week);
+  return values.every((value) => value >= minimum && value <= maximum);
+}
+
 function auditTask(lessonId: string, task: PracticeTask) {
   const week = Number(/-w(\d+)-/.exec(lessonId)?.[1] ?? 0);
+  const [minimumFrequency, maximumFrequency] = frequencyRangeForWeek(week);
   check(isPracticeTaskSafe(task), `${lessonId}: ${task.kind} must be renderable`);
   check(Boolean((task as { feedback?: { correct?: string; wrong?: string } }).feedback?.correct), `${lessonId}: ${task.kind} needs feedback`);
 
@@ -51,7 +63,7 @@ function auditTask(lessonId: string, task: PracticeTask) {
       break;
     }
     case "statisticaGraph": {
-      check(task.categories.length >= 2 && task.categories.every((category) => category.count >= 1 && category.count <= 8), `${lessonId}: graph counts must be 1..8`);
+      check(task.categories.length >= 2 && frequenciesMatchWeek(task.categories.map((category) => category.count), week), `${lessonId}: graph counts must be ${minimumFrequency}..${maximumFrequency}`);
       if (week === 4) check(task.display === "objects", `${lessonId}: Week 4 must use one-to-one object displays`);
       if (week === 5) check(task.display === "pictures", `${lessonId}: Week 5 must use one-to-one picture displays`);
       if (task.mode !== "build") {
@@ -68,6 +80,7 @@ function auditTask(lessonId: string, task: PracticeTask) {
     case "statisticaTapGraph": {
       const ordered = [...task.categories].sort((a, b) => task.ask === "most" ? b.count - a.count : a.count - b.count);
       check(task.categories.length >= 3 && unique(task.categories.map((category) => category.count)), `${lessonId}: tap graph needs three distinct frequencies`);
+      check(frequenciesMatchWeek(task.categories.map((category) => category.count), week), `${lessonId}: tap graph counts must be ${minimumFrequency}..${maximumFrequency}`);
       check(task.correctCategoryId === ordered[0]!.id, `${lessonId}: tap graph answer must be the ${task.ask}`);
       if (week === 4) check(task.display === "objects", `${lessonId}: Week 4 tap tasks must use object displays`);
       if (week === 5) check(task.display === "pictures", `${lessonId}: Week 5 tap tasks must use picture displays`);
@@ -78,6 +91,7 @@ function auditTask(lessonId: string, task: PracticeTask) {
         .sort((a, b) => task.direction === "most-to-least" ? b.count - a.count : a.count - b.count)
         .map((category) => category.id);
       check(task.categories.length === 3 && unique(task.categories.map((category) => category.count)), `${lessonId}: rank needs three distinct frequencies`);
+      check(frequenciesMatchWeek(task.categories.map((category) => category.count), week), `${lessonId}: rank counts must be ${minimumFrequency}..${maximumFrequency}`);
       check(task.correctOrderIds.length === 3 && task.correctOrderIds.every((id, index) => id === ordered[index]), `${lessonId}: rank order must match frequencies`);
       break;
     }
@@ -86,11 +100,12 @@ function auditTask(lessonId: string, task: PracticeTask) {
       const difference = Math.abs(a!.count - b!.count);
       const larger = a!.count > b!.count ? a! : b!;
       check(task.categories.length === 2 && difference >= 1 && difference <= 4, `${lessonId}: gap needs a clear small difference`);
+      check(frequenciesMatchWeek(task.categories.map((category) => category.count), week), `${lessonId}: gap counts must be ${minimumFrequency}..${maximumFrequency}`);
       check(task.difference === difference && task.largerCategoryId === larger.id, `${lessonId}: gap answer must match the two frequencies`);
       break;
     }
     case "statisticaTable": {
-      check(task.rows.length === 3 && task.rows.every((row) => row.count >= 1 && row.count <= 8), `${lessonId}: table needs three valid rows`);
+      check(task.rows.length === 3 && frequenciesMatchWeek(task.rows.map((row) => row.count), week), `${lessonId}: table counts must be ${minimumFrequency}..${maximumFrequency}`);
       if (task.mode === "select") {
         check(Boolean(task.correctRowId && task.rows.some((row) => row.id === task.correctRowId)), `${lessonId}: table selection needs a listed answer row`);
       } else {
