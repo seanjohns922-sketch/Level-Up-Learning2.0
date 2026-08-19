@@ -54,6 +54,10 @@ function countsFor(round: number, forceTie = false): number[] {
   return forceTie ? [first, first, third] : [first, second, third];
 }
 
+function tallyCountFor(round: number): number {
+  return pick([15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25], round);
+}
+
 const numOptions = (correct: number, round: number) => {
   const set = new Set<number>([correct]);
   let d = 1;
@@ -108,7 +112,7 @@ export function sortTaskHard(round: number, target: number): PracticeTask {
 export function tallyRecordTask(round: number, target: number): PracticeTask {
   const survey = pick(SURVEYS, round);
   const cat = pick(survey.cats, round + 1);
-  const count = countsFor(round)[0]!;
+  const count = tallyCountFor(round);
   return {
     kind: "statisticaTally", mode: "record", target, count, label: cat.label.toLowerCase(),
     prompt: `Make a tally to record ${count} for "${cat.label}".`,
@@ -118,7 +122,7 @@ export function tallyRecordTask(round: number, target: number): PracticeTask {
 }
 
 export function tallyReadTask(round: number, target: number): PracticeTask {
-  const count = countsFor(round + 2)[1]! + 3; // 5..9 so a bundle shows
+  const count = tallyCountFor(round + 4);
   return {
     kind: "statisticaTally", mode: "read", target, count, label: "votes",
     prompt: "How many does this tally show?",
@@ -135,20 +139,32 @@ function surveyCats(round: number, forceTie = false) {
   return { survey, categories };
 }
 
-export function tapGraphTask(round: number, target: number): PracticeTask {
+function makeTapGraphTask(round: number, target: number, display: "objects" | "pictures"): PracticeTask {
   const { survey, categories } = surveyCats(round + 2);
   const ask = round % 2 === 0 ? "most" : "fewest";
   const ordered = [...categories].sort((a, b) => ask === "most" ? b.count - a.count : a.count - b.count);
   const answer = ordered[0]!;
   return {
     kind: "statisticaTapGraph", target, ask,
-    display: round % 3 === 0 ? "objects" : "pictures",
+    display,
     categories,
     correctCategoryId: answer.id,
     prompt: `Tap the column with the ${ask === "most" ? "MOST" : "FEWEST"} ${survey.unit}.`,
     speakText: `Read the display. Tap the ${ask === "most" ? "tallest" : "shortest"} column, then check your answer.`,
     feedback: { correct: `Yes — ${answer.label} has the ${ask}.`, wrong: `Compare the column heights and find the ${ask === "most" ? "tallest" : "shortest"}.` },
   };
+}
+
+export function tapGraphTask(round: number, target: number): PracticeTask {
+  return makeTapGraphTask(round, target, round % 3 === 0 ? "objects" : "pictures");
+}
+
+export function tapObjectGraphTask(round: number, target: number): PracticeTask {
+  return makeTapGraphTask(round, target, "objects");
+}
+
+export function tapPictureGraphTask(round: number, target: number): PracticeTask {
+  return makeTapGraphTask(round, target, "pictures");
 }
 
 export function rankTask(round: number, target: number): PracticeTask {
@@ -214,14 +230,14 @@ export function buildTask(round: number, target: number, display: "objects" | "p
   };
 }
 
-export function readGraphTask(round: number, target: number): PracticeTask {
+function makeReadGraphTask(round: number, target: number, display: "objects" | "pictures"): PracticeTask {
   const { survey, categories } = surveyCats(round + 1);
   const askMost = round % 2 === 0;
   const sorted = [...categories].sort((a, b) => b.count - a.count);
   const answer = askMost ? sorted[0]! : sorted[sorted.length - 1]!;
   const options = order(categories.map((c) => ({ id: c.id, label: c.label })), round);
   return {
-    kind: "statisticaGraph", mode: "read", target, display: "pictures", categories,
+    kind: "statisticaGraph", mode: "read", target, display, categories,
     prompt: askMost ? "Which had the MOST votes?" : "Which had the FEWEST votes?",
     speakText: `${survey.question} Read the picture graph and find the ${askMost ? "tallest" : "shortest"} column.`,
     options, correctOptionIds: [answer.id],
@@ -229,16 +245,34 @@ export function readGraphTask(round: number, target: number): PracticeTask {
   };
 }
 
-export function frequencyTask(round: number, target: number): PracticeTask {
+
+export function readGraphTask(round: number, target: number): PracticeTask {
+  return makeReadGraphTask(round, target, "pictures");
+}
+
+export function readObjectGraphTask(round: number, target: number): PracticeTask {
+  return makeReadGraphTask(round, target, "objects");
+}
+
+function makeFrequencyTask(round: number, target: number, display: "objects" | "pictures"): PracticeTask {
   const { survey, categories } = surveyCats(round + 3);
   const cat = pick(categories, round);
   return {
-    kind: "statisticaGraph", mode: "read", target, display: "pictures", categories,
+    kind: "statisticaGraph", mode: "read", target, display, categories,
     prompt: `How many chose ${cat.label}?`,
     speakText: `${survey.question} Count the pictures in the ${cat.label} column.`,
     options: numOptions(cat.count, round), correctOptionIds: [`n${cat.count}`],
     feedback: { correct: `Right — ${cat.count} chose ${cat.label}.`, wrong: `Count the pictures in the ${cat.label} column.` },
   };
+}
+
+
+export function frequencyTask(round: number, target: number): PracticeTask {
+  return makeFrequencyTask(round, target, "pictures");
+}
+
+export function objectFrequencyTask(round: number, target: number): PracticeTask {
+  return makeFrequencyTask(round, target, "objects");
 }
 
 export function compareTask(round: number, target: number): PracticeTask {
@@ -263,7 +297,7 @@ export function compareTask(round: number, target: number): PracticeTask {
 // Judge whether a statement about the data is TRUE or FALSE — active reasoning,
 // not just spotting the tallest column. The statement is generated from the real
 // counts and flipped on some rounds so the answer isn't always the same.
-export function claimTask(round: number, target: number): PracticeTask {
+function makeClaimTask(round: number, target: number, display: "objects" | "pictures"): PracticeTask {
   const { survey, categories } = surveyCats(round + 1);
   const top = [...categories].sort((a, b) => b.count - a.count);
   const most = top[0]!, least = top[top.length - 1]!;
@@ -290,13 +324,22 @@ export function claimTask(round: number, target: number): PracticeTask {
     isActuallyTrue = x.count > y.count;
   }
   return {
-    kind: "statisticaGraph", mode: "claim", target, display: "pictures", categories,
+    kind: "statisticaGraph", mode: "claim", target, display, categories,
     prompt: `${statement} Is that true or false?`,
     speakText: "Read the graph, then decide: does the picture graph show that this is true, or false?",
     options: [{ id: "t", label: "True" }, { id: "f", label: "False" }],
     correctOptionIds: [isActuallyTrue ? "t" : "f"],
     feedback: { correct: "Right — you checked the graph to judge the statement.", wrong: "Read the columns again and check what the data really shows." },
   };
+}
+
+
+export function claimTask(round: number, target: number): PracticeTask {
+  return makeClaimTask(round, target, "pictures");
+}
+
+export function objectClaimTask(round: number, target: number): PracticeTask {
+  return makeClaimTask(round, target, "objects");
 }
 
 export function interpretTask(round: number, target: number): PracticeTask {
@@ -315,13 +358,13 @@ export function interpretTask(round: number, target: number): PracticeTask {
 // ── Teaching cards (shown first) — one per skill so the opening matches the lesson.
 // Graph lessons open by reading the tallest column; sort lessons open by grouping;
 // tally lessons open by reading marks. The right teach card is chosen per lesson.
-function teachGraphTask(round: number, target: number): PracticeTask {
+function teachGraphTask(round: number, target: number, display: "objects" | "pictures" = "pictures"): PracticeTask {
   const { survey, categories } = surveyCats(round);
   const top = [...categories].sort((x, y) => y.count - x.count)[0]!;
   return {
-    kind: "statisticaGraph", mode: "read", target, display: "pictures", categories,
+    kind: "statisticaGraph", mode: "read", target, display, categories,
     prompt: `Let's read the graph. ${survey.question} Which column is the tallest?`,
-    speakText: "This is a picture graph. Each picture stands for one vote. The tallest column had the most votes — tap it.",
+    speakText: `This is a one-to-one ${display === "objects" ? "object display" : "picture graph"}. Each ${display === "objects" ? "object" : "picture"} stands for one vote. The tallest column had the most votes. Tap it.`,
     options: order(categories.map((c) => ({ id: c.id, label: c.label })), round), correctOptionIds: [top.id],
     feedback: { correct: "That's the tallest column — the most votes.", wrong: "The tallest column is the one with the most pictures." },
   };
@@ -340,7 +383,7 @@ function teachSortTask(round: number, target: number): PracticeTask {
 }
 
 function teachTallyReadTask(round: number, target: number): PracticeTask {
-  const count = 3 + (round % 3); // 3..5 marks
+  const count = tallyCountFor(round);
   return {
     kind: "statisticaTally", mode: "read", target, count, label: "votes",
     prompt: "Let's read a tally. How many marks are there?",
@@ -351,7 +394,7 @@ function teachTallyReadTask(round: number, target: number): PracticeTask {
 }
 
 function teachTallyRecordTask(round: number, target: number): PracticeTask {
-  const count = 3 + (round % 3); // 3..5 marks
+  const count = tallyCountFor(round + 2);
   return {
     kind: "statisticaTally", mode: "record", target, count, label: "votes",
     prompt: `Let's make a tally. Add marks until there are ${count}.`,
@@ -375,6 +418,7 @@ function teachFor(gens: [Gen, Gen, Gen], seed: number, target: number): Practice
   if (probe.kind === "statisticaTally") {
     return probe.mode === "record" ? teachTallyRecordTask(seed, target) : teachTallyReadTask(seed, target);
   }
+  if (probe.kind === "statisticaGraph") return teachGraphTask(seed, target, probe.display);
   if (["statisticaRank", "statisticaGap", "statisticaTapGraph", "statisticaTable"].includes(probe.kind)) {
     return gens[0](seed + 17, target);
   }
@@ -419,14 +463,16 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y1-statistics-w3-l1": [tallyRecordTask, sortTask, tableFrequencyTask],
   "y1-statistics-w3-l2": [tallyRecordTask, tableFrequencyTask, tallyReadTask],
   "y1-statistics-w3-l3": [tallyReadTask, tableFrequencyTask, tapGraphTask],
-  // W4 One-to-one build + tap the finished display.
-  "y1-statistics-w4-l1": [collectTask, buildObjects, tapGraphTask],
-  "y1-statistics-w4-l2": [sortTask, buildObjects, tapGraphTask],
-  "y1-statistics-w4-l3": [tapGraphTask, frequencyTask, buildObjects],
-  // W5 Picture graph + build + visual reading.
-  "y1-statistics-w5-l1": [buildPics, tapGraphTask, tableFrequencyTask],
-  "y1-statistics-w5-l2": [buildPics, tapGraphTask, readGraphTask],
-  "y1-statistics-w5-l3": [tapGraphTask, tableFrequencyTask, claimTask],
+  // W4 One-to-one OBJECT displays: construct, read an exact frequency, then
+  // judge a claim from the finished display. Every object represents one vote.
+  "y1-statistics-w4-l1": [buildObjects, tapObjectGraphTask, objectFrequencyTask],
+  "y1-statistics-w4-l2": [objectFrequencyTask, buildObjects, tapObjectGraphTask],
+  "y1-statistics-w4-l3": [tapObjectGraphTask, objectClaimTask, buildObjects],
+  // W5 One-to-one PICTURE displays: translate the same data into pictures,
+  // compare frequencies and use the graph as evidence. No many-to-one key.
+  "y1-statistics-w5-l1": [frequencyTask, tapPictureGraphTask, readGraphTask],
+  "y1-statistics-w5-l2": [buildPics, frequencyTask, tapPictureGraphTask],
+  "y1-statistics-w5-l3": [compareTask, claimTask, readGraphTask],
   // W6 Rank + compare + count the difference gap.
   "y1-statistics-w6-l1": [tapGraphTask, rankTask, gapTask],
   "y1-statistics-w6-l2": [rankTask, gapTask, compareTask],

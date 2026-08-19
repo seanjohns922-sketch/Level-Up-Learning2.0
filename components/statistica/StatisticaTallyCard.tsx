@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Minus, Plus } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "statisticaTally" }>;
@@ -50,7 +51,7 @@ export default function StatisticaTallyCard({ task, onCorrect, onWrong }: { task
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
 
       <div className="mx-auto flex min-h-[96px] max-w-md items-center justify-center rounded-lg border border-[#f2bc45]/45 bg-[#17281f] p-4">
         <TallyMarks n={isRecord ? built : task.count} />
@@ -61,7 +62,7 @@ export default function StatisticaTallyCard({ task, onCorrect, onWrong }: { task
           <div className="flex items-center justify-center gap-3">
             <button type="button" onClick={() => !settled && setBuilt((v) => Math.max(0, v - 1))} disabled={settled} aria-label="remove a tally" className="grid h-11 w-11 place-items-center rounded-lg border-2 border-[#b9caaa] bg-[#fffaf0] text-[#244531] disabled:opacity-40"><Minus className="h-5 w-5" /></button>
             <div className="min-w-[3ch] text-center font-mono text-2xl font-black text-[#c74f4b] tabular-nums">{built}</div>
-            <button type="button" onClick={() => !settled && setBuilt((v) => Math.min(20, v + 1))} disabled={settled} aria-label={`add a tally for ${task.label}`} className="grid h-11 w-14 place-items-center rounded-lg border-2 border-[#f2bc45] bg-[#fff0df] text-[#5b2e27] disabled:opacity-40"><Plus className="h-5 w-5" /></button>
+            <button type="button" onClick={() => !settled && setBuilt((v) => Math.min(25, v + 1))} disabled={settled} aria-label={`add a tally for ${task.label}`} className="grid h-11 w-14 place-items-center rounded-lg border-2 border-[#f2bc45] bg-[#fff0df] text-[#5b2e27] disabled:opacity-40"><Plus className="h-5 w-5" /></button>
           </div>
           <div className="flex justify-center"><SubmitButton disabled={settled} onClick={submitRecord} /></div>
         </>
@@ -69,7 +70,10 @@ export default function StatisticaTallyCard({ task, onCorrect, onWrong }: { task
         <>
           <div className="mx-auto grid max-w-xs grid-cols-3 gap-2">
             {task.options?.map((option) => (
-              <button key={option.id} type="button" onClick={() => !settled && setChosen(option.id)} className={["rounded-lg border-2 p-3 text-center text-lg font-black transition", chosen === option.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}>{option.label}</button>
+              <div key={option.id} className="relative">
+                <button type="button" onClick={() => !settled && setChosen(option.id)} className={["min-h-14 w-full rounded-lg border-2 p-3 pr-11 text-center text-lg font-black transition", chosen === option.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}>{option.label}</button>
+                <OptionReadAloudButton text={option.label} className="absolute right-1 top-1/2 -translate-y-1/2" />
+              </div>
             ))}
           </div>
           <div className="flex justify-center"><SubmitButton disabled={settled || !chosen} onClick={submitRead} /></div>

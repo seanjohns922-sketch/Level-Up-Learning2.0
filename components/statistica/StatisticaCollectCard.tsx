@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import DataIcon from "@/components/statistica/DataIcon";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "statisticaCollect" }>;
@@ -36,17 +37,18 @@ export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { ta
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
 
       {/* live per-category counters */}
       <div className="mx-auto grid max-w-md gap-2" style={{ gridTemplateColumns: `repeat(${task.categories.length}, minmax(0,1fr))` }}>
         {task.categories.map((cat, i) => (
-          <div key={cat.id} className="rounded-lg border-2 p-2 text-center" style={{ borderColor: cat.color, background: `${cat.color}14` }}>
+          <div key={cat.id} className="relative rounded-lg border-2 p-2 text-center" style={{ borderColor: cat.color, background: `${cat.color}14` }}>
+            <OptionReadAloudButton text={`${cat.label}, ${counts[i]} collected`} className="absolute right-1 top-1" />
             <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: cat.color }}>{cat.label}</div>
             <div className="my-1 flex min-h-[16px] flex-wrap justify-center gap-[3px]">
               {Array.from({ length: counts[i]! }, (_, k) => <span key={k} className="h-2.5 w-2.5 rounded-full" style={{ background: cat.color }} />)}
             </div>
-            <div className="text-lg font-black leading-none text-white tabular-nums">{counts[i]}</div>
+            <div className="text-lg font-black leading-none text-[#17281f] tabular-nums">{counts[i]}</div>
           </div>
         ))}
       </div>
@@ -58,10 +60,13 @@ export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { ta
             const it = itemsById.get(id)!;
             const cat = task.categories.find((c) => c.id === it.category)!;
             return (
-              <button key={id} type="button" onClick={() => tap(id)} className="flex flex-col items-center gap-0.5 rounded-lg border-2 px-3 py-1.5 text-xs font-black text-[#244531] shadow-sm transition hover:-translate-y-0.5 active:scale-90" style={{ borderColor: cat.color, background: "#fffaf0" }}>
-                <DataIcon name={it.label} color={cat.color} size={26} />
-                {it.label}
-              </button>
+              <div key={id} className="relative">
+                <button type="button" onClick={() => tap(id)} className="flex min-h-20 min-w-20 flex-col items-center justify-center gap-0.5 rounded-lg border-2 px-3 py-1.5 text-xs font-black text-[#244531] shadow-sm transition hover:-translate-y-0.5 active:scale-90" style={{ borderColor: cat.color, background: "#fffaf0" }}>
+                  <DataIcon name={it.label} color={cat.color} size={26} />
+                  {it.label}
+                </button>
+                <OptionReadAloudButton text={it.label} className="absolute right-1 top-1" />
+              </div>
             );
           })}
         </div>
@@ -74,10 +79,16 @@ export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { ta
       {/* answer phase */}
       {done ? (
         <>
-          <div className="text-center text-sm font-black text-white/90">{task.question}</div>
+          <div className="flex items-center justify-center gap-2 text-center text-sm font-black text-[#17281f]">
+            <span>{task.question}</span>
+            <OptionReadAloudButton text={task.question} />
+          </div>
           <div className="mx-auto grid max-w-md gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(task.categories.length, 3)}, minmax(0,1fr))` }}>
             {task.categories.map((cat) => (
-              <button key={cat.id} type="button" onClick={() => !settled && setChosen(cat.id)} className={["rounded-lg border-2 p-3 text-center text-sm font-black transition", chosen === cat.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}>{cat.label}</button>
+              <div key={cat.id} className="relative">
+                <button type="button" onClick={() => !settled && setChosen(cat.id)} className={["min-h-14 w-full rounded-lg border-2 p-3 pr-12 text-center text-sm font-black transition", chosen === cat.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}>{cat.label}</button>
+                <OptionReadAloudButton text={cat.label} className="absolute right-2 top-1/2 -translate-y-1/2" />
+              </div>
             ))}
           </div>
           <div className="flex justify-center">
@@ -85,7 +96,7 @@ export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { ta
           </div>
         </>
       ) : (
-        <div className="text-center text-xs font-bold text-white/45">{gathered} of {total} collected — tap them all</div>
+        <div className="text-center text-xs font-bold text-[#496253]">{gathered} of {total} collected - tap them all</div>
       )}
     </div>
   );

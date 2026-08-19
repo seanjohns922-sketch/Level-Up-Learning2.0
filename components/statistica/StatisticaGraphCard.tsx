@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Minus } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import DataIcon from "@/components/statistica/DataIcon";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "statisticaGraph" }>;
@@ -38,7 +39,7 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
 
       <div className="mx-auto max-w-md rounded-lg border border-[#f2bc45]/45 bg-[#17281f] p-4 shadow-[inset_0_1px_0_rgba(255,240,199,0.12)]">
         <div className="flex items-end justify-center gap-3">
@@ -61,7 +62,10 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
                     return <div key={r} className={`h-[22px] w-[22px] ${cellShape} border`} style={filled ? { background: cat.color, borderColor: cat.color } : { borderColor: "rgba(242,188,69,0.22)", background: "rgba(255,244,223,0.04)" }} />;
                   })}
                 </div>
-                <div className="mt-2 max-w-[64px] text-center text-[11px] font-bold leading-tight text-white/85">{cat.label}</div>
+                <div className="mt-2 flex max-w-[80px] items-center gap-1 text-center text-[11px] font-bold leading-tight text-white/85">
+                  <span>{cat.label}</span>
+                  <OptionReadAloudButton text={isBuild ? `${cat.label}, target ${cat.count}` : cat.label} />
+                </div>
                 {isBuild ? (
                   <div className="mt-1 flex gap-1">
                     <button type="button" onClick={() => add(i, -1)} disabled={settled} aria-label={`remove from ${cat.label}`} className="grid h-6 w-6 place-items-center rounded-md border border-white/15 bg-white/5 text-white/70 disabled:opacity-40"><Minus className="h-3.5 w-3.5" /></button>
@@ -80,7 +84,10 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
         <>
           <div className="mx-auto grid max-w-md gap-2 sm:grid-cols-2">
             {task.options?.map((option) => (
-              <button key={option.id} type="button" onClick={() => !settled && setChosen(option.id)} className={["rounded-lg border-2 p-3 text-center text-sm font-black transition", chosen === option.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}>{option.label}</button>
+              <div key={option.id} className="relative">
+                <button type="button" onClick={() => !settled && setChosen(option.id)} className={["min-h-14 w-full rounded-lg border-2 p-3 pr-12 text-center text-sm font-black transition", chosen === option.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}>{option.label}</button>
+                <OptionReadAloudButton text={option.label} className="absolute right-2 top-1/2 -translate-y-1/2" />
+              </div>
             ))}
           </div>
           <div className="flex justify-center"><SubmitButton disabled={settled || !chosen} onClick={submitOption} /></div>

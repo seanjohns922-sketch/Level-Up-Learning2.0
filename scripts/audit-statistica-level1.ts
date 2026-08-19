@@ -19,6 +19,7 @@ function unique<T>(values: T[]) {
 }
 
 function auditTask(lessonId: string, task: PracticeTask) {
+  const week = Number(/-w(\d+)-/.exec(lessonId)?.[1] ?? 0);
   check(isPracticeTaskSafe(task), `${lessonId}: ${task.kind} must be renderable`);
   check(Boolean((task as { feedback?: { correct?: string; wrong?: string } }).feedback?.correct), `${lessonId}: ${task.kind} needs feedback`);
 
@@ -41,7 +42,8 @@ function auditTask(lessonId: string, task: PracticeTask) {
       break;
     }
     case "statisticaTally": {
-      check(task.count >= 1 && task.count <= 20, `${lessonId}: tally count must be 1..20`);
+      check(task.count >= 1 && task.count <= 25, `${lessonId}: tally count must be 1..25`);
+      if (week === 3) check(task.count >= 15, `${lessonId}: Week 3 tallies must reach the teens or twenties`);
       if (task.mode === "read") {
         const answer = task.options?.find((option) => option.id === task.correctOptionIds?.[0]);
         check(task.correctOptionIds?.length === 1 && answer?.label === String(task.count), `${lessonId}: tally answer must match shown marks`);
@@ -50,6 +52,8 @@ function auditTask(lessonId: string, task: PracticeTask) {
     }
     case "statisticaGraph": {
       check(task.categories.length >= 2 && task.categories.every((category) => category.count >= 1 && category.count <= 8), `${lessonId}: graph counts must be 1..8`);
+      if (week === 4) check(task.display === "objects", `${lessonId}: Week 4 must use one-to-one object displays`);
+      if (week === 5) check(task.display === "pictures", `${lessonId}: Week 5 must use one-to-one picture displays`);
       if (task.mode !== "build") {
         const optionIds = new Set(task.options?.map((option) => option.id));
         check(task.correctOptionIds?.length === 1 && optionIds.has(task.correctOptionIds[0]!), `${lessonId}: graph ${task.mode} needs one valid answer`);
@@ -65,6 +69,8 @@ function auditTask(lessonId: string, task: PracticeTask) {
       const ordered = [...task.categories].sort((a, b) => task.ask === "most" ? b.count - a.count : a.count - b.count);
       check(task.categories.length >= 3 && unique(task.categories.map((category) => category.count)), `${lessonId}: tap graph needs three distinct frequencies`);
       check(task.correctCategoryId === ordered[0]!.id, `${lessonId}: tap graph answer must be the ${task.ask}`);
+      if (week === 4) check(task.display === "objects", `${lessonId}: Week 4 tap tasks must use object displays`);
+      if (week === 5) check(task.display === "pictures", `${lessonId}: Week 5 tap tasks must use picture displays`);
       break;
     }
     case "statisticaRank": {

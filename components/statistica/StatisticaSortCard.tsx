@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import DataIcon from "@/components/statistica/DataIcon";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "statisticaSort" }>;
@@ -37,22 +38,24 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
   const chip = (it: { id: string; label: string; category: string }, inBin: boolean) => {
     const color = task.categories.find((c) => c.id === it.category)?.color ?? "#c65b4e";
     return (
-      <button
-        key={it.id}
-        type="button"
-        onClick={() => (inBin ? returnItem(it.id) : setSelected((s) => (s === it.id ? null : it.id)))}
-        disabled={settled}
-        className={["flex items-center gap-1.5 rounded-lg border-2 px-2.5 py-1.5 text-sm font-black transition disabled:opacity-70", selected === it.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}
-      >
-        <DataIcon name={it.label} color={color} size={20} />
-        {it.label}
-      </button>
+      <div key={it.id} className="relative">
+        <button
+          type="button"
+          onClick={() => (inBin ? returnItem(it.id) : setSelected((s) => (s === it.id ? null : it.id)))}
+          disabled={settled}
+          className={["flex min-h-11 items-center gap-1.5 rounded-lg border-2 py-1.5 pl-2.5 pr-11 text-sm font-black transition disabled:opacity-70", selected === it.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}
+        >
+          <DataIcon name={it.label} color={color} size={20} />
+          {it.label}
+        </button>
+        <OptionReadAloudButton text={it.label} className="absolute right-1 top-1/2 -translate-y-1/2" />
+      </div>
     );
   };
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
 
       {/* tray of items to sort */}
       <div className="mx-auto flex min-h-[52px] max-w-md flex-wrap items-center justify-center gap-2 rounded-lg border border-dashed border-[#f2bc45]/45 bg-[#17281f] p-3">
@@ -64,10 +67,11 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
         {task.categories.map((cat) => {
           const inThis = task.items.filter((it) => placement[it.id] === cat.id);
           return (
-            <button key={cat.id} type="button" onClick={() => pickBin(cat.id)} disabled={settled || !selected} className="min-h-[92px] rounded-lg border-2 p-2 text-left transition disabled:cursor-default" style={{ borderColor: cat.color, background: `${cat.color}14` }}>
-              <div className="mb-1.5 text-center text-xs font-black uppercase tracking-wide" style={{ color: cat.color }}>{cat.label}</div>
+            <div key={cat.id} className="relative min-h-[92px] rounded-lg border-2 p-2 text-left" style={{ borderColor: cat.color, background: `${cat.color}14` }}>
+              <button type="button" onClick={() => pickBin(cat.id)} disabled={settled || !selected} className="mb-1.5 min-h-9 w-full rounded-md pr-9 text-center text-xs font-black uppercase tracking-wide transition disabled:cursor-default" style={{ color: cat.color }}>{cat.label}</button>
+              <OptionReadAloudButton text={cat.label} className="absolute right-1 top-1" />
               <div className="flex flex-wrap justify-center gap-1.5">{inThis.map((it) => chip(it, true))}</div>
-            </button>
+            </div>
           );
         })}
       </div>

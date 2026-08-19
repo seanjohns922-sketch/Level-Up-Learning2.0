@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, RotateCcw } from "lucide-react";
 import DataIcon from "@/components/statistica/DataIcon";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
@@ -54,7 +55,7 @@ export function StatisticaRankCard({ task, onCorrect, onWrong }: { task: RankTas
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
       <div className={panel}>
         <div className="flex items-end justify-center gap-3 sm:gap-6">
           {task.categories.map((category) => <MiniColumn key={category.id} {...category} selected={order.includes(category.id)} />)}
@@ -63,18 +64,24 @@ export function StatisticaRankCard({ task, onCorrect, onWrong }: { task: RankTas
           {task.categories.map((_, index) => {
             const category = task.categories.find((item) => item.id === order[index]);
             return (
-              <button key={index} type="button" disabled={!category || settled} onClick={() => !settled && setOrder((current) => current.filter((__, i) => i !== index))} className="min-h-20 rounded-lg border-2 border-dashed border-[#f2bc45]/45 bg-[#fffaf0]/5 p-2 text-center text-sm font-black text-white disabled:opacity-100">
-                <span className="block text-[10px] uppercase text-[#f2bc45]">{index + 1}</span>
-                {category?.label ?? "Tap a column"}
-              </button>
+              <div key={index} className="relative">
+                <button type="button" disabled={!category || settled} onClick={() => !settled && setOrder((current) => current.filter((__, i) => i !== index))} className="min-h-20 w-full rounded-lg border-2 border-dashed border-[#f2bc45]/45 bg-[#fffaf0]/5 p-2 pr-11 text-center text-sm font-black text-white disabled:opacity-100">
+                  <span className="block text-[10px] uppercase text-[#f2bc45]">{index + 1}</span>
+                  {category?.label ?? "Tap a column"}
+                </button>
+                <OptionReadAloudButton text={`${index + 1}. ${category?.label ?? "Empty position"}`} className="absolute right-1 top-1/2 -translate-y-1/2" />
+              </div>
             );
           })}
         </div>
         <div className="mt-3 flex flex-wrap justify-center gap-2">
           {available.map((category) => (
-            <button key={category.id} type="button" onClick={() => choose(category.id)} disabled={settled} className="rounded-lg border-2 border-[#b9caaa] bg-[#fffaf0] px-4 py-3 text-sm font-black text-[#244531] hover:border-[#f06b64] disabled:opacity-50">
-              {category.label}
-            </button>
+            <div key={category.id} className="relative">
+              <button type="button" onClick={() => choose(category.id)} disabled={settled} className="min-h-12 rounded-lg border-2 border-[#b9caaa] bg-[#fffaf0] py-3 pl-4 pr-12 text-sm font-black text-[#244531] hover:border-[#f06b64] disabled:opacity-50">
+                {category.label}
+              </button>
+              <OptionReadAloudButton text={category.label} className="absolute right-1 top-1/2 -translate-y-1/2" />
+            </div>
           ))}
         </div>
       </div>
@@ -104,9 +111,12 @@ export function StatisticaGapCard({ task, onCorrect, onWrong }: { task: GapTask 
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
       <div className={panel}>
-        <p className="mb-4 text-center text-sm font-bold text-[#fff0c7]">Tap every extra data mark, then check your count.</p>
+        <div className="mb-4 flex items-center justify-center gap-2">
+          <p className="text-center text-sm font-bold text-[#fff0c7]">Tap every extra data mark, then check your count.</p>
+          <OptionReadAloudButton text="Tap every extra data mark, then check your count." />
+        </div>
         <div className="grid grid-cols-2 gap-4 sm:gap-8">
           {task.categories.map((category) => (
             <div key={category.id} className="flex flex-col items-center">
@@ -121,11 +131,14 @@ export function StatisticaGapCard({ task, onCorrect, onWrong }: { task: GapTask 
                   );
                 })}
               </div>
-              <div className="mt-2 text-sm font-black text-white">{category.label}</div>
+              <div className="mt-2 flex items-center gap-1 text-sm font-black text-white">{category.label}<OptionReadAloudButton text={category.label} /></div>
             </div>
           ))}
         </div>
-        <div className="mt-4 text-center text-xl font-black text-[#fff0c7]">Extra marks counted: {selected.length}</div>
+        <div className="mt-4 flex items-center justify-center gap-2 text-xl font-black text-[#fff0c7]">
+          <span>Extra marks counted: {selected.length}</span>
+          <OptionReadAloudButton text={`Extra marks counted: ${selected.length}`} />
+        </div>
       </div>
       <div className="flex justify-center"><SubmitButton disabled={settled || selected.length === 0} onClick={submit} /></div>
     </div>
@@ -144,20 +157,23 @@ export function StatisticaTapGraphCard({ task, onCorrect, onWrong }: { task: Tap
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
       <div className={panel}>
         <div className="flex items-end justify-center gap-3 sm:gap-6">
           {task.categories.map((category) => (
-            <button key={category.id} type="button" disabled={settled} onClick={() => setChosen(category.id)} aria-pressed={chosen === category.id} className={`flex min-w-0 flex-1 flex-col items-center rounded-lg border-2 p-2 transition ${chosen === category.id ? "border-[#ff7b72] bg-[#fff0c7]/15 ring-2 ring-[#f2bc45]/60" : "border-transparent hover:border-[#f2bc45]/55"}`}>
-              <div className="flex h-44 flex-col-reverse gap-1.5">
-                {Array.from({ length: category.count }, (_, index) => task.display === "pictures" ? (
-                  <span key={index} className="grid h-7 w-9 place-items-center"><DataIcon name={category.label} color={category.color} size={27} /></span>
-                ) : (
-                  <span key={index} className="h-6 w-10 rounded-md border border-white/15" style={{ backgroundColor: category.color }} />
-                ))}
-              </div>
-              <span className="mt-2 max-w-full truncate text-sm font-black text-white">{category.label}</span>
-            </button>
+            <div key={category.id} className={`relative flex min-w-0 flex-1 rounded-lg border-2 transition ${chosen === category.id ? "border-[#ff7b72] bg-[#fff0c7]/15 ring-2 ring-[#f2bc45]/60" : "border-transparent hover:border-[#f2bc45]/55"}`}>
+              <button type="button" disabled={settled} onClick={() => setChosen(category.id)} aria-pressed={chosen === category.id} className="flex min-w-0 flex-1 flex-col items-center p-2">
+                <div className="flex h-44 flex-col-reverse gap-1.5">
+                  {Array.from({ length: category.count }, (_, index) => task.display === "pictures" ? (
+                    <span key={index} className="grid h-7 w-9 place-items-center"><DataIcon name={category.label} color={category.color} size={27} /></span>
+                  ) : (
+                    <span key={index} className="h-6 w-10 rounded-md border border-white/15" style={{ backgroundColor: category.color }} />
+                  ))}
+                </div>
+                <span className="mt-2 max-w-full truncate pr-8 text-sm font-black text-white">{category.label}</span>
+              </button>
+              <OptionReadAloudButton text={category.label} className="absolute bottom-1 right-1" />
+            </div>
           ))}
         </div>
       </div>
@@ -182,15 +198,18 @@ export function StatisticaTableCard({ task, onCorrect, onWrong }: { task: TableT
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
       <div className={panel}>
         <div className="overflow-hidden rounded-lg border border-[#f2bc45]/45">
           <div className="grid grid-cols-[1fr_90px] bg-[#f2bc45]/15 px-4 py-2 text-xs font-black uppercase text-[#fff0c7]"><span>Category</span><span className="text-center">Frequency</span></div>
           {task.rows.map((row) => (
-            <button key={row.id} type="button" disabled={task.mode !== "select" || settled} onClick={() => setChosen(row.id)} className={`grid w-full grid-cols-[1fr_90px] items-center border-t border-white/10 px-4 py-3 text-left transition ${chosen === row.id ? "bg-[#ff7b72]/25 ring-2 ring-inset ring-[#ff7b72]" : "bg-[#fffaf0]/5"} ${task.mode === "select" ? "hover:bg-[#fff0c7]/10" : "cursor-default"}`}>
-              <span className="flex items-center gap-3 font-black text-white"><span className="h-4 w-4 rounded-sm" style={{ backgroundColor: row.color }} />{row.label}</span>
-              <span className="text-center text-xl font-black text-[#fff0c7]">{row.count}</span>
-            </button>
+            <div key={row.id} className={`relative border-t border-white/10 transition ${chosen === row.id ? "bg-[#ff7b72]/25 ring-2 ring-inset ring-[#ff7b72]" : "bg-[#fffaf0]/5"} ${task.mode === "select" ? "hover:bg-[#fff0c7]/10" : ""}`}>
+              <button type="button" disabled={task.mode !== "select" || settled} onClick={() => setChosen(row.id)} className={`grid w-full grid-cols-[1fr_90px] items-center px-4 py-3 pr-14 text-left ${task.mode !== "select" ? "cursor-default" : ""}`}>
+                <span className="flex items-center gap-3 font-black text-white"><span className="h-4 w-4 rounded-sm" style={{ backgroundColor: row.color }} />{row.label}</span>
+                <span className="text-center text-xl font-black text-[#fff0c7]">{row.count}</span>
+              </button>
+              <OptionReadAloudButton text={`${row.label}, ${row.count}`} className="absolute right-2 top-1/2 -translate-y-1/2" />
+            </div>
           ))}
         </div>
         {task.mode === "count" ? (
@@ -198,6 +217,7 @@ export function StatisticaTableCard({ task, onCorrect, onWrong }: { task: TableT
             <button type="button" onClick={() => setCount((value) => Math.max(0, value - 1))} disabled={settled} aria-label="decrease answer" className="h-12 w-12 rounded-lg border-2 border-[#f2bc45]/50 bg-white/5 text-2xl font-black text-white">−</button>
             <output className="grid h-14 min-w-20 place-items-center rounded-lg bg-[#fffaf0] text-2xl font-black text-[#244531]">{count}</output>
             <button type="button" onClick={() => setCount((value) => Math.min(10, value + 1))} disabled={settled} aria-label="increase answer" className="h-12 w-12 rounded-lg border-2 border-[#f2bc45]/50 bg-white/5 text-2xl font-black text-white">+</button>
+            <OptionReadAloudButton text={`Current answer: ${count}`} />
           </div>
         ) : null}
       </div>
