@@ -15,13 +15,14 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
   const isBuild = task.mode === "build";
   const maxCount = Math.max(1, ...task.categories.map((c) => c.count));
   const rows = maxCount;
-  // Adaptive unit height so tall one-to-one displays (up to ~20) still fit.
-  const unit = rows > 14 ? 12 : rows > 10 ? 15 : rows > 6 ? 20 : 26;
-  const cellSize = rows > 14 ? 10 : rows > 10 ? 13 : rows > 6 ? 17 : 22;
-  const cellGap = unit - cellSize;
+  // Size cells to fill a target plot height so items are as large as the row
+  // count allows — small data gets big icons, 20-tall columns still fit.
+  const unit = Math.max(14, Math.min(34, Math.floor(360 / rows)));
+  const cellGap = Math.max(2, Math.min(6, Math.round(unit * 0.16)));
+  const cellSize = unit - cellGap;
   const plotH = rows * unit;
-  const colWidth = cellSize + 16;
-  const AXIS = 22;
+  const colWidth = cellSize + 22;
+  const AXIS = 24;
 
   // Labelled gridlines at sensible intervals (not one line per unit when tall).
   const step = rows <= 6 ? 1 : rows <= 12 ? 2 : 5;
@@ -64,7 +65,7 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
 
-      <div className="mx-auto max-w-md rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] p-4 pt-3 shadow-[inset_0_1px_0_rgba(255,240,199,0.14),0_12px_32px_rgba(0,0,0,0.32)]">
+      <div className="mx-auto max-w-lg rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] p-4 pt-3 shadow-[inset_0_1px_0_rgba(255,240,199,0.14),0_12px_32px_rgba(0,0,0,0.32)]">
         {/* plot area (axis gutter handled by left:AXIS on the absolute children) */}
         <div className="relative mx-auto" style={{ height: plotH }}>
           {/* labelled gridlines */}
@@ -121,11 +122,11 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
         <div className="flex justify-center"><SubmitButton disabled={settled} onClick={submitBuild} /></div>
       ) : (
         <>
-          <div className="mx-auto grid max-w-md gap-2 sm:grid-cols-2">
+          <div className="mx-auto grid max-w-lg gap-2" style={{ gridTemplateColumns: `repeat(${task.options?.length ?? 2}, minmax(0,1fr))` }}>
             {task.options?.map((option) => (
               <div key={option.id} className="relative">
-                <button type="button" onClick={() => !settled && setChosen(option.id)} className={["min-h-14 w-full rounded-lg border-2 p-3 pr-12 text-center text-sm font-black transition", chosen === option.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}>{option.label}</button>
-                <OptionReadAloudButton text={option.label} className="absolute right-2 top-1/2 -translate-y-1/2" />
+                <button type="button" onClick={() => !settled && setChosen(option.id)} className={["min-h-11 w-full rounded-lg border-2 px-2 py-2 pr-8 text-center text-sm font-black transition", chosen === option.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}>{option.label}</button>
+                <OptionReadAloudButton text={option.label} className="absolute right-1 top-1/2 -translate-y-1/2 scale-90" />
               </div>
             ))}
           </div>
