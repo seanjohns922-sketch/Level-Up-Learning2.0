@@ -21,7 +21,8 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
   const cellGap = Math.max(2, Math.min(6, Math.round(unit * 0.16)));
   const cellSize = unit - cellGap;
   const plotH = rows * unit;
-  const colWidth = cellSize + 22;
+  const isColumns = task.display === "columns";
+  const colWidth = isColumns ? Math.min(64, cellSize + 40) : cellSize + 22;
   const AXIS = 24;
 
   // Labelled gridlines at sensible intervals (not one line per unit when tall).
@@ -86,10 +87,14 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
               return (
                 <div
                   key={cat.id}
-                  className="relative flex flex-col-reverse items-center overflow-hidden rounded-t-lg pt-1 transition-shadow"
-                  style={{ height: plotH, width: colWidth, gap: cellGap, background: `${cat.color}14`, boxShadow: `inset 0 -3px 0 ${cat.color}${matched ? "" : "66"}` }}
+                  className={`relative flex flex-col-reverse items-center overflow-hidden rounded-t-lg transition-shadow ${isColumns ? "" : "pt-1"}`}
+                  style={{ height: plotH, width: colWidth, gap: isColumns ? 0 : cellGap, background: `${cat.color}14`, boxShadow: `inset 0 -3px 0 ${cat.color}${matched ? "" : "66"}` }}
                 >
-                  {Array.from({ length: value }, (_, r) => cell(cat, r))}
+                  {isColumns ? (
+                    <div className="w-full rounded-t-md shadow-[inset_0_2px_0_rgba(255,255,255,0.28)]" style={{ height: value * unit, background: `linear-gradient(to top, ${cat.color}, ${cat.color}cc)` }} />
+                  ) : (
+                    Array.from({ length: value }, (_, r) => cell(cat, r))
+                  )}
                 </div>
               );
             })}

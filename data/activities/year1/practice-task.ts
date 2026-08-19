@@ -2794,7 +2794,9 @@ export type PracticeTask = (
       prompt: string;
       speakText: string;
       target: number;
-      display: "objects" | "pictures";
+      // "columns" renders solid bars (column/bar graph, Year 2+); objects/pictures
+      // are one-to-one displays.
+      display: "objects" | "pictures" | "columns";
       categories: Array<{ id: string; label: string; color: string; count: number }>;
       options?: Array<{ id: string; label: string }>;
       correctOptionIds?: string[];
