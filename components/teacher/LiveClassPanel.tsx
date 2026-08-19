@@ -820,8 +820,25 @@ function isCardActiveNow(card: LiveStudentCard, now = Date.now()) {
 
 function getDisplayStatusSubtext(card: LiveStudentCard, group: LiveCardDisplayGroup) {
   if (group === "waiting_to_start") return "Waiting To Start";
-  if (card.currentLessonStatus === "completed" && card.lastActiveAt) {
-    return `Completed ${formatRelativeTime(card.lastActiveAt)}`;
+  if (card.currentLessonStatus === "completed") {
+    const completedAt = card.completedAt ?? card.lastActiveAt;
+    if (!completedAt) return "Completed";
+
+    const completionTime = new Date(completedAt).getTime();
+    const activityTime = card.lastActiveAt ? new Date(card.lastActiveAt).getTime() : completionTime;
+    const hasNewerUnscoredActivity =
+      Number.isFinite(completionTime) &&
+      Number.isFinite(activityTime) &&
+      activityTime - completionTime > 60_000;
+
+    if (hasNewerUnscoredActivity && card.lastActiveAt) {
+      const activityLabel = group === "live"
+        ? "Active now"
+        : `Active ${formatRelativeTime(card.lastActiveAt)}`;
+      return `${activityLabel} · scored ${formatRelativeTime(completedAt)}`;
+    }
+
+    return `Scored ${formatRelativeTime(completedAt)}`;
   }
   if (group === "idle" && card.lastActiveAt) {
     return `Idle ${formatRelativeTime(card.lastActiveAt)}`;
