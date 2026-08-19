@@ -10,19 +10,30 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 type Task = Extract<PracticeTask, { kind: "statisticaGraph" }>;
 
 // One-to-one displays (objects) and picture graphs. build = fill each column to
-// its target count; read/compare = answer a question about the filled display.
+// its target count; read/compare/claim = answer a question about the display.
 export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
   const isBuild = task.mode === "build";
   const maxCount = Math.max(1, ...task.categories.map((c) => c.count));
   const rows = maxCount;
-  const rowHeight = rows > 12 ? 12 : rows > 8 ? 18 : 26;
-  const cellSize = rows > 12 ? 10 : rows > 8 ? 15 : 22;
-  const cellGap = rows > 12 ? 2 : rows > 8 ? 3 : 4;
+  // Adaptive unit height so tall one-to-one displays (up to ~20) still fit.
+  const unit = rows > 14 ? 12 : rows > 10 ? 15 : rows > 6 ? 20 : 26;
+  const cellSize = rows > 14 ? 10 : rows > 10 ? 13 : rows > 6 ? 17 : 22;
+  const cellGap = unit - cellSize;
+  const plotH = rows * unit;
+  const colWidth = cellSize + 16;
+  const AXIS = 22;
+
+  // Labelled gridlines at sensible intervals (not one line per unit when tall).
+  const step = rows <= 6 ? 1 : rows <= 12 ? 2 : 5;
+  const stops: number[] = [];
+  for (let v = step; v <= rows; v += step) stops.push(v);
+  if (stops[stops.length - 1] !== rows) stops.push(rows);
+
   const [built, setBuilt] = useState<number[]>(() => task.categories.map(() => 0));
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
 
-  const cellShape = task.display === "pictures" ? "rounded-full" : "rounded-md";
+  const cellShape = task.display === "pictures" ? "rounded-full" : "rounded-[3px]";
 
   function add(i: number, delta: number) {
     if (settled) return;
@@ -40,44 +51,69 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
     if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(); else onWrong(chosen);
   }
 
+  const cell = (cat: { label: string; color: string }, key: number) =>
+    task.display === "pictures" ? (
+      <div key={key} className="grid place-items-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]" style={{ height: cellSize, width: cellSize }}>
+        <DataIcon name={cat.label} color={cat.color} size={cellSize} />
+      </div>
+    ) : (
+      <div key={key} className={`${cellShape} shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]`} style={{ height: cellSize, width: cellSize, background: cat.color }} />
+    );
+
   return (
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
 
-      <div className="mx-auto max-w-md rounded-lg border border-[#f2bc45]/45 bg-[#17281f] p-4 shadow-[inset_0_1px_0_rgba(255,240,199,0.12)]">
-        <div className="flex items-end justify-center gap-3">
-          {/* value axis */}
-          <div className="flex flex-col-reverse justify-between pb-8 pr-1 text-[10px] font-black text-[#f2bc45]/70" style={{ height: rows * rowHeight }}>
-            {Array.from({ length: rows }, (_, r) => <span key={r} className="leading-none">{r + 1}</span>)}
+      <div className="mx-auto max-w-md rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] p-4 pt-3 shadow-[inset_0_1px_0_rgba(255,240,199,0.14),0_12px_32px_rgba(0,0,0,0.32)]">
+        {/* plot area (axis gutter handled by left:AXIS on the absolute children) */}
+        <div className="relative mx-auto" style={{ height: plotH }}>
+          {/* labelled gridlines */}
+          {stops.map((v) => (
+            <div key={v} className="pointer-events-none absolute right-0 flex items-center" style={{ left: AXIS, bottom: v * unit }}>
+              <span className="absolute -translate-x-full -translate-y-1/2 pr-1.5 text-right text-[9px] font-black tabular-nums text-[#f2bc45]/60" style={{ left: 0 }}>{v}</span>
+              <div className="h-px w-full" style={{ borderTop: "1px dashed rgba(242,188,69,0.16)" }} />
+            </div>
+          ))}
+          {/* baseline shelf */}
+          <div className="absolute bottom-0 h-[2px] rounded-full bg-[#f2bc45]/40" style={{ left: AXIS - 4, right: 0 }} />
+
+          {/* columns */}
+          <div className="absolute bottom-0 flex items-end justify-around" style={{ left: AXIS, right: 0, height: plotH }}>
+            {task.categories.map((cat, i) => {
+              const value = isBuild ? built[i]! : cat.count;
+              const matched = isBuild && built[i] === cat.count;
+              return (
+                <div
+                  key={cat.id}
+                  className="relative flex flex-col-reverse items-center overflow-hidden rounded-t-lg pt-1 transition-shadow"
+                  style={{ height: plotH, width: colWidth, gap: cellGap, background: `${cat.color}14`, boxShadow: `inset 0 -3px 0 ${cat.color}${matched ? "" : "66"}` }}
+                >
+                  {Array.from({ length: value }, (_, r) => cell(cat, r))}
+                </div>
+              );
+            })}
           </div>
-          {task.categories.map((cat, i) => {
-            const value = isBuild ? built[i]! : cat.count;
-            const matched = isBuild && built[i] === cat.count;
-            return (
-              <div key={cat.id} className="flex flex-col items-center">
-                {isBuild ? <div className={`mb-1 text-xs font-black ${matched ? "text-emerald-300" : "text-amber-300"}`}>aim: {cat.count}</div> : null}
-                <div className="relative flex flex-col-reverse" style={{ height: rows * rowHeight, gap: cellGap }}>
-                  {Array.from({ length: rows }, (_, r) => {
-                    const filled = r < value;
-                    if (task.display === "pictures" && filled) {
-                      return <div key={r} className="grid place-items-center" style={{ height: cellSize, width: cellSize }}><DataIcon name={cat.label} color={cat.color} size={cellSize} /></div>;
-                    }
-                    return <div key={r} className={`${cellShape} border`} style={filled ? { height: cellSize, width: cellSize, background: cat.color, borderColor: cat.color } : { height: cellSize, width: cellSize, borderColor: "rgba(242,188,69,0.22)", background: "rgba(255,244,223,0.04)" }} />;
-                  })}
-                </div>
-                <div className="mt-2 flex max-w-[80px] items-center gap-1 text-center text-[11px] font-bold leading-tight text-white/85">
-                  <span>{cat.label}</span>
-                  <OptionReadAloudButton text={isBuild ? `${cat.label}, target ${cat.count}` : cat.label} />
-                </div>
-                {isBuild ? (
-                  <div className="mt-1 flex gap-1">
-                    <button type="button" onClick={() => add(i, -1)} disabled={settled} aria-label={`remove from ${cat.label}`} className="grid h-6 w-6 place-items-center rounded-md border border-white/15 bg-white/5 text-white/70 disabled:opacity-40"><Minus className="h-3.5 w-3.5" /></button>
-                    <button type="button" onClick={() => add(i, 1)} disabled={settled} aria-label={`add to ${cat.label}`} className="grid h-6 w-9 place-items-center rounded-md border border-[#f2bc45]/55 bg-[#f2bc45]/15 text-sm font-black text-[#fff0c7] disabled:opacity-40">+</button>
-                  </div>
-                ) : null}
+        </div>
+
+        {/* category labels sit on the shelf, aligned under each column */}
+        <div className="flex justify-around" style={{ paddingLeft: AXIS }}>
+          {task.categories.map((cat, i) => (
+            <div key={cat.id} className="flex flex-col items-center" style={{ width: colWidth }}>
+              {isBuild ? (
+                <div className={`mb-1 mt-2 text-[11px] font-black ${built[i] === cat.count ? "text-emerald-300" : "text-amber-300"}`}>aim {cat.count}</div>
+              ) : null}
+              <div className={`flex items-center gap-1 text-center text-[11px] font-bold leading-tight text-white/90 ${isBuild ? "" : "mt-2"}`}>
+                <span className="max-w-[68px]">{cat.label}</span>
+                <OptionReadAloudButton text={isBuild ? `${cat.label}, target ${cat.count}` : cat.label} />
               </div>
-            );
-          })}
+              {isBuild ? (
+                <div className="mt-1.5 flex gap-1">
+                  <button type="button" onClick={() => add(i, -1)} disabled={settled} aria-label={`remove from ${cat.label}`} className="grid h-7 w-7 place-items-center rounded-md border border-white/15 bg-white/5 text-white/70 transition hover:bg-white/10 disabled:opacity-40"><Minus className="h-3.5 w-3.5" /></button>
+                  <button type="button" onClick={() => add(i, 1)} disabled={settled} aria-label={`add to ${cat.label}`} className="grid h-7 w-10 place-items-center rounded-md border border-[#f2bc45]/55 bg-[#f2bc45]/15 text-base font-black text-[#fff0c7] transition hover:bg-[#f2bc45]/25 disabled:opacity-40">+</button>
+                </div>
+              ) : null}
+            </div>
+          ))}
         </div>
       </div>
 
