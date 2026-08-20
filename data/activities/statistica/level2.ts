@@ -316,40 +316,34 @@ export function sameDataDisplayTask(round: number, target: number): PracticeTask
   };
 }
 
-// ── Lesson map (24 lessons) — Year 2 signatures ──────────────────────────────
+// ── Lesson map (18 lessons, 6 weeks) — Year 2 signatures ─────────────────────
+// W1 questions/categories · W2 tables · W3 picture & column graphs ·
+// W4 different displays · W5 interpret · W6 investigation.
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   // W1 Questions & Categories
   "y2-statistics-w1-l1": [l2CollectTask, l2SortTask, l2TapPictureGraphTask],
-  "y2-statistics-w1-l2": [l2SortTask, l2TableSelectTask, l2CollectTask],
-  "y2-statistics-w1-l3": [l2SortTask, l2CollectTask, l2FrequencyTask],
-  // W2 Collecting Data
-  "y2-statistics-w2-l1": [l2CollectTask, l2TallyRecordTask, l2TapPictureGraphTask],
-  "y2-statistics-w2-l2": [l2CollectTask, l2TallyReadTask, l2FrequencyTask],
-  "y2-statistics-w2-l3": [l2CollectTask, l2TableFrequencyTask, l2CompareTask],
-  // W3 Recording Data — TABLES
-  "y2-statistics-w3-l1": [l2TallyRecordTask, l2SortTask, l2TallyReadTask],
-  "y2-statistics-w3-l2": [l2TableFrequencyTask, l2TableSelectTask, l2TableFrequencyTask],
-  "y2-statistics-w3-l3": [l2TableSelectTask, l2TableFrequencyTask, l2FrequencyTask],
-  // W4 Picture Graphs
-  "y2-statistics-w4-l1": [l2BuildPicsTask, l2BuildPicsTask, l2TapPictureGraphTask],
-  "y2-statistics-w4-l2": [l2TapPictureGraphTask, l2FrequencyTask, l2ReadGraphTask],
-  "y2-statistics-w4-l3": [l2FrequencyTask, l2CompareTask, l2RankTask],
-  // W5 Column Graphs — NEW
-  "y2-statistics-w5-l1": [readColumnsTask, buildColumnsTask, readColumnsTask],
-  "y2-statistics-w5-l2": [buildColumnsTask, readColumnsTask, buildColumnsTask],
-  "y2-statistics-w5-l3": [readColumnsTask, columnFrequencyTask, compareColumnsTask],
-  // W6 Different Displays
-  "y2-statistics-w6-l1": [buildColumnsTask, l2BuildPicsTask, readColumnsTask],
-  "y2-statistics-w6-l2": [sameDataDisplayTask, compareColumnsTask, columnClaimTask],
-  "y2-statistics-w6-l3": [sameDataDisplayTask, l2RankTask, columnClaimTask],
-  // W7 Interpreting Displays
-  "y2-statistics-w7-l1": [l2RankTask, l2TapPictureGraphTask, columnFrequencyTask],
-  "y2-statistics-w7-l2": [l2GapTask, l2CompareTask, compareColumnsTask],
-  "y2-statistics-w7-l3": [l2ClaimTask, l2RankTask, l2ReadGraphTask],
-  // W8 Statistical Investigation
-  "y2-statistics-w8-l1": [l2CollectTask, l2TallyRecordTask, l2TableFrequencyTask],
-  "y2-statistics-w8-l2": [l2BuildPicsTask, buildColumnsTask, l2TapPictureGraphTask],
-  "y2-statistics-w8-l3": [compareColumnsTask, l2RankTask, l2ClaimTask],
+  "y2-statistics-w1-l2": [l2SortTask, l2CollectTask, l2TableSelectTask],
+  "y2-statistics-w1-l3": [l2SortTask, l2TapPictureGraphTask, l2CollectTask],
+  // W2 Recording Data — TABLES
+  "y2-statistics-w2-l1": [l2SortTask, l2TallyRecordTask, l2TableFrequencyTask],
+  "y2-statistics-w2-l2": [l2TableFrequencyTask, l2TableSelectTask, l2TableFrequencyTask],
+  "y2-statistics-w2-l3": [l2TableSelectTask, l2TableFrequencyTask, l2FrequencyTask],
+  // W3 Picture & Column Graphs — build both, read both
+  "y2-statistics-w3-l1": [l2BuildPicsTask, l2TapPictureGraphTask, l2BuildPicsTask],
+  "y2-statistics-w3-l2": [buildColumnsTask, readColumnsTask, buildColumnsTask],
+  "y2-statistics-w3-l3": [readColumnsTask, columnFrequencyTask, l2TapPictureGraphTask],
+  // W4 Different Displays — same data as picture vs column, which works best
+  "y2-statistics-w4-l1": [buildColumnsTask, l2BuildPicsTask, readColumnsTask],
+  "y2-statistics-w4-l2": [sameDataDisplayTask, compareColumnsTask, columnClaimTask],
+  "y2-statistics-w4-l3": [sameDataDisplayTask, l2RankTask, columnClaimTask],
+  // W5 Interpreting Displays — most/least, compare, conclude
+  "y2-statistics-w5-l1": [l2RankTask, l2TapPictureGraphTask, columnFrequencyTask],
+  "y2-statistics-w5-l2": [l2GapTask, l2CompareTask, compareColumnsTask],
+  "y2-statistics-w5-l3": [l2ClaimTask, l2RankTask, l2ReadGraphTask],
+  // W6 Statistical Investigation — collect -> display -> compare & report
+  "y2-statistics-w6-l1": [l2CollectTask, l2TallyRecordTask, l2TableFrequencyTask],
+  "y2-statistics-w6-l2": [l2BuildPicsTask, buildColumnsTask, l2TapPictureGraphTask],
+  "y2-statistics-w6-l3": [compareColumnsTask, l2RankTask, l2ClaimTask],
 };
 
 function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {

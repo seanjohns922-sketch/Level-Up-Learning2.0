@@ -140,7 +140,7 @@ for (const lessonId of STATISTICA_LEVEL2_LESSON_IDS) {
   });
 }
 
-check(STATISTICA_LEVEL2_LESSON_IDS.length === 24, `Level 2 should have 24 lessons, found ${STATISTICA_LEVEL2_LESSON_IDS.length}`);
+check(STATISTICA_LEVEL2_LESSON_IDS.length === 18, `Level 2 should have 18 lessons (6 weeks), found ${STATISTICA_LEVEL2_LESSON_IDS.length}`);
 check(sawColumns, "Level 2 must use column graphs somewhere");
 
 console.log("\nStatistica Level 2 activity coverage");
@@ -150,4 +150,4 @@ if (problems > 0) {
   console.error(`\nStatistica Level 2 audit failed with ${problems} problem(s).`);
   process.exit(1);
 }
-console.log(`Statistica Level 2 audit passed: 24 lessons, ${taskCount} generated tasks validated.`);
+console.log(`Statistica Level 2 audit passed: 18 lessons, ${taskCount} generated tasks validated.`);

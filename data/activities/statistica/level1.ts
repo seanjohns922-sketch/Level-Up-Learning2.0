@@ -473,54 +473,39 @@ const week6TapGraph: Gen = (r, t) => makeTapGraphTask(r, t, r % 3 === 0 ? "objec
 const week6Rank: Gen = (r, t) => makeRankTask(r, t, WEEK_6_COUNTS);
 const week6Gap: Gen = (r, t) => makeGapTask(r, t, WEEK_6_COUNTS);
 const week6Compare: Gen = (r, t) => makeCompareTask(r, t, WEEK_6_COUNTS);
-const week7TableFrequency: Gen = (r, t) => makeTableFrequencyTask(r, t, WEEK_7_COUNTS);
-const week7TableSelect: Gen = (r, t) => makeTableSelectTask(r, t, WEEK_7_COUNTS);
 const week7TapGraph: Gen = (r, t) => makeTapGraphTask(r, t, r % 3 === 0 ? "objects" : "pictures", WEEK_7_COUNTS);
 const week7Frequency: Gen = (r, t) => makeFrequencyTask(r, t, "pictures", WEEK_7_COUNTS);
 const week7Claim: Gen = (r, t) => makeClaimTask(r, t, "pictures", WEEK_7_COUNTS);
 const week7Rank: Gen = (r, t) => makeRankTask(r, t, WEEK_7_COUNTS);
 
-// Week 1 remains the shipped introduction. Weeks 2-8 deliberately mix three
-// interaction families per lesson while preserving each week's curricular identity.
+// 6-week Year 1: Collect -> Record -> Represent -> Compare -> Interpret ->
+// Investigate. Week 1 is the gentle intro; every later lesson mixes at least two
+// interaction families and no lesson repeats one family three times.
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   // W1 What is Data? — meet data by COLLECTING and SORTING it (no tally/build yet).
-  // l1 Data All Around Us: collect the data around us (the new gather mini-game).
   "y1-statistics-w1-l1": [collectTask, sortTask, collectTask],
-  // l2 Sort Into Categories: pure sorting mastery across all three sort sets.
-  "y1-statistics-w1-l2": [sortTask, sortTask, sortTask],
-  // l3 What Does the Data Tell Us?: interpret — spot the most, judge a true/false
-  // claim, and compare two categories.
-  "y1-statistics-w1-l3": [readGraphTask, claimTask, compareTask],
-  // W2 Question + categories + collection.
-  "y1-statistics-w2-l1": [collectTask, sortTask, readGraphTask],
-  "y1-statistics-w2-l2": [sortTaskHard, collectTask, tapGraphTask],
-  "y1-statistics-w2-l3": [collectTask, sortTaskHard, tapGraphTask],
-  // W3 List + tally + record.
-  "y1-statistics-w3-l1": [tallyRecordTask, sortTask, tableFrequencyTask],
-  "y1-statistics-w3-l2": [tallyRecordTask, tableFrequencyTask, tallyReadTask],
-  "y1-statistics-w3-l3": [tallyReadTask, tableFrequencyTask, tapGraphTask],
-  // W4 One-to-one OBJECT displays: construct, read an exact frequency, then
-  // judge a claim from the finished display. Every object represents one vote.
-  "y1-statistics-w4-l1": [buildObjects, tapObjectGraphTask, objectFrequencyTask],
-  "y1-statistics-w4-l2": [objectFrequencyTask, buildObjects, tapObjectGraphTask],
-  "y1-statistics-w4-l3": [tapObjectGraphTask, objectClaimTask, buildObjects],
-  // W5 One-to-one PICTURE displays: translate the same data into pictures,
-  // compare frequencies and use the graph as evidence. No many-to-one key.
-  "y1-statistics-w5-l1": [frequencyTask, tapPictureGraphTask, readGraphTask],
-  "y1-statistics-w5-l2": [buildPics, frequencyTask, tapPictureGraphTask],
-  "y1-statistics-w5-l3": [compareTask, claimTask, readGraphTask],
-  // W6 Rank + compare + count the difference gap.
-  "y1-statistics-w6-l1": [week6TapGraph, week6Rank, week6Gap],
-  "y1-statistics-w6-l2": [week6Rank, week6Gap, week6Compare],
-  "y1-statistics-w6-l3": [week6Gap, week6Rank, week6TapGraph],
-  // W7 Table + graph + interpretation.
-  "y1-statistics-w7-l1": [week7TableFrequency, week7TapGraph, week7Frequency],
-  "y1-statistics-w7-l2": [week7TableSelect, week7Claim, week7TapGraph],
-  "y1-statistics-w7-l3": [week7TableSelect, week7Rank, week7Claim],
-  // W8 cumulative investigation: collect -> represent -> interpret.
-  "y1-statistics-w8-l1": [collectTask, sortTask, tallyRecordTask],
-  "y1-statistics-w8-l2": [buildPics, tableFrequencyTask, tapGraphTask],
-  "y1-statistics-w8-l3": [rankTask, gapTask, claimTask],
+  "y1-statistics-w1-l2": [sortTaskHard, sortTask, collectTask],
+  "y1-statistics-w1-l3": [collectTask, sortTask, tapPictureGraphTask],
+  // W2 Recording Data — lists and tally marks.
+  "y1-statistics-w2-l1": [sortTask, tallyRecordTask, tallyReadTask],
+  "y1-statistics-w2-l2": [tallyRecordTask, tallyRecordTask, tallyReadTask],
+  "y1-statistics-w2-l3": [tallyReadTask, tallyReadTask, frequencyTask],
+  // W3 One-to-One Displays — build object/picture graphs and read them.
+  "y1-statistics-w3-l1": [buildPics, tapPictureGraphTask, buildObjects],
+  "y1-statistics-w3-l2": [tapPictureGraphTask, frequencyTask, tapObjectGraphTask],
+  "y1-statistics-w3-l3": [frequencyTask, tapPictureGraphTask, compareTask],
+  // W4 Comparing Frequencies — rank, compare and count the gap (larger data 9-12).
+  "y1-statistics-w4-l1": [week6Rank, week6TapGraph, week6Gap],
+  "y1-statistics-w4-l2": [week6Compare, week6Gap, week6Compare],
+  "y1-statistics-w4-l3": [week6Compare, week6Rank, week6TapGraph],
+  // W5 Interpreting Data — read evidence and judge true/false claims (data 15-20).
+  "y1-statistics-w5-l1": [week7Frequency, week7TapGraph, week7Claim],
+  "y1-statistics-w5-l2": [week7Claim, week7Frequency, week7Claim],
+  "y1-statistics-w5-l3": [interpretTask, week7Rank, week7Claim],
+  // W6 Mini Investigation — the full cycle: collect -> represent -> interpret.
+  "y1-statistics-w6-l1": [collectTask, sortTask, tallyRecordTask],
+  "y1-statistics-w6-l2": [buildPics, buildObjects, tapPictureGraphTask],
+  "y1-statistics-w6-l3": [rankTask, gapTask, claimTask],
 };
 
 export function getStatisticaLevel1TaskSet(lessonId: string): RealmLessonTaskSet | null {
