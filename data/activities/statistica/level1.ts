@@ -101,7 +101,7 @@ function makeSortTask(round: number, target: number, size: number): PracticeTask
     kind: "statisticaSort", target, prompt: hard ? `${set.prompt} There are ${items.length} to sort!` : set.prompt,
     speakText: "Data can be sorted into groups called categories. Tap a card, then tap the group it belongs to.",
     items, categories: set.cats,
-    feedback: { correct: "Sorted! Every card is in the right group.", wrong: "Look again — each card belongs to just one group." },
+    feedback: { correct: "Sorted! Every card is in the right group.", wrong: "The cards marked with a red cross are in the wrong group — each one belongs in a different group." },
   };
 }
 

@@ -81,7 +81,7 @@ export function l2SortTask(round: number, target: number): PracticeTask {
     kind: "statisticaSort", target, prompt: `${set.prompt} There are 12 to sort into 4 groups.`,
     speakText: "Year 2 data has more groups. Tap a card, then tap the group it belongs in.",
     items, categories: set.cats,
-    feedback: { correct: "Sorted! Every card is in the right group.", wrong: "Look again — each card belongs in just one of the four groups." },
+    feedback: { correct: "Sorted! Every card is in the right group.", wrong: "The cards marked with a red cross are in the wrong group — move each one to where it belongs." },
   };
 }
 

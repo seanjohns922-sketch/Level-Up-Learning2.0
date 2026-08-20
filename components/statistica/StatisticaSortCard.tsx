@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import DataIcon from "@/components/statistica/DataIcon";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -35,20 +35,32 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
     if (ok) onCorrect(); else onWrong(task.items.map((it) => `${it.id}:${placement[it.id]}`).join(","));
   }
 
+  // After checking, mark each placed card right (green) or wrong (red).
+  const statusOf = (it: { id: string; category: string }): "correct" | "wrong" | null =>
+    settled && placement[it.id] ? (placement[it.id] === it.category ? "correct" : "wrong") : null;
+
   const chip = (it: { id: string; label: string; category: string }, inBin: boolean) => {
     const color = task.categories.find((c) => c.id === it.category)?.color ?? "#c65b4e";
+    const status = statusOf(it);
+    const stateCls = status === "correct"
+      ? "border-emerald-500 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-400"
+      : status === "wrong"
+        ? "border-red-500 bg-red-50 text-red-900 ring-2 ring-red-400"
+        : selected === it.id
+          ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55"
+          : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]";
     return (
       <div key={it.id} className="relative">
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); if (inBin) returnItem(it.id); else setSelected((s) => (s === it.id ? null : it.id)); }}
           disabled={settled}
-          className={["flex min-h-11 items-center gap-1.5 rounded-lg border-2 py-1.5 pl-2.5 pr-11 text-sm font-black transition disabled:opacity-70", selected === it.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}
+          className={["flex min-h-11 items-center gap-1.5 rounded-lg border-2 py-1.5 pl-2.5 pr-11 text-sm font-black transition disabled:opacity-100", stateCls].join(" ")}
         >
-          <DataIcon name={it.label} color={color} size={20} />
+          {status === "correct" ? <Check className="h-5 w-5 text-emerald-600" /> : status === "wrong" ? <X className="h-5 w-5 text-red-600" /> : <DataIcon name={it.label} color={color} size={20} />}
           {it.label}
         </button>
-        <OptionReadAloudButton text={it.label} className="absolute right-1 top-1/2 -translate-y-1/2" />
+        {!settled ? <OptionReadAloudButton text={it.label} className="absolute right-1 top-1/2 -translate-y-1/2" /> : null}
       </div>
     );
   };
