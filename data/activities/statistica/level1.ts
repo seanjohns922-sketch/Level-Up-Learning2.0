@@ -384,7 +384,7 @@ export function interpretTask(round: number, target: number): PracticeTask {
 // ── Teaching cards (shown first) — one per skill so the opening matches the lesson.
 // Graph lessons open by reading the tallest column; sort lessons open by grouping;
 // tally lessons open by reading marks. The right teach card is chosen per lesson.
-function teachGraphTask(round: number, target: number, display: "objects" | "pictures" = "pictures"): PracticeTask {
+function teachGraphTask(round: number, target: number, display: "objects" | "pictures" | "columns" = "pictures"): PracticeTask {
   const { survey, categories } = surveyCats(round);
   const top = [...categories].sort((x, y) => y.count - x.count)[0]!;
   return {
