@@ -11,7 +11,7 @@ const check = (condition: boolean, message: string) => {
   if (!condition) { problems += 1; console.error(`FAIL: ${message}`); }
 };
 const unique = <T,>(v: T[]) => new Set(v).size === v.length;
-const inRange = (v: number) => v >= 1 && v <= 12;
+const inRange = (v: number) => v >= 1 && v <= 15; // Year 3 uses larger frequencies
 
 function auditTask(lessonId: string, task: PracticeTask) {
   check(isPracticeTaskSafe(task), `${lessonId}: ${task.kind} must be renderable`);
@@ -22,6 +22,12 @@ function auditTask(lessonId: string, task: PracticeTask) {
       const ids = new Set(task.options.map((o) => o.id));
       check(task.options.length === 2 && task.correctOptionIds.length === 1 && ids.has(task.correctOptionIds[0]!), `${lessonId}: classify needs one valid answer`);
       check(["categorical", "numerical"].includes(task.correctOptionIds[0]!), `${lessonId}: classify answer must be categorical/numerical`);
+      break;
+    }
+    case "statisticaInference": {
+      const ids = new Set(task.options.map((o) => o.id));
+      check(task.options.length >= 3 && task.correctOptionIds.length === 1 && ids.has(task.correctOptionIds[0]!), `${lessonId}: inference needs one valid answer among conclusions`);
+      check(task.categories.length >= 2 && task.categories.every((c) => inRange(c.count)), `${lessonId}: inference graph counts must be 1..15`);
       break;
     }
     case "statisticaCollect": {
@@ -46,7 +52,7 @@ function auditTask(lessonId: string, task: PracticeTask) {
       break;
     }
     case "statisticaGraph": {
-      check(task.categories.length >= 2 && task.categories.every((c) => inRange(c.count)), `${lessonId}: graph counts must be 1..12`);
+      check(task.categories.length >= 2 && task.categories.every((c) => inRange(c.count)), `${lessonId}: graph counts must be 1..15`);
       if (task.mode !== "build") {
         const ids = new Set(task.options?.map((o) => o.id));
         check(task.correctOptionIds?.length === 1 && ids.has(task.correctOptionIds[0]!), `${lessonId}: graph ${task.mode} needs one valid answer`);
@@ -89,7 +95,7 @@ function auditTask(lessonId: string, task: PracticeTask) {
       break;
     }
     case "statisticaTable": {
-      check(task.rows.length >= 2 && task.rows.every((r) => inRange(r.count)), `${lessonId}: table counts must be 1..12`);
+      check(task.rows.length >= 2 && task.rows.every((r) => inRange(r.count)), `${lessonId}: table counts must be 1..15`);
       if (task.mode === "select") check(Boolean(task.correctRowId && task.rows.some((r) => r.id === task.correctRowId)), `${lessonId}: table select needs a real row`);
       else check(Boolean(task.answerCount && task.rows.some((r) => r.count === task.answerCount)), `${lessonId}: table count answer must be shown`);
       break;

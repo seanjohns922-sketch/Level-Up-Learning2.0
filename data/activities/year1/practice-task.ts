@@ -2866,6 +2866,19 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica Level 3 — read a data display and choose the conclusion the
+      // data supports (AC9M3ST02/ST03 "make inferences in context").
+      kind: "statisticaInference";
+      prompt: string;
+      speakText: string;
+      target: number;
+      display: "columns" | "pictures";
+      categories: Array<{ id: string; label: string; color: string; count: number }>;
+      options: Array<{ id: string; label: string }>;
+      correctOptionIds: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 6 · W3-4 — Four-quadrant Cartesian plane (AC9M6SP02). Signed ordered
       // pairs on an 8x8 grid (-4..4 each axis), origin centred. Plot/read points,
       // name quadrants, and reason about how coordinates change across the axes.
