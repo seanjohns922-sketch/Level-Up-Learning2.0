@@ -2879,6 +2879,46 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica Level 4 — many-to-one data displays with a KEY (AC9M4ST01).
+      // Each symbol stands for keyUnits data points (e.g. 1 star = 2 students),
+      // so rows can include a half symbol. "read": how many does a row show;
+      // "calc": total from symbols x key; "compare": how many more; "build": add
+      // whole symbols (each = keyUnits) until every row matches its frequency.
+      kind: "statisticaPictograph";
+      mode: "read" | "calc" | "compare" | "build";
+      prompt: string;
+      speakText: string;
+      target: number;
+      keyUnits: number;
+      unitNoun: string;
+      // One symbol shape drawn for every row (a many-to-one display uses a single
+      // repeated symbol); rows differ by count, and cat.color tints each row.
+      symbolLabel: string;
+      categories: Array<{ id: string; label: string; color: string; count: number }>;
+      options?: Array<{ id: string; label: string }>;
+      correctOptionIds?: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Statistica Level 4 — describe the distribution of a data set (AC9M4ST02):
+      // where data is concentrated, its overall shape, and variation/spread.
+      // "compare"/"variation" show two data sets side by side. A column display
+      // plus a multiple-choice judgement about the distribution.
+      kind: "statisticaShape";
+      mode: "concentrated" | "spread" | "variation" | "compare";
+      prompt: string;
+      speakText: string;
+      target: number;
+      display: "columns";
+      categories: Array<{ id: string; label: string; color: string; count: number }>;
+      categoriesB?: Array<{ id: string; label: string; color: string; count: number }>;
+      setLabelA?: string;
+      setLabelB?: string;
+      options: Array<{ id: string; label: string }>;
+      correctOptionIds: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 6 · W3-4 — Four-quadrant Cartesian plane (AC9M6SP02). Signed ordered
       // pairs on an 8x8 grid (-4..4 each axis), origin centred. Plot/read points,
       // name quadrants, and reason about how coordinates change across the axes.

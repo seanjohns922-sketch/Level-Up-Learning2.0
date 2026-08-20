@@ -293,6 +293,8 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "statisticaCollect",
   "statisticaClassify",
   "statisticaInference",
+  "statisticaPictograph",
+  "statisticaShape",
   "statisticaRank",
   "statisticaGap",
   "statisticaTapGraph",
