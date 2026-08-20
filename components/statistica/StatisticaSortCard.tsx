@@ -41,7 +41,7 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
       <div key={it.id} className="relative">
         <button
           type="button"
-          onClick={() => (inBin ? returnItem(it.id) : setSelected((s) => (s === it.id ? null : it.id)))}
+          onClick={(e) => { e.stopPropagation(); if (inBin) returnItem(it.id); else setSelected((s) => (s === it.id ? null : it.id)); }}
           disabled={settled}
           className={["flex min-h-11 items-center gap-1.5 rounded-lg border-2 py-1.5 pl-2.5 pr-11 text-sm font-black transition disabled:opacity-70", selected === it.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}
         >
@@ -66,10 +66,20 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
       <div className="mx-auto grid max-w-md gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(task.categories.length, 3)}, minmax(0,1fr))` }}>
         {task.categories.map((cat) => {
           const inThis = task.items.filter((it) => placement[it.id] === cat.id);
+          const armed = Boolean(selected) && !settled;
           return (
-            <div key={cat.id} className="relative min-h-[92px] rounded-lg border-2 p-2 text-left" style={{ borderColor: cat.color, background: `${cat.color}14` }}>
-              <button type="button" onClick={() => pickBin(cat.id)} disabled={settled || !selected} className="mb-1.5 min-h-9 w-full rounded-md pr-9 text-center text-xs font-black uppercase tracking-wide transition disabled:cursor-default" style={{ color: cat.color }}>{cat.label}</button>
-              <OptionReadAloudButton text={cat.label} className="absolute right-1 top-1" />
+            <div
+              key={cat.id}
+              role="button"
+              tabIndex={armed ? 0 : -1}
+              aria-label={`Put in ${cat.label}`}
+              onClick={() => pickBin(cat.id)}
+              onKeyDown={(e) => { if (armed && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pickBin(cat.id); } }}
+              className={["relative min-h-[92px] rounded-lg border-2 p-2 text-left transition", armed ? "cursor-pointer hover:brightness-110" : "cursor-default"].join(" ")}
+              style={{ borderColor: cat.color, background: `${cat.color}14`, boxShadow: armed ? `0 0 0 3px ${cat.color}55` : "none" }}
+            >
+              <div className="mb-1.5 min-h-9 pr-9 text-center text-xs font-black uppercase tracking-wide" style={{ color: cat.color }}>{cat.label}</div>
+              <span onClick={(e) => e.stopPropagation()}><OptionReadAloudButton text={cat.label} className="absolute right-1 top-1" /></span>
               <div className="flex flex-wrap justify-center gap-1.5">{inThis.map((it) => chip(it, true))}</div>
             </div>
           );
