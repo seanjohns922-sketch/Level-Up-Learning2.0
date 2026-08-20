@@ -35,6 +35,7 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
   const isColumns = display === "columns";
   const colWidth = isColumns ? Math.min(64, cellSize + 40) : cellSize + 22;
   const AXIS = 24;
+  const COL_GAP = 20; // fixed spacing between columns, so every graph matches
   const step = rows <= 6 ? 1 : rows <= 12 ? 2 : 5;
   const stops: number[] = [];
   for (let v = step; v <= rows; v += step) stops.push(v);
@@ -59,7 +60,7 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
         ))}
         <div className="absolute bottom-0 h-[2px] rounded-full bg-[#f2bc45]/40" style={{ left: AXIS - 4, right: 0 }} />
 
-        <div className="absolute bottom-0 flex items-end justify-around" style={{ left: AXIS, right: 0, height: plotH }}>
+        <div className="absolute bottom-0 flex items-end justify-center" style={{ left: AXIS, right: 0, height: plotH, gap: COL_GAP }}>
           {categories.map((cat, i) => {
             const value = heights[i]!;
             const status = statusById[cat.id];
@@ -83,7 +84,7 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
         </div>
       </div>
 
-      <div className="flex justify-around" style={{ paddingLeft: AXIS }}>
+      <div className="flex justify-center" style={{ paddingLeft: AXIS, gap: COL_GAP }}>
         {categories.map((cat, i) => (
           <div key={cat.id} className="flex flex-col items-center" style={{ width: colWidth }}>
             <div className="mt-2 flex items-center gap-1 text-center text-[11px] font-bold leading-tight text-white/90">
