@@ -328,19 +328,21 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y2-statistics-w2-l1": [l2SortTask, l2TallyRecordTask, l2TableFrequencyTask],
   "y2-statistics-w2-l2": [l2TableFrequencyTask, l2TableSelectTask, l2TableFrequencyTask],
   "y2-statistics-w2-l3": [l2TableSelectTask, l2TableFrequencyTask, l2FrequencyTask],
-  // W3 Picture & Column Graphs — build both, read both
-  "y2-statistics-w3-l1": [l2BuildPicsTask, l2TapPictureGraphTask, l2BuildPicsTask],
-  "y2-statistics-w3-l2": [buildColumnsTask, readColumnsTask, buildColumnsTask],
-  "y2-statistics-w3-l3": [readColumnsTask, columnFrequencyTask, l2TapPictureGraphTask],
-  // W4 Different Displays — same data as picture vs column, which works best
-  "y2-statistics-w4-l1": [buildColumnsTask, l2BuildPicsTask, readColumnsTask],
-  "y2-statistics-w4-l2": [sameDataDisplayTask, compareColumnsTask, columnClaimTask],
+  // W3 Picture & Column Graphs — l1 pictures (build/tap/read), l2 columns
+  // (build/read), l3 reading both + a table so each lesson looks different.
+  "y2-statistics-w3-l1": [l2BuildPicsTask, l2TapPictureGraphTask, l2ReadGraphTask],
+  "y2-statistics-w3-l2": [buildColumnsTask, readColumnsTask, columnFrequencyTask],
+  "y2-statistics-w3-l3": [readColumnsTask, l2FrequencyTask, l2TableFrequencyTask],
+  // W4 Different Displays — build the same data two ways, then compare/choose.
+  "y2-statistics-w4-l1": [l2BuildPicsTask, buildColumnsTask, sameDataDisplayTask],
+  "y2-statistics-w4-l2": [sameDataDisplayTask, compareColumnsTask, l2TapPictureGraphTask],
   "y2-statistics-w4-l3": [sameDataDisplayTask, l2RankTask, columnClaimTask],
-  // W5 Interpreting Displays — most/least, compare, conclude
-  "y2-statistics-w5-l1": [l2RankTask, l2TapPictureGraphTask, columnFrequencyTask],
-  "y2-statistics-w5-l2": [l2GapTask, l2CompareTask, compareColumnsTask],
-  "y2-statistics-w5-l3": [l2ClaimTask, l2RankTask, l2ReadGraphTask],
-  // W6 Statistical Investigation — collect -> display -> compare & report
+  // W5 Interpreting Displays — spread the distinct reasoning interactions
+  // (rank / gap / table) so it isn't three graph-MCQs in a row.
+  "y2-statistics-w5-l1": [l2RankTask, l2TapPictureGraphTask, l2GapTask],
+  "y2-statistics-w5-l2": [l2GapTask, compareColumnsTask, l2CompareTask],
+  "y2-statistics-w5-l3": [l2ClaimTask, l2RankTask, l2TableSelectTask],
+  // W6 Statistical Investigation — collect/record, represent, interpret/report.
   "y2-statistics-w6-l1": [l2CollectTask, l2TallyRecordTask, l2TableFrequencyTask],
   "y2-statistics-w6-l2": [l2BuildPicsTask, buildColumnsTask, l2TapPictureGraphTask],
   "y2-statistics-w6-l3": [compareColumnsTask, l2RankTask, l2ClaimTask],
