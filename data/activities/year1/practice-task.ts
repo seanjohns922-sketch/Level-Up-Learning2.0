@@ -2853,6 +2853,19 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica Level 3 — classify a data variable as categorical or numerical
+      // (AC9M3ST01). Shows the variable and example responses; pick the type.
+      kind: "statisticaClassify";
+      prompt: string;
+      speakText: string;
+      target: number;
+      variable: string;
+      examples: string;
+      options: Array<{ id: string; label: string }>;
+      correctOptionIds: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 6 · W3-4 — Four-quadrant Cartesian plane (AC9M6SP02). Signed ordered
       // pairs on an 8x8 grid (-4..4 each axis), origin centred. Plot/read points,
       // name quadrants, and reason about how coordinates change across the axes.
