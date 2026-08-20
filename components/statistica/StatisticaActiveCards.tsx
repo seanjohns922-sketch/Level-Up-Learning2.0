@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { Check, RotateCcw } from "lucide-react";
-import DataIcon from "@/components/statistica/DataIcon";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
+import StatisticaPlot from "@/components/statistica/StatisticaPlot";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type RankTask = Extract<PracticeTask, { kind: "statisticaRank" }>;
@@ -23,35 +23,13 @@ function SubmitButton({ disabled, onClick }: { disabled: boolean; onClick: () =>
   );
 }
 
-function MiniColumn({ label, color, count, selected = false }: { label: string; color: string; count: number; selected?: boolean }) {
-  const dense = count > 12;
-  const medium = count > 8;
-  const stackHeight = dense ? "h-52" : medium ? "h-48" : "h-40";
-  const markSize = dense ? "h-2 w-8" : medium ? "h-3 w-8" : "h-4 w-8";
-  const markGap = dense || medium ? "gap-0.5" : "gap-1";
-
-  return (
-    <div className="flex min-w-0 flex-1 flex-col items-center justify-end gap-1">
-      <div className="text-sm font-black text-[#fff0c7]">{count}</div>
-      <div className={`flex ${stackHeight} flex-col-reverse ${markGap} rounded-md border border-white/10 bg-black/15 p-2`}>
-        {Array.from({ length: count }, (_, index) => (
-          <span key={index} className={`${markSize} rounded-full border border-white/15`} style={{ backgroundColor: color }} />
-        ))}
-      </div>
-      <div className={`mt-1 max-w-full truncate text-sm font-black ${selected ? "text-[#ff7b72]" : "text-white"}`}>{label}</div>
-    </div>
-  );
-}
-
 export function StatisticaRankCard({ task, onCorrect, onWrong }: { task: RankTask } & ResultProps) {
   const [order, setOrder] = useState<string[]>([]);
   const [settled, setSettled] = useState(false);
-  const available = task.categories.filter((category) => !order.includes(category.id));
 
   function choose(id: string) {
     if (!settled && !order.includes(id)) setOrder((current) => [...current, id]);
   }
-
   function submit() {
     if (settled || order.length !== task.categories.length) return;
     setSettled(true);
@@ -62,34 +40,20 @@ export function StatisticaRankCard({ task, onCorrect, onWrong }: { task: RankTas
   return (
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
-      <div className={panel}>
-        <div className="flex items-end justify-center gap-3 sm:gap-6">
-          {task.categories.map((category) => <MiniColumn key={category.id} {...category} selected={order.includes(category.id)} />)}
-        </div>
-        <div className="mt-5 grid grid-cols-3 gap-2" aria-label="Ranked order">
-          {task.categories.map((_, index) => {
-            const category = task.categories.find((item) => item.id === order[index]);
-            return (
-              <div key={index} className="relative">
-                <button type="button" disabled={!category || settled} onClick={() => !settled && setOrder((current) => current.filter((__, i) => i !== index))} className="min-h-20 w-full rounded-lg border-2 border-dashed border-[#f2bc45]/45 bg-[#fffaf0]/5 p-2 pr-11 text-center text-sm font-black text-white disabled:opacity-100">
-                  <span className="block text-[10px] uppercase text-[#f2bc45]">{index + 1}</span>
-                  {category?.label ?? "Tap a column"}
-                </button>
-                <OptionReadAloudButton text={`${index + 1}. ${category?.label ?? "Empty position"}`} className="absolute right-1 top-1/2 -translate-y-1/2" />
-              </div>
-            );
-          })}
-        </div>
-        <div className="mt-3 flex flex-wrap justify-center gap-2">
-          {available.map((category) => (
-            <div key={category.id} className="relative">
-              <button type="button" onClick={() => choose(category.id)} disabled={settled} className="min-h-12 rounded-lg border-2 border-[#b9caaa] bg-[#fffaf0] py-3 pl-4 pr-12 text-sm font-black text-[#244531] hover:border-[#f06b64] disabled:opacity-50">
-                {category.label}
+      <StatisticaPlot categories={task.categories} display="columns" onColumnClick={choose} selectedIds={order} />
+      <div className="mx-auto grid max-w-lg grid-cols-3 gap-2" aria-label="Ranked order">
+        {task.categories.map((_, index) => {
+          const category = task.categories.find((item) => item.id === order[index]);
+          return (
+            <div key={index} className="relative">
+              <button type="button" disabled={!category || settled} onClick={() => !settled && setOrder((current) => current.filter((__, i) => i !== index))} className="min-h-16 w-full rounded-lg border-2 border-dashed border-[#b9caaa] bg-[#fffaf0] p-2 pr-9 text-center text-sm font-black text-[#244531] disabled:opacity-100">
+                <span className="block text-[10px] uppercase text-[#c65b1a]">{index + 1}</span>
+                {category?.label ?? "Tap a bar"}
               </button>
-              <OptionReadAloudButton text={category.label} className="absolute right-1 top-1/2 -translate-y-1/2" />
+              <OptionReadAloudButton text={`${index + 1}. ${category?.label ?? "Empty position"}`} className="absolute right-1 top-1/2 -translate-y-1/2 scale-90" />
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
       <div className="flex justify-center gap-2">
         <button type="button" onClick={() => setOrder([])} disabled={settled || order.length === 0} aria-label="Reset order" className="grid h-12 w-12 place-items-center rounded-lg border-2 border-[#b9caaa] bg-[#fffaf0] text-[#244531] disabled:opacity-40"><RotateCcw className="h-5 w-5" /></button>
@@ -101,14 +65,13 @@ export function StatisticaRankCard({ task, onCorrect, onWrong }: { task: RankTas
 
 export function StatisticaGapCard({ task, onCorrect, onWrong }: { task: GapTask } & ResultProps) {
   const smaller = Math.min(...task.categories.map((category) => category.count));
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [settled, setSettled] = useState(false);
 
-  function toggle(index: number) {
+  function toggle(key: string) {
     if (settled) return;
-    setSelected((current) => current.includes(index) ? current.filter((value) => value !== index) : [...current, index]);
+    setSelected((current) => current.includes(key) ? current.filter((v) => v !== key) : [...current, key]);
   }
-
   function submit() {
     if (settled || selected.length === 0) return;
     setSettled(true);
@@ -118,35 +81,23 @@ export function StatisticaGapCard({ task, onCorrect, onWrong }: { task: GapTask 
   return (
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
-      <div className={panel}>
-        <div className="mb-4 flex items-center justify-center gap-2">
-          <p className="text-center text-sm font-bold text-[#fff0c7]">Tap every extra data mark, then check your count.</p>
-          <OptionReadAloudButton text="Tap every extra data mark, then check your count." />
-        </div>
-        <div className="grid grid-cols-2 gap-4 sm:gap-8">
-          {task.categories.map((category) => {
-            const compact = category.count > 8;
-            return (
-            <div key={category.id} className="flex flex-col items-center">
-              <div className={`flex h-52 flex-col-reverse rounded-lg border border-white/10 bg-black/15 p-3 ${compact ? "gap-1" : "gap-1.5"}`}>
-                {Array.from({ length: category.count }, (_, index) => {
-                  const isExtra = category.id === task.largerCategoryId && index >= smaller;
-                  const active = isExtra && selected.includes(index);
-                  return (
-                    <button key={index} type="button" disabled={!isExtra || settled} onClick={() => toggle(index)} aria-label={isExtra ? `extra ${category.label} mark ${index - smaller + 1}` : undefined} className={`grid w-16 place-items-center rounded-md border transition ${compact ? "h-3.5" : "h-7"} ${isExtra ? "cursor-pointer border-[#f2bc45]" : "cursor-default border-white/10"} ${active ? "ring-4 ring-[#fff0c7]/70" : ""}`} style={{ backgroundColor: category.color }}>
-                      {isExtra ? <span className="h-2 w-2 rounded-full bg-white/90" /> : null}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="mt-2 flex items-center gap-1 text-sm font-black text-white">{category.label}<OptionReadAloudButton text={category.label} /></div>
-            </div>
-          )})}
-        </div>
-        <div className="mt-4 flex items-center justify-center gap-2 text-xl font-black text-[#fff0c7]">
-          <span>Extra marks counted: {selected.length}</span>
-          <OptionReadAloudButton text={`Extra marks counted: ${selected.length}`} />
-        </div>
+      <StatisticaPlot
+        categories={task.categories}
+        display="objects"
+        cell={(cat, cellIndex, _colIndex, cellSize) => {
+          const isExtra = cat.id === task.largerCategoryId && cellIndex >= smaller;
+          const key = `${cat.id}:${cellIndex}`;
+          const active = isExtra && selected.includes(key);
+          return (
+            <button key={cellIndex} type="button" disabled={!isExtra || settled} onClick={() => toggle(key)} aria-label={isExtra ? `extra mark ${cellIndex - smaller + 1}` : undefined} className={`grid place-items-center rounded-[3px] border transition ${isExtra ? "cursor-pointer border-[#fff0c7]" : "cursor-default border-white/15"} ${active ? "ring-2 ring-[#fff0c7]" : ""}`} style={{ height: cellSize, width: cellSize, background: cat.color }}>
+              {isExtra ? <span className="h-1.5 w-1.5 rounded-full bg-white/95" /> : null}
+            </button>
+          );
+        }}
+      />
+      <div className="flex items-center justify-center gap-2 text-lg font-black text-[#244531]">
+        <span>Extra marks counted: {selected.length}</span>
+        <OptionReadAloudButton text={`Extra marks counted: ${selected.length}`} />
       </div>
       <div className="flex justify-center"><SubmitButton disabled={settled || selected.length === 0} onClick={submit} /></div>
     </div>
@@ -163,36 +114,20 @@ export function StatisticaTapGraphCard({ task, onCorrect, onWrong }: { task: Tap
     if (chosen === task.correctCategoryId) onCorrect(); else onWrong(chosen);
   }
 
+  const statusById: Record<string, "correct" | "wrong"> = settled
+    ? { [task.correctCategoryId]: "correct", ...(chosen && chosen !== task.correctCategoryId ? { [chosen]: "wrong" as const } : {}) }
+    : {};
+
   return (
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
-      <div className={panel}>
-        <div className="flex items-end justify-center gap-3 sm:gap-6">
-          {task.categories.map((category) => {
-            const dense = category.count > 12;
-            const medium = category.count > 8;
-            const stackHeight = dense ? "h-52" : medium ? "h-48" : "h-44";
-            const stackGap = dense ? "gap-0" : medium ? "gap-0.5" : "gap-1.5";
-            const pictureSize = dense ? 14 : medium ? 17 : 27;
-            const pictureCell = dense ? "h-[10px] w-9" : medium ? "h-4 w-9" : "h-7 w-9";
-            const objectCell = dense ? "h-2.5 w-10" : medium ? "h-3 w-10" : "h-6 w-10";
-            return (
-            <div key={category.id} className={`relative flex min-w-0 flex-1 rounded-lg border-2 transition ${chosen === category.id ? "border-[#ff7b72] bg-[#fff0c7]/15 ring-2 ring-[#f2bc45]/60" : "border-transparent hover:border-[#f2bc45]/55"}`}>
-              <button type="button" disabled={settled} onClick={() => setChosen(category.id)} aria-pressed={chosen === category.id} className="flex min-w-0 flex-1 flex-col items-center p-2">
-                <div className={`flex ${stackHeight} flex-col-reverse ${stackGap}`}>
-                  {Array.from({ length: category.count }, (_, index) => task.display === "pictures" ? (
-                    <span key={index} className={`grid ${pictureCell} place-items-center`}><DataIcon name={category.label} color={category.color} size={pictureSize} /></span>
-                  ) : (
-                    <span key={index} className={`${objectCell} rounded-md border border-white/15`} style={{ backgroundColor: category.color }} />
-                  ))}
-                </div>
-                <span className="mt-2 max-w-full truncate pr-8 text-sm font-black text-white">{category.label}</span>
-              </button>
-              <OptionReadAloudButton text={category.label} className="absolute bottom-1 right-1" />
-            </div>
-          )})}
-        </div>
-      </div>
+      <StatisticaPlot
+        categories={task.categories}
+        display={task.display}
+        onColumnClick={(id) => { if (!settled) setChosen(id); }}
+        selectedIds={chosen ? [chosen] : []}
+        statusById={statusById}
+      />
       <div className="flex justify-center"><SubmitButton disabled={settled || !chosen} onClick={submit} /></div>
     </div>
   );
