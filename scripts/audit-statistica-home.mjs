@@ -25,6 +25,25 @@ for (const assetName of assetNames) {
   assert(visualMap.includes(`/images/${assetName}`), `Statistica visual map does not reference ${assetName}`);
 }
 
+const legendCatalogue = read("data/legends.ts");
+const dataraVideos = [
+  ["Datara Picker", "datara-picker"],
+  ["Datara Sorter", "datara-solver"],
+  ["Datara Grapher", "datara-grapher"],
+  ["Datara Analyst", "datara-analyst"],
+  ["Datara Decoder", "datara-decoder"],
+  ["Datara Insightkeeper", "datara-insightkeeper"],
+];
+assert(legendCatalogue.includes("unlockVideoUrl: legendVideoUrl(videoSlug)"), "Statistica legends must expose an unlock video");
+assert(legendCatalogue.includes("showcaseVideoUrl: legendVideoUrl(videoSlug)"), "Statistica legends must expose a showcase video");
+for (const [legendName, videoSlug] of dataraVideos) {
+  const videoPath = path.join(root, "public", "videos", "legends", `${videoSlug}.mp4`);
+  assert(legendCatalogue.includes(`\"${legendName}\"`), `Missing Statistica legend: ${legendName}`);
+  assert(legendCatalogue.includes(`\"${videoSlug}\"`), `${legendName} is not mapped to ${videoSlug}.mp4`);
+  assert(fs.existsSync(videoPath), `Missing ${legendName} video: ${videoSlug}.mp4`);
+  assert(fs.statSync(videoPath).size > 0, `${legendName} video is empty: ${videoSlug}.mp4`);
+}
+
 const route = read("app/statistica/page.tsx");
 assert(route.includes("StatisticaMap"), "Statistica route must render the Statistica map");
 assert(route.includes('entry.id !== "Prep"'), "Statistica route must exclude Prep from level selection");

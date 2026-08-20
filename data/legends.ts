@@ -155,6 +155,7 @@ function statisticaLegend(
   stats: LegendStats,
   front: string,
   back: string,
+  videoSlug: string,
 ): Legend {
   return {
     id,
@@ -170,6 +171,8 @@ function statisticaLegend(
       cardFront: front,
       cardBack: back,
     },
+    unlockVideoUrl: legendVideoUrl(videoSlug),
+    showcaseVideoUrl: legendVideoUrl(videoSlug),
   };
 }
 
@@ -414,6 +417,7 @@ const LEGENDS: Legend[] = [
     { calculation: 42, speed: 40, accuracy: 48 },
     "/cards/datara-picker-y1-front.png",
     "/cards/datara-picker-y1-back.png",
+    "datara-picker",
   ),
   statisticaLegend(
     "datara-sorter-y2",
@@ -424,6 +428,7 @@ const LEGENDS: Legend[] = [
     { calculation: 50, speed: 48, accuracy: 56 },
     "/cards/datara-sorter-y2-front.png",
     "/cards/datara-sorter-y2-back.png",
+    "datara-solver",
   ),
   statisticaLegend(
     "datara-grapher-y3",
@@ -434,6 +439,7 @@ const LEGENDS: Legend[] = [
     { calculation: 58, speed: 55, accuracy: 62 },
     "/cards/datara-grapher-y3-front.png",
     "/cards/datara-grapher-y3-back.png",
+    "datara-grapher",
   ),
   statisticaLegend(
     "datara-analyst-y4",
@@ -444,6 +450,7 @@ const LEGENDS: Legend[] = [
     { calculation: 66, speed: 62, accuracy: 69 },
     "/cards/datara-analyst-y4-front.png",
     "/cards/datara-analyst-y4-back.png",
+    "datara-analyst",
   ),
   statisticaLegend(
     "datara-decoder-y5",
@@ -454,6 +461,7 @@ const LEGENDS: Legend[] = [
     { calculation: 76, speed: 70, accuracy: 78 },
     "/cards/datara-decoder-y5-front.png",
     "/cards/datara-decoder-y5-back.png",
+    "datara-decoder",
   ),
   statisticaLegend(
     "datara-insightkeeper-y6",
@@ -464,6 +472,7 @@ const LEGENDS: Legend[] = [
     { calculation: 85, speed: 79, accuracy: 87 },
     "/cards/datara-insightkeeper-y6-front.png",
     "/cards/datara-insightkeeper-y6-back.png",
+    "datara-insightkeeper",
   ),
 ];
 
