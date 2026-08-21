@@ -27,7 +27,12 @@ type Props = {
 // small data gets big icons and tall columns still fit.
 export default function StatisticaPlot({ categories, display, values, onColumnClick, selectedIds = [], statusById = {}, footer, cell, labelReadAloud = true }: Props) {
   const heights = categories.map((c, i) => values?.[i] ?? c.count);
-  const rows = Math.max(1, ...categories.map((c) => c.count), ...heights);
+  const maxVal = Math.max(1, ...categories.map((c) => c.count), ...heights);
+  // Round the axis top up to a whole number of steps so the scale is always
+  // consistent (…5, 10, 15) instead of snapping the top gridline to the data's
+  // max value (which produced odd labels like 13).
+  const step = maxVal <= 6 ? 1 : maxVal <= 12 ? 2 : 5;
+  const rows = Math.ceil(maxVal / step) * step;
   const unit = Math.max(14, Math.min(34, Math.floor(360 / rows)));
   const cellGap = Math.max(2, Math.min(6, Math.round(unit * 0.16)));
   const cellSize = unit - cellGap;
@@ -36,10 +41,8 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
   const colWidth = isColumns ? Math.min(64, cellSize + 40) : cellSize + 22;
   const AXIS = 24;
   const COL_GAP = 20; // fixed spacing between columns, so every graph matches
-  const step = rows <= 6 ? 1 : rows <= 12 ? 2 : 5;
   const stops: number[] = [];
   for (let v = step; v <= rows; v += step) stops.push(v);
-  if (stops[stops.length - 1] !== rows) stops.push(rows);
   const cellShape = display === "pictures" ? "rounded-full" : "rounded-[3px]";
 
   const defaultCell = (cat: PlotCat, key: number) =>
