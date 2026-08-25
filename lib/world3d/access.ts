@@ -65,7 +65,7 @@ export function resolveRealm3DAccess(input: Realm3DAccessInput): Realm3DAccessDe
     return { canExplore3D: true, reason: "allowed", source: "dev" };
   }
 
-  if (process.env.NEXT_PUBLIC_ENABLE_REALM_3D !== "1") {
+  if (process.env.NEXT_PUBLIC_ENABLE_REALM_3D === "0") {
     return { canExplore3D: false, reason: "global-disabled", source: "platform" };
   }
 
@@ -92,6 +92,6 @@ export function resolveRealm3DAccess(input: Realm3DAccessInput): Realm3DAccessDe
 }
 
 export function resolvePostLoginExperience(input: Realm3DAccessInput & { fallbackHref: string }) {
-  if (process.env.NEXT_PUBLIC_REALM_3D_DEFAULT !== "1") return input.fallbackHref;
+  if (process.env.NEXT_PUBLIC_REALM_3D_DEFAULT === "0") return input.fallbackHref;
   return resolveRealm3DAccess(input).canExplore3D ? "/world" : input.fallbackHref;
 }

@@ -120,9 +120,10 @@ The 3D experience is a navigation layer over the existing learning engine. It do
 
 Production 3D access requires all applicable layers to pass:
 
-1. `NEXT_PUBLIC_ENABLE_REALM_3D=1` enables the platform capability.
+1. The platform capability is enabled by default. `NEXT_PUBLIC_ENABLE_REALM_3D=0`
+   is the emergency global kill switch.
 2. Optional `NEXT_PUBLIC_REALM_3D_SCHOOL_ALLOWLIST`, `NEXT_PUBLIC_REALM_3D_CLASS_ALLOWLIST`, and `NEXT_PUBLIC_REALM_3D_STUDENT_ALLOWLIST` constrain the pilot.
-3. `NEXT_PUBLIC_REALM_3D_DEFAULT=1` changes the post-login `/realms` destination to `/world`; when absent, current students retain the existing 2D entry flow.
+3. 3D is the post-login default when `NEXT_PUBLIC_REALM_3D_DEFAULT` is absent. Set `NEXT_PUBLIC_REALM_3D_DEFAULT=0` to restore `/realms` as the default 2D entry.
 4. Unsupported realms, missing WebGL, and reduced-motion device fallback stay in 2D.
 
 The global platform flag is evaluated before demo access. A local browser value cannot override it in production. Teacher preview remains an explicit preview route and does not write student progress.

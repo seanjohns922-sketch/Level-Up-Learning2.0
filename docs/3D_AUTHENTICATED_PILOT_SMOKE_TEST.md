@@ -8,7 +8,10 @@ and continue it when the canonical pathway reaches that state.
 ## Release Preconditions
 
 - [ ] Use the release candidate that passed the automated release/parity suite.
-- [ ] Confirm `NEXT_PUBLIC_REALM_3D_DEFAULT` is not `1` (production default stays 2D).
+- [ ] Confirm 3D is the post-login default and `NEXT_PUBLIC_REALM_3D_DEFAULT=0`
+      remains available as the immediate 2D-default kill switch.
+- [ ] Confirm `NEXT_PUBLIC_ENABLE_REALM_3D=0` remains available as the global 3D
+      kill switch.
 - [ ] Confirm the existing test student is already covered by the controlled-pilot
       access policy. Do not widen school, class, or student allowlists for this test.
 - [ ] Confirm a normal, non-allowlisted account still enters the existing 2D flow.
@@ -56,8 +59,8 @@ Every snapshot must satisfy these invariants:
 **Before: S01** - Record the complete canonical snapshot. No page is open.
 
 - [ ] Sign in as the test student through the normal login.
-- [ ] Confirm the normal entry remains 2D unless the student deliberately selects
-      the controlled 3D option.
+- [ ] Confirm an eligible student enters 3D by default and can still select the
+      visible 2D/Quick Start path.
 - [ ] Open 2D Continue Learning and record its exact destination without starting.
 - [ ] Open 3D and record Current Mission and the corresponding gate state.
 
