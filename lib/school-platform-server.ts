@@ -127,6 +127,105 @@ export type SchoolHomeSnapshot = {
   studentDirectoryError: string | null;
 };
 
+export type SchoolAnalyticsSnapshot = {
+  generatedAt: string;
+  windowDays: number;
+  filters: {
+    yearLevel: string | null;
+    classId: string | null;
+    realmId: string | null;
+  };
+  overview: {
+    students: number;
+    activeThisWeek: number;
+    weeklyTargetMet: number;
+    onTrack: number;
+    levelsMastered: number;
+    averageGrowth: number | null;
+    matchedGrowthPairs: number;
+  };
+  realms: Array<{
+    realmId: string;
+    activeStudents: number;
+    weeklyTargetMet: number;
+    masteredLevels: number;
+    averageAccuracy: number | null;
+    lessons: number;
+    quizzes: number;
+    averageGrowth: number | null;
+  }>;
+  growthTrend: Array<{
+    date: string;
+    averageGrowth: number | null;
+    matchedPairs: number;
+  }>;
+  engagementTrend: Array<{
+    date: string;
+    activeStudents: number;
+    activities: number;
+  }>;
+  engagement: {
+    activeLearners: number;
+    averageLearningDays: number | null;
+    returningLearners: number;
+    lessonsCompleted: number;
+    quizzesCompleted: number;
+  };
+  curriculum: Array<{
+    topic: string;
+    yearLevel: string | null;
+    students: number;
+    evidenceCount: number;
+    averageAccuracy: number | null;
+  }>;
+  classes: Array<{
+    id: string | null;
+    name: string;
+    students: number;
+    activeStudents: number;
+    weeklyTargetMet: number;
+    masteredLevels: number;
+    averageAccuracy: number | null;
+    averageGrowth: number | null;
+  }>;
+  students: Array<{
+    id: string;
+    name: string;
+    yearLevel: string | null;
+    classId: string | null;
+    className: string;
+    lastActive: string | null;
+    averageAccuracy: number | null;
+    realmsUsed: number;
+    learningDays: number;
+    activeThisWeek: boolean;
+    weeklyTargetMet: boolean;
+    masteredLevels: number;
+    status: "on_track" | "active" | "needs_attention";
+    averageGrowth: number | null;
+    realms: Array<{
+      realmId: string;
+      averageAccuracy: number | null;
+      activities: number;
+      currentLevel: string | null;
+      currentWeek: number | null;
+      pathwayStatus: string | null;
+      pretestScore: number | null;
+      posttestScore: number | null;
+      mastered: boolean;
+      growth: number | null;
+    }>;
+  }>;
+  methodology: {
+    weeklyTarget: string;
+    onTrack: string;
+    mastery: string;
+    growth: string;
+    lessonDeduplication: string;
+    quizDeduplication: string;
+  };
+};
+
 export function isSchoolPlatformPreviewEnabled() {
   return process.env.SCHOOL_PLATFORM_PREVIEW_ENABLED !== "false";
 }
@@ -388,6 +487,37 @@ export async function loadSchoolStudentDirectoryPreview(
     console.error("[SchoolHome] Unable to load the canonical student directory", error);
     throw new Error(message);
   }
+}
+
+export async function loadSchoolAnalyticsSnapshot(
+  schoolId: string,
+  academicYearId: string,
+  filters: {
+    days?: number;
+    yearLevel?: string | null;
+    classId?: string | null;
+    realmId?: string | null;
+  } = {},
+  accessToken = "",
+) {
+  const access = await requireSchoolPreviewAccess(schoolId, accessToken);
+  if (!access) return null;
+
+  return supabaseRequest<SchoolAnalyticsSnapshot>(
+    "/rest/v1/rpc/get_school_analytics_snapshot",
+    access.accessToken,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        p_school_id: schoolId,
+        p_academic_year_id: academicYearId,
+        p_days: filters.days ?? 30,
+        p_year_level: filters.yearLevel || null,
+        p_class_id: filters.classId || null,
+        p_realm_id: filters.realmId || null,
+      }),
+    },
+  );
 }
 
 export async function loadSchoolLicenceSummaries(schoolId: string) {

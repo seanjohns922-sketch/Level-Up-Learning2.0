@@ -28,6 +28,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type {
@@ -42,6 +43,26 @@ import {
 } from "@/lib/roster-import";
 import { getSchoolLogo } from "@/lib/school-logos";
 import { downloadStudentRosterTemplate } from "@/lib/student-roster-template";
+
+const SchoolAnalyticsDashboard = dynamic(
+  () => import("./SchoolAnalyticsDashboard"),
+  {
+    loading: () => (
+      <div className="space-y-5" aria-label="Loading school analytics">
+        <div className="h-14 animate-pulse bg-slate-200" />
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+          {Array.from({ length: 6 }, (_, index) => (
+            <div key={index} className="h-32 animate-pulse bg-slate-200" />
+          ))}
+        </div>
+        <div className="grid gap-5 xl:grid-cols-2">
+          <div className="h-72 animate-pulse bg-slate-200" />
+          <div className="h-72 animate-pulse bg-slate-200" />
+        </div>
+      </div>
+    ),
+  },
+);
 
 type TabId =
   | "home"
@@ -2547,11 +2568,6 @@ export default function SchoolHomeClient({
                 >
                   <Icon className="h-4 w-4" />
                   {item.label}
-                  {item.id === "insights" && isAdministrator ? (
-                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-500">
-                      Soon
-                    </span>
-                  ) : null}
                 </button>
               );
             })}
@@ -2935,19 +2951,27 @@ export default function SchoolHomeClient({
           ) : null}
 
           {tab === "insights" ? (
-            <EmptyState
-              icon={BarChart3}
-              title={
-                isAdministrator
-                  ? "Whole-school insights are coming soon"
-                  : "Class insights are available inside each class"
-              }
-              detail={
-                isAdministrator
-                  ? "This phase does not invent analytics. Existing class learning data remains in the class dashboard."
-                  : "Open a class to view learning trends, assessment summaries and student insights."
-              }
-            />
+            isAdministrator ? (
+              academicYearId ? (
+                <SchoolAnalyticsDashboard
+                  schoolId={snapshot.school.id}
+                  academicYearId={academicYearId}
+                  classes={filteredClasses}
+                />
+              ) : (
+                <EmptyState
+                  icon={BarChart3}
+                  title="Select an academic year"
+                  detail="School analytics require an academic year before canonical learning evidence can be loaded."
+                />
+              )
+            ) : (
+              <EmptyState
+                icon={BarChart3}
+                title="Class insights are available inside each class"
+                detail="Open a class to view learning trends, assessment summaries and student insights."
+              />
+            )
           ) : null}
 
           {tab === "administration" ? (

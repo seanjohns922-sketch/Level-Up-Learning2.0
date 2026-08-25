@@ -147,7 +147,7 @@ const checks = [
     "student identity directory and insights scope",
     /School Students/.test(client) &&
       /Explorer Code/.test(client) &&
-      /Whole-school insights are coming soon/.test(client),
+      /SchoolAnalyticsDashboard/.test(client),
   ],
   [
     "administrators can assign a new student to an active school class",
