@@ -738,8 +738,8 @@ export default function ProfilePage() {
               </div>
 
               <div className="mb-1 grid grid-cols-7 gap-1">
-                {DAYS.map((day) => (
-                  <div key={day} className="text-center text-[9px] font-bold text-[#94A3B8]">
+                {DAYS.map((day, index) => (
+                  <div key={`${day}-${index}`} className="text-center text-[9px] font-bold text-[#94A3B8]">
                     {day}
                   </div>
                 ))}

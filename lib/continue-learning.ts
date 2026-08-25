@@ -2,9 +2,11 @@
 
 import type { ProgressRealmScope } from "@/data/progress";
 import { buildLessonId } from "@/lib/lesson-routing";
-import { getLastRealm, getLastStarpathRoute, setLastRealm } from "@/lib/last-realm";
+import { getLastRealm, setLastRealm } from "@/lib/last-realm";
 import { getRealmAvailability, resolveRealmEntryRoute } from "@/lib/realm-entry";
-import { STARPATH_WORLD_ROUTE } from "@/lib/starpath-routes";
+import { resolveCanonicalNextActivity } from "@/lib/canonical-next-activity";
+import { readProgramStore } from "@/lib/program-progress";
+import { getRealmDefinition, isLiveRealmId, tryCanonicalRealmId, type LiveRealmId } from "@/lib/realms/realm-registry";
 import {
   lessonResumeHasProgress,
   loadLessonResume,
@@ -16,7 +18,6 @@ import {
   getActiveStudentProfile,
 } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
 
 export type ActiveLearningContext = "lesson" | "session" | "pretest" | "posttest";
 
@@ -36,9 +37,11 @@ function getCurrentStudentId() {
   return getActiveStudentIdentity().studentId;
 }
 
-function realmFromRoute(route: string): "number-nexus" | "measurelands" {
+function progressRealmFromRoute(route: string): LiveRealmId {
   const params = new URL(route, "https://level-up-learning.local").searchParams;
-  return params.get("realm_id") === "measurement" ? "measurelands" : "number-nexus";
+  const explicit = tryCanonicalRealmId(params.get("realm_id"));
+  if (explicit && isLiveRealmId(explicit)) return explicit;
+  return route.startsWith("/starpath") ? "space" : route.startsWith("/measurelands") ? "measurement" : "number";
 }
 
 export function rememberActiveLearningDestination(context: ActiveLearningContext) {
@@ -50,7 +53,7 @@ export function rememberActiveLearningDestination(context: ActiveLearningContext
     const route = `${window.location.pathname}${window.location.search}`;
     const destination: ActiveLearningDestination = { context, route, updatedAt: Date.now() };
     localStorage.setItem(activeLearningKey(studentId), JSON.stringify(destination));
-    setLastRealm(realmFromRoute(route));
+    setLastRealm(getRealmDefinition(progressRealmFromRoute(route)).portalId);
   } catch {
     // Storage can be unavailable in restricted browser modes; learning remains usable.
   }
@@ -74,7 +77,7 @@ function readActiveLearningDestination(): ActiveLearningDestination | null {
 function resolveSavedResumeRoute(destination: ActiveLearningDestination | null) {
   if (!destination) return null;
   const url = new URL(destination.route, "https://level-up-learning.local");
-  const realmId: ProgressRealmScope = url.searchParams.get("realm_id") === "measurement" ? "measurement" : "number";
+  const realmId: ProgressRealmScope = progressRealmFromRoute(destination.route);
 
   if (destination.context === "pretest") {
     const year = url.searchParams.get("year")?.trim();
@@ -105,9 +108,7 @@ export async function resolveContinueLearningRoute() {
   const resumeRoute = resolveSavedResumeRoute(readActiveLearningDestination());
   const studentId = getCurrentStudentId();
   if (resumeRoute && studentId) {
-    const resumeRealm: ProgressRealmScope = new URL(resumeRoute, "https://level-up-learning.local").searchParams.get("realm_id") === "measurement"
-      ? "measurement"
-      : "number";
+    const resumeRealm: ProgressRealmScope = progressRealmFromRoute(resumeRoute);
     const restored = await restoreStudentStateFromServer(studentId, resumeRealm);
     if (!restored.progress) throw new Error("Canonical progress was not found for the saved activity");
     return resumeRoute;
@@ -115,11 +116,6 @@ export async function resolveContinueLearningRoute() {
 
   const lastRealm = getLastRealm();
   if (!lastRealm) return "/realms";
-  // Starpath is demo/preview (no saved-progress resume), so send them back to the
-  // exact Starpath world they were in rather than a different realm or the Tower.
-  if (lastRealm === "starpath-realm") {
-    return isDemoPreviewMode() ? getLastStarpathRoute() ?? STARPATH_WORLD_ROUTE : "/realms";
-  }
   const availability = getRealmAvailability(lastRealm);
   if (!availability?.enabled) return "/realms";
 
@@ -127,10 +123,16 @@ export async function resolveContinueLearningRoute() {
   const restored = await restoreStudentStateFromServer(studentId, availability.progressRealmId);
   if (!restored.progress) throw new Error("Canonical realm progress was not found");
   const profile = getActiveStudentProfile();
-  return resolveRealmEntryRoute({
+  const entryRoute = resolveRealmEntryRoute({
     realmId: availability.progressRealmId,
     progress: restored.progress,
     fallbackYear: profile?.yearLevel ?? "Year 1",
     introSeen: restored.introSeen,
   });
+  if (entryRoute.startsWith("/pretest") || entryRoute === "/home") return entryRoute;
+  return resolveCanonicalNextActivity({
+    realmId: availability.progressRealmId,
+    progress: restored.progress,
+    store: readProgramStore(),
+  }).route;
 }

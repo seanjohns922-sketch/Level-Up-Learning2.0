@@ -19,6 +19,7 @@ import { loadAssessmentReviewItems } from "@/lib/assessment-review-state";
 import { buildLessonRoute } from "@/lib/lesson-routing";
 import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { getWorld3DReturnPathForPosttest } from "@/lib/world3d/return-context";
 const POSTTEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
 const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 
@@ -410,7 +411,10 @@ function ResultsPage() {
     return diagnosticRequiredWeeks;
   })();
 
-  function goHome() { router.push(getRealmHomeRoute(realmId)); }
+  const posttestReturnPath = isPostTest
+    ? getWorld3DReturnPathForPosttest({ realmId: progressRealmId, level: year })
+    : null;
+  function goHome() { router.push(posttestReturnPath ?? getRealmHomeRoute(realmId)); }
   const assignedStartWeek = isPostTest
     ? getAssignedReviewWeek(storedPosttestProfile) ?? 1
     : getAssignedReviewWeek(storedPretestProfile) ?? 1;
@@ -448,7 +452,7 @@ function ResultsPage() {
     router.push(`/program?${qs}&legacy=1${realmParam}`);
   }
   function goContinue() {
-    router.push(getRealmHomeRoute(realmId));
+    router.push(posttestReturnPath ?? getRealmHomeRoute(realmId));
   }
 
   if (restoreState !== "ready") {

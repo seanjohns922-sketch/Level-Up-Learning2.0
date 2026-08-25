@@ -88,7 +88,7 @@ import {
 import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { DEMO_MODE } from "@/data/config";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { resolveBrainBreakFrequency, type BrainBreakFrequency } from "@/lib/brain-break-settings";
 import { trackLiveLearningEvent } from "@/lib/live-class-client";
@@ -109,6 +109,7 @@ import {
   clearLessonSession,
   getOrCreateLessonSessionId,
 } from "@/lib/resume-state";
+import { getWorld3DReturnPathForLesson } from "@/lib/world3d/return-context";
 
 export default function LessonPageWrapper() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
@@ -225,7 +226,7 @@ function LessonPage() {
     realmId === "measurement"
       ? `y${yearNumber}-measurement-w${week}-`
       : `y${yearNumber}-w${week}-`;
-  const previewMode = isDemoPreviewMode();
+  const previewMode = useDemoPreviewMode();
   const effectiveLessonId = lessonId.startsWith(expectedPrefix)
     ? lessonId
     : defaultLessonId;
@@ -463,7 +464,14 @@ function LessonPage() {
   async function completeLesson() {
     if (lessonFinalizedRef.current) {
       const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
-      router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
+      const world3DReturnPath = getWorld3DReturnPathForLesson({
+        realmId: lessonRealmId,
+        level: year,
+        week,
+        lessonNumber,
+        lessonId: effectiveLessonId,
+      });
+      router.push(world3DReturnPath ?? `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
       return;
     }
     lessonFinalizedRef.current = true;
@@ -558,7 +566,14 @@ function LessonPage() {
 
   function goBackToProgram() {
     const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
-    router.push(`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
+    const world3DReturnPath = getWorld3DReturnPathForLesson({
+      realmId: lessonRealmId,
+      level: year,
+      week,
+      lessonNumber,
+      lessonId: effectiveLessonId,
+    });
+    router.push(world3DReturnPath ?? `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
   }
 
   const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;

@@ -8,16 +8,7 @@ import type {
 } from "@/components/realms/dashboard/types";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
-
-const BACKGROUNDS: Record<RealmLevelId, string> = {
-  Prep: "/images/number-nexus-bg-prep.png",
-  "Year 1": "/images/number-nexus-bg-y1.png",
-  "Year 2": "/images/number-nexus-bg-y1.png",
-  "Year 3": "/images/number-nexus-home-bg.jpg",
-  "Year 4": "/images/number-nexus-home-bg.jpg",
-  "Year 5": "/images/number-nexus-bg-y5.png",
-  "Year 6": "/images/number-nexus-bg-y6.png",
-};
+import { getNumberNexusLevelTheme } from "@/lib/number-nexus-visuals";
 
 const LEVEL_LABELS: Record<RealmLevelId, string> = {
   Prep: "GROUND LEVEL",
@@ -89,7 +80,7 @@ const NUMBER_NEXUS_DISTRICTS = [
 
 function getNumberNexusWorld(level: RealmLevelId): RealmDashboardWorld {
   return {
-    bgImage: BACKGROUNDS[level],
+    bgImage: getNumberNexusLevelTheme(level).background,
     levelLabel: LEVEL_LABELS[level],
     zones: NUMBER_NEXUS_DISTRICTS,
   };

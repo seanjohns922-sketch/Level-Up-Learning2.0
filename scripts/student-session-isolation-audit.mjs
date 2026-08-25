@@ -64,7 +64,7 @@ check(
   "Login does not seed progress before the server restore finishes",
   login.includes('restoreStudentStateFromServer(student.student_id, "number")') &&
     !login.includes("persistResolvedStudentProgress(") &&
-    login.indexOf("writeProgress(") > login.indexOf('restoreStudentStateFromServer(student.student_id, "number")')
+    !login.includes("writeProgress(")
 );
 check(
   "Late restore responses verify the active student before committing",

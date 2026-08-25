@@ -1,0 +1,246 @@
+"use client";
+
+import { useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
+import * as THREE from "three";
+
+export type WorldMoveInput = { up: boolean; down: boolean; left: boolean; right: boolean };
+export type WorldMovementBounds = { minX: number; maxX: number; minZ: number; maxZ: number };
+export type WorldRoamEllipse = { centerZ: number; radiusX: number; radiusZ: number };
+export type WorldInteractionTarget = { id: string; position: [number, number, number]; distance: number };
+
+export const EMPTY_WORLD_MOVE_INPUT: WorldMoveInput = { up: false, down: false, left: false, right: false };
+
+export function TrialStudentAvatar({ movingRef }: { movingRef: React.MutableRefObject<boolean> }) {
+  const bodyRef = useRef<THREE.Group>(null);
+  const leftLegRef = useRef<THREE.Group>(null);
+  const rightLegRef = useRef<THREE.Group>(null);
+  const leftArmRef = useRef<THREE.Group>(null);
+  const rightArmRef = useRef<THREE.Group>(null);
+  const skin = "#c98d68";
+  const hair = "#35251f";
+  const uniform = "#0f8f87";
+  const uniformDark = "#083f46";
+
+  useFrame(({ clock }, delta) => {
+    const phase = clock.elapsedTime * 8.5;
+    const stride = movingRef.current ? Math.sin(phase) * 0.62 : 0;
+    const smoothing = 1 - Math.exp(-delta * 14);
+    if (leftLegRef.current) leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, stride, smoothing);
+    if (rightLegRef.current) rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, -stride, smoothing);
+    if (leftArmRef.current) leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, -stride * 0.72, smoothing);
+    if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, stride * 0.72, smoothing);
+    if (bodyRef.current) {
+      const targetY = movingRef.current ? Math.abs(Math.sin(phase * 2)) * 0.035 : 0;
+      bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, targetY, smoothing);
+    }
+  });
+
+  return (
+    <group>
+      <mesh position={[0, -0.73, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.56, 24]} />
+        <meshBasicMaterial color="#02090c" transparent opacity={0.42} depthWrite={false} />
+      </mesh>
+      <group ref={bodyRef}>
+        {[-1, 1].map((side) => (
+          <group key={`leg-${side}`} ref={side === -1 ? leftLegRef : rightLegRef} position={[side * 0.18, 0.02, 0]}>
+            <mesh position={[0, -0.32, 0]}><boxGeometry args={[0.27, 0.62, 0.3]} /><meshStandardMaterial color="#172a44" roughness={0.74} /></mesh>
+            <mesh position={[0, -0.66, 0.08]}><boxGeometry args={[0.31, 0.18, 0.48]} /><meshStandardMaterial color="#e5f4f4" roughness={0.62} /></mesh>
+          </group>
+        ))}
+        <mesh position={[0, 0.4, 0]}><boxGeometry args={[0.78, 0.82, 0.4]} /><meshStandardMaterial color={uniform} roughness={0.66} /></mesh>
+        <mesh position={[0, 0.43, -0.215]}><boxGeometry args={[0.5, 0.52, 0.08]} /><meshStandardMaterial color={uniformDark} roughness={0.64} /></mesh>
+        <mesh position={[0, 0.52, 0.215]}><boxGeometry args={[0.12, 0.54, 0.045]} /><meshStandardMaterial color="#9ff6e8" emissive="#22d3c5" emissiveIntensity={0.28} /></mesh>
+        {[-1, 1].map((side) => (
+          <group key={`arm-${side}`} ref={side === -1 ? leftArmRef : rightArmRef} position={[side * 0.52, 0.75, 0]}>
+            <mesh position={[0, -0.38, 0]}><boxGeometry args={[0.23, 0.76, 0.28]} /><meshStandardMaterial color={uniformDark} roughness={0.68} /></mesh>
+            <mesh position={[0, -0.85, 0]}><boxGeometry args={[0.24, 0.2, 0.29]} /><meshStandardMaterial color={skin} roughness={0.78} /></mesh>
+          </group>
+        ))}
+        <mesh position={[0, 1.1, 0]}><boxGeometry args={[0.58, 0.58, 0.54]} /><meshStandardMaterial color={skin} roughness={0.8} /></mesh>
+        <mesh position={[0, 1.36, -0.02]}><boxGeometry args={[0.62, 0.16, 0.58]} /><meshStandardMaterial color={hair} roughness={0.86} /></mesh>
+        <mesh position={[0, 1.22, -0.28]}><boxGeometry args={[0.62, 0.3, 0.1]} /><meshStandardMaterial color={hair} roughness={0.86} /></mesh>
+        <mesh position={[-0.18, 1.34, 0.24]} rotation={[0, 0, -0.22]}><boxGeometry args={[0.18, 0.18, 0.12]} /><meshStandardMaterial color={hair} roughness={0.86} /></mesh>
+        <mesh position={[0.08, 1.38, 0.24]} rotation={[0, 0, 0.16]}><boxGeometry args={[0.24, 0.17, 0.12]} /><meshStandardMaterial color={hair} roughness={0.86} /></mesh>
+        {[-0.14, 0.14].map((x) => <mesh key={x} position={[x, 1.15, 0.276]}><boxGeometry args={[0.055, 0.075, 0.025]} /><meshBasicMaterial color="#17212b" /></mesh>)}
+        <mesh position={[0, 1.01, 0.279]}><boxGeometry args={[0.18, 0.035, 0.025]} /><meshBasicMaterial color="#7f3e36" /></mesh>
+      </group>
+    </group>
+  );
+}
+
+export function SharedThirdPersonPlayer({
+  initialPosition,
+  spawnTarget,
+  spawnNonce,
+  moveInput,
+  bounds,
+  roamEllipse,
+  interactionTargets = [],
+  onNearestTargetId,
+  initialYaw = 0,
+  initialPitch = -0.08,
+  cameraDistance = 9.5,
+  cameraTargetHeight = 1.55,
+  cameraLookAhead = 0,
+  cameraMinY = 0.85,
+  speed = 4.6,
+}: {
+  initialPosition: [number, number, number];
+  spawnTarget?: [number, number, number] | null;
+  spawnNonce?: number;
+  moveInput: WorldMoveInput;
+  bounds: WorldMovementBounds;
+  roamEllipse?: WorldRoamEllipse;
+  interactionTargets?: WorldInteractionTarget[];
+  onNearestTargetId?: (id: string | null) => void;
+  initialYaw?: number;
+  initialPitch?: number;
+  cameraDistance?: number;
+  cameraTargetHeight?: number;
+  cameraLookAhead?: number;
+  cameraMinY?: number;
+  speed?: number;
+}) {
+  const keys = useRef(new Set<string>());
+  const playerRef = useRef<THREE.Group | null>(null);
+  const movingRef = useRef(false);
+  const nearestIdRef = useRef<string | null>(null);
+  const yaw = useRef(initialYaw);
+  const pitch = useRef(initialPitch);
+  const { camera, gl } = useThree();
+
+  useEffect(() => {
+    const down = (event: KeyboardEvent) => keys.current.add(event.key.toLowerCase());
+    const up = (event: KeyboardEvent) => keys.current.delete(event.key.toLowerCase());
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+    };
+  }, []);
+
+  useEffect(() => {
+    const element = gl.domElement;
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    const start = (event: PointerEvent) => { dragging = true; lastX = event.clientX; lastY = event.clientY; };
+    const look = (event: PointerEvent) => {
+      if (!dragging) return;
+      yaw.current -= (event.clientX - lastX) * 0.005;
+      pitch.current = THREE.MathUtils.clamp(pitch.current - (event.clientY - lastY) * 0.005, -1.05, 1.2);
+      lastX = event.clientX;
+      lastY = event.clientY;
+    };
+    const end = () => { dragging = false; };
+    element.addEventListener("pointerdown", start);
+    window.addEventListener("pointermove", look);
+    window.addEventListener("pointerup", end);
+    window.addEventListener("pointercancel", end);
+    return () => {
+      element.removeEventListener("pointerdown", start);
+      window.removeEventListener("pointermove", look);
+      window.removeEventListener("pointerup", end);
+      window.removeEventListener("pointercancel", end);
+    };
+  }, [gl]);
+
+  useEffect(() => {
+    if (!spawnTarget || !playerRef.current) return;
+    playerRef.current.position.set(...spawnTarget);
+    yaw.current = initialYaw;
+    pitch.current = initialPitch;
+  }, [initialPitch, initialYaw, spawnNonce, spawnTarget]);
+
+  useFrame((_, delta) => {
+    const player = playerRef.current;
+    if (!player) return;
+    const sinYaw = Math.sin(yaw.current);
+    const cosYaw = Math.cos(yaw.current);
+    const forward = new THREE.Vector3(-sinYaw, 0, -cosYaw);
+    const right = new THREE.Vector3(cosYaw, 0, -sinYaw);
+    const movement = new THREE.Vector3();
+    if (keys.current.has("w") || keys.current.has("arrowup") || moveInput.up) movement.add(forward);
+    if (keys.current.has("s") || keys.current.has("arrowdown") || moveInput.down) movement.sub(forward);
+    if (keys.current.has("d") || keys.current.has("arrowright") || moveInput.right) movement.add(right);
+    if (keys.current.has("a") || keys.current.has("arrowleft") || moveInput.left) movement.sub(right);
+    movingRef.current = movement.lengthSq() > 0;
+    if (movement.lengthSq() > 0) {
+      movement.normalize().multiplyScalar(speed * delta);
+      player.position.add(movement);
+      player.rotation.y = Math.atan2(forward.x, forward.z);
+    }
+    player.position.x = THREE.MathUtils.clamp(player.position.x, bounds.minX, bounds.maxX);
+    player.position.z = THREE.MathUtils.clamp(player.position.z, bounds.minZ, bounds.maxZ);
+    if (roamEllipse) {
+      const normalizedX = player.position.x / roamEllipse.radiusX;
+      const normalizedZ = (player.position.z - roamEllipse.centerZ) / roamEllipse.radiusZ;
+      const distance = Math.hypot(normalizedX, normalizedZ);
+      if (distance > 1) {
+        player.position.x = (normalizedX / distance) * roamEllipse.radiusX;
+        player.position.z = roamEllipse.centerZ + (normalizedZ / distance) * roamEllipse.radiusZ;
+      }
+    }
+
+    const cosPitch = Math.cos(pitch.current);
+    const lookDirection = new THREE.Vector3(-sinYaw * cosPitch, Math.sin(pitch.current), -cosYaw * cosPitch);
+    const head = new THREE.Vector3(player.position.x, player.position.y + 1.55, player.position.z);
+    const desiredCamera = head.clone().addScaledVector(lookDirection, -cameraDistance);
+    desiredCamera.y = Math.max(desiredCamera.y, cameraMinY);
+    camera.position.lerp(desiredCamera, 1 - Math.pow(0.0001, delta));
+    camera.lookAt(
+      player.position.x + forward.x * cameraLookAhead,
+      player.position.y + cameraTargetHeight,
+      player.position.z + forward.z * cameraLookAhead,
+    );
+
+    let nearestId: string | null = null;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+    for (const target of interactionTargets) {
+      const distance = player.position.distanceTo(new THREE.Vector3(target.position[0], player.position.y, target.position[2]));
+      if (distance <= target.distance && distance < nearestDistance) {
+        nearestId = target.id;
+        nearestDistance = distance;
+      }
+    }
+    if (nearestId !== nearestIdRef.current) {
+      nearestIdRef.current = nearestId;
+      onNearestTargetId?.(nearestId);
+    }
+  });
+
+  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]}><TrialStudentAvatar movingRef={movingRef} /></group>;
+}
+
+export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void }) {
+  const button = (label: "UP" | "DOWN" | "LEFT" | "RIGHT") => {
+    const key = label.toLowerCase() as keyof WorldMoveInput;
+    const display = label === "UP" ? "^" : label === "DOWN" ? "v" : label === "LEFT" ? "<" : ">";
+    return (
+      <button
+        type="button"
+        aria-label={`Move ${key}`}
+        onPointerDown={() => onChange({ ...input, [key]: true })}
+        onPointerUp={() => onChange({ ...input, [key]: false })}
+        onPointerCancel={() => onChange({ ...input, [key]: false })}
+        onPointerLeave={() => onChange({ ...input, [key]: false })}
+        style={{ width: 44, height: 44, border: "1px solid rgba(255,255,255,0.24)", borderRadius: 7, background: input[key] ? "#f8fafc" : "rgba(15,23,42,0.88)", color: input[key] ? "#0f172a" : "#f8fafc", fontSize: 18, fontWeight: 900, cursor: "pointer", touchAction: "none" }}
+      >{display}</button>
+    );
+  };
+  return <div style={{ position: "absolute", left: 16, bottom: 18, display: "grid", gridTemplateColumns: "44px 44px 44px", gap: 7, pointerEvents: "auto" }}><span />{button("UP")}<span />{button("LEFT")}{button("DOWN")}{button("RIGHT")}</div>;
+}
+
+export function KeyboardWorldAction({ enabled, onAction }: { enabled: boolean; onAction: () => void }) {
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && enabled) onAction();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [enabled, onAction]);
+  return null;
+}

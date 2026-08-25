@@ -14,7 +14,7 @@ const panel = read("components/teacher/LiveClassPanel.tsx");
 const liveClient = read("lib/live-class-client.ts");
 const migration = read("supabase/migrations/20260812140000_include_assessments_in_live_class.sql");
 
-requireText(tracker, 'context === "pretest" || context === "posttest"', "Assessment routes do not publish Live Class presence.");
+requireText(tracker, 'context !== "pretest" && context !== "posttest"', "Assessment routes do not publish Live Class presence.");
 requireText(tracker, 'eventType: "activity_started"', "Assessment presence does not use canonical live activity telemetry.");
 requireText(panel, '"activity_started"', "Live Class excludes assessment start events.");
 requireText(panel, 'get_live_class_activity_today', "Live Class does not load the canonical active-today fallback.");

@@ -22,11 +22,8 @@ export function getLevelBand(levelNum: number): LevelBand {
  * L6     → Apex Sky-Vault (final)
  */
 export function getHomeBg(levelNum: number, isPrep?: boolean): string {
-  if (isPrep) return "/images/number-nexus-home-bg-prep.jpg";
-  if (levelNum >= 6) return "/images/number-nexus-home-bg-y6.jpg";
-  if (levelNum >= 5) return "/images/number-nexus-home-bg-y5.jpg";
-  if (levelNum >= 3) return "/images/number-nexus-home-bg-y3.jpg"; // L3+L4 mid-city data canyon
-  return "/images/number-nexus-home-bg.jpg"; // L1+L2 starter Nexus
+  const level = (isPrep ? "Prep" : `Year ${Math.max(1, Math.min(6, levelNum))}`) as RealmLevelId;
+  return getNumberNexusLevelTheme(level).background;
 }
 
 /** Image filter per band */
@@ -95,3 +92,5 @@ export function getVignetteStyle(levelNum: number): string {
   // Foundation + advanced share the L5-style vignette for visual consistency
   return "inset 0 0 150px 55px rgba(5,18,35,0.48), inset 0 -60px 80px -20px rgba(5,18,35,0.36)";
 }
+import { getNumberNexusLevelTheme } from "@/lib/number-nexus-visuals";
+import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";

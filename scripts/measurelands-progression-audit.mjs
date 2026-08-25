@@ -28,10 +28,10 @@ check(
 );
 check(
   "Measurelands correct answers wait for Next Challenge",
-  runner.includes('isStructuredRealm && status === "correct"') &&
-    runner.includes('const isStructuredRealm = isMeasurement || realmId === "space"') &&
+  runner.includes('(isStructuredRealm || requireManualCorrectAdvance) && status === "correct"') &&
+    runner.includes("const isStructuredRealm = isMeasurement || isStarpath || isStatistics") &&
     runner.includes("onClick={continueAfterCorrect}") &&
-    markCorrectBody.includes("if (!isStructuredRealm)"),
+    markCorrectBody.includes("if (!isStructuredRealm && !requireManualCorrectAdvance)"),
 );
 check(
   "Wrong answers retain an explicit next action",

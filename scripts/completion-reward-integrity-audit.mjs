@@ -40,7 +40,11 @@ const checks = [
   ["retakes record activity with zero XP", (migration.match(/perform public\.upsert_student_activity_daily/g) ?? []).length === 2],
   ["quiz reveals are gated by server eligibility", /if \(rewardEligible === true\)[\s\S]*awardAndReveal\(studentId, "quiz"/.test(syncClient)],
   ["lesson reveals are gated by server eligibility", /if \(completed === true\)[\s\S]*awardAndReveal\(studentId, "lesson"/.test(syncClient)],
-  ["live table distinguishes lesson attempts", livePanel.includes(">Lesson attempt</SortHeader>")],
+  [
+    "live table distinguishes lesson attempts",
+    /<SortHeader sortKey="attempt"[\s\S]*?>Attempt \/ progress<\/SortHeader>/.test(livePanel) &&
+      /`Attempt \$\{card\.attemptNumber\}`/.test(livePanel),
+  ],
   ["timed lessons finish on time, not question count", /const finished = secondsLeft <= 0;/.test(practiceRunner)],
   ["Number Nexus lessons finish on time, not question count", /const finished = secondsLeft <= 0;/.test(lessonEngine)],
   ["Number Nexus timer continues through feedback", !/turnState !== "answering" \? c : c - 1/.test(lessonEngine)],

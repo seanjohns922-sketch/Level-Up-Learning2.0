@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { deactivateDemoPreviewMode, isDemoPreviewMode } from "@/lib/demo-mode";
+import { deactivateDemoPreviewMode, useDemoPreviewMode } from "@/lib/demo-mode";
 import { clearScopedProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { clearActiveStudentSession } from "@/lib/studentIdentity";
@@ -10,7 +10,7 @@ export default function DemoPreviewBanner() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const active = isDemoPreviewMode();
+  const active = useDemoPreviewMode();
   const isStarpathProgram = pathname === "/program" && searchParams.get("realm_id") === "space";
   const usesRealmNavigation = ["/measurelands", "/number-nexus", "/starpath"].some(
     (route) => pathname.startsWith(route),

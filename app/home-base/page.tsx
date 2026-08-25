@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
+  ArrowLeft,
   Castle,
   Check,
   Gem,
@@ -35,6 +36,7 @@ import {
 import { persistCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 import { resolveContinueLearningRoute } from "@/lib/continue-learning";
 import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/studentIdentity";
+import { clearWorldNavigationContext, getCentralWorldHomeReturnPath } from "@/lib/world3d/world-navigation-context";
 
 export default function HomeBasePage() {
   const router = useRouter();
@@ -45,7 +47,12 @@ export default function HomeBasePage() {
   const [busy, setBusy] = useState(false);
   const [gemVault, setGemVault] = useState<GemVault | null>(null);
   const [realmies, setRealmies] = useState<RealmieCollection | null>(null);
+  const [worldReturnPath, setWorldReturnPath] = useState<string | null>(null);
   const sessionError = student?.studentId ? null : "Log in as a student to visit My Home.";
+
+  useEffect(() => {
+    setWorldReturnPath(getCentralWorldHomeReturnPath());
+  }, []);
 
   useEffect(() => {
     if (!student?.studentId) return;
@@ -189,6 +196,21 @@ export default function HomeBasePage() {
       >
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,11,14,.88)_0%,rgba(9,11,14,.34)_48%,rgba(9,11,14,.72)_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(9,11,14,.94)_0%,transparent_55%,rgba(9,11,14,.36)_100%)]" />
+
+        {worldReturnPath ? (
+          <button
+            type="button"
+            onClick={() => {
+              const returnPath = worldReturnPath;
+              clearWorldNavigationContext();
+              router.push(returnPath);
+            }}
+            className="absolute left-5 top-5 z-20 inline-flex min-h-11 items-center gap-2 rounded-md border border-white/30 bg-slate-950/80 px-4 py-2 text-sm font-black text-white shadow-lg backdrop-blur-md transition hover:bg-slate-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40 lg:left-8"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Return to World
+          </button>
+        ) : null}
 
         <div className="relative z-10 mx-auto grid min-h-[min(720px,calc(100vh-65px))] max-w-[1440px] gap-6 px-5 py-7 lg:grid-cols-[minmax(270px,420px)_1fr_minmax(240px,330px)] lg:px-8">
           <div className="flex flex-col justify-between gap-8">

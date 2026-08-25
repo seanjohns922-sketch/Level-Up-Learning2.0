@@ -32,9 +32,18 @@ const quizPage = read("app/starpath/quiz/[level]/[week]/page.tsx");
 const lessonPlaceholder = read("components/starpath/StarpathDevelopmentLesson.tsx");
 const quizPlaceholder = read("components/starpath/StarpathDevelopmentQuiz.tsx");
 
-assert.match(dashboard, /buildStarpathProgramHref/, "Dashboard must enter the week page first");
+assert.match(dashboard, /buildRealmProgramHref/, "Dashboard must use the shared canonical week route");
+assert.match(
+  dashboard,
+  /buildProgramHref:[\s\S]*buildRealmProgramHref\(\{ realmId: "space", year: level, week, preview: true \}\)/,
+  "Dashboard must enter the canonical Starpath week page first",
+);
 assert.doesNotMatch(dashboard, /buildStarpathLessonHref/, "Dashboard must not bypass the week page");
-assert.match(programPage, /realmId !== "space"/);
+assert.match(
+  programPage,
+  /requireSharedWeeklyProgramRealm\(sp\.get\("realm_id"\) \?\? "number"\)/,
+  "The shared week page must reject unsupported realm identifiers through the canonical realm guard",
+);
 assert.match(programPage, /getStarpathProgram/);
 assert.match(programPage, /getStarpathBackground/);
 assert.match(programPage, /buildStarpathWeeklyQuizHref/);

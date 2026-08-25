@@ -9,7 +9,7 @@ import { getProgramForYear } from "@/data/programs";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { getYear6WeeklyQuiz, type Year6WeeklyQuizQuestion } from "@/data/quizzes/year6";
 import { DEMO_MODE } from "@/data/config";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
 import PostTestTransition from "@/components/PostTestTransition";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import {
@@ -78,6 +78,7 @@ import {
   type Difficulty,
   type LessonConfig,
 } from "@/app/config/lesson-config";
+import { getWorld3DReturnPathForQuiz } from "@/lib/world3d/return-context";
 import type { Lesson, WeekPlan } from "@/data/programs/year1";
 import type { LessonActivity } from "@/data/programs/types";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -7998,7 +7999,7 @@ function SessionPage({
   const studentLevelLabel = formatStudentLevelLabel(year);
 
   const isLesson = type === "lesson";
-  const previewMode = isDemoPreviewMode();
+  const previewMode = useDemoPreviewMode();
   const title = isLesson
     ? `Lesson ${n}`
     : year === "Prep" && Number(week) === 4
@@ -8063,6 +8064,15 @@ function SessionPage({
   const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
 
   function backToWeek() {
+    const world3DReturnPath = getWorld3DReturnPathForQuiz({
+      realmId: quizRealmId,
+      level: year,
+      week: Number(week),
+    });
+    if (world3DReturnPath) {
+      router.push(world3DReturnPath);
+      return;
+    }
     router.push(`/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(week)}&legacy=1${realmParam}`);
   }
 

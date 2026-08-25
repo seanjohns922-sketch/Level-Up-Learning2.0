@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { DEMO_MODE } from "@/data/config";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import {
@@ -24,7 +24,7 @@ import {
   type ProgramProgressStore,
 } from "@/lib/program-progress";
 import { getHomeBg, getHomeBgFilter, getVignetteStyle } from "@/lib/levelBand";
-import { buildLessonRoute, normalizeStudentYearLabel } from "@/lib/lesson-routing";
+import { buildLessonId, buildLessonRoute, normalizeStudentYearLabel } from "@/lib/lesson-routing";
 import { readStarpathDemoJourney, writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
 import { getStarpathLevelForYear, type StarpathLevelDefinition } from "@/lib/starpath-levels";
 import {
@@ -43,6 +43,11 @@ import {
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { weeklyQuizMinimumCorrect, weeklyQuizPassed } from "@/lib/assessment-rules";
+import {
+  getWorld3DReturnPathForWeek,
+  preserveWorld3DReturnContextForLesson,
+  preserveWorld3DReturnContextForQuiz,
+} from "@/lib/world3d/return-context";
 
 const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
 const PATHWAY_JOURNAL_KEY_PREFIX = "lul:pathway-journal";
@@ -319,7 +324,9 @@ function ProgramPage() {
   } as const;
 
   const legacyProgramMode = sp.get("legacy") === "1";
-  const previewMode = isStatisticsRealm || isDemoPreviewMode();
+  const teacherPreview = sp.get("teacher_preview") === "1";
+  const demoPreviewMode = useDemoPreviewMode();
+  const previewMode = isStatisticsRealm || teacherPreview || demoPreviewMode;
   const canonicalRealmId = realmId as "number" | "measurement" | "space";
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
@@ -584,14 +591,26 @@ function ProgramPage() {
         router.push(`/statistica/lesson/${encodeURIComponent(curriculumYear)}/${weekNum}/${item.n}?teacher_preview=1`);
         return;
       }
-      router.push(
-        buildLessonRoute({
+      const lessonId = buildLessonId({
+        yearLabel: curriculumYear,
+        week: weekNum,
+        lessonNumber: item.n,
+        realmId,
+      });
+      preserveWorld3DReturnContextForLesson({
+        realmId,
+        level: curriculumYear,
+        week: weekNum,
+        lessonNumber: item.n,
+        lessonId,
+      });
+      const lessonRoute = buildLessonRoute({
           yearLabel: curriculumYear,
           week: weekNum,
           lessonNumber: item.n,
           realmId,
-        })
-      );
+        });
+      router.push(`${lessonRoute}${teacherPreview ? "&teacher_preview=1" : ""}`);
       return;
     }
     if (isStarpathRealm && starpathProgram && item.type === "quiz") {
@@ -603,10 +622,15 @@ function ProgramPage() {
       return;
     }
     if (item.type === "posttest") {
-      router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}${realmParam}`);
+      router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}${realmParam}${teacherPreview ? "&teacher_preview=1" : ""}`);
       return;
     }
-    router.push(`/session?year=${encodeURIComponent(curriculumYear)}&week=${week}&type=${item.type}&n=${item.n}${realmParam}`);
+    preserveWorld3DReturnContextForQuiz({
+      realmId,
+      level: curriculumYear,
+      week: weekNum,
+    });
+    router.push(`/session?year=${encodeURIComponent(curriculumYear)}&week=${week}&type=${item.type}&n=${item.n}${realmParam}${teacherPreview ? "&teacher_preview=1" : ""}`);
   }
 
   function goToWeek(targetWeek: number) {
@@ -621,7 +645,7 @@ function ProgramPage() {
       router.push(buildStarpathProgramHref({ selectedLevel: starpathProgram.definition.id }, clamped));
       return;
     }
-    router.push(buildRealmProgramHref({ realmId, year, week: clamped, preview: isStatisticsRealm }));
+    router.push(buildRealmProgramHref({ realmId, year, week: clamped, preview: isStatisticsRealm || teacherPreview }));
   }
 
   function setTeacherModeState(next: boolean) {
@@ -677,6 +701,15 @@ function ProgramPage() {
       ? `/measurelands?level=${encodeURIComponent(curriculumYear)}`
       : "/number-nexus";
 
+  function goBackToMap() {
+    const world3DReturnPath = getWorld3DReturnPathForWeek({
+      realmId,
+      level: curriculumYear,
+      week: weekNum,
+    });
+    router.push(world3DReturnPath ?? realmHomeRoute);
+  }
+
   if (canonicalStatus !== "ready") {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#f6f2ec] px-6 text-center">
@@ -718,7 +751,7 @@ function ProgramPage() {
               ? isPrep
                 ? "/images/measurelands-home-bg.png"
                 : levelNum === 1
-                ? "/images/measurelands-home-bg-y1.png"
+                ? "/images/measurelands-home-bg.png"
                 : levelNum === 2
                 ? "/images/measurelands-home-bg-y2.png"
                 : levelNum === 3
@@ -868,7 +901,7 @@ function ProgramPage() {
           <div className="flex items-start justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => router.push(realmHomeRoute)}
+                onClick={goBackToMap}
                 className={`px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
                   isStarpathRealm
                     ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
@@ -1612,7 +1645,7 @@ function ProgramPage() {
                   {previousQuizNeedsRetry ? `Return to Week ${weekNum - 1}` : `Go to Week ${lastAllowedWeek}`}
                 </button>
                 <button
-                  onClick={() => router.push(realmHomeRoute)}
+                  onClick={goBackToMap}
                   className="rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white transition hover:bg-white/15"
                 >
                   Back to Map

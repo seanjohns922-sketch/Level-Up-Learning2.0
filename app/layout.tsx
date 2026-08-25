@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GlobalTapFeedback } from "@/components/GlobalTapFeedback";
@@ -9,6 +7,7 @@ import { FullscreenToggle } from "@/components/FullscreenToggle";
 import StudentScreenRecorder from "@/components/StudentScreenRecorder";
 import DemoPreviewBanner from "@/components/demo/DemoPreviewBanner";
 import GemRevealHost from "@/components/gems/GemRevealHost";
+import VercelClientInsights from "@/components/VercelClientInsights";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -32,8 +31,7 @@ export default function RootLayout({
           </Suspense>
           {children}
           <GemRevealHost />
-          <Analytics />
-          <SpeedInsights />
+          {process.env.NODE_ENV === "production" ? <VercelClientInsights /> : null}
         </ErrorBoundary>
       </body>
     </html>

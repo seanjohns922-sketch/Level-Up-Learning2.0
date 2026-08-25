@@ -12,6 +12,7 @@ import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/stud
 import { deactivateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
 import { bootstrapDemoPreview } from "@/lib/demo-preview-bootstrap";
 import { resolveStudentDestination } from "@/lib/student-destination";
+import { resolvePostLoginExperience } from "@/lib/world3d/access";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import { GraduationCap, Briefcase, KeyRound, User, Lock, Users } from "lucide-react";
@@ -725,11 +726,14 @@ export default function LoginPage() {
 
     const placementComplete = isPlacementComplete(progress);
 
-    const dest = resolveStudentDestination({
+    const twoDDestination = resolveStudentDestination({
       progress,
       introSeen,
       fallbackYear: studentWorkingYear ?? studentSchoolYear ?? "Year 1",
     });
+    const dest = twoDDestination === "/realms"
+      ? resolvePostLoginExperience({ realmId: "number", classId: student.class_id, studentId: student.student_id, respectReducedMotion: true, fallbackHref: twoDDestination })
+      : twoDDestination;
     console.log("[LoginRouteDebug]", {
       student_id: student.student_id,
       student_table: {

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Play } from "lucide-react";
+import { Box, Lock, Play } from "lucide-react";
 import { readProgress } from "@/data/progress";
 import { computeFogProgress } from "@/lib/fog-progress";
 import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
@@ -22,6 +22,8 @@ import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import { fetchGlobalXp } from "@/lib/economy";
 import RealmDashboardNav from "@/components/world/RealmDashboardNav";
 import { setLastRealm } from "@/lib/last-realm";
+import { resolveRealm3DAccess } from "@/lib/world3d/access";
+import { getNumberNexusLevelTheme } from "@/lib/number-nexus-visuals";
 
 // ─── Era system — ONE evolving city, five real background images ─────────────────
 // Prep=0  Y1-2=1  Y3-4=2  Y5=3  Y6=4
@@ -81,7 +83,10 @@ const ERA_CONFIGS = [
     scanlineOpacity: 0.06,
     beamOpacity: 0.5 },
 ] as const;
-type EraConfig = typeof ERA_CONFIGS[number];
+type EraConfigSource = typeof ERA_CONFIGS[number];
+type EraConfig = {
+  [Key in keyof EraConfigSource]: Key extends "bgImage" ? string : EraConfigSource[Key];
+};
 
 // ─── District zones ─────────────────────────────────────────────────────────────
 // Balanced symmetric composition:
@@ -334,8 +339,18 @@ export default function NumberNexusMap() {
   const [bestChain] = useState(() => readBestChain("number", year));
   const [classBestChain, setClassBestChain] = useState<number | null>(null);
   const [globalXpBalance, setGlobalXpBalance] = useState<number | null>(null);
+  const [realm3DAccess] = useState(() => {
+    const profile = getActiveStudentProfile();
+    return resolveRealm3DAccess({
+      realmId: "number",
+      classId: profile?.classId,
+      studentId: profile?.studentId,
+      respectReducedMotion: true,
+    });
+  });
   const eraIdx     = getEra(year);
-  const era        = ERA_CONFIGS[eraIdx];
+  const levelTheme = getNumberNexusLevelTheme(year);
+  const era        = useMemo(() => ({ ...ERA_CONFIGS[eraIdx], bgImage: levelTheme.background }), [eraIdx, levelTheme.background]);
   const isGuided   = eraIdx <= 1; // Prep, Year 1, Year 2 — single big button, no menu decisions
   const canvasRef  = useWorldCanvas(era);
 
@@ -694,6 +709,47 @@ export default function NumberNexusMap() {
             {classBestChain ?? "—"}
           </span>
         </div>
+        {realm3DAccess.canExplore3D ? (
+          <button
+            type="button"
+            className="nn-hud-btn"
+            onClick={() => {
+              const params = new URLSearchParams({ level: year });
+              if (isDemoPreviewMode()) params.set("teacher_preview", "1");
+              router.push(`/world/number-nexus?${params.toString()}`);
+            }}
+            style={{
+              ...hudBtn,
+              width: 92,
+              color: "#ecfeff",
+              fontSize: 8,
+              fontWeight: 900,
+              letterSpacing: "0.12em",
+              fontFamily: "ui-monospace,monospace",
+              textAlign: "center",
+              textTransform: "uppercase",
+            }}
+          >
+            <span
+              aria-hidden="true"
+              className="nn-hud-icon"
+              style={{
+                width: 34,
+                height: 34,
+                display: "grid",
+                placeItems: "center",
+                borderRadius: 999,
+                background: "radial-gradient(circle at 50% 35%, rgba(251,191,36,0.34) 0%, rgba(20,184,166,0.18) 60%, rgba(2,8,16,0) 100%)",
+                border: "1px solid rgba(251,191,36,0.35)",
+                boxShadow: "inset 0 0 14px rgba(251,191,36,0.2), 0 0 18px rgba(20,184,166,0.14)",
+                fontSize: 18,
+              }}
+            >
+              <Box size={16} />
+            </span>
+            Explore Prototype
+          </button>
+        ) : null}
       </div>
 
       {/* ── Bottom label (week navigation arrows removed — entry is via districts) ── */}

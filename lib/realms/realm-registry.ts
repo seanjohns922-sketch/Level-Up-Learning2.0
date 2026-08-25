@@ -5,7 +5,10 @@ export type CanonicalRealmId =
   | "pattern"
   | "statistics"
   | "chance"
-  | "time";
+  | "time"
+  | "reading"
+  | "writing"
+  | "advanced-literacy";
 
 export type RealmLifecycle = "live" | "coming_soon" | "hidden";
 
@@ -172,6 +175,63 @@ export const REALM_REGISTRY = {
     iconKey: "Clock",
     themeKey: "chrono",
     displayOrder: 7,
+  },
+  reading: {
+    realmId: "reading",
+    portalId: "reading-ridge",
+    slug: "reading-ridge",
+    name: "Reading Ridge",
+    shortName: "Reading",
+    strand: "Reading Comprehension & Fluency",
+    status: "coming_soon",
+    isSelectable: false,
+    totalWeeks: null,
+    lessonsPerWeek: null,
+    hasWeeklyQuiz: false,
+    levelLabels: SCHOOL_LEVEL_LABELS,
+    legendCount: 7,
+    legendCollectionName: "Ridge Readers",
+    iconKey: "BookOpen",
+    themeKey: "reading",
+    displayOrder: 8,
+  },
+  writing: {
+    realmId: "writing",
+    portalId: "inkwell-wilds",
+    slug: "inkwell-wilds",
+    name: "Inkwell Wilds",
+    shortName: "Writing",
+    strand: "Writing, Grammar & Spelling",
+    status: "coming_soon",
+    isSelectable: false,
+    totalWeeks: null,
+    lessonsPerWeek: null,
+    hasWeeklyQuiz: false,
+    levelLabels: SCHOOL_LEVEL_LABELS,
+    legendCount: 7,
+    legendCollectionName: "Inkwell Scribes",
+    iconKey: "PenTool",
+    themeKey: "inkwell",
+    displayOrder: 9,
+  },
+  "advanced-literacy": {
+    realmId: "advanced-literacy",
+    portalId: "runehaven-peaks",
+    slug: "runehaven-peaks",
+    name: "Runehaven Peaks",
+    shortName: "Runehaven",
+    strand: "Advanced Literacy & Lore",
+    status: "coming_soon",
+    isSelectable: false,
+    totalWeeks: null,
+    lessonsPerWeek: null,
+    hasWeeklyQuiz: false,
+    levelLabels: SCHOOL_LEVEL_LABELS,
+    legendCount: 7,
+    legendCollectionName: "Rune Keepers",
+    iconKey: "Gem",
+    themeKey: "runehaven",
+    displayOrder: 10,
   },
 } as const satisfies Record<CanonicalRealmId, RealmRegistryEntry>;
 
