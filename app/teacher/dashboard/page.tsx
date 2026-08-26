@@ -1388,21 +1388,8 @@ export default function TeacherDashboardPage() {
           </div>
         ) : (
           <>
-            {/* Header bar: class context + view tabs, anchored together */}
-            <div className="flex items-center justify-between gap-3 flex-wrap rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-              <div className="flex min-w-0 items-center gap-3">
-                <div
-                  className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-base font-black text-[#00E5C3] ring-1 ring-[#00E5C3]/30"
-                  style={{ background: "linear-gradient(150deg,#12463d,#0a2f2a 55%,#061c17)", boxShadow: "inset 0 1px 0 rgba(0,229,195,0.35), 0 8px 18px -8px rgba(0,194,168,0.55)" }}
-                >
-                  {(selectedClass?.name ?? "").replace(/\s/g, "").slice(0, 3).toUpperCase() || "—"}
-                </div>
-                <div className="min-w-0">
-                  <div className="truncate text-[15px] font-black text-[#0F172A]">{selectedClass?.name ? `Class ${selectedClass.name}` : "Class"}</div>
-                  <div className="text-xs font-semibold text-[#64748B]">{classStudents.length} student{classStudents.length === 1 ? "" : "s"}</div>
-                </div>
-              </div>
-
+            {/* View tabs on the left; year pills (curriculum) or roll count fill the right */}
+            <div className="flex items-center justify-between gap-3 flex-wrap rounded-2xl border border-[#E6E8EC] bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
               <div className="flex w-fit items-center gap-1 rounded-xl bg-[#F1F5F9] p-1">
                 {([
                   { id: "live",       label: "Live Class" },
@@ -1423,26 +1410,33 @@ export default function TeacherDashboardPage() {
                   </button>
                 ))}
               </div>
-            </div>
 
-            {activeTab === "curriculum" ? (
-              <div className="flex w-fit items-center gap-1 overflow-x-auto rounded-xl border border-[#E6E8EC] bg-white p-1">
-                {YEAR_LEVELS.map((yr) => (
-                  <button
-                    key={yr}
-                    onClick={() => setActiveYear(yr)}
-                    className={[
-                      "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
-                      activeYear === yr
-                        ? "bg-[#0F172A] text-white shadow-sm"
-                        : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
-                    ].join(" ")}
-                  >
-                    {yr}
-                  </button>
-                ))}
-              </div>
-            ) : null}
+              {activeTab === "curriculum" ? (
+                <div className="flex items-center gap-2">
+                  <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#94A3B8]">Year</span>
+                  <div className="flex w-fit items-center gap-0.5 overflow-x-auto rounded-xl bg-[#F1F5F9] p-1">
+                    {YEAR_LEVELS.map((yr) => (
+                      <button
+                        key={yr}
+                        onClick={() => setActiveYear(yr)}
+                        className={[
+                          "px-3 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
+                          activeYear === yr
+                            ? "bg-[#0F172A] text-white shadow-sm"
+                            : "text-[#64748B] hover:text-[#0F172A] hover:bg-white",
+                        ].join(" ")}
+                      >
+                        {yr === "Prep" ? "Prep" : yr.replace("Year ", "Y")}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <span className="pr-1 text-xs font-semibold text-[#64748B]">
+                  {classStudents.length} student{classStudents.length === 1 ? "" : "s"}
+                </span>
+              )}
+            </div>
 
             {/* eslint-disable @typescript-eslint/no-explicit-any */}
             {activeTab === "live" ? (
