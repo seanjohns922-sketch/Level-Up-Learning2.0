@@ -164,31 +164,6 @@ function isRecentIso(value: unknown, cutoffMs: number) {
   return Number.isFinite(time) && time >= cutoffMs;
 }
 
-function lessonSummaryStats(summary: LessonAttemptSummary | null | undefined) {
-  if (!summary) return { correct: 0, total: 0 };
-  const correctCandidate = summary.correctCount ?? summary.correctAnswers ?? null;
-  const totalCandidate = summary.totalQuestions ?? summary.questionsAnswered ?? null;
-  const correct = typeof correctCandidate === "number" && Number.isFinite(correctCandidate) ? correctCandidate : 0;
-  const total = typeof totalCandidate === "number" && Number.isFinite(totalCandidate) ? totalCandidate : 0;
-  return { correct, total };
-}
-
-function weekCompletedLessons(ids: string[], week: number) {
-  const tag = `-w${week}-`;
-  return ids.filter((id) => id.includes(tag)).length;
-}
-
-function weekQuizPassed(quiz: JsonObject | undefined) {
-  if (!quiz) return false;
-  if (quiz.passed === true) return true;
-  const attempts = Array.isArray(quiz.attempts) ? quiz.attempts : [];
-  return attempts.some((attempt) => {
-    if (!attempt || typeof attempt !== "object") return false;
-    const record = attempt as Record<string, unknown>;
-    return record.passed === true;
-  });
-}
-
 function weekCompletionCount(completedIds: string[], week: number): number {
   // lesson ids like "y1-w3-l1", "y1-w3-l2", "y1-w3-l3"
   const prefix = `-w${week}-`;
@@ -1133,48 +1108,6 @@ export default function TeacherDashboardPage() {
     }
   });
 
-  let lessonCorrectSum = 0;
-  let lessonQuestionSum = 0;
-  let lessonsCompleted = 0;
-  classProgressRows.forEach((row) => {
-    const lessonAttempts = parseLessonAttempts(row.lesson_attempts);
-    Object.values(lessonAttempts).forEach((attempt) => {
-      const attempts = Array.isArray(attempt?.attempts) && attempt.attempts.length > 0
-        ? attempt.attempts
-        : attempt?.latestSummary
-          ? [attempt.latestSummary]
-          : [];
-      attempts.forEach((summary) => {
-        if (!summary?.completedAt) return;
-        const stats = lessonSummaryStats(summary);
-        if (stats.total <= 0) return;
-        lessonsCompleted += 1;
-        lessonCorrectSum += stats.correct;
-        lessonQuestionSum += stats.total;
-      });
-    });
-  });
-
-  const averageLessonScore = lessonQuestionSum > 0
-    ? formatAccuracy(lessonCorrectSum, lessonQuestionSum)
-    : "—";
-
-  const weeksPassed = classProgressRows.reduce((sum, row) => {
-    const realmDefinition = getRealmDefinition(analyticsRealmId);
-    const realmWeeks = getRealmWeekNumbers(analyticsRealmId);
-    const lessonsPerWeek = realmDefinition.lessonsPerWeek;
-    if (lessonsPerWeek == null) return sum;
-    const completedIds = parseCompletedLessons(row.completed_lesson_ids);
-    const quizScores = parseQuizScores(row.quiz_scores);
-    const passedWeeks = realmWeeks.filter((week) => {
-      return weekCompletedLessons(completedIds, week) >= lessonsPerWeek && weekQuizPassed(quizScores[String(week)]);
-    }).length;
-    return sum + passedWeeks;
-  }, 0);
-  const teacherAdvancedWeeks = classProgressRows.reduce(
-    (sum, row) => sum + new Set(row.teacher_advanced_weeks ?? []).size,
-    0,
-  );
   const isDev = process.env.NODE_ENV !== "production";
 
   async function openSchoolPreview(destinationSchoolId?: string | null) {
@@ -1455,15 +1388,6 @@ export default function TeacherDashboardPage() {
           </div>
         ) : (
           <>
-            {/* KPI strip — primary stat dominates, secondary stats supporting */}
-            <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr_1fr_1fr_1fr] gap-3">
-              <KpiTile primary label="Students" value={classStudents.length} subtitle="enrolled in this class" accent="#0EA5A4" icon={(<path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" />)} />
-              <KpiTile label="Active This Week" value={activeStudentsThisWeek.size} subtitle={`${activeStudentsThisWeek.size} student${activeStudentsThisWeek.size === 1 ? "" : "s"} active`} accent="#0EA5A4" icon={(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>)} />
-              <KpiTile label="Average Accuracy" value={averageLessonScore} subtitle={averageLessonScore === "—" ? "no completed lessons" : "average lesson accuracy"} accent="#0EA5A4" icon={(<><path d="M3 3v18h18" /><path d="M7 14l3-3 3 3 5-5" /></>)} />
-              <KpiTile label="Lessons Completed" value={lessonsCompleted} subtitle={`${lessonsCompleted} lesson${lessonsCompleted === 1 ? "" : "s"} completed`} accent="#F59E0B" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
-              <KpiTile label="Weeks Passed" value={weeksPassed} subtitle={`${weeksPassed} completed normally · ${teacherAdvancedWeeks} teacher advanced`} accent="#6366F1" icon={(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>)} />
-            </div>
-
             {/* Year level + view tabs */}
             <div className="flex items-center justify-between gap-3 flex-wrap">
               {activeTab === "curriculum" ? (
@@ -1690,59 +1614,3 @@ export default function TeacherDashboardPage() {
   );
 }
 
-function KpiTile({
-  label, value, subtitle, accent, icon, primary,
-}: {
-  label: string;
-  value: string | number;
-  subtitle?: string;
-  accent: string;
-  icon: React.ReactNode;
-  primary?: boolean;
-}) {
-  if (primary) {
-    return (
-      <div
-        className="relative overflow-hidden rounded-2xl px-5 py-4 border border-white/5 bg-[linear-gradient(135deg,#0A2F2A_0%,#0F3A34_60%,#0A2F2A_100%)] shadow-[0_10px_30px_-14px_rgba(0,0,0,0.55)]"
-      >
-        <div className="absolute inset-y-0 left-0 w-[3px] bg-[#00E5C3] shadow-[0_0_18px_2px_rgba(0,229,195,0.55)]" />
-        <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-[#00C2A8]/10 blur-2xl pointer-events-none" />
-        <div className="relative flex items-start justify-between">
-          <div>
-            <div className="text-[10px] font-extrabold text-[#00E5C3] uppercase tracking-[0.18em]">{label}</div>
-            <div className="mt-1 text-[44px] leading-none font-black text-white tabular-nums tracking-tight">
-              {value}
-            </div>
-            <div className="mt-1.5 text-[11px] font-semibold text-slate-300/80 tracking-wide">
-              {subtitle ?? "enrolled in this class"}
-            </div>
-          </div>
-          <div className="h-9 w-9 rounded-xl bg-[#062521] border border-[#00C2A8]/30 shadow-[inset_0_0_8px_rgba(0,229,195,0.18)] flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="#00E5C3" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              {icon}
-            </svg>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="bg-white rounded-xl border border-[#E6E8EC] px-4 py-3.5 hover:border-[#CBD5E1] transition shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-      <div className="flex items-start justify-between mb-2">
-        <div className="h-8 w-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke={accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            {icon}
-          </svg>
-        </div>
-      </div>
-      <div className="text-xl font-black text-[#0F172A] leading-none tabular-nums opacity-80">{value}</div>
-      <div className="flex items-center gap-2 mt-1.5">
-        <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: accent }} />
-        <div className="text-[10px] font-extrabold text-[#64748B] uppercase tracking-[0.14em]">{label}</div>
-      </div>
-      <div className="mt-1 text-[11px] font-semibold text-[#94A3B8]">
-        {subtitle ?? ""}
-      </div>
-    </div>
-  );
-}

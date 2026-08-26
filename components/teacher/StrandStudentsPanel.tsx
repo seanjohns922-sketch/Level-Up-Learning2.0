@@ -155,22 +155,6 @@ type Props = {
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
-type ClassInsightCard = {
-  title: string;
-  headline: string;
-  detail: string;
-  action: string;
-};
-type ClassPerformanceEvidence = {
-  studentId: string;
-  studentName: string;
-  focus: string;
-  accuracy: number;
-  correct: number;
-  total: number;
-  source: "lesson" | "quiz";
-};
-
 function yearToLevelLabel(year: string): string {
   return formatStudentLevelLabel(year);
 }
@@ -678,193 +662,6 @@ function buildStudentWeeklyPerformanceSummary({
   };
 }
 
-function buildClassInsight(
-  rows: Array<{
-    studentId: string;
-    studentName: string;
-    prog?: ProgressRow;
-    workingYear: string;
-    flag: StudentFlag;
-  }>,
-): ClassInsightCard {
-  const classSize = rows.length;
-  const evidence: ClassPerformanceEvidence[] = [];
-
-  function pushLessonEvidence(row: { studentId: string; studentName: string; prog?: ProgressRow; workingYear: string }) {
-    if (!row.prog) return;
-    const lessonAttempts = parseLessonAttempts(row.prog.lesson_attempts);
-    const lessonPrefix = lessonIdPrefix(row.workingYear);
-
-    Object.entries(lessonAttempts).forEach(([lessonId, carrier]) => {
-      if (!lessonId.startsWith(lessonPrefix)) return;
-
-      const attempts = Array.isArray(carrier.attempts)
-        ? [...carrier.attempts].reverse()
-        : [];
-      const latestCompleted =
-        attempts.find((attempt) => {
-          if (!attempt || typeof attempt !== "object") return false;
-          const candidate = attempt as Record<string, unknown>;
-          return Boolean(candidate.completedAt ?? candidate.at);
-        }) ??
-        (carrier.latestSummary && (carrier.latestSummary.completedAt || carrier.latestSummary.title)
-          ? carrier.latestSummary
-          : null);
-
-      if (!latestCompleted || typeof latestCompleted !== "object") return;
-
-      const record = latestCompleted as Record<string, unknown>;
-      const total = numberOrNull(record.totalQuestions ?? record.questionsAnswered);
-      const correct = numberOrNull(record.correctCount ?? record.correctAnswers);
-      const accuracy = calculateAccuracy(correct, total);
-
-      if (!total || total <= 0 || correct == null || accuracy == null) return;
-
-      const weakestTopic =
-        carrier.latestInsight?.needsSupport?.trim() ||
-        carrier.latestSummary?.areasToImprove?.[0]?.label?.trim() ||
-        [...(carrier.latestSummary?.topicSummaries ?? [])]
-          .filter((topic) => typeof topic?.accuracy === "number")
-          .sort((left, right) => (left?.accuracy ?? 100) - (right?.accuracy ?? 100))[0]
-          ?.label?.trim() ||
-        carrier.latestSummary?.struggledQuestionTypes?.[0]?.trim() ||
-        carrier.latestSummary?.title?.trim() ||
-        lessonId;
-
-      evidence.push({
-        studentId: row.studentId,
-        studentName: row.studentName,
-        focus: weakestTopic,
-        accuracy,
-        correct,
-        total,
-        source: "lesson",
-      });
-    });
-  }
-
-  function pushQuizEvidence(row: { studentId: string; studentName: string; prog?: ProgressRow }) {
-    if (!row.prog) return;
-    const quizScores = parseQuizScores(row.prog.quiz_scores);
-
-    Object.entries(quizScores).forEach(([key, quiz]) => {
-      if (!/^\d+$/.test(key) || !quiz || typeof quiz !== "object") return;
-      const breakdown = Array.isArray(quiz.lessonBreakdown)
-        ? (quiz.lessonBreakdown as Array<Record<string, unknown>>)
-        : [];
-
-      breakdown.forEach((item) => {
-        const total = numberOrNull(item.total);
-        const correct = numberOrNull(item.correct);
-        const accuracy = calculateAccuracy(correct, total);
-        if (!total || total <= 0 || correct == null || accuracy == null) return;
-
-        evidence.push({
-          studentId: row.studentId,
-          studentName: row.studentName,
-          focus:
-            (typeof item.title === "string" && item.title.trim()) ||
-            (typeof item.lessonNumber === "number" ? `Lesson ${item.lessonNumber}` : "Weekly Quiz"),
-          accuracy,
-          correct,
-          total,
-          source: "quiz",
-        });
-      });
-    });
-  }
-
-  rows.forEach((row) => {
-    pushLessonEvidence(row);
-    pushQuizEvidence(row);
-  });
-
-  const lowEvidence = evidence.filter((item) => item.accuracy < 70);
-  const focusGroups = new Map<string, { studentIds: Set<string>; studentNames: Set<string>; lowestAccuracy: number }>();
-  lowEvidence.forEach((item) => {
-    const current = focusGroups.get(item.focus) ?? {
-      studentIds: new Set<string>(),
-      studentNames: new Set<string>(),
-      lowestAccuracy: 100,
-    };
-    current.studentIds.add(item.studentId);
-    current.studentNames.add(item.studentName);
-    current.lowestAccuracy = Math.min(current.lowestAccuracy, item.accuracy);
-    focusGroups.set(item.focus, current);
-  });
-
-  const sortedGroups = [...focusGroups.entries()].sort((left, right) => {
-    const countGap = right[1].studentIds.size - left[1].studentIds.size;
-    if (countGap !== 0) return countGap;
-    return left[1].lowestAccuracy - right[1].lowestAccuracy;
-  });
-
-  const struggledGroup = sortedGroups.find(([, group]) => {
-    const count = group.studentIds.size;
-    return count >= 3 || (classSize > 0 && count / classSize >= 0.3);
-  });
-  if (struggledGroup) {
-    const [focus, group] = struggledGroup;
-    const count = group.studentIds.size;
-    return {
-      title: "Most Struggled Skill",
-      headline: focus,
-      detail: `${count} of ${classSize} students scored below 70%.`,
-      action: "Run a 10-minute reteach before the weekly quiz.",
-    };
-  }
-
-  const interventionGroup = sortedGroups.find(([, group]) => group.studentIds.size >= 2);
-  if (interventionGroup) {
-    const [focus, group] = interventionGroup;
-    const names = [...group.studentNames].sort().slice(0, 3);
-    const nameLabel =
-      names.length === 1
-        ? names[0]!
-        : names.length === 2
-          ? `${names[0]} and ${names[1]}`
-          : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
-
-    return {
-      title: "Intervention Group",
-      headline: `${nameLabel} need support with ${focus}.`,
-      detail: "These students are below 70% accuracy on the same focus area.",
-      action: "Pull this group for a short targeted mini-lesson.",
-    };
-  }
-
-  const completedLessonEvidence = evidence.filter((item) => item.source === "lesson");
-  const lessonCount = completedLessonEvidence.length;
-  const totalQuestions = completedLessonEvidence.reduce((sum, item) => sum + item.total, 0);
-  const totalCorrect = completedLessonEvidence.reduce((sum, item) => sum + item.correct, 0);
-  const averageAccuracy = calculateAccuracy(totalCorrect, totalQuestions);
-
-  if (averageAccuracy != null && lessonCount > 0 && averageAccuracy >= 85) {
-    return {
-      title: "Celebration",
-      headline: "Most students are progressing successfully.",
-      detail: `Class average lesson accuracy is ${averageAccuracy}%.`,
-      action: "Celebrate effort and encourage students to continue their current pathway.",
-    };
-  }
-
-  if (averageAccuracy != null && lessonCount > 0) {
-    return {
-      title: "Class Snapshot",
-      headline: `Average lesson accuracy is ${averageAccuracy}%.`,
-      detail: `Students have completed ${lessonCount} lesson${lessonCount === 1 ? "" : "s"} across the class.`,
-      action: "Continue current pathway and monitor students below 70%.",
-    };
-  }
-
-  return {
-    title: "No Class Trend Yet",
-    headline: "More completed lessons are needed before a reliable class insight can be generated.",
-    detail: "Insights will improve as students complete more lessons and quizzes.",
-    action: "Check back after students complete their next lesson.",
-  };
-}
-
 function timeAgo(iso?: string): string {
   if (!iso) return "—";
   const ms = Date.now() - new Date(iso).getTime();
@@ -915,22 +712,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
   type SortKey = "name" | "lastName" | "schoolYear" | "workingLevel" | "week" | "status" | "tower";
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
-  // Class Insight is collapsible; remember each teacher's preference.
-  const [insightCollapsed, setInsightCollapsed] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("lul_teacher_insight_collapsed") === "1";
-  });
-  function toggleInsight() {
-    setInsightCollapsed((prev) => {
-      const next = !prev;
-      try {
-        window.localStorage.setItem("lul_teacher_insight_collapsed", next ? "1" : "0");
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
-  }
 
   function toggleSort(k: SortKey) {
     if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -1057,14 +838,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       }
     });
 
-  const classInsight = buildClassInsight(studentRows.filter((row) => row.prog && row.workingYear).map((row) => ({
-    studentId: row.s.id,
-    studentName: row.nameParts.displayName,
-    prog: row.prog!,
-    workingYear: row.workingYear!,
-    flag: row.flag,
-  })));
-
   return (
     <div className="space-y-5">
       {/* Strand tab strip */}
@@ -1113,46 +886,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
           {genre.strand} · {genre.realm} curriculum is coming soon. Student data shown is placeholder.
         </div>
       )}
-
-      <div className="grid grid-cols-1 gap-4">
-        <div className={`relative overflow-hidden rounded-2xl bg-white border border-[#E6E8EC] shadow-[0_4px_18px_-12px_rgba(15,23,42,0.18)] ${insightCollapsed ? "px-5 py-3" : "p-5"}`}>
-          <div className="absolute inset-y-0 left-0 w-[3px] bg-[#00C2A8] shadow-[0_0_14px_1px_rgba(0,229,195,0.45)]" />
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-extrabold text-[#0A2F2A] uppercase tracking-[0.18em]">
-              Class Insight
-            </span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#00E5C3] shadow-[0_0_6px_rgba(0,229,195,0.8)]" />
-            <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">planning</span>
-            {insightCollapsed ? (
-              <span className="ml-1 truncate text-[11px] font-semibold text-[#64748B]">· {classInsight.title}</span>
-            ) : null}
-            <button
-              type="button"
-              onClick={toggleInsight}
-              className="ml-auto shrink-0 rounded-md px-2 py-1 text-[11px] font-bold text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A]"
-              title={insightCollapsed ? "Show class insight" : "Hide class insight"}
-            >
-              {insightCollapsed ? "Show" : "Hide"}
-            </button>
-          </div>
-          {insightCollapsed ? null : (
-            <>
-              <div className="mt-2 text-2xl font-black text-[#0F172A] tracking-tight leading-snug">
-                {classInsight.title}
-              </div>
-              <div className="mt-2 text-base font-bold text-[#0A2F2A]">
-                {classInsight.headline}
-              </div>
-              <div className="mt-3 text-sm font-medium text-[#475569] tracking-wide">
-                {classInsight.detail}
-              </div>
-              <div className="mt-3 text-sm font-semibold text-[#0F172A]">
-                Suggested Action: {classInsight.action}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
 
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
