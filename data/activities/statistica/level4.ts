@@ -233,9 +233,9 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y4-statistics-w2-l2": [pictoBuildTask, pictoCompareTask, pictoReadTask],
   "y4-statistics-w2-l3": [pictoReadTask, pictoBuildTask, pictoCalcTask],
   // W3 Column Graphs — read, construct, interpret (bridge picto <-> columns)
-  "y4-statistics-w3-l1": [numColumnReadTask, pictoCompareTask, numTableTask],
-  "y4-statistics-w3-l2": [numColumnBuildTask, pictoBuildTask, numColumnReadTask],
-  "y4-statistics-w3-l3": [catColumnReadTask, inferenceTask, pictoReadTask],
+  "y4-statistics-w3-l1": [numColumnReadTask, catColumnReadTask, inferenceTask],
+  "y4-statistics-w3-l2": [numColumnBuildTask, numColumnReadTask, catColumnReadTask],
+  "y4-statistics-w3-l3": [catColumnReadTask, inferenceTask, numColumnReadTask],
   // W4 Distribution Shape — where it concentrates, its shape, comparing shapes
   "y4-statistics-w4-l1": [shapeConcentratedTask, numColumnReadTask, shapeSpreadTask],
   "y4-statistics-w4-l2": [shapeSpreadTask, shapeConcentratedTask, inferenceTask],

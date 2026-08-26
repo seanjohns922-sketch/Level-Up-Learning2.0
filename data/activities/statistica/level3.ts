@@ -266,7 +266,6 @@ export function inferenceTask(round: number, target: number, large = false): Pra
 // Large-scale reading variants used in Weeks 3-4: same graphs, but the data
 // climbs into the 30-40s so the scale counts by 10s. Build tasks stay small.
 const catColumnReadTaskLg: Gen = (r, t) => catColumnReadTask(r, t, true);
-const catColumnFrequencyTaskLg: Gen = (r, t) => catColumnFrequencyTask(r, t, true);
 const catCompareTaskLg: Gen = (r, t) => catCompareTask(r, t, true);
 const numColumnReadTaskLg: Gen = (r, t) => numColumnReadTask(r, t, true);
 const inferenceTaskLg: Gen = (r, t) => inferenceTask(r, t, true);
@@ -281,10 +280,10 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y3-statistics-w2-l1": [classifyTask, catColumnReadTask, numTableTask],
   "y3-statistics-w2-l2": [classifyTask, numColumnReadTask, catCompareTask],
   "y3-statistics-w2-l3": [numTableTask, tableSelectTask, catColumnFrequencyTask],
-  // W3 Frequency Tables — graphs now read a by-10s scale into the 30-40s
-  "y3-statistics-w3-l1": [numTableTask, catColumnFrequencyTaskLg, tableSelectTask],
-  "y3-statistics-w3-l2": [tableSelectTask, numTableTask, catCompareTaskLg],
-  "y3-statistics-w3-l3": [numTableTask, tableSelectTask, numColumnReadTaskLg],
+  // W3 Frequency Tables — tally/table reading and completion (on-topic, no graphs)
+  "y3-statistics-w3-l1": [numTableTask, tableSelectTask, numTableTask],
+  "y3-statistics-w3-l2": [tableSelectTask, numTableTask, tableSelectTask],
+  "y3-statistics-w3-l3": [numTableTask, tableSelectTask, numTableTask],
   // W4 Representing Data — choose, create, compare, conclude (larger data)
   "y3-statistics-w4-l1": [catColumnReadTaskLg, numColumnReadTaskLg, catCompareTaskLg],
   "y3-statistics-w4-l2": [catColumnBuildTask, numColumnBuildTask, numColumnReadTaskLg],
