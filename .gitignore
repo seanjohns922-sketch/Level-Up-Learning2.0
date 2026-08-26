@@ -43,3 +43,23 @@ next-env.d.ts
 
 # Supabase CLI linked-project metadata
 /supabase/.temp/
+
+# Generated 3D review captures and candidate artwork exports.
+/artifacts/
+/docs/captures/
+/docs/reports/
+/scripts/capture-world3d-cdp.mjs
+/public/images/measurelands-panorama-y3-360.png
+/public/images/measurelands-panorama-y3-city.jpg
+/public/images/measurelands-panorama-y3-district.jpg
+/public/images/measurelands-panorama-y6-front-seamless-4k.jpg
+/public/images/measurelands-panorama-y6-full-seamless-8k.jpg
+/public/images/measurelands-panorama-y6-rear-seamless-4k.jpg
+/public/images/number-nexus-city-skyline-hd.png
+/public/images/number-nexus-city-skyline.jpg
+/public/images/number-nexus-skyline-hd.png
+/public/images/number-nexus-skyline.jpg
+/public/images/starpath-panorama-y3-rear.png
+/public/images/starpath-panorama-y4-front-4k.jpg
+/public/images/starpath-panorama-y4-rear-4k.jpg
+/public/images/starpath-y4-crystal-floor-2k.jpg
