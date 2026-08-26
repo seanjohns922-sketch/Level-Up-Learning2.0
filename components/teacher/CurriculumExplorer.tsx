@@ -408,7 +408,6 @@ export default function CurriculumExplorer({
           {/* Lesson cards */}
           <div className="grid md:grid-cols-3 gap-3">
             {(week?.lessons ?? []).map((lsn) => {
-              const counts = lessonStatusCounts(lsn.id);
               const lacc = lessonAvgAccuracy(selectedWeekNumber, lsn.lesson);
               return (
                 <button
@@ -451,14 +450,6 @@ export default function CurriculumExplorer({
                         ({lacc.attempts})
                       </span>
                     </span>
-                  </div>
-
-                  {/* Status counts */}
-                  <div className="grid grid-cols-4 gap-1.5 pt-1">
-                    <StatusPill label="Done" value={counts.completed} tone="teal" />
-                    <StatusPill label="Active" value={counts.inProgress} tone="amber" />
-                    <StatusPill label="New" value={counts.notStarted} tone="slate" />
-                    <StatusPill label="Help" value={counts.struggling} tone="rose" />
                   </div>
 
                   <span className="mt-auto w-full px-3 py-2 rounded-lg bg-teal-50 text-teal-700 text-xs font-extrabold text-center border border-teal-100">
