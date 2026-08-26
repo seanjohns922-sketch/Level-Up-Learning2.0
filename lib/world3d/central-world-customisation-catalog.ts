@@ -79,7 +79,7 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = ENTRIES.map((e
     tier: entry.tier,
     marketplace_visual: {
       type: "asset",
-      src: `/marketplace/central-world/${entry.assetKey}.svg`,
+      src: `/marketplace/central-world/${entry.assetKey}.webp`,
       alt: `${entry.name} central world customisation preview`,
       previewMode: "background",
     },

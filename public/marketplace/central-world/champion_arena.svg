@@ -1,27 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="champion_arena marketplace preview">
-  <defs>
-    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="#7dd3fc"/>
-      <stop offset="58%" stop-color="#fde68a"/>
-      <stop offset="100%" stop-color="#fef3c7"/>
-    </linearGradient>
-    <linearGradient id="grass" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="#86efac"/>
-      <stop offset="100%" stop-color="#16a34a"/>
-    </linearGradient>
-    <filter id="soft" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.2"/>
-    </filter>
-    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <rect width="1280" height="720" fill="url(#sky)"/>
-  <circle cx="1060" cy="150" r="72" fill="#fde68a" opacity="0.78"/>
-  <path d="M0 336 C160 274 252 306 390 246 C530 184 668 314 810 248 C970 174 1082 276 1280 222 L1280 720 L0 720 Z" fill="#166534" opacity="0.34"/>
-  <path d="M0 420 C168 360 280 392 426 348 C596 298 738 408 900 354 C1064 300 1164 378 1280 328 L1280 720 L0 720 Z" fill="#15803d" opacity="0.48"/>
-  <path d="M0 520 C190 466 350 500 512 458 C674 418 840 526 1014 466 C1128 428 1206 458 1280 436 L1280 720 L0 720 Z" fill="url(#grass)"/>
-  <path d="M0 648 C172 608 340 614 520 640 C704 668 876 610 1046 626 C1132 634 1208 668 1280 646 L1280 720 L0 720 Z" fill="#15803d" opacity="0.42"/>
-  <path d="M134 482 C232 452 312 466 400 438" stroke="#fef9c3" stroke-width="18" stroke-linecap="round" opacity="0.42"/>
-  <path d="M56 568 C250 516 408 572 586 520 C790 462 1012 514 1216 462" fill="none" stroke="#eab308" stroke-width="6" opacity="0.32"/><ellipse cx="640" cy="590" rx="362" ry="74" fill="#ca8a04" opacity="0.65"/><path d="M290 520 C350 370 470 300 640 300 C810 300 930 370 990 520 Z" fill="#fde68a" filter="url(#soft)"/><path d="M364 502 C430 408 512 366 640 366 C768 366 850 408 916 502" fill="none" stroke="#ca8a04" stroke-width="28"/><rect x="576" y="472" width="128" height="70" rx="12" fill="#facc15"/><path d="M428 326 L428 470 M852 326 L852 470" stroke="#92400e" stroke-width="14"/><path d="M428 326 L512 352 L428 378 M852 326 L768 352 L852 378" fill="#eab308"/></svg>
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="champion_arena marketplace render">
+      
+    <defs>
+      <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f8fafc" stop-opacity="0.95"/>
+        <stop offset="0.52" stop-color="#eab308" stop-opacity="0.42"/>
+        <stop offset="1" stop-color="#0f172a" stop-opacity="0.18"/>
+      </linearGradient>
+      <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#fff7ad"/>
+        <stop offset="0.48" stop-color="#facc15"/>
+        <stop offset="1" stop-color="#a16207"/>
+      </linearGradient>
+      <linearGradient id="stone" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f8fafc"/>
+        <stop offset="0.5" stop-color="#cbd5e1"/>
+        <stop offset="1" stop-color="#64748b"/>
+      </linearGradient>
+      <linearGradient id="wood" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f59e0b"/>
+        <stop offset="0.5" stop-color="#a16207"/>
+        <stop offset="1" stop-color="#451a03"/>
+      </linearGradient>
+      <radialGradient id="water" cx="50%" cy="38%" r="64%">
+        <stop offset="0" stop-color="#ecfeff"/>
+        <stop offset="0.46" stop-color="#eab308"/>
+        <stop offset="1" stop-color="#0369a1"/>
+      </radialGradient>
+      <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+        <feDropShadow dx="0" dy="24" stdDeviation="18" flood-color="#052e16" flood-opacity="0.34"/>
+      </filter>
+      <filter id="lift" x="-25%" y="-30%" width="150%" height="170%">
+        <feDropShadow dx="0" dy="16" stdDeviation="10" flood-color="#020617" flood-opacity="0.32"/>
+      </filter>
+      <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+        <feGaussianBlur stdDeviation="10" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+      
+    <rect width="1280" height="720" fill="#ffffff" opacity="0.02"/>
+    
+    <ellipse cx="640" cy="584" rx="500" ry="104" fill="#022c22" opacity="0.28"/>
+    <path d="M0 668 C214 604 392 642 598 604 C808 566 1004 622 1280 548 L1280 720 L0 720 Z" fill="#eab308" opacity="0.15"/>
+      
+    <ellipse cx="640" cy="626" rx="456" ry="96" fill="#022c22" opacity="0.36" filter="url(#shadow)"/>
+    <ellipse cx="640" cy="590" rx="456" ry="92" fill="#eab308" opacity="0.34"/>
+    <ellipse cx="640" cy="560" rx="428" ry="72" fill="#f8fafc" opacity="0.2"/>
+    <path d="M226 552 C492 504 788 502 1054 552" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.32" stroke-linecap="round"/><g filter="url(#lift)"><ellipse cx="640" cy="578" rx="350" ry="78" fill="#a16207" opacity="0.72"/><path d="M300 530 C362 374 490 292 640 292 C790 292 918 374 980 530 Z" fill="url(#gold)"/><path d="M372 510 C430 414 522 364 640 364 C758 364 850 414 908 510" fill="none" stroke="#a16207" stroke-width="30"/><rect x="574" y="462" width="132" height="74" rx="14" fill="#facc15"/><path d="M430 322 L430 480 M850 322 L850 480" stroke="#78350f" stroke-width="14"/><path d="M430 322 L524 350 L430 382 M850 322 L756 350 L850 382" fill="#eab308"/></g>
+      <rect x="38" y="38" width="1204" height="644" rx="52" fill="none" stroke="#ffffff" stroke-opacity="0.26" stroke-width="3"/>
+    </svg>

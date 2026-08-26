@@ -1,27 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="stone_arch_bridge marketplace preview">
-  <defs>
-    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="#7dd3fc"/>
-      <stop offset="58%" stop-color="#fde68a"/>
-      <stop offset="100%" stop-color="#fef3c7"/>
-    </linearGradient>
-    <linearGradient id="grass" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="#86efac"/>
-      <stop offset="100%" stop-color="#16a34a"/>
-    </linearGradient>
-    <filter id="soft" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.2"/>
-    </filter>
-    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <rect width="1280" height="720" fill="url(#sky)"/>
-  <circle cx="1060" cy="150" r="72" fill="#fde68a" opacity="0.78"/>
-  <path d="M0 336 C160 274 252 306 390 246 C530 184 668 314 810 248 C970 174 1082 276 1280 222 L1280 720 L0 720 Z" fill="#166534" opacity="0.34"/>
-  <path d="M0 420 C168 360 280 392 426 348 C596 298 738 408 900 354 C1064 300 1164 378 1280 328 L1280 720 L0 720 Z" fill="#15803d" opacity="0.48"/>
-  <path d="M0 520 C190 466 350 500 512 458 C674 418 840 526 1014 466 C1128 428 1206 458 1280 436 L1280 720 L0 720 Z" fill="url(#grass)"/>
-  <path d="M0 648 C172 608 340 614 520 640 C704 668 876 610 1046 626 C1132 634 1208 668 1280 646 L1280 720 L0 720 Z" fill="#15803d" opacity="0.42"/>
-  <path d="M134 482 C232 452 312 466 400 438" stroke="#fef9c3" stroke-width="18" stroke-linecap="round" opacity="0.42"/>
-  <path d="M56 568 C250 516 408 572 586 520 C790 462 1012 514 1216 462" fill="none" stroke="#64748b" stroke-width="6" opacity="0.32"/><path d="M80 590 C280 536 416 596 620 548 C850 494 1028 564 1200 514" fill="none" stroke="#38bdf8" stroke-width="96" opacity="0.76"/><path d="M250 526 C380 394 900 394 1030 526 L1030 594 L250 594 Z" fill="#cbd5e1" filter="url(#soft)"/><path d="M470 594 C488 486 792 486 810 594 Z" fill="#38bdf8" opacity="0.72"/><g stroke="#64748b" stroke-width="5" opacity="0.5"><path d="M300 510 L348 584"/><path d="M374 510 L422 584"/><path d="M448 510 L496 584"/><path d="M522 510 L570 584"/><path d="M596 510 L644 584"/><path d="M670 510 L718 584"/><path d="M744 510 L792 584"/><path d="M818 510 L866 584"/><path d="M892 510 L940 584"/><path d="M966 510 L1014 584"/></g></svg>
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="stone_arch_bridge marketplace render">
+      
+    <defs>
+      <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f8fafc" stop-opacity="0.95"/>
+        <stop offset="0.52" stop-color="#64748b" stop-opacity="0.42"/>
+        <stop offset="1" stop-color="#0f172a" stop-opacity="0.18"/>
+      </linearGradient>
+      <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#fff7ad"/>
+        <stop offset="0.48" stop-color="#facc15"/>
+        <stop offset="1" stop-color="#a16207"/>
+      </linearGradient>
+      <linearGradient id="stone" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f8fafc"/>
+        <stop offset="0.5" stop-color="#cbd5e1"/>
+        <stop offset="1" stop-color="#64748b"/>
+      </linearGradient>
+      <linearGradient id="wood" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f59e0b"/>
+        <stop offset="0.5" stop-color="#a16207"/>
+        <stop offset="1" stop-color="#451a03"/>
+      </linearGradient>
+      <radialGradient id="water" cx="50%" cy="38%" r="64%">
+        <stop offset="0" stop-color="#ecfeff"/>
+        <stop offset="0.46" stop-color="#64748b"/>
+        <stop offset="1" stop-color="#0369a1"/>
+      </radialGradient>
+      <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+        <feDropShadow dx="0" dy="24" stdDeviation="18" flood-color="#052e16" flood-opacity="0.34"/>
+      </filter>
+      <filter id="lift" x="-25%" y="-30%" width="150%" height="170%">
+        <feDropShadow dx="0" dy="16" stdDeviation="10" flood-color="#020617" flood-opacity="0.32"/>
+      </filter>
+      <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+        <feGaussianBlur stdDeviation="10" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+      
+    <rect width="1280" height="720" fill="#ffffff" opacity="0.02"/>
+    
+    <ellipse cx="640" cy="584" rx="500" ry="104" fill="#022c22" opacity="0.28"/>
+    <path d="M0 668 C214 604 392 642 598 604 C808 566 1004 622 1280 548 L1280 720 L0 720 Z" fill="#64748b" opacity="0.15"/>
+      <path d="M82 604 C280 526 438 598 626 542 C850 474 1030 560 1198 496" fill="none" stroke="#38bdf8" stroke-width="106" opacity="0.82"/><g filter="url(#lift)"><path d="M248 532 C382 388 900 388 1032 532 L1032 606 L248 606 Z" fill="url(#stone)"/><path d="M466 606 C486 488 794 488 814 606 Z" fill="#38bdf8" opacity="0.82"/><g stroke="#64748b" stroke-width="5" opacity="0.5"><path d="M306 514 L360 596"/><path d="M430 474 L480 602"/><path d="M552 438 L570 602"/><path d="M728 438 L708 602"/><path d="M850 474 L800 602"/><path d="M974 514 L920 596"/></g></g>
+      <rect x="38" y="38" width="1204" height="644" rx="52" fill="none" stroke="#ffffff" stroke-opacity="0.26" stroke-width="3"/>
+    </svg>

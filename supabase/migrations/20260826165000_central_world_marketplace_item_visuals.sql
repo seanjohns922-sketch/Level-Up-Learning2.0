@@ -32,7 +32,7 @@ set metadata = item.metadata || jsonb_build_object(
   'marketplace_visual',
   jsonb_build_object(
     'type', 'asset',
-    'src', '/marketplace/central-world/' || visuals.asset_key || '.svg',
+    'src', '/marketplace/central-world/' || visuals.asset_key || '.webp',
     'alt', item.name || ' central world customisation preview',
     'previewMode', 'background'
   )
