@@ -440,8 +440,8 @@ export default function SchoolAnalyticsDashboard({
     const pct = (v: number | null) => (v === null ? "—" : `${v}%`);
     const statusText = student.status === "on_track" ? "On track" : student.status === "needs_attention" ? "Needs attention" : "Active";
     const realmRows = student.realms.map((realm) => {
-      const band = bandFor(realm.averageAccuracy);
-      return `<tr><td class="strong">${REALMS[realm.realmId] ?? realm.realmId}</td><td>${realm.currentLevel ?? "Not placed"}${realm.currentWeek ? ` · Wk ${realm.currentWeek}` : ""}</td><td class="num">${pct(realm.averageAccuracy)}</td><td>${band ? BAND_LABEL[band] : "No evidence"}</td><td class="num">${pct(realm.pretestScore)}</td><td class="num">${pct(realm.posttestScore)}</td><td class="num growth">${realm.growth === null ? "—" : `${realm.growth > 0 ? "+" : ""}${realm.growth} pts`}</td></tr>`;
+      const band = bandFor(realm.assessmentScore);
+      return `<tr><td class="strong">${REALMS[realm.realmId] ?? realm.realmId}</td><td>${realm.currentLevel ?? "Not placed"}${realm.currentWeek ? ` · Wk ${realm.currentWeek}` : ""}</td><td class="num">${pct(realm.assessmentScore)}</td><td>${band ? BAND_LABEL[band] : "No evidence"}</td><td class="num">${pct(realm.pretestScore)}</td><td class="num">${pct(realm.posttestScore)}</td><td class="num growth">${realm.growth === null ? "—" : `${realm.growth > 0 ? "+" : ""}${realm.growth} pts`}</td></tr>`;
     }).join("");
     win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${student.name} — Progress report</title><style>
       *{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0e1512;margin:0;padding:34px 40px;font-variant-numeric:tabular-nums}
@@ -468,7 +468,7 @@ export default function SchoolAnalyticsDashboard({
         <div class="card"><small>Learning days</small><b>${student.learningDays}</b></div>
       </div>
       <h2>Progress by curriculum strand</h2>
-      <table><thead><tr><th>Realm / strand</th><th>Current</th><th class="num">Accuracy</th><th>Band</th><th class="num">Pre</th><th class="num">Post</th><th class="num">Growth</th></tr></thead><tbody>${realmRows || `<tr><td colspan="7">No realm evidence in this window.</td></tr>`}</tbody></table>
+      <table><thead><tr><th>Realm / strand</th><th>Current</th><th class="num">Latest test</th><th>Band</th><th class="num">Pre</th><th class="num">Post</th><th class="num">Growth</th></tr></thead><tbody>${realmRows || `<tr><td colspan="7">No realm evidence in this window.</td></tr>`}</tbody></table>
       <footer>Growth uses matched pre-test and post-test pairs. Achievement bands: Working towards &lt;55%, At 55–84%, Above ≥85%.</footer>
       <button class="btn noprint" onclick="window.print()">Print / Save as PDF</button>
     </body></html>`);
@@ -553,7 +553,7 @@ export default function SchoolAnalyticsDashboard({
       const year = student.yearLevel ?? "Not recorded";
       for (const realm of student.realms) {
         const strand = strandForRealm(realm.realmId);
-        const band = bandFor(realm.averageAccuracy);
+        const band = bandFor(realm.assessmentScore);
         if (!strand || !band) continue;
         yearSet.add(year);
         const key = `${strand}|${year}`;
@@ -728,8 +728,8 @@ export default function SchoolAnalyticsDashboard({
         <div className="space-y-5">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h3 className="font-bold text-slate-950">Curriculum evidence by AC9 strand</h3>
-              <p className="mt-1 text-sm text-slate-500">Achievement banded against the Australian Curriculum. Evidence observed, not a coverage claim.</p>
+              <h3 className="font-bold text-slate-950">Post-test achievement by AC9 strand</h3>
+              <p className="mt-1 text-sm text-slate-500">Banded against the Australian Curriculum from placement pre-tests and each level&apos;s post-test — not lesson practice.</p>
             </div>
             <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
               {BAND_ORDER.map((band) => (

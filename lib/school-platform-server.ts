@@ -223,6 +223,11 @@ export type SchoolAnalyticsSnapshot = {
       pathwayStatus: string | null;
       pretestScore: number | null;
       posttestScore: number | null;
+      // Latest assessment (placement pre-test, then each level's post-test) —
+      // the signal for achievement bands, not lesson practice accuracy.
+      assessmentScore: number | null;
+      assessmentLevel: string | null;
+      assessmentType: string | null;
       mastered: boolean;
       growth: number | null;
     }>;
