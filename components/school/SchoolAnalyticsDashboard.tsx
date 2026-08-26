@@ -444,46 +444,130 @@ export default function SchoolAnalyticsDashboard({
     [snapshot?.realms],
   );
 
-  const printStudentReport = (student: SchoolAnalyticsSnapshot["students"][number]) => {
-    const win = window.open("", "_blank", "noopener,width=920,height=1200");
-    if (!win) return;
+  const downloadStudentReportPdf = async (student: SchoolAnalyticsSnapshot["students"][number]) => {
     const generated = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date());
     const pct = (v: number | null) => (v === null ? "—" : `${v}%`);
     const statusText = student.status === "on_track" ? "On track" : student.status === "needs_attention" ? "Needs attention" : "Active";
-    const realmRows = student.realms.map((realm) => {
-      const standing = levelStanding(student.yearLevel, realm.currentLevel);
-      return `<tr><td class="strong">${REALMS[realm.realmId] ?? realm.realmId}</td><td>${realm.currentLevel ?? "Not placed"}${realm.currentWeek ? ` · Wk ${realm.currentWeek}` : ""}</td><td class="num">${pct(realm.assessmentScore)}</td><td>${standing ? STANDING_STYLE[standing].label : "—"}</td><td class="num">${pct(realm.pretestScore)}</td><td class="num">${pct(realm.posttestScore)}</td><td class="num growth">${realm.growth === null ? "—" : `${realm.growth > 0 ? "+" : ""}${realm.growth} pts`}</td></tr>`;
-    }).join("");
-    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${student.name} — Progress report</title><style>
-      *{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0e1512;margin:0;padding:34px 40px;font-variant-numeric:tabular-nums}
-      .eyebrow{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#0b6f4c}
-      h1{font-size:26px;margin:6px 0 2px}.meta{color:#5c6b63;font-size:13px;margin:0}
-      .band{display:inline-block;margin:14px 8px 0 0;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#e3f4ec;color:#0b6f4c}
-      .cards{display:flex;gap:10px;margin:22px 0}.card{flex:1;border:1px solid #d6ddd7;border-radius:10px;padding:12px 14px}
-      .card small{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5c6b63}.card b{display:block;font-size:22px;margin-top:4px}
-      h2{font-size:14px;margin:24px 0 8px;letter-spacing:.02em}
-      table{width:100%;border-collapse:collapse;font-size:12.5px}th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#5c6b63;border-bottom:2px solid #d6ddd7;padding:7px 8px}
-      td{padding:8px;border-bottom:1px solid #eef2ef}.strong{font-weight:700}.num{text-align:right}.growth{color:#0b6f4c;font-weight:700}
-      footer{margin-top:26px;padding-top:12px;border-top:1px solid #d6ddd7;font-size:10.5px;color:#8a988f}
-      @media print{body{padding:14mm}.noprint{display:none}}
-      .btn{margin-top:20px;padding:9px 16px;border:0;border-radius:8px;background:#0f9d6b;color:#fff;font-weight:800;font-size:13px;cursor:pointer}
-    </style></head><body>
-      <div class="eyebrow">Level Up Learning · Student progress</div>
-      <h1>${student.name}</h1>
-      <p class="meta">${student.yearLevel ?? "Year not recorded"} · ${student.className || "No class"} · Last ${days} days · Generated ${generated}</p>
-      <span class="band">${statusText}</span><span class="band">${student.weeklyTargetMet ? "Weekly target met" : "Weekly target not yet met"}</span>
-      <div class="cards">
-        <div class="card"><small>Avg accuracy</small><b>${pct(student.averageAccuracy)}</b></div>
-        <div class="card"><small>Avg growth</small><b>${student.averageGrowth === null ? "—" : `${student.averageGrowth} pts`}</b></div>
-        <div class="card"><small>Levels mastered</small><b>${student.masteredLevels}</b></div>
-        <div class="card"><small>Learning days</small><b>${student.learningDays}</b></div>
-      </div>
-      <h2>Progress by curriculum strand</h2>
-      <table><thead><tr><th>Realm / strand</th><th>Current</th><th class="num">Latest test</th><th>Band</th><th class="num">Pre</th><th class="num">Post</th><th class="num">Growth</th></tr></thead><tbody>${realmRows || `<tr><td colspan="7">No realm evidence in this window.</td></tr>`}</tbody></table>
-      <footer>Latest test = most recent post-test (or placement pre-test). Standing compares working level to school grade: at level = level matches year. Growth uses matched pre/post-test pairs.</footer>
-      <button class="btn noprint" onclick="window.print()">Print / Save as PDF</button>
-    </body></html>`);
-    win.document.close();
+    const { default: jsPDF } = await import("jspdf");
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const margin = 16;
+    let y = 18;
+    const addPageIfNeeded = (height: number) => {
+      if (y + height <= 282) return;
+      pdf.addPage();
+      y = 18;
+    };
+    const text = (value: string, x: number, nextY: number, options?: Parameters<typeof pdf.text>[3]) => {
+      pdf.text(value, x, nextY, options);
+      y = Math.max(y, nextY);
+    };
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(11, 111, 76);
+    pdf.setFontSize(9);
+    text("LEVEL UP LEARNING · STUDENT PROGRESS", margin, y);
+    pdf.setTextColor(14, 21, 18);
+    pdf.setFontSize(22);
+    text(student.name, margin, y + 9);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+    pdf.setTextColor(92, 107, 99);
+    text(`${student.yearLevel ?? "Year not recorded"} · ${student.className || "No class"} · Last ${days} days · Generated ${generated}`, margin, y + 6);
+
+    const pill = (label: string, x: number, nextY: number) => {
+      const width = pdf.getTextWidth(label) + 8;
+      pdf.setFillColor(227, 244, 236);
+      pdf.roundedRect(x, nextY - 5, width, 7.5, 3.5, 3.5, "F");
+      pdf.setTextColor(11, 111, 76);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(8.5);
+      pdf.text(label, x + 4, nextY);
+      return x + width + 4;
+    };
+    let pillX = margin;
+    pillX = pill(statusText, pillX, y + 11);
+    pill(student.weeklyTargetMet ? "Weekly target met" : "Weekly target not yet met", pillX, y + 11);
+    y += 20;
+
+    const cards = [
+      ["Avg accuracy", pct(student.averageAccuracy)],
+      ["Avg growth", student.averageGrowth === null ? "—" : `${student.averageGrowth} pts`],
+      ["Levels mastered", String(student.masteredLevels)],
+      ["Learning days", String(student.learningDays)],
+    ];
+    const cardWidth = (pageWidth - margin * 2 - 9) / 4;
+    cards.forEach(([label, value], index) => {
+      const x = margin + index * (cardWidth + 3);
+      pdf.setDrawColor(214, 221, 215);
+      pdf.roundedRect(x, y, cardWidth, 23, 3, 3);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(92, 107, 99);
+      pdf.text(label.toUpperCase(), x + 4, y + 7);
+      pdf.setTextColor(14, 21, 18);
+      pdf.setFontSize(15);
+      pdf.text(value, x + 4, y + 17);
+    });
+    y += 35;
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(13);
+    pdf.setTextColor(14, 21, 18);
+    text("Progress by curriculum strand", margin, y);
+    y += 8;
+
+    const headers = ["Realm / strand", "Current", "Latest", "Band", "Pre", "Post", "Growth"];
+    const widths = [39, 34, 20, 27, 18, 18, 25];
+    const drawRow = (values: string[], header = false) => {
+      addPageIfNeeded(header ? 11 : 10);
+      let x = margin;
+      pdf.setFont("helvetica", header ? "bold" : "normal");
+      pdf.setFontSize(header ? 7.2 : 8.5);
+      pdf.setTextColor(header ? 92 : 14, header ? 107 : 21, header ? 99 : 18);
+      if (header) {
+        pdf.setDrawColor(214, 221, 215);
+        pdf.line(margin, y + 2, pageWidth - margin, y + 2);
+      }
+      values.forEach((value, index) => {
+        const lines = pdf.splitTextToSize(value, widths[index] - 2).slice(0, 2);
+        pdf.text(lines, x, y + (header ? 0 : 2));
+        x += widths[index];
+      });
+      if (!header) {
+        pdf.setDrawColor(238, 242, 239);
+        pdf.line(margin, y + 8, pageWidth - margin, y + 8);
+      }
+      y += header ? 8 : 10;
+    };
+    drawRow(headers, true);
+    if (student.realms.length === 0) {
+      drawRow(["No realm evidence in this window.", "", "", "", "", "", ""]);
+    } else {
+      student.realms.forEach((realm) => {
+        const standing = levelStanding(student.yearLevel, realm.currentLevel);
+        drawRow([
+          REALMS[realm.realmId] ?? realm.realmId,
+          `${realm.currentLevel ?? "Not placed"}${realm.currentWeek ? ` · Wk ${realm.currentWeek}` : ""}`,
+          pct(realm.assessmentScore),
+          standing ? STANDING_STYLE[standing].label : "—",
+          pct(realm.pretestScore),
+          pct(realm.posttestScore),
+          realm.growth === null ? "—" : `${realm.growth > 0 ? "+" : ""}${realm.growth} pts`,
+        ]);
+      });
+    }
+
+    addPageIfNeeded(28);
+    pdf.setDrawColor(214, 221, 215);
+    pdf.line(margin, y + 4, pageWidth - margin, y + 4);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(138, 152, 143);
+    const footer = "Latest test = most recent post-test (or placement pre-test). Standing compares working level to school grade. Growth uses matched pre/post-test pairs.";
+    pdf.text(pdf.splitTextToSize(footer, pageWidth - margin * 2), margin, y + 12);
+    const fileName = `${student.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "student"}-progress-report.pdf`;
+    pdf.save(fileName);
   };
 
   const openLearningJourney = async (studentId: string) => {
@@ -1008,8 +1092,8 @@ export default function SchoolAnalyticsDashboard({
                 <span className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
                   {selectedStudent.weeklyTargetMet ? "Weekly target met" : "Weekly target not yet met"}
                 </span>
-                <button type="button" onClick={() => printStudentReport(selectedStudent)} className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50">
-                  <Download className="h-3.5 w-3.5" /> Print report
+                <button type="button" onClick={() => void downloadStudentReportPdf(selectedStudent)} className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50">
+                  <Download className="h-3.5 w-3.5" /> Download PDF
                 </button>
                 <button type="button" onClick={() => void openLearningJourney(selectedStudent.id)} className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-800">
                   <TrendingUp className="h-3.5 w-3.5" /> Learning journey
