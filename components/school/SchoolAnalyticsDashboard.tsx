@@ -81,6 +81,7 @@ const YEAR_LEVELS = [
 // their age.)
 type LevelStanding = "below" | "at" | "above";
 const SCHOOL_LEVEL_ORDER = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+const PLACEMENT_LEVEL_COLUMNS = [...SCHOOL_LEVEL_ORDER, "Not placed"];
 const levelIndex = (year: string | null | undefined) => (year ? SCHOOL_LEVEL_ORDER.indexOf(year) : -1);
 function levelStanding(grade: string | null | undefined, working: string | null | undefined): LevelStanding | null {
   const g = levelIndex(grade);
@@ -622,16 +623,21 @@ export default function SchoolAnalyticsDashboard({
   // foundation the future weighted overall-maths level builds on.
   const placementByStrand = useMemo(() => {
     const students = snapshot?.students ?? [];
-    const groups = new Map<string, { key: string; label: string; order: number; levels: Map<string, number>; standings: Record<LevelStanding, number>; standingTotal: number; preSum: number; preCount: number; placed: number }>();
+    const groups = new Map<string, { key: string; label: string; order: number; levels: Map<string, number>; byGrade: Map<string, { levels: Map<string, number>; total: number }>; standings: Record<LevelStanding, number>; standingTotal: number; preSum: number; preCount: number; placed: number }>();
     for (const student of students) {
       for (const realm of student.realms) {
         const strand: AcStrand | null = strandForRealm(realm.realmId);
         const key = strand ?? "other";
         const label = strand ? AC_STRANDS[strand].label : "Other";
         const order = strand ? AC_STRANDS[strand].order : 99;
-        const group = groups.get(key) ?? { key, label, order, levels: new Map(), standings: { below: 0, at: 0, above: 0 }, standingTotal: 0, preSum: 0, preCount: 0, placed: 0 };
+        const group = groups.get(key) ?? { key, label, order, levels: new Map(), byGrade: new Map(), standings: { below: 0, at: 0, above: 0 }, standingTotal: 0, preSum: 0, preCount: 0, placed: 0 };
         const level = realm.currentLevel ?? "Not placed";
+        const grade = student.yearLevel ?? "Not recorded";
         group.levels.set(level, (group.levels.get(level) ?? 0) + 1);
+        const gradeRow = group.byGrade.get(grade) ?? { levels: new Map(), total: 0 };
+        gradeRow.levels.set(level, (gradeRow.levels.get(level) ?? 0) + 1);
+        gradeRow.total += 1;
+        group.byGrade.set(grade, gradeRow);
         const standing = levelStanding(student.yearLevel, realm.currentLevel);
         if (standing) {
           group.standings[standing] += 1;
@@ -646,6 +652,13 @@ export default function SchoolAnalyticsDashboard({
       .map((group) => ({
         ...group,
         levels: [...group.levels.entries()].sort((a, b) => a[0].localeCompare(b[0], "en-AU", { numeric: true })),
+        gradeRows: [...group.byGrade.entries()]
+          .sort((a, b) => levelIndex(a[0]) - levelIndex(b[0]))
+          .map(([grade, value]) => ({
+            grade,
+            total: value.total,
+            levels: [...value.levels.entries()].sort((a, b) => a[0].localeCompare(b[0], "en-AU", { numeric: true })),
+          })),
         baseline: group.preCount ? Math.round(group.preSum / group.preCount) : null,
         onLevelPct: group.standingTotal ? Math.round(((group.standings.at + group.standings.above) / group.standingTotal) * 100) : null,
       }))
@@ -931,24 +944,44 @@ export default function SchoolAnalyticsDashboard({
                   </ul>
                   <div className="mt-5 border-t border-slate-100 pt-4">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Level match</p>
+                      <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">School grade → working level</p>
                       {group.onLevelPct !== null ? (
                         <span className="text-xs font-bold text-slate-700">{group.onLevelPct}% at or above</span>
                       ) : (
                         <span className="text-xs font-semibold text-slate-400">No year match yet</span>
                       )}
                     </div>
-                    <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-slate-100">
-                      {STANDING_ORDER.map((standing) => group.standingTotal ? (
-                        <div key={standing} title={`${STANDING_STYLE[standing].label}: ${group.standings[standing]}`} style={{ width: `${(group.standings[standing] / group.standingTotal) * 100}%`, background: STANDING_STYLE[standing].bar }} />
-                      ) : null)}
-                    </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-slate-500">
-                      {STANDING_ORDER.map((standing) => (
-                        <span key={standing} className="inline-flex items-center gap-1.5">
-                          <span className="h-2.5 w-2.5 rounded-sm" style={{ background: STANDING_STYLE[standing].bar }} />
-                          {STANDING_STYLE[standing].label}: {group.standings[standing]}
-                        </span>
+                    <div className="mt-3 space-y-2">
+                      <div className="grid grid-cols-[4.5rem_repeat(8,minmax(0,1fr))] gap-1 text-[10px] font-bold uppercase tracking-[0.04em] text-slate-400">
+                        <span>Grade</span>
+                        {PLACEMENT_LEVEL_COLUMNS.map((level) => <span key={level} className="text-center">{level === "Prep" ? "P" : level === "Not placed" ? "NP" : level.replace("Year ", "Y")}</span>)}
+                      </div>
+                      {group.gradeRows.map((gradeRow) => (
+                        <button
+                          key={gradeRow.grade}
+                          type="button"
+                          onClick={() => { if (group.key !== "other") setRealmId(group.key); if (gradeRow.grade !== "Not recorded") setYearLevel(gradeRow.grade); setTab("students"); }}
+                          className="grid w-full grid-cols-[4.5rem_repeat(8,minmax(0,1fr))] gap-1 text-left text-xs"
+                        >
+                          <span className="flex h-7 items-center truncate font-bold text-slate-700">{gradeRow.grade}</span>
+                          {PLACEMENT_LEVEL_COLUMNS.map((level, index) => {
+                            const count = gradeRow.levels.find(([workingLevel]) => workingLevel === level)?.[1] ?? 0;
+                            const isExpected = gradeRow.grade === level;
+                            const workingIndex = levelIndex(level);
+                            const gradeIndex = levelIndex(gradeRow.grade);
+                            const isBelow = count > 0 && workingIndex >= 0 && gradeIndex >= 0 && workingIndex < gradeIndex;
+                            return (
+                              <span
+                                key={level}
+                                title={`${gradeRow.grade} working at ${level}: ${count}`}
+                                className={`flex h-7 items-center justify-center rounded-sm border text-[11px] font-black tabular-nums ${isExpected ? "border-slate-900" : isBelow ? "border-rose-300" : "border-slate-100"} ${count ? "text-white" : "text-slate-300"}`}
+                                style={{ background: count ? (isBelow ? STANDING_STYLE.below.bar : LEVEL_RAMP[index % LEVEL_RAMP.length]) : "#f8fafc" }}
+                              >
+                                {count || ""}
+                              </span>
+                            );
+                          })}
+                        </button>
                       ))}
                     </div>
                     {group.standingTotal && group.standings.below > 0 ? (
