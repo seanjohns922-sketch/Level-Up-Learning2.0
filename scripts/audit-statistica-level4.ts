@@ -134,6 +134,12 @@ for (const lessonId of STATISTICA_LEVEL4_LESSON_IDS) {
   const activities = sample.activities.map((a) => a() as PracticeTask);
   const week = Number(/-w(\d+)-/.exec(lessonId)?.[1] ?? 0);
   const families = activities.map(family);
+  if (lessonId === "y4-statistics-w1-l3") {
+    check(
+      [family(teaching), ...families].every((item) => item.startsWith("pictograph:")),
+      `${lessonId}: Calculate Frequencies must stay on many-to-one pictographs, not Level 3 column graphs`,
+    );
+  }
   if (activities.some((t) => t.kind === "statisticaPictograph" && (t.mode === "read" || t.mode === "calc"))) sawPictoRead = true;
   if (activities.some((t) => t.kind === "statisticaPictograph" && t.mode === "build")) sawPictoBuild = true;
   if (activities.some((t) => t.kind === "statisticaShape" && t.mode === "concentrated")) sawConcentrated = true;

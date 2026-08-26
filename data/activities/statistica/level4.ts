@@ -227,7 +227,7 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   // W1 Many-to-One Displays — the key, reading rows, calculating totals
   "y4-statistics-w1-l1": [pictoReadTask, pictoCalcTask, pictoCompareTask],
   "y4-statistics-w1-l2": [pictoCalcTask, pictoCompareTask, pictoReadTask],
-  "y4-statistics-w1-l3": [pictoCompareTask, pictoReadTask, numColumnReadTask],
+  "y4-statistics-w1-l3": [pictoCompareTask, pictoCalcTask, pictoBuildTask],
   // W2 Build Many-to-One — interpret the key, build, read partial symbols
   "y4-statistics-w2-l1": [pictoBuildTask, pictoReadTask, pictoCalcTask],
   "y4-statistics-w2-l2": [pictoBuildTask, pictoCompareTask, pictoReadTask],
