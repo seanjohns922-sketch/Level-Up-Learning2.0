@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   ChevronRight,
   CircleHelp,
+  Download,
   GraduationCap,
   RefreshCw,
   Search,
@@ -21,6 +22,12 @@ import type {
   SchoolAnalyticsSnapshot,
   SchoolHomeSnapshot,
 } from "@/lib/school-platform-server";
+import {
+  type AchievementBand,
+  AC_STRANDS,
+  BAND_LABEL,
+  bandFor,
+} from "@/lib/curriculum/ac-standards";
 
 type AnalyticsTab =
   | "overview"
@@ -62,6 +69,13 @@ const YEAR_LEVELS = [
   "Year 5",
   "Year 6",
 ];
+
+const BAND_STYLE: Record<AchievementBand, { label: string; pill: string; bar: string }> = {
+  above: { label: "Above", pill: "bg-emerald-100 text-emerald-800", bar: "#059669" },
+  at: { label: "At standard", pill: "bg-amber-100 text-amber-800", bar: "#cf9526" },
+  working_towards: { label: "Working towards", pill: "bg-rose-100 text-rose-800", bar: "#c2534d" },
+};
+const BAND_ORDER: AchievementBand[] = ["above", "at", "working_towards"];
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-AU", {
   day: "numeric",
@@ -253,6 +267,15 @@ export default function SchoolAnalyticsDashboard({
     }
   }, [academicYearId, classId, days, realmId, schoolId, yearLevel]);
 
+  const exportHref = useMemo(() => {
+    if (!academicYearId) return "";
+    const params = new URLSearchParams({ academicYearId, days: String(days), type: tab === "curriculum" ? "curriculum" : "students" });
+    if (yearLevel) params.set("yearLevel", yearLevel);
+    if (classId) params.set("classId", classId);
+    if (realmId) params.set("realmId", realmId);
+    return `/api/school/${schoolId}/analytics/export?${params}`;
+  }, [academicYearId, classId, days, realmId, schoolId, tab, yearLevel]);
+
   useEffect(() => {
     void loadAnalytics();
   }, [loadAnalytics]);
@@ -296,6 +319,70 @@ export default function SchoolAnalyticsDashboard({
     [snapshot?.realms],
   );
 
+  const printStudentReport = (student: SchoolAnalyticsSnapshot["students"][number]) => {
+    const win = window.open("", "_blank", "noopener,width=920,height=1200");
+    if (!win) return;
+    const generated = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date());
+    const pct = (v: number | null) => (v === null ? "—" : `${v}%`);
+    const statusText = student.status === "on_track" ? "On track" : student.status === "needs_attention" ? "Needs attention" : "Active";
+    const realmRows = student.realms.map((realm) => {
+      const band = bandFor(realm.averageAccuracy);
+      return `<tr><td class="strong">${REALMS[realm.realmId] ?? realm.realmId}</td><td>${realm.currentLevel ?? "Not placed"}${realm.currentWeek ? ` · Wk ${realm.currentWeek}` : ""}</td><td class="num">${pct(realm.averageAccuracy)}</td><td>${band ? BAND_LABEL[band] : "No evidence"}</td><td class="num">${pct(realm.pretestScore)}</td><td class="num">${pct(realm.posttestScore)}</td><td class="num growth">${realm.growth === null ? "—" : `${realm.growth > 0 ? "+" : ""}${realm.growth} pts`}</td></tr>`;
+    }).join("");
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${student.name} — Progress report</title><style>
+      *{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0e1512;margin:0;padding:34px 40px;font-variant-numeric:tabular-nums}
+      .eyebrow{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#0b6f4c}
+      h1{font-size:26px;margin:6px 0 2px}.meta{color:#5c6b63;font-size:13px;margin:0}
+      .band{display:inline-block;margin:14px 8px 0 0;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:800;background:#e3f4ec;color:#0b6f4c}
+      .cards{display:flex;gap:10px;margin:22px 0}.card{flex:1;border:1px solid #d6ddd7;border-radius:10px;padding:12px 14px}
+      .card small{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5c6b63}.card b{display:block;font-size:22px;margin-top:4px}
+      h2{font-size:14px;margin:24px 0 8px;letter-spacing:.02em}
+      table{width:100%;border-collapse:collapse;font-size:12.5px}th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#5c6b63;border-bottom:2px solid #d6ddd7;padding:7px 8px}
+      td{padding:8px;border-bottom:1px solid #eef2ef}.strong{font-weight:700}.num{text-align:right}.growth{color:#0b6f4c;font-weight:700}
+      footer{margin-top:26px;padding-top:12px;border-top:1px solid #d6ddd7;font-size:10.5px;color:#8a988f}
+      @media print{body{padding:14mm}.noprint{display:none}}
+      .btn{margin-top:20px;padding:9px 16px;border:0;border-radius:8px;background:#0f9d6b;color:#fff;font-weight:800;font-size:13px;cursor:pointer}
+    </style></head><body>
+      <div class="eyebrow">Level Up Learning · Student progress</div>
+      <h1>${student.name}</h1>
+      <p class="meta">${student.yearLevel ?? "Year not recorded"} · ${student.className || "No class"} · Last ${days} days · Generated ${generated}</p>
+      <span class="band">${statusText}</span><span class="band">${student.weeklyTargetMet ? "Weekly target met" : "Weekly target not yet met"}</span>
+      <div class="cards">
+        <div class="card"><small>Avg accuracy</small><b>${pct(student.averageAccuracy)}</b></div>
+        <div class="card"><small>Avg growth</small><b>${student.averageGrowth === null ? "—" : `${student.averageGrowth} pts`}</b></div>
+        <div class="card"><small>Levels mastered</small><b>${student.masteredLevels}</b></div>
+        <div class="card"><small>Learning days</small><b>${student.learningDays}</b></div>
+      </div>
+      <h2>Progress by curriculum strand</h2>
+      <table><thead><tr><th>Realm / strand</th><th>Current</th><th class="num">Accuracy</th><th>Band</th><th class="num">Pre</th><th class="num">Post</th><th class="num">Growth</th></tr></thead><tbody>${realmRows || `<tr><td colspan="7">No realm evidence in this window.</td></tr>`}</tbody></table>
+      <footer>Growth uses matched pre-test and post-test pairs. Achievement bands: Working towards &lt;55%, At 55–84%, Above ≥85%.</footer>
+      <button class="btn noprint" onclick="window.print()">Print / Save as PDF</button>
+    </body></html>`);
+    win.document.close();
+  };
+
+  // Group curriculum evidence by AC9 strand, with an evidence-weighted band
+  // distribution per strand (the visual leaders scan first).
+  const curriculumByStrand = useMemo(() => {
+    const rows = snapshot?.curriculum ?? [];
+    const groups = new Map<string, { key: string; label: string; order: number; rows: typeof rows; evidence: number; weightedAccuracy: number; bands: Record<AchievementBand, number> }>();
+    for (const row of rows) {
+      const key = row.strand ?? "other";
+      const label = row.strandLabel ?? "Other evidence";
+      const order = row.strand ? AC_STRANDS[row.strand].order : 99;
+      const group = groups.get(key) ?? { key, label, order, rows: [], evidence: 0, weightedAccuracy: 0, bands: { above: 0, at: 0, working_towards: 0 } };
+      group.rows = [...group.rows, row];
+      group.evidence += row.evidenceCount;
+      if (row.averageAccuracy !== null) group.weightedAccuracy += row.averageAccuracy * row.evidenceCount;
+      const band = row.band ?? bandFor(row.averageAccuracy);
+      if (band) group.bands[band] += row.evidenceCount;
+      groups.set(key, group);
+    }
+    return [...groups.values()]
+      .map((group) => ({ ...group, averageAccuracy: group.evidence ? Math.round(group.weightedAccuracy / group.evidence) : null }))
+      .sort((a, b) => a.order - b.order);
+  }, [snapshot?.curriculum]);
+
   if (loading && !snapshot) return <LoadingView />;
 
   if (error && !snapshot) {
@@ -325,6 +412,17 @@ export default function SchoolAnalyticsDashboard({
   return (
     <section className="space-y-6">
       <div className="border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Filters</p>
+          <a
+            href={exportHref || undefined}
+            download
+            aria-disabled={!exportHref}
+            className={`inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold ${exportHref ? "text-emerald-800 hover:bg-emerald-50" : "pointer-events-none text-slate-300"}`}
+          >
+            <Download className="h-3.5 w-3.5" /> Export {tab === "curriculum" ? "curriculum" : "students"} CSV
+          </a>
+        </div>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <label className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
             School year level
@@ -428,11 +526,70 @@ export default function SchoolAnalyticsDashboard({
       ) : null}
 
       {tab === "curriculum" ? (
-        <article className="overflow-hidden border border-slate-200 bg-white shadow-sm">
-          <div className="p-5"><h3 className="font-bold">Curriculum evidence heatmap</h3><p className="mt-1 text-sm text-slate-500">Observed performance by lesson topic and school year. This reports evidence, not a curriculum-coverage claim.</p></div>
-          <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-sm"><thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.1em] text-slate-500"><tr><th className="px-5 py-3">Skill group</th><th className="px-4 py-3">Year</th><th className="px-4 py-3">Students</th><th className="px-4 py-3">Evidence</th><th className="px-4 py-3">Accuracy</th><th className="px-4 py-3"><span className="sr-only">Drill down</span></th></tr></thead><tbody>{snapshot.curriculum.map((row) => { const accuracy = row.averageAccuracy ?? 0; const shade = row.averageAccuracy === null ? "bg-slate-100" : accuracy >= 85 ? "bg-emerald-100 text-emerald-900" : accuracy >= 70 ? "bg-amber-100 text-amber-900" : "bg-red-100 text-red-900"; return <tr key={`${row.topic}-${row.yearLevel}`} className="border-t border-slate-100"><td className="px-5 py-3 font-semibold">{row.topic}</td><td className="px-4 py-3">{row.yearLevel ?? "Not recorded"}</td><td className="px-4 py-3">{row.students}</td><td className="px-4 py-3">{row.evidenceCount}</td><td className="px-4 py-3"><span className={`inline-flex min-w-20 justify-center rounded-md px-3 py-1 font-bold ${shade}`}>{formatPercent(row.averageAccuracy)}</span></td><td className="px-4 py-3 text-right"><button type="button" onClick={() => { if (row.yearLevel) setYearLevel(row.yearLevel); setTab("students"); }} className="inline-flex items-center gap-1 font-bold text-emerald-700">View students <ChevronRight className="h-4 w-4" /></button></td></tr>; })}</tbody></table></div>
-          {snapshot.curriculum.length === 0 ? <p className="p-5 text-sm text-slate-500">No curriculum evidence in this reporting window.</p> : null}
-        </article>
+        <div className="space-y-5">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h3 className="font-bold text-slate-950">Curriculum evidence by AC9 strand</h3>
+              <p className="mt-1 text-sm text-slate-500">Achievement banded against the Australian Curriculum. Evidence observed, not a coverage claim.</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
+              {BAND_ORDER.map((band) => (
+                <span key={band} className="inline-flex items-center gap-1.5">
+                  <span className="h-3 w-3 rounded-sm" style={{ background: BAND_STYLE[band].bar }} />
+                  {BAND_STYLE[band].label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {curriculumByStrand.length === 0 ? (
+            <p className="border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">No curriculum evidence in this reporting window.</p>
+          ) : (
+            curriculumByStrand.map((group) => {
+              const strandBand = bandFor(group.averageAccuracy);
+              const total = group.bands.above + group.bands.at + group.bands.working_towards;
+              return (
+                <article key={group.key} className="overflow-hidden border border-slate-200 bg-white shadow-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-5">
+                    <div className="flex items-center gap-3">
+                      <h4 className="text-base font-bold text-slate-950">{group.label}</h4>
+                      {strandBand ? <span className={`rounded-md px-2.5 py-1 text-xs font-bold ${BAND_STYLE[strandBand].pill}`}>{BAND_STYLE[strandBand].label}</span> : null}
+                      <span className="text-xs text-slate-500">{group.rows.length} topics · {group.evidence} evidence</span>
+                    </div>
+                    <div className="flex min-w-[180px] flex-1 items-center justify-end gap-3">
+                      <div className="flex h-3 w-full max-w-[260px] overflow-hidden rounded-full bg-slate-100">
+                        {BAND_ORDER.map((band) => total ? (
+                          <div key={band} title={`${BAND_STYLE[band].label}: ${group.bands[band]}`} style={{ width: `${(group.bands[band] / total) * 100}%`, background: BAND_STYLE[band].bar }} />
+                        ) : null)}
+                      </div>
+                      <span className="text-lg font-bold tabular-nums text-slate-950">{formatPercent(group.averageAccuracy)}</span>
+                    </div>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {[...group.rows].sort((a, b) => (a.averageAccuracy ?? 999) - (b.averageAccuracy ?? 999)).map((row) => {
+                      const band = row.band ?? bandFor(row.averageAccuracy);
+                      return (
+                        <button
+                          key={`${row.topic}-${row.yearLevel}`}
+                          type="button"
+                          onClick={() => { if (row.yearLevel) setYearLevel(row.yearLevel); setTab("students"); }}
+                          className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm hover:bg-emerald-50"
+                        >
+                          <span className="min-w-0 flex-1 truncate font-semibold text-slate-800">{row.topic}</span>
+                          <span className="hidden w-20 shrink-0 text-xs text-slate-500 sm:block">{row.yearLevel ?? "—"}</span>
+                          <span className="w-10 shrink-0 text-right text-xs tabular-nums text-slate-500">{row.evidenceCount}</span>
+                          <span className="w-16 shrink-0 text-right font-bold tabular-nums text-slate-900">{formatPercent(row.averageAccuracy)}</span>
+                          <span className={`hidden w-32 shrink-0 justify-center rounded-md px-2 py-1 text-center text-xs font-bold sm:inline-flex ${band ? BAND_STYLE[band].pill : "bg-slate-100 text-slate-500"}`}>{band ? BAND_STYLE[band].label : "No evidence"}</span>
+                          <ChevronRight className="h-4 w-4 shrink-0 text-emerald-700" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </article>
+              );
+            })
+          )}
+        </div>
       ) : null}
 
       {tab === "engagement" ? (
@@ -518,6 +675,9 @@ export default function SchoolAnalyticsDashboard({
                 <span className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
                   {selectedStudent.weeklyTargetMet ? "Weekly target met" : "Weekly target not yet met"}
                 </span>
+                <button type="button" onClick={() => printStudentReport(selectedStudent)} className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50">
+                  <Download className="h-3.5 w-3.5" /> Print report
+                </button>
               </div>
             </div>
             <div className="mt-6 grid gap-3 lg:grid-cols-3">

@@ -1,4 +1,11 @@
 import { cookies } from "next/headers";
+import {
+  type AcStrand,
+  type AchievementBand,
+  AC_STRANDS,
+  bandFor,
+  strandForRealm,
+} from "@/lib/curriculum/ac-standards";
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ??
@@ -174,6 +181,10 @@ export type SchoolAnalyticsSnapshot = {
   curriculum: Array<{
     topic: string;
     yearLevel: string | null;
+    realmId: string | null;
+    strand: AcStrand | null;
+    strandLabel: string | null;
+    band: AchievementBand | null;
     students: number;
     evidenceCount: number;
     averageAccuracy: number | null;
@@ -503,7 +514,7 @@ export async function loadSchoolAnalyticsSnapshot(
   const access = await requireSchoolPreviewAccess(schoolId, accessToken);
   if (!access) return null;
 
-  return supabaseRequest<SchoolAnalyticsSnapshot>(
+  const snapshot = await supabaseRequest<SchoolAnalyticsSnapshot>(
     "/rest/v1/rpc/get_school_analytics_snapshot",
     access.accessToken,
     {
@@ -518,6 +529,30 @@ export async function loadSchoolAnalyticsSnapshot(
       }),
     },
   );
+
+  return enrichCurriculumWithStandards(snapshot);
+}
+
+// Attach AC9 strand + achievement band to each curriculum evidence row. This is
+// derived (not persisted): strand comes from the realm the evidence belongs to,
+// the band from observed accuracy against the shared thresholds. Degrades
+// gracefully if an older RPC omits `realmId`.
+function enrichCurriculumWithStandards(
+  snapshot: SchoolAnalyticsSnapshot | null,
+): SchoolAnalyticsSnapshot | null {
+  if (!snapshot?.curriculum) return snapshot;
+  snapshot.curriculum = snapshot.curriculum.map((row) => {
+    const strand: AcStrand | null =
+      row.strand ?? strandForRealm(row.realmId ?? null);
+    return {
+      ...row,
+      realmId: row.realmId ?? null,
+      strand,
+      strandLabel: strand ? AC_STRANDS[strand].label : null,
+      band: row.band ?? bandFor(row.averageAccuracy),
+    };
+  });
+  return snapshot;
 }
 
 export async function loadSchoolLicenceSummaries(schoolId: string) {

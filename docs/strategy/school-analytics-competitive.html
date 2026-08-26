@@ -1,0 +1,290 @@
+<title>School Analytics — Competitive Landscape & Roadmap</title>
+<style>
+  :root{
+    --paper:#eef2ef; --card:#ffffff; --ink:#0e1512; --muted:#5c6b63; --hair:#d6ddd7;
+    --brand:#0f9d6b; --brand-ink:#0b6f4c; --brand-soft:#e3f4ec;
+    --full:#0f9d6b; --partial:#cf9526; --none:#c65551;
+    --grid:#dbe3dd; --shadow:0 1px 2px rgba(14,21,18,.06),0 8px 26px rgba(14,21,18,.07);
+    --r:14px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#0a0f0d; --card:#111815; --ink:#e8efea; --muted:#8a988f; --hair:#232d28;
+      --brand:#34d399; --brand-ink:#7ff0c4; --brand-soft:#12291f;
+      --full:#34d399; --partial:#e8b64a; --none:#e0716c;
+      --grid:#222c27; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#eef2ef; --card:#ffffff; --ink:#0e1512; --muted:#5c6b63; --hair:#d6ddd7;
+    --brand:#0f9d6b; --brand-ink:#0b6f4c; --brand-soft:#e3f4ec;
+    --full:#0f9d6b; --partial:#cf9526; --none:#c65551; --grid:#dbe3dd;
+    --shadow:0 1px 2px rgba(14,21,18,.06),0 8px 26px rgba(14,21,18,.07);
+  }
+  :root[data-theme="dark"]{
+    --paper:#0a0f0d; --card:#111815; --ink:#e8efea; --muted:#8a988f; --hair:#232d28;
+    --brand:#34d399; --brand-ink:#7ff0c4; --brand-soft:#12291f;
+    --full:#34d399; --partial:#e8b64a; --none:#e0716c; --grid:#222c27;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;
+    font-variant-numeric:tabular-nums;}
+  .wrap{max-width:1080px;margin:0 auto;padding:38px 22px 64px;}
+  .eyebrow{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--brand-ink);}
+  h1{font-size:clamp(28px,4.4vw,44px);line-height:1.02;letter-spacing:-.02em;margin:.34em 0 .18em;text-wrap:balance;font-weight:850;}
+  .thesis{font-size:clamp(15px,1.9vw,18px);color:var(--muted);max-width:60ch;margin:0;}
+  section{margin-top:44px;}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .sec-num{font-size:12px;font-weight:800;color:var(--brand);letter-spacing:.1em;}
+  h2{font-size:clamp(18px,2.4vw,23px);letter-spacing:-.01em;margin:0;font-weight:820;}
+  .sub{color:var(--muted);font-size:13.5px;margin:0;}
+  .card{background:var(--card);border:1px solid var(--hair);border-radius:var(--r);box-shadow:var(--shadow);}
+  .pad{padding:20px;}
+  /* legend chips */
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-weight:600;align-items:center;}
+  .lg{display:inline-flex;align-items:center;gap:7px;}
+  .dot{width:13px;height:13px;border-radius:4px;display:inline-block;}
+  .d-full{background:var(--full);}
+  .d-part{background:linear-gradient(135deg,var(--partial) 0 50%,transparent 50% 100%);border:1.5px solid var(--partial);}
+  .d-none{background:transparent;border:1.5px solid var(--none);}
+
+  /* ── Scatter ── */
+  .scatter-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;}
+  @media(max-width:760px){.scatter-grid{grid-template-columns:1fr}}
+  .plot{width:100%;height:auto;display:block;}
+  .keyrow{display:flex;flex-direction:column;gap:10px;}
+  .keyitem{display:flex;align-items:center;gap:11px;font-size:13.5px;font-weight:650;}
+  .pin{width:12px;height:12px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 3px color-mix(in srgb,currentColor 18%,transparent);}
+  .take{margin-top:6px;padding:13px 15px;border-radius:11px;background:var(--brand-soft);border:1px solid color-mix(in srgb,var(--brand) 30%,transparent);font-size:13.5px;font-weight:640;color:var(--ink);}
+
+  /* ── Bar race ── */
+  .bars{display:flex;flex-direction:column;gap:11px;}
+  .bar{display:grid;grid-template-columns:132px 1fr 46px;align-items:center;gap:12px;}
+  .bar .nm{font-size:13.5px;font-weight:700;}
+  .bar .track{height:22px;border-radius:7px;background:color-mix(in srgb,var(--muted) 14%,transparent);overflow:hidden;position:relative;}
+  .bar .fill{height:100%;border-radius:7px;}
+  .bar .val{font-size:13px;font-weight:800;text-align:right;}
+  .bar.us .nm{color:var(--brand-ink);}
+  .ghost{position:absolute;top:0;bottom:0;width:1.5px;background:var(--none);opacity:.65;}
+  .ghost span{position:absolute;top:-16px;transform:translateX(-50%);font-size:9px;font-weight:800;color:var(--none);white-space:nowrap;}
+
+  /* ── Matrix ── */
+  .matrix{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
+  .matrix th,.matrix td{padding:0;}
+  .mhead{position:sticky;top:0;}
+  .matrix thead th{padding:10px 6px;text-align:center;font-weight:800;font-size:11.5px;vertical-align:bottom;border-bottom:2px solid var(--hair);}
+  .matrix thead th.cap{text-align:left;width:32%;padding-left:4px;}
+  .matrix thead th.us{color:var(--brand-ink);}
+  .matrix tbody td{border-bottom:1px solid var(--hair);height:44px;}
+  .matrix .cap{text-align:left;font-weight:650;padding:6px 10px 6px 4px;line-height:1.2;}
+  .cell{text-align:center;}
+  .uscol{background:color-mix(in srgb,var(--brand) 7%,transparent);}
+  .swatch{width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;position:relative;}
+  .s-full{background:var(--full);}
+  .s-part{background:color-mix(in srgb,var(--partial) 22%,transparent);border:1.5px solid var(--partial);}
+  .s-none{background:transparent;border:1.5px solid color-mix(in srgb,var(--none) 55%,transparent);}
+  .s-part::after{content:"";position:absolute;inset:0;border-radius:6px;background:linear-gradient(135deg,var(--partial) 0 50%,transparent 50%);opacity:.5;}
+  .tier{position:absolute;top:-8px;right:-9px;font-size:8.5px;font-weight:900;color:#fff;background:var(--brand-ink);border-radius:20px;padding:1px 5px;letter-spacing:.02em;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+  .scorerow td{border-bottom:none!important;padding-top:10px;}
+  .score{font-size:15px;font-weight:900;color:var(--brand-ink);}
+
+  /* ── Roadmap ── */
+  .road{display:grid;gap:14px;}
+  .phase{display:grid;grid-template-columns:96px 1fr;gap:0;border-radius:var(--r);overflow:hidden;border:1px solid var(--hair);background:var(--card);box-shadow:var(--shadow);}
+  @media(max-width:620px){.phase{grid-template-columns:70px 1fr}}
+  .phase .rail{background:var(--brand);color:#04140d;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 6px;text-align:center;}
+  .phase.t2 .rail{background:color-mix(in srgb,var(--brand) 62%,var(--card));}
+  .phase.t3 .rail{background:color-mix(in srgb,var(--brand) 34%,var(--card));}
+  .phase .rail b{font-size:22px;font-weight:900;line-height:1;}
+  .phase .rail small{font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-top:5px;opacity:.85;}
+  .phase .body{padding:15px 17px;}
+  .phase h3{margin:0 0 3px;font-size:15.5px;font-weight:820;}
+  .phase .why{margin:0 0 11px;font-size:12.5px;color:var(--muted);}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{font-size:11.5px;font-weight:750;padding:5px 10px;border-radius:20px;background:var(--brand-soft);color:var(--brand-ink);border:1px solid color-mix(in srgb,var(--brand) 26%,transparent);}
+  .chip.keep{background:transparent;color:var(--muted);border:1px dashed var(--hair);}
+  .lift{margin-left:auto;font-size:12px;font-weight:800;color:var(--brand-ink);white-space:nowrap;}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--hair);font-size:11.5px;color:var(--muted);}
+  .foot-grid{display:flex;gap:26px;flex-wrap:wrap;}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Level Up Learning · School Analytics Strategy</div>
+    <h1>Everyone reports activity.<br>We report verified growth against the curriculum.</h1>
+    <p class="thesis">How our teacher analytics stack up against Essential Assessment, Mathletics, Prodigy and Reading Eggs — and the three moves that make us the clear choice for schools.</p>
+  </header>
+
+  <!-- 1 · POSITIONING -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>The whitespace</h2><p class="sub">Great game <em>and</em> deep reporting — nobody owns the top-right. We can.</p></div>
+    <div class="card pad scatter-grid">
+      <svg class="plot" viewBox="0 0 420 340" role="img" aria-label="Positioning map: engagement versus leadership reporting depth">
+        <defs>
+          <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--brand)"/></marker>
+        </defs>
+        <!-- quadrant tint top-right -->
+        <rect x="210" y="26" width="176" height="142" fill="var(--brand)" opacity="0.07"/>
+        <!-- grid -->
+        <g stroke="var(--grid)" stroke-width="1">
+          <line x1="46" y1="26" x2="46" y2="300"/><line x1="46" y1="300" x2="392" y2="300"/>
+          <line x1="219" y1="26" x2="219" y2="300" stroke-dasharray="3 4"/>
+          <line x1="46" y1="168" x2="392" y2="168" stroke-dasharray="3 4"/>
+        </g>
+        <!-- axis labels -->
+        <text x="219" y="330" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">Engagement / student experience →</text>
+        <text x="16" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)" transform="rotate(-90 16 163)">Leadership reporting depth →</text>
+        <text x="384" y="42" text-anchor="end" font-size="9.5" font-weight="800" fill="var(--brand-ink)" opacity=".9">BOTH — open</text>
+        <!-- competitors: x=46+val*34.6, y=300-val*27.4 (0..10) -->
+        <!-- EA (2,9) -->
+        <circle cx="115" cy="53" r="7" fill="#7a8a80"/><text x="127" y="57" font-size="10.5" font-weight="700" fill="var(--ink)">Ess. Assessment</text>
+        <!-- Reading Eggs (6,6) -->
+        <circle cx="254" cy="136" r="7" fill="#c58bb0"/><text x="266" y="140" font-size="10.5" font-weight="700" fill="var(--ink)">Reading Eggs</text>
+        <!-- Mathletics (8,5) -->
+        <circle cx="323" cy="163" r="7" fill="#6f9bd1"/><text x="315" y="180" text-anchor="end" font-size="10.5" font-weight="700" fill="var(--ink)">Mathletics</text>
+        <!-- Prodigy (9,4) -->
+        <circle cx="357" cy="191" r="7" fill="#d69a4a"/><text x="349" y="207" text-anchor="end" font-size="10.5" font-weight="700" fill="var(--ink)">Prodigy</text>
+        <!-- Level Up now (8,5.5) -> target (9,9) -->
+        <line x1="323" y1="149" x2="352" y2="60" stroke="var(--brand)" stroke-width="2.4" stroke-dasharray="2 5" marker-end="url(#ah)"/>
+        <circle cx="323" cy="149" r="6" fill="none" stroke="var(--brand)" stroke-width="2.4"/>
+        <text x="311" y="145" text-anchor="end" font-size="10" font-weight="700" fill="var(--muted)">Us now</text>
+        <circle cx="357" cy="53" r="9" fill="var(--brand)"/><text x="345" y="50" text-anchor="end" font-size="11" font-weight="900" fill="var(--brand-ink)">Us — target</text>
+      </svg>
+      <div>
+        <div class="keyrow">
+          <div class="keyitem" style="color:#7a8a80"><span class="pin" style="background:#7a8a80"></span>Reporting powerhouse, no game</div>
+          <div class="keyitem" style="color:#6f9bd1"><span class="pin" style="background:#6f9bd1"></span>Game-first, data is thin</div>
+          <div class="keyitem" style="color:#d69a4a"><span class="pin" style="background:#d69a4a"></span>Game-first, US-centric standards</div>
+          <div class="keyitem" style="color:var(--brand)"><span class="pin" style="background:var(--brand)"></span>Us — game <em>and</em> credible data</div>
+        </div>
+        <div class="take">The top-right quadrant is empty. Our 3D game already puts us far right; Tiers 1–3 lift us to the top. That corner is the whole strategy.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · COVERAGE INDEX -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Coverage index</h2><p class="sub">12 capabilities scored Full=2 · Partial=1 · None=0. We pass Essential Assessment at Tier&nbsp;1.</p></div>
+    <div class="card pad bars">
+      <div class="bar"><span class="nm">Prodigy</span><div class="track"><div class="fill" style="width:54%;background:#d69a4a"></div></div><span class="val">54</span></div>
+      <div class="bar"><span class="nm">Mathletics</span><div class="track"><div class="fill" style="width:63%;background:#6f9bd1"></div></div><span class="val">63</span></div>
+      <div class="bar"><span class="nm">Reading Eggs</span><div class="track"><div class="fill" style="width:67%;background:#c58bb0"></div></div><span class="val">67</span></div>
+      <div class="bar"><span class="nm">Essential Assess.</span><div class="track"><div class="fill" style="width:75%;background:#7a8a80"></div></div><span class="val">75</span></div>
+      <div class="bar us"><span class="nm">Level Up — now</span><div class="track"><div class="fill" style="width:58%;background:color-mix(in srgb,var(--brand) 50%,transparent)"></div><div class="ghost" style="left:75%"><span>EA 75</span></div></div><span class="val">58</span></div>
+      <div class="bar us"><span class="nm">＋ Tier 1</span><div class="track"><div class="fill" style="width:83%;background:color-mix(in srgb,var(--brand) 72%,transparent)"></div><div class="ghost" style="left:75%"></div></div><span class="val">83</span></div>
+      <div class="bar us"><span class="nm">＋ Tier 2</span><div class="track"><div class="fill" style="width:96%;background:color-mix(in srgb,var(--brand) 86%,transparent)"></div><div class="ghost" style="left:75%"></div></div><span class="val">96</span></div>
+      <div class="bar us"><span class="nm">＋ Tier 3</span><div class="track"><div class="fill" style="width:100%;background:var(--brand)"></div><div class="ghost" style="left:75%"></div></div><span class="val">100</span></div>
+    </div>
+  </section>
+
+  <!-- 3 · MATRIX -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Capability matrix</h2>
+      <div class="legend" style="margin-left:auto">
+        <span class="lg"><span class="dot d-full"></span>Full</span>
+        <span class="lg"><span class="dot d-part"></span>Partial</span>
+        <span class="lg"><span class="dot d-none"></span>Missing</span>
+        <span class="lg"><span class="tier" style="position:static;box-shadow:none">T1</span>&nbsp;closed by tier</span>
+      </div>
+    </div>
+    <div class="card" style="overflow-x:auto">
+      <table class="matrix" style="min-width:640px">
+        <thead><tr>
+          <th class="cap">Capability</th>
+          <th class="us">Level&nbsp;Up</th><th>Ess.&nbsp;Assess.</th><th>Mathletics</th><th>Prodigy</th><th>Reading&nbsp;Eggs</th>
+        </tr></thead>
+        <tbody>
+          <!-- rows: L=LUL(with tier tag), E, M, P, R -->
+          <tr><td class="cap">AC9 / achievement-standard bands</td>
+            <td class="cell uscol"><span class="swatch s-part"><span class="tier">T1</span></span></td>
+            <td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-full"></span></td></tr>
+          <tr><td class="cap">Verified growth — matched pre/post</td>
+            <td class="cell uscol"><span class="swatch s-full"></span></td>
+            <td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-part"></span></td></tr>
+          <tr><td class="cap">Diagnostic / placement baseline</td>
+            <td class="cell uscol"><span class="swatch s-part"><span class="tier">T1</span></span></td>
+            <td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-full"></span></td></tr>
+          <tr><td class="cap">Whole-school leader roll-up</td>
+            <td class="cell uscol"><span class="swatch s-full"></span></td>
+            <td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-part"></span></td></tr>
+          <tr><td class="cap">Class &amp; student drill-down</td>
+            <td class="cell uscol"><span class="swatch s-full"></span></td>
+            <td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-full"></span></td></tr>
+          <tr><td class="cap">Engagement / time-on-task incl. home</td>
+            <td class="cell uscol"><span class="swatch s-part"><span class="tier">T3</span></span></td>
+            <td class="cell"><span class="swatch s-none"></span></td><td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-part"></span></td></tr>
+          <tr><td class="cap">Curriculum evidence heatmap</td>
+            <td class="cell uscol"><span class="swatch s-full"></span></td>
+            <td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-part"></span></td></tr>
+          <tr><td class="cap">Auto semester report comments</td>
+            <td class="cell uscol"><span class="swatch s-none"><span class="tier">T2</span></span></td>
+            <td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-none"></span></td><td class="cell"><span class="swatch s-none"></span></td><td class="cell"><span class="swatch s-full"></span></td></tr>
+          <tr><td class="cap">Export / SIS — Compass, Sentral</td>
+            <td class="cell uscol"><span class="swatch s-none"><span class="tier">T1</span></span></td>
+            <td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-none"></span></td><td class="cell"><span class="swatch s-part"></span></td></tr>
+          <tr><td class="cap">Printable parent report + certificates</td>
+            <td class="cell uscol"><span class="swatch s-none"><span class="tier">T1</span></span></td>
+            <td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-full"></span></td></tr>
+          <tr><td class="cap">Teacher action loop — group / assign</td>
+            <td class="cell uscol"><span class="swatch s-part"><span class="tier">T2</span></span></td>
+            <td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-full"></span></td><td class="cell"><span class="swatch s-part"></span></td></tr>
+          <tr><td class="cap">Methodology transparency</td>
+            <td class="cell uscol"><span class="swatch s-full"></span></td>
+            <td class="cell"><span class="swatch s-part"></span></td><td class="cell"><span class="swatch s-none"></span></td><td class="cell"><span class="swatch s-none"></span></td><td class="cell"><span class="swatch s-none"></span></td></tr>
+          <tr class="scorerow"><td class="cap" style="font-weight:800">Coverage index</td>
+            <td class="cell uscol"><span class="score">58</span></td>
+            <td class="cell"><span class="score" style="color:var(--muted)">75</span></td><td class="cell"><span class="score" style="color:var(--muted)">63</span></td><td class="cell"><span class="score" style="color:var(--muted)">54</span></td><td class="cell"><span class="score" style="color:var(--muted)">67</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 4 · ROADMAP -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>The three moves</h2><p class="sub">Ordered by commercial impact. Tier 1 wins the sale; Tiers 2–3 make us un-switchable.</p></div>
+    <div class="road">
+      <div class="phase t1">
+        <div class="rail"><b>1</b><small>Win the sale</small></div>
+        <div class="body">
+          <h3>Curriculum + export <span class="lift">58 → 83</span></h3>
+          <p class="why">Moves us onto Essential Assessment's turf — where the leadership budget and stickiness live. Descriptor mastery already exists in our data; it isn't surfaced yet.</p>
+          <div class="chips">
+            <span class="chip">AC9 / VC alignment</span><span class="chip">Working towards · at · above bands</span><span class="chip">Per-student PDF</span><span class="chip">CSV export</span><span class="chip">Compass / Sentral push</span><span class="chip">Placement baseline view</span>
+          </div>
+        </div>
+      </div>
+      <div class="phase t2">
+        <div class="rail"><b>2</b><small>Make it sticky</small></div>
+        <div class="body">
+          <h3>Report comments + action loop <span class="lift">83 → 96</span></h3>
+          <p class="why">The #1 teacher time-saver in Australia, plus a clear "what do I do Monday" path from every flagged student.</p>
+          <div class="chips">
+            <span class="chip">Auto semester comments</span><span class="chip">Success · growth · future focus</span><span class="chip">Needs-attention → group</span><span class="chip">Assign / re-place from analytics</span>
+          </div>
+        </div>
+      </div>
+      <div class="phase t3">
+        <div class="rail"><b>3</b><small>Pull ahead</small></div>
+        <div class="body">
+          <h3>Signal &amp; comparison <span class="lift">96 → 100</span></h3>
+          <p class="why">Cheap wins on data we already hold — the details leaders and parents love.</p>
+          <div class="chips">
+            <span class="chip">Per-student growth sparkline</span><span class="chip">Time-on-task · home vs school</span><span class="chip">Class vs cohort benchmark</span>
+            <span class="chip keep">Keeps our edge: verified growth</span><span class="chip keep">Keeps our edge: transparency</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-grid">
+      <span>Coverage index = mean of 12 capabilities (Full 2 · Partial 1 · None 0), normalised to 100.</span>
+      <span>Competitor ratings from public product &amp; help documentation, Aug 2026.</span>
+      <span>Positioning is directional judgement, not a benchmark score.</span>
+    </div>
+  </footer>
+</div>
