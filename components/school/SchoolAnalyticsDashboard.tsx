@@ -37,6 +37,7 @@ type AnalyticsTab =
   | "growth"
   | "curriculum"
   | "placement"
+  | "intervention"
   | "engagement"
   | "classes"
   | "students";
@@ -54,6 +55,7 @@ const TABS: Array<{ id: AnalyticsTab; label: string }> = [
   { id: "growth", label: "Growth" },
   { id: "curriculum", label: "Curriculum" },
   { id: "placement", label: "Placement" },
+  { id: "intervention", label: "Intervention" },
   { id: "engagement", label: "Engagement" },
   { id: "classes", label: "Classes" },
   { id: "students", label: "Students" },
@@ -540,6 +542,35 @@ export default function SchoolAnalyticsDashboard({
       .sort((a, b) => a.order - b.order);
   }, [snapshot?.students]);
 
+  // Leadership intervention lens: for each AC9 strand x school year, how many
+  // students are working towards the standard (aggregate only — no individual
+  // grouping/reassignment; that is the teacher surface's job).
+  const intervention = useMemo(() => {
+    const students = snapshot?.students ?? [];
+    const cells = new Map<string, { strand: AcStrand; year: string; needs: number; total: number }>();
+    const yearSet = new Set<string>();
+    for (const student of students) {
+      const year = student.yearLevel ?? "Not recorded";
+      for (const realm of student.realms) {
+        const strand = strandForRealm(realm.realmId);
+        const band = bandFor(realm.averageAccuracy);
+        if (!strand || !band) continue;
+        yearSet.add(year);
+        const key = `${strand}|${year}`;
+        const cell = cells.get(key) ?? { strand, year, needs: 0, total: 0 };
+        cell.total += 1;
+        if (band === "working_towards") cell.needs += 1;
+        cells.set(key, cell);
+      }
+    }
+    const strands = [...new Set([...cells.values()].map((c) => c.strand))].sort((a, b) => AC_STRANDS[a].order - AC_STRANDS[b].order);
+    const years = [...YEAR_LEVELS, "Not recorded"].filter((y) => yearSet.has(y));
+    const hotspots = [...cells.values()].filter((c) => c.needs > 0).sort((a, b) => b.needs - a.needs || (b.needs / b.total) - (a.needs / a.total));
+    const totalNeeds = hotspots.reduce((sum, c) => sum + c.needs, 0);
+    const maxNeeds = Math.max(1, ...hotspots.map((c) => c.needs));
+    return { cells, strands, years, hotspots, totalNeeds, maxNeeds };
+  }, [snapshot?.students]);
+
   if (loading && !snapshot) return <LoadingView />;
 
   if (error && !snapshot) {
@@ -794,6 +825,85 @@ export default function SchoolAnalyticsDashboard({
                 </article>
               ))}
             </div>
+          )}
+        </div>
+      ) : null}
+
+      {tab === "intervention" ? (
+        <div className="space-y-5">
+          <div>
+            <h3 className="font-bold text-slate-950">Where to intervene</h3>
+            <p className="mt-1 text-sm text-slate-500">Students working towards the standard, by strand and school year. Direct support here, then hand the list to the class teacher.</p>
+          </div>
+
+          {intervention.hotspots.length === 0 ? (
+            <p className="border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">No students are working towards the standard in this view — or there isn&apos;t enough evidence yet.</p>
+          ) : (
+            <>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {intervention.hotspots.slice(0, 6).map((cell) => (
+                  <button
+                    key={`${cell.strand}-${cell.year}`}
+                    type="button"
+                    onClick={() => { setRealmId(cell.strand); if (cell.year !== "Not recorded") setYearLevel(cell.year); setTab("students"); }}
+                    className="flex items-center justify-between gap-3 border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-rose-400 hover:bg-rose-50"
+                  >
+                    <div>
+                      <p className="text-sm font-bold text-slate-950">{cell.year} · {AC_STRANDS[cell.strand].label}</p>
+                      <p className="mt-0.5 text-xs text-slate-500">{Math.round((cell.needs / cell.total) * 100)}% of {cell.total} assessed</p>
+                    </div>
+                    <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-rose-100 text-rose-800">
+                      <span className="text-base font-black leading-none">{cell.needs}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <article className="overflow-hidden border border-slate-200 bg-white shadow-sm">
+                <div className="flex items-center justify-between p-5">
+                  <h4 className="font-bold text-slate-950">Intervention heatmap</h4>
+                  <span className="text-xs font-semibold text-slate-500">{intervention.totalNeeds} students working towards</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[640px] text-sm">
+                    <thead className="bg-slate-50 text-xs uppercase tracking-[0.08em] text-slate-500">
+                      <tr>
+                        <th className="px-5 py-3 text-left">Strand</th>
+                        {intervention.years.map((year) => <th key={year} className="px-3 py-3 text-center font-bold">{year.replace("Year ", "Y")}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {intervention.strands.map((strand) => (
+                        <tr key={strand} className="border-t border-slate-100">
+                          <td className="px-5 py-2.5 font-semibold text-slate-800">{AC_STRANDS[strand].label}</td>
+                          {intervention.years.map((year) => {
+                            const cell = intervention.cells.get(`${strand}|${year}`);
+                            if (!cell || cell.total === 0) return <td key={year} className="px-3 py-2.5 text-center text-slate-300">—</td>;
+                            const intensity = cell.needs / intervention.maxNeeds;
+                            const bg = cell.needs === 0 ? "color-mix(in srgb, #0f9d6b 12%, transparent)" : `color-mix(in srgb, #c2534d ${12 + Math.round(intensity * 66)}%, transparent)`;
+                            return (
+                              <td key={year} className="px-2 py-2 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => { setRealmId(strand); if (year !== "Not recorded") setYearLevel(year); setTab("students"); }}
+                                  title={`${cell.needs} of ${cell.total} working towards`}
+                                  className="inline-flex min-w-11 flex-col items-center rounded-md px-2 py-1.5 font-bold text-slate-900 transition hover:ring-2 hover:ring-rose-400"
+                                  style={{ background: bg }}
+                                >
+                                  <span className="tabular-nums">{cell.needs}</span>
+                                  <span className="text-[10px] font-semibold text-slate-500">/ {cell.total}</span>
+                                </button>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="px-5 py-3 text-xs text-slate-500">Each cell: students working towards / students assessed. Tap a cell to see the students.</p>
+              </article>
+            </>
           )}
         </div>
       ) : null}
