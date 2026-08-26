@@ -11,7 +11,7 @@ const check = (condition: boolean, message: string) => {
   if (!condition) { problems += 1; console.error(`FAIL: ${message}`); }
 };
 const unique = <T,>(v: T[]) => new Set(v).size === v.length;
-const inRange = (v: number) => v >= 1 && v <= 15; // Year 3 uses larger frequencies
+const inRange = (v: number) => v >= 1 && v <= 50; // Year 3 W3-4 graphs scale into the 30-40s (by 10s)
 
 function auditTask(lessonId: string, task: PracticeTask) {
   check(isPracticeTaskSafe(task), `${lessonId}: ${task.kind} must be renderable`);

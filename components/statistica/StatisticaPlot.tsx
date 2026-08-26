@@ -31,9 +31,12 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
   // Round the axis top up to a whole number of steps so the scale is always
   // consistent (…5, 10, 15) instead of snapping the top gridline to the data's
   // max value (which produced odd labels like 13).
-  const step = maxVal <= 6 ? 1 : maxVal <= 12 ? 2 : 5;
+  const step = maxVal <= 6 ? 1 : maxVal <= 12 ? 2 : maxVal <= 24 ? 5 : 10;
   const rows = Math.ceil(maxVal / step) * step;
-  const unit = Math.max(14, Math.min(34, Math.floor(360 / rows)));
+  // Columns can pack tighter than object/picture icons, so a tall by-10s scale
+  // (rows up to ~40) still renders at the same ~360px height as a small graph.
+  const minUnit = display === "columns" ? 9 : 14;
+  const unit = Math.max(minUnit, Math.min(34, Math.floor(360 / rows)));
   const cellGap = Math.max(2, Math.min(6, Math.round(unit * 0.16)));
   const cellSize = unit - cellGap;
   const plotH = rows * unit;

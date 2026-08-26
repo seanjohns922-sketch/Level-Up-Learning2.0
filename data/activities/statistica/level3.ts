@@ -15,10 +15,10 @@ type Gen = (round: number, target: number) => PracticeTask;
 const C = { red: "#ef4444", amber: "#f59e0b", orange: "#fb923c", blue: "#3b82f6", green: "#22c55e", purple: "#a855f7", teal: "#14b8a6", pink: "#ec4899", indigo: "#6366f1" };
 const pick = <T,>(arr: T[], i: number) => arr[((i % arr.length) + arr.length) % arr.length]!;
 const order = <T,>(arr: T[], round: number) => (round % 2 ? [...arr].reverse() : arr);
-function numOptions(correct: number, round: number) {
+function numOptions(correct: number, round: number, spread = 1) {
   const set = new Set<number>([correct]);
   let d = 1;
-  while (set.size < 3) { set.add(Math.max(1, correct + (d % 2 ? d : -d))); d += 1; }
+  while (set.size < 3) { set.add(Math.max(1, correct + (d % 2 ? d : -d) * spread)); d += 1; }
   return order([...set].map((n) => ({ id: `n${n}`, label: String(n) })), round);
 }
 
@@ -32,10 +32,14 @@ const CAT_SURVEYS: CatSurvey[] = [
 ];
 const CAT_COUNTS = [[8, 12, 5, 10, 7], [11, 6, 14, 9, 4], [7, 13, 10, 5, 12], [15, 8, 11, 6, 9], [10, 14, 7, 12, 5], [6, 9, 13, 8, 11]];
 const CAT_COUNTS_SMALL = [[4, 6, 3, 5, 2], [6, 3, 7, 4, 2], [3, 7, 5, 2, 6], [7, 4, 6, 3, 5], [5, 7, 3, 6, 2], [2, 5, 7, 4, 6]];
+// Weeks 3-4 step the class-survey data up into the 30-40s so students read a
+// scale that counts by 10s (each row has a distinct max and min, no ties).
+const CAT_COUNTS_LARGE = [[24, 38, 15, 31, 27], [36, 21, 40, 30, 13], [18, 39, 33, 16, 28], [40, 25, 34, 19, 31], [33, 37, 22, 14, 29], [17, 30, 38, 26, 35]];
 
-function catCats(round: number, opts: { build?: boolean; forceTie?: boolean } = {}): { survey: CatSurvey; categories: CatN[] } {
+function catCats(round: number, opts: { build?: boolean; forceTie?: boolean; large?: boolean } = {}): { survey: CatSurvey; categories: CatN[] } {
   const survey = pick(CAT_SURVEYS, round);
-  const counts = [...pick(opts.build ? CAT_COUNTS_SMALL : CAT_COUNTS, round)];
+  const source = opts.build ? CAT_COUNTS_SMALL : opts.large ? CAT_COUNTS_LARGE : CAT_COUNTS;
+  const counts = [...pick(source, round)];
   if (opts.forceTie) counts[1] = counts[0];
   return { survey, categories: survey.cats.map((c, i) => ({ ...c, count: counts[i]! })) };
 }
@@ -50,10 +54,12 @@ const NUM_SURVEYS = [
 ];
 const NUM_FREQ = [[3, 7, 12, 9, 5], [5, 11, 8, 14, 6], [8, 4, 13, 10, 7], [2, 9, 15, 11, 6], [6, 12, 9, 7, 13], [4, 8, 14, 10, 5]];
 const NUM_FREQ_SMALL = [[3, 5, 7, 4, 2], [5, 7, 3, 6, 2], [6, 3, 7, 4, 5], [2, 6, 4, 7, 3], [7, 4, 6, 2, 5], [4, 7, 5, 3, 6]];
+// Weeks 3-4 numerical distributions scaled into the 30-40s (distinct max per row).
+const NUM_FREQ_LARGE = [[13, 27, 40, 34, 18], [20, 38, 30, 39, 22], [31, 16, 40, 36, 26], [12, 33, 39, 35, 21], [24, 37, 31, 28, 40], [17, 30, 38, 32, 19]];
 
-function numCats(round: number, small = false) {
+function numCats(round: number, small = false, large = false) {
   const survey = pick(NUM_SURVEYS, round);
-  const freqs = pick(small ? NUM_FREQ_SMALL : NUM_FREQ, round);
+  const freqs = pick(small ? NUM_FREQ_SMALL : large ? NUM_FREQ_LARGE : NUM_FREQ, round);
   const categories = ["0", "1", "2", "3", "4"].map((v, i) => ({ id: `v${v}`, label: v, color: survey.color, count: freqs[i]! }));
   return { survey, categories };
 }
@@ -92,8 +98,8 @@ export function numColumnBuildTask(round: number, target: number): PracticeTask 
     feedback: { correct: "Your column graph matches the numerical data.", wrong: "Check each bar against its number." },
   };
 }
-export function numColumnReadTask(round: number, target: number): PracticeTask {
-  const { survey, categories } = numCats(round + 1);
+export function numColumnReadTask(round: number, target: number, large = false): PracticeTask {
+  const { survey, categories } = numCats(round + 1, false, large);
   const top = [...categories].sort((a, b) => b.count - a.count)[0]!;
   return {
     kind: "statisticaGraph", mode: "read", target, display: "columns", categories,
@@ -116,8 +122,8 @@ export function numColumnFrequencyTask(round: number, target: number): PracticeT
 }
 
 // ── Categorical column graphs (larger Year-3 data) ───────────────────────────
-export function catColumnReadTask(round: number, target: number): PracticeTask {
-  const { survey, categories } = catCats(round + 1);
+export function catColumnReadTask(round: number, target: number, large = false): PracticeTask {
+  const { survey, categories } = catCats(round + 1, { large });
   const askMost = round % 2 === 0;
   const sorted = [...categories].sort((a, b) => b.count - a.count);
   const answer = askMost ? sorted[0]! : sorted[sorted.length - 1]!;
@@ -129,14 +135,14 @@ export function catColumnReadTask(round: number, target: number): PracticeTask {
     feedback: { correct: `Yes — ${answer.label}.`, wrong: `Compare all the bars and find the ${askMost ? "tallest" : "shortest"}.` },
   };
 }
-export function catColumnFrequencyTask(round: number, target: number): PracticeTask {
-  const { survey, categories } = catCats(round + 2);
+export function catColumnFrequencyTask(round: number, target: number, large = false): PracticeTask {
+  const { survey, categories } = catCats(round + 2, { large });
   const cat = pick(categories, round);
   return {
     kind: "statisticaGraph", mode: "read", target, display: "columns", categories,
     prompt: `${survey.q} How many chose ${cat.label}?`,
     speakText: `Read up the ${cat.label} column to the scale.`,
-    options: numOptions(cat.count, round), correctOptionIds: [`n${cat.count}`],
+    options: numOptions(cat.count, round, large ? 10 : 1), correctOptionIds: [`n${cat.count}`],
     feedback: { correct: `Right — ${cat.count} chose ${cat.label}.`, wrong: `Follow the ${cat.label} bar across to the numbers.` },
   };
 }
@@ -149,9 +155,9 @@ export function catColumnBuildTask(round: number, target: number): PracticeTask 
     feedback: { correct: "Your column graph matches the data.", wrong: "Check each bar against the scale." },
   };
 }
-export function catCompareTask(round: number, target: number): PracticeTask {
+export function catCompareTask(round: number, target: number, large = false): PracticeTask {
   const forceTie = round % 3 === 2;
-  const { survey, categories } = catCats(round + 2, { forceTie });
+  const { survey, categories } = catCats(round + 2, { forceTie, large });
   const a = categories[0]!, b = categories[1]!;
   const correct = a.count > b.count ? "a" : a.count < b.count ? "b" : "eq";
   return {
@@ -233,8 +239,8 @@ export function gapTask(round: number, target: number): PracticeTask {
 }
 
 // ── Inference — choose the conclusion the data supports (the Year 3 novelty) ─
-export function inferenceTask(round: number, target: number): PracticeTask {
-  const { survey, categories } = catCats(round + 2);
+export function inferenceTask(round: number, target: number, large = false): PracticeTask {
+  const { survey, categories } = catCats(round + 2, { large });
   const sorted = [...categories].sort((a, b) => b.count - a.count);
   const most = sorted[0]!, least = sorted[sorted.length - 1]!;
   const shape = round % 3;
@@ -257,6 +263,14 @@ export function inferenceTask(round: number, target: number): PracticeTask {
   };
 }
 
+// Large-scale reading variants used in Weeks 3-4: same graphs, but the data
+// climbs into the 30-40s so the scale counts by 10s. Build tasks stay small.
+const catColumnReadTaskLg: Gen = (r, t) => catColumnReadTask(r, t, true);
+const catColumnFrequencyTaskLg: Gen = (r, t) => catColumnFrequencyTask(r, t, true);
+const catCompareTaskLg: Gen = (r, t) => catCompareTask(r, t, true);
+const numColumnReadTaskLg: Gen = (r, t) => numColumnReadTask(r, t, true);
+const inferenceTaskLg: Gen = (r, t) => inferenceTask(r, t, true);
+
 // ── Lesson map (18 lessons, 6 weeks) — Year 3, no collect/sort ────────────────
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   // W1 Types of Data — classify + first look at each data type
@@ -267,14 +281,14 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y3-statistics-w2-l1": [classifyTask, catColumnReadTask, numTableTask],
   "y3-statistics-w2-l2": [classifyTask, numColumnReadTask, catCompareTask],
   "y3-statistics-w2-l3": [numTableTask, tableSelectTask, catColumnFrequencyTask],
-  // W3 Frequency Tables
-  "y3-statistics-w3-l1": [numTableTask, catColumnFrequencyTask, tableSelectTask],
-  "y3-statistics-w3-l2": [tableSelectTask, numTableTask, catCompareTask],
-  "y3-statistics-w3-l3": [numTableTask, tableSelectTask, numColumnReadTask],
-  // W4 Representing Data — choose, create, compare, conclude
-  "y3-statistics-w4-l1": [catColumnReadTask, numColumnReadTask, catCompareTask],
-  "y3-statistics-w4-l2": [catColumnBuildTask, numColumnBuildTask, numColumnReadTask],
-  "y3-statistics-w4-l3": [catCompareTask, catColumnReadTask, inferenceTask],
+  // W3 Frequency Tables — graphs now read a by-10s scale into the 30-40s
+  "y3-statistics-w3-l1": [numTableTask, catColumnFrequencyTaskLg, tableSelectTask],
+  "y3-statistics-w3-l2": [tableSelectTask, numTableTask, catCompareTaskLg],
+  "y3-statistics-w3-l3": [numTableTask, tableSelectTask, numColumnReadTaskLg],
+  // W4 Representing Data — choose, create, compare, conclude (larger data)
+  "y3-statistics-w4-l1": [catColumnReadTaskLg, numColumnReadTaskLg, catCompareTaskLg],
+  "y3-statistics-w4-l2": [catColumnBuildTask, numColumnBuildTask, numColumnReadTaskLg],
+  "y3-statistics-w4-l3": [catCompareTaskLg, catColumnReadTaskLg, inferenceTaskLg],
   // W5 Interpreting Data — evidence, inferences, answers
   "y3-statistics-w5-l1": [numColumnFrequencyTask, rankTask, catColumnReadTask],
   "y3-statistics-w5-l2": [inferenceTask, catClaimTask, gapTask],
