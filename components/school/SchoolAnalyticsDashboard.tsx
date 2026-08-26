@@ -622,16 +622,21 @@ export default function SchoolAnalyticsDashboard({
   // foundation the future weighted overall-maths level builds on.
   const placementByStrand = useMemo(() => {
     const students = snapshot?.students ?? [];
-    const groups = new Map<string, { key: string; label: string; order: number; levels: Map<string, number>; preSum: number; preCount: number; placed: number }>();
+    const groups = new Map<string, { key: string; label: string; order: number; levels: Map<string, number>; standings: Record<LevelStanding, number>; standingTotal: number; preSum: number; preCount: number; placed: number }>();
     for (const student of students) {
       for (const realm of student.realms) {
         const strand: AcStrand | null = strandForRealm(realm.realmId);
         const key = strand ?? "other";
         const label = strand ? AC_STRANDS[strand].label : "Other";
         const order = strand ? AC_STRANDS[strand].order : 99;
-        const group = groups.get(key) ?? { key, label, order, levels: new Map(), preSum: 0, preCount: 0, placed: 0 };
+        const group = groups.get(key) ?? { key, label, order, levels: new Map(), standings: { below: 0, at: 0, above: 0 }, standingTotal: 0, preSum: 0, preCount: 0, placed: 0 };
         const level = realm.currentLevel ?? "Not placed";
         group.levels.set(level, (group.levels.get(level) ?? 0) + 1);
+        const standing = levelStanding(student.yearLevel, realm.currentLevel);
+        if (standing) {
+          group.standings[standing] += 1;
+          group.standingTotal += 1;
+        }
         group.placed += 1;
         if (realm.pretestScore !== null) { group.preSum += realm.pretestScore; group.preCount += 1; }
         groups.set(key, group);
@@ -642,6 +647,7 @@ export default function SchoolAnalyticsDashboard({
         ...group,
         levels: [...group.levels.entries()].sort((a, b) => a[0].localeCompare(b[0], "en-AU", { numeric: true })),
         baseline: group.preCount ? Math.round(group.preSum / group.preCount) : null,
+        onLevelPct: group.standingTotal ? Math.round(((group.standings.at + group.standings.above) / group.standingTotal) * 100) : null,
       }))
       .sort((a, b) => a.order - b.order);
   }, [snapshot?.students]);
@@ -923,6 +929,39 @@ export default function SchoolAnalyticsDashboard({
                       </li>
                     ))}
                   </ul>
+                  <div className="mt-5 border-t border-slate-100 pt-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Level match</p>
+                      {group.onLevelPct !== null ? (
+                        <span className="text-xs font-bold text-slate-700">{group.onLevelPct}% at or above</span>
+                      ) : (
+                        <span className="text-xs font-semibold text-slate-400">No year match yet</span>
+                      )}
+                    </div>
+                    <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-slate-100">
+                      {STANDING_ORDER.map((standing) => group.standingTotal ? (
+                        <div key={standing} title={`${STANDING_STYLE[standing].label}: ${group.standings[standing]}`} style={{ width: `${(group.standings[standing] / group.standingTotal) * 100}%`, background: STANDING_STYLE[standing].bar }} />
+                      ) : null)}
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-slate-500">
+                      {STANDING_ORDER.map((standing) => (
+                        <span key={standing} className="inline-flex items-center gap-1.5">
+                          <span className="h-2.5 w-2.5 rounded-sm" style={{ background: STANDING_STYLE[standing].bar }} />
+                          {STANDING_STYLE[standing].label}: {group.standings[standing]}
+                        </span>
+                      ))}
+                    </div>
+                    {group.standingTotal && group.standings.below > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => { if (group.key !== "other") setRealmId(group.key); setTab("intervention"); }}
+                        className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:text-rose-800"
+                      >
+                        {group.standings.below} need lift in {group.label}
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </button>
+                    ) : null}
+                  </div>
                 </article>
               ))}
             </div>
