@@ -1134,7 +1134,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
-        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_0.85fr_0.95fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
+        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_1.2fr_0.95fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
           <div className="flex items-center gap-3">
             {([
               ["name", "Student"],
@@ -1205,7 +1205,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 <button
                   onClick={() => setExpandedId(isOpen ? null : s.id)}
                   className={[
-                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_0.85fr_0.95fr_1.1fr] items-center px-5 py-3.5 text-left transition",
+                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_1.2fr_0.95fr_1.1fr] items-center px-5 py-3.5 text-left transition",
                     isOpen ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
                   ].join(" ")}
                 >
@@ -1228,14 +1228,16 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
                     {week ? `W${week}` : "—"}
                   </span>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1">
                     {weekDots.map((dot, i) => (
                       <span
                         key={i}
                         title={`${dot.label}: ${dot.accuracy == null ? "not attempted" : `${dot.accuracy}%`}`}
-                        className={`h-3 w-3 rounded-full ${dot.kind === "quiz" ? "ring-2 ring-offset-1 ring-slate-200" : ""}`}
+                        className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black tabular-nums ${dot.accuracy == null ? "text-slate-400" : "text-white"} ${dot.kind === "quiz" ? "ring-2 ring-offset-1 ring-slate-300" : ""}`}
                         style={{ background: weekDotColor(dot.accuracy) }}
-                      />
+                      >
+                        {dot.accuracy == null ? "–" : dot.accuracy}
+                      </span>
                     ))}
                   </div>
                   <div className="min-w-0">
