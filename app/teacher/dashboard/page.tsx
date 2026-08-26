@@ -1388,30 +1388,22 @@ export default function TeacherDashboardPage() {
           </div>
         ) : (
           <>
-            {/* Year level + view tabs */}
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              {activeTab === "curriculum" ? (
-                <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit overflow-x-auto">
-                  {YEAR_LEVELS.map((yr) => (
-                    <button
-                      key={yr}
-                      onClick={() => setActiveYear(yr)}
-                      className={[
-                        "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
-                        activeYear === yr
-                          ? "bg-[#0F172A] text-white shadow-sm"
-                          : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
-                      ].join(" ")}
-                    >
-                      {yr}
-                    </button>
-                  ))}
+            {/* Header bar: class context + view tabs, anchored together */}
+            <div className="flex items-center justify-between gap-3 flex-wrap rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+              <div className="flex min-w-0 items-center gap-3">
+                <div
+                  className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-base font-black text-[#00E5C3] ring-1 ring-[#00E5C3]/30"
+                  style={{ background: "linear-gradient(150deg,#12463d,#0a2f2a 55%,#061c17)", boxShadow: "inset 0 1px 0 rgba(0,229,195,0.35), 0 8px 18px -8px rgba(0,194,168,0.55)" }}
+                >
+                  {(selectedClass?.name ?? "").replace(/\s/g, "").slice(0, 3).toUpperCase() || "—"}
                 </div>
-              ) : (
-                <div />
-              )}
+                <div className="min-w-0">
+                  <div className="truncate text-[15px] font-black text-[#0F172A]">{selectedClass?.name ? `Class ${selectedClass.name}` : "Class"}</div>
+                  <div className="text-xs font-semibold text-[#64748B]">{classStudents.length} student{classStudents.length === 1 ? "" : "s"}</div>
+                </div>
+              </div>
 
-              <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-[#E6E8EC] w-fit shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+              <div className="flex w-fit items-center gap-1 rounded-xl bg-[#F1F5F9] p-1">
                 {([
                   { id: "live",       label: "Live Class" },
                   { id: "students",   label: "Students" },
@@ -1421,10 +1413,10 @@ export default function TeacherDashboardPage() {
                     key={t.id}
                     onClick={() => setActiveTab(t.id)}
                     className={[
-                      "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
+                      "px-4 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
                       activeTab === t.id
-                        ? "bg-[#0A2F2A] text-[#00E5C3] ring-1 ring-[#00C2A8]/50 shadow-[0_0_14px_-2px_rgba(0,229,195,0.45)]"
-                        : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
+                        ? "bg-[#0A2F2A] text-[#00E5C3] shadow-[0_1px_3px_rgba(10,47,42,0.35)]"
+                        : "text-[#64748B] hover:text-[#0F172A]",
                     ].join(" ")}
                   >
                     {t.label}
@@ -1432,6 +1424,25 @@ export default function TeacherDashboardPage() {
                 ))}
               </div>
             </div>
+
+            {activeTab === "curriculum" ? (
+              <div className="flex w-fit items-center gap-1 overflow-x-auto rounded-xl border border-[#E6E8EC] bg-white p-1">
+                {YEAR_LEVELS.map((yr) => (
+                  <button
+                    key={yr}
+                    onClick={() => setActiveYear(yr)}
+                    className={[
+                      "px-3.5 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
+                      activeYear === yr
+                        ? "bg-[#0F172A] text-white shadow-sm"
+                        : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9]",
+                    ].join(" ")}
+                  >
+                    {yr}
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
             {/* eslint-disable @typescript-eslint/no-explicit-any */}
             {activeTab === "live" ? (

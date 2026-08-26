@@ -726,7 +726,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
   const [genreId, setGenreId] = useState<string>(firstAvail.id);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   type SortKey = "name" | "lastName" | "schoolYear" | "workingLevel" | "week" | "status" | "tower";
-  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortKey, setSortKey] = useState<SortKey>("lastName");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   function toggleSort(k: SortKey) {
@@ -856,65 +856,6 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
   return (
     <div className="space-y-5">
-      {/* Strand selector — grouped by domain, uniform cards */}
-      <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-        {([
-          ["Mathematics", MATHS_STRAND_IDS],
-          ["English", ENGLISH_STRAND_IDS],
-        ] as [string, string[]][]).map(([groupLabel, ids]) => {
-          const groupGenres = genres.filter((g) => ids.includes(g.id));
-          if (groupGenres.length === 0) return null;
-          return (
-            <div key={groupLabel} className="mb-4 last:mb-0">
-              <div className="px-0.5 pb-2 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.16em]">
-                {groupLabel}
-              </div>
-              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-                {groupGenres.map((g) => {
-                  const active = g.id === genreId;
-                  const soon = !g.available;
-                  const accent = STRAND_ACCENT[g.id] ?? "#64748B";
-                  return (
-                    <button
-                      key={g.id}
-                      onClick={() => { if (!soon) { setGenreId(g.id); setExpandedId(null); } }}
-                      disabled={soon}
-                      aria-pressed={active}
-                      className={[
-                        "relative flex flex-col rounded-xl border px-3.5 py-2.5 text-left transition",
-                        active
-                          ? "border-[#00C2A8] bg-[#00C2A8]/[0.06] shadow-[0_0_0_3px_rgba(0,194,168,0.14)]"
-                          : soon
-                            ? "border-[#EEF1F4] bg-[#FAFBFC] cursor-not-allowed"
-                            : "border-[#E6E8EC] bg-white hover:border-[#00C2A8]/60 hover:bg-[#00C2A8]/[0.03]",
-                      ].join(" ")}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: soon ? "#CBD5E1" : accent }} />
-                        <span className={`truncate text-sm font-bold ${soon ? "text-[#94A3B8]" : active ? "text-[#0A2F2A]" : "text-[#0F172A]"}`}>
-                          {STRAND_SHORT[g.id] ?? g.strand}
-                        </span>
-                        {soon ? (
-                          <span className="ml-auto shrink-0 rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-400">
-                            Soon
-                          </span>
-                        ) : active ? (
-                          <span className="ml-auto shrink-0 text-[#00C2A8]">
-                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l4 4 10-10" /></svg>
-                          </span>
-                        ) : null}
-                      </div>
-                      <span className={`mt-1 truncate pl-[18px] text-[11px] font-semibold tracking-wide ${soon ? "text-[#B4BECA]" : "text-[#64748B]"}`}>
-                        {g.realm}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
 
       {/* Strand context banner */}
       {isPlaceholder && (
@@ -923,9 +864,45 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
         </div>
       )}
 
-      {/* Student table */}
+      {/* Student panel: slim strand filter + table, one connected card */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
-        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_1.2fr_0.95fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
+        <div className="flex items-center gap-2 overflow-x-auto border-b border-[#E6E8EC] px-5 py-2.5">
+          <span className="shrink-0 pr-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#94A3B8]">Strand</span>
+          {[...MATHS_STRAND_IDS, "__divider__", ...ENGLISH_STRAND_IDS].map((id, idx) => {
+            if (id === "__divider__") return <span key={`div-${idx}`} className="mx-1 h-5 w-px shrink-0 bg-[#E2E8F0]" />;
+            const g = genres.find((x) => x.id === id);
+            if (!g) return null;
+            const active = g.id === genreId;
+            const soon = !g.available;
+            const accent = STRAND_ACCENT[g.id] ?? "#64748B";
+            return (
+              <button
+                key={g.id}
+                onClick={() => { if (!soon) { setGenreId(g.id); setExpandedId(null); } }}
+                disabled={soon}
+                aria-pressed={active}
+                title={g.realm}
+                className={[
+                  "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-[13px] font-bold transition",
+                  active
+                    ? "border-[#00C2A8] bg-[#00C2A8]/[0.08] text-[#0A2F2A] shadow-[0_0_0_2px_rgba(0,194,168,0.16)]"
+                    : soon
+                      ? "border-[#EEF1F4] bg-[#F8FAFC] text-[#94A3B8] cursor-not-allowed"
+                      : "border-[#E6E8EC] bg-white text-[#0F172A] hover:border-[#00C2A8]/60",
+                ].join(" ")}
+              >
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: soon ? "#CBD5E1" : accent }} />
+                {STRAND_SHORT[g.id] ?? g.strand}
+                {soon ? (
+                  <span className="text-[9px] font-extrabold uppercase tracking-wide text-[#94A3B8]">soon</span>
+                ) : active ? (
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#00C2A8" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l4 4 10-10" /></svg>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.5fr_1.15fr_1.3fr_1.05fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
           <div className="flex items-center gap-3">
             {([
               ["name", "Student"],
@@ -996,12 +973,12 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 <button
                   onClick={() => setExpandedId(isOpen ? null : s.id)}
                   className={[
-                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_1.2fr_0.95fr_1.1fr] items-center px-5 py-3.5 text-left transition",
+                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.5fr_1.15fr_1.3fr_1.05fr] items-center px-5 py-3.5 text-left transition",
                     isOpen ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-8 w-8 rounded-full bg-[#0A2F2A] text-[#00E5C3] ring-1 ring-[#00C2A8]/40 shadow-[0_0_10px_-2px_rgba(0,229,195,0.55)] flex items-center justify-center text-xs font-black shrink-0">
+                    <div className="h-9 w-9 rounded-full bg-[#D3F1EC] text-[#0B6B5E] flex items-center justify-center text-sm font-black shrink-0">
                       {s.display_name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex items-center gap-2.5 flex-wrap">
@@ -1032,7 +1009,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     ))}
                   </div>
                   <div className="min-w-0">
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.04em] ${PLACEMENT_STATUS_STYLE[placementStatus]}`}>
+                    <span className={`inline-block whitespace-nowrap rounded-md px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.04em] ${PLACEMENT_STATUS_STYLE[placementStatus]}`}>
                       {placementStatus}
                     </span>
                   </div>
