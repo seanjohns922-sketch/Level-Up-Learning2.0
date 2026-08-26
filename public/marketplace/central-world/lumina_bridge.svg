@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="lumina_bridge marketplace preview">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="58%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#86efac"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+    <filter id="soft" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.2"/>
+    </filter>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1280" height="720" fill="url(#sky)"/>
+  <circle cx="1060" cy="150" r="72" fill="#fde68a" opacity="0.78"/>
+  <path d="M0 336 C160 274 252 306 390 246 C530 184 668 314 810 248 C970 174 1082 276 1280 222 L1280 720 L0 720 Z" fill="#166534" opacity="0.34"/>
+  <path d="M0 420 C168 360 280 392 426 348 C596 298 738 408 900 354 C1064 300 1164 378 1280 328 L1280 720 L0 720 Z" fill="#15803d" opacity="0.48"/>
+  <path d="M0 520 C190 466 350 500 512 458 C674 418 840 526 1014 466 C1128 428 1206 458 1280 436 L1280 720 L0 720 Z" fill="url(#grass)"/>
+  <path d="M0 648 C172 608 340 614 520 640 C704 668 876 610 1046 626 C1132 634 1208 668 1280 646 L1280 720 L0 720 Z" fill="#15803d" opacity="0.42"/>
+  <path d="M134 482 C232 452 312 466 400 438" stroke="#fef9c3" stroke-width="18" stroke-linecap="round" opacity="0.42"/>
+  <path d="M56 568 C250 516 408 572 586 520 C790 462 1012 514 1216 462" fill="none" stroke="#06b6d4" stroke-width="6" opacity="0.32"/><path d="M80 590 C280 536 416 596 620 548 C850 494 1028 564 1200 514" fill="none" stroke="#38bdf8" stroke-width="96" opacity="0.76"/><path d="M250 520 C380 382 900 382 1030 520 L1030 578 L250 578 Z" fill="#cffafe" filter="url(#soft)" opacity="0.9"/><path d="M302 516 C448 430 832 430 978 516" fill="none" stroke="#06b6d4" stroke-width="22" filter="url(#glow)"/><path d="M472 578 C490 480 790 480 808 578 Z" fill="#38bdf8" opacity="0.72"/></svg>
