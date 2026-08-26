@@ -701,6 +701,185 @@ export default function SchoolAnalyticsDashboard({
     return { cells, strands, years, hotspots, totalNeeds, maxNeeds };
   }, [snapshot?.students]);
 
+  const downloadPlacementPdf = async () => {
+    if (!snapshot || placementByStrand.length === 0) return;
+    const { default: jsPDF } = await import("jspdf");
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 14;
+    const contentWidth = pageWidth - margin * 2;
+    const generated = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date());
+    const selectedClass = classes.find((item) => item.id === classId);
+    const filterLine = [
+      selectedClass ? selectedClass.name : yearLevel ? yearLevel : "Whole school",
+      realmId ? REALMS[realmId] ?? realmId : "All strands",
+      `Last ${days} days`,
+      `Generated ${generated}`,
+    ].join(" · ");
+    let y = margin;
+
+    const addPageIfNeeded = (height: number) => {
+      if (y + height <= pageHeight - margin) return;
+      pdf.addPage();
+      y = margin;
+      drawHeader(false);
+    };
+    const drawHeader = (firstPage: boolean) => {
+      pdf.setFillColor(246, 249, 252);
+      pdf.rect(0, 0, pageWidth, firstPage ? 39 : 22, "F");
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(9, 18, 35);
+      pdf.setFontSize(firstPage ? 18 : 11);
+      pdf.text("Level Up Learning", margin, firstPage ? 15 : 12);
+      if (firstPage) {
+        pdf.setFontSize(21);
+        pdf.text("Placement baseline by AC9 strand", margin, 28);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
+        pdf.setTextColor(99, 116, 144);
+        pdf.text("Where students are working now, and their average pre-test starting point per strand.", margin, 35);
+        y = 47;
+      } else {
+        y = 29;
+      }
+    };
+    const roundedCard = (x: number, top: number, width: number, height: number) => {
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(218, 226, 235);
+      pdf.roundedRect(x, top, width, height, 1.5, 1.5, "FD");
+    };
+    const drawSegmentBar = (items: Array<[string, number]>, x: number, top: number, width: number, height: number, total: number) => {
+      let offset = 0;
+      items.forEach(([label, count]) => {
+        if (!count) return;
+        const segmentWidth = Math.max(1.4, (count / Math.max(1, total)) * width);
+        pdf.setFillColor(levelColor(label));
+        pdf.rect(x + offset, top, segmentWidth, height, "F");
+        offset += segmentWidth;
+      });
+      pdf.setDrawColor(255, 255, 255);
+      pdf.roundedRect(x, top, width, height, height / 2, height / 2);
+    };
+    const drawLegend = (items: Array<[string, number]>, x: number, top: number, width: number) => {
+      const colWidth = width / 2;
+      items.forEach(([label, count], index) => {
+        const col = index % 2;
+        const row = Math.floor(index / 2);
+        const itemX = x + col * colWidth;
+        const itemY = top + row * 7;
+        pdf.setFillColor(levelColor(label));
+        pdf.roundedRect(itemX, itemY - 3.5, 3.3, 3.3, 1.1, 1.1, "F");
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(8.5);
+        pdf.setTextColor(45, 58, 80);
+        pdf.text(label, itemX + 6, itemY - 0.6);
+        pdf.setTextColor(96, 116, 148);
+        pdf.text(String(count), itemX + colWidth - 6, itemY - 0.6, { align: "right" });
+      });
+    };
+    const shortLevel = (level: string) => level === "Prep" ? "P" : level === "Not placed" ? "NP" : level.replace("Year ", "Y");
+
+    drawHeader(true);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(96, 116, 148);
+    pdf.text(filterLine, margin, 43);
+
+    placementByStrand.forEach((group) => {
+      const schoolLegendHeight = Math.max(1, Math.ceil(group.gradeCounts.length / 2)) * 7;
+      const levelLegendHeight = Math.max(1, Math.ceil(group.levels.length / 2)) * 7;
+      const cardHeight = 94 + schoolLegendHeight + levelLegendHeight + group.gradeRows.length * 10 + (group.standings.below > 0 ? 12 : 0);
+      addPageIfNeeded(cardHeight + 8);
+      const top = y;
+      roundedCard(margin, top, contentWidth, cardHeight);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(15);
+      pdf.setTextColor(9, 18, 35);
+      pdf.text(group.label, margin + 7, top + 13);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+      pdf.setTextColor(96, 116, 148);
+      pdf.text(`${group.placed} placements`, margin + 7, top + 21);
+      pdf.setFillColor(243, 246, 250);
+      pdf.roundedRect(pageWidth - margin - 42, top + 8, 35, 8, 2, 2, "F");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(9);
+      pdf.setTextColor(45, 58, 80);
+      pdf.text(`Baseline ${formatPercent(group.baseline)}`, pageWidth - margin - 24.5, top + 13.5, { align: "center" });
+
+      let rowY = top + 33;
+      pdf.setFontSize(8.5);
+      pdf.setTextColor(96, 116, 148);
+      pdf.text("STUDENTS BY SCHOOL YEAR", margin + 7, rowY);
+      drawSegmentBar(group.gradeCounts, margin + 7, rowY + 5, contentWidth - 14, 5.5, group.placed);
+      drawLegend(group.gradeCounts, margin + 7, rowY + 18, contentWidth - 14);
+
+      rowY += 24 + schoolLegendHeight;
+      pdf.setFontSize(8.5);
+      pdf.setTextColor(96, 116, 148);
+      pdf.text("STUDENTS BY WORKING LEVEL", margin + 7, rowY);
+      drawSegmentBar(group.levels, margin + 7, rowY + 5, contentWidth - 14, 5.5, group.placed);
+      drawLegend(group.levels, margin + 7, rowY + 18, contentWidth - 14);
+
+      rowY += 26 + levelLegendHeight;
+      pdf.setDrawColor(232, 237, 243);
+      pdf.line(margin + 7, rowY - 9, pageWidth - margin - 7, rowY - 9);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(9);
+      pdf.setTextColor(96, 116, 148);
+      pdf.text("SCHOOL GRADE \u2192 WORKING LEVEL", margin + 7, rowY);
+      pdf.setTextColor(45, 58, 80);
+      pdf.text(group.onLevelPct === null ? "No year match yet" : `${group.onLevelPct}% at or above`, pageWidth - margin - 7, rowY, { align: "right" });
+
+      const gridX = margin + 7;
+      const labelWidth = 28;
+      const cellGap = 1.5;
+      const cellWidth = (contentWidth - 14 - labelWidth - cellGap * PLACEMENT_LEVEL_COLUMNS.length) / PLACEMENT_LEVEL_COLUMNS.length;
+      rowY += 10;
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(142, 158, 181);
+      pdf.text("GRADE", gridX, rowY);
+      PLACEMENT_LEVEL_COLUMNS.forEach((level, index) => {
+        pdf.text(shortLevel(level), gridX + labelWidth + index * (cellWidth + cellGap) + cellWidth / 2, rowY, { align: "center" });
+      });
+      group.gradeRows.forEach((gradeRow) => {
+        rowY += 10;
+        pdf.setFontSize(8.5);
+        pdf.setTextColor(45, 58, 80);
+        pdf.text(gradeRow.grade, gridX, rowY + 4);
+        PLACEMENT_LEVEL_COLUMNS.forEach((level, index) => {
+          const count = gradeRow.levels.find(([workingLevel]) => workingLevel === level)?.[1] ?? 0;
+          const workingIndex = levelIndex(level);
+          const gradeIndex = levelIndex(gradeRow.grade);
+          const isBelow = count > 0 && workingIndex >= 0 && gradeIndex >= 0 && workingIndex < gradeIndex;
+          const isExpected = gradeRow.grade === level;
+          const x = gridX + labelWidth + index * (cellWidth + cellGap);
+          pdf.setFillColor(count ? (isBelow ? "#e7aaaa" : levelColor(level)) : "#f8fafc");
+          pdf.setDrawColor(isExpected ? 9 : isBelow ? 244 : 232, isExpected ? 18 : isBelow ? 114 : 237, isExpected ? 35 : isBelow ? 132 : 243);
+          pdf.roundedRect(x, rowY, cellWidth, 7.5, 1.4, 1.4, "FD");
+          if (count) {
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(8.5);
+            pdf.setTextColor(isBelow ? 140 : 255, isBelow ? 12 : 255, isBelow ? 48 : 255);
+            pdf.text(String(count), x + cellWidth / 2, rowY + 5.1, { align: "center" });
+          }
+        });
+      });
+      if (group.standings.below > 0) {
+        rowY += 12;
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(9);
+        pdf.setTextColor(221, 0, 63);
+        pdf.text(`${group.standings.below} need lift in ${group.label}`, margin + 7, rowY);
+      }
+      y = top + cardHeight + 8;
+    });
+
+    const fileParts = [(selectedClass?.name ?? yearLevel) || "school", "placement-baseline"].map((part) => part.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
+    pdf.save(`${fileParts.filter(Boolean).join("-")}.pdf`);
+  };
+
   if (loading && !snapshot) return <LoadingView />;
 
   if (error && !snapshot) {
@@ -733,14 +912,25 @@ export default function SchoolAnalyticsDashboard({
         <div className="mb-3 flex items-center justify-between gap-3">
           <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Filters</p>
           <div className="flex items-center gap-2">
-            <a
-              href={exportHref || undefined}
-              download
-              aria-disabled={!exportHref}
-              className={`inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold ${exportHref ? "text-emerald-800 hover:bg-emerald-50" : "pointer-events-none text-slate-300"}`}
-            >
-              <Download className="h-3.5 w-3.5" /> Export {tab === "curriculum" ? "curriculum" : "students"} CSV
-            </a>
+            {tab === "placement" ? (
+              <button
+                type="button"
+                onClick={() => void downloadPlacementPdf()}
+                disabled={!snapshot || placementByStrand.length === 0}
+                className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
+              >
+                <Download className="h-3.5 w-3.5" /> Placement PDF
+              </button>
+            ) : (
+              <a
+                href={exportHref || undefined}
+                download
+                aria-disabled={!exportHref}
+                className={`inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold ${exportHref ? "text-emerald-800 hover:bg-emerald-50" : "pointer-events-none text-slate-300"}`}
+              >
+                <Download className="h-3.5 w-3.5" /> Export {tab === "curriculum" ? "curriculum" : "students"} CSV
+              </a>
+            )}
             <a
               href={resultsHref || undefined}
               download
