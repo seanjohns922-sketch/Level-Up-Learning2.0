@@ -377,14 +377,16 @@ export default function SchoolAnalyticsDashboard({
     }
   }, [academicYearId, classId, days, realmId, schoolId, yearLevel]);
 
-  const exportHref = useMemo(() => {
+  const buildExportHref = useCallback((type: "students" | "curriculum" | "results") => {
     if (!academicYearId) return "";
-    const params = new URLSearchParams({ academicYearId, days: String(days), type: tab === "curriculum" ? "curriculum" : "students" });
+    const params = new URLSearchParams({ academicYearId, days: String(days), type });
     if (yearLevel) params.set("yearLevel", yearLevel);
     if (classId) params.set("classId", classId);
     if (realmId) params.set("realmId", realmId);
     return `/api/school/${schoolId}/analytics/export?${params}`;
-  }, [academicYearId, classId, days, realmId, schoolId, tab, yearLevel]);
+  }, [academicYearId, classId, days, realmId, schoolId, yearLevel]);
+  const exportHref = buildExportHref(tab === "curriculum" ? "curriculum" : "students");
+  const resultsHref = buildExportHref("results");
 
   useEffect(() => {
     void loadAnalytics();
@@ -569,14 +571,25 @@ export default function SchoolAnalyticsDashboard({
       <div className="border border-slate-200 bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between gap-3">
           <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Filters</p>
-          <a
-            href={exportHref || undefined}
-            download
-            aria-disabled={!exportHref}
-            className={`inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold ${exportHref ? "text-emerald-800 hover:bg-emerald-50" : "pointer-events-none text-slate-300"}`}
-          >
-            <Download className="h-3.5 w-3.5" /> Export {tab === "curriculum" ? "curriculum" : "students"} CSV
-          </a>
+          <div className="flex items-center gap-2">
+            <a
+              href={exportHref || undefined}
+              download
+              aria-disabled={!exportHref}
+              className={`inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold ${exportHref ? "text-emerald-800 hover:bg-emerald-50" : "pointer-events-none text-slate-300"}`}
+            >
+              <Download className="h-3.5 w-3.5" /> Export {tab === "curriculum" ? "curriculum" : "students"} CSV
+            </a>
+            <a
+              href={resultsHref || undefined}
+              download
+              aria-disabled={!resultsHref}
+              title="Flat per-student results, mappable into Compass / Sentral"
+              className={`inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-xs font-bold ${resultsHref ? "text-slate-700 hover:bg-slate-50" : "pointer-events-none text-slate-300"}`}
+            >
+              <Download className="h-3.5 w-3.5" /> Results (SIS)
+            </a>
+          </div>
         </div>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <label className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">

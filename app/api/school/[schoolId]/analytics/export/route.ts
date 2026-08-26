@@ -34,13 +34,36 @@ function curriculumCsv(snapshot: SchoolAnalyticsSnapshot): string {
   return toCsv([header, ...body]);
 }
 
+// One row per student with per-strand level + achievement band and overall
+// results — a flat "gradebook" shape mappable into Compass / Sentral imports.
+const RESULT_REALMS: Array<[string, string]> = [
+  ["number", "Number"], ["measurement", "Measurement"], ["space", "Space"], ["statistics", "Statistics"],
+];
+function resultsCsv(snapshot: SchoolAnalyticsSnapshot): string {
+  const header = ["Student", "Year level", "Class", "Overall accuracy %", "Overall growth (pts)", "Levels mastered"];
+  for (const [, label] of RESULT_REALMS) header.push(`${label} level`, `${label} band`);
+  const body = snapshot.students.map((s) => {
+    const row: Array<string | number | null | undefined> = [
+      s.name, s.yearLevel ?? "", s.className, s.averageAccuracy ?? "", s.averageGrowth ?? "", s.masteredLevels,
+    ];
+    for (const [id] of RESULT_REALMS) {
+      const realm = s.realms.find((r) => r.realmId === id);
+      const band = realm ? bandFor(realm.averageAccuracy) : null;
+      row.push(realm?.currentLevel ?? "", band ? BAND_LABEL[band] : "");
+    }
+    return row;
+  });
+  return toCsv([header, ...body]);
+}
+
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ schoolId: string }> },
 ) {
   const { schoolId } = await context.params;
   const academicYearId = request.nextUrl.searchParams.get("academicYearId") ?? "";
-  const type = request.nextUrl.searchParams.get("type") === "curriculum" ? "curriculum" : "students";
+  const typeParam = request.nextUrl.searchParams.get("type");
+  const type = typeParam === "curriculum" || typeParam === "results" ? typeParam : "students";
 
   if (!academicYearId) {
     return NextResponse.json({ error: "Academic year is required." }, { status: 400 });
@@ -66,7 +89,7 @@ export async function GET(
       return NextResponse.json({ error: "School access denied." }, { status: 403 });
     }
 
-    const csv = type === "curriculum" ? curriculumCsv(snapshot) : studentsCsv(snapshot);
+    const csv = type === "curriculum" ? curriculumCsv(snapshot) : type === "results" ? resultsCsv(snapshot) : studentsCsv(snapshot);
     const stamp = new Date().toISOString().slice(0, 10);
     // Leading BOM so Excel opens UTF-8 cleanly.
     return new NextResponse(`﻿${csv}`, {
