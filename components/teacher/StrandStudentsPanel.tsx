@@ -240,14 +240,15 @@ function latestLessonAccuracy(carrier: InsightCarrier | undefined): number | nul
 }
 
 function weekActivityDots(prog: ProgressRow | null, weekNumber: number | null, lessons: Lesson[]): WeekDot[] {
+  const round = (value: number | null) => (value == null ? null : Math.round(value));
   const lessonAttempts = prog ? parseLessonAttempts(prog.lesson_attempts) : {};
   const dots: WeekDot[] = [];
   for (let i = 0; i < 3; i += 1) {
     const lesson = lessons[i];
-    dots.push({ kind: "lesson", label: `Lesson ${i + 1}`, accuracy: lesson ? latestLessonAccuracy(lessonAttempts[lesson.id]) : null });
+    dots.push({ kind: "lesson", label: `Lesson ${i + 1}`, accuracy: lesson ? round(latestLessonAccuracy(lessonAttempts[lesson.id])) : null });
   }
   const quizScores = prog ? parseQuizScores(prog.quiz_scores) : {};
-  dots.push({ kind: "quiz", label: "Quiz", accuracy: getQuizPercent(weekNumber != null ? quizScores[String(weekNumber)] : undefined) });
+  dots.push({ kind: "quiz", label: "Quiz", accuracy: round(getQuizPercent(weekNumber != null ? quizScores[String(weekNumber)] : undefined)) });
   return dots;
 }
 
