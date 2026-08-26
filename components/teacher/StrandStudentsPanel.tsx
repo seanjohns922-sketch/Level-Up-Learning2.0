@@ -223,6 +223,41 @@ function getQuizPercent(quiz: JsonObject | undefined): number | null {
   return calculateAccuracy(getQuizScore(quiz), getQuizTotal(quiz));
 }
 
+// At-a-glance dots for the current week: the 3 lessons + the quiz, coloured by
+// accuracy (green >=80, orange 50-79, red <50, grey = not attempted yet).
+type WeekDot = { kind: "lesson" | "quiz"; label: string; accuracy: number | null };
+
+function latestLessonAccuracy(carrier: InsightCarrier | undefined): number | null {
+  const attempts = Array.isArray(carrier?.attempts)
+    ? carrier!.attempts.filter((entry): entry is NonNullable<InsightCarrier["latestSummary"]> => Boolean(entry) && typeof entry === "object")
+    : [];
+  const latest = [...attempts].reverse().find((entry) => Boolean(entry.completedAt ?? entry.at)) ?? carrier?.latestSummary ?? null;
+  if (!latest) return null;
+  return calculateAccuracy(
+    numberOrNull(latest.correctCount ?? latest.correctAnswers),
+    numberOrNull(latest.totalQuestions ?? latest.questionsAnswered),
+  );
+}
+
+function weekActivityDots(prog: ProgressRow | null, weekNumber: number | null, lessons: Lesson[]): WeekDot[] {
+  const lessonAttempts = prog ? parseLessonAttempts(prog.lesson_attempts) : {};
+  const dots: WeekDot[] = [];
+  for (let i = 0; i < 3; i += 1) {
+    const lesson = lessons[i];
+    dots.push({ kind: "lesson", label: `Lesson ${i + 1}`, accuracy: lesson ? latestLessonAccuracy(lessonAttempts[lesson.id]) : null });
+  }
+  const quizScores = prog ? parseQuizScores(prog.quiz_scores) : {};
+  dots.push({ kind: "quiz", label: "Quiz", accuracy: getQuizPercent(weekNumber != null ? quizScores[String(weekNumber)] : undefined) });
+  return dots;
+}
+
+function weekDotColor(accuracy: number | null): string {
+  if (accuracy == null) return "#E2E8F0";
+  if (accuracy >= 80) return "#16A34A";
+  if (accuracy >= 50) return "#F59E0B";
+  return "#DC2626";
+}
+
 function getQuizScore(quiz: JsonObject | undefined): number | null {
   const value = quiz?.score;
   return typeof value === "number" ? value : null;
@@ -970,8 +1005,9 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const summary = buildWeekSummary(weekInsights, status, liveRow);
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
       const latestPretest = getLatestPretestProgress(s.id);
+      const weekDots = weekActivityDots(prog, week, activeWeekPlan?.lessons ?? []);
 
-      return { s, snapshot, prog, liveRow, pct, status, placementStatus, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts };
+      return { s, snapshot, prog, liveRow, pct, status, placementStatus, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts, weekDots };
     })
     .sort((a, b) => {
       const dir = sortDir === "asc" ? 1 : -1;
@@ -1098,7 +1134,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
-        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_0.95fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
+        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_0.85fr_0.95fr_1.1fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
           <div className="flex items-center gap-3">
             {([
               ["name", "Student"],
@@ -1126,9 +1162,17 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             ["schoolYear", "School Year"],
             ["workingLevel", "Working Level"],
             ["week", "Week"],
+            [null, "This Week"],
             ["status", "Pathway"],
             ["tower", "Progress"],
-          ] as [SortKey, string][]).map(([key, label], idx) => {
+          ] as [SortKey | null, string][]).map(([key, label], idx) => {
+            if (!key) {
+              return (
+                <span key={`hdr-${idx}`} className="text-left text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#94A3B8]">
+                  {label}
+                </span>
+              );
+            }
             const active = sortKey === key;
             return (
               <button
@@ -1153,7 +1197,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             No students enrolled yet.
           </div>
         ) : (
-          studentRows.map(({ s, snapshot, prog, liveRow, pct, placementStatus, week, schoolYear, workingYear, latestPretest }) => {
+          studentRows.map(({ s, snapshot, prog, liveRow, pct, placementStatus, week, schoolYear, workingYear, latestPretest, weekDots }) => {
               const isOpen = expandedId === s.id;
 
             return (
@@ -1161,7 +1205,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 <button
                   onClick={() => setExpandedId(isOpen ? null : s.id)}
                   className={[
-                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_0.95fr_1.1fr] items-center px-5 py-3.5 text-left transition",
+                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.55fr_0.85fr_0.95fr_1.1fr] items-center px-5 py-3.5 text-left transition",
                     isOpen ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
                   ].join(" ")}
                 >
@@ -1184,6 +1228,16 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                   <span className="text-xs font-bold text-[#475569] tabular-nums">
                     {week ? `W${week}` : "—"}
                   </span>
+                  <div className="flex items-center gap-1.5">
+                    {weekDots.map((dot, i) => (
+                      <span
+                        key={i}
+                        title={`${dot.label}: ${dot.accuracy == null ? "not attempted" : `${dot.accuracy}%`}`}
+                        className={`h-3 w-3 rounded-full ${dot.kind === "quiz" ? "ring-2 ring-offset-1 ring-slate-200" : ""}`}
+                        style={{ background: weekDotColor(dot.accuracy) }}
+                      />
+                    ))}
+                  </div>
                   <div className="min-w-0">
                     <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.04em] ${PLACEMENT_STATUS_STYLE[placementStatus]}`}>
                       {placementStatus}
