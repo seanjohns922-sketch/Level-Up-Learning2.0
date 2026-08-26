@@ -262,6 +262,22 @@ function weekDotColor(accuracy: number | null): string {
   return "#DC2626";
 }
 
+// Clean strand labels + a realm accent for the strand selector. The realm
+// registry uses verbose names ("Reading Comprehension & Fluency"); here reading
+// is just Reading, so the picker stays scannable.
+const STRAND_SHORT: Record<string, string> = {
+  number: "Number", measurement: "Measurement", space: "Space",
+  statistics: "Statistics", algebra: "Algebra", probability: "Probability",
+  reading: "Reading", writing: "Writing", grammar: "Grammar",
+};
+const STRAND_ACCENT: Record<string, string> = {
+  number: "#0e9c93", measurement: "#c2892e", space: "#5b6ee6",
+  statistics: "#c2557a", algebra: "#7c3aed", probability: "#0891b2",
+  reading: "#e07a5f", writing: "#3d8b6f", grammar: "#b45309",
+};
+const MATHS_STRAND_IDS = ["number", "measurement", "space", "statistics", "algebra", "probability"];
+const ENGLISH_STRAND_IDS = ["reading", "writing", "grammar"];
+
 function getQuizScore(quiz: JsonObject | undefined): number | null {
   const value = quiz?.score;
   return typeof value === "number" ? value : null;
@@ -840,44 +856,64 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 
   return (
     <div className="space-y-5">
-      {/* Strand tab strip */}
-      <div className="bg-white rounded-2xl border border-[#E6E8EC] p-3 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-        <div className="px-1 pb-2 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.16em]">
-          Strand · Realm
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {genres.map((g) => {
-            const locked = false; // already filtered by year ordinal
-            const active = g.id === genreId;
-            const placeholder = !g.available;
-            return (
-              <button
-                key={g.id}
-                onClick={() => { setGenreId(g.id); setExpandedId(null); }}
-                disabled={locked}
-                className={[
-                  "px-3.5 py-2 rounded-xl border text-left transition",
-                  active
-                    ? "border-[#00C2A8] bg-white shadow-[0_0_0_3px_rgba(0,194,168,0.12),0_8px_22px_-12px_rgba(0,194,168,0.55)]"
-                    : "border-[#E6E8EC] bg-white hover:border-[#00C2A8]/50",
-                  locked && "opacity-50 cursor-not-allowed",
-                ].filter(Boolean).join(" ")}
-              >
-                <div className={`text-sm font-bold ${active ? "text-[#0A2F2A]" : "text-[#0F172A]"}`}>
-                  {g.strand}
-                </div>
-                <div className="text-[11px] font-semibold text-[#64748B] flex items-center gap-1.5 tracking-wide">
-                  {g.realm}
-                  {placeholder && (
-                    <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-500">
-                      Soon
-                    </span>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
+      {/* Strand selector — grouped by domain, uniform cards */}
+      <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+        {([
+          ["Mathematics", MATHS_STRAND_IDS],
+          ["English", ENGLISH_STRAND_IDS],
+        ] as [string, string[]][]).map(([groupLabel, ids]) => {
+          const groupGenres = genres.filter((g) => ids.includes(g.id));
+          if (groupGenres.length === 0) return null;
+          return (
+            <div key={groupLabel} className="mb-4 last:mb-0">
+              <div className="px-0.5 pb-2 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.16em]">
+                {groupLabel}
+              </div>
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+                {groupGenres.map((g) => {
+                  const active = g.id === genreId;
+                  const soon = !g.available;
+                  const accent = STRAND_ACCENT[g.id] ?? "#64748B";
+                  return (
+                    <button
+                      key={g.id}
+                      onClick={() => { if (!soon) { setGenreId(g.id); setExpandedId(null); } }}
+                      disabled={soon}
+                      aria-pressed={active}
+                      className={[
+                        "relative flex flex-col rounded-xl border px-3.5 py-2.5 text-left transition",
+                        active
+                          ? "border-[#00C2A8] bg-[#00C2A8]/[0.06] shadow-[0_0_0_3px_rgba(0,194,168,0.14)]"
+                          : soon
+                            ? "border-[#EEF1F4] bg-[#FAFBFC] cursor-not-allowed"
+                            : "border-[#E6E8EC] bg-white hover:border-[#00C2A8]/60 hover:bg-[#00C2A8]/[0.03]",
+                      ].join(" ")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: soon ? "#CBD5E1" : accent }} />
+                        <span className={`truncate text-sm font-bold ${soon ? "text-[#94A3B8]" : active ? "text-[#0A2F2A]" : "text-[#0F172A]"}`}>
+                          {STRAND_SHORT[g.id] ?? g.strand}
+                        </span>
+                        {soon ? (
+                          <span className="ml-auto shrink-0 rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-400">
+                            Soon
+                          </span>
+                        ) : active ? (
+                          <span className="ml-auto shrink-0 text-[#00C2A8]">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l4 4 10-10" /></svg>
+                          </span>
+                        ) : null}
+                      </div>
+                      <span className={`mt-1 truncate pl-[18px] text-[11px] font-semibold tracking-wide ${soon ? "text-[#B4BECA]" : "text-[#64748B]"}`}>
+                        {g.realm}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Strand context banner */}
