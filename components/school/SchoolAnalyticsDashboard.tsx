@@ -665,6 +665,33 @@ export default function SchoolAnalyticsDashboard({
       .sort((a, b) => a.order - b.order);
   }, [snapshot?.students]);
 
+  // Year level x genre gap: for each grade and strand, how many students sit
+  // below their grade level. The quick "which year is lacking, and in what" view.
+  const placementGradeGenre = useMemo(() => {
+    const students = snapshot?.students ?? [];
+    const cells = new Map<string, { below: number; total: number }>();
+    const strandSet = new Set<AcStrand>();
+    const gradeSet = new Set<string>();
+    for (const student of students) {
+      const grade = student.yearLevel ?? "Not recorded";
+      for (const realm of student.realms) {
+        const strand = strandForRealm(realm.realmId);
+        const standing = levelStanding(student.yearLevel, realm.currentLevel);
+        if (!strand || !standing) continue;
+        strandSet.add(strand);
+        gradeSet.add(grade);
+        const key = `${grade}|${strand}`;
+        const cell = cells.get(key) ?? { below: 0, total: 0 };
+        cell.total += 1;
+        if (standing === "below") cell.below += 1;
+        cells.set(key, cell);
+      }
+    }
+    const strands = [...strandSet].sort((a, b) => AC_STRANDS[a].order - AC_STRANDS[b].order);
+    const grades = [...YEAR_LEVELS, "Not recorded"].filter((g) => gradeSet.has(g));
+    return { cells, strands, grades };
+  }, [snapshot?.students]);
+
   // Leadership intervention lens: for each AC9 strand x school year, how many
   // students are below their grade level (aggregate only — no individual
   // grouping/reassignment; that is the teacher surface's job).
@@ -917,6 +944,52 @@ export default function SchoolAnalyticsDashboard({
             <h3 className="font-bold text-slate-950">Placement baseline by AC9 strand</h3>
             <p className="mt-1 text-sm text-slate-500">Where students are working now, and their average pre-test starting point per strand.</p>
           </div>
+
+          {placementGradeGenre.grades.length > 0 && placementGradeGenre.strands.length > 0 ? (
+            <article className="border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <h4 className="font-bold text-slate-950">Year level vs genre — where&apos;s the gap?</h4>
+                  <p className="mt-1 text-xs text-slate-500">Students working below their grade level, by year and genre. Redder = bigger gap. Tap a cell to see who.</p>
+                </div>
+              </div>
+              <div className="mt-4 overflow-x-auto">
+                <div style={{ minWidth: 120 + placementGradeGenre.strands.length * 96 }}>
+                  <div className="grid gap-1.5 pb-1 text-[10px] font-bold uppercase tracking-[0.06em] text-slate-400" style={{ gridTemplateColumns: `6rem repeat(${placementGradeGenre.strands.length}, minmax(0,1fr))` }}>
+                    <span className="flex items-center">Grade</span>
+                    {placementGradeGenre.strands.map((strand) => <span key={strand} className="text-center">{AC_STRANDS[strand].label}</span>)}
+                  </div>
+                  {placementGradeGenre.grades.map((grade) => (
+                    <div key={grade} className="grid gap-1.5 py-0.5" style={{ gridTemplateColumns: `6rem repeat(${placementGradeGenre.strands.length}, minmax(0,1fr))` }}>
+                      <span className="flex items-center text-sm font-bold text-slate-700">{grade}</span>
+                      {placementGradeGenre.strands.map((strand) => {
+                        const cell = placementGradeGenre.cells.get(`${grade}|${strand}`);
+                        if (!cell || cell.total === 0) return <span key={strand} className="flex h-11 items-center justify-center rounded-md bg-slate-50 text-xs text-slate-300">—</span>;
+                        const pctBelow = cell.below / cell.total;
+                        const bg = cell.below === 0
+                          ? "color-mix(in srgb, #0f9d6b 15%, transparent)"
+                          : `color-mix(in srgb, #c2534d ${18 + Math.round(pctBelow * 62)}%, transparent)`;
+                        return (
+                          <button
+                            key={strand}
+                            type="button"
+                            onClick={() => { setRealmId(strand); if (grade !== "Not recorded") setYearLevel(grade); setTab("students"); }}
+                            title={`${grade} · ${AC_STRANDS[strand].label}: ${cell.below} of ${cell.total} below level`}
+                            className="flex h-11 flex-col items-center justify-center rounded-md font-black tabular-nums text-slate-900 transition hover:ring-2 hover:ring-rose-400"
+                            style={{ background: bg }}
+                          >
+                            <span className="text-sm leading-none">{cell.below}</span>
+                            <span className="text-[10px] font-semibold leading-none text-slate-500">of {cell.total}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </article>
+          ) : null}
+
           {placementByStrand.length === 0 ? (
             <p className="border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">No placement evidence in this view.</p>
           ) : (
