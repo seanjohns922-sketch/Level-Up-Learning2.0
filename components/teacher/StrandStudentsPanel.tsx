@@ -241,15 +241,34 @@ function latestLessonAccuracy(carrier: InsightCarrier | undefined): number | nul
 
 function weekActivityDots(prog: ProgressRow | null, weekNumber: number | null, lessons: Lesson[]): WeekDot[] {
   const round = (value: number | null) => (value == null ? null : Math.round(value));
+  const wk = weekNumber != null ? `W${weekNumber} ` : "";
   const lessonAttempts = prog ? parseLessonAttempts(prog.lesson_attempts) : {};
   const dots: WeekDot[] = [];
   for (let i = 0; i < 3; i += 1) {
     const lesson = lessons[i];
-    dots.push({ kind: "lesson", label: `Lesson ${i + 1}`, accuracy: lesson ? round(latestLessonAccuracy(lessonAttempts[lesson.id])) : null });
+    dots.push({ kind: "lesson", label: `${wk}Lesson ${i + 1}`, accuracy: lesson ? round(latestLessonAccuracy(lessonAttempts[lesson.id])) : null });
   }
   const quizScores = prog ? parseQuizScores(prog.quiz_scores) : {};
-  dots.push({ kind: "quiz", label: "Quiz", accuracy: round(getQuizPercent(weekNumber != null ? quizScores[String(weekNumber)] : undefined)) });
+  dots.push({ kind: "quiz", label: `${wk}Quiz`, accuracy: round(getQuizPercent(weekNumber != null ? quizScores[String(weekNumber)] : undefined)) });
   return dots;
+}
+
+// The dots show the week the student is actually working in: their current
+// week if they've started it, otherwise the most recent earlier week that has
+// results — so a completed week keeps showing until they begin the next lessons.
+function pickDisplayWeek(prog: ProgressRow | null, currentWeek: number | null, plan: Array<{ week: number; lessons: Lesson[] }>): number | null {
+  if (currentWeek == null) return null;
+  const lessonAttempts = prog ? parseLessonAttempts(prog.lesson_attempts) : {};
+  const quizScores = prog ? parseQuizScores(prog.quiz_scores) : {};
+  const hasActivity = (w: number) => {
+    const lessons = plan.find((entry) => entry.week === w)?.lessons ?? [];
+    return lessons.some((lesson) => latestLessonAccuracy(lessonAttempts[lesson.id]) != null)
+      || getQuizPercent(quizScores[String(w)]) != null;
+  };
+  for (let w = currentWeek; w >= 1; w -= 1) {
+    if (hasActivity(w)) return w;
+  }
+  return currentWeek;
 }
 
 function weekDotColor(accuracy: number | null): string {
@@ -1006,7 +1025,9 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const summary = buildWeekSummary(weekInsights, status, liveRow);
       const flag = deriveStudentFlag(pickPrimaryInsight(weekInsights), status);
       const latestPretest = getLatestPretestProgress(s.id);
-      const weekDots = weekActivityDots(prog, week, activeWeekPlan?.lessons ?? []);
+      const displayWeek = pickDisplayWeek(prog, week, planForStudentYear);
+      const displayWeekPlan = displayWeek != null ? planForStudentYear.find((entry) => entry.week === displayWeek) : undefined;
+      const weekDots = weekActivityDots(prog, displayWeek, displayWeekPlan?.lessons ?? []);
 
       return { s, snapshot, prog, liveRow, pct, status, placementStatus, week, schoolYear, workingYear, summary, flag, latestPretest, nameParts, weekDots };
     })
