@@ -138,25 +138,145 @@ function LockedCustomisationPlot({ position, active }: { position: [number, numb
   );
 }
 
+function RewardBuilding({ assetKey, accent, tier }: { assetKey: string; accent: string; tier: number }) {
+  if (assetKey === "treehouse") {
+    return (
+      <group>
+        <mesh position={[0, 1.05, 0]} castShadow><cylinderGeometry args={[0.34, 0.42, 2.1, 10]} /><meshStandardMaterial color="#7c4a1f" roughness={0.8} /></mesh>
+        <mesh position={[-0.7, 2.24, 0]} castShadow><sphereGeometry args={[0.9, 16, 10]} /><meshStandardMaterial color="#2f7d32" roughness={0.9} /></mesh>
+        <mesh position={[0.55, 2.35, 0.15]} castShadow><sphereGeometry args={[1.05, 16, 10]} /><meshStandardMaterial color="#36a546" roughness={0.9} /></mesh>
+        <RoundedBox args={[1.9, 1.12, 1.5]} radius={0.16} smoothness={3} position={[0, 1.85, 0]} castShadow><meshStandardMaterial color="#9a5b25" roughness={0.7} /></RoundedBox>
+      </group>
+    );
+  }
+  if (assetKey === "observatory") {
+    return (
+      <group>
+        <RoundedBox args={[2.25, 1.5, 1.85]} radius={0.18} smoothness={3} position={[0, 1.05, 0]} castShadow><meshStandardMaterial color="#d8d3ef" roughness={0.54} metalness={0.08} /></RoundedBox>
+        <mesh position={[0, 2.06, 0]} castShadow><sphereGeometry args={[1.18, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color={accent} roughness={0.48} metalness={0.2} /></mesh>
+        <mesh position={[0.72, 2.32, 0.15]} rotation={[0.2, 0, -0.7]} castShadow><cylinderGeometry args={[0.22, 0.3, 1.55, 16]} /><meshStandardMaterial color="#7dd3fc" emissive="#38bdf8" emissiveIntensity={0.28} /></mesh>
+      </group>
+    );
+  }
+  const wide = assetKey === "games_room" || assetKey === "clubhouse";
+  return (
+    <group>
+      <RoundedBox args={[wide ? 2.7 : 2.25, tier === 3 ? 1.72 : 1.42, wide ? 2.05 : 1.74]} radius={0.18} smoothness={3} position={[0, 0.92, 0]} castShadow>
+        <meshStandardMaterial color={assetKey === "games_room" ? "#2e1065" : assetKey === "training_centre" ? "#475569" : assetKey === "workshop" ? "#9a3412" : accent} roughness={0.62} metalness={tier === 3 ? 0.18 : 0.05} />
+      </RoundedBox>
+      <mesh position={[0, tier === 3 ? 1.98 : 1.7, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[wide ? 2.1 : 1.75, 0.9, 4]} /><meshStandardMaterial color={assetKey === "games_room" ? "#7c3aed" : "#1d4ed8"} roughness={0.52} metalness={0.15} /></mesh>
+      {([-0.64, 0.64] as const).map((x) => <mesh key={x} position={[x, 1.08, 0.91]}><planeGeometry args={[0.42, 0.46]} /><meshStandardMaterial color="#fde68a" emissive="#facc15" emissiveIntensity={0.55} /></mesh>)}
+      {assetKey === "games_room" ? <mesh position={[0, 1.46, 0.94]}><planeGeometry args={[1.25, 0.34]} /><meshStandardMaterial color="#67e8f9" emissive="#06b6d4" emissiveIntensity={0.7} /></mesh> : null}
+      {assetKey === "training_centre" ? <mesh position={[0, 2.38, 0]} rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.16, 0.16, 2.0, 12]} /><meshStandardMaterial color="#94a3b8" metalness={0.35} roughness={0.35} /></mesh> : null}
+    </group>
+  );
+}
+
+function RewardAnimalYard({ assetKey, accent, tier }: { assetKey: string; accent: string; tier: number }) {
+  return (
+    <group>
+      <mesh position={[0, 0.42, 0]} receiveShadow><cylinderGeometry args={[2.35, 2.55, 0.32, 36]} /><meshStandardMaterial color={accent} roughness={0.9} /></mesh>
+      {Array.from({ length: 10 }, (_, index) => {
+        const angle = (index / 10) * Math.PI * 2;
+        return <mesh key={index} position={[Math.cos(angle) * 2.25, 0.86, Math.sin(angle) * 2.25]} castShadow><boxGeometry args={[0.14, 0.9, 0.14]} /><meshStandardMaterial color="#f7d58a" roughness={0.82} /></mesh>;
+      })}
+      {assetKey === "farmyard" ? (
+        <group>
+          <RoundedBox args={[1.45, 1.15, 1.25]} radius={0.12} smoothness={3} position={[0, 1.23, 0]} castShadow><meshStandardMaterial color="#dc2626" roughness={0.58} /></RoundedBox>
+          <mesh position={[0, 2.02, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[1.25, 0.75, 4]} /><meshStandardMaterial color="#facc15" /></mesh>
+        </group>
+      ) : assetKey === "wildlife_habitat" ? (
+        <group>{[-0.72, 0.72, 0].map((x, index) => <mesh key={index} position={[x, 1.42 + index * 0.2, index ? 0.2 : -0.45]} castShadow><sphereGeometry args={[0.72, 14, 10]} /><meshStandardMaterial color={index === 1 ? "#15803d" : "#166534"} roughness={0.95} /></mesh>)}</group>
+      ) : (
+        <group>
+          <mesh position={[0, 1.08, 0]} castShadow><sphereGeometry args={[tier === 1 ? 0.48 : 0.62, 18, 12]} /><meshStandardMaterial color={assetKey === "bunny_garden" ? "#f8fafc" : assetKey === "pony_paddock" ? "#92400e" : "#f59e0b"} roughness={0.68} /></mesh>
+          <mesh position={[0.52, 1.34, 0.08]} castShadow><sphereGeometry args={[0.32, 14, 10]} /><meshStandardMaterial color={assetKey === "bunny_garden" ? "#f8fafc" : assetKey === "pony_paddock" ? "#92400e" : "#f59e0b"} roughness={0.68} /></mesh>
+        </group>
+      )}
+    </group>
+  );
+}
+
+function RewardPlayPlace({ assetKey, tier }: { assetKey: string; tier: number }) {
+  if (assetKey === "adventure_playground") {
+    return (
+      <group>
+        <mesh position={[0, 0.42, 0]} receiveShadow><cylinderGeometry args={[2.45, 2.65, 0.3, 36]} /><meshStandardMaterial color="#fef3c7" roughness={0.88} /></mesh>
+        <mesh position={[-0.75, 1.34, 0]} castShadow><coneGeometry args={[0.82, 1.75, 4]} /><meshStandardMaterial color="#f97316" /></mesh>
+        <mesh position={[0.75, 1.34, 0]} castShadow><coneGeometry args={[0.82, 1.75, 4]} /><meshStandardMaterial color="#2563eb" /></mesh>
+        <mesh position={[0, 1.52, 0]} castShadow><boxGeometry args={[2.0, 0.22, 0.22]} /><meshStandardMaterial color="#fde68a" /></mesh>
+      </group>
+    );
+  }
+  if (assetKey === "trampoline_park") {
+    return (
+      <group>
+        <mesh position={[0, 0.55, 0]} castShadow><cylinderGeometry args={[1.85, 2.05, 0.45, 36]} /><meshStandardMaterial color="#111827" roughness={0.55} /></mesh>
+        <mesh position={[0, 0.82, 0]} castShadow><cylinderGeometry args={[1.52, 1.65, 0.12, 36]} /><meshStandardMaterial color="#38bdf8" emissive="#0284c7" emissiveIntensity={0.2} /></mesh>
+        <mesh position={[0, 1.85, 0]} castShadow><sphereGeometry args={[0.28, 14, 10]} /><meshStandardMaterial color="#facc15" emissive="#fde047" emissiveIntensity={0.35} /></mesh>
+      </group>
+    );
+  }
+  return (
+    <group>
+      <mesh position={[0, 0.43, 0]} receiveShadow><cylinderGeometry args={[tier === 3 ? 2.35 : 1.95, tier === 3 ? 2.55 : 2.1, 0.36, 40]} /><meshStandardMaterial color="#075985" roughness={0.5} metalness={0.08} /></mesh>
+      <mesh position={[0, 0.68, 0]}><cylinderGeometry args={[tier === 3 ? 2.02 : 1.62, tier === 3 ? 2.1 : 1.72, 0.16, 40]} /><meshStandardMaterial color="#38bdf8" emissive="#0ea5e9" emissiveIntensity={0.18} roughness={0.32} /></mesh>
+      {assetKey === "water_park" || assetKey === "splash_pool" ? <mesh position={[0.44, 1.7, 0.1]} rotation={[0, 0, -0.52]} castShadow><torusGeometry args={[0.82, 0.12, 12, 28, Math.PI * 1.35]} /><meshStandardMaterial color="#f97316" /></mesh> : null}
+    </group>
+  );
+}
+
+function RewardSpecialPlace({ assetKey, accent, tier }: { assetKey: string; accent: string; tier: number }) {
+  if (assetKey === "sports_stadium") {
+    return (
+      <group>
+        <mesh position={[0, 0.76, 0]} castShadow><cylinderGeometry args={[2.35, 2.65, 1.0, 40, 1, false, 0, Math.PI * 2]} /><meshStandardMaterial color="#1d4ed8" roughness={0.55} /></mesh>
+        <mesh position={[0, 1.36, 0]}><torusGeometry args={[1.72, 0.22, 12, 40]} /><meshStandardMaterial color="#bfdbfe" /></mesh>
+        <mesh position={[-1.68, 2.2, 0.2]} castShadow><sphereGeometry args={[0.28, 12, 8]} /><meshStandardMaterial color="#f8fafc" emissive="#f8fafc" emissiveIntensity={0.5} /></mesh>
+        <mesh position={[1.68, 2.2, 0.2]} castShadow><sphereGeometry args={[0.28, 12, 8]} /><meshStandardMaterial color="#f8fafc" emissive="#f8fafc" emissiveIntensity={0.5} /></mesh>
+      </group>
+    );
+  }
+  if (assetKey === "cinema" || assetKey === "arcade") {
+    return (
+      <group>
+        <RoundedBox args={[2.7, 1.72, 1.85]} radius={0.18} smoothness={3} position={[0, 1.1, 0]} castShadow><meshStandardMaterial color={assetKey === "cinema" ? "#7f1d1d" : "#581c87"} roughness={0.55} metalness={0.08} /></RoundedBox>
+        <mesh position={[0, 2.16, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[2.0, 0.72, 4]} /><meshStandardMaterial color={assetKey === "cinema" ? "#facc15" : "#a855f7"} emissive={assetKey === "arcade" ? "#7c3aed" : "#000000"} emissiveIntensity={0.3} /></mesh>
+        <mesh position={[0, 1.55, 0.96]}><planeGeometry args={[1.55, 0.42]} /><meshStandardMaterial color="#67e8f9" emissive="#06b6d4" emissiveIntensity={0.65} /></mesh>
+      </group>
+    );
+  }
+  if (assetKey === "pet_sanctuary") {
+    return (
+      <group>
+        <mesh position={[0, 0.45, 0]} receiveShadow><cylinderGeometry args={[2.35, 2.55, 0.3, 36]} /><meshStandardMaterial color="#ccfbf1" roughness={0.8} /></mesh>
+        <RoundedBox args={[2.1, 1.22, 1.62]} radius={0.24} smoothness={4} position={[0, 1.15, 0]} castShadow><meshStandardMaterial color="#14b8a6" roughness={0.56} /></RoundedBox>
+        <mesh position={[0, 2.06, 0]} castShadow><sphereGeometry args={[0.48, 18, 12]} /><meshStandardMaterial color="#f472b6" emissive="#ec4899" emissiveIntensity={0.24} /></mesh>
+      </group>
+    );
+  }
+  return <RewardBuilding assetKey="clubhouse" accent={accent} tier={tier} />;
+}
+
+function RewardPlotObject({ item, accent, tier }: { item: EconomyItem; accent: string; tier: number }) {
+  const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
+  const category = typeof item.metadata.marketplaceCategory === "string" ? item.metadata.marketplaceCategory : "";
+  if (category === "animals") return <RewardAnimalYard assetKey={assetKey} accent={accent} tier={tier} />;
+  if (category === "pools_play") return <RewardPlayPlace assetKey={assetKey} tier={tier} />;
+  if (category === "special") return <RewardSpecialPlace assetKey={assetKey} accent={accent} tier={tier} />;
+  return <RewardBuilding assetKey={assetKey} accent={accent} tier={tier} />;
+}
+
 function EquippedCustomisationPlot({ item, position, active }: { item: EconomyItem; position: [number, number, number]; active: boolean }) {
   const tier = Number(item.metadata.tier ?? 1);
   const accent = item.accent || "#38bdf8";
-  const height = tier === 3 ? 3.2 : tier === 2 ? 2.35 : 1.55;
-  const radius = tier === 3 ? 1.72 : tier === 2 ? 1.42 : 1.12;
+  const labelY = tier === 3 ? 4.35 : tier === 2 ? 3.65 : 3.2;
   return (
     <group position={[position[0], 0, position[2]]}>
       <mesh position={[0, 0.1, 0]} receiveShadow><cylinderGeometry args={[3.25, 3.45, 0.2, 36]} /><meshStandardMaterial color={active ? "#f1c96a" : "#a8905f"} roughness={0.9} /></mesh>
       <mesh position={[0, 0.23, 0]} receiveShadow><cylinderGeometry args={[2.85, 3.02, 0.14, 36]} /><meshStandardMaterial color="#526d46" roughness={1} /></mesh>
-      <RoundedBox args={[radius * 1.9, height, radius * 1.55]} radius={0.18} smoothness={3} position={[0, 0.34 + height / 2, 0]} castShadow>
-        <meshStandardMaterial color={accent} roughness={0.58} metalness={tier === 3 ? 0.28 : 0.08} emissive={active ? accent : "#000000"} emissiveIntensity={active ? 0.12 : 0} />
-      </RoundedBox>
-      {tier >= 2 ? (
-        <mesh position={[0, height + 0.88, 0]} castShadow><coneGeometry args={[radius * 1.25, 1.1, 5]} /><meshStandardMaterial color="#f5d071" roughness={0.52} metalness={0.18} /></mesh>
-      ) : null}
-      {tier >= 3 ? (
-        <mesh position={[0, height + 1.62, 0]} castShadow><octahedronGeometry args={[0.58, 0]} /><meshStandardMaterial color="#fff3b0" emissive="#f4c95f" emissiveIntensity={0.55} metalness={0.35} roughness={0.38} /></mesh>
-      ) : null}
-      <Html center position={[0, height + 1.25, 0]} distanceFactor={16} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}>
+      <RewardPlotObject item={item} accent={accent} tier={tier} />
+      <Html center position={[0, labelY, 0]} distanceFactor={16} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div>
       </Html>
     </group>

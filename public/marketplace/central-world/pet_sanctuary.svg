@@ -1,0 +1,51 @@
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="pet_sanctuary marketplace render">
+      
+    <defs>
+      <linearGradient id="front" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f8fafc"/>
+        <stop offset="0.42" stop-color="#14b8a6"/>
+        <stop offset="1" stop-color="#111827"/>
+      </linearGradient>
+      <linearGradient id="roof" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#60a5fa"/>
+        <stop offset="0.5" stop-color="#14b8a6"/>
+        <stop offset="1" stop-color="#0f172a"/>
+      </linearGradient>
+      <linearGradient id="wood" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f59e0b"/>
+        <stop offset="0.5" stop-color="#a16207"/>
+        <stop offset="1" stop-color="#451a03"/>
+      </linearGradient>
+      <linearGradient id="stone" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f8fafc"/>
+        <stop offset="0.48" stop-color="#cbd5e1"/>
+        <stop offset="1" stop-color="#64748b"/>
+      </linearGradient>
+      <radialGradient id="water" cx="50%" cy="34%" r="68%">
+        <stop offset="0" stop-color="#ecfeff"/>
+        <stop offset="0.52" stop-color="#38bdf8"/>
+        <stop offset="1" stop-color="#0369a1"/>
+      </radialGradient>
+      <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+        <feDropShadow dx="0" dy="26" stdDeviation="18" flood-color="#020617" flood-opacity="0.36"/>
+      </filter>
+      <filter id="lift" x="-25%" y="-30%" width="150%" height="170%">
+        <feDropShadow dx="0" dy="16" stdDeviation="9" flood-color="#020617" flood-opacity="0.32"/>
+      </filter>
+      <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+        <feGaussianBlur stdDeviation="9" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+      
+    <rect width="1280" height="720" fill="#ffffff" opacity="0.02"/>
+    
+    <ellipse cx="640" cy="614" rx="520" ry="102" fill="#022c22" opacity="0.28"/>
+    <path d="M0 668 C214 604 392 642 598 604 C808 566 1004 622 1280 548 L1280 720 L0 720 Z" fill="#14b8a6" opacity="0.14"/>
+      
+    <ellipse cx="640" cy="628" rx="470" ry="94" fill="#022c22" opacity="0.36" filter="url(#shadow)"/>
+    <ellipse cx="640" cy="592" rx="470" ry="90" fill="#14b8a6" opacity="0.28"/>
+    <ellipse cx="640" cy="562" rx="434" ry="70" fill="#f8fafc" opacity="0.18"/><g filter="url(#lift)"><path d="M360 566 C434 410 540 354 640 354 C740 354 846 410 920 566 Z" fill="#ccfbf1"/><path d="M420 566 C470 464 552 422 640 422 C728 422 810 464 860 566" fill="#14b8a6"/><circle cx="520" cy="448" r="58" fill="#16a34a"/><circle cx="760" cy="448" r="58" fill="#16a34a"/><path d="M604 474 C604 430 676 430 676 474 C676 522 640 532 640 560 C640 532 604 522 604 474 Z" fill="#f472b6" filter="url(#glow)"/></g>
+      <rect x="38" y="38" width="1204" height="644" rx="52" fill="none" stroke="#ffffff" stroke-opacity="0.26" stroke-width="3"/>
+    </svg>

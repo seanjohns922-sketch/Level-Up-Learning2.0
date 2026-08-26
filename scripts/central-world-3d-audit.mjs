@@ -18,6 +18,7 @@ const home = read("app/home-base/page.tsx");
 const marketplace = read("app/marketplace/page.tsx");
 const catalogue = read("lib/world3d/central-world-customisation-catalog.ts");
 const migration = read("supabase/migrations/20260826152000_central_world_customisation_catalogue.sql");
+const launchMigration = read("supabase/migrations/20260826173500_central_world_launch_rewards_catalogue.sql");
 
 check(page.includes("CentralWorld3DEntry"), "/world must use the gated central-world entry");
 check(entry.includes("resolveRealm3DAccess"), "Central World must reuse the existing 3D rollout resolver");
@@ -76,10 +77,22 @@ check(world.includes("...CENTRAL_WORLD_CUSTOMISATION_PLOTS.map"), "Customisation
 check(world.includes("getEquippedCentralWorldItems"), "Central World does not read equipped customisation items");
 check(world.includes("OPEN MARKETPLACE"), "Locked customisation plot marketplace action is missing");
 check(world.includes("activePlotEquipped"), "Equipped customisation plot state is missing");
-check(marketplace.includes("World Plots") && marketplace.includes("mergeCentralWorldCatalogue"), "Marketplace is not wired to central-world catalogue items");
+check(
+  marketplace.includes("Buildings")
+    && marketplace.includes("Animals")
+    && marketplace.includes("Pools & Play")
+    && marketplace.includes("Special")
+    && marketplace.includes("mergeCentralWorldCatalogue"),
+  "Marketplace is not wired to the V1 central-world reward categories",
+);
 check(catalogue.includes("slot: `world_plot_${entry.plot}`"), "Central-world catalogue item slots are missing");
-check((catalogue.match(/assetKey: "/g) ?? []).length === 24, "Central-world catalogue must define 24 plot item variants");
+check((catalogue.match(/assetKey: "/g) ?? []).length === 21, "Central-world catalogue must define the 21 launch reward items");
+for (const category of ["buildings", "animals", "pools_play", "special"]) {
+  check(catalogue.includes(`area: "${category}"`) && marketplace.includes(category), `Launch category missing: ${category}`);
+}
+check(catalogue.includes("gridSize") && launchMigration.includes('"gridSize"'), "Launch rewards must carry future grid placement size metadata");
 check(migration.includes("world_plot_1") && migration.includes("world_plot_8"), "Central-world catalogue migration does not allow world plot equip slots");
-check((migration.match(/central_world_plot_/g) ?? []).length >= 24, "Central-world catalogue migration must seed 24 plot items");
+check((launchMigration.match(/central_world_plot_/g) ?? []).length >= 21, "Launch catalogue migration must seed the V1 reward items");
+check(launchMigration.includes("active = false") && launchMigration.includes("item_key like 'central_world_plot_%'"), "Launch catalogue migration must retire the old tiny plot items");
 
 console.log("Central World 3D checkpoint audit passed.");

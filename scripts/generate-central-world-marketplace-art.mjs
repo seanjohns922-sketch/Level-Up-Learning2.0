@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
 
@@ -8,70 +8,74 @@ const backdropPath = path.join(root, "public", "images", "central-world-valley-p
 mkdirSync(outputDir, { recursive: true });
 
 const items = [
-  ["reflection_pond", "#38bdf8", "water", "pond"],
-  ["willow_lake", "#0ea5e9", "water", "lake"],
-  ["crystal_reservoir", "#8b5cf6", "water", "crystal"],
-  ["practice_court", "#f59e0b", "training", "court"],
-  ["explorer_gym", "#f97316", "training", "gym"],
-  ["champion_arena", "#eab308", "training", "arena"],
-  ["wildflower_garden", "#22c55e", "garden", "flowers"],
-  ["scholar_grove", "#16a34a", "garden", "grove"],
-  ["starlight_conservatory", "#a855f7", "garden", "conservatory"],
-  ["timber_footbridge", "#a16207", "crossing", "timber"],
-  ["stone_arch_bridge", "#64748b", "crossing", "stone"],
-  ["lumina_bridge", "#06b6d4", "crossing", "lumina"],
-  ["garden_fence", "#84cc16", "boundary", "fence"],
-  ["stone_boundary", "#78716c", "boundary", "wall"],
-  ["crystal_ward", "#c084fc", "boundary", "ward"],
-  ["picnic_circle", "#fb7185", "community", "picnic"],
-  ["explorer_plaza", "#14b8a6", "community", "plaza"],
-  ["festival_courtyard", "#ec4899", "community", "festival"],
-  ["tool_shed", "#a16207", "workshop", "shed"],
-  ["maker_workshop", "#ea580c", "workshop", "maker"],
-  ["inventor_hall", "#facc15", "workshop", "hall"],
-  ["trail_lookout", "#60a5fa", "lookout", "trail"],
-  ["skywatch_deck", "#6366f1", "lookout", "skydeck"],
-  ["celestial_observatory", "#7c3aed", "lookout", "observatory"],
+  ["clubhouse", "#2563eb", "buildings", "clubhouse"],
+  ["games_room", "#7c3aed", "buildings", "games"],
+  ["treehouse", "#16a34a", "buildings", "treehouse"],
+  ["training_centre", "#22c55e", "buildings", "training"],
+  ["workshop", "#0ea5e9", "buildings", "workshop"],
+  ["observatory", "#8b5cf6", "buildings", "observatory"],
+  ["puppy_yard", "#f59e0b", "animals", "puppy"],
+  ["bunny_garden", "#f472b6", "animals", "bunny"],
+  ["pony_paddock", "#a16207", "animals", "pony"],
+  ["farmyard", "#84cc16", "animals", "farmyard"],
+  ["wildlife_habitat", "#059669", "animals", "wildlife"],
+  ["backyard_pool", "#0ea5e9", "play", "pool"],
+  ["splash_pool", "#06b6d4", "play", "splash"],
+  ["water_park", "#0284c7", "play", "waterpark"],
+  ["adventure_playground", "#f97316", "play", "playground"],
+  ["trampoline_park", "#22c55e", "play", "trampoline"],
+  ["sports_stadium", "#2563eb", "special", "stadium"],
+  ["cinema", "#dc2626", "special", "cinema"],
+  ["arcade", "#a855f7", "special", "arcade"],
+  ["party_house", "#ec4899", "special", "party"],
+  ["pet_sanctuary", "#14b8a6", "special", "sanctuary"],
 ];
+
+const activeFiles = new Set(items.flatMap(([key]) => [`${key}.svg`, `${key}.webp`]));
+for (const file of readdirSync(outputDir)) {
+  if ((file.endsWith(".svg") || file.endsWith(".webp")) && !activeFiles.has(file)) {
+    unlinkSync(path.join(outputDir, file));
+  }
+}
 
 const escapeXml = (value) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 
 function defs(accent, night = false) {
   return `
     <defs>
-      <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1">
-        <stop offset="0" stop-color="#f8fafc" stop-opacity="0.95"/>
-        <stop offset="0.52" stop-color="${accent}" stop-opacity="0.42"/>
-        <stop offset="1" stop-color="#0f172a" stop-opacity="0.18"/>
-      </linearGradient>
-      <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1">
-        <stop offset="0" stop-color="#fff7ad"/>
-        <stop offset="0.48" stop-color="#facc15"/>
-        <stop offset="1" stop-color="#a16207"/>
-      </linearGradient>
-      <linearGradient id="stone" x1="0" x2="1" y1="0" y2="1">
+      <linearGradient id="front" x1="0" x2="1" y1="0" y2="1">
         <stop offset="0" stop-color="#f8fafc"/>
-        <stop offset="0.5" stop-color="#cbd5e1"/>
-        <stop offset="1" stop-color="#64748b"/>
+        <stop offset="0.42" stop-color="${accent}"/>
+        <stop offset="1" stop-color="#111827"/>
+      </linearGradient>
+      <linearGradient id="roof" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#60a5fa"/>
+        <stop offset="0.5" stop-color="${accent}"/>
+        <stop offset="1" stop-color="#0f172a"/>
       </linearGradient>
       <linearGradient id="wood" x1="0" x2="1" y1="0" y2="1">
         <stop offset="0" stop-color="#f59e0b"/>
         <stop offset="0.5" stop-color="#a16207"/>
         <stop offset="1" stop-color="#451a03"/>
       </linearGradient>
-      <radialGradient id="water" cx="50%" cy="38%" r="64%">
+      <linearGradient id="stone" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#f8fafc"/>
+        <stop offset="0.48" stop-color="#cbd5e1"/>
+        <stop offset="1" stop-color="#64748b"/>
+      </linearGradient>
+      <radialGradient id="water" cx="50%" cy="34%" r="68%">
         <stop offset="0" stop-color="#ecfeff"/>
-        <stop offset="0.46" stop-color="${accent}"/>
+        <stop offset="0.52" stop-color="#38bdf8"/>
         <stop offset="1" stop-color="#0369a1"/>
       </radialGradient>
       <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
-        <feDropShadow dx="0" dy="24" stdDeviation="18" flood-color="#052e16" flood-opacity="${night ? 0.54 : 0.34}"/>
+        <feDropShadow dx="0" dy="26" stdDeviation="18" flood-color="#020617" flood-opacity="${night ? 0.58 : 0.36}"/>
       </filter>
       <filter id="lift" x="-25%" y="-30%" width="150%" height="170%">
-        <feDropShadow dx="0" dy="16" stdDeviation="10" flood-color="#020617" flood-opacity="0.32"/>
+        <feDropShadow dx="0" dy="16" stdDeviation="9" flood-color="#020617" flood-opacity="0.32"/>
       </filter>
       <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
-        <feGaussianBlur stdDeviation="10" result="blur"/>
+        <feGaussianBlur stdDeviation="9" result="blur"/>
         <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
     </defs>`;
@@ -79,120 +83,104 @@ function defs(accent, night = false) {
 
 function sceneGrade(accent, night = false) {
   const stars = night
-    ? `<g fill="#f8fafc" opacity="0.88">${Array.from({ length: 42 }, (_, i) => `<circle cx="${80 + (i * 137) % 1120}" cy="${34 + (i * 61) % 220}" r="${1.5 + (i % 3)}"/>`).join("")}</g>`
+    ? `<g fill="#f8fafc" opacity="0.88">${Array.from({ length: 46 }, (_, i) => `<circle cx="${72 + (i * 139) % 1136}" cy="${30 + (i * 59) % 216}" r="${1.5 + (i % 3)}"/>`).join("")}</g>`
     : "";
   return `
-    <rect width="1280" height="720" fill="${night ? "#0f172a" : "#ffffff"}" opacity="${night ? 0.5 : 0.02}"/>
+    <rect width="1280" height="720" fill="${night ? "#0f172a" : "#ffffff"}" opacity="${night ? 0.52 : 0.02}"/>
     ${stars}
-    <ellipse cx="640" cy="584" rx="500" ry="104" fill="#022c22" opacity="0.28"/>
-    <path d="M0 668 C214 604 392 642 598 604 C808 566 1004 622 1280 548 L1280 720 L0 720 Z" fill="${accent}" opacity="0.15"/>`;
+    <ellipse cx="640" cy="614" rx="520" ry="102" fill="#022c22" opacity="0.28"/>
+    <path d="M0 668 C214 604 392 642 598 604 C808 566 1004 622 1280 548 L1280 720 L0 720 Z" fill="${accent}" opacity="0.14"/>`;
 }
 
-function basePlatform(accent, wide = false) {
-  const rx = wide ? 456 : 346;
+function platform(accent, wide = true) {
+  const rx = wide ? 470 : 360;
   return `
-    <ellipse cx="640" cy="626" rx="${rx}" ry="96" fill="#022c22" opacity="0.36" filter="url(#shadow)"/>
-    <ellipse cx="640" cy="590" rx="${rx}" ry="92" fill="${accent}" opacity="0.34"/>
-    <ellipse cx="640" cy="560" rx="${rx - 28}" ry="72" fill="#f8fafc" opacity="0.2"/>
-    <path d="M${640 - rx + 42} 552 C492 504 788 502 ${640 + rx - 42} 552" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.32" stroke-linecap="round"/>`;
+    <ellipse cx="640" cy="628" rx="${rx}" ry="94" fill="#022c22" opacity="0.36" filter="url(#shadow)"/>
+    <ellipse cx="640" cy="592" rx="${rx}" ry="90" fill="${accent}" opacity="0.28"/>
+    <ellipse cx="640" cy="562" rx="${rx - 36}" ry="70" fill="#f8fafc" opacity="0.18"/>`;
 }
 
-function water(type, accent) {
-  const extras = type === "lake"
-    ? `<g filter="url(#lift)"><path d="M360 504 C304 438 362 350 432 342 C496 334 532 398 498 474" fill="#4d7c0f"/><path d="M386 398 C350 480 388 526 350 584" stroke="#84cc16" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M464 394 C506 472 456 530 492 588" stroke="#84cc16" stroke-width="14" fill="none" stroke-linecap="round"/></g>`
-    : type === "crystal"
-      ? `<g filter="url(#glow)" opacity="0.96"><path d="M536 444 L588 322 L640 444 L588 544 Z" fill="#8b5cf6"/><path d="M640 466 L704 282 L770 466 L704 584 Z" fill="#a78bfa"/><path d="M754 452 L806 334 L858 452 L806 548 Z" fill="#7c3aed"/></g>`
-      : `<g filter="url(#lift)"><path d="M346 542 C390 452 472 476 486 548" fill="#15803d"/><path d="M800 548 C834 456 932 466 962 548" fill="#15803d"/><circle cx="394" cy="456" r="52" fill="#22c55e"/><circle cx="454" cy="458" r="44" fill="#16a34a"/><circle cx="874" cy="462" r="46" fill="#22c55e"/><circle cx="928" cy="468" r="36" fill="#16a34a"/></g>`;
-  const size = type === "pond" ? [300, 74] : [402, 100];
-  return `${basePlatform(accent, type !== "pond")}<ellipse cx="640" cy="540" rx="${size[0] + 54}" ry="${size[1] + 18}" fill="#075985" opacity="0.42" filter="url(#lift)"/><ellipse cx="640" cy="516" rx="${size[0] + 26}" ry="${size[1] + 8}" fill="url(#water)" filter="url(#lift)"/><ellipse cx="640" cy="488" rx="${size[0] - 12}" ry="${Math.max(32, size[1] - 38)}" fill="#e0f2fe" opacity="0.5"/><path d="M398 506 C526 470 754 548 896 500" fill="none" stroke="#ecfeff" stroke-width="12" opacity="0.62" stroke-linecap="round"/>${extras}`;
+function windows(points, color = "#fde68a") {
+  return points.map(([x, y, w = 44, h = 58]) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${color}" filter="url(#glow)"/><path d="M${x + w / 2} ${y} L${x + w / 2} ${y + h} M${x} ${y + h / 2} L${x + w} ${y + h / 2}" stroke="#92400e" stroke-width="4" opacity="0.45"/>`).join("");
 }
 
-function training(type, accent) {
-  if (type === "court") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><path d="M352 464 L928 424 L1000 578 L422 624 Z" fill="#d97706"/><path d="M402 484 L884 452 L928 558 L446 590 Z" fill="#fff7ed"/><path d="M640 468 L674 570 M410 536 L918 502" stroke="#d97706" stroke-width="9"/><circle cx="668" cy="518" r="54" fill="none" stroke="#d97706" stroke-width="10"/><rect x="812" y="348" width="52" height="130" rx="8" fill="#f8fafc"/><circle cx="838" cy="486" r="30" fill="none" stroke="#fb923c" stroke-width="10"/></g>`;
+function building(type, accent) {
+  if (type === "treehouse") {
+    return `${platform(accent, false)}<g filter="url(#lift)"><rect x="574" y="340" width="82" height="260" rx="34" fill="#78350f"/><circle cx="496" cy="320" r="104" fill="#166534"/><circle cx="612" cy="270" r="118" fill="#15803d"/><circle cx="750" cy="326" r="112" fill="#16a34a"/><path d="M430 484 L640 370 L850 484 L810 594 L470 594 Z" fill="url(#wood)"/><rect x="530" y="496" width="92" height="98" rx="12" fill="#451a03"/><rect x="672" y="502" width="92" height="62" rx="12" fill="#fde68a"/><path d="M446 600 L380 676 M830 600 L900 676" stroke="#92400e" stroke-width="16"/></g>`;
   }
-  if (type === "gym") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><path d="M362 398 L640 302 L918 398 L918 584 L362 584 Z" fill="#fed7aa"/><path d="M410 430 L870 430 L870 542 L410 542 Z" fill="#fff7ed"/><path d="M474 556 L474 424 L806 424 L806 556" stroke="#ea580c" stroke-width="22" fill="none" stroke-linecap="round"/><rect x="456" y="552" width="364" height="34" rx="17" fill="#fdba74"/><circle cx="538" cy="500" r="36" fill="#fb923c"/><circle cx="742" cy="500" r="36" fill="#fb923c"/></g>`;
+  if (type === "observatory") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="450" y="394" width="380" height="206" rx="30" fill="url(#stone)"/><path d="M408 396 Q640 212 872 396 Z" fill="url(#roof)"/><path d="M544 396 Q640 284 736 396" fill="#ddd6fe"/><circle cx="640" cy="308" r="58" fill="#f8fafc" opacity="0.94" filter="url(#glow)"/><path d="M826 340 L958 256" stroke="${accent}" stroke-width="38" stroke-linecap="round"/><circle cx="986" cy="238" r="50" fill="#e0e7ff"/><rect x="574" y="492" width="132" height="108" rx="18" fill="#312e81"/></g>`;
   }
-  return `${basePlatform(accent, true)}<g filter="url(#lift)"><ellipse cx="640" cy="578" rx="350" ry="78" fill="#a16207" opacity="0.72"/><path d="M300 530 C362 374 490 292 640 292 C790 292 918 374 980 530 Z" fill="url(#gold)"/><path d="M372 510 C430 414 522 364 640 364 C758 364 850 414 908 510" fill="none" stroke="#a16207" stroke-width="30"/><rect x="574" y="462" width="132" height="74" rx="14" fill="#facc15"/><path d="M430 322 L430 480 M850 322 L850 480" stroke="#78350f" stroke-width="14"/><path d="M430 322 L524 350 L430 382 M850 322 L756 350 L850 382" fill="${accent}"/></g>`;
+  if (type === "games") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="360" y="350" width="560" height="248" rx="34" fill="#1e1b4b"/><path d="M330 378 Q640 244 950 378 L910 434 L370 434 Z" fill="#312e81"/><rect x="472" y="456" width="336" height="142" rx="28" fill="#111827"/><rect x="530" y="400" width="220" height="60" rx="24" fill="#e0f2fe"/><circle cx="584" cy="430" r="16" fill="#2563eb"/><circle cx="704" cy="430" r="16" fill="#ec4899"/><path d="M604 430 L660 430 M632 402 L632 458" stroke="#2563eb" stroke-width="12"/><rect x="398" y="470" width="54" height="94" rx="10" fill="#7c3aed"/><rect x="828" y="470" width="54" height="94" rx="10" fill="#7c3aed"/></g>`;
+  }
+  if (type === "training") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="370" y="384" width="540" height="216" rx="28" fill="#334155"/><path d="M410 384 L640 272 L870 384 Z" fill="#94a3b8"/><rect x="498" y="460" width="284" height="140" rx="26" fill="#0f172a"/><path d="M490 354 L490 484 M790 354 L790 484" stroke="#64748b" stroke-width="30"/><circle cx="460" cy="354" r="52" fill="#64748b"/><circle cx="820" cy="354" r="52" fill="#64748b"/><path d="M864 430 L830 508 L890 508 L850 594" stroke="#38bdf8" stroke-width="18" fill="none" filter="url(#glow)"/></g>`;
+  }
+  if (type === "workshop") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="386" y="370" width="508" height="230" rx="28" fill="#92400e"/><path d="M338 386 L640 248 L942 386 Z" fill="#1d4ed8"/><rect x="484" y="460" width="100" height="140" rx="12" fill="#451a03"/><rect x="656" y="454" width="134" height="74" rx="12" fill="#fde68a"/><path d="M744 580 L848 474 M824 476 L852 504" stroke="#38bdf8" stroke-width="18" stroke-linecap="round"/></g>`;
+  }
+  return `${platform(accent, true)}<g filter="url(#lift)"><rect x="360" y="360" width="560" height="240" rx="30" fill="#0f172a"/><rect x="390" y="332" width="500" height="240" rx="24" fill="url(#front)"/><path d="M326 358 L640 228 L954 358 Z" fill="url(#roof)"/><rect x="572" y="478" width="136" height="94" rx="16" fill="#1e293b"/><rect x="414" y="414" width="110" height="84" rx="12" fill="#bae6fd"/><rect x="756" y="414" width="110" height="84" rx="12" fill="#bae6fd"/><path d="M494 330 L494 286 L548 302 L494 318" fill="${accent}"/></g>`;
 }
 
-function garden(type, accent) {
-  if (type === "flowers") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><ellipse cx="640" cy="532" rx="358" ry="100" fill="#dcfce7"/><path d="M360 588 C480 488 778 488 930 584" fill="none" stroke="#fef3c7" stroke-width="42" stroke-linecap="round"/><g>${Array.from({ length: 54 }, (_, index) => `<circle cx="${336 + (index * 53) % 610}" cy="${460 + (index * 37) % 126}" r="${7 + (index % 4) * 2}" fill="${["#f472b6", "#facc15", "#60a5fa", "#fb7185"][index % 4]}"/>`).join("")}</g></g>`;
-  }
-  if (type === "grove") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><rect x="520" y="500" width="244" height="80" rx="18" fill="#fef3c7"/><path d="M544 500 L640 552 L740 500" fill="none" stroke="${accent}" stroke-width="18"/><rect x="574" y="454" width="136" height="56" rx="12" fill="#dcfce7"/><circle cx="384" cy="420" r="70" fill="#22c55e"/><circle cx="336" cy="452" r="58" fill="#16a34a"/><rect x="356" y="458" width="34" height="122" rx="15" fill="#854d0e"/><circle cx="896" cy="420" r="72" fill="#22c55e"/><circle cx="946" cy="456" r="58" fill="#16a34a"/><rect x="888" y="458" width="34" height="122" rx="15" fill="#854d0e"/></g>`;
-  }
-  return `${basePlatform(accent, true)}<g filter="url(#lift)"><path d="M348 594 L932 594 L876 364 Q640 220 404 364 Z" fill="#ddd6fe"/><path d="M408 584 L872 584 L826 392 Q640 294 454 392 Z" fill="#f5f3ff" opacity="0.72"/><path d="M640 292 L640 594 M458 388 L822 388 M404 480 L876 480" stroke="#8b5cf6" stroke-width="11" opacity="0.72"/><circle cx="514" cy="540" r="22" fill="#f472b6"/><circle cx="600" cy="516" r="20" fill="#22c55e"/><circle cx="716" cy="536" r="24" fill="#a855f7"/></g>`;
+function animal(type, accent) {
+  const fence = `<path d="M250 538 L1030 538 M250 588 L1030 588" stroke="#fef3c7" stroke-width="18" stroke-linecap="round"/><g fill="#fef3c7">${Array.from({ length: 10 }, (_, i) => `<rect x="${276 + i * 78}" y="492" width="26" height="120" rx="10"/>`).join("")}</g>`;
+  const body = type === "bunny"
+    ? `<ellipse cx="622" cy="484" rx="96" ry="70" fill="#f8fafc"/><circle cx="708" cy="448" r="56" fill="#f8fafc"/><path d="M690 400 C650 302 700 292 728 394 M740 402 C768 304 814 322 772 410" stroke="#f8fafc" stroke-width="32" fill="none" stroke-linecap="round"/><circle cx="730" cy="444" r="8" fill="#111827"/><circle cx="756" cy="462" r="9" fill="#f472b6"/>`
+    : type === "pony"
+      ? `<ellipse cx="640" cy="486" rx="142" ry="72" fill="#92400e"/><circle cx="770" cy="430" r="54" fill="#92400e"/><path d="M742 394 L784 338 L806 410" fill="#78350f"/><path d="M560 536 L540 606 M628 540 L618 612 M704 538 L724 610" stroke="#451a03" stroke-width="18" stroke-linecap="round"/><path d="M506 450 C452 392 446 490 506 506" stroke="#fbbf24" stroke-width="22" fill="none" stroke-linecap="round"/>`
+      : type === "wildlife"
+        ? `<circle cx="508" cy="448" r="88" fill="#166534"/><circle cx="742" cy="432" r="104" fill="#15803d"/><rect x="488" y="476" width="44" height="112" rx="18" fill="#854d0e"/><rect x="724" y="466" width="48" height="124" rx="20" fill="#854d0e"/><ellipse cx="640" cy="516" rx="90" ry="52" fill="#f59e0b"/><circle cx="714" cy="486" r="36" fill="#f59e0b"/><circle cx="724" cy="482" r="6" fill="#111827"/>`
+        : type === "farmyard"
+          ? `<rect x="504" y="394" width="272" height="184" rx="20" fill="#dc2626"/><path d="M460 404 L640 284 L820 404 Z" fill="#facc15"/><rect x="594" y="484" width="92" height="94" rx="46" fill="#7f1d1d"/><circle cx="858" cy="506" r="42" fill="#f8fafc"/><circle cx="890" cy="486" r="30" fill="#f8fafc"/><circle cx="898" cy="482" r="5" fill="#111827"/>`
+          : `<ellipse cx="628" cy="500" rx="118" ry="68" fill="#f59e0b"/><circle cx="724" cy="452" r="48" fill="#f59e0b"/><path d="M700 412 L672 372 L716 400 M746 414 L792 376 L772 430" fill="#92400e"/><circle cx="742" cy="448" r="7" fill="#111827"/><path d="M536 542 L520 598 M618 552 L612 610 M702 540 L724 596" stroke="#92400e" stroke-width="14" stroke-linecap="round"/>`;
+  return `${platform(accent, true)}<g filter="url(#lift)">${fence}${body}</g>`;
 }
 
-function crossing(type, accent) {
-  const stream = `<path d="M82 604 C280 526 438 598 626 542 C850 474 1030 560 1198 496" fill="none" stroke="#38bdf8" stroke-width="106" opacity="0.82"/>`;
-  if (type === "timber") {
-    return `${stream}<g filter="url(#lift)"><path d="M254 480 C412 410 856 410 1028 480 L1028 548 C830 498 450 498 254 548 Z" fill="url(#wood)"/><g stroke="#fef3c7" stroke-width="9" opacity="0.7">${Array.from({ length: 9 }, (_, index) => `<path d="M${326 + index * 78} 452 L${306 + index * 78} 532"/>`).join("")}</g></g>`;
+function play(type, accent) {
+  if (type === "waterpark") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><ellipse cx="640" cy="560" rx="356" ry="96" fill="url(#water)"/><path d="M468 500 C520 354 668 340 724 478" fill="none" stroke="#f97316" stroke-width="42" stroke-linecap="round"/><path d="M724 478 C780 550 872 498 910 420" fill="none" stroke="#facc15" stroke-width="42" stroke-linecap="round"/><path d="M530 428 L530 318 L592 318 L592 414" stroke="#38bdf8" stroke-width="26"/><path d="M760 454 C746 386 772 334 824 306" stroke="#ecfeff" stroke-width="12" fill="none" stroke-linecap="round"/></g>`;
   }
-  if (type === "stone") {
-    return `${stream}<g filter="url(#lift)"><path d="M248 532 C382 388 900 388 1032 532 L1032 606 L248 606 Z" fill="url(#stone)"/><path d="M466 606 C486 488 794 488 814 606 Z" fill="#38bdf8" opacity="0.82"/><g stroke="#64748b" stroke-width="5" opacity="0.5"><path d="M306 514 L360 596"/><path d="M430 474 L480 602"/><path d="M552 438 L570 602"/><path d="M728 438 L708 602"/><path d="M850 474 L800 602"/><path d="M974 514 L920 596"/></g></g>`;
+  if (type === "playground") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><path d="M430 578 L542 378 L654 578 Z M642 578 L754 378 L866 578 Z" fill="#f97316"/><path d="M518 422 L778 422 M482 488 L814 488" stroke="#fde68a" stroke-width="18"/><path d="M824 438 C936 476 922 568 804 594" stroke="#38bdf8" stroke-width="34" fill="none"/><rect x="538" y="332" width="212" height="70" rx="16" fill="#2563eb"/></g>`;
   }
-  return `${stream}<g filter="url(#glow)"><path d="M248 524 C386 378 898 378 1032 524 L1032 586 L248 586 Z" fill="#cffafe" opacity="0.94"/><path d="M304 516 C448 420 832 420 976 516" fill="none" stroke="${accent}" stroke-width="24"/><path d="M470 586 C490 484 790 484 810 586 Z" fill="#38bdf8" opacity="0.84"/></g>`;
+  if (type === "trampoline") {
+    return `${platform(accent, false)}<g filter="url(#lift)"><ellipse cx="640" cy="548" rx="260" ry="78" fill="#111827"/><ellipse cx="640" cy="536" rx="218" ry="56" fill="#38bdf8"/><path d="M430 544 L394 628 M850 544 L886 628 M514 588 L494 652 M766 588 L786 652" stroke="#64748b" stroke-width="18"/><path d="M610 382 C650 318 714 382 670 438 C642 472 592 438 610 382" fill="#fde68a" filter="url(#glow)"/></g>`;
+  }
+  const jets = type === "splash" ? `<path d="M540 500 C506 412 566 388 590 492 M662 496 C626 402 706 380 728 492 M782 512 C744 436 802 414 832 508" stroke="#ecfeff" stroke-width="12" fill="none" stroke-linecap="round" filter="url(#glow)"/>` : "";
+  return `${platform(accent, true)}<g filter="url(#lift)"><ellipse cx="640" cy="548" rx="${type === "pool" ? 320 : 370}" ry="${type === "pool" ? 88 : 108}" fill="#075985"/><ellipse cx="640" cy="522" rx="${type === "pool" ? 292 : 340}" ry="${type === "pool" ? 66 : 84}" fill="url(#water)"/><path d="M430 514 C542 478 740 548 868 506" stroke="#ecfeff" stroke-width="12" opacity="0.64" fill="none" stroke-linecap="round"/>${jets}</g>`;
 }
 
-function boundary(type, accent) {
-  if (type === "fence") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)" fill="#fef3c7" stroke="#a16207" stroke-width="8">${Array.from({ length: 12 }, (_, index) => `<path d="M${150 + index * 88} 548 L${150 + index * 88} 420 L${180 + index * 88} 388 L${210 + index * 88} 420 L${210 + index * 88} 548 Z"/>`).join("")}<path d="M126 470 L1152 470 M126 528 L1152 528"/></g>`;
+function special(type, accent) {
+  if (type === "stadium") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><path d="M302 534 C370 376 504 310 640 310 C776 310 910 376 978 534 L908 600 L372 600 Z" fill="#1d4ed8"/><path d="M410 514 C468 426 544 390 640 390 C736 390 812 426 870 514" fill="none" stroke="#bfdbfe" stroke-width="36"/><circle cx="640" cy="492" r="46" fill="#f8fafc"/><path d="M384 318 L384 470 M896 318 L896 470" stroke="#e0f2fe" stroke-width="18"/><circle cx="384" cy="300" r="34" fill="#f8fafc" filter="url(#glow)"/><circle cx="896" cy="300" r="34" fill="#f8fafc" filter="url(#glow)"/></g>`;
   }
-  if (type === "wall") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><path d="M146 556 C318 496 506 524 668 494 C850 462 1010 492 1138 446 L1138 606 L146 606 Z" fill="url(#stone)"/><g stroke="#57534e" stroke-width="5" opacity="0.48"><path d="M160 514 L1120 514 M160 566 L1120 566"/><path d="M220 506 L272 602"/><path d="M384 488 L430 604"/><path d="M548 500 L596 604"/><path d="M720 486 L768 604"/><path d="M884 492 L930 604"/><path d="M1040 472 L1088 604"/></g></g>`;
+  if (type === "cinema") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="392" y="354" width="496" height="246" rx="28" fill="#7f1d1d"/><path d="M352 376 L640 242 L928 376 Z" fill="#facc15"/><rect x="484" y="394" width="312" height="78" rx="18" fill="#111827"/><text x="640" y="450" fill="#facc15" font-family="Arial Black, sans-serif" font-size="54" text-anchor="middle">CINEMA</text><rect x="560" y="500" width="160" height="100" rx="16" fill="#450a0a"/></g>`;
   }
-  return `${basePlatform(accent, true)}<g filter="url(#glow)"><path d="M178 540 C346 446 506 524 660 458 C820 392 990 474 1102 416" fill="none" stroke="#f3e8ff" stroke-width="34" stroke-linecap="round"/><g fill="${accent}">${[238, 380, 536, 696, 858, 1012].map((x, index) => `<path d="M${x} ${514 - (index % 2) * 42} L${x + 30} ${448 - (index % 2) * 42} L${x + 62} ${514 - (index % 2) * 42} L${x + 30} ${582 - (index % 2) * 42} Z"/>`).join("")}</g></g>`;
+  if (type === "arcade") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="384" y="360" width="512" height="240" rx="28" fill="#581c87"/><path d="M424 332 L856 332 L910 394 L370 394 Z" fill="#a855f7"/><text x="640" y="386" fill="#67e8f9" font-family="Arial Black, sans-serif" font-size="56" text-anchor="middle">ARCADE</text><rect x="476" y="452" width="110" height="130" rx="14" fill="#111827"/><rect x="694" y="452" width="110" height="130" rx="14" fill="#111827"/><circle cx="532" cy="526" r="12" fill="#facc15"/><circle cx="750" cy="526" r="12" fill="#22c55e"/></g>`;
+  }
+  if (type === "party") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="410" y="386" width="460" height="214" rx="28" fill="#fdf2f8"/><path d="M366 396 L640 270 L914 396 Z" fill="#a855f7"/><rect x="576" y="500" width="128" height="100" rx="18" fill="#7e22ce"/><path d="M380 432 C492 364 566 484 660 418 C750 356 824 450 900 398" stroke="#facc15" stroke-width="14" fill="none"/><circle cx="480" cy="514" r="26" fill="#ec4899"/><circle cx="804" cy="516" r="26" fill="#22c55e"/></g>`;
+  }
+  return `${platform(accent, true)}<g filter="url(#lift)"><path d="M360 566 C434 410 540 354 640 354 C740 354 846 410 920 566 Z" fill="#ccfbf1"/><path d="M420 566 C470 464 552 422 640 422 C728 422 810 464 860 566" fill="#14b8a6"/><circle cx="520" cy="448" r="58" fill="#16a34a"/><circle cx="760" cy="448" r="58" fill="#16a34a"/><path d="M604 474 C604 430 676 430 676 474 C676 522 640 532 640 560 C640 532 604 522 604 474 Z" fill="#f472b6" filter="url(#glow)"/></g>`;
 }
 
-function community(type, accent) {
-  if (type === "picnic") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><rect x="512" y="492" width="256" height="130" rx="24" fill="${accent}"/><path d="M512 558 L768 558 M640 492 L640 622" stroke="#fff1f2" stroke-width="12"/><rect x="404" y="456" width="124" height="56" rx="16" fill="#fef3c7"/><rect x="752" y="456" width="124" height="56" rx="16" fill="#fef3c7"/><circle cx="610" cy="526" r="18" fill="#fef3c7"/><circle cx="676" cy="584" r="16" fill="#fde68a"/></g>`;
-  }
-  if (type === "plaza") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><circle cx="640" cy="496" r="94" fill="#5eead4"/><circle cx="640" cy="472" r="56" fill="#ecfeff"/><path d="M640 334 C608 402 604 436 640 470 C676 436 672 402 640 334 Z" fill="${accent}" filter="url(#glow)"/><rect x="354" y="520" width="136" height="34" rx="17" fill="#0f766e"/><rect x="790" y="520" width="136" height="34" rx="17" fill="#0f766e"/></g>`;
-  }
-  return `${basePlatform(accent, true)}<g filter="url(#lift)"><rect x="480" y="470" width="320" height="106" rx="20" fill="#be185d"/><path d="M390 410 C530 330 750 486 896 390" fill="none" stroke="#f9a8d4" stroke-width="16"/><g>${[420, 500, 580, 660, 740, 820].map((x, index) => `<path d="M${x} ${408 + (index % 2) * 20} L${x + 42} ${444 + (index % 2) * 20} L${x - 6} ${462 + (index % 2) * 20} Z" fill="${index % 2 ? "#facc15" : accent}"/>`).join("")}</g><circle cx="556" cy="526" r="16" fill="#fef3c7"/><circle cx="646" cy="526" r="16" fill="#fef3c7"/><circle cx="726" cy="526" r="16" fill="#fef3c7"/></g>`;
-}
-
-function workshop(type, accent) {
-  if (type === "shed") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><rect x="420" y="388" width="430" height="214" rx="20" fill="#92400e"/><path d="M382 400 L640 270 L896 400 Z" fill="url(#wood)"/><rect x="492" y="434" width="116" height="168" rx="8" fill="#78350f"/><rect x="650" y="430" width="130" height="92" rx="10" fill="#fef3c7"/><path d="M742 566 L820 488 M804 492 L822 510" stroke="#facc15" stroke-width="15" stroke-linecap="round"/></g>`;
-  }
-  if (type === "maker") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><rect x="332" y="360" width="610" height="246" rx="24" fill="#fed7aa"/><path d="M388 360 L640 252 L888 360 Z" fill="#c2410c"/><rect x="420" y="432" width="156" height="76" rx="12" fill="#fff7ed"/><rect x="646" y="432" width="156" height="76" rx="12" fill="#fff7ed"/><circle cx="566" cy="556" r="36" fill="none" stroke="#ea580c" stroke-width="15"/><circle cx="720" cy="550" r="46" fill="none" stroke="#f97316" stroke-width="15"/></g>`;
-  }
-  return `${basePlatform(accent, true)}<g filter="url(#lift)"><rect x="342" y="350" width="596" height="260" rx="24" fill="#fef3c7"/><path d="M316 360 L640 228 L964 360 Z" fill="url(#gold)"/><rect x="574" y="446" width="132" height="164" rx="66" fill="#92400e"/><circle cx="640" cy="348" r="38" fill="#facc15" filter="url(#glow)"/><circle cx="478" cy="516" r="36" fill="none" stroke="#ca8a04" stroke-width="13"/><circle cx="806" cy="516" r="36" fill="none" stroke="#ca8a04" stroke-width="13"/></g>`;
-}
-
-function lookout(type, accent) {
-  if (type === "trail") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><path d="M190 666 C410 548 474 452 640 448 C810 444 854 548 1090 642" fill="none" stroke="#fef3c7" stroke-width="86" stroke-linecap="round"/><rect x="480" y="376" width="320" height="106" rx="20" fill="#92400e"/><path d="M500 376 L500 532 M780 376 L780 532 M470 426 L810 426" stroke="#fef3c7" stroke-width="15"/><path d="M528 318 L752 318 L810 376 L470 376 Z" fill="${accent}"/></g>`;
-  }
-  if (type === "skydeck") {
-    return `${basePlatform(accent, true)}<g filter="url(#lift)"><rect x="470" y="440" width="340" height="98" rx="20" fill="#312e81"/><path d="M504 440 L504 592 M776 440 L776 592 M450 488 L830 488" stroke="#c7d2fe" stroke-width="15"/><path d="M642 420 L742 338" stroke="${accent}" stroke-width="22" stroke-linecap="round"/><circle cx="760" cy="322" r="40" fill="#e0e7ff"/><rect x="612" y="414" width="64" height="84" rx="12" fill="#4338ca"/></g>`;
-  }
-  return `${basePlatform(accent, true)}<g filter="url(#lift)"><rect x="456" y="428" width="368" height="176" rx="28" fill="#ede9fe"/><path d="M450 428 Q640 254 830 428 Z" fill="${accent}"/><path d="M552 428 Q640 318 728 428" fill="#c4b5fd"/><circle cx="640" cy="354" r="50" fill="#f8fafc" opacity="0.9"/><path d="M538 508 L742 508 M640 428 L640 604" stroke="#7c3aed" stroke-width="10"/></g>`;
+function objectFor(family, type, accent) {
+  if (family === "buildings") return building(type, accent);
+  if (family === "animals") return animal(type, accent);
+  if (family === "play") return play(type, accent);
+  return special(type, accent);
 }
 
 function overlay(key, accent, family, type) {
-  const night = key.includes("starlight") || key.includes("skywatch") || key.includes("celestial") || key.includes("lumina");
-  const object = family === "water" ? water(type, accent)
-    : family === "training" ? training(type, accent)
-      : family === "garden" ? garden(type, accent)
-        : family === "crossing" ? crossing(type, accent)
-          : family === "boundary" ? boundary(type, accent)
-            : family === "community" ? community(type, accent)
-              : family === "workshop" ? workshop(type, accent)
-                : lookout(type, accent);
+  const night = key === "observatory" || key === "cinema" || key === "arcade" || key === "party_house";
   return Buffer.from(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="${escapeXml(key)} marketplace render">
       ${defs(accent, night)}
       ${sceneGrade(accent, night)}
-      ${object}
+      ${objectFor(family, type, accent)}
       <rect x="38" y="38" width="1204" height="644" rx="52" fill="none" stroke="#ffffff" stroke-opacity="0.26" stroke-width="3"/>
     </svg>`);
 }
@@ -202,24 +190,16 @@ for (const [key, accent, family, type] of items) {
   const webpPath = path.join(outputDir, `${key}.webp`);
   const layeredSvg = overlay(key, accent, family, type);
   writeFileSync(svgPath, layeredSvg);
-  const overlayImage = await sharp(layeredSvg)
-    .resize(1280, 720, { fit: "fill" })
-    .png()
-    .toBuffer();
+  const overlayImage = await sharp(layeredSvg).resize(1280, 720, { fit: "fill" }).png().toBuffer();
+  const night = key === "observatory" || key === "cinema" || key === "arcade" || key === "party_house";
   const backdrop = await sharp(backdropPath)
     .resize(1280, 720, { fit: "cover", position: "center" })
-    .modulate({ brightness: key.includes("skywatch") || key.includes("celestial") ? 0.62 : 1.04, saturation: 1.12 })
-    .blur(0.35)
+    .modulate({ brightness: night ? 0.64 : 1.05, saturation: 1.14 })
+    .blur(0.32)
     .png()
     .toBuffer();
-  const composite = await sharp(backdrop)
-    .composite([{ input: overlayImage }])
-    .png()
-    .toBuffer();
-  await sharp(composite)
-    .resize(960, 540, { fit: "cover" })
-    .webp({ quality: 86, effort: 6 })
-    .toFile(webpPath);
+  const composite = await sharp(backdrop).composite([{ input: overlayImage }]).png().toBuffer();
+  await sharp(composite).resize(960, 540, { fit: "cover" }).webp({ quality: 87, effort: 6 }).toFile(webpPath);
 }
 
-console.log(`Generated ${items.length} premium central-world marketplace WebP renders.`);
+console.log(`Generated ${items.length} launch central-world marketplace WebP renders.`);

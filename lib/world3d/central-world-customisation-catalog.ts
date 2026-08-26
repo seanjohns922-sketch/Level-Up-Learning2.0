@@ -1,14 +1,10 @@
 import type { EconomyItem, EconomyState } from "@/lib/economy";
 
 export type CentralWorldCustomisationArea =
-  | "waterworks"
-  | "training"
-  | "gardens"
-  | "crossing"
-  | "boundary"
-  | "community"
-  | "workshop"
-  | "lookout";
+  | "buildings"
+  | "animals"
+  | "pools_play"
+  | "special";
 
 type CatalogueEntry = {
   plot: number;
@@ -21,40 +17,38 @@ type CatalogueEntry = {
   price: number;
   accent: string;
   icon: string;
+  gridSize: `${number}x${number}`;
 };
 
 const ENTRIES: CatalogueEntry[] = [
-  { plot: 1, area: "waterworks", name: "Reflection Pond", description: "A calm pond beside the Tower path.", assetKey: "reflection_pond", rarity: "common", tier: 1, price: 200, accent: "#38bdf8", icon: "waves" },
-  { plot: 1, area: "waterworks", name: "Willow Lake", description: "A peaceful lake shaded by a willow tree.", assetKey: "willow_lake", rarity: "rare", tier: 2, price: 800, accent: "#0ea5e9", icon: "tree-pine" },
-  { plot: 1, area: "waterworks", name: "Crystal Reservoir", description: "A brilliant reservoir powered by crystal light.", assetKey: "crystal_reservoir", rarity: "legendary", tier: 3, price: 2400, accent: "#8b5cf6", icon: "gem" },
+  { plot: 1, area: "buildings", name: "Clubhouse", description: "Your place to hang out and relax with friends.", assetKey: "clubhouse", rarity: "rare", tier: 2, price: 800, accent: "#2563eb", icon: "house", gridSize: "4x4" },
+  { plot: 1, area: "buildings", name: "Games Room", description: "Arcade games, challenges and tons of fun.", assetKey: "games_room", rarity: "legendary", tier: 3, price: 2400, accent: "#7c3aed", icon: "gamepad-2", gridSize: "4x4" },
+  { plot: 1, area: "buildings", name: "Treehouse", description: "A cosy hideout up in the trees.", assetKey: "treehouse", rarity: "common", tier: 1, price: 200, accent: "#16a34a", icon: "tree-pine", gridSize: "2x2" },
 
-  { plot: 2, area: "training", name: "Practice Court", description: "A simple court for daily training.", assetKey: "practice_court", rarity: "common", tier: 1, price: 200, accent: "#f59e0b", icon: "dumbbell" },
-  { plot: 2, area: "training", name: "Explorer Gym", description: "A dedicated gym for growing explorers.", assetKey: "explorer_gym", rarity: "rare", tier: 2, price: 800, accent: "#f97316", icon: "dumbbell" },
-  { plot: 2, area: "training", name: "Champion Arena", description: "A grand arena built for Tower champions.", assetKey: "champion_arena", rarity: "legendary", tier: 3, price: 2400, accent: "#eab308", icon: "trophy" },
+  { plot: 2, area: "buildings", name: "Training Centre", description: "Train, level up and get stronger every day.", assetKey: "training_centre", rarity: "common", tier: 1, price: 200, accent: "#22c55e", icon: "dumbbell", gridSize: "3x3" },
+  { plot: 2, area: "buildings", name: "Workshop", description: "Build, create and invent awesome things.", assetKey: "workshop", rarity: "rare", tier: 2, price: 800, accent: "#0ea5e9", icon: "wrench", gridSize: "3x3" },
+  { plot: 2, area: "buildings", name: "Observatory", description: "Explore the stars and unlock cosmic discoveries.", assetKey: "observatory", rarity: "legendary", tier: 3, price: 2400, accent: "#8b5cf6", icon: "telescope", gridSize: "4x4" },
 
-  { plot: 3, area: "gardens", name: "Wildflower Garden", description: "A bright garden filled with wildflowers.", assetKey: "wildflower_garden", rarity: "common", tier: 1, price: 200, accent: "#22c55e", icon: "flower-2" },
-  { plot: 3, area: "gardens", name: "Scholar Grove", description: "A shady grove for reading and reflection.", assetKey: "scholar_grove", rarity: "rare", tier: 2, price: 800, accent: "#16a34a", icon: "trees" },
-  { plot: 3, area: "gardens", name: "Starlight Conservatory", description: "A glass garden glowing beneath the stars.", assetKey: "starlight_conservatory", rarity: "legendary", tier: 3, price: 2400, accent: "#a855f7", icon: "sparkles" },
+  { plot: 3, area: "animals", name: "Puppy Yard", description: "A playful yard for happy puppies.", assetKey: "puppy_yard", rarity: "common", tier: 1, price: 200, accent: "#f59e0b", icon: "paw-print", gridSize: "3x3" },
+  { plot: 3, area: "animals", name: "Bunny Garden", description: "A soft garden full of bunny burrows and carrots.", assetKey: "bunny_garden", rarity: "common", tier: 1, price: 200, accent: "#f472b6", icon: "carrot", gridSize: "3x3" },
+  { plot: 3, area: "animals", name: "Pony Paddock", description: "A bright paddock for ponies to trot around.", assetKey: "pony_paddock", rarity: "rare", tier: 2, price: 800, accent: "#a16207", icon: "horseshoe", gridSize: "4x3" },
 
-  { plot: 4, area: "crossing", name: "Timber Footbridge", description: "A sturdy timber crossing for the grounds.", assetKey: "timber_footbridge", rarity: "common", tier: 1, price: 200, accent: "#a16207", icon: "route" },
-  { plot: 4, area: "crossing", name: "Stone Arch Bridge", description: "A lasting stone bridge with a high arch.", assetKey: "stone_arch_bridge", rarity: "rare", tier: 2, price: 800, accent: "#64748b", icon: "landmark" },
-  { plot: 4, area: "crossing", name: "Lumina Bridge", description: "A radiant bridge lit by magical energy.", assetKey: "lumina_bridge", rarity: "legendary", tier: 3, price: 2400, accent: "#06b6d4", icon: "sparkles" },
+  { plot: 4, area: "animals", name: "Farmyard", description: "A cheerful farm space with animals and hay bales.", assetKey: "farmyard", rarity: "rare", tier: 2, price: 800, accent: "#84cc16", icon: "barn", gridSize: "4x4" },
+  { plot: 4, area: "animals", name: "Wildlife Habitat", description: "A nature habitat for curious wildlife.", assetKey: "wildlife_habitat", rarity: "legendary", tier: 3, price: 2400, accent: "#059669", icon: "trees", gridSize: "4x4" },
 
-  { plot: 5, area: "boundary", name: "Garden Fence", description: "A neat fence marking the Tower grounds.", assetKey: "garden_fence", rarity: "common", tier: 1, price: 200, accent: "#84cc16", icon: "fence" },
-  { plot: 5, area: "boundary", name: "Stone Boundary", description: "A strong stone boundary around the grounds.", assetKey: "stone_boundary", rarity: "rare", tier: 2, price: 800, accent: "#78716c", icon: "shield" },
-  { plot: 5, area: "boundary", name: "Crystal Ward", description: "A crystal barrier that watches over the Tower.", assetKey: "crystal_ward", rarity: "legendary", tier: 3, price: 2400, accent: "#c084fc", icon: "shield-check" },
+  { plot: 5, area: "pools_play", name: "Backyard Pool", description: "A cool pool for sunny days in your world.", assetKey: "backyard_pool", rarity: "common", tier: 1, price: 200, accent: "#0ea5e9", icon: "waves", gridSize: "3x2" },
+  { plot: 5, area: "pools_play", name: "Splash Pool", description: "A colourful splash zone with fountains.", assetKey: "splash_pool", rarity: "rare", tier: 2, price: 800, accent: "#06b6d4", icon: "waves", gridSize: "3x3" },
+  { plot: 5, area: "pools_play", name: "Water Park", description: "Slides, water jets and a huge fun zone.", assetKey: "water_park", rarity: "legendary", tier: 3, price: 2400, accent: "#0284c7", icon: "waves", gridSize: "4x4" },
 
-  { plot: 6, area: "community", name: "Picnic Circle", description: "A friendly place to gather and rest.", assetKey: "picnic_circle", rarity: "common", tier: 1, price: 200, accent: "#fb7185", icon: "users" },
-  { plot: 6, area: "community", name: "Explorer Plaza", description: "A lively plaza for explorers to meet.", assetKey: "explorer_plaza", rarity: "rare", tier: 2, price: 800, accent: "#14b8a6", icon: "users-round" },
-  { plot: 6, area: "community", name: "Festival Courtyard", description: "A colourful courtyard for Tower celebrations.", assetKey: "festival_courtyard", rarity: "legendary", tier: 3, price: 2400, accent: "#ec4899", icon: "party-popper" },
+  { plot: 6, area: "pools_play", name: "Adventure Playground", description: "Climbing towers, slides and places to explore.", assetKey: "adventure_playground", rarity: "rare", tier: 2, price: 800, accent: "#f97316", icon: "mountain", gridSize: "4x3" },
+  { plot: 6, area: "pools_play", name: "Trampoline Park", description: "Bounce high in a park made for energy.", assetKey: "trampoline_park", rarity: "common", tier: 1, price: 200, accent: "#22c55e", icon: "circle-dot", gridSize: "3x3" },
 
-  { plot: 7, area: "workshop", name: "Tool Shed", description: "A compact shed for tools and supplies.", assetKey: "tool_shed", rarity: "common", tier: 1, price: 200, accent: "#a16207", icon: "hammer" },
-  { plot: 7, area: "workshop", name: "Maker Workshop", description: "A busy workshop for building new ideas.", assetKey: "maker_workshop", rarity: "rare", tier: 2, price: 800, accent: "#ea580c", icon: "wrench" },
-  { plot: 7, area: "workshop", name: "Inventor Hall", description: "A grand hall for ambitious inventions.", assetKey: "inventor_hall", rarity: "legendary", tier: 3, price: 2400, accent: "#facc15", icon: "lightbulb" },
+  { plot: 7, area: "special", name: "Sports Stadium", description: "Compete and celebrate your biggest wins.", assetKey: "sports_stadium", rarity: "rare", tier: 2, price: 800, accent: "#2563eb", icon: "trophy", gridSize: "4x4" },
+  { plot: 7, area: "special", name: "Cinema", description: "Watch movies with friends in your own cinema.", assetKey: "cinema", rarity: "legendary", tier: 3, price: 2400, accent: "#dc2626", icon: "clapperboard", gridSize: "3x3" },
+  { plot: 7, area: "special", name: "Arcade", description: "Retro games and high score challenges.", assetKey: "arcade", rarity: "rare", tier: 2, price: 800, accent: "#a855f7", icon: "joystick", gridSize: "3x3" },
 
-  { plot: 8, area: "lookout", name: "Trail Lookout", description: "A raised lookout over the Tower grounds.", assetKey: "trail_lookout", rarity: "common", tier: 1, price: 200, accent: "#60a5fa", icon: "binoculars" },
-  { plot: 8, area: "lookout", name: "Skywatch Deck", description: "A high deck made for watching the night sky.", assetKey: "skywatch_deck", rarity: "rare", tier: 2, price: 800, accent: "#6366f1", icon: "telescope" },
-  { plot: 8, area: "lookout", name: "Celestial Observatory", description: "A magnificent observatory for exploring the cosmos.", assetKey: "celestial_observatory", rarity: "legendary", tier: 3, price: 2400, accent: "#7c3aed", icon: "orbit" },
+  { plot: 8, area: "special", name: "Party House", description: "The perfect spot for parties and celebrations.", assetKey: "party_house", rarity: "common", tier: 1, price: 200, accent: "#ec4899", icon: "party-popper", gridSize: "3x3" },
+  { plot: 8, area: "special", name: "Pet Sanctuary", description: "A peaceful place for pets to feel at home.", assetKey: "pet_sanctuary", rarity: "legendary", tier: 3, price: 2400, accent: "#14b8a6", icon: "heart", gridSize: "4x4" },
 ];
 
 export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = ENTRIES.map((entry) => ({
@@ -76,6 +70,8 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = ENTRIES.map((e
     worldPlotId: `customisation-plot-${entry.plot}`,
     worldAssetKey: entry.assetKey,
     worldArea: entry.area,
+    marketplaceCategory: entry.area,
+    gridSize: entry.gridSize,
     tier: entry.tier,
     marketplace_visual: {
       type: "asset",
