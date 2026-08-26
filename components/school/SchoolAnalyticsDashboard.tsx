@@ -97,6 +97,10 @@ const STANDING_STYLE: Record<LevelStanding, { label: string; pill: string; bar: 
 const STANDING_ORDER: LevelStanding[] = ["below", "at", "above"];
 // Sequential ramp for ordinal working levels in the placement view.
 const LEVEL_RAMP = ["#0b6f4c", "#0f9d6b", "#3fb889", "#7fce9f", "#a9dcb3", "#cfe8cc", "#e6e2b0"];
+// Colour a level/grade by its position on the Ground->Year 6 ladder, so the
+// school-grade bar and the working-level bar share colours (Year 3 == Level 3)
+// and any mismatch between them reads as a colour shift.
+const levelColor = (level: string) => { const i = levelIndex(level); return i >= 0 ? LEVEL_RAMP[i] : "#cbd5e1"; };
 
 const JOURNEY_PASS = 85;
 const JOURNEY_LADDER: Array<[string, string]> = [
@@ -652,6 +656,9 @@ export default function SchoolAnalyticsDashboard({
       .map((group) => ({
         ...group,
         levels: [...group.levels.entries()].sort((a, b) => a[0].localeCompare(b[0], "en-AU", { numeric: true })),
+        gradeCounts: [...group.byGrade.entries()]
+          .sort((a, b) => levelIndex(a[0]) - levelIndex(b[0]))
+          .map(([grade, value]) => [grade, value.total] as [string, number]),
         gradeRows: [...group.byGrade.entries()]
           .sort((a, b) => levelIndex(a[0]) - levelIndex(b[0]))
           .map(([grade, value]) => ({
@@ -663,33 +670,6 @@ export default function SchoolAnalyticsDashboard({
         onLevelPct: group.standingTotal ? Math.round(((group.standings.at + group.standings.above) / group.standingTotal) * 100) : null,
       }))
       .sort((a, b) => a.order - b.order);
-  }, [snapshot?.students]);
-
-  // Year level x genre gap: for each grade and strand, how many students sit
-  // below their grade level. The quick "which year is lacking, and in what" view.
-  const placementGradeGenre = useMemo(() => {
-    const students = snapshot?.students ?? [];
-    const cells = new Map<string, { below: number; total: number }>();
-    const strandSet = new Set<AcStrand>();
-    const gradeSet = new Set<string>();
-    for (const student of students) {
-      const grade = student.yearLevel ?? "Not recorded";
-      for (const realm of student.realms) {
-        const strand = strandForRealm(realm.realmId);
-        const standing = levelStanding(student.yearLevel, realm.currentLevel);
-        if (!strand || !standing) continue;
-        strandSet.add(strand);
-        gradeSet.add(grade);
-        const key = `${grade}|${strand}`;
-        const cell = cells.get(key) ?? { below: 0, total: 0 };
-        cell.total += 1;
-        if (standing === "below") cell.below += 1;
-        cells.set(key, cell);
-      }
-    }
-    const strands = [...strandSet].sort((a, b) => AC_STRANDS[a].order - AC_STRANDS[b].order);
-    const grades = [...YEAR_LEVELS, "Not recorded"].filter((g) => gradeSet.has(g));
-    return { cells, strands, grades };
   }, [snapshot?.students]);
 
   // Leadership intervention lens: for each AC9 strand x school year, how many
@@ -945,51 +925,6 @@ export default function SchoolAnalyticsDashboard({
             <p className="mt-1 text-sm text-slate-500">Where students are working now, and their average pre-test starting point per strand.</p>
           </div>
 
-          {placementGradeGenre.grades.length > 0 && placementGradeGenre.strands.length > 0 ? (
-            <article className="border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex flex-wrap items-end justify-between gap-2">
-                <div>
-                  <h4 className="font-bold text-slate-950">Year level vs genre — where&apos;s the gap?</h4>
-                  <p className="mt-1 text-xs text-slate-500">Students working below their grade level, by year and genre. Redder = bigger gap. Tap a cell to see who.</p>
-                </div>
-              </div>
-              <div className="mt-4 overflow-x-auto">
-                <div style={{ minWidth: 120 + placementGradeGenre.strands.length * 96 }}>
-                  <div className="grid gap-1.5 pb-1 text-[10px] font-bold uppercase tracking-[0.06em] text-slate-400" style={{ gridTemplateColumns: `6rem repeat(${placementGradeGenre.strands.length}, minmax(0,1fr))` }}>
-                    <span className="flex items-center">Grade</span>
-                    {placementGradeGenre.strands.map((strand) => <span key={strand} className="text-center">{AC_STRANDS[strand].label}</span>)}
-                  </div>
-                  {placementGradeGenre.grades.map((grade) => (
-                    <div key={grade} className="grid gap-1.5 py-0.5" style={{ gridTemplateColumns: `6rem repeat(${placementGradeGenre.strands.length}, minmax(0,1fr))` }}>
-                      <span className="flex items-center text-sm font-bold text-slate-700">{grade}</span>
-                      {placementGradeGenre.strands.map((strand) => {
-                        const cell = placementGradeGenre.cells.get(`${grade}|${strand}`);
-                        if (!cell || cell.total === 0) return <span key={strand} className="flex h-11 items-center justify-center rounded-md bg-slate-50 text-xs text-slate-300">—</span>;
-                        const pctBelow = cell.below / cell.total;
-                        const bg = cell.below === 0
-                          ? "color-mix(in srgb, #0f9d6b 15%, transparent)"
-                          : `color-mix(in srgb, #c2534d ${18 + Math.round(pctBelow * 62)}%, transparent)`;
-                        return (
-                          <button
-                            key={strand}
-                            type="button"
-                            onClick={() => { setRealmId(strand); if (grade !== "Not recorded") setYearLevel(grade); setTab("students"); }}
-                            title={`${grade} · ${AC_STRANDS[strand].label}: ${cell.below} of ${cell.total} below level`}
-                            className="flex h-11 flex-col items-center justify-center rounded-md font-black tabular-nums text-slate-900 transition hover:ring-2 hover:ring-rose-400"
-                            style={{ background: bg }}
-                          >
-                            <span className="text-sm leading-none">{cell.below}</span>
-                            <span className="text-[10px] font-semibold leading-none text-slate-500">of {cell.total}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </article>
-          ) : null}
-
           {placementByStrand.length === 0 ? (
             <p className="border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">No placement evidence in this view.</p>
           ) : (
@@ -1001,20 +936,42 @@ export default function SchoolAnalyticsDashboard({
                     <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">Baseline {formatPercent(group.baseline)}</span>
                   </div>
                   <p className="mt-1 text-xs text-slate-500">{group.placed} placements</p>
-                  <div className="mt-4 flex h-4 w-full overflow-hidden rounded-full bg-slate-100">
-                    {group.levels.map(([level, count], index) => (
-                      <div key={level} title={`${level}: ${count}`} style={{ width: `${(count / group.placed) * 100}%`, background: LEVEL_RAMP[index % LEVEL_RAMP.length] }} />
-                    ))}
+                  <div className="mt-4 space-y-5">
+                    <div>
+                      <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">Students by school year</p>
+                      <div className="flex h-4 w-full overflow-hidden rounded-full bg-slate-100">
+                        {group.gradeCounts.map(([grade, count]) => (
+                          <div key={grade} title={`${grade}: ${count}`} style={{ width: `${(count / group.placed) * 100}%`, background: levelColor(grade) }} />
+                        ))}
+                      </div>
+                      <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                        {group.gradeCounts.map(([grade, count]) => (
+                          <li key={grade} className="flex items-center gap-2">
+                            <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: levelColor(grade) }} />
+                            <span className="min-w-0 flex-1 truncate font-semibold text-slate-700">{grade}</span>
+                            <span className="tabular-nums text-slate-500">{count}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">Students by working level</p>
+                      <div className="flex h-4 w-full overflow-hidden rounded-full bg-slate-100">
+                        {group.levels.map(([level, count]) => (
+                          <div key={level} title={`${level}: ${count}`} style={{ width: `${(count / group.placed) * 100}%`, background: levelColor(level) }} />
+                        ))}
+                      </div>
+                      <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                        {group.levels.map(([level, count]) => (
+                          <li key={level} className="flex items-center gap-2">
+                            <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: levelColor(level) }} />
+                            <span className="min-w-0 flex-1 truncate font-semibold text-slate-700">{level}</span>
+                            <span className="tabular-nums text-slate-500">{count}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                  <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-                    {group.levels.map(([level, count], index) => (
-                      <li key={level} className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: LEVEL_RAMP[index % LEVEL_RAMP.length] }} />
-                        <span className="min-w-0 flex-1 truncate font-semibold text-slate-700">{level}</span>
-                        <span className="tabular-nums text-slate-500">{count}</span>
-                      </li>
-                    ))}
-                  </ul>
                   <div className="mt-5 border-t border-slate-100 pt-4">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">School grade → working level</p>
