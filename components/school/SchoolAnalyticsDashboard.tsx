@@ -24,15 +24,18 @@ import type {
 } from "@/lib/school-platform-server";
 import {
   type AchievementBand,
+  type AcStrand,
   AC_STRANDS,
   BAND_LABEL,
   bandFor,
+  strandForRealm,
 } from "@/lib/curriculum/ac-standards";
 
 type AnalyticsTab =
   | "overview"
   | "growth"
   | "curriculum"
+  | "placement"
   | "engagement"
   | "classes"
   | "students";
@@ -49,6 +52,7 @@ const TABS: Array<{ id: AnalyticsTab; label: string }> = [
   { id: "overview", label: "Overview" },
   { id: "growth", label: "Growth" },
   { id: "curriculum", label: "Curriculum" },
+  { id: "placement", label: "Placement" },
   { id: "engagement", label: "Engagement" },
   { id: "classes", label: "Classes" },
   { id: "students", label: "Students" },
@@ -76,6 +80,8 @@ const BAND_STYLE: Record<AchievementBand, { label: string; pill: string; bar: st
   working_towards: { label: "Working towards", pill: "bg-rose-100 text-rose-800", bar: "#c2534d" },
 };
 const BAND_ORDER: AchievementBand[] = ["above", "at", "working_towards"];
+// Sequential ramp for ordinal working levels in the placement view.
+const LEVEL_RAMP = ["#0b6f4c", "#0f9d6b", "#3fb889", "#7fce9f", "#a9dcb3", "#cfe8cc", "#e6e2b0"];
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-AU", {
   day: "numeric",
@@ -383,6 +389,35 @@ export default function SchoolAnalyticsDashboard({
       .sort((a, b) => a.order - b.order);
   }, [snapshot?.curriculum]);
 
+  // Placement baseline: where students currently sit per AC9 strand (working
+  // level distribution) and their average pre-test starting point. This is the
+  // foundation the future weighted overall-maths level builds on.
+  const placementByStrand = useMemo(() => {
+    const students = snapshot?.students ?? [];
+    const groups = new Map<string, { key: string; label: string; order: number; levels: Map<string, number>; preSum: number; preCount: number; placed: number }>();
+    for (const student of students) {
+      for (const realm of student.realms) {
+        const strand: AcStrand | null = strandForRealm(realm.realmId);
+        const key = strand ?? "other";
+        const label = strand ? AC_STRANDS[strand].label : "Other";
+        const order = strand ? AC_STRANDS[strand].order : 99;
+        const group = groups.get(key) ?? { key, label, order, levels: new Map(), preSum: 0, preCount: 0, placed: 0 };
+        const level = realm.currentLevel ?? "Not placed";
+        group.levels.set(level, (group.levels.get(level) ?? 0) + 1);
+        group.placed += 1;
+        if (realm.pretestScore !== null) { group.preSum += realm.pretestScore; group.preCount += 1; }
+        groups.set(key, group);
+      }
+    }
+    return [...groups.values()]
+      .map((group) => ({
+        ...group,
+        levels: [...group.levels.entries()].sort((a, b) => a[0].localeCompare(b[0], "en-AU", { numeric: true })),
+        baseline: group.preCount ? Math.round(group.preSum / group.preCount) : null,
+      }))
+      .sort((a, b) => a.order - b.order);
+  }, [snapshot?.students]);
+
   if (loading && !snapshot) return <LoadingView />;
 
   if (error && !snapshot) {
@@ -588,6 +623,44 @@ export default function SchoolAnalyticsDashboard({
                 </article>
               );
             })
+          )}
+        </div>
+      ) : null}
+
+      {tab === "placement" ? (
+        <div className="space-y-5">
+          <div>
+            <h3 className="font-bold text-slate-950">Placement baseline by AC9 strand</h3>
+            <p className="mt-1 text-sm text-slate-500">Where students are working now, and their average pre-test starting point per strand.</p>
+          </div>
+          {placementByStrand.length === 0 ? (
+            <p className="border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">No placement evidence in this view.</p>
+          ) : (
+            <div className="grid gap-4 lg:grid-cols-2">
+              {placementByStrand.map((group) => (
+                <article key={group.key} className="border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <h4 className="font-bold text-slate-950">{group.label}</h4>
+                    <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">Baseline {formatPercent(group.baseline)}</span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">{group.placed} placements</p>
+                  <div className="mt-4 flex h-4 w-full overflow-hidden rounded-full bg-slate-100">
+                    {group.levels.map(([level, count], index) => (
+                      <div key={level} title={`${level}: ${count}`} style={{ width: `${(count / group.placed) * 100}%`, background: LEVEL_RAMP[index % LEVEL_RAMP.length] }} />
+                    ))}
+                  </div>
+                  <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                    {group.levels.map(([level, count], index) => (
+                      <li key={level} className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: LEVEL_RAMP[index % LEVEL_RAMP.length] }} />
+                        <span className="min-w-0 flex-1 truncate font-semibold text-slate-700">{level}</span>
+                        <span className="tabular-nums text-slate-500">{count}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
           )}
         </div>
       ) : null}
