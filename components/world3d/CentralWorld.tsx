@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
@@ -14,7 +14,19 @@ import {
   type WorldMoveInput,
 } from "@/components/world3d/SharedWorldPlayer";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
-import { CENTRAL_WORLD_ANCHORS, CENTRAL_WORLD_CONFIG, type CentralWorldQuality } from "@/lib/world3d/central-world-config";
+import { economyErrorMessage, fetchDemoEconomy, fetchStudentEconomy, type EconomyItem } from "@/lib/economy";
+import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import {
+  CENTRAL_WORLD_ANCHORS,
+  CENTRAL_WORLD_CONFIG,
+  CENTRAL_WORLD_CUSTOMISATION_PLOTS,
+  type CentralWorldQuality,
+} from "@/lib/world3d/central-world-config";
+import {
+  CENTRAL_WORLD_CUSTOMISATION_CATALOG,
+  getEquippedCentralWorldItems,
+  mergeCentralWorldCatalogue,
+} from "@/lib/world3d/central-world-customisation-catalog";
 import { rememberCentralWorldHomeEntry } from "@/lib/world3d/world-navigation-context";
 
 type CentralWorldMetrics = {
@@ -58,7 +70,7 @@ function CentralWorldMetricsReporter({ quality }: { quality: CentralWorldQuality
   return null;
 }
 
-function CentralWorldScene({ quality, moveInput, spawnTarget, spawnNonce, onActiveTarget }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; spawnTarget: [number, number, number] | null; spawnNonce: number; onActiveTarget: (id: string | null) => void }) {
+function CentralWorldScene({ quality, moveInput, spawnTarget, spawnNonce, equippedCustomisationPlots, onActiveTarget }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; spawnTarget: [number, number, number] | null; spawnNonce: number; equippedCustomisationPlots: Record<string, EconomyItem>; onActiveTarget: (id: string | null) => void }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   const handleNearestTarget = useCallback((id: string | null) => {
     setActiveTargetId(id);
@@ -72,7 +84,13 @@ function CentralWorldScene({ quality, moveInput, spawnTarget, spawnNonce, onActi
       <ambientLight intensity={0.45} color="#fff3da" />
       <directionalLight position={[-24, 35, 18]} intensity={2.1} color="#ffd18a" />
       <directionalLight position={[18, 16, -16]} intensity={0.4} color="#b9dcff" />
-      <CentralWorldEnvironment quality={quality} entranceActive={activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance} homeActive={activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance} />
+      <CentralWorldEnvironment
+        quality={quality}
+        entranceActive={activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance}
+        homeActive={activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance}
+        activeCustomisationPlotId={activeTargetId}
+        equippedCustomisationPlots={equippedCustomisationPlots}
+      />
       <SharedThirdPersonPlayer
         initialPosition={CENTRAL_WORLD_CONFIG.spawnPoint}
         spawnTarget={spawnTarget}
@@ -83,6 +101,7 @@ function CentralWorldScene({ quality, moveInput, spawnTarget, spawnNonce, onActi
         interactionTargets={[
           { id: CENTRAL_WORLD_ANCHORS.towerMainEntrance, position: CENTRAL_WORLD_CONFIG.towerMainEntrance, distance: 3.8 },
           { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: CENTRAL_WORLD_CONFIG.myHomeEntrance, distance: 3.4 },
+          ...CENTRAL_WORLD_CUSTOMISATION_PLOTS.map((plot) => ({ id: plot.id, position: plot.position, distance: 3.8 })),
         ]}
         onNearestTargetId={handleNearestTarget}
         cameraDistance={11.5}
@@ -115,6 +134,34 @@ export default function CentralWorld() {
   );
   const [spawnNonce, setSpawnNonce] = useState(0);
   const [showIntro, setShowIntro] = useState(false);
+  const [equippedCustomisationPlots, setEquippedCustomisationPlots] = useState<Record<string, EconomyItem>>({});
+  const [economyMessage, setEconomyMessage] = useState<string | null>(null);
+  const activeCustomisationPlot = CENTRAL_WORLD_CUSTOMISATION_PLOTS.find((plot) => plot.id === activeTargetId);
+  const activePlotEquipped = activeCustomisationPlot ? Boolean(equippedCustomisationPlots[activeCustomisationPlot.id]) : false;
+  const hasAvailableAction = activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance || Boolean(activeCustomisationPlot && !activePlotEquipped);
+  const student = useMemo(() => getActiveStudentProfile(), []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const request = preview
+      ? fetchDemoEconomy(CENTRAL_WORLD_CUSTOMISATION_CATALOG)
+      : student?.studentId
+        ? fetchStudentEconomy(student.studentId)
+        : null;
+    if (!request) return;
+    void request
+      .then((next) => {
+        if (cancelled) return;
+        const merged = mergeCentralWorldCatalogue(next);
+        setEquippedCustomisationPlots(getEquippedCentralWorldItems(merged));
+      })
+      .catch((error) => {
+        if (!cancelled) setEconomyMessage(economyErrorMessage(error));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [preview, student?.studentId]);
 
   useEffect(() => {
     const key = "lul:central-world:intro-seen:v1";
@@ -135,10 +182,14 @@ export default function CentralWorld() {
       router.push("/home-base");
       return;
     }
+    if (activeCustomisationPlot && !activePlotEquipped) {
+      router.push(preview ? "/marketplace?teacher_preview=1" : "/marketplace");
+      return;
+    }
     if (activeTargetId !== CENTRAL_WORLD_ANCHORS.towerMainEntrance) return;
     setTransitioning(true);
     window.setTimeout(() => router.push(preview ? "/world/tower?teacher_preview=1" : "/world/tower"), 500);
-  }, [activeTargetId, preview, router, transitioning]);
+  }, [activeCustomisationPlot, activePlotEquipped, activeTargetId, preview, router, transitioning]);
 
   function teleport(position: [number, number, number]) {
     setSpawnTarget(position);
@@ -148,16 +199,25 @@ export default function CentralWorld() {
   return (
     <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", background: "#69afe4" }}>
       <Canvas camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
-        <CentralWorldScene quality={quality} moveInput={moveInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} onActiveTarget={setActiveTargetId} />
+        <CentralWorldScene quality={quality} moveInput={moveInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} equippedCustomisationPlots={equippedCustomisationPlots} onActiveTarget={setActiveTargetId} />
       </Canvas>
 
       <WorldHUD context="central" preview={preview} accent="#efbd61" fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} />
 
       <WorldMovePad input={moveInput} onChange={setMoveInput} />
-      {activeTargetId ? <WorldInteractionPrompt location={activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? "MY HOME" : "TOWER OF KNOWLEDGE"} status={activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? "Your personal Level Up space" : "Realm Chamber"} actionLabel={activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? "ENTER MY HOME" : "ENTER TOWER"} onAction={runActiveAction} /> : null}
-      <KeyboardWorldAction enabled={Boolean(activeTargetId)} onAction={runActiveAction} />
+      {activeTargetId ? (
+        <WorldInteractionPrompt
+          location={activeCustomisationPlot ? "CUSTOMISATION AREA" : activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? "MY HOME" : "TOWER OF KNOWLEDGE"}
+          status={activeCustomisationPlot ? activePlotEquipped ? equippedCustomisationPlots[activeCustomisationPlot.id].name : "Unlock a world feature in the Marketplace." : activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? "Your personal Level Up space" : "Realm Chamber"}
+          actionLabel={activeCustomisationPlot ? activePlotEquipped ? "INSTALLED" : "OPEN MARKETPLACE" : activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? "ENTER MY HOME" : "ENTER TOWER"}
+          disabled={Boolean(activeCustomisationPlot && activePlotEquipped)}
+          onAction={runActiveAction}
+        />
+      ) : null}
+      <KeyboardWorldAction enabled={hasAvailableAction} onAction={runActiveAction} />
 
-      {debug ? <div style={{ position: "absolute", right: 16, bottom: 130, display: "flex", gap: 6, zIndex: 30 }}><button type="button" onClick={() => teleport(CENTRAL_WORLD_CONFIG.spawnPoint)} style={debugButton}>SPAWN</button><button type="button" onClick={() => teleport(CENTRAL_WORLD_CONFIG.myHomeExitSpawn)} style={debugButton}>HOME</button><button type="button" onClick={() => teleport(CENTRAL_WORLD_CONFIG.towerPlaza)} style={debugButton}>PLAZA</button></div> : null}
+      {debug ? <div style={{ position: "absolute", right: 16, bottom: 130, display: "flex", gap: 6, zIndex: 30 }}><button type="button" onClick={() => teleport(CENTRAL_WORLD_CONFIG.spawnPoint)} style={debugButton}>SPAWN</button><button type="button" onClick={() => teleport(CENTRAL_WORLD_CONFIG.myHomeExitSpawn)} style={debugButton}>HOME</button><button type="button" onClick={() => teleport(CENTRAL_WORLD_CONFIG.towerPlaza)} style={debugButton}>PLAZA</button><button type="button" onClick={() => teleport(CENTRAL_WORLD_CUSTOMISATION_PLOTS[0].position)} style={debugButton}>PLOTS</button></div> : null}
+      {economyMessage ? <div style={{ position: "absolute", left: 16, bottom: 126, maxWidth: 360, zIndex: 30, border: "1px solid rgba(146,64,14,.28)", borderRadius: 6, background: "rgba(255,251,235,.94)", color: "#78350f", padding: "10px 12px", fontSize: 12, fontWeight: 800 }}>{economyMessage}</div> : null}
       {showIntro ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(24,31,25,.22)", color: "#fff8e8", pointerEvents: "none", animation: "centralWorldReveal 2.3s ease both" }}><div style={{ textAlign: "center", textShadow: "0 3px 18px rgba(0,0,0,.4)" }}><div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.24em" }}>THE LEVEL UP WORLD</div><div style={{ marginTop: 8, fontSize: 30, fontWeight: 900 }}>Tower of Knowledge</div></div><style>{`@keyframes centralWorldReveal{0%{opacity:1;background:rgba(10,15,11,1)}25%,70%{opacity:1}100%{opacity:0}}`}</style></div> : null}
       {transitioning ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "#211914", color: "#fff0c9", fontWeight: 900, letterSpacing: "0.16em", zIndex: 20 }}>ENTERING THE TOWER...</div> : null}
     </main>

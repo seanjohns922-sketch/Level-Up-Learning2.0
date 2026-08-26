@@ -5,35 +5,46 @@ import * as Icons from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
 import MarketplaceItemImage from "@/components/economy/MarketplaceItemImage";
-import { economyErrorMessage, equipEconomyItem, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyCategory, type EconomyItem, type EconomyState } from "@/lib/economy";
+import { economyErrorMessage, equipEconomyItem, fetchDemoEconomy, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyCategory, type EconomyItem, type EconomyState } from "@/lib/economy";
 import { isMarketplaceItemAvailable, isMarketplaceItemListed } from "@/lib/marketplace-visuals";
+import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { persistCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
+import {
+  CENTRAL_WORLD_CUSTOMISATION_CATALOG,
+  mergeCentralWorldCatalogue,
+} from "@/lib/world3d/central-world-customisation-catalog";
 
 const CATEGORIES: Array<{ id: "all" | EconomyCategory; label: string }> = [
   { id: "all", label: "All" }, { id: "avatar", label: "Avatar" }, { id: "pet", label: "Pets" },
   { id: "home", label: "Home Base" }, { id: "background", label: "Backgrounds" },
-  { id: "trail", label: "Trails" }, { id: "title", label: "Titles" },
+  { id: "decoration", label: "World Plots" }, { id: "trail", label: "Trails" }, { id: "title", label: "Titles" },
 ];
 
 export default function MarketplacePage() {
   const student = useMemo(() => getActiveStudentProfile(), []);
+  const preview = isDemoPreviewMode();
+  const studentId = student?.studentId ?? (preview ? "demo-preview" : null);
   const [state, setState] = useState<EconomyState | null>(null);
   const [category, setCategory] = useState<"all" | EconomyCategory>("all");
   const [selected, setSelected] = useState<EconomyItem | null>(null);
   const [brokenArtworkIds, setBrokenArtworkIds] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const sessionMessage = student?.studentId ? null : "Log in as a student to open the Marketplace.";
+  const sessionMessage = studentId ? null : "Log in as a student to open the Marketplace.";
 
   useEffect(() => {
-    if (!student?.studentId) return;
-    fetchStudentEconomy(student.studentId).then((next) => {
+    if (!studentId) return;
+    const request = preview
+      ? fetchDemoEconomy(CENTRAL_WORLD_CUSTOMISATION_CATALOG)
+      : fetchStudentEconomy(studentId);
+    request.then((next) => {
+      next = mergeCentralWorldCatalogue(next);
       setState(next);
-      persistCanonicalAvatarAppearance(student.studentId, next);
+      persistCanonicalAvatarAppearance(studentId, next);
       setSelected(next.items.find(isMarketplaceItemListed) ?? null);
     }).catch((error) => setMessage(economyErrorMessage(error)));
-  }, [student?.studentId]);
+  }, [preview, studentId]);
 
   const owned = useMemo(() => new Set(state?.inventory.map((entry) => entry.item_key) ?? []), [state?.inventory]);
   const equipped = useMemo(() => new Set(Object.values(state?.equipped ?? {})), [state?.equipped]);
@@ -55,14 +66,15 @@ export default function MarketplacePage() {
     : currentAvatarOutfit;
 
   async function act() {
-    if (!student?.studentId || !selected || busy || selectedUnavailable) return;
+    if (!studentId || !selected || busy || selectedUnavailable) return;
     setBusy(true); setMessage(null);
     try {
       const next = selectedOwned
-        ? await equipEconomyItem(student.studentId, selected.item_key)
-        : await purchaseEconomyItem(student.studentId, selected.item_key);
-      setState(next);
-      persistCanonicalAvatarAppearance(student.studentId, next);
+        ? await equipEconomyItem(studentId, selected.item_key, CENTRAL_WORLD_CUSTOMISATION_CATALOG, preview)
+        : await purchaseEconomyItem(studentId, selected.item_key, CENTRAL_WORLD_CUSTOMISATION_CATALOG, preview);
+      const merged = mergeCentralWorldCatalogue(next);
+      setState(merged);
+      persistCanonicalAvatarAppearance(studentId, merged);
       setMessage(selectedOwned ? `${selected.name} is now equipped.` : `${selected.name} added to your collection.`);
     } catch (error) { setMessage(economyErrorMessage(error)); }
     finally { setBusy(false); }

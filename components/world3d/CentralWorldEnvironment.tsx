@@ -4,7 +4,12 @@ import { Html, RoundedBox, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { CENTRAL_WORLD_CONFIG, type CentralWorldQuality } from "@/lib/world3d/central-world-config";
+import {
+  CENTRAL_WORLD_CONFIG,
+  CENTRAL_WORLD_CUSTOMISATION_PLOTS,
+  type CentralWorldQuality,
+} from "@/lib/world3d/central-world-config";
+import type { EconomyItem } from "@/lib/economy";
 import { WorldPanorama } from "@/components/world3d/WorldPanorama";
 
 const COLORS = {
@@ -72,6 +77,92 @@ function MyHomePath() {
   return <group><mesh geometry={geometries.edge}><meshStandardMaterial color={COLORS.pathEdge} roughness={1} side={THREE.DoubleSide} /></mesh><mesh geometry={geometries.path}><meshStandardMaterial color={COLORS.path} roughness={0.96} side={THREE.DoubleSide} /></mesh></group>;
 }
 
+function CustomisationPath({ pathPoints }: { pathPoints: Array<[number, number]> }) {
+  const geometries = useMemo(() => {
+    const curve = new THREE.CatmullRomCurve3(pathPoints.map(([x, z]) => new THREE.Vector3(x, 0, z)));
+    const ribbon = (width: number, y: number) => {
+      const vertices: number[] = [];
+      const indices: number[] = [];
+      const segments = 24;
+      for (let index = 0; index <= segments; index += 1) {
+        const point = curve.getPoint(index / segments);
+        const tangent = curve.getTangent(index / segments).normalize();
+        const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).multiplyScalar(width / 2);
+        vertices.push(point.x + normal.x, y, point.z + normal.z, point.x - normal.x, y, point.z - normal.z);
+        if (index < segments) indices.push(index * 2, index * 2 + 1, index * 2 + 2, index * 2 + 1, index * 2 + 3, index * 2 + 2);
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+      return geometry;
+    };
+    return { edge: ribbon(2.1, 0.05), path: ribbon(1.55, 0.08) };
+  }, [pathPoints]);
+
+  useEffect(() => () => {
+    geometries.edge.dispose();
+    geometries.path.dispose();
+  }, [geometries]);
+
+  return (
+    <group>
+      <mesh geometry={geometries.edge}><meshStandardMaterial color={COLORS.pathEdge} roughness={1} side={THREE.DoubleSide} /></mesh>
+      <mesh geometry={geometries.path}><meshStandardMaterial color={COLORS.path} roughness={0.96} side={THREE.DoubleSide} /></mesh>
+    </group>
+  );
+}
+
+function CustomisationPaths() {
+  return (
+    <group>
+      {CENTRAL_WORLD_CUSTOMISATION_PLOTS.map((plot) => <CustomisationPath key={`${plot.id}-path`} pathPoints={plot.pathPoints} />)}
+    </group>
+  );
+}
+
+function LockedCustomisationPlot({ position, active }: { position: [number, number, number]; active: boolean }) {
+  return (
+    <group position={[position[0], 0, position[2]]}>
+      <mesh position={[0, 0.1, 0]} receiveShadow><cylinderGeometry args={[3.05, 3.3, 0.2, 32]} /><meshStandardMaterial color={active ? "#bea862" : "#756d59"} roughness={0.95} /></mesh>
+      <mesh position={[0, 0.22, 0]} receiveShadow><cylinderGeometry args={[2.72, 2.86, 0.12, 32]} /><meshStandardMaterial color={active ? "#5a684d" : "#454d42"} roughness={1} /></mesh>
+      <group position={[0, 0.88, 0]}>
+        <mesh position={[0, 0.32, 0]} castShadow><torusGeometry args={[0.34, 0.09, 10, 24]} /><meshStandardMaterial color={active ? "#ffe08a" : "#c9b776"} metalness={0.3} roughness={0.55} /></mesh>
+        <RoundedBox args={[0.95, 0.78, 0.38]} radius={0.12} smoothness={4} castShadow><meshStandardMaterial color={active ? "#f1ca5f" : "#9a8548"} metalness={0.25} roughness={0.58} /></RoundedBox>
+        <mesh position={[0, -0.04, 0.205]}><circleGeometry args={[0.09, 18]} /><meshStandardMaterial color="#302a20" roughness={0.8} /></mesh>
+      </group>
+      {([[-2.45, 0.34, 0], [2.45, 0.34, 0], [0, 0.34, -2.45], [0, 0.34, 2.45]] as Array<[number, number, number]>).map(([x, y, z], index) => (
+        <mesh key={index} position={[x, y, z]} castShadow receiveShadow><cylinderGeometry args={[0.22, 0.3, 0.52, 8]} /><meshStandardMaterial color="#8d846c" roughness={0.95} /></mesh>
+      ))}
+    </group>
+  );
+}
+
+function EquippedCustomisationPlot({ item, position, active }: { item: EconomyItem; position: [number, number, number]; active: boolean }) {
+  const tier = Number(item.metadata.tier ?? 1);
+  const accent = item.accent || "#38bdf8";
+  const height = tier === 3 ? 3.2 : tier === 2 ? 2.35 : 1.55;
+  const radius = tier === 3 ? 1.72 : tier === 2 ? 1.42 : 1.12;
+  return (
+    <group position={[position[0], 0, position[2]]}>
+      <mesh position={[0, 0.1, 0]} receiveShadow><cylinderGeometry args={[3.25, 3.45, 0.2, 36]} /><meshStandardMaterial color={active ? "#f1c96a" : "#a8905f"} roughness={0.9} /></mesh>
+      <mesh position={[0, 0.23, 0]} receiveShadow><cylinderGeometry args={[2.85, 3.02, 0.14, 36]} /><meshStandardMaterial color="#526d46" roughness={1} /></mesh>
+      <RoundedBox args={[radius * 1.9, height, radius * 1.55]} radius={0.18} smoothness={3} position={[0, 0.34 + height / 2, 0]} castShadow>
+        <meshStandardMaterial color={accent} roughness={0.58} metalness={tier === 3 ? 0.28 : 0.08} emissive={active ? accent : "#000000"} emissiveIntensity={active ? 0.12 : 0} />
+      </RoundedBox>
+      {tier >= 2 ? (
+        <mesh position={[0, height + 0.88, 0]} castShadow><coneGeometry args={[radius * 1.25, 1.1, 5]} /><meshStandardMaterial color="#f5d071" roughness={0.52} metalness={0.18} /></mesh>
+      ) : null}
+      {tier >= 3 ? (
+        <mesh position={[0, height + 1.62, 0]} castShadow><octahedronGeometry args={[0.58, 0]} /><meshStandardMaterial color="#fff3b0" emissive="#f4c95f" emissiveIntensity={0.55} metalness={0.35} roughness={0.38} /></mesh>
+      ) : null}
+      <Html center position={[0, height + 1.25, 0]} distanceFactor={16} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div>
+      </Html>
+    </group>
+  );
+}
+
 function MeadowGround() {
   const sourceTexture = useTexture("/images/central-world-grass-tile.png");
   const texture = useMemo(() => {
@@ -92,10 +183,10 @@ function MeadowGround() {
 
 function GrassTufts({ quality }: { quality: CentralWorldQuality }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const count = quality === "low" ? 70 : quality === "medium" ? 150 : 260;
+  const count = quality === "low" ? 85 : quality === "medium" ? 180 : 310;
   const transforms = useMemo(() => Array.from({ length: count }, (_, index) => {
-    const x = ((index * 17.13) % 78) - 39;
-    const z = ((index * 29.71) % 50) - 25;
+    const x = ((index * 17.13) % 92) - 46;
+    const z = ((index * 29.71) % 86) - 32;
     const nearPath = Math.abs(x - Math.sin(z * 0.16)) < 3.2;
     return { x: nearPath ? x + (x < 0 ? -3.8 : 3.8) : x, z, scale: 0.5 + ((index * 7) % 10) / 18 };
   }), [count]);
@@ -263,7 +354,7 @@ function PlaceholderMyHome({ active }: { active: boolean }) {
   );
 }
 
-export function CentralWorldEnvironment({ quality, entranceActive, homeActive }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean }) {
+export function CentralWorldEnvironment({ quality, entranceActive, homeActive, activeCustomisationPlotId, equippedCustomisationPlots = {} }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; activeCustomisationPlotId?: string | null; equippedCustomisationPlots?: Record<string, EconomyItem> }) {
   return (
     <group>
       <Suspense fallback={null}>
@@ -274,9 +365,16 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive }:
       </Suspense>
       <ValleyPath />
       <MyHomePath />
+      <CustomisationPaths />
       <GrassTufts quality={quality} />
       <PlaceholderKnowledgeTower active={entranceActive} />
       <PlaceholderMyHome active={homeActive} />
+      {CENTRAL_WORLD_CUSTOMISATION_PLOTS.map((plot) => {
+        const equipped = equippedCustomisationPlots[plot.id];
+        return equipped
+          ? <EquippedCustomisationPlot key={plot.id} item={equipped} position={plot.position} active={activeCustomisationPlotId === plot.id} />
+          : <LockedCustomisationPlot key={plot.id} position={plot.position} active={activeCustomisationPlotId === plot.id} />;
+      })}
     </group>
   );
 }

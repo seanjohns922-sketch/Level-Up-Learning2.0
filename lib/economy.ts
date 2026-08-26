@@ -163,8 +163,20 @@ function buildDemoEconomyState(items: EconomyItem[]): EconomyState {
   };
 }
 
-export async function fetchDemoEconomy(): Promise<EconomyState> {
-  return buildDemoEconomyState(await fetchEconomyCatalog());
+function mergeEconomyItems(items: EconomyItem[], fallbackItems: EconomyItem[]) {
+  const merged = new Map(fallbackItems.map((item) => [item.item_key, item]));
+  for (const item of items) merged.set(item.item_key, item);
+  return Array.from(merged.values());
+}
+
+export async function fetchDemoEconomy(fallbackItems: EconomyItem[] = []): Promise<EconomyState> {
+  let catalog: EconomyItem[] = [];
+  try {
+    catalog = await fetchEconomyCatalog();
+  } catch {
+    // Demo review must still work before a catalogue migration is deployed.
+  }
+  return buildDemoEconomyState(mergeEconomyItems(catalog, fallbackItems));
 }
 
 /**
@@ -220,9 +232,14 @@ export async function fetchGlobalXp(studentId: string) {
   };
 }
 
-export async function purchaseEconomyItem(studentId: string, itemKey: string) {
+export async function purchaseEconomyItem(
+  studentId: string,
+  itemKey: string,
+  fallbackItems: EconomyItem[] = [],
+  forceDemo = false,
+) {
   // Demo owns everything already — treat a "buy" as a no-op refresh.
-  if (isDemoPreviewMode()) return fetchDemoEconomy();
+  if (forceDemo || isDemoPreviewMode()) return fetchDemoEconomy(fallbackItems);
   const { data, error } = await supabase.rpc("purchase_economy_item_secure", {
     p_student_id: studentId,
     p_item_key: itemKey,
@@ -232,9 +249,20 @@ export async function purchaseEconomyItem(studentId: string, itemKey: string) {
   return normalizeEconomyState(data);
 }
 
-export async function equipEconomyItem(studentId: string, itemKey: string) {
-  if (isDemoPreviewMode()) {
-    const items = await fetchEconomyCatalog();
+export async function equipEconomyItem(
+  studentId: string,
+  itemKey: string,
+  fallbackItems: EconomyItem[] = [],
+  forceDemo = false,
+) {
+  if (forceDemo || isDemoPreviewMode()) {
+    let catalog: EconomyItem[] = [];
+    try {
+      catalog = await fetchEconomyCatalog();
+    } catch {
+      // The fallback catalogue is authoritative in isolated demo review.
+    }
+    const items = mergeEconomyItems(catalog, fallbackItems);
     const slot = demoSlotFor(items.find((item) => item.item_key === itemKey));
     if (slot) {
       const equipped = readDemoJson<Record<string, string>>(DEMO_EQUIPPED_STORAGE_KEY, {});
