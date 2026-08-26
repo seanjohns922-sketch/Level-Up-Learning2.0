@@ -237,6 +237,25 @@ export type SchoolAnalyticsSnapshot = {
   };
 };
 
+export type StudentLearningJourney = {
+  student: {
+    id: string;
+    name: string;
+    yearLevel: string | null;
+    className: string;
+  };
+  levels: Array<{
+    realmId: string;
+    workingLevel: string;
+    isCurrent: boolean;
+    currentWeek: number | null;
+    status: string;
+    pretestScore: number | null;
+    posttestScore: number | null;
+    posttestCompletedAt: string | null;
+  }>;
+};
+
 export function isSchoolPlatformPreviewEnabled() {
   return process.env.SCHOOL_PLATFORM_PREVIEW_ENABLED !== "false";
 }
@@ -531,6 +550,24 @@ export async function loadSchoolAnalyticsSnapshot(
   );
 
   return enrichCurriculumWithStandards(snapshot);
+}
+
+export async function loadStudentLearningJourney(
+  schoolId: string,
+  studentId: string,
+  accessToken = "",
+) {
+  const access = await requireSchoolPreviewAccess(schoolId, accessToken);
+  if (!access) return null;
+
+  return supabaseRequest<StudentLearningJourney>(
+    "/rest/v1/rpc/get_student_learning_journey",
+    access.accessToken,
+    {
+      method: "POST",
+      body: JSON.stringify({ p_school_id: schoolId, p_student_id: studentId }),
+    },
+  );
 }
 
 // Attach AC9 strand + achievement band to each curriculum evidence row. This is

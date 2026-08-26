@@ -21,6 +21,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   SchoolAnalyticsSnapshot,
   SchoolHomeSnapshot,
+  StudentLearningJourney,
 } from "@/lib/school-platform-server";
 import {
   type AchievementBand,
@@ -82,6 +83,109 @@ const BAND_STYLE: Record<AchievementBand, { label: string; pill: string; bar: st
 const BAND_ORDER: AchievementBand[] = ["above", "at", "working_towards"];
 // Sequential ramp for ordinal working levels in the placement view.
 const LEVEL_RAMP = ["#0b6f4c", "#0f9d6b", "#3fb889", "#7fce9f", "#a9dcb3", "#cfe8cc", "#e6e2b0"];
+
+const JOURNEY_PASS = 85;
+const JOURNEY_LADDER: Array<[string, string]> = [
+  ["Prep", "Ground"], ["Year 1", "Level 1"], ["Year 2", "Level 2"], ["Year 3", "Level 3"],
+  ["Year 4", "Level 4"], ["Year 5", "Level 5"], ["Year 6", "Level 6"],
+];
+const JOURNEY_REALMS: Record<string, { name: string; color: string; order: number }> = {
+  number: { name: "Number Nexus", color: "#0e9c93", order: 0 },
+  measurement: { name: "Measurelands", color: "#c2892e", order: 1 },
+  space: { name: "Starpath", color: "#5b6ee6", order: 2 },
+  statistics: { name: "Statistica", color: "#c2557a", order: 3 },
+};
+const JOURNEY_CHECK = '<svg viewBox="0 0 24 24" width="13" height="13"><path d="M5 12l4 4 10-10" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+// Render a printable Learning Journey document from live progression data. Kept
+// as a pure string builder so it can be written into a popup for print/PDF.
+function buildJourneyHtml(data: StudentLearningJourney): string {
+  const meta = (id: string) => JOURNEY_REALMS[id] ?? { name: id, color: "#5a6a62", order: 99 };
+  const fmt = (iso: string | null) => (iso ? new Intl.DateTimeFormat("en-AU", { month: "short", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date(iso)) : "");
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
+  const labelFor = (workingLevel: string) => JOURNEY_LADDER.find((l) => l[0] === workingLevel)?.[1] ?? workingLevel;
+
+  const byRealm = new Map<string, StudentLearningJourney["levels"]>();
+  for (const lv of data.levels) {
+    const list = byRealm.get(lv.realmId) ?? [];
+    list.push(lv);
+    byRealm.set(lv.realmId, list);
+  }
+  const realmIds = [...byRealm.keys()].sort((a, b) => meta(a).order - meta(b).order);
+  const passed = (r?: StudentLearningJourney["levels"][number]) => Boolean(r && r.posttestScore != null && r.posttestScore >= JOURNEY_PASS);
+
+  let mastered = 0;
+  const milestones: Array<{ iso: string; date: string; realm: string; color: string; level: string; score: number; next: string }> = [];
+
+  const sections = realmIds.map((rid) => {
+    const rows = byRealm.get(rid)!;
+    const m = meta(rid);
+    const curRow = rows.find((r) => r.isCurrent);
+    const curLabel = curRow ? labelFor(curRow.workingLevel) : null;
+    let masteredHere = 0;
+    const steps = JOURNEY_LADDER.map(([id, label], i) => {
+      const row = rows.find((r) => r.workingLevel === id);
+      const isPass = passed(row);
+      const isCurrent = Boolean(row && row.isCurrent && !isPass);
+      let cls = ""; let date = "";
+      if (isPass && row) {
+        cls = "done"; masteredHere += 1;
+        date = i === 0 ? "start" : fmt(row.posttestCompletedAt);
+        if (row.posttestCompletedAt) milestones.push({ iso: row.posttestCompletedAt, date: fmt(row.posttestCompletedAt), realm: m.name, color: m.color, level: label, score: row.posttestScore!, next: JOURNEY_LADDER[i + 1]?.[1] ?? "complete" });
+      } else if (isCurrent && row) {
+        cls = "current"; date = row.currentWeek ? `Week ${row.currentWeek}` : "current";
+      } else if (row) {
+        cls = "started";
+      }
+      const node = isPass ? JOURNEY_CHECK : id === "Prep" ? "G" : String(i);
+      return `<div class="step ${cls}"><span class="node">${node}</span><span class="lab">${label}</span><span class="date">${date}</span></div>`;
+    }).join("");
+    mastered += masteredHere;
+    return `<section class="realm" style="--accent:${m.color}"><div class="realm-head"><h3>${esc(m.name)}</h3><div class="rmeta"><span class="mastered">${masteredHere} mastered</span>${curLabel ? `<span class="now">${curLabel}${curRow && curRow.currentWeek ? ` · Week ${curRow.currentWeek}` : ""}</span>` : ""}</div></div><div class="stepwrap"><div class="stepper">${steps}</div></div></section>`;
+  }).join("");
+
+  milestones.sort((a, b) => b.iso.localeCompare(a.iso));
+  const mileHtml = milestones.length
+    ? milestones.map((ms) => `<div class="mile" style="--accent:${ms.color}"><div class="when">${ms.date}</div><div class="what"><span class="rdot"></span><div class="txt"><b>${esc(ms.realm)}</b> — passed ${ms.level} post-test <span class="score">${ms.score}%</span> <span class="adv">→ ${ms.next === "complete" ? "realm complete" : `advanced to ${ms.next}`}</span></div></div></div>`).join("")
+    : `<p style="color:#8a988f;font-size:13px;padding:8px 0">No post-tests passed yet.</p>`;
+
+  const generated = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date());
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(data.student.name)} — Learning Journey</title><style>
+    *{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0d1512;margin:0;padding:30px 40px;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+    .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.19em;text-transform:uppercase;color:#0a6f4b}
+    h1{font-size:30px;margin:5px 0 2px;font-weight:850}.meta{margin:0;color:#5a6a62;font-size:13px;font-weight:600}
+    .head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;border-bottom:1px solid #dde4df;padding-bottom:18px}
+    .stats{display:flex;gap:12px;margin:20px 0}.stat{flex:1;border:1px solid #dde4df;border-radius:12px;padding:12px 15px}.stat b{display:block;font-size:26px;font-weight:900;line-height:1}.stat span{font-size:11px;font-weight:700;color:#5a6a62;text-transform:uppercase;letter-spacing:.05em}
+    h2{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8a988f;margin:26px 0 12px}
+    .realm{border:1px solid #dde4df;border-radius:15px;padding:16px 20px 20px;margin-bottom:12px;border-left:4px solid var(--accent)}
+    .realm-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.realm-head h3{margin:0;font-size:16px;font-weight:850;color:var(--accent)}
+    .rmeta{display:flex;gap:12px;align-items:center}.mastered{font-size:11.5px;font-weight:700;color:#5a6a62}.now{font-size:12px;font-weight:800;color:#fff;background:var(--accent);border-radius:20px;padding:3px 11px}
+    .stepwrap{overflow-x:auto;padding-top:16px}.stepper{position:relative;display:flex;justify-content:space-between;min-width:460px}
+    .step{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+    .step::before{content:"";position:absolute;top:15px;right:50%;width:100%;height:3px;background:#dde4df;z-index:-1}.step:first-child::before{display:none}
+    .step.done::before,.step.current::before{background:var(--accent)}
+    .node{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#f1f5f2;border:2.5px solid #dde4df;color:#8a988f;font-size:11px;font-weight:800}
+    .step.done .node{background:var(--accent);border-color:var(--accent);color:#fff}
+    .step.current .node{background:#fff;border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
+    .step.started .node{border-color:var(--accent)}
+    .lab{font-size:10px;font-weight:800;color:#5a6a62;white-space:nowrap}.step.current .lab{color:var(--accent)}
+    .date{font-size:9px;font-weight:700;color:#8a988f;min-height:11px}.step.current .date{color:var(--accent)}
+    .timeline{border:1px solid #dde4df;border-radius:15px;padding:6px 20px}
+    .mile{display:grid;grid-template-columns:90px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid #eef2ef}.mile:last-child{border-bottom:0}
+    .when{font-size:12px;font-weight:800;color:#5a6a62}.what{display:flex;gap:10px;align-items:flex-start}.rdot{width:11px;height:11px;border-radius:50%;background:var(--accent);margin-top:4px;flex:0 0 auto}
+    .txt{font-size:13px}.score{font-weight:800;color:var(--accent)}.adv{color:#5a6a62;font-weight:600}
+    footer{margin-top:22px;font-size:10.5px;color:#8a988f}
+    .btn{margin-top:20px;padding:9px 16px;border:0;border-radius:8px;background:#0f9d6b;color:#fff;font-weight:800;font-size:13px;cursor:pointer}
+    @media print{body{padding:12mm}.noprint{display:none}}
+  </style></head><body>
+    <div class="head"><div><div class="eyebrow">Level Up Learning · Learning Journey</div><h1>${esc(data.student.name)}</h1><p class="meta">${esc(data.student.yearLevel ?? "Year not recorded")} · ${esc(data.student.className)} · Generated ${generated}</p></div></div>
+    <div class="stats"><div class="stat"><b>${mastered}</b><span>Levels mastered</span></div><div class="stat"><b>${realmIds.length}</b><span>Realms active</span></div><div class="stat"><b>${milestones.length}</b><span>Post-tests passed</span></div></div>
+    <h2>Realm progression</h2>${sections || '<p style="color:#8a988f;font-size:13px">No realm progress recorded yet.</p>'}
+    <h2>Milestones</h2><div class="timeline">${mileHtml}</div>
+    <footer>A level is mastered when its post-test is passed (${JOURNEY_PASS}%+). Each realm progresses Ground → Level 1–6. Dates show when each post-test was passed.</footer>
+    <button class="btn noprint" onclick="window.print()">Print / Save as PDF</button>
+  </body></html>`;
+}
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-AU", {
   day: "numeric",
@@ -365,6 +469,22 @@ export default function SchoolAnalyticsDashboard({
       <button class="btn noprint" onclick="window.print()">Print / Save as PDF</button>
     </body></html>`);
     win.document.close();
+  };
+
+  const openLearningJourney = async (studentId: string) => {
+    const win = window.open("", "_blank", "width=1000,height=1200");
+    if (!win) return;
+    win.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:system-ui;padding:40px;color:#334">Generating learning journey…</body>');
+    try {
+      const response = await fetch(`/api/school/${schoolId}/student/${studentId}/journey`, { credentials: "same-origin" });
+      const result = (await response.json()) as StudentLearningJourney & { error?: string };
+      if (!response.ok) throw new Error(result.error ?? "Learning journey unavailable.");
+      win.document.open();
+      win.document.write(buildJourneyHtml(result));
+      win.document.close();
+    } catch {
+      win.document.body.innerHTML = '<p style="font-family:system-ui;padding:40px;color:#a33">Could not generate the learning journey. Please try again.</p>';
+    }
   };
 
   // Group curriculum evidence by AC9 strand, with an evidence-weighted band
@@ -750,6 +870,9 @@ export default function SchoolAnalyticsDashboard({
                 </span>
                 <button type="button" onClick={() => printStudentReport(selectedStudent)} className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50">
                   <Download className="h-3.5 w-3.5" /> Print report
+                </button>
+                <button type="button" onClick={() => void openLearningJourney(selectedStudent.id)} className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-800">
+                  <TrendingUp className="h-3.5 w-3.5" /> Learning journey
                 </button>
               </div>
             </div>
