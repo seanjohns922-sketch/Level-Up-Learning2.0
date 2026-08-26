@@ -1000,12 +1000,17 @@ export default function SchoolAnalyticsDashboard({
                             const workingIndex = levelIndex(level);
                             const gradeIndex = levelIndex(gradeRow.grade);
                             const isBelow = count > 0 && workingIndex >= 0 && gradeIndex >= 0 && workingIndex < gradeIndex;
+                            // How many years below expected: 1 = light rose, 2+ = progressively deeper red.
+                            const yearsBelow = isBelow ? gradeIndex - workingIndex : 0;
+                            const belowBg = `color-mix(in srgb, #c2534d ${Math.min(30 + yearsBelow * 20, 92)}%, white)`;
+                            const belowLight = yearsBelow <= 1;
+                            const textClass = !count ? "text-slate-300" : isBelow ? (belowLight ? "text-rose-900" : "text-white") : "text-white";
                             return (
                               <span
                                 key={level}
-                                title={`${gradeRow.grade} working at ${level}: ${count}`}
-                                className={`flex h-7 items-center justify-center rounded-sm border text-[11px] font-black tabular-nums ${isExpected ? "border-slate-900" : isBelow ? "border-rose-300" : "border-slate-100"} ${count ? "text-white" : "text-slate-300"}`}
-                                style={{ background: count ? (isBelow ? STANDING_STYLE.below.bar : LEVEL_RAMP[index % LEVEL_RAMP.length]) : "#f8fafc" }}
+                                title={`${gradeRow.grade} working at ${level}: ${count}${yearsBelow ? ` (${yearsBelow} ${yearsBelow === 1 ? "year" : "years"} below)` : ""}`}
+                                className={`flex h-7 items-center justify-center rounded-sm border text-[11px] font-black tabular-nums ${isExpected ? "border-slate-900" : isBelow ? "border-rose-300" : "border-slate-100"} ${textClass}`}
+                                style={{ background: count ? (isBelow ? belowBg : LEVEL_RAMP[index % LEVEL_RAMP.length]) : "#f8fafc" }}
                               >
                                 {count || ""}
                               </span>
