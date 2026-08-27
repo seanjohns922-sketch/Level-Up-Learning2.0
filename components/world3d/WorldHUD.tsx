@@ -9,6 +9,7 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { TOWER_REALM_PORTALS } from "@/lib/world3d/tower-realm-chamber-config";
 import { resolveTowerRealmEntry } from "@/lib/world3d/tower-realm-entry";
 import { resolveWorldJourney, type WorldJourney } from "@/lib/world3d/world-journey";
+import { joinSpeechParts, WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
 
 export type WorldHUDContext = "central" | "tower" | "realm";
 
@@ -115,22 +116,36 @@ export function WorldHUD({
     title: journey.realmName,
     detail: journey.activityLabel,
   };
+  const missionSpeech = joinSpeechParts([displayedMission.eyebrow ?? (context === "realm" ? "Current mission" : "Current journey"), displayedMission.title, displayedMission.detail]);
+  const primaryActionSpeech = primaryAction ? `${primaryAction.label}. Button.` : null;
+  const worldActionsSpeech = joinSpeechParts([
+    "World actions",
+    primaryActionSpeech,
+    "Realm Teleport. Opens fast travel to the learning realms.",
+    quickStartBusy ? "Quick Start is opening" : `Quick Start. ${journey.activityLabel}`,
+    "2D View. Opens the normal map view.",
+  ]);
 
   return (
     <>
       <div className="worldHud" data-world-hud={context} style={{ "--world-accent": accent } as React.CSSProperties}>
         <section className="worldHudMission" aria-label={displayedMission.eyebrow ?? "Current mission"}>
-          <span>{displayedMission.eyebrow ?? (context === "realm" ? "CURRENT MISSION" : "CURRENT JOURNEY")}</span>
-          <strong>{displayedMission.title}</strong>
-          <small>{displayedMission.detail}</small>
+          <div className="worldHudMissionText">
+            <span>{displayedMission.eyebrow ?? (context === "realm" ? "CURRENT MISSION" : "CURRENT JOURNEY")}</span>
+            <strong>{displayedMission.title}</strong>
+            <small>{displayedMission.detail}</small>
+          </div>
+          <WorldVoiceButton text={missionSpeech} compact className="worldHudRead" label="Read current mission" />
         </section>
 
         <div className="worldHudIdentity">
-          <div className="worldHudXp" title="Experience points"><Zap size={15} aria-hidden="true" />{compactXp(xp)}</div>
+          <div className="worldHudXp" title="Experience points"><Zap size={15} aria-hidden="true" />{compactXp(xp)}<WorldVoiceButton text={`Experience points. ${compactXp(xp)}.`} compact label="Read XP" /></div>
           <button type="button" className="worldHudIcon" onClick={() => router.push("/profile")} aria-label="Open profile" title="Profile"><UserRound size={19} /></button>
+          <WorldVoiceButton text="Profile. Opens your profile." compact label="Read profile" />
         </div>
 
         <nav className="worldHudActions" aria-label="World actions">
+          <WorldVoiceButton text={worldActionsSpeech} className="worldHudActionRead" label="Read world actions" />
           {primaryAction ? (
             <button type="button" className="worldHudSecondary" onClick={primaryAction.onClick}>
               {primaryAction.icon === "map" ? <Map size={17} /> : <DoorOpen size={17} />}{primaryAction.label}
@@ -145,14 +160,17 @@ export function WorldHUD({
       {teleportOpen ? (
         <div className="worldTeleportBackdrop" role="dialog" aria-modal="true" aria-label="Realm Teleport">
           <section className="worldTeleportPanel">
-            <header><div><span>FAST TRAVEL</span><h2>Realm Teleport</h2></div><button type="button" onClick={() => setTeleportOpen(false)} aria-label="Close Realm Teleport" title="Close"><X size={20} /></button></header>
+            <header><div><span>FAST TRAVEL</span><h2>Realm Teleport</h2></div><div className="worldTeleportHeaderActions"><WorldVoiceButton text="Fast travel. Realm Teleport. Choose a learning realm to enter." label="Read Realm Teleport" /><button type="button" onClick={() => setTeleportOpen(false)} aria-label="Close Realm Teleport" title="Close"><X size={20} /></button></div></header>
             <div className="worldTeleportGrid">
               {TOWER_REALM_PORTALS.map((portal) => {
                 const live = portal.realm.status === "live" && portal.realm.isSelectable;
+                const portalSpeech = joinSpeechParts([portal.realm.name, portal.subject, live ? "Enter realm" : "Coming soon"]);
                 return (
-                  <button key={portal.realmId} type="button" disabled={!live || Boolean(busyRealmId)} onClick={() => live && void enterRealm(portal.realmId)} style={{ borderColor: portal.accent }}>
+                  <div key={portal.realmId} className={`worldTeleportTile ${!live || busyRealmId ? "worldTeleportTileDisabled" : ""}`} style={{ borderColor: portal.accent }}>
+                    <WorldVoiceButton text={portalSpeech} compact className="worldTeleportTileRead" label={`Read ${portal.realm.name}`} />
                     <strong>{portal.realm.name}</strong><span style={{ color: portal.accent }}>{portal.subject}</span><small>{live ? "ENTER REALM" : "COMING SOON"}</small>
-                  </button>
+                    <button type="button" disabled={!live || Boolean(busyRealmId)} onClick={() => live && void enterRealm(portal.realmId)} aria-label={`${live ? "Enter" : "Coming soon"} ${portal.realm.name}`}><span>{live ? "Enter" : "Coming soon"}</span></button>
+                  </div>
                 );
               })}
             </div>
@@ -163,13 +181,14 @@ export function WorldHUD({
 
       <style>{`
         .worldHud{position:absolute;inset:0;z-index:18;pointer-events:none;color:#fff8e8;font-family:system-ui,sans-serif}.worldHud button{font:inherit}
-        .worldHudMission{position:absolute;left:max(16px,env(safe-area-inset-left));top:max(16px,env(safe-area-inset-top));width:min(310px,calc(100vw - 32px));border-left:3px solid var(--world-accent);padding:10px 13px;background:rgba(19,24,23,.78);box-shadow:0 12px 30px rgba(0,0,0,.23);backdrop-filter:blur(9px)}
+        .worldHudMission{position:absolute;left:max(16px,env(safe-area-inset-left));top:max(16px,env(safe-area-inset-top));width:min(340px,calc(100vw - 32px));display:flex;align-items:flex-start;gap:10px;border-left:3px solid var(--world-accent);padding:10px 11px 10px 13px;background:rgba(19,24,23,.78);box-shadow:0 12px 30px rgba(0,0,0,.23);backdrop-filter:blur(9px)}
+        .worldHudMissionText{min-width:0;flex:1}.worldHudRead{flex:0 0 auto;margin-top:1px}
         .worldHudMission span{display:block;color:var(--world-accent);font-size:10px;font-weight:950;letter-spacing:.16em}.worldHudMission strong{display:block;margin-top:4px;font-size:18px;line-height:1.15}.worldHudMission small{display:block;margin-top:4px;color:rgba(255,248,232,.76);font-size:12px;font-weight:650;line-height:1.3}
-        .worldHudIdentity{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));display:flex;gap:7px;pointer-events:auto}.worldHudXp,.worldHudIcon{height:40px;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:rgba(24,22,21,.82);color:#fff4dd;box-shadow:0 8px 22px rgba(0,0,0,.22);backdrop-filter:blur(9px)}.worldHudXp{display:flex;align-items:center;gap:6px;padding:0 11px;font-size:12px;font-weight:900}.worldHudXp svg{color:var(--world-accent)}.worldHudIcon{width:40px;display:grid;place-items:center;cursor:pointer}
-        .worldHudActions{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(70px,calc(env(safe-area-inset-bottom) + 64px));display:flex;align-items:center;justify-content:flex-end;gap:7px;pointer-events:auto}.worldHudActions button{min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:5px;padding:9px 12px;font-size:12px;font-weight:950;cursor:pointer;white-space:nowrap}.worldHudSecondary,.worldHudFallback{border:1px solid rgba(255,235,195,.3);background:rgba(24,22,21,.88);color:#fff5df}.worldHudQuick{border:1px solid color-mix(in srgb,var(--world-accent),#fff 20%);background:var(--world-accent);color:#1d2422}.worldHudFallback{padding-inline:10px!important}.worldHudActions button:disabled{opacity:.65;cursor:default}
-        .worldTeleportBackdrop{position:absolute;inset:0;z-index:50;display:grid;place-items:center;padding:18px;background:rgba(10,10,12,.72);backdrop-filter:blur(8px)}.worldTeleportPanel{width:min(760px,100%);max-height:min(760px,calc(100dvh - 36px));overflow:auto;border:1px solid rgba(238,206,148,.35);border-radius:7px;padding:18px;background:#241d1a;color:#fff3dc;box-shadow:0 28px 70px rgba(0,0,0,.5)}.worldTeleportPanel header{display:flex;align-items:center;justify-content:space-between;gap:14px}.worldTeleportPanel header span{color:#efc677;font-size:10px;font-weight:950;letter-spacing:.16em}.worldTeleportPanel h2{margin:3px 0 0;font-size:24px}.worldTeleportPanel header button{width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:#332722;color:#fff;cursor:pointer}.worldTeleportGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:16px}.worldTeleportGrid>button{min-height:106px;border:1px solid;border-radius:5px;padding:13px;background:rgba(12,14,15,.5);color:#fff;text-align:left;cursor:pointer}.worldTeleportGrid>button:disabled{opacity:.56;cursor:default}.worldTeleportGrid strong,.worldTeleportGrid span,.worldTeleportGrid small{display:block}.worldTeleportGrid strong{font-size:16px}.worldTeleportGrid span{margin-top:4px;font-size:10px;font-weight:900;letter-spacing:.08em}.worldTeleportGrid small{margin-top:13px;font-size:11px;font-weight:900}.worldTeleportPanel p{margin:12px 0 0;color:#ffdca0;font-weight:800}
-        @media(max-width:900px){.worldHudMission{top:max(68px,calc(env(safe-area-inset-top) + 54px));width:275px}.worldHudActions{bottom:max(78px,calc(env(safe-area-inset-bottom) + 70px));max-width:calc(100vw - 120px);flex-wrap:wrap}.worldHudActions button{min-height:46px}.worldHudFallback{font-size:0!important;width:46px;padding:0!important}.worldHudFallback svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-        @media(max-width:560px){.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHudActions button{padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
+        .worldHudIdentity{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));display:flex;gap:7px;pointer-events:auto}.worldHudXp,.worldHudIcon{height:40px;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:rgba(24,22,21,.82);color:#fff4dd;box-shadow:0 8px 22px rgba(0,0,0,.22);backdrop-filter:blur(9px)}.worldHudXp{display:flex;align-items:center;gap:6px;padding:0 8px 0 11px;font-size:12px;font-weight:900}.worldHudXp svg{color:var(--world-accent)}.worldHudXp .worldVoiceButton{margin-left:2px}.worldHudIcon{width:40px;display:grid;place-items:center;cursor:pointer}
+        .worldHudActions{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(70px,calc(env(safe-area-inset-bottom) + 64px));display:flex;align-items:center;justify-content:flex-end;gap:7px;pointer-events:auto}.worldHudActions button:not(.worldVoiceButton){min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:5px;padding:9px 12px;font-size:12px;font-weight:950;cursor:pointer;white-space:nowrap}.worldHudSecondary,.worldHudFallback{border:1px solid rgba(255,235,195,.3);background:rgba(24,22,21,.88);color:#fff5df}.worldHudQuick{border:1px solid color-mix(in srgb,var(--world-accent),#fff 20%);background:var(--world-accent);color:#1d2422}.worldHudFallback{padding-inline:10px!important}.worldHudActions button:disabled{opacity:.65;cursor:default}
+        .worldHudActionRead{border-radius:5px!important}.worldTeleportBackdrop{position:absolute;inset:0;z-index:50;display:grid;place-items:center;padding:18px;background:rgba(10,10,12,.72);backdrop-filter:blur(8px)}.worldTeleportPanel{width:min(760px,100%);max-height:min(760px,calc(100dvh - 36px));overflow:auto;border:1px solid rgba(238,206,148,.35);border-radius:7px;padding:18px;background:#241d1a;color:#fff3dc;box-shadow:0 28px 70px rgba(0,0,0,.5)}.worldTeleportPanel header{display:flex;align-items:center;justify-content:space-between;gap:14px}.worldTeleportPanel header span{color:#efc677;font-size:10px;font-weight:950;letter-spacing:.16em}.worldTeleportPanel h2{margin:3px 0 0;font-size:24px}.worldTeleportHeaderActions{display:flex;align-items:center;gap:8px}.worldTeleportPanel header button:not(.worldVoiceButton){width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:#332722;color:#fff;cursor:pointer}.worldTeleportGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:16px}.worldTeleportTile{position:relative;min-height:118px;border:1px solid;border-radius:5px;padding:13px 48px 46px 13px;background:rgba(12,14,15,.5);color:#fff;text-align:left}.worldTeleportTileRead{position:absolute;right:10px;top:10px}.worldTeleportTileDisabled{opacity:.56}.worldTeleportTile>button:not(.worldVoiceButton){position:absolute;left:13px;right:13px;bottom:10px;height:30px;border:1px solid rgba(255,235,195,.22);border-radius:5px;background:rgba(255,244,221,.1);color:#fff4dd;font-size:11px;font-weight:950;cursor:pointer}.worldTeleportTile>button:disabled{cursor:default}.worldTeleportGrid strong,.worldTeleportGrid span,.worldTeleportGrid small{display:block}.worldTeleportGrid strong{font-size:16px}.worldTeleportGrid span{margin-top:4px;font-size:10px;font-weight:900;letter-spacing:.08em}.worldTeleportGrid small{margin-top:13px;font-size:11px;font-weight:900}.worldTeleportPanel p{margin:12px 0 0;color:#ffdca0;font-weight:800}
+        @media(max-width:900px){.worldHudMission{top:max(68px,calc(env(safe-area-inset-top) + 54px));width:275px}.worldHudActions{bottom:max(78px,calc(env(safe-area-inset-bottom) + 70px));max-width:calc(100vw - 120px);flex-wrap:wrap}.worldHudActions button:not(.worldVoiceButton){min-height:46px}.worldHudFallback{font-size:0!important;width:46px;padding:0!important}.worldHudFallback svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:560px){.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHudActions button:not(.worldVoiceButton){padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
       `}</style>
     </>
   );

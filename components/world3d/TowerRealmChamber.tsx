@@ -24,6 +24,7 @@ import {
 } from "@/lib/world3d/tower-realm-chamber-config";
 import { resolveTowerRealmEntry } from "@/lib/world3d/tower-realm-entry";
 import { WORLD3D_CANONICAL_RESTORED_EVENT } from "@/lib/world3d/canonical-bootstrap";
+import { WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
 
 type TowerWorldMetrics = {
   active: boolean;
@@ -261,8 +262,8 @@ export default function TowerRealmChamber() {
       {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realm.status !== "live")} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
       <KeyboardWorldAction enabled={Boolean(activePortal || atExit)} onAction={runActiveAction} />
 
-      {entryMessage ? <div role="status" style={{ position: "absolute", left: "50%", top: 105, transform: "translateX(-50%)", zIndex: 35, border: "1px solid rgba(255,214,147,.55)", borderRadius: 6, padding: "10px 14px", background: "rgba(44,28,22,.96)", color: "#fff1d1", fontWeight: 850 }}>{entryMessage}</div> : null}
-      {showIntro ? <div style={{ position: "absolute", inset: 0, zIndex: 25, display: "grid", placeItems: "center", background: "rgba(20,13,11,.28)", color: "#fff0cf", pointerEvents: "none", animation: "towerReveal 2.4s ease both" }}><div style={{ textAlign: "center", textShadow: "0 4px 20px #000" }}><div style={{ fontSize: 12, fontWeight: 950, letterSpacing: "0.2em" }}>TOWER OF KNOWLEDGE</div><div style={{ marginTop: 7, fontSize: 31, fontWeight: 950 }}>Where all learning worlds meet</div></div><style>{`@keyframes towerReveal{0%{opacity:1;background:rgba(14,9,8,1)}28%,72%{opacity:1}100%{opacity:0}}`}</style></div> : null}
+      {entryMessage ? <div role="status" style={{ position: "absolute", left: "50%", top: 105, transform: "translateX(-50%)", zIndex: 35, border: "1px solid rgba(255,214,147,.55)", borderRadius: 6, padding: "10px 14px", background: "rgba(44,28,22,.96)", color: "#fff1d1", fontWeight: 850, display: "flex", alignItems: "center", gap: 8 }}>{entryMessage}<WorldVoiceButton text={entryMessage} compact label="Read message" /></div> : null}
+      {showIntro ? <div style={{ position: "absolute", inset: 0, zIndex: 25, display: "grid", placeItems: "center", background: "rgba(20,13,11,.28)", color: "#fff0cf", pointerEvents: "none", animation: "towerReveal 2.4s ease both" }}><div style={{ textAlign: "center", textShadow: "0 4px 20px #000", pointerEvents: "auto" }}><div style={{ fontSize: 12, fontWeight: 950, letterSpacing: "0.2em" }}>TOWER OF KNOWLEDGE</div><div style={{ marginTop: 7, fontSize: 31, fontWeight: 950 }}>Where all learning worlds meet</div><div style={{ marginTop: 12 }}><WorldVoiceButton text="Tower of Knowledge. Where all learning worlds meet." label="Read tower title" /></div></div><style>{`@keyframes towerReveal{0%{opacity:1;background:rgba(14,9,8,1)}28%,72%{opacity:1}100%{opacity:0}}`}</style></div> : null}
     </main>
   );
 }
