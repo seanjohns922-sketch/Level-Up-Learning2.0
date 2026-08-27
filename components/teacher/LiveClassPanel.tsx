@@ -12,7 +12,6 @@ import {
   normalizeLearningScore,
 } from "@/lib/learning-score";
 import {
-  buildLiveClassInsight,
   buildLiveStudentInsight,
   formatRelativeTime,
   type LearningState,
@@ -1224,30 +1223,13 @@ export default function LiveClassPanel({
       })),
     )?.accuracy ?? null;
   }, [cards]);
-  const classInsight = useMemo(
-    () =>
-      buildLiveClassInsight(
-        cards.map((card) => ({
-          studentId: card.id,
-          studentName: card.displayName,
-          classId: selectedClass?.id ?? "",
-          skillTag: card.skillTag,
-          misconceptionTag: card.misconceptionTag,
-          aiStatus: card.status,
-          learningState: card.learningState,
-          accuracyPercent: card.accuracyPercent ?? null,
-          questionsAnswered: card.questionsAnswered ?? null,
-        }))
-      ),
-    [cards, selectedClass?.id]
-  );
 
   const isDrawerOpen = Boolean(selectedStudent);
 
   return (
     <>
       <section className="grid gap-4">
-        <div className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
+        <div>
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_14px_36px_rgba(15,23,42,0.08)]">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -1298,22 +1280,6 @@ export default function LiveClassPanel({
               <span className="text-slate-600">{formatPercentage(classAccuracy, "—", 0)} class accuracy</span>
               <span className="text-slate-300">·</span>
               <span className="text-slate-500">{statusCounts.idle} idle</span>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-slate-200 bg-[linear-gradient(135deg,#062521_0%,#0a2f2a_45%,#0e3f38_100%)] p-5 text-white shadow-[0_18px_40px_rgba(2,23,22,0.28)] flex flex-col">
-            <div className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#7DE7D7]">
-              {classInsight.title}
-            </div>
-            <div className="mt-2 text-xl font-black leading-tight">{classInsight.headline}</div>
-            {classInsight.detail && (
-              <div className="mt-1 text-sm font-semibold text-teal-200/80">{classInsight.detail}</div>
-            )}
-            <div className="mt-auto pt-4 border-t border-white/10">
-              <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-teal-400/80 mb-1">
-                Suggested Action
-              </div>
-              <div className="text-sm font-semibold text-slate-100 leading-snug">{classInsight.suggestedAction}</div>
             </div>
           </div>
         </div>
