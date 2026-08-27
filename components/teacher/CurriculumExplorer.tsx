@@ -375,7 +375,6 @@ export default function CurriculumExplorer({
                 </h2>
                 <div className="text-xs font-semibold text-[#64748B] mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span>{yearLabel} · {studentCount} student{studentCount === 1 ? "" : "s"}</span>
-                  <span>· class avg <b className="text-[#0F172A]">{weekAvgPct(selectedWeekNumber)}%</b> done</span>
                   {(() => {
                     const acc = weekAvgAccuracy(selectedWeekNumber);
                     return (
