@@ -1212,17 +1212,28 @@ export default function LiveClassPanel({
   }, [cards]);
 
   const activeStudentCount = cards.filter((card) => isCardActiveNow(card)).length;
-  const activeTodayCount = dailyActivity.filter((activity) =>
-    students.some((student) => student.id === activity.student_id)
+  // Students who did any work today (today-scoped RPC feed).
+  const activeTodayIds = useMemo(
+    () => new Set(dailyActivity.map((activity) => activity.student_id)),
+    [dailyActivity]
+  );
+  const activeTodayCount = cards.filter((card) => activeTodayIds.has(card.id)).length;
+  // Idle = worked today but not active right now. Not started = no work today yet.
+  const idleTodayCount = cards.filter(
+    (card) => activeTodayIds.has(card.id) && !isCardActiveNow(card)
   ).length;
+  const notStartedTodayCount = cards.filter((card) => !activeTodayIds.has(card.id)).length;
+  // Accuracy scoped to today's workers, so the number reflects the live picture.
   const classAccuracy = useMemo(() => {
     return aggregateLearningScores(
-      cards.map((card) => ({
-        correct: card.correctCount ?? 0,
-        total: card.questionsAnswered ?? 0,
-      })),
+      cards
+        .filter((card) => activeTodayIds.has(card.id))
+        .map((card) => ({
+          correct: card.correctCount ?? 0,
+          total: card.questionsAnswered ?? 0,
+        })),
     )?.accuracy ?? null;
-  }, [cards]);
+  }, [cards, activeTodayIds]);
 
   const isDrawerOpen = Boolean(selectedStudent);
 
@@ -1277,9 +1288,11 @@ export default function LiveClassPanel({
                 <span className="h-2 w-2 rounded-full bg-rose-500" />{statusCounts.needs_support} need help
               </span>
               <span className="text-slate-300">·</span>
-              <span className="text-slate-600">{formatPercentage(classAccuracy, "—", 0)} class accuracy</span>
+              <span className="text-slate-600">{formatPercentage(classAccuracy, "—", 0)} accuracy today</span>
               <span className="text-slate-300">·</span>
-              <span className="text-slate-500">{statusCounts.idle} idle</span>
+              <span className="text-slate-500">{idleTodayCount} idle</span>
+              <span className="text-slate-300">·</span>
+              <span className="text-slate-400">{notStartedTodayCount} not started</span>
             </div>
           </div>
         </div>
