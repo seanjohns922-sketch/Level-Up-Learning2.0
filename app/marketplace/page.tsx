@@ -16,19 +16,25 @@ import {
 } from "@/lib/world3d/central-world-customisation-catalog";
 
 type LaunchMarketplaceCategory = "buildings" | "animals" | "pools_play" | "special";
+type MarketplaceCategory = LaunchMarketplaceCategory | "more_rewards";
 
-const CATEGORIES: Array<{ id: LaunchMarketplaceCategory; label: string; tabIcon: keyof typeof Icons }> = [
+const CATEGORIES: Array<{ id: MarketplaceCategory; label: string; tabIcon: keyof typeof Icons }> = [
   { id: "buildings", label: "Buildings", tabIcon: "House" },
   { id: "animals", label: "Animals", tabIcon: "PawPrint" },
   { id: "pools_play", label: "Pools & Play", tabIcon: "Waves" },
   { id: "special", label: "Special", tabIcon: "Star" },
+  { id: "more_rewards", label: "More Rewards", tabIcon: "Gift" },
 ];
 
-function itemLaunchCategory(item: EconomyItem): LaunchMarketplaceCategory | null {
+function centralWorldCategory(item: EconomyItem): LaunchMarketplaceCategory | null {
   const category = item.metadata?.marketplaceCategory;
   return category === "buildings" || category === "animals" || category === "pools_play" || category === "special"
     ? category
     : null;
+}
+
+function itemMarketplaceCategory(item: EconomyItem): MarketplaceCategory {
+  return centralWorldCategory(item) ?? "more_rewards";
 }
 
 export default function MarketplacePage() {
@@ -36,7 +42,7 @@ export default function MarketplacePage() {
   const preview = isDemoPreviewMode();
   const studentId = student?.studentId ?? (preview ? "demo-preview" : null);
   const [state, setState] = useState<EconomyState | null>(null);
-  const [category, setCategory] = useState<LaunchMarketplaceCategory>("buildings");
+  const [category, setCategory] = useState<MarketplaceCategory>("buildings");
   const [selected, setSelected] = useState<EconomyItem | null>(null);
   const [brokenArtworkIds, setBrokenArtworkIds] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
@@ -52,19 +58,19 @@ export default function MarketplacePage() {
       next = mergeCentralWorldCatalogue(next);
       setState(next);
       persistCanonicalAvatarAppearance(studentId, next);
-      setSelected(next.items.find((item) => isMarketplaceItemListed(item) && itemLaunchCategory(item) === "buildings") ?? next.items.find((item) => itemLaunchCategory(item) !== null) ?? null);
+      setSelected(next.items.find((item) => isMarketplaceItemListed(item) && centralWorldCategory(item) === "buildings") ?? next.items.find((item) => isMarketplaceItemListed(item)) ?? null);
     }).catch((error) => setMessage(economyErrorMessage(error)));
   }, [preview, studentId]);
 
   const owned = useMemo(() => new Set(state?.inventory.map((entry) => entry.item_key) ?? []), [state?.inventory]);
   const equipped = useMemo(() => new Set(Object.values(state?.equipped ?? {})), [state?.equipped]);
-  const items = useMemo(() => (state?.items ?? []).filter((item) => isMarketplaceItemListed(item) && itemLaunchCategory(item) === category), [category, state?.items]);
+  const items = useMemo(() => (state?.items ?? []).filter((item) => isMarketplaceItemListed(item) && itemMarketplaceCategory(item) === category), [category, state?.items]);
   useEffect(() => {
     if (items.length > 0 && !items.some((item) => item.item_key === selected?.item_key)) setSelected(items[0]);
   }, [items, selected?.item_key]);
   const selectedOwned = selected ? owned.has(selected.item_key) : false;
   const selectedEquipped = selected ? equipped.has(selected.item_key) : false;
-  const selectedIsWorldReward = selected ? itemLaunchCategory(selected) !== null : false;
+  const selectedIsWorldReward = selected ? centralWorldCategory(selected) !== null : false;
   const selectedUnavailable = selected
     ? !isMarketplaceItemAvailable(selected) || brokenArtworkIds.has(selected.item_key)
     : true;
@@ -122,7 +128,7 @@ export default function MarketplacePage() {
                 <MarketplaceItemImage key={selected.item_key} item={selected} context="preview" avatarOutfit={previewOutfit} onArtworkError={(itemKey) => setBrokenArtworkIds((current) => new Set(current).add(itemKey))} />
                 <span className="absolute left-3 top-3 rounded bg-black/40 px-2 py-1 text-[10px] font-black uppercase text-white">Preview</span>
               </div>
-              <div className="mt-5 flex items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: selected.accent }}>{itemLaunchCategory(selected)?.replace("_", " & ") ?? "World reward"}</p><span className="rounded px-2 py-1 text-[10px] font-black uppercase" style={{ color: RARITY_STYLES[selected.rarity].color, background: RARITY_STYLES[selected.rarity].background }}>{RARITY_STYLES[selected.rarity].label}</span></div>
+              <div className="mt-5 flex items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: selected.accent }}>{centralWorldCategory(selected)?.replace("_", " & ") ?? selected.category.replace("_", " ")}</p><span className="rounded px-2 py-1 text-[10px] font-black uppercase" style={{ color: RARITY_STYLES[selected.rarity].color, background: RARITY_STYLES[selected.rarity].background }}>{RARITY_STYLES[selected.rarity].label}</span></div>
               <h2 className="mt-1 text-2xl font-black">{selected.name}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{selected.description}</p>
               {typeof selected.metadata?.gridSize === "string" ? <p className="mt-3 inline-flex items-center gap-2 rounded bg-slate-100 px-2 py-1 text-[11px] font-black uppercase text-slate-600"><Icons.Grid3X3 className="h-3.5 w-3.5" /> {selected.metadata.gridSize}</p> : null}
               <button type="button" disabled={busy || selectedUnavailable || selectedEquipped || (!selectedOwned && (state?.wallet.xp_balance ?? 0) < (selected.price ?? 0))} onClick={act} className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-amber-400 px-4 py-3 text-sm font-black text-slate-950 hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500">
