@@ -356,7 +356,7 @@ export default function LoginPage() {
         setTeacherError("Demo access could not be isolated from the login session. Please try again.");
         return false;
       }
-      router.push("/realms");
+      router.push("/world?teacher_preview=1");
       return true;
     } catch {
       setTeacherError("Demo access could not be activated. Please try again.");
@@ -828,7 +828,7 @@ export default function LoginPage() {
       setDemoCode("");
       const search = new URLSearchParams(window.location.search);
       const requestedReturn = search.get("returnTo");
-      let demoDestination = "/realms";
+      let demoDestination = "/world?teacher_preview=1";
       if (requestedReturn?.startsWith("/") && !requestedReturn.startsWith("//")) {
         const candidate = new URL(requestedReturn, window.location.origin);
         const selectedLevel = tryNormalizeStarpathLevel(candidate.searchParams.get("level"));

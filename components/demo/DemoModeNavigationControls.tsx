@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { ClipboardCheck } from "lucide-react";
 import { clearScopedProgress } from "@/data/progress";
 import { deactivateDemoPreviewMode, isDemoPreviewMode } from "@/lib/demo-mode";
+import { resetDemoEconomyPreview } from "@/lib/economy";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { clearActiveStudentSession } from "@/lib/studentIdentity";
 
@@ -24,6 +25,7 @@ export default function DemoModeNavigationControls({
   function exitDemoMode() {
     clearScopedProgress("demo-preview");
     clearScopedProgramStore("demo-preview");
+    resetDemoEconomyPreview();
     clearActiveStudentSession();
     deactivateDemoPreviewMode();
     router.replace("/login");

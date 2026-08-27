@@ -44,7 +44,7 @@ export default function StudentHomePage() {
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
-      router.replace("/realms");
+      router.replace("/world?teacher_preview=1");
       return;
     }
     const studentId = studentProfile?.studentId;

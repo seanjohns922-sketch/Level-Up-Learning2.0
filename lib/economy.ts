@@ -114,11 +114,12 @@ function normalizeEconomyState(value: unknown): EconomyState {
 
 // ── Demo Preview economy ────────────────────────────────────────────────────
 // Demo Preview mode has no real student wallet, so the economy is synthesised
-// client-side: the full catalogue, everything owned, effectively unlimited XP.
-// Equipped layers and the free avatar base persist to localStorage so the demo
-// keeps its look across pages. Every mutator below short-circuits here.
+// client-side with effectively unlimited XP. Avatar/home rewards remain owned
+// for review; central-world rewards must be purchased in demo so the
+// buy -> place -> view-in-world loop can be tested.
 const DEMO_BASE_STORAGE_KEY = "lul:demo-preview:avatar_base_v1";
 const DEMO_EQUIPPED_STORAGE_KEY = "lul:demo-preview:equipped_v1";
+const DEMO_PURCHASED_STORAGE_KEY = "lul:demo-preview:purchased_v1";
 const DEMO_WALLET = { xp_earned: 999999, xp_spent: 0, xp_balance: 999999, essence: 999 };
 
 function readDemoJson<T>(key: string, fallback: T): T {
@@ -145,6 +146,27 @@ function demoSlotFor(item: EconomyItem | undefined): string | null {
   return (item.metadata as { slot?: string })?.slot ?? item.category;
 }
 
+function isCentralWorldReward(item: EconomyItem) {
+  const metadata = item.metadata as { marketplaceCategory?: unknown; slot?: unknown };
+  return typeof metadata.marketplaceCategory === "string"
+    && typeof metadata.slot === "string"
+    && metadata.slot.startsWith("world_plot_");
+}
+
+function readDemoPurchasedKeys() {
+  return new Set(readDemoJson<string[]>(DEMO_PURCHASED_STORAGE_KEY, []));
+}
+
+function writeDemoPurchasedKeys(keys: Set<string>) {
+  writeDemoJson(DEMO_PURCHASED_STORAGE_KEY, Array.from(keys).sort());
+}
+
+export function resetDemoEconomyPreview() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(DEMO_PURCHASED_STORAGE_KEY);
+  window.localStorage.removeItem(DEMO_EQUIPPED_STORAGE_KEY);
+}
+
 /** Full active catalogue (no student context). Used to build the demo economy. */
 export async function fetchEconomyCatalog(): Promise<EconomyItem[]> {
   const { data, error } = await supabase.rpc("get_economy_catalog_secure");
@@ -154,11 +176,16 @@ export async function fetchEconomyCatalog(): Promise<EconomyItem[]> {
 
 function buildDemoEconomyState(items: EconomyItem[]): EconomyState {
   const now = new Date().toISOString();
+  const equipped = readDemoJson<Record<string, string>>(DEMO_EQUIPPED_STORAGE_KEY, {});
+  const purchased = readDemoPurchasedKeys();
+  const inventory = items
+    .filter((item) => !isCentralWorldReward(item) || purchased.has(item.item_key) || Object.values(equipped).includes(item.item_key))
+    .map((item) => ({ item_key: item.item_key, acquired_at: now, acquisition_type: "demo" }));
   return {
     wallet: { ...DEMO_WALLET },
     items,
-    inventory: items.map((item) => ({ item_key: item.item_key, acquired_at: now, acquisition_type: "demo" })),
-    equipped: readDemoJson<Record<string, string>>(DEMO_EQUIPPED_STORAGE_KEY, {}),
+    inventory,
+    equipped,
     avatarBase: readDemoJson<AvatarOutfit>(DEMO_BASE_STORAGE_KEY, {}),
   };
 }
@@ -238,8 +265,19 @@ export async function purchaseEconomyItem(
   fallbackItems: EconomyItem[] = [],
   forceDemo = false,
 ) {
-  // Demo owns everything already — treat a "buy" as a no-op refresh.
-  if (forceDemo || isDemoPreviewMode()) return fetchDemoEconomy(fallbackItems);
+  if (forceDemo || isDemoPreviewMode()) {
+    let catalog: EconomyItem[] = [];
+    try {
+      catalog = await fetchEconomyCatalog();
+    } catch {
+      // The fallback catalogue is authoritative in isolated demo review.
+    }
+    const items = mergeEconomyItems(catalog, fallbackItems);
+    const purchased = readDemoPurchasedKeys();
+    purchased.add(itemKey);
+    writeDemoPurchasedKeys(purchased);
+    return buildDemoEconomyState(items);
+  }
   const { data, error } = await supabase.rpc("purchase_economy_item_secure", {
     p_student_id: studentId,
     p_item_key: itemKey,
@@ -265,6 +303,9 @@ export async function equipEconomyItem(
     const items = mergeEconomyItems(catalog, fallbackItems);
     const slot = demoSlotFor(items.find((item) => item.item_key === itemKey));
     if (slot) {
+      const purchased = readDemoPurchasedKeys();
+      purchased.add(itemKey);
+      writeDemoPurchasedKeys(purchased);
       const equipped = readDemoJson<Record<string, string>>(DEMO_EQUIPPED_STORAGE_KEY, {});
       equipped[slot] = itemKey;
       writeDemoJson(DEMO_EQUIPPED_STORAGE_KEY, equipped);

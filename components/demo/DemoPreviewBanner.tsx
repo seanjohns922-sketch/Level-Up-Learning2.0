@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { deactivateDemoPreviewMode, useDemoPreviewMode } from "@/lib/demo-mode";
 import { clearScopedProgress } from "@/data/progress";
 import { clearScopedProgramStore } from "@/lib/program-progress";
+import { resetDemoEconomyPreview } from "@/lib/economy";
 import { clearActiveStudentSession } from "@/lib/studentIdentity";
 
 export default function DemoPreviewBanner() {
@@ -21,6 +22,7 @@ export default function DemoPreviewBanner() {
   function exitDemoMode() {
     clearScopedProgress("demo-preview");
     clearScopedProgramStore("demo-preview");
+    resetDemoEconomyPreview();
     clearActiveStudentSession();
     deactivateDemoPreviewMode();
     router.replace("/login");

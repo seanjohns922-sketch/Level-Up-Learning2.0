@@ -8,7 +8,9 @@ const home = read("app/home-base/page.tsx");
 const legends = read("components/home/HallOfLegendsWidget.tsx");
 
 const checks = [
-  ["Demo economy owns the complete active catalogue", economy.includes("items.map((item) => ({ item_key: item.item_key")],
+  ["Demo economy keeps central-world rewards purchasable", economy.includes("isCentralWorldReward") && economy.includes("DEMO_PURCHASED_STORAGE_KEY")],
+  ["Demo purchases persist locally", economy.includes("purchased.add(itemKey)") && economy.includes("writeDemoPurchasedKeys(purchased)")],
+  ["Demo placed world rewards persist by slot", economy.includes("equipped[slot] = itemKey") && economy.includes("world_plot_")],
   ["Demo economy has a showcase wallet", economy.includes("xp_balance: 999999")],
   ["Demo gem vault marks every active definition owned", gems.includes("owned: activeDefinitions.map")],
   ["Demo gem progress is complete", gems.includes("Number(definition.target ?? 1)")],
