@@ -4,14 +4,13 @@ import { useMemo, useState } from "react";
 import {
   getGenresForYear,
   getCurriculumPlan,
-  lessonIdPrefix,
   DEFAULT_LESSON_XP,
   type Genre,
 } from "@/data/programs/genres";
 import type { Lesson } from "@/data/programs/year1";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
 import { calculateAccuracy } from "@/lib/learning-score";
-import { getRealmDefinition, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
+import { tryCanonicalRealmId } from "@/lib/realms/realm-registry";
 import { selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
 type ProgressLike = {
@@ -91,7 +90,6 @@ export default function CurriculumExplorer({
     [yearLabel, genreId]
   );
   const selectedRealmId = tryCanonicalRealmId(genreId);
-  const realmDefinition = selectedRealmId ? getRealmDefinition(selectedRealmId) : null;
 
   const week = plan.find((w) => w.week === weekNum) ?? plan[0];
   const selectedWeekNumber = week?.week ?? null;
@@ -106,12 +104,6 @@ export default function CurriculumExplorer({
           )
       : [];
   const isPlaceholder = !genre?.available;
-  const prefix =
-    genreId === "measurement"
-      ? `${lessonIdPrefix(yearLabel)}measurement-`
-      : genreId === "space"
-        ? `${lessonIdPrefix(yearLabel)}space-`
-        : lessonIdPrefix(yearLabel);
 
   /** Per-lesson status counts across loaded students. */
   function lessonStatusCounts(lessonId: string) {
@@ -129,24 +121,6 @@ export default function CurriculumExplorer({
     return { completed, inProgress, notStarted, struggling: 0 };
   }
 
-  /** Class average completion % for a given week. */
-  function weekAvgPct(w: number | null) {
-    if (isPlaceholder) return 0;
-    if (w == null) return 0;
-    if (yearProgress.length === 0 || studentCount === 0) return 0;
-    const lessonsInWeek =
-      plan.find((x) => x.week === w)?.lessons.length ??
-      realmDefinition?.lessonsPerWeek ??
-      0;
-    const total = lessonsInWeek * studentCount;
-    let done = 0;
-    const wantPrefix = `-w${w}-`;
-    for (const p of yearProgress) {
-      const ids = parseCompleted(p.completed_lesson_ids);
-      done += ids.filter((id) => id.startsWith(prefix) && id.includes(wantPrefix)).length;
-    }
-    return total === 0 ? 0 : Math.round((done / total) * 100);
-  }
 
   function parseQuizLessonBreakdown(raw: unknown): QuizLessonBreakdownItem[] {
     if (!Array.isArray(raw)) return [];
@@ -319,7 +293,6 @@ export default function CurriculumExplorer({
           <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 mt-1">
             {plan.map((w) => {
               const active = w.week === weekNum;
-              const pct = weekAvgPct(w.week);
               const acc = weekAvgAccuracy(w.week);
               return (
                 <button
@@ -338,19 +311,37 @@ export default function CurriculumExplorer({
                   <div className="text-[12px] font-bold text-[#0F172A] line-clamp-2 leading-snug mt-0.5">
                     {w.topic}
                   </div>
-                  <div className="mt-2 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                  <div
+                    className="mt-2 h-2 rounded-full bg-slate-100 overflow-hidden"
+                    title={acc.attempts === 0 ? "No quiz attempts yet" : `Quiz accuracy avg across ${acc.attempts} student${acc.attempts === 1 ? "" : "s"}`}
+                  >
                     <div
-                      className="h-full rounded-full bg-teal-500 transition-all"
-                      style={{ width: `${pct}%` }}
+                      className={`h-full rounded-full transition-all ${
+                        acc.attempts === 0
+                          ? "bg-slate-200"
+                          : acc.avg >= 80
+                            ? "bg-emerald-500"
+                            : acc.avg >= 60
+                              ? "bg-amber-500"
+                              : "bg-rose-500"
+                      }`}
+                      style={{ width: `${acc.attempts === 0 ? 0 : acc.avg}%` }}
                     />
                   </div>
                   <div className="mt-1 flex items-center justify-between gap-1">
-                    <span className="text-[10px] font-bold text-[#64748B] tabular-nums">
-                      {pct}% done
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-[#94A3B8]">
+                      Accuracy
                     </span>
                     <span
-                      title={acc.attempts === 0 ? "No quiz attempts yet" : `Quiz accuracy avg across ${acc.attempts} student${acc.attempts === 1 ? "" : "s"}`}
-                      className={`text-[9px] font-extrabold tabular-nums px-1.5 py-0.5 rounded border ${accTone(acc.avg, acc.attempts)}`}
+                      className={`text-[10px] font-extrabold tabular-nums ${
+                        acc.attempts === 0
+                          ? "text-[#94A3B8]"
+                          : acc.avg >= 80
+                            ? "text-emerald-700"
+                            : acc.avg >= 60
+                              ? "text-amber-700"
+                              : "text-rose-700"
+                      }`}
                     >
                       {acc.attempts === 0 ? "—" : `${acc.avg}%`}
                     </span>
@@ -531,27 +522,6 @@ export default function CurriculumExplorer({
           };
         })() : null}
       />
-    </div>
-  );
-}
-
-function StatusPill({
-  label, value, tone,
-}: {
-  label: string;
-  value: number;
-  tone: "teal" | "amber" | "slate" | "rose";
-}) {
-  const map = {
-    teal:  "bg-teal-50 text-teal-700 border-teal-100",
-    amber: "bg-amber-50 text-amber-700 border-amber-100",
-    slate: "bg-slate-50 text-slate-600 border-slate-100",
-    rose:  "bg-rose-50 text-rose-700 border-rose-100",
-  } as const;
-  return (
-    <div className={`rounded-lg border px-1.5 py-1 text-center ${map[tone]}`}>
-      <div className="text-[14px] font-black tabular-nums leading-none">{value}</div>
-      <div className="text-[9px] font-extrabold uppercase tracking-wider mt-0.5 opacity-80">{label}</div>
     </div>
   );
 }
