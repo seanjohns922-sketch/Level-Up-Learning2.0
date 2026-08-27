@@ -1,8 +1,5 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
-import {
-  numColumnBuildTask,
-} from "@/data/activities/statistica/level3";
 
 // ── Statistica Level 4 (Year 4) — AC9M4ST01 (many-to-one data displays with a
 // KEY; column graphs) + AC9M4ST02 (describe the DISTRIBUTION of data: where it
@@ -220,6 +217,29 @@ export function colInferenceTask(round: number, target: number): PracticeTask {
   };
 }
 
+// Construct a column graph on a SCALE — each +/- tap is worth 5, so bars reach
+// two-digit frequencies against a by-fives axis (Year-4 "build with a scale",
+// not the one-square-per-tap Year-3 build). Every aim is a multiple of 5.
+const COL_BUILD_FREQ: number[][] = [
+  [15, 25, 10, 30, 20],
+  [20, 10, 30, 15, 25],
+  [30, 20, 15, 25, 10],
+  [10, 30, 25, 20, 15],
+  [25, 15, 20, 10, 30],
+  [15, 30, 10, 25, 20],
+];
+export function colBuildTask(round: number, target: number): PracticeTask {
+  const survey = pick(COL_SURVEYS, round);
+  const freq = pick(COL_BUILD_FREQ, round);
+  const categories = survey.cats.map((c, i) => ({ ...c, count: freq[i]! }));
+  return {
+    kind: "statisticaGraph", mode: "build", target, display: "columns", categories, buildStep: 5,
+    prompt: `${survey.q}. Build the column graph to match the frequencies.`,
+    speakText: `Each tap is worth 5. Count on in fives to reach each aim.`,
+    feedback: { correct: "Every column matches its frequency.", wrong: "Each tap adds 5 — count on in fives to each aim." },
+  };
+}
+
 // ── Distribution shape & variation (numerical, values 0-4) ───────────────────
 const NUM_CTX = [
   { q: "Goals scored each game", color: C.green },
@@ -348,7 +368,7 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   // W3 Column Graphs — read a by-10s scale, then calculate off it (Year-4 rigour:
   // totals, combined categories, scaled differences — not "which bar is tallest")
   "y4-statistics-w3-l1": [colReadTask, colCombineTask, colDiffTask],
-  "y4-statistics-w3-l2": [numColumnBuildTask, colReadTask, colTotalTask],
+  "y4-statistics-w3-l2": [colBuildTask, colReadTask, colTotalTask],
   "y4-statistics-w3-l3": [colInferenceTask, colReadTask, colDiffTask],
   // W4 Distribution Shape — where it concentrates, its shape, comparing shapes
   "y4-statistics-w4-l1": [shapeConcentratedTask, colReadTask, shapeSpreadTask],
@@ -360,7 +380,7 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y4-statistics-w5-l3": [shapeCompareTask, shapeVariationTask, shapeSpreadTask],
   // W6 Investigation — collect, represent, analyse and report
   "y4-statistics-w6-l1": [pictoReadTask, colCombineTask, shapeConcentratedTask],
-  "y4-statistics-w6-l2": [pictoBuildTask, numColumnBuildTask, shapeVariationTask],
+  "y4-statistics-w6-l2": [pictoBuildTask, colBuildTask, shapeVariationTask],
   "y4-statistics-w6-l3": [shapeCompareTask, colInferenceTask, pictoCompareTask],
 };
 

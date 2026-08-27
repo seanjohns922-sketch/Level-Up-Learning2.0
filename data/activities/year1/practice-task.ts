@@ -2800,6 +2800,10 @@ export type PracticeTask = (
       categories: Array<{ id: string; label: string; color: string; count: number }>;
       options?: Array<{ id: string; label: string }>;
       correctOptionIds?: string[];
+      // build mode only — how much each +/- tap adds. Defaults to 1 (one-to-one);
+      // Year 4 column builds use a scale > 1 (e.g. 5) so bars reach two-digit
+      // frequencies against a scaled axis. Every count must be a multiple of it.
+      buildStep?: number;
       feedback: { correct: string; wrong: string };
     }
   | {

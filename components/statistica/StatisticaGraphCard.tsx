@@ -13,6 +13,7 @@ type Task = Extract<PracticeTask, { kind: "statisticaGraph" }>;
 // each column to its target; read/compare/claim = answer about the display.
 export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
   const isBuild = task.mode === "build";
+  const buildStep = task.buildStep ?? 1;
   const rows = Math.max(1, ...task.categories.map((c) => c.count));
   const [built, setBuilt] = useState<number[]>(() => task.categories.map(() => 0));
   const [chosen, setChosen] = useState<string | null>(null);
@@ -46,8 +47,8 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
           <>
             <div className={`mt-1 text-[11px] font-black ${built[i] === cat.count ? "text-emerald-300" : "text-amber-300"}`}>aim {cat.count}</div>
             <div className="mt-1 flex gap-1">
-              <button type="button" onClick={() => add(i, -1)} disabled={settled} aria-label={`remove from ${cat.label}`} className="grid h-7 w-7 place-items-center rounded-md border border-white/15 bg-white/5 text-white/70 transition hover:bg-white/10 disabled:opacity-40"><Minus className="h-3.5 w-3.5" /></button>
-              <button type="button" onClick={() => add(i, 1)} disabled={settled} aria-label={`add to ${cat.label}`} className="grid h-7 w-10 place-items-center rounded-md border border-[#f2bc45]/55 bg-[#f2bc45]/15 text-base font-black text-[#fff0c7] transition hover:bg-[#f2bc45]/25 disabled:opacity-40">+</button>
+              <button type="button" onClick={() => add(i, -buildStep)} disabled={settled} aria-label={`remove ${buildStep} from ${cat.label}`} className="grid h-7 w-7 place-items-center rounded-md border border-white/15 bg-white/5 text-white/70 transition hover:bg-white/10 disabled:opacity-40"><Minus className="h-3.5 w-3.5" /></button>
+              <button type="button" onClick={() => add(i, buildStep)} disabled={settled} aria-label={`add ${buildStep} to ${cat.label}`} className="grid h-7 w-10 place-items-center rounded-md border border-[#f2bc45]/55 bg-[#f2bc45]/15 text-base font-black text-[#fff0c7] transition hover:bg-[#f2bc45]/25 disabled:opacity-40">{buildStep > 1 ? `+${buildStep}` : "+"}</button>
             </div>
           </>
         ) : undefined}
