@@ -1,11 +1,7 @@
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 import {
-  numColumnReadTask,
   numColumnBuildTask,
-  catColumnReadTask,
-  numTableTask,
-  inferenceTask,
 } from "@/data/activities/statistica/level3";
 
 // ── Statistica Level 4 (Year 4) — AC9M4ST01 (many-to-one data displays with a
@@ -104,6 +100,123 @@ export function pictoBuildTask(round: number, target: number): PracticeTask {
     prompt: `${theme.q}. Build the pictograph so each row reaches its total.`,
     speakText: `Each symbol is worth ${key} ${theme.unit}. Add symbols until every row matches its aim.`,
     feedback: { correct: "Your pictograph matches every total.", wrong: `Each symbol is worth ${key}, so divide each total by ${key}.` },
+  };
+}
+
+// ── Year-4 column graphs (two-digit data on a by-10s scale) ──────────────────
+// The genuine Year-4 step up from Level 3's "which bar is tallest": every value
+// is two digits on a scale that counts in tens, so children read BETWEEN
+// gridlines, and the questions demand calculation off the graph — totals,
+// combined categories and scaled differences, not a single glance.
+type ColSurvey = { q: string; unit: string; cats: Array<{ id: string; label: string; color: string }> };
+const COL_COLORS = [C.pink, C.red, C.indigo, C.amber, C.teal];
+const COL_SURVEYS: ColSurvey[] = [
+  { q: "Books borrowed each day", unit: "books", cats: ["Mon", "Tue", "Wed", "Thu", "Fri"].map((l, i) => ({ id: `c${i}`, label: l, color: COL_COLORS[i]! })) },
+  { q: "Cans collected by each class", unit: "cans", cats: ["3A", "3B", "4A", "4B", "5A"].map((l, i) => ({ id: `c${i}`, label: l, color: COL_COLORS[i]! })) },
+  { q: "Tickets sold each show night", unit: "tickets", cats: ["Wed", "Thu", "Fri", "Sat", "Sun"].map((l, i) => ({ id: `c${i}`, label: l, color: COL_COLORS[i]! })) },
+  { q: "Laps run by each house team", unit: "laps", cats: ["Red", "Blue", "Green", "Gold", "Teal"].map((l, i) => ({ id: `c${i}`, label: l, color: COL_COLORS[i]! })) },
+  { q: "Visitors to the fair each hour", unit: "visitors", cats: ["9am", "10am", "11am", "12pm", "1pm"].map((l, i) => ({ id: `c${i}`, label: l, color: COL_COLORS[i]! })) },
+  { q: "Cupcakes sold at each stall", unit: "cupcakes", cats: ["Stall 1", "Stall 2", "Stall 3", "Stall 4", "Stall 5"].map((l, i) => ({ id: `c${i}`, label: l, color: COL_COLORS[i]! })) },
+];
+// Distinct multiples of 5, most sitting between the by-10 gridlines (…25, 35, 45)
+// so reading forces a "count on in fives" between the printed tens.
+const COL_FREQ: number[][] = [
+  [35, 20, 45, 30, 25],
+  [40, 15, 30, 45, 20],
+  [25, 45, 35, 15, 40],
+  [30, 25, 45, 20, 35],
+  [45, 30, 20, 40, 25],
+  [20, 40, 25, 45, 30],
+];
+type ColCat = { id: string; label: string; color: string; count: number };
+function colData(round: number): { survey: ColSurvey; categories: ColCat[] } {
+  const survey = pick(COL_SURVEYS, round);
+  const freq = pick(COL_FREQ, round);
+  const categories = survey.cats.map((c, i) => ({ ...c, count: freq[i]! }));
+  return { survey, categories };
+}
+// Two distinct categories, deterministic per round, with the taller one first.
+function colPair(categories: ColCat[], round: number): { hi: ColCat; lo: ColCat } {
+  const a = categories[round % categories.length]!;
+  const b = categories[(round + 2) % categories.length]!;
+  const [hi, lo] = a.count >= b.count ? [a, b] : [b, a];
+  return { hi, lo };
+}
+// Three numeric answer options (correct + two plausible mistakes), as {id,label}.
+function colNumOptions(correct: number, round: number, extras: number[] = []): Array<{ id: string; label: string }> {
+  const cands = [correct + 10, correct - 10, correct + 5, correct - 5, ...extras].filter((n) => n > 0 && n !== correct);
+  const seen = new Set<number>();
+  const wrongs = cands.filter((n) => (seen.has(n) ? false : (seen.add(n), true))).slice(0, 2);
+  return order([correct, ...wrongs].map((n) => ({ id: `n${n}`, label: String(n) })), round);
+}
+
+// Read one two-digit bar off the by-10s scale (answer equals that bar's height).
+export function colReadTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = colData(round);
+  const offGrid = categories.filter((c) => c.count % 10 !== 0);
+  const cat = (offGrid.length ? offGrid : categories)[round % (offGrid.length || categories.length)]!;
+  return {
+    kind: "statisticaGraph", mode: "read", target, display: "columns", categories,
+    prompt: `${survey.q}. How many ${survey.unit} for ${cat.label}?`,
+    speakText: `Read up the ${cat.label} column. It sits between two lines, so count on in fives from the ten below.`,
+    options: colNumOptions(cat.count, round), correctOptionIds: [`n${cat.count}`],
+    feedback: { correct: `Yes — ${cat.label} shows ${cat.count} ${survey.unit}.`, wrong: `The ${cat.label} bar sits between two lines — read the tens, then count on in fives.` },
+  };
+}
+// Add every bar for a whole-of-data total (two-step read + add).
+export function colTotalTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = colData(round);
+  const total = categories.reduce((s, c) => s + c.count, 0);
+  return {
+    kind: "statisticaInference", target, display: "columns", categories,
+    prompt: `${survey.q}. How many ${survey.unit} altogether?`,
+    speakText: `Read every column, then add them all together.`,
+    options: colNumOptions(total, round), correctOptionIds: [`n${total}`],
+    feedback: { correct: `Yes — all five columns add to ${total}.`, wrong: `Read each bar off the scale, then add all five.` },
+  };
+}
+// Combine two categories (read two bars + add); a single bar is the trap.
+export function colCombineTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = colData(round);
+  const { hi, lo } = colPair(categories, round);
+  const sum = hi.count + lo.count;
+  return {
+    kind: "statisticaInference", target, display: "columns", categories,
+    prompt: `${survey.q}. How many ${survey.unit} for ${hi.label} and ${lo.label} together?`,
+    speakText: `Read the ${hi.label} column and the ${lo.label} column, then add them.`,
+    options: colNumOptions(sum, round, [hi.count, lo.count]), correctOptionIds: [`n${sum}`],
+    feedback: { correct: `Yes — ${hi.count} and ${lo.count} make ${sum}.`, wrong: `Add the two columns together, not just one.` },
+  };
+}
+// Scaled difference (how many more); the sum is the classic wrong answer.
+export function colDiffTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = colData(round);
+  const { hi, lo } = colPair(categories, round);
+  const diff = hi.count - lo.count;
+  return {
+    kind: "statisticaInference", target, display: "columns", categories,
+    prompt: `${survey.q}. How many more ${survey.unit} for ${hi.label} than ${lo.label}?`,
+    speakText: `Find the gap between the ${hi.label} column and the ${lo.label} column.`,
+    options: colNumOptions(diff, round, [hi.count + lo.count]), correctOptionIds: [`n${diff}`],
+    feedback: { correct: `Yes — ${hi.count} take away ${lo.count} is ${diff}.`, wrong: `Subtract the shorter column from the taller one.` },
+  };
+}
+// Quantified interpretation — a claim that only holds if you do the arithmetic.
+export function colInferenceTask(round: number, target: number): PracticeTask {
+  const { survey, categories } = colData(round);
+  const { hi, lo } = colPair(categories, round);
+  const diff = hi.count - lo.count;
+  const options = order([
+    { id: "c", label: `${hi.label} had ${diff} more ${survey.unit} than ${lo.label}.` },
+    { id: "w1", label: `${lo.label} had more ${survey.unit} than ${hi.label}.` },
+    { id: "w2", label: `${hi.label} had ${diff + 10} more ${survey.unit} than ${lo.label}.` },
+  ], round);
+  return {
+    kind: "statisticaInference", target, display: "columns", categories,
+    prompt: `${survey.q}. Which statement does the graph support?`,
+    speakText: `Work out the difference between the columns, then pick the true statement.`,
+    options, correctOptionIds: ["c"],
+    feedback: { correct: `Right — ${hi.label} is ${diff} ahead of ${lo.label}.`, wrong: `Read both columns and work out the exact difference.` },
   };
 }
 
@@ -232,22 +345,23 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y4-statistics-w2-l1": [pictoBuildTask, pictoReadTask, pictoCalcTask],
   "y4-statistics-w2-l2": [pictoBuildTask, pictoCompareTask, pictoReadTask],
   "y4-statistics-w2-l3": [pictoReadTask, pictoBuildTask, pictoCalcTask],
-  // W3 Column Graphs — read, construct, interpret (bridge picto <-> columns)
-  "y4-statistics-w3-l1": [numColumnReadTask, catColumnReadTask, inferenceTask],
-  "y4-statistics-w3-l2": [numColumnBuildTask, numColumnReadTask, catColumnReadTask],
-  "y4-statistics-w3-l3": [catColumnReadTask, inferenceTask, numColumnReadTask],
+  // W3 Column Graphs — read a by-10s scale, then calculate off it (Year-4 rigour:
+  // totals, combined categories, scaled differences — not "which bar is tallest")
+  "y4-statistics-w3-l1": [colReadTask, colCombineTask, colDiffTask],
+  "y4-statistics-w3-l2": [numColumnBuildTask, colReadTask, colTotalTask],
+  "y4-statistics-w3-l3": [colInferenceTask, colReadTask, colDiffTask],
   // W4 Distribution Shape — where it concentrates, its shape, comparing shapes
-  "y4-statistics-w4-l1": [shapeConcentratedTask, numColumnReadTask, shapeSpreadTask],
-  "y4-statistics-w4-l2": [shapeSpreadTask, shapeConcentratedTask, inferenceTask],
-  "y4-statistics-w4-l3": [shapeCompareTask, shapeConcentratedTask, numColumnReadTask],
+  "y4-statistics-w4-l1": [shapeConcentratedTask, colReadTask, shapeSpreadTask],
+  "y4-statistics-w4-l2": [shapeSpreadTask, shapeConcentratedTask, colInferenceTask],
+  "y4-statistics-w4-l3": [shapeCompareTask, shapeConcentratedTask, colReadTask],
   // W5 Variation — spread, more vs less variation, comparing data sets
-  "y4-statistics-w5-l1": [shapeVariationTask, shapeConcentratedTask, numColumnReadTask],
-  "y4-statistics-w5-l2": [shapeVariationTask, shapeCompareTask, inferenceTask],
+  "y4-statistics-w5-l1": [shapeVariationTask, shapeConcentratedTask, colReadTask],
+  "y4-statistics-w5-l2": [shapeVariationTask, shapeCompareTask, colInferenceTask],
   "y4-statistics-w5-l3": [shapeCompareTask, shapeVariationTask, shapeSpreadTask],
   // W6 Investigation — collect, represent, analyse and report
-  "y4-statistics-w6-l1": [pictoReadTask, numTableTask, shapeConcentratedTask],
+  "y4-statistics-w6-l1": [pictoReadTask, colCombineTask, shapeConcentratedTask],
   "y4-statistics-w6-l2": [pictoBuildTask, numColumnBuildTask, shapeVariationTask],
-  "y4-statistics-w6-l3": [shapeCompareTask, inferenceTask, pictoCompareTask],
+  "y4-statistics-w6-l3": [shapeCompareTask, colInferenceTask, pictoCompareTask],
 };
 
 function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {

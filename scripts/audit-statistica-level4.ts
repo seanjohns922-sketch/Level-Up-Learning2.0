@@ -12,6 +12,9 @@ const check = (condition: boolean, message: string) => {
   if (!condition) { problems += 1; console.error(`FAIL: ${message}`); }
 };
 const inRange = (v: number) => v >= 1 && v <= 15;
+// Year-4 column graphs scale into the 40s (by 10s), so graph/inference reads
+// carry two-digit counts; shape/table stay small (0-4 frequencies).
+const inRangeGraph = (v: number) => v >= 1 && v <= 50;
 const argmax = (f: number[]) => f.reduce((best, v, i) => (v > f[best]! ? i : best), 0);
 const bucket = (i: number) => (i <= 1 ? "low" : i === 2 ? "middle" : "high");
 const variance = (f: number[]) => {
@@ -71,7 +74,7 @@ function auditTask(lessonId: string, task: PracticeTask) {
       break;
     }
     case "statisticaGraph": {
-      check(task.categories.length >= 2 && task.categories.every((c) => inRange(c.count)), `${lessonId}: graph counts must be 1..15`);
+      check(task.categories.length >= 2 && task.categories.every((c) => inRangeGraph(c.count)), `${lessonId}: graph counts must be 1..50`);
       if (task.mode !== "build") {
         const ids = new Set(task.options?.map((o) => o.id));
         check(task.correctOptionIds?.length === 1 && ids.has(task.correctOptionIds[0]!), `${lessonId}: graph ${task.mode} needs one valid answer`);
@@ -97,7 +100,7 @@ function auditTask(lessonId: string, task: PracticeTask) {
     case "statisticaInference": {
       const ids = new Set(task.options.map((o) => o.id));
       check(task.options.length >= 3 && task.correctOptionIds.length === 1 && ids.has(task.correctOptionIds[0]!), `${lessonId}: inference needs one valid answer`);
-      check(task.categories.length >= 2 && task.categories.every((c) => inRange(c.count)), `${lessonId}: inference graph counts must be 1..15`);
+      check(task.categories.length >= 2 && task.categories.every((c) => inRangeGraph(c.count)), `${lessonId}: inference graph counts must be 1..50`);
       break;
     }
     default:
