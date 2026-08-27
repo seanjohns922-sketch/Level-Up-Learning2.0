@@ -442,7 +442,7 @@ export default function CurriculumExplorer({
                       : `Average % correct on Lesson ${lsn.lesson} quiz questions across ${lacc.attempts} student${lacc.attempts === 1 ? "" : "s"}`}
                   >
                     <span className="text-[9px] font-extrabold uppercase tracking-wider opacity-80">
-                      Quiz Accuracy
+                      Lesson Accuracy
                     </span>
                     <span className="text-[12px] font-black tabular-nums">
                       {lacc.attempts === 0 ? "—" : `${lacc.avg}%`}
@@ -473,12 +473,37 @@ export default function CurriculumExplorer({
                 15 questions · 5 from each lesson · 80% to pass
               </div>
             </div>
-            <button
-              disabled
-              className="px-3.5 py-2 rounded-lg bg-[#F1F5F9] text-[#64748B] text-sm font-bold cursor-not-allowed"
-            >
-              Assign Quiz
-            </button>
+            <div className="flex items-center gap-3">
+              {(() => {
+                const q = weekAvgAccuracy(selectedWeekNumber);
+                return (
+                  <div
+                    className={`flex items-center gap-3 rounded-xl border px-4 py-2.5 ${accTone(q.avg, q.attempts)}`}
+                    title={q.attempts === 0
+                      ? "No students have completed this week's quiz yet"
+                      : `Average quiz score across ${q.attempts} student${q.attempts === 1 ? "" : "s"}`}
+                  >
+                    <div className="text-left">
+                      <div className="text-[9px] font-extrabold uppercase tracking-wider opacity-80">
+                        Class Avg Score
+                      </div>
+                      <div className="text-2xl font-black tabular-nums leading-none mt-0.5">
+                        {q.attempts === 0 ? "—" : `${q.avg}%`}
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-bold opacity-70 leading-tight">
+                      {q.attempts === 0 ? "no attempts yet" : `${q.attempts} sat`}
+                    </div>
+                  </div>
+                );
+              })()}
+              <button
+                disabled
+                className="px-3.5 py-2 rounded-lg bg-[#F1F5F9] text-[#64748B] text-sm font-bold cursor-not-allowed"
+              >
+                Assign Quiz
+              </button>
+            </div>
           </div>
         </div>
       </div>
