@@ -17,11 +17,12 @@ const STATISTICA_LEVELS = LEVEL_CATALOG.filter((level) => level.id !== "Prep") a
   label: string;
 }>;
 
+// Statistics is a 6-week strand (3 districts x 2 weeks): Collect -> Represent
+// -> Investigate. Positions are hand-placed around the avatar/HUD centre.
 const DISTRICT_POSITIONS = [
   { left: "4%", top: "14%", color: "#79b85a", name: "DATA GROVES", identity: "COLLECT" },
-  { left: "5%", top: "58%", color: "#59add1", name: "CHART CRYSTALS", identity: "REPRESENT" },
-  { left: "68%", top: "14%", color: "#f06b64", name: "PATTERN TERRACES", identity: "COMPARE" },
-  { left: "68%", top: "58%", color: "#f2bc45", name: "INSIGHT OBSERVATORY", identity: "INVESTIGATE" },
+  { left: "68%", top: "14%", color: "#59add1", name: "CHART CRYSTALS", identity: "REPRESENT" },
+  { left: "5%", top: "58%", color: "#f2bc45", name: "INSIGHT OBSERVATORY", identity: "INVESTIGATE" },
 ] as const;
 
 function normalizeLevel(level: string): RealmLevelId {
@@ -74,7 +75,7 @@ export const STATISTICA_DASHBOARD_CONFIG = {
   realmMark: "ST",
   districtTagline: "DATA WORLD DISTRICTS",
   guidedTagline: "FOLLOW THE DATA TRAIL",
-  totalWeeks: 8,
+  totalWeeks: 6,
   maxLevelIndex: 6,
   districtModeLevels: ["Year 3", "Year 4", "Year 5", "Year 6"],
   worldForLevel: getStatisticaWorld,
