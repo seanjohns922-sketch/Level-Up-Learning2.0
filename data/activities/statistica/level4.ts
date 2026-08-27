@@ -364,7 +364,7 @@ export function shapeVariationTask(round: number, target: number): PracticeTask 
   const answer = variance(fa) > variance(fb) ? "a" : "b";
   return {
     kind: "statisticaShape", mode: "variation", target, display: "columns",
-    categories: makeCats(fa, ctx.color), categoriesB: makeCats(fb, C.pink),
+    categories: makeCats(fa, C.teal), categoriesB: makeCats(fb, C.pink),
     setLabelA: "Class A", setLabelB: "Class B",
     prompt: `${ctx.q}: which class has MORE variation (more spread out)?`,
     speakText: "More variation means the data is spread across the values, not bunched on one column.",
@@ -397,7 +397,7 @@ export function shapeCompareTask(round: number, target: number): PracticeTask {
   const answer = pa > pb ? "a" : "b";
   return {
     kind: "statisticaShape", mode: "compare", target, display: "columns",
-    categories: makeCats(fa, ctx.color), categoriesB: makeCats(fb, C.indigo),
+    categories: makeCats(fa, C.teal), categoriesB: makeCats(fb, C.indigo),
     setLabelA: "Group A", setLabelB: "Group B",
     prompt: `${ctx.q}: which group's data peaks at a HIGHER value?`,
     speakText: "Find the tallest column in each group and compare which value it sits over.",

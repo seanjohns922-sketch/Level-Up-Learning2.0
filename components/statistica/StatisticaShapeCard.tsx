@@ -16,6 +16,11 @@ export default function StatisticaShapeCard({ task, onCorrect, onWrong }: { task
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
   const twoSets = Boolean(task.categoriesB);
+  // Both plots share one axis so a taller bar always means more (a compare /
+  // variation judgement is meaningless if the two graphs use different scales).
+  const sharedMax = twoSets
+    ? Math.max(...task.categories.map((c) => c.count), ...task.categoriesB!.map((c) => c.count))
+    : undefined;
 
   function submit() {
     if (settled || !chosen) return;
@@ -31,11 +36,11 @@ export default function StatisticaShapeCard({ task, onCorrect, onWrong }: { task
         <div className="mx-auto flex max-w-2xl flex-col items-stretch gap-3 sm:flex-row">
           <figure className="flex-1">
             <figcaption className="mb-1 text-center text-xs font-black uppercase tracking-[0.12em] text-[#f2bc45]/75">{task.setLabelA ?? "Set A"}</figcaption>
-            <StatisticaPlot categories={task.categories} display="columns" labelReadAloud={false} />
+            <StatisticaPlot categories={task.categories} display="columns" labelReadAloud={false} axisMax={sharedMax} />
           </figure>
           <figure className="flex-1">
             <figcaption className="mb-1 text-center text-xs font-black uppercase tracking-[0.12em] text-[#f2bc45]/75">{task.setLabelB ?? "Set B"}</figcaption>
-            <StatisticaPlot categories={task.categoriesB!} display="columns" labelReadAloud={false} />
+            <StatisticaPlot categories={task.categoriesB!} display="columns" labelReadAloud={false} axisMax={sharedMax} />
           </figure>
         </div>
       ) : (

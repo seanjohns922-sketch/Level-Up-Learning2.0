@@ -20,14 +20,17 @@ type Props = {
   // Override individual cells (e.g. tappable "extra" marks for the gap task).
   cell?: (cat: PlotCat, cellIndex: number, colIndex: number, cellSize: number) => ReactNode;
   labelReadAloud?: boolean;
+  // Force the axis to at least this value so side-by-side plots (compare /
+  // variation) share one scale and their bar heights are directly comparable.
+  axisMax?: number;
 };
 
 // The shared premium data-plot used by every Statistica graph card: column
 // tracks, a grounded baseline, interval gridlines and adaptive cell sizing so
 // small data gets big icons and tall columns still fit.
-export default function StatisticaPlot({ categories, display, values, onColumnClick, selectedIds = [], statusById = {}, footer, cell, labelReadAloud = true }: Props) {
+export default function StatisticaPlot({ categories, display, values, onColumnClick, selectedIds = [], statusById = {}, footer, cell, labelReadAloud = true, axisMax }: Props) {
   const heights = categories.map((c, i) => values?.[i] ?? c.count);
-  const maxVal = Math.max(1, ...categories.map((c) => c.count), ...heights);
+  const maxVal = Math.max(1, axisMax ?? 0, ...categories.map((c) => c.count), ...heights);
   // Round the axis top up to a whole number of steps so the scale is always
   // consistent (…5, 10, 15) instead of snapping the top gridline to the data's
   // max value (which produced odd labels like 13).
