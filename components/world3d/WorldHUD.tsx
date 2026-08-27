@@ -111,11 +111,19 @@ export function WorldHUD({
     }
   }
 
-  const displayedMission = mission ?? {
-    eyebrow: context === "realm" ? "CURRENT MISSION" : "CURRENT JOURNEY",
-    title: journey.realmName,
-    detail: journey.activityLabel,
-  };
+  const displayedMission = mission ?? (
+    context === "central"
+      ? {
+          eyebrow: "CENTRAL HUB",
+          title: "Level Up World",
+          detail: `Next up: ${journey.realmName} · ${journey.activityLabel}`,
+        }
+      : {
+          eyebrow: context === "realm" ? "CURRENT MISSION" : "REALM CHAMBER",
+          title: context === "tower" ? "Tower of Knowledge" : journey.realmName,
+          detail: context === "tower" ? "Choose a realm or quick start your next activity." : journey.activityLabel,
+        }
+  );
   const missionSpeech = joinSpeechParts([displayedMission.eyebrow ?? (context === "realm" ? "Current mission" : "Current journey"), displayedMission.title, displayedMission.detail]);
   const primaryActionSpeech = primaryAction ? `${primaryAction.label}. Button.` : null;
   const worldActionsSpeech = joinSpeechParts([
