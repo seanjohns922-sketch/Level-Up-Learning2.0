@@ -103,6 +103,29 @@ function auditTask(lessonId: string, task: PracticeTask) {
       check(task.categories.length >= 2 && task.categories.every((c) => inRangeGraph(c.count)), `${lessonId}: inference graph counts must be 1..50`);
       break;
     }
+    case "statisticaInvestigation": {
+      const step = task.buildStep ?? 1;
+      check(task.surveys.length === 3, `${lessonId}: investigation must offer 3 survey choices`);
+      const questions = new Set(task.surveys.map((s) => s.question));
+      check(questions.size === 3, `${lessonId}: the 3 survey choices must be distinct`);
+      for (const s of task.surveys) {
+        check(s.categories.length >= 2 && s.categories.every((c) => inRangeGraph(c.count) && c.count % step === 0), `${lessonId}: survey counts must be buildable multiples of ${step}`);
+        const opts = new Set(s.options.map((o) => o.id));
+        check(s.options.length >= 2 && s.correctOptionIds.length === 1 && opts.has(s.correctOptionIds[0]!), `${lessonId}: survey analysis needs one valid answer`);
+        // A numeric-answer analysis (id like "n28") must equal a real quantity;
+        // a category answer must be one of the survey's categories.
+        if (s.correctOptionIds[0]!.startsWith("n")) {
+          const n = Number(s.correctOptionIds[0]!.slice(1));
+          const total = s.categories.reduce((a, c) => a + c.count, 0);
+          const counts = s.categories.map((c) => c.count);
+          const diff = Math.max(...counts) - Math.min(...counts);
+          check(n === total || n === diff, `${lessonId}: numeric analysis answer must equal the total or the difference`);
+        } else {
+          check(s.categories.some((c) => c.id === s.correctOptionIds[0]), `${lessonId}: category analysis answer must be a real category`);
+        }
+      }
+      break;
+    }
     default:
       break;
   }
@@ -113,6 +136,7 @@ function family(task: PracticeTask) {
   if (task.kind === "statisticaShape") return `shape:${task.mode}`;
   if (task.kind === "statisticaGraph") return `graph:${task.mode}`;
   if (task.kind === "statisticaTable") return `table:${task.mode}`;
+  if (task.kind === "statisticaInvestigation") return "investigation";
   return task.kind.replace("statistica", "").toLowerCase();
 }
 function fingerprint(task: PracticeTask) {
@@ -149,7 +173,10 @@ for (const lessonId of STATISTICA_LEVEL4_LESSON_IDS) {
   if (activities.some((t) => t.kind === "statisticaShape" && t.mode === "variation")) sawVariation = true;
   coverage.push({ lesson: lessonId.replace("y4-statistics-", ""), teach: family(teaching), a1: families[0]!, a2: families[1]!, a3: families[2]! });
 
-  if (week >= 2) check(new Set(families).size >= 2, `${lessonId}: cannot repeat one interaction family three times`);
+  // A whole-lesson investigation deliberately runs three investigation goes;
+  // every other week-2+ lesson must mix at least two interaction families.
+  const allInvestigation = families.every((f) => f === "investigation");
+  if (week >= 2 && !allInvestigation) check(new Set(families).size >= 2, `${lessonId}: cannot repeat one interaction family three times`);
 
   for (let round = 0; round < 8; round += 1) {
     const set = getStatisticaLevel4TaskSet(lessonId)!;

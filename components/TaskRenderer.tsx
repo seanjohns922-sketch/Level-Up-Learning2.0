@@ -209,6 +209,7 @@ import StatisticaClassifyCard from "@/components/statistica/StatisticaClassifyCa
 import StatisticaInferenceCard from "@/components/statistica/StatisticaInferenceCard";
 import StatisticaPictographCard from "@/components/statistica/StatisticaPictographCard";
 import StatisticaShapeCard from "@/components/statistica/StatisticaShapeCard";
+import StatisticaInvestigationCard from "@/components/statistica/StatisticaInvestigationCard";
 import StatisticaSortCard from "@/components/statistica/StatisticaSortCard";
 import StatisticaTallyCard from "@/components/statistica/StatisticaTallyCard";
 import StatisticaGraphCard from "@/components/statistica/StatisticaGraphCard";
@@ -742,6 +743,8 @@ function TaskRendererInner({
       return <StatisticaPictographCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaShape":
       return <StatisticaShapeCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "statisticaInvestigation":
+      return <StatisticaInvestigationCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaSort":
       return <StatisticaSortCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaTally":

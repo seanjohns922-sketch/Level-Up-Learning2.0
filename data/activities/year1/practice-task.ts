@@ -2923,6 +2923,31 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica Level 4 — guided statistical investigation (AC9M4ST03). The
+      // student picks one of three survey questions, predicts an outcome, sees
+      // the (pre-rolled) class data, builds the column graph to match it, then
+      // answers an analysis question about their own chosen data set. One card
+      // walks the whole design -> represent -> analyse cycle.
+      kind: "statisticaInvestigation";
+      prompt: string;
+      speakText: string;
+      target: number;
+      // How much each +/- tap adds when building (default 1). Every count must
+      // be a multiple of it so bars can reach their exact frequency.
+      buildStep?: number;
+      surveys: Array<{
+        id: string;
+        question: string;
+        unit: string;
+        categories: Array<{ id: string; label: string; color: string; count: number }>;
+        analysisPrompt: string;
+        analysisSpeak: string;
+        options: Array<{ id: string; label: string }>;
+        correctOptionIds: string[];
+      }>;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Level 6 · W3-4 — Four-quadrant Cartesian plane (AC9M6SP02). Signed ordered
       // pairs on an 8x8 grid (-4..4 each axis), origin centred. Plot/read points,
       // name quadrants, and reason about how coordinates change across the axes.

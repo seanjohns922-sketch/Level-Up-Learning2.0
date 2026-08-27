@@ -407,6 +407,86 @@ export function shapeCompareTask(round: number, target: number): PracticeTask {
   };
 }
 
+// ── Guided statistical investigation (AC9M4ST03) ─────────────────────────────
+// The student picks one of three survey questions, predicts, sees the class
+// data, builds the graph, then analyses their own data set — the full cycle in
+// one card. Data is pre-rolled per survey so answers stay verifiable.
+type InvestSurvey = { q: string; unit: string; cats: string[]; colors: string[] };
+const INVEST_SURVEYS: InvestSurvey[] = [
+  { q: "What is the class's favourite sport?", unit: "students", cats: ["Soccer", "Netball", "Basketball", "Cricket"], colors: [C.green, C.pink, C.orange, C.blue] },
+  { q: "Which pet do students have at home?", unit: "students", cats: ["Dog", "Cat", "Fish", "Bird"], colors: [C.amber, C.indigo, C.teal, C.red] },
+  { q: "How do students travel to school?", unit: "students", cats: ["Walk", "Car", "Bus", "Bike"], colors: [C.teal, C.red, C.amber, C.green] },
+  { q: "What is the class's favourite fruit?", unit: "students", cats: ["Apple", "Banana", "Orange", "Grapes"], colors: [C.red, C.amber, C.orange, C.purple] },
+  { q: "What is the favourite school subject?", unit: "students", cats: ["Maths", "Art", "Sport", "Music"], colors: [C.blue, C.pink, C.green, C.indigo] },
+  { q: "Which season do students like best?", unit: "students", cats: ["Summer", "Autumn", "Winter", "Spring"], colors: [C.amber, C.orange, C.blue, C.green] },
+  { q: "What did students choose for lunch?", unit: "students", cats: ["Sandwich", "Pasta", "Sushi", "Wrap"], colors: [C.orange, C.red, C.teal, C.green] },
+  { q: "What do students do on the weekend?", unit: "students", cats: ["Park", "Movies", "Gaming", "Reading"], colors: [C.green, C.indigo, C.purple, C.blue] },
+  { q: "Which drink do students bring to school?", unit: "students", cats: ["Water", "Juice", "Milk", "Smoothie"], colors: [C.blue, C.amber, C.teal, C.pink] },
+  { q: "What is the class's favourite pet to draw?", unit: "students", cats: ["Rabbit", "Horse", "Turtle", "Parrot"], colors: [C.pink, C.amber, C.green, C.red] },
+];
+// Class-sized counts, all multiples of 2, distinct within a set so most/least
+// are unambiguous.
+const INVEST_COUNTS = [
+  [6, 10, 4, 8], [8, 4, 10, 6], [10, 6, 8, 4], [4, 8, 6, 10],
+  [8, 10, 6, 4], [6, 4, 10, 8], [10, 8, 4, 6], [4, 6, 8, 10],
+];
+function investNumOptions(correct: number, round: number, extras: number[] = []): Array<{ id: string; label: string }> {
+  const cands = [correct + 2, correct - 2, correct + 4, correct - 4, ...extras].filter((n) => n > 0 && n !== correct);
+  const seen = new Set<number>();
+  const wrongs = cands.filter((n) => (seen.has(n) ? false : (seen.add(n), true))).slice(0, 2);
+  return order([correct, ...wrongs].map((n) => ({ id: `n${n}`, label: String(n) })), round);
+}
+type InvestSurveyData = {
+  id: string; question: string; unit: string;
+  categories: ColCat[]; analysisPrompt: string; analysisSpeak: string;
+  options: Array<{ id: string; label: string }>; correctOptionIds: string[];
+};
+function buildInvestSurvey(tmpl: InvestSurvey, freq: number[], round: number, aType: number): InvestSurveyData {
+  const categories: ColCat[] = tmpl.cats.map((label, i) => ({ id: `c${i}`, label, color: tmpl.colors[i]!, count: freq[i]! }));
+  const sorted = [...categories].sort((a, b) => b.count - a.count);
+  const hi = sorted[0]!, lo = sorted[sorted.length - 1]!;
+  const total = categories.reduce((s, c) => s + c.count, 0);
+  let analysisPrompt: string, analysisSpeak: string, options: Array<{ id: string; label: string }>, correct: string;
+  if (aType === 0) {
+    analysisPrompt = "Your data: which was chosen the MOST?";
+    analysisSpeak = "Find the tallest column.";
+    options = order(categories.map((c) => ({ id: c.id, label: c.label })), round); correct = hi.id;
+  } else if (aType === 1) {
+    analysisPrompt = "Your data: which was chosen the LEAST?";
+    analysisSpeak = "Find the shortest column.";
+    options = order(categories.map((c) => ({ id: c.id, label: c.label })), round); correct = lo.id;
+  } else if (aType === 2) {
+    analysisPrompt = `Your data: how many students were surveyed altogether?`;
+    analysisSpeak = "Add every column together.";
+    options = investNumOptions(total, round); correct = `n${total}`;
+  } else {
+    analysisPrompt = `Your data: how many more chose ${hi.label} than ${lo.label}?`;
+    analysisSpeak = "Find the gap between the tallest and shortest columns.";
+    options = investNumOptions(hi.count - lo.count, round, [hi.count + lo.count]); correct = `n${hi.count - lo.count}`;
+  }
+  return { id: `s${tmpl.cats[0]}`, question: tmpl.q, unit: tmpl.unit, categories, analysisPrompt, analysisSpeak, options, correctOptionIds: [correct] };
+}
+export function investigationTask(round: number, target: number): PracticeTask {
+  // Three DISTINCT survey topics, each with its own rolled data + analysis.
+  const n = INVEST_SURVEYS.length;
+  const i0 = ((round % n) + n) % n;
+  const rot = Array.from({ length: n }, (_, k) => (i0 + k) % n);
+  const p1 = 1 + (round % (n - 1));               // 1..n-1 → different slot from 0
+  const p2raw = 1 + ((round * 2) % (n - 1));
+  const p2 = p2raw === p1 ? (p2raw % (n - 1)) + 1 : p2raw; // distinct from p1
+  const idx = [rot[0]!, rot[p1]!, rot[p2]!];
+  const surveys = idx.map((si, i) =>
+    buildInvestSurvey(INVEST_SURVEYS[si]!, pick(INVEST_COUNTS, round * 2 + i * 3), round + i, (round + i) % 4),
+  );
+  return {
+    kind: "statisticaInvestigation", target, buildStep: 2,
+    prompt: "Design a survey: which question will you investigate?",
+    speakText: "Pick a question, predict the result, then collect and graph the data.",
+    surveys,
+    feedback: { correct: "Great statistical thinking — your analysis matches your data.", wrong: "Read your own graph again to answer the question." },
+  };
+}
+
 // ── Lesson map (18 lessons, 6 weeks) — leads with many-to-one + distribution ──
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   // W1 Many-to-One Displays — the key, reading rows, calculating totals
@@ -430,10 +510,11 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y4-statistics-w5-l1": [shapeVariationTask, shapeConcentratedTask, colReadTask],
   "y4-statistics-w5-l2": [shapeVariationTask, shapeCompareTask, colInferenceTask],
   "y4-statistics-w5-l3": [shapeCompareTask, shapeVariationTask, shapeSpreadTask],
-  // W6 Investigation — collect, represent, analyse and report
-  "y4-statistics-w6-l1": [pictoReadTask, colCombineTask, shapeConcentratedTask],
-  "y4-statistics-w6-l2": [pictoBuildTask, colBuildTask, shapeVariationTask],
-  "y4-statistics-w6-l3": [shapeCompareTask, colInferenceTask, pictoCompareTask],
+  // W6 Investigation — L1 & L2 run the full design->predict->represent->analyse
+  // cycle (one investigation per go, ~3-4 min); L3 is quick review practice.
+  "y4-statistics-w6-l1": [investigationTask, investigationTask, investigationTask],
+  "y4-statistics-w6-l2": [investigationTask, investigationTask, investigationTask],
+  "y4-statistics-w6-l3": [colReadTask, pictoReadTask, colDiffTask],
 };
 
 function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {

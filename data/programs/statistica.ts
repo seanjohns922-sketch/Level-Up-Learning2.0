@@ -61,7 +61,7 @@ const LEVEL_SEEDS: Record<StatisticaLevel, StatisticaWeekSeed[]> = {
     { focus: "Column Graphs", lessons: ["Read Column Graphs", "Construct Column Graphs", "Interpret the Results"], curriculum: ["AC9M4ST01"] },
     { focus: "Distribution Shape", lessons: ["Where Is Data Concentrated?", "Describe the Shape", "Compare Distributions"], curriculum: ["AC9M4ST02"] },
     { focus: "Variation", lessons: ["What Is Variation?", "More vs Less Variation", "Compare Data Sets"], curriculum: ["AC9M4ST02"] },
-    { focus: "Statistical Investigation", lessons: ["Design a Survey", "Analyse the Data", "Communicate Findings"], curriculum: ["AC9M4ST01", "AC9M4ST02", "AC9M4ST03"] },
+    { focus: "Statistical Investigation", lessons: ["Design & Investigate", "Investigate Again", "Quick Data Review"], curriculum: ["AC9M4ST01", "AC9M4ST02", "AC9M4ST03"] },
   ],
   5: [
     { focus: "Data Types", lessons: ["Nominal Data", "Ordinal Data", "Discrete Numerical Data"], curriculum: ["AC9M5ST01"] },
