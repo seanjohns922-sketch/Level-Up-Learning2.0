@@ -38,12 +38,17 @@ const PICTO_THEMES: PictoTheme[] = [
 const ROW_COLORS = [C.red, C.blue, C.green, C.amber];
 const KEYS = [2, 5, 10];
 // Whole-symbol counts per row (distinct within each set, so most/least differ).
-const SYM_SETS = [[3, 5, 2, 4], [4, 2, 6, 3], [6, 3, 5, 2], [2, 6, 4, 5], [5, 4, 2, 6], [3, 6, 4, 2]];
+const SYM_SETS = [
+  [3, 5, 2, 4], [4, 2, 6, 3], [6, 3, 5, 2], [2, 6, 4, 5], [5, 4, 2, 6], [3, 6, 4, 2],
+  [4, 6, 3, 5], [5, 3, 6, 2], [6, 2, 4, 3], [2, 5, 3, 6], [3, 6, 5, 4], [5, 4, 6, 3],
+];
 
 type PictoCat = { id: string; label: string; color: string; count: number };
 function pictoData(round: number, opts: { half?: boolean } = {}) {
+  // Different strides so theme, key and symbol counts vary independently
+  // rather than all cycling together every few rounds.
   const theme = pick(PICTO_THEMES, round);
-  const key = pick(KEYS, round);
+  const key = pick(KEYS, round * 2 + 1);
   const syms = pick(SYM_SETS, round);
   // A single half symbol (only for even keys, so half a symbol is a whole number
   // of units) teaches reading partial symbols.
@@ -124,11 +129,17 @@ const COL_FREQ: number[][] = [
   [30, 25, 45, 20, 35],
   [45, 30, 20, 40, 25],
   [20, 40, 25, 45, 30],
+  [15, 35, 45, 25, 30],
+  [45, 25, 15, 35, 20],
+  [30, 45, 20, 35, 15],
+  [25, 15, 40, 30, 45],
 ];
 type ColCat = { id: string; label: string; color: string; count: number };
+// Survey and frequencies are picked on different strides (co-prime with their
+// pool sizes) so the scenario and the exact bar heights vary independently.
 function colData(round: number): { survey: ColSurvey; categories: ColCat[] } {
   const survey = pick(COL_SURVEYS, round);
-  const freq = pick(COL_FREQ, round);
+  const freq = pick(COL_FREQ, round * 7 + 1);
   const categories = survey.cats.map((c, i) => ({ ...c, count: freq[i]! }));
   return { survey, categories };
 }
@@ -227,10 +238,16 @@ const COL_BUILD_FREQ: number[][] = [
   [10, 30, 25, 20, 15],
   [25, 15, 20, 10, 30],
   [15, 30, 10, 25, 20],
+  [20, 30, 10, 25, 15],
+  [30, 15, 25, 10, 20],
+  [15, 25, 30, 20, 10],
+  [25, 10, 20, 30, 15],
+  [10, 30, 20, 15, 25],
+  [20, 15, 30, 25, 10],
 ];
 export function colBuildTask(round: number, target: number): PracticeTask {
   const survey = pick(COL_SURVEYS, round);
-  const freq = pick(COL_BUILD_FREQ, round);
+  const freq = pick(COL_BUILD_FREQ, round * 7 + 1);
   const categories = survey.cats.map((c, i) => ({ ...c, count: freq[i]! }));
   return {
     kind: "statisticaGraph", mode: "build", target, display: "columns", categories, buildStep: 5,
@@ -241,13 +258,26 @@ export function colBuildTask(round: number, target: number): PracticeTask {
 }
 
 // ── Distribution shape & variation (numerical, values 0-4) ───────────────────
+// A wide pool of everyday contexts. Context is picked on a stride co-prime with
+// the pool size (round*3), so the scenario changes every question and does not
+// move in lockstep with the shape data — the pairing rarely repeats.
 const NUM_CTX = [
   { q: "Goals scored each game", color: C.green },
   { q: "Books read each week", color: C.blue },
   { q: "Pets per family", color: C.orange },
   { q: "Times absent each term", color: C.purple },
   { q: "Apps opened each day", color: C.teal },
+  { q: "Siblings per student", color: C.pink },
+  { q: "Teeth lost this year", color: C.red },
+  { q: "Trophies won each season", color: C.amber },
+  { q: "Pieces of fruit each day", color: C.green },
+  { q: "Hours of sport each week", color: C.indigo },
+  { q: "Songs practised each day", color: C.blue },
+  { q: "Buses caught each week", color: C.teal },
+  { q: "Cups of water each day", color: C.purple },
+  { q: "Board games played each month", color: C.orange },
 ];
+const ctxFor = (round: number, offset: number) => pick(NUM_CTX, round * 3 + offset);
 const VALS = ["0", "1", "2", "3", "4"];
 function makeCats(freq: number[], color: string): PictoCat[] {
   return VALS.map((v, i) => ({ id: `v${v}`, label: v, color, count: freq[i]! }));
@@ -260,10 +290,15 @@ function variance(freq: number[]) {
   return freq.reduce((s, f, i) => s + f * (i - mean) ** 2, 0) / n;
 }
 
-// Clearly-peaked shapes so "where is it concentrated" has one honest answer.
-const CONC_SHAPES = [[2, 5, 10, 6, 2], [11, 7, 4, 2, 1], [1, 3, 4, 7, 12], [3, 8, 12, 7, 3], [12, 8, 5, 3, 1], [1, 2, 5, 8, 11]];
+// Clearly-peaked shapes so "where is it concentrated" has one honest answer —
+// four each peaking low / middle / high so the answer isn't predictable.
+const CONC_SHAPES = [
+  [11, 7, 4, 2, 1], [12, 8, 5, 3, 1], [9, 11, 5, 3, 2], [13, 6, 3, 2, 1],
+  [2, 5, 10, 6, 2], [3, 8, 12, 7, 3], [1, 6, 13, 6, 1], [2, 7, 11, 8, 3],
+  [1, 3, 4, 7, 12], [1, 2, 5, 8, 11], [2, 3, 5, 9, 13], [1, 4, 6, 10, 12],
+];
 export function shapeConcentratedTask(round: number, target: number): PracticeTask {
-  const ctx = pick(NUM_CTX, round);
+  const ctx = ctxFor(round, 0);
   const freq = pick(CONC_SHAPES, round);
   const where = bucket(argmax(freq));
   return {
@@ -280,21 +315,28 @@ export function shapeConcentratedTask(round: number, target: number): PracticeTa
   };
 }
 
-// Shapes including an even/uniform one for describing overall spread.
-const SHAPE_LIB: Array<{ freq: number[]; id: string; label: string }> = [
-  { freq: [2, 5, 11, 6, 2], id: "middle", label: "clustered around the middle" },
-  { freq: [12, 7, 4, 2, 1], id: "low", label: "mostly at the low values" },
-  { freq: [1, 2, 4, 7, 12], id: "high", label: "mostly at the high values" },
-  { freq: [6, 5, 6, 5, 6], id: "even", label: "spread out fairly evenly" },
+// Several distinct graphs for each of the four shape descriptions, so the same
+// answer sentence is paired with many different-looking column graphs.
+const SPREAD_LABELS: Array<{ id: string; label: string }> = [
+  { id: "middle", label: "clustered around the middle" },
+  { id: "low", label: "mostly at the low values" },
+  { id: "high", label: "mostly at the high values" },
+  { id: "even", label: "spread out fairly evenly" },
+];
+const SPREAD_SHAPES: Array<{ freq: number[]; id: string }> = [
+  { freq: [2, 5, 11, 6, 2], id: "middle" }, { freq: [1, 6, 12, 5, 1], id: "middle" }, { freq: [3, 6, 13, 6, 2], id: "middle" },
+  { freq: [12, 7, 4, 2, 1], id: "low" }, { freq: [13, 6, 3, 2, 1], id: "low" }, { freq: [11, 8, 5, 3, 1], id: "low" },
+  { freq: [1, 2, 4, 7, 12], id: "high" }, { freq: [1, 2, 5, 8, 13], id: "high" }, { freq: [2, 3, 4, 6, 11], id: "high" },
+  { freq: [6, 5, 6, 5, 6], id: "even" }, { freq: [5, 6, 5, 6, 5], id: "even" }, { freq: [7, 6, 7, 6, 7], id: "even" },
 ];
 export function shapeSpreadTask(round: number, target: number): PracticeTask {
-  const ctx = pick(NUM_CTX, round + 1);
-  const shape = pick(SHAPE_LIB, round);
+  const ctx = ctxFor(round, 5);
+  const shape = pick(SPREAD_SHAPES, round);
   return {
     kind: "statisticaShape", mode: "spread", target, display: "columns", categories: makeCats(shape.freq, ctx.color),
     prompt: `${ctx.q}: which best describes the shape of the data?`,
     speakText: "Look at where the columns are tall and short, then pick the sentence that fits.",
-    options: order(SHAPE_LIB.map((s) => ({ id: s.id, label: `The data is ${s.label}.` })), round),
+    options: order(SPREAD_LABELS.map((s) => ({ id: s.id, label: `The data is ${s.label}.` })), round),
     correctOptionIds: [shape.id],
     feedback: { correct: "Yes — that matches the shape of the columns.", wrong: "Look again at where the data bunches up or spreads out." },
   };
@@ -307,9 +349,14 @@ const VAR_PAIRS = [
   [[1, 4, 13, 3, 1], [5, 5, 4, 5, 5]],
   [[3, 4, 10, 4, 2], [9, 2, 1, 2, 9]],
   [[1, 2, 15, 2, 1], [4, 6, 5, 6, 4]],
+  [[2, 2, 12, 2, 2], [7, 5, 4, 5, 7]],
+  [[1, 1, 14, 1, 1], [6, 6, 5, 6, 6]],
+  [[3, 3, 11, 3, 2], [8, 4, 2, 4, 8]],
+  [[2, 4, 11, 3, 1], [9, 3, 1, 3, 9]],
+  [[1, 3, 12, 4, 1], [5, 6, 4, 6, 5]],
 ];
 export function shapeVariationTask(round: number, target: number): PracticeTask {
-  const ctx = pick(NUM_CTX, round + 2);
+  const ctx = ctxFor(round, 9);
   const pair = pick(VAR_PAIRS, round);
   const swap = round % 2 === 1;
   const fa = swap ? pair[1]! : pair[0]!;
@@ -334,9 +381,14 @@ const COMPARE_PAIRS = [
   [[1, 3, 11, 3, 1], [9, 4, 2, 1, 1]],
   [[11, 4, 2, 2, 1], [1, 2, 4, 6, 11]],
   [[1, 2, 4, 11, 3], [3, 11, 4, 2, 1]],
+  [[9, 5, 3, 2, 1], [1, 2, 3, 5, 9]],
+  [[1, 9, 4, 2, 1], [1, 2, 4, 9, 2]],
+  [[2, 4, 10, 3, 1], [10, 4, 2, 1, 1]],
+  [[1, 3, 5, 10, 2], [2, 10, 5, 3, 1]],
+  [[11, 3, 2, 1, 1], [1, 1, 2, 3, 11]],
 ];
 export function shapeCompareTask(round: number, target: number): PracticeTask {
-  const ctx = pick(NUM_CTX, round + 3);
+  const ctx = ctxFor(round, 12);
   const pair = pick(COMPARE_PAIRS, round);
   const swap = round % 2 === 1;
   const fa = swap ? pair[1]! : pair[0]!;

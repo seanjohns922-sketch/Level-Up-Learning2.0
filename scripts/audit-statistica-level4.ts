@@ -162,7 +162,7 @@ for (const lessonId of STATISTICA_LEVEL4_LESSON_IDS) {
   sample.activities.forEach((_, slot) => {
     const vs = getStatisticaLevel4TaskSet(lessonId)!;
     const sigs = Array.from({ length: 12 }, () => fingerprint(vs.activities[slot]!() as PracticeTask));
-    check(new Set(sigs).size >= 5, `${lessonId} activity ${slot + 1}: needs >=5 variants across 12 calls`);
+    check(new Set(sigs).size >= 10, `${lessonId} activity ${slot + 1}: needs >=10 distinct variants across 12 calls (kids should rarely see a repeat)`);
   });
 }
 
