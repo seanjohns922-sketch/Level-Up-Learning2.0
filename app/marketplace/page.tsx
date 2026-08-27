@@ -7,7 +7,7 @@ import { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
 import MarketplaceItemImage from "@/components/economy/MarketplaceItemImage";
 import { economyErrorMessage, equipEconomyItem, fetchDemoEconomy, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyItem, type EconomyState } from "@/lib/economy";
 import { isMarketplaceItemAvailable, isMarketplaceItemListed } from "@/lib/marketplace-visuals";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { DEMO_PREVIEW_SCOPE, useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { persistCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 import {
@@ -39,7 +39,7 @@ function itemMarketplaceCategory(item: EconomyItem): MarketplaceCategory {
 
 export default function MarketplacePage() {
   const student = useMemo(() => getActiveStudentProfile(), []);
-  const preview = isDemoPreviewMode();
+  const preview = useDemoPreviewMode() || student?.studentId === DEMO_PREVIEW_SCOPE;
   const studentId = student?.studentId ?? (preview ? "demo-preview" : null);
   const [state, setState] = useState<EconomyState | null>(null);
   const [category, setCategory] = useState<MarketplaceCategory>("buildings");
