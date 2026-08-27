@@ -23,12 +23,14 @@ type Props = {
   // Force the axis to at least this value so side-by-side plots (compare /
   // variation) share one scale and their bar heights are directly comparable.
   axisMax?: number;
+  // Narrower columns/gaps so two plots fit side by side without overflowing.
+  dense?: boolean;
 };
 
 // The shared premium data-plot used by every Statistica graph card: column
 // tracks, a grounded baseline, interval gridlines and adaptive cell sizing so
 // small data gets big icons and tall columns still fit.
-export default function StatisticaPlot({ categories, display, values, onColumnClick, selectedIds = [], statusById = {}, footer, cell, labelReadAloud = true, axisMax }: Props) {
+export default function StatisticaPlot({ categories, display, values, onColumnClick, selectedIds = [], statusById = {}, footer, cell, labelReadAloud = true, axisMax, dense = false }: Props) {
   const heights = categories.map((c, i) => values?.[i] ?? c.count);
   const maxVal = Math.max(1, axisMax ?? 0, ...categories.map((c) => c.count), ...heights);
   // Round the axis top up to a whole number of steps so the scale is always
@@ -44,9 +46,9 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
   const cellSize = unit - cellGap;
   const plotH = rows * unit;
   const isColumns = display === "columns";
-  const colWidth = isColumns ? Math.min(64, cellSize + 40) : cellSize + 22;
+  const colWidth = isColumns ? Math.min(dense ? 38 : 64, cellSize + (dense ? 22 : 40)) : cellSize + 22;
   const AXIS = 24;
-  const COL_GAP = 20; // fixed spacing between columns, so every graph matches
+  const COL_GAP = dense ? 10 : 20; // spacing between columns, so every graph matches
   const stops: number[] = [];
   for (let v = step; v <= rows; v += step) stops.push(v);
   const cellShape = display === "pictures" ? "rounded-full" : "rounded-[3px]";
@@ -59,7 +61,7 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
     );
 
   return (
-    <div className="mx-auto max-w-lg rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] p-4 pt-3 shadow-[inset_0_1px_0_rgba(255,240,199,0.14),0_12px_32px_rgba(0,0,0,0.32)]">
+    <div className={`mx-auto ${dense ? "max-w-[300px]" : "max-w-lg"} rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] ${dense ? "p-3 pt-2" : "p-4 pt-3"} shadow-[inset_0_1px_0_rgba(255,240,199,0.14),0_12px_32px_rgba(0,0,0,0.32)]`}>
       <div className="relative mx-auto" style={{ height: plotH }}>
         {stops.map((v) => (
           <div key={v} className="pointer-events-none absolute right-0 flex items-center" style={{ left: AXIS, bottom: v * unit }}>
