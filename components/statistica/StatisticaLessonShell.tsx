@@ -11,6 +11,7 @@ import { getStatisticaLevel2TaskSet } from "@/data/activities/statistica/level2"
 import { getStatisticaLevel3TaskSet } from "@/data/activities/statistica/level3";
 import { getStatisticaLevel4TaskSet } from "@/data/activities/statistica/level4";
 import { getStatisticaLevel5TaskSet } from "@/data/activities/statistica/level5";
+import { getStatisticaLevel6TaskSet } from "@/data/activities/statistica/level6";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 
 type Props = {
@@ -34,6 +35,7 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
       : levelNumber === 3 ? getStatisticaLevel3TaskSet(lessonId)
       : levelNumber === 4 ? getStatisticaLevel4TaskSet(lessonId)
       : levelNumber === 5 ? getStatisticaLevel5TaskSet(lessonId)
+      : levelNumber === 6 ? getStatisticaLevel6TaskSet(lessonId)
       : null;
     return taskSet ? createRandomRealmLessonGenerator(taskSet) : null;
   });
