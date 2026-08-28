@@ -2923,6 +2923,25 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica Level 5 — line graph of change over time (AC9M5ST02). The
+      // x-axis is an ordered sequence (times of day, days, months) and the
+      // y-axis a numerical quantity. "read" = value at a point; "trend" =
+      // rose/fell/steady between points; "infer" = when it peaked / a
+      // conclusion the data supports.
+      kind: "statisticaLineGraph";
+      mode: "read" | "trend" | "infer";
+      prompt: string;
+      speakText: string;
+      target: number;
+      unit: string;
+      yLabel: string;
+      color: string;
+      points: Array<{ label: string; value: number }>;
+      options: Array<{ id: string; label: string }>;
+      correctOptionIds: string[];
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Statistica Level 4 — guided statistical investigation (AC9M4ST03). The
       // student picks one of three survey questions, predicts an outcome, sees
       // the (pre-rolled) class data, builds the column graph to match it, then

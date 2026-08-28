@@ -296,6 +296,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "statisticaPictograph",
   "statisticaShape",
   "statisticaInvestigation",
+  "statisticaLineGraph",
   "statisticaRank",
   "statisticaGap",
   "statisticaTapGraph",
