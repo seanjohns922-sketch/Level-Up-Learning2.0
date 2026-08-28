@@ -1121,6 +1121,9 @@ function ProgramPage() {
                 } : isMeasurementRealm ? {
                   borderRadius: 14,
                   background: "linear-gradient(135deg, rgba(200,160,48,0.42), rgba(120,90,15,0.14) 40%, rgba(200,160,48,0.36))",
+                } : isStatisticsRealm ? {
+                  borderRadius: 14,
+                  background: "linear-gradient(135deg, rgba(240,107,100,0.5), rgba(242,188,69,0.18) 42%, rgba(121,184,90,0.5))",
                 } : {
                   clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
                   background: "linear-gradient(135deg, rgba(94,234,212,0.55), rgba(20,184,166,0.15) 40%, rgba(13,148,136,0.5))",
@@ -1136,19 +1139,23 @@ function ProgramPage() {
                   borderRadius: 12,
                   background: "linear-gradient(135deg, #140e04 0%, #1e1506 50%, #2a1e08 100%)",
                   boxShadow: "inset 0 1px 0 rgba(200,160,48,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(109,40,217,0.08)",
+                } : isStatisticsRealm ? {
+                  borderRadius: 12,
+                  background: "linear-gradient(135deg, #0d221d 0%, #12312a 50%, #1c3f37 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(242,188,69,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(240,107,100,0.1)",
                 } : {
                   clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
                   background: "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
                   boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 18px rgba(0,0,0,0.45)",
                 }}
               >
-                {!isMeasurementRealm && !isStarpathRealm && (
+                {!isMeasurementRealm && !isStarpathRealm && !isStatisticsRealm && (
                   <div
                     className="absolute inset-0 opacity-15 pointer-events-none"
                     style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.4) 0 1px, transparent 1px 3px)" }}
                   />
                 )}
-                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isStarpathRealm ? "ring-1 ring-cyan-400/20" : isMeasurementRealm ? "ring-1 ring-yellow-900/40" : "ring-1 ring-teal-400/20"}`}>
+                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isStarpathRealm ? "ring-1 ring-cyan-400/20" : isMeasurementRealm ? "ring-1 ring-yellow-900/40" : isStatisticsRealm ? "ring-1 ring-[#f2bc45]/25" : "ring-1 ring-teal-400/20"}`}>
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${percent}%`, background: rt.xpBg, boxShadow: rt.xpGlow }}
