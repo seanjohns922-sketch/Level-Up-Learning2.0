@@ -14,6 +14,8 @@ import {
   CENTRAL_WORLD_GRID,
   gridToWorld,
   rotatedGridSize,
+  type CentralWorldGroundTile,
+  type CentralWorldGroundType,
   type CentralWorldPlacement,
 } from "@/lib/world3d/central-world-layout";
 
@@ -205,16 +207,25 @@ function RewardSpecialPlace({ assetKey, accent, tier }: { assetKey: string; acce
 function RewardPlotObject({ item, accent, tier }: { item: EconomyItem; accent: string; tier: number }) {
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
   const category = typeof item.metadata.marketplaceCategory === "string" ? item.metadata.marketplaceCategory : "";
+  if (category === "world_basic") return <StarterScenery assetKey={assetKey} />;
   if (category === "animals") return <RewardAnimalYard assetKey={assetKey} accent={accent} tier={tier} />;
   if (category === "pools_play") return <RewardPlayPlace assetKey={assetKey} tier={tier} />;
   if (category === "special") return <RewardSpecialPlace assetKey={assetKey} accent={accent} tier={tier} />;
   return <RewardBuilding assetKey={assetKey} accent={accent} tier={tier} />;
 }
 
+function StarterScenery({ assetKey }: { assetKey: string }) {
+  if (assetKey === "lamp_post") return <group><mesh position={[0, 1.25, 0]} castShadow><cylinderGeometry args={[0.09, 0.13, 2.5, 10]} /><meshStandardMaterial color="#344239" metalness={0.45} roughness={0.48} /></mesh><mesh position={[0, 2.55, 0]}><sphereGeometry args={[0.3, 16, 12]} /><meshStandardMaterial color="#fff1a8" emissive="#facc15" emissiveIntensity={0.85} /></mesh></group>;
+  if (assetKey === "flower_bed") return <group><mesh position={[0, 0.15, 0]}><cylinderGeometry args={[0.72, 0.82, 0.24, 20]} /><meshStandardMaterial color="#5d3b24" roughness={1} /></mesh>{[[0.3, "#f472b6"], [-0.28, "#facc15"], [0, "#a78bfa"]].map(([x, color], index) => <mesh key={index} position={[Number(x), 0.48, index === 2 ? 0.25 : -0.08]}><sphereGeometry args={[0.2, 10, 8]} /><meshStandardMaterial color={String(color)} /></mesh>)}</group>;
+  const pine = assetKey === "pine_tree";
+  return <group><mesh position={[0, 1.05, 0]} castShadow><cylinderGeometry args={[0.18, 0.3, 2.1, 10]} /><meshStandardMaterial color="#74431f" roughness={0.9} /></mesh>{pine ? <><mesh position={[0, 2.15, 0]} castShadow><coneGeometry args={[1.05, 2.2, 10]} /><meshStandardMaterial color="#276749" roughness={0.95} /></mesh><mesh position={[0, 3.05, 0]} castShadow><coneGeometry args={[0.78, 1.65, 10]} /><meshStandardMaterial color="#2f855a" roughness={0.95} /></mesh></> : <><mesh position={[-0.42, 2.25, 0]} castShadow><sphereGeometry args={[0.78, 14, 10]} /><meshStandardMaterial color="#3f8f3a" roughness={0.95} /></mesh><mesh position={[0.45, 2.35, 0.08]} castShadow><sphereGeometry args={[0.88, 14, 10]} /><meshStandardMaterial color="#4cae4f" roughness={0.95} /></mesh></>}</group>;
+}
+
 function worldObjectScale(item: EconomyItem) {
   const category = item.metadata.marketplaceCategory;
   if (category === "buildings") return 2.45;
   if (category === "special") return 1.9;
+  if (category === "world_basic") return 1.25;
   return 1.75;
 }
 
@@ -247,7 +258,7 @@ function PlacedWorldObject({ item, placement, preview = false, valid = true }: {
       <group ref={groupRef} scale={scale}>
         <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} />
       </group>
-      {!preview ? <Html center position={[0, 4.2 * scale, 0]} distanceFactor={18} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div></Html> : null}
+      {!preview && item.metadata.marketplaceCategory !== "world_basic" ? <Html center position={[0, 4.2 * scale, 0]} distanceFactor={18} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div></Html> : null}
     </group>
   );
 }
@@ -263,6 +274,13 @@ function BuildModeGrid() {
       <mesh position={[-30, 0.126, -6]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[18, 15]} /><meshBasicMaterial color="#ef4444" transparent opacity={0.18} depthWrite={false} /></mesh>
     </group>
   );
+}
+
+const GROUND_TILE_COLORS: Record<CentralWorldGroundType, string> = { path: "#a77a50", road: "#4b5563", stone: "#a8a29e" };
+
+function GroundTile({ tile, preview = false, valid = true }: { tile: CentralWorldGroundTile; preview?: boolean; valid?: boolean }) {
+  const [x, , z] = gridToWorld(tile.gridX, tile.gridZ);
+  return <mesh position={[x, preview ? 0.18 : 0.105, z]} receiveShadow><boxGeometry args={[CENTRAL_WORLD_GRID.cellSize + 0.04, preview ? 0.12 : 0.08, CENTRAL_WORLD_GRID.cellSize + 0.04]} /><meshStandardMaterial color={preview ? valid ? GROUND_TILE_COLORS[tile.tileType] : "#ef4444" : GROUND_TILE_COLORS[tile.tileType]} transparent={preview} opacity={preview ? 0.72 : 1} roughness={0.95} /></mesh>;
 }
 
 function MeadowGround() {
@@ -283,15 +301,19 @@ function MeadowGround() {
   return <mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[135, 96]} /><meshStandardMaterial map={texture} color="#ffffff" roughness={1} /></mesh>;
 }
 
-function GrassTufts({ quality }: { quality: CentralWorldQuality }) {
+function GrassTufts({ quality, groundTiles }: { quality: CentralWorldQuality; groundTiles: CentralWorldGroundTile[] }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const count = quality === "low" ? 85 : quality === "medium" ? 180 : 310;
-  const transforms = useMemo(() => Array.from({ length: count }, (_, index) => {
+  const desiredCount = quality === "low" ? 85 : quality === "medium" ? 180 : 310;
+  const transforms = useMemo(() => {
+    const coveredCells = new Set(groundTiles.map((tile) => `${tile.gridX}:${tile.gridZ}`));
+    return Array.from({ length: desiredCount }, (_, index) => {
     const x = ((index * 17.13) % 92) - 46;
     const z = ((index * 29.71) % 86) - 32;
     const nearPath = Math.abs(x - Math.sin(z * 0.16)) < 3.2;
     return { x: nearPath ? x + (x < 0 ? -3.8 : 3.8) : x, z, scale: 0.5 + ((index * 7) % 10) / 18 };
-  }), [count]);
+    }).filter((item) => !coveredCells.has(`${Math.round(item.x / CENTRAL_WORLD_GRID.cellSize)}:${Math.round(item.z / CENTRAL_WORLD_GRID.cellSize)}`));
+  }, [desiredCount, groundTiles]);
+  const count = transforms.length;
   useLayoutEffect(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
@@ -456,7 +478,7 @@ function PlaceholderMyHome({ active }: { active: boolean }) {
   );
 }
 
-export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], itemsById = new Map(), buildPreview = null }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null }) {
+export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean } | null; editing?: boolean }) {
   return (
     <group>
       <Suspense fallback={null}>
@@ -467,15 +489,17 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, p
       </Suspense>
       <ValleyPath />
       <MyHomePath />
-      <GrassTufts quality={quality} />
+      {groundTiles.map((tile) => <GroundTile key={`${tile.gridX}:${tile.gridZ}`} tile={tile} />)}
+      <GrassTufts quality={quality} groundTiles={groundTiles} />
       <PlaceholderKnowledgeTower active={entranceActive} />
       <PlaceholderMyHome active={homeActive} />
-      {buildPreview ? <BuildModeGrid /> : null}
+      {editing || buildPreview ? <BuildModeGrid /> : null}
       {placedCustomisations.map((placement, index) => {
         const item = itemsById.get(placement.itemId);
         return item ? <PlacedWorldObject key={`${placement.itemId}-${index}`} item={item} placement={placement} /> : null;
       })}
       {buildPreview ? <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} preview valid={buildPreview.valid} /> : null}
+      {groundPreview ? <GroundTile tile={groundPreview.tile} preview valid={groundPreview.valid} /> : null}
     </group>
   );
 }

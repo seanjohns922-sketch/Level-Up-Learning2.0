@@ -18,6 +18,7 @@ const home = read("app/home-base/page.tsx");
 const marketplace = read("app/marketplace/page.tsx");
 const catalogue = read("lib/world3d/central-world-customisation-catalog.ts");
 const layout = read("lib/world3d/central-world-layout.ts");
+const editorCatalogue = read("lib/world3d/central-world-editor-catalog.ts");
 const migration = read("supabase/migrations/20260826152000_central_world_customisation_catalogue.sql");
 const launchMigration = read("supabase/migrations/20260826173500_central_world_launch_rewards_catalogue.sql");
 
@@ -54,7 +55,12 @@ check(marketplace.includes("Place in world") && marketplace.includes("build=${en
 check(environment.includes("worldObjectScale") && environment.includes('category === "buildings"') && environment.includes("return 2.45"), "Purchased buildings must render at landmark scale");
 check(environment.includes("BuildModeGrid") && environment.includes("PlacedWorldObject"), "Grid placement preview or placed world objects are missing");
 check(layout.includes("itemId: string") && layout.includes("gridX: number") && layout.includes("gridZ: number") && layout.includes("rotation: 0 | 90 | 180 | 270"), "Saved world placement model is incomplete");
-check(layout.includes("isProtectedCell") && layout.includes("validateCentralWorldPlacement"), "Tower, home and path protection rules are missing");
+check(layout.includes("isCentralWorldProtectedCell") && layout.includes("validateCentralWorldPlacement"), "Tower, home and path protection rules are missing");
+check(world.includes('label: editorOpen ? "EXIT EDIT" : "EDIT WORLD"') && world.includes('aria-label="Edit world controls"'), "Central hub Edit World entry or controls are missing");
+check(world.includes('"path"') && world.includes('"road"') && world.includes('"stone"') && world.includes('"erase"'), "Ground painting tools are incomplete");
+check(layout.includes("CentralWorldGroundTile") && layout.includes("writeCentralWorldGroundTiles"), "Ground customisation persistence is missing");
+check(environment.includes("GroundTile") && environment.includes("StarterScenery"), "Ground tiles or starter scenery do not render in the 3D hub");
+for (const item of ["tree", "pine_tree", "flower_bed", "lamp_post"]) check(editorCatalogue.includes(`"${item}"`), `Starter scenery missing: ${item}`);
 check(
   marketplace.includes("Buildings")
     && marketplace.includes("Animals")

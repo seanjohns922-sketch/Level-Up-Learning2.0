@@ -1,14 +1,19 @@
 import type { EconomyItem } from "@/lib/economy";
 
 export type CentralWorldPlacement = {
+  placementId?: string;
   itemId: string;
   gridX: number;
   gridZ: number;
   rotation: 0 | 90 | 180 | 270;
 };
 
+export type CentralWorldGroundType = "path" | "road" | "stone";
+export type CentralWorldGroundTile = { gridX: number; gridZ: number; tileType: CentralWorldGroundType };
+
 export const CENTRAL_WORLD_GRID = { cellSize: 2, minX: -21, maxX: 21, minZ: -13, maxZ: 25 } as const;
 const STORAGE_PREFIX = "lul:central-world:layout:v1";
+const GROUND_STORAGE_PREFIX = "lul:central-world:ground:v1";
 
 export function parseGridSize(item: EconomyItem): [number, number] {
   const value = typeof item.metadata.gridSize === "string" ? item.metadata.gridSize : "3x3";
@@ -34,7 +39,7 @@ function occupiedCells(placement: CentralWorldPlacement, item: EconomyItem) {
   return cells;
 }
 
-function isProtectedCell(gridX: number, gridZ: number) {
+export function isCentralWorldProtectedCell(gridX: number, gridZ: number) {
   const x = gridX * CENTRAL_WORLD_GRID.cellSize;
   const z = gridZ * CENTRAL_WORLD_GRID.cellSize;
   if (z <= -13 && Math.abs(x) <= 12) return true;
@@ -48,7 +53,7 @@ export function validateCentralWorldPlacement(placement: CentralWorldPlacement, 
   const cells = occupiedCells(placement, item);
   for (const key of cells) {
     const [x, z] = key.split(":").map(Number);
-    if (x < CENTRAL_WORLD_GRID.minX || x > CENTRAL_WORLD_GRID.maxX || z < CENTRAL_WORLD_GRID.minZ || z > CENTRAL_WORLD_GRID.maxZ || isProtectedCell(x, z)) return false;
+    if (x < CENTRAL_WORLD_GRID.minX || x > CENTRAL_WORLD_GRID.maxX || z < CENTRAL_WORLD_GRID.minZ || z > CENTRAL_WORLD_GRID.maxZ || isCentralWorldProtectedCell(x, z)) return false;
   }
   const occupied = new Set<string>();
   for (const existing of placements) {
@@ -69,4 +74,23 @@ export function readCentralWorldPlacements(scope: string) {
 
 export function writeCentralWorldPlacements(scope: string, placements: CentralWorldPlacement[]) {
   if (typeof window !== "undefined") window.localStorage.setItem(`${STORAGE_PREFIX}:${scope}`, JSON.stringify(placements));
+}
+
+export function validateCentralWorldGroundCell(gridX: number, gridZ: number) {
+  return gridX >= CENTRAL_WORLD_GRID.minX && gridX <= CENTRAL_WORLD_GRID.maxX
+    && gridZ >= CENTRAL_WORLD_GRID.minZ && gridZ <= CENTRAL_WORLD_GRID.maxZ
+    && !isCentralWorldProtectedCell(gridX, gridZ);
+}
+
+export function readCentralWorldGroundTiles(scope: string) {
+  if (typeof window === "undefined") return [] as CentralWorldGroundTile[];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(`${GROUND_STORAGE_PREFIX}:${scope}`) ?? "[]");
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((entry): entry is CentralWorldGroundTile => Number.isInteger(entry?.gridX) && Number.isInteger(entry?.gridZ) && ["path", "road", "stone"].includes(entry?.tileType));
+  } catch { return []; }
+}
+
+export function writeCentralWorldGroundTiles(scope: string, tiles: CentralWorldGroundTile[]) {
+  if (typeof window !== "undefined") window.localStorage.setItem(`${GROUND_STORAGE_PREFIX}:${scope}`, JSON.stringify(tiles));
 }
