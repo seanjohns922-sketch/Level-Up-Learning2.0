@@ -105,23 +105,26 @@ function auditTask(lessonId: string, task: PracticeTask) {
     }
     case "statisticaInvestigation": {
       const step = task.buildStep ?? 1;
-      check(task.surveys.length === 3, `${lessonId}: investigation must offer 3 survey choices`);
+      check(task.surveys.length === 4, `${lessonId}: investigation must offer 4 survey choices`);
       const questions = new Set(task.surveys.map((s) => s.question));
-      check(questions.size === 3, `${lessonId}: the 3 survey choices must be distinct`);
+      check(questions.size === 4, `${lessonId}: the 4 survey choices must be distinct`);
       for (const s of task.surveys) {
         check(s.categories.length >= 2 && s.categories.every((c) => inRangeGraph(c.count) && c.count % step === 0), `${lessonId}: survey counts must be buildable multiples of ${step}`);
-        const opts = new Set(s.options.map((o) => o.id));
-        check(s.options.length >= 2 && s.correctOptionIds.length === 1 && opts.has(s.correctOptionIds[0]!), `${lessonId}: survey analysis needs one valid answer`);
-        // A numeric-answer analysis (id like "n28") must equal a real quantity;
-        // a category answer must be one of the survey's categories.
-        if (s.correctOptionIds[0]!.startsWith("n")) {
-          const n = Number(s.correctOptionIds[0]!.slice(1));
-          const total = s.categories.reduce((a, c) => a + c.count, 0);
-          const counts = s.categories.map((c) => c.count);
-          const diff = Math.max(...counts) - Math.min(...counts);
-          check(n === total || n === diff, `${lessonId}: numeric analysis answer must equal the total or the difference`);
-        } else {
-          check(s.categories.some((c) => c.id === s.correctOptionIds[0]), `${lessonId}: category analysis answer must be a real category`);
+        check(s.analyses.length >= 2 && s.analyses.length <= 3, `${lessonId}: each survey needs 2-3 analysis questions`);
+        const total = s.categories.reduce((a, c) => a + c.count, 0);
+        const counts = s.categories.map((c) => c.count);
+        const diff = Math.max(...counts) - Math.min(...counts);
+        for (const a of s.analyses) {
+          const opts = new Set(a.options.map((o) => o.id));
+          check(a.options.length >= 2 && a.correctOptionIds.length === 1 && opts.has(a.correctOptionIds[0]!), `${lessonId}: analysis needs one valid answer`);
+          // A numeric answer (id like "n120") must equal a real quantity; a
+          // category answer must be one of the survey's categories.
+          if (a.correctOptionIds[0]!.startsWith("n")) {
+            const nv = Number(a.correctOptionIds[0]!.slice(1));
+            check(nv === total || nv === diff, `${lessonId}: numeric analysis answer must equal the total or the difference`);
+          } else {
+            check(s.categories.some((c) => c.id === a.correctOptionIds[0]), `${lessonId}: category analysis answer must be a real category`);
+          }
         }
       }
       break;

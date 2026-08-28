@@ -22,6 +22,7 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
   const [built, setBuilt] = useState<number[]>([]);
   const [buildTried, setBuildTried] = useState(false);
   const [chosen, setChosen] = useState<string | null>(null);
+  const [analysisIndex, setAnalysisIndex] = useState(0);
   const [settled, setSettled] = useState(false);
 
   const buildStep = task.buildStep ?? 1;
@@ -41,9 +42,16 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
     if (buildMatches) setStep("analyse");
   }
   function submitAnalysis() {
-    if (settled || !chosen) return;
-    setSettled(true);
-    if (survey!.correctOptionIds.includes(chosen)) onCorrect(); else onWrong(chosen);
+    if (settled || !chosen || !survey) return;
+    const q = survey.analyses[analysisIndex]!;
+    if (!q.correctOptionIds.includes(chosen)) { setSettled(true); onWrong(chosen); return; }
+    if (analysisIndex + 1 < survey.analyses.length) {
+      setAnalysisIndex(analysisIndex + 1);
+      setChosen(null);
+    } else {
+      setSettled(true);
+      onCorrect();
+    }
   }
 
   const predictionLabel = survey?.categories.find((c) => c.id === prediction)?.label ?? null;
@@ -133,12 +141,15 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
         </>
       )}
 
-      {step === "analyse" && survey && (
+      {step === "analyse" && survey && (() => {
+        const q = survey.analyses[analysisIndex]!;
+        return (
         <>
-          <TaskHeading prompt={survey.analysisPrompt} speech={`${survey.analysisPrompt}. ${survey.analysisSpeak}`} />
+          <p className="text-center text-[11px] font-black uppercase tracking-[0.14em] text-[#c74f4b]">Question {analysisIndex + 1} of {survey.analyses.length}</p>
+          <TaskHeading prompt={q.prompt} speech={`${q.prompt}. ${q.speak}`} />
           <StatisticaPlot categories={survey.categories} display="columns" labelReadAloud={false} />
           <div className="mx-auto grid max-w-lg gap-2">
-            {survey.options.map((option) => (
+            {q.options.map((option) => (
               <div key={option.id} className="relative">
                 <button type="button" onClick={() => !settled && setChosen(option.id)} className={["min-h-12 w-full rounded-lg border-2 px-3 py-2 pr-10 text-left text-sm font-bold transition", chosen === option.id ? "border-[#f06b64] bg-[#fff0df] text-[#5b2e27] ring-2 ring-[#f2bc45]/55" : "border-[#b9caaa] bg-[#fffaf0] text-[#244531] hover:border-[#f06b64]"].join(" ")}>{option.label}</button>
                 <OptionReadAloudButton text={option.label} className="absolute right-1 top-1/2 -translate-y-1/2 scale-90" />
@@ -149,7 +160,8 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
             <button type="button" onClick={submitAnalysis} disabled={settled || !chosen} className="flex h-12 items-center gap-2 rounded-lg bg-[#c74f4b] px-7 font-black text-white shadow-md transition hover:bg-[#a93f3c] active:scale-95 disabled:opacity-40"><Check className="h-5 w-5" /> Check</button>
           </div>
         </>
-      )}
+        );
+      })()}
     </div>
   );
 }

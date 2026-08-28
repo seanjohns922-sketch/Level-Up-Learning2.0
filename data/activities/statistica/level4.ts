@@ -424,62 +424,69 @@ const INVEST_SURVEYS: InvestSurvey[] = [
   { q: "Which drink do students bring to school?", unit: "students", cats: ["Water", "Juice", "Milk", "Smoothie"], colors: [C.blue, C.amber, C.teal, C.pink] },
   { q: "What is the class's favourite pet to draw?", unit: "students", cats: ["Rabbit", "Horse", "Turtle", "Parrot"], colors: [C.pink, C.amber, C.green, C.red] },
 ];
-// Class-sized counts, all multiples of 2, distinct within a set so most/least
-// are unambiguous.
+// Year-level-sized counts (a bigger survey), all multiples of 5 so bars build
+// against a by-fives scale; distinct within a set so most/least are unambiguous.
 const INVEST_COUNTS = [
-  [6, 10, 4, 8], [8, 4, 10, 6], [10, 6, 8, 4], [4, 8, 6, 10],
-  [8, 10, 6, 4], [6, 4, 10, 8], [10, 8, 4, 6], [4, 6, 8, 10],
+  [20, 35, 15, 30], [30, 15, 40, 25], [40, 20, 30, 15], [15, 30, 25, 40],
+  [25, 40, 20, 35], [35, 15, 30, 20], [30, 25, 40, 15], [20, 40, 15, 35],
 ];
+const INVEST_STEP = 5;
 function investNumOptions(correct: number, round: number, extras: number[] = []): Array<{ id: string; label: string }> {
-  const cands = [correct + 2, correct - 2, correct + 4, correct - 4, ...extras].filter((n) => n > 0 && n !== correct);
+  const cands = [correct + 5, correct - 5, correct + 10, correct - 10, ...extras].filter((n) => n > 0 && n !== correct);
   const seen = new Set<number>();
   const wrongs = cands.filter((n) => (seen.has(n) ? false : (seen.add(n), true))).slice(0, 2);
   return order([correct, ...wrongs].map((n) => ({ id: `n${n}`, label: String(n) })), round);
 }
+type Analysis = { prompt: string; speak: string; options: Array<{ id: string; label: string }>; correctOptionIds: string[] };
 type InvestSurveyData = {
   id: string; question: string; unit: string;
-  categories: ColCat[]; analysisPrompt: string; analysisSpeak: string;
-  options: Array<{ id: string; label: string }>; correctOptionIds: string[];
+  categories: ColCat[]; analyses: Analysis[];
 };
-function buildInvestSurvey(tmpl: InvestSurvey, freq: number[], round: number, aType: number): InvestSurveyData {
-  const categories: ColCat[] = tmpl.cats.map((label, i) => ({ id: `c${i}`, label, color: tmpl.colors[i]!, count: freq[i]! }));
+// One analysis question of a given kind against the data set.
+function makeAnalysis(kind: number, categories: ColCat[], unit: string, round: number): Analysis {
   const sorted = [...categories].sort((a, b) => b.count - a.count);
   const hi = sorted[0]!, lo = sorted[sorted.length - 1]!;
   const total = categories.reduce((s, c) => s + c.count, 0);
-  let analysisPrompt: string, analysisSpeak: string, options: Array<{ id: string; label: string }>, correct: string;
-  if (aType === 0) {
-    analysisPrompt = "Your data: which was chosen the MOST?";
-    analysisSpeak = "Find the tallest column.";
-    options = order(categories.map((c) => ({ id: c.id, label: c.label })), round); correct = hi.id;
-  } else if (aType === 1) {
-    analysisPrompt = "Your data: which was chosen the LEAST?";
-    analysisSpeak = "Find the shortest column.";
-    options = order(categories.map((c) => ({ id: c.id, label: c.label })), round); correct = lo.id;
-  } else if (aType === 2) {
-    analysisPrompt = `Your data: how many students were surveyed altogether?`;
-    analysisSpeak = "Add every column together.";
-    options = investNumOptions(total, round); correct = `n${total}`;
-  } else {
-    analysisPrompt = `Your data: how many more chose ${hi.label} than ${lo.label}?`;
-    analysisSpeak = "Find the gap between the tallest and shortest columns.";
-    options = investNumOptions(hi.count - lo.count, round, [hi.count + lo.count]); correct = `n${hi.count - lo.count}`;
-  }
-  return { id: `s${tmpl.cats[0]}`, question: tmpl.q, unit: tmpl.unit, categories, analysisPrompt, analysisSpeak, options, correctOptionIds: [correct] };
+  if (kind === 0) return {
+    prompt: "Your data: which was chosen the MOST?", speak: "Find the tallest column.",
+    options: order(categories.map((c) => ({ id: c.id, label: c.label })), round), correctOptionIds: [hi.id],
+  };
+  if (kind === 1) return {
+    prompt: "Your data: which was chosen the LEAST?", speak: "Find the shortest column.",
+    options: order(categories.map((c) => ({ id: c.id, label: c.label })), round), correctOptionIds: [lo.id],
+  };
+  if (kind === 2) return {
+    prompt: `Your data: how many ${unit} were surveyed altogether?`, speak: "Add every column together.",
+    options: investNumOptions(total, round), correctOptionIds: [`n${total}`],
+  };
+  return {
+    prompt: `Your data: how many more chose ${hi.label} than ${lo.label}?`, speak: "Find the gap between the tallest and shortest columns.",
+    options: investNumOptions(hi.count - lo.count, round, [hi.count + lo.count]), correctOptionIds: [`n${hi.count - lo.count}`],
+  };
+}
+function buildInvestSurvey(tmpl: InvestSurvey, freq: number[], round: number): InvestSurveyData {
+  const categories: ColCat[] = tmpl.cats.map((label, i) => ({ id: `c${i}`, label, color: tmpl.colors[i]!, count: freq[i]! }));
+  // Three questions per data set — identify (most/least) -> total -> difference:
+  // a read, an add and a subtract, so analysing is real work, not one glance.
+  const analyses = [
+    makeAnalysis(round % 2, categories, tmpl.unit, round),
+    makeAnalysis(2, categories, tmpl.unit, round + 1),
+    makeAnalysis(3, categories, tmpl.unit, round + 2),
+  ];
+  return { id: `s${tmpl.cats[0]}`, question: tmpl.q, unit: tmpl.unit, categories, analyses };
 }
 export function investigationTask(round: number, target: number): PracticeTask {
-  // Three DISTINCT survey topics, each with its own rolled data + analysis.
+  // FOUR distinct survey topics to choose from, each with rolled data + 3 Qs.
   const n = INVEST_SURVEYS.length;
   const i0 = ((round % n) + n) % n;
   const rot = Array.from({ length: n }, (_, k) => (i0 + k) % n);
-  const p1 = 1 + (round % (n - 1));               // 1..n-1 → different slot from 0
-  const p2raw = 1 + ((round * 2) % (n - 1));
-  const p2 = p2raw === p1 ? (p2raw % (n - 1)) + 1 : p2raw; // distinct from p1
-  const idx = [rot[0]!, rot[p1]!, rot[p2]!];
+  const gap = 1 + (round % 3); // 1..3 spacing between chosen slots, distinct
+  const idx = [rot[0]!, rot[gap]!, rot[gap * 2]!, rot[gap * 3]!];
   const surveys = idx.map((si, i) =>
-    buildInvestSurvey(INVEST_SURVEYS[si]!, pick(INVEST_COUNTS, round * 2 + i * 3), round + i, (round + i) % 4),
+    buildInvestSurvey(INVEST_SURVEYS[si]!, pick(INVEST_COUNTS, round * 2 + i * 3), round + i),
   );
   return {
-    kind: "statisticaInvestigation", target, buildStep: 2,
+    kind: "statisticaInvestigation", target, buildStep: INVEST_STEP,
     prompt: "Design a survey: which question will you investigate?",
     speakText: "Pick a question, predict the result, then collect and graph the data.",
     surveys,

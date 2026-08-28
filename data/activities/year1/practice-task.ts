@@ -2940,10 +2940,13 @@ export type PracticeTask = (
         question: string;
         unit: string;
         categories: Array<{ id: string; label: string; color: string; count: number }>;
-        analysisPrompt: string;
-        analysisSpeak: string;
-        options: Array<{ id: string; label: string }>;
-        correctOptionIds: string[];
+        // Two or three analysis questions asked in turn about this data set.
+        analyses: Array<{
+          prompt: string;
+          speak: string;
+          options: Array<{ id: string; label: string }>;
+          correctOptionIds: string[];
+        }>;
       }>;
       feedback: { correct: string; wrong: string };
     }
