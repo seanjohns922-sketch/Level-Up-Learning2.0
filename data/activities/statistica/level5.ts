@@ -59,6 +59,40 @@ export function dataTypeTask(round: number, target: number): PracticeTask {
   };
 }
 
+// Sort survey cards into their data-type bin — a hands-on way to contrast all
+// three types at once (far livelier than picking a type from a list).
+const TYPE_BINS = [
+  { id: "nominal", label: "Nominal", color: C.indigo },
+  { id: "ordinal", label: "Ordinal", color: C.amber },
+  { id: "numerical", label: "Numerical", color: C.teal },
+];
+// Pool sizes are co-prime (7, 8, 7) so the six-card mix has a long period and
+// rarely repeats across a session.
+const SORT_ITEMS: Record<"nominal" | "ordinal" | "numerical", string[]> = {
+  nominal: ["Favourite colour", "Pet type", "Eye colour", "Way to school", "Favourite fruit", "Football team", "Music genre"],
+  ordinal: ["Star rating", "T-shirt size", "Race place", "Spice level", "Skill level", "Medal won", "Year level", "Satisfaction"],
+  numerical: ["Number of siblings", "Goals scored", "Books read", "Pets owned", "Cousins", "Cars in car park", "Apps opened"],
+};
+export function dataTypeSortTask(round: number, target: number): PracticeTask {
+  // Two of each type so the three bins stay balanced; the pair chosen per type
+  // rotates so the mix rarely repeats.
+  const chosen: Array<{ label: string; category: "nominal" | "ordinal" | "numerical" }> = [];
+  (["nominal", "ordinal", "numerical"] as const).forEach((type, k) => {
+    const pool = SORT_ITEMS[type];
+    chosen.push({ label: pick(pool, round + k), category: type });
+    chosen.push({ label: pick(pool, round + k + 3), category: type });
+  });
+  const items = order(chosen, round).map((it, i) => ({ id: `it${i}`, label: it.label, category: it.category }));
+  return {
+    kind: "statisticaSort", target,
+    prompt: "Sort each survey into its data type.",
+    speakText: "Nominal is named groups with no order. Ordinal is groups with an order. Numerical is counts. Tap a card, then tap its bin.",
+    items,
+    categories: TYPE_BINS,
+    feedback: { correct: "Sorted! Named groups are nominal, ordered groups are ordinal, counts are numerical.", wrong: "Check the red cards: named group, ordered group, or a count?" },
+  };
+}
+
 // ── W2 Valid data: spot the out-of-range value (AC9M5ST01) ───────────────────
 type SpotItem = { vals: number[]; rule: string; bad: number };
 const SPOT_ERRORS: SpotItem[] = [
@@ -273,10 +307,10 @@ export function displayChoiceTask(round: number, target: number): PracticeTask {
 
 // ── Lesson map (18 lessons, 6 weeks) ─────────────────────────────────────────
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
-  // W1 Data Types — nominal, ordinal, discrete numerical
-  "y5-statistics-w1-l1": [dataTypeTask, dataTypeTask, dataTypeTask],
-  "y5-statistics-w1-l2": [dataTypeTask, dataTypeTask, dataTypeTask],
-  "y5-statistics-w1-l3": [dataTypeTask, dataTypeTask, dataTypeTask],
+  // W1 Data Types — sort survey cards into type bins, then quick-check by naming
+  "y5-statistics-w1-l1": [dataTypeSortTask, dataTypeTask, dataTypeSortTask],
+  "y5-statistics-w1-l2": [dataTypeSortTask, dataTypeSortTask, dataTypeTask],
+  "y5-statistics-w1-l3": [dataTypeSortTask, dataTypeTask, dataTypeSortTask],
   // W2 Valid Data — spot, validate, clean out-of-range values
   "y5-statistics-w2-l1": [spotErrorTask, spotErrorTask, spotErrorTask],
   "y5-statistics-w2-l2": [spotErrorTask, spotErrorTask, spotErrorTask],

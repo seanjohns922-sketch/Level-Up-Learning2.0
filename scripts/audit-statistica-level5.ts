@@ -27,6 +27,15 @@ function auditTask(lessonId: string, task: PracticeTask) {
       check(ids.size === task.options.length, `${lessonId}: classify option ids must be unique`);
       break;
     }
+    case "statisticaSort": {
+      const cats = new Set(task.categories.map((c) => c.id));
+      const itemIds = new Set(task.items.map((it) => it.id));
+      check(task.categories.length >= 2 && task.items.length >= 2, `${lessonId}: sort needs bins and items`);
+      check(itemIds.size === task.items.length, `${lessonId}: sort item ids must be unique`);
+      check(task.items.every((it) => cats.has(it.category)), `${lessonId}: every sort item must belong to a real bin`);
+      check(task.categories.every((c) => task.items.some((it) => it.category === c.id)), `${lessonId}: every bin must have at least one item`);
+      break;
+    }
     case "statisticaGraph": {
       check(task.categories.length >= 2 && task.categories.every((c) => inRangeGraph(c.count)), `${lessonId}: graph counts must be 1..60`);
       const ids = new Set(task.options?.map((o) => o.id));
