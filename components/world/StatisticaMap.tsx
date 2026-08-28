@@ -18,11 +18,14 @@ const STATISTICA_LEVELS = LEVEL_CATALOG.filter((level) => level.id !== "Prep") a
 }>;
 
 // Statistics is a 6-week strand (3 districts x 2 weeks): Collect -> Represent
-// -> Investigate. Positions are hand-placed around the avatar/HUD centre.
+// -> Investigate. Two flank the title at the top corners; the third is centred
+// between them, above the avatar, for a symmetric triangle. Cards are ~380px
+// wide and anchored by their top-left corner, so the centre card is offset by
+// half a card width from 50%.
 const DISTRICT_POSITIONS = [
-  { left: "4%", top: "14%", color: "#79b85a", name: "DATA GROVES", identity: "COLLECT" },
-  { left: "68%", top: "14%", color: "#59add1", name: "CHART CRYSTALS", identity: "REPRESENT" },
-  { left: "5%", top: "58%", color: "#f2bc45", name: "INSIGHT OBSERVATORY", identity: "INVESTIGATE" },
+  { left: "4%", top: "13%", color: "#79b85a", name: "DATA GROVES", identity: "COLLECT" },
+  { left: "68%", top: "13%", color: "#59add1", name: "CHART CRYSTALS", identity: "REPRESENT" },
+  { left: "calc(50% - 190px)", top: "53%", color: "#f2bc45", name: "INSIGHT OBSERVATORY", identity: "INVESTIGATE" },
 ] as const;
 
 function normalizeLevel(level: string): RealmLevelId {
