@@ -17,6 +17,7 @@ const navigation = read("lib/world3d/world-navigation-context.ts");
 const home = read("app/home-base/page.tsx");
 const marketplace = read("app/marketplace/page.tsx");
 const catalogue = read("lib/world3d/central-world-customisation-catalog.ts");
+const layout = read("lib/world3d/central-world-layout.ts");
 const migration = read("supabase/migrations/20260826152000_central_world_customisation_catalogue.sql");
 const launchMigration = read("supabase/migrations/20260826173500_central_world_launch_rewards_catalogue.sql");
 
@@ -36,47 +37,24 @@ check(config.includes('myHomeEntrance: "my-home-entry"'), "Semantic My Home entr
 check(config.includes('myHomeExitSpawn: "my-home-exit-spawn"'), "Semantic My Home return anchor is missing");
 check(config.includes('futureLeaderboardMonument: "future-leaderboard-monument"'), "Future leaderboard reservation is missing");
 check(config.includes('futureCollectionArea: "future-collection-area"'), "Future collection reservation is missing");
-check(config.includes("CENTRAL_WORLD_CUSTOMISATION_PLOTS"), "Central world customisation plots are not configured");
-check((config.match(/id: "customisation-plot-/g) ?? []).length === 8, "Central world must have exactly eight customisation plots");
-const plotPositions = [...config.matchAll(/position: \[(-?\d+(?:\.\d+)?), 0\.75, (-?\d+(?:\.\d+)?)\]/g)]
-  .slice(-8)
-  .map((match) => ({ x: Number(match[1]), z: Number(match[2]) }));
-const plotDistances = plotPositions.map(({ x }) => Math.abs(x));
-check(
-  plotDistances.length === 8
-    && plotDistances[0] < plotDistances[2]
-    && plotDistances[2] > plotDistances[4]
-    && plotDistances[4] < plotDistances[6]
-    && plotDistances[1] < plotDistances[3]
-    && plotDistances[3] > plotDistances[5]
-    && plotDistances[5] < plotDistances[7],
-  "Central world customisation plots must alternate near and far from the hub path",
-);
 check(config.includes("maxZ: 54"), "Central world rear meadow must provide substantial playable depth");
-check(
-  plotPositions.slice(0, 4).every(({ z }) => z > 18)
-    && plotPositions.slice(2, 4).every(({ z }) => z >= 40),
-  "Rear customisation plots must use two spacious rows behind the spawn point",
-);
-check(
-  plotPositions.every(({ x, z }) => Math.abs(x) <= 48 && z >= -35.5 && z <= 54),
-  "Customisation plots must remain inside the playable world bounds",
-);
 check(environment.includes("PlaceholderKnowledgeTower"), "Placeholder Tower is missing");
 check(environment.includes("PlaceholderMyHome"), "Physical My Home placeholder is missing");
-check(environment.includes("CustomisationPaths"), "Customisation plots are not connected to the hub path network");
-check(environment.includes("LockedCustomisationPlot"), "Locked customisation plots are not rendered in the hub");
-check(environment.includes("EquippedCustomisationPlot"), "Equipped customisation plots are not rendered in the hub");
+check(!environment.includes("CustomisationPaths") && !environment.includes("LockedCustomisationPlot") && !environment.includes("EquippedCustomisationPlot"), "Legacy fixed-slot pads or branch paths must not render in the free-placement hub");
 check(environment.includes("central-world-valley-panorama.png") && environment.includes("MeadowGround") && environment.includes("GrassTufts"), "V1 valley layers are incomplete");
 check(sharedPlayer.includes("SharedThirdPersonPlayer") && numberNexus.includes("TrialStudentAvatar") && numberNexus.includes("WorldMovePad"), "Central World and Number Nexus must share player infrastructure");
 check(!world.includes("NumberNexus") && !environment.includes("number-nexus"), "Central World must not import Number Nexus art");
 check(navigation.includes('destination: "my-home"') && navigation.includes('spawn=my-home-exit-spawn'), "My Home navigation context is incomplete");
 check(home.includes("Return to World") && home.includes("clearWorldNavigationContext"), "Home must offer a conditional semantic return to Central World");
 check(!world.includes('>MY HOME<') && !world.includes('>TOWER<') && !world.includes("CLASS BEST"), "Obsolete 3D navigation widgets remain in Central World");
-check(world.includes("...CENTRAL_WORLD_CUSTOMISATION_PLOTS.map"), "Customisation plots are not registered as interaction targets");
-check(world.includes("getEquippedCentralWorldItems"), "Central World does not read equipped customisation items");
-check(world.includes("OPEN MARKETPLACE"), "Locked customisation plot marketplace action is missing");
-check(world.includes("activePlotEquipped"), "Equipped customisation plot state is missing");
+check(!world.includes("CENTRAL_WORLD_CUSTOMISATION_PLOTS") && !world.includes("OPEN MARKETPLACE"), "Legacy fixed-slot interactions must not remain in the free-placement hub");
+check(world.includes('searchParams.get("build")') && world.includes("confirmBuildPlacement"), "Marketplace rewards must open the hub placement flow");
+check(world.includes("Read build instructions") && world.includes("RotateCw"), "Build Mode must provide spoken instructions and rotation controls");
+check(marketplace.includes("Place in world") && marketplace.includes("build=${encodeURIComponent(selected.item_key)}"), "Owned world rewards must launch Build Mode");
+check(environment.includes("worldObjectScale") && environment.includes('category === "buildings"') && environment.includes("return 2.45"), "Purchased buildings must render at landmark scale");
+check(environment.includes("BuildModeGrid") && environment.includes("PlacedWorldObject"), "Grid placement preview or placed world objects are missing");
+check(layout.includes("itemId: string") && layout.includes("gridX: number") && layout.includes("gridZ: number") && layout.includes("rotation: 0 | 90 | 180 | 270"), "Saved world placement model is incomplete");
+check(layout.includes("isProtectedCell") && layout.includes("validateCentralWorldPlacement"), "Tower, home and path protection rules are missing");
 check(
   marketplace.includes("Buildings")
     && marketplace.includes("Animals")

@@ -1,6 +1,7 @@
 "use client";
 
 import { type ComponentType, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import * as Icons from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
@@ -38,6 +39,7 @@ function itemMarketplaceCategory(item: EconomyItem): MarketplaceCategory {
 }
 
 export default function MarketplacePage() {
+  const router = useRouter();
   const student = useMemo(() => getActiveStudentProfile(), []);
   const preview = useDemoPreviewMode() || student?.studentId === DEMO_PREVIEW_SCOPE;
   const studentId = student?.studentId ?? (preview ? "demo-preview" : null);
@@ -89,13 +91,17 @@ export default function MarketplacePage() {
     if (!studentId || !selected || busy || selectedUnavailable) return;
     setBusy(true); setMessage(null);
     try {
+      if (selectedOwned && selectedIsWorldReward) {
+        router.push(`/world?${preview ? "teacher_preview=1&" : ""}build=${encodeURIComponent(selected.item_key)}`);
+        return;
+      }
       const next = selectedOwned
         ? await equipEconomyItem(studentId, selected.item_key, CENTRAL_WORLD_CUSTOMISATION_CATALOG, preview)
         : await purchaseEconomyItem(studentId, selected.item_key, CENTRAL_WORLD_CUSTOMISATION_CATALOG, preview);
       const merged = mergeCentralWorldCatalogue(next);
       setState(merged);
       persistCanonicalAvatarAppearance(studentId, merged);
-      setMessage(selectedOwned ? `${selected.name} is now placed in your world.` : `${selected.name} added to your collection.`);
+      setMessage(selectedOwned ? `${selected.name} is now equipped.` : `${selected.name} added to your collection.`);
     } catch (error) { setMessage(economyErrorMessage(error)); }
     finally { setBusy(false); }
   }
@@ -131,8 +137,8 @@ export default function MarketplacePage() {
               <div className="mt-5 flex items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: selected.accent }}>{centralWorldCategory(selected)?.replace("_", " & ") ?? selected.category.replace("_", " ")}</p><span className="rounded px-2 py-1 text-[10px] font-black uppercase" style={{ color: RARITY_STYLES[selected.rarity].color, background: RARITY_STYLES[selected.rarity].background }}>{RARITY_STYLES[selected.rarity].label}</span></div>
               <h2 className="mt-1 text-2xl font-black">{selected.name}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{selected.description}</p>
               {typeof selected.metadata?.gridSize === "string" ? <p className="mt-3 inline-flex items-center gap-2 rounded bg-slate-100 px-2 py-1 text-[11px] font-black uppercase text-slate-600"><Icons.Grid3X3 className="h-3.5 w-3.5" /> {selected.metadata.gridSize}</p> : null}
-              <button type="button" disabled={busy || selectedUnavailable || selectedEquipped || (!selectedOwned && (state?.wallet.xp_balance ?? 0) < (selected.price ?? 0))} onClick={act} className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-amber-400 px-4 py-3 text-sm font-black text-slate-950 hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500">
-                {selectedUnavailable ? "Artwork unavailable" : selectedEquipped ? <><Icons.Check className="h-4 w-4" /> {selectedIsWorldReward ? "Placed in world" : "Equipped"}</> : selectedOwned ? selectedIsWorldReward ? "Place in world" : "Equip item" : <><Icons.Zap className="h-4 w-4" /> Buy for {selected.price} XP</>}
+              <button type="button" disabled={busy || selectedUnavailable || (!selectedIsWorldReward && selectedEquipped) || (!selectedOwned && (state?.wallet.xp_balance ?? 0) < (selected.price ?? 0))} onClick={act} className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-amber-400 px-4 py-3 text-sm font-black text-slate-950 hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500">
+                {selectedUnavailable ? "Artwork unavailable" : selectedOwned && selectedIsWorldReward ? <><Icons.Move3D className="h-4 w-4" /> Place in world</> : selectedEquipped ? <><Icons.Check className="h-4 w-4" /> Equipped</> : selectedOwned ? "Equip item" : <><Icons.Zap className="h-4 w-4" /> Buy for {selected.price} XP</>}
               </button>
             </> : <div className="py-16 text-center text-sm font-bold text-slate-500">Select an item to preview it.</div>}
           </aside>
