@@ -300,34 +300,95 @@ export function discreteValidResponseTask(round: number, target: number): Practi
   };
 }
 
-// ── W2 Valid data: spot the out-of-range value (AC9M5ST01) ───────────────────
-type SpotItem = { vals: number[]; rule: string; bad: number };
+// ── W2 Valid data: identify and responsibly fix mixed data errors ────────────
+type SpotItem = {
+  vals: string[];
+  rule: string;
+  badIndex: number;
+  issue: "missing" | "category" | "range" | "type" | "units" | "multiple";
+  fix: string;
+  unsafeFix: string;
+};
 const SPOT_ERRORS: SpotItem[] = [
-  { rule: "Star ratings must be 1 to 5", vals: [4, 2, 5, 8, 3], bad: 8 },
-  { rule: "Ages must be 5 to 12", vals: [9, 10, 11, 3, 15], bad: 15 },
-  { rule: "Test scores are out of 20", vals: [18, 12, 25, 9, 15], bad: 25 },
-  { rule: "Months are numbered 1 to 12", vals: [3, 7, 13, 10, 1], bad: 13 },
-  { rule: "A dice roll is 1 to 6", vals: [4, 6, 2, 9, 5], bad: 9 },
-  { rule: "Percentages are 0 to 100", vals: [80, 45, 110, 60, 95], bad: 110 },
-  { rule: "Ratings must be 1 to 5", vals: [2, 5, 1, 7, 4], bad: 7 },
-  { rule: "Ages must be 5 to 12", vals: [8, 11, 2, 9, 12], bad: 2 },
-  { rule: "Scores are out of 10", vals: [7, 9, 4, 14, 6], bad: 14 },
-  { rule: "Class sizes are 20 to 30", vals: [24, 28, 22, 45, 26], bad: 45 },
-  { rule: "A week has 7 days", vals: [3, 5, 7, 9, 2], bad: 9 },
-  { rule: "Shoe sizes are 1 to 13", vals: [5, 8, 3, 20, 11], bad: 20 },
-  { rule: "Temperatures were 15 to 30", vals: [22, 18, 35, 25, 20], bad: 35 },
-  { rule: "Goals per game are 0 to 8", vals: [3, 5, 1, 12, 4], bad: 12 },
+  { rule: "Star ratings must be whole numbers from 1 to 5", vals: ["4", "2", "5", "8", "3"], badIndex: 3, issue: "range", fix: "Ask the student to give a rating from 1 to 5", unsafeFix: "Change 8 to 5 without asking" },
+  { rule: "Every student must record one pet choice", vals: ["Dog", "Cat", "—", "Fish", "Dog"], badIndex: 2, issue: "missing", fix: "Ask the student for the missing response", unsafeFix: "Fill the blank with Dog because it is common" },
+  { rule: "Travel choices are Walk, Bike, Bus or Car", vals: ["Walk", "Bus", "Buss", "Bike", "Car"], badIndex: 2, issue: "category", fix: "Check that Buss was meant to be Bus", unsafeFix: "Create a new category called Buss" },
+  { rule: "Number of pets must be a whole-number count", vals: ["2", "0", "many", "1", "3"], badIndex: 2, issue: "type", fix: "Ask for the actual whole-number count", unsafeFix: "Treat many as 10" },
+  { rule: "All heights must be recorded in centimetres", vals: ["142 cm", "135 cm", "1.48 m", "151 cm"], badIndex: 2, issue: "units", fix: "Convert 1.48 m to 148 cm", unsafeFix: "Remove the units from every height" },
+  { rule: "Choose one main way of travelling to school", vals: ["Walk", "Bus", "Bike and car", "Car"], badIndex: 2, issue: "multiple", fix: "Ask the student to choose their main way", unsafeFix: "Count the response in both categories" },
+  { rule: "Favourite fruit choices are Apple, Banana, Mango or Pear", vals: ["Apple", "Mango", "7", "Pear"], badIndex: 2, issue: "type", fix: "Ask the student to choose one listed fruit", unsafeFix: "Add 7 as a fruit category" },
+  { rule: "Sport names must use the agreed category labels", vals: ["Soccer", "Netball", "soccer", "Tennis"], badIndex: 2, issue: "category", fix: "Standardise soccer to the Soccer category", unsafeFix: "Count soccer as a different sport" },
 ];
-export function spotErrorTask(round: number, target: number): PracticeTask {
-  const item = pick(SPOT_ERRORS, round);
+
+const ISSUE_LABELS: Record<SpotItem["issue"], string> = {
+  missing: "A response is missing",
+  category: "A category label is inconsistent",
+  range: "A number is outside the allowed range",
+  type: "The response is the wrong type",
+  units: "The measurement uses different units",
+  multiple: "More than one answer was recorded",
+};
+
+export function mixedErrorTeachingTask(round: number, target: number): PracticeTask {
   return {
     kind: "statisticaClassify", target,
-    prompt: "Which value is a data-entry error?",
-    speakText: "One value breaks the rule. Read the rule, then find the value that could not be right.",
+    prompt: "What should we check before using collected data?",
+    speakText: "Data errors are not only unusual numbers. Check for missing answers, inconsistent categories, wrong response types, mixed units and answers that break the collection rule.",
+    variable: "A class survey is ready to analyse", examples: "Think about every way a response could break the survey rule.",
+    options: order([
+      { id: "mixed", label: "Missing, inconsistent or impossible entries" },
+      { id: "numbers", label: "Only numbers that look too large" },
+      { id: "none", label: "Nothing if the table looks neat" },
+    ], round),
+    correctOptionIds: ["mixed"],
+    feedback: { correct: "Correct — valid data also needs complete, consistent responses that follow the collection rule.", wrong: "Look beyond large numbers. Text categories, blanks, units and multiple answers can also create errors." },
+  };
+}
+
+export function spotErrorTask(round: number, target: number): PracticeTask {
+  const item = pick(SPOT_ERRORS, round);
+  const bad = item.vals[item.badIndex]!;
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which entry needs checking?",
+    speakText: "One entry breaks the data collection rule. It could be a number, a word, a blank, a unit or more than one answer.",
     variable: item.vals.join(",  "), examples: item.rule,
-    options: order(item.vals.map((v) => ({ id: `v${v}`, label: String(v) })), round),
-    correctOptionIds: [`v${item.bad}`],
-    feedback: { correct: `Yes — ${item.bad} breaks the rule: ${item.rule.toLowerCase()}.`, wrong: `Check each value against the rule: ${item.rule.toLowerCase()}.` },
+    options: order(item.vals.map((value, index) => ({ id: `entry-${index}`, label: value })), round),
+    correctOptionIds: [`entry-${item.badIndex}`],
+    feedback: { correct: `Yes — ${bad} needs checking because ${ISSUE_LABELS[item.issue].toLowerCase()}.`, wrong: `Check every entry against this rule: ${item.rule.toLowerCase()}.` },
+  };
+}
+
+export function errorReasonTask(round: number, target: number): PracticeTask {
+  const item = pick(SPOT_ERRORS, round + 1);
+  const issueIds = Object.keys(ISSUE_LABELS) as SpotItem["issue"][];
+  const alternatives = issueIds.filter((issue) => issue !== item.issue);
+  const options = [item.issue, alternatives[round % alternatives.length]!, alternatives[(round + 2) % alternatives.length]!];
+  return {
+    kind: "statisticaClassify", target,
+    prompt: `Why does “${item.vals[item.badIndex]}” need checking?`,
+    speakText: "Use the survey rule to explain the type of data error.",
+    variable: item.vals.join(",  "), examples: item.rule,
+    options: order(options.map((issue) => ({ id: issue, label: ISSUE_LABELS[issue] })), round),
+    correctOptionIds: [item.issue],
+    feedback: { correct: `Correct — ${ISSUE_LABELS[item.issue].toLowerCase()}.`, wrong: "Compare the entry with the collection rule, then name exactly what does not match." },
+  };
+}
+
+export function cleanErrorTask(round: number, target: number): PracticeTask {
+  const item = pick(SPOT_ERRORS, round + 2);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "What is the most responsible way to clean this entry?",
+    speakText: "Cleaning data should preserve the truth. Correct an obvious format only when it is certain. Otherwise, ask the person who supplied the response.",
+    variable: `${item.vals[item.badIndex]} needs checking`, examples: item.rule,
+    options: order([
+      { id: "fix", label: item.fix },
+      { id: "guess", label: item.unsafeFix },
+      { id: "ignore", label: "Ignore the rule and keep it unchanged" },
+    ], round),
+    correctOptionIds: ["fix"],
+    feedback: { correct: "Yes — that fixes or verifies the entry without inventing data.", wrong: "Do not guess or hide the problem. Make a certain correction or check with the person who gave the response." },
   };
 }
 
@@ -520,9 +581,13 @@ const WEEK1_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
   "y5-statistics-w1-l3": [discreteTeachingTask, discreteQuestionTask, discreteValidResponseTask, dataTypeSortTask],
 };
 
+const FOCUSED_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
+  ...WEEK1_GENS,
+  "y5-statistics-w2-l1": [mixedErrorTeachingTask, spotErrorTask, errorReasonTask, cleanErrorTask],
+};
+
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
-  // W2 Valid Data — spot, validate, clean out-of-range values
-  "y5-statistics-w2-l1": [spotErrorTask, spotErrorTask, spotErrorTask],
+  // W2 Valid Data — Lessons 2 and 3 retain repeated validation practice.
   "y5-statistics-w2-l2": [spotErrorTask, spotErrorTask, spotErrorTask],
   "y5-statistics-w2-l3": [spotErrorTask, spotErrorTask, spotErrorTask],
   // W3 Mode & Shape — find the mode, more than one mode, describe the shape
@@ -574,11 +639,11 @@ export function getStatisticaLevel5TaskSet(lessonId: string): RealmLessonTaskSet
   const week = m ? Number(m[1]) : 1;
   const lesson = m ? Number(m[2]) : 1;
   const seed = (week - 1) * 2 + (lesson - 1);
-  const focusedGens = WEEK1_GENS[lessonId];
+  const focusedGens = FOCUSED_GENS[lessonId];
   if (focusedGens) return focusedTaskSet(focusedGens, seed);
   const gens = LESSON_GENS[lessonId];
   if (!gens) return null;
   return taskSet(gens, seed);
 }
 
-export const STATISTICA_LEVEL5_LESSON_IDS = [...Object.keys(WEEK1_GENS), ...Object.keys(LESSON_GENS)];
+export const STATISTICA_LEVEL5_LESSON_IDS = [...Object.keys(FOCUSED_GENS), ...Object.keys(LESSON_GENS)];
