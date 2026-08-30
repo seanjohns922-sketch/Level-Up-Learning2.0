@@ -618,21 +618,74 @@ export function PlaceholderKnowledgeTower({ active, onEnter }: { active: boolean
   );
 }
 
+// A grand two-storey explorer lodge: stone base, timber-framed render walls, a
+// balcony over an arched double door, a big hip roof and a ridge banner. Reads
+// as an earned HQ, not just a house. Front faces +z (toward the entry pad).
+const LODGE = { stone: "#7c746a", stoneDark: "#5b544b", render: "#ece0c6", timber: "#8a5a34", timberDark: "#654222", roof: "#4c3a2c", glass: "#9ed2c5", banner: "#c2410c" } as const;
+
 function PlaceholderMyHome({ active, onEnter }: { active: boolean; onEnter?: () => void }) {
+  const doorGlow = active ? 0.6 : 0.06;
   return (
     <group position={CENTRAL_WORLD_CONFIG.myHomePosition} rotation={[0, CENTRAL_WORLD_CONFIG.myHomeRotationY, 0]} onClick={(event) => { if (!onEnter) return; event.stopPropagation(); onEnter(); }} onPointerOver={() => { if (onEnter) document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
-      <RoundedBox args={[9, 0.7, 8]} radius={0.3} smoothness={2} position={[0, 0.35, 0]}><meshStandardMaterial color="#806746" roughness={0.9} /></RoundedBox>
-      <RoundedBox args={[7.4, 5.6, 6.2]} radius={0.35} smoothness={2} position={[0, 3.45, 0]}><meshStandardMaterial color="#e2c58d" roughness={0.82} /></RoundedBox>
-      <mesh position={[0, 7.05, 0]} rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[5.6, 3.6, 4]} /><meshStandardMaterial color="#76513d" roughness={0.84} /></mesh>
-      <group position={[0, 0, 3.15]}>
-        <RoundedBox args={[3.1, 4.3, 0.7]} radius={0.22} smoothness={2} position={[0, 2.55, 0]}><meshStandardMaterial color="#7a5b38" roughness={0.84} /></RoundedBox>
-        <RoundedBox args={[2.15, 3.55, 0.5]} radius={0.18} smoothness={2} position={[0, 2.25, 0.42]}><meshStandardMaterial color="#27382f" emissive={active ? "#dba84e" : "#2d382f"} emissiveIntensity={active ? 0.55 : 0.08} roughness={0.78} /></RoundedBox>
-        <mesh position={[0.72, 2.25, 0.7]}><sphereGeometry args={[0.11, 10, 10]} /><meshStandardMaterial color="#f0c56c" emissive="#dba84e" emissiveIntensity={0.55} /></mesh>
+      {/* stone base + entry steps */}
+      <RoundedBox args={[11, 1.0, 10]} radius={0.3} smoothness={2} position={[0, 0.5, 0]} castShadow><meshStandardMaterial color={LODGE.stone} roughness={0.9} /></RoundedBox>
+      <RoundedBox args={[4.6, 0.4, 1.4]} radius={0.12} smoothness={2} position={[0, 1.05, 5.0]}><meshStandardMaterial color={LODGE.stoneDark} roughness={0.9} /></RoundedBox>
+      {/* ground floor: stone wainscot + render walls + timber corner posts */}
+      <RoundedBox args={[8.8, 1.4, 7.4]} radius={0.18} smoothness={2} position={[0, 1.75, 0]} castShadow><meshStandardMaterial color={LODGE.stone} roughness={0.88} /></RoundedBox>
+      <RoundedBox args={[8.6, 3.0, 7.2]} radius={0.22} smoothness={2} position={[0, 3.9, 0]} castShadow><meshStandardMaterial color={LODGE.render} roughness={0.82} /></RoundedBox>
+      {([[-4.15, -3.5], [4.15, -3.5], [-4.15, 3.5], [4.15, 3.5]] as const).map(([x, z], i) => <mesh key={i} position={[x, 3.4, z]}><boxGeometry args={[0.42, 4.4, 0.42]} /><meshStandardMaterial color={LODGE.timber} roughness={0.8} /></mesh>)}
+      {/* mid-floor timber band + balcony deck over the entry */}
+      <RoundedBox args={[8.9, 0.6, 7.5]} radius={0.12} smoothness={2} position={[0, 5.5, 0]}><meshStandardMaterial color={LODGE.timber} roughness={0.8} /></RoundedBox>
+      <RoundedBox args={[8.0, 0.4, 1.9]} radius={0.1} smoothness={2} position={[0, 5.75, 4.0]} castShadow><meshStandardMaterial color={LODGE.timberDark} roughness={0.82} /></RoundedBox>
+      {[-3.4, -1.7, 0, 1.7, 3.4].map((x) => <mesh key={x} position={[x, 6.4, 4.85]}><boxGeometry args={[0.14, 1.0, 0.14]} /><meshStandardMaterial color={LODGE.timberDark} roughness={0.8} /></mesh>)}
+      <mesh position={[0, 6.9, 4.85]}><boxGeometry args={[7.4, 0.16, 0.16]} /><meshStandardMaterial color={LODGE.timberDark} roughness={0.8} /></mesh>
+      {/* upper storey */}
+      <RoundedBox args={[7.4, 3.0, 6.0]} radius={0.22} smoothness={2} position={[0, 7.4, 0]} castShadow><meshStandardMaterial color={LODGE.render} roughness={0.82} /></RoundedBox>
+      {([[0, 5.9], [3.5, 0], [-3.5, 0]] as const).map(([x, z], i) => <mesh key={i} position={[x, 7.4, z]}><boxGeometry args={[0.36, 3.2, 0.36]} /><meshStandardMaterial color={LODGE.timber} roughness={0.8} /></mesh>)}
+      {([-1.9, 1.9] as const).map((x) => <mesh key={x} position={[x, 7.6, 3.05]}><boxGeometry args={[1.1, 1.4, 0.16]} /><meshStandardMaterial color={LODGE.glass} emissive="#6da99c" emissiveIntensity={0.2} /></mesh>)}
+      {/* stone chimney */}
+      <mesh position={[-3.2, 8.7, -1.6]} castShadow><boxGeometry args={[1.1, 4.2, 1.1]} /><meshStandardMaterial color={LODGE.stone} roughness={0.9} /></mesh>
+      <mesh position={[-3.2, 10.9, -1.6]}><boxGeometry args={[1.3, 0.4, 1.3]} /><meshStandardMaterial color={LODGE.stoneDark} roughness={0.9} /></mesh>
+      {/* big hip roof (overhangs the walls) + ridge finial + banner */}
+      <mesh position={[0, 10.5, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[7.2, 4.4, 4]} /><meshStandardMaterial color={LODGE.roof} roughness={0.8} /></mesh>
+      <mesh position={[0, 8.5, 0]} rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[7.5, 0.7, 4]} /><meshStandardMaterial color={LODGE.timberDark} roughness={0.8} /></mesh>
+      <mesh position={[0, 12.9, 0]}><cylinderGeometry args={[0.09, 0.09, 2.2, 8]} /><meshStandardMaterial color="#cbd5e1" metalness={0.3} roughness={0.5} /></mesh>
+      <mesh position={[0.95, 13.4, 0]}><planeGeometry args={[1.8, 0.7]} /><meshStandardMaterial color={LODGE.banner} emissive={LODGE.banner} emissiveIntensity={0.25} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0.95, 12.7, 0]}><planeGeometry args={[1.8, 0.6]} /><meshStandardMaterial color="#e6b64c" side={THREE.DoubleSide} /></mesh>
+      {/* arched double door + keystone lantern, glowing warm when active */}
+      <group position={[0, 0, 3.62]}>
+        <RoundedBox args={[3.6, 4.9, 0.6]} radius={1.5} smoothness={4} position={[0, 2.7, 0]}><meshStandardMaterial color={LODGE.stoneDark} roughness={0.86} /></RoundedBox>
+        {([-0.72, 0.72] as const).map((x) => <RoundedBox key={x} args={[1.32, 3.7, 0.32]} radius={0.12} smoothness={3} position={[x, 2.15, 0.34]}><meshStandardMaterial color="#3a2a1c" emissive={active ? "#dba84e" : "#241a12"} emissiveIntensity={doorGlow} roughness={0.8} /></RoundedBox>)}
+        {([-0.28, 0.28] as const).map((x) => <mesh key={x} position={[x, 2.2, 0.56]}><sphereGeometry args={[0.09, 10, 10]} /><meshStandardMaterial color="#e6b64c" metalness={0.4} roughness={0.4} /></mesh>)}
+        <mesh position={[0, 4.55, 0.5]}><sphereGeometry args={[0.34, 16, 16]} /><meshStandardMaterial color="#f0c56c" emissive="#dba84e" emissiveIntensity={active ? 0.9 : 0.4} /></mesh>
       </group>
-      {[-2.15, 2.15].map((x) => <mesh key={x} position={[x, 3.65, 3.15]}><boxGeometry args={[1.25, 1.55, 0.18]} /><meshStandardMaterial color="#9ed2c5" emissive="#6da99c" emissiveIntensity={0.18} /></mesh>)}
-      <mesh position={[0, 0.08, 5.2]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[2.35, 32]} /><meshStandardMaterial color={active ? "#e9bc64" : "#917448"} emissive={active ? "#dba84e" : "#000000"} emissiveIntensity={active ? 0.35 : 0} roughness={0.92} /></mesh>
-      <pointLight position={[0, 4, 5]} color="#ffd995" intensity={active ? 1.4 : 0.65} distance={16} />
-      <Html center position={[0, 6.6, 3.8]} distanceFactor={18} zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "8px 13px", border: "1px solid rgba(255,232,185,.68)", borderRadius: 4, background: "rgba(43,37,30,.9)", color: "#fff3d6", fontFamily: "ui-monospace,monospace", fontSize: 12, fontWeight: 950, letterSpacing: ".14em", whiteSpace: "nowrap" }}>MY HOME</div></Html>
+      {/* ground-floor windows flanking the entry */}
+      {([-3.1, 3.1] as const).map((x) => <mesh key={x} position={[x, 3.7, 3.66]}><planeGeometry args={[1.3, 1.7]} /><meshStandardMaterial color={LODGE.glass} emissive={active ? "#dba84e" : "#6da99c"} emissiveIntensity={active ? 0.3 : 0.16} /></mesh>)}
+      {/* entry pad */}
+      <mesh position={[0, 0.08, 6.4]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[2.6, 32]} /><meshStandardMaterial color={active ? "#e9bc64" : "#917448"} emissive={active ? "#dba84e" : "#000000"} emissiveIntensity={active ? 0.35 : 0} roughness={0.92} /></mesh>
+      <pointLight position={[0, 5, 6]} color="#ffd995" intensity={active ? 1.7 : 0.7} distance={20} />
+      <Html center position={[0, 8.8, 4.2]} distanceFactor={20} zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "8px 13px", border: "1px solid rgba(255,232,185,.68)", borderRadius: 4, background: "rgba(43,37,30,.9)", color: "#fff3d6", fontFamily: "ui-monospace,monospace", fontSize: 12, fontWeight: 950, letterSpacing: ".14em", whiteSpace: "nowrap" }}>MY HOME</div></Html>
+    </group>
+  );
+}
+
+// A few permanent Aussie gum trees framing the meadow. Positioned just outside
+// the build grid (|x| > 42, or z < -26 / z > 50) so they never collide with a
+// student's placed items, and clear of the Tower and My Home.
+const PERMANENT_GUM_TREES: Array<[number, number, number]> = [
+  [-46, 12, 1.15], [-46, -12, 0.95], [46, 14, 1.1], [46, -10, 1.0],
+  [46, 36, 1.2], [-46, 34, 1.05], [-18, 56, 1.15], [18, 56, 1.0],
+  [30, -34, 0.9], [-14, -34, 1.1],
+];
+
+function PermanentGumTrees() {
+  return (
+    <group>
+      {PERMANENT_GUM_TREES.map(([x, z, s], i) => (
+        <group key={i} position={[x, 0, z]} rotation={[0, i * 1.3, 0]} scale={s}>
+          <GumTree height={4.4} canopy={1.55} />
+        </group>
+      ))}
     </group>
   );
 }
@@ -650,6 +703,7 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, p
       <MyHomePath />
       {groundTiles.map((tile) => <GroundTile key={`${tile.gridX}:${tile.gridZ}`} tile={tile} />)}
       <GrassTufts quality={quality} groundTiles={groundTiles} />
+      <PermanentGumTrees />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} />
       <PlaceholderMyHome active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
