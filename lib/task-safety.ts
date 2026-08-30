@@ -292,6 +292,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "starpathTessellation",
   "statisticaCollect",
   "statisticaConcept",
+  "statisticaDisplayStudio",
   "statisticaClassify",
   "statisticaInference",
   "statisticaPictograph",

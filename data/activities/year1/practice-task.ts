@@ -2958,6 +2958,35 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica Level 5 — visually choose, compare and design displays for
+      // a stated purpose (AC9M5ST01/ST02).
+      kind: "statisticaDisplayStudio";
+      mode: "guide" | "match" | "compare" | "design";
+      scene?: "intro";
+      prompt: string;
+      speakText: string;
+      target: number;
+      question: string;
+      purpose: string;
+      data: {
+        labels: string[];
+        values: number[];
+        unit: string;
+      };
+      displayOptions: Array<"line" | "column" | "table">;
+      correctDisplay: "line" | "column" | "table";
+      guideItems?: Array<{
+        title: string;
+        body: string;
+        display?: "line" | "column" | "table";
+      }>;
+      titleOptions?: Array<{ id: string; label: string }>;
+      correctTitleId?: string;
+      reasonOptions?: Array<{ id: string; label: string }>;
+      correctReasonId?: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Statistica Level 4 — guided statistical investigation (AC9M4ST03). The
       // student picks one of three survey questions, predicts an outcome, sees
       // the (pre-rolled) class data, builds the column graph to match it, then

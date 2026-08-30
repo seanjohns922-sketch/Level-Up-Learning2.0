@@ -611,6 +611,135 @@ export function displayChoiceTask(round: number, target: number): PracticeTask {
   };
 }
 
+type StudioDisplay = "line" | "column" | "table";
+type StudioItem = {
+  question: string;
+  purpose: string;
+  labels: string[];
+  values: number[];
+  unit: string;
+  best: StudioDisplay;
+  title: string;
+};
+
+const STUDIO_ITEMS: StudioItem[] = [
+  { question: "How did the temperature change during the day?", purpose: "Make the rise, peak and fall easy to see.", labels: ["6am", "9am", "12pm", "3pm", "6pm"], values: [12, 17, 24, 22, 16], unit: "°C", best: "line", title: "Temperature through the day" },
+  { question: "How did the bean plant grow over five weeks?", purpose: "Show how one measurement changed in time order.", labels: ["W1", "W2", "W3", "W4", "W5"], values: [3, 7, 11, 16, 22], unit: "cm", best: "line", title: "Bean plant growth by week" },
+  { question: "Which class sport received the most votes?", purpose: "Compare the frequencies of separate categories.", labels: ["Soccer", "Netball", "Cricket", "Tennis"], values: [12, 9, 6, 4], unit: "votes", best: "column", title: "Class votes for favourite sport" },
+  { question: "Which type of pet is most common?", purpose: "Make differences between pet categories easy to compare.", labels: ["Dog", "Cat", "Fish", "Bird"], values: [11, 8, 5, 3], unit: "pets", best: "column", title: "Pets owned by the class" },
+  { question: "What was the exact rainfall on Wednesday?", purpose: "Look up one precise value quickly.", labels: ["Mon", "Tue", "Wed", "Thu", "Fri"], values: [4, 9, 13, 7, 5], unit: "mm", best: "table", title: "Daily rainfall this week" },
+  { question: "Exactly how many books were borrowed from each genre?", purpose: "Read and report every exact frequency.", labels: ["Fantasy", "Sport", "History", "Science"], values: [18, 11, 7, 14], unit: "books", best: "table", title: "Library books borrowed by genre" },
+  { question: "How did website visits change from January to May?", purpose: "Show the overall trend across ordered months.", labels: ["Jan", "Feb", "Mar", "Apr", "May"], values: [20, 28, 25, 39, 47], unit: "visits", best: "line", title: "Website visits from January to May" },
+  { question: "Which way of travelling to school is least common?", purpose: "Compare separate travel categories.", labels: ["Walk", "Bike", "Bus", "Car"], values: [8, 4, 10, 13], unit: "students", best: "column", title: "How students travel to school" },
+];
+
+function studioData(item: StudioItem) {
+  return { labels: item.labels, values: item.values, unit: item.unit };
+}
+
+export function displayMatchGuideTask(round: number, target: number): PracticeTask {
+  const item = pick(STUDIO_ITEMS, round);
+  return {
+    kind: "statisticaDisplayStudio", mode: "guide", scene: "intro", target,
+    prompt: "Choose the display that serves the question",
+    speakText: "Use a line graph for change over time, a column graph to compare categories, and a table when exact values matter most.",
+    question: "What does the reader need to discover?", purpose: "The best display depends on the question, not just the data.",
+    data: studioData(item), displayOptions: ["line", "column", "table"], correctDisplay: item.best,
+    guideItems: [
+      { title: "Line graph", body: "See change and trends over time.", display: "line" },
+      { title: "Column graph", body: "Compare separate categories.", display: "column" },
+      { title: "Table", body: "Look up exact values quickly.", display: "table" },
+    ],
+    feedback: { correct: "Ready to match questions to displays.", wrong: "Choose a display by thinking about what the reader needs to discover." },
+  };
+}
+
+export function displayMatchStudioTask(round: number, target: number): PracticeTask {
+  const item = pick(STUDIO_ITEMS, round);
+  return {
+    kind: "statisticaDisplayStudio", mode: "match", target,
+    prompt: "Match the question to its best display",
+    speakText: `${item.question} ${item.purpose} Choose the display that makes that job easiest.`,
+    question: item.question, purpose: item.purpose, data: studioData(item),
+    displayOptions: ["line", "column", "table"], correctDisplay: item.best,
+    feedback: { correct: `Correct — a ${item.best} display best serves this question.`, wrong: "Think about the purpose: trend over time, category comparison, or exact lookup." },
+  };
+}
+
+export function displayCompareGuideTask(round: number, target: number): PracticeTask {
+  const item = pick(STUDIO_ITEMS, round + 2);
+  return {
+    kind: "statisticaDisplayStudio", mode: "guide", scene: "intro", target,
+    prompt: "The same data can tell different stories",
+    speakText: "Two displays can both be accurate, but one may answer a particular question faster and more clearly. Compare what each display makes easy to notice.",
+    question: item.question, purpose: "Compare displays by how clearly they answer the question.",
+    data: studioData(item), displayOptions: ["line", "column", "table"], correctDisplay: item.best,
+    guideItems: [
+      { title: "Look", body: "What feature stands out first?", display: "column" },
+      { title: "Ask", body: "What question must the display answer?", display: "table" },
+      { title: "Decide", body: "Which view communicates it most clearly?", display: "line" },
+    ],
+    feedback: { correct: "Ready to compare displays.", wrong: "Compare each display against the question it needs to answer." },
+  };
+}
+
+export function displayCompareStudioTask(round: number, target: number): PracticeTask {
+  const item = pick(STUDIO_ITEMS, round + 1);
+  const challenger: StudioDisplay = item.best === "table" ? "column" : "table";
+  return {
+    kind: "statisticaDisplayStudio", mode: "compare", target,
+    prompt: "Which display answers the question more clearly?",
+    speakText: `Both displays use the same data. ${item.question} Compare the views and choose the one that answers this purpose most clearly.`,
+    question: item.question, purpose: item.purpose, data: studioData(item),
+    displayOptions: round % 2 ? [challenger, item.best] : [item.best, challenger], correctDisplay: item.best,
+    feedback: { correct: "Yes — both may be accurate, but that display communicates the required information more clearly.", wrong: "Do not choose only by appearance. Choose the display that answers the stated question most directly." },
+  };
+}
+
+export function displayDesignGuideTask(round: number, target: number): PracticeTask {
+  const item = pick(STUDIO_ITEMS, round + 4);
+  return {
+    kind: "statisticaDisplayStudio", mode: "guide", scene: "intro", target,
+    prompt: "Plan a display that communicates clearly",
+    speakText: "A strong display uses the right format, a title that says what the data shows, clear labels and a reason connected to the investigation question.",
+    question: item.question, purpose: "Build for the reader: choose, label and justify.",
+    data: studioData(item), displayOptions: ["line", "column", "table"], correctDisplay: item.best,
+    guideItems: [
+      { title: "1. Choose", body: "Match the display to the purpose." },
+      { title: "2. Label", body: "Use a specific title and clear units." },
+      { title: "3. Justify", body: "Explain why the display helps the reader." },
+    ],
+    feedback: { correct: "Ready to design a display.", wrong: "Choose, label and justify every display." },
+  };
+}
+
+export function displayDesignStudioTask(round: number, target: number): PracticeTask {
+  const item = pick(STUDIO_ITEMS, round + 2);
+  const correctReason = item.best === "line" ? "It makes change over time easy to follow."
+    : item.best === "column" ? "It makes category frequencies easy to compare."
+    : "It makes exact values quick to find.";
+  return {
+    kind: "statisticaDisplayStudio", mode: "design", target,
+    prompt: "Design the clearest display",
+    speakText: `${item.question} Choose the display, then select a precise title and a justification connected to the question.`,
+    question: item.question, purpose: item.purpose, data: studioData(item),
+    displayOptions: ["line", "column", "table"], correctDisplay: item.best,
+    titleOptions: order([
+      { id: "clear", label: item.title },
+      { id: "vague", label: "Our data" },
+      { id: "wrong", label: "Class temperature results" },
+    ], round),
+    correctTitleId: "clear",
+    reasonOptions: order([
+      { id: "purpose", label: correctReason },
+      { id: "colour", label: "It will look best in my favourite colour." },
+      { id: "always", label: "This display is always the best for every data set." },
+    ], round + 1),
+    correctReasonId: "purpose",
+    feedback: { correct: "Strong design — the display, title and justification all serve the investigation question.", wrong: "Check all three decisions: display purpose, specific title and evidence-based justification." },
+  };
+}
+
 // ── Lesson map (18 lessons, 6 weeks) ─────────────────────────────────────────
 const WEEK1_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
   // Teaching, fast recognition, reasoning/ordering, then application.
@@ -623,6 +752,9 @@ const FOCUSED_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
   ...WEEK1_GENS,
   "y5-statistics-w2-l1": [mixedErrorTeachingTask, spotErrorTask, errorReasonTask, cleanErrorTask],
   "y5-statistics-w3-l1": [modeIntroductionTask, modeReadTask, modeFromListTask, modeReadTask],
+  "y5-statistics-w5-l1": [displayMatchGuideTask, displayMatchStudioTask, displayMatchStudioTask, displayMatchStudioTask],
+  "y5-statistics-w5-l2": [displayCompareGuideTask, displayCompareStudioTask, displayCompareStudioTask, displayCompareStudioTask],
+  "y5-statistics-w5-l3": [displayDesignGuideTask, displayDesignStudioTask, displayDesignStudioTask, displayDesignStudioTask],
 };
 
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
@@ -636,10 +768,6 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y5-statistics-w4-l1": [lineReadTask, lineReadTask, lineTrendTask],
   "y5-statistics-w4-l2": [lineTrendTask, lineReadTask, lineTrendTask],
   "y5-statistics-w4-l3": [lineInferTask, lineTrendTask, lineReadTask],
-  // W5 Choosing Displays — match, compare, justify the display choice
-  "y5-statistics-w5-l1": [displayChoiceTask, displayChoiceTask, displayChoiceTask],
-  "y5-statistics-w5-l2": [displayChoiceTask, displayChoiceTask, displayChoiceTask],
-  "y5-statistics-w5-l3": [displayChoiceTask, displayChoiceTask, displayChoiceTask],
   // W6 Investigation — L1 & L2 run the full investigation; L3 is quick review
   "y5-statistics-w6-l1": [investigationTask, investigationTask, investigationTask],
   "y5-statistics-w6-l2": [investigationTask, investigationTask, investigationTask],
