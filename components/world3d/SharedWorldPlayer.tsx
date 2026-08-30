@@ -96,6 +96,7 @@ export function SharedThirdPersonPlayer({
   cameraTargetHeight = 1.55,
   cameraLookAhead = 0,
   cameraMinY = 0.85,
+  cameraEnabled = true,
   speed = 4.6,
 }: {
   initialPosition: [number, number, number];
@@ -113,6 +114,7 @@ export function SharedThirdPersonPlayer({
   cameraTargetHeight?: number;
   cameraLookAhead?: number;
   cameraMinY?: number;
+  cameraEnabled?: boolean;
   speed?: number;
 }) {
   const keys = useRef(new Set<string>());
@@ -215,17 +217,19 @@ export function SharedThirdPersonPlayer({
       }
     }
 
-    const cosPitch = Math.cos(pitch.current);
-    const lookDirection = new THREE.Vector3(-sinYaw * cosPitch, Math.sin(pitch.current), -cosYaw * cosPitch);
-    const head = new THREE.Vector3(player.position.x, player.position.y + 1.55, player.position.z);
-    const desiredCamera = head.clone().addScaledVector(lookDirection, -cameraDistance);
-    desiredCamera.y = Math.max(desiredCamera.y, cameraMinY);
-    camera.position.lerp(desiredCamera, 1 - Math.pow(0.0001, delta));
-    camera.lookAt(
-      player.position.x + forward.x * cameraLookAhead,
-      player.position.y + cameraTargetHeight,
-      player.position.z + forward.z * cameraLookAhead,
-    );
+    if (cameraEnabled) {
+      const cosPitch = Math.cos(pitch.current);
+      const lookDirection = new THREE.Vector3(-sinYaw * cosPitch, Math.sin(pitch.current), -cosYaw * cosPitch);
+      const head = new THREE.Vector3(player.position.x, player.position.y + 1.55, player.position.z);
+      const desiredCamera = head.clone().addScaledVector(lookDirection, -cameraDistance);
+      desiredCamera.y = Math.max(desiredCamera.y, cameraMinY);
+      camera.position.lerp(desiredCamera, 1 - Math.pow(0.0001, delta));
+      camera.lookAt(
+        player.position.x + forward.x * cameraLookAhead,
+        player.position.y + cameraTargetHeight,
+        player.position.z + forward.z * cameraLookAhead,
+      );
+    }
 
     let nearestId: string | null = null;
     let nearestDistance = Number.POSITIVE_INFINITY;

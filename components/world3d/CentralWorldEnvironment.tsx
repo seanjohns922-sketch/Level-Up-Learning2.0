@@ -1,6 +1,6 @@
 "use client";
 
-import { Html, RoundedBox, useTexture } from "@react-three/drei";
+import { Edges, Html, RoundedBox, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -253,7 +253,8 @@ function PlacedWorldObject({ item, placement, preview = false, valid = true }: {
     <group position={position} rotation={[0, (placement.rotation * Math.PI) / 180, 0]}>
       <mesh position={[0, 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[width * CENTRAL_WORLD_GRID.cellSize - 0.18, depth * CENTRAL_WORLD_GRID.cellSize - 0.18]} />
-        <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.42 : 0.18} depthWrite={false} />
+        <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.58 : 0.18} depthWrite={false} />
+        {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
       </mesh>
       <group ref={groupRef} scale={scale}>
         <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} />
@@ -263,15 +264,14 @@ function PlacedWorldObject({ item, placement, preview = false, valid = true }: {
   );
 }
 
-function BuildModeGrid() {
-  const width = (CENTRAL_WORLD_GRID.maxX - CENTRAL_WORLD_GRID.minX + 1) * CENTRAL_WORLD_GRID.cellSize;
-  const depth = (CENTRAL_WORLD_GRID.maxZ - CENTRAL_WORLD_GRID.minZ + 1) * CENTRAL_WORLD_GRID.cellSize;
-  const centreZ = ((CENTRAL_WORLD_GRID.minZ + CENTRAL_WORLD_GRID.maxZ) / 2) * CENTRAL_WORLD_GRID.cellSize;
+function BuildModeGrid({ cursor }: { cursor: { gridX: number; gridZ: number } }) {
+  const [x, , z] = gridToWorld(cursor.gridX, cursor.gridZ);
+  const cells = 16;
+  const size = cells * CENTRAL_WORLD_GRID.cellSize;
   return (
-    <group>
-      <gridHelper args={[Math.max(width, depth), Math.round(Math.max(width, depth) / CENTRAL_WORLD_GRID.cellSize), "#d8f3dc", "#8bc49a"]} position={[0, 0.115, centreZ]} />
-      <mesh position={[0, 0.125, -39]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[13, 48]} /><meshBasicMaterial color="#ef4444" transparent opacity={0.2} depthWrite={false} /></mesh>
-      <mesh position={[-30, 0.126, -6]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[18, 15]} /><meshBasicMaterial color="#ef4444" transparent opacity={0.18} depthWrite={false} /></mesh>
+    <group position={[x, 0.115, z]}>
+      <gridHelper args={[size, cells, "#eafff3", "#67d5b5"]} />
+      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.72, 0.94, 32]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.95} depthWrite={false} /></mesh>
     </group>
   );
 }
@@ -478,7 +478,7 @@ function PlaceholderMyHome({ active }: { active: boolean }) {
   );
 }
 
-export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean } | null; editing?: boolean }) {
+export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 } }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number } }) {
   return (
     <group>
       <Suspense fallback={null}>
@@ -493,7 +493,7 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, p
       <GrassTufts quality={quality} groundTiles={groundTiles} />
       <PlaceholderKnowledgeTower active={entranceActive} />
       <PlaceholderMyHome active={homeActive} />
-      {editing || buildPreview ? <BuildModeGrid /> : null}
+      {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
       {placedCustomisations.map((placement, index) => {
         const item = itemsById.get(placement.itemId);
         return item ? <PlacedWorldObject key={`${placement.itemId}-${index}`} item={item} placement={placement} /> : null;

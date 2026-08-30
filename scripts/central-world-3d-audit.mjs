@@ -58,9 +58,12 @@ check(world.includes("Read build instructions") && world.includes("RotateCw"), "
 check(marketplace.includes("Place in world") && marketplace.includes("build=${encodeURIComponent(selected.item_key)}"), "Owned world rewards must launch Build Mode");
 check(environment.includes("worldObjectScale") && environment.includes('category === "buildings"') && environment.includes("return 2.45"), "Purchased buildings must render at landmark scale");
 check(environment.includes("BuildModeGrid") && environment.includes("PlacedWorldObject"), "Grid placement preview or placed world objects are missing");
+check(world.includes("BuildModeCamera") && world.includes("BuildModeSurface") && world.includes("onBuildCell"), "Focused build camera or tap-to-place surface is missing");
+check(world.includes("OWNED INVENTORY") && world.includes("ownedWorldItems") && world.includes("chooseInventoryItem"), "Owned marketplace inventory is missing from Edit World");
+check(world.includes("paintMode") && world.includes("applyGroundAt"), "Path and ground drag painting is missing");
 check(layout.includes("itemId: string") && layout.includes("gridX: number") && layout.includes("gridZ: number") && layout.includes("rotation: 0 | 90 | 180 | 270"), "Saved world placement model is incomplete");
 check(layout.includes("isCentralWorldProtectedCell") && layout.includes("validateCentralWorldPlacement"), "Tower, home and path protection rules are missing");
-check(world.includes('label: editorOpen ? "EXIT EDIT" : "EDIT WORLD"') && world.includes('aria-label="Edit world controls"'), "Central hub Edit World entry or controls are missing");
+check(world.includes('label: "EDIT WORLD"') && world.includes('aria-label="Edit world controls"'), "Central hub Edit World entry or controls are missing");
 check(world.includes('"path"') && world.includes('"road"') && world.includes('"stone"') && world.includes('"erase"'), "Ground painting tools are incomplete");
 check(layout.includes("CentralWorldGroundTile") && layout.includes("writeCentralWorldGroundTiles"), "Ground customisation persistence is missing");
 check(environment.includes("GroundTile") && environment.includes("StarterScenery"), "Ground tiles or starter scenery do not render in the 3D hub");
