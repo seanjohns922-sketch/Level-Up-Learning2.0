@@ -30,7 +30,9 @@ check(hud.includes("resolveWorldJourney"), "Quick Start and Current Journey must
 check(world.includes("rememberCentralWorldHomeEntry"), "Physical My Home entry must preserve transient return context");
 check(world.includes('"/world/tower?teacher_preview=1"'), "3D Tower destination is missing");
 check(world.includes("KeyboardWorldAction"), "Keyboard Tower interaction is missing");
-check(world.includes("WorldMovePad"), "Touch movement controls are missing");
+check(world.includes("WorldJoystick") && !world.includes("<WorldMovePad"), "Central hub must use the 360-degree touch joystick");
+check(sharedPlayer.includes("analogX") && sharedPlayer.includes("analogY") && sharedPlayer.includes("magnitude"), "Analog camera-relative movement is missing");
+check(sharedPlayer.includes("setPointerCapture") && sharedPlayer.includes('touchAction: "none"'), "Joystick pointer capture or iPad touch protection is missing");
 check(world.includes("__LEVEL_UP_CENTRAL_WORLD_3D_METRICS__"), "Central-world metrics hook is missing");
 check(config.includes('towerMainEntrance: "tower-main-entrance"'), "Semantic Tower entrance anchor is missing");
 check(config.includes('towerExitSpawn: "tower-exit-spawn"'), "Semantic Tower exit anchor is missing");

@@ -1,17 +1,17 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { DEFAULT_OUTFIT } from "@/components/avatar/StudentAvatar";
 import { useCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 
-export type WorldMoveInput = { up: boolean; down: boolean; left: boolean; right: boolean };
+export type WorldMoveInput = { up: boolean; down: boolean; left: boolean; right: boolean; analogX?: number; analogY?: number; magnitude?: number };
 export type WorldMovementBounds = { minX: number; maxX: number; minZ: number; maxZ: number };
 export type WorldRoamEllipse = { centerZ: number; radiusX: number; radiusZ: number };
 export type WorldInteractionTarget = { id: string; position: [number, number, number]; distance: number };
 
-export const EMPTY_WORLD_MOVE_INPUT: WorldMoveInput = { up: false, down: false, left: false, right: false };
+export const EMPTY_WORLD_MOVE_INPUT: WorldMoveInput = { up: false, down: false, left: false, right: false, analogX: 0, analogY: 0, magnitude: 0 };
 
 export function TrialStudentAvatar({ movingRef }: { movingRef: React.MutableRefObject<boolean> }) {
   const bodyRef = useRef<THREE.Group>(null);
@@ -175,11 +175,18 @@ export function SharedThirdPersonPlayer({
     if (keys.current.has("s") || keys.current.has("arrowdown") || moveInput.down) movement.sub(forward);
     if (keys.current.has("d") || keys.current.has("arrowright") || moveInput.right) movement.add(right);
     if (keys.current.has("a") || keys.current.has("arrowleft") || moveInput.left) movement.sub(right);
+    const analogX = THREE.MathUtils.clamp(moveInput.analogX ?? 0, -1, 1);
+    const analogY = THREE.MathUtils.clamp(moveInput.analogY ?? 0, -1, 1);
+    movement.addScaledVector(forward, analogY);
+    movement.addScaledVector(right, analogX);
     movingRef.current = movement.lengthSq() > 0;
     if (movement.lengthSq() > 0) {
-      movement.normalize().multiplyScalar(speed * delta);
+      const keyboardActive = keys.current.has("w") || keys.current.has("arrowup") || keys.current.has("s") || keys.current.has("arrowdown") || keys.current.has("d") || keys.current.has("arrowright") || keys.current.has("a") || keys.current.has("arrowleft") || moveInput.up || moveInput.down || moveInput.left || moveInput.right;
+      const intensity = keyboardActive ? 1 : THREE.MathUtils.clamp(moveInput.magnitude ?? Math.hypot(analogX, analogY), 0, 1);
+      movement.normalize();
+      player.rotation.y = Math.atan2(movement.x, movement.z);
+      movement.multiplyScalar(speed * intensity * delta);
       player.position.add(movement);
-      player.rotation.y = Math.atan2(forward.x, forward.z);
     }
     player.position.x = THREE.MathUtils.clamp(player.position.x, bounds.minX, bounds.maxX);
     player.position.z = THREE.MathUtils.clamp(player.position.z, bounds.minZ, bounds.maxZ);
@@ -225,7 +232,7 @@ export function SharedThirdPersonPlayer({
 
 export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void }) {
   const button = (label: "UP" | "DOWN" | "LEFT" | "RIGHT") => {
-    const key = label.toLowerCase() as keyof WorldMoveInput;
+    const key = label.toLowerCase() as "up" | "down" | "left" | "right";
     const display = label === "UP" ? "^" : label === "DOWN" ? "v" : label === "LEFT" ? "<" : ">";
     return (
       <button
@@ -240,6 +247,89 @@ export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onCha
     );
   };
   return <div style={{ position: "absolute", left: 16, bottom: 18, display: "grid", gridTemplateColumns: "44px 44px 44px", gap: 7, pointerEvents: "auto" }}><span />{button("UP")}<span />{button("LEFT")}{button("DOWN")}{button("RIGHT")}</div>;
+}
+
+export function WorldJoystick({ onChange }: { onChange: (input: WorldMoveInput) => void }) {
+  const baseRef = useRef<HTMLDivElement>(null);
+  const pointerIdRef = useRef<number | null>(null);
+  const [knob, setKnob] = useState({ x: 0, y: 0, active: false });
+  const maxTravel = 37;
+  const deadZone = 0.12;
+
+  useEffect(() => {
+    const stop = () => {
+      pointerIdRef.current = null;
+      setKnob({ x: 0, y: 0, active: false });
+      onChange(EMPTY_WORLD_MOVE_INPUT);
+    };
+    window.addEventListener("blur", stop);
+    document.addEventListener("visibilitychange", stop);
+    return () => {
+      window.removeEventListener("blur", stop);
+      document.removeEventListener("visibilitychange", stop);
+      onChange(EMPTY_WORLD_MOVE_INPUT);
+    };
+  }, [onChange]);
+
+  function update(clientX: number, clientY: number) {
+    const base = baseRef.current;
+    if (!base) return;
+    const bounds = base.getBoundingClientRect();
+    const rawX = clientX - (bounds.left + bounds.width / 2);
+    const rawY = clientY - (bounds.top + bounds.height / 2);
+    const distance = Math.hypot(rawX, rawY);
+    const scale = distance > maxTravel ? maxTravel / distance : 1;
+    const x = rawX * scale;
+    const y = rawY * scale;
+    const normalizedX = x / maxTravel;
+    const normalizedY = -y / maxTravel;
+    const rawMagnitude = Math.min(1, distance / maxTravel);
+    const magnitude = rawMagnitude <= deadZone ? 0 : (rawMagnitude - deadZone) / (1 - deadZone);
+    setKnob({ x, y, active: true });
+    onChange({ ...EMPTY_WORLD_MOVE_INPUT, analogX: magnitude ? normalizedX : 0, analogY: magnitude ? normalizedY : 0, magnitude });
+  }
+
+  function release(event?: React.PointerEvent<HTMLDivElement>) {
+    if (event && pointerIdRef.current !== event.pointerId) return;
+    if (event && baseRef.current?.hasPointerCapture(event.pointerId)) baseRef.current.releasePointerCapture(event.pointerId);
+    pointerIdRef.current = null;
+    setKnob({ x: 0, y: 0, active: false });
+    onChange(EMPTY_WORLD_MOVE_INPUT);
+  }
+
+  return (
+    <div
+      ref={baseRef}
+      role="application"
+      aria-label="Movement joystick. Drag in any direction to move."
+      title="Drag to move"
+      data-world-joystick
+      data-active={knob.active ? "true" : "false"}
+      onContextMenu={(event) => event.preventDefault()}
+      onPointerDown={(event) => {
+        if (pointerIdRef.current !== null) return;
+        event.preventDefault();
+        event.stopPropagation();
+        pointerIdRef.current = event.pointerId;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        update(event.clientX, event.clientY);
+      }}
+      onPointerMove={(event) => {
+        if (pointerIdRef.current !== event.pointerId) return;
+        event.preventDefault();
+        event.stopPropagation();
+        update(event.clientX, event.clientY);
+      }}
+      onPointerUp={(event) => { event.preventDefault(); event.stopPropagation(); release(event); }}
+      onPointerCancel={(event) => { event.preventDefault(); event.stopPropagation(); release(event); }}
+      onLostPointerCapture={() => {
+        if (pointerIdRef.current !== null) release();
+      }}
+      style={{ position: "absolute", left: "max(24px, calc(env(safe-area-inset-left) + 18px))", bottom: "max(24px, calc(env(safe-area-inset-bottom) + 18px))", zIndex: 32, width: 124, height: 124, border: "2px solid rgba(255,244,220,.52)", borderRadius: "50%", background: "radial-gradient(circle, rgba(32,44,39,.7) 0 34%, rgba(15,23,42,.9) 35% 100%)", boxShadow: "0 10px 30px rgba(0,0,0,.32), inset 0 0 0 8px rgba(255,255,255,.04)", touchAction: "none", userSelect: "none", WebkitUserSelect: "none", WebkitTouchCallout: "none", pointerEvents: "auto" }}
+    >
+      <div aria-hidden="true" style={{ position: "absolute", left: "50%", top: "50%", width: 50, height: 50, border: "2px solid rgba(255,255,255,.72)", borderRadius: "50%", background: knob.active ? "#f4c95d" : "#f8fafc", boxShadow: "0 6px 16px rgba(0,0,0,.35)", transform: `translate(calc(-50% + ${knob.x}px), calc(-50% + ${knob.y}px))`, transition: knob.active ? "none" : "transform 120ms ease-out, background 120ms ease-out" }} />
+    </div>
+  );
 }
 
 export function KeyboardWorldAction({ enabled, onAction }: { enabled: boolean; onAction: () => void }) {

@@ -11,7 +11,7 @@ import {
   EMPTY_WORLD_MOVE_INPUT,
   KeyboardWorldAction,
   SharedThirdPersonPlayer,
-  WorldMovePad,
+  WorldJoystick,
   type WorldMoveInput,
 } from "@/components/world3d/SharedWorldPlayer";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
@@ -308,6 +308,20 @@ export default function CentralWorld() {
     } catch { /* Transient introduction state must never block the world. */ }
   }, []);
 
+  useEffect(() => {
+    const previousHtmlOverscroll = document.documentElement.style.overscrollBehavior;
+    const previousBodyOverscroll = document.body.style.overscrollBehavior;
+    const previousBodyTouchAction = document.body.style.touchAction;
+    document.documentElement.style.overscrollBehavior = "none";
+    document.body.style.overscrollBehavior = "none";
+    document.body.style.touchAction = "none";
+    return () => {
+      document.documentElement.style.overscrollBehavior = previousHtmlOverscroll;
+      document.body.style.overscrollBehavior = previousBodyOverscroll;
+      document.body.style.touchAction = previousBodyTouchAction;
+    };
+  }, []);
+
   function runActiveAction() {
     if (!activeTargetId || transitioning) return;
     if (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance) {
@@ -326,14 +340,14 @@ export default function CentralWorld() {
   }
 
   return (
-    <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", background: "#69afe4" }}>
-      <Canvas camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
+    <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
+      <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
         <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placedCustomisations} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} onActiveTarget={setActiveTargetId} />
       </Canvas>
 
       <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: editorOpen ? "EXIT EDIT" : "EDIT WORLD", icon: "edit", onClick: editorOpen ? closeWorldEditor : openWorldEditor }} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} />
 
-      {!buildPreview && !editorOpen ? <WorldMovePad input={moveInput} onChange={setMoveInput} /> : null}
+      {!buildPreview && !editorOpen ? <WorldJoystick onChange={setMoveInput} /> : null}
       {buildPreview && !editorOpen ? (
         <section aria-label="Build mode controls" style={{ position: "absolute", left: "50%", bottom: 22, transform: "translateX(-50%)", zIndex: 35, width: "min(94vw, 560px)", border: `2px solid ${buildValid ? "#4ade80" : "#fb7185"}`, borderRadius: 8, background: "rgba(18,28,24,.94)", color: "#fff", padding: 12, boxShadow: "0 14px 40px rgba(0,0,0,.35)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}><div><div style={{ color: "#f6c862", fontSize: 11, fontWeight: 950, letterSpacing: ".16em" }}>BUILD MODE</div><div style={{ marginTop: 2, fontSize: 18, fontWeight: 950 }}>{buildPreview.item.name}</div></div><WorldVoiceButton compact label="Read build instructions" text={`${buildPreview.item.name}. Use the arrow buttons to choose a place. Rotate it if you want. Green means it can be placed. Red means choose another space.`} /></div>
