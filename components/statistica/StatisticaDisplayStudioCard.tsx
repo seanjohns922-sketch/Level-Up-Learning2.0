@@ -69,7 +69,11 @@ export default function StatisticaDisplayStudioCard({ task, onCorrect, onWrong, 
       <div className="mx-auto max-w-4xl rounded-xl border border-[#d6dfce] bg-[#f8fbf5] px-4 py-3 text-center">
         <div className="text-xs font-black uppercase tracking-[0.14em] text-[#6b7f70]">Question to answer</div>
         <div className="mt-1 text-lg font-black text-[#173b2c]">{task.question}</div>
+        <div className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-[#9a5b2f]">Display job</div>
         <p className="mt-1 text-sm font-bold text-[#607467]">{task.purpose}</p>
+        <p className="mt-2 text-xs font-bold text-[#52705e]">
+          {task.mode === "compare" ? "Both displays are accurate." : "More than one display may be accurate."} Choose the one with the requested feature.
+        </p>
       </div>
 
       <div className={`mx-auto grid max-w-4xl gap-3 ${task.displayOptions.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
@@ -138,10 +142,10 @@ function DisplayPreview({ kind, data, compact = false }: { kind: DisplayKind; da
   if (kind === "table") {
     return (
       <div className="overflow-hidden rounded-md border border-[#c7d5c0] bg-white" style={{ height }}>
-        {data.labels.slice(0, compact ? 3 : 4).map((label, index) => (
-          <div key={label} className="grid grid-cols-[1fr_82px] border-b border-[#e0e8dc] text-[11px] font-bold last:border-b-0">
-            <div className="truncate px-2 py-1 text-[#355444]">{label}</div>
-            <div className="whitespace-nowrap border-l border-[#e0e8dc] bg-[#edf6e8] px-1 py-1 text-center text-[#173b2c]">{data.values[index]} {data.unit}</div>
+        {data.labels.slice(0, compact ? 3 : data.labels.length).map((label, index, rows) => (
+          <div key={label} style={{ height: `${100 / rows.length}%` }} className="grid grid-cols-[1fr_82px] items-center border-b border-[#e0e8dc] text-[11px] font-bold last:border-b-0">
+            <div className="truncate px-2 text-[#355444]">{label}</div>
+            <div className="flex h-full items-center justify-center whitespace-nowrap border-l border-[#e0e8dc] bg-[#edf6e8] px-1 text-[#173b2c]">{data.values[index]} {data.unit}</div>
           </div>
         ))}
       </div>

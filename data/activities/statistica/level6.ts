@@ -90,6 +90,243 @@ export function discreteContinuousTask(round: number, target: number): PracticeT
   };
 }
 
+type MeasureItem = {
+  variable: string;
+  examples: string;
+  low: string;
+  high: string;
+  between: string;
+  tool: string;
+  unit: string;
+  wrongTool: string;
+};
+const CONTINUOUS_MEASURES: MeasureItem[] = [
+  { variable: "A student's height", examples: "142.4 cm, 142.45 cm, 142.5 cm", low: "142.4", high: "142.6", between: "142.5", tool: "Use a height measure and record centimetres", unit: "cm", wrongTool: "Count students and record people" },
+  { variable: "Time to run 100 metres", examples: "14.2 s, 14.25 s, 14.3 s", low: "14.2", high: "14.4", between: "14.3", tool: "Use a stopwatch and record seconds", unit: "s", wrongTool: "Count runners and record runners" },
+  { variable: "Water temperature", examples: "18.5°C, 18.55°C, 18.6°C", low: "18.5", high: "18.7", between: "18.6", tool: "Use a thermometer and record degrees Celsius", unit: "°C", wrongTool: "Use a ruler and record centimetres" },
+  { variable: "Water in a bottle", examples: "0.7 L, 0.75 L, 0.8 L", low: "0.7", high: "0.9", between: "0.8", tool: "Use a measuring jug and record litres", unit: "L", wrongTool: "Count bottles and record bottles" },
+  { variable: "Length of a leaf", examples: "6.2 cm, 6.25 cm, 6.3 cm", low: "6.2", high: "6.4", between: "6.3", tool: "Use a ruler and record centimetres", unit: "cm", wrongTool: "Use scales and record kilograms" },
+  { variable: "Mass of a school bag", examples: "2.4 kg, 2.45 kg, 2.5 kg", low: "2.4", high: "2.6", between: "2.5", tool: "Use scales and record kilograms", unit: "kg", wrongTool: "Count the bags and record bags" },
+];
+
+export function continuousTeachingTask(round: number, target: number): PracticeTask {
+  const item = pick(CONTINUOUS_MEASURES, round);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "What makes this CONTINUOUS numerical data?",
+    speakText: "Continuous data is measured. A measurement can fall anywhere between two values, depending on the precision of the tool.",
+    variable: item.variable, examples: item.examples,
+    options: order([
+      { id: "measured", label: "It is measured and can fall between values" },
+      { id: "counted", label: "It is counted only in whole-number steps" },
+      { id: "category", label: "It sorts responses into named groups" },
+    ], round),
+    correctOptionIds: ["measured"],
+    feedback: { correct: "Correct — measurements can take values between the marked numbers.", wrong: "Ask whether the variable is counted in whole steps or measured along a scale." },
+  };
+}
+
+export function valueBetweenTask(round: number, target: number): PracticeTask {
+  const item = pick(CONTINUOUS_MEASURES, round + 1);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: `Which measurement could lie between ${item.low} and ${item.high} ${item.unit}?`,
+    speakText: "Continuous measurements can take a value between two other measurements.",
+    variable: item.variable, examples: `The tool measures in ${item.unit}.`,
+    options: order([
+      { id: "between", label: `${item.between} ${item.unit}` },
+      { id: "low", label: `${item.low} ${item.unit}` },
+      { id: "words", label: "About three objects" },
+    ], round),
+    correctOptionIds: ["between"],
+    feedback: { correct: `Yes — ${item.between} lies between ${item.low} and ${item.high}.`, wrong: "Choose a measured value greater than the lower measurement and less than the higher measurement." },
+  };
+}
+
+export function measurementPlanTask(round: number, target: number): PracticeTask {
+  const item = pick(CONTINUOUS_MEASURES, round + 2);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which collection plan will produce useful continuous data?",
+    speakText: "Choose a suitable measuring tool and record every result with the same unit.",
+    variable: item.variable, examples: "Select the tool and unit that match the variable.",
+    options: order([
+      { id: "valid", label: item.tool },
+      { id: "wrong", label: item.wrongTool },
+      { id: "label", label: "Record each result as low, medium or high" },
+    ], round),
+    correctOptionIds: ["valid"],
+    feedback: { correct: "Yes — the tool measures the variable and the shared unit makes results comparable.", wrong: "The plan needs a measuring tool and a numerical unit suited to the variable." },
+  };
+}
+
+export function measurementPrecisionTask(round: number, target: number): PracticeTask {
+  const item = pick(CONTINUOUS_MEASURES, round + 3);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Why can careful measurements contain different numbers of decimal places?",
+    speakText: "A more precise tool can measure smaller intervals. Continuous data can be recorded to different levels of precision.",
+    variable: item.variable, examples: item.examples,
+    options: order([
+      { id: "precision", label: "The tools may measure to different levels of precision" },
+      { id: "invalid", label: "Any measurement with a decimal must be wrong" },
+      { id: "category", label: "Decimals turn the measurement into categorical data" },
+    ], round),
+    correctOptionIds: ["precision"],
+    feedback: { correct: "Correct — precision describes how finely a measuring tool records a value.", wrong: "Decimals can be valid measurements. Think about the smallest interval each tool can measure." },
+  };
+}
+
+const COUNT_VARIABLES = ["Number of siblings", "Goals scored", "Books borrowed", "Students absent", "Cars in the car park", "Pets owned"];
+const MEASURE_VARIABLES = ["Height", "Running time", "Water temperature", "Leaf length", "Bottle volume", "School bag mass"];
+
+export function countMeasureTeachingTask(round: number, target: number): PracticeTask {
+  const measured = round % 2 === 0;
+  const variable = measured ? pick(MEASURE_VARIABLES, round) : pick(COUNT_VARIABLES, round);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Should this variable be counted or measured?",
+    speakText: "Count separate objects or events in whole steps. Measure attributes such as length, time, temperature, volume or mass.",
+    variable, examples: "Choose how the class should collect the numerical data.",
+    options: order([
+      { id: "count", label: "Count it — discrete data" },
+      { id: "measure", label: "Measure it — continuous data" },
+    ], round),
+    correctOptionIds: [measured ? "measure" : "count"],
+    feedback: { correct: measured ? "Yes — use a tool to measure this attribute." : "Yes — count each separate object or event.", wrong: "Can the result fall between values, or only move in separate whole-number steps?" },
+  };
+}
+
+export function countMeasureSortTask(round: number, target: number): PracticeTask {
+  const items = [0, 1, 2].flatMap((offset) => [
+    { label: pick(COUNT_VARIABLES, round + offset), category: "count" },
+    { label: pick(MEASURE_VARIABLES, round + offset + 2), category: "measure" },
+  ]);
+  return {
+    kind: "statisticaSort", target,
+    prompt: "Sort each variable by how its data should be collected.",
+    speakText: "Put whole-number counts under count. Put attributes collected with a measuring tool under measure.",
+    items: order(items, round).map((item, index) => ({ id: `collect-${index}`, ...item })),
+    categories: [
+      { id: "count", label: "Count — discrete", color: C.indigo },
+      { id: "measure", label: "Measure — continuous", color: C.teal },
+    ],
+    feedback: { correct: "Correct — counts use whole steps, while measurements can fall between values.", wrong: "Ask whether each variable needs counting or a measuring tool." },
+  };
+}
+
+type CollectionPlan = { variable: string; good: string; wrongType: string; wrongUnit: string };
+const COLLECTION_PLANS: CollectionPlan[] = [
+  { variable: "Number of goals in each game", good: "Count the goals and record a whole number", wrongType: "Measure the goals with a ruler", wrongUnit: "Record each answer in kilograms" },
+  { variable: "Time for each student to sprint 50 metres", good: "Use one stopwatch and record seconds", wrongType: "Count how many students run", wrongUnit: "Record each time in centimetres" },
+  { variable: "Mass of each lunch box", good: "Use the same scales and record grams", wrongType: "Count the lunch boxes only", wrongUnit: "Record each mass in seconds" },
+  { variable: "Number of books borrowed by each student", good: "Count the books and record a whole number", wrongType: "Measure the height of the book stack", wrongUnit: "Record each answer in litres" },
+  { variable: "Temperature of water samples", good: "Use one thermometer and record degrees Celsius", wrongType: "Count the water samples only", wrongUnit: "Record each temperature in metres" },
+  { variable: "Volume of water in each bottle", good: "Use a measuring jug and record millilitres", wrongType: "Count the bottles only", wrongUnit: "Record each volume in seconds" },
+];
+
+export function collectionMethodTask(round: number, target: number): PracticeTask {
+  const item = pick(COLLECTION_PLANS, round);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which method will collect comparable data?",
+    speakText: "Use the same suitable method and unit for every member of the data set.",
+    variable: item.variable, examples: "Choose the collection instruction for the whole class.",
+    options: order([
+      { id: "good", label: item.good },
+      { id: "type", label: item.wrongType },
+      { id: "unit", label: item.wrongUnit },
+    ], round),
+    correctOptionIds: ["good"],
+    feedback: { correct: "Yes — that method matches the variable and records every result consistently.", wrong: "Check whether the method and unit actually measure or count the named variable." },
+  };
+}
+
+export function validCollectionResponseTask(round: number, target: number): PracticeTask {
+  const measured = pick(CONTINUOUS_MEASURES, round + 1);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which response is ready to add to this measured data set?",
+    speakText: "A useful measurement includes a numerical value and the agreed unit.",
+    variable: measured.variable, examples: `The class agreed to record every result in ${measured.unit}.`,
+    options: order([
+      { id: "valid", label: `${measured.between} ${measured.unit}` },
+      { id: "missing", label: measured.between },
+      { id: "category", label: "Medium" },
+    ], round),
+    correctOptionIds: ["valid"],
+    feedback: { correct: "Correct — the response has a value and the agreed measurement unit.", wrong: "The data set needs a numerical measurement recorded with the agreed unit." },
+  };
+}
+
+const FOUR_TYPE_ITEMS: Record<"nominal" | "ordinal" | "discrete" | "continuous", string[]> = {
+  nominal: ["Favourite music", "Eye colour", "Travel method", "Pet type"],
+  ordinal: ["Satisfaction level", "T-shirt size", "Race place", "Spice level"],
+  discrete: ["Goals scored", "Siblings", "Books borrowed", "Students absent"],
+  continuous: ["Height", "Running time", "Temperature", "Water volume"],
+};
+
+export function comparisonTeachingTask(round: number, target: number): PracticeTask {
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "What must be checked before two data sets are compared?",
+    speakText: "A fair comparison needs the same variable, compatible units and collection rules that measure or count in the same way.",
+    variable: "Two Year 6 classes collected data", examples: "Decide what makes their results comparable.",
+    options: order([
+      { id: "match", label: "Same variable, compatible units and collection method" },
+      { id: "size", label: "Both tables use the same font size" },
+      { id: "colour", label: "Both graphs use the same favourite colour" },
+    ], round),
+    correctOptionIds: ["match"],
+    feedback: { correct: "Correct — comparable data must represent the same variable on compatible terms.", wrong: "Visual styling does not make data comparable. Check the variable, units and collection method." },
+  };
+}
+
+export function fourTypeSortTask(round: number, target: number): PracticeTask {
+  const types = ["nominal", "ordinal", "discrete", "continuous"] as const;
+  const chosen = types.flatMap((type, typeIndex) => [0, 2].map((offset) => ({
+    label: pick(FOUR_TYPE_ITEMS[type], round + typeIndex + offset),
+    category: type,
+  })));
+  return {
+    kind: "statisticaSort", target,
+    prompt: "Sort the variables before choosing how to compare them.",
+    speakText: "Nominal is unordered categories. Ordinal is ordered categories. Discrete is counted. Continuous is measured.",
+    items: order(chosen, round).map((item, index) => ({ id: `type-${index}`, ...item })),
+    categories: [
+      { id: "nominal", label: "Nominal", color: C.indigo },
+      { id: "ordinal", label: "Ordinal", color: C.amber },
+      { id: "discrete", label: "Discrete", color: C.teal },
+      { id: "continuous", label: "Continuous", color: C.pink },
+    ],
+    feedback: { correct: "Correct — now the data type can guide how the sets are represented and compared.", wrong: "Check whether each variable is an unordered category, ordered category, count or measurement." },
+  };
+}
+
+const COMPARISON_PAIRS = [
+  { focus: "Compare running performance", good: "Class A and Class B 100 m times, both recorded in seconds", wrongVariable: "Class A running times and Class B favourite sports", wrongUnit: "Class A times in seconds and Class B heights in centimetres" },
+  { focus: "Compare plant growth", good: "Plant A and Plant B heights, both measured weekly in centimetres", wrongVariable: "Plant A height and Plant B number of leaves", wrongUnit: "Plant A height in centimetres and Plant B mass in grams" },
+  { focus: "Compare reading activity", good: "Class A and Class B books read, both counted over the same month", wrongVariable: "Class A books read and Class B reading enjoyment", wrongUnit: "Class A books per month and Class B minutes per day" },
+  { focus: "Compare water temperature", good: "Tank A and Tank B temperatures, measured at the same times in degrees Celsius", wrongVariable: "Tank A temperature and Tank B water volume", wrongUnit: "Tank A temperature in Celsius and Tank B depth in centimetres" },
+];
+
+export function comparablePairTask(round: number, target: number): PracticeTask {
+  const item = pick(COMPARISON_PAIRS, round);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which pair of data sets can be compared meaningfully?",
+    speakText: "Choose two sets that record the same variable with compatible units and collection periods.",
+    variable: item.focus, examples: "Select the fair comparison.",
+    options: order([
+      { id: "good", label: item.good },
+      { id: "variable", label: item.wrongVariable },
+      { id: "unit", label: item.wrongUnit },
+    ], round),
+    correctOptionIds: ["good"],
+    feedback: { correct: "Yes — those sets measure the same variable on compatible terms.", wrong: "A meaningful comparison needs the same variable, compatible units and matching collection conditions." },
+  };
+}
+
 // ── W2/W3 Range: highest minus lowest value in a set (AC9M6ST01) ─────────────
 const RANGE_CTX = [
   { q: "Goals scored each game", labels: ["G1", "G2", "G3", "G4", "G5"] },
@@ -223,11 +460,13 @@ export function misleadingTask(round: number, target: number): PracticeTask {
 }
 
 // ── Lesson map (18 lessons, 6 weeks) ─────────────────────────────────────────
+const FOCUSED_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
+  "y6-statistics-w1-l1": [continuousTeachingTask, valueBetweenTask, measurementPlanTask, measurementPrecisionTask],
+  "y6-statistics-w1-l2": [countMeasureTeachingTask, countMeasureSortTask, collectionMethodTask, validCollectionResponseTask],
+  "y6-statistics-w1-l3": [comparisonTeachingTask, fourTypeSortTask, comparablePairTask, shapeCompareTask],
+};
+
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
-  // W1 Types of Data — nominal vs ordinal, discrete vs continuous
-  "y6-statistics-w1-l1": [nominalOrdinalTask, nominalOrdinalTask, nominalOrdinalTask],
-  "y6-statistics-w1-l2": [discreteContinuousTask, discreteContinuousTask, discreteContinuousTask],
-  "y6-statistics-w1-l3": [nominalOrdinalTask, discreteContinuousTask, nominalOrdinalTask],
   // W2 Mode, Range & Shape
   "y6-statistics-w2-l1": [modeReadTask, rangeTask, modeReadTask],
   "y6-statistics-w2-l2": [rangeTask, modeReadTask, shapeConcentratedTask],
@@ -250,6 +489,19 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y6-statistics-w6-l3": [rangeTask, modeReadTask, misleadingTask],
 };
 
+function focusedTaskSet(gens: [Gen, Gen, Gen, Gen], seed: number): RealmLessonTaskSet {
+  let t = 10;
+  const rounds = [seed + 3, seed + 7, seed + 11];
+  return {
+    teaching: () => gens[0](seed, ++t),
+    activities: [
+      () => gens[1](rounds[0]++, ++t),
+      () => gens[2](rounds[1]++, ++t),
+      () => gens[3](rounds[2]++, ++t),
+    ],
+  };
+}
+
 function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {
   let t = 10;
   const rounds = [seed, seed + 1, seed + 2];
@@ -264,13 +516,15 @@ function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {
 }
 
 export function getStatisticaLevel6TaskSet(lessonId: string): RealmLessonTaskSet | null {
-  const gens = LESSON_GENS[lessonId];
-  if (!gens) return null;
   const m = /-w(\d+)-l(\d+)$/.exec(lessonId);
   const week = m ? Number(m[1]) : 1;
   const lesson = m ? Number(m[2]) : 1;
   const seed = (week - 1) * 2 + (lesson - 1);
+  const focusedGens = FOCUSED_GENS[lessonId];
+  if (focusedGens) return focusedTaskSet(focusedGens, seed);
+  const gens = LESSON_GENS[lessonId];
+  if (!gens) return null;
   return taskSet(gens, seed);
 }
 
-export const STATISTICA_LEVEL6_LESSON_IDS = Object.keys(LESSON_GENS);
+export const STATISTICA_LEVEL6_LESSON_IDS = [...Object.keys(FOCUSED_GENS), ...Object.keys(LESSON_GENS)];

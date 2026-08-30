@@ -154,6 +154,7 @@
     "qa:statistica-level5-week2": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-level5-week2.ts",
     "qa:statistica-level5-week3": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-level5-week3.ts",
     "qa:statistica-level5-week5": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-level5-week5.ts",
+    "qa:statistica-level6-week1": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-level6-week1.ts",
     "qa:statistica-home": "node scripts/audit-statistica-home.mjs",
     "qa:archived-student-roster": "node scripts/archived-student-roster-audit.mjs",
     "qa:pretest-pathway": "node --no-warnings --experimental-strip-types scripts/pretest-pathway-assignment-audit.mjs",

@@ -50,6 +50,16 @@ for (const lesson of lessons) {
     activities.every((task) => task.kind === "statisticaDisplayStudio" && task.mode === lesson.mode),
     `${lesson.id}: activities must use the promised ${lesson.mode} interaction`,
   );
+  const openingDisplays = activities.flatMap((task) => task.kind === "statisticaDisplayStudio" ? [task.correctDisplay] : []);
+  check(new Set(openingDisplays).size === 3, `${lesson.id}: opening cycle must cover line, column and table briefs`);
+
+  for (const task of activities) {
+    if (task.kind !== "statisticaDisplayStudio") continue;
+    const brief = task.purpose.toLowerCase();
+    if (task.correctDisplay === "line") check(/connect|join/.test(brief), `${lesson.id}: line answer needs an explicit connected-trend brief`);
+    if (task.correctDisplay === "column") check(/separate bars/.test(brief), `${lesson.id}: column answer needs an explicit separate-bars brief`);
+    if (task.correctDisplay === "table") check(/print.*exact|exact.*print/.test(brief), `${lesson.id}: table answer needs an explicit exact-values brief`);
+  }
 
   if (lesson.mode === "design") {
     for (const task of activities) {

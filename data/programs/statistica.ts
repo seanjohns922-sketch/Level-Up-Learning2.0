@@ -72,7 +72,7 @@ const LEVEL_SEEDS: Record<StatisticaLevel, StatisticaWeekSeed[]> = {
     { focus: "Statistical Investigation", lessons: ["Pose an Unbiased Question", "Collect & Validate", "Analyse & Report"], curriculum: ["AC9M5ST01", "AC9M5ST02", "AC9M5ST03"] },
   ],
   6: [
-    { focus: "Types of Data", lessons: ["Nominal vs Ordinal", "Discrete vs Continuous", "Classify the Data"], curriculum: ["AC9M6ST01"] },
+    { focus: "Types of Data", lessons: ["Continuous Data", "Counting and Measuring", "Fair Data Comparisons"], curriculum: ["AC9M6ST01"] },
     { focus: "Mode, Range & Shape", lessons: ["Find the Mode", "Calculate the Range", "Describe the Shape"], curriculum: ["AC9M6ST01"] },
     { focus: "Comparative Displays", lessons: ["Side-by-Side Graphs", "Compare Two Groups", "Draw Conclusions"], curriculum: ["AC9M6ST01"] },
     { focus: "Statistics in the Media", lessons: ["Read the Claim", "Check the Evidence", "Does the Data Support It?"], curriculum: ["AC9M6ST02"] },

@@ -75,7 +75,7 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
       </div>
 
       {/* category bins */}
-      <div className="mx-auto grid max-w-md gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(task.categories.length, 3)}, minmax(0,1fr))` }}>
+      <div className="mx-auto grid max-w-md gap-3" style={{ gridTemplateColumns: `repeat(${task.categories.length === 4 ? 2 : Math.min(task.categories.length, 3)}, minmax(0,1fr))` }}>
         {task.categories.map((cat) => {
           const inThis = task.items.filter((it) => placement[it.id] === cat.id);
           const armed = Boolean(selected) && !settled;

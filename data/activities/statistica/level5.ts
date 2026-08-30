@@ -614,7 +614,7 @@ export function displayChoiceTask(round: number, target: number): PracticeTask {
 type StudioDisplay = "line" | "column" | "table";
 type StudioItem = {
   question: string;
-  purpose: string;
+  brief: string;
   labels: string[];
   values: number[];
   unit: string;
@@ -623,14 +623,15 @@ type StudioItem = {
 };
 
 const STUDIO_ITEMS: StudioItem[] = [
-  { question: "How did the temperature change during the day?", purpose: "Make the rise, peak and fall easy to see.", labels: ["6am", "9am", "12pm", "3pm", "6pm"], values: [12, 17, 24, 22, 16], unit: "°C", best: "line", title: "Temperature through the day" },
-  { question: "How did the bean plant grow over five weeks?", purpose: "Show how one measurement changed in time order.", labels: ["W1", "W2", "W3", "W4", "W5"], values: [3, 7, 11, 16, 22], unit: "cm", best: "line", title: "Bean plant growth by week" },
-  { question: "Which class sport received the most votes?", purpose: "Compare the frequencies of separate categories.", labels: ["Soccer", "Netball", "Cricket", "Tennis"], values: [12, 9, 6, 4], unit: "votes", best: "column", title: "Class votes for favourite sport" },
-  { question: "Which type of pet is most common?", purpose: "Make differences between pet categories easy to compare.", labels: ["Dog", "Cat", "Fish", "Bird"], values: [11, 8, 5, 3], unit: "pets", best: "column", title: "Pets owned by the class" },
-  { question: "What was the exact rainfall on Wednesday?", purpose: "Look up one precise value quickly.", labels: ["Mon", "Tue", "Wed", "Thu", "Fri"], values: [4, 9, 13, 7, 5], unit: "mm", best: "table", title: "Daily rainfall this week" },
-  { question: "Exactly how many books were borrowed from each genre?", purpose: "Read and report every exact frequency.", labels: ["Fantasy", "Sport", "History", "Science"], values: [18, 11, 7, 14], unit: "books", best: "table", title: "Library books borrowed by genre" },
-  { question: "How did website visits change from January to May?", purpose: "Show the overall trend across ordered months.", labels: ["Jan", "Feb", "Mar", "Apr", "May"], values: [20, 28, 25, 39, 47], unit: "visits", best: "line", title: "Website visits from January to May" },
-  { question: "Which way of travelling to school is least common?", purpose: "Compare separate travel categories.", labels: ["Walk", "Bike", "Bus", "Car"], values: [8, 4, 10, 13], unit: "students", best: "column", title: "How students travel to school" },
+  { question: "How did the temperature change during the day?", brief: "Connect consecutive times so the overall trend is explicit.", labels: ["6am", "9am", "12pm", "3pm", "6pm"], values: [12, 17, 24, 22, 16], unit: "°C", best: "line", title: "Temperature through the day" },
+  { question: "Which class sport received the most votes?", brief: "Use separate bars so category frequencies can be compared at a glance.", labels: ["Soccer", "Netball", "Cricket", "Tennis"], values: [12, 9, 6, 4], unit: "votes", best: "column", title: "Class votes for favourite sport" },
+  { question: "What was the exact rainfall on Wednesday?", brief: "Print every exact daily measurement in rows for direct lookup.", labels: ["Mon", "Tue", "Wed", "Thu", "Fri"], values: [4, 9, 13, 7, 5], unit: "mm", best: "table", title: "Daily rainfall this week" },
+  { question: "How did the bean plant grow over five weeks?", brief: "Join each weekly measurement to emphasise continuous growth.", labels: ["W1", "W2", "W3", "W4", "W5"], values: [3, 7, 11, 16, 22], unit: "cm", best: "line", title: "Bean plant growth by week" },
+  { question: "Which type of pet is most common?", brief: "Use separate bars to emphasise differences between pet categories.", labels: ["Dog", "Cat", "Fish", "Bird"], values: [11, 8, 5, 3], unit: "pets", best: "column", title: "Pets owned by the class" },
+  { question: "Exactly how many books were borrowed from each genre?", brief: "Print every exact frequency so none must be estimated from an axis.", labels: ["Fantasy", "Sport", "History", "Science"], values: [18, 11, 7, 14], unit: "books", best: "table", title: "Library books borrowed by genre" },
+  { question: "How did website visits change from January to May?", brief: "Connect the ordered months to make the overall trend explicit.", labels: ["Jan", "Feb", "Mar", "Apr", "May"], values: [20, 28, 25, 39, 47], unit: "visits", best: "line", title: "Website visits from January to May" },
+  { question: "Which way of travelling to school is least common?", brief: "Use separate bars to compare the travel categories at a glance.", labels: ["Walk", "Bike", "Bus", "Car"], values: [8, 4, 10, 13], unit: "students", best: "column", title: "How students travel to school" },
+  { question: "What exact time did each runner record?", brief: "Print every runner's exact time so the values can be copied without estimation.", labels: ["Ari", "Bea", "Chen", "Dani"], values: [14, 12, 16, 13], unit: "sec", best: "table", title: "Runner times for the class race" },
 ];
 
 function studioData(item: StudioItem) {
@@ -641,9 +642,9 @@ export function displayMatchGuideTask(round: number, target: number): PracticeTa
   const item = pick(STUDIO_ITEMS, round);
   return {
     kind: "statisticaDisplayStudio", mode: "guide", scene: "intro", target,
-    prompt: "Choose the display that serves the question",
-    speakText: "Use a line graph for change over time, a column graph to compare categories, and a table when exact values matter most.",
-    question: "What does the reader need to discover?", purpose: "The best display depends on the question, not just the data.",
+    prompt: "Choose a display that fits the job",
+    speakText: "More than one display can show data accurately. Choose a line graph when the job needs connected change, a column graph for separate category bars, and a table for printed exact values.",
+    question: "What does this display need to do?", purpose: "Several displays may be accurate. The display job tells us which feature matters most.",
     data: studioData(item), displayOptions: ["line", "column", "table"], correctDisplay: item.best,
     guideItems: [
       { title: "Line graph", body: "See change and trends over time.", display: "line" },
@@ -658,11 +659,11 @@ export function displayMatchStudioTask(round: number, target: number): PracticeT
   const item = pick(STUDIO_ITEMS, round);
   return {
     kind: "statisticaDisplayStudio", mode: "match", target,
-    prompt: "Match the question to its best display",
-    speakText: `${item.question} ${item.purpose} Choose the display that makes that job easiest.`,
-    question: item.question, purpose: item.purpose, data: studioData(item),
+    prompt: "Which display has the feature needed for this job?",
+    speakText: `${item.question} The display job is: ${item.brief} Choose the display with that specific feature.`,
+    question: item.question, purpose: item.brief, data: studioData(item),
     displayOptions: ["line", "column", "table"], correctDisplay: item.best,
-    feedback: { correct: `Correct — a ${item.best} display best serves this question.`, wrong: "Think about the purpose: trend over time, category comparison, or exact lookup." },
+    feedback: { correct: `Correct — the ${item.best} display has the feature needed for this job.`, wrong: "Several displays could be accurate. Look for the one feature this display job specifically needs." },
   };
 }
 
@@ -670,9 +671,9 @@ export function displayCompareGuideTask(round: number, target: number): Practice
   const item = pick(STUDIO_ITEMS, round + 2);
   return {
     kind: "statisticaDisplayStudio", mode: "guide", scene: "intro", target,
-    prompt: "The same data can tell different stories",
+    prompt: "Accurate displays can serve different purposes",
     speakText: "Two displays can both be accurate, but one may answer a particular question faster and more clearly. Compare what each display makes easy to notice.",
-    question: item.question, purpose: "Compare displays by how clearly they answer the question.",
+    question: item.question, purpose: "Compare each display with the specific job it needs to do.",
     data: studioData(item), displayOptions: ["line", "column", "table"], correctDisplay: item.best,
     guideItems: [
       { title: "Look", body: "What feature stands out first?", display: "column" },
@@ -688,11 +689,11 @@ export function displayCompareStudioTask(round: number, target: number): Practic
   const challenger: StudioDisplay = item.best === "table" ? "column" : "table";
   return {
     kind: "statisticaDisplayStudio", mode: "compare", target,
-    prompt: "Which display answers the question more clearly?",
-    speakText: `Both displays use the same data. ${item.question} Compare the views and choose the one that answers this purpose most clearly.`,
-    question: item.question, purpose: item.purpose, data: studioData(item),
+    prompt: "Which accurate display fits this job more directly?",
+    speakText: `Both displays use the same accurate data. ${item.question} The display job is: ${item.brief} Choose the display with that requested feature.`,
+    question: item.question, purpose: item.brief, data: studioData(item),
     displayOptions: round % 2 ? [challenger, item.best] : [item.best, challenger], correctDisplay: item.best,
-    feedback: { correct: "Yes — both may be accurate, but that display communicates the required information more clearly.", wrong: "Do not choose only by appearance. Choose the display that answers the stated question most directly." },
+    feedback: { correct: "Yes — both displays are accurate, but that one provides the feature needed for this job.", wrong: "Both displays may be accurate. Check whether the job needs connected change, separate bars or printed exact values." },
   };
 }
 
@@ -702,7 +703,7 @@ export function displayDesignGuideTask(round: number, target: number): PracticeT
     kind: "statisticaDisplayStudio", mode: "guide", scene: "intro", target,
     prompt: "Plan a display that communicates clearly",
     speakText: "A strong display uses the right format, a title that says what the data shows, clear labels and a reason connected to the investigation question.",
-    question: item.question, purpose: "Build for the reader: choose, label and justify.",
+    question: item.question, purpose: "Build for the reader: fit the display job, label clearly and justify.",
     data: studioData(item), displayOptions: ["line", "column", "table"], correctDisplay: item.best,
     guideItems: [
       { title: "1. Choose", body: "Match the display to the purpose." },
@@ -721,8 +722,8 @@ export function displayDesignStudioTask(round: number, target: number): Practice
   return {
     kind: "statisticaDisplayStudio", mode: "design", target,
     prompt: "Design the clearest display",
-    speakText: `${item.question} Choose the display, then select a precise title and a justification connected to the question.`,
-    question: item.question, purpose: item.purpose, data: studioData(item),
+    speakText: `${item.question} The display job is: ${item.brief} Choose the display with that feature, then select a precise title and justification.`,
+    question: item.question, purpose: item.brief, data: studioData(item),
     displayOptions: ["line", "column", "table"], correctDisplay: item.best,
     titleOptions: order([
       { id: "clear", label: item.title },
