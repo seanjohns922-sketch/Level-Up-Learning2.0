@@ -26,7 +26,13 @@ type World3DWeekEntry = Omit<World3DReturnContext, "source" | "createdAt" | "act
 
 function writeWorld3DReturnContext(context: World3DReturnContext) {
   if (typeof window === "undefined") return;
-  window.sessionStorage.setItem(RETURN_CONTEXT_KEY, JSON.stringify(context));
+  // Storage can throw (private mode, sandboxed preview iframe, locked-down
+  // devices). Remembering the return spawn must never block entering the world.
+  try {
+    window.sessionStorage.setItem(RETURN_CONTEXT_KEY, JSON.stringify(context));
+  } catch {
+    /* no-op — entry proceeds without a remembered return path */
+  }
 }
 
 export function rememberWorld3DWeekEntry(context: World3DWeekEntry) {
@@ -76,7 +82,11 @@ export function readWorld3DReturnContext(): World3DReturnContext | null {
 
 export function clearWorld3DReturnContext() {
   if (typeof window === "undefined") return;
-  window.sessionStorage.removeItem(RETURN_CONTEXT_KEY);
+  try {
+    window.sessionStorage.removeItem(RETURN_CONTEXT_KEY);
+  } catch {
+    /* no-op — storage unavailable */
+  }
 }
 
 function contextMatchesWeek(

@@ -56,7 +56,11 @@ export function readWorldNavigationContext(): WorldNavigationContext | null {
 
 export function clearWorldNavigationContext() {
   if (typeof window === "undefined") return;
-  window.sessionStorage.removeItem(WORLD_NAVIGATION_CONTEXT_KEY);
+  try {
+    window.sessionStorage.removeItem(WORLD_NAVIGATION_CONTEXT_KEY);
+  } catch {
+    /* no-op — storage unavailable */
+  }
 }
 
 export function getCentralWorldHomeReturnPath() {
