@@ -7,29 +7,43 @@ const outputDir = path.join(root, "public", "marketplace", "central-world");
 const backdropPath = path.join(root, "public", "images", "central-world-valley-panorama.png");
 mkdirSync(outputDir, { recursive: true });
 
+// Aussie re-skin — must stay in step with the 3D models in
+// CentralWorldEnvironment.tsx and the catalogue names. Keys are unchanged so the
+// existing webp/svg filenames (and item_key -> src mapping) still resolve.
 const items = [
-  ["clubhouse", "#2563eb", "buildings", "clubhouse"],
+  ["clubhouse", "#3b82f6", "buildings", "queenslander"],
   ["games_room", "#7c3aed", "buildings", "games"],
   ["treehouse", "#16a34a", "buildings", "treehouse"],
   ["training_centre", "#22c55e", "buildings", "training"],
-  ["workshop", "#0ea5e9", "buildings", "workshop"],
-  ["observatory", "#8b5cf6", "buildings", "observatory"],
-  ["puppy_yard", "#f59e0b", "animals", "puppy"],
-  ["bunny_garden", "#f472b6", "animals", "bunny"],
+  ["workshop", "#dc2626", "buildings", "surfclub"],
+  ["observatory", "#e6b64c", "buildings", "sydneytower"],
+  ["puppy_yard", "#3b82f6", "animals", "puppy"],
+  ["bunny_garden", "#a78bfa", "animals", "bunny"],
   ["pony_paddock", "#a16207", "animals", "pony"],
-  ["farmyard", "#84cc16", "animals", "farmyard"],
-  ["wildlife_habitat", "#059669", "animals", "wildlife"],
+  ["farmyard", "#c2410c", "animals", "homestead"],
+  ["wildlife_habitat", "#5c7a4b", "animals", "koala"],
   ["backyard_pool", "#0ea5e9", "play", "pool"],
   ["splash_pool", "#06b6d4", "play", "splash"],
-  ["water_park", "#0284c7", "play", "waterpark"],
+  ["water_park", "#0284c7", "play", "lagoon"],
   ["adventure_playground", "#f97316", "play", "playground"],
   ["trampoline_park", "#22c55e", "play", "trampoline"],
-  ["sports_stadium", "#2563eb", "special", "stadium"],
+  ["sports_stadium", "#2563eb", "special", "afl"],
   ["cinema", "#dc2626", "special", "cinema"],
   ["arcade", "#a855f7", "special", "arcade"],
   ["party_house", "#ec4899", "special", "party"],
-  ["pet_sanctuary", "#14b8a6", "special", "sanctuary"],
+  ["pet_sanctuary", "#a16207", "special", "kangaroo"],
 ];
+
+// Kangaroo built from primitives, facing right, sitting up. Reused at two sizes.
+const ROO = `
+  <ellipse cx="-52" cy="30" rx="46" ry="14" fill="#a9713c" transform="rotate(-18 -52 30)"/>
+  <ellipse cx="-6" cy="66" rx="40" ry="14" fill="#b07b41"/>
+  <ellipse cx="6" cy="4" rx="42" ry="54" fill="#c0824a"/>
+  <ellipse cx="20" cy="10" rx="22" ry="34" fill="#d9a86e"/>
+  <circle cx="34" cy="-62" r="26" fill="#c0824a"/>
+  <ellipse cx="54" cy="-64" rx="14" ry="9" fill="#b07b41"/>
+  <ellipse cx="24" cy="-92" rx="7" ry="18" fill="#b07b41"/><ellipse cx="42" cy="-90" rx="7" ry="18" fill="#b07b41"/>
+  <circle cx="30" cy="-64" r="4" fill="#241708"/>`;
 
 const activeFiles = new Set(items.flatMap(([key]) => [`${key}.svg`, `${key}.webp`]));
 for (const file of readdirSync(outputDir)) {
@@ -105,6 +119,15 @@ function windows(points, color = "#fde68a") {
 }
 
 function building(type, accent) {
+  if (type === "queenslander") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="452" y="500" width="34" height="96" fill="#8a5a3c"/><rect x="794" y="500" width="34" height="96" fill="#8a5a3c"/><rect x="416" y="360" width="448" height="150" rx="14" fill="url(#front)"/><rect x="404" y="486" width="472" height="34" rx="8" fill="#93c5fd"/><path d="M372 360 L640 250 L908 360 Z" fill="url(#roof)"/><path d="M452 486 L452 360 M556 486 L556 360 M724 486 L724 360 M828 486 L828 360" stroke="#f8fafc" stroke-width="12"/><rect x="596" y="392" width="88" height="118" rx="10" fill="#1e293b"/><rect x="470" y="404" width="78" height="76" rx="10" fill="#bae6fd"/><rect x="732" y="404" width="78" height="76" rx="10" fill="#bae6fd"/><path d="M596 596 L684 596 L684 512" stroke="#c98a52" stroke-width="16" fill="none"/></g>`;
+  }
+  if (type === "surfclub") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="392" y="386" width="440" height="214" rx="24" fill="#2563eb"/><path d="M352 396 L612 268 L872 396 Z" fill="#e5484d"/><rect x="440" y="470" width="360" height="46" rx="10" fill="#eff6ff"/><rect x="788" y="356" width="120" height="244" rx="16" fill="#1d4ed8"/><rect x="766" y="298" width="164" height="88" rx="16" fill="#f8fafc"/><path d="M300 560 L300 400 M1000 560 L1000 400" stroke="#cbd5e1" stroke-width="12"/><rect x="300" y="404" width="70" height="46" fill="#ef4444"/><rect x="300" y="452" width="70" height="44" fill="#facc15"/><rect x="930" y="404" width="70" height="46" fill="#ef4444"/><rect x="930" y="452" width="70" height="44" fill="#facc15"/></g>`;
+  }
+  if (type === "sydneytower") {
+    return `${platform(accent, false)}<g filter="url(#lift)"><rect x="520" y="520" width="240" height="80" rx="16" fill="#c7cdd6"/><rect x="612" y="250" width="56" height="290" rx="12" fill="#b6c2d2"/><ellipse cx="640" cy="250" rx="74" ry="22" fill="#d9a441"/><path d="M566 250 L714 250 L690 168 L590 168 Z" fill="#e6b64c"/><ellipse cx="640" cy="168" rx="50" ry="20" fill="#f2cd6e"/><rect x="576" y="208" width="128" height="14" rx="6" fill="#6b551f"/><rect x="634" y="70" width="12" height="100" fill="#cbd5e1"/><circle cx="640" cy="66" r="10" fill="#ef4444" filter="url(#glow)"/></g>`;
+  }
   if (type === "treehouse") {
     return `${platform(accent, false)}<g filter="url(#lift)"><rect x="574" y="340" width="82" height="260" rx="34" fill="#78350f"/><circle cx="496" cy="320" r="104" fill="#166534"/><circle cx="612" cy="270" r="118" fill="#15803d"/><circle cx="750" cy="326" r="112" fill="#16a34a"/><path d="M430 484 L640 370 L850 484 L810 594 L470 594 Z" fill="url(#wood)"/><rect x="530" y="496" width="92" height="98" rx="12" fill="#451a03"/><rect x="672" y="502" width="92" height="62" rx="12" fill="#fde68a"/><path d="M446 600 L380 676 M830 600 L900 676" stroke="#92400e" stroke-width="16"/></g>`;
   }
@@ -124,6 +147,12 @@ function building(type, accent) {
 }
 
 function animal(type, accent) {
+  if (type === "koala") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="452" y="360" width="34" height="220" fill="#d8ceba"/><circle cx="410" cy="326" r="64" fill="#6f8a60"/><circle cx="540" cy="316" r="70" fill="#799a5f"/><circle cx="469" cy="336" r="86" fill="#5c7a4b"/><rect x="720" y="330" width="42" height="250" fill="#ddd2bd"/><circle cx="652" cy="290" r="74" fill="#799a5f"/><circle cx="828" cy="278" r="80" fill="#9cbc7e"/><circle cx="741" cy="298" r="104" fill="#5c7a4b"/><g transform="translate(741 474)"><circle cx="0" cy="0" r="58" fill="#98a1ab"/><circle cx="0" cy="-60" r="46" fill="#a6afb9"/><circle cx="-38" cy="-92" r="26" fill="#b0b8c2"/><circle cx="38" cy="-92" r="26" fill="#b0b8c2"/><ellipse cx="0" cy="-54" rx="13" ry="17" fill="#2f343c"/><circle cx="-18" cy="-70" r="7" fill="#23272e"/><circle cx="18" cy="-70" r="7" fill="#23272e"/></g></g>`;
+  }
+  if (type === "homestead") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><rect x="430" y="400" width="330" height="180" rx="16" fill="#e8dcc0"/><path d="M398 402 L595 300 L792 402 Z" fill="#cbd5e1"/><rect x="470" y="470" width="90" height="110" rx="10" fill="#7a5b38"/><rect x="620" y="446" width="96" height="70" rx="10" fill="#bae6fd"/><path d="M842 560 L842 400" stroke="#9aa3ad" stroke-width="18"/><g transform="translate(842 392)"><path d="M0 0 L92 -18 L84 6 Z" fill="#cbd5e1"/><path d="M0 0 L18 -92 L-6 -84 Z" fill="#e2e8f0"/><path d="M0 0 L-92 18 L-84 -6 Z" fill="#cbd5e1"/><path d="M0 0 L-18 92 L6 84 Z" fill="#e2e8f0"/><circle r="12" fill="#64748b"/></g></g>`;
+  }
   const fence = `<path d="M250 538 L1030 538 M250 588 L1030 588" stroke="#fef3c7" stroke-width="18" stroke-linecap="round"/><g fill="#fef3c7">${Array.from({ length: 10 }, (_, i) => `<rect x="${276 + i * 78}" y="492" width="26" height="120" rx="10"/>`).join("")}</g>`;
   const body = type === "bunny"
     ? `<ellipse cx="622" cy="484" rx="96" ry="70" fill="#f8fafc"/><circle cx="708" cy="448" r="56" fill="#f8fafc"/><path d="M690 400 C650 302 700 292 728 394 M740 402 C768 304 814 322 772 410" stroke="#f8fafc" stroke-width="32" fill="none" stroke-linecap="round"/><circle cx="730" cy="444" r="8" fill="#111827"/><circle cx="756" cy="462" r="9" fill="#f472b6"/>`
@@ -138,6 +167,9 @@ function animal(type, accent) {
 }
 
 function play(type, accent) {
+  if (type === "lagoon") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><ellipse cx="640" cy="556" rx="366" ry="100" fill="#f2e6bd"/><ellipse cx="620" cy="548" rx="300" ry="78" fill="url(#water)"/><ellipse cx="540" cy="524" rx="150" ry="36" fill="#8fdcf6" opacity="0.6"/><circle cx="856" cy="540" r="34" fill="#9aa3ad"/><circle cx="892" cy="556" r="24" fill="#b3bcc6"/><path d="M360 560 C346 460 372 380 400 330" stroke="#a97c46" stroke-width="22" fill="none"/><g transform="translate(400 322)"><path d="M0 0 C-70 -30 -120 -10 -150 30 C-100 0 -50 6 0 8 Z" fill="#3f9e56"/><path d="M0 0 C-30 -70 -6 -120 34 -150 C6 -100 8 -50 8 0 Z" fill="#4cb264"/><path d="M0 0 C70 -20 120 6 150 44 C100 6 50 8 0 10 Z" fill="#3f9e56"/><path d="M0 0 C34 -66 84 -60 120 -34 C70 -20 30 6 8 8 Z" fill="#4cb264"/></g></g>`;
+  }
   if (type === "waterpark") {
     return `${platform(accent, true)}<g filter="url(#lift)"><ellipse cx="640" cy="560" rx="356" ry="96" fill="url(#water)"/><path d="M468 500 C520 354 668 340 724 478" fill="none" stroke="#f97316" stroke-width="42" stroke-linecap="round"/><path d="M724 478 C780 550 872 498 910 420" fill="none" stroke="#facc15" stroke-width="42" stroke-linecap="round"/><path d="M530 428 L530 318 L592 318 L592 414" stroke="#38bdf8" stroke-width="26"/><path d="M760 454 C746 386 772 334 824 306" stroke="#ecfeff" stroke-width="12" fill="none" stroke-linecap="round"/></g>`;
   }
@@ -152,6 +184,12 @@ function play(type, accent) {
 }
 
 function special(type, accent) {
+  if (type === "afl") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><ellipse cx="640" cy="500" rx="410" ry="150" fill="#64748b"/><ellipse cx="640" cy="492" rx="360" ry="128" fill="#475569"/><ellipse cx="640" cy="486" rx="316" ry="112" fill="#3f9a45"/><ellipse cx="640" cy="486" rx="316" ry="112" fill="none" stroke="#eafff0" stroke-width="6"/><ellipse cx="640" cy="486" rx="60" ry="24" fill="none" stroke="#eafff0" stroke-width="5"/><rect x="600" y="462" width="80" height="48" fill="none" stroke="#eafff0" stroke-width="4"/><path d="M330 486 L330 400 M368 486 L368 388 M912 486 L912 400 M874 486 L874 388" stroke="#f8fafc" stroke-width="10"/><path d="M470 372 L470 300 M810 372 L810 300" stroke="#cbd5e1" stroke-width="12"/><rect x="440" y="282" width="60" height="30" rx="6" fill="#fef9c3" filter="url(#glow)"/><rect x="780" y="282" width="60" height="30" rx="6" fill="#fef9c3" filter="url(#glow)"/></g>`;
+  }
+  if (type === "kangaroo") {
+    return `${platform(accent, true)}<g filter="url(#lift)"><path d="M250 538 L1030 538 M250 588 L1030 588" stroke="#c8a86a" stroke-width="16" stroke-linecap="round"/><g fill="#9c6a3c">${Array.from({ length: 10 }, (_, i) => `<rect x="${276 + i * 78}" y="492" width="22" height="120" rx="8"/>`).join("")}</g><g transform="translate(500 500) scale(0.72)">${ROO}</g><g transform="translate(742 476)">${ROO}</g></g>`;
+  }
   if (type === "stadium") {
     return `${platform(accent, true)}<g filter="url(#lift)"><path d="M302 534 C370 376 504 310 640 310 C776 310 910 376 978 534 L908 600 L372 600 Z" fill="#1d4ed8"/><path d="M410 514 C468 426 544 390 640 390 C736 390 812 426 870 514" fill="none" stroke="#bfdbfe" stroke-width="36"/><circle cx="640" cy="492" r="46" fill="#f8fafc"/><path d="M384 318 L384 470 M896 318 L896 470" stroke="#e0f2fe" stroke-width="18"/><circle cx="384" cy="300" r="34" fill="#f8fafc" filter="url(#glow)"/><circle cx="896" cy="300" r="34" fill="#f8fafc" filter="url(#glow)"/></g>`;
   }
@@ -175,7 +213,7 @@ function objectFor(family, type, accent) {
 }
 
 function overlay(key, accent, family, type) {
-  const night = key === "observatory" || key === "cinema" || key === "arcade" || key === "party_house";
+  const night = key === "cinema" || key === "arcade" || key === "party_house";
   return Buffer.from(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="${escapeXml(key)} marketplace render">
       ${defs(accent, night)}
@@ -191,7 +229,7 @@ for (const [key, accent, family, type] of items) {
   const layeredSvg = overlay(key, accent, family, type);
   writeFileSync(svgPath, layeredSvg);
   const overlayImage = await sharp(layeredSvg).resize(1280, 720, { fit: "fill" }).png().toBuffer();
-  const night = key === "observatory" || key === "cinema" || key === "arcade" || key === "party_house";
+  const night = key === "cinema" || key === "arcade" || key === "party_house";
   const backdrop = await sharp(backdropPath)
     .resize(1280, 720, { fit: "cover", position: "center" })
     .modulate({ brightness: night ? 0.64 : 1.05, saturation: 1.14 })
