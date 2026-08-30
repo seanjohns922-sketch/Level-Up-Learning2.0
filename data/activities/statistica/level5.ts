@@ -93,6 +93,213 @@ export function dataTypeSortTask(round: number, target: number): PracticeTask {
   };
 }
 
+// Week 1 uses a deliberate progression. Each lesson teaches one data type in
+// depth before the mixed three-way sort appears as the final consolidation.
+const NOMINAL_SURVEYS = [
+  { question: "Which pet would you most like?", good: "Dog / Cat / Fish / Bird", ordered: "Small / Medium / Large", count: "0 / 1 / 2 / 3" },
+  { question: "What is your favourite fruit?", good: "Apple / Banana / Mango / Pear", ordered: "Not ripe / Ripe / Very ripe", count: "1 / 2 / 3 / 4" },
+  { question: "How do you travel to school?", good: "Walk / Bike / Bus / Car", ordered: "Near / Medium / Far", count: "0 / 1 / 2 / 3" },
+  { question: "Which music style do you prefer?", good: "Pop / Rock / Jazz / Classical", ordered: "Quiet / Medium / Loud", count: "1 / 2 / 3 / 4" },
+];
+
+export function nominalTeachingTask(round: number, target: number): PracticeTask {
+  const item = pick(NOMINAL_SURVEYS, round);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "What makes these responses NOMINAL data?",
+    speakText: "Nominal data uses names or labels. The groups do not have a natural first-to-last order.",
+    variable: item.question, examples: item.good,
+    options: order([
+      { id: "names", label: "They are named groups with no order" },
+      { id: "ordered", label: "They can be ranked from low to high" },
+      { id: "counts", label: "They are whole-number counts" },
+    ], round),
+    correctOptionIds: ["names"],
+    feedback: { correct: "Exactly — the answers are names, and none comes before another.", wrong: "Ask whether the response groups have a natural order. Nominal groups do not." },
+  };
+}
+
+export function nominalResponseTask(round: number, target: number): PracticeTask {
+  const item = pick(NOMINAL_SURVEYS, round + 1);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which response set would collect NOMINAL data?",
+    speakText: "Choose named groups that do not have a natural order.",
+    variable: item.question, examples: "Choose the best set of possible answers.",
+    options: order([
+      { id: "nominal", label: item.good },
+      { id: "ordinal", label: item.ordered },
+      { id: "count", label: item.count },
+    ], round),
+    correctOptionIds: ["nominal"],
+    feedback: { correct: "Yes — those are separate named groups with no ranking.", wrong: "Nominal responses are labels, not ratings and not counts." },
+  };
+}
+
+const NOMINAL_CHECK_ITEMS = [
+  { label: "Favourite colour", category: "nominal" }, { label: "Eye colour", category: "nominal" }, { label: "Football team", category: "nominal" },
+  { label: "Star rating", category: "other" }, { label: "Books read", category: "other" }, { label: "T-shirt size", category: "other" },
+  { label: "Music genre", category: "nominal" }, { label: "Race place", category: "other" },
+];
+export function nominalSortTask(round: number, target: number): PracticeTask {
+  const start = (round * 2) % NOMINAL_CHECK_ITEMS.length;
+  const chosen = Array.from({ length: 6 }, (_, index) => NOMINAL_CHECK_ITEMS[(start + index) % NOMINAL_CHECK_ITEMS.length]!);
+  return {
+    kind: "statisticaSort", target,
+    prompt: "Sort the surveys: nominal data or not nominal?",
+    speakText: "Nominal data is named groups with no natural order. Put ratings and counts in not nominal.",
+    items: order(chosen, round).map((item, index) => ({ id: `nom${index}`, ...item })),
+    categories: [{ id: "nominal", label: "Nominal data", color: C.indigo }, { id: "other", label: "Not nominal", color: C.orange }],
+    feedback: { correct: "Correct — every nominal survey uses unordered names or labels.", wrong: "Check whether each survey uses unordered names, an ordered rating, or a count." },
+  };
+}
+
+const NOMINAL_CATEGORY_SETS = [
+  { q: "Favourite school lunch", good: "Sandwich / Salad / Pasta / Other", overlap: "Hot food / Pasta / Other", ordered: "Dislike / Okay / Love" },
+  { q: "Main way to school", good: "Walk / Bike / Bus / Car / Other", overlap: "Wheels / Bike / Car", ordered: "Near / Medium / Far" },
+  { q: "Favourite book genre", good: "Fantasy / Sport / Mystery / Other", overlap: "Fiction / Fantasy / Mystery", ordered: "Good / Better / Best" },
+];
+export function nominalCategoryDesignTask(round: number, target: number): PracticeTask {
+  const item = pick(NOMINAL_CATEGORY_SETS, round);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which set gives clear, non-overlapping nominal categories?",
+    speakText: "Good survey categories are clear and separate. Each answer should fit one group.",
+    variable: item.q, examples: "Choose the clearest response categories.",
+    options: order([{ id: "good", label: item.good }, { id: "overlap", label: item.overlap }, { id: "ordered", label: item.ordered }], round),
+    correctOptionIds: ["good"],
+    feedback: { correct: "Yes — each response has one clear named group, with Other available.", wrong: "Avoid overlapping groups and rating scales. Each response should fit one named category." },
+  };
+}
+
+const ORDINAL_SCALES = [
+  { variable: "Spice level", low: "Mild", middle: "Medium", high: "Hot" },
+  { variable: "T-shirt size", low: "Small", middle: "Medium", high: "Large" },
+  { variable: "Skill level", low: "Beginner", middle: "Developing", high: "Expert" },
+  { variable: "Satisfaction", low: "Unhappy", middle: "Okay", high: "Very happy" },
+  { variable: "Medal", low: "Bronze", middle: "Silver", high: "Gold" },
+];
+
+export function ordinalTeachingTask(round: number, target: number): PracticeTask {
+  const item = pick(ORDINAL_SCALES, round);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Why is this ORDINAL data?",
+    speakText: "Ordinal data uses named groups that have a meaningful order.",
+    variable: item.variable, examples: `${item.low}, ${item.middle}, ${item.high}`,
+    options: order([
+      { id: "ordered", label: "The named groups have a clear order" },
+      { id: "nominal", label: "The names have no order" },
+      { id: "count", label: "The answers are counts" },
+    ], round),
+    correctOptionIds: ["ordered"],
+    feedback: { correct: "Yes — the categories can be placed in a meaningful order.", wrong: "Ordinal categories are names, but unlike nominal categories they can be ranked." },
+  };
+}
+
+export function ordinalOrderTask(round: number, target: number): PracticeTask {
+  const item = pick(ORDINAL_SCALES, round + 1);
+  const values = [{ label: item.low, category: "low" }, { label: item.middle, category: "middle" }, { label: item.high, category: "high" }];
+  return {
+    kind: "statisticaSort", target,
+    prompt: `Put the ${item.variable.toLowerCase()} categories in order.`,
+    speakText: "Place the lowest category first, then the middle category, then the highest category.",
+    items: order(values, round).map((value, index) => ({ id: `ord${index}`, ...value })),
+    categories: [{ id: "low", label: "Lowest", color: C.blue }, { id: "middle", label: "Middle", color: C.amber }, { id: "high", label: "Highest", color: C.pink }],
+    feedback: { correct: "Ordered correctly — that meaningful ranking makes the data ordinal.", wrong: "Think about which category is lowest, in the middle and highest." },
+  };
+}
+
+export function ordinalReasonTask(round: number, target: number): PracticeTask {
+  const item = pick(ORDINAL_SCALES, round + 2);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which statement about this data is true?",
+    speakText: "Ordinal groups have an order, but the gap between neighbouring groups is not a measured amount.",
+    variable: item.variable, examples: `${item.low} → ${item.middle} → ${item.high}`,
+    options: order([
+      { id: "rank", label: `${item.high} ranks above ${item.middle}` },
+      { id: "amount", label: `${item.high} is exactly twice ${item.middle}` },
+      { id: "none", label: "The groups have no order" },
+    ], round),
+    correctOptionIds: ["rank"],
+    feedback: { correct: "Correct — ordinal categories tell us rank, not an exact numerical gap.", wrong: "The order is meaningful, but ordinal labels do not tell us an exact amount between levels." },
+  };
+}
+
+export function ordinalScaleFixTask(round: number, target: number): PracticeTask {
+  const item = pick(ORDINAL_SCALES, round + 3);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which response scale is ordered clearly from low to high?",
+    speakText: "Look for a scale whose labels move in one clear direction from low to high.",
+    variable: item.variable, examples: "Choose the correctly ordered scale.",
+    options: order([
+      { id: "good", label: `${item.low} → ${item.middle} → ${item.high}` },
+      { id: "mixed", label: `${item.high} → ${item.low} → ${item.middle}` },
+      { id: "nominal", label: "Red → Blue → Green" },
+    ], round),
+    correctOptionIds: ["good"],
+    feedback: { correct: "Yes — the labels move consistently from the lowest to the highest category.", wrong: "Find the scale that moves in one direction from low to middle to high." },
+  };
+}
+
+const DISCRETE_COUNTS = [
+  { variable: "Number of siblings", question: "How many siblings do you have?", examples: "0, 1, 2, 3", impossible: "2.5" },
+  { variable: "Goals scored in a game", question: "How many goals were scored in the game?", examples: "0, 1, 2, 3, 4", impossible: "1.5" },
+  { variable: "Books borrowed", question: "How many books did you borrow?", examples: "0, 1, 2, 3", impossible: "2.7" },
+  { variable: "Pets owned", question: "How many pets do you own?", examples: "0, 1, 2, 3", impossible: "1.5" },
+  { variable: "Students absent", question: "How many students are absent?", examples: "0, 1, 2, 3", impossible: "0.5" },
+];
+
+export function discreteTeachingTask(round: number, target: number): PracticeTask {
+  const item = pick(DISCRETE_COUNTS, round);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Why is this DISCRETE NUMERICAL data?",
+    speakText: "Discrete numerical data is counted in separate whole-number steps.",
+    variable: item.variable, examples: item.examples,
+    options: order([
+      { id: "count", label: "It records whole-number counts" },
+      { id: "names", label: "It records unordered names" },
+      { id: "rank", label: "It records ordered labels" },
+    ], round),
+    correctOptionIds: ["count"],
+    feedback: { correct: "Yes — these answers are counts in whole-number steps.", wrong: "Discrete numerical data answers how many and is recorded as whole-number counts." },
+  };
+}
+
+export function discreteQuestionTask(round: number, target: number): PracticeTask {
+  const item = pick(DISCRETE_COUNTS, round + 1);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which question collects discrete numerical data?",
+    speakText: "Choose the question answered by counting how many.",
+    variable: "Planning a class survey", examples: "Which question should the class ask?",
+    options: order([
+      { id: "count", label: item.question },
+      { id: "name", label: "What is your favourite colour?" },
+      { id: "rank", label: "How satisfied are you: low, medium or high?" },
+    ], round),
+    correctOptionIds: ["count"],
+    feedback: { correct: "Correct — how many produces a whole-number count.", wrong: "Look for the question answered with a number you can count." },
+  };
+}
+
+export function discreteValidResponseTask(round: number, target: number): PracticeTask {
+  const item = pick(DISCRETE_COUNTS, round + 2);
+  const valid = String((round % 4) + 1);
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which could be a valid response to this count question?",
+    speakText: "A count uses a whole number. You cannot have part of one counted object or person.",
+    variable: item.variable, examples: "Choose a possible whole-number count.",
+    options: order([{ id: "valid", label: valid }, { id: "decimal", label: item.impossible }, { id: "category", label: "Blue" }], round),
+    correctOptionIds: ["valid"],
+    feedback: { correct: `Yes — ${valid} is a possible whole-number count.`, wrong: "A discrete count must be a whole number that answers how many." },
+  };
+}
+
 // ── W2 Valid data: spot the out-of-range value (AC9M5ST01) ───────────────────
 type SpotItem = { vals: number[]; rule: string; bad: number };
 const SPOT_ERRORS: SpotItem[] = [
@@ -306,11 +513,14 @@ export function displayChoiceTask(round: number, target: number): PracticeTask {
 }
 
 // ── Lesson map (18 lessons, 6 weeks) ─────────────────────────────────────────
+const WEEK1_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
+  // Teaching, fast recognition, reasoning/ordering, then application.
+  "y5-statistics-w1-l1": [nominalTeachingTask, nominalResponseTask, nominalSortTask, nominalCategoryDesignTask],
+  "y5-statistics-w1-l2": [ordinalTeachingTask, ordinalOrderTask, ordinalReasonTask, ordinalScaleFixTask],
+  "y5-statistics-w1-l3": [discreteTeachingTask, discreteQuestionTask, discreteValidResponseTask, dataTypeSortTask],
+};
+
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
-  // W1 Data Types — sort survey cards into type bins, then quick-check by naming
-  "y5-statistics-w1-l1": [dataTypeSortTask, dataTypeTask, dataTypeSortTask],
-  "y5-statistics-w1-l2": [dataTypeSortTask, dataTypeSortTask, dataTypeTask],
-  "y5-statistics-w1-l3": [dataTypeSortTask, dataTypeTask, dataTypeSortTask],
   // W2 Valid Data — spot, validate, clean out-of-range values
   "y5-statistics-w2-l1": [spotErrorTask, spotErrorTask, spotErrorTask],
   "y5-statistics-w2-l2": [spotErrorTask, spotErrorTask, spotErrorTask],
@@ -333,6 +543,19 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y5-statistics-w6-l3": [lineReadTask, modeReadTask, displayChoiceTask],
 };
 
+function focusedTaskSet(gens: [Gen, Gen, Gen, Gen], seed: number): RealmLessonTaskSet {
+  let t = 10;
+  const rounds = [seed + 3, seed + 7, seed + 11];
+  return {
+    teaching: () => gens[0](seed, ++t),
+    activities: [
+      () => gens[1](rounds[0]++, ++t),
+      () => gens[2](rounds[1]++, ++t),
+      () => gens[3](rounds[2]++, ++t),
+    ],
+  };
+}
+
 function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {
   let t = 10;
   const rounds = [seed, seed + 1, seed + 2];
@@ -347,13 +570,15 @@ function taskSet(gens: [Gen, Gen, Gen], seed: number): RealmLessonTaskSet {
 }
 
 export function getStatisticaLevel5TaskSet(lessonId: string): RealmLessonTaskSet | null {
-  const gens = LESSON_GENS[lessonId];
-  if (!gens) return null;
   const m = /-w(\d+)-l(\d+)$/.exec(lessonId);
   const week = m ? Number(m[1]) : 1;
   const lesson = m ? Number(m[2]) : 1;
   const seed = (week - 1) * 2 + (lesson - 1);
+  const focusedGens = WEEK1_GENS[lessonId];
+  if (focusedGens) return focusedTaskSet(focusedGens, seed);
+  const gens = LESSON_GENS[lessonId];
+  if (!gens) return null;
   return taskSet(gens, seed);
 }
 
-export const STATISTICA_LEVEL5_LESSON_IDS = Object.keys(LESSON_GENS);
+export const STATISTICA_LEVEL5_LESSON_IDS = [...Object.keys(WEEK1_GENS), ...Object.keys(LESSON_GENS)];
