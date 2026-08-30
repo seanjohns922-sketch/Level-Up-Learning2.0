@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, Eraser, Flower2, Lamp, PackageOpen, Route, RotateCw, ShoppingBag, Trees, Undo2, X, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, Eraser, Flower2, Hand, Lamp, PackageOpen, Route, RotateCw, ShoppingBag, Trash2, Trees, Undo2, X, ZoomIn, ZoomOut } from "lucide-react";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
@@ -38,6 +38,7 @@ import { CENTRAL_WORLD_STARTER_SCENERY } from "@/lib/world3d/central-world-edito
 import {
   CENTRAL_WORLD_GRID,
   gridToWorld,
+  placementOccupiesCell,
   readCentralWorldGroundTiles,
   readCentralWorldPlacements,
   validateCentralWorldGroundCell,
@@ -49,14 +50,14 @@ import {
   type CentralWorldPlacement,
 } from "@/lib/world3d/central-world-layout";
 
-type WorldEditTool = CentralWorldGroundType | "tree" | "pine_tree" | "flower_bed" | "lamp_post" | "erase";
+type WorldEditTool = CentralWorldGroundType | "move" | "tree" | "pine_tree" | "flower_bed" | "lamp_post" | "erase";
 const SCENERY_ITEM_BY_TOOL: Partial<Record<WorldEditTool, string>> = {
   tree: "central_world_starter_tree",
   pine_tree: "central_world_starter_pine",
   flower_bed: "central_world_starter_flowers",
   lamp_post: "central_world_starter_lamp",
 };
-const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { path: "Path", road: "Road", stone: "Stone", tree: "Tree", pine_tree: "Pine tree", flower_bed: "Flower bed", lamp_post: "Lamp post", erase: "Eraser" };
+const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { move: "Move", path: "Path", road: "Road", stone: "Stone", tree: "Tree", pine_tree: "Pine tree", flower_bed: "Flower bed", lamp_post: "Lamp post", erase: "Eraser" };
 
 type CentralWorldMetrics = {
   active: boolean;
@@ -247,7 +248,7 @@ export default function CentralWorld() {
   const [groundTiles, setGroundTiles] = useState<CentralWorldGroundTile[]>([]);
   const [buildPlacement, setBuildPlacement] = useState<CentralWorldPlacement | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
-  const [editTool, setEditTool] = useState<WorldEditTool>("path");
+  const [editTool, setEditTool] = useState<WorldEditTool>("move");
   const [selectedInventoryItemKey, setSelectedInventoryItemKey] = useState<string | null>(null);
   const [editCursor, setEditCursor] = useState({ gridX: -5, gridZ: 5 });
   const [buildZoom, setBuildZoom] = useState(28);
@@ -265,6 +266,7 @@ export default function CentralWorld() {
   const buildPreview = buildItem && buildPlacement ? { placement: buildPlacement, item: buildItem, valid: buildValid } : null;
   const isGroundTool = !selectedInventoryItemKey && (editTool === "path" || editTool === "road" || editTool === "stone");
   const isEraseTool = !selectedInventoryItemKey && editTool === "erase";
+  const isMoveTool = !selectedInventoryItemKey && editTool === "move";
   const groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null = editorOpen && (isGroundTool || isEraseTool) ? {
     tile: { ...editCursor, tileType: isGroundTool ? editTool : groundTiles.find((tile) => tile.gridX === editCursor.gridX && tile.gridZ === editCursor.gridZ)?.tileType ?? "stone" },
     valid: editTool !== "erase" && validateCentralWorldGroundCell(editCursor.gridX, editCursor.gridZ),
@@ -329,7 +331,7 @@ export default function CentralWorld() {
     const cursor = { gridX: -5, gridZ: 5 };
     const [worldX, , worldZ] = gridToWorld(cursor.gridX, cursor.gridZ);
     setEditCursor(cursor);
-    setEditTool("path");
+    setEditTool("move");
     setSelectedInventoryItemKey(null);
     setBuildPlacement(null);
     setBuildZoom(28);
@@ -337,7 +339,7 @@ export default function CentralWorld() {
     setEditorOpen(true);
     setSpawnTarget([worldX, 0.75, worldZ + 8]);
     setSpawnNonce((value) => value + 1);
-    void speak("Edit World. Choose a path, road, stone, tree, flower bed, lamp post, or eraser. Use the arrow buttons to move, then press add.", undefined, "manual", { rate: 0.9 });
+    void speak("Edit World. Tap anything you have placed to pick it up and move it. Or choose a path, tree, or the eraser from the tools.", undefined, "manual", { rate: 0.9 });
   }
 
   function closeWorldEditor() {
@@ -348,7 +350,16 @@ export default function CentralWorld() {
   function chooseEditTool(tool: WorldEditTool) {
     setSelectedInventoryItemKey(null);
     setEditTool(tool);
-    void speak(`${EDIT_TOOL_NAMES[tool]} selected. Use the arrow buttons to choose a space, then press ${tool === "erase" ? "remove" : "add"}.`, undefined, "manual", { rate: 0.9 });
+    void speak(
+      tool === "move"
+        ? "Move selected. Tap anything you have placed to pick it up."
+        : tool === "erase"
+          ? "Eraser selected. Tap an item to remove it, or tap the ground to rub out a path."
+          : `${EDIT_TOOL_NAMES[tool]} selected. Use the arrow buttons to choose a space, then press add.`,
+      undefined,
+      "manual",
+      { rate: 0.9 },
+    );
     const itemId = SCENERY_ITEM_BY_TOOL[tool];
     placementSequence.current += 1;
     setBuildPlacement(itemId ? { placementId: `${itemId}-${placementSequence.current}`, itemId, ...editCursor, rotation: 0 } : null);
@@ -368,6 +379,36 @@ export default function CentralWorld() {
     router.replace(preview ? "/world?teacher_preview=1" : "/world");
   }
 
+  // Move tool: tap anywhere on a placed object to pick it up, then nudge / rotate
+  // / delete / place it. Reuses the held-item flow (selecting its item hides it
+  // from the placed set while it's in hand).
+  function pickUpPlacementAt(gridX: number, gridZ: number) {
+    const hit = [...placedCustomisations].reverse().find((placement) => {
+      const item = itemsById.get(placement.itemId);
+      return item ? placementOccupiesCell(placement, item, gridX, gridZ) : false;
+    });
+    if (!hit) return;
+    const item = itemsById.get(hit.itemId);
+    placementSequence.current += 1;
+    setSelectedInventoryItemKey(hit.itemId);
+    setBuildPlacement({ ...hit, placementId: hit.placementId ?? `${hit.itemId}-${placementSequence.current}` });
+    setEditCursor({ gridX: hit.gridX, gridZ: hit.gridZ });
+    void speak(`${item?.name ?? "Item"} picked up. Move it, rotate, then place — or delete it.`, undefined, "manual", { rate: 0.9 });
+  }
+
+  function deleteHeldPlacement() {
+    if (!buildItem) return;
+    setEditHistory((current) => [...current, { placements: placedCustomisations, tiles: groundTiles }].slice(-30));
+    // placementsWithoutBuildItem already excludes the held item, so committing it
+    // removes the object entirely.
+    writeCentralWorldPlacements(placementScope, placementsWithoutBuildItem);
+    setPlacedCustomisations(placementsWithoutBuildItem);
+    setSelectedInventoryItemKey(null);
+    setBuildPlacement(null);
+    setEditTool("move");
+    void speak(`${buildItem.name} deleted.`, undefined, "manual", { rate: 0.9 });
+  }
+
   function confirmBuildPlacement() {
     if (!buildPlacement || !buildItem || !buildValid) return;
     setEditHistory((current) => [...current, { placements: placedCustomisations, tiles: groundTiles }].slice(-30));
@@ -384,17 +425,27 @@ export default function CentralWorld() {
   function applyGroundAt(gridX: number, gridZ: number, announce = false) {
     if (!editorOpen || selectedInventoryItemKey) return;
     if (editTool === "erase") {
+      // Remove whatever the tapped cell belongs to. A placed object counts if the
+      // cell is anywhere inside its footprint (not just its centre); only when no
+      // object is hit do we rub out the ground tile underneath.
+      const covering = placedCustomisations.filter((placement) => {
+        const item = itemsById.get(placement.itemId);
+        return item ? placementOccupiesCell(placement, item, gridX, gridZ) : false;
+      });
       setEditHistory((current) => [...current, { placements: placedCustomisations, tiles: groundTiles }].slice(-30));
-      setGroundTiles((current) => {
-        const next = current.filter((tile) => tile.gridX !== gridX || tile.gridZ !== gridZ);
-        writeCentralWorldGroundTiles(placementScope, next);
-        return next;
-      });
-      setPlacedCustomisations((current) => {
-        const next = current.filter((placement) => placement.gridX !== gridX || placement.gridZ !== gridZ);
-        writeCentralWorldPlacements(placementScope, next);
-        return next;
-      });
+      if (covering.length > 0) {
+        setPlacedCustomisations((current) => {
+          const next = current.filter((placement) => !covering.includes(placement));
+          writeCentralWorldPlacements(placementScope, next);
+          return next;
+        });
+      } else {
+        setGroundTiles((current) => {
+          const next = current.filter((tile) => tile.gridX !== gridX || tile.gridZ !== gridZ);
+          writeCentralWorldGroundTiles(placementScope, next);
+          return next;
+        });
+      }
       if (announce) void speak("Removed.", undefined, "manual", { rate: 0.9 });
       return;
     }
@@ -416,7 +467,12 @@ export default function CentralWorld() {
   function selectBuildCell(gridX: number, gridZ: number, paint: boolean) {
     const nextCursor = { gridX, gridZ };
     setEditCursor(nextCursor);
-    setBuildPlacement((current) => current ? { ...current, ...nextCursor } : current);
+    if (buildPlacement) {
+      setBuildPlacement({ ...buildPlacement, ...nextCursor });
+    } else if (isMoveTool) {
+      pickUpPlacementAt(gridX, gridZ);
+      return;
+    }
     if (paint) applyGroundAt(gridX, gridZ);
   }
 
@@ -508,7 +564,7 @@ export default function CentralWorld() {
       {editorOpen ? (
         <section className="centralWorldEditor" aria-label="Edit world controls" style={{ position: "absolute", left: "50%", bottom: 10, transform: "translateX(-50%)", zIndex: 35, width: "min(97vw, 1040px)", maxHeight: "min(46dvh, 380px)", overflowY: "auto", border: "2px solid #5eead4", borderRadius: 7, background: "rgba(13,24,22,.96)", color: "#fff", padding: 11, boxShadow: "0 14px 40px rgba(0,0,0,.4)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-            <div><div style={{ color: "#5eead4", fontSize: 10, fontWeight: 950, letterSpacing: ".16em" }}>EDIT WORLD</div><div style={{ marginTop: 1, fontSize: 16, fontWeight: 950 }}>{selectedInventoryItemKey ? `Placing ${buildItem?.name ?? "item"}` : isGroundTool || isEraseTool ? "Tap or drag on the grass" : "Tap a space, then place"}</div></div>
+            <div><div style={{ color: "#5eead4", fontSize: 10, fontWeight: 950, letterSpacing: ".16em" }}>EDIT WORLD</div><div style={{ marginTop: 1, fontSize: 16, fontWeight: 950 }}>{selectedInventoryItemKey ? `Placing ${buildItem?.name ?? "item"}` : isMoveTool ? "Tap an item to move or delete it" : isGroundTool ? "Tap or drag on the grass" : isEraseTool ? "Tap an item to remove it" : "Tap a space, then place"}</div></div>
             <div style={{ display: "flex", gap: 5 }}>
               <button type="button" onClick={() => setBuildZoom((value) => Math.min(38, value + 4))} aria-label="Zoom camera out" title="Zoom out" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomOut size={18} /></button>
               <button type="button" onClick={() => setBuildZoom((value) => Math.max(18, value - 4))} aria-label="Zoom camera in" title="Zoom in" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomIn size={18} /></button>
@@ -530,6 +586,7 @@ export default function CentralWorld() {
           <div style={{ marginTop: 5, color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>BASIC TOOLS</div>
           <div aria-label="World editing tools" style={{ marginTop: 5, display: "flex", gap: 5, overflowX: "auto", paddingBottom: 3 }}>
             {([
+              ["move", "Move", <Hand key="move-icon" size={17} />],
               ["path", "Path", <Route key="path-icon" size={17} />], ["road", "Road", <Route key="road-icon" size={17} />], ["stone", "Stone", <Route key="stone-icon" size={17} />],
               ["tree", "Tree", <Trees key="tree-icon" size={17} />], ["pine_tree", "Pine", <Trees key="pine-icon" size={17} />], ["flower_bed", "Flowers", <Flower2 key="flower-icon" size={17} />],
               ["lamp_post", "Lamp", <Lamp key="lamp-icon" size={17} />], ["erase", "Erase", <Eraser key="erase-icon" size={17} />],
@@ -537,8 +594,8 @@ export default function CentralWorld() {
           </div>
           <div className="centralWorldEditorControls" style={{ marginTop: 6, display: "grid", gridTemplateColumns: "auto minmax(120px,1fr) auto", alignItems: "center", gap: 9 }}>
             <div className="centralWorldEditorDpad" style={{ display: "grid", gridTemplateColumns: "repeat(3, 40px)", gridTemplateRows: "repeat(2, 40px)", gap: 4 }}><button type="button" aria-label="Move cursor forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={19} /></button><button type="button" aria-label="Move cursor left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={19} /></button><button type="button" aria-label="Move cursor backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={19} /></button><button type="button" aria-label="Move cursor right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={19} /></button></div>
-            <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Drag across items to remove them." : buildValid ? `${buildItem?.name ?? "Item"} fits here.` : "Choose a clear green space."}</div>
-            <div className="centralWorldEditorActions" style={{ display: "flex", alignItems: "center", gap: 6 }}><button type="button" disabled={!buildPreview} onClick={() => setBuildPlacement((current) => current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current)} aria-label="Rotate selected item" title="Rotate" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", visibility: buildPreview ? "visible" : "hidden" }}><RotateCw size={19} /></button><button type="button" disabled={!isEraseTool && (buildPreview ? !buildValid : !groundPreview?.valid)} onClick={buildPreview ? confirmBuildPlacement : applyGroundTool} style={{ ...debugButton, minHeight: 48, minWidth: 92, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: isEraseTool ? "#ef4444" : "#22c55e", color: "white" }}>{isEraseTool ? <Eraser size={18} /> : <Check size={18} />}{isEraseTool ? "Remove" : buildPreview ? "Place" : "Paint"}</button></div>
+            <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isMoveTool || isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? `${buildItem?.name ?? "Item"} fits here.` : "Choose a clear green space.") : isMoveTool ? "Tap an item to pick it up." : isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Tap an item to remove it." : "Choose a clear green space."}</div>
+            <div className="centralWorldEditorActions" style={{ display: "flex", alignItems: "center", gap: 6 }}><button type="button" disabled={!buildPreview} onClick={() => setBuildPlacement((current) => current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current)} aria-label="Rotate selected item" title="Rotate" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", visibility: buildPreview ? "visible" : "hidden" }}><RotateCw size={19} /></button>{buildPreview ? <button type="button" onClick={deleteHeldPlacement} aria-label="Delete selected item" title="Delete" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", background: "#ef4444", color: "#fff" }}><Trash2 size={19} /></button> : null}<button type="button" disabled={!isEraseTool && (buildPreview ? !buildValid : !groundPreview?.valid)} onClick={buildPreview ? confirmBuildPlacement : applyGroundTool} style={{ ...debugButton, minHeight: 48, minWidth: 92, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: isEraseTool ? "#ef4444" : "#22c55e", color: "white", visibility: isMoveTool && !buildPreview ? "hidden" : "visible" }}>{isEraseTool ? <Eraser size={18} /> : <Check size={18} />}{isEraseTool ? "Remove" : buildPreview ? "Place" : "Paint"}</button></div>
           </div>
         </section>
       ) : null}

@@ -30,6 +30,16 @@ export function gridToWorld(gridX: number, gridZ: number): [number, number, numb
   return [gridX * CENTRAL_WORLD_GRID.cellSize, 0, gridZ * CENTRAL_WORLD_GRID.cellSize];
 }
 
+// True when the placement's footprint (its whole grid span, not just the centre
+// cell) covers the given cell — so a tap anywhere on a large object can select
+// or erase it, not only its exact middle.
+export function placementOccupiesCell(placement: CentralWorldPlacement, item: EconomyItem, gridX: number, gridZ: number) {
+  const [width, depth] = rotatedGridSize(item, placement.rotation);
+  const startX = placement.gridX - Math.floor(width / 2);
+  const startZ = placement.gridZ - Math.floor(depth / 2);
+  return gridX >= startX && gridX < startX + width && gridZ >= startZ && gridZ < startZ + depth;
+}
+
 function occupiedCells(placement: CentralWorldPlacement, item: EconomyItem) {
   const [width, depth] = rotatedGridSize(item, placement.rotation);
   const cells: string[] = [];
