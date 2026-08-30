@@ -397,12 +397,12 @@ function TowerDial() {
   );
 }
 
-export function PlaceholderKnowledgeTower({ active }: { active: boolean }) {
+export function PlaceholderKnowledgeTower({ active, onEnter }: { active: boolean; onEnter?: () => void }) {
   const doorEmissive = active ? "#f0b862" : "#3a2410";
   const doorGlow = active ? 0.6 : 0.08;
   const corners: Array<[number, number]> = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
   return (
-    <group position={CENTRAL_WORLD_CONFIG.towerPosition}>
+    <group position={CENTRAL_WORLD_CONFIG.towerPosition} onClick={(event) => { if (!onEnter) return; event.stopPropagation(); onEnter(); }} onPointerOver={() => { if (onEnter) document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
       {/* stepped plinth */}
       <RoundedBox args={[18, 1.8, 16.5]} radius={0.35} smoothness={2} position={[0, 0.9, 0]}><meshStandardMaterial color={T.sandLow} roughness={0.86} /></RoundedBox>
       <RoundedBox args={[15, 1.8, 13.8]} radius={0.35} smoothness={2} position={[0, 2.6, 0]}><meshStandardMaterial color={T.sandMid} roughness={0.82} /></RoundedBox>
@@ -454,14 +454,14 @@ export function PlaceholderKnowledgeTower({ active }: { active: boolean }) {
       {/* warm stone uplight so the sandstone reads golden */}
       <pointLight position={[0, 6, 12]} color="#ffcf85" intensity={active ? 2.4 : 1.6} distance={34} />
 
-      <Html center position={[0, 15, 6.4]} distanceFactor={20}><div style={{ padding: "8px 13px", border: "1px solid rgba(255,226,163,.7)", background: "rgba(39,29,22,.9)", color: "#fff1c9", fontFamily: "ui-monospace, monospace", fontSize: 12, fontWeight: 900, letterSpacing: "0.15em", whiteSpace: "nowrap" }}>TOWER OF KNOWLEDGE</div></Html>
+      <Html center position={[0, 15, 6.4]} distanceFactor={20} style={{ pointerEvents: "none" }}><div style={{ padding: "8px 13px", border: "1px solid rgba(255,226,163,.7)", background: "rgba(39,29,22,.9)", color: "#fff1c9", fontFamily: "ui-monospace, monospace", fontSize: 12, fontWeight: 900, letterSpacing: "0.15em", whiteSpace: "nowrap" }}>TOWER OF KNOWLEDGE</div></Html>
     </group>
   );
 }
 
-function PlaceholderMyHome({ active }: { active: boolean }) {
+function PlaceholderMyHome({ active, onEnter }: { active: boolean; onEnter?: () => void }) {
   return (
-    <group position={CENTRAL_WORLD_CONFIG.myHomePosition} rotation={[0, CENTRAL_WORLD_CONFIG.myHomeRotationY, 0]}>
+    <group position={CENTRAL_WORLD_CONFIG.myHomePosition} rotation={[0, CENTRAL_WORLD_CONFIG.myHomeRotationY, 0]} onClick={(event) => { if (!onEnter) return; event.stopPropagation(); onEnter(); }} onPointerOver={() => { if (onEnter) document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
       <RoundedBox args={[9, 0.7, 8]} radius={0.3} smoothness={2} position={[0, 0.35, 0]}><meshStandardMaterial color="#806746" roughness={0.9} /></RoundedBox>
       <RoundedBox args={[7.4, 5.6, 6.2]} radius={0.35} smoothness={2} position={[0, 3.45, 0]}><meshStandardMaterial color="#e2c58d" roughness={0.82} /></RoundedBox>
       <mesh position={[0, 7.05, 0]} rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[5.6, 3.6, 4]} /><meshStandardMaterial color="#76513d" roughness={0.84} /></mesh>
@@ -478,7 +478,7 @@ function PlaceholderMyHome({ active }: { active: boolean }) {
   );
 }
 
-export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 } }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number } }) {
+export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void }) {
   return (
     <group>
       <Suspense fallback={null}>
@@ -491,8 +491,8 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, p
       <MyHomePath />
       {groundTiles.map((tile) => <GroundTile key={`${tile.gridX}:${tile.gridZ}`} tile={tile} />)}
       <GrassTufts quality={quality} groundTiles={groundTiles} />
-      <PlaceholderKnowledgeTower active={entranceActive} />
-      <PlaceholderMyHome active={homeActive} />
+      <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} />
+      <PlaceholderMyHome active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
       {placedCustomisations.map((placement, index) => {
         const item = itemsById.get(placement.itemId);

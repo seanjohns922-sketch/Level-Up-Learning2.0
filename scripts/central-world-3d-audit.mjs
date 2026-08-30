@@ -29,6 +29,8 @@ check(world.includes('<WorldHUD context="central"'), "Central World must use the
 check(hud.includes("resolveWorldJourney"), "Quick Start and Current Journey must use the shared canonical journey resolver");
 check(world.includes("rememberCentralWorldHomeEntry"), "Physical My Home entry must preserve transient return context");
 check(world.includes('"/world/tower?teacher_preview=1"'), "3D Tower destination is missing");
+check(world.includes('window.location.assign("/home-base")') && world.includes("window.location.assign(preview ?"), "Hub boundary navigation must use reliable full-page transitions");
+check(environment.includes("onEnterTower") && environment.includes("onEnterHome") && environment.includes("onClick"), "Tower and My Home models must be directly clickable");
 check(world.includes("KeyboardWorldAction"), "Keyboard Tower interaction is missing");
 check(world.includes("WorldJoystick") && !world.includes("<WorldMovePad"), "Central hub must use the 360-degree touch joystick");
 check(world.includes("WorldLookJoystick") && world.includes("lookInput"), "Central hub must provide a separate 360-degree camera joystick");

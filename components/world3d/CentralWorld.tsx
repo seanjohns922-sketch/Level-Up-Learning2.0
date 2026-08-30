@@ -157,7 +157,7 @@ function BuildModeSurface({ active, paint, onCell }: { active: boolean; paint: b
   );
 }
 
-function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNonce, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, editCursor, buildZoom, paintMode, onBuildCell, onActiveTarget }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null; editing: boolean; editCursor: { gridX: number; gridZ: number }; buildZoom: number; paintMode: boolean; onBuildCell: (gridX: number, gridZ: number, paint: boolean) => void; onActiveTarget: (id: string | null) => void }) {
+function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNonce, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, editCursor, buildZoom, paintMode, onBuildCell, onEnterTower, onEnterHome, onActiveTarget }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null; editing: boolean; editCursor: { gridX: number; gridZ: number }; buildZoom: number; paintMode: boolean; onBuildCell: (gridX: number, gridZ: number, paint: boolean) => void; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   const handleNearestTarget = useCallback((id: string | null) => {
     setActiveTargetId(id);
@@ -182,6 +182,8 @@ function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNo
         groundPreview={groundPreview}
         editing={editing}
         editCursor={editCursor}
+        onEnterTower={onEnterTower}
+        onEnterHome={onEnterHome}
       />
       <SharedThirdPersonPlayer
         initialPosition={CENTRAL_WORLD_CONFIG.spawnPoint}
@@ -192,8 +194,8 @@ function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNo
         bounds={CENTRAL_WORLD_CONFIG.playableBounds}
         roamEllipse={CENTRAL_WORLD_CONFIG.roamEllipse}
         interactionTargets={[
-          { id: CENTRAL_WORLD_ANCHORS.towerMainEntrance, position: CENTRAL_WORLD_CONFIG.towerMainEntrance, distance: 3.8 },
-          { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: CENTRAL_WORLD_CONFIG.myHomeEntrance, distance: 3.4 },
+          { id: CENTRAL_WORLD_ANCHORS.towerMainEntrance, position: CENTRAL_WORLD_CONFIG.towerMainEntrance, distance: 6.2 },
+          { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: CENTRAL_WORLD_CONFIG.myHomeEntrance, distance: 4.8 },
         ]}
         onNearestTargetId={handleNearestTarget}
         cameraDistance={11.5}
@@ -455,16 +457,22 @@ export default function CentralWorld() {
     };
   }, []);
 
+  function enterMyHome() {
+    if (transitioning) return;
+    rememberCentralWorldHomeEntry(preview);
+    window.location.assign("/home-base");
+  }
+
+  function enterTower() {
+    if (transitioning) return;
+    setTransitioning(true);
+    window.setTimeout(() => window.location.assign(preview ? "/world/tower?teacher_preview=1" : "/world/tower"), 350);
+  }
+
   function runActiveAction() {
     if (!activeTargetId || transitioning) return;
-    if (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance) {
-      rememberCentralWorldHomeEntry(preview);
-      router.push("/home-base");
-      return;
-    }
-    if (activeTargetId !== CENTRAL_WORLD_ANCHORS.towerMainEntrance) return;
-    setTransitioning(true);
-    window.setTimeout(() => router.push(preview ? "/world/tower?teacher_preview=1" : "/world/tower"), 500);
+    if (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance) enterMyHome();
+    if (activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance) enterTower();
   }
 
   function teleport(position: [number, number, number]) {
@@ -475,7 +483,7 @@ export default function CentralWorld() {
   return (
     <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
-        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} editCursor={editCursor} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool)} onBuildCell={selectBuildCell} onActiveTarget={setActiveTargetId} />
+        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} editCursor={editCursor} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool)} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} />
       </Canvas>
 
       {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
