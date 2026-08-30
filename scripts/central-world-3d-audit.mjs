@@ -58,7 +58,7 @@ check(!world.includes("CENTRAL_WORLD_CUSTOMISATION_PLOTS") && !world.includes("O
 check(world.includes('searchParams.get("build")') && world.includes("confirmBuildPlacement"), "Marketplace rewards must open the hub placement flow");
 check(world.includes("Read build instructions") && world.includes("RotateCw"), "Build Mode must provide spoken instructions and rotation controls");
 check(marketplace.includes("Place in world") && marketplace.includes("build=${encodeURIComponent(selected.item_key)}"), "Owned world rewards must launch Build Mode");
-check(environment.includes("worldObjectScale") && environment.includes('category === "buildings"') && environment.includes("return 2.45"), "Purchased buildings must render at landmark scale");
+check(environment.includes("worldObjectScale") && environment.includes("parseGridSize") && environment.includes("footprintMetres"), "Purchased items must render at a true per-item footprint scale (the AFL oval towers over a cubby)");
 check(environment.includes("BuildModeGrid") && environment.includes("PlacedWorldObject"), "Grid placement preview or placed world objects are missing");
 check(world.includes("BuildModeCamera") && world.includes("BuildModeSurface") && world.includes("onBuildCell"), "Focused build camera or tap-to-place surface is missing");
 check(world.includes("OWNED INVENTORY") && world.includes("ownedWorldItems") && world.includes("chooseInventoryItem"), "Owned marketplace inventory is missing from Edit World");

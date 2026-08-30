@@ -13,6 +13,7 @@ import { WorldPanorama } from "@/components/world3d/WorldPanorama";
 import {
   CENTRAL_WORLD_GRID,
   gridToWorld,
+  parseGridSize,
   rotatedGridSize,
   type CentralWorldGroundTile,
   type CentralWorldGroundType,
@@ -84,7 +85,184 @@ function MyHomePath() {
   return <group><mesh geometry={geometries.edge}><meshStandardMaterial color={COLORS.pathEdge} roughness={1} side={THREE.DoubleSide} /></mesh><mesh geometry={geometries.path}><meshStandardMaterial color={COLORS.path} roughness={0.96} side={THREE.DoubleSide} /></mesh></group>;
 }
 
+// ---------------------------------------------------------------------------
+// Aussie marquee models. Authored around a ~4.6-unit base span so the shared
+// footprint scale (worldObjectScale) sizes them true-to-scale in the world.
+// ---------------------------------------------------------------------------
+
+const GUM = { trunk: "#d8ceba", trunkDark: "#c2b79f", green0: "#5c7a4b", green1: "#799a5f", green2: "#6f8a60", green3: "#9cbc7e" } as const;
+
+function GumTree({ height = 3.6, canopy = 1.0 }: { height?: number; canopy?: number }) {
+  const top = height;
+  return (
+    <group>
+      <mesh position={[0, height / 2, 0]} castShadow><cylinderGeometry args={[canopy * 0.13, canopy * 0.2, height, 10]} /><meshStandardMaterial color={GUM.trunk} roughness={0.85} /></mesh>
+      {([[0, top, 0, 1.0, GUM.green0], [-0.6, top - 0.2, 0.22, 0.62, GUM.green1], [0.62, top - 0.15, 0.12, 0.62, GUM.green2], [-0.05, top + 0.32, -0.24, 0.72, GUM.green1], [0.2, top + 0.42, 0.1, 0.55, GUM.green3]] as const).map(([x, y, z, r, c], i) => (
+        <mesh key={i} position={[x * canopy, y, z * canopy]} castShadow><sphereGeometry args={[r * canopy, 14, 10]} /><meshStandardMaterial color={c} roughness={0.95} /></mesh>
+      ))}
+    </group>
+  );
+}
+
+function Koala() {
+  return (
+    <group>
+      <mesh position={[0, 0, 0]} castShadow><sphereGeometry args={[0.42, 16, 12]} /><meshStandardMaterial color="#98a1ab" roughness={0.82} /></mesh>
+      <mesh position={[0, 0.16, 0.12]} scale={[0.7, 0.6, 0.5]}><sphereGeometry args={[0.4, 14, 10]} /><meshStandardMaterial color="#b7bec7" roughness={0.82} /></mesh>
+      <mesh position={[0, 0.5, 0.04]} castShadow><sphereGeometry args={[0.33, 16, 12]} /><meshStandardMaterial color="#a6afb9" roughness={0.82} /></mesh>
+      {([-0.28, 0.28] as const).map((dx) => <mesh key={dx} position={[dx, 0.74, 0]} castShadow><sphereGeometry args={[0.18, 12, 10]} /><meshStandardMaterial color="#b0b8c2" roughness={0.85} /></mesh>)}
+      <mesh position={[0, 0.5, 0.32]}><sphereGeometry args={[0.1, 12, 10]} /><meshStandardMaterial color="#2f343c" roughness={0.5} /></mesh>
+      {([-0.13, 0.13] as const).map((dx) => <mesh key={dx} position={[dx, 0.62, 0.28]}><sphereGeometry args={[0.045, 8, 8]} /><meshStandardMaterial color="#23272e" /></mesh>)}
+    </group>
+  );
+}
+
+function KoalaGumTrees() {
+  return (
+    <group>
+      <mesh position={[0, 0.16, 0]} receiveShadow><cylinderGeometry args={[2.35, 2.5, 0.32, 36]} /><meshStandardMaterial color="#8fae5c" roughness={0.95} /></mesh>
+      <group position={[-1.1, 0.32, -0.7]} scale={0.9}><GumTree height={3.4} canopy={0.95} /></group>
+      <group position={[0.9, 0.32, 0.7]} scale={1.08}><GumTree height={3.9} canopy={1.15} /></group>
+      <group position={[0.9, 1.95, 1.02]}><Koala /></group>
+    </group>
+  );
+}
+
+function Roo({ s = 1 }: { s?: number }) {
+  const hide = "#c0824a", hideDark = "#b07b41";
+  return (
+    <group scale={s}>
+      <mesh position={[-0.62, 0.32, 0]} rotation={[0, 0, 0.6]} castShadow><cylinderGeometry args={[0.08, 0.17, 1.15, 8]} /><meshStandardMaterial color={hideDark} roughness={0.85} /></mesh>
+      {([0.12, -0.12] as const).map((dz) => <mesh key={dz} position={[-0.08, 0.16, dz]} rotation={[0.5, 0, 0]}><boxGeometry args={[0.52, 0.15, 0.18]} /><meshStandardMaterial color={hideDark} roughness={0.85} /></mesh>)}
+      <mesh position={[0.05, 0.72, 0]} scale={[0.8, 1.05, 0.7]} castShadow><sphereGeometry args={[0.5, 16, 12]} /><meshStandardMaterial color={hide} roughness={0.85} /></mesh>
+      <mesh position={[0.3, 0.84, 0]} scale={[0.5, 0.82, 0.5]}><sphereGeometry args={[0.4, 14, 10]} /><meshStandardMaterial color="#d9a86e" roughness={0.85} /></mesh>
+      <mesh position={[0.36, 1.36, 0]} scale={[1, 0.9, 0.8]} castShadow><sphereGeometry args={[0.26, 14, 12]} /><meshStandardMaterial color={hide} roughness={0.85} /></mesh>
+      <mesh position={[0.58, 1.29, 0]}><sphereGeometry args={[0.13, 12, 10]} /><meshStandardMaterial color={hideDark} roughness={0.85} /></mesh>
+      {([-0.1, 0.1] as const).map((dz) => <mesh key={dz} position={[0.28, 1.64, dz]} rotation={[0, 0, -0.2]}><coneGeometry args={[0.07, 0.36, 8]} /><meshStandardMaterial color={hideDark} roughness={0.85} /></mesh>)}
+      {([-0.17, 0.17] as const).map((dz) => <mesh key={dz} position={[0.32, 0.76, dz]} rotation={[0, 0, -0.7]}><cylinderGeometry args={[0.05, 0.06, 0.42, 8]} /><meshStandardMaterial color={hideDark} roughness={0.85} /></mesh>)}
+    </group>
+  );
+}
+
+function KangarooSanctuary() {
+  return (
+    <group>
+      <mesh position={[0, 0.18, 0]} receiveShadow><cylinderGeometry args={[2.4, 2.6, 0.3, 36]} /><meshStandardMaterial color="#d8c07f" roughness={0.96} /></mesh>
+      {Array.from({ length: 16 }, (_, i) => { const a = (i / 16) * Math.PI * 2; return <mesh key={i} position={[Math.cos(a) * 2.3, 0.62, Math.sin(a) * 2.3]} castShadow><boxGeometry args={[0.1, 0.9, 0.1]} /><meshStandardMaterial color="#9c6a3c" roughness={0.9} /></mesh>; })}
+      {([0.78, 0.48] as const).map((y) => <mesh key={y} position={[0, y, 0]} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[2.3, 0.045, 6, 44]} /><meshStandardMaterial color="#b07a44" roughness={0.9} /></mesh>)}
+      {([[1.1, 0.6], [-0.9, 1.0], [0.2, -1.15]] as const).map(([x, z], i) => <mesh key={i} position={[x, 0.42, z]}><coneGeometry args={[0.18, 0.42, 6]} /><meshStandardMaterial color="#a7b56a" roughness={0.95} /></mesh>)}
+      <group position={[0.6, 0.3, 0.55]} rotation={[0, -0.6, 0]}><Roo s={1.05} /></group>
+      <group position={[-0.95, 0.3, -0.45]} rotation={[0, 0.9, 0]}><Roo s={0.72} /></group>
+    </group>
+  );
+}
+
+function AflOval() {
+  return (
+    <group>
+      <mesh position={[0, 0.34, 0]} scale={[1.35, 1, 1.05]} receiveShadow castShadow><cylinderGeometry args={[2.5, 2.78, 0.68, 48]} /><meshStandardMaterial color="#64748b" roughness={0.82} /></mesh>
+      <mesh position={[0, 0.56, 0]} scale={[1.32, 1, 1.02]}><cylinderGeometry args={[2.12, 2.32, 0.5, 48]} /><meshStandardMaterial color="#475569" roughness={0.78} /></mesh>
+      <mesh position={[0, 0.63, 0]} scale={[1.32, 1, 1.02]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[1.95, 48]} /><meshStandardMaterial color="#3f9a45" roughness={0.9} /></mesh>
+      <mesh position={[0, 0.645, 0]} scale={[1.32, 1, 1.02]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[1.84, 1.95, 48]} /><meshBasicMaterial color="#eafff0" /></mesh>
+      <mesh position={[0, 0.65, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.24, 0.32, 24]} /><meshBasicMaterial color="#eafff0" /></mesh>
+      {([-1, 1] as const).map((sgn) => ([-0.5, -0.18, 0.18, 0.5] as const).map((dz, i) => (
+        <mesh key={`${sgn}-${i}`} position={[sgn * 2.42, 0.63 + (Math.abs(dz) < 0.3 ? 0.9 : 0.52), dz]} castShadow><boxGeometry args={[0.06, Math.abs(dz) < 0.3 ? 1.8 : 1.04, 0.06]} /><meshStandardMaterial color="#f8fafc" roughness={0.6} /></mesh>
+      )))}
+      {Array.from({ length: 6 }, (_, i) => { const a = (i / 6) * Math.PI * 2 + Math.PI / 6; const fx = Math.cos(a) * 3.35; const fz = Math.sin(a) * 2.55; return (
+        <group key={i} position={[fx, 0, fz]}>
+          <mesh position={[0, 1.4, 0]} castShadow><cylinderGeometry args={[0.05, 0.08, 2.8, 8]} /><meshStandardMaterial color="#cbd5e1" metalness={0.3} roughness={0.5} /></mesh>
+          <mesh position={[0, 2.85, 0]}><boxGeometry args={[0.52, 0.3, 0.14]} /><meshStandardMaterial color="#fef9c3" emissive="#fde047" emissiveIntensity={0.6} /></mesh>
+        </group>
+      ); })}
+    </group>
+  );
+}
+
+function SydneyTower() {
+  return (
+    <group>
+      <mesh position={[0, 0.34, 0]} receiveShadow><cylinderGeometry args={[1.4, 1.6, 0.68, 24]} /><meshStandardMaterial color="#c7cdd6" roughness={0.82} /></mesh>
+      <mesh position={[0, 3.3, 0]} castShadow><cylinderGeometry args={[0.32, 0.4, 5.6, 20]} /><meshStandardMaterial color="#b6c2d2" metalness={0.2} roughness={0.5} /></mesh>
+      <mesh position={[0, 6.15, 0]} castShadow><cylinderGeometry args={[1.02, 0.82, 1.4, 24]} /><meshStandardMaterial color="#e6b64c" metalness={0.4} roughness={0.38} /></mesh>
+      <mesh position={[0, 6.15, 0]} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[0.98, 0.09, 8, 24]} /><meshStandardMaterial color="#6b551f" roughness={0.5} /></mesh>
+      <mesh position={[0, 7.0, 0]}><cylinderGeometry args={[0.66, 1.0, 0.44, 24]} /><meshStandardMaterial color="#f2cd6e" metalness={0.45} roughness={0.35} /></mesh>
+      <mesh position={[0, 8.5, 0]} castShadow><cylinderGeometry args={[0.035, 0.06, 2.7, 8]} /><meshStandardMaterial color="#cbd5e1" metalness={0.3} /></mesh>
+      <mesh position={[0, 9.95, 0]}><sphereGeometry args={[0.11, 10, 10]} /><meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.65} /></mesh>
+    </group>
+  );
+}
+
+function Queenslander() {
+  return (
+    <group>
+      {([[-1.5, -1.4], [1.5, -1.4], [-1.5, 1.4], [1.5, 1.4]] as const).map(([x, z], i) => <mesh key={i} position={[x, 0.6, z]}><boxGeometry args={[0.28, 1.2, 0.28]} /><meshStandardMaterial color="#8a5a3c" roughness={0.9} /></mesh>)}
+      <RoundedBox args={[3.7, 2.0, 3.4]} radius={0.12} smoothness={3} position={[0, 2.2, 0]} castShadow><meshStandardMaterial color="#dbeafe" roughness={0.8} /></RoundedBox>
+      <RoundedBox args={[3.8, 0.5, 3.5]} radius={0.1} smoothness={3} position={[0, 1.35, 0]} castShadow><meshStandardMaterial color="#93c5fd" roughness={0.82} /></RoundedBox>
+      <mesh position={[0, 3.7, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[3.0, 1.3, 4]} /><meshStandardMaterial color="#d24b46" roughness={0.7} metalness={0.1} /></mesh>
+      {([-1.55, -0.52, 0.52, 1.55] as const).map((x) => <mesh key={x} position={[x, 2.0, 1.78]}><boxGeometry args={[0.12, 1.6, 0.12]} /><meshStandardMaterial color="#f8fafc" roughness={0.7} /></mesh>)}
+      <mesh position={[0, 2.05, 1.79]}><planeGeometry args={[1.2, 1.3]} /><meshStandardMaterial color="#27382f" emissive="#dba84e" emissiveIntensity={0.2} roughness={0.8} /></mesh>
+      <mesh position={[0, 1.05, 2.05]}><boxGeometry args={[1.1, 0.7, 0.7]} /><meshStandardMaterial color="#c98a52" roughness={0.85} /></mesh>
+    </group>
+  );
+}
+
+function SurfClub() {
+  return (
+    <group>
+      <mesh position={[0, 0.16, 0]} receiveShadow><cylinderGeometry args={[2.5, 2.6, 0.3, 36]} /><meshStandardMaterial color="#f0dfa8" roughness={0.95} /></mesh>
+      <RoundedBox args={[3.6, 2.2, 2.6]} radius={0.14} smoothness={3} position={[-0.3, 1.4, 0]} castShadow><meshStandardMaterial color="#2563eb" roughness={0.62} /></RoundedBox>
+      <mesh position={[-0.3, 3.0, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[2.7, 1.0, 4]} /><meshStandardMaterial color="#e5484d" roughness={0.6} /></mesh>
+      <mesh position={[-0.3, 1.5, 1.32]}><planeGeometry args={[2.6, 0.5]} /><meshStandardMaterial color="#eff6ff" emissive="#bfdbfe" emissiveIntensity={0.15} roughness={0.4} /></mesh>
+      <RoundedBox args={[1.3, 3.4, 1.3]} radius={0.1} smoothness={3} position={[1.55, 1.9, 0.2]} castShadow><meshStandardMaterial color="#1d4ed8" roughness={0.6} /></RoundedBox>
+      <RoundedBox args={[1.7, 1.2, 1.7]} radius={0.12} smoothness={3} position={[1.55, 3.9, 0.2]} castShadow><meshStandardMaterial color="#f8fafc" roughness={0.55} /></RoundedBox>
+      {([-2.3, 2.3] as const).map((x) => (
+        <group key={x} position={[x, 0.3, -1.8]}>
+          <mesh position={[0, 1.5, 0]}><cylinderGeometry args={[0.05, 0.07, 3.0, 8]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+          <mesh position={[0, 2.55, 0.3]}><planeGeometry args={[0.7, 0.5]} /><meshStandardMaterial color="#ef4444" side={THREE.DoubleSide} /></mesh>
+          <mesh position={[0, 2.05, 0.3]}><planeGeometry args={[0.7, 0.5]} /><meshStandardMaterial color="#facc15" side={THREE.DoubleSide} /></mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function OutbackHomestead() {
+  return (
+    <group>
+      <mesh position={[0, 0.16, 0]} receiveShadow><cylinderGeometry args={[2.5, 2.6, 0.3, 36]} /><meshStandardMaterial color="#d98f5a" roughness={0.96} /></mesh>
+      <RoundedBox args={[3.6, 2.0, 2.8]} radius={0.1} smoothness={3} position={[-0.4, 1.3, 0]} castShadow><meshStandardMaterial color="#e8dcc0" roughness={0.8} /></RoundedBox>
+      <mesh position={[-0.4, 2.75, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[2.7, 0.9, 4]} /><meshStandardMaterial color="#b9c1cb" metalness={0.25} roughness={0.6} /></mesh>
+      <mesh position={[-0.4, 1.4, 1.5]}><boxGeometry args={[2.4, 0.12, 0.9]} /><meshStandardMaterial color="#c9b48f" roughness={0.85} /></mesh>
+      {([-1.4, 0.5] as const).map((x) => <mesh key={x} position={[x, 0.7, 1.9]}><cylinderGeometry args={[0.08, 0.08, 1.1, 8]} /><meshStandardMaterial color="#f8fafc" /></mesh>)}
+      <group position={[2.0, 0, 0.6]}>
+        <mesh position={[0, 1.6, 0]}><cylinderGeometry args={[0.12, 0.22, 3.2, 8]} /><meshStandardMaterial color="#9aa3ad" metalness={0.3} roughness={0.6} /></mesh>
+        <mesh position={[0, 3.3, 0]}><sphereGeometry args={[0.14, 10, 10]} /><meshStandardMaterial color="#64748b" metalness={0.4} /></mesh>
+        {Array.from({ length: 6 }, (_, i) => { const a = (i / 6) * Math.PI * 2; return <mesh key={i} position={[Math.cos(a) * 0.5, 3.3, Math.sin(a) * 0.5]} rotation={[0, -a, 0.15]}><boxGeometry args={[0.9, 0.02, 0.22]} /><meshStandardMaterial color="#cbd5e1" metalness={0.2} roughness={0.6} /></mesh>; })}
+      </group>
+    </group>
+  );
+}
+
+function LagoonPool() {
+  return (
+    <group>
+      <mesh position={[0, 0.16, 0]} receiveShadow><cylinderGeometry args={[2.6, 2.7, 0.3, 40]} /><meshStandardMaterial color="#e9d9a6" roughness={0.95} /></mesh>
+      <mesh position={[0, 0.34, 0]} scale={[1.15, 1, 0.9]}><cylinderGeometry args={[2.0, 2.0, 0.12, 40]} /><meshStandardMaterial color="#f2e6bd" roughness={0.9} /></mesh>
+      <mesh position={[0, 0.42, 0]} scale={[1.1, 1, 0.85]}><cylinderGeometry args={[1.85, 1.85, 0.1, 40]} /><meshStandardMaterial color="#2ba7e0" transparent opacity={0.92} roughness={0.25} metalness={0.15} /></mesh>
+      <mesh position={[-0.6, 0.45, -0.35]} scale={[1, 1, 0.85]}><cylinderGeometry args={[0.9, 0.9, 0.11, 32]} /><meshStandardMaterial color="#8fdcf6" transparent opacity={0.7} roughness={0.2} /></mesh>
+      {([[1.8, 1.3, 0.55], [2.15, 1.7, 0.4]] as const).map(([x, z, r], i) => <mesh key={i} position={[x, 0.35 + r * 0.5, z]} castShadow><dodecahedronGeometry args={[r, 0]} /><meshStandardMaterial color={i ? "#b3bcc6" : "#9aa3ad"} roughness={0.9} /></mesh>)}
+      <group position={[1.7, 0.3, -1.4]}>
+        <mesh position={[0, 1.5, 0]} rotation={[0, 0, 0.12]} castShadow><cylinderGeometry args={[0.1, 0.16, 3.0, 8]} /><meshStandardMaterial color="#a97c46" roughness={0.85} /></mesh>
+        {Array.from({ length: 6 }, (_, i) => { const a = (i / 6) * Math.PI * 2; return <mesh key={i} position={[Math.cos(a) * 0.7, 3.0, Math.sin(a) * 0.7]} rotation={[0.5, -a, 0]} castShadow><coneGeometry args={[0.22, 1.4, 4]} /><meshStandardMaterial color={i % 2 ? "#3f9e56" : "#4cb264"} roughness={0.9} /></mesh>; })}
+      </group>
+    </group>
+  );
+}
+
 function RewardBuilding({ assetKey, accent, tier }: { assetKey: string; accent: string; tier: number }) {
+  if (assetKey === "clubhouse") return <Queenslander />;
+  if (assetKey === "workshop") return <SurfClub />;
+  if (assetKey === "observatory") return <SydneyTower />;
   if (assetKey === "treehouse") {
     return (
       <group>
@@ -95,16 +273,7 @@ function RewardBuilding({ assetKey, accent, tier }: { assetKey: string; accent: 
       </group>
     );
   }
-  if (assetKey === "observatory") {
-    return (
-      <group>
-        <RoundedBox args={[2.25, 1.5, 1.85]} radius={0.18} smoothness={3} position={[0, 1.05, 0]} castShadow><meshStandardMaterial color="#d8d3ef" roughness={0.54} metalness={0.08} /></RoundedBox>
-        <mesh position={[0, 2.06, 0]} castShadow><sphereGeometry args={[1.18, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color={accent} roughness={0.48} metalness={0.2} /></mesh>
-        <mesh position={[0.72, 2.32, 0.15]} rotation={[0.2, 0, -0.7]} castShadow><cylinderGeometry args={[0.22, 0.3, 1.55, 16]} /><meshStandardMaterial color="#7dd3fc" emissive="#38bdf8" emissiveIntensity={0.28} /></mesh>
-      </group>
-    );
-  }
-  const wide = assetKey === "games_room" || assetKey === "clubhouse";
+  const wide = assetKey === "games_room";
   return (
     <group>
       <RoundedBox args={[wide ? 2.7 : 2.25, tier === 3 ? 1.72 : 1.42, wide ? 2.05 : 1.74]} radius={0.18} smoothness={3} position={[0, 0.92, 0]} castShadow>
@@ -119,6 +288,8 @@ function RewardBuilding({ assetKey, accent, tier }: { assetKey: string; accent: 
 }
 
 function RewardAnimalYard({ assetKey, accent, tier }: { assetKey: string; accent: string; tier: number }) {
+  if (assetKey === "wildlife_habitat") return <KoalaGumTrees />;
+  if (assetKey === "farmyard") return <OutbackHomestead />;
   return (
     <group>
       <mesh position={[0, 0.42, 0]} receiveShadow><cylinderGeometry args={[2.35, 2.55, 0.32, 36]} /><meshStandardMaterial color={accent} roughness={0.9} /></mesh>
@@ -144,6 +315,7 @@ function RewardAnimalYard({ assetKey, accent, tier }: { assetKey: string; accent
 }
 
 function RewardPlayPlace({ assetKey, tier }: { assetKey: string; tier: number }) {
+  if (assetKey === "water_park") return <LagoonPool />;
   if (assetKey === "adventure_playground") {
     return (
       <group>
@@ -173,16 +345,8 @@ function RewardPlayPlace({ assetKey, tier }: { assetKey: string; tier: number })
 }
 
 function RewardSpecialPlace({ assetKey, accent, tier }: { assetKey: string; accent: string; tier: number }) {
-  if (assetKey === "sports_stadium") {
-    return (
-      <group>
-        <mesh position={[0, 0.76, 0]} castShadow><cylinderGeometry args={[2.35, 2.65, 1.0, 40, 1, false, 0, Math.PI * 2]} /><meshStandardMaterial color="#1d4ed8" roughness={0.55} /></mesh>
-        <mesh position={[0, 1.36, 0]}><torusGeometry args={[1.72, 0.22, 12, 40]} /><meshStandardMaterial color="#bfdbfe" /></mesh>
-        <mesh position={[-1.68, 2.2, 0.2]} castShadow><sphereGeometry args={[0.28, 12, 8]} /><meshStandardMaterial color="#f8fafc" emissive="#f8fafc" emissiveIntensity={0.5} /></mesh>
-        <mesh position={[1.68, 2.2, 0.2]} castShadow><sphereGeometry args={[0.28, 12, 8]} /><meshStandardMaterial color="#f8fafc" emissive="#f8fafc" emissiveIntensity={0.5} /></mesh>
-      </group>
-    );
-  }
+  if (assetKey === "sports_stadium") return <AflOval />;
+  if (assetKey === "pet_sanctuary") return <KangarooSanctuary />;
   if (assetKey === "cinema" || assetKey === "arcade") {
     return (
       <group>
@@ -192,16 +356,8 @@ function RewardSpecialPlace({ assetKey, accent, tier }: { assetKey: string; acce
       </group>
     );
   }
-  if (assetKey === "pet_sanctuary") {
-    return (
-      <group>
-        <mesh position={[0, 0.45, 0]} receiveShadow><cylinderGeometry args={[2.35, 2.55, 0.3, 36]} /><meshStandardMaterial color="#ccfbf1" roughness={0.8} /></mesh>
-        <RoundedBox args={[2.1, 1.22, 1.62]} radius={0.24} smoothness={4} position={[0, 1.15, 0]} castShadow><meshStandardMaterial color="#14b8a6" roughness={0.56} /></RoundedBox>
-        <mesh position={[0, 2.06, 0]} castShadow><sphereGeometry args={[0.48, 18, 12]} /><meshStandardMaterial color="#f472b6" emissive="#ec4899" emissiveIntensity={0.24} /></mesh>
-      </group>
-    );
-  }
-  return <RewardBuilding assetKey="clubhouse" accent={accent} tier={tier} />;
+  // Aussie BBQ Backyard (party_house) falls back to the accent house shell.
+  return <RewardBuilding assetKey="party_house" accent={accent} tier={tier} />;
 }
 
 function RewardPlotObject({ item, accent, tier }: { item: EconomyItem; accent: string; tier: number }) {
@@ -221,12 +377,15 @@ function StarterScenery({ assetKey }: { assetKey: string }) {
   return <group><mesh position={[0, 1.05, 0]} castShadow><cylinderGeometry args={[0.18, 0.3, 2.1, 10]} /><meshStandardMaterial color="#74431f" roughness={0.9} /></mesh>{pine ? <><mesh position={[0, 2.15, 0]} castShadow><coneGeometry args={[1.05, 2.2, 10]} /><meshStandardMaterial color="#276749" roughness={0.95} /></mesh><mesh position={[0, 3.05, 0]} castShadow><coneGeometry args={[0.78, 1.65, 10]} /><meshStandardMaterial color="#2f855a" roughness={0.95} /></mesh></> : <><mesh position={[-0.42, 2.25, 0]} castShadow><sphereGeometry args={[0.78, 14, 10]} /><meshStandardMaterial color="#3f8f3a" roughness={0.95} /></mesh><mesh position={[0.45, 2.35, 0.08]} castShadow><sphereGeometry args={[0.88, 14, 10]} /><meshStandardMaterial color="#4cae4f" roughness={0.95} /></mesh></>}</group>;
 }
 
+// Size comes from the item's own footprint now, not a fixed per-category number,
+// so a 16 m AFL oval towers over a 4 m gum-tree cubby. Models are authored to
+// span ~4.6 world units at scale 1 and fill ~92% of the smaller footprint edge.
 function worldObjectScale(item: EconomyItem) {
-  const category = item.metadata.marketplaceCategory;
-  if (category === "buildings") return 2.45;
-  if (category === "special") return 1.9;
-  if (category === "world_basic") return 1.25;
-  return 1.75;
+  if (item.metadata.marketplaceCategory === "world_basic") return 1.25;
+  const [gridW, gridD] = parseGridSize(item);
+  const footprintMetres = Math.min(gridW, gridD) * CENTRAL_WORLD_GRID.cellSize;
+  const scale = (footprintMetres * 0.92) / 4.6;
+  return Math.min(Math.max(scale, 0.62), 3.6);
 }
 
 function PlacedWorldObject({ item, placement, preview = false, valid = true }: { item: EconomyItem; placement: CentralWorldPlacement; preview?: boolean; valid?: boolean }) {
