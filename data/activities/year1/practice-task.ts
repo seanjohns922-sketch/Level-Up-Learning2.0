@@ -2857,6 +2857,22 @@ export type PracticeTask = (
       feedback: { correct: string; wrong: string };
     }
   | {
+      // Statistica concept introduction — explains a new idea with a worked
+      // example before the lesson begins asking questions.
+      kind: "statisticaConcept";
+      scene: "intro";
+      target: number;
+      title: string;
+      definition: string;
+      speakText: string;
+      exampleLabel: string;
+      exampleValues: string[];
+      highlightValue: string;
+      explanation: string;
+      continueLabel: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       // Statistica Level 3 — classify a data variable as categorical or numerical
       // (AC9M3ST01). Shows the variable and example responses; pick the type.
       kind: "statisticaClassify";

@@ -412,11 +412,49 @@ const MODE_BI = [
   [2, 8, 3, 8, 2], [1, 6, 2, 6, 3], [7, 3, 2, 3, 7], [2, 9, 4, 9, 1],
   [1, 5, 8, 5, 8], [6, 2, 6, 3, 1],
 ];
+const MODE_LISTS = [
+  { values: ["2", "3", "3", "4", "5"], mode: "3" },
+  { values: ["1", "4", "2", "4", "3", "4"], mode: "4" },
+  { values: ["0", "2", "1", "2", "3", "2"], mode: "2" },
+  { values: ["5", "3", "5", "2", "5", "4"], mode: "5" },
+];
 type ModeCat = { id: string; label: string; color: string; count: number };
 function modeCats(freq: number[], color: string): ModeCat[] {
   return MODE_VALS.map((v, i) => ({ id: `v${i}`, label: v, color, count: freq[i]! }));
 }
 function argmax(freq: number[]) { return freq.reduce((best, v, i) => (v > freq[best]! ? i : best), 0); }
+
+export function modeIntroductionTask(round: number, target: number): PracticeTask {
+  const item = pick(MODE_LISTS, round);
+  const count = item.values.filter((value) => value === item.mode).length;
+  return {
+    kind: "statisticaConcept", scene: "intro", target,
+    title: "What is the mode?",
+    definition: "The mode is the value that appears most often in a set of data.",
+    speakText: `The mode is the value that appears most often. In this example, ${item.mode} is the mode because it appears ${count} times, more than any other value.`,
+    exampleLabel: "Look at this data set",
+    exampleValues: item.values,
+    highlightValue: item.mode,
+    explanation: `${item.mode} appears ${count} times. Every other value appears fewer times, so the mode is ${item.mode}.`,
+    continueLabel: "Find the mode",
+    feedback: { correct: "Now use that idea to find the mode.", wrong: "The mode is the value that appears most often." },
+  };
+}
+
+export function modeFromListTask(round: number, target: number): PracticeTask {
+  const item = pick(MODE_LISTS, round + 1);
+  const choices = [...new Set(item.values)];
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "Which value is the mode?",
+    speakText: "Count how often each value appears. The value that appears most often is the mode.",
+    variable: item.values.join(",  "), examples: "Find the value that occurs more often than the others.",
+    options: order(choices.map((value) => ({ id: `value-${value}`, label: value })), round),
+    correctOptionIds: [`value-${item.mode}`],
+    feedback: { correct: `Correct — ${item.mode} appears most often, so it is the mode.`, wrong: "Count each value carefully. The mode has the greatest frequency." },
+  };
+}
+
 // Read the mode off a distribution — the value with the tallest column.
 export function modeReadTask(round: number, target: number): PracticeTask {
   const ctx = pick(MODE_CTX, round);
@@ -584,6 +622,7 @@ const WEEK1_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
 const FOCUSED_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
   ...WEEK1_GENS,
   "y5-statistics-w2-l1": [mixedErrorTeachingTask, spotErrorTask, errorReasonTask, cleanErrorTask],
+  "y5-statistics-w3-l1": [modeIntroductionTask, modeReadTask, modeFromListTask, modeReadTask],
 };
 
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
@@ -591,7 +630,6 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y5-statistics-w2-l2": [spotErrorTask, spotErrorTask, spotErrorTask],
   "y5-statistics-w2-l3": [spotErrorTask, spotErrorTask, spotErrorTask],
   // W3 Mode & Shape — find the mode, more than one mode, describe the shape
-  "y5-statistics-w3-l1": [modeReadTask, shapeConcentratedTask, modeReadTask],
   "y5-statistics-w3-l2": [modeCountTask, modeReadTask, shapeSpreadTask],
   "y5-statistics-w3-l3": [shapeConcentratedTask, shapeSpreadTask, modeReadTask],
   // W4 Line Graphs — read, change over time, make inferences (Year-5 star)

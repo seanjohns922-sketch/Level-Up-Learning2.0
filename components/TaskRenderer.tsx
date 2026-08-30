@@ -206,6 +206,7 @@ import StarpathCartesianCard from "@/components/starpath/StarpathCartesianCard";
 import StarpathTessellationCard from "@/components/starpath/StarpathTessellationCard";
 import StatisticaCollectCard from "@/components/statistica/StatisticaCollectCard";
 import StatisticaClassifyCard from "@/components/statistica/StatisticaClassifyCard";
+import StatisticaConceptCard from "@/components/statistica/StatisticaConceptCard";
 import StatisticaInferenceCard from "@/components/statistica/StatisticaInferenceCard";
 import StatisticaPictographCard from "@/components/statistica/StatisticaPictographCard";
 import StatisticaShapeCard from "@/components/statistica/StatisticaShapeCard";
@@ -738,6 +739,8 @@ function TaskRendererInner({
       return <StatisticaCollectCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaClassify":
       return <StatisticaClassifyCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "statisticaConcept":
+      return <StatisticaConceptCard key={k} task={t} onContinue={onC} />;
     case "statisticaInference":
       return <StatisticaInferenceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaPictograph":
