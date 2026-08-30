@@ -20,7 +20,14 @@ export function rememberCentralWorldHomeEntry(teacherPreview = false) {
     returnSpawnPointId: "my-home-exit-spawn",
     createdAt: Date.now(),
   };
-  window.sessionStorage.setItem(WORLD_NAVIGATION_CONTEXT_KEY, JSON.stringify(context));
+  // Storage can throw (Safari private mode, sandboxed preview iframe, locked-down
+  // devices). Remembering the return spawn is a nice-to-have — it must never
+  // block entering My Home.
+  try {
+    window.sessionStorage.setItem(WORLD_NAVIGATION_CONTEXT_KEY, JSON.stringify(context));
+  } catch {
+    /* no-op — entry proceeds without a remembered return spawn */
+  }
 }
 
 export function readWorldNavigationContext(): WorldNavigationContext | null {
