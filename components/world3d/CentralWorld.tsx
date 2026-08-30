@@ -9,9 +9,12 @@ import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
 import {
   EMPTY_WORLD_MOVE_INPUT,
+  EMPTY_WORLD_LOOK_INPUT,
   KeyboardWorldAction,
   SharedThirdPersonPlayer,
   WorldJoystick,
+  WorldLookJoystick,
+  type WorldLookInput,
   type WorldMoveInput,
 } from "@/components/world3d/SharedWorldPlayer";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
@@ -93,7 +96,7 @@ function CentralWorldMetricsReporter({ quality }: { quality: CentralWorldQuality
   return null;
 }
 
-function CentralWorldScene({ quality, moveInput, spawnTarget, spawnNonce, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, onActiveTarget }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; spawnTarget: [number, number, number] | null; spawnNonce: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null; editing: boolean; onActiveTarget: (id: string | null) => void }) {
+function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNonce, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, onActiveTarget }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null; editing: boolean; onActiveTarget: (id: string | null) => void }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   const handleNearestTarget = useCallback((id: string | null) => {
     setActiveTargetId(id);
@@ -123,6 +126,7 @@ function CentralWorldScene({ quality, moveInput, spawnTarget, spawnNonce, placed
         spawnTarget={spawnTarget}
         spawnNonce={spawnNonce}
         moveInput={moveInput}
+        lookInput={lookInput}
         bounds={CENTRAL_WORLD_CONFIG.playableBounds}
         roamEllipse={CENTRAL_WORLD_CONFIG.roamEllipse}
         interactionTargets={[
@@ -150,6 +154,7 @@ export default function CentralWorld() {
   const quality: CentralWorldQuality = requestedQuality === "low" || requestedQuality === "high" ? requestedQuality : "medium";
   const debug = preview && searchParams.get("debug") === "1";
   const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
+  const [lookInput, setLookInput] = useState<WorldLookInput>(EMPTY_WORLD_LOOK_INPUT);
   const placementSequence = useRef(0);
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   const [transitioning, setTransitioning] = useState(false);
@@ -342,12 +347,12 @@ export default function CentralWorld() {
   return (
     <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
-        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placedCustomisations} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} onActiveTarget={setActiveTargetId} />
+        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placedCustomisations} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} onActiveTarget={setActiveTargetId} />
       </Canvas>
 
       <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: editorOpen ? "EXIT EDIT" : "EDIT WORLD", icon: "edit", onClick: editorOpen ? closeWorldEditor : openWorldEditor }} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} />
 
-      {!buildPreview && !editorOpen ? <WorldJoystick onChange={setMoveInput} /> : null}
+      {!buildPreview && !editorOpen ? <><WorldJoystick onChange={setMoveInput} /><WorldLookJoystick onChange={setLookInput} /></> : null}
       {buildPreview && !editorOpen ? (
         <section aria-label="Build mode controls" style={{ position: "absolute", left: "50%", bottom: 22, transform: "translateX(-50%)", zIndex: 35, width: "min(94vw, 560px)", border: `2px solid ${buildValid ? "#4ade80" : "#fb7185"}`, borderRadius: 8, background: "rgba(18,28,24,.94)", color: "#fff", padding: 12, boxShadow: "0 14px 40px rgba(0,0,0,.35)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}><div><div style={{ color: "#f6c862", fontSize: 11, fontWeight: 950, letterSpacing: ".16em" }}>BUILD MODE</div><div style={{ marginTop: 2, fontSize: 18, fontWeight: 950 }}>{buildPreview.item.name}</div></div><WorldVoiceButton compact label="Read build instructions" text={`${buildPreview.item.name}. Use the arrow buttons to choose a place. Rotate it if you want. Green means it can be placed. Red means choose another space.`} /></div>
@@ -395,6 +400,7 @@ export default function CentralWorld() {
       {debug ? <div style={{ position: "absolute", right: 16, bottom: 130, display: "flex", gap: 6, zIndex: 30 }}><button type="button" onClick={() => teleport(CENTRAL_WORLD_CONFIG.spawnPoint)} style={debugButton}>SPAWN</button><button type="button" onClick={() => teleport(CENTRAL_WORLD_CONFIG.myHomeExitSpawn)} style={debugButton}>HOME</button><button type="button" onClick={() => teleport(CENTRAL_WORLD_CONFIG.towerPlaza)} style={debugButton}>PLAZA</button></div> : null}
       {economyMessage ? <div style={{ position: "absolute", left: 16, bottom: 126, maxWidth: 360, zIndex: 30, border: "1px solid rgba(146,64,14,.28)", borderRadius: 6, background: "rgba(255,251,235,.94)", color: "#78350f", padding: "10px 12px", fontSize: 12, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}><span>{economyMessage}</span><WorldVoiceButton text={economyMessage} compact label="Read message" /></div> : null}
       {showIntro ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(24,31,25,.22)", color: "#fff8e8", pointerEvents: "none", animation: "centralWorldReveal 2.3s ease both" }}><div style={{ textAlign: "center", textShadow: "0 3px 18px rgba(0,0,0,.4)", pointerEvents: "auto" }}><div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.24em" }}>THE LEVEL UP WORLD</div><div style={{ marginTop: 8, fontSize: 30, fontWeight: 900 }}>Tower of Knowledge</div><div style={{ marginTop: 12 }}><WorldVoiceButton text="The Level Up World. Tower of Knowledge." label="Read world title" /></div></div><style>{`@keyframes centralWorldReveal{0%{opacity:1;background:rgba(10,15,11,1)}25%,70%{opacity:1}100%{opacity:0}}`}</style></div> : null}
+      <style>{`@media (pointer:coarse){body:has([data-world3d-root]) .fullscreen-toggle{display:none}}`}</style>
       {transitioning ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "#211914", color: "#fff0c9", fontWeight: 900, letterSpacing: "0.16em", zIndex: 20 }}><div style={{ display: "flex", alignItems: "center", gap: 12 }}><span>ENTERING THE TOWER...</span><WorldVoiceButton text={joinSpeechParts(["Entering the tower"])} label="Read entering tower" /></div></div> : null}
     </main>
   );

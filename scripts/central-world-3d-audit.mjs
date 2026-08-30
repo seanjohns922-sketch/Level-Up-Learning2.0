@@ -31,7 +31,9 @@ check(world.includes("rememberCentralWorldHomeEntry"), "Physical My Home entry m
 check(world.includes('"/world/tower?teacher_preview=1"'), "3D Tower destination is missing");
 check(world.includes("KeyboardWorldAction"), "Keyboard Tower interaction is missing");
 check(world.includes("WorldJoystick") && !world.includes("<WorldMovePad"), "Central hub must use the 360-degree touch joystick");
+check(world.includes("WorldLookJoystick") && world.includes("lookInput"), "Central hub must provide a separate 360-degree camera joystick");
 check(sharedPlayer.includes("analogX") && sharedPlayer.includes("analogY") && sharedPlayer.includes("magnitude"), "Analog camera-relative movement is missing");
+check(sharedPlayer.includes('event.pointerType === "touch"') && sharedPlayer.includes("yaw.current -= lookX"), "Touch camera look must use the right joystick instead of canvas dragging");
 check(sharedPlayer.includes("setPointerCapture") && sharedPlayer.includes('touchAction: "none"'), "Joystick pointer capture or iPad touch protection is missing");
 check(world.includes("__LEVEL_UP_CENTRAL_WORLD_3D_METRICS__"), "Central-world metrics hook is missing");
 check(config.includes('towerMainEntrance: "tower-main-entrance"'), "Semantic Tower entrance anchor is missing");

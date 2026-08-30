@@ -7,11 +7,13 @@ import { DEFAULT_OUTFIT } from "@/components/avatar/StudentAvatar";
 import { useCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 
 export type WorldMoveInput = { up: boolean; down: boolean; left: boolean; right: boolean; analogX?: number; analogY?: number; magnitude?: number };
+export type WorldLookInput = { x: number; y: number; magnitude: number };
 export type WorldMovementBounds = { minX: number; maxX: number; minZ: number; maxZ: number };
 export type WorldRoamEllipse = { centerZ: number; radiusX: number; radiusZ: number };
 export type WorldInteractionTarget = { id: string; position: [number, number, number]; distance: number };
 
 export const EMPTY_WORLD_MOVE_INPUT: WorldMoveInput = { up: false, down: false, left: false, right: false, analogX: 0, analogY: 0, magnitude: 0 };
+export const EMPTY_WORLD_LOOK_INPUT: WorldLookInput = { x: 0, y: 0, magnitude: 0 };
 
 export function TrialStudentAvatar({ movingRef }: { movingRef: React.MutableRefObject<boolean> }) {
   const bodyRef = useRef<THREE.Group>(null);
@@ -83,6 +85,7 @@ export function SharedThirdPersonPlayer({
   spawnTarget,
   spawnNonce,
   moveInput,
+  lookInput = EMPTY_WORLD_LOOK_INPUT,
   bounds,
   roamEllipse,
   interactionTargets = [],
@@ -99,6 +102,7 @@ export function SharedThirdPersonPlayer({
   spawnTarget?: [number, number, number] | null;
   spawnNonce?: number;
   moveInput: WorldMoveInput;
+  lookInput?: WorldLookInput;
   bounds: WorldMovementBounds;
   roamEllipse?: WorldRoamEllipse;
   interactionTargets?: WorldInteractionTarget[];
@@ -135,7 +139,12 @@ export function SharedThirdPersonPlayer({
     let dragging = false;
     let lastX = 0;
     let lastY = 0;
-    const start = (event: PointerEvent) => { dragging = true; lastX = event.clientX; lastY = event.clientY; };
+    const start = (event: PointerEvent) => {
+      if (event.pointerType === "touch") return;
+      dragging = true;
+      lastX = event.clientX;
+      lastY = event.clientY;
+    };
     const look = (event: PointerEvent) => {
       if (!dragging) return;
       yaw.current -= (event.clientX - lastX) * 0.005;
@@ -166,6 +175,12 @@ export function SharedThirdPersonPlayer({
   useFrame((_, delta) => {
     const player = playerRef.current;
     if (!player) return;
+    const lookIntensity = THREE.MathUtils.clamp(lookInput.magnitude, 0, 1);
+    const lookDirectionLength = Math.hypot(lookInput.x, lookInput.y);
+    const lookX = lookDirectionLength > 0 ? lookInput.x / lookDirectionLength : 0;
+    const lookY = lookDirectionLength > 0 ? lookInput.y / lookDirectionLength : 0;
+    yaw.current -= lookX * lookIntensity * 2.1 * delta;
+    pitch.current = THREE.MathUtils.clamp(pitch.current + lookY * lookIntensity * 1.65 * delta, -1.05, 1.2);
     const sinYaw = Math.sin(yaw.current);
     const cosYaw = Math.cos(yaw.current);
     const forward = new THREE.Vector3(-sinYaw, 0, -cosYaw);
@@ -249,7 +264,7 @@ export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onCha
   return <div style={{ position: "absolute", left: 16, bottom: 18, display: "grid", gridTemplateColumns: "44px 44px 44px", gap: 7, pointerEvents: "auto" }}><span />{button("UP")}<span />{button("LEFT")}{button("DOWN")}{button("RIGHT")}</div>;
 }
 
-export function WorldJoystick({ onChange }: { onChange: (input: WorldMoveInput) => void }) {
+function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "left" | "right"; label: string; dataAttribute: "move" | "look"; onChange: (input: { x: number; y: number; magnitude: number }) => void }) {
   const baseRef = useRef<HTMLDivElement>(null);
   const pointerIdRef = useRef<number | null>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0, active: false });
@@ -260,14 +275,14 @@ export function WorldJoystick({ onChange }: { onChange: (input: WorldMoveInput) 
     const stop = () => {
       pointerIdRef.current = null;
       setKnob({ x: 0, y: 0, active: false });
-      onChange(EMPTY_WORLD_MOVE_INPUT);
+      onChange({ x: 0, y: 0, magnitude: 0 });
     };
     window.addEventListener("blur", stop);
     document.addEventListener("visibilitychange", stop);
     return () => {
       window.removeEventListener("blur", stop);
       document.removeEventListener("visibilitychange", stop);
-      onChange(EMPTY_WORLD_MOVE_INPUT);
+      onChange({ x: 0, y: 0, magnitude: 0 });
     };
   }, [onChange]);
 
@@ -286,7 +301,7 @@ export function WorldJoystick({ onChange }: { onChange: (input: WorldMoveInput) 
     const rawMagnitude = Math.min(1, distance / maxTravel);
     const magnitude = rawMagnitude <= deadZone ? 0 : (rawMagnitude - deadZone) / (1 - deadZone);
     setKnob({ x, y, active: true });
-    onChange({ ...EMPTY_WORLD_MOVE_INPUT, analogX: magnitude ? normalizedX : 0, analogY: magnitude ? normalizedY : 0, magnitude });
+    onChange({ x: magnitude ? normalizedX : 0, y: magnitude ? normalizedY : 0, magnitude });
   }
 
   function release(event?: React.PointerEvent<HTMLDivElement>) {
@@ -294,16 +309,16 @@ export function WorldJoystick({ onChange }: { onChange: (input: WorldMoveInput) 
     if (event && baseRef.current?.hasPointerCapture(event.pointerId)) baseRef.current.releasePointerCapture(event.pointerId);
     pointerIdRef.current = null;
     setKnob({ x: 0, y: 0, active: false });
-    onChange(EMPTY_WORLD_MOVE_INPUT);
+    onChange({ x: 0, y: 0, magnitude: 0 });
   }
 
   return (
     <div
       ref={baseRef}
       role="application"
-      aria-label="Movement joystick. Drag in any direction to move."
-      title="Drag to move"
-      data-world-joystick
+      aria-label={label}
+      title={label}
+      data-world-joystick={dataAttribute}
       data-active={knob.active ? "true" : "false"}
       onContextMenu={(event) => event.preventDefault()}
       onPointerDown={(event) => {
@@ -325,11 +340,19 @@ export function WorldJoystick({ onChange }: { onChange: (input: WorldMoveInput) 
       onLostPointerCapture={() => {
         if (pointerIdRef.current !== null) release();
       }}
-      style={{ position: "absolute", left: "max(24px, calc(env(safe-area-inset-left) + 18px))", bottom: "max(24px, calc(env(safe-area-inset-bottom) + 18px))", zIndex: 32, width: 124, height: 124, border: "2px solid rgba(255,244,220,.52)", borderRadius: "50%", background: "radial-gradient(circle, rgba(32,44,39,.7) 0 34%, rgba(15,23,42,.9) 35% 100%)", boxShadow: "0 10px 30px rgba(0,0,0,.32), inset 0 0 0 8px rgba(255,255,255,.04)", touchAction: "none", userSelect: "none", WebkitUserSelect: "none", WebkitTouchCallout: "none", pointerEvents: "auto" }}
+      style={{ position: "absolute", [side]: side === "left" ? "max(24px, calc(env(safe-area-inset-left) + 18px))" : "max(24px, calc(env(safe-area-inset-right) + 18px))", bottom: "max(24px, calc(env(safe-area-inset-bottom) + 18px))", zIndex: 32, width: 124, height: 124, border: "2px solid rgba(255,244,220,.52)", borderRadius: "50%", background: "radial-gradient(circle, rgba(32,44,39,.7) 0 34%, rgba(15,23,42,.9) 35% 100%)", boxShadow: "0 10px 30px rgba(0,0,0,.32), inset 0 0 0 8px rgba(255,255,255,.04)", touchAction: "none", userSelect: "none", WebkitUserSelect: "none", WebkitTouchCallout: "none", pointerEvents: "auto" }}
     >
       <div aria-hidden="true" style={{ position: "absolute", left: "50%", top: "50%", width: 50, height: 50, border: "2px solid rgba(255,255,255,.72)", borderRadius: "50%", background: knob.active ? "#f4c95d" : "#f8fafc", boxShadow: "0 6px 16px rgba(0,0,0,.35)", transform: `translate(calc(-50% + ${knob.x}px), calc(-50% + ${knob.y}px))`, transition: knob.active ? "none" : "transform 120ms ease-out, background 120ms ease-out" }} />
     </div>
   );
+}
+
+export function WorldJoystick({ onChange }: { onChange: (input: WorldMoveInput) => void }) {
+  return <WorldAnalogJoystick side="left" label="Movement joystick. Drag in any direction to move." dataAttribute="move" onChange={({ x, y, magnitude }) => onChange({ ...EMPTY_WORLD_MOVE_INPUT, analogX: x, analogY: y, magnitude })} />;
+}
+
+export function WorldLookJoystick({ onChange }: { onChange: (input: WorldLookInput) => void }) {
+  return <WorldAnalogJoystick side="right" label="Camera joystick. Drag to look around." dataAttribute="look" onChange={onChange} />;
 }
 
 export function KeyboardWorldAction({ enabled, onAction }: { enabled: boolean; onAction: () => void }) {
