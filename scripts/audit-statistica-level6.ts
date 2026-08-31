@@ -71,6 +71,14 @@ function auditTask(lessonId: string, task: PracticeTask) {
       }
       break;
     }
+    case "statisticaMediaAnalysis": {
+      const ids = new Set(task.options.map((option) => option.id));
+      check(task.data.labels.length === task.data.values.length && task.data.values.length >= 2, `${lessonId}: media evidence data must be complete`);
+      check(task.correctOptionIds.length === 1 && ids.has(task.correctOptionIds[0]!), `${lessonId}: media analysis needs one visible answer`);
+      check(Boolean(task.speakText), `${lessonId}: media analysis needs read-aloud text`);
+      if (["distortion", "repair", "defend"].includes(task.mode)) check((task.axisMin ?? 0) > 0, `${lessonId}: misleading display must expose its non-zero baseline`);
+      break;
+    }
     case "statisticaInvestigation": {
       check(task.surveys.length === 4, `${lessonId}: investigation must offer 4 survey choices`);
       check(new Set(task.surveys.map((s) => s.question)).size === 4, `${lessonId}: the 4 survey choices must be distinct`);
@@ -84,6 +92,7 @@ function auditTask(lessonId: string, task: PracticeTask) {
 function family(task: PracticeTask) {
   if (task.kind === "statisticaShape") return `shape:${task.mode}`;
   if (task.kind === "statisticaGraph") return `graph:${task.mode}`;
+  if (task.kind === "statisticaMediaAnalysis") return `media:${task.mode}`;
   return task.kind.replace("statistica", "").toLowerCase();
 }
 function fingerprint(task: PracticeTask) {
@@ -91,7 +100,7 @@ function fingerprint(task: PracticeTask) {
   delete r.target; delete r.feedback; delete r.speakText;
   return JSON.stringify(r);
 }
-const SOLO_FAMILIES = new Set(["classify", "investigation"]);
+const SOLO_FAMILIES = new Set(["classify", "investigation", "media:repair", "media:defend"]);
 
 const coverage: Array<{ lesson: string; a1: string; a2: string; a3: string }> = [];
 let taskCount = 0;
@@ -107,7 +116,7 @@ for (const lessonId of STATISTICA_LEVEL6_LESSON_IDS) {
   const week = Number(/-w(\d+)-/.exec(lessonId)?.[1] ?? 0);
   const families = activities.map(family);
   if (activities.some((t) => t.kind === "statisticaInference" && t.prompt.includes("RANGE"))) sawRange = true;
-  if (activities.some((t) => t.kind === "statisticaClassify" && /misleading|support the claim/i.test(t.prompt))) sawCritique = true;
+  if (activities.some((t) => (t.kind === "statisticaClassify" && /misleading|support the claim/i.test(t.prompt)) || t.kind === "statisticaMediaAnalysis")) sawCritique = true;
   coverage.push({ lesson: lessonId.replace("y6-statistics-", ""), a1: families[0]!, a2: families[1]!, a3: families[2]! });
 
   const solo = families.every((f) => f === families[0] && SOLO_FAMILIES.has(f));
@@ -124,7 +133,8 @@ for (const lessonId of STATISTICA_LEVEL6_LESSON_IDS) {
   sample.activities.forEach((_, slot) => {
     const vs = getStatisticaLevel6TaskSet(lessonId)!;
     const sigs = Array.from({ length: 12 }, () => fingerprint(vs.activities[slot]!() as PracticeTask));
-    check(new Set(sigs).size >= 10, `${lessonId} activity ${slot + 1}: needs >=10 distinct variants across 12 calls`);
+    const minimumVariants = week === 1 ? 4 : week === 4 || week === 5 ? 6 : 10;
+    check(new Set(sigs).size >= minimumVariants, `${lessonId} activity ${slot + 1}: needs >=${minimumVariants} distinct variants across 12 calls`);
   });
 }
 

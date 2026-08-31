@@ -293,6 +293,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "statisticaCollect",
   "statisticaConcept",
   "statisticaDisplayStudio",
+  "statisticaMediaAnalysis",
   "statisticaClassify",
   "statisticaInference",
   "statisticaPictograph",
@@ -320,6 +321,23 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
   if (!task || !hasText(task.kind) || !SUPPORTED_PRACTICE_TASK_KINDS.has(task.kind)) return false;
+  if (task.kind === "statisticaMediaAnalysis") {
+    const optionIds = new Set(task.options.map((option) => option.id));
+    return hasText(task.prompt)
+      && hasText(task.speakText)
+      && hasText(task.claim)
+      && hasText(task.data.title)
+      && hasText(task.data.unit)
+      && task.data.labels.length >= 2
+      && task.data.labels.length === task.data.values.length
+      && task.data.labels.every(hasText)
+      && task.data.values.every((value) => Number.isFinite(value) && value >= 0)
+      && task.options.length >= 2
+      && optionIds.size === task.options.length
+      && task.options.every((option) => hasText(option.label))
+      && task.correctOptionIds.length === 1
+      && optionIds.has(task.correctOptionIds[0]!);
+  }
   if (task.kind === "starpathLevel6Assessment") {
     if (!hasText(task.prompt) || !hasText(task.speakText) || !hasText(task.contextLabel)) return false;
     if (!hasText(task.feedback.correct) || task.feedback.correct !== task.feedback.wrong) return false;

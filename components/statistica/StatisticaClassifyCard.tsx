@@ -21,14 +21,24 @@ export default function StatisticaClassifyCard({ task, onCorrect, onWrong }: { t
   }
 
   return (
-    <div className="space-y-4">
+    <div className={task.supportingDetails?.length ? "space-y-3" : "space-y-4"}>
       <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
 
-      <div className="mx-auto max-w-md rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] p-5 text-center shadow-[inset_0_1px_0_rgba(255,240,199,0.14)]">
-        <div className="text-[11px] font-black uppercase tracking-[0.14em] text-[#f2bc45]/70">The data we collect</div>
+      <div className={`mx-auto rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] text-center shadow-[inset_0_1px_0_rgba(255,240,199,0.14)] ${task.supportingDetails?.length ? "max-w-2xl p-3" : "max-w-md p-5"}`}>
+        <div className="text-[11px] font-black uppercase tracking-[0.14em] text-[#f2bc45]/70">{task.variableLabel ?? "The data we collect"}</div>
         <div className="mt-1 text-lg font-black text-white">{task.variable}</div>
-        <div className="mt-3 text-[11px] font-black uppercase tracking-[0.14em] text-[#f2bc45]/70">Example answers</div>
+        <div className={`${task.supportingDetails?.length ? "mt-2" : "mt-3"} text-[11px] font-black uppercase tracking-[0.14em] text-[#f2bc45]/70`}>{task.examplesLabel ?? "Example answers"}</div>
         <div className="mt-1 text-sm font-bold text-white/85">{task.examples}</div>
+        {task.supportingDetails?.length ? (
+          <dl className="mt-3 grid gap-2 text-left sm:grid-cols-2">
+            {task.supportingDetails.map((detail) => (
+              <div key={detail.label} className="rounded-lg border border-white/10 bg-white/[0.06] px-3 py-2">
+                <dt className="text-[10px] font-black uppercase tracking-[0.12em] text-[#f2bc45]/75">{detail.label}</dt>
+                <dd className="mt-1 text-xs font-bold leading-relaxed text-white/85">{detail.value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
       </div>
 
       <div className="mx-auto grid max-w-md gap-2" style={{ gridTemplateColumns: `repeat(${task.options.length}, minmax(0,1fr))` }}>

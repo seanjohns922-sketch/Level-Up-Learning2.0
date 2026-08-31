@@ -2882,6 +2882,9 @@ export type PracticeTask = (
       target: number;
       variable: string;
       examples: string;
+      variableLabel?: string;
+      examplesLabel?: string;
+      supportingDetails?: Array<{ label: string; value: string }>;
       options: Array<{ id: string; label: string }>;
       correctOptionIds: string[];
       feedback: { correct: string; wrong: string };
@@ -2985,6 +2988,31 @@ export type PracticeTask = (
       correctTitleId?: string;
       reasonOptions?: Array<{ id: string; label: string }>;
       correctReasonId?: string;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
+      // Statistica Level 6 — analyse evidence behind media claims and critique
+      // misleading representations (AC9M6ST02). Students must read or calculate
+      // from the displayed data before judging the method or conclusion.
+      kind: "statisticaMediaAnalysis";
+      mode: "calculate" | "compare" | "method" | "conclusion" | "distortion" | "repair" | "defend";
+      prompt: string;
+      speakText: string;
+      target: number;
+      claim: string;
+      data: {
+        title: string;
+        labels: string[];
+        values: number[];
+        unit: string;
+      };
+      display: "columns" | "table";
+      axisMin?: number;
+      sample?: string;
+      method?: string;
+      evidenceNote?: string;
+      options: Array<{ id: string; label: string }>;
+      correctOptionIds: string[];
       feedback: { correct: string; wrong: string };
     }
   | {

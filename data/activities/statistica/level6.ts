@@ -403,38 +403,312 @@ export function rangeCompareTask(round: number, target: number): PracticeTask {
 }
 
 // ── W4 Statistics in the media: is the claim fair? (AC9M6ST02) ───────────────
-type ClaimItem = { claim: string; evidence: string; verdict: "fair" | "misleading" | "insufficient" };
+type ClaimItem = {
+  claim: string;
+  result: string;
+  sample: string;
+  collection: string;
+  verdict: "fair" | "misleading" | "insufficient";
+  reason: string;
+};
 const CLAIMS: ClaimItem[] = [
-  { claim: "9 out of 10 dentists recommend it!", evidence: "Only 10 dentists were asked.", verdict: "misleading" },
-  { claim: "Most students love maths.", evidence: "Only the maths club was surveyed.", verdict: "misleading" },
-  { claim: "Sales doubled this year!", evidence: "The graph's scale starts at 90, not 0.", verdict: "misleading" },
-  { claim: "60% of students chose pizza.", evidence: "200 students were surveyed; 120 chose pizza.", verdict: "fair" },
-  { claim: "Our team is the most popular.", evidence: "No survey data is given at all.", verdict: "insufficient" },
-  { claim: "Crime is falling fast.", evidence: "Only 2 months of data are shown.", verdict: "insufficient" },
-  { claim: "Everyone prefers our brand.", evidence: "The survey was run by the brand's own staff.", verdict: "misleading" },
-  { claim: "Half the class walks to school.", evidence: "15 of 30 students walk to school.", verdict: "fair" },
-  { claim: "This town is the sunniest.", evidence: "Only one sunny week was measured.", verdict: "insufficient" },
-  { claim: "Most people agree with the plan.", evidence: "Only people who already support it were asked.", verdict: "misleading" },
-  { claim: "The new bus is always on time.", evidence: "Records for every day this month show 96% on time.", verdict: "fair" },
-  { claim: "Reading scores jumped up.", evidence: "The result is not compared to any other year.", verdict: "insufficient" },
+  { claim: "9 out of 10 dentists recommend it!", result: "9 of the 10 dentists asked recommended the product.", sample: "10 dentists selected by the manufacturer.", collection: "The manufacturer paid for and ran the product trial.", verdict: "misleading", reason: "the result describes 9 of 10 sponsor-selected dentists, not dentists generally" },
+  { claim: "Most students love maths.", result: "18 of 20 students said they love maths.", sample: "20 members of the school maths club.", collection: "A voluntary poll was taken during a maths club meeting.", verdict: "misleading", reason: "maths club members are a biased sample of all students" },
+  { claim: "Sales doubled this year!", result: "Sales increased from 100 units last year to 200 units this year.", sample: "Every recorded sale from both full calendar years.", collection: "The totals came from the same sales system and used the same dates.", verdict: "fair", reason: "200 is exactly double 100 and the two complete years are comparable" },
+  { claim: "60% of students chose pizza.", result: "120 of 200 surveyed students chose pizza.", sample: "200 students randomly selected across all year levels.", collection: "Each student chose one lunch option in the same anonymous survey.", verdict: "fair", reason: "120 out of 200 equals 60% and the sample covers the school" },
+  { claim: "Our team is the most popular.", result: "The team has 4,200 online followers.", sample: "Follower totals are given for this team only.", collection: "No popularity results for any other team were collected.", verdict: "insufficient", reason: "a comparison claim needs information about the other teams" },
+  { claim: "Crime is falling fast.", result: "Reports fell from 42 in June to 31 in July.", sample: "Two months of reports from one police district.", collection: "No earlier months or seasonal comparison were supplied.", verdict: "insufficient", reason: "two months are not enough to establish a fast downward trend" },
+  { claim: "Everyone prefers our brand.", result: "18 of 25 people preferred the brand; 7 chose another brand.", sample: "25 existing customers approached inside the brand's store.", collection: "The brand's own staff asked the questions.", verdict: "misleading", reason: "18 out of 25 is not everyone, and the store sample is biased" },
+  { claim: "Half the class walks to school.", result: "15 of the class's 30 students walk to school.", sample: "All 30 students in the class responded.", collection: "The teacher recorded one travel method for every student.", verdict: "fair", reason: "15 is exactly half of 30 and the whole class was included" },
+  { claim: "This town is the sunniest.", result: "The town had 6 sunny days during one week.", sample: "One week of weather from this town only.", collection: "No other towns or longer time periods were measured.", verdict: "insufficient", reason: "the claim needs comparable weather data from other towns over more time" },
+  { claim: "Most people agree with the plan.", result: "82 of 100 respondents supported the plan.", sample: "100 subscribers to the campaign's supporter newsletter.", collection: "The survey link was sent only to existing supporters.", verdict: "misleading", reason: "the high result comes from a sample already likely to support the plan" },
+  { claim: "The new bus is always on time.", result: "The bus was on time for 96 of 100 recorded trips.", sample: "Every trip made by the bus during one month.", collection: "Arrival times were taken from the complete trip log.", verdict: "misleading", reason: "96% is strong, but four late trips mean it was not always on time" },
+  { claim: "Reading scores jumped up.", result: "This year's average reading score is 74 points.", sample: "All current Year 6 students completed the same test.", collection: "No earlier score or comparison year was provided.", verdict: "insufficient", reason: "an increase cannot be calculated without an earlier result" },
 ];
 export function mediaClaimTask(round: number, target: number): PracticeTask {
   const item = pick(CLAIMS, round);
-  const why = item.verdict === "fair" ? "The evidence supports it." : item.verdict === "misleading" ? "The evidence does not really support it." : "There isn't enough data to decide.";
   return {
     kind: "statisticaClassify", target,
     prompt: "Does the evidence support the claim?",
-    speakText: "Read the claim and the evidence. Decide whether the data really backs up the claim.",
-    variable: `“${item.claim}”`, examples: item.evidence,
+    speakText: `Claim: ${item.claim} Result: ${item.result} Sample: ${item.sample} How it was collected: ${item.collection} Decide whether the evidence really supports the claim.`,
+    variable: `“${item.claim}”`, examples: item.result,
+    variableLabel: "Claim",
+    examplesLabel: "Survey result",
+    supportingDetails: [
+      { label: "Who was included", value: item.sample },
+      { label: "How it was collected", value: item.collection },
+    ],
     options: order([
       { id: "fair", label: "Yes — the claim is fair" },
       { id: "misleading", label: "No — it's misleading" },
       { id: "insufficient", label: "Not enough data to tell" },
     ], round),
     correctOptionIds: [item.verdict],
-    feedback: { correct: `Right — ${why}`, wrong: "Weigh the evidence: does it truly support the claim, oppose it, or is there too little to tell?" },
+    feedback: { correct: `Right — ${item.reason}.`, wrong: "Check the result, who was included and how the information was collected. Does that evidence justify every word in the claim?" },
   };
 }
+
+type MediaDataCase = {
+  title: string;
+  labels: string[];
+  values: number[];
+  unit: string;
+  claim: string;
+  sample: string;
+  method: string;
+};
+const MEDIA_DATA_CASES: MediaDataCase[] = [
+  { title: "Preferred lunch", labels: ["Pizza", "Pasta", "Salad"], values: [45, 30, 25], unit: "students", claim: "Nearly everyone chose pizza.", sample: "100 students selected across all year levels.", method: "Each student selected one option in the same anonymous survey." },
+  { title: "Travel to school", labels: ["Active", "Car"], values: [36, 24], unit: "students", claim: "Three quarters of students use active travel.", sample: "60 students randomly selected from the school roll.", method: "Travel method was recorded on the same school day." },
+  { title: "Device choice", labels: ["Tablet", "Laptop"], values: [48, 32], unit: "students", claim: "Twice as many students chose tablets.", sample: "80 students completed the technology survey.", method: "Every participant selected exactly one device." },
+  { title: "After-school activity", labels: ["Sport", "Music", "Reading"], values: [21, 9, 5], unit: "students", claim: "Sport was chosen by 60% of students.", sample: "All 35 students in two Year 6 classes responded.", method: "Students nominated their main activity for the same week." },
+  { title: "Library borrowing", labels: ["Fiction", "Non-fiction", "Graphic"], values: [27, 12, 6], unit: "books", claim: "Fiction borrowing was greater than the other categories combined.", sample: "All 45 books borrowed by Year 6 during one week.", method: "Each loan was exported once from the library system." },
+  { title: "Park preference", labels: ["Adventure", "Nature", "Sports"], values: [44, 36, 20], unit: "responses", claim: "A majority preferred the adventure park.", sample: "100 residents randomly selected from the council register.", method: "Residents selected one preferred park design." },
+];
+
+function mediaTaskBase(item: MediaDataCase, round: number, target: number) {
+  return {
+    kind: "statisticaMediaAnalysis" as const,
+    target,
+    claim: item.claim,
+    data: { title: item.title, labels: item.labels, values: item.values, unit: item.unit },
+    display: (round % 2 === 0 ? "columns" : "table") as "columns" | "table",
+    sample: item.sample,
+    method: item.method,
+  };
+}
+
+export function mediaCalculateTask(round: number, target: number): PracticeTask {
+  const item = pick(MEDIA_DATA_CASES, round);
+  const total = item.values.reduce((sum, value) => sum + value, 0);
+  const largest = Math.max(...item.values);
+  const leader = item.labels[item.values.indexOf(largest)]!;
+  const percent = Math.round((largest / total) * 100);
+  return {
+    ...mediaTaskBase(item, round, target), mode: "calculate",
+    prompt: `Calculate the share who chose ${leader}.`,
+    speakText: `Add the frequencies to find the total, then divide ${largest} by that total and convert the result to a percentage.`,
+    evidenceNote: `${largest} chose ${leader}. First calculate the total number represented.`,
+    options: order([
+      { id: "correct", label: `${percent}% — ${largest} out of ${total}` },
+      { id: "largest", label: `${largest}% — use the largest frequency as the percent` },
+      { id: "remainder", label: `${100 - percent}% — use everyone outside the leading group` },
+      { id: "double", label: `${Math.min(100, percent + 20)}% — estimate from the tallest display` },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: `Correct — ${largest} ÷ ${total} = ${percent}%.`, wrong: `Find the total first, then calculate ${largest} out of that total.` },
+  };
+}
+
+export function mediaCompareTask(round: number, target: number): PracticeTask {
+  const item = pick(MEDIA_DATA_CASES, round + 1);
+  const sorted = item.values.map((value, index) => ({ value, label: item.labels[index]! })).sort((a, b) => b.value - a.value);
+  const difference = sorted[0]!.value - sorted[1]!.value;
+  return {
+    ...mediaTaskBase(item, round, target), mode: "compare",
+    prompt: "What does a calculation show about the two leading categories?",
+    speakText: `Identify the two greatest frequencies and subtract. Do not judge only by the visual height of the columns.`,
+    evidenceNote: `Compare ${sorted[0]!.label} with ${sorted[1]!.label}.`,
+    options: order([
+      { id: "correct", label: `${sorted[0]!.label} leads ${sorted[1]!.label} by ${difference} ${item.unit}.` },
+      { id: "sum", label: `The difference is ${sorted[0]!.value + sorted[1]!.value} ${item.unit}.` },
+      { id: "reverse", label: `${sorted[1]!.label} leads by ${difference} ${item.unit}.` },
+      { id: "equal", label: "The two leading categories are equal." },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: `Yes — ${sorted[0]!.value} − ${sorted[1]!.value} = ${difference}.`, wrong: "Read the two greatest frequencies and subtract the second from the first." },
+  };
+}
+
+export function mediaSupportedConclusionTask(round: number, target: number): PracticeTask {
+  const item = pick(MEDIA_DATA_CASES, round + 2);
+  const total = item.values.reduce((sum, value) => sum + value, 0);
+  const largest = Math.max(...item.values);
+  const leader = item.labels[item.values.indexOf(largest)]!;
+  const percent = Math.round((largest / total) * 100);
+  return {
+    ...mediaTaskBase(item, round, target), mode: "conclusion",
+    prompt: "Which conclusion is fully supported by the evidence?",
+    speakText: "Choose the conclusion that reports the exact result without exaggerating it or claiming a cause the data did not test.",
+    evidenceNote: "Use a calculation and check every word in the conclusion.",
+    options: order([
+      { id: "correct", label: `${leader} was the largest category: ${largest} of ${total}, or ${percent}%.` },
+      { id: "everyone", label: `Everyone preferred ${leader}.` },
+      { id: "cause", label: `${leader} was largest because it is objectively the best choice.` },
+      { id: "majority", label: `${leader} had a majority, regardless of whether ${percent}% exceeds 50%.` },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: "Correct — that conclusion states the result precisely and does not go beyond the evidence.", wrong: "Reject absolute, causal or majority claims unless the displayed data actually establishes them." },
+  };
+}
+
+type MethodCase = MediaDataCase & { flaw: string; repair: string; cautious: string };
+const METHOD_CASES: MethodCase[] = [
+  { ...MEDIA_DATA_CASES[0]!, claim: "Most Australian students choose pizza.", sample: "20 customers leaving one pizza shop.", method: "The shop owner asked customers at Friday dinner time.", flaw: "The convenience sample already favours pizza customers.", repair: "Randomly sample students from different schools, regions and year levels.", cautious: "In this pizza-shop sample, 45% selected pizza." },
+  { ...MEDIA_DATA_CASES[1]!, claim: "Students never want to travel by car.", sample: "Members of the school's cycling club.", method: "Students answered by raising their hands during a cycling meeting.", flaw: "Cycling club members are unlikely to represent all students.", repair: "Randomly select students from the full school roll and survey them privately.", cautious: "In the cycling-club sample, active travel was more common than car travel." },
+  { ...MEDIA_DATA_CASES[2]!, claim: "Tablets are the best device for learning.", sample: "80 students who had just received free tablets.", method: "The tablet supplier asked, 'How much do you love your new tablet?'", flaw: "The leading question and supplier-selected context can influence responses.", repair: "Use a neutral question and randomly sample students with experience using both devices.", cautious: "In this sample, 48 of 80 students selected tablets." },
+  { ...MEDIA_DATA_CASES[3]!, claim: "Year 6 students spend all their free time playing sport.", sample: "35 students attending an interschool sports day.", method: "Students named one activity while waiting for their event.", flaw: "The event-based sample over-represents students interested in sport.", repair: "Survey all Year 6 classes on an ordinary day using the same neutral question.", cautious: "Sport was the most common response in this sports-day sample." },
+  { ...MEDIA_DATA_CASES[4]!, claim: "Children only want fiction books.", sample: "Loans recorded from the fiction floor display.", method: "The report omitted loans from classrooms and the digital library.", flaw: "Part of the relevant borrowing data was omitted.", repair: "Combine fiction, non-fiction, graphic, classroom and digital loans for the same period.", cautious: "Fiction was largest among the three loan categories shown." },
+  { ...MEDIA_DATA_CASES[5]!, claim: "The whole town demands an adventure park.", sample: "100 responses to a link posted in an adventure-sports group.", method: "People chose whether to open the link and complete the survey.", flaw: "The voluntary online sample is likely to over-represent adventure-sports supporters.", repair: "Randomly contact residents from the council register and follow up non-responses.", cautious: "Adventure was the largest choice among people who answered this link." },
+];
+
+export function mediaMethodTask(round: number, target: number): PracticeTask {
+  const item = pick(METHOD_CASES, round);
+  return {
+    ...mediaTaskBase(item, round, target), mode: "method",
+    prompt: "What is the strongest problem with this investigation?",
+    speakText: "Inspect who was included and how responses were collected. Choose the flaw that could systematically influence the result.",
+    options: order([
+      { id: "correct", label: item.flaw },
+      { id: "colour", label: "The display does not use enough different colours." },
+      { id: "whole", label: "Every survey must ask the entire population." },
+      { id: "size", label: "The category names contain different numbers of letters." },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: `Correct — ${item.flaw}`, wrong: "Look for a sampling or collection choice that could push the results in one direction." },
+  };
+}
+
+export function mediaRedesignTask(round: number, target: number): PracticeTask {
+  const item = pick(METHOD_CASES, round + 1);
+  return {
+    ...mediaTaskBase(item, round, target), mode: "method",
+    prompt: "Which redesign would produce stronger evidence?",
+    speakText: "Improve both representation and consistency. The best redesign reduces selection or response bias.",
+    options: order([
+      { id: "correct", label: item.repair },
+      { id: "more", label: "Ask more people from exactly the same biased group." },
+      { id: "headline", label: "Keep the method but make the headline less specific." },
+      { id: "public", label: "Show every respondent the current result before they answer." },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: "Yes — that redesign makes the sample and collection process more representative.", wrong: "A stronger design changes how participants are selected or how the question is asked." },
+  };
+}
+
+export function mediaMethodConclusionTask(round: number, target: number): PracticeTask {
+  const item = pick(METHOD_CASES, round + 2);
+  return {
+    ...mediaTaskBase(item, round, target), mode: "conclusion",
+    prompt: "Which conclusion respects the limits of this investigation?",
+    speakText: "A defensible conclusion names the sample and does not generalise beyond the people or data actually included.",
+    options: order([
+      { id: "correct", label: item.cautious },
+      { id: "claim", label: item.claim },
+      { id: "proof", label: "The result proves the same pattern applies everywhere." },
+      { id: "none", label: "Biased sampling means none of the recorded results can be described." },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: "Correct — it reports what happened in this sample without pretending the sample represents everyone.", wrong: "Keep the conclusion tied to the people and categories that were actually measured." },
+  };
+}
+
+type DistortionCase = {
+  title: string;
+  labels: string[];
+  values: number[];
+  unit: string;
+  axisMin: number;
+  claim: string;
+  note: string;
+  flaw: string;
+  repair: string;
+  defence: string;
+};
+const DISTORTION_CASES: DistortionCase[] = [
+  { title: "Approval rating", labels: ["Before", "After"], values: [92, 98], unit: "%", axisMin: 90, claim: "Approval exploded after the campaign!", note: "The graph begins at 90%, making a 6-point rise fill most of the plot.", flaw: "The truncated axis exaggerates a 6 percentage-point increase.", repair: "Redraw the columns from 0% to 100% and retain the exact values 92% and 98%.", defence: "Approval rose 6 points; starting at 90% exaggerates the increase." },
+  { title: "Weekly sales", labels: ["Week 1", "Week 2"], values: [480, 520], unit: "sales", axisMin: 450, claim: "Sales have gone through the roof!", note: "The vertical axis begins at 450 sales.", flaw: "Starting at 450 magnifies a difference of only 40 sales.", repair: "Use a zero baseline, label the scale consistently and report the 40-sale increase.", defence: "Sales rose 40, about 8%; starting at 450 exaggerates the rise." },
+  { title: "Average score", labels: ["Class A", "Class B"], values: [74, 78], unit: "points", axisMin: 72, claim: "Class B completely outperformed Class A!", note: "Only the narrow interval from 72 to 78 is shown.", flaw: "A 4-point difference is drawn as though one result is several times larger.", repair: "Show a scale appropriate to the full assessment range and state the 4-point difference.", defence: "Class B averaged 4 points more; starting at 72 exaggerates it." },
+  { title: "Water use", labels: ["Old", "New"], values: [310, 290], unit: "litres", axisMin: 280, claim: "The new system almost eliminated water use!", note: "The graph starts at 280 litres and omits the zero baseline.", flaw: "The display turns a 20-litre reduction into an apparently enormous drop.", repair: "Begin at zero and report the reduction as 20 litres, about 6% of the original use.", defence: "Use fell 20 litres, about 6%; it was not almost eliminated." },
+  { title: "Downloads", labels: ["April", "May"], values: [995, 1005], unit: "downloads", axisMin: 990, claim: "Downloads doubled in May!", note: "The graph shows only 990 to 1005 downloads.", flaw: "The 10-download increase is visually stretched and does not represent doubling.", repair: "Use a zero baseline and replace 'doubled' with the exact increase from 995 to 1005.", defence: "Downloads rose 10, about 1%; the graph and headline exaggerate it." },
+  { title: "Race time", labels: ["Earlier", "Current"], values: [65, 62], unit: "seconds", axisMin: 60, claim: "The runner is now unbelievably faster!", note: "The graph begins at 60 seconds, and lower times are better.", flaw: "The narrow scale exaggerates a 3-second improvement and the context must recognise lower is better.", repair: "Show a broader scale and state that race time improved by 3 seconds.", defence: "Time improved 3 seconds; the narrow axis exaggerates it." },
+];
+
+function distortionBase(item: DistortionCase, target: number) {
+  return {
+    kind: "statisticaMediaAnalysis" as const,
+    target,
+    claim: item.claim,
+    data: { title: item.title, labels: item.labels, values: item.values, unit: item.unit },
+    display: "columns" as const,
+    axisMin: item.axisMin,
+    evidenceNote: item.note,
+  };
+}
+
+export function mediaDistortionTask(round: number, target: number): PracticeTask {
+  const item = pick(DISTORTION_CASES, round);
+  return {
+    ...distortionBase(item, target), mode: "distortion",
+    prompt: "What makes the representation misleading?",
+    speakText: "Read the exact values, calculate their difference and inspect where the vertical axis begins.",
+    options: order([
+      { id: "correct", label: item.flaw },
+      { id: "colour", label: "The two columns use the same colour family." },
+      { id: "labels", label: "The category labels are written horizontally." },
+      { id: "data", label: "Any graph with different values is automatically misleading." },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: `Correct — ${item.flaw}`, wrong: "Compare the exact values with the visual impression created by the axis." },
+  };
+}
+
+export function mediaQuantifyDistortionTask(round: number, target: number): PracticeTask {
+  const item = pick(DISTORTION_CASES, round + 1);
+  const difference = Math.abs(item.values[1]! - item.values[0]!);
+  return {
+    ...distortionBase(item, target), mode: "calculate",
+    prompt: "Calculate the actual change before judging the headline.",
+    speakText: "Subtract the two exact values. The visual size of the bars is not the numerical difference.",
+    options: order([
+      { id: "correct", label: `${difference} ${item.unit}` },
+      { id: "sum", label: `${item.values[0]! + item.values[1]!} ${item.unit}` },
+      { id: "axis", label: `${Math.abs(item.values[1]! - item.axisMin)} ${item.unit}` },
+      { id: "double", label: `${difference * 2} ${item.unit}` },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: `Correct — the actual change is ${difference} ${item.unit}.`, wrong: "Subtract one displayed value from the other; do not subtract the axis minimum." },
+  };
+}
+
+export function mediaRepairTask(round: number, target: number): PracticeTask {
+  const item = pick(DISTORTION_CASES, round + 2);
+  return {
+    ...distortionBase(item, target), mode: "repair",
+    prompt: "Which change would repair both the display and its message?",
+    speakText: "Choose a repair that gives the graph an honest scale and rewrites the claim to match the calculated change.",
+    options: order([
+      { id: "correct", label: item.repair },
+      { id: "hide", label: "Remove the values so readers focus only on the column heights." },
+      { id: "narrow", label: "Start the axis even closer to the smaller value." },
+      { id: "decorate", label: "Keep the scale and add brighter colours and larger labels." },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: "Yes — that repair corrects the scale and makes the conclusion proportional to the data.", wrong: "A genuine repair changes the misleading scale or missing context, not its decoration." },
+  };
+}
+
+export function mediaDefendDistortionTask(round: number, target: number): PracticeTask {
+  const item = pick(DISTORTION_CASES, round + 3);
+  return {
+    ...distortionBase(item, target), mode: "defend",
+    prompt: "Which critique uses the numbers and identifies the distortion?",
+    speakText: "A strong critique states the real change, names the visual flaw and explains how the claim should be limited.",
+    options: order([
+      { id: "correct", label: item.defence },
+      { id: "feeling", label: "It is misleading because it looks dramatic." },
+      { id: "reject", label: "Both recorded values must therefore be false." },
+      { id: "style", label: "Different column colours would make it accurate." },
+    ], round),
+    correctOptionIds: ["correct"],
+    feedback: { correct: "Correct — the critique connects the calculation, the representation and the conclusion.", wrong: "Choose the critique that cites the values and explains exactly how the graph changes their impression." },
+  };
+}
+
+const mediaRepairVariantTask = (round: number, target: number) => mediaRepairTask(round + 2, target);
+const mediaRepairChallengeTask = (round: number, target: number) => mediaRepairTask(round + 4, target);
+const mediaDefendVariantTask = (round: number, target: number) => mediaDefendDistortionTask(round + 2, target);
+const mediaDefendChallengeTask = (round: number, target: number) => mediaDefendDistortionTask(round + 4, target);
 
 // ── W5 Misleading statistics: name the flaw in the representation (ST02) ──────
 type FlawItem = { desc: string; detail: string; flaw: "axis" | "scale" | "cherry" | "total" };
@@ -482,6 +756,12 @@ const FOCUSED_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
   "y6-statistics-w1-l2": [countMeasureTeachingTask, countMeasureSortTask, collectionMethodTask, validCollectionResponseTask],
   "y6-statistics-w1-l3": [comparisonTeachingTask, fourTypeSortTask, comparablePairTask, shapeCompareTask],
   "y6-statistics-w2-l2": [rangeIntroductionTask, rangeTask, modeReadTask, shapeConcentratedTask],
+  "y6-statistics-w4-l1": [mediaClaimTask, mediaCalculateTask, mediaCompareTask, mediaSupportedConclusionTask],
+  "y6-statistics-w4-l2": [mediaClaimTask, mediaMethodTask, mediaRedesignTask, mediaMethodConclusionTask],
+  "y6-statistics-w4-l3": [mediaClaimTask, mediaSupportedConclusionTask, mediaMethodConclusionTask, mediaMethodTask],
+  "y6-statistics-w5-l1": [misleadingTask, mediaDistortionTask, mediaQuantifyDistortionTask, mediaDefendDistortionTask],
+  "y6-statistics-w5-l2": [misleadingTask, mediaRepairTask, mediaRepairVariantTask, mediaRepairChallengeTask],
+  "y6-statistics-w5-l3": [misleadingTask, mediaDefendDistortionTask, mediaDefendVariantTask, mediaDefendChallengeTask],
 };
 
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
@@ -492,14 +772,6 @@ const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   "y6-statistics-w3-l1": [rangeCompareTask, shapeCompareTask, rangeTask],
   "y6-statistics-w3-l2": [shapeCompareTask, rangeCompareTask, shapeVariationTask],
   "y6-statistics-w3-l3": [rangeCompareTask, rangeTask, shapeCompareTask],
-  // W4 Statistics in the Media — read the claim, check evidence, decide
-  "y6-statistics-w4-l1": [mediaClaimTask, mediaClaimTask, mediaClaimTask],
-  "y6-statistics-w4-l2": [mediaClaimTask, mediaClaimTask, mediaClaimTask],
-  "y6-statistics-w4-l3": [mediaClaimTask, mediaClaimTask, mediaClaimTask],
-  // W5 Misleading Statistics — broken axes, misleading graphics, critique
-  "y6-statistics-w5-l1": [misleadingTask, misleadingTask, misleadingTask],
-  "y6-statistics-w5-l2": [misleadingTask, misleadingTask, misleadingTask],
-  "y6-statistics-w5-l3": [misleadingTask, misleadingTask, misleadingTask],
   // W6 Investigation — L1 & L2 run the full investigation; L3 is quick review
   "y6-statistics-w6-l1": [investigationTask, investigationTask, investigationTask],
   "y6-statistics-w6-l2": [investigationTask, investigationTask, investigationTask],
