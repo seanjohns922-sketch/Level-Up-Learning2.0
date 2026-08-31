@@ -27,12 +27,16 @@ export default function StatisticaConceptCard({ task, onContinue }: { task: Task
           <div className="mt-3 flex flex-wrap justify-center gap-2" aria-label={task.exampleValues.join(", ")}>
             {task.exampleValues.map((value, index) => {
               const highlighted = value === task.highlightValue;
+              const secondaryHighlighted = value === task.secondaryHighlightValue;
               return (
-                <div
-                  key={`${value}-${index}`}
-                  className={`grid h-12 w-12 place-items-center rounded-lg border-2 text-lg font-black ${highlighted ? "border-[#c74f4b] bg-[#ffe2d5] text-[#8f302d]" : "border-[#cad8c1] bg-white text-[#244531]"}`}
-                >
-                  {value}
+                <div key={`${value}-${index}`} className="flex flex-col items-center gap-1">
+                  <div
+                    className={`grid h-12 w-12 place-items-center rounded-lg border-2 text-lg font-black ${highlighted ? "border-[#c74f4b] bg-[#ffe2d5] text-[#8f302d]" : secondaryHighlighted ? "border-[#138a78] bg-[#dff7ee] text-[#116354]" : "border-[#cad8c1] bg-white text-[#244531]"}`}
+                  >
+                    {value}
+                  </div>
+                  {highlighted ? <span className="text-[10px] font-black uppercase text-[#8f302d]">Highest</span> : null}
+                  {secondaryHighlighted ? <span className="text-[10px] font-black uppercase text-[#116354]">Lowest</span> : null}
                 </div>
               );
             })}

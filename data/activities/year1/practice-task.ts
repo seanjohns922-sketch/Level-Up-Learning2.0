@@ -2868,6 +2868,7 @@ export type PracticeTask = (
       exampleLabel: string;
       exampleValues: string[];
       highlightValue: string;
+      secondaryHighlightValue?: string;
       explanation: string;
       continueLabel: string;
       feedback: { correct: string; wrong: string };

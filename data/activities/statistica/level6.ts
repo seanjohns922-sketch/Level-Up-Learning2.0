@@ -351,6 +351,23 @@ function rangeNumOptions(correct: number, hi: number, round: number): Array<{ id
   const wrongs = cands.filter((n) => (seen.has(n) ? false : (seen.add(n), true))).slice(0, 2);
   return order([correct, ...wrongs].map((n) => ({ id: `n${n}`, label: String(n) })), round);
 }
+export function rangeIntroductionTask(round: number, target: number): PracticeTask {
+  const vals = pick(RANGE_SETS, round * 3 + 1);
+  const hi = Math.max(...vals), lo = Math.min(...vals), result = hi - lo;
+  return {
+    kind: "statisticaConcept", scene: "intro", target,
+    title: "What is the range?",
+    definition: "The range tells us how far the data spreads from its lowest value to its highest value.",
+    speakText: `First find the lowest value, ${lo}. Then find the highest value, ${hi}. Subtract the lowest from the highest. ${hi} take away ${lo} equals ${result}, so the range is ${result}.`,
+    exampleLabel: "Find the two endpoints",
+    exampleValues: vals.map(String),
+    highlightValue: String(hi),
+    secondaryHighlightValue: String(lo),
+    explanation: `Highest ${hi} − lowest ${lo} = range ${result}. The range is not the highest value; it is the distance between the highest and lowest values.`,
+    continueLabel: "Calculate the range",
+    feedback: { correct: "Now find the highest and lowest values, then subtract.", wrong: "Range equals the highest value minus the lowest value." },
+  };
+}
 export function rangeTask(round: number, target: number): PracticeTask {
   const ctx = pick(RANGE_CTX, round);
   const vals = pick(RANGE_SETS, round * 3 + 1);
@@ -464,12 +481,12 @@ const FOCUSED_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
   "y6-statistics-w1-l1": [continuousTeachingTask, valueBetweenTask, measurementPlanTask, measurementPrecisionTask],
   "y6-statistics-w1-l2": [countMeasureTeachingTask, countMeasureSortTask, collectionMethodTask, validCollectionResponseTask],
   "y6-statistics-w1-l3": [comparisonTeachingTask, fourTypeSortTask, comparablePairTask, shapeCompareTask],
+  "y6-statistics-w2-l2": [rangeIntroductionTask, rangeTask, modeReadTask, shapeConcentratedTask],
 };
 
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {
   // W2 Mode, Range & Shape
   "y6-statistics-w2-l1": [modeReadTask, rangeTask, modeReadTask],
-  "y6-statistics-w2-l2": [rangeTask, modeReadTask, shapeConcentratedTask],
   "y6-statistics-w2-l3": [shapeConcentratedTask, shapeSpreadTask, rangeTask],
   // W3 Comparative Displays — side-by-side, compare groups, conclude
   "y6-statistics-w3-l1": [rangeCompareTask, shapeCompareTask, rangeTask],
