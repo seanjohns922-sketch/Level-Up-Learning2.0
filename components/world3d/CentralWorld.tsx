@@ -583,15 +583,22 @@ export default function CentralWorld() {
             }) : <div style={{ minHeight: 54, flex: 1, display: "flex", alignItems: "center", justifyContent: "center", border: "1px dashed rgba(255,255,255,.2)", borderRadius: 5, color: "#bfd0c8", fontSize: 11, fontWeight: 800 }}>Your purchased buildings and places will appear here.</div>}
           </div>
 
-          <div style={{ marginTop: 5, color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>BASIC TOOLS</div>
-          <div aria-label="World editing tools" style={{ marginTop: 5, display: "flex", flexWrap: "wrap", gap: 5, paddingBottom: 3 }}>
-            {([
-              ["move", "Move", <Hand key="move-icon" size={17} />],
-              ["path", "Path", <Route key="path-icon" size={17} />], ["road", "Road", <Route key="road-icon" size={17} />], ["stone", "Stone", <Route key="stone-icon" size={17} />],
-              ["tree", "Tree", <Trees key="tree-icon" size={17} />], ["pine_tree", "Pine", <Trees key="pine-icon" size={17} />], ["flower_bed", "Flowers", <Flower2 key="flower-icon" size={17} />],
-              ["lamp_post", "Lamp", <Lamp key="lamp-icon" size={17} />], ["erase", "Erase", <Eraser key="erase-icon" size={17} />],
-            ] as Array<[WorldEditTool, string, React.ReactNode]>).map(([tool, label, icon]) => { const selected = !selectedInventoryItemKey && editTool === tool; return <button key={tool} type="button" onClick={() => chooseEditTool(tool)} aria-pressed={selected} style={{ ...debugButton, flex: "0 0 auto", minWidth: 70, padding: "7px 8px", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, background: selected ? "#14b8a6" : debugButton.background, color: selected ? "#fff" : debugButton.color }}>{icon}{label}</button>; })}
-          </div>
+          {([
+            ["ACTIONS", [["move", "Move", <Hand key="move-icon" size={17} />], ["erase", "Erase", <Eraser key="erase-icon" size={17} />]]],
+            ["GROUND & PATHS", [["path", "Path", <Route key="path-icon" size={17} />], ["road", "Road", <Route key="road-icon" size={17} />], ["stone", "Stone", <Route key="stone-icon" size={17} />]]],
+            ["NATURE & DECOR", [["tree", "Tree", <Trees key="tree-icon" size={17} />], ["pine_tree", "Pine", <Trees key="pine-icon" size={17} />], ["flower_bed", "Flowers", <Flower2 key="flower-icon" size={17} />], ["lamp_post", "Lamp", <Lamp key="lamp-icon" size={17} />]]],
+          ] as Array<[string, Array<[WorldEditTool, string, React.ReactNode]>]>).map(([groupLabel, tools]) => (
+            <div key={groupLabel} style={{ marginTop: 8 }}>
+              <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>{groupLabel}</div>
+              <div aria-label={`${groupLabel} tools`} style={{ marginTop: 4, display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {tools.map(([tool, label, icon]) => {
+                  const selected = !selectedInventoryItemKey && editTool === tool;
+                  const selectedBg = tool === "erase" ? "#ef4444" : "#efbd61";
+                  return <button key={tool} type="button" onClick={() => chooseEditTool(tool)} aria-pressed={selected} style={{ ...debugButton, flex: "0 0 auto", minWidth: 68, padding: "7px 10px", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, background: selected ? selectedBg : debugButton.background, color: selected ? (tool === "erase" ? "#fff" : "#2b2119") : debugButton.color }}>{icon}{label}</button>;
+                })}
+              </div>
+            </div>
+          ))}
           <div className="centralWorldEditorControls" style={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
             <div className="centralWorldEditorDpad" style={{ display: "grid", gridTemplateColumns: "repeat(3, 40px)", gridTemplateRows: "repeat(2, 40px)", gap: 4 }}><button type="button" aria-label="Move cursor forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={19} /></button><button type="button" aria-label="Move cursor left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={19} /></button><button type="button" aria-label="Move cursor backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={19} /></button><button type="button" aria-label="Move cursor right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={19} /></button></div>
             <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isMoveTool || isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? `${buildItem?.name ?? "Item"} fits here.` : "Choose a clear green space.") : isMoveTool ? "Tap an item to pick it up." : isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Tap an item to remove it." : "Choose a clear green space."}</div>
