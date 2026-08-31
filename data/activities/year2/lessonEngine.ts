@@ -422,6 +422,19 @@ export type EquivalentFractionYesNoQuestion = {
   answer: "yes" | "no";
 };
 
+export const YEAR6_EQUIVALENT_VISUAL_STRICT_TEMPLATES = [
+  { prompt: "Are these fraction bars equal?", left: { numerator: 3, denominator: 4 }, right: { numerator: 6, denominator: 8 }, barsEquivalent: true, answer: "yes" as const },
+  { prompt: "Do these shaded bars represent the same amount?", left: { numerator: 2, denominator: 3 }, right: { numerator: 4, denominator: 6 }, barsEquivalent: true, answer: "yes" as const },
+  { prompt: "True or false: 6/9 = 2/3.", left: { numerator: 6, denominator: 9 }, right: { numerator: 2, denominator: 3 }, barsEquivalent: true, answer: "yes" as const },
+  { prompt: "A student says, “3/4 and 6/8 are different because the numbers are bigger.” Is this correct?", left: { numerator: 3, denominator: 4 }, right: { numerator: 6, denominator: 8 }, barsEquivalent: true, answer: "no" as const },
+  { prompt: "Are these equivalent?", left: { numerator: 5, denominator: 8 }, right: { numerator: 10, denominator: 16 }, barsEquivalent: true, answer: "yes" as const },
+  { prompt: "Do these bars show the same value?", left: { numerator: 2, denominator: 5 }, right: { numerator: 10, denominator: 20 }, barsEquivalent: false, answer: "no" as const },
+  { prompt: "Are these equivalent?", left: { numerator: 3, denominator: 5 }, right: { numerator: 8, denominator: 15 }, barsEquivalent: false, answer: "no" as const },
+  { prompt: "True or false: 4/6 and 2/3 represent the same amount.", left: { numerator: 4, denominator: 6 }, right: { numerator: 2, denominator: 3 }, barsEquivalent: true, answer: "yes" as const },
+  { prompt: "A student says, “4/6 and 2/3 are equal because both can be scaled by 2.” Is this correct?", left: { numerator: 4, denominator: 6 }, right: { numerator: 2, denominator: 3 }, barsEquivalent: true, answer: "yes" as const },
+  { prompt: "Are these equivalent?", left: { numerator: 3, denominator: 4 }, right: { numerator: 8, denominator: 16 }, barsEquivalent: false, answer: "no" as const },
+] as const;
+
 export type FractionDecimalPercentSet = {
   id: string;
   fraction: string;
@@ -8160,69 +8173,9 @@ function generateInteractiveQuestion(
 
   if (activityType === "equivalent_fraction_yes_no") {
     if (config.mode === "y6_equivalent_visual_strict") {
-      const templates = [
-        {
-          prompt: "Are these fraction bars equal?",
-          left: { numerator: 3, denominator: 4 },
-          right: { numerator: 6, denominator: 8 },
-          answer: "yes" as const,
-        },
-        {
-          prompt: "Do these shaded bars represent the same amount?",
-          left: { numerator: 2, denominator: 3 },
-          right: { numerator: 4, denominator: 6 },
-          answer: "yes" as const,
-        },
-        {
-          prompt: "True or false: 6/9 = 2/3.",
-          left: { numerator: 6, denominator: 9 },
-          right: { numerator: 2, denominator: 3 },
-          answer: "yes" as const,
-        },
-        {
-          prompt: "A student says, “3/4 and 6/8 are different because the numbers are bigger.” Is this correct?",
-          left: { numerator: 3, denominator: 4 },
-          right: { numerator: 6, denominator: 8 },
-          answer: "no" as const,
-        },
-        {
-          prompt: "Are these equivalent?",
-          left: { numerator: 5, denominator: 8 },
-          right: { numerator: 10, denominator: 16 },
-          answer: "yes" as const,
-        },
-        {
-          prompt: "Do these bars show the same value?",
-          left: { numerator: 2, denominator: 5 },
-          right: { numerator: 10, denominator: 20 },
-          answer: "yes" as const,
-        },
-        {
-          prompt: "Are these equivalent?",
-          left: { numerator: 3, denominator: 5 },
-          right: { numerator: 8, denominator: 15 },
-          answer: "no" as const,
-        },
-        {
-          prompt: "True or false: 4/6 and 2/3 represent the same amount.",
-          left: { numerator: 4, denominator: 6 },
-          right: { numerator: 2, denominator: 3 },
-          answer: "yes" as const,
-        },
-        {
-          prompt: "A student says, “4/6 and 2/3 are equal because both can be scaled by 2.” Is this correct?",
-          left: { numerator: 4, denominator: 6 },
-          right: { numerator: 2, denominator: 3 },
-          answer: "yes" as const,
-        },
-        {
-          prompt: "Are these equivalent?",
-          left: { numerator: 3, denominator: 4 },
-          right: { numerator: 8, denominator: 16 },
-          answer: "no" as const,
-        },
-      ] as const;
-      const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
+      const chosen = YEAR6_EQUIVALENT_VISUAL_STRICT_TEMPLATES[
+        randInt(0, YEAR6_EQUIVALENT_VISUAL_STRICT_TEMPLATES.length - 1)
+      ] ?? YEAR6_EQUIVALENT_VISUAL_STRICT_TEMPLATES[0]!;
       return {
         kind: "equivalent_fraction_yes_no",
         prompt: chosen.prompt,

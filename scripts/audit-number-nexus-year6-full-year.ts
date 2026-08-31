@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { YEAR1_WEEKLY_QUIZZES } from "../app/config/lesson-config";
-import { buildLessonActivityPool, generateQuestion, getLevelForLesson } from "../data/activities/year2/lessonEngine";
+import {
+  buildLessonActivityPool,
+  generateQuestion,
+  getLevelForLesson,
+  YEAR6_EQUIVALENT_VISUAL_STRICT_TEMPLATES,
+} from "../data/activities/year2/lessonEngine";
 import { NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS } from "../data/assessments/numberNexusAssessmentBlueprint";
 import { getYear6WeeklyQuiz } from "../data/quizzes/year6";
 import { YEAR6_PROGRAM } from "../data/programs/year6";
@@ -31,6 +36,23 @@ let generated = 0;
 let quizItems = 0;
 
 assert.equal(YEAR6_PROGRAM.length, 12, "Level 6 must contain exactly 12 weeks.");
+for (const template of YEAR6_EQUIVALENT_VISUAL_STRICT_TEMPLATES) {
+  const mathematicallyEquivalent =
+    template.left.numerator * template.right.denominator ===
+    template.right.numerator * template.left.denominator;
+  assert.equal(
+    mathematicallyEquivalent,
+    template.barsEquivalent,
+    `Equivalent-fraction visual is mathematically inconsistent: ${template.prompt}`,
+  );
+  if (!template.prompt.startsWith("A student says")) {
+    assert.equal(
+      template.answer,
+      mathematicallyEquivalent ? "yes" : "no",
+      `Equivalent-fraction answer key is incorrect: ${template.prompt}`,
+    );
+  }
+}
 for (const week of YEAR6_PROGRAM) {
   assert.equal(week.lessons.length, 3, `Week ${week.week} must contain exactly 3 lessons.`);
   assert.deepEqual([...week.curriculum].sort(), [...expectedWeekCodes[week.week]!].sort(), `Week ${week.week} curriculum metadata is incorrect.`);
