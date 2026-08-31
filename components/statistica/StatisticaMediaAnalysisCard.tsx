@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, Check, Table2 } from "lucide-react";
+import { BarChart3, Check, Circle, Table2 } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -14,6 +14,7 @@ const MODE_LABELS: Record<Task["mode"], string> = {
   method: "Audit the method",
   conclusion: "Test the conclusion",
   distortion: "Detect the distortion",
+  quantify: "Measure the real change",
   repair: "Repair the representation",
   defend: "Defend your critique",
 };
@@ -31,6 +32,52 @@ function EvidenceDisplay({ task }: { task: Task }) {
             </tr>
           ))}</tbody>
         </table>
+      </div>
+    );
+  }
+
+  if (task.display === "pictograph") {
+    return (
+      <div className="rounded-lg border border-[#b8c9b0] bg-[#10271d] p-3 text-white">
+        <div className="flex items-center gap-2 text-xs font-black"><Circle className="h-4 w-4 text-[#f2bc45]" />{task.data.title}</div>
+        <div className="mt-3 grid min-h-32 grid-cols-2 items-end gap-5 border-b-2 border-[#d6b65b]/65 px-4 pb-2">
+          {task.data.values.map((value, index) => {
+            const scale = task.data.visualMultipliers?.[index] ?? 1;
+            return (
+              <div key={task.data.labels[index]} className="flex flex-col items-center justify-end gap-1">
+                <span className="text-xs font-black">{value} {task.data.unit}</span>
+                <div className="rounded-md bg-[#20b8a5] shadow-[inset_0_2px_0_rgba(255,255,255,.35)]" style={{ width: `${44 * scale}px`, height: `${44 * scale}px` }} />
+                <span className="text-[10px] font-bold text-white/80">{task.data.labels[index]}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  if (task.display === "selected") {
+    const source = task.data.source;
+    return (
+      <div className="rounded-lg border border-[#b8c9b0] bg-[#10271d] p-3 text-white">
+        <div className="flex items-center justify-between gap-2 text-xs font-black"><span className="inline-flex items-center gap-2"><BarChart3 className="h-4 w-4 text-[#f2bc45]" />{task.data.title}</span><span className="rounded bg-[#f2bc45] px-2 py-1 text-[10px] uppercase text-[#3f2b1e]">Published selection</span></div>
+        <div className="mt-3 flex h-20 items-end gap-3 border-b-2 border-l-2 border-[#d6b65b]/65 px-3">
+          {task.data.values.map((value, index) => <div key={task.data.labels[index]} className="flex flex-1 flex-col items-center justify-end self-stretch"><span className="text-[10px] font-black">{value}</span><div className="w-full max-w-12 rounded-t bg-[#20b8a5]" style={{ height: `${Math.max(12, value / Math.max(...task.data.values) * 78)}%` }} /><span className="text-[9px] font-bold">{task.data.labels[index]}</span></div>)}
+        </div>
+        {source ? <div className="mt-2 rounded bg-white/10 px-2 py-1.5 text-[10px]"><span className="font-black text-[#f2bc45]">Full record: </span>{source.labels.map((label, index) => `${label} ${source.values[index]}`).join(" · ")}</div> : null}
+      </div>
+    );
+  }
+
+  if (task.display === "parts") {
+    const total = task.data.values.reduce((sum, value) => sum + value, 0);
+    return (
+      <div className="rounded-lg border border-[#b8c9b0] bg-[#10271d] p-3 text-white">
+        <div className="flex items-center justify-between gap-2 text-xs font-black"><span className="inline-flex items-center gap-2"><BarChart3 className="h-4 w-4 text-[#f2bc45]" />{task.data.title}</span><span className="rounded bg-[#f2bc45] px-2 py-1 text-[10px] uppercase text-[#3f2b1e]">Claimed whole</span></div>
+        <div className="mt-4 flex h-12 overflow-hidden rounded-md border-2 border-white/30">
+          {task.data.values.map((value, index) => <div key={task.data.labels[index]} className="flex min-w-0 items-center justify-center border-r border-white/30 px-1 text-[10px] font-black last:border-r-0 odd:bg-[#20b8a5] even:bg-[#6366f1]" style={{ width: `${value / total * 100}%` }}>{value}%</div>)}
+        </div>
+        <div className="mt-2 grid gap-1 text-[10px] font-bold sm:grid-cols-3">{task.data.labels.map((label, index) => <span key={label}>{label}: {task.data.values[index]}%</span>)}</div>
       </div>
     );
   }
@@ -68,7 +115,11 @@ export default function StatisticaMediaAnalysisCard({ task, onCorrect, onWrong }
   function submit() {
     if (!chosen || settled) return;
     setSettled(true);
-    if (task.correctOptionIds.includes(chosen)) onCorrect(); else onWrong(chosen);
+    if (task.correctOptionIds.includes(chosen)) {
+      onCorrect();
+    } else {
+      onWrong(task.options.find((option) => option.id === chosen)?.label ?? chosen);
+    }
   }
 
   return (
@@ -78,7 +129,7 @@ export default function StatisticaMediaAnalysisCard({ task, onCorrect, onWrong }
         <EvidenceDisplay task={task} />
         <aside className="rounded-lg border-2 border-[#d8c98e] bg-[#fffaf0] p-3 text-[#244531]">
           <div className="text-[10px] font-black uppercase tracking-[0.14em] text-[#9b6221]">{MODE_LABELS[task.mode]}</div>
-          <div className="mt-2 text-[10px] font-black uppercase tracking-[0.12em] text-[#718477]">Media claim</div>
+          <div className="mt-2 text-[10px] font-black uppercase tracking-[0.12em] text-[#718477]">{task.mode === "method" || task.mode === "conclusion" || task.mode === "calculate" || task.mode === "compare" ? "Media claim" : "Headline paired with the graphic"}</div>
           <div className="mt-1 text-base font-black leading-snug">“{task.claim}”</div>
           {task.evidenceNote ? <div className="mt-2 rounded-md bg-[#eaf3e5] px-3 py-2 text-xs font-bold leading-relaxed">{task.evidenceNote}</div> : null}
         </aside>

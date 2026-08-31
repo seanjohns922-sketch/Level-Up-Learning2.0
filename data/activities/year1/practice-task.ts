@@ -2995,7 +2995,7 @@ export type PracticeTask = (
       // misleading representations (AC9M6ST02). Students must read or calculate
       // from the displayed data before judging the method or conclusion.
       kind: "statisticaMediaAnalysis";
-      mode: "calculate" | "compare" | "method" | "conclusion" | "distortion" | "repair" | "defend";
+      mode: "calculate" | "compare" | "method" | "conclusion" | "distortion" | "quantify" | "repair" | "defend";
       prompt: string;
       speakText: string;
       target: number;
@@ -3005,8 +3005,10 @@ export type PracticeTask = (
         labels: string[];
         values: number[];
         unit: string;
+        visualMultipliers?: number[];
+        source?: { labels: string[]; values: number[] };
       };
-      display: "columns" | "table";
+      display: "columns" | "table" | "pictograph" | "selected" | "parts";
       axisMin?: number;
       sample?: string;
       method?: string;

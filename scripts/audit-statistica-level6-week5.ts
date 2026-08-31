@@ -1,4 +1,4 @@
-import { getStatisticaLevel6TaskSet } from "@/data/activities/statistica/level6";
+import { getStatisticaLevel6TaskSet, mediaRepairTask } from "@/data/activities/statistica/level6";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
@@ -11,7 +11,7 @@ const check = (condition: boolean, message: string) => {
 };
 
 const expectedModes = [
-  ["distortion", "calculate", "defend"],
+  ["distortion", "quantify", "defend"],
   ["repair", "repair", "repair"],
   ["defend", "defend", "defend"],
 ];
@@ -30,7 +30,8 @@ for (let lesson = 1; lesson <= 3; lesson += 1) {
   for (const task of activities) {
     check(isPracticeTaskSafe(task), `Week 5 Lesson ${lesson}: ${task.kind} must be renderer-safe`);
     if (task.kind !== "statisticaMediaAnalysis") continue;
-    check(task.display === "columns" && (task.axisMin ?? 0) > 0, `Week 5 Lesson ${lesson}: distorted graph and baseline must be visible`);
+    if (lesson === 1) check(task.display === "columns" && (task.axisMin ?? 0) > 0, `Week 5 Lesson 1: the broken axis must be visible`);
+    if (lesson === 2) check(["pictograph", "selected", "parts"].includes(task.display), `Week 5 Lesson 2: practice must use a misleading graphic, omitted series or invalid whole`);
     check(task.data.labels.length === task.data.values.length, `Week 5 Lesson ${lesson}: graph data must be complete`);
     check(Boolean(task.evidenceNote && task.speakText), `Week 5 Lesson ${lesson}: visual context and voice-over are required`);
     const optionIds = new Set(task.options.map((option) => option.id));
@@ -42,6 +43,9 @@ for (let lesson = 1; lesson <= 3; lesson += 1) {
     check(new Set(variants).size >= 6, `Week 5 Lesson ${lesson} activity ${index + 1} needs at least six datasets`);
   });
 }
+
+const lesson2Displays = new Set(Array.from({ length: 18 }, (_, round) => (mediaRepairTask(round, round + 1) as Extract<PracticeTask, { kind: "statisticaMediaAnalysis" }>).display));
+check(["pictograph", "selected", "parts"].every((display) => lesson2Displays.has(display as "pictograph" | "selected" | "parts")), "Week 5 Lesson 2 must cover picture area, omitted data and invalid totals");
 
 if (problems > 0) {
   console.error(`\nStatistica Level 6 Week 5 audit failed with ${problems} problem(s).`);

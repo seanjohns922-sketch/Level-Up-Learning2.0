@@ -608,45 +608,65 @@ type DistortionCase = {
   labels: string[];
   values: number[];
   unit: string;
-  axisMin: number;
+  display: "columns" | "pictograph" | "selected" | "parts";
+  axisMin?: number;
+  visualMultipliers?: number[];
+  source?: { labels: string[]; values: number[] };
   claim: string;
   note: string;
   flaw: string;
   repair: string;
   defence: string;
 };
-const DISTORTION_CASES: DistortionCase[] = [
-  { title: "Approval rating", labels: ["Before", "After"], values: [92, 98], unit: "%", axisMin: 90, claim: "Approval exploded after the campaign!", note: "The graph begins at 90%, making a 6-point rise fill most of the plot.", flaw: "The truncated axis exaggerates a 6 percentage-point increase.", repair: "Redraw the columns from 0% to 100% and retain the exact values 92% and 98%.", defence: "Approval rose 6 points; starting at 90% exaggerates the increase." },
-  { title: "Weekly sales", labels: ["Week 1", "Week 2"], values: [480, 520], unit: "sales", axisMin: 450, claim: "Sales have gone through the roof!", note: "The vertical axis begins at 450 sales.", flaw: "Starting at 450 magnifies a difference of only 40 sales.", repair: "Use a zero baseline, label the scale consistently and report the 40-sale increase.", defence: "Sales rose 40, about 8%; starting at 450 exaggerates the rise." },
-  { title: "Average score", labels: ["Class A", "Class B"], values: [74, 78], unit: "points", axisMin: 72, claim: "Class B completely outperformed Class A!", note: "Only the narrow interval from 72 to 78 is shown.", flaw: "A 4-point difference is drawn as though one result is several times larger.", repair: "Show a scale appropriate to the full assessment range and state the 4-point difference.", defence: "Class B averaged 4 points more; starting at 72 exaggerates it." },
-  { title: "Water use", labels: ["Old", "New"], values: [310, 290], unit: "litres", axisMin: 280, claim: "The new system almost eliminated water use!", note: "The graph starts at 280 litres and omits the zero baseline.", flaw: "The display turns a 20-litre reduction into an apparently enormous drop.", repair: "Begin at zero and report the reduction as 20 litres, about 6% of the original use.", defence: "Use fell 20 litres, about 6%; it was not almost eliminated." },
-  { title: "Downloads", labels: ["April", "May"], values: [995, 1005], unit: "downloads", axisMin: 990, claim: "Downloads doubled in May!", note: "The graph shows only 990 to 1005 downloads.", flaw: "The 10-download increase is visually stretched and does not represent doubling.", repair: "Use a zero baseline and replace 'doubled' with the exact increase from 995 to 1005.", defence: "Downloads rose 10, about 1%; the graph and headline exaggerate it." },
-  { title: "Race time", labels: ["Earlier", "Current"], values: [65, 62], unit: "seconds", axisMin: 60, claim: "The runner is now unbelievably faster!", note: "The graph begins at 60 seconds, and lower times are better.", flaw: "The narrow scale exaggerates a 3-second improvement and the context must recognise lower is better.", repair: "Show a broader scale and state that race time improved by 3 seconds.", defence: "Time improved 3 seconds; the narrow axis exaggerates it." },
+const AXIS_DISTORTION_CASES: DistortionCase[] = [
+  { display: "columns", title: "Approval rating", labels: ["Before", "After"], values: [92, 98], unit: "%", axisMin: 90, claim: "Approval exploded after the campaign!", note: "The columns begin at 90%, so their visible heights represent 2 and 8 points rather than 92 and 98.", flaw: "The cut-off axis makes a 6-point rise look four times as large.", repair: "Redraw the columns from 0% to 100% and report the rise from 92% to 98%.", defence: "Approval rose 6 percentage points, but the cut-off axis makes the visible columns look four times different." },
+  { display: "columns", title: "Weekly sales", labels: ["Week 1", "Week 2"], values: [480, 520], unit: "sales", axisMin: 450, claim: "Sales have gone through the roof!", note: "The columns begin at 450, so the visible heights are 30 and 70 although the totals are 480 and 520.", flaw: "The cut-off axis makes a 40-sale rise look much larger than it is.", repair: "Begin the columns at zero and report the increase from 480 to 520 sales.", defence: "Sales rose by 40, about 8%, but the 450 baseline greatly exaggerates the visual change." },
+  { display: "columns", title: "Average score", labels: ["Class A", "Class B"], values: [74, 78], unit: "points", axisMin: 72, claim: "Class B completely outperformed Class A!", note: "The visible columns represent only the 2 and 6 points above a baseline of 72.", flaw: "The cut-off axis makes a 4-point difference look like one score is three times the other.", repair: "Use the full assessment scale and state that the averages differ by 4 points.", defence: "Class B averaged 4 points more, but the baseline of 72 turns the visible heights into a misleading 2-to-6 comparison." },
+  { display: "columns", title: "Water use", labels: ["Old", "New"], values: [310, 290], unit: "litres", axisMin: 280, claim: "The new system almost eliminated water use!", note: "The columns begin at 280 litres, leaving visible heights of 30 and 10.", flaw: "The cut-off axis makes a 20-litre reduction look like use fell by two thirds.", repair: "Begin at zero and report the reduction from 310 to 290 litres.", defence: "Use fell by 20 litres, about 6%, not by the two thirds suggested by the visible column heights." },
+  { display: "columns", title: "Downloads", labels: ["April", "May"], values: [995, 1005], unit: "downloads", axisMin: 990, claim: "Downloads doubled in May!", note: "The baseline of 990 makes the visible heights 5 and 15, even though the totals are 995 and 1005.", flaw: "The cut-off axis makes a 10-download rise look like the result tripled.", repair: "Begin at zero and replace 'doubled' with the increase from 995 to 1005 downloads.", defence: "Downloads rose by 10, about 1%, while the cut-off axis makes the visible height triple." },
+  { display: "columns", title: "Race time", labels: ["Earlier", "Current"], values: [65, 62], unit: "seconds", axisMin: 60, claim: "The runner is now unbelievably faster!", note: "Lower times are better. The baseline of 60 leaves visible column heights of 5 and 2 seconds.", flaw: "The cut-off axis exaggerates a reduction of only 3 seconds.", repair: "Use a zero baseline and state that the race time improved from 65 to 62 seconds.", defence: "The time improved by 3 seconds, about 5%; the cut-off axis makes the reduction look much larger." },
 ];
+
+const GRAPHIC_DISTORTION_CASES: DistortionCase[] = [
+  { display: "pictograph", title: "Game downloads", labels: ["April", "May"], values: [100, 200], unit: "downloads", visualMultipliers: [1, 2], claim: "May downloads were four times April's!", note: "The May square is twice as wide and twice as tall as April's square.", flaw: "Doubling both dimensions creates four times the area for only twice the value.", repair: "Use equal-sized symbols, with one symbol representing 100 downloads, or use columns with a zero baseline.", defence: "Downloads doubled from 100 to 200, but the May picture has four times the area." },
+  { display: "pictograph", title: "Team supporters", labels: ["Blue", "Gold"], values: [40, 60], unit: "supporters", visualMultipliers: [1, 1.5], claim: "Gold has more than twice the support!", note: "The Gold square is 1.5 times as wide and tall as the Blue square.", flaw: "The area grows to 2.25 times even though 60 is only 1.5 times 40.", repair: "Keep every supporter icon the same size and vary only the number of icons.", defence: "Gold has 20 more supporters, or 1.5 times as many, but its picture covers 2.25 times the area." },
+  { display: "pictograph", title: "Trees planted", labels: ["Last year", "This year"], values: [50, 100], unit: "trees", visualMultipliers: [1, 2], claim: "The planting program grew fourfold!", note: "The second tree symbol is twice as wide and twice as tall as the first.", flaw: "The four-times area overstates a result that only doubled from 50 to 100.", repair: "Use equal-sized tree symbols with a fixed key, or columns beginning at zero.", defence: "The number of trees doubled, but doubling both picture dimensions creates four times the area." },
+  { display: "selected", title: "Quarterly sales", labels: ["Q1", "Q2", "Q3"], values: [120, 135, 140], unit: "sales", source: { labels: ["Q1", "Q2", "Q3", "Q4"], values: [120, 135, 140, 80] }, claim: "Sales rose throughout the year!", note: "The published graph stops at Q3. The full record includes Q4 sales of 80.", flaw: "Leaving out Q4 hides the large fall at the end of the year.", repair: "Plot all four quarters on the same scale and describe the rise to Q3 followed by the Q4 fall.", defence: "Sales rose from Q1 to Q3 but then fell to 80 in Q4, which the published selection omits." },
+  { display: "selected", title: "Daily visitors", labels: ["Mon", "Tue", "Wed"], values: [210, 230, 250], unit: "visitors", source: { labels: ["Mon", "Tue", "Wed", "Thu", "Fri"], values: [210, 230, 250, 160, 150] }, claim: "Visitor numbers climbed all week!", note: "Only Monday to Wednesday are graphed; Thursday and Friday are present in the full record.", flaw: "Selecting only the first three days hides the fall on Thursday and Friday.", repair: "Graph all five days in order and describe both the rise and the later fall.", defence: "Visitors rose to 250 on Wednesday, then fell to 160 and 150; the headline omits those days." },
+  { display: "selected", title: "Monthly rainfall", labels: ["Jan", "Feb", "Mar"], values: [42, 51, 63], unit: "mm", source: { labels: ["Jan", "Feb", "Mar", "Apr", "May"], values: [42, 51, 63, 38, 31] }, claim: "Rainfall kept increasing this year!", note: "The published selection ends in March, but the source record continues through May.", flaw: "Omitting April and May hides that rainfall fell after March.", repair: "Show every available month in time order and describe the rise followed by the fall.", defence: "Rainfall peaked at 63 mm in March, then fell to 38 and 31 mm; those months were omitted." },
+  { display: "parts", title: "How students travel", labels: ["Walk", "Car", "Bus"], values: [55, 40, 20], unit: "%", claim: "This chart represents every student's travel method.", note: "The three labelled percentages are presented as parts of one whole.", flaw: "The parts total 115%, so they cannot describe one response from every student.", repair: "Check the categories and data, then redraw only after the mutually exclusive parts total 100%.", defence: "55% + 40% + 20% = 115%, so the displayed parts cannot form one whole." },
+  { display: "parts", title: "School budget", labels: ["Learning", "Sport", "Arts"], values: [48, 37, 25], unit: "%", claim: "The full budget is divided among these areas.", note: "The chart labels all three figures as percentages of the same total budget.", flaw: "The labelled budget shares add to 110%, which is impossible for one whole budget.", repair: "Correct the figures or categories so they are non-overlapping and sum to exactly 100%.", defence: "48% + 37% + 25% = 110%, so this cannot be a valid division of one budget." },
+  { display: "parts", title: "Favourite activities", labels: ["Sport", "Gaming", "Music"], values: [52, 33, 24], unit: "%", claim: "Every student selected one favourite activity.", note: "The categories are presented as non-overlapping percentages of one group.", flaw: "The percentages total 109%, so they cannot represent one choice from every student.", repair: "Verify the counts and denominator, then recalculate non-overlapping percentages that sum to 100%.", defence: "52% + 33% + 24% = 109%, so the claimed one-choice survey is internally inconsistent." },
+];
+
+const ALL_DISTORTION_CASES = [...AXIS_DISTORTION_CASES, ...GRAPHIC_DISTORTION_CASES];
+const PICTURE_DISTORTION_CASES = GRAPHIC_DISTORTION_CASES.filter((item) => item.display === "pictograph");
+const OMITTED_DISTORTION_CASES = GRAPHIC_DISTORTION_CASES.filter((item) => item.display === "selected");
+const WHOLE_DISTORTION_CASES = GRAPHIC_DISTORTION_CASES.filter((item) => item.display === "parts");
 
 function distortionBase(item: DistortionCase, target: number) {
   return {
     kind: "statisticaMediaAnalysis" as const,
     target,
     claim: item.claim,
-    data: { title: item.title, labels: item.labels, values: item.values, unit: item.unit },
-    display: "columns" as const,
+    data: { title: item.title, labels: item.labels, values: item.values, unit: item.unit, visualMultipliers: item.visualMultipliers, source: item.source },
+    display: item.display,
     axisMin: item.axisMin,
     evidenceNote: item.note,
   };
 }
 
 export function mediaDistortionTask(round: number, target: number): PracticeTask {
-  const item = pick(DISTORTION_CASES, round);
+  const item = pick(AXIS_DISTORTION_CASES, round);
   return {
     ...distortionBase(item, target), mode: "distortion",
     prompt: "What makes the representation misleading?",
     speakText: "Read the exact values, calculate their difference and inspect where the vertical axis begins.",
     options: order([
       { id: "correct", label: item.flaw },
-      { id: "colour", label: "The two columns use the same colour family." },
-      { id: "labels", label: "The category labels are written horizontally." },
-      { id: "data", label: "Any graph with different values is automatically misleading." },
+      { id: "difference", label: "The subtraction is wrong because the two values are different." },
+      { id: "labels", label: "The category labels should be written vertically." },
+      { id: "colour", label: "Each column needs a completely different colour." },
     ], round),
     correctOptionIds: ["correct"],
     feedback: { correct: `Correct — ${item.flaw}`, wrong: "Compare the exact values with the visual impression created by the axis." },
@@ -654,17 +674,18 @@ export function mediaDistortionTask(round: number, target: number): PracticeTask
 }
 
 export function mediaQuantifyDistortionTask(round: number, target: number): PracticeTask {
-  const item = pick(DISTORTION_CASES, round + 1);
+  const item = pick(AXIS_DISTORTION_CASES, round + 1);
   const difference = Math.abs(item.values[1]! - item.values[0]!);
+  const percent = Math.round(difference / item.values[0]! * 100);
   return {
-    ...distortionBase(item, target), mode: "calculate",
-    prompt: "Calculate the actual change before judging the headline.",
-    speakText: "Subtract the two exact values. The visual size of the bars is not the numerical difference.",
+    ...distortionBase(item, target), mode: "quantify",
+    prompt: "Which calculation describes the real change?",
+    speakText: "Subtract the exact values, then compare the difference with the earlier value. Do not use the visible column heights as the totals.",
     options: order([
-      { id: "correct", label: `${difference} ${item.unit}` },
+      { id: "correct", label: `${difference} ${item.unit}, about ${percent}% of the earlier value` },
       { id: "sum", label: `${item.values[0]! + item.values[1]!} ${item.unit}` },
-      { id: "axis", label: `${Math.abs(item.values[1]! - item.axisMin)} ${item.unit}` },
-      { id: "double", label: `${difference * 2} ${item.unit}` },
+      { id: "axis", label: `${Math.abs(item.values[1]! - item.axisMin!)} ${item.unit}, using the axis baseline as the earlier value` },
+      { id: "double", label: `${difference * 2} ${item.unit}, because two columns are shown` },
     ], round),
     correctOptionIds: ["correct"],
     feedback: { correct: `Correct — the actual change is ${difference} ${item.unit}.`, wrong: "Subtract one displayed value from the other; do not subtract the axis minimum." },
@@ -672,7 +693,11 @@ export function mediaQuantifyDistortionTask(round: number, target: number): Prac
 }
 
 export function mediaRepairTask(round: number, target: number): PracticeTask {
-  const item = pick(DISTORTION_CASES, round + 2);
+  const item = pick(GRAPHIC_DISTORTION_CASES, round);
+  return repairDistortionTask(item, round, target);
+}
+
+function repairDistortionTask(item: DistortionCase, round: number, target: number): PracticeTask {
   return {
     ...distortionBase(item, target), mode: "repair",
     prompt: "Which change would repair both the display and its message?",
@@ -688,8 +713,7 @@ export function mediaRepairTask(round: number, target: number): PracticeTask {
   };
 }
 
-export function mediaDefendDistortionTask(round: number, target: number): PracticeTask {
-  const item = pick(DISTORTION_CASES, round + 3);
+function defendDistortionTask(item: DistortionCase, round: number, target: number): PracticeTask {
   return {
     ...distortionBase(item, target), mode: "defend",
     prompt: "Which critique uses the numbers and identifies the distortion?",
@@ -705,10 +729,19 @@ export function mediaDefendDistortionTask(round: number, target: number): Practi
   };
 }
 
-const mediaRepairVariantTask = (round: number, target: number) => mediaRepairTask(round + 2, target);
-const mediaRepairChallengeTask = (round: number, target: number) => mediaRepairTask(round + 4, target);
-const mediaDefendVariantTask = (round: number, target: number) => mediaDefendDistortionTask(round + 2, target);
-const mediaDefendChallengeTask = (round: number, target: number) => mediaDefendDistortionTask(round + 4, target);
+export function mediaDefendDistortionTask(round: number, target: number): PracticeTask {
+  return defendDistortionTask(pick(ALL_DISTORTION_CASES, round), round, target);
+}
+
+function mediaDefendAxisTask(round: number, target: number): PracticeTask {
+  return defendDistortionTask(pick(AXIS_DISTORTION_CASES, round), round, target);
+}
+
+const mediaRepairPictureTask = (round: number, target: number) => repairDistortionTask(pick(PICTURE_DISTORTION_CASES, round), round, target);
+const mediaRepairOmittedTask = (round: number, target: number) => repairDistortionTask(pick(OMITTED_DISTORTION_CASES, round), round, target);
+const mediaRepairWholeTask = (round: number, target: number) => repairDistortionTask(pick(WHOLE_DISTORTION_CASES, round), round, target);
+const mediaDefendPictureTask = (round: number, target: number) => defendDistortionTask(pick(PICTURE_DISTORTION_CASES, round), round, target);
+const mediaDefendOmittedOrWholeTask = (round: number, target: number) => defendDistortionTask(pick([...OMITTED_DISTORTION_CASES, ...WHOLE_DISTORTION_CASES], round), round, target);
 
 // ── W5 Misleading statistics: name the flaw in the representation (ST02) ──────
 type FlawItem = { desc: string; detail: string; flaw: "axis" | "scale" | "cherry" | "total" };
@@ -750,6 +783,28 @@ export function misleadingTask(round: number, target: number): PracticeTask {
   };
 }
 
+const AXIS_FLAW_ROUNDS = [0, 4, 8];
+const GRAPHIC_FLAW_ROUNDS = [1, 2, 3, 5, 6, 7, 9, 10, 11];
+const brokenAxisTeachingTask = (round: number, target: number) => misleadingTask(pick(AXIS_FLAW_ROUNDS, round), target);
+const misleadingGraphicsTeachingTask = (round: number, target: number) => misleadingTask(pick(GRAPHIC_FLAW_ROUNDS, round), target);
+
+function critiqueTeachingTask(round: number, target: number): PracticeTask {
+  return {
+    kind: "statisticaClassify", target,
+    prompt: "What makes a statistical critique convincing?",
+    speakText: "A strong critique uses the actual numbers, identifies the feature that distorts them, and explains how the conclusion should change.",
+    variable: "A graph looks dramatic, but you suspect it is misleading.",
+    examples: "Choose the strongest way to justify your judgement.",
+    options: order([
+      { id: "evidence", label: "Calculate the real result, name the distortion, then explain its effect" },
+      { id: "feeling", label: "Say the graph feels wrong without referring to any values" },
+      { id: "style", label: "Change the colours and assume that makes the conclusion accurate" },
+    ], round),
+    correctOptionIds: ["evidence"],
+    feedback: { correct: "Correct — a defensible critique connects the numbers, the visual choice and the conclusion.", wrong: "A critique needs numerical evidence and a precise explanation of how the representation affects interpretation." },
+  };
+}
+
 // ── Lesson map (18 lessons, 6 weeks) ─────────────────────────────────────────
 const FOCUSED_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
   "y6-statistics-w1-l1": [continuousTeachingTask, valueBetweenTask, measurementPlanTask, measurementPrecisionTask],
@@ -759,9 +814,9 @@ const FOCUSED_GENS: Record<string, [Gen, Gen, Gen, Gen]> = {
   "y6-statistics-w4-l1": [mediaClaimTask, mediaCalculateTask, mediaCompareTask, mediaSupportedConclusionTask],
   "y6-statistics-w4-l2": [mediaClaimTask, mediaMethodTask, mediaRedesignTask, mediaMethodConclusionTask],
   "y6-statistics-w4-l3": [mediaClaimTask, mediaSupportedConclusionTask, mediaMethodConclusionTask, mediaMethodTask],
-  "y6-statistics-w5-l1": [misleadingTask, mediaDistortionTask, mediaQuantifyDistortionTask, mediaDefendDistortionTask],
-  "y6-statistics-w5-l2": [misleadingTask, mediaRepairTask, mediaRepairVariantTask, mediaRepairChallengeTask],
-  "y6-statistics-w5-l3": [misleadingTask, mediaDefendDistortionTask, mediaDefendVariantTask, mediaDefendChallengeTask],
+  "y6-statistics-w5-l1": [brokenAxisTeachingTask, mediaDistortionTask, mediaQuantifyDistortionTask, mediaDefendAxisTask],
+  "y6-statistics-w5-l2": [misleadingGraphicsTeachingTask, mediaRepairPictureTask, mediaRepairOmittedTask, mediaRepairWholeTask],
+  "y6-statistics-w5-l3": [critiqueTeachingTask, mediaDefendAxisTask, mediaDefendPictureTask, mediaDefendOmittedOrWholeTask],
 };
 
 const LESSON_GENS: Record<string, [Gen, Gen, Gen]> = {

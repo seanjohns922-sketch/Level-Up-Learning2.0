@@ -76,7 +76,10 @@ function auditTask(lessonId: string, task: PracticeTask) {
       check(task.data.labels.length === task.data.values.length && task.data.values.length >= 2, `${lessonId}: media evidence data must be complete`);
       check(task.correctOptionIds.length === 1 && ids.has(task.correctOptionIds[0]!), `${lessonId}: media analysis needs one visible answer`);
       check(Boolean(task.speakText), `${lessonId}: media analysis needs read-aloud text`);
-      if (["distortion", "repair", "defend"].includes(task.mode)) check((task.axisMin ?? 0) > 0, `${lessonId}: misleading display must expose its non-zero baseline`);
+      if (task.display === "columns" && ["distortion", "quantify", "repair", "defend"].includes(task.mode)) check((task.axisMin ?? 0) > 0, `${lessonId}: broken-axis display must expose its non-zero baseline`);
+      if (task.display === "pictograph") check(task.data.visualMultipliers?.length === task.data.values.length, `${lessonId}: misleading picture sizes must be visible`);
+      if (task.display === "selected") check(task.data.source?.labels.length === task.data.source?.values.length, `${lessonId}: omitted data must be available for comparison`);
+      if (task.display === "parts") check(task.data.values.reduce((sum, value) => sum + value, 0) !== 100, `${lessonId}: invalid whole must expose a total that is not 100%`);
       break;
     }
     case "statisticaInvestigation": {
