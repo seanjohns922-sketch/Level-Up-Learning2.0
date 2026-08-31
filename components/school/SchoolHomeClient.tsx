@@ -2951,25 +2951,19 @@ export default function SchoolHomeClient({
           ) : null}
 
           {tab === "insights" ? (
-            isAdministrator ? (
-              academicYearId ? (
-                <SchoolAnalyticsDashboard
-                  schoolId={snapshot.school.id}
-                  academicYearId={academicYearId}
-                  classes={filteredClasses}
-                />
-              ) : (
-                <EmptyState
-                  icon={BarChart3}
-                  title="Select an academic year"
-                  detail="School analytics require an academic year before canonical learning evidence can be loaded."
-                />
-              )
+            academicYearId ? (
+              <SchoolAnalyticsDashboard
+                schoolId={snapshot.school.id}
+                academicYearId={academicYearId}
+                classes={filteredClasses}
+                audience={isAdministrator ? "leadership" : "teacher"}
+                teacherClassIds={myClasses.map((classRow) => classRow.id)}
+              />
             ) : (
               <EmptyState
                 icon={BarChart3}
-                title="Class insights are available inside each class"
-                detail="Open a class to view learning trends, assessment summaries and student insights."
+                title="Select an academic year"
+                detail="School analytics require an academic year before canonical learning evidence can be loaded."
               />
             )
           ) : null}

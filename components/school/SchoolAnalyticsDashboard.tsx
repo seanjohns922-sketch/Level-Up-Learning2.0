@@ -45,6 +45,8 @@ type SchoolAnalyticsDashboardProps = {
   classes: Array<
     Pick<SchoolHomeSnapshot["classes"][number], "id" | "name" | "yearLevels">
   >;
+  audience?: "leadership" | "teacher";
+  teacherClassIds?: string[];
 };
 
 const TABS: Array<{ id: AnalyticsTab; label: string }> = [
@@ -62,6 +64,7 @@ const REALMS: Record<string, string> = {
   number: "Number Nexus",
   measurement: "Measurelands",
   space: "Starpath",
+  statistics: "Statistica",
 };
 
 const YEAR_LEVELS = [
@@ -356,6 +359,8 @@ export default function SchoolAnalyticsDashboard({
   schoolId,
   academicYearId,
   classes,
+  audience = "leadership",
+  teacherClassIds = [],
 }: SchoolAnalyticsDashboardProps) {
   const [tab, setTab] = useState<AnalyticsTab>("overview");
   const [days, setDays] = useState(30);
@@ -368,6 +373,7 @@ export default function SchoolAnalyticsDashboard({
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [studentSort, setStudentSort] = useState<"name" | "accuracy" | "activity" | "growth">("name");
   const [studentSearch, setStudentSearch] = useState("");
+  const teacherClassIdSet = useMemo(() => new Set(teacherClassIds), [teacherClassIds]);
 
   const loadAnalytics = useCallback(async () => {
     if (!academicYearId) return;
@@ -594,7 +600,7 @@ export default function SchoolAnalyticsDashboard({
   // Group curriculum evidence by AC9 strand, with an evidence-weighted band
   // distribution per strand (the visual leaders scan first).
   const standingByStrand = useMemo(() => {
-    const students = snapshot?.students ?? [];
+    const students = snapshot?.analysisStudents ?? snapshot?.students ?? [];
     type Counts = Record<LevelStanding, number>;
     const groups = new Map<AcStrand, { strand: AcStrand; label: string; order: number; counts: Counts; total: number; byGrade: Map<string, { counts: Counts; total: number }> }>();
     for (const student of students) {
@@ -620,13 +626,13 @@ export default function SchoolAnalyticsDashboard({
           .map(([grade, value]) => ({ grade, ...value })),
       }))
       .sort((a, b) => a.order - b.order);
-  }, [snapshot?.students]);
+  }, [snapshot?.analysisStudents, snapshot?.students]);
 
   // Placement baseline: where students currently sit per AC9 strand (working
   // level distribution) and their average pre-test starting point. This is the
   // foundation the future weighted overall-maths level builds on.
   const placementByStrand = useMemo(() => {
-    const students = snapshot?.students ?? [];
+    const students = snapshot?.analysisStudents ?? snapshot?.students ?? [];
     const groups = new Map<string, { key: string; label: string; order: number; levels: Map<string, number>; byGrade: Map<string, { levels: Map<string, number>; total: number }>; standings: Record<LevelStanding, number>; standingTotal: number; preSum: number; preCount: number; placed: number }>();
     for (const student of students) {
       for (const realm of student.realms) {
@@ -670,13 +676,13 @@ export default function SchoolAnalyticsDashboard({
         onLevelPct: group.standingTotal ? Math.round(((group.standings.at + group.standings.above) / group.standingTotal) * 100) : null,
       }))
       .sort((a, b) => a.order - b.order);
-  }, [snapshot?.students]);
+  }, [snapshot?.analysisStudents, snapshot?.students]);
 
   // Leadership intervention lens: for each AC9 strand x school year, how many
   // students are below their grade level (aggregate only — no individual
   // grouping/reassignment; that is the teacher surface's job).
   const intervention = useMemo(() => {
-    const students = snapshot?.students ?? [];
+    const students = snapshot?.analysisStudents ?? snapshot?.students ?? [];
     const cells = new Map<string, { strand: AcStrand; year: string; needs: number; total: number }>();
     const yearSet = new Set<string>();
     for (const student of students) {
@@ -699,7 +705,7 @@ export default function SchoolAnalyticsDashboard({
     const totalNeeds = hotspots.reduce((sum, c) => sum + c.needs, 0);
     const maxNeeds = Math.max(1, ...hotspots.map((c) => c.needs));
     return { cells, strands, years, hotspots, totalNeeds, maxNeeds };
-  }, [snapshot?.students]);
+  }, [snapshot?.analysisStudents, snapshot?.students]);
 
   const downloadPlacementPdf = async () => {
     if (!snapshot || placementByStrand.length === 0) return;
@@ -975,6 +981,18 @@ export default function SchoolAnalyticsDashboard({
         </div>
         {loading ? <div className="mt-3 h-1 animate-pulse bg-emerald-300" /> : null}
       </div>
+
+      {audience === "teacher" ? (
+        <div className="flex flex-col gap-2 border-l-4 border-emerald-600 bg-emerald-50 px-4 py-3 text-sm text-emerald-950 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-bold">School view with class-level follow-through</p>
+            <p className="mt-0.5 text-emerald-800">School and class comparisons include the full cohort. Named student evidence is limited to your assigned classes.</p>
+          </div>
+          <button type="button" onClick={() => setTab("classes")} className="inline-flex shrink-0 items-center gap-1 font-bold text-emerald-800">
+            Compare classes <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      ) : null}
 
       <nav className="flex gap-1 overflow-x-auto border-b border-slate-200" aria-label="School analytics views">
         {TABS.map((item) => (
@@ -1311,57 +1329,69 @@ export default function SchoolAnalyticsDashboard({
       ) : null}
 
       {tab === "classes" ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {snapshot.classes.map((item) => {
-            const classActiveRate = item.students
-              ? Math.round((item.activeStudents / item.students) * 100)
-              : 0;
-            return (
-              <button
-                key={item.id ?? item.name}
-                type="button"
-                onClick={() => {
-                  if (item.id) setClassId(item.id);
-                  setTab("students");
-                }}
-                className="border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:border-emerald-500 hover:bg-emerald-50"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <h3 className="font-bold text-slate-950">{item.name}</h3>
-                    <p className="mt-1 text-xs text-slate-500">Open student evidence</p>
-                  </div>
-                  <School className="h-5 w-5 text-emerald-700" />
-                </div>
-                <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                  <div>
-                    <p className="text-slate-500">Active this week</p>
-                    <p className="font-bold">{item.activeStudents} of {item.students} ({classActiveRate}%)</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500">Weekly target</p>
-                    <p className="font-bold">{item.weeklyTargetMet} students</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500">Average accuracy</p>
-                    <p className="font-bold">{formatPercent(item.averageAccuracy)}</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500">Levels mastered</p>
-                    <p className="font-bold">{item.masteredLevels}</p>
-                  </div>
-                  <div className="col-span-2 border-t border-slate-100 pt-3">
-                    <p className="text-slate-500">Matched assessment growth</p>
-                    <p className="font-bold text-emerald-700">{formatPercent(item.averageGrowth, " pts")}</p>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-          {snapshot.classes.length === 0 ? (
-            <p className="text-sm text-slate-500">No classes match these filters.</p>
-          ) : null}
-        </div>
+        <article className="overflow-hidden border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-end justify-between gap-3 p-5">
+            <div>
+              <h3 className="font-bold text-slate-950">Class comparison</h3>
+              <p className="mt-1 text-sm text-slate-500">Compare participation, achievement and growth across the school using the same reporting window.</p>
+            </div>
+            <span className="text-xs font-semibold text-slate-500">{snapshot.classes.length} classes in this view</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.08em] text-slate-500">
+                <tr>
+                  <th className="px-5 py-3">Class</th>
+                  <th className="px-4 py-3 text-right">Students</th>
+                  <th className="px-4 py-3 text-right">Active</th>
+                  <th className="px-4 py-3 text-right">Weekly target</th>
+                  <th className="px-4 py-3 text-right">Accuracy</th>
+                  <th className="px-4 py-3 text-right">Mastered</th>
+                  <th className="px-4 py-3 text-right">Growth</th>
+                  <th className="px-5 py-3"><span className="sr-only">Open comparison</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {snapshot.classes.map((item) => {
+                  const isMyClass = Boolean(item.id && teacherClassIdSet.has(item.id));
+                  const activeRate = item.students ? Math.round((item.activeStudents / item.students) * 100) : 0;
+                  const targetRate = item.students ? Math.round((item.weeklyTargetMet / item.students) * 100) : 0;
+                  return (
+                    <tr key={item.id ?? item.name} className={`border-t border-slate-100 ${isMyClass ? "bg-emerald-50/60" : "hover:bg-slate-50"}`}>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <School className="h-4 w-4 text-emerald-700" />
+                          <span className="font-bold text-slate-950">{item.name}</span>
+                          {isMyClass ? <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-emerald-800">My class</span> : null}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-right font-semibold tabular-nums">{item.students}</td>
+                      <td className="px-4 py-4 text-right"><span className="font-bold tabular-nums">{activeRate}%</span><span className="ml-1 text-xs text-slate-400">({item.activeStudents})</span></td>
+                      <td className="px-4 py-4 text-right"><span className="font-bold tabular-nums">{targetRate}%</span><span className="ml-1 text-xs text-slate-400">({item.weeklyTargetMet})</span></td>
+                      <td className="px-4 py-4 text-right font-bold tabular-nums">{formatPercent(item.averageAccuracy)}</td>
+                      <td className="px-4 py-4 text-right font-semibold tabular-nums">{item.masteredLevels}</td>
+                      <td className="px-4 py-4 text-right font-bold tabular-nums text-emerald-700">{formatPercent(item.averageGrowth, " pts")}</td>
+                      <td className="px-5 py-4 text-right">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (item.id) setClassId(item.id);
+                            setTab(audience === "teacher" && !isMyClass ? "overview" : "students");
+                          }}
+                          className="inline-flex items-center gap-1 font-bold text-emerald-700"
+                        >
+                          {audience === "teacher" && !isMyClass ? "View class trend" : "View students"}
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {snapshot.classes.length === 0 ? <p className="border-t border-slate-100 p-5 text-sm text-slate-500">No classes match these filters.</p> : null}
+        </article>
       ) : null}
 
       {tab === "students" ? (

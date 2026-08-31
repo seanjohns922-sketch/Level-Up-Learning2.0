@@ -167,6 +167,7 @@
     "qa:school-platform-phase2a": "node scripts/school-platform-phase2a-audit.mjs",
     "qa:school-platform-phase2b1": "node scripts/school-platform-phase2b1-audit.mjs",
     "qa:school-analytics-sa1": "node scripts/school-analytics-sa1-audit.mjs",
+    "qa:teacher-school-insights": "node scripts/teacher-school-insights-audit.mjs",
     "qa:school-invitation-email": "node scripts/school-invitation-email-audit.mjs",
     "qa:platform-admin-pa1": "node scripts/platform-admin-pa1-audit.mjs",
     "qa:platform-admin-pa2": "node scripts/platform-admin-pa2-audit.mjs",

@@ -199,6 +199,14 @@ export type SchoolAnalyticsSnapshot = {
     averageAccuracy: number | null;
     averageGrowth: number | null;
   }>;
+  analysisStudents: Array<{
+    yearLevel: string | null;
+    realms: Array<{
+      realmId: string;
+      currentLevel: string | null;
+      pretestScore: number | null;
+    }>;
+  }>;
   students: Array<{
     id: string;
     name: string;
