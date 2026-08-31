@@ -271,24 +271,29 @@ export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onCha
 function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "left" | "right"; label: string; dataAttribute: "move" | "look"; onChange: (input: { x: number; y: number; magnitude: number }) => void }) {
   const baseRef = useRef<HTMLDivElement>(null);
   const pointerIdRef = useRef<number | null>(null);
+  const onChangeRef = useRef(onChange);
   const [knob, setKnob] = useState({ x: 0, y: 0, active: false });
   const maxTravel = 37;
   const deadZone = 0.12;
 
   useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
     const stop = () => {
       pointerIdRef.current = null;
       setKnob({ x: 0, y: 0, active: false });
-      onChange({ x: 0, y: 0, magnitude: 0 });
+      onChangeRef.current({ x: 0, y: 0, magnitude: 0 });
     };
     window.addEventListener("blur", stop);
     document.addEventListener("visibilitychange", stop);
     return () => {
       window.removeEventListener("blur", stop);
       document.removeEventListener("visibilitychange", stop);
-      onChange({ x: 0, y: 0, magnitude: 0 });
+      onChangeRef.current({ x: 0, y: 0, magnitude: 0 });
     };
-  }, [onChange]);
+  }, []);
 
   function update(clientX: number, clientY: number) {
     const base = baseRef.current;
@@ -305,7 +310,7 @@ function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "
     const rawMagnitude = Math.min(1, distance / maxTravel);
     const magnitude = rawMagnitude <= deadZone ? 0 : (rawMagnitude - deadZone) / (1 - deadZone);
     setKnob({ x, y, active: true });
-    onChange({ x: magnitude ? normalizedX : 0, y: magnitude ? normalizedY : 0, magnitude });
+    onChangeRef.current({ x: magnitude ? normalizedX : 0, y: magnitude ? normalizedY : 0, magnitude });
   }
 
   function release(event?: React.PointerEvent<HTMLDivElement>) {
@@ -313,7 +318,7 @@ function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "
     if (event && baseRef.current?.hasPointerCapture(event.pointerId)) baseRef.current.releasePointerCapture(event.pointerId);
     pointerIdRef.current = null;
     setKnob({ x: 0, y: 0, active: false });
-    onChange({ x: 0, y: 0, magnitude: 0 });
+    onChangeRef.current({ x: 0, y: 0, magnitude: 0 });
   }
 
   return (

@@ -37,6 +37,11 @@ check(world.includes("WorldLookJoystick") && world.includes("lookInput"), "Centr
 check(sharedPlayer.includes("analogX") && sharedPlayer.includes("analogY") && sharedPlayer.includes("magnitude"), "Analog camera-relative movement is missing");
 check(sharedPlayer.includes('event.pointerType === "touch"') && sharedPlayer.includes("yaw.current -= lookX"), "Touch camera look must use the right joystick instead of canvas dragging");
 check(sharedPlayer.includes("setPointerCapture") && sharedPlayer.includes('touchAction: "none"'), "Joystick pointer capture or iPad touch protection is missing");
+check(
+  sharedPlayer.includes("onChangeRef.current = onChange")
+    && /document\.addEventListener\("visibilitychange", stop\);[\s\S]*?\}, \[\]\);/.test(sharedPlayer),
+  "Joystick input must not reset when its parent callback changes during an iPad drag",
+);
 check(world.includes("__LEVEL_UP_CENTRAL_WORLD_3D_METRICS__"), "Central-world metrics hook is missing");
 check(config.includes('towerMainEntrance: "tower-main-entrance"'), "Semantic Tower entrance anchor is missing");
 check(config.includes('towerExitSpawn: "tower-exit-spawn"'), "Semantic Tower exit anchor is missing");
