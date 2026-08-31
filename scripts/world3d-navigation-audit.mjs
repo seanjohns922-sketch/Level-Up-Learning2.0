@@ -23,7 +23,7 @@ check(number.includes("<WorldHUD") && number.includes('context="realm"'), "Numbe
 check(hud.includes("fetchStudentEconomy") && hud.includes('router.push("/profile")'), "Compact canonical XP/profile controls are incomplete");
 check(hud.includes("resolveWorldJourney") && journey.includes("resolveContinueLearningRoute"), "Current Mission and Quick Start do not share canonical journey resolution");
 check(hud.includes("resolveTowerRealmEntry") && hud.includes("TOWER_REALM_PORTALS"), "Realm Teleport does not share Tower realm resolution");
-check(hud.includes("2D VIEW") && hud.includes("REALM TELEPORT") && hud.includes("QUICK START"), "Required fast and fallback actions are missing");
+check(hud.includes("2D VIEW") && hud.includes("REALMS") && hud.includes("QUICK START"), "Required fast and fallback actions are missing");
 check(interaction.includes("location") && interaction.includes("action"), "Shared environmental interaction presentation is missing");
 check(central.includes("WorldInteractionPrompt") && tower.includes("WorldInteractionPrompt") && number.includes("WorldInteractionPrompt"), "Worlds are not sharing interaction presentation");
 check(!number.includes("TeleportPanel") && !number.includes("CLASS BEST") && !number.includes("LEVEL 4"), "Obsolete Number Nexus 3D dashboard controls remain");

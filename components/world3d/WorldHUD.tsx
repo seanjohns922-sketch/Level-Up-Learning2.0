@@ -128,10 +128,10 @@ export function WorldHUD({
   const primaryActionSpeech = primaryAction ? `${primaryAction.label}. Button.` : null;
   const worldActionsSpeech = joinSpeechParts([
     "World actions",
-    primaryActionSpeech,
-    "Realm Teleport. Opens fast travel to the learning realms.",
     quickStartBusy ? "Quick Start is opening" : `Quick Start. ${journey.activityLabel}`,
-    "2D View. Opens the normal map view.",
+    "Realms. Opens fast travel to the learning realms.",
+    context === "central" ? primaryActionSpeech : null,
+    context === "central" ? null : "2D View. Opens the normal map view.",
   ]);
 
   return (
@@ -154,15 +154,30 @@ export function WorldHUD({
 
         <nav className="worldHudActions" aria-label="World actions">
           <WorldVoiceButton text={worldActionsSpeech} className="worldHudActionRead" label="Read world actions" />
-          {primaryAction ? (
-            <button type="button" className={`worldHudSecondary ${primaryAction.icon === "edit" ? "worldHudEdit" : ""}`} onClick={primaryAction.onClick}>
-              {primaryAction.icon === "map" ? <Map size={17} /> : primaryAction.icon === "edit" ? <Hammer size={17} /> : <DoorOpen size={17} />}{primaryAction.label}
-            </button>
-          ) : null}
-          <button type="button" className="worldHudSecondary" onClick={() => setTeleportOpen(true)}><Sparkles size={17} />REALM TELEPORT</button>
-          <button type="button" className="worldHudQuick" disabled={quickStartBusy} onClick={() => void quickStart()}><Play size={17} />{quickStartBusy ? "OPENING..." : "QUICK START"}</button>
-          <button type="button" className="worldHudFallback" onClick={() => router.push(fallbackHref)}><Map size={17} />2D VIEW</button>
+          {context === "central" ? (
+            <>
+              {/* Central hub: one clear hero pair. Build (Edit World) sits apart at
+                  bottom-left, and Go/View controls live in their own cluster. */}
+              <button type="button" className="worldHudQuick" disabled={quickStartBusy} onClick={() => void quickStart()}><Play size={17} />{quickStartBusy ? "OPENING..." : "QUICK START"}</button>
+              <button type="button" className="worldHudSecondary" onClick={() => setTeleportOpen(true)}><Sparkles size={17} />REALMS</button>
+            </>
+          ) : (
+            <>
+              {primaryAction ? (
+                <button type="button" className={`worldHudSecondary ${primaryAction.icon === "edit" ? "worldHudEdit" : ""}`} onClick={primaryAction.onClick}>
+                  {primaryAction.icon === "map" ? <Map size={17} /> : primaryAction.icon === "edit" ? <Hammer size={17} /> : <DoorOpen size={17} />}{primaryAction.label}
+                </button>
+              ) : null}
+              <button type="button" className="worldHudSecondary" onClick={() => setTeleportOpen(true)}><Sparkles size={17} />REALMS</button>
+              <button type="button" className="worldHudQuick" disabled={quickStartBusy} onClick={() => void quickStart()}><Play size={17} />{quickStartBusy ? "OPENING..." : "QUICK START"}</button>
+              <button type="button" className="worldHudFallback" onClick={() => router.push(fallbackHref)}><Map size={17} />2D VIEW</button>
+            </>
+          )}
         </nav>
+
+        {context === "central" && primaryAction ? (
+          <button type="button" className="worldHudBuild" onClick={primaryAction.onClick} aria-label={primaryAction.label}><Hammer size={17} />{primaryAction.label}</button>
+        ) : null}
       </div>
 
       {teleportOpen ? (
@@ -195,9 +210,10 @@ export function WorldHUD({
         .worldHudIdentity{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));display:flex;gap:7px;pointer-events:auto}.worldHudXp,.worldHudIcon{height:40px;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:rgba(24,22,21,.82);color:#fff4dd;box-shadow:0 8px 22px rgba(0,0,0,.22);backdrop-filter:blur(9px)}.worldHudXp{display:flex;align-items:center;gap:6px;padding:0 8px 0 11px;font-size:12px;font-weight:900}.worldHudXp svg{color:var(--world-accent)}.worldHudXp .worldVoiceButton{margin-left:2px}.worldHudIcon{width:40px;display:grid;place-items:center;cursor:pointer}
         .worldHudActions{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(70px,calc(env(safe-area-inset-bottom) + 64px));display:flex;align-items:center;justify-content:flex-end;gap:7px;pointer-events:auto}.worldHudActions button:not(.worldVoiceButton){min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:5px;padding:9px 12px;font-size:12px;font-weight:950;cursor:pointer;white-space:nowrap}.worldHudSecondary,.worldHudFallback{border:1px solid rgba(255,235,195,.3);background:rgba(24,22,21,.88);color:#fff5df}.worldHudQuick{border:1px solid color-mix(in srgb,var(--world-accent),#fff 20%);background:var(--world-accent);color:#1d2422}.worldHudFallback{padding-inline:10px!important}.worldHudActions button:disabled{opacity:.65;cursor:default}
         .worldHud[data-world-hud="central"] .worldHudActions{left:50%;right:auto;transform:translateX(-50%);max-width:calc(100vw - 340px)}
+        .worldHudBuild{position:absolute;left:max(16px,env(safe-area-inset-left));bottom:max(70px,calc(env(safe-area-inset-bottom) + 64px));pointer-events:auto;min-height:42px;display:inline-flex;align-items:center;gap:7px;border-radius:5px;padding:9px 12px;font-size:12px;font-weight:950;cursor:pointer;border:1px solid rgba(255,235,195,.28);background:rgba(24,22,21,.62);color:#fff5df;backdrop-filter:blur(9px)}
         .worldHudActionRead{border-radius:5px!important}.worldTeleportBackdrop{position:absolute;inset:0;z-index:50;display:grid;place-items:center;padding:18px;background:rgba(10,10,12,.72);backdrop-filter:blur(8px)}.worldTeleportPanel{width:min(760px,100%);max-height:min(760px,calc(100dvh - 36px));overflow:auto;border:1px solid rgba(238,206,148,.35);border-radius:7px;padding:18px;background:#241d1a;color:#fff3dc;box-shadow:0 28px 70px rgba(0,0,0,.5)}.worldTeleportPanel header{display:flex;align-items:center;justify-content:space-between;gap:14px}.worldTeleportPanel header span{color:#efc677;font-size:10px;font-weight:950;letter-spacing:.16em}.worldTeleportPanel h2{margin:3px 0 0;font-size:24px}.worldTeleportHeaderActions{display:flex;align-items:center;gap:8px}.worldTeleportPanel header button:not(.worldVoiceButton){width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:#332722;color:#fff;cursor:pointer}.worldTeleportGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:16px}.worldTeleportTile{position:relative;min-height:118px;border:1px solid;border-radius:5px;padding:13px 48px 46px 13px;background:rgba(12,14,15,.5);color:#fff;text-align:left}.worldTeleportTileRead{position:absolute;right:10px;top:10px}.worldTeleportTileDisabled{opacity:.56}.worldTeleportTile>button:not(.worldVoiceButton){position:absolute;left:13px;right:13px;bottom:10px;height:30px;border:1px solid rgba(255,235,195,.22);border-radius:5px;background:rgba(255,244,221,.1);color:#fff4dd;font-size:11px;font-weight:950;cursor:pointer}.worldTeleportTile>button:disabled{cursor:default}.worldTeleportGrid strong,.worldTeleportGrid span,.worldTeleportGrid small{display:block}.worldTeleportGrid strong{font-size:16px}.worldTeleportGrid span{margin-top:4px;font-size:10px;font-weight:900;letter-spacing:.08em}.worldTeleportGrid small{margin-top:13px;font-size:11px;font-weight:900}.worldTeleportPanel p{margin:12px 0 0;color:#ffdca0;font-weight:800}
         @media(max-width:900px){.worldHudMission{top:max(68px,calc(env(safe-area-inset-top) + 54px));width:275px}.worldHudActions{bottom:max(78px,calc(env(safe-area-inset-bottom) + 70px));max-width:calc(100vw - 120px);flex-wrap:wrap}.worldHudActions button:not(.worldVoiceButton){min-height:46px}.worldHudFallback{font-size:0!important;width:46px;padding:0!important}.worldHudFallback svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-        @media(max-width:560px){.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHud[data-world-hud="central"] .worldHudActions{top:max(164px,calc(env(safe-area-inset-top) + 158px));bottom:auto;max-width:calc(100vw - 20px)}.worldHudActions button:not(.worldVoiceButton){padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary.worldHudEdit{width:auto!important;padding:8px 9px!important;font-size:11px!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
+        @media(max-width:560px){.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHud[data-world-hud="central"] .worldHudActions{top:max(164px,calc(env(safe-area-inset-top) + 158px));bottom:auto;max-width:calc(100vw - 20px)}.worldHudBuild{left:10px;bottom:auto;top:max(214px,calc(env(safe-area-inset-top) + 208px));font-size:11px;padding:8px 9px}.worldHudActions button:not(.worldVoiceButton){padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary.worldHudEdit{width:auto!important;padding:8px 9px!important;font-size:11px!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
       `}</style>
     </>
   );
