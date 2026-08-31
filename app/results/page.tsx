@@ -20,6 +20,7 @@ import { buildLessonRoute } from "@/lib/lesson-routing";
 import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getWorld3DReturnPathForPosttest } from "@/lib/world3d/return-context";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
 const POSTTEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
 const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 
@@ -54,6 +55,7 @@ function getNextYearLabel(year: string) {
 function getRealmHomeRoute(realmId?: string | null): string {
   if (realmId === "measurement") return "/measurelands";
   if (realmId === "space") return "/starpath?realm_id=space&level=ground";
+  if (realmId === "statistics") return "/statistica";
   return "/levels";
 }
 
@@ -272,7 +274,7 @@ function ResultsPage() {
   const year = sp.get("year") ?? "Year 3";
   const realmId = sp.get("realm_id") ?? undefined;
   const progressRealmId =
-    realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : "number";
+    (realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : "number") as LiveRealmId;
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const realmParam = realmId ? `&realm_id=${encodeURIComponent(realmId)}` : "";

@@ -617,6 +617,10 @@ function ProgramPage() {
       router.push(buildStarpathWeeklyQuizHref({ selectedLevel: starpathProgram.definition.id }, weekNum));
       return;
     }
+    if (isStatisticsRealm && item.type === "quiz") {
+      router.push(`/statistica/quiz/${encodeURIComponent(curriculumYear)}/${weekNum}`);
+      return;
+    }
     if (isStarpathRealm && starpathProgram && item.type === "posttest") {
       router.push(buildStarpathPostTestPageHref({ selectedLevel: starpathProgram.definition.id }));
       return;
@@ -1309,7 +1313,7 @@ function ProgramPage() {
                               </p>
                               <button
                                 type="button"
-                                onClick={() => router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}${isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`)}
+                                onClick={() => router.push(`/posttest?year=${encodeURIComponent(curriculumYear)}${realmId !== "number" ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`)}
                                 className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.16em] text-white"
                                 style={{
                                   background: isMeasurementRealm

@@ -45,12 +45,13 @@ type StudentRuntimeContextRow = {
   last_name?: string | null;
 };
 
-export type StudentProgressRealmId = LiveRealmId;
+export type StudentProgressRealmId = LiveRealmId | "statistics";
 
 const REALM_PROGRAM_SUFFIX: Record<StudentProgressRealmId, string> = {
   number: "number",
   measurement: "measurelands",
   space: "starpath",
+  statistics: "statistica",
 };
 
 function realmProgramKey(year: string, realmId: StudentProgressRealmId) {
@@ -59,7 +60,7 @@ function realmProgramKey(year: string, realmId: StudentProgressRealmId) {
 
 function quizIdForRealm(year: string, week: number, realmId: StudentProgressRealmId) {
   const yearNumber = parseInt(year.replace(/\D/g, ""), 10) || 0;
-  const segment = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : "number";
+  const segment = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : "number";
   return `y${yearNumber}-${segment}-w${week}-quiz`;
 }
 
@@ -252,7 +253,7 @@ export async function restoreStudentStateFromServer(
       unlockedLegends: [],
       teacherAdvancedWeeks: [],
     };
-    writeProgress(progress, realmId);
+    if (realmId !== "statistics") writeProgress(progress, realmId);
     return { rows: [] as StudentProgressSnapshotRow[], progress, introSeen: true };
   }
 
@@ -284,9 +285,9 @@ export async function restoreStudentStateFromServer(
   const progress = buildStudentProgress(primaryRow);
   assertActiveRestoreStudent(studentId);
   if (progress) {
-    writeProgress(progress, realmId);
+    if (realmId !== "statistics") writeProgress(progress, realmId);
   }
-  hydrateProgramStore(compatRows, realmId);
+  if (realmId !== "statistics") hydrateProgramStore(compatRows, realmId);
 
   return { rows: compatRows, progress, introSeen };
 }

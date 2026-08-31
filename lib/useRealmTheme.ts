@@ -171,10 +171,40 @@ const STARPATH: RealmTheme = {
   confetti: ["#67e8f9", "#a78bfa", "#f0abfc", "#fde68a", "#22d3ee"],
 };
 
+const STATISTICA: RealmTheme = {
+  ...NUMBER_NEXUS,
+  realmId: "statistics",
+  ctaFrom: "#a83e4b",
+  ctaTo: "#f2bc45",
+  ctaHoverFrom: "#c74f4b",
+  ctaHoverTo: "#f6cc70",
+  ctaGradientClass: "bg-gradient-to-r from-[#a83e4b] to-[#f2bc45]",
+  ctaHoverGradientClass: "hover:from-[#c74f4b] hover:to-[#f6cc70]",
+  ctaGradientCss: "linear-gradient(135deg, #8e3341 0%, #e85d63 55%, #f2bc45 100%)",
+  ctaShadow: "0 10px 30px -8px rgba(232,93,99,0.46)",
+  accentText: "#f2bc45",
+  accentTextSoft: "rgba(255,244,223,0.86)",
+  borderRing: "rgba(242,188,69,0.38)",
+  surfaceTint: "rgba(32,180,134,0.08)",
+  haloA: "rgba(32,180,134,0.14)",
+  haloB: "rgba(240,107,100,0.13)",
+  haloC: "rgba(242,188,69,0.08)",
+  passRing: "#20b486",
+  passRingGlow: "#f2bc45",
+  cardSurface: "linear-gradient(135deg, #101d15 0%, #163a32 52%, #51312b 100%)",
+  chipBorder: "rgba(242,188,69,0.34)",
+  chipBg: "rgba(240,107,100,0.12)",
+  chipText: "#fff4df",
+  trophyGradient: "radial-gradient(circle at 35% 30%, #f2bc45 0%, #20b486 58%, #163a32 100%)",
+  statIcon: "#f2bc45",
+  confetti: ["#20b486", "#f2bc45", "#f06b64", "#6c63d9", "#fff4df"],
+};
+
 /** Pure resolver — safe in SSR, client, server components. */
 export function getRealmTheme(realmId?: string | null): RealmTheme {
   if (realmId === "measurement") return MEASURELANDS;
   if (realmId === "space") return STARPATH;
+  if (realmId === "statistics") return STATISTICA;
   return NUMBER_NEXUS;
 }
 
@@ -186,4 +216,4 @@ export function useRealmTheme(realmId?: string | null): RealmTheme {
   return getRealmTheme(realmId);
 }
 
-export const REALM_THEME_TOKENS = { NUMBER_NEXUS, MEASURELANDS, STARPATH };
+export const REALM_THEME_TOKENS = { NUMBER_NEXUS, MEASURELANDS, STARPATH, STATISTICA };

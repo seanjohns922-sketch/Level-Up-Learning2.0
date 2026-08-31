@@ -38,6 +38,8 @@ export type StarpathVoyageQuizMeta = {
   nextWeekHref?: string;
 };
 
+type VoyageQuizRealm = "space" | "statistics";
+
 type QuizPhase = "home" | "quiz" | "results" | "review";
 
 type SavedVoyageQuiz = {
@@ -69,15 +71,20 @@ function newCompletionKey() {
 export default function StarpathVoyageQuiz({
   quiz,
   tasks,
+  realm = "space",
 }: {
   quiz: StarpathVoyageQuizMeta;
   tasks: PracticeTask[];
+  realm?: VoyageQuizRealm;
 }) {
   const router = useRouter();
-  const theme = REALM_QUIZ_THEMES.space;
+  const theme = REALM_QUIZ_THEMES[realm];
+  const isStatistica = realm === "statistics";
+  const unitLabel = isStatistica ? "lesson" : "mission";
+  const realmTitle = isStatistica ? "Statistica Data Quiz" : "Starpath Voyage Quiz";
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
   const answersAreEditable = true;
-  const storageKey = `starpath-voyage-quiz:v2:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
+  const storageKey = `${realm}-weekly-quiz:v2:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
   const [order, setOrder] = useState<number[]>(() => tasks.map((_, index) => index));
@@ -116,7 +123,7 @@ export default function StarpathVoyageQuiz({
   const wrongIndexes = orderedTasks
     .map((_, questionIndex) => questionIndex)
     .filter((questionIndex) => answers[String(questionIndex)] === false);
-  const quizIntroduction = `${quiz.title}. Great work completing this week's missions! It is time to show what you discovered across all three missions. There are 15 questions, with five questions from each mission. The quiz takes approximately 8 to 10 minutes. Work at your own pace. The pass mark is 80 percent. You can earn ${QUIZ_XP} XP, chain progress, and gems.`;
+  const quizIntroduction = `${quiz.title}. Great work completing this week's ${unitLabel}s! It is time to show what you discovered across all three ${unitLabel}s. There are 15 questions, with five questions from each ${unitLabel}. The quiz takes approximately 8 to 10 minutes. Work at your own pace. The pass mark is 80 percent. You can earn ${QUIZ_XP} XP, chain progress, and gems.`;
 
   useEffect(() => {
     try {
@@ -198,13 +205,13 @@ export default function StarpathVoyageQuiz({
     const replaySources: ReplayQuestionSource[] = orderedTasks.map((quizTask, questionIndex) => {
       const lessonIndex = Math.min(2, Math.floor(questionIndex / 5));
       return {
-        id: `${quiz.level}-space-w${quiz.week}-quiz-q${questionIndex + 1}`,
+        id: `${quiz.level}-${realm}-w${quiz.week}-quiz-q${questionIndex + 1}`,
         prompt: taskPrompt(quizTask),
         type: "practiceTask",
         correctAnswer: "Correct response",
         skillId: quiz.lessonSkillIds[lessonIndex][0],
         skillLabel: quiz.lessonTitles[lessonIndex],
-        strand: "Space",
+        strand: isStatistica ? "Statistics" : "Space",
         curriculumCodes: quiz.lessonCurriculumCodes[lessonIndex],
         linkedWeeks: [quiz.week],
         linkedLessons: [lessonIndex + 1],
@@ -225,10 +232,12 @@ export default function StarpathVoyageQuiz({
 
     try {
       const passedQuiz = weeklyQuizPassed(finalPercent);
-      writeStarpathDemoJourney(quiz.level, {
-        currentWeek: passedQuiz ? Math.min(8, quiz.week + 1) : quiz.week,
-        currentLesson: passedQuiz ? 0 : 3,
-      });
+      if (!isStatistica) {
+        writeStarpathDemoJourney(quiz.level, {
+          currentWeek: passedQuiz ? Math.min(8, quiz.week + 1) : quiz.week,
+          currentLesson: passedQuiz ? 0 : 3,
+        });
+      }
       if (studentId) {
         await saveNumberWeeklyQuizAttempt(
           studentId,
@@ -254,7 +263,7 @@ export default function StarpathVoyageQuiz({
             at: completedAt,
           },
           newCompletionKey(),
-          "space"
+          realm
         );
       }
       localStorage.removeItem(storageKey);
@@ -262,7 +271,7 @@ export default function StarpathVoyageQuiz({
       setFinalScore(score);
       setPhase("results");
     } catch (error) {
-      console.warn("[Starpath] Voyage Quiz persist failed", error);
+      console.warn(`[${isStatistica ? "Statistica" : "Starpath"}] Weekly quiz persist failed`, error);
       window.alert("We couldn't save this quiz yet. Please try again.");
     } finally {
       setSaving(false);
@@ -286,7 +295,7 @@ export default function StarpathVoyageQuiz({
     <main className="relative isolate min-h-screen px-3 py-4 text-white sm:px-6">
       <div className="mx-auto w-full max-w-[1200px]">
         <RealmWeeklyQuizChrome
-          realm="space"
+          realm={realm}
           levelNumber={levelNumber}
           levelLabel={quiz.levelLabel}
           year={quiz.level}
@@ -303,40 +312,40 @@ export default function StarpathVoyageQuiz({
         >
           {phase === "home" ? (
             <div className="mx-auto max-w-4xl">
-              <div className="overflow-hidden rounded-lg border border-violet-300 bg-[#111735] shadow-xl">
+              <div className="overflow-hidden rounded-lg border shadow-xl" style={{ borderColor: theme.panelBorder, background: isStatistica ? "#163a32" : "#111735" }}>
                 <div className="relative px-6 py-9 text-white sm:px-10">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(139,92,246,0.38),transparent_34%),radial-gradient(circle_at_82%_28%,rgba(34,211,238,0.28),transparent_30%)]" />
+                  <div className={isStatistica ? "absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(240,107,100,0.28),transparent_34%),radial-gradient(circle_at_82%_28%,rgba(242,188,69,0.22),transparent_30%)]" : "absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(139,92,246,0.38),transparent_34%),radial-gradient(circle_at_82%_28%,rgba(34,211,238,0.28),transparent_30%)]"} />
                   <div className="relative">
-                    <div className="font-mono text-xs font-black uppercase tracking-[0.2em] text-cyan-200">
-                      Starpath Voyage Quiz
+                    <div className="font-mono text-xs font-black uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
+                      {realmTitle}
                     </div>
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <h1 className="text-3xl font-black sm:text-5xl">{quiz.title}</h1>
                       <ReadAloudBtn
                         text={quizIntroduction}
-                        speechKey={`starpath-voyage-quiz-${quiz.level}-${quiz.week}`}
+                        speechKey={`${realm}-weekly-quiz-${quiz.level}-${quiz.week}`}
                         size="md"
                         label="Read quiz"
-                        className="border-cyan-200/30 bg-indigo-950/70 text-cyan-100 hover:border-cyan-200 hover:text-white"
+                        className={isStatistica ? "border-amber-200/30 bg-emerald-950/60 text-amber-50 hover:border-amber-200 hover:text-white" : "border-cyan-200/30 bg-indigo-950/70 text-cyan-100 hover:border-cyan-200 hover:text-white"}
                       />
                     </div>
-                    <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-violet-100">
-                      Great work completing this week&apos;s missions! It&apos;s time to show what you discovered across all three missions.
+                    <p className="mt-4 max-w-2xl text-base font-semibold leading-7" style={{ color: theme.accentSoft }}>
+                      Great work completing this week&apos;s {unitLabel}s! It&apos;s time to show what you discovered across all three {unitLabel}s.
                     </p>
                   </div>
                 </div>
 
-                <div className="grid gap-4 border-t border-white/10 bg-[#0b1029] p-5 sm:grid-cols-4 sm:p-7">
+                <div className="grid gap-4 border-t border-white/10 p-5 sm:grid-cols-4 sm:p-7" style={{ background: isStatistica ? "#101d15" : "#0b1029" }}>
                   {[
-                    { icon: BookOpen, value: "15 questions", label: "Five from each mission" },
+                    { icon: BookOpen, value: "15 questions", label: `Five from each ${unitLabel}` },
                     { icon: Clock3, value: "8–10 minutes", label: "Work at your own pace" },
                     { icon: Trophy, value: "80% pass mark", label: "Show your mastery" },
                     { icon: Gem, value: `${QUIZ_XP} XP`, label: "Plus chain and gems" },
                   ].map(({ icon: Icon, value, label }) => (
                     <div key={value} className="rounded-lg border border-white/10 bg-white/5 p-4 text-white">
-                      <Icon className="h-6 w-6 text-cyan-300" />
+                      <Icon className="h-6 w-6" style={{ color: theme.accent }} />
                       <div className="mt-3 font-black">{value}</div>
-                      <div className="mt-1 text-sm text-violet-200">{label}</div>
+                      <div className="mt-1 text-sm" style={{ color: theme.accentSoft }}>{label}</div>
                     </div>
                   ))}
                 </div>
@@ -345,7 +354,8 @@ export default function StarpathVoyageQuiz({
               <button
                 type="button"
                 onClick={beginQuiz}
-                className="mx-auto mt-6 flex min-h-14 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-cyan-500 px-8 text-lg font-black text-white shadow-lg transition hover:brightness-110 active:scale-[0.98]"
+                className="mx-auto mt-6 flex min-h-14 items-center justify-center gap-2 rounded-lg px-8 text-lg font-black text-white shadow-lg transition hover:brightness-110 active:scale-[0.98]"
+                style={{ background: isStatistica ? "linear-gradient(90deg, #a83e4b, #e85d63 58%, #f2bc45)" : "linear-gradient(90deg, #7c3aed, #06b6d4)" }}
               >
                 <Sparkles className="h-5 w-5" />
                 {hasResume ? "Resume Quiz" : "Begin Quiz"}
@@ -356,17 +366,17 @@ export default function StarpathVoyageQuiz({
           {phase === "quiz" ? (
             <div className="mx-auto max-w-3xl">
               <div className="mb-5 flex items-center justify-between gap-3">
-                <span className="font-mono text-xs font-black uppercase tracking-[0.16em] text-violet-800">
+                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: isStatistica ? "#8e3341" : "#5b21b6" }}>
                   Question {index + 1} of {total}
                 </span>
-                <span className="font-mono text-xs font-black uppercase tracking-[0.16em] text-cyan-700">
+                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: isStatistica ? "#13785f" : "#0e7490" }}>
                   {answeredCount} answered
                 </span>
               </div>
-              <div className="mb-6 h-2 overflow-hidden rounded-full bg-violet-100">
+              <div className="mb-6 h-2 overflow-hidden rounded-full" style={{ background: isStatistica ? "#dcebd6" : "#ede9fe" }}>
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 transition-all duration-300"
-                  style={{ width: `${total ? (answeredCount / total) * 100 : 0}%` }}
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{ width: `${total ? (answeredCount / total) * 100 : 0}%`, background: isStatistica ? "linear-gradient(90deg, #20b486, #f2bc45)" : "linear-gradient(90deg, #8b5cf6, #22d3ee)" }}
                 />
               </div>
 
@@ -458,7 +468,7 @@ export default function StarpathVoyageQuiz({
                 <span className="text-3xl font-black">{percent}%</span>
               </div>
               <h2 className="mt-5 text-3xl font-black text-slate-950">
-                {passed ? "Voyage complete!" : "Keep exploring!"}
+                {passed ? (isStatistica ? "Data check complete!" : "Voyage complete!") : "Keep exploring!"}
               </h2>
               <p className="mt-2 text-base font-semibold text-slate-600">
                 You answered {finalScore}/{total} correctly.
@@ -483,7 +493,7 @@ export default function StarpathVoyageQuiz({
                     ].join(" ")}
                   >
                     <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-violet-700">
-                      Mission {result.lesson}
+                      {isStatistica ? "Lesson" : "Mission"} {result.lesson}
                     </div>
                     <div className="mt-2 text-2xl font-black text-slate-950">{result.score}/5</div>
                     <div className="mt-1 text-sm font-bold text-slate-700">{result.title}</div>
@@ -497,7 +507,7 @@ export default function StarpathVoyageQuiz({
                   </div>
                   <p className="mt-2 font-bold text-slate-900">
                     Return to {weakestLessons
-                      .map((result) => `Mission ${result.lesson}: ${result.title}`)
+                      .map((result) => `${isStatistica ? "Lesson" : "Mission"} ${result.lesson}: ${result.title}`)
                       .join(" and ")} for more practice.
                   </p>
                 </div>
@@ -559,7 +569,7 @@ export default function StarpathVoyageQuiz({
                               taskFeedback(reviewTask)?.wrong ??
                               "Review this question and try the quiz again.",
                           })}
-                          speechKey={`starpath-quiz-review:${quiz.level}:${quiz.week}:${questionIndex}`}
+                          speechKey={`${realm}-quiz-review:${quiz.level}:${quiz.week}:${questionIndex}`}
                           label="Read feedback"
                           className="shrink-0 border-rose-200 bg-white text-rose-800"
                         />

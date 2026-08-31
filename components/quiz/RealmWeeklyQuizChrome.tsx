@@ -1,13 +1,13 @@
 "use client";
 
-import { ArrowLeft, Orbit, Ruler, Zap } from "lucide-react";
+import { ArrowLeft, ChartNoAxesColumnIncreasing, Orbit, Ruler, Zap } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { getRealmLessonArtwork } from "@/components/lesson/RealmLessonHome";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
-export type RealmQuizThemeId = LiveRealmId;
+export type RealmQuizThemeId = LiveRealmId | "statistics";
 
 export const REALM_QUIZ_THEMES = {
   number: {
@@ -57,6 +57,22 @@ export const REALM_QUIZ_THEMES = {
       "linear-gradient(180deg, rgba(7,10,27,0.62), rgba(7,10,27,0.94))",
     workspaceBg: "linear-gradient(180deg, #f8f7ff 0%, #eefcff 100%)",
     ThemeIcon: Orbit,
+  },
+  statistics: {
+    realmName: "Statistica",
+    quizName: "Data Quiz",
+    eyebrow: "Statistica Evidence Check",
+    pageBg: "#14231d",
+    shellBg: "rgba(18, 49, 42, 0.96)",
+    panelBorder: "rgba(242, 188, 69, 0.3)",
+    accent: "#f06b64",
+    accentSoft: "#fff4df",
+    heroOverlay:
+      "linear-gradient(90deg, rgba(18,49,42,0.97) 0%, rgba(35,67,55,0.82) 48%, rgba(35,67,55,0.22) 100%)",
+    backdropOverlay:
+      "linear-gradient(180deg, rgba(18,49,42,0.38), rgba(20,35,29,0.9))",
+    workspaceBg: "linear-gradient(180deg, #fffaf0 0%, #edf5e8 100%)",
+    ThemeIcon: ChartNoAxesColumnIncreasing,
   },
 } as const satisfies Record<RealmQuizThemeId, object>;
 
@@ -112,6 +128,8 @@ export function RealmWeeklyQuizChrome({
           />
         ) : realm === "space" ? (
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_18%,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_28%_38%,rgba(139,92,246,0.18),transparent_34%)]" />
+        ) : realm === "statistics" ? (
+          <div className="absolute inset-0 opacity-25" style={{ backgroundImage: "linear-gradient(rgba(242,188,69,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(240,107,100,0.1) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
         ) : (
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_18%,rgba(214,166,74,0.15),transparent_34%)]" />
         )}

@@ -52,9 +52,10 @@ import {
 } from "./level3Blueprint";
 import { validateStarpathAssessmentBlueprintForLevel } from "./starpathAssessmentBlueprint";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
+import { getStatisticaIndependentAssessment } from "./statisticaIndependentBanks";
 
 export type AssessmentQuestion = PretestQuestion | PosttestQuestion;
-export type AssessmentRealmId = LiveRealmId;
+export type AssessmentRealmId = LiveRealmId | "statistics";
 
 function assertAssessmentRealmHandled(realmId: never): never {
   throw new Error(`Assessment resolver is missing for live realm: ${realmId}`);
@@ -134,6 +135,8 @@ export function getPretestForLevel(level: SupportedMathLevel, realmId: Assessmen
       return getStarpathPretest(yearLabelForLevel(level));
     case "measurement":
       return getMeasurelandsPretestForYear(yearLabelForLevel(level)) as PretestQuestion[];
+    case "statistics":
+      return getStatisticaIndependentAssessment(level, "pretest") as unknown as PretestQuestion[];
     case "number":
       break;
     default:
@@ -160,6 +163,8 @@ export function getPosttestForLevel(level: SupportedMathLevel, realmId: Assessme
       return getStarpathPosttest(yearLabelForLevel(level));
     case "measurement":
       return getMeasurelandsPosttestForYear(yearLabelForLevel(level));
+    case "statistics":
+      return { yearLabel: yearLabelForLevel(level), questions: getStatisticaIndependentAssessment(level, "posttest") };
     case "number":
       break;
     default:
@@ -190,6 +195,8 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
       return getStarpathPretest(yearLabel);
     case "measurement":
       return getMeasurelandsPretestForYear(yearLabel) as PretestQuestion[];
+    case "statistics":
+      return getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
     case "number":
       break;
     default:
@@ -219,6 +226,8 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
       return getStarpathPosttest(yearLabel);
     case "measurement":
       return getMeasurelandsPosttestForYear(yearLabel);
+    case "statistics":
+      return { yearLabel, questions: getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") };
     case "number":
       break;
     default:
@@ -265,6 +274,8 @@ export function validateAssessmentBlueprintForLevel(level: SupportedMathLevel, r
     case "space":
       return validateStarpathAssessmentBlueprintForLevel(level);
     case "measurement":
+      return [];
+    case "statistics":
       return [];
     case "number":
       break;

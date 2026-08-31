@@ -8,6 +8,7 @@ import { getRealmTheme } from "@/lib/useRealmTheme";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { isGroundLevelYear } from "@/lib/lesson-routing";
+import { getStatisticaBackground } from "@/lib/statistica-visuals";
 
 interface AssessmentShellProps {
   /** "Pre-Test" or "Post-Test" */
@@ -87,13 +88,16 @@ export default function AssessmentShell({
   const studentLevelLabel = formatStudentLevelLabel(year);
   const theme = getRealmTheme(realmId);
   const isSpace = realmId === "space";
-  const isGroundNumber = !theme.isMeasurement && !isSpace && isGroundLevelYear(year);
-  const isModernNumber = !theme.isMeasurement && !isSpace && (isGroundNumber || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6");
+  const isStatistics = realmId === "statistics";
+  const isGroundNumber = !theme.isMeasurement && !isSpace && !isStatistics && isGroundLevelYear(year);
+  const isModernNumber = !theme.isMeasurement && !isSpace && !isStatistics && (isGroundNumber || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6");
   const contentWidth = wideContent || isModernNumber ? "max-w-6xl" : "max-w-2xl";
   const progressTrack = theme.isMeasurement
     ? "rgba(214,184,108,0.22)"
     : isSpace
       ? "rgba(124,58,237,0.22)"
+      : isStatistics
+        ? "rgba(242,188,69,0.22)"
       : "rgba(94,234,212,0.18)";
   const progressBg = theme.ctaGradientCss;
 
@@ -106,6 +110,8 @@ export default function AssessmentShell({
           ? "linear-gradient(180deg, #140d04 0%, #2a1a06 40%, #120b03 100%)"
           : isSpace
             ? "#070a1b"
+            : isStatistics
+              ? "#14231d"
             : isModernNumber
               ? "#001b18"
             : "linear-gradient(to bottom, rgb(2 6 23), rgb(15 23 42), rgb(2 6 23))",
@@ -130,6 +136,13 @@ export default function AssessmentShell({
             className="absolute inset-0"
             style={{ background: "linear-gradient(180deg, rgba(7,10,27,0.70), rgba(19,12,52,0.86))" }}
           />
+        </div>
+      )}
+      {isStatistics && (
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={getStatisticaBackground(year as RealmLevelId)} alt="" className="h-full w-full object-cover" style={{ filter: "brightness(0.3) saturate(1.08)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(18,49,42,0.72), rgba(20,35,29,0.92))" }} />
         </div>
       )}
 

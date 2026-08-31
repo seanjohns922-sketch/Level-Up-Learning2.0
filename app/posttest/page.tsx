@@ -29,6 +29,7 @@ import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 import { clearCompletionId, getOrCreateCompletionId } from "@/lib/resume-state";
 import { buildAssessmentQuestionSnapshots } from "@/lib/assessment-replay";
 import { curriculumCodesForAssessmentQuestion } from "@/lib/assessment-curriculum";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 const PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
 const POSTTEST_DRAFT_VERSION = 1;
@@ -332,11 +333,12 @@ function PostTestPage() {
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
   const realmId = params.get("realm_id") ?? undefined;
-  if (realmId !== undefined && realmId !== "number" && realmId !== "measurement" && realmId !== "space") {
+  if (realmId !== undefined && realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics") {
     throw new Error(`Unsupported post-test realm: ${realmId}`);
   }
   const progressRealmId =
-    realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : "number";
+    realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : "number";
+  const localProgressRealmId = progressRealmId as LiveRealmId;
   // Final week is realm-specific: Measurelands = 8, Number Nexus = 12. Never
   // hardcode 12 for a realm-aware assessment (that leaks a Number assumption).
   const lastWeek = getLastProgramWeek(progressRealmId);
@@ -401,7 +403,7 @@ function PostTestPage() {
 
   useEffect(() => {
     if (previewMode) {
-      setCanonicalProgress(readProgress(progressRealmId));
+      setCanonicalProgress(readProgress(localProgressRealmId));
       return;
     }
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() : null;
@@ -448,7 +450,7 @@ function PostTestPage() {
         setRestoreState("error");
       });
     return () => { cancelled = true; };
-  }, [lastWeek, previewMode, progressRealmId, realmId, router, year]);
+  }, [lastWeek, localProgressRealmId, previewMode, progressRealmId, realmId, router, year]);
 
   useEffect(() => {
     if (restoreState !== "ready" || draftLoaded || questions.length === 0) return;
@@ -633,7 +635,7 @@ function PostTestPage() {
     const reviewItems = buildPosttestPracticeReviewItems(questions, finalAnswers);
     saveAssessmentReviewState({
       year,
-      realmId: progressRealmId,
+      realmId: localProgressRealmId,
       mode: "posttest",
       items: reviewItems,
     });
@@ -700,7 +702,7 @@ function PostTestPage() {
   }
 
   const isInteractiveTask =
-    (q?.type === "measurelandsTask" || q?.type === "starpathTask") && Boolean(q.practiceTask);
+    (q?.type === "measurelandsTask" || q?.type === "starpathTask" || q?.type === "statisticaTask") && Boolean(q.practiceTask);
   const hasAnswer =
     q?.type === "mab" ? mabHasSelection : q?.type === "numeric" ? picked.trim().length > 0 : !!picked;
 

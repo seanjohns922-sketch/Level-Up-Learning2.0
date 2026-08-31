@@ -38,6 +38,7 @@ import { supabase } from "@/lib/supabase";
 import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 import { buildAssessmentQuestionSnapshots } from "@/lib/assessment-replay";
 import { curriculumCodesForAssessmentQuestion } from "@/lib/assessment-curriculum";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
@@ -365,10 +366,11 @@ function PretestPage() {
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
   const realmId = searchParams.get("realm_id") ?? "number";
-  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space") {
+  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics") {
     throw new Error(`Unsupported pre-test realm: ${realmId}`);
   }
-  const progressRealmId = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : "number";
+  const progressRealmId = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : "number";
+  const localProgressRealmId = progressRealmId as LiveRealmId;
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
   const reviewBank = searchParams.get("review_bank");
@@ -380,6 +382,10 @@ function PretestPage() {
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {
+    if (realmId === "statistics" && year === "Year 1") {
+      router.replace("/program?year=Year%201&week=1&legacy=1&realm_id=statistics&teacher_preview=1");
+      return;
+    }
     if (year === "Prep") {
       router.replace(realmId === "measurement" ? "/measurelands" : "/home");
     }
@@ -443,7 +449,7 @@ function PretestPage() {
       return;
     }
     if (isDemoPreviewMode()) {
-      setCanonicalProgress(readProgress(progressRealmId));
+      setCanonicalProgress(readProgress(localProgressRealmId));
       return;
     }
     let cancelled = false;
@@ -471,7 +477,7 @@ function PretestPage() {
         setRestoreState("error");
       });
     return () => { cancelled = true; };
-  }, [progressRealmId, router, year]);
+  }, [localProgressRealmId, progressRealmId, router, year]);
 
   useEffect(() => {
     setMab({ tens: 0, ones: 0 });
@@ -479,15 +485,15 @@ function PretestPage() {
 
   // ── Load any saved snapshot once; offer to resume rather than auto-restart ──
   useEffect(() => {
-    const snapshot = loadPretestResume(year, progressRealmId);
+    const snapshot = loadPretestResume(year, localProgressRealmId);
     if (pretestResumeHasProgress(snapshot)) {
       setShowResumePrompt(true);
     }
     setResumeReady(true);
-  }, [progressRealmId, year]);
+  }, [localProgressRealmId, year]);
 
   function resumeFromSnapshot() {
-    const snapshot = loadPretestResume(year, progressRealmId);
+    const snapshot = loadPretestResume(year, localProgressRealmId);
     if (snapshot) {
       const restored = [...Array(questions.length).fill(null)];
       snapshot.answers.forEach((a, i) => {
@@ -502,7 +508,7 @@ function PretestPage() {
   }
 
   function restartAssessment() {
-    clearPretestResume(year, progressRealmId);
+    clearPretestResume(year, localProgressRealmId);
     setAnswers(Array(questions.length).fill(null));
     setIdkResponses([]);
     setAssessmentStartedAt(Date.now());
@@ -515,14 +521,14 @@ function PretestPage() {
     if (!resumeReady || showResumePrompt) return;
     savePretestResume({
       year,
-      realmId: progressRealmId,
+      realmId: localProgressRealmId,
       index,
       answers,
       idkResponses,
       startedAt: assessmentStartedAt,
       updatedAt: Date.now(),
     });
-  }, [resumeReady, showResumePrompt, year, progressRealmId, index, answers, idkResponses, assessmentStartedAt]);
+  }, [resumeReady, showResumePrompt, year, localProgressRealmId, index, answers, idkResponses, assessmentStartedAt]);
 
   function choose(value: string) {
     const next = [...answers];
@@ -570,7 +576,7 @@ function PretestPage() {
   function persistSnapshot() {
     savePretestResume({
       year,
-      realmId: progressRealmId,
+      realmId: localProgressRealmId,
       index,
       answers,
       idkResponses,
@@ -743,15 +749,15 @@ function PretestPage() {
       return;
     }
 
-    clearYearProgress(year, progressRealmId);
+    clearYearProgress(year, localProgressRealmId);
     // Assessment complete — clear the resume snapshot so we don't re-offer it.
     saveAssessmentReviewState({
       year,
-      realmId: progressRealmId,
+      realmId: localProgressRealmId,
       mode: "pretest",
       items: buildPretestReviewItems(questions, resolved),
     });
-    clearPretestResume(year, progressRealmId);
+    clearPretestResume(year, localProgressRealmId);
 
     // 85%+ → celebrate the level advancement before showing the full results.
     if (passed) {
@@ -781,7 +787,7 @@ function PretestPage() {
         : selected !== null;
 
   const isMeasurelandsTask =
-    (question?.type === "measurelandsTask" || question?.type === "starpathTask") &&
+    (question?.type === "measurelandsTask" || question?.type === "starpathTask" || question?.type === "statisticaTask") &&
     Boolean(question.practiceTask);
 
   useEffect(() => {

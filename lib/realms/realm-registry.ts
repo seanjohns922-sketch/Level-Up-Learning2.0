@@ -42,6 +42,15 @@ const SCHOOL_LEVEL_LABELS = [
   "Year 6",
 ] as const;
 
+const YEAR_LEVEL_LABELS = [
+  "Year 1",
+  "Year 2",
+  "Year 3",
+  "Year 4",
+  "Year 5",
+  "Year 6",
+] as const;
+
 export const REALM_REGISTRY = {
   number: {
     realmId: "number",
@@ -109,10 +118,10 @@ export const REALM_REGISTRY = {
     strand: "Statistics",
     status: "coming_soon",
     isSelectable: false,
-    totalWeeks: 8,
+    totalWeeks: 6,
     lessonsPerWeek: 3,
     hasWeeklyQuiz: true,
-    levelLabels: SCHOOL_LEVEL_LABELS,
+    levelLabels: YEAR_LEVEL_LABELS,
     legendCount: 6,
     legendCollectionName: "Data Guardians",
     iconKey: "BarChart3",

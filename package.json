@@ -149,6 +149,7 @@
     "qa:realm-release-gate": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/realm-release-gate-audit.ts",
     "qa:teacher-real-activity-preview": "node scripts/teacher-real-activity-preview-audit.mjs",
     "qa:statistica-blueprint": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-blueprint.ts",
+    "qa:statistica-assessments": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-assessments.ts",
     "qa:statistica-level1": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-level1.ts",
     "qa:statistica-level5-week1": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-level5-week1.ts",
     "qa:statistica-level5-week2": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-level5-week2.ts",
