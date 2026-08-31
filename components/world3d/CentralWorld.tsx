@@ -541,7 +541,12 @@ export default function CentralWorld() {
         <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} editCursor={editCursor} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool)} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} />
       </Canvas>
 
-      {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
+      {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} navActions={[
+        { key: "centre", label: "Centre", icon: <MapPin size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.spawnPoint) },
+        { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.myHomeExitSpawn) },
+        { key: "plaza", label: "Plaza", icon: <LayoutGrid size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
+        { key: "map", label: "Map", icon: <MapIcon size={15} />, onClick: () => router.push(preview ? "/home-base?teacher_preview=1" : "/home-base") },
+      ]} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
 
       {!buildPreview && !editorOpen ? <><WorldJoystick onChange={setMoveInput} /><WorldLookJoystick onChange={setLookInput} /></> : null}
       {buildPreview && !editorOpen ? (
@@ -615,18 +620,6 @@ export default function CentralWorld() {
       ) : null}
       <KeyboardWorldAction enabled={hasAvailableAction && !editorOpen && !buildPreview} onAction={runActiveAction} />
 
-      {!editorOpen && !buildPreview && !transitioning ? (
-        <div aria-label="Go and view" style={{ position: "absolute", right: "max(16px,env(safe-area-inset-right))", top: "max(64px,calc(env(safe-area-inset-top) + 58px))", zIndex: 19, display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 4, padding: 5, borderRadius: 12, background: "rgba(22,28,23,.5)", border: "1px solid rgba(255,235,195,.22)", backdropFilter: "blur(6px)", pointerEvents: "auto" }}>
-          {([
-            ["Centre", <MapPin key="c" size={15} />, () => teleport(CENTRAL_WORLD_CONFIG.spawnPoint)],
-            ["Home", <Home key="h" size={15} />, () => teleport(CENTRAL_WORLD_CONFIG.myHomeExitSpawn)],
-            ["Plaza", <LayoutGrid key="p" size={15} />, () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza)],
-            ["Map", <MapIcon key="m" size={15} />, () => router.push(preview ? "/home-base?teacher_preview=1" : "/home-base")],
-          ] as Array<[string, React.ReactNode, () => void]>).map(([label, icon, onClick]) => (
-            <button key={label} type="button" onClick={onClick} aria-label={label} style={{ minHeight: 36, display: "inline-flex", alignItems: "center", gap: 5, border: "1px solid rgba(0,0,0,.06)", borderRadius: 8, padding: "7px 10px", background: "#f6f1e6", color: "#2b2119", fontWeight: 900, fontSize: 11, letterSpacing: ".03em", cursor: "pointer" }}>{icon}{label}</button>
-          ))}
-        </div>
-      ) : null}
       {economyMessage ? <div style={{ position: "absolute", left: 16, bottom: 126, maxWidth: 360, zIndex: 30, border: "1px solid rgba(146,64,14,.28)", borderRadius: 6, background: "rgba(255,251,235,.94)", color: "#78350f", padding: "10px 12px", fontSize: 12, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}><span>{economyMessage}</span><WorldVoiceButton text={economyMessage} compact label="Read message" /></div> : null}
       {showIntro ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(24,31,25,.22)", color: "#fff8e8", pointerEvents: "none", animation: "centralWorldReveal 2.3s ease both" }}><div style={{ textAlign: "center", textShadow: "0 3px 18px rgba(0,0,0,.4)", pointerEvents: "auto" }}><div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.24em" }}>THE LEVEL UP WORLD</div><div style={{ marginTop: 8, fontSize: 30, fontWeight: 900 }}>Tower of Knowledge</div><div style={{ marginTop: 12 }}><WorldVoiceButton text="The Level Up World. Tower of Knowledge." label="Read world title" /></div></div><style>{`@keyframes centralWorldReveal{0%{opacity:1;background:rgba(10,15,11,1)}25%,70%{opacity:1}100%{opacity:0}}`}</style></div> : null}
       <style>{`@media (pointer:coarse){body:has([data-world3d-root]) .fullscreen-toggle{display:none}}@media(max-height:520px){.centralWorldEditor{width:min(300px,94vw)!important}}`}</style>
