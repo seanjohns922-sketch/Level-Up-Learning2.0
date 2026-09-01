@@ -49,7 +49,7 @@ function rows(seed: number, scale = 1) {
 }
 
 function assessmentPrompt(level: number, form: StatisticaAssessmentKind, index: number, action: string) {
-  if (level <= 3) return action;
+  if (level <= 4) return action;
   const check = form === "pretest" ? "starting check" : "mastery check";
   return `Year ${level} ${check}, ${CONTEXTS[(index + level + (form === "posttest" ? 3 : 0)) % CONTEXTS.length]}, evidence file ${index + 1}: ${action}`;
 }
@@ -710,32 +710,227 @@ function levelThreeTask(form: StatisticaAssessmentKind, index: number): Practice
 }
 
 function levelFourTask(form: StatisticaAssessmentKind, index: number): PracticeTask {
-  const scale = index % 2 === 0 ? 2 : 5;
-  const data = rows(index, scale);
-  const greatest = [...data].sort((a, b) => b.count - a.count)[0]!;
-  if (index % 3 === 0) {
-    return {
-      kind: "statisticaPictograph", mode: index % 2 === 0 ? "build" : "read",
-      prompt: assessmentPrompt(4, form, index, "apply the key to construct or read the many-to-one display."),
-      speakText: `One symbol represents ${scale} observations.`, target: greatest.count, keyUnits: scale, unitNoun: "observations", symbolLabel: "marker", categories: data,
-      options: index % 2 === 0 ? undefined : options([String(greatest.count - scale), String(greatest.count), String(greatest.count + scale)]),
-      correctOptionIds: index % 2 === 0 ? undefined : ["1"], feedback: feedback(),
-    };
+  const action = (pretest: string, posttest: string) => assessmentPrompt(4, form, index, form === "pretest" ? pretest : posttest);
+  const key = form === "pretest" ? 4 : 6;
+  const picto = (form === "pretest" ? [12, 18, 8, 14] : [24, 33, 18, 27]).map((count, rowIndex) => ({
+    id: `picto-${rowIndex}`, label: ["North", "East", "South", "West"][rowIndex]!, color: COLOURS[rowIndex]!, count,
+  }));
+  const columns = (form === "pretest" ? [35, 20, 45, 30, 25] : [45, 25, 55, 35, 40]).map((count, rowIndex) => ({
+    id: `column-${rowIndex}`, label: ["Mon", "Tue", "Wed", "Thu", "Fri"][rowIndex]!, color: COLOURS[rowIndex % COLOURS.length]!, count,
+  }));
+  const distributionA = (form === "pretest" ? [2, 5, 9, 6, 3] : [1, 4, 10, 8, 2]).map((count, value) => ({
+    id: `score-${value}`, label: String(value), color: COLOURS[value % COLOURS.length]!, count,
+  }));
+  const distributionB = (form === "pretest" ? [5, 6, 6, 5, 3] : [6, 7, 5, 4, 3]).map((count, value) => ({
+    id: `score-${value}`, label: String(value), color: COLOURS[value % COLOURS.length]!, count,
+  }));
+
+  switch (index) {
+    case 0: {
+      const answer = picto[1]!.count;
+      return {
+        kind: "statisticaPictograph", mode: "read",
+        prompt: action("Use the key and partial symbol to calculate the East frequency.", "Calculate the East frequency from the many-to-one display, including the half symbol."),
+        speakText: `Each marker represents ${key}. Count the whole markers and add half of the key for the partial marker.`, target: answer,
+        keyUnits: key, unitNoun: "observations", symbolLabel: "marker", categories: picto,
+        options: options([String(answer - key / 2), String(answer + key / 2), String(answer)]), correctOptionIds: ["2"], feedback: feedback(),
+      };
+    }
+    case 1: {
+      const symbols = form === "pretest" ? 5 : 7;
+      const answer = symbols * key;
+      const categories = picto.map((row, rowIndex) => ({ ...row, count: rowIndex === 0 ? answer : row.count }));
+      return {
+        kind: "statisticaPictograph", mode: "calc",
+        prompt: action(`North shows ${symbols} markers. Use the key to calculate its frequency.`, `A habitat row contains ${symbols} complete markers. What frequency does the key represent?`),
+        speakText: `Multiply ${symbols} markers by ${key} observations for each marker.`, target: answer, keyUnits: key, unitNoun: "observations", symbolLabel: "marker", categories,
+        options: options([String(symbols + key), String(answer), String(answer - key)]), correctOptionIds: ["1"], feedback: feedback(),
+      };
+    }
+    case 2: {
+      const high = picto[1]!;
+      const low = picto[2]!;
+      const difference = high.count - low.count;
+      return {
+        kind: "statisticaPictograph", mode: "compare",
+        prompt: action("Use the key to find how many more observations East has than South.", "Calculate the difference between East and South from the scaled pictograph."),
+        speakText: "Calculate both frequencies with the key, then subtract the smaller total from the larger total.", target: difference,
+        keyUnits: key, unitNoun: "observations", symbolLabel: "marker", categories: picto,
+        options: options([String(difference + key), String(difference), String(high.count)]), correctOptionIds: ["1"], feedback: feedback(),
+      };
+    }
+    case 3: {
+      const buildCounts = form === "pretest" ? [12, 20, 16, 8] : [18, 30, 24, 12];
+      const categories = picto.map((row, rowIndex) => ({ ...row, count: buildCounts[rowIndex]! }));
+      return {
+        kind: "statisticaPictograph", mode: "build",
+        prompt: action("Construct a many-to-one pictograph from the frequency table and key.", "Convert the frequency table into a many-to-one pictograph without target values beside the rows."),
+        speakText: `Each marker represents ${key}. Divide each frequency by the key to decide how many markers to add.`, target: Math.max(...buildCounts),
+        keyUnits: key, unitNoun: "observations", symbolLabel: "marker", categories,
+        sourceFrequencies: categories.map(({ label, count }) => ({ label, count })), hideBuildTargets: true, feedback: feedback(),
+      };
+    }
+    case 4: {
+      const answer = columns[0]!.count;
+      return {
+        kind: "statisticaGraph", mode: "read",
+        prompt: action("Read Monday's value from the scaled column graph.", "Read Monday's exact value when its column sits between labelled gridlines."),
+        speakText: "Use the numbered scale and the halfway interval to read the exact column height.", target: answer, display: "columns", categories: columns,
+        options: options([String(answer - 5), String(answer), String(answer + 10)]), correctOptionIds: ["1"], feedback: feedback(),
+      };
+    }
+    case 5: {
+      const buildCounts = form === "pretest" ? [15, 30, 25, 40, 20] : [20, 45, 35, 55, 30];
+      const categories = columns.map((row, rowIndex) => ({ ...row, count: buildCounts[rowIndex]! }));
+      return {
+        kind: "statisticaGraph", mode: "build",
+        prompt: action("Construct a scaled column graph from the five-day frequency table.", "Construct the unfamiliar five-category column graph using intervals of five."),
+        speakText: "Read each table frequency and set the matching column. The target values are not repeated beside the controls.", target: Math.max(...buildCounts),
+        display: "columns", categories, buildStep: 5, sourceFrequencies: categories.map(({ label, count }) => ({ label, count })), hideBuildTargets: true, feedback: feedback(),
+      };
+    }
+    case 6: {
+      const total = columns[0]!.count + columns[2]!.count;
+      return {
+        kind: "statisticaInference",
+        prompt: action("Use the scaled graph to find the combined total for Monday and Wednesday.", "Calculate the combined Monday and Wednesday frequency from the scaled graph."),
+        speakText: "Read both columns accurately, then add their frequencies.", target: total, display: "columns", categories: columns,
+        options: options([String(total - 10), String(columns[2]!.count), String(total)]), correctOptionIds: ["2"], feedback: feedback(),
+      };
+    }
+    case 7:
+      return {
+        kind: "statisticaShape", mode: "concentrated",
+        prompt: action("Where is this distribution concentrated?", "Which description identifies the concentration without ignoring the surrounding values?"),
+        speakText: "Look for the neighbouring values with the greatest frequencies, not only one column.", target: 1, display: "columns", categories: distributionA,
+        options: options(["Mostly around values 2 and 3", "Only at value 4", "Evenly across every value"]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 8:
+      return {
+        kind: "statisticaShape", mode: "spread",
+        prompt: action("Which statement describes how the observations vary across the values?", "Analyse the spread of observations across the full distribution."),
+        speakText: "Use all five columns to describe where observations occur and how frequencies change.", target: 1, display: "columns", categories: distributionB,
+        options: options(form === "pretest"
+          ? ["Observations occur across 0 to 4, with similar frequencies through the middle.", "All observations equal 2.", "Only the tallest column shows variation."]
+          : ["Observations cover 0 to 4 but are more frequent at the lower values.", "The values are evenly frequent.", "The highest category has the highest frequency."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 9:
+      return {
+        kind: "statisticaShape", mode: "compare",
+        prompt: action("Compare both distributions using concentration and variation.", "Which comparison accurately describes both distributions rather than one tallest column?"),
+        speakText: "Compare where each distribution is concentrated and how frequencies vary across every value.", target: 1, display: "columns", categories: distributionA, categoriesB: distributionB,
+        setLabelA: "Group A", setLabelB: "Group B",
+        options: options(["Group A is more concentrated near the middle; Group B is more evenly spread or weighted lower.", "The distributions are identical because they use the same labels.", "Group B has no variation because it has a tallest column."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 10:
+      return {
+        kind: "statisticaShape", mode: "variation",
+        prompt: action("Which group shows greater variation across the displayed values?", "Decide which distribution has greater variation and use the full shape as evidence."),
+        speakText: "A distribution with frequencies spread more broadly across values shows greater variation.", target: 1, display: "columns", categories: distributionA, categoriesB: distributionB,
+        setLabelA: "Group A", setLabelB: "Group B",
+        options: options(["Group B, because its observations are distributed more broadly across the values.", "Group A, only because its tallest column is taller.", "Neither group, because both have a mode."]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 11:
+      return {
+        kind: "statisticaDisplayStudio", mode: "compare",
+        prompt: action("Choose the display that makes distribution shape easiest to inspect.", "Choose the representation that best supports a comparison of shape and variation."),
+        speakText: "Column heights make concentration and variation across ordered values visible.", target: 1,
+        question: "How are observations distributed across values 0 to 4?", purpose: "Inspect concentration, gaps and variation across the complete distribution.",
+        data: { labels: distributionA.map((row) => row.label), values: distributionA.map((row) => row.count), unit: "observations" },
+        displayOptions: ["table", "column"], correctDisplay: "column", feedback: feedback(),
+      };
+    case 12:
+      return {
+        kind: "statisticaInference",
+        prompt: action("Which conclusion uses the complete distribution as evidence?", "Which analysis is supported by the complete unfamiliar distribution?"),
+        speakText: "Include both the concentration and the variation rather than reporting only a single frequency.", target: 1, display: "columns", categories: distributionA,
+        options: options(["Values 2 and 3 are most common, but observations occur from 0 to 4.", "Every observation equals 2 because 2 has the tallest column.", "The graph proves what caused each value."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 13: {
+      const shifted = distributionB.map((row, rowIndex) => ({ ...row, count: form === "pretest" ? [1, 3, 7, 8, 6][rowIndex]! : [2, 3, 5, 7, 8][rowIndex]! }));
+      return {
+        kind: "statisticaShape", mode: "compare",
+        prompt: action("Compare the original group with the shifted distribution. What changed?", "Analyse how the second distribution shifted while retaining variation."),
+        speakText: "Track where the higher frequencies moved and compare the overall spread.", target: 1, display: "columns", categories: distributionA, categoriesB: shifted,
+        setLabelA: "Original", setLabelB: "Later group",
+        options: options(["The later group is concentrated at higher values while both groups still vary across several values.", "The groups are identical because both use five categories.", "The later group contains no variation."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    }
+    case 14:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which statistical question can be answered by collecting varied numerical responses?", "Which investigation question is specific enough to support a defensible comparison?"),
+        speakText: "Choose a question that identifies the group, variable and data to collect.", target: 1,
+        variable: "Designing an investigation", examples: "The responses should vary and directly answer the question.",
+        options: options(form === "pretest"
+          ? ["How many minutes does each student read tonight?", "Is reading good?", "How many letters are in read?"]
+          : ["How does the number of active-play minutes compare between two Year 4 classes during the same lunch period?", "Which class is better?", "Is exercise fun?"]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 15:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which collection method gives a fair class reading-time dataset?", "Which method supports a fair comparison between the two classes?"),
+        speakText: "Use the same measurement rule and include the intended students once.", target: 1,
+        variable: "Selecting a fair method", examples: "Collection conditions must be consistent.",
+        options: options(form === "pretest"
+          ? ["Ask every student for the same evening and record each response once", "Ask keen readers several times", "Estimate from three students"]
+          : ["Observe both classes for equal periods using the same definition of active play", "Observe one class for ten minutes and the other for an hour", "Count only students already playing sport"]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 16:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which plan correctly links the question, data and display?", "Which plan would produce evidence that can answer the comparison question?"),
+        speakText: "Every stage must address the same variable and use an appropriate display.", target: 1,
+        variable: "Checking an investigation plan", examples: "Question, collection, representation and conclusion must align.",
+        options: options(form === "pretest"
+          ? ["Collect each student's reading minutes and display the frequencies on a column graph", "Ask about reading but graph shoe colours", "Choose the conclusion before collecting data"]
+          : ["Record active-play minutes consistently, create comparable displays and describe both distributions", "Collect different variables from each class", "Compare only the single highest student"]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 17:
+      return {
+        kind: "statisticaDisplayStudio", mode: "design",
+        prompt: action("Choose the display that best communicates the reading-minute distribution.", "Choose a display that allows leadership to compare both classes' distributions."),
+        speakText: "Use a column display to show frequencies across ordered numerical values.", target: 1,
+        question: form === "pretest" ? "How are reading times distributed?" : "How do active-play distributions differ between classes?",
+        purpose: "Show concentration and variation across ordered numerical values.", data: { labels: distributionA.map((row) => row.label), values: distributionA.map((row) => row.count), unit: "students" },
+        displayOptions: ["table", "column"], correctDisplay: "column", feedback: feedback(),
+      };
+    case 18:
+      return {
+        kind: "statisticaInference",
+        prompt: action("Which conclusion answers the reading investigation without exaggerating?", "Which conclusion is defensible after comparing the two class distributions?"),
+        speakText: "Base the conclusion on concentration and variation in the observed groups only.", target: 1, display: "columns", categories: distributionA,
+        options: options(form === "pretest"
+          ? ["This class was concentrated near the middle values, with responses across 0 to 4.", "Every Year 4 class will have this exact result.", "The graph proves why students read."]
+          : ["The observed class was concentrated around 2 and 3, but results still varied from 0 to 4.", "The tallest column proves this class is always more active.", "One value explains every student's behaviour."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    default: {
+      const surveyCategories = (form === "pretest" ? [10, 20, 15, 25] : [15, 30, 20, 25]).map((count, rowIndex) => ({
+        id: `choice-${rowIndex}`, label: ["Option A", "Option B", "Option C", "Option D"][rowIndex]!, color: COLOURS[rowIndex]!, count,
+      }));
+      return {
+        kind: "statisticaInvestigation",
+        prompt: action("Choose a useful question, build its display and analyse the resulting data.", "Complete the unfamiliar investigation cycle and defend the resulting conclusion."),
+        speakText: "Select an investigation, make a prediction, construct the graph and answer from the complete distribution.", target: 1, buildStep: 5,
+        surveys: [{
+          id: "class-choice", question: form === "pretest" ? "Which community activity should the class choose?" : "Which habitat project should receive the most volunteer time?",
+          unit: "responses", categories: surveyCategories,
+          analyses: [
+            { prompt: "Which option has the greatest frequency?", speak: "Read all four columns before choosing.", options: options(surveyCategories.map((row) => row.label)), correctOptionIds: [String(surveyCategories.findIndex((row) => row.count === Math.max(...surveyCategories.map((candidate) => candidate.count))))] },
+            { prompt: "Which conclusion is supported?", speak: "Keep the conclusion about this surveyed group.", options: options([`${surveyCategories[1]!.label} was selected by ${surveyCategories[1]!.count} respondents.`, "The result will be identical everywhere.", "The display proves why each person chose."]), correctOptionIds: ["0"] },
+          ],
+        }], feedback: feedback(),
+      };
+    }
   }
-  if (index % 3 === 1) {
-    return {
-      kind: "statisticaGraph", mode: "build",
-      prompt: assessmentPrompt(4, form, index, "construct the scaled column graph."),
-      speakText: `The scale increases by ${scale}.`, target: greatest.count, display: "columns", categories: data, buildStep: scale, feedback: feedback(),
-    };
-  }
-  const comparison = data.map((row, rowIndex) => ({ ...row, count: row.count + (rowIndex % 2 === 0 ? scale * 2 : -scale) }));
-  return {
-    kind: "statisticaShape", mode: "compare",
-    prompt: assessmentPrompt(4, form, index, "compare concentration and variation across both distributions."),
-    speakText: "Describe the complete pattern, not only the tallest column.", target: 1, display: "columns", categories: data, categoriesB: comparison,
-    setLabelA: "Site A", setLabelB: "Site B", options: options(["Site B is more spread across categories.", "The distributions are identical.", "Colour determines variation."]), correctOptionIds: ["0"], feedback: feedback(),
-  };
 }
 
 function levelFiveTask(form: StatisticaAssessmentKind, index: number): PracticeTask {
@@ -852,10 +1047,7 @@ function taskFor(level: StatisticaLevel, form: StatisticaAssessmentKind, index: 
   if (level === 1) return levelOneTask(index);
   if (level === 2) return levelTwoTask(form, index);
   if (level === 3) return levelThreeTask(form, index);
-  if (level === 4) {
-    if (descriptorCode === "AC9M4ST03") return investigationTask(level, form, index);
-    return levelFourTask(form, descriptorCode === "AC9M4ST01" ? index * 3 + (index % 2) : index * 3 + 2);
-  }
+  if (level === 4) return levelFourTask(form, index);
   if (level === 5) {
     if (descriptorCode === "AC9M5ST03") return investigationTask(level, form, index);
     if (descriptorCode === "AC9M5ST01") return index % 2 === 0 ? levelFiveTask(form, index * 3) : modeAndShapeTask(level, form, index);

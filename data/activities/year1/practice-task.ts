@@ -2808,6 +2808,7 @@ export type PracticeTask = (
       // student calculates each frequency before setting the columns, so target
       // values must not be printed beside the controls.
       sourceObservations?: string[];
+      sourceFrequencies?: Array<{ label: string; count: number }>;
       hideBuildTargets?: boolean;
       feedback: { correct: string; wrong: string };
     }
@@ -2924,6 +2925,8 @@ export type PracticeTask = (
       // repeated symbol); rows differ by count, and cat.color tints each row.
       symbolLabel: string;
       categories: Array<{ id: string; label: string; color: string; count: number }>;
+      sourceFrequencies?: Array<{ label: string; count: number }>;
+      hideBuildTargets?: boolean;
       options?: Array<{ id: string; label: string }>;
       correctOptionIds?: string[];
       feedback: { correct: string; wrong: string };

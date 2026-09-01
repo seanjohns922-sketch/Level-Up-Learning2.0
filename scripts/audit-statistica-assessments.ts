@@ -18,7 +18,9 @@ const descriptorTaskKinds: Record<string, readonly string[]> = {
   AC9M3ST01: ["statisticaClassify", "statisticaTally", "statisticaSort", "statisticaTable"],
   AC9M3ST02: ["statisticaGraph", "statisticaShape", "statisticaRank", "statisticaDisplayStudio", "statisticaInference"],
   AC9M3ST03: ["statisticaClassify", "statisticaDisplayStudio", "statisticaInference"],
-  AC9M4ST01: ["statisticaPictograph", "statisticaGraph"], AC9M4ST02: ["statisticaShape"], AC9M4ST03: ["statisticaClassify"],
+  AC9M4ST01: ["statisticaPictograph", "statisticaGraph", "statisticaInference"],
+  AC9M4ST02: ["statisticaShape", "statisticaDisplayStudio", "statisticaInference"],
+  AC9M4ST03: ["statisticaClassify", "statisticaDisplayStudio", "statisticaInference", "statisticaInvestigation"],
   AC9M5ST01: ["statisticaClassify", "statisticaShape"], AC9M5ST02: ["statisticaLineGraph"], AC9M5ST03: ["statisticaClassify"],
   AC9M6ST01: ["statisticaClassify", "statisticaShape"], AC9M6ST02: ["statisticaMediaAnalysis"], AC9M6ST03: ["statisticaClassify"],
 };
@@ -119,6 +121,27 @@ assert.notDeepEqual(
 assert.ok(
   yearThreePosttest.some((item) => item.practiceTask?.kind === "statisticaShape" && Boolean(item.practiceTask.categoriesB)),
   "Year 3 post-test must require a two-distribution comparison",
+);
+
+const yearFourPretest = getStatisticaIndependentAssessment(4, "pretest");
+const yearFourPosttest = getStatisticaIndependentAssessment(4, "posttest");
+for (const [form, items] of [["pre-test", yearFourPretest], ["post-test", yearFourPosttest]] as const) {
+  assert.equal(items.length, 20, `Year 4 ${form} must retain 20 questions`);
+  assert.ok(items.every((item) => !/starting check|mastery check|evidence file/i.test(item.prompt)), `Year 4 ${form} prompts must use natural child-facing language`);
+  assert.ok(new Set(items.map((item) => item.practiceTask!.kind)).size >= 7, `Year 4 ${form} needs broad interaction variety`);
+  const pictographTasks = items.flatMap((item) => item.practiceTask?.kind === "statisticaPictograph" ? [item.practiceTask] : []);
+  assert.deepEqual(new Set(pictographTasks.map((task) => task.mode)), new Set(["read", "calc", "compare", "build"]), `Year 4 ${form} must assess all many-to-one operations`);
+  assert.ok(pictographTasks.some((task) => task.categories.some((row) => row.count % task.keyUnits === task.keyUnits / 2)), `Year 4 ${form} must interpret a partial symbol`);
+  const constructionTasks = items.flatMap((item) => item.practiceTask?.kind === "statisticaGraph" && item.practiceTask.mode === "build" ? [item.practiceTask] : []);
+  assert.ok(constructionTasks.every((task) => task.hideBuildTargets && task.sourceFrequencies?.length === task.categories.length), `Year 4 ${form} graph construction must use source tables without printed targets`);
+  const shapeModes = items.flatMap((item) => item.practiceTask?.kind === "statisticaShape" ? [item.practiceTask.mode] : []);
+  assert.ok(new Set(shapeModes).size >= 4, `Year 4 ${form} must vary concentration, spread and comparison analysis`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaInvestigation"), `Year 4 ${form} must complete an investigation cycle`);
+}
+assert.notDeepEqual(
+  yearFourPretest.map((item) => item.practiceTask),
+  yearFourPosttest.map((item) => item.practiceTask),
+  "Year 4 post-test must be independently authored, not a renamed pre-test",
 );
 
 const ids = new Set<string>();

@@ -55,6 +55,15 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
         </div>
       ) : null}
 
+      {isBuild && task.sourceFrequencies?.length ? (
+        <div className="mx-auto max-w-lg overflow-hidden rounded-xl border-2 border-[#b9caaa] bg-[#fffaf0] text-[#244531]">
+          <div className="grid grid-cols-[1fr_auto] bg-[#e7f0e2] px-4 py-2 text-xs font-black uppercase tracking-[0.12em]"><span>Category</span><span>Frequency</span></div>
+          {task.sourceFrequencies.map((row) => (
+            <div key={row.label} className="grid grid-cols-[1fr_auto] border-t border-[#d7dfd2] px-4 py-2 text-sm font-bold"><span>{row.label}</span><span className="tabular-nums">{row.count}</span></div>
+          ))}
+        </div>
+      ) : null}
+
       <StatisticaPlot
         categories={task.categories}
         display={task.display}

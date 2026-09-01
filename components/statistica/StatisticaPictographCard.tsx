@@ -64,6 +64,15 @@ export default function StatisticaPictographCard({ task, onCorrect, onWrong }: {
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
 
+      {isBuild && task.sourceFrequencies?.length ? (
+        <div className="mx-auto max-w-lg overflow-hidden rounded-xl border-2 border-[#b9caaa] bg-[#fffaf0] text-[#244531]">
+          <div className="grid grid-cols-[1fr_auto] bg-[#e7f0e2] px-4 py-2 text-xs font-black uppercase tracking-[0.12em]"><span>Category</span><span>Frequency</span></div>
+          {task.sourceFrequencies.map((row) => (
+            <div key={row.label} className="grid grid-cols-[1fr_auto] border-t border-[#d7dfd2] px-4 py-2 text-sm font-bold"><span>{row.label}</span><span className="tabular-nums">{row.count}</span></div>
+          ))}
+        </div>
+      ) : null}
+
       <div className="mx-auto max-w-lg rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] p-4 shadow-[inset_0_1px_0_rgba(255,240,199,0.14),0_12px_32px_rgba(0,0,0,0.32)]">
         {/* Key legend — the heart of a many-to-one display */}
         <div className="mb-3 flex items-center justify-center gap-2 rounded-lg border border-[#f2bc45]/30 bg-[#f2bc45]/10 px-3 py-1.5">
@@ -88,7 +97,7 @@ export default function StatisticaPictographCard({ task, onCorrect, onWrong }: {
                 </div>
                 {isBuild ? (
                   <div className="flex shrink-0 items-center gap-1">
-                    <span className={`mr-1 w-12 text-right text-[11px] font-black tabular-nums ${built[i]! * task.keyUnits === cat.count ? "text-emerald-300" : "text-amber-300"}`}>aim {cat.count}</span>
+                    {!task.hideBuildTargets ? <span className={`mr-1 w-12 text-right text-[11px] font-black tabular-nums ${built[i]! * task.keyUnits === cat.count ? "text-emerald-300" : "text-amber-300"}`}>aim {cat.count}</span> : null}
                     <button type="button" onClick={() => step(i, -1)} disabled={settled} aria-label={`remove a symbol from ${cat.label}`} className="grid h-8 w-8 place-items-center rounded-md border border-white/15 bg-white/5 text-white/70 transition hover:bg-white/10 disabled:opacity-40"><Minus className="h-4 w-4" /></button>
                     <button type="button" onClick={() => step(i, 1)} disabled={settled} aria-label={`add a symbol to ${cat.label}`} className="grid h-8 w-10 place-items-center rounded-md border border-[#f2bc45]/55 bg-[#f2bc45]/15 text-lg font-black text-[#fff0c7] transition hover:bg-[#f2bc45]/25 disabled:opacity-40">+</button>
                   </div>
