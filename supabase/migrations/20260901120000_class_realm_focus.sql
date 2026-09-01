@@ -49,19 +49,19 @@ revoke all on public.class_realm_focus from anon;
 grant select, insert, update on public.class_realm_focus to authenticated;
 
 -- Shape one focus row as jsonb for the RPCs below.
-create or replace function public.class_realm_focus_json(row public.class_realm_focus)
+create or replace function public.class_realm_focus_json(rec public.class_realm_focus)
 returns jsonb
 language sql
 stable
 as $$
   select jsonb_build_object(
-    'class_id', row.class_id,
-    'focus_realm_id', row.focus_realm_id,
-    'starts_at', row.starts_at,
-    'ends_at', row.ends_at,
-    'engaged', row.engaged,
-    'engaged_at', row.engaged_at,
-    'updated_at', row.updated_at
+    'class_id', rec.class_id,
+    'focus_realm_id', rec.focus_realm_id,
+    'starts_at', rec.starts_at,
+    'ends_at', rec.ends_at,
+    'engaged', rec.engaged,
+    'engaged_at', rec.engaged_at,
+    'updated_at', rec.updated_at
   );
 $$;
 
