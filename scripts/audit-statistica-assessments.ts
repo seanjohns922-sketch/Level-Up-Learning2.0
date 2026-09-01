@@ -24,7 +24,9 @@ const descriptorTaskKinds: Record<string, readonly string[]> = {
   AC9M5ST01: ["statisticaClassify", "statisticaSort", "statisticaShape"],
   AC9M5ST02: ["statisticaLineGraph", "statisticaDisplayStudio"],
   AC9M5ST03: ["statisticaClassify", "statisticaDisplayStudio", "statisticaInvestigation"],
-  AC9M6ST01: ["statisticaClassify", "statisticaShape"], AC9M6ST02: ["statisticaMediaAnalysis"], AC9M6ST03: ["statisticaClassify"],
+  AC9M6ST01: ["statisticaClassify", "statisticaSort", "statisticaShape"],
+  AC9M6ST02: ["statisticaMediaAnalysis"],
+  AC9M6ST03: ["statisticaClassify", "statisticaDisplayStudio", "statisticaInvestigation"],
 };
 
 assert.equal(STATISTICA_WEEKLY_QUIZ_FORMS.length, 30, "Statistica must have 30 weekly quiz forms");
@@ -166,6 +168,33 @@ assert.notDeepEqual(
   "Year 5 post-test must be independently authored, not a renamed pre-test",
 );
 
+const yearSixPretest = getStatisticaIndependentAssessment(6, "pretest");
+const yearSixPosttest = getStatisticaIndependentAssessment(6, "posttest");
+for (const [form, items] of [["pre-test", yearSixPretest], ["post-test", yearSixPosttest]] as const) {
+  assert.equal(items.length, 20, `Year 6 ${form} must retain 20 questions`);
+  assert.ok(items.every((item) => !/starting check|mastery check|evidence file/i.test(item.prompt)), `Year 6 ${form} prompts must use natural child-facing language`);
+  assert.ok(new Set(items.map((item) => item.practiceTask!.kind)).size >= 6, `Year 6 ${form} needs broad interaction variety`);
+  const dataTypeSort = items.find((item) => item.practiceTask?.kind === "statisticaSort")?.practiceTask;
+  assert.ok(dataTypeSort?.kind === "statisticaSort" && dataTypeSort.categories.length === 4 && dataTypeSort.items.length >= 8, `Year 6 ${form} must classify all four data types`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaShape" && Boolean(item.practiceTask.categoriesB)), `Year 6 ${form} must compare paired distributions`);
+  const mediaModes = items.flatMap((item) => item.practiceTask?.kind === "statisticaMediaAnalysis" ? [item.practiceTask.mode] : []);
+  assert.deepEqual(new Set(mediaModes), new Set(["calculate", "method", "conclusion", "distortion", "quantify", "repair", "defend"]), `Year 6 ${form} must analyse media evidence through seven distinct operations`);
+  const correctPositions = items.flatMap((item) => {
+    const task = item.practiceTask!;
+    if (!("options" in task) || !Array.isArray(task.options) || !("correctOptionIds" in task) || !task.correctOptionIds?.length) return [];
+    return [task.options.findIndex((option) => task.correctOptionIds!.includes(option.id))];
+  });
+  assert.ok(new Set(correctPositions).size >= 3, `Year 6 ${form} must vary correct-answer positions`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaDisplayStudio" && item.practiceTask.mode === "design"), `Year 6 ${form} must design and justify an exact comparison display`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaInvestigation"), `Year 6 ${form} must complete an investigation cycle`);
+  assert.ok(items.slice(-2).every((item) => ["statisticaInvestigation", "statisticaClassify"].includes(item.practiceTask!.kind)), `Year 6 ${form} must finish with investigation and qualified reporting`);
+}
+assert.notDeepEqual(
+  yearSixPretest.map((item) => item.practiceTask),
+  yearSixPosttest.map((item) => item.practiceTask),
+  "Year 6 post-test must be independently authored, not a renamed pre-test",
+);
+
 const ids = new Set<string>();
 const prompts = new Set<string>();
 const contexts = new Set<string>();
@@ -189,6 +218,21 @@ for (const level of levels) {
       assert.equal(item.type, "statisticaTask");
       assert.ok(item.practiceTask, `${item.id} needs a visual interaction`);
       assert.equal(isPracticeTaskSafe(item.practiceTask), true, `${item.id} must be accepted by the production task renderer`);
+      if ("options" in item.practiceTask && Array.isArray(item.practiceTask.options) && "correctOptionIds" in item.practiceTask) {
+        for (const correctId of item.practiceTask.correctOptionIds ?? []) {
+          assert.ok(item.practiceTask.options.some((option) => option.id === correctId), `${item.id} correct answer must match a visible choice`);
+        }
+      }
+      if (item.practiceTask.kind === "statisticaInvestigation") {
+        for (const survey of item.practiceTask.surveys) {
+          assert.ok(survey.analyses.length >= 2, `${item.id} investigation needs multi-step analysis`);
+          for (const analysis of survey.analyses) {
+            for (const correctId of analysis.correctOptionIds) {
+              assert.ok(analysis.options.some((option) => option.id === correctId), `${item.id} investigation answer must match a visible choice`);
+            }
+          }
+        }
+      }
       if (item.practiceTask.kind === "statisticaDisplayStudio" && item.practiceTask.mode === "design") {
         const designTask = item.practiceTask;
         assert.ok((designTask.titleOptions?.length ?? 0) >= 3, `${item.id} design task needs visible title choices`);

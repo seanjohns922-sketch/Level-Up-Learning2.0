@@ -39,15 +39,6 @@ function options(labels: readonly string[]) {
   return labels.map((label, index) => ({ id: String(index), label }));
 }
 
-function rows(seed: number, scale = 1) {
-  return ["North", "East", "South", "West"].map((label, index) => ({
-    id: label.toLowerCase(),
-    label,
-    color: COLOURS[index]!,
-    count: (3 + ((seed * 2 + index * 3) % 6)) * scale,
-  }));
-}
-
 function assessmentPrompt(level: number, form: StatisticaAssessmentKind, index: number, action: string) {
   if (level <= 4) return action;
   const check = form === "pretest" ? "starting check" : "mastery check";
@@ -1168,86 +1159,285 @@ function levelFiveTask(form: StatisticaAssessmentKind, index: number): PracticeT
   }
 }
 
+function buildLevelSixTask(form: StatisticaAssessmentKind, index: number): PracticeTask {
+  const action = <T,>(pretest: T, posttest: T): T => form === "pretest" ? pretest : posttest;
+  const shapeA = (form === "pretest" ? [1, 4, 11, 4, 1] : [1, 3, 13, 5, 1]).map((count, value) => ({
+    id: `shape-a-${value}`, label: String(value), color: COLOURS[value % COLOURS.length]!, count,
+  }));
+  const shapeB = (form === "pretest" ? [5, 4, 11, 4, 5] : [6, 4, 13, 4, 6]).map((count, value) => ({
+    id: `shape-b-${value}`, label: String(value), color: COLOURS[value % COLOURS.length]!, count,
+  }));
+  const rawA = form === "pretest" ? [12, 14, 14, 15, 15, 15, 16, 18] : [22, 24, 25, 25, 25, 26, 27, 28];
+  const rawB = form === "pretest" ? [10, 13, 15, 15, 15, 17, 19, 21] : [18, 22, 25, 25, 25, 28, 31, 34];
+  const rawMode = form === "pretest" ? 15 : 25;
+  const rangeA = Math.max(...rawA) - Math.min(...rawA);
+  const rangeB = Math.max(...rawB) - Math.min(...rawB);
+
+  switch (index) {
+    case 0:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Recovery time was recorded as 42.6, 39.8 and 45.1 seconds. What type of numerical data is this?", "Water temperature was recorded as 18.4, 19.05 and 20.2 degrees Celsius. What type of data is this?"),
+        speakText: "Decide whether the values were counted in whole steps or measured along a continuous scale.", target: 1,
+        variable: action("Recovery time", "Water temperature"), examples: action("42.6 s, 39.8 s, 45.1 s", "18.4°C, 19.05°C, 20.2°C"),
+        options: options(["Continuous numerical", "Discrete numerical", "Ordinal categorical"]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 1: {
+      const mixed = form === "pretest"
+        ? [["Favourite activity", "nominal"], ["Satisfaction rating", "ordinal"], ["Goals scored", "discrete"], ["Running time", "continuous"], ["Eye colour", "nominal"], ["Water volume", "continuous"], ["Race place", "ordinal"], ["Books read", "discrete"]]
+        : [["Habitat type", "nominal"], ["Risk rating", "ordinal"], ["Birds counted", "discrete"], ["Leaf length", "continuous"], ["Transport mode", "nominal"], ["Recovery stage", "ordinal"], ["Visits recorded", "discrete"], ["Air temperature", "continuous"]];
+      return {
+        kind: "statisticaSort",
+        prompt: action("Sort the eight variables into all four Year 6 data types.", "Classify each investigation variable before deciding how to collect it."),
+        speakText: "Separate unordered categories, ordered categories, whole-number counts and continuous measurements.", target: mixed.length,
+        categories: [
+          { id: "nominal", label: "Nominal", color: COLOURS[0]! }, { id: "ordinal", label: "Ordinal", color: COLOURS[1]! },
+          { id: "discrete", label: "Discrete", color: COLOURS[2]! }, { id: "continuous", label: "Continuous", color: COLOURS[3]! },
+        ],
+        items: mixed.map(([label, category], itemIndex) => ({ id: `data-${itemIndex}`, label: label!, category: category! })), feedback: feedback(),
+      };
+    }
+    case 2:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Calculate the mode and range of Sample A.", "Calculate the mode and range of the recorded response times."),
+        speakText: "Find the value occurring most often, then subtract the minimum from the maximum.", target: 1,
+        variable: action("Sample A", "Response times"), examples: rawA.join(", "),
+        supportingDetails: [{ label: "Definitions", value: "Mode = most frequent value. Range = maximum minus minimum." }],
+        options: options([`Mode ${rawMode}; range ${rangeA}`, `Mode ${rawMode}; range ${Math.max(...rawA)}`, `Mode ${Math.max(...rawA)}; range ${rangeA}`]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 3:
+      return {
+        kind: "statisticaShape", mode: "compare",
+        prompt: action("Both groups have the same mode. Which comparison uses the complete distributions?", "Compare the two distributions using mode, concentration and variation."),
+        speakText: "An equal mode does not make two distributions equal. Compare where all frequencies occur and how strongly they cluster.", target: 1,
+        display: "columns", categories: shapeA, categoriesB: shapeB, setLabelA: "Group A", setLabelB: "Group B",
+        options: options(["Both peak at 2, but Group A is more concentrated while Group B has more observations at the extremes.", "The groups are identical because both have mode 2.", "Group B has no mode because it has variation."]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 4:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Compare Sample A and Sample B using both mode and range.", "Which statement correctly compares the two recorded samples?"),
+        speakText: "Calculate each range and identify each mode before deciding what the statistics show.", target: 1,
+        variable: "Two numerical samples", examples: `A: ${rawA.join(", ")} | B: ${rawB.join(", ")}`,
+        supportingDetails: [{ label: "Comparison", value: "Do not use one summary statistic to describe every feature." }],
+        options: options([`Both have mode ${rawMode}, but B has the greater range: ${rangeB} compared with ${rangeA}.`, `Both have range ${rawMode} because that is their mode.`, `A is more variable because its maximum is smaller.`]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 5:
+      return {
+        kind: "statisticaShape", mode: "variation",
+        prompt: action("Which group shows greater variation, and what evidence supports that judgement?", "Use the full shapes to decide which distribution is more variable."),
+        speakText: "Look beyond the tallest column and compare how much frequency lies away from the centre.", target: 1,
+        display: "columns", categories: shapeA, categoriesB: shapeB, setLabelA: "Group A", setLabelB: "Group B",
+        options: options(["Group B, because more observations occur at values far from the modal value.", "Group A, because its centre column is tall.", "Neither, because an equal mode guarantees equal variation."]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 6:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which comparison plan would produce valid side-by-side recovery-time data?", "Which method supports a fair comparison of two habitat measurements?"),
+        speakText: "Both groups need the same variable, unit, instrument, duration and inclusion rule.", target: 1,
+        variable: "Planning a fair comparison", examples: action("Compare recovery times for two training groups.", "Compare water temperature at two wetland sites."),
+        supportingDetails: [{ label: "Validity", value: "A comparison is weakened when collection conditions differ." }],
+        options: options(action(
+          ["Use the same timing rule after the same activity and record every selected participant once.", "Time one group after exercise and the other before exercise.", "Keep only the fastest result from Group A."],
+          ["Use calibrated thermometers at both sites at matched times and depths.", "Measure one site at dawn and the other at midday.", "Round one site's results but not the other."],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 7: {
+      const values = action([64, 58], [83, 76]);
+      const difference = values[0]! - values[1]!;
+      return {
+        kind: "statisticaMediaAnalysis", mode: "calculate",
+        prompt: action("Calculate the actual change before judging the headline.", "Use the published table to calculate the exact difference."),
+        speakText: "Subtract the later value from the earlier value, then compare the size of the change with the wording of the claim.", target: difference,
+        claim: action("The new plan transformed the result.", "The revised process delivered a dramatic improvement."),
+        data: { title: action("Average completion time", "Average error rate"), labels: ["Earlier", "Current"], values, unit: action("minutes", "errors") }, display: "table",
+        evidenceNote: action("Lower completion time is better.", "Lower error count is better."),
+        options: options([`The recorded improvement is ${difference} ${action("minutes", "errors")}.`, `The recorded improvement is ${values[1]} ${action("minutes", "errors")}.`, "The table does not contain enough numbers to calculate a change."]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    }
+    case 8:
+      return {
+        kind: "statisticaMediaAnalysis", mode: "method",
+        prompt: action("Audit the survey method before accepting the popularity claim.", "Which method flaw most limits the environmental claim?"),
+        speakText: "Check who was invited, who responded and whether the sample represents the group named in the claim.", target: 1,
+        claim: action("Every family prefers the new homework portal.", "The whole town supports the wetland project."),
+        data: { title: "Survey responses", labels: ["Support", "Do not support"], values: action([24, 4], [31, 6]), unit: "responses" }, display: "columns",
+        sample: action("Twenty-eight volunteers who clicked a link in the portal newsletter.", "Thirty-seven volunteers recruited at a wetland open day."), method: "Voluntary-response survey",
+        options: options(["The voluntary sample is likely to overrepresent people already engaged with the subject.", "The result is unbiased because more people selected support.", "A column graph makes every sample representative."]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 9:
+      return {
+        kind: "statisticaMediaAnalysis", mode: "conclusion",
+        prompt: action("Decide whether the conclusion is supported by the evidence and sample.", "Test the headline against the experiment that was actually conducted."),
+        speakText: "Separate what happened in the observed sample from a universal claim about everyone or every future condition.", target: 1,
+        claim: action("The program improves results for every student.", "The treatment makes every plant grow faster."),
+        data: { title: action("Observed sample average", "Observed plant growth"), labels: ["Comparison", "Program"], values: action([71, 76], [18, 22]), unit: action("points", "cm") }, display: "table",
+        sample: action("Two classes from one school over one assessment week.", "Twelve seedlings of one variety over three weeks."), method: "Same measurement schedule for both observed groups",
+        options: options(["The observed group had the higher average, but the evidence does not justify a claim about every student or plant.", "The higher average proves every individual improved.", "The claim is true because both groups were measured." ]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 10: {
+      const values = action([94, 97], [72, 75]);
+      const axisMin = action(92, 70);
+      return {
+        kind: "statisticaMediaAnalysis", mode: "distortion",
+        prompt: action("What makes the published graph visually misleading?", "Identify how the axis changes the impression of the result."),
+        speakText: "Compare the exact values with the visual difference created by an axis that begins close to the smaller value.", target: 1,
+        claim: action("Support has skyrocketed!", "Performance has surged!"),
+        data: { title: action("Survey support", "Performance score"), labels: ["Earlier", "Current"], values, unit: action("percent", "points") }, display: "columns", axisMin,
+        evidenceNote: `The exact increase is ${values[1]! - values[0]!} ${action("percentage points", "points")}.`,
+        options: options([`The axis starts at ${axisMin}, so a ${values[1]! - values[0]!}-point increase occupies most of the visible scale.`, "The category labels are horizontal.", "Using the same colour for both columns changes the values."]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    }
+    case 11:
+      return {
+        kind: "statisticaMediaAnalysis", mode: "quantify",
+        prompt: action("Quantify the real change and compare it with the oversized symbols.", "Calculate the proportional change before judging the pictograph."),
+        speakText: "Use the printed values. Doubling both an icon's width and height makes its area four times as large.", target: 1,
+        claim: action("Participation has doubled!", "Recycling has exploded to twice its old level!"),
+        data: { title: action("Club participation", "Recycling collected"), labels: ["Earlier", "Current"], values: action([100, 120], [50, 60]), unit: action("students", "kg"), visualMultipliers: [1, 2] }, display: "pictograph",
+        evidenceNote: action("The printed values rise from 100 to 120.", "The printed values rise from 50 to 60."),
+        options: options(["The value increased by 20%, but the second icon's fourfold area greatly exaggerates that change.", "The value doubled because the icon is twice as wide.", "The symbol area does not affect how the graph is interpreted."]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 12:
+      return {
+        kind: "statisticaMediaAnalysis", mode: "repair",
+        prompt: action("Which repair would make the published trend report fair?", "Repair the selected-data display so it answers the full-period question."),
+        speakText: "Restore the omitted observations and use a consistent scale before writing the conclusion.", target: 1,
+        claim: action("Visits rose every month this year.", "Water quality improved throughout the whole study."),
+        data: {
+          title: action("Months selected for publication", "Weeks selected for publication"), labels: action(["Jan", "Feb", "Mar"], ["W1", "W2", "W3"]), values: action([20, 28, 35], [62, 68, 73]), unit: action("visits", "points"),
+          source: action({ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], values: [20, 28, 35, 24, 19, 22] }, { labels: ["W1", "W2", "W3", "W4", "W5", "W6"], values: [62, 68, 73, 65, 59, 63] }),
+        }, display: "selected",
+        options: options(["Show all six periods on one consistent scale and rewrite the claim to include the later decline.", "Keep only the rising periods and make the title larger.", "Remove the exact values so readers focus on the shape." ]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 13: {
+      const values = action([45, 35, 25], [52, 38, 20]);
+      const total = values.reduce((sum, value) => sum + value, 0);
+      return {
+        kind: "statisticaMediaAnalysis", mode: "defend",
+        prompt: action("Choose the critique that proves the claimed whole is invalid.", "Defend a critique of the percentage display using numerical evidence."),
+        speakText: "Add every percentage, identify the exact flaw and explain why the whole cannot represent one complete group.", target: total,
+        claim: "These percentages describe the whole sample.",
+        data: { title: action("Reported preference share", "Reported budget share"), labels: ["A", "B", "C"], values, unit: "%" }, display: "parts",
+        evidenceNote: `The displayed parts total ${total}%.`,
+        options: options([`The parts total ${total}%, not 100%, so the categories cannot represent one complete whole as shown.`, "The display is invalid because three categories are never allowed.", "Changing the colours would make the percentages total 100%." ]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    }
+    case 14:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which refined question is neutral, measurable and specific enough for an investigation?", "Which question supports a defensible comparison of two groups?"),
+        speakText: "A strong statistical question names the group, variable and conditions without suggesting the desired answer.", target: 1,
+        variable: "Refining the investigation question", examples: action("Topic: screen use before school", "Topic: travel time for two year levels"),
+        options: options(action(
+          ["How many minutes of screen use does each sampled Year 6 student record before school this week?", "Why do students use too many screens?", "Are screens bad?"],
+          ["How do recorded travel times compare for sampled Year 5 and Year 6 students using the same school-day definition?", "Why is Year 6 travel faster?", "Which year level is best?"],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 15:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which sampling plan best represents the year level while remaining practical?", "Which plan reduces selection bias in the two-group comparison?"),
+        speakText: "Select participants across the intended population rather than relying only on volunteers or one convenient subgroup.", target: 1,
+        variable: "Selecting the sample", examples: action("The year level has six classes.", "Each year level has five classes."),
+        supportingDetails: [{ label: "Goal", value: "Make the sample reasonably representative of the group named in the question." }],
+        options: options(action(
+          ["Randomly select a similar number of students from each of the six classes.", "Survey only the technology club.", "Use the first ten volunteers who respond."],
+          ["Randomly select students from every class in both year levels using the same rule.", "Use one high-performing class from Year 6 and all Year 5 classes.", "Ask only students who walk to school."],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 16:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which collection protocol produces valid continuous data?", "Which protocol makes the two groups' measurements comparable?"),
+        speakText: "Specify the instrument, unit, precision, timing and treatment of missing or invalid records.", target: 1,
+        variable: "Writing the collection protocol", examples: action("Measure travel time in minutes.", "Measure leaf length at two sites."),
+        options: options(action(
+          ["Use the same timer, record to the nearest tenth of a minute and document missing journeys.", "Let each student choose minutes or hours.", "Round some results to whole numbers and keep others to tenths."],
+          ["Use the same ruler and precision, sample leaves by one rule and measure both sites on the same day.", "Use centimetres at one site and unconverted millimetres at the other.", "Keep only the longest leaves from Site A."],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 17:
+      return {
+        kind: "statisticaDisplayStudio", mode: "design",
+        prompt: action("Design the summary display that best supports an exact two-group comparison.", "Choose a precise display, title and justification for the investigation report."),
+        speakText: "Match the display to the reporting purpose, then choose a title and justification that identify the evidence accurately.", target: 1,
+        question: action("What were the mode and range for each recovery-time group?", "What were the mode and range for each habitat sample?"), purpose: "Allow exact summary values for both groups to be looked up without estimating from an axis.",
+        data: { labels: ["A mode", "A range", "B mode", "B range"], values: [rawMode, rangeA, rawMode, rangeB], unit: "units" },
+        displayOptions: ["column", "line", "table"], correctDisplay: "table",
+        titleOptions: options(action(["Recovery-time mode and range by group", "Our graph", "Fastest students"], ["Habitat-sample mode and range", "Results", "Best habitat"])), correctTitleId: "0",
+        reasonOptions: options(["A table prints each exact summary value and keeps the two groups clearly labelled.", "A line graph should connect mode to range as if they were consecutive times.", "The display with the brightest colour is most valid."]), correctReasonId: "0", feedback: feedback(),
+      };
+    case 18: {
+      const counts = action([15, 30, 20, 25], [20, 35, 15, 30]);
+      const labels = action(["Walk", "Bike", "Bus", "Car"], ["Creek", "Wetland", "Woodland", "Grassland"]);
+      const categories = counts.map((count, rowIndex) => ({ id: `investigation-${rowIndex}`, label: labels[rowIndex]!, color: COLOURS[rowIndex]!, count }));
+      const greatestIndex = counts.indexOf(Math.max(...counts));
+      return {
+        kind: "statisticaInvestigation",
+        prompt: action("Complete the travel investigation and report only what the evidence supports.", "Complete the habitat-priority investigation from prediction to qualified conclusion."),
+        speakText: "Choose the question, predict, construct the display accurately and analyse the observed sample without overgeneralising.", target: 1, buildStep: 5,
+        surveys: [{
+          id: "level-six-investigation", question: action("What was the main travel mode in the sampled Year 6 group?", "Which habitat was prioritised by the sampled community group?"), unit: "responses", categories,
+          analyses: [
+            { prompt: "Which category has the greatest observed frequency?", speak: "Compare every column before selecting the greatest frequency.", options: options(labels), correctOptionIds: [String(greatestIndex)] },
+            { prompt: "Which conclusion is defensible?", speak: "Keep the finding within the group that was actually sampled.", options: options([`${labels[greatestIndex]} was recorded most often in this sample.`, `${labels[greatestIndex]} is preferred by everyone in the wider population.`, `The graph proves why respondents selected ${labels[greatestIndex]}.`]), correctOptionIds: ["0"] },
+          ],
+        }], feedback: feedback(),
+      };
+    }
+    default:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which final report integrates the comparison and its limitations?", "Which conclusion is strongest for the completed two-group investigation?"),
+        speakText: "Use mode, range and shape together, identify the observed sample and state limits on generalisation.", target: 1,
+        variable: "Communicating a defensible conclusion", examples: action(`Both samples had mode ${rawMode}; ranges were ${rangeA} and ${rangeB}.`, `Both samples had mode ${rawMode}; Sample B had the wider range.`),
+        supportingDetails: [{ label: "Scope", value: action("Two selected groups were measured once under matched conditions.", "The samples came from two sites during one collection period.") }],
+        options: options(action(
+          [`Both observed groups had mode ${rawMode}, but Sample B varied more widely; the result should be limited to these measured groups.`, "Equal modes prove the groups are identical in every way.", "The larger range proves the method caused the difference."],
+          [`Both samples had mode ${rawMode}, while Sample B had greater spread; further samples are needed before generalising to all conditions.`, "Sample B will always be more variable at every site.", "The mode alone proves the habitats are equivalent."],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+  }
+}
+
+function rotateAssessmentOptions<T>(values: T[], shift: number): T[] {
+  if (values.length < 2) return values;
+  const offset = ((shift % values.length) + values.length) % values.length;
+  return [...values.slice(offset), ...values.slice(0, offset)];
+}
+
 function levelSixTask(form: StatisticaAssessmentKind, index: number): PracticeTask {
-  if (index % 4 === 0) {
-    const continuous = index % 2 === 0;
+  const task = buildLevelSixTask(form, index);
+  const shift = index + (form === "posttest" ? 1 : 0);
+
+  if (task.kind === "statisticaDisplayStudio" && task.mode === "design") {
     return {
-      kind: "statisticaClassify",
-      prompt: assessmentPrompt(6, form, index, "classify the data and test whether the comparison method is fair."),
-      speakText: "Distinguish a measurement from a count, then check that both groups used the same collection rule.", target: 1,
-      variable: continuous ? "Recovery time in seconds" : "Number of completed circuits", examples: continuous ? "42.6, 39.8, 45.1" : "6, 8, 7",
-      supportingDetails: [{ label: "Method", value: "Both groups were observed for the same period under the same conditions." }],
-      options: options(["Continuous measurement", "Discrete count", "Categorical label"]), correctOptionIds: [continuous ? "0" : "1"], feedback: feedback(),
+      ...task,
+      titleOptions: task.titleOptions ? rotateAssessmentOptions(task.titleOptions, shift) : task.titleOptions,
+      reasonOptions: task.reasonOptions ? rotateAssessmentOptions(task.reasonOptions, shift + 1) : task.reasonOptions,
     };
   }
-  if (index % 4 === 1) {
-    const a = rows(index);
-    const b = a.map((row, rowIndex) => ({ ...row, count: row.count + (rowIndex % 2 === 0 ? 3 : -1) }));
+  if (task.kind === "statisticaInvestigation") {
     return {
-      kind: "statisticaShape", mode: "compare",
-      prompt: assessmentPrompt(6, form, index, "compare mode, range and shape before judging the groups."),
-      speakText: "Use several distribution features, not a single tallest bar.", target: 1, display: "columns", categories: a, categoriesB: b, setLabelA: "Group A", setLabelB: "Group B",
-      options: options(["Group B is more variable and the groups have different shapes.", "The colours prove Group A is stronger.", "One peak is enough to describe both groups."]), correctOptionIds: ["0"], feedback: feedback(),
+      ...task,
+      surveys: task.surveys.map((survey, surveyIndex) => ({
+        ...survey,
+        analyses: survey.analyses.map((analysis, analysisIndex) => ({
+          ...analysis,
+          options: rotateAssessmentOptions(analysis.options, shift + surveyIndex + analysisIndex),
+        })),
+      })),
     };
   }
-  const before = 70 + index;
-  const after = 67 + index;
-  const mediaMode = (["method", "conclusion", "distortion", "repair"] as const)[index % 4]!;
-  return {
-    kind: "statisticaMediaAnalysis", mode: mediaMode,
-    prompt: assessmentPrompt(6, form, index, "audit the claim using the sample, exact values and representation."),
-    speakText: "Analyse the evidence before deciding whether the claim is defensible.", target: 1,
-    claim: "The new approach produced a dramatic improvement for everyone.",
-    data: { title: "Reported result", labels: ["Before", "After"], values: [before, after], unit: "points" }, display: "columns", axisMin: index % 2 === 0 ? 65 : undefined,
-    sample: "Fourteen volunteers from one participating group.", method: "Voluntary response, one collection day", evidenceNote: `The measured difference is ${before - after} points.`,
-    options: options([`The broad claim is not justified; the sample is narrow and the ${before - after}-point change may be visually exaggerated.`, "Two bars prove the result applies to everyone.", "Matching colours make the method unbiased."]), correctOptionIds: ["0"], feedback: feedback(),
-  };
+  if (task.kind === "statisticaClassify" || task.kind === "statisticaShape" || task.kind === "statisticaMediaAnalysis") {
+    return { ...task, options: rotateAssessmentOptions(task.options, shift) };
+  }
+  return task;
 }
 
-function investigationTask(level: StatisticaLevel, form: StatisticaAssessmentKind, index: number): PracticeTask {
-  return {
-    kind: "statisticaClassify",
-    prompt: assessmentPrompt(level, form, index, "choose the plan that can produce a defensible answer to the investigation question."),
-    speakText: "Check the question, sample, variable, collection method and proposed conclusion together.",
-    target: 1,
-    variable: "Investigation plan",
-    examples: "Question: How does travel time vary for students in our year level?",
-    supportingDetails: [
-      { label: "Evidence needed", value: "A defined sample, the same measurement rule and records from every participant." },
-      { label: "Reporting rule", value: "The conclusion must stay within the group and conditions actually studied." },
-    ],
-    options: options([
-      "Measure a defined sample using one rule, display all results, then qualify the conclusion.",
-      "Ask only the fastest traveller and apply the result to everyone.",
-      "Remove inconvenient results without recording why.",
-    ]),
-    correctOptionIds: ["0"],
-    feedback: feedback(),
-  };
-}
-
-function modeAndShapeTask(level: 5 | 6, form: StatisticaAssessmentKind, index: number): PracticeTask {
-  const data = rows(index);
-  const greatest = [...data].sort((a, b) => b.count - a.count)[0]!;
-  return {
-    kind: "statisticaShape",
-    mode: "concentrated",
-    prompt: assessmentPrompt(level, form, index, "identify the mode and select the description supported by the complete distribution."),
-    speakText: "Find the greatest frequency, then inspect how the remaining values are distributed.",
-    target: greatest.count,
-    display: "columns",
-    categories: data,
-    options: options([
-      `${greatest.label} is the mode, but the other frequencies still show variation.`,
-      "The mode means every observation has that value.",
-      "A distribution has no variation whenever it has a mode.",
-    ]),
-    correctOptionIds: ["0"],
-    feedback: feedback(),
-  };
-}
-
-function taskFor(level: StatisticaLevel, form: StatisticaAssessmentKind, index: number, descriptorCode: string) {
+function taskFor(level: StatisticaLevel, form: StatisticaAssessmentKind, index: number) {
   if (level === 1) return levelOneTask(index);
   if (level === 2) return levelTwoTask(form, index);
   if (level === 3) return levelThreeTask(form, index);
@@ -1255,9 +1445,7 @@ function taskFor(level: StatisticaLevel, form: StatisticaAssessmentKind, index: 
   if (level === 5) {
     return levelFiveTask(form, index);
   }
-  if (descriptorCode === "AC9M6ST03") return investigationTask(level, form, index);
-  if (descriptorCode === "AC9M6ST01") return index % 2 === 0 ? levelSixTask(form, index * 4) : modeAndShapeTask(level, form, index);
-  return levelSixTask(form, index * 4 + 2);
+  return levelSixTask(form, index);
 }
 
 function expandMix<T extends string>(mix: Record<T, number>): T[] {
@@ -1288,7 +1476,7 @@ function buildForm(level: StatisticaLevel, form: StatisticaAssessmentKind): Asse
   const cognitive = expandMix(formBlueprint.cognitiveMix);
   return Array.from({ length: 20 }, (_, index) => {
     const descriptor = descriptors[index]!;
-    const task = taskFor(level, form, index, descriptor.code);
+    const task = taskFor(level, form, index);
     const responseMode: AssessmentResponseMode = index < formBlueprint.selectedResponseMaximum ? "selected_response" : "manipulated_response";
     const cognitiveCategory = cognition(cognitive[index]!);
     const itemDifficulty = difficulty(difficulties[index]!);
