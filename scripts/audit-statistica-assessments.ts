@@ -7,12 +7,14 @@ import { getStatisticaAssessmentBlueprint } from "@/data/assessments/statisticaA
 import { ASSESSMENT_THRESHOLDS, posttestPassed, weeklyQuizPassed } from "@/lib/assessment-rules";
 import { getPosttestForYearLabel, getPretestForYearLabel } from "@/data/assessments/api";
 import { buildAssessmentReturnRoute } from "@/lib/assessment-routes";
+import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 const levels = [1, 2, 3, 4, 5, 6] as const;
 const descriptorTaskKinds: Record<string, readonly string[]> = {
   AC9M1ST01: ["statisticaTally", "statisticaTable", "statisticaClassify", "statisticaCollect", "statisticaSort"],
   AC9M1ST02: ["statisticaGraph", "statisticaTapGraph", "statisticaGap", "statisticaRank", "statisticaInference"],
-  AC9M2ST01: ["statisticaClassify", "statisticaTable"], AC9M2ST02: ["statisticaGraph", "statisticaInference"],
+  AC9M2ST01: ["statisticaTally", "statisticaTable", "statisticaClassify", "statisticaCollect", "statisticaSort"],
+  AC9M2ST02: ["statisticaGraph", "statisticaTapGraph", "statisticaGap", "statisticaRank", "statisticaDisplayStudio", "statisticaInference"],
   AC9M3ST01: ["statisticaClassify", "statisticaTable"], AC9M3ST02: ["statisticaInference"], AC9M3ST03: ["statisticaClassify"],
   AC9M4ST01: ["statisticaPictograph", "statisticaGraph"], AC9M4ST02: ["statisticaShape"], AC9M4ST03: ["statisticaClassify"],
   AC9M5ST01: ["statisticaClassify", "statisticaShape"], AC9M5ST02: ["statisticaLineGraph"], AC9M5ST03: ["statisticaClassify"],
@@ -50,6 +52,33 @@ assert.ok(yearOnePosttest.some((item) => item.practiceTask?.kind === "statistica
 assert.ok(yearOnePosttest.some((item) => item.practiceTask?.kind === "statisticaSort"), "Year 1 must assess categorising data");
 assert.ok(yearOnePosttest.slice(-3).every((item) => item.practiceTask?.kind === "statisticaInference"), "Year 1 must finish with evidence-based reasoning");
 
+const yearTwoPretest = getStatisticaIndependentAssessment(2, "pretest");
+const yearTwoPosttest = getStatisticaIndependentAssessment(2, "posttest");
+for (const [form, items] of [["pre-test", yearTwoPretest], ["post-test", yearTwoPosttest]] as const) {
+  assert.equal(items.length, 20, `Year 2 ${form} must retain 20 questions`);
+  assert.ok(items.every((item) => !/starting check|mastery check|evidence file/i.test(item.prompt)), `Year 2 ${form} prompts must use natural child-facing language`);
+  assert.ok(new Set(items.map((item) => item.practiceTask!.kind)).size >= 10, `Year 2 ${form} needs broad interaction variety`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaCollect"), `Year 2 ${form} must assess data collection`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaSort"), `Year 2 ${form} must assess categorisation`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaDisplayStudio"), `Year 2 ${form} must assess display choice`);
+  assert.ok(items.slice(-3).every((item) => item.practiceTask?.kind === "statisticaInference"), `Year 2 ${form} must finish with evidence-based reasoning`);
+}
+assert.notDeepEqual(
+  yearTwoPretest.map((item) => item.practiceTask),
+  yearTwoPosttest.map((item) => item.practiceTask),
+  "Year 2 post-test must be independently authored, not a renamed pre-test",
+);
+const yearTwoPostCounts = yearTwoPosttest.flatMap((item) => {
+  const task = item.practiceTask!;
+  if (task.kind === "statisticaTally") return [task.count];
+  if ("categories" in task && Array.isArray(task.categories)) {
+    return task.categories.flatMap((category) => "count" in category && typeof category.count === "number" ? [category.count] : []);
+  }
+  if (task.kind === "statisticaTable") return task.rows.map((row) => row.count);
+  return [];
+});
+assert.ok(Math.max(...yearTwoPostCounts) >= 18, "Year 2 post-test must include meaningful double-digit frequencies");
+
 const ids = new Set<string>();
 const prompts = new Set<string>();
 const contexts = new Set<string>();
@@ -72,6 +101,7 @@ for (const level of levels) {
       assert.equal(item.sourcePool, formBlueprint.kind);
       assert.equal(item.type, "statisticaTask");
       assert.ok(item.practiceTask, `${item.id} needs a visual interaction`);
+      assert.equal(isPracticeTaskSafe(item.practiceTask), true, `${item.id} must be accepted by the production task renderer`);
       assert.ok(descriptorTaskKinds[item.primaryDescriptorCode]?.includes(item.practiceTask!.kind), `${item.id} renderer ${item.practiceTask!.kind} does not match ${item.primaryDescriptorCode}`);
       assert.ok("speakText" in item.practiceTask! && String(item.practiceTask.speakText).trim().length >= 12, `${item.id} needs read-aloud text`);
       assert.ok(!ids.has(item.id), `Duplicate assessment id ${item.id}`);
