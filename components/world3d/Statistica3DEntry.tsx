@@ -17,7 +17,7 @@ const StatisticaLevel3World = dynamic(() => import("@/components/world3d/Statist
   loading: () => <div className="grid min-h-screen place-items-center bg-[#12312a] font-semibold text-amber-100/80">Opening Statistica...</div>,
 });
 
-const STATISTICA_3D_LEVELS: RealmLevelId[] = ["Year 1"];
+const STATISTICA_3D_LEVELS: RealmLevelId[] = ["Year 1", "Year 2"];
 
 function resolvePreviewLevel(value: string | null): RealmLevelId {
   if (value === "Level 1" || value === "Year 1") return "Year 1";

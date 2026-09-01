@@ -35,6 +35,16 @@ export const STATISTICA_LEVEL_THEMES: Partial<Record<RealmLevelId, StatisticaLev
     accent: "#f06b64",
     secondaryAccent: "#f2bc45",
   },
+  "Year 2": {
+    level: "Year 2",
+    background: "/images/statistica-home-y2.png",
+    sky: "#8cced4",
+    fog: "#7ea98c",
+    ambientLight: "#f4fff1",
+    sunLight: "#ffd985",
+    accent: "#4fa7c9",
+    secondaryAccent: "#f2b84b",
+  },
 };
 
 export function getStatisticaLevelTheme(level: RealmLevelId) {

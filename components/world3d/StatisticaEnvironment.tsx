@@ -29,8 +29,8 @@ function stateVisual(state: RealmWorldGateState, accent: string, active: boolean
   return { frame: "#2c6f64", energy: accent, intensity: active ? 1.05 : state === "current" ? 0.72 : 0.42 };
 }
 
-function StatisticaGround() {
-  const source = useLoader(THREE.TextureLoader, "/images/statistica-home-y1.png");
+function StatisticaGround({ asset }: { asset: string }) {
+  const source = useLoader(THREE.TextureLoader, asset);
   const { gl } = useThree();
   const texture = useMemo(() => {
     const next = source.clone();
@@ -119,7 +119,7 @@ export function StatisticaEnvironment({ theme, quality, districtInterior }: { th
       <ambientLight color={theme.ambientLight} intensity={0.48} />
       <hemisphereLight args={[theme.sky, "#224339", 0.56]} />
       <directionalLight position={[-13, 24, 10]} color={theme.sunLight} intensity={1.2} />
-      <Suspense fallback={null}><StatisticaGround /></Suspense>
+      <Suspense fallback={null}><StatisticaGround asset={theme.background} /></Suspense>
       <mesh position={[0, -0.11, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[0.82, 1, 1]}><ringGeometry args={[53.8, 54.1, 72]} /><meshBasicMaterial color={theme.secondaryAccent} transparent opacity={0.24} toneMapped={false} depthWrite={false} /></mesh>
       {[-4.6, -2.9, -1.2, 1.2, 2.9, 4.6].map((x, index) => (
         <DataColumn key={x} x={x} z={districtInterior ? -11.8 : -16.5} height={[1.2, 2.4, 1.7, 3.2, 2, 2.8][index]!} color={[theme.accent, theme.secondaryAccent, "#79b85a", "#59add1", theme.accent, "#fff4df"][index]!} />

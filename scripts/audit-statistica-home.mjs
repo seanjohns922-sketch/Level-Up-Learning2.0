@@ -24,6 +24,7 @@ const visualMap = read("lib/statistica-visuals.ts");
 for (const assetName of assetNames) {
   assert(visualMap.includes(`/images/${assetName}`), `Statistica visual map does not reference ${assetName}`);
 }
+assert(visualMap.includes('"Year 2": {'), "Statistica Level 2 must have its own 3D visual theme");
 
 const legendCatalogue = read("data/legends.ts");
 const dataraVideos = [
@@ -72,6 +73,13 @@ assert(programRoute.includes("isStatisticsRealm"), "Shared weekly program must a
 for (const token of ['left: "4%"', 'top: "13%"', 'left: "calc(50% - 190px)"', 'top: "53%"', 'left: "68%"']) {
   assert(map.includes(token), `Statistica widget coordinate missing: ${token}`);
 }
+
+const statistica3dEntry = read("components/world3d/Statistica3DEntry.tsx");
+const statistica3dWorld = read("components/world3d/StatisticaLevel3World.tsx");
+const statistica3dEnvironment = read("components/world3d/StatisticaEnvironment.tsx");
+assert(statistica3dEntry.includes('["Year 1", "Year 2"]'), "Statistica 3D entry must support Levels 1 and 2");
+assert(statistica3dWorld.includes('level === "Year 1" || level === "Year 2"'), "Statistica Level 2 must use the guided Start Adventure 3D flow");
+assert(statistica3dEnvironment.includes("<StatisticaGround asset={theme.background} />"), "Statistica 3D ground must use the selected level background");
 
 for (const forbidden of ["fetchGlobalXp", "award", "writeProgress", "writeProgramStore", "supabase.from", "Blueprint preview"]) {
   assert(!map.includes(forbidden), `Statistica preview must not perform progress writes: ${forbidden}`);
