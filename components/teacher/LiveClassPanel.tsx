@@ -18,6 +18,7 @@ import {
   type LiveStudentStatus,
 } from "@/lib/live-class";
 import { LiveStudentDrawer, type LiveStudentDrawerData, type LiveStudentEventRow } from "@/components/teacher/LiveStudentDrawer";
+import FocusModeControl from "@/components/teacher/FocusModeControl";
 import { tryCanonicalRealmId } from "@/lib/realms/realm-registry";
 import { selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
@@ -1294,6 +1295,8 @@ export default function LiveClassPanel({
               <span className="text-slate-300">·</span>
               <span className="text-slate-400">{notStartedTodayCount} not started</span>
             </div>
+
+            {selectedClass?.id ? <FocusModeControl classId={selectedClass.id} /> : null}
           </div>
         </div>
 
