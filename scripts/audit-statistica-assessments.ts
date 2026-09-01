@@ -15,7 +15,9 @@ const descriptorTaskKinds: Record<string, readonly string[]> = {
   AC9M1ST02: ["statisticaGraph", "statisticaTapGraph", "statisticaGap", "statisticaRank", "statisticaInference"],
   AC9M2ST01: ["statisticaTally", "statisticaTable", "statisticaClassify", "statisticaCollect", "statisticaSort"],
   AC9M2ST02: ["statisticaGraph", "statisticaTapGraph", "statisticaGap", "statisticaRank", "statisticaDisplayStudio", "statisticaInference"],
-  AC9M3ST01: ["statisticaClassify", "statisticaTable"], AC9M3ST02: ["statisticaInference"], AC9M3ST03: ["statisticaClassify"],
+  AC9M3ST01: ["statisticaClassify", "statisticaTally", "statisticaSort", "statisticaTable", "statisticaCollect"],
+  AC9M3ST02: ["statisticaGraph", "statisticaShape", "statisticaRank", "statisticaDisplayStudio", "statisticaInference"],
+  AC9M3ST03: ["statisticaClassify", "statisticaDisplayStudio", "statisticaInference"],
   AC9M4ST01: ["statisticaPictograph", "statisticaGraph"], AC9M4ST02: ["statisticaShape"], AC9M4ST03: ["statisticaClassify"],
   AC9M5ST01: ["statisticaClassify", "statisticaShape"], AC9M5ST02: ["statisticaLineGraph"], AC9M5ST03: ["statisticaClassify"],
   AC9M6ST01: ["statisticaClassify", "statisticaShape"], AC9M6ST02: ["statisticaMediaAnalysis"], AC9M6ST03: ["statisticaClassify"],
@@ -78,6 +80,27 @@ const yearTwoPostCounts = yearTwoPosttest.flatMap((item) => {
   return [];
 });
 assert.ok(Math.max(...yearTwoPostCounts) >= 18, "Year 2 post-test must include meaningful double-digit frequencies");
+
+const yearThreePretest = getStatisticaIndependentAssessment(3, "pretest");
+const yearThreePosttest = getStatisticaIndependentAssessment(3, "posttest");
+for (const [form, items] of [["pre-test", yearThreePretest], ["post-test", yearThreePosttest]] as const) {
+  assert.equal(items.length, 20, `Year 3 ${form} must retain 20 questions`);
+  assert.ok(items.every((item) => !/starting check|mastery check|evidence file/i.test(item.prompt)), `Year 3 ${form} prompts must use natural child-facing language`);
+  assert.ok(new Set(items.map((item) => item.practiceTask!.kind)).size >= 10, `Year 3 ${form} needs broad interaction variety`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaSort"), `Year 3 ${form} must organise raw discrete numerical data`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaShape"), `Year 3 ${form} must compare variation across two displays`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaDisplayStudio"), `Year 3 ${form} must select displays for a stated purpose`);
+  assert.ok(items.slice(-2).every((item) => item.practiceTask?.kind === "statisticaInference"), `Year 3 ${form} must finish with evidence-based reporting`);
+}
+assert.notDeepEqual(
+  yearThreePretest.map((item) => item.practiceTask),
+  yearThreePosttest.map((item) => item.practiceTask),
+  "Year 3 post-test must be independently authored, not a renamed pre-test",
+);
+assert.ok(
+  yearThreePosttest.some((item) => item.practiceTask?.kind === "statisticaShape" && Boolean(item.practiceTask.categoriesB)),
+  "Year 3 post-test must require a two-distribution comparison",
+);
 
 const ids = new Set<string>();
 const prompts = new Set<string>();

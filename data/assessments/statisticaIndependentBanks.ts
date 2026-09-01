@@ -49,7 +49,7 @@ function rows(seed: number, scale = 1) {
 }
 
 function assessmentPrompt(level: number, form: StatisticaAssessmentKind, index: number, action: string) {
-  if (level <= 2) return action;
+  if (level <= 3) return action;
   const check = form === "pretest" ? "starting check" : "mastery check";
   return `Year ${level} ${check}, ${CONTEXTS[(index + level + (form === "posttest" ? 3 : 0)) % CONTEXTS.length]}, evidence file ${index + 1}: ${action}`;
 }
@@ -484,37 +484,217 @@ function levelTwoTask(form: StatisticaAssessmentKind, index: number): PracticeTa
 }
 
 function levelThreeTask(form: StatisticaAssessmentKind, index: number): PracticeTask {
-  const data = rows(index);
+  const action = (pretest: string, posttest: string) => assessmentPrompt(3, form, index, form === "pretest" ? pretest : posttest);
+  const categorical = (form === "pretest"
+    ? [
+        ["Walk", "Car", "Bus", "Bike", 12, 18, 9, 15],
+        ["Stories", "Facts", "Comics", "Poetry", 17, 11, 20, 8],
+        ["Soccer", "Handball", "Skipping", "Chase", 14, 19, 10, 16],
+      ]
+    : [
+        ["Garden", "Pond", "Trees", "Grassland", 21, 13, 18, 16],
+        ["Paper", "Plastic", "Food", "Other", 23, 15, 19, 11],
+        ["Art", "Sport", "Music", "Coding", 16, 24, 20, 14],
+      ])[index % 3]!;
+  const data = categorical.slice(0, 4).map((label, rowIndex) => ({
+    id: String(label).toLowerCase(), label: String(label), color: COLOURS[rowIndex]!, count: Number(categorical[rowIndex + 4]),
+  }));
+  const numerical = (form === "pretest" ? [3, 6, 8, 5, 2] : [2, 5, 9, 7, 3]).map((count, value) => ({
+    id: `value-${value}`, label: `${value}`, color: COLOURS[value % COLOURS.length]!, count,
+  }));
   const greatest = [...data].sort((a, b) => b.count - a.count)[0]!;
-  if (index % 3 === 0) {
-    const numerical = index % 2 === 0;
-    return {
-      kind: "statisticaClassify",
-      prompt: assessmentPrompt(3, form, index, "classify the variable and identify the data needed."),
-      speakText: "Decide whether each response is a category label or a whole-number count.", target: 1,
-      variable: numerical ? "Number of seedlings that survived" : "Type of habitat observed",
-      examples: numerical ? "7, 4, 9, 6" : "pond, tree, grassland, pond",
-      supportingDetails: [{ label: "Investigation", value: "Use the variable that directly answers the stated question." }],
-      options: options(["Categorical", "Discrete numerical"]), correctOptionIds: [numerical ? "1" : "0"], feedback: feedback(),
-    };
+  const fewest = [...data].sort((a, b) => a.count - b.count)[0]!;
+
+  switch (index) {
+    case 0:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("A class records the number of books each student borrowed. What type of data is this?", "A wildlife team records how many birds are seen at each survey point. What type of data is collected?"),
+        speakText: "Decide whether the responses are category names or whole-number counts.", target: 1,
+        variable: form === "pretest" ? "Number of books borrowed" : "Number of birds observed", examples: form === "pretest" ? "0, 2, 1, 4, 2" : "6, 3, 8, 5, 6",
+        options: options(["Categorical", "Discrete numerical"]), correctOptionIds: ["1"], feedback: feedback(),
+      };
+    case 1:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Students record their main way of travelling to school. What type of data is this?", "Students record the habitat where each insect was found. What type of data is this?"),
+        speakText: "These responses are names of groups rather than counts.", target: 1,
+        variable: form === "pretest" ? "Travel method" : "Habitat type", examples: form === "pretest" ? "walk, bus, car, bike" : "pond, garden, tree, grassland",
+        options: options(["Discrete numerical", "Categorical"]), correctOptionIds: ["1"], feedback: feedback(),
+      };
+    case 2: {
+      const count = form === "pretest" ? 16 : 22;
+      return {
+        kind: "statisticaTally", mode: "read",
+        prompt: action("Read the tally for students who completed two reading challenges. What frequency is recorded?", "Read the grouped tally from the habitat survey. How many observations were recorded?"),
+        speakText: "Count the complete groups of five, then add the remaining marks.", target: count, count, label: "recorded observations",
+        options: options(form === "pretest" ? ["11", "16", "18"] : ["20", "24", "22"]), correctOptionIds: [form === "pretest" ? "1" : "2"], feedback: feedback(),
+      };
+    }
+    case 3: {
+      const categories = numerical.slice(0, 4).map((row) => ({ id: row.id, label: `${row.label} pets`, color: row.color }));
+      const rawValues = form === "pretest" ? [0, 2, 1, 3, 2, 1, 0, 2, 3, 1] : [3, 1, 2, 0, 3, 2, 2, 1, 0, 3, 2, 1];
+      return {
+        kind: "statisticaSort",
+        prompt: action("Sort the raw pet counts so equal numerical values are recorded together.", "Organise all twelve raw pet counts into their correct numerical groups."),
+        speakText: "Each card is a whole-number response. Place equal values in the same group.", target: rawValues.length, categories,
+        items: rawValues.map((value, itemIndex) => ({ id: `response-${itemIndex}`, label: String(value), category: `value-${value}` })), feedback: feedback(),
+      };
+    }
+    case 4:
+      return {
+        kind: "statisticaTable", mode: "count",
+        prompt: action("The table shows books borrowed. How many students borrowed exactly 2 books?", "The frequency table shows goals scored. How many players scored exactly 2 goals?"),
+        speakText: "Find the row for the exact numerical value, then read its frequency.", target: numerical[2]!.count, rows: numerical, answerCount: numerical[2]!.count, feedback: feedback(),
+      };
+    case 5: {
+      const categories = data.slice(0, 3).map(({ id, label, color }) => ({ id, label, color }));
+      const itemCategories = form === "pretest" ? [0, 1, 2, 0, 2, 1, 0, 2, 0, 1] : [2, 0, 1, 2, 2, 0, 1, 2, 0, 2, 1, 2];
+      return {
+        kind: "statisticaCollect",
+        prompt: action("Collect every survey response and use the counters to identify the most frequent category.", "Collect all habitat records and determine which category has the greatest frequency."),
+        speakText: "Collect every response before comparing the completed category counters.", target: itemCategories.length, categories,
+        items: itemCategories.map((categoryIndex, itemIndex) => ({ id: `observation-${itemIndex}`, label: categories[categoryIndex]!.label, category: categories[categoryIndex]!.id })),
+        question: "Which category was recorded most often?", correctOptionIds: [categories[form === "pretest" ? 0 : 2]!.id], feedback: feedback(),
+      };
+    }
+    case 6:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which record would correctly organise the question: How many siblings does each student have?", "Which recording plan preserves the discrete numerical data from a daily step challenge?"),
+        speakText: "Choose a record that keeps each whole-number response and its frequency.", target: 1,
+        variable: "Selecting a suitable data record", examples: form === "pretest" ? "Responses: 0, 1, 2, 1, 3, 2" : "Responses are whole numbers of completed laps.",
+        options: options(form === "pretest"
+          ? ["A table with rows 0, 1, 2 and 3 siblings", "Groups called nice and not nice", "One total for the whole class"]
+          : ["A frequency table for each number of laps", "A list containing only the highest result", "Categories called fast and colourful"]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 7:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which question could be answered by collecting different responses from the class?", "Which statistical question would help plan equipment for lunchtime?"),
+        speakText: "A useful statistical question expects varied responses and has a clear purpose.", target: 1,
+        variable: "Starting an investigation", examples: "The question must tell the class what data to collect.",
+        options: options(form === "pretest"
+          ? ["How many letters are in the word school?", "How many pets does each student have?", "Is today Tuesday?"]
+          : ["Which lunchtime activity does each student prefer?", "Is sport good?", "What colour is the oval?"]),
+        correctOptionIds: [form === "pretest" ? "1" : "0"], feedback: feedback(),
+      };
+    case 8:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("To investigate how many pets students have, which data should be collected?", "To compare playground use, which data directly answers the investigation question?"),
+        speakText: "Select the variable that directly answers the stated question.", target: 1,
+        variable: form === "pretest" ? "How many pets does each student have?" : "Which playground area is used most at lunch?", examples: "Collect one relevant response for each observation.",
+        options: options(form === "pretest"
+          ? ["Each student's favourite animal", "The number of pets each student has", "The colour of each pet"]
+          : ["The area used by each observed student", "The weather next month", "The colour of students' shoes"]),
+        correctOptionIds: [form === "pretest" ? "1" : "0"], feedback: feedback(),
+      };
+    case 9:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which collection method would give one reliable response from every student in the class?", "Which method makes the playground comparison fair?"),
+        speakText: "Choose a consistent method that includes the intended group without repeated responses.", target: 1,
+        variable: "Planning data collection", examples: "The same rule should be used for every observation.",
+        options: options(form === "pretest"
+          ? ["Ask every student once and record each answer", "Ask two friends four times", "Guess what the class might say"]
+          : ["Observe each area for the same time on the same days", "Watch one area for an hour and another for five minutes", "Only record the busiest-looking moment"]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 10:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("The categories are Dog, Cat and Animal. How should this investigation be repaired?", "A transport survey has Walk, Wheels and Bike. What must be fixed before collecting data?"),
+        speakText: "Categories should be clear, cover the likely responses and not overlap.", target: 1,
+        variable: "Repairing investigation categories", examples: form === "pretest" ? "Dog and cat also fit animal." : "A bike fits both wheels and bike.",
+        options: options(form === "pretest"
+          ? ["Use Dog, Cat and Other pet", "Keep the overlapping categories", "Remove every animal response"]
+          : ["Use Walk, Bike, Scooter and Other", "Count bikes in both groups", "Ignore anyone using wheels"]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 11:
+      return {
+        kind: "statisticaDisplayStudio", mode: "compare",
+        prompt: action("Choose the display that makes category frequencies easiest to compare.", "Choose the display that best reveals differences between playground-area frequencies."),
+        speakText: "Choose a display whose columns make category differences easy to compare.", target: 1,
+        question: form === "pretest" ? "Which travel method was recorded most often?" : "Which playground areas were used more or less often?",
+        purpose: "Compare frequencies across separate categories.", data: { labels: data.map((row) => row.label), values: data.map((row) => row.count), unit: "responses" },
+        displayOptions: ["table", "column"], correctDisplay: "column", feedback: feedback(),
+      };
+    case 12:
+      return {
+        kind: "statisticaInference",
+        prompt: action("Which conclusion answers the survey question using only the collected data?", "Which conclusion is justified by the playground investigation?"),
+        speakText: "Choose a conclusion that answers the question without claiming more than the observations show.", target: greatest.count, display: "columns", categories: data,
+        options: options([`${greatest.label} was recorded most often in this investigation.`, `${greatest.label} will always be most popular everywhere.`, `${fewest.label} caused the other frequencies.`]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 13:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which plan includes a question, relevant data and a fair collection method?", "Which complete plan could produce a defensible answer about active travel?"),
+        speakText: "Check the question, variable and collection method together before choosing.", target: 1,
+        variable: "Complete investigation plan", examples: "Every part of the plan must support the same investigation question.",
+        options: options(form === "pretest"
+          ? ["Ask how many books each student read; record each whole-number answer once", "Ask about books; record shoe colours", "Choose an answer before collecting data"]
+          : ["Ask how students travelled today; survey every class once with non-overlapping categories", "Only ask cyclists whether cycling is best", "Count the same walkers each time they pass"]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 14:
+      return {
+        kind: "statisticaGraph", mode: "build",
+        prompt: action("Construct a column graph for the frequency table of books borrowed.", "Build an accurate column graph for the goals-scored frequency table."),
+        speakText: "Set each column to the frequency for that exact numerical value.", target: 9, display: "columns", categories: numerical, feedback: feedback(),
+      };
+    case 15: {
+      const comparison = numerical.map((row, rowIndex) => ({ ...row, count: form === "pretest" ? [2, 4, 7, 7, 4][rowIndex]! : [4, 7, 9, 5, 1][rowIndex]! }));
+      return {
+        kind: "statisticaShape", mode: "compare",
+        prompt: action("Compare the two book-count distributions. Which statement describes their variation?", "Compare both goals-scored distributions. Which analysis uses the complete shapes?"),
+        speakText: "Compare where the frequencies are concentrated and how they vary across the numerical values.", target: 1, display: "columns", categories: numerical, categoriesB: comparison,
+        setLabelA: form === "pretest" ? "Class A" : "Team A", setLabelB: form === "pretest" ? "Class B" : "Team B",
+        options: options(form === "pretest"
+          ? ["Class A is concentrated near 2 books, while Class B is spread across 2 and 3 books.", "The distributions are identical.", "The colours determine the variation."]
+          : ["Team A is concentrated around 2 and 3 goals; Team B has more low-goal results.", "Only the tallest column matters.", "Both teams have exactly the same shape."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    }
+    case 16: {
+      const ranked = data.slice(0, 3);
+      return {
+        kind: "statisticaRank",
+        prompt: action("Order the first three survey categories from greatest frequency to smallest frequency.", "Rank the first three habitat categories from least frequent to most frequent."),
+        speakText: "Use the exact frequencies to place all three categories in order.", target: ranked.length,
+        direction: form === "pretest" ? "most-to-least" : "least-to-most", categories: ranked,
+        correctOrderIds: [...ranked].sort((a, b) => form === "pretest" ? b.count - a.count : a.count - b.count).map((row) => row.id), feedback: feedback(),
+      };
+    }
+    case 17:
+      return {
+        kind: "statisticaDisplayStudio", mode: "compare",
+        prompt: action("Which display makes every exact frequency easiest to retrieve?", "Which display best supports a report requiring all exact category frequencies?"),
+        speakText: "Choose the display that presents every exact value directly.", target: 1,
+        question: "What was the exact frequency for every category?", purpose: "Report every exact frequency without estimating column heights.",
+        data: { labels: data.map((row) => row.label), values: data.map((row) => row.count), unit: "responses" }, displayOptions: ["column", "table"], correctDisplay: "table", feedback: feedback(),
+      };
+    case 18:
+      return {
+        kind: "statisticaInference",
+        prompt: action("What does the numerical display reveal about variation in books borrowed?", "Which statement correctly analyses variation in the goals-scored data?"),
+        speakText: "Look beyond the tallest column and describe how observations vary across all values.", target: numerical[2]!.count, display: "columns", categories: numerical,
+        options: options(["Responses occur across several values, with the greatest frequency at 2.", "Every response is 2 because that column is tallest.", "There is no variation whenever one value is most frequent."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    default:
+      return {
+        kind: "statisticaInference",
+        prompt: action("Which report accurately answers the question and acknowledges variation in the data?", "Which final report is fully supported by the unfamiliar dataset?"),
+        speakText: "Use the greatest frequency and the spread of the remaining values without making universal claims.", target: numerical[2]!.count, display: "columns", categories: numerical,
+        options: options(["The value 2 occurred most often, but responses varied from 0 to 4 in this group.", "Everyone will always have exactly 2.", "The graph proves why each person gave their response."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
   }
-  if (index % 3 === 1) {
-    const countMode = index % 2 === 1;
-    return {
-      kind: "statisticaTable", mode: countMode ? "count" : "select",
-      prompt: assessmentPrompt(3, form, index, "complete the frequency-table reading."),
-      speakText: "Match the named category with its exact frequency.", target: greatest.count, rows: data,
-      answerCount: countMode ? greatest.count : undefined,
-      correctRowId: countMode ? undefined : greatest.id,
-      feedback: feedback(),
-    };
-  }
-  return {
-    kind: "statisticaInference",
-    prompt: assessmentPrompt(3, form, index, "select the conclusion that answers the investigation question."),
-    speakText: "A valid inference must be supported by the displayed data.", target: greatest.count, display: "columns", categories: data,
-    options: options([`${greatest.label} occurred most often in this dataset.`, `${greatest.label} will always occur most often everywhere.`, "The data proves what caused the result."]), correctOptionIds: ["0"], feedback: feedback(),
-  };
 }
 
 function levelFourTask(form: StatisticaAssessmentKind, index: number): PracticeTask {
@@ -659,10 +839,7 @@ function modeAndShapeTask(level: 5 | 6, form: StatisticaAssessmentKind, index: n
 function taskFor(level: StatisticaLevel, form: StatisticaAssessmentKind, index: number, descriptorCode: string) {
   if (level === 1) return levelOneTask(index);
   if (level === 2) return levelTwoTask(form, index);
-  if (level === 3) {
-    if (descriptorCode === "AC9M3ST03") return investigationTask(level, form, index);
-    return levelThreeTask(form, descriptorCode === "AC9M3ST01" ? index * 3 + (index % 2) : index * 3 + 2);
-  }
+  if (level === 3) return levelThreeTask(form, index);
   if (level === 4) {
     if (descriptorCode === "AC9M4ST03") return investigationTask(level, form, index);
     return levelFourTask(form, descriptorCode === "AC9M4ST01" ? index * 3 + (index % 2) : index * 3 + 2);
