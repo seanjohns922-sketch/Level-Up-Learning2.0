@@ -3,7 +3,10 @@
 // (year F or 1-6; strand N/A/M/SP/ST/P) — so strand and year are parsed, not
 // hand-mapped. This module also carries the realm->strand link, the
 // achievement-band thresholds and the strand weighting used for the future
-// whole-maths overall level (Number weighted most; Probability/Statistics least).
+// whole-maths overall level. The weight is the number of AC9 content
+// descriptors in that strand across Foundation-Year 6 (counted from the official
+// ACARA F-6 curriculum), so the overall level is a curriculum-point weighted
+// average: overall = Σ(strand level × weight) ÷ Σ(weight), Σ(weight) = 139.
 
 export type AcStrand =
   | "number"
@@ -20,19 +23,23 @@ export type AcStrandMeta = {
   label: string;
   // AC9 code strand suffix (the letters between the year and the number).
   code: string;
-  // Relative weight for the planned overall maths level. Number is weighted
-  // most; algebra/measurement/space next; statistics/probability least.
+  // Weight for the planned overall maths level = the count of AC9 content
+  // descriptors in the strand across Foundation-Year 6 (the strand's share of
+  // the curriculum). Number carries the most; probability the least.
   weight: number;
   order: number;
 };
 
+// weight = number of AC9 content descriptors F-6 per strand (verified against
+// the official ACARA F-6 curriculum). Sum = 139. Per-strand share: Number 38%,
+// Measurement 20%, Space 12%, Statistics 12%, Algebra 12%, Probability 6%.
 export const AC_STRANDS: Record<AcStrand, AcStrandMeta> = {
-  number: { id: "number", label: "Number", code: "N", weight: 3, order: 0 },
-  algebra: { id: "algebra", label: "Algebra", code: "A", weight: 2, order: 1 },
-  measurement: { id: "measurement", label: "Measurement", code: "M", weight: 2, order: 2 },
-  space: { id: "space", label: "Space", code: "SP", weight: 2, order: 3 },
-  statistics: { id: "statistics", label: "Statistics", code: "ST", weight: 1, order: 4 },
-  probability: { id: "probability", label: "Probability", code: "P", weight: 1, order: 5 },
+  number: { id: "number", label: "Number", code: "N", weight: 53, order: 0 },
+  algebra: { id: "algebra", label: "Algebra", code: "A", weight: 16, order: 1 },
+  measurement: { id: "measurement", label: "Measurement", code: "M", weight: 28, order: 2 },
+  space: { id: "space", label: "Space", code: "SP", weight: 17, order: 3 },
+  statistics: { id: "statistics", label: "Statistics", code: "ST", weight: 17, order: 4 },
+  probability: { id: "probability", label: "Probability", code: "P", weight: 8, order: 5 },
 };
 
 // Longest suffixes first so "SP"/"ST" match before "S" would.
