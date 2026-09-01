@@ -940,37 +940,232 @@ function levelFourTask(form: StatisticaAssessmentKind, index: number): PracticeT
 }
 
 function levelFiveTask(form: StatisticaAssessmentKind, index: number): PracticeTask {
-  if (index % 3 === 0) {
-    const numerical = index % 2 === 0;
-    return {
-      kind: "statisticaClassify",
-      prompt: assessmentPrompt(5, form, index, "classify and validate the dataset before analysis."),
-      speakText: "Use the meaning of the field, then identify any missing or invalid record.", target: 1,
-      variable: numerical ? "Number of visits per week" : "Satisfaction rating",
-      examples: numerical ? "3, 5, missing, 4" : "low, medium, high, medium",
-      supportingDetails: [{ label: "Quality check", value: "Do not silently treat missing data as zero." }],
-      options: options(["Ordinal categorical", "Discrete numerical", "Continuous numerical"]), correctOptionIds: [numerical ? "1" : "0"], feedback: feedback(),
-    };
+  const action = <T,>(pretest: T, posttest: T): T => form === "pretest" ? pretest : posttest;
+  const distributionA = (form === "pretest" ? [2, 5, 12, 6, 2] : [1, 4, 14, 7, 2]).map((count, value) => ({
+    id: `a-${value}`, label: String(value), color: COLOURS[value % COLOURS.length]!, count,
+  }));
+  const distributionB = (form === "pretest" ? [5, 5, 8, 6, 4] : [6, 5, 9, 5, 3]).map((count, value) => ({
+    id: `b-${value}`, label: String(value), color: COLOURS[value % COLOURS.length]!, count,
+  }));
+  const lineLabels = form === "pretest" ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] : ["9am", "10am", "11am", "12pm", "1pm", "2pm"];
+  const lineValues = form === "pretest" ? [8, 13, 11, 20, 16, 24] : [120, 150, 135, 190, 210, 180];
+  const linePoints = lineLabels.map((label, pointIndex) => ({ label, value: lineValues[pointIndex]! }));
+  const lineUnit = form === "pretest" ? "mm" : "visitors";
+  const lineLabel = form === "pretest" ? "Daily rainfall" : "Museum visitors";
+
+  switch (index) {
+    case 0:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("A survey records satisfaction as Low, Medium or High. What type of data is this?", "A habitat rating records Poor, Fair, Good or Excellent. What type of data is this?"),
+        speakText: "Decide whether the responses are unordered names, ordered categories or numerical counts.", target: 1,
+        variable: action("Satisfaction rating", "Habitat quality rating"), examples: action("Low, Medium, High", "Poor, Fair, Good, Excellent"),
+        options: options(["Nominal categorical", "Ordinal categorical", "Discrete numerical"]), correctOptionIds: ["1"], feedback: feedback(),
+      };
+    case 1: {
+      const mixed = form === "pretest"
+        ? [["Favourite sport", "nominal"], ["Race place", "ordinal"], ["Goals scored", "numerical"], ["Eye colour", "nominal"], ["Star rating", "ordinal"], ["Books borrowed", "numerical"]]
+        : [["Transport type", "nominal"], ["Skill stage", "ordinal"], ["Birds observed", "numerical"], ["Music genre", "nominal"], ["Agreement rating", "ordinal"], ["Visits made", "numerical"]];
+      return {
+        kind: "statisticaSort",
+        prompt: action("Sort each survey variable by the type of data it produces.", "Sort the unfamiliar variables into the correct data-type groups."),
+        speakText: "Nominal data uses unordered names, ordinal data uses ordered categories, and discrete numerical data uses counts.", target: mixed.length,
+        categories: [
+          { id: "nominal", label: "Nominal", color: COLOURS[0]! },
+          { id: "ordinal", label: "Ordinal", color: COLOURS[1]! },
+          { id: "numerical", label: "Discrete numerical", color: COLOURS[3]! },
+        ],
+        items: mixed.map(([label, category], itemIndex) => ({ id: `type-${itemIndex}`, label: label!, category: category! })), feedback: feedback(),
+      };
+    }
+    case 2:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which record must be checked before the weekly-visit data is analysed?", "Which entry is invalid for a whole-number count of animals observed?"),
+        speakText: "Inspect the variable definition and every record. Missing values and impossible values must be checked, not silently changed.", target: 1,
+        variable: action("Visits made this week", "Animals observed in ten minutes"), examples: action("4, 6, missing, 5, 3", "7, 4, 2.5, 6, 3"),
+        supportingDetails: [{ label: "Collection rule", value: action("Record one whole-number count for every participant.", "Record a whole-number count made during the same ten-minute period.") }],
+        options: options(action(["The missing record", "The value 6", "The value 3"], ["The value 2.5", "The value 7", "The value 3"])), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 3:
+      return {
+        kind: "statisticaShape", mode: "concentrated",
+        prompt: action("Identify the mode and explain what the tallest frequency means.", "Which statement correctly identifies the mode without confusing value and frequency?"),
+        speakText: "The mode is the data value occurring most often. The height of its column is its frequency.", target: 1, display: "columns", categories: distributionA,
+        options: options([`The mode is 2; its frequency is ${distributionA[2]!.count}.`, `The mode is ${distributionA[2]!.count} because that is the tallest frequency.`, "Every observation equals 2 because 2 is the mode."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 4:
+      return {
+        kind: "statisticaShape", mode: "variation",
+        prompt: action("Compare the two distributions using mode and overall shape.", "Which comparison uses evidence from both complete distributions?"),
+        speakText: "Compare the modal value and how broadly the remaining observations are distributed.", target: 1, display: "columns", categories: distributionA, categoriesB: distributionB,
+        setLabelA: "Group A", setLabelB: "Group B",
+        options: options(["Both groups have mode 2, but Group B is less concentrated and more broadly distributed.", "The groups are identical because both have mode 2.", "Group A has no variation because one column is tallest."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 5:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("What is the defensible way to handle a missing response before analysis?", "A value was entered as 42 when the allowed rating scale is 1 to 5. What should the team do?"),
+        speakText: "Preserve the evidence trail. Check questionable records against the source and document any correction or exclusion.", target: 1,
+        variable: "Validating collected data", examples: action("One survey row is blank.", "Recorded ratings: 3, 4, 42, 2, 5"),
+        supportingDetails: [{ label: "Rule", value: "Do not invent a replacement value or delete a record without checking." }],
+        options: options(action(
+          ["Check the source; record it as missing if it cannot be recovered.", "Replace it with zero.", "Copy the previous student's response."],
+          ["Check the original response and document the correction or exclusion.", "Change 42 to 4 because it looks close.", "Keep 42 so the sample stays large."],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 6:
+      return {
+        kind: "statisticaShape", mode: "compare",
+        prompt: action("Two groups share the same mode. What additional evidence is needed to compare them?", "Why is reporting only the mode insufficient for these two groups?"),
+        speakText: "A mode identifies the most frequent value, but a comparison also needs the shape and variation of all observations.", target: 1, display: "columns", categories: distributionA, categoriesB: distributionB,
+        setLabelA: "Sample A", setLabelB: "Sample B",
+        options: options(["Compare how frequencies are distributed across all values, not only the modal value.", "No other evidence is needed because equal modes make distributions equal.", "Compare the graph colours instead of the frequencies."]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 7:
+      return {
+        kind: "statisticaLineGraph", mode: "read",
+        prompt: action("Use the line graph to find the exact rainfall recorded on Wednesday.", "Use the line graph to find the visitor count at 11am."),
+        speakText: `Locate ${lineLabels[2]} on the horizontal axis, follow it to the point and read the vertical scale.`, target: lineValues[2]!, unit: lineUnit, yLabel: lineLabel, color: "#20b486", points: linePoints,
+        options: options([String(lineValues[2]! - (form === "pretest" ? 3 : 15)), String(lineValues[2]), String(lineValues[2]! + (form === "pretest" ? 5 : 15))]), correctOptionIds: ["1"], feedback: feedback(),
+      };
+    case 8:
+      return {
+        kind: "statisticaLineGraph", mode: "trend",
+        prompt: action("Describe the change in rainfall from Wednesday to Thursday.", "Describe the change in visitors from 11am to 12pm."),
+        speakText: "Read both endpoint values, then describe the direction and size of the change.", target: Math.abs(lineValues[3]! - lineValues[2]!), unit: lineUnit, yLabel: lineLabel, color: "#2879c9", points: linePoints,
+        options: options(action(["It rose by 9 mm.", "It fell by 9 mm.", "It rose by 20 mm."], ["It rose by 55 visitors.", "It fell by 55 visitors.", "It rose by 190 visitors."])), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 9: {
+      const change = lineValues.at(-1)! - lineValues[0]!;
+      return {
+        kind: "statisticaLineGraph", mode: "infer",
+        prompt: action("Calculate the overall change in rainfall from Monday to Saturday.", "Calculate the overall change in visitors from 9am to 2pm."),
+        speakText: "Subtract the first value from the final value, and state whether the result is an increase or decrease.", target: Math.abs(change), unit: lineUnit, yLabel: lineLabel, color: "#6c63d9", points: linePoints,
+        options: options(action(["An increase of 16 mm", "An increase of 24 mm", "A decrease of 16 mm"], ["An increase of 60 visitors", "An increase of 180 visitors", "A decrease of 60 visitors"])), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    }
+    case 10:
+      return {
+        kind: "statisticaLineGraph", mode: "infer",
+        prompt: action("During which interval did rainfall increase most sharply?", "During which interval did visitor numbers increase most sharply?"),
+        speakText: "Calculate each upward change between consecutive points, then compare the increases.", target: 1, unit: lineUnit, yLabel: lineLabel, color: "#ef6f6c", points: linePoints,
+        options: options(action(["Wednesday to Thursday", "Monday to Tuesday", "Friday to Saturday"], ["11am to 12pm", "9am to 10am", "12pm to 1pm"])), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 11:
+      return {
+        kind: "statisticaLineGraph", mode: "infer",
+        prompt: action("Which claim is supported by the complete rainfall graph?", "Which report is supported by the complete visitor graph?"),
+        speakText: "Check every point and avoid a claim that ignores a fall or extends beyond the observed period.", target: 1, unit: lineUnit, yLabel: lineLabel, color: "#f2bc45", points: linePoints,
+        options: options(action(
+          ["Rainfall changed unevenly, with falls as well as rises, and was highest on Saturday.", "Rainfall increased every day.", "Saturday will always be the wettest day."],
+          ["Visitors rose overall, but the pattern included falls before and after the peak at 1pm.", "Visitor numbers rose in every interval.", "The museum will always peak at 1pm."],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 12:
+      return {
+        kind: "statisticaDisplayStudio", mode: "compare",
+        prompt: action("Choose the display that makes the changing rainfall pattern easiest to inspect.", "Choose the display that best reveals rises, falls and the visitor peak."),
+        speakText: "A table gives exact values, while a line graph connects ordered times to emphasise change and trend.", target: 1,
+        question: action("How did rainfall change across the six days?", "How did visitor numbers change through the day?"), purpose: "Make the sequence, direction of change and turning points visible.",
+        data: { labels: lineLabels, values: lineValues, unit: lineUnit }, displayOptions: ["table", "line"], correctDisplay: "line", feedback: feedback(),
+      };
+    case 13:
+      return {
+        kind: "statisticaDisplayStudio", mode: "design",
+        prompt: action("Design a clear display for the six-day rainfall record.", "Design a display that communicates the museum visitor pattern."),
+        speakText: "Choose the display, a precise title and a justification tied to the investigation question.", target: 1,
+        question: action("When did rainfall rise, fall and reach its highest value?", "How did museum attendance change from 9am to 2pm?"), purpose: "Communicate change over ordered time points without overstating the evidence.",
+        data: { labels: lineLabels, values: lineValues, unit: lineUnit }, displayOptions: ["line", "column", "table"], correctDisplay: "line",
+        titleOptions: options(action(["Daily rainfall from Monday to Saturday", "Weather data", "Favourite days"], ["Museum visitors from 9am to 2pm", "Museum information", "Most popular exhibitions"])), correctTitleId: "0",
+        reasonOptions: options(["Connecting consecutive times makes rises, falls and turning points easy to follow.", "A line graph proves the same pattern will happen again.", "The brightest display is always the most accurate."]), correctReasonId: "0", feedback: feedback(),
+      };
+    case 14:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which question is unbiased and can produce varied data for a Year 5 investigation?", "Which question would support a fair investigation of lunchtime activity?"),
+        speakText: "Choose a neutral question that defines the group and variable without suggesting a preferred answer.", target: 1,
+        variable: "Posing the investigation question", examples: action("The team wants to investigate reading habits.", "The team wants to compare lunchtime activity."),
+        options: options(action(
+          ["How many minutes did each Year 5 student read last night?", "Don't you agree that reading longer is better?", "Is reading fun?"],
+          ["How many active minutes did each student record during the same lunch break?", "Why are active students healthier?", "Was lunch good?"],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 15:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which collection plan would produce representative and comparable reading data?", "Which method gives the fairest comparison between two classes?"),
+        speakText: "Check who is included, whether each person is recorded once, and whether the same collection rule is used.", target: 1,
+        variable: "Choosing a collection method", examples: action("Question: How long did Year 5 students read last night?", "Question: How do active minutes compare between Class A and Class B?"),
+        supportingDetails: [{ label: "Fair evidence", value: "Use a defined sample and consistent conditions." }],
+        options: options(action(
+          ["Invite every student in the year level and record one response for the same evening.", "Ask only library club members.", "Record keen readers twice."],
+          ["Observe both classes for the same lunch period using one definition of active movement.", "Observe one class for twice as long.", "Count only students already on a sports team."],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 16:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("The reading dataset contains a blank and a duplicated student. Which action protects its validity?", "One class used minutes while the other recorded a Low-Medium-High rating. What must happen before comparison?"),
+        speakText: "Validate records and make sure both groups collect the same variable with the same rule before analysis.", target: 1,
+        variable: "Checking the investigation evidence", examples: action("24 records expected; 24 rows include one blank and one duplicate.", "Class A: minutes. Class B: activity rating."),
+        options: options(action(
+          ["Check the source, remove the confirmed duplicate and report the unresolved missing response.", "Turn the blank into zero and keep the duplicate.", "Delete both rows without documenting it."],
+          ["Recollect comparable data using the same variable and measurement rule.", "Compare the two displays as they are.", "Convert every rating to a guessed number of minutes."],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 17:
+      return {
+        kind: "statisticaDisplayStudio", mode: "design",
+        prompt: action("Choose and justify a display for reporting the investigation.", "Design the display that best answers the two-class comparison question."),
+        speakText: "Align the display, title and justification with the variable and investigation question.", target: 1,
+        question: action("How many students were recorded in each reading-minute interval?", "How did active minutes change across the shared observation period?"),
+        purpose: action("Compare separate interval frequencies without implying continuous values between the groups.", "Make the ordered sequence and differences between time points clear."),
+        data: action(
+          { labels: ["0-9", "10-19", "20-29", "30-39", "40+"], values: [3, 7, 11, 6, 2], unit: "students" },
+          { labels: ["Start", "5 min", "10 min", "15 min", "20 min"], values: [6, 11, 15, 13, 18], unit: "active students" },
+        ),
+        displayOptions: ["table", "column", "line"], correctDisplay: form === "pretest" ? "column" : "line",
+        titleOptions: options(action(["Distribution of Year 5 reading minutes", "Our results", "Best readers"], ["Active students across the shared lunch period", "Class activity", "Why exercise matters"])), correctTitleId: "0",
+        reasonOptions: options(action(
+          ["Columns make frequencies across ordered reading-minute groups easy to compare.", "Columns prove why students read for different times.", "A title does not need to identify the data."],
+          ["A line connects the ordered times and reveals changes across the observation period.", "A line proves one class caused the changes.", "Any display is equally useful for every question."],
+        )), correctReasonId: "0", feedback: feedback(),
+      };
+    case 18: {
+      const surveyCounts = form === "pretest" ? [10, 20, 15, 25] : [15, 30, 20, 25];
+      const surveyLabels = form === "pretest" ? ["Garden", "Sport", "Art", "Reading"] : ["Creek", "Woodland", "Wetland", "Grassland"];
+      const categories = surveyCounts.map((count, rowIndex) => ({ id: `survey-${rowIndex}`, label: surveyLabels[rowIndex]!, color: COLOURS[rowIndex]!, count }));
+      const greatestIndex = surveyCounts.indexOf(Math.max(...surveyCounts));
+      return {
+        kind: "statisticaInvestigation",
+        prompt: action("Complete the community-program investigation from question to evidence-based report.", "Complete the habitat-priority investigation and qualify the final conclusion."),
+        speakText: "Choose the investigation, predict, construct the graph from the data and answer using only the observed evidence.", target: 1, buildStep: 5,
+        surveys: [{
+          id: "year-five-investigation", question: action("Which community program should surveyed Year 5 students prioritise?", "Which habitat project should surveyed volunteers prioritise?"), unit: "responses", categories,
+          analyses: [
+            { prompt: "Which option has the greatest recorded frequency?", speak: "Compare all four frequencies before selecting the greatest.", options: options(surveyLabels), correctOptionIds: [String(greatestIndex)] },
+            { prompt: "Which conclusion stays within the evidence collected?", speak: "Report this sample's result without claiming it represents everyone.", options: options([`${surveyLabels[greatestIndex]} was selected most often by this surveyed group.`, `${surveyLabels[greatestIndex]} is the best choice for every community.`, `The display proves why every respondent chose ${surveyLabels[greatestIndex]}.`]), correctOptionIds: ["0"] },
+          ],
+        }], feedback: feedback(),
+      };
+    }
+    default:
+      return {
+        kind: "statisticaClassify",
+        prompt: action("Which final report answers the reading investigation without overstating the result?", "Which recommendation is justified by the completed class comparison?"),
+        speakText: "Use the observed pattern, name the group and conditions, and avoid claiming the result applies beyond the evidence.", target: 1,
+        variable: "Writing a defensible conclusion", examples: action("The surveyed group had a mode of 20 to 29 minutes, with responses in every interval.", "Class A had a higher observed mode, while both classes showed substantial variation."),
+        supportingDetails: [{ label: "Limit", value: action("One Year 5 group was surveyed on one evening.", "Both classes were observed during one shared lunch period.") }],
+        options: options(action(
+          ["In this surveyed group, 20 to 29 minutes was most common, but reading time varied across all intervals.", "All Year 5 students always read for 20 to 29 minutes.", "The mode proves longer reading caused better learning."],
+          ["During this observation, Class A had the higher mode, but one lunch period is not enough to generalise to every day.", "Class A will always be more active.", "The higher mode proves the observation method was perfect."],
+        )), correctOptionIds: ["0"], feedback: feedback(),
+      };
   }
-  const points = [10 + index, 13 + index, 17 + index, 15 + index, 20 + index].map((value, pointIndex) => ({ label: `T${pointIndex + 1}`, value }));
-  if (index % 3 === 1) {
-    return {
-      kind: "statisticaLineGraph", mode: index % 2 === 0 ? "trend" : "infer",
-      prompt: assessmentPrompt(5, form, index, "analyse the change over ordered time points."),
-      speakText: "Read the exact values in time order before describing the pattern.", target: points[4]!.value, unit: "units", yLabel: "Recorded value", color: "#20b486", points,
-      options: options(["The value rose, dipped, then reached its peak.", "The value stayed constant.", "The first point is the peak."]), correctOptionIds: ["0"], feedback: feedback(),
-    };
-  }
-  return {
-    kind: "statisticaDisplayStudio", mode: "design",
-    prompt: assessmentPrompt(5, form, index, "choose and justify the display that best answers the brief."),
-    speakText: "Select a display based on the question and ordered nature of the data.", target: 1,
-    question: "How did the recorded value change over five ordered times?", purpose: "Reveal rises, falls and the overall trend.",
-    data: { labels: points.map((point) => point.label), values: points.map((point) => point.value), unit: "units" }, displayOptions: ["line", "column", "table"], correctDisplay: "line",
-    titleOptions: options(["Recorded value across five ordered times", "Our graph", "Favourite category results"]), correctTitleId: "0",
-    reasonOptions: options(["A line graph makes rises, falls and the overall trend easy to follow.", "A line graph is always correct for every kind of data.", "The line colour determines whether the evidence is accurate."]), correctReasonId: "0",
-    feedback: feedback(),
-  };
 }
 
 function levelSixTask(form: StatisticaAssessmentKind, index: number): PracticeTask {
@@ -1058,9 +1253,7 @@ function taskFor(level: StatisticaLevel, form: StatisticaAssessmentKind, index: 
   if (level === 3) return levelThreeTask(form, index);
   if (level === 4) return levelFourTask(form, index);
   if (level === 5) {
-    if (descriptorCode === "AC9M5ST03") return investigationTask(level, form, index);
-    if (descriptorCode === "AC9M5ST01") return index % 2 === 0 ? levelFiveTask(form, index * 3) : modeAndShapeTask(level, form, index);
-    return levelFiveTask(form, index * 3 + 1);
+    return levelFiveTask(form, index);
   }
   if (descriptorCode === "AC9M6ST03") return investigationTask(level, form, index);
   if (descriptorCode === "AC9M6ST01") return index % 2 === 0 ? levelSixTask(form, index * 4) : modeAndShapeTask(level, form, index);

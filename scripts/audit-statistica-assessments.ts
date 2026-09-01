@@ -21,7 +21,9 @@ const descriptorTaskKinds: Record<string, readonly string[]> = {
   AC9M4ST01: ["statisticaPictograph", "statisticaGraph", "statisticaInference"],
   AC9M4ST02: ["statisticaShape", "statisticaDisplayStudio", "statisticaInference"],
   AC9M4ST03: ["statisticaClassify", "statisticaDisplayStudio", "statisticaInference", "statisticaInvestigation"],
-  AC9M5ST01: ["statisticaClassify", "statisticaShape"], AC9M5ST02: ["statisticaLineGraph"], AC9M5ST03: ["statisticaClassify"],
+  AC9M5ST01: ["statisticaClassify", "statisticaSort", "statisticaShape"],
+  AC9M5ST02: ["statisticaLineGraph", "statisticaDisplayStudio"],
+  AC9M5ST03: ["statisticaClassify", "statisticaDisplayStudio", "statisticaInvestigation"],
   AC9M6ST01: ["statisticaClassify", "statisticaShape"], AC9M6ST02: ["statisticaMediaAnalysis"], AC9M6ST03: ["statisticaClassify"],
 };
 
@@ -142,6 +144,26 @@ assert.notDeepEqual(
   yearFourPretest.map((item) => item.practiceTask),
   yearFourPosttest.map((item) => item.practiceTask),
   "Year 4 post-test must be independently authored, not a renamed pre-test",
+);
+
+const yearFivePretest = getStatisticaIndependentAssessment(5, "pretest");
+const yearFivePosttest = getStatisticaIndependentAssessment(5, "posttest");
+for (const [form, items] of [["pre-test", yearFivePretest], ["post-test", yearFivePosttest]] as const) {
+  assert.equal(items.length, 20, `Year 5 ${form} must retain 20 questions`);
+  assert.ok(items.every((item) => !/starting check|mastery check|evidence file/i.test(item.prompt)), `Year 5 ${form} prompts must use natural child-facing language`);
+  assert.ok(new Set(items.map((item) => item.practiceTask!.kind)).size >= 6, `Year 5 ${form} needs broad interaction variety`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaSort"), `Year 5 ${form} must sort mixed data types`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaShape" && Boolean(item.practiceTask.categoriesB)), `Year 5 ${form} must compare two complete distributions`);
+  const lineModes = items.flatMap((item) => item.practiceTask?.kind === "statisticaLineGraph" ? [item.practiceTask.mode] : []);
+  assert.deepEqual(new Set(lineModes), new Set(["read", "trend", "infer"]), `Year 5 ${form} must assess reading, change and inference from line graphs`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaDisplayStudio" && item.practiceTask.mode === "design"), `Year 5 ${form} must design and justify a display`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaInvestigation"), `Year 5 ${form} must complete an investigation cycle`);
+  assert.ok(items.slice(-2).every((item) => ["statisticaInvestigation", "statisticaClassify"].includes(item.practiceTask!.kind)), `Year 5 ${form} must finish with investigation and defensible reporting`);
+}
+assert.notDeepEqual(
+  yearFivePretest.map((item) => item.practiceTask),
+  yearFivePosttest.map((item) => item.practiceTask),
+  "Year 5 post-test must be independently authored, not a renamed pre-test",
 );
 
 const ids = new Set<string>();
