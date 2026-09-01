@@ -39,13 +39,29 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
 
+      {isBuild && task.sourceObservations?.length ? (
+        <div className="mx-auto max-w-lg rounded-xl border-2 border-[#b9caaa] bg-[#fffaf0] p-3 text-[#244531]">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <span className="text-xs font-black uppercase tracking-[0.12em]">Raw observations</span>
+            <OptionReadAloudButton text={`Raw observations: ${task.sourceObservations.join(", ")}`} className="shrink-0" />
+          </div>
+          <div className="flex flex-wrap justify-center gap-1.5">
+            {task.sourceObservations.map((observation, observationIndex) => (
+              <span key={`${observation}-${observationIndex}`} className="grid h-9 min-w-9 place-items-center rounded-md border border-[#b9caaa] bg-white px-2 text-sm font-black">
+                {observation}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       <StatisticaPlot
         categories={task.categories}
         display={task.display}
         values={isBuild ? built : undefined}
         footer={isBuild ? (cat, i) => (
           <>
-            <div className={`mt-1 text-[11px] font-black ${built[i] === cat.count ? "text-emerald-300" : "text-amber-300"}`}>aim {cat.count}</div>
+            {!task.hideBuildTargets ? <div className={`mt-1 text-[11px] font-black ${built[i] === cat.count ? "text-emerald-300" : "text-amber-300"}`}>aim {cat.count}</div> : null}
             <div className="mt-1 flex gap-1">
               <button type="button" onClick={() => add(i, -buildStep)} disabled={settled} aria-label={`remove ${buildStep} from ${cat.label}`} className="grid h-7 w-7 place-items-center rounded-md border border-white/15 bg-white/5 text-white/70 transition hover:bg-white/10 disabled:opacity-40"><Minus className="h-3.5 w-3.5" /></button>
               <button type="button" onClick={() => add(i, buildStep)} disabled={settled} aria-label={`add ${buildStep} to ${cat.label}`} className="grid h-7 w-10 place-items-center rounded-md border border-[#f2bc45]/55 bg-[#f2bc45]/15 text-base font-black text-[#fff0c7] transition hover:bg-[#f2bc45]/25 disabled:opacity-40">{buildStep > 1 ? `+${buildStep}` : "+"}</button>

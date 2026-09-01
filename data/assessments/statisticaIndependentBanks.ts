@@ -544,18 +544,22 @@ function levelThreeTask(form: StatisticaAssessmentKind, index: number): Practice
     case 4:
       return {
         kind: "statisticaTable", mode: "count",
-        prompt: action("The table shows books borrowed. How many students borrowed exactly 2 books?", "The frequency table shows goals scored. How many players scored exactly 2 goals?"),
-        speakText: "Find the row for the exact numerical value, then read its frequency.", target: numerical[2]!.count, rows: numerical, answerCount: numerical[2]!.count, feedback: feedback(),
+        prompt: action("The table shows books borrowed. How many students borrowed at least 2 books?", "The frequency table shows goals scored. How many players scored 2 or more goals?"),
+        speakText: "Add the frequencies for 2, 3 and 4. Do not include the rows below 2.", target: numerical.slice(2).reduce((sum, row) => sum + row.count, 0), rows: numerical,
+        answerCount: numerical.slice(2).reduce((sum, row) => sum + row.count, 0), feedback: feedback(),
       };
     case 5: {
-      const categories = data.slice(0, 3).map(({ id, label, color }) => ({ id, label, color }));
-      const itemCategories = form === "pretest" ? [0, 1, 2, 0, 2, 1, 0, 2, 0, 1] : [2, 0, 1, 2, 2, 0, 1, 2, 0, 2, 1, 2];
+      const categories = form === "pretest"
+        ? [{ id: "bird", label: "Birds", color: COLOURS[0]! }, { id: "insect", label: "Insects", color: COLOURS[1]! }, { id: "other", label: "Other animals", color: COLOURS[2]! }]
+        : [{ id: "pond", label: "Pond", color: COLOURS[0]! }, { id: "garden", label: "Garden", color: COLOURS[1]! }, { id: "trees", label: "Trees", color: COLOURS[2]! }];
+      const observations = form === "pretest"
+        ? [["sparrow", "sparrow", "bird"], ["bee", "bee", "insect"], ["snail", "snail", "other"], ["ant", "ant", "insect"], ["robin", "robin", "bird"], ["lizard", "lizard", "other"], ["butterfly", "butterfly", "insect"], ["magpie", "magpie", "bird"], ["worm", "worm", "other"]]
+        : [["frog", "frog", "pond"], ["bee", "bee", "garden"], ["possum", "possum", "trees"], ["water-beetle", "water beetle", "pond"], ["ant", "ant", "garden"], ["parrot", "parrot", "trees"], ["dragonfly", "dragonfly", "pond"], ["butterfly", "butterfly", "garden"], ["koala", "koala", "trees"], ["tadpole", "tadpole", "pond"], ["ladybird", "ladybird", "garden"], ["owl", "owl", "trees"]];
       return {
-        kind: "statisticaCollect",
-        prompt: action("Collect every survey response and use the counters to identify the most frequent category.", "Collect all habitat records and determine which category has the greatest frequency."),
-        speakText: "Collect every response before comparing the completed category counters.", target: itemCategories.length, categories,
-        items: itemCategories.map((categoryIndex, itemIndex) => ({ id: `observation-${itemIndex}`, label: categories[categoryIndex]!.label, category: categories[categoryIndex]!.id })),
-        question: "Which category was recorded most often?", correctOptionIds: [categories[form === "pretest" ? 0 : 2]!.id], feedback: feedback(),
+        kind: "statisticaSort",
+        prompt: action("Classify each garden observation before the frequencies can be compared.", "Classify every wildlife observation by habitat before analysing the results."),
+        speakText: "Decide which category each observation belongs in. The cards do not reveal their category.", target: observations.length, categories,
+        items: observations.map(([id, label, category]) => ({ id: id!, label: label!, category: category! })), feedback: feedback(),
       };
     }
     case 6:
@@ -642,10 +646,14 @@ function levelThreeTask(form: StatisticaAssessmentKind, index: number): Practice
         correctOptionIds: ["0"], feedback: feedback(),
       };
     case 14:
+      const sourceObservations = form === "pretest"
+        ? ["2", "1", "3", "0", "2", "4", "1", "2", "3", "1", "0", "2", "1", "3", "2", "4", "1", "2", "0", "3", "2", "1", "3", "2"]
+        : ["2", "3", "1", "4", "2", "0", "3", "2", "1", "4", "2", "3", "1", "2", "0", "3", "2", "4", "1", "3", "2", "1", "3", "2", "3", "2"];
       return {
         kind: "statisticaGraph", mode: "build",
-        prompt: action("Construct a column graph for the frequency table of books borrowed.", "Build an accurate column graph for the goals-scored frequency table."),
-        speakText: "Set each column to the frequency for that exact numerical value.", target: 9, display: "columns", categories: numerical, feedback: feedback(),
+        prompt: action("Use the raw book data to calculate each frequency and construct the column graph.", "Organise the raw goals data, then build its column graph without a completed frequency table."),
+        speakText: "Count how often each value appears in the raw observations, then set every column. No target frequencies are shown.",
+        target: 9, display: "columns", categories: numerical, sourceObservations, hideBuildTargets: true, feedback: feedback(),
       };
     case 15: {
       const comparison = numerical.map((row, rowIndex) => ({ ...row, count: form === "pretest" ? [2, 4, 7, 7, 4][rowIndex]! : [4, 7, 9, 5, 1][rowIndex]! }));
@@ -683,7 +691,9 @@ function levelThreeTask(form: StatisticaAssessmentKind, index: number): Practice
         kind: "statisticaInference",
         prompt: action("What does the numerical display reveal about variation in books borrowed?", "Which statement correctly analyses variation in the goals-scored data?"),
         speakText: "Look beyond the tallest column and describe how observations vary across all values.", target: numerical[2]!.count, display: "columns", categories: numerical,
-        options: options(["Responses occur across several values, with the greatest frequency at 2.", "Every response is 2 because that column is tallest.", "There is no variation whenever one value is most frequent."]),
+        options: options(form === "pretest"
+          ? ["Values range from 0 to 4, and 2 books has the greatest frequency.", "Values range from 2 to 8 because those are the largest frequencies.", "The greatest frequency is 6 because 1 book was chosen by 6 students."]
+          : ["Values range from 0 to 4 goals, with the data concentrated around 2 and 3.", "The range is 7 because the frequency for 3 goals is 7.", "The data is concentrated at 4 goals because 4 is the largest score."]),
         correctOptionIds: ["0"], feedback: feedback(),
       };
     default:
@@ -691,7 +701,9 @@ function levelThreeTask(form: StatisticaAssessmentKind, index: number): Practice
         kind: "statisticaInference",
         prompt: action("Which report accurately answers the question and acknowledges variation in the data?", "Which final report is fully supported by the unfamiliar dataset?"),
         speakText: "Use the greatest frequency and the spread of the remaining values without making universal claims.", target: numerical[2]!.count, display: "columns", categories: numerical,
-        options: options(["The value 2 occurred most often, but responses varied from 0 to 4 in this group.", "Everyone will always have exactly 2.", "The graph proves why each person gave their response."]),
+        options: options(form === "pretest"
+          ? ["Two books occurred most often, and the observed values extended from 0 to 4 books.", "Eight books occurred most often because 8 is the tallest frequency.", "Most students borrowed 4 books because 4 is the greatest category value."]
+          : ["Two goals occurred most often, while observed scores varied from 0 to 4 goals.", "Nine goals occurred most often because the tallest frequency is 9.", "Four goals occurred most often because 4 is the greatest score shown."]),
         correctOptionIds: ["0"], feedback: feedback(),
       };
   }

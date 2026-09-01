@@ -346,9 +346,9 @@ export default function AssessmentShell({
 
         {/* ── Navigation ── */}
         <div
-          className={`assessment-navigation z-20 mt-5 flex items-center justify-between gap-3 ${isModernNumber ? "relative" : "sticky"}`}
+          className={`assessment-navigation z-20 mt-5 flex items-center justify-between gap-3 ${isModernNumber || isStatistics ? "relative" : "sticky"}`}
           style={{
-            bottom: isModernNumber ? undefined : "max(5rem, calc(env(safe-area-inset-bottom) + 4rem))",
+            bottom: isModernNumber || isStatistics ? undefined : "max(5rem, calc(env(safe-area-inset-bottom) + 4rem))",
           }}
         >
           <button

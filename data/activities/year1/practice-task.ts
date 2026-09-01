@@ -2804,6 +2804,11 @@ export type PracticeTask = (
       // Year 4 column builds use a scale > 1 (e.g. 5) so bars reach two-digit
       // frequencies against a scaled axis. Every count must be a multiple of it.
       buildStep?: number;
+      // Assessment construction can begin with unsorted raw observations. The
+      // student calculates each frequency before setting the columns, so target
+      // values must not be printed beside the controls.
+      sourceObservations?: string[];
+      hideBuildTargets?: boolean;
       feedback: { correct: string; wrong: string };
     }
   | {
