@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 import LiveClassPanel from "@/components/teacher/LiveClassPanel";
+import FocusModeControl from "@/components/teacher/FocusModeControl";
 import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
 import PlacementManager from "@/components/teacher/PlacementManager";
 import { fetchRealmCompatProgressForClass } from "@/lib/realm-progress-compat";
@@ -1440,11 +1441,16 @@ export default function TeacherDashboardPage() {
 
             {/* eslint-disable @typescript-eslint/no-explicit-any */}
             {activeTab === "live" ? (
-              <LiveClassPanel
-                selectedClass={selectedClass ?? null}
-                students={classStudents as any}
-                progressRows={progress}
-              />
+              <div className="grid gap-5">
+                {selectedClassId ? (
+                  <FocusModeControl classId={selectedClassId} className={selectedClass?.name ?? null} />
+                ) : null}
+                <LiveClassPanel
+                  selectedClass={selectedClass ?? null}
+                  students={classStudents as any}
+                  progressRows={progress}
+                />
+              </div>
             ) : activeTab === "curriculum" ? (
               <CurriculumExplorer
                 yearLabel={activeYear}

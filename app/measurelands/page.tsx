@@ -10,6 +10,7 @@ import { resolveRealmEntryRoute } from "@/lib/realm-entry";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { consumeRestoredRealmEntry } from "@/lib/realm-entry-handoff";
 import { RealmDashboardError, RealmDashboardLoading } from "@/components/realms/dashboard";
+import FocusLockGuard from "@/components/realms/FocusLockGuard";
 import { MEASURELANDS_DASHBOARD_CONFIG } from "@/components/world/MeasurelandsMap";
 
 const MeasurelandsMap = dynamic(
@@ -146,5 +147,10 @@ export default function MeasurelandsPage() {
     );
   }
 
-  return <MeasurelandsMap key={resolvedYear} year={resolvedYear} />;
+  return (
+    <>
+      <FocusLockGuard realmId="measurement" />
+      <MeasurelandsMap key={resolvedYear} year={resolvedYear} />
+    </>
+  );
 }

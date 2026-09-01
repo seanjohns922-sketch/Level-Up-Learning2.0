@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import StarpathMap from "@/components/world/StarpathMap";
+import FocusLockGuard from "@/components/realms/FocusLockGuard";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { STARPATH_REALM_ID } from "@/lib/starpath-routes";
 
@@ -17,5 +18,10 @@ export default async function StarpathPage({
     redirect("/realms");
   }
 
-  return <StarpathMap level={getStarpathLevel(level).yearLabel} />;
+  return (
+    <>
+      <FocusLockGuard realmId="space" />
+      <StarpathMap level={getStarpathLevel(level).yearLabel} />
+    </>
+  );
 }

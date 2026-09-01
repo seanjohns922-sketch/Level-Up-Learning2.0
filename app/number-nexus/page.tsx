@@ -9,6 +9,7 @@ import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import { buildDefaultStudentProgress } from "@/lib/student-destination";
 import { enterReviewMode, exitReviewMode } from "@/lib/review-mode";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
+import FocusLockGuard from "@/components/realms/FocusLockGuard";
 
 const NumberNexusMap = dynamic(
   () => import("@/components/world/NumberNexusMap"),
@@ -141,5 +142,10 @@ export default function NumberNexusPage() {
     );
   }
 
-  return <NumberNexusMap key={progressVersion} />;
+  return (
+    <>
+      <FocusLockGuard realmId="number" />
+      <NumberNexusMap key={progressVersion} />
+    </>
+  );
 }
