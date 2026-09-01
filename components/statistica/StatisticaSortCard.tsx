@@ -40,7 +40,6 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
     settled && placement[it.id] ? (placement[it.id] === it.category ? "correct" : "wrong") : null;
 
   const chip = (it: { id: string; label: string; category: string }, inBin: boolean) => {
-    const color = task.categories.find((c) => c.id === it.category)?.color ?? "#c65b4e";
     const status = statusOf(it);
     const stateCls = status === "correct"
       ? "border-emerald-500 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-400"
@@ -57,7 +56,7 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
           disabled={settled}
           className={["flex min-h-11 items-center gap-1.5 rounded-lg border-2 py-1.5 pl-2.5 pr-11 text-sm font-black transition disabled:opacity-100", stateCls].join(" ")}
         >
-          {status === "correct" ? <Check className="h-5 w-5 text-emerald-600" /> : status === "wrong" ? <X className="h-5 w-5 text-red-600" /> : <DataIcon name={it.label} color={color} size={20} />}
+          {status === "correct" ? <Check className="h-5 w-5 text-emerald-600" /> : status === "wrong" ? <X className="h-5 w-5 text-red-600" /> : <DataIcon name={it.label} color="#496253" size={20} />}
           {it.label}
         </button>
         {!settled ? <OptionReadAloudButton text={it.label} className="absolute right-1 top-1/2 -translate-y-1/2" /> : null}

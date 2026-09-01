@@ -97,10 +97,10 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
 
       <div className="flex justify-center" style={{ paddingLeft: AXIS, gap: COL_GAP }}>
         {categories.map((cat, i) => (
-          <div key={cat.id} className="flex flex-col items-center" style={{ width: colWidth }}>
-            <div className="mt-2 flex items-center gap-1 text-center text-[11px] font-bold leading-tight text-white/90">
-              <span className="max-w-[68px]">{cat.label}</span>
-              {labelReadAloud ? <OptionReadAloudButton text={cat.label} /> : null}
+          <div key={cat.id} className="flex min-w-0 flex-col items-center" style={{ width: colWidth }}>
+            <div className="mt-2 flex min-h-[68px] w-full flex-col items-center text-center text-[11px] font-bold leading-tight text-white/90">
+              <span className="min-h-[28px] w-full [overflow-wrap:anywhere]">{cat.label}</span>
+              {labelReadAloud ? <OptionReadAloudButton text={cat.label} className="mt-1 origin-top scale-75" /> : null}
             </div>
             {footer ? footer(cat, i) : null}
           </div>

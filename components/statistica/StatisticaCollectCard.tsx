@@ -42,13 +42,15 @@ export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { ta
       {/* live per-category counters */}
       <div className="mx-auto grid max-w-md gap-2" style={{ gridTemplateColumns: `repeat(${task.categories.length}, minmax(0,1fr))` }}>
         {task.categories.map((cat, i) => (
-          <div key={cat.id} className="relative rounded-lg border-2 p-2 text-center" style={{ borderColor: cat.color, background: `${cat.color}14` }}>
-            <OptionReadAloudButton text={`${cat.label}, ${counts[i]} collected`} className="absolute right-1 top-1" />
-            <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: cat.color }}>{cat.label}</div>
+          <div key={cat.id} className="rounded-lg border-2 p-2 text-center" style={{ borderColor: cat.color, background: `${cat.color}14` }}>
+            <div className="min-h-8 text-[11px] font-black uppercase tracking-wide [overflow-wrap:anywhere]" style={{ color: cat.color }}>{cat.label}</div>
             <div className="my-1 flex min-h-[16px] flex-wrap justify-center gap-[3px]">
               {Array.from({ length: counts[i]! }, (_, k) => <span key={k} className="h-2.5 w-2.5 rounded-full" style={{ background: cat.color }} />)}
             </div>
-            <div className="text-lg font-black leading-none text-[#17281f] tabular-nums">{counts[i]}</div>
+            <div className="flex min-h-10 items-center justify-center gap-1">
+              <div className="text-lg font-black leading-none text-[#17281f] tabular-nums">{counts[i]}</div>
+              <OptionReadAloudButton text={`${cat.label}, ${counts[i]} collected`} className="origin-center scale-75" />
+            </div>
           </div>
         ))}
       </div>
@@ -58,11 +60,10 @@ export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { ta
         <div className="mx-auto flex min-h-[120px] max-w-md flex-wrap items-center justify-center gap-2 rounded-lg border border-dashed border-[#f2bc45]/45 bg-[#17281f] p-3">
           {order.filter((id) => !collected.has(id)).map((id) => {
             const it = itemsById.get(id)!;
-            const cat = task.categories.find((c) => c.id === it.category)!;
             return (
               <div key={id} className="relative">
-                <button type="button" onClick={() => tap(id)} className="flex min-h-20 min-w-20 flex-col items-center justify-center gap-0.5 rounded-lg border-2 px-3 py-1.5 text-xs font-black text-[#244531] shadow-sm transition hover:-translate-y-0.5 active:scale-90" style={{ borderColor: cat.color, background: "#fffaf0" }}>
-                  <DataIcon name={it.label} color={cat.color} size={26} />
+                <button type="button" onClick={() => tap(id)} className="flex min-h-20 min-w-20 flex-col items-center justify-center gap-0.5 rounded-lg border-2 border-[#b9caaa] bg-[#fffaf0] px-3 py-1.5 text-xs font-black text-[#244531] shadow-sm transition hover:-translate-y-0.5 hover:border-[#7c9283] active:scale-90">
+                  <DataIcon name={it.label} color="#496253" size={26} />
                   {it.label}
                 </button>
                 <OptionReadAloudButton text={it.label} className="absolute right-1 top-1" />

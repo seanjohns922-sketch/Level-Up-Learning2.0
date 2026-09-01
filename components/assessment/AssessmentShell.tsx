@@ -342,18 +342,6 @@ export default function AssessmentShell({
             {questionContent}
           </div>
 
-          {/* "I Don't Know" — marks incorrect, records the response, advances */}
-          {onIdk && (
-            <div className="mt-6 flex justify-center">
-              <button
-                onClick={onIdk}
-                className="flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-bold text-slate-300 bg-slate-700/40 border border-slate-600/60 hover:bg-slate-700/70 hover:text-white transition active:scale-[0.98]"
-              >
-                <HelpCircle className="h-5 w-5" />
-                I Don&apos;t Know — Skip This Question
-              </button>
-            </div>
-          )}
         </div>
 
         {/* ── Navigation ── */}
@@ -375,6 +363,17 @@ export default function AssessmentShell({
           >
             Back
           </button>
+
+          {onIdk ? (
+            <button
+              type="button"
+              onClick={onIdk}
+              className="flex min-h-12 min-w-0 max-w-sm flex-1 items-center justify-center gap-2 rounded-lg border-2 border-slate-500 bg-slate-800 px-4 py-3 text-sm font-black text-white shadow-lg transition hover:bg-slate-700 active:scale-[0.98] sm:text-base"
+            >
+              <HelpCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+              <span>I Don&apos;t Know <span className="hidden sm:inline">- Skip This Question</span></span>
+            </button>
+          ) : null}
 
           {isLast ? (
             <button
