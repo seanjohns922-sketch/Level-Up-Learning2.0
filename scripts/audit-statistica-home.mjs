@@ -19,12 +19,19 @@ for (const assetName of assetNames) {
   const assetPath = path.join(root, "public", "images", assetName);
   assert(fs.existsSync(assetPath), `Missing Statistica home background: ${assetName}`);
 }
+assert(fs.existsSync(path.join(root, "public", "images", "statistica-terrace-tile.png")), "Missing Statistica terrace tile texture");
 
 const visualMap = read("lib/statistica-visuals.ts");
 for (const assetName of assetNames) {
   assert(visualMap.includes(`/images/${assetName}`), `Statistica visual map does not reference ${assetName}`);
 }
 assert(visualMap.includes('"Year 2": {'), "Statistica Level 2 must have its own 3D visual theme");
+assert(visualMap.includes('"Year 3": {'), "Statistica Level 3 must have its own 3D visual theme");
+assert(visualMap.includes('"Year 4": {'), "Statistica Level 4 must have its own 3D visual theme");
+assert(visualMap.includes('"Year 5": {'), "Statistica Level 5 must have its own 3D visual theme");
+assert(visualMap.includes('floorStyle: "cliffTerrace"'), "Statistica Level 5 must use a valley/cliff terrace floor");
+assert(visualMap.includes('"Year 6": {'), "Statistica Level 6 must have its own 3D visual theme");
+assert(visualMap.includes('floorStyle: "summitTerrace"'), "Statistica Level 6 must use a summit terrace floor");
 
 const legendCatalogue = read("data/legends.ts");
 const dataraVideos = [
@@ -52,7 +59,8 @@ assert(!route.includes('teacher_preview !== "1"'), "Live Statistica route must n
 
 const carousel = read("components/realms/RealmCarousel.tsx");
 assert(carousel.includes('current.id === "statistica"'), "Realm carousel must identify the Statistica realm");
-assert(carousel.includes('router.push(`/statistica?teacher_preview=1&level=${encodeURIComponent(displayedLevel)}`)'), "Realm carousel must still support Statistica preview entry");
+assert(carousel.includes('router.push(`/world/statistica?teacher_preview=1&level=${encodeURIComponent(displayedLevel)}`)'), "Realm carousel must open Statistica preview in 3D");
+assert(carousel.includes("if (isStatisticaPreview)"), "Realm carousel must let live Statistica use the shared live realm entry path");
 
 const portalPreview = read("components/realms/RealmPortalPreview.tsx");
 assert(portalPreview.includes('statistica: "/videos/realms/statistica.mp4"'), "Statistica carousel video must be mapped");
@@ -77,9 +85,17 @@ for (const token of ['left: "4%"', 'top: "13%"', 'left: "calc(50% - 190px)"', 't
 const statistica3dEntry = read("components/world3d/Statistica3DEntry.tsx");
 const statistica3dWorld = read("components/world3d/StatisticaLevel3World.tsx");
 const statistica3dEnvironment = read("components/world3d/StatisticaEnvironment.tsx");
-assert(statistica3dEntry.includes('["Year 1", "Year 2"]'), "Statistica 3D entry must support Levels 1 and 2");
+assert(statistica3dEntry.includes('["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"]'), "Statistica 3D entry must support Levels 1-6");
 assert(statistica3dWorld.includes('level === "Year 1" || level === "Year 2"'), "Statistica Level 2 must use the guided Start Adventure 3D flow");
-assert(statistica3dEnvironment.includes("<StatisticaGround asset={theme.background} />"), "Statistica 3D ground must use the selected level background");
+assert(statistica3dWorld.includes('districtLayout: STATISTICA_DISTRICT_LAYOUT'), "Statistica Level 3 must use the shared district 3D layout");
+assert(statistica3dEnvironment.includes("<StatisticaGround theme={theme} />"), "Statistica 3D ground must use the selected level theme");
+assert(statistica3dEnvironment.includes('"/images/statistica-terrace-tile.png"'), "Statistica 3D ground must use the supplied marble terrace tile texture");
+assert(statistica3dEnvironment.includes("summitTerrace ? 2.2 : 3"), "Statistica 3D ground must repeat the terrace tile so borders stay visible");
+assert(statistica3dEnvironment.includes('theme.floorStyle === "cliffTerrace"'), "Statistica 3D ground must support the Level 5 cliff terrace");
+assert(statistica3dEnvironment.includes('theme.floorStyle === "summitTerrace"'), "Statistica 3D ground must support the Level 6 summit terrace");
+assert(statistica3dEnvironment.includes("planeGeometry args={cliffTerrace ? [104, 72] : [120, 80]}"), "Statistica 3D ground must read as a broad tiled terrace");
+assert(statistica3dEnvironment.includes("boxGeometry args={cliffTerrace ? [104, 0.92, 1.35] : [120, 0.78, 1.1]}"), "Statistica 3D ground must have a raised terrace edge");
+assert(!statistica3dEnvironment.includes("theme.background} /></Suspense>"), "Statistica 3D ground must not flatten the panorama asset onto the floor");
 
 for (const forbidden of ["fetchGlobalXp", "award", "writeProgress", "writeProgramStore", "supabase.from", "Blueprint preview"]) {
   assert(!map.includes(forbidden), `Statistica preview must not perform progress writes: ${forbidden}`);

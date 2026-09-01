@@ -163,10 +163,10 @@ export default function RealmCarousel() {
 
   async function enterRealm() {
     if (!isActive || enteringRealm) return;
-    if (isStatisticaRealm) {
+    if (isStatisticaPreview) {
       setLastRealm(current.id);
       exitReviewMode();
-      router.push(`/statistica?teacher_preview=1&level=${encodeURIComponent(displayedLevel)}`);
+      router.push(`/world/statistica?teacher_preview=1&level=${encodeURIComponent(displayedLevel)}`);
       return;
     }
 

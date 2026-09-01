@@ -29,9 +29,11 @@ function stateVisual(state: RealmWorldGateState, accent: string, active: boolean
   return { frame: "#2c6f64", energy: accent, intensity: active ? 1.05 : state === "current" ? 0.72 : 0.42 };
 }
 
-function StatisticaGround({ asset }: { asset: string }) {
-  const source = useLoader(THREE.TextureLoader, asset);
+function StatisticaGround({ theme }: { theme: StatisticaLevelTheme }) {
+  const source = useLoader(THREE.TextureLoader, "/images/statistica-terrace-tile.png");
   const { gl } = useThree();
+  const cliffTerrace = theme.floorStyle === "cliffTerrace";
+  const summitTerrace = theme.floorStyle === "summitTerrace";
   const texture = useMemo(() => {
     const next = source.clone();
     next.colorSpace = THREE.SRGBColorSpace;
@@ -39,16 +41,72 @@ function StatisticaGround({ asset }: { asset: string }) {
     next.generateMipmaps = true;
     next.minFilter = THREE.LinearMipmapLinearFilter;
     next.magFilter = THREE.LinearFilter;
+    next.wrapS = THREE.RepeatWrapping;
+    next.wrapT = THREE.RepeatWrapping;
+    next.repeat.set(cliffTerrace ? 2.4 : summitTerrace ? 2.2 : 3, cliffTerrace ? 1.7 : summitTerrace ? 2.2 : 2);
     next.needsUpdate = true;
     return next;
-  }, [gl, source]);
+  }, [cliffTerrace, gl, source, summitTerrace]);
   useEffect(() => () => texture.dispose(), [texture]);
 
+  if (summitTerrace) {
+    return (
+      <group>
+        <mesh position={[0, -0.28, 6]} scale={[1, 0.2, 0.78]}>
+          <cylinderGeometry args={[46, 46, 1, 96]} />
+          <meshStandardMaterial color={theme.ledgeSide} roughness={0.82} />
+        </mesh>
+        <mesh position={[0, 0.12, 6]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.78, 1]}>
+          <circleGeometry args={[46, 96]} />
+          <meshBasicMaterial map={texture} color="#ffffff" toneMapped={false} />
+        </mesh>
+        <mesh position={[0, 0.145, 1.8]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.18, 0.72, 1]}>
+          <ringGeometry args={[12, 18.5, 96]} />
+          <meshBasicMaterial color={theme.accent} transparent opacity={0.34} depthWrite={false} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, 0.15, 1.8]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.18, 0.72, 1]}>
+          <ringGeometry args={[19.6, 21.1, 96]} />
+          <meshBasicMaterial color={theme.secondaryAccent} transparent opacity={0.46} depthWrite={false} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, 0.155, 1.8]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.18, 0.72, 1]}>
+          <circleGeometry args={[7.8, 72]} />
+          <meshBasicMaterial color={theme.waterGlow ?? theme.accent} transparent opacity={0.2} depthWrite={false} toneMapped={false} />
+        </mesh>
+      </group>
+    );
+  }
+
   return (
-    <mesh position={[0, -0.16, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[0.82, 1, 1]}>
-      <circleGeometry args={[55, 72]} />
-      <meshStandardMaterial map={texture} emissiveMap={texture} emissive="#fff4d8" emissiveIntensity={0.16} roughness={0.98} />
-    </mesh>
+    <group>
+      <mesh position={[0, 0.12, cliffTerrace ? 4 : 8]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={cliffTerrace ? [104, 72] : [120, 80]} />
+        <meshBasicMaterial map={texture} color="#ffffff" toneMapped={false} />
+      </mesh>
+      <mesh position={[0, -0.28, cliffTerrace ? 40.15 : 48.15]}>
+        <boxGeometry args={cliffTerrace ? [104, 0.92, 1.35] : [120, 0.78, 1.1]} />
+        <meshStandardMaterial color={theme.ledgeSide} roughness={0.82} />
+      </mesh>
+      {cliffTerrace ? (
+        <>
+          <mesh position={[-52.3, -0.55, 4]}>
+            <boxGeometry args={[1.4, 1.6, 72]} />
+            <meshStandardMaterial color={theme.cliffSide} roughness={0.9} />
+          </mesh>
+          <mesh position={[52.3, -0.55, 4]}>
+            <boxGeometry args={[1.4, 1.6, 72]} />
+            <meshStandardMaterial color={theme.cliffSide} roughness={0.9} />
+          </mesh>
+          <mesh position={[0, -0.86, 40.85]}>
+            <boxGeometry args={[102, 0.9, 1.8]} />
+            <meshStandardMaterial color={theme.cliffSide} roughness={0.94} />
+          </mesh>
+          <mesh position={[0, -0.3, 42]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[84, 5.5]} />
+            <meshBasicMaterial color={theme.waterGlow} transparent opacity={0.34} depthWrite={false} toneMapped={false} />
+          </mesh>
+        </>
+      ) : null}
+    </group>
   );
 }
 
@@ -119,7 +177,7 @@ export function StatisticaEnvironment({ theme, quality, districtInterior }: { th
       <ambientLight color={theme.ambientLight} intensity={0.48} />
       <hemisphereLight args={[theme.sky, "#224339", 0.56]} />
       <directionalLight position={[-13, 24, 10]} color={theme.sunLight} intensity={1.2} />
-      <Suspense fallback={null}><StatisticaGround asset={theme.background} /></Suspense>
+      <Suspense fallback={null}><StatisticaGround theme={theme} /></Suspense>
       <mesh position={[0, -0.11, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[0.82, 1, 1]}><ringGeometry args={[53.8, 54.1, 72]} /><meshBasicMaterial color={theme.secondaryAccent} transparent opacity={0.24} toneMapped={false} depthWrite={false} /></mesh>
       {[-4.6, -2.9, -1.2, 1.2, 2.9, 4.6].map((x, index) => (
         <DataColumn key={x} x={x} z={districtInterior ? -11.8 : -16.5} height={[1.2, 2.4, 1.7, 3.2, 2, 2.8][index]!} color={[theme.accent, theme.secondaryAccent, "#79b85a", "#59add1", theme.accent, "#fff4df"][index]!} />
