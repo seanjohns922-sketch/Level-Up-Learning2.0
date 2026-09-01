@@ -318,9 +318,9 @@ export default function RealmDashboardShell({
     return "locked";
   };
 
-  const visibleLevelCatalog = typeof config.maxLevelIndex === "number"
-    ? LEVEL_CATALOG.slice(0, config.maxLevelIndex + 1)
-    : LEVEL_CATALOG;
+  const minimumLevel = config.minLevelIndex ?? 0;
+  const maximumLevel = config.maxLevelIndex ?? LEVEL_CATALOG.length - 1;
+  const visibleLevelCatalog = LEVEL_CATALOG.slice(minimumLevel, maximumLevel + 1);
   const currentYear = progress?.year;
   const levelOptions: RealmDashboardLevelOption[] = visibleLevelCatalog.map((catalogLevel) => {
     const id = catalogLevel.id as RealmLevelId;

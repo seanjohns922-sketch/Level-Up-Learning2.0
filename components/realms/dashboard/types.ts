@@ -89,7 +89,7 @@ export type RealmDashboardTheme = {
 };
 
 export type CanonicalRealmDashboardConfig = {
-  realmId: LegendRealmId | "starpath-realm" | "statistica";
+  realmId: LegendRealmId | "starpath-realm" | "statistica" | "pattern-peaks";
   storageRealmId: ProgramRealmId;
   slug: string;
   displayName: string;
@@ -97,6 +97,7 @@ export type CanonicalRealmDashboardConfig = {
   districtTagline: string;
   guidedTagline: string;
   totalWeeks: number;
+  minLevelIndex?: number;
   maxLevelIndex?: number;
   districtModeLevels: readonly RealmLevelId[];
   worldForLevel: (level: RealmLevelId) => RealmDashboardWorld;

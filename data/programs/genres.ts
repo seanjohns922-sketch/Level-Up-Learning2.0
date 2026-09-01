@@ -8,6 +8,7 @@ import { YEAR4_MEASURELANDS_PROGRAM } from "./year4Measurelands";
 import { YEAR5_MEASURELANDS_PROGRAM } from "./year5Measurelands";
 import { YEAR6_MEASURELANDS_PROGRAM } from "./year6Measurelands";
 import { getStatisticaProgramForYearLabel } from "./statistica";
+import { getPatternPeaksProgramForYearLabel } from "./patternPeaks";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getStarpathLevelForYear } from "@/lib/starpath-levels";
 import { buildLessonRoute } from "@/lib/lesson-routing";
@@ -226,6 +227,10 @@ export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[
 
   if (genreId === "statistics") {
     return getStatisticaProgramForYearLabel(yearLabel) ?? placeholderWeeks(yearLabel, genre);
+  }
+
+  if (genreId === "algebra") {
+    return getPatternPeaksProgramForYearLabel(yearLabel) ?? placeholderWeeks(yearLabel, genre);
   }
 
   return placeholderWeeks(yearLabel, genre);

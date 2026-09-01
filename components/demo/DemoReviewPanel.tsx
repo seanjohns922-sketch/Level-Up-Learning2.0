@@ -42,7 +42,7 @@ import {
   buildStarpathWeeklyQuizHref,
 } from "@/lib/starpath-routes";
 
-type ReviewRealm = "number" | "measurement" | "space" | "statistics";
+type ReviewRealm = "number" | "measurement" | "space" | "statistics" | "pattern";
 type YearLabel = "Prep" | `Year ${1 | 2 | 3 | 4 | 5 | 6}`;
 
 const REALMS: readonly { id: ReviewRealm; label: string; accent: string }[] = [
@@ -50,6 +50,7 @@ const REALMS: readonly { id: ReviewRealm; label: string; accent: string }[] = [
   { id: "measurement", label: "Measurelands", accent: "#d6a63a" },
   { id: "space", label: "Starpath", accent: "#a78bfa" },
   { id: "statistics", label: "Statistica", accent: "#f06b64" },
+  { id: "pattern", label: "Pattern Peaks", accent: "#39d9a0" },
 ];
 
 const BRAIN_BREAK_GAME_LABELS: Record<BrainBreakGame, string> = {
@@ -89,11 +90,13 @@ function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "
 }
 
 function hasPretest(realm: ReviewRealm, year: YearLabel) {
+  if (realm === "pattern") return false;
   if (realm === "statistics" && year === "Prep") return false;
   return getPretestForYearLabel(year, realm).length > 0;
 }
 
 function hasPosttest(realm: ReviewRealm, year: YearLabel) {
+  if (realm === "pattern") return false;
   if (realm === "statistics" && year === "Prep") return false;
   return Boolean(getPosttestForYearLabel(year, realm)?.questions.length);
 }
@@ -131,10 +134,13 @@ export default function DemoReviewPanel() {
   const selectedStarpathWeek = starpathProgram?.weeks[week - 1];
   const pretestAvailable = hasPretest(realm, year);
   const posttestAvailable = hasPosttest(realm, year);
-  const weeklyContentAvailable = realm !== "space" || selectedStarpathWeek?.status === "implemented";
+  const weeklyProgramAvailable = realm === "pattern"
+    ? year === "Year 3"
+    : realm !== "space" || selectedStarpathWeek?.status === "implemented";
+  const weeklyContentAvailable = realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.status === "implemented");
   const weeklyQuizAvailable = realm === "statistics"
     ? week <= 5
-    : realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented";
+    : realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented");
 
   useEffect(() => {
     if (!isDemoPreviewMode() || localStorage.getItem(ACTIVE_STUDENT_KEY) !== "demo-preview") {
@@ -148,7 +154,8 @@ export default function DemoReviewPanel() {
 
   useEffect(() => {
     if (realm === "statistics" && year === "Prep") setYear("Year 1");
-  }, [realm, year]);
+    if (realm === "pattern" && levelNumber < 3) setYear("Year 3");
+  }, [levelNumber, realm, year]);
 
   const realmHome = useMemo(() => {
     if (realm === "space") {
@@ -157,11 +164,14 @@ export default function DemoReviewPanel() {
     if (realm === "statistics") {
       return `/statistica?teacher_preview=1&level=${encodeURIComponent(year)}`;
     }
+    if (realm === "pattern") {
+      return `/pattern-peaks?teacher_preview=1&level=${encodeURIComponent(year)}`;
+    }
     return `${realm === "measurement" ? "/measurelands" : "/number-nexus"}?level=${encodeURIComponent(year)}`;
   }, [realm, starpathLevel, year]);
 
   function preparePreview(profile?: AssessmentResultProfile) {
-    if (realm === "statistics") return;
+    if (realm === "statistics" || realm === "pattern") return;
     writeProgress({
       year,
       scorePercent: 0,
@@ -240,6 +250,7 @@ export default function DemoReviewPanel() {
 
   function programHref() {
     if (realm === "space") return buildStarpathProgramHref({ selectedLevel: starpathLevel }, week);
+    if (realm === "pattern") return `/pattern-peaks/program?teacher_preview=1&level=${encodeURIComponent(year)}&week=${week}`;
     const params = new URLSearchParams({ year, week: String(week), legacy: "1", realm_id: realm });
     return `/program?${params.toString()}`;
   }
@@ -311,7 +322,10 @@ export default function DemoReviewPanel() {
             </label>
             <label className="text-xs font-bold text-white/60">Level
               <select value={year} onChange={(event) => setYear(event.target.value as YearLabel)} className="mt-2 h-11 w-full border border-white/15 bg-[#171a22] px-3 text-sm font-bold text-white">
-                {LEVEL_CATALOG.filter((item) => realm !== "statistics" || item.id !== "Prep").map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                {LEVEL_CATALOG
+                  .filter((item) => realm !== "statistics" || item.id !== "Prep")
+                  .filter((item) => realm !== "pattern" || Number(item.id.replace("Year ", "")) >= 3)
+                  .map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
               </select>
             </label>
             <div className="flex items-end gap-2">
@@ -358,7 +372,7 @@ export default function DemoReviewPanel() {
               </select>
             </label>
             <div className="grid gap-2 sm:grid-cols-3 md:self-end">
-              <button type="button" disabled={!weeklyContentAvailable} onClick={() => weeklyContentAvailable && open(programHref())} className={actionClass(weeklyContentAvailable)}><Route size={16} /> Week</button>
+              <button type="button" disabled={!weeklyProgramAvailable} onClick={() => weeklyProgramAvailable && open(programHref())} className={actionClass(weeklyProgramAvailable)}><Route size={16} /> Week</button>
               <button type="button" disabled={!weeklyContentAvailable} onClick={() => weeklyContentAvailable && open(lessonHref())} className={actionClass(weeklyContentAvailable)}><BookOpen size={16} /> Lesson</button>
               <button type="button" disabled={!weeklyQuizAvailable} onClick={() => weeklyQuizAvailable && open(quizHref())} className={actionClass(weeklyQuizAvailable)}><ClipboardCheck size={16} /> Quiz</button>
             </div>
@@ -385,8 +399,8 @@ export default function DemoReviewPanel() {
             <button type="button" disabled={!pretestAvailable} onClick={() => pretestAvailable && openResult("pre-pass")} className={actionClass(pretestAvailable)}><CheckCircle2 size={16} /> Pre 85%</button>
             <button type="button" disabled={!pretestAvailable} onClick={() => pretestAvailable && openResult("pre-targeted")} className={actionClass(pretestAvailable)}><Route size={16} /> Targeted</button>
             <button type="button" disabled={!pretestAvailable} onClick={() => pretestAvailable && openResult("pre-full")} className={actionClass(pretestAvailable)}><BookOpen size={16} /> Full Path</button>
-            <button type="button" onClick={() => openResult("post-pass")} className={actionClass()}><Sparkles size={16} /> Unlock</button>
-            <button type="button" onClick={() => openResult("post-fail")} className={actionClass()}><XCircle size={16} /> Post Fail</button>
+            <button type="button" disabled={!posttestAvailable} onClick={() => posttestAvailable && openResult("post-pass")} className={actionClass(posttestAvailable)}><Sparkles size={16} /> Unlock</button>
+            <button type="button" disabled={!posttestAvailable} onClick={() => posttestAvailable && openResult("post-fail")} className={actionClass(posttestAvailable)}><XCircle size={16} /> Post Fail</button>
           </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             <button type="button" onClick={previewGemReveal} disabled={gemLoading} className={actionClass(!gemLoading)}><Gem size={16} /> {gemLoading ? "Loading..." : "Gem Reveal"}</button>

@@ -74,14 +74,14 @@ export function levelLabelForYear(year: string | null | undefined): string {
 export function isLevelUnlocked(
   year: string,
   progress: StudentProgress | null | undefined,
-  opts: { forceOpen?: boolean; realmId?: LegendRealmId | "starpath-realm" | "statistica" } = {}
+  opts: { forceOpen?: boolean; realmId?: LegendRealmId | "starpath-realm" | "statistica" | "pattern-peaks" } = {}
 ): boolean {
   if (opts.forceOpen) return true;
   const currentYear = progress?.year ?? "Year 1";
   if (year === currentYear) return true;
 
   const realmId = opts.realmId ?? "number-nexus";
-  if (realmId === "starpath-realm" || realmId === "statistica") return false;
+  if (realmId === "starpath-realm" || realmId === "statistica" || realmId === "pattern-peaks") return false;
   const currentIndex = levelIndexForYear(currentYear);
   const yearIndex = levelIndexForYear(year);
   const passedLegendIds = new Set(
