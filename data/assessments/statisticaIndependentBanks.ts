@@ -1177,7 +1177,7 @@ function buildLevelSixTask(form: StatisticaAssessmentKind, index: number): Pract
     case 0:
       return {
         kind: "statisticaClassify",
-        prompt: action("Recovery time was recorded as 42.6, 39.8 and 45.1 seconds. What type of numerical data is this?", "Water temperature was recorded as 18.4, 19.05 and 20.2 degrees Celsius. What type of data is this?"),
+        prompt: action("Recovery times include decimals. What type of data is this?", "Water temperatures include decimals. What type of data is this?"),
         speakText: "Decide whether the values were counted in whole steps or measured along a continuous scale.", target: 1,
         variable: action("Recovery time", "Water temperature"), examples: action("42.6 s, 39.8 s, 45.1 s", "18.4°C, 19.05°C, 20.2°C"),
         options: options(["Continuous numerical", "Discrete numerical", "Ordinal categorical"]), correctOptionIds: ["0"], feedback: feedback(),
