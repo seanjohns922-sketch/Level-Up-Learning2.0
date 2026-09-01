@@ -10,7 +10,8 @@ import { buildAssessmentReturnRoute } from "@/lib/assessment-routes";
 
 const levels = [1, 2, 3, 4, 5, 6] as const;
 const descriptorTaskKinds: Record<string, readonly string[]> = {
-  AC9M1ST01: ["statisticaTally", "statisticaTable"], AC9M1ST02: ["statisticaGraph", "statisticaInference"],
+  AC9M1ST01: ["statisticaTally", "statisticaTable", "statisticaClassify", "statisticaCollect", "statisticaSort"],
+  AC9M1ST02: ["statisticaGraph", "statisticaTapGraph", "statisticaGap", "statisticaRank", "statisticaInference"],
   AC9M2ST01: ["statisticaClassify", "statisticaTable"], AC9M2ST02: ["statisticaGraph", "statisticaInference"],
   AC9M3ST01: ["statisticaClassify", "statisticaTable"], AC9M3ST02: ["statisticaInference"], AC9M3ST03: ["statisticaClassify"],
   AC9M4ST01: ["statisticaPictograph", "statisticaGraph"], AC9M4ST02: ["statisticaShape"], AC9M4ST03: ["statisticaClassify"],
@@ -39,6 +40,15 @@ assert.equal(quizSerializations.size, 450, "All 450 quiz tasks must be structura
 
 assert.equal(Object.keys(STATISTICA_INDEPENDENT_ASSESSMENT_FORMS).length, 11, "Statistica must have 11 pre/post forms");
 assert.deepEqual(getStatisticaIndependentAssessment(1, "pretest"), [], "Year 1 must not have a pre-test");
+const yearOnePosttest = getStatisticaIndependentAssessment(1, "posttest");
+assert.equal(yearOnePosttest.length, 20, "Year 1 must retain a complete post-test");
+assert.ok(yearOnePosttest.every((item) => !/mastery check|evidence file/i.test(item.prompt)), "Year 1 prompts must use natural child-facing language");
+assert.ok(new Set(yearOnePosttest.map((item) => item.practiceTask!.kind)).size >= 9, "Year 1 post-test needs broad interaction variety");
+const yearOneTallyCounts = yearOnePosttest.flatMap((item) => item.practiceTask?.kind === "statisticaTally" ? [item.practiceTask.count] : []);
+assert.ok(new Set(yearOneTallyCounts).size >= 4 && Math.max(...yearOneTallyCounts) >= 14, "Year 1 tallies must vary and include grouped values above 10");
+assert.ok(yearOnePosttest.some((item) => item.practiceTask?.kind === "statisticaCollect"), "Year 1 must assess collecting data");
+assert.ok(yearOnePosttest.some((item) => item.practiceTask?.kind === "statisticaSort"), "Year 1 must assess categorising data");
+assert.ok(yearOnePosttest.slice(-3).every((item) => item.practiceTask?.kind === "statisticaInference"), "Year 1 must finish with evidence-based reasoning");
 
 const ids = new Set<string>();
 const prompts = new Set<string>();
