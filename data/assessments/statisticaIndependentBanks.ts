@@ -900,7 +900,13 @@ function levelFourTask(form: StatisticaAssessmentKind, index: number): PracticeT
         speakText: "Use a column display to show frequencies across ordered numerical values.", target: 1,
         question: form === "pretest" ? "How are reading times distributed?" : "How do active-play distributions differ between classes?",
         purpose: "Show concentration and variation across ordered numerical values.", data: { labels: distributionA.map((row) => row.label), values: distributionA.map((row) => row.count), unit: "students" },
-        displayOptions: ["table", "column"], correctDisplay: "column", feedback: feedback(),
+        displayOptions: ["table", "column"], correctDisplay: "column",
+        titleOptions: options(form === "pretest"
+          ? ["Reading minutes reported by this class", "Our data", "Favourite books in the library"]
+          : ["Active-play minutes in two Year 4 classes", "Some class results", "School lunch choices"]),
+        correctTitleId: "0",
+        reasonOptions: options(["Column heights make concentration and variation across ordered values visible.", "A column graph is always best for every dataset.", "The colours are more important than the evidence."]),
+        correctReasonId: "0", feedback: feedback(),
       };
     case 18:
       return {
@@ -960,7 +966,10 @@ function levelFiveTask(form: StatisticaAssessmentKind, index: number): PracticeT
     prompt: assessmentPrompt(5, form, index, "choose and justify the display that best answers the brief."),
     speakText: "Select a display based on the question and ordered nature of the data.", target: 1,
     question: "How did the recorded value change over five ordered times?", purpose: "Reveal rises, falls and the overall trend.",
-    data: { labels: points.map((point) => point.label), values: points.map((point) => point.value), unit: "units" }, displayOptions: ["line", "column", "table"], correctDisplay: "line", feedback: feedback(),
+    data: { labels: points.map((point) => point.label), values: points.map((point) => point.value), unit: "units" }, displayOptions: ["line", "column", "table"], correctDisplay: "line",
+    titleOptions: options(["Recorded value across five ordered times", "Our graph", "Favourite category results"]), correctTitleId: "0",
+    reasonOptions: options(["A line graph makes rises, falls and the overall trend easy to follow.", "A line graph is always correct for every kind of data.", "The line colour determines whether the evidence is accurate."]), correctReasonId: "0",
+    feedback: feedback(),
   };
 }
 

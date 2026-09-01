@@ -167,6 +167,13 @@ for (const level of levels) {
       assert.equal(item.type, "statisticaTask");
       assert.ok(item.practiceTask, `${item.id} needs a visual interaction`);
       assert.equal(isPracticeTaskSafe(item.practiceTask), true, `${item.id} must be accepted by the production task renderer`);
+      if (item.practiceTask.kind === "statisticaDisplayStudio" && item.practiceTask.mode === "design") {
+        const designTask = item.practiceTask;
+        assert.ok((designTask.titleOptions?.length ?? 0) >= 3, `${item.id} design task needs visible title choices`);
+        assert.ok((designTask.reasonOptions?.length ?? 0) >= 3, `${item.id} design task needs visible justification choices`);
+        assert.ok(designTask.titleOptions?.some((option) => option.id === designTask.correctTitleId), `${item.id} correct title must match a visible choice`);
+        assert.ok(designTask.reasonOptions?.some((option) => option.id === designTask.correctReasonId), `${item.id} correct reason must match a visible choice`);
+      }
       assert.ok(descriptorTaskKinds[item.primaryDescriptorCode]?.includes(item.practiceTask!.kind), `${item.id} renderer ${item.practiceTask!.kind} does not match ${item.primaryDescriptorCode}`);
       assert.ok("speakText" in item.practiceTask! && String(item.practiceTask.speakText).trim().length >= 12, `${item.id} needs read-aloud text`);
       assert.ok(!ids.has(item.id), `Duplicate assessment id ${item.id}`);
