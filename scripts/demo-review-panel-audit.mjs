@@ -13,11 +13,23 @@ const checks = [
   ["Demo navigation exposes the review workspace", navigation.includes('router.push("/demo-review")')],
   ["Pre-Test and Post-Test launchers use real assessment routes", panel.includes('`/${kind}?${params.toString()}`')],
   [
-    "Live Starpath assessment buttons follow registered assessment banks",
-    panel.includes('getPretestForYearLabel(year, "space").length > 0') &&
-      panel.includes('getPosttestForYearLabel(year, "space")?.questions.length') &&
+    "Assessment buttons follow each realm's registered assessment banks",
+    panel.includes("getPretestForYearLabel(year, realm).length > 0") &&
+      panel.includes("getPosttestForYearLabel(year, realm)?.questions.length") &&
       !panel.includes('pretestAvailable = year !== "Prep" && (realm !== "space" || levelNumber <= 2)') &&
       !panel.includes('posttestAvailable = realm !== "space" || levelNumber <= 3'),
+  ],
+  [
+    "Statistica assessments are selectable with no unsupported Prep option",
+    panel.includes('| "statistics"') &&
+      panel.includes('{ id: "statistics", label: "Statistica"') &&
+      panel.includes('realm !== "statistics" || item.id !== "Prep"'),
+  ],
+  [
+    "Statistica review links use its real map, lesson and quiz routes",
+    panel.includes('/statistica?teacher_preview=1&level=') &&
+      panel.includes('/statistica/lesson/') &&
+      panel.includes('/statistica/quiz/'),
   ],
   [
     "Starpath weekly content availability follows the program registry",

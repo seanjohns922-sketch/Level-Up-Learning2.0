@@ -38,7 +38,7 @@ export default async function StatisticaQuizPage({
         level: year,
         levelLabel: year,
         week,
-        title: `${weekPlan.topic} Data Quiz`,
+        title: `${weekPlan.topic} Quiz`,
         coverage: `15 evidence questions from ${weekPlan.lessons.map((lesson) => lesson.title).join(", ")}`,
         lessonTitles: weekPlan.lessons.map((lesson) => lesson.title) as [string, string, string],
         lessonCurriculumCodes: weekPlan.lessons.map((lesson) => [...lesson.curriculum]) as [string[], string[], string[]],

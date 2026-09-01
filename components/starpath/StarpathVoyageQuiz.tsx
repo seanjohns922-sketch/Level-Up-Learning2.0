@@ -60,6 +60,62 @@ function taskPrompt(task: PracticeTask) {
   return "prompt" in task && typeof task.prompt === "string" ? task.prompt : "Starpath quiz question";
 }
 
+function optionLabel(task: PracticeTask, optionId: string) {
+  if (!("options" in task) || !Array.isArray(task.options)) return optionId;
+  const option = task.options.find((candidate) =>
+    typeof candidate === "object" && candidate !== null && "id" in candidate && String(candidate.id) === optionId
+  );
+  return option && typeof option === "object" && "label" in option ? String(option.label) : optionId;
+}
+
+function categoryLabel(task: PracticeTask, categoryId: string) {
+  const rows = "categories" in task && Array.isArray(task.categories)
+    ? task.categories
+    : "rows" in task && Array.isArray(task.rows)
+      ? task.rows
+      : [];
+  const row = rows.find((candidate) => candidate.id === categoryId);
+  return row && "label" in row && typeof row.label === "string" ? row.label : categoryId;
+}
+
+function studentAnswerForReview(task: PracticeTask, response?: string) {
+  if (!response?.trim()) return "Incorrect attempt";
+  if (response.includes(" | ")) return response.split(" | ").map((part) => optionLabel(task, part)).join("; ");
+  if (response.includes(",")) return response.split(",").map((part) => categoryLabel(task, part)).join(", ");
+  const option = optionLabel(task, response);
+  return option === response ? categoryLabel(task, response) : option;
+}
+
+function correctAnswerForReview(task: PracticeTask) {
+  if ("correctOptionIds" in task && Array.isArray(task.correctOptionIds) && task.correctOptionIds.length > 0) {
+    return task.correctOptionIds.map((optionId) => optionLabel(task, optionId)).join(" or ");
+  }
+  if ("correctCategoryId" in task && typeof task.correctCategoryId === "string") {
+    return categoryLabel(task, task.correctCategoryId);
+  }
+  if ("correctRowId" in task && typeof task.correctRowId === "string") {
+    return categoryLabel(task, task.correctRowId);
+  }
+  if ("answerCount" in task && typeof task.answerCount === "number") return String(task.answerCount);
+  if ("difference" in task && typeof task.difference === "number") return String(task.difference);
+  if ("correctOrderIds" in task && Array.isArray(task.correctOrderIds)) {
+    return task.correctOrderIds.map((categoryId) => categoryLabel(task, categoryId)).join(", ");
+  }
+  if ("correctDisplay" in task && typeof task.correctDisplay === "string") return `${task.correctDisplay} display`;
+  if ("mode" in task && task.mode === "record" && "count" in task && typeof task.count === "number") {
+    return String(task.count);
+  }
+  if ("categories" in task && Array.isArray(task.categories)) {
+    const categoryCounts = task.categories.flatMap((category) =>
+      "label" in category && "count" in category && typeof category.count === "number"
+        ? [`${category.label}: ${category.count}`]
+        : []
+    );
+    if (categoryCounts.length > 0) return categoryCounts.join(", ");
+  }
+  return "See the data model shown in the question";
+}
+
 function lessonOrder(length: number) {
   return Array.from({ length }, (_, index) => index);
 }
@@ -208,7 +264,7 @@ export default function StarpathVoyageQuiz({
         id: `${quiz.level}-${realm}-w${quiz.week}-quiz-q${questionIndex + 1}`,
         prompt: taskPrompt(quizTask),
         type: "practiceTask",
-        correctAnswer: "Correct response",
+        correctAnswer: correctAnswerForReview(quizTask),
         skillId: quiz.lessonSkillIds[lessonIndex][0],
         skillLabel: quiz.lessonTitles[lessonIndex],
         strand: isStatistica ? "Statistics" : "Space",
@@ -222,7 +278,9 @@ export default function StarpathVoyageQuiz({
     const questionResults = buildAssessmentQuestionSnapshots(
       replaySources,
       (_question, questionIndex) =>
-        answers[String(questionIndex)] === true ? "Correct response" : "Incorrect response",
+        answers[String(questionIndex)] === true
+          ? correctAnswerForReview(orderedTasks[questionIndex]!)
+          : studentAnswerForReview(orderedTasks[questionIndex]!, responses[String(questionIndex)]),
       (_question) => {
         const questionIndex = replaySources.indexOf(_question);
         return answers[String(questionIndex)] === true;
@@ -392,7 +450,7 @@ export default function StarpathVoyageQuiz({
                     callbacks={{
                       markCorrect: () => answer(true),
                       markCorrectSoft: () => answer(true),
-                      markWrong: () => answer(false),
+                      markWrong: (response) => answer(false, response == null ? undefined : String(response)),
                       recordAssessmentAnswer: (correct, response) => answer(correct, response),
                     }}
                   />
@@ -400,15 +458,15 @@ export default function StarpathVoyageQuiz({
               ) : null}
 
               {currentAnswer !== undefined ? (
-                <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border-2 border-cyan-200 bg-cyan-50 px-4 py-3">
-                  <div className="flex items-center gap-2 font-bold text-cyan-950">
-                    <Check className="h-5 w-5 text-cyan-600" />
+                <div className={`mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border-2 px-4 py-3 ${isStatistica ? "border-[#79b85a]/60 bg-[#edf5e8]" : "border-cyan-200 bg-cyan-50"}`}>
+                  <div className={`flex items-center gap-2 font-bold ${isStatistica ? "text-[#244531]" : "text-cyan-950"}`}>
+                    <Check className={`h-5 w-5 ${isStatistica ? "text-[#20b486]" : "text-cyan-600"}`} />
                     Answer recorded. You can change it before finishing the quiz.
                   </div>
                   <button
                     type="button"
                     onClick={changeAnswer}
-                    className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-violet-300 bg-white px-4 text-sm font-black text-violet-800 transition hover:bg-violet-50"
+                    className={`inline-flex min-h-10 items-center gap-2 rounded-lg border bg-white px-4 text-sm font-black transition ${isStatistica ? "border-[#f06b64]/55 text-[#8e3341] hover:bg-[#fff0df]" : "border-violet-300 text-violet-800 hover:bg-violet-50"}`}
                   >
                     <RotateCcw className="h-4 w-4" /> Change answer
                   </button>
@@ -423,7 +481,7 @@ export default function StarpathVoyageQuiz({
                     setIndex((value) => Math.max(0, value - 1));
                     setNonce((value) => value + 1);
                   }}
-                  className="inline-flex min-h-12 items-center gap-2 rounded-lg border-2 border-violet-300 bg-white px-5 font-black text-violet-800 disabled:cursor-not-allowed disabled:opacity-40"
+                  className={`inline-flex min-h-12 items-center gap-2 rounded-lg border-2 bg-white px-5 font-black disabled:cursor-not-allowed disabled:opacity-40 ${isStatistica ? "border-[#f06b64]/55 text-[#8e3341]" : "border-violet-300 text-violet-800"}`}
                 >
                   <ArrowLeft className="h-5 w-5" /> Back
                 </button>
@@ -436,7 +494,7 @@ export default function StarpathVoyageQuiz({
                       setIndex((value) => Math.min(total - 1, value + 1));
                       setNonce((value) => value + 1);
                     }}
-                    className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-cyan-500 px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
+                    className={`inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40 ${isStatistica ? "bg-gradient-to-r from-[#a83e4b] via-[#e85d63] to-[#f2bc45]" : "bg-gradient-to-r from-violet-600 to-cyan-500"}`}
                   >
                     Next <ArrowRight className="h-5 w-5" />
                   </button>
@@ -445,7 +503,7 @@ export default function StarpathVoyageQuiz({
                     type="button"
                     disabled={answeredCount !== total || saving}
                     onClick={finishQuiz}
-                    className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-cyan-500 px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
+                    className={`inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40 ${isStatistica ? "bg-gradient-to-r from-[#a83e4b] via-[#e85d63] to-[#f2bc45]" : "bg-gradient-to-r from-violet-600 to-cyan-500"}`}
                   >
                     {saving ? "Saving…" : "Finish Quiz"} <Check className="h-5 w-5" />
                   </button>
@@ -456,13 +514,15 @@ export default function StarpathVoyageQuiz({
 
           {phase === "results" ? (
             <div className="mx-auto max-w-xl text-center">
-              <div className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-violet-700">
+              <div className={`font-mono text-[11px] font-black uppercase tracking-[0.2em] ${isStatistica ? "text-[#a83e4b]" : "text-violet-700"}`}>
                 {quiz.title}
               </div>
               <div
                 className={[
                   "mx-auto mt-4 flex h-24 w-24 items-center justify-center rounded-full text-white shadow-lg",
-                  passed ? "bg-gradient-to-br from-violet-600 to-cyan-500" : "bg-gradient-to-br from-amber-500 to-amber-700",
+                  passed
+                    ? isStatistica ? "bg-gradient-to-br from-[#a83e4b] via-[#e85d63] to-[#f2bc45]" : "bg-gradient-to-br from-violet-600 to-cyan-500"
+                    : "bg-gradient-to-br from-amber-500 to-amber-700",
                 ].join(" ")}
               >
                 <span className="text-3xl font-black">{percent}%</span>
@@ -478,7 +538,7 @@ export default function StarpathVoyageQuiz({
               </p>
               {!passed ? (
                 <div className="mt-4 rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-3 font-bold text-amber-950">
-                  Week {quiz.week + 1} is not unlocked yet. Review a mission below, then try the quiz again.
+                  Week {quiz.week + 1} is not unlocked yet. Review a {isStatistica ? "lesson" : "mission"} below, then try the quiz again.
                 </div>
               ) : null}
               <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">
@@ -492,7 +552,7 @@ export default function StarpathVoyageQuiz({
                         : "border-amber-200 bg-amber-50",
                     ].join(" ")}
                   >
-                    <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-violet-700">
+                    <div className={`font-mono text-xs font-black uppercase tracking-[0.16em] ${isStatistica ? "text-[#a83e4b]" : "text-violet-700"}`}>
                       {isStatistica ? "Lesson" : "Mission"} {result.lesson}
                     </div>
                     <div className="mt-2 text-2xl font-black text-slate-950">{result.score}/5</div>
@@ -501,8 +561,8 @@ export default function StarpathVoyageQuiz({
                 ))}
               </div>
               {wrongIndexes.length ? (
-                <div className="mt-5 rounded-lg border-2 border-violet-200 bg-violet-50 p-4 text-left">
-                  <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-violet-700">
+                <div className={`mt-5 rounded-lg border-2 p-4 text-left ${isStatistica ? "border-[#79b85a]/45 bg-[#edf5e8]" : "border-violet-200 bg-violet-50"}`}>
+                  <div className={`font-mono text-xs font-black uppercase tracking-[0.16em] ${isStatistica ? "text-[#13785f]" : "text-violet-700"}`}>
                     Where to practise
                   </div>
                   <p className="mt-2 font-bold text-slate-900">
@@ -517,7 +577,7 @@ export default function StarpathVoyageQuiz({
                   <button
                     type="button"
                     onClick={restart}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-violet-300 bg-white px-6 text-base font-black text-violet-800"
+                    className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 bg-white px-6 text-base font-black ${isStatistica ? "border-[#f06b64]/55 text-[#8e3341]" : "border-violet-300 text-violet-800"}`}
                   >
                     <RotateCcw className="h-5 w-5" /> Retry Quiz
                   </button>
@@ -526,7 +586,7 @@ export default function StarpathVoyageQuiz({
                   <button
                     type="button"
                     onClick={() => setPhase("review")}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-violet-700 px-6 text-base font-black text-white"
+                    className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-base font-black text-white ${isStatistica ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : "bg-violet-700"}`}
                   >
                     Review Answers <BookOpen className="h-5 w-5" />
                   </button>
@@ -534,7 +594,7 @@ export default function StarpathVoyageQuiz({
                 <button
                   type="button"
                   onClick={() => router.push(passed && quiz.nextWeekHref ? quiz.nextWeekHref : quiz.weekHref)}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-cyan-500 px-6 text-base font-black text-white shadow-lg"
+                  className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-base font-black text-white shadow-lg ${isStatistica ? "bg-gradient-to-r from-[#a83e4b] via-[#e85d63] to-[#f2bc45]" : "bg-gradient-to-r from-violet-600 to-cyan-500"}`}
                 >
                   {passed && quiz.nextWeekHref
                     ? `Continue to Week ${quiz.week + 1}`
@@ -548,7 +608,7 @@ export default function StarpathVoyageQuiz({
           {phase === "review" ? (
             <div className="mx-auto max-w-3xl">
               <div className="text-center">
-                <div className="font-mono text-xs font-black uppercase tracking-[0.2em] text-violet-700">
+                <div className={`font-mono text-xs font-black uppercase tracking-[0.2em] ${isStatistica ? "text-[#a83e4b]" : "text-violet-700"}`}>
                   Quiz Review
                 </div>
                 <h2 className="mt-2 text-3xl font-black text-slate-950">Questions to revisit</h2>
@@ -557,7 +617,7 @@ export default function StarpathVoyageQuiz({
                 {wrongIndexes.map((questionIndex) => {
                   const reviewTask = orderedTasks[questionIndex]!;
                   return (
-                    <div key={questionIndex} className="rounded-lg border-2 border-rose-200 bg-rose-50 p-4">
+                    <div key={questionIndex} className={`rounded-lg border-2 p-4 ${isStatistica ? "border-[#f06b64]/40 bg-[#fff0df]" : "border-rose-200 bg-rose-50"}`}>
                       <div className="flex items-center justify-between gap-3">
                         <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-rose-700">
                           Question {questionIndex + 1}
@@ -565,17 +625,27 @@ export default function StarpathVoyageQuiz({
                         <ReadAloudBtn
                           text={buildIncorrectFeedbackSpeech({
                             prompt: taskPrompt(reviewTask),
+                            studentAnswer: studentAnswerForReview(reviewTask, responses[String(questionIndex)]),
+                            correctAnswer: correctAnswerForReview(reviewTask),
                             explanation:
                               taskFeedback(reviewTask)?.wrong ??
                               "Review this question and try the quiz again.",
                           })}
                           speechKey={`${realm}-quiz-review:${quiz.level}:${quiz.week}:${questionIndex}`}
                           label="Read feedback"
-                          className="shrink-0 border-rose-200 bg-white text-rose-800"
+                          className={isStatistica ? "shrink-0 border-[#f06b64]/40 bg-white text-[#8e3341]" : "shrink-0 border-rose-200 bg-white text-rose-800"}
                         />
                       </div>
                       <div className="mt-2 text-lg font-black text-slate-950">{taskPrompt(reviewTask)}</div>
-                      <div className="mt-2 font-semibold text-rose-900">
+                      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        <div className="rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm font-bold text-rose-800">
+                          <span className="font-black">Your answer:</span> {studentAnswerForReview(reviewTask, responses[String(questionIndex)])}
+                        </div>
+                        <div className="rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm font-bold text-emerald-800">
+                          <span className="font-black">Correct answer:</span> {correctAnswerForReview(reviewTask)}
+                        </div>
+                      </div>
+                      <div className={`mt-2 rounded-lg border px-3 py-2 font-semibold ${isStatistica ? "border-[#f2bc45]/50 bg-[#fffaf0] text-[#5b2e27]" : "border-rose-200 bg-white text-rose-900"}`}>
                         {taskFeedback(reviewTask)?.wrong ?? "Review this question and try the quiz again."}
                       </div>
                     </div>
@@ -585,7 +655,7 @@ export default function StarpathVoyageQuiz({
               <button
                 type="button"
                 onClick={() => setPhase("results")}
-                className="mx-auto mt-6 flex min-h-12 items-center gap-2 rounded-lg border-2 border-violet-300 bg-white px-6 font-black text-violet-800"
+                className={`mx-auto mt-6 flex min-h-12 items-center gap-2 rounded-lg border-2 bg-white px-6 font-black ${isStatistica ? "border-[#f06b64]/55 text-[#8e3341]" : "border-violet-300 text-violet-800"}`}
               >
                 <ArrowLeft className="h-5 w-5" /> Back to Results
               </button>

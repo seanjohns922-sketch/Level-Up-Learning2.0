@@ -10,7 +10,7 @@ const session = read("app/session/page.tsx");
 const starpath = read("components/starpath/StarpathDevelopmentQuiz.tsx");
 const starpathVoyage = read("components/starpath/StarpathVoyageQuiz.tsx");
 
-for (const realm of ["number", "measurement", "space"]) {
+for (const realm of ["number", "measurement", "space", "statistics"]) {
   assert.ok(chrome.includes(`${realm}: {`), `Missing ${realm} quiz theme`);
 }
 
@@ -42,5 +42,11 @@ assert.match(starpathVoyage, /if \(!task \|\| \(!answersAreEditable && currentAn
 assert.match(starpathVoyage, /Answer recorded\. You can change it before finishing the quiz\./);
 assert.match(starpathVoyage, /changeAnswer|Change Answer/);
 assert.match(starpathVoyage, /delete next\[answerKey\]/);
+assert.match(starpathVoyage, /markWrong: \(response\) => answer\(false/);
+assert.match(starpathVoyage, /studentAnswerForReview/);
+assert.match(starpathVoyage, /correctAnswerForReview/);
+assert.match(starpathVoyage, /Your answer:/);
+assert.match(starpathVoyage, /Correct answer:/);
+assert.match(starpathVoyage, /isStatistica \? "bg-gradient-to-br from-\[#a83e4b\]/);
 
-console.log("Realm weekly quiz audit passed: shared presentation is intact and Starpath answers remain editable before final submission.");
+console.log("Realm weekly quiz audit passed: shared presentation, Statistica theming, editable answers and mistake review are intact.");

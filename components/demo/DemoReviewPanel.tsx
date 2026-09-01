@@ -42,13 +42,14 @@ import {
   buildStarpathWeeklyQuizHref,
 } from "@/lib/starpath-routes";
 
-type ReviewRealm = "number" | "measurement" | "space";
+type ReviewRealm = "number" | "measurement" | "space" | "statistics";
 type YearLabel = "Prep" | `Year ${1 | 2 | 3 | 4 | 5 | 6}`;
 
 const REALMS: readonly { id: ReviewRealm; label: string; accent: string }[] = [
   { id: "number", label: "Number Nexus", accent: "#14b8a6" },
   { id: "measurement", label: "Measurelands", accent: "#d6a63a" },
   { id: "space", label: "Starpath", accent: "#a78bfa" },
+  { id: "statistics", label: "Statistica", accent: "#f06b64" },
 ];
 
 const BRAIN_BREAK_GAME_LABELS: Record<BrainBreakGame, string> = {
@@ -88,13 +89,13 @@ function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "
 }
 
 function hasPretest(realm: ReviewRealm, year: YearLabel) {
-  if (realm === "space") return getPretestForYearLabel(year, "space").length > 0;
-  return year !== "Prep";
+  if (realm === "statistics" && year === "Prep") return false;
+  return getPretestForYearLabel(year, realm).length > 0;
 }
 
 function hasPosttest(realm: ReviewRealm, year: YearLabel) {
-  if (realm === "space") return Boolean(getPosttestForYearLabel(year, "space")?.questions.length);
-  return true;
+  if (realm === "statistics" && year === "Prep") return false;
+  return Boolean(getPosttestForYearLabel(year, realm)?.questions.length);
 }
 
 function resultsHref(realm: ReviewRealm, year: YearLabel, scenario: "pre-pass" | "pre-targeted" | "pre-full" | "post-pass" | "post-fail") {
@@ -123,7 +124,7 @@ export default function DemoReviewPanel() {
   const [breakGame, setBreakGame] = useState<BrainBreakGame | "random">("random");
   const [activeBreak, setActiveBreak] = useState<Villain | null>(null);
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
-  const maxWeek = realm === "number" ? 12 : 8;
+  const maxWeek = realm === "number" ? 12 : realm === "statistics" ? 6 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
   const starpathLevel = getStarpathLevelForYear(year).id;
   const starpathProgram = realm === "space" ? getStarpathProgram(starpathLevel) : null;
@@ -131,7 +132,9 @@ export default function DemoReviewPanel() {
   const pretestAvailable = hasPretest(realm, year);
   const posttestAvailable = hasPosttest(realm, year);
   const weeklyContentAvailable = realm !== "space" || selectedStarpathWeek?.status === "implemented";
-  const weeklyQuizAvailable = realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented";
+  const weeklyQuizAvailable = realm === "statistics"
+    ? week <= 5
+    : realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented";
 
   useEffect(() => {
     if (!isDemoPreviewMode() || localStorage.getItem(ACTIVE_STUDENT_KEY) !== "demo-preview") {
@@ -143,14 +146,22 @@ export default function DemoReviewPanel() {
     setWeek((current) => Math.min(current, maxWeek));
   }, [maxWeek]);
 
+  useEffect(() => {
+    if (realm === "statistics" && year === "Prep") setYear("Year 1");
+  }, [realm, year]);
+
   const realmHome = useMemo(() => {
     if (realm === "space") {
       return `/starpath?realm_id=space&level=${encodeURIComponent(starpathLevel)}&destination=world`;
+    }
+    if (realm === "statistics") {
+      return `/statistica?teacher_preview=1&level=${encodeURIComponent(year)}`;
     }
     return `${realm === "measurement" ? "/measurelands" : "/number-nexus"}?level=${encodeURIComponent(year)}`;
   }, [realm, starpathLevel, year]);
 
   function preparePreview(profile?: AssessmentResultProfile) {
+    if (realm === "statistics") return;
     writeProgress({
       year,
       scorePercent: 0,
@@ -234,11 +245,15 @@ export default function DemoReviewPanel() {
   }
 
   function lessonHref() {
+    if (realm === "statistics") {
+      return `/statistica/lesson/${encodeURIComponent(year)}/${week}/${lesson}?teacher_preview=1`;
+    }
     return buildLessonRoute({ yearLabel: year, week, lessonNumber: lesson, realmId: realm });
   }
 
   function quizHref() {
     if (realm === "space") return buildStarpathWeeklyQuizHref({ selectedLevel: starpathLevel }, week);
+    if (realm === "statistics") return `/statistica/quiz/${encodeURIComponent(year)}/${week}`;
     const params = new URLSearchParams({ year, week: String(week), type: "quiz", n: "1", realm_id: realm });
     return `/session?${params.toString()}`;
   }
@@ -296,7 +311,7 @@ export default function DemoReviewPanel() {
             </label>
             <label className="text-xs font-bold text-white/60">Level
               <select value={year} onChange={(event) => setYear(event.target.value as YearLabel)} className="mt-2 h-11 w-full border border-white/15 bg-[#171a22] px-3 text-sm font-bold text-white">
-                {LEVEL_CATALOG.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                {LEVEL_CATALOG.filter((item) => realm !== "statistics" || item.id !== "Prep").map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
               </select>
             </label>
             <div className="flex items-end gap-2">
