@@ -29,7 +29,7 @@ export function resolveCanonicalNextActivity(input: {
   const { realmId, progress, store } = input;
   const year = progress.year;
   if (progress.status === "PASSED") {
-    return { type: "realm-complete", label: `${year} complete`, route: `/${realmId === "number" ? "number-nexus" : realmId === "measurement" ? "measurelands" : "starpath"}` };
+    return { type: "realm-complete", label: `${year} complete`, route: `/${realmId === "number" ? "number-nexus" : realmId === "measurement" ? "measurelands" : realmId === "space" ? "starpath" : "statistica"}` };
   }
 
   const requiredWeeks = progress.requiredWeeks ?? [];

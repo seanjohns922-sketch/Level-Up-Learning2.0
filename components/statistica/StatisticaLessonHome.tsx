@@ -24,7 +24,7 @@ export default function StatisticaLessonHome({
   successCriteria,
 }: StatisticaLessonHomeProps) {
   const router = useRouter();
-  const weekHref = buildRealmProgramHref({ realmId: "statistics", year: level, week, preview: true });
+  const weekHref = buildRealmProgramHref({ realmId: "statistics", year: level, week });
 
   return (
     <main className="min-h-screen bg-[#06151a] p-3 sm:p-5">

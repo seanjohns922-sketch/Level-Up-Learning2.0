@@ -116,8 +116,8 @@ export const REALM_REGISTRY = {
     name: "Statistica",
     shortName: "Stats",
     strand: "Statistics",
-    status: "coming_soon",
-    isSelectable: false,
+    status: "live",
+    isSelectable: true,
     totalWeeks: 6,
     lessonsPerWeek: 3,
     hasWeeklyQuiz: true,
@@ -252,6 +252,12 @@ export type LiveRealmId = {
     : never;
 }[CanonicalRealmId];
 
+export type LiveRealmRegistryEntry = RealmRegistryEntry & {
+  realmId: LiveRealmId;
+  status: "live";
+  isSelectable: true;
+};
+
 export const LIVE_REALM_IDS = CANONICAL_REALM_IDS.filter(
   (realmId): realmId is LiveRealmId =>
     REALM_REGISTRY[realmId].status === "live" && REALM_REGISTRY[realmId].isSelectable,
@@ -262,8 +268,8 @@ export function isLiveRealmId(value: string | null | undefined): value is LiveRe
   return realmId != null && LIVE_REALM_IDS.includes(realmId as LiveRealmId);
 }
 
-export function getLiveRealmDefinitions() {
-  return LIVE_REALM_IDS.map((realmId) => REALM_REGISTRY[realmId]);
+export function getLiveRealmDefinitions(): LiveRealmRegistryEntry[] {
+  return LIVE_REALM_IDS.map((realmId) => REALM_REGISTRY[realmId] as LiveRealmRegistryEntry);
 }
 
 const REALM_ALIASES = new Map<string, CanonicalRealmId>(

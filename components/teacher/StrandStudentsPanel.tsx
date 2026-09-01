@@ -797,6 +797,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
           ? `${lessonIdPrefix(workingYear)}measurement-`
           : genreId === "space"
             ? `${lessonIdPrefix(workingYear)}space-`
+            : genreId === "statistics"
+              ? `${lessonIdPrefix(workingYear)}statistics-`
             : lessonIdPrefix(workingYear)
         : "";
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
@@ -1037,6 +1039,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                         ? `${lessonIdPrefix(workingYear)}measurement-`
                         : genre.id === "space"
                           ? `${lessonIdPrefix(workingYear)}space-`
+                          : genre.id === "statistics"
+                            ? `${lessonIdPrefix(workingYear)}statistics-`
                           : lessonIdPrefix(workingYear)
                     }
                     onProgressChanged={onProgressChanged}

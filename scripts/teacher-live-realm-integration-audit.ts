@@ -63,10 +63,11 @@ const placementManager = read("components/teacher/PlacementManager.tsx");
 assert(!/filter\(\(realm\)\s*=>\s*realm\.id\s*!==\s*["']space["']\)/.test(placementManager), "Teacher placement manager must not exclude Starpath.");
 
 const starpathPlacementMigration = read("supabase/migrations/20260814143000_enable_starpath_teacher_placements.sql");
-assert(starpathPlacementMigration.includes("p_realm_id not in ('number', 'measurement', 'space')"), "Teacher placement RPC must allow Starpath realm_id=space.");
+assert(starpathPlacementMigration.includes("p_realm_id not in ('number', 'measurement', 'space', 'statistics')"), "Teacher placement RPC must allow live realm ids.");
 assert(starpathPlacementMigration.includes("when p_realm_id = 'space' then 'starpath'"), "realm_program_key must map Starpath to starpath program keys.");
-assert(starpathPlacementMigration.includes("placement.realm_id in ('number', 'measurement', 'space')"), "Saved Starpath placements must be materialised as canonical progress rows.");
-assert(starpathPlacementMigration.includes("check (realm_id in ('number', 'measurement', 'space'))"), "Teacher progress override table must allow Starpath.");
+assert(starpathPlacementMigration.includes("when p_realm_id = 'statistics' then 'statistica'"), "realm_program_key must map Statistica to statistica program keys.");
+assert(starpathPlacementMigration.includes("placement.realm_id in ('number', 'measurement', 'space', 'statistics')"), "Saved live-realm placements must be materialised as canonical progress rows.");
+assert(starpathPlacementMigration.includes("check (realm_id in ('number', 'measurement', 'space', 'statistics'))"), "Teacher progress override table must allow live realms.");
 assert(starpathPlacementMigration.includes("p_realm_id in ('measurement', 'space') then 8"), "Teacher advancement must treat Starpath as an 8-week realm.");
 
 const realmProgressCompat = read("lib/realm-progress-compat.ts");
@@ -81,9 +82,10 @@ const strandStudents = read("components/teacher/StrandStudentsPanel.tsx");
 assert(strandStudents.includes("isLiveRealmId(selectedRealmId)"), "Students tab must derive expandable realms from the live registry.");
 assert(!strandStudents.includes("unsupported teacher realm"), "Student detail must not maintain a separate realm allowlist.");
 assert(strandStudents.includes('`${lessonIdPrefix(workingYear)}space-`'), "Students tab must count Starpath lesson IDs with a space-specific prefix.");
+assert(strandStudents.includes('`${lessonIdPrefix(workingYear)}statistics-`'), "Students tab must count Statistica lesson IDs with a statistics-specific prefix.");
 
 const curriculumExplorer = read("components/teacher/CurriculumExplorer.tsx");
-assert(curriculumExplorer.includes('`${lessonIdPrefix(yearLabel)}space-`'), "Curriculum tab must count Starpath lesson IDs with a space-specific prefix.");
+assert(curriculumExplorer.includes("selectedRealmId") && curriculumExplorer.includes("selectCanonicalTeacherProgressRow"), "Curriculum tab must scope progress by selected live realm.");
 assert(curriculumExplorer.includes("realmId={selectedRealmId ?? undefined}"), "Curriculum preview must pass the canonical realm to the lesson drawer.");
 
 const lessonPreview = read("components/teacher/LessonPreviewDrawer.tsx");

@@ -16,7 +16,7 @@ alter table public.realmie_catalogue
 
 alter table public.realmie_catalogue
   add constraint realmie_catalogue_realm_id_check
-    check (realm_id in ('number', 'measurement', 'space', 'global')),
+    check (realm_id in ('number', 'measurement', 'space', 'statistics', 'global')),
   add constraint realmie_catalogue_category_check
     check (category in (
       'legend', 'villain', 'variant', 'event',
@@ -43,7 +43,7 @@ alter table public.realmie_unlock_receipts
   add constraint realmie_unlock_receipts_canonical_realm_id_check
     check (
       canonical_realm_id is null
-      or canonical_realm_id in ('number', 'measurement', 'space', 'global')
+      or canonical_realm_id in ('number', 'measurement', 'space', 'statistics', 'global')
     );
 
 alter table public.realmie_product_events
@@ -69,7 +69,7 @@ alter table public.realmie_product_events
   add constraint realmie_product_events_realm_id_check
     check (
       realm_id is null
-      or realm_id in ('number', 'measurement', 'space', 'global')
+      or realm_id in ('number', 'measurement', 'space', 'statistics', 'global')
     );
 
 create table if not exists public.realmie_discovery_rules (
@@ -84,7 +84,7 @@ create table if not exists public.realmie_discovery_rules (
     'canonical_learning_streak',
     'special_event'
   )),
-  realm_id text check (realm_id in ('number', 'measurement', 'space', 'global')),
+  realm_id text check (realm_id in ('number', 'measurement', 'space', 'statistics', 'global')),
   threshold integer check (threshold is null or threshold > 0),
   rule_payload jsonb not null default '{}'::jsonb,
   is_active boolean not null default true,
@@ -434,7 +434,7 @@ begin
   end if;
 
   if p_realm_id is not null
-    and p_realm_id not in ('number', 'measurement', 'space', 'global') then
+    and p_realm_id not in ('number', 'measurement', 'space', 'statistics', 'global') then
     raise exception 'Unsupported Realmie discovery realm';
   end if;
 
@@ -447,7 +447,7 @@ begin
       from public.student_lesson_attempts attempt
       where attempt.student_id = p_student_id
         and attempt.completed
-        and attempt.realm_id in ('number', 'measurement', 'space')
+        and attempt.realm_id in ('number', 'measurement', 'space', 'statistics')
         and public.realmie_attempt_is_canonical(attempt.summary)
     ) unique_lessons
     group by unique_lessons.realm_id
@@ -465,7 +465,7 @@ begin
       select distinct attempt.realm_id, attempt.working_level, attempt.week
       from public.student_weekly_quiz_attempts attempt
       where attempt.student_id = p_student_id
-        and attempt.realm_id in ('number', 'measurement', 'space')
+        and attempt.realm_id in ('number', 'measurement', 'space', 'statistics')
         and attempt.passed
         and attempt.accuracy_percent >= 80
         and public.realmie_attempt_is_canonical(attempt.summary)
@@ -640,7 +640,7 @@ set search_path = public
 as $$
 begin
   if new.completed
-    and new.realm_id in ('number', 'measurement', 'space')
+    and new.realm_id in ('number', 'measurement', 'space', 'statistics')
     and public.realmie_attempt_is_canonical(new.summary) then
     perform public.evaluate_realmie_discoveries_internal(
       new.student_id,
@@ -668,7 +668,7 @@ as $$
 begin
   if new.passed
     and new.accuracy_percent >= 80
-    and new.realm_id in ('number', 'measurement', 'space')
+    and new.realm_id in ('number', 'measurement', 'space', 'statistics')
     and public.realmie_attempt_is_canonical(new.summary) then
     perform public.evaluate_realmie_discoveries_internal(
       new.student_id,
@@ -739,7 +739,7 @@ begin
   perform public.assert_student_access(p_student_id);
   select s.class_id into actual_class_id from public.students s where s.id = p_student_id;
   if p_class_id is distinct from actual_class_id
-    or p_realm_id not in ('number', 'measurement', 'space')
+    or p_realm_id not in ('number', 'measurement', 'space', 'statistics')
     or p_assessment_type not in ('pretest', 'posttest') then
     raise exception 'Student context does not match';
   end if;
@@ -837,14 +837,14 @@ begin
       select student_id
       from public.student_lesson_attempts
       where completed
-        and realm_id in ('number', 'measurement', 'space')
+        and realm_id in ('number', 'measurement', 'space', 'statistics')
         and public.realmie_attempt_is_canonical(summary)
       union
       select student_id
       from public.student_weekly_quiz_attempts
       where passed
         and accuracy_percent >= 80
-        and realm_id in ('number', 'measurement', 'space')
+        and realm_id in ('number', 'measurement', 'space', 'statistics')
         and public.realmie_attempt_is_canonical(summary)
     ) evidence
   loop
@@ -1330,7 +1330,7 @@ begin
   end if;
 
   if p_realm_id is not null
-    and p_realm_id not in ('number', 'measurement', 'space', 'global') then
+    and p_realm_id not in ('number', 'measurement', 'space', 'statistics', 'global') then
     raise exception 'Unsupported Realmies telemetry realm';
   end if;
 

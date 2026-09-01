@@ -588,7 +588,20 @@ function ProgramPage() {
 
     if (item.type === "lesson") {
       if (isStatisticsRealm) {
-        router.push(`/statistica/lesson/${encodeURIComponent(curriculumYear)}/${weekNum}/${item.n}?teacher_preview=1`);
+        const lessonId = buildLessonId({
+          yearLabel: curriculumYear,
+          week: weekNum,
+          lessonNumber: item.n,
+          realmId,
+        });
+        preserveWorld3DReturnContextForLesson({
+          realmId,
+          level: curriculumYear,
+          week: weekNum,
+          lessonNumber: item.n,
+          lessonId,
+        });
+        router.push(`/statistica/lesson/${encodeURIComponent(curriculumYear)}/${weekNum}/${item.n}${teacherPreview ? "?teacher_preview=1" : ""}`);
         return;
       }
       const lessonId = buildLessonId({
@@ -618,6 +631,11 @@ function ProgramPage() {
       return;
     }
     if (isStatisticsRealm && item.type === "quiz") {
+      preserveWorld3DReturnContextForQuiz({
+        realmId,
+        level: curriculumYear,
+        week: weekNum,
+      });
       router.push(`/statistica/quiz/${encodeURIComponent(curriculumYear)}/${weekNum}`);
       return;
     }
@@ -700,7 +718,7 @@ function ProgramPage() {
   const realmHomeRoute = isStarpathRealm && starpathProgram
     ? buildStarpathWorldHref({ selectedLevel: starpathProgram.definition.id })
     : isStatisticsRealm
-      ? `/statistica?teacher_preview=1&level=${encodeURIComponent(curriculumYear)}&week=${weekNum}`
+      ? `/statistica?level=${encodeURIComponent(curriculumYear)}&week=${weekNum}${teacherPreview ? "&teacher_preview=1" : ""}`
     : isMeasurementRealm
       ? `/measurelands?level=${encodeURIComponent(curriculumYear)}`
       : "/number-nexus";

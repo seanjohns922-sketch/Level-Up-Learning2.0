@@ -152,6 +152,7 @@ function realmName(realmId: string) {
     measurement: "Measurelands",
     space: "Starpath",
     starpath: "Starpath",
+    statistics: "Statistica",
     statistica: "Statistica",
     "pattern-peaks": "Pattern Peaks",
     "chance-hollow": "Chance Hollow",

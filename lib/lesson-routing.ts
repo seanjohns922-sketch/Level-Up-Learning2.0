@@ -44,6 +44,8 @@ export function buildLessonId(input: {
     }
     case "measurement":
       return `y${parseStudentYearNumber(normalizedYear)}-measurement-w${input.week}-l${input.lessonNumber}`;
+    case "statistics":
+      return `y${parseStudentYearNumber(normalizedYear)}-statistics-w${input.week}-l${input.lessonNumber}`;
     case "number":
       return `y${parseStudentYearNumber(normalizedYear)}-w${input.week}-l${input.lessonNumber}`;
     default:
@@ -65,6 +67,9 @@ export function buildLessonRoute(input: {
       input.week,
       input.lessonNumber,
     );
+  }
+  if (input.realmId === "statistics") {
+    return `/statistica/lesson/${encodeURIComponent(normalizedYear)}/${input.week}/${input.lessonNumber}`;
   }
   const lessonId = buildLessonId(input);
   const realmParam = input.realmId === "measurement" ? `&realm_id=${encodeURIComponent("measurement")}` : "";

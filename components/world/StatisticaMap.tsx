@@ -141,7 +141,6 @@ export const STATISTICA_DASHBOARD_CONFIG = {
     floatAnimation: "realm-character-float 4.6s ease-in-out infinite",
   },
   demo: {
-    only: true,
     unlockAllDistricts: true,
     readJourney: () => ({ currentWeek: 1, currentLesson: 1 }),
     buildLevelHref: (level: RealmLevelId) => buildStatisticaPreviewHref(level),

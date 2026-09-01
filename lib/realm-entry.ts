@@ -57,6 +57,7 @@ export function resolveRealmEntryRoute(args: {
 
   if (year === "Prep") return route;
   if (isPlacementComplete(args.progress)) return route;
+  if (args.realmId === "statistics" && year === "Year 1") return route;
 
   return `/pretest?year=${encodeURIComponent(year)}&realm_id=${args.realmId}`;
 }

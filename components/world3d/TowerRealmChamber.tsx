@@ -135,7 +135,7 @@ function TowerScene({
 }
 
 function buildProgressSummary(realmId: CanonicalRealmId) {
-  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space") return "COMING SOON";
+  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics") return "COMING SOON";
   const progress = readProgress(realmId);
   if (!progress) return "BEGIN JOURNEY";
   const week = progress.assignedWeek ? ` · WEEK ${progress.assignedWeek}` : "";

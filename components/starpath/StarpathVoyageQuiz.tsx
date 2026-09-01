@@ -24,6 +24,7 @@ import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { buildAssessmentQuestionSnapshots, type ReplayQuestionSource } from "@/lib/assessment-replay";
 import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
+import { getWorld3DReturnPathForQuiz } from "@/lib/world3d/return-context";
 
 export type StarpathVoyageQuizMeta = {
   level: RealmLevelId;
@@ -180,6 +181,11 @@ export default function StarpathVoyageQuiz({
     .map((_, questionIndex) => questionIndex)
     .filter((questionIndex) => answers[String(questionIndex)] === false);
   const quizIntroduction = `${quiz.title}. Great work completing this week's ${unitLabel}s! It is time to show what you discovered across all three ${unitLabel}s. There are 15 questions, with five questions from each ${unitLabel}. The quiz takes approximately 8 to 10 minutes. Work at your own pace. The pass mark is 80 percent. You can earn ${QUIZ_XP} XP, chain progress, and gems.`;
+  const backHref = getWorld3DReturnPathForQuiz({
+    realmId: realm,
+    level: quiz.level,
+    week: quiz.week,
+  }) ?? quiz.weekHref;
 
   useEffect(() => {
     try {
@@ -361,7 +367,7 @@ export default function StarpathVoyageQuiz({
           questionCount={total || 15}
           focus={quiz.coverage}
           demoMode
-          onBack={() => router.push(quiz.weekHref)}
+          onBack={() => router.push(backHref)}
         />
 
         <section
@@ -593,7 +599,7 @@ export default function StarpathVoyageQuiz({
                 ) : null}
                 <button
                   type="button"
-                  onClick={() => router.push(passed && quiz.nextWeekHref ? quiz.nextWeekHref : quiz.weekHref)}
+                  onClick={() => router.push(passed && quiz.nextWeekHref ? quiz.nextWeekHref : backHref)}
                   className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-base font-black text-white shadow-lg ${isStatistica ? "bg-gradient-to-r from-[#a83e4b] via-[#e85d63] to-[#f2bc45]" : "bg-gradient-to-r from-violet-600 to-cyan-500"}`}
                 >
                   {passed && quiz.nextWeekHref

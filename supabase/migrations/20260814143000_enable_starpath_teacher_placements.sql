@@ -15,6 +15,7 @@ as $$
     || case
       when p_realm_id = 'measurement' then 'measurelands'
       when p_realm_id = 'space' then 'starpath'
+      when p_realm_id = 'statistics' then 'statistica'
       else 'number'
     end;
 $$;
@@ -39,7 +40,7 @@ declare
   v_class_id uuid;
   v_school_year_level text;
 begin
-  if p_realm_id not in ('number', 'measurement', 'space') then
+  if p_realm_id not in ('number', 'measurement', 'space', 'statistics') then
     raise exception 'Invalid realm';
   end if;
   if p_assigned_level not in ('Prep', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6') then
@@ -209,7 +210,7 @@ select
   '[]'::jsonb
 from public.student_realm_placement placement
 join public.students student on student.id = placement.student_id
-where placement.realm_id in ('number', 'measurement', 'space')
+where placement.realm_id in ('number', 'measurement', 'space', 'statistics')
   and not exists (
     select 1
     from public.student_realm_progress progress
@@ -228,7 +229,7 @@ alter table public.student_progress_overrides
   drop constraint if exists student_progress_overrides_realm_id_check;
 alter table public.student_progress_overrides
   add constraint student_progress_overrides_realm_id_check
-  check (realm_id in ('number', 'measurement', 'space'));
+  check (realm_id in ('number', 'measurement', 'space', 'statistics'));
 
 create or replace function public.teacher_advance_student_week(
   p_student_id uuid,
@@ -253,7 +254,7 @@ begin
   if v_teacher is null or not public.can_manage_student_progress(p_student_id) then
     raise exception 'Not authorized for this student' using errcode = '42501';
   end if;
-  if p_realm_id not in ('number', 'measurement', 'space') then
+  if p_realm_id not in ('number', 'measurement', 'space', 'statistics') then
     raise exception 'Invalid realm';
   end if;
   if p_reason not in (

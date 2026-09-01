@@ -253,7 +253,7 @@ export async function restoreStudentStateFromServer(
       unlockedLegends: [],
       teacherAdvancedWeeks: [],
     };
-    if (realmId !== "statistics") writeProgress(progress, realmId);
+    writeProgress(progress, realmId);
     return { rows: [] as StudentProgressSnapshotRow[], progress, introSeen: true };
   }
 
@@ -285,9 +285,9 @@ export async function restoreStudentStateFromServer(
   const progress = buildStudentProgress(primaryRow);
   assertActiveRestoreStudent(studentId);
   if (progress) {
-    if (realmId !== "statistics") writeProgress(progress, realmId);
+    writeProgress(progress, realmId);
   }
-  if (realmId !== "statistics") hydrateProgramStore(compatRows, realmId);
+  hydrateProgramStore(compatRows, realmId);
 
   return { rows: compatRows, progress, introSeen };
 }

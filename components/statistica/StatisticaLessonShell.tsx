@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
 import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
@@ -13,6 +13,7 @@ import { getStatisticaLevel4TaskSet } from "@/data/activities/statistica/level4"
 import { getStatisticaLevel5TaskSet } from "@/data/activities/statistica/level5";
 import { getStatisticaLevel6TaskSet } from "@/data/activities/statistica/level6";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
+import { getWorld3DReturnPathForLesson, preserveWorld3DReturnContextForLesson } from "@/lib/world3d/return-context";
 
 type Props = {
   level: string;
@@ -39,8 +40,24 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
       : null;
     return taskSet ? createRandomRealmLessonGenerator(taskSet) : null;
   });
-  const weekHref = buildRealmProgramHref({ realmId: "statistics", year: level, week, preview: true });
+  const weekHref = getWorld3DReturnPathForLesson({
+    realmId: "statistics",
+    level,
+    week,
+    lessonNumber,
+    lessonId,
+  }) ?? buildRealmProgramHref({ realmId: "statistics", year: level, week });
   const back = () => router.push(weekHref);
+
+  useEffect(() => {
+    preserveWorld3DReturnContextForLesson({
+      realmId: "statistics",
+      level,
+      week,
+      lessonNumber,
+      lessonId,
+    });
+  }, [lessonId, lessonNumber, level, week]);
 
   if (started && getTask) {
     return (

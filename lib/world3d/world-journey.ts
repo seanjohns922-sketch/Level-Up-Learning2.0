@@ -11,6 +11,7 @@ export type WorldJourney = {
 function realmNameFor(url: URL) {
   if (url.pathname.startsWith("/starpath")) return "Starpath";
   if (url.searchParams.get("realm_id") === "measurement" || url.pathname.startsWith("/measurelands")) return "Measurelands";
+  if (url.searchParams.get("realm_id") === "statistics" || url.pathname.startsWith("/statistica")) return "Statistica";
   if (url.pathname === "/realms") return "Choose a realm";
   return "Number Nexus";
 }

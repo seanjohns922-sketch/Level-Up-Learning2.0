@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import StatisticaLessonShell from "@/components/statistica/StatisticaLessonShell";
 import { getStatisticaProgramForYearLabel } from "@/data/programs/statistica";
 
@@ -26,15 +26,11 @@ export default async function StatisticaLessonPage({
   params: Promise<{ level: string; week: string; lesson: string }>;
   searchParams: Promise<{ teacher_preview?: string }>;
 }) {
-  const [route, query] = await Promise.all([params, searchParams]);
+  const [route] = await Promise.all([params, searchParams]);
   const level = normalizeLevel(route.level);
   const week = parseInteger(route.week, 1, 8);
   const lessonNumber = parseInteger(route.lesson, 1, 3);
   if (!level || !week || !lessonNumber) notFound();
-
-  if (query.teacher_preview !== "1") {
-    redirect(`/statistica/lesson/${encodeURIComponent(level.label)}/${week}/${lessonNumber}?teacher_preview=1`);
-  }
 
   const program = getStatisticaProgramForYearLabel(level.label);
   const weekPlan = program?.find((candidate) => candidate.week === week);

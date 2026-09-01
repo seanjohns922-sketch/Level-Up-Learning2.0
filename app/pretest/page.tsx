@@ -383,7 +383,7 @@ function PretestPage() {
 
   useEffect(() => {
     if (realmId === "statistics" && year === "Year 1") {
-      router.replace("/program?year=Year%201&week=1&legacy=1&realm_id=statistics&teacher_preview=1");
+      router.replace("/program?year=Year%201&week=1&legacy=1&realm_id=statistics");
       return;
     }
     if (year === "Prep") {

@@ -11,13 +11,13 @@ alter table public.student_completion_receipts
   drop constraint if exists student_completion_receipts_realm_id_check;
 alter table public.student_completion_receipts
   add constraint student_completion_receipts_realm_id_check
-  check (realm_id in ('number', 'measurement', 'space'));
+  check (realm_id in ('number', 'measurement', 'space', 'statistics'));
 
 alter table public.economy_items
   drop constraint if exists economy_items_realm_id_check;
 alter table public.economy_items
   add constraint economy_items_realm_id_check
-  check (realm_id in ('number', 'measurement', 'space'));
+  check (realm_id in ('number', 'measurement', 'space', 'statistics'));
 
 -- ── complete_realm_lesson (widen realm guard to include 'space') ─────────────
 create or replace function public.complete_realm_lesson(
@@ -48,7 +48,7 @@ declare
 begin
   perform public.assert_student_access(p_student_id);
   select s.class_id into actual_class_id from public.students s where s.id = p_student_id;
-  if p_class_id is distinct from actual_class_id or p_realm_id not in ('number', 'measurement', 'space') then
+  if p_class_id is distinct from actual_class_id or p_realm_id not in ('number', 'measurement', 'space', 'statistics') then
     raise exception 'Student context does not match';
   end if;
 
@@ -147,7 +147,7 @@ declare
 begin
   perform public.assert_student_access(p_student_id);
   select s.class_id into actual_class_id from public.students s where s.id = p_student_id;
-  if p_class_id is distinct from actual_class_id or p_realm_id not in ('number', 'measurement', 'space') then
+  if p_class_id is distinct from actual_class_id or p_realm_id not in ('number', 'measurement', 'space', 'statistics') then
     raise exception 'Student context does not match';
   end if;
 
@@ -237,7 +237,7 @@ declare
   roll double precision := random();
 begin
   perform public.assert_student_access(p_student_id);
-  if p_realm_id not in ('number', 'measurement', 'space') then raise exception 'Invalid realm'; end if;
+  if p_realm_id not in ('number', 'measurement', 'space', 'statistics') then raise exception 'Invalid realm'; end if;
   if not exists (
     select 1 from public.student_completion_receipts scr
     where scr.student_id = p_student_id
@@ -344,7 +344,7 @@ set search_path = public
 as $$
 begin
   perform public.assert_student_access(p_student_id);
-  if p_realm_id not in ('number', 'measurement', 'space') then
+  if p_realm_id not in ('number', 'measurement', 'space', 'statistics') then
     raise exception 'Invalid realm';
   end if;
   return query select * from public.get_student_realm_progress_compat(p_student_id, p_realm_id);
@@ -371,7 +371,7 @@ declare
 begin
   perform public.assert_student_access(p_student_id);
   select s.class_id into actual_class_id from public.students s where s.id = p_student_id;
-  if p_class_id is distinct from actual_class_id or p_realm_id not in ('number', 'measurement', 'space') then
+  if p_class_id is distinct from actual_class_id or p_realm_id not in ('number', 'measurement', 'space', 'statistics') then
     raise exception 'Student context does not match';
   end if;
   perform public.save_student_realm_progress(
