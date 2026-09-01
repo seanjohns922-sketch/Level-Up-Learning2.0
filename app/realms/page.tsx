@@ -4,16 +4,20 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import RealmCarousel from "@/components/realms/RealmCarousel";
 import { isPlacementComplete } from "@/data/progress";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 
 function GuardedRealmsPage() {
   const router = useRouter();
-  const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">(isDemoPreviewMode() ? "ready" : "loading");
+  const preview = useDemoPreviewMode();
+  const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
-    if (isDemoPreviewMode()) return;
+    if (preview) {
+      router.replace("/world/tower?teacher_preview=1");
+      return;
+    }
     const studentId = getActiveStudentIdentity().studentId;
     if (!studentId) {
       router.replace("/login");
@@ -41,7 +45,9 @@ function GuardedRealmsPage() {
       setRestoreState("error");
     });
     return () => { cancelled = true; };
-  }, [router]);
+  }, [preview, router]);
+
+  if (preview) return <div className="grid min-h-screen place-items-center bg-[#211815] font-bold text-amber-100">Returning to the 3D Tower...</div>;
 
   if (restoreState === "loading") return <div className="grid min-h-screen place-items-center bg-black font-bold text-white/70">Loading your realms...</div>;
   if (restoreState === "error") return (

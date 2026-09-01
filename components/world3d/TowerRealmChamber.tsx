@@ -79,6 +79,7 @@ function TowerScene({
   onNearestTarget,
   progressByRealm,
   initialPosition,
+  preview,
 }: {
   quality: TowerWorldQuality;
   reducedMotion: boolean;
@@ -87,6 +88,7 @@ function TowerScene({
   onNearestTarget: (id: string | null) => void;
   progressByRealm: Record<string, string>;
   initialPosition: [number, number, number];
+  preview: boolean;
 }) {
   const activePortal = getTowerPortalByInteractionId(activeInteractionId);
   const targets = useMemo(() => [
@@ -115,6 +117,7 @@ function TowerScene({
         reducedMotion={reducedMotion}
         activeInteractionId={activeInteractionId}
         progressByRealm={progressByRealm}
+        previewPattern={preview}
       />
       <SharedThirdPersonPlayer
         initialPosition={initialPosition}
@@ -134,7 +137,8 @@ function TowerScene({
   );
 }
 
-function buildProgressSummary(realmId: CanonicalRealmId) {
+function buildProgressSummary(realmId: CanonicalRealmId, preview: boolean) {
+  if (preview && realmId === "pattern") return "LEVEL 3 PREVIEW";
   if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics") return "COMING SOON";
   const progress = readProgress(realmId);
   if (!progress) return "BEGIN JOURNEY";
@@ -142,10 +146,10 @@ function buildProgressSummary(realmId: CanonicalRealmId) {
   return `${progress.year.toUpperCase()}${week}`;
 }
 
-function buildProgressMap(version: number) {
+function buildProgressMap(version: number, preview: boolean) {
   void version;
   return Object.fromEntries(
-    TOWER_REALM_PORTALS.map((portal) => [portal.realmId, buildProgressSummary(portal.realmId)]),
+    TOWER_REALM_PORTALS.map((portal) => [portal.realmId, buildProgressSummary(portal.realmId, preview)]),
   );
 }
 
@@ -169,7 +173,7 @@ export default function TowerRealmChamber() {
     return returnPortal?.returnSpawn ?? TOWER_CHAMBER_CONFIG.spawnPoint;
   }, [searchParams]);
 
-  const progressByRealm = useMemo(() => buildProgressMap(progressVersion), [progressVersion]);
+  const progressByRealm = useMemo(() => buildProgressMap(progressVersion, preview), [preview, progressVersion]);
   const activePortal = getTowerPortalByInteractionId(activeInteractionId);
   const atExit = activeInteractionId === TOWER_CHAMBER_CONFIG.exitInteractionId;
 
@@ -243,6 +247,7 @@ export default function TowerRealmChamber() {
           onNearestTarget={setActiveInteractionId}
           progressByRealm={progressByRealm}
           initialPosition={initialPosition}
+          preview={preview}
         />
       </Canvas>
 
@@ -259,7 +264,7 @@ export default function TowerRealmChamber() {
       />
 
       <WorldMovePad input={moveInput} onChange={setMoveInput} />
-      {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realm.status !== "live")} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
+      {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal?.realmId === "pattern" && preview ? "PREVIEW REALM" : activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realm.status !== "live" && !(preview && activePortal.realmId === "pattern"))} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
       <KeyboardWorldAction enabled={Boolean(activePortal || atExit)} onAction={runActiveAction} />
 
       {entryMessage ? <div role="status" style={{ position: "absolute", left: "50%", top: 105, transform: "translateX(-50%)", zIndex: 35, border: "1px solid rgba(255,214,147,.55)", borderRadius: 6, padding: "10px 14px", background: "rgba(44,28,22,.96)", color: "#fff1d1", fontWeight: 850, display: "flex", alignItems: "center", gap: 8 }}>{entryMessage}<WorldVoiceButton text={entryMessage} compact label="Read message" /></div> : null}

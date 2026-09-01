@@ -16,6 +16,7 @@ type RealmPortal3DProps = {
   quality: TowerWorldQuality;
   reducedMotion: boolean;
   progressSummary: string;
+  previewAvailable?: boolean;
 };
 
 declare global {
@@ -71,15 +72,17 @@ function PortalWindow({
   videoActive,
   quality,
   reducedMotion,
-}: Pick<RealmPortal3DProps, "config" | "videoActive" | "quality" | "reducedMotion">) {
+  previewAvailable = false,
+}: Pick<RealmPortal3DProps, "config" | "videoActive" | "quality" | "reducedMotion" | "previewAvailable">) {
   const poster = useTexture(config.posterAsset);
+  const available = (config.realm.status === "live" && config.realm.isSelectable) || previewAvailable;
   const canPlay = videoActive
     && quality !== "low"
     && !reducedMotion
-    && config.realm.status === "live"
+    && available
     && Boolean(config.previewVideo);
 
-  const isComingSoon = config.realm.status !== "live" || !config.realm.isSelectable;
+  const isComingSoon = !available;
   return (
     <group position={[0, 4.55, 0.08]}>
       <mesh>
@@ -130,10 +133,11 @@ export function RealmPortal3D({
   quality,
   reducedMotion,
   progressSummary,
+  previewAvailable = false,
 }: RealmPortal3DProps) {
   const energyRef = useRef<THREE.Mesh>(null);
   const frameColor = nearby ? "#d6b06b" : "#866a45";
-  const live = config.realm.status === "live" && config.realm.isSelectable;
+  const available = (config.realm.status === "live" && config.realm.isSelectable) || previewAvailable;
 
   useFrame(({ clock }) => {
     if (!energyRef.current) return;
@@ -157,16 +161,16 @@ export function RealmPortal3D({
         <boxGeometry args={[3.95, 3.95, 0.16]} />
         <meshStandardMaterial color={frameColor} emissive={config.accentSoft} emissiveIntensity={nearby ? 0.75 : 0.18} metalness={0.7} roughness={0.3} />
       </mesh>
-      <PortalWindow config={config} videoActive={videoActive} quality={quality} reducedMotion={reducedMotion} />
+      <PortalWindow config={config} videoActive={videoActive} quality={quality} reducedMotion={reducedMotion} previewAvailable={previewAvailable} />
       <mesh ref={energyRef} position={[0, 0.14, 0.28]} rotation={[-Math.PI / 2, 0, 0]}>
         <torusGeometry args={[3.15, 0.11, 10, 48]} />
-        <meshBasicMaterial color={config.accent} toneMapped={false} transparent opacity={live ? (nearby ? 0.95 : 0.42) : 0.12} />
+        <meshBasicMaterial color={config.accent} toneMapped={false} transparent opacity={available ? (nearby ? 0.95 : 0.42) : 0.12} />
       </mesh>
       <Html center position={[0, 12.25, 0]} distanceFactor={22} zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ width: 260, border: `2px solid ${nearby ? config.accent : "rgba(241,220,177,.72)"}`, borderRadius: 6, padding: "12px 15px", background: "rgba(24,17,15,.96)", boxShadow: nearby ? `0 0 30px ${config.accentSoft}` : "0 12px 28px rgba(0,0,0,.38)", color: "#fff8e9", textAlign: "center", fontFamily: "system-ui, sans-serif" }}>
           <div style={{ fontSize: 19, lineHeight: 1.15, fontWeight: 950 }}>{config.realm.name}</div>
           <div style={{ marginTop: 5, color: config.accent, fontSize: 12, lineHeight: 1.25, fontWeight: 950, letterSpacing: "0.1em" }}>{config.subject}</div>
-          <div style={{ marginTop: 8, color: "#fff0d4", fontSize: 13, lineHeight: 1.2, fontWeight: 900 }}>{live ? progressSummary : "COMING SOON"}</div>
+          <div style={{ marginTop: 8, color: "#fff0d4", fontSize: 13, lineHeight: 1.2, fontWeight: 900 }}>{available ? progressSummary : "COMING SOON"}</div>
         </div>
       </Html>
     </group>

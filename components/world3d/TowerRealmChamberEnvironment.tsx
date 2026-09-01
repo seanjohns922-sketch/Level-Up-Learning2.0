@@ -108,11 +108,13 @@ export function TowerRealmChamberEnvironment({
   reducedMotion,
   activeInteractionId,
   progressByRealm,
+  previewPattern = false,
 }: {
   quality: TowerWorldQuality;
   reducedMotion: boolean;
   activeInteractionId: string | null;
   progressByRealm: Record<string, string>;
+  previewPattern?: boolean;
 }) {
   return (
     <>
@@ -130,6 +132,7 @@ export function TowerRealmChamberEnvironment({
               quality={quality}
               reducedMotion={reducedMotion}
               progressSummary={progressByRealm[portal.realmId] ?? "BEGIN JOURNEY"}
+              previewAvailable={previewPattern && portal.realmId === "pattern"}
             />
           );
         })}

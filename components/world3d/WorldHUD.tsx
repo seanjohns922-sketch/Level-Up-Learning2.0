@@ -176,7 +176,7 @@ export function WorldHUD({
               ) : null}
               <button type="button" className="worldHudSecondary" onClick={() => setTeleportOpen(true)}><Sparkles size={17} />REALMS</button>
               <button type="button" className="worldHudQuick" disabled={quickStartBusy} onClick={() => void quickStart()}><Play size={17} />{quickStartBusy ? "OPENING..." : "QUICK START"}</button>
-              <button type="button" className="worldHudFallback" onClick={() => router.push(fallbackHref)}><Map size={17} />2D VIEW</button>
+              {!preview ? <button type="button" className="worldHudFallback" onClick={() => router.push(fallbackHref)}><Map size={17} />2D VIEW</button> : null}
             </>
           )}
         </nav>
@@ -190,12 +190,13 @@ export function WorldHUD({
             <div className="worldTeleportGrid">
               {TOWER_REALM_PORTALS.map((portal) => {
                 const live = portal.realm.status === "live" && portal.realm.isSelectable;
-                const portalSpeech = joinSpeechParts([portal.realm.name, portal.subject, live ? "Enter realm" : "Coming soon"]);
+                const available = live || (preview && portal.realmId === "pattern");
+                const portalSpeech = joinSpeechParts([portal.realm.name, portal.subject, available ? (live ? "Enter realm" : "Preview realm") : "Coming soon"]);
                 return (
-                  <div key={portal.realmId} className={`worldTeleportTile ${!live || busyRealmId ? "worldTeleportTileDisabled" : ""}`} style={{ borderColor: portal.accent }}>
+                  <div key={portal.realmId} className={`worldTeleportTile ${!available || busyRealmId ? "worldTeleportTileDisabled" : ""}`} style={{ borderColor: portal.accent }}>
                     <WorldVoiceButton text={portalSpeech} compact className="worldTeleportTileRead" label={`Read ${portal.realm.name}`} />
-                    <strong>{portal.realm.name}</strong><span style={{ color: portal.accent }}>{portal.subject}</span><small>{live ? "ENTER REALM" : "COMING SOON"}</small>
-                    <button type="button" disabled={!live || Boolean(busyRealmId)} onClick={() => live && void enterRealm(portal.realmId)} aria-label={`${live ? "Enter" : "Coming soon"} ${portal.realm.name}`}><span>{live ? "Enter" : "Coming soon"}</span></button>
+                    <strong>{portal.realm.name}</strong><span style={{ color: portal.accent }}>{portal.subject}</span><small>{available ? (live ? "ENTER REALM" : "PREVIEW REALM") : "COMING SOON"}</small>
+                    <button type="button" disabled={!available || Boolean(busyRealmId)} onClick={() => available && void enterRealm(portal.realmId)} aria-label={`${available ? (live ? "Enter" : "Preview") : "Coming soon"} ${portal.realm.name}`}><span>{available ? (live ? "Enter" : "Preview") : "Coming soon"}</span></button>
                   </div>
                 );
               })}

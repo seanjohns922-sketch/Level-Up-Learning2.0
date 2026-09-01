@@ -33,6 +33,14 @@ export async function resolveTowerRealmEntry(args: {
   teacherPreview: boolean;
 }): Promise<TowerRealmEntryResult> {
   const realm = getRealmDefinition(args.realmId);
+  if (args.teacherPreview && args.realmId === "pattern") {
+    setLastRealm(realm.portalId);
+    exitReviewMode();
+    return {
+      status: "ready",
+      route: "/pattern-peaks?teacher_preview=1&level=Year%203",
+    };
+  }
   const availability = getRealmAvailability(realm.portalId);
   if (!availability?.enabled || realm.status !== "live" || !realm.isSelectable) {
     return { status: "unavailable", message: `${realm.name} is coming soon.` };
