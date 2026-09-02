@@ -46,9 +46,20 @@ export const PATTERN_YEAR3_WEEK3_RULE_LABELS = ["×2", "+5", "−3"] as const;
 export const PATTERN_YEAR3_WEEK5_RECENT_WINDOW = 12;
 export const PATTERN_YEAR3_WEEK7_FACTORS = [3, 4, 5, 10] as const;
 export const PATTERN_YEAR3_WEEK7_LESSON3_TARGET_FACTORS = [2, 3, 4, 5] as const;
+export const PATTERN_YEAR3_WEEK8_LESSON1_RULE_LABELS = [
+  "+2",
+  "+4",
+  "+5",
+  "+10",
+  "−2",
+  "−5",
+  "Double",
+  "Halve",
+] as const;
 
 const recentYear3Week5NumberSets = new Map<number, string[]>();
 const year3Week7FactorBags = new Map<number, number[]>();
+let year3Week8RuleBag: string[] = [];
 
 export function isPatternPeaksQuestion(question: unknown): question is Year2QuestionData {
   if (!question || typeof question !== "object") return false;
@@ -106,6 +117,13 @@ function nextYear3Week7Factor(
   const factor = bag.shift()!;
   year3Week7FactorBags.set(lessonNumber, bag);
   return factor;
+}
+
+function nextYear3Week8RuleLabel() {
+  if (year3Week8RuleBag.length === 0) {
+    year3Week8RuleBag = shuffle(PATTERN_YEAR3_WEEK8_LESSON1_RULE_LABELS);
+  }
+  return year3Week8RuleBag.shift()!;
 }
 
 function uniqueOptions(answer: string, distractors: Array<string | number>) {
@@ -477,6 +495,106 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
       product,
       `Add one more group of ${n}: ${knownProduct} + ${n}.`,
       nextFactVisual,
+    );
+  }
+
+  if (week === 8 && lessonNumber === 1) {
+    const rules = [
+      { label: "+2", apply: (value: number) => value + 2, start: () => rand(2, 15) },
+      { label: "+4", apply: (value: number) => value + 4, start: () => rand(2, 15) },
+      { label: "+5", apply: (value: number) => value + 5, start: () => rand(2, 15) },
+      { label: "+10", apply: (value: number) => value + 10, start: () => rand(2, 15) },
+      { label: "−2", apply: (value: number) => value - 2, start: () => rand(12, 28) },
+      { label: "−5", apply: (value: number) => value - 5, start: () => rand(25, 45) },
+      { label: "Double", apply: (value: number) => value * 2, start: () => rand(2, 6) },
+      { label: "Halve", apply: (value: number) => value / 2, start: () => rand(1, 8) * 16 },
+    ] as const;
+    const nextRuleLabel = nextYear3Week8RuleLabel();
+    const rule = rules.find((candidate) => candidate.label === nextRuleLabel)!;
+    const terms = [rule.start()];
+    while (terms.length < 5) terms.push(rule.apply(terms.at(-1)!));
+
+    if (role === "fast_thinking") {
+      return mcq(
+        "Which rule generates every term in this investigation?",
+        rule.label,
+        PATTERN_YEAR3_WEEK8_LESSON1_RULE_LABELS.filter((label) => label !== rule.label).slice(0, 3),
+        "Test the same rule on at least two jumps.",
+        sequenceVisual("Test the rule", terms),
+      );
+    }
+
+    if (role === "reasoning") {
+      return mcq(
+        "Which observation is supported by every step?",
+        `Every step follows the ${rule.label} rule`,
+        ["Only the first step follows the rule", "The rule changes after each term", "The terms have no rule"],
+        "Check each neighbouring pair, not just the first pair.",
+        sequenceVisual("Check all the evidence", terms),
+      );
+    }
+
+    return typed(
+      `Use the ${rule.label} rule to complete the investigation.`,
+      terms[4]!,
+      "Apply the same rule one more time.",
+      sequenceVisual("Complete the investigation", [...terms.slice(0, 4), "?"], Array.from({ length: 4 }, () => rule.label)),
+    );
+  }
+
+  if (week === 8 && lessonNumber === 2) {
+    const [smallerStep, largerStep] = pick([[2, 5], [3, 6], [4, 7], [5, 10]] as const);
+    const start = rand(2, 12);
+    const swapRules = rand(0, 1) === 1;
+    const stepA = swapRules ? largerStep : smallerStep;
+    const stepB = swapRules ? smallerStep : largerStep;
+    const termsA = Array.from({ length: 5 }, (_, index) => start + index * stepA);
+    const termsB = Array.from({ length: 5 }, (_, index) => start + index * stepB);
+    const comparisonVisual = (hideFinalFor?: "A" | "B"): QuestionVisual => ({
+      type: "expression_flow",
+      title: "Two rules from the same start",
+      cards: [
+        {
+          label: `Rule A: add ${stepA}`,
+          tokens: [String(start), "+", String(stepA), "+", String(stepA), "+", String(stepA), "+", String(stepA)],
+          result: hideFinalFor === "A" ? "?" : String(termsA[4]),
+        },
+        {
+          label: `Rule B: add ${stepB}`,
+          tokens: [String(start), "+", String(stepB), "+", String(stepB), "+", String(stepB), "+", String(stepB)],
+          result: hideFinalFor === "B" ? "?" : String(termsB[4]),
+        },
+      ],
+    });
+    const fasterRule = stepA > stepB ? "Rule A" : "Rule B";
+
+    if (role === "fast_thinking") {
+      return mcq(
+        "After four steps, which rule produces the larger number?",
+        fasterRule,
+        [fasterRule === "Rule A" ? "Rule B" : "Rule A", "They are equal"],
+        "Both rules start together, so compare how much each one adds.",
+        comparisonVisual(),
+      );
+    }
+
+    if (role === "reasoning") {
+      const gap = Math.abs(termsA[4]! - termsB[4]!);
+      return mcq(
+        "How far apart are the two results after four steps?",
+        gap,
+        [Math.abs(stepA - stepB), gap + 2, gap + 4],
+        "Subtract the smaller final result from the larger final result.",
+        comparisonVisual(),
+      );
+    }
+
+    const targetRule = rand(0, 1) === 0 ? "A" : "B";
+    return typed(
+      `Complete Rule ${targetRule} after four steps.`,
+      targetRule === "A" ? termsA[4]! : termsB[4]!,
+      `Start at ${start} and add ${targetRule === "A" ? stepA : stepB} four times.`,
+      comparisonVisual(targetRule),
     );
   }
 

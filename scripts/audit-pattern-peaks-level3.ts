@@ -15,6 +15,7 @@ import {
   PATTERN_YEAR3_WEEK5_RECENT_WINDOW,
   PATTERN_YEAR3_WEEK7_FACTORS,
   PATTERN_YEAR3_WEEK7_LESSON3_TARGET_FACTORS,
+  PATTERN_YEAR3_WEEK8_LESSON1_RULE_LABELS,
 } from "@/data/activities/patternPeaks/generator";
 import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/year2/lessonEngine";
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
@@ -246,6 +247,40 @@ assert.deepEqual(
   new Set(PATTERN_YEAR3_WEEK7_LESSON3_TARGET_FACTORS),
   "Use the Next Fact must rotate the 2, 3, 4 and 5 fact families.",
 );
+
+const levelThreeInvestigation = PATTERN_PEAKS_PROGRAMS["Year 3"][7]!.lessons[0]!;
+const investigationRules = new Set<string>();
+for (const activity of levelThreeInvestigation.activities ?? []) {
+  for (let sample = 0; sample < 24; sample += 1) {
+    const question = generatePatternPeaksQuestion(3, levelThreeInvestigation, activity);
+    assert("visual" in question && "answer" in question);
+    assert.equal(question.visual?.type, "pattern_sequence_strip", "Plan and Test needs a number-pattern investigation.");
+    assert.notEqual(question.visual?.type, "array", "Plan and Test must not fall back to an array.");
+    if (activity.config.rotationRole === "fast_thinking") investigationRules.add(String(question.answer));
+    if (question.kind === "typed_response") {
+      assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Plan and Test needs one inline missing term.");
+    }
+  }
+}
+assert.deepEqual(
+  investigationRules,
+  new Set(PATTERN_YEAR3_WEEK8_LESSON1_RULE_LABELS),
+  "Plan and Test must rotate all eight Level 3 rules without getting stuck on the Week 3 set.",
+);
+
+const levelThreeCompareRules = PATTERN_PEAKS_PROGRAMS["Year 3"][7]!.lessons[1]!;
+for (const activity of levelThreeCompareRules.activities ?? []) {
+  for (let sample = 0; sample < 24; sample += 1) {
+    const question = generatePatternPeaksQuestion(3, levelThreeCompareRules, activity);
+    assert("visual" in question);
+    assert.equal(question.visual?.type, "expression_flow", "Compare Two Rules needs a side-by-side rule comparison.");
+    assert.equal(question.visual.cards.length, 2, "Compare Two Rules must show both rules together.");
+    assert(!question.prompt.toLowerCase().includes("array"), "Compare Two Rules must not fall back to array work.");
+    if (question.kind === "typed_response") {
+      assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Compare Two Rules needs one inline final value.");
+    }
+  }
+}
 
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
