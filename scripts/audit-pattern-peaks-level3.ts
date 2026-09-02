@@ -153,6 +153,20 @@ for (const currentLesson of PATTERN_PEAKS_PROGRAMS["Year 3"][2]!.lessons) {
   }
 }
 
+const levelThreeInverseLesson = PATTERN_PEAKS_PROGRAMS["Year 3"][3]!.lessons[0]!;
+for (const activity of levelThreeInverseLesson.activities ?? []) {
+  for (let sample = 0; sample < 50; sample += 1) {
+    const question = generatePatternPeaksQuestion(3, levelThreeInverseLesson, activity);
+    assert("visual" in question && question.visual?.type === "inverse_step_card", "Year 3 Week 4 Lesson 1 needs its inverse visual.");
+    if (question.kind === "multiple_choice") {
+      assert(!question.visual.inverseOperation.includes("="), "The multiple-choice visual reveals the equation structure.");
+      assert.notEqual(question.visual.inverseOperation, question.answer, "The inverse visual duplicates the correct multiple-choice option.");
+    } else if (question.kind === "typed_response") {
+      assert(question.visual.inverseOperation.includes("?"), "The typed inverse question needs its inline answer field.");
+    }
+  }
+}
+
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
 assert.equal(REALM_REGISTRY.pattern.totalWeeks, 8, "Pattern Peaks needs the agreed eight-week contract.");

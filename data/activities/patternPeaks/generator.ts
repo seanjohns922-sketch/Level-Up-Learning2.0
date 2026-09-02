@@ -253,15 +253,21 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
       const a = rand(18, 45);
       const b = rand(6, 17);
       const total = a + b;
-      const visual = inverseVisual("Addition and subtraction undo", `${a} + ${b} = ${total}`, `${total} − ${b} = ${a}`);
-      return role === "apply_create"
-        ? typed(
-            `Use the inverse: ${total} − ${b} = ?`,
-            a,
-            "Subtraction undoes the addition.",
-            inverseVisual("Addition and subtraction undo", `${a} + ${b} = ${total}`, `${total} − ${b} = ?`),
-          )
-        : mcq("Which equation proves the addition fact?", `${total} − ${b} = ${a}`, [`${total} + ${b} = ${a}`, `${a} − ${b} = ${total}`], "Use subtraction to undo the addition.", visual);
+      if (role === "apply_create") {
+        const visual = inverseVisual("Addition and subtraction undo", `${a} + ${b} = ${total}`, `${total} − ${b} = ?`);
+        return typed(
+          `Use the inverse: ${total} − ${b} = ?`,
+          a,
+          "Subtraction undoes the addition.",
+          visual,
+        );
+      }
+      const visual = inverseVisual(
+        "Addition and subtraction undo",
+        `${a} + ${b} = ${total}`,
+        "Choose the subtraction equation that reverses the addition.",
+      );
+      return mcq("Which equation proves the addition fact?", `${total} − ${b} = ${a}`, [`${total} + ${b} = ${a}`, `${a} − ${b} = ${total}`], "Use subtraction to undo the addition.", visual);
     }
     const factorA = pick([3, 4, 5, 10]);
     const factorB = rand(2, 10);
