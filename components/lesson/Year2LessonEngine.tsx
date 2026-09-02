@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Sparkle, Zap } from "lucide-react";
+import { ArrowRight, Sigma, Sparkle, Zap } from "lucide-react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
@@ -627,11 +627,13 @@ export function Year2LessonEngine({
   questionGenerator?: LessonQuestionGenerator;
 }) {
   const isMeasurement = realmId === "measurement";
-  const isLevelTwoNumber = !isMeasurement && levelNumber === 2;
-  const isLevelThreeNumber = !isMeasurement && levelNumber === 3;
-  const isLevelFourNumber = !isMeasurement && levelNumber === 4;
-  const isLevelFiveNumber = !isMeasurement && levelNumber === 5;
-  const isLevelSixNumber = !isMeasurement && levelNumber === 6;
+  const isPattern = realmId === "pattern";
+  const isNumber = !realmId || realmId === "number";
+  const isLevelTwoNumber = isNumber && levelNumber === 2;
+  const isLevelThreeNumber = isNumber && levelNumber === 3;
+  const isLevelFourNumber = isNumber && levelNumber === 4;
+  const isLevelFiveNumber = isNumber && levelNumber === 5;
+  const isLevelSixNumber = isNumber && levelNumber === 6;
   const isModernNumber = isLevelTwoNumber || isLevelThreeNumber || isLevelFourNumber || isLevelFiveNumber || isLevelSixNumber;
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
@@ -1400,6 +1402,13 @@ export function Year2LessonEngine({
       if (count >= 3)  return "border-amber-600/40 shadow-[0_0_18px_rgba(180,120,20,0.28)]";
       return "border-amber-800/20";
     }
+    if (isPattern) {
+      if (count >= 10) return "border-emerald-300 ring-2 ring-violet-400/50 ring-offset-2 ring-offset-emerald-950 nexus-card-glow";
+      if (count >= 8) return "border-violet-300/80 shadow-[0_0_22px_rgba(139,92,246,0.38)]";
+      if (count >= 5) return "border-emerald-300/80 shadow-[0_0_22px_rgba(52,211,153,0.36)]";
+      if (count >= 3) return "border-emerald-400/60 shadow-[0_0_18px_rgba(16,185,129,0.28)]";
+      return "border-emerald-800/20";
+    }
     if (count >= 10) return "border-teal-300 ring-2 ring-emerald-400/50 ring-offset-2 ring-offset-slate-950 nexus-card-glow";
     if (count >= 8)  return "border-orange-300/80 shadow-[0_0_22px_rgba(251,146,60,0.4)]";
     if (count >= 5)  return "border-yellow-300/80 shadow-[0_0_22px_rgba(253,224,71,0.4)]";
@@ -1413,7 +1422,9 @@ export function Year2LessonEngine({
     status === "correct" && isNexus
       ? isMeasurement
         ? "border-amber-400/60 nexus-correct-pulse ring-2 ring-amber-300/40 ring-offset-2 ring-offset-amber-950"
-        : "border-teal-300 nexus-correct-pulse ring-2 ring-emerald-400/50 ring-offset-2 ring-offset-slate-950"
+        : isPattern
+          ? "border-emerald-300 nexus-correct-pulse ring-2 ring-violet-400/50 ring-offset-2 ring-offset-emerald-950"
+          : "border-teal-300 nexus-correct-pulse ring-2 ring-emerald-400/50 ring-offset-2 ring-offset-slate-950"
       : status === "correct"
       ? "border-emerald-300 shadow-emerald-100/50"
       : status === "wrong"
@@ -1443,6 +1454,7 @@ export function Year2LessonEngine({
                 ? "number-nexus-level-six relative"
             : "relative"}
       data-number-nexus-level={isModernNumber ? String(levelNumber) : undefined}
+      data-lesson-realm={realmId ?? "number"}
     >
       {showLessonResume && (
         <LessonResumeGate
@@ -1460,13 +1472,13 @@ export function Year2LessonEngine({
           80% { transform: translateX(3px); }
         }
         @keyframes nexusCardGlow {
-          0%, 100% { box-shadow: 0 0 38px rgba(45,212,191,0.65), 0 0 70px rgba(45,212,191,0.3), inset 0 0 20px rgba(45,212,191,0.07); }
-          50% { box-shadow: 0 0 64px rgba(45,212,191,0.95), 0 0 120px rgba(45,212,191,0.5), inset 0 0 32px rgba(45,212,191,0.12); }
+          0%, 100% { box-shadow: 0 0 38px var(--lesson-glow-strong), 0 0 70px var(--lesson-glow-soft), inset 0 0 20px var(--lesson-glow-inset); }
+          50% { box-shadow: 0 0 64px var(--lesson-glow-peak), 0 0 120px var(--lesson-glow-mid), inset 0 0 32px var(--lesson-glow-inset-peak); }
         }
         @keyframes nexusCorrectPulse {
-          0% { box-shadow: 0 0 0 0 rgba(45,212,191,0.8); }
-          70% { box-shadow: 0 0 0 20px rgba(45,212,191,0); }
-          100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); }
+          0% { box-shadow: 0 0 0 0 var(--lesson-pulse); }
+          70% { box-shadow: 0 0 0 20px var(--lesson-pulse-clear); }
+          100% { box-shadow: 0 0 0 0 var(--lesson-pulse-clear); }
         }
         @keyframes nexusBadgePulse {
           0%, 100% { opacity: 0.9; }
@@ -1477,6 +1489,33 @@ export function Year2LessonEngine({
         }
         .nexus-correct-pulse {
           animation: nexusCorrectPulse 0.6s ease-out forwards;
+        }
+        :global([data-lesson-realm="pattern"] .bg-cyan-50) {
+          background-color: #ecfdf5;
+        }
+        :global([data-lesson-realm="pattern"] .border-cyan-100) {
+          border-color: #d1fae5;
+        }
+        :global([data-lesson-realm="pattern"] .border-cyan-200) {
+          border-color: #a7f3d0;
+        }
+        :global([data-lesson-realm="pattern"] .border-cyan-300) {
+          border-color: #a78bfa;
+        }
+        :global([data-lesson-realm="pattern"] .text-cyan-800) {
+          color: #5b21b6;
+        }
+        :global([data-lesson-realm="pattern"] .text-cyan-700) {
+          color: #047857;
+        }
+        :global([data-lesson-realm="pattern"] .text-cyan-300) {
+          color: #a78bfa;
+        }
+        :global([data-lesson-realm="pattern"] .text-cyan-200) {
+          color: #c4b5fd;
+        }
+        :global([data-lesson-realm="pattern"] .text-cyan-100) {
+          color: #d1fae5;
         }
       `}</style>
       <div
@@ -1590,18 +1629,44 @@ export function Year2LessonEngine({
                 className={`${
                   isModernNumber
                     ? "rounded-lg border shadow-sm"
-                    : "rounded-[1.75rem] border-2 shadow-lg"
+                    : isPattern
+                      ? "rounded-xl border-2 shadow-lg"
+                      : "rounded-[1.75rem] border-2 shadow-lg"
                 } p-4 transition-all duration-500 sm:p-6 ${statusBorder} ${statusMotion}`}
-                style={isMeasurement ? {
+                style={{
+                  ...(isPattern ? {
+                    "--lesson-glow-strong": "rgba(52,211,153,0.62)",
+                    "--lesson-glow-soft": "rgba(124,58,237,0.28)",
+                    "--lesson-glow-inset": "rgba(110,231,183,0.08)",
+                    "--lesson-glow-peak": "rgba(52,211,153,0.9)",
+                    "--lesson-glow-mid": "rgba(124,58,237,0.46)",
+                    "--lesson-glow-inset-peak": "rgba(196,181,253,0.14)",
+                    "--lesson-pulse": "rgba(52,211,153,0.8)",
+                    "--lesson-pulse-clear": "rgba(52,211,153,0)",
+                  } : {
+                    "--lesson-glow-strong": "rgba(45,212,191,0.65)",
+                    "--lesson-glow-soft": "rgba(45,212,191,0.3)",
+                    "--lesson-glow-inset": "rgba(45,212,191,0.07)",
+                    "--lesson-glow-peak": "rgba(45,212,191,0.95)",
+                    "--lesson-glow-mid": "rgba(45,212,191,0.5)",
+                    "--lesson-glow-inset-peak": "rgba(45,212,191,0.12)",
+                    "--lesson-pulse": "rgba(45,212,191,0.8)",
+                    "--lesson-pulse-clear": "rgba(45,212,191,0)",
+                  }),
+                  ...(isMeasurement ? {
                   background: "linear-gradient(180deg, #fffdf7 0%, #fff7e6 100%)",
                   boxShadow: "0 18px 45px rgba(92,56,10,0.10)",
                 } : isModernNumber ? {
                   background: "#f8fbfc",
                   boxShadow: "0 8px 24px rgba(15,118,110,0.08)",
+                } : isPattern ? {
+                  background: "linear-gradient(180deg, #f8fffc 0%, #eefbf6 58%, #f4f0ff 100%)",
+                  boxShadow: "0 18px 45px rgba(5,150,105,0.10), 0 8px 28px rgba(91,33,182,0.08)",
                 } : {
                   background: "linear-gradient(180deg, #fbfffe 0%, #effcf9 100%)",
                   boxShadow: "0 18px 45px rgba(4,78,70,0.10)",
-                }}
+                }),
+                } as React.CSSProperties}
               >
                 <div className="mb-3 flex items-center justify-between gap-2">
                   <span
@@ -1610,6 +1675,10 @@ export function Year2LessonEngine({
                       background: "rgba(75,40,100,0.08)",
                       border: "1px solid rgba(139,92,246,0.3)",
                       color: "#5b21b6",
+                    } : isPattern ? {
+                      background: "rgba(236,253,245,0.94)",
+                      border: "1px solid rgba(124,58,237,0.28)",
+                      color: "#047857",
                     } : {
                       background: "#f0fdf4",
                       color: "#15803d",
@@ -1627,6 +1696,13 @@ export function Year2LessonEngine({
                         textShadow: "0 0 10px rgba(200,160,48,0.7)",
                         boxShadow: "0 0 12px rgba(200,160,48,0.25)",
                         animation: "nexusBadgePulse 2s ease-in-out infinite",
+                      } : isPattern ? {
+                        background: "linear-gradient(135deg, rgba(6,78,59,0.94), rgba(76,29,149,0.94))",
+                        border: "1px solid rgba(167,243,208,0.58)",
+                        color: "#d1fae5",
+                        textShadow: "0 0 10px rgba(52,211,153,0.72)",
+                        boxShadow: "0 0 14px rgba(124,58,237,0.34)",
+                        animation: "nexusBadgePulse 2s ease-in-out infinite",
                       } : {
                         background: "rgba(4,47,46,0.85)",
                         border: "1px solid rgba(45,212,191,0.5)",
@@ -1637,8 +1713,8 @@ export function Year2LessonEngine({
                       }}
                     >
                       <span className="inline-flex items-center gap-1">
-                        {isMeasurement ? <Sparkle className="h-3.5 w-3.5" /> : <Zap className="h-3.5 w-3.5" />}
-                        {isMeasurement ? "Surge State" : "Nexus State"}
+                        {isMeasurement ? <Sparkle className="h-3.5 w-3.5" /> : isPattern ? <Sigma className="h-3.5 w-3.5" /> : <Zap className="h-3.5 w-3.5" />}
+                        {isMeasurement ? "Surge State" : isPattern ? "Pattern State" : "Nexus State"}
                       </span>
                     </span>
                   )}
@@ -1694,7 +1770,7 @@ export function Year2LessonEngine({
                         onClick={handleNextQuestion}
                         disabled={turnState === "advancing"}
                         className={`pointer-events-auto inline-flex items-center gap-2 rounded-xl px-5 py-3 font-black text-white transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70 ${
-                          isMeasurement ? "bg-[#8a6422]" : "bg-teal-700"
+                          isMeasurement ? "bg-[#8a6422]" : isPattern ? "bg-violet-700" : "bg-teal-700"
                         }`}
                       >
                         {turnState === "advancing" ? "Loading..." : advanceError ? "Try Again" : "Next Question"}

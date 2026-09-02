@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Hourglass, Cog, Timer, Scale, Ruler, Star, Sparkles } from "lucide-react";
+import { Braces, Equal, Hourglass, Cog, Timer, Scale, Ruler, Sigma, Star, Sparkles } from "lucide-react";
 
 /**
  * The top-tier 10-combo celebration.
@@ -151,16 +151,44 @@ const STATISTICS_THEME: RealmTheme = {
   particleSplit: 0.55,
 };
 
+const PATTERN_THEME: RealmTheme = {
+  flashBg: "radial-gradient(circle at 50% 50%, rgba(52,211,153,0.62) 0%, rgba(124,58,237,0.34) 40%, rgba(4,20,16,0) 75%)",
+  gridColor: "rgba(110,231,183,0.17)",
+  scanColor: "rgba(196,181,253,0.44)",
+  ringInner: "rgba(167,243,208,0.94)",
+  ringOuter: "rgba(167,139,250,0.64)",
+  ringShadow: "0 0 54px rgba(52,211,153,0.7), inset 0 0 26px rgba(167,139,250,0.42)",
+  cornerConic: "conic-gradient(from 45deg, rgba(52,211,153,0), rgba(52,211,153,0.74) 15%, rgba(167,139,250,0.56) 30%, rgba(250,204,21,0.28) 45%, rgba(52,211,153,0) 60%)",
+  titleGradient: "linear-gradient(180deg, #ecfdf5 0%, #6ee7b7 42%, #7c3aed 100%)",
+  titleFilter: "drop-shadow(0 0 26px rgba(110,231,183,0.98)) drop-shadow(0 0 52px rgba(124,58,237,0.72))",
+  title: "PATTERN MASTERY",
+  engaged: "ACHIEVED",
+  engagedColor: "rgba(221,214,254,0.98)",
+  engagedShadow: "0 0 18px rgba(167,139,250,0.9), 0 0 36px rgba(52,211,153,0.66)",
+  dividerGradient: "linear-gradient(90deg, transparent, rgba(110,231,183,0.92), rgba(167,139,250,0.74), transparent)",
+  dividerShadow: "0 0 12px rgba(52,211,153,0.74)",
+  copy: "You connected every step in the pattern!",
+  copyColor: "rgba(209,250,229,0.94)",
+  copyShadow: "0 0 10px rgba(16,185,129,0.8)",
+  bottomText: "10 correct in a row - rule mastered",
+  bottomColor: "rgba(196,181,253,0.94)",
+  bottomShadow: "0 0 12px rgba(124,58,237,0.78)",
+  particleHues: [152, 265],
+  particleSplit: 0.55,
+};
+
 const MEASURE_GLYPHS = [Hourglass, Cog, Timer, Scale, Ruler];
 const STARPATH_GLYPHS = [Star, Sparkles];
+const PATTERN_GLYPHS = [Sigma, Braces, Equal];
 
 export default function NexusActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
-  const t = isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : NEXUS_THEME;
-  const glyphSet = isMeasurement ? MEASURE_GLYPHS : STARPATH_GLYPHS;
-  const glyphColorRgb = isStarpath ? "196,181,253" : "200,160,48";
+  const isPattern = realmId === "pattern";
+  const t = isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : isPattern ? PATTERN_THEME : NEXUS_THEME;
+  const glyphSet = isMeasurement ? MEASURE_GLYPHS : isPattern ? PATTERN_GLYPHS : STARPATH_GLYPHS;
+  const glyphColorRgb = isStarpath ? "196,181,253" : isPattern ? "110,231,183" : "200,160,48";
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);
@@ -173,11 +201,11 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
       setActive({ id: idRef.current });
       const timer = setTimeout(() => setActive(null), 2800);
       try {
-        window.dispatchEvent(new CustomEvent(isMeasurement ? "lul:legendary-activated" : isStatistics ? "lul:master-analyst-activated" : "lul:nexus-activated"));
+        window.dispatchEvent(new CustomEvent(isMeasurement ? "lul:legendary-activated" : isStatistics ? "lul:master-analyst-activated" : isPattern ? "lul:pattern-mastery-activated" : "lul:nexus-activated"));
       } catch {}
       return () => clearTimeout(timer);
     }
-  }, [comboCount, isMeasurement, isStatistics]);
+  }, [comboCount, isMeasurement, isPattern, isStatistics]);
 
   const particles = useMemo(() => {
     if (!active) return [];
@@ -193,7 +221,7 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
   }, [active, t.particleHues, t.particleSplit]);
 
   const glyphs = useMemo(() => {
-    if (!active || (!isMeasurement && !isStarpath)) return [];
+    if (!active || (!isMeasurement && !isStarpath && !isPattern)) return [];
     return Array.from({ length: 14 }, (_, i) => {
       const left = 5 + seeded(active.id * 61 + i) * 90;
       const delay = seeded(active.id * 67 + i) * 0.7;
@@ -201,7 +229,7 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
       const rot = (seeded(active.id * 73 + i) - 0.5) * 50;
       return { id: i, Icon: glyphSet[i % glyphSet.length], left, delay, size, rot };
     });
-  }, [active, isMeasurement, isStarpath, glyphSet]);
+  }, [active, isMeasurement, isPattern, isStarpath, glyphSet]);
 
   if (!active) return null;
 

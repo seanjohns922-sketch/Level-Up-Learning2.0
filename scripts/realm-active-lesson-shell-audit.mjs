@@ -14,6 +14,10 @@ const graph = read("components/statistica/StatisticaGraphCard.tsx");
 const tally = read("components/statistica/StatisticaTallyCard.tsx");
 const sort = read("components/statistica/StatisticaSortCard.tsx");
 const statisticaShell = read("components/statistica/StatisticaLessonShell.tsx");
+const patternShell = read("components/pattern-peaks/PatternPeaksLessonShell.tsx");
+const comboActivation = read("components/lesson/ComboActivation.tsx");
+const nexusActivation = read("components/lesson/NexusActivation.tsx");
+const realmTheme = read("lib/useRealmTheme.ts");
 
 assert.equal(
   (route.match(/<RealmActiveLessonShell/g) ?? []).length,
@@ -48,6 +52,34 @@ assert.match(hud, /"DATA STREAK"/);
 assert.match(practice, /hasStatisticaFeedback/);
 
 for (const marker of [
+  'realmId="pattern"',
+  'realm="pattern"',
+  "generatePatternPeaksQuestion",
+]) {
+  assert.ok(patternShell.includes(marker), `Pattern Peaks active lesson is missing shared functionality: ${marker}`);
+}
+
+assert.match(engine, /const isPattern = realmId === "pattern"/);
+assert.match(engine, /const isNumber = !realmId \|\| realmId === "number"/);
+assert.match(engine, /isPattern \? "Pattern State" : "Nexus State"/);
+assert.match(engine, /data-number-nexus-level=\{isModernNumber \? String\(levelNumber\) : undefined\}/);
+assert.match(comboActivation, /const PATTERN_TIERS/);
+assert.match(nexusActivation, /const PATTERN_THEME/);
+assert.match(realmTheme, /if \(realmId === "pattern"\) return PATTERN_PEAKS/);
+
+for (const numberMarker of [
+  'title: "SURGE"',
+  'title: "OVERDRIVE"',
+  'title: "NEXUS STATE"',
+  'copy: "Your number power is surging!"',
+]) {
+  assert.ok(
+    comboActivation.includes(numberMarker) || nexusActivation.includes(numberMarker),
+    `Number Nexus presentation changed or is missing: ${numberMarker}`,
+  );
+}
+
+for (const marker of [
   "RealmActiveLessonShell",
   'realm="statistics"',
   'completionMode="time_only"',
@@ -70,4 +102,4 @@ for (const [name, source] of [["graph", graph], ["tally", tally], ["sort", sort]
   assert.doesNotMatch(source, /(?:cyan|teal)-/, `Statistica ${name} activity must not inherit Number Nexus cyan/teal classes`);
 }
 
-console.log("Realm active lesson shell audit passed: shared lesson mechanics retain distinct Number Nexus, Measurelands, Starpath and Statistica presentation.");
+console.log("Realm active lesson shell audit passed: shared lesson mechanics retain distinct Number Nexus, Measurelands, Starpath, Statistica and Pattern Peaks presentation.");

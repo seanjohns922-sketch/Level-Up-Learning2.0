@@ -150,6 +150,7 @@ export default function MultipleChoiceActivity({
   realmId?: string;
 }) {
   const isMeasurement = realmId === "measurement";
+  const isPattern = realmId === "pattern";
   const theme = getRealmTheme(realmId);
   const [picked, setPicked] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
@@ -250,6 +251,11 @@ export default function MultipleChoiceActivity({
               borderColor: "rgba(184,137,58,0.28)",
               background: "linear-gradient(180deg, #fff9ee 0%, #fdf6e8 100%)",
             }
+          : isPattern
+            ? {
+                borderColor: "rgba(124,58,237,0.24)",
+                background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(236,253,245,0.74) 100%)",
+              }
           : undefined
       }
     >
@@ -258,7 +264,7 @@ export default function MultipleChoiceActivity({
       questionData.visual?.type === "receipt" ? (
         <MoneyContextVisual visual={questionData.visual} />
       ) : null}
-      <div className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-[0.22em] ${isMeasurement ? "text-[#7c5a20]" : "text-teal-700/90"}`}>
+      <div className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-[0.22em] ${isMeasurement ? "text-[#7c5a20]" : isPattern ? "text-violet-700" : "text-teal-700/90"}`}>
         <span
           className="h-1.5 w-1.5 rounded-full"
           style={{ background: theme.ctaTo, boxShadow: `0 0 6px ${theme.ctaFrom}` }}
@@ -279,7 +285,7 @@ export default function MultipleChoiceActivity({
         </p>
       ) : null}
       {isMultiSelect && questionData.instruction ? (
-        <p className={`mt-2 text-sm font-bold ${isMeasurement ? "text-[#7c5a20]" : "text-emerald-700"}`}>
+        <p className={`mt-2 text-sm font-bold ${isMeasurement ? "text-[#7c5a20]" : isPattern ? "text-violet-700" : "text-emerald-700"}`}>
           <MathFormattedText text={questionData.instruction} />
         </p>
       ) : null}
@@ -420,6 +426,10 @@ export default function MultipleChoiceActivity({
                   ? isPicked
                     ? "border-amber-500/60 bg-amber-50 text-amber-900 shadow-[0_2px_0_rgba(180,83,9,0.2),inset_0_1px_0_rgba(255,255,255,0.8)] ring-1 ring-amber-400/40"
                     : "border-amber-800/25 bg-[#fdf6e8] text-slate-800 hover:-translate-y-[1px] hover:border-amber-600/40 hover:shadow-[0_4px_12px_rgba(180,83,9,0.1)]"
+                  : isPattern
+                    ? isPicked
+                      ? "border-violet-400 bg-gradient-to-br from-emerald-50 to-violet-50 text-emerald-950 shadow-[0_2px_0_rgba(91,33,182,0.22),inset_0_1px_0_rgba(255,255,255,0.85)] ring-1 ring-violet-300/60"
+                      : "border-emerald-900/20 bg-white text-slate-800 hover:-translate-y-[1px] hover:border-violet-300 hover:bg-emerald-50/40 hover:shadow-[0_4px_12px_rgba(91,33,182,0.1)]"
                   : isPicked
                     ? "border-teal-400 bg-gradient-to-br from-teal-50 to-emerald-50 text-teal-900 shadow-[0_2px_0_rgba(13,148,136,0.25),inset_0_1px_0_rgba(255,255,255,0.8)] ring-1 ring-teal-300/60"
                     : "border-slate-200 bg-white text-slate-800 hover:-translate-y-[1px] hover:border-teal-300 hover:bg-teal-50/30 hover:shadow-[0_4px_12px_rgba(13,148,136,0.08)]",
@@ -437,6 +447,10 @@ export default function MultipleChoiceActivity({
                     ? isPicked
                       ? "opacity-100 bg-gradient-to-b from-amber-400 to-amber-600"
                       : "opacity-0 group-hover:opacity-60 bg-amber-500"
+                    : isPattern
+                      ? isPicked
+                        ? "bg-gradient-to-b from-emerald-400 to-violet-500 opacity-100"
+                        : "bg-violet-400 opacity-0 group-hover:opacity-60"
                     : isPicked
                       ? "bg-gradient-to-b from-teal-400 to-emerald-500 opacity-100"
                       : "bg-teal-400 opacity-0 group-hover:opacity-60",
@@ -455,7 +469,7 @@ export default function MultipleChoiceActivity({
             type="button"
             onClick={submitMultiSelect}
             disabled={selected.length === 0 || submitted}
-            className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition disabled:cursor-not-allowed disabled:bg-gray-300 ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : "bg-teal-600 hover:bg-teal-700"}`}
+            className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition disabled:cursor-not-allowed disabled:bg-gray-300 ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isPattern ? "bg-violet-700 hover:bg-violet-800" : "bg-teal-600 hover:bg-teal-700"}`}
           >
             Check answer
           </button>

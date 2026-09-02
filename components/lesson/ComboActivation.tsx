@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
-import { Hourglass, Cog, Timer, Scale, Ruler, Star, Sparkles, Orbit } from "lucide-react";
+import { Braces, Equal, Hourglass, Cog, Timer, Scale, Ruler, Sigma, Star, Sparkles, Orbit } from "lucide-react";
 
 type GlyphIcon = ComponentType<{ className?: string; style?: React.CSSProperties }>;
 
@@ -212,13 +212,53 @@ const STATISTICS_TIERS: TierConfig[] = [
   },
 ];
 
+const PATTERN_TIERS: TierConfig[] = [
+  {
+    threshold: 5,
+    title: "RULE FOUND",
+    engaged: "CONNECTED",
+    subtitle: "5 in a row - the pattern is taking shape!",
+    hues: [152, 265],
+    flashColor: "rgba(52,211,153,0.52)",
+    ringColor: "rgba(110,231,183,0.88)",
+    ringCount: 3,
+    particleCount: 28,
+    duration: 1.8,
+    cornerSize: 120,
+    titleGradient: "linear-gradient(180deg, #ecfdf5 0%, #34d399 48%, #047857 100%)",
+    titleFilter: "drop-shadow(0 0 20px rgba(52,211,153,0.92)) drop-shadow(0 0 42px rgba(91,33,182,0.62))",
+    accentColor: "rgba(167,243,208,0.96)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(52,211,153,0.9), rgba(139,92,246,0.68), transparent)",
+    glyphs: [Sigma, Equal, Braces],
+  },
+  {
+    threshold: 8,
+    title: "PATTERN CHAIN",
+    engaged: "ASCENDING",
+    subtitle: "8 in a row - every rule is connecting!",
+    hues: [265, 152],
+    flashColor: "rgba(139,92,246,0.54)",
+    ringColor: "rgba(196,181,253,0.9)",
+    ringCount: 4,
+    particleCount: 40,
+    duration: 2.2,
+    cornerSize: 145,
+    titleGradient: "linear-gradient(180deg, #f5f3ff 0%, #a78bfa 46%, #5b21b6 100%)",
+    titleFilter: "drop-shadow(0 0 22px rgba(167,139,250,0.96)) drop-shadow(0 0 46px rgba(16,185,129,0.68))",
+    accentColor: "rgba(221,214,254,0.98)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(167,139,250,0.92), rgba(52,211,153,0.7), transparent)",
+    glyphs: [Sigma, Braces, Equal],
+  },
+];
+
 type ActivationKey = { id: number; tier: TierConfig };
 
 export default function ComboActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
-  const tiers = isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : isStatistics ? STATISTICS_TIERS : NEXUS_TIERS;
+  const isPattern = realmId === "pattern";
+  const tiers = isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : isStatistics ? STATISTICS_TIERS : isPattern ? PATTERN_TIERS : NEXUS_TIERS;
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);
