@@ -56,7 +56,7 @@ const PORTAL_PRESENTATION: readonly TowerPortalPresentation[] = [
     position: [-18.1, 0, -15.8],
     rotationY: 0.85,
     returnSpawn: [-15.1, 0.75, -13.2],
-    posterAsset: "/cards/patternox-wigglecode-y3-front.png",
+    posterAsset: "/images/patternpeaks-home-bg-y6.jpeg",
     previewVideo: "/videos/realms/pattern-peaks.mp4",
     accent: "#82d68d",
     accentSoft: "#315f3b",

@@ -72,6 +72,13 @@ assert(demoPanel.includes('{ id: "pattern", label: "Pattern Peaks"'), "Demo Revi
 assert(demoPanel.includes("/pattern-peaks/program?teacher_preview=1"), "Demo Review does not expose Pattern Peaks program previews.");
 assert(demoPanel.includes("? levelNumber >= 3"), "Demo Review does not expose the Level 4-6 program blueprints.");
 
+const towerPortalConfig = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-chamber-config.ts"), "utf8");
+assert(towerPortalConfig.includes('posterAsset: "/images/patternpeaks-home-bg-y6.jpeg"'), "Pattern Peaks tower portal must use the Level 6 realm background, not a card asset.");
+const towerChamber = fs.readFileSync(path.join(root, "components/world3d/TowerRealmChamber.tsx"), "utf8");
+assert(towerChamber.includes('return "LEVEL 6 PREVIEW"'), "Pattern Peaks tower portal must identify the Level 6 preview.");
+const towerEntry = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-entry.ts"), "utf8");
+assert(towerEntry.includes('level=Year%206'), "Pattern Peaks tower preview must open Level 6.");
+
 for (const page of ["app/pattern-peaks/page.tsx", "app/pattern-peaks/program/page.tsx"]) {
   const source = fs.readFileSync(path.join(root, page), "utf8");
   assert(source.includes("getServerStarpathAccess"), `${page} is not server-gated.`);

@@ -38,7 +38,7 @@ export async function resolveTowerRealmEntry(args: {
     exitReviewMode();
     return {
       status: "ready",
-      route: "/pattern-peaks?teacher_preview=1&level=Year%203",
+      route: "/pattern-peaks?teacher_preview=1&level=Year%206",
     };
   }
   const availability = getRealmAvailability(realm.portalId);

@@ -138,7 +138,7 @@ function TowerScene({
 }
 
 function buildProgressSummary(realmId: CanonicalRealmId, preview: boolean) {
-  if (preview && realmId === "pattern") return "LEVEL 3 PREVIEW";
+  if (preview && realmId === "pattern") return "LEVEL 6 PREVIEW";
   if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics") return "COMING SOON";
   const progress = readProgress(realmId);
   if (!progress) return "BEGIN JOURNEY";
