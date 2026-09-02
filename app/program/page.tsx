@@ -677,7 +677,10 @@ function ProgramPage() {
           lessonNumber: item.n,
           realmId,
         });
-      router.push(`${lessonRoute}${teacherPreview ? "&teacher_preview=1" : ""}`);
+      // Path-style realm routes (Statistica, Pattern Peaks) have no query string,
+      // so pick the right separator instead of always using "&".
+      const previewSep = lessonRoute.includes("?") ? "&" : "?";
+      router.push(`${lessonRoute}${teacherPreview ? `${previewSep}teacher_preview=1` : ""}`);
       return;
     }
     if (isStarpathRealm && starpathProgram && item.type === "quiz") {
