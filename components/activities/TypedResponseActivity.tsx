@@ -1674,6 +1674,9 @@ export default function TypedResponseActivity({
     !declaredInputType &&
     /^-?\d+$/.test(questionData.answer.replace(/,/g, "").trim());
   const isIntegerInput = declaredInputType === "integer" || inferredIntegerInput;
+  const hasInlinePatternSequenceInput =
+    questionData.visual?.type === "pattern_sequence_strip" &&
+    questionData.visual.terms.filter((term) => term === "?").length === 1;
   const isCartesianPlotTask =
     questionData.visual?.type === "cartesian_grid" &&
     Boolean(questionData.visual.targetCoordinate) &&
@@ -2790,7 +2793,12 @@ export default function TypedResponseActivity({
         <BestBuyCardComparisonVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "pattern_sequence_strip" ? (
-        <PatternSequenceStripVisual visual={questionData.visual} />
+        <PatternSequenceStripVisual
+          visual={questionData.visual}
+          missingTermValue={hasInlinePatternSequenceInput ? typed : undefined}
+          onMissingTermChange={hasInlinePatternSequenceInput ? setTyped : undefined}
+          missingTermInputMode={isIntegerInput ? "numeric" : "decimal"}
+        />
       ) : null}
       {questionData.visual?.type === "growing_pattern" ? (
         <GrowingPatternVisual visual={questionData.visual} />
@@ -3802,7 +3810,7 @@ export default function TypedResponseActivity({
                 <span>Tap a grid point to place the dot.</span>
               )}
             </div>
-          ) : questionData.visual?.type === "box_method" || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
+          ) : questionData.visual?.type === "box_method" || hasInlinePatternSequenceInput || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
             <input
               value={typed}
               onChange={(event) =>

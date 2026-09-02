@@ -87,6 +87,8 @@ export function pretestResumeHasProgress(state: PretestResumeState | null): bool
 
 export type LessonResumeState = {
   lessonKey: string;
+  /** Realm that produced the saved question. Older snapshots may not include it. */
+  realmId?: string;
   /** Seconds left on the lesson countdown when saved. */
   secondsLeft: number;
   /** Questions answered so far (drives the HUD progress). */

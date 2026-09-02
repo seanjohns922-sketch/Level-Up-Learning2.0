@@ -27,6 +27,29 @@ type QuestionVisual =
   | BracketEquationCardVisualData;
 type RotationRole = "fast_thinking" | "reasoning" | "apply_create";
 
+const PATTERN_VISUAL_TYPES = new Set([
+  "array",
+  "pattern_sequence_strip",
+  "growing_pattern",
+  "function_machine_card",
+  "input_output_table",
+  "expression_flow",
+  "balance_equation_card",
+  "inverse_step_card",
+  "unknown_tile_equation",
+  "bracket_equation_card",
+]);
+
+export const PATTERN_YEAR3_DOUBLE_STARTS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 25] as const;
+export const PATTERN_YEAR3_HALVING_FINAL_TERMS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20] as const;
+
+export function isPatternPeaksQuestion(question: unknown): question is Year2QuestionData {
+  if (!question || typeof question !== "object") return false;
+  const candidate = question as { kind?: unknown; visual?: { type?: unknown } };
+  if (candidate.kind !== "multiple_choice" && candidate.kind !== "typed_response") return false;
+  return typeof candidate.visual?.type === "string" && PATTERN_VISUAL_TYPES.has(candidate.visual.type);
+}
+
 const rand = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const pick = <T,>(items: readonly T[]) => items[rand(0, items.length - 1)]!;
 
@@ -142,13 +165,44 @@ function roleFor(activity: LessonActivity): RotationRole {
 
 function year3Question(week: number, lessonNumber: number, role: RotationRole): Year2QuestionData {
   if (week <= 2) {
-    const doubling = (week + lessonNumber + rand(0, 1)) % 2 === 0;
-    const start = doubling ? rand(2, 7) : rand(3, 8) * 8;
+    // Keep the arithmetic varied while ensuring every halving sequence stays in whole numbers.
+    // Lesson 1.2 deliberately includes both operations in every three-activity rotation.
+    const doubling = week === 1 && lessonNumber === 2
+      ? role !== "reasoning" && (role === "fast_thinking" || rand(0, 1) === 0)
+      : rand(0, 1) === 0;
+    const start = doubling ? pick(PATTERN_YEAR3_DOUBLE_STARTS) : pick(PATTERN_YEAR3_HALVING_FINAL_TERMS) * 8;
     const values = doubling
       ? [start, start * 2, start * 4, start * 8]
       : [start, start / 2, start / 4, start / 8];
     const rule = doubling ? "Double each term" : "Halve each term";
+    const compactRule = doubling ? "Double" : "Halve";
     const next = doubling ? values[3]! * 2 : values[3]! / 2;
+
+    if (week === 1 && lessonNumber === 2) {
+      if (role === "fast_thinking") {
+        return typed(
+          "Type the missing term.",
+          next,
+          `Use the rule: ${rule.toLowerCase()}.`,
+          sequenceVisual("Continue the pattern", [...values, "?"], [compactRule, compactRule, compactRule, compactRule]),
+        );
+      }
+      if (role === "reasoning") {
+        return typed(
+          "Type the missing term.",
+          values[2]!,
+          `Check the term on both sides using the rule: ${rule.toLowerCase()}.`,
+          sequenceVisual("Restore the pattern", [values[0]!, values[1]!, "?", values[3]!], [compactRule, compactRule, compactRule]),
+        );
+      }
+      return typed(
+        "Type the missing term.",
+        values[0]!,
+        `Work backwards from ${values[1]} by undoing the rule.`,
+        sequenceVisual("Work backwards", ["?", values[1]!, values[2]!, values[3]!], [compactRule, compactRule, compactRule]),
+      );
+    }
+
     const shown = lessonNumber === 3 ? [values[0]!, values[1]!, doubling ? values[2]! + 2 : values[2]! - 1, values[3]!] : values;
     const visual = sequenceVisual(lessonNumber === 3 ? "Find the broken step" : "Follow the pattern", [...shown, "?"], [rule, rule, rule, null]);
     if (role === "fast_thinking") {
@@ -454,8 +508,17 @@ export function generatePatternPeaksQuestion(
 ): Year2QuestionData {
   const role = roleFor(activity);
   const lessonNumber = lesson.lesson;
-  if (level === 3) return year3Question(lesson.week, lessonNumber, role);
-  if (level === 4) return year4Question(lesson.week, lessonNumber, role);
-  if (level === 5) return year5Question(lesson.week, lessonNumber, role);
-  return year6Question(lesson.week, lessonNumber, role);
+  const question = level === 3
+    ? year3Question(lesson.week, lessonNumber, role)
+    : level === 4
+      ? year4Question(lesson.week, lessonNumber, role)
+      : level === 5
+        ? year5Question(lesson.week, lessonNumber, role)
+        : year6Question(lesson.week, lessonNumber, role);
+
+  if (!isPatternPeaksQuestion(question)) {
+    const visualType = (question as { visual?: { type?: string } }).visual?.type;
+    throw new Error(`Pattern Peaks generated an incompatible ${visualType ?? "missing"} visual.`);
+  }
+  return question;
 }

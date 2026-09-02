@@ -318,7 +318,7 @@ const SEEDS: Record<PatternPeaksYearLabel, WeekSeed[]> = {
   "Year 6": level6Seeds,
 };
 
-function patternActivities(patternSkill: string, mechanic: string): LessonActivity[] {
+function patternActivities(patternSkill: string, mechanic: string, numericEntryOnly = false): LessonActivity[] {
   const config = (rotationRole: "fast_thinking" | "reasoning" | "apply_create") => ({
     patternSkill,
     mechanic,
@@ -326,8 +326,8 @@ function patternActivities(patternSkill: string, mechanic: string): LessonActivi
     lessonStructure: "8_minute_rotation",
   });
   return [
-    { activityType: "multiple_choice", weight: 1, config: config("fast_thinking") },
-    { activityType: "multiple_choice", weight: 1, config: config("reasoning") },
+    { activityType: numericEntryOnly ? "typed_response" : "multiple_choice", weight: 1, config: config("fast_thinking") },
+    { activityType: numericEntryOnly ? "typed_response" : "multiple_choice", weight: 1, config: config("reasoning") },
     { activityType: "typed_response", weight: 1, config: config("apply_create") },
   ];
 }
@@ -353,7 +353,7 @@ function buildProgram(yearLabel: PatternPeaksYearLabel, seeds: WeekSeed[]): Week
       curriculum: item.curriculum,
       activityType: "pattern-peaks",
       config: { realmId: "pattern", mechanic: item.mechanic, implementationStatus: "implemented" },
-      activities: patternActivities(id, item.mechanic),
+      activities: patternActivities(id, item.mechanic, yearLabel === "Year 3" && weekNumber === 1 && lessonNumber === 2),
     };
     });
     return {

@@ -611,6 +611,7 @@ export function Year2LessonEngine({
   nextUpLabel,
   brainBreakFrequency = "normal",
   questionGenerator = generateQuestion,
+  isQuestionCompatible,
 }: {
   lesson: Lesson;
   onTimedComplete: () => void;
@@ -625,6 +626,7 @@ export function Year2LessonEngine({
   nextUpLabel?: string;
   brainBreakFrequency?: BrainBreakFrequency;
   questionGenerator?: LessonQuestionGenerator;
+  isQuestionCompatible?: (question: unknown) => boolean;
 }) {
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
@@ -714,7 +716,8 @@ export function Year2LessonEngine({
   const currentTurnSafe =
     currentActivity !== null &&
     currentQuestion !== null &&
-    isLessonQuestionSafe(currentActivity, currentQuestion);
+    isLessonQuestionSafe(currentActivity, currentQuestion) &&
+    (isQuestionCompatible?.(currentQuestion) ?? true);
   const questionsAnsweredRef = useRef(0);
   const invalidRecoveryCountRef = useRef(0);
   const showMultiStepCalculationFeedback = isMultiStepCalculationLesson(level, lesson);
@@ -767,7 +770,12 @@ export function Year2LessonEngine({
         questionGenerator,
       );
       const nextActivity = activities[nextTurn.activityIndex];
-      if (!nextActivity || !nextTurn.question || !isLessonQuestionSafe(nextActivity, nextTurn.question)) {
+      if (
+        !nextActivity ||
+        !nextTurn.question ||
+        !isLessonQuestionSafe(nextActivity, nextTurn.question) ||
+        !(isQuestionCompatible?.(nextTurn.question) ?? true)
+      ) {
         throw new Error("Generated lesson turn failed safety validation");
       }
 
@@ -869,17 +877,39 @@ export function Year2LessonEngine({
   // ── Resume gate: load a saved snapshot once and offer to continue ──
   useEffect(() => {
     const snap = loadLessonResume(resumeLessonKey);
-    if (lessonResumeHasProgress(snap)) {
+    const expectedRealm = realmId ?? "number";
+    const realmMatches = snap?.realmId
+      ? snap.realmId === expectedRealm
+      : expectedRealm !== "pattern";
+    const questionMatches = snap?.currentQuestion
+      ? (isQuestionCompatible?.(snap.currentQuestion) ?? true)
+      : true;
+    if (lessonResumeHasProgress(snap) && realmMatches && questionMatches) {
       setShowLessonResume(true);
       showLessonResumeRef.current = true;
     } else {
+      if (snap && (!realmMatches || !questionMatches)) {
+        clearLessonResume(resumeLessonKey);
+      }
       resumeResolvedRef.current = true;
     }
-  }, [resumeLessonKey]);
+  }, [isQuestionCompatible, realmId, resumeLessonKey]);
 
   function resumeLesson() {
     const snap = loadLessonResume(resumeLessonKey);
     if (snap) {
+      const expectedRealm = realmId ?? "number";
+      const realmMatches = snap.realmId
+        ? snap.realmId === expectedRealm
+        : expectedRealm !== "pattern";
+      const questionMatches = snap.currentQuestion
+        ? (isQuestionCompatible?.(snap.currentQuestion) ?? true)
+        : true;
+      if (!realmMatches || !questionMatches) {
+        clearLessonResume(resumeLessonKey);
+        restartLesson();
+        return;
+      }
       setSecondsLeft(snap.secondsLeft);
       setQuestionsAnswered(snap.questionsAnswered);
       questionsAnsweredRef.current = snap.questionsAnswered;
@@ -982,6 +1012,7 @@ export function Year2LessonEngine({
     if (!resumeResolvedRef.current || finished || brainBreakActiveRef.current) return;
     saveLessonResume({
       lessonKey: resumeLessonKey,
+      realmId: realmId ?? "number",
       secondsLeft,
       questionsAnswered,
       correctAnswers,
@@ -1005,7 +1036,7 @@ export function Year2LessonEngine({
       showMistakeReview: showLessonMistakeReview,
       updatedAt: Date.now(),
     });
-  }, [resumeLessonKey, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog, currentActivityIndex, currentQuestion, currentQuestionSequence, questionKey, status, wrongFeedback, coachDone, lessonMistakeReviewDone, showLessonMistakeReview]);
+  }, [resumeLessonKey, realmId, secondsLeft, finished, questionsAnswered, correctAnswers, comboCount, lessonMistakes, attemptLog, currentActivityIndex, currentQuestion, currentQuestionSequence, questionKey, status, wrongFeedback, coachDone, lessonMistakeReviewDone, showLessonMistakeReview]);
 
   // Brain breaks fire at the scheduled seconds-left thresholds (count + timing
   // come from the teacher-set frequency × level). Each pauses the clock and uses

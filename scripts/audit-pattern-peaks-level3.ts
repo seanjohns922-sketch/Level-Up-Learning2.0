@@ -6,7 +6,12 @@ import {
   PATTERN_PEAKS_SPINES,
   type PatternPeaksYearLabel,
 } from "@/data/programs/patternPeaks";
-import { generatePatternPeaksQuestion } from "@/data/activities/patternPeaks/generator";
+import {
+  generatePatternPeaksQuestion,
+  isPatternPeaksQuestion,
+  PATTERN_YEAR3_DOUBLE_STARTS,
+  PATTERN_YEAR3_HALVING_FINAL_TERMS,
+} from "@/data/activities/patternPeaks/generator";
 import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/year2/lessonEngine";
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
 import { isLessonQuestionSafe } from "@/lib/task-safety";
@@ -53,8 +58,10 @@ for (const level of Object.keys(PATTERN_PEAKS_PROGRAMS) as PatternPeaksYearLabel
       assert.equal(pool.violations.length, 0, `${level} ${currentLesson.title} has rotation policy violations.`);
       assert.equal(pool.activities.length, 3, `${level} ${currentLesson.title} has an empty production activity pool.`);
       for (const activity of activities) {
-        for (let sample = 0; sample < 3; sample += 1) {
+        for (let sample = 0; sample < 25; sample += 1) {
           const question = generatePatternPeaksQuestion(getLevelForLesson(currentLesson), currentLesson, activity);
+          assert(isPatternPeaksQuestion(question), `${level} ${currentLesson.title} leaked a non-Pattern question.`);
+          assert.notEqual((question as { visual?: { type?: string } }).visual?.type, "mab", `${level} ${currentLesson.title} leaked a Number Nexus MAB visual.`);
           assert(isLessonQuestionSafe(activity, question), `${level} ${currentLesson.title} generated an unsafe ${String(activity.config.rotationRole)} question.`);
           assert("visual" in question && question.visual, `${level} ${currentLesson.title} generated a question without an algebra visual.`);
           assert("helper" in question && question.helper, `${level} ${currentLesson.title} generated a question without guided feedback.`);
@@ -67,6 +74,30 @@ for (const level of Object.keys(PATTERN_PEAKS_PROGRAMS) as PatternPeaksYearLabel
   assert.deepEqual(usedDescriptors, allowedDescriptors, `${level} does not cover its complete ACARA Algebra descriptor set.`);
   assert.equal(mechanics.size, 24, `${level} needs a distinct mechanic for every lesson blueprint.`);
 }
+
+const levelThreeDoubleOrHalve = PATTERN_PEAKS_PROGRAMS["Year 3"][0]!.lessons[1]!;
+const doubleOrHalveQuestions = (levelThreeDoubleOrHalve.activities ?? []).flatMap((activity) =>
+  Array.from({ length: 30 }, () => generatePatternPeaksQuestion(3, levelThreeDoubleOrHalve, activity)),
+);
+assert(
+  doubleOrHalveQuestions.every((question) => question.kind === "typed_response"),
+  "Year 3 Week 1 Lesson 2 must require students to type each numeric answer.",
+);
+assert(
+  doubleOrHalveQuestions.every((question) => /^\d+$/.test(question.answer)),
+  "Year 3 Week 1 Lesson 2 must produce whole-number answers.",
+);
+const doubleOrHalveRules = new Set(
+  doubleOrHalveQuestions.flatMap((question) =>
+    question.visual?.type === "pattern_sequence_strip"
+      ? (question.visual.arrowLabels ?? []).filter((label): label is string => Boolean(label))
+      : [],
+  ),
+);
+assert(doubleOrHalveRules.has("Double"), "Year 3 Week 1 Lesson 2 must include doubling.");
+assert(doubleOrHalveRules.has("Halve"), "Year 3 Week 1 Lesson 2 must include halving.");
+assert(new Set(PATTERN_YEAR3_DOUBLE_STARTS).size >= 12, "Year 3 doubling needs a broad starting-number pool.");
+assert(new Set(PATTERN_YEAR3_HALVING_FINAL_TERMS).size >= 8, "Year 3 halving needs a broad number pool.");
 
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
@@ -127,6 +158,11 @@ assert(patternoxCollection.includes("LegendDetailModal"), "Patternox cards do no
 const lessonShell = fs.readFileSync(path.join(root, "components/pattern-peaks/PatternPeaksLessonShell.tsx"), "utf8");
 assert(lessonShell.includes("Year2LessonEngine"), "Pattern Peaks lessons do not use the shared reviewed lesson engine.");
 assert(lessonShell.includes("generatePatternPeaksQuestion"), "Pattern Peaks lessons do not use their curriculum generator.");
+assert(lessonShell.includes("isQuestionCompatible={isPatternPeaksQuestion}"), "Pattern Peaks does not reject incompatible saved or generated questions.");
+const typedResponseActivity = fs.readFileSync(path.join(root, "components/activities/TypedResponseActivity.tsx"), "utf8");
+assert(typedResponseActivity.includes("hasInlinePatternSequenceInput"), "Typed sequence questions do not place the answer field in the missing term.");
+const patternSequenceVisual = fs.readFileSync(path.join(root, "components/activities/PatternSequenceStripVisual.tsx"), "utf8");
+assert(patternSequenceVisual.includes('aria-label="Missing term"'), "The inline missing-term field is not accessible.");
 
 const towerPortalConfig = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-chamber-config.ts"), "utf8");
 assert(towerPortalConfig.includes('posterAsset: "/images/patternpeaks-home-bg-y6.jpeg"'), "Pattern Peaks tower portal must use the Level 6 realm background, not a card asset.");

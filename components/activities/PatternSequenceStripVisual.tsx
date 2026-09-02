@@ -5,8 +5,14 @@ import type { PatternSequenceStripVisualData } from "@/data/activities/year2/les
 
 export default function PatternSequenceStripVisual({
   visual,
+  missingTermValue,
+  onMissingTermChange,
+  missingTermInputMode = "numeric",
 }: {
   visual: PatternSequenceStripVisualData;
+  missingTermValue?: string;
+  onMissingTermChange?: (value: string) => void;
+  missingTermInputMode?: "numeric" | "decimal";
 }) {
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
@@ -16,11 +22,24 @@ export default function PatternSequenceStripVisual({
       <div className="mt-4 flex flex-wrap items-start gap-2 md:gap-3">
         {visual.terms.map((term, index) => (
           <div key={`${visual.title}-${term}-${index}`} className="flex items-start gap-2 md:gap-3">
-            <div className="min-w-[64px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center shadow-sm">
-              <div className="text-2xl font-black text-slate-900">
-                <MathFormattedText text={term} />
+            {term === "?" && onMissingTermChange ? (
+              <input
+                type="text"
+                value={missingTermValue ?? ""}
+                onChange={(event) => onMissingTermChange(event.target.value.replace(/[^\d.,-]/g, ""))}
+                inputMode={missingTermInputMode}
+                autoComplete="off"
+                aria-label="Missing term"
+                placeholder="?"
+                className="h-[58px] w-[82px] rounded-2xl border-2 border-dashed border-violet-400 bg-white px-2 text-center text-2xl font-black text-slate-900 shadow-sm outline-none transition placeholder:text-violet-500 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-200"
+              />
+            ) : (
+              <div className="min-w-[64px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center shadow-sm">
+                <div className="text-2xl font-black text-slate-900">
+                  <MathFormattedText text={term} />
+                </div>
               </div>
-            </div>
+            )}
             {index < visual.terms.length - 1 ? (
               <div className="flex flex-col items-center pt-1">
                 {visual.arrowLabels?.[index] ? (

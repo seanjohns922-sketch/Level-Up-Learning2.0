@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
 import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
 import { Year2LessonEngine } from "@/components/lesson/Year2LessonEngine";
-import { generatePatternPeaksQuestion } from "@/data/activities/patternPeaks/generator";
+import { generatePatternPeaksQuestion, isPatternPeaksQuestion } from "@/data/activities/patternPeaks/generator";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 import { getWorld3DReturnPathForLesson, preserveWorld3DReturnContextForLesson } from "@/lib/world3d/return-context";
 import type { Lesson } from "@/data/programs/year1";
@@ -82,6 +82,7 @@ export default function PatternPeaksLessonShell({
                 lessonTitle: lesson.title,
               }}
               questionGenerator={generatePatternPeaksQuestion}
+              isQuestionCompatible={isPatternPeaksQuestion}
             />
           </RealmActiveLessonShell>
         </div>
