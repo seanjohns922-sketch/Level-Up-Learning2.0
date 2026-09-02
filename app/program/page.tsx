@@ -374,6 +374,13 @@ function ProgramPage() {
     boxShadow: "inset 0 1px 0 rgba(255,244,223,0.16), 0 8px 20px rgba(8,27,22,0.3)",
   } as const;
 
+  const patternNavWidgetStyle = {
+    borderRadius: 8,
+    border: "1px solid rgba(52,211,153,0.34)",
+    background: "linear-gradient(135deg, rgba(10,17,14,0.9), rgba(46,29,99,0.72) 55%, rgba(6,49,40,0.85))",
+    boxShadow: "inset 0 1px 0 rgba(167,243,208,0.16), 0 8px 20px rgba(6,14,10,0.32)",
+  } as const;
+
   const legacyProgramMode = sp.get("legacy") === "1";
   const teacherPreview = sp.get("teacher_preview") === "1";
   const demoPreviewMode = useDemoPreviewMode();
@@ -994,9 +1001,11 @@ function ProgramPage() {
                     ? "text-[#fff4df] hover:brightness-110 focus:ring-2 focus:ring-[#f2bc45]/30"
                     : isMeasurementRealm
                     ? "text-yellow-100/85 hover:bg-yellow-950/30"
+                    : isPatternRealm
+                    ? "text-emerald-50 hover:brightness-110 focus:ring-2 focus:ring-emerald-300/30"
                     : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                 }`}
-                style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isMeasurementRealm ? {
+                style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isMeasurementRealm ? {
                   borderRadius: 999,
                   border: "1px solid rgba(200,160,48,0.32)",
                   background: "rgba(22,14,4,0.65)",
@@ -1021,9 +1030,11 @@ function ProgramPage() {
                       ? "text-[#fff4df] hover:brightness-110 focus:ring-2 focus:ring-[#f2bc45]/30"
                       : isMeasurementRealm
                       ? "text-yellow-100/85 hover:bg-yellow-950/30"
-                      : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
+                      : isPatternRealm
+                    ? "text-emerald-50 hover:brightness-110 focus:ring-2 focus:ring-emerald-300/30"
+                    : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                   }`}
-                  style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isMeasurementRealm ? {
+                  style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isMeasurementRealm ? {
                     borderRadius: 999,
                     border: "1px solid rgba(200,160,48,0.32)",
                     background: "rgba(22,14,4,0.65)",
@@ -1034,10 +1045,10 @@ function ProgramPage() {
                   }}
                 >
                   <span className="flex items-center gap-2">
-                    <span className={`h-1.5 w-1.5 rounded-full ${isStarpathRealm ? "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]" : isStatisticsRealm ? "bg-[#f2bc45] shadow-[0_0_8px_rgba(242,188,69,0.9)]" : isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
+                    <span className={`h-1.5 w-1.5 rounded-full ${isStarpathRealm ? "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]" : isStatisticsRealm ? "bg-[#f2bc45] shadow-[0_0_8px_rgba(242,188,69,0.9)]" : isPatternRealm ? "bg-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.9)]" : isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
                     Week {weekNum}
                   </span>
-                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition-transform ${isStarpathRealm ? "text-cyan-100/80" : isMeasurementRealm ? "text-yellow-200/60" : "text-teal-100/80"} ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition-transform ${isStarpathRealm ? "text-cyan-100/80" : isPatternRealm ? "text-emerald-100/80" : isMeasurementRealm ? "text-yellow-200/60" : "text-teal-100/80"} ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
@@ -1049,6 +1060,8 @@ function ProgramPage() {
                         ? "border border-cyan-300/30"
                         : isStatisticsRealm
                         ? "border border-[#f2bc45]/35"
+                        : isPatternRealm
+                        ? "border border-emerald-300/30"
                         : isMeasurementRealm
                         ? "border border-yellow-900/40"
                         : "border border-teal-300/30"
@@ -1061,6 +1074,10 @@ function ProgramPage() {
                       borderRadius: 8,
                       background: "rgba(18,49,42,0.96)",
                       boxShadow: "inset 0 1px 0 rgba(255,244,223,0.18), 0 14px 40px rgba(8,27,22,0.62), 0 0 24px rgba(240,107,100,0.18)",
+                    } : isPatternRealm ? {
+                      borderRadius: 8,
+                      background: "rgba(10,17,14,0.96)",
+                      boxShadow: "inset 0 1px 0 rgba(167,243,208,0.18), 0 14px 40px rgba(6,14,10,0.62), 0 0 24px rgba(124,58,237,0.18)",
                     } : isMeasurementRealm ? {
                       borderRadius: 14,
                       background: "rgba(22,14,4,0.94)",
@@ -1072,7 +1089,7 @@ function ProgramPage() {
                     }}
                   >
                     <div className={`px-3 py-1.5 border-b text-[9px] font-mono font-bold uppercase tracking-[0.2em] ${
-                      isStarpathRealm ? "border-cyan-300/15 text-cyan-300/80" : isStatisticsRealm ? "border-[#f2bc45]/20 text-[#f2bc45]/80" : isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
+                      isStarpathRealm ? "border-cyan-300/15 text-cyan-300/80" : isStatisticsRealm ? "border-[#f2bc45]/20 text-[#f2bc45]/80" : isPatternRealm ? "border-emerald-300/20 text-emerald-300/80" : isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
                     }`}>
                       Select Week
                     </div>
@@ -1106,6 +1123,12 @@ function ProgramPage() {
                                     : isUnlocked
                                     ? "text-[#fff4df]/85 hover:bg-[#f06b64]/12 hover:text-[#fff4df]"
                                     : "text-[#fff4df]/30 hover:bg-white/5"
+                                  : isPatternRealm
+                                  ? isCurrent
+                                    ? "bg-emerald-400/15 text-emerald-100"
+                                    : isUnlocked
+                                    ? "text-emerald-50/85 hover:bg-emerald-400/10 hover:text-emerald-50"
+                                    : "text-emerald-50/30 hover:bg-white/5"
                                   : isMeasurementRealm
                                   ? isCurrent
                                     ? "bg-yellow-900/20 text-yellow-100"
@@ -1121,13 +1144,15 @@ function ProgramPage() {
                             >
                               <span className="flex items-center gap-1.5">
                                 {isCurrent ? (
-                                  <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 ${isStarpathRealm ? "text-cyan-300" : isMeasurementRealm ? "text-yellow-300" : "text-teal-300"}`} fill="none" stroke="currentColor" strokeWidth="3">
+                                  <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 ${isStarpathRealm ? "text-cyan-300" : isPatternRealm ? "text-emerald-300" : isMeasurementRealm ? "text-yellow-300" : "text-teal-300"}`} fill="none" stroke="currentColor" strokeWidth="3">
                                     <path d="M5 12l5 5L20 7" />
                                   </svg>
                                 ) : (
                                   <span className={`h-1 w-1 rounded-full ${
                                     isStarpathRealm
                                       ? isUnlocked ? "bg-cyan-400/70" : "bg-white/20"
+                                      : isPatternRealm
+                                      ? isUnlocked ? "bg-emerald-400/70" : "bg-white/20"
                                       : isMeasurementRealm
                                       ? isUnlocked ? "bg-yellow-600/60" : "bg-white/15"
                                       : isUnlocked ? "bg-teal-400/70" : "bg-white/20"
@@ -1138,6 +1163,8 @@ function ProgramPage() {
                               <span className={`text-[8px] tracking-[0.16em] ${
                                 isStarpathRealm
                                   ? isCurrent ? "text-cyan-300" : isUnlocked ? "text-cyan-200/60" : "text-white/30"
+                                  : isPatternRealm
+                                  ? isCurrent ? "text-emerald-300" : isUnlocked ? "text-emerald-200/60" : "text-white/30"
                                   : isMeasurementRealm
                                   ? isCurrent ? "text-yellow-300/80" : isUnlocked ? "text-yellow-200/45" : "text-white/25"
                                   : isCurrent ? "text-teal-300" : isUnlocked ? "text-teal-200/60" : "text-white/30"
@@ -1161,7 +1188,7 @@ function ProgramPage() {
             <button
               type="button"
               onClick={handleSecretTeacherToggle}
-              className={`inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isStatisticsRealm ? "text-[#fff4df]" : isMeasurementRealm ? "text-yellow-50/95" : "text-teal-50"}`}
+              className={`inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isStatisticsRealm ? "text-[#fff4df]" : isPatternRealm ? "text-emerald-50" : isMeasurementRealm ? "text-yellow-50/95" : "text-teal-50"}`}
               style={{
                 background: rt.pillBg,
                 clipPath: rt.rounded ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
