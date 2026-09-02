@@ -302,6 +302,51 @@ for (const levelFourEqualityLesson of PATTERN_PEAKS_PROGRAMS["Year 4"][0]!.lesso
   }
 }
 
+const levelFourAdditionUnknowns = PATTERN_PEAKS_PROGRAMS["Year 4"][1]!;
+const movingUnknownForms = new Set<string>();
+for (const currentLesson of levelFourAdditionUnknowns.lessons) {
+  assert(
+    (currentLesson.activities ?? []).every((activity) => activity.activityType === "typed_response"),
+    `Year 4 Week 2 ${currentLesson.title} must use typed unknown-number responses in every rotation.`,
+  );
+  for (const activity of currentLesson.activities ?? []) {
+    for (let sample = 0; sample < 30; sample += 1) {
+      const question = generatePatternPeaksQuestion(4, currentLesson, activity);
+      assert.equal(question.kind, "typed_response", `Year 4 Week 2 ${currentLesson.title} must ask for a number, not a conceptual choice.`);
+      assert("visual" in question && question.visual);
+      assert.equal(countInlineMathAnswerSlots(question.visual), 1, `Year 4 Week 2 ${currentLesson.title} needs one inline answer field.`);
+      assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, `Year 4 Week 2 ${currentLesson.title} generated an invalid unknown.`);
+
+      if (currentLesson.lesson === 1) {
+        assert.equal(question.visual.type, "unknown_tile_equation", "Find the Missing Addend needs an equation model.");
+        assert.equal(question.visual.left.split("+").length - 1, 2, "Find the Missing Addend must combine two known parts before the unknown.");
+      } else if (currentLesson.lesson === 2) {
+        assert.equal(question.visual.type, "unknown_tile_equation", "Unknowns Move Around needs an equation model.");
+        const { left, right } = question.visual;
+        const form = left.startsWith("□")
+          ? "unknown-first-left"
+          : /^\d+ \+ □$/.test(left) && /^\d+$/.test(right)
+            ? "unknown-second-left"
+            : /^\d+$/.test(left) && right.startsWith("□")
+              ? "unknown-on-right"
+              : right === "□"
+                ? "unknown-whole"
+                : "unknown-in-balanced-sentence";
+        movingUnknownForms.add(form);
+      } else {
+        assert.equal(question.visual.type, "inverse_step_card", "Prove the Missing Value needs a visible inverse check.");
+        assert(question.visual.equation.includes("□"), "Prove the Missing Value must retain the original unknown equation.");
+        assert(question.visual.inverseOperation.includes("?"), "Prove the Missing Value must place the typed answer in the inverse check.");
+      }
+    }
+  }
+}
+assert.deepEqual(
+  movingUnknownForms,
+  new Set(["unknown-first-left", "unknown-second-left", "unknown-on-right", "unknown-whole", "unknown-in-balanced-sentence"]),
+  "Unknowns Move Around must rotate five genuinely different equation forms.",
+);
+
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
 assert.equal(REALM_REGISTRY.pattern.totalWeeks, 8, "Pattern Peaks needs the agreed eight-week contract.");

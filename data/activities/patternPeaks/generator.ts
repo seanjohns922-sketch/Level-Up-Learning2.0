@@ -60,6 +60,7 @@ export const PATTERN_YEAR3_WEEK8_LESSON1_RULE_LABELS = [
 const recentYear3Week5NumberSets = new Map<number, string[]>();
 const year3Week7FactorBags = new Map<number, number[]>();
 let year3Week8RuleBag: string[] = [];
+let year4Week2EquationFormBag: number[] = [];
 
 export function isPatternPeaksQuestion(question: unknown): question is Year2QuestionData {
   if (!question || typeof question !== "object") return false;
@@ -124,6 +125,13 @@ function nextYear3Week8RuleLabel() {
     year3Week8RuleBag = shuffle(PATTERN_YEAR3_WEEK8_LESSON1_RULE_LABELS);
   }
   return year3Week8RuleBag.shift()!;
+}
+
+function nextYear4Week2EquationForm() {
+  if (year4Week2EquationFormBag.length === 0) {
+    year4Week2EquationFormBag = shuffle([0, 1, 2, 3, 4]);
+  }
+  return year4Week2EquationFormBag.shift()!;
 }
 
 function uniqueOptions(answer: string, distractors: Array<string | number>) {
@@ -602,7 +610,12 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
   return year3Question(mixedWeek, lessonNumber, role);
 }
 
-function year4Question(week: number, lessonNumber: number, role: RotationRole): Year2QuestionData {
+function year4Question(
+  week: number,
+  lessonNumber: number,
+  role: RotationRole,
+  useDedicatedWeekTwo = false,
+): Year2QuestionData {
   if (week === 1 && lessonNumber <= 2) {
     const known = rand(35, 140);
     const missing = rand(12, 70);
@@ -642,6 +655,74 @@ function year4Question(week: number, lessonNumber: number, role: RotationRole): 
       missing,
       helper,
       unknownVisual("Balance both number sentences", left, right),
+    );
+  }
+
+  if (week === 2 && useDedicatedWeekTwo) {
+    if (lessonNumber === 1) {
+      const knownA = rand(20, 90);
+      const knownB = rand(10, 60);
+      const missing = rand(12, 70);
+      const total = knownA + knownB + missing;
+      return typed(
+        `${knownA} + ${knownB} + □ = ${total}. Type the unknown.`,
+        missing,
+        role === "reasoning"
+          ? `Combine the known parts first: ${knownA} + ${knownB} = ${knownA + knownB}.`
+          : `Subtract both known parts from ${total}.`,
+        unknownVisual("Combine, then find the missing part", `${knownA} + ${knownB} + □`, String(total)),
+      );
+    }
+
+    if (lessonNumber === 2) {
+      const known = rand(35, 140);
+      const missing = rand(12, 70);
+      const total = known + missing;
+      const form = nextYear4Week2EquationForm();
+      let left: string;
+      let right: string;
+      let answer = missing;
+
+      if (form === 0) {
+        left = `□ + ${known}`;
+        right = String(total);
+      } else if (form === 1) {
+        left = `${known} + □`;
+        right = String(total);
+      } else if (form === 2) {
+        left = String(total);
+        right = `□ + ${known}`;
+      } else if (form === 3) {
+        left = `${known} + ${missing}`;
+        right = "□";
+        answer = total;
+      } else {
+        const completePartA = rand(20, total - 20);
+        const completePartB = total - completePartA;
+        left = `${completePartA} + ${completePartB}`;
+        right = `${known} + □`;
+      }
+
+      return typed(
+        `${left} = ${right}. Type the unknown.`,
+        answer,
+        role === "reasoning"
+          ? "Treat the equals sign as a balance: both complete sides need the same value."
+          : "Calculate the known value, then find what is missing.",
+        unknownVisual("Track the moving unknown", left, right),
+      );
+    }
+
+    const known = rand(35, 160);
+    const missing = rand(12, 80);
+    const total = known + missing;
+    return typed(
+      `Use the inverse to find the unknown in ${known} + □ = ${total}.`,
+      missing,
+      role === "reasoning"
+        ? `Check that ${total} − ${known} gives the same missing value.`
+        : "Undo the addition with subtraction.",
+      inverseVisual("Solve, then check", `${known} + □ = ${total}`, `${total} − ${known} = ?`),
     );
   }
 
@@ -869,7 +950,7 @@ export function generatePatternPeaksQuestion(
   const question = patternLevel === 3
     ? year3Question(lesson.week, lessonNumber, role)
     : patternLevel === 4
-      ? year4Question(lesson.week, lessonNumber, role)
+      ? year4Question(lesson.week, lessonNumber, role, true)
       : patternLevel === 5
         ? year5Question(lesson.week, lessonNumber, role)
         : year6Question(lesson.week, lessonNumber, role);
