@@ -15,6 +15,7 @@ import {
 import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/year2/lessonEngine";
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
 import { isLessonQuestionSafe } from "@/lib/task-safety";
+import { countInlineMathAnswerSlots } from "@/lib/inline-math-answer";
 import { getAllLegends } from "@/data/legends";
 
 const root = process.cwd();
@@ -24,6 +25,8 @@ const descriptorSets: Record<PatternPeaksYearLabel, Set<string>> = {
   "Year 5": new Set(["AC9M5A01", "AC9M5A02"]),
   "Year 6": new Set(["AC9M6A01", "AC9M6A02", "AC9M6A03"]),
 };
+
+const inlineTypedVisualTypes = new Set<string>();
 
 for (const level of Object.keys(PATTERN_PEAKS_PROGRAMS) as PatternPeaksYearLabel[]) {
   const program = PATTERN_PEAKS_PROGRAMS[level];
@@ -65,6 +68,11 @@ for (const level of Object.keys(PATTERN_PEAKS_PROGRAMS) as PatternPeaksYearLabel
           assert(isLessonQuestionSafe(activity, question), `${level} ${currentLesson.title} generated an unsafe ${String(activity.config.rotationRole)} question.`);
           assert("visual" in question && question.visual, `${level} ${currentLesson.title} generated a question without an algebra visual.`);
           assert("helper" in question && question.helper, `${level} ${currentLesson.title} generated a question without guided feedback.`);
+          if (question.kind === "typed_response") {
+            const slotCount = countInlineMathAnswerSlots(question.visual);
+            assert(slotCount <= 1, `${level} ${currentLesson.title} generated ${slotCount} competing inline answer fields.`);
+            if (slotCount === 1 && question.visual) inlineTypedVisualTypes.add(question.visual.type);
+          }
         }
       }
       currentLesson.curriculum.forEach((code) => usedDescriptors.add(code));
@@ -73,6 +81,18 @@ for (const level of Object.keys(PATTERN_PEAKS_PROGRAMS) as PatternPeaksYearLabel
   }
   assert.deepEqual(usedDescriptors, allowedDescriptors, `${level} does not cover its complete ACARA Algebra descriptor set.`);
   assert.equal(mechanics.size, 24, `${level} needs a distinct mechanic for every lesson blueprint.`);
+}
+
+for (const visualType of [
+  "pattern_sequence_strip",
+  "function_machine_card",
+  "input_output_table",
+  "expression_flow",
+  "unknown_tile_equation",
+  "bracket_equation_card",
+  "inverse_step_card",
+]) {
+  assert(inlineTypedVisualTypes.has(visualType), `Pattern Peaks never generated an inline ${visualType} typed response.`);
 }
 
 const levelThreeDoubleOrHalve = PATTERN_PEAKS_PROGRAMS["Year 3"][0]!.lessons[1]!;
@@ -160,9 +180,13 @@ assert(lessonShell.includes("Year2LessonEngine"), "Pattern Peaks lessons do not 
 assert(lessonShell.includes("generatePatternPeaksQuestion"), "Pattern Peaks lessons do not use their curriculum generator.");
 assert(lessonShell.includes("isQuestionCompatible={isPatternPeaksQuestion}"), "Pattern Peaks does not reject incompatible saved or generated questions.");
 const typedResponseActivity = fs.readFileSync(path.join(root, "components/activities/TypedResponseActivity.tsx"), "utf8");
-assert(typedResponseActivity.includes("hasInlinePatternSequenceInput"), "Typed sequence questions do not place the answer field in the missing term.");
+assert(typedResponseActivity.includes("hasInlineVisualInput"), "Typed Pattern Peaks questions do not place the answer field in the visual's missing value.");
 const patternSequenceVisual = fs.readFileSync(path.join(root, "components/activities/PatternSequenceStripVisual.tsx"), "utf8");
-assert(patternSequenceVisual.includes('aria-label="Missing term"'), "The inline missing-term field is not accessible.");
+assert(patternSequenceVisual.includes('ariaLabel="Missing term"'), "The inline missing-term field is not accessible.");
+for (const visualFile of ["FunctionMachineCardVisual.tsx", "InputOutputTableVisual.tsx", "ExpressionFlowVisual.tsx", "EquationVisualCards.tsx"]) {
+  const source = fs.readFileSync(path.join(root, "components/activities", visualFile), "utf8");
+  assert(source.includes("InlineMathAnswerInput"), `${visualFile} does not support inline Pattern Peaks answers.`);
+}
 
 const towerPortalConfig = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-chamber-config.ts"), "utf8");
 assert(towerPortalConfig.includes('posterAsset: "/images/patternpeaks-home-bg-y6.jpeg"'), "Pattern Peaks tower portal must use the Level 6 realm background, not a card asset.");

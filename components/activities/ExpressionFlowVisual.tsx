@@ -1,6 +1,7 @@
 "use client";
 
 import { MathFormattedText } from "@/components/FractionText";
+import InlineMathAnswerInput, { type InlineMathInputMode } from "@/components/activities/InlineMathAnswerInput";
 import type { ExpressionFlowVisualData } from "@/data/activities/year2/lessonEngine";
 
 function tokenTone(token: string) {
@@ -18,9 +19,28 @@ function tokenTone(token: string) {
 
 export default function ExpressionFlowVisual({
   visual,
+  answerValue,
+  onAnswerChange,
+  answerInputMode,
 }: {
   visual: ExpressionFlowVisualData;
+  answerValue?: string;
+  onAnswerChange?: (value: string) => void;
+  answerInputMode?: InlineMathInputMode;
 }) {
+  const renderValue = (value: string) =>
+    value === "?" && onAnswerChange ? (
+      <InlineMathAnswerInput
+        value={answerValue ?? ""}
+        onChange={onAnswerChange}
+        inputMode={answerInputMode}
+        tone="dark"
+        ariaLabel="Missing result"
+      />
+    ) : (
+      <MathFormattedText text={value} />
+    );
+
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -81,7 +101,7 @@ export default function ExpressionFlowVisual({
                       isHighlighted ? "bg-cyan-400/15 shadow-[0_0_12px_rgba(34,211,238,0.35)] ring-1 ring-cyan-300/60" : "",
                     ].join(" ")}
                   >
-                    <MathFormattedText text={token} />
+                    {renderValue(token)}
                   </div>
                 );
               })}
@@ -96,7 +116,7 @@ export default function ExpressionFlowVisual({
 
             {card.result ? (
               <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xl font-black text-cyan-100">
-                = <MathFormattedText text={card.result} />
+                = {renderValue(card.result)}
               </div>
             ) : null}
 

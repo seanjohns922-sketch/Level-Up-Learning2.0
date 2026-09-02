@@ -44,6 +44,7 @@ import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVi
 import ReversePatternCardVisual from "@/components/activities/ReversePatternCardVisual";
 import { Fraction, MathFormattedText } from "@/components/FractionText";
 import { hasRequiredRelationshipVisual } from "@/lib/relationship-visual";
+import { countInlineMathAnswerSlots } from "@/lib/inline-math-answer";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
@@ -1674,9 +1675,12 @@ export default function TypedResponseActivity({
     !declaredInputType &&
     /^-?\d+$/.test(questionData.answer.replace(/,/g, "").trim());
   const isIntegerInput = declaredInputType === "integer" || inferredIntegerInput;
-  const hasInlinePatternSequenceInput =
-    questionData.visual?.type === "pattern_sequence_strip" &&
-    questionData.visual.terms.filter((term) => term === "?").length === 1;
+  const inlineAnswerInputMode = isIntegerInput
+    ? "numeric" as const
+    : /^-?\d+(?:\.\d+)?$/.test(questionData.answer.replace(/,/g, "").trim())
+      ? "decimal" as const
+      : undefined;
+  const hasInlineVisualInput = countInlineMathAnswerSlots(questionData.visual) === 1;
   const isCartesianPlotTask =
     questionData.visual?.type === "cartesian_grid" &&
     Boolean(questionData.visual.targetCoordinate) &&
@@ -2795,9 +2799,9 @@ export default function TypedResponseActivity({
       {questionData.visual?.type === "pattern_sequence_strip" ? (
         <PatternSequenceStripVisual
           visual={questionData.visual}
-          missingTermValue={hasInlinePatternSequenceInput ? typed : undefined}
-          onMissingTermChange={hasInlinePatternSequenceInput ? setTyped : undefined}
-          missingTermInputMode={isIntegerInput ? "numeric" : "decimal"}
+          missingTermValue={hasInlineVisualInput ? typed : undefined}
+          onMissingTermChange={hasInlineVisualInput ? setTyped : undefined}
+          missingTermInputMode={inlineAnswerInputMode}
         />
       ) : null}
       {questionData.visual?.type === "growing_pattern" ? (
@@ -2807,10 +2811,20 @@ export default function TypedResponseActivity({
         <ErrorPatternVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "function_machine_card" ? (
-        <FunctionMachineCardVisual visual={questionData.visual} />
+        <FunctionMachineCardVisual
+          visual={questionData.visual}
+          answerValue={hasInlineVisualInput ? typed : undefined}
+          onAnswerChange={hasInlineVisualInput ? setTyped : undefined}
+          answerInputMode={inlineAnswerInputMode}
+        />
       ) : null}
       {questionData.visual?.type === "input_output_table" ? (
-        <InputOutputTableVisual visual={questionData.visual} />
+        <InputOutputTableVisual
+          visual={questionData.visual}
+          answerValue={hasInlineVisualInput ? typed : undefined}
+          onAnswerChange={hasInlineVisualInput ? setTyped : undefined}
+          answerInputMode={inlineAnswerInputMode}
+        />
       ) : null}
       {questionData.visual?.type === "missing_rule_machine" ? (
         <MissingRuleMachineVisual visual={questionData.visual} />
@@ -2851,19 +2865,24 @@ export default function TypedResponseActivity({
         />
       ) : null}
       {questionData.visual?.type === "expression_flow" ? (
-        <ExpressionFlowVisual visual={questionData.visual} />
+        <ExpressionFlowVisual
+          visual={questionData.visual}
+          answerValue={hasInlineVisualInput ? typed : undefined}
+          onAnswerChange={hasInlineVisualInput ? setTyped : undefined}
+          answerInputMode={inlineAnswerInputMode}
+        />
       ) : null}
       {questionData.visual?.type === "balance_equation_card" ? (
-        <BalanceEquationCardVisual visual={questionData.visual} />
+        <BalanceEquationCardVisual visual={questionData.visual} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
       ) : null}
       {questionData.visual?.type === "inverse_step_card" ? (
-        <InverseStepCardVisual visual={questionData.visual} />
+        <InverseStepCardVisual visual={questionData.visual} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
       ) : null}
       {questionData.visual?.type === "unknown_tile_equation" ? (
-        <UnknownTileEquationVisual visual={questionData.visual} />
+        <UnknownTileEquationVisual visual={questionData.visual} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
       ) : null}
       {questionData.visual?.type === "bracket_equation_card" ? (
-        <BracketEquationCardVisual visual={questionData.visual} />
+        <BracketEquationCardVisual visual={questionData.visual} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
       ) : null}
       {questionData.visual?.type === "check_substitution_card" ? (
         <CheckBySubstitutionCardVisual visual={questionData.visual} />
@@ -3810,7 +3829,7 @@ export default function TypedResponseActivity({
                 <span>Tap a grid point to place the dot.</span>
               )}
             </div>
-          ) : questionData.visual?.type === "box_method" || hasInlinePatternSequenceInput || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
+          ) : questionData.visual?.type === "box_method" || hasInlineVisualInput || isColumnMultiplication || isStrategyMultiplication || isEstimateStrategyMultiplication || isDivisionRemainderCheck || isDivisionBuildGroups ? null : (
             <input
               value={typed}
               onChange={(event) =>

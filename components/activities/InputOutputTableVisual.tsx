@@ -1,13 +1,32 @@
 "use client";
 
 import { MathFormattedText } from "@/components/FractionText";
+import InlineMathAnswerInput, { type InlineMathInputMode } from "@/components/activities/InlineMathAnswerInput";
 import type { InputOutputTableVisualData } from "@/data/activities/year2/lessonEngine";
 
 export default function InputOutputTableVisual({
   visual,
+  answerValue,
+  onAnswerChange,
+  answerInputMode,
 }: {
   visual: InputOutputTableVisualData;
+  answerValue?: string;
+  onAnswerChange?: (value: string) => void;
+  answerInputMode?: InlineMathInputMode;
 }) {
+  const renderValue = (value: string, label: string) =>
+    value === "?" && onAnswerChange ? (
+      <InlineMathAnswerInput
+        value={answerValue ?? ""}
+        onChange={onAnswerChange}
+        inputMode={answerInputMode}
+        ariaLabel={`Missing ${label.toLowerCase()}`}
+      />
+    ) : (
+      <MathFormattedText text={value} />
+    );
+
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">
@@ -24,10 +43,10 @@ export default function InputOutputTableVisual({
             className="grid grid-cols-2 text-center text-2xl font-black text-slate-900"
           >
             <div className="px-4 py-4">
-              <MathFormattedText text={pair.input} />
+              {renderValue(pair.input, "Input")}
             </div>
             <div className="border-l border-slate-100 px-4 py-4">
-              <MathFormattedText text={pair.output} />
+              {renderValue(pair.output, "Output")}
             </div>
           </div>
         ))}

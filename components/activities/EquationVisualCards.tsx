@@ -1,6 +1,7 @@
 "use client";
 
 import { MathFormattedText } from "@/components/FractionText";
+import InlineMathAnswerInput, { type InlineMathInputMode } from "@/components/activities/InlineMathAnswerInput";
 import type {
   BalanceEquationCardVisualData,
   BracketEquationCardVisualData,
@@ -9,7 +10,17 @@ import type {
   UnknownTileEquationVisualData,
 } from "@/data/activities/year2/lessonEngine";
 
-function renderUnknownAware(text: string, unknownSymbol = "x") {
+type InlineAnswerProps = {
+  answerValue?: string;
+  onAnswerChange?: (value: string) => void;
+  answerInputMode?: InlineMathInputMode;
+};
+
+function renderUnknownAware(
+  text: string,
+  unknownSymbol = "x",
+  answer?: InlineAnswerProps & { tone?: "light" | "dark" },
+) {
   const parts = text.split(unknownSymbol);
   if (parts.length === 1) {
     return <MathFormattedText text={text} />;
@@ -21,9 +32,19 @@ function renderUnknownAware(text: string, unknownSymbol = "x") {
         <span key={`${part}-${index}`} className="inline-flex items-center gap-2">
           {part ? <MathFormattedText text={part} /> : null}
           {index < parts.length - 1 ? (
-            <span className="inline-flex h-9 min-w-[2.2rem] items-center justify-center rounded-xl border border-cyan-300 bg-cyan-400/15 px-2 text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,0.3)]">
-              {unknownSymbol}
-            </span>
+            answer?.onAnswerChange ? (
+              <InlineMathAnswerInput
+                value={answer.answerValue ?? ""}
+                onChange={answer.onAnswerChange}
+                inputMode={answer.answerInputMode}
+                tone={answer.tone}
+                ariaLabel="Missing value"
+              />
+            ) : (
+              <span className="inline-flex h-9 min-w-[2.2rem] items-center justify-center rounded-xl border border-cyan-300 bg-cyan-400/15 px-2 text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,0.3)]">
+                {unknownSymbol}
+              </span>
+            )
           ) : null}
         </span>
       ))}
@@ -36,11 +57,13 @@ function EquationSide({
   value,
   unknownSymbol,
   accent = "slate",
+  answer,
 }: {
   label: string;
   value: string;
   unknownSymbol?: string;
   accent?: "slate" | "gold";
+  answer?: InlineAnswerProps;
 }) {
   return (
     <div
@@ -55,7 +78,7 @@ function EquationSide({
         {label}
       </div>
       <div className="mt-2 text-2xl font-black text-slate-900">
-        {renderUnknownAware(value, unknownSymbol)}
+        {renderUnknownAware(value, unknownSymbol, answer)}
       </div>
     </div>
   );
@@ -63,20 +86,21 @@ function EquationSide({
 
 export function BalanceEquationCardVisual({
   visual,
+  ...answer
 }: {
   visual: BalanceEquationCardVisualData;
-}) {
+} & InlineAnswerProps) {
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">
         {visual.title}
       </div>
       <div className="mt-4 grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
-        <EquationSide label="Left side" value={visual.left} unknownSymbol={visual.unknownSymbol} />
+        <EquationSide label="Left side" value={visual.left} unknownSymbol={visual.unknownSymbol} answer={answer} />
         <div className="text-center text-3xl font-black text-cyan-600 drop-shadow-[0_0_10px_rgba(34,211,238,0.35)]">
           =
         </div>
-        <EquationSide label="Right side" value={visual.right} unknownSymbol={visual.unknownSymbol} />
+        <EquationSide label="Right side" value={visual.right} unknownSymbol={visual.unknownSymbol} answer={answer} />
       </div>
     </div>
   );
@@ -84,9 +108,10 @@ export function BalanceEquationCardVisual({
 
 export function InverseStepCardVisual({
   visual,
+  ...answer
 }: {
   visual: InverseStepCardVisualData;
-}) {
+} & InlineAnswerProps) {
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">
@@ -94,12 +119,14 @@ export function InverseStepCardVisual({
       </div>
       <div className="mt-4 rounded-[24px] border border-cyan-200 bg-slate-950 p-4 shadow-[0_0_24px_rgba(34,211,238,0.1)]">
         <div className="text-center text-2xl font-black text-white">
-          <MathFormattedText text={visual.equation} />
+          {renderUnknownAware(visual.equation, "?", { ...answer, tone: "dark" })}
         </div>
         <div className="mt-4 inline-flex rounded-full border border-cyan-300 bg-cyan-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-cyan-200">
           {visual.focusLabel ?? "Undo step"}
         </div>
-        <div className="mt-3 text-lg font-black text-cyan-100">{visual.inverseOperation}</div>
+        <div className="mt-3 text-lg font-black text-cyan-100">
+          {renderUnknownAware(visual.inverseOperation, "?", { ...answer, tone: "dark" })}
+        </div>
       </div>
     </div>
   );
@@ -107,9 +134,10 @@ export function InverseStepCardVisual({
 
 export function UnknownTileEquationVisual({
   visual,
+  ...answer
 }: {
   visual: UnknownTileEquationVisualData;
-}) {
+} & InlineAnswerProps) {
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">
@@ -120,11 +148,12 @@ export function UnknownTileEquationVisual({
           label="Mystery side"
           value={visual.left}
           unknownSymbol={visual.unknownSymbol ?? "□"}
+          answer={answer}
         />
         <div className="text-center text-3xl font-black text-cyan-600 drop-shadow-[0_0_10px_rgba(34,211,238,0.35)]">
           =
         </div>
-        <EquationSide label="Known side" value={visual.right} unknownSymbol={visual.unknownSymbol ?? "□"} />
+        <EquationSide label="Known side" value={visual.right} unknownSymbol={visual.unknownSymbol ?? "□"} answer={answer} />
       </div>
     </div>
   );
@@ -132,20 +161,22 @@ export function UnknownTileEquationVisual({
 
 export function BracketEquationCardVisual({
   visual,
+  ...answer
 }: {
   visual: BracketEquationCardVisualData;
-}) {
+} & InlineAnswerProps) {
+  const unknownSymbol = visual.left.includes("□") || visual.right.includes("□") ? "□" : "?";
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">
         {visual.title}
       </div>
       <div className="mt-4 grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
-        <EquationSide label="Left side" value={visual.left} unknownSymbol="x" accent="gold" />
+        <EquationSide label="Left side" value={visual.left} unknownSymbol={unknownSymbol} accent="gold" answer={answer} />
         <div className="text-center text-3xl font-black text-cyan-600 drop-shadow-[0_0_10px_rgba(34,211,238,0.35)]">
           =
         </div>
-        <EquationSide label="Right side" value={visual.right} unknownSymbol="x" />
+        <EquationSide label="Right side" value={visual.right} unknownSymbol={unknownSymbol} answer={answer} />
       </div>
       {(visual.bracketGroup || visual.outsideFactor) ? (
         <div className="mt-4 flex flex-wrap gap-2">

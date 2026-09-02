@@ -1,13 +1,32 @@
 "use client";
 
 import { MathFormattedText } from "@/components/FractionText";
+import InlineMathAnswerInput, { type InlineMathInputMode } from "@/components/activities/InlineMathAnswerInput";
 import type { FunctionMachineCardVisualData } from "@/data/activities/year2/lessonEngine";
 
 export default function FunctionMachineCardVisual({
   visual,
+  answerValue,
+  onAnswerChange,
+  answerInputMode,
 }: {
   visual: FunctionMachineCardVisualData;
+  answerValue?: string;
+  onAnswerChange?: (value: string) => void;
+  answerInputMode?: InlineMathInputMode;
 }) {
+  const renderValue = (value: string, label: string) =>
+    value === "?" && onAnswerChange ? (
+      <InlineMathAnswerInput
+        value={answerValue ?? ""}
+        onChange={onAnswerChange}
+        inputMode={answerInputMode}
+        ariaLabel={`Missing ${label.toLowerCase()}`}
+      />
+    ) : (
+      <MathFormattedText text={value} />
+    );
+
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">
@@ -19,7 +38,7 @@ export default function FunctionMachineCardVisual({
             Input
           </div>
           <div className="mt-2 text-3xl font-black text-slate-900">
-            <MathFormattedText text={visual.input} />
+            {renderValue(visual.input, "Input")}
           </div>
         </div>
         <div className="text-center text-2xl font-black text-cyan-700">→</div>
@@ -28,7 +47,7 @@ export default function FunctionMachineCardVisual({
             Rule
           </div>
           <div className="mt-2 text-2xl font-black text-white">
-            <MathFormattedText text={visual.rule} />
+            {renderValue(visual.rule, "Rule")}
           </div>
         </div>
         <div className="text-center text-2xl font-black text-cyan-700">→</div>
@@ -37,7 +56,7 @@ export default function FunctionMachineCardVisual({
             Output
           </div>
           <div className="mt-2 text-3xl font-black text-slate-900">
-            <MathFormattedText text={visual.output} />
+            {renderValue(visual.output, "Output")}
           </div>
         </div>
       </div>

@@ -150,11 +150,15 @@ function expressionVisual(title: string, expressions: string[]): QuestionVisual 
   return {
     type: "expression_flow",
     title,
-    cards: expressions.map((expression, index) => ({
-      label: index === expressions.length - 1 ? "Result" : `Step ${index + 1}`,
-      tokens: expression.split(" "),
-      result: index === expressions.length - 1 ? expression : undefined,
-    })),
+    cards: expressions.map((expression, index) => {
+      const isResult = index === expressions.length - 1;
+      const outputMatch = isResult ? expression.match(/^Output\s+(.+)$/) : null;
+      return {
+        label: isResult ? "Result" : `Step ${index + 1}`,
+        tokens: outputMatch ? ["Output"] : expression.split(" "),
+        result: isResult ? (outputMatch?.[1] ?? expression) : undefined,
+      };
+    }),
   };
 }
 
@@ -247,7 +251,12 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
       const total = a + b;
       const visual = inverseVisual("Addition and subtraction undo", `${a} + ${b} = ${total}`, `${total} − ${b} = ${a}`);
       return role === "apply_create"
-        ? typed(`Use the inverse: ${total} − ${b} = ?`, a, "Subtraction undoes the addition.", visual)
+        ? typed(
+            `Use the inverse: ${total} − ${b} = ?`,
+            a,
+            "Subtraction undoes the addition.",
+            inverseVisual("Addition and subtraction undo", `${a} + ${b} = ${total}`, `${total} − ${b} = ?`),
+          )
         : mcq("Which equation proves the addition fact?", `${total} − ${b} = ${a}`, [`${total} + ${b} = ${a}`, `${a} − ${b} = ${total}`], "Use subtraction to undo the addition.", visual);
     }
     const factorA = pick([3, 4, 5, 10]);
@@ -445,7 +454,14 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     const apply = (value: number) => value * multiplier + add;
     const pairs: Array<[number, number]> = [1, 2, 3, 4].map((input) => [input, apply(input)]);
     const visual = tableVisual("Connect table and rule", pairs);
-    if (role === "apply_create") return typed(`Use output = input × ${multiplier} + ${add}. What is the output for 10?`, apply(10), "Substitute the input into the complete rule.", visual);
+    if (role === "apply_create") {
+      return typed(
+        `Use output = input × ${multiplier} + ${add}. What is the output for 10?`,
+        apply(10),
+        "Substitute the input into the complete rule.",
+        tableVisual("Connect table and rule", [...pairs, [10, "?"]]),
+      );
+    }
     if (role === "reasoning") return mcq("How does this growth differ from simply adding the same amount to each output?", "The input is multiplied before the constant is added", ["Only the labels are different", "The output always doubles"], "Connect each table row to both operations in the rule.", visual);
     return mcq("Which rule matches the table?", `×${multiplier}, then +${add}`, [`+${multiplier}, then ×${add}`, `×${add}, then +${multiplier}`], "Test the rule against more than one row.", visual);
   }
@@ -471,7 +487,14 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     const bracketed = (a + b) * c;
     const unbracketed = a + b * c;
     const visual = bracketVisual("Brackets change the grouping", `(${a} + ${b}) × ${c}`, String(bracketed), `${a} + ${b}`, `× ${c}`);
-    if (role === "apply_create") return typed(`Calculate (${a} + ${b}) × ${c}.`, bracketed, "Calculate inside the brackets first.", visual);
+    if (role === "apply_create") {
+      return typed(
+        `Calculate (${a} + ${b}) × ${c}.`,
+        bracketed,
+        "Calculate inside the brackets first.",
+        bracketVisual("Brackets change the grouping", `(${a} + ${b}) × ${c}`, "?", `${a} + ${b}`, `× ${c}`),
+      );
+    }
     if (role === "reasoning") return mcq("Why do the bracketed and unbracketed expressions differ?", "The brackets make the addition happen first", ["Brackets are decorative", "Multiplication is ignored"], "Identify which operation the brackets group.", expressionVisual("Compare operation order", [`(${a} + ${b}) × ${c} = ${bracketed}`, `${a} + ${b} × ${c} = ${unbracketed}`]));
     return mcq("What value does the bracketed expression have?", bracketed, [unbracketed, a + b + c, a * b * c], "Complete the bracketed operation first.", visual);
   }
@@ -493,7 +516,14 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     const output = even ? input / 2 + 3 : input * 2 + 1;
     const path = even ? "Even → divide by 2 → add 3" : "Odd → multiply by 2 → add 1";
     const visual = expressionVisual("Decision algorithm", [`Input ${input}`, even ? `${input} ÷ 2 = ${input / 2}` : `${input} × 2 = ${input * 2}`, `Output ${output}`]);
-    if (role === "apply_create") return typed(`Follow the decision algorithm for input ${input}.`, output, path, visual);
+    if (role === "apply_create") {
+      return typed(
+        `Follow the decision algorithm for input ${input}.`,
+        output,
+        path,
+        expressionVisual("Decision algorithm", [`Input ${input}`, even ? `${input} ÷ 2 = ${input / 2}` : `${input} × 2 = ${input * 2}`, "Output ?"]),
+      );
+    }
     if (role === "reasoning") return mcq("Why was this branch selected?", even ? `${input} is even` : `${input} is odd`, [even ? `${input} is odd` : `${input} is even`, "The output was chosen first"], "Test the decision condition before following its steps.", visual);
     return mcq("Which path should the algorithm follow?", path, [even ? "Odd → multiply by 2 → add 1" : "Even → divide by 2 → add 3", "Always add 3"], "Classify the input at the decision point.", visual);
   }
@@ -502,17 +532,21 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 }
 
 export function generatePatternPeaksQuestion(
-  level: SupportedMathLevel,
+  _level: SupportedMathLevel,
   lesson: Lesson,
   activity: LessonActivity,
 ): Year2QuestionData {
   const role = roleFor(activity);
   const lessonNumber = lesson.lesson;
-  const question = level === 3
+  // The shared Number Nexus resolver intentionally caps Year 6 at its Level 5
+  // arithmetic contract. Pattern Peaks owns a real Year 6 algebra generator,
+  // so select this realm's level from its canonical lesson id instead.
+  const patternLevel = Number(lesson.id.match(/^y(\d+)-/)?.[1] ?? _level);
+  const question = patternLevel === 3
     ? year3Question(lesson.week, lessonNumber, role)
-    : level === 4
+    : patternLevel === 4
       ? year4Question(lesson.week, lessonNumber, role)
-      : level === 5
+      : patternLevel === 5
         ? year5Question(lesson.week, lessonNumber, role)
         : year6Question(lesson.week, lessonNumber, role);
 
