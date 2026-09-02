@@ -318,6 +318,9 @@ assert(lessonShell.includes("generatePatternPeaksQuestion"), "Pattern Peaks less
 assert(lessonShell.includes("isQuestionCompatible={isPatternPeaksQuestion}"), "Pattern Peaks does not reject incompatible saved or generated questions.");
 const typedResponseActivity = fs.readFileSync(path.join(root, "components/activities/TypedResponseActivity.tsx"), "utf8");
 assert(typedResponseActivity.includes("hasInlineVisualInput"), "Typed Pattern Peaks questions do not place the answer field in the visual's missing value.");
+const multipleChoiceActivity = fs.readFileSync(path.join(root, "components/activities/MultipleChoiceActivity.tsx"), "utf8");
+assert(multipleChoiceActivity.includes("compactPatternOptions"), "Short Pattern Peaks answers do not use the compact responsive grid.");
+assert(multipleChoiceActivity.includes('longestOptionLength <= 44'), "Long Pattern Peaks answers are not protected from cramped columns.");
 const patternSequenceVisual = fs.readFileSync(path.join(root, "components/activities/PatternSequenceStripVisual.tsx"), "utf8");
 assert(patternSequenceVisual.includes('ariaLabel="Missing term"'), "The inline missing-term field is not accessible.");
 for (const visualFile of ["FunctionMachineCardVisual.tsx", "InputOutputTableVisual.tsx", "ExpressionFlowVisual.tsx", "EquationVisualCards.tsx"]) {

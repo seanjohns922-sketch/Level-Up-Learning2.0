@@ -160,6 +160,23 @@ export default function MultipleChoiceActivity({
 
   const isMultiSelect =
     Array.isArray(questionData.correctAnswers) && questionData.correctAnswers.length > 0;
+  const longestOptionLength = questionData.options.reduce(
+    (longest, option) => Math.max(longest, option.length),
+    0,
+  );
+  const compactPatternOptions =
+    isPattern &&
+    !isMultiSelect &&
+    questionData.options.length >= 2 &&
+    questionData.options.length <= 4 &&
+    longestOptionLength <= 44;
+  const compactOptionColumns = compactPatternOptions
+    ? questionData.options.length === 2
+      ? "md:grid-cols-2"
+      : questionData.options.length === 3
+        ? "lg:grid-cols-3"
+        : "md:grid-cols-2 xl:grid-cols-4"
+    : "";
   const missingRelationshipVisual = !hasRequiredRelationshipVisual(
     questionData.prompt,
     questionData.visual?.type,
@@ -403,7 +420,7 @@ export default function MultipleChoiceActivity({
         <ReversePatternCardVisual visual={questionData.visual} />
       ) : null}
 
-      <div className="mt-6 grid gap-2.5">
+      <div className={["mt-6 grid gap-2.5", compactOptionColumns].join(" ")}>
         {questionData.options.map((option, index) => {
           const isPicked = isMultiSelect
             ? selected.includes(option)
@@ -414,7 +431,10 @@ export default function MultipleChoiceActivity({
               type="button"
               onClick={() => choose(option)}
               className={[
-                "group relative w-full rounded-2xl border px-5 py-4 text-left text-xl md:text-[1.4rem] font-extrabold tracking-tight transition-all duration-150",
+                "group relative w-full rounded-2xl border px-5 text-left font-extrabold tracking-tight transition-all duration-150",
+                compactPatternOptions
+                  ? "min-h-[68px] py-3 text-lg md:text-xl"
+                  : "py-4 text-xl md:text-[1.4rem]",
                 "active:translate-y-[1px] active:shadow-none",
                 renderMode === "lesson" && submitted && !isMultiSelect
                   ? option === questionData.answer
