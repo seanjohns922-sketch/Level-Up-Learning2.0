@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BarChart3, Compass, Orbit, Zap } from "lucide-react";
+import { BarChart3, Compass, Orbit, Sigma, Zap } from "lucide-react";
 
 type ComboTier = "cold" | "spark" | "surge" | "overdrive" | "nexus";
 
@@ -230,8 +230,11 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
-  const TIER_CONFIG = isMeasurement ? MEASUREMENT_TIER_CONFIG : isStarpath ? STARPATH_TIER_CONFIG : isStatistics ? STATISTICS_TIER_CONFIG : NEXUS_TIER_CONFIG;
-  const IconCmp = isMeasurement ? Compass : isStarpath ? Orbit : isStatistics ? BarChart3 : Zap;
+  const isPattern = realmId === "pattern";
+  // Pattern Peaks reuses the green-family combo tiers (closest to its emerald
+  // theme) with its own Sigma glyph.
+  const TIER_CONFIG = isMeasurement ? MEASUREMENT_TIER_CONFIG : isStarpath ? STARPATH_TIER_CONFIG : isStatistics || isPattern ? STATISTICS_TIER_CONFIG : NEXUS_TIER_CONFIG;
+  const IconCmp = isMeasurement ? Compass : isStarpath ? Orbit : isStatistics ? BarChart3 : isPattern ? Sigma : Zap;
   const prevCountRef = useRef(count);
   const [broken, setBroken] = useState(false);
   const [bump, setBump] = useState(false);
@@ -278,7 +281,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
       <div
         aria-hidden
         className="absolute -inset-[2px] pointer-events-none"
-        style={isMeasurement || isStarpath || isStatistics ? {
+        style={isMeasurement || isStarpath || isStatistics || isPattern ? {
           borderRadius: 12,
           background: config.borderGradient,
           transition: "background 0.5s ease",
@@ -293,7 +296,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
       {/* Inner plate */}
       <div
         className="relative overflow-hidden px-3 py-2.5"
-        style={isMeasurement || isStarpath || isStatistics ? {
+        style={isMeasurement || isStarpath || isStatistics || isPattern ? {
           borderRadius: 10,
           background: config.bgGradient,
           boxShadow:

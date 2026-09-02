@@ -56,6 +56,7 @@ export function LessonHUDRail({
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
+  const isPattern = realmId === "pattern";
 
   const showCrumb =
     typeof levelNumber === "number" &&
@@ -77,6 +78,9 @@ export function LessonHUDRail({
         } : isStatistics ? {
           borderRadius: 18,
           background: "linear-gradient(135deg, rgba(242,188,69,0.65) 0%, rgba(240,107,100,0.58) 48%, rgba(143,191,127,0.54) 100%)",
+        } : isPattern ? {
+          borderRadius: 18,
+          background: "linear-gradient(135deg, rgba(16,185,129,0.62) 0%, rgba(124,58,237,0.5) 48%, rgba(52,211,153,0.5) 100%)",
         } : {
           clipPath: "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
           background: "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
@@ -96,21 +100,27 @@ export function LessonHUDRail({
           borderRadius: 16,
           background: "linear-gradient(145deg, #13251d 0%, #244531 52%, #3b3020 100%)",
           boxShadow: "inset 0 1px 0 rgba(255,244,223,0.18), inset 0 -14px 28px rgba(8,18,13,0.52), 0 0 26px rgba(240,107,100,0.12)",
+        } : isPattern ? {
+          borderRadius: 16,
+          background: "linear-gradient(145deg, #0a110e 0%, #12261f 52%, #1b1638 100%)",
+          boxShadow: "inset 0 1px 0 rgba(167,243,208,0.18), inset 0 -14px 28px rgba(6,14,10,0.55), 0 0 26px rgba(124,58,237,0.16)",
         } : {
           clipPath: "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
           background: "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
           boxShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
         }}
       >
-        {isStarpath || isStatistics ? (
+        {isStarpath || isStatistics || isPattern ? (
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 opacity-30"
             style={{
               backgroundImage: isStatistics
                 ? "radial-gradient(circle, rgba(242,188,69,0.55) 1px, transparent 1.5px)"
+                : isPattern
+                ? "radial-gradient(circle, rgba(52,211,153,0.5) 1px, transparent 1.5px)"
                 : "radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1.4px)",
-              backgroundSize: isStatistics ? "22px 22px" : "26px 26px",
+              backgroundSize: isStatistics || isPattern ? "22px 22px" : "26px 26px",
             }}
           />
         ) : null}
@@ -131,6 +141,10 @@ export function LessonHUDRail({
                 border: "1px solid rgba(242,188,69,0.38)",
                 background: "rgba(255,244,223,0.08)",
                 color: "#fff0c7",
+              } : isPattern ? {
+                border: "1px solid rgba(52,211,153,0.38)",
+                background: "rgba(16,185,129,0.1)",
+                color: "#a7f3d0",
               } : {
                 border: "1px solid rgba(94,234,212,0.3)",
                 background: "rgba(94,234,212,0.1)",
@@ -159,6 +173,10 @@ export function LessonHUDRail({
                 border: "1px solid rgba(240,107,100,0.36)",
                 background: "rgba(240,107,100,0.12)",
                 color: "#ffd9d5",
+              } : isPattern ? {
+                border: "1px solid rgba(124,58,237,0.4)",
+                background: "rgba(124,58,237,0.16)",
+                color: "#ddd6fe",
               } : {
                   border: "1px solid rgba(110,231,183,0.3)",
                   background: "rgba(110,231,183,0.1)",
@@ -203,7 +221,7 @@ export function LessonHUDRail({
         {/* Combo chain counter */}
         <ComboCounter
           count={comboCount}
-          chainLabel={isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : isStatistics ? "DATA STREAK" : undefined}
+          chainLabel={isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : isStatistics ? "DATA STREAK" : isPattern ? "PATTERN STREAK" : undefined}
           realmId={realmId}
         />
 
@@ -218,6 +236,10 @@ export function LessonHUDRail({
                 border: "1px solid rgba(200,160,48,0.3)",
                 background: hintOpen ? "rgba(200,160,48,0.1)" : "rgba(200,160,48,0.07)",
                 boxShadow: hintOpen ? "0 0 14px rgba(200,160,48,0.15)" : undefined,
+              } : isPattern ? {
+                border: "1px solid rgba(52,211,153,0.32)",
+                background: hintOpen ? "rgba(16,185,129,0.12)" : "rgba(16,185,129,0.08)",
+                boxShadow: hintOpen ? "0 0 14px rgba(16,185,129,0.16)" : undefined,
               } : {
                 border: "1px solid rgba(251,191,36,0.3)",
                 background: "rgba(245,158,11,0.1)",

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartColumn, Hourglass, Orbit, Timer } from "lucide-react";
+import { ChartColumn, Hourglass, Orbit, Sigma, Timer } from "lucide-react";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -18,6 +18,8 @@ export function LessonTimer({
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
+  const isPattern = realmId === "pattern";
+  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern;
   const clamped = Math.max(0, seconds);
   const minutes = Math.floor(clamped / 60);
   const remaining = clamped % 60;
@@ -117,15 +119,33 @@ export function LessonTimer({
     danger: nexusPalette.danger,
   } as const;
 
-  const palette = (isMeasurement ? measurementPalette : isStarpath ? starpathPalette : isStatistics ? statisticsPalette : nexusPalette)[state];
-  const IconCmp = isMeasurement ? Hourglass : isStarpath ? Orbit : isStatistics ? ChartColumn : Timer;
+  const patternPalette = {
+    ok: {
+      bezel: "linear-gradient(135deg, rgba(16,185,129,0.6) 0%, rgba(124,58,237,0.5) 52%, rgba(52,211,153,0.46) 100%)",
+      bg: "linear-gradient(135deg, #0a110e 0%, #12261f 55%, #1b1638 100%)",
+      text: "text-emerald-50",
+      icon: "text-emerald-200",
+      glow: "rgba(52,211,153,0.5)",
+    },
+    warn: {
+      bezel: "linear-gradient(135deg, rgba(253,224,71,0.55) 0%, rgba(124,58,237,0.48) 52%, rgba(52,211,153,0.42) 100%)",
+      bg: "linear-gradient(135deg, #1e1a0c 0%, #2a1640 55%, #12261f 100%)",
+      text: "text-amber-100",
+      icon: "text-violet-200",
+      glow: "rgba(167,139,250,0.52)",
+    },
+    danger: nexusPalette.danger,
+  } as const;
+
+  const palette = (isMeasurement ? measurementPalette : isStarpath ? starpathPalette : isStatistics ? statisticsPalette : isPattern ? patternPalette : nexusPalette)[state];
+  const IconCmp = isMeasurement ? Hourglass : isStarpath ? Orbit : isStatistics ? ChartColumn : isPattern ? Sigma : Timer;
 
   return (
     <div className="relative inline-block min-w-[100px]">
       <div
         aria-hidden
         className="absolute -inset-[2px] pointer-events-none"
-        style={isMeasurement || isStarpath || isStatistics ? {
+        style={isRounded ? {
           borderRadius: 12,
           background: palette.bezel,
         } : {
@@ -136,7 +156,7 @@ export function LessonTimer({
       />
       <div
         className="relative inline-flex w-full items-center justify-center gap-1.5 px-3 py-2 overflow-hidden transition-colors duration-500"
-        style={isMeasurement || isStarpath || isStatistics ? {
+        style={isRounded ? {
           borderRadius: 10,
           background: palette.bg,
           boxShadow:
@@ -144,6 +164,8 @@ export function LessonTimer({
               ? "inset 0 1px 0 rgba(200,160,48,0.2), inset 0 -8px 16px rgba(0,0,0,0.45)"
               : isStarpath
                 ? "inset 0 1px 0 rgba(165,243,252,0.18), inset 0 -8px 16px rgba(2,6,23,0.48)"
+                : isPattern
+                  ? "inset 0 1px 0 rgba(167,243,208,0.18), inset 0 -8px 16px rgba(6,14,10,0.5)"
                 : "inset 0 1px 0 rgba(255,240,199,0.18), inset 0 -8px 16px rgba(8,18,13,0.48)",
         } : {
           clipPath:
@@ -153,7 +175,7 @@ export function LessonTimer({
             "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -8px 16px rgba(0,0,0,0.4)",
         }}
       >
-        {!isMeasurement && !isStarpath && !isStatistics && (
+        {!isRounded && (
           <div
             aria-hidden
             className="absolute inset-0 opacity-[0.15] pointer-events-none"
