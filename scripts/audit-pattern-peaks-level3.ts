@@ -11,6 +11,7 @@ import {
   isPatternPeaksQuestion,
   PATTERN_YEAR3_DOUBLE_STARTS,
   PATTERN_YEAR3_HALVING_FINAL_TERMS,
+  PATTERN_YEAR3_WEEK3_RULE_LABELS,
 } from "@/data/activities/patternPeaks/generator";
 import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/year2/lessonEngine";
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
@@ -118,6 +119,39 @@ assert(doubleOrHalveRules.has("Double"), "Year 3 Week 1 Lesson 2 must include do
 assert(doubleOrHalveRules.has("Halve"), "Year 3 Week 1 Lesson 2 must include halving.");
 assert(new Set(PATTERN_YEAR3_DOUBLE_STARTS).size >= 12, "Year 3 doubling needs a broad starting-number pool.");
 assert(new Set(PATTERN_YEAR3_HALVING_FINAL_TERMS).size >= 8, "Year 3 halving needs a broad number pool.");
+
+assert.equal(new Set(PATTERN_YEAR3_WEEK3_RULE_LABELS).size, 3, "Every Year 3 Week 3 lesson needs three distinct rules.");
+for (const currentLesson of PATTERN_PEAKS_PROGRAMS["Year 3"][2]!.lessons) {
+  const weekThreeQuestions = (currentLesson.activities ?? []).flatMap((activity) =>
+    Array.from({ length: 100 }, () => generatePatternPeaksQuestion(3, currentLesson, activity)),
+  );
+  const generatedRules = new Set(
+    weekThreeQuestions.flatMap((question) => {
+      if (!("visual" in question)) return [];
+      if (question.visual?.type === "function_machine_card") return [question.visual.rule];
+      if (question.kind === "multiple_choice" && question.prompt === "Which rule matches every input-output pair?") {
+        return [question.answer];
+      }
+      return [];
+    }),
+  );
+  assert.deepEqual(
+    generatedRules,
+    new Set(PATTERN_YEAR3_WEEK3_RULE_LABELS),
+    `Year 3 Week 3 ${currentLesson.title} must rotate through all three rules.`,
+  );
+  for (const question of weekThreeQuestions) {
+    if ("visual" in question && question.visual?.type === "input_output_table") {
+      assert(
+        question.visual.pairs.every((pair) => Number(pair.input) >= 0 && Number(pair.output) >= 0),
+        `Year 3 Week 3 ${currentLesson.title} generated a negative table value.`,
+      );
+    }
+    if ("answer" in question && typeof question.answer === "string" && /^-?\d+$/.test(question.answer)) {
+      assert(Number(question.answer) >= 0, `Year 3 Week 3 ${currentLesson.title} generated a negative answer.`);
+    }
+  }
+}
 
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");

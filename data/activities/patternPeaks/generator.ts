@@ -42,6 +42,7 @@ const PATTERN_VISUAL_TYPES = new Set([
 
 export const PATTERN_YEAR3_DOUBLE_STARTS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 25] as const;
 export const PATTERN_YEAR3_HALVING_FINAL_TERMS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20] as const;
+export const PATTERN_YEAR3_WEEK3_RULE_LABELS = ["×2", "+5", "−3"] as const;
 
 export function isPatternPeaksQuestion(question: unknown): question is Year2QuestionData {
   if (!question || typeof question !== "object") return false;
@@ -226,17 +227,20 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
   }
 
   if (week === 3) {
-    const input = rand(3, 12);
     const operations = [
-      { label: "×2", apply: (value: number) => value * 2 },
-      { label: "+5", apply: (value: number) => value + 5 },
-      { label: "−3", apply: (value: number) => value - 3 },
+      { label: PATTERN_YEAR3_WEEK3_RULE_LABELS[0], apply: (value: number) => value * 2, minimumInput: 1 },
+      { label: PATTERN_YEAR3_WEEK3_RULE_LABELS[1], apply: (value: number) => value + 5, minimumInput: 1 },
+      { label: PATTERN_YEAR3_WEEK3_RULE_LABELS[2], apply: (value: number) => value - 3, minimumInput: 3 },
     ] as const;
-    const operation = operations[(lessonNumber - 1) % operations.length]!;
+    // Every Week 3 lesson practises all three rules. Subtraction starts at 3 or
+    // above so Level 3 learners never encounter a negative input or output.
+    const operation = pick(operations);
+    const input = rand(Math.max(3, operation.minimumInput), 12);
     const output = operation.apply(input);
-    const pairs: Array<[number, number]> = [1, 2, 3].map((value) => [value, operation.apply(value)]);
+    const tableStart = rand(operation.minimumInput, Math.max(operation.minimumInput, 5));
+    const pairs: Array<[number, number]> = [tableStart, tableStart + 1, tableStart + 2].map((value) => [value, operation.apply(value)]);
     if (role === "fast_thinking") {
-      return mcq("What output does the machine make?", output, [output - 2, output + 2, input], "Apply the operation to the input once.", machineVisual("Function machine", input, operation.label, "?"));
+      return mcq("What output does the machine make?", output, [output + 1, output + 2, output + 5], "Apply the operation to the input once.", machineVisual("Function machine", input, operation.label, "?"));
     }
     if (role === "reasoning") {
       return mcq("Which rule matches every input-output pair?", operation.label, operations.filter((item) => item.label !== operation.label).map((item) => item.label), "A rule must work for every row, not just one.", tableVisual("Rule decoder", pairs));
