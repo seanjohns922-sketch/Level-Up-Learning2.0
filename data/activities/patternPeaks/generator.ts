@@ -330,6 +330,17 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
     const missing = rand(6, 20);
     const total = known + missing;
     const visual = unknownVisual("Hidden rune equation", `${known} + □`, String(total));
+    if (lessonNumber === 1) {
+      const prompt = role === "fast_thinking"
+        ? `${known} + □ = ${total}. Type the missing addend.`
+        : role === "reasoning"
+          ? `What value makes ${known} + □ = ${total} true?`
+          : `Complete the equation: ${known} + □ = ${total}.`;
+      const helper = role === "reasoning"
+        ? `Use the inverse: subtract ${known} from ${total}.`
+        : "Find the missing part of the total.";
+      return typed(prompt, missing, helper, visual);
+    }
     if (role === "apply_create") return typed(`${known} + □ = ${total}. Type the unknown.`, missing, "Subtract the known part from the whole.", visual);
     if (role === "reasoning") return mcq("Which check proves the unknown?", `${total} − ${known} = ${missing}`, [`${known} − ${missing} = ${total}`, `${total} + ${known} = ${missing}`], "Use the inverse and substitute the result.", visual);
     return mcq("What is the unknown?", missing, [missing - 2, missing + 2, known], "Find the missing part.", visual);

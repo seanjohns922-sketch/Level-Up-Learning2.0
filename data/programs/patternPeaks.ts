@@ -353,7 +353,14 @@ function buildProgram(yearLabel: PatternPeaksYearLabel, seeds: WeekSeed[]): Week
       curriculum: item.curriculum,
       activityType: "pattern-peaks",
       config: { realmId: "pattern", mechanic: item.mechanic, implementationStatus: "implemented" },
-      activities: patternActivities(id, item.mechanic, yearLabel === "Year 3" && weekNumber === 1 && lessonNumber === 2),
+      activities: patternActivities(
+        id,
+        item.mechanic,
+        yearLabel === "Year 3" && (
+          (weekNumber === 1 && lessonNumber === 2) ||
+          (weekNumber === 6 && lessonNumber === 1)
+        ),
+      ),
     };
     });
     return {

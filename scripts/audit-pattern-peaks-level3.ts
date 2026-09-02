@@ -185,6 +185,16 @@ for (const currentLesson of PATTERN_PEAKS_PROGRAMS["Year 3"][4]!.lessons) {
   );
 }
 
+const levelThreeMissingAddends = PATTERN_PEAKS_PROGRAMS["Year 3"][5]!.lessons[0]!;
+for (const activity of levelThreeMissingAddends.activities ?? []) {
+  for (let sample = 0; sample < 50; sample += 1) {
+    const question = generatePatternPeaksQuestion(3, levelThreeMissingAddends, activity);
+    assert.equal(question.kind, "typed_response", "Year 3 Week 6 Lesson 1 must use typed answers, not multiple choice.");
+    assert("visual" in question && question.visual?.type === "unknown_tile_equation", "Missing Addends needs its inline equation visual.");
+    assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Missing Addends needs exactly one inline answer field.");
+  }
+}
+
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
 assert.equal(REALM_REGISTRY.pattern.totalWeeks, 8, "Pattern Peaks needs the agreed eight-week contract.");
