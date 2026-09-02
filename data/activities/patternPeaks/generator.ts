@@ -44,8 +44,10 @@ export const PATTERN_YEAR3_DOUBLE_STARTS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 
 export const PATTERN_YEAR3_HALVING_FINAL_TERMS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20] as const;
 export const PATTERN_YEAR3_WEEK3_RULE_LABELS = ["×2", "+5", "−3"] as const;
 export const PATTERN_YEAR3_WEEK5_RECENT_WINDOW = 12;
+export const PATTERN_YEAR3_WEEK7_FACTORS = [3, 4, 5, 10] as const;
 
 const recentYear3Week5NumberSets = new Map<number, string[]>();
+let year3Week7FactorBag: number[] = [];
 
 export function isPatternPeaksQuestion(question: unknown): question is Year2QuestionData {
   if (!question || typeof question !== "object") return false;
@@ -90,6 +92,13 @@ function shuffle<T>(items: readonly T[]) {
     [result[index], result[swap]] = [result[swap]!, result[index]!];
   }
   return result;
+}
+
+function nextYear3Week7Factor() {
+  if (year3Week7FactorBag.length === 0) {
+    year3Week7FactorBag = shuffle(PATTERN_YEAR3_WEEK7_FACTORS);
+  }
+  return year3Week7FactorBag.shift()!;
 }
 
 function uniqueOptions(answer: string, distractors: Array<string | number>) {
@@ -347,9 +356,6 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
   }
 
   if (week === 7) {
-    const factor = pick([3, 4, 5, 10]);
-    const n = rand(3, 9);
-    const product = factor * n;
     if (lessonNumber === 1) {
       const base = rand(3, 9);
       const visual = sequenceVisual("Related addition facts", [base, base + 10, base + 20, base + 30, "?"], ["+10", "+10", "+10", null]);
@@ -357,9 +363,62 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
         ? typed("Type the next related value.", base + 40, "The ones stay the same while the tens increase.", visual)
         : mcq("What stays the same in this fact pattern?", "The ones digit", ["The tens digit", "Every digit changes"], "Compare place values in each term.", visual);
     }
+
+    if (lessonNumber === 2) {
+      const factor = nextYear3Week7Factor();
+      const firstMultiplier = rand(1, 5);
+      const multipliers = Array.from({ length: 5 }, (_, index) => firstMultiplier + index);
+      const products = multipliers.map((multiplier) => multiplier * factor);
+      const productLadder = sequenceVisual(
+        `${factor} facts product ladder`,
+        products,
+        Array.from({ length: products.length - 1 }, () => `+${factor}`),
+      );
+
+      if (role === "fast_thinking") {
+        return mcq(
+          `Which rule grows this ${factor} facts pattern?`,
+          `Add ${factor} each time`,
+          [`Add 1 each time`, `Multiply by ${factor} each time`, `Subtract ${factor} each time`],
+          `Each multiplier increases by 1, so each product increases by ${factor}.`,
+          productLadder,
+        );
+      }
+
+      if (role === "reasoning") {
+        return mcq(
+          "What happens to the product when the multiplier increases by 1?",
+          `The product increases by ${factor}`,
+          [`The product increases by 1`, `The product doubles`, `The product decreases by ${factor}`],
+          "Compare the output in each row with the output directly below it.",
+          tableVisual(
+            `${factor} facts relationship table`,
+            multipliers.map((multiplier, index) => [multiplier, products[index]!] as [number, number]),
+          ),
+        );
+      }
+
+      const missingIndex = rand(1, products.length - 2);
+      const missingProduct = products[missingIndex]!;
+      const terms = products.map((product, index) => index === missingIndex ? "?" : product);
+      return typed(
+        `Type the missing product in this ${factor} facts pattern.`,
+        missingProduct,
+        `The products increase by ${factor} each time. Check the fact ${factor} × ${multipliers[missingIndex]}.`,
+        sequenceVisual(
+          `${factor} facts missing product`,
+          terms,
+          Array.from({ length: terms.length - 1 }, () => `+${factor}`),
+        ),
+      );
+    }
+
+    const factor = pick(PATTERN_YEAR3_WEEK7_FACTORS);
+    const n = rand(3, 9);
+    const product = factor * n;
     const visual = { type: "array" as const, rows: factor, columns: n };
     if (role === "apply_create") return typed(`${factor} groups of ${n} make how many?`, product, "Use a known multiplication fact.", visual);
-    return mcq(lessonNumber === 2 ? "Which fact matches the array?" : "Which known fact is most efficient?", `${factor} × ${n} = ${product}`, [`${factor} + ${n} = ${product}`, `${product} ÷ ${factor} = ${product}`], "Choose the fact that matches equal rows and columns.", visual);
+    return mcq("Which known fact is most efficient?", `${factor} × ${n} = ${product}`, [`${factor} + ${n} = ${product}`, `${product} ÷ ${factor} = ${product}`], "Choose the fact that matches equal rows and columns.", visual);
   }
 
   const mixedWeek = ((lessonNumber - 1) % 3) + 3;

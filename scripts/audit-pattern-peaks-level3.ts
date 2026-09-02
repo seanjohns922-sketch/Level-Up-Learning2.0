@@ -13,6 +13,7 @@ import {
   PATTERN_YEAR3_HALVING_FINAL_TERMS,
   PATTERN_YEAR3_WEEK3_RULE_LABELS,
   PATTERN_YEAR3_WEEK5_RECENT_WINDOW,
+  PATTERN_YEAR3_WEEK7_FACTORS,
 } from "@/data/activities/patternPeaks/generator";
 import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/year2/lessonEngine";
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
@@ -194,6 +195,34 @@ for (const activity of levelThreeMissingAddends.activities ?? []) {
     assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Missing Addends needs exactly one inline answer field.");
   }
 }
+
+const levelThreeMultiplicationPatterns = PATTERN_PEAKS_PROGRAMS["Year 3"][6]!.lessons[1]!;
+const multiplicationPatternFactors = new Set<number>();
+for (const activity of levelThreeMultiplicationPatterns.activities ?? []) {
+  for (let sample = 0; sample < 40; sample += 1) {
+    const question = generatePatternPeaksQuestion(3, levelThreeMultiplicationPatterns, activity);
+    assert("visual" in question && question.visual, "Multiplication Fact Patterns needs a relationship visual.");
+    assert.notEqual(question.visual.type, "array", "Multiplication Fact Patterns must not fall back to isolated arrays.");
+    if (activity.config.rotationRole === "reasoning") {
+      assert.equal(question.visual.type, "input_output_table", "The reasoning rotation must compare several multiplication facts.");
+      const firstPair = question.visual.pairs[0]!;
+      multiplicationPatternFactors.add(Number(firstPair.output) / Number(firstPair.input));
+    } else {
+      assert.equal(question.visual.type, "pattern_sequence_strip", "The fact-pattern rotation needs a product ladder.");
+      const factorLabel = question.visual.arrowLabels?.[0];
+      assert(typeof factorLabel === "string" && factorLabel.startsWith("+"), "The product ladder must show its constant increase.");
+      multiplicationPatternFactors.add(Number(factorLabel.slice(1)));
+      if (question.kind === "typed_response") {
+        assert.equal(countInlineMathAnswerSlots(question.visual), 1, "The missing product must use one inline answer field.");
+      }
+    }
+  }
+}
+assert.deepEqual(
+  multiplicationPatternFactors,
+  new Set(PATTERN_YEAR3_WEEK7_FACTORS),
+  "Multiplication Fact Patterns must rotate the 3, 4, 5 and 10 fact families.",
+);
 
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
