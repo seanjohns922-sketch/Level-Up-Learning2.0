@@ -27,6 +27,23 @@ import {
 import { getSchoolLogo } from "@/lib/school-logos";
 import { getRealmWeekNumbers, selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
+// Coerce a class's stored year_level into a real curriculum year. A class with a
+// blank, legacy ("Foundation"), or mixed/odd year_level would otherwise flow
+// straight into getGenresForYear(), whose yearOrdinal() treats any unrecognised
+// label as ordinal 0 AND fails realm.levelLabels.includes(...) — making every
+// built realm render as "coming soon / placeholder". Normalise + fall back so
+// the curriculum view always shows real strands.
+function toCurriculumYear(raw: string | null | undefined): string {
+  const value = (raw ?? "").trim();
+  const lowered = value.toLowerCase();
+  if (lowered === "prep" || lowered === "foundation" || lowered === "ground" || lowered === "ground level") {
+    return "Prep";
+  }
+  const match = /^year\s*([1-6])$/i.exec(value);
+  if (match) return `Year ${match[1]}`;
+  return "Year 1";
+}
+
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = {
   id: string;
@@ -414,7 +431,7 @@ export default function TeacherDashboardPage() {
         const firstClassId = cls[0].id;
         setSelectedClassId(firstClassId);
         selectedClassRef.current = firstClassId;
-        setActiveYear(cls[0].year_level ?? "Year 1");
+        setActiveYear(toCurriculumYear(cls[0].year_level));
         // The class shell can render immediately. Historical attempts and live
         // telemetry hydrate in the background instead of delaying first paint.
         setLoading(false);
@@ -533,7 +550,7 @@ export default function TeacherDashboardPage() {
     const cls = classes.find(c => c.id === classId);
     console.log("[TeacherDashboard] selectedClassId:", classId, "code:", cls?.class_code);
     setSelectedClassId(classId);
-    setActiveYear(cls?.year_level ?? "Year 1");
+    setActiveYear(toCurriculumYear(cls?.year_level));
     setExpandedStudent(null);
     loadClassData(classId, false);
   }
