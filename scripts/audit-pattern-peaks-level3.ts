@@ -224,6 +224,37 @@ assert.deepEqual(
   "Multiplication Fact Patterns must rotate the 3, 4, 5 and 10 fact families.",
 );
 
+const levelThreeEfficientFacts = PATTERN_PEAKS_PROGRAMS["Year 3"][6]!.lessons[2]!;
+const efficientFactFactors = new Set<number>();
+const efficientStrategyFamilies = new Set<string>();
+for (const activity of levelThreeEfficientFacts.activities ?? []) {
+  for (let sample = 0; sample < 40; sample += 1) {
+    const question = generatePatternPeaksQuestion(3, levelThreeEfficientFacts, activity);
+    assert("visual" in question && question.visual?.type === "expression_flow", "Choose an Efficient Fact needs a related-fact pathway.");
+    assert(!question.prompt.includes("groups of"), "Choose an Efficient Fact fell back to an isolated array calculation.");
+    const factorMatch = question.prompt.match(/(\d+) ×/);
+    assert(factorMatch, "Choose an Efficient Fact must name its target multiplication fact.");
+    efficientFactFactors.add(Number(factorMatch[1]));
+    const questionText = `${question.prompt} ${"helper" in question ? question.helper ?? "" : ""}`;
+    if (/halve/i.test(questionText)) efficientStrategyFamilies.add("halve");
+    if (/double/i.test(questionText)) efficientStrategyFamilies.add("double");
+    if (/one more group/i.test(questionText)) efficientStrategyFamilies.add("one-more-group");
+    if (question.kind === "typed_response") {
+      assert.equal(countInlineMathAnswerSlots(question.visual), 1, "The efficient-fact calculation needs one inline product field.");
+    }
+  }
+}
+assert.deepEqual(
+  efficientFactFactors,
+  new Set(PATTERN_YEAR3_WEEK7_FACTORS),
+  "Choose an Efficient Fact must rotate the 3, 4, 5 and 10 fact families.",
+);
+assert.deepEqual(
+  efficientStrategyFamilies,
+  new Set(["halve", "double", "one-more-group"]),
+  "Choose an Efficient Fact must practise halving, doubling and adding one more group.",
+);
+
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
 assert.equal(REALM_REGISTRY.pattern.totalWeeks, 8, "Pattern Peaks needs the agreed eight-week contract.");

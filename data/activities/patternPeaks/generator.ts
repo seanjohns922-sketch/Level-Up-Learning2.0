@@ -47,7 +47,7 @@ export const PATTERN_YEAR3_WEEK5_RECENT_WINDOW = 12;
 export const PATTERN_YEAR3_WEEK7_FACTORS = [3, 4, 5, 10] as const;
 
 const recentYear3Week5NumberSets = new Map<number, string[]>();
-let year3Week7FactorBag: number[] = [];
+const year3Week7FactorBags = new Map<number, number[]>();
 
 export function isPatternPeaksQuestion(question: unknown): question is Year2QuestionData {
   if (!question || typeof question !== "object") return false;
@@ -94,11 +94,14 @@ function shuffle<T>(items: readonly T[]) {
   return result;
 }
 
-function nextYear3Week7Factor() {
-  if (year3Week7FactorBag.length === 0) {
-    year3Week7FactorBag = shuffle(PATTERN_YEAR3_WEEK7_FACTORS);
+function nextYear3Week7Factor(lessonNumber: number) {
+  let bag = year3Week7FactorBags.get(lessonNumber) ?? [];
+  if (bag.length === 0) {
+    bag = shuffle(PATTERN_YEAR3_WEEK7_FACTORS);
   }
-  return year3Week7FactorBag.shift()!;
+  const factor = bag.shift()!;
+  year3Week7FactorBags.set(lessonNumber, bag);
+  return factor;
 }
 
 function uniqueOptions(answer: string, distractors: Array<string | number>) {
@@ -365,7 +368,7 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
     }
 
     if (lessonNumber === 2) {
-      const factor = nextYear3Week7Factor();
+      const factor = nextYear3Week7Factor(lessonNumber);
       const firstMultiplier = rand(1, 5);
       const multipliers = Array.from({ length: 5 }, (_, index) => firstMultiplier + index);
       const products = multipliers.map((multiplier) => multiplier * factor);
@@ -413,12 +416,98 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
       );
     }
 
-    const factor = pick(PATTERN_YEAR3_WEEK7_FACTORS);
+    const factor = nextYear3Week7Factor(lessonNumber);
     const n = rand(3, 9);
     const product = factor * n;
-    const visual = { type: "array" as const, rows: factor, columns: n };
-    if (role === "apply_create") return typed(`${factor} groups of ${n} make how many?`, product, "Use a known multiplication fact.", visual);
-    return mcq("Which known fact is most efficient?", `${factor} × ${n} = ${product}`, [`${factor} + ${n} = ${product}`, `${product} ÷ ${factor} = ${product}`], "Choose the fact that matches equal rows and columns.", visual);
+    const relation = factor === 3
+      ? {
+          anchorFactor: 2,
+          strategy: `Add one more group of ${n}`,
+          working: `${2 * n} + ${n}`,
+          explanation: `Use 2 × ${n}, then add one more group of ${n}.`,
+        }
+      : factor === 4
+        ? {
+            anchorFactor: 2,
+            strategy: `Double the 2 × ${n} product`,
+            working: `${2 * n} × 2`,
+            explanation: `Use 2 × ${n}, then double that product.`,
+          }
+        : factor === 5
+          ? {
+              anchorFactor: 10,
+              strategy: `Halve the 10 × ${n} product`,
+              working: `${10 * n} ÷ 2`,
+              explanation: `Use 10 × ${n}, then halve that product.`,
+            }
+          : {
+              anchorFactor: 5,
+              strategy: `Double the 5 × ${n} product`,
+              working: `${5 * n} × 2`,
+              explanation: `Use 5 × ${n}, then double that product.`,
+            };
+    const anchorProduct = relation.anchorFactor * n;
+    const launchpadVisual: QuestionVisual = {
+      type: "expression_flow",
+      title: "Related-fact launchpad",
+      cards: [
+        {
+          label: "Known fact",
+          tokens: [String(relation.anchorFactor), "×", String(n), "=", String(anchorProduct)],
+        },
+        {
+          label: "Target fact",
+          tokens: [String(factor), "×", String(n)],
+          note: "Choose the shortest connection from the known fact.",
+        },
+      ],
+    };
+
+    if (role === "fast_thinking") {
+      return mcq(
+        `Which efficient strategy connects the known fact to ${factor} × ${n}?`,
+        relation.strategy,
+        [`Add ${factor}`, `Subtract ${n}`, `Multiply the known product by ${n}`],
+        "Look at how the known factor is related to the target factor.",
+        launchpadVisual,
+      );
+    }
+
+    if (role === "reasoning") {
+      return mcq(
+        `Which equation correctly derives ${factor} × ${n} from the known fact?`,
+        `${relation.working} = ${product}`,
+        [`${relation.working} = ${product + factor}`, `${relation.working} = ${Math.max(0, product - factor)}`, `${factor} + ${n} = ${product}`],
+        relation.explanation,
+        launchpadVisual,
+      );
+    }
+
+    const calculationVisual: QuestionVisual = {
+      type: "expression_flow",
+      title: "Efficient-fact pathway",
+      cards: [
+        {
+          label: "Known fact",
+          tokens: [String(relation.anchorFactor), "×", String(n), "=", String(anchorProduct)],
+        },
+        {
+          label: "Efficient move",
+          tokens: relation.strategy.split(" "),
+        },
+        {
+          label: "Target product",
+          tokens: [String(factor), "×", String(n)],
+          result: "?",
+        },
+      ],
+    };
+    return typed(
+      `Use the related fact to calculate ${factor} × ${n}.`,
+      product,
+      relation.explanation,
+      calculationVisual,
+    );
   }
 
   const mixedWeek = ((lessonNumber - 1) % 3) + 3;
