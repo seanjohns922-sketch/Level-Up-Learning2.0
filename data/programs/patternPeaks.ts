@@ -3,6 +3,14 @@ import type { LessonActivity } from "./types";
 
 export type PatternPeaksYearLabel = "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
+export type PatternPeaksLessonConceptIntro = {
+  term: string;
+  title: string;
+  meaning: string;
+  example: string;
+  exampleExplanation: string;
+};
+
 type LessonSeed = { title: string; focus: string; mechanic: string; curriculum: CurriculumCode[] };
 type WeekSeed = { topic: string; purpose: string; lessons: [LessonSeed, LessonSeed, LessonSeed] };
 
@@ -362,7 +370,8 @@ function buildProgram(yearLabel: PatternPeaksYearLabel, seeds: WeekSeed[]): Week
           (weekNumber === 7 && lessonNumber === 3)
         ) || yearLabel === "Year 4" && (
           (weekNumber === 1 && lessonNumber <= 2) ||
-          weekNumber === 2
+          weekNumber === 2 ||
+          weekNumber === 4
         ),
       ),
     };
@@ -393,6 +402,40 @@ export const PATTERN_PEAKS_LEVEL3_PROGRAM = PATTERN_PEAKS_PROGRAMS["Year 3"];
 export const PATTERN_PEAKS_LEVEL4_PROGRAM = PATTERN_PEAKS_PROGRAMS["Year 4"];
 export const PATTERN_PEAKS_LEVEL5_PROGRAM = PATTERN_PEAKS_PROGRAMS["Year 5"];
 export const PATTERN_PEAKS_LEVEL6_PROGRAM = PATTERN_PEAKS_PROGRAMS["Year 6"];
+
+const LEVEL4_WEEK4_CONCEPT_INTROS: Record<number, PatternPeaksLessonConceptIntro> = {
+  1: {
+    term: "Commutative",
+    title: "Order can change",
+    meaning: "When we add, we can swap the addends and the total stays the same.",
+    example: "4 + 7 = 7 + 4",
+    exampleExplanation: "Both sides equal 11.",
+  },
+  2: {
+    term: "Associative",
+    title: "Grouping can change",
+    meaning: "When adding three or more numbers, we can change which pair we add first and keep the same total.",
+    example: "(3 + 7) + 5 = 3 + (7 + 5)",
+    exampleExplanation: "Both sides equal 15.",
+  },
+  3: {
+    term: "Equivalent",
+    title: "Different expressions, same value",
+    meaning: "Two calculations are equivalent when they look different but have the same value.",
+    example: "8 + 6 = 20 − 6",
+    exampleExplanation: "Both sides equal 14.",
+  },
+};
+
+export function getPatternPeaksLessonConceptIntro(
+  yearLabel: PatternPeaksYearLabel,
+  week: number,
+  lessonNumber: number,
+) {
+  return yearLabel === "Year 4" && week === 4
+    ? LEVEL4_WEEK4_CONCEPT_INTROS[lessonNumber]
+    : undefined;
+}
 
 export function getPatternPeaksWeekPurposes(yearLabel: PatternPeaksYearLabel): Record<number, string> {
   return Object.fromEntries(PATTERN_PEAKS_SPINES[yearLabel].map((week) => [week.week, week.purpose]));

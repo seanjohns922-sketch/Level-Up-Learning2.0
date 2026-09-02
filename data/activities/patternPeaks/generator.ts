@@ -614,7 +614,7 @@ function year4Question(
   week: number,
   lessonNumber: number,
   role: RotationRole,
-  useDedicatedWeekTwo = false,
+  useDedicatedLessons = false,
 ): Year2QuestionData {
   if (week === 1 && lessonNumber <= 2) {
     const known = rand(35, 140);
@@ -658,7 +658,7 @@ function year4Question(
     );
   }
 
-  if (week === 2 && useDedicatedWeekTwo) {
+  if (week === 2 && useDedicatedLessons) {
     if (lessonNumber === 1) {
       const knownA = rand(20, 90);
       const knownB = rand(10, 60);
@@ -723,6 +723,50 @@ function year4Question(
         ? `Check that ${total} − ${known} gives the same missing value.`
         : "Undo the addition with subtraction.",
       inverseVisual("Solve, then check", `${known} + □ = ${total}`, `${total} − ${known} = ?`),
+    );
+  }
+
+  if (week === 4 && useDedicatedLessons) {
+    if (lessonNumber === 1) {
+      const a = rand(20, 160);
+      const b = rand(20, 160);
+      return typed(
+        `${a} + ${b} = ${b} + □. Type the unknown.`,
+        a,
+        role === "reasoning"
+          ? "Commutative means the addends can change order and the total stays the same."
+          : "Commutative means order can change: the same two addends appear on both sides.",
+        unknownVisual("Order can change — commutative", `${a} + ${b}`, `${b} + □`),
+      );
+    }
+
+    if (lessonNumber === 2) {
+      const a = rand(20, 80);
+      const b = rand(15, 70);
+      const c = rand(10, 60);
+      const groupedValue = b + c;
+      return typed(
+        `(${a} + ${b}) + ${c} = ${a} + (□). Type the grouped value.`,
+        groupedValue,
+        role === "reasoning"
+          ? `Associative means the grouping can change: combine ${b} and ${c}.`
+          : "Associative means grouping can change without changing the total. Add the numbers inside the new group.",
+        unknownVisual("Grouping can change — associative", `(${a} + ${b}) + ${c}`, `${a} + (□)`),
+      );
+    }
+
+    const a = rand(25, 110);
+    const b = rand(15, 80);
+    const total = a + b;
+    const missing = rand(8, 35);
+    const largerNumber = total + missing;
+    return typed(
+      `${a} + ${b} = ${largerNumber} − □. Type the unknown.`,
+      missing,
+        role === "reasoning"
+          ? `Equivalent means both expressions have the same value: ${a} + ${b} = ${total}.`
+          : `Equivalent means the same value. Make the right side equal ${total}.`,
+      unknownVisual("Different expression, same value — equivalent", `${a} + ${b}`, `${largerNumber} − □`),
     );
   }
 

@@ -6,6 +6,7 @@ import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShe
 import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
 import { Year2LessonEngine } from "@/components/lesson/Year2LessonEngine";
 import { generatePatternPeaksQuestion, isPatternPeaksQuestion } from "@/data/activities/patternPeaks/generator";
+import { getPatternPeaksLessonConceptIntro, type PatternPeaksYearLabel } from "@/data/programs/patternPeaks";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 import { getWorld3DReturnPathForLesson, preserveWorld3DReturnContextForLesson } from "@/lib/world3d/return-context";
 import type { Lesson } from "@/data/programs/year1";
@@ -49,6 +50,7 @@ export default function PatternPeaksLessonShell({
     `use the ${String(lesson.config?.mechanic ?? "pattern model")} to show my thinking`,
     "check my answer and explain why the rule or equation works",
   ];
+  const conceptIntro = getPatternPeaksLessonConceptIntro(level as PatternPeaksYearLabel, week, lesson.lesson);
 
   if (started) {
     return (
@@ -102,6 +104,7 @@ export default function PatternPeaksLessonShell({
         lessonTitle={lesson.title}
         focus={lesson.focus}
         successCriteria={successCriteria}
+        conceptIntro={conceptIntro}
         onBack={back}
         onStart={() => setStarted(true)}
       />

@@ -4,6 +4,7 @@ import path from "node:path";
 import {
   PATTERN_PEAKS_PROGRAMS,
   PATTERN_PEAKS_SPINES,
+  getPatternPeaksLessonConceptIntro,
   type PatternPeaksYearLabel,
 } from "@/data/programs/patternPeaks";
 import {
@@ -346,6 +347,44 @@ assert.deepEqual(
   new Set(["unknown-first-left", "unknown-second-left", "unknown-on-right", "unknown-whole", "unknown-in-balanced-sentence"]),
   "Unknowns Move Around must rotate five genuinely different equation forms.",
 );
+
+const levelFourEquivalentEquations = PATTERN_PEAKS_PROGRAMS["Year 4"][3]!;
+for (const currentLesson of levelFourEquivalentEquations.lessons) {
+  assert(
+    (currentLesson.activities ?? []).every((activity) => activity.activityType === "typed_response"),
+    `Year 4 Week 4 ${currentLesson.title} must assess a numeric response after teaching the vocabulary.`,
+  );
+  for (const activity of currentLesson.activities ?? []) {
+    for (let sample = 0; sample < 30; sample += 1) {
+      const question = generatePatternPeaksQuestion(4, currentLesson, activity);
+      assert.equal(question.kind, "typed_response", `Year 4 Week 4 ${currentLesson.title} must not quiz unexplained property names.`);
+      assert.equal(question.visual?.type, "unknown_tile_equation", `Year 4 Week 4 ${currentLesson.title} needs a visible equivalent equation.`);
+      assert.equal(countInlineMathAnswerSlots(question.visual), 1, `Year 4 Week 4 ${currentLesson.title} needs one inline numeric answer.`);
+      assert(!/which property|why can the addends/i.test(question.prompt), `Year 4 Week 4 ${currentLesson.title} retained the vocabulary-first question.`);
+      assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, `Year 4 Week 4 ${currentLesson.title} generated an invalid answer.`);
+      const expectedTeachingWord = currentLesson.lesson === 1
+        ? "commutative"
+        : currentLesson.lesson === 2
+          ? "associative"
+          : "equivalent";
+      assert(question.helper?.toLowerCase().includes(expectedTeachingWord), `Year 4 Week 4 ${currentLesson.title} must explain ${expectedTeachingWord} before expecting its use.`);
+    }
+  }
+}
+
+const levelFourWeekFourConcepts = levelFourEquivalentEquations.lessons.map((currentLesson) =>
+  getPatternPeaksLessonConceptIntro("Year 4", 4, currentLesson.lesson),
+);
+assert.deepEqual(
+  levelFourWeekFourConcepts.map((intro) => intro?.term),
+  ["Commutative", "Associative", "Equivalent"],
+  "Each Year 4 Week 4 lesson needs its own property introduction.",
+);
+for (const intro of levelFourWeekFourConcepts) {
+  assert(intro?.meaning && intro.example && intro.exampleExplanation, "Every property introduction needs a meaning, example and explanation.");
+  assert(intro.exampleExplanation.toLowerCase().includes("both sides equal"), "Each property example must make equality explicit.");
+}
+assert.equal(getPatternPeaksLessonConceptIntro("Year 4", 3, 1), undefined, "Property introductions must not leak into other weeks.");
 
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
