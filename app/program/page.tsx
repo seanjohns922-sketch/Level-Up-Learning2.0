@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Lock, LockOpen, RotateCcw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getCurriculumPlan } from "@/data/programs/genres";
+import { getCurriculumPlan, genreIdForRealm } from "@/data/programs/genres";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { DEMO_MODE } from "@/data/config";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
@@ -35,6 +35,7 @@ import {
 } from "@/lib/starpath-routes";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import { getStatisticaBackground } from "@/lib/statistica-visuals";
+import { getPatternPeaksBackground } from "@/lib/pattern-peaks-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import {
   buildRealmProgramHref,
@@ -87,6 +88,7 @@ function ProgramPage() {
   const realmId = requireSharedWeeklyProgramRealm(sp.get("realm_id") ?? "number");
   const isStarpathRealm = realmId === "space";
   const isStatisticsRealm = realmId === "statistics";
+  const isPatternRealm = realmId === "pattern";
   const starpathProgram = useMemo(
     () => (isStarpathRealm ? getStarpathWeekProgram(year) : null),
     [isStarpathRealm, year],
@@ -96,7 +98,7 @@ function ProgramPage() {
   const program = useMemo(
     () => isStarpathRealm
       ? starpathProgram?.weeks ?? []
-      : getCurriculumPlan(year, realmId),
+      : getCurriculumPlan(year, genreIdForRealm(realmId)),
     [isStarpathRealm, realmId, starpathProgram, year]
   );
   const curriculumYear = useMemo(() => {
@@ -158,6 +160,55 @@ function ProgramPage() {
     focusColor: "text-cyan-200",
     dividerColor: "border-cyan-300/20",
     xpLabelColor: "text-cyan-100/90",
+  } : isPatternRealm ? {
+    // Pattern Peaks — charcoal panels, emerald primary, controlled violet
+    // secondary, restrained ancient gold highlight. Rounded like the other
+    // non-Number realms; never the Number cyber-clip.
+    rounded: true,
+    scanline: false,
+    cardClip: undefined as string | undefined,
+    bezelClip: undefined as string | undefined,
+    badgeClip: undefined as string | undefined,
+    statusClip: undefined as string | undefined,
+    actionClip: undefined as string | undefined,
+    connClip: undefined as string | undefined,
+    cardActiveBg: "linear-gradient(145deg, rgba(10,17,14,0.97), rgba(13,28,24,0.97) 58%, rgba(24,20,48,0.94))",
+    cardCompletedBg: "linear-gradient(145deg, rgba(6,63,52,0.98), rgba(37,44,110,0.95))",
+    cardLockedBg: "linear-gradient(145deg, rgba(10,17,14,0.9), rgba(20,28,36,0.84))",
+    bezelActiveBg: "linear-gradient(145deg, rgba(16,185,129,0.62), rgba(139,92,246,0.28) 48%, rgba(52,211,153,0.5))",
+    bezelCompletedBg: "linear-gradient(145deg, rgba(52,211,153,0.6), rgba(200,160,48,0.4))",
+    bezelLockedBg: "linear-gradient(145deg, rgba(16,185,129,0.18), rgba(139,92,246,0.14))",
+    bezelPosttestBg: "linear-gradient(145deg, rgba(212,175,55,0.7), rgba(139,92,246,0.48))",
+    cardActiveShadow: "0 12px 30px rgba(3,14,10,0.56), 0 0 18px rgba(16,185,129,0.16), inset 0 1px 0 rgba(209,250,229,0.16)",
+    cardCompletedShadow: "0 12px 30px rgba(3,14,10,0.52), 0 0 18px rgba(139,92,246,0.2), inset 0 1px 0 rgba(209,250,229,0.22)",
+    cardLockedShadow: "0 8px 20px rgba(3,14,10,0.46)",
+    badgeActiveBg: "linear-gradient(135deg, #065f46, #7c3aed)",
+    badgeCompletedBg: "linear-gradient(135deg, #047857, #10b981)",
+    badgeLockedBg: "linear-gradient(135deg, #1e293b, #312e59)",
+    badgePosttestBg: "linear-gradient(135deg, #a1791f, #7c3aed)",
+    badgeShadow: "inset 0 1px 0 rgba(209,250,229,0.28), 0 0 12px rgba(16,185,129,0.22)",
+    statusActiveBg: "linear-gradient(135deg, #065f46, #0d9488)",
+    statusCompletedBg: "linear-gradient(135deg, #047857, #10b981)",
+    statusLockedBg: "linear-gradient(135deg, #1e293b, #312e59)",
+    statusPosttestBg: "linear-gradient(135deg, #a1791f, #7c3aed)",
+    statusShadow: "0 0 12px rgba(16,185,129,0.3)",
+    dotClass: "bg-emerald-200 shadow-[0_0_8px_rgba(52,211,153,0.9)]",
+    actionActiveBg: "linear-gradient(135deg, #7c3aed, #059669 55%, #34d399)",
+    actionCompletedBg: "linear-gradient(135deg, #7c3aed, #047857)",
+    actionPosttestBg: "linear-gradient(135deg, #a1791f, #7c3aed)",
+    actionShadow: "0 0 18px rgba(16,185,129,0.34), 0 6px 16px rgba(3,14,10,0.5), inset 0 1px 0 rgba(209,250,229,0.28)",
+    connActiveBg: "radial-gradient(circle, #34d399, #7c3aed 72%)",
+    connCompletedBg: "radial-gradient(circle, #a7f3d0, #047857 72%)",
+    connShadow: "0 0 14px rgba(52,211,153,0.5)",
+    xpBg: "linear-gradient(90deg, #7c3aed, #10b981 55%, #d4af37)",
+    xpGlow: "0 0 14px rgba(16,185,129,0.58)",
+    pillBg: "linear-gradient(135deg, rgba(10,17,14,0.96), rgba(46,29,99,0.9), rgba(6,49,40,0.94))",
+    pillShadow: "inset 0 1px 0 rgba(209,250,229,0.22), 0 0 22px rgba(124,58,237,0.24)",
+    pillDot: "bg-emerald-200 shadow-[0_0_9px_rgba(52,211,153,0.95)]",
+    headingGlow: "drop-shadow-[0_2px_16px_rgba(16,185,129,0.32)]",
+    focusColor: "text-emerald-200",
+    dividerColor: "border-emerald-300/20",
+    xpLabelColor: "text-emerald-100/90",
   } : isStatisticsRealm ? {
     rounded: true,
     scanline: false,
@@ -326,7 +377,10 @@ function ProgramPage() {
   const legacyProgramMode = sp.get("legacy") === "1";
   const teacherPreview = sp.get("teacher_preview") === "1";
   const demoPreviewMode = useDemoPreviewMode();
-  const previewMode = isStatisticsRealm || teacherPreview || demoPreviewMode;
+  // Pattern Peaks is still a preview realm (coming_soon / not selectable), so it
+  // rides the shared Week Home in preview exactly like Statistica — this skips
+  // the canonical live-realm progress bootstrap it can't satisfy yet.
+  const previewMode = isStatisticsRealm || isPatternRealm || teacherPreview || demoPreviewMode;
   const canonicalRealmId = realmId as "number" | "measurement" | "space";
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
@@ -721,6 +775,8 @@ function ProgramPage() {
       ? `/statistica?level=${encodeURIComponent(curriculumYear)}&week=${weekNum}${teacherPreview ? "&teacher_preview=1" : ""}`
     : isMeasurementRealm
       ? `/measurelands?level=${encodeURIComponent(curriculumYear)}`
+    : isPatternRealm
+      ? `/pattern-peaks?level=${encodeURIComponent(curriculumYear)}`
       : "/number-nexus";
 
   function goBackToMap() {
@@ -769,6 +825,8 @@ function ProgramPage() {
               ? getStarpathBackground(curriculumYear as RealmLevelId)
               : isStatisticsRealm
               ? getStatisticaBackground(curriculumYear as RealmLevelId)
+              : isPatternRealm
+              ? getPatternPeaksBackground(curriculumYear as RealmLevelId)
               : isMeasurementRealm
               ? isPrep
                 ? "/images/measurelands-home-bg.png"
@@ -794,6 +852,8 @@ function ProgramPage() {
               ? "brightness(0.88) contrast(1.1) saturate(1.1)"
               : isStatisticsRealm
               ? "brightness(0.82) contrast(1.08) saturate(1.12)"
+              : isPatternRealm
+              ? "brightness(0.82) contrast(1.1) saturate(1.1)"
               : isMeasurementRealm
               ? levelNum === 4
                 ? "brightness(0.90) contrast(1.16) saturate(1.05)"
@@ -801,7 +861,7 @@ function ProgramPage() {
               : isPrep
               ? "brightness(1.22) contrast(1.05) saturate(1.18)"
               : getHomeBgFilter(levelNum),
-            imageRendering: isMeasurementRealm || isStarpathRealm || isStatisticsRealm ? "auto" : undefined,
+            imageRendering: isMeasurementRealm || isStarpathRealm || isStatisticsRealm || isPatternRealm ? "auto" : undefined,
             WebkitBackfaceVisibility: isMeasurementRealm || isStarpathRealm || isStatisticsRealm ? "hidden" : undefined,
           }}
         />
@@ -1107,7 +1167,7 @@ function ProgramPage() {
               }}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${rt.pillDot}`} />
-              {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : isStatisticsRealm ? "Data Program" : "Program"}
+              {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : isStatisticsRealm ? "Data Program" : isPatternRealm ? "Algebra Program" : "Program"}
             </button>
             <h1 className={`text-4xl md:text-5xl font-black text-white mt-3 tracking-tight ${rt.headingGlow}`}>Week {weekNum}</h1>
             <p className={`text-base md:text-lg mt-2 font-semibold ${isStatisticsRealm ? "text-[#fff4df]" : isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
@@ -1146,6 +1206,9 @@ function ProgramPage() {
                 } : isStatisticsRealm ? {
                   borderRadius: 14,
                   background: "linear-gradient(135deg, rgba(240,107,100,0.5), rgba(242,188,69,0.18) 42%, rgba(121,184,90,0.5))",
+                } : isPatternRealm ? {
+                  borderRadius: 14,
+                  background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(139,92,246,0.2) 42%, rgba(52,211,153,0.5))",
                 } : {
                   clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
                   background: "linear-gradient(135deg, rgba(94,234,212,0.55), rgba(20,184,166,0.15) 40%, rgba(13,148,136,0.5))",
@@ -1165,19 +1228,23 @@ function ProgramPage() {
                   borderRadius: 12,
                   background: "linear-gradient(135deg, #0d221d 0%, #12312a 50%, #1c3f37 100%)",
                   boxShadow: "inset 0 1px 0 rgba(242,188,69,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(240,107,100,0.1)",
+                } : isPatternRealm ? {
+                  borderRadius: 12,
+                  background: "linear-gradient(135deg, #0a110e 0%, #0d1c18 50%, #181430 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(16,185,129,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(124,58,237,0.1)",
                 } : {
                   clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
                   background: "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
                   boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 18px rgba(0,0,0,0.45)",
                 }}
               >
-                {!isMeasurementRealm && !isStarpathRealm && !isStatisticsRealm && (
+                {!isMeasurementRealm && !isStarpathRealm && !isStatisticsRealm && !isPatternRealm && (
                   <div
                     className="absolute inset-0 opacity-15 pointer-events-none"
                     style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.4) 0 1px, transparent 1px 3px)" }}
                   />
                 )}
-                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isStarpathRealm ? "ring-1 ring-cyan-400/20" : isMeasurementRealm ? "ring-1 ring-yellow-900/40" : isStatisticsRealm ? "ring-1 ring-[#f2bc45]/25" : "ring-1 ring-teal-400/20"}`}>
+                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isStarpathRealm ? "ring-1 ring-cyan-400/20" : isMeasurementRealm ? "ring-1 ring-yellow-900/40" : isStatisticsRealm ? "ring-1 ring-[#f2bc45]/25" : isPatternRealm ? "ring-1 ring-emerald-400/20" : "ring-1 ring-teal-400/20"}`}>
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${percent}%`, background: rt.xpBg, boxShadow: rt.xpGlow }}
@@ -1360,7 +1427,7 @@ function ProgramPage() {
       {/* ── Horizontal lesson dashboard ── */}
       <div
         className={`relative z-10 px-4 pb-16 md:px-6 ${
-          isMeasurementRealm || isStatisticsRealm ? "pt-16 md:pt-24" : "pt-10 md:pt-16"
+          isMeasurementRealm || isStatisticsRealm || isPatternRealm ? "pt-16 md:pt-24" : "pt-10 md:pt-16"
         }`}
       >
         <div className="max-w-6xl mx-auto">

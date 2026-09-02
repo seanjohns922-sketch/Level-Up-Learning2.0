@@ -179,6 +179,16 @@ function starpathWeeks(yearLabel: string): WeekPlan[] {
  * Returns the 12-week curriculum plan for a (year, genre) combination.
  * Falls back to a 12-week placeholder scaffold when no real program exists.
  */
+// The shared Week Home addresses realms by canonical realm id, but the genre
+// registry keys a few strands by strand name. Map realm id -> genre id so the
+// shared page can look up any realm's curriculum. (Only Pattern Peaks / Chanzia
+// differ from their realm id today; the rest are identical.)
+export function genreIdForRealm(realmId: string): string {
+  if (realmId === "pattern") return "algebra";
+  if (realmId === "chance") return "probability";
+  return realmId;
+}
+
 export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[] {
   const k = yearKey(yearLabel);
   const genre = getGenresForYear(yearLabel).find((g) => g.id === genreId);

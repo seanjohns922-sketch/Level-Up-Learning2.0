@@ -34,9 +34,13 @@ export function buildLessonId(input: {
   realmId?: string;
 }): string {
   const normalizedYear = normalizeStudentYearLabel(input.yearLabel);
-  const normalizedRealm = (input.realmId == null || input.realmId === ""
-    ? "number"
-    : input.realmId) as StudentRealmId;
+  const rawRealm = input.realmId == null || input.realmId === "" ? "number" : input.realmId;
+  // Pattern Peaks is a preview realm (not yet a live StudentRealmId), but it
+  // rides the shared Week Home, so it needs a lesson id here too.
+  if (rawRealm === "pattern") {
+    return `y${parseStudentYearNumber(normalizedYear)}-pattern-w${input.week}-l${input.lessonNumber}`;
+  }
+  const normalizedRealm = rawRealm as StudentRealmId;
   switch (normalizedRealm) {
     case "space": {
       const level = getStarpathLevelForYear(normalizedYear as Parameters<typeof getStarpathLevelForYear>[0]);
@@ -70,6 +74,9 @@ export function buildLessonRoute(input: {
   }
   if (input.realmId === "statistics") {
     return `/statistica/lesson/${encodeURIComponent(normalizedYear)}/${input.week}/${input.lessonNumber}`;
+  }
+  if (input.realmId === "pattern") {
+    return `/pattern-peaks/lesson/${encodeURIComponent(normalizedYear)}/${input.week}/${input.lessonNumber}`;
   }
   const lessonId = buildLessonId(input);
   const realmParam = input.realmId === "measurement" ? `&realm_id=${encodeURIComponent("measurement")}` : "";

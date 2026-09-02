@@ -142,7 +142,9 @@ export const PATTERN_PEAKS_DASHBOARD_CONFIG = {
     unlockAllDistricts: true,
     readJourney: () => ({ currentWeek: 1, currentLesson: 1 }),
     buildLevelHref: previewHref,
-    buildProgramHref: (level, week) => `/pattern-peaks/program?teacher_preview=1&level=${encodeURIComponent(level)}&week=${week}`,
+    // Ride the shared Week Home (same page as Number Nexus / Measurelands /
+    // Statistica), skinned as Pattern Peaks via realm_id=pattern.
+    buildProgramHref: (level, week) => `/program?year=${encodeURIComponent(level)}&week=${week}&realm_id=pattern&legacy=1&teacher_preview=1`,
   },
 } satisfies CanonicalRealmDashboardConfig;
 
