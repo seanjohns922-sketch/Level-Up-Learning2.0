@@ -14,6 +14,7 @@ import {
   PATTERN_YEAR3_WEEK3_RULE_LABELS,
   PATTERN_YEAR3_WEEK5_RECENT_WINDOW,
   PATTERN_YEAR3_WEEK7_FACTORS,
+  PATTERN_YEAR3_WEEK7_LESSON3_TARGET_FACTORS,
 } from "@/data/activities/patternPeaks/generator";
 import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/year2/lessonEngine";
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
@@ -224,36 +225,26 @@ assert.deepEqual(
   "Multiplication Fact Patterns must rotate the 3, 4, 5 and 10 fact families.",
 );
 
-const levelThreeEfficientFacts = PATTERN_PEAKS_PROGRAMS["Year 3"][6]!.lessons[2]!;
-const efficientFactFactors = new Set<number>();
-const efficientStrategyFamilies = new Set<string>();
-for (const activity of levelThreeEfficientFacts.activities ?? []) {
+const levelThreeNextFacts = PATTERN_PEAKS_PROGRAMS["Year 3"][6]!.lessons[2]!;
+assert.equal(levelThreeNextFacts.title, "Use the Next Fact");
+const nextFactFactors = new Set<number>();
+for (const activity of levelThreeNextFacts.activities ?? []) {
   for (let sample = 0; sample < 40; sample += 1) {
-    const question = generatePatternPeaksQuestion(3, levelThreeEfficientFacts, activity);
-    assert("visual" in question && question.visual?.type === "expression_flow", "Choose an Efficient Fact needs a related-fact pathway.");
-    assert(!question.prompt.includes("groups of"), "Choose an Efficient Fact fell back to an isolated array calculation.");
+    const question = generatePatternPeaksQuestion(3, levelThreeNextFacts, activity);
+    assert.equal(question.kind, "typed_response", "Use the Next Fact must keep every response direct and typed.");
+    assert("visual" in question && question.visual?.type === "expression_flow", "Use the Next Fact needs a clear one-step fact pathway.");
     const factorMatches = [...question.prompt.matchAll(/(\d+) ×/g)];
     const targetFactor = factorMatches.at(-1)?.[1];
-    assert(targetFactor, "Choose an Efficient Fact must name its target multiplication fact.");
-    efficientFactFactors.add(Number(targetFactor));
-    const questionText = `${question.prompt} ${"helper" in question ? question.helper ?? "" : ""} ${"answer" in question ? String(question.answer ?? "") : ""}`;
-    if (/halve/i.test(questionText)) efficientStrategyFamilies.add("halve");
-    if (/double/i.test(questionText)) efficientStrategyFamilies.add("double");
-    if (/one more group/i.test(questionText)) efficientStrategyFamilies.add("one-more-group");
-    if (question.kind === "typed_response") {
-      assert.equal(countInlineMathAnswerSlots(question.visual), 1, "The efficient-fact calculation needs one inline product field.");
-    }
+    assert(targetFactor, "Use the Next Fact must name its target multiplication fact.");
+    nextFactFactors.add(Number(targetFactor));
+    assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Use the Next Fact needs one inline answer field.");
+    assert(!/halve|double|easiest/i.test(`${question.prompt} ${question.helper ?? ""}`), "Use the Next Fact must teach one consistent add-a-group strategy.");
   }
 }
 assert.deepEqual(
-  efficientFactFactors,
-  new Set(PATTERN_YEAR3_WEEK7_FACTORS),
-  "Choose an Efficient Fact must rotate the 3, 4, 5 and 10 fact families.",
-);
-assert.deepEqual(
-  efficientStrategyFamilies,
-  new Set(["halve", "double", "one-more-group"]),
-  "Choose an Efficient Fact must practise halving, doubling and adding one more group.",
+  nextFactFactors,
+  new Set(PATTERN_YEAR3_WEEK7_LESSON3_TARGET_FACTORS),
+  "Use the Next Fact must rotate the 2, 3, 4 and 5 fact families.",
 );
 
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");

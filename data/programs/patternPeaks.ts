@@ -69,7 +69,7 @@ const level3Seeds: WeekSeed[] = [
     lessons: [
       lesson("Patterns in Addition Facts", "Use patterns in facts to 20 to derive related calculations with larger numbers.", "Fact ladder", "AC9M3A03"),
       lesson("Multiplication Fact Patterns", "Recognise and explain patterns in the 3, 4, 5 and 10 multiplication facts.", "Array observatory", "AC9M3A03"),
-      lesson("Choose an Efficient Fact", "Select a known or related fact that reduces the calculation effort.", "Strategy sorter", "AC9M3A03"),
+      lesson("Use the Next Fact", "Use a known multiplication fact to calculate the next fact by adding one equal group.", "Fact stepper", "AC9M3A03"),
     ],
   },
   {
@@ -358,7 +358,8 @@ function buildProgram(yearLabel: PatternPeaksYearLabel, seeds: WeekSeed[]): Week
         item.mechanic,
         yearLabel === "Year 3" && (
           (weekNumber === 1 && lessonNumber === 2) ||
-          (weekNumber === 6 && lessonNumber === 1)
+          (weekNumber === 6 && lessonNumber === 1) ||
+          (weekNumber === 7 && lessonNumber === 3)
         ),
       ),
     };

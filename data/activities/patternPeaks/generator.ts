@@ -45,6 +45,7 @@ export const PATTERN_YEAR3_HALVING_FINAL_TERMS = [2, 4, 6, 8, 10, 12, 14, 16, 18
 export const PATTERN_YEAR3_WEEK3_RULE_LABELS = ["×2", "+5", "−3"] as const;
 export const PATTERN_YEAR3_WEEK5_RECENT_WINDOW = 12;
 export const PATTERN_YEAR3_WEEK7_FACTORS = [3, 4, 5, 10] as const;
+export const PATTERN_YEAR3_WEEK7_LESSON3_TARGET_FACTORS = [2, 3, 4, 5] as const;
 
 const recentYear3Week5NumberSets = new Map<number, string[]>();
 const year3Week7FactorBags = new Map<number, number[]>();
@@ -94,10 +95,13 @@ function shuffle<T>(items: readonly T[]) {
   return result;
 }
 
-function nextYear3Week7Factor(lessonNumber: number) {
+function nextYear3Week7Factor(
+  lessonNumber: number,
+  factors: readonly number[] = PATTERN_YEAR3_WEEK7_FACTORS,
+) {
   let bag = year3Week7FactorBags.get(lessonNumber) ?? [];
   if (bag.length === 0) {
-    bag = shuffle(PATTERN_YEAR3_WEEK7_FACTORS);
+    bag = shuffle(factors);
   }
   const factor = bag.shift()!;
   year3Week7FactorBags.set(lessonNumber, bag);
@@ -416,107 +420,63 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
       );
     }
 
-    const factor = nextYear3Week7Factor(lessonNumber);
+    const factor = nextYear3Week7Factor(lessonNumber, PATTERN_YEAR3_WEEK7_LESSON3_TARGET_FACTORS);
     const n = rand(3, 9);
     const product = factor * n;
-    const relation = factor === 3
-      ? {
-          anchorFactor: 2,
-          choice: `Use 2 × ${n}, then add one more group of ${n}`,
-          action: `Add ${n} to ${2 * n}`,
-          why: "3 groups are 2 groups plus 1 more group.",
-        }
-      : factor === 4
-        ? {
-            anchorFactor: 2,
-            choice: `Use 2 × ${n}, then double it`,
-            action: `Double ${2 * n}`,
-            why: "4 groups are double 2 groups.",
-          }
-        : factor === 5
-          ? {
-              anchorFactor: 10,
-              choice: `Use 10 × ${n}, then halve it`,
-              action: `Halve ${10 * n}`,
-              why: "5 groups are half of 10 groups.",
-            }
-          : {
-              anchorFactor: 5,
-              choice: `Use 5 × ${n}, then double it`,
-              action: `Double ${5 * n}`,
-              why: "10 groups are double 5 groups.",
-            };
-    const anchorProduct = relation.anchorFactor * n;
-    const targetVisual: QuestionVisual = {
+    const knownFactor = factor - 1;
+    const knownProduct = knownFactor * n;
+    const nextFactVisual: QuestionVisual = {
       type: "expression_flow",
-      title: "Choose a helper fact",
+      title: "Step to the next fact",
       cards: [
         {
-          label: "Fact to solve",
-          tokens: [String(factor), "×", String(n)],
-          note: "Pick a fact you already know that makes this easier.",
-        },
-      ],
-    };
-
-    if (role === "fast_thinking") {
-      return mcq(
-        `What is the easiest way to work out ${factor} × ${n}?`,
-        relation.choice,
-        [`Add ${factor} and ${n}`, `Use 10 × ${n}, then double it`, `Subtract ${n} from ${factor}`],
-        "Choose a multiplication fact that uses the same group size.",
-        targetVisual,
-      );
-    }
-
-    if (role === "reasoning") {
-      const reasoningVisual: QuestionVisual = {
-        type: "expression_flow",
-        title: "One helpful fact",
-        cards: [
-          {
-            label: "Fact you know",
-            tokens: [String(relation.anchorFactor), "×", String(n), "=", String(anchorProduct)],
-          },
-          {
-            label: "Fact to solve",
-            tokens: [String(factor), "×", String(n)],
-          },
-        ],
-      };
-      return mcq(
-        `Why does ${relation.anchorFactor} × ${n} help with ${factor} × ${n}?`,
-        relation.why,
-        [`${factor} groups are the same as ${relation.anchorFactor} groups.`, `Adding ${factor} and ${n} gives the same answer.`, "Every multiplication fact has the same answer."],
-        "Compare the number of equal groups in the two facts.",
-        reasoningVisual,
-      );
-    }
-
-    const calculationVisual: QuestionVisual = {
-      type: "expression_flow",
-      title: "Use a fact you know",
-      cards: [
-        {
-          label: "Fact you know",
-          tokens: [String(relation.anchorFactor), "×", String(n), "=", String(anchorProduct)],
+          label: "Known fact",
+          tokens: [String(knownFactor), "×", String(n), "=", String(knownProduct)],
         },
         {
-          label: "What to do",
-          tokens: relation.action.split(" "),
+          label: "Add one equal group",
+          tokens: ["+", String(n)],
         },
         {
-          label: "Your answer",
-          tokens: [String(factor), "×", String(n)],
+          label: "Next fact",
+          tokens: [String(factor), "×", String(n), "="],
           result: "?",
         },
       ],
     };
+
+    if (role === "reasoning") {
+      return typed(
+        `How much do you add to move from ${knownFactor} × ${n} to ${factor} × ${n}?`,
+        n,
+        `One more group contains ${n}.`,
+        {
+          type: "expression_flow",
+          title: "Find the size of one more group",
+          cards: [
+            {
+              label: "Known fact",
+              tokens: [String(knownFactor), "×", String(n), "=", String(knownProduct)],
+            },
+            {
+              label: "One more group",
+              tokens: ["Add"],
+              result: "?",
+            },
+            {
+              label: "Next fact",
+              tokens: [String(factor), "×", String(n)],
+            },
+          ],
+        },
+      );
+    }
+
     return typed(
-      `Use the fact shown to work out ${factor} × ${n}.`,
+      `Use ${knownFactor} × ${n} = ${knownProduct} to work out ${factor} × ${n}.`,
       product,
-      `${relation.action}, then type the answer.`,
-      calculationVisual,
+      `Add one more group of ${n}: ${knownProduct} + ${n}.`,
+      nextFactVisual,
     );
   }
 
