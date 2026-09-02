@@ -422,90 +422,100 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
     const relation = factor === 3
       ? {
           anchorFactor: 2,
-          strategy: `Add one more group of ${n}`,
-          working: `${2 * n} + ${n}`,
-          explanation: `Use 2 × ${n}, then add one more group of ${n}.`,
+          choice: `Use 2 × ${n}, then add one more group of ${n}`,
+          action: `Add ${n} to ${2 * n}`,
+          why: "3 groups are 2 groups plus 1 more group.",
         }
       : factor === 4
         ? {
             anchorFactor: 2,
-            strategy: `Double the 2 × ${n} product`,
-            working: `${2 * n} × 2`,
-            explanation: `Use 2 × ${n}, then double that product.`,
+            choice: `Use 2 × ${n}, then double it`,
+            action: `Double ${2 * n}`,
+            why: "4 groups are double 2 groups.",
           }
         : factor === 5
           ? {
               anchorFactor: 10,
-              strategy: `Halve the 10 × ${n} product`,
-              working: `${10 * n} ÷ 2`,
-              explanation: `Use 10 × ${n}, then halve that product.`,
+              choice: `Use 10 × ${n}, then halve it`,
+              action: `Halve ${10 * n}`,
+              why: "5 groups are half of 10 groups.",
             }
           : {
               anchorFactor: 5,
-              strategy: `Double the 5 × ${n} product`,
-              working: `${5 * n} × 2`,
-              explanation: `Use 5 × ${n}, then double that product.`,
+              choice: `Use 5 × ${n}, then double it`,
+              action: `Double ${5 * n}`,
+              why: "10 groups are double 5 groups.",
             };
     const anchorProduct = relation.anchorFactor * n;
-    const launchpadVisual: QuestionVisual = {
+    const targetVisual: QuestionVisual = {
       type: "expression_flow",
-      title: "Related-fact launchpad",
+      title: "Choose a helper fact",
       cards: [
         {
-          label: "Known fact",
-          tokens: [String(relation.anchorFactor), "×", String(n), "=", String(anchorProduct)],
-        },
-        {
-          label: "Target fact",
+          label: "Fact to solve",
           tokens: [String(factor), "×", String(n)],
-          note: "Choose the shortest connection from the known fact.",
+          note: "Pick a fact you already know that makes this easier.",
         },
       ],
     };
 
     if (role === "fast_thinking") {
       return mcq(
-        `Which efficient strategy connects the known fact to ${factor} × ${n}?`,
-        relation.strategy,
-        [`Add ${factor}`, `Subtract ${n}`, `Multiply the known product by ${n}`],
-        "Look at how the known factor is related to the target factor.",
-        launchpadVisual,
+        `What is the easiest way to work out ${factor} × ${n}?`,
+        relation.choice,
+        [`Add ${factor} and ${n}`, `Use 10 × ${n}, then double it`, `Subtract ${n} from ${factor}`],
+        "Choose a multiplication fact that uses the same group size.",
+        targetVisual,
       );
     }
 
     if (role === "reasoning") {
+      const reasoningVisual: QuestionVisual = {
+        type: "expression_flow",
+        title: "One helpful fact",
+        cards: [
+          {
+            label: "Fact you know",
+            tokens: [String(relation.anchorFactor), "×", String(n), "=", String(anchorProduct)],
+          },
+          {
+            label: "Fact to solve",
+            tokens: [String(factor), "×", String(n)],
+          },
+        ],
+      };
       return mcq(
-        `Which equation correctly derives ${factor} × ${n} from the known fact?`,
-        `${relation.working} = ${product}`,
-        [`${relation.working} = ${product + factor}`, `${relation.working} = ${Math.max(0, product - factor)}`, `${factor} + ${n} = ${product}`],
-        relation.explanation,
-        launchpadVisual,
+        `Why does ${relation.anchorFactor} × ${n} help with ${factor} × ${n}?`,
+        relation.why,
+        [`${factor} groups are the same as ${relation.anchorFactor} groups.`, `Adding ${factor} and ${n} gives the same answer.`, "Every multiplication fact has the same answer."],
+        "Compare the number of equal groups in the two facts.",
+        reasoningVisual,
       );
     }
 
     const calculationVisual: QuestionVisual = {
       type: "expression_flow",
-      title: "Efficient-fact pathway",
+      title: "Use a fact you know",
       cards: [
         {
-          label: "Known fact",
+          label: "Fact you know",
           tokens: [String(relation.anchorFactor), "×", String(n), "=", String(anchorProduct)],
         },
         {
-          label: "Efficient move",
-          tokens: relation.strategy.split(" "),
+          label: "What to do",
+          tokens: relation.action.split(" "),
         },
         {
-          label: "Target product",
+          label: "Your answer",
           tokens: [String(factor), "×", String(n)],
           result: "?",
         },
       ],
     };
     return typed(
-      `Use the related fact to calculate ${factor} × ${n}.`,
+      `Use the fact shown to work out ${factor} × ${n}.`,
       product,
-      relation.explanation,
+      `${relation.action}, then type the answer.`,
       calculationVisual,
     );
   }

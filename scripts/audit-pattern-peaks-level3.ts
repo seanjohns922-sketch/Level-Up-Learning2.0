@@ -232,10 +232,11 @@ for (const activity of levelThreeEfficientFacts.activities ?? []) {
     const question = generatePatternPeaksQuestion(3, levelThreeEfficientFacts, activity);
     assert("visual" in question && question.visual?.type === "expression_flow", "Choose an Efficient Fact needs a related-fact pathway.");
     assert(!question.prompt.includes("groups of"), "Choose an Efficient Fact fell back to an isolated array calculation.");
-    const factorMatch = question.prompt.match(/(\d+) ×/);
-    assert(factorMatch, "Choose an Efficient Fact must name its target multiplication fact.");
-    efficientFactFactors.add(Number(factorMatch[1]));
-    const questionText = `${question.prompt} ${"helper" in question ? question.helper ?? "" : ""}`;
+    const factorMatches = [...question.prompt.matchAll(/(\d+) ×/g)];
+    const targetFactor = factorMatches.at(-1)?.[1];
+    assert(targetFactor, "Choose an Efficient Fact must name its target multiplication fact.");
+    efficientFactFactors.add(Number(targetFactor));
+    const questionText = `${question.prompt} ${"helper" in question ? question.helper ?? "" : ""} ${"answer" in question ? String(question.answer ?? "") : ""}`;
     if (/halve/i.test(questionText)) efficientStrategyFamilies.add("halve");
     if (/double/i.test(questionText)) efficientStrategyFamilies.add("double");
     if (/one more group/i.test(questionText)) efficientStrategyFamilies.add("one-more-group");
