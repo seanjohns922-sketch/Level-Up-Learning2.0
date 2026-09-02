@@ -603,6 +603,48 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
 }
 
 function year4Question(week: number, lessonNumber: number, role: RotationRole): Year2QuestionData {
+  if (week === 1 && lessonNumber <= 2) {
+    const known = rand(35, 140);
+    const missing = rand(12, 70);
+    const total = known + missing;
+
+    if (lessonNumber === 1) {
+      const unknownPosition = rand(0, 2);
+      const left = unknownPosition === 2
+        ? String(total)
+        : unknownPosition === 1
+          ? `□ + ${known}`
+          : `${known} + □`;
+      const right = unknownPosition === 2 ? `${known} + □` : String(total);
+      const helper = role === "reasoning"
+        ? `Both sides must equal ${total}. Find the missing part.`
+        : `Subtract ${known} from ${total}.`;
+      return typed(
+        `${left} = ${right}. Type the unknown.`,
+        missing,
+        helper,
+        unknownVisual("Make both sides equal", left, right),
+      );
+    }
+
+    const completePartA = rand(20, total - 20);
+    const completePartB = total - completePartA;
+    const mysterySide = rand(0, 1) === 0 ? `${known} + □` : `□ + ${known}`;
+    const completeSide = `${completePartA} + ${completePartB}`;
+    const unknownOnLeft = rand(0, 1) === 0;
+    const left = unknownOnLeft ? mysterySide : completeSide;
+    const right = unknownOnLeft ? completeSide : mysterySide;
+    const helper = role === "reasoning"
+      ? `The complete side totals ${total}. What must the other side add to ${known}?`
+      : "Calculate the complete side first, then find the missing part.";
+    return typed(
+      `${left} = ${right}. Type the unknown.`,
+      missing,
+      helper,
+      unknownVisual("Balance both number sentences", left, right),
+    );
+  }
+
   if (week <= 4) {
     const subtraction = week === 3;
     const regrouping = week === 4;

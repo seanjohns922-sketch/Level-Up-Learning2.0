@@ -282,6 +282,26 @@ for (const activity of levelThreeCompareRules.activities ?? []) {
   }
 }
 
+for (const levelFourEqualityLesson of PATTERN_PEAKS_PROGRAMS["Year 4"][0]!.lessons.slice(0, 2)) {
+  assert(
+    (levelFourEqualityLesson.activities ?? []).every((activity) => activity.activityType === "typed_response"),
+    `Year 4 ${levelFourEqualityLesson.title} must use typed unknown-number responses in every rotation.`,
+  );
+  for (const activity of levelFourEqualityLesson.activities ?? []) {
+    for (let sample = 0; sample < 30; sample += 1) {
+      const question = generatePatternPeaksQuestion(4, levelFourEqualityLesson, activity);
+      assert.equal(question.kind, "typed_response", `Year 4 ${levelFourEqualityLesson.title} must ask for the unknown value directly.`);
+      assert.equal(question.visual?.type, "unknown_tile_equation", `Year 4 ${levelFourEqualityLesson.title} needs an unknown-number equation.`);
+      assert.equal(countInlineMathAnswerSlots(question.visual), 1, `Year 4 ${levelFourEqualityLesson.title} needs one inline answer field.`);
+      assert(!/what must the equals sign|which equation proves/i.test(question.prompt), `Year 4 ${levelFourEqualityLesson.title} retained a conceptual multiple-choice prompt.`);
+      assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, `Year 4 ${levelFourEqualityLesson.title} generated an invalid unknown.`);
+      if (levelFourEqualityLesson.lesson === 2) {
+        assert(question.visual.left.includes("+") && question.visual.right.includes("+"), "Balance Both Sides must present a number sentence on each side.");
+      }
+    }
+  }
+}
+
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
 assert.equal(REALM_REGISTRY.pattern.totalWeeks, 8, "Pattern Peaks needs the agreed eight-week contract.");
