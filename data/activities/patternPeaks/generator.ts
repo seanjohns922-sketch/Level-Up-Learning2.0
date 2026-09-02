@@ -43,6 +43,9 @@ const PATTERN_VISUAL_TYPES = new Set([
 export const PATTERN_YEAR3_DOUBLE_STARTS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 25] as const;
 export const PATTERN_YEAR3_HALVING_FINAL_TERMS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20] as const;
 export const PATTERN_YEAR3_WEEK3_RULE_LABELS = ["×2", "+5", "−3"] as const;
+export const PATTERN_YEAR3_WEEK5_RECENT_WINDOW = 12;
+
+const recentYear3Week5NumberSets = new Map<number, string[]>();
 
 export function isPatternPeaksQuestion(question: unknown): question is Year2QuestionData {
   if (!question || typeof question !== "object") return false;
@@ -53,6 +56,32 @@ export function isPatternPeaksQuestion(question: unknown): question is Year2Ques
 
 const rand = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const pick = <T,>(items: readonly T[]) => items[rand(0, items.length - 1)]!;
+
+function freshYear3Week5Numbers(lessonNumber: number) {
+  const recent = recentYear3Week5NumberSets.get(lessonNumber) ?? [];
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    const a = rand(8, 24);
+    const b = rand(5, 18);
+    const total = a + b;
+    const c = rand(4, total - 4);
+    const signature = `${a}:${b}:${c}`;
+    if (recent.includes(signature)) continue;
+    recent.push(signature);
+    recentYear3Week5NumberSets.set(
+      lessonNumber,
+      recent.slice(-PATTERN_YEAR3_WEEK5_RECENT_WINDOW),
+    );
+    return { a, b, total, c, d: total - c };
+  }
+
+  // The value space is large enough that this should never be reached, but a
+  // valid fallback keeps generation safe if Math.random is mocked in a test.
+  const a = rand(8, 24);
+  const b = rand(5, 18);
+  const total = a + b;
+  const c = rand(4, total - 4);
+  return { a, b, total, c, d: total - c };
+}
 
 function shuffle<T>(items: readonly T[]) {
   const result = [...items];
@@ -279,11 +308,7 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
   }
 
   if (week === 5) {
-    const a = rand(8, 24);
-    const b = rand(5, 18);
-    const total = a + b;
-    const c = rand(4, total - 4);
-    const d = total - c;
+    const { a, b, total, c, d } = freshYear3Week5Numbers(lessonNumber);
     const visual = balanceVisual("Keep both sides equal", `${a} + ${b}`, `${c} + ${d}`);
     if (role === "fast_thinking") return mcq("Are both sides equal?", "Yes", ["No"], "Calculate both sides separately.", visual);
     if (role === "reasoning") return mcq("Which explanation proves the equation is true?", `Both sides equal ${total}`, [`Only the left side equals ${total}`, "The equals sign means calculate next"], "The equals sign compares two values.", visual);

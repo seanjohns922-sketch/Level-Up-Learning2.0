@@ -12,6 +12,7 @@ import {
   PATTERN_YEAR3_DOUBLE_STARTS,
   PATTERN_YEAR3_HALVING_FINAL_TERMS,
   PATTERN_YEAR3_WEEK3_RULE_LABELS,
+  PATTERN_YEAR3_WEEK5_RECENT_WINDOW,
 } from "@/data/activities/patternPeaks/generator";
 import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/year2/lessonEngine";
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
@@ -165,6 +166,23 @@ for (const activity of levelThreeInverseLesson.activities ?? []) {
       assert(question.visual.inverseOperation.includes("?"), "The typed inverse question needs its inline answer field.");
     }
   }
+}
+
+for (const currentLesson of PATTERN_PEAKS_PROGRAMS["Year 3"][4]!.lessons) {
+  const typedActivity = (currentLesson.activities ?? []).find((activity) => activity.config.rotationRole === "apply_create")!;
+  const consecutiveNumberSentences = Array.from(
+    { length: PATTERN_YEAR3_WEEK5_RECENT_WINDOW },
+    () => generatePatternPeaksQuestion(3, currentLesson, typedActivity),
+  );
+  const numberSignatures = consecutiveNumberSentences.map((question) => {
+    assert("visual" in question && question.visual?.type === "unknown_tile_equation", "Week 5 typed work needs an equation visual.");
+    return `${question.visual.left}=${question.visual.right}`;
+  });
+  assert.equal(
+    new Set(numberSignatures).size,
+    PATTERN_YEAR3_WEEK5_RECENT_WINDOW,
+    `Year 3 Week 5 ${currentLesson.title} repeated a recent number sentence.`,
+  );
 }
 
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
