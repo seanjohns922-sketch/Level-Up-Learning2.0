@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
 import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
 import { Year2LessonEngine } from "@/components/lesson/Year2LessonEngine";
 import { generatePatternPeaksQuestion } from "@/data/activities/patternPeaks/generator";
+import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
+import { getWorld3DReturnPathForLesson, preserveWorld3DReturnContextForLesson } from "@/lib/world3d/return-context";
 import type { Lesson } from "@/data/programs/year1";
 
 export default function PatternPeaksLessonShell({
@@ -21,8 +23,27 @@ export default function PatternPeaksLessonShell({
 }) {
   const router = useRouter();
   const [started, setStarted] = useState(false);
-  const weekHref = `/pattern-peaks/program?teacher_preview=1&level=${encodeURIComponent(level)}&week=${week}`;
+  // Return to the shared Week Home (same as every other realm); prefer the
+  // stored 3D return path so a lesson entered from the Pattern Peaks 3D world
+  // lands back there.
+  const weekHref = getWorld3DReturnPathForLesson({
+    realmId: "pattern",
+    level,
+    week,
+    lessonNumber: lesson.lesson,
+    lessonId: lesson.id,
+  }) ?? buildRealmProgramHref({ realmId: "pattern", year: level, week });
   const back = () => router.push(weekHref);
+
+  useEffect(() => {
+    preserveWorld3DReturnContextForLesson({
+      realmId: "pattern",
+      level,
+      week,
+      lessonNumber: lesson.lesson,
+      lessonId: lesson.id,
+    });
+  }, [lesson.id, lesson.lesson, level, week]);
   const successCriteria = [
     lesson.focus,
     `use the ${String(lesson.config?.mechanic ?? "pattern model")} to show my thinking`,
