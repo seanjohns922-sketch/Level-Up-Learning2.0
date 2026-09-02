@@ -6,7 +6,7 @@ import type {
   RealmDashboardDistrict,
   RealmDashboardWorld,
 } from "@/components/realms/dashboard/types";
-import { PATTERN_PEAKS_SPINE } from "@/data/programs/patternPeaks";
+import { getPatternPeaksSpineForYearLabel } from "@/data/programs/patternPeaks";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
 import { getPatternPeaksBackground } from "@/lib/pattern-peaks-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
@@ -36,10 +36,11 @@ function previewHref(level: RealmLevelId) {
 }
 
 function getDistricts(level: RealmLevelId): readonly RealmDashboardDistrict[] {
+  const spine = getPatternPeaksSpineForYearLabel(level);
   return DISTRICTS.map((position, index) => {
     const weekStart = index * 2 + 1;
     const weekEnd = weekStart + 1;
-    const focus = PATTERN_PEAKS_SPINE
+    const focus = spine
       .filter((week) => week.week === weekStart || week.week === weekEnd)
       .map((week) => week.topic)
       .join(" / ");

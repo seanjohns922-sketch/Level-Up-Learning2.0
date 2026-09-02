@@ -1,15 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowLeft, BookOpen, CheckCircle2, RotateCcw, Volume2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, RotateCcw, Volume2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { getCurriculumPlan } from "@/data/programs/genres";
-import { PATTERN_PEAKS_LEVEL3_WEEK_PURPOSES } from "@/data/programs/patternPeaks";
+import {
+  getPatternPeaksWeekPurposes,
+  type PatternPeaksYearLabel,
+} from "@/data/programs/patternPeaks";
 import { getPatternPeaksBackground, getPatternoxCard } from "@/lib/pattern-peaks-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 
 const SUPPORTED_LEVELS: RealmLevelId[] = ["Year 3", "Year 4", "Year 5", "Year 6"];
+
+const PATTERNOX_NAMES: Record<PatternPeaksYearLabel, string> = {
+  "Year 3": "Wigglecode",
+  "Year 4": "Sequencer",
+  "Year 5": "Solver",
+  "Year 6": "Codemaster",
+};
 
 function normalizeLevel(level: string): RealmLevelId {
   return SUPPORTED_LEVELS.includes(level as RealmLevelId) ? (level as RealmLevelId) : "Year 3";
@@ -19,8 +29,12 @@ export default function PatternPeaksProgramPreview({ level, selectedWeek }: { le
   const normalizedLevel = normalizeLevel(level);
   const [showCardBack, setShowCardBack] = useState(false);
   const program = useMemo(() => getCurriculumPlan(normalizedLevel, "algebra"), [normalizedLevel]);
+  const purposes = useMemo(
+    () => getPatternPeaksWeekPurposes(normalizedLevel as PatternPeaksYearLabel),
+    [normalizedLevel],
+  );
   const activeWeek = Math.min(Math.max(selectedWeek, 1), 8);
-  const isImplementedLevel = normalizedLevel === "Year 3";
+  const patternoxName = PATTERNOX_NAMES[normalizedLevel as PatternPeaksYearLabel];
 
   return (
     <main className="min-h-screen bg-[#0c1219] text-white">
@@ -58,13 +72,12 @@ export default function PatternPeaksProgramPreview({ level, selectedWeek }: { le
           <div className="mb-5 flex items-end justify-between gap-4 border-b border-white/10 pb-4">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#39d9a0]">Eight-week spine</p>
-              <h2 id="journey-heading" className="mt-1 text-2xl font-black">Level 3 journey</h2>
+              <h2 id="journey-heading" className="mt-1 text-2xl font-black">{normalizedLevel} journey</h2>
             </div>
             <span className="border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs font-black text-amber-100">24 lessons</span>
           </div>
 
-          {isImplementedLevel ? (
-            <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
               {program.map((week) => {
                 const active = week.week === activeWeek;
                 return (
@@ -77,9 +90,9 @@ export default function PatternPeaksProgramPreview({ level, selectedWeek }: { le
                         <p className="text-xs font-black uppercase tracking-[0.16em] text-[#ffcc62]">Week {week.week}</p>
                         <h3 className="mt-1 text-xl font-black">{week.topic}</h3>
                       </div>
-                      <ReadAloudBtn text={`Week ${week.week}. ${week.topic}. ${PATTERN_PEAKS_LEVEL3_WEEK_PURPOSES[week.week]}`} />
+                      <ReadAloudBtn text={`Week ${week.week}. ${week.topic}. ${purposes[week.week]}`} />
                     </div>
-                    <p className="mt-3 min-h-12 text-sm font-semibold leading-6 text-white/64">{PATTERN_PEAKS_LEVEL3_WEEK_PURPOSES[week.week]}</p>
+                    <p className="mt-3 min-h-12 text-sm font-semibold leading-6 text-white/64">{purposes[week.week]}</p>
                     <ol className="mt-4 space-y-2 border-t border-white/10 pt-4">
                       {week.lessons.map((lesson) => (
                         <li key={lesson.id} className="flex min-h-12 items-center gap-3 bg-black/20 px-3 py-2.5">
@@ -99,13 +112,6 @@ export default function PatternPeaksProgramPreview({ level, selectedWeek }: { le
                 );
               })}
             </div>
-          ) : (
-            <div className="border border-white/12 bg-white/[0.035] px-6 py-14 text-center">
-              <BookOpen className="mx-auto text-violet-200" size={30} />
-              <h3 className="mt-4 text-xl font-black">{normalizedLevel} is next</h3>
-              <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-white/55">The Level 3 foundation is being built first. This level will use the same eight-week structure with more advanced algebraic reasoning.</p>
-            </div>
-          )}
         </section>
 
         <aside className="lg:sticky lg:top-6 lg:self-start" aria-label="Patternox reward">
@@ -113,7 +119,7 @@ export default function PatternPeaksProgramPreview({ level, selectedWeek }: { le
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-200">Patternox</p>
-                <h2 className="mt-1 text-lg font-black">Wigglecode</h2>
+                <h2 className="mt-1 text-lg font-black">{patternoxName}</h2>
               </div>
               <button
                 type="button"

@@ -135,7 +135,7 @@ export default function DemoReviewPanel() {
   const pretestAvailable = hasPretest(realm, year);
   const posttestAvailable = hasPosttest(realm, year);
   const weeklyProgramAvailable = realm === "pattern"
-    ? year === "Year 3"
+    ? levelNumber >= 3
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
   const weeklyContentAvailable = realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.status === "implemented");
   const weeklyQuizAvailable = realm === "statistics"
