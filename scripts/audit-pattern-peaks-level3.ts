@@ -135,6 +135,13 @@ assert(towerChamber.includes('return "LEVEL 6 PREVIEW"'), "Pattern Peaks tower p
 const towerEntry = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-entry.ts"), "utf8");
 assert(towerEntry.includes('level=Year%206'), "Pattern Peaks tower preview must open Level 6.");
 
+const patternMap = fs.readFileSync(path.join(root, "components/world/PatternPeaksMap.tsx"), "utf8");
+assert.equal((patternMap.match(/left: "4%"/g) ?? []).length, 2, "The two left Pattern Peaks districts must align.");
+assert.equal((patternMap.match(/left: "67%"/g) ?? []).length, 2, "The two right Pattern Peaks districts must align.");
+assert.equal((patternMap.match(/top: "18%"/g) ?? []).length, 2, "The top Pattern Peaks districts must align.");
+assert.equal((patternMap.match(/top: "57%"/g) ?? []).length, 2, "The lower Pattern Peaks districts must align.");
+assert(patternMap.includes("districtMinHeight: 124"), "Pattern Peaks district cards need a shared minimum height.");
+
 for (const page of ["app/pattern-peaks/page.tsx", "app/pattern-peaks/program/page.tsx", "app/pattern-peaks/lesson/[level]/[week]/[lesson]/page.tsx"]) {
   const source = fs.readFileSync(path.join(root, page), "utf8");
   assert(source.includes("getServerStarpathAccess"), `${page} is not server-gated.`);

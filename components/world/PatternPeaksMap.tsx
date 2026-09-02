@@ -18,9 +18,9 @@ const PATTERN_LEVELS = LEVEL_CATALOG.filter((level) => {
 
 const DISTRICTS = [
   { left: "4%", top: "18%", color: "#39d9a0", name: "SEQUENCE PASS", identity: "NOTICE" },
-  { left: "69%", top: "17%", color: "#b899ff", name: "RULEWORKS", identity: "CONNECT" },
-  { left: "7%", top: "57%", color: "#ffcc62", name: "EQUATION RIDGE", identity: "SOLVE" },
-  { left: "66%", top: "56%", color: "#ff7b72", name: "SUMMIT LAB", identity: "JUSTIFY" },
+  { left: "67%", top: "18%", color: "#b899ff", name: "RULEWORKS", identity: "CONNECT" },
+  { left: "4%", top: "57%", color: "#ffcc62", name: "EQUATION RIDGE", identity: "SOLVE" },
+  { left: "67%", top: "57%", color: "#ff7b72", name: "SUMMIT LAB", identity: "JUSTIFY" },
 ] as const;
 
 function normalizeLevel(level: string): RealmLevelId {
@@ -103,6 +103,7 @@ export const PATTERN_PEAKS_DASHBOARD_CONFIG = {
     launchOverlay: "radial-gradient(circle at 50% 60%, rgba(57,217,160,0.7) 0%, rgba(184,153,255,0.28) 28%, rgba(10,15,23,0.97) 72%)",
     districtBackground: "linear-gradient(135deg, rgba(16,26,34,0.9), rgba(34,39,57,0.78))",
     districtActiveBackground: "linear-gradient(135deg, rgba(29,79,66,0.94), rgba(64,46,91,0.88))",
+    districtMinHeight: 124,
     hudBackground: "linear-gradient(180deg, rgba(13,20,29,0.96), rgba(8,13,20,0.98))",
     hudBorder: "1.5px solid rgba(57,217,160,0.34)",
     hudShadow: "0 10px 28px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)",

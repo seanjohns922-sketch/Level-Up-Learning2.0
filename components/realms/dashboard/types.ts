@@ -70,6 +70,7 @@ export type RealmDashboardTheme = {
   launchOverlay: string;
   districtBackground: string;
   districtActiveBackground: string;
+  districtMinHeight?: number | string;
   hudBackground: string;
   hudBorder: string;
   hudShadow: string;

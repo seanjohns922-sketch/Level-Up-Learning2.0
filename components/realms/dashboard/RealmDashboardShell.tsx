@@ -148,6 +148,7 @@ function RealmDistrictLabel({
       style={{
         width: 380,
         maxWidth: "29vw",
+        minHeight: config.theme.districtMinHeight,
         textAlign: "left",
         cursor: locked ? "default" : "pointer",
         opacity: locked ? 0.56 : 1,
