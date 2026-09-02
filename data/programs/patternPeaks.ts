@@ -1,4 +1,5 @@
 import type { CurriculumCode, Lesson, WeekPlan } from "./year1";
+import type { LessonActivity } from "./types";
 
 export type PatternPeaksYearLabel = "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
@@ -317,21 +318,44 @@ const SEEDS: Record<PatternPeaksYearLabel, WeekSeed[]> = {
   "Year 6": level6Seeds,
 };
 
+function patternActivities(patternSkill: string, mechanic: string): LessonActivity[] {
+  const config = (rotationRole: "fast_thinking" | "reasoning" | "apply_create") => ({
+    patternSkill,
+    mechanic,
+    rotationRole,
+    lessonStructure: "8_minute_rotation",
+  });
+  return [
+    { activityType: "multiple_choice", weight: 1, config: config("fast_thinking") },
+    { activityType: "multiple_choice", weight: 1, config: config("reasoning") },
+    { activityType: "typed_response", weight: 1, config: config("apply_create") },
+  ];
+}
+
 function buildProgram(yearLabel: PatternPeaksYearLabel, seeds: WeekSeed[]): WeekPlan[] {
   const level = yearLabel.replace("Year ", "");
   return seeds.map((week, weekIndex) => {
     const weekNumber = weekIndex + 1;
-    const lessons = week.lessons.map((item, lessonIndex): Lesson => ({
-      id: `y${level}-algebra-w${weekNumber}-l${lessonIndex + 1}`,
+    const lessons = week.lessons.map((item, lessonIndex): Lesson => {
+      const lessonNumber = lessonIndex + 1;
+      const id = `y${level}-algebra-w${weekNumber}-l${lessonNumber}`;
+      return {
+      id,
       week: weekNumber,
-      lesson: lessonIndex + 1,
+      lesson: lessonNumber,
       title: item.title,
       focus: item.focus,
-      activityIdeas: [item.mechanic],
+      activityIdeas: [
+        `${item.mechanic}: recognise and respond fluently`,
+        `${item.mechanic}: reason from evidence and diagnose`,
+        `${item.mechanic}: apply, construct or calculate`,
+      ],
       curriculum: item.curriculum,
-      activityType: "pattern-peaks-blueprint",
-      config: { realmId: "pattern", mechanic: item.mechanic, implementationStatus: "blueprint" },
-    }));
+      activityType: "pattern-peaks",
+      config: { realmId: "pattern", mechanic: item.mechanic, implementationStatus: "implemented" },
+      activities: patternActivities(id, item.mechanic),
+    };
+    });
     return {
       id: `y${level}-algebra-w${weekNumber}`,
       week: weekNumber,

@@ -6,7 +6,10 @@ import {
   PATTERN_PEAKS_SPINES,
   type PatternPeaksYearLabel,
 } from "@/data/programs/patternPeaks";
+import { generatePatternPeaksQuestion } from "@/data/activities/patternPeaks/generator";
+import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/year2/lessonEngine";
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
+import { isLessonQuestionSafe } from "@/lib/task-safety";
 
 const root = process.cwd();
 const descriptorSets: Record<PatternPeaksYearLabel, Set<string>> = {
@@ -34,11 +37,30 @@ for (const level of Object.keys(PATTERN_PEAKS_PROGRAMS) as PatternPeaksYearLabel
     for (const [lessonIndex, currentLesson] of week.lessons.entries()) {
       assert.equal(currentLesson.id, `y${levelNumber}-algebra-w${week.week}-l${lessonIndex + 1}`, `${currentLesson.title} has a non-canonical id.`);
       assert(currentLesson.focus.length >= 55, `${level} ${currentLesson.title} needs a specific learning focus.`);
-      assert.equal(currentLesson.activityIdeas.length, 1, `${level} ${currentLesson.title} needs one primary mechanic.`);
-      assert.equal(currentLesson.config?.implementationStatus, "blueprint", `${level} ${currentLesson.title} must remain blueprint-only.`);
+      assert.equal(currentLesson.activityIdeas.length, 3, `${level} ${currentLesson.title} needs three child-facing activity descriptions.`);
+      assert.equal(currentLesson.config?.implementationStatus, "implemented", `${level} ${currentLesson.title} must be implemented.`);
+      assert.equal(currentLesson.activityType, "pattern-peaks", `${level} ${currentLesson.title} must use the Pattern Peaks engine.`);
       assert(currentLesson.curriculum.every((code) => allowedDescriptors.has(code)), `${level} ${currentLesson.title} leaks outside ACARA Algebra ownership.`);
+      const activities = currentLesson.activities ?? [];
+      assert.equal(activities.length, 3, `${level} ${currentLesson.title} must have exactly three rotations.`);
+      assert.deepEqual(
+        new Set(activities.map((activity) => activity.config.rotationRole)),
+        new Set(["fast_thinking", "reasoning", "apply_create"]),
+        `${level} ${currentLesson.title} must include fast, reasoning and apply/create rotations.`,
+      );
+      const pool = buildLessonActivityPool(getLevelForLesson(currentLesson), currentLesson);
+      assert.equal(pool.violations.length, 0, `${level} ${currentLesson.title} has rotation policy violations.`);
+      assert.equal(pool.activities.length, 3, `${level} ${currentLesson.title} has an empty production activity pool.`);
+      for (const activity of activities) {
+        for (let sample = 0; sample < 3; sample += 1) {
+          const question = generatePatternPeaksQuestion(getLevelForLesson(currentLesson), currentLesson, activity);
+          assert(isLessonQuestionSafe(activity, question), `${level} ${currentLesson.title} generated an unsafe ${String(activity.config.rotationRole)} question.`);
+          assert("visual" in question && question.visual, `${level} ${currentLesson.title} generated a question without an algebra visual.`);
+          assert("helper" in question && question.helper, `${level} ${currentLesson.title} generated a question without guided feedback.`);
+        }
+      }
       currentLesson.curriculum.forEach((code) => usedDescriptors.add(code));
-      mechanics.add(currentLesson.activityIdeas[0]!);
+      mechanics.add(String(currentLesson.config?.mechanic));
     }
   }
   assert.deepEqual(usedDescriptors, allowedDescriptors, `${level} does not cover its complete ACARA Algebra descriptor set.`);
@@ -71,6 +93,13 @@ const demoPanel = fs.readFileSync(path.join(root, "components/demo/DemoReviewPan
 assert(demoPanel.includes('{ id: "pattern", label: "Pattern Peaks"'), "Demo Review does not expose Pattern Peaks.");
 assert(demoPanel.includes("/pattern-peaks/program?teacher_preview=1"), "Demo Review does not expose Pattern Peaks program previews.");
 assert(demoPanel.includes("? levelNumber >= 3"), "Demo Review does not expose the Level 4-6 program blueprints.");
+assert(demoPanel.includes("/pattern-peaks/lesson/"), "Demo Review does not expose Pattern Peaks lessons.");
+
+const programPreview = fs.readFileSync(path.join(root, "components/pattern-peaks/PatternPeaksProgramPreview.tsx"), "utf8");
+assert(programPreview.includes("/pattern-peaks/lesson/"), "Pattern Peaks week cards do not link to implemented lessons.");
+const lessonShell = fs.readFileSync(path.join(root, "components/pattern-peaks/PatternPeaksLessonShell.tsx"), "utf8");
+assert(lessonShell.includes("Year2LessonEngine"), "Pattern Peaks lessons do not use the shared reviewed lesson engine.");
+assert(lessonShell.includes("generatePatternPeaksQuestion"), "Pattern Peaks lessons do not use their curriculum generator.");
 
 const towerPortalConfig = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-chamber-config.ts"), "utf8");
 assert(towerPortalConfig.includes('posterAsset: "/images/patternpeaks-home-bg-y6.jpeg"'), "Pattern Peaks tower portal must use the Level 6 realm background, not a card asset.");
@@ -79,9 +108,9 @@ assert(towerChamber.includes('return "LEVEL 6 PREVIEW"'), "Pattern Peaks tower p
 const towerEntry = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-entry.ts"), "utf8");
 assert(towerEntry.includes('level=Year%206'), "Pattern Peaks tower preview must open Level 6.");
 
-for (const page of ["app/pattern-peaks/page.tsx", "app/pattern-peaks/program/page.tsx"]) {
+for (const page of ["app/pattern-peaks/page.tsx", "app/pattern-peaks/program/page.tsx", "app/pattern-peaks/lesson/[level]/[week]/[lesson]/page.tsx"]) {
   const source = fs.readFileSync(path.join(root, page), "utf8");
   assert(source.includes("getServerStarpathAccess"), `${page} is not server-gated.`);
 }
 
-console.log("Pattern Peaks curriculum audit passed: 4 levels, 32 weeks, 96 lessons, ACARA ownership, gated previews, and assets verified.");
+console.log("Pattern Peaks curriculum audit passed: 4 levels, 32 weeks, 96 lessons, 288 rotations, ACARA ownership, lesson review, gated previews, and assets verified.");

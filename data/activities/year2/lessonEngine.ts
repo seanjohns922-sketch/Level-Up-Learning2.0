@@ -26569,6 +26569,13 @@ export function buildLessonActivityPool(
   const pool: LessonActivity[] = [];
   const violations: Year2PolicyViolation[] = validateLessonRotationStructure(lesson);
 
+  // Pattern Peaks supplies its own ACARA-aligned generator. Keep the shared
+  // three-role rotation contract, but do not apply Number Nexus week policies
+  // to algebra lessons that happen to share the same year/week coordinates.
+  if (lesson.id.includes("-algebra-")) {
+    return { activities: violations.length === 0 ? [...activities] : [], violations };
+  }
+
   for (const activity of activities) {
     const validation = validateLessonActivityIntentForLevel(level, lesson, activity);
     if (validation.valid) {

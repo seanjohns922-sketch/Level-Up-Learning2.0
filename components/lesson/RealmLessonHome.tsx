@@ -10,6 +10,7 @@ import {
   Medal,
   Play,
   Ruler,
+  Sigma,
   Sparkles,
   Star,
   Video,
@@ -19,8 +20,9 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { getHomeBg } from "@/lib/levelBand";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { getStatisticaBackground } from "@/lib/statistica-visuals";
+import { getPatternPeaksBackground } from "@/lib/pattern-peaks-visuals";
 
-export type RealmLessonThemeId = "number" | "measurement" | "statistics";
+export type RealmLessonThemeId = "number" | "measurement" | "statistics" | "pattern";
 
 type RealmLessonHomeProps = {
   realm: RealmLessonThemeId;
@@ -130,11 +132,39 @@ export const REALM_LESSON_THEMES = {
     gridColor: "rgba(240,107,100,0.28)",
     ThemeIcon: ChartNoAxesColumnIncreasing,
   },
+  pattern: {
+    realmName: "Pattern Peaks",
+    experienceLabel: "Pattern Challenge",
+    startLabel: "Start Challenge",
+    videoLabel: "Summit Briefing",
+    rewardLabel: "Challenge Rewards",
+    completionLabel: "Challenge Complete",
+    legendLabel: "Patternox",
+    intro:
+      "Read the pattern trail, test each rule, and explain why your algebra works.",
+    pageBg: "#0c1219",
+    shellBg: "rgba(12, 21, 28, 0.97)",
+    panelBg: "rgba(25, 45, 48, 0.9)",
+    panelBorder: "rgba(57, 217, 160, 0.3)",
+    accent: "#39d9a0",
+    accentSoft: "#e8fff7",
+    secondary: "#ffcc62",
+    heroOverlay:
+      "linear-gradient(90deg, rgba(8,17,23,0.98) 0%, rgba(18,39,42,0.86) 50%, rgba(18,39,42,0.2) 100%)",
+    backdropOverlay:
+      "linear-gradient(180deg, rgba(8,14,22,0.46), rgba(8,14,22,0.88))",
+    videoBg: "linear-gradient(135deg, #101923 0%, #183d39 54%, #4b3970 100%)",
+    buttonBg: "linear-gradient(90deg, #14785f, #28b98b 58%, #7659c4)",
+    buttonShadow: "0 16px 40px rgba(57,217,160,0.24)",
+    gridColor: "rgba(57,217,160,0.24)",
+    ThemeIcon: Sigma,
+  },
 } as const;
 
 export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: number, year: string) {
   if (realm === "number") return getHomeBg(levelNumber, year === "Prep");
   if (realm === "statistics") return getStatisticaBackground(`Year ${levelNumber}` as RealmLevelId);
+  if (realm === "pattern") return getPatternPeaksBackground(`Year ${levelNumber}` as RealmLevelId);
   if (year === "Prep") return "/images/measurelands-home-bg.png";
   return MEASURELANDS_BACKGROUNDS[levelNumber] ?? "/images/measurelands-home-bg.png";
 }
@@ -190,15 +220,15 @@ export function RealmLessonHome({
           src={artworkSrc}
           alt=""
           className="h-full w-full object-cover"
-          style={{ filter: realm === "statistics" ? "brightness(0.56) saturate(1.16)" : "brightness(0.38) saturate(1.12)" }}
+          style={{ filter: realm === "statistics" || realm === "pattern" ? "brightness(0.56) saturate(1.16)" : "brightness(0.38) saturate(1.12)" }}
         />
         <div className="absolute inset-0" style={{ background: theme.backdropOverlay }} />
-        {realm === "number" || realm === "statistics" ? (
+        {realm === "number" || realm === "statistics" || realm === "pattern" ? (
           <div
             className="absolute inset-0 opacity-30"
             style={{
               backgroundImage:
-                realm === "statistics"
+                realm === "statistics" || realm === "pattern"
                   ? `linear-gradient(${theme.gridColor} 1px, transparent 1px), linear-gradient(90deg, ${theme.gridColor} 1px, transparent 1px)`
                   : "linear-gradient(rgba(94,234,212,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,0.12) 1px, transparent 1px)",
               backgroundSize: realm === "statistics" ? "36px 36px" : "44px 44px",

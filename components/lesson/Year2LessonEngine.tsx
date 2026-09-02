@@ -38,6 +38,7 @@ import {
 } from "@/data/activities/year2/lessonEngine";
 import { pickWeightedIndex } from "@/lib/weightedRandom";
 import type { Lesson } from "@/data/programs/year1";
+import type { LessonActivity } from "@/data/programs/types";
 import { isLessonQuestionSafe } from "@/lib/task-safety";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
@@ -48,9 +49,19 @@ function getWorkingLevelForLesson(lesson: Lesson) {
   return yearNumber === 0 ? "Prep" : `Year ${yearNumber}`;
 }
 
-function buildInitialTurn(lesson: Lesson, activities: Lesson["activities"] = []) {
+export type LessonQuestionGenerator = (
+  level: SupportedMathLevel,
+  lesson: Lesson,
+  activity: LessonActivity,
+) => Year2QuestionData;
+
+function buildInitialTurn(
+  lesson: Lesson,
+  activities: Lesson["activities"] = [],
+  questionGenerator: LessonQuestionGenerator = generateQuestion,
+) {
   const level = getLevelForLesson(lesson);
-  return chooseNextLessonTurn(level, lesson, activities, [], null, [], 0);
+  return chooseNextLessonTurn(level, lesson, activities, [], null, [], 0, questionGenerator);
 }
 
 function isOrderedStrategyFluencyLesson(level: SupportedMathLevel, lesson: Lesson) {
@@ -77,7 +88,8 @@ function chooseNextLessonTurn(
   currentBag: number[],
   lastIndex: number | null,
   history: QuestionHistoryEntry[],
-  questionOrder: number
+  questionOrder: number,
+  questionGenerator: LessonQuestionGenerator,
 ) {
   if (!activities || activities.length === 0) {
     return {
@@ -146,7 +158,7 @@ function chooseNextLessonTurn(
       : activity;
 
     for (let attempt = 0; attempt < CANDIDATES_PER_ACTIVITY; attempt += 1) {
-      const question = generateQuestion(level, lesson, activityWithTemplateIndex);
+      const question = questionGenerator(level, lesson, activityWithTemplateIndex);
       if (!isLessonQuestionSafe(activityWithTemplateIndex, question)) {
         continue;
       }
@@ -194,7 +206,7 @@ function chooseNextLessonTurn(
     activityIndex: chosenActivityIndex,
     question:
       best?.question ??
-      generateQuestion(
+      questionGenerator(
         level,
         lesson,
         level === 4 && lesson.week === 8
@@ -598,6 +610,7 @@ export function Year2LessonEngine({
   practisedSkills,
   nextUpLabel,
   brainBreakFrequency = "normal",
+  questionGenerator = generateQuestion,
 }: {
   lesson: Lesson;
   onTimedComplete: () => void;
@@ -611,6 +624,7 @@ export function Year2LessonEngine({
   practisedSkills?: string[];
   nextUpLabel?: string;
   brainBreakFrequency?: BrainBreakFrequency;
+  questionGenerator?: LessonQuestionGenerator;
 }) {
   const isMeasurement = realmId === "measurement";
   const isLevelTwoNumber = !isMeasurement && levelNumber === 2;
@@ -624,7 +638,10 @@ export function Year2LessonEngine({
   const workingLevel = useMemo(() => getWorkingLevelForLesson(lesson), [lesson]);
   const lessonPool = useMemo(() => buildLessonActivityPool(level, lesson), [level, lesson]);
   const activities = lessonPool.activities;
-  const initialTurn = useMemo(() => buildInitialTurn(lesson, activities), [activities, lesson]);
+  const initialTurn = useMemo(
+    () => buildInitialTurn(lesson, activities, questionGenerator),
+    [activities, lesson, questionGenerator],
+  );
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const [brainBreakVillain, setBrainBreakVillain] = useState<Villain | null>(null);
   const [brainBreakKey, setBrainBreakKey] = useState<string | null>(null);
@@ -655,12 +672,12 @@ export function Year2LessonEngine({
   const showLessonResumeRef = useRef(false);
   const bestChainRef = useRef(0);
   useEffect(() => {
-    bestChainRef.current = readBestChain("number", workingLevel);
-  }, [workingLevel]);
+    bestChainRef.current = readBestChain(realmId ?? "number", workingLevel);
+  }, [realmId, workingLevel]);
   function saveBestChain(chain: number) {
     if (chain > bestChainRef.current) {
       bestChainRef.current = chain;
-      writeBestChain("number", workingLevel, chain);
+      writeBestChain(realmId ?? "number", workingLevel, chain);
     }
   }
   const [currentActivityIndex, setCurrentActivityIndex] = useState(initialTurn.activityIndex);
@@ -744,7 +761,8 @@ export function Year2LessonEngine({
         bagRef.current,
         lastIndexRef.current,
         questionHistoryRef.current,
-        questionOrderRef.current
+        questionOrderRef.current,
+        questionGenerator,
       );
       const nextActivity = activities[nextTurn.activityIndex];
       if (!nextActivity || !nextTurn.question || !isLessonQuestionSafe(nextActivity, nextTurn.question)) {

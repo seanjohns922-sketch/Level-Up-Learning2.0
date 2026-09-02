@@ -36,7 +36,7 @@ export function RealmActiveLessonShell({
 }) {
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
-  const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : "Mission";
+  const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : realm === "pattern" ? "Challenge" : "Mission";
   const readText = `${lessonTitle}. ${focus ?? "Practise today's lesson skill."}`;
 
   return (
@@ -47,10 +47,10 @@ export function RealmActiveLessonShell({
           src={artworkSrc}
           alt=""
           className="h-full w-full object-cover"
-          style={{ filter: realm === "statistics" ? "brightness(0.5) saturate(1.16)" : "brightness(0.34) saturate(1.14)" }}
+          style={{ filter: realm === "statistics" || realm === "pattern" ? "brightness(0.5) saturate(1.16)" : "brightness(0.34) saturate(1.14)" }}
         />
         <div className="absolute inset-0" style={{ background: theme.backdropOverlay }} />
-        {realm === "number" || realm === "statistics" ? (
+        {realm === "number" || realm === "statistics" || realm === "pattern" ? (
           <div
             className="absolute inset-0 opacity-25"
             style={{
@@ -117,7 +117,9 @@ export function RealmActiveLessonShell({
                 ? "linear-gradient(180deg, #fffaf0 0%, #f7eedc 100%)"
                 : realm === "statistics"
                   ? "linear-gradient(180deg, #fffaf2 0%, #eef5e7 100%)"
-                : "linear-gradient(180deg, #f7fffe 0%, #eaf9f8 100%)",
+                  : realm === "pattern"
+                    ? "linear-gradient(180deg, #f7fff9 0%, #eef1ff 100%)"
+                  : "linear-gradient(180deg, #f7fffe 0%, #eaf9f8 100%)",
           }}
         >
           {children}

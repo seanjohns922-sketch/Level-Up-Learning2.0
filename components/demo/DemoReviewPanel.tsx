@@ -137,7 +137,9 @@ export default function DemoReviewPanel() {
   const weeklyProgramAvailable = realm === "pattern"
     ? levelNumber >= 3
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
-  const weeklyContentAvailable = realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.status === "implemented");
+  const weeklyContentAvailable = realm === "pattern"
+    ? levelNumber >= 3
+    : realm !== "space" || selectedStarpathWeek?.status === "implemented";
   const weeklyQuizAvailable = realm === "statistics"
     ? week <= 5
     : realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented");
@@ -256,6 +258,9 @@ export default function DemoReviewPanel() {
   }
 
   function lessonHref() {
+    if (realm === "pattern") {
+      return `/pattern-peaks/lesson/${encodeURIComponent(year)}/${week}/${lesson}?teacher_preview=1`;
+    }
     if (realm === "statistics") {
       return `/statistica/lesson/${encodeURIComponent(year)}/${week}/${lesson}?teacher_preview=1`;
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowLeft, CheckCircle2, RotateCcw, Volume2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -95,12 +96,18 @@ export default function PatternPeaksProgramPreview({ level, selectedWeek }: { le
                     <p className="mt-3 min-h-12 text-sm font-semibold leading-6 text-white/64">{purposes[week.week]}</p>
                     <ol className="mt-4 space-y-2 border-t border-white/10 pt-4">
                       {week.lessons.map((lesson) => (
-                        <li key={lesson.id} className="flex min-h-12 items-center gap-3 bg-black/20 px-3 py-2.5">
-                          <span className="grid h-7 w-7 shrink-0 place-items-center border border-violet-300/30 bg-violet-300/10 text-xs font-black text-violet-100">{lesson.lesson}</span>
-                          <div className="min-w-0">
-                            <p className="font-bold">{lesson.title}</p>
-                            <p className="truncate text-xs text-white/45">{String(lesson.config?.mechanic ?? "Pattern investigation")}</p>
-                          </div>
+                        <li key={lesson.id}>
+                          <Link
+                            href={`/pattern-peaks/lesson/${encodeURIComponent(normalizedLevel)}/${week.week}/${lesson.lesson}?teacher_preview=1`}
+                            className="flex min-h-14 items-center gap-3 border border-transparent bg-black/20 px-3 py-2.5 transition hover:border-[#39d9a0]/60 hover:bg-[#39d9a0]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#ffcc62]"
+                          >
+                            <span className="grid h-8 w-8 shrink-0 place-items-center border border-violet-300/30 bg-violet-300/10 text-xs font-black text-violet-100">{lesson.lesson}</span>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-bold">{lesson.title}</p>
+                              <p className="truncate text-xs text-white/45">{String(lesson.config?.mechanic ?? "Pattern investigation")}</p>
+                            </div>
+                            <span className="text-xs font-black uppercase tracking-[0.12em] text-[#39d9a0]">Open</span>
+                          </Link>
                         </li>
                       ))}
                     </ol>
