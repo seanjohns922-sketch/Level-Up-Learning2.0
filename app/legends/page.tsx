@@ -67,12 +67,13 @@ const REALMS: RealmDef[] = [
   {
     id: "pattern-peaks",
     name: "Pattern Peaks",
-    legendLine: "Pattern Weavers",
+    legendLine: "Patternox Collection",
     icon: <Triangle className="h-5 w-5" />,
-    totalLegends: 7,
+    totalLegends: 4,
     status: "locked",
-    glowColor: "transparent",
-    borderGlow: "rgba(255,255,255,0.15)",
+    route: "/legends/pattern-peaks",
+    glowColor: "rgba(57, 217, 160, 0.22)",
+    borderGlow: "rgba(139, 92, 246, 0.58)",
   },
   {
     id: "statistica",
@@ -173,17 +174,30 @@ export default function LegendsPage() {
     [demoPreview],
   );
 
+  const patternPeaksCollected = useMemo(
+    () => (demoPreview ? getAllLegends("pattern-peaks").length : 0),
+    [demoPreview],
+  );
+
   const realms = useMemo(
     () =>
       REALMS.map((realm) =>
-        (realm.id === "starpath-realm" || realm.id === "statistica") && demoPreview
+        (realm.id === "starpath-realm" ||
+          realm.id === "pattern-peaks" ||
+          realm.id === "statistica") &&
+        demoPreview
           ? { ...realm, status: "open" as const }
           : realm,
       ),
     [demoPreview],
   );
 
-  const totalCollected = numbotCollected + measurelandsCollected + starpathCollected + statisticaCollected;
+  const totalCollected =
+    numbotCollected +
+    measurelandsCollected +
+    starpathCollected +
+    patternPeaksCollected +
+    statisticaCollected;
   const totalLegends = realms.reduce((sum, r) => sum + r.totalLegends, 0);
   const pct = totalLegends > 0 ? Math.round((totalCollected / totalLegends) * 100) : 0;
 
@@ -294,6 +308,8 @@ export default function LegendsPage() {
                       ? measurelandsCollected
                       : realm.id === "starpath-realm"
                         ? starpathCollected
+                      : realm.id === "pattern-peaks"
+                        ? patternPeaksCollected
                       : realm.id === "statistica"
                         ? statisticaCollected
                       : 0

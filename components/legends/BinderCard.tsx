@@ -20,6 +20,8 @@ export default function BinderCard({
       ? "Measurelands"
       : legend.realmId === "starpath"
         ? "Starpath"
+        : legend.realmId === "pattern-peaks"
+          ? "Pattern Peaks"
         : legend.realmId === "statistica"
           ? "Statistica"
           : "Number";

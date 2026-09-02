@@ -1,5 +1,10 @@
-export type LegendRealmId = "number-nexus" | "measurelands" | "starpath" | "statistica";
-export type LegendStrand = "Number" | "Measurement" | "Space" | "Statistics";
+export type LegendRealmId =
+  | "number-nexus"
+  | "measurelands"
+  | "starpath"
+  | "pattern-peaks"
+  | "statistica";
+export type LegendStrand = "Number" | "Measurement" | "Space" | "Algebra" | "Statistics";
 
 export type LegendStats = {
   calculation: number;
@@ -44,6 +49,11 @@ const DEFAULT_IMAGES: Record<LegendRealmId, LegendImages> = {
     avatar: "/cards/geospin-shapeshifter-y4-front.png",
     cardFront: "/cards/geospin-shapeshifter-y4-front.png",
     cardBack: "/cards/geospin-shapeshifter-y4-back.png",
+  },
+  "pattern-peaks": {
+    avatar: "/cards/patternox-sequencer-y4-front.png",
+    cardFront: "/cards/patternox-sequencer-y4-front.png",
+    cardBack: "/cards/patternox-sequencer-y4-back.png",
   },
   statistica: {
     avatar: "/cards/datara-analyst-y4-front.png",
@@ -162,6 +172,36 @@ function statisticaLegend(
     realmId: "statistica",
     yearLabel,
     strand: "Statistics",
+    name,
+    description,
+    stars,
+    stats,
+    images: {
+      avatar: front,
+      cardFront: front,
+      cardBack: back,
+    },
+    unlockVideoUrl: legendVideoUrl(videoSlug),
+    showcaseVideoUrl: legendVideoUrl(videoSlug),
+  };
+}
+
+function patternPeaksLegend(
+  id: string,
+  yearLabel: string,
+  name: string,
+  description: string,
+  stars: number,
+  stats: LegendStats,
+  front: string,
+  back: string,
+  videoSlug: string,
+): Legend {
+  return {
+    id,
+    realmId: "pattern-peaks",
+    yearLabel,
+    strand: "Algebra",
     name,
     description,
     stars,
@@ -408,6 +448,50 @@ const LEGENDS: Legend[] = [
     "/cards/geospin-starweaver-y6-back.png",
     "geospin-starweaver",
   ),
+  patternPeaksLegend(
+    "patternox-wigglecode-y3",
+    "Year 3",
+    "Patternox Wigglecode",
+    "Spots changing patterns and follows rules through every twist in the trail.",
+    3,
+    { calculation: 58, speed: 56, accuracy: 62 },
+    "/cards/patternox-wigglecode-y3-front.png",
+    "/cards/patternox-wigglecode-y3-back.png",
+    "patternox-wigglecode",
+  ),
+  patternPeaksLegend(
+    "patternox-sequencer-y4",
+    "Year 4",
+    "Patternox Sequencer",
+    "Connects number sequences, equivalent statements, and efficient algebraic rules.",
+    4,
+    { calculation: 67, speed: 63, accuracy: 70 },
+    "/cards/patternox-sequencer-y4-front.png",
+    "/cards/patternox-sequencer-y4-back.png",
+    "patternox-sequencer",
+  ),
+  patternPeaksLegend(
+    "patternox-solver-y5",
+    "Year 5",
+    "Patternox Solver",
+    "Uses inverse operations and number properties to solve unknown values with confidence.",
+    5,
+    { calculation: 77, speed: 71, accuracy: 80 },
+    "/cards/patternox-solver-y5-front.png",
+    "/cards/patternox-solver-y5-back.png",
+    "patternox-solver",
+  ),
+  patternPeaksLegend(
+    "patternox-codemaster-y6",
+    "Year 6",
+    "Patternox Codemaster",
+    "Masters growing patterns, algorithms, brackets, and multi-operation equations.",
+    6,
+    { calculation: 86, speed: 80, accuracy: 88 },
+    "/cards/patternox-codemaster-y6-front.png",
+    "/cards/patternox-codemaster-y6-back.png",
+    "patternox-codemaster",
+  ),
   statisticaLegend(
     "datara-picker-y1",
     "Year 1",
@@ -479,6 +563,9 @@ const LEGENDS: Legend[] = [
 export function normalizeLegendRealmId(realmId?: string | null): LegendRealmId {
   if (realmId === "measurelands" || realmId === "measurement") return "measurelands";
   if (realmId === "starpath" || realmId === "starpath-realm" || realmId === "space") return "starpath";
+  if (realmId === "pattern-peaks" || realmId === "pattern" || realmId === "algebra") {
+    return "pattern-peaks";
+  }
   if (realmId === "statistica" || realmId === "statistics") return "statistica";
   return "number-nexus";
 }
@@ -505,6 +592,8 @@ export function getLegendForYear(
           ? "Measurement"
           : realmId === "starpath"
             ? "Space"
+            : realmId === "pattern-peaks"
+              ? "Algebra"
             : realmId === "statistica"
               ? "Statistics"
               : "Number",

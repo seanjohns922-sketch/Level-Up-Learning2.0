@@ -59,6 +59,7 @@ export default function LegendDetailModal({
   // Realm-aware theming keeps the shared card interaction consistent.
   const isMeasure = legend.realmId === "measurelands";
   const isStarpath = legend.realmId === "starpath";
+  const isPatternPeaks = legend.realmId === "pattern-peaks";
   const isStatistica = legend.realmId === "statistica";
   const t = isMeasure
     ? {
@@ -76,6 +77,14 @@ export default function LegendDetailModal({
           pill: "rounded-full border border-violet-600/20 bg-white/80 px-3 py-1 text-xs font-black text-violet-700 transition hover:bg-white",
           year: "text-violet-600",
         }
+      : isPatternPeaks
+        ? {
+            panelBg: "bg-gradient-to-br from-[#eefcf5] via-[#edf7ff] to-[#f4efff]",
+            glow: "from-[#39d9a0]/25 to-violet-500/25",
+            active: "bg-[#174f3c] text-white",
+            pill: "rounded-full border border-[#174f3c]/20 bg-white/85 px-3 py-1 text-xs font-black text-[#174f3c] transition hover:bg-white",
+            year: "text-violet-700",
+          }
       : isStatistica
         ? {
             panelBg: "bg-gradient-to-br from-[#f7f4e8] via-[#eaf7ef] to-[#fff0eb]",

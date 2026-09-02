@@ -10,6 +10,7 @@ import { generatePatternPeaksQuestion } from "@/data/activities/patternPeaks/gen
 import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/year2/lessonEngine";
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
 import { isLessonQuestionSafe } from "@/lib/task-safety";
+import { getAllLegends } from "@/data/legends";
 
 const root = process.cwd();
 const descriptorSets: Record<PatternPeaksYearLabel, Set<string>> = {
@@ -85,6 +86,10 @@ for (const asset of [
   "public/cards/patternox-solver-y5-back.png",
   "public/cards/patternox-codemaster-y6-front.png",
   "public/cards/patternox-codemaster-y6-back.png",
+  "public/videos/legends/patternox-wigglecode.mp4",
+  "public/videos/legends/patternox-sequencer.mp4",
+  "public/videos/legends/patternox-solver.mp4",
+  "public/videos/legends/patternox-codemaster.mp4",
 ]) {
   assert(fs.existsSync(path.join(root, asset)), `${asset} is missing.`);
 }
@@ -94,9 +99,31 @@ assert(demoPanel.includes('{ id: "pattern", label: "Pattern Peaks"'), "Demo Revi
 assert(demoPanel.includes("/pattern-peaks/program?teacher_preview=1"), "Demo Review does not expose Pattern Peaks program previews.");
 assert(demoPanel.includes("? levelNumber >= 3"), "Demo Review does not expose the Level 4-6 program blueprints.");
 assert(demoPanel.includes("/pattern-peaks/lesson/"), "Demo Review does not expose Pattern Peaks lessons.");
+assert(demoPanel.includes('"/legends/pattern-peaks"'), "Demo Review does not expose all Patternox videos.");
 
 const programPreview = fs.readFileSync(path.join(root, "components/pattern-peaks/PatternPeaksProgramPreview.tsx"), "utf8");
 assert(programPreview.includes("/pattern-peaks/lesson/"), "Pattern Peaks week cards do not link to implemented lessons.");
+assert(programPreview.includes("PATTERNOX_VIDEOS"), "Patternox cards do not expose their showcase videos.");
+
+const patternoxLegends = getAllLegends("pattern-peaks");
+assert.equal(patternoxLegends.length, 4, "Pattern Peaks must expose four Level 3-6 Patternox cards.");
+assert.deepEqual(
+  patternoxLegends.map((legend) => legend.yearLabel),
+  ["Year 3", "Year 4", "Year 5", "Year 6"],
+  "Patternox cards must cover Levels 3-6 in order.",
+);
+for (const legend of patternoxLegends) {
+  assert(legend.showcaseVideoUrl, `${legend.name} is missing its showcase video.`);
+  assert(legend.unlockVideoUrl, `${legend.name} is missing its unlock video.`);
+  assert.equal(legend.showcaseVideoUrl, legend.unlockVideoUrl, `${legend.name} must use the same canonical video in both card flows.`);
+}
+
+const legendsHall = fs.readFileSync(path.join(root, "app/legends/page.tsx"), "utf8");
+assert(legendsHall.includes('route: "/legends/pattern-peaks"'), "The Hall of Legends does not link to the Patternox collection.");
+assert(legendsHall.includes('realm.id === "pattern-peaks"'), "Patternox cards are not unlocked in Demo Mode.");
+const patternoxCollection = fs.readFileSync(path.join(root, "app/legends/pattern-peaks/page.tsx"), "utf8");
+assert(patternoxCollection.includes("isDemoPreviewMode"), "The Patternox collection is not demo-gated.");
+assert(patternoxCollection.includes("LegendDetailModal"), "Patternox cards do not use the standard video-enabled card detail.");
 const lessonShell = fs.readFileSync(path.join(root, "components/pattern-peaks/PatternPeaksLessonShell.tsx"), "utf8");
 assert(lessonShell.includes("Year2LessonEngine"), "Pattern Peaks lessons do not use the shared reviewed lesson engine.");
 assert(lessonShell.includes("generatePatternPeaksQuestion"), "Pattern Peaks lessons do not use their curriculum generator.");

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, RotateCcw, Volume2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Play, RotateCcw, Volume2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { getCurriculumPlan } from "@/data/programs/genres";
@@ -22,6 +22,13 @@ const PATTERNOX_NAMES: Record<PatternPeaksYearLabel, string> = {
   "Year 6": "Codemaster",
 };
 
+const PATTERNOX_VIDEOS: Record<PatternPeaksYearLabel, string> = {
+  "Year 3": "/videos/legends/patternox-wigglecode.mp4",
+  "Year 4": "/videos/legends/patternox-sequencer.mp4",
+  "Year 5": "/videos/legends/patternox-solver.mp4",
+  "Year 6": "/videos/legends/patternox-codemaster.mp4",
+};
+
 function normalizeLevel(level: string): RealmLevelId {
   return SUPPORTED_LEVELS.includes(level as RealmLevelId) ? (level as RealmLevelId) : "Year 3";
 }
@@ -29,6 +36,7 @@ function normalizeLevel(level: string): RealmLevelId {
 export default function PatternPeaksProgramPreview({ level, selectedWeek }: { level: string; selectedWeek: number }) {
   const normalizedLevel = normalizeLevel(level);
   const [showCardBack, setShowCardBack] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
   const program = useMemo(() => getCurriculumPlan(normalizedLevel, "algebra"), [normalizedLevel]);
   const purposes = useMemo(
     () => getPatternPeaksWeekPurposes(normalizedLevel as PatternPeaksYearLabel),
@@ -36,6 +44,7 @@ export default function PatternPeaksProgramPreview({ level, selectedWeek }: { le
   );
   const activeWeek = Math.min(Math.max(selectedWeek, 1), 8);
   const patternoxName = PATTERNOX_NAMES[normalizedLevel as PatternPeaksYearLabel];
+  const patternoxVideo = PATTERNOX_VIDEOS[normalizedLevel as PatternPeaksYearLabel];
 
   return (
     <main className="min-h-screen bg-[#0c1219] text-white">
@@ -150,9 +159,45 @@ export default function PatternPeaksProgramPreview({ level, selectedWeek }: { le
             <div className="mt-4 flex items-center gap-2 text-sm font-bold text-white/70">
               <Volume2 size={16} className="text-[#39d9a0]" /> Complete the level to earn this card.
             </div>
+            <button
+              type="button"
+              onClick={() => setShowVideo(true)}
+              className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 bg-[#39d9a0] px-4 text-sm font-black text-[#071914] transition hover:bg-[#69e8bc]"
+            >
+              <Play size={17} fill="currentColor" /> Watch {patternoxName}
+            </button>
           </div>
         </aside>
       </div>
+
+      {showVideo ? (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setShowVideo(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl overflow-hidden border border-emerald-300/30 bg-black shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <video
+              src={patternoxVideo}
+              controls
+              autoPlay
+              playsInline
+              className="aspect-video w-full bg-black object-contain"
+            />
+            <button
+              type="button"
+              onClick={() => setShowVideo(false)}
+              className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/70 text-white transition hover:bg-black"
+              title="Close video"
+              aria-label={`Close ${patternoxName} video`}
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

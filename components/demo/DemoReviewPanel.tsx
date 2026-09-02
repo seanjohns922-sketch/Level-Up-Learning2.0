@@ -410,7 +410,13 @@ export default function DemoReviewPanel() {
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             <button type="button" onClick={previewGemReveal} disabled={gemLoading} className={actionClass(!gemLoading)}><Gem size={16} /> {gemLoading ? "Loading..." : "Gem Reveal"}</button>
             <button type="button" onClick={() => open("/my-realmies?review_reveal=1")} className={actionClass()}><Sparkles size={16} /> Realmie Reveal</button>
-            <button type="button" onClick={() => open("/legends")} className={actionClass()}><Eye size={16} /> Legend Collection</button>
+            <button
+              type="button"
+              onClick={() => open(realm === "pattern" ? "/legends/pattern-peaks" : "/legends")}
+              className={actionClass()}
+            >
+              <Eye size={16} /> {realm === "pattern" ? "Patternox Videos" : "Legend Collection"}
+            </button>
           </div>
         </section>
 
