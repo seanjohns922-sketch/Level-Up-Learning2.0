@@ -146,6 +146,10 @@ function buildNextActivityRow(
 ): LiveStudentActivityRow {
   const isAssessmentStart = input.eventType === "activity_started" &&
     (input.activityId === "pretest" || input.activityId === "posttest");
+  const isLearningActivityStart = input.eventType === "lesson_started" || input.eventType === "quiz_started";
+  const changedLearningActivity = Boolean(
+    input.lessonId && existing?.current_lesson && input.lessonId !== existing.current_lesson,
+  );
   const sameQuestion = existing?.current_question_id && input.questionId
     ? existing.current_question_id === input.questionId
     : false;
@@ -173,6 +177,20 @@ function buildNextActivityRow(
   let currentLessonStatus = existing?.current_lesson_status ?? "active";
   let completedAt = existing?.completed_at ?? null;
 
+  // A route can move directly into a new lesson/quiz before its asynchronous
+  // start event is persisted. The changed canonical lesson id is therefore an
+  // equally strong reset boundary, preventing counters bleeding across work.
+  if (isLearningActivityStart || changedLearningActivity) {
+    sessionIncorrectCount = 0;
+    consecutiveIncorrectCount = 0;
+    sessionHintCount = 0;
+    currentQuestionAttempts = 0;
+    questionsAnswered = 0;
+    correctCount = 0;
+    currentLessonStatus = "active";
+    completedAt = null;
+  }
+
   if (input.eventType === "answer_correct" || input.eventType === "answer_incorrect") {
     currentQuestionAttempts = sameQuestion ? prevAttempts + 1 : 1;
   }
@@ -188,16 +206,6 @@ function buildNextActivityRow(
   if (input.eventType === "hint_used") {
     sessionHintCount += 1;
   }
-  if (input.eventType === "lesson_started" || input.eventType === "quiz_started") {
-    sessionIncorrectCount = 0;
-    consecutiveIncorrectCount = 0;
-    sessionHintCount = 0;
-    currentQuestionAttempts = 0;
-    questionsAnswered = 0;
-    correctCount = 0;
-    currentLessonStatus = "active";
-    completedAt = null;
-  }
   if (
     input.eventType === "activity_started" ||
     input.eventType === "question_loaded" ||
@@ -209,7 +217,7 @@ function buildNextActivityRow(
   }
 
   const lessonStartedAt =
-    (input.eventType === "lesson_started" || input.eventType === "quiz_started")
+    (isLearningActivityStart || changedLearningActivity)
       ? timestamp
       : (existing?.lesson_started_at ?? null);
 
@@ -220,6 +228,13 @@ function buildNextActivityRow(
     if (finalCorrect != null) correctCount = Math.min(finalCorrect, questionsAnswered);
     currentLessonStatus = "completed";
     completedAt = timestamp;
+  } else {
+    // Prefer runner-supplied distinct-question totals over event increments.
+    // This remains correct across retries and concurrent telemetry requests.
+    const reportedAnswered = normalizedCount(input.questionsAnswered ?? input.totalQuestions);
+    const reportedCorrect = normalizedCount(input.correctCount ?? input.correctAnswers);
+    if (reportedAnswered != null) questionsAnswered = reportedAnswered;
+    if (reportedCorrect != null) correctCount = Math.min(reportedCorrect, questionsAnswered);
   }
 
   const shouldClearQuestion = input.eventType === "lesson_completed" || input.eventType === "quiz_completed";

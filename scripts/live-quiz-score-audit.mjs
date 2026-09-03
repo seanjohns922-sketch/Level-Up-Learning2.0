@@ -10,6 +10,12 @@ const source = fs.readFileSync(
   path.join(repoRoot, "components/teacher/LiveClassPanel.tsx"),
   "utf8",
 );
+const sessionSource = fs.readFileSync(path.join(repoRoot, "app/session/page.tsx"), "utf8");
+const telemetrySource = fs.readFileSync(path.join(repoRoot, "lib/live-class-client.ts"), "utf8");
+const guardMigration = fs.readFileSync(
+  path.join(repoRoot, "supabase/migrations/20260903190000_enforce_live_quiz_snapshot_totals.sql"),
+  "utf8",
+);
 
 assert.match(
   source,
@@ -25,6 +31,12 @@ assert.doesNotMatch(
   source,
   /\(row\.current_lesson && eventLessonId === row\.current_lesson\) \|\|\s*\(row\.current_lesson_title/,
 );
+assert.match(source, /Math\.min\(answered, WEEKLY_QUIZ_QUESTION_COUNT\)/, "Live Class must reject impossible quiz denominators.");
+assert.match(sessionSource, /const quizKey = quizAttemptKey/, "Quiz telemetry must reset for the full realm quiz identity.");
+assert.match(sessionSource, /questionsAnswered: distinctAnswered/, "Quiz telemetry must report distinct questions, not accumulated responses.");
+assert.match(telemetrySource, /isLearningActivityStart \|\| changedLearningActivity/, "A changed lesson or quiz id must reset live counters.");
+assert.match(guardMigration, /new\.questions_answered := least\(15/, "The database must enforce the 15-question live quiz ceiling.");
+assert.match(guardMigration, /update public\.live_student_activity/, "Existing malformed live quiz snapshots must be repaired.");
 
 function matchesCurrentQuiz(row, event) {
   if (event.student_id !== row.student_id) return false;

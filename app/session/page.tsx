@@ -8685,7 +8685,7 @@ function SessionPage({
     );
   }, [buildQuizQuestions, quizRealmId, week, year]);
 
-  const quizAttemptKey = `${type}|${realmId}|${year}|${week}|${WEEKLY_QUIZ_QUESTIONS_PER_LESSON}`;
+  const quizAttemptKey = `${type}|${quizRealmId}|${year}|${week}|${WEEKLY_QUIZ_QUESTIONS_PER_LESSON}`;
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => buildSafeQuizQuestions());
 
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
@@ -9157,7 +9157,7 @@ function SessionPage({
 
   useEffect(() => {
     if (!year || !week || quizQuestions.length === 0 || quizSubmitted) return;
-    const quizKey = `${year}-w${week}`;
+    const quizKey = quizAttemptKey;
     if (liveQuizStartedRef.current === quizKey) return;
     liveQuizStartedRef.current = quizKey;
     void trackLiveLearningEvent({
@@ -9170,7 +9170,7 @@ function SessionPage({
       progressPercent: 0,
       progressLabel: "Quiz started",
     });
-  }, [quizQuestions.length, quizSubmitted, week, year]);
+  }, [quizAttemptKey, quizLessonId, quizQuestions.length, quizRealmId, quizStrand, quizSubmitted, week, year]);
 
   useEffect(() => {
     if (!currentQuiz || quizSubmitted) return;
@@ -9213,12 +9213,37 @@ function SessionPage({
     return () => {
       clearIdleLiveEventTimer();
     };
-  }, [currentQuiz, quizIndex, quizQuestions.length, quizSubmitted, week, year]);
+  }, [currentQuiz, quizIndex, quizLessonId, quizQuestions.length, quizStrand, quizSubmitted, week, year]);
 
   useEffect(() => {
     if (!currentQuiz || !currentAnswered || quizSubmitted) return;
     if (liveAnsweredQuestionIdsRef.current.has(currentQuiz.id)) return;
     liveAnsweredQuestionIdsRef.current.add(currentQuiz.id);
+    const distinctAnswered = quizQuestions.filter((question) => {
+      if (question.kind === "lessonActivity" || question.kind === "practiceTask") {
+        return quizLessonActivityResults[question.id]?.attempted === true;
+      }
+      if (question.kind === "typed") return (quizTyped[question.id] ?? "").trim().length > 0;
+      if (question.kind === "numberLineTap" || question.kind === "numberLineJump") {
+        return typeof quizLineAnswers[question.id] === "number";
+      }
+      if (question.kind === "chartFill") return quizChartDone[question.id] === true;
+      if (question.kind === "mab") return quizMabAnswers[question.id]?.touched === true;
+      if (question.kind === "moneyMake" || question.kind === "moneyChange" || question.kind === "moneyEnough") {
+        return quizMoneyAnswers[question.id]?.attempted === true;
+      }
+      return typeof quizAnswers[question.id] === "number";
+    }).length;
+    const distinctCorrect = quizQuestions.filter((question) => isQuizQuestionCorrect(
+      question,
+      quizAnswers,
+      quizTyped,
+      quizLineAnswers,
+      quizChartDone,
+      quizMabAnswers,
+      quizMoneyAnswers,
+      quizLessonActivityResults,
+    )).length;
     void trackLiveLearningEvent({
       eventType: isQuizQuestionCorrect(
         currentQuiz,
@@ -9262,6 +9287,9 @@ function SessionPage({
         ? Math.round(((quizIndex + 1) / quizQuestions.length) * 100)
         : 0,
       progressLabel: `Quiz question ${quizIndex + 1} of ${quizQuestions.length}`,
+      questionsAnswered: distinctAnswered,
+      totalQuestions: quizQuestions.length,
+      correctCount: distinctCorrect,
       skillTag: currentQuiz.skill ?? currentQuiz.quizMeta?.type ?? currentQuiz.kind,
     });
   }, [
@@ -9274,7 +9302,10 @@ function SessionPage({
     quizLineAnswers,
     quizMabAnswers,
     quizMoneyAnswers,
+    quizLessonId,
+    quizQuestions,
     quizQuestions.length,
+    quizStrand,
     quizSubmitted,
     quizTyped,
     week,

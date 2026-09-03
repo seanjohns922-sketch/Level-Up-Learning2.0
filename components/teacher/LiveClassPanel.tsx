@@ -26,6 +26,7 @@ import {
   tryCanonicalRealmId,
 } from "@/lib/realms/realm-registry";
 import { selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
+import { WEEKLY_QUIZ_QUESTION_COUNT } from "@/lib/weekly-quiz-contract";
 
 type ClassRow = {
   id: string;
@@ -690,6 +691,14 @@ function buildCurrentLessonPerformance(
   if (answered === 0 && rowAnswered > 0 && (lessonEvents.length === 0 || rowCompleted)) {
     answered = rowAnswered;
     correct = Math.min(rowCorrect, answered);
+  }
+
+  // Weekly quizzes have one canonical response per question. Telemetry is
+  // advisory and must never display a denominator above the quiz contract if
+  // a stale counter or retry event slipped through.
+  if (isQuizActivity(row)) {
+    answered = Math.min(answered, WEEKLY_QUIZ_QUESTION_COUNT);
+    correct = Math.min(correct, answered);
   }
 
   const score = normalizeLearningScore(correct, answered);
