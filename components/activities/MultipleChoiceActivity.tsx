@@ -45,6 +45,7 @@ import ReversePatternCardVisual from "@/components/activities/ReversePatternCard
 import { FractionText, MathFormattedText } from "@/components/FractionText";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import { hasRequiredRelationshipVisual } from "@/lib/relationship-visual";
+import { getPatternQuestionReadAloudText } from "@/lib/pattern-question-read-aloud";
 
 function FractionBar({
   numerator,
@@ -151,6 +152,9 @@ export default function MultipleChoiceActivity({
 }) {
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
+  const questionReadAloudText = isPattern
+    ? getPatternQuestionReadAloudText(questionData)
+    : questionData.prompt;
   const theme = getRealmTheme(realmId);
   const [picked, setPicked] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
@@ -293,7 +297,7 @@ export default function MultipleChoiceActivity({
           <MathFormattedText text={questionData.prompt} />
         </h2>
         <div className="mt-1.5">
-          <ReadAloudBtn text={questionData.prompt} />
+          <ReadAloudBtn text={questionReadAloudText} label={isPattern ? "Read all" : undefined} />
         </div>
       </div>
       {renderMode === "lesson" && questionData.helper ? (

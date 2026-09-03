@@ -607,6 +607,7 @@ function LessonRendererInner({
             onCorrect={onCorrect}
             onWrong={onWrong}
             renderMode={renderMode}
+            realmId={realmId}
           />
         );
       }
@@ -642,6 +643,7 @@ function LessonRendererInner({
           onCorrect={onCorrect}
           onWrong={onWrong}
           renderMode={renderMode}
+          realmId={realmId}
         />
       );
     }

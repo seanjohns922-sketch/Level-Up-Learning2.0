@@ -22,6 +22,7 @@ import { buildLessonActivityPool, getLevelForLesson } from "@/data/activities/ye
 import { REALM_REGISTRY } from "@/lib/realms/realm-registry";
 import { isLessonQuestionSafe } from "@/lib/task-safety";
 import { countInlineMathAnswerSlots } from "@/lib/inline-math-answer";
+import { getPatternQuestionReadAloudText } from "@/lib/pattern-question-read-aloud";
 import { getAllLegends } from "@/data/legends";
 
 const root = process.cwd();
@@ -74,6 +75,13 @@ for (const level of Object.keys(PATTERN_PEAKS_PROGRAMS) as PatternPeaksYearLabel
           assert(isLessonQuestionSafe(activity, question), `${level} ${currentLesson.title} generated an unsafe ${String(activity.config.rotationRole)} question.`);
           assert("visual" in question && question.visual, `${level} ${currentLesson.title} generated a question without an algebra visual.`);
           assert("helper" in question && question.helper, `${level} ${currentLesson.title} generated a question without guided feedback.`);
+          const completeSpeech = getPatternQuestionReadAloudText(question);
+          assert(completeSpeech.includes(question.prompt), `${level} ${currentLesson.title} read-aloud omitted the prompt.`);
+          assert(completeSpeech.includes(question.helper), `${level} ${currentLesson.title} read-aloud omitted the helper text.`);
+          assert(
+            completeSpeech.length > question.prompt.length + question.helper.length + 5,
+            `${level} ${currentLesson.title} read-aloud omitted the visual information.`,
+          );
           if (question.kind === "typed_response") {
             const slotCount = countInlineMathAnswerSlots(question.visual);
             assert(slotCount <= 1, `${level} ${currentLesson.title} generated ${slotCount} competing inline answer fields.`);
@@ -362,6 +370,10 @@ for (const currentLesson of levelFourEquivalentEquations.lessons) {
       assert.equal(countInlineMathAnswerSlots(question.visual), 1, `Year 4 Week 4 ${currentLesson.title} needs one inline numeric answer.`);
       assert(!/which property|why can the addends/i.test(question.prompt), `Year 4 Week 4 ${currentLesson.title} retained the vocabulary-first question.`);
       assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, `Year 4 Week 4 ${currentLesson.title} generated an invalid answer.`);
+      const readAloudText = getPatternQuestionReadAloudText(question);
+      assert(readAloudText.includes(question.prompt), `Year 4 Week 4 ${currentLesson.title} read-aloud omitted the prompt.`);
+      assert(question.helper && readAloudText.includes(question.helper), `Year 4 Week 4 ${currentLesson.title} read-aloud omitted the property explanation.`);
+      assert(readAloudText.includes("blank"), `Year 4 Week 4 ${currentLesson.title} read-aloud omitted the unknown position.`);
       const expectedTeachingWord = currentLesson.lesson === 1
         ? "commutative"
         : currentLesson.lesson === 2

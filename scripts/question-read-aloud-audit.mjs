@@ -22,6 +22,21 @@ const checks = [
     patterns: ["QuestionReadAloudBoundary", "questionData.prompt"],
   },
   {
+    name: "Pattern Peaks questions read every visible question part",
+    file: "lib/pattern-question-read-aloud.ts",
+    patterns: ["question.prompt", "question.helper", "question.instruction", "patternVisualSpeech", 'replaceAll("□", " blank ")'],
+  },
+  {
+    name: "Pattern Peaks activity controls use the complete speech text",
+    file: "components/activities/MultipleChoiceActivity.tsx",
+    patterns: ["getPatternQuestionReadAloudText(questionData)", 'label={isPattern ? "Read all" : undefined}'],
+  },
+  {
+    name: "Pattern Peaks typed responses use the complete speech text",
+    file: "components/activities/TypedResponseActivity.tsx",
+    patterns: ["getPatternQuestionReadAloudText(questionData)", 'label={isPattern ? "Read all" : undefined}'],
+  },
+  {
     name: "fallback hides when an activity supplies prompt audio",
     file: "components/QuestionReadAloudBoundary.tsx",
     patterns: [":has(", 'data-read-aloud-kind="prompt"', 'label="Read question"'],
@@ -50,6 +65,11 @@ const checks = [
     name: "read-aloud controls support a scoped speech rate",
     file: "components/ReadAloudBtn.tsx",
     patterns: ["ReadAloudRateProvider", "ReadAloudRateContext", "rate: speechRate"],
+  },
+  {
+    name: "math speech names operators, brackets and unknowns",
+    file: "lib/speak.ts",
+    patterns: ['replaceAll("□", " blank ")', 'replaceAll("×", " times ")', 'replaceAll("=", " equals ")', 'replaceAll("(", " open bracket ")'],
   },
   {
     name: "Starpath quizzes use the shared task renderer",

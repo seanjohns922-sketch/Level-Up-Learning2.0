@@ -26,6 +26,7 @@ type QuestionVisual =
   | UnknownTileEquationVisualData
   | BracketEquationCardVisualData;
 type RotationRole = "fast_thinking" | "reasoning" | "apply_create";
+export type PatternPeaksQuestion = Extract<Year2QuestionData, { kind: "multiple_choice" | "typed_response" }>;
 
 const PATTERN_VISUAL_TYPES = new Set([
   "array",
@@ -62,7 +63,7 @@ const year3Week7FactorBags = new Map<number, number[]>();
 let year3Week8RuleBag: string[] = [];
 let year4Week2EquationFormBag: number[] = [];
 
-export function isPatternPeaksQuestion(question: unknown): question is Year2QuestionData {
+export function isPatternPeaksQuestion(question: unknown): question is PatternPeaksQuestion {
   if (!question || typeof question !== "object") return false;
   const candidate = question as { kind?: unknown; visual?: { type?: unknown } };
   if (candidate.kind !== "multiple_choice" && candidate.kind !== "typed_response") return false;

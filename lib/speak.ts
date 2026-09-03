@@ -126,6 +126,17 @@ function fractionToSpeech(numeratorText: string, denominatorText: string) {
 function normalizeMathText(text: string) {
   let normalized = text;
 
+  normalized = normalized
+    .replaceAll("□", " blank ")
+    .replaceAll("×", " times ")
+    .replaceAll("÷", " divided by ")
+    .replaceAll("−", " minus ")
+    .replaceAll("+", " plus ")
+    .replaceAll("=", " equals ")
+    .replaceAll("→", " then ")
+    .replaceAll("(", " open bracket ")
+    .replaceAll(")", " close bracket ");
+
   normalized = normalized.replace(/(\d+)\s*\/\s*(\d+)/g, (_, numerator, denominator) =>
     fractionToSpeech(numerator, denominator)
   );

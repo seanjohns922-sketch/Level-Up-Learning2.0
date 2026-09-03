@@ -45,6 +45,7 @@ import ReversePatternCardVisual from "@/components/activities/ReversePatternCard
 import { Fraction, MathFormattedText } from "@/components/FractionText";
 import { hasRequiredRelationshipVisual } from "@/lib/relationship-visual";
 import { countInlineMathAnswerSlots } from "@/lib/inline-math-answer";
+import { getPatternQuestionReadAloudText } from "@/lib/pattern-question-read-aloud";
 
 function normalize(value: string) {
   return value.trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
@@ -1600,12 +1601,18 @@ export default function TypedResponseActivity({
   onCorrect,
   onWrong,
   renderMode = "lesson",
+  realmId,
 }: {
   questionData: TypedResponseQuestion;
   onCorrect?: () => void;
   onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
+  realmId?: string;
 }) {
+  const isPattern = realmId === "pattern";
+  const questionReadAloudText = isPattern
+    ? getPatternQuestionReadAloudText(questionData)
+    : questionData.prompt;
   const writtenMethod = questionData.writtenMethod;
   const isGuidedAddition = writtenMethod?.operation === "+";
   const isGuidedSubtraction = writtenMethod?.operation === "-";
@@ -2759,7 +2766,7 @@ export default function TypedResponseActivity({
         <h2 className="text-2xl font-black text-gray-900">
           <MathFormattedText text={questionData.prompt} />
         </h2>
-        <ReadAloudBtn text={questionData.prompt} />
+        <ReadAloudBtn text={questionReadAloudText} label={isPattern ? "Read all" : undefined} />
       </div>
       {questionData.visual?.type === "mab" ? (
         <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
