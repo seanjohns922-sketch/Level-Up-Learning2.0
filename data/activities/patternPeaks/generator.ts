@@ -1068,7 +1068,7 @@ function year4Question(
     }
     // "?" becomes the answer box the student types into.
     return typed(
-      `Work out ${factor} × ${twoDigit} in your head.`,
+      "Work it out in your head.",
       product,
       `Split ${twoDigit} into ${tensPart} and ${onesPart}, multiply each by ${factor}, then add the parts.`,
       promptVisual("Mental multiplication", [
@@ -1077,72 +1077,63 @@ function year4Question(
     );
   }
 
-  // Week 8 — "Equation Expedition" (AC9M4A01 + AC9M4A02): integrate additive
-  // unknowns with multiplication facts and reason about solutions.
-  // L1 follow clues (fact -> additive unknown), L2 compare two strategies,
-  // L3 diagnose and defend a flawed solution.
+  // Week 8 — "Equation Expedition" (AC9M4A01 + AC9M4A02): a multiplication fact
+  // and a missing number in one equation, plus efficiency and error-spotting.
+  // The card carries the maths so the prompts stay short.
   if (week === 8) {
     const f1 = rand(3, 9);
     const f2 = rand(3, 9);
     const product = f1 * f2;
 
-    // These are text-reasoning questions — no worked visual (the clues, the two
-    // strategies and the flawed working are stated in the prompt).
     if (lessonNumber === 1) {
       const missing = rand(6, 40);
       const total = product + missing;
-      // "?" in Clue 2 is the answer box the student types into (typed variant);
-      // in the reasoning MCQ it simply renders as a "?" glyph.
-      const clues = promptVisual("Follow the clues", [
-        { label: "Clue 1", tokens: ["▲", "=", `${f1}`, "×", `${f2}`] },
-        { label: "Clue 2", tokens: ["▲", "+", "?", "=", `${total}`] },
+      const equationCard = promptVisual("Find the missing number", [
+        { tokens: [`${f1}`, "×", `${f2}`, "+", "?", "=", `${total}`] },
       ]);
       if (role === "reasoning") {
         return mcq(
-          `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + ? = ${total}. Which clue should you work out first?`,
-          `▲ = ${f1} × ${f2}`,
-          [`▲ + ? = ${total}`, `? on its own`],
-          "Find the known value first, then use it to unlock the unknown.",
-          clues,
+          "What should you work out first?",
+          `${f1} × ${f2}`,
+          [`? + ${total}`, "the ? on its own"],
+          "Do the multiplication first, then find the missing part.",
+          equationCard,
         );
       }
       return typed(
-        `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + ? = ${total}. Find the missing number.`,
+        "Find the missing number.",
         missing,
-        "Work out ▲ from the multiplication first, then find the missing part of the sum.",
-        clues,
+        `First work out ${f1} × ${f2}, then find what to add to reach ${total}.`,
+        equationCard,
       );
     }
 
     if (lessonNumber === 2) {
       const even = pick([6, 8, 10, 12, 14]);
       const answer = 5 * even;
-      const sharedFact = promptVisual("Both students agree", [
-        { label: "Same answer", tokens: ["5", "×", `${even}`, "=", `${answer}`] },
-      ]);
       return mcq(
-        `Two students both correctly work out 5 × ${even} = ${answer}. Whose way is more efficient?`,
-        `Ari: half of ${even} is ${even / 2}, then × 10`,
-        [`Bo: add ${even} five times`, `Cass: count up in fives ${even} times`],
-        "All ways reach the same answer — choose the one with the fewest steps.",
-        sharedFact,
+        "Whose way is more efficient?",
+        `Ari: half of ${even}, then × 10`,
+        [`Bo: add ${even} five times`, "Cass: count up in fives"],
+        `Both reach 5 × ${even} = ${answer} — pick the way with fewer steps.`,
+        promptVisual("Same answer, two ways", [
+          { tokens: ["5", "×", `${even}`, "=", `${answer}`] },
+        ]),
       );
     }
 
-    // L3 Defend the Solution — diagnose and correct a flawed value.
+    // L3 Spot the mistake.
     const missing = rand(5, 30);
     const total = product + missing;
     const studentAnswer = missing + rand(2, 5);
-    const working = promptVisual("A student's working", [
-      { label: "Step 1", tokens: ["▲", "=", `${f1}`, "×", `${f2}`, "=", `${product}`] },
-      { label: "Step 2", tokens: ["▲", "+", "?", "=", `${total}`], note: `They answered ${studentAnswer}. Is that right?` },
-    ]);
     return mcq(
-      `A student wrote ▲ = ${f1} × ${f2} = ${product}, then ▲ + ? = ${total} and answered ? = ${studentAnswer}. What is the correct value?`,
+      "Spot the mistake. What is the correct answer?",
       missing,
       [studentAnswer, total, product],
-      `Check the student's value: does ${product} + ${studentAnswer} equal ${total}?`,
-      working,
+      `Work out ${f1} × ${f2}, then check the student's answer.`,
+      promptVisual("A student's answer", [
+        { tokens: [`${f1}`, "×", `${f2}`, "+", "?", "=", `${total}`], note: `The student answered ${studentAnswer}.` },
+      ]),
     );
   }
 
