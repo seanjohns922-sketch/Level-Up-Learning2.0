@@ -2794,6 +2794,7 @@ export default function TypedResponseActivity({
           rows={questionData.visual.rows}
           cols={questionData.visual.columns}
           highlightedRows={questionData.visual.highlightedRows}
+          rotatable={questionData.visual.rotatable}
           title="Grouped set model"
         />
       ) : null}

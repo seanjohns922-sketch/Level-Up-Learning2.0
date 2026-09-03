@@ -412,6 +412,35 @@ for (const activity of levelFiveConstructEquivalent.activities ?? []) {
   }
 }
 
+const levelFiveMultiplicationProperties = PATTERN_PEAKS_PROGRAMS["Year 5"][4]!;
+for (const currentLesson of levelFiveMultiplicationProperties.lessons) {
+  assert(
+    (currentLesson.activities ?? []).every((activity) => activity.activityType === "typed_response"),
+    `Year 5 Week 5 ${currentLesson.title} must assess calculations instead of opinion or yes/no choices.`,
+  );
+  for (const activity of currentLesson.activities ?? []) {
+    for (let sample = 0; sample < 30; sample += 1) {
+      const question = generatePatternPeaksQuestion(5, currentLesson, activity);
+      assert.equal(question.kind, "typed_response", `Year 5 Week 5 ${currentLesson.title} must require a numeric response.`);
+      assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, `Year 5 Week 5 ${currentLesson.title} generated an invalid numeric answer.`);
+      assert(!/which pair is easiest|does regrouping|can you regroup|are .* equal|why is/i.test(question.prompt), `Year 5 Week 5 ${currentLesson.title} retained a subjective or recall-only prompt.`);
+      if (currentLesson.lesson === 1) {
+        assert.equal(question.visual?.type, "array", "Turn the Array must show an array model.");
+        if (question.visual?.type === "array") {
+          assert.equal(question.visual.rotatable, true, "Turn the Array must let the student physically turn the model.");
+        }
+      } else {
+        assert.equal(question.visual?.type, "expression_flow", `${currentLesson.title} needs a visible calculation.`);
+        assert.equal(countInlineMathAnswerSlots(question.visual), 1, `${currentLesson.title} needs one inline numeric answer.`);
+      }
+    }
+  }
+}
+
+const arrayVisualSource = fs.readFileSync(path.join(root, "components/activities/ArrayVisual.tsx"), "utf8");
+assert(arrayVisualSource.includes("↻ Turn array"), "The array visual is missing its student-controlled turn action.");
+assert(arrayVisualSource.includes("displayRows = turned ? cols : rows"), "Turning the array must swap its rows and columns.");
+
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
 assert.equal(REALM_REGISTRY.pattern.totalWeeks, 8, "Pattern Peaks needs the agreed eight-week contract.");

@@ -336,6 +336,7 @@ export default function MultipleChoiceActivity({
           rows={questionData.visual.rows}
           cols={questionData.visual.columns}
           highlightedRows={questionData.visual.highlightedRows}
+          rotatable={questionData.visual.rotatable}
           title="Grouped set model"
         />
       ) : null}

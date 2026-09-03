@@ -15,7 +15,7 @@ import type { Lesson } from "@/data/programs/year1";
 import type { LessonActivity } from "@/data/programs/types";
 
 type QuestionVisual =
-  | { type: "array"; rows: number; columns: number; highlightedRows?: number[] }
+  | { type: "array"; rows: number; columns: number; highlightedRows?: number[]; rotatable?: boolean }
   | PatternSequenceStripVisualData
   | GrowingPatternVisualData
   | FunctionMachineCardVisualData
@@ -1509,95 +1509,101 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
   // Week 5 — Properties of Multiplication (AC9M5A02).
   if (week === 5) {
     if (lessonNumber === 1) {
-      // Turn the Array — commutative, and division is not.
+      // Turn the Array — physically transpose the model and calculate what stays invariant.
       const a = rand(3, 8);
       const b = rand(3, 8);
+      const product = a * b;
+      const visual = { type: "array" as const, rows: a, columns: b, rotatable: true };
       if (role === "apply_create") {
         return typed(
-          "Make both sides equal.",
+          `Turn the array. Complete ${b} × ? = ${product}.`,
           a,
-          "Swapping factors keeps the product.",
-          promptVisual("Turn the array", [{ tokens: [`${a}`, "×", `${b}`, "=", `${b}`, "×", "?"] }]),
+          "Turning swaps the rows and columns while keeping the total number of dots unchanged.",
+          visual,
         );
       }
       if (role === "reasoning") {
-        return mcq(
-          `Why is ${a} × ${b} = ${b} × ${a}?`,
-          "You can turn the array to match",
-          ["Because the numbers are close", "Because the product is even"],
-          "Rotating an array swaps rows and columns.",
-          { type: "array" as const, rows: a, columns: b },
+        return typed(
+          "Turn the array. How many rows does it have now?",
+          b,
+          "The original columns become the rows after the array is turned.",
+          visual,
         );
       }
-      return mcq(
-        `Is ${a} ÷ ${b} the same as ${b} ÷ ${a}?`,
-        "No",
-        ["Yes", "Always"],
-        "Division is not commutative.",
+      return typed(
+        "Turn the array. What product stays the same?",
+        product,
+        "Turning changes the arrangement, but it does not change the number of dots.",
+        visual,
       );
     }
 
     if (lessonNumber === 2) {
-      // Regroup Three Factors — associativity.
+      // Regroup Three Factors — calculate both bracketed paths instead of judging a preferred strategy.
       const trio = pick([
-        { nums: [2, 7, 5], easy: "2 × 5", hard: ["2 × 7", "7 × 5"] },
-        { nums: [5, 3, 2], easy: "5 × 2", hard: ["5 × 3", "3 × 2"] },
-        { nums: [2, 9, 5], easy: "2 × 5", hard: ["2 × 9", "9 × 5"] },
-        { nums: [4, 7, 5], easy: "4 × 5", hard: ["4 × 7", "7 × 5"] },
-        { nums: [5, 6, 2], easy: "5 × 2", hard: ["5 × 6", "6 × 2"] },
+        [2, 7, 5],
+        [5, 3, 2],
+        [2, 9, 5],
+        [4, 7, 5],
+        [5, 6, 2],
       ]);
-      const [x, y, z] = trio.nums as [number, number, number];
+      const [x, y, z] = trio as [number, number, number];
       const answer = x * y * z;
       if (role === "apply_create") {
         return typed(
-          "Multiply the three factors.",
+          "Calculate the full product.",
           answer,
-          "Multiply a friendly pair first.",
-          promptVisual("Regroup three factors", [{ tokens: [`${x}`, "×", `${y}`, "×", `${z}`, "=", "?"] }]),
+          "Work inside the brackets first, then multiply by the remaining factor.",
+          promptVisual("Regroup three factors", [{ tokens: [`(${x}`, "×", `${y})`, "×", `${z}`, "=", "?"] }]),
         );
       }
       if (role === "reasoning") {
-        return mcq(
-          "Which pair is easiest to multiply first?",
-          trio.easy,
-          trio.hard,
-          "Look for factors that make 10.",
-          promptVisual("Regroup three factors", [{ tokens: [`${x}`, "×", `${y}`, "×", `${z}`] }]),
+        return typed(
+          "Calculate the value inside the brackets.",
+          y * z,
+          "Multiply the two factors inside the brackets and enter that subtotal.",
+          promptVisual("Group the last two factors", [{ tokens: [`${x}`, "×", `(${y}`, "×", `${z})`, "=", `${x}`, "×", "?"] }]),
         );
       }
-      return mcq(
-        "Does regrouping the factors change the answer?",
-        "No",
-        ["Yes", "Sometimes"],
-        "Multiplication is associative.",
+      return typed(
+        "Calculate the value inside the brackets.",
+        x * y,
+        "Multiply the two factors inside the brackets and enter that subtotal.",
+        promptVisual("Group the first two factors", [{ tokens: [`(${x}`, "×", `${y})`, "×", `${z}`, "=", "?", "×", `${z}`] }]),
       );
     }
 
-    // L3 Why Division Is Different.
-    const n = rand(2, 4);
+    // L3 Why Division Is Different — calculate both paths and compare their values.
     const m = rand(2, 4);
-    const start = n * m * rand(2, 4);
+    const n = m * rand(2, 3);
+    const leftAnswer = rand(2, 5);
+    const start = n * m * leftAnswer;
+    const rightAnswer = start / (n / m);
     if (role === "apply_create") {
       return typed(
-        "Work it out left to right.",
-        start / n / m,
-        "Do the first division, then the second.",
-        promptVisual("Why division is different", [{ tokens: [`${start}`, "÷", `${n}`, "÷", `${m}`, "=", "?"] }]),
+        "Calculate the left-grouped division.",
+        leftAnswer,
+        "Work inside the left-hand brackets first, then divide that result by the final divisor.",
+        promptVisual("Divide in two steps", [{ tokens: [`(${start}`, "÷", `${n})`, "÷", `${m}`, "=", "?"] }]),
       );
     }
     if (role === "reasoning") {
-      return mcq(
-        `Are (${start} ÷ ${n}) ÷ ${m} and ${start} ÷ (${n} ÷ ${m}) equal?`,
-        "No",
-        ["Yes", "Always"],
-        "Grouping changes the quotient — division is not associative.",
+      return typed(
+        "Calculate the right-grouped division.",
+        rightAnswer,
+        "Work inside the right-hand brackets first, then divide the starting number by that result.",
+        promptVisual("Divide inside the brackets first", [{ tokens: [`${start}`, "÷", `(${n}`, "÷", `${m})`, "=", "?"] }]),
       );
     }
-    return mcq(
-      "Can you regroup a division like a multiplication?",
-      "No",
-      ["Yes", "Always"],
-      "Regrouping division changes the answer.",
+    return typed(
+      "How much larger is the right-grouped result?",
+      rightAnswer - leftAnswer,
+      "Subtract the smaller displayed result from the larger one. Different results show that division cannot be regrouped like multiplication.",
+      promptVisual("Compare the grouped results", [
+        { label: "Left grouped", tokens: [`(${start}`, "÷", `${n})`, "÷", `${m}`, "=", `${leftAnswer}`] },
+        { label: "Right grouped", tokens: [`${start}`, "÷", `(${n}`, "÷", `${m})`, "=", `${rightAnswer}`] },
+        { label: "Difference", tokens: [`${rightAnswer}`, "−", `${leftAnswer}`, "=", "?"] },
+      ]),
     );
   }
 
