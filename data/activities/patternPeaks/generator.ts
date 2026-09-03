@@ -224,6 +224,16 @@ function bracketVisual(title: string, left: string, right: string, bracketGroup?
   return { type: "bracket_equation_card", title, left, right, bracketGroup, outsideFactor };
 }
 
+// A problem/clue presentation card: the big expression-token chips (like the
+// worked-flow cards) but WITHOUT a "Result" line, so it looks rich without
+// revealing the answer. Use it for reasoning/mental questions.
+function promptVisual(
+  title: string,
+  cards: Array<{ label?: string; tokens: string[]; note?: string }>,
+): QuestionVisual {
+  return { type: "expression_flow", title, cards };
+}
+
 function expressionVisual(title: string, expressions: string[]): QuestionVisual {
   return {
     type: "expression_flow",
@@ -1045,18 +1055,23 @@ function year4Question(
     const tensPart = Math.floor(twoDigit / 10) * 10;
     const onesPart = twoDigit - tensPart;
     const product = factor * twoDigit;
+    const problem = promptVisual("Mental multiplication", [
+      { label: "Work it out", tokens: [`${factor}`, "×", `${twoDigit}`] },
+    ]);
     if (role === "reasoning") {
       return mcq(
         `Which split makes ${factor} × ${twoDigit} easiest to do mentally?`,
         `${factor} × ${tensPart} + ${factor} × ${onesPart}`,
         [`${factor} × ${twoDigit} × 10`, `${factor} + ${twoDigit}`],
         "Only one option has the same value as the original — work each out to check.",
+        problem,
       );
     }
     return typed(
       `Work out ${factor} × ${twoDigit} in your head.`,
       product,
       `Split ${twoDigit} into ${tensPart} and ${onesPart}, multiply each by ${factor}, then add the parts.`,
+      problem,
     );
   }
 
@@ -1074,29 +1089,39 @@ function year4Question(
     if (lessonNumber === 1) {
       const missing = rand(6, 40);
       const total = product + missing;
+      const clues = promptVisual("Follow the clues", [
+        { label: "Clue 1", tokens: ["▲", "=", `${f1}`, "×", `${f2}`] },
+        { label: "Clue 2", tokens: ["▲", "+", "□", "=", `${total}`] },
+      ]);
       if (role === "reasoning") {
         return mcq(
           `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + □ = ${total}. Which clue should you work out first?`,
           `▲ = ${f1} × ${f2}`,
           [`▲ + □ = ${total}`, `□ on its own`],
           "Find the known value first, then use it to unlock the unknown.",
+          clues,
         );
       }
       return typed(
         `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + □ = ${total}. What is □?`,
         missing,
         "Work out ▲ from the multiplication first, then find the missing part of the sum.",
+        clues,
       );
     }
 
     if (lessonNumber === 2) {
       const even = pick([6, 8, 10, 12, 14]);
       const answer = 5 * even;
+      const sharedFact = promptVisual("Both students agree", [
+        { label: "Same answer", tokens: ["5", "×", `${even}`, "=", `${answer}`] },
+      ]);
       return mcq(
         `Two students both correctly work out 5 × ${even} = ${answer}. Whose way is more efficient?`,
         `Ari: half of ${even} is ${even / 2}, then × 10`,
         [`Bo: add ${even} five times`, `Cass: count up in fives ${even} times`],
         "All ways reach the same answer — choose the one with the fewest steps.",
+        sharedFact,
       );
     }
 
@@ -1104,11 +1129,16 @@ function year4Question(
     const missing = rand(5, 30);
     const total = product + missing;
     const studentAnswer = missing + rand(2, 5);
+    const working = promptVisual("A student's working", [
+      { label: "Step 1", tokens: ["▲", "=", `${f1}`, "×", `${f2}`, "=", `${product}`] },
+      { label: "Step 2", tokens: ["▲", "+", "□", "=", `${total}`], note: `They wrote □ = ${studentAnswer}. Is that right?` },
+    ]);
     return mcq(
       `A student wrote ▲ = ${f1} × ${f2} = ${product}, then ▲ + □ = ${total} so □ = ${studentAnswer}. What is the correct value of □?`,
       missing,
       [studentAnswer, total, product],
       `Check the student's value: does ${product} + ${studentAnswer} equal ${total}?`,
+      working,
     );
   }
 
