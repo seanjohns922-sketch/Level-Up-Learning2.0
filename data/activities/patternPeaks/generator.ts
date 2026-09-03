@@ -1055,23 +1055,25 @@ function year4Question(
     const tensPart = Math.floor(twoDigit / 10) * 10;
     const onesPart = twoDigit - tensPart;
     const product = factor * twoDigit;
-    const problem = promptVisual("Mental multiplication", [
-      { label: "Work it out", tokens: [`${factor}`, "×", `${twoDigit}`] },
-    ]);
     if (role === "reasoning") {
       return mcq(
         `Which split makes ${factor} × ${twoDigit} easiest to do mentally?`,
         `${factor} × ${tensPart} + ${factor} × ${onesPart}`,
         [`${factor} × ${twoDigit} × 10`, `${factor} + ${twoDigit}`],
         "Only one option has the same value as the original — work each out to check.",
-        problem,
+        promptVisual("Mental multiplication", [
+          { label: "Which split?", tokens: [`${factor}`, "×", `${twoDigit}`] },
+        ]),
       );
     }
+    // "?" becomes the answer box the student types into.
     return typed(
       `Work out ${factor} × ${twoDigit} in your head.`,
       product,
       `Split ${twoDigit} into ${tensPart} and ${onesPart}, multiply each by ${factor}, then add the parts.`,
-      problem,
+      promptVisual("Mental multiplication", [
+        { label: "Work it out", tokens: [`${factor}`, "×", `${twoDigit}`, "=", "?"] },
+      ]),
     );
   }
 
@@ -1089,21 +1091,23 @@ function year4Question(
     if (lessonNumber === 1) {
       const missing = rand(6, 40);
       const total = product + missing;
+      // "?" in Clue 2 is the answer box the student types into (typed variant);
+      // in the reasoning MCQ it simply renders as a "?" glyph.
       const clues = promptVisual("Follow the clues", [
         { label: "Clue 1", tokens: ["▲", "=", `${f1}`, "×", `${f2}`] },
-        { label: "Clue 2", tokens: ["▲", "+", "□", "=", `${total}`] },
+        { label: "Clue 2", tokens: ["▲", "+", "?", "=", `${total}`] },
       ]);
       if (role === "reasoning") {
         return mcq(
-          `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + □ = ${total}. Which clue should you work out first?`,
+          `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + ? = ${total}. Which clue should you work out first?`,
           `▲ = ${f1} × ${f2}`,
-          [`▲ + □ = ${total}`, `□ on its own`],
+          [`▲ + ? = ${total}`, `? on its own`],
           "Find the known value first, then use it to unlock the unknown.",
           clues,
         );
       }
       return typed(
-        `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + □ = ${total}. What is □?`,
+        `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + ? = ${total}. Find the missing number.`,
         missing,
         "Work out ▲ from the multiplication first, then find the missing part of the sum.",
         clues,
@@ -1131,10 +1135,10 @@ function year4Question(
     const studentAnswer = missing + rand(2, 5);
     const working = promptVisual("A student's working", [
       { label: "Step 1", tokens: ["▲", "=", `${f1}`, "×", `${f2}`, "=", `${product}`] },
-      { label: "Step 2", tokens: ["▲", "+", "□", "=", `${total}`], note: `They wrote □ = ${studentAnswer}. Is that right?` },
+      { label: "Step 2", tokens: ["▲", "+", "?", "=", `${total}`], note: `They answered ${studentAnswer}. Is that right?` },
     ]);
     return mcq(
-      `A student wrote ▲ = ${f1} × ${f2} = ${product}, then ▲ + □ = ${total} so □ = ${studentAnswer}. What is the correct value of □?`,
+      `A student wrote ▲ = ${f1} × ${f2} = ${product}, then ▲ + ? = ${total} and answered ? = ${studentAnswer}. What is the correct value?`,
       missing,
       [studentAnswer, total, product],
       `Check the student's value: does ${product} + ${studentAnswer} equal ${total}?`,
