@@ -1318,10 +1318,11 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
       );
     }
     return mcq(
-      "How many facts are in one fact family?",
-      "4",
-      ["2", "3"],
-      "Two multiplications and two divisions.",
+      `Which fact is also in the family of ${a} × ${b} = ${p}?`,
+      `${p} ÷ ${b} = ${a}`,
+      [`${p} − ${b} = ${a}`, `${p} + ${a} = ${b}`],
+      "A family uses the same three numbers with × and ÷.",
+      promptVisual("Complete the family", [{ tokens: [`${a}`, "×", `${b}`, "=", `${p}`] }]),
     );
   }
 
