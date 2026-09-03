@@ -4,6 +4,7 @@ import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes
 import {
   getLiveRealmDefinitions,
   getRealmDefinition,
+  isRealmFirstLevel,
 } from "@/lib/realms/realm-registry";
 
 type CurriculumRealmAvailability = {
@@ -55,9 +56,8 @@ export function resolveRealmEntryRoute(args: {
 
   const route = `/${getRealmDefinition(args.realmId).slug}`;
 
-  if (year === "Prep") return route;
+  if (isRealmFirstLevel(args.realmId, year)) return route;
   if (isPlacementComplete(args.progress)) return route;
-  if (args.realmId === "statistics" && year === "Year 1") return route;
 
   return `/pretest?year=${encodeURIComponent(year)}&realm_id=${args.realmId}`;
 }

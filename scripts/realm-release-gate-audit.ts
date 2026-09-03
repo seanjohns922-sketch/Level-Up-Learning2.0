@@ -9,6 +9,7 @@ import {
   getRealmDefinition,
   LIVE_REALM_IDS,
   tryCanonicalRealmId,
+  getRealmFirstLevel,
 } from "@/lib/realms/realm-registry";
 import {
   buildRealmProgramHref,
@@ -47,6 +48,16 @@ for (const realmId of CANONICAL_REALM_IDS) {
   for (const alias of [realm.realmId, realm.portalId, realm.slug, realm.name, realm.shortName, realm.activityCode, realm.strand]) {
     assert.equal(tryCanonicalRealmId(alias), realm.realmId, `${realm.name} alias "${alias}" is not canonicalised.`);
   }
+}
+
+const firstLevelMigration = latestMigrationContaining(
+  "create or replace function public.realm_first_level(",
+);
+for (const realm of liveRealms) {
+  assert(
+    firstLevelMigration.body.includes(`when '${realm.realmId}' then '${getRealmFirstLevel(realm.realmId)}'`),
+    `${realm.name}'s first curriculum level must be registered in ${firstLevelMigration.filename}.`,
+  );
 }
 
 for (const realm of liveRealms) {
@@ -95,6 +106,11 @@ assert(!studentsPanel.includes("unsupported teacher realm"), "Student detail con
 
 const placements = read("components/teacher/PlacementManager.tsx");
 assert(placements.includes("getLiveRealmDefinitions"), "Placement management must discover registry-live realms.");
+assert(
+  placements.includes("isRealmFirstLevel(realmId, level)") &&
+    placements.includes('level === "Prep" ? "ground_week1" : "full_level"'),
+  "Teacher placement must remove the pre-test option at every realm's first curriculum level.",
+);
 
 const sharedProgram = read("app/program/page.tsx");
 assert(
@@ -161,6 +177,7 @@ for (const requiredGuard of [
 const statisticaLessonRoute = read("app/statistica/lesson/[level]/[week]/[lesson]/page.tsx");
 const statisticaQuizRoute = read("app/statistica/quiz/[level]/[week]/page.tsx");
 const statisticaLessonShell = read("components/statistica/StatisticaLessonShell.tsx");
+const statisticaEntry = read("components/statistica/StatisticaEntry.tsx");
 assert(
   statisticaLessonRoute.includes("CanonicalRealmActivityGate") && statisticaLessonRoute.includes('activity="lesson"'),
   "Statistica lesson routes must enforce canonical week and lesson order.",
@@ -172,6 +189,17 @@ assert(
 assert(
   statisticaLessonShell.includes("saveRealmLessonAttempt(") && statisticaLessonShell.includes('"statistics"'),
   "Statistica lesson completion must save to canonical statistics progress.",
+);
+assert(
+  statisticaEntry.includes('restoreStudentStateFromServer(identity.studentId, "statistics")') &&
+    statisticaEntry.includes("restored.progress") &&
+    statisticaEntry.includes("RealmDashboardLoading"),
+  "Statistica must restore its canonical level before rendering the world.",
+);
+assert(
+  statisticaLessonShell.includes("completionKeyRef.current") &&
+    statisticaLessonShell.includes("exitRequestedRef.current"),
+  "Statistica completion retries must be idempotent and wait for persistence before exit.",
 );
 const starpathLessonRoute = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
 const starpathQuizRoute = read("app/starpath/quiz/[level]/[week]/page.tsx");

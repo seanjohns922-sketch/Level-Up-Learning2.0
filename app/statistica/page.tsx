@@ -1,6 +1,4 @@
-import StatisticaMap from "@/components/world/StatisticaMap";
-import FocusLockGuard from "@/components/realms/FocusLockGuard";
-import { LEVEL_CATALOG } from "@/lib/level-catalog";
+import StatisticaEntry from "@/components/statistica/StatisticaEntry";
 
 type StatisticaPageProps = {
   searchParams: Promise<{
@@ -9,18 +7,7 @@ type StatisticaPageProps = {
   }>;
 };
 
-function normalizeLevel(level?: string) {
-  const requested = level ?? "Year 1";
-  return LEVEL_CATALOG.some((entry) => entry.id === requested && entry.id !== "Prep") ? requested : "Year 1";
-}
-
 export default async function StatisticaPage({ searchParams }: StatisticaPageProps) {
   const params = await searchParams;
-  const level = normalizeLevel(params.level);
-  return (
-    <>
-      <FocusLockGuard realmId="statistics" />
-      <StatisticaMap level={level} />
-    </>
-  );
+  return <StatisticaEntry requestedLevel={params.level} />;
 }

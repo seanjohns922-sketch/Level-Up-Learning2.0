@@ -25,6 +25,8 @@ import {
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
+import { isRealmFirstLevel } from "@/lib/realms/realm-registry";
+import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 import {
   clearPretestResume,
   clearCompletionId,
@@ -382,14 +384,14 @@ function PretestPage() {
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {
-    if (realmId === "statistics" && year === "Year 1") {
-      router.replace("/program?year=Year%201&week=1&legacy=1&realm_id=statistics");
+    if (year !== "Prep" && isRealmFirstLevel(progressRealmId, year)) {
+      router.replace(buildRealmProgramHref({ realmId: progressRealmId, year, week: 1 }));
       return;
     }
     if (year === "Prep") {
       router.replace(realmId === "measurement" ? "/measurelands" : "/home");
     }
-  }, [realmId, router, year]);
+  }, [progressRealmId, realmId, router, year]);
 
   useEffect(() => {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());

@@ -289,7 +289,8 @@ assert.ok(!bankSource.includes("data/activities/statistica/level"), "Assessment 
 const programPageSource = fs.readFileSync(path.join(process.cwd(), "app/program/page.tsx"), "utf8");
 const pretestPageSource = fs.readFileSync(path.join(process.cwd(), "app/pretest/page.tsx"), "utf8");
 assert.ok(programPageSource.includes("/statistica/quiz/"), "Program page must route Statistica weekly quizzes to the dedicated runner");
-assert.ok(pretestPageSource.includes('realmId === "statistics" && year === "Year 1"'), "Year 1 Statistica pre-test requests must redirect to the program");
+assert.ok(pretestPageSource.includes("isRealmFirstLevel(progressRealmId, year)"), "Every realm's first curriculum level must bypass the pre-test");
+assert.ok(pretestPageSource.includes("buildRealmProgramHref({ realmId: progressRealmId, year, week: 1 })"), "First-level pre-test bypass must preserve the selected realm");
 assert.equal(ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent, 80);
 assert.equal(ASSESSMENT_THRESHOLDS.posttestPassPercent, 85);
 assert.equal(weeklyQuizPassed(80), true);

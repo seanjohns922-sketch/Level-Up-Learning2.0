@@ -53,8 +53,11 @@ for (const [legendName, videoSlug] of dataraVideos) {
 }
 
 const route = read("app/statistica/page.tsx");
-assert(route.includes("StatisticaMap"), "Statistica route must render the Statistica map");
-assert(route.includes('entry.id !== "Prep"'), "Statistica route must exclude Prep from level selection");
+const entry = read("components/statistica/StatisticaEntry.tsx");
+assert(route.includes("StatisticaEntry"), "Statistica route must use its canonical entry boundary");
+assert(entry.includes("StatisticaMap"), "Statistica entry must render the Statistica map");
+assert(entry.includes("SUPPORTED_LEVELS") && !entry.includes('"Prep"'), "Statistica entry must exclude Prep from level selection");
+assert(entry.includes('restoreStudentStateFromServer(identity.studentId, "statistics")'), "Statistica entry must restore canonical student progress before rendering");
 assert(!route.includes('teacher_preview !== "1"'), "Live Statistica route must not force teacher preview mode");
 
 const carousel = read("components/realms/RealmCarousel.tsx");

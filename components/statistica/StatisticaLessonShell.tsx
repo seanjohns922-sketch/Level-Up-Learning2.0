@@ -37,6 +37,8 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
   const summaryRef = useRef<LessonPerformanceSummary | null>(null);
   const savingRef = useRef(false);
   const completionSavedRef = useRef(false);
+  const exitRequestedRef = useRef(false);
+  const completionKeyRef = useRef<string | null>(null);
   // Levels 1-3 are built; other levels stay blueprint-only until they're coded.
   const [getTask] = useState<RealmLessonTaskGenerator | null>(() => {
     const taskSet = levelNumber === 1 ? getStatisticaLevel1TaskSet(lessonId)
@@ -62,7 +64,10 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
       router.push(weekHref);
       return;
     }
-    if (savingRef.current) return;
+    if (savingRef.current) {
+      exitRequestedRef.current = true;
+      return;
+    }
     if (previewMode) {
       completionSavedRef.current = true;
       return;
@@ -76,10 +81,12 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
 
     savingRef.current = true;
     const summary = summaryRef.current;
-    const completionKey =
+    const completionKey = completionKeyRef.current ?? (
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random()}`;
+        : `${Date.now()}-${Math.random()}`
+    );
+    completionKeyRef.current = completionKey;
     void saveRealmLessonAttempt(
       studentId,
       level,
@@ -112,6 +119,8 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
         completionSavedRef.current = true;
         return restoreStudentStateFromServer(studentId, "statistics").catch((error) => {
           console.warn("[Statistica] Lesson saved but progress refresh failed", error);
+        }).then(() => {
+          if (exitRequestedRef.current) router.push(weekHref);
         });
       })
       .catch((error) => {

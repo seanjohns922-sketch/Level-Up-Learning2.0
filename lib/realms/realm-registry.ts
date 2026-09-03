@@ -323,6 +323,16 @@ export function getRealmDefinition(value: string): RealmRegistryEntry {
   return REALM_REGISTRY[requireCanonicalRealmId(value)];
 }
 
+export function getRealmFirstLevel(value: string): string {
+  const firstLevel = getRealmDefinition(value).levelLabels[0];
+  if (!firstLevel) throw new Error(`Realm has no curriculum levels: ${value}`);
+  return firstLevel;
+}
+
+export function isRealmFirstLevel(value: string, level: string): boolean {
+  return getRealmFirstLevel(value) === level.trim();
+}
+
 export function getRealmActivityCode(value: string | null | undefined): string | null {
   const realmId = tryCanonicalRealmId(value);
   return realmId ? REALM_REGISTRY[realmId].activityCode : null;

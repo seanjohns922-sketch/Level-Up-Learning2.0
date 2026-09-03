@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowLeft, ArrowUp, ArrowUpDown, ChevronRight, Lock, MoreHorizontal, Users, X } from "lucide-react";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
-import { getLiveRealmDefinitions } from "@/lib/realms/realm-registry";
+import { getLiveRealmDefinitions, isRealmFirstLevel } from "@/lib/realms/realm-registry";
 import {
   fetchRealmCompatProgressForClass,
   fetchTeacherRealmPlacements,
@@ -45,12 +45,16 @@ const ENTRY_MODES: { value: PlacementEntryMode; label: string }[] = [
   { value: "ground_week1", label: "Ground Level: Week 1" },
 ];
 
-function normalizeEntryMode(level: string, entry: PlacementEntryMode): PlacementEntryMode {
-  if (level === "Prep") return "ground_week1";
+function normalizeEntryMode(realmId: string, level: string, entry: PlacementEntryMode): PlacementEntryMode {
+  if (isRealmFirstLevel(realmId, level)) return level === "Prep" ? "ground_week1" : "full_level";
   return entry === "ground_week1" ? "pretest" : entry;
 }
 
-function entryModesForLevel(level: string) {
+function entryModesForLevel(realmId: string, level: string) {
+  if (isRealmFirstLevel(realmId, level)) {
+    const firstMode = level === "Prep" ? "ground_week1" : "full_level";
+    return ENTRY_MODES.filter((mode) => mode.value === firstMode);
+  }
   return level === "Prep"
     ? ENTRY_MODES.filter((mode) => mode.value === "ground_week1")
     : ENTRY_MODES.filter((mode) => mode.value !== "ground_week1");
@@ -220,7 +224,7 @@ export default function PlacementManager({
         const level = supportedLevel(realmId, schoolYearOf(student));
         next[student.id] = {
           level,
-          entry: level === "Prep" ? "ground_week1" : "pretest",
+          entry: normalizeEntryMode(realmId, level, "pretest"),
         };
         changed = true;
       }
@@ -292,6 +296,7 @@ export default function PlacementManager({
       [studentId]: {
         level,
         entry: normalizeEntryMode(
+          realm,
           level,
           prev[studentId]?.entry ?? savedPlacement(realm, studentId)?.assigned_entry_mode ?? "pretest",
         ),
@@ -304,7 +309,7 @@ export default function PlacementManager({
       ...prev,
       [studentId]: {
         level: prev[studentId]?.level ?? defaultLevel(realm, s),
-        entry: normalizeEntryMode(prev[studentId]?.level ?? defaultLevel(realm, s), entry),
+        entry: normalizeEntryMode(realm, prev[studentId]?.level ?? defaultLevel(realm, s), entry),
       },
     }));
   }
@@ -321,6 +326,7 @@ export default function PlacementManager({
         next[s.id] = {
           level,
           entry: normalizeEntryMode(
+            realmId,
             level,
             prev[s.id]?.entry ?? savedPlacement(realmId, s.id)?.assigned_entry_mode ?? "pretest",
           ),
@@ -342,7 +348,7 @@ export default function PlacementManager({
         edits.map(([studentId, edit]) => ({
           studentId,
           assignedLevel: edit.level,
-          entryMode: normalizeEntryMode(edit.level, edit.entry),
+          entryMode: normalizeEntryMode(realmId, edit.level, edit.entry),
         }))
       );
 
@@ -578,6 +584,7 @@ export default function PlacementManager({
                   const cur = currentProgress(realmId, s.id);
                   const level = pending[s.id]?.level ?? defaultLevel(realmId, s);
                   const entry = normalizeEntryMode(
+                    realmId,
                     level,
                     pending[s.id]?.entry ?? savedPlacement(realmId, s.id)?.assigned_entry_mode ?? "pretest",
                   );
@@ -603,7 +610,7 @@ export default function PlacementManager({
                         onChange={(e) => setRowEntry(s.id, e.target.value as PlacementEntryMode, s, realmId)}
                         className="rounded-lg border border-[#E6E8EC] bg-white px-2 py-1.5 text-sm font-semibold text-[#0F172A]"
                       >
-                        {entryModesForLevel(level).map((m) => (
+                        {entryModesForLevel(realmId, level).map((m) => (
                           <option key={m.value} value={m.value}>{m.label}</option>
                         ))}
                       </select>
