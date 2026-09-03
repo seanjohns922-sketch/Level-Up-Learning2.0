@@ -797,6 +797,103 @@ function year4Question(
     return mcq(week === 1 ? "What must the equals sign tell us?" : "What is the unknown?", week === 1 ? "Both sides have the same value" : missing, week === 1 ? ["Write the answer next", "The left side is always larger"] : [missing - 5, missing + 5, known], "Compare both sides as complete values.", visual);
   }
 
+  // Week 5 — "Multiplication Fact Patterns". Each lesson targets its own idea:
+  // L1 reads the fact grid (symmetry + related products), L2 derives a fact from
+  // known nearby facts, L3 reveals the related division facts.
+  if (week === 5) {
+    const n = rand(4, 10);
+
+    if (lessonNumber === 1) {
+      // Read the Fact Grid — symmetry (a×b = b×a) and related products.
+      const factor = rand(3, 9);
+      const product = factor * n;
+      const visual = { type: "array" as const, rows: factor, columns: n };
+      if (role === "apply_create") {
+        return typed(
+          `The grid shows ${factor} × ${n} = ${product}. What is ${factor} × ${n + 1}?`,
+          product + factor,
+          `One more column adds another row of ${factor}: ${product} + ${factor}.`,
+          visual,
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Why do ${factor} × ${n} and ${n} × ${factor} give the same product?`,
+          "The array is the same grid, just turned on its side",
+          ["Because the two numbers are added", "Because the larger factor always wins"],
+          "Rows become columns when you rotate the grid — the product does not change.",
+          visual,
+        );
+      }
+      return mcq(
+        "Which fact shows the same product on the grid, turned on its side?",
+        `${n} × ${factor} = ${product}`,
+        [`${factor} + ${n} = ${product}`, `${factor} × ${n + 1} = ${product}`],
+        "Symmetry on the fact grid: a × b = b × a.",
+        visual,
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Connect Related Facts — derive a fact from known nearby facts.
+      const factor = [6, 7, 9][rand(0, 2)]!;
+      const product = factor * n;
+      const visual = { type: "array" as const, rows: factor, columns: n };
+      const strategyText =
+        factor === 6 ? `double 3 × ${n} (= ${3 * n})`
+        : factor === 9 ? `10 × ${n} then take away one ${n} (${10 * n} − ${n})`
+        : `5 × ${n} + 2 × ${n} (${5 * n} + ${2 * n})`;
+      if (role === "reasoning") {
+        const correct =
+          factor === 6 ? `Double 3 × ${n}`
+          : factor === 9 ? `10 × ${n} − ${n}`
+          : `5 × ${n} + 2 × ${n}`;
+        return mcq(
+          `Which known facts build ${factor} × ${n}?`,
+          correct,
+          [`${factor} + ${n}`, `${product} + ${factor}`],
+          "Break the harder fact into facts you already know.",
+          visual,
+        );
+      }
+      return typed(
+        `Use a known fact to work out ${factor} × ${n}.`,
+        product,
+        `Try ${strategyText}.`,
+        visual,
+      );
+    }
+
+    // Reveal the Division Facts — turn a known product into its division facts.
+    const factor = rand(3, 10);
+    const product = factor * n;
+    const visual = { type: "array" as const, rows: factor, columns: n };
+    if (role === "apply_create") {
+      return typed(
+        `${factor} × ${n} = ${product}. Work out ${product} ÷ ${factor}.`,
+        n,
+        "Divide the product by one factor to find the other.",
+        visual,
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `${factor} × ${n} = ${product}. Which division fact does the same array show?`,
+        `${product} ÷ ${factor} = ${n}`,
+        [`${product} ÷ ${n} = ${product}`, `${factor} ÷ ${n} = ${product}`],
+        "The same array splits back into equal groups.",
+        visual,
+      );
+    }
+    return mcq(
+      "Which related division fact is true?",
+      `${product} ÷ ${factor} = ${n}`,
+      [`${product} ÷ ${n} = ${product}`, `${factor} ÷ ${n} = ${product}`],
+      "Use the rows and columns as factors, then reverse it.",
+      visual,
+    );
+  }
+
   if (week <= 7) {
     const factor = week === 6 ? [6, 7, 9][lessonNumber - 1]! : rand(3, 10);
     const n = rand(4, 10);
