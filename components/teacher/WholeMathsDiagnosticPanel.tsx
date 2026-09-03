@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Clock3, LockKeyhole, ShieldCheck, TrendingUp } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock3, LockKeyhole, ShieldCheck, TrendingUp } from "lucide-react";
 import {
   AC_DESCRIPTOR_COUNTS_BY_LEVEL,
   AC_PRIMARY_LEVELS,
@@ -25,6 +25,9 @@ import {
 import { formatProgressionPoint } from "@/lib/live-maths-progression";
 
 type DiagnosticStudent = { id: string; display_name: string };
+type TrackerTab = "all" | LiveMathsProgressionRow["strand"];
+type FormalCheckpoint = Exclude<TeacherDiagnosticSittingRow["checkpoint"], "ad_hoc">;
+type DiagnosticPoint = { checkpoint: FormalCheckpoint; level: number; completedAt: string };
 
 const CHECKPOINT_LABEL = {
   start: "Start-of-year diagnostic",
@@ -32,6 +35,65 @@ const CHECKPOINT_LABEL = {
   end: "End-of-year diagnostic",
   ad_hoc: "Ad hoc",
 } as const;
+
+const CHECKPOINT_SHORT: Record<FormalCheckpoint, string> = {
+  start: "S",
+  mid: "M",
+  end: "E",
+};
+
+const TRACK_LEVELS = ["Prep", "1", "2", "3", "4", "5", "6"] as const;
+
+function levelPosition(level: number) {
+  return `${(Math.max(0, Math.min(6, level)) / 6) * 100}%`;
+}
+
+function ProgressionTrack({
+  liveLevel,
+  diagnosticPoints,
+}: {
+  liveLevel: number | null;
+  diagnosticPoints: DiagnosticPoint[];
+}) {
+  const latestDiagnostic = diagnosticPoints.at(-1)?.level ?? null;
+  return (
+    <div className="min-w-[520px]">
+      <div className="relative ml-[76px] h-4 text-[10px] font-black uppercase tracking-wide text-slate-400" aria-hidden>
+        {TRACK_LEVELS.map((level, index) => (
+          <span key={level} className="absolute -translate-x-1/2" style={{ left: levelPosition(index) }}>{level}</span>
+        ))}
+      </div>
+      <div className="mt-1 grid grid-cols-[68px_1fr] items-center gap-2">
+        <span className="text-[10px] font-black uppercase tracking-wide text-teal-700">Live</span>
+        <div className="relative h-5">
+          <div className="absolute inset-x-0 top-2 h-1 rounded-full bg-slate-100" />
+          {liveLevel != null && <>
+            <div className="absolute left-0 top-2 h-1 rounded-full bg-teal-500" style={{ width: levelPosition(liveLevel) }} />
+            <span className="absolute top-0 h-5 w-5 -translate-x-1/2 rounded-full border-[3px] border-white bg-teal-600 shadow" style={{ left: levelPosition(liveLevel) }} aria-label={`Current live level ${formatProgressionPoint(liveLevel)}`} />
+          </>}
+        </div>
+      </div>
+      <div className="mt-2 grid grid-cols-[68px_1fr] items-center gap-2">
+        <span className="text-[10px] font-black uppercase tracking-wide text-violet-700">Diagnostic</span>
+        <div className="relative h-7">
+          <div className="absolute inset-x-0 top-3 h-1 rounded-full bg-slate-100" />
+          {latestDiagnostic != null && <div className="absolute left-0 top-3 h-1 rounded-full bg-violet-400" style={{ width: levelPosition(latestDiagnostic) }} />}
+          {diagnosticPoints.map((point) => (
+            <span
+              key={`${point.checkpoint}-${point.completedAt}`}
+              className="absolute top-0 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white bg-violet-600 text-[10px] font-black text-white shadow"
+              style={{ left: levelPosition(point.level) }}
+              title={`${CHECKPOINT_LABEL[point.checkpoint]}: ${formatProgressionPoint(point.level)}`}
+              aria-label={`${CHECKPOINT_LABEL[point.checkpoint]} level ${formatProgressionPoint(point.level)}`}
+            >
+              {CHECKPOINT_SHORT[point.checkpoint]}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const WORKED_EXAMPLE = {
   number: 4,
@@ -51,7 +113,7 @@ export default function WholeMathsDiagnosticPanel({
 }) {
   const [sittings, setSittings] = useState<TeacherDiagnosticSittingRow[]>([]);
   const [progression, setProgression] = useState<LiveMathsProgressionRow[]>([]);
-  const [selectedStrand, setSelectedStrand] = useState<LiveMathsProgressionRow["strand"]>("number");
+  const [selectedStrand, setSelectedStrand] = useState<TrackerTab>("all");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -96,14 +158,34 @@ export default function WholeMathsDiagnosticPanel({
   const availableWeight = diagnosticAvailableWeight();
   const workedOverall = computeWholeMathsLevel(WORKED_EXAMPLE);
   const workedReachedPoints = computeReachedCurriculumPoints(WORKED_EXAMPLE);
-  const progressionByStudent = useMemo(
-    () => new Map(
-      progression
-        .filter((row) => row.strand === selectedStrand)
-        .map((row) => [row.student_id, row]),
-    ),
-    [progression, selectedStrand],
-  );
+  const progressionByStudent = useMemo(() => {
+    const grouped = new Map<string, LiveMathsProgressionRow[]>();
+    for (const row of progression) {
+      const rows = grouped.get(row.student_id) ?? [];
+      rows.push(row);
+      grouped.set(row.student_id, rows);
+    }
+    return grouped;
+  }, [progression]);
+
+  const diagnosticPointsByStudent = useMemo(() => {
+    const grouped = new Map<string, Map<FormalCheckpoint, DiagnosticPoint>>();
+    for (const sitting of [...sittings].sort((left, right) => left.created_at.localeCompare(right.created_at))) {
+      if (sitting.checkpoint === "ad_hoc" || sitting.status !== "completed") continue;
+      const level = selectedStrand === "all"
+        ? sitting.overall_level
+        : sitting.strand_results.find((result) => result.strand === selectedStrand && result.status === "completed")?.measured_level;
+      if (level == null) continue;
+      const checkpoints = grouped.get(sitting.student_id) ?? new Map<FormalCheckpoint, DiagnosticPoint>();
+      checkpoints.set(sitting.checkpoint, {
+        checkpoint: sitting.checkpoint,
+        level,
+        completedAt: sitting.completed_at ?? sitting.created_at,
+      });
+      grouped.set(sitting.student_id, checkpoints);
+    }
+    return new Map([...grouped].map(([studentId, checkpoints]) => [studentId, [...checkpoints.values()].sort((left, right) => left.completedAt.localeCompare(right.completedAt))]));
+  }, [selectedStrand, sittings]);
 
   return (
     <section className="space-y-5" aria-labelledby="whole-maths-diagnostic-title">
@@ -132,50 +214,84 @@ export default function WholeMathsDiagnosticPanel({
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
           <div>
             <div className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-teal-700" aria-hidden /><h3 className="text-lg font-black text-slate-950">Live progression tracker</h3></div>
-            <p className="mt-1 text-sm text-slate-500">Start, mid and end-of-year Whole-Maths results are official; completed realm pathways and tests move the live prediction between them.</p>
+            <p className="mt-1 text-sm text-slate-500">Compare each student&apos;s live learning level with their Start, Mid and End diagnostic checkpoints on the Prep–6 continuum.</p>
           </div>
-          <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1">
-            {DIAGNOSTIC_STRANDS.filter((definition) => definition.available).map((definition) => (
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1">
               <button
-                key={definition.strand}
                 type="button"
-                onClick={() => setSelectedStrand(definition.strand as LiveMathsProgressionRow["strand"])}
-                className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold transition ${selectedStrand === definition.strand ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-white"}`}
+                onClick={() => setSelectedStrand("all")}
+                className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold transition ${selectedStrand === "all" ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-white"}`}
               >
-                {AC_STRANDS[definition.strand].label}
+                All
               </button>
-            ))}
+              {DIAGNOSTIC_STRANDS.filter((definition) => definition.available).map((definition) => (
+                <button
+                  key={definition.strand}
+                  type="button"
+                  onClick={() => setSelectedStrand(definition.strand as LiveMathsProgressionRow["strand"])}
+                  className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold transition ${selectedStrand === definition.strand ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-white"}`}
+                >
+                  {AC_STRANDS[definition.strand].label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              disabled
+              title="Scheduling unlocks when all six strand tests are ready."
+              className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-black text-slate-400"
+            >
+              <CalendarDays className="h-4 w-4" aria-hidden /> Set Start / Mid / End
+              <LockKeyhole className="h-3.5 w-3.5" aria-hidden />
+            </button>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-sm">
-            <thead><tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-black uppercase tracking-wide text-slate-500"><th className="px-5 py-3">Student</th><th className="px-4 py-3">Verified realm point</th><th className="px-4 py-3">Live prediction</th><th className="px-4 py-3">Movement</th><th className="px-4 py-3">Confidence</th><th className="px-4 py-3">Evidence</th></tr></thead>
-            <tbody className="divide-y divide-slate-100">
-              {loading || loadError ? (
-                <tr><td colSpan={6} className={`px-5 py-8 text-center font-semibold ${loadError ? "text-amber-800" : "text-slate-500"}`}>{loadError ?? "Loading live progression…"}</td></tr>
-              ) : students.length === 0 ? (
-                <tr><td colSpan={6} className="px-5 py-8 text-center font-semibold text-slate-500">No students in this class.</td></tr>
-              ) : students.map((student) => {
-                const row = progressionByStudent.get(student.id);
-                const movement = row ? Math.round((row.predicted_level - row.checkpoint_level) * 100) / 100 : null;
-                return (
-                  <tr key={student.id}>
-                    <th className="px-5 py-4 font-bold text-slate-900">{student.display_name}</th>
-                    <td className="px-4 py-4">
-                      {row ? <><span className="font-black text-slate-950">{formatProgressionPoint(row.checkpoint_level)}</span><span className="ml-2 text-xs text-slate-500">{row.checkpoint_source === "diagnostic" ? "Whole diagnostic" : row.checkpoint_source === "pretest" ? "Pre-test" : row.checkpoint_source === "posttest" ? "Post-test" : "Placement baseline"}</span></> : <span className="text-slate-400">Awaiting baseline</span>}
-                    </td>
-                    <td className="px-4 py-4 font-black text-teal-700">{row ? formatProgressionPoint(row.predicted_level) : "—"}</td>
-                    <td className="px-4 py-4 font-bold text-emerald-700">{movement == null ? "—" : movement > 0 ? `+${movement.toFixed(2)}` : "No change yet"}</td>
-                    <td className="px-4 py-4">{row ? <div className="flex items-center gap-2"><div className="h-2 w-20 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500" style={{ width: `${row.prediction_confidence}%` }} /></div><span className="text-xs font-bold text-slate-600">{row.prediction_confidence}%</span></div> : "—"}</td>
-                    <td className="px-4 py-4 text-xs font-semibold text-slate-600">{row ? `${row.evidence.passedQuizWeeks ?? 0} quiz passes · ${row.evidence.completedUnconfirmedLessons ?? 0} lessons awaiting quiz` : "No canonical evidence yet"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-100 bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600">
+          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-teal-600" />Live score</span>
+          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-violet-600" />Diagnostic score</span>
+          <span className="text-slate-400">S = Start · M = Mid · E = End</span>
+          {selectedStrand === "all" && <span className="font-semibold text-amber-700">All requires completed results from all six strands.</span>}
+        </div>
+        <div className="divide-y divide-slate-100">
+          {loading || loadError ? (
+            <div className={`px-5 py-8 text-center text-sm font-semibold ${loadError ? "text-amber-800" : "text-slate-500"}`}>{loadError ?? "Loading live progression…"}</div>
+          ) : students.length === 0 ? (
+            <div className="px-5 py-8 text-center text-sm font-semibold text-slate-500">No students in this class.</div>
+          ) : students.map((student) => {
+            const studentProgression = progressionByStudent.get(student.id) ?? [];
+            const realmRow = selectedStrand === "all"
+              ? null
+              : studentProgression.find((row) => row.strand === selectedStrand) ?? null;
+            const liveLevel = selectedStrand === "all"
+              ? computeWholeMathsLevel(Object.fromEntries(studentProgression.map((row) => [row.strand, row.predicted_level])))
+              : realmRow?.predicted_level ?? null;
+            const diagnosticPoints = diagnosticPointsByStudent.get(student.id) ?? [];
+            const latestDiagnostic = diagnosticPoints.at(-1)?.level ?? null;
+            return (
+              <div key={student.id} className="grid gap-4 px-5 py-4 xl:grid-cols-[220px_minmax(560px,1fr)] xl:items-center">
+                <div>
+                  <p className="font-black text-slate-950">{student.display_name}</p>
+                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-bold">
+                    <span className="text-teal-700">Live {liveLevel == null ? "—" : formatProgressionPoint(liveLevel)}</span>
+                    <span className="text-violet-700">Diagnostic {latestDiagnostic == null ? "—" : formatProgressionPoint(latestDiagnostic)}</span>
+                  </div>
+                </div>
+                {selectedStrand === "all" && liveLevel == null && diagnosticPoints.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+                    Complete Whole-Maths tracking will activate when all six strand engines are available.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto pb-1">
+                    <ProgressionTrack liveLevel={liveLevel} diagnosticPoints={diagnosticPoints} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
         <div className="border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs leading-5 text-slate-500">
-          A passed quiz contributes a confirmed week. Completed lessons contribute limited provisional movement until their quiz is passed. A realm post-test recalibrates the verified realm point; 85% mastery confirms the next level, while a lower result updates the live estimate without promoting. Repeated attempts are deduplicated.
+          The teal marker moves as lessons, quizzes and realm tests update the live score. Purple markers are formal diagnostic results and remain fixed historical checkpoints. The complete All score is withheld until every strand has been tested.
         </div>
       </article>
 

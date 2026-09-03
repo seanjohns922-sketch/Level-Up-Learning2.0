@@ -110,7 +110,10 @@ assert(
 
 const panel = read("components/teacher/WholeMathsDiagnosticPanel.tsx");
 assert(panel.includes("Live progression tracker"), "The teacher Diagnostic tab is missing the live tracker.");
-assert(panel.includes("Start, mid and end-of-year Whole-Maths results are official"), "Official, checkpoint and predicted levels are not clearly distinguished.");
+assert(panel.includes("Live score") && panel.includes("Diagnostic score"), "Live and diagnostic levels are not clearly distinguished.");
+assert(panel.includes("S = Start · M = Mid · E = End"), "The diagnostic checkpoint markers are missing.");
+assert(panel.includes('setSelectedStrand("all")'), "The complete Whole-Maths view is missing.");
+assert(!panel.includes(">Confidence<") && !panel.includes(">Evidence<"), "Internal confidence or evidence leaked back into the teacher tracker.");
 assert(panel.includes("30_000"), "The live tracker must refresh while the teacher keeps the tab open.");
 
 console.log("Live maths progression audit passed: official results stay fixed, realm tests recalibrate checkpoints, and weekly evidence moves predictions.");

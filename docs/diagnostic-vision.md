@@ -177,6 +177,24 @@ lesson, quiz, assessment, diagnostic or working-level changes. A realm pre/post-
 recalibrates `checkpoint_level`; practice evidence can change `predicted_level` and
 confidence only; neither can update `official_level`.
 
+### Teacher progression tracker
+
+The teacher-facing tracker deliberately does not show confidence percentages or raw
+evidence counts. Those fields may remain internal for auditability, but the primary
+view answers only: where was the student formally measured, and where are they
+tracking now?
+
+- One row per student on a shared Prep–6 scale.
+- A teal line and endpoint show the current live score.
+- A violet diagnostic line carries fixed `S`, `M` and `E` dots for Start, Mid and
+  End results. Historical dots never move when the live score changes.
+- Tabs are ordered `All`, `Number`, `Measurement`, `Space`, `Statistics`, then the
+  future `Algebra` and `Probability` strands.
+- `All` displays a complete curriculum-point-weighted score only when all six strand
+  values exist. It must never substitute, renormalise or approximate from four.
+- Start/Mid/End assignment belongs in this panel. The scheduling control remains
+  locked until all six diagnostic strand engines are production-ready.
+
 Realm assessment recalibration uses the named `MASTERY = 85` and `FLOOR = 40`
 thresholds. At 85%+, the next level boundary is confirmed (Level 3 → 4.00). From
 40–84%, the score is placed proportionally within the tested level (a Level 2 result
