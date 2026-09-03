@@ -1141,57 +1141,749 @@ function year4Question(
 }
 
 function year5Question(week: number, lessonNumber: number, role: RotationRole): Year2QuestionData {
-  if (week <= 3) {
-    const factorA = rand(4, 12);
-    const factorB = rand(3, 12);
-    const product = factorA * factorB;
-    const unknownKind = lessonNumber === 2 && week === 3 ? "divisor" : lessonNumber === 1 && week === 3 ? "factor" : "inverse";
-    const visual = unknownKind === "factor"
-      ? unknownVisual("Unknown factor", `${factorA} × □`, String(product))
-      : unknownKind === "divisor"
-        ? unknownVisual("Unknown divisor", `${product} ÷ □`, String(factorA))
-        : inverseVisual("Multiplication and division inverses", `${factorA} × ${factorB} = ${product}`, `${product} ÷ ${factorA} = ${factorB}`);
-    if (role === "apply_create") return typed(unknownKind === "divisor" ? `${product} ÷ □ = ${factorA}` : `${factorA} × □ = ${product}`, factorB, "Use the related inverse fact.", visual);
-    if (role === "reasoning") return mcq("Which equation checks the relationship?", `${product} ÷ ${factorA} = ${factorB}`, [`${product} − ${factorA} = ${factorB}`, `${factorA} ÷ ${factorB} = ${product}`], "A complete fact family uses the same factors and product.", visual);
-    return mcq(week === 2 ? "Which fact completes the family?" : "What is the missing value?", week === 2 ? `${factorB} × ${factorA} = ${product}` : factorB, week === 2 ? [`${factorA} + ${factorB} = ${product}`, `${product} × ${factorA} = ${factorB}`] : [factorB - 1, factorB + 1, factorA], "Connect multiplication and division using the same three numbers.", visual);
-  }
+  // Level 5 pattern: prompts stay short, the card carries the maths, and the
+  // "?" token is the answer box the student types into. Cards never show the
+  // answer. Each week's three lessons have distinct focuses (see level5Seeds).
 
-  if (week <= 6) {
-    const a = rand(6, 14);
+  // Week 1 — Multiplication and Division Inverses (AC9M5A01).
+  if (week === 1) {
+    const a = rand(3, 9);
     const b = rand(3, 9);
-    const c = rand(2, 7);
-    const product = a * b;
-    if (week === 4) {
-      const visual = balanceVisual("Equivalent multiplication", `${a} × ${b}`, `${b} × ${a}`);
+    const p = a * b;
+
+    if (lessonNumber === 1) {
+      // Operations That Undo — division undoes multiplication.
       if (role === "apply_create") {
-        const knownFactor = pick([a, b]);
-        return typed(`${a} × ${b} = ${knownFactor} × □. Type the unknown.`, product / knownFactor, "Both sides must have the same product.", balanceVisual("Construct an equivalent", `${a} × ${b}`, `${knownFactor} × □`));
+        return typed(
+          "Find the missing factor.",
+          b,
+          `Divide: ${p} ÷ ${a}.`,
+          promptVisual("Operations that undo", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
+        );
       }
-      return mcq("Which expression has the same value?", `${b} × ${a}`, [`${a} + ${b}`, `${product} × ${b}`], "Multiplication is commutative.", visual);
+      if (role === "reasoning") {
+        return mcq(
+          `Which fact undoes ${a} × ${b} = ${p}?`,
+          `${p} ÷ ${a} = ${b}`,
+          [`${p} − ${a} = ${b}`, `${p} ÷ ${a} = ${b + 1}`],
+          "Division splits the product back into equal groups.",
+          promptVisual("Operations that undo", [{ tokens: [`${a}`, "×", `${b}`, "=", `${p}`] }]),
+        );
+      }
+      return mcq(
+        "Which operation undoes multiplication?",
+        "Division",
+        ["Addition", "Subtraction"],
+        "Inverse operations reverse each other.",
+      );
     }
-    if (week === 5) {
-      const answer = a * b * c;
-      const visual = balanceVisual("Regroup three factors", `(${a} × ${b}) × ${c}`, `${a} × (${b} × ${c})`);
-      if (role === "apply_create") return typed(`Calculate ${a} × (${b} × ${c}).`, answer, "Multiply the friendly pair first.", visual);
-      const correct = lessonNumber === 3 ? "Division grouping can change the quotient" : "Multiplication can be regrouped without changing the product";
-      return mcq("Which statement is correct?", correct, [lessonNumber === 3 ? "Division is always associative" : "Regrouping changes every product", "The equals sign means calculate left to right"], "Test the grouping with the displayed values.", visual);
+
+    if (lessonNumber === 2) {
+      // Turn Division Around — rewrite division as multiplication.
+      if (role === "apply_create") {
+        return typed(
+          "Work out the quotient.",
+          b,
+          `Ask: ${a} times what makes ${p}?`,
+          promptVisual("Turn division around", [{ tokens: [`${p}`, "÷", `${a}`, "=", "?"] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Which multiplication helps you work out ${p} ÷ ${a}?`,
+          `${a} × ? = ${p}`,
+          [`${a} + ? = ${p}`, `${p} × ? = ${a}`],
+          "Turn the division into a matching multiplication.",
+          promptVisual("Turn division around", [{ tokens: [`${p}`, "÷", `${a}`, "=", "?"] }]),
+        );
+      }
+      return mcq(
+        `What is ${p} ÷ ${a}?`,
+        b,
+        [b + 1, b - 1, a],
+        "Think: a times what makes the total?",
+      );
     }
-    const friendly = 10;
-    const factor = rand(4, 9);
-    const target = friendly + c;
-    const answer = factor * target;
-    const visual = balanceVisual("Distribute across a sum", `${factor} × (${friendly} + ${c})`, `(${factor} × ${friendly}) + (${factor} × ${c})`);
-    if (role === "apply_create") return typed(`Calculate ${factor} × ${target} by splitting ${target} into ${friendly} + ${c}.`, answer, "Multiply both parts, then combine the partial products.", visual);
-    return mcq("Which equation correctly distributes the multiplication?", `${factor} × ${friendly} + ${factor} × ${c}`, [`${factor} × ${friendly} + ${c}`, `${factor + friendly} × ${c}`], "The outside factor multiplies every part inside.", visual);
+
+    // L3 Check with the Inverse.
+    if (role === "apply_create") {
+      return typed(
+        "Find the missing factor, then check.",
+        a,
+        `Divide: ${p} ÷ ${b}.`,
+        promptVisual("Check with the inverse", [{ tokens: ["?", "×", `${b}`, "=", `${p}`] }]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `How can you check ${p} ÷ ${a} = ${b} is right?`,
+        `${b} × ${a} = ${p}`,
+        [`${b} + ${a} = ${p}`, `${p} × ${a} = ${b}`],
+        "Multiply the quotient by the divisor to get back the total.",
+        promptVisual("Check with the inverse", [{ tokens: [`${p}`, "÷", `${a}`, "=", `${b}`], note: "Claim to check." }]),
+      );
+    }
+    return mcq(
+      `To check ${p} ÷ ${a} = ${b}, what should you multiply?`,
+      `${b} × ${a}`,
+      [`${b} + ${a}`, `${p} × ${a}`],
+      "Multiply back to the total.",
+    );
   }
 
+  // Week 2 — Fact Families (AC9M5A01).
+  if (week === 2) {
+    const a = rand(3, 9);
+    const b = rand(3, 9);
+    const p = a * b;
+
+    if (lessonNumber === 1) {
+      // Four Connected Facts.
+      if (role === "apply_create") {
+        return typed(
+          "Complete the fact family.",
+          b,
+          "The same three numbers make four facts.",
+          promptVisual("Four connected facts", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
+        );
+      }
+      const array = { type: "array" as const, rows: a, columns: b };
+      if (role === "reasoning") {
+        return mcq(
+          `Which fact does NOT belong to ${a} × ${b} = ${p}?`,
+          `${a} + ${b} = ${p}`,
+          [`${p} ÷ ${a} = ${b}`, `${b} × ${a} = ${p}`],
+          "A family uses the same three numbers with × and ÷.",
+          array,
+        );
+      }
+      return mcq(
+        "Which division fact matches this array?",
+        `${p} ÷ ${a} = ${b}`,
+        [`${p} ÷ ${a} = ${b + 1}`, `${a} ÷ ${b} = ${p}`],
+        "Divide the total by one side.",
+        array,
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Partition the Product — different equal groupings.
+      const set = pick([
+        { p: 24, shown: [4, 6], other: [3, 8], wrong: [5, 5] },
+        { p: 36, shown: [6, 6], other: [4, 9], wrong: [5, 7] },
+        { p: 48, shown: [6, 8], other: [4, 12], wrong: [5, 9] },
+        { p: 30, shown: [5, 6], other: [3, 10], wrong: [4, 7] },
+      ]);
+      if (role === "apply_create") {
+        return typed(
+          "Complete another grouping.",
+          set.other[1]!,
+          `Find the missing factor for ${set.other[0]} × ? = ${set.p}.`,
+          promptVisual("Partition the product", [{ tokens: [`${set.other[0]}`, "×", "?", "=", `${set.p}`] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Which is another way to make ${set.p}?`,
+          `${set.other[0]} × ${set.other[1]}`,
+          [`${set.wrong[0]} × ${set.wrong[1]}`, `${set.shown[0]} + ${set.shown[1]}`],
+          "Look for a different pair with the same product.",
+          promptVisual("Partition the product", [{ tokens: [`${set.shown[0]}`, "×", `${set.shown[1]}`, "=", `${set.p}`] }]),
+        );
+      }
+      return mcq(
+        `Which pair multiplies to ${set.p}?`,
+        `${set.other[0]} × ${set.other[1]}`,
+        [`${set.wrong[0]} × ${set.wrong[1]}`, `${set.shown[0]} + ${set.shown[0]}`],
+        "Check the product of each pair.",
+      );
+    }
+
+    // L3 Complete the Family.
+    if (role === "apply_create") {
+      return typed(
+        "Complete the family.",
+        a,
+        "Use the same three numbers.",
+        promptVisual("Complete the family", [{ tokens: [`${p}`, "÷", "?", "=", `${b}`] }]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `You know ${a} × ${b} = ${p}. Which fact completes the family?`,
+        `${p} ÷ ${b} = ${a}`,
+        [`${p} ÷ ${b} = ${a + 1}`, `${a} − ${b} = ${p}`],
+        "Rearrange the same three numbers.",
+        promptVisual("Complete the family", [{ tokens: [`${a}`, "×", `${b}`, "=", `${p}`] }]),
+      );
+    }
+    return mcq(
+      "How many facts are in one fact family?",
+      "4",
+      ["2", "3"],
+      "Two multiplications and two divisions.",
+    );
+  }
+
+  // Week 3 — Unknown Multiplicative Parts (AC9M5A01, AC9M5A02).
+  if (week === 3) {
+    const a = rand(3, 9);
+    const b = rand(3, 9);
+    const p = a * b;
+
+    if (lessonNumber === 1) {
+      // Unknown Products and Factors.
+      if (role === "apply_create") {
+        return typed(
+          "Find the unknown factor.",
+          b,
+          "Divide to undo the multiplication.",
+          promptVisual("Unknown factor", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `In ${a} × ? = ${p}, which operation finds the unknown?`,
+          `${p} ÷ ${a}`,
+          [`${p} × ${a}`, `${p} − ${a}`],
+          "Divide the product by the known factor.",
+          promptVisual("Unknown factor", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
+        );
+      }
+      return mcq(
+        "Which is the missing product?",
+        p,
+        [p + a, p - b, p + 1],
+        "Multiply the two factors.",
+        promptVisual("Unknown product", [{ tokens: [`${a}`, "×", `${b}`, "=", "?"] }]),
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Unknown Dividends and Divisors.
+      if (role === "apply_create") {
+        return typed(
+          "Find the unknown divisor.",
+          b,
+          `${p} ÷ ? = ${a} means ? × ${a} = ${p}.`,
+          promptVisual("Unknown divisor", [{ tokens: [`${p}`, "÷", "?", "=", `${a}`] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `In ? ÷ ${b} = ${a}, how do you find the dividend?`,
+          `${a} × ${b}`,
+          [`${a} ÷ ${b}`, `${a} + ${b}`],
+          "Multiply the quotient by the divisor.",
+          promptVisual("Unknown dividend", [{ tokens: ["?", "÷", `${b}`, "=", `${a}`] }]),
+        );
+      }
+      return mcq(
+        "Find the missing dividend.",
+        p,
+        [p + b, p - b, a + b],
+        "Multiply back to the total.",
+        promptVisual("Unknown dividend", [{ tokens: ["?", "÷", `${b}`, "=", `${a}`] }]),
+      );
+    }
+
+    // L3 Large-Number Inverses — same small fact, scaled up.
+    const tens = a * 10;
+    const bigP = tens * b;
+    if (role === "apply_create") {
+      return typed(
+        "Find the unknown factor.",
+        b,
+        `Use the small fact ${a} × ${b}, then scale.`,
+        promptVisual("Large-number inverse", [{ tokens: [`${tens}`, "×", "?", "=", `${bigP}`] }]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `You know ${a} × ${b} = ${p}. What is ${tens} × ${b}?`,
+        bigP,
+        [p * 10 + b, p + tens, p * 2],
+        "Ten times the factor gives ten times the product.",
+        promptVisual("Scale the fact", [{ tokens: [`${a}`, "×", `${b}`, "=", `${p}`] }]),
+      );
+    }
+    return mcq(
+      `What is ${bigP} ÷ ${tens}?`,
+      b,
+      [b + 1, b - 1, tens],
+      "Divide using the matching small fact.",
+      promptVisual("Large-number inverse", [{ tokens: [`${bigP}`, "÷", `${tens}`, "=", "?"] }]),
+    );
+  }
+
+  // Week 4 — Equivalent Multiplicative Equations (AC9M5A02).
+  if (week === 4) {
+    const a = rand(3, 9);
+    const b = 2 * rand(2, 5); // even, so double/halve stays whole
+    const p = a * b;
+
+    if (lessonNumber === 1) {
+      // Same Value, Different Form.
+      if (role === "apply_create") {
+        return typed(
+          "Make both sides equal.",
+          b,
+          "The same factors in any order give the same product.",
+          promptVisual("Same value", [{ tokens: [`${a}`, "×", `${b}`, "=", "?", "×", `${a}`] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Which expression has the same value as ${a} × ${b}?`,
+          `${b} × ${a}`,
+          [`${a} + ${b}`, `${a} × ${b + 1}`],
+          "Reordering factors keeps the product.",
+          promptVisual("Same value", [{ tokens: [`${a}`, "×", `${b}`] }]),
+        );
+      }
+      return mcq(
+        "Does changing the order of factors change the product?",
+        "No",
+        ["Yes", "Sometimes"],
+        "Multiplication is commutative.",
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // True or False Relationships.
+      if (role === "apply_create") {
+        return typed(
+          "Find the value that makes both sides equal.",
+          b,
+          "Both sides must have the same product.",
+          promptVisual("Make it true", [{ tokens: [`${a}`, "×", "?", "=", `${b}`, "×", `${a}`] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Which statement about ${a} × ${b} is true?`,
+          `${a} × ${b} = ${a} × ${b - 1} + ${a}`,
+          [`${a} × ${b} = ${a} × ${b - 1}`, `${a} × ${b} = ${a} × ${b - 1} − ${a}`],
+          `${a} groups of ${b} is ${a} groups of ${b - 1}, plus one more ${a}.`,
+          promptVisual("True or false?", [{ tokens: [`${a}`, "×", `${b}`] }]),
+        );
+      }
+      return mcq(
+        "Which statement is FALSE?",
+        `${a} × ${b} = ${a} + ${b}`,
+        [`${a} × ${b} = ${b} × ${a}`, `${a} × ${b} = ${p}`],
+        "Check each one with the values.",
+      );
+    }
+
+    // L3 Construct an Equivalent — double one factor, halve the other.
+    if (role === "apply_create") {
+      return typed(
+        "Build an equivalent expression.",
+        b / 2,
+        `Double ${a} to ${a * 2}, so halve ${b}.`,
+        promptVisual("Construct an equivalent", [{ tokens: [`${a}`, "×", `${b}`, "=", `${a * 2}`, "×", "?"] }]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `Which keeps the same value as ${a} × ${b}?`,
+        `${a * 2} × ${b / 2}`,
+        [`${a * 2} × ${b}`, `${a + 2} × ${b}`],
+        "Double one factor, halve the other.",
+        promptVisual("Construct an equivalent", [{ tokens: [`${a}`, "×", `${b}`] }]),
+      );
+    }
+    return mcq(
+      `To keep ${a} × ${b} the same after doubling ${a}, you must ___ ${b}.`,
+      "halve",
+      ["double", "keep"],
+      "Double one, halve the other.",
+    );
+  }
+
+  // Week 5 — Properties of Multiplication (AC9M5A02).
+  if (week === 5) {
+    if (lessonNumber === 1) {
+      // Turn the Array — commutative, and division is not.
+      const a = rand(3, 8);
+      const b = rand(3, 8);
+      if (role === "apply_create") {
+        return typed(
+          "Make both sides equal.",
+          a,
+          "Swapping factors keeps the product.",
+          promptVisual("Turn the array", [{ tokens: [`${a}`, "×", `${b}`, "=", `${b}`, "×", "?"] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Why is ${a} × ${b} = ${b} × ${a}?`,
+          "You can turn the array to match",
+          ["Because the numbers are close", "Because the product is even"],
+          "Rotating an array swaps rows and columns.",
+          { type: "array" as const, rows: a, columns: b },
+        );
+      }
+      return mcq(
+        `Is ${a} ÷ ${b} the same as ${b} ÷ ${a}?`,
+        "No",
+        ["Yes", "Always"],
+        "Division is not commutative.",
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Regroup Three Factors — associativity.
+      const trio = pick([
+        { nums: [2, 7, 5], easy: "2 × 5", hard: ["2 × 7", "7 × 5"] },
+        { nums: [5, 3, 2], easy: "5 × 2", hard: ["5 × 3", "3 × 2"] },
+        { nums: [2, 9, 5], easy: "2 × 5", hard: ["2 × 9", "9 × 5"] },
+        { nums: [4, 7, 5], easy: "4 × 5", hard: ["4 × 7", "7 × 5"] },
+        { nums: [5, 6, 2], easy: "5 × 2", hard: ["5 × 6", "6 × 2"] },
+      ]);
+      const [x, y, z] = trio.nums as [number, number, number];
+      const answer = x * y * z;
+      if (role === "apply_create") {
+        return typed(
+          "Multiply the three factors.",
+          answer,
+          "Multiply a friendly pair first.",
+          promptVisual("Regroup three factors", [{ tokens: [`${x}`, "×", `${y}`, "×", `${z}`, "=", "?"] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "Which pair is easiest to multiply first?",
+          trio.easy,
+          trio.hard,
+          "Look for factors that make 10.",
+          promptVisual("Regroup three factors", [{ tokens: [`${x}`, "×", `${y}`, "×", `${z}`] }]),
+        );
+      }
+      return mcq(
+        "Does regrouping the factors change the answer?",
+        "No",
+        ["Yes", "Sometimes"],
+        "Multiplication is associative.",
+      );
+    }
+
+    // L3 Why Division Is Different.
+    const n = rand(2, 4);
+    const m = rand(2, 4);
+    const start = n * m * rand(2, 4);
+    if (role === "apply_create") {
+      return typed(
+        "Work it out left to right.",
+        start / n / m,
+        "Do the first division, then the second.",
+        promptVisual("Why division is different", [{ tokens: [`${start}`, "÷", `${n}`, "÷", `${m}`, "=", "?"] }]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `Are (${start} ÷ ${n}) ÷ ${m} and ${start} ÷ (${n} ÷ ${m}) equal?`,
+        "No",
+        ["Yes", "Always"],
+        "Grouping changes the quotient — division is not associative.",
+      );
+    }
+    return mcq(
+      "Can you regroup a division like a multiplication?",
+      "No",
+      ["Yes", "Always"],
+      "Regrouping division changes the answer.",
+    );
+  }
+
+  // Week 6 — Distributive Reasoning (AC9M5A02).
+  if (week === 6) {
+    const f = rand(3, 8);
+    const c = rand(2, 6);
+    const target = 10 + c;
+    const total = f * target;
+
+    if (lessonNumber === 1) {
+      // Split an Array.
+      if (role === "apply_create") {
+        return typed(
+          "Split into parts, then solve.",
+          total,
+          `Work out ${f} × 10 and ${f} × ${c}, then add.`,
+          promptVisual("Split an array", [{ tokens: [`${f}`, "×", "(", "10", "+", `${c}`, ")", "=", "?"] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Which shows ${f} × (10 + ${c}) split into parts?`,
+          `${f} × 10 + ${f} × ${c}`,
+          [`${f} × 10 + ${c}`, `${f} + 10 × ${c}`],
+          "The outside factor multiplies every part.",
+          promptVisual("Split an array", [{ tokens: [`${f}`, "×", "(", "10", "+", `${c}`, ")"] }]),
+        );
+      }
+      return mcq(
+        `${f} × (10 + ${c}) = ${f} × 10 + ${f} × ?`,
+        c,
+        [10, f !== c ? f : f + 1],
+        "Distribute to each part.",
+        promptVisual("Split an array", [{ tokens: [`${f}`, "×", "(", "10", "+", `${c}`, ")"] }]),
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Build from Friendly Numbers.
+      if (role === "apply_create") {
+        return typed(
+          "Use the ten fact to finish.",
+          total,
+          `Add ${f} × ${c} to ${f * 10}.`,
+          promptVisual("Build from friendly numbers", [
+            { label: "You know", tokens: [`${f}`, "×", "10", "=", `${f * 10}`] },
+            { label: "Now find", tokens: [`${f}`, "×", `${target}`, "=", "?"] },
+          ]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `You know ${f} × 10 = ${f * 10}. What must you add for ${f} × ${target}?`,
+          `${f} × ${c}`,
+          [`${c}`, `10 × ${c}`],
+          "Add the extra groups of the factor.",
+          promptVisual("Build from friendly numbers", [{ tokens: [`${f}`, "×", "10", "=", `${f * 10}`] }]),
+        );
+      }
+      return mcq(
+        `Which friendly fact helps with ${f} × ${target}?`,
+        `${f} × 10`,
+        [`${f} × ${c}`, `10 × ${c}`],
+        "Start from a ten fact.",
+      );
+    }
+
+    // L3 Find the Hidden Factor.
+    if (role === "apply_create") {
+      return typed(
+        "Find the missing part.",
+        c,
+        `Undo the known part: ${total} − ${f * 10}, then divide by ${f}.`,
+        promptVisual("Find the hidden factor", [
+          { tokens: [`${f}`, "×", "10", "+", `${f}`, "×", "?", "=", `${total}`] },
+        ]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        "Both blanks are the same. What is the hidden factor?",
+        f,
+        [f + 1, f - 1],
+        "The factor is shared by both parts.",
+        promptVisual("Find the hidden factor", [
+          { tokens: ["?", "×", "10", "+", "?", "×", `${c}`, "=", `${total}`] },
+        ]),
+      );
+    }
+    return mcq(
+      `In ${f} × 10 + ${f} × ${c}, what is the shared factor?`,
+      f,
+      [10, c !== f ? c : c + 1],
+      "The factor sits outside both parts.",
+    );
+  }
+
+  // Week 7 — Factors, Multiples and Constraints (AC9M5A02).
   if (week === 7) {
-    const factor = pick([4, 5, 6, 8, 10]);
-    const value = factor * rand(3, 12);
-    const visual = sequenceVisual("Factor and multiple clues", [factor, factor * 2, factor * 3, factor * 4, "..."], [`+${factor}`, `+${factor}`, `+${factor}`, null]);
-    if (role === "apply_create") return typed(`Type the missing factor: ${factor} × □ = ${value}.`, value / factor, "Use the factor clue and related division.", visual);
-    if (role === "reasoning") return mcq(`Which value satisfies both clues: a multiple of ${factor} and less than ${value + factor}?`, value, [value + factor, value - 1, factor + 1], "Test every constraint, not only one.", visual);
-    return mcq(`Which number is a multiple of ${factor}?`, value, [value - 1, value + 1, value + 2], "A multiple divides exactly by the factor.", visual);
+    if (lessonNumber === 1) {
+      // Use Factor Clues.
+      const set = pick([
+        { n: 24, factors: [2, 3, 4, 6, 8, 12], notFactor: 5 },
+        { n: 36, factors: [2, 3, 4, 6, 9, 12, 18], notFactor: 5 },
+        { n: 30, factors: [2, 3, 5, 6, 10, 15], notFactor: 4 },
+        { n: 40, factors: [2, 4, 5, 8, 10, 20], notFactor: 3 },
+      ]);
+      const aFactor = pick(set.factors);
+      if (role === "apply_create") {
+        return typed(
+          `Type a factor of ${set.n} (not 1 or ${set.n}).`,
+          set.factors[0]!,
+          `A factor divides ${set.n} exactly.`,
+          undefined,
+          set.factors.map(String),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Which number is a factor of ${set.n}?`,
+          aFactor,
+          [set.notFactor, set.n + 1],
+          `It divides ${set.n} with no remainder.`,
+        );
+      }
+      return mcq(
+        `Which number is NOT a factor of ${set.n}?`,
+        set.notFactor,
+        [set.factors[0]!, set.factors[1]!],
+        "A factor divides with no remainder.",
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Use Multiple Clues — combine constraints.
+      const factor = pick([3, 4, 6, 7, 8]);
+      const k = rand(3, 8);
+      const target = factor * k;
+      const hi = target + factor;
+      if (role === "apply_create") {
+        const smallest = factor * (Math.floor(target / factor) + 1);
+        return typed(
+          `Type the smallest multiple of ${factor} greater than ${target}.`,
+          smallest,
+          `Count up in ${factor}s from ${target}.`,
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Which value is a multiple of ${factor} AND less than ${hi}?`,
+          target,
+          [hi, target - 1],
+          "Both clues must be true.",
+        );
+      }
+      return mcq(
+        `Which is a multiple of ${factor}?`,
+        target,
+        [target + 1, target - 1],
+        `It is in the ${factor} times table.`,
+      );
+    }
+
+    // L3 Find All Solutions.
+    const set = pick([
+      { n: 12, all: "1×12, 2×6, 3×4", partial: "1×12, 2×6", extra: "1×12, 2×6, 3×4, 5×2", real: "3×4", fake: "5×3" },
+      { n: 18, all: "1×18, 2×9, 3×6", partial: "1×18, 3×6", extra: "1×18, 2×9, 3×6, 4×5", real: "2×9", fake: "4×5" },
+      { n: 20, all: "1×20, 2×10, 4×5", partial: "1×20, 4×5", extra: "1×20, 2×10, 4×5, 3×7", real: "4×5", fake: "3×7" },
+    ]);
+    const count = set.all.split(",").length;
+    if (role === "apply_create") {
+      return typed(
+        `How many factor pairs does ${set.n} have?`,
+        count,
+        `List them: ${set.all}.`,
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `Which lists ALL factor pairs of ${set.n}?`,
+        set.all,
+        [set.partial, set.extra],
+        "Include every pair, and no false ones.",
+      );
+    }
+    return mcq(
+      `Which is a factor pair of ${set.n}?`,
+      set.real,
+      [set.fake, `${set.n}×2`],
+      `Their product is ${set.n}.`,
+    );
+  }
+
+  // Week 8 — Multiplicative Mystery (AC9M5A01, AC9M5A02): integrate inverse,
+  // property and equivalence reasoning across a connected investigation.
+  if (week === 8) {
+    const a = rand(3, 9);
+    const b = rand(3, 9);
+    const p = a * b;
+
+    if (lessonNumber === 1) {
+      // Analyse the Evidence — reconstruct a missing value from the fact family.
+      if (role === "apply_create") {
+        return typed(
+          "Reconstruct the missing factor.",
+          b,
+          `Use the fact family: ${p} ÷ ${a}.`,
+          promptVisual("Analyse the evidence", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Which fact recovers the missing factor in ${a} × ? = ${p}?`,
+          `${p} ÷ ${a}`,
+          [`${p} × ${a}`, `${p} − ${a}`],
+          "Divide to recover the factor.",
+          promptVisual("Analyse the evidence", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
+        );
+      }
+      return mcq(
+        `The array holds ${p} counters in ${a} rows. How many columns?`,
+        b,
+        [b + 1, b - 1, a],
+        "Divide the total by the rows.",
+        { type: "array" as const, rows: a, columns: b },
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Solve the Connected Equations — the first result feeds the second.
+      const m = rand(3, 6);
+      const second = b * m;
+      // Card 1 is already solved (only card 2 holds the "?" the student types).
+      const chain = promptVisual("Connected equations", [
+        { label: "First (solved)", tokens: [`${a}`, "×", `${b}`, "=", `${p}`] },
+        { label: "Second", tokens: [`${b}`, "×", "?", "=", `${second}`] },
+      ]);
+      if (role === "apply_create") {
+        return typed(
+          "Solve the second equation.",
+          m,
+          `The first equation gives ${b}; now divide ${second} ÷ ${b}.`,
+          chain,
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "Why solve the first equation first?",
+          "Its answer is the factor in the next equation",
+          ["It uses the biggest numbers", "It is a division"],
+          "Each solved unknown feeds the next.",
+          chain,
+        );
+      }
+      return mcq(
+        `In ${a} × ? = ${p}, what is the factor?`,
+        b,
+        [b + 1, b - 1, m],
+        `Divide ${p} ÷ ${a} to start the chain.`,
+        promptVisual("Connected equations", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
+      );
+    }
+
+    // L3 Expose the Flawed Argument — a misused property.
+    if (role === "apply_create") {
+      return typed(
+        "Correct it. What is the right answer?",
+        b,
+        `Do the division the right way round: ${p} ÷ ${a}.`,
+        promptVisual("Expose the flaw", [
+          { tokens: [`${p}`, "÷", `${a}`, "=", "?"], note: `A student swapped it to ${a} ÷ ${p}.` },
+        ]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `A student says ${p} ÷ ${a} = ${a} ÷ ${p}. What is the flaw?`,
+        "Division is not commutative",
+        ["Nothing, it is correct", "They should have added"],
+        "Swapping the numbers in a division changes the answer.",
+        promptVisual("Expose the flaw", [{ tokens: [`${p}`, "÷", `${a}`, "=", `${a}`, "÷", `${p}`], note: "A student wrote this." }]),
+      );
+    }
+    return mcq(
+      "Which claim is FALSE?",
+      `${a} ÷ ${b} = ${b} ÷ ${a}`,
+      [`${a} × ${b} = ${b} × ${a}`, `${p} ÷ ${a} = ${b}`],
+      "Only multiplication lets you swap freely.",
+    );
   }
 
   return year5Question(lessonNumber === 1 ? 2 : lessonNumber === 2 ? 6 : 7, lessonNumber, role);
