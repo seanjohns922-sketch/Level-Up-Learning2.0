@@ -18,6 +18,10 @@ export type RealmRegistryEntry = {
   slug: string;
   name: string;
   shortName: string;
+  /** Compact teacher-dashboard identifier. Must be unique and 2–3 capitals. */
+  activityCode: string;
+  /** Canonical suffix used by student_realm_progress.program_key. */
+  programSuffix: string;
   strand: string;
   status: RealmLifecycle;
   isSelectable: boolean;
@@ -58,6 +62,8 @@ export const REALM_REGISTRY = {
     slug: "number-nexus",
     name: "Number Nexus",
     shortName: "Number",
+    activityCode: "NN",
+    programSuffix: "number",
     strand: "Number",
     status: "live",
     isSelectable: true,
@@ -77,6 +83,8 @@ export const REALM_REGISTRY = {
     slug: "measurelands",
     name: "Measurelands",
     shortName: "Measure",
+    activityCode: "ML",
+    programSuffix: "measurelands",
     strand: "Measurement",
     status: "live",
     isSelectable: true,
@@ -96,6 +104,8 @@ export const REALM_REGISTRY = {
     slug: "pattern-peaks",
     name: "Pattern Peaks",
     shortName: "Patterns",
+    activityCode: "PP",
+    programSuffix: "pattern-peaks",
     strand: "Algebra & Patterns",
     status: "coming_soon",
     isSelectable: false,
@@ -115,6 +125,8 @@ export const REALM_REGISTRY = {
     slug: "statistica",
     name: "Statistica",
     shortName: "Stats",
+    activityCode: "ST",
+    programSuffix: "statistica",
     strand: "Statistics",
     status: "live",
     isSelectable: true,
@@ -134,6 +146,8 @@ export const REALM_REGISTRY = {
     slug: "chance-hollow",
     name: "Chance Hollow",
     shortName: "Chance",
+    activityCode: "CH",
+    programSuffix: "chance-hollow",
     strand: "Probability",
     status: "coming_soon",
     isSelectable: false,
@@ -153,6 +167,8 @@ export const REALM_REGISTRY = {
     slug: "starpath",
     name: "Starpath",
     shortName: "Starpath",
+    activityCode: "SP",
+    programSuffix: "starpath",
     strand: "Space & Spatial Reasoning",
     status: "live",
     isSelectable: true,
@@ -172,6 +188,8 @@ export const REALM_REGISTRY = {
     slug: "chronoscape",
     name: "Chronoscape",
     shortName: "Chrono",
+    activityCode: "CS",
+    programSuffix: "chronoscape",
     strand: "Time & Temporal Reasoning",
     status: "coming_soon",
     isSelectable: false,
@@ -191,6 +209,8 @@ export const REALM_REGISTRY = {
     slug: "reading-ridge",
     name: "Reading Ridge",
     shortName: "Reading",
+    activityCode: "RR",
+    programSuffix: "reading-ridge",
     strand: "Reading Comprehension & Fluency",
     status: "coming_soon",
     isSelectable: false,
@@ -210,6 +230,8 @@ export const REALM_REGISTRY = {
     slug: "inkwell-wilds",
     name: "Inkwell Wilds",
     shortName: "Writing",
+    activityCode: "IW",
+    programSuffix: "inkwell-wilds",
     strand: "Writing, Grammar & Spelling",
     status: "coming_soon",
     isSelectable: false,
@@ -229,6 +251,8 @@ export const REALM_REGISTRY = {
     slug: "runehaven-peaks",
     name: "Runehaven Peaks",
     shortName: "Runehaven",
+    activityCode: "RP",
+    programSuffix: "runehaven-peaks",
     strand: "Advanced Literacy & Lore",
     status: "coming_soon",
     isSelectable: false,
@@ -277,7 +301,10 @@ const REALM_ALIASES = new Map<string, CanonicalRealmId>(
     [realm.realmId, realm.realmId],
     [realm.portalId, realm.realmId],
     [realm.slug, realm.realmId],
-    [realm.realmId === "number" ? "nn" : realm.realmId === "measurement" ? "ml" : realm.realmId, realm.realmId],
+    [realm.name.toLowerCase(), realm.realmId],
+    [realm.shortName.toLowerCase(), realm.realmId],
+    [realm.activityCode.toLowerCase(), realm.realmId],
+    [realm.strand.toLowerCase(), realm.realmId],
   ]),
 );
 
@@ -294,4 +321,9 @@ export function requireCanonicalRealmId(value: string): CanonicalRealmId {
 
 export function getRealmDefinition(value: string): RealmRegistryEntry {
   return REALM_REGISTRY[requireCanonicalRealmId(value)];
+}
+
+export function getRealmActivityCode(value: string | null | undefined): string | null {
+  const realmId = tryCanonicalRealmId(value);
+  return realmId ? REALM_REGISTRY[realmId].activityCode : null;
 }

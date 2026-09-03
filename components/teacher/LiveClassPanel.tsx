@@ -19,7 +19,12 @@ import {
 } from "@/lib/live-class";
 import { LiveStudentDrawer, type LiveStudentDrawerData, type LiveStudentEventRow } from "@/components/teacher/LiveStudentDrawer";
 import FocusModeControl from "@/components/teacher/FocusModeControl";
-import { getRealmDefinition, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
+import {
+  getRealmActivityCode,
+  getRealmDefinition,
+  isLiveRealmId,
+  tryCanonicalRealmId,
+} from "@/lib/realms/realm-registry";
 import { selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
 type ClassRow = {
@@ -441,29 +446,13 @@ function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEv
 }
 
 function normalizeAttemptRealm(value?: string | null) {
-  const normalized = value?.trim().toLowerCase();
-  if (normalized === "number" || normalized === "number-nexus" || normalized === "nn") {
-    return "number";
-  }
-  if (normalized === "measurement" || normalized === "measurelands" || normalized === "ml") {
-    return "measurement";
-  }
-  if (normalized === "space" || normalized === "starpath" || normalized === "sp") {
-    return "space";
-  }
-  if (normalized === "statistics" || normalized === "statistica" || normalized === "stats" || normalized === "st") {
-    return "statistics";
-  }
-  return null;
+  const normalized = tryCanonicalRealmId(value);
+  return isLiveRealmId(normalized) ? normalized : null;
 }
 
 function formatRealmBadge(realm?: string | null) {
   const normalized = normalizeAttemptRealm(realm);
-  if (normalized === "measurement") return "ML";
-  if (normalized === "space") return "SP";
-  if (normalized === "statistics") return "ST";
-  if (normalized === "number") return "NN";
-  return "—";
+  return normalized ? getRealmActivityCode(normalized) ?? "—" : "—";
 }
 
 function formatRealmName(realm?: string | null) {

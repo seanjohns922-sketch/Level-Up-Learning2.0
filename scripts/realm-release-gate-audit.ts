@@ -3,7 +3,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { getPosttestForYearLabel, getPretestForYearLabel } from "@/data/assessments/api";
 import { getCurriculumPlan, getGenresForYear } from "@/data/programs/genres";
-import { getLiveRealmDefinitions, LIVE_REALM_IDS } from "@/lib/realms/realm-registry";
+import {
+  CANONICAL_REALM_IDS,
+  getLiveRealmDefinitions,
+  getRealmDefinition,
+  LIVE_REALM_IDS,
+  tryCanonicalRealmId,
+} from "@/lib/realms/realm-registry";
 import {
   buildRealmProgramHref,
   isSharedWeeklyProgramRealm,
@@ -30,6 +36,18 @@ function latestMigrationContaining(marker: string) {
 }
 
 assert(LIVE_REALM_IDS.length > 0, "At least one live realm is required.");
+
+const activityCodes = new Set<string>();
+for (const realmId of CANONICAL_REALM_IDS) {
+  const realm = getRealmDefinition(realmId);
+  assert(/^[A-Z]{2,3}$/.test(realm.activityCode), `${realm.name} needs a 2–3 letter capital activity code.`);
+  assert(!activityCodes.has(realm.activityCode), `${realm.activityCode} is assigned to more than one realm.`);
+  activityCodes.add(realm.activityCode);
+  assert(/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(realm.programSuffix), `${realm.name} has an invalid program-key suffix.`);
+  for (const alias of [realm.realmId, realm.portalId, realm.slug, realm.name, realm.shortName, realm.activityCode, realm.strand]) {
+    assert.equal(tryCanonicalRealmId(alias), realm.realmId, `${realm.name} alias "${alias}" is not canonicalised.`);
+  }
+}
 
 for (const realm of liveRealms) {
   assert.equal(realm.status, "live", `${realm.name} release status is inconsistent.`);
@@ -98,8 +116,30 @@ assert(
 
 const studentProgressSync = read("lib/student-progress-sync.ts");
 assert(
-  /row\.realm_id === "statistics"[\s\S]*\? "statistics"/.test(studentProgressSync),
-  "Canonical Statistica activity must hydrate the statistics cache, never Number Nexus.",
+  studentProgressSync.includes("isLiveRealmId(row.realm_id) ? row.realm_id : realmId"),
+  "Student progress hydration must recognise every registry-live realm.",
+);
+assert(
+  studentProgressSync.includes("getRealmDefinition(realmId).programSuffix"),
+  "Student progress keys must use the canonical realm registry.",
+);
+
+const dashboardShell = read("components/realms/dashboard/RealmDashboardShell.tsx");
+assert(
+  dashboardShell.includes("isLiveRealmId(config.storageRealmId)"),
+  "Realm dashboards must restore progress for every registry-live realm.",
+);
+
+const liveClassPanel = read("components/teacher/LiveClassPanel.tsx");
+assert(
+  liveClassPanel.includes("getRealmActivityCode(normalized)"),
+  "Live Class activity badges must come from the realm registry.",
+);
+
+const lessonRouting = read("lib/lesson-routing.ts");
+assert(
+  lessonRouting.includes("type StudentRealmId = LiveRealmId") && lessonRouting.includes("assertLessonRealmHandled(normalizedRealm)"),
+  "Lesson routing must remain exhaustive when a new realm becomes live.",
 );
 
 const demoMode = read("lib/demo-mode.ts");
@@ -190,6 +230,7 @@ for (const realm of liveRealms) {
 }
 
 const databaseFunctions = [
+  "create or replace function public.realm_week_is_playable(",
   "create or replace function public.complete_realm_lesson(",
   "create or replace function public.complete_realm_quiz(",
   "create or replace function public.complete_realm_assessment(",

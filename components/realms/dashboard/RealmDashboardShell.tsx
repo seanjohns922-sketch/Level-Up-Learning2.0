@@ -33,6 +33,7 @@ import type {
 } from "./types";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
+import { isLiveRealmId } from "@/lib/realms/realm-registry";
 
 function useWorldCanvas(colors: readonly string[], ringColor: string) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -238,7 +239,7 @@ export default function RealmDashboardShell({
   const world = useMemo(() => config.worldForLevel(resolvedYear), [config, resolvedYear]);
   const [progress, setProgress] = useState<StudentProgress | null>(() => {
     if (restoredProgress !== undefined) return restoredProgress;
-    return config.storageRealmId === "number" || config.storageRealmId === "measurement" || config.storageRealmId === "space" || config.storageRealmId === "statistics"
+    return isLiveRealmId(config.storageRealmId)
       ? readProgress(config.storageRealmId)
       : null;
   });

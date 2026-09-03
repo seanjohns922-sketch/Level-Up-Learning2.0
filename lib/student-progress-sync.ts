@@ -12,7 +12,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 import { awardAndReveal } from "@/lib/gem-reveal";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
-import type { LiveRealmId } from "@/lib/realms/realm-registry";
+import { getRealmDefinition, isLiveRealmId, type LiveRealmId } from "@/lib/realms/realm-registry";
 
 export type StudentProgressSnapshotRow = {
   realm_id?: string | null;
@@ -45,23 +45,15 @@ type StudentRuntimeContextRow = {
   last_name?: string | null;
 };
 
-export type StudentProgressRealmId = LiveRealmId | "statistics";
-
-const REALM_PROGRAM_SUFFIX: Record<StudentProgressRealmId, string> = {
-  number: "number",
-  measurement: "measurelands",
-  space: "starpath",
-  statistics: "statistica",
-};
+export type StudentProgressRealmId = LiveRealmId;
 
 function realmProgramKey(year: string, realmId: StudentProgressRealmId) {
-  return `${year.toLowerCase().replace(/\s+/g, "")}-${REALM_PROGRAM_SUFFIX[realmId]}`;
+  return `${year.toLowerCase().replace(/\s+/g, "")}-${getRealmDefinition(realmId).programSuffix}`;
 }
 
 function quizIdForRealm(year: string, week: number, realmId: StudentProgressRealmId) {
   const yearNumber = parseInt(year.replace(/\D/g, ""), 10) || 0;
-  const segment = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : "number";
-  return `y${yearNumber}-${segment}-w${week}-quiz`;
+  return `y${yearNumber}-${realmId}-w${week}-quiz`;
 }
 
 async function getStudentRuntimeContext(studentId: string) {
@@ -124,14 +116,7 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[], realmId: Studen
   rows.forEach((row) => {
     const year = row.year;
     if (!year) return;
-    const rowRealmId =
-      row.realm_id === "measurement"
-        ? "measurement"
-        : row.realm_id === "space"
-          ? "space"
-          : row.realm_id === "statistics"
-            ? "statistics"
-          : "number";
+    const rowRealmId = isLiveRealmId(row.realm_id) ? row.realm_id : realmId;
 
     const completedLessonIds = parseStringArray(row.completed_lesson_ids);
     completedLessonIds.forEach((lessonId) => {
