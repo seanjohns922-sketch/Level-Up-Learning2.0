@@ -138,6 +138,10 @@ export function UnknownTileEquationVisual({
 }: {
   visual: UnknownTileEquationVisualData;
 } & InlineAnswerProps) {
+  const unknownSymbol = visual.unknownSymbol ?? "□";
+  // The side that holds the unknown is the one the student is solving — label it
+  // the "Mystery side" wherever it sits, so the box is never under "Known side".
+  const leftIsMystery = visual.left.includes(unknownSymbol);
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">
@@ -145,15 +149,15 @@ export function UnknownTileEquationVisual({
       </div>
       <div className="mt-4 grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
         <EquationSide
-          label="Mystery side"
+          label={leftIsMystery ? "Mystery side" : "Known side"}
           value={visual.left}
-          unknownSymbol={visual.unknownSymbol ?? "□"}
+          unknownSymbol={unknownSymbol}
           answer={answer}
         />
         <div className="text-center text-3xl font-black text-cyan-600 drop-shadow-[0_0_10px_rgba(34,211,238,0.35)]">
           =
         </div>
-        <EquationSide label="Known side" value={visual.right} unknownSymbol={visual.unknownSymbol ?? "□"} answer={answer} />
+        <EquationSide label={leftIsMystery ? "Known side" : "Mystery side"} value={visual.right} unknownSymbol={unknownSymbol} answer={answer} />
       </div>
     </div>
   );

@@ -3868,7 +3868,8 @@ export default function TypedResponseActivity({
             <button
               type="button"
               onClick={check}
-              className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700"
+              disabled={!typed.trim()}
+              className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {typedResponseButtonLabel}
             </button>
