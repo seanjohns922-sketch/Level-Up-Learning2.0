@@ -894,6 +894,92 @@ function year4Question(
     );
   }
 
+  // Week 6 — "Derive Harder Facts". Each lesson teaches its own strategy:
+  // L1 sixes by doubling threes, L2 sevens by the 5+2 split, L3 nines by 10×−1.
+  if (week === 6) {
+    const n = rand(4, 10);
+    const factor = [6, 7, 9][lessonNumber - 1]!;
+    const product = factor * n;
+    const visual = { type: "array" as const, rows: factor, columns: n };
+
+    if (lessonNumber === 1) {
+      if (role === "reasoning") {
+        return mcq(
+          `Which known fact helps you work out 6 × ${n}?`,
+          `Double 3 × ${n}`,
+          [`Add 3 + ${n}`, `Double 6 × ${n}`],
+          "6 is double 3, so 6 × n is double 3 × n.",
+          visual,
+        );
+      }
+      if (role === "apply_create") {
+        return typed(
+          `3 × ${n} = ${3 * n}. Use it to work out 6 × ${n}.`,
+          product,
+          `6 is double 3, so double ${3 * n}.`,
+          visual,
+        );
+      }
+      return typed(
+        `Double 3 × ${n} to find 6 × ${n}.`,
+        product,
+        `3 × ${n} = ${3 * n}, then double it.`,
+        visual,
+      );
+    }
+
+    if (lessonNumber === 2) {
+      if (role === "reasoning") {
+        return mcq(
+          `How can you split 7 × ${n} into easier facts?`,
+          `5 × ${n} + 2 × ${n}`,
+          [`7 + ${n}`, `5 × ${n} − 2 × ${n}`],
+          "Split 7 into 5 and 2, then add the two products.",
+          visual,
+        );
+      }
+      if (role === "apply_create") {
+        return typed(
+          `5 × ${n} = ${5 * n} and 2 × ${n} = ${2 * n}. What is 7 × ${n}?`,
+          product,
+          `Add the two parts: ${5 * n} + ${2 * n}.`,
+          visual,
+        );
+      }
+      return typed(
+        `Split 7 into 5 and 2 to find 7 × ${n}.`,
+        product,
+        `7 × ${n} = 5 × ${n} + 2 × ${n}.`,
+        visual,
+      );
+    }
+
+    // L3 — nines via ten times minus one.
+    if (role === "reasoning") {
+      return mcq(
+        `Which known fact helps you work out 9 × ${n}?`,
+        `10 × ${n} − ${n}`,
+        [`10 × ${n} + ${n}`, `9 + ${n}`],
+        `9 is one less than 10, so take one ${n} off 10 × ${n}.`,
+        visual,
+      );
+    }
+    if (role === "apply_create") {
+      return typed(
+        `10 × ${n} = ${10 * n}. Use it to work out 9 × ${n}.`,
+        product,
+        `9 × ${n} = 10 × ${n} − ${n}.`,
+        visual,
+      );
+    }
+    return typed(
+      `Use 10 × ${n} then subtract one ${n} to find 9 × ${n}.`,
+      product,
+      `10 × ${n} = ${10 * n}, then take away one ${n}.`,
+      visual,
+    );
+  }
+
   if (week <= 7) {
     const factor = week === 6 ? [6, 7, 9][lessonNumber - 1]! : rand(3, 10);
     const n = rand(4, 10);
