@@ -1,8 +1,25 @@
 # Whole-Maths Diagnostic — spec & build brief
 
-Status: **planned** (build after all six realms exist — Algebra + Probability realms
-are not built yet). This doc is the source of truth for the feature and is written
-so it can be handed straight to a coding agent.
+Status: **staged foundation — not live**. Number, Measurement, Space and Statistics
+are wired to their existing level-test banks, curriculum links and secure persistence.
+The teacher Diagnostic tab is visible as a readiness/reporting surface, but the full
+launch is deliberately locked. Algebra + Probability remain explicit unavailable
+dependencies; no four-strand result is renormalised or presented as a Whole-Maths
+overall. This doc remains the source of truth for the completed six-strand feature.
+
+Current implementation:
+
+- `lib/whole-maths-diagnostic.ts` owns the adaptive rules, named thresholds and
+  weighted-overall calculation; `lib/whole-maths-diagnostic-questions.ts` owns
+  deterministic level-test selection and curriculum linking.
+- `components/teacher/WholeMathsDiagnosticPanel.tsx` is the staged teacher tab.
+- `app/diagnostic/page.tsx` is the unlinked student instrument used while building
+  and verifying the four available strands.
+- `supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql` owns
+  immutable sittings and server-controlled placement. Full six-strand assignment is
+  rejected until the two missing test banks exist.
+- `scripts/whole-maths-diagnostic-audit.ts` prevents partial results being labelled
+  as the official 139-point overall.
 
 ## What it is
 
@@ -120,6 +137,39 @@ the working level, reconciled at the next sitting.
   placement rule reads/writes here.
 - The Start/Mid/End student report already exists as a design (per-strand tracks +
   weighted 3-dot overall) — the diagnostic populates it.
+
+## Future state and territory curriculum crosswalks
+
+Do **not** build jurisdiction-specific reporting until all six maths realms are
+complete and the Australian Curriculum v9 Whole-Maths Diagnostic has been verified
+end to end. AC9 remains the canonical question, scoring and placement framework.
+
+After the six-strand AC9 release is stable, add state and territory curricula as a
+versioned reporting layer:
+
+`diagnostic question → AC9 descriptor → jurisdiction descriptor(s)`
+
+This crosswalk must:
+
+- cover NSW, Victoria, Queensland, Western Australia, South Australia, Tasmania,
+  the ACT and the Northern Territory;
+- reuse the existing questions and diagnostic scores rather than duplicate banks;
+- support one-to-many, many-to-one and partial alignments instead of assuming every
+  jurisdiction descriptor is a direct match;
+- store the jurisdiction, curriculum version and effective dates so syllabus
+  changes never rewrite historical reports;
+- use authoritative jurisdiction curriculum sources and undergo curriculum review
+  before release; and
+- affect reporting only — jurisdiction mappings must not alter the adaptive rules,
+  `MASTERY`, `FLOOR`, strand placement or the 139-point AC9 weighted overall.
+
+Release order is therefore fixed:
+
+1. Complete all six realm level-test banks.
+2. Validate AC9 question links, adaptive measurement, placement and weighted overall.
+3. Release the six-strand AC9 Whole-Maths Diagnostic.
+4. Build and validate the jurisdiction crosswalks.
+5. Enable state/territory reporting based on each school’s selected curriculum.
 
 ## Acceptance criteria
 

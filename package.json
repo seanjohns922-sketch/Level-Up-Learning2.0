@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run qa:realm-release-gate",
+    "prebuild": "npm run qa:realm-release-gate && npm run qa:whole-maths-diagnostic",
     "build": "next build",
     "build:dev": "next build",
     "start": "next start",
@@ -147,6 +147,7 @@
     "qa:teacher-canonical-snapshot": "node scripts/teacher-canonical-snapshot-audit.mjs",
     "qa:teacher-live-realms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/teacher-live-realm-integration-audit.ts",
     "qa:realm-release-gate": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/realm-release-gate-audit.ts",
+    "qa:whole-maths-diagnostic": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/whole-maths-diagnostic-audit.ts",
     "qa:teacher-real-activity-preview": "node scripts/teacher-real-activity-preview-audit.mjs",
     "qa:statistica-blueprint": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-blueprint.ts",
     "qa:statistica-assessments": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-assessments.ts",

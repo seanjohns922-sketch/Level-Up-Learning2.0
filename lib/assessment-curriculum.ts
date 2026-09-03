@@ -31,10 +31,9 @@ export function curriculumCodesForAssessmentQuestion(
     );
   }
 
-  const plans =
-    realmId === "measurement"
-      ? getCurriculumPlan(workingLevel, "measurement")
-      : getProgramForYear(workingLevel);
+  const plans = realmId === "number"
+    ? getProgramForYear(workingLevel)
+    : getCurriculumPlan(workingLevel, realmId);
   return Array.from(
     new Set(
       plans

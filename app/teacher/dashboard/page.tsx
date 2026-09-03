@@ -10,6 +10,7 @@ import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 import LiveClassPanel from "@/components/teacher/LiveClassPanel";
 import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
 import PlacementManager from "@/components/teacher/PlacementManager";
+import WholeMathsDiagnosticPanel from "@/components/teacher/WholeMathsDiagnosticPanel";
 import { fetchRealmCompatProgressForClass } from "@/lib/realm-progress-compat";
 import {
   BRAIN_BREAK_FREQUENCIES,
@@ -307,7 +308,7 @@ export default function TeacherDashboardPage() {
   const [liveEvents, setLiveEvents] = useState<LiveActivityEventRow[]>([]);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
-  const [activeTab, setActiveTab] = useState<"live" | "students" | "curriculum">("live");
+  const [activeTab, setActiveTab] = useState<"live" | "students" | "diagnostic" | "curriculum">("live");
   const [analyticsRealmId, setAnalyticsRealmId] = useState<LiveRealmId>(LIVE_REALM_IDS[0] ?? "number");
   const [showPlacements, setShowPlacements] = useState(false);
   const [pinToast, setPinToast] = useState<string | null>(null);
@@ -1411,6 +1412,7 @@ export default function TeacherDashboardPage() {
                 {([
                   { id: "live",       label: "Live Class" },
                   { id: "students",   label: "Students" },
+                  { id: "diagnostic", label: "Diagnostic" },
                   { id: "curriculum", label: "Curriculum" },
                 ] as const).map((t) => (
                   <button
@@ -1469,6 +1471,11 @@ export default function TeacherDashboardPage() {
                 studentIds={classStudents.map((student) => student.id)}
                 progress={progress as any}
                 progressAvailable={!progressLoadError}
+              />
+            ) : activeTab === "diagnostic" ? (
+              <WholeMathsDiagnosticPanel
+                selectedClass={selectedClass ?? null}
+                students={classStudents}
               />
             ) : (
               <StrandStudentsPanel
@@ -1635,4 +1642,3 @@ export default function TeacherDashboardPage() {
     </main>
   );
 }
-
