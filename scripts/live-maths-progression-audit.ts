@@ -10,8 +10,9 @@ import {
 const root = process.cwd();
 const read = (relativePath: string) => fs.readFileSync(path.join(root, relativePath), "utf8");
 
-assert.equal(measuredCheckpointForAssessment(3, 85), 4, "An 85% Level 3 post-test must confirm Level 4.00.");
-assert.equal(measuredCheckpointForAssessment(2, 60), 2.44, "A 60% Level 2 post-test must recalibrate the realm checkpoint to 2.44.");
+assert.equal(measuredCheckpointForAssessment(3, 85), 3, "An 85% Level 3 post-test must confirm completion of Level 3.");
+assert.equal(measuredCheckpointForAssessment(4, 60), 3.44, "A 60% Level 4 test must sit within the 3.00–4.00 curriculum band.");
+assert.equal(measuredCheckpointForAssessment(2, 60), 1.44, "A 60% Level 2 post-test must recalibrate within the 1.00–2.00 band.");
 
 const firstQuiz = estimateLiveProgression({
   checkpointLevel: 4.1,
@@ -75,11 +76,12 @@ assert.equal(
     probability: 4,
     measurement: measuredCheckpointForAssessment(2, 60),
   }),
-  3.27,
-  "Johnny's Number mastery and 60% Measurement post-test must recalibrate his live whole-maths estimate to 3.27.",
+  2.74,
+  "Johnny's Number mastery and 60% Measurement post-test must use completed-level band semantics.",
 );
 
 const migration = read("supabase/migrations/20260903180000_live_maths_progression_tracker.sql");
+const levelBandMigration = read("supabase/migrations/20260903200000_correct_live_progression_level_band.sql");
 for (const required of [
   "student_live_maths_progression",
   "refresh_student_live_maths_progression",
@@ -87,7 +89,8 @@ for (const required of [
   "v_mastery constant integer := 85",
   "v_floor constant integer := 40",
   "checkpoint_source in ('diagnostic', 'pretest', 'posttest', 'placement')",
-  "when v_assessment_score >= v_mastery then v_assessment_level + 1",
+  "when v_assessment_score >= v_mastery then v_assessment_level",
+  "v_assessment_level - 1 + ((v_assessment_score - v_floor)",
   ") = 6",
   "sitting.checkpoint in ('start', 'mid', 'end')",
   "v_lesson_week_credit constant numeric := 0.4",
@@ -107,6 +110,13 @@ assert(
   !/set\s+official_level[\s\S]{0,160}(student_lesson_attempts|student_weekly_quiz_attempts)/i.test(migration),
   "Weekly evidence must never directly overwrite an official level.",
 );
+for (const required of [
+  "v_assessment_level - 1 + ((v_assessment_score - v_floor)",
+  "create or replace function public.complete_whole_math_diagnostic_strand",
+  "Recompute every current four-realm row",
+]) {
+  assert(levelBandMigration.includes(required), `Level-band correction migration is missing: ${required}`);
+}
 
 const panel = read("components/teacher/WholeMathsDiagnosticPanel.tsx");
 assert(panel.includes("Live progression tracker"), "The teacher Diagnostic tab is missing the live tracker.");

@@ -261,9 +261,9 @@ begin
   if found and v_assessment_level is not null and v_assessment_score is not null
     and (v_checkpoint_at is null or v_assessment_at > v_checkpoint_at) then
     v_checkpoint := greatest(0, least(6, case
-      when v_assessment_score >= v_mastery then v_assessment_level + 1
-      when v_assessment_score >= v_floor then v_assessment_level + ((v_assessment_score - v_floor) / (v_mastery - v_floor))
-      else v_assessment_level - least(0.9, (v_floor - v_assessment_score) / v_floor)
+      when v_assessment_score >= v_mastery then v_assessment_level
+      when v_assessment_score >= v_floor then v_assessment_level - 1 + ((v_assessment_score - v_floor) / (v_mastery - v_floor))
+      else v_assessment_level - 1 - least(0.9, (v_floor - v_assessment_score) / v_floor)
     end));
     v_checkpoint_source := v_assessment_type;
     v_checkpoint_at := v_assessment_at;
@@ -271,7 +271,7 @@ begin
 
   -- A teacher placement is a transparent fallback, not verified evidence.
   if v_checkpoint is null then
-    v_checkpoint := v_working_number;
+    v_checkpoint := greatest(0, v_working_number - 1);
     v_checkpoint_source := 'placement';
     v_checkpoint_at := coalesce(v_progress.created_at, v_progress.updated_at, now());
   end if;

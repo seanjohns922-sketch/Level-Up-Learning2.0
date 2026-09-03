@@ -39,13 +39,13 @@ export function measuredCheckpointForAssessment(level: number, percent: number):
   const boundedLevel = Math.max(0, Math.min(6, level));
   const boundedPercent = Math.max(0, Math.min(100, percent));
   const measured = boundedPercent >= LIVE_PROGRESSION_ASSESSMENT_MASTERY
-    ? boundedLevel + 1
+    ? boundedLevel
     : boundedPercent >= LIVE_PROGRESSION_ASSESSMENT_FLOOR
-      ? boundedLevel + (
+      ? boundedLevel - 1 + (
         (boundedPercent - LIVE_PROGRESSION_ASSESSMENT_FLOOR) /
         (LIVE_PROGRESSION_ASSESSMENT_MASTERY - LIVE_PROGRESSION_ASSESSMENT_FLOOR)
       )
-      : boundedLevel - Math.min(
+      : boundedLevel - 1 - Math.min(
         0.9,
         (LIVE_PROGRESSION_ASSESSMENT_FLOOR - boundedPercent) /
           LIVE_PROGRESSION_ASSESSMENT_FLOOR,

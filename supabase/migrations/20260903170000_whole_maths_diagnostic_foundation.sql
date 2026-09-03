@@ -342,9 +342,9 @@ begin
   set status = 'completed',
       measured_level = greatest(0, least(6,
         case
-          when v_terminal_percent >= v_mastery then v_terminal_level + 0.9
-          when v_terminal_percent >= v_floor then v_terminal_level + ((v_terminal_percent - v_floor) / (v_mastery - v_floor))
-          else v_terminal_level - least(0.9, (v_floor - v_terminal_percent) / v_floor)
+          when v_terminal_percent >= v_mastery then v_terminal_level
+          when v_terminal_percent >= v_floor then v_terminal_level - 1 + ((v_terminal_percent - v_floor) / (v_mastery - v_floor))
+          else v_terminal_level - 1 - least(0.9, (v_floor - v_terminal_percent) / v_floor)
         end
       )),
       recommended_level = 'Year ' || v_recommended,
@@ -415,9 +415,9 @@ begin
   return jsonb_build_object(
     'sitting_complete', v_pending = 0,
     'measured_level', greatest(0, least(6, case
-      when v_terminal_percent >= v_mastery then v_terminal_level + 0.9
-      when v_terminal_percent >= v_floor then v_terminal_level + ((v_terminal_percent - v_floor) / (v_mastery - v_floor))
-      else v_terminal_level - least(0.9, (v_floor - v_terminal_percent) / v_floor) end)),
+      when v_terminal_percent >= v_mastery then v_terminal_level
+      when v_terminal_percent >= v_floor then v_terminal_level - 1 + ((v_terminal_percent - v_floor) / (v_mastery - v_floor))
+      else v_terminal_level - 1 - least(0.9, (v_floor - v_terminal_percent) / v_floor) end)),
     'recommended_level', 'Year ' || v_recommended,
     'placement_applied', v_placement,
     'flag', v_flag

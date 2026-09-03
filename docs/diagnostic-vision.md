@@ -136,7 +136,9 @@ Thresholds as named constants in one place: `MASTERY = 85`, `FLOOR = 40`.
 
 Canonical example (Number): **85% on Level 3 (mastered) → probe Level 4 → 60% on
 Level 4 (instructional band) → working level becomes Level 4 and the recorded
-diagnostic strand point is 4.44.** The next-level result contributes to the official
+diagnostic strand point is 3.44.** A Level 4 test measures the curriculum band from
+3.00 (Level 3 complete) to 4.00 (Level 4 complete); it must never be plotted one year
+ahead. The next-level result contributes to the official
 diagnostic calculation and establishes the new realm placement. If the student had
 scored below 85% on the starting Level 3 probe, that result would still contribute
 to the diagnostic point but their existing Level 3 realm placement would not change.
@@ -196,9 +198,9 @@ tracking now?
   locked until all six diagnostic strand engines are production-ready.
 
 Realm assessment recalibration uses the named `MASTERY = 85` and `FLOOR = 40`
-thresholds. At 85%+, the next level boundary is confirmed (Level 3 → 4.00). From
-40–84%, the score is placed proportionally within the tested level (a Level 2 result
-of 60% → 2.44). Below 40%, the checkpoint may move below the tested level while the
+thresholds. At 85%+, completion of the tested level is confirmed (Level 3 → 3.00).
+From 40–84%, the score is placed proportionally within the tested curriculum band
+(a Level 4 result of 60% → 3.44). Below 40%, the checkpoint may move below the tested level while the
 student's assigned working level remains unchanged for support/review.
 Predicted strand levels will use the same level-aware descriptor calculation for the
 live overall after all six strands exist. Until then, the four available strand
@@ -221,9 +223,10 @@ diagnostic result unless those values came from all six completed formal strand
 tests in the same sitting.
 
 If that student later masters the Level 3 Number post-test at 85%, Number is
-checkpointed at 4.00. If a subsequent Level 2 Measurement post-test scores 60%,
-Measurement is checkpointed at 2.44 rather than advanced. With the other four realm
-levels unchanged, the live whole-maths estimate recalculates to 3.27 (display 3.3).
+checkpointed at 3.00 and their working program advances into Level 4. If a subsequent
+Level 2 Measurement post-test scores 60%, Measurement is checkpointed at 1.44 rather
+than advanced. With the other four realm levels unchanged, the live whole-maths
+estimate recalculates to 2.74 (display 2.7).
 The earlier optimistic lesson/quiz projection is replaced by the newer assessment
 evidence; the official Whole-Maths diagnostic remains unchanged.
 
