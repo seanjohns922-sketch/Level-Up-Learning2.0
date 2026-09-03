@@ -745,14 +745,14 @@ function year4Question(
       const a = rand(20, 80);
       const b = rand(15, 70);
       const c = rand(10, 60);
-      const groupedValue = b + c;
       return typed(
-        `(${a} + ${b}) + ${c} = ${a} + (□). Type the grouped value.`,
-        groupedValue,
+        `(${a} + ${b}) + ${c} = ${a} + (□). Write what goes inside the brackets.`,
+        `${b} + ${c}`,
         role === "reasoning"
-          ? `Associative means the grouping can change: combine ${b} and ${c}.`
-          : "Associative means grouping can change without changing the total. Add the numbers inside the new group.",
+          ? `Associative means the grouping can change: group ${b} and ${c} together inside the brackets.`
+          : "Associative means grouping can change without changing the total. Keep the numbers in order and write the last two as an addition inside the brackets.",
         unknownVisual("Grouping can change — associative", `(${a} + ${b}) + ${c}`, `${a} + (□)`),
+        [`${b}+${c}`],
       );
     }
 
