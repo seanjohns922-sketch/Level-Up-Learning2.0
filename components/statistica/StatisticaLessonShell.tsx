@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
 import { RealmLessonHome } from "@/components/lesson/RealmLessonHome";
@@ -14,6 +14,10 @@ import { getStatisticaLevel5TaskSet } from "@/data/activities/statistica/level5"
 import { getStatisticaLevel6TaskSet } from "@/data/activities/statistica/level6";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 import { getWorld3DReturnPathForLesson, preserveWorld3DReturnContextForLesson } from "@/lib/world3d/return-context";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
+import { getActiveStudentIdentity } from "@/lib/studentIdentity";
+import { restoreStudentStateFromServer, saveRealmLessonAttempt } from "@/lib/student-progress-sync";
+import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 
 type Props = {
   level: string;
@@ -28,7 +32,11 @@ type Props = {
 
 export default function StatisticaLessonShell({ level, levelNumber, week, lessonNumber, lessonId, lessonTitle, focus, successCriteria }: Props) {
   const router = useRouter();
+  const previewMode = useDemoPreviewMode();
   const [started, setStarted] = useState(false);
+  const summaryRef = useRef<LessonPerformanceSummary | null>(null);
+  const savingRef = useRef(false);
+  const completionSavedRef = useRef(false);
   // Levels 1-3 are built; other levels stay blueprint-only until they're coded.
   const [getTask] = useState<RealmLessonTaskGenerator | null>(() => {
     const taskSet = levelNumber === 1 ? getStatisticaLevel1TaskSet(lessonId)
@@ -48,6 +56,72 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
     lessonId,
   }) ?? buildRealmProgramHref({ realmId: "statistics", year: level, week });
   const back = () => router.push(weekHref);
+
+  const completeLesson = useCallback(() => {
+    if (completionSavedRef.current) {
+      router.push(weekHref);
+      return;
+    }
+    if (savingRef.current) return;
+    if (previewMode) {
+      completionSavedRef.current = true;
+      return;
+    }
+
+    const studentId = getActiveStudentIdentity().studentId;
+    if (!studentId) {
+      window.alert("We couldn't verify this student, so the lesson was not saved. Please return home and sign in again.");
+      return;
+    }
+
+    savingRef.current = true;
+    const summary = summaryRef.current;
+    const completionKey =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random()}`;
+    void saveRealmLessonAttempt(
+      studentId,
+      level,
+      week,
+      lessonNumber,
+      lessonId,
+      {
+        at: new Date().toISOString(),
+        completed: true,
+        lessonId,
+        lessonNumber,
+        title: lessonTitle,
+        questionsAnswered: summary?.questionsAnswered ?? 0,
+        totalQuestions: summary?.questionsAnswered ?? 0,
+        correctAnswers: summary?.correctAnswers ?? 0,
+        correctCount: summary?.correctAnswers ?? 0,
+        accuracy: summary?.accuracy ?? 0,
+        accuracyPercent: summary?.accuracy ?? 0,
+        bestChain: summary?.bestChain ?? 0,
+        timeSpentSeconds: summary?.timeSpentSeconds ?? 0,
+        topicSummaries: summary?.topicSummaries ?? [],
+        strengths: summary?.strengths ?? [],
+        areasToImprove: summary?.areasToImprove ?? [],
+        struggledQuestionTypes: summary?.struggledQuestionTypes ?? [],
+      },
+      completionKey,
+      "statistics",
+    )
+      .then(() => {
+        completionSavedRef.current = true;
+        return restoreStudentStateFromServer(studentId, "statistics").catch((error) => {
+          console.warn("[Statistica] Lesson saved but progress refresh failed", error);
+        });
+      })
+      .catch((error) => {
+        console.error("[Statistica] Lesson completion save failed", error);
+        window.alert("We couldn't save this lesson yet. Please check the connection and press Finish again.");
+      })
+      .finally(() => {
+        savingRef.current = false;
+      });
+  }, [lessonId, lessonNumber, lessonTitle, level, previewMode, router, week, weekHref]);
 
   useEffect(() => {
     preserveWorld3DReturnContextForLesson({
@@ -72,7 +146,7 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
             lessonNumber={lessonNumber}
             lessonTitle={lessonTitle}
             focus={focus}
-            demoMode
+            demoMode={previewMode}
             onBack={back}
           >
             <PracticeRunner
@@ -80,7 +154,8 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
               completionMode="time_only"
               scoreCap={10}
               getTask={getTask}
-              onComplete={back}
+              onComplete={completeLesson}
+              onPerformanceSummary={(summary) => { summaryRef.current = summary; }}
               lessonTitle={lessonTitle}
               liveContext={{
                 level,
@@ -94,6 +169,8 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
               practisedSkills={[...successCriteria]}
               nextUpLabel={lessonNumber < 3 ? `Week ${week} lesson ${lessonNumber + 1}` : `Week ${week} quiz`}
               activityNoun="Investigation"
+              showResultsAfterReflection
+              showMistakeReview={false}
             />
           </RealmActiveLessonShell>
         </div>

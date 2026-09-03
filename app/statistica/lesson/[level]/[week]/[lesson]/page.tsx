@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import StatisticaLessonShell from "@/components/statistica/StatisticaLessonShell";
+import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
 import { getStatisticaProgramForYearLabel } from "@/data/programs/statistica";
 
 function parseInteger(value: string, minimum: number, maximum: number) {
@@ -41,19 +42,27 @@ export default async function StatisticaLessonPage({
   const weekConcept = weekPlan.topic.toLowerCase();
 
   return (
-    <StatisticaLessonShell
-      level={level.label}
-      levelNumber={level.number}
+    <CanonicalRealmActivityGate
+      realmId="statistics"
+      year={level.label}
       week={week}
+      activity="lesson"
       lessonNumber={lessonNumber}
-      lessonId={lesson.id}
-      lessonTitle={lesson.title}
-      focus={`use ${lessonConcept} to explore ${weekConcept}`}
-      successCriteria={[
-        `recognise and use ${lessonConcept}`,
-        "use evidence from the data to answer a question",
-        `explain how my result connects to ${weekConcept}`,
-      ]}
-    />
+    >
+      <StatisticaLessonShell
+        level={level.label}
+        levelNumber={level.number}
+        week={week}
+        lessonNumber={lessonNumber}
+        lessonId={lesson.id}
+        lessonTitle={lesson.title}
+        focus={`use ${lessonConcept} to explore ${weekConcept}`}
+        successCriteria={[
+          `recognise and use ${lessonConcept}`,
+          "use evidence from the data to answer a question",
+          `explain how my result connects to ${weekConcept}`,
+        ]}
+      />
+    </CanonicalRealmActivityGate>
   );
 }

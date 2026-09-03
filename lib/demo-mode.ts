@@ -25,12 +25,15 @@ export function isDemoAccessFeatureEnabled() {
 export function isDemoPreviewMode() {
   if (DEMO_MODE) return true;
   if (typeof window === "undefined") return false;
+  const activeStudent = window.localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim();
   if (new URLSearchParams(window.location.search).get("teacher_preview") === "1") {
-    return true;
+    // A URL flag must never turn a real student's canonical journey into an
+    // unrestricted preview. Teacher previews run without a real student scope.
+    return !activeStudent || activeStudent === DEMO_PREVIEW_SCOPE;
   }
   return isDemoAccessFeatureEnabled() &&
     window.localStorage.getItem(DEMO_PREVIEW_STORAGE_KEY) === "1" &&
-    window.localStorage.getItem(ACTIVE_STUDENT_KEY)?.trim() === DEMO_PREVIEW_SCOPE;
+    activeStudent === DEMO_PREVIEW_SCOPE;
 }
 
 export function useDemoPreviewMode() {

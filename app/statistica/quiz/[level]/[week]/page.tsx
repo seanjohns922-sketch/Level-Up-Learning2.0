@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import StarpathVoyageQuiz from "@/components/starpath/StarpathVoyageQuiz";
+import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
 import { getStatisticaWeeklyQuizTasks } from "@/data/activities/statistica/weeklyQuizBank";
 import { STATISTICA_PROGRAMS } from "@/data/programs/statistica";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
@@ -18,10 +19,13 @@ function parseWeek(value: string) {
 
 export default async function StatisticaQuizPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ level: string; week: string }>;
+  searchParams: Promise<{ teacher_preview?: string }>;
 }) {
   const route = await params;
+  const query = await searchParams;
   const level = parseLevel(route.level);
   const week = parseWeek(route.week);
   if (!level || !week) notFound();
@@ -31,10 +35,12 @@ export default async function StatisticaQuizPage({
   if (!weekPlan || !tasks || tasks.length !== 15) notFound();
 
   const year = `Year ${level}` as const;
+  const teacherPreview = query.teacher_preview === "1";
   return (
-    <StarpathVoyageQuiz
-      realm="statistics"
-      quiz={{
+    <CanonicalRealmActivityGate realmId="statistics" year={year} week={week} activity="quiz">
+      <StarpathVoyageQuiz
+        realm="statistics"
+        quiz={{
         level: year,
         levelLabel: year,
         week,
@@ -43,10 +49,11 @@ export default async function StatisticaQuizPage({
         lessonTitles: weekPlan.lessons.map((lesson) => lesson.title) as [string, string, string],
         lessonCurriculumCodes: weekPlan.lessons.map((lesson) => [...lesson.curriculum]) as [string[], string[], string[]],
         lessonSkillIds: weekPlan.lessons.map((lesson) => [lesson.id]) as [string[], string[], string[]],
-        weekHref: buildRealmProgramHref({ realmId: "statistics", year, week, preview: true }),
-        nextWeekHref: buildRealmProgramHref({ realmId: "statistics", year, week: week + 1, preview: true }),
-      }}
-      tasks={tasks}
-    />
+        weekHref: buildRealmProgramHref({ realmId: "statistics", year, week, preview: teacherPreview }),
+        nextWeekHref: buildRealmProgramHref({ realmId: "statistics", year, week: week + 1, preview: teacherPreview }),
+        }}
+        tasks={tasks}
+      />
+    </CanonicalRealmActivityGate>
   );
 }

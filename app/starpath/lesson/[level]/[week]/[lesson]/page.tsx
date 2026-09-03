@@ -20,6 +20,7 @@ import {
   buildStarpathProgramHref,
   STARPATH_REALM_ID,
 } from "@/lib/starpath-routes";
+import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
 
 export const dynamic = "force-dynamic";
 
@@ -61,37 +62,31 @@ export default async function StarpathLessonPage({
     weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
   };
 
-  if (GROUND_LESSON_CONTENT[lesson.id]) {
-    return <StarpathGroundLesson lesson={lessonMetadata} />;
-  }
-
-  if (LEVEL_ONE_LESSON_CONTENT[lesson.id]) {
-    return <StarpathLevelOneLesson lesson={lessonMetadata} />;
-  }
-
-  if (LEVEL_TWO_LESSON_CONTENT[lesson.id]) {
-    return <StarpathLevelTwoLesson lesson={lessonMetadata} />;
-  }
-
-  if (LEVEL_THREE_LESSON_CONTENT[lesson.id]) {
-    return <StarpathLevelThreeLesson lesson={lessonMetadata} />;
-  }
-
-  if (LEVEL_FOUR_LESSON_CONTENT[lesson.id]) {
-    return <StarpathLevelFourLesson lesson={lessonMetadata} />;
-  }
-
-  if (LEVEL_FIVE_LESSON_CONTENT[lesson.id]) {
-    return <StarpathLevelFiveLesson lesson={lessonMetadata} />;
-  }
-
-  if (LEVEL_SIX_LESSON_CONTENT[lesson.id]) {
-    return <StarpathLevelSixLesson lesson={lessonMetadata} />;
-  }
+  const lessonContent = GROUND_LESSON_CONTENT[lesson.id]
+    ? <StarpathGroundLesson lesson={lessonMetadata} />
+    : LEVEL_ONE_LESSON_CONTENT[lesson.id]
+      ? <StarpathLevelOneLesson lesson={lessonMetadata} />
+      : LEVEL_TWO_LESSON_CONTENT[lesson.id]
+        ? <StarpathLevelTwoLesson lesson={lessonMetadata} />
+        : LEVEL_THREE_LESSON_CONTENT[lesson.id]
+          ? <StarpathLevelThreeLesson lesson={lessonMetadata} />
+          : LEVEL_FOUR_LESSON_CONTENT[lesson.id]
+            ? <StarpathLevelFourLesson lesson={lessonMetadata} />
+            : LEVEL_FIVE_LESSON_CONTENT[lesson.id]
+              ? <StarpathLevelFiveLesson lesson={lessonMetadata} />
+              : LEVEL_SIX_LESSON_CONTENT[lesson.id]
+                ? <StarpathLevelSixLesson lesson={lessonMetadata} />
+                : <StarpathDevelopmentLesson lesson={lessonMetadata} />;
 
   return (
-    <StarpathDevelopmentLesson
-      lesson={lessonMetadata}
-    />
+    <CanonicalRealmActivityGate
+      realmId="space"
+      year={definition.yearLabel}
+      week={week}
+      activity="lesson"
+      lessonNumber={lessonNumber}
+    >
+      {lessonContent}
+    </CanonicalRealmActivityGate>
   );
 }

@@ -8,6 +8,7 @@ import {
   buildRealmProgramHref,
   isSharedWeeklyProgramRealm,
 } from "@/lib/realms/realm-journey";
+import { getPlayableWeeks, type ProgramProgressStore } from "@/lib/program-progress";
 
 const root = process.cwd();
 const read = (relativePath: string) => fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -25,7 +26,7 @@ function latestMigrationContaining(marker: string) {
   const start = source.lastIndexOf(marker);
   const end = source.indexOf("$$;", start);
   assert(end > start, `Could not isolate ${marker} in ${filename}.`);
-  return { filename, body: source.slice(start, end + 3) };
+  return { filename, body: source.slice(start, end + 3), source };
 }
 
 assert(LIVE_REALM_IDS.length > 0, "At least one live realm is required.");
@@ -77,6 +78,106 @@ assert(!studentsPanel.includes("unsupported teacher realm"), "Student detail con
 const placements = read("components/teacher/PlacementManager.tsx");
 assert(placements.includes("getLiveRealmDefinitions"), "Placement management must discover registry-live realms.");
 
+const sharedProgram = read("app/program/page.tsx");
+assert(
+  !sharedProgram.includes("previewMode = isStatisticsRealm"),
+  "Live Statistica must never inherit teacher-preview progression bypasses.",
+);
+assert(
+  sharedProgram.includes("previewMode = isPatternRealm || teacherPreview || demoPreviewMode"),
+  "Only explicit demo/teacher preview and unreleased Pattern Peaks may bypass canonical progression.",
+);
+assert(
+  sharedProgram.includes("preview: teacherPreview"),
+  "Statistica week navigation must preserve preview only for an explicit teacher preview.",
+);
+assert(
+  !sharedProgram.includes("hidden_teacher_mode") && !sharedProgram.includes("|| teacherMode"),
+  "A browser-local hidden teacher mode must never bypass live student progression.",
+);
+
+const studentProgressSync = read("lib/student-progress-sync.ts");
+assert(
+  /row\.realm_id === "statistics"[\s\S]*\? "statistics"/.test(studentProgressSync),
+  "Canonical Statistica activity must hydrate the statistics cache, never Number Nexus.",
+);
+
+const demoMode = read("lib/demo-mode.ts");
+assert(
+  demoMode.includes("return !activeStudent || activeStudent === DEMO_PREVIEW_SCOPE"),
+  "A teacher-preview URL must not bypass progression in a real student session.",
+);
+
+const activityGate = read("components/realms/CanonicalRealmActivityGate.tsx");
+for (const requiredGuard of [
+  "restoreStudentStateFromServer(studentId, realmId)",
+  "isWeekPlayable(",
+  "previousLessonComplete",
+  "quizReady",
+]) {
+  assert(activityGate.includes(requiredGuard), `Canonical activity gate is missing ${requiredGuard}.`);
+}
+
+const statisticaLessonRoute = read("app/statistica/lesson/[level]/[week]/[lesson]/page.tsx");
+const statisticaQuizRoute = read("app/statistica/quiz/[level]/[week]/page.tsx");
+const statisticaLessonShell = read("components/statistica/StatisticaLessonShell.tsx");
+assert(
+  statisticaLessonRoute.includes("CanonicalRealmActivityGate") && statisticaLessonRoute.includes('activity="lesson"'),
+  "Statistica lesson routes must enforce canonical week and lesson order.",
+);
+assert(
+  statisticaQuizRoute.includes("CanonicalRealmActivityGate") && statisticaQuizRoute.includes('activity="quiz"'),
+  "Statistica quiz routes must require all three canonical lesson completions.",
+);
+assert(
+  statisticaLessonShell.includes("saveRealmLessonAttempt(") && statisticaLessonShell.includes('"statistics"'),
+  "Statistica lesson completion must save to canonical statistics progress.",
+);
+const starpathLessonRoute = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
+const starpathQuizRoute = read("app/starpath/quiz/[level]/[week]/page.tsx");
+assert(
+  starpathLessonRoute.includes("CanonicalRealmActivityGate") && starpathLessonRoute.includes('activity="lesson"'),
+  "Starpath lesson routes must enforce the same canonical sequence as the other live realms.",
+);
+assert(
+  starpathQuizRoute.includes("CanonicalRealmActivityGate") && starpathQuizRoute.includes('activity="quiz"'),
+  "Starpath quiz routes must enforce the same canonical sequence as the other live realms.",
+);
+
+const lockedStatisticaStore: ProgramProgressStore = {};
+assert.deepEqual(
+  getPlayableWeeks(lockedStatisticaStore, "Year 3", [], [], "statistics", [], 1),
+  [1],
+  "An empty Statistica pathway must fail closed to its assigned week.",
+);
+assert.deepEqual(
+  getPlayableWeeks(lockedStatisticaStore, "Year 3", [1, 2, 3, 4, 5, 6], [], "statistics", [], 1),
+  [1],
+  "A full Statistica pathway must initially unlock only Week 1.",
+);
+assert.deepEqual(
+  getPlayableWeeks(lockedStatisticaStore, "Year 3", [2, 4], [1, 3, 5, 6], "statistics", [], 2),
+  [2],
+  "A targeted Statistica pathway must initially unlock only its first required week.",
+);
+const progressedStatisticaStore: ProgramProgressStore = {
+  "statistics|Year 3|2": {
+    lessonsCompleted: [true, true, true],
+    quizCompleted: true,
+    quizBestScore: 80,
+  },
+};
+assert.deepEqual(
+  getPlayableWeeks(progressedStatisticaStore, "Year 3", [2, 4], [1, 3, 5, 6], "statistics", [], 2),
+  [2, 4],
+  "A targeted Statistica pathway may reveal only the next required week after a pass.",
+);
+assert.deepEqual(
+  getPlayableWeeks(lockedStatisticaStore, "Year 3", [], [1, 2, 3, 4, 5, 6], "statistics", [], 1),
+  [1, 2, 3, 4, 5, 6],
+  "All Statistica weeks may open only when the server explicitly assigns an open-practice plan.",
+);
+
 const carousel = read("components/realms/RealmCarousel.tsx");
 for (const realm of liveRealms) {
   assert(carousel.includes(`id: "${realm.portalId}"`), `${realm.name} is missing from the realm carousel.`);
@@ -113,6 +214,33 @@ const bulkPlacement = latestMigrationContaining(
 assert(
   bulkPlacement.body.includes("public.teacher_change_starting_level("),
   `Bulk teacher placement in ${bulkPlacement.filename} must use the guarded single-student placement path.`,
+);
+
+const assessmentCompletion = latestMigrationContaining(
+  "create or replace function public.complete_realm_assessment(",
+);
+
+const activitySequence = latestMigrationContaining(
+  "create or replace function public.realm_week_is_playable(",
+);
+for (const requiredDatabaseGuard of [
+  "trg_enforce_realm_lesson_sequence",
+  "trg_enforce_realm_quiz_sequence",
+  "The previous lesson must be completed first",
+  "All three lessons must be completed before the quiz",
+]) {
+  assert(
+    activitySequence.source.includes(requiredDatabaseGuard),
+    `Canonical activity sequence migration ${activitySequence.filename} is missing ${requiredDatabaseGuard}.`,
+  );
+}
+assert(
+  assessmentCompletion.body.includes("when p_realm_id = 'statistics' then '[1,2,3,4,5,6]'::jsonb"),
+  `Statistica full pre-test pathways in ${assessmentCompletion.filename} must contain exactly six weeks.`,
+);
+assert(
+  assessmentCompletion.body.includes("public.realm_program_key(effective_progress->>'next_working_level', p_realm_id)"),
+  `Assessment advancement in ${assessmentCompletion.filename} must preserve the realm-specific program key.`,
 );
 
 console.log(`Realm release gate passed for: ${liveRealms.map((realm) => realm.name).join(", ")}.`);

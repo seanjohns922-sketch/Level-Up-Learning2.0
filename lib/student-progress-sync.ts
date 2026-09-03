@@ -129,6 +129,8 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[], realmId: Studen
         ? "measurement"
         : row.realm_id === "space"
           ? "space"
+          : row.realm_id === "statistics"
+            ? "statistics"
           : "number";
 
     const completedLessonIds = parseStringArray(row.completed_lesson_ids);

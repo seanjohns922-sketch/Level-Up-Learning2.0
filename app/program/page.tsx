@@ -41,6 +41,7 @@ import {
   buildRealmProgramHref,
   requireSharedWeeklyProgramRealm,
 } from "@/lib/realms/realm-journey";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { weeklyQuizMinimumCorrect, weeklyQuizPassed } from "@/lib/assessment-rules";
@@ -50,7 +51,6 @@ import {
   preserveWorld3DReturnContextForQuiz,
 } from "@/lib/world3d/return-context";
 
-const TEACHER_MODE_KEY = "lul:hidden_teacher_mode";
 const PATHWAY_JOURNAL_KEY_PREFIX = "lul:pathway-journal";
 
 function getStarpathWeekProgram(year: string) {
@@ -382,13 +382,12 @@ function ProgramPage() {
   } as const;
 
   const legacyProgramMode = sp.get("legacy") === "1";
-  const teacherPreview = sp.get("teacher_preview") === "1";
   const demoPreviewMode = useDemoPreviewMode();
-  // Pattern Peaks is still a preview realm (coming_soon / not selectable), so it
-  // rides the shared Week Home in preview exactly like Statistica — this skips
-  // the canonical live-realm progress bootstrap it can't satisfy yet.
-  const previewMode = isStatisticsRealm || isPatternRealm || teacherPreview || demoPreviewMode;
-  const canonicalRealmId = realmId as "number" | "measurement" | "space";
+  const teacherPreview = sp.get("teacher_preview") === "1" && demoPreviewMode;
+  // Pattern Peaks is still a preview realm (coming_soon / not selectable).
+  // Statistica is live and must always use canonical student progression.
+  const previewMode = isPatternRealm || teacherPreview || demoPreviewMode;
+  const canonicalRealmId = realmId as LiveRealmId;
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
     typeof window !== "undefined" ? readProgramStore() : {}
@@ -399,11 +398,6 @@ function ProgramPage() {
   const [canonicalStatus, setCanonicalStatus] = useState<"loading" | "ready" | "error">(
     DEMO_MODE || previewMode ? "ready" : "loading",
   );
-  const [teacherMode, setTeacherMode] = useState(() =>
-    typeof window !== "undefined" ? window.localStorage.getItem(TEACHER_MODE_KEY) === "true" : false
-  );
-  const [teacherToast, setTeacherToast] = useState("");
-  const secretTapCountRef = useRef(0);
   const [weekMenuOpen, setWeekMenuOpen] = useState(false);
   const weekMenuRef = useRef<HTMLDivElement | null>(null);
   const pathwayJournalStorageKey = `${PATHWAY_JOURNAL_KEY_PREFIX}:${realmId}:${curriculumYear}`;
@@ -412,7 +406,7 @@ function ProgramPage() {
     return window.sessionStorage.getItem(pathwayJournalStorageKey) === "true";
   });
 
-  const unrestrictedMode = DEMO_MODE || previewMode || teacherMode;
+  const unrestrictedMode = DEMO_MODE || previewMode;
 
   useEffect(() => {
     if (DEMO_MODE || previewMode) return;
@@ -700,7 +694,7 @@ function ProgramPage() {
         level: curriculumYear,
         week: weekNum,
       });
-      router.push(`/statistica/quiz/${encodeURIComponent(curriculumYear)}/${weekNum}`);
+      router.push(`/statistica/quiz/${encodeURIComponent(curriculumYear)}/${weekNum}${teacherPreview ? "?teacher_preview=1" : ""}`);
       return;
     }
     if (isStarpathRealm && starpathProgram && item.type === "posttest") {
@@ -731,31 +725,7 @@ function ProgramPage() {
       router.push(buildStarpathProgramHref({ selectedLevel: starpathProgram.definition.id }, clamped));
       return;
     }
-    router.push(buildRealmProgramHref({ realmId, year, week: clamped, preview: isStatisticsRealm || teacherPreview }));
-  }
-
-  function setTeacherModeState(next: boolean) {
-    setTeacherMode(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(TEACHER_MODE_KEY, next ? "true" : "false");
-    }
-    setTeacherToast(next ? "Teacher mode enabled" : "Teacher mode disabled");
-    window.setTimeout(() => setTeacherToast(""), 1800);
-  }
-
-  function handleSecretTeacherToggle() {
-    secretTapCountRef.current += 1;
-    const next = secretTapCountRef.current;
-    if (next >= 6) {
-      secretTapCountRef.current = 0;
-      setTeacherModeState(!teacherMode);
-      return;
-    }
-    window.setTimeout(() => {
-      if (secretTapCountRef.current === next) {
-        secretTapCountRef.current = 0;
-      }
-    }, 1500);
+    router.push(buildRealmProgramHref({ realmId, year, week: clamped, preview: teacherPreview }));
   }
 
   const lessonsDoneCount = progress.lessonsCompleted.filter(Boolean).length;
@@ -1185,9 +1155,7 @@ function ProgramPage() {
 
           <div className="text-center">
             {/* Nexus level pill */}
-            <button
-              type="button"
-              onClick={handleSecretTeacherToggle}
+            <div
               className={`inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isStatisticsRealm ? "text-[#fff4df]" : isPatternRealm ? "text-emerald-50" : isMeasurementRealm ? "text-yellow-50/95" : "text-teal-50"}`}
               style={{
                 background: rt.pillBg,
@@ -1198,7 +1166,7 @@ function ProgramPage() {
             >
               <span className={`h-1.5 w-1.5 rounded-full ${rt.pillDot}`} />
               {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : isStatisticsRealm ? "Data Program" : isPatternRealm ? "Algebra Program" : "Program"}
-            </button>
+            </div>
             <h1 className={`text-4xl md:text-5xl font-black text-white mt-3 tracking-tight ${rt.headingGlow}`}>Week {weekNum}</h1>
             <p className={`text-base md:text-lg mt-2 font-semibold ${isStatisticsRealm ? "text-[#fff4df]" : isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
               <span className={`${rt.focusColor} font-mono text-xs uppercase tracking-[0.18em] mr-2`}>Focus</span>
@@ -1216,12 +1184,6 @@ function ProgramPage() {
                   : `${lessonsDoneCount}/3 ${isStarpathRealm ? "Missions" : "Lessons"} · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : isStarpathRealm ? "Voyage Quiz Pending" : "Quiz Pending"}`
                 : "◆ Preview Locked"}
             </p>
-
-            {teacherToast ? (
-              <div className={`mt-3 inline-flex items-center rounded-full px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.16em] ${isMeasurementRealm ? "border border-yellow-900/35 bg-[#2a1a06]/75 text-yellow-100/90" : "border border-teal-300/35 bg-black/30 text-teal-100"}`}>
-                {teacherToast}
-              </div>
-            ) : null}
 
             {/* XP plate */}
             <div className={`mt-5 mx-auto relative ${isStarpathRealm ? "max-w-xs" : "max-w-sm"}`}>

@@ -211,9 +211,17 @@ export function getPlayableWeeks(
   teacherAdvancedWeeks: number[] = [],
   currentAssignedWeek?: number,
 ): number[] {
-  void optionalWeeks;
   const normalizedRequired = normalizeWeekList(requiredWeeks, realmId);
-  if (!normalizedRequired.length) return getProgramWeeks(realmId);
+  const allProgramWeeks = getProgramWeeks(realmId);
+  const normalizedOptional = normalizeWeekList(optionalWeeks, realmId);
+  if (!normalizedRequired.length) {
+    const hasExplicitOpenPracticePlan =
+      normalizedOptional.length === allProgramWeeks.length &&
+      allProgramWeeks.every((week) => normalizedOptional.includes(week));
+    if (hasExplicitOpenPracticePlan) return allProgramWeeks;
+    const assignedWeek = Math.max(1, Math.min(allProgramWeeks.length, currentAssignedWeek ?? 1));
+    return [assignedWeek];
+  }
 
   if (hasCompletedRequiredWeeks(store, year, normalizedRequired, realmId, teacherAdvancedWeeks)) {
     return getProgramWeeks(realmId);

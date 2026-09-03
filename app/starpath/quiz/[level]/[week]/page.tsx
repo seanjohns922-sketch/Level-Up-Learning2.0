@@ -5,6 +5,7 @@ import { getStarpathQuizTasks } from "@/data/activities/starpath/ground/week1Qui
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getStarpathLevel, tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathProgramHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
+import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
 
 export const dynamic = "force-dynamic";
 
@@ -35,8 +36,9 @@ export default async function StarpathQuizPage({
   const quizTasks = getStarpathQuizTasks(level, week);
   if (quizTasks && quizTasks.length > 0) {
     return (
-      <StarpathVoyageQuiz
-        quiz={{
+      <CanonicalRealmActivityGate realmId="space" year={definition.yearLabel} week={week} activity="quiz">
+        <StarpathVoyageQuiz
+          quiz={{
           level: definition.yearLabel,
           levelLabel: definition.displayLabel,
           week,
@@ -58,25 +60,28 @@ export default async function StarpathQuizPage({
             week < program.weeks.length
               ? buildStarpathProgramHref({ selectedLevel: level }, week + 1)
               : undefined,
-        }}
-        tasks={quizTasks}
-      />
+          }}
+          tasks={quizTasks}
+        />
+      </CanonicalRealmActivityGate>
     );
   }
 
   return (
-    <StarpathDevelopmentQuiz
-      quiz={{
-        level: definition.yearLabel,
-        levelLabel: definition.displayLabel,
-        week,
-        title: `${weekPlan.title} Voyage Quiz`,
-        coverage: weekPlan.quiz.coverage,
-        sourceLessons: weekPlan.lessons.map((lesson) => lesson.title),
-        registryId: weekPlan.quiz.id,
-        status: weekPlan.quiz.status,
-        weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
-      }}
-    />
+    <CanonicalRealmActivityGate realmId="space" year={definition.yearLabel} week={week} activity="quiz">
+      <StarpathDevelopmentQuiz
+        quiz={{
+          level: definition.yearLabel,
+          levelLabel: definition.displayLabel,
+          week,
+          title: `${weekPlan.title} Voyage Quiz`,
+          coverage: weekPlan.quiz.coverage,
+          sourceLessons: weekPlan.lessons.map((lesson) => lesson.title),
+          registryId: weekPlan.quiz.id,
+          status: weekPlan.quiz.status,
+          weekHref: buildStarpathProgramHref({ selectedLevel: level }, week),
+        }}
+      />
+    </CanonicalRealmActivityGate>
   );
 }

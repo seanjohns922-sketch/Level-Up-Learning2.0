@@ -18,7 +18,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskRenderer } from "@/components/TaskRenderer";
 import { weeklyQuizMinimumCorrect, weeklyQuizPassed, ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
-import { saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
+import { restoreStudentStateFromServer, saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -329,6 +329,7 @@ export default function StarpathVoyageQuiz({
           newCompletionKey(),
           realm
         );
+        await restoreStudentStateFromServer(studentId, realm);
       }
       localStorage.removeItem(storageKey);
       setHasResume(false);

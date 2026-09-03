@@ -12,7 +12,7 @@ assert.deepEqual(REALM_REGISTRY.statistics.levelLabels, ["Year 1", "Year 2", "Ye
 const catalogueEntry = getAllRealms().find((realm) => realm.id === "statistics");
 assert(catalogueEntry, "Statistica must exist in the realm catalogue.");
 assert.equal(catalogueEntry.realm, "Statistica");
-assert.equal(catalogueEntry.hasContent, false, "Statistica remains preview-only until quizzes and assessments pass release gates.");
+assert.equal(catalogueEntry.hasContent, true, "Live Statistica must expose its released curriculum.");
 
 for (const level of STATISTICA_META.levels) {
   const yearLabel = `Year ${level}`;
@@ -20,7 +20,7 @@ for (const level of STATISTICA_META.levels) {
   const resolved = getCurriculumPlan(yearLabel, "statistics");
   const genre = getGenresForYear(yearLabel).find((candidate) => candidate.id === "statistics");
   assert(genre, `Statistics genre missing for ${yearLabel}.`);
-  assert.equal(genre.available, false, "Statistica must remain preview-only during assessment construction.");
+  assert.equal(genre.available, true, `Statistica must be available for ${yearLabel}.`);
   assert.equal(direct.length, 6, `${yearLabel} must have six focused weeks.`);
   assert.deepEqual(resolved, direct, `${yearLabel} does not resolve to the canonical Statistica program.`);
 

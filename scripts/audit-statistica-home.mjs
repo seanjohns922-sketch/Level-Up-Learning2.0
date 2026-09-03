@@ -75,7 +75,7 @@ assert(map.includes('realmId: "statistics"'), "Statistica world must preserve it
 
 const programRoute = read("app/program/page.tsx");
 assert(programRoute.includes("requireSharedWeeklyProgramRealm"), "Shared weekly program must discover supported realms from the registry contract");
-assert(programRoute.includes("getCurriculumPlan(year, realmId)"), "Shared weekly program must load curriculum by canonical realm");
+assert(programRoute.includes("getCurriculumPlan(year, genreIdForRealm(realmId))"), "Shared weekly program must load curriculum through the canonical realm mapping");
 assert(programRoute.includes("getStatisticaBackground"), "Shared weekly program must use Statistica artwork");
 assert(programRoute.includes("isStatisticsRealm"), "Shared weekly program must apply the Statistica theme contract");
 for (const token of ['left: "4%"', 'top: "13%"', 'left: "calc(50% - 190px)"', 'top: "53%"', 'left: "68%"']) {
