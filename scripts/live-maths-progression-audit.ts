@@ -96,6 +96,8 @@ for (const required of [
   "official_level = excluded.official_level",
   "predicted_level = excluded.predicted_level",
   "get_teacher_live_maths_progression",
+  "drop function if exists public.get_teacher_live_maths_progression(uuid)",
+  "drop column official_source",
   "trg_refresh_live_progression_from_diagnostic_sitting",
   "security definer",
 ]) {

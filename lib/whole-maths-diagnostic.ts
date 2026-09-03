@@ -88,13 +88,16 @@ export function diagnosticLevelLabel(level: number): string {
 }
 
 function measuredLevelForProbe(level: number, percent: number): number {
-  if (percent >= DIAGNOSTIC_MASTERY) return Math.min(6, level + 0.9);
-  if (percent >= DIAGNOSTIC_FLOOR) {
+  let measured: number;
+  if (percent >= DIAGNOSTIC_MASTERY) measured = Math.min(6, level + 0.9);
+  else if (percent >= DIAGNOSTIC_FLOOR) {
     const fraction = (percent - DIAGNOSTIC_FLOOR) / (DIAGNOSTIC_MASTERY - DIAGNOSTIC_FLOOR);
-    return Math.min(6, level + fraction);
+    measured = Math.min(6, level + fraction);
+  } else {
+    const fractionBelow = (DIAGNOSTIC_FLOOR - percent) / DIAGNOSTIC_FLOOR;
+    measured = Math.max(0, level - Math.min(0.9, fractionBelow));
   }
-  const fractionBelow = (DIAGNOSTIC_FLOOR - percent) / DIAGNOSTIC_FLOOR;
-  return Math.max(0, level - Math.min(0.9, fractionBelow));
+  return Math.round(measured * 100) / 100;
 }
 
 export function decideDiagnosticPlacement(

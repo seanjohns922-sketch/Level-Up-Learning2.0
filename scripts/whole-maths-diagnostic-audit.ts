@@ -118,11 +118,19 @@ assert.equal(
 );
 
 const canonicalPromotion = decideDiagnosticPlacement("Year 3", [
-  { level: "Year 3", score: 9, total: 10, percent: 90 },
-  { level: "Year 4", score: 11, total: 20, percent: 55 },
+  { level: "Year 3", score: 17, total: 20, percent: 85 },
+  { level: "Year 4", score: 12, total: 20, percent: 60 },
 ]);
 assert.equal(canonicalPromotion.recommendedLevel, "Year 4");
 assert.equal(canonicalPromotion.placementChanged, true);
+assert.equal(canonicalPromotion.measuredLevel, 4.44);
+
+const currentLevelNotMastered = decideDiagnosticPlacement("Year 3", [
+  { level: "Year 3", score: 16, total: 20, percent: 80 },
+]);
+assert.equal(currentLevelNotMastered.recommendedLevel, "Year 3");
+assert.equal(currentLevelNotMastered.placementChanged, false);
+assert.equal(currentLevelNotMastered.measuredLevel, 3.89);
 
 const leapfrog = decideDiagnosticPlacement("Year 4", [
   { level: "Year 4", score: 18, total: 20, percent: 90 },

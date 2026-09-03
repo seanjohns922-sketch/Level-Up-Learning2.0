@@ -23,6 +23,80 @@ create table if not exists public.student_live_maths_progression (
   primary key (student_id, realm_id)
 );
 
+-- Upgrade an earlier draft of this migration safely. That draft labelled realm
+-- pre-tests/placements as official and did not have a separate checkpoint.
+alter table public.student_live_maths_progression
+  alter column official_level drop not null,
+  alter column official_at drop not null,
+  add column if not exists checkpoint_level numeric(4,2),
+  add column if not exists checkpoint_source text,
+  add column if not exists checkpoint_at timestamptz;
+
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'student_live_maths_progression'
+      and column_name = 'official_source'
+  ) then
+    execute $upgrade$
+      update public.student_live_maths_progression
+      set checkpoint_level = coalesce(
+            checkpoint_level,
+            official_level,
+            nullif(substring(current_working_level from '[0-9]+'), '')::numeric,
+            0
+          ),
+          checkpoint_source = coalesce(checkpoint_source, official_source, 'placement'),
+          checkpoint_at = coalesce(checkpoint_at, official_at, updated_at, now()),
+          official_level = null,
+          official_at = null
+    $upgrade$;
+    alter table public.student_live_maths_progression drop column official_source;
+  else
+    update public.student_live_maths_progression
+    set checkpoint_level = coalesce(
+          checkpoint_level,
+          official_level,
+          nullif(substring(current_working_level from '[0-9]+'), '')::numeric,
+          0
+        ),
+        checkpoint_source = coalesce(checkpoint_source, 'placement'),
+        checkpoint_at = coalesce(checkpoint_at, official_at, updated_at, now())
+    where checkpoint_level is null or checkpoint_source is null or checkpoint_at is null;
+  end if;
+end;
+$$;
+
+alter table public.student_live_maths_progression
+  alter column checkpoint_level set not null,
+  alter column checkpoint_source set not null,
+  alter column checkpoint_at set not null;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.student_live_maths_progression'::regclass
+      and conname = 'student_live_maths_progression_checkpoint_level_check'
+  ) then
+    alter table public.student_live_maths_progression
+      add constraint student_live_maths_progression_checkpoint_level_check
+      check (checkpoint_level between 0 and 6);
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.student_live_maths_progression'::regclass
+      and conname = 'student_live_maths_progression_checkpoint_source_check'
+  ) then
+    alter table public.student_live_maths_progression
+      add constraint student_live_maths_progression_checkpoint_source_check
+      check (checkpoint_source in ('diagnostic', 'pretest', 'posttest', 'placement'));
+  end if;
+end;
+$$;
+
 create index if not exists student_live_maths_progression_class_idx
   on public.student_live_maths_progression(class_id, realm_id, predicted_level desc);
 
@@ -359,7 +433,11 @@ create trigger trg_refresh_live_progression_from_diagnostic_sitting
 after insert or update or delete on public.whole_math_diagnostic_sittings
 for each row execute function public.refresh_live_maths_progression_from_sitting_trigger();
 
-create or replace function public.get_teacher_live_maths_progression(p_class_id uuid)
+-- Drop first: an earlier version of this function returns a different set of
+-- columns, and create-or-replace cannot change a function's return type.
+drop function if exists public.get_teacher_live_maths_progression(uuid);
+
+create function public.get_teacher_live_maths_progression(p_class_id uuid)
 returns table (
   student_id uuid,
   realm_id text,

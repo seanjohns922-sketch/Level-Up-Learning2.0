@@ -134,10 +134,12 @@ but above the floor** (their instructional / zone-of-proximal-development level)
 
 Thresholds as named constants in one place: `MASTERY = 85`, `FLOOR = 40`.
 
-Canonical example (Number, mid-test): **90% on Level 3 (mastered) → probe Level 4 →
-55% on Level 4 (instructional band) → working level becomes Level 4.** 55% is the
-correct trigger — place where the learning edge is, not where they've already
-mastered.
+Canonical example (Number): **85% on Level 3 (mastered) → probe Level 4 → 60% on
+Level 4 (instructional band) → working level becomes Level 4 and the recorded
+diagnostic strand point is 4.44.** The next-level result contributes to the official
+diagnostic calculation and establishes the new realm placement. If the student had
+scored below 85% on the starting Level 3 probe, that result would still contribute
+to the diagnostic point but their existing Level 3 realm placement would not change.
 
 Placement is **server-controlled** (students never self-place), same security pattern
 as existing RPCs (SECURITY DEFINER + `assert_student_access`). It **coexists with the
