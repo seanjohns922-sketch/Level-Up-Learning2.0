@@ -67,7 +67,12 @@ export function isPatternPeaksQuestion(question: unknown): question is PatternPe
   if (!question || typeof question !== "object") return false;
   const candidate = question as { kind?: unknown; visual?: { type?: unknown } };
   if (candidate.kind !== "multiple_choice" && candidate.kind !== "typed_response") return false;
-  return typeof candidate.visual?.type === "string" && PATTERN_VISUAL_TYPES.has(candidate.visual.type);
+  // A visual is optional. When one is present it must be a supported type, but
+  // text-only reasoning questions (e.g. mental-strategy or "spot the error")
+  // are allowed to render with no visual rather than a card that restates the
+  // working or gives the answer away.
+  if (candidate.visual == null) return true;
+  return typeof candidate.visual.type === "string" && PATTERN_VISUAL_TYPES.has(candidate.visual.type);
 }
 
 const rand = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -1034,29 +1039,24 @@ function year4Question(
     }
 
     // L3 Mental Strategy Challenge — two-digit × one-digit by partitioning.
+    // No worked visual: the split IS what the student has to find/apply.
     const factor = rand(3, 8);
     const twoDigit = rand(12, 24);
     const tensPart = Math.floor(twoDigit / 10) * 10;
     const onesPart = twoDigit - tensPart;
     const product = factor * twoDigit;
-    const splitVisual = expressionVisual("Split into tens and ones", [
-      `${factor} × ${twoDigit}`,
-      `= ${factor} × ${tensPart} + ${factor} × ${onesPart}`,
-    ]);
     if (role === "reasoning") {
       return mcq(
         `Which split makes ${factor} × ${twoDigit} easiest to do mentally?`,
         `${factor} × ${tensPart} + ${factor} × ${onesPart}`,
         [`${factor} × ${twoDigit} × 10`, `${factor} + ${twoDigit}`],
-        "Break the two-digit number into tens and ones, multiply each, then add.",
-        splitVisual,
+        "Only one option has the same value as the original — work each out to check.",
       );
     }
     return typed(
       `Work out ${factor} × ${twoDigit} in your head.`,
       product,
-      `Try ${factor} × ${tensPart} = ${factor * tensPart}, then ${factor} × ${onesPart} = ${factor * onesPart}, and add.`,
-      splitVisual,
+      `Split ${twoDigit} into ${tensPart} and ${onesPart}, multiply each by ${factor}, then add the parts.`,
     );
   }
 
@@ -1069,43 +1069,34 @@ function year4Question(
     const f2 = rand(3, 9);
     const product = f1 * f2;
 
+    // These are text-reasoning questions — no worked visual (the clues, the two
+    // strategies and the flawed working are stated in the prompt).
     if (lessonNumber === 1) {
       const missing = rand(6, 40);
       const total = product + missing;
-      const cluesVisual = expressionVisual("Follow the clues", [
-        `▲ = ${f1} × ${f2}`,
-        `▲ + □ = ${total}`,
-      ]);
       if (role === "reasoning") {
         return mcq(
-          "Which clue should you work out first?",
+          `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + □ = ${total}. Which clue should you work out first?`,
           `▲ = ${f1} × ${f2}`,
           [`▲ + □ = ${total}`, `□ on its own`],
           "Find the known value first, then use it to unlock the unknown.",
-          cluesVisual,
         );
       }
       return typed(
         `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + □ = ${total}. What is □?`,
         missing,
-        `First ▲ = ${product}, then ${product} + □ = ${total}.`,
-        cluesVisual,
+        "Work out ▲ from the multiplication first, then find the missing part of the sum.",
       );
     }
 
     if (lessonNumber === 2) {
       const even = pick([6, 8, 10, 12, 14]);
       const answer = 5 * even;
-      const compareVisual = expressionVisual("Two ways to solve 5 × " + even, [
-        `Ari: half of ${even} (${even / 2}), then × 10`,
-        `Bo: ${even} + ${even} + ${even} + ${even} + ${even}`,
-      ]);
       return mcq(
         `Two students both correctly work out 5 × ${even} = ${answer}. Whose way is more efficient?`,
         `Ari: half of ${even} is ${even / 2}, then × 10`,
         [`Bo: add ${even} five times`, `Cass: count up in fives ${even} times`],
         "All ways reach the same answer — choose the one with the fewest steps.",
-        compareVisual,
       );
     }
 
@@ -1113,16 +1104,11 @@ function year4Question(
     const missing = rand(5, 30);
     const total = product + missing;
     const studentAnswer = missing + rand(2, 5);
-    const defendVisual = expressionVisual("Check the working", [
-      `▲ = ${f1} × ${f2} = ${product}`,
-      `▲ + □ = ${total}, so □ = ${studentAnswer}`,
-    ]);
     return mcq(
       `A student wrote ▲ = ${f1} × ${f2} = ${product}, then ▲ + □ = ${total} so □ = ${studentAnswer}. What is the correct value of □?`,
       missing,
       [studentAnswer, total, product],
       `Check the student's value: does ${product} + ${studentAnswer} equal ${total}?`,
-      defendVisual,
     );
   }
 
