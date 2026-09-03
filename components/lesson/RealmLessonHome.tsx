@@ -196,6 +196,62 @@ function uniqueCriteria(criteria: readonly string[], focus: string) {
     : [focus];
 }
 
+export type LessonConceptIntroData = {
+  term: string;
+  title: string;
+  meaning: string;
+  example: string;
+  exampleExplanation: string;
+};
+
+// The "Meet the idea" teaching card. Shared so it can appear either on the
+// lesson home or as a step inside the lesson (Pattern Peaks shows it inside,
+// after Start, so the home page stays a clean briefing).
+export function LessonConceptIntro({
+  realm,
+  conceptIntro,
+}: {
+  realm: RealmLessonThemeId;
+  conceptIntro: LessonConceptIntroData;
+}) {
+  const theme = REALM_LESSON_THEMES[realm];
+  const conceptText = `${conceptIntro.term}. ${conceptIntro.title}. ${conceptIntro.meaning} For example, ${conceptIntro.example}. ${conceptIntro.exampleExplanation}`;
+  return (
+    <section
+      className="overflow-hidden rounded-lg border p-5 sm:p-6"
+      style={{ background: theme.panelBg, borderColor: theme.panelBorder }}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: theme.secondary }}>
+            Meet the idea · {conceptIntro.term}
+          </div>
+          <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">{conceptIntro.title}</h2>
+          <p className="mt-2 max-w-3xl text-base font-semibold leading-7" style={{ color: theme.accentSoft }}>
+            {conceptIntro.meaning}
+          </p>
+        </div>
+        <ReadAloudBtn
+          text={conceptText}
+          label="Read idea"
+          className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/20"
+        />
+      </div>
+      <div className="mt-5 grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="rounded-lg border border-white/10 bg-black/25 px-5 py-5 text-center text-2xl font-black text-white sm:text-3xl">
+          {conceptIntro.example}
+        </div>
+        <div
+          className="rounded-lg border px-5 py-4 text-center text-base font-black md:max-w-56"
+          style={{ borderColor: `${theme.accent}55`, background: `${theme.accent}16`, color: theme.accentSoft }}
+        >
+          {conceptIntro.exampleExplanation}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function RealmLessonHome({
   realm,
   levelNumber,
@@ -302,40 +358,7 @@ export function RealmLessonHome({
         </div>
 
         <div className="space-y-5 p-5 sm:p-7">
-          {conceptIntro ? (
-            <section
-              className="overflow-hidden rounded-lg border p-5 sm:p-6"
-              style={{ background: theme.panelBg, borderColor: theme.panelBorder }}
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <div className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: theme.secondary }}>
-                    Meet the idea · {conceptIntro.term}
-                  </div>
-                  <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">{conceptIntro.title}</h2>
-                  <p className="mt-2 max-w-3xl text-base font-semibold leading-7" style={{ color: theme.accentSoft }}>
-                    {conceptIntro.meaning}
-                  </p>
-                </div>
-                <ReadAloudBtn
-                  text={conceptText}
-                  label="Read idea"
-                  className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/20"
-                />
-              </div>
-              <div className="mt-5 grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
-                <div className="rounded-lg border border-white/10 bg-black/25 px-5 py-5 text-center text-2xl font-black text-white sm:text-3xl">
-                  {conceptIntro.example}
-                </div>
-                <div
-                  className="rounded-lg border px-5 py-4 text-center text-base font-black md:max-w-56"
-                  style={{ borderColor: `${theme.accent}55`, background: `${theme.accent}16`, color: theme.accentSoft }}
-                >
-                  {conceptIntro.exampleExplanation}
-                </div>
-              </div>
-            </section>
-          ) : null}
+          {conceptIntro ? <LessonConceptIntro realm={realm} conceptIntro={conceptIntro} /> : null}
 
           <div className="grid gap-5 lg:grid-cols-2">
             <section className="rounded-lg border p-5" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
