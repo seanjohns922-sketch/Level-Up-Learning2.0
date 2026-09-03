@@ -20,6 +20,9 @@ requireText(tracker, "presenceRequestInFlightRef", "Presence heartbeats can over
 requireText(client, 'rpc("touch_live_student_presence_secure"', "The client does not use the secure presence RPC.");
 requireText(panel, "ACTIVE_NOW_WINDOW_MS = 120_000", "Active Now does not use a bounded presence window.");
 requireText(panel, "isCardActiveNow(card)", "Live Class does not classify rows from recent presence.");
+requireText(panel, 'normalized === "statistics"', "Live Class does not recognise canonical Statistica activity.");
+requireText(panel, 'if (normalized === "statistics") return "ST"', "Live Class does not show the ST Statistica badge.");
+requireText(panel, 'aria-label={`Realm: ${formatRealmName(card.currentRealm)}`}', "Live Class realm badges do not expose their full accessible name.");
 requireText(migration, "public.assert_student_write(p_student_id)", "Presence writes are not student-authorised.");
 requireText(migration, "student.archived_at is null", "Archived students can publish presence.");
 requireText(migration, "last_active_at = clock_timestamp()", "Presence does not use the trusted database clock.");

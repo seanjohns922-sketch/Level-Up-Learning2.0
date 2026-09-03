@@ -19,7 +19,7 @@ import {
 } from "@/lib/live-class";
 import { LiveStudentDrawer, type LiveStudentDrawerData, type LiveStudentEventRow } from "@/components/teacher/LiveStudentDrawer";
 import FocusModeControl from "@/components/teacher/FocusModeControl";
-import { tryCanonicalRealmId } from "@/lib/realms/realm-registry";
+import { getRealmDefinition, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
 import { selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 
 type ClassRow = {
@@ -451,6 +451,9 @@ function normalizeAttemptRealm(value?: string | null) {
   if (normalized === "space" || normalized === "starpath" || normalized === "sp") {
     return "space";
   }
+  if (normalized === "statistics" || normalized === "statistica" || normalized === "stats" || normalized === "st") {
+    return "statistics";
+  }
   return null;
 }
 
@@ -458,8 +461,14 @@ function formatRealmBadge(realm?: string | null) {
   const normalized = normalizeAttemptRealm(realm);
   if (normalized === "measurement") return "ML";
   if (normalized === "space") return "SP";
+  if (normalized === "statistics") return "ST";
   if (normalized === "number") return "NN";
   return "—";
+}
+
+function formatRealmName(realm?: string | null) {
+  const normalized = normalizeAttemptRealm(realm);
+  return normalized ? getRealmDefinition(normalized).name : "Realm unavailable";
 }
 
 function compareNullableNumbers(left: number | null, right: number | null, direction: LiveSortDirection) {
@@ -1375,7 +1384,13 @@ export default function LiveClassPanel({
                     <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${meta.dot}`} />
                     <span className="truncate text-sm font-bold text-slate-900">{card.displayName}</span>
                   </div>
-                  <span className="text-xs font-bold text-slate-500">{formatRealmBadge(card.currentRealm)}</span>
+                  <span
+                    className="text-xs font-bold text-slate-500"
+                    title={formatRealmName(card.currentRealm)}
+                    aria-label={`Realm: ${formatRealmName(card.currentRealm)}`}
+                  >
+                    {formatRealmBadge(card.currentRealm)}
+                  </span>
                   <span className="text-xs font-semibold text-slate-600">{levelTag}</span>
                   <span className="text-xs font-semibold text-slate-500 tabular-nums">{weekTag}</span>
                   <span className="truncate text-xs font-semibold text-slate-600">{lessonTag}</span>
