@@ -9,16 +9,36 @@ const source = fs.readFileSync(
 
 assert.match(
   source,
-  /hasSavedPlacement \|\| hasRealmProgress \|\| next\[student\.id\]/,
-  "Only genuinely new placement rows should receive automatic defaults.",
+  /savedLevelIsSupported \|\| hasRealmProgress \|\| next\[student\.id\]/,
+  "Only new or unsupported placement rows should receive automatic defaults.",
 );
 assert.match(
   source,
-  /entry: schoolYearOf\(student\) === "Prep" \? "ground_week1" : "pretest"/,
-  "New placement rows must persist the student's school-year default.",
+  /const level = supportedLevel\(realmId, schoolYearOf\(student\)\);[\s\S]*entry: level === "Prep" \? "ground_week1" : "pretest"/,
+  "New placement rows must persist a school-year default supported by the selected realm.",
 );
 assert.match(source, /if \(level === "Prep"\) return "ground_week1"/);
 assert.match(source, /entryModesForLevel\(level\)/);
+assert.match(
+  source,
+  /levelLabels: realm\.levelLabels/,
+  "Placement level choices must come from each realm's supported curriculum levels.",
+);
+assert.match(
+  source,
+  /activeLevelCatalog\.map/,
+  "Statistica must not offer its unsupported Prep level.",
+);
+assert.match(
+  source,
+  /savedLevelIsSupported/,
+  "A legacy placement on an unsupported realm level must be corrected rather than counted as valid.",
+);
+assert.match(
+  source,
+  /database migration must be deployed/,
+  "Database realm drift must produce an actionable teacher-facing error.",
+);
 assert.match(source, /level !== "Prep" \? <button onClick=\{\(\) => onResetPretest\(s\)\}/);
 for (const key of ["surname", "schoolYear", "assignedStart", "currentProgress"]) {
   assert.match(source, new RegExp(`toggleSort\\("${key}"\\)`));

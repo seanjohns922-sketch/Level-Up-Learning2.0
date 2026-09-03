@@ -89,11 +89,12 @@ for (const realm of liveRealms) {
 }
 
 const databaseFunctions = [
-  "create or replace function public.complete_realm_lesson",
-  "create or replace function public.complete_realm_quiz",
-  "create or replace function public.complete_realm_assessment",
-  "create or replace function public.teacher_change_starting_level",
-  "create or replace function public.teacher_advance_student_week",
+  "create or replace function public.complete_realm_lesson(",
+  "create or replace function public.complete_realm_quiz(",
+  "create or replace function public.complete_realm_assessment(",
+  "create or replace function public.teacher_change_starting_level(",
+  "create or replace function public.teacher_change_starting_levels(",
+  "create or replace function public.teacher_advance_student_week(",
 ];
 
 for (const marker of databaseFunctions) {
@@ -105,6 +106,14 @@ for (const marker of databaseFunctions) {
     );
   }
 }
+
+const bulkPlacement = latestMigrationContaining(
+  "create or replace function public.teacher_change_starting_levels(",
+);
+assert(
+  bulkPlacement.body.includes("public.teacher_change_starting_level("),
+  `Bulk teacher placement in ${bulkPlacement.filename} must use the guarded single-student placement path.`,
+);
 
 console.log(`Realm release gate passed for: ${liveRealms.map((realm) => realm.name).join(", ")}.`);
 console.log("World routes, curriculum, assessments, teacher views, placements, parent coverage and database RPCs are present.");

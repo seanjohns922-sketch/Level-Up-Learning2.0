@@ -34,6 +34,7 @@ const PLACEMENT_REALMS = getLiveRealmDefinitions()
   .map((realm) => ({
     id: realm.realmId,
     label: `${realm.name} (${realm.strand})`,
+    levelLabels: realm.levelLabels,
     active: true,
   }));
 const ACTIVE_REALM_IDS = PLACEMENT_REALMS.filter((r) => r.active).map((r) => r.id);
@@ -71,6 +72,22 @@ function surnameOf(s: PMStudent) {
   if (savedSurname) return savedSurname;
   const nameParts = s.display_name.trim().split(/\s+/).filter(Boolean);
   return nameParts.at(-1) ?? s.display_name;
+}
+
+function placementErrorMessage(error: unknown, realmLabel: string) {
+  const message = error && typeof error === "object" && "message" in error
+    ? String(error.message)
+    : error instanceof Error ? error.message : "";
+  if (/invalid realm/i.test(message)) {
+    return `${realmLabel} placement is not enabled in the live database. A database migration must be deployed.`;
+  }
+  if (/not authorized|permission|row-level security/i.test(message)) {
+    return "Your teacher account is not authorised to place one or more of these students.";
+  }
+  if (/canonical progress|could not be verified/i.test(message)) {
+    return "The placement was recorded, but the student's learning program was not created. Please contact support before retrying.";
+  }
+  return message ? `Placements were not saved: ${message}` : "Placements were not saved. Please try again.";
 }
 
 export default function PlacementManager({
@@ -153,6 +170,16 @@ export default function PlacementManager({
     [placements]
   );
 
+  const activeRealm = PLACEMENT_REALMS.find((realm) => realm.id === realmId);
+  const activeLevelCatalog = LEVEL_CATALOG.filter((level) => activeRealm?.levelLabels.includes(level.id));
+
+  function supportedLevel(realm: string, requestedLevel: string) {
+    const definition = PLACEMENT_REALMS.find((candidate) => candidate.id === realm);
+    return definition?.levelLabels.includes(requestedLevel)
+      ? requestedLevel
+      : definition?.levelLabels[0] ?? requestedLevel;
+  }
+
   function savedPlacement(realm: string, studentId: string) {
     return placementByStudentRealm.get(`${realm}:${studentId}`) ?? null;
   }
@@ -168,7 +195,10 @@ export default function PlacementManager({
   }
 
   function defaultLevel(realm: string, s: PMStudent): string {
-    return savedPlacement(realm, s.id)?.assigned_start_level ?? currentProgress(realm, s.id)?.year ?? schoolYearOf(s);
+    return supportedLevel(
+      realm,
+      savedPlacement(realm, s.id)?.assigned_start_level ?? currentProgress(realm, s.id)?.year ?? schoolYearOf(s),
+    );
   }
 
   // A newly enrolled student has neither teacher placement nor realm progress.
@@ -179,20 +209,24 @@ export default function PlacementManager({
       const next = { ...previous };
       let changed = false;
       for (const student of students) {
-        const hasSavedPlacement = placementByStudentRealm.has(`${realmId}:${student.id}`);
+        const saved = placementByStudentRealm.get(`${realmId}:${student.id}`);
+        const savedLevelIsSupported = saved
+          ? activeRealm?.levelLabels.includes(saved.assigned_start_level) === true
+          : false;
         const hasRealmProgress = (progressByRealm[realmId] ?? []).some(
-          (row) => row.student_id === student.id,
+          (row) => row.student_id === student.id && activeRealm?.levelLabels.includes(row.year),
         );
-        if (hasSavedPlacement || hasRealmProgress || next[student.id]) continue;
+        if (savedLevelIsSupported || hasRealmProgress || next[student.id]) continue;
+        const level = supportedLevel(realmId, schoolYearOf(student));
         next[student.id] = {
-          level: schoolYearOf(student),
-          entry: schoolYearOf(student) === "Prep" ? "ground_week1" : "pretest",
+          level,
+          entry: level === "Prep" ? "ground_week1" : "pretest",
         };
         changed = true;
       }
       return changed ? next : previous;
     });
-  }, [loading, placementByStudentRealm, progressByRealm, realmId, students]);
+  }, [activeRealm, loading, placementByStudentRealm, progressByRealm, realmId, students]);
 
   function toggleSort(nextKey: PlacementSortKey) {
     if (sortKey === nextKey) {
@@ -283,10 +317,11 @@ export default function PlacementManager({
     setPending((prev) => {
       const next = { ...prev };
       for (const s of visibleStudents) {
+        const level = supportedLevel(realmId, schoolYearOf(s));
         next[s.id] = {
-          level: schoolYearOf(s),
+          level,
           entry: normalizeEntryMode(
-            schoolYearOf(s),
+            level,
             prev[s.id]?.entry ?? savedPlacement(realmId, s.id)?.assigned_entry_mode ?? "pretest",
           ),
         };
@@ -346,7 +381,10 @@ export default function PlacementManager({
       });
     } catch (err) {
       console.warn("[PlacementManager] save failed", err);
-      setSaveMessage({ kind: "error", text: "Placements were not fully saved. Please try again." });
+      setSaveMessage({
+        kind: "error",
+        text: placementErrorMessage(err, activeRealm?.label ?? "This realm"),
+      });
     } finally {
       setSaving(false);
     }
@@ -390,8 +428,6 @@ export default function PlacementManager({
     setResetRealmFor(null);
     setResetConfirmText("");
   }
-
-  const activeRealm = PLACEMENT_REALMS.find((r) => r.id === realmId);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#F7F8FA]">
@@ -558,7 +594,7 @@ export default function PlacementManager({
                         onChange={(e) => setRowLevel(s.id, e.target.value, realmId)}
                         className="rounded-lg border border-[#E6E8EC] bg-white px-2 py-1.5 text-sm font-semibold text-[#0F172A]"
                       >
-                        {LEVEL_CATALOG.map((l) => (
+                        {activeLevelCatalog.map((l) => (
                           <option key={l.id} value={l.id}>{l.label}</option>
                         ))}
                       </select>
