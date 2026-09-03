@@ -1,27 +1,35 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Clock3, LockKeyhole, ShieldCheck } from "lucide-react";
-import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
+import { CheckCircle2, Clock3, LockKeyhole, ShieldCheck, TrendingUp } from "lucide-react";
+import {
+  AC_DESCRIPTOR_COUNTS_BY_LEVEL,
+  AC_PRIMARY_LEVELS,
+  AC_STRANDS,
+} from "@/lib/curriculum/ac-standards";
 import {
   DIAGNOSTIC_FLOOR,
   DIAGNOSTIC_MASTERY,
   DIAGNOSTIC_STRANDS,
   WHOLE_MATHS_WEIGHT_TOTAL,
   computeWholeMathsLevel,
+  computeReachedCurriculumPoints,
   diagnosticAvailableWeight,
 } from "@/lib/whole-maths-diagnostic";
 import {
   fetchTeacherDiagnostics,
+  fetchTeacherLiveMathsProgression,
+  type LiveMathsProgressionRow,
   type TeacherDiagnosticSittingRow,
 } from "@/lib/whole-maths-diagnostic-client";
+import { formatProgressionPoint } from "@/lib/live-maths-progression";
 
 type DiagnosticStudent = { id: string; display_name: string };
 
 const CHECKPOINT_LABEL = {
-  start: "Start",
-  mid: "Mid",
-  end: "End",
+  start: "Start-of-year diagnostic",
+  mid: "Mid-year diagnostic",
+  end: "End-of-year diagnostic",
   ad_hoc: "Ad hoc",
 } as const;
 
@@ -42,22 +50,31 @@ export default function WholeMathsDiagnosticPanel({
   students: DiagnosticStudent[];
 }) {
   const [sittings, setSittings] = useState<TeacherDiagnosticSittingRow[]>([]);
+  const [progression, setProgression] = useState<LiveMathsProgressionRow[]>([]);
+  const [selectedStrand, setSelectedStrand] = useState<LiveMathsProgressionRow["strand"]>("number");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    async function load() {
+    async function load(showLoading: boolean) {
       if (!selectedClass?.id) {
         setSittings([]);
+        setProgression([]);
         setLoading(false);
         return;
       }
-      setLoading(true);
-      setLoadError(null);
+      if (showLoading) setLoading(true);
       try {
-        const rows = await fetchTeacherDiagnostics(selectedClass.id);
-        if (!cancelled) setSittings(rows);
+        const [rows, liveProgression] = await Promise.all([
+          fetchTeacherDiagnostics(selectedClass.id),
+          fetchTeacherLiveMathsProgression(selectedClass.id),
+        ]);
+        if (!cancelled) {
+          setSittings(rows);
+          setProgression(liveProgression);
+          setLoadError(null);
+        }
       } catch (error) {
         if (!cancelled) {
           console.warn("[WholeMathsDiagnostic] Could not load staged diagnostics", error);
@@ -67,8 +84,9 @@ export default function WholeMathsDiagnosticPanel({
         if (!cancelled) setLoading(false);
       }
     }
-    void load();
-    return () => { cancelled = true; };
+    void load(true);
+    const intervalId = window.setInterval(() => { void load(false); }, 30_000);
+    return () => { cancelled = true; window.clearInterval(intervalId); };
   }, [selectedClass?.id]);
 
   const studentNames = useMemo(
@@ -77,9 +95,14 @@ export default function WholeMathsDiagnosticPanel({
   );
   const availableWeight = diagnosticAvailableWeight();
   const workedOverall = computeWholeMathsLevel(WORKED_EXAMPLE);
-  const workedWeightedSum = DIAGNOSTIC_STRANDS.reduce(
-    (sum, definition) => sum + WORKED_EXAMPLE[definition.strand] * AC_STRANDS[definition.strand].weight,
-    0,
+  const workedReachedPoints = computeReachedCurriculumPoints(WORKED_EXAMPLE);
+  const progressionByStudent = useMemo(
+    () => new Map(
+      progression
+        .filter((row) => row.strand === selectedStrand)
+        .map((row) => [row.student_id, row]),
+    ),
+    [progression, selectedStrand],
   );
 
   return (
@@ -95,7 +118,7 @@ export default function WholeMathsDiagnosticPanel({
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
               The first four genre engines are coded and use their existing level-test questions.
-              Full diagnostic launch and the official weighted overall remain locked until Algebra and Probability are complete.
+              Full diagnostic launch and the official Whole-Maths overall remain locked until Algebra and Probability are complete.
             </p>
           </div>
           <div className="rounded-xl border border-amber-200 bg-white px-4 py-3 text-right">
@@ -105,6 +128,57 @@ export default function WholeMathsDiagnosticPanel({
         </div>
       </div>
 
+      <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
+          <div>
+            <div className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-teal-700" aria-hidden /><h3 className="text-lg font-black text-slate-950">Live progression tracker</h3></div>
+            <p className="mt-1 text-sm text-slate-500">Start, mid and end-of-year Whole-Maths results are official; completed realm pathways and tests move the live prediction between them.</p>
+          </div>
+          <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1">
+            {DIAGNOSTIC_STRANDS.filter((definition) => definition.available).map((definition) => (
+              <button
+                key={definition.strand}
+                type="button"
+                onClick={() => setSelectedStrand(definition.strand as LiveMathsProgressionRow["strand"])}
+                className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold transition ${selectedStrand === definition.strand ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-white"}`}
+              >
+                {AC_STRANDS[definition.strand].label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[760px] text-left text-sm">
+            <thead><tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-black uppercase tracking-wide text-slate-500"><th className="px-5 py-3">Student</th><th className="px-4 py-3">Verified realm point</th><th className="px-4 py-3">Live prediction</th><th className="px-4 py-3">Movement</th><th className="px-4 py-3">Confidence</th><th className="px-4 py-3">Evidence</th></tr></thead>
+            <tbody className="divide-y divide-slate-100">
+              {loading || loadError ? (
+                <tr><td colSpan={6} className={`px-5 py-8 text-center font-semibold ${loadError ? "text-amber-800" : "text-slate-500"}`}>{loadError ?? "Loading live progression…"}</td></tr>
+              ) : students.length === 0 ? (
+                <tr><td colSpan={6} className="px-5 py-8 text-center font-semibold text-slate-500">No students in this class.</td></tr>
+              ) : students.map((student) => {
+                const row = progressionByStudent.get(student.id);
+                const movement = row ? Math.round((row.predicted_level - row.checkpoint_level) * 100) / 100 : null;
+                return (
+                  <tr key={student.id}>
+                    <th className="px-5 py-4 font-bold text-slate-900">{student.display_name}</th>
+                    <td className="px-4 py-4">
+                      {row ? <><span className="font-black text-slate-950">{formatProgressionPoint(row.checkpoint_level)}</span><span className="ml-2 text-xs text-slate-500">{row.checkpoint_source === "diagnostic" ? "Whole diagnostic" : row.checkpoint_source === "pretest" ? "Pre-test" : row.checkpoint_source === "posttest" ? "Post-test" : "Placement baseline"}</span></> : <span className="text-slate-400">Awaiting baseline</span>}
+                    </td>
+                    <td className="px-4 py-4 font-black text-teal-700">{row ? formatProgressionPoint(row.predicted_level) : "—"}</td>
+                    <td className="px-4 py-4 font-bold text-emerald-700">{movement == null ? "—" : movement > 0 ? `+${movement.toFixed(2)}` : "No change yet"}</td>
+                    <td className="px-4 py-4">{row ? <div className="flex items-center gap-2"><div className="h-2 w-20 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500" style={{ width: `${row.prediction_confidence}%` }} /></div><span className="text-xs font-bold text-slate-600">{row.prediction_confidence}%</span></div> : "—"}</td>
+                    <td className="px-4 py-4 text-xs font-semibold text-slate-600">{row ? `${row.evidence.passedQuizWeeks ?? 0} quiz passes · ${row.evidence.completedUnconfirmedLessons ?? 0} lessons awaiting quiz` : "No canonical evidence yet"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs leading-5 text-slate-500">
+          A passed quiz contributes a confirmed week. Completed lessons contribute limited provisional movement until their quiz is passed. A realm post-test recalibrates the verified realm point; 85% mastery confirms the next level, while a lower result updates the live estimate without promoting. Repeated attempts are deduplicated.
+        </div>
+      </article>
+
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {DIAGNOSTIC_STRANDS.map((definition) => {
           const strand = AC_STRANDS[definition.strand];
@@ -113,7 +187,7 @@ export default function WholeMathsDiagnosticPanel({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="font-black text-slate-950">{strand.label}</h3>
-                  <p className="mt-1 text-xs font-semibold text-slate-500">Weight {strand.weight} of {WHOLE_MATHS_WEIGHT_TOTAL}</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">F–6 total {strand.weight} of {WHOLE_MATHS_WEIGHT_TOTAL}</p>
                 </div>
                 {definition.available ? <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-label="Engine ready" /> : <Clock3 className="h-5 w-5 text-slate-400" aria-label="Waiting for realm" />}
               </div>
@@ -127,14 +201,14 @@ export default function WholeMathsDiagnosticPanel({
 
       <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="max-w-4xl">
-          <h3 className="text-lg font-black text-slate-950">How a student&apos;s overall maths level is weighted</h3>
+          <h3 className="text-lg font-black text-slate-950">How a student&apos;s overall maths level is calculated</h3>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            The complete diagnostic tests all six maths strands. Each strand counts in proportion to how much of the Australian Curriculum v9 Foundation–Year 6 curriculum it covers. Number carries the most weight and Probability the least.
+            The complete diagnostic tests all six maths strands. It counts the Australian Curriculum v9 descriptors reached at each student&apos;s measured level in each strand, then maps the combined curriculum points back to one progression level. This handles mixed profiles without applying one fixed F–6 percentage to every year.
           </p>
         </div>
         <div className="mt-5 overflow-x-auto">
           <table className="w-full min-w-[620px] text-left text-sm">
-            <thead><tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500"><th className="pb-2">Strand</th><th className="pb-2">Points (F–6)</th><th className="pb-2">Weight</th><th className="pb-2">Curriculum share</th></tr></thead>
+            <thead><tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500"><th className="pb-2">Strand</th><th className="pb-2">Points (F–6)</th><th className="pb-2">F–6 share</th><th className="pb-2">Curriculum share</th></tr></thead>
             <tbody>
               {DIAGNOSTIC_STRANDS.map((definition) => {
                 const strand = AC_STRANDS[definition.strand];
@@ -152,15 +226,30 @@ export default function WholeMathsDiagnosticPanel({
             </tbody>
           </table>
         </div>
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[720px] text-center text-xs">
+            <caption className="mb-2 text-left font-black uppercase tracking-wide text-slate-500">AC9 descriptors at each level</caption>
+            <thead><tr className="border-b border-slate-200 text-slate-500"><th className="pb-2 text-left">Strand</th>{AC_PRIMARY_LEVELS.map((level) => <th key={level} className="pb-2">{level === 0 ? "F" : `L${level}`}</th>)}<th className="pb-2">F–6</th></tr></thead>
+            <tbody>
+              {DIAGNOSTIC_STRANDS.map((definition) => (
+                <tr key={definition.strand} className="border-b border-slate-100 last:border-0">
+                  <th className="py-2 text-left font-bold text-slate-800">{AC_STRANDS[definition.strand].label}</th>
+                  {AC_PRIMARY_LEVELS.map((level) => <td key={level} className="py-2 font-semibold text-slate-600">{AC_DESCRIPTOR_COUNTS_BY_LEVEL[level][definition.strand]}</td>)}
+                  <td className="py-2 font-black text-slate-900">{AC_STRANDS[definition.strand].weight}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
           <div className="rounded-xl bg-slate-950 p-4 text-white">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-teal-300">How it&apos;s combined</p>
-            <p className="mt-2 font-mono text-base font-bold">overall = Σ (strand level × points) ÷ {WHOLE_MATHS_WEIGHT_TOTAL}</p>
-            <p className="mt-2 text-xs leading-5 text-slate-300">The official number is withheld unless all six strand levels are present.</p>
+            <p className="mt-2 font-mono text-base font-bold">overall = level position of Σ curriculum points reached</p>
+            <p className="mt-2 text-xs leading-5 text-slate-300">An official number is withheld until all six formal strand tests are complete. A live estimate may use all six current realm predictions before then.</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Worked Year 5 example</p>
-            <p className="mt-2 text-sm text-slate-700">Weighted sum {workedWeightedSum} ÷ {WHOLE_MATHS_WEIGHT_TOTAL}</p>
+            <p className="mt-2 text-sm text-slate-700">{workedReachedPoints} of {WHOLE_MATHS_WEIGHT_TOTAL} curriculum points reached</p>
             <p className="mt-1 text-2xl font-black text-slate-950">Overall level {workedOverall?.toFixed(1)}/6</p>
           </div>
         </div>

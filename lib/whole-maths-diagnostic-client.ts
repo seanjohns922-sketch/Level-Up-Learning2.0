@@ -40,6 +40,27 @@ export type PendingStudentDiagnostic = {
   status: "assigned" | "in_progress";
 };
 
+export type LiveMathsProgressionRow = {
+  student_id: string;
+  realm_id: "number" | "measurement" | "space" | "statistics";
+  strand: "number" | "measurement" | "space" | "statistics";
+  current_working_level: string;
+  official_level: number | null;
+  official_at: string | null;
+  checkpoint_level: number;
+  checkpoint_source: "diagnostic" | "pretest" | "posttest" | "placement";
+  checkpoint_at: string;
+  predicted_level: number;
+  prediction_confidence: number;
+  evidence: {
+    passedQuizWeeks?: number;
+    completedUnconfirmedLessons?: number;
+    confirmedWeekEquivalents?: number;
+    totalWeeks?: number;
+  };
+  updated_at: string;
+};
+
 function rpcError(error: { message?: string } | null, fallback: string): never {
   throw new Error(error?.message || fallback);
 }
@@ -50,6 +71,14 @@ export async function fetchTeacherDiagnostics(classId: string) {
   });
   if (error) rpcError(error, "Could not load diagnostics.");
   return (Array.isArray(data) ? data : []) as TeacherDiagnosticSittingRow[];
+}
+
+export async function fetchTeacherLiveMathsProgression(classId: string) {
+  const { data, error } = await supabase.rpc("get_teacher_live_maths_progression", {
+    p_class_id: classId,
+  });
+  if (error) rpcError(error, "Could not load live maths progression.");
+  return (Array.isArray(data) ? data : []) as LiveMathsProgressionRow[];
 }
 
 export async function assignWholeMathsDiagnostic(

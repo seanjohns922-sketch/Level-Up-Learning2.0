@@ -1,4 +1,10 @@
-import { AC_STRANDS, type AcStrand } from "@/lib/curriculum/ac-standards";
+import {
+  AC_DESCRIPTOR_COUNTS_BY_LEVEL,
+  AC_PRIMARY_LEVELS,
+  AC_STRANDS,
+  type AcPrimaryLevel,
+  type AcStrand,
+} from "@/lib/curriculum/ac-standards";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 export const DIAGNOSTIC_MASTERY = 85;
@@ -155,11 +161,62 @@ export function computeWholeMathsLevel(
 ): number | null {
   const strands = Object.values(AC_STRANDS) as Array<(typeof AC_STRANDS)[AcStrand]>;
   if (strands.some((strand) => measuredLevels[strand.id] == null)) return null;
-  const weighted = strands.reduce(
-    (sum, strand) => sum + measuredLevels[strand.id]! * strand.weight,
+  const reachedPoints = strands.reduce(
+    (sum, strand) => sum + curriculumPointsReached(strand.id, measuredLevels[strand.id]!),
     0,
   );
-  return Math.round((weighted / WHOLE_MATHS_WEIGHT_TOTAL) * 100) / 100;
+  return wholeMathsLevelForCurriculumPoints(reachedPoints);
+}
+
+// A strand level is a position inside that year's curriculum: 3.5 means
+// halfway through the Year 3 descriptor load. A level of 4.0 therefore carries
+// all descriptors below Year 4, while 4.5 carries half of Year 4. The Level 6
+// ceiling represents the completed F-6 continuum because the product has no
+// Level 7 primary band.
+export function curriculumPointsReached(strand: AcStrand, measuredLevel: number): number {
+  if (!Number.isFinite(measuredLevel)) throw new Error("A measured strand level must be finite.");
+  const bounded = Math.max(0, Math.min(6, measuredLevel));
+  if (bounded === 6) return AC_STRANDS[strand].weight;
+
+  const activeLevel = Math.floor(bounded) as AcPrimaryLevel;
+  const completed = AC_PRIMARY_LEVELS
+    .filter((level) => level < activeLevel)
+    .reduce<number>((sum, level) => sum + AC_DESCRIPTOR_COUNTS_BY_LEVEL[level][strand], 0);
+  const fraction = bounded - activeLevel;
+  return completed + fraction * AC_DESCRIPTOR_COUNTS_BY_LEVEL[activeLevel][strand];
+}
+
+export function wholeMathsLevelForCurriculumPoints(curriculumPoints: number): number {
+  if (!Number.isFinite(curriculumPoints)) throw new Error("Curriculum points must be finite.");
+  const bounded = Math.max(0, Math.min(WHOLE_MATHS_WEIGHT_TOTAL, curriculumPoints));
+  let completedPoints = 0;
+
+  // Levels 0-5 are continuous bands. Level 6 is the reporting ceiling and
+  // includes the remaining Year 6 descriptor load.
+  for (const level of AC_PRIMARY_LEVELS.slice(0, 6)) {
+    const levelPoints = Object.values(AC_DESCRIPTOR_COUNTS_BY_LEVEL[level]).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
+    if (bounded <= completedPoints + levelPoints) {
+      return Math.round((level + (bounded - completedPoints) / levelPoints) * 100) / 100;
+    }
+    completedPoints += levelPoints;
+  }
+  return 6;
+}
+
+export function computeReachedCurriculumPoints(
+  measuredLevels: Partial<Record<AcStrand, number | null>>,
+): number | null {
+  const strands = Object.keys(AC_STRANDS) as AcStrand[];
+  if (strands.some((strand) => measuredLevels[strand] == null)) return null;
+  return Math.round(
+    strands.reduce(
+      (sum, strand) => sum + curriculumPointsReached(strand, measuredLevels[strand]!),
+      0,
+    ) * 100,
+  ) / 100;
 }
 
 export function diagnosticAvailableWeight(): number {
