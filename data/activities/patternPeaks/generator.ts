@@ -980,20 +980,150 @@ function year4Question(
     );
   }
 
-  if (week <= 7) {
-    const factor = week === 6 ? [6, 7, 9][lessonNumber - 1]! : rand(3, 10);
+  // Week 7 — "Efficient Fact Strategies" (AC9M4A02): select and apply fact
+  // strategies to larger calculations. L1 choose the fastest known fact,
+  // L2 scale a fact up by 10, L3 mental strategy for a two-digit product.
+  if (week === 7) {
     const n = rand(4, 10);
-    const product = factor * n;
-    const visual = { type: "array" as const, rows: factor, columns: n };
-    if (role === "apply_create") {
-      const scaled = week === 7 ? product * 10 : product;
-      return typed(week === 7 ? `Use ${factor} × ${n} = ${product} to calculate ${factor} × ${n * 10}.` : `Calculate ${factor} × ${n}.`, scaled, week === 7 ? "Scale one factor by 10, so the product scales by 10." : "Use a connected known fact.", visual);
+
+    if (lessonNumber === 1) {
+      const factor = [6, 7, 8, 9][rand(0, 3)]!;
+      const product = factor * n;
+      const visual = { type: "array" as const, rows: factor, columns: n };
+      const best =
+        factor === 6 ? `Double 3 × ${n}`
+        : factor === 8 ? `Double 4 × ${n}`
+        : factor === 9 ? `10 × ${n} − ${n}`
+        : `5 × ${n} + 2 × ${n}`;
+      if (role === "apply_create") {
+        return typed(
+          `Choose an efficient known fact to work out ${factor} × ${n}.`,
+          product,
+          "Start from a fact you know well, then adjust.",
+          visual,
+        );
+      }
+      return mcq(
+        `What is the most efficient way to work out ${factor} × ${n}?`,
+        best,
+        [`Add ${factor} + ${n}`, `Count by ${factor} a total of ${n} times`],
+        "Pick the known fact that reaches the answer in the fewest steps.",
+        visual,
+      );
     }
+
+    if (lessonNumber === 2) {
+      const factor = rand(3, 9);
+      const product = factor * n;
+      const visual = { type: "array" as const, rows: factor, columns: n };
+      if (role === "reasoning") {
+        return mcq(
+          `You know ${factor} × ${n} = ${product}. Which fact does that help you find?`,
+          `${factor} × ${n * 10} = ${product * 10}`,
+          [`${factor} × ${n + 10} = ${product * 10}`, `${factor} × ${n} = ${product * 10}`],
+          "Ten times a factor makes the product ten times as big.",
+          visual,
+        );
+      }
+      return typed(
+        `Use ${factor} × ${n} = ${product} to work out ${factor} × ${n * 10}.`,
+        product * 10,
+        "The factor is 10 times bigger, so the product is 10 times bigger.",
+        visual,
+      );
+    }
+
+    // L3 Mental Strategy Challenge — two-digit × one-digit by partitioning.
+    const factor = rand(3, 8);
+    const twoDigit = rand(12, 24);
+    const tensPart = Math.floor(twoDigit / 10) * 10;
+    const onesPart = twoDigit - tensPart;
+    const product = factor * twoDigit;
+    const splitVisual = expressionVisual("Split into tens and ones", [
+      `${factor} × ${twoDigit}`,
+      `= ${factor} × ${tensPart} + ${factor} × ${onesPart}`,
+    ]);
     if (role === "reasoning") {
-      const strategy = factor === 6 ? `Double ${3 * n}` : factor === 9 ? `${10 * n} − ${n}` : `${5 * n} + ${2 * n}`;
-      return mcq("Which strategy efficiently derives the product?", strategy, [`${factor} + ${n}`, `${product} + ${factor}`], "Break the harder fact into known facts.", visual);
+      return mcq(
+        `Which split makes ${factor} × ${twoDigit} easiest to do mentally?`,
+        `${factor} × ${tensPart} + ${factor} × ${onesPart}`,
+        [`${factor} × ${twoDigit} × 10`, `${factor} + ${twoDigit}`],
+        "Break the two-digit number into tens and ones, multiply each, then add.",
+        splitVisual,
+      );
     }
-    return mcq(lessonNumber === 3 ? "Which related division fact is true?" : "What is the product?", lessonNumber === 3 ? `${product} ÷ ${factor} = ${n}` : product, lessonNumber === 3 ? [`${product} ÷ ${n} = ${product}`, `${factor} ÷ ${n} = ${product}`] : [product - factor, product + factor, factor + n], "Use the rows and columns as factors.", visual);
+    return typed(
+      `Work out ${factor} × ${twoDigit} in your head.`,
+      product,
+      `Try ${factor} × ${tensPart} = ${factor * tensPart}, then ${factor} × ${onesPart} = ${factor * onesPart}, and add.`,
+      splitVisual,
+    );
+  }
+
+  // Week 8 — "Equation Expedition" (AC9M4A01 + AC9M4A02): integrate additive
+  // unknowns with multiplication facts and reason about solutions.
+  // L1 follow clues (fact -> additive unknown), L2 compare two strategies,
+  // L3 diagnose and defend a flawed solution.
+  if (week === 8) {
+    const f1 = rand(3, 9);
+    const f2 = rand(3, 9);
+    const product = f1 * f2;
+
+    if (lessonNumber === 1) {
+      const missing = rand(6, 40);
+      const total = product + missing;
+      const cluesVisual = expressionVisual("Follow the clues", [
+        `▲ = ${f1} × ${f2}`,
+        `▲ + □ = ${total}`,
+      ]);
+      if (role === "reasoning") {
+        return mcq(
+          "Which clue should you work out first?",
+          `▲ = ${f1} × ${f2}`,
+          [`▲ + □ = ${total}`, `□ on its own`],
+          "Find the known value first, then use it to unlock the unknown.",
+          cluesVisual,
+        );
+      }
+      return typed(
+        `Clue 1: ▲ = ${f1} × ${f2}. Clue 2: ▲ + □ = ${total}. What is □?`,
+        missing,
+        `First ▲ = ${product}, then ${product} + □ = ${total}.`,
+        cluesVisual,
+      );
+    }
+
+    if (lessonNumber === 2) {
+      const even = pick([6, 8, 10, 12, 14]);
+      const answer = 5 * even;
+      const compareVisual = expressionVisual("Two ways to solve 5 × " + even, [
+        `Ari: half of ${even} (${even / 2}), then × 10`,
+        `Bo: ${even} + ${even} + ${even} + ${even} + ${even}`,
+      ]);
+      return mcq(
+        `Two students both correctly work out 5 × ${even} = ${answer}. Whose way is more efficient?`,
+        `Ari: half of ${even} is ${even / 2}, then × 10`,
+        [`Bo: add ${even} five times`, `Cass: count up in fives ${even} times`],
+        "All ways reach the same answer — choose the one with the fewest steps.",
+        compareVisual,
+      );
+    }
+
+    // L3 Defend the Solution — diagnose and correct a flawed value.
+    const missing = rand(5, 30);
+    const total = product + missing;
+    const studentAnswer = missing + rand(2, 5);
+    const defendVisual = expressionVisual("Check the working", [
+      `▲ = ${f1} × ${f2} = ${product}`,
+      `▲ + □ = ${total}, so □ = ${studentAnswer}`,
+    ]);
+    return mcq(
+      `A student wrote ▲ = ${f1} × ${f2} = ${product}, then ▲ + □ = ${total} so □ = ${studentAnswer}. What is the correct value of □?`,
+      missing,
+      [studentAnswer, total, product],
+      `Check the student's value: does ${product} + ${studentAnswer} equal ${total}?`,
+      defendVisual,
+    );
   }
 
   return year4Question(lessonNumber === 1 ? 2 : lessonNumber === 2 ? 6 : 3, lessonNumber, role);
