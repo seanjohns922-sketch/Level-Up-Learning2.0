@@ -1495,11 +1495,14 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         promptVisual("Construct an equivalent", [{ tokens: [`${a}`, "×", `${b}`] }]),
       );
     }
-    return mcq(
-      `To keep ${a} × ${b} the same after doubling ${a}, you must ___ ${b}.`,
-      "halve",
-      ["double", "keep"],
-      "Double one, halve the other.",
+    return typed(
+      "Calculate the missing factor.",
+      b / 2,
+      `The original product is ${p}. Doubling ${a} means the other factor must be halved to keep the product equal.`,
+      promptVisual("Keep the product equal", [
+        { label: "Original", tokens: [`${a}`, "×", `${b}`, "=", `${p}`] },
+        { label: "Equivalent", tokens: [`${a * 2}`, "×", "?", "=", `${p}`] },
+      ]),
     );
   }
 

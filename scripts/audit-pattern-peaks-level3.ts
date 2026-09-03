@@ -398,6 +398,20 @@ for (const intro of levelFourWeekFourConcepts) {
 }
 assert.equal(getPatternPeaksLessonConceptIntro("Year 4", 3, 1), undefined, "Property introductions must not leak into other weeks.");
 
+const levelFiveConstructEquivalent = PATTERN_PEAKS_PROGRAMS["Year 5"][3]!.lessons[2]!;
+for (const activity of levelFiveConstructEquivalent.activities ?? []) {
+  for (let sample = 0; sample < 30; sample += 1) {
+    const question = generatePatternPeaksQuestion(5, levelFiveConstructEquivalent, activity);
+    assert(!/must ___|\bhalve\b.*\bdouble\b.*\bkeep\b/i.test(question.prompt), "Construct an Equivalent retained a vocabulary-choice blank.");
+    if (activity.config.rotationRole === "fast_thinking") {
+      assert.equal(question.kind, "typed_response", "Construct an Equivalent fast thinking must require a numeric answer.");
+      assert.equal(question.visual?.type, "expression_flow", "Construct an Equivalent needs the original and equivalent expressions together.");
+      assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Construct an Equivalent needs one inline missing-factor field.");
+      assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, "Construct an Equivalent generated an invalid missing factor.");
+    }
+  }
+}
+
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
 assert.equal(REALM_REGISTRY.pattern.totalWeeks, 8, "Pattern Peaks needs the agreed eight-week contract.");
