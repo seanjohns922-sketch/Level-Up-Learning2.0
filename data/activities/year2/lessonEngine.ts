@@ -3415,6 +3415,24 @@ export type ReversePatternCardVisualData = {
   terms: string[];
 };
 
+export type DecisionPathCardVisualData = {
+  type: "decision_path_card";
+  title: string;
+  // The number arriving at the gate (or "?" when it is being asked for).
+  input: string;
+  // The gate's decision, e.g. "Multiple of 6?".
+  decision: string;
+  // What happens on each exit, e.g. "÷ 6" (pass) and "− 1" (fail).
+  passLabel: string;
+  failLabel: string;
+  // The value each exit produces. Leave undefined to show the gate's
+  // structure without giving the answer away.
+  passOutput?: string;
+  failOutput?: string;
+  // When set, that exit is highlighted as the traced path.
+  activeBranch?: "pass" | "fail";
+};
+
 export type MultiStepMethodVisualData = {
   type: "multi_step_method";
   title: string;
@@ -3502,6 +3520,7 @@ export type MultipleChoiceQuestion = {
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
     | ReversePatternCardVisualData
+    | DecisionPathCardVisualData
     | RuleBoxVisualData;
 };
 
@@ -3585,6 +3604,7 @@ export type TypedResponseQuestion = {
     | TermPositionCardVisualData
     | TermPredictorCardVisualData
     | ReversePatternCardVisualData
+    | DecisionPathCardVisualData
     | {
         type: "numeric_input_only";
       }

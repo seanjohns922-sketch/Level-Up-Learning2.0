@@ -11,6 +11,7 @@ import CartesianGridVisual from "@/components/activities/CartesianGridVisual";
 import ExpressionFlowVisual from "@/components/activities/ExpressionFlowVisual";
 import InputOutputTableVisual from "@/components/activities/InputOutputTableVisual";
 import FunctionMachineCardVisual from "@/components/activities/FunctionMachineCardVisual";
+import DecisionPathCardVisual from "@/components/activities/DecisionPathCardVisual";
 import { BalanceEquationCardVisual } from "@/components/activities/EquationVisualCards";
 import MeasurelandsAssessmentVisual from "@/components/assessment/MeasurelandsAssessmentVisual";
 import NumberNexusGroundAssessmentVisual, { GroundAssessmentToken } from "@/components/assessment/NumberNexusGroundAssessmentVisual";
@@ -336,6 +337,7 @@ export default function AssessmentQuestionCard({
       {visual.type === "expression_flow" ? <ExpressionFlowVisual visual={visual as never} /> : null}
       {visual.type === "input_output_table" ? <InputOutputTableVisual visual={visual as never} /> : null}
       {visual.type === "function_machine_card" ? <FunctionMachineCardVisual visual={visual as never} /> : null}
+      {visual.type === "decision_path_card" ? <DecisionPathCardVisual visual={visual as never} /> : null}
       {visual.type === "balance_equation_card" ? <BalanceEquationCardVisual visual={visual as never} /> : null}
       {visual.type === "prep_collection" ? (
         <PrepCollectionVisual

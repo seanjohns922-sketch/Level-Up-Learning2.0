@@ -310,12 +310,12 @@ const level6Seeds: WeekSeed[] = [
     ],
   },
   {
-    topic: "Algorithms with Decisions",
-    purpose: "Create, follow and debug algorithms containing ordered steps and decision points.",
+    topic: "The Number Gatekeeper",
+    purpose: "Follow, debug and program a gate that routes numbers down branching paths using divisibility decisions.",
     lessons: [
-      lesson("Follow the Decision Path", "Trace a branched algorithm and explain why different inputs diverge.", "Branching flowchart trail", "AC9M6A03"),
-      lesson("Debug the Algorithm", "Locate a faulty step by comparing expected and generated number sets.", "Algorithm fault debugger", "AC9M6A03"),
-      lesson("Design a Number Generator", "Create an algorithm generating a defined set and explain its pattern.", "Number-generator bench", "AC9M6A03"),
+      lesson("Follow the Gate", "Trace a number through the gate and work out which exit it takes.", "Branching gate flowchart", "AC9M6A03"),
+      lesson("Debug the Gate", "Find the misrouted number and give the output the gate should have produced.", "Gate fault finder", "AC9M6A03"),
+      lesson("Program the Gate", "Design the gate's rule so only the right numbers pass through.", "Gate programming bench", "AC9M6A03"),
     ],
   },
   {

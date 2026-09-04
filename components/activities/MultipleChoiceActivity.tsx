@@ -31,6 +31,7 @@ import TableToPairCardsVisual from "@/components/activities/TableToPairCardsVisu
 import MiniCoordinatePreviewVisual from "@/components/activities/MiniCoordinatePreviewVisual";
 import CartesianGridVisual from "@/components/activities/CartesianGridVisual";
 import ExpressionFlowVisual from "@/components/activities/ExpressionFlowVisual";
+import DecisionPathCardVisual from "@/components/activities/DecisionPathCardVisual";
 import FactorPairTreeVisual from "@/components/activities/FactorPairTreeVisual";
 import {
   BalanceEquationCardVisual,
@@ -428,6 +429,9 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "reverse_pattern_card" ? (
         <ReversePatternCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "decision_path_card" ? (
+        <DecisionPathCardVisual visual={questionData.visual} />
       ) : null}
 
       <div className={["mt-6 grid gap-2.5", compactOptionColumns].join(" ")}>

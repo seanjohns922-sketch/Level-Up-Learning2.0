@@ -1,6 +1,7 @@
 import type {
   BalanceEquationCardVisualData,
   BracketEquationCardVisualData,
+  DecisionPathCardVisualData,
   ExpressionFlowVisualData,
   FactorPairTreeVisualData,
   FunctionMachineCardVisualData,
@@ -26,6 +27,7 @@ type QuestionVisual =
   | BalanceEquationCardVisualData
   | InverseStepCardVisualData
   | UnknownTileEquationVisualData
+  | DecisionPathCardVisualData
   | BracketEquationCardVisualData;
 type RotationRole = "fast_thinking" | "reasoning" | "apply_create";
 export type PatternPeaksQuestion = Extract<Year2QuestionData, { kind: "multiple_choice" | "typed_response" }>;
@@ -42,6 +44,7 @@ const PATTERN_VISUAL_TYPES = new Set([
   "inverse_step_card",
   "unknown_tile_equation",
   "bracket_equation_card",
+  "decision_path_card",
 ]);
 
 export const PATTERN_YEAR3_DOUBLE_STARTS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 25] as const;
@@ -235,6 +238,32 @@ function promptVisual(
   cards: Array<{ label?: string; tokens: string[]; note?: string }>,
 ): QuestionVisual {
   return { type: "expression_flow", title, cards };
+}
+
+// The Gatekeeper flowchart: a number arrives, a decision routes it down one of
+// two labelled exits. Leave outputs undefined to show the gate without giving
+// the answer away; pass activeBranch to highlight the traced path.
+function decisionVisual(opts: {
+  title: string;
+  input: string | number;
+  decision: string;
+  passLabel: string;
+  failLabel: string;
+  passOutput?: string | number;
+  failOutput?: string | number;
+  activeBranch?: "pass" | "fail";
+}): QuestionVisual {
+  return {
+    type: "decision_path_card",
+    title: opts.title,
+    input: String(opts.input),
+    decision: opts.decision,
+    passLabel: opts.passLabel,
+    failLabel: opts.failLabel,
+    passOutput: opts.passOutput === undefined ? undefined : String(opts.passOutput),
+    failOutput: opts.failOutput === undefined ? undefined : String(opts.failOutput),
+    activeBranch: opts.activeBranch,
+  };
 }
 
 function roleFor(activity: LessonActivity): RotationRole {
@@ -2484,96 +2513,152 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     );
   }
 
-  // Week 7 — Algorithms with Decisions (AC9M6A03): decisions on divisibility.
+  // Week 7 — The Number Gatekeeper (AC9M6A03): algorithms that branch on a
+  // decision. A number reaches the gate; a divisibility rule routes it down one
+  // of two exits. Every question shows the branching flowchart so students
+  // trace, debug, and program the gate.
   if (week === 7) {
     const d = pick([3, 4, 6, 9]);
 
     if (lessonNumber === 1) {
-      // Follow the Decision Path.
+      // Follow the Gate — trace one number down to its output.
       const input = pick([d * rand(4, 12), d * rand(4, 12) + 1]);
       const divisible = input % d === 0;
       const output = divisible ? input / d : input - 1;
+      const gateReveal = divisible
+        ? `${input} is a multiple of ${d}, so it takes the Yes exit: ${input} ÷ ${d} = ${output}.`
+        : `${input} is not a multiple of ${d}, so it takes the No exit: ${input} − 1 = ${output}.`;
+      const gate = decisionVisual({
+        title: "The Gatekeeper",
+        input,
+        decision: `Multiple of ${d}?`,
+        passLabel: `÷ ${d}`,
+        failLabel: "− 1",
+      });
       if (role === "apply_create") {
         return typed(
-          `What does the algorithm output for ${input}?`,
+          `Trace ${input} through the gate. What number comes out?`,
           output,
-          `Is ${input} a multiple of ${d}?`,
-          promptVisual("Decision algorithm", [
-            { tokens: [`${input}`, "→", "?"], note: `If a multiple of ${d}: ÷ ${d}. Otherwise: − 1.` },
-          ]),
+          `First decide: is ${input} a multiple of ${d}?`,
+          gate,
+          undefined,
+          gateReveal,
         );
       }
       if (role === "reasoning") {
         return mcq(
-          `Which branch does ${input} take?`,
-          divisible ? `Divide by ${d}` : "Subtract 1",
-          [divisible ? "Subtract 1" : `Divide by ${d}`, "Stop straight away"],
-          `Check if ${input} is a multiple of ${d}.`,
+          `Which exit does ${input} take at the gate?`,
+          divisible ? `Yes exit: ÷ ${d}` : "No exit: − 1",
+          [divisible ? "No exit: − 1" : `Yes exit: ÷ ${d}`, "It stops at the gate"],
+          `A multiple of ${d} divides by ${d} with nothing left over.`,
+          gate,
+          gateReveal,
         );
       }
       return mcq(
-        `Is ${input} a multiple of ${d}?`,
+        `Does ${input} pass the gate?`,
         divisible ? "Yes" : "No",
         [divisible ? "No" : "Yes", "Cannot tell"],
-        `A multiple of ${d} divides by ${d} with nothing left over.`,
+        `To pass, a number must be a multiple of ${d}.`,
+        gate,
       );
     }
 
     if (lessonNumber === 2) {
-      // Debug the Algorithm.
+      // Debug the Gate — a multiple was misrouted down the No exit.
       const multiple = d * rand(5, 12);
       const correct = multiple / d;
       const wrong = multiple - 1;
+      const buggyGate = decisionVisual({
+        title: "Gate malfunction",
+        input: multiple,
+        decision: `Multiple of ${d}?`,
+        passLabel: `÷ ${d}`,
+        failLabel: "− 1",
+        failOutput: wrong,
+        activeBranch: "fail",
+      });
+      const debugReveal = `${multiple} is a multiple of ${d}, so it should take the Yes exit: ${multiple} ÷ ${d} = ${correct}.`;
       if (role === "apply_create") {
         return typed(
-          "Fix the bug. What is the correct output?",
+          `The gate sent ${multiple} down the wrong exit. What number should come out?`,
           correct,
-          `${multiple} is a multiple of ${d}, so divide by ${d}.`,
-          promptVisual("Debug the algorithm", [
-            { tokens: [`${multiple}`, "→", "?"], note: `Rule: multiples of ${d} are divided by ${d}. A bug gave ${wrong}.` },
-          ]),
+          `Is ${multiple} a multiple of ${d}? Then which exit is correct?`,
+          buggyGate,
+          undefined,
+          debugReveal,
         );
       }
       if (role === "reasoning") {
         return mcq(
-          `The algorithm output ${wrong} for ${multiple}. What went wrong?`,
-          "It took the wrong branch",
-          ["The input was wrong", "Nothing went wrong"],
-          `${multiple} is a multiple of ${d}, so it should divide.`,
+          `The gate output ${wrong} for ${multiple}. What went wrong?`,
+          "It took the No exit by mistake",
+          ["The number was too big", "Nothing — that is correct"],
+          `${multiple} divides evenly by ${d}, so it belongs on the Yes exit.`,
+          buggyGate,
+          debugReveal,
         );
       }
       return mcq(
-        `Is ${multiple} a multiple of ${d}?`,
-        "Yes",
-        ["No", "Cannot tell"],
+        `${multiple} reaches the gate. Which exit is correct?`,
+        `Yes exit: ÷ ${d}`,
+        ["No exit: − 1", "Neither exit"],
         `${multiple} ÷ ${d} leaves no remainder.`,
+        decisionVisual({
+          title: "The Gatekeeper",
+          input: multiple,
+          decision: `Multiple of ${d}?`,
+          passLabel: `÷ ${d}`,
+          failLabel: "− 1",
+        }),
       );
     }
 
-    // L3 Design a Number Generator.
-    const k = rand(5, 10);
+    // L3 Program the Gate — choose the rule so only the right numbers pass.
+    const sample = d * rand(6, 14);
     if (role === "apply_create") {
       return typed(
-        "The generator lists multiples. Type the next number.",
-        d * (k + 1),
-        `It counts up in ${d}s.`,
-        sequenceVisual("Number generator", [`${d}`, `${d * 2}`, `${d * k}`, "?"]),
+        `You program the gate to pass multiples of ${d} and divide them by ${d}. ${sample} arrives — what comes out?`,
+        sample / d,
+        `${sample} is a multiple of ${d}, so it passes.`,
+        decisionVisual({
+          title: "Your gate",
+          input: sample,
+          decision: `Multiple of ${d}?`,
+          passLabel: `÷ ${d}`,
+          failLabel: "block",
+        }),
+        undefined,
+        `${sample} passes, then ${sample} ÷ ${d} = ${sample / d}.`,
       );
     }
     if (role === "reasoning") {
       return mcq(
-        `A generator adds ${d} each time. What set does it make?`,
-        `Multiples of ${d}`,
-        [`Factors of ${d}`, "Odd numbers"],
-        `Adding ${d} repeatedly lists its multiples.`,
+        `You want the gate to let through ONLY numbers in the ${d} times table. Which rule should the gate use?`,
+        `Multiple of ${d}?`,
+        [`Greater than ${d}?`, `Factor of ${d}?`],
+        `Numbers in the ${d} times table are the multiples of ${d}.`,
+        decisionVisual({
+          title: "Program the gate",
+          input: sample,
+          decision: "? ? ?",
+          passLabel: "let through",
+          failLabel: "block",
+        }),
       );
     }
-    const sample = d * rand(6, 14);
     return mcq(
-      `Which number is a multiple of ${d}?`,
+      `The gate passes only multiples of ${d}. Which number gets through?`,
       sample,
       [`${sample + 1}`, `${sample - 1}`],
-      `A multiple of ${d} is in its times table.`,
+      `A number gets through only if it is in the ${d} times table.`,
+      decisionVisual({
+        title: "The Gatekeeper",
+        input: "?",
+        decision: `Multiple of ${d}?`,
+        passLabel: "let through",
+        failLabel: "block",
+      }),
     );
   }
 

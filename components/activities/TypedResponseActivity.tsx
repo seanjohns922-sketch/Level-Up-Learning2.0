@@ -43,6 +43,7 @@ import RuleBuilderCardVisual from "@/components/activities/RuleBuilderCardVisual
 import TermPositionCardVisual from "@/components/activities/TermPositionCardVisual";
 import TermPredictorCardVisual from "@/components/activities/TermPredictorCardVisual";
 import ReversePatternCardVisual from "@/components/activities/ReversePatternCardVisual";
+import DecisionPathCardVisual from "@/components/activities/DecisionPathCardVisual";
 import { Fraction, MathFormattedText } from "@/components/FractionText";
 import { hasRequiredRelationshipVisual } from "@/lib/relationship-visual";
 import { countInlineMathAnswerSlots } from "@/lib/inline-math-answer";
@@ -2916,6 +2917,9 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "reverse_pattern_card" ? (
         <ReversePatternCardVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "decision_path_card" ? (
+        <DecisionPathCardVisual visual={questionData.visual} />
       ) : null}
       {discountStepMethodVisual ? (
         <DiscountVisual

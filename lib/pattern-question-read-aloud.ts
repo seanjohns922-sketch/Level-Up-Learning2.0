@@ -47,6 +47,13 @@ function patternVisualSpeech(visual: PatternVisual) {
         card.result ? `Result ${speakMath(card.result)}` : "",
         card.note,
       ].filter(Boolean).join(". ")).join(". ")}.`;
+    case "decision_path_card":
+      return [
+        `${visual.title}. Number in: ${speakMath(visual.input)}.`,
+        `Gate: ${speakMath(visual.decision)}.`,
+        `If yes: ${speakMath(visual.passLabel)}${visual.passOutput ? `, giving ${speakMath(visual.passOutput)}` : ""}.`,
+        `If no: ${speakMath(visual.failLabel)}${visual.failOutput ? `, giving ${speakMath(visual.failOutput)}` : ""}.`,
+      ].join(" ");
     case "factor_pair_tree":
       return `${visual.title}. Product ${visual.product}. Factor pairs: ${visual.pairs.map((pair) => `${speakMath(pair.left)} times ${speakMath(pair.right)} equals ${visual.product}`).join(". ")}.`;
     case "balance_equation_card":

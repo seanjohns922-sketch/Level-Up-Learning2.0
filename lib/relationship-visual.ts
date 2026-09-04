@@ -22,6 +22,7 @@ const RELATIONSHIP_VISUAL_TYPES = new Set([
   "term_position_card",
   "term_predictor_card",
   "reverse_pattern_card",
+  "decision_path_card",
 ]);
 
 export type RelationshipResponseKind = "multiple_choice" | "typed_response";
