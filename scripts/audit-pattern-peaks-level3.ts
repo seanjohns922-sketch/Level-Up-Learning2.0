@@ -400,6 +400,7 @@ assert.equal(getPatternPeaksLessonConceptIntro("Year 4", 3, 1), undefined, "Prop
 
 const levelFiveFactorIntro = getPatternPeaksLessonConceptIntro("Year 5", 7, 1);
 assert.equal(levelFiveFactorIntro?.term, "Factor", "Use Factor Clues must introduce the word factor before questioning begins.");
+assert(levelFiveFactorIntro?.meaning.includes("Factors are numbers you multiply together to get a product"), "The factor introduction must begin with a child-friendly multiplication definition.");
 assert(levelFiveFactorIntro?.meaning.toLowerCase().includes("no remainder"), "The factor introduction must explain exact division.");
 assert.deepEqual(levelFiveFactorIntro?.factorModel?.pairs, [[1, 12], [2, 6], [3, 4]], "The factor introduction must show multiple factor-pair arrays.");
 assert.equal(levelFiveFactorIntro?.factorModel?.nonFactor, 5, "The factor introduction must contrast a non-factor.");

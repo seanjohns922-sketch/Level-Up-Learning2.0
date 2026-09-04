@@ -438,7 +438,7 @@ const LEVEL4_WEEK4_CONCEPT_INTROS: Record<number, PatternPeaksLessonConceptIntro
 const LEVEL5_WEEK7_FACTOR_INTRO: PatternPeaksLessonConceptIntro = {
   term: "Factor",
   title: "Factors make exact groups",
-  meaning: "A factor is a whole number that divides another whole number exactly, with no remainder. Factors come in pairs because each pair multiplies to make the same product.",
+  meaning: "Factors are numbers you multiply together to get a product. For example, 3 × 4 = 12, so 3 and 4 are factors of 12. You can check a factor by dividing: it divides the product exactly, with no remainder. Factors come in pairs because each pair multiplies to make the same product.",
   example: "3 × 4 = 12",
   exampleExplanation: "3 and 4 are factors of 12. Both 12 ÷ 3 and 12 ÷ 4 give whole-number answers with no remainder.",
   factorModel: {
