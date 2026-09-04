@@ -120,6 +120,21 @@ export function diffPick(
 
 export type PracticeTask = (
   | {
+      /** Independent Pattern Peaks quiz/assessment item. The question payload is
+       * authored outside the lesson generator so assessment evidence never
+       * reuses a taught lesson instance. */
+      kind: "patternPeaksQuestion";
+      prompt: string;
+      speakText: string;
+      target: number;
+      question: import("@/data/activities/year2/lessonEngine").TypedResponseQuestion | import("@/data/activities/year2/lessonEngine").MultipleChoiceQuestion;
+      answerCount?: number;
+      options?: Array<{ id: string; label: string }>;
+      correctOptionIds?: string[];
+      presentation?: "assessment";
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       kind: "repeatingPattern";
       mode: "identify_unit";
       prompt: string;

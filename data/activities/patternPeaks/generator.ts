@@ -777,13 +777,12 @@ function year4Question(
       const b = rand(15, 70);
       const c = rand(10, 60);
       return typed(
-        `(${a} + ${b}) + ${c} = ${a} + (□). Write what goes inside the brackets.`,
-        `${b} + ${c}`,
+        `(${a} + ${b}) + ${c} = ${a} + □. Type the value of the regrouped part.`,
+        b + c,
         role === "reasoning"
-          ? `Associative means the grouping can change: group ${b} and ${c} together inside the brackets.`
-          : "Associative means grouping can change without changing the total. Keep the numbers in order and write the last two as an addition inside the brackets.",
-        unknownVisual("Grouping can change — associative", `(${a} + ${b}) + ${c}`, `${a} + (□)`),
-        [`${b}+${c}`],
+          ? `Associative means the grouping can change: ${b} + ${c} makes the regrouped value.`
+          : "Associative means grouping can change without changing the total. Add the final two parts to find the value of the new group.",
+        unknownVisual("Grouping can change — associative", `(${a} + ${b}) + ${c}`, `${a} + □`),
       );
     }
 
@@ -1191,6 +1190,10 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         "Division",
         ["Addition", "Subtraction"],
         "Inverse operations reverse each other.",
+        promptVisual("Operations that undo", [
+          { tokens: [`${a}`, "×", `${b}`, "=", `${p}`] },
+          { tokens: [`${p}`, "÷", `${a}`, "=", `${b}`] },
+        ]),
       );
     }
 
@@ -1218,6 +1221,10 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         b,
         [b + 1, b - 1, a],
         "Think: a times what makes the total?",
+        promptVisual("Turn division around", [
+          { tokens: [`${p}`, "÷", `${a}`, "=", "?"] },
+          { tokens: [`${a}`, "×", "?", "=", `${p}`] },
+        ]),
       );
     }
 
@@ -1244,6 +1251,10 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
       `${b} × ${a}`,
       [`${b} + ${a}`, `${p} × ${a}`],
       "Multiply back to the total.",
+      promptVisual("Check with the inverse", [
+        { tokens: [`${p}`, "÷", `${a}`, "=", `${b}`] },
+        { tokens: [`${b}`, "×", `${a}`, "=", "?"] },
+      ]),
     );
   }
 
@@ -1312,6 +1323,9 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         `${set.other[0]} × ${set.other[1]}`,
         [`${set.wrong[0]} × ${set.wrong[1]}`, `${set.shown[0]} + ${set.shown[0]}`],
         "Check the product of each pair.",
+        promptVisual("Partition the product", [
+          { tokens: [`${set.shown[0]}`, "×", `${set.shown[1]}`, "=", `${set.p}`], note: "Find another factor pair with this product." },
+        ]),
       );
     }
 
@@ -1364,6 +1378,7 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           `${p} ÷ ${a}`,
           [`${p} × ${a}`, `${p} − ${a}`],
           "Divide the product by the known factor.",
+          promptVisual("Choose the inverse", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
         );
       }
       return typed(
@@ -1390,6 +1405,7 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           `${a} × ${b}`,
           [`${a} ÷ ${b}`, `${a} + ${b}`],
           "Multiply the quotient by the divisor.",
+          promptVisual("Choose the inverse", [{ tokens: ["?", "÷", `${b}`, "=", `${a}`] }]),
         );
       }
       return typed(
@@ -1458,6 +1474,10 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         "No",
         ["Yes", "Sometimes"],
         "Multiplication is commutative.",
+        promptVisual("Same value, different order", [
+          { tokens: [`${a}`, "×", `${b}`, "=", `${p}`] },
+          { tokens: [`${b}`, "×", `${a}`, "=", `${p}`] },
+        ]),
       );
     }
 
@@ -1485,6 +1505,7 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         `${a} × ${b} = ${a} + ${b}`,
         [`${a} × ${b} = ${b} × ${a}`, `${a} × ${b} = ${p}`],
         "Check each one with the values.",
+        promptVisual("Test the relationship", [{ tokens: [`${a}`, "×", `${b}`, "=", `${p}`] }]),
       );
     }
 
@@ -1703,6 +1724,9 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         f,
         [f + 1, f - 1],
         "The factor is shared by both parts.",
+        promptVisual("Find the shared factor", [
+          { tokens: ["?", "×", "10", "+", "?", "×", `${c}`, "=", `${total}`], note: "Both question marks have the same value." },
+        ]),
       );
     }
     return mcq(
@@ -1710,6 +1734,9 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
       f,
       [10, c !== f ? c : c + 1],
       "The factor sits outside both parts.",
+      promptVisual("Spot the shared factor", [
+        { tokens: [`${f}`, "×", "10", "+", `${f}`, "×", `${c}`] },
+      ]),
     );
   }
 
@@ -1775,6 +1802,9 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           `Type the smallest multiple of ${factor} greater than ${target}.`,
           smallest,
           `Count up in ${factor}s from ${target}.`,
+          promptVisual("Continue the multiples", [
+            { tokens: [`${target - factor}`, "→", `${target}`, "→", "?"] },
+          ]),
         );
       }
       if (role === "reasoning") {
@@ -1783,6 +1813,10 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           target,
           [hi, target - 1],
           "Both clues must be true.",
+          promptVisual("Use both clues", [
+            { label: "Clue 1", tokens: ["multiple", "of", `${factor}`] },
+            { label: "Clue 2", tokens: ["value", "<", `${hi}`] },
+          ]),
         );
       }
       return mcq(
@@ -1790,6 +1824,9 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         target,
         [target + 1, target - 1],
         `It is in the ${factor} times table.`,
+        promptVisual("Follow the multiples", [
+          { tokens: [`${target - factor}`, "→", `${target}`, "→", `${target + factor}`] },
+        ]),
       );
     }
 
@@ -1856,6 +1893,7 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           `${p} ÷ ${a}`,
           [`${p} × ${a}`, `${p} − ${a}`],
           "Divide to recover the factor.",
+          promptVisual("Analyse the evidence", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
         );
       }
       return mcq(
@@ -1890,6 +1928,7 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           "Its answer is the factor in the next equation",
           ["It uses the biggest numbers", "It is a division"],
           "Each solved unknown feeds the next.",
+          chain,
         );
       }
       return typed(
@@ -2217,6 +2256,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         rule(input + 3),
         [`${(input + 3) * mult}`, `${rule(input + 3) + add}`],
         `Multiply by ${mult}, then add ${add}.`,
+        machineVisual("Transfer the rule", input + 3, `× ${mult}, then + ${add}`, "?"),
       );
     }
     return mcq(
@@ -2224,6 +2264,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       `input × ${mult} + ${add}`,
       [`input + ${mult} × ${add}`, `(input + ${mult}) × ${add}`],
       "Match both the operations and their order.",
+      machineVisual("Transfer the rule", "input", `× ${mult}, then + ${add}`, "output"),
     );
   }
 
@@ -2347,7 +2388,14 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
           `Work out (${a} + ${b}) × ${c}.`,
           bracketed,
           "Do the brackets first.",
-          promptVisual("Brackets first", [{ tokens: ["(", `${a}`, "+", `${b}`, ")", "×", `${c}`, "=", "?"] }]),
+          {
+            type: "bracket_equation_card",
+            title: "Brackets first",
+            left: `(${a} + ${b}) × ${c}`,
+            right: "?",
+            bracketGroup: `${a} + ${b}`,
+            outsideFactor: `× ${c}`,
+          },
         );
       }
       if (role === "reasoning") {
@@ -2356,6 +2404,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
           "The brackets make the addition happen first",
           ["Brackets are just decoration", "One of them skips the ×"],
           "Brackets change which operation you do first.",
+          promptVisual("Compare the operation order", [
+            { tokens: ["(", `${a}`, "+", `${b}`, ")", "×", `${c}`] },
+            { tokens: [`${a}`, "+", `${b}`, "×", `${c}`] },
+          ]),
         );
       }
       return mcq(
@@ -2363,6 +2415,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         `${a} + ${b}`,
         [`${b} × ${c}`, `${a} + ${b} + ${c}`],
         "Whatever is inside the brackets.",
+        promptVisual("Brackets first", [{ tokens: ["(", `${a}`, "+", `${b}`, ")", "×", `${c}`] }]),
       );
     }
 
@@ -2394,6 +2447,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         a + b * c,
         [`${(a + b) * c}`, `${b * c}`],
         `Do ${b} × ${c} first, then add ${a}.`,
+        promptVisual("Follow the operation order", [{ tokens: [`${a}`, "+", `${b}`, "×", `${c}`, "=", "?"] }]),
       );
     }
 
@@ -2412,6 +2466,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         `${c} × ${a} + ${c} × ${b}`,
         [`${c} × ${a} + ${b}`, `${a} + ${c} × ${b}`],
         `Multiply ${c} by each part inside the brackets.`,
+        promptVisual("Distribute the factor", [{ tokens: ["(", `${a}`, "+", `${b}`, ")", "×", `${c}`] }]),
       );
     }
     return mcq(
@@ -2419,6 +2474,9 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       c * a,
       [`${c * a + c}`, `${c * a - c}`],
       "This is one of the two products you add.",
+      promptVisual("Build the equivalent expression", [
+        { tokens: [`${c}`, "×", `${a}`, "+", `${c}`, "×", `${b}`] },
+      ]),
     );
   }
 
@@ -2445,6 +2503,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
           `Divide by ${mult}`,
           [`Subtract ${add}`, `Multiply by ${mult}`],
           "Undo the outer operation first.",
+          promptVisual("Undo from the outside", [{ tokens: ["(", "?", "+", `${add}`, ")", "×", `${mult}`, "=", `${total}`] }]),
         );
       }
       return mcq(
@@ -2452,6 +2511,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         `divide by ${mult}`,
         [`multiply by ${mult}`, `subtract ${mult}`],
         "Division reverses multiplication.",
+        promptVisual("Undo the outside step", [{ tokens: ["(", "?", "+", `${add}`, ")", "×", `${mult}`, "=", `${total}`] }]),
       );
     }
 
@@ -2471,6 +2531,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
           "No, you solve it the same way",
           ["Yes, the right side can't be solved", "Yes, you add instead"],
           "An equation balances both ways.",
+          promptVisual("Both sides stay equal", [{ tokens: [`${total}`, "=", `${mult}`, "×", "(", "?", "+", `${add}`, ")"] }]),
         );
       }
       return mcq(
@@ -2478,6 +2539,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         total / mult,
         [`${total - mult}`, `${total + mult}`],
         "Dividing undoes the outer × first.",
+        promptVisual("Undo the outer step", [{ tokens: [`${total}`, "÷", `${mult}`, "=", "?"] }]),
       );
     }
 
@@ -2720,6 +2782,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
           "Divide, then subtract",
           ["Subtract, then divide", "Multiply, then add"],
           "Undo the outer operation first.",
+          promptVisual("Reverse the steps", [{ tokens: ["(", "?", "+", `${add}`, ")", "×", `${mult}`, "=", `${total}`] }]),
         );
       }
       return mcq(
@@ -2727,6 +2790,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         total / mult,
         [`${total - mult}`, `${total + mult}`],
         "Undo the × before the +.",
+        promptVisual("First reverse step", [{ tokens: [`${total}`, "÷", `${mult}`, "=", "?"] }]),
       );
     }
 
@@ -2747,6 +2811,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         `No — it adds one ${growth} too many`,
         ["Yes, it is correct", `No — it is too small by ${start}`],
         "Test the claim on Stage 1 before trusting it.",
+        tiles,
       );
     }
     return mcq(

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run qa:realm-release-gate && npm run qa:whole-maths-diagnostic && npm run qa:live-maths-progression",
+    "prebuild": "npm run qa:realm-release-gate && npm run qa:pattern-peaks-assessments && npm run qa:whole-maths-diagnostic && npm run qa:live-maths-progression",
     "build": "next build",
     "build:dev": "next build",
     "start": "next start",
@@ -167,6 +167,8 @@
     "qa:statistica-level6-week5": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-statistica-level6-week5.ts",
     "qa:statistica-home": "node scripts/audit-statistica-home.mjs",
     "qa:pattern-peaks-curriculum": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-pattern-peaks-level3.ts",
+    "qa:pattern-peaks-assessments": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-pattern-peaks-assessments.ts",
+    "generate:pattern-peaks-review": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/generate-pattern-peaks-educator-review.ts",
     "qa:pattern-peaks-level3": "npm run qa:pattern-peaks-curriculum",
     "qa:archived-student-roster": "node scripts/archived-student-roster-audit.mjs",
     "qa:pretest-pathway": "node --no-warnings --experimental-strip-types scripts/pretest-pathway-assignment-audit.mjs",

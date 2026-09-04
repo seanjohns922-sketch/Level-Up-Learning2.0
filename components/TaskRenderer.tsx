@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef, type ReactNode } from "react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { PatternPeaksQuestionCard } from "@/components/pattern-peaks/PatternPeaksQuestionCard";
 import QuestionReadAloudBoundary from "@/components/QuestionReadAloudBoundary";
 import MatchThePair from "@/components/MatchThePair";
 import CountObjects from "@/components/CountObjects";
@@ -367,6 +368,8 @@ function TaskRendererInner({
   );
 
   switch (task.kind) {
+    case "patternPeaksQuestion":
+      return <PatternPeaksQuestionCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "matchPairs":
       return <MatchThePair key={k} config={t.config} onComplete={onC} />;
     case "countObjects":

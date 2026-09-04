@@ -697,6 +697,11 @@ function ProgramPage() {
       router.push(`/statistica/quiz/${encodeURIComponent(curriculumYear)}/${weekNum}${teacherPreview ? "?teacher_preview=1" : ""}`);
       return;
     }
+    if (isPatternRealm && item.type === "quiz") {
+      preserveWorld3DReturnContextForQuiz({ realmId, level: curriculumYear, week: weekNum });
+      router.push(`/pattern-peaks/quiz/${encodeURIComponent(curriculumYear)}/${weekNum}${teacherPreview ? "?teacher_preview=1" : ""}`);
+      return;
+    }
     if (isStarpathRealm && starpathProgram && item.type === "posttest") {
       router.push(buildStarpathPostTestPageHref({ selectedLevel: starpathProgram.definition.id }));
       return;

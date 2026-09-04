@@ -10,6 +10,7 @@ import {
   LIVE_REALM_IDS,
   tryCanonicalRealmId,
   getRealmFirstLevel,
+  isRealmFirstLevel,
 } from "@/lib/realms/realm-registry";
 import {
   buildRealmProgramHref,
@@ -88,7 +89,7 @@ for (const realm of liveRealms) {
     if (yearLabel !== "Prep") {
       const pretest = getPretestForYearLabel(yearLabel, realm.realmId);
       const posttest = getPosttestForYearLabel(yearLabel, realm.realmId);
-      if (!(realm.realmId === "statistics" && yearLabel === "Year 1")) {
+      if (!isRealmFirstLevel(realm.realmId, yearLabel)) {
         assert(pretest.length > 0, `${realm.name} ${yearLabel} pre-test is missing.`);
       }
       assert((posttest?.questions.length ?? 0) > 0, `${realm.name} ${yearLabel} post-test is missing.`);

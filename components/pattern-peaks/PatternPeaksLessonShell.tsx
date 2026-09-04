@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
 import { RealmLessonHome, LessonConceptIntro } from "@/components/lesson/RealmLessonHome";
@@ -10,6 +10,11 @@ import { getPatternPeaksLessonConceptIntro, type PatternPeaksYearLabel } from "@
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 import { getWorld3DReturnPathForLesson, preserveWorld3DReturnContextForLesson } from "@/lib/world3d/return-context";
 import type { Lesson } from "@/data/programs/year1";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
+import { getActiveStudentIdentity } from "@/lib/studentIdentity";
+import { restoreStudentStateFromServer, saveRealmLessonAttempt } from "@/lib/student-progress-sync";
+import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
+import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 type Phase = "home" | "concept" | "active";
 
@@ -25,7 +30,13 @@ export default function PatternPeaksLessonShell({
   lesson: Lesson;
 }) {
   const router = useRouter();
+  const previewMode = useDemoPreviewMode();
   const [phase, setPhase] = useState<Phase>("home");
+  const summaryRef = useRef<LessonPerformanceSummary | null>(null);
+  const savingRef = useRef(false);
+  const completionSavedRef = useRef(false);
+  const exitRequestedRef = useRef(false);
+  const completionKeyRef = useRef<string | null>(null);
   // Return to the shared Week Home (same as every other realm); prefer the
   // stored 3D return path so a lesson entered from the Pattern Peaks 3D world
   // lands back there.
@@ -37,6 +48,51 @@ export default function PatternPeaksLessonShell({
     lessonId: lesson.id,
   }) ?? buildRealmProgramHref({ realmId: "pattern", year: level, week });
   const back = () => router.push(weekHref);
+
+  const completeLesson = useCallback(() => {
+    if (completionSavedRef.current) {
+      router.push(weekHref);
+      return;
+    }
+    if (savingRef.current) {
+      exitRequestedRef.current = true;
+      return;
+    }
+    if (previewMode) {
+      completionSavedRef.current = true;
+      return;
+    }
+    const studentId = getActiveStudentIdentity().studentId;
+    if (!studentId) {
+      window.alert("We couldn't verify this student, so the lesson was not saved. Please return home and sign in again.");
+      return;
+    }
+    savingRef.current = true;
+    const summary = summaryRef.current;
+    const completionKey = completionKeyRef.current ?? (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`);
+    completionKeyRef.current = completionKey;
+    void saveRealmLessonAttempt(studentId, level, week, lesson.lesson, lesson.id, {
+      at: new Date().toISOString(), completed: true, lessonId: lesson.id, lessonNumber: lesson.lesson,
+      title: lesson.title, questionsAnswered: summary?.questionsAnswered ?? 0,
+      totalQuestions: summary?.questionsAnswered ?? 0, correctAnswers: summary?.correctAnswers ?? 0,
+      correctCount: summary?.correctAnswers ?? 0, accuracy: summary?.accuracy ?? 0,
+      accuracyPercent: summary?.accuracy ?? 0, bestChain: summary?.bestChain ?? 0,
+      timeSpentSeconds: summary?.timeSpentSeconds ?? 0, topicSummaries: summary?.topicSummaries ?? [],
+      strengths: summary?.strengths ?? [], areasToImprove: summary?.areasToImprove ?? [],
+      struggledQuestionTypes: summary?.struggledQuestionTypes ?? [],
+    }, completionKey, "pattern" as LiveRealmId)
+      .then(() => {
+        completionSavedRef.current = true;
+        return restoreStudentStateFromServer(studentId, "pattern" as LiveRealmId).catch((error) => {
+          console.warn("[Pattern Peaks] Lesson saved but progress refresh failed", error);
+        }).then(() => { if (exitRequestedRef.current) router.push(weekHref); });
+      })
+      .catch((error) => {
+        console.error("[Pattern Peaks] Lesson completion save failed", error);
+        window.alert("We couldn't save this lesson yet. Please check the connection and press Finish again.");
+      })
+      .finally(() => { savingRef.current = false; });
+  }, [lesson.id, lesson.lesson, lesson.title, level, previewMode, router, week, weekHref]);
 
   useEffect(() => {
     preserveWorld3DReturnContextForLesson({
@@ -67,13 +123,14 @@ export default function PatternPeaksLessonShell({
             lessonNumber={lesson.lesson}
             lessonTitle={lesson.title}
             focus={lesson.focus}
-            demoMode
+            demoMode={previewMode}
             onBack={back}
           >
             <Year2LessonEngine
               lesson={lesson}
-              onTimedComplete={back}
-              onExit={back}
+              onTimedComplete={completeLesson}
+              onExit={completeLesson}
+              onPerformanceSummary={(summary) => { summaryRef.current = summary; }}
               realmId="pattern"
               levelNumber={levelNumber}
               practisedSkills={successCriteria}

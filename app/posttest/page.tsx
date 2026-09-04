@@ -333,11 +333,11 @@ function PostTestPage() {
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
   const realmId = params.get("realm_id") ?? undefined;
-  if (realmId !== undefined && realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics") {
+  if (realmId !== undefined && realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics" && realmId !== "pattern") {
     throw new Error(`Unsupported post-test realm: ${realmId}`);
   }
   const progressRealmId =
-    realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : "number";
+    realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : realmId === "pattern" ? "pattern" : "number";
   const localProgressRealmId = progressRealmId as LiveRealmId;
   // Final week is realm-specific: Measurelands = 8, Number Nexus = 12. Never
   // hardcode 12 for a realm-aware assessment (that leaks a Number assumption).
@@ -412,7 +412,7 @@ function PostTestPage() {
       return;
     }
     let cancelled = false;
-    void restoreStudentStateFromServer(studentId, progressRealmId)
+    void restoreStudentStateFromServer(studentId, localProgressRealmId)
       .then((restored) => {
         if (cancelled) return;
         const progress = restored.progress;
@@ -616,8 +616,8 @@ function PostTestPage() {
           placement_result: latest,
           question_results: questionResults,
           completed_at: completedAt,
-        }, completionId, progressPayload, progressRealmId);
-      const restored = await restoreStudentStateFromServer(studentId, progressRealmId);
+        }, completionId, progressPayload, localProgressRealmId);
+      const restored = await restoreStudentStateFromServer(studentId, localProgressRealmId);
       if (!restored.progress) throw new Error("Saved post-test did not produce canonical progress");
       setCanonicalProgress(restored.progress);
       clearCompletionId(assessmentCompletionKey);
@@ -702,7 +702,7 @@ function PostTestPage() {
   }
 
   const isInteractiveTask =
-    (q?.type === "measurelandsTask" || q?.type === "starpathTask" || q?.type === "statisticaTask") && Boolean(q.practiceTask);
+    (q?.type === "measurelandsTask" || q?.type === "starpathTask" || q?.type === "statisticaTask" || q?.type === "patternPeaksTask") && Boolean(q.practiceTask);
   const hasAnswer =
     q?.type === "mab" ? mabHasSelection : q?.type === "numeric" ? picked.trim().length > 0 : !!picked;
 

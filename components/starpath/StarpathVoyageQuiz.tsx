@@ -21,6 +21,7 @@ import { writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
 import { restoreStudentStateFromServer, saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
+import type { StudentProgressRealmId } from "@/lib/student-progress-sync";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { buildAssessmentQuestionSnapshots, type ReplayQuestionSource } from "@/lib/assessment-replay";
 import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
@@ -39,7 +40,7 @@ export type StarpathVoyageQuizMeta = {
   nextWeekHref?: string;
 };
 
-type VoyageQuizRealm = "space" | "statistics";
+type VoyageQuizRealm = "space" | "statistics" | "pattern";
 
 type QuizPhase = "home" | "quiz" | "results" | "review";
 
@@ -137,8 +138,10 @@ export default function StarpathVoyageQuiz({
   const router = useRouter();
   const theme = REALM_QUIZ_THEMES[realm];
   const isStatistica = realm === "statistics";
-  const unitLabel = isStatistica ? "lesson" : "mission";
-  const realmTitle = isStatistica ? "Statistica Data Quiz" : "Starpath Voyage Quiz";
+  const isPattern = realm === "pattern";
+  const isLessonRealm = isStatistica || isPattern;
+  const unitLabel = isLessonRealm ? "lesson" : "mission";
+  const realmTitle = isStatistica ? "Statistica Data Quiz" : isPattern ? "Pattern Peaks Quiz" : "Starpath Voyage Quiz";
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
   const answersAreEditable = true;
   const storageKey = `${realm}-weekly-quiz:v2:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
@@ -273,7 +276,7 @@ export default function StarpathVoyageQuiz({
         correctAnswer: correctAnswerForReview(quizTask),
         skillId: quiz.lessonSkillIds[lessonIndex][0],
         skillLabel: quiz.lessonTitles[lessonIndex],
-        strand: isStatistica ? "Statistics" : "Space",
+        strand: isStatistica ? "Statistics" : isPattern ? "Algebra" : "Space",
         curriculumCodes: quiz.lessonCurriculumCodes[lessonIndex],
         linkedWeeks: [quiz.week],
         linkedLessons: [lessonIndex + 1],
@@ -296,7 +299,7 @@ export default function StarpathVoyageQuiz({
 
     try {
       const passedQuiz = weeklyQuizPassed(finalPercent);
-      if (!isStatistica) {
+      if (realm === "space") {
         writeStarpathDemoJourney(quiz.level, {
           currentWeek: passedQuiz ? Math.min(8, quiz.week + 1) : quiz.week,
           currentLesson: passedQuiz ? 0 : 3,
@@ -327,16 +330,16 @@ export default function StarpathVoyageQuiz({
             at: completedAt,
           },
           newCompletionKey(),
-          realm
+          realm as StudentProgressRealmId
         );
-        await restoreStudentStateFromServer(studentId, realm);
+        await restoreStudentStateFromServer(studentId, realm as StudentProgressRealmId);
       }
       localStorage.removeItem(storageKey);
       setHasResume(false);
       setFinalScore(score);
       setPhase("results");
     } catch (error) {
-      console.warn(`[${isStatistica ? "Statistica" : "Starpath"}] Weekly quiz persist failed`, error);
+      console.warn(`[${isStatistica ? "Statistica" : isPattern ? "Pattern Peaks" : "Starpath"}] Weekly quiz persist failed`, error);
       window.alert("We couldn't save this quiz yet. Please try again.");
     } finally {
       setSaving(false);
@@ -535,7 +538,7 @@ export default function StarpathVoyageQuiz({
                 <span className="text-3xl font-black">{percent}%</span>
               </div>
               <h2 className="mt-5 text-3xl font-black text-slate-950">
-                {passed ? (isStatistica ? "Data check complete!" : "Voyage complete!") : "Keep exploring!"}
+                {passed ? (isStatistica ? "Data check complete!" : isPattern ? "Peak quiz complete!" : "Voyage complete!") : "Keep exploring!"}
               </h2>
               <p className="mt-2 text-base font-semibold text-slate-600">
                 You answered {finalScore}/{total} correctly.
@@ -545,7 +548,7 @@ export default function StarpathVoyageQuiz({
               </p>
               {!passed ? (
                 <div className="mt-4 rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-3 font-bold text-amber-950">
-                  Week {quiz.week + 1} is not unlocked yet. Review a {isStatistica ? "lesson" : "mission"} below, then try the quiz again.
+                  Week {quiz.week + 1} is not unlocked yet. Review a {unitLabel} below, then try the quiz again.
                 </div>
               ) : null}
               <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">
@@ -560,7 +563,7 @@ export default function StarpathVoyageQuiz({
                     ].join(" ")}
                   >
                     <div className={`font-mono text-xs font-black uppercase tracking-[0.16em] ${isStatistica ? "text-[#a83e4b]" : "text-violet-700"}`}>
-                      {isStatistica ? "Lesson" : "Mission"} {result.lesson}
+                      {isLessonRealm ? "Lesson" : "Mission"} {result.lesson}
                     </div>
                     <div className="mt-2 text-2xl font-black text-slate-950">{result.score}/5</div>
                     <div className="mt-1 text-sm font-bold text-slate-700">{result.title}</div>
@@ -574,7 +577,7 @@ export default function StarpathVoyageQuiz({
                   </div>
                   <p className="mt-2 font-bold text-slate-900">
                     Return to {weakestLessons
-                      .map((result) => `${isStatistica ? "Lesson" : "Mission"} ${result.lesson}: ${result.title}`)
+                      .map((result) => `${isLessonRealm ? "Lesson" : "Mission"} ${result.lesson}: ${result.title}`)
                       .join(" and ")} for more practice.
                   </p>
                 </div>

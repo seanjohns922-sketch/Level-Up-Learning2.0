@@ -368,10 +368,10 @@ function PretestPage() {
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
   const realmId = searchParams.get("realm_id") ?? "number";
-  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics") {
+  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics" && realmId !== "pattern") {
     throw new Error(`Unsupported pre-test realm: ${realmId}`);
   }
-  const progressRealmId = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : "number";
+  const progressRealmId = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : realmId === "pattern" ? "pattern" : "number";
   const localProgressRealmId = progressRealmId as LiveRealmId;
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
@@ -455,7 +455,7 @@ function PretestPage() {
       return;
     }
     let cancelled = false;
-    void restoreStudentStateFromServer(studentId, progressRealmId)
+    void restoreStudentStateFromServer(studentId, localProgressRealmId)
       .then((restored) => {
         if (cancelled) return;
         const progress = restored.progress;
@@ -739,8 +739,8 @@ function PretestPage() {
           },
           question_results: questionResults,
           completed_at: completedAt,
-        }, completionId, progressPayload, progressRealmId);
-      const restored = await restoreStudentStateFromServer(studentId, progressRealmId);
+        }, completionId, progressPayload, localProgressRealmId);
+      const restored = await restoreStudentStateFromServer(studentId, localProgressRealmId);
       if (!restored.progress) throw new Error("Saved pre-test did not produce canonical progress");
       setCanonicalProgress(restored.progress);
       clearCompletionId(assessmentCompletionKey);
@@ -789,7 +789,7 @@ function PretestPage() {
         : selected !== null;
 
   const isMeasurelandsTask =
-    (question?.type === "measurelandsTask" || question?.type === "starpathTask" || question?.type === "statisticaTask") &&
+    (question?.type === "measurelandsTask" || question?.type === "starpathTask" || question?.type === "statisticaTask" || question?.type === "patternPeaksTask") &&
     Boolean(question.practiceTask);
 
   useEffect(() => {

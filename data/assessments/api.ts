@@ -53,9 +53,11 @@ import {
 import { validateStarpathAssessmentBlueprintForLevel } from "./starpathAssessmentBlueprint";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 import { getStatisticaIndependentAssessment } from "./statisticaIndependentBanks";
+import { getPatternPeaksIndependentAssessment } from "./patternPeaksIndependentBanks";
+import { validatePatternPeaksAssessmentBlueprintForLevel } from "./patternPeaksAssessmentBlueprint";
 
 export type AssessmentQuestion = PretestQuestion | PosttestQuestion;
-export type AssessmentRealmId = LiveRealmId | "statistics";
+export type AssessmentRealmId = LiveRealmId | "statistics" | "pattern";
 
 function assertAssessmentRealmHandled(realmId: never): never {
   throw new Error(`Assessment resolver is missing for live realm: ${realmId}`);
@@ -137,6 +139,8 @@ export function getPretestForLevel(level: SupportedMathLevel, realmId: Assessmen
       return getMeasurelandsPretestForYear(yearLabelForLevel(level)) as PretestQuestion[];
     case "statistics":
       return getStatisticaIndependentAssessment(level, "pretest") as unknown as PretestQuestion[];
+    case "pattern":
+      return getPatternPeaksIndependentAssessment(level, "pretest") as unknown as PretestQuestion[];
     case "number":
       break;
     default:
@@ -165,6 +169,8 @@ export function getPosttestForLevel(level: SupportedMathLevel, realmId: Assessme
       return getMeasurelandsPosttestForYear(yearLabelForLevel(level));
     case "statistics":
       return { yearLabel: yearLabelForLevel(level), questions: getStatisticaIndependentAssessment(level, "posttest") };
+    case "pattern":
+      return { yearLabel: yearLabelForLevel(level), questions: getPatternPeaksIndependentAssessment(level, "posttest") };
     case "number":
       break;
     default:
@@ -197,6 +203,8 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
       return getMeasurelandsPretestForYear(yearLabel) as PretestQuestion[];
     case "statistics":
       return getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
+    case "pattern":
+      return getPatternPeaksIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
     case "number":
       break;
     default:
@@ -228,6 +236,8 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
       return getMeasurelandsPosttestForYear(yearLabel);
     case "statistics":
       return { yearLabel, questions: getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") };
+    case "pattern":
+      return { yearLabel, questions: getPatternPeaksIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") };
     case "number":
       break;
     default:
@@ -277,6 +287,8 @@ export function validateAssessmentBlueprintForLevel(level: SupportedMathLevel, r
       return [];
     case "statistics":
       return [];
+    case "pattern":
+      return validatePatternPeaksAssessmentBlueprintForLevel(level);
     case "number":
       break;
     default:

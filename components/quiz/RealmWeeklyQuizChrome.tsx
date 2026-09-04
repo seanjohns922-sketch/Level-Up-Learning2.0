@@ -1,13 +1,13 @@
 "use client";
 
-import { ArrowLeft, ChartNoAxesColumnIncreasing, Orbit, Ruler, Zap } from "lucide-react";
+import { ArrowLeft, ChartNoAxesColumnIncreasing, Orbit, Ruler, Sigma, Zap } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { getRealmLessonArtwork } from "@/components/lesson/RealmLessonHome";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
-export type RealmQuizThemeId = LiveRealmId | "statistics";
+export type RealmQuizThemeId = LiveRealmId | "statistics" | "pattern";
 
 export const REALM_QUIZ_THEMES = {
   number: {
@@ -74,6 +74,20 @@ export const REALM_QUIZ_THEMES = {
     workspaceBg: "linear-gradient(180deg, #fffaf0 0%, #edf5e8 100%)",
     ThemeIcon: ChartNoAxesColumnIncreasing,
   },
+  pattern: {
+    realmName: "Pattern Peaks",
+    quizName: "Peak Quiz",
+    eyebrow: "Pattern Peaks Knowledge Check",
+    pageBg: "#071719",
+    shellBg: "rgba(8, 31, 33, 0.96)",
+    panelBorder: "rgba(57, 217, 160, 0.3)",
+    accent: "#39d9a0",
+    accentSoft: "#ddd6fe",
+    heroOverlay: "linear-gradient(90deg, rgba(7,23,25,0.98) 0%, rgba(25,54,52,0.86) 48%, rgba(73,48,112,0.28) 100%)",
+    backdropOverlay: "linear-gradient(180deg, rgba(7,18,24,0.5), rgba(7,19,24,0.94))",
+    workspaceBg: "linear-gradient(180deg, #f7fffc 0%, #f1efff 100%)",
+    ThemeIcon: Sigma,
+  },
 } as const satisfies Record<RealmQuizThemeId, object>;
 
 function getQuizArtwork(realm: RealmQuizThemeId, levelNumber: number, year: string) {
@@ -130,6 +144,8 @@ export function RealmWeeklyQuizChrome({
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_18%,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_28%_38%,rgba(139,92,246,0.18),transparent_34%)]" />
         ) : realm === "statistics" ? (
           <div className="absolute inset-0 opacity-25" style={{ backgroundImage: "linear-gradient(rgba(242,188,69,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(240,107,100,0.1) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+        ) : realm === "pattern" ? (
+          <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "linear-gradient(rgba(57,217,160,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(118,89,196,0.12) 1px, transparent 1px)", backgroundSize: "46px 46px" }} />
         ) : (
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_18%,rgba(214,166,74,0.15),transparent_34%)]" />
         )}

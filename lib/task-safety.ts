@@ -311,6 +311,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "statisticaSort",
   "statisticaTally",
   "statisticaGraph",
+  "patternPeaksQuestion",
   "starpathLevel6Assessment",
   "starpathCoordinate",
   "starpathTransform",
