@@ -1969,10 +1969,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "This table stores the pattern as pairs of...?",
-        "stage and count",
-        ["count and colour", "start and finish"],
-        "Each row links a stage number to its count.",
+        `Which stage has ${counts[2]} tiles?`,
+        "3",
+        ["2", "4"],
+        "Find that count in the table.",
         tableVisual("Picture to table", pairs),
       );
     }
@@ -2029,10 +2029,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "These fractions are...?",
-        "getting bigger",
-        ["getting smaller", "staying equal"],
-        "Each step adds a positive amount.",
+        "Which is the largest fraction shown?",
+        `${s + 4}/${den}`,
+        [`${s}/${den}`, `${s + 2}/${den}`],
+        "The biggest top number makes the largest fraction.",
         sequenceVisual("Fraction sequence", terms),
       );
     }
@@ -2085,18 +2085,18 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     }
     if (role === "reasoning") {
       return mcq(
-        "What stays the same all the way along?",
-        "The size of the step",
-        ["The digits", "The number of decimal places"],
-        "Subtract each term from the next.",
+        "Each term goes up by the same amount. What is it?",
+        `${step}`,
+        [`${Number((step * 2).toFixed(2))}`, `${Number((step / 2).toFixed(2))}`],
+        "Subtract one term from the next.",
         sequenceVisual("Decimal sequence", show),
       );
     }
     return mcq(
-      "Is this sequence adding or multiplying?",
-      "adding",
-      ["multiplying", "dividing"],
-      "Check the gap between terms.",
+      "Which is the largest term shown?",
+      `${t[4]}`,
+      [`${t[0]}`, `${t[2]}`],
+      "The terms increase from left to right.",
       sequenceVisual("Decimal sequence", show),
     );
   }
@@ -2130,10 +2130,11 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "A picture, a table and a rule can all show...?",
-        "the same pattern",
-        ["different patterns", "only the answer"],
-        "Different views of one relationship.",
+        `Using × ${mult} then + ${add}, what is the output for 5?`,
+        rule(5),
+        [`${5 * mult}`, `${rule(5) + add}`],
+        `Multiply by ${mult}, then add ${add}.`,
+        tableVisual("Match the rule", pairs),
       );
     }
 
@@ -2150,17 +2151,19 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       }
       if (role === "reasoning") {
         return mcq(
-          "How is multiplying growth different from adding growth?",
-          "The jumps get bigger each step",
-          ["The jumps stay the same", "It shrinks each step"],
-          "Compare the size of each gap.",
+          `Adding ${add} each step from ${s}: ${s}, ${s + add}, ... What comes next?`,
+          s + 2 * add,
+          [s + 3 * add, s + add],
+          `Add ${add} once more.`,
+          sequenceVisual("Adding growth", [`${s}`, `${s + add}`]),
         );
       }
       return mcq(
-        "Over many steps, which grows faster?",
-        `Multiplying by ${mult}`,
-        [`Adding ${add}`, "They stay equal"],
-        "Multiplying pulls ahead of adding.",
+        `Multiplying by ${mult} from ${s}: ${s}, ${s * mult}, ${s * mult * mult}, ... What comes next?`,
+        s * mult * mult * mult,
+        [s * mult * mult + mult, s * mult * mult + 1],
+        `Multiply by ${mult} once more.`,
+        sequenceVisual("Multiplying growth", [`${s}`, `${s * mult}`, `${s * mult * mult}`]),
       );
     }
 
@@ -2176,10 +2179,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     }
     if (role === "reasoning") {
       return mcq(
-        "A rule shown as a machine and as a table are...?",
-        "the same rule",
-        ["different rules", "opposite rules"],
-        "The steps are identical, only the display changes.",
+        `Apply × ${mult} then + ${add} to ${input + 3}.`,
+        rule(input + 3),
+        [`${(input + 3) * mult}`, `${rule(input + 3) + add}`],
+        `Multiply by ${mult}, then add ${add}.`,
       );
     }
     return mcq(
@@ -2216,10 +2219,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "A function machine gives one output for each...?",
-        "input",
-        ["output", "rule"],
-        "One input in, one output out.",
+        `For input 3, what does × ${mult} then + ${add} give?`,
+        3 * mult + add,
+        [`${3 * mult}`, `${3 * mult + 2 * add}`],
+        `${mult} × 3, then + ${add}.`,
       );
     }
 
@@ -2246,10 +2249,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "To find a hidden rule you should...?",
-        "test it on more than one pair",
-        ["use only the first pair", "guess"],
-        "One pair can fit many rules.",
+        `A rule turns 2 into ${rule(2)} and 3 into ${rule(3)}. What does it turn 5 into?`,
+        rule(5),
+        [`${5 * mult}`, `${rule(5) + add}`],
+        "Find the step from the pairs, then use it on 5.",
       );
     }
 
@@ -2264,17 +2267,17 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     }
     if (role === "reasoning") {
       return mcq(
-        "Which input is the best edge case to test?",
-        "0",
-        ["a typical number like 5", "no test is needed"],
-        "Edge cases like 0 catch hidden bugs.",
+        `For an input of 1, what does × ${mult} then + ${add} give?`,
+        mult + add,
+        [`${mult}`, `${mult + 2 * add}`],
+        `${mult} × 1 = ${mult}, then + ${add}.`,
       );
     }
     return mcq(
-      "After building a machine you should...?",
-      "test it",
-      ["publish it straight away", "delete it"],
-      "Testing proves the algorithm works.",
+      `For an input of 2, what does × ${mult} then + ${add} give?`,
+      2 * mult + add,
+      [`${2 * mult}`, `${2 * mult + 2 * add}`],
+      `${mult} × 2, then + ${add}.`,
     );
   }
 
@@ -2330,10 +2333,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "Brackets tell you which part to do...?",
-        "first",
-        ["last", "never"],
-        "Brackets always go first.",
+        `Without brackets, ${a} + ${b} × ${c} = ?`,
+        a + b * c,
+        [`${(a + b) * c}`, `${b * c}`],
+        `Do ${b} × ${c} first, then add ${a}.`,
       );
     }
 
@@ -2355,10 +2358,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       );
     }
     return mcq(
-      `(${a} + ${b}) × ${c} means ${c} lots of...?`,
-      `(${a} + ${b})`,
-      [`${a}`, `${a} × ${b}`],
-      "The bracket is the group being repeated.",
+      `What is ${c} × ${a}?`,
+      c * a,
+      [`${c * a + c}`, `${c * a - c}`],
+      "This is one of the two products you add.",
     );
   }
 
@@ -2414,10 +2417,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        `In ${total} = ${mult} × (? + ${add}), the unknown is...?`,
-        "inside the brackets",
-        ["the total", "the ×"],
-        "Look for the ? symbol.",
+        `What is ${total} ÷ ${mult}?`,
+        total / mult,
+        [`${total - mult}`, `${total + mult}`],
+        "Dividing undoes the outer × first.",
       );
     }
 
@@ -2441,10 +2444,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       );
     }
     return mcq(
-      `? + ? = ${target} has...?`,
-      "many solutions",
-      ["one solution", "no solution"],
-      "Several pairs of numbers work.",
+      `Which pair adds to ${target}?`,
+      `${x} + ${target - x}`,
+      [`${x} + ${target - x + 1}`, `${target} + ${x}`],
+      `The two numbers must total ${target}.`,
     );
   }
 
@@ -2507,10 +2510,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "To debug, compare the expected output with...?",
-        "the output it generated",
-        ["the input only", "the title"],
-        "A mismatch shows where the bug is.",
+        `Is ${multiple} a multiple of ${d}?`,
+        "Yes",
+        ["No", "Cannot tell"],
+        `${multiple} ÷ ${d} leaves no remainder.`,
       );
     }
 
@@ -2532,11 +2535,12 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         `Adding ${d} repeatedly lists its multiples.`,
       );
     }
+    const sample = d * rand(4, 9);
     return mcq(
-      `Multiples of ${d} are made by...?`,
-      `counting up in ${d}s`,
-      [`dividing by ${d}`, `subtracting ${d}`],
-      "Repeated addition builds multiples.",
+      `Which number is a multiple of ${d}?`,
+      sample,
+      [`${sample + 1}`, `${sample - 1}`],
+      `A multiple of ${d} is in its times table.`,
     );
   }
 
@@ -2570,10 +2574,11 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "A general rule lets you reach any stage...?",
-        "without drawing every one",
-        ["only by drawing them all", "only for small stages"],
-        "That is why a rule is powerful.",
+        `The structure adds ${growth} each stage. How much does the count grow over 3 stages?`,
+        growth * 3,
+        [growth, growth * 2],
+        `Three stages means three lots of ${growth}.`,
+        tiles,
       );
     }
 
@@ -2600,10 +2605,10 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "To check your solution, put it back and...?",
-        "work forwards",
-        ["change the total", "guess again"],
-        "A correct value rebuilds the total.",
+        `First step: what is ${total} ÷ ${mult}?`,
+        total / mult,
+        [`${total - mult}`, `${total + mult}`],
+        "Undo the × before the +.",
       );
     }
 
@@ -2627,10 +2632,11 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       );
     }
     return mcq(
-      "A good generalisation must work for...?",
-      "every stage",
-      ["just the first stage", "only large stages"],
-      "One counter-example is enough to disprove it.",
+      "How many tiles are in Stage 1?",
+      start,
+      [`${start + growth}`, `${start + 1}`],
+      "Stage 1 is the very first stage.",
+      tiles,
     );
   }
 
