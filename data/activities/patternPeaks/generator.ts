@@ -2338,21 +2338,26 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     }
 
     if (lessonNumber === 2) {
-      // Place the Brackets (insert brackets to hit a target).
+      // Place the Brackets — choose the bracketing that hits a target value.
+      const exprCard = promptVisual("Place the brackets", [{ tokens: [`${a}`, "+", `${b}`, "×", `${c}`] }]);
       if (role === "apply_create") {
-        return typed(
-          "What value belongs inside the brackets?",
-          a + b,
-          `Divide ${bracketed} by ${c}.`,
-          promptVisual("Place the brackets", [{ tokens: ["(", "?", ")", "×", `${c}`, "=", `${bracketed}`] }]),
+        return mcq(
+          `Where do the brackets go to make ${a} + ${b} × ${c} = ${bracketed}?`,
+          `(${a} + ${b}) × ${c}`,
+          [`${a} + (${b} × ${c})`, `(${a} + ${b} × ${c})`],
+          "Group the part that must happen first.",
+          exprCard,
+          `(${a} + ${b}) × ${c} = ${bracketed}. The brackets make the addition happen first.`,
         );
       }
       if (role === "reasoning") {
-        return mcq(
-          `Where do the brackets go to reach ${bracketed}?`,
-          `(${a} + ${b}) × ${c}`,
-          [`${a} + (${b} × ${c})`, `(${a} × ${b}) + ${c}`],
-          "Group so the addition happens first.",
+        return typed(
+          `Place brackets in ${a} + ${b} × ${c} to make the largest value. What is it?`,
+          bracketed,
+          "Grouping the addition first gives the bigger result.",
+          exprCard,
+          undefined,
+          `(${a} + ${b}) × ${c} = ${bracketed} is the largest.`,
         );
       }
       return mcq(
