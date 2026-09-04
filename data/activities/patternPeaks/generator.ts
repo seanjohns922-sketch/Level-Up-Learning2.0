@@ -2199,35 +2199,39 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     const add = rand(2, 9);
     const rule = (x: number) => x * mult + add;
 
+    const ruleLabel = `× ${mult}, then + ${add}`;
+
     if (lessonNumber === 1) {
       // Follow a Multi-Step Machine.
-      const input = rand(2, 12);
+      const input = rand(4, 12);
       if (role === "apply_create") {
         return typed(
           "Run the machine.",
           rule(input),
           "Multiply first, then add.",
-          machineVisual("Multi-step machine", input, `× ${mult}, then + ${add}`, "?"),
+          machineVisual("Multi-step machine", input, ruleLabel, "?"),
         );
       }
       if (role === "reasoning") {
         return mcq(
-          `In × ${mult} then + ${add}, which step happens first?`,
+          "Which step happens first?",
           `× ${mult}`,
           [`+ ${add}`, "either order"],
           "Follow the steps in the order written.",
+          machineVisual("Multi-step machine", input, ruleLabel, rule(input)),
         );
       }
-      return mcq(
-        `For input 3, what does × ${mult} then + ${add} give?`,
-        3 * mult + add,
-        [`${3 * mult}`, `${3 * mult + 2 * add}`],
-        `${mult} × 3, then + ${add}.`,
+      const fastIn = rand(2, 3);
+      return typed(
+        "Run the machine.",
+        rule(fastIn),
+        "Multiply first, then add.",
+        machineVisual("Multi-step machine", fastIn, ruleLabel, "?"),
       );
     }
 
     if (lessonNumber === 2) {
-      // Discover the Algorithm.
+      // Discover the Algorithm — read the input/output table, find the rule.
       const pairs: Array<[number | string, number | string]> = [
         [2, rule(2)], [3, rule(3)], [4, rule(4)],
       ];
@@ -2241,43 +2245,45 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       }
       if (role === "reasoning") {
         return mcq(
-          "From the pairs, which rule fits?",
+          "Which rule fits the table?",
           `× ${mult}, then + ${add}`,
           [`+ ${mult + add}`, `× ${mult + 1}`],
           "A good rule works on every row.",
           tableVisual("Discover the rule", pairs),
         );
       }
-      return mcq(
-        `A rule turns 2 into ${rule(2)} and 3 into ${rule(3)}. What does it turn 5 into?`,
+      return typed(
+        "Work out the rule, then fill in for 5.",
         rule(5),
-        [`${5 * mult}`, `${rule(5) + add}`],
-        "Find the step from the pairs, then use it on 5.",
+        "Find what turns each input into its output.",
+        tableVisual("Discover the rule", [[2, rule(2)], [3, rule(3)], [5, "?"]]),
       );
     }
 
     // L3 Create and Test a Machine (edge cases).
     if (role === "apply_create") {
       return typed(
-        "Test your machine on 0. What does it output?",
+        "Test your machine on 0.",
         add,
         `Multiply first: ${mult} × 0 = 0, then add ${add}.`,
-        machineVisual("Test on 0", 0, `× ${mult}, then + ${add}`, "?"),
+        machineVisual("Test on 0", 0, ruleLabel, "?"),
       );
     }
     if (role === "reasoning") {
       return mcq(
-        `For an input of 1, what does × ${mult} then + ${add} give?`,
-        mult + add,
-        [`${mult}`, `${mult + 2 * add}`],
-        `${mult} × 1 = ${mult}, then + ${add}.`,
+        `Why does input 0 give ${add}?`,
+        `${mult} × 0 = 0, then + ${add}`,
+        ["0 skips the × step", "0 always gives 0"],
+        "Follow both steps on 0.",
+        machineVisual("Test on 0", 0, ruleLabel, add),
       );
     }
-    return mcq(
-      `For an input of 2, what does × ${mult} then + ${add} give?`,
-      2 * mult + add,
-      [`${2 * mult}`, `${2 * mult + 2 * add}`],
-      `${mult} × 2, then + ${add}.`,
+    const edge = rand(2, 3);
+    return typed(
+      `Test your machine on ${edge}.`,
+      rule(edge),
+      "Multiply first, then add.",
+      machineVisual(`Test on ${edge}`, edge, ruleLabel, "?"),
     );
   }
 
