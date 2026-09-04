@@ -1969,10 +1969,11 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       return mcq(
-        "A table stores a pattern as pairs of...?",
+        "This table stores the pattern as pairs of...?",
         "stage and count",
         ["count and colour", "start and finish"],
         "Each row links a stage number to its count.",
+        tableVisual("Picture to table", pairs),
       );
     }
 
