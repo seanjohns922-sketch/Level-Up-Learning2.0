@@ -385,7 +385,7 @@ function buildProgram(yearLabel: PatternPeaksYearLabel, seeds: WeekSeed[]): Week
         ) || yearLabel === "Year 5" && (
           weekNumber === 5 ||
           (weekNumber === 6 && lessonNumber <= 2) ||
-          (weekNumber === 7 && lessonNumber === 1)
+          (weekNumber === 7 && (lessonNumber === 1 || lessonNumber === 3))
         ),
       ),
     };

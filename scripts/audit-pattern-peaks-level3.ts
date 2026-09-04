@@ -452,6 +452,32 @@ const factorPairTreeSource = fs.readFileSync(path.join(root, "components/activit
 assert(factorPairTreeSource.includes("Factor pairs"), "The factor-pair tree renderer is missing its branch label.");
 assert(factorPairTreeSource.includes("InlineMathAnswerInput"), "The factor-pair tree must accept the answer inside the missing branch.");
 
+const levelFiveFindAllSolutions = PATTERN_PEAKS_PROGRAMS["Year 5"][6]!.lessons[2]!;
+assert(
+  (levelFiveFindAllSolutions.activities ?? []).every((activity) => activity.activityType === "typed_response"),
+  "Find All Solutions must use typed factor-tree tasks in every rotation.",
+);
+for (const activity of levelFiveFindAllSolutions.activities ?? []) {
+  for (let sample = 0; sample < 40; sample += 1) {
+    const question = generatePatternPeaksQuestion(5, levelFiveFindAllSolutions, activity);
+    assert.equal(question.kind, "typed_response", "Find All Solutions retained a multiple-choice list task.");
+    assert.equal(question.visual?.type, "factor_pair_tree", "Find All Solutions must always show the complete factor-pair structure.");
+    assert(!/which lists|which is a factor pair/i.test(question.prompt), "Find All Solutions retained a bland selection prompt.");
+    assert(!question.helper?.startsWith("List them:"), "Find All Solutions must not reveal every answer in its helper.");
+    if (question.visual?.type === "factor_pair_tree") {
+      for (const pair of question.visual.pairs) {
+        if (pair.left !== "?" && pair.right !== "?") {
+          assert.equal(Number(pair.left) * Number(pair.right), question.visual.product, "The factor-pair tree contains a false branch.");
+        }
+      }
+    }
+    const slotCount = countInlineMathAnswerSlots(question.visual);
+    assert.equal(slotCount, activity.config.rotationRole === "apply_create" ? 0 : 1, "Find All Solutions generated the wrong number of inline fields.");
+    const speech = getPatternQuestionReadAloudText(question);
+    assert(speech.includes(question.prompt) && speech.includes("Factor pairs"), "Find All Solutions read-aloud omitted the visual tree.");
+  }
+}
+
 const levelFiveConstructEquivalent = PATTERN_PEAKS_PROGRAMS["Year 5"][3]!.lessons[2]!;
 for (const activity of levelFiveConstructEquivalent.activities ?? []) {
   for (let sample = 0; sample < 30; sample += 1) {

@@ -1780,31 +1780,42 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
 
     // L3 Find All Solutions.
     const set = pick([
-      { n: 12, all: "1×12, 2×6, 3×4", partial: "1×12, 2×6", extra: "1×12, 2×6, 3×4, 5×2", real: "3×4", fake: "5×3" },
-      { n: 18, all: "1×18, 2×9, 3×6", partial: "1×18, 3×6", extra: "1×18, 2×9, 3×6, 4×5", real: "2×9", fake: "4×5" },
-      { n: 20, all: "1×20, 2×10, 4×5", partial: "1×20, 4×5", extra: "1×20, 2×10, 4×5, 3×7", real: "4×5", fake: "3×7" },
+      { n: 12, pairs: [[1, 12], [2, 6], [3, 4]] },
+      { n: 18, pairs: [[1, 18], [2, 9], [3, 6]] },
+      { n: 20, pairs: [[1, 20], [2, 10], [4, 5]] },
+      { n: 24, pairs: [[1, 24], [2, 12], [3, 8], [4, 6]] },
+      { n: 36, pairs: [[1, 36], [2, 18], [3, 12], [4, 9], [6, 6]] },
     ]);
-    const count = set.all.split(",").length;
+    const count = set.pairs.length;
     if (role === "apply_create") {
       return typed(
         `How many factor pairs does ${set.n} have?`,
         count,
-        `List them: ${set.all}.`,
+        "Follow the branches in order. Stop when the two factors meet or cross.",
+        {
+          type: "factor_pair_tree",
+          title: "Count every factor-pair branch",
+          product: set.n,
+          pairs: set.pairs.map(([left, right]) => ({ left: String(left), right: String(right) })),
+        },
       );
     }
-    if (role === "reasoning") {
-      return mcq(
-        `Which lists ALL factor pairs of ${set.n}?`,
-        set.all,
-        [set.partial, set.extra],
-        "Include every pair, and no false ones.",
-      );
-    }
-    return mcq(
-      `Which is a factor pair of ${set.n}?`,
-      set.real,
-      [set.fake, `${set.n}×2`],
-      `Their product is ${set.n}.`,
+    const missingIndex = rand(0, set.pairs.length - 1);
+    const missingPair = set.pairs[missingIndex]!;
+    const hideRight = role === "reasoning";
+    return typed(
+      hideRight ? "Complete the missing factor partner." : "Complete the missing factor-pair branch.",
+      hideRight ? missingPair[1]! : missingPair[0]!,
+      `Use the visible factor and the product ${set.n}. Every completed branch must multiply to ${set.n}.`,
+      {
+        type: "factor_pair_tree",
+        title: "Find every solution",
+        product: set.n,
+        pairs: set.pairs.map(([left, right], index) => ({
+          left: index === missingIndex && !hideRight ? "?" : String(left),
+          right: index === missingIndex && hideRight ? "?" : String(right),
+        })),
+      },
     );
   }
 
