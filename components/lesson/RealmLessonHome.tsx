@@ -202,6 +202,11 @@ export type LessonConceptIntroData = {
   meaning: string;
   example: string;
   exampleExplanation: string;
+  factorModel?: {
+    product: number;
+    pairs: Array<[number, number]>;
+    nonFactor: number;
+  };
 };
 
 // The "Meet the idea" teaching card. Shared so it can appear either on the
@@ -215,7 +220,11 @@ export function LessonConceptIntro({
   conceptIntro: LessonConceptIntroData;
 }) {
   const theme = REALM_LESSON_THEMES[realm];
-  const conceptText = `${conceptIntro.term}. ${conceptIntro.title}. ${conceptIntro.meaning} For example, ${conceptIntro.example}. ${conceptIntro.exampleExplanation}`;
+  const factorModelText = conceptIntro.factorModel
+    ? `The factor pairs for ${conceptIntro.factorModel.product} shown here are ${conceptIntro.factorModel.pairs.map(([left, right]) => `${left} times ${right}`).join(", ")}. ${conceptIntro.factorModel.nonFactor} is not a factor because ${conceptIntro.factorModel.product} divided by ${conceptIntro.factorModel.nonFactor} leaves a remainder of ${conceptIntro.factorModel.product % conceptIntro.factorModel.nonFactor}.`
+    : "";
+  const conceptText = `${conceptIntro.term}. ${conceptIntro.title}. ${conceptIntro.meaning} For example, ${conceptIntro.example}. ${conceptIntro.exampleExplanation} ${factorModelText}`;
+  const factorCheck = conceptIntro.factorModel?.pairs.at(-1)?.[0] ?? 1;
   return (
     <section
       className="overflow-hidden rounded-lg border p-5 sm:p-6"
@@ -248,6 +257,33 @@ export function LessonConceptIntro({
           {conceptIntro.exampleExplanation}
         </div>
       </div>
+      {conceptIntro.factorModel ? (
+        <div className="mt-5 rounded-lg border border-white/10 bg-black/20 p-4 sm:p-5">
+          <div className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accentSoft }}>
+            Factor pairs make exact arrays
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {conceptIntro.factorModel.pairs.map(([rows, columns]) => (
+              <div key={`${rows}-${columns}`} className="rounded-lg border border-white/10 bg-white/10 p-4 text-center">
+                <div className="mx-auto grid w-fit gap-1.5" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 0.65rem))` }}>
+                  {Array.from({ length: rows * columns }, (_, index) => (
+                    <span key={index} className="h-2.5 w-2.5 rounded-full" style={{ background: theme.accent }} />
+                  ))}
+                </div>
+                <div className="mt-3 text-lg font-black text-white">{rows} × {columns} = {conceptIntro.factorModel!.product}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-lg border border-emerald-300/25 bg-emerald-400/10 px-4 py-3 font-black text-emerald-100">
+              {conceptIntro.factorModel.product} ÷ {factorCheck} = {conceptIntro.factorModel.product / factorCheck} · no remainder ✓
+            </div>
+            <div className="rounded-lg border border-rose-300/25 bg-rose-400/10 px-4 py-3 font-black text-rose-100">
+              {conceptIntro.factorModel.product} ÷ {conceptIntro.factorModel.nonFactor} = 2 remainder {conceptIntro.factorModel.product % conceptIntro.factorModel.nonFactor} · not a factor
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

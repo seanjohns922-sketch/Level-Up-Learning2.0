@@ -398,6 +398,16 @@ for (const intro of levelFourWeekFourConcepts) {
 }
 assert.equal(getPatternPeaksLessonConceptIntro("Year 4", 3, 1), undefined, "Property introductions must not leak into other weeks.");
 
+const levelFiveFactorIntro = getPatternPeaksLessonConceptIntro("Year 5", 7, 1);
+assert.equal(levelFiveFactorIntro?.term, "Factor", "Use Factor Clues must introduce the word factor before questioning begins.");
+assert(levelFiveFactorIntro?.meaning.toLowerCase().includes("no remainder"), "The factor introduction must explain exact division.");
+assert.deepEqual(levelFiveFactorIntro?.factorModel?.pairs, [[1, 12], [2, 6], [3, 4]], "The factor introduction must show multiple factor-pair arrays.");
+assert.equal(levelFiveFactorIntro?.factorModel?.nonFactor, 5, "The factor introduction must contrast a non-factor.");
+assert.equal(getPatternPeaksLessonConceptIntro("Year 5", 7, 2), undefined, "The factor introduction must only appear before Use Factor Clues.");
+const lessonConceptIntroSource = fs.readFileSync(path.join(root, "components/lesson/RealmLessonHome.tsx"), "utf8");
+assert(lessonConceptIntroSource.includes("Factor pairs make exact arrays"), "The factor introduction is missing its visual factor-pair model.");
+assert(lessonConceptIntroSource.includes("factorModelText"), "The factor-pair model must be included in read-aloud text.");
+
 const levelFiveConstructEquivalent = PATTERN_PEAKS_PROGRAMS["Year 5"][3]!.lessons[2]!;
 for (const activity of levelFiveConstructEquivalent.activities ?? []) {
   for (let sample = 0; sample < 30; sample += 1) {

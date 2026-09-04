@@ -9,6 +9,11 @@ export type PatternPeaksLessonConceptIntro = {
   meaning: string;
   example: string;
   exampleExplanation: string;
+  factorModel?: {
+    product: number;
+    pairs: Array<[number, number]>;
+    nonFactor: number;
+  };
 };
 
 type LessonSeed = { title: string; focus: string; mechanic: string; curriculum: CurriculumCode[] };
@@ -430,14 +435,27 @@ const LEVEL4_WEEK4_CONCEPT_INTROS: Record<number, PatternPeaksLessonConceptIntro
   },
 };
 
+const LEVEL5_WEEK7_FACTOR_INTRO: PatternPeaksLessonConceptIntro = {
+  term: "Factor",
+  title: "Factors make exact groups",
+  meaning: "A factor is a whole number that divides another whole number exactly, with no remainder. Factors come in pairs because each pair multiplies to make the same product.",
+  example: "3 × 4 = 12",
+  exampleExplanation: "3 and 4 are factors of 12. Both 12 ÷ 3 and 12 ÷ 4 give whole-number answers with no remainder.",
+  factorModel: {
+    product: 12,
+    pairs: [[1, 12], [2, 6], [3, 4]],
+    nonFactor: 5,
+  },
+};
+
 export function getPatternPeaksLessonConceptIntro(
   yearLabel: PatternPeaksYearLabel,
   week: number,
   lessonNumber: number,
 ) {
-  return yearLabel === "Year 4" && week === 4
-    ? LEVEL4_WEEK4_CONCEPT_INTROS[lessonNumber]
-    : undefined;
+  if (yearLabel === "Year 4" && week === 4) return LEVEL4_WEEK4_CONCEPT_INTROS[lessonNumber];
+  if (yearLabel === "Year 5" && week === 7 && lessonNumber === 1) return LEVEL5_WEEK7_FACTOR_INTRO;
+  return undefined;
 }
 
 export function getPatternPeaksWeekPurposes(yearLabel: PatternPeaksYearLabel): Record<number, string> {
