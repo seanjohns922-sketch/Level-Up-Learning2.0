@@ -478,6 +478,25 @@ for (const activity of levelFiveFindAllSolutions.activities ?? []) {
   }
 }
 
+const levelFiveExposeFlaw = PATTERN_PEAKS_PROGRAMS["Year 5"][7]!.lessons[2]!;
+assert(
+  (levelFiveExposeFlaw.activities ?? []).every((activity) => activity.activityType === "typed_response"),
+  "Expose the Flawed Argument must use short typed repairs in every rotation.",
+);
+for (const activity of levelFiveExposeFlaw.activities ?? []) {
+  for (let sample = 0; sample < 50; sample += 1) {
+    const question = generatePatternPeaksQuestion(5, levelFiveExposeFlaw, activity);
+    assert.equal(question.kind, "typed_response", "Expose the Flawed Argument retained a wordy multiple-choice task.");
+    assert(question.prompt.split(/\s+/).length <= 7, "Expose the Flawed Argument generated an overly wordy prompt.");
+    assert(!/what is the flaw|which claim|division is not commutative/i.test(question.prompt), "Expose the Flawed Argument retained a property-recall prompt.");
+    assert.equal(question.visual?.type, "expression_flow", "Expose the Flawed Argument needs a visible incorrect and repaired calculation.");
+    assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Expose the Flawed Argument needs one inline repair field.");
+    assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, "Expose the Flawed Argument generated an invalid repair value.");
+    const speech = getPatternQuestionReadAloudText(question);
+    assert(speech.includes(question.prompt) && speech.includes("blank"), "Expose the Flawed Argument read-aloud omitted the repair field.");
+  }
+}
+
 const levelFiveConstructEquivalent = PATTERN_PEAKS_PROGRAMS["Year 5"][3]!.lessons[2]!;
 for (const activity of levelFiveConstructEquivalent.activities ?? []) {
   for (let sample = 0; sample < 30; sample += 1) {

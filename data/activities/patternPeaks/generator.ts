@@ -1886,31 +1886,40 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
       );
     }
 
-    // L3 Expose the Flawed Argument — a misused property.
+    // L3 Expose the Flawed Argument — repair a distributive error with concise calculations.
+    const extraColumns = rand(2, 4);
+    const target = b + extraColumns;
+    const extraProduct = a * extraColumns;
+    const correctTotal = a * target;
     if (role === "apply_create") {
       return typed(
-        "Correct it. What is the right answer?",
-        b,
-        `Do the division the right way round: ${p} ÷ ${a}.`,
+        "Fix the total.",
+        correctTotal,
+        "Multiply the outside factor by both parts, then add.",
         promptVisual("Expose the flaw", [
-          { tokens: [`${p}`, "÷", `${a}`, "=", "?"], note: `A student swapped it to ${a} ÷ ${p}.` },
+          { label: "Incorrect", tokens: [`${a}`, "×", `(${b}`, "+", `${extraColumns})`, "=", `${p}`, "+", `${extraColumns}`] },
+          { label: "Correct", tokens: [`${a}`, "×", `(${b}`, "+", `${extraColumns})`, "=", "?"] },
         ]),
       );
     }
     if (role === "reasoning") {
-      return mcq(
-        `A student says ${p} ÷ ${a} = ${a} ÷ ${p}. What is the flaw?`,
-        "Division is not commutative",
-        ["Nothing, it is correct", "They should have added"],
-        "Swapping the numbers in a division changes the answer.",
-        promptVisual("Expose the flaw", [{ tokens: [`${p}`, "÷", `${a}`, "=", `${a}`, "÷", `${p}`], note: "A student wrote this." }]),
+      return typed(
+        "Find the missing partial product.",
+        extraProduct,
+        `Multiply ${a} by the extra ${extraColumns} columns.`,
+        promptVisual("Repair the split", [
+          { tokens: [`${a}`, "×", `(${b}`, "+", `${extraColumns})`, "=", `${a}`, "×", `${b}`, "+", "?"] },
+        ]),
       );
     }
-    return mcq(
-      "Which claim is FALSE?",
-      `${a} ÷ ${b} = ${b} ÷ ${a}`,
-      [`${a} × ${b} = ${b} × ${a}`, `${p} ÷ ${a} = ${b}`],
-      "Only multiplication lets you swap freely.",
+    return typed(
+      `What should replace + ${extraColumns}?`,
+      extraProduct,
+      `The outside factor ${a} must multiply the extra part too.`,
+      promptVisual("Replace the incorrect term", [
+        { label: "Incorrect", tokens: [`${p}`, "+", `${extraColumns}`] },
+        { label: "Correct", tokens: [`${p}`, "+", "?"] },
+      ]),
     );
   }
 
