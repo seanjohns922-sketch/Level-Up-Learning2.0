@@ -2453,29 +2453,34 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     }
 
     // L3 Find Pairs of Unknowns.
-    const target = rand(15, 35);
-    const x = rand(3, target - 3);
+    const target = rand(18, 40);
+    const firstNumber = rand(4, target - 6);
+    const secondNumber = target - firstNumber;
+    const shift = rand(1, Math.min(4, secondNumber - 1));
     if (role === "apply_create") {
       return typed(
-        "Find the second number.",
-        target - x,
-        `Subtract ${x} from ${target}.`,
-        promptVisual("Pairs that fit", [{ tokens: [`${x}`, "+", "?", "=", `${target}`] }]),
+        "Complete the pair.",
+        firstNumber,
+        `Subtract ${secondNumber} from ${target}.`,
+        promptVisual("Pair that fits", [{ tokens: ["?", "+", `${secondNumber}`, "=", `${target}`] }]),
       );
     }
     if (role === "reasoning") {
-      return mcq(
-        `How many whole-number pairs (each at least 1) make ? + ? = ${target}?`,
-        target - 1,
-        [target, target + 1, 1],
-        "List them: (1, ...), (2, ...) and so on.",
+      return typed(
+        "Keep the total the same.",
+        secondNumber - shift,
+        `The first number increased by ${shift}, so the second decreases by ${shift}.`,
+        promptVisual("Linked pairs", [
+          { label: "First pair", tokens: [`${firstNumber}`, "+", `${secondNumber}`, "=", `${target}`] },
+          { label: "New pair", tokens: [`${firstNumber + shift}`, "+", "?", "=", `${target}`] },
+        ]),
       );
     }
-    return mcq(
-      `Which pair adds to ${target}?`,
-      `${x} + ${target - x}`,
-      [`${x} + ${target - x + 1}`, `${target} + ${x}`],
-      `The two numbers must total ${target}.`,
+    return typed(
+      "Complete the pair.",
+      secondNumber,
+      `Subtract ${firstNumber} from ${target}.`,
+      promptVisual("Pair that fits", [{ tokens: [`${firstNumber}`, "+", "?", "=", `${target}`] }]),
     );
   }
 

@@ -497,6 +497,24 @@ for (const activity of levelFiveExposeFlaw.activities ?? []) {
   }
 }
 
+const levelSixUnknownPairs = PATTERN_PEAKS_PROGRAMS["Year 6"][5]!.lessons[2]!;
+assert(
+  (levelSixUnknownPairs.activities ?? []).every((activity) => activity.activityType === "typed_response"),
+  "Find Pairs of Unknowns must use typed equation tasks in every rotation.",
+);
+for (const activity of levelSixUnknownPairs.activities ?? []) {
+  for (let sample = 0; sample < 50; sample += 1) {
+    const question = generatePatternPeaksQuestion(getLevelForLesson(levelSixUnknownPairs), levelSixUnknownPairs, activity);
+    assert.equal(question.kind, "typed_response", "Find Pairs of Unknowns retained a multiple-choice task.");
+    assert(!/how many whole-number pairs|which pair/i.test(question.prompt), "Find Pairs of Unknowns retained a pair-counting or selection prompt.");
+    assert.equal(question.visual?.type, "expression_flow", "Find Pairs of Unknowns needs a visible equation pair.");
+    assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Find Pairs of Unknowns needs one inline answer field.");
+    assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, "Find Pairs of Unknowns generated an invalid pair value.");
+    const speech = getPatternQuestionReadAloudText(question);
+    assert(speech.includes(question.prompt) && speech.includes("blank"), "Find Pairs of Unknowns read-aloud omitted the equation or blank.");
+  }
+}
+
 const levelFiveConstructEquivalent = PATTERN_PEAKS_PROGRAMS["Year 5"][3]!.lessons[2]!;
 for (const activity of levelFiveConstructEquivalent.activities ?? []) {
   for (let sample = 0; sample < 30; sample += 1) {
