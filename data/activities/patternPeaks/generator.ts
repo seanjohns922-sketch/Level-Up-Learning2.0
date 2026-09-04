@@ -1130,8 +1130,8 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
 
   // Week 1 — Multiplication and Division Inverses (AC9M5A01).
   if (week === 1) {
-    const a = rand(3, 9);
-    const b = rand(3, 9);
+    const a = rand(4, 12);
+    const b = rand(4, 12);
     const p = a * b;
 
     if (lessonNumber === 1) {
@@ -1311,8 +1311,8 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
 
   // Week 3 — Unknown Multiplicative Parts (AC9M5A01, AC9M5A02).
   if (week === 3) {
-    const a = rand(3, 9);
-    const b = rand(3, 9);
+    const a = rand(4, 11);
+    const b = rand(4, 11);
     const p = a * b;
 
     if (lessonNumber === 1) {
@@ -1520,10 +1520,12 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
       // Regroup Three Factors — calculate both bracketed paths instead of judging a preferred strategy.
       const trio = pick([
         [2, 7, 5],
-        [5, 3, 2],
-        [2, 9, 5],
         [4, 7, 5],
-        [5, 6, 2],
+        [3, 8, 5],
+        [4, 6, 5],
+        [2, 9, 6],
+        [6, 4, 5],
+        [3, 7, 6],
       ]);
       const [x, y, z] = trio as [number, number, number];
       const answer = x * y * z;
@@ -1683,10 +1685,10 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
     if (lessonNumber === 1) {
       // Use Factor Clues.
       const set = pick([
-        { n: 24, factors: [2, 3, 4, 6, 8, 12], pairs: [[1, 24], [2, 12], [3, 8], [4, 6]] },
         { n: 36, factors: [2, 3, 4, 6, 9, 12, 18], pairs: [[1, 36], [2, 18], [3, 12], [4, 9], [6, 6]] },
-        { n: 30, factors: [2, 3, 5, 6, 10, 15], pairs: [[1, 30], [2, 15], [3, 10], [5, 6]] },
         { n: 40, factors: [2, 4, 5, 8, 10, 20], pairs: [[1, 40], [2, 20], [4, 10], [5, 8]] },
+        { n: 48, factors: [2, 3, 4, 6, 8, 12, 16, 24], pairs: [[1, 48], [2, 24], [3, 16], [4, 12], [6, 8]] },
+        { n: 60, factors: [2, 3, 4, 5, 6, 10, 12, 15, 20, 30], pairs: [[1, 60], [2, 30], [3, 20], [4, 15], [5, 12], [6, 10]] },
       ]);
       const aFactor = pick(set.factors);
       const partner = set.n / aFactor;
@@ -1730,8 +1732,8 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
 
     if (lessonNumber === 2) {
       // Use Multiple Clues — combine constraints.
-      const factor = pick([3, 4, 6, 7, 8]);
-      const k = rand(3, 8);
+      const factor = pick([4, 6, 7, 8, 9]);
+      const k = rand(5, 12);
       const target = factor * k;
       const hi = target + factor;
       if (role === "apply_create") {
@@ -1760,11 +1762,10 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
 
     // L3 Find All Solutions.
     const set = pick([
-      { n: 12, pairs: [[1, 12], [2, 6], [3, 4]] },
-      { n: 18, pairs: [[1, 18], [2, 9], [3, 6]] },
-      { n: 20, pairs: [[1, 20], [2, 10], [4, 5]] },
       { n: 24, pairs: [[1, 24], [2, 12], [3, 8], [4, 6]] },
       { n: 36, pairs: [[1, 36], [2, 18], [3, 12], [4, 9], [6, 6]] },
+      { n: 48, pairs: [[1, 48], [2, 24], [3, 16], [4, 12], [6, 8]] },
+      { n: 60, pairs: [[1, 60], [2, 30], [3, 20], [4, 15], [5, 12], [6, 10]] },
     ]);
     const count = set.pairs.length;
     if (role === "apply_create") {
@@ -1802,8 +1803,8 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
   // Week 8 — Multiplicative Mystery (AC9M5A01, AC9M5A02): integrate inverse,
   // property and equivalence reasoning across a connected investigation.
   if (week === 8) {
-    const a = rand(3, 9);
-    const b = rand(3, 9);
+    const a = rand(4, 10);
+    const b = rand(4, 10);
     const p = a * b;
 
     if (lessonNumber === 1) {
@@ -1835,7 +1836,7 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
 
     if (lessonNumber === 2) {
       // Solve the Connected Equations — the first result feeds the second.
-      const m = rand(3, 6);
+      const m = rand(4, 9);
       const second = b * m;
       // Card 1 is already solved (only card 2 holds the "?" the student types).
       const chain = promptVisual("Connected equations", [
