@@ -14,6 +14,11 @@ export type PatternPeaksLessonConceptIntro = {
     pairs: Array<[number, number]>;
     nonFactor: number;
   };
+  multipleModel?: {
+    base: number;
+    multipliers: number[];
+    nonMultiple: number;
+  };
 };
 
 type LessonSeed = { title: string; focus: string; mechanic: string; curriculum: CurriculumCode[] };
@@ -449,6 +454,19 @@ const LEVEL5_WEEK7_FACTOR_INTRO: PatternPeaksLessonConceptIntro = {
   },
 };
 
+const LEVEL5_WEEK7_MULTIPLE_INTRO: PatternPeaksLessonConceptIntro = {
+  term: "Multiple",
+  title: "Multiples grow in equal jumps",
+  meaning: "A multiple is the product you get when you multiply a number by a whole number. Starting at 0, you can find multiples by repeatedly adding the same number. Multiples continue forever.",
+  example: "6 × 4 = 24",
+  exampleExplanation: "24 is a multiple of 6 because 6 multiplied by the whole number 4 equals 24. It also appears in the 6 times table.",
+  multipleModel: {
+    base: 6,
+    multipliers: [0, 1, 2, 3, 4, 5],
+    nonMultiple: 25,
+  },
+};
+
 export function getPatternPeaksLessonConceptIntro(
   yearLabel: PatternPeaksYearLabel,
   week: number,
@@ -456,6 +474,7 @@ export function getPatternPeaksLessonConceptIntro(
 ) {
   if (yearLabel === "Year 4" && week === 4) return LEVEL4_WEEK4_CONCEPT_INTROS[lessonNumber];
   if (yearLabel === "Year 5" && week === 7 && lessonNumber === 1) return LEVEL5_WEEK7_FACTOR_INTRO;
+  if (yearLabel === "Year 5" && week === 7 && lessonNumber === 2) return LEVEL5_WEEK7_MULTIPLE_INTRO;
   return undefined;
 }
 

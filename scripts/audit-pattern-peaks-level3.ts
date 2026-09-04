@@ -404,10 +404,18 @@ assert(levelFiveFactorIntro?.meaning.includes("Factors are numbers you multiply 
 assert(levelFiveFactorIntro?.meaning.toLowerCase().includes("no remainder"), "The factor introduction must explain exact division.");
 assert.deepEqual(levelFiveFactorIntro?.factorModel?.pairs, [[1, 12], [2, 6], [3, 4]], "The factor introduction must show multiple factor-pair arrays.");
 assert.equal(levelFiveFactorIntro?.factorModel?.nonFactor, 5, "The factor introduction must contrast a non-factor.");
-assert.equal(getPatternPeaksLessonConceptIntro("Year 5", 7, 2), undefined, "The factor introduction must only appear before Use Factor Clues.");
+const levelFiveMultipleIntro = getPatternPeaksLessonConceptIntro("Year 5", 7, 2);
+assert.equal(levelFiveMultipleIntro?.term, "Multiple", "Use Multiple Clues must introduce the word multiple before questioning begins.");
+assert(levelFiveMultipleIntro?.meaning.includes("product you get when you multiply"), "The multiple introduction must use a child-friendly multiplication definition.");
+assert(levelFiveMultipleIntro?.meaning.includes("continue forever"), "The multiple introduction must explain that multiples do not stop.");
+assert.deepEqual(levelFiveMultipleIntro?.multipleModel?.multipliers, [0, 1, 2, 3, 4, 5], "The multiple introduction must show repeated equal jumps from zero.");
+assert.equal(levelFiveMultipleIntro?.multipleModel?.nonMultiple, 25, "The multiple introduction must contrast a non-multiple.");
+assert.equal(getPatternPeaksLessonConceptIntro("Year 5", 7, 3), undefined, "Week 7 vocabulary introductions must not leak into Find All Solutions.");
 const lessonConceptIntroSource = fs.readFileSync(path.join(root, "components/lesson/RealmLessonHome.tsx"), "utf8");
 assert(lessonConceptIntroSource.includes("Factor pairs make exact arrays"), "The factor introduction is missing its visual factor-pair model.");
 assert(lessonConceptIntroSource.includes("factorModelText"), "The factor-pair model must be included in read-aloud text.");
+assert(lessonConceptIntroSource.includes("Multiples form equal jumps"), "The multiple introduction is missing its equal-jump model.");
+assert(lessonConceptIntroSource.includes("multipleModelText"), "The multiple model must be included in read-aloud text.");
 
 const levelFiveFactorClues = PATTERN_PEAKS_PROGRAMS["Year 5"][6]!.lessons[0]!;
 assert(

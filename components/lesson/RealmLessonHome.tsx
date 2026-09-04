@@ -207,6 +207,11 @@ export type LessonConceptIntroData = {
     pairs: Array<[number, number]>;
     nonFactor: number;
   };
+  multipleModel?: {
+    base: number;
+    multipliers: number[];
+    nonMultiple: number;
+  };
 };
 
 // The "Meet the idea" teaching card. Shared so it can appear either on the
@@ -223,8 +228,13 @@ export function LessonConceptIntro({
   const factorModelText = conceptIntro.factorModel
     ? `The factor pairs for ${conceptIntro.factorModel.product} shown here are ${conceptIntro.factorModel.pairs.map(([left, right]) => `${left} times ${right}`).join(", ")}. ${conceptIntro.factorModel.nonFactor} is not a factor because ${conceptIntro.factorModel.product} divided by ${conceptIntro.factorModel.nonFactor} leaves a remainder of ${conceptIntro.factorModel.product % conceptIntro.factorModel.nonFactor}.`
     : "";
-  const conceptText = `${conceptIntro.term}. ${conceptIntro.title}. ${conceptIntro.meaning} For example, ${conceptIntro.example}. ${conceptIntro.exampleExplanation} ${factorModelText}`;
+  const multipleModelText = conceptIntro.multipleModel
+    ? `The multiples of ${conceptIntro.multipleModel.base} shown here are ${conceptIntro.multipleModel.multipliers.map((multiplier) => conceptIntro.multipleModel!.base * multiplier).join(", ")}. Each jump adds ${conceptIntro.multipleModel.base}. ${conceptIntro.multipleModel.nonMultiple} is not a multiple of ${conceptIntro.multipleModel.base} because it is not in that equal-jump sequence.`
+    : "";
+  const conceptText = `${conceptIntro.term}. ${conceptIntro.title}. ${conceptIntro.meaning} For example, ${conceptIntro.example}. ${conceptIntro.exampleExplanation} ${factorModelText} ${multipleModelText}`;
   const factorCheck = conceptIntro.factorModel?.pairs.at(-1)?.[0] ?? 1;
+  const multipleCheckMultiplier = conceptIntro.multipleModel?.multipliers.find((multiplier) => multiplier > 1) ?? 1;
+  const multipleCheckValue = (conceptIntro.multipleModel?.base ?? 1) * multipleCheckMultiplier;
   return (
     <section
       className="overflow-hidden rounded-lg border p-5 sm:p-6"
@@ -280,6 +290,39 @@ export function LessonConceptIntro({
             </div>
             <div className="rounded-lg border border-rose-300/25 bg-rose-400/10 px-4 py-3 font-black text-rose-100">
               {conceptIntro.factorModel.product} ÷ {conceptIntro.factorModel.nonFactor} = 2 remainder {conceptIntro.factorModel.product % conceptIntro.factorModel.nonFactor} · not a factor
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {conceptIntro.multipleModel ? (
+        <div className="mt-5 rounded-lg border border-white/10 bg-black/20 p-4 sm:p-5">
+          <div className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accentSoft }}>
+            Multiples form equal jumps
+          </div>
+          <div className="mt-4 overflow-x-auto pb-2">
+            <div className="flex min-w-max items-center gap-2">
+              {conceptIntro.multipleModel.multipliers.map((multiplier, index) => {
+                const value = conceptIntro.multipleModel!.base * multiplier;
+                return (
+                  <div key={multiplier} className="flex items-center gap-2">
+                    {index > 0 ? <span className="text-xl font-black" style={{ color: theme.accent }}>→</span> : null}
+                    <div className="rounded-lg border border-white/10 bg-white/10 px-4 py-3 text-center">
+                      <div className="text-xs font-bold" style={{ color: theme.accentSoft }}>
+                        {conceptIntro.multipleModel!.base} × {multiplier}
+                      </div>
+                      <div className="mt-1 text-2xl font-black text-white">{value}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-lg border border-emerald-300/25 bg-emerald-400/10 px-4 py-3 font-black text-emerald-100">
+              {multipleCheckValue} is in the {conceptIntro.multipleModel.base} times table · multiple ✓
+            </div>
+            <div className="rounded-lg border border-rose-300/25 bg-rose-400/10 px-4 py-3 font-black text-rose-100">
+              {conceptIntro.multipleModel.nonMultiple} is not in the {conceptIntro.multipleModel.base} times table · not a multiple
             </div>
           </div>
         </div>
