@@ -262,6 +262,37 @@ function weekDotColor(accuracy: number | null): string {
   return "#DC2626";
 }
 
+// Keep the expanded lesson cards in the same three accuracy bands as the
+// four at-a-glance circles: green >=80, amber 50–79, red <50.
+function lessonAccuracyTone(accuracy: number | null) {
+  if (accuracy == null) {
+    return {
+      card: "border-[#E6E8EC] bg-white hover:border-teal-300",
+      badge: "bg-slate-100 text-slate-500",
+      accuracy: "text-[#475569]",
+    };
+  }
+  if (accuracy >= 80) {
+    return {
+      card: "border-green-300 bg-green-50/70 hover:border-green-400",
+      badge: "bg-green-600 text-white",
+      accuracy: "text-green-700",
+    };
+  }
+  if (accuracy >= 50) {
+    return {
+      card: "border-amber-300 bg-amber-50/70 hover:border-amber-400",
+      badge: "bg-amber-500 text-white",
+      accuracy: "text-amber-700",
+    };
+  }
+  return {
+    card: "border-red-300 bg-red-50/70 hover:border-red-400",
+    badge: "bg-red-600 text-white",
+    accuracy: "text-red-700",
+  };
+}
+
 // Clean strand labels + a realm accent for the strand selector. The realm
 // registry uses verbose names ("Reading Comprehension & Fluency"); here reading
 // is just Reading, so the picker stays scannable.
@@ -1362,6 +1393,7 @@ function StudentStrandDetail({
                   accuracy: null,
                   attemptCount: 0,
                 };
+              const accuracyTone = lessonAccuracyTone(performance.accuracy);
               return (
                 <button
                   key={lsn.id}
@@ -1369,8 +1401,8 @@ function StudentStrandDetail({
                   onClick={() => setPreviewLesson(lsn)}
                   title="Click to preview lesson content"
                   className={[
-                    "text-left rounded-xl border p-3 flex flex-col gap-2 transition hover:border-teal-300 hover:shadow-sm cursor-pointer",
-                    done ? "border-emerald-200 bg-emerald-50/40" : "border-[#E6E8EC] bg-white",
+                    "text-left rounded-xl border p-3 flex flex-col gap-2 transition hover:shadow-sm cursor-pointer",
+                    accuracyTone.card,
                   ].join(" ")}
                 >
                   <div className="flex items-center justify-between">
@@ -1379,11 +1411,7 @@ function StudentStrandDetail({
                     </span>
                     <span className={[
                       "text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded",
-                      performance.status === "Completed"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : performance.status === "In Progress"
-                          ? "bg-amber-100 text-amber-700"
-                          : "bg-slate-100 text-slate-500",
+                      accuracyTone.badge,
                     ].join(" ")}>
                       {performance.status}
                     </span>
@@ -1400,7 +1428,7 @@ function StudentStrandDetail({
                         ? `${performance.correct} / ${performance.total}`
                         : "— / —"}
                     </div>
-                    <div className="font-semibold text-[#475569]">
+                    <div className={`font-semibold ${accuracyTone.accuracy}`}>
                       {performance.accuracy != null
                         ? `${formatAccuracy(performance.correct, performance.total)} accuracy`
                         : "— accuracy"}
