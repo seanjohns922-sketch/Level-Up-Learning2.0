@@ -2045,31 +2045,31 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     const show = t.map((v) => `${v}`);
 
     if (reverse) {
-      // Reverse the Pattern — recover the start term.
+      // Reverse the Pattern — recover an earlier term by reasoning backwards.
       if (role === "apply_create") {
         return typed(
           "Type the starting term.",
           t[0]!.toFixed(2),
-          "Work out the step from the terms you can see, then step back once.",
+          "Work out the step, then step back from the first number.",
           sequenceVisual("Reverse the sequence", ["?", show[1]!, show[2]!, show[3]!, show[4]!]),
           [String(t[0]), t[0]!.toFixed(2)],
         );
       }
       if (role === "reasoning") {
         return mcq(
-          "To go back one step, you...?",
-          "Subtract the step",
-          ["Add the step", "Divide by the step"],
-          "Reverse the operation to travel backwards.",
+          `What number comes just before ${t[1]}?`,
+          `${t[0]}`,
+          [`${t[2]}`, `${t[3]}`],
+          "Step back once from the first number shown.",
           sequenceVisual("Reverse the sequence", [show[1]!, show[2]!, show[3]!, show[4]!]),
         );
       }
       return mcq(
-        "Working backwards uses the...?",
-        "opposite operation",
-        ["same operation", "biggest number"],
-        "Undo each step to travel back.",
-        sequenceVisual("Reverse the sequence", [show[1]!, show[2]!, show[3]!, show[4]!]),
+        "How much does each step add?",
+        `${step}`,
+        [`${Number((step * 2).toFixed(2))}`, `${Number((step / 2).toFixed(2))}`],
+        "Subtract one term from the next.",
+        sequenceVisual("Reverse the sequence", show),
       );
     }
 
