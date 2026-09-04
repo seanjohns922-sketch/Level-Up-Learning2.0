@@ -31,6 +31,7 @@ import TableToPairCardsVisual from "@/components/activities/TableToPairCardsVisu
 import MiniCoordinatePreviewVisual from "@/components/activities/MiniCoordinatePreviewVisual";
 import CartesianGridVisual from "@/components/activities/CartesianGridVisual";
 import ExpressionFlowVisual from "@/components/activities/ExpressionFlowVisual";
+import FactorPairTreeVisual from "@/components/activities/FactorPairTreeVisual";
 import {
   BalanceEquationCardVisual,
   BracketEquationCardVisual,
@@ -2875,6 +2876,14 @@ export default function TypedResponseActivity({
       ) : null}
       {questionData.visual?.type === "expression_flow" ? (
         <ExpressionFlowVisual
+          visual={questionData.visual}
+          answerValue={hasInlineVisualInput ? typed : undefined}
+          onAnswerChange={hasInlineVisualInput ? setTyped : undefined}
+          answerInputMode={inlineAnswerInputMode}
+        />
+      ) : null}
+      {questionData.visual?.type === "factor_pair_tree" ? (
+        <FactorPairTreeVisual
           visual={questionData.visual}
           answerValue={hasInlineVisualInput ? typed : undefined}
           onAnswerChange={hasInlineVisualInput ? setTyped : undefined}

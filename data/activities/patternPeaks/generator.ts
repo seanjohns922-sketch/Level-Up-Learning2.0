@@ -2,6 +2,7 @@ import type {
   BalanceEquationCardVisualData,
   BracketEquationCardVisualData,
   ExpressionFlowVisualData,
+  FactorPairTreeVisualData,
   FunctionMachineCardVisualData,
   GrowingPatternVisualData,
   InputOutputTableVisualData,
@@ -21,6 +22,7 @@ type QuestionVisual =
   | FunctionMachineCardVisualData
   | InputOutputTableVisualData
   | ExpressionFlowVisualData
+  | FactorPairTreeVisualData
   | BalanceEquationCardVisualData
   | InverseStepCardVisualData
   | UnknownTileEquationVisualData
@@ -35,6 +37,7 @@ const PATTERN_VISUAL_TYPES = new Set([
   "function_machine_card",
   "input_output_table",
   "expression_flow",
+  "factor_pair_tree",
   "balance_equation_card",
   "inverse_step_card",
   "unknown_tile_equation",
@@ -1700,34 +1703,48 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
     if (lessonNumber === 1) {
       // Use Factor Clues.
       const set = pick([
-        { n: 24, factors: [2, 3, 4, 6, 8, 12], notFactor: 5 },
-        { n: 36, factors: [2, 3, 4, 6, 9, 12, 18], notFactor: 5 },
-        { n: 30, factors: [2, 3, 5, 6, 10, 15], notFactor: 4 },
-        { n: 40, factors: [2, 4, 5, 8, 10, 20], notFactor: 3 },
+        { n: 24, factors: [2, 3, 4, 6, 8, 12], pairs: [[1, 24], [2, 12], [3, 8], [4, 6]] },
+        { n: 36, factors: [2, 3, 4, 6, 9, 12, 18], pairs: [[1, 36], [2, 18], [3, 12], [4, 9], [6, 6]] },
+        { n: 30, factors: [2, 3, 5, 6, 10, 15], pairs: [[1, 30], [2, 15], [3, 10], [5, 6]] },
+        { n: 40, factors: [2, 4, 5, 8, 10, 20], pairs: [[1, 40], [2, 20], [4, 10], [5, 8]] },
       ]);
       const aFactor = pick(set.factors);
+      const partner = set.n / aFactor;
       if (role === "apply_create") {
+        const missingIndex = rand(0, set.pairs.length - 1);
+        const missingPair = set.pairs[missingIndex]!;
+        const tree: FactorPairTreeVisualData = {
+          type: "factor_pair_tree",
+          title: "Complete the factor-pair tree",
+          product: set.n,
+          pairs: set.pairs.map(([left, right], index) => ({
+            left: String(left),
+            right: index === missingIndex ? "?" : String(right),
+          })),
+        };
         return typed(
-          `Type a factor of ${set.n} (not 1 or ${set.n}).`,
-          set.factors[0]!,
-          `A factor divides ${set.n} exactly.`,
-          undefined,
-          set.factors.map(String),
+          `Complete the missing factor pair for ${set.n}.`,
+          missingPair[1]!,
+          `Every branch must multiply to make ${set.n}. Use the known factor on the incomplete branch.`,
+          tree,
         );
       }
       if (role === "reasoning") {
-        return mcq(
-          `Which number is a factor of ${set.n}?`,
-          aFactor,
-          [set.notFactor, set.n + 1],
-          `It divides ${set.n} with no remainder.`,
+        return typed(
+          "Find the missing factor partner.",
+          partner,
+          `Find the whole number that multiplies by ${aFactor} to make ${set.n}.`,
+          unknownVisual("Build a factor pair", `${aFactor} × □`, `${set.n}`),
         );
       }
-      return mcq(
-        `Which number is NOT a factor of ${set.n}?`,
-        set.notFactor,
-        [set.factors[0]!, set.factors[1]!],
-        "A factor divides with no remainder.",
+      return typed(
+        "Use exact division to find the quotient.",
+        partner,
+        "A whole-number quotient with no remainder confirms a factor pair.",
+        promptVisual("Factor scanner", [
+          { label: "Exact division check", tokens: [`${set.n}`, "÷", `${aFactor}`, "=", "?"] },
+          { label: "Remainder", tokens: ["0", "✓"] },
+        ]),
       );
     }
 

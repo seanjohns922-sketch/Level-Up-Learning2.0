@@ -22,6 +22,12 @@ export function countInlineMathAnswerSlots(visual: TypedResponseQuestion["visual
       0,
     );
   }
+  if (visual.type === "factor_pair_tree") {
+    return visual.pairs.reduce(
+      (total, pair) => total + (pair.left === "?" ? 1 : 0) + (pair.right === "?" ? 1 : 0),
+      0,
+    );
+  }
   if (visual.type === "balance_equation_card" || visual.type === "unknown_tile_equation") {
     const marker = visual.unknownSymbol ?? "□";
     return countTextOccurrences(visual.left, marker) + countTextOccurrences(visual.right, marker);

@@ -409,6 +409,41 @@ const lessonConceptIntroSource = fs.readFileSync(path.join(root, "components/les
 assert(lessonConceptIntroSource.includes("Factor pairs make exact arrays"), "The factor introduction is missing its visual factor-pair model.");
 assert(lessonConceptIntroSource.includes("factorModelText"), "The factor-pair model must be included in read-aloud text.");
 
+const levelFiveFactorClues = PATTERN_PEAKS_PROGRAMS["Year 5"][6]!.lessons[0]!;
+assert(
+  (levelFiveFactorClues.activities ?? []).every((activity) => activity.activityType === "typed_response"),
+  "Use Factor Clues must use typed calculations in every rotation.",
+);
+for (const activity of levelFiveFactorClues.activities ?? []) {
+  for (let sample = 0; sample < 40; sample += 1) {
+    const question = generatePatternPeaksQuestion(5, levelFiveFactorClues, activity);
+    assert.equal(question.kind, "typed_response", "Use Factor Clues retained a multiple-choice recognition task.");
+    assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, "Use Factor Clues generated an invalid numeric answer.");
+    assert(!/which number|not a factor|type a factor/i.test(question.prompt), "Use Factor Clues retained a bland factor-selection prompt.");
+    assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Use Factor Clues needs one inline numeric answer field.");
+    if (activity.config.rotationRole === "apply_create") {
+      assert.equal(question.visual?.type, "factor_pair_tree", "The apply/create rotation must use the factor-pair tree.");
+      if (question.visual?.type === "factor_pair_tree") {
+        assert(question.visual.pairs.length >= 4, "The factor-pair tree must show the complete set of branches.");
+        assert.equal(
+          question.visual.pairs.filter((pair) => pair.left === "?" || pair.right === "?").length,
+          1,
+          "The factor-pair tree must contain exactly one incomplete branch.",
+        );
+      }
+    } else if (activity.config.rotationRole === "reasoning") {
+      assert.equal(question.visual?.type, "unknown_tile_equation", "Missing factor partners need a visible multiplication equation.");
+    } else {
+      assert.equal(question.visual?.type, "expression_flow", "The factor scanner needs a visible exact-division check.");
+    }
+    const speech = getPatternQuestionReadAloudText(question);
+    assert(speech.includes(question.prompt) && speech.includes("blank"), "Use Factor Clues read-aloud must include the question and missing value.");
+  }
+}
+const factorPairTreeSource = fs.readFileSync(path.join(root, "components/activities/FactorPairTreeVisual.tsx"), "utf8");
+assert(factorPairTreeSource.includes("Factor pairs"), "The factor-pair tree renderer is missing its branch label.");
+assert(factorPairTreeSource.includes("InlineMathAnswerInput"), "The factor-pair tree must accept the answer inside the missing branch.");
+
 const levelFiveConstructEquivalent = PATTERN_PEAKS_PROGRAMS["Year 5"][3]!.lessons[2]!;
 for (const activity of levelFiveConstructEquivalent.activities ?? []) {
   for (let sample = 0; sample < 30; sample += 1) {

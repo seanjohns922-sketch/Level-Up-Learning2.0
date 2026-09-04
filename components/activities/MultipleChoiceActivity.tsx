@@ -31,6 +31,7 @@ import TableToPairCardsVisual from "@/components/activities/TableToPairCardsVisu
 import MiniCoordinatePreviewVisual from "@/components/activities/MiniCoordinatePreviewVisual";
 import CartesianGridVisual from "@/components/activities/CartesianGridVisual";
 import ExpressionFlowVisual from "@/components/activities/ExpressionFlowVisual";
+import FactorPairTreeVisual from "@/components/activities/FactorPairTreeVisual";
 import {
   BalanceEquationCardVisual,
   BracketEquationCardVisual,
@@ -397,6 +398,9 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.visual?.type === "expression_flow" ? (
         <ExpressionFlowVisual visual={questionData.visual} />
+      ) : null}
+      {questionData.visual?.type === "factor_pair_tree" ? (
+        <FactorPairTreeVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "balance_equation_card" ? (
         <BalanceEquationCardVisual visual={questionData.visual} />

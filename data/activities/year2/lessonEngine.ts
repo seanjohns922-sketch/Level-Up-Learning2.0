@@ -3335,6 +3335,16 @@ export type ExpressionFlowVisualData = {
   }>;
 };
 
+export type FactorPairTreeVisualData = {
+  type: "factor_pair_tree";
+  title: string;
+  product: number;
+  pairs: Array<{
+    left: string;
+    right: string;
+  }>;
+};
+
 export type BalanceEquationCardVisualData = {
   type: "balance_equation_card";
   title: string;
@@ -3479,6 +3489,7 @@ export type MultipleChoiceQuestion = {
     | MiniCoordinatePreviewVisualData
     | CartesianGridVisualData
     | ExpressionFlowVisualData
+    | FactorPairTreeVisualData
     | BalanceEquationCardVisualData
     | InverseStepCardVisualData
     | UnknownTileEquationVisualData
@@ -3558,6 +3569,7 @@ export type TypedResponseQuestion = {
     | MiniCoordinatePreviewVisualData
     | CartesianGridVisualData
     | ExpressionFlowVisualData
+    | FactorPairTreeVisualData
     | BalanceEquationCardVisualData
     | InverseStepCardVisualData
     | UnknownTileEquationVisualData

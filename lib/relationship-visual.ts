@@ -12,6 +12,7 @@ const RELATIONSHIP_VISUAL_TYPES = new Set([
   "mini_coordinate_preview",
   "cartesian_grid",
   "expression_flow",
+  "factor_pair_tree",
   "balance_equation_card",
   "inverse_step_card",
   "unknown_tile_equation",
