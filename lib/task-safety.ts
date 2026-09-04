@@ -16,7 +16,11 @@ function hasTypedResponseShape(question: Extract<Year2QuestionData, { kind: "typ
 
 export function canRenderByGeneratedKind(activity: LessonActivity) {
   const mode = typeof activity.config?.mode === "string" ? activity.config.mode : "";
-  return mode.startsWith("y6_");
+  // Pattern Peaks lessons let the generator choose each question's kind, so a
+  // "solve the ?" item can render as a typed input even in a rotation slot that
+  // was seeded as multiple choice.
+  const isPatternPeaks = typeof activity.config?.patternSkill === "string";
+  return mode.startsWith("y6_") || isPatternPeaks;
 }
 
 export function isLessonQuestionSafe(

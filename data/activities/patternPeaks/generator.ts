@@ -1194,7 +1194,7 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           `${a} × ? = ${p}`,
           [`${a} + ? = ${p}`, `${p} × ? = ${a}`],
           "Turn the division into a matching multiplication.",
-          promptVisual("Turn division around", [{ tokens: [`${p}`, "÷", `${a}`, "=", "?"] }]),
+          promptVisual("Turn division around", [{ tokens: [`${p}`, "÷", `${a}`] }]),
         );
       }
       return mcq(
@@ -1348,13 +1348,11 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           `${p} ÷ ${a}`,
           [`${p} × ${a}`, `${p} − ${a}`],
           "Divide the product by the known factor.",
-          promptVisual("Unknown factor", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
         );
       }
-      return mcq(
-        "Which is the missing product?",
+      return typed(
+        "Find the missing product.",
         p,
-        [p + a, p - b, p + 1],
         "Multiply the two factors.",
         promptVisual("Unknown product", [{ tokens: [`${a}`, "×", `${b}`, "=", "?"] }]),
       );
@@ -1376,13 +1374,11 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           `${a} × ${b}`,
           [`${a} ÷ ${b}`, `${a} + ${b}`],
           "Multiply the quotient by the divisor.",
-          promptVisual("Unknown dividend", [{ tokens: ["?", "÷", `${b}`, "=", `${a}`] }]),
         );
       }
-      return mcq(
+      return typed(
         "Find the missing dividend.",
         p,
-        [p + b, p - b, a + b],
         "Multiply back to the total.",
         promptVisual("Unknown dividend", [{ tokens: ["?", "÷", `${b}`, "=", `${a}`] }]),
       );
@@ -1408,11 +1404,10 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         promptVisual("Scale the fact", [{ tokens: [`${a}`, "×", `${b}`, "=", `${p}`] }]),
       );
     }
-    return mcq(
-      `What is ${bigP} ÷ ${tens}?`,
-      b,
-      [b + 1, b - 1, tens],
+    return typed(
       "Divide using the matching small fact.",
+      b,
+      `${bigP} ÷ ${tens} — think ${p} ÷ ${a}.`,
       promptVisual("Large-number inverse", [{ tokens: [`${bigP}`, "÷", `${tens}`, "=", "?"] }]),
     );
   }
@@ -1686,13 +1681,10 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
     }
     if (role === "reasoning") {
       return mcq(
-        "Both blanks are the same. What is the hidden factor?",
+        `? × 10 + ? × ${c} = ${total}, and both ? are equal. What is the hidden factor?`,
         f,
         [f + 1, f - 1],
         "The factor is shared by both parts.",
-        promptVisual("Find the hidden factor", [
-          { tokens: ["?", "×", "10", "+", "?", "×", `${c}`, "=", `${total}`] },
-        ]),
       );
     }
     return mcq(
@@ -1822,7 +1814,6 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           `${p} ÷ ${a}`,
           [`${p} × ${a}`, `${p} − ${a}`],
           "Divide to recover the factor.",
-          promptVisual("Analyse the evidence", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
         );
       }
       return mcq(
@@ -1857,13 +1848,11 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
           "Its answer is the factor in the next equation",
           ["It uses the biggest numbers", "It is a division"],
           "Each solved unknown feeds the next.",
-          chain,
         );
       }
-      return mcq(
-        `In ${a} × ? = ${p}, what is the factor?`,
+      return typed(
+        "Find the first factor.",
         b,
-        [b + 1, b - 1, m],
         `Divide ${p} ÷ ${a} to start the chain.`,
         promptVisual("Connected equations", [{ tokens: [`${a}`, "×", "?", "=", `${p}`] }]),
       );

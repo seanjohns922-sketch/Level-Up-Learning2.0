@@ -1290,9 +1290,15 @@ export function Year2LessonEngine({
     ? (currentQuestion as Record<string, unknown>).helper as string | undefined ?? null
     : null;
 
-  const activityLabel = currentActivity
-    ? currentActivity.activityType.replace(/_/g, " ").toUpperCase()
-    : "PRACTISE";
+  // Prefer the actual question kind so a slot seeded as multiple choice that
+  // renders a typed "?" input is labelled correctly (and vice versa).
+  const activityLabel = (() => {
+    const kind = currentQuestion?.kind;
+    if (kind === "multiple_choice" || kind === "typed_response") {
+      return kind.replace(/_/g, " ").toUpperCase();
+    }
+    return currentActivity ? currentActivity.activityType.replace(/_/g, " ").toUpperCase() : "PRACTISE";
+  })();
   const showStrategySwitchPrompt =
     isOrderedStrategyFluencyLesson(level, lesson) && questionsAnswered === 4 && status === "idle";
   const showEstimatePrompt =
