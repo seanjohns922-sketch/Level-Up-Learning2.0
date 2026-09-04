@@ -1996,10 +1996,11 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       );
     }
     return mcq(
-      `How many growth steps from Stage 1 to Stage ${laterStage}?`,
-      laterStage - 1,
-      [laterStage, laterStage - 2],
-      "Count the gaps between stages, not the stages.",
+      `The pattern adds ${growth} each stage. How much does the count grow over 2 stages?`,
+      growth * 2,
+      [growth, growth * 3],
+      `Two stages means two lots of ${growth}.`,
+      tiles,
     );
   }
 
