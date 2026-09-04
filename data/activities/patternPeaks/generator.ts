@@ -223,10 +223,6 @@ function unknownVisual(title: string, left: string, right: string, unknownSymbol
   return { type: "unknown_tile_equation", title, left, right, unknownSymbol };
 }
 
-function bracketVisual(title: string, left: string, right: string, bracketGroup?: string, outsideFactor?: string): QuestionVisual {
-  return { type: "bracket_equation_card", title, left, right, bracketGroup, outsideFactor };
-}
-
 // A problem/clue presentation card: the big expression-token chips (like the
 // worked-flow cards) but WITHOUT a "Result" line, so it looks rich without
 // revealing the answer. Use it for reasoning/mental questions.
@@ -235,22 +231,6 @@ function promptVisual(
   cards: Array<{ label?: string; tokens: string[]; note?: string }>,
 ): QuestionVisual {
   return { type: "expression_flow", title, cards };
-}
-
-function expressionVisual(title: string, expressions: string[]): QuestionVisual {
-  return {
-    type: "expression_flow",
-    title,
-    cards: expressions.map((expression, index) => {
-      const isResult = index === expressions.length - 1;
-      const outputMatch = isResult ? expression.match(/^Output\s+(.+)$/) : null;
-      return {
-        label: isResult ? "Result" : `Step ${index + 1}`,
-        tokens: outputMatch ? ["Output"] : expression.split(" "),
-        result: isResult ? (outputMatch?.[1] ?? expression) : undefined,
-      };
-    }),
-  };
 }
 
 function roleFor(activity: LessonActivity): RotationRole {
@@ -1927,108 +1907,727 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
 }
 
 function year6Question(week: number, lessonNumber: number, role: RotationRole): Year2QuestionData {
+  // Level 6 pattern (same house rules as Level 5): short prompts, the card
+  // carries the maths, the "?" is the typed answer box, cards never reveal the
+  // answer, and each week's three lessons are differentiated (see level6Seeds).
+  // Value questions are typed; concept questions are multiple choice with no
+  // "?" card.
+
+  // Week 1 — Visually Growing Patterns (AC9M6A01).
   if (week === 1) {
     const growth = rand(2, 5);
     const start = rand(1, 4);
     const counts = [start, start + growth, start + growth * 2, start + growth * 3];
-    const stage = rand(6, 10);
-    const predicted = start + growth * (stage - 1);
-    const visual = growingVisual("Visually growing pattern", counts, lessonNumber === 1 ? "tiles" : "dots");
-    if (role === "apply_create") return typed(`The rule is start at ${start}, then add ${growth} each stage. How many are in Stage ${stage}?`, predicted, "Connect the stage number to the repeated growth.", visual);
-    if (role === "reasoning") return mcq("Which rule explains every stage?", `Start at ${start}; add ${growth} each stage`, [`Multiply every stage by ${growth}`, `Add ${start} each stage`], "Compare corresponding counts, then test a later stage.", visual);
-    return mcq("How many objects are in the next stage?", counts[3]! + growth, [counts[3]!, counts[3]! + growth - 1, counts[3]! * 2], "Continue the constant growth.", visual);
-  }
+    const nextCount = start + growth * 4;
+    const laterStage = rand(7, 11);
+    const laterCount = start + growth * (laterStage - 1);
+    const tiles = growingVisual("Growing pattern", counts, "tiles");
 
-  if (week === 2) {
-    const decimal = lessonNumber !== 1;
-    const step = decimal ? pick([0.25, 0.5, 1.25]) : pick([0.5, 0.25, 0.75]);
-    const start = decimal ? pick([0.5, 1.25, 2.5]) : pick([0.25, 0.5, 1]);
-    const terms = [start, start + step, start + step * 2, start + step * 3].map((value) => Number(value.toFixed(2)));
-    const answer = Number((start + step * 4).toFixed(2));
-    const visual = sequenceVisual(decimal ? "Decimal sequence" : "Fraction sequence", [...terms, "?"], [`+${step}`, `+${step}`, `+${step}`, null]);
-    if (role === "apply_create") return typed("Type the next term.", answer, `Add ${step} to the previous term.`, visual, [answer.toFixed(2)]);
-    if (role === "reasoning") return mcq("Which statement describes the structure?", `The difference is always ${step}`, [`Each term is multiplied by ${step}`, "The difference changes each time"], "Compare consecutive terms using equivalent decimal forms.", visual);
-    return mcq("What is the next term?", answer, [answer - step, answer + step, terms[3]!], "Use the constant difference.", visual);
-  }
-
-  if (week === 3) {
-    const multiplier = rand(2, 5);
-    const add = rand(1, 6);
-    const apply = (value: number) => value * multiplier + add;
-    const pairs: Array<[number, number]> = [1, 2, 3, 4].map((input) => [input, apply(input)]);
-    const visual = tableVisual("Connect table and rule", pairs);
-    if (role === "apply_create") {
-      return typed(
-        `Use output = input × ${multiplier} + ${add}. What is the output for 10?`,
-        apply(10),
-        "Substitute the input into the complete rule.",
-        tableVisual("Connect table and rule", [...pairs, [10, "?"]]),
+    if (lessonNumber === 1) {
+      // Build the Next Stage.
+      if (role === "apply_create") {
+        return typed("How many tiles in the next stage?", nextCount, "Add the same amount one more time.", tiles);
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "What is the same from each stage to the next?",
+          `It adds ${growth}`,
+          ["It doubles", "It adds a different amount each time"],
+          "Compare each stage with the one before it.",
+          tiles,
+        );
+      }
+      return mcq(
+        "How many tiles are added each stage?",
+        growth,
+        [growth + 1, growth - 1, growth * 2],
+        "Look at the jump between two stages.",
+        tiles,
       );
     }
-    if (role === "reasoning") return mcq("How does this growth differ from simply adding the same amount to each output?", "The input is multiplied before the constant is added", ["Only the labels are different", "The output always doubles"], "Connect each table row to both operations in the rule.", visual);
-    return mcq("Which rule matches the table?", `×${multiplier}, then +${add}`, [`+${multiplier}, then ×${add}`, `×${add}, then +${multiplier}`], "Test the rule against more than one row.", visual);
-  }
 
-  if (week === 4) {
-    const multiplier = rand(2, 5);
-    const add = rand(2, 9);
-    const input = rand(2, 12);
-    const output = input * multiplier + add;
-    const visual = machineVisual("Multi-step algorithm", input, `×${multiplier}, then +${add}`, "?");
-    if (role === "apply_create") return typed(`Follow the algorithm for input ${input}.`, output, "Complete the steps in their stated order.", visual);
-    if (role === "reasoning") {
-      const secondInput = input + 1;
-      return mcq(`The next input is ${secondInput}. Which output should it create?`, secondInput * multiplier + add, [output + 1, output + add, output * 2], "Changing the input by one changes the multiplied part first.", tableVisual("Test the algorithm", [[input, output], [secondInput, "?"]]));
+    if (lessonNumber === 2) {
+      // From Picture to Table.
+      const pairs: Array<[number | string, number | string]> = [
+        [1, counts[0]!], [2, counts[1]!], [3, counts[2]!], [4, counts[3]!],
+      ];
+      if (role === "apply_create") {
+        return typed(
+          "Complete the table for Stage 5.",
+          nextCount,
+          "Keep adding the same step down the table.",
+          tableVisual("Picture to table", [...pairs, [5, "?"]]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "As the stage goes up by 1, the count goes up by...?",
+          `${growth}`,
+          [`${start}`, "double", `${growth + 1}`],
+          "Read down the count column.",
+          tableVisual("Picture to table", pairs),
+        );
+      }
+      return mcq(
+        "A table stores a pattern as pairs of...?",
+        "stage and count",
+        ["count and colour", "start and finish"],
+        "Each row links a stage number to its count.",
+      );
     }
-    return mcq("What output does the machine generate?", output, [input + multiplier + add, input * (multiplier + add), output - multiplier], "Follow multiplication before the final addition.", visual);
+
+    // L3 State and Use the Rule (predict a non-consecutive stage).
+    if (role === "apply_create") {
+      return typed(
+        `How many tiles at Stage ${laterStage}?`,
+        laterCount,
+        `Rule: start at ${start}, add ${growth} each stage.`,
+        tiles,
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        "Which rule gives the count at any stage?",
+        `Start at ${start}, add ${growth} each stage`,
+        [`Multiply the stage by ${growth}`, `Add ${growth} to the stage`],
+        "Test it on Stage 2 and Stage 3.",
+        tiles,
+      );
+    }
+    return mcq(
+      `How many growth steps from Stage 1 to Stage ${laterStage}?`,
+      laterStage - 1,
+      [laterStage, laterStage - 2],
+      "Count the gaps between stages, not the stages.",
+    );
   }
 
+  // Week 2 — Rational Number Patterns (AC9M6A01).
+  if (week === 2) {
+    if (lessonNumber === 1) {
+      // Fraction Sequences — real fractions (whole-number numerator answer).
+      const den = pick([3, 4, 5, 6, 8]);
+      const s = rand(1, 3);
+      const terms = [s, s + 1, s + 2, s + 3].map((n) => `${n}/${den}`);
+      if (role === "apply_create") {
+        return typed(
+          `The next fraction is ?/${den}. Type the missing numerator.`,
+          s + 4,
+          "The numerator goes up by 1 each step.",
+          sequenceVisual("Fraction sequence", terms),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "What is added each step?",
+          `1/${den}`,
+          [`${den}/1`, `2/${den}`, `1/${den + 1}`],
+          "Compare two neighbouring fractions.",
+          sequenceVisual("Fraction sequence", terms),
+        );
+      }
+      return mcq(
+        "These fractions are...?",
+        "getting bigger",
+        ["getting smaller", "staying equal"],
+        "Each step adds a positive amount.",
+        sequenceVisual("Fraction sequence", terms),
+      );
+    }
+
+    // L2 Decimal Sequences (missing middle term) and L3 Reverse the Pattern.
+    const reverse = lessonNumber === 3;
+    const step = pick([0.25, 0.5, 0.75, 1.25]);
+    const start = pick([0.5, 1.25, 2.5, 3]);
+    const t = [0, 1, 2, 3].map((i) => Number((start + step * i).toFixed(2)));
+
+    if (reverse) {
+      // Reverse the Pattern — recover the start term.
+      if (role === "apply_create") {
+        return typed(
+          "Type the starting term.",
+          t[0]!.toFixed(2),
+          `Each step adds ${step}, so step back by ${step}.`,
+          sequenceVisual("Reverse the sequence", ["?", `${t[1]}`, `${t[2]}`, `${t[3]}`]),
+          [String(t[0]), t[0]!.toFixed(2)],
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "To go back one step, you...?",
+          `Subtract ${step}`,
+          [`Add ${step}`, `Divide by ${step}`],
+          "Reverse the operation.",
+          sequenceVisual("Reverse the sequence", [`${t[1]}`, `${t[2]}`, `${t[3]}`]),
+        );
+      }
+      return mcq(
+        "Working backwards uses the...?",
+        "opposite operation",
+        ["same operation", "biggest number"],
+        "Undo each step to travel back.",
+      );
+    }
+
+    // L2 Decimal Sequences.
+    if (role === "apply_create") {
+      return typed(
+        "Type the missing term.",
+        t[2]!.toFixed(2),
+        `The step is ${step} each time.`,
+        sequenceVisual("Decimal sequence", [`${t[0]}`, `${t[1]}`, "?", `${t[3]}`]),
+        [String(t[2]), t[2]!.toFixed(2)],
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        "What stays constant in this sequence?",
+        `The step of ${step}`,
+        ["The digits", "The number of decimal places"],
+        "Subtract each term from the next.",
+        sequenceVisual("Decimal sequence", [`${t[0]}`, `${t[1]}`, `${t[2]}`, `${t[3]}`]),
+      );
+    }
+    return mcq(
+      "Is this sequence adding or multiplying?",
+      "adding",
+      ["multiplying", "dividing"],
+      "Check the gap between terms.",
+      sequenceVisual("Decimal sequence", [`${t[0]}`, `${t[1]}`, `${t[2]}`, `${t[3]}`]),
+    );
+  }
+
+  // Week 3 — Rules Across Representations (AC9M6A01, AC9M6A03).
+  if (week === 3) {
+    const mult = rand(2, 5);
+    const add = rand(1, 6);
+    const rule = (x: number) => x * mult + add;
+    const pairs: Array<[number | string, number | string]> = [
+      [1, rule(1)], [2, rule(2)], [3, rule(3)],
+    ];
+
+    if (lessonNumber === 1) {
+      // Match Pattern, Table and Rule.
+      if (role === "apply_create") {
+        return typed(
+          `Rule: × ${mult} then + ${add}. Fill in Stage 10.`,
+          rule(10),
+          "Put 10 through both steps in order.",
+          tableVisual("Match the rule", [...pairs, [10, "?"]]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "Which rule matches the table?",
+          `× ${mult}, then + ${add}`,
+          [`+ ${add}, then × ${mult}`, `× ${mult}, then − ${add}`],
+          "Test it against two rows.",
+          tableVisual("Match the rule", pairs),
+        );
+      }
+      return mcq(
+        "A picture, a table and a rule can all show...?",
+        "the same pattern",
+        ["different patterns", "only the answer"],
+        "Different views of one relationship.",
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Compare Growth — additive vs multiplicative.
+      const s = rand(2, 4);
+      if (role === "apply_create") {
+        return typed(
+          `A pattern multiplies by ${mult} each step from ${s}. Type step 3.`,
+          s * mult * mult,
+          "Multiply, then multiply again.",
+          sequenceVisual("Multiplying growth", [`${s}`, `${s * mult}`, "?"]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "How is multiplying growth different from adding growth?",
+          "The jumps get bigger each step",
+          ["The jumps stay the same", "It shrinks each step"],
+          "Compare the size of each gap.",
+        );
+      }
+      return mcq(
+        "Over many steps, which grows faster?",
+        `Multiplying by ${mult}`,
+        [`Adding ${add}`, "They stay equal"],
+        "Multiplying pulls ahead of adding.",
+      );
+    }
+
+    // L3 Transfer the Rule (same rule, new representation).
+    const input = rand(5, 9);
+    if (role === "apply_create") {
+      return typed(
+        `Rule: × ${mult} then + ${add}. Output for ${input}?`,
+        rule(input),
+        "The rule works the same in a table.",
+        tableVisual("Transfer the rule", [[input, "?"]]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        "A rule shown as a machine and as a table are...?",
+        "the same rule",
+        ["different rules", "opposite rules"],
+        "The steps are identical, only the display changes.",
+      );
+    }
+    return mcq(
+      `Which shows the same rule as × ${mult} then + ${add}?`,
+      `input × ${mult} + ${add}`,
+      [`input + ${mult} × ${add}`, `(input + ${mult}) × ${add}`],
+      "Match both the operations and their order.",
+    );
+  }
+
+  // Week 4 — Function Machines and Algorithms (AC9M6A03).
+  if (week === 4) {
+    const mult = rand(2, 5);
+    const add = rand(2, 9);
+    const rule = (x: number) => x * mult + add;
+
+    if (lessonNumber === 1) {
+      // Follow a Multi-Step Machine.
+      const input = rand(2, 12);
+      if (role === "apply_create") {
+        return typed(
+          "Run the machine.",
+          rule(input),
+          "Multiply first, then add.",
+          machineVisual("Multi-step machine", input, `× ${mult}, then + ${add}`, "?"),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `In × ${mult} then + ${add}, which step happens first?`,
+          `× ${mult}`,
+          [`+ ${add}`, "either order"],
+          "Follow the steps in the order written.",
+        );
+      }
+      return mcq(
+        "A function machine gives one output for each...?",
+        "input",
+        ["output", "rule"],
+        "One input in, one output out.",
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Discover the Algorithm.
+      const pairs: Array<[number | string, number | string]> = [
+        [2, rule(2)], [3, rule(3)], [4, rule(4)],
+      ];
+      if (role === "apply_create") {
+        return typed(
+          "Work out the rule, then fill in for 7.",
+          rule(7),
+          "Find what turns each input into its output.",
+          tableVisual("Discover the rule", [...pairs, [7, "?"]]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "From the pairs, which rule fits?",
+          `× ${mult}, then + ${add}`,
+          [`+ ${mult + add}`, `× ${mult + 1}`],
+          "A good rule works on every row.",
+          tableVisual("Discover the rule", pairs),
+        );
+      }
+      return mcq(
+        "To find a hidden rule you should...?",
+        "test it on more than one pair",
+        ["use only the first pair", "guess"],
+        "One pair can fit many rules.",
+      );
+    }
+
+    // L3 Create and Test a Machine (edge cases).
+    if (role === "apply_create") {
+      return typed(
+        "Test your machine on 0. What does it output?",
+        add,
+        `Multiply first: ${mult} × 0 = 0, then add ${add}.`,
+        machineVisual("Test on 0", 0, `× ${mult}, then + ${add}`, "?"),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        "Which input is the best edge case to test?",
+        "0",
+        ["a typical number like 5", "no test is needed"],
+        "Edge cases like 0 catch hidden bugs.",
+      );
+    }
+    return mcq(
+      "After building a machine you should...?",
+      "test it",
+      ["publish it straight away", "delete it"],
+      "Testing proves the algorithm works.",
+    );
+  }
+
+  // Week 5 — Brackets and Operation Order (AC9M6A02).
   if (week === 5) {
     const a = rand(2, 8);
     const b = rand(2, 7);
     const c = rand(2, 6);
     const bracketed = (a + b) * c;
-    const unbracketed = a + b * c;
-    const visual = bracketVisual("Brackets change the grouping", `(${a} + ${b}) × ${c}`, String(bracketed), `${a} + ${b}`, `× ${c}`);
-    if (role === "apply_create") {
-      return typed(
-        `Calculate (${a} + ${b}) × ${c}.`,
-        bracketed,
-        "Calculate inside the brackets first.",
-        bracketVisual("Brackets change the grouping", `(${a} + ${b}) × ${c}`, "?", `${a} + ${b}`, `× ${c}`),
+
+    if (lessonNumber === 1) {
+      // Why Brackets Matter.
+      if (role === "apply_create") {
+        return typed(
+          `Work out (${a} + ${b}) × ${c}.`,
+          bracketed,
+          "Do the brackets first.",
+          promptVisual("Brackets first", [{ tokens: ["(", `${a}`, "+", `${b}`, ")", "×", `${c}`, "=", "?"] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Why do (${a} + ${b}) × ${c} and ${a} + ${b} × ${c} differ?`,
+          "The brackets make the addition happen first",
+          ["Brackets are just decoration", "One of them skips the ×"],
+          "Brackets change which operation you do first.",
+        );
+      }
+      return mcq(
+        `In (${a} + ${b}) × ${c}, what do you do first?`,
+        `${a} + ${b}`,
+        [`${b} × ${c}`, `${a} + ${b} + ${c}`],
+        "Whatever is inside the brackets.",
       );
     }
-    if (role === "reasoning") return mcq("Why do the bracketed and unbracketed expressions differ?", "The brackets make the addition happen first", ["Brackets are decorative", "Multiplication is ignored"], "Identify which operation the brackets group.", expressionVisual("Compare operation order", [`(${a} + ${b}) × ${c} = ${bracketed}`, `${a} + ${b} × ${c} = ${unbracketed}`]));
-    return mcq("What value does the bracketed expression have?", bracketed, [unbracketed, a + b + c, a * b * c], "Complete the bracketed operation first.", visual);
+
+    if (lessonNumber === 2) {
+      // Place the Brackets (insert brackets to hit a target).
+      if (role === "apply_create") {
+        return typed(
+          "What value belongs inside the brackets?",
+          a + b,
+          `Divide ${bracketed} by ${c}.`,
+          promptVisual("Place the brackets", [{ tokens: ["(", "?", ")", "×", `${c}`, "=", `${bracketed}`] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Where do the brackets go to reach ${bracketed}?`,
+          `(${a} + ${b}) × ${c}`,
+          [`${a} + (${b} × ${c})`, `(${a} × ${b}) + ${c}`],
+          "Group so the addition happens first.",
+        );
+      }
+      return mcq(
+        "Brackets tell you which part to do...?",
+        "first",
+        ["last", "never"],
+        "Brackets always go first.",
+      );
+    }
+
+    // L3 Construct an Equivalent Expression (evaluate a distributed form).
+    if (role === "apply_create") {
+      return typed(
+        "Work out this equivalent expression.",
+        bracketed,
+        "Add the two products.",
+        promptVisual("Equivalent expression", [{ tokens: [`${c}`, "×", `${a}`, "+", `${c}`, "×", `${b}`, "=", "?"] }]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `Which is equivalent to (${a} + ${b}) × ${c}?`,
+        `${c} × ${a} + ${c} × ${b}`,
+        [`${c} × ${a} + ${b}`, `${a} + ${c} × ${b}`],
+        `Multiply ${c} by each part inside the brackets.`,
+      );
+    }
+    return mcq(
+      `(${a} + ${b}) × ${c} means ${c} lots of...?`,
+      `(${a} + ${b})`,
+      [`${a}`, `${a} × ${b}`],
+      "The bracket is the group being repeated.",
+    );
   }
 
+  // Week 6 — Complex Unknowns (AC9M6A02).
   if (week === 6) {
-    const multiplier = rand(2, 6);
+    const mult = rand(2, 6);
     const add = rand(2, 9);
     const unknown = rand(3, 14);
-    const total = (unknown + add) * multiplier;
-    const visual = bracketVisual("Unknown inside brackets", `(□ + ${add}) × ${multiplier}`, String(total), `□ + ${add}`, `× ${multiplier}`);
-    if (role === "apply_create") return typed(`Solve (□ + ${add}) × ${multiplier} = ${total}.`, unknown, "Undo the outside multiplication, then undo the addition.", visual);
-    if (role === "reasoning") return mcq("Which operation should be undone first?", `Divide ${total} by ${multiplier}`, [`Subtract ${add} from ${total}`, `Multiply ${total} by ${multiplier}`], "Reverse the original operations in reverse order.", visual);
-    return mcq("What is the unknown?", unknown, [unknown - 1, unknown + add, total / multiplier], "Use inverse operations and then substitute to check.", visual);
-  }
+    const total = (unknown + add) * mult;
 
-  if (week === 7) {
-    const input = rand(2, 20);
-    const even = input % 2 === 0;
-    const output = even ? input / 2 + 3 : input * 2 + 1;
-    const path = even ? "Even → divide by 2 → add 3" : "Odd → multiply by 2 → add 1";
-    const visual = expressionVisual("Decision algorithm", [`Input ${input}`, even ? `${input} ÷ 2 = ${input / 2}` : `${input} × 2 = ${input * 2}`, `Output ${output}`]);
-    if (role === "apply_create") {
-      return typed(
-        `Follow the decision algorithm for input ${input}.`,
-        output,
-        path,
-        expressionVisual("Decision algorithm", [`Input ${input}`, even ? `${input} ÷ 2 = ${input / 2}` : `${input} × 2 = ${input * 2}`, "Output ?"]),
+    if (lessonNumber === 1) {
+      // Unknown Inside the Brackets.
+      if (role === "apply_create") {
+        return typed(
+          "Find the unknown.",
+          unknown,
+          `Divide ${total} by ${mult}, then subtract ${add}.`,
+          promptVisual("Unknown in brackets", [{ tokens: ["(", "?", "+", `${add}`, ")", "×", `${mult}`, "=", `${total}`] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `In (? + ${add}) × ${mult} = ${total}, which do you undo first?`,
+          `Divide by ${mult}`,
+          [`Subtract ${add}`, `Multiply by ${mult}`],
+          "Undo the outer operation first.",
+        );
+      }
+      return mcq(
+        `To undo × ${mult}, you...?`,
+        `divide by ${mult}`,
+        [`multiply by ${mult}`, `subtract ${mult}`],
+        "Division reverses multiplication.",
       );
     }
-    if (role === "reasoning") return mcq("Why was this branch selected?", even ? `${input} is even` : `${input} is odd`, [even ? `${input} is odd` : `${input} is even`, "The output was chosen first"], "Test the decision condition before following its steps.", visual);
-    return mcq("Which path should the algorithm follow?", path, [even ? "Odd → multiply by 2 → add 1" : "Even → divide by 2 → add 3", "Always add 3"], "Classify the input at the decision point.", visual);
+
+    if (lessonNumber === 2) {
+      // Unknown on Either Side.
+      if (role === "apply_create") {
+        return typed(
+          "Find the unknown.",
+          unknown,
+          `Divide ${total} by ${mult}, then subtract ${add}.`,
+          promptVisual("Unknown on the right", [{ tokens: [`${total}`, "=", `${mult}`, "×", "(", "?", "+", `${add}`, ")"] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "Does it matter which side the unknown is on?",
+          "No, you solve it the same way",
+          ["Yes, the right side can't be solved", "Yes, you add instead"],
+          "An equation balances both ways.",
+        );
+      }
+      return mcq(
+        `In ${total} = ${mult} × (? + ${add}), the unknown is...?`,
+        "inside the brackets",
+        ["the total", "the ×"],
+        "Look for the ? symbol.",
+      );
+    }
+
+    // L3 Find Pairs of Unknowns.
+    const target = rand(8, 16);
+    const x = rand(2, target - 2);
+    if (role === "apply_create") {
+      return typed(
+        "Find the second number.",
+        target - x,
+        `Subtract ${x} from ${target}.`,
+        promptVisual("Pairs that fit", [{ tokens: [`${x}`, "+", "?", "=", `${target}`] }]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `How many whole-number pairs (each at least 1) make ? + ? = ${target}?`,
+        target - 1,
+        [target, target + 1, 1],
+        "List them: (1, ...), (2, ...) and so on.",
+      );
+    }
+    return mcq(
+      `? + ? = ${target} has...?`,
+      "many solutions",
+      ["one solution", "no solution"],
+      "Several pairs of numbers work.",
+    );
+  }
+
+  // Week 7 — Algorithms with Decisions (AC9M6A03): decisions on divisibility.
+  if (week === 7) {
+    const d = pick([2, 3, 5]);
+
+    if (lessonNumber === 1) {
+      // Follow the Decision Path.
+      const input = pick([d * rand(2, 6), d * rand(2, 6) + 1]);
+      const divisible = input % d === 0;
+      const output = divisible ? input / d : input - 1;
+      if (role === "apply_create") {
+        return typed(
+          `What does the algorithm output for ${input}?`,
+          output,
+          `Is ${input} a multiple of ${d}?`,
+          promptVisual("Decision algorithm", [
+            { tokens: [`${input}`, "→", "?"], note: `If a multiple of ${d}: ÷ ${d}. Otherwise: − 1.` },
+          ]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `Which branch does ${input} take?`,
+          divisible ? `Divide by ${d}` : "Subtract 1",
+          [divisible ? "Subtract 1" : `Divide by ${d}`, "Stop straight away"],
+          `Check if ${input} is a multiple of ${d}.`,
+        );
+      }
+      return mcq(
+        `Is ${input} a multiple of ${d}?`,
+        divisible ? "Yes" : "No",
+        [divisible ? "No" : "Yes", "Cannot tell"],
+        `A multiple of ${d} divides by ${d} with nothing left over.`,
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Debug the Algorithm.
+      const multiple = d * rand(3, 7);
+      const correct = multiple / d;
+      const wrong = multiple - 1;
+      if (role === "apply_create") {
+        return typed(
+          "Fix the bug. What is the correct output?",
+          correct,
+          `${multiple} is a multiple of ${d}, so divide by ${d}.`,
+          promptVisual("Debug the algorithm", [
+            { tokens: [`${multiple}`, "→", "?"], note: `Rule: multiples of ${d} are divided by ${d}. A bug gave ${wrong}.` },
+          ]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          `The algorithm output ${wrong} for ${multiple}. What went wrong?`,
+          "It took the wrong branch",
+          ["The input was wrong", "Nothing went wrong"],
+          `${multiple} is a multiple of ${d}, so it should divide.`,
+        );
+      }
+      return mcq(
+        "To debug, compare the expected output with...?",
+        "the output it generated",
+        ["the input only", "the title"],
+        "A mismatch shows where the bug is.",
+      );
+    }
+
+    // L3 Design a Number Generator.
+    const k = rand(3, 6);
+    if (role === "apply_create") {
+      return typed(
+        "The generator lists multiples. Type the next number.",
+        d * (k + 1),
+        `It counts up in ${d}s.`,
+        sequenceVisual("Number generator", [`${d}`, `${d * 2}`, `${d * k}`, "?"]),
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `A generator adds ${d} each time. What set does it make?`,
+        `Multiples of ${d}`,
+        [`Factors of ${d}`, "Odd numbers"],
+        `Adding ${d} repeatedly lists its multiples.`,
+      );
+    }
+    return mcq(
+      `Multiples of ${d} are made by...?`,
+      `counting up in ${d}s`,
+      [`dividing by ${d}`, `subtracting ${d}`],
+      "Repeated addition builds multiples.",
+    );
+  }
+
+  // Week 8 — Pattern Peaks Summit (AC9M6A01, A02, A03): integrate growing
+  // patterns, bracketed unknowns and algorithms in one investigation.
+  if (week === 8) {
+    const growth = rand(2, 4);
+    const start = rand(1, 3);
+    const counts = [start, start + growth, start + growth * 2, start + growth * 3];
+    const tiles = growingVisual("Growing structure", counts, "tiles");
+
+    if (lessonNumber === 1) {
+      // Model the Growing Structure.
+      const stage = rand(7, 12);
+      const count = start + growth * (stage - 1);
+      if (role === "apply_create") {
+        return typed(
+          `How many tiles at Stage ${stage}?`,
+          count,
+          `Rule: start ${start}, add ${growth} each stage.`,
+          tiles,
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "Which rule models the structure?",
+          `Start ${start}, add ${growth} each stage`,
+          [`Multiply the stage by ${growth}`, `Add ${stage} each stage`],
+          "Test it on two stages.",
+          tiles,
+        );
+      }
+      return mcq(
+        "A general rule lets you reach any stage...?",
+        "without drawing every one",
+        ["only by drawing them all", "only for small stages"],
+        "That is why a rule is powerful.",
+      );
+    }
+
+    if (lessonNumber === 2) {
+      // Build the Solving Algorithm (bracketed unknown).
+      const mult = rand(2, 5);
+      const add = rand(2, 8);
+      const unknown = rand(3, 12);
+      const total = (unknown + add) * mult;
+      if (role === "apply_create") {
+        return typed(
+          "Solve for the unknown.",
+          unknown,
+          `Divide ${total} by ${mult}, then subtract ${add}.`,
+          promptVisual("Solving algorithm", [{ tokens: ["(", "?", "+", `${add}`, ")", "×", `${mult}`, "=", `${total}`] }]),
+        );
+      }
+      if (role === "reasoning") {
+        return mcq(
+          "What order should the algorithm undo the operations?",
+          "Divide, then subtract",
+          ["Subtract, then divide", "Multiply, then add"],
+          "Undo the outer operation first.",
+        );
+      }
+      return mcq(
+        "To check your solution, put it back and...?",
+        "work forwards",
+        ["change the total", "guess again"],
+        "A correct value rebuilds the total.",
+      );
+    }
+
+    // L3 Defend a Generalisation (evaluate and correct a claim).
+    const stage2 = rand(6, 10);
+    const trueCount = start + growth * (stage2 - 1);
+    if (role === "apply_create") {
+      return typed(
+        `How many tiles at Stage ${stage2}?`,
+        trueCount,
+        `Use ${stage2} − 1 steps of ${growth}, starting from ${start}.`,
+        tiles,
+      );
+    }
+    if (role === "reasoning") {
+      return mcq(
+        `A climber claims Stage n has ${start} + ${growth} × n tiles. Stage 1 should give ${start}. Is the claim right?`,
+        `No — it adds one ${growth} too many`,
+        ["Yes, it is correct", `No — it is too small by ${start}`],
+        "Test the claim on Stage 1 before trusting it.",
+      );
+    }
+    return mcq(
+      "A good generalisation must work for...?",
+      "every stage",
+      ["just the first stage", "only large stages"],
+      "One counter-example is enough to disprove it.",
+    );
   }
 
   return year6Question(lessonNumber === 1 ? 1 : lessonNumber === 2 ? 6 : 7, lessonNumber, role);
