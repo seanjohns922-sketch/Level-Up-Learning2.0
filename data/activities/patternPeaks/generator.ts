@@ -1915,11 +1915,11 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 
   // Week 1 — Visually Growing Patterns (AC9M6A01).
   if (week === 1) {
-    const growth = rand(2, 5);
+    const growth = rand(3, 6);
     const start = rand(1, 4);
     const counts = [start, start + growth, start + growth * 2, start + growth * 3];
     const nextCount = start + growth * 4;
-    const laterStage = rand(7, 11);
+    const laterStage = rand(10, 18);
     const laterCount = start + growth * (laterStage - 1);
     const tiles = growingVisual("Growing pattern", counts, "tiles");
 
@@ -2008,8 +2008,8 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
   if (week === 2) {
     if (lessonNumber === 1) {
       // Fraction Sequences — real fractions (whole-number numerator answer).
-      const den = pick([3, 4, 5, 6, 8]);
-      const s = rand(1, 3);
+      const den = pick([4, 5, 6, 8, 10, 12]);
+      const s = rand(2, 6);
       const terms = [s, s + 1, s + 2, s + 3, s + 4].map((n) => `${n}/${den}`);
       if (role === "apply_create") {
         return typed(
@@ -2039,8 +2039,8 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 
     // L2 Decimal Sequences (missing middle term) and L3 Reverse the Pattern.
     const reverse = lessonNumber === 3;
-    const step = pick([0.25, 0.5, 0.75, 1.25]);
-    const start = pick([0.5, 1.25, 2.5, 3]);
+    const step = pick([0.4, 0.6, 0.75, 1.2, 1.25]);
+    const start = pick([1.5, 2.4, 3.6, 0.8, 2.5]);
     const t = [0, 1, 2, 3, 4].map((i) => Number((start + step * i).toFixed(2)));
     const show = t.map((v) => `${v}`);
 
@@ -2104,7 +2104,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
   // Week 3 — Rules Across Representations (AC9M6A01, AC9M6A03).
   if (week === 3) {
     const mult = rand(2, 5);
-    const add = rand(1, 6);
+    const add = rand(4, 14);
     const rule = (x: number) => x * mult + add;
     const pairs: Array<[number | string, number | string]> = [
       [1, rule(1)], [2, rule(2)], [3, rule(3)],
@@ -2168,7 +2168,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     }
 
     // L3 Transfer the Rule (same rule, new representation).
-    const input = rand(5, 9);
+    const input = rand(6, 12);
     if (role === "apply_create") {
       return typed(
         `Rule: × ${mult} then + ${add}. Output for ${input}?`,
@@ -2195,15 +2195,15 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 
   // Week 4 — Function Machines and Algorithms (AC9M6A03).
   if (week === 4) {
-    const mult = rand(2, 5);
-    const add = rand(2, 9);
+    const mult = rand(4, 9);
+    const add = rand(6, 20);
     const rule = (x: number) => x * mult + add;
 
     const ruleLabel = `× ${mult}, then + ${add}`;
 
     if (lessonNumber === 1) {
       // Follow a Multi-Step Machine.
-      const input = rand(4, 12);
+      const input = rand(8, 20);
       if (role === "apply_create") {
         return typed(
           "Run the machine.",
@@ -2221,7 +2221,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
           machineVisual("Multi-step machine", input, ruleLabel, rule(input)),
         );
       }
-      const fastIn = rand(2, 3);
+      const fastIn = rand(5, 9);
       return typed(
         "Run the machine.",
         rule(fastIn),
@@ -2278,7 +2278,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         machineVisual("Test on 0", 0, ruleLabel, add),
       );
     }
-    const edge = rand(2, 3);
+    const edge = rand(6, 11);
     return typed(
       `Test your machine on ${edge}.`,
       rule(edge),
@@ -2289,9 +2289,9 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 
   // Week 5 — Brackets and Operation Order (AC9M6A02).
   if (week === 5) {
-    const a = rand(2, 8);
-    const b = rand(2, 7);
-    const c = rand(2, 6);
+    const a = rand(6, 15);
+    const b = rand(4, 12);
+    const c = rand(3, 8);
     const bracketed = (a + b) * c;
 
     if (lessonNumber === 1) {
@@ -2373,9 +2373,9 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 
   // Week 6 — Complex Unknowns (AC9M6A02).
   if (week === 6) {
-    const mult = rand(2, 6);
-    const add = rand(2, 9);
-    const unknown = rand(3, 14);
+    const mult = rand(3, 8);
+    const add = rand(4, 15);
+    const unknown = rand(5, 25);
     const total = (unknown + add) * mult;
 
     if (lessonNumber === 1) {
@@ -2431,8 +2431,8 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     }
 
     // L3 Find Pairs of Unknowns.
-    const target = rand(8, 16);
-    const x = rand(2, target - 2);
+    const target = rand(15, 35);
+    const x = rand(3, target - 3);
     if (role === "apply_create") {
       return typed(
         "Find the second number.",
@@ -2459,11 +2459,11 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 
   // Week 7 — Algorithms with Decisions (AC9M6A03): decisions on divisibility.
   if (week === 7) {
-    const d = pick([2, 3, 5]);
+    const d = pick([3, 4, 6, 9]);
 
     if (lessonNumber === 1) {
       // Follow the Decision Path.
-      const input = pick([d * rand(2, 6), d * rand(2, 6) + 1]);
+      const input = pick([d * rand(4, 12), d * rand(4, 12) + 1]);
       const divisible = input % d === 0;
       const output = divisible ? input / d : input - 1;
       if (role === "apply_create") {
@@ -2494,7 +2494,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 
     if (lessonNumber === 2) {
       // Debug the Algorithm.
-      const multiple = d * rand(3, 7);
+      const multiple = d * rand(5, 12);
       const correct = multiple / d;
       const wrong = multiple - 1;
       if (role === "apply_create") {
@@ -2524,7 +2524,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     }
 
     // L3 Design a Number Generator.
-    const k = rand(3, 6);
+    const k = rand(5, 10);
     if (role === "apply_create") {
       return typed(
         "The generator lists multiples. Type the next number.",
@@ -2541,7 +2541,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         `Adding ${d} repeatedly lists its multiples.`,
       );
     }
-    const sample = d * rand(4, 9);
+    const sample = d * rand(6, 14);
     return mcq(
       `Which number is a multiple of ${d}?`,
       sample,
@@ -2553,14 +2553,14 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
   // Week 8 — Pattern Peaks Summit (AC9M6A01, A02, A03): integrate growing
   // patterns, bracketed unknowns and algorithms in one investigation.
   if (week === 8) {
-    const growth = rand(2, 4);
+    const growth = rand(3, 6);
     const start = rand(1, 3);
     const counts = [start, start + growth, start + growth * 2, start + growth * 3];
     const tiles = growingVisual("Growing structure", counts, "tiles");
 
     if (lessonNumber === 1) {
       // Model the Growing Structure.
-      const stage = rand(7, 12);
+      const stage = rand(10, 16);
       const count = start + growth * (stage - 1);
       if (role === "apply_create") {
         return typed(
@@ -2590,9 +2590,9 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 
     if (lessonNumber === 2) {
       // Build the Solving Algorithm (bracketed unknown).
-      const mult = rand(2, 5);
-      const add = rand(2, 8);
-      const unknown = rand(3, 12);
+      const mult = rand(3, 7);
+      const add = rand(4, 12);
+      const unknown = rand(5, 20);
       const total = (unknown + add) * mult;
       if (role === "apply_create") {
         return typed(
@@ -2619,7 +2619,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     }
 
     // L3 Defend a Generalisation (evaluate and correct a claim).
-    const stage2 = rand(6, 10);
+    const stage2 = rand(9, 15);
     const trueCount = start + growth * (stage2 - 1);
     if (role === "apply_create") {
       return typed(
