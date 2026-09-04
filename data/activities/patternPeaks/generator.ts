@@ -2237,14 +2237,20 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
 
     if (lessonNumber === 2) {
       // Discover the Algorithm — read the input/output table, find the rule.
+      // Inferring a rule is harder than applying one, so this lesson uses a
+      // smaller multiplier and a round constant: once you spot the step, the
+      // offset is easy to work out.
+      const dMult = rand(2, 5);
+      const dAdd = pick([3, 5, 10]);
+      const dRule = (x: number) => x * dMult + dAdd;
       const pairs: Array<[number | string, number | string]> = [
-        [2, rule(2)], [3, rule(3)], [4, rule(4)],
+        [2, dRule(2)], [3, dRule(3)], [4, dRule(4)],
       ];
-      const ruleReveal = `The rule is × ${mult} then + ${add}.`;
+      const ruleReveal = `The rule is × ${dMult} then + ${dAdd}.`;
       if (role === "apply_create") {
         return typed(
           "Work out the rule, then fill in for 7.",
-          rule(7),
+          dRule(7),
           "Find what turns each input into its output.",
           tableVisual("Discover the rule", [...pairs, [7, "?"]]),
           undefined,
@@ -2254,8 +2260,8 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       if (role === "reasoning") {
         return mcq(
           "Which rule fits the table?",
-          `× ${mult}, then + ${add}`,
-          [`+ ${mult + add}`, `× ${mult + 1}`],
+          `× ${dMult}, then + ${dAdd}`,
+          [`+ ${dMult + dAdd}`, `× ${dMult + 1}`],
           "A good rule works on every row.",
           tableVisual("Discover the rule", pairs),
           ruleReveal,
@@ -2263,9 +2269,9 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       }
       return typed(
         "Work out the rule, then fill in for 6.",
-        rule(6),
+        dRule(6),
         "Find what turns each input into its output.",
-        tableVisual("Discover the rule", [[2, rule(2)], [3, rule(3)], [4, rule(4)], [6, "?"]]),
+        tableVisual("Discover the rule", [[2, dRule(2)], [3, dRule(3)], [4, dRule(4)], [6, "?"]]),
         undefined,
         ruleReveal,
       );
