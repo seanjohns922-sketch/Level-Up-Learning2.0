@@ -15,7 +15,7 @@ import type { Lesson } from "@/data/programs/year1";
 import type { LessonActivity } from "@/data/programs/types";
 
 type QuestionVisual =
-  | { type: "array"; rows: number; columns: number; highlightedRows?: number[]; rotatable?: boolean }
+  | { type: "array"; rows: number; columns: number; highlightedRows?: number[]; rotatable?: boolean; splitAfterColumns?: number }
   | PatternSequenceStripVisualData
   | GrowingPatternVisualData
   | FunctionMachineCardVisualData
@@ -1616,29 +1616,28 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
 
     if (lessonNumber === 1) {
       // Split an Array.
+      const splitArray = { type: "array" as const, rows: f, columns: target, splitAfterColumns: 10 };
       if (role === "apply_create") {
         return typed(
-          "Split into parts, then solve.",
+          "Find the total number of dots in the split array.",
           total,
-          `Work out ${f} × 10 and ${f} × ${c}, then add.`,
-          promptVisual("Split an array", [{ tokens: [`${f}`, "×", "(", "10", "+", `${c}`, ")", "=", "?"] }]),
+          "Tap each coloured part, calculate both partial products, then add them.",
+          splitArray,
         );
       }
       if (role === "reasoning") {
-        return mcq(
-          `Which shows ${f} × (10 + ${c}) split into parts?`,
-          `${f} × 10 + ${f} × ${c}`,
-          [`${f} × 10 + ${c}`, `${f} + 10 × ${c}`],
-          "The outside factor multiplies every part.",
-          promptVisual("Split an array", [{ tokens: [`${f}`, "×", "(", "10", "+", `${c}`, ")"] }]),
+        return typed(
+          "How many dots are in the violet section?",
+          f * c,
+          "Tap the violet section, then multiply its rows by its columns.",
+          splitArray,
         );
       }
-      return mcq(
-        `${f} × (10 + ${c}) = ${f} × 10 + ${f} × ?`,
-        c,
-        [10, f !== c ? f : f + 1],
-        "Distribute to each part.",
-        promptVisual("Split an array", [{ tokens: [`${f}`, "×", "(", "10", "+", `${c}`, ")"] }]),
+      return typed(
+        "How many dots are in the teal section?",
+        f * 10,
+        "Tap the teal section, then multiply its rows by its columns.",
+        splitArray,
       );
     }
 
@@ -1656,19 +1655,21 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
         );
       }
       if (role === "reasoning") {
-        return mcq(
-          `You know ${f} × 10 = ${f * 10}. What must you add for ${f} × ${target}?`,
-          `${f} × ${c}`,
-          [`${c}`, `10 × ${c}`],
-          "Add the extra groups of the factor.",
-          promptVisual("Build from friendly numbers", [{ tokens: [`${f}`, "×", "10", "=", `${f * 10}`] }]),
+        return typed(
+          `How much must be added to ${f} × 10 to make ${f} × ${target}?`,
+          f * c,
+          "Multiply the extra columns by the shared factor.",
+          promptVisual("Build from friendly numbers", [
+            { label: "Friendly fact", tokens: [`${f}`, "×", "10", "=", `${f * 10}`] },
+            { label: "Extra part", tokens: [`${f}`, "×", `${c}`, "=", "?"] },
+          ]),
         );
       }
-      return mcq(
-        `Which friendly fact helps with ${f} × ${target}?`,
-        `${f} × 10`,
-        [`${f} × ${c}`, `10 × ${c}`],
-        "Start from a ten fact.",
+      return typed(
+        "Calculate the friendly ten fact.",
+        f * 10,
+        "Multiply the shared factor by 10 before adding the extra part.",
+        promptVisual("Start with a friendly fact", [{ tokens: [`${f}`, "×", "10", "=", "?"] }]),
       );
     }
 

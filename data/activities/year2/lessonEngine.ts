@@ -533,6 +533,7 @@ export type MixedWordProblemQuestion = {
         columns: number;
         highlightedRows?: number[];
         rotatable?: boolean;
+        splitAfterColumns?: number;
       };
 };
 
@@ -3450,6 +3451,7 @@ export type MultipleChoiceQuestion = {
         columns: number;
         highlightedRows?: number[];
         rotatable?: boolean;
+        splitAfterColumns?: number;
       }
     | MABVisualData
     | DecimalVisualData
@@ -3519,6 +3521,7 @@ export type TypedResponseQuestion = {
         columns: number;
         highlightedRows?: number[];
         rotatable?: boolean;
+        splitAfterColumns?: number;
       }
     | MABVisualData
     | DecimalVisualData

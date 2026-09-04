@@ -440,6 +440,33 @@ for (const currentLesson of levelFiveMultiplicationProperties.lessons) {
 const arrayVisualSource = fs.readFileSync(path.join(root, "components/activities/ArrayVisual.tsx"), "utf8");
 assert(arrayVisualSource.includes("↻ Turn array"), "The array visual is missing its student-controlled turn action.");
 assert(arrayVisualSource.includes("displayRows = turned ? cols : rows"), "Turning the array must swap its rows and columns.");
+assert(arrayVisualSource.includes("Tap either coloured section"), "The split array must let students isolate each partial product.");
+
+const levelFiveDistributiveReasoning = PATTERN_PEAKS_PROGRAMS["Year 5"][5]!.lessons.slice(0, 2);
+for (const currentLesson of levelFiveDistributiveReasoning) {
+  assert(
+    (currentLesson.activities ?? []).every((activity) => activity.activityType === "typed_response"),
+    `Year 5 Week 6 ${currentLesson.title} must use objective numeric responses.`,
+  );
+  for (const activity of currentLesson.activities ?? []) {
+    for (let sample = 0; sample < 30; sample += 1) {
+      const question = generatePatternPeaksQuestion(5, currentLesson, activity);
+      assert.equal(question.kind, "typed_response", `Year 5 Week 6 ${currentLesson.title} retained a multiple-choice shortcut.`);
+      assert(Number.isInteger(Number(question.answer)) && Number(question.answer) > 0, `Year 5 Week 6 ${currentLesson.title} generated an invalid answer.`);
+      assert(!/which friendly fact|which shows/i.test(question.prompt), `Year 5 Week 6 ${currentLesson.title} retained a recognition-only prompt.`);
+      if (currentLesson.lesson === 1) {
+        assert.equal(question.visual?.type, "array", "Split an Array must show a real array instead of only a bracketed expression.");
+        if (question.visual?.type === "array") {
+          assert.equal(question.visual.splitAfterColumns, 10, "Split an Array must visibly partition the ten fact from the extra columns.");
+          assert(question.visual.columns > question.visual.splitAfterColumns, "Split an Array must show both coloured sections.");
+        }
+      } else {
+        assert.equal(question.visual?.type, "expression_flow", "Build from Friendly Numbers needs a visible calculation.");
+        assert.equal(countInlineMathAnswerSlots(question.visual), 1, "Build from Friendly Numbers needs one inline numeric answer.");
+      }
+    }
+  }
+}
 
 assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
