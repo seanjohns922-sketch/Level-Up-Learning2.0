@@ -153,6 +153,7 @@ function mcq(
   distractors: Array<string | number>,
   helper: string,
   visual?: QuestionVisual,
+  explanation?: string,
 ): Year2QuestionData {
   return {
     kind: "multiple_choice",
@@ -160,6 +161,7 @@ function mcq(
     answer: String(answer),
     options: uniqueOptions(String(answer), distractors),
     helper,
+    explanation,
     visual,
   };
 }
@@ -170,6 +172,7 @@ function typed(
   helper: string,
   visual?: QuestionVisual,
   acceptedAnswers?: string[],
+  explanation?: string,
 ): Year2QuestionData {
   return {
     kind: "typed_response",
@@ -177,6 +180,7 @@ function typed(
     answer: String(answer),
     acceptedAnswers,
     helper,
+    explanation,
     placeholder: "Type your answer",
     visual,
   };
@@ -2236,12 +2240,15 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       const pairs: Array<[number | string, number | string]> = [
         [2, rule(2)], [3, rule(3)], [4, rule(4)],
       ];
+      const ruleReveal = `The rule is × ${mult} then + ${add}.`;
       if (role === "apply_create") {
         return typed(
           "Work out the rule, then fill in for 7.",
           rule(7),
           "Find what turns each input into its output.",
           tableVisual("Discover the rule", [...pairs, [7, "?"]]),
+          undefined,
+          ruleReveal,
         );
       }
       if (role === "reasoning") {
@@ -2251,13 +2258,16 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
           [`+ ${mult + add}`, `× ${mult + 1}`],
           "A good rule works on every row.",
           tableVisual("Discover the rule", pairs),
+          ruleReveal,
         );
       }
       return typed(
-        "Work out the rule, then fill in for 5.",
-        rule(5),
+        "Work out the rule, then fill in for 6.",
+        rule(6),
         "Find what turns each input into its output.",
-        tableVisual("Discover the rule", [[2, rule(2)], [3, rule(3)], [5, "?"]]),
+        tableVisual("Discover the rule", [[2, rule(2)], [3, rule(3)], [4, rule(4)], [6, "?"]]),
+        undefined,
+        ruleReveal,
       );
     }
 

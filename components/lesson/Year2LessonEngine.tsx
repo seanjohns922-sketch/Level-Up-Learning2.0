@@ -434,6 +434,11 @@ function getQuestionExplanation(question: Year2QuestionData | null, correctAnswe
       return `${working}\n\n${expanded} = ${correctAnswer}.`;
     }
   }
+  // A dedicated wrong-answer explanation (e.g. the hidden rule) wins over the
+  // helper, which stays the always-visible subtitle.
+  if ("explanation" in question && typeof question.explanation === "string" && question.explanation.trim()) {
+    return question.explanation;
+  }
   if ("helper" in question && typeof question.helper === "string" && question.helper.trim()) {
     return question.helper;
   }

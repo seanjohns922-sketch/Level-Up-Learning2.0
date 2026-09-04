@@ -3448,6 +3448,9 @@ export type MultipleChoiceQuestion = {
   options: string[];
   answer: string;
   helper?: string;
+  // Shown only after a wrong answer (the helper stays as the always-visible
+  // subtitle). Use it to reveal a rule that must not be given away up front.
+  explanation?: string;
   instruction?: string;
   correctAnswers?: string[];
   selectionFeedback?: Record<string, string>;
@@ -3521,6 +3524,9 @@ export type TypedResponseQuestion = {
   answer: string;
   acceptedAnswers?: string[];
   helper?: string;
+  // Shown only after a wrong answer (the helper stays as the always-visible
+  // subtitle). Use it to reveal a rule that must not be given away up front.
+  explanation?: string;
   placeholder?: string;
   inputType?: "integer" | "fraction" | "mixed" | "flexible_fraction";
   fixedDenominator?: number;
