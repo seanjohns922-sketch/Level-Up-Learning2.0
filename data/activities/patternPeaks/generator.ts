@@ -2010,12 +2010,12 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       // Fraction Sequences — real fractions (whole-number numerator answer).
       const den = pick([3, 4, 5, 6, 8]);
       const s = rand(1, 3);
-      const terms = [s, s + 1, s + 2, s + 3].map((n) => `${n}/${den}`);
+      const terms = [s, s + 1, s + 2, s + 3, s + 4].map((n) => `${n}/${den}`);
       if (role === "apply_create") {
         return typed(
           `The next fraction is ?/${den}. Type the missing numerator.`,
-          s + 4,
-          "The numerator goes up by 1 each step.",
+          s + 5,
+          "Look at how the top number changes each step.",
           sequenceVisual("Fraction sequence", terms),
         );
       }
@@ -2041,7 +2041,8 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     const reverse = lessonNumber === 3;
     const step = pick([0.25, 0.5, 0.75, 1.25]);
     const start = pick([0.5, 1.25, 2.5, 3]);
-    const t = [0, 1, 2, 3].map((i) => Number((start + step * i).toFixed(2)));
+    const t = [0, 1, 2, 3, 4].map((i) => Number((start + step * i).toFixed(2)));
+    const show = t.map((v) => `${v}`);
 
     if (reverse) {
       // Reverse the Pattern — recover the start term.
@@ -2049,18 +2050,18 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         return typed(
           "Type the starting term.",
           t[0]!.toFixed(2),
-          `Each step adds ${step}, so step back by ${step}.`,
-          sequenceVisual("Reverse the sequence", ["?", `${t[1]}`, `${t[2]}`, `${t[3]}`]),
+          "Work out the step from the terms you can see, then step back once.",
+          sequenceVisual("Reverse the sequence", ["?", show[1]!, show[2]!, show[3]!, show[4]!]),
           [String(t[0]), t[0]!.toFixed(2)],
         );
       }
       if (role === "reasoning") {
         return mcq(
           "To go back one step, you...?",
-          `Subtract ${step}`,
-          [`Add ${step}`, `Divide by ${step}`],
-          "Reverse the operation.",
-          sequenceVisual("Reverse the sequence", [`${t[1]}`, `${t[2]}`, `${t[3]}`]),
+          "Subtract the step",
+          ["Add the step", "Divide by the step"],
+          "Reverse the operation to travel backwards.",
+          sequenceVisual("Reverse the sequence", [show[1]!, show[2]!, show[3]!, show[4]!]),
         );
       }
       return mcq(
@@ -2068,26 +2069,27 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
         "opposite operation",
         ["same operation", "biggest number"],
         "Undo each step to travel back.",
+        sequenceVisual("Reverse the sequence", [show[1]!, show[2]!, show[3]!, show[4]!]),
       );
     }
 
-    // L2 Decimal Sequences.
+    // L2 Decimal Sequences (missing middle term).
     if (role === "apply_create") {
       return typed(
         "Type the missing term.",
         t[2]!.toFixed(2),
-        `The step is ${step} each time.`,
-        sequenceVisual("Decimal sequence", [`${t[0]}`, `${t[1]}`, "?", `${t[3]}`]),
+        "Work out the step from two terms you can see, then fill the gap.",
+        sequenceVisual("Decimal sequence", [show[0]!, show[1]!, "?", show[3]!, show[4]!]),
         [String(t[2]), t[2]!.toFixed(2)],
       );
     }
     if (role === "reasoning") {
       return mcq(
-        "What stays constant in this sequence?",
-        `The step of ${step}`,
+        "What stays the same all the way along?",
+        "The size of the step",
         ["The digits", "The number of decimal places"],
         "Subtract each term from the next.",
-        sequenceVisual("Decimal sequence", [`${t[0]}`, `${t[1]}`, `${t[2]}`, `${t[3]}`]),
+        sequenceVisual("Decimal sequence", show),
       );
     }
     return mcq(
@@ -2095,7 +2097,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       "adding",
       ["multiplying", "dividing"],
       "Check the gap between terms.",
-      sequenceVisual("Decimal sequence", [`${t[0]}`, `${t[1]}`, `${t[2]}`, `${t[3]}`]),
+      sequenceVisual("Decimal sequence", show),
     );
   }
 
