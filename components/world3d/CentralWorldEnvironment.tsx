@@ -571,12 +571,90 @@ function worldObjectScale(item: EconomyItem) {
   return Math.min(Math.max(scale, 0.62), 3.6);
 }
 
-function PlacedWorldObject({ item, placement, preview = false, valid = true }: { item: EconomyItem; placement: CentralWorldPlacement; preview?: boolean; valid?: boolean }) {
+// Per-animal wander behaviour. radius is how far (world units) it strays from
+// where it was placed — small, so a fenced paddock keeps it in. hop gives a
+// bouncy gait; otherwise it walks with a subtle bob.
+type Gait = { speed: number; radius: number; hop?: boolean };
+const ANIMAL_GAITS: Record<string, Gait> = {
+  kangaroo: { speed: 0.9, radius: 1.7, hop: true },
+  emu: { speed: 0.75, radius: 1.7 },
+  wombat: { speed: 0.34, radius: 1.2 },
+  koala: { speed: 0.24, radius: 0.8 },
+  echidna: { speed: 0.3, radius: 1.0 },
+  kookaburra: { speed: 0, radius: 0 },
+  cockatoo: { speed: 0, radius: 0 },
+};
+
+function AnimalRoamer({ gait, children }: { gait: Gait; children: React.ReactNode }) {
+  const ref = useRef<THREE.Group>(null);
+  const s = useRef({ px: 0, pz: 0, tx: 0, tz: 0, yaw: 0, pause: 1.2, clock: 0, moving: false });
+  // Seed each animal with a random phase after mount (random is client-only, so
+  // it stays out of render) so they don't all pause and step in lockstep.
+  useEffect(() => {
+    s.current.pause = 0.4 + Math.random() * 2.4;
+    s.current.clock = Math.random() * 10;
+  }, []);
+  useFrame((_, deltaRaw) => {
+    const g = ref.current;
+    if (!g) return;
+    const delta = Math.min(deltaRaw, 0.05);
+    const st = s.current;
+    st.clock += delta;
+
+    // Perch animals (radius 0) just bob in place.
+    if (gait.radius <= 0.05) {
+      g.position.y = Math.abs(Math.sin(st.clock * 2.6)) * 0.05;
+      return;
+    }
+
+    if (st.moving) {
+      const dx = st.tx - st.px;
+      const dz = st.tz - st.pz;
+      const dist = Math.hypot(dx, dz);
+      if (dist < 0.08) {
+        st.moving = false;
+        st.pause = 0.9 + Math.random() * 2.8;
+      } else {
+        const nx = dx / dist;
+        const nz = dz / dist;
+        const step = Math.min(gait.speed * delta, dist);
+        st.px += nx * step;
+        st.pz += nz * step;
+        // Smoothly turn to face travel direction.
+        const targetYaw = Math.atan2(nx, nz);
+        let dy = targetYaw - st.yaw;
+        dy = Math.atan2(Math.sin(dy), Math.cos(dy));
+        st.yaw += dy * Math.min(1, delta * 6);
+        g.position.x = st.px;
+        g.position.z = st.pz;
+        g.rotation.y = st.yaw;
+        g.position.y = gait.hop
+          ? Math.abs(Math.sin(st.clock * 6)) * 0.16
+          : Math.sin(st.clock * 9) * 0.02;
+      }
+    } else {
+      st.pause -= delta;
+      g.position.y = Math.sin(st.clock * 2) * 0.015;
+      if (st.pause <= 0) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 0.4 + Math.random() * gait.radius;
+        st.tx = Math.cos(a) * r;
+        st.tz = Math.sin(a) * r;
+        st.moving = true;
+      }
+    }
+  });
+  return <group ref={ref}>{children}</group>;
+}
+
+function PlacedWorldObject({ item, placement, preview = false, valid = true, animate = false }: { item: EconomyItem; placement: CentralWorldPlacement; preview?: boolean; valid?: boolean; animate?: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const tier = Number(item.metadata.tier ?? 1);
   const scale = worldObjectScale(item);
   const [width, depth] = rotatedGridSize(item, placement.rotation);
   const position = gridToWorld(placement.gridX, placement.gridZ);
+  const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
+  const gait = animate && !preview && item.metadata.worldSceneryGroup === "animals" ? ANIMAL_GAITS[assetKey] : undefined;
 
   useLayoutEffect(() => {
     if (!preview || !groupRef.current) return;
@@ -598,9 +676,17 @@ function PlacedWorldObject({ item, placement, preview = false, valid = true }: {
         <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.58 : 0.18} depthWrite={false} />
         {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
       </mesh>
-      <group ref={groupRef} scale={scale}>
-        <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} />
-      </group>
+      {gait ? (
+        <AnimalRoamer gait={gait}>
+          <group ref={groupRef} scale={scale}>
+            <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} />
+          </group>
+        </AnimalRoamer>
+      ) : (
+        <group ref={groupRef} scale={scale}>
+          <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} />
+        </group>
+      )}
       {!preview && item.metadata.marketplaceCategory !== "world_basic" ? <Html center position={[0, 4.2 * scale, 0]} distanceFactor={18} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div></Html> : null}
     </group>
   );
@@ -892,7 +978,7 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, p
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
       {placedCustomisations.map((placement, index) => {
         const item = itemsById.get(placement.itemId);
-        return item ? <PlacedWorldObject key={`${placement.itemId}-${index}`} item={item} placement={placement} /> : null;
+        return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} animate={!editing} /> : null;
       })}
       {buildPreview ? <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} preview valid={buildPreview.valid} /> : null}
       {groundPreview ? <GroundTile tile={groundPreview.tile} preview valid={groundPreview.valid} /> : null}
