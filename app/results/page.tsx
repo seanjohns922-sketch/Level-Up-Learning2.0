@@ -21,6 +21,7 @@ import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getWorld3DReturnPathForPosttest } from "@/lib/world3d/return-context";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 const POSTTEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
 const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 
@@ -457,6 +458,61 @@ function ResultsPage() {
     router.push(posttestReturnPath ?? getRealmHomeRoute(realmId));
   }
 
+  const realmSpokenName = progressRealmId === "measurement"
+    ? "Measurelands"
+    : progressRealmId === "space"
+      ? "Starpath"
+      : progressRealmId === "statistics"
+        ? "Statistica"
+        : "Number Nexus";
+  const resultActions = passed
+    ? isPostTest || passedByProgram
+      ? "You can choose View My Legends or Go to Levels."
+      : nextYear
+        ? `You can choose Start ${formatStudentLevelLabel(nextYear)} Pre-Test or Go to Levels.`
+        : "You can choose Enter the Tower or Go to Levels."
+    : isPostTest
+      ? "You can choose Continue, Practise weak areas, or Retry Post-Test."
+      : `You can choose ${requiresFullPathway ? "Start Full Pathway" : `Start Required Pathway at Week ${assignedStartWeek}`} or Go to Levels.`;
+  const nextSteps = isPostTest && !passed
+    ? [
+        "Review any week's lessons.",
+        "Retry the post-test when ready.",
+        `Score ${POSTTEST_PASS_THRESHOLD} percent or more to unlock your Legend.`,
+      ]
+    : [
+        "Complete 3 lessons every week.",
+        "Complete 1 quiz to test your skills.",
+        "Legends unlock with mastery.",
+      ];
+  const resultsSpeech = [
+    `${msg.title}. ${msg.sub}`,
+    `${realmSpokenName}, ${studentLevelLabel}, ${isPostTest ? "post-test" : source === "program_complete" ? "program" : "pre-test"} results.`,
+    `You scored ${score} out of ${total}, which is ${displayPercent} percent. Your status is ${passed ? "pass" : "keep growing"}.`,
+    passed
+      ? isPostTest
+        ? year === "Prep"
+          ? "You passed the Ground Level mastery test. Your Legend is ready to collect and Level 1 is now open."
+          : "Post-test passed. Your Legend is ready to collect."
+        : nextYear
+          ? `Pre-test passed. Up next: ${nextStudentLevelLabel}.`
+          : "Final pre-test passed. All Legends are ready to collect."
+      : isPostTest
+        ? `${POSTTEST_PASS_THRESHOLD} percent is required to pass. Revisit the recommended weeks and retry when ready.`
+        : `Your personalised program for ${studentLevelLabel} is ready. ${requiresFullPathway ? "Complete the full pathway." : requiredWeeks.length > 0 ? `Focus on Weeks ${requiredWeeks.join(", ")}.` : "Work through it week by week."}`,
+    isPostTest && storedPretestProfile && storedPosttestProfile
+      ? `Your growth: you improved from ${storedPretestProfile.percentage} percent to ${storedPosttestProfile.percentage} percent. ${strongestGrowth ? `Your strongest growth was ${strongestGrowth.skillLabel}.` : ""} ${keepPractising ? `Keep practising ${keepPractising.skillLabel}.` : ""}`
+      : "",
+    topStrengths.length > 0 ? `You did well with: ${topStrengths.map((item) => item.skillLabel).join(", ")}.` : "",
+    topWeakAreas.length > 0 ? `Focus on these next: ${topWeakAreas.map((item) => item.skillLabel).join(", ")}.` : "",
+    !passed && isPostTest && storedPosttestProfile?.recommendedWeeks.length
+      ? `Start with Week ${storedPosttestProfile.recommendedWeeks.slice(0, 3).join(", then Week ")}.`
+      : "",
+    `What's next? ${nextSteps.join(" ")}`,
+    assessmentReviewItems.length > 0 ? "You can also go back to your incorrect questions." : "",
+    resultActions,
+  ].filter(Boolean).join(" ");
+
   if (restoreState !== "ready") {
     return (
       <main className="min-h-screen flex items-center justify-center bg-slate-950 p-6 text-center">
@@ -548,9 +604,17 @@ function ResultsPage() {
               )}
             </div>
 
-            <h1 className="text-3xl font-extrabold font-display text-white mb-1 tracking-tight">
-              {msg.title}
-            </h1>
+            <div className="mb-1 flex flex-wrap items-center justify-center gap-2">
+              <h1 className="text-3xl font-extrabold font-display text-white tracking-tight">
+                {msg.title}
+              </h1>
+              <ReadAloudBtn
+                text={resultsSpeech}
+                speechKey={`assessment-results-${progressRealmId}-${year}-${isPostTest ? "posttest" : "pretest"}`}
+                label="Read results"
+                className="border-white/20 bg-white/10 text-white hover:bg-white/15"
+              />
+            </div>
             <p className="text-sm text-slate-400 mb-3">{msg.sub}</p>
             <div
               className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] px-3 py-1 rounded-full border"

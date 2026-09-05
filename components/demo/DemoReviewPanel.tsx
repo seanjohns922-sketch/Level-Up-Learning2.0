@@ -90,13 +90,11 @@ function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "
 }
 
 function hasPretest(realm: ReviewRealm, year: YearLabel) {
-  if (realm === "pattern") return false;
   if (realm === "statistics" && year === "Prep") return false;
   return getPretestForYearLabel(year, realm).length > 0;
 }
 
 function hasPosttest(realm: ReviewRealm, year: YearLabel) {
-  if (realm === "pattern") return false;
   if (realm === "statistics" && year === "Prep") return false;
   return Boolean(getPosttestForYearLabel(year, realm)?.questions.length);
 }

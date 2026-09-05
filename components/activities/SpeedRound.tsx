@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Zap, Flame } from "lucide-react";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -101,7 +102,13 @@ export default function SpeedRound({
     return (
       <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm text-center">
         <div className="mb-3 flex justify-center"><Zap className="h-12 w-12 text-amber-500" fill="currentColor" /></div>
-        <h2 className="text-2xl font-black text-gray-900">Speed Round Complete!</h2>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <h2 className="text-2xl font-black text-gray-900">Speed Round Complete!</h2>
+          <ReadAloudBtn
+            text={`Speed Round complete. You got ${score} questions correct. Your best streak was ${bestStreak}. Choose Continue to move on.`}
+            label="Read results"
+          />
+        </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
             <div className="text-xs font-bold uppercase tracking-wide text-gray-500">

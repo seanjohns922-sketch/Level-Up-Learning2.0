@@ -1194,7 +1194,13 @@ export function PracticeRunner({
               <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
                 Lesson Complete
               </div>
-              <h1 className="mt-2 text-3xl font-black text-slate-950">Review My Mistakes</h1>
+              <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+                <h1 className="text-3xl font-black text-slate-950">Review My Mistakes</h1>
+                <ReadAloudBtn
+                  text={`Lesson complete. You have ${lessonMistakes.length} question${lessonMistakes.length === 1 ? "" : "s"} to review. Reviewing will not change your X P or score. Choose Review My Mistakes to hear and review them, or choose Finish Lesson.`}
+                  label="Read results"
+                />
+              </div>
               <p className="mt-2 text-sm font-semibold text-slate-600">
                 You have {lessonMistakes.length} question{lessonMistakes.length === 1 ? "" : "s"} to review. This will not change XP or your score.
               </p>

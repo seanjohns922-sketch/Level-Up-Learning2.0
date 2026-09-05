@@ -217,6 +217,7 @@ export default function LessonReflection({
   const theme = getRealmTheme(realmId);
   const xp = calcXP(correctAnswers);
   const stars = accuracy >= 85 ? 3 : accuracy >= 60 ? 2 : 1;
+  const spokenStats = `You earned ${xp} X P. Your best chain was ${bestChain}. Your accuracy was ${Math.round(accuracy)} percent.`;
 
   const statChipProps = theme.isMeasurement
     ? {
@@ -308,8 +309,8 @@ export default function LessonReflection({
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
             <div className="text-2xl font-black text-white">{copy?.reflectionTitle ?? "Amazing work!"}</div>
             <ReadAloudBtn
-              text={`${copy?.reflectionTitle ?? "Amazing work!"}. ${copy?.reflectionPrompt ?? "Choose how this lesson felt."}`}
-              label="Read"
+              text={`${copy?.reflectionTitle ?? "Amazing work!"}. ${lessonTitle}. ${spokenStats} ${copy?.reflectionPrompt ?? "Choose Continue to finish."} ${(copy?.reflectionOptions?.length ?? 0) > 0 ? `Your choices are: ${copy?.reflectionOptions?.join(", ")}.` : ""}`}
+              label="Read results"
               className="border-white/20 bg-white/10 text-white"
             />
           </div>
@@ -384,8 +385,8 @@ export default function LessonReflection({
         <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
           <div className="text-2xl font-black text-white">Nice work!</div>
           <ReadAloudBtn
-            text={`Nice work. ${lessonTitle}. How confident do you feel now?`}
-            label="Read"
+            text={`Lesson complete. Nice work. ${lessonTitle}. ${spokenStats} How confident do you feel now? Your choices are: ${CONFIDENCE_OPTIONS.map((option) => option.label).join(", ")}. You can also choose Skip.`}
+            label="Read results"
             className="border-white/20 bg-white/10 text-white"
           />
         </div>

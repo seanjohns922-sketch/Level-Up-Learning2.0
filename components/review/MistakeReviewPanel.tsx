@@ -104,6 +104,9 @@ export default function MistakeReviewPanel({
         button: "bg-trust-blue text-white",
         heading: "text-slate-950",
       };
+  const reviewSpeech = items.length === 0
+    ? `${title ?? copy.title}. ${emptyTitle}. ${emptyMessage} Choose ${copy.finish} when you are ready.`
+    : `${title ?? copy.title}. You have ${items.length} question${items.length === 1 ? "" : "s"} to review. Use Read feedback on each question to hear the question, your result, and what to practise. Choose ${copy.finish} when you are done.`;
 
   return (
     <main className={`min-h-screen ${accent.page} px-4 py-6`}>
@@ -113,7 +116,15 @@ export default function MistakeReviewPanel({
             <BookOpen className="h-4 w-4" />
             {copy.badge}
           </div>
-          <h1 className="mt-3 text-3xl font-black text-white">{title ?? copy.title}</h1>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            <h1 className="text-3xl font-black text-white">{title ?? copy.title}</h1>
+            <ReadAloudBtn
+              text={reviewSpeech}
+              speechKey={`mistake-review-results-${mode}`}
+              label="Read results"
+              className="border-white/20 bg-white/10 text-white hover:bg-white/15"
+            />
+          </div>
         </div>
 
         {items.length === 0 ? (
@@ -139,7 +150,13 @@ export default function MistakeReviewPanel({
                         prompt: item.prompt,
                         studentAnswer: copy.showAnswers ? item.studentAnswer : null,
                         correctAnswer: copy.showAnswers ? item.correctAnswer : null,
-                        explanation: item.explanation || copy.explanation,
+                        explanation: [
+                          item.explanation || copy.explanation,
+                          item.week ? `Week ${item.week}.` : "",
+                          item.lesson ? `Lesson ${item.lesson}.` : "",
+                          item.lessonTitle || item.skillLabel || "",
+                          copy.showPracticeButton && onPractice ? "Choose Go to Lesson to practise this skill." : "",
+                        ].filter(Boolean).join(" "),
                       })}
                       speechKey={`mistake-review:${mode}:${item.id}`}
                       label="Read feedback"

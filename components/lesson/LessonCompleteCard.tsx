@@ -32,6 +32,18 @@ export function LessonCompleteCard({
 }) {
   const xp = calcXP(xpCorrectAnswers ?? correctAnswers);
   const theme = getRealmTheme(realmId);
+  const resolvedTitle = completionTitle ?? lessonTitle;
+  const resolvedMessage = completionMessage ?? "Nice work. Your progress has been updated.";
+  const resolvedExitLabel = exitLabel ?? "Return to Week";
+  const resultsSpeech = [
+    "Lesson complete.",
+    `${resolvedTitle}.`,
+    `${resolvedMessage}`,
+    `You earned ${xp} X P.`,
+    `You answered ${questionsAnswered} questions and got ${correctAnswers} correct.`,
+    `Your accuracy was ${Math.round(accuracy)} percent.`,
+    `Next button: ${resolvedExitLabel}.`,
+  ].join(" ");
 
   return (
     <div className="relative">
@@ -87,11 +99,11 @@ export function LessonCompleteCard({
           </div>
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
             <h2 className="text-2xl font-bold tracking-[-0.01em] text-white">
-              {completionTitle ?? lessonTitle}
+              {resolvedTitle}
             </h2>
             <ReadAloudBtn
-              text={`${completionTitle ?? lessonTitle}. ${completionMessage ?? "Nice work. Your progress has been updated."}`}
-              label="Read"
+              text={resultsSpeech}
+              label="Read results"
               className="border-white/20 bg-white/10 text-white"
             />
           </div>
@@ -154,7 +166,7 @@ export function LessonCompleteCard({
               color: theme.isMeasurement ? "#f5e6c4" : "#ccfbf1",
             }}
           >
-            {completionMessage ?? "Nice work — your progress has been updated."}
+            {resolvedMessage}
           </div>
 
           <button

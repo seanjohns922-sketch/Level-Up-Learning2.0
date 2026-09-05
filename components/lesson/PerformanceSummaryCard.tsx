@@ -1,5 +1,7 @@
 "use client";
 
+import ReadAloudBtn from "@/components/ReadAloudBtn";
+
 type TopicPerformanceSummary = {
   label: string;
   correct: number;
@@ -35,6 +37,23 @@ export function PerformanceSummaryCard({
   onStartPostTest: () => void;
   onPractiseWeakAreas: () => void;
 }) {
+  const resultsSpeech = [
+    `Performance summary for ${summary.lessonTitle}.`,
+    `You answered ${summary.questionsAnswered} questions with ${summary.accuracy} percent accuracy.`,
+    `Your total time was ${formatDuration(summary.timeSpentSeconds)}.`,
+    `Accuracy per topic: ${summary.topicSummaries.map((topic) => `${topic.label}, ${topic.correct} out of ${topic.total}, ${topic.accuracy} percent, in ${formatDuration(topic.timeSpentSeconds)}`).join(". ")}.`,
+    summary.strengths.length > 0
+      ? `Your strengths were ${summary.strengths.map((item) => `${item.label}, ${item.accuracy} percent`).join("; ")}.`
+      : "No clear strength showed yet in this run.",
+    summary.areasToImprove.length > 0
+      ? `Areas to improve are ${summary.areasToImprove.map((item) => `${item.label}, ${item.accuracy} percent`).join("; ")}.`
+      : "No major gaps showed up in this session.",
+    summary.struggledQuestionTypes.length > 0
+      ? `Question types that needed more care: ${summary.struggledQuestionTypes.join(", ")}.`
+      : "No repeated struggle pattern showed up.",
+    "You can choose Start Post-Test or Practise weak areas.",
+  ].join(" ");
+
   return (
     <div className="relative">
       <div
@@ -62,9 +81,16 @@ export function PerformanceSummaryCard({
           <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-300/30 bg-teal-500/10 px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-teal-200/90">
             Performance Summary
           </div>
-          <h2 className="mt-2 text-2xl font-bold tracking-[-0.01em] text-white">
-            {summary.lessonTitle}
-          </h2>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+            <h2 className="text-2xl font-bold tracking-[-0.01em] text-white">
+              {summary.lessonTitle}
+            </h2>
+            <ReadAloudBtn
+              text={resultsSpeech}
+              label="Read results"
+              className="border-white/20 bg-white/10 text-white hover:bg-white/15"
+            />
+          </div>
           <p className="mt-2 text-sm font-medium text-teal-50/85">
             Accuracy by topic, time spent, and the question types that needed the most care.
           </p>

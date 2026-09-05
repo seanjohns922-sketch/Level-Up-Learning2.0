@@ -183,6 +183,33 @@ export default function StarpathVoyageQuiz({
   const wrongIndexes = orderedTasks
     .map((_, questionIndex) => questionIndex)
     .filter((questionIndex) => answers[String(questionIndex)] === false);
+  const resultsTitle = passed
+    ? isStatistica
+      ? "Data check complete!"
+      : isPattern
+        ? "Peak quiz complete!"
+        : "Voyage complete!"
+    : "Keep exploring!";
+  const resultsSpeech = [
+    resultsTitle,
+    `You answered ${finalScore} out of ${total} questions correctly. Your score was ${percent} percent.`,
+    passed
+      ? `You passed the ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent} percent mark and earned ${QUIZ_XP} X P.`
+      : `You need ${requiredCorrect} out of ${total} to pass. Week ${quiz.week + 1} is not unlocked yet.`,
+    ...lessonScores.map((result) =>
+      `${isLessonRealm ? "Lesson" : "Mission"} ${result.lesson}, ${result.title}: ${result.score} out of 5.`
+    ),
+    wrongIndexes.length
+      ? `Where to practise: ${weakestLessons
+          .map((result) => `${isLessonRealm ? "Lesson" : "Mission"} ${result.lesson}, ${result.title}`)
+          .join(" and ")}.`
+      : "You answered every question correctly.",
+    !passed ? "You can choose Retry Quiz." : "",
+    wrongIndexes.length ? "You can choose Review Answers." : "",
+    passed && quiz.nextWeekHref
+      ? `You can continue to Week ${quiz.week + 1}.`
+      : `You can return to Week ${quiz.week}.`,
+  ].filter(Boolean).join(" ");
   const quizIntroduction = `${quiz.title}. Great work completing this week's ${unitLabel}s! It is time to show what you discovered across all three ${unitLabel}s. There are 15 questions, with five questions from each ${unitLabel}. The quiz takes approximately 8 to 10 minutes. Work at your own pace. The pass mark is 80 percent. You can earn ${QUIZ_XP} XP, chain progress, and gems.`;
   const backHref = getWorld3DReturnPathForQuiz({
     realmId: realm,
@@ -537,9 +564,15 @@ export default function StarpathVoyageQuiz({
               >
                 <span className="text-3xl font-black">{percent}%</span>
               </div>
-              <h2 className="mt-5 text-3xl font-black text-slate-950">
-                {passed ? (isStatistica ? "Data check complete!" : isPattern ? "Peak quiz complete!" : "Voyage complete!") : "Keep exploring!"}
-              </h2>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+                <h2 className="text-3xl font-black text-slate-950">{resultsTitle}</h2>
+                <ReadAloudBtn
+                  text={resultsSpeech}
+                  speechKey={`${realm}-weekly-quiz-results-${quiz.level}-${quiz.week}`}
+                  label="Read results"
+                  className={isPattern ? "border-[#39d9a0]/45 bg-white text-[#14785f]" : isStatistica ? "border-[#f06b64]/40 bg-white text-[#8e3341]" : "border-violet-200 bg-white text-violet-800"}
+                />
+              </div>
               <p className="mt-2 text-base font-semibold text-slate-600">
                 You answered {finalScore}/{total} correctly.
                 {passed

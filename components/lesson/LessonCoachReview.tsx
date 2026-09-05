@@ -17,6 +17,7 @@ function buildSpokenSummary(review: CoachReview): string {
   if (review.keepPractising.length) parts.push(`Keep practising: ${review.keepPractising.join(" ")}`);
   if (review.coachTip) parts.push(`Coach tip: ${review.coachTip}`);
   if (review.nextUpLabel) parts.push(`Next up: ${review.nextUpLabel}.`);
+  parts.push("Choose Continue when you are ready.");
   return parts.join(" ");
 }
 

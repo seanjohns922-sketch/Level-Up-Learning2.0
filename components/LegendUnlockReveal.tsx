@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Library, Star } from "lucide-react";
 import LegendCardArtwork from "@/components/legends/LegendCardArtwork";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { Legend } from "@/data/legends";
 import { markLegendUnlockVideoSeen } from "@/lib/legend-video-state";
 
@@ -114,6 +115,15 @@ export default function LegendUnlockReveal({
   const showInfo = past("info");
   const showButtons = past("ready");
   const hasUnlockVideo = Boolean(unlockVideoUrl);
+  const revealSpeech = [
+    `${headerTitle}. Legend unlocked.`,
+    `You unlocked ${legend.name}.`,
+    `${legend.strand}, ${legend.yearLabel}.`,
+    scorePercent !== undefined ? `Your score was ${scorePercent} percent. ${scoreLabel}.` : "",
+    legend.description,
+    hasUnlockVideo ? "A Legend cinematic is available." : "",
+    "You can choose View My Legends or Continue.",
+  ].filter(Boolean).join(" ");
 
   useEffect(() => {
     if (!hasUnlockVideo || !showInfo || videoComplete || videoFailed || !videoRef.current) return;
@@ -417,6 +427,13 @@ export default function LegendUnlockReveal({
           >
             {legend.description}
           </p>
+
+          <ReadAloudBtn
+            text={revealSpeech}
+            speechKey={`legend-unlock-results-${legend.id}`}
+            label="Read results"
+            className="mt-3 border-white/20 bg-white/10 text-white hover:bg-white/15"
+          />
 
           {showInfo && hasUnlockVideo ? (
             <div className="mt-4 w-full rounded-lg border border-white/12 bg-black/30 p-2 backdrop-blur-sm">

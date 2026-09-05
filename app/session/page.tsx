@@ -8903,16 +8903,47 @@ function SessionPage({
   const quizReviewSpoken = useMemo(() => {
     const total = Math.max(1, quizQuestions.length);
     const pct = Math.round((finalScore / total) * 100);
-    const passed = finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100));
+    const requiredCorrect = Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100));
+    const passed = finalScore >= requiredCorrect;
     const parts: string[] = [
+      `${quizCompletionTitle}.`,
+      `${quizCompletionMessage}`,
       `You scored ${finalScore} out of ${quizQuestions.length}, ${pct} percent.`,
-      passed ? "You passed!" : "Keep going — you're close.",
+      passed
+        ? isFinalQuizWeek
+          ? "You passed the final weekly quiz. The post-test is next."
+          : `You passed. Week ${Number(week) + 1} is unlocked.`
+        : `Keep going. You need ${requiredCorrect} out of ${quizQuestions.length} to pass.`,
     ];
-    lessonBreakdown.forEach((b) => parts.push(`Lesson ${b.lessonNumber}: ${b.correct} out of ${b.total}.`));
-    if (!passed && weakestLessonBreakdown) parts.push(`Keep practising Lesson ${weakestLessonBreakdown.lessonNumber}.`);
+    lessonBreakdown.forEach((b) => parts.push(
+      `Lesson ${b.lessonNumber}${b.lessonTitle ? `, ${b.lessonTitle}` : ""}: ${b.correct} out of ${b.total}, ${b.percent} percent. ${getLessonFeedback(b.correct, b.total)}.`
+    ));
+    if (quizHasMistakes && weakestLessonBreakdowns.length > 0) {
+      parts.push(`Recommended practice: ${weakestLessonBreakdowns
+        .map((item) => `Lesson ${item.lessonNumber}${item.lessonTitle ? `, ${item.lessonTitle}` : ""}`)
+        .join(" and ")}.`);
+    } else {
+      parts.push("Well done. You mastered every skill this week.");
+    }
     parts.push(`Coach tip: ${quizCoachTip}`);
+    parts.push("Available buttons include Back to Week.");
+    if (!passed) parts.push("You can choose Try Quiz Again or practise the recommended lesson.");
+    if (quizHasMistakes) parts.push("You can choose Review My Quiz.");
+    if (passed) parts.push(isFinalQuizWeek ? "You can choose Continue to Post-Test." : `You can choose Go to Week ${Number(week) + 1}.`);
     return parts.join(" ");
-  }, [finalScore, quizQuestions.length, quizConfig, lessonBreakdown, weakestLessonBreakdown, quizCoachTip]);
+  }, [
+    finalScore,
+    isFinalQuizWeek,
+    lessonBreakdown,
+    quizCompletionMessage,
+    quizCompletionTitle,
+    quizConfig,
+    quizCoachTip,
+    quizHasMistakes,
+    quizQuestions.length,
+    weakestLessonBreakdowns,
+    week,
+  ]);
   const isReadingQuizReview = speakState.isSpeaking && speakState.currentText === quizReviewSpoken;
 
   function completeWeek(currentWeek: number) {
