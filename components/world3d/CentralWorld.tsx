@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, Cherry, Droplets, Eraser, Fence, Flag, Flower2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, Route, RotateCw, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, Check, Cherry, Droplets, Eraser, Feather, Fence, Flag, Flower2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
@@ -59,6 +59,7 @@ const SCENERY_GROUPS: Array<[string, WorldSceneryGroup]> = [
   ["TREES & PLANTS", "trees_plants"],
   ["ROCKS & WATER", "rocks_water"],
   ["FURNITURE & FUN", "furniture_fun"],
+  ["AUSSIE ANIMALS", "animals"],
 ];
 // A little symbol per scenery item, keyed by its worldAssetKey. Bridge,
 // toadstool and sign have no exact lucide glyph, so Landmark/Cherry/Signpost
@@ -69,6 +70,7 @@ const SCENERY_ICON: Record<string, LucideIcon> = {
   tree: TreeDeciduous, pine_tree: TreePine, palm_tree: TreePalm, shrub: Shrub, hedge: Leaf, toadstool: Cherry, log: Logs, flower_bed: Flower2,
   boulder: Mountain, rock_pile: Hexagon, pond: Waves, fountain: Droplets, bridge: Landmark,
   lamp_post: Lamp, bench: Sofa, fence: Fence, mailbox: Mailbox, flag: Flag, umbrella: Umbrella, signpost: Signpost, balloons: PartyPopper,
+  kangaroo: Rabbit, koala: PawPrint, wombat: PawPrint, emu: Bird, kookaburra: Feather, echidna: Shell, cockatoo: Bird,
 };
 
 type CentralWorldMetrics = {

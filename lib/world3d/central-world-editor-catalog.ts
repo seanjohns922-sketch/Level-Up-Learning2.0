@@ -1,6 +1,6 @@
 import type { EconomyItem } from "@/lib/economy";
 
-export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun";
+export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals";
 
 function starter(
   item_key: string,
@@ -62,4 +62,13 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_umbrella", "Umbrella", "umbrella", "#f2704a", "furniture_fun", "2x2", 1.4),
   starter("central_world_starter_sign", "Sign", "signpost", "#a16207", "furniture_fun", "1x1", 1.1),
   starter("central_world_starter_balloons", "Balloons", "balloons", "#e0518a", "furniture_fun", "1x1", 1.15),
+
+  // Aussie animals
+  starter("central_world_starter_kangaroo", "Kangaroo", "kangaroo", "#b5793f", "animals", "1x1", 1.3),
+  starter("central_world_starter_koala", "Koala", "koala", "#8a94a0", "animals", "1x1", 1.1),
+  starter("central_world_starter_wombat", "Wombat", "wombat", "#7a5a3f", "animals", "1x1", 1.1),
+  starter("central_world_starter_emu", "Emu", "emu", "#6b5f52", "animals", "1x1", 1.35),
+  starter("central_world_starter_kookaburra", "Kookaburra", "kookaburra", "#9c8161", "animals", "1x1", 1.0),
+  starter("central_world_starter_echidna", "Echidna", "echidna", "#5c4a35", "animals", "1x1", 1.0),
+  starter("central_world_starter_cockatoo", "Cockatoo", "cockatoo", "#e6ebef", "animals", "1x1", 1.0),
 ];
