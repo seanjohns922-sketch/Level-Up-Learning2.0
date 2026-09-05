@@ -483,7 +483,13 @@ function StarterScenery({ assetKey }: { assetKey: string }) {
 // so a 16 m AFL oval towers over a 4 m gum-tree cubby. Models are authored to
 // span ~4.6 world units at scale 1 and fill ~92% of the smaller footprint edge.
 function worldObjectScale(item: EconomyItem) {
-  if (item.metadata.marketplaceCategory === "world_basic") return 1.25;
+  if (item.metadata.marketplaceCategory === "world_basic") {
+    // Free scenery meshes are authored at varied natural sizes, so each item
+    // carries its own display scale (tuned to fill its footprint) rather than a
+    // one-size-fits-all value that leaves long items like the bridge undersized.
+    const custom = Number(item.metadata.worldScale);
+    return Number.isFinite(custom) && custom > 0 ? custom : 1.25;
+  }
   const [gridW, gridD] = parseGridSize(item);
   const footprintMetres = Math.min(gridW, gridD) * CENTRAL_WORLD_GRID.cellSize;
   const scale = (footprintMetres * 0.92) / 4.6;
