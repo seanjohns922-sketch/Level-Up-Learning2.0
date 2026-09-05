@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { DEFAULT_OUTFIT } from "@/components/avatar/StudentAvatar";
 import { useCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 
-export type WorldMoveInput = { up: boolean; down: boolean; left: boolean; right: boolean; analogX?: number; analogY?: number; magnitude?: number };
+export type WorldMoveInput = { up: boolean; down: boolean; left: boolean; right: boolean; analogX?: number; analogY?: number; magnitude?: number; sprint?: boolean };
 export type WorldLookInput = { x: number; y: number; magnitude: number };
 export type WorldMovementBounds = { minX: number; maxX: number; minZ: number; maxZ: number };
 export type WorldRoamEllipse = { centerZ: number; radiusX: number; radiusZ: number };
@@ -15,7 +15,7 @@ export type WorldInteractionTarget = { id: string; position: [number, number, nu
 export const EMPTY_WORLD_MOVE_INPUT: WorldMoveInput = { up: false, down: false, left: false, right: false, analogX: 0, analogY: 0, magnitude: 0 };
 export const EMPTY_WORLD_LOOK_INPUT: WorldLookInput = { x: 0, y: 0, magnitude: 0 };
 
-export function TrialStudentAvatar({ movingRef }: { movingRef: React.MutableRefObject<boolean> }) {
+export function TrialStudentAvatar({ movingRef, sprintingRef }: { movingRef: React.MutableRefObject<boolean>; sprintingRef?: React.MutableRefObject<boolean> }) {
   const bodyRef = useRef<THREE.Group>(null);
   const leftLegRef = useRef<THREE.Group>(null);
   const rightLegRef = useRef<THREE.Group>(null);
@@ -31,17 +31,20 @@ export function TrialStudentAvatar({ movingRef }: { movingRef: React.MutableRefO
   const topTrim = avatar.shirtTrim;
   const pants = avatar.pants;
   const shoes = avatar.shoes;
+  const gaitPhase = useRef(0);
 
-  useFrame(({ clock }, delta) => {
-    const phase = clock.elapsedTime * 8.5;
-    const stride = movingRef.current ? Math.sin(phase) * 0.62 : 0;
+  useFrame((_, delta) => {
+    const sprinting = Boolean(sprintingRef?.current);
+    gaitPhase.current += delta * (sprinting ? 13.5 : 8.5);
+    const strideStrength = sprinting ? 0.78 : 0.62;
+    const stride = movingRef.current ? Math.sin(gaitPhase.current) * strideStrength : 0;
     const smoothing = 1 - Math.exp(-delta * 14);
     if (leftLegRef.current) leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, stride, smoothing);
     if (rightLegRef.current) rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, -stride, smoothing);
     if (leftArmRef.current) leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, -stride * 0.72, smoothing);
     if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, stride * 0.72, smoothing);
     if (bodyRef.current) {
-      const targetY = movingRef.current ? Math.abs(Math.sin(phase * 2)) * 0.035 : 0;
+      const targetY = movingRef.current ? Math.abs(Math.sin(gaitPhase.current * 2)) * (sprinting ? 0.05 : 0.035) : 0;
       bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, targetY, smoothing);
     }
   });
@@ -120,6 +123,7 @@ export function SharedThirdPersonPlayer({
   const keys = useRef(new Set<string>());
   const playerRef = useRef<THREE.Group | null>(null);
   const movingRef = useRef(false);
+  const sprintingRef = useRef(false);
   const nearestIdRef = useRef<string | null>(null);
   const yaw = useRef(initialYaw);
   const pitch = useRef(initialPitch);
@@ -197,12 +201,14 @@ export function SharedThirdPersonPlayer({
     movement.addScaledVector(forward, analogY);
     movement.addScaledVector(right, analogX);
     movingRef.current = movement.lengthSq() > 0;
+    sprintingRef.current = Boolean(moveInput.sprint || keys.current.has("shift"));
     if (movement.lengthSq() > 0) {
       const keyboardActive = keys.current.has("w") || keys.current.has("arrowup") || keys.current.has("s") || keys.current.has("arrowdown") || keys.current.has("d") || keys.current.has("arrowright") || keys.current.has("a") || keys.current.has("arrowleft") || moveInput.up || moveInput.down || moveInput.left || moveInput.right;
       const intensity = keyboardActive ? 1 : THREE.MathUtils.clamp(moveInput.magnitude ?? Math.hypot(analogX, analogY), 0, 1);
       movement.normalize();
       player.rotation.y = Math.atan2(movement.x, movement.z);
-      movement.multiplyScalar(speed * intensity * delta);
+      const movementSpeed = speed * (sprintingRef.current ? 1.75 : 1);
+      movement.multiplyScalar(movementSpeed * intensity * delta);
       player.position.add(movement);
     }
     player.position.x = THREE.MathUtils.clamp(player.position.x, bounds.minX, bounds.maxX);
@@ -246,7 +252,57 @@ export function SharedThirdPersonPlayer({
     }
   });
 
-  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]}><TrialStudentAvatar movingRef={movingRef} /></group>;
+  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group>;
+}
+
+function WorldSprintButton({ active, onChange }: { active: boolean; onChange: (active: boolean) => void }) {
+  const release = () => onChange(false);
+  return (
+    <button
+      type="button"
+      aria-label="Hold to run faster"
+      aria-pressed={active}
+      title="Hold to run faster. On a keyboard, hold Shift while moving."
+      data-world-sprint
+      onPointerDown={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        event.currentTarget.setPointerCapture(event.pointerId);
+        onChange(true);
+      }}
+      onPointerUp={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+        release();
+      }}
+      onPointerCancel={release}
+      onLostPointerCapture={release}
+      style={{
+        position: "absolute",
+        left: "max(166px, calc(env(safe-area-inset-left) + 160px))",
+        bottom: "max(42px, calc(env(safe-area-inset-bottom) + 36px))",
+        zIndex: 33,
+        width: 70,
+        height: 70,
+        border: `2px solid ${active ? "#fde68a" : "rgba(255,244,220,.58)"}`,
+        borderRadius: "50%",
+        background: active ? "linear-gradient(145deg, #facc15, #f59e0b)" : "rgba(15,23,42,.9)",
+        color: active ? "#422006" : "#fff8e8",
+        boxShadow: active ? "0 0 0 5px rgba(250,204,21,.2), 0 10px 28px rgba(0,0,0,.35)" : "0 10px 28px rgba(0,0,0,.32)",
+        fontSize: 12,
+        fontWeight: 950,
+        letterSpacing: ".08em",
+        cursor: "pointer",
+        touchAction: "none",
+        userSelect: "none",
+        WebkitUserSelect: "none",
+      }}
+    >
+      <span aria-hidden="true" style={{ display: "block", fontSize: 20, lineHeight: 1 }}>⚡</span>
+      RUN
+    </button>
+  );
 }
 
 export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void }) {
@@ -265,7 +321,7 @@ export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onCha
       >{display}</button>
     );
   };
-  return <div style={{ position: "absolute", left: 16, bottom: 18, display: "grid", gridTemplateColumns: "44px 44px 44px", gap: 7, pointerEvents: "auto" }}><span />{button("UP")}<span />{button("LEFT")}{button("DOWN")}{button("RIGHT")}</div>;
+  return <><div style={{ position: "absolute", left: 16, bottom: 18, display: "grid", gridTemplateColumns: "44px 44px 44px", gap: 7, pointerEvents: "auto" }}><span />{button("UP")}<span />{button("LEFT")}{button("DOWN")}{button("RIGHT")}</div><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
 }
 
 function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "left" | "right"; label: string; dataAttribute: "move" | "look"; onChange: (input: { x: number; y: number; magnitude: number }) => void }) {
@@ -356,8 +412,8 @@ function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "
   );
 }
 
-export function WorldJoystick({ onChange }: { onChange: (input: WorldMoveInput) => void }) {
-  return <WorldAnalogJoystick side="left" label="Movement joystick. Drag in any direction to move." dataAttribute="move" onChange={({ x, y, magnitude }) => onChange({ ...EMPTY_WORLD_MOVE_INPUT, analogX: x, analogY: y, magnitude })} />;
+export function WorldJoystick({ input, onChange }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void }) {
+  return <><WorldAnalogJoystick side="left" label="Movement joystick. Drag in any direction to move." dataAttribute="move" onChange={({ x, y, magnitude }) => onChange({ ...input, up: false, down: false, left: false, right: false, analogX: x, analogY: y, magnitude })} /><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
 }
 
 export function WorldLookJoystick({ onChange }: { onChange: (input: WorldLookInput) => void }) {

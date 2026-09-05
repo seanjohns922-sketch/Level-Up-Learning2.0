@@ -548,7 +548,7 @@ export default function CentralWorld() {
         { key: "map", label: "Map", icon: <MapIcon size={15} />, onClick: () => router.push(preview ? "/home-base?teacher_preview=1" : "/home-base") },
       ]} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
 
-      {!buildPreview && !editorOpen ? <><WorldJoystick onChange={setMoveInput} /><WorldLookJoystick onChange={setLookInput} /></> : null}
+      {!buildPreview && !editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} /><WorldLookJoystick onChange={setLookInput} /></> : null}
       {buildPreview && !editorOpen ? (
         <section aria-label="Build mode controls" style={{ position: "absolute", left: "50%", bottom: 22, transform: "translateX(-50%)", zIndex: 35, width: "min(94vw, 560px)", border: `2px solid ${buildValid ? "#4ade80" : "#fb7185"}`, borderRadius: 8, background: "rgba(18,28,24,.94)", color: "#fff", padding: 12, boxShadow: "0 14px 40px rgba(0,0,0,.35)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}><div><div style={{ color: "#f6c862", fontSize: 11, fontWeight: 950, letterSpacing: ".16em" }}>BUILD MODE</div><div style={{ marginTop: 2, fontSize: 18, fontWeight: 950 }}>{buildPreview.item.name}</div></div><WorldVoiceButton compact label="Read build instructions" text={`${buildPreview.item.name}. Use the arrow buttons to choose a place. Rotate it if you want. Green means it can be placed. Red means choose another space.`} /></div>
