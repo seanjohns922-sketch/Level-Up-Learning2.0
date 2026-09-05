@@ -379,13 +379,17 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   if (assetKey === "flower_bed") return <group><mesh position={[0, 0.15, 0]}><cylinderGeometry args={[0.72, 0.82, 0.24, 20]} /><meshStandardMaterial color="#5d3b24" roughness={1} /></mesh>{[[0.3, "#f472b6"], [-0.28, "#facc15"], [0, "#a78bfa"]].map(([x, color], index) => <mesh key={index} position={[Number(x), 0.48, index === 2 ? 0.25 : -0.08]}><sphereGeometry args={[0.2, 10, 8]} /><meshStandardMaterial color={t(String(color))} /></mesh>)}</group>;
 
   if (assetKey === "palm_tree") return <group>
-    <mesh position={[0, 1.3, 0]} rotation={[0, 0, 0.08]} castShadow><cylinderGeometry args={[0.16, 0.28, 2.6, 8]} /><meshStandardMaterial color="#9a6b3f" roughness={0.9} /></mesh>
-    {Array.from({ length: 6 }, (_, i) => { const a = (i / 6) * Math.PI * 2; return <mesh key={i} position={[Math.cos(a) * 0.45, 2.55, Math.sin(a) * 0.45]} rotation={[0.6, -a, 0]} castShadow><coneGeometry args={[0.3, 1.7, 4]} /><meshStandardMaterial color={t(i % 2 ? "#2f9e6f" : "#37b07d")} roughness={0.9} /></mesh>; })}
-    {([[-0.14, 0.12], [0.16, -0.08], [0.04, 0.18]] as const).map(([x, z], i) => <mesh key={i} position={[x, 2.42, z]}><sphereGeometry args={[0.11, 10, 8]} /><meshStandardMaterial color="#6b4423" roughness={0.8} /></mesh>)}
+    {/* curved two-segment trunk with ring texture */}
+    <mesh position={[0, 0.75, 0]} rotation={[0, 0, 0.05]} castShadow><cylinderGeometry args={[0.2, 0.28, 1.5, 8]} /><meshStandardMaterial color="#9a6b3f" roughness={0.9} /></mesh>
+    <mesh position={[0.14, 2.05, 0]} rotation={[0, 0, 0.17]} castShadow><cylinderGeometry args={[0.14, 0.2, 1.7, 8]} /><meshStandardMaterial color="#a5764a" roughness={0.9} /></mesh>
+    {([0.5, 1.0, 1.5, 2.0, 2.5] as const).map((y, i) => <mesh key={i} position={[y * 0.05, y, 0]} rotation={[0, 0, 0.1]}><cylinderGeometry args={[0.215, 0.215, 0.09, 8]} /><meshStandardMaterial color="#7e552f" roughness={0.92} /></mesh>)}
+    {/* drooping fronds */}
+    {Array.from({ length: 9 }, (_, i) => { const a = (i / 9) * Math.PI * 2; return <mesh key={i} position={[0.28 + Math.cos(a) * 0.3, 2.85, Math.sin(a) * 0.3]} rotation={[0.95, -a, 0]} castShadow><coneGeometry args={[0.17, 2.0, 4]} /><meshStandardMaterial color={t(i % 2 ? "#2f9e6f" : "#37b07d")} roughness={0.9} /></mesh>; })}
+    {([[-0.12, 0.1], [0.16, -0.06], [0.05, 0.16]] as const).map(([x, z], i) => <mesh key={i} position={[0.28 + x, 2.72, z]}><sphereGeometry args={[0.1, 10, 8]} /><meshStandardMaterial color="#6b4423" roughness={0.8} /></mesh>)}
   </group>;
 
   if (assetKey === "shrub") return <group>
-    {([[0, 0.5, 0, 0.6], [-0.42, 0.4, 0.1, 0.44], [0.4, 0.42, -0.08, 0.46], [0.1, 0.78, 0.04, 0.4]] as const).map(([x, y, z, r], i) => <mesh key={i} position={[x, y, z]} castShadow><sphereGeometry args={[r, 12, 10]} /><meshStandardMaterial color={t(i % 2 ? "#4d9b46" : "#3f8f3a")} roughness={0.95} /></mesh>)}
+    {([[0, 0.52, 0, 0.6], [-0.44, 0.42, 0.12, 0.46], [0.42, 0.44, -0.1, 0.48], [0.12, 0.82, 0.05, 0.44], [-0.2, 0.68, -0.34, 0.38], [0.3, 0.72, 0.32, 0.36]] as const).map(([x, y, z, r], i) => <mesh key={i} position={[x, y, z]} castShadow><sphereGeometry args={[r, 12, 10]} /><meshStandardMaterial color={t(["#4d9b46", "#3f8f3a", "#57b85a", "#469544", "#3a8738", "#50a84c"][i])} roughness={0.95} /></mesh>)}
   </group>;
 
   if (assetKey === "hedge") return <group>
@@ -550,8 +554,24 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
     {([-0.09, 0.09] as const).map((dx) => <mesh key={dx} position={[dx, 1.18, 0.18]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
   </group>;
 
-  const pine = assetKey === "pine_tree";
-  return <group><mesh position={[0, 1.05, 0]} castShadow><cylinderGeometry args={[0.18, 0.3, 2.1, 10]} /><meshStandardMaterial color="#74431f" roughness={0.9} /></mesh>{pine ? <><mesh position={[0, 2.15, 0]} castShadow><coneGeometry args={[1.05, 2.2, 10]} /><meshStandardMaterial color={t("#276749")} roughness={0.95} /></mesh><mesh position={[0, 3.05, 0]} castShadow><coneGeometry args={[0.78, 1.65, 10]} /><meshStandardMaterial color={t("#2f855a")} roughness={0.95} /></mesh></> : <><mesh position={[-0.42, 2.25, 0]} castShadow><sphereGeometry args={[0.78, 14, 10]} /><meshStandardMaterial color={t("#3f8f3a")} roughness={0.95} /></mesh><mesh position={[0.45, 2.35, 0.08]} castShadow><sphereGeometry args={[0.88, 14, 10]} /><meshStandardMaterial color={t("#4cae4f")} roughness={0.95} /></mesh></>}</group>;
+  if (assetKey === "pine_tree") return <group>
+    <mesh position={[0, 0.95, 0]} castShadow><cylinderGeometry args={[0.16, 0.28, 1.9, 8]} /><meshStandardMaterial color="#5b3a1e" roughness={0.9} /></mesh>
+    {([[2.05, 1.15, "#2f6d3f"], [2.75, 0.94, "#357a46"], [3.35, 0.74, "#3c854c"], [3.9, 0.54, "#43904f"]] as const).map(([y, r, c], i) => <mesh key={i} position={[0, y, 0]} castShadow><coneGeometry args={[r, 1.35, 10]} /><meshStandardMaterial color={t(c)} roughness={0.95} /></mesh>)}
+    <mesh position={[0, 4.45, 0]} castShadow><coneGeometry args={[0.26, 0.7, 8]} /><meshStandardMaterial color={t("#47954f")} roughness={0.9} /></mesh>
+  </group>;
+
+  // broadleaf tree — tapered trunk, a couple of branch stubs and a layered,
+  // multi-tone canopy so it reads fuller and more organic than two spheres.
+  const canopy = [
+    [0, 3.05, 0, 1.05, "#3f8f3a"], [-0.72, 2.72, 0.24, 0.82, "#4cae4f"], [0.76, 2.78, -0.16, 0.86, "#57b85a"],
+    [0.16, 3.55, 0.1, 0.72, "#379a44"], [-0.36, 3.2, -0.4, 0.66, "#4aa64d"], [0.42, 3.22, 0.46, 0.62, "#42933f"],
+  ] as const;
+  return <group>
+    <mesh position={[0, 1.15, 0]} castShadow><cylinderGeometry args={[0.15, 0.33, 2.3, 8]} /><meshStandardMaterial color="#74431f" roughness={0.9} /></mesh>
+    <mesh position={[0.28, 2.0, 0]} rotation={[0, 0, -0.6]} castShadow><cylinderGeometry args={[0.06, 0.11, 0.85, 6]} /><meshStandardMaterial color="#6f3f1c" roughness={0.9} /></mesh>
+    <mesh position={[-0.24, 2.2, 0.06]} rotation={[0, 0, 0.7]} castShadow><cylinderGeometry args={[0.05, 0.1, 0.72, 6]} /><meshStandardMaterial color="#6b3d1c" roughness={0.9} /></mesh>
+    {canopy.map(([x, y, z, r, c], i) => <mesh key={i} position={[x, y, z]} castShadow><sphereGeometry args={[r, 14, 12]} /><meshStandardMaterial color={t(c)} roughness={0.94} /></mesh>)}
+  </group>;
 }
 
 // Size comes from the item's own footprint now, not a fixed per-category number,
