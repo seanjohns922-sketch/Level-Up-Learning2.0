@@ -558,17 +558,21 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   </group>;
 
   if (assetKey === "kookaburra") return <group>
-    <mesh position={[0, 0.25, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.06, 0.06, 0.7, 8]} /><meshStandardMaterial color="#6f4a2c" /></mesh>
-    <mesh position={[0, 0.72, 0]} scale={[0.8, 0.98, 1]} castShadow><sphereGeometry args={[0.34, 16, 12]} /><meshStandardMaterial color={t("#f2ece0")} roughness={0.9} /></mesh>
-    <mesh position={[0, 0.82, -0.16]} scale={[0.9, 0.82, 0.7]}><sphereGeometry args={[0.3, 14, 10]} /><meshStandardMaterial color="#7c5f3e" /></mesh>
-    {/* blue wing patches */}
-    {([-1, 1] as const).map((s) => <mesh key={s} position={[s * 0.3, 0.72, -0.05]} rotation={[0, 0, s * 0.2]} scale={[0.4, 0.85, 0.5]}><sphereGeometry args={[0.2, 10, 8]} /><meshStandardMaterial color="#3f7d9c" roughness={0.7} /></mesh>)}
-    <mesh position={[0, 1.06, 0.06]} castShadow><sphereGeometry args={[0.26, 14, 12]} /><meshStandardMaterial color={t("#f2ece0")} /></mesh>
-    <mesh position={[0, 1.2, 0.0]} scale={[0.9, 0.5, 0.9]}><sphereGeometry args={[0.24, 12, 8]} /><meshStandardMaterial color="#7c5f3e" /></mesh>
-    {([-1, 1] as const).map((s) => <mesh key={s} position={[s * 0.16, 1.06, 0.12]} scale={[1.4, 0.5, 0.6]}><sphereGeometry args={[0.1, 10, 8]} /><meshStandardMaterial color="#6f5636" /></mesh>)}
-    <mesh position={[0, 1.0, 0.34]} rotation={[Math.PI / 2, 0, 0]} castShadow><coneGeometry args={[0.09, 0.4, 8]} /><meshStandardMaterial color="#33302a" /></mesh>
-    <mesh position={[0, 0.66, -0.38]} rotation={[0.4, 0, 0]}><boxGeometry args={[0.24, 0.06, 0.4]} /><meshStandardMaterial color="#6a4f30" /></mesh>
-    {([-0.1, 0.1] as const).map((dx) => <mesh key={dx} position={[dx, 1.12, 0.2]}><sphereGeometry args={[0.038, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
+    <StarterGum />
+    {/* kookaburra perched on a branch up in the tree */}
+    <group position={[0.42, 2.3, 0.5]}>
+      <mesh position={[0, 0.28, -0.15]} rotation={[0.2, 0.4, Math.PI / 2]}><cylinderGeometry args={[0.045, 0.06, 0.7, 8]} /><meshStandardMaterial color="#6f4a2c" /></mesh>
+      {([-0.09, 0.09] as const).map((dx) => <mesh key={dx} position={[dx, 0.33, 0.02]}><cylinderGeometry args={[0.02, 0.02, 0.16, 6]} /><meshStandardMaterial color="#5a4a30" /></mesh>)}
+      <mesh position={[0, 0.72, 0]} scale={[0.8, 0.98, 1]} castShadow><sphereGeometry args={[0.34, 16, 12]} /><meshStandardMaterial color={t("#f2ece0")} roughness={0.9} /></mesh>
+      <mesh position={[0, 0.82, -0.16]} scale={[0.9, 0.82, 0.7]}><sphereGeometry args={[0.3, 14, 10]} /><meshStandardMaterial color="#7c5f3e" /></mesh>
+      {([-1, 1] as const).map((s) => <mesh key={s} position={[s * 0.3, 0.72, -0.05]} rotation={[0, 0, s * 0.2]} scale={[0.4, 0.85, 0.5]}><sphereGeometry args={[0.2, 10, 8]} /><meshStandardMaterial color="#3f7d9c" roughness={0.7} /></mesh>)}
+      <mesh position={[0, 1.06, 0.06]} castShadow><sphereGeometry args={[0.26, 14, 12]} /><meshStandardMaterial color={t("#f2ece0")} /></mesh>
+      <mesh position={[0, 1.2, 0.0]} scale={[0.9, 0.5, 0.9]}><sphereGeometry args={[0.24, 12, 8]} /><meshStandardMaterial color="#7c5f3e" /></mesh>
+      {([-1, 1] as const).map((s) => <mesh key={s} position={[s * 0.16, 1.06, 0.12]} scale={[1.4, 0.5, 0.6]}><sphereGeometry args={[0.1, 10, 8]} /><meshStandardMaterial color="#6f5636" /></mesh>)}
+      <mesh position={[0, 1.0, 0.34]} rotation={[Math.PI / 2, 0, 0]} castShadow><coneGeometry args={[0.09, 0.4, 8]} /><meshStandardMaterial color="#33302a" /></mesh>
+      <mesh position={[0, 0.66, -0.38]} rotation={[0.4, 0, 0]}><boxGeometry args={[0.24, 0.06, 0.4]} /><meshStandardMaterial color="#6a4f30" /></mesh>
+      {([-0.1, 0.1] as const).map((dx) => <mesh key={dx} position={[dx, 1.12, 0.2]}><sphereGeometry args={[0.038, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
+    </group>
   </group>;
 
   if (assetKey === "echidna") return <group>
@@ -639,7 +643,6 @@ const ANIMAL_GAITS: Record<string, Gait> = {
   emu: { speed: 0.75, radius: 1.7 },
   wombat: { speed: 0.34, radius: 1.2 },
   echidna: { speed: 0.3, radius: 1.0 },
-  kookaburra: { speed: 0, radius: 0 },
   cockatoo: { speed: 0, radius: 0 },
 };
 

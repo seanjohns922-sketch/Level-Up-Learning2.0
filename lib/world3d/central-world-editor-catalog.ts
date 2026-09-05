@@ -69,7 +69,7 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_koala", "Koala Gum Tree", "koala", "#8a94a0", "animals", "2x2", 1.3),
   starter("central_world_starter_wombat", "Wombat", "wombat", "#7a5a3f", "animals", "1x1", 1.1),
   starter("central_world_starter_emu", "Emu", "emu", "#6b5f52", "animals", "1x1", 1.35),
-  starter("central_world_starter_kookaburra", "Kookaburra", "kookaburra", "#9c8161", "animals", "1x1", 1.0),
+  starter("central_world_starter_kookaburra", "Kookaburra Gum Tree", "kookaburra", "#9c8161", "animals", "2x2", 1.3),
   starter("central_world_starter_echidna", "Echidna", "echidna", "#5c4a35", "animals", "1x1", 1.0),
   starter("central_world_starter_cockatoo", "Cockatoo", "cockatoo", "#e6ebef", "animals", "1x1", 1.0),
 ];
