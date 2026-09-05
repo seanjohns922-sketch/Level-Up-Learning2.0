@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, Eraser, Hand, Home, LayoutGrid, Map as MapIcon, MapPin, PackageOpen, Route, RotateCw, ShoppingBag, Trash2, Undo2, X, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, Cherry, Droplets, Eraser, Fence, Flag, Flower2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, Route, RotateCw, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
@@ -60,6 +60,14 @@ const SCENERY_GROUPS: Array<[string, WorldSceneryGroup]> = [
   ["ROCKS & WATER", "rocks_water"],
   ["FURNITURE & FUN", "furniture_fun"],
 ];
+// A little symbol per scenery item, keyed by its worldAssetKey. Bridge,
+// toadstool and sign have no exact lucide glyph, so Landmark/Cherry/Signpost
+// stand in as the closest read.
+const SCENERY_ICON: Record<string, LucideIcon> = {
+  tree: TreeDeciduous, pine_tree: TreePine, palm_tree: TreePalm, shrub: Shrub, hedge: Leaf, toadstool: Cherry, log: Logs, flower_bed: Flower2,
+  boulder: Mountain, rock_pile: Hexagon, pond: Waves, fountain: Droplets, bridge: Landmark,
+  lamp_post: Lamp, bench: Sofa, fence: Fence, mailbox: Mailbox, flag: Flag, umbrella: Umbrella, signpost: Signpost, balloons: PartyPopper,
+};
 
 type CentralWorldMetrics = {
   active: boolean;
@@ -630,7 +638,8 @@ export default function CentralWorld() {
                 <div aria-label={`${groupLabel} items`} style={{ marginTop: 4, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 5 }}>
                   {items.map((item) => {
                     const selected = selectedSceneryItemKey === item.item_key;
-                    return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><span aria-hidden style={{ width: 16, height: 16, borderRadius: 5, flex: "0 0 auto", background: item.accent, boxShadow: "inset 0 0 0 1px rgba(255,255,255,.35)" }} /><span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
+                    const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? Sprout;
+                    return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={19} color={selected ? "#eafffb" : item.accent} strokeWidth={2.4} style={{ flex: "0 0 auto" }} aria-hidden /><span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
                   })}
                 </div>
               </div>
