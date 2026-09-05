@@ -2,7 +2,7 @@
 
 import { Edges, Html, RoundedBox, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import {
   CENTRAL_WORLD_CONFIG,
@@ -758,131 +758,209 @@ function GrassTufts({ quality, groundTiles }: { quality: CentralWorldQuality; gr
   return <group><instancedMesh ref={meshRef} args={[undefined, undefined, count]}><planeGeometry args={[0.12, 0.72]} /><meshStandardMaterial color="#7d9c46" roughness={1} side={THREE.DoubleSide} /></instancedMesh></group>;
 }
 
-// Warm sandstone / bronze tower palette (lighter + more sunlit as it rises).
+// Warm golden-sandstone / bronze tower palette. The scene's key light is a warm
+// directional sun from the upper-left-front, so front/left faces read bright and
+// right/back read shadowed for free — recesses use the darker tones below.
 const T = {
-  sandLow: "#8f6a37",
-  sandMid: "#bd914e",
-  sandHi: "#d8b76a",
-  sandTop: "#eccd84",
-  bronze: "#7c5327",
+  stone: "#cf9f52",       // main sunlit sandstone
+  stoneMid: "#bd914e",    // mid faces
+  stoneWarm: "#e3bd6f",   // projecting trim / edge highlights
+  stoneHi: "#f1d492",     // brightest highlights (gable rims, finials)
+  stoneDeep: "#6a4d2a",   // shadowed / recessed stone
+  recess: "#1d1409",      // deep window + arch interior
+  bronze: "#845827",
   bronzeLit: "#caa250",
-  recess: "#211710",
-  glass: "#f6cf74",
-  door: "#180f0a",
+  gold: "#e6b955",
+  clockFace: "#e8dcc0",
+  glass: "#eac274",       // warm window glow
+  door: "#160e07",
 };
 
-// A capped gothic pinnacle (shaft + spire) used along the buttresses and belfry.
-function Pinnacle({ h = 5, r = 0.6 }: { h?: number; r?: number }) {
+// Respect the OS reduced-motion setting (client-only, so it stays out of render).
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!media) return;
+    const update = () => setReduced(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    return () => media.removeEventListener?.("change", update);
+  }, []);
+  return reduced;
+}
+
+// A pointed (lancet) arch panel: a rectangle capped by a 45°-rotated square whose
+// top corner forms the point. Base sits at local y=0; total height is h + w/2.
+// Nest these (smaller + darker + pushed toward +z) to build recessed arch layers.
+function PointedPanel({ w, h, d, color, emissive, ei = 0, roughness = 0.85, metalness = 0 }: { w: number; h: number; d: number; color: string; emissive?: string; ei?: number; roughness?: number; metalness?: number }) {
+  const head = w / Math.SQRT2;
   return (
     <group>
-      <RoundedBox args={[r * 2, h, r * 2]} radius={r * 0.35} smoothness={2} position={[0, h / 2, 0]}>
-        <meshStandardMaterial color={T.sandHi} roughness={0.72} />
-      </RoundedBox>
-      <mesh position={[0, h + r * 1.5, 0]}><coneGeometry args={[r * 1.5, r * 3.2, 4]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.35} roughness={0.5} /></mesh>
+      <mesh position={[0, h / 2, 0]}><boxGeometry args={[w, h, d]} /><meshStandardMaterial color={color} emissive={emissive ?? "#000000"} emissiveIntensity={ei} roughness={roughness} metalness={metalness} /></mesh>
+      <mesh position={[0, h, 0]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[head, head, d]} /><meshStandardMaterial color={color} emissive={emissive ?? "#000000"} emissiveIntensity={ei} roughness={roughness} metalness={metalness} /></mesh>
     </group>
   );
 }
 
-// A pointed-arch lancet: recessed surround, warm glowing glass and a diamond head.
-function Lancet({ w = 0.95, h = 3.2, glow = false }: { w?: number; h?: number; glow?: boolean }) {
-  const em = glow ? 0.95 : 0.5;
+// A modular tapered gothic spire (square shaft + pyramid cap + gold finial),
+// rotated 45° so a flat face reads cleanly from the front. Base at local y=0.
+function Spire({ h, r, tone = T.stone, finial = true }: { h: number; r: number; tone?: string; finial?: boolean }) {
+  const shaft = h * 0.44;
+  const cap = h * 0.56;
   return (
     <group>
-      <mesh><boxGeometry args={[w + 0.32, h + 0.4, 0.36]} /><meshStandardMaterial color={T.recess} roughness={0.9} /></mesh>
-      <mesh position={[0, h / 2 + 0.05, 0.02]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[w * 0.78, w * 0.78, 0.34]} /><meshStandardMaterial color={T.recess} roughness={0.9} /></mesh>
-      <mesh position={[0, 0, 0.16]}><planeGeometry args={[w, h]} /><meshStandardMaterial color={T.glass} emissive={T.glass} emissiveIntensity={em} roughness={0.4} /></mesh>
-      <mesh position={[0, h / 2 + 0.05, 0.17]} rotation={[0, 0, Math.PI / 4]}><planeGeometry args={[w * 0.55, w * 0.55]} /><meshStandardMaterial color={T.glass} emissive={T.glass} emissiveIntensity={em} /></mesh>
+      <mesh position={[0, shaft / 2, 0]} rotation={[0, Math.PI / 4, 0]}><cylinderGeometry args={[r * 0.82, r, shaft, 4]} /><meshStandardMaterial color={tone} roughness={0.72} /></mesh>
+      <mesh position={[0, shaft + cap / 2, 0]} rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[r * 1.16, cap, 4]} /><meshStandardMaterial color={tone} roughness={0.64} /></mesh>
+      {finial ? <mesh position={[0, shaft + cap + r * 0.4, 0]}><octahedronGeometry args={[r * 0.42, 0]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.4} roughness={0.42} /></mesh> : null}
     </group>
   );
 }
 
-// Large circular mechanical knowledge dial (bronze ring, gears, slow rotation).
-function TowerDial() {
-  const ringRef = useRef<THREE.Group>(null);
-  const gearRef = useRef<THREE.Group>(null);
+// A brass clock gear (rim + hub + teeth) in the XY plane.
+function Gear({ r, teeth, tone = T.bronzeLit }: { r: number; teeth: number; tone?: string }) {
+  return (
+    <group>
+      <mesh><torusGeometry args={[r, r * 0.16, 8, 22]} /><meshStandardMaterial color={tone} metalness={0.72} roughness={0.34} /></mesh>
+      <mesh><circleGeometry args={[r * 0.5, 18]} /><meshStandardMaterial color={T.bronze} metalness={0.6} roughness={0.42} /></mesh>
+      {Array.from({ length: teeth }, (_, i) => { const a = (i / teeth) * Math.PI * 2; return <mesh key={i} position={[Math.cos(a) * r, Math.sin(a) * r, 0]} rotation={[0, 0, a]}><boxGeometry args={[r * 0.24, r * 0.3, r * 0.34]} /><meshStandardMaterial color={tone} metalness={0.72} roughness={0.34} /></mesh>; })}
+    </group>
+  );
+}
+
+// A recessed pointed-arch window: stone surround, dark inset, warm glowing glass.
+function GothicWindow({ w = 1.0, h = 3.0, glow = false }: { w?: number; h?: number; glow?: boolean }) {
+  return (
+    <group>
+      <PointedPanel w={w + 0.5} h={h + 0.3} d={0.5} color={T.stoneWarm} />
+      <group position={[0, 0.16, 0.2]}><PointedPanel w={w} h={h} d={0.4} color={T.recess} /></group>
+      <group position={[0, 0.3, 0.32]}><PointedPanel w={w * 0.64} h={h * 0.82} d={0.2} color={T.glass} emissive={T.glass} ei={glow ? 0.9 : 0.5} /></group>
+    </group>
+  );
+}
+
+// The hero clock: a stone gable with a trefoil finial, a thick stone + bronze
+// surround, a cream face, exposed turning brass gears and dimensional hands.
+// Gear/hand motion is gated by `animate` (off on low quality / reduced motion).
+function TowerClock({ animate }: { animate: boolean }) {
+  const gearA = useRef<THREE.Group>(null);
+  const gearB = useRef<THREE.Group>(null);
+  const gearC = useRef<THREE.Group>(null);
+  const minute = useRef<THREE.Group>(null);
   useFrame((_, delta) => {
-    if (ringRef.current) ringRef.current.rotation.z += delta * 0.05;
-    if (gearRef.current) gearRef.current.rotation.z -= delta * 0.09;
+    if (!animate) return;
+    const d = Math.min(delta, 0.05);
+    if (gearA.current) gearA.current.rotation.z += d * 0.22;
+    if (gearB.current) gearB.current.rotation.z -= d * 0.34;
+    if (gearC.current) gearC.current.rotation.z += d * 0.5;
+    if (minute.current) minute.current.rotation.z -= d * 0.05;
   });
   return (
-    <group position={[0, 27, 4.55]}>
-      <mesh><torusGeometry args={[3.15, 0.4, 12, 48]} /><meshStandardMaterial color={T.bronze} metalness={0.75} roughness={0.32} /></mesh>
-      <mesh position={[0, 0, -0.08]}><circleGeometry args={[2.95, 48]} /><meshStandardMaterial color="#2c2016" metalness={0.35} roughness={0.5} /></mesh>
-      {/* hour ticks */}
-      {Array.from({ length: 12 }, (_, i) => <mesh key={i} rotation={[0, 0, (i / 12) * Math.PI * 2]} position={[Math.sin((i / 12) * Math.PI * 2) * 2.55, Math.cos((i / 12) * Math.PI * 2) * 2.55, 0.05]}><boxGeometry args={[0.12, 0.5, 0.08]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.6} roughness={0.4} /></mesh>)}
-      {/* exposed gear */}
-      <group ref={gearRef} position={[0.9, -0.7, 0.02]}>
-        <mesh><torusGeometry args={[0.85, 0.16, 8, 24]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.7} roughness={0.35} /></mesh>
-        {Array.from({ length: 10 }, (_, i) => <mesh key={i} rotation={[0, 0, (i / 10) * Math.PI * 2]} position={[Math.sin((i / 10) * Math.PI * 2) * 0.95, Math.cos((i / 10) * Math.PI * 2) * 0.95, 0]}><boxGeometry args={[0.18, 0.22, 0.14]} /><meshStandardMaterial color={T.bronze} metalness={0.7} /></mesh>)}
+    <group>
+      {/* pointed stone gable framing the clock */}
+      <group position={[0, 0, -0.25]}><PointedPanel w={8.6} h={8.6} d={1.3} color={T.stoneMid} /></group>
+      <group position={[0, 0.25, 0.4]}><PointedPanel w={7.3} h={8.0} d={0.6} color={T.stoneWarm} /></group>
+      {/* trefoil ornament at the gable apex */}
+      {([[-0.55, 12.5], [0.55, 12.5], [0, 13.05]] as const).map(([x, y], i) => <mesh key={i} position={[x, y, 0.7]}><torusGeometry args={[0.34, 0.12, 8, 16]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.4} roughness={0.4} /></mesh>)}
+      {/* clock assembly */}
+      <group position={[0, 5.5, 0.8]}>
+        <mesh><torusGeometry args={[3.5, 0.55, 14, 40]} /><meshStandardMaterial color={T.stoneHi} roughness={0.68} /></mesh>
+        <mesh position={[0, 0, 0.12]}><torusGeometry args={[3.05, 0.26, 12, 40]} /><meshStandardMaterial color={T.bronze} metalness={0.72} roughness={0.34} /></mesh>
+        <mesh position={[0, 0, 0.02]}><circleGeometry args={[3.0, 48]} /><meshStandardMaterial color={T.clockFace} roughness={0.58} /></mesh>
+        {/* hour ticks */}
+        {Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * Math.PI * 2; return <mesh key={i} position={[Math.sin(a) * 2.62, Math.cos(a) * 2.62, 0.12]} rotation={[0, 0, -a]}><boxGeometry args={[0.12, 0.46, 0.06]} /><meshStandardMaterial color={T.bronze} metalness={0.5} roughness={0.4} /></mesh>; })}
+        {/* exposed gear train (lower centre, like the reference) */}
+        <group ref={gearA} position={[-0.7, -0.55, 0.16]}><Gear r={1.15} teeth={12} /></group>
+        <group ref={gearB} position={[0.95, -0.05, 0.2]}><Gear r={0.72} teeth={9} /></group>
+        <group ref={gearC} position={[0.15, 1.0, 0.16]}><Gear r={0.5} teeth={8} /></group>
+        {/* dimensional hands */}
+        <group ref={minute} position={[0, 0, 0.34]}><mesh position={[0, 1.05, 0]}><boxGeometry args={[0.13, 2.3, 0.09]} /><meshStandardMaterial color="#2a2018" metalness={0.3} /></mesh></group>
+        <mesh position={[0.62, 0.42, 0.4]} rotation={[0, 0, -0.95]}><boxGeometry args={[0.15, 1.5, 0.09]} /><meshStandardMaterial color="#2a2018" metalness={0.3} /></mesh>
+        <mesh position={[0, 0, 0.46]}><sphereGeometry args={[0.2, 12, 12]} /><meshStandardMaterial color={T.gold} metalness={0.5} roughness={0.4} /></mesh>
       </group>
-      {/* rotating spoke ring + hands */}
-      <group ref={ringRef}>
-        <mesh><torusGeometry args={[2.15, 0.12, 8, 40]} /><meshStandardMaterial color={T.bronzeLit} emissive="#8d5d24" emissiveIntensity={0.25} metalness={0.62} /></mesh>
-        {[0, 1, 2, 3].map((i) => <mesh key={i} rotation={[0, 0, i * Math.PI / 2]} position={[0, 0, 0.1]}><boxGeometry args={[0.14, 4.2, 0.16]} /><meshStandardMaterial color={T.bronze} metalness={0.62} /></mesh>)}
-      </group>
-      <mesh position={[0, 0, 0.32]}><circleGeometry args={[0.55, 24]} /><meshStandardMaterial color={T.sandTop} emissive="#e5b85e" emissiveIntensity={0.5} /></mesh>
     </group>
   );
 }
 
-export function PlaceholderKnowledgeTower({ active, onEnter }: { active: boolean; onEnter?: () => void }) {
+export function PlaceholderKnowledgeTower({ active, onEnter, quality = "medium" }: { active: boolean; onEnter?: () => void; quality?: CentralWorldQuality }) {
+  const reduced = usePrefersReducedMotion();
+  const detail = quality !== "low";
+  const animate = quality !== "low" && !reduced;
   const doorEmissive = active ? "#f0b862" : "#3a2410";
-  const doorGlow = active ? 0.6 : 0.08;
+  const doorGlow = active ? 0.65 : 0.08;
   const corners: Array<[number, number]> = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
+  const bodyTopY = 28.6;
+  const upperTopY = 40.2;
   return (
     <group position={CENTRAL_WORLD_CONFIG.towerPosition} onClick={(event) => { if (!onEnter) return; event.stopPropagation(); onEnter(); }} onPointerOver={() => { if (onEnter) document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
-      {/* stepped plinth */}
-      <RoundedBox args={[18, 1.8, 16.5]} radius={0.35} smoothness={2} position={[0, 0.9, 0]}><meshStandardMaterial color={T.sandLow} roughness={0.86} /></RoundedBox>
-      <RoundedBox args={[15, 1.8, 13.8]} radius={0.35} smoothness={2} position={[0, 2.6, 0]}><meshStandardMaterial color={T.sandMid} roughness={0.82} /></RoundedBox>
+      {/* ---- stepped stone base / apron, blending into the hill ---- */}
+      <mesh position={[0, 0.5, 0]}><boxGeometry args={[15, 1, 14]} /><meshStandardMaterial color={T.stoneDeep} roughness={0.9} /></mesh>
+      <mesh position={[0, 1.3, 0]}><boxGeometry args={[12.5, 1, 12]} /><meshStandardMaterial color={T.stoneMid} roughness={0.86} /></mesh>
+      <mesh position={[0, 2.1, 0]}><boxGeometry args={[10.5, 1, 10]} /><meshStandardMaterial color={T.stone} roughness={0.84} /></mesh>
 
-      {/* lower body */}
-      <RoundedBox args={[11, 18, 10.5]} radius={0.5} smoothness={2} position={[0, 12.5, 0]}><meshStandardMaterial color={T.sandMid} roughness={0.8} /></RoundedBox>
-      {/* corner buttresses with pinnacles */}
-      {corners.map(([sx, sz], i) => (
-        <group key={i} position={[sx * 5.6, 0, sz * 5.3]}>
-          <RoundedBox args={[2.3, 25, 2.3]} radius={0.25} smoothness={2} position={[0, 12.5, 0]}><meshStandardMaterial color={T.sandMid} roughness={0.8} /></RoundedBox>
-          <RoundedBox args={[1.7, 6, 1.7]} radius={0.2} smoothness={2} position={[0, 27, 0]}><meshStandardMaterial color={T.sandHi} roughness={0.74} /></RoundedBox>
-          <group position={[0, 30, 0]}><Pinnacle h={5.5} r={0.85} /></group>
-        </group>
-      ))}
-      {/* cornice band */}
-      <RoundedBox args={[12.6, 1.4, 12] } radius={0.2} smoothness={2} position={[0, 21.5, 0]}><meshStandardMaterial color={T.sandHi} roughness={0.72} /></RoundedBox>
+      {/* ---- slim central body (tall, faintly tapered) ---- */}
+      <mesh position={[0, 15.6, 0]}><boxGeometry args={[7.4, 26, 7.4]} /><meshStandardMaterial color={T.stone} roughness={0.82} /></mesh>
+      {/* corner buttress ribs full height */}
+      {corners.map(([sx, sz], i) => <mesh key={`br${i}`} position={[sx * 3.55, 15.1, sz * 3.55]}><boxGeometry args={[1.2, 27, 1.2]} /><meshStandardMaterial color={T.stoneMid} roughness={0.82} /></mesh>)}
+      {/* vertical pilaster ribbing on the faces for carved depth */}
+      {detail ? ([-3.0, 3.0] as const).map((x) => <mesh key={`pf${x}`} position={[x, 14.6, 3.78]}><boxGeometry args={[0.7, 24, 0.55]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.78} /></mesh>) : null}
+      {detail ? ([-1, 1] as const).map((s) => <mesh key={`ps${s}`} position={[s * 3.78, 14.6, 0]}><boxGeometry args={[0.55, 24, 0.7]} /><meshStandardMaterial color={T.stoneMid} roughness={0.8} /></mesh>) : null}
+      {/* cornice band over the lower body */}
+      <mesh position={[0, bodyTopY + 0.3, 0]}><boxGeometry args={[8.4, 1.2, 8.4]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.76} /></mesh>
 
-      {/* upper body (holds the dial) */}
-      <RoundedBox args={[9, 13, 8.8]} radius={0.45} smoothness={2} position={[0, 28, 0]}><meshStandardMaterial color={T.sandHi} roughness={0.76} /></RoundedBox>
-      <TowerDial />
-      {/* lancet windows on the lower + upper body faces */}
-      {[-2.6, 2.6].map((x) => <group key={`lw${x}`} position={[x, 10, 5.28]}><Lancet w={1.1} h={4.4} glow /></group>)}
-      {[-1, 1].map((s) => <group key={`ls${s}`} position={[s * 5.28, 11, 0]} rotation={[0, s * Math.PI / 2, 0]}><Lancet w={1.1} h={4.6} /></group>)}
-      {[-2.9, 2.9].map((x) => <group key={`uw${x}`} position={[x, 30, 4.42]}><Lancet w={0.85} h={3} /></group>)}
+      {/* ---- upper transition body ---- */}
+      <mesh position={[0, 34.4, 0]}><boxGeometry args={[6.0, 11, 6.0]} /><meshStandardMaterial color={T.stone} roughness={0.8} /></mesh>
+      <mesh position={[0, upperTopY, 0]}><boxGeometry args={[6.8, 1, 6.8]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.76} /></mesh>
 
-      {/* belfry cornice + open arched stage */}
-      <RoundedBox args={[10.4, 1.4, 10.2]} radius={0.2} smoothness={2} position={[0, 35, 0]}><meshStandardMaterial color={T.sandHi} roughness={0.72} /></RoundedBox>
-      <RoundedBox args={[8.4, 7, 8.2]} radius={0.4} smoothness={2} position={[0, 39.5, 0]}><meshStandardMaterial color={T.sandTop} roughness={0.72} /></RoundedBox>
-      {[-1, 1].map((s) => <group key={`bell${s}`} position={[s * 2.5, 40, 4.15]}><Lancet w={1.4} h={5} glow /></group>)}
-      {/* belfry corner pinnacles */}
-      {corners.map(([sx, sz], i) => <group key={`bp${i}`} position={[sx * 4.4, 43, sz * 4.3]}><Pinnacle h={5} r={0.7} /></group>)}
+      {/* ---- hero clock + gable on the front ---- */}
+      <group position={[0, 16.5, 3.72]}><TowerClock animate={animate} /></group>
 
-      {/* crowning spire + finial */}
-      <mesh position={[0, 47.5, 0]}><coneGeometry args={[4.6, 12, 8]} /><meshStandardMaterial color={T.sandTop} roughness={0.66} /></mesh>
-      <mesh position={[0, 53.4, 0]}><coneGeometry args={[1.3, 3, 8]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.4} roughness={0.45} /></mesh>
-      <mesh position={[0, 55.4, 0]}><octahedronGeometry args={[0.7, 0]} /><meshStandardMaterial color="#ffe6a6" emissive="#f2c257" emissiveIntensity={0.7} metalness={0.4} roughness={0.4} /></mesh>
+      {/* ---- recessed gothic windows ---- */}
+      {([-1, 1] as const).map((s) => <group key={`sw${s}`} position={[s * 3.73, 11, 0]} rotation={[0, s * Math.PI / 2, 0]}><GothicWindow w={1.05} h={4.4} /></group>)}
+      {detail ? ([-1, 1] as const).map((s) => <group key={`sw2${s}`} position={[s * 3.73, 19.5, 0]} rotation={[0, s * Math.PI / 2, 0]}><GothicWindow w={0.95} h={3.6} glow /></group>) : null}
+      {([-1, 1] as const).map((s) => <group key={`uw${s}`} position={[s * 3.02, 31.5, 0]} rotation={[0, s * Math.PI / 2, 0]}><GothicWindow w={0.85} h={3.0} glow /></group>)}
+      {detail ? <group position={[0, 31.5, 3.02]}><GothicWindow w={0.9} h={3.2} /></group> : null}
 
-      {/* monumental pointed-arch entrance */}
-      <group position={[0, 0, 5.25]}>
-        <mesh position={[0, 0.25, 1.8]}><boxGeometry args={[9.5, 0.5, 3.4]} /><meshStandardMaterial color={T.sandLow} roughness={0.85} /></mesh>
-        <mesh position={[0, 0.65, 1.1]}><boxGeometry args={[7.8, 0.5, 2]} /><meshStandardMaterial color={T.sandMid} roughness={0.83} /></mesh>
-        <RoundedBox args={[7.8, 11, 1.3]} radius={0.3} smoothness={2} position={[0, 6, 0]}><meshStandardMaterial color={T.sandHi} roughness={0.74} /></RoundedBox>
-        <mesh position={[0, 5, 0.55]}><boxGeometry args={[5.4, 8.6, 0.7]} /><meshStandardMaterial color={T.door} emissive={doorEmissive} emissiveIntensity={doorGlow} roughness={0.82} /></mesh>
-        <mesh position={[0, 9.4, 0.55]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[3.9, 3.9, 0.7]} /><meshStandardMaterial color={T.door} emissive={doorEmissive} emissiveIntensity={doorGlow} roughness={0.82} /></mesh>
-        {/* keystone lantern */}
-        <mesh position={[0, 11, 0.7]}><sphereGeometry args={[0.5, 16, 16]} /><meshStandardMaterial color={T.sandTop} emissive="#f2c257" emissiveIntensity={active ? 0.9 : 0.4} /></mesh>
+      {/* ---- monumental layered pointed-arch entrance ---- */}
+      <group position={[0, 2.6, 3.72]}>
+        <group position={[0, 0, 0]}><PointedPanel w={6.2} h={9.5} d={1.0} color={T.stoneWarm} /></group>
+        <group position={[0, 0.4, 0.5]}><PointedPanel w={5.0} h={8.8} d={0.8} color={T.stoneMid} /></group>
+        <group position={[0, 0.8, 0.95]}><PointedPanel w={4.0} h={8.0} d={0.6} color={T.stoneDeep} /></group>
+        <group position={[0, 1.2, 1.3]}><PointedPanel w={3.2} h={7.2} d={0.5} color={T.recess} /></group>
+        {/* dark door with gold knowledge emblem */}
+        <group position={[0, 1.4, 1.55]}><PointedPanel w={2.5} h={6.0} d={0.3} color={T.door} emissive={doorEmissive} ei={doorGlow} /></group>
+        <mesh position={[0, 3.4, 1.85]}><torusGeometry args={[0.6, 0.14, 8, 20]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.4} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
+        <mesh position={[0, 3.4, 1.85]}><octahedronGeometry args={[0.32, 0]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.38} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
+        {/* keystone lantern above the arch */}
+        <mesh position={[0, 9.6, 1.4]}><sphereGeometry args={[0.5, 16, 16]} /><meshStandardMaterial color={T.stoneHi} emissive="#f2c257" emissiveIntensity={active ? 0.95 : 0.4} /></mesh>
+        {/* mounted plaque */}
+        <mesh position={[0, 11.2, 1.1]}><boxGeometry args={[6.0, 1.5, 0.4]} /><meshStandardMaterial color="#2a1d12" roughness={0.7} /></mesh>
+        <mesh position={[0, 11.2, 1.31]}><boxGeometry args={[5.6, 1.1, 0.06]} /><meshStandardMaterial color={T.gold} metalness={0.5} roughness={0.45} emissive="#5c3f14" emissiveIntensity={0.2} /></mesh>
       </group>
 
-      {/* warm stone uplight so the sandstone reads golden */}
-      <pointLight position={[0, 6, 12]} color="#ffcf85" intensity={active ? 2.4 : 1.6} distance={34} />
+      {/* entrance stairs sweeping down to the path */}
+      {([[7.0, 4.4], [8.4, 5.4], [9.8, 6.5]] as const).map(([w, z], i) => <mesh key={`st${i}`} position={[0, 2.1 - i * 0.55, z]}><boxGeometry args={[w, 0.6, 1.4]} /><meshStandardMaterial color={T.stoneMid} roughness={0.85} /></mesh>)}
+      {/* buttress spires flanking the doorway */}
+      {([-1, 1] as const).map((s) => <group key={`ep${s}`} position={[s * 3.7, 2.6, 3.4]}><Spire h={6} r={0.7} tone={T.stoneMid} /></group>)}
 
-      <Html center position={[0, 15, 6.4]} distanceFactor={20} style={{ pointerEvents: "none" }}><div style={{ padding: "8px 13px", border: "1px solid rgba(255,226,163,.7)", background: "rgba(39,29,22,.9)", color: "#fff1c9", fontFamily: "ui-monospace, monospace", fontSize: 12, fontWeight: 900, letterSpacing: "0.15em", whiteSpace: "nowrap" }}>TOWER OF KNOWLEDGE</div></Html>
+      {/* ---- clustered pinnacles (lower cornice + base + upper cornice) ---- */}
+      {corners.map(([sx, sz], i) => <group key={`lc${i}`} position={[sx * 3.4, bodyTopY, sz * 3.4]}><Spire h={7} r={0.78} /></group>)}
+      {detail ? corners.map(([sx, sz], i) => <group key={`bc${i}`} position={[sx * 4.5, 2.6, sz * 4.5]}><Spire h={5} r={0.65} tone={T.stoneMid} /></group>) : null}
+      {corners.map(([sx, sz], i) => <group key={`uc${i}`} position={[sx * 2.7, upperTopY, sz * 2.7]}><Spire h={6} r={0.72} /></group>)}
+
+      {/* ---- crown: a bundle of tall spires, tallest at centre ---- */}
+      <group position={[0, upperTopY, 0]}><Spire h={18} r={1.35} tone={T.stoneWarm} /></group>
+      {corners.map(([sx, sz], i) => <group key={`cc${i}`} position={[sx * 2.0, upperTopY, sz * 2.0]}><Spire h={12} r={0.85} /></group>)}
+      {detail ? ([[-2.5, 0], [2.5, 0], [0, -2.5], [0, 2.5]] as const).map(([x, z], i) => <group key={`cf${i}`} position={[x, upperTopY, z]}><Spire h={9} r={0.68} tone={T.stoneMid} /></group>) : null}
+
+      {/* ---- landscaping so it doesn't look "placed on grass" ---- */}
+      {detail ? ([[-6.5, 5, 0.35], [6.8, 4.5, -0.3], [-5.5, -5.5, 0.4], [6, -5, 0.3]] as const).map(([x, z, r], i) => <mesh key={`rk${i}`} position={[x, r * 0.7, z]} castShadow><dodecahedronGeometry args={[r, 0]} /><meshStandardMaterial color="#7c8792" roughness={0.9} flatShading /></mesh>) : null}
+      {detail ? ([[-5.8, 4.2], [5.6, 4.8], [-6.2, -3.5], [5.2, -4.6]] as const).map(([x, z], i) => <group key={`sh${i}`} position={[x, 0, z]}>{[[0, 0.5, 0, 0.5], [-0.35, 0.4, 0.1, 0.36], [0.34, 0.42, -0.06, 0.38]].map(([dx, dy, dz, rr], j) => <mesh key={j} position={[dx, dy, dz]}><sphereGeometry args={[rr, 10, 8]} /><meshStandardMaterial color={j % 2 ? "#4d9b46" : "#3f8f3a"} roughness={0.95} /></mesh>)}</group>) : null}
+
+      {/* warm stone uplight so the sandstone reads golden */}
+      <pointLight position={[0, 8, 13]} color="#ffcf85" intensity={(active ? 2.4 : 1.7) * (detail ? 1 : 0.7)} distance={40} />
+
+      <Html center position={[0, 16.4, 5.4]} distanceFactor={22} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 12px", border: "1px solid rgba(230,185,85,.85)", background: "rgba(26,18,10,.92)", color: "#f4d79a", fontFamily: "ui-monospace, monospace", fontSize: 11, fontWeight: 900, letterSpacing: "0.18em", whiteSpace: "nowrap", borderRadius: 2 }}>TOWER OF KNOWLEDGE</div></Html>
     </group>
   );
 }
@@ -973,7 +1051,7 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, p
       {groundTiles.map((tile) => <GroundTile key={`${tile.gridX}:${tile.gridZ}`} tile={tile} />)}
       <GrassTufts quality={quality} groundTiles={groundTiles} />
       <PermanentGumTrees />
-      <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} />
+      <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <PlaceholderMyHome active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
       {placedCustomisations.map((placement, index) => {
