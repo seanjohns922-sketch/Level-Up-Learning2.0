@@ -370,6 +370,20 @@ function RewardPlotObject({ item, accent, tier, tint }: { item: EconomyItem; acc
   return <RewardBuilding assetKey={assetKey} accent={accent} tier={tier} />;
 }
 
+// A eucalyptus / gum tree: pale mottled trunk, a couple of branches and a sparse
+// blue-green canopy. Shared by the standalone gum tree and the koala's tree.
+function StarterGum({ canopyColor = "#8fae86" }: { canopyColor?: string }) {
+  return (
+    <group>
+      <mesh position={[0, 1.5, 0]} castShadow><cylinderGeometry args={[0.18, 0.3, 3.0, 9]} /><meshStandardMaterial color="#cfc9ba" roughness={0.9} /></mesh>
+      {([[0.16, 1.2, 0.12], [-0.14, 2.0, -0.1], [0.1, 2.6, -0.14], [-0.12, 0.9, 0.14]] as const).map(([x, y, z], i) => <mesh key={i} position={[x, y, z]} scale={[1, 1.7, 1]}><sphereGeometry args={[0.09, 8, 8]} /><meshStandardMaterial color="#9a9384" roughness={0.95} /></mesh>)}
+      <mesh position={[0.4, 2.9, 0]} rotation={[0, 0, -0.9]} castShadow><cylinderGeometry args={[0.06, 0.12, 1.0, 6]} /><meshStandardMaterial color="#c2bcae" roughness={0.9} /></mesh>
+      <mesh position={[-0.38, 3.2, 0.1]} rotation={[0, 0, 0.95]} castShadow><cylinderGeometry args={[0.05, 0.1, 0.9, 6]} /><meshStandardMaterial color="#bdb7a8" roughness={0.9} /></mesh>
+      {([[0, 3.75, 0, 0.95], [0.72, 3.4, 0.2, 0.66], [-0.66, 3.5, -0.15, 0.62], [0.2, 4.2, 0.05, 0.6], [-0.3, 3.95, 0.35, 0.5]] as const).map(([x, y, z, r], i) => <mesh key={i} position={[x, y, z]} castShadow><sphereGeometry args={[r, 12, 10]} /><meshStandardMaterial color={i % 2 ? canopyColor : "#7d9b7a"} roughness={0.95} /></mesh>)}
+    </group>
+  );
+}
+
 // `tint`, when set, recolours only the item's designated paint surface (petals,
 // foliage, canopy, cloth, cap, water, glow…). Structural parts — trunks, poles,
 // posts, stems, basins — keep their fixed colours so the recolour always reads.
@@ -483,75 +497,100 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
     {([[0.35, 2.0, 0.1], [-0.3, 2.16, -0.05], [0.14, 2.36, 0.2]] as const).map(([x, y, z], i) => { const len = y - 0.44; return <mesh key={i} position={[x / 2, 0.44 + len / 2, z / 2]} rotation={[0, 0, -Math.atan2(x, len)]}><cylinderGeometry args={[0.008, 0.008, len * 1.04, 4]} /><meshStandardMaterial color="#cbd5e1" /></mesh>; })}
   </group>;
 
+  if (assetKey === "gum_tree") return <StarterGum canopyColor={t("#8fae86")} />;
+
   if (assetKey === "kangaroo") return <group>
-    <mesh position={[0, 0.35, -0.55]} rotation={[0.6, 0, 0]} castShadow><cylinderGeometry args={[0.1, 0.22, 1.15, 8]} /><meshStandardMaterial color={t("#b5793f")} roughness={0.85} /></mesh>
-    <mesh position={[0, 0.12, -0.02]} castShadow><boxGeometry args={[0.34, 0.16, 0.72]} /><meshStandardMaterial color={t("#a86e39")} roughness={0.85} /></mesh>
-    <mesh position={[0, 0.52, -0.1]} scale={[0.8, 1, 0.72]} castShadow><sphereGeometry args={[0.4, 14, 12]} /><meshStandardMaterial color={t("#b5793f")} roughness={0.85} /></mesh>
-    <mesh position={[0, 1.02, 0.06]} rotation={[-0.2, 0, 0]} scale={[0.6, 0.92, 0.58]} castShadow><sphereGeometry args={[0.5, 16, 12]} /><meshStandardMaterial color={t("#b5793f")} roughness={0.85} /></mesh>
-    <mesh position={[0, 1.6, 0.2]} scale={[0.7, 0.82, 0.95]} castShadow><sphereGeometry args={[0.3, 14, 12]} /><meshStandardMaterial color={t("#b5793f")} roughness={0.85} /></mesh>
-    <mesh position={[0, 1.55, 0.44]} scale={[0.6, 0.6, 1]}><sphereGeometry args={[0.16, 10, 10]} /><meshStandardMaterial color={t("#a86e39")} /></mesh>
-    {([-0.12, 0.12] as const).map((dx) => <mesh key={dx} position={[dx, 1.92, 0.12]} rotation={[-0.2, 0, 0]} castShadow><coneGeometry args={[0.08, 0.36, 8]} /><meshStandardMaterial color={t("#b5793f")} /></mesh>)}
-    {([-0.2, 0.2] as const).map((dx) => <mesh key={dx} position={[dx, 1.16, 0.34]} rotation={[0.9, 0, 0]}><cylinderGeometry args={[0.05, 0.06, 0.34, 6]} /><meshStandardMaterial color={t("#a86e39")} /></mesh>)}
-    {([-0.12, 0.12] as const).map((dx) => <mesh key={dx} position={[dx, 1.66, 0.43]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
+    {/* heavy tail sweeping down to the ground */}
+    <mesh position={[0, 0.5, -0.5]} rotation={[0.5, 0, 0]} castShadow><cylinderGeometry args={[0.12, 0.26, 1.0, 8]} /><meshStandardMaterial color={t("#9a8467")} roughness={0.85} /></mesh>
+    <mesh position={[0, 0.16, -0.95]} rotation={[1.2, 0, 0]} castShadow><cylinderGeometry args={[0.06, 0.14, 0.7, 8]} /><meshStandardMaterial color={t("#9a8467")} roughness={0.85} /></mesh>
+    {/* hind foot */}
+    <mesh position={[0, 0.1, 0.08]} castShadow><boxGeometry args={[0.34, 0.14, 0.72]} /><meshStandardMaterial color={t("#7c6851")} roughness={0.85} /></mesh>
+    {/* haunch + upright torso leaning forward */}
+    <mesh position={[0, 0.56, -0.12]} scale={[0.85, 1, 0.75]} castShadow><sphereGeometry args={[0.42, 16, 12]} /><meshStandardMaterial color={t("#9a8467")} roughness={0.85} /></mesh>
+    <mesh position={[0, 1.12, 0.06]} rotation={[-0.22, 0, 0]} scale={[0.6, 0.95, 0.55]} castShadow><sphereGeometry args={[0.52, 16, 12]} /><meshStandardMaterial color={t("#9a8467")} roughness={0.85} /></mesh>
+    <mesh position={[0, 1.06, 0.3]} rotation={[-0.22, 0, 0]} scale={[0.42, 0.82, 0.4]}><sphereGeometry args={[0.5, 14, 12]} /><meshStandardMaterial color="#c8bda6" roughness={0.85} /></mesh>
+    {/* head + muzzle */}
+    <mesh position={[0, 1.7, 0.24]} scale={[0.62, 0.78, 0.95]} castShadow><sphereGeometry args={[0.3, 14, 12]} /><meshStandardMaterial color={t("#9a8467")} roughness={0.85} /></mesh>
+    <mesh position={[0, 1.62, 0.5]} scale={[0.55, 0.55, 1]}><sphereGeometry args={[0.16, 10, 10]} /><meshStandardMaterial color={t("#9a8467")} /></mesh>
+    <mesh position={[0, 1.58, 0.63]}><sphereGeometry args={[0.06, 8, 8]} /><meshStandardMaterial color="#2a2018" /></mesh>
+    {/* tall ears */}
+    {([-0.13, 0.13] as const).map((dx) => <mesh key={dx} position={[dx, 2.04, 0.16]} rotation={[-0.15, 0, -dx * 0.8]} castShadow><coneGeometry args={[0.08, 0.42, 8]} /><meshStandardMaterial color={t("#9a8467")} /></mesh>)}
+    {/* small forearms + eyes */}
+    {([-0.18, 0.18] as const).map((dx) => <mesh key={dx} position={[dx, 1.22, 0.38]} rotation={[1.0, 0, 0]}><cylinderGeometry args={[0.045, 0.06, 0.36, 6]} /><meshStandardMaterial color={t("#7c6851")} /></mesh>)}
+    {([-0.12, 0.12] as const).map((dx) => <mesh key={dx} position={[dx, 1.76, 0.46]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
   </group>;
 
   if (assetKey === "koala") return <group>
-    <mesh position={[0, 0.55, 0]} scale={[0.9, 1, 0.85]} castShadow><sphereGeometry args={[0.5, 16, 12]} /><meshStandardMaterial color={t("#8a94a0")} roughness={0.9} /></mesh>
-    <mesh position={[0, 0.5, 0.34]} scale={[0.6, 0.7, 0.4]}><sphereGeometry args={[0.4, 12, 10]} /><meshStandardMaterial color="#c7cdd4" roughness={0.9} /></mesh>
-    <mesh position={[0, 1.14, 0.05]} castShadow><sphereGeometry args={[0.38, 16, 12]} /><meshStandardMaterial color={t("#8a94a0")} roughness={0.9} /></mesh>
-    {([-0.34, 0.34] as const).map((dx) => <mesh key={dx} position={[dx, 1.28, 0]} castShadow><sphereGeometry args={[0.2, 12, 10]} /><meshStandardMaterial color={t("#8a94a0")} /></mesh>)}
-    {([-0.34, 0.34] as const).map((dx) => <mesh key={dx} position={[dx, 1.28, 0.06]}><sphereGeometry args={[0.11, 10, 8]} /><meshStandardMaterial color="#d7b9c6" /></mesh>)}
-    <mesh position={[0, 1.07, 0.36]} scale={[0.85, 1.15, 0.6]}><sphereGeometry args={[0.12, 10, 10]} /><meshStandardMaterial color="#2b2523" /></mesh>
-    {([-0.15, 0.15] as const).map((dx) => <mesh key={dx} position={[dx, 1.2, 0.32]}><sphereGeometry args={[0.05, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
-    {([-0.22, 0.22] as const).map((dx) => <mesh key={dx} position={[dx, 0.16, 0.3]}><sphereGeometry args={[0.12, 10, 8]} /><meshStandardMaterial color="#6b7580" /></mesh>)}
+    <StarterGum />
+    {/* koala clinging to the trunk */}
+    <group position={[0, 1.7, 0.3]}>
+      <mesh position={[0, 0, 0]} scale={[0.82, 0.95, 0.72]} castShadow><sphereGeometry args={[0.42, 16, 12]} /><meshStandardMaterial color={t("#9ba3a8")} roughness={0.92} /></mesh>
+      <mesh position={[0, -0.05, 0.2]} scale={[0.55, 0.72, 0.4]}><sphereGeometry args={[0.34, 12, 10]} /><meshStandardMaterial color="#cdd3d6" roughness={0.9} /></mesh>
+      <mesh position={[0, 0.5, 0.08]} castShadow><sphereGeometry args={[0.3, 16, 12]} /><meshStandardMaterial color={t("#9ba3a8")} roughness={0.9} /></mesh>
+      {([-0.29, 0.29] as const).map((dx) => <mesh key={dx} position={[dx, 0.62, 0]} castShadow><sphereGeometry args={[0.18, 12, 10]} /><meshStandardMaterial color={t("#9ba3a8")} /></mesh>)}
+      {([-0.29, 0.29] as const).map((dx) => <mesh key={dx} position={[dx, 0.62, 0.06]}><sphereGeometry args={[0.1, 10, 8]} /><meshStandardMaterial color="#eef0f1" /></mesh>)}
+      <mesh position={[0, 0.44, 0.3]} scale={[0.9, 1.25, 0.7]}><sphereGeometry args={[0.11, 10, 10]} /><meshStandardMaterial color="#2b2320" /></mesh>
+      {([-0.13, 0.13] as const).map((dx) => <mesh key={dx} position={[dx, 0.56, 0.26]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
+      {([-0.34, 0.34] as const).map((dx) => <mesh key={dx} position={[dx, 0.02, -0.02]} rotation={[0, 0, -dx * 1.8]}><cylinderGeometry args={[0.07, 0.08, 0.5, 6]} /><meshStandardMaterial color={t("#8a939a")} /></mesh>)}
+    </group>
   </group>;
 
   if (assetKey === "wombat") return <group>
-    <mesh position={[0, 0.4, 0]} scale={[1, 0.85, 1.35]} castShadow><sphereGeometry args={[0.5, 16, 12]} /><meshStandardMaterial color={t("#7a5a3f")} roughness={0.9} /></mesh>
-    <mesh position={[0, 0.5, 0.7]} scale={[1, 0.9, 0.9]} castShadow><sphereGeometry args={[0.34, 14, 12]} /><meshStandardMaterial color={t("#7a5a3f")} /></mesh>
-    {([-0.2, 0.2] as const).map((dx) => <mesh key={dx} position={[dx, 0.78, 0.66]}><sphereGeometry args={[0.1, 10, 8]} /><meshStandardMaterial color={t("#7a5a3f")} /></mesh>)}
-    <mesh position={[0, 0.42, 1.0]}><sphereGeometry args={[0.14, 10, 10]} /><meshStandardMaterial color="#4a3626" /></mesh>
-    {([-0.13, 0.13] as const).map((dx) => <mesh key={dx} position={[dx, 0.56, 0.94]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
-    {([[-0.3, 0.5], [0.3, 0.5], [-0.3, -0.4], [0.3, -0.4]] as const).map(([x, z], i) => <mesh key={i} position={[x, 0.12, z]}><cylinderGeometry args={[0.12, 0.12, 0.24, 8]} /><meshStandardMaterial color={t("#6b4e36")} /></mesh>)}
+    <mesh position={[0, 0.45, 0]} scale={[1.15, 0.9, 1.4]} castShadow><sphereGeometry args={[0.5, 18, 14]} /><meshStandardMaterial color={t("#8a7358")} roughness={0.92} /></mesh>
+    <mesh position={[0, 0.42, 0.72]} scale={[1.1, 0.95, 0.9]} castShadow><sphereGeometry args={[0.36, 16, 12]} /><meshStandardMaterial color={t("#8a7358")} /></mesh>
+    {([-0.22, 0.22] as const).map((dx) => <mesh key={dx} position={[dx, 0.72, 0.66]} castShadow><sphereGeometry args={[0.11, 10, 8]} /><meshStandardMaterial color={t("#8a7358")} /></mesh>)}
+    {([-0.22, 0.22] as const).map((dx) => <mesh key={dx} position={[dx, 0.72, 0.71]}><sphereGeometry args={[0.05, 8, 8]} /><meshStandardMaterial color="#6b5844" /></mesh>)}
+    <mesh position={[0, 0.34, 1.04]} scale={[1.1, 0.8, 0.8]}><sphereGeometry args={[0.16, 12, 10]} /><meshStandardMaterial color={t("#8a7358")} /></mesh>
+    <mesh position={[0, 0.32, 1.18]}><sphereGeometry args={[0.09, 10, 10]} /><meshStandardMaterial color="#33271c" /></mesh>
+    {([-0.16, 0.16] as const).map((dx) => <mesh key={dx} position={[dx, 0.5, 0.98]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
+    {([[-0.32, 0.42], [0.32, 0.42], [-0.32, -0.42], [0.32, -0.42]] as const).map(([x, z], i) => <mesh key={i} position={[x, 0.1, z]} castShadow><cylinderGeometry args={[0.14, 0.15, 0.2, 8]} /><meshStandardMaterial color={t("#6f5a42")} /></mesh>)}
   </group>;
 
   if (assetKey === "emu") return <group>
-    {([-0.12, 0.12] as const).map((dx) => <mesh key={dx} position={[dx, 0.4, 0]} castShadow><cylinderGeometry args={[0.05, 0.06, 0.82, 6]} /><meshStandardMaterial color="#7c6f5e" /></mesh>)}
-    {([-0.12, 0.12] as const).map((dx) => <mesh key={dx} position={[dx, 0.02, 0.08]}><boxGeometry args={[0.16, 0.06, 0.28]} /><meshStandardMaterial color="#7c6f5e" /></mesh>)}
-    <mesh position={[0, 1.0, 0]} scale={[0.9, 1, 1.15]} castShadow><sphereGeometry args={[0.5, 16, 12]} /><meshStandardMaterial color={t("#6b5f52")} roughness={1} /></mesh>
-    {([[0.3, 1.1, -0.2], [-0.3, 1.05, -0.1], [0, 1.22, -0.35]] as const).map(([x, y, z], i) => <mesh key={i} position={[x, y, z]}><sphereGeometry args={[0.3, 12, 10]} /><meshStandardMaterial color={t("#6b5f52")} roughness={1} /></mesh>)}
-    <mesh position={[0, 1.55, 0.18]} rotation={[0.25, 0, 0]} castShadow><cylinderGeometry args={[0.09, 0.13, 0.9, 8]} /><meshStandardMaterial color={t("#6b5f52")} /></mesh>
-    <mesh position={[0, 2.05, 0.32]} castShadow><sphereGeometry args={[0.15, 12, 10]} /><meshStandardMaterial color={t("#5a5044")} /></mesh>
-    <mesh position={[0, 2.02, 0.48]} rotation={[Math.PI / 2, 0, 0]}><coneGeometry args={[0.05, 0.2, 8]} /><meshStandardMaterial color="#3f3630" /></mesh>
-    {([-0.08, 0.08] as const).map((dx) => <mesh key={dx} position={[dx, 2.1, 0.42]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
+    {([-0.13, 0.13] as const).map((dx) => <mesh key={dx} position={[dx, 0.45, 0]} castShadow><cylinderGeometry args={[0.05, 0.07, 0.9, 6]} /><meshStandardMaterial color="#6b6156" /></mesh>)}
+    {([-0.13, 0.13] as const).map((dx) => <mesh key={dx} position={[dx, 0.02, 0.1]}><boxGeometry args={[0.17, 0.06, 0.3]} /><meshStandardMaterial color="#6b6156" /></mesh>)}
+    {([[0, 1.05, 0, 0.55], [0.32, 1.1, -0.18, 0.36], [-0.32, 1.02, -0.12, 0.36], [0, 1.3, -0.32, 0.34], [0.18, 0.85, 0.25, 0.3], [-0.2, 0.9, 0.2, 0.3], [0, 1.2, 0.2, 0.32]] as const).map(([x, y, z, r], i) => <mesh key={i} position={[x, y, z]} castShadow><sphereGeometry args={[r, 12, 10]} /><meshStandardMaterial color={t("#6f6154")} roughness={1} /></mesh>)}
+    <mesh position={[0, 1.65, 0.15]} rotation={[0.2, 0, 0]} castShadow><cylinderGeometry args={[0.08, 0.12, 1.0, 8]} /><meshStandardMaterial color="#4a453d" roughness={0.95} /></mesh>
+    <mesh position={[0, 2.12, 0.24]} rotation={[0.1, 0, 0]} castShadow><cylinderGeometry args={[0.07, 0.09, 0.55, 8]} /><meshStandardMaterial color="#3f3a34" roughness={0.95} /></mesh>
+    <mesh position={[0, 2.4, 0.3]} castShadow><sphereGeometry args={[0.13, 12, 10]} /><meshStandardMaterial color="#3f3a34" /></mesh>
+    <mesh position={[0, 2.38, 0.44]} rotation={[Math.PI / 2, 0, 0]}><coneGeometry args={[0.05, 0.18, 8]} /><meshStandardMaterial color="#2f2a26" /></mesh>
+    {([-0.07, 0.07] as const).map((dx) => <mesh key={dx} position={[dx, 2.45, 0.4]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
   </group>;
 
   if (assetKey === "kookaburra") return <group>
     <mesh position={[0, 0.25, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.06, 0.06, 0.7, 8]} /><meshStandardMaterial color="#6f4a2c" /></mesh>
-    <mesh position={[0, 0.72, 0]} scale={[0.8, 0.95, 1]} castShadow><sphereGeometry args={[0.34, 16, 12]} /><meshStandardMaterial color={t("#efe6d4")} roughness={0.9} /></mesh>
-    <mesh position={[0, 0.8, -0.14]} scale={[0.85, 0.8, 0.7]}><sphereGeometry args={[0.3, 14, 10]} /><meshStandardMaterial color="#8a6f4a" /></mesh>
-    <mesh position={[0, 1.06, 0.06]} castShadow><sphereGeometry args={[0.26, 14, 12]} /><meshStandardMaterial color={t("#efe6d4")} /></mesh>
-    {([-0.12, 0.12] as const).map((dx) => <mesh key={dx} position={[dx, 1.09, 0.14]}><sphereGeometry args={[0.09, 10, 8]} /><meshStandardMaterial color="#6f5636" /></mesh>)}
-    <mesh position={[0, 1.0, 0.32]} rotation={[Math.PI / 2, 0, 0]} castShadow><coneGeometry args={[0.08, 0.34, 8]} /><meshStandardMaterial color="#3a332c" /></mesh>
-    <mesh position={[0, 0.66, -0.36]} rotation={[0.4, 0, 0]}><boxGeometry args={[0.22, 0.06, 0.36]} /><meshStandardMaterial color="#9c6a3c" /></mesh>
-    {([-0.1, 0.1] as const).map((dx) => <mesh key={dx} position={[dx, 1.11, 0.2]}><sphereGeometry args={[0.035, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
+    <mesh position={[0, 0.72, 0]} scale={[0.8, 0.98, 1]} castShadow><sphereGeometry args={[0.34, 16, 12]} /><meshStandardMaterial color={t("#f2ece0")} roughness={0.9} /></mesh>
+    <mesh position={[0, 0.82, -0.16]} scale={[0.9, 0.82, 0.7]}><sphereGeometry args={[0.3, 14, 10]} /><meshStandardMaterial color="#7c5f3e" /></mesh>
+    {/* blue wing patches */}
+    {([-1, 1] as const).map((s) => <mesh key={s} position={[s * 0.3, 0.72, -0.05]} rotation={[0, 0, s * 0.2]} scale={[0.4, 0.85, 0.5]}><sphereGeometry args={[0.2, 10, 8]} /><meshStandardMaterial color="#3f7d9c" roughness={0.7} /></mesh>)}
+    <mesh position={[0, 1.06, 0.06]} castShadow><sphereGeometry args={[0.26, 14, 12]} /><meshStandardMaterial color={t("#f2ece0")} /></mesh>
+    <mesh position={[0, 1.2, 0.0]} scale={[0.9, 0.5, 0.9]}><sphereGeometry args={[0.24, 12, 8]} /><meshStandardMaterial color="#7c5f3e" /></mesh>
+    {([-1, 1] as const).map((s) => <mesh key={s} position={[s * 0.16, 1.06, 0.12]} scale={[1.4, 0.5, 0.6]}><sphereGeometry args={[0.1, 10, 8]} /><meshStandardMaterial color="#6f5636" /></mesh>)}
+    <mesh position={[0, 1.0, 0.34]} rotation={[Math.PI / 2, 0, 0]} castShadow><coneGeometry args={[0.09, 0.4, 8]} /><meshStandardMaterial color="#33302a" /></mesh>
+    <mesh position={[0, 0.66, -0.38]} rotation={[0.4, 0, 0]}><boxGeometry args={[0.24, 0.06, 0.4]} /><meshStandardMaterial color="#6a4f30" /></mesh>
+    {([-0.1, 0.1] as const).map((dx) => <mesh key={dx} position={[dx, 1.12, 0.2]}><sphereGeometry args={[0.038, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
   </group>;
 
   if (assetKey === "echidna") return <group>
     <mesh position={[0, 0.3, 0]} scale={[1, 0.7, 1.3]} castShadow><sphereGeometry args={[0.42, 16, 12]} /><meshStandardMaterial color={t("#5c4a35")} roughness={1} /></mesh>
-    {Array.from({ length: 26 }, (_, i) => { const a = (i / 26) * Math.PI * 2; const r = 0.3 + (i % 3) * 0.03; const x = Math.cos(a) * r; const z = Math.sin(a) * r * 1.3; const y = 0.42 + (i % 4) * 0.05; return <mesh key={i} position={[x, y, z]} rotation={[Math.sin(a) * 0.7, 0, -Math.cos(a) * 0.7]} castShadow><coneGeometry args={[0.04, 0.36, 5]} /><meshStandardMaterial color="#3a2e1f" /></mesh>; })}
-    <mesh position={[0, 0.22, 0.62]} rotation={[Math.PI / 2, 0, 0]} castShadow><cylinderGeometry args={[0.04, 0.08, 0.42, 8]} /><meshStandardMaterial color={t("#4a3a28")} /></mesh>
-    {([-0.1, 0.1] as const).map((dx) => <mesh key={dx} position={[dx, 0.36, 0.42]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
+    {Array.from({ length: 30 }, (_, i) => { const a = (i / 30) * Math.PI * 2; const r = 0.28 + (i % 3) * 0.035; const x = Math.cos(a) * r; const z = Math.sin(a) * r * 1.3; const y = 0.42 + (i % 4) * 0.05; return <mesh key={i} position={[x, y, z]} rotation={[Math.sin(a) * 0.75, 0, -Math.cos(a) * 0.75]} castShadow><coneGeometry args={[0.038, 0.44, 5]} /><meshStandardMaterial color={i % 3 === 0 ? "#b89a5e" : "#cdb079"} roughness={0.85} /></mesh>; })}
+    {/* long slender down-curved snout */}
+    <mesh position={[0, 0.2, 0.66]} rotation={[Math.PI / 2 + 0.4, 0, 0]} castShadow><cylinderGeometry args={[0.03, 0.07, 0.6, 8]} /><meshStandardMaterial color={t("#4a3a28")} /></mesh>
+    <mesh position={[0, 0.06, 0.9]}><sphereGeometry args={[0.035, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>
+    {([-0.1, 0.1] as const).map((dx) => <mesh key={dx} position={[dx, 0.36, 0.42]}><sphereGeometry args={[0.028, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
   </group>;
 
   if (assetKey === "cockatoo") return <group>
     <mesh position={[0, 0.25, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.06, 0.06, 0.7, 8]} /><meshStandardMaterial color="#6f4a2c" /></mesh>
-    <mesh position={[0, 0.75, 0]} scale={[0.78, 1, 0.85]} castShadow><sphereGeometry args={[0.34, 16, 12]} /><meshStandardMaterial color={t("#f8fafc")} roughness={0.85} /></mesh>
-    <mesh position={[0, 1.15, 0.04]} castShadow><sphereGeometry args={[0.24, 14, 12]} /><meshStandardMaterial color={t("#f8fafc")} /></mesh>
-    {([-0.06, 0.02, 0.1] as const).map((dx, i) => <mesh key={i} position={[dx, 1.4, -0.02]} rotation={[-0.3 + i * 0.1, 0, 0.1 - i * 0.1]} castShadow><coneGeometry args={[0.05, 0.3, 6]} /><meshStandardMaterial color="#facc15" /></mesh>)}
-    <mesh position={[0, 1.08, 0.24]} rotation={[Math.PI / 2 + 0.4, 0, 0]}><coneGeometry args={[0.07, 0.2, 8]} /><meshStandardMaterial color="#3a332c" /></mesh>
+    <mesh position={[0, 0.75, 0]} scale={[0.78, 1.02, 0.85]} castShadow><sphereGeometry args={[0.34, 16, 12]} /><meshStandardMaterial color={t("#f8fafc")} roughness={0.85} /></mesh>
+    <mesh position={[0, 1.16, 0.05]} castShadow><sphereGeometry args={[0.25, 14, 12]} /><meshStandardMaterial color={t("#f8fafc")} /></mesh>
+    {/* swept sulphur crest */}
+    {([-0.1, -0.02, 0.06, 0.14] as const).map((dx, i) => <mesh key={i} position={[dx, 1.42 + i * 0.02, -0.04]} rotation={[-0.5 + i * 0.12, 0, 0.18 - i * 0.09]} castShadow><coneGeometry args={[0.05, 0.42, 5]} /><meshStandardMaterial color="#f5d130" roughness={0.7} /></mesh>)}
+    {/* hooked dark beak + yellow cheek */}
+    <mesh position={[0, 1.08, 0.24]} rotation={[Math.PI / 2 + 0.5, 0, 0]} castShadow><coneGeometry args={[0.09, 0.26, 8]} /><meshStandardMaterial color="#2f2a26" /></mesh>
+    {([-0.2, 0.2] as const).map((dx) => <mesh key={dx} position={[dx, 1.12, 0.13]}><sphereGeometry args={[0.05, 8, 8]} /><meshStandardMaterial color="#f5d130" /></mesh>)}
     <mesh position={[0, 0.66, -0.32]} rotation={[0.5, 0, 0]}><boxGeometry args={[0.2, 0.05, 0.34]} /><meshStandardMaterial color={t("#eef1f4")} /></mesh>
-    {([-0.09, 0.09] as const).map((dx) => <mesh key={dx} position={[dx, 1.18, 0.18]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
+    {([-0.09, 0.09] as const).map((dx) => <mesh key={dx} position={[dx, 1.2, 0.18]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
   </group>;
 
   if (assetKey === "pine_tree") return <group>
@@ -599,7 +638,6 @@ const ANIMAL_GAITS: Record<string, Gait> = {
   kangaroo: { speed: 0.9, radius: 1.7, hop: true },
   emu: { speed: 0.75, radius: 1.7 },
   wombat: { speed: 0.34, radius: 1.2 },
-  koala: { speed: 0.24, radius: 0.8 },
   echidna: { speed: 0.3, radius: 1.0 },
   kookaburra: { speed: 0, radius: 0 },
   cockatoo: { speed: 0, radius: 0 },

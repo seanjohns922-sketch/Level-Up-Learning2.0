@@ -67,7 +67,7 @@ const SCENERY_GROUPS: Array<[string, WorldSceneryGroup]> = [
 // Kid-friendly recolour palette shown when a scenery item is held.
 const SCENERY_TINTS = ["#ef4444", "#f97316", "#f5c451", "#22c55e", "#16a34a", "#38bdf8", "#2563eb", "#a855f7", "#ec4899", "#8a5a34", "#f8fafc", "#1f2937"] as const;
 const SCENERY_ICON: Record<string, LucideIcon> = {
-  tree: TreeDeciduous, pine_tree: TreePine, palm_tree: TreePalm, shrub: Shrub, hedge: Leaf, toadstool: Cherry, log: Logs, flower_bed: Flower2,
+  tree: TreeDeciduous, pine_tree: TreePine, palm_tree: TreePalm, gum_tree: TreeDeciduous, shrub: Shrub, hedge: Leaf, toadstool: Cherry, log: Logs, flower_bed: Flower2,
   boulder: Mountain, rock_pile: Hexagon, pond: Waves, fountain: Droplets, bridge: Landmark,
   lamp_post: Lamp, bench: Sofa, fence: Fence, mailbox: Mailbox, flag: Flag, umbrella: Umbrella, signpost: Signpost, balloons: PartyPopper,
   kangaroo: Rabbit, koala: PawPrint, wombat: PawPrint, emu: Bird, kookaburra: Feather, echidna: Shell, cockatoo: Bird,

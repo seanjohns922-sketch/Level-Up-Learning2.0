@@ -40,6 +40,7 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_tree", "Tree", "tree", "#3f8f3a", "trees_plants", "2x2", 1.25),
   starter("central_world_starter_pine", "Pine Tree", "pine_tree", "#256b43", "trees_plants", "2x2", 1.25),
   starter("central_world_starter_palm", "Palm Tree", "palm_tree", "#2f9e6f", "trees_plants", "2x2", 1.3),
+  starter("central_world_starter_gum", "Gum Tree", "gum_tree", "#8fae86", "trees_plants", "2x2", 1.3),
   starter("central_world_starter_shrub", "Shrub", "shrub", "#4d9b46", "trees_plants", "1x1", 1.05),
   starter("central_world_starter_hedge", "Hedge", "hedge", "#3c7a3a", "trees_plants", "2x1", 1.45),
   starter("central_world_starter_toadstool", "Toadstool", "toadstool", "#e05a52", "trees_plants", "1x1", 1.0),
@@ -65,7 +66,7 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
 
   // Aussie animals
   starter("central_world_starter_kangaroo", "Kangaroo", "kangaroo", "#b5793f", "animals", "1x1", 1.3),
-  starter("central_world_starter_koala", "Koala", "koala", "#8a94a0", "animals", "1x1", 1.1),
+  starter("central_world_starter_koala", "Koala Gum Tree", "koala", "#8a94a0", "animals", "2x2", 1.3),
   starter("central_world_starter_wombat", "Wombat", "wombat", "#7a5a3f", "animals", "1x1", 1.1),
   starter("central_world_starter_emu", "Emu", "emu", "#6b5f52", "animals", "1x1", 1.35),
   starter("central_world_starter_kookaburra", "Kookaburra", "kookaburra", "#9c8161", "animals", "1x1", 1.0),
