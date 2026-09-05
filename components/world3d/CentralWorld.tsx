@@ -63,6 +63,8 @@ const SCENERY_GROUPS: Array<[string, WorldSceneryGroup]> = [
 // A little symbol per scenery item, keyed by its worldAssetKey. Bridge,
 // toadstool and sign have no exact lucide glyph, so Landmark/Cherry/Signpost
 // stand in as the closest read.
+// Kid-friendly recolour palette shown when a scenery item is held.
+const SCENERY_TINTS = ["#ef4444", "#f97316", "#f5c451", "#22c55e", "#16a34a", "#38bdf8", "#2563eb", "#a855f7", "#ec4899", "#8a5a34", "#f8fafc", "#1f2937"] as const;
 const SCENERY_ICON: Record<string, LucideIcon> = {
   tree: TreeDeciduous, pine_tree: TreePine, palm_tree: TreePalm, shrub: Shrub, hedge: Leaf, toadstool: Cherry, log: Logs, flower_bed: Flower2,
   boulder: Mountain, rock_pile: Hexagon, pond: Waves, fountain: Droplets, bridge: Landmark,
@@ -387,6 +389,10 @@ export default function CentralWorld() {
     void speak(`${item.name} selected. Use the arrow buttons to choose a space, then press add. You can place as many as you like.`, undefined, "manual", { rate: 0.9 });
   }
 
+  function setHeldTint(tint: string | undefined) {
+    setBuildPlacement((current) => (current ? { ...current, tint } : current));
+  }
+
   function chooseInventoryItem(item: EconomyItem) {
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(item.item_key);
@@ -645,6 +651,19 @@ export default function CentralWorld() {
               </div>
             );
           })}
+          {buildPreview && buildItem?.metadata.marketplaceCategory === "world_basic" ? (
+            <div style={{ marginTop: 10 }}>
+              <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>COLOUR</div>
+              <div aria-label="Recolour item" style={{ marginTop: 5, display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                <button type="button" onClick={() => setHeldTint(undefined)} aria-pressed={!buildPlacement?.tint} aria-label="Default colour" title="Default" style={{ ...debugButton, minHeight: 30, padding: "0 10px", fontSize: 11, fontWeight: 900, background: !buildPlacement?.tint ? "#efbd61" : debugButton.background, color: !buildPlacement?.tint ? "#2b2119" : debugButton.color }}>Default</button>
+                {SCENERY_TINTS.map((c) => {
+                  const selected = buildPlacement?.tint === c;
+                  return <button key={c} type="button" onClick={() => setHeldTint(c)} aria-pressed={selected} aria-label={`Paint colour ${c}`} style={{ width: 30, height: 30, borderRadius: 8, flex: "0 0 auto", background: c, cursor: "pointer", border: selected ? "2px solid #fff" : "2px solid rgba(255,255,255,.28)", boxShadow: selected ? "0 0 0 3px rgba(94,234,212,.4)" : "inset 0 0 0 1px rgba(0,0,0,.15)" }} />;
+                })}
+              </div>
+            </div>
+          ) : null}
+
           <div className="centralWorldEditorControls" style={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
             <div className="centralWorldEditorDpad" style={{ display: "grid", gridTemplateColumns: "repeat(3, 40px)", gridTemplateRows: "repeat(2, 40px)", gap: 4 }}><button type="button" aria-label="Move cursor forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={19} /></button><button type="button" aria-label="Move cursor left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={19} /></button><button type="button" aria-label="Move cursor backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={19} /></button><button type="button" aria-label="Move cursor right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={19} /></button></div>
             <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isMoveTool || isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? `${buildItem?.name ?? "Item"} fits here.` : "Choose a clear green space.") : isMoveTool ? "Tap an item to pick it up." : isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Tap an item to remove it." : "Choose a clear green space."}</div>

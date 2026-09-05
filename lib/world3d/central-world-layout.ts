@@ -6,6 +6,9 @@ export type CentralWorldPlacement = {
   gridX: number;
   gridZ: number;
   rotation: 0 | 90 | 180 | 270;
+  // Optional recolour applied to the item's paint surface. Persisted alongside
+  // the placement; undefined means the item's default colours.
+  tint?: string;
 };
 
 export type CentralWorldGroundType = "path" | "road" | "stone";
