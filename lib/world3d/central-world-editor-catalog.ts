@@ -1,6 +1,6 @@
 import type { EconomyItem } from "@/lib/economy";
 
-export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals";
+export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals" | "fortress";
 
 function starter(
   item_key: string,
@@ -72,4 +72,12 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_kookaburra", "Kookaburra Gum Tree", "kookaburra", "#9c8161", "animals", "2x2", 1.3),
   starter("central_world_starter_echidna", "Echidna", "echidna", "#5c4a35", "animals", "1x1", 1.0),
   starter("central_world_starter_cockatoo", "Cockatoo", "cockatoo", "#e6ebef", "animals", "1x1", 1.0),
+
+  // Fortress kit
+  starter("central_world_starter_wall", "Castle Wall", "castle_wall", "#9a8d7c", "fortress", "2x1", 1.0),
+  starter("central_world_starter_corner", "Wall Corner", "castle_corner", "#9a8d7c", "fortress", "1x1", 1.0),
+  starter("central_world_starter_gatehouse", "Gatehouse", "castle_gate", "#8f8271", "fortress", "3x1", 1.0),
+  starter("central_world_starter_turret", "Turret", "castle_turret", "#9a8d7c", "fortress", "2x2", 1.1),
+  starter("central_world_starter_keep", "Keep", "castle_keep", "#8f8271", "fortress", "3x3", 1.25),
+  starter("central_world_starter_banner", "Banner", "castle_banner", "#1f3352", "fortress", "1x1", 1.0),
 ];

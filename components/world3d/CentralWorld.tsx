@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, Check, Cherry, Droplets, Eraser, Feather, Fence, Flag, Flower2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flower2, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
@@ -51,7 +51,7 @@ import {
 } from "@/lib/world3d/central-world-layout";
 
 type WorldEditTool = CentralWorldGroundType | "move" | "scenery" | "erase";
-const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { move: "Move", path: "Path", road: "Road", stone: "Stone", scenery: "Scenery", erase: "Eraser" };
+const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { move: "Move", path: "Path", road: "Road", stone: "Stone", water: "Water", scenery: "Scenery", erase: "Eraser" };
 // The free scenery palette is driven entirely off CENTRAL_WORLD_STARTER_SCENERY,
 // grouped into these sections. Add an item to the catalogue (and a mesh in
 // StarterScenery) and it appears here automatically.
@@ -60,6 +60,7 @@ const SCENERY_GROUPS: Array<[string, WorldSceneryGroup]> = [
   ["ROCKS & WATER", "rocks_water"],
   ["FURNITURE & FUN", "furniture_fun"],
   ["AUSSIE ANIMALS", "animals"],
+  ["FORTRESS", "fortress"],
 ];
 // A little symbol per scenery item, keyed by its worldAssetKey. Bridge,
 // toadstool and sign have no exact lucide glyph, so Landmark/Cherry/Signpost
@@ -71,6 +72,7 @@ const SCENERY_ICON: Record<string, LucideIcon> = {
   boulder: Mountain, rock_pile: Hexagon, pond: Waves, fountain: Droplets, bridge: Landmark,
   lamp_post: Lamp, bench: Sofa, fence: Fence, mailbox: Mailbox, flag: Flag, umbrella: Umbrella, signpost: Signpost, balloons: PartyPopper,
   kangaroo: Rabbit, koala: PawPrint, wombat: PawPrint, emu: Bird, kookaburra: Feather, echidna: Shell, cockatoo: Bird,
+  castle_wall: BrickWall, castle_corner: Grid2x2, castle_gate: DoorOpen, castle_turret: Castle, castle_keep: Shield, castle_banner: Flag,
 };
 
 type CentralWorldMetrics = {
@@ -281,7 +283,7 @@ export default function CentralWorld() {
   const buildValid = Boolean(buildItem && buildPlacement && validateCentralWorldPlacement(buildPlacement, buildItem, placementsWithoutBuildItem, itemsById));
   const buildPreview = buildItem && buildPlacement ? { placement: buildPlacement, item: buildItem, valid: buildValid } : null;
   const heldItemKey = selectedInventoryItemKey ?? selectedSceneryItemKey;
-  const isGroundTool = !heldItemKey && (editTool === "path" || editTool === "road" || editTool === "stone");
+  const isGroundTool = !heldItemKey && (editTool === "path" || editTool === "road" || editTool === "stone" || editTool === "water");
   const isEraseTool = !heldItemKey && editTool === "erase";
   const isMoveTool = !heldItemKey && editTool === "move";
   const groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null = editorOpen && (isGroundTool || isEraseTool) ? {
@@ -623,7 +625,7 @@ export default function CentralWorld() {
 
           {([
             ["ACTIONS", [["move", "Move", <Hand key="move-icon" size={17} />], ["erase", "Erase", <Eraser key="erase-icon" size={17} />]]],
-            ["GROUND & PATHS", [["path", "Path", <Route key="path-icon" size={17} />], ["road", "Road", <Route key="road-icon" size={17} />], ["stone", "Stone", <Route key="stone-icon" size={17} />]]],
+            ["GROUND & PATHS", [["path", "Path", <Route key="path-icon" size={17} />], ["road", "Road", <Route key="road-icon" size={17} />], ["stone", "Stone", <Route key="stone-icon" size={17} />], ["water", "Water", <Waves key="water-icon" size={17} />]]],
           ] as Array<[string, Array<[WorldEditTool, string, React.ReactNode]>]>).map(([groupLabel, tools]) => (
             <div key={groupLabel} style={{ marginTop: 8 }}>
               <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>{groupLabel}</div>

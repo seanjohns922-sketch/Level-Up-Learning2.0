@@ -597,6 +597,55 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
     {([-0.09, 0.09] as const).map((dx) => <mesh key={dx} position={[dx, 1.2, 0.18]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#1f1512" /></mesh>)}
   </group>;
 
+  if (assetKey === "castle_wall") return <group>
+    <mesh position={[0, 1.0, 0]} castShadow><boxGeometry args={[3.7, 2.0, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
+    {([0.55, 1.1, 1.65] as const).map((y) => <mesh key={y} position={[0, y, 0.36]}><boxGeometry args={[3.7, 0.05, 0.02]} /><meshStandardMaterial color="#6f6355" roughness={0.95} /></mesh>)}
+    {([-1.55, -0.775, 0, 0.775, 1.55] as const).map((x) => <mesh key={x} position={[x, 2.25, 0]} castShadow><boxGeometry args={[0.55, 0.5, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>)}
+  </group>;
+
+  if (assetKey === "castle_corner") return <group>
+    <mesh position={[0, 1.1, 0]} castShadow><boxGeometry args={[1.1, 2.2, 1.1]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
+    {([[-0.35, -0.35], [0.35, -0.35], [-0.35, 0.35], [0.35, 0.35]] as const).map(([x, z], i) => <mesh key={i} position={[x, 2.4, z]} castShadow><boxGeometry args={[0.4, 0.5, 0.4]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>)}
+  </group>;
+
+  if (assetKey === "castle_gate") return <group>
+    {([-1.65, 1.65] as const).map((x) => <mesh key={x} position={[x, 1.5, 0]} castShadow><boxGeometry args={[1.0, 3.0, 1.0]} /><meshStandardMaterial color={t("#8f8271")} roughness={0.9} /></mesh>)}
+    {([-1.65, 1.65] as const).flatMap((x) => ([-0.3, 0.3] as const).map((z) => <mesh key={`${x}-${z}`} position={[x, 3.15, z]} castShadow><boxGeometry args={[0.42, 0.5, 0.42]} /><meshStandardMaterial color={t("#8f8271")} roughness={0.9} /></mesh>))}
+    <mesh position={[0, 2.3, 0]} castShadow><boxGeometry args={[2.4, 1.0, 0.9]} /><meshStandardMaterial color={t("#8f8271")} roughness={0.9} /></mesh>
+    <mesh position={[0, 0.9, 0.15]}><boxGeometry args={[1.3, 1.8, 0.6]} /><meshStandardMaterial color="#241a10" roughness={0.9} /></mesh>
+    <mesh position={[0, 1.75, 0.2]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[0.95, 0.95, 0.5]} /><meshStandardMaterial color="#241a10" roughness={0.9} /></mesh>
+    {([-0.4, 0, 0.4] as const).map((x) => <mesh key={x} position={[x, 0.9, 0.42]}><boxGeometry args={[0.06, 1.7, 0.05]} /><meshStandardMaterial color="#4a4038" metalness={0.4} roughness={0.5} /></mesh>)}
+  </group>;
+
+  if (assetKey === "castle_turret") return <group>
+    <mesh position={[0, 1.8, 0]} castShadow><cylinderGeometry args={[0.85, 0.95, 3.6, 12]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
+    {Array.from({ length: 10 }, (_, i) => { const a = (i / 10) * Math.PI * 2; return <mesh key={i} position={[Math.cos(a) * 0.9, 3.7, Math.sin(a) * 0.9]} rotation={[0, -a, 0]} castShadow><boxGeometry args={[0.3, 0.5, 0.3]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>; })}
+    <mesh position={[0, 4.6, 0]} castShadow><coneGeometry args={[1.05, 1.7, 12]} /><meshStandardMaterial color="#26324f" roughness={0.7} /></mesh>
+    <mesh position={[0, 5.6, 0]}><cylinderGeometry args={[0.03, 0.03, 0.6, 6]} /><meshStandardMaterial color="#caa250" metalness={0.4} roughness={0.45} /></mesh>
+    <mesh position={[0.18, 5.75, 0]}><boxGeometry args={[0.32, 0.2, 0.02]} /><meshStandardMaterial color="#c2410c" roughness={0.6} side={THREE.DoubleSide} /></mesh>
+    {([0, Math.PI / 2, Math.PI, Math.PI * 1.5] as const).map((a, i) => <mesh key={i} position={[Math.cos(a) * 0.86, 2.0, Math.sin(a) * 0.86]} rotation={[0, -a, 0]}><boxGeometry args={[0.14, 0.7, 0.05]} /><meshStandardMaterial color="#241a10" /></mesh>)}
+  </group>;
+
+  if (assetKey === "castle_keep") return <group>
+    <mesh position={[0, 2.2, 0]} castShadow><boxGeometry args={[3.4, 4.4, 3.4]} /><meshStandardMaterial color={t("#8f8271")} roughness={0.9} /></mesh>
+    {([1.2, 2.4, 3.6] as const).map((y) => <mesh key={y} position={[0, y, 1.71]}><boxGeometry args={[3.4, 0.05, 0.02]} /><meshStandardMaterial color="#6f6355" /></mesh>)}
+    {([-1.3, -0.65, 0, 0.65, 1.3] as const).flatMap((x) => ([-1.7, 1.7] as const).map((z) => <mesh key={`m${x}-${z}`} position={[x, 4.65, z]} castShadow><boxGeometry args={[0.5, 0.5, 0.4]} /><meshStandardMaterial color={t("#8f8271")} /></mesh>))}
+    {([-1.3, -0.65, 0, 0.65, 1.3] as const).flatMap((z) => ([-1.7, 1.7] as const).map((x) => <mesh key={`n${x}-${z}`} position={[x, 4.65, z]} castShadow><boxGeometry args={[0.4, 0.5, 0.5]} /><meshStandardMaterial color={t("#8f8271")} /></mesh>))}
+    {([[-1.7, -1.7], [1.7, -1.7], [-1.7, 1.7], [1.7, 1.7]] as const).map(([x, z], i) => <group key={i} position={[x, 0, z]}><mesh position={[0, 2.6, 0]} castShadow><cylinderGeometry args={[0.4, 0.45, 5.2, 8]} /><meshStandardMaterial color={t("#8f8271")} /></mesh><mesh position={[0, 5.6, 0]} castShadow><coneGeometry args={[0.55, 1.0, 8]} /><meshStandardMaterial color="#26324f" /></mesh></group>)}
+    <mesh position={[0, 1.1, 1.72]}><boxGeometry args={[1.0, 2.0, 0.15]} /><meshStandardMaterial color="#3a281a" roughness={0.8} /></mesh>
+    <mesh position={[0, 2.0, 1.75]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[0.72, 0.72, 0.12]} /><meshStandardMaterial color="#3a281a" /></mesh>
+    {([-1, 1] as const).map((x) => <mesh key={x} position={[x, 3.0, 1.72]}><boxGeometry args={[0.3, 0.7, 0.06]} /><meshStandardMaterial color="#241a10" /></mesh>)}
+  </group>;
+
+  if (assetKey === "castle_banner") return <group>
+    <mesh position={[0, 1.3, 0]} castShadow><cylinderGeometry args={[0.05, 0.06, 2.6, 8]} /><meshStandardMaterial color="#6b5836" metalness={0.2} roughness={0.6} /></mesh>
+    <mesh position={[0, 2.4, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.035, 0.035, 0.9, 6]} /><meshStandardMaterial color="#6b5836" /></mesh>
+    <mesh position={[0, 1.7, 0]}><boxGeometry args={[0.8, 1.35, 0.04]} /><meshStandardMaterial color={t("#1f3352")} roughness={0.7} side={THREE.DoubleSide} /></mesh>
+    {([2.32, 1.05] as const).map((y) => <mesh key={y} position={[0, y, 0.03]}><boxGeometry args={[0.8, 0.08, 0.02]} /><meshStandardMaterial color="#caa250" metalness={0.4} roughness={0.45} /></mesh>)}
+    <mesh position={[0, 0.95, 0]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[0.4, 0.4, 0.04]} /><meshStandardMaterial color={t("#1f3352")} roughness={0.7} side={THREE.DoubleSide} /></mesh>
+    <mesh position={[0, 1.7, 0.04]}><octahedronGeometry args={[0.16, 0]} /><meshStandardMaterial color="#e6b955" metalness={0.5} roughness={0.4} /></mesh>
+  </group>;
+
   if (assetKey === "pine_tree") return <group>
     <mesh position={[0, 0.95, 0]} castShadow><cylinderGeometry args={[0.16, 0.28, 1.9, 8]} /><meshStandardMaterial color="#5b3a1e" roughness={0.9} /></mesh>
     {([[2.05, 1.15, "#2f6d3f"], [2.75, 0.94, "#357a46"], [3.35, 0.74, "#3c854c"], [3.9, 0.54, "#43904f"]] as const).map(([y, r, c], i) => <mesh key={i} position={[0, y, 0]} castShadow><coneGeometry args={[r, 1.35, 10]} /><meshStandardMaterial color={t(c)} roughness={0.95} /></mesh>)}
@@ -765,11 +814,15 @@ function BuildModeGrid({ cursor }: { cursor: { gridX: number; gridZ: number } })
   );
 }
 
-const GROUND_TILE_COLORS: Record<CentralWorldGroundType, string> = { path: "#a77a50", road: "#4b5563", stone: "#a8a29e" };
+const GROUND_TILE_COLORS: Record<CentralWorldGroundType, string> = { path: "#a77a50", road: "#4b5563", stone: "#a8a29e", water: "#2f7fa6" };
 
 function GroundTile({ tile, preview = false, valid = true }: { tile: CentralWorldGroundTile; preview?: boolean; valid?: boolean }) {
+  const isWater = tile.tileType === "water";
   const [x, , z] = gridToWorld(tile.gridX, tile.gridZ);
-  return <mesh position={[x, preview ? 0.18 : 0.105, z]} receiveShadow><boxGeometry args={[CENTRAL_WORLD_GRID.cellSize + 0.04, preview ? 0.12 : 0.08, CENTRAL_WORLD_GRID.cellSize + 0.04]} /><meshStandardMaterial color={preview ? valid ? GROUND_TILE_COLORS[tile.tileType] : "#ef4444" : GROUND_TILE_COLORS[tile.tileType]} transparent={preview} opacity={preview ? 0.72 : 1} roughness={0.95} /></mesh>;
+  const color = preview ? (valid ? GROUND_TILE_COLORS[tile.tileType] : "#ef4444") : GROUND_TILE_COLORS[tile.tileType];
+  // Water sits a touch lower and reads wet (smooth + a little reflective) so a
+  // painted moat looks like water, not a blue path.
+  return <mesh position={[x, preview ? 0.18 : isWater ? 0.055 : 0.105, z]} receiveShadow><boxGeometry args={[CENTRAL_WORLD_GRID.cellSize + 0.04, preview ? 0.12 : 0.08, CENTRAL_WORLD_GRID.cellSize + 0.04]} /><meshStandardMaterial color={color} transparent={preview} opacity={preview ? 0.72 : 1} roughness={isWater ? 0.18 : 0.95} metalness={isWater ? 0.25 : 0} emissive={isWater ? "#123a4f" : "#000000"} emissiveIntensity={isWater ? 0.25 : 0} /></mesh>;
 }
 
 function MeadowGround() {

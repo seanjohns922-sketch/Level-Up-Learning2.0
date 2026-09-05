@@ -11,7 +11,7 @@ export type CentralWorldPlacement = {
   tint?: string;
 };
 
-export type CentralWorldGroundType = "path" | "road" | "stone";
+export type CentralWorldGroundType = "path" | "road" | "stone" | "water";
 export type CentralWorldGroundTile = { gridX: number; gridZ: number; tileType: CentralWorldGroundType };
 
 export const CENTRAL_WORLD_GRID = { cellSize: 2, minX: -21, maxX: 21, minZ: -13, maxZ: 25 } as const;
@@ -105,7 +105,7 @@ export function readCentralWorldGroundTiles(scope: string) {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(`${GROUND_STORAGE_PREFIX}:${scope}`) ?? "[]");
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter((entry): entry is CentralWorldGroundTile => Number.isInteger(entry?.gridX) && Number.isInteger(entry?.gridZ) && ["path", "road", "stone"].includes(entry?.tileType));
+    return parsed.filter((entry): entry is CentralWorldGroundTile => Number.isInteger(entry?.gridX) && Number.isInteger(entry?.gridZ) && ["path", "road", "stone", "water"].includes(entry?.tileType));
   } catch { return []; }
 }
 
