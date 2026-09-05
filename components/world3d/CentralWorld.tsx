@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, Eraser, Flower2, Hand, Home, Lamp, LayoutGrid, Map as MapIcon, MapPin, PackageOpen, Route, RotateCw, ShoppingBag, Trash2, Trees, Undo2, X, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, Eraser, Hand, Home, LayoutGrid, Map as MapIcon, MapPin, PackageOpen, Route, RotateCw, ShoppingBag, Trash2, Undo2, X, ZoomIn, ZoomOut } from "lucide-react";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
@@ -34,7 +34,7 @@ import {
 import { rememberCentralWorldHomeEntry } from "@/lib/world3d/world-navigation-context";
 import { joinSpeechParts, WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
 import { speak } from "@/lib/speak";
-import { CENTRAL_WORLD_STARTER_SCENERY } from "@/lib/world3d/central-world-editor-catalog";
+import { CENTRAL_WORLD_STARTER_SCENERY, type WorldSceneryGroup } from "@/lib/world3d/central-world-editor-catalog";
 import {
   CENTRAL_WORLD_GRID,
   gridToWorld,
@@ -50,14 +50,16 @@ import {
   type CentralWorldPlacement,
 } from "@/lib/world3d/central-world-layout";
 
-type WorldEditTool = CentralWorldGroundType | "move" | "tree" | "pine_tree" | "flower_bed" | "lamp_post" | "erase";
-const SCENERY_ITEM_BY_TOOL: Partial<Record<WorldEditTool, string>> = {
-  tree: "central_world_starter_tree",
-  pine_tree: "central_world_starter_pine",
-  flower_bed: "central_world_starter_flowers",
-  lamp_post: "central_world_starter_lamp",
-};
-const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { move: "Move", path: "Path", road: "Road", stone: "Stone", tree: "Tree", pine_tree: "Pine tree", flower_bed: "Flower bed", lamp_post: "Lamp post", erase: "Eraser" };
+type WorldEditTool = CentralWorldGroundType | "move" | "scenery" | "erase";
+const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { move: "Move", path: "Path", road: "Road", stone: "Stone", scenery: "Scenery", erase: "Eraser" };
+// The free scenery palette is driven entirely off CENTRAL_WORLD_STARTER_SCENERY,
+// grouped into these sections. Add an item to the catalogue (and a mesh in
+// StarterScenery) and it appears here automatically.
+const SCENERY_GROUPS: Array<[string, WorldSceneryGroup]> = [
+  ["TREES & PLANTS", "trees_plants"],
+  ["ROCKS & WATER", "rocks_water"],
+  ["FURNITURE & FUN", "furniture_fun"],
+];
 
 type CentralWorldMetrics = {
   active: boolean;
@@ -249,6 +251,7 @@ export default function CentralWorld() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editTool, setEditTool] = useState<WorldEditTool>("move");
   const [selectedInventoryItemKey, setSelectedInventoryItemKey] = useState<string | null>(null);
+  const [selectedSceneryItemKey, setSelectedSceneryItemKey] = useState<string | null>(null);
   const [editCursor, setEditCursor] = useState({ gridX: -5, gridZ: 5 });
   const [buildZoom, setBuildZoom] = useState(28);
   const [editHistory, setEditHistory] = useState<Array<{ placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] }>>([]);
@@ -256,16 +259,19 @@ export default function CentralWorld() {
   const hasAvailableAction = activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance;
   const student = useMemo(() => getActiveStudentProfile(), []);
   const placementScope = student?.studentId ?? (preview ? "demo-preview" : "guest");
-  const editorItemKey = editorOpen ? selectedInventoryItemKey ?? SCENERY_ITEM_BY_TOOL[editTool] ?? null : null;
+  const editorItemKey = editorOpen ? selectedInventoryItemKey ?? selectedSceneryItemKey ?? null : null;
   const activeBuildItemKey = requestedBuildItemKey ?? editorItemKey;
   const buildItem = activeBuildItemKey ? itemsById.get(activeBuildItemKey) ?? null : null;
-  const uniqueOwnedItemKey = requestedBuildItemKey ?? selectedInventoryItemKey;
-  const placementsWithoutBuildItem = uniqueOwnedItemKey && buildItem ? placedCustomisations.filter((placement) => placement.itemId !== buildItem.item_key) : placedCustomisations;
+  // Exclude the item currently in hand by its unique placementId (not itemId),
+  // so moving one of several identical scenery items leaves the others intact.
+  const heldPlacementId = buildPlacement?.placementId ?? null;
+  const placementsWithoutBuildItem = heldPlacementId ? placedCustomisations.filter((placement) => placement.placementId !== heldPlacementId) : placedCustomisations;
   const buildValid = Boolean(buildItem && buildPlacement && validateCentralWorldPlacement(buildPlacement, buildItem, placementsWithoutBuildItem, itemsById));
   const buildPreview = buildItem && buildPlacement ? { placement: buildPlacement, item: buildItem, valid: buildValid } : null;
-  const isGroundTool = !selectedInventoryItemKey && (editTool === "path" || editTool === "road" || editTool === "stone");
-  const isEraseTool = !selectedInventoryItemKey && editTool === "erase";
-  const isMoveTool = !selectedInventoryItemKey && editTool === "move";
+  const heldItemKey = selectedInventoryItemKey ?? selectedSceneryItemKey;
+  const isGroundTool = !heldItemKey && (editTool === "path" || editTool === "road" || editTool === "stone");
+  const isEraseTool = !heldItemKey && editTool === "erase";
+  const isMoveTool = !heldItemKey && editTool === "move";
   const groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null = editorOpen && (isGroundTool || isEraseTool) ? {
     tile: { ...editCursor, tileType: isGroundTool ? editTool : groundTiles.find((tile) => tile.gridX === editCursor.gridX && tile.gridZ === editCursor.gridZ)?.tileType ?? "stone" },
     valid: editTool !== "erase" && validateCentralWorldGroundCell(editCursor.gridX, editCursor.gridZ),
@@ -297,7 +303,7 @@ export default function CentralWorld() {
         setGroundTiles(nextGroundTiles);
         if (requestedBuildItemKey && nextItemsById.has(requestedBuildItemKey) && ownedKeys.has(requestedBuildItemKey)) {
           const existing = nextPlacements.find((placement) => placement.itemId === requestedBuildItemKey);
-          const nextBuildPlacement = existing ?? { itemId: requestedBuildItemKey, gridX: -5, gridZ: 5, rotation: 0 };
+          const nextBuildPlacement = existing ?? { placementId: `${requestedBuildItemKey}-${(placementSequence.current += 1)}`, itemId: requestedBuildItemKey, gridX: -5, gridZ: 5, rotation: 0 };
           const [worldX, , worldZ] = gridToWorld(nextBuildPlacement.gridX, nextBuildPlacement.gridZ);
           setBuildPlacement(nextBuildPlacement);
           setEditCursor({ gridX: nextBuildPlacement.gridX, gridZ: nextBuildPlacement.gridZ });
@@ -332,6 +338,7 @@ export default function CentralWorld() {
     setEditCursor(cursor);
     setEditTool("move");
     setSelectedInventoryItemKey(null);
+    setSelectedSceneryItemKey(null);
     setBuildPlacement(null);
     setBuildZoom(28);
     setEditHistory([]);
@@ -348,6 +355,7 @@ export default function CentralWorld() {
 
   function chooseEditTool(tool: WorldEditTool) {
     setSelectedInventoryItemKey(null);
+    setSelectedSceneryItemKey(null);
     setEditTool(tool);
     void speak(
       tool === "move"
@@ -359,12 +367,20 @@ export default function CentralWorld() {
       "manual",
       { rate: 0.9 },
     );
-    const itemId = SCENERY_ITEM_BY_TOOL[tool];
+    setBuildPlacement(null);
+  }
+
+  function chooseSceneryItem(item: EconomyItem) {
+    setSelectedInventoryItemKey(null);
+    setSelectedSceneryItemKey(item.item_key);
+    setEditTool("scenery");
     placementSequence.current += 1;
-    setBuildPlacement(itemId ? { placementId: `${itemId}-${placementSequence.current}`, itemId, ...editCursor, rotation: 0 } : null);
+    setBuildPlacement({ placementId: `${item.item_key}-${placementSequence.current}`, itemId: item.item_key, ...editCursor, rotation: 0 });
+    void speak(`${item.name} selected. Use the arrow buttons to choose a space, then press add. You can place as many as you like.`, undefined, "manual", { rate: 0.9 });
   }
 
   function chooseInventoryItem(item: EconomyItem) {
+    setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(item.item_key);
     const existing = placedCustomisations.find((placement) => placement.itemId === item.item_key);
     placementSequence.current += 1;
@@ -389,6 +405,7 @@ export default function CentralWorld() {
     if (!hit) return;
     const item = itemsById.get(hit.itemId);
     placementSequence.current += 1;
+    setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(hit.itemId);
     setBuildPlacement({ ...hit, placementId: hit.placementId ?? `${hit.itemId}-${placementSequence.current}` });
     setEditCursor({ gridX: hit.gridX, gridZ: hit.gridZ });
@@ -403,6 +420,7 @@ export default function CentralWorld() {
     writeCentralWorldPlacements(placementScope, placementsWithoutBuildItem);
     setPlacedCustomisations(placementsWithoutBuildItem);
     setSelectedInventoryItemKey(null);
+    setSelectedSceneryItemKey(null);
     setBuildPlacement(null);
     setEditTool("move");
     void speak(`${buildItem.name} deleted.`, undefined, "manual", { rate: 0.9 });
@@ -422,7 +440,7 @@ export default function CentralWorld() {
   }
 
   function applyGroundAt(gridX: number, gridZ: number, announce = false) {
-    if (!editorOpen || selectedInventoryItemKey) return;
+    if (!editorOpen || heldItemKey) return;
     if (editTool === "erase") {
       // Remove whatever the tapped cell belongs to. A placed object counts if the
       // cell is anywhere inside its footprint (not just its centre); only when no
@@ -568,7 +586,7 @@ export default function CentralWorld() {
       {editorOpen ? (
         <section className="centralWorldEditor" aria-label="Edit world controls" style={{ position: "absolute", left: 10, top: 10, bottom: 10, zIndex: 35, width: "min(330px, 90vw)", overflowY: "auto", border: "2px solid #5eead4", borderRadius: 7, background: "rgba(13,24,22,.96)", color: "#fff", padding: 11, boxShadow: "0 14px 40px rgba(0,0,0,.4)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-            <div><div style={{ color: "#5eead4", fontSize: 10, fontWeight: 950, letterSpacing: ".16em" }}>EDIT WORLD</div><div style={{ marginTop: 1, fontSize: 16, fontWeight: 950 }}>{selectedInventoryItemKey ? `Placing ${buildItem?.name ?? "item"}` : isMoveTool ? "Tap an item to move or delete it" : isGroundTool ? "Tap or drag on the grass" : isEraseTool ? "Tap an item to remove it" : "Tap a space, then place"}</div></div>
+            <div><div style={{ color: "#5eead4", fontSize: 10, fontWeight: 950, letterSpacing: ".16em" }}>EDIT WORLD</div><div style={{ marginTop: 1, fontSize: 16, fontWeight: 950 }}>{heldItemKey ? `Placing ${buildItem?.name ?? "item"}` : isMoveTool ? "Tap an item to move or delete it" : isGroundTool ? "Tap or drag on the grass" : isEraseTool ? "Tap an item to remove it" : "Tap a space, then place"}</div></div>
             <div style={{ display: "flex", gap: 5 }}>
               <button type="button" onClick={() => setBuildZoom((value) => Math.min(38, value + 4))} aria-label="Zoom camera out" title="Zoom out" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomOut size={18} /></button>
               <button type="button" onClick={() => setBuildZoom((value) => Math.max(18, value - 4))} aria-label="Zoom camera in" title="Zoom in" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomIn size={18} /></button>
@@ -590,19 +608,34 @@ export default function CentralWorld() {
           {([
             ["ACTIONS", [["move", "Move", <Hand key="move-icon" size={17} />], ["erase", "Erase", <Eraser key="erase-icon" size={17} />]]],
             ["GROUND & PATHS", [["path", "Path", <Route key="path-icon" size={17} />], ["road", "Road", <Route key="road-icon" size={17} />], ["stone", "Stone", <Route key="stone-icon" size={17} />]]],
-            ["NATURE & DECOR", [["tree", "Tree", <Trees key="tree-icon" size={17} />], ["pine_tree", "Pine", <Trees key="pine-icon" size={17} />], ["flower_bed", "Flowers", <Flower2 key="flower-icon" size={17} />], ["lamp_post", "Lamp", <Lamp key="lamp-icon" size={17} />]]],
           ] as Array<[string, Array<[WorldEditTool, string, React.ReactNode]>]>).map(([groupLabel, tools]) => (
             <div key={groupLabel} style={{ marginTop: 8 }}>
               <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>{groupLabel}</div>
               <div aria-label={`${groupLabel} tools`} style={{ marginTop: 4, display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {tools.map(([tool, label, icon]) => {
-                  const selected = !selectedInventoryItemKey && editTool === tool;
+                  const selected = !heldItemKey && editTool === tool;
                   const selectedBg = tool === "erase" ? "#ef4444" : "#efbd61";
                   return <button key={tool} type="button" onClick={() => chooseEditTool(tool)} aria-pressed={selected} style={{ ...debugButton, flex: "0 0 auto", minWidth: 68, padding: "7px 10px", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, background: selected ? selectedBg : debugButton.background, color: selected ? (tool === "erase" ? "#fff" : "#2b2119") : debugButton.color }}>{icon}{label}</button>;
                 })}
               </div>
             </div>
           ))}
+
+          {SCENERY_GROUPS.map(([groupLabel, group]) => {
+            const items = CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldSceneryGroup === group);
+            if (!items.length) return null;
+            return (
+              <div key={group} style={{ marginTop: 8 }}>
+                <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>{groupLabel}</div>
+                <div aria-label={`${groupLabel} items`} style={{ marginTop: 4, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 5 }}>
+                  {items.map((item) => {
+                    const selected = selectedSceneryItemKey === item.item_key;
+                    return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><span aria-hidden style={{ width: 16, height: 16, borderRadius: 5, flex: "0 0 auto", background: item.accent, boxShadow: "inset 0 0 0 1px rgba(255,255,255,.35)" }} /><span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
+                  })}
+                </div>
+              </div>
+            );
+          })}
           <div className="centralWorldEditorControls" style={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
             <div className="centralWorldEditorDpad" style={{ display: "grid", gridTemplateColumns: "repeat(3, 40px)", gridTemplateRows: "repeat(2, 40px)", gap: 4 }}><button type="button" aria-label="Move cursor forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={19} /></button><button type="button" aria-label="Move cursor left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={19} /></button><button type="button" aria-label="Move cursor backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={19} /></button><button type="button" aria-label="Move cursor right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={19} /></button></div>
             <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isMoveTool || isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? `${buildItem?.name ?? "Item"} fits here.` : "Choose a clear green space.") : isMoveTool ? "Tap an item to pick it up." : isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Tap an item to remove it." : "Choose a clear green space."}</div>

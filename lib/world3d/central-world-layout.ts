@@ -78,7 +78,12 @@ export function readCentralWorldPlacements(scope: string) {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(`${STORAGE_PREFIX}:${scope}`) ?? "[]");
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter((entry): entry is CentralWorldPlacement => typeof entry?.itemId === "string" && Number.isInteger(entry?.gridX) && Number.isInteger(entry?.gridZ) && [0, 90, 180, 270].includes(entry?.rotation));
+    return parsed
+      .filter((entry): entry is CentralWorldPlacement => typeof entry?.itemId === "string" && Number.isInteger(entry?.gridX) && Number.isInteger(entry?.gridZ) && [0, 90, 180, 270].includes(entry?.rotation))
+      // Backfill a stable id for older placements saved before ids existed, so a
+      // moved item can always be matched (and excluded) by placementId — vital
+      // now that many identical scenery items can share an itemId.
+      .map((entry, index) => (entry.placementId ? entry : { ...entry, placementId: `${entry.itemId}-legacy-${index}` }));
   } catch { return []; }
 }
 
