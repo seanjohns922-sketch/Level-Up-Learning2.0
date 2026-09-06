@@ -348,20 +348,35 @@ export default function CentralWorld() {
     };
   }, [placementScope, preview, requestedBuildItemKey, student?.studentId]);
 
-  function moveBuildPlacement(gridX: number, gridZ: number) {
-    const nextCursor = { gridX: editCursor.gridX + gridX, gridZ: editCursor.gridZ + gridZ };
-    const next = buildPlacement ? { ...buildPlacement, ...nextCursor } : null;
-    if (!next && !editorOpen) return;
-    setEditCursor(nextCursor);
-    if (next) setBuildPlacement(next);
-    const [worldX, , worldZ] = gridToWorld(nextCursor.gridX, nextCursor.gridZ);
-    setSpawnTarget([worldX, 0.75, worldZ + 8]);
-    setSpawnNonce((value) => value + 1);
-  }
+  // Pan the build camera/cursor by whole cells. The avatar stays put — panning no
+  // longer teleports it to follow the cursor — and the cursor is clamped to the
+  // grid. Stable identity so the keyboard listener can depend on it.
+  const moveBuildPlacement = useCallback((dx: number, dz: number) => {
+    const cx = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX);
+    const cz = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ);
+    setEditCursor((cur) => ({ gridX: cx(cur.gridX + dx), gridZ: cz(cur.gridZ + dz) }));
+    setBuildPlacement((bp) => (bp ? { ...bp, gridX: cx(bp.gridX + dx), gridZ: cz(bp.gridZ + dz) } : bp));
+  }, [setEditCursor, setBuildPlacement]);
+
+  // Laptop: arrow keys pan the build view (the on-screen arrows do the same on
+  // iPad). Only while editing/placing, and we swallow the keys so the page
+  // doesn't scroll.
+  const inBuildMode = editorOpen || Boolean(buildPreview);
+  useEffect(() => {
+    if (!inBuildMode) return;
+    const onKey = (event: KeyboardEvent) => {
+      const move: Record<string, [number, number]> = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+      const delta = move[event.key];
+      if (!delta) return;
+      event.preventDefault();
+      moveBuildPlacement(delta[0], delta[1]);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [inBuildMode, moveBuildPlacement]);
 
   function openWorldEditor() {
     const cursor = { gridX: -5, gridZ: 5 };
-    const [worldX, , worldZ] = gridToWorld(cursor.gridX, cursor.gridZ);
     setEditCursor(cursor);
     setEditTool("move");
     setSelectedInventoryItemKey(null);
@@ -370,9 +385,8 @@ export default function CentralWorld() {
     setBuildZoom(28);
     setEditHistory([]);
     setEditorOpen(true);
-    setSpawnTarget([worldX, 0.75, worldZ + 8]);
-    setSpawnNonce((value) => value + 1);
-    void speak("Edit World. Tap anything you have placed to pick it up and move it. Or choose a path, tree, or the eraser from the tools.", undefined, "manual", { rate: 0.9 });
+    // Leave the avatar where it was standing — only the build camera moves.
+    void speak("Edit World. Use the arrow keys or the arrow buttons to move around. Tap the grass to place things.", undefined, "manual", { rate: 0.9 });
   }
 
   function closeWorldEditor() {
