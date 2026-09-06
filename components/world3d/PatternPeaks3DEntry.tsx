@@ -17,7 +17,7 @@ const PatternPeaksLevel3World = dynamic(() => import("@/components/world3d/Patte
   loading: () => <div className="grid min-h-screen place-items-center bg-[#17242d] font-semibold text-emerald-100/80">Opening Pattern Peaks...</div>,
 });
 
-const PATTERN_PEAKS_3D_LEVELS: RealmLevelId[] = ["Year 3", "Year 4"];
+const PATTERN_PEAKS_3D_LEVELS: RealmLevelId[] = ["Year 3", "Year 4", "Year 5"];
 
 function resolvePreviewLevel(value: string | null): RealmLevelId {
   if (value === "Level 3" || value === "Year 3") return "Year 3";
