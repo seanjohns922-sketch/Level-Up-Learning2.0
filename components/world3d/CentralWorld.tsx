@@ -185,7 +185,7 @@ function BuildModeSurface({ active, paint, onCell }: { active: boolean; paint: b
   );
 }
 
-function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNonce, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, editCursor, buildZoom, paintMode, onBuildCell, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null; editing: boolean; editCursor: { gridX: number; gridZ: number }; buildZoom: number; paintMode: boolean; onBuildCell: (gridX: number, gridZ: number, paint: boolean) => void; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void }) {
+function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNonce, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, editCursor, buildZoom, paintMode, onBuildCell, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, avatarPosRef }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null; editing: boolean; editCursor: { gridX: number; gridZ: number }; buildZoom: number; paintMode: boolean; onBuildCell: (gridX: number, gridZ: number, paint: boolean) => void; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   const handleNearestTarget = useCallback((id: string | null) => {
     setActiveTargetId(id);
@@ -231,8 +231,9 @@ function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNo
         cameraTargetHeight={3.6}
         cameraEnabled={!editing && !buildPreview}
         speed={4.2}
+        positionRef={avatarPosRef}
       />
-      <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={editCursor} zoom={buildZoom} />
+      <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={cameraFocus} zoom={buildZoom} />
       <BuildModeSurface active={editing || Boolean(buildPreview)} paint={paintMode} onCell={onBuildCell} />
       <CentralWorldMetricsReporter quality={quality} />
     </>
@@ -258,6 +259,9 @@ export default function CentralWorld() {
   const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
   const [lookInput, setLookInput] = useState<WorldLookInput>(EMPTY_WORLD_LOOK_INPUT);
   const placementSequence = useRef(0);
+  // The player writes its live ground position here each frame, so opening Edit
+  // World can centre the fixed build camera on wherever the avatar is standing.
+  const avatarPosRef = useRef({ x: 0, z: 18 });
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [spawnTarget, setSpawnTarget] = useState<[number, number, number] | null>(() =>
@@ -280,6 +284,9 @@ export default function CentralWorld() {
   const [selectedSceneryItemKey, setSelectedSceneryItemKey] = useState<string | null>(null);
   const [paletteTab, setPaletteTab] = useState<PaletteTab>("ground");
   const [editCursor, setEditCursor] = useState({ gridX: -5, gridZ: 5 });
+  // The build camera stays fixed on this point while editing; only the item
+  // (editCursor) moves with the arrows.
+  const [cameraFocus, setCameraFocus] = useState({ gridX: 0, gridZ: 9 });
   const [buildZoom, setBuildZoom] = useState(28);
   const [editHistory, setEditHistory] = useState<Array<{ placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] }>>([]);
   const [economyMessage, setEconomyMessage] = useState<string | null>(null);
@@ -351,15 +358,14 @@ export default function CentralWorld() {
   // Pan the build camera/cursor by whole cells. The avatar stays put — panning no
   // longer teleports it to follow the cursor — and the cursor is clamped to the
   // grid. Stable identity so the keyboard listener can depend on it.
-  // Pan the build CAMERA only. The cursor is just the camera's focus point now —
-  // it does not carry the held item, so panning never disturbs a placement (and
-  // the avatar never moves). Clamped to the grid.
+  // Arrows move the ITEM around the grid (one cell per press); the camera and
+  // avatar stay put. When no item is held, they still nudge the build cursor.
   const moveBuildPlacement = useCallback((dx: number, dz: number) => {
-    const step = 2;
     const cx = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX);
     const cz = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ);
-    setEditCursor((cur) => ({ gridX: cx(cur.gridX + dx * step), gridZ: cz(cur.gridZ + dz * step) }));
-  }, [setEditCursor]);
+    setEditCursor((cur) => ({ gridX: cx(cur.gridX + dx), gridZ: cz(cur.gridZ + dz) }));
+    setBuildPlacement((bp) => (bp ? { ...bp, gridX: cx(bp.gridX + dx), gridZ: cz(bp.gridZ + dz) } : bp));
+  }, [setEditCursor, setBuildPlacement]);
 
   // Laptop: arrow keys pan the build view (the on-screen arrows do the same on
   // iPad). Only while editing/placing, and we swallow the keys so the page
@@ -379,7 +385,14 @@ export default function CentralWorld() {
   }, [inBuildMode, moveBuildPlacement]);
 
   function openWorldEditor() {
-    const cursor = { gridX: -5, gridZ: 5 };
+    // Centre the fixed build camera and the first item on wherever the avatar
+    // is standing, so you build right where you are.
+    const cell = CENTRAL_WORLD_GRID.cellSize;
+    const cursor = {
+      gridX: THREE.MathUtils.clamp(Math.round(avatarPosRef.current.x / cell), CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX),
+      gridZ: THREE.MathUtils.clamp(Math.round(avatarPosRef.current.z / cell), CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ),
+    };
+    setCameraFocus(cursor);
     setEditCursor(cursor);
     setEditTool("move");
     setSelectedInventoryItemKey(null);
@@ -389,7 +402,7 @@ export default function CentralWorld() {
     setEditHistory([]);
     setEditorOpen(true);
     // Leave the avatar where it was standing — only the build camera moves.
-    void speak("Edit World. Use the arrow keys or the arrow buttons to move around. Tap the grass to place things.", undefined, "manual", { rate: 0.9 });
+    void speak("Edit World. Pick something, then use the arrow keys or arrow buttons to move it around the grid. Tap the grass to drop it.", undefined, "manual", { rate: 0.9 });
   }
 
   function closeWorldEditor() {
@@ -455,7 +468,8 @@ export default function CentralWorld() {
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(hit.itemId);
     setBuildPlacement({ ...hit, placementId: hit.placementId ?? `${hit.itemId}-${placementSequence.current}` });
-    void speak(`${item?.name ?? "Item"} picked up. Tap where you want it, or delete it.`, undefined, "manual", { rate: 0.9 });
+    setEditCursor({ gridX: hit.gridX, gridZ: hit.gridZ });
+    void speak(`${item?.name ?? "Item"} picked up. Use the arrows to move it, then tap to drop it.`, undefined, "manual", { rate: 0.9 });
   }
 
   function deleteHeldPlacement() {
@@ -542,6 +556,7 @@ export default function CentralWorld() {
   function placeHeldAt(gridX: number, gridZ: number) {
     if (!buildItem || !buildPlacement) return;
     const candidate = { ...buildPlacement, gridX, gridZ };
+    setEditCursor({ gridX, gridZ });
     if (!validateCentralWorldPlacement(candidate, buildItem, placementsWithoutBuildItem, itemsById)) {
       setBuildPlacement(candidate);
       return;
@@ -564,6 +579,7 @@ export default function CentralWorld() {
       else setBuildPlacement({ ...buildPlacement, gridX, gridZ });
       return;
     }
+    setEditCursor({ gridX, gridZ });
     if (isMoveTool) {
       pickUpPlacementAt(gridX, gridZ);
       return;
@@ -634,7 +650,7 @@ export default function CentralWorld() {
   return (
     <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
-        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} editCursor={editCursor} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} />
+        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} editCursor={editCursor} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} avatarPosRef={avatarPosRef} />
       </Canvas>
 
       {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} navActions={[

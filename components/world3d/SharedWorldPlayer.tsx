@@ -101,6 +101,7 @@ export function SharedThirdPersonPlayer({
   cameraMinY = 0.85,
   cameraEnabled = true,
   speed = 4.6,
+  positionRef,
 }: {
   initialPosition: [number, number, number];
   spawnTarget?: [number, number, number] | null;
@@ -119,6 +120,7 @@ export function SharedThirdPersonPlayer({
   cameraMinY?: number;
   cameraEnabled?: boolean;
   speed?: number;
+  positionRef?: React.MutableRefObject<{ x: number; z: number }>;
 }) {
   const keys = useRef(new Set<string>());
   const playerRef = useRef<THREE.Group | null>(null);
@@ -221,6 +223,11 @@ export function SharedThirdPersonPlayer({
         player.position.x = (normalizedX / distance) * roamEllipse.radiusX;
         player.position.z = roamEllipse.centerZ + (normalizedZ / distance) * roamEllipse.radiusZ;
       }
+    }
+
+    if (positionRef) {
+      positionRef.current.x = player.position.x;
+      positionRef.current.z = player.position.z;
     }
 
     if (cameraEnabled) {
