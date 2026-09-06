@@ -100,6 +100,7 @@ export function SharedThirdPersonPlayer({
   cameraLookAhead = 0,
   cameraMinY = 0.85,
   cameraEnabled = true,
+  movementEnabled = true,
   speed = 4.6,
   positionRef,
 }: {
@@ -119,6 +120,7 @@ export function SharedThirdPersonPlayer({
   cameraLookAhead?: number;
   cameraMinY?: number;
   cameraEnabled?: boolean;
+  movementEnabled?: boolean;
   speed?: number;
   positionRef?: React.MutableRefObject<{ x: number; z: number }>;
 }) {
@@ -202,9 +204,9 @@ export function SharedThirdPersonPlayer({
     const analogY = THREE.MathUtils.clamp(moveInput.analogY ?? 0, -1, 1);
     movement.addScaledVector(forward, analogY);
     movement.addScaledVector(right, analogX);
-    movingRef.current = movement.lengthSq() > 0;
+    movingRef.current = movementEnabled && movement.lengthSq() > 0;
     sprintingRef.current = Boolean(moveInput.sprint || keys.current.has("shift"));
-    if (movement.lengthSq() > 0) {
+    if (movementEnabled && movement.lengthSq() > 0) {
       const keyboardActive = keys.current.has("w") || keys.current.has("arrowup") || keys.current.has("s") || keys.current.has("arrowdown") || keys.current.has("d") || keys.current.has("arrowright") || keys.current.has("a") || keys.current.has("arrowleft") || moveInput.up || moveInput.down || moveInput.left || moveInput.right;
       const intensity = keyboardActive ? 1 : THREE.MathUtils.clamp(moveInput.magnitude ?? Math.hypot(analogX, analogY), 0, 1);
       movement.normalize();
