@@ -1140,24 +1140,6 @@ function PlaceholderMyHome({ active, onEnter }: { active: boolean; onEnter?: () 
 // A few permanent Aussie gum trees framing the meadow. Positioned just outside
 // the build grid (|x| > 42, or z < -26 / z > 50) so they never collide with a
 // student's placed items, and clear of the Tower and My Home.
-const PERMANENT_GUM_TREES: Array<[number, number, number]> = [
-  [-46, 12, 1.15], [-46, -12, 0.95], [46, 14, 1.1], [46, -10, 1.0],
-  [46, 36, 1.2], [-46, 34, 1.05], [-18, 56, 1.15], [18, 56, 1.0],
-  [30, -34, 0.9], [-14, -34, 1.1],
-];
-
-function PermanentGumTrees() {
-  return (
-    <group>
-      {PERMANENT_GUM_TREES.map(([x, z, s], i) => (
-        <group key={i} position={[x, 0, z]} rotation={[0, i * 1.3, 0]} scale={s}>
-          <GumTree height={4.4} canopy={1.55} />
-        </group>
-      ))}
-    </group>
-  );
-}
-
 export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void }) {
   return (
     <group>
@@ -1171,7 +1153,6 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, p
       <MyHomePath />
       {groundTiles.map((tile) => <GroundTile key={`${tile.gridX}:${tile.gridZ}`} tile={tile} />)}
       <GrassTufts quality={quality} groundTiles={groundTiles} />
-      <PermanentGumTrees />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <PlaceholderMyHome active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
