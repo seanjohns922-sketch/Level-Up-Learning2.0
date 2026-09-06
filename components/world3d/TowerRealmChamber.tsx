@@ -264,7 +264,7 @@ export default function TowerRealmChamber() {
       />
 
       <WorldMovePad input={moveInput} onChange={setMoveInput} />
-      {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal?.realmId === "pattern" && preview ? "PREVIEW REALM" : activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realm.status !== "live" && !(preview && activePortal.realmId === "pattern"))} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
+      {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realm.status !== "live")} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
       <KeyboardWorldAction enabled={Boolean(activePortal || atExit)} onAction={runActiveAction} />
 
       {entryMessage ? <div role="status" style={{ position: "absolute", left: "50%", top: 105, transform: "translateX(-50%)", zIndex: 35, border: "1px solid rgba(255,214,147,.55)", borderRadius: 6, padding: "10px 14px", background: "rgba(44,28,22,.96)", color: "#fff1d1", fontWeight: 850, display: "flex", alignItems: "center", gap: 8 }}>{entryMessage}<WorldVoiceButton text={entryMessage} compact label="Read message" /></div> : null}

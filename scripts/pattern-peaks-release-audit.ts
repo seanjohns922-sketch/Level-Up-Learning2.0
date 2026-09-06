@@ -51,6 +51,8 @@ assert(parentPortal.includes('realmId === "pattern" ? "algebra" : realmId'), "Th
 const schoolAnalytics = read("components/school/SchoolAnalyticsDashboard.tsx");
 assert(schoolAnalytics.includes('pattern: "Pattern Peaks"'), "School analytics must label Pattern Peaks results.");
 assert(read("app/api/school/[schoolId]/analytics/export/route.ts").includes('["pattern", "Algebra"]'), "School exports must include Algebra results.");
+const towerChamber = read("components/world3d/TowerRealmChamber.tsx");
+assert(!towerChamber.includes('activePortal?.realmId === "pattern" && preview ? "PREVIEW REALM"'), "The live Pattern Peaks portal must never retain its old preview label.");
 const liveProgressionClient = read("lib/whole-maths-diagnostic-client.ts");
 assert(liveProgressionClient.includes('| "pattern";') && liveProgressionClient.includes('| "algebra";'), "Teacher live progression types must accept Pattern Peaks Algebra rows.");
 for (const route of [
