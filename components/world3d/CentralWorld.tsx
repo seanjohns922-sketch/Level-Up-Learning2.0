@@ -127,12 +127,16 @@ function CentralWorldMetricsReporter({ quality }: { quality: CentralWorldQuality
   return null;
 }
 
-function BuildModeCamera({ active, cursor, zoom }: { active: boolean; cursor: { gridX: number; gridZ: number }; zoom: number }) {
+function BuildModeCamera({ active, cursor, zoom, yaw, pitch }: { active: boolean; cursor: { gridX: number; gridZ: number }; zoom: number; yaw: number; pitch: number }) {
   const { camera } = useThree();
   useFrame((_, delta) => {
     if (!active) return;
     const [x, , z] = gridToWorld(cursor.gridX, cursor.gridZ);
-    const desired = new THREE.Vector3(x + zoom * 0.54, zoom * 0.82, z + zoom * 0.68);
+    // Orbit the focus point: yaw spins 360° around it, pitch tilts from low
+    // (see behind walls) to nearly top-down.
+    const dist = zoom * 1.2;
+    const horiz = Math.cos(pitch) * dist;
+    const desired = new THREE.Vector3(x + Math.sin(yaw) * horiz, Math.max(2, Math.sin(pitch) * dist), z + Math.cos(yaw) * horiz);
     camera.position.lerp(desired, 1 - Math.pow(0.00001, delta));
     camera.lookAt(x, 0, z);
   });
@@ -185,7 +189,7 @@ function BuildModeSurface({ active, paint, onCell }: { active: boolean; paint: b
   );
 }
 
-function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNonce, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, onBuildCell, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, avatarPosRef }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null; editing: boolean; buildZoom: number; paintMode: boolean; onBuildCell: (gridX: number, gridZ: number, paint: boolean) => void; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNonce, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, onBuildCell, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef }: { quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean } | null; editing: boolean; buildZoom: number; paintMode: boolean; onBuildCell: (gridX: number, gridZ: number, paint: boolean) => void; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   const handleNearestTarget = useCallback((id: string | null) => {
     setActiveTargetId(id);
@@ -235,7 +239,7 @@ function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNo
         speed={4.2}
         positionRef={avatarPosRef}
       />
-      <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={cameraFocus} zoom={buildZoom} />
+      <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
       <BuildModeSurface active={editing || Boolean(buildPreview)} paint={paintMode} onCell={onBuildCell} />
       <CentralWorldMetricsReporter quality={quality} />
     </>
@@ -286,9 +290,13 @@ export default function CentralWorld() {
   const [selectedSceneryItemKey, setSelectedSceneryItemKey] = useState<string | null>(null);
   const [paletteTab, setPaletteTab] = useState<PaletteTab>("ground");
   const [editCursor, setEditCursor] = useState({ gridX: -5, gridZ: 5 });
-  // The build camera stays fixed on this point while editing; only the item
-  // (editCursor) moves with the arrows.
+  // The build camera orbits this focus point; the right-hand pad spins (yaw) and
+  // tilts (pitch) it a full turn so you can see your build from any angle.
   const [cameraFocus, setCameraFocus] = useState({ gridX: 0, gridZ: 9 });
+  const [buildOrbit, setBuildOrbit] = useState({ yaw: 0.67, pitch: 0.78 });
+  const orbitCamera = useCallback((dYaw: number, dPitch: number) => {
+    setBuildOrbit((o) => ({ yaw: o.yaw + dYaw, pitch: THREE.MathUtils.clamp(o.pitch + dPitch, 0.32, 1.45) }));
+  }, [setBuildOrbit]);
   const [buildZoom, setBuildZoom] = useState(28);
   const [editHistory, setEditHistory] = useState<Array<{ placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] }>>([]);
   const [economyMessage, setEconomyMessage] = useState<string | null>(null);
@@ -383,13 +391,6 @@ export default function CentralWorld() {
     }
   }, [setEditCursor, setBuildPlacement, setCameraFocus]);
 
-  // Dedicated camera pan (the right-hand pad) — always moves the view, even while
-  // an item is in hand, so you can look around before dropping it.
-  const panCamera = useCallback((dx: number, dz: number) => {
-    const cx = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX);
-    const cz = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ);
-    setCameraFocus((f) => ({ gridX: cx(f.gridX + dx * 2), gridZ: cz(f.gridZ + dz * 2) }));
-  }, [setCameraFocus]);
 
   const rotateHeld = useCallback(() => {
     setBuildPlacement((current) => (current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current));
@@ -681,7 +682,7 @@ export default function CentralWorld() {
   return (
     <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
-        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} avatarPosRef={avatarPosRef} />
+        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} />
       </Canvas>
 
       {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} navActions={[
@@ -801,10 +802,10 @@ export default function CentralWorld() {
           <div style={{ position: "absolute", right: 16, bottom: 84, zIndex: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "rgba(13,24,22,.92)", border: "1px solid #2f5a49", borderRadius: 12, padding: 8 }}>
             <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".14em" }}>CAMERA</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 44px)", gridTemplateRows: "repeat(2, 44px)", gap: 4 }}>
-              <button type="button" aria-label="Move camera up" onClick={() => panCamera(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={20} /></button>
-              <button type="button" aria-label="Move camera left" onClick={() => panCamera(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={20} /></button>
-              <button type="button" aria-label="Move camera down" onClick={() => panCamera(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={20} /></button>
-              <button type="button" aria-label="Move camera right" onClick={() => panCamera(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={20} /></button>
+              <button type="button" aria-label="Tilt camera up" onClick={() => orbitCamera(0, 0.18)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={20} /></button>
+              <button type="button" aria-label="Spin camera left" onClick={() => orbitCamera(-0.5, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={20} /></button>
+              <button type="button" aria-label="Tilt camera down" onClick={() => orbitCamera(0, -0.18)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={20} /></button>
+              <button type="button" aria-label="Spin camera right" onClick={() => orbitCamera(0.5, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={20} /></button>
             </div>
           </div>
         </>
