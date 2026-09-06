@@ -16,6 +16,7 @@ import {
   normalizeWorkingLevelLabel,
 } from "@/lib/studentLevelLabel";
 import { resolveStudentNameParts } from "@/lib/studentName";
+import { highestRosterCurriculumYear } from "@/lib/class-curriculum-year";
 import type { Lesson } from "@/data/programs/year1";
 import { getLatestPosttestProfile } from "@/data/assessments/analysis";
 import {
@@ -752,7 +753,11 @@ function resolveDisplayedWeek(prog?: ProgressRow) {
 }
 
 export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, onRealmChange, onProgressChanged, progressAvailable = true }: Props) {
-  const genres = getGenresForYear(yearLabel);
+  const strandCatalogYear = highestRosterCurriculumYear(
+    yearLabel,
+    students.map((student) => student.school_year_level ?? student.year_level),
+  );
+  const genres = getGenresForYear(strandCatalogYear);
   const firstAvail = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvail.id);
   const [expandedId, setExpandedId] = useState<string | null>(null);

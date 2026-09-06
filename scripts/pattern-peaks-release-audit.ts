@@ -5,6 +5,7 @@ import { getPosttestForYearLabel, getPretestForYearLabel } from "@/data/assessme
 import { getCurriculumPlan, getGenresForYear } from "@/data/programs/genres";
 import { DIAGNOSTIC_STRANDS, diagnosticAvailableWeight } from "@/lib/whole-maths-diagnostic";
 import { REALM_REGISTRY, getRealmFirstLevel } from "@/lib/realms/realm-registry";
+import { highestRosterCurriculumYear, normalizeClassCurriculumYear } from "@/lib/class-curriculum-year";
 
 const root = process.cwd();
 const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
@@ -16,6 +17,11 @@ assert.equal(REALM_REGISTRY.pattern.totalWeeks, 8);
 assert.equal(REALM_REGISTRY.pattern.lessonsPerWeek, 3);
 assert.equal(getRealmFirstLevel("pattern"), "Year 3");
 assert.deepEqual(REALM_REGISTRY.pattern.levelLabels, ["Year 3", "Year 4", "Year 5", "Year 6"]);
+for (const mixedLabel of ["Year 3/4", "3/4", "Grade 3 & 4", "3-4"]) {
+  assert.equal(normalizeClassCurriculumYear(mixedLabel), "Year 3", `${mixedLabel} must expose the Year 3 Algebra strand.`);
+}
+assert.equal(highestRosterCurriculumYear(null, ["Year 3", "Year 4"]), "Year 4", "Student school years must expose Algebra even when mixed-class metadata is blank.");
+assert.equal(highestRosterCurriculumYear("Year 2/3", ["Year 2", "Year 3"]), "Year 3", "A mixed Year 2/3 class must expose Algebra for its Year 3 students.");
 
 for (const year of ["Prep", "Year 1", "Year 2"]) {
   assert(!getGenresForYear(year).some((genre) => genre.id === "algebra"), `${year} must not expose Pattern Peaks.`);
@@ -51,6 +57,7 @@ assert(parentPortal.includes('realmId === "pattern" ? "algebra" : realmId'), "Th
 const schoolAnalytics = read("components/school/SchoolAnalyticsDashboard.tsx");
 assert(schoolAnalytics.includes('pattern: "Pattern Peaks"'), "School analytics must label Pattern Peaks results.");
 assert(read("app/api/school/[schoolId]/analytics/export/route.ts").includes('["pattern", "Algebra"]'), "School exports must include Algebra results.");
+assert(read("components/teacher/StrandStudentsPanel.tsx").includes("highestRosterCurriculumYear"), "Teacher strand tabs must account for every year represented in a mixed class.");
 const towerChamber = read("components/world3d/TowerRealmChamber.tsx");
 assert(!towerChamber.includes('activePortal?.realmId === "pattern" && preview ? "PREVIEW REALM"'), "The live Pattern Peaks portal must never retain its old preview label.");
 const liveProgressionClient = read("lib/whole-maths-diagnostic-client.ts");
