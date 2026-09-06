@@ -19,6 +19,8 @@ const checks = [
   ["Gem Vault uses the demo-aware vault reader", vault.includes("fetchGemVault(studentId)")],
   ["My Home loads the demo gem showcase", home.includes("? fetchGemVault(sid)")],
   ["My Home unlocks every implemented legend in demo", legends.includes("new Set(getAllLegends().map((legend) => legend.id))")],
+  ["Pattern Peaks and Statistica realm cards are live", legendsHall.includes('id: "pattern-peaks"') && legendsHall.includes('id: "statistica"') && (legendsHall.match(/status: "open"/g) ?? []).length >= 5],
+  ["Legends page honours teacher preview URLs", legendsHall.includes("window.location.search") && legendsHall.includes('get("teacher_preview") === "1"')],
   ["Demo opens every live Legends collection card", legendsHall.includes("demoPreview && realm.route") && legendsHall.includes('status: "open" as const')],
   ["Demo Hall total counts implemented legend cards", legendsHall.includes("demoPreview ? getAllLegends().length")],
 ];

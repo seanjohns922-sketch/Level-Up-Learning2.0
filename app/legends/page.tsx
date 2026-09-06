@@ -70,7 +70,7 @@ const REALMS: RealmDef[] = [
     legendLine: "Patternox Collection",
     icon: <Triangle className="h-5 w-5" />,
     totalLegends: 4,
-    status: "locked",
+    status: "open",
     route: "/legends/pattern-peaks",
     glowColor: "rgba(57, 217, 160, 0.22)",
     borderGlow: "rgba(139, 92, 246, 0.58)",
@@ -81,7 +81,7 @@ const REALMS: RealmDef[] = [
     legendLine: "Data Guardians",
     icon: <BarChart3 className="h-5 w-5" />,
     totalLegends: 6,
-    status: "locked",
+    status: "open",
     route: "/legends/statistica",
     glowColor: "rgba(255, 107, 103, 0.2)",
     borderGlow: "rgba(213, 164, 47, 0.58)",
@@ -137,7 +137,9 @@ export default function LegendsPage() {
   const [measureProgress] = useState<StudentProgress | null>(() => readProgress("measurement"));
   const [spaceProgress] = useState<StudentProgress | null>(() => readProgress("space"));
   const [patternProgress] = useState<StudentProgress | null>(() => readProgress("pattern"));
-  const demoPreview = useDemoPreviewMode();
+  const demoPreview =
+    useDemoPreviewMode() ||
+    (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("teacher_preview") === "1");
 
   const unlockedIds = useMemo(
     () => getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
