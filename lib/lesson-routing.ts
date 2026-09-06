@@ -35,11 +35,6 @@ export function buildLessonId(input: {
 }): string {
   const normalizedYear = normalizeStudentYearLabel(input.yearLabel);
   const rawRealm = input.realmId == null || input.realmId === "" ? "number" : input.realmId;
-  // Pattern Peaks is a preview realm (not yet a live StudentRealmId), but it
-  // rides the shared Week Home, so it needs a lesson id here too.
-  if (rawRealm === "pattern") {
-    return `y${parseStudentYearNumber(normalizedYear)}-pattern-w${input.week}-l${input.lessonNumber}`;
-  }
   const normalizedRealm = rawRealm as StudentRealmId;
   switch (normalizedRealm) {
     case "space": {
@@ -50,6 +45,8 @@ export function buildLessonId(input: {
       return `y${parseStudentYearNumber(normalizedYear)}-measurement-w${input.week}-l${input.lessonNumber}`;
     case "statistics":
       return `y${parseStudentYearNumber(normalizedYear)}-statistics-w${input.week}-l${input.lessonNumber}`;
+    case "pattern":
+      return `y${parseStudentYearNumber(normalizedYear)}-pattern-w${input.week}-l${input.lessonNumber}`;
     case "number":
       return `y${parseStudentYearNumber(normalizedYear)}-w${input.week}-l${input.lessonNumber}`;
     default:

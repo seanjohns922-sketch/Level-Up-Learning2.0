@@ -59,7 +59,7 @@ const REALMS: RealmDef[] = [
     legendLine: "Geospin Collection",
     icon: <Compass className="h-5 w-5" />,
     totalLegends: 7,
-    status: "locked",
+    status: "open",
     route: "/legends/starpath",
     glowColor: "rgba(103, 232, 249, 0.22)",
     borderGlow: "rgba(139, 92, 246, 0.62)",
@@ -136,6 +136,7 @@ export default function LegendsPage() {
   const [numberProgress] = useState<StudentProgress | null>(() => readProgress("number"));
   const [measureProgress] = useState<StudentProgress | null>(() => readProgress("measurement"));
   const [spaceProgress] = useState<StudentProgress | null>(() => readProgress("space"));
+  const [patternProgress] = useState<StudentProgress | null>(() => readProgress("pattern"));
   const [demoPreview, setDemoPreview] = useState(false);
 
   useEffect(() => {
@@ -174,16 +175,18 @@ export default function LegendsPage() {
     [demoPreview],
   );
 
-  const patternPeaksCollected = useMemo(
-    () => (demoPreview ? getAllLegends("pattern-peaks").length : 0),
-    [demoPreview],
-  );
+  const patternPeaksCollected = useMemo(() => {
+    const all = getAllLegends("pattern-peaks");
+    const visibleIds = demoPreview
+      ? all.map((legend) => legend.id)
+      : getEffectiveUnlockedLegendIds(patternProgress?.year, patternProgress?.unlockedLegends, "pattern-peaks");
+    return all.filter((legend) => visibleIds.includes(legend.id)).length;
+  }, [demoPreview, patternProgress]);
 
   const realms = useMemo(
     () =>
       REALMS.map((realm) =>
         (realm.id === "starpath-realm" ||
-          realm.id === "pattern-peaks" ||
           realm.id === "statistica") &&
         demoPreview
           ? { ...realm, status: "open" as const }

@@ -199,8 +199,8 @@ export default function WholeMathsDiagnosticPanel({
               Whole-Maths Diagnostic
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              The first four genre engines are coded and use their existing level-test questions.
-              Full diagnostic launch and the official Whole-Maths overall remain locked until Algebra and Probability are complete.
+              The first five genre engines are coded and use their existing level-test questions.
+              Full diagnostic launch and the official Whole-Maths overall remain locked until Probability is complete.
             </p>
           </div>
           <div className="rounded-xl border border-amber-200 bg-white px-4 py-3 text-right">

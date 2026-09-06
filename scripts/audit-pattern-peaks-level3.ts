@@ -585,8 +585,8 @@ for (const currentLesson of levelFiveDistributiveReasoning) {
   }
 }
 
-assert.equal(REALM_REGISTRY.pattern.status, "coming_soon", "Pattern Peaks must remain review-only.");
-assert.equal(REALM_REGISTRY.pattern.isSelectable, false, "Pattern Peaks must not be selectable by students yet.");
+assert.equal(REALM_REGISTRY.pattern.status, "live", "Pattern Peaks must be registered as live.");
+assert.equal(REALM_REGISTRY.pattern.isSelectable, true, "Pattern Peaks must be selectable by students.");
 assert.equal(REALM_REGISTRY.pattern.totalWeeks, 8, "Pattern Peaks needs the agreed eight-week contract.");
 assert.deepEqual(REALM_REGISTRY.pattern.levelLabels, ["Year 3", "Year 4", "Year 5", "Year 6"]);
 
@@ -660,9 +660,10 @@ for (const visualFile of ["FunctionMachineCardVisual.tsx", "InputOutputTableVisu
 const towerPortalConfig = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-chamber-config.ts"), "utf8");
 assert(towerPortalConfig.includes('posterAsset: "/images/patternpeaks-home-bg-y6.jpeg"'), "Pattern Peaks tower portal must use the Level 6 realm background, not a card asset.");
 const towerChamber = fs.readFileSync(path.join(root, "components/world3d/TowerRealmChamber.tsx"), "utf8");
-assert(towerChamber.includes('return "LEVEL 6 PREVIEW"'), "Pattern Peaks tower portal must identify the Level 6 preview.");
+assert(towerChamber.includes('realmId !== "pattern"'), "Pattern Peaks tower portal must report canonical progress as a live realm.");
 const towerEntry = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-entry.ts"), "utf8");
-assert(towerEntry.includes('level=Year%206'), "Pattern Peaks tower preview must open Level 6.");
+assert(!towerEntry.includes('level=Year%206'), "Pattern Peaks tower entry must not bypass canonical placement with a fixed preview level.");
+assert(towerEntry.includes("resolveRealmEntryRoute"), "Pattern Peaks tower entry must use the canonical placement resolver.");
 
 const patternMap = fs.readFileSync(path.join(root, "components/world/PatternPeaksMap.tsx"), "utf8");
 assert.equal((patternMap.match(/left: "4%"/g) ?? []).length, 2, "The two left Pattern Peaks districts must align.");
@@ -671,9 +672,9 @@ assert.equal((patternMap.match(/top: "18%"/g) ?? []).length, 2, "The top Pattern
 assert.equal((patternMap.match(/top: "57%"/g) ?? []).length, 2, "The lower Pattern Peaks districts must align.");
 assert(patternMap.includes("districtMinHeight: 124"), "Pattern Peaks district cards need a shared minimum height.");
 
-for (const page of ["app/pattern-peaks/page.tsx", "app/pattern-peaks/program/page.tsx", "app/pattern-peaks/lesson/[level]/[week]/[lesson]/page.tsx"]) {
-  const source = fs.readFileSync(path.join(root, page), "utf8");
-  assert(source.includes("getServerStarpathAccess"), `${page} is not server-gated.`);
-}
+const patternEntry = fs.readFileSync(path.join(root, "components/pattern-peaks/PatternPeaksEntry.tsx"), "utf8");
+assert(patternEntry.includes('restoreStudentStateFromServer(identity.studentId, "pattern")'), "Pattern Peaks does not restore canonical progress before rendering.");
+assert(patternEntry.includes('realmId: "pattern"'), "Pattern Peaks does not resolve canonical entry placement.");
+assert(!patternMap.includes("only: true"), "Live Pattern Peaks must not force every student into Demo Mode.");
 
-console.log("Pattern Peaks curriculum audit passed: 4 levels, 32 weeks, 96 lessons, 288 rotations, ACARA ownership, lesson review, gated previews, and assets verified.");
+console.log("Pattern Peaks curriculum audit passed: Years 3-6, 32 weeks, 96 lessons, 288 rotations, ACARA ownership, canonical live entry, Demo Review, and assets verified.");

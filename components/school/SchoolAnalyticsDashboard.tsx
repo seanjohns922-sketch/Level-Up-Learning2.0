@@ -65,6 +65,7 @@ const REALMS: Record<string, string> = {
   measurement: "Measurelands",
   space: "Starpath",
   statistics: "Statistica",
+  pattern: "Pattern Peaks",
 };
 
 const YEAR_LEVELS = [
@@ -115,6 +116,7 @@ const JOURNEY_REALMS: Record<string, { name: string; color: string; order: numbe
   measurement: { name: "Measurelands", color: "#c2892e", order: 1 },
   space: { name: "Starpath", color: "#5b6ee6", order: 2 },
   statistics: { name: "Statistica", color: "#c2557a", order: 3 },
+  pattern: { name: "Pattern Peaks", color: "#7c3aed", order: 4 },
 };
 const JOURNEY_CHECK = '<svg viewBox="0 0 24 24" width="13" height="13"><path d="M5 12l4 4 10-10" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 

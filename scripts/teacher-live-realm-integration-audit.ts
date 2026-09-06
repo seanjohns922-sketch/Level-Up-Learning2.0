@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { getCurriculumPlan, getGenresForYear } from "@/data/programs/genres";
+import { genreIdForRealm, getCurriculumPlan, getGenresForYear } from "@/data/programs/genres";
 import {
   getLiveRealmDefinitions,
   LIVE_REALM_IDS,
@@ -25,13 +25,14 @@ for (const yearLabel of yearLabels) {
   const genres = getGenresForYear(yearLabel);
   for (const realm of liveRealms) {
     if (!realm.levelLabels.includes(yearLabel)) continue;
-    const genre = genres.find((candidate) => candidate.id === realm.realmId);
+    const genreId = genreIdForRealm(realm.realmId);
+    const genre = genres.find((candidate) => candidate.id === genreId);
     assert(genre, `${realm.name} missing from teacher genre selector for ${yearLabel}.`);
     assert.equal(genre.available, true, `${realm.name} must not render a Soon badge for ${yearLabel}.`);
     assert.equal(genre.realm, realm.name, `${realm.realmId} must display the live realm name.`);
     assert.equal(genre.strand, realm.strand, `${realm.name} has the wrong strand label.`);
 
-    const plan = getCurriculumPlan(yearLabel, realm.realmId);
+    const plan = getCurriculumPlan(yearLabel, genreId);
     assert.equal(plan.length, realm.totalWeeks, `${realm.name} ${yearLabel} must expose ${realm.totalWeeks} weeks.`);
     assert(!plan.some((week) => week.week > realm.totalWeeks!), `${realm.name} ${yearLabel} leaked extra weeks.`);
     for (const week of plan) {
@@ -83,6 +84,7 @@ assert(strandStudents.includes("isLiveRealmId(selectedRealmId)"), "Students tab 
 assert(!strandStudents.includes("unsupported teacher realm"), "Student detail must not maintain a separate realm allowlist.");
 assert(strandStudents.includes('`${lessonIdPrefix(workingYear)}space-`'), "Students tab must count Starpath lesson IDs with a space-specific prefix.");
 assert(strandStudents.includes('`${lessonIdPrefix(workingYear)}statistics-`'), "Students tab must count Statistica lesson IDs with a statistics-specific prefix.");
+assert(strandStudents.includes('`${lessonIdPrefix(workingYear)}pattern-`'), "Students tab must count Pattern Peaks lesson IDs with a pattern-specific prefix.");
 
 const curriculumExplorer = read("components/teacher/CurriculumExplorer.tsx");
 assert(curriculumExplorer.includes("selectedRealmId") && curriculumExplorer.includes("selectCanonicalTeacherProgressRow"), "Curriculum tab must scope progress by selected live realm.");

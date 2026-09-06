@@ -1,9 +1,7 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import PatternPeaksLessonShell from "@/components/pattern-peaks/PatternPeaksLessonShell";
 import { getPatternPeaksProgramForYearLabel } from "@/data/programs/patternPeaks";
-import { getServerStarpathAccess } from "@/lib/demo-session-server";
 import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
-import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 function parseInteger(value: string, minimum: number, maximum: number) {
   if (!/^\d+$/.test(value)) return null;
@@ -27,9 +25,6 @@ export default async function PatternPeaksLessonPage({
 }: {
   params: Promise<{ level: string; week: string; lesson: string }>;
 }) {
-  const access = await getServerStarpathAccess();
-  if (!access.allowed) redirect("/login");
-
   const route = await params;
   const level = normalizeLevel(route.level);
   const week = parseInteger(route.week, 1, 8);
@@ -42,7 +37,7 @@ export default async function PatternPeaksLessonPage({
   if (!lesson) notFound();
 
   return (
-    <CanonicalRealmActivityGate realmId={"pattern" as LiveRealmId} year={level.label} week={week} activity="lesson" lessonNumber={lessonNumber}>
+    <CanonicalRealmActivityGate realmId="pattern" year={level.label} week={week} activity="lesson" lessonNumber={lessonNumber}>
       <PatternPeaksLessonShell level={level.label} levelNumber={level.number} week={week} lesson={lesson} />
     </CanonicalRealmActivityGate>
   );

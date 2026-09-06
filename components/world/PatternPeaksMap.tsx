@@ -139,12 +139,10 @@ export const PATTERN_PEAKS_DASHBOARD_CONFIG = {
     floatAnimation: "realm-character-float 4.6s ease-in-out infinite",
   },
   demo: {
-    only: true,
     unlockAllDistricts: true,
     readJourney: () => ({ currentWeek: 1, currentLesson: 1 }),
     buildLevelHref: previewHref,
-    // Ride the shared Week Home (same page as Number Nexus / Measurelands /
-    // Statistica), skinned as Pattern Peaks via realm_id=pattern.
+    // Demo Review uses the shared Week Home with an explicit preview marker.
     buildProgramHref: (level, week) => `/program?year=${encodeURIComponent(level)}&week=${week}&realm_id=pattern&legacy=1&teacher_preview=1`,
   },
 } satisfies CanonicalRealmDashboardConfig;

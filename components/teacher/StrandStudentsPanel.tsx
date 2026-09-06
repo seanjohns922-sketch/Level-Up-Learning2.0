@@ -829,8 +829,10 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
           : genreId === "space"
             ? `${lessonIdPrefix(workingYear)}space-`
             : genreId === "statistics"
-              ? `${lessonIdPrefix(workingYear)}statistics-`
-            : lessonIdPrefix(workingYear)
+            ? `${lessonIdPrefix(workingYear)}statistics-`
+            : selectedRealmId === "pattern"
+              ? `${lessonIdPrefix(workingYear)}pattern-`
+              : lessonIdPrefix(workingYear)
         : "";
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
       const planForStudentYear = workingYear ? getCurriculumPlan(workingYear, genreId) : [];
@@ -1072,7 +1074,9 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                           ? `${lessonIdPrefix(workingYear)}space-`
                           : genre.id === "statistics"
                             ? `${lessonIdPrefix(workingYear)}statistics-`
-                          : lessonIdPrefix(workingYear)
+                            : selectedRealmId === "pattern"
+                              ? `${lessonIdPrefix(workingYear)}pattern-`
+                              : lessonIdPrefix(workingYear)
                     }
                     onProgressChanged={onProgressChanged}
                   />

@@ -15,6 +15,6 @@ export default async function PatternPeaksProgramPage({ searchParams }: PatternP
   const week = Number(params.week ?? "1");
   const safeWeek = Number.isInteger(week) && week > 0 ? week : 1;
   redirect(
-    `/program?year=${encodeURIComponent(level)}&week=${safeWeek}&realm_id=pattern&legacy=1&teacher_preview=1`,
+    `/program?year=${encodeURIComponent(level)}&week=${safeWeek}&realm_id=pattern&legacy=1${params.teacher_preview === "1" ? "&teacher_preview=1" : ""}`,
   );
 }

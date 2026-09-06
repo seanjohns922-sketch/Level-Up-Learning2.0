@@ -42,8 +42,8 @@ export type PendingStudentDiagnostic = {
 
 export type LiveMathsProgressionRow = {
   student_id: string;
-  realm_id: "number" | "measurement" | "space" | "statistics";
-  strand: "number" | "measurement" | "space" | "statistics";
+  realm_id: "number" | "measurement" | "space" | "statistics" | "pattern";
+  strand: "number" | "measurement" | "space" | "statistics" | "algebra";
   current_working_level: string;
   official_level: number | null;
   official_at: string | null;

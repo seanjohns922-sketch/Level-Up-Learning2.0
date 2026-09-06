@@ -317,7 +317,7 @@ assert.ok(pretestSource.includes('question?.type === "patternPeaksTask"'));
 assert.ok(posttestSource.includes('q?.type === "patternPeaksTask"'));
 assert.ok(lessonRouteSource.includes("CanonicalRealmActivityGate") && lessonRouteSource.includes('activity="lesson"'));
 assert.ok(quizRouteSource.includes("CanonicalRealmActivityGate") && quizRouteSource.includes('activity="quiz"'));
-assert.ok(lessonShellSource.includes("saveRealmLessonAttempt") && lessonShellSource.includes('"pattern" as LiveRealmId'));
+assert.ok(lessonShellSource.includes("saveRealmLessonAttempt") && lessonShellSource.includes('completionKey, "pattern"'));
 assert.ok(lessonShellSource.includes("completionKeyRef.current") && lessonShellSource.includes("exitRequestedRef.current"));
 assert.ok(taskRendererSource.includes("assessmentMode={assessmentMode}"), "Task renderer must pass assessment mode into Pattern Peaks");
 assert.ok(patternQuestionCardSource.includes("assessmentMode={assessmentMode}"), "Pattern Peaks activities must receive assessment mode");

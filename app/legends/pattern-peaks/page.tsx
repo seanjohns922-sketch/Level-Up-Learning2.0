@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Mountain, Sparkles } from "lucide-react";
 import BinderCard from "@/components/legends/BinderCard";
 import LegendDetailModal from "@/components/legends/LegendDetailModal";
-import { getAllLegends, type Legend } from "@/data/legends";
+import { getAllLegends, getEffectiveUnlockedLegendIds, type Legend } from "@/data/legends";
+import { readProgress, type StudentProgress } from "@/data/progress";
 import { YEAR_ORDER } from "@/data/yearOrder";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 
@@ -16,19 +17,17 @@ export default function PatternPeaksCollectionPage() {
   const [barAnimated, setBarAnimated] = useState(false);
   const [demoPreview, setDemoPreview] = useState(false);
   const [demoResolved, setDemoResolved] = useState(false);
+  const [progress, setProgress] = useState<StudentProgress | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDemoPreview(isDemoPreviewMode());
+      setProgress(readProgress("pattern"));
       setDemoResolved(true);
       setBarAnimated(true);
     }, 100);
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    if (demoResolved && !demoPreview) router.replace("/legends");
-  }, [demoPreview, demoResolved, router]);
 
   const legends = useMemo(
     () =>
@@ -37,8 +36,15 @@ export default function PatternPeaksCollectionPage() {
       ),
     [],
   );
+  const unlockedIds = useMemo(
+    () => getEffectiveUnlockedLegendIds(progress?.year, progress?.unlockedLegends, "pattern-peaks"),
+    [progress],
+  );
+  const visibleUnlockedIds = demoPreview ? legends.map((legend) => legend.id) : unlockedIds;
+  const collectedCount = legends.filter((legend) => visibleUnlockedIds.includes(legend.id)).length;
+  const percentage = legends.length > 0 ? Math.round((collectedCount / legends.length) * 100) : 0;
 
-  if (!demoResolved || !demoPreview) {
+  if (!demoResolved) {
     return (
       <main className="grid min-h-screen place-items-center bg-[#0c1219] text-[#e8fff7]">
         <p className="font-semibold">Opening the Patternox Summit...</p>
@@ -92,13 +98,13 @@ export default function PatternPeaksCollectionPage() {
 
           <div className="mt-6 max-w-sm">
             <div className="mb-2 flex items-center justify-between text-sm font-bold">
-              <span className="text-white">{legends.length} / {legends.length} collected</span>
-              <span className="text-[#39d9a0]">100%</span>
+              <span className="text-white">{collectedCount} / {legends.length} collected</span>
+              <span className="text-[#39d9a0]">{percentage}%</span>
             </div>
             <div className="h-4 overflow-hidden border border-emerald-300/25 bg-black/45">
               <div
                 className="h-full bg-[linear-gradient(90deg,#39d9a0,#54a8ff,#8b5cf6)] shadow-[0_0_14px_rgba(57,217,160,0.35)] transition-all duration-1000"
-                style={{ width: barAnimated ? "100%" : "0%" }}
+                style={{ width: barAnimated ? `${percentage}%` : "0%" }}
               />
             </div>
           </div>
@@ -114,8 +120,8 @@ export default function PatternPeaksCollectionPage() {
               <BinderCard
                 key={legend.id}
                 legend={legend}
-                isUnlocked
-                isDemoPreview
+                isUnlocked={visibleUnlockedIds.includes(legend.id)}
+                isDemoPreview={demoPreview}
                 onClick={() => setSelectedLegend(legend)}
               />
             ))}
@@ -125,10 +131,9 @@ export default function PatternPeaksCollectionPage() {
         <div className="mt-10 flex items-start gap-3 border border-emerald-300/20 bg-[#16252a]/85 p-5 text-white/80 backdrop-blur-md">
           <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-[#ffcc62]" />
           <div>
-            <p className="font-bold text-white">Demo collection unlocked</p>
+            <p className="font-bold text-white">How to collect Patternox</p>
             <p className="mt-1 text-sm text-white/65">
-              Select any Patternox card to flip, enlarge, watch its showcase, or preview the
-              full unlock video.
+              Complete each Pattern Peaks level to unlock its Patternox card and video.
             </p>
           </div>
         </div>

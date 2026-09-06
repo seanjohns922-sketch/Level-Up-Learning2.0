@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { getPosttestForYearLabel, getPretestForYearLabel } from "@/data/assessments/api";
-import { getCurriculumPlan, getGenresForYear } from "@/data/programs/genres";
+import { genreIdForRealm, getCurriculumPlan, getGenresForYear } from "@/data/programs/genres";
 import {
   CANONICAL_REALM_IDS,
   getLiveRealmDefinitions,
@@ -75,10 +75,11 @@ for (const realm of liveRealms) {
   assert(fs.existsSync(path.join(root, "app", realm.slug, "page.tsx")), `${realm.name} is live but app/${realm.slug}/page.tsx is missing.`);
 
   for (const yearLabel of realm.levelLabels) {
-    const genre = getGenresForYear(yearLabel).find((candidate) => candidate.id === realm.realmId);
+    const genreId = genreIdForRealm(realm.realmId);
+    const genre = getGenresForYear(yearLabel).find((candidate) => candidate.id === genreId);
     assert(genre?.available, `${realm.name} ${yearLabel} is not available in teacher curriculum.`);
 
-    const plan = getCurriculumPlan(yearLabel, realm.realmId);
+    const plan = getCurriculumPlan(yearLabel, genreId);
     assert.equal(plan.length, realm.totalWeeks, `${realm.name} ${yearLabel} has the wrong week count.`);
     for (const week of plan) {
       assert.equal(week.lessons.length, realm.lessonsPerWeek, `${realm.name} ${yearLabel} Week ${week.week} has the wrong lesson count.`);
@@ -119,8 +120,9 @@ assert(
   "Live Statistica must never inherit teacher-preview progression bypasses.",
 );
 assert(
-  sharedProgram.includes("previewMode = isPatternRealm || teacherPreview || demoPreviewMode"),
-  "Only explicit demo/teacher preview and unreleased Pattern Peaks may bypass canonical progression.",
+  sharedProgram.includes("previewMode = teacherPreview || demoPreviewMode") &&
+    !sharedProgram.includes("previewMode = isPatternRealm ||"),
+  "Live Pattern Peaks must not bypass canonical progression.",
 );
 assert(
   sharedProgram.includes("preview: teacherPreview"),
@@ -179,6 +181,10 @@ const statisticaLessonRoute = read("app/statistica/lesson/[level]/[week]/[lesson
 const statisticaQuizRoute = read("app/statistica/quiz/[level]/[week]/page.tsx");
 const statisticaLessonShell = read("components/statistica/StatisticaLessonShell.tsx");
 const statisticaEntry = read("components/statistica/StatisticaEntry.tsx");
+const patternLessonRoute = read("app/pattern-peaks/lesson/[level]/[week]/[lesson]/page.tsx");
+const patternQuizRoute = read("app/pattern-peaks/quiz/[level]/[week]/page.tsx");
+const patternLessonShell = read("components/pattern-peaks/PatternPeaksLessonShell.tsx");
+const patternEntry = read("components/pattern-peaks/PatternPeaksEntry.tsx");
 assert(
   statisticaLessonRoute.includes("CanonicalRealmActivityGate") && statisticaLessonRoute.includes('activity="lesson"'),
   "Statistica lesson routes must enforce canonical week and lesson order.",
@@ -202,6 +208,11 @@ assert(
     statisticaLessonShell.includes("exitRequestedRef.current"),
   "Statistica completion retries must be idempotent and wait for persistence before exit.",
 );
+assert(patternLessonRoute.includes("CanonicalRealmActivityGate") && patternLessonRoute.includes('activity="lesson"'), "Pattern Peaks lessons must enforce canonical order.");
+assert(patternQuizRoute.includes("CanonicalRealmActivityGate") && patternQuizRoute.includes('activity="quiz"'), "Pattern Peaks quizzes must require three lessons.");
+assert(patternLessonShell.includes("saveRealmLessonAttempt(") && patternLessonShell.includes('"pattern"'), "Pattern Peaks lessons must save canonical progress.");
+assert(patternLessonShell.includes("completionKeyRef.current") && patternLessonShell.includes("exitRequestedRef.current"), "Pattern Peaks completion must be idempotent.");
+assert(patternEntry.includes('restoreStudentStateFromServer(identity.studentId, "pattern")') && patternEntry.includes("RealmDashboardLoading"), "Pattern Peaks must restore canonical progress before rendering.");
 const starpathLessonRoute = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
 const starpathQuizRoute = read("app/starpath/quiz/[level]/[week]/page.tsx");
 assert(
@@ -307,6 +318,10 @@ for (const requiredDatabaseGuard of [
 assert(
   assessmentCompletion.body.includes("when p_realm_id = 'statistics' then '[1,2,3,4,5,6]'::jsonb"),
   `Statistica full pre-test pathways in ${assessmentCompletion.filename} must contain exactly six weeks.`,
+);
+assert(
+  assessmentCompletion.body.includes("when p_realm_id = 'pattern' then '[1,2,3,4,5,6,7,8]'::jsonb"),
+  `Pattern Peaks full pre-test pathways in ${assessmentCompletion.filename} must contain exactly eight weeks.`,
 );
 assert(
   assessmentCompletion.body.includes("public.realm_program_key(effective_progress->>'next_working_level', p_realm_id)"),

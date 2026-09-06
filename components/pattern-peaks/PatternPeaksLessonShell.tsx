@@ -14,7 +14,6 @@ import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, saveRealmLessonAttempt } from "@/lib/student-progress-sync";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
-import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 type Phase = "home" | "concept" | "active";
 
@@ -80,10 +79,10 @@ export default function PatternPeaksLessonShell({
       timeSpentSeconds: summary?.timeSpentSeconds ?? 0, topicSummaries: summary?.topicSummaries ?? [],
       strengths: summary?.strengths ?? [], areasToImprove: summary?.areasToImprove ?? [],
       struggledQuestionTypes: summary?.struggledQuestionTypes ?? [],
-    }, completionKey, "pattern" as LiveRealmId)
+    }, completionKey, "pattern")
       .then(() => {
         completionSavedRef.current = true;
-        return restoreStudentStateFromServer(studentId, "pattern" as LiveRealmId).catch((error) => {
+        return restoreStudentStateFromServer(studentId, "pattern").catch((error) => {
           console.warn("[Pattern Peaks] Lesson saved but progress refresh failed", error);
         }).then(() => { if (exitRequestedRef.current) router.push(weekHref); });
       })

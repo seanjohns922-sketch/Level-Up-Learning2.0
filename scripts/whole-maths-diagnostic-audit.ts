@@ -55,10 +55,10 @@ assert.equal(AC_DESCRIPTOR_COUNTS_BY_LEVEL[4].space, 3, "AC9 Year 4 Space must c
 assert.equal(AC_DESCRIPTOR_COUNTS_BY_LEVEL[6].algebra, 3, "AC9 Year 6 Algebra must carry 3 descriptors.");
 assert.deepEqual(
   AVAILABLE_DIAGNOSTIC_STRANDS.map((strand) => strand.strand),
-  ["number", "measurement", "space", "statistics"],
-  "Only the four built maths strands may be active in the staged diagnostic.",
+  ["number", "measurement", "space", "statistics", "algebra"],
+  "The five built maths strands must be active in the staged diagnostic.",
 );
-assert.equal(diagnosticAvailableWeight(), 115, "The staged four strands must cover 115 of 139 curriculum points.");
+assert.equal(diagnosticAvailableWeight(), 131, "The staged five strands must cover 131 of 139 curriculum points.");
 
 assert.equal(
   computeWholeMathsLevel({ number: 4, measurement: 4.5, space: 4, statistics: 4.5, algebra: 3.5, probability: 4 }),
@@ -152,7 +152,8 @@ assert.equal(noDemotion.placementChanged, false);
 assert.equal(noDemotion.flag, "review_support");
 
 for (const strand of AVAILABLE_DIAGNOSTIC_STRANDS) {
-  for (let level = 1; level <= 6; level += 1) {
+  const firstLevel = strand.strand === "algebra" ? 3 : 1;
+  for (let level = firstLevel; level <= 6; level += 1) {
     const questions = getDiagnosticQuestions(strand.strand, `Year ${level}`, "audit-sitting");
     assert.equal(questions.length, 10, `${strand.strand} Year ${level} must draw 10 questions from its existing level test.`);
     assert(questions.every(({ question }) => question.id), `${strand.strand} Year ${level} diagnostic questions need stable IDs.`);
@@ -189,4 +190,4 @@ for (const required of [
   assert(migration.toLowerCase().includes(required.toLowerCase()), `Diagnostic migration is missing: ${required}`);
 }
 
-console.log("Whole-Maths Diagnostic audit passed: four strands staged, six-strand overall locked, and server placement guarded.");
+console.log("Whole-Maths Diagnostic audit passed: five strands staged, six-strand overall locked, and server placement guarded.");

@@ -1,11 +1,9 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import StarpathVoyageQuiz from "@/components/starpath/StarpathVoyageQuiz";
 import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
 import { getPatternPeaksWeeklyQuizTasks } from "@/data/activities/patternPeaks/weeklyQuizBank";
 import { PATTERN_PEAKS_PROGRAMS, type PatternPeaksYearLabel } from "@/data/programs/patternPeaks";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
-import type { LiveRealmId } from "@/lib/realms/realm-registry";
-import { getServerStarpathAccess } from "@/lib/demo-session-server";
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +21,6 @@ export default async function PatternPeaksQuizPage({ params, searchParams }: {
   params: Promise<{ level: string; week: string }>;
   searchParams: Promise<{ teacher_preview?: string }>;
 }) {
-  const access = await getServerStarpathAccess();
-  if (!access.allowed) redirect("/login");
   const route = await params;
   const query = await searchParams;
   const level = parseLevel(route.level);
@@ -38,7 +34,7 @@ export default async function PatternPeaksQuizPage({ params, searchParams }: {
 
   const teacherPreview = query.teacher_preview === "1";
   return (
-    <CanonicalRealmActivityGate realmId={"pattern" as LiveRealmId} year={year} week={week} activity="quiz">
+    <CanonicalRealmActivityGate realmId="pattern" year={year} week={week} activity="quiz">
       <StarpathVoyageQuiz
         realm="pattern"
         quiz={{

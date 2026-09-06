@@ -38,6 +38,7 @@ function curriculumCsv(snapshot: SchoolAnalyticsSnapshot): string {
 // results — a flat "gradebook" shape mappable into Compass / Sentral imports.
 const RESULT_REALMS: Array<[string, string]> = [
   ["number", "Number"], ["measurement", "Measurement"], ["space", "Space"], ["statistics", "Statistics"],
+  ["pattern", "Algebra"],
 ];
 function resultsCsv(snapshot: SchoolAnalyticsSnapshot): string {
   const header = ["Student", "Year level", "Class", "Overall accuracy %", "Overall growth (pts)", "Levels mastered"];

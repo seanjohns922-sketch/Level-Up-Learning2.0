@@ -57,6 +57,7 @@ function getRealmHomeRoute(realmId?: string | null): string {
   if (realmId === "measurement") return "/measurelands";
   if (realmId === "space") return "/starpath?realm_id=space&level=ground";
   if (realmId === "statistics") return "/statistica";
+  if (realmId === "pattern") return "/pattern-peaks";
   return "/levels";
 }
 
@@ -275,7 +276,7 @@ function ResultsPage() {
   const year = sp.get("year") ?? "Year 3";
   const realmId = sp.get("realm_id") ?? undefined;
   const progressRealmId =
-    (realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : "number") as LiveRealmId;
+    (realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : realmId === "pattern" ? "pattern" : "number") as LiveRealmId;
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const realmParam = realmId ? `&realm_id=${encodeURIComponent(realmId)}` : "";
@@ -464,6 +465,8 @@ function ResultsPage() {
       ? "Starpath"
       : progressRealmId === "statistics"
         ? "Statistica"
+        : progressRealmId === "pattern"
+          ? "Pattern Peaks"
         : "Number Nexus";
   const resultActions = passed
     ? isPostTest || passedByProgram

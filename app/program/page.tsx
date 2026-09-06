@@ -384,9 +384,9 @@ function ProgramPage() {
   const legacyProgramMode = sp.get("legacy") === "1";
   const demoPreviewMode = useDemoPreviewMode();
   const teacherPreview = sp.get("teacher_preview") === "1" && demoPreviewMode;
-  // Pattern Peaks is still a preview realm (coming_soon / not selectable).
-  // Statistica is live and must always use canonical student progression.
-  const previewMode = isPatternRealm || teacherPreview || demoPreviewMode;
+  // Every live realm uses canonical student progression. Only an authorised
+  // Demo Review session may bypass it.
+  const previewMode = teacherPreview || demoPreviewMode;
   const canonicalRealmId = realmId as LiveRealmId;
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
