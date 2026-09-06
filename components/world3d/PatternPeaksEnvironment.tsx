@@ -30,7 +30,7 @@ function stateVisual(state: RealmWorldGateState, accent: string, active: boolean
   return { frame: "#293947", energy: accent, intensity: active ? 1.1 : state === "current" ? 0.76 : 0.45 };
 }
 
-const LEVEL_VISUALS: Record<"Year 3" | "Year 4" | "Year 5", { background: string; floor: string; sky: string; fog: string; sun: string; accent: string; crystal: string }> = {
+const LEVEL_VISUALS: Record<"Year 3" | "Year 4" | "Year 5" | "Year 6", { background: string; floor: string; sky: string; fog: string; sun: string; accent: string; crystal: string }> = {
   "Year 3": {
     background: "/images/patternpeaks-home-bg-y3.jpeg",
     floor: "/images/patternpeaks-level3-floor.png",
@@ -58,9 +58,19 @@ const LEVEL_VISUALS: Record<"Year 3" | "Year 4" | "Year 5", { background: string
     accent: "#56efb0",
     crystal: "#bd63f4",
   },
+  "Year 6": {
+    background: "/images/patternpeaks-home-bg-y6.jpeg",
+    floor: "/images/patternpeaks-level6-floor.png",
+    sky: "#2c3954",
+    fog: "#151c2b",
+    sun: "#b9f7e5",
+    accent: "#63f0aa",
+    crystal: "#b665f0",
+  },
 };
 
 export function getPatternPeaks3DVisuals(level: RealmLevelId) {
+  if (level === "Year 6") return LEVEL_VISUALS["Year 6"];
   if (level === "Year 5") return LEVEL_VISUALS["Year 5"];
   if (level === "Year 4") return LEVEL_VISUALS["Year 4"];
   return LEVEL_VISUALS["Year 3"];
