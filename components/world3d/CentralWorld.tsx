@@ -373,8 +373,11 @@ export default function CentralWorld() {
     const cx = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX);
     const cz = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ);
     if (heldRef.current) {
+      // Move the item AND carry the camera with it, so you can walk it to a new
+      // spot anywhere on the map and drop it there.
       setEditCursor((cur) => ({ gridX: cx(cur.gridX + dx), gridZ: cz(cur.gridZ + dz) }));
       setBuildPlacement((bp) => (bp ? { ...bp, gridX: cx(bp.gridX + dx), gridZ: cz(bp.gridZ + dz) } : bp));
+      setCameraFocus((f) => ({ gridX: cx(f.gridX + dx), gridZ: cz(f.gridZ + dz) }));
     } else {
       setCameraFocus((f) => ({ gridX: cx(f.gridX + dx * 2), gridZ: cz(f.gridZ + dz * 2) }));
     }
