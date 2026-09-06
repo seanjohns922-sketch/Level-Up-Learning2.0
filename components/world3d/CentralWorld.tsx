@@ -376,7 +376,7 @@ export default function CentralWorld() {
         ? "Move selected. Tap anything you have placed to pick it up."
         : tool === "erase"
           ? "Eraser selected. Tap an item to remove it, or tap the ground to rub out a path."
-          : `${EDIT_TOOL_NAMES[tool]} selected. Use the arrow buttons to choose a space, then press add.`,
+          : `${EDIT_TOOL_NAMES[tool]} selected. Tap or drag across the grass to paint it.`,
       undefined,
       "manual",
       { rate: 0.9 },
@@ -390,7 +390,7 @@ export default function CentralWorld() {
     setEditTool("scenery");
     placementSequence.current += 1;
     setBuildPlacement({ placementId: `${item.item_key}-${placementSequence.current}`, itemId: item.item_key, ...editCursor, rotation: 0 });
-    void speak(`${item.name} selected. Use the arrow buttons to choose a space, then press add. You can place as many as you like.`, undefined, "manual", { rate: 0.9 });
+    void speak(`${item.name} selected. Tap the grass to place it, and drag to lay a whole row. Place as many as you like.`, undefined, "manual", { rate: 0.9 });
   }
 
   function setHeldTint(tint: string | undefined) {
@@ -404,7 +404,7 @@ export default function CentralWorld() {
     placementSequence.current += 1;
     setBuildPlacement(existing ?? { placementId: `${item.item_key}-${placementSequence.current}`, itemId: item.item_key, ...editCursor, rotation: 0 });
     if (existing) setEditCursor({ gridX: existing.gridX, gridZ: existing.gridZ });
-    void speak(`${item.name} selected. Tap a space to move it, rotate if needed, then press place.`, undefined, "manual", { rate: 0.9 });
+    void speak(`${item.name} selected. Tap the grass to place it. Rotate first if you need to.`, undefined, "manual", { rate: 0.9 });
   }
 
   function closeBuildMode() {
@@ -499,12 +499,37 @@ export default function CentralWorld() {
     applyGroundAt(editCursor.gridX, editCursor.gridZ, true);
   }
 
+  // Minecraft-style: tap a cell to drop the held item right there (and keep it in
+  // hand for the next), drag to lay a whole run. Invalid cells just show the red
+  // ghost without placing.
+  function placeHeldAt(gridX: number, gridZ: number) {
+    if (!buildItem || !buildPlacement) return;
+    const candidate = { ...buildPlacement, gridX, gridZ };
+    setEditCursor({ gridX, gridZ });
+    if (!validateCentralWorldPlacement(candidate, buildItem, placementsWithoutBuildItem, itemsById)) {
+      setBuildPlacement(candidate);
+      return;
+    }
+    setEditHistory((current) => [...current, { placements: placedCustomisations, tiles: groundTiles }].slice(-30));
+    setPlacedCustomisations((current) => {
+      const next = [...current.filter((p) => p.placementId !== candidate.placementId), candidate];
+      writeCentralWorldPlacements(placementScope, next);
+      return next;
+    });
+    placementSequence.current += 1;
+    setBuildPlacement({ ...candidate, placementId: `${candidate.itemId}-${placementSequence.current}` });
+  }
+
   function selectBuildCell(gridX: number, gridZ: number, paint: boolean) {
-    const nextCursor = { gridX, gridZ };
-    setEditCursor(nextCursor);
     if (buildPlacement) {
-      setBuildPlacement({ ...buildPlacement, ...nextCursor });
-    } else if (isMoveTool) {
+      // Editor: tap/drag drops the item. Marketplace deep-link (no editor): keep
+      // the old move-the-cursor-then-Place flow so a single item isn't duplicated.
+      if (editorOpen) placeHeldAt(gridX, gridZ);
+      else { setEditCursor({ gridX, gridZ }); setBuildPlacement({ ...buildPlacement, gridX, gridZ }); }
+      return;
+    }
+    setEditCursor({ gridX, gridZ });
+    if (isMoveTool) {
       pickUpPlacementAt(gridX, gridZ);
       return;
     }
@@ -574,7 +599,7 @@ export default function CentralWorld() {
   return (
     <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
-        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} editCursor={editCursor} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool)} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} />
+        <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} editCursor={editCursor} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} />
       </Canvas>
 
       {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} navActions={[
@@ -604,7 +629,7 @@ export default function CentralWorld() {
       {editorOpen ? (
         <section className="centralWorldEditor" aria-label="Edit world controls" style={{ position: "absolute", left: 10, top: 10, bottom: 10, zIndex: 35, width: "min(330px, 90vw)", overflowY: "auto", border: "2px solid #5eead4", borderRadius: 7, background: "rgba(13,24,22,.96)", color: "#fff", padding: 11, boxShadow: "0 14px 40px rgba(0,0,0,.4)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-            <div><div style={{ color: "#5eead4", fontSize: 10, fontWeight: 950, letterSpacing: ".16em" }}>EDIT WORLD</div><div style={{ marginTop: 1, fontSize: 16, fontWeight: 950 }}>{heldItemKey ? `Placing ${buildItem?.name ?? "item"}` : isMoveTool ? "Tap an item to move or delete it" : isGroundTool ? "Tap or drag on the grass" : isEraseTool ? "Tap an item to remove it" : "Tap a space, then place"}</div></div>
+            <div><div style={{ color: "#5eead4", fontSize: 10, fontWeight: 950, letterSpacing: ".16em" }}>EDIT WORLD</div><div style={{ marginTop: 1, fontSize: 16, fontWeight: 950 }}>{heldItemKey ? `Tap the grass to place ${buildItem?.name ?? "item"} — drag to lay a row` : isMoveTool ? "Tap an item to move or delete it" : isGroundTool ? "Tap or drag on the grass" : isEraseTool ? "Tap an item to remove it" : "Tap a space, then place"}</div></div>
             <div style={{ display: "flex", gap: 5 }}>
               <button type="button" onClick={() => setBuildZoom((value) => Math.min(38, value + 4))} aria-label="Zoom camera out" title="Zoom out" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomOut size={18} /></button>
               <button type="button" onClick={() => setBuildZoom((value) => Math.max(18, value - 4))} aria-label="Zoom camera in" title="Zoom in" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomIn size={18} /></button>
@@ -670,7 +695,7 @@ export default function CentralWorld() {
 
           <div className="centralWorldEditorControls" style={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
             <div className="centralWorldEditorDpad" style={{ display: "grid", gridTemplateColumns: "repeat(3, 40px)", gridTemplateRows: "repeat(2, 40px)", gap: 4 }}><button type="button" aria-label="Move cursor forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={19} /></button><button type="button" aria-label="Move cursor left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={19} /></button><button type="button" aria-label="Move cursor backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={19} /></button><button type="button" aria-label="Move cursor right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={19} /></button></div>
-            <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isMoveTool || isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? `${buildItem?.name ?? "Item"} fits here.` : "Choose a clear green space.") : isMoveTool ? "Tap an item to pick it up." : isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Tap an item to remove it." : "Choose a clear green space."}</div>
+            <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isMoveTool || isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? "Tap the grass to place — drag to lay a row." : "That space is taken — try a clear one.") : isMoveTool ? "Tap an item to pick it up." : isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Tap an item to remove it." : "Choose a clear green space."}</div>
             <div className="centralWorldEditorActions" style={{ display: "flex", alignItems: "center", gap: 6 }}><button type="button" disabled={!buildPreview} onClick={() => setBuildPlacement((current) => current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current)} aria-label="Rotate selected item" title="Rotate" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", visibility: buildPreview ? "visible" : "hidden" }}><RotateCw size={19} /></button>{buildPreview ? <button type="button" onClick={deleteHeldPlacement} aria-label="Delete selected item" title="Delete" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", background: "#ef4444", color: "#fff" }}><Trash2 size={19} /></button> : null}<button type="button" disabled={!isEraseTool && (buildPreview ? !buildValid : !groundPreview?.valid)} onClick={buildPreview ? confirmBuildPlacement : applyGroundTool} style={{ ...debugButton, minHeight: 48, minWidth: 92, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: isEraseTool ? "#ef4444" : "#22c55e", color: "white", visibility: isMoveTool && !buildPreview ? "hidden" : "visible" }}>{isEraseTool ? <Eraser size={18} /> : <Check size={18} />}{isEraseTool ? "Remove" : buildPreview ? "Place" : "Paint"}</button></div>
           </div>
         </section>
