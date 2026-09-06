@@ -117,36 +117,69 @@ function authoredQuestion(
   }
 
   if (level === 4) {
-    const descriptorIndex = Math.floor(index / 2);
+    const formShift = form === "posttest" ? 3 : 0;
     if (descriptorCode === "AC9M4A01") {
-      archetype = descriptorIndex % 4;
-      if (archetype <= 1) {
-        const whole = 130 + (seed % 160); const part = 35 + (index * 7 % 80);
-        const left = archetype === 0 ? `${part} + ?` : `? + ${part}`;
-        return { question: { kind: "typed_response", prompt: "Find the unknown addend.", answer: String(whole - part), visual: { type: "unknown_tile_equation", title: "Addition equation", left, right: String(whole) } }, structure: "unknown-position" };
+      archetype = descriptorIndex >= 8 ? (descriptorIndex === 8 ? 4 : 5) : (descriptorIndex + formShift) % 6;
+      const challengeLift = descriptorIndex >= 6 ? 120 : 0;
+      const whole = 145 + challengeLift + ((seed + descriptorIndex * 19) % 180);
+      const part = 34 + ((seed + descriptorIndex * 11) % 90);
+      const unknown = whole - part;
+      if (archetype === 0) {
+        const left = descriptorIndex % 2 === 0 ? `${part} + ?` : `? + ${part}`;
+        return { question: { kind: "typed_response", prompt: "What number completes this addition equation?", answer: String(unknown), visual: { type: "unknown_tile_equation", title: "Addition equation", left, right: String(whole) } }, structure: "unknown-addend" };
+      }
+      if (archetype === 1) {
+        return { question: { kind: "typed_response", prompt: "What number is subtracted in this equation?", answer: String(part), visual: { type: "unknown_tile_equation", title: "Subtraction equation", left: `${whole} − ?`, right: String(unknown) } }, structure: "unknown-subtrahend" };
       }
       if (archetype === 2) {
-        const whole = 180 + (seed % 170); const remaining = 45 + (index * 9 % 90);
-        return { question: { kind: "typed_response", prompt: "Which value completes the subtraction equation?", answer: String(whole - remaining), visual: { type: "inverse_step_card", title: "Subtraction equation", equation: `${whole} − ? = ${remaining}`, inverseOperation: `${whole} − ${remaining}` } }, structure: "inverse-add-sub" };
+        return { question: { kind: "typed_response", prompt: "What starting number completes this subtraction equation?", answer: String(whole), visual: { type: "unknown_tile_equation", title: "Subtraction equation", left: `? − ${part}`, right: String(unknown) } }, structure: "unknown-minuend" };
       }
-      const a = 16 + index; const b = 25 + (seed % 16); const c = 24 + (index % 8);
-      return { question: { kind: "typed_response", prompt: "Calculate the total.", answer: String(a + b + c), visual: { type: "expression_flow", title: "Addition expression", cards: [{ tokens: [String(a), "+", String(b), "+", String(c)] }, { tokens: [String(a), "+", `(${b} + ${c})`], result: "?" }] } }, structure: "regroup-addends" };
+      if (archetype === 3) {
+        const leftFirst = 75 + ((seed + descriptorIndex) % 85);
+        const leftSecond = 35 + ((seed + descriptorIndex * 7) % 70);
+        const rightKnown = 40 + ((seed + descriptorIndex * 13) % 80);
+        const answer = leftFirst + leftSecond - rightKnown;
+        return { question: { kind: "typed_response", prompt: "What number makes both addition expressions equal?", answer: String(answer), visual: { type: "balance_equation_card", title: "Balanced addition equation", left: `${leftFirst} + ${leftSecond}`, right: `${rightKnown} + ?` } }, structure: "balanced-addition-equation" };
+      }
+      if (archetype === 4) {
+        const a = 28 + ((seed + descriptorIndex) % 45);
+        const b = 32 + ((seed + descriptorIndex * 5) % 48);
+        const move = 6 + ((seed + descriptorIndex) % 18);
+        return { question: { kind: "typed_response", prompt: "What number keeps these addition expressions equivalent?", answer: String(b - move), visual: { type: "balance_equation_card", title: "Equivalent addition equations", left: `${a} + ${b}`, right: `${a + move} + ?` } }, structure: "compensating-equivalence" };
+      }
+      const a = 45 + ((seed + descriptorIndex) % 55);
+      const b = 25 + ((seed + descriptorIndex * 3) % 45);
+      const c = 15 + ((seed + descriptorIndex * 7) % 35);
+      return { question: { kind: "typed_response", prompt: "What number makes the connected equations agree?", answer: String(b + c), visual: { type: "expression_flow", title: "Connected equivalent equations", cards: [{ tokens: [String(a), "+", String(b), "+", String(c)] }, { tokens: [String(a), "+", "?"], result: String(a + b + c) }] } }, structure: "connected-addition-equations" };
     }
 
-    archetype = (descriptorIndex + (form === "posttest" ? 2 : 0)) % 4;
-    const factor = [6, 7, 8, 9][descriptorIndex % 4]!;
-    const groups = 4 + (seed % 9);
+    archetype = descriptorIndex >= 8 ? (descriptorIndex === 8 ? 4 : 5) : (descriptorIndex + formShift) % 6;
+    const factor = [3, 4, 6, 7, 8, 9][(descriptorIndex + formShift) % 6]!;
+    const groups = 3 + ((seed + descriptorIndex * 5) % 8);
     const product = factor * groups;
     if (archetype === 0) {
-      return { question: { kind: "typed_response", prompt: "Find the missing second factor.", answer: String(groups), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `${factor} × ? = ${product}`, inverseOperation: `${product} ÷ ${factor}` } }, structure: "missing-factor-right" };
+      return { question: { kind: "typed_response", prompt: "What is the product of this multiplication fact?", answer: String(product), visual: { type: "unknown_tile_equation", title: "Multiplication fact", left: `${factor} × ${groups}`, right: "?" } }, structure: "multiplication-product" };
     }
     if (archetype === 1) {
-      return { question: { kind: "typed_response", prompt: "Find the missing first factor.", answer: String(factor), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `? × ${groups} = ${product}`, inverseOperation: `${product} ÷ ${groups}` } }, structure: "missing-factor-left" };
+      const left = descriptorIndex % 2 === 0 ? `${factor} × ?` : `? × ${factor}`;
+      return { question: { kind: "typed_response", prompt: "What factor completes this multiplication equation?", answer: String(groups), visual: { type: "unknown_tile_equation", title: "Multiplication equation", left, right: String(product) } }, structure: "multiplication-unknown" };
     }
     if (archetype === 2) {
-      return { question: { kind: "typed_response", prompt: "Find the quotient.", answer: String(groups), visual: { type: "inverse_step_card", title: "Division equation", equation: `${product} ÷ ${factor} = ?`, inverseOperation: `${factor} × ${groups}` } }, structure: "related-division-quotient" };
+      return { question: { kind: "typed_response", prompt: "What is the quotient of this related division fact?", answer: String(groups), visual: { type: "unknown_tile_equation", title: "Related division fact", left: `${product} ÷ ${factor}`, right: "?" } }, structure: "division-quotient" };
     }
-    return { question: { kind: "typed_response", prompt: "Find the missing divisor.", answer: String(factor), visual: { type: "inverse_step_card", title: "Division equation", equation: `${product} ÷ ? = ${groups}`, inverseOperation: `${groups} × ${factor}` } }, structure: "related-division-divisor" };
+    if (archetype === 3) {
+      return { question: { kind: "typed_response", prompt: "What divisor completes this division equation?", answer: String(factor), visual: { type: "unknown_tile_equation", title: "Division equation", left: `${product} ÷ ?`, right: String(groups) } }, structure: "division-unknown" };
+    }
+    if (archetype === 4) {
+      const derivedFactor = descriptorIndex % 2 === 0 ? 9 : 6;
+      const knownFactor = descriptorIndex % 2 === 0 ? 10 : 3;
+      const other = 4 + ((seed + descriptorIndex) % 7);
+      const derivedProduct = derivedFactor * other;
+      const knownProduct = knownFactor * other;
+      const relationship = derivedFactor === 9 ? `subtract ${other}` : "double the product";
+      return { question: { kind: "typed_response", prompt: "What is the connected multiplication product?", answer: String(derivedProduct), visual: { type: "expression_flow", title: "Derive a multiplication fact", cards: [{ label: "Known fact", tokens: [String(knownFactor), "×", String(other), "=", String(knownProduct)] }, { label: relationship, tokens: [String(derivedFactor), "×", String(other)], result: "?" }] } }, structure: "derived-multiplication-fact" };
+    }
+    return { question: { kind: "typed_response", prompt: "What number makes both connected fact-family equations true?", answer: String(groups), visual: { type: "expression_flow", title: "Connected multiplication and division facts", cards: [{ tokens: [String(factor), "×", "?", "=", String(product)] }, { tokens: [String(product), "÷", "?", "=", String(factor)] }] } }, structure: "connected-fact-family" };
   }
 
   if (level === 5) {
@@ -319,7 +352,7 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
       : undefined;
     const misconception = levelThreeMisconception ?? levelFiveMisconception ?? descriptor.misconceptionIds[index % Math.max(1, descriptor.misconceptionIds.length)];
     const shortForm = form === "pretest" ? "pre" : "post";
-    const contentVersion = level === 3 || level === 5 ? 2 : 1;
+    const contentVersion = level === 3 || level === 4 || level === 5 ? 2 : 1;
     const id = `pattern-peaks-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v${contentVersion}`;
     const options = question.kind === "multiple_choice" ? question.options.map((label, optionIndex) => ({ id: String(optionIndex), label })) : undefined;
     const correctIndex = question.kind === "multiple_choice" ? question.options.indexOf(question.answer) : -1;

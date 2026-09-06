@@ -650,6 +650,33 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
     <mesh position={[0, 1.7, 0.04]}><octahedronGeometry args={[0.16, 0]} /><meshStandardMaterial color="#e6b955" metalness={0.5} roughness={0.4} /></mesh>
   </group>;
 
+  if (assetKey === "drawbridge") return <DrawbridgeMesh tint={tint} />;
+
+  if (assetKey === "torch") return <group>
+    <mesh position={[0, 0.8, 0]} castShadow><cylinderGeometry args={[0.08, 0.1, 1.6, 8]} /><meshStandardMaterial color={t("#6b4a2a")} roughness={0.9} /></mesh>
+    <mesh position={[0, 1.66, 0]} castShadow><cylinderGeometry args={[0.2, 0.12, 0.3, 10]} /><meshStandardMaterial color="#4a4038" metalness={0.3} roughness={0.6} /></mesh>
+    <mesh position={[0, 1.98, 0]}><coneGeometry args={[0.16, 0.5, 8]} /><meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={1.1} /></mesh>
+    <mesh position={[0, 2.1, 0]}><coneGeometry args={[0.09, 0.34, 8]} /><meshStandardMaterial color="#fde68a" emissive="#fbbf24" emissiveIntensity={1.5} /></mesh>
+    <pointLight position={[0, 2.05, 0]} color="#ffb347" intensity={1.3} distance={6.5} />
+  </group>;
+
+  if (assetKey === "chest") return <group>
+    <mesh position={[0, 0.3, 0]} castShadow><boxGeometry args={[0.9, 0.55, 0.6]} /><meshStandardMaterial color={t("#8a5a34")} roughness={0.85} /></mesh>
+    <mesh position={[0, 0.6, 0]} rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.3, 0.3, 0.9, 12, 1, false, 0, Math.PI]} /><meshStandardMaterial color={t("#7a4d2c")} roughness={0.85} /></mesh>
+    {([-0.3, 0.3] as const).map((x) => <mesh key={x} position={[x, 0.45, 0]}><boxGeometry args={[0.08, 0.78, 0.62]} /><meshStandardMaterial color="#caa250" metalness={0.5} roughness={0.4} /></mesh>)}
+    <mesh position={[0, 0.4, 0.31]}><boxGeometry args={[0.16, 0.2, 0.06]} /><meshStandardMaterial color="#e6b955" metalness={0.6} roughness={0.35} /></mesh>
+    {([["#ef4444", -0.15, 0.72, 0.1], ["#38bdf8", 0.12, 0.72, -0.05], ["#facc15", 0, 0.75, 0.15]] as const).map(([c, x, y, z], i) => <mesh key={i} position={[x, y, z]}><octahedronGeometry args={[0.07, 0]} /><meshStandardMaterial color={c} emissive={c} emissiveIntensity={0.35} /></mesh>)}
+  </group>;
+
+  if (assetKey === "well") return <group>
+    <mesh position={[0, 0.4, 0]} castShadow><cylinderGeometry args={[0.7, 0.8, 0.8, 16]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
+    <mesh position={[0, 0.79, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.55, 16]} /><meshStandardMaterial color="#1d3a4a" roughness={0.2} metalness={0.2} /></mesh>
+    {([-0.65, 0.65] as const).map((x) => <mesh key={x} position={[x, 1.4, 0]} castShadow><boxGeometry args={[0.12, 1.4, 0.12]} /><meshStandardMaterial color="#6b4a2a" roughness={0.9} /></mesh>)}
+    <mesh position={[0, 2.15, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[0.95, 0.6, 4]} /><meshStandardMaterial color="#7a4d2c" roughness={0.8} /></mesh>
+    <mesh position={[0, 1.85, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.05, 0.05, 1.3, 8]} /><meshStandardMaterial color="#5f3f22" /></mesh>
+    <mesh position={[0.2, 1.42, 0]}><cylinderGeometry args={[0.14, 0.12, 0.24, 10]} /><meshStandardMaterial color="#6b4a2a" /></mesh>
+  </group>;
+
   if (assetKey === "pine_tree") return <group>
     <mesh position={[0, 0.95, 0]} castShadow><cylinderGeometry args={[0.16, 0.28, 1.9, 8]} /><meshStandardMaterial color="#5b3a1e" roughness={0.9} /></mesh>
     {([[2.05, 1.15, "#2f6d3f"], [2.75, 0.94, "#357a46"], [3.35, 0.74, "#3c854c"], [3.9, 0.54, "#43904f"]] as const).map(([y, r, c], i) => <mesh key={i} position={[0, y, 0]} castShadow><coneGeometry args={[r, 1.35, 10]} /><meshStandardMaterial color={t(c)} roughness={0.95} /></mesh>)}
@@ -767,7 +794,48 @@ function AnimalRoamer({ gait, children }: { gait: Gait; children: React.ReactNod
   return <group ref={ref}>{children}</group>;
 }
 
-function PlacedWorldObject({ item, placement, preview = false, valid = true, animate = false }: { item: EconomyItem; placement: CentralWorldPlacement; preview?: boolean; valid?: boolean; animate?: boolean }) {
+// A drawbridge: stone abutment, chain posts and a plank deck that hinges at the
+// near end. Pass deckRef to animate the deck (raise/lower).
+function DrawbridgeMesh({ tint, deckRef }: { tint?: string; deckRef?: React.RefObject<THREE.Group | null> }) {
+  const wood = tint ?? "#8a5a34";
+  return (
+    <group>
+      <mesh position={[0, 0.35, -0.2]} castShadow><boxGeometry args={[2.2, 0.7, 0.7]} /><meshStandardMaterial color="#8a8378" roughness={0.9} /></mesh>
+      {([-0.95, 0.95] as const).map((x) => <mesh key={x} position={[x, 1.5, -0.35]} castShadow><boxGeometry args={[0.22, 2.8, 0.22]} /><meshStandardMaterial color="#6f6355" roughness={0.9} /></mesh>)}
+      <group ref={deckRef} position={[0, 0.62, 0.05]}>
+        <mesh position={[0, 0, 1.7]} castShadow><boxGeometry args={[1.8, 0.16, 3.4]} /><meshStandardMaterial color={wood} roughness={0.9} /></mesh>
+        {([-1.2, -0.6, 0, 0.6, 1.2] as const).map((z) => <mesh key={z} position={[0, 0.09, 1.7 + z]}><boxGeometry args={[1.8, 0.02, 0.05]} /><meshStandardMaterial color="#5f3f22" /></mesh>)}
+        {([-0.6, 0.6] as const).map((x) => <mesh key={x} position={[x, 0.1, 1.7]}><boxGeometry args={[0.12, 0.05, 3.3]} /><meshStandardMaterial color="#6b4a2a" /></mesh>)}
+        {([-0.95, 0.95] as const).map((x) => <mesh key={x} position={[x, 0.12, 3.3]} rotation={[0.5, 0, 0]}><cylinderGeometry args={[0.03, 0.03, 2.4, 5]} /><meshStandardMaterial color="#3a3a3a" metalness={0.5} roughness={0.5} /></mesh>)}
+      </group>
+    </group>
+  );
+}
+
+// Interactive drawbridge: tap to raise/lower; the deck damps to its target angle
+// (snaps instantly under reduced motion).
+function Drawbridge({ state, tint, onToggle }: { state?: "up" | "down"; tint?: string; onToggle?: () => void }) {
+  const deckRef = useRef<THREE.Group>(null);
+  const reduced = usePrefersReducedMotion();
+  const up = state === "up";
+  useFrame((_, delta) => {
+    const g = deckRef.current;
+    if (!g) return;
+    const target = up ? -Math.PI * 0.46 : 0;
+    g.rotation.x = reduced ? target : THREE.MathUtils.damp(g.rotation.x, target, 5, Math.min(delta, 0.05));
+  });
+  return (
+    <group
+      onClick={onToggle ? (event) => { event.stopPropagation(); onToggle(); } : undefined}
+      onPointerOver={onToggle ? () => { document.body.style.cursor = "pointer"; } : undefined}
+      onPointerOut={onToggle ? () => { document.body.style.cursor = ""; } : undefined}
+    >
+      <DrawbridgeMesh tint={tint} deckRef={deckRef} />
+    </group>
+  );
+}
+
+function PlacedWorldObject({ item, placement, preview = false, valid = true, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; preview?: boolean; valid?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
   const groupRef = useRef<THREE.Group>(null);
   const tier = Number(item.metadata.tier ?? 1);
   const scale = worldObjectScale(item);
@@ -775,6 +843,9 @@ function PlacedWorldObject({ item, placement, preview = false, valid = true, ani
   const position = gridToWorld(placement.gridX, placement.gridZ);
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
   const gait = animate && !preview && item.metadata.worldSceneryGroup === "animals" ? ANIMAL_GAITS[assetKey] : undefined;
+  // In roam mode the drawbridge is interactive (tap to raise/lower); in edit mode
+  // it's static so the build surface can pick it up.
+  const interactiveBridge = assetKey === "drawbridge" && !preview && animate;
 
   useLayoutEffect(() => {
     if (!preview || !groupRef.current) return;
@@ -796,7 +867,11 @@ function PlacedWorldObject({ item, placement, preview = false, valid = true, ani
         <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.58 : 0.18} depthWrite={false} />
         {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
       </mesh>
-      {gait ? (
+      {interactiveBridge ? (
+        <group ref={groupRef} scale={scale}>
+          <Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} />
+        </group>
+      ) : gait ? (
         <AnimalRoamer gait={gait}>
           <group ref={groupRef} scale={scale}>
             <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} />
@@ -1143,7 +1218,7 @@ function PlaceholderMyHome({ active, onEnter }: { active: boolean; onEnter?: () 
 // A few permanent Aussie gum trees framing the meadow. Positioned just outside
 // the build grid (|x| > 42, or z < -26 / z > 50) so they never collide with a
 // student's placed items, and clear of the Tower and My Home.
-export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void }) {
+export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
   return (
     <group>
       <Suspense fallback={null}>
@@ -1161,7 +1236,7 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, p
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
       {placedCustomisations.map((placement, index) => {
         const item = itemsById.get(placement.itemId);
-        return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} animate={!editing} /> : null;
+        return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} animate={!editing} onToggle={onToggleDrawbridge} /> : null;
       })}
       {buildPreview ? <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} preview valid={buildPreview.valid} /> : null}
       {groundPreview ? <GroundTile tile={groundPreview.tile} preview valid={groundPreview.valid} /> : null}

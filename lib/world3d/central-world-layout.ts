@@ -9,6 +9,9 @@ export type CentralWorldPlacement = {
   // Optional recolour applied to the item's paint surface. Persisted alongside
   // the placement; undefined means the item's default colours.
   tint?: string;
+  // Interactive open/closed state (e.g. a drawbridge). Persisted; undefined
+  // means the item's default (down/closed).
+  state?: "up" | "down";
 };
 
 export type CentralWorldGroundType = "path" | "road" | "stone" | "water";

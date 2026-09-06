@@ -80,4 +80,8 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_turret", "Turret", "castle_turret", "#9a8d7c", "fortress", "2x2", 1.45),
   starter("central_world_starter_keep", "Keep", "castle_keep", "#8f8271", "fortress", "3x3", 1.65),
   starter("central_world_starter_banner", "Banner", "castle_banner", "#1f3352", "fortress", "1x1", 1.2),
+  starter("central_world_starter_drawbridge", "Drawbridge", "drawbridge", "#8a5a34", "fortress", "2x2", 1.15),
+  starter("central_world_starter_torch", "Torch", "torch", "#f59e0b", "fortress", "1x1", 1.15),
+  starter("central_world_starter_chest", "Treasure Chest", "chest", "#b8863f", "fortress", "1x1", 1.2),
+  starter("central_world_starter_well", "Well", "well", "#9a8d7c", "fortress", "2x2", 1.15),
 ];

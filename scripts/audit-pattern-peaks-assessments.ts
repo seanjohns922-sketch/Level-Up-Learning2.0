@@ -17,8 +17,8 @@ const descriptorStructures: Record<string, string[]> = {
   AC9M3A02: ["derived-addition-fact", "derived-subtraction-fact"],
   AC9M3A03: ["multiplication-fact", "related-division-fact", "connected-fact-family"],
   AC9M3A04: ["multiple-algorithm", "odd-even-algorithm", "ordered-number-algorithm"],
-  AC9M4A01: ["unknown-position", "inverse-add-sub", "regroup-addends"],
-  AC9M4A02: ["missing-factor-right", "missing-factor-left", "related-division-quotient", "related-division-divisor"],
+  AC9M4A01: ["unknown-addend", "unknown-subtrahend", "unknown-minuend", "balanced-addition-equation", "compensating-equivalence", "connected-addition-equations"],
+  AC9M4A02: ["multiplication-product", "multiplication-unknown", "division-quotient", "division-unknown", "derived-multiplication-fact", "connected-fact-family"],
   AC9M5A01: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence"],
   AC9M5A02: ["multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence"],
   AC9M5A03: ["factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
@@ -131,7 +131,7 @@ assert.equal(totalAssessmentItems, 140);
 
 const requiredStructures: Record<number, string[]> = {
   3: ["add-sub-inverse", "subtraction-unknown", "partition-equivalence", "derived-addition-fact", "derived-subtraction-fact", "multiplication-fact", "related-division-fact", "connected-fact-family", "multiple-algorithm", "odd-even-algorithm", "ordered-number-algorithm"],
-  4: ["unknown-position", "inverse-add-sub", "regroup-addends", "missing-factor-right", "missing-factor-left", "related-division-quotient", "related-division-divisor"],
+  4: ["unknown-addend", "unknown-subtrahend", "unknown-minuend", "balanced-addition-equation", "compensating-equivalence", "connected-addition-equations", "multiplication-product", "multiplication-unknown", "division-quotient", "division-unknown", "derived-multiplication-fact", "connected-fact-family"],
   5: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence", "multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence", "factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
   6: ["stage-generalisation", "multi-representation-rule", "bracket-order", "reverse-algorithm", "three-step-algorithm"],
 };
@@ -152,12 +152,21 @@ for (const form of ["pretest", "posttest"] as const) {
     );
   }
   const levelFourStructures = levelFourItems.map((item) => item.structureKey);
-  for (const structure of descriptorStructures.AC9M4A02) {
-    assert.ok(
-      levelFourStructures.some((value) => value.includes(structure)),
-      `Year 4 ${form} must include ${structure}`,
-    );
+  for (const code of ["AC9M4A01", "AC9M4A02"]) {
+    for (const structure of descriptorStructures[code]!) {
+      assert.ok(
+        levelFourItems.some((item) => item.primaryDescriptorCode === code && item.structureKey.includes(structure)),
+        `Year 4 ${form} must include ${structure}`,
+      );
+    }
   }
+  const levelFourMaths = levelFourItems.map((item) => {
+    assert.equal(item.practiceTask?.kind, "patternPeaksQuestion");
+    const question = item.practiceTask.question;
+    return JSON.stringify({ ...question, prompt: question.prompt.replace(/^Peak (North|South)-\d+:\s*/, "") });
+  });
+  assert.equal(new Set(levelFourMaths).size, 20, `Year 4 ${form} must not repeat a mathematical item`);
+  assert.ok(!levelFourStructures.some((value) => value.includes("inverse-step")), `Year 4 ${form} must not expose an inverse-operation scaffold`);
 }
 
 const levelThreeItems = getPatternPeaksIndependentAssessment(3, "posttest");
@@ -214,6 +223,22 @@ for (const level of [4, 5, 6] as const) {
     `Year ${level} Pre and Post forms must be independent`,
   );
 }
+
+const normaliseLevelFourTask = (item: ReturnType<typeof getPatternPeaksIndependentAssessment>[number]) => {
+  if (item.practiceTask?.kind !== "patternPeaksQuestion") return "";
+  const question = item.practiceTask.question;
+  return JSON.stringify({
+    ...question,
+    prompt: question.prompt.replace(/^Peak (North|South)-\d+:\s*/, ""),
+  });
+};
+const levelFourPrePayloads = new Set(getPatternPeaksIndependentAssessment(4, "pretest").map(normaliseLevelFourTask));
+const levelFourPostPayloads = getPatternPeaksIndependentAssessment(4, "posttest").map(normaliseLevelFourTask);
+assert.equal(
+  levelFourPostPayloads.filter((payload) => levelFourPrePayloads.has(payload)).length,
+  0,
+  "Year 4 Pre-Test and Post-Test must not reuse an identical mathematical item",
+);
 
 const normaliseYearFiveTask = (item: ReturnType<typeof getPatternPeaksIndependentAssessment>[number]) => {
   if (item.practiceTask?.kind !== "patternPeaksQuestion") return "";
