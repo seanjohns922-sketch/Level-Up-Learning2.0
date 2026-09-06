@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Zap, Clock, Mountain, Compass, Triangle, BarChart3, Dices, BookOpen, Feather, Languages, Lightbulb } from "lucide-react";
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import RealmCard from "@/components/legends/RealmCard";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
 
 export type RealmDef = {
   id: string;
@@ -137,11 +137,7 @@ export default function LegendsPage() {
   const [measureProgress] = useState<StudentProgress | null>(() => readProgress("measurement"));
   const [spaceProgress] = useState<StudentProgress | null>(() => readProgress("space"));
   const [patternProgress] = useState<StudentProgress | null>(() => readProgress("pattern"));
-  const [demoPreview, setDemoPreview] = useState(false);
-
-  useEffect(() => {
-    setDemoPreview(isDemoPreviewMode());
-  }, []);
+  const demoPreview = useDemoPreviewMode();
 
   const unlockedIds = useMemo(
     () => getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
@@ -186,9 +182,7 @@ export default function LegendsPage() {
   const realms = useMemo(
     () =>
       REALMS.map((realm) =>
-        (realm.id === "starpath-realm" ||
-          realm.id === "statistica") &&
-        demoPreview
+        demoPreview && realm.route
           ? { ...realm, status: "open" as const }
           : realm,
       ),
@@ -201,7 +195,7 @@ export default function LegendsPage() {
     starpathCollected +
     patternPeaksCollected +
     statisticaCollected;
-  const totalLegends = realms.reduce((sum, r) => sum + r.totalLegends, 0);
+  const totalLegends = demoPreview ? getAllLegends().length : realms.reduce((sum, r) => sum + r.totalLegends, 0);
   const pct = totalLegends > 0 ? Math.round((totalCollected / totalLegends) * 100) : 0;
 
   return (

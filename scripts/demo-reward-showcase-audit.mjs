@@ -6,6 +6,7 @@ const gems = read("lib/gems.ts");
 const vault = read("app/gem-vault/page.tsx");
 const home = read("app/home-base/page.tsx");
 const legends = read("components/home/HallOfLegendsWidget.tsx");
+const legendsHall = read("app/legends/page.tsx");
 
 const checks = [
   ["Demo economy keeps central-world rewards purchasable", economy.includes("isCentralWorldReward") && economy.includes("DEMO_PURCHASED_STORAGE_KEY")],
@@ -18,6 +19,8 @@ const checks = [
   ["Gem Vault uses the demo-aware vault reader", vault.includes("fetchGemVault(studentId)")],
   ["My Home loads the demo gem showcase", home.includes("? fetchGemVault(sid)")],
   ["My Home unlocks every implemented legend in demo", legends.includes("new Set(getAllLegends().map((legend) => legend.id))")],
+  ["Demo opens every live Legends collection card", legendsHall.includes("demoPreview && realm.route") && legendsHall.includes('status: "open" as const')],
+  ["Demo Hall total counts implemented legend cards", legendsHall.includes("demoPreview ? getAllLegends().length")],
 ];
 
 console.log("\nDemo Reward Showcase Audit");
