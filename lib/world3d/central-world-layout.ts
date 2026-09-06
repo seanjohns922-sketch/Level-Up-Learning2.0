@@ -60,7 +60,7 @@ export function isCentralWorldProtectedCell(gridX: number, gridZ: number) {
   // Tower base + its doorway approach only (was a broad corridor). Everything
   // else behind and around the tower is now buildable, so it can be fortified.
   if (z >= -56 && z <= -31 && Math.abs(x) <= 9) return true;
-  if (x >= -38 && x <= -20 && z >= -13 && z <= 2) return true;
+  if (x >= -68 && x <= -52 && z >= 16 && z <= 32) return true;
   if (z >= 13 && Math.abs(x) <= 5) return true;
   if (z > -13 && z < 13 && Math.abs(x - Math.sin(z * 0.16)) <= 4.5) return true;
   return false;

@@ -13,14 +13,16 @@ export const CENTRAL_WORLD_CONFIG = {
   towerMainEntrance: [0, 0.75, -35] as [number, number, number],
   towerExitSpawn: [0, 0.75, -31.5] as [number, number, number],
   towerPlaza: [0, 0.75, -30] as [number, number, number],
-  myHomePosition: [-30, 0, -6] as [number, number, number],
+  // Moved 15 squares (30 m) left and 15 squares forward — away from the tower —
+  // so My Home sits in its own clearing rather than crowding the tower corridor.
+  myHomePosition: [-60, 0, 24] as [number, number, number],
   myHomeRotationY: Math.PI / 2,
-  myHomeEntrance: [-24.8, 0.75, -6] as [number, number, number],
-  myHomeExitSpawn: [-22.8, 0.75, -4.5] as [number, number, number],
-  // Reaches well behind the tower (base back ~z -53) so the avatar can walk all
-  // the way around it, and stays inside the 135-unit meadow / following backdrop.
-  playableBounds: { minX: -54, maxX: 54, minZ: -60, maxZ: 54 },
-  roamEllipse: { centerZ: -4, radiusX: 53, radiusZ: 59 },
+  myHomeEntrance: [-54.8, 0.75, 24] as [number, number, number],
+  myHomeExitSpawn: [-52.8, 0.75, 25.5] as [number, number, number],
+  // Reaches well behind the tower (base back ~z -53) and far enough left to reach
+  // the relocated My Home, while staying inside the 135-unit meadow / backdrop.
+  playableBounds: { minX: -64, maxX: 54, minZ: -60, maxZ: 54 },
+  roamEllipse: { centerZ: -4, radiusX: 66, radiusZ: 59 },
   pathPoints: [
     [2.5, 52],
     [3.4, 43],
@@ -36,11 +38,11 @@ export const CENTRAL_WORLD_CONFIG = {
     [0, -38.5],
   ] as Array<[number, number]>,
   myHomePathPoints: [
-    [-0.8, -7],
-    [-6, -6.8],
-    [-12.5, -6.2],
-    [-18.5, -5.8],
-    [-24.8, -6],
+    [-1.4, 10],
+    [-16, 14],
+    [-30, 18],
+    [-44, 22],
+    [-54.8, 24],
   ] as Array<[number, number]>,
   futureZones: {
     west: [-19, 0, -4] as [number, number, number],
