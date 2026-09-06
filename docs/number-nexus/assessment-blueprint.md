@@ -973,7 +973,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### Cross-Realm Boundary
 
-- **AC9M3A01, AC9M3A02, AC9M3A03 -> Pattern Peaks (Algebra):** From Level 3 onward, Algebra is exclusively owned by Pattern Peaks; Number Nexus contains no AC9M3A-coded lessons or quizzes.
+- **AC9M3A01, AC9M3A02, AC9M3A03, AC9M3A04 -> Pattern Peaks (Algebra):** From Level 3 onward, Algebra is exclusively owned by Pattern Peaks; Number Nexus contains no AC9M3A-coded lessons or quizzes.
 
 ## Year 4
 

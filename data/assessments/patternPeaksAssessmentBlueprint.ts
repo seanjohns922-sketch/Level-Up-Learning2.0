@@ -34,9 +34,10 @@ export type PatternPeaksAssessmentBlueprint = {
 };
 
 const DESCRIPTIONS: Record<string, string> = {
-  AC9M3A01: "Recognise, continue and create patterns using doubling and halving.",
-  AC9M3A02: "Use relationships between addition and subtraction to find unknown values.",
-  AC9M3A03: "Extend and apply patterns in addition and multiplication facts.",
+  AC9M3A01: "Recognise addition and subtraction as inverse operations, partition numbers and find unknown values in number sentences.",
+  AC9M3A02: "Extend and apply addition and subtraction facts to 20 to calculate efficiently with larger numbers.",
+  AC9M3A03: "Recall multiplication facts for 3, 4, 5 and 10 and apply the related division facts.",
+  AC9M3A04: "Describe, follow and create algorithms to investigate numbers, including odd, even and multiples patterns.",
   AC9M4A01: "Find unknown values in equivalent addition and subtraction equations.",
   AC9M4A02: "Recall and use multiplication facts and related division facts.",
   AC9M5A01: "Continue and create extended additive sequences with natural numbers, fractions and decimals, and explain emerging patterns.",
@@ -48,7 +49,7 @@ const DESCRIPTIONS: Record<string, string> = {
 };
 
 const ALLOCATIONS: Record<PatternPeaksLevel, number[]> = {
-  3: [7, 7, 6],
+  3: [5, 5, 5, 5],
   4: [10, 10],
   5: [6, 8, 6],
   6: [7, 6, 7],

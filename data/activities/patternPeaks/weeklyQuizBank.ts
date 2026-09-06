@@ -19,6 +19,26 @@ function sequenceQuestion(level: PatternQuizLevel, week: number, lesson: number,
   const seed = level * 100 + week * 20 + lesson * 5 + variant;
 
   if (level === 3) {
+    if (week === 2) {
+      if (lesson === 1) {
+        const base = [2, 3, 5, 10][variant % 4]!;
+        const start = 2 + variant;
+        const values = Array.from({ length: 6 }, (_, index) => base * (start + index));
+        return typed("Type the missing multiple.", values[5]!, { type: "pattern_sequence_strip", title: `Multiples of ${base}`, terms: values.slice(0, 5).map(String).concat("?") });
+      }
+      if (lesson === 2) {
+        const input = 14 + (seed % 35);
+        const even = input % 2 === 0;
+        return typed(
+          "Follow the odd-or-even path. What is the output?",
+          even ? input / 2 : input + 1,
+          { type: "decision_path_card", title: "Odd or even algorithm", input: String(input), decision: "Is the number even?", passLabel: "Yes: halve it", failLabel: "No: add 1", activeBranch: even ? "pass" : "fail" },
+        );
+      }
+      const input = 3 + (seed % 10);
+      const add = [2, 3, 5, 10][variant % 4]!;
+      return typed("Follow both algorithm steps.", (input + add) * 2, { type: "expression_flow", title: "Two-step algorithm", cards: [{ label: "Input", tokens: [String(input)] }, { label: "Step 1", tokens: ["add", String(add)] }, { label: "Step 2", tokens: ["double"], result: "?" }] });
+    }
     if (week <= 2) {
       const doubling = (lesson + variant) % 2 === 0;
       const start = doubling ? 2 + (seed % 5) : (3 + (seed % 5)) * 8;

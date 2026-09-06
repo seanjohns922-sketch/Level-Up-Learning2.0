@@ -272,6 +272,77 @@ function roleFor(activity: LessonActivity): RotationRole {
 }
 
 function year3Question(week: number, lessonNumber: number, role: RotationRole): Year2QuestionData {
+  if (week === 2) {
+    const base = pick([2, 3, 5, 10]);
+    const startMultiplier = rand(1, 5);
+    const multiples = Array.from({ length: 6 }, (_, index) => base * (startMultiplier + index));
+
+    if (lessonNumber === 1) {
+      if (role === "reasoning") {
+        return mcq(
+          "Which rule generates every number?",
+          `Add ${base}`,
+          [`Add ${base + 1}`, `Double each number`, `Subtract ${base}`],
+          "Check the same rule between every pair.",
+          sequenceVisual(`Multiples of ${base}`, multiples.slice(0, 5)),
+        );
+      }
+      const missingIndex = role === "apply_create" ? 4 : 2;
+      return typed(
+        "Type the missing multiple.",
+        multiples[missingIndex]!,
+        `These are multiples of ${base}.`,
+        sequenceVisual(
+          `Follow the multiples of ${base}`,
+          multiples.slice(0, 5).map((value, index) => index === missingIndex ? "?" : value),
+          Array.from({ length: 4 }, () => `+${base}`),
+        ),
+      );
+    }
+
+    if (lessonNumber === 2) {
+      const input = rand(12, 49);
+      const even = input % 2 === 0;
+      const output = even ? input / 2 : input + 1;
+      const visual = decisionVisual({
+        title: "Odd or even path",
+        input,
+        decision: "Is the number even?",
+        passLabel: "Yes: halve it",
+        failLabel: "No: add 1",
+        activeBranch: even ? "pass" : "fail",
+      });
+      if (role === "reasoning") {
+        return mcq(
+          `Which path does ${input} follow?`,
+          even ? "Even path" : "Odd path",
+          [even ? "Odd path" : "Even path", "Both paths"],
+          "Decide whether the input can be shared into pairs with none left over.",
+          visual,
+        );
+      }
+      return typed("Follow the decision path. What is the output?", output, "Apply only the matching branch.", visual);
+    }
+
+    const input = rand(3, 12);
+    const add = pick([2, 3, 5, 10]);
+    const output = (input + add) * 2;
+    const flow: QuestionVisual = {
+      type: "expression_flow",
+      title: "Two-step number algorithm",
+      cards: [
+        { label: "Input", tokens: [String(input)] },
+        { label: "Step 1", tokens: ["add", String(add)] },
+        { label: "Step 2", tokens: ["double"], result: "?" },
+      ],
+    };
+    if (role === "reasoning") {
+      const wrongOrder = input * 2 + add;
+      return mcq("Which output follows both steps in order?", output, [wrongOrder, output + add], "Complete Step 1 before Step 2.", flow);
+    }
+    return typed("Follow both steps. What is the final output?", output, "Keep the steps in the stated order.", flow);
+  }
+
   if (week <= 2) {
     // Keep the arithmetic varied while ensuring every halving sequence stays in whole numbers.
     // Lesson 1.2 deliberately includes both operations in every three-activity rotation.

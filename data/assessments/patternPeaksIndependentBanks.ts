@@ -54,34 +54,66 @@ function authoredQuestion(
   let archetype = index % 5;
 
   if (level === 3) {
-    if (descriptorCode === "AC9M3A01") archetype = index % 2;
-    if (descriptorCode === "AC9M3A02") {
-      const whole = 38 + (seed % 45); const part = 12 + (index % 18);
-      return index % 2 === 0
-        ? { question: { kind: "typed_response", prompt: "Find the missing addend.", answer: String(whole - part), visual: { type: "inverse_step_card", title: "Addition equation", equation: `${part} + ? = ${whole}`, inverseOperation: `${whole} − ${part}` } }, structure: "add-sub-inverse" }
-        : { question: { kind: "typed_response", prompt: "Find the missing value that keeps both sides equal.", answer: String(whole - part), visual: { type: "balance_equation_card", title: "Relational equality", left: String(whole), right: `${part} + ?` } }, structure: "relational-equality" };
+    if (descriptorCode === "AC9M3A01") {
+      archetype = descriptorIndex % 3;
+      const whole = 54 + descriptorIndex * 9 + (seed % 18);
+      const part = 16 + descriptorIndex * 3 + (seed % 9);
+      if (archetype === 0) {
+        return { question: { kind: "typed_response", prompt: "Find the unknown addend.", answer: String(whole - part), visual: { type: "unknown_tile_equation", title: "Addition unknown", left: `${part} + ?`, right: String(whole) } }, structure: "add-sub-inverse" };
+      }
+      if (archetype === 1) {
+        const remainder = whole - part;
+        return { question: { kind: "typed_response", prompt: "Find the missing part.", answer: String(part), visual: { type: "unknown_tile_equation", title: "Subtraction unknown", left: `${whole} − ?`, right: String(remainder) } }, structure: "subtraction-unknown" };
+      }
+      const firstPartition = 20 + descriptorIndex * 4;
+      return { question: { kind: "typed_response", prompt: "Complete the equivalent number sentence.", answer: String(whole - firstPartition), visual: { type: "balance_equation_card", title: "Partition the same total", left: String(whole), right: `${firstPartition} + ?` } }, structure: "partition-equivalence" };
     }
-    if (descriptorCode === "AC9M3A03") archetype = index % 2 === 0 ? 2 : 4;
+
+    if (descriptorCode === "AC9M3A02") {
+      archetype = descriptorIndex % 2;
+      const first = 6 + ((seed + descriptorIndex) % 5);
+      const second = 5 + ((seed + descriptorIndex * 2) % 6);
+      if (archetype === 0) {
+        const scale = descriptorIndex >= 3 ? 100 : 10;
+        return { question: { kind: "typed_response", prompt: "Extend the addition fact to calculate the larger sum.", answer: String((first + second) * scale), visual: { type: "expression_flow", title: "Extend a known addition fact", cards: [{ label: "Known fact", tokens: [String(first), "+", String(second), "=", String(first + second)] }, { label: "Larger calculation", tokens: [String(first * scale), "+", String(second * scale)], result: "?" }] } }, structure: "derived-addition-fact" };
+      }
+      const total = first + second;
+      const scale = descriptorIndex >= 3 ? 100 : 10;
+      return { question: { kind: "typed_response", prompt: "Extend the subtraction fact to calculate the larger difference.", answer: String(first * scale), visual: { type: "expression_flow", title: "Extend a known subtraction fact", cards: [{ label: "Known fact", tokens: [String(total), "−", String(second), "=", String(first)] }, { label: "Larger calculation", tokens: [String(total * scale), "−", String(second * scale)], result: "?" }] } }, structure: "derived-subtraction-fact" };
+    }
+
+    if (descriptorCode === "AC9M3A03") {
+      const factor = [3, 4, 5, 10][descriptorIndex % 4]!;
+      const other = 4 + ((seed + descriptorIndex) % 7);
+      const product = factor * other;
+      if (descriptorIndex === 4) {
+        return { question: { kind: "typed_response", prompt: "Find the value that makes both related facts true.", answer: String(other), visual: { type: "expression_flow", title: "Connected multiplication and division facts", cards: [{ tokens: [String(factor), "×", "?", "=", String(product)] }, { tokens: [String(product), "÷", "?", "=", String(factor)] }] } }, structure: "connected-fact-family" };
+      }
+      if (descriptorIndex % 2 === 0) {
+        return { question: { kind: "typed_response", prompt: "Find the product.", answer: String(product), visual: { type: "unknown_tile_equation", title: `${factor} multiplication fact`, left: `${factor} × ${other}`, right: "?" } }, structure: "multiplication-fact" };
+      }
+      return { question: { kind: "typed_response", prompt: "Find the related quotient.", answer: String(other), visual: { type: "unknown_tile_equation", title: "Related division fact", left: `${product} ÷ ${factor}`, right: "?" } }, structure: "related-division-fact" };
+    }
+
+    archetype = descriptorIndex % 3;
     if (archetype === 0) {
-      const start = 2 + (seed % 6);
-      const halve = index % 2 === 1;
-      const terms = halve ? [start * 8, start * 4, start * 2, start] : [start, start * 2, start * 4, start * 8];
-      return { question: { kind: "typed_response", prompt: "What number replaces the question mark?", answer: String(terms[3]), visual: { type: "pattern_sequence_strip", title: halve ? "Halving pattern" : "Doubling pattern", terms: [...terms.slice(0, 3).map(String), "?"] } }, structure: "extended-sequence" };
+      const base = [2, 3, 5, 10][descriptorIndex % 4]!;
+      const startMultiplier = 3 + descriptorIndex;
+      const terms = Array.from({ length: 6 }, (_, position) => base * (startMultiplier + position));
+      const missingPosition = descriptorIndex >= 3 ? 4 : 3;
+      return { question: { kind: "typed_response", prompt: "Follow the algorithm. Type the missing multiple.", answer: String(terms[missingPosition]), visual: { type: "pattern_sequence_strip", title: `Add ${base} each step`, terms: terms.map((value, position) => position === missingPosition ? "?" : String(value)) } }, structure: "multiple-algorithm" };
     }
     if (archetype === 1) {
-      const input = 4 + (seed % 12); const add = 3 + (index % 6);
-      return { question: { kind: "typed_response", prompt: "What is the missing output?", answer: String(input + add), visual: { type: "function_machine_card", title: "One-step function", input: String(input), rule: `+ ${add}`, output: "?" } }, structure: "function-machine" };
+      const input = 23 + descriptorIndex * 7;
+      const even = input % 2 === 0;
+      const hasFinalStep = descriptorIndex >= 4;
+      const branchResult = even ? input / 2 : input + 5;
+      const answer = hasFinalStep ? branchResult * 2 : branchResult;
+      return { question: { kind: "typed_response", prompt: hasFinalStep ? "Follow the decision branch, then double its result. What is the output?" : "Follow the correct decision branch. What is the output?", answer: String(answer), visual: { type: "decision_path_card", title: "Odd or even decision", input: String(input), decision: "Is the input even?", passLabel: hasFinalStep ? "Yes: halve, then double" : "Yes: halve it", failLabel: hasFinalStep ? "No: add 5, then double" : "No: add 5", activeBranch: even ? "pass" : "fail" } }, structure: "odd-even-algorithm" };
     }
-    if (archetype === 2) {
-      const factor = [3, 4, 5, 10][index % 4]!; const other = 3 + (seed % 8); const product = factor * other;
-      return { question: { kind: "typed_response", prompt: "Find the missing factor.", answer: String(other), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `${factor} × ? = ${product}`, inverseOperation: `${product} ÷ ${factor}` } }, structure: "inverse-fact" };
-    }
-    if (archetype === 3) {
-      const a = 18 + (seed % 24); const b = 7 + (index % 10); const c = 9 + (seed % 8);
-      return { question: { kind: "typed_response", prompt: "Make both sides equal.", answer: String(a + b - c), visual: { type: "balance_equation_card", title: "Equivalent sentence", left: `${a} + ${b}`, right: `${c} + ?` } }, structure: "relational-equality" };
-    }
-    const base = 4 + (seed % 7); const factor = [3, 4, 5, 10][index % 4]!;
-    return { question: { kind: "typed_response", prompt: "Calculate the missing product.", answer: String((base + 1) * factor), visual: { type: "expression_flow", title: "Related multiplication facts", cards: [{ tokens: [String(base), "×", String(factor)], result: String(base * factor) }, { tokens: [String(base + 1), "×", String(factor)], result: "?" }] } }, structure: "derived-fact" };
+    const input = 4 + descriptorIndex;
+    const add = [3, 5, 10][descriptorIndex % 3]!;
+    return { question: { kind: "typed_response", prompt: "Follow both steps in order. What is the final output?", answer: String((input + add) * 2), visual: { type: "expression_flow", title: "Two-step number algorithm", cards: [{ label: "Input", tokens: [String(input)] }, { label: "Step 1", tokens: ["add", String(add)] }, { label: "Step 2", tokens: ["double"], result: "?" }] } }, structure: "ordered-number-algorithm" };
   }
 
   if (level === 4) {
@@ -210,6 +242,10 @@ function authoredQuestion(
 
 function descriptorSlots(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind) {
   const blueprint = getPatternPeaksAssessmentBlueprint(level)!;
+  if (level === 3) {
+    const descriptorsByCode = new Map(blueprint.descriptors.map((descriptor) => [descriptor.code, descriptor]));
+    return Array.from({ length: 20 }, (_, index) => descriptorsByCode.get(["AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3A04"][index % 4]!)!);
+  }
   if (level === 4) {
     const [additionAndSubtraction, multiplicationAndDivision] = blueprint.descriptors;
     if (!additionAndSubtraction || !multiplicationAndDivision) return [];
@@ -257,6 +293,17 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
     const itemDifficulty = difficulty(difficulties[index]!);
     const cognitiveCategory = cognition(cognitive[index]!);
     const week = descriptor.weeks[index % descriptor.weeks.length] ?? 1;
+    const levelThreeMisconception = level === 3
+      ? core.structure.includes("algorithm")
+        ? core.structure.includes("multiple") ? "pp-rule-from-one-step" : "pp-algorithm-branch-error"
+        : core.structure.includes("derived-")
+          ? "pp-additive-fact-extension"
+          : core.structure.includes("multiplication") || core.structure.includes("division") || core.structure.includes("fact-family")
+            ? "pp-related-fact-confusion"
+            : core.structure.includes("partition")
+              ? "pp-equals-answer-cue"
+              : "pp-operation-direction"
+      : undefined;
     const levelFiveMisconception = level === 5
       ? core.structure.includes("sequence")
         ? "pp-sequence-step-confusion"
@@ -270,9 +317,9 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
                 ? "pp-systematic-search-gap"
                 : "pp-factor-multiple-confusion"
       : undefined;
-    const misconception = levelFiveMisconception ?? descriptor.misconceptionIds[index % Math.max(1, descriptor.misconceptionIds.length)];
+    const misconception = levelThreeMisconception ?? levelFiveMisconception ?? descriptor.misconceptionIds[index % Math.max(1, descriptor.misconceptionIds.length)];
     const shortForm = form === "pretest" ? "pre" : "post";
-    const contentVersion = level === 5 ? 2 : 1;
+    const contentVersion = level === 3 || level === 5 ? 2 : 1;
     const id = `pattern-peaks-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v${contentVersion}`;
     const options = question.kind === "multiple_choice" ? question.options.map((label, optionIndex) => ({ id: String(optionIndex), label })) : undefined;
     const correctIndex = question.kind === "multiple_choice" ? question.options.indexOf(question.answer) : -1;

@@ -13,9 +13,10 @@ const levels = [3, 4, 5, 6] as const;
 const root = process.cwd();
 const selectedMaximum = { 3: 4, 4: 3, 5: 2, 6: 1 } as const;
 const descriptorStructures: Record<string, string[]> = {
-  AC9M3A01: ["extended-sequence", "function-machine"],
-  AC9M3A02: ["add-sub-inverse", "relational-equality"],
-  AC9M3A03: ["inverse-fact", "derived-fact"],
+  AC9M3A01: ["add-sub-inverse", "subtraction-unknown", "partition-equivalence"],
+  AC9M3A02: ["derived-addition-fact", "derived-subtraction-fact"],
+  AC9M3A03: ["multiplication-fact", "related-division-fact", "connected-fact-family"],
+  AC9M3A04: ["multiple-algorithm", "odd-even-algorithm", "ordered-number-algorithm"],
   AC9M4A01: ["unknown-position", "inverse-add-sub", "regroup-addends"],
   AC9M4A02: ["missing-factor-right", "missing-factor-left", "related-division-quotient", "related-division-divisor"],
   AC9M5A01: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence"],
@@ -129,7 +130,7 @@ for (const level of levels) {
 assert.equal(totalAssessmentItems, 140);
 
 const requiredStructures: Record<number, string[]> = {
-  3: ["extended-sequence", "function-machine", "inverse-fact", "relational-equality", "derived-fact"],
+  3: ["add-sub-inverse", "subtraction-unknown", "partition-equivalence", "derived-addition-fact", "derived-subtraction-fact", "multiplication-fact", "related-division-fact", "connected-fact-family", "multiple-algorithm", "odd-even-algorithm", "ordered-number-algorithm"],
   4: ["unknown-position", "inverse-add-sub", "regroup-addends", "missing-factor-right", "missing-factor-left", "related-division-quotient", "related-division-divisor"],
   5: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence", "multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence", "factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
   6: ["stage-generalisation", "multi-representation-rule", "bracket-order", "reverse-algorithm", "three-step-algorithm"],
@@ -158,6 +159,27 @@ for (const form of ["pretest", "posttest"] as const) {
     );
   }
 }
+
+const levelThreeItems = getPatternPeaksIndependentAssessment(3, "posttest");
+assert.deepEqual(
+  ["AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3A04"].map((code) => levelThreeItems.filter((item) => item.primaryDescriptorCode === code).length),
+  [5, 5, 5, 5],
+  "Year 3 Post-Test must allocate five items to every Algebra descriptor",
+);
+for (let index = 1; index < levelThreeItems.length; index += 1) {
+  assert.notEqual(levelThreeItems[index]!.primaryDescriptorCode, levelThreeItems[index - 1]!.primaryDescriptorCode, "Year 3 standards must be interleaved");
+}
+for (const code of ["AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3A04"]) {
+  for (const structure of descriptorStructures[code]!) {
+    assert.ok(levelThreeItems.some((item) => item.primaryDescriptorCode === code && item.structureKey.includes(structure)), `Year 3 Post-Test must include ${structure}`);
+  }
+}
+const levelThreeMaths = levelThreeItems.map((item) => {
+  assert.equal(item.practiceTask?.kind, "patternPeaksQuestion");
+  const question = item.practiceTask.question;
+  return JSON.stringify({ ...question, prompt: question.prompt.replace(/^Peak South-\d+:\s*/, "") });
+});
+assert.equal(new Set(levelThreeMaths).size, 20, "Year 3 Post-Test must not repeat a mathematical item");
 
 for (const form of ["pretest", "posttest"] as const) {
   const levelFiveItems = getPatternPeaksIndependentAssessment(5, form);

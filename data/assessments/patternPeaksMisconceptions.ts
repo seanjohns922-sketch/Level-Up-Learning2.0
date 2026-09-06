@@ -1,7 +1,9 @@
 export const PATTERN_PEAKS_MISCONCEPTION_LIBRARY = [
-  { id: "pp-rule-from-one-step", descriptorCodes: ["AC9M3A01"], description: "Infers a rule from one transition without checking every term." },
-  { id: "pp-operation-direction", descriptorCodes: ["AC9M3A02", "AC9M4A01"], description: "Uses the original operation instead of its inverse." },
-  { id: "pp-equals-answer-cue", descriptorCodes: ["AC9M3A02", "AC9M4A01"], description: "Treats equals as an instruction to calculate rather than a relation." },
+  { id: "pp-rule-from-one-step", descriptorCodes: ["AC9M3A04"], description: "Infers an algorithm from one step without checking every input or transition." },
+  { id: "pp-operation-direction", descriptorCodes: ["AC9M3A01", "AC9M4A01"], description: "Uses the original operation instead of its inverse." },
+  { id: "pp-equals-answer-cue", descriptorCodes: ["AC9M3A01", "AC9M4A01"], description: "Treats equals as an instruction to calculate rather than a relation." },
+  { id: "pp-additive-fact-extension", descriptorCodes: ["AC9M3A02"], description: "Does not preserve a known addition or subtraction fact when extending it to larger place values." },
+  { id: "pp-algorithm-branch-error", descriptorCodes: ["AC9M3A04"], description: "Chooses the wrong decision branch or performs algorithm steps in the wrong order." },
   { id: "pp-sequence-step-confusion", descriptorCodes: ["AC9M5A01"], description: "Applies an inconsistent additive step or changes the wrong part of a fraction or decimal sequence." },
   { id: "pp-related-fact-confusion", descriptorCodes: ["AC9M3A03", "AC9M4A02", "AC9M5A02"], description: "Does not preserve a product or fact family when transforming a fact." },
   { id: "pp-property-overgeneralisation", descriptorCodes: ["AC9M4A01", "AC9M5A02"], description: "Applies a multiplication or addition property to subtraction or division." },
