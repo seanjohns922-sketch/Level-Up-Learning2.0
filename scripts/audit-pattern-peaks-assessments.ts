@@ -22,9 +22,9 @@ const descriptorStructures: Record<string, string[]> = {
   AC9M5A01: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence"],
   AC9M5A02: ["multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence"],
   AC9M5A03: ["factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
-  AC9M6A01: ["stage-generalisation", "rational-sequence"],
-  AC9M6A02: ["multi-representation-rule", "three-step-algorithm"],
-  AC9M6A03: ["bracket-order", "reverse-algorithm"],
+  AC9M6A01: ["natural-number-sequence", "decimal-sequence", "fraction-sequence", "reverse-sequence", "sequence-rule-transfer", "visual-stage-generalisation", "rational-rule-transfer"],
+  AC9M6A02: ["bracket-order", "bracketed-unknown", "bracketed-equivalence", "two-sided-unknown", "connected-bracketed-equations", "bracket-placement-comparison"],
+  AC9M6A03: ["follow-function-machine", "infer-function-rule", "compare-function-machines", "debug-function-machine", "branching-number-algorithm", "reverse-number-algorithm", "generated-number-set"],
 };
 const assessmentCoachingPattern = /\b(use the|undo|regroup|check both sides|calculate efficiently|brackets first|inverse operation|follow the full algorithm)\b/i;
 
@@ -133,7 +133,7 @@ const requiredStructures: Record<number, string[]> = {
   3: ["add-sub-inverse", "subtraction-unknown", "partition-equivalence", "derived-addition-fact", "derived-subtraction-fact", "multiplication-fact", "related-division-fact", "connected-fact-family", "multiple-algorithm", "odd-even-algorithm", "ordered-number-algorithm"],
   4: ["unknown-addend", "unknown-subtrahend", "unknown-minuend", "balanced-addition-equation", "compensating-equivalence", "connected-addition-equations", "multiplication-product", "multiplication-unknown", "division-quotient", "division-unknown", "derived-multiplication-fact", "connected-fact-family"],
   5: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence", "multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence", "factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
-  6: ["stage-generalisation", "multi-representation-rule", "bracket-order", "reverse-algorithm", "three-step-algorithm"],
+  6: ["natural-number-sequence", "decimal-sequence", "fraction-sequence", "reverse-sequence", "sequence-rule-transfer", "visual-stage-generalisation", "rational-rule-transfer", "bracket-order", "bracketed-unknown", "bracketed-equivalence", "two-sided-unknown", "connected-bracketed-equations", "bracket-placement-comparison", "follow-function-machine", "infer-function-rule", "compare-function-machines", "debug-function-machine", "branching-number-algorithm", "reverse-number-algorithm", "generated-number-set"],
 };
 for (const level of levels) {
   const structures = getPatternPeaksIndependentAssessment(level, "posttest").map((item) => item.structureKey);
@@ -258,6 +258,42 @@ assert.equal(
   levelFivePostPayloads.filter((payload) => levelFivePrePayloads.has(payload)).length,
   0,
   "Year 5 Pre and Post must not reuse mathematically identical items",
+);
+
+const normaliseLevelSixTask = (item: ReturnType<typeof getPatternPeaksIndependentAssessment>[number]) => {
+  if (item.practiceTask?.kind !== "patternPeaksQuestion") return "";
+  const question = item.practiceTask.question;
+  return JSON.stringify({
+    ...question,
+    prompt: question.prompt.replace(/^Peak (North|South)-\d+:\s*/, ""),
+  });
+};
+for (const form of ["pretest", "posttest"] as const) {
+  const items = getPatternPeaksIndependentAssessment(6, form);
+  assert.deepEqual(
+    ["AC9M6A01", "AC9M6A02", "AC9M6A03"].map((code) => items.filter((item) => item.primaryDescriptorCode === code).length),
+    [7, 6, 7],
+    `Year 6 ${form} must preserve the 7/6/7 standards allocation`,
+  );
+  for (let index = 1; index < items.length; index += 1) {
+    assert.notEqual(items[index]!.primaryDescriptorCode, items[index - 1]!.primaryDescriptorCode, `Year 6 ${form} standards must be interleaved`);
+  }
+  for (const code of ["AC9M6A01", "AC9M6A02", "AC9M6A03"]) {
+    for (const structure of descriptorStructures[code]!) {
+      assert.ok(
+        items.some((item) => item.primaryDescriptorCode === code && item.structureKey.includes(structure)),
+        `Year 6 ${form} must include ${structure}`,
+      );
+    }
+  }
+  assert.equal(new Set(items.map(normaliseLevelSixTask)).size, 20, `Year 6 ${form} must contain 20 mathematically distinct items`);
+}
+const levelSixPrePayloads = new Set(getPatternPeaksIndependentAssessment(6, "pretest").map(normaliseLevelSixTask));
+const levelSixPostPayloads = getPatternPeaksIndependentAssessment(6, "posttest").map(normaliseLevelSixTask);
+assert.equal(
+  levelSixPostPayloads.filter((payload) => levelSixPrePayloads.has(payload)).length,
+  0,
+  "Year 6 Pre-Test and Post-Test must not reuse an identical mathematical item",
 );
 
 const weeklySource = readFileSync(`${root}/data/activities/patternPeaks/weeklyQuizBank.ts`, "utf8");

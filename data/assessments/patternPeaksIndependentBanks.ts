@@ -248,29 +248,128 @@ function authoredQuestion(
     return { question: { kind: "typed_response", prompt: `How many multiples of ${base} are there from ${lower} to ${upper}, including both endpoints?`, answer: String(count), visual: { type: "pattern_sequence_strip", title: "Systematic multiple search", terms: [String(lower), "…", String(upper)] } }, structure: "multiple-search-algorithm" };
   }
 
-  archetype = descriptorCode === "AC9M6A01" ? 0 : descriptorCode === "AC9M6A02" ? (index % 2 === 0 ? 1 : 4) : (index % 2 === 0 ? 2 : 3);
-  if (archetype === 0) {
-    if (index % 2 === 1) {
-      const denominator = 4 + (seed % 5); const start = 1 + (index % 3); const step = 1 + (seed % 3);
-      return { question: { kind: "typed_response", prompt: "Continue the rational-number pattern. Give the missing numerator.", answer: String(start + 4 * step), visual: { type: "pattern_sequence_strip", title: `Equal steps with denominator ${denominator}`, terms: [0, 1, 2, 3].map((position) => `${start + position * step}/${denominator}`).concat(`?/${denominator}`) } }, structure: "rational-sequence" };
+  const formShift = form === "posttest" ? 2 : 0;
+
+  if (descriptorCode === "AC9M6A01") {
+    archetype = descriptorIndex % 7;
+    if (archetype === 0) {
+      const start = 18 + formShift * 7 + descriptorIndex * 3;
+      const step = 7 + ((seed + descriptorIndex) % 8);
+      const terms = Array.from({ length: 7 }, (_, position) => start + position * step);
+      const missingPosition = 5;
+      return { question: { kind: "typed_response", prompt: "Complete the extended number sequence.", answer: String(terms[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Natural-number sequence", terms: terms.map((value, position) => position === missingPosition ? "?" : String(value)) } }, structure: "natural-number-sequence" };
     }
-    const start = 3 + (seed % 6); const step = 4 + (index % 7);
-    return { question: { kind: "typed_response", prompt: "Generalise the growth rule. How many tiles are in Stage 10?", answer: String(start + 9 * step), visual: { type: "growing_pattern", title: "Visual growth", stages: [1, 2, 3, 4].map((stage) => ({ label: `Stage ${stage}`, count: start + (stage - 1) * step, style: "tiles" })) } }, structure: "stage-generalisation" };
+    if (archetype === 1) {
+      const start = 0.4 + formShift * 0.15;
+      const step = [0.25, 0.35, 0.45][(descriptorIndex + formShift) % 3]!;
+      const terms = Array.from({ length: 7 }, (_, position) => Number((start + position * step).toFixed(2)));
+      const missingPosition = 5;
+      return { question: { kind: "typed_response", prompt: "Complete the extended decimal sequence.", answer: String(terms[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Decimal sequence", terms: terms.map((value, position) => position === missingPosition ? "?" : String(value)) } }, structure: "decimal-sequence" };
+    }
+    if (archetype === 2) {
+      const denominator = [5, 6, 8, 10][(descriptorIndex + formShift) % 4]!;
+      const numeratorStart = 1 + formShift;
+      const numeratorStep = 2 + ((descriptorIndex + formShift) % 3);
+      const numerators = Array.from({ length: 7 }, (_, position) => numeratorStart + position * numeratorStep);
+      const missingPosition = 5;
+      return { question: { kind: "typed_response", prompt: "What numerator completes this extended fraction sequence?", answer: String(numerators[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Fraction sequence", terms: numerators.map((value, position) => position === missingPosition ? `?/${denominator}` : `${value}/${denominator}`) } }, structure: "fraction-sequence" };
+    }
+    if (archetype === 3) {
+      const step = 6 + ((seed + formShift) % 7);
+      const start = 30 + formShift * 9;
+      const terms = Array.from({ length: 6 }, (_, position) => start + position * step);
+      return { question: { kind: "typed_response", prompt: "Work backwards to find the missing first term.", answer: String(terms[0]), visual: { type: "pattern_sequence_strip", title: "Reverse an additive sequence", terms: terms.map((value, position) => position === 0 ? "?" : String(value)) } }, structure: "reverse-sequence" };
+    }
+    if (archetype === 4) {
+      const start = 12 + formShift * 5;
+      const step = 9 + ((seed + descriptorIndex) % 7);
+      const targetPosition = form === "posttest" ? 14 : 12;
+      return { question: { kind: "typed_response", prompt: `The sequence adds ${step} each time. What is term ${targetPosition}?`, answer: String(start + (targetPosition - 1) * step), visual: { type: "pattern_sequence_strip", title: "Apply the sequence rule", terms: [0, 1, 2, 3].map((position) => String(start + position * step)).concat(`Term ${targetPosition}: ?`) } }, structure: "sequence-rule-transfer" };
+    }
+    if (archetype === 5) {
+      const start = 4 + formShift;
+      const step = 5 + ((seed + descriptorIndex) % 7);
+      const stages = [1, 2, 3, 4].map((stage) => ({ label: `Stage ${stage}`, count: start + (stage - 1) * step, style: "tiles" as const }));
+      const targetStage = form === "posttest" ? 12 : 10;
+      return { question: { kind: "typed_response", prompt: `How many tiles are in Stage ${targetStage}?`, answer: String(start + (targetStage - 1) * step), visual: { type: "growing_pattern", title: "Visually growing pattern", stages } }, structure: "visual-stage-generalisation" };
+    }
+    const denominator = [6, 8, 10][formShift % 3]!;
+    const numeratorStart = 2 + formShift;
+    const firstStep = 3 + formShift;
+    const secondStep = 5 + formShift;
+    const targetPosition = form === "posttest" ? 10 : 9;
+    const numerators = [numeratorStart];
+    for (let position = 1; position < targetPosition; position += 1) {
+      numerators.push(numerators[position - 1]! + (position % 2 === 1 ? firstStep : secondStep));
+    }
+    return { question: { kind: "typed_response", prompt: `The numerator increases by ${firstStep}, then ${secondStep}, repeating. What is the numerator of term ${targetPosition}?`, answer: String(numerators[targetPosition - 1]), visual: { type: "pattern_sequence_strip", title: "Alternating rational-number rule", terms: numerators.slice(0, 5).map((value) => `${value}/${denominator}`).concat(`Term ${targetPosition}: ?/${denominator}`) } }, structure: "rational-rule-transfer" };
+  }
+
+  if (descriptorCode === "AC9M6A02") {
+    archetype = descriptorIndex % 6;
+    const a = 5 + ((seed + descriptorIndex) % 9);
+    const b = 3 + ((seed + formShift) % 7);
+    const outside = 2 + ((descriptorIndex + formShift) % 4);
+    if (archetype === 0) {
+      return { question: { kind: "typed_response", prompt: "Calculate the bracketed expression.", answer: String((a + b) * outside), visual: { type: "bracket_equation_card", title: "Brackets and operation order", left: `(${a} + ${b}) × ${outside}`, right: "?", bracketGroup: `${a} + ${b}`, outsideFactor: `× ${outside}` } }, structure: "bracket-order" };
+    }
+    if (archetype === 1) {
+      const unknown = 7 + ((seed + descriptorIndex) % 12);
+      return { question: { kind: "typed_response", prompt: "Find the unknown inside the brackets.", answer: String(unknown), visual: { type: "bracket_equation_card", title: "Unknown inside brackets", left: `(? + ${b}) × ${outside}`, right: String((unknown + b) * outside), bracketGroup: `? + ${b}`, outsideFactor: `× ${outside}` } }, structure: "bracketed-unknown" };
+    }
+    if (archetype === 2) {
+      const known = a * outside;
+      return { question: { kind: "typed_response", prompt: "What number completes these equivalent bracketed expressions?", answer: String(b * outside), visual: { type: "balance_equation_card", title: "Equivalent expressions with brackets", left: `(${a} + ${b}) × ${outside}`, right: `${known} + ?` } }, structure: "bracketed-equivalence" };
+    }
+    if (archetype === 3) {
+      const unknown = 8 + ((seed + descriptorIndex) % 13);
+      const rightExtra = 4 + formShift;
+      return { question: { kind: "typed_response", prompt: "Find the unknown that makes both sides equal.", answer: String(unknown), visual: { type: "balance_equation_card", title: "Unknown on either side", left: `(? + ${b}) × ${outside}`, right: `${(unknown + b) * outside - rightExtra} + ${rightExtra}` } }, structure: "two-sided-unknown" };
+    }
+    if (archetype === 4) {
+      const unknown = 9 + ((seed + descriptorIndex) % 12);
+      const total = (unknown + b) * outside;
+      return { question: { kind: "typed_response", prompt: "One value makes both equivalent equations true. Find it.", answer: String(unknown), visual: { type: "expression_flow", title: "Connected bracketed equations", cards: [{ tokens: ["(?", "+", String(b), ")", "×", String(outside), "=", String(total)] }, { tokens: ["?", "×", String(outside), "+", String(b * outside), "=", String(total)] }] } }, structure: "connected-bracketed-equations" };
+    }
+    const withoutBrackets = a + b * outside;
+    const withBrackets = (a + b) * outside;
+    return { question: { kind: "typed_response", prompt: "How much does adding the brackets change the value?", answer: String(withBrackets - withoutBrackets), visual: { type: "expression_flow", title: "Compare bracket placement", cards: [{ label: "Without brackets", tokens: [String(a), "+", String(b), "×", String(outside)] }, { label: "With brackets", tokens: ["(", String(a), "+", String(b), ")", "×", String(outside)] }, { label: "Difference", tokens: ["?"] }] } }, structure: "bracket-placement-comparison" };
+  }
+
+  archetype = descriptorIndex % 7;
+  const input = 4 + ((seed + descriptorIndex) % 9);
+  const add = 3 + ((seed + formShift) % 7);
+  const multiply = 2 + ((descriptorIndex + formShift) % 3);
+  const output = (input + add) * multiply;
+  if (archetype === 0) {
+    return { question: { kind: "typed_response", prompt: "Follow the function machine. What is the output?", answer: String(output), visual: { type: "expression_flow", title: "Two-step function machine", cards: [{ label: "Input", tokens: [String(input)] }, { label: "Step 1", tokens: ["add", String(add)] }, { label: "Step 2", tokens: ["multiply by", String(multiply)], result: "?" }] } }, structure: "follow-function-machine" };
   }
   if (archetype === 1) {
-    const multiply = 2 + (index % 4); const add = 3 + (seed % 8); const input = 5 + (index % 7);
-    return { question: { kind: "typed_response", prompt: "What is the missing output?", answer: String(input * multiply + add), visual: { type: "input_output_table", title: `Multiply by ${multiply}, then add ${add}`, pairs: [1, 2, 4].map((value) => ({ input: String(value), output: String(value * multiply + add) })).concat({ input: String(input), output: "?" }) } }, structure: "multi-representation-rule" };
+    const tableInputs = [1, 3, 5, input];
+    return { question: { kind: "typed_response", prompt: "Infer the machine rule from every row. What is the missing output?", answer: String(input * multiply + add), visual: { type: "input_output_table", title: "Unknown function-machine rule", pairs: tableInputs.map((value, position) => ({ input: String(value), output: position === tableInputs.length - 1 ? "?" : String(value * multiply + add) })) } }, structure: "infer-function-rule" };
   }
   if (archetype === 2) {
-    const a = 3 + (seed % 8); const b = 2 + (index % 6); const outside = 2 + (seed % 4);
-    return { question: { kind: "typed_response", prompt: "Calculate the value.", answer: String((a + b) * outside), visual: { type: "bracket_equation_card", title: "Bracketed expression", left: `(${a} + ${b}) × ${outside}`, right: "?", bracketGroup: `${a} + ${b}`, outsideFactor: `× ${outside}` } }, structure: "bracket-order" };
+    const first = input * multiply + add;
+    const second = (input + add) * multiply;
+    return { question: { kind: "typed_response", prompt: "Both machines receive the same input. What is the difference between their outputs?", answer: String(Math.abs(second - first)), visual: { type: "expression_flow", title: "Compare function machines", cards: [{ label: "Machine A", tokens: [String(input), "×", String(multiply), "+", String(add)], result: String(first) }, { label: "Machine B", tokens: ["(", String(input), "+", String(add), ")", "×", String(multiply)], result: String(second) }, { label: "Difference", tokens: ["?"] }] } }, structure: "compare-function-machines" };
   }
   if (archetype === 3) {
-    const unknown = 4 + (seed % 10); const add = 3 + (index % 7); const outside = 2 + (index % 4);
-    return { question: { kind: "typed_response", prompt: "Find the missing value in the bracketed equation.", answer: String(unknown), visual: { type: "bracket_equation_card", title: "Bracketed equation", left: `(? + ${add}) × ${outside}`, right: String((unknown + add) * outside), bracketGroup: `? + ${add}`, outsideFactor: `× ${outside}` } }, structure: "reverse-algorithm" };
+    const incorrect = output + 2 + formShift;
+    return { question: { kind: "typed_response", prompt: "The recorded output is wrong. What should the output be?", answer: String(output), visual: { type: "input_output_table", title: `Add ${add}, then multiply by ${multiply}`, pairs: [{ input: "2", output: String((2 + add) * multiply) }, { input: "5", output: String((5 + add) * multiply) }, { input: String(input), output: `${incorrect} (check)` }] } }, structure: "debug-function-machine" };
   }
-  const input = 4 + (seed % 9); const add = 2 + (index % 6); const multiply = 2 + (seed % 3);
-  return { question: { kind: "typed_response", prompt: "What is the final output?", answer: String((input + add) * multiply - 2), visual: { type: "expression_flow", title: "Three-step algorithm", cards: [{ label: "Start", tokens: [String(input)] }, { label: "Step 1", tokens: [String(input), "+", String(add)], result: String(input + add) }, { label: "Steps 2 and 3", tokens: [String(input + add), "×", String(multiply), "−", "2"], result: "?" }] } }, structure: "three-step-algorithm" };
+  if (archetype === 4) {
+    const even = input % 2 === 0;
+    const branchResult = even ? input / 2 : input + add;
+    const final = branchResult * multiply;
+    return { question: { kind: "typed_response", prompt: "Follow the decision and final algorithm step. What is the output?", answer: String(final), visual: { type: "decision_path_card", title: "Branching number algorithm", input: String(input), decision: "Is the input even?", passLabel: `Yes: halve, then multiply by ${multiply}`, failLabel: `No: add ${add}, then multiply by ${multiply}`, activeBranch: even ? "pass" : "fail" } }, structure: "branching-number-algorithm" };
+  }
+  if (archetype === 5) {
+    const finalOutput = output;
+    return { question: { kind: "typed_response", prompt: "Reverse the algorithm to find its input.", answer: String(input), visual: { type: "expression_flow", title: "Reverse a two-step algorithm", cards: [{ label: "Unknown input", tokens: ["?"] }, { label: "Step 1", tokens: ["add", String(add)] }, { label: "Step 2", tokens: ["multiply by", String(multiply)] }, { label: "Output", tokens: [String(finalOutput)] }] } }, structure: "reverse-number-algorithm" };
+  }
+  const inputs = [2, 4, 6];
+  const outputs = inputs.map((value) => (value + add) * multiply);
+  return { question: { kind: "typed_response", prompt: "The algorithm generates three outputs. What is their total?", answer: String(outputs.reduce((sum, value) => sum + value, 0)), visual: { type: "expression_flow", title: "Generate a number set", cards: [{ label: "Inputs", tokens: inputs.map(String) }, { label: "Rule for each input", tokens: ["add", String(add), "then multiply by", String(multiply)] }, { label: "Total of all three outputs", tokens: ["?"] }] } }, structure: "generated-number-set" };
 }
 
 function descriptorSlots(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind) {
@@ -303,6 +402,23 @@ function descriptorSlots(level: PatternPeaksLevel, form: PatternPeaksAssessmentK
       "AC9M5A02", "AC9M5A03", "AC9M5A01", "AC9M5A02", "AC9M5A02",
     ];
     return (form === "pretest" ? pretestCodes : posttestCodes).map((code) => descriptorsByCode.get(code)!);
+  }
+  if (level === 6) {
+    const descriptorsByCode = new Map(blueprint.descriptors.map((descriptor) => [descriptor.code, descriptor]));
+    const codes = form === "pretest"
+      ? [
+          "AC9M6A01", "AC9M6A02", "AC9M6A03", "AC9M6A01", "AC9M6A03",
+          "AC9M6A02", "AC9M6A01", "AC9M6A03", "AC9M6A02", "AC9M6A01",
+          "AC9M6A03", "AC9M6A02", "AC9M6A01", "AC9M6A03", "AC9M6A02",
+          "AC9M6A01", "AC9M6A03", "AC9M6A02", "AC9M6A01", "AC9M6A03",
+        ]
+      : [
+          "AC9M6A03", "AC9M6A02", "AC9M6A01", "AC9M6A03", "AC9M6A01",
+          "AC9M6A02", "AC9M6A03", "AC9M6A01", "AC9M6A02", "AC9M6A03",
+          "AC9M6A01", "AC9M6A02", "AC9M6A03", "AC9M6A01", "AC9M6A02",
+          "AC9M6A03", "AC9M6A01", "AC9M6A02", "AC9M6A03", "AC9M6A01",
+        ];
+    return codes.map((code) => descriptorsByCode.get(code)!);
   }
   return blueprint.descriptors.flatMap((descriptor) => Array.from({ length: descriptor.allocation[form] }, () => descriptor));
 }
@@ -352,7 +468,7 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
       : undefined;
     const misconception = levelThreeMisconception ?? levelFiveMisconception ?? descriptor.misconceptionIds[index % Math.max(1, descriptor.misconceptionIds.length)];
     const shortForm = form === "pretest" ? "pre" : "post";
-    const contentVersion = level === 3 || level === 4 || level === 5 ? 2 : 1;
+    const contentVersion = level >= 3 ? 2 : 1;
     const id = `pattern-peaks-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v${contentVersion}`;
     const options = question.kind === "multiple_choice" ? question.options.map((label, optionIndex) => ({ id: String(optionIndex), label })) : undefined;
     const correctIndex = question.kind === "multiple_choice" ? question.options.indexOf(question.answer) : -1;

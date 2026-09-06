@@ -11,9 +11,10 @@ export const PATTERN_PEAKS_MISCONCEPTION_LIBRARY = [
   { id: "pp-systematic-search-gap", descriptorCodes: ["AC9M5A03"], description: "Stops a factor or multiple search early, skips a valid result, or does not recognise the emerging pattern." },
   { id: "pp-distributive-part-missed", descriptorCodes: ["AC9M5A02"], description: "Distributes to only one part or fails to recombine both partial products." },
   { id: "pp-growth-additive-only", descriptorCodes: ["AC9M6A01"], description: "Reads a visual growth pattern from totals without connecting stage and structure." },
-  { id: "pp-rule-representation-mismatch", descriptorCodes: ["AC9M6A01", "AC9M6A02"], description: "Matches a rule to one value but not the full table, graph or sequence." },
-  { id: "pp-operation-order", descriptorCodes: ["AC9M6A02", "AC9M6A03"], description: "Ignores brackets or performs a multi-step algorithm in the wrong order." },
-  { id: "pp-unknown-guess-check", descriptorCodes: ["AC9M6A02", "AC9M6A03"], description: "Guesses an unknown without undoing operations or checking substitution." },
+  { id: "pp-rule-representation-mismatch", descriptorCodes: ["AC9M6A01", "AC9M6A03"], description: "Matches a rule to one value but not the full table, visual or sequence." },
+  { id: "pp-operation-order", descriptorCodes: ["AC9M6A02", "AC9M6A03"], description: "Ignores brackets or performs ordered algorithm steps incorrectly." },
+  { id: "pp-unknown-guess-check", descriptorCodes: ["AC9M6A02", "AC9M6A03"], description: "Guesses an unknown or algorithm rule without checking all available evidence." },
+  { id: "pp-machine-rule-overfit", descriptorCodes: ["AC9M6A03"], description: "Infers an algorithm from one input-output pair without checking every row or decision." },
 ] as const;
 
 export function getPatternPeaksMisconceptions(descriptorCode: string) {

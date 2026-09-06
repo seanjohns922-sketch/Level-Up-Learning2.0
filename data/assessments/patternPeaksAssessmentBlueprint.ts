@@ -43,16 +43,17 @@ const DESCRIPTIONS: Record<string, string> = {
   AC9M5A01: "Continue and create extended additive sequences with natural numbers, fractions and decimals, and explain emerging patterns.",
   AC9M5A02: "Find unknown values in equivalent multiplication and division number sentences using properties, inverse operations, factors and multiples.",
   AC9M5A03: "Use algorithms and digital tools to explore factors and multiples and explain emerging patterns.",
-  AC9M6A01: "Recognise, continue and create growing patterns with rational numbers.",
-  AC9M6A02: "Describe, apply and compare rules and algorithms across representations.",
-  AC9M6A03: "Find unknown values in numerical equations and justify solutions.",
+  AC9M6A01: "Recognise and use rules that generate visually growing patterns and number patterns involving rational numbers.",
+  AC9M6A02: "Find unknown values in numerical equations involving brackets and combinations of arithmetic operations, using number properties.",
+  AC9M6A03: "Create and use multi-step and decision algorithms that generate number sets, then interpret emerging patterns.",
 };
 
 const ALLOCATIONS: Record<PatternPeaksLevel, number[]> = {
   3: [5, 5, 5, 5],
   4: [10, 10],
   5: [6, 8, 6],
-  6: [7, 6, 7],
+  // Program discovery order is A01, A03, A02; this yields A01=7, A03=7, A02=6.
+  6: [7, 7, 6],
 };
 
 const form = (

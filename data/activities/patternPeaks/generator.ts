@@ -2741,7 +2741,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
     );
   }
 
-  // Week 8 — Pattern Peaks Summit (AC9M6A01, A02, A03): integrate growing
+  // Week 8 — Pattern Peaks Summit (AC9M6A01–A03): integrate growing
   // patterns, bracketed unknowns and algorithms in one investigation.
   if (week === 8) {
     const growth = rand(3, 6);
