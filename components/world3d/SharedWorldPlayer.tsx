@@ -101,6 +101,7 @@ export function SharedThirdPersonPlayer({
   cameraMinY = 0.85,
   cameraEnabled = true,
   movementEnabled = true,
+  hidden = false,
   speed = 4.6,
   positionRef,
 }: {
@@ -121,6 +122,7 @@ export function SharedThirdPersonPlayer({
   cameraMinY?: number;
   cameraEnabled?: boolean;
   movementEnabled?: boolean;
+  hidden?: boolean;
   speed?: number;
   positionRef?: React.MutableRefObject<{ x: number; z: number }>;
 }) {
@@ -261,7 +263,7 @@ export function SharedThirdPersonPlayer({
     }
   });
 
-  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group>;
+  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group>;
 }
 
 function WorldSprintButton({ active, onChange }: { active: boolean; onChange: (active: boolean) => void }) {

@@ -231,6 +231,7 @@ function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNo
         cameraTargetHeight={3.6}
         cameraEnabled={!editing && !buildPreview}
         movementEnabled={!editing && !buildPreview}
+        hidden={editing || Boolean(buildPreview)}
         speed={4.2}
         positionRef={avatarPosRef}
       />
@@ -359,14 +360,25 @@ export default function CentralWorld() {
   // Pan the build camera/cursor by whole cells. The avatar stays put — panning no
   // longer teleports it to follow the cursor — and the cursor is clamped to the
   // grid. Stable identity so the keyboard listener can depend on it.
-  // Arrows / WASD / the on-screen arrows PAN the grid (move the camera). The
-  // avatar stays put — its own movement is disabled while editing. Tap to place.
+  // Whether an item is currently in hand, mirrored to a ref so the stable
+  // move handler can branch without re-binding every render.
+  const heldRef = useRef(false);
+  useEffect(() => { heldRef.current = Boolean(buildPlacement); }, [buildPlacement]);
+
+  // The arrows / WASD / on-screen arrows do double duty (and the avatar never
+  // moves — its own movement is disabled and it's hidden while editing):
+  //   • holding an item  → move that item around the grid, one cell at a time
+  //   • nothing in hand  → pan the camera to look around the world
   const moveBuildPlacement = useCallback((dx: number, dz: number) => {
-    const step = 2;
     const cx = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX);
     const cz = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ);
-    setCameraFocus((f) => ({ gridX: cx(f.gridX + dx * step), gridZ: cz(f.gridZ + dz * step) }));
-  }, [setCameraFocus]);
+    if (heldRef.current) {
+      setEditCursor((cur) => ({ gridX: cx(cur.gridX + dx), gridZ: cz(cur.gridZ + dz) }));
+      setBuildPlacement((bp) => (bp ? { ...bp, gridX: cx(bp.gridX + dx), gridZ: cz(bp.gridZ + dz) } : bp));
+    } else {
+      setCameraFocus((f) => ({ gridX: cx(f.gridX + dx * 2), gridZ: cz(f.gridZ + dz * 2) }));
+    }
+  }, [setEditCursor, setBuildPlacement, setCameraFocus]);
 
   // Laptop: arrow keys and WASD pan the build view (the on-screen arrows do the
   // same on iPad). Only while editing, and we swallow the keys so they neither
@@ -406,7 +418,7 @@ export default function CentralWorld() {
     setEditHistory([]);
     setEditorOpen(true);
     // Leave the avatar where it was standing — only the build camera moves.
-    void speak("Edit World. Use the arrow keys, W A S D, or the arrow buttons to move the view around. The avatar stays put. Tap the grass to place things.", undefined, "manual", { rate: 0.9 });
+    void speak("Edit World. Your character stays put. With nothing chosen, the arrows move the view around. Pick something, and the arrows move it — then tap the grass to drop it.", undefined, "manual", { rate: 0.9 });
   }
 
   function closeWorldEditor() {
@@ -684,7 +696,7 @@ export default function CentralWorld() {
       {editorOpen ? (
         <section className="centralWorldEditor" aria-label="Edit world controls" style={{ position: "absolute", left: 10, top: 10, bottom: 10, zIndex: 35, width: "min(330px, 90vw)", overflowY: "auto", border: "2px solid #5eead4", borderRadius: 7, background: "rgba(13,24,22,.96)", color: "#fff", padding: 11, boxShadow: "0 14px 40px rgba(0,0,0,.4)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-            <div><div style={{ color: "#5eead4", fontSize: 10, fontWeight: 950, letterSpacing: ".16em" }}>EDIT WORLD</div><div style={{ marginTop: 1, fontSize: 16, fontWeight: 950 }}>{heldItemKey ? `Tap the grass to place ${buildItem?.name ?? "item"} — drag to lay a row` : isMoveTool ? "Tap an item to move or delete it" : isGroundTool ? "Tap or drag on the grass" : isEraseTool ? "Tap an item to remove it" : "Tap a space, then place"}</div></div>
+            <div><div style={{ color: "#5eead4", fontSize: 10, fontWeight: 950, letterSpacing: ".16em" }}>EDIT WORLD</div><div style={{ marginTop: 1, fontSize: 16, fontWeight: 950 }}>{heldItemKey ? `Arrows move ${buildItem?.name ?? "item"} · tap the grass to drop it` : isMoveTool ? "Tap an item to move it · arrows pan the view" : isGroundTool ? "Tap or drag on the grass" : isEraseTool ? "Tap an item to remove it" : "Arrows pan the view · pick something to place"}</div></div>
             <div style={{ display: "flex", gap: 5 }}>
               <button type="button" onClick={() => setBuildZoom((value) => Math.min(38, value + 4))} aria-label="Zoom camera out" title="Zoom out" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomOut size={18} /></button>
               <button type="button" onClick={() => setBuildZoom((value) => Math.max(18, value - 4))} aria-label="Zoom camera in" title="Zoom in" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomIn size={18} /></button>
@@ -751,7 +763,7 @@ export default function CentralWorld() {
 
           <div className="centralWorldEditorControls" style={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
             <div className="centralWorldEditorDpad" style={{ display: "grid", gridTemplateColumns: "repeat(3, 40px)", gridTemplateRows: "repeat(2, 40px)", gap: 4 }}><button type="button" aria-label="Move cursor forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={19} /></button><button type="button" aria-label="Move cursor left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={19} /></button><button type="button" aria-label="Move cursor backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={19} /></button><button type="button" aria-label="Move cursor right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={19} /></button></div>
-            <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isMoveTool || isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? "Tap the grass to place — drag to lay a row." : "That space is taken — try a clear one.") : isMoveTool ? "Tap an item to pick it up." : isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Tap an item to remove it." : "Choose a clear green space."}</div>
+            <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isMoveTool || isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? "Arrows nudge it · tap the grass to drop it." : "That space is taken — try a clear one.") : isMoveTool ? "Tap an item to pick it up · arrows pan the view." : isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Tap an item to remove it." : "Arrows pan the view."}</div>
             <div className="centralWorldEditorActions" style={{ display: "flex", alignItems: "center", gap: 6 }}><button type="button" disabled={!buildPreview} onClick={() => setBuildPlacement((current) => current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current)} aria-label="Rotate selected item" title="Rotate" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", visibility: buildPreview ? "visible" : "hidden" }}><RotateCw size={19} /></button>{buildPreview ? <button type="button" onClick={deleteHeldPlacement} aria-label="Delete selected item" title="Delete" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", background: "#ef4444", color: "#fff" }}><Trash2 size={19} /></button> : null}<button type="button" disabled={!isEraseTool && (buildPreview ? !buildValid : !groundPreview?.valid)} onClick={buildPreview ? confirmBuildPlacement : applyGroundTool} style={{ ...debugButton, minHeight: 48, minWidth: 92, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: isEraseTool ? "#ef4444" : "#22c55e", color: "white", visibility: isMoveTool && !buildPreview ? "hidden" : "visible" }}>{isEraseTool ? <Eraser size={18} /> : <Check size={18} />}{isEraseTool ? "Remove" : buildPreview ? "Place" : "Paint"}</button></div>
           </div>
         </section>
