@@ -29,7 +29,7 @@ const root = process.cwd();
 const descriptorSets: Record<PatternPeaksYearLabel, Set<string>> = {
   "Year 3": new Set(["AC9M3A01", "AC9M3A02", "AC9M3A03"]),
   "Year 4": new Set(["AC9M4A01", "AC9M4A02"]),
-  "Year 5": new Set(["AC9M5A01", "AC9M5A02"]),
+  "Year 5": new Set(["AC9M5A01", "AC9M5A02", "AC9M5A03"]),
   "Year 6": new Set(["AC9M6A01", "AC9M6A02", "AC9M6A03"]),
 };
 

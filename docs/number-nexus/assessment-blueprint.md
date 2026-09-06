@@ -1522,7 +1522,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### Cross-Realm Boundary
 
-- **AC9M5A01, AC9M5A02 -> Pattern Peaks (Algebra):** Level 5 Algebra belongs exclusively to Pattern Peaks. Number Nexus lessons, quizzes and assessments contain only AC9M5N-coded outcomes.
+- **AC9M5A01, AC9M5A02, AC9M5A03 -> Pattern Peaks (Algebra):** Level 5 Algebra belongs exclusively to Pattern Peaks. Number Nexus lessons, quizzes and assessments contain only AC9M5N-coded outcomes.
 
 ## Year 6
 

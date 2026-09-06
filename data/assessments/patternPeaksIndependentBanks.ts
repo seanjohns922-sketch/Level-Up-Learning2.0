@@ -42,7 +42,13 @@ function numericChoice(question: TypedResponseQuestion, index: number): Multiple
   return { kind: "multiple_choice", prompt: question.prompt, answer: question.answer, options, visual: question.visual as MultipleChoiceQuestion["visual"] };
 }
 
-function authoredQuestion(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind, index: number, descriptorCode: string): { question: TypedResponseQuestion; structure: string } {
+function authoredQuestion(
+  level: PatternPeaksLevel,
+  form: PatternPeaksAssessmentKind,
+  index: number,
+  descriptorCode: string,
+  descriptorIndex = index,
+): { question: TypedResponseQuestion; structure: string } {
   const offset = form === "posttest" ? 17 : 3;
   const seed = level * 101 + index * 13 + offset;
   let archetype = index % 5;
@@ -112,27 +118,69 @@ function authoredQuestion(level: PatternPeaksLevel, form: PatternPeaksAssessment
   }
 
   if (level === 5) {
-    archetype = descriptorCode === "AC9M5A01" ? 0 : 1 + (index % 4);
+    const formShift = form === "posttest" ? 5 : 0;
+
+    if (descriptorCode === "AC9M5A01") {
+      archetype = (descriptorIndex + formShift) % 3;
+      if (archetype === 0) {
+        const step = [7, 9, 12, 14][(descriptorIndex + formShift) % 4]!;
+        const start = (form === "pretest" ? 28 : 43) + descriptorIndex * 6;
+        const terms = Array.from({ length: 6 }, (_, position) => start + step * position);
+        const missingPosition = descriptorIndex % 2 === 0 ? 5 : 3;
+        return { question: { kind: "typed_response", prompt: "Find the missing term in the sequence.", answer: String(terms[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Extended natural-number sequence", terms: terms.map((value, position) => position === missingPosition ? "?" : String(value)) } }, structure: "extended-additive-sequence" };
+      }
+      if (archetype === 1) {
+        const start = (form === "pretest" ? 0.35 : 0.6) + descriptorIndex * 0.1;
+        const step = [0.2, 0.25, 0.4][(descriptorIndex + formShift) % 3]!;
+        const terms = Array.from({ length: 6 }, (_, position) => Number((start + step * position).toFixed(2)));
+        const missingPosition = descriptorIndex % 2 === 0 ? 4 : 2;
+        return { question: { kind: "typed_response", prompt: "Complete the decimal sequence.", answer: String(terms[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Extended decimal sequence", terms: terms.map((value, position) => position === missingPosition ? "?" : String(value)) } }, structure: "decimal-additive-sequence" };
+      }
+      const denominator = [4, 5, 6, 8][(descriptorIndex + formShift) % 4]!;
+      const numeratorStep = 1 + ((descriptorIndex + formShift) % 3);
+      const numeratorStart = 1 + descriptorIndex + (form === "posttest" ? 2 : 0);
+      const numerators = Array.from({ length: 6 }, (_, position) => numeratorStart + numeratorStep * position);
+      const missingPosition = descriptorIndex % 2 === 0 ? 5 : 3;
+      return { question: { kind: "typed_response", prompt: "Complete the fraction sequence. Type the missing numerator.", answer: String(numerators[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Extended fraction sequence", terms: numerators.map((value, position) => position === missingPosition ? `?/${denominator}` : `${value}/${denominator}`) } }, structure: "fraction-additive-sequence" };
+    }
+
+    if (descriptorCode === "AC9M5A02") {
+      archetype = (descriptorIndex + formShift) % 4;
+      if (archetype === 0) {
+        const factor = 7 + ((seed + descriptorIndex) % 12) + (form === "posttest" ? 11 : 0); const other = 4 + ((descriptorIndex + formShift) % 8); const product = factor * other;
+        return { question: { kind: "typed_response", prompt: "Find the unknown factor.", answer: String(factor), visual: { type: "unknown_tile_equation", title: "Equivalent multiplication sentence", left: `? × ${other}`, right: String(product) } }, structure: "multiplicative-unknown" };
+      }
+      if (archetype === 1) {
+        const divisor = 4 + ((seed + descriptorIndex) % 9) + (form === "posttest" ? 3 : 0); const quotient = 5 + ((descriptorIndex + formShift) % 8); const dividend = divisor * quotient;
+        return { question: { kind: "typed_response", prompt: "Find the unknown divisor.", answer: String(divisor), visual: { type: "unknown_tile_equation", title: "Equivalent division sentence", left: `${dividend} ÷ ?`, right: String(quotient) } }, structure: "division-unknown" };
+      }
+      if (archetype === 2) {
+        const a = 3 + ((seed + descriptorIndex) % 6) + (form === "posttest" ? 2 : 0); const b = 4 + ((descriptorIndex + 2) % 7); const c = 2 + ((seed + formShift) % 5);
+        return { question: { kind: "typed_response", prompt: "Calculate the value of the expression.", answer: String(a * b * c), visual: { type: "expression_flow", title: "Equivalent multiplication expressions", cards: [{ tokens: [String(a), "×", String(b), "×", String(c)] }, { tokens: [`(${a} × ${b})`, "×", String(c)], result: "?" }] } }, structure: "multiplication-property" };
+      }
+      const factor = 6 + ((seed + descriptorIndex) % 8) + (form === "posttest" ? 4 : 0); const extra = 3 + ((descriptorIndex + formShift) % 7);
+      return { question: { kind: "typed_response", prompt: "Find the value of the equivalent expression.", answer: String(factor * (10 + extra)), visual: { type: "expression_flow", title: "Equivalent distributive expressions", cards: [{ tokens: [String(factor), "×", `(10 + ${extra})`] }, { tokens: [`${factor} × 10`, "+", `${factor} × ${extra}`], result: "?" }] } }, structure: "distributive-equivalence" };
+    }
+
+    archetype = (descriptorIndex + formShift) % 3;
     if (archetype === 0) {
-      const factor = 8 + (seed % 14); const other = 4 + (index % 9); const product = factor * other;
-      return { question: { kind: "typed_response", prompt: "Find the unknown factor.", answer: String(factor), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `? × ${other} = ${product}`, inverseOperation: `${product} ÷ ${other}` } }, structure: "multiplicative-unknown" };
+      const product = [36, 40, 48, 54, 60, 72, 84, 90][(descriptorIndex + formShift) % 8]!;
+      let pairCount = 0;
+      for (let value = 1; value <= Math.sqrt(product); value += 1) if (product % value === 0) pairCount += 1;
+      return { question: { kind: "typed_response", prompt: `How many factor pairs does ${product} have?`, answer: String(pairCount), visual: { type: "factor_pair_tree", title: "Systematic factor search", product, pairs: [] } }, structure: "factor-search-algorithm" };
     }
     if (archetype === 1) {
-      const a = 3 + (seed % 5); const b = 4 + (index % 6); const c = 2 + (seed % 4);
-      return { question: { kind: "typed_response", prompt: "Calculate the product.", answer: String(a * b * c), visual: { type: "expression_flow", title: "Multiplication expression", cards: [{ tokens: [String(a), "×", String(b), "×", String(c)] }, { tokens: [String(a), "×", `(${b} × ${c})`], result: "?" }] } }, structure: "multiplication-property" };
+      const first = [4, 6, 8, 9][(descriptorIndex + formShift) % 4]!;
+      const second = [6, 8, 10, 12][(descriptorIndex + 2 + formShift) % 4]!;
+      let common = Math.max(first, second);
+      while (common % first !== 0 || common % second !== 0) common += 1;
+      return { question: { kind: "typed_response", prompt: `Find the least common multiple of ${first} and ${second}.`, answer: String(common), visual: { type: "pattern_sequence_strip", title: "Compare two multiple sequences", terms: [`Multiples of ${first}`, `Multiples of ${second}`, "First match: ?"] } }, structure: "common-multiple-algorithm" };
     }
-    if (archetype === 2) {
-      const factor = 6 + (seed % 9); const extra = 2 + (index % 7);
-      return { question: { kind: "typed_response", prompt: "Calculate the product.", answer: String(factor * (10 + extra)), visual: { type: "expression_flow", title: "Multiplication expression", cards: [{ tokens: [String(factor), "×", `(10 + ${extra})`] }, { tokens: [`${factor} × 10`, "+", `${factor} × ${extra}`], result: "?" }] } }, structure: "distributive" };
-    }
-    if (archetype === 3) {
-      const product = [24, 30, 36, 42, 48, 60, 72][seed % 7]!; const pairs: Array<[number, number]> = [];
-      for (let value = 1; value <= Math.sqrt(product); value += 1) if (product % value === 0) pairs.push([value, product / value]);
-      const [left, right] = pairs[index % pairs.length]!;
-      return { question: { kind: "typed_response", prompt: `What factor pairs with ${left} to make ${product}?`, answer: String(right), visual: { type: "factor_pair_tree", title: "Complete the factor pair", product, pairs: [{ left: String(left), right: "?" }] } }, structure: "factor-constraints" };
-    }
-    const base = [4, 6, 7, 8][index % 4]!; const multiplier = 6 + (seed % 7);
-    return { question: { kind: "typed_response", prompt: `Find the least multiple of ${base} that is greater than ${base * (multiplier - 1)}.`, answer: String(base * multiplier), visual: { type: "pattern_sequence_strip", title: `Multiples of ${base}`, terms: [multiplier - 3, multiplier - 2, multiplier - 1].map((value) => String(base * value)).concat("?") } }, structure: "multiple-constraint" };
+    const base = [5, 6, 7, 8, 9][(descriptorIndex + formShift) % 5]!;
+    const lower = base * (5 + descriptorIndex);
+    const upper = lower + base * (3 + (descriptorIndex % 2));
+    const count = Math.floor(upper / base) - Math.floor(lower / base) + 1;
+    return { question: { kind: "typed_response", prompt: `How many multiples of ${base} are there from ${lower} to ${upper}, including both endpoints?`, answer: String(count), visual: { type: "pattern_sequence_strip", title: "Systematic multiple search", terms: [String(lower), "…", String(upper)] } }, structure: "multiple-search-algorithm" };
   }
 
   archetype = descriptorCode === "AC9M6A01" ? 0 : descriptorCode === "AC9M6A02" ? (index % 2 === 0 ? 1 : 4) : (index % 2 === 0 ? 2 : 3);
@@ -171,6 +219,22 @@ function descriptorSlots(level: PatternPeaksLevel, form: PatternPeaksAssessmentK
       return useAddition ? additionAndSubtraction : multiplicationAndDivision;
     });
   }
+  if (level === 5) {
+    const descriptorsByCode = new Map(blueprint.descriptors.map((descriptor) => [descriptor.code, descriptor]));
+    const pretestCodes = [
+      "AC9M5A01", "AC9M5A02", "AC9M5A03", "AC9M5A02", "AC9M5A01",
+      "AC9M5A03", "AC9M5A02", "AC9M5A01", "AC9M5A03", "AC9M5A02",
+      "AC9M5A01", "AC9M5A03", "AC9M5A02", "AC9M5A01", "AC9M5A03",
+      "AC9M5A02", "AC9M5A01", "AC9M5A03", "AC9M5A02", "AC9M5A02",
+    ];
+    const posttestCodes = [
+      "AC9M5A03", "AC9M5A02", "AC9M5A01", "AC9M5A02", "AC9M5A03",
+      "AC9M5A01", "AC9M5A02", "AC9M5A03", "AC9M5A01", "AC9M5A02",
+      "AC9M5A03", "AC9M5A01", "AC9M5A02", "AC9M5A03", "AC9M5A01",
+      "AC9M5A02", "AC9M5A03", "AC9M5A01", "AC9M5A02", "AC9M5A02",
+    ];
+    return (form === "pretest" ? pretestCodes : posttestCodes).map((code) => descriptorsByCode.get(code)!);
+  }
   return blueprint.descriptors.flatMap((descriptor) => Array.from({ length: descriptor.allocation[form] }, () => descriptor));
 }
 
@@ -184,7 +248,8 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
 
   return Array.from({ length: 20 }, (_, index) => {
     const descriptor = descriptors[index]!;
-    const core = authoredQuestion(level, form, index, descriptor.code);
+    const descriptorIndex = descriptors.slice(0, index).filter((candidate) => candidate.code === descriptor.code).length;
+    const core = authoredQuestion(level, form, index, descriptor.code, descriptorIndex);
     core.question.prompt = `Peak ${form === "pretest" ? "North" : "South"}-${index + 1}: ${core.question.prompt}`;
     const isSelected = index < profile.selectedResponseMaximum;
     const question: PatternQuestion = isSelected ? numericChoice(core.question, index) : core.question;
@@ -192,9 +257,23 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
     const itemDifficulty = difficulty(difficulties[index]!);
     const cognitiveCategory = cognition(cognitive[index]!);
     const week = descriptor.weeks[index % descriptor.weeks.length] ?? 1;
-    const misconception = descriptor.misconceptionIds[index % Math.max(1, descriptor.misconceptionIds.length)];
+    const levelFiveMisconception = level === 5
+      ? core.structure.includes("sequence")
+        ? "pp-sequence-step-confusion"
+        : core.structure.includes("distributive")
+          ? "pp-distributive-part-missed"
+          : core.structure.includes("multiplication-property")
+            ? "pp-property-overgeneralisation"
+            : core.structure.includes("unknown")
+              ? "pp-related-fact-confusion"
+              : core.structure.includes("factor-search") || core.structure.includes("multiple-search")
+                ? "pp-systematic-search-gap"
+                : "pp-factor-multiple-confusion"
+      : undefined;
+    const misconception = levelFiveMisconception ?? descriptor.misconceptionIds[index % Math.max(1, descriptor.misconceptionIds.length)];
     const shortForm = form === "pretest" ? "pre" : "post";
-    const id = `pattern-peaks-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v1`;
+    const contentVersion = level === 5 ? 2 : 1;
+    const id = `pattern-peaks-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v${contentVersion}`;
     const options = question.kind === "multiple_choice" ? question.options.map((label, optionIndex) => ({ id: String(optionIndex), label })) : undefined;
     const correctIndex = question.kind === "multiple_choice" ? question.options.indexOf(question.answer) : -1;
     const task: PracticeTask = {
@@ -213,13 +292,13 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
     return {
       schemaVersion: 1,
       id,
-      version: "1.0.0",
+      version: `${contentVersion}.0.0`,
       realm: "pattern",
       level,
       form,
       origin: "assessment_authored",
       sourcePool: form,
-      bankId: `pattern-peaks-year-${level}-${form}-v1`,
+      bankId: `pattern-peaks-year-${level}-${form}-v${contentVersion}`,
       primaryDescriptorCode: descriptor.code,
       descriptorCodes: [descriptor.code],
       curriculumLessonMapping: [{ week, lesson: (index % 3) + 1 }],

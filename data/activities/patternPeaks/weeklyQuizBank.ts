@@ -103,7 +103,41 @@ function sequenceQuestion(level: PatternQuizLevel, week: number, lesson: number,
   }
 
   if (level === 5) {
-    if (week <= 3) {
+    if (week === 1) {
+      const step = [4, 6, 7, 9, 12][(lesson + variant) % 5]!;
+      const subtract = (lesson + variant) % 4 === 0;
+      const start = subtract ? 90 + (seed % 35) : 18 + (seed % 30);
+      const values = Array.from({ length: 6 }, (_, index) => start + (subtract ? -1 : 1) * step * index);
+      const missingIndex = lesson === 2 ? 2 : 5;
+      return typed(
+        lesson === 3 ? "Use the rule to find the missing term." : "Continue the additive sequence.",
+        values[missingIndex]!,
+        {
+          type: "pattern_sequence_strip",
+          title: lesson === 3 ? `Rule: ${subtract ? "subtract" : "add"} ${step}` : "Extended number sequence",
+          terms: values.map((value, index) => index === missingIndex ? "?" : String(value)),
+        },
+      );
+    }
+    if (week === 2) {
+      if (lesson === 1) {
+        const start = 0.4 + (variant % 4) * 0.15;
+        const step = [0.2, 0.25, 0.4, 0.5, 0.75][variant]!;
+        const values = Array.from({ length: 6 }, (_, index) => Number((start + step * index).toFixed(2)));
+        return typed("Continue the decimal sequence.", values[5]!, { type: "pattern_sequence_strip", title: `Add ${step}`, terms: values.slice(0, 5).map(String).concat("?") });
+      }
+      if (lesson === 2) {
+        const denominator = [4, 5, 6, 8, 10][variant]!;
+        const numeratorStep = 1 + (variant % 3);
+        const numerators = Array.from({ length: 6 }, (_, index) => 1 + variant + numeratorStep * index);
+        return typed("Continue the fraction sequence. Type the missing numerator.", numerators[5]!, { type: "pattern_sequence_strip", title: `Add ${numeratorStep}/${denominator}`, terms: numerators.slice(0, 5).map((value) => `${value}/${denominator}`).concat(`?/${denominator}`) });
+      }
+      const start = 15 + (seed % 25);
+      const step = [3, 4, 6, 7, 9][variant]!;
+      const values = Array.from({ length: 6 }, (_, index) => start + step * index);
+      return typed("Apply the stated rule to find the sixth term.", values[5]!, { type: "pattern_sequence_strip", title: `Start at ${start}; add ${step}`, terms: values.slice(0, 5).map(String).concat("?") });
+    }
+    if (week === 3) {
       const factor = 6 + (seed % 9);
       const other = 4 + (seed % 8);
       const product = factor * other;

@@ -18,8 +18,9 @@ const descriptorStructures: Record<string, string[]> = {
   AC9M3A03: ["inverse-fact", "derived-fact"],
   AC9M4A01: ["unknown-position", "inverse-add-sub", "regroup-addends"],
   AC9M4A02: ["missing-factor-right", "missing-factor-left", "related-division-quotient", "related-division-divisor"],
-  AC9M5A01: ["multiplicative-unknown"],
-  AC9M5A02: ["multiplication-property", "distributive", "factor-constraints", "multiple-constraint"],
+  AC9M5A01: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence"],
+  AC9M5A02: ["multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence"],
+  AC9M5A03: ["factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
   AC9M6A01: ["stage-generalisation", "rational-sequence"],
   AC9M6A02: ["multi-representation-rule", "three-step-algorithm"],
   AC9M6A03: ["bracket-order", "reverse-algorithm"],
@@ -130,7 +131,7 @@ assert.equal(totalAssessmentItems, 140);
 const requiredStructures: Record<number, string[]> = {
   3: ["extended-sequence", "function-machine", "inverse-fact", "relational-equality", "derived-fact"],
   4: ["unknown-position", "inverse-add-sub", "regroup-addends", "missing-factor-right", "missing-factor-left", "related-division-quotient", "related-division-divisor"],
-  5: ["multiplicative-unknown", "multiplication-property", "distributive", "factor-constraints", "multiple-constraint"],
+  5: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence", "multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence", "factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
   6: ["stage-generalisation", "multi-representation-rule", "bracket-order", "reverse-algorithm", "three-step-algorithm"],
 };
 for (const level of levels) {
@@ -158,6 +159,32 @@ for (const form of ["pretest", "posttest"] as const) {
   }
 }
 
+for (const form of ["pretest", "posttest"] as const) {
+  const levelFiveItems = getPatternPeaksIndependentAssessment(5, form);
+  assert.deepEqual(
+    ["AC9M5A01", "AC9M5A02", "AC9M5A03"].map((code) => levelFiveItems.filter((item) => item.primaryDescriptorCode === code).length),
+    [6, 8, 6],
+    `Year 5 ${form} must preserve the 6/8/6 standards allocation`,
+  );
+  let longestDescriptorRun = 1;
+  let currentDescriptorRun = 1;
+  for (let index = 1; index < levelFiveItems.length; index += 1) {
+    currentDescriptorRun = levelFiveItems[index]!.primaryDescriptorCode === levelFiveItems[index - 1]!.primaryDescriptorCode
+      ? currentDescriptorRun + 1
+      : 1;
+    longestDescriptorRun = Math.max(longestDescriptorRun, currentDescriptorRun);
+  }
+  assert.ok(longestDescriptorRun <= 2, `Year 5 ${form} must interleave standards rather than block repeated skills`);
+  for (const code of ["AC9M5A01", "AC9M5A02", "AC9M5A03"]) {
+    for (const structure of descriptorStructures[code]!) {
+      assert.ok(
+        levelFiveItems.some((item) => item.primaryDescriptorCode === code && item.structureKey.includes(structure)),
+        `Year 5 ${form} must include ${structure}`,
+      );
+    }
+  }
+}
+
 for (const level of [4, 5, 6] as const) {
   assert.notDeepEqual(
     getPatternPeaksIndependentAssessment(level, "pretest").map((item) => item.practiceTask),
@@ -165,6 +192,26 @@ for (const level of [4, 5, 6] as const) {
     `Year ${level} Pre and Post forms must be independent`,
   );
 }
+
+const normaliseYearFiveTask = (item: ReturnType<typeof getPatternPeaksIndependentAssessment>[number]) => {
+  if (item.practiceTask?.kind !== "patternPeaksQuestion") return "";
+  const question = item.practiceTask.question;
+  return JSON.stringify({
+    question: {
+      ...question,
+      prompt: question.prompt.replace(/^Peak (North|South)-\d+:\s*/, ""),
+    },
+    descriptor: item.primaryDescriptorCode,
+    structure: item.structureKey.replace(/-(pretest|posttest)-/, "-form-").replace(/-\d+$/, ""),
+  });
+};
+const levelFivePrePayloads = new Set(getPatternPeaksIndependentAssessment(5, "pretest").map(normaliseYearFiveTask));
+const levelFivePostPayloads = getPatternPeaksIndependentAssessment(5, "posttest").map(normaliseYearFiveTask);
+assert.equal(
+  levelFivePostPayloads.filter((payload) => levelFivePrePayloads.has(payload)).length,
+  0,
+  "Year 5 Pre and Post must not reuse mathematically identical items",
+);
 
 const weeklySource = readFileSync(`${root}/data/activities/patternPeaks/weeklyQuizBank.ts`, "utf8");
 const assessmentSource = readFileSync(`${root}/data/assessments/patternPeaksIndependentBanks.ts`, "utf8");

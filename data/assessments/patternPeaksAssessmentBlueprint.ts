@@ -39,8 +39,9 @@ const DESCRIPTIONS: Record<string, string> = {
   AC9M3A03: "Extend and apply patterns in addition and multiplication facts.",
   AC9M4A01: "Find unknown values in equivalent addition and subtraction equations.",
   AC9M4A02: "Recall and use multiplication facts and related division facts.",
-  AC9M5A01: "Use multiplication and division as inverse operations to find unknown values.",
-  AC9M5A02: "Apply multiplication properties, factors and multiples to solve problems.",
+  AC9M5A01: "Continue and create extended additive sequences with natural numbers, fractions and decimals, and explain emerging patterns.",
+  AC9M5A02: "Find unknown values in equivalent multiplication and division number sentences using properties, inverse operations, factors and multiples.",
+  AC9M5A03: "Use algorithms and digital tools to explore factors and multiples and explain emerging patterns.",
   AC9M6A01: "Recognise, continue and create growing patterns with rational numbers.",
   AC9M6A02: "Describe, apply and compare rules and algorithms across representations.",
   AC9M6A03: "Find unknown values in numerical equations and justify solutions.",
@@ -49,7 +50,7 @@ const DESCRIPTIONS: Record<string, string> = {
 const ALLOCATIONS: Record<PatternPeaksLevel, number[]> = {
   3: [7, 7, 6],
   4: [10, 10],
-  5: [8, 12],
+  5: [6, 8, 6],
   6: [7, 6, 7],
 };
 
