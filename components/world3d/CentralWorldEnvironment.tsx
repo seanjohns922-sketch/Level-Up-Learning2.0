@@ -676,7 +676,12 @@ function worldObjectScale(item: EconomyItem) {
     // carries its own display scale (tuned to fill its footprint) rather than a
     // one-size-fits-all value that leaves long items like the bridge undersized.
     const custom = Number(item.metadata.worldScale);
-    return Number.isFinite(custom) && custom > 0 ? custom : 1.25;
+    const base = Number.isFinite(custom) && custom > 0 ? custom : 1.25;
+    // Trees, animals and decor read a touch small against the avatar and grid, so
+    // enlarge them. Fortress pieces are sized to their footprints (walls must
+    // tile cell-to-cell), so they keep their exact scale.
+    const bump = item.metadata.worldSceneryGroup === "fortress" ? 1 : 1.3;
+    return base * bump;
   }
   const [gridW, gridD] = parseGridSize(item);
   const footprintMetres = Math.min(gridW, gridD) * CENTRAL_WORLD_GRID.cellSize;

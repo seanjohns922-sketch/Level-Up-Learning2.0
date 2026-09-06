@@ -14,7 +14,9 @@ export type CentralWorldPlacement = {
 export type CentralWorldGroundType = "path" | "road" | "stone" | "water";
 export type CentralWorldGroundTile = { gridX: number; gridZ: number; tileType: CentralWorldGroundType };
 
-export const CENTRAL_WORLD_GRID = { cellSize: 2, minX: -21, maxX: 21, minZ: -13, maxZ: 25 } as const;
+// The buildable grid now reaches back to enclose the Tower of Knowledge
+// (base around world z -46) so kids can wall and moat right around it.
+export const CENTRAL_WORLD_GRID = { cellSize: 2, minX: -24, maxX: 24, minZ: -29, maxZ: 25 } as const;
 const STORAGE_PREFIX = "lul:central-world:layout:v1";
 const GROUND_STORAGE_PREFIX = "lul:central-world:ground:v1";
 
@@ -55,7 +57,9 @@ function occupiedCells(placement: CentralWorldPlacement, item: EconomyItem) {
 export function isCentralWorldProtectedCell(gridX: number, gridZ: number) {
   const x = gridX * CENTRAL_WORLD_GRID.cellSize;
   const z = gridZ * CENTRAL_WORLD_GRID.cellSize;
-  if (z <= -13 && Math.abs(x) <= 12) return true;
+  // Tower base + its doorway approach only (was a broad corridor). Everything
+  // else behind and around the tower is now buildable, so it can be fortified.
+  if (z >= -56 && z <= -31 && Math.abs(x) <= 9) return true;
   if (x >= -38 && x <= -20 && z >= -13 && z <= 2) return true;
   if (z >= 13 && Math.abs(x) <= 5) return true;
   if (z > -13 && z < 13 && Math.abs(x - Math.sin(z * 0.16)) <= 4.5) return true;
