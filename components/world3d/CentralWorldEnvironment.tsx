@@ -525,7 +525,7 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   if (assetKey === "koala") return <group>
     <StarterGum />
     {/* koala clinging to the trunk */}
-    <group position={[0, 1.7, 0.3]}>
+    <group position={[0, 1.7, 0.36]} scale={0.62}>
       <mesh position={[0, 0, 0]} scale={[0.82, 0.95, 0.72]} castShadow><sphereGeometry args={[0.42, 16, 12]} /><meshStandardMaterial color={t("#9ba3a8")} roughness={0.92} /></mesh>
       <mesh position={[0, -0.05, 0.2]} scale={[0.55, 0.72, 0.4]}><sphereGeometry args={[0.34, 12, 10]} /><meshStandardMaterial color="#cdd3d6" roughness={0.9} /></mesh>
       <mesh position={[0, 0.5, 0.08]} castShadow><sphereGeometry args={[0.3, 16, 12]} /><meshStandardMaterial color={t("#9ba3a8")} roughness={0.9} /></mesh>
@@ -562,7 +562,7 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   if (assetKey === "kookaburra") return <group>
     <StarterGum />
     {/* kookaburra perched on a branch up in the tree */}
-    <group position={[0.42, 2.3, 0.5]}>
+    <group position={[0.42, 2.5, 0.5]} scale={0.6}>
       <mesh position={[0, 0.28, -0.15]} rotation={[0.2, 0.4, Math.PI / 2]}><cylinderGeometry args={[0.045, 0.06, 0.7, 8]} /><meshStandardMaterial color="#6f4a2c" /></mesh>
       {([-0.09, 0.09] as const).map((dx) => <mesh key={dx} position={[dx, 0.33, 0.02]}><cylinderGeometry args={[0.02, 0.02, 0.16, 6]} /><meshStandardMaterial color="#5a4a30" /></mesh>)}
       <mesh position={[0, 0.72, 0]} scale={[0.8, 0.98, 1]} castShadow><sphereGeometry args={[0.34, 16, 12]} /><meshStandardMaterial color={t("#f2ece0")} roughness={0.9} /></mesh>
