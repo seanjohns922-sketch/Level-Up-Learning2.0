@@ -37,10 +37,10 @@ function starter(
 // here and one case there; the editor palette is driven entirely off this list.
 export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   // Trees & plants
-  starter("central_world_starter_tree", "Tree", "tree", "#3f8f3a", "trees_plants", "2x2", 1.25),
-  starter("central_world_starter_pine", "Pine Tree", "pine_tree", "#256b43", "trees_plants", "2x2", 1.25),
-  starter("central_world_starter_palm", "Palm Tree", "palm_tree", "#2f9e6f", "trees_plants", "2x2", 1.3),
-  starter("central_world_starter_gum", "Gum Tree", "gum_tree", "#8fae86", "trees_plants", "2x2", 1.3),
+  starter("central_world_starter_tree", "Tree", "tree", "#3f8f3a", "trees_plants", "2x2", 1.8),
+  starter("central_world_starter_pine", "Pine Tree", "pine_tree", "#256b43", "trees_plants", "2x2", 1.8),
+  starter("central_world_starter_palm", "Palm Tree", "palm_tree", "#2f9e6f", "trees_plants", "2x2", 1.85),
+  starter("central_world_starter_gum", "Gum Tree", "gum_tree", "#8fae86", "trees_plants", "2x2", 1.85),
   starter("central_world_starter_shrub", "Shrub", "shrub", "#4d9b46", "trees_plants", "1x1", 1.05),
   starter("central_world_starter_hedge", "Hedge", "hedge", "#3c7a3a", "trees_plants", "2x1", 1.45),
   starter("central_world_starter_toadstool", "Toadstool", "toadstool", "#e05a52", "trees_plants", "1x1", 1.0),
@@ -65,19 +65,19 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_balloons", "Balloons", "balloons", "#e0518a", "furniture_fun", "1x1", 1.15),
 
   // Aussie animals
-  starter("central_world_starter_kangaroo", "Kangaroo", "kangaroo", "#b5793f", "animals", "1x1", 1.3),
-  starter("central_world_starter_koala", "Koala Gum Tree", "koala", "#8a94a0", "animals", "2x2", 1.3),
+  starter("central_world_starter_kangaroo", "Kangaroo", "kangaroo", "#b5793f", "animals", "1x1", 0.7),
+  starter("central_world_starter_koala", "Koala Gum Tree", "koala", "#8a94a0", "animals", "2x2", 1.85),
   starter("central_world_starter_wombat", "Wombat", "wombat", "#7a5a3f", "animals", "1x1", 1.1),
   starter("central_world_starter_emu", "Emu", "emu", "#6b5f52", "animals", "1x1", 1.35),
-  starter("central_world_starter_kookaburra", "Kookaburra Gum Tree", "kookaburra", "#9c8161", "animals", "2x2", 1.3),
+  starter("central_world_starter_kookaburra", "Kookaburra Gum Tree", "kookaburra", "#9c8161", "animals", "2x2", 1.85),
   starter("central_world_starter_echidna", "Echidna", "echidna", "#5c4a35", "animals", "1x1", 1.0),
   starter("central_world_starter_cockatoo", "Cockatoo", "cockatoo", "#e6ebef", "animals", "1x1", 1.0),
 
   // Fortress kit
   starter("central_world_starter_wall", "Castle Wall", "castle_wall", "#9a8d7c", "fortress", "1x1", 1.0),
   starter("central_world_starter_corner", "Wall Corner", "castle_corner", "#9a8d7c", "fortress", "1x1", 1.0),
-  starter("central_world_starter_gatehouse", "Gatehouse", "castle_gate", "#8f8271", "fortress", "3x1", 1.0),
-  starter("central_world_starter_turret", "Turret", "castle_turret", "#9a8d7c", "fortress", "2x2", 1.1),
-  starter("central_world_starter_keep", "Keep", "castle_keep", "#8f8271", "fortress", "3x3", 1.25),
-  starter("central_world_starter_banner", "Banner", "castle_banner", "#1f3352", "fortress", "1x1", 1.0),
+  starter("central_world_starter_gatehouse", "Gatehouse", "castle_gate", "#8f8271", "fortress", "3x1", 1.3),
+  starter("central_world_starter_turret", "Turret", "castle_turret", "#9a8d7c", "fortress", "2x2", 1.45),
+  starter("central_world_starter_keep", "Keep", "castle_keep", "#8f8271", "fortress", "3x3", 1.65),
+  starter("central_world_starter_banner", "Banner", "castle_banner", "#1f3352", "fortress", "1x1", 1.2),
 ];

@@ -598,15 +598,16 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   </group>;
 
   if (assetKey === "castle_wall") return <group>
-    {/* one cell wide (~2 m) so segments tile seamlessly side by side */}
-    <mesh position={[0, 1.0, 0]} castShadow><boxGeometry args={[1.98, 2.0, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
-    {([0.55, 1.1, 1.65] as const).map((y) => <mesh key={y} position={[0, y, 0.36]}><boxGeometry args={[1.98, 0.05, 0.02]} /><meshStandardMaterial color="#6f6355" roughness={0.95} /></mesh>)}
-    {([-0.66, 0, 0.66] as const).map((x) => <mesh key={x} position={[x, 2.25, 0]} castShadow><boxGeometry args={[0.5, 0.5, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>)}
+    {/* one cell wide (~2 m) so segments tile seamlessly side by side; tall for a
+       properly imposing rampart */}
+    <mesh position={[0, 1.5, 0]} castShadow><boxGeometry args={[1.98, 3.0, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
+    {([0.7, 1.4, 2.1, 2.7] as const).map((y) => <mesh key={y} position={[0, y, 0.36]}><boxGeometry args={[1.98, 0.05, 0.02]} /><meshStandardMaterial color="#6f6355" roughness={0.95} /></mesh>)}
+    {([-0.66, 0, 0.66] as const).map((x) => <mesh key={x} position={[x, 3.25, 0]} castShadow><boxGeometry args={[0.5, 0.5, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>)}
   </group>;
 
   if (assetKey === "castle_corner") return <group>
-    <mesh position={[0, 1.1, 0]} castShadow><boxGeometry args={[1.1, 2.2, 1.1]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
-    {([[-0.35, -0.35], [0.35, -0.35], [-0.35, 0.35], [0.35, 0.35]] as const).map(([x, z], i) => <mesh key={i} position={[x, 2.4, z]} castShadow><boxGeometry args={[0.4, 0.5, 0.4]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>)}
+    <mesh position={[0, 1.65, 0]} castShadow><boxGeometry args={[1.15, 3.3, 1.15]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
+    {([[-0.36, -0.36], [0.36, -0.36], [-0.36, 0.36], [0.36, 0.36]] as const).map(([x, z], i) => <mesh key={i} position={[x, 3.55, z]} castShadow><boxGeometry args={[0.42, 0.5, 0.42]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>)}
   </group>;
 
   if (assetKey === "castle_gate") return <group>
