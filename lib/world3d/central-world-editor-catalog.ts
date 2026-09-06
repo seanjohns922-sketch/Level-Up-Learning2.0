@@ -74,7 +74,7 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_cockatoo", "Cockatoo", "cockatoo", "#e6ebef", "animals", "1x1", 1.0),
 
   // Fortress kit
-  starter("central_world_starter_wall", "Castle Wall", "castle_wall", "#9a8d7c", "fortress", "2x1", 1.0),
+  starter("central_world_starter_wall", "Castle Wall", "castle_wall", "#9a8d7c", "fortress", "1x1", 1.0),
   starter("central_world_starter_corner", "Wall Corner", "castle_corner", "#9a8d7c", "fortress", "1x1", 1.0),
   starter("central_world_starter_gatehouse", "Gatehouse", "castle_gate", "#8f8271", "fortress", "3x1", 1.0),
   starter("central_world_starter_turret", "Turret", "castle_turret", "#9a8d7c", "fortress", "2x2", 1.1),

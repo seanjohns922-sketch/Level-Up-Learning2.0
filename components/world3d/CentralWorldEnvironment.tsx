@@ -598,9 +598,10 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   </group>;
 
   if (assetKey === "castle_wall") return <group>
-    <mesh position={[0, 1.0, 0]} castShadow><boxGeometry args={[3.7, 2.0, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
-    {([0.55, 1.1, 1.65] as const).map((y) => <mesh key={y} position={[0, y, 0.36]}><boxGeometry args={[3.7, 0.05, 0.02]} /><meshStandardMaterial color="#6f6355" roughness={0.95} /></mesh>)}
-    {([-1.55, -0.775, 0, 0.775, 1.55] as const).map((x) => <mesh key={x} position={[x, 2.25, 0]} castShadow><boxGeometry args={[0.55, 0.5, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>)}
+    {/* one cell wide (~2 m) so segments tile seamlessly side by side */}
+    <mesh position={[0, 1.0, 0]} castShadow><boxGeometry args={[1.98, 2.0, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>
+    {([0.55, 1.1, 1.65] as const).map((y) => <mesh key={y} position={[0, y, 0.36]}><boxGeometry args={[1.98, 0.05, 0.02]} /><meshStandardMaterial color="#6f6355" roughness={0.95} /></mesh>)}
+    {([-0.66, 0, 0.66] as const).map((x) => <mesh key={x} position={[x, 2.25, 0]} castShadow><boxGeometry args={[0.5, 0.5, 0.7]} /><meshStandardMaterial color={t("#9a8d7c")} roughness={0.9} /></mesh>)}
   </group>;
 
   if (assetKey === "castle_corner") return <group>

@@ -17,8 +17,10 @@ export const CENTRAL_WORLD_CONFIG = {
   myHomeRotationY: Math.PI / 2,
   myHomeEntrance: [-24.8, 0.75, -6] as [number, number, number],
   myHomeExitSpawn: [-22.8, 0.75, -4.5] as [number, number, number],
-  playableBounds: { minX: -48, maxX: 48, minZ: -35.5, maxZ: 54 },
-  roamEllipse: { centerZ: 8, radiusX: 47, radiusZ: 46 },
+  // Reaches well behind the tower (base back ~z -53) so the avatar can walk all
+  // the way around it, and stays inside the 135-unit meadow / following backdrop.
+  playableBounds: { minX: -54, maxX: 54, minZ: -60, maxZ: 54 },
+  roamEllipse: { centerZ: -4, radiusX: 53, radiusZ: 59 },
   pathPoints: [
     [2.5, 52],
     [3.4, 43],
