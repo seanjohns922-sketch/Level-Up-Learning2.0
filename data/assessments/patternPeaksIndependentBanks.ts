@@ -79,22 +79,36 @@ function authoredQuestion(level: PatternPeaksLevel, form: PatternPeaksAssessment
   }
 
   if (level === 4) {
-    archetype = descriptorCode === "AC9M4A01" ? index % 4 : 4;
-    if (archetype <= 1) {
-      const whole = 130 + (seed % 160); const part = 35 + (index * 7 % 80);
-      const left = archetype === 0 ? `${part} + ?` : `? + ${part}`;
-      return { question: { kind: "typed_response", prompt: "Find the unknown addend.", answer: String(whole - part), visual: { type: "unknown_tile_equation", title: "Addition equation", left, right: String(whole) } }, structure: "unknown-position" };
-    }
-    if (archetype === 2) {
-      const whole = 180 + (seed % 170); const remaining = 45 + (index * 9 % 90);
-      return { question: { kind: "typed_response", prompt: "Which value completes the subtraction equation?", answer: String(whole - remaining), visual: { type: "inverse_step_card", title: "Subtraction equation", equation: `${whole} − ? = ${remaining}`, inverseOperation: `${whole} − ${remaining}` } }, structure: "inverse-add-sub" };
-    }
-    if (archetype === 3) {
+    const descriptorIndex = Math.floor(index / 2);
+    if (descriptorCode === "AC9M4A01") {
+      archetype = descriptorIndex % 4;
+      if (archetype <= 1) {
+        const whole = 130 + (seed % 160); const part = 35 + (index * 7 % 80);
+        const left = archetype === 0 ? `${part} + ?` : `? + ${part}`;
+        return { question: { kind: "typed_response", prompt: "Find the unknown addend.", answer: String(whole - part), visual: { type: "unknown_tile_equation", title: "Addition equation", left, right: String(whole) } }, structure: "unknown-position" };
+      }
+      if (archetype === 2) {
+        const whole = 180 + (seed % 170); const remaining = 45 + (index * 9 % 90);
+        return { question: { kind: "typed_response", prompt: "Which value completes the subtraction equation?", answer: String(whole - remaining), visual: { type: "inverse_step_card", title: "Subtraction equation", equation: `${whole} − ? = ${remaining}`, inverseOperation: `${whole} − ${remaining}` } }, structure: "inverse-add-sub" };
+      }
       const a = 16 + index; const b = 25 + (seed % 16); const c = 24 + (index % 8);
       return { question: { kind: "typed_response", prompt: "Calculate the total.", answer: String(a + b + c), visual: { type: "expression_flow", title: "Addition expression", cards: [{ tokens: [String(a), "+", String(b), "+", String(c)] }, { tokens: [String(a), "+", `(${b} + ${c})`], result: "?" }] } }, structure: "regroup-addends" };
     }
-    const factor = [6, 7, 9][index % 3]!; const groups = 5 + (seed % 8); const product = factor * groups;
-    return { question: { kind: "typed_response", prompt: "How many groups complete the equation?", answer: String(groups), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `${factor} × ? = ${product}`, inverseOperation: `${product} ÷ ${factor}` } }, structure: "derived-multiplication" };
+
+    archetype = (descriptorIndex + (form === "posttest" ? 2 : 0)) % 4;
+    const factor = [6, 7, 8, 9][descriptorIndex % 4]!;
+    const groups = 4 + (seed % 9);
+    const product = factor * groups;
+    if (archetype === 0) {
+      return { question: { kind: "typed_response", prompt: "Find the missing second factor.", answer: String(groups), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `${factor} × ? = ${product}`, inverseOperation: `${product} ÷ ${factor}` } }, structure: "missing-factor-right" };
+    }
+    if (archetype === 1) {
+      return { question: { kind: "typed_response", prompt: "Find the missing first factor.", answer: String(factor), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `? × ${groups} = ${product}`, inverseOperation: `${product} ÷ ${groups}` } }, structure: "missing-factor-left" };
+    }
+    if (archetype === 2) {
+      return { question: { kind: "typed_response", prompt: "Find the quotient.", answer: String(groups), visual: { type: "inverse_step_card", title: "Division equation", equation: `${product} ÷ ${factor} = ?`, inverseOperation: `${factor} × ${groups}` } }, structure: "related-division-quotient" };
+    }
+    return { question: { kind: "typed_response", prompt: "Find the missing divisor.", answer: String(factor), visual: { type: "inverse_step_card", title: "Division equation", equation: `${product} ÷ ? = ${groups}`, inverseOperation: `${groups} × ${factor}` } }, structure: "related-division-divisor" };
   }
 
   if (level === 5) {
@@ -148,6 +162,15 @@ function authoredQuestion(level: PatternPeaksLevel, form: PatternPeaksAssessment
 
 function descriptorSlots(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind) {
   const blueprint = getPatternPeaksAssessmentBlueprint(level)!;
+  if (level === 4) {
+    const [additionAndSubtraction, multiplicationAndDivision] = blueprint.descriptors;
+    if (!additionAndSubtraction || !multiplicationAndDivision) return [];
+    return Array.from({ length: 20 }, (_, index) => {
+      const pretestStartsWithAddition = form === "pretest";
+      const useAddition = index % 2 === (pretestStartsWithAddition ? 0 : 1);
+      return useAddition ? additionAndSubtraction : multiplicationAndDivision;
+    });
+  }
   return blueprint.descriptors.flatMap((descriptor) => Array.from({ length: descriptor.allocation[form] }, () => descriptor));
 }
 

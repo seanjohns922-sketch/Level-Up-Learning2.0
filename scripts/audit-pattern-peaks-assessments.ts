@@ -17,7 +17,7 @@ const descriptorStructures: Record<string, string[]> = {
   AC9M3A02: ["add-sub-inverse", "relational-equality"],
   AC9M3A03: ["inverse-fact", "derived-fact"],
   AC9M4A01: ["unknown-position", "inverse-add-sub", "regroup-addends"],
-  AC9M4A02: ["derived-multiplication"],
+  AC9M4A02: ["missing-factor-right", "missing-factor-left", "related-division-quotient", "related-division-divisor"],
   AC9M5A01: ["multiplicative-unknown"],
   AC9M5A02: ["multiplication-property", "distributive", "factor-constraints", "multiple-constraint"],
   AC9M6A01: ["stage-generalisation", "rational-sequence"],
@@ -129,13 +129,33 @@ assert.equal(totalAssessmentItems, 140);
 
 const requiredStructures: Record<number, string[]> = {
   3: ["extended-sequence", "function-machine", "inverse-fact", "relational-equality", "derived-fact"],
-  4: ["unknown-position", "inverse-add-sub", "regroup-addends", "derived-multiplication"],
+  4: ["unknown-position", "inverse-add-sub", "regroup-addends", "missing-factor-right", "missing-factor-left", "related-division-quotient", "related-division-divisor"],
   5: ["multiplicative-unknown", "multiplication-property", "distributive", "factor-constraints", "multiple-constraint"],
   6: ["stage-generalisation", "multi-representation-rule", "bracket-order", "reverse-algorithm", "three-step-algorithm"],
 };
 for (const level of levels) {
   const structures = getPatternPeaksIndependentAssessment(level, "posttest").map((item) => item.structureKey);
   for (const required of requiredStructures[level]) assert.ok(structures.some((value) => value.includes(required)), `Year ${level} must assess ${required}`);
+}
+
+for (const form of ["pretest", "posttest"] as const) {
+  const levelFourItems = getPatternPeaksIndependentAssessment(4, form);
+  assert.equal(levelFourItems.filter((item) => item.primaryDescriptorCode === "AC9M4A01").length, 10);
+  assert.equal(levelFourItems.filter((item) => item.primaryDescriptorCode === "AC9M4A02").length, 10);
+  for (let index = 1; index < levelFourItems.length; index += 1) {
+    assert.notEqual(
+      levelFourItems[index]!.primaryDescriptorCode,
+      levelFourItems[index - 1]!.primaryDescriptorCode,
+      `Year 4 ${form} descriptors must be interleaved`,
+    );
+  }
+  const levelFourStructures = levelFourItems.map((item) => item.structureKey);
+  for (const structure of descriptorStructures.AC9M4A02) {
+    assert.ok(
+      levelFourStructures.some((value) => value.includes(structure)),
+      `Year 4 ${form} must include ${structure}`,
+    );
+  }
 }
 
 for (const level of [4, 5, 6] as const) {
