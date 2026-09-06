@@ -369,7 +369,7 @@ function TaskRendererInner({
 
   switch (task.kind) {
     case "patternPeaksQuestion":
-      return <PatternPeaksQuestionCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <PatternPeaksQuestionCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />;
     case "matchPairs":
       return <MatchThePair key={k} config={t.config} onComplete={onC} />;
     case "countObjects":

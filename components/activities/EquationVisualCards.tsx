@@ -108,9 +108,11 @@ export function BalanceEquationCardVisual({
 
 export function InverseStepCardVisual({
   visual,
+  showSupport = true,
   ...answer
 }: {
   visual: InverseStepCardVisualData;
+  showSupport?: boolean;
 } & InlineAnswerProps) {
   return (
     <div className="mt-5 rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
@@ -121,12 +123,16 @@ export function InverseStepCardVisual({
         <div className="text-center text-2xl font-black text-white">
           {renderUnknownAware(visual.equation, "?", { ...answer, tone: "dark" })}
         </div>
-        <div className="mt-4 inline-flex rounded-full border border-cyan-300 bg-cyan-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-cyan-200">
-          {visual.focusLabel ?? "Undo step"}
-        </div>
-        <div className="mt-3 text-lg font-black text-cyan-100">
-          {renderUnknownAware(visual.inverseOperation, "?", { ...answer, tone: "dark" })}
-        </div>
+        {showSupport ? (
+          <>
+            <div className="mt-4 inline-flex rounded-full border border-cyan-300 bg-cyan-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-cyan-200">
+              {visual.focusLabel ?? "Undo step"}
+            </div>
+            <div className="mt-3 text-lg font-black text-cyan-100">
+              {renderUnknownAware(visual.inverseOperation, "?", { ...answer, tone: "dark" })}
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   );
@@ -165,9 +171,11 @@ export function UnknownTileEquationVisual({
 
 export function BracketEquationCardVisual({
   visual,
+  showSupport = true,
   ...answer
 }: {
   visual: BracketEquationCardVisualData;
+  showSupport?: boolean;
 } & InlineAnswerProps) {
   const unknownSymbol = visual.left.includes("□") || visual.right.includes("□") ? "□" : "?";
   return (
@@ -182,7 +190,7 @@ export function BracketEquationCardVisual({
         </div>
         <EquationSide label="Right side" value={visual.right} unknownSymbol={unknownSymbol} answer={answer} />
       </div>
-      {(visual.bracketGroup || visual.outsideFactor) ? (
+      {showSupport && (visual.bracketGroup || visual.outsideFactor) ? (
         <div className="mt-4 flex flex-wrap gap-2">
           {visual.bracketGroup ? (
             <div className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-amber-800">

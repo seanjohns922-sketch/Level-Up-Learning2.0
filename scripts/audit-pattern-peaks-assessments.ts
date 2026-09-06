@@ -7,6 +7,7 @@ import { PATTERN_PEAKS_INDEPENDENT_ASSESSMENT_FORMS, getPatternPeaksIndependentA
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 import { getPosttestForYearLabel, getPretestForYearLabel, validateAssessmentBlueprintForLevel } from "@/data/assessments/api";
 import { isRealmFirstLevel } from "@/lib/realms/realm-registry";
+import { getPatternQuestionReadAloudText } from "@/lib/pattern-question-read-aloud";
 
 const levels = [3, 4, 5, 6] as const;
 const root = process.cwd();
@@ -23,6 +24,7 @@ const descriptorStructures: Record<string, string[]> = {
   AC9M6A02: ["multi-representation-rule", "three-step-algorithm"],
   AC9M6A03: ["bracket-order", "reverse-algorithm"],
 };
+const assessmentCoachingPattern = /\b(use the|undo|regroup|check both sides|calculate efficiently|brackets first|inverse operation|follow the full algorithm)\b/i;
 
 assert.equal(PATTERN_PEAKS_WEEKLY_QUIZ_FORMS.length, 28, "Pattern Peaks must have 28 weekly quiz forms");
 const quizIds = new Set<string>();
@@ -80,6 +82,25 @@ for (const level of levels) {
       assert.equal(item.type, "patternPeaksTask");
       assert.equal(item.practiceTask?.kind, "patternPeaksQuestion");
       assert.equal(isPracticeTaskSafe(item.practiceTask), true, `${item.id} must be accepted by the production renderer`);
+      if (item.practiceTask?.kind === "patternPeaksQuestion") {
+        const question = item.practiceTask.question;
+        assert.ok(
+          !assessmentCoachingPattern.test(question.prompt),
+          `${item.id} assessment prompt must not coach a solving strategy`,
+        );
+        const independentSpeech = getPatternQuestionReadAloudText(question, { includeSupport: false });
+        assert.ok(!independentSpeech.includes("Undo step"), `${item.id} assessment audio must not announce an undo step`);
+        if (question.visual?.type === "inverse_step_card") {
+          assert.ok(
+            !independentSpeech.includes(question.visual.inverseOperation),
+            `${item.id} assessment audio must not reveal the inverse operation`,
+          );
+          assert.ok(
+            question.visual.equation.includes("?") || question.visual.equation.includes("□"),
+            `${item.id} assessment equation must not reveal its answer`,
+          );
+        }
+      }
       assert.ok(item.curriculumCodes?.includes(item.primaryDescriptorCode));
       assert.ok(descriptorStructures[item.primaryDescriptorCode]?.some((structure) => item.structureKey.includes(structure)), `${item.id} structure must match ${item.primaryDescriptorCode}`);
       assert.ok(item.misconceptionTags.length > 0);
@@ -138,6 +159,8 @@ const posttestSource = readFileSync(`${root}/app/posttest/page.tsx`, "utf8");
 const lessonRouteSource = readFileSync(`${root}/app/pattern-peaks/lesson/[level]/[week]/[lesson]/page.tsx`, "utf8");
 const quizRouteSource = readFileSync(`${root}/app/pattern-peaks/quiz/[level]/[week]/page.tsx`, "utf8");
 const lessonShellSource = readFileSync(`${root}/components/pattern-peaks/PatternPeaksLessonShell.tsx`, "utf8");
+const taskRendererSource = readFileSync(`${root}/components/TaskRenderer.tsx`, "utf8");
+const patternQuestionCardSource = readFileSync(`${root}/components/pattern-peaks/PatternPeaksQuestionCard.tsx`, "utf8");
 assert.ok(apiSource.includes('case "pattern"'));
 assert.ok(programSource.includes("/pattern-peaks/quiz/"));
 assert.ok(pretestSource.includes('question?.type === "patternPeaksTask"'));
@@ -146,5 +169,7 @@ assert.ok(lessonRouteSource.includes("CanonicalRealmActivityGate") && lessonRout
 assert.ok(quizRouteSource.includes("CanonicalRealmActivityGate") && quizRouteSource.includes('activity="quiz"'));
 assert.ok(lessonShellSource.includes("saveRealmLessonAttempt") && lessonShellSource.includes('"pattern" as LiveRealmId'));
 assert.ok(lessonShellSource.includes("completionKeyRef.current") && lessonShellSource.includes("exitRequestedRef.current"));
+assert.ok(taskRendererSource.includes("assessmentMode={assessmentMode}"), "Task renderer must pass assessment mode into Pattern Peaks");
+assert.ok(patternQuestionCardSource.includes("assessmentMode={assessmentMode}"), "Pattern Peaks activities must receive assessment mode");
 
 console.log("Pattern Peaks assessment audit passed: 28 weekly forms / 420 quiz items / 7 independent Pre-Post forms / 140 assessment items.");

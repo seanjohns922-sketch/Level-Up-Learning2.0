@@ -52,7 +52,7 @@ function authoredQuestion(level: PatternPeaksLevel, form: PatternPeaksAssessment
     if (descriptorCode === "AC9M3A02") {
       const whole = 38 + (seed % 45); const part = 12 + (index % 18);
       return index % 2 === 0
-        ? { question: { kind: "typed_response", prompt: "Use addition and subtraction as inverse operations to find the unknown.", answer: String(whole - part), visual: { type: "inverse_step_card", title: "Addition and subtraction undo", equation: `${part} + ? = ${whole}`, inverseOperation: `${whole} − ${part}` } }, structure: "add-sub-inverse" }
+        ? { question: { kind: "typed_response", prompt: "Find the missing addend.", answer: String(whole - part), visual: { type: "inverse_step_card", title: "Addition equation", equation: `${part} + ? = ${whole}`, inverseOperation: `${whole} − ${part}` } }, structure: "add-sub-inverse" }
         : { question: { kind: "typed_response", prompt: "Find the missing value that keeps both sides equal.", answer: String(whole - part), visual: { type: "balance_equation_card", title: "Relational equality", left: String(whole), right: `${part} + ?` } }, structure: "relational-equality" };
     }
     if (descriptorCode === "AC9M3A03") archetype = index % 2 === 0 ? 2 : 4;
@@ -64,18 +64,18 @@ function authoredQuestion(level: PatternPeaksLevel, form: PatternPeaksAssessment
     }
     if (archetype === 1) {
       const input = 4 + (seed % 12); const add = 3 + (index % 6);
-      return { question: { kind: "typed_response", prompt: "Apply the rule to the new input.", answer: String(input + add), visual: { type: "function_machine_card", title: "One-step function", input: String(input), rule: `+ ${add}`, output: "?" } }, structure: "function-machine" };
+      return { question: { kind: "typed_response", prompt: "What is the missing output?", answer: String(input + add), visual: { type: "function_machine_card", title: "One-step function", input: String(input), rule: `+ ${add}`, output: "?" } }, structure: "function-machine" };
     }
     if (archetype === 2) {
       const factor = [3, 4, 5, 10][index % 4]!; const other = 3 + (seed % 8); const product = factor * other;
-      return { question: { kind: "typed_response", prompt: "Use the inverse fact to find the missing value.", answer: String(other), visual: { type: "inverse_step_card", title: "Fact family", equation: `${factor} × ? = ${product}`, inverseOperation: `${product} ÷ ${factor}` } }, structure: "inverse-fact" };
+      return { question: { kind: "typed_response", prompt: "Find the missing factor.", answer: String(other), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `${factor} × ? = ${product}`, inverseOperation: `${product} ÷ ${factor}` } }, structure: "inverse-fact" };
     }
     if (archetype === 3) {
       const a = 18 + (seed % 24); const b = 7 + (index % 10); const c = 9 + (seed % 8);
       return { question: { kind: "typed_response", prompt: "Make both sides equal.", answer: String(a + b - c), visual: { type: "balance_equation_card", title: "Equivalent sentence", left: `${a} + ${b}`, right: `${c} + ?` } }, structure: "relational-equality" };
     }
     const base = 4 + (seed % 7); const factor = [3, 4, 5, 10][index % 4]!;
-    return { question: { kind: "typed_response", prompt: "Use the known fact to calculate the next fact.", answer: String((base + 1) * factor), visual: { type: "expression_flow", title: "Derived fact", cards: [{ tokens: [String(base), "×", String(factor)], result: String(base * factor) }, { tokens: [String(base + 1), "×", String(factor)], result: "?" }] } }, structure: "derived-fact" };
+    return { question: { kind: "typed_response", prompt: "Calculate the missing product.", answer: String((base + 1) * factor), visual: { type: "expression_flow", title: "Related multiplication facts", cards: [{ tokens: [String(base), "×", String(factor)], result: String(base * factor) }, { tokens: [String(base + 1), "×", String(factor)], result: "?" }] } }, structure: "derived-fact" };
   }
 
   if (level === 4) {
@@ -83,33 +83,33 @@ function authoredQuestion(level: PatternPeaksLevel, form: PatternPeaksAssessment
     if (archetype <= 1) {
       const whole = 130 + (seed % 160); const part = 35 + (index * 7 % 80);
       const left = archetype === 0 ? `${part} + ?` : `? + ${part}`;
-      return { question: { kind: "typed_response", prompt: "Find the unknown addend and check both sides.", answer: String(whole - part), visual: { type: "unknown_tile_equation", title: "Addition unknown", left, right: String(whole) } }, structure: "unknown-position" };
+      return { question: { kind: "typed_response", prompt: "Find the unknown addend.", answer: String(whole - part), visual: { type: "unknown_tile_equation", title: "Addition equation", left, right: String(whole) } }, structure: "unknown-position" };
     }
     if (archetype === 2) {
       const whole = 180 + (seed % 170); const remaining = 45 + (index * 9 % 90);
-      return { question: { kind: "typed_response", prompt: "Undo the subtraction to find the missing part.", answer: String(whole - remaining), visual: { type: "inverse_step_card", title: "Subtraction unknown", equation: `${whole} − ? = ${remaining}`, inverseOperation: `${whole} − ${remaining}` } }, structure: "inverse-add-sub" };
+      return { question: { kind: "typed_response", prompt: "Which value completes the subtraction equation?", answer: String(whole - remaining), visual: { type: "inverse_step_card", title: "Subtraction equation", equation: `${whole} − ? = ${remaining}`, inverseOperation: `${whole} − ${remaining}` } }, structure: "inverse-add-sub" };
     }
     if (archetype === 3) {
       const a = 16 + index; const b = 25 + (seed % 16); const c = 24 + (index % 8);
-      return { question: { kind: "typed_response", prompt: "Regroup the addends to calculate efficiently.", answer: String(a + b + c), visual: { type: "expression_flow", title: "Associative structure", cards: [{ tokens: [String(a), "+", String(b), "+", String(c)] }, { tokens: [String(a), "+", `(${b} + ${c})`], result: "?" }] } }, structure: "regroup-addends" };
+      return { question: { kind: "typed_response", prompt: "Calculate the total.", answer: String(a + b + c), visual: { type: "expression_flow", title: "Addition expression", cards: [{ tokens: [String(a), "+", String(b), "+", String(c)] }, { tokens: [String(a), "+", `(${b} + ${c})`], result: "?" }] } }, structure: "regroup-addends" };
     }
     const factor = [6, 7, 9][index % 3]!; const groups = 5 + (seed % 8); const product = factor * groups;
-    return { question: { kind: "typed_response", prompt: "Use the known fact and its related division fact.", answer: String(groups), visual: { type: "inverse_step_card", title: "Related multiplication and division", equation: `${factor} × ${groups} = ${product}`, inverseOperation: `${product} ÷ ${factor}` } }, structure: "derived-multiplication" };
+    return { question: { kind: "typed_response", prompt: "How many groups complete the equation?", answer: String(groups), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `${factor} × ? = ${product}`, inverseOperation: `${product} ÷ ${factor}` } }, structure: "derived-multiplication" };
   }
 
   if (level === 5) {
     archetype = descriptorCode === "AC9M5A01" ? 0 : 1 + (index % 4);
     if (archetype === 0) {
       const factor = 8 + (seed % 14); const other = 4 + (index % 9); const product = factor * other;
-      return { question: { kind: "typed_response", prompt: "Find the unknown factor using the inverse operation.", answer: String(factor), visual: { type: "inverse_step_card", title: "Unknown multiplicative part", equation: `? × ${other} = ${product}`, inverseOperation: `${product} ÷ ${other}` } }, structure: "multiplicative-unknown" };
+      return { question: { kind: "typed_response", prompt: "Find the unknown factor.", answer: String(factor), visual: { type: "inverse_step_card", title: "Multiplication equation", equation: `? × ${other} = ${product}`, inverseOperation: `${product} ÷ ${other}` } }, structure: "multiplicative-unknown" };
     }
     if (archetype === 1) {
       const a = 3 + (seed % 5); const b = 4 + (index % 6); const c = 2 + (seed % 4);
-      return { question: { kind: "typed_response", prompt: "Regroup the factors, then calculate.", answer: String(a * b * c), visual: { type: "expression_flow", title: "Associative multiplication", cards: [{ tokens: [String(a), "×", String(b), "×", String(c)] }, { tokens: [String(a), "×", `(${b} × ${c})`], result: "?" }] } }, structure: "multiplication-property" };
+      return { question: { kind: "typed_response", prompt: "Calculate the product.", answer: String(a * b * c), visual: { type: "expression_flow", title: "Multiplication expression", cards: [{ tokens: [String(a), "×", String(b), "×", String(c)] }, { tokens: [String(a), "×", `(${b} × ${c})`], result: "?" }] } }, structure: "multiplication-property" };
     }
     if (archetype === 2) {
       const factor = 6 + (seed % 9); const extra = 2 + (index % 7);
-      return { question: { kind: "typed_response", prompt: "Use the split to calculate the product.", answer: String(factor * (10 + extra)), visual: { type: "expression_flow", title: "Distributive reasoning", cards: [{ tokens: [String(factor), "×", `(10 + ${extra})`] }, { tokens: [`${factor} × 10`, "+", `${factor} × ${extra}`], result: "?" }] } }, structure: "distributive" };
+      return { question: { kind: "typed_response", prompt: "Calculate the product.", answer: String(factor * (10 + extra)), visual: { type: "expression_flow", title: "Multiplication expression", cards: [{ tokens: [String(factor), "×", `(10 + ${extra})`] }, { tokens: [`${factor} × 10`, "+", `${factor} × ${extra}`], result: "?" }] } }, structure: "distributive" };
     }
     if (archetype === 3) {
       const product = [24, 30, 36, 42, 48, 60, 72][seed % 7]!; const pairs: Array<[number, number]> = [];
@@ -132,18 +132,18 @@ function authoredQuestion(level: PatternPeaksLevel, form: PatternPeaksAssessment
   }
   if (archetype === 1) {
     const multiply = 2 + (index % 4); const add = 3 + (seed % 8); const input = 5 + (index % 7);
-    return { question: { kind: "typed_response", prompt: "Apply the two-step rule to the new input.", answer: String(input * multiply + add), visual: { type: "input_output_table", title: `Multiply by ${multiply}, then add ${add}`, pairs: [1, 2, 4].map((value) => ({ input: String(value), output: String(value * multiply + add) })).concat({ input: String(input), output: "?" }) } }, structure: "multi-representation-rule" };
+    return { question: { kind: "typed_response", prompt: "What is the missing output?", answer: String(input * multiply + add), visual: { type: "input_output_table", title: `Multiply by ${multiply}, then add ${add}`, pairs: [1, 2, 4].map((value) => ({ input: String(value), output: String(value * multiply + add) })).concat({ input: String(input), output: "?" }) } }, structure: "multi-representation-rule" };
   }
   if (archetype === 2) {
     const a = 3 + (seed % 8); const b = 2 + (index % 6); const outside = 2 + (seed % 4);
-    return { question: { kind: "typed_response", prompt: "Use the brackets first, then calculate.", answer: String((a + b) * outside), visual: { type: "bracket_equation_card", title: "Order of operations", left: `(${a} + ${b}) × ${outside}`, right: "?", bracketGroup: `${a} + ${b}`, outsideFactor: `× ${outside}` } }, structure: "bracket-order" };
+    return { question: { kind: "typed_response", prompt: "Calculate the value.", answer: String((a + b) * outside), visual: { type: "bracket_equation_card", title: "Bracketed expression", left: `(${a} + ${b}) × ${outside}`, right: "?", bracketGroup: `${a} + ${b}`, outsideFactor: `× ${outside}` } }, structure: "bracket-order" };
   }
   if (archetype === 3) {
     const unknown = 4 + (seed % 10); const add = 3 + (index % 7); const outside = 2 + (index % 4);
-    return { question: { kind: "typed_response", prompt: "Undo the operations in reverse order to find the unknown.", answer: String(unknown), visual: { type: "bracket_equation_card", title: "Complex unknown", left: `(? + ${add}) × ${outside}`, right: String((unknown + add) * outside), bracketGroup: `? + ${add}`, outsideFactor: `× ${outside}` } }, structure: "reverse-algorithm" };
+    return { question: { kind: "typed_response", prompt: "Find the missing value in the bracketed equation.", answer: String(unknown), visual: { type: "bracket_equation_card", title: "Bracketed equation", left: `(? + ${add}) × ${outside}`, right: String((unknown + add) * outside), bracketGroup: `? + ${add}`, outsideFactor: `× ${outside}` } }, structure: "reverse-algorithm" };
   }
   const input = 4 + (seed % 9); const add = 2 + (index % 6); const multiply = 2 + (seed % 3);
-  return { question: { kind: "typed_response", prompt: "Follow the full algorithm and record the final output.", answer: String((input + add) * multiply - 2), visual: { type: "expression_flow", title: "Three-step algorithm", cards: [{ label: "Start", tokens: [String(input)] }, { label: "Step 1", tokens: [String(input), "+", String(add)], result: String(input + add) }, { label: "Steps 2 and 3", tokens: [String(input + add), "×", String(multiply), "−", "2"], result: "?" }] } }, structure: "three-step-algorithm" };
+  return { question: { kind: "typed_response", prompt: "What is the final output?", answer: String((input + add) * multiply - 2), visual: { type: "expression_flow", title: "Three-step algorithm", cards: [{ label: "Start", tokens: [String(input)] }, { label: "Step 1", tokens: [String(input), "+", String(add)], result: String(input + add) }, { label: "Steps 2 and 3", tokens: [String(input + add), "×", String(multiply), "−", "2"], result: "?" }] } }, structure: "three-step-algorithm" };
 }
 
 function descriptorSlots(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind) {

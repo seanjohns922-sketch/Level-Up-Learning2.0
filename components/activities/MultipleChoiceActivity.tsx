@@ -145,17 +145,19 @@ export default function MultipleChoiceActivity({
   onWrong,
   renderMode = "lesson",
   realmId,
+  assessmentMode = false,
 }: {
   questionData: MultipleChoiceQuestion;
   onCorrect?: () => void;
   onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
   realmId?: string;
+  assessmentMode?: boolean;
 }) {
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
   const questionReadAloudText = isPattern
-    ? getPatternQuestionReadAloudText(questionData)
+    ? getPatternQuestionReadAloudText(questionData, { includeSupport: !assessmentMode })
     : questionData.prompt;
   const theme = getRealmTheme(realmId);
   const [picked, setPicked] = useState<string | null>(null);
@@ -407,13 +409,13 @@ export default function MultipleChoiceActivity({
         <BalanceEquationCardVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "inverse_step_card" ? (
-        <InverseStepCardVisual visual={questionData.visual} />
+        <InverseStepCardVisual visual={questionData.visual} showSupport={!assessmentMode} />
       ) : null}
       {questionData.visual?.type === "unknown_tile_equation" ? (
         <UnknownTileEquationVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "bracket_equation_card" ? (
-        <BracketEquationCardVisual visual={questionData.visual} />
+        <BracketEquationCardVisual visual={questionData.visual} showSupport={!assessmentMode} />
       ) : null}
       {questionData.visual?.type === "check_substitution_card" ? (
         <CheckBySubstitutionCardVisual visual={questionData.visual} />

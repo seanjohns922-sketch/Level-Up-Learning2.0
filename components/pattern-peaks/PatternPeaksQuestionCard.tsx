@@ -10,10 +10,12 @@ export function PatternPeaksQuestionCard({
   task,
   onCorrect,
   onWrong,
+  assessmentMode = false,
 }: {
   task: PatternTask;
   onCorrect: () => void;
   onWrong: () => void;
+  assessmentMode?: boolean;
 }) {
   const question = task.question;
   if (question.kind === "typed_response") {
@@ -22,6 +24,7 @@ export function PatternPeaksQuestionCard({
         questionData={question}
         renderMode="quiz"
         realmId="pattern"
+        assessmentMode={assessmentMode}
         onCorrect={onCorrect}
         onWrong={onWrong}
       />
@@ -33,6 +36,7 @@ export function PatternPeaksQuestionCard({
       questionData={question}
       renderMode="quiz"
       realmId="pattern"
+      assessmentMode={assessmentMode}
       onCorrect={onCorrect}
       onWrong={onWrong}
     />

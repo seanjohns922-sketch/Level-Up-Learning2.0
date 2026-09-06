@@ -22,7 +22,7 @@ function speakMath(value: string | number) {
     .trim();
 }
 
-function patternVisualSpeech(visual: PatternVisual) {
+function patternVisualSpeech(visual: PatternVisual, includeSupport: boolean) {
   switch (visual.type) {
     case "array":
       return `Array. ${visual.rows} rows and ${visual.columns} columns.`;
@@ -60,24 +60,32 @@ function patternVisualSpeech(visual: PatternVisual) {
     case "unknown_tile_equation":
       return `${visual.title}. Left side: ${speakMath(visual.left)}. Equals right side: ${speakMath(visual.right)}.`;
     case "inverse_step_card":
-      return `${visual.title}. Equation: ${speakMath(visual.equation)}. ${visual.focusLabel ?? "Undo step"}: ${speakMath(visual.inverseOperation)}.`;
+      return [
+        `${visual.title}. Equation: ${speakMath(visual.equation)}.`,
+        includeSupport
+          ? `${visual.focusLabel ?? "Undo step"}: ${speakMath(visual.inverseOperation)}.`
+          : "",
+      ].filter(Boolean).join(" ");
     case "bracket_equation_card":
       return [
         visual.title,
         `Left side: ${speakMath(visual.left)}. Equals right side: ${speakMath(visual.right)}.`,
-        visual.bracketGroup ? `Bracket group: ${speakMath(visual.bracketGroup)}.` : "",
-        visual.outsideFactor ? `Outside step: ${speakMath(visual.outsideFactor)}.` : "",
+        includeSupport && visual.bracketGroup ? `Bracket group: ${speakMath(visual.bracketGroup)}.` : "",
+        includeSupport && visual.outsideFactor ? `Outside step: ${speakMath(visual.outsideFactor)}.` : "",
       ].filter(Boolean).join(" ");
     default:
       return "";
   }
 }
 
-export function getPatternQuestionReadAloudText(question: PatternQuestion) {
+export function getPatternQuestionReadAloudText(
+  question: PatternQuestion,
+  { includeSupport = true }: { includeSupport?: boolean } = {},
+) {
   return [
     question.prompt,
-    question.helper ? `Help: ${question.helper}` : "",
+    includeSupport && question.helper ? `Help: ${question.helper}` : "",
     "instruction" in question && question.instruction ? `Instruction: ${question.instruction}` : "",
-    question.visual ? patternVisualSpeech(question.visual) : "",
+    question.visual ? patternVisualSpeech(question.visual, includeSupport) : "",
   ].filter(Boolean).join(" ");
 }

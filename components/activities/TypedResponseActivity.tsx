@@ -1604,16 +1604,18 @@ export default function TypedResponseActivity({
   onWrong,
   renderMode = "lesson",
   realmId,
+  assessmentMode = false,
 }: {
   questionData: TypedResponseQuestion;
   onCorrect?: () => void;
   onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
   realmId?: string;
+  assessmentMode?: boolean;
 }) {
   const isPattern = realmId === "pattern";
   const questionReadAloudText = isPattern
-    ? getPatternQuestionReadAloudText(questionData)
+    ? getPatternQuestionReadAloudText(questionData, { includeSupport: !assessmentMode })
     : questionData.prompt;
   const writtenMethod = questionData.writtenMethod;
   const isGuidedAddition = writtenMethod?.operation === "+";
@@ -2895,13 +2897,13 @@ export default function TypedResponseActivity({
         <BalanceEquationCardVisual visual={questionData.visual} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
       ) : null}
       {questionData.visual?.type === "inverse_step_card" ? (
-        <InverseStepCardVisual visual={questionData.visual} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
+        <InverseStepCardVisual visual={questionData.visual} showSupport={!assessmentMode} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
       ) : null}
       {questionData.visual?.type === "unknown_tile_equation" ? (
         <UnknownTileEquationVisual visual={questionData.visual} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
       ) : null}
       {questionData.visual?.type === "bracket_equation_card" ? (
-        <BracketEquationCardVisual visual={questionData.visual} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
+        <BracketEquationCardVisual visual={questionData.visual} showSupport={!assessmentMode} answerValue={hasInlineVisualInput ? typed : undefined} onAnswerChange={hasInlineVisualInput ? setTyped : undefined} answerInputMode={inlineAnswerInputMode} />
       ) : null}
       {questionData.visual?.type === "check_substitution_card" ? (
         <CheckBySubstitutionCardVisual visual={questionData.visual} />

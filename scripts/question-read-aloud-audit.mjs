@@ -29,12 +29,12 @@ const checks = [
   {
     name: "Pattern Peaks activity controls use the complete speech text",
     file: "components/activities/MultipleChoiceActivity.tsx",
-    patterns: ["getPatternQuestionReadAloudText(questionData)", 'label={isPattern ? "Read all" : undefined}'],
+    patterns: ["getPatternQuestionReadAloudText(questionData,", 'label={isPattern ? "Read all" : undefined}'],
   },
   {
     name: "Pattern Peaks typed responses use the complete speech text",
     file: "components/activities/TypedResponseActivity.tsx",
-    patterns: ["getPatternQuestionReadAloudText(questionData)", 'label={isPattern ? "Read all" : undefined}'],
+    patterns: ["getPatternQuestionReadAloudText(questionData,", 'label={isPattern ? "Read all" : undefined}'],
   },
   {
     name: "fallback hides when an activity supplies prompt audio",
