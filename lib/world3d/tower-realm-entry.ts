@@ -23,6 +23,7 @@ function appendPreview(route: string, preview: boolean) {
 function adaptCanonicalRouteToAvailable3DWorld(route: string, realmId: CanonicalRealmId) {
   if (realmId === "number" && route === "/number-nexus") return "/world/number-nexus";
   if (realmId === "measurement" && route === "/measurelands") return "/world/measurelands";
+  if (realmId === "pattern" && route === "/pattern-peaks") return "/world/pattern-peaks";
   if (realmId === "space" && route === "/starpath") return "/world/starpath";
   if (realmId === "statistics" && route === "/statistica") return "/world/statistica";
   return route;

@@ -35,6 +35,7 @@ assert.deepEqual(canBrowserRunRealm3D({ respectReducedMotion: true }), { ok: fal
 globalThis.window.matchMedia = () => ({ matches: false });
 globalThis.document.createElement = () => ({ getContext: () => ({}) });
 assert.deepEqual(canBrowserRunRealm3D({ respectReducedMotion: true }), { ok: true });
+assert.equal(resolveRealm3DAccess({ realmId: "pattern" }).canExplore3D, true, "Pattern Peaks must be available to the shared 3D access gate");
 
 delete process.env.NEXT_PUBLIC_REALM_3D_DEFAULT;
 assert.equal(
