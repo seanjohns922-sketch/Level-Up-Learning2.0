@@ -14,9 +14,10 @@ export type CentralWorldPlacement = {
 export type CentralWorldGroundType = "path" | "road" | "stone" | "water";
 export type CentralWorldGroundTile = { gridX: number; gridZ: number; tileType: CentralWorldGroundType };
 
-// The buildable grid now reaches back to enclose the Tower of Knowledge
-// (base around world z -46) so kids can wall and moat right around it.
-export const CENTRAL_WORLD_GRID = { cellSize: 2, minX: -24, maxX: 24, minZ: -29, maxZ: 25 } as const;
+// The buildable grid reaches back to enclose the Tower of Knowledge (base around
+// world z -46) and left far enough to reach My Home (world x -60), so kids can
+// wall and moat around both landmarks.
+export const CENTRAL_WORLD_GRID = { cellSize: 2, minX: -34, maxX: 30, minZ: -31, maxZ: 28 } as const;
 const STORAGE_PREFIX = "lul:central-world:layout:v1";
 const GROUND_STORAGE_PREFIX = "lul:central-world:ground:v1";
 
