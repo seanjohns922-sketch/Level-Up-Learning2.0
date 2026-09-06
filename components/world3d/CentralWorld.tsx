@@ -383,6 +383,18 @@ export default function CentralWorld() {
     }
   }, [setEditCursor, setBuildPlacement, setCameraFocus]);
 
+  // Dedicated camera pan (the right-hand pad) — always moves the view, even while
+  // an item is in hand, so you can look around before dropping it.
+  const panCamera = useCallback((dx: number, dz: number) => {
+    const cx = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX);
+    const cz = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ);
+    setCameraFocus((f) => ({ gridX: cx(f.gridX + dx * 2), gridZ: cz(f.gridZ + dz * 2) }));
+  }, [setCameraFocus]);
+
+  const rotateHeld = useCallback(() => {
+    setBuildPlacement((current) => (current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current));
+  }, [setBuildPlacement]);
+
   // Laptop: arrow keys and WASD pan the build view (the on-screen arrows do the
   // same on iPad). Only while editing, and we swallow the keys so they neither
   // scroll the page nor walk the avatar.
@@ -764,12 +776,38 @@ export default function CentralWorld() {
             </div>
           ) : null}
 
-          <div className="centralWorldEditorControls" style={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center", gap: 9 }}>
-            <div className="centralWorldEditorDpad" style={{ display: "grid", gridTemplateColumns: "repeat(3, 40px)", gridTemplateRows: "repeat(2, 40px)", gap: 4 }}><button type="button" aria-label="Move cursor forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={19} /></button><button type="button" aria-label="Move cursor left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={19} /></button><button type="button" aria-label="Move cursor backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={19} /></button><button type="button" aria-label="Move cursor right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={19} /></button></div>
-            <div className="centralWorldEditorStatus" role="status" style={{ textAlign: "center", color: isMoveTool || isEraseTool || buildValid || groundPreview?.valid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? "Arrows nudge it · tap the grass to drop it." : "That space is taken — try a clear one.") : isMoveTool ? "Tap an item to pick it up · arrows pan the view." : isGroundTool ? "Drag across the grass to paint." : isEraseTool ? "Tap an item to remove it." : "Arrows pan the view."}</div>
-            <div className="centralWorldEditorActions" style={{ display: "flex", alignItems: "center", gap: 6 }}><button type="button" disabled={!buildPreview} onClick={() => setBuildPlacement((current) => current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current)} aria-label="Rotate selected item" title="Rotate" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", visibility: buildPreview ? "visible" : "hidden" }}><RotateCw size={19} /></button>{buildPreview ? <button type="button" onClick={deleteHeldPlacement} aria-label="Delete selected item" title="Delete" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", background: "#ef4444", color: "#fff" }}><Trash2 size={19} /></button> : null}<button type="button" disabled={!isEraseTool && (buildPreview ? !buildValid : !groundPreview?.valid)} onClick={buildPreview ? confirmBuildPlacement : applyGroundTool} style={{ ...debugButton, minHeight: 48, minWidth: 92, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: isEraseTool ? "#ef4444" : "#22c55e", color: "white", visibility: isMoveTool && !buildPreview ? "hidden" : "visible" }}>{isEraseTool ? <Eraser size={18} /> : <Check size={18} />}{isEraseTool ? "Remove" : buildPreview ? "Place" : "Paint"}</button></div>
-          </div>
         </section>
+      ) : null}
+
+      {/* Floating build controls, always reachable (outside the scrolling panel):
+          object nudge + turn + place at bottom centre, camera pan pad on the right. */}
+      {editorOpen ? (
+        <>
+          <div style={{ position: "absolute", left: "calc(50% + 165px)", bottom: 16, transform: "translateX(-50%)", zIndex: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, pointerEvents: "none" }}>
+            <div role="status" style={{ padding: "4px 12px", borderRadius: 999, background: "rgba(13,24,22,.82)", color: buildPreview ? (buildValid ? "#86efac" : "#fda4af") : "#cfe6d8", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? "Arrows move it · tap the grass to drop it" : "That space is taken — try a clear one") : isMoveTool ? "Tap an item to pick it up" : isGroundTool ? "Tap or drag the grass to paint" : isEraseTool ? "Tap an item to remove it" : "Pick something to place"}</div>
+            <div style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 10, background: "rgba(13,24,22,.92)", border: "1px solid #2f5a49", borderRadius: 12, padding: 8 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 38px)", gridTemplateRows: "repeat(2, 38px)", gap: 3 }}>
+                <button type="button" aria-label="Move item forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={18} /></button>
+                <button type="button" aria-label="Move item left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={18} /></button>
+                <button type="button" aria-label="Move item backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={18} /></button>
+                <button type="button" aria-label="Move item right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={18} /></button>
+              </div>
+              <button type="button" disabled={!buildPreview} onClick={rotateHeld} aria-label="Turn item 90 degrees" title="Turn 90 degrees" style={{ ...debugButton, minHeight: 46, padding: "0 12px", display: "inline-flex", alignItems: "center", gap: 6, opacity: buildPreview ? 1 : 0.4 }}><RotateCw size={18} /> Turn</button>
+              {buildPreview ? <button type="button" onClick={deleteHeldPlacement} aria-label="Delete item" title="Delete" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", background: "#ef4444", color: "#fff" }}><Trash2 size={18} /></button> : null}
+              <button type="button" disabled={!isEraseTool && (buildPreview ? !buildValid : !groundPreview?.valid)} onClick={buildPreview ? confirmBuildPlacement : applyGroundTool} style={{ ...debugButton, minHeight: 46, minWidth: 84, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: isEraseTool ? "#ef4444" : "#22c55e", color: "white", visibility: isMoveTool && !buildPreview ? "hidden" : "visible" }}>{isEraseTool ? <Eraser size={18} /> : <Check size={18} />}{isEraseTool ? "Remove" : buildPreview ? "Place" : "Paint"}</button>
+            </div>
+          </div>
+
+          <div style={{ position: "absolute", right: 16, bottom: 84, zIndex: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "rgba(13,24,22,.92)", border: "1px solid #2f5a49", borderRadius: 12, padding: 8 }}>
+            <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".14em" }}>CAMERA</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 44px)", gridTemplateRows: "repeat(2, 44px)", gap: 4 }}>
+              <button type="button" aria-label="Move camera up" onClick={() => panCamera(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={20} /></button>
+              <button type="button" aria-label="Move camera left" onClick={() => panCamera(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={20} /></button>
+              <button type="button" aria-label="Move camera down" onClick={() => panCamera(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={20} /></button>
+              <button type="button" aria-label="Move camera right" onClick={() => panCamera(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={20} /></button>
+            </div>
+          </div>
+        </>
       ) : null}
       {activeTargetId && !editorOpen && !buildPreview ? (
         <WorldInteractionPrompt
