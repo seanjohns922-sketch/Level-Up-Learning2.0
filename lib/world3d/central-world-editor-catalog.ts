@@ -42,7 +42,7 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_palm", "Palm Tree", "palm_tree", "#2f9e6f", "trees_plants", "2x2", 1.85),
   starter("central_world_starter_gum", "Gum Tree", "gum_tree", "#8fae86", "trees_plants", "2x2", 1.85),
   starter("central_world_starter_shrub", "Shrub", "shrub", "#4d9b46", "trees_plants", "1x1", 1.05),
-  starter("central_world_starter_hedge", "Hedge", "hedge", "#3c7a3a", "trees_plants", "2x1", 1.45),
+  starter("central_world_starter_hedge", "Hedge", "hedge", "#3c7a3a", "trees_plants", "1x1", 1.0),
   starter("central_world_starter_toadstool", "Toadstool", "toadstool", "#e05a52", "trees_plants", "1x1", 1.0),
   starter("central_world_starter_log", "Log", "log", "#8a5a34", "trees_plants", "2x1", 1.4),
   starter("central_world_starter_flowers", "Flower Bed", "flower_bed", "#ec4899", "trees_plants", "1x1", 1.25),
@@ -57,7 +57,7 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   // Furniture & fun
   starter("central_world_starter_lamp", "Lamp Post", "lamp_post", "#f5c451", "furniture_fun", "1x1", 1.25),
   starter("central_world_starter_bench", "Bench", "bench", "#b6763f", "furniture_fun", "2x1", 1.35),
-  starter("central_world_starter_fence", "Fence", "fence", "#c69a63", "furniture_fun", "2x1", 1.5),
+  starter("central_world_starter_fence", "Fence", "fence", "#c69a63", "furniture_fun", "1x1", 1.0),
   starter("central_world_starter_mailbox", "Mailbox", "mailbox", "#d0463f", "furniture_fun", "1x1", 1.1),
   starter("central_world_starter_flag", "Flag", "flag", "#2563eb", "furniture_fun", "1x1", 1.15),
   starter("central_world_starter_umbrella", "Umbrella", "umbrella", "#f2704a", "furniture_fun", "2x2", 1.4),

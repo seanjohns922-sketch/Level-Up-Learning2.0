@@ -55,12 +55,22 @@ const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { move: "Move", path: "Pa
 // The free scenery palette is driven entirely off CENTRAL_WORLD_STARTER_SCENERY,
 // grouped into these sections. Add an item to the catalogue (and a mesh in
 // StarterScenery) and it appears here automatically.
-const SCENERY_GROUPS: Array<[string, WorldSceneryGroup]> = [
-  ["TREES & PLANTS", "trees_plants"],
-  ["ROCKS & WATER", "rocks_water"],
-  ["FURNITURE & FUN", "furniture_fun"],
-  ["AUSSIE ANIMALS", "animals"],
-  ["FORTRESS", "fortress"],
+// Category tabs for the build palette, so kids pick a category and see just its
+// items instead of scrolling one long list.
+type PaletteTab = "ground" | WorldSceneryGroup;
+const PALETTE_TABS: Array<{ key: PaletteTab; label: string; Icon: LucideIcon }> = [
+  { key: "ground", label: "Ground", Icon: Route },
+  { key: "trees_plants", label: "Plants", Icon: TreeDeciduous },
+  { key: "rocks_water", label: "Rocks", Icon: Mountain },
+  { key: "furniture_fun", label: "Décor", Icon: Lamp },
+  { key: "animals", label: "Animals", Icon: PawPrint },
+  { key: "fortress", label: "Fortress", Icon: Castle },
+];
+const GROUND_TOOLS: Array<[WorldEditTool, string, LucideIcon]> = [
+  ["path", "Path", Route],
+  ["road", "Road", Route],
+  ["stone", "Stone", Route],
+  ["water", "Water", Waves],
 ];
 // A little symbol per scenery item, keyed by its worldAssetKey. Bridge,
 // toadstool and sign have no exact lucide glyph, so Landmark/Cherry/Signpost
@@ -266,6 +276,7 @@ export default function CentralWorld() {
   const [editTool, setEditTool] = useState<WorldEditTool>("move");
   const [selectedInventoryItemKey, setSelectedInventoryItemKey] = useState<string | null>(null);
   const [selectedSceneryItemKey, setSelectedSceneryItemKey] = useState<string | null>(null);
+  const [paletteTab, setPaletteTab] = useState<PaletteTab>("ground");
   const [editCursor, setEditCursor] = useState({ gridX: -5, gridZ: 5 });
   const [buildZoom, setBuildZoom] = useState(28);
   const [editHistory, setEditHistory] = useState<Array<{ placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] }>>([]);
@@ -648,38 +659,39 @@ export default function CentralWorld() {
             }) : <div style={{ minHeight: 54, flex: 1, display: "flex", alignItems: "center", justifyContent: "center", border: "1px dashed rgba(255,255,255,.2)", borderRadius: 5, color: "#bfd0c8", fontSize: 11, fontWeight: 800 }}>Your purchased buildings and places will appear here.</div>}
           </div>
 
-          {([
-            ["ACTIONS", [["move", "Move", <Hand key="move-icon" size={17} />], ["erase", "Erase", <Eraser key="erase-icon" size={17} />]]],
-            ["GROUND & PATHS", [["path", "Path", <Route key="path-icon" size={17} />], ["road", "Road", <Route key="road-icon" size={17} />], ["stone", "Stone", <Route key="stone-icon" size={17} />], ["water", "Water", <Waves key="water-icon" size={17} />]]],
-          ] as Array<[string, Array<[WorldEditTool, string, React.ReactNode]>]>).map(([groupLabel, tools]) => (
-            <div key={groupLabel} style={{ marginTop: 8 }}>
-              <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>{groupLabel}</div>
-              <div aria-label={`${groupLabel} tools`} style={{ marginTop: 4, display: "flex", flexWrap: "wrap", gap: 5 }}>
-                {tools.map(([tool, label, icon]) => {
-                  const selected = !heldItemKey && editTool === tool;
-                  const selectedBg = tool === "erase" ? "#ef4444" : "#efbd61";
-                  return <button key={tool} type="button" onClick={() => chooseEditTool(tool)} aria-pressed={selected} style={{ ...debugButton, flex: "0 0 auto", minWidth: 68, padding: "7px 10px", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, background: selected ? selectedBg : debugButton.background, color: selected ? (tool === "erase" ? "#fff" : "#2b2119") : debugButton.color }}>{icon}{label}</button>;
-                })}
-              </div>
+          {/* Actions */}
+          <div style={{ marginTop: 8 }}>
+            <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>ACTIONS</div>
+            <div style={{ marginTop: 4, display: "flex", gap: 5 }}>
+              {([["move", "Move", Hand], ["erase", "Erase", Eraser]] as Array<[WorldEditTool, string, LucideIcon]>).map(([tool, label, Icon]) => {
+                const selected = !heldItemKey && editTool === tool;
+                const selectedBg = tool === "erase" ? "#ef4444" : "#efbd61";
+                return <button key={tool} type="button" onClick={() => chooseEditTool(tool)} aria-pressed={selected} style={{ ...debugButton, flex: "1 1 0", padding: "8px 10px", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, background: selected ? selectedBg : debugButton.background, color: selected ? (tool === "erase" ? "#fff" : "#2b2119") : debugButton.color }}><Icon size={17} />{label}</button>;
+              })}
             </div>
-          ))}
+          </div>
 
-          {SCENERY_GROUPS.map(([groupLabel, group]) => {
-            const items = CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldSceneryGroup === group);
-            if (!items.length) return null;
-            return (
-              <div key={group} style={{ marginTop: 8 }}>
-                <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>{groupLabel}</div>
-                <div aria-label={`${groupLabel} items`} style={{ marginTop: 4, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 5 }}>
-                  {items.map((item) => {
-                    const selected = selectedSceneryItemKey === item.item_key;
-                    const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? Sprout;
-                    return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={19} color={selected ? "#eafffb" : item.accent} strokeWidth={2.4} style={{ flex: "0 0 auto" }} aria-hidden /><span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
-                  })}
-                </div>
-              </div>
-            );
-          })}
+          {/* Category tabs */}
+          <div role="tablist" aria-label="Build categories" style={{ marginTop: 8, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4 }}>
+            {PALETTE_TABS.map(({ key, label, Icon }) => {
+              const active = paletteTab === key;
+              return <button key={key} type="button" role="tab" aria-selected={active} onClick={() => setPaletteTab(key)} style={{ ...debugButton, padding: "7px 2px", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, fontSize: 10, fontWeight: 900, minWidth: 0, background: active ? "#0f766e" : debugButton.background, color: active ? "#eafffb" : debugButton.color, border: active ? "1px solid #5eead4" : debugButton.border, boxShadow: active ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={18} />{label}</button>;
+            })}
+          </div>
+
+          {/* Active tab content */}
+          <div style={{ marginTop: 7, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 5 }}>
+            {paletteTab === "ground"
+              ? GROUND_TOOLS.map(([tool, label, Icon]) => {
+                  const selected = !heldItemKey && editTool === tool;
+                  return <button key={tool} type="button" onClick={() => chooseEditTool(tool)} aria-pressed={selected} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", fontSize: 12, fontWeight: 900, background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border }}><Icon size={18} style={{ flex: "0 0 auto" }} />{label}</button>;
+                })
+              : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldSceneryGroup === paletteTab).map((item) => {
+                  const selected = selectedSceneryItemKey === item.item_key;
+                  const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? Sprout;
+                  return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={19} color={selected ? "#eafffb" : item.accent} strokeWidth={2.4} style={{ flex: "0 0 auto" }} aria-hidden /><span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
+                })}
+          </div>
           {buildPreview && buildItem?.metadata.marketplaceCategory === "world_basic" ? (
             <div style={{ marginTop: 10 }}>
               <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>COLOUR</div>

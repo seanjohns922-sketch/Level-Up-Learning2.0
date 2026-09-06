@@ -407,8 +407,9 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   </group>;
 
   if (assetKey === "hedge") return <group>
-    <RoundedBox args={[2.4, 1.0, 0.9]} radius={0.18} smoothness={3} position={[0, 0.55, 0]} castShadow><meshStandardMaterial color={t("#3c7a3a")} roughness={0.98} /></RoundedBox>
-    {Array.from({ length: 5 }, (_, i) => <mesh key={i} position={[-0.9 + i * 0.45, 1.05, 0]}><sphereGeometry args={[0.3, 10, 8]} /><meshStandardMaterial color={t("#478a42")} roughness={0.98} /></mesh>)}
+    {/* one cell wide so hedges abut into a continuous run */}
+    <RoundedBox args={[2.0, 1.05, 0.9]} radius={0.1} smoothness={3} position={[0, 0.58, 0]} castShadow><meshStandardMaterial color={t("#3c7a3a")} roughness={0.98} /></RoundedBox>
+    {Array.from({ length: 4 }, (_, i) => <mesh key={i} position={[-0.75 + i * 0.5, 1.12, 0]}><sphereGeometry args={[0.32, 10, 8]} /><meshStandardMaterial color={t("#478a42")} roughness={0.98} /></mesh>)}
   </group>;
 
   if (assetKey === "toadstool") return <group>
@@ -459,8 +460,9 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   </group>;
 
   if (assetKey === "fence") return <group>
-    {([-0.75, 0.75] as const).map((x) => <mesh key={x} position={[x, 0.5, 0]} castShadow><boxGeometry args={[0.14, 1.0, 0.14]} /><meshStandardMaterial color={t("#c69a63")} roughness={0.9} /></mesh>)}
-    {([0.7, 0.35] as const).map((y) => <mesh key={y} position={[0, y, 0]} castShadow><boxGeometry args={[1.7, 0.12, 0.08]} /><meshStandardMaterial color={t("#d8b483")} roughness={0.9} /></mesh>)}
+    {/* posts on the shared cell edges + full-width rails so fences join up */}
+    {([-1.0, 1.0] as const).map((x) => <mesh key={x} position={[x, 0.55, 0]} castShadow><boxGeometry args={[0.16, 1.1, 0.16]} /><meshStandardMaterial color={t("#c69a63")} roughness={0.9} /></mesh>)}
+    {([0.78, 0.4] as const).map((y) => <mesh key={y} position={[0, y, 0]} castShadow><boxGeometry args={[2.0, 0.13, 0.08]} /><meshStandardMaterial color={t("#d8b483")} roughness={0.9} /></mesh>)}
   </group>;
 
   if (assetKey === "mailbox") return <group>
@@ -679,10 +681,11 @@ function worldObjectScale(item: EconomyItem) {
     const custom = Number(item.metadata.worldScale);
     const base = Number.isFinite(custom) && custom > 0 ? custom : 1.25;
     // Trees, animals and decor read a touch small against the avatar and grid, so
-    // enlarge them. Fortress pieces are sized to their footprints (walls must
-    // tile cell-to-cell), so they keep their exact scale.
-    const bump = item.metadata.worldSceneryGroup === "fortress" ? 1 : 1.3;
-    return base * bump;
+    // enlarge them. Pieces that tile cell-to-cell (fortress kit, fences, hedges)
+    // stay at their exact footprint scale so runs merge seamlessly.
+    const assetKey = item.metadata.worldAssetKey;
+    const tiles = item.metadata.worldSceneryGroup === "fortress" || assetKey === "fence" || assetKey === "hedge";
+    return base * (tiles ? 1 : 1.3);
   }
   const [gridW, gridD] = parseGridSize(item);
   const footprintMetres = Math.min(gridW, gridD) * CENTRAL_WORLD_GRID.cellSize;
