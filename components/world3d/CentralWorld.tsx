@@ -351,12 +351,15 @@ export default function CentralWorld() {
   // Pan the build camera/cursor by whole cells. The avatar stays put — panning no
   // longer teleports it to follow the cursor — and the cursor is clamped to the
   // grid. Stable identity so the keyboard listener can depend on it.
+  // Pan the build CAMERA only. The cursor is just the camera's focus point now —
+  // it does not carry the held item, so panning never disturbs a placement (and
+  // the avatar never moves). Clamped to the grid.
   const moveBuildPlacement = useCallback((dx: number, dz: number) => {
+    const step = 2;
     const cx = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX);
     const cz = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ);
-    setEditCursor((cur) => ({ gridX: cx(cur.gridX + dx), gridZ: cz(cur.gridZ + dz) }));
-    setBuildPlacement((bp) => (bp ? { ...bp, gridX: cx(bp.gridX + dx), gridZ: cz(bp.gridZ + dz) } : bp));
-  }, [setEditCursor, setBuildPlacement]);
+    setEditCursor((cur) => ({ gridX: cx(cur.gridX + dx * step), gridZ: cz(cur.gridZ + dz * step) }));
+  }, [setEditCursor]);
 
   // Laptop: arrow keys pan the build view (the on-screen arrows do the same on
   // iPad). Only while editing/placing, and we swallow the keys so the page
@@ -430,7 +433,6 @@ export default function CentralWorld() {
     const existing = placedCustomisations.find((placement) => placement.itemId === item.item_key);
     placementSequence.current += 1;
     setBuildPlacement(existing ?? { placementId: `${item.item_key}-${placementSequence.current}`, itemId: item.item_key, ...editCursor, rotation: 0 });
-    if (existing) setEditCursor({ gridX: existing.gridX, gridZ: existing.gridZ });
     void speak(`${item.name} selected. Tap the grass to place it. Rotate first if you need to.`, undefined, "manual", { rate: 0.9 });
   }
 
@@ -453,8 +455,7 @@ export default function CentralWorld() {
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(hit.itemId);
     setBuildPlacement({ ...hit, placementId: hit.placementId ?? `${hit.itemId}-${placementSequence.current}` });
-    setEditCursor({ gridX: hit.gridX, gridZ: hit.gridZ });
-    void speak(`${item?.name ?? "Item"} picked up. Move it, rotate, then place — or delete it.`, undefined, "manual", { rate: 0.9 });
+    void speak(`${item?.name ?? "Item"} picked up. Tap where you want it, or delete it.`, undefined, "manual", { rate: 0.9 });
   }
 
   function deleteHeldPlacement() {
@@ -541,7 +542,6 @@ export default function CentralWorld() {
   function placeHeldAt(gridX: number, gridZ: number) {
     if (!buildItem || !buildPlacement) return;
     const candidate = { ...buildPlacement, gridX, gridZ };
-    setEditCursor({ gridX, gridZ });
     if (!validateCentralWorldPlacement(candidate, buildItem, placementsWithoutBuildItem, itemsById)) {
       setBuildPlacement(candidate);
       return;
@@ -561,10 +561,9 @@ export default function CentralWorld() {
       // Editor: tap/drag drops the item. Marketplace deep-link (no editor): keep
       // the old move-the-cursor-then-Place flow so a single item isn't duplicated.
       if (editorOpen) placeHeldAt(gridX, gridZ);
-      else { setEditCursor({ gridX, gridZ }); setBuildPlacement({ ...buildPlacement, gridX, gridZ }); }
+      else setBuildPlacement({ ...buildPlacement, gridX, gridZ });
       return;
     }
-    setEditCursor({ gridX, gridZ });
     if (isMoveTool) {
       pickUpPlacementAt(gridX, gridZ);
       return;
