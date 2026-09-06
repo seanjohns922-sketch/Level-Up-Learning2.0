@@ -25,12 +25,16 @@ export default function HallOfLegendsWidget() {
     // Measurelands unlocks (saved under the "measurement" scope) are missed.
     const numberProgress = readProgress("number");
     const measureProgress = readProgress("measurement");
+    const patternProgress = readProgress("pattern");
+    const statisticsProgress = readProgress("statistics");
     const spaceProgress = readProgress("space");
     const nextUnlocked = isDemoPreviewMode()
       ? new Set(getAllLegends().map((legend) => legend.id))
       : new Set<string>([
           ...getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
           ...getEffectiveUnlockedLegendIds(measureProgress?.year, measureProgress?.unlockedLegends, "measurelands"),
+          ...getEffectiveUnlockedLegendIds(patternProgress?.year, patternProgress?.unlockedLegends, "pattern-peaks"),
+          ...getEffectiveUnlockedLegendIds(statisticsProgress?.year, statisticsProgress?.unlockedLegends, "statistica"),
           ...getEffectiveUnlockedLegendIds(spaceProgress?.year, spaceProgress?.unlockedLegends, "starpath"),
         ]);
     // eslint-disable-next-line react-hooks/set-state-in-effect

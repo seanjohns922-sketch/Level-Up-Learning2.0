@@ -7,6 +7,7 @@ import {
   PatternPeaksAdventurePortal,
   PatternPeaksDistrictGate,
   PatternPeaksEnvironment,
+  getPatternPeaks3DVisuals,
   PATTERN_PEAKS_DISTRICT_LAYOUT,
   PatternPeaksReturnBeam,
   PatternPeaksWeekGate,
@@ -18,13 +19,14 @@ export default function PatternPeaksLevel3World({ level = "Year 3" }: { level?: 
   const searchParams = useSearchParams();
   const preview = searchParams.get("teacher_preview") === "1";
   const initialYaw = Number(searchParams.get("camYaw")) || 0;
+  const visuals = getPatternPeaks3DVisuals(level);
   const config = useMemo<SharedRealmWorld3DConfig>(() => ({
     realmId: "pattern",
     realmName: "Pattern Peaks",
     level,
     preview,
-    accent: "#39d9a0",
-    sky: "#a9c9df",
+    accent: visuals.accent,
+    sky: visuals.sky,
     worldState: getPatternPeaksWorldState({ preview, level }),
     refreshWorldState: () => getPatternPeaksWorldState({ preview, level }),
     worldHref: `/world/pattern-peaks?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`,
@@ -39,12 +41,12 @@ export default function PatternPeaksLevel3World({ level = "Year 3" }: { level?: 
     weekPositions: [[-4.35, 0, -4], [4.35, 0, -4]],
     cityReturnPosition: [0, 0, 22.5],
     towerReturnPosition: [0, 0, 31],
-    Environment: PatternPeaksEnvironment,
+    Environment: ({ quality, districtInterior }) => <PatternPeaksEnvironment quality={quality} districtInterior={districtInterior} level={level} />,
     DistrictGate: PatternPeaksDistrictGate,
     WeekGate: PatternPeaksWeekGate,
     AdventurePortal: PatternPeaksAdventurePortal,
     ReturnBeam: PatternPeaksReturnBeam,
-  }), [initialYaw, level, preview]);
+  }), [initialYaw, level, preview, visuals.accent, visuals.sky]);
 
   return <SharedRealmWorld3D config={config} />;
 }

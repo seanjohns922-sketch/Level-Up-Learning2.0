@@ -5,6 +5,7 @@ import { useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { WorldPanorama } from "@/components/world3d/WorldPanorama";
+import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { RealmWorldGateState } from "@/lib/world3d/realm-world-state";
 
 export type PatternPeaksQuality = "low" | "medium" | "high";
@@ -29,8 +30,33 @@ function stateVisual(state: RealmWorldGateState, accent: string, active: boolean
   return { frame: "#293947", energy: accent, intensity: active ? 1.1 : state === "current" ? 0.76 : 0.45 };
 }
 
-function PatternPeaksFloorTexture() {
-  const source = useLoader(THREE.TextureLoader, "/images/patternpeaks-level3-floor.png");
+const LEVEL_VISUALS: Record<"Year 3" | "Year 4", { background: string; floor: string; sky: string; fog: string; sun: string; accent: string; crystal: string }> = {
+  "Year 3": {
+    background: "/images/patternpeaks-home-bg-y3.jpeg",
+    floor: "/images/patternpeaks-level3-floor.png",
+    sky: "#a9c9df",
+    fog: "#23303b",
+    sun: "#def5ff",
+    accent: "#39d9a0",
+    crystal: "#b899ff",
+  },
+  "Year 4": {
+    background: "/images/patternpeaks-home-bg-y4.jpeg",
+    floor: "/images/patternpeaks-level4-floor.png",
+    sky: "#9d90c4",
+    fog: "#241f37",
+    sun: "#d9cdfd",
+    accent: "#57e6a6",
+    crystal: "#c177ff",
+  },
+};
+
+export function getPatternPeaks3DVisuals(level: RealmLevelId) {
+  return LEVEL_VISUALS[level === "Year 4" ? "Year 4" : "Year 3"];
+}
+
+function PatternPeaksFloorTexture({ asset }: { asset: string }) {
+  const source = useLoader(THREE.TextureLoader, asset);
   const { gl } = useThree();
   const texture = useMemo(() => {
     const next = source.clone();
@@ -54,7 +80,7 @@ function PatternPeaksFloorTexture() {
   );
 }
 
-function PatternPeaksGround() {
+function PatternPeaksGround({ floorAsset }: { floorAsset: string }) {
   return (
     <group>
       <mesh position={[0, -0.98, 4.2]}>
@@ -66,7 +92,7 @@ function PatternPeaksGround() {
         <meshBasicMaterial color="#303a45" toneMapped={false} />
       </mesh>
       <Suspense fallback={null}>
-        <PatternPeaksFloorTexture />
+        <PatternPeaksFloorTexture asset={floorAsset} />
       </Suspense>
       <mesh position={[0, 0.12, 4.2]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[8.2, 8.55, 6]} />
@@ -169,25 +195,26 @@ export function PatternPeaksReturnBeam({ accent, active, label = "RETURN TO PATT
   );
 }
 
-export function PatternPeaksEnvironment({ quality, districtInterior }: { quality: PatternPeaksQuality; districtInterior?: boolean }) {
+export function PatternPeaksEnvironment({ quality, districtInterior, level = "Year 3" }: { quality: PatternPeaksQuality; districtInterior?: boolean; level?: RealmLevelId }) {
+  const visuals = getPatternPeaks3DVisuals(level);
   return (
     <>
       <Suspense fallback={null}>
-        <WorldPanorama asset="/images/patternpeaks-home-bg-y3.jpeg" radius={56} height={60} y={20} horizontalScale={0.82} skyBlendColor="#a9c9df" flipX crisp />
+        <WorldPanorama asset={visuals.background} radius={56} height={60} y={20} horizontalScale={0.82} skyBlendColor={visuals.sky} flipX crisp />
       </Suspense>
-      <fog attach="fog" args={["#23303b", 32, 76]} />
+      <fog attach="fog" args={[visuals.fog, 32, 76]} />
       <ambientLight color="#b9d5e8" intensity={0.46} />
       <hemisphereLight args={["#b9d5e8", "#17242d", 0.62]} />
-      <directionalLight position={[-15, 23, 12]} color="#def5ff" intensity={1.25} />
-      <directionalLight position={[15, 8, -12]} color="#39d9a0" intensity={0.28} />
-      <PatternPeaksGround />
+      <directionalLight position={[-15, 23, 12]} color={visuals.sun} intensity={1.25} />
+      <directionalLight position={[15, 8, -12]} color={visuals.accent} intensity={0.28} />
+      <PatternPeaksGround floorAsset={visuals.floor} />
       {[[-18, -17], [-12, 19], [16, -18], [21, 12]].map(([x, z], index) => (
-        <Crystal key={`${x}-${z}`} position={[x, 0, z]} color={index % 2 === 0 ? "#39d9a0" : "#b899ff"} scale={index === 2 ? 1.25 : 1} />
+        <Crystal key={`${x}-${z}`} position={[x, 0, z]} color={index % 2 === 0 ? visuals.accent : visuals.crystal} scale={index === 2 ? 1.25 : 1} />
       ))}
       {[-3, -1, 1, 3].map((offset, index) => (
-        <PatternBlock key={offset} position={[offset * 1.55, 1.2, districtInterior ? -12.2 : -18.2]} color={index < 2 ? "#39d9a0" : "#b899ff"} label={index < 2 ? `${index + 2}` : "?"} />
+        <PatternBlock key={offset} position={[offset * 1.55, 1.2, districtInterior ? -12.2 : -18.2]} color={index < 2 ? visuals.accent : visuals.crystal} label={index < 2 ? `${index + 2}` : "?"} />
       ))}
-      {quality === "high" ? <pointLight position={[0, 6.8, 1.5]} color="#39d9a0" intensity={1.5} distance={28} /> : null}
+      {quality === "high" ? <pointLight position={[0, 6.8, 1.5]} color={visuals.accent} intensity={1.5} distance={28} /> : null}
     </>
   );
 }

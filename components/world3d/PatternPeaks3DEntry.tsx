@@ -17,6 +17,8 @@ const PatternPeaksLevel3World = dynamic(() => import("@/components/world3d/Patte
   loading: () => <div className="grid min-h-screen place-items-center bg-[#17242d] font-semibold text-emerald-100/80">Opening Pattern Peaks...</div>,
 });
 
+const PATTERN_PEAKS_3D_LEVELS: RealmLevelId[] = ["Year 3", "Year 4"];
+
 function resolvePreviewLevel(value: string | null): RealmLevelId {
   if (value === "Level 3" || value === "Year 3") return "Year 3";
   if (value === "Level 4" || value === "Year 4") return "Year 4";
@@ -39,7 +41,7 @@ export default function PatternPeaks3DEntry({ teacherPreview = false }: { teache
   const [status, setStatus] = useState(entry.status);
   const [resolvedLevel, setResolvedLevel] = useState<RealmLevelId>(requestedLevel);
   const displayStatus = previewMode && entry.decision.canExplore3D ? "ready" : status;
-  const has3DLevel = resolvedLevel === "Year 3";
+  const has3DLevel = PATTERN_PEAKS_3D_LEVELS.includes(resolvedLevel);
 
   useEffect(() => {
     if (!previewMode || has3DLevel) return;
@@ -61,7 +63,7 @@ export default function PatternPeaks3DEntry({ teacherPreview = false }: { teache
           router.replace("/home");
           return;
         }
-        if (restored.progress.year !== "Year 3") {
+        if (!PATTERN_PEAKS_3D_LEVELS.includes(restored.progress.year as RealmLevelId)) {
           router.replace(`/pattern-peaks?level=${encodeURIComponent(restored.progress.year)}`);
           return;
         }
