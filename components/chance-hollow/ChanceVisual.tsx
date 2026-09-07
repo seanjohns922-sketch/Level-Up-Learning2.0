@@ -70,16 +70,34 @@ const PIP_LAYOUT: Record<number, ReadonlyArray<[number, number]>> = {
   6: [[0.3, 0.28], [0.7, 0.28], [0.3, 0.5], [0.7, 0.5], [0.3, 0.72], [0.7, 0.72]],
 };
 
+type Vec = [number, number];
+// Place a die face's pips onto a parallelogram face (origin O, edge vectors u, v)
+// so the pips sit correctly on each 3D face.
+function facePips(num: number, O: Vec, u: Vec, v: Vec, key: string, r = 4.6) {
+  const pips = PIP_LAYOUT[Math.min(Math.max(num, 1), 6)] ?? PIP_LAYOUT[1]!;
+  return pips.map(([px, py], i) => (
+    <circle key={`${key}-${i}`} cx={O[0] + px * u[0] + py * v[0]} cy={O[1] + px * u[1] + py * v[1]} r={r} fill={INK} />
+  ));
+}
+
+// A 3D isometric die showing three faces at once, so it reads as a six-sided
+// cube rather than a flat card. `face` is shown on the top; two other numbers
+// sit on the visible sides.
 function Die({ face }: { face: number }) {
-  const pips = PIP_LAYOUT[Math.min(Math.max(face, 1), 6)] ?? PIP_LAYOUT[1]!;
-  const s = 108;
-  const pad = 8;
+  const top = Math.min(Math.max(face, 1), 6);
+  const [s1, s2] = [1, 2, 3, 5, 6].filter((n) => n !== top);
+  // Cube vertices (isometric).
+  const A: Vec = [75, 16], B: Vec = [131, 48], C: Vec = [75, 80], D: Vec = [19, 48];
+  const D2: Vec = [19, 104], C2: Vec = [75, 136], B2: Vec = [131, 104];
+  const sub = (p: Vec, q: Vec): Vec => [p[0] - q[0], p[1] - q[1]];
   return (
-    <svg viewBox="0 0 124 124" width="120" height="120" role="img" aria-label={`Die showing ${face}`}>
-      <rect x={pad} y={pad} width={s} height={s} rx={20} fill="#ffffff" stroke={FRAME} strokeWidth={4} />
-      {pips.map(([px, py], i) => (
-        <circle key={i} cx={pad + px * s} cy={pad + py * s} r={9} fill={INK} />
-      ))}
+    <svg viewBox="0 0 150 152" width="140" height="142" role="img" aria-label={`Die showing ${top} on top`}>
+      <polygon points={`${A} ${B} ${C} ${D}`} fill="#ffffff" stroke={FRAME} strokeWidth={2.5} strokeLinejoin="round" />
+      <polygon points={`${D} ${C} ${C2} ${D2}`} fill="#e7ddf7" stroke={FRAME} strokeWidth={2.5} strokeLinejoin="round" />
+      <polygon points={`${C} ${B} ${B2} ${C2}`} fill="#d6c6ef" stroke={FRAME} strokeWidth={2.5} strokeLinejoin="round" />
+      {facePips(top, D, sub(A, D), sub(C, D), "top")}
+      {facePips(s1!, D, sub(C, D), sub(D2, D), "left")}
+      {facePips(s2!, C, sub(B, C), sub(C2, C), "right")}
     </svg>
   );
 }
