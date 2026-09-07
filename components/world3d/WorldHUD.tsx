@@ -190,7 +190,7 @@ export function WorldHUD({
             <div className="worldTeleportGrid">
               {TOWER_REALM_PORTALS.map((portal) => {
                 const live = portal.realm.status === "live" && portal.realm.isSelectable;
-                const available = live || (preview && portal.realmId === "pattern");
+                const available = live || (preview && (portal.realmId === "pattern" || portal.realmId === "chance"));
                 const portalSpeech = joinSpeechParts([portal.realm.name, portal.subject, available ? (live ? "Enter realm" : "Preview realm") : "Coming soon"]);
                 return (
                   <div key={portal.realmId} className={`worldTeleportTile ${!available || busyRealmId ? "worldTeleportTileDisabled" : ""}`} style={{ borderColor: portal.accent }}>

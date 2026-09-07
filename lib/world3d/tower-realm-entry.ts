@@ -29,11 +29,25 @@ function adaptCanonicalRouteToAvailable3DWorld(route: string, realmId: Canonical
   return route;
 }
 
+function previewRouteForStagedRealm(realmId: CanonicalRealmId) {
+  if (realmId === "chance") return "/chance-hollow?level=Year%203";
+  return null;
+}
+
 export async function resolveTowerRealmEntry(args: {
   realmId: CanonicalRealmId;
   teacherPreview: boolean;
 }): Promise<TowerRealmEntryResult> {
   const realm = getRealmDefinition(args.realmId);
+  if (args.teacherPreview) {
+    const stagedPreviewRoute = previewRouteForStagedRealm(args.realmId);
+    if (stagedPreviewRoute) {
+      setLastRealm(realm.portalId);
+      exitReviewMode();
+      return { status: "ready", route: appendPreview(stagedPreviewRoute, true) };
+    }
+  }
+
   const availability = getRealmAvailability(realm.portalId);
   if (!availability?.enabled || realm.status !== "live" || !realm.isSelectable) {
     return { status: "unavailable", message: `${realm.name} is coming soon.` };
