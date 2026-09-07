@@ -20,6 +20,17 @@ const PURPLE = "#8b5cf6";
 
 const choice = <T,>(items: readonly T[]): T => items[Math.floor(Math.random() * items.length)]!;
 const randInt = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+type Paint = { k: string; n: string };
+const PAL: readonly Paint[] = [
+  { k: RED, n: "red" },
+  { k: BLUE, n: "blue" },
+  { k: GREEN, n: "green" },
+  { k: YELLOW, n: "yellow" },
+  { k: PURPLE, n: "purple" },
+];
+const plural = (n: number) => (n === 1 ? "" : "s");
 
 function shuffle<T>(items: readonly T[]): T[] {
   const out = [...items];
@@ -55,26 +66,6 @@ function task(c: ChanceCase, seed: number): PracticeTask {
   };
 }
 
-// Curated bank: walks its cases without repeating (each shown once before any
-// repeat, never twice in a row).
-function pool(cases: readonly ChanceCase[]): Gen {
-  let bag: number[] = [];
-  let last = -1;
-  let seed = 0;
-  return () => {
-    if (bag.length === 0) {
-      bag = shuffle(cases.map((_, index) => index));
-      if (cases.length > 1 && bag[bag.length - 1] === last) {
-        [bag[0], bag[bag.length - 1]] = [bag[bag.length - 1]!, bag[0]!];
-      }
-    }
-    const index = bag.pop()!;
-    last = index;
-    seed += 1;
-    return task(cases[index]!, seed);
-  };
-}
-
 // Parametric: builds a freshly randomised case each call.
 function generated(makers: readonly (() => ChanceCase)[]): Gen {
   let lastPrompt = "";
@@ -89,110 +80,78 @@ function generated(makers: readonly (() => ChanceCase)[]): Gen {
 }
 
 // ───────────────────────── Week 1: Equally Likely Outcomes ───────────────────
-const fairCases = pool([
-  {
-    prompt: "This spinner has 2 red parts and 2 blue parts. Is red just as likely as blue?",
-    answer: "Yes, they are equally likely",
-    options: ["Yes, they are equally likely", "No, red is more likely", "No, blue is more likely", "No, red is impossible"],
-    correct: "Yes. Red and blue each have 2 parts, so they have the same chance.",
-    wrong: "Count the parts. Red has 2 and blue has 2, so they are equally likely.",
-    visual: { type: "spinner", wedges: [RED, BLUE, RED, BLUE] },
-  },
-  {
-    prompt: "A bag has 3 yellow counters and 1 green counter. Is the draw fair between yellow and green?",
-    answer: "No, yellow is more likely",
-    options: ["No, yellow is more likely", "Yes, it is fair", "No, green is more likely", "No, yellow is impossible"],
-    correct: "Correct. Yellow has more counters, so yellow is more likely.",
-    wrong: "A fair draw needs equal counts. Yellow has 3 and green has 1.",
-    visual: { type: "bag", counters: [YELLOW, YELLOW, YELLOW, GREEN] },
-  },
-  {
-    prompt: "A coin can land heads or tails. Are heads and tails equally likely?",
-    answer: "Yes, each side has the same chance",
-    options: ["Yes, each side has the same chance", "No, heads is certain", "No, tails is impossible", "No, heads is more likely"],
-    correct: "Yes. A fair coin has two sides with the same chance.",
-    wrong: "A fair coin has heads and tails. Neither side has more chance before the toss.",
-    visual: { type: "coin", face: "heads" },
-  },
-  {
-    prompt: "This spinner has 3 green parts and 1 yellow part. Is green just as likely as yellow?",
-    answer: "No, green is more likely",
-    options: ["No, green is more likely", "Yes, they are equally likely", "No, yellow is more likely", "No, green is impossible"],
-    correct: "Correct. Green has 3 parts and yellow has 1, so green is more likely.",
-    wrong: "Equal chance needs equal parts. Green has 3 and yellow has 1.",
-    visual: { type: "spinner", wedges: [GREEN, GREEN, GREEN, YELLOW] },
-  },
-]);
+// L1 "Fair or Not Fair?" — two colours with random counts (sometimes equal).
+function fairMaker(): ChanceCase {
+  if (Math.random() < 0.25) {
+    return { prompt: "A coin can land heads or tails. Are heads and tails equally likely?", answer: "Yes, each side has the same chance", options: ["Yes, each side has the same chance", "No, heads is more likely", "No, tails is impossible", "No, heads is certain"], correct: "Yes. A fair coin has two sides with the same chance.", wrong: "A fair coin has heads and tails; neither side has more chance.", visual: { type: "coin", face: "heads" } };
+  }
+  const isSpinner = Math.random() < 0.5;
+  const [c1, c2] = shuffle(PAL).slice(0, 2) as [Paint, Paint];
+  const a = randInt(1, 4);
+  const b = Math.random() < 0.4 ? a : (() => { let x = randInt(1, 4); while (x === a) x = randInt(1, 4); return x; })();
+  const items = shuffle([...Array(a).fill(c1.k), ...Array(b).fill(c2.k)] as string[]);
+  const equal = a === b;
+  const bigger = a > b ? c1 : c2;
+  const answer = equal ? "Yes, they are equally likely" : `No, ${bigger.n} is more likely`;
+  const prompt = isSpinner
+    ? `This spinner has ${a} ${c1.n} part${plural(a)} and ${b} ${c2.n} part${plural(b)}. Is ${c1.n} just as likely as ${c2.n}?`
+    : `A bag has ${a} ${c1.n} and ${b} ${c2.n} counter${plural(b)}. Is ${c1.n} just as likely as ${c2.n}?`;
+  return {
+    prompt,
+    answer,
+    options: [`Yes, they are equally likely`, `No, ${c1.n} is more likely`, `No, ${c2.n} is more likely`, `No, ${c1.n} is impossible`],
+    correct: equal ? `Yes. Both have ${a}, so they are equally likely.` : `Correct. ${cap(bigger.n)} has more, so ${bigger.n} is more likely.`,
+    wrong: equal ? `Equal counts (${a} and ${b}) mean an equal chance.` : `Compare the counts: ${a} vs ${b}. The bigger one is more likely.`,
+    visual: isSpinner ? { type: "spinner", wedges: items } : { type: "bag", counters: items },
+  };
+}
 
-const equalChanceCases = pool([
-  {
-    prompt: "Which pair of outcomes is equally likely on a normal die?",
-    answer: "Rolling a 2 and rolling a 5",
-    options: ["Rolling a 2 and rolling a 5", "Rolling an even number and rolling a 6", "Rolling less than 5 and rolling a 1", "Rolling a 7 and rolling a 3"],
-    correct: "Right. Each single face on a normal die has 1 chance out of 6.",
-    wrong: "Single die faces are equally likely. A 2 and a 5 each have one face.",
-    visual: { type: "die", face: 5 },
-  },
-  {
-    prompt: "Which spinner makes red and blue equally likely?",
-    answer: "2 red parts and 2 blue parts",
-    options: ["2 red parts and 2 blue parts", "3 red parts and 1 blue part", "1 red part and 3 blue parts", "4 red parts and 0 blue parts"],
-    correct: "Yes. Equal parts means equal chance.",
-    wrong: "Red and blue need the same number of parts to be equally likely.",
-    visual: { type: "spinner", wedges: [RED, BLUE, RED, BLUE] },
-  },
-  {
-    prompt: "A bag has 4 red counters and 4 blue counters. Which statement is true?",
-    answer: "Red and blue are equally likely",
-    options: ["Red and blue are equally likely", "Red is more likely", "Blue is more likely", "Blue is impossible"],
-    correct: "Correct. Both colours have 4 counters.",
-    wrong: "Count the counters. Red and blue have the same count.",
-    visual: { type: "bag", counters: [RED, RED, RED, RED, BLUE, BLUE, BLUE, BLUE] },
-  },
-  {
-    prompt: "A bag has 2 red, 2 blue and 2 green counters. Which is true?",
-    answer: "All three colours are equally likely",
-    options: ["All three colours are equally likely", "Red is most likely", "Green is impossible", "Blue is certain"],
-    correct: "Right. Each colour has 2 counters, so they share the chance evenly.",
-    wrong: "Equal counts means equal chance — every colour has 2 counters.",
-    visual: { type: "bag", counters: [RED, RED, BLUE, BLUE, GREEN, GREEN] },
-  },
-]);
+// L2 "Equal Chance Outcomes" — spot the equally-likely case.
+function equalChanceMaker(): ChanceCase {
+  if (Math.random() < 0.4) {
+    const [x, y] = shuffle([1, 2, 3, 4, 5, 6]).slice(0, 2).sort((p, q) => p - q) as [number, number];
+    const answer = `Rolling a ${x} and rolling a ${y}`;
+    return {
+      prompt: "Which pair of outcomes is equally likely on a normal die?",
+      answer,
+      options: distinctOptions(answer, ["Rolling an even number and rolling a 6", "Rolling less than 5 and rolling a 1", "Rolling a 7 and rolling a 3", "Rolling a number over 4 and rolling a 2"]),
+      correct: "Right. Each single face on a normal die has 1 chance out of 6.",
+      wrong: "Single die faces are equally likely — each number sits on one face.",
+      visual: { type: "die", face: x },
+    };
+  }
+  const each = randInt(2, 3);
+  const cols = shuffle(PAL).slice(0, choice([2, 3] as const)) as Paint[];
+  const items = shuffle(cols.flatMap((c) => Array(each).fill(c.k)) as string[]);
+  const answer = cols.length === 2 ? `${cap(cols[0]!.n)} and ${cols[1]!.n} are equally likely` : "All the colours are equally likely";
+  return {
+    prompt: `This tool has ${each} of each colour. Which statement is true?`,
+    answer,
+    options: distinctOptions(answer, [`${cap(cols[0]!.n)} is most likely`, `${cap(cols[1]!.n)} is impossible`, `${cap(cols[0]!.n)} is certain`, `${cap(cols[cols.length - 1]!.n)} is least likely`]),
+    correct: "Correct. Equal counts give every colour the same chance.",
+    wrong: "Every colour has the same count, so they are equally likely.",
+    visual: Math.random() < 0.5 ? { type: "spinner", wedges: items } : { type: "bag", counters: items },
+  };
+}
 
-const explainEqualCases = pool([
-  {
-    prompt: "Why is rolling a 1 just as likely as rolling a 6?",
-    answer: "Each number is on one face",
-    options: ["Each number is on one face", "Six is the biggest number", "One comes first", "The die likes both numbers"],
-    correct: "Yes. Each number appears on one face of the die.",
-    wrong: "Use the die faces as evidence. Each number appears once.",
-    visual: { type: "die", face: 6 },
-  },
-  {
-    prompt: "Why is this red-blue spinner fair?",
-    answer: "It has the same number of red and blue parts",
-    options: ["It has the same number of red and blue parts", "Red is brighter", "Blue is darker", "The spinner has four parts"],
-    correct: "Right. Equal colour counts make the two outcomes equally likely.",
-    wrong: "Fairness comes from equal chances, not the colour brightness.",
-    visual: { type: "spinner", wedges: [RED, BLUE, RED, BLUE] },
-  },
-  {
-    prompt: "Why are heads and tails equally likely on a fair coin?",
-    answer: "The coin has one head side and one tail side",
-    options: ["The coin has one head side and one tail side", "The coin is shiny", "Heads is heavier", "Tails always comes first"],
-    correct: "Yes. Two equal sides means an equal chance either way.",
-    wrong: "A fair coin has two matching sides, so neither is more likely.",
-    visual: { type: "coin", face: "tails" },
-  },
-  {
-    prompt: "A bag has 3 red and 3 blue counters. Why are the colours equally likely?",
-    answer: "There is the same number of each colour",
-    options: ["There is the same number of each colour", "Red is a warm colour", "The bag is small", "Blue counters are lighter"],
-    correct: "Right. Equal counts of each colour give an equal chance.",
-    wrong: "The reason is the counts: 3 red and 3 blue is the same number of each.",
-    visual: { type: "bag", counters: [RED, RED, RED, BLUE, BLUE, BLUE] },
-  },
-]);
+// L3 "Explain Equal Chance" — pick the reason it is fair.
+function explainMaker(): ChanceCase {
+  const kind = choice(["coin", "die", "spinner", "bag"] as const);
+  if (kind === "coin") {
+    return { prompt: "Why are heads and tails equally likely on a fair coin?", answer: "The coin has one head side and one tail side", options: ["The coin has one head side and one tail side", "The coin is shiny", "Heads is heavier", "Tails always comes first"], correct: "Yes. Two equal sides means an equal chance either way.", wrong: "A fair coin has two matching sides, so neither is more likely.", visual: { type: "coin", face: choice(["heads", "tails"] as const) } };
+  }
+  if (kind === "die") {
+    const [x, y] = shuffle([1, 2, 3, 4, 5, 6]).slice(0, 2) as [number, number];
+    return { prompt: `Why is rolling a ${x} just as likely as rolling a ${y}?`, answer: "Each number is on one face", options: ["Each number is on one face", "Six is the biggest number", "Smaller numbers come first", "The die likes both numbers"], correct: "Yes. Each number appears on exactly one face.", wrong: "Use the die faces: each number appears once.", visual: { type: "die", face: x } };
+  }
+  const each = randInt(2, 3);
+  const [c1, c2] = shuffle(PAL).slice(0, 2) as [Paint, Paint];
+  const items = shuffle([...Array(each).fill(c1.k), ...Array(each).fill(c2.k)] as string[]);
+  if (kind === "spinner") {
+    return { prompt: `Why is this ${c1.n}-${c2.n} spinner fair?`, answer: "It has the same number of each colour part", options: ["It has the same number of each colour part", `${cap(c1.n)} is brighter`, `${cap(c2.n)} is darker`, "The spinner is round"], correct: "Right. Equal colour counts make the outcomes equally likely.", wrong: "Fairness comes from equal counts, not the colours themselves.", visual: { type: "spinner", wedges: items } };
+  }
+  return { prompt: `A bag has ${each} ${c1.n} and ${each} ${c2.n} counters. Why are the colours equally likely?`, answer: "There is the same number of each colour", options: ["There is the same number of each colour", `${cap(c1.n)} is a nicer colour`, "The bag is small", `${cap(c2.n)} counters are lighter`], correct: "Right. Equal counts of each colour give an equal chance.", wrong: `The reason is the counts: ${each} and ${each} is the same number of each.`, visual: { type: "bag", counters: items } };
+}
 
 // ───────────────────────────── Week 2: Chance Tools ─────────────────────────
 // L1 "Read the Chance Tool" — identify what a tool can land on.
@@ -225,40 +184,27 @@ function countOutcomesMaker(): ChanceCase {
   return { prompt: "This bag has red, blue and purple counters. How many colour outcomes are possible?", answer: "3", options: ["3", "2", "5", "6"], correct: "Yes. Red, blue and purple are the possible colour outcomes.", wrong: "Count the different colours, not every counter.", visual: { type: "bag", counters: [RED, BLUE, PURPLE, RED, BLUE] } };
 }
 
-const matchToolCases = pool([
-  {
-    prompt: "Which tool best matches a 1 out of 6 chance?",
-    answer: "A normal die, rolling one chosen number",
-    options: ["A normal die, rolling one chosen number", "A fair coin, choosing heads", "A spinner with 1 red and 1 blue", "A bag with 3 red and 3 blue"],
-    correct: "Correct. One chosen die face is 1 out of 6.",
-    wrong: "Look for the tool with six equally likely outcomes.",
-    visual: { type: "die", face: 1 },
-  },
-  {
-    prompt: "Which tool best matches a 1 out of 2 chance?",
-    answer: "A fair coin",
-    options: ["A fair coin", "A normal die", "A five-colour spinner", "A bag with only red counters"],
-    correct: "Yes. A fair coin has two equally likely outcomes.",
-    wrong: "A 1 out of 2 chance means one winning outcome from two equal outcomes.",
-    visual: { type: "coin", face: "tails" },
-  },
-  {
-    prompt: "Which tool best matches a 1 out of 4 chance?",
-    answer: "A spinner with 4 equal parts, choosing one",
-    options: ["A spinner with 4 equal parts, choosing one", "A fair coin", "A normal die, choosing one number", "A bag with 2 red and 2 blue"],
-    correct: "Yes. One part of four equal parts is 1 out of 4.",
-    wrong: "A 1 out of 4 chance needs four equally likely outcomes.",
-    visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] },
-  },
-  {
-    prompt: "Which tool best matches a 1 out of 3 chance?",
-    answer: "A spinner with 3 equal parts, choosing one",
-    options: ["A spinner with 3 equal parts, choosing one", "A fair coin", "A normal die", "A bag with 5 counters"],
-    correct: "Yes. One part of three equal parts is 1 out of 3.",
-    wrong: "A 1 out of 3 chance needs three equally likely outcomes.",
-    visual: { type: "spinner", wedges: [RED, BLUE, GREEN] },
-  },
-]);
+// L3 "Match Tool to Chance" — which tool gives a 1 out of N chance.
+function matchToolMaker(): ChanceCase {
+  const n = choice([2, 3, 4, 6] as const);
+  const answers: Record<number, string> = {
+    2: "A fair coin",
+    3: "A spinner with 3 equal parts, choosing one",
+    4: "A spinner with 4 equal parts, choosing one",
+    6: "A normal die, rolling one chosen number",
+  };
+  const answer = answers[n]!;
+  const others = Object.values(answers).filter((t) => t !== answer).concat(["A bag with only red counters", "A bag with 3 red and 3 blue"]);
+  const visual: ChanceVisual = n === 2 ? { type: "coin", face: "tails" } : n === 6 ? { type: "die", face: randInt(1, 6) } : { type: "spinner", wedges: PAL.slice(0, n).map((p) => p.k) };
+  return {
+    prompt: `Which tool best matches a 1 out of ${n} chance?`,
+    answer,
+    options: distinctOptions(answer, others),
+    correct: `Yes. One outcome from ${n} equally likely outcomes is 1 out of ${n}.`,
+    wrong: `A 1 out of ${n} chance needs ${n} equally likely outcomes.`,
+    visual,
+  };
+}
 
 // ─────────────────────── Week 3: Probability as Fractions ────────────────────
 // L1 "One Out Of" — a single target part; the chance is always 1/total.
@@ -323,75 +269,48 @@ function compareFractionMaker(): ChanceCase {
 }
 
 // ───────────────────────────── Week 4: Fair Games ───────────────────────────
-const fairGameCases = pool([
-  {
-    prompt: "Game rule: you win on heads, I win on tails. Is the game fair?",
-    answer: "Yes, both players have one outcome",
-    options: ["Yes, both players have one outcome", "No, heads always wins", "No, tails is impossible", "No, one player has more outcomes"],
-    correct: "Yes. Heads and tails are equally likely on a fair coin.",
-    wrong: "Each player has one equally likely coin outcome.",
-    visual: { type: "coin", face: "heads" },
-  },
-  {
-    prompt: "Game rule: you win on 1 or 2, I win on 3, 4, 5 or 6. Is the game fair?",
-    answer: "No, one player has more winning outcomes",
-    options: ["No, one player has more winning outcomes", "Yes, both players use a die", "Yes, all dice games are fair", "No, 1 and 2 are impossible"],
-    correct: "Correct. One player has 2 outcomes and the other has 4.",
-    wrong: "Count the winning outcomes for each player.",
-    visual: { type: "die", face: 4 },
-  },
-  {
-    prompt: "Game rule: you win on red, I win on green, on a spinner with 2 red and 2 green parts. Is it fair?",
-    answer: "Yes, both colours have equal parts",
-    options: ["Yes, both colours have equal parts", "No, red always wins", "No, green is impossible", "No, red has more parts"],
-    correct: "Yes. Two red and two green parts give each player the same chance.",
-    wrong: "Fair means equal parts — here red and green each have 2.",
-    visual: { type: "spinner", wedges: [RED, GREEN, RED, GREEN] },
-  },
-  {
-    prompt: "Game rule: you win on an even number, I win on an odd number, on a normal die. Is it fair?",
-    answer: "Yes, there are three evens and three odds",
-    options: ["Yes, there are three evens and three odds", "No, even numbers are bigger", "No, odds win more often", "No, 6 is impossible"],
-    correct: "Yes. 2, 4, 6 are even and 1, 3, 5 are odd — three each.",
-    wrong: "Count them: three even faces and three odd faces is equal.",
-    visual: { type: "die", face: 4 },
-  },
-]);
+// L1 "Is the Game Fair?" — random fair or unfair setup across tools.
+function fairGameMaker(): ChanceCase {
+  const kind = choice(["coin", "evenodd", "spinner", "diesplit"] as const);
+  if (kind === "coin") {
+    return { prompt: "Game: you win on heads, I win on tails. Is the game fair?", answer: "Yes, both players have one outcome", options: ["Yes, both players have one outcome", "No, heads always wins", "No, tails is impossible", "No, one player has more outcomes"], correct: "Yes. Heads and tails are equally likely.", wrong: "Each player has one equally likely coin outcome.", visual: { type: "coin", face: "heads" } };
+  }
+  if (kind === "evenodd") {
+    return { prompt: "Game: you win on an even number, I win on an odd number, on a normal die. Is it fair?", answer: "Yes, there are three evens and three odds", options: ["Yes, there are three evens and three odds", "No, even numbers are bigger", "No, odds win more often", "No, 6 is impossible"], correct: "Yes. 2, 4, 6 are even and 1, 3, 5 are odd — three each.", wrong: "Three even and three odd faces is equal.", visual: { type: "die", face: choice([2, 4, 6] as const) } };
+  }
+  if (kind === "spinner") {
+    const [c1, c2] = shuffle(PAL).slice(0, 2) as [Paint, Paint];
+    const a = randInt(1, 3);
+    const b = Math.random() < 0.5 ? a : (() => { let x = randInt(1, 3); while (x === a) x = randInt(1, 3); return x; })();
+    const items = shuffle([...Array(a).fill(c1.k), ...Array(b).fill(c2.k)] as string[]);
+    const fair = a === b;
+    const bigger = a > b ? c1 : c2;
+    const answer = fair ? "Yes, both colours have equal parts" : `No, ${bigger.n} has more parts`;
+    return { prompt: `Game: you win on ${c1.n}, I win on ${c2.n}, on a spinner with ${a} ${c1.n} and ${b} ${c2.n} part${plural(b)}. Is it fair?`, answer, options: [`Yes, both colours have equal parts`, `No, ${c1.n} has more parts`, `No, ${c2.n} has more parts`, `No, ${c2.n} is impossible`], correct: fair ? "Yes. Equal parts give each player the same chance." : `Correct. ${cap(bigger.n)} has more parts, so it is not fair.`, wrong: fair ? "Equal parts means the game is fair." : "Count the winning parts for each player.", visual: { type: "spinner", wedges: items } };
+  }
+  const k = randInt(2, 4);
+  const fair = k === 3;
+  const answer = fair ? "Yes, each player wins on three numbers" : `No, one player wins on ${Math.max(k, 6 - k)} numbers`;
+  return { prompt: `Game: you win on 1 to ${k}, I win on the rest, on a normal die. Is it fair?`, answer, options: distinctOptions(answer, ["Yes, all dice games are fair", `No, one player wins on ${Math.min(k, 6 - k)} numbers`, "No, some numbers are impossible", "No, the bigger numbers win more"]), correct: fair ? "Yes. 1-3 and 4-6 is three winning numbers each." : `Correct. One player wins on ${Math.max(k, 6 - k)} numbers and the other on ${Math.min(k, 6 - k)}.`, wrong: "Count how many numbers each player wins on.", visual: { type: "die", face: k } };
+}
 
-const fixGameCases = pool([
-  {
-    prompt: "A die game has Player A winning on 1, 2, 3 and Player B winning on 4, 5. What fixes it best?",
-    answer: "Add 6 to Player B's winning numbers",
-    options: ["Add 6 to Player B's winning numbers", "Remove 1 from the die", "Let Player A also win on 6", "Use only odd numbers"],
-    correct: "Yes. Then each player has 3 winning outcomes.",
-    wrong: "A fair fix gives each player the same number of outcomes.",
-    visual: { type: "die", face: 6 },
-  },
-  {
-    prompt: "A spinner game has 3 red parts for A and 1 blue part for B. What makes it fair?",
-    answer: "Use 2 red parts and 2 blue parts",
-    options: ["Use 2 red parts and 2 blue parts", "Use 4 red parts", "Use 3 red parts and 2 blue parts", "Make blue smaller"],
-    correct: "Correct. Equal parts give equal chance.",
-    wrong: "To make it fair, both colours need the same number of equal parts.",
-    visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] },
-  },
-  {
-    prompt: "A coin game gives Player A both heads and tails, and Player B nothing. What fixes it?",
-    answer: "Give Player B tails",
-    options: ["Give Player B tails", "Add a second coin", "Remove tails", "Toss the coin twice"],
-    correct: "Yes. Then A wins on heads and B wins on tails — one outcome each.",
-    wrong: "A fair fix gives each player one of the two coin outcomes.",
-    visual: { type: "coin", face: "heads" },
-  },
-  {
-    prompt: "A bag game has Player A winning on 4 red and Player B winning on 1 blue. What makes it fair?",
-    answer: "Use 2 red and 2 blue counters",
-    options: ["Use 2 red and 2 blue counters", "Add more red counters", "Use 3 red and 1 blue", "Remove the blue counter"],
-    correct: "Correct. Equal counts give each player the same chance.",
-    wrong: "To be fair, both colours need the same number of counters.",
-    visual: { type: "bag", counters: [RED, RED, RED, RED, BLUE] },
-  },
-]);
+// L2 "Fix the Game" — how to make an unfair setup fair.
+function fixGameMaker(): ChanceCase {
+  const kind = choice(["spinner", "bag", "die"] as const);
+  if (kind === "spinner") {
+    const [c1, c2] = shuffle(PAL).slice(0, 2) as [Paint, Paint];
+    const big = randInt(3, 4);
+    const answer = `Use ${big - 1} ${c1.n} parts and ${big - 1} ${c2.n} parts`;
+    return { prompt: `A spinner game has ${big} ${c1.n} parts for A and 1 ${c2.n} part for B. What makes it fair?`, answer, options: distinctOptions(answer, [`Use ${big + 1} ${c1.n} parts`, `Use ${big} ${c1.n} parts and 2 ${c2.n} parts`, `Make the ${c2.n} part smaller`, `Add another ${c1.n} part`]), correct: "Correct. Equal parts give equal chance.", wrong: "To make it fair, both colours need the same number of equal parts.", visual: { type: "spinner", wedges: shuffle([...Array(big).fill(c1.k), c2.k] as string[]) } };
+  }
+  if (kind === "bag") {
+    const [c1, c2] = shuffle(PAL).slice(0, 2) as [Paint, Paint];
+    const big = randInt(3, 4);
+    const answer = `Use ${big - 1} ${c1.n} and ${big - 1} ${c2.n} counters`;
+    return { prompt: `A bag game has Player A winning on ${big} ${c1.n} and Player B winning on 1 ${c2.n}. What makes it fair?`, answer, options: distinctOptions(answer, [`Add more ${c1.n} counters`, `Use ${big} ${c1.n} and 1 ${c2.n}`, `Remove the ${c2.n} counter`, `Use only ${c1.n} counters`]), correct: "Correct. Equal counts give each player the same chance.", wrong: "To be fair, both colours need the same number of counters.", visual: { type: "bag", counters: shuffle([...Array(big).fill(c1.k), c2.k] as string[]) } };
+  }
+  return { prompt: "A die game has Player A winning on 1, 2, 3 and Player B winning on 4, 5. What fixes it best?", answer: "Add 6 to Player B's winning numbers", options: ["Add 6 to Player B's winning numbers", "Remove 1 from the die", "Let Player A also win on 6", "Use only odd numbers"], correct: "Yes. Then each player wins on three numbers.", wrong: "A fair fix gives each player the same number of outcomes.", visual: { type: "die", face: 6 } };
+}
 
 // ─────────────────────────── Week 5: Compare Chances ────────────────────────
 // L1 "More Chance or Less Chance?" — winner side varies (not always B).
@@ -411,40 +330,31 @@ function compareChanceMaker(): ChanceCase {
   };
 }
 
-const sameChanceCases = pool([
-  {
-    prompt: "Which two chances are the same?",
-    answer: "2 out of 4 and 3 out of 6",
-    options: ["2 out of 4 and 3 out of 6", "1 out of 4 and 3 out of 6", "1 out of 6 and 2 out of 4", "3 out of 4 and 1 out of 6"],
-    correct: "Right. Both are one half of the outcomes.",
-    wrong: "Look for two chances that cover the same part of the whole.",
-    visual: { type: "scale" },
-  },
-  {
-    prompt: "A coin lands heads and a red-blue fair spinner lands red. How do the chances compare?",
-    answer: "They are the same chance",
-    options: ["They are the same chance", "Heads is certain", "Red is impossible", "The spinner has more chance"],
-    correct: "Yes. Each event has 1 out of 2 chance.",
-    wrong: "A fair coin and a two-colour fair spinner both have one winning outcome out of two.",
-    visual: { type: "spinner", wedges: [RED, BLUE] },
-  },
-  {
-    prompt: "Which two chances are the same?",
-    answer: "1 out of 2 and 3 out of 6",
-    options: ["1 out of 2 and 3 out of 6", "1 out of 3 and 2 out of 6", "2 out of 4 and 1 out of 6", "3 out of 4 and 2 out of 6"],
-    correct: "Right. 1 out of 2 and 3 out of 6 are both one half.",
-    wrong: "Find two chances that each cover half of the whole.",
-    visual: { type: "scale" },
-  },
-  {
-    prompt: "Rolling an even number on a die, and a fair coin landing heads. How do the chances compare?",
-    answer: "They are the same chance",
-    options: ["They are the same chance", "The die has more chance", "Heads is certain", "Even numbers are impossible"],
-    correct: "Yes. Even numbers are 3 out of 6, which is one half — the same as heads.",
-    wrong: "Even numbers are 3 of 6 (one half), the same as a coin's one out of two.",
-    visual: { type: "die", face: 4 },
-  },
-]);
+// L2 "Same Chance" — find the pair of equal chances (equivalent fractions).
+function sameChanceMaker(): ChanceCase {
+  if (Math.random() < 0.4) {
+    // Half-equivalents: n out of 2n.
+    const n = choice([1, 2, 3] as const);
+    const answer = `${n} out of ${2 * n} and ${n + 1} out of ${2 * (n + 1)}`;
+    return {
+      prompt: "Which two chances are the same?",
+      answer,
+      options: distinctOptions(answer, [`${n} out of ${2 * n} and ${n} out of ${2 * n + 1}`, `1 out of ${2 * n} and ${n} out of ${2 * n}`, `${n + 1} out of ${2 * n} and ${n} out of ${2 * (n + 1)}`, `${n} out of ${n + 1} and 1 out of 2`]),
+      correct: "Right. Both chances are one half of the whole.",
+      wrong: "Look for two chances that each cover the same part of the whole.",
+      visual: { type: "scale" },
+    };
+  }
+  // "one half" events across tools.
+  const evt = choice(["coinVspinner", "dieEvenVcoin", "spinnerVcoin"] as const);
+  if (evt === "coinVspinner") {
+    return { prompt: "A coin lands heads, and a red-blue fair spinner lands red. How do the chances compare?", answer: "They are the same chance", options: ["They are the same chance", "Heads is certain", "Red is impossible", "The spinner has more chance"], correct: "Yes. Each event has a 1 out of 2 chance.", wrong: "A fair coin and a two-colour fair spinner each have one winning outcome out of two.", visual: { type: "spinner", wedges: [RED, BLUE] } };
+  }
+  if (evt === "dieEvenVcoin") {
+    return { prompt: "Rolling an even number on a die, and a fair coin landing heads. How do the chances compare?", answer: "They are the same chance", options: ["They are the same chance", "The die has more chance", "Heads is certain", "Even numbers are impossible"], correct: "Yes. Even numbers are 3 out of 6 — one half — the same as heads.", wrong: "Even numbers are 3 of 6 (one half), the same as a coin's one out of two.", visual: { type: "die", face: choice([2, 4, 6] as const) } };
+  }
+  return { prompt: "A fair 4-part spinner landing on 2 chosen parts, and a coin landing heads. How do the chances compare?", answer: "They are the same chance", options: ["They are the same chance", "The coin has more chance", "The spinner is certain", "Heads is impossible"], correct: "Yes. 2 out of 4 is one half — the same as heads.", wrong: "2 of 4 parts is one half, the same as a coin's one out of two.", visual: { type: "spinner", wedges: [RED, RED, BLUE, BLUE] } };
+}
 
 // L3 "Best Prediction" — the colour with the most parts.
 function bestPredictionMaker(): ChanceCase {
@@ -519,20 +429,20 @@ function makeBuildFairTask(): PracticeTask {
 }
 
 const lessonGens: Record<string, Gen> = {
-  "1-1": fairCases,
-  "1-2": equalChanceCases,
-  "1-3": explainEqualCases,
+  "1-1": generated([fairMaker]),
+  "1-2": generated([equalChanceMaker]),
+  "1-3": generated([explainMaker]),
   "2-1": generated([readToolMaker]),
   "2-2": generated([countOutcomesMaker]),
-  "2-3": matchToolCases,
+  "2-3": generated([matchToolMaker]),
   "3-1": generated([oneOutOfMaker]),
   "3-2": generated([fractionChanceMaker]),
   "3-3": generated([compareFractionMaker]),
-  "4-1": fairGameCases,
-  "4-2": fixGameCases,
+  "4-1": generated([fairGameMaker]),
+  "4-2": generated([fixGameMaker]),
   "4-3": makeBuildFairTask,
   "5-1": generated([compareChanceMaker]),
-  "5-2": sameChanceCases,
+  "5-2": generated([sameChanceMaker]),
   "5-3": generated([bestPredictionMaker]),
   "6-1": makePredictMostTask,
   "6-2": () => ({
