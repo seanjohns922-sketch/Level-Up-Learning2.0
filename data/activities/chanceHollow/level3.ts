@@ -89,6 +89,7 @@ const randGen = (makers: readonly (() => ChanceCase)[]): Gen => {
 };
 
 // ── Random apparatus helpers ────────────────────────────────────────────────
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const randInt = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
 const choice = <T,>(items: readonly T[]): T => items[Math.floor(Math.random() * items.length)]!;
 const shuffleArr = <T,>(items: readonly T[]): T[] => {
@@ -224,6 +225,88 @@ function tallyMostMaker(): () => ChanceCase {
   };
 }
 
+// Test the prediction: you predicted an outcome, ran ONE trial, and interpret
+// the result. Varies the object (spinner, bag, coin) and whether the result
+// matched, so the teaching point — a less-likely outcome can still happen, and
+// a fair coin can land either way — comes up in many guises.
+function testPredictionMaker(): () => ChanceCase {
+  return () => {
+    const mode = choice(["spinner", "bag", "coin"] as const);
+    const matched = Math.random() < 0.5;
+
+    if (mode === "coin") {
+      const predicted = choice(["heads", "tails"] as const);
+      const other = predicted === "heads" ? "tails" : "heads";
+      const result = matched ? predicted : other;
+      const base = { visual: { type: "coin", face: result } as ChanceVisual };
+      if (!matched) {
+        const answer = `${cap(result)} was just as likely — one toss can go either way`;
+        return {
+          ...base,
+          prompt: `You predicted ${predicted}. You tossed the coin once and it landed ${result}. What does the test show?`,
+          answer,
+          options: [answer, "The coin is broken", `${cap(predicted)} is impossible`, "The toss does not count"],
+          correct: "Right. A coin is 50/50, so one toss can land either way.",
+          wrong: `Heads and tails are equally likely, so landing ${result} is fair even after predicting ${predicted}.`,
+        };
+      }
+      const answer = `It matched — but ${other} was just as likely`;
+      return {
+        ...base,
+        prompt: `You predicted ${predicted}. You tossed the coin once and it landed ${result}. What does the test show?`,
+        answer,
+        options: [answer, `${cap(predicted)} was certain`, `${cap(other)} is impossible`, "The coin is loaded"],
+        correct: "Right. It matched, though a coin is 50/50 so either side was fair.",
+        wrong: `It landed ${result} as predicted, but ${other} was equally likely — a coin is 50/50.`,
+      };
+    }
+
+    // Spinner or bag with a clear majority colour, plus 1-2 minority colours.
+    const total = mode === "spinner" ? randInt(4, 6) : randInt(5, 8);
+    const half = total / 2;
+    const majCount = randInt(Math.floor(half) + 1, total - 1);
+    const paints = shuffleArr(PAINTS);
+    const maj = paints[0]!;
+    const others = paints.slice(1, 3);
+    const entries: Array<[Paint, number]> = [[maj, majCount]];
+    const minCounts = new Map<Paint, number>();
+    let remaining = total - majCount;
+    let oi = 0;
+    while (remaining > 0) {
+      const p = others[oi % others.length]!;
+      minCounts.set(p, (minCounts.get(p) ?? 0) + 1);
+      remaining -= 1;
+      oi += 1;
+    }
+    for (const [p, n] of minCounts) entries.push([p, n]);
+    const items = shuffleArr(paintList(entries));
+    const k = choice([...minCounts.keys()]);
+    const drew = mode === "spinner" ? "spun" : "drew";
+    const visual: ChanceVisual = mode === "spinner" ? { type: "spinner", wedges: items } : { type: "bag", counters: items };
+
+    if (matched) {
+      const answer = `The prediction worked — ${maj.name} was the likely result`;
+      return {
+        prompt: `You predicted ${maj.name} (the biggest share) and ${drew} ${maj.name}. What does the test show?`,
+        answer,
+        options: [answer, `${cap(maj.name)} only happened by luck`, `${cap(maj.name)} is now impossible`, `You must predict ${k.name} next`],
+        correct: `Yes. ${maj.name} had the most, so predicting it paid off.`,
+        wrong: `${cap(maj.name)} had the biggest share, so a ${maj.name} result matches the prediction.`,
+        visual,
+      };
+    }
+    const answer = `${cap(k.name)} was less likely but could still happen`;
+    return {
+      prompt: `You predicted ${maj.name} (the biggest share) but ${drew} ${k.name}. What does the test show?`,
+      answer,
+      options: [answer, mode === "spinner" ? "The spinner is broken" : "The bag is broken", `${cap(k.name)} is impossible`, "Your prediction was cheating"],
+      correct: `Right. ${k.name} was less likely, but 'unlikely' does not mean impossible.`,
+      wrong: `${cap(k.name)} has fewer, so it is less likely — but it can still come up sometimes.`,
+      visual,
+    };
+  };
+}
+
 // ─────────────────────────────── Week 1: Chance Words ───────────────────────
 const w1l1 = poolGen([
   { prompt: "The sun will set this evening. Certain or impossible?", answer: "Certain", options: FOUR_SCALE, correct: "Yes. The sun sets every day, so it must happen.", wrong: "'Certain' means it must happen. The sun sets every single day.", visual: { type: "scale", highlight: "certain" } },
@@ -295,12 +378,9 @@ const w3l3 = poolGen([
 // Parametric: fresh "predict the colour it lands on most" spinner every time.
 const w4l1 = randGen([predictMostMaker()]);
 
-const w4l2 = poolGen([
-  { prompt: "You predicted red on this spinner, but you spun blue. What does that show?", answer: "Blue was less likely but could still happen", options: ["Blue was less likely but could still happen", "Your prediction was cheating", "Blue is impossible", "The spinner is broken"], correct: "Right. A less likely outcome can still happen sometimes.", wrong: "Blue is unlikely here, but 'unlikely' does not mean impossible — it can still happen.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
-  { prompt: "You predicted 'a number 1 to 6' and rolled a 4. What does the test show?", answer: "The prediction worked — 4 is one of the outcomes", options: ["The prediction worked — 4 is one of the outcomes", "The prediction failed", "4 is not on a die", "You need to roll again"], correct: "Yes. 4 is in 1 to 6, so the prediction held up.", wrong: "4 is one of the numbers 1 to 6, so the prediction was correct.", visual: { type: "die", face: 4 } },
-  { prompt: "You predicted heads and tossed the coin once. It landed tails. What does the test show?", answer: "Tails was just as likely — one toss can go either way", options: ["Tails was just as likely — one toss can go either way", "The coin is broken", "Heads is impossible", "The toss does not count"], correct: "Right. Heads and tails are equally likely, so one toss can be either.", wrong: "A coin is 50/50, so a single toss can land tails even if you picked heads.", visual: { type: "coin", face: "tails" } },
-  { prompt: "You predicted blue on this mostly-blue spinner and spun blue. What does the test show?", answer: "The prediction worked — blue was the likely result", options: ["The prediction worked — blue was the likely result", "Blue only happened by luck", "Blue is now impossible", "You must predict red next"], correct: "Yes. Blue was the biggest section, so predicting it paid off.", wrong: "Blue has the most sections, so a blue result matches the prediction.", visual: { type: "spinner", wedges: [BLUE, BLUE, BLUE, RED] } },
-]);
+// Parametric: fresh "test the prediction" across spinner, bag and coin, with the
+// result matching or not, so the object and scenario vary every time.
+const w4l2 = randGen([testPredictionMaker()]);
 
 const w4l3 = poolGen([
   { prompt: "You predicted heads. The coin landed tails. Did it match?", answer: "No — but tails was still a fair result", options: ["No — but tails was still a fair result", "Yes — they matched", "No — tails is impossible", "Yes — tails counts as heads"], correct: "Right. It did not match, yet tails was always possible.", wrong: "Heads and tails differ, so it did not match — but tails could still happen.", visual: { type: "coin", face: "tails" } },
