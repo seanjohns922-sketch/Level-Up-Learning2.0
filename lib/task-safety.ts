@@ -322,6 +322,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "audioPick",
   "numberHunt",
   "groupCountVisual",
+  "chanceSpinTally",
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
@@ -418,6 +419,13 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
         && !fixedCells.has(`${answer.r}:${answer.c}`)
       ))
       && (assessmentTask.fixed ?? []).every((item) => isBoardCell(item.r, item.c));
+  }
+  if (task.kind === "chanceSpinTally") {
+    return hasText(task.prompt)
+      && Array.isArray(task.wedges) && task.wedges.length >= 2
+      && Array.isArray(task.labels) && task.labels.length >= 2
+      && Number.isInteger(task.spins) && task.spins >= 1
+      && task.labels.every((label) => hasText(label.colour) && hasText(label.name));
   }
   if (task.kind !== "starpathObject") return true;
   const objectTask = task as StarpathObjectTask;

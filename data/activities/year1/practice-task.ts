@@ -181,6 +181,15 @@ export type PracticeTask = (
       visual?: ChanceVisual;
     }
   | {
+      // Chance Hollow: spin a spinner `spins` times and record each result by
+      // tapping the colour it lands on, building a real tally.
+      kind: "chanceSpinTally";
+      prompt: string;
+      wedges: string[]; // one entry per equal wedge (colour)
+      spins: number;
+      labels: { colour: string; name: string }[]; // distinct colours + names
+    }
+  | {
       kind: "order3";
       prompt: string;
       numbers: number[];

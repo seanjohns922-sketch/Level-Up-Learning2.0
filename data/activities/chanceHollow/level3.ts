@@ -204,27 +204,6 @@ function predictMostMaker(): () => ChanceCase {
   };
 }
 
-// Read a tally: which outcome came up most. Four-colour spinner so all four
-// outcomes are the four options; the winning count is made strictly highest.
-function tallyMostMaker(): () => ChanceCase {
-  return () => {
-    const paints = PAINTS;
-    const counts = paints.map(() => randInt(1, 7));
-    let maxIdx = 0;
-    for (let i = 1; i < counts.length; i += 1) if (counts[i]! > counts[maxIdx]!) maxIdx = i;
-    counts[maxIdx] = Math.max(...counts) + randInt(1, 2);
-    const tally = paints.map((p, i) => `${p.name} ${counts[i]}`).join(", ");
-    return {
-      prompt: `Spin a 4-colour spinner and tally the results — ${tally}. Which came up most?`,
-      answer: paints[maxIdx]!.name,
-      options: paints.map((p) => p.name),
-      correct: `Right. ${paints[maxIdx]!.name} has the highest tally (${counts[maxIdx]}).`,
-      wrong: `Find the biggest count in the tally — ${paints[maxIdx]!.name} has ${counts[maxIdx]}.`,
-      visual: { type: "spinner", wedges: paints.map((p) => p.c) },
-    };
-  };
-}
-
 // Test the prediction: you predicted an outcome, ran ONE trial, and interpret
 // the result. Varies the object (spinner, bag, coin) and whether the result
 // matched, so the teaching point — a less-likely outcome can still happen, and
@@ -482,7 +461,21 @@ const w5l1 = poolGen([
 ]);
 
 // Parametric: fresh randomised tally to read ("which came up most?") each time.
-const w5l2 = randGen([tallyMostMaker()]);
+// Interactive: actually spin the spinner 10 times and record each result as a
+// tally. Fresh spinner (3-4 colours, some with two wedges) every time.
+function makeSpinTallyTask(): PracticeTask {
+  const chosen = shuffleArr(PAINTS).slice(0, randInt(3, 4));
+  const wedges: string[] = [];
+  for (const p of chosen) for (let i = 0, w = randInt(1, 2); i < w; i += 1) wedges.push(p.c);
+  return {
+    kind: "chanceSpinTally",
+    prompt: "Spin the spinner 10 times. After each spin, tap the colour it landed on to record a tally.",
+    wedges: shuffleArr(wedges),
+    spins: 10,
+    labels: chosen.map((p) => ({ colour: p.c, name: p.name })),
+  };
+}
+const w5l2: Gen = makeSpinTallyTask;
 
 const w5l3 = poolGen([
   { prompt: "Spin a 4-colour spinner 16 times. Red:5, Blue:2, Green:5, Yellow:4. Which tied for most?", answer: "Red and green", options: ["Red and green", "Blue and yellow", "Only red", "Green and yellow"], correct: "Right. Red and green both have 5 — the highest count.", wrong: "Look for the two highest equal counts: red and green each have 5.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
