@@ -436,8 +436,18 @@ export function PracticeRunner({
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
-  const isNumberNexus = !isMeasurement && !isStarpath && !isStatistics;
-  const isStructuredRealm = isMeasurement || isStarpath || isStatistics;
+  const isChance = realmId === "chance";
+  const isNumberNexus = !isMeasurement && !isStarpath && !isStatistics && !isChance;
+  const isStructuredRealm = isMeasurement || isStarpath || isStatistics || isChance;
+  const primaryActionClass = isMeasurement
+    ? "bg-[#8a6422] hover:bg-[#a2732e]"
+    : isStarpath
+      ? "bg-violet-700 hover:bg-violet-600"
+      : isStatistics
+        ? "bg-[#c74f4b] hover:bg-[#a93f3c]"
+        : isChance
+          ? "bg-gradient-to-r from-rose-600 via-pink-500 to-amber-400 shadow-[0_12px_28px_rgba(251,113,133,0.24)] hover:brightness-110"
+          : "bg-teal-700 hover:bg-teal-600";
   const totalSeconds = minutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const completedRef = useRef(false);
@@ -1581,7 +1591,7 @@ export function PracticeRunner({
             <Dots count={(task as CountTask).count} />
             <div className="flex items-center gap-3">
               <input value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Type your answer" className="flex-1 px-4 py-3 rounded-lg border border-border text-xl font-bold bg-card" />
-              <button onClick={check} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isStatistics ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
+              <button onClick={check} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${primaryActionClass}`}>Check</button>
             </div>
           </div>
         )}
@@ -1604,7 +1614,7 @@ export function PracticeRunner({
               </div>
               <div className="flex items-center gap-3">
                 <button onClick={() => setOrder([])} className="px-5 py-3 rounded-lg bg-muted text-foreground font-extrabold text-xl hover:bg-muted/80 transition">Reset</button>
-                <button onClick={check} className={`flex-1 px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isStatistics ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : "bg-teal-600 hover:bg-teal-700"}`}>Check</button>
+                <button onClick={check} className={`flex-1 px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${primaryActionClass}`}>Check</button>
               </div>
             </div>
           );
@@ -1615,7 +1625,7 @@ export function PracticeRunner({
           return (
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
-                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isStatistics ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span></button>
+                <button type="button" onClick={() => { speak(t.speechText ?? String(t.targetNumber)); setHasPlayed(true); }} className={`px-5 py-3 rounded-lg text-white font-extrabold text-xl transition ${primaryActionClass}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Listen</span></button>
                 <div className="text-sm font-bold text-muted-foreground">{hasPlayed ? "Now tap the number." : "Tap Listen first."}</div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -1634,7 +1644,7 @@ export function PracticeRunner({
             <div className="grid gap-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm text-muted-foreground">Tap the correct number tile.</div>
-                <button type="button" onClick={() => speak(String(t.targetNumber))} className={`px-3 py-2 rounded-xl text-white font-bold transition ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isStatistics ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : "bg-teal-600 hover:bg-teal-700"}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Hear number</span></button>
+                <button type="button" onClick={() => speak(String(t.targetNumber))} className={`px-3 py-2 rounded-xl text-white font-bold transition ${primaryActionClass}`}><span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Hear number</span></button>
               </div>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
                 {t.tiles.map((n: number) => (
@@ -1654,9 +1664,7 @@ export function PracticeRunner({
             <button
               type="button"
               onClick={continueAfterWrong}
-              className={`rounded-lg px-5 py-3 text-lg font-black text-white transition hover:brightness-105 ${
-                isMeasurement ? "bg-[#8a6422]" : isStarpath ? "bg-violet-700" : isStatistics ? "bg-[#c74f4b]" : "bg-teal-700"
-              }`}
+              className={`rounded-lg px-5 py-3 text-lg font-black text-white transition ${primaryActionClass}`}
             >
               Next Question
             </button>
@@ -1668,15 +1676,7 @@ export function PracticeRunner({
               type="button"
               onClick={continueAfterCorrect}
               disabled={isAdvancingTask}
-              className={`rounded-lg px-5 py-3 text-lg font-black text-white transition disabled:cursor-wait disabled:opacity-60 ${
-                isMeasurement
-                  ? "bg-[#8a6422] hover:bg-[#a2732e]"
-                  : isStarpath
-                    ? "bg-violet-700 hover:bg-violet-600"
-                    : isStatistics
-                      ? "bg-[#c74f4b] hover:bg-[#a93f3c]"
-                    : "bg-teal-700 hover:bg-teal-600"
-              }`}
+              className={`rounded-lg px-5 py-3 text-lg font-black text-white transition disabled:cursor-wait disabled:opacity-60 ${primaryActionClass}`}
             >
               {isAdvancingTask
                 ? "Loading..."
