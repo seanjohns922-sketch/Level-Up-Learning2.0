@@ -925,7 +925,7 @@ function MeadowGround() {
   useEffect(() => () => texture.dispose(), [texture]);
   // Large enough that the ground always reaches the horizon panorama — no void
   // is ever visible around the Tower or the playable edge.
-  return <mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[135, 96]} /><meshStandardMaterial map={texture} color="#ffffff" roughness={1} /></mesh>;
+  return <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[135, 96]} /><meshStandardMaterial map={texture} color="#ffffff" roughness={1} /></mesh>;
 }
 
 function GrassTufts({ quality, groundTiles }: { quality: CentralWorldQuality; groundTiles: CentralWorldGroundTile[] }) {

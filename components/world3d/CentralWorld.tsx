@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
+import { Environment, Lightformer } from "@react-three/drei";
 import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
@@ -199,10 +200,41 @@ function CentralWorldScene({ quality, moveInput, lookInput, spawnTarget, spawnNo
     <>
       <color attach="background" args={["#69afe4"]} />
       <fog attach="fog" args={["#a7b9ac", 58, 112]} />
-      <hemisphereLight args={["#d9efff", "#38522f", 1.15]} />
-      <ambientLight intensity={0.45} color="#fff3da" />
-      <directionalLight position={[-24, 35, 18]} intensity={2.1} color="#ffd18a" />
-      <directionalLight position={[18, 16, -16]} intensity={0.4} color="#b9dcff" />
+      {/* Base rig, dialled back to leave room for the image-based lighting below
+         so the scene reads lit rather than flat-shaded. */}
+      <hemisphereLight args={["#d9efff", "#38522f", 0.7]} />
+      <ambientLight intensity={0.28} color="#fff3da" />
+      {/* Warm key light. On high quality it casts real soft shadows over the
+         whole roam area, which is what grounds the buildings and animals. */}
+      <directionalLight
+        position={[-24, 35, 18]}
+        intensity={2.3}
+        color="#ffd18a"
+        castShadow={quality === "high"}
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-near={1}
+        shadow-camera-far={150}
+        shadow-camera-left={-82}
+        shadow-camera-right={82}
+        shadow-camera-top={82}
+        shadow-camera-bottom={-82}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.05}
+      />
+      <directionalLight position={[18, 16, -16]} intensity={0.45} color="#b9dcff" />
+      {/* Static image-based lighting (rendered once) so metal roofs, gold trim
+         and water pick up soft sky/ground reflections instead of reading as flat
+         paint. Built from Lightformers — no external HDR, so CSP-safe. Skipped on
+         the low tier to protect weaker devices. */}
+      {quality !== "low" ? (
+        <Environment resolution={quality === "high" ? 256 : 128} frames={1} background={false}>
+          <color attach="background" args={["#8fb7d6"]} />
+          <Lightformer intensity={1.5} color="#fff2d6" position={[-10, 14, 8]} scale={[16, 16, 1]} />
+          <Lightformer intensity={0.7} color="#cfe6ff" position={[12, 8, -10]} scale={[12, 12, 1]} />
+          <Lightformer intensity={0.5} color="#a7c8ec" position={[0, 12, -14]} scale={[20, 8, 1]} />
+          <Lightformer intensity={0.4} form="ring" color="#6f9a58" position={[0, -8, 0]} scale={[24, 24, 1]} rotation={[Math.PI / 2, 0, 0]} />
+        </Environment>
+      ) : null}
       <CentralWorldEnvironment
         quality={quality}
         entranceActive={activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance}
@@ -681,7 +713,7 @@ export default function CentralWorld() {
 
   return (
     <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
-      <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
+      <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality === "high" ? "soft" : false}>
         <CentralWorldScene quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} />
       </Canvas>
 
