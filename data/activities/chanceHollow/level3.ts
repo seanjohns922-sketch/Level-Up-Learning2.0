@@ -36,10 +36,23 @@ type ChanceCase = {
   visual?: ChanceVisual;
 };
 
-// Turn a pool of cases into a generator that walks its own cases WITHOUT
-// repeating: every case is shown once before any repeats, and the same case
-// never appears twice in a row. This is independent of timing, so a lesson can
-// never show the same question over and over.
+const FOUR_SCALE = ["Certain", "Likely", "Unlikely", "Impossible"] as const;
+
+function caseToTask(c: ChanceCase, optionSeed: number, lead?: string): PracticeTask {
+  return {
+    kind: "mcq",
+    prompt: lead ? `${lead} ${c.prompt}` : c.prompt,
+    options: rotate([...c.options], optionSeed),
+    answer: c.answer,
+    feedback: { correct: c.correct, wrong: c.wrong },
+    ...(c.visual ? { visual: c.visual } : {}),
+  };
+}
+
+// A curated BANK generator: walks a fixed set of hand-written cases WITHOUT
+// repeating (every case shown once before any repeat, never twice in a row).
+// Used for qualitative lessons — chance words, everyday events, reasons — where
+// the answer depends on world knowledge and cannot be computed.
 const poolGen = (cases: readonly ChanceCase[], lead?: string): Gen => {
   let queue: number[] = [];
   let last = -1;
@@ -47,7 +60,6 @@ const poolGen = (cases: readonly ChanceCase[], lead?: string): Gen => {
   return () => {
     if (queue.length === 0) {
       queue = shuffledIndices(cases.length);
-      // Avoid a back-to-back repeat across the reshuffle boundary.
       if (cases.length > 1 && queue[queue.length - 1] === last) {
         [queue[queue.length - 1], queue[0]] = [queue[0]!, queue[queue.length - 1]!];
       }
@@ -55,19 +67,162 @@ const poolGen = (cases: readonly ChanceCase[], lead?: string): Gen => {
     const index = queue.pop()!;
     last = index;
     optionSeed += 1;
-    const c = cases[index]!;
-    return {
-      kind: "mcq",
-      prompt: lead ? `${lead} ${c.prompt}` : c.prompt,
-      options: rotate([...c.options], optionSeed),
-      answer: c.answer,
-      feedback: { correct: c.correct, wrong: c.wrong },
-      ...(c.visual ? { visual: c.visual } : {}),
-    };
+    return caseToTask(cases[index]!, optionSeed, lead);
   };
 };
 
-const FOUR_SCALE = ["Certain", "Likely", "Unlikely", "Impossible"] as const;
+// A PARAMETRIC generator: builds a freshly randomised case every call from one
+// or more maker functions, so an apparatus lesson (spinner, bag, die, tally)
+// draws from effectively unlimited questions rather than a fixed pool. The
+// maker computes the answer from the randomised numbers, so it is always
+// correct. Avoids repeating the exact same prompt twice in a row.
+const randGen = (makers: readonly (() => ChanceCase)[]): Gen => {
+  let lastPrompt = "";
+  let optionSeed = 0;
+  return () => {
+    let c = choice(makers)();
+    for (let guard = 0; c.prompt === lastPrompt && guard < 6; guard += 1) c = choice(makers)();
+    lastPrompt = c.prompt;
+    optionSeed += 1;
+    return caseToTask(c, optionSeed);
+  };
+};
+
+// ── Random apparatus helpers ────────────────────────────────────────────────
+const randInt = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const choice = <T,>(items: readonly T[]): T => items[Math.floor(Math.random() * items.length)]!;
+const shuffleArr = <T,>(items: readonly T[]): T[] => {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j]!, out[i]!];
+  }
+  return out;
+};
+
+type Paint = { c: string; name: string };
+const PAINTS: readonly Paint[] = [
+  { c: RED, name: "red" },
+  { c: BLUE, name: "blue" },
+  { c: GREEN, name: "green" },
+  { c: YELLOW, name: "yellow" },
+];
+
+// Build a flat list of `count` items per colour, in colour order given.
+function paintList(entries: ReadonlyArray<[Paint, number]>): string[] {
+  const out: string[] = [];
+  for (const [paint, n] of entries) for (let i = 0; i < n; i += 1) out.push(paint.c);
+  return out;
+}
+
+// Spinner or bag "likely / unlikely?" — the target colour is a clear majority
+// (>half, so likely) or clear minority (<half, so unlikely); never exactly half.
+function likelihoodMaker(kind: "spinner" | "bag"): () => ChanceCase {
+  return () => {
+    const total = kind === "spinner" ? randInt(4, 6) : randInt(5, 8);
+    const wantLikely = Math.random() < 0.5;
+    const half = total / 2;
+    const targetCount = wantLikely
+      ? randInt(Math.floor(half) + 1, total - 1)
+      : randInt(1, Math.ceil(half) - 1);
+    const paints = shuffleArr(PAINTS);
+    const target = paints[0]!;
+    const others = paints.slice(1);
+    const entries: Array<[Paint, number]> = [[target, targetCount]];
+    let remaining = total - targetCount;
+    let oi = 0;
+    const otherCounts = new Map<Paint, number>();
+    while (remaining > 0) {
+      const p = others[oi % Math.min(others.length, 2)]!;
+      otherCounts.set(p, (otherCounts.get(p) ?? 0) + 1);
+      remaining -= 1;
+      oi += 1;
+    }
+    for (const [p, n] of otherCounts) entries.push([p, n]);
+    const items = shuffleArr(paintList(entries));
+    const answer = wantLikely ? "Likely" : "Unlikely";
+    const noun = kind === "spinner" ? "parts" : "counters";
+    return {
+      prompt: kind === "spinner"
+        ? `The spinner lands on ${target.name}. Likely or unlikely?`
+        : `You draw a ${target.name} counter from this bag. Likely or unlikely?`,
+      answer,
+      options: FOUR_SCALE,
+      correct: `Yes. ${targetCount} of the ${total} ${noun} are ${target.name}, ${wantLikely ? "more" : "less"} than half, so it is ${answer.toLowerCase()}.`,
+      wrong: `Count them: ${targetCount} of ${total} ${noun} are ${target.name} — ${wantLikely ? "most of them" : "only a few"} — so ${target.name} is ${answer.toLowerCase()}.`,
+      visual: kind === "spinner" ? { type: "spinner", wedges: items } : { type: "bag", counters: items },
+    };
+  };
+}
+
+// Die "roll a number less than N" — count of winning faces is 1,2 (unlikely) or
+// 4,5 (likely); N is never 4, so it is never an even chance.
+function dieLikelihoodMaker(): () => ChanceCase {
+  return () => {
+    const n = choice([2, 3, 5, 6]);
+    const winning = n - 1; // faces 1..n-1
+    const wantLikely = winning > 3;
+    const answer = wantLikely ? "Likely" : "Unlikely";
+    return {
+      prompt: `You roll a number less than ${n} on one die. Likely or unlikely?`,
+      answer,
+      options: FOUR_SCALE,
+      correct: `Yes. ${winning} of the 6 faces are less than ${n}, so it is ${answer.toLowerCase()}.`,
+      wrong: `Count the faces under ${n}: there are ${winning} of 6, ${wantLikely ? "more" : "less"} than half, so it is ${answer.toLowerCase()}.`,
+      visual: { type: "die", face: randInt(1, 6) },
+    };
+  };
+}
+
+// Predict the colour a spinner lands on most — one colour is a strict plurality.
+function predictMostMaker(): () => ChanceCase {
+  return () => {
+    const paints = shuffleArr(PAINTS).slice(0, randInt(3, 4));
+    const counts = paints.map(() => randInt(1, 3));
+    // guarantee a unique maximum
+    let maxIdx = 0;
+    for (let i = 1; i < counts.length; i += 1) if (counts[i]! > counts[maxIdx]!) maxIdx = i;
+    counts[maxIdx] = Math.max(...counts) + randInt(1, 2);
+    const entries = paints.map((p, i) => [p, counts[i]!] as [Paint, number]);
+    const wedges = shuffleArr(paintList(entries));
+    const winner = paints[maxIdx]!;
+    const options = shuffleArr(paints.map((p) => p.name));
+    while (options.length < 4) {
+      const extra = PAINTS.find((p) => !options.includes(p.name));
+      if (!extra) break;
+      options.push(extra.name);
+    }
+    return {
+      prompt: "Which colour should you predict this spinner lands on most?",
+      answer: winner.name,
+      options: options.slice(0, 4),
+      correct: `Yes. ${winner.name} has the most parts (${counts[maxIdx]}), so it is the best prediction.`,
+      wrong: `Predict the biggest section — ${winner.name} has the most parts here.`,
+      visual: { type: "spinner", wedges },
+    };
+  };
+}
+
+// Read a tally: which outcome came up most. Four-colour spinner so all four
+// outcomes are the four options; the winning count is made strictly highest.
+function tallyMostMaker(): () => ChanceCase {
+  return () => {
+    const paints = PAINTS;
+    const counts = paints.map(() => randInt(1, 7));
+    let maxIdx = 0;
+    for (let i = 1; i < counts.length; i += 1) if (counts[i]! > counts[maxIdx]!) maxIdx = i;
+    counts[maxIdx] = Math.max(...counts) + randInt(1, 2);
+    const tally = paints.map((p, i) => `${p.name} ${counts[i]}`).join(", ");
+    return {
+      prompt: `Spin a 4-colour spinner and tally the results — ${tally}. Which came up most?`,
+      answer: paints[maxIdx]!.name,
+      options: paints.map((p) => p.name),
+      correct: `Right. ${paints[maxIdx]!.name} has the highest tally (${counts[maxIdx]}).`,
+      wrong: `Find the biggest count in the tally — ${paints[maxIdx]!.name} has ${counts[maxIdx]}.`,
+      visual: { type: "spinner", wedges: paints.map((p) => p.c) },
+    };
+  };
+}
 
 // ─────────────────────────────── Week 1: Chance Words ───────────────────────
 const w1l1 = poolGen([
@@ -77,12 +232,8 @@ const w1l1 = poolGen([
   { prompt: "You will draw a red counter from a bag with only blue counters. Certain or impossible?", answer: "Impossible", options: FOUR_SCALE, correct: "Correct. There are no red counters, so it can never happen.", wrong: "There are no red counters in the bag, so drawing red is impossible.", visual: { type: "bag", counters: [BLUE, BLUE, BLUE, BLUE, BLUE, BLUE] } },
 ]);
 
-const w1l2 = poolGen([
-  { prompt: "The spinner lands on red. Likely or unlikely?", answer: "Likely", options: FOUR_SCALE, correct: "Yes. Most of the spinner is red, so red is likely.", wrong: "Three of the four parts are red, so landing on red is likely.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
-  { prompt: "The spinner lands on blue. Likely or unlikely?", answer: "Unlikely", options: FOUR_SCALE, correct: "Right. Only a small part is blue, so blue is unlikely.", wrong: "Only one of the four parts is blue, so blue is unlikely.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
-  { prompt: "You draw the one red counter from this bag. Likely or unlikely?", answer: "Unlikely", options: FOUR_SCALE, correct: "Yes. There is only one red among many, so it is unlikely.", wrong: "There is only one red counter and lots of blue, so red is unlikely.", visual: { type: "bag", counters: [BLUE, BLUE, BLUE, BLUE, BLUE, RED] } },
-  { prompt: "You roll a number less than 6 on one die. Likely or unlikely?", answer: "Likely", options: FOUR_SCALE, correct: "Yes. Five of the six numbers are less than 6, so it is likely.", wrong: "The numbers 1, 2, 3, 4 and 5 all work — five out of six — so it is likely.", visual: { type: "die", face: 4 } },
-]);
+// Parametric: fresh spinner / bag / die "likely or unlikely?" every time.
+const w1l2 = randGen([likelihoodMaker("spinner"), likelihoodMaker("bag"), dieLikelihoodMaker()]);
 
 const w1l3 = poolGen([
   { prompt: "You roll a 7 on a normal die. Which chance word and why?", answer: "Impossible — a die only has 1 to 6", options: ["Impossible — a die only has 1 to 6", "Unlikely — 7 is a big number", "Likely — 7 is on most dice", "Certain — a 7 always comes up"], correct: "Correct. A die has no 7, so rolling one can never happen.", wrong: "Look at the die: the faces are 1 to 6. There is no 7, so it is impossible.", visual: { type: "die", face: 6 } },
@@ -141,12 +292,8 @@ const w3l3 = poolGen([
 ]);
 
 // ─────────────────────────── Week 4: Predict and Test ────────────────────────
-const w4l1 = poolGen([
-  { prompt: "Which colour should you predict this spinner lands on most?", answer: "Red", options: ["Red", "Blue", "They are equal", "Yellow"], correct: "Yes. Most of the spinner is red, so red is the best prediction.", wrong: "Predict the biggest section. Three parts are red, so predict red.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
-  { prompt: "The bag has 5 yellow and 5 black. What is the best prediction for one draw?", answer: "Yellow and black are equally likely", options: ["Yellow and black are equally likely", "Yellow is certain", "Black is impossible", "Yellow is more likely"], correct: "Right. Equal counts means an even chance either way.", wrong: "The counts are equal (5 and 5), so neither colour is more likely.", visual: { type: "bag", counters: [YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, "#111827", "#111827", "#111827", "#111827", "#111827"] } },
-  { prompt: "Before rolling one die, what is a fair prediction?", answer: "Any number from 1 to 6 could come up", options: ["Any number from 1 to 6 could come up", "A 9 will come up", "Only a 6 can come up", "The same number every time"], correct: "Yes. Each of the six numbers has the same chance.", wrong: "Every face 1 to 6 is equally likely, so any of them could come up.", visual: { type: "die", face: 2 } },
-  { prompt: "Which colour should you predict this spinner lands on most?", answer: "Blue", options: ["Blue", "Red", "Yellow", "Green"], correct: "Yes. Blue has the most sections, so predict blue.", wrong: "Predict the biggest share. Blue has the most parts here.", visual: { type: "spinner", wedges: [BLUE, BLUE, BLUE, RED, YELLOW] } },
-]);
+// Parametric: fresh "predict the colour it lands on most" spinner every time.
+const w4l1 = randGen([predictMostMaker()]);
 
 const w4l2 = poolGen([
   { prompt: "You predicted red on this spinner, but you spun blue. What does that show?", answer: "Blue was less likely but could still happen", options: ["Blue was less likely but could still happen", "Your prediction was cheating", "Blue is impossible", "The spinner is broken"], correct: "Right. A less likely outcome can still happen sometimes.", wrong: "Blue is unlikely here, but 'unlikely' does not mean impossible — it can still happen.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
@@ -170,12 +317,8 @@ const w5l1 = poolGen([
   { prompt: "You will roll one die 30 times. What should you expect?", answer: "Each number about 5 times", options: ["Each number about 5 times", "Always a six", "Never a one", "All thirty the same number"], correct: "Right. Six equal faces over 30 rolls average about 5 each.", wrong: "The faces are equally likely, so 30 rolls give each number about 5.", visual: { type: "die", face: 3 } },
 ]);
 
-const w5l2 = poolGen([
-  { prompt: "Toss a coin 10 times. Tally — Heads: 6, Tails: 4. Which happened more often?", answer: "Heads", options: ["Heads", "Tails", "They were equal", "You cannot tell"], correct: "Right. 6 is more than 4, so heads happened more.", wrong: "Compare the counts: 6 heads is more than 4 tails.", visual: { type: "coin", face: "heads" } },
-  { prompt: "Roll a die 12 times. Tally — 1:1, 2:4, 3:2, 4:1, 5:3, 6:1. Which came up most?", answer: "2", options: ["2", "5", "6", "4"], correct: "Yes. The number 2 has the highest tally (4).", wrong: "Find the biggest count in the tally — 2 has 4, more than any other.", visual: { type: "die", face: 2 } },
-  { prompt: "Draw and replace a counter 10 times. Tally — Red: 3, Blue: 7. Which happened more?", answer: "Blue", options: ["Blue", "Red", "They were equal", "You cannot tell"], correct: "Right. 7 blue is more than 3 red.", wrong: "Compare the tallies: 7 blue beats 3 red.", visual: { type: "bag", counters: [RED, RED, RED, BLUE, BLUE, BLUE, BLUE, BLUE, BLUE, BLUE] } },
-  { prompt: "How many tally marks record seven spins?", answer: "Four crossed with three more", options: ["Four crossed with three more", "Seven separate circles", "One mark for all seven", "Two crossed groups of five"], correct: "Yes. A group of five (four crossed by one) plus two more makes seven.", wrong: "Tallies group in fives: a crossed group of five, then two more, is seven.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
-]);
+// Parametric: fresh randomised tally to read ("which came up most?") each time.
+const w5l2 = randGen([tallyMostMaker()]);
 
 const w5l3 = poolGen([
   { prompt: "Spin a 4-colour spinner 16 times. Red:5, Blue:2, Green:5, Yellow:4. Which tied for most?", answer: "Red and green", options: ["Red and green", "Blue and yellow", "Only red", "Green and yellow"], correct: "Right. Red and green both have 5 — the highest count.", wrong: "Look for the two highest equal counts: red and green each have 5.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
