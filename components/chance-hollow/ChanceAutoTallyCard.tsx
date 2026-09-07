@@ -98,12 +98,13 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
   const { tool, draw, labels, spins, mode } = task;
   const trials = mode === "compareTrials" || mode === "predictMatch" ? 2 : 1;
 
-  const [phase, setPhase] = useState<"ready" | "predict" | "running" | "answer" | "reveal">(mode === "predictMatch" ? "predict" : "ready");
+  const isPredict = mode === "predictMatch" || mode === "predictMost";
+  const [phase, setPhase] = useState<"ready" | "predict" | "running" | "answer" | "reveal">(isPredict ? "predict" : "ready");
   const [tallies, setTallies] = useState<Tally[]>(() => Array.from({ length: trials }, () => ({})));
   const [current, setCurrent] = useState<string | null>(null);
   const [rotation, setRotation] = useState(0);
   const [settled, setSettled] = useState(false);
-  const [prediction, setPrediction] = useState<"yes" | "no" | null>(null);
+  const [prediction, setPrediction] = useState<string | null>(null);
   const timers = useRef<number[]>([]);
   useEffect(() => () => { timers.current.forEach((id) => { window.clearTimeout(id); window.clearInterval(id); }); }, []);
 
@@ -122,22 +123,28 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
       setRotation((rot) => rot + 120 + Math.floor(Math.random() * 240));
       setTallies((ts) => { const copy = ts.map((m) => ({ ...m })); copy[trial]![key] = (copy[trial]![key] ?? 0) + 1; return copy; });
       step += 1;
-      if (step >= total) { window.clearInterval(iv); setCurrent(null); setPhase(mode === "predictMatch" ? "reveal" : "answer"); }
+      if (step >= total) { window.clearInterval(iv); setCurrent(null); setPhase(isPredict ? "reveal" : "answer"); }
     }, 170);
     timers.current.push(iv);
   }
 
-  function predict(choiceMade: "yes" | "no") {
+  function predict(value: string) {
     if (phase !== "predict") return;
-    setPrediction(choiceMade);
+    setPrediction(value);
     run("predict");
   }
 
   function checkPrediction() {
     if (settled) return;
     setSettled(true);
-    const identical = trialsIdentical();
-    const wasRight = (prediction === "yes") === identical;
+    let wasRight: boolean;
+    if (mode === "predictMost") {
+      const counts = labels.map((l) => tallies[0]![l.key] ?? 0);
+      const max = Math.max(...counts);
+      wasRight = (tallies[0]![prediction ?? ""] ?? -1) === max;
+    } else {
+      wasRight = (prediction === "yes") === trialsIdentical();
+    }
     if (wasRight) onCorrect(); else onWrong(prediction ?? undefined);
   }
 
@@ -179,8 +186,8 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
           <div className={phase === "running" ? "animate-pulse" : ""}>
             <ToolFace tool={tool} current={current} rotation={rotation} draw={draw} />
           </div>
-          {mode === "predictMatch" ? (
-            <span className="text-sm font-bold text-[#6b6280]">{phase === "running" ? "Running…" : phase === "predict" ? "Predict first" : "Two trials run"}</span>
+          {isPredict ? (
+            <span className="text-sm font-bold text-[#6b6280]">{phase === "running" ? "Running…" : phase === "predict" ? "Predict first" : "Experiment run"}</span>
           ) : (
             <button type="button" onClick={() => run("ready")} disabled={phase !== "ready"} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-5 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
               <Play className="h-5 w-5" /> {phase === "ready" ? `Auto-${actionWord} ${spins}${trials > 1 ? ` × ${trials}` : ""}` : phase === "running" ? "Running…" : "Done"}
@@ -199,23 +206,44 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
           )}
 
           {phase === "predict" ? (
-            <div className="space-y-2">
-              <div className="flex items-start gap-2">
-                <p className="text-lg font-black text-[#3a2f52]">First, predict: will the two trials come out exactly the same?</p>
-                <ReadAloudBtn text="First, predict: will the two trials come out exactly the same?" />
+            mode === "predictMost" ? (
+              <div className="space-y-2">
+                <div className="flex items-start gap-2">
+                  <p className="text-lg font-black text-[#3a2f52]">First, predict: which colour will come up most?</p>
+                  <ReadAloudBtn text="First, predict: which colour will come up most?" />
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {labels.map((l) => (
+                    <button key={l.key} type="button" onClick={() => predict(l.key)} className="flex items-center justify-between gap-2 rounded-lg border-2 border-[#e0d3f2] bg-white px-4 py-3 text-left font-black text-[#3a2f52] transition hover:border-[#6d3f9c]">
+                      <span className="flex items-center gap-2">{l.colour ? <span className="inline-block h-4 w-4 rounded-full border border-white shadow" style={{ background: l.colour }} /> : null}<span className="capitalize">{l.name}</span></span>
+                      <OptionReadAloudButton text={l.name} />
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {([["no", "No — they will be different"], ["yes", "Yes — they will match exactly"]] as const).map(([id, label]) => (
-                  <button key={id} type="button" onClick={() => predict(id)} className="flex items-center justify-between gap-3 rounded-lg border-2 border-[#e0d3f2] bg-white px-4 py-3 text-left font-black text-[#3a2f52] transition hover:border-[#6d3f9c]">
-                    <span>{label}</span>
-                    <OptionReadAloudButton text={label} />
-                  </button>
-                ))}
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-start gap-2">
+                  <p className="text-lg font-black text-[#3a2f52]">First, predict: will the two trials come out exactly the same?</p>
+                  <ReadAloudBtn text="First, predict: will the two trials come out exactly the same?" />
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {([["no", "No — they will be different"], ["yes", "Yes — they will match exactly"]] as const).map(([id, label]) => (
+                    <button key={id} type="button" onClick={() => predict(id)} className="flex items-center justify-between gap-3 rounded-lg border-2 border-[#e0d3f2] bg-white px-4 py-3 text-left font-black text-[#3a2f52] transition hover:border-[#6d3f9c]">
+                      <span>{label}</span>
+                      <OptionReadAloudButton text={label} />
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )
           ) : phase === "reveal" ? (
             <div className="space-y-2">
-              <p className="text-lg font-black text-[#3a2f52]">You predicted the trials would be <span className="text-[#6d3f9c]">{prediction === "yes" ? "the same" : "different"}</span>.</p>
+              <p className="text-lg font-black text-[#3a2f52]">
+                {mode === "predictMost"
+                  ? <>You predicted <span className="capitalize text-[#6d3f9c]">{labels.find((l) => l.key === prediction)?.name ?? prediction}</span> would come up most.</>
+                  : <>You predicted the trials would be <span className="text-[#6d3f9c]">{prediction === "yes" ? "the same" : "different"}</span>.</>}
+              </p>
               <button type="button" disabled={settled} onClick={checkPrediction} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-5 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
                 See if I was right
               </button>

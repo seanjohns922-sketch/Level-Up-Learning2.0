@@ -126,6 +126,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "starpathMapRoute") return "Map Route";
   if (kind === "chanceSpinTally") return "Record the Tally";
   if (kind === "chanceAutoTally") return "Run the Experiment";
+  if (kind === "chanceBuildFair") return "Design a Fair Game";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";

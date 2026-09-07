@@ -205,8 +205,17 @@ export type PracticeTask = (
       spins: number;
       labels: { key: string; name: string; colour?: string }[];
       // `predictMatch` asks the student to predict whether two trials will match
-      // before running them, then reveals and grades the prediction.
-      mode: "most" | "least" | "compareTrials" | "predictMatch";
+      // before running them; `predictMost` asks them to predict the most likely
+      // outcome first. Both reveal and grade the prediction after running.
+      mode: "most" | "least" | "compareTrials" | "predictMatch" | "predictMost";
+    }
+  | {
+      // Chance Hollow: build a fair spinner by giving each colour an equal number
+      // of parts.
+      kind: "chanceBuildFair";
+      prompt: string;
+      colours: { key: string; name: string; colour: string }[];
+      maxParts: number;
     }
   | {
       kind: "order3";
