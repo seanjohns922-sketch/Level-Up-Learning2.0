@@ -7,6 +7,7 @@ import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShe
 import { LessonConceptIntro, RealmLessonHome } from "@/components/lesson/RealmLessonHome";
 import { createRandomRealmLessonGenerator, type RealmLessonTaskGenerator } from "@/data/activities/realm-lesson-blueprint";
 import { getChanceHollowLevel3TaskSet } from "@/data/activities/chanceHollow/level3";
+import { getChanceHollowLevel4TaskSet } from "@/data/activities/chanceHollow/level4";
 import type { Lesson } from "@/data/programs/year1";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
@@ -17,7 +18,44 @@ import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEn
 
 type Phase = "home" | "concept" | "active";
 
-function conceptFor(week: number, lesson: Lesson) {
+function conceptFor(levelNumber: number, week: number, lesson: Lesson) {
+  if (levelNumber === 4) {
+    if (week <= 2) {
+      return {
+        term: "equally likely",
+        title: "Equal outcomes have equal chance",
+        meaning: "Outcomes are equally likely when each result has the same chance of happening. A fair chance tool gives matching outcomes equal opportunity.",
+        example: "On a fair coin, heads and tails are equally likely.",
+        exampleExplanation: "Each side has one outcome, so neither side has more chance before the toss.",
+      };
+    }
+    if (week <= 3) {
+      return {
+        term: "fraction chance",
+        title: "Chance can be described as a fraction",
+        meaning: "A probability fraction compares the number of winning outcomes with the total number of equally likely outcomes.",
+        example: "If 2 of 6 spinner parts are red, the chance of red is 2 out of 6.",
+        exampleExplanation: "The winning outcomes are the red parts, and the total outcomes are all spinner parts.",
+      };
+    }
+    if (week <= 5) {
+      return {
+        term: "fair game",
+        title: "Fair games give players equal chances",
+        meaning: "A game is fair when each player has the same chance to win. We can check fairness by counting winning outcomes.",
+        example: "A coin game is fair if one player wins on heads and the other wins on tails.",
+        exampleExplanation: "Each player has one equally likely outcome, so both players have the same chance.",
+      };
+    }
+    return {
+      term: "expected result",
+      title: "Expected and actual results can differ",
+      meaning: "Expected results describe what should happen about often. Actual results are what really happened in the trial.",
+      example: "In 20 fair coin tosses, we expect about 10 heads, but we might get 8, 11 or 12.",
+      exampleExplanation: "Chance results vary, so actual results do not always match the expected result exactly.",
+    };
+  }
+
   if (week <= 2) {
     return {
       term: "chance event",
@@ -45,7 +83,108 @@ function conceptFor(week: number, lesson: Lesson) {
   };
 }
 
-function successCriteriaFor(week: number, lessonNumber: number): string[] {
+function successCriteriaFor(levelNumber: number, week: number, lessonNumber: number): string[] {
+  if (levelNumber === 4) {
+    const criteria: Record<string, string[]> = {
+      "1-1": [
+        "tell if a chance situation is fair",
+        "count each possible outcome",
+        "explain who has more chance",
+      ],
+      "1-2": [
+        "recognise equal chance outcomes",
+        "use equal counts as evidence",
+        "choose matching chance words",
+      ],
+      "1-3": [
+        "explain why chances are equal",
+        "use outcome counts in my reason",
+        "check that each outcome can happen",
+      ],
+      "2-1": [
+        "read outcomes from a chance tool",
+        "name the possible results",
+        "use the tool as evidence",
+      ],
+      "2-2": [
+        "count possible outcomes",
+        "count different outcomes carefully",
+        "tell the total number of outcomes",
+      ],
+      "2-3": [
+        "match a tool to a chance",
+        "choose a tool with the right number of outcomes",
+        "explain the match",
+      ],
+      "3-1": [
+        "describe one outcome out of all outcomes",
+        "count winning outcomes",
+        "count total outcomes",
+      ],
+      "3-2": [
+        "write chance as a simple fraction",
+        "use winning outcomes as the numerator",
+        "use total outcomes as the denominator",
+      ],
+      "3-3": [
+        "compare chance fractions",
+        "decide which chance is greater",
+        "explain my comparison",
+      ],
+      "4-1": [
+        "decide if a game is fair",
+        "count each player's winning outcomes",
+        "explain my fairness decision",
+      ],
+      "4-2": [
+        "spot what makes a game unfair",
+        "change outcomes to make the game fair",
+        "check both players have equal chance",
+      ],
+      "4-3": [
+        "design a fair game",
+        "give each player equal winning outcomes",
+        "explain why my game is fair",
+      ],
+      "5-1": [
+        "compare which event has more chance",
+        "use outcome counts to compare",
+        "choose the event with better chance",
+      ],
+      "5-2": [
+        "recognise the same chance in different tools",
+        "compare equivalent chances",
+        "explain why chances match",
+      ],
+      "5-3": [
+        "choose the best prediction",
+        "use the most likely outcome",
+        "explain why my prediction is sensible",
+      ],
+      "6-1": [
+        "predict from the chance tool",
+        "use probability before testing",
+        "explain my expected result",
+      ],
+      "6-2": [
+        "run and record a chance trial",
+        "read the recorded results",
+        "compare results with my prediction",
+      ],
+      "6-3": [
+        "compare expected and actual results",
+        "notice when results vary",
+        "explain variation using chance language",
+      ],
+    };
+
+    return criteria[`${week}-${lessonNumber}`] ?? [
+      "compare chance outcomes",
+      "explain my probability thinking",
+      "use the chance tool as evidence",
+    ];
+  }
+
   const criteria: Record<string, string[]> = {
     "1-1": [
       "use certain for something that will happen",
@@ -166,7 +305,12 @@ export default function ChanceHollowLessonShell({
   const exitRequestedRef = useRef(false);
   const completionKeyRef = useRef<string | null>(null);
   const [getTask] = useState<RealmLessonTaskGenerator | null>(() => {
-    const taskSet = levelNumber === 3 ? getChanceHollowLevel3TaskSet(lesson.id) : null;
+    const taskSet =
+      levelNumber === 3
+        ? getChanceHollowLevel3TaskSet(lesson.id)
+        : levelNumber === 4
+          ? getChanceHollowLevel4TaskSet(lesson.id)
+          : null;
     return taskSet ? createRandomRealmLessonGenerator(taskSet) : null;
   });
   const weekHref = getWorld3DReturnPathForLesson({
@@ -242,8 +386,8 @@ export default function ChanceHollowLessonShell({
     });
   }, [lesson.id, lesson.lesson, level, week]);
 
-  const successCriteria = successCriteriaFor(week, lesson.lesson);
-  const conceptIntro = conceptFor(week, lesson);
+  const successCriteria = successCriteriaFor(levelNumber, week, lesson.lesson);
+  const conceptIntro = conceptFor(levelNumber, week, lesson);
 
   useEffect(() => {
     if (!previewMode) router.replace("/realms");

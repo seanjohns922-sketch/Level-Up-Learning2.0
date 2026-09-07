@@ -23,8 +23,8 @@ function normalizeLevel(value: string) {
   } catch {
     return null;
   }
-  const match = /^Year\s+3$/i.exec(decoded.replace(/\+/g, " ").trim());
-  return match ? { label: "Year 3", number: 3 } : null;
+  const match = /^Year\s+([34])$/i.exec(decoded.replace(/\+/g, " ").trim());
+  return match ? { label: `Year ${match[1]}`, number: Number(match[1]) } : null;
 }
 
 export default async function ChanceHollowLessonPage({ params }: PageProps) {

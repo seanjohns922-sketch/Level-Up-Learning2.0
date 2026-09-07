@@ -13,6 +13,7 @@ import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 
 const CHANCE_LEVELS: Array<{ id: RealmLevelId; label: string }> = [
   { id: "Year 3", label: "Level 3" },
+  { id: "Year 4", label: "Level 4" },
 ];
 
 const DISTRICTS = [
@@ -51,7 +52,7 @@ function getDistricts(level: RealmLevelId): readonly RealmDashboardDistrict[] {
 function getWorld(level: RealmLevelId): RealmDashboardWorld {
   return {
     bgImage: getChanceHollowBackground(level),
-    levelLabel: "LEVEL 3",
+    levelLabel: level === "Year 4" ? "LEVEL 4" : "LEVEL 3",
     zones: getDistricts(level),
   };
 }
@@ -66,8 +67,8 @@ export const CHANCE_HOLLOW_DASHBOARD_CONFIG = {
   guidedTagline: "FOLLOW THE CHANCE TRAIL",
   totalWeeks: 6,
   minLevelIndex: 3,
-  maxLevelIndex: 3,
-  districtModeLevels: ["Year 3"],
+  maxLevelIndex: 4,
+  districtModeLevels: ["Year 3", "Year 4"],
   worldForLevel: getWorld,
   districtsForLevel: getDistricts,
   theme: {
