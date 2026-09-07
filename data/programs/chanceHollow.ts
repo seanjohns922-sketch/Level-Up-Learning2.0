@@ -10,9 +10,6 @@ type ChanceWeekSeed = {
   lessons: readonly [string, string, string];
 };
 
-const LEVEL_3_OUTCOME =
-  "Students identify everyday chance events, describe possible outcomes with chance language, conduct repeated chance experiments, record results, and discuss variation.";
-
 const LEVEL_3_SEEDS: readonly ChanceWeekSeed[] = [
   {
     topic: "Chance Words",
@@ -53,7 +50,46 @@ const LEVEL_3_SEEDS: readonly ChanceWeekSeed[] = [
 ];
 
 function lessonFocus(seed: ChanceWeekSeed, title: string) {
-  return `Probability: ${title.toLowerCase()} within ${seed.topic.toLowerCase()}. ${seed.purpose} ${LEVEL_3_OUTCOME}`;
+  switch (title) {
+    case "Certain or Impossible":
+      return "tell if an event is certain or impossible.";
+    case "Likely or Unlikely":
+      return "tell if an event is likely or unlikely.";
+    case "Explain the Chance Word":
+      return "explain why a chance word matches an event.";
+    case "Chance Around Us":
+      return "find chance events in everyday life.";
+    case "Sort Event Cards":
+      return "sort events using chance words.";
+    case "Give a Reason":
+      return "give a reason for my chance word.";
+    case "What Could Happen?":
+      return "name what could happen in a chance event.";
+    case "List All Outcomes":
+      return "list all possible outcomes.";
+    case "Match Event to Outcome":
+      return "match an event to its possible outcomes.";
+    case "Make a Prediction":
+      return "make a sensible prediction before testing.";
+    case "Test the Prediction":
+      return "test a prediction with a simple experiment.";
+    case "Did It Match?":
+      return "compare my prediction with the result.";
+    case "Coin, Dice and Spinner Trials":
+      return "run chance trials with coins, dice and spinners.";
+    case "Record With Tallies":
+      return "record chance results with tallies.";
+    case "Compare Trial Results":
+      return "compare results from repeated trials.";
+    case "Same Experiment, New Results":
+      return "notice that chance results can change.";
+    case "Compare Class Results":
+      return "compare chance results across the class.";
+    case "Explain Variation":
+      return "explain variation in repeated chance trials.";
+    default:
+      return seed.purpose.toLowerCase();
+  }
 }
 
 function buildLevel3Program(): WeekPlan[] {
@@ -104,5 +140,5 @@ export const CHANCE_HOLLOW_META = {
   curriculum: {
     3: ["AC9M3P01", "AC9M3P02"],
   },
-  outcome: LEVEL_3_OUTCOME,
+  outcome: "Students describe chance events, list outcomes, run trials, record results, and discuss variation.",
 } as const;

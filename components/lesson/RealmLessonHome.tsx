@@ -380,9 +380,15 @@ export function RealmLessonHome({
 }: RealmLessonHomeProps) {
   const theme = REALM_LESSON_THEMES[realm];
   const criteria = uniqueCriteria(successCriteria, focus);
+  const learningStatement = /^I\s+am\s+learning\s+to\b/i.test(focus)
+    ? focus
+    : `I am learning to ${focus}`;
+  const criteriaStatements = criteria.map((criterion) =>
+    /^I\s+can\b/i.test(criterion) ? criterion : `I can ${criterion}`,
+  );
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
-  const learningText = `Today I am learning to ${focus}`;
-  const criteriaText = `I can ${criteria.join(". I can ")}.`;
+  const learningText = learningStatement;
+  const criteriaText = `${criteriaStatements.join(". ")}.`;
   const conceptText = conceptIntro
     ? `${conceptIntro.term}. ${conceptIntro.title}. ${conceptIntro.meaning} For example, ${conceptIntro.example}. ${conceptIntro.exampleExplanation}`
     : "";
@@ -517,7 +523,7 @@ export function RealmLessonHome({
                   <div className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: theme.accent }}>Today I am learning to...</div>
                   <ReadAloudBtn text={learningText} label="Read" className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/20" />
                 </div>
-                <p className="mt-3 text-xl font-bold leading-8 text-white">{focus}</p>
+                <p className="mt-3 text-xl font-bold leading-8 text-white">{learningStatement}</p>
               </section>
 
               <section className="rounded-lg border p-5" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
@@ -526,7 +532,7 @@ export function RealmLessonHome({
                   <ReadAloudBtn text={criteriaText} label="Read" className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/20" />
                 </div>
                 <ul className="mt-3 space-y-3">
-                  {criteria.map((criterion) => (
+                  {criteriaStatements.map((criterion) => (
                     <li key={criterion} className="flex items-start gap-3 text-base font-semibold text-slate-100">
                       <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate-950" style={{ background: theme.accent }}>
                         <Check className="h-4 w-4" strokeWidth={3} />

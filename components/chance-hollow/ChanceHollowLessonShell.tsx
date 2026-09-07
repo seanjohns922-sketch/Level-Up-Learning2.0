@@ -45,6 +45,107 @@ function conceptFor(week: number, lesson: Lesson) {
   };
 }
 
+function successCriteriaFor(week: number, lessonNumber: number): string[] {
+  const criteria: Record<string, string[]> = {
+    "1-1": [
+      "use certain for something that will happen",
+      "use impossible for something that cannot happen",
+      "choose the best chance word for an event",
+    ],
+    "1-2": [
+      "use likely for something that has a good chance",
+      "use unlikely for something that has a small chance",
+      "compare two chance events",
+    ],
+    "1-3": [
+      "choose a chance word",
+      "give a reason for my choice",
+      "use chance words in a sentence",
+    ],
+    "2-1": [
+      "spot chance events around me",
+      "tell what could happen",
+      "use chance words for real events",
+    ],
+    "2-2": [
+      "sort event cards by chance",
+      "check if a chance word makes sense",
+      "explain one sorted choice",
+    ],
+    "2-3": [
+      "give a reason for a chance word",
+      "use evidence from the event",
+      "change my answer when the evidence changes",
+    ],
+    "3-1": [
+      "name possible outcomes",
+      "tell if an outcome can happen",
+      "choose a matching outcome",
+    ],
+    "3-2": [
+      "list every possible outcome",
+      "check that no outcomes are missing",
+      "use the tool to support my list",
+    ],
+    "3-3": [
+      "match an event to its outcomes",
+      "reject outcomes that cannot happen",
+      "explain why an outcome matches",
+    ],
+    "4-1": [
+      "make a prediction before testing",
+      "use outcomes to support my prediction",
+      "say why my prediction is sensible",
+    ],
+    "4-2": [
+      "run a simple chance experiment",
+      "record what happens",
+      "compare the result with my prediction",
+    ],
+    "4-3": [
+      "say if my prediction matched",
+      "explain the result with chance language",
+      "remember that possible outcomes can surprise us",
+    ],
+    "5-1": [
+      "run repeated chance trials",
+      "record each result carefully",
+      "count how often each outcome happens",
+    ],
+    "5-2": [
+      "record results with tally marks",
+      "read a tally table",
+      "find the outcome that happened most often",
+    ],
+    "5-3": [
+      "compare repeated trial results",
+      "find what stayed the same or changed",
+      "use results to describe chance",
+    ],
+    "6-1": [
+      "repeat the same experiment",
+      "notice that results can change",
+      "describe variation between trials",
+    ],
+    "6-2": [
+      "compare class chance results",
+      "find similarities and differences",
+      "talk about variation using evidence",
+    ],
+    "6-3": [
+      "explain why repeated results can vary",
+      "use tally evidence in my explanation",
+      "connect variation to chance",
+    ],
+  };
+
+  return criteria[`${week}-${lessonNumber}`] ?? [
+    "use chance language",
+    "explain my thinking",
+    "record results carefully",
+  ];
+}
+
 export default function ChanceHollowLessonShell({
   level,
   levelNumber,
@@ -141,11 +242,7 @@ export default function ChanceHollowLessonShell({
     });
   }, [lesson.id, lesson.lesson, level, week]);
 
-  const successCriteria = [
-    lesson.focus,
-    "use chance words or possible outcomes to explain my thinking",
-    "record or compare chance results carefully",
-  ];
+  const successCriteria = successCriteriaFor(week, lesson.lesson);
   const conceptIntro = conceptFor(week, lesson);
 
   useEffect(() => {
