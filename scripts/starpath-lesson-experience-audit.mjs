@@ -83,7 +83,7 @@ for (const label of ["STAR CHAIN", "IN ORBIT", "SUPERNOVA", "HYPERDRIVE", "STARP
 const platformBlueprint = read("data/activities/realm-lesson-blueprint.ts");
 assert.match(platformBlueprint, /RealmLessonBlueprint/);
 assert.match(platformBlueprint, /activities: readonly \[/);
-assert.equal((platformBlueprint.match(/RealmLessonActivityDefinition,/g) ?? []).length, 2);
+assert.equal((platformBlueprint.match(/RealmLessonActivityDefinition,/g) ?? []).length, 3);
 assert.match(platformBlueprint, /\.\.\.RealmLessonActivityDefinition\[\]/);
 assert.match(platformBlueprint, /createRandomRealmLessonGenerator/);
 assert.match(platformBlueprint, /shuffledActivityBag/);

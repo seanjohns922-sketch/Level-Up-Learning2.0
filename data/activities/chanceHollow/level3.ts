@@ -2,21 +2,12 @@ import type { ChanceVisual, PracticeTask } from "@/data/activities/year1/practic
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 
 type Gen = () => PracticeTask;
+type ChanceMaker = () => ChanceCase;
 
 const rotate = <T,>(items: readonly T[], amount: number) => {
   const offset = ((amount % items.length) + items.length) % items.length;
   return [...items.slice(offset), ...items.slice(0, offset)];
 };
-
-// Fisher–Yates shuffle of [0..n).
-function shuffledIndices(n: number): number[] {
-  const bag = Array.from({ length: n }, (_, index) => index);
-  for (let index = bag.length - 1; index > 0; index -= 1) {
-    const swap = Math.floor(Math.random() * (index + 1));
-    [bag[index], bag[swap]] = [bag[swap]!, bag[index]!];
-  }
-  return bag;
-}
 
 // Counter / wedge colours reused across the apparatus visuals.
 const RED = "#e5484d";
@@ -49,34 +40,10 @@ function caseToTask(c: ChanceCase, optionSeed: number, lead?: string): PracticeT
   };
 }
 
-// A curated BANK generator: walks a fixed set of hand-written cases WITHOUT
-// repeating (every case shown once before any repeat, never twice in a row).
-// Used for qualitative lessons — chance words, everyday events, reasons — where
-// the answer depends on world knowledge and cannot be computed.
-const poolGen = (cases: readonly ChanceCase[], lead?: string): Gen => {
-  let queue: number[] = [];
-  let last = -1;
-  let optionSeed = 0;
-  return () => {
-    if (queue.length === 0) {
-      queue = shuffledIndices(cases.length);
-      if (cases.length > 1 && queue[queue.length - 1] === last) {
-        [queue[queue.length - 1], queue[0]] = [queue[0]!, queue[queue.length - 1]!];
-      }
-    }
-    const index = queue.pop()!;
-    last = index;
-    optionSeed += 1;
-    return caseToTask(cases[index]!, optionSeed, lead);
-  };
-};
-
-// A PARAMETRIC generator: builds a freshly randomised case every call from one
-// or more maker functions, so an apparatus lesson (spinner, bag, die, tally)
-// draws from effectively unlimited questions rather than a fixed pool. The
-// maker computes the answer from the randomised numbers, so it is always
-// correct. Avoids repeating the exact same prompt twice in a row.
-const randGen = (makers: readonly (() => ChanceCase)[]): Gen => {
+// Every lesson question is generated from an activity/object maker. Makers
+// contain reusable context data, never complete question pools, and compute the
+// answer from their selected object or randomised values on every call.
+const randGen = (makers: readonly ChanceMaker[]): Gen => {
   let lastPrompt = "";
   let optionSeed = 0;
   return () => {
@@ -375,71 +342,135 @@ function didItMatchMaker(): () => ChanceCase {
 }
 
 // ─────────────────────────────── Week 1: Chance Words ───────────────────────
-const w1l1 = poolGen([
-  { prompt: "The sun will set this evening. Certain or impossible?", answer: "Certain", options: FOUR_SCALE, correct: "Yes. The sun sets every day, so it must happen.", wrong: "'Certain' means it must happen. The sun sets every single day.", visual: { type: "scale", highlight: "certain" } },
-  { prompt: "A cat will read a newspaper out loud. Certain or impossible?", answer: "Impossible", options: FOUR_SCALE, correct: "Right. Cats cannot read, so it can never happen.", wrong: "'Impossible' means it can never happen. Cats cannot read aloud.", visual: { type: "scale", highlight: "impossible" } },
-  { prompt: "You will get one year older on your next birthday. Certain or impossible?", answer: "Certain", options: FOUR_SCALE, correct: "Yes. Birthdays always add a year, so it must happen.", wrong: "This one must happen every birthday, so it is certain.", visual: { type: "scale", highlight: "certain" } },
-  { prompt: "You will draw a red counter from a bag with only blue counters. Certain or impossible?", answer: "Impossible", options: FOUR_SCALE, correct: "Correct. There are no red counters, so it can never happen.", wrong: "There are no red counters in the bag, so drawing red is impossible.", visual: { type: "bag", counters: [BLUE, BLUE, BLUE, BLUE, BLUE, BLUE] } },
-]);
+const CERTAIN_EVENTS = [
+  ["The sun will set this evening", "the sun sets every day"],
+  ["You will get one year older on your next birthday", "a birthday adds one year to your age"],
+  ["A week will have seven days", "every week has seven days"],
+  ["A normal die will show a number from 1 to 6", "those are its six faces"],
+] as const;
+const IMPOSSIBLE_EVENTS = [
+  ["A cat will read a newspaper aloud", "cats cannot read aloud"],
+  ["A fish will ride a bicycle to school", "fish cannot ride bicycles"],
+  ["A normal die will roll a 9", "a normal die has no 9"],
+  ["You will draw purple from a bag containing only orange counters", "there are no purple counters in the bag"],
+] as const;
+
+function certainOrImpossibleMaker(): ChanceCase {
+  const isCertain = Math.random() < 0.5;
+  const events: ReadonlyArray<readonly [string, string]> = isCertain ? CERTAIN_EVENTS : IMPOSSIBLE_EVENTS;
+  const [event, reason] = choice(events);
+  const answer = isCertain ? "Certain" : "Impossible";
+  return {
+    prompt: `${event}. Certain or impossible?`,
+    answer,
+    options: FOUR_SCALE,
+    correct: `Yes. It is ${answer.toLowerCase()} because ${reason}.`,
+    wrong: `${cap(answer)} means it ${isCertain ? "must happen" : "cannot happen"}; ${reason}.`,
+    visual: { type: "scale", highlight: answer.toLowerCase() as "certain" | "impossible" },
+  };
+}
+const w1l1 = randGen([certainOrImpossibleMaker]);
 
 // Parametric: fresh spinner / bag / die "likely or unlikely?" every time.
 const w1l2 = randGen([likelihoodMaker("spinner"), likelihoodMaker("bag"), dieLikelihoodMaker()]);
 
-const w1l3 = poolGen([
-  { prompt: "You roll a 7 on a normal die. Which chance word and why?", answer: "Impossible — a die only has 1 to 6", options: ["Impossible — a die only has 1 to 6", "Unlikely — 7 is a big number", "Likely — 7 is on most dice", "Certain — a 7 always comes up"], correct: "Correct. A die has no 7, so rolling one can never happen.", wrong: "Look at the die: the faces are 1 to 6. There is no 7, so it is impossible.", visual: { type: "die", face: 6 } },
-  { prompt: "A tossed coin lands on heads. Which chance word and why?", answer: "50/50 — heads and tails are equally likely", options: ["50/50 — heads and tails are equally likely", "Certain — coins always land heads", "Impossible — coins have no heads", "Unlikely — heads hardly ever happens"], correct: "Yes. A coin has two equal sides, so heads and tails are equally likely.", wrong: "A coin has two equal sides, so heads is neither likely nor unlikely — it is 50/50.", visual: { type: "coin", face: "heads" } },
-  { prompt: "You draw a counter from a bag that has counters in it. Which chance word and why?", answer: "Certain — there is always a counter to draw", options: ["Certain — there is always a counter to draw", "Unlikely — the bag might be empty", "Impossible — you cannot reach in", "Likely — but sometimes you draw nothing"], correct: "Right. The bag has counters, so you must draw one — it is certain.", wrong: "The bag is full of counters, so you will always draw one. That is certain.", visual: { type: "bag", counters: [RED, BLUE, YELLOW, GREEN, RED, BLUE] } },
-  { prompt: "The spinner lands on green, but there is no green on it. Which chance word and why?", answer: "Impossible — there is no green section", options: ["Impossible — there is no green section", "Unlikely — green is a rare colour", "Certain — every spinner has green", "Likely — green is a common colour"], correct: "Correct. With no green section, landing on green can never happen.", wrong: "There is no green on the spinner, so landing on green is impossible.", visual: { type: "spinner", wedges: [RED, RED, BLUE, YELLOW] } },
-]);
+function explainChanceWordMaker(): ChanceCase {
+  const mode = choice(["die", "coin", "bag", "spinner"] as const);
+  if (mode === "die") {
+    const impossible = randInt(7, 12);
+    const answer = "Impossible — a die only has 1 to 6";
+    return { prompt: `You roll a ${impossible} on a normal die. Which chance word and why?`, answer, options: [answer, `Unlikely — ${impossible} is a big number`, `Likely — ${impossible} is on most dice`, `Certain — ${impossible} always comes up`], correct: `Correct. A die has no ${impossible}, so it can never happen.`, wrong: `The die faces are 1 to 6. There is no ${impossible}, so it is impossible.`, visual: { type: "die", face: randInt(1, 6) } };
+  }
+  if (mode === "coin") {
+    const face = choice(["heads", "tails"] as const);
+    const other = face === "heads" ? "tails" : "heads";
+    const answer = `50/50 — ${face} and ${other} are equally likely`;
+    return { prompt: `A fair coin lands on ${face}. Which chance description and why?`, answer, options: [answer, `Certain — coins always land ${face}`, `Impossible — coins have no ${face}`, `Unlikely — ${face} hardly ever happens`], correct: "Yes. A fair coin has two equal sides.", wrong: `${cap(face)} and ${other} have the same chance, so it is 50/50.`, visual: { type: "coin", face } };
+  }
+  const paints = shuffleArr(PAINTS);
+  const present = paints.slice(0, randInt(2, 3));
+  const missing = paints.find((paint) => !present.includes(paint))!;
+  const items = present.flatMap((paint) => Array(randInt(1, 3)).fill(paint.c)) as string[];
+  const answer = `Impossible — there is no ${missing.name}`;
+  const visual: ChanceVisual = mode === "spinner" ? { type: "spinner", wedges: shuffleArr(items) } : { type: "bag", counters: shuffleArr(items) };
+  return { prompt: `The ${mode} gives ${missing.name}. Which chance word and why?`, answer, options: [answer, `Unlikely — ${missing.name} is rare`, `Certain — every ${mode} has ${missing.name}`, `Likely — ${missing.name} is common`], correct: `Correct. There is no ${missing.name}, so it cannot happen.`, wrong: `Only visible outcomes can happen; ${missing.name} is absent.`, visual };
+}
+const w1l3 = randGen([explainChanceWordMaker]);
 
 // ─────────────────────────── Week 2: Everyday Chance Events ──────────────────
-const w2l1 = poolGen([
-  // Week 2 steps up from Week 1: instead of labelling one event, kids COMPARE
-  // two-plus events, sort several cards into a named pile, and justify with
-  // everyday reasons (no apparatus). L1 — compare and pick the most/least likely.
-  { prompt: "Which of these is the MOST likely to happen?", answer: "You will eat some food today", options: ["You will eat some food today", "You will eat exactly seven peas today", "You will eat nothing for a whole week", "You will eat a bicycle today"], correct: "Right. Eating something today is the everyday one, so it is the most likely.", wrong: "Compare them: eating some food today is the one that usually happens.", visual: { type: "scale" } },
-  { prompt: "Which of these is the LEAST likely to happen?", answer: "A real dragon will visit your class", options: ["A real dragon will visit your class", "You will get some homework this week", "The sun will come up tomorrow", "You will have a drink today"], correct: "Yes. Dragons are not real, so that is the least likely of the four.", wrong: "Find the one that almost never happens: a real dragon visiting is the least likely.", visual: { type: "scale" } },
-  { prompt: "On a normal school day, which is MORE likely?", answer: "Your teacher takes the roll", options: ["Your teacher takes the roll", "It snows inside your classroom", "Everyone wears the exact same shoes", "A lion sits at your desk"], correct: "Right. Taking the roll happens most school days, so it is more likely.", wrong: "Think about a normal day: taking the roll is the one that usually happens.", visual: { type: "scale" } },
-  { prompt: "Which of these is the MOST likely this weekend?", answer: "You will sleep at some point", options: ["You will sleep at some point", "You will grow 10 cm taller", "You will meet a talking fish", "You will visit the moon"], correct: "Yes. Everyone sleeps, so that is by far the most likely.", wrong: "Compare them: sleeping at some point is the everyday, most likely one.", visual: { type: "scale" } },
-]);
+const LIKELY_DAILY_EVENTS = ["You will eat some food today", "You will sleep tonight", "Your teacher will take the roll", "You will have a drink today"] as const;
+const UNUSUAL_EVENTS = ["You will grow 10 cm taller today", "Everyone will wear identical shoes", "It will snow inside the classroom", "You will visit the moon this afternoon"] as const;
+const IMPOSSIBLE_DAILY_EVENTS = ["You will eat a bicycle", "A real dragon will visit class", "A fish will do your homework", "You will fly home without a machine"] as const;
 
-const w2l2 = poolGen([
-  // L2 — sort several event cards at once: which card belongs in the named pile.
-  { prompt: "Sort the cards. Which one belongs in the CERTAIN pile?", answer: "Night will come tonight", options: ["Night will come tonight", "You roll a six next try", "A cat does your homework", "It rains indoors"], correct: "Right. Night always comes, so that card is certain.", wrong: "The certain pile is for things that must happen. Night always comes tonight.", visual: { type: "scale", highlight: "certain" } },
-  { prompt: "Sort the cards. Which one belongs in the IMPOSSIBLE pile?", answer: "A pig flies by itself", options: ["A pig flies by itself", "You have lunch today", "It is sunny sometime", "You blink today"], correct: "Yes. Pigs cannot fly, so that card is impossible.", wrong: "The impossible pile is for things that can never happen — a pig flying by itself.", visual: { type: "scale", highlight: "impossible" } },
-  { prompt: "Sort the cards. Which one belongs in the UNLIKELY pile?", answer: "You flip ten heads in a row", options: ["You flip ten heads in a row", "The sun rises", "You breathe today", "You get older this year"], correct: "Right. Ten heads in a row can happen but almost never — that is unlikely.", wrong: "The unlikely pile is for things that can happen but hardly ever — ten heads in a row.", visual: { type: "scale", highlight: "unlikely" } },
-  { prompt: "Sort the cards. Which one belongs in the LIKELY pile?", answer: "It is sunny sometime this week", options: ["It is sunny sometime this week", "You meet a unicorn", "You turn into a frog", "You fly with no plane"], correct: "Yes. Some sun in a week usually happens, so that card is likely.", wrong: "The likely pile is for things that usually happen — some sun during the week.", visual: { type: "scale", highlight: "likely" } },
-]);
+function compareEverydayChanceMaker(): ChanceCase {
+  const askLeast = Math.random() < 0.5;
+  const likely = choice(LIKELY_DAILY_EVENTS);
+  const impossible = choice(IMPOSSIBLE_DAILY_EVENTS);
+  const unusual = shuffleArr(UNUSUAL_EVENTS).slice(0, 2);
+  const options = shuffleArr([likely, ...unusual, impossible]);
+  const answer = askLeast ? impossible : likely;
+  return { prompt: `Which event is ${askLeast ? "LEAST" : "MOST"} likely to happen?`, answer, options, correct: `Right. ${answer} is the ${askLeast ? "least" : "most"} likely event here.`, wrong: `Compare what usually happens with what cannot happen. Choose ${answer}.`, visual: { type: "scale" } };
+}
+const w2l1 = randGen([compareEverydayChanceMaker]);
 
-const w2l3 = poolGen([
-  // L3 — justify an everyday event (reasons, not apparatus).
-  { prompt: "Rain falling at some point this week is likely because…", answer: "it usually rains at least once in a week", options: ["it usually rains at least once in a week", "rain likes the number seven", "the clouds look heavy today", "umbrellas make the rain come"], correct: "Right. Over a whole week rain usually happens at least once.", wrong: "Give a reason about how often it happens: rain usually comes at least once a week.", visual: { type: "scale", highlight: "likely" } },
-  { prompt: "Seeing a real dinosaur on the way to school is impossible because…", answer: "dinosaurs died out long ago", options: ["dinosaurs died out long ago", "dinosaurs are too shy", "it is the wrong season", "dinosaurs sleep in the daytime"], correct: "Yes. Dinosaurs are extinct, so it can never happen.", wrong: "The reason is that dinosaurs no longer exist — they died out long ago.", visual: { type: "scale", highlight: "impossible" } },
-  { prompt: "The bell ringing at home time is certain because…", answer: "it rings at the same time every school day", options: ["it rings at the same time every school day", "the bell likes ringing", "it is a lucky bell", "someone might forget it"], correct: "Right. It rings every school day, so it must happen.", wrong: "Give a reason it must happen: the bell rings at the same time every school day.", visual: { type: "scale", highlight: "certain" } },
-  { prompt: "Winning a raffle when you hold 1 ticket out of 100 is unlikely because…", answer: "there are 99 other tickets that could win", options: ["there are 99 other tickets that could win", "raffles never have a winner", "your ticket is the wrong colour", "you bought it too late"], correct: "Yes. With 99 other tickets, your one ticket is unlikely to win.", wrong: "Think about the numbers: 99 other tickets could win, so yours is unlikely.", visual: { type: "scale", highlight: "unlikely" } },
-]);
+function sortChanceEventMaker(): ChanceCase {
+  const category = choice(["certain", "likely", "unlikely", "impossible"] as const);
+  const examples = {
+    certain: choice(CERTAIN_EVENTS)[0],
+    likely: choice(LIKELY_DAILY_EVENTS),
+    unlikely: choice(UNUSUAL_EVENTS),
+    impossible: choice(IMPOSSIBLE_DAILY_EVENTS),
+  };
+  return { prompt: `Sort the cards. Which one belongs in the ${category.toUpperCase()} pile?`, answer: examples[category], options: shuffleArr(Object.values(examples)), correct: `Right. That event is ${category}.`, wrong: `The ${category} pile needs an event that ${category === "certain" ? "must happen" : category === "impossible" ? "cannot happen" : category === "likely" ? "usually happens" : "can happen but rarely does"}.`, visual: { type: "scale", highlight: category } };
+}
+const w2l2 = randGen([sortChanceEventMaker]);
+
+const REASONED_EVENTS = [
+  { event: "The school bell will ring at home time", word: "certain", reason: "it is scheduled every school day" },
+  { event: "Seeing a living dinosaur on the way to school", word: "impossible", reason: "dinosaurs died out long ago" },
+  { event: "Winning with one raffle ticket among many", word: "unlikely", reason: "many other tickets could win" },
+  { event: "Having a drink today", word: "likely", reason: "people usually drink every day" },
+] as const;
+function justifyChanceMaker(): ChanceCase {
+  const picked = choice(REASONED_EVENTS);
+  const distractors = shuffleArr(REASONED_EVENTS.filter((item) => item !== picked).map((item) => item.reason));
+  return { prompt: `${picked.event} is ${picked.word} because…`, answer: picked.reason, options: shuffleArr([picked.reason, ...distractors]), correct: `Yes. ${cap(picked.reason)}.`, wrong: `Choose evidence about what can happen and how often: ${picked.reason}.`, visual: { type: "scale", highlight: picked.word } };
+}
+const w2l3 = randGen([justifyChanceMaker]);
 
 // ─────────────────────────── Week 3: Possible Outcomes ───────────────────────
-const w3l1 = poolGen([
-  { prompt: "What could this spinner land on?", answer: "Red, blue or yellow", options: ["Red, blue or yellow", "Only red", "Red, blue, yellow or green", "Purple or orange"], correct: "Yes. Those three colours are the only sections, so any of them could come up.", wrong: "List only the colours you can see: red, blue and yellow.", visual: { type: "spinner", wedges: [RED, BLUE, YELLOW] } },
-  { prompt: "What could a tossed coin land on?", answer: "Heads or tails", options: ["Heads or tails", "Only heads", "Heads, tails or its edge", "A number from 1 to 6"], correct: "Right. A coin has two sides, so it is heads or tails.", wrong: "A coin has two faces, so the outcomes are heads or tails.", visual: { type: "coin", face: "heads" } },
-  { prompt: "What could you roll on one die?", answer: "Any number from 1 to 6", options: ["Any number from 1 to 6", "Only a 6", "Any number from 1 to 10", "Heads or tails"], correct: "Yes. The faces are 1 to 6, so any of those could come up.", wrong: "A die has the faces 1 to 6, so any of those numbers could be rolled.", visual: { type: "die", face: 3 } },
-  { prompt: "What could you draw from this bag?", answer: "Red or blue", options: ["Red or blue", "Only red", "Red, blue or green", "A number from 1 to 6"], correct: "Yes. The bag holds red and blue, so a draw is red or blue.", wrong: "Only red and blue are in the bag, so those are the outcomes.", visual: { type: "bag", counters: [RED, RED, BLUE, BLUE] } },
-]);
+function possibleOutcomesMaker(): ChanceCase {
+  const mode = choice(["coin", "die", "spinner", "bag"] as const);
+  if (mode === "coin") return { prompt: "What could a tossed coin land on?", answer: "Heads or tails", options: ["Heads or tails", "Only heads", "A number from 1 to 6", "Red or blue"], correct: "Right. A coin has two sides: heads and tails.", wrong: "List both coin faces: heads or tails.", visual: { type: "coin", face: choice(["heads", "tails"] as const) } };
+  if (mode === "die") return { prompt: "What could you roll on one normal die?", answer: "Any number from 1 to 6", options: ["Any number from 1 to 6", "Only a 6", "Any number from 1 to 10", "Heads or tails"], correct: "Yes. All six die faces are possible.", wrong: "A normal die has the faces 1 to 6.", visual: { type: "die", face: randInt(1, 6) } };
+  const selected = shuffleArr(PAINTS).slice(0, randInt(2, 3));
+  const names = selected.map((paint) => paint.name);
+  const answer = names.map(cap).join(", ").replace(/, ([^,]*)$/, " or $1");
+  const missing = PAINTS.find((paint) => !selected.includes(paint))!;
+  const items = shuffleArr(selected.flatMap((paint) => Array(randInt(1, 3)).fill(paint.c)) as string[]);
+  return { prompt: `What could this ${mode} give?`, answer, options: [answer, `Only ${names[0]}`, `${answer} or ${missing.name}`, "Any number from 1 to 6"], correct: `Yes. ${answer} are the visible outcomes.`, wrong: `List each visible colour and no others: ${answer}.`, visual: mode === "spinner" ? { type: "spinner", wedges: items } : { type: "bag", counters: items } };
+}
+const w3l1 = randGen([possibleOutcomesMaker]);
 
-const w3l2 = poolGen([
-  { prompt: "Which list shows ALL the outcomes for one coin toss?", answer: "Heads or tails", options: ["Heads or tails", "Heads only", "Heads, tails or sideways", "Just tails"], correct: "Correct — every result that could happen in one toss.", wrong: "All outcomes means every result. For a coin that is heads or tails.", visual: { type: "coin", face: "tails" } },
-  { prompt: "Which list shows ALL the outcomes for rolling one die?", answer: "1, 2, 3, 4, 5 or 6", options: ["1, 2, 3, 4, 5 or 6", "1, 2 or 3", "1 to 100", "Only the even numbers"], correct: "Yes — those six numbers are all the outcomes.", wrong: "All outcomes for a die are the six faces: 1, 2, 3, 4, 5 or 6.", visual: { type: "die", face: 6 } },
-  { prompt: "Which list shows ALL the outcomes for this spinner?", answer: "Red, blue or yellow", options: ["Red, blue or yellow", "Red or blue", "Red, blue, yellow or green", "Red, blue, yellow or purple"], correct: "Right — every colour on the spinner, and only those.", wrong: "Count the colours on the spinner: red, blue and yellow — no more, no fewer.", visual: { type: "spinner", wedges: [RED, RED, BLUE, YELLOW] } },
-  { prompt: "Which list shows ALL the outcomes for one draw from this bag?", answer: "Red or blue", options: ["Red or blue", "Red only", "Red, blue or green", "Blue, red or yellow"], correct: "Yes — the bag only holds red and blue counters.", wrong: "The bag has only red and blue, so those are all the outcomes.", visual: { type: "bag", counters: [RED, RED, BLUE, BLUE, RED, BLUE] } },
-]);
+function allOutcomesMaker(): ChanceCase {
+  const generated = possibleOutcomesMaker();
+  return { ...generated, prompt: "Which answer lists ALL the possible outcomes for this chance tool?" };
+}
+const w3l2 = randGen([allOutcomesMaker]);
 
-const w3l3 = poolGen([
-  { prompt: "You roll one die. Which result is NOT possible?", answer: "A 7", options: ["A 7", "A 4", "A 1", "A 6"], correct: "Right. A die has no 7, so that outcome is impossible.", wrong: "Check the faces 1 to 6. A 7 is not on the die, so it is not possible.", visual: { type: "die", face: 5 } },
-  { prompt: "This bag holds red and blue only. Which draw is NOT possible?", answer: "Green", options: ["Green", "Red", "Blue", "A red or a blue"], correct: "Yes. There are no green counters, so green cannot be drawn.", wrong: "Only red and blue are in the bag, so green is not a possible outcome.", visual: { type: "bag", counters: [RED, RED, RED, BLUE, BLUE, BLUE] } },
-  { prompt: "You toss a coin. Which is NOT a possible outcome?", answer: "It lands on 6", options: ["It lands on 6", "It lands on heads", "It lands on tails", "It shows heads facing up"], correct: "Correct. A coin has heads and tails, not numbers.", wrong: "A coin only shows heads or tails — it has no 6.", visual: { type: "coin", face: "heads" } },
-  { prompt: "This spinner has red, blue and yellow. Which is NOT a possible outcome?", answer: "Purple", options: ["Purple", "Red", "Yellow", "Blue"], correct: "Right. There is no purple section, so purple is not possible.", wrong: "Only red, blue and yellow are on the spinner, so purple cannot happen.", visual: { type: "spinner", wedges: [RED, BLUE, YELLOW] } },
-]);
+function impossibleOutcomeMaker(): ChanceCase {
+  const mode = choice(["die", "coin", "spinner", "bag"] as const);
+  if (mode === "die") {
+    const impossible = randInt(7, 12);
+    return { prompt: "You roll one die. Which result is NOT possible?", answer: `A ${impossible}`, options: shuffleArr([`A ${impossible}`, `A ${randInt(1, 2)}`, `A ${randInt(3, 4)}`, `A ${randInt(5, 6)}`]), correct: `Right. A die has no ${impossible}.`, wrong: `A normal die only has 1 to 6, so ${impossible} is not possible.`, visual: { type: "die", face: randInt(1, 6) } };
+  }
+  if (mode === "coin") return { prompt: "You toss a coin. Which result is NOT possible?", answer: "It lands on a number", options: ["It lands on a number", "It lands on heads", "It lands on tails", "It shows tails facing up"], correct: "Correct. A coin has heads and tails, not numbers.", wrong: "A coin can show heads or tails; it has no numbered face.", visual: { type: "coin", face: choice(["heads", "tails"] as const) } };
+  const selected = shuffleArr(PAINTS).slice(0, 3);
+  const missing = PAINTS.find((paint) => !selected.includes(paint))!;
+  const items = shuffleArr(selected.flatMap((paint) => Array(randInt(1, 2)).fill(paint.c)) as string[]);
+  return { prompt: `Which ${mode} outcome is NOT possible?`, answer: cap(missing.name), options: shuffleArr([cap(missing.name), ...selected.map((paint) => cap(paint.name))]), correct: `Right. There is no ${missing.name} outcome.`, wrong: `Only the visible colours can happen; ${missing.name} is absent.`, visual: mode === "spinner" ? { type: "spinner", wedges: items } : { type: "bag", counters: items } };
+}
+const w3l3 = randGen([impossibleOutcomeMaker]);
 
 // ─────────────────────────── Week 4: Predict and Test ────────────────────────
 // Parametric: fresh "predict the colour it lands on most" spinner every time.
@@ -453,12 +484,16 @@ const w4l2 = randGen([testPredictionMaker()]);
 const w4l3 = randGen([didItMatchMaker()]);
 
 // ─────────────────────── Week 5: Repeated Experiments ────────────────────────
-const w5l1 = poolGen([
-  { prompt: "You will toss a coin 10 times. What is a fair way to record each toss?", answer: "Make a tally mark under heads or tails each time", options: ["Make a tally mark under heads or tails each time", "Only write down the heads", "Guess the total at the end", "Rub out results you do not like"], correct: "Yes. A tally mark for every toss keeps the record fair and complete.", wrong: "Record every toss with a tally mark so no results are missed.", visual: { type: "coin", face: "heads" } },
-  { prompt: "You will spin this 4-colour spinner 20 times. What should you expect?", answer: "Each colour about 5 times", options: ["Each colour about 5 times", "All 20 the same colour", "Red exactly 20 times", "One colour on every spin"], correct: "Right. Equal sections should each come up roughly a quarter of the time.", wrong: "The sections are equal, so 20 spins should give each colour about 5.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
-  { prompt: "Why do we repeat a chance experiment many times instead of once?", answer: "More trials give us a clearer picture of what usually happens", options: ["More trials give us a clearer picture of what usually happens", "One try is always enough", "To make the game last longer", "So the teacher stays busy"], correct: "Yes. Lots of trials show the pattern better than a single try.", wrong: "One trial can be luck; repeating many times shows what usually happens.", visual: { type: "die", face: 6 } },
-  { prompt: "You will roll one die 30 times. What should you expect?", answer: "Each number about 5 times", options: ["Each number about 5 times", "Always a six", "Never a one", "All thirty the same number"], correct: "Right. Six equal faces over 30 rolls average about 5 each.", wrong: "The faces are equally likely, so 30 rolls give each number about 5.", visual: { type: "die", face: 3 } },
-]);
+function planRepeatedExperimentMaker(): ChanceCase {
+  const mode = choice(["coin", "spinner", "die"] as const);
+  const outcomes = mode === "coin" ? 2 : mode === "spinner" ? 4 : 6;
+  const repetitions = outcomes * choice([3, 4, 5, 6]);
+  const action = mode === "coin" ? "toss" : mode === "spinner" ? "spin" : "roll";
+  const answer = `Record every ${action} and expect about ${repetitions / outcomes} of each outcome`;
+  const visual: ChanceVisual = mode === "coin" ? { type: "coin", face: choice(["heads", "tails"] as const) } : mode === "spinner" ? { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } : { type: "die", face: randInt(1, 6) };
+  return { prompt: `You will ${action} a fair ${mode} ${repetitions} times. What is a sensible plan?`, answer, options: [answer, "Only record the result you wanted", "Guess the totals at the end", "Rub out surprising results"], correct: "Yes. Record every trial, then compare the counts with a roughly even result.", wrong: "A fair investigation records every trial and uses the number of outcomes to form an expectation.", visual };
+}
+const w5l1 = randGen([planRepeatedExperimentMaker]);
 
 // Parametric: fresh randomised tally to read ("which came up most?") each time.
 // Interactive: actually run a chance tool 10 times and record each result as a
@@ -538,19 +573,27 @@ const w6l1: Gen = () => choice([
   () => makeAutoTallyTask("predictMatch", 10),
 ])();
 
-const w6l2 = poolGen([
-  { prompt: "The whole class combines 100 tosses: Heads 52, Tails 48. What does this suggest?", answer: "Heads and tails are about equally likely", options: ["Heads and tails are about equally likely", "Heads always wins", "Tails is impossible", "The coin is unfair"], correct: "Yes. Over many tosses the counts get close to even — about 50/50.", wrong: "52 and 48 are very close, which suggests heads and tails are about equal.", visual: { type: "coin", face: "heads" } },
-  { prompt: "Why do we combine everyone's results as a class?", answer: "More trials together give a clearer, fairer picture", options: ["More trials together give a clearer, fairer picture", "To make one group win", "So we can stop early", "To use up more paper"], correct: "Right. Pooling lots of trials smooths out the ups and downs.", wrong: "Combining results means many more trials, which shows the pattern more clearly.", visual: { type: "die", face: 5 } },
-  { prompt: "The class spun an equal 4-colour spinner 40 times. Roughly what do you expect for each colour?", answer: "About 10 each", options: ["About 10 each", "All 40 red", "Exactly 7 each", "About 20 each"], correct: "Yes. Equal sections over 40 spins average about a quarter each — near 10.", wrong: "Equal sections share the 40 spins about evenly, so roughly 10 per colour.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
-  { prompt: "The class rolled a die 120 times and each number came up about 20 times. What does this suggest?", answer: "Each number is about equally likely", options: ["Each number is about equally likely", "Six is the best number", "One is impossible", "The die is loaded"], correct: "Right. Roughly equal counts suggest every face is equally likely.", wrong: "About 20 each means the six numbers are coming up about equally often.", visual: { type: "die", face: 4 } },
-]);
+function combineClassResultsMaker(): ChanceCase {
+  const mode = choice(["coin", "spinner", "die"] as const);
+  const outcomes = mode === "coin" ? 2 : mode === "spinner" ? 4 : 6;
+  const expectedEach = choice([8, 10, 15, 20]);
+  const trials = outcomes * expectedEach;
+  const answer = mode === "coin" ? "Heads and tails are about equally likely" : `Each ${mode === "spinner" ? "colour" : "number"} is about equally likely`;
+  const visual: ChanceVisual = mode === "coin" ? { type: "coin", face: choice(["heads", "tails"] as const) } : mode === "spinner" ? { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } : { type: "die", face: randInt(1, 6) };
+  return { prompt: `The class combined ${trials} fair-${mode} results and each outcome appeared about ${expectedEach} times. What does this suggest?`, answer, options: [answer, "One outcome is certain", "One outcome is impossible", `The ${mode} must be unfair`], correct: "Right. Similar counts over many trials support equal chances.", wrong: "When the outcome counts are close over many trials, the outcomes are about equally likely.", visual };
+}
+const w6l2 = randGen([combineClassResultsMaker]);
 
-const w6l3 = poolGen([
-  { prompt: "An equal red/blue spinner gave Red 6, Blue 4. Why did they not split evenly?", answer: "Chance results do not always split exactly evenly", options: ["Chance results do not always split exactly evenly", "Blue is impossible", "Red is certain", "The spinner is faulty"], correct: "Right. Even with equal chances, real trials wobble around the even split.", wrong: "Equal chances do not force an exact even split — real results vary a little.", visual: { type: "spinner", wedges: [RED, BLUE] } },
-  { prompt: "You predicted blue but red came up. What is the best reflection?", answer: "A prediction can be sensible even when another outcome happens", options: ["A prediction can be sensible even when another outcome happens", "The prediction made red impossible", "Only wrong predictions have outcomes", "Red must have cheated"], correct: "Yes. A good prediction can still be beaten by a possible outcome.", wrong: "Your prediction was reasonable; another possible outcome just happened this time.", visual: { type: "spinner", wedges: [RED, RED, BLUE, BLUE] } },
-  { prompt: "The class repeats a die experiment and gets different totals each time. What is worth discussing?", answer: "How and why the results varied across the trials", options: ["How and why the results varied across the trials", "Why dice have no outcomes", "Why the experiment was certain", "Which group is the best"], correct: "Right. Discussing the variation is the whole point of the investigation.", wrong: "The useful discussion is about the variation — how the results differed and why.", visual: { type: "die", face: 6 } },
-  { prompt: "Two groups spin the same fair spinner and get different results. The best explanation is…", answer: "chance naturally varies from trial to trial", options: ["chance naturally varies from trial to trial", "one spinner must be fake", "spinners have no colours", "the results were copied wrongly"], correct: "Right. A fair spinner still gives different results each time — that is variation.", wrong: "Nothing is wrong with the spinner; chance results simply vary between trials.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
-]);
+function explainVariationMaker(): ChanceCase {
+  const mode = choice(["coin", "spinner", "die"] as const);
+  const first = randInt(3, 8);
+  let second = randInt(3, 8);
+  while (second === first) second = randInt(3, 8);
+  const answer = "Chance results can vary from trial to trial";
+  const visual: ChanceVisual = mode === "coin" ? { type: "coin", face: choice(["heads", "tails"] as const) } : mode === "spinner" ? { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } : { type: "die", face: randInt(1, 6) };
+  return { prompt: `Two groups used the same fair ${mode}. One outcome appeared ${first} times for Group A and ${second} times for Group B. What explains the difference?`, answer, options: [answer, `The ${mode} must be broken`, "One result is impossible", "Both groups must get identical totals"], correct: "Right. Fair chance tools can still produce different short-run results.", wrong: "Fair does not mean every small trial is identical; natural variation is expected.", visual };
+}
+const w6l3 = randGen([explainVariationMaker]);
 
 // Each of the 18 lessons runs the generator that matches its title.
 const LESSON_GENERATORS: Record<string, Gen> = {

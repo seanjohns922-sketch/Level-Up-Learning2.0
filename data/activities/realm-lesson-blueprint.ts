@@ -24,8 +24,11 @@ export type RealmLessonTaskGenerator = (ctx?: RealmLessonTaskContext) => Practic
 
 export type RealmLessonTaskSet = {
   teaching: RealmLessonTaskGenerator;
-  // At least two activity generators; most lessons use three.
+  // Platform contract: every lesson teaches through at least three example
+  // activities or objects. Each generator must build a fresh question when
+  // called; fixed lesson-level question pools are not supported.
   activities: readonly [
+    RealmLessonTaskGenerator,
     RealmLessonTaskGenerator,
     RealmLessonTaskGenerator,
     ...RealmLessonTaskGenerator[],
@@ -66,8 +69,9 @@ export type RealmLessonBlueprint = {
   successCriteria: readonly string[];
   artworkSrc: string;
   teaching: RealmLessonTeachingDefinition;
-  // At least two activities; most lessons use three.
+  // Platform contract: at least three curriculum activities per lesson.
   activities: readonly [
+    RealmLessonActivityDefinition,
     RealmLessonActivityDefinition,
     RealmLessonActivityDefinition,
     ...RealmLessonActivityDefinition[],
