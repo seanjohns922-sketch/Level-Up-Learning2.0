@@ -231,8 +231,36 @@ function tallyMostMaker(): () => ChanceCase {
 // a fair coin can land either way — comes up in many guises.
 function testPredictionMaker(): () => ChanceCase {
   return () => {
-    const mode = choice(["spinner", "bag", "coin"] as const);
+    const mode = choice(["spinner", "bag", "coin", "die"] as const);
     const matched = Math.random() < 0.5;
+
+    if (mode === "die") {
+      // Predict "a number less than N" (the likely result, N is 5 or 6), roll,
+      // and interpret whether the likely prediction came true.
+      const n = choice([5, 6] as const);
+      const result = matched ? randInt(1, n - 1) : randInt(n, 6);
+      const base = { visual: { type: "die", face: result } as ChanceVisual };
+      if (matched) {
+        const answer = `The prediction worked — ${result} is less than ${n}`;
+        return {
+          ...base,
+          prompt: `You predicted a number less than ${n} (the likely result) and rolled a ${result}. What does the test show?`,
+          answer,
+          options: [answer, `${result} is bigger than ${n}`, `A ${result} is impossible`, "You must roll again"],
+          correct: `Yes. ${result} is less than ${n}, so the likely prediction came true.`,
+          wrong: `${result} is one of the numbers below ${n}, so the prediction matched.`,
+        };
+      }
+      const answer = `A ${result} was less likely but could still happen`;
+      return {
+        ...base,
+        prompt: `You predicted a number less than ${n} (the likely result) but rolled a ${result}. What does the test show?`,
+        answer,
+        options: [answer, "The die is broken", `A ${result} is impossible`, "Your prediction was cheating"],
+        correct: `Right. Numbers ${n} and up were less likely, but they can still come up.`,
+        wrong: `${result} is ${n} or more — less likely than a number below ${n} — but still possible.`,
+      };
+    }
 
     if (mode === "coin") {
       const predicted = choice(["heads", "tails"] as const);
