@@ -429,6 +429,13 @@ function ProgramPage() {
     boxShadow: "inset 0 1px 0 rgba(167,243,208,0.16), 0 8px 20px rgba(6,14,10,0.32)",
   } as const;
 
+  const chanceNavWidgetStyle = {
+    borderRadius: 8,
+    border: "1px solid rgba(251,113,133,0.34)",
+    background: "linear-gradient(135deg, rgba(31,18,32,0.92), rgba(88,35,54,0.78) 55%, rgba(75,42,20,0.84))",
+    boxShadow: "inset 0 1px 0 rgba(255,241,242,0.16), 0 8px 20px rgba(18,10,24,0.34)",
+  } as const;
+
   const legacyProgramMode = sp.get("legacy") === "1";
   const demoPreviewMode = useDemoPreviewMode();
   const teacherPreview = sp.get("teacher_preview") === "1" && demoPreviewMode;
@@ -635,12 +642,16 @@ function ProgramPage() {
     && !weeklyQuizPassed(previousQuizBestPercent);
   const pathwayChipBase = isMeasurementRealm
     ? "border border-yellow-900/30 bg-[#2a1a06]/85 text-yellow-100"
+    : isChanceRealm
+    ? "border border-rose-300/25 bg-[#301b27]/85 text-rose-50"
     : "border border-teal-300/25 bg-black/35 text-teal-50";
   const optionalChipBase = isMeasurementRealm
     ? "border border-white/10 bg-[#1f1407]/75 text-amber-50/90"
+    : isChanceRealm
+    ? "border border-white/10 bg-[#211421]/75 text-rose-50/90"
     : "border border-white/10 bg-white/5 text-white/85";
 
-  type ProgramItem = { type: "lesson" | "quiz" | "posttest"; n: number; title: string; focus: string };
+  type ProgramItem = { type: "lesson" | "quiz" | "posttest"; n: number; title: string; focus: string; comingSoon?: boolean };
   const items: ProgramItem[] = useMemo(() => {
     const weekPlan = program.find((w) => w.week === weekNum);
     const starpathWeek = starpathProgram?.weeks.find((candidate) => candidate.week === weekNum);
@@ -650,7 +661,16 @@ function ProgramPage() {
       { type: "lesson" as const, n: 2, title: lessons[1]?.displayTitle ?? lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.displayTitle ?? lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
     ];
-    if (isChanceRealm) return base;
+    if (isChanceRealm) {
+      base.push({
+        type: "quiz" as const,
+        n: 1,
+        title: "Weekly Quiz",
+        focus: "Coming soon: this will check all three Chance Hollow lessons.",
+        comingSoon: true,
+      });
+      return base;
+    }
     if (weekNum !== lastWeek) {
       base.push({
         type: "quiz" as const,
@@ -670,6 +690,7 @@ function ProgramPage() {
 
   function openItem(item: (typeof items)[number]) {
     if (!weekUnlocked && !unrestrictedMode) return;
+    if (item.comingSoon) return;
 
     if (!unrestrictedMode) {
       if (item.type === "lesson") {
@@ -957,6 +978,8 @@ function ProgramPage() {
                 ? "radial-gradient(circle at top, rgba(165,243,252,0.12), transparent 58%)"
                 : isStatisticsRealm
                 ? "radial-gradient(circle at top, rgba(255,244,223,0.14), transparent 58%)"
+                : isChanceRealm
+                ? "radial-gradient(circle at top, rgba(255,241,242,0.12), transparent 58%)"
                 : isMeasurementRealm && levelNum === 4
                 ? "radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 60%)"
                 : "radial-gradient(circle at top, rgba(255,255,255,0.10), transparent 60%)",
@@ -1010,6 +1033,8 @@ function ProgramPage() {
               ? "rgba(34,211,238,0.34)"
               : isStatisticsRealm
               ? "rgba(240,107,100,0.3)"
+              : isChanceRealm
+              ? "rgba(251,113,133,0.32)"
               : isMeasurementRealm
               ? "rgba(251,191,36,0.28)"
               : "rgba(94,234,212,0.30)"
@@ -1033,9 +1058,11 @@ function ProgramPage() {
                     ? "text-yellow-100/85 hover:bg-yellow-950/30"
                     : isPatternRealm
                     ? "text-emerald-50 hover:brightness-110 focus:ring-2 focus:ring-emerald-300/30"
+                    : isChanceRealm
+                    ? "text-rose-50 hover:brightness-110 focus:ring-2 focus:ring-rose-300/30"
                     : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                 }`}
-                style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isMeasurementRealm ? {
+                style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isChanceRealm ? chanceNavWidgetStyle : isMeasurementRealm ? {
                   borderRadius: 999,
                   border: "1px solid rgba(200,160,48,0.32)",
                   background: "rgba(22,14,4,0.65)",
@@ -1058,13 +1085,15 @@ function ProgramPage() {
                       ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
                       : isStatisticsRealm
                       ? "text-[#fff4df] hover:brightness-110 focus:ring-2 focus:ring-[#f2bc45]/30"
-                      : isMeasurementRealm
-                      ? "text-yellow-100/85 hover:bg-yellow-950/30"
-                      : isPatternRealm
+                    : isMeasurementRealm
+                    ? "text-yellow-100/85 hover:bg-yellow-950/30"
+                    : isPatternRealm
                     ? "text-emerald-50 hover:brightness-110 focus:ring-2 focus:ring-emerald-300/30"
+                    : isChanceRealm
+                    ? "text-rose-50 hover:brightness-110 focus:ring-2 focus:ring-rose-300/30"
                     : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
                   }`}
-                  style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isMeasurementRealm ? {
+                  style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isChanceRealm ? chanceNavWidgetStyle : isMeasurementRealm ? {
                     borderRadius: 999,
                     border: "1px solid rgba(200,160,48,0.32)",
                     background: "rgba(22,14,4,0.65)",
@@ -1075,10 +1104,10 @@ function ProgramPage() {
                   }}
                 >
                   <span className="flex items-center gap-2">
-                    <span className={`h-1.5 w-1.5 rounded-full ${isStarpathRealm ? "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]" : isStatisticsRealm ? "bg-[#f2bc45] shadow-[0_0_8px_rgba(242,188,69,0.9)]" : isPatternRealm ? "bg-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.9)]" : isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
+                    <span className={`h-1.5 w-1.5 rounded-full ${isStarpathRealm ? "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]" : isStatisticsRealm ? "bg-[#f2bc45] shadow-[0_0_8px_rgba(242,188,69,0.9)]" : isPatternRealm ? "bg-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.9)]" : isChanceRealm ? "bg-rose-200 shadow-[0_0_8px_rgba(251,113,133,0.9)]" : isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
                     Week {weekNum}
                   </span>
-                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition-transform ${isStarpathRealm ? "text-cyan-100/80" : isPatternRealm ? "text-emerald-100/80" : isMeasurementRealm ? "text-yellow-200/60" : "text-teal-100/80"} ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition-transform ${isStarpathRealm ? "text-cyan-100/80" : isPatternRealm ? "text-emerald-100/80" : isChanceRealm ? "text-rose-100/80" : isMeasurementRealm ? "text-yellow-200/60" : "text-teal-100/80"} ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
@@ -1092,6 +1121,8 @@ function ProgramPage() {
                         ? "border border-[#f2bc45]/35"
                         : isPatternRealm
                         ? "border border-emerald-300/30"
+                        : isChanceRealm
+                        ? "border border-rose-300/30"
                         : isMeasurementRealm
                         ? "border border-yellow-900/40"
                         : "border border-teal-300/30"
@@ -1108,6 +1139,10 @@ function ProgramPage() {
                       borderRadius: 8,
                       background: "rgba(10,17,14,0.96)",
                       boxShadow: "inset 0 1px 0 rgba(167,243,208,0.18), 0 14px 40px rgba(6,14,10,0.62), 0 0 24px rgba(124,58,237,0.18)",
+                    } : isChanceRealm ? {
+                      borderRadius: 8,
+                      background: "rgba(31,18,32,0.96)",
+                      boxShadow: "inset 0 1px 0 rgba(255,241,242,0.18), 0 14px 40px rgba(18,10,24,0.62), 0 0 24px rgba(251,113,133,0.18)",
                     } : isMeasurementRealm ? {
                       borderRadius: 14,
                       background: "rgba(22,14,4,0.94)",
@@ -1119,7 +1154,7 @@ function ProgramPage() {
                     }}
                   >
                     <div className={`px-3 py-1.5 border-b text-[9px] font-mono font-bold uppercase tracking-[0.2em] ${
-                      isStarpathRealm ? "border-cyan-300/15 text-cyan-300/80" : isStatisticsRealm ? "border-[#f2bc45]/20 text-[#f2bc45]/80" : isPatternRealm ? "border-emerald-300/20 text-emerald-300/80" : isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
+                      isStarpathRealm ? "border-cyan-300/15 text-cyan-300/80" : isStatisticsRealm ? "border-[#f2bc45]/20 text-[#f2bc45]/80" : isPatternRealm ? "border-emerald-300/20 text-emerald-300/80" : isChanceRealm ? "border-rose-300/20 text-rose-200/80" : isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
                     }`}>
                       Select Week
                     </div>
@@ -1159,6 +1194,12 @@ function ProgramPage() {
                                     : isUnlocked
                                     ? "text-emerald-50/85 hover:bg-emerald-400/10 hover:text-emerald-50"
                                     : "text-emerald-50/30 hover:bg-white/5"
+                                  : isChanceRealm
+                                  ? isCurrent
+                                    ? "bg-rose-400/15 text-rose-100"
+                                    : isUnlocked
+                                    ? "text-rose-50/85 hover:bg-rose-400/10 hover:text-rose-50"
+                                    : "text-rose-50/30 hover:bg-white/5"
                                   : isMeasurementRealm
                                   ? isCurrent
                                     ? "bg-yellow-900/20 text-yellow-100"
@@ -1174,7 +1215,7 @@ function ProgramPage() {
                             >
                               <span className="flex items-center gap-1.5">
                                 {isCurrent ? (
-                                  <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 ${isStarpathRealm ? "text-cyan-300" : isPatternRealm ? "text-emerald-300" : isMeasurementRealm ? "text-yellow-300" : "text-teal-300"}`} fill="none" stroke="currentColor" strokeWidth="3">
+                                  <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 ${isStarpathRealm ? "text-cyan-300" : isPatternRealm ? "text-emerald-300" : isChanceRealm ? "text-rose-300" : isMeasurementRealm ? "text-yellow-300" : "text-teal-300"}`} fill="none" stroke="currentColor" strokeWidth="3">
                                     <path d="M5 12l5 5L20 7" />
                                   </svg>
                                 ) : (
@@ -1183,6 +1224,8 @@ function ProgramPage() {
                                       ? isUnlocked ? "bg-cyan-400/70" : "bg-white/20"
                                       : isPatternRealm
                                       ? isUnlocked ? "bg-emerald-400/70" : "bg-white/20"
+                                      : isChanceRealm
+                                      ? isUnlocked ? "bg-rose-400/70" : "bg-white/20"
                                       : isMeasurementRealm
                                       ? isUnlocked ? "bg-yellow-600/60" : "bg-white/15"
                                       : isUnlocked ? "bg-teal-400/70" : "bg-white/20"
@@ -1195,6 +1238,8 @@ function ProgramPage() {
                                   ? isCurrent ? "text-cyan-300" : isUnlocked ? "text-cyan-200/60" : "text-white/30"
                                   : isPatternRealm
                                   ? isCurrent ? "text-emerald-300" : isUnlocked ? "text-emerald-200/60" : "text-white/30"
+                                  : isChanceRealm
+                                  ? isCurrent ? "text-rose-300" : isUnlocked ? "text-rose-200/60" : "text-white/30"
                                   : isMeasurementRealm
                                   ? isCurrent ? "text-yellow-300/80" : isUnlocked ? "text-yellow-200/45" : "text-white/25"
                                   : isCurrent ? "text-teal-300" : isUnlocked ? "text-teal-200/60" : "text-white/30"
@@ -1216,7 +1261,7 @@ function ProgramPage() {
           <div className="text-center">
             {/* Nexus level pill */}
             <div
-              className={`inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isStatisticsRealm ? "text-[#fff4df]" : isPatternRealm ? "text-emerald-50" : isMeasurementRealm ? "text-yellow-50/95" : "text-teal-50"}`}
+              className={`inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isStatisticsRealm ? "text-[#fff4df]" : isPatternRealm ? "text-emerald-50" : isChanceRealm ? "text-rose-50" : isMeasurementRealm ? "text-yellow-50/95" : "text-teal-50"}`}
               style={{
                 background: rt.pillBg,
                 clipPath: rt.rounded ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
@@ -1228,16 +1273,16 @@ function ProgramPage() {
               {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : isStatisticsRealm ? "Data Program" : isPatternRealm ? "Algebra Program" : isChanceRealm ? "Probability Program" : "Program"}
             </div>
             <h1 className={`text-4xl md:text-5xl font-black text-white mt-3 tracking-tight ${rt.headingGlow}`}>Week {weekNum}</h1>
-            <p className={`text-base md:text-lg mt-2 font-semibold ${isStatisticsRealm ? "text-[#fff4df]" : isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
+            <p className={`text-base md:text-lg mt-2 font-semibold ${isStatisticsRealm ? "text-[#fff4df]" : isChanceRealm ? "text-rose-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
               <span className={`${rt.focusColor} font-mono text-xs uppercase tracking-[0.18em] mr-2`}>Focus</span>
               {currentWeekPlan?.topic ?? "Your current focus"}
             </p>
             {hasPersonalizedPlan ? (
-              <p className={`mt-2 text-xs font-mono uppercase tracking-[0.16em] ${isMeasurementRealm ? "text-amber-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : "text-teal-200/80"}`}>
+              <p className={`mt-2 text-xs font-mono uppercase tracking-[0.16em] ${isChanceRealm ? "text-rose-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : isMeasurementRealm ? "text-amber-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : "text-teal-200/80"}`}>
                 {currentWeekIsRequired ? "◆ Required Week" : canTakePostTestEarly ? "◆ Optional Practice Week" : "◆ Locked Bonus Week"}
               </p>
             ) : null}
-            <p className={`mt-2 text-xs font-mono uppercase tracking-[0.16em] ${isMeasurementRealm ? "text-amber-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : "text-teal-200/80"}`}>
+            <p className={`mt-2 text-xs font-mono uppercase tracking-[0.16em] ${isChanceRealm ? "text-rose-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : isMeasurementRealm ? "text-amber-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : "text-teal-200/80"}`}>
               {weekUnlocked
                 ? weekComplete
                   ? "◆ Completed"
@@ -1263,6 +1308,9 @@ function ProgramPage() {
                 } : isPatternRealm ? {
                   borderRadius: 14,
                   background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(139,92,246,0.2) 42%, rgba(52,211,153,0.5))",
+                } : isChanceRealm ? {
+                  borderRadius: 14,
+                  background: "linear-gradient(135deg, rgba(251,113,133,0.5), rgba(251,191,36,0.18) 42%, rgba(34,211,238,0.42))",
                 } : {
                   clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
                   background: "linear-gradient(135deg, rgba(94,234,212,0.55), rgba(20,184,166,0.15) 40%, rgba(13,148,136,0.5))",
@@ -1286,19 +1334,23 @@ function ProgramPage() {
                   borderRadius: 12,
                   background: "linear-gradient(135deg, #0a110e 0%, #0d1c18 50%, #181430 100%)",
                   boxShadow: "inset 0 1px 0 rgba(16,185,129,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(124,58,237,0.1)",
+                } : isChanceRealm ? {
+                  borderRadius: 12,
+                  background: "linear-gradient(135deg, #1f1220 0%, #351d2b 50%, #4b2a14 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(255,241,242,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(251,113,133,0.12)",
                 } : {
                   clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
                   background: "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
                   boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 18px rgba(0,0,0,0.45)",
                 }}
               >
-                {!isMeasurementRealm && !isStarpathRealm && !isStatisticsRealm && !isPatternRealm && (
+                {!isMeasurementRealm && !isStarpathRealm && !isStatisticsRealm && !isPatternRealm && !isChanceRealm && (
                   <div
                     className="absolute inset-0 opacity-15 pointer-events-none"
                     style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.4) 0 1px, transparent 1px 3px)" }}
                   />
                 )}
-                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isStarpathRealm ? "ring-1 ring-cyan-400/20" : isMeasurementRealm ? "ring-1 ring-yellow-900/40" : isStatisticsRealm ? "ring-1 ring-[#f2bc45]/25" : isPatternRealm ? "ring-1 ring-emerald-400/20" : "ring-1 ring-teal-400/20"}`}>
+                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isStarpathRealm ? "ring-1 ring-cyan-400/20" : isMeasurementRealm ? "ring-1 ring-yellow-900/40" : isStatisticsRealm ? "ring-1 ring-[#f2bc45]/25" : isPatternRealm ? "ring-1 ring-emerald-400/20" : isChanceRealm ? "ring-1 ring-rose-400/20" : "ring-1 ring-teal-400/20"}`}>
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${percent}%`, background: rt.xpBg, boxShadow: rt.xpGlow }}
@@ -1313,11 +1365,15 @@ function ProgramPage() {
             {hasPersonalizedPlan ? (
               <div className="mt-4 mx-auto max-w-3xl">
                 <div
-                  className={`overflow-hidden backdrop-blur-md ${isMeasurementRealm ? "rounded-[22px]" : ""}`}
+                  className={`overflow-hidden backdrop-blur-md ${isMeasurementRealm || isChanceRealm ? "rounded-[22px]" : ""}`}
                   style={isMeasurementRealm ? {
                     background: "rgba(20,14,6,0.66)",
                     border: "1px solid rgba(200,160,48,0.24)",
                     boxShadow: "0 14px 34px rgba(0,0,0,0.24), inset 0 1px 0 rgba(200,160,48,0.12)",
+                  } : isChanceRealm ? {
+                    background: "rgba(31,18,32,0.68)",
+                    border: "1px solid rgba(251,113,133,0.24)",
+                    boxShadow: "0 14px 34px rgba(18,10,24,0.28), inset 0 1px 0 rgba(255,241,242,0.12)",
                   } : {
                     clipPath: "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
                     background: "rgba(2,18,18,0.72)",
@@ -1331,15 +1387,15 @@ function ProgramPage() {
                     className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
                   >
                     <div className="min-w-0">
-                      <div className={`text-[11px] font-mono font-black uppercase tracking-[0.22em] ${isMeasurementRealm ? "text-amber-100/90" : "text-teal-300/85"}`}>
+                      <div className={`text-[11px] font-mono font-black uppercase tracking-[0.22em] ${isChanceRealm ? "text-rose-100/90" : isMeasurementRealm ? "text-amber-100/90" : "text-teal-300/85"}`}>
                         Pathway Journal
                       </div>
-                      <div className={`mt-1 text-xs ${isMeasurementRealm ? "text-amber-50/75" : "text-white/70"}`}>
+                      <div className={`mt-1 text-xs ${isChanceRealm ? "text-rose-50/75" : isMeasurementRealm ? "text-amber-50/75" : "text-white/70"}`}>
                         {requiredWeeks.length} required week{requiredWeeks.length === 1 ? "" : "s"}
                         {optionalWeeks.length > 0 ? ` · ${optionalWeeks.length} optional` : ""}
                       </div>
                     </div>
-                    <span className={`inline-flex items-center gap-2 whitespace-nowrap text-[11px] font-mono font-black uppercase tracking-[0.18em] ${isMeasurementRealm ? "text-yellow-100/85" : "text-teal-100/85"}`}>
+                    <span className={`inline-flex items-center gap-2 whitespace-nowrap text-[11px] font-mono font-black uppercase tracking-[0.18em] ${isChanceRealm ? "text-rose-100/85" : isMeasurementRealm ? "text-yellow-100/85" : "text-teal-100/85"}`}>
                       {pathwayJournalOpen ? "Hide" : "Show"}
                       <svg
                         viewBox="0 0 24 24"
@@ -1354,13 +1410,13 @@ function ProgramPage() {
                   </button>
 
                   {pathwayJournalOpen ? (
-                    <div className={`border-t px-4 pb-4 pt-3 ${isMeasurementRealm ? "border-yellow-900/20" : "border-teal-400/15"}`}>
+                    <div className={`border-t px-4 pb-4 pt-3 ${isChanceRealm ? "border-rose-400/15" : isMeasurementRealm ? "border-yellow-900/20" : "border-teal-400/15"}`}>
                       <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
                         <div>
-                          <div className={`text-[11px] font-mono font-black uppercase tracking-[0.22em] ${isMeasurementRealm ? "text-yellow-100/90" : "text-teal-300/85"}`}>
+                          <div className={`text-[11px] font-mono font-black uppercase tracking-[0.22em] ${isChanceRealm ? "text-rose-100/90" : isMeasurementRealm ? "text-yellow-100/90" : "text-teal-300/85"}`}>
                             Required Pathway
                           </div>
-                          <div className={`mt-2 text-sm ${isMeasurementRealm ? "text-amber-50/80" : "text-teal-50/90"}`}>
+                          <div className={`mt-2 text-sm ${isChanceRealm ? "text-rose-50/85" : isMeasurementRealm ? "text-amber-50/80" : "text-teal-50/90"}`}>
                             {fullRequiredPath
                               ? "These weeks are needed to pass this level. Complete them in order."
                               : "These weeks are needed to pass this level."}
@@ -1379,16 +1435,20 @@ function ProgramPage() {
                                     ? {
                                         background: isMeasurementRealm
                                           ? "linear-gradient(135deg, #1d3b22 0%, #0f6b4c 100%)"
+                                          : isChanceRealm
+                                          ? "linear-gradient(135deg, #9f1239 0%, #fb7185 100%)"
                                           : "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
                                         boxShadow: isMeasurementRealm
                                           ? "inset 0 1px 0 rgba(167,243,208,0.18)"
+                                          : isChanceRealm
+                                          ? "inset 0 1px 0 rgba(255,241,242,0.35), 0 0 16px rgba(251,113,133,0.22)"
                                           : "inset 0 1px 0 rgba(110,231,183,0.45), 0 0 16px rgba(16,185,129,0.28)",
                                       }
                                     : unlocked
                                       ? undefined
                                       : {
                                           opacity: 0.72,
-                                          background: isMeasurementRealm ? "rgba(42,26,6,0.55)" : "rgba(15,23,42,0.72)",
+                                          background: isChanceRealm ? "rgba(49,18,34,0.62)" : isMeasurementRealm ? "rgba(42,26,6,0.55)" : "rgba(15,23,42,0.72)",
                                         }}
                                 >
                                   <span>{done ? <Check className="h-4 w-4" /> : unlocked ? <LockOpen className="h-4 w-4" /> : <Lock className="h-4 w-4" />}</span>
@@ -1403,7 +1463,7 @@ function ProgramPage() {
                           <div className={`text-[11px] font-mono font-black uppercase tracking-[0.22em] ${isMeasurementRealm ? "text-amber-200/90" : "text-amber-200/90"}`}>
                             Optional Practice
                           </div>
-                          <div className={`mt-2 text-sm ${isMeasurementRealm ? "text-amber-50/80" : "text-white/80"}`}>
+                          <div className={`mt-2 text-sm ${isChanceRealm ? "text-rose-50/80" : isMeasurementRealm ? "text-amber-50/80" : "text-white/80"}`}>
                             {canTakePostTestEarly
                               ? "You’ve completed your required pathway. You can take the post-test now or keep practising for extra XP."
                               : "Complete your required pathway to unlock these extra weeks for more XP, rewards, and practice."}
@@ -1426,13 +1486,15 @@ function ProgramPage() {
                                     ? {
                                         background: isMeasurementRealm
                                           ? "linear-gradient(135deg, #1d3b22 0%, #0f6b4c 100%)"
+                                          : isChanceRealm
+                                          ? "linear-gradient(135deg, rgba(251,113,133,0.34), rgba(159,18,57,0.9))"
                                           : "linear-gradient(135deg, rgba(16,185,129,0.28), rgba(6,78,59,0.9))",
                                       }
                                     : optionalPlayable
                                       ? undefined
                                       : {
                                           opacity: 0.72,
-                                          background: isMeasurementRealm ? "rgba(31,20,7,0.55)" : "linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.92))",
+                                          background: isChanceRealm ? "linear-gradient(135deg, rgba(49,18,34,0.84), rgba(31,18,32,0.9))" : isMeasurementRealm ? "rgba(31,20,7,0.55)" : "linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.92))",
                                         }}
                                 >
                                   <span>{done ? <Check className="h-4 w-4" /> : optionalPlayable ? <LockOpen className="h-4 w-4" /> : <Lock className="h-4 w-4" />}</span>
@@ -1443,8 +1505,8 @@ function ProgramPage() {
                           </div>
 
                           {requiredWeeksComplete ? (
-                            <div className={`mt-4 rounded-2xl p-4 ${isMeasurementRealm ? "border border-yellow-900/30 bg-[#2a1a06]/70" : "border border-emerald-300/25 bg-emerald-400/10"}`}>
-                              <div className={`text-[11px] font-mono font-black uppercase tracking-[0.18em] ${isMeasurementRealm ? "text-yellow-100/90" : "text-emerald-200"}`}>
+                            <div className={`mt-4 rounded-2xl p-4 ${isChanceRealm ? "border border-rose-300/25 bg-rose-400/10" : isMeasurementRealm ? "border border-yellow-900/30 bg-[#2a1a06]/70" : "border border-emerald-300/25 bg-emerald-400/10"}`}>
+                              <div className={`text-[11px] font-mono font-black uppercase tracking-[0.18em] ${isChanceRealm ? "text-rose-100/90" : isMeasurementRealm ? "text-yellow-100/90" : "text-emerald-200"}`}>
                                 Ready For Post-Test
                               </div>
                               <p className="mt-2 text-sm text-white/85">
@@ -1457,9 +1519,13 @@ function ProgramPage() {
                                 style={{
                                   background: isMeasurementRealm
                                     ? "linear-gradient(135deg, #7c5a20 0%, #b8893a 55%, #d6b86c 100%)"
+                                    : isChanceRealm
+                                    ? "linear-gradient(135deg, #be3455, #fb7185 55%, #fbbf24)"
                                     : "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
                                   boxShadow: isMeasurementRealm
                                     ? "inset 0 1px 0 rgba(245,220,160,0.35), 0 0 16px rgba(184,137,58,0.22)"
+                                    : isChanceRealm
+                                    ? "inset 0 1px 0 rgba(255,241,242,0.35), 0 0 16px rgba(251,113,133,0.22)"
                                     : "inset 0 1px 0 rgba(110,231,183,0.45), 0 0 16px rgba(16,185,129,0.22)",
                                 }}
                               >
@@ -1481,7 +1547,7 @@ function ProgramPage() {
       {/* ── Horizontal lesson dashboard ── */}
       <div
         className={`relative z-10 px-4 pb-16 md:px-6 ${
-          isMeasurementRealm || isStatisticsRealm || isPatternRealm ? "pt-16 md:pt-24" : "pt-10 md:pt-16"
+          isMeasurementRealm || isStatisticsRealm || isPatternRealm || isChanceRealm ? "pt-16 md:pt-24" : "pt-10 md:pt-16"
         }`}
       >
         <div className="max-w-6xl mx-auto">
@@ -1489,6 +1555,7 @@ function ProgramPage() {
             {items.map((item, idx) => {
               const isLesson = item.type === "lesson";
               const isPostTest = item.type === "posttest";
+              const comingSoon = item.comingSoon === true;
               const quizBestPercent = progress.quizBestScore ?? progress.quizScore ?? 0;
               const quizTotal = progress.quizTotal ?? 15;
               const quizBestCorrect = progress.quizBestCorrect
@@ -1502,6 +1569,7 @@ function ProgramPage() {
                   : quizPassed;
 
               let locked = false;
+              if (comingSoon) locked = true;
               if (!unrestrictedMode) {
                 if (!weekUnlocked) {
                   locked = true;
@@ -1584,7 +1652,7 @@ function ProgramPage() {
                     {/* Completed checkmark watermark */}
                     {completed && (
                       <svg
-                        className={`absolute -right-4 -bottom-4 h-32 w-32 pointer-events-none ${isMeasurementRealm ? "text-yellow-200/10" : "text-emerald-400/10"}`}
+                        className={`absolute -right-4 -bottom-4 h-32 w-32 pointer-events-none ${isChanceRealm ? "text-rose-300/10" : isMeasurementRealm ? "text-yellow-200/10" : "text-emerald-400/10"}`}
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -1598,7 +1666,14 @@ function ProgramPage() {
                       <div
                         className="absolute top-0 left-0 h-1 w-full pointer-events-none"
                         style={
-                          isMeasurementRealm
+                          isChanceRealm
+                            ? {
+                                background:
+                                  "linear-gradient(90deg, #fb7185, #fbbf24 55%, transparent 100%)",
+                                boxShadow:
+                                  "0 0 12px rgba(251,113,133,0.58), 0 0 16px rgba(251,191,36,0.2)",
+                              }
+                            : isMeasurementRealm
                             ? {
                                 background:
                                   "linear-gradient(90deg, #fcd34d, #c8a030 45%, #7c3aed 80%, transparent 100%)",
@@ -1639,12 +1714,14 @@ function ProgramPage() {
 
                       {completed ? (
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] ${isMeasurementRealm ? "text-yellow-50" : "text-emerald-100"}`}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] ${isChanceRealm ? "text-rose-50" : isMeasurementRealm ? "text-yellow-50" : "text-emerald-100"}`}
                           style={{
                             clipPath: rt.statusClip,
                             borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
                             background: rt.statusCompletedBg,
-                            boxShadow: isMeasurementRealm
+                            boxShadow: isChanceRealm
+                              ? "inset 0 1px 0 rgba(255,241,242,0.32), 0 0 10px rgba(251,113,133,0.18)"
+                              : isMeasurementRealm
                               ? "inset 0 1px 0 rgba(252,211,77,0.32), 0 0 10px rgba(109,40,217,0.18)"
                               : "inset 0 1px 0 rgba(110,231,183,0.4)",
                           }}
@@ -1663,6 +1740,17 @@ function ProgramPage() {
                           }}
                         >
                           <RotateCcw className="h-3.5 w-3.5" /> TRY AGAIN
+                        </span>
+                      ) : comingSoon ? (
+                        <span
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-rose-50"
+                          style={{
+                            clipPath: rt.statusClip,
+                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
+                            background: rt.statusLockedBg,
+                          }}
+                        >
+                          COMING SOON
                         </span>
                       ) : locked ? (
                         <span
@@ -1705,6 +1793,8 @@ function ProgramPage() {
                       <div className="mt-1.5 text-xs text-white/60 leading-snug line-clamp-2">
                         {needsRetry
                           ? `Best score: ${quizBestCorrect}/${quizTotal}. You need ${weeklyQuizMinimumCorrect(quizTotal)}/${quizTotal} to unlock Week ${Math.min(lastWeek, weekNum + 1)}.`
+                          : comingSoon
+                          ? item.focus
                           : !weekUnlocked
                           ? hasPersonalizedPlan
                             ? "Complete your current lesson to unlock this"
@@ -1720,11 +1810,11 @@ function ProgramPage() {
                     {/* Row 3: XP + action button */}
                     <div className={`relative flex items-center justify-between pt-2 border-t ${rt.dividerColor ?? "border-teal-400/15"}`}>
                       <span className={`text-[10px] font-mono font-bold tracking-[0.14em] ${rt.xpLabelColor ?? "text-teal-200/70"}`}>
-                        {isPostTest ? "MASTERY" : isLesson ? "10 XP" : "20 XP"}
+                        {isPostTest ? "MASTERY" : isLesson ? "10 XP" : comingSoon ? "QUIZ" : "20 XP"}
                       </span>
                       {locked ? (
                         <span className="text-[10px] font-mono font-extrabold text-slate-400">
-                          {weekUnlocked ? "—" : "LOCKED"}
+                          {comingSoon ? "SOON" : weekUnlocked ? "—" : "LOCKED"}
                         </span>
                       ) : (
                         <span
@@ -1771,14 +1861,14 @@ function ProgramPage() {
 
           {!weekUnlocked ? (
             <div className="mt-6 rounded-[28px] border border-white/10 bg-black/25 p-6 text-center backdrop-blur-md shadow-[0_16px_48px_rgba(0,0,0,0.24)]">
-              <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] ${isMeasurementRealm ? "bg-[#2a1a06]/85 text-yellow-100" : "bg-white/8 text-teal-100"}`}>
+              <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] ${isChanceRealm ? "bg-[#301b27]/85 text-rose-100" : isMeasurementRealm ? "bg-[#2a1a06]/85 text-yellow-100" : "bg-white/8 text-teal-100"}`}>
                 <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="4" y="11" width="16" height="9" rx="2" />
                   <path d="M8 11V8a4 4 0 018 0v3" />
                 </svg>
               </div>
               <h2 className="mt-4 text-2xl font-black text-white">Week {weekNum} is locked</h2>
-              <p className={`mt-2 text-sm font-semibold ${isMeasurementRealm ? "text-amber-50/80" : "text-teal-100/75"}`}>
+              <p className={`mt-2 text-sm font-semibold ${isChanceRealm ? "text-rose-50/80" : isMeasurementRealm ? "text-amber-50/80" : "text-teal-100/75"}`}>
                 {previousQuizNeedsRetry
                   ? `Pass the Week ${weekNum - 1} quiz with ${weeklyQuizMinimumCorrect(previousQuizTotal)}/${previousQuizTotal}. Your best is ${previousQuizBestCorrect}/${previousQuizTotal}.`
                   : "Complete previous weeks to unlock"}
@@ -1786,8 +1876,11 @@ function ProgramPage() {
               <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                 <button
                   onClick={() => goToWeek(previousQuizNeedsRetry ? weekNum - 1 : lastAllowedWeek)}
-                  className={`rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 ${isMeasurementRealm ? "" : "bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-emerald-950/30"}`}
-                  style={isMeasurementRealm ? {
+                  className={`rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 ${isMeasurementRealm || isChanceRealm ? "" : "bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-emerald-950/30"}`}
+                  style={isChanceRealm ? {
+                    background: "linear-gradient(135deg, #be3455, #fb7185 55%, #fbbf24)",
+                    boxShadow: "0 10px 24px rgba(49,18,34,0.32)",
+                  } : isMeasurementRealm ? {
                     background: "linear-gradient(135deg, #7c5a20 0%, #b8893a 55%, #d6b86c 100%)",
                     boxShadow: "0 10px 24px rgba(80,45,8,0.32)",
                   } : undefined}
