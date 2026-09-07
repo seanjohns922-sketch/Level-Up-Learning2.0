@@ -218,6 +218,16 @@ export type PracticeTask = (
       maxParts: number;
     }
   | {
+      // Chance Hollow: compare two or three real tools shown side by side, then
+      // pick the answer (which has more chance / more outcomes / are they equal).
+      kind: "chanceCompare";
+      prompt: string;
+      tools: { visual: ChanceVisual; label: string; caption?: string }[];
+      options: string[];
+      answer: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       kind: "order3";
       prompt: string;
       numbers: number[];

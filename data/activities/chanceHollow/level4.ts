@@ -184,27 +184,7 @@ function countOutcomesMaker(): ChanceCase {
   return { prompt: "This bag has red, blue and purple counters. How many colour outcomes are possible?", answer: "3", options: ["3", "2", "5", "6"], correct: "Yes. Red, blue and purple are the possible colour outcomes.", wrong: "Count the different colours, not every counter.", visual: { type: "bag", counters: [RED, BLUE, PURPLE, RED, BLUE] } };
 }
 
-// L3 "Match Tool to Chance" — which tool gives a 1 out of N chance.
-function matchToolMaker(): ChanceCase {
-  const n = choice([2, 3, 4, 6] as const);
-  const answers: Record<number, string> = {
-    2: "A fair coin",
-    3: "A spinner with 3 equal parts, choosing one",
-    4: "A spinner with 4 equal parts, choosing one",
-    6: "A normal die, rolling one chosen number",
-  };
-  const answer = answers[n]!;
-  const others = Object.values(answers).filter((t) => t !== answer).concat(["A bag with only red counters", "A bag with 3 red and 3 blue"]);
-  const visual: ChanceVisual = n === 2 ? { type: "coin", face: "tails" } : n === 6 ? { type: "die", face: randInt(1, 6) } : { type: "spinner", wedges: PAL.slice(0, n).map((p) => p.k) };
-  return {
-    prompt: `Which tool best matches a 1 out of ${n} chance?`,
-    answer,
-    options: distinctOptions(answer, others),
-    correct: `Yes. One outcome from ${n} equally likely outcomes is 1 out of ${n}.`,
-    wrong: `A 1 out of ${n} chance needs ${n} equally likely outcomes.`,
-    visual,
-  };
-}
+// (W2 L3 "Match Tool to Chance" is now the visual compareOutcomesTask below.)
 
 // ─────────────────────── Week 3: Probability as Fractions ────────────────────
 // L1 "One Out Of" — a single target part; the chance is always 1/total.
@@ -342,48 +322,8 @@ function fixGameMaker(): ChanceCase {
 }
 
 // ─────────────────────────── Week 5: Compare Chances ────────────────────────
-// L1 "More Chance or Less Chance?" — winner side varies (not always B).
-function compareChanceMaker(): ChanceCase {
-  const total = 6;
-  const a = randInt(1, 4);
-  let b = randInt(1, 4);
-  while (a === b) b = randInt(1, 4);
-  const answer = a > b ? "Spinner A" : "Spinner B";
-  return {
-    prompt: `Which spinner gives a better chance of red: Spinner A has ${a}/${total} red, Spinner B has ${b}/${total} red?`,
-    answer,
-    options: ["Spinner A", "Spinner B", "They are the same", "Red is impossible"],
-    correct: `Yes. ${answer} has more red parts out of the same total of ${total}.`,
-    wrong: `Both totals are ${total}, so the one with more red parts wins.`,
-    visual: { type: "scale" },
-  };
-}
-
-// L2 "Same Chance" — find the pair of equal chances (equivalent fractions).
-function sameChanceMaker(): ChanceCase {
-  if (Math.random() < 0.4) {
-    // Half-equivalents: n out of 2n.
-    const n = choice([1, 2, 3] as const);
-    const answer = `${n} out of ${2 * n} and ${n + 1} out of ${2 * (n + 1)}`;
-    return {
-      prompt: "Which two chances are the same?",
-      answer,
-      options: distinctOptions(answer, [`${n} out of ${2 * n} and ${n} out of ${2 * n + 1}`, `1 out of ${2 * n} and ${n} out of ${2 * n}`, `${n + 1} out of ${2 * n} and ${n} out of ${2 * (n + 1)}`, `${n} out of ${n + 1} and 1 out of 2`]),
-      correct: "Right. Both chances are one half of the whole.",
-      wrong: "Look for two chances that each cover the same part of the whole.",
-      visual: { type: "scale" },
-    };
-  }
-  // "one half" events across tools.
-  const evt = choice(["coinVspinner", "dieEvenVcoin", "spinnerVcoin"] as const);
-  if (evt === "coinVspinner") {
-    return { prompt: "A coin lands heads, and a red-blue fair spinner lands red. How do the chances compare?", answer: "They are the same chance", options: ["They are the same chance", "Heads is certain", "Red is impossible", "The spinner has more chance"], correct: "Yes. Each event has a 1 out of 2 chance.", wrong: "A fair coin and a two-colour fair spinner each have one winning outcome out of two.", visual: { type: "spinner", wedges: [RED, BLUE] } };
-  }
-  if (evt === "dieEvenVcoin") {
-    return { prompt: "Rolling an even number on a die, and a fair coin landing heads. How do the chances compare?", answer: "They are the same chance", options: ["They are the same chance", "The die has more chance", "Heads is certain", "Even numbers are impossible"], correct: "Yes. Even numbers are 3 out of 6 — one half — the same as heads.", wrong: "Even numbers are 3 of 6 (one half), the same as a coin's one out of two.", visual: { type: "die", face: choice([2, 4, 6] as const) } };
-  }
-  return { prompt: "A fair 4-part spinner landing on 2 chosen parts, and a coin landing heads. How do the chances compare?", answer: "They are the same chance", options: ["They are the same chance", "The coin has more chance", "The spinner is certain", "Heads is impossible"], correct: "Yes. 2 out of 4 is one half — the same as heads.", wrong: "2 of 4 parts is one half, the same as a coin's one out of two.", visual: { type: "spinner", wedges: [RED, RED, BLUE, BLUE] } };
-}
+// L1 "More Chance or Less Chance?" and L2 "Same Chance" are now the visual
+// side-by-side compare tasks (compareChanceTask / compareSameTask) below.
 
 // L3 "Best Prediction" — the colour with the most parts.
 function bestPredictionMaker(): ChanceCase {
@@ -442,7 +382,7 @@ function expectedActualMaker(): ChanceCase {
   };
 }
 
-// L4 W4-3 "Design a Fair Game" — interactive: build a spinner with equal parts.
+// L4 W4-3 "Design a Fair Game" — repair an unfair spinner, then play Chanzia.
 function makeBuildFairTask(): PracticeTask {
   const pair = choice([
     [{ key: RED, name: "Red" }, { key: BLUE, name: "Blue" }],
@@ -451,9 +391,89 @@ function makeBuildFairTask(): PracticeTask {
   ] as const);
   return {
     kind: "chanceBuildFair",
-    prompt: "Design a fair game: give both colours the same number of parts so each player has an equal chance.",
+    prompt: "Fix the unfair spinner so both players have an equal chance, then challenge Chanzia to see who wins.",
     colours: pair.map((c) => ({ key: c.key, name: c.name, colour: c.key })),
     maxParts: 6,
+  };
+}
+
+// ── Side-by-side compare tasks (chanceCompare) ───────────────────────────────
+// Each call returns a fresh compare task; the visuals change every time even
+// though the question wording stays constant, so it never truly repeats.
+function randTask(makers: readonly (() => PracticeTask)[]): Gen {
+  return () => choice(makers)();
+}
+
+function spinnerWedges(red: number, total: number): string[] {
+  return shuffle([...Array(red).fill(RED), ...Array(total - red).fill(BLUE)] as string[]);
+}
+
+// W2 L3 "Match Tool to Chance" — which tool has more possible outcomes.
+function randTool(): { visual: ChanceVisual; count: number } {
+  const t = choice(["coin", "die", "spinner", "bag"] as const);
+  if (t === "coin") return { visual: { type: "coin", face: "heads" }, count: 2 };
+  if (t === "die") return { visual: { type: "die", face: randInt(1, 6) }, count: 6 };
+  if (t === "spinner") {
+    const k = randInt(3, 4);
+    return { visual: { type: "spinner", wedges: shuffle(PAL).slice(0, k).map((p) => p.k) }, count: k };
+  }
+  const cols = shuffle(PAL).slice(0, choice([2, 3] as const));
+  const counters = shuffle(cols.flatMap((c) => Array(randInt(1, 2)).fill(c.k)) as string[]);
+  return { visual: { type: "bag", counters }, count: cols.length };
+}
+function compareOutcomesTask(): PracticeTask {
+  const A = randTool();
+  let B = randTool();
+  for (let g = 0; A.count === B.count && g < 12; g += 1) B = randTool();
+  const answer = A.count > B.count ? "Tool A" : "Tool B";
+  return {
+    kind: "chanceCompare",
+    prompt: "Which tool has more possible outcomes?",
+    tools: [{ label: "Tool A", visual: A.visual }, { label: "Tool B", visual: B.visual }],
+    options: shuffle(["Tool A", "Tool B", "They have the same number", "Neither has outcomes"]),
+    answer,
+    feedback: { correct: `Yes. Tool ${answer === "Tool A" ? "A" : "B"} can land on more different outcomes.`, wrong: "Count how many different results each tool can land on." },
+  };
+}
+
+// W5 L1 "More Chance or Less Chance?" — two spinners, which has a better chance of red.
+function compareChanceTask(): PracticeTask {
+  const total = choice([4, 6] as const);
+  const a = randInt(1, total - 1);
+  let b = randInt(1, total - 1);
+  for (let g = 0; a === b && g < 12; g += 1) b = randInt(1, total - 1);
+  const answer = a > b ? "Spinner A" : "Spinner B";
+  return {
+    kind: "chanceCompare",
+    prompt: "Which spinner gives a better chance of landing on red?",
+    tools: [{ label: "Spinner A", visual: { type: "spinner", wedges: spinnerWedges(a, total) } }, { label: "Spinner B", visual: { type: "spinner", wedges: spinnerWedges(b, total) } }],
+    options: shuffle(["Spinner A", "Spinner B", "They are the same", "Red is impossible"]),
+    answer,
+    feedback: { correct: `Yes. ${answer} has more red parts, so red is more likely on it.`, wrong: "Look at how much of each spinner is red — more red means a better chance." },
+  };
+}
+
+// W5 L2 "Same Chance" — two spinners that sometimes have equal chance (equivalent
+// fractions like 1/2 and 2/4 that look different but are the same).
+function compareSameTask(): PracticeTask {
+  const same = Math.random() < 0.5;
+  let redA: number, totalA: number, redB: number, totalB: number;
+  if (same) {
+    redA = choice([1, 2] as const); totalA = redA * 2;
+    redB = choice([1, 2, 3] as const); totalB = redB * 2; // both exactly one half
+  } else {
+    totalA = choice([4, 6] as const); redA = randInt(1, totalA - 1);
+    totalB = choice([4, 6] as const); redB = randInt(1, totalB - 1);
+    for (let g = 0; redA / totalA === redB / totalB && g < 12; g += 1) redB = randInt(1, totalB - 1);
+  }
+  const answer = same ? "They are the same" : redA / totalA > redB / totalB ? "Spinner A" : "Spinner B";
+  return {
+    kind: "chanceCompare",
+    prompt: "Which spinner gives a better chance of red — or are they the same?",
+    tools: [{ label: "Spinner A", visual: { type: "spinner", wedges: spinnerWedges(redA, totalA) } }, { label: "Spinner B", visual: { type: "spinner", wedges: spinnerWedges(redB, totalB) } }],
+    options: shuffle(["Spinner A", "Spinner B", "They are the same", "Red is impossible"]),
+    answer,
+    feedback: { correct: same ? "Right. Both spinners are half red, so the chance is the same even though they look different." : `Yes. ${answer} has the bigger share of red.`, wrong: "Compare the share of red on each — an equal share means the same chance." },
   };
 }
 
@@ -463,15 +483,15 @@ const lessonGens: Record<string, Gen> = {
   "1-3": generated([explainMaker]),
   "2-1": generated([readToolMaker]),
   "2-2": generated([countOutcomesMaker]),
-  "2-3": generated([matchToolMaker]),
+  "2-3": randTask([compareOutcomesTask]),
   "3-1": generated([oneOutOfMaker]),
   "3-2": generated([fractionChanceMaker]),
   "3-3": generated([compareFractionMaker]),
   "4-1": generated([fairCoinGameMaker, fairDieGameMaker, fairSpinnerGameMaker, fairBagGameMaker]),
   "4-2": generated([fixGameMaker]),
   "4-3": makeBuildFairTask,
-  "5-1": generated([compareChanceMaker]),
-  "5-2": generated([sameChanceMaker]),
+  "5-1": randTask([compareChanceTask]),
+  "5-2": randTask([compareSameTask]),
   "5-3": generated([bestPredictionMaker]),
   "6-1": makePredictMostTask,
   "6-2": () => ({

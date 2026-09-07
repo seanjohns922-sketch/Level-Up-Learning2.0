@@ -325,6 +325,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "chanceSpinTally",
   "chanceAutoTally",
   "chanceBuildFair",
+  "chanceCompare",
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
@@ -434,6 +435,14 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
       && Array.isArray(task.colours) && task.colours.length === 2
       && Number.isInteger(task.maxParts) && task.maxParts >= 2
       && task.colours.every((c) => hasText(c.key) && hasText(c.name) && hasText(c.colour));
+  }
+  if (task.kind === "chanceCompare") {
+    return hasText(task.prompt)
+      && Array.isArray(task.tools) && task.tools.length >= 2
+      && task.tools.every((t) => hasText(t.label) && Boolean(t.visual))
+      && Array.isArray(task.options) && task.options.length >= 2
+      && new Set(task.options).size === task.options.length
+      && task.options.includes(task.answer);
   }
   if (task.kind !== "starpathObject") return true;
   const objectTask = task as StarpathObjectTask;
