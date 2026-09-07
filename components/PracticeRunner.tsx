@@ -31,6 +31,7 @@ import { pickBreak, type Villain } from "@/lib/brain-break";
 import { getBrainBreakSchedule, type BrainBreakFrequency } from "@/lib/brain-break-settings";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 import ChanceVisual from "@/components/chance-hollow/ChanceVisual";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 
 type McqTask = Extract<PracticeTask, { kind: "mcq" }>;
@@ -1541,6 +1542,7 @@ export function PracticeRunner({
                 onClick={() => opt === (task as McqTask).answer ? markCorrect() : markWrong(opt)}
                 className={[
                   "w-full text-left px-5 py-4 rounded-lg border transition text-xl font-bold",
+                  isChance ? "flex items-center justify-between gap-3" : "",
                   awaitingWrongNext && opt === currentWrongFeedback?.studentAnswer
                     ? "border-red-400 bg-red-50 text-red-800"
                     : awaitingWrongNext && opt === (task as McqTask).answer
@@ -1548,7 +1550,14 @@ export function PracticeRunner({
                       : "border-border bg-card hover:bg-muted",
                 ].join(" ")}
               >
-                {opt}
+                {isChance ? (
+                  <>
+                    <span>{opt}</span>
+                    <OptionReadAloudButton text={opt} />
+                  </>
+                ) : (
+                  opt
+                )}
               </button>
             ))}
           </div>
