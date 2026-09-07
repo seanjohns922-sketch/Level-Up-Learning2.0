@@ -259,6 +259,22 @@ function LagoonPool() {
   );
 }
 
+// TODO (marketplace buildings — deferred until after Chance Hollow):
+// Sean's call is these look "povo" and need to actually read as real buildings,
+// Roblox-quality, not flat low-poly boxes. Lighting/materials were already
+// upgraded (see CentralWorld.tsx lighting pass); the remaining work is the
+// GEOMETRY, per building:
+//  - Give each building a real silhouette. Right now clubhouse/games_room/
+//    training_centre all fall through to ONE shared box+cone mesh below — split
+//    them into distinct models.
+//  - Retire the flat 4-sided cone roofs and the glowing-panel windows.
+//  - Add the parts that make a mesh read as a building: framed windows with
+//    sills, a real door, roof tiling/ridge, gutters/eaves, wall trim, railings,
+//    verandah posts — and get the proportions right (storey height vs footprint).
+//  - Queenslander / SurfClub / SydneyTower are the closest to the target; use
+//    them as the quality bar and bring the rest up to it.
+// Aim for the Roblox "stylised-but-clearly-a-building" look, staying procedural
+// (no GLB/textures — house rule). See memory: marketplace-building-quality.
 function RewardBuilding({ assetKey, accent, tier }: { assetKey: string; accent: string; tier: number }) {
   if (assetKey === "clubhouse") return <Queenslander />;
   if (assetKey === "workshop") return <SurfClub />;
