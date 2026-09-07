@@ -335,6 +335,66 @@ function testPredictionMaker(): () => ChanceCase {
   };
 }
 
+// Did it match? A yes/no read on prediction vs result, across all four objects
+// (spinner, bag, coin, die), matching or not.
+function didItMatchMaker(): () => ChanceCase {
+  return () => {
+    const mode = choice(["spinner", "bag", "coin", "die"] as const);
+    const matched = Math.random() < 0.5;
+
+    if (mode === "coin") {
+      const predicted = choice(["heads", "tails"] as const);
+      const other = predicted === "heads" ? "tails" : "heads";
+      const result = matched ? predicted : other;
+      const base = { visual: { type: "coin", face: result } as ChanceVisual };
+      if (matched) {
+        const answer = `Yes — you predicted ${predicted} and got ${predicted}`;
+        return { ...base, prompt: `You predicted ${predicted}. The coin landed ${result}. Did it match?`, answer, options: [answer, `No — ${predicted} does not count`, `${cap(predicted)} was impossible`, "Only if it was likely"], correct: "Right. You predicted it and it came up, so it matched.", wrong: `You predicted ${predicted} and got ${predicted}, so yes — it matched.` };
+      }
+      const answer = `No — but ${result} was still a fair result`;
+      return { ...base, prompt: `You predicted ${predicted}. The coin landed ${result}. Did it match?`, answer, options: [answer, "Yes — they matched", `${cap(result)} is impossible`, `Yes — ${result} counts as ${predicted}`], correct: "Right. It did not match, but a coin is 50/50 so it was still fair.", wrong: `You predicted ${predicted} but got ${result}, so it did not match — though ${result} was still possible.` };
+    }
+
+    if (mode === "die") {
+      const n = choice([3, 4, 5] as const);
+      const result = matched ? randInt(1, n - 1) : randInt(n, 6);
+      const base = { visual: { type: "die", face: result } as ChanceVisual };
+      if (matched) {
+        const answer = `Yes — ${result} is less than ${n}`;
+        return { ...base, prompt: `You predicted a number less than ${n}. You rolled ${result}. Did it match?`, answer, options: [answer, `No — ${result} is too small`, `No — you needed exactly ${n}`, "Only if it was likely"], correct: `Right. ${result} is below ${n}, so it matched.`, wrong: `${result} is less than ${n}, so your prediction matched.` };
+      }
+      const answer = `No — ${result} is not less than ${n}`;
+      return { ...base, prompt: `You predicted a number less than ${n}. You rolled ${result}. Did it match?`, answer, options: [answer, "Yes — they matched", `A ${result} is impossible`, `Yes — ${result} counts as less`], correct: `Right. ${result} is ${n} or more, so it did not match.`, wrong: `${result} is not below ${n}, so the prediction did not match.` };
+    }
+
+    // Spinner or bag: predict a present colour; result is that colour or another.
+    const paints = shuffleArr(PAINTS).slice(0, randInt(2, 3));
+    const total = mode === "spinner" ? randInt(3, 5) : randInt(4, 7);
+    const counts = paints.map(() => 1);
+    let remaining = total - paints.length;
+    let idx = 0;
+    while (remaining > 0) {
+      counts[idx % paints.length] += 1;
+      remaining -= 1;
+      idx += 1;
+    }
+    const entries: Array<[Paint, number]> = paints.map((p, i) => [p, counts[i]!]);
+    const items = shuffleArr(paintList(entries));
+    const predicted = choice(paints);
+    const otherPaints = paints.filter((p) => p !== predicted);
+    const result = matched ? predicted : choice(otherPaints);
+    const drewVerb = mode === "spinner" ? "landed on" : "drew";
+    const noun = mode === "spinner" ? "spinner" : "bag";
+    const visual: ChanceVisual = mode === "spinner" ? { type: "spinner", wedges: items } : { type: "bag", counters: items };
+    if (matched) {
+      const answer = `Yes — you got ${predicted.name}`;
+      return { prompt: `You predicted ${predicted.name}. The ${noun} ${drewVerb} ${result.name}. Did it match?`, answer, options: [answer, `No — ${predicted.name} does not count`, `${cap(predicted.name)} was impossible`, "Only if it was likely"], correct: `Right. You predicted ${predicted.name} and got ${predicted.name}.`, wrong: `You predicted ${predicted.name} and got ${predicted.name}, so it matched.`, visual };
+    }
+    const answer = `No — you got ${result.name}, not ${predicted.name}`;
+    return { prompt: `You predicted ${predicted.name}. The ${noun} ${drewVerb} ${result.name}. Did it match?`, answer, options: [answer, "Yes — they matched", `${cap(result.name)} is impossible`, `Yes — ${result.name} counts as ${predicted.name}`], correct: `Right. You predicted ${predicted.name} but got ${result.name}.`, wrong: `You got ${result.name}, not ${predicted.name}, so it did not match.`, visual };
+  };
+}
+
 // ─────────────────────────────── Week 1: Chance Words ───────────────────────
 const w1l1 = poolGen([
   { prompt: "The sun will set this evening. Certain or impossible?", answer: "Certain", options: FOUR_SCALE, correct: "Yes. The sun sets every day, so it must happen.", wrong: "'Certain' means it must happen. The sun sets every single day.", visual: { type: "scale", highlight: "certain" } },
@@ -410,12 +470,8 @@ const w4l1 = randGen([predictMostMaker()]);
 // result matching or not, so the object and scenario vary every time.
 const w4l2 = randGen([testPredictionMaker()]);
 
-const w4l3 = poolGen([
-  { prompt: "You predicted heads. The coin landed tails. Did it match?", answer: "No — but tails was still a fair result", options: ["No — but tails was still a fair result", "Yes — they matched", "No — tails is impossible", "Yes — tails counts as heads"], correct: "Right. It did not match, yet tails was always possible.", wrong: "Heads and tails differ, so it did not match — but tails could still happen.", visual: { type: "coin", face: "tails" } },
-  { prompt: "You predicted 'a number 1 to 6'. You rolled a 3. Did it match?", answer: "Yes — 3 is in 1 to 6", options: ["Yes — 3 is in 1 to 6", "No — 3 is too small", "No — you needed a 6", "No — 3 is an unlucky number"], correct: "Yes. 3 is one of the numbers you predicted.", wrong: "Your prediction covered 1 to 6, and 3 is in that range, so it matched.", visual: { type: "die", face: 3 } },
-  { prompt: "You predicted red (mostly-red spinner). It landed red. Did it match?", answer: "Yes — and red was the likely result", options: ["Yes — and red was the likely result", "No — red does not count", "Yes — but only by luck", "No — you must predict blue"], correct: "Right. It matched, and red was the most likely outcome anyway.", wrong: "You predicted red and got red, so it matched — and red was the likely result.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
-  { prompt: "You predicted 'red or blue' from this bag and drew blue. Did it match?", answer: "Yes — blue was one of the outcomes", options: ["Yes — blue was one of the outcomes", "No — you needed red", "No — blue does not count", "Only if you had said blue"], correct: "Right. Your prediction covered red or blue, and blue is one of them.", wrong: "You predicted red or blue, and blue is in that list, so it matched.", visual: { type: "bag", counters: [RED, RED, BLUE, BLUE] } },
-]);
+// Parametric: fresh "did it match?" across spinner, bag, coin and die.
+const w4l3 = randGen([didItMatchMaker()]);
 
 // ─────────────────────── Week 5: Repeated Experiments ────────────────────────
 const w5l1 = poolGen([
