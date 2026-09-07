@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PracticeRunner } from "@/components/PracticeRunner";
 import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
-import { LessonConceptIntro, RealmLessonHome } from "@/components/lesson/RealmLessonHome";
+import { LessonConceptIntro, RealmLessonHome, type LessonConceptIntroData } from "@/components/lesson/RealmLessonHome";
 import { createRandomRealmLessonGenerator, type RealmLessonTaskGenerator } from "@/data/activities/realm-lesson-blueprint";
 import { getChanceHollowLevel3TaskSet } from "@/data/activities/chanceHollow/level3";
 import { getChanceHollowLevel4TaskSet } from "@/data/activities/chanceHollow/level4";
@@ -18,7 +18,7 @@ import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEn
 
 type Phase = "home" | "concept" | "active";
 
-function conceptFor(levelNumber: number, week: number, lesson: Lesson) {
+function conceptFor(levelNumber: number, week: number, lesson: Lesson): LessonConceptIntroData {
   if (levelNumber === 4) {
     if (week <= 2) {
       return {
@@ -36,6 +36,13 @@ function conceptFor(levelNumber: number, week: number, lesson: Lesson) {
         meaning: "A probability fraction compares the number of winning outcomes with the total number of equally likely outcomes.",
         example: "If 2 of 6 spinner parts are red, the chance of red is 2 out of 6.",
         exampleExplanation: "The winning outcomes are the red parts, and the total outcomes are all spinner parts.",
+        chanceModel: {
+          visual: { type: "spinner", wedges: ["#fb7185", "#fb7185", "#6d3f9c", "#6d3f9c", "#6d3f9c", "#6d3f9c"] },
+          numerator: 2,
+          denominator: 6,
+          winningLabel: "2 red winning parts",
+          totalLabel: "6 equal parts altogether",
+        },
       };
     }
     if (week <= 5) {

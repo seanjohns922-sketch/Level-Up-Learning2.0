@@ -18,6 +18,8 @@ import {
   Zap,
 } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import ChanceVisual from "@/components/chance-hollow/ChanceVisual";
+import type { ChanceVisual as ChanceVisualData } from "@/data/activities/year1/practice-task";
 import { getHomeBg } from "@/lib/levelBand";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { getStatisticaBackground } from "@/lib/statistica-visuals";
@@ -36,13 +38,7 @@ type RealmLessonHomeProps = {
   lessonTitle: string;
   focus: string;
   successCriteria: readonly string[];
-  conceptIntro?: {
-    term: string;
-    title: string;
-    meaning: string;
-    example: string;
-    exampleExplanation: string;
-  };
+  conceptIntro?: LessonConceptIntroData;
   embeddedVideoSrc?: string;
   startDisabled?: boolean;
   startDisabledLabel?: string;
@@ -280,6 +276,13 @@ export type LessonConceptIntroData = {
   meaning: string;
   example: string;
   exampleExplanation: string;
+  chanceModel?: {
+    visual: ChanceVisualData;
+    numerator: number;
+    denominator: number;
+    winningLabel: string;
+    totalLabel: string;
+  };
   factorModel?: {
     product: number;
     pairs: Array<[number, number]>;
@@ -336,7 +339,29 @@ export function LessonConceptIntro({
       </div>
       <div className="mt-5 grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
         <div className="rounded-lg border border-white/10 bg-black/25 px-5 py-5 text-center text-2xl font-black text-white sm:text-3xl">
-          {conceptIntro.example}
+          <div>{conceptIntro.example}</div>
+          {conceptIntro.chanceModel ? (
+            <div className="mt-6 flex flex-col items-center justify-center gap-5 border-t border-white/10 pt-5 sm:flex-row sm:gap-10">
+              <ChanceVisual visual={conceptIntro.chanceModel.visual} variant="concept" />
+              <div className="flex items-center gap-5" aria-label={`${conceptIntro.chanceModel.numerator} out of ${conceptIntro.chanceModel.denominator}`}>
+                <div className="min-w-20 text-center text-4xl font-black leading-none text-rose-300 sm:text-5xl">
+                  <div>{conceptIntro.chanceModel.numerator}</div>
+                  <div className="my-2 h-1 rounded-full bg-amber-300" />
+                  <div className="text-white">{conceptIntro.chanceModel.denominator}</div>
+                </div>
+                <div className="space-y-2 text-left text-sm font-bold leading-5 sm:text-base">
+                  <div className="flex items-center gap-2 text-rose-200">
+                    <span className="h-3 w-3 rounded-full bg-[#fb7185]" />
+                    {conceptIntro.chanceModel.winningLabel}
+                  </div>
+                  <div className="flex items-center gap-2 text-white/70">
+                    <span className="h-3 w-3 rounded-full border border-white/30 bg-[#6d3f9c]" />
+                    {conceptIntro.chanceModel.totalLabel}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
         <div
           className="rounded-lg border px-5 py-4 text-center text-base font-black md:max-w-56"
