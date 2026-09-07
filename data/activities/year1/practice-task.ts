@@ -1,4 +1,14 @@
 export type Difficulty = "easy" | "medium" | "hard";
+
+// Chance Hollow apparatus drawn above an mcq prompt so a probability question
+// shows the real tool it is about (a spinner, coin, die, bag of counters) or a
+// likelihood scale, instead of being text-only.
+export type ChanceVisual =
+  | { type: "spinner"; wedges: string[] } // each entry is one equal wedge colour
+  | { type: "coin"; face?: "heads" | "tails" }
+  | { type: "die"; face: number }
+  | { type: "bag"; counters: string[] } // each entry is one counter colour
+  | { type: "scale"; highlight?: "certain" | "likely" | "unlikely" | "impossible" };
 export type StarpathShape = "circle" | "oval" | "triangle" | "square" | "rectangle";
 export type Year1PatternToken =
   | "amber-star"
@@ -167,6 +177,8 @@ export type PracticeTask = (
       options: string[];
       answer: string;
       feedback?: { correct: string; wrong: string };
+      // Optional apparatus drawn above the options (used by Chance Hollow).
+      visual?: ChanceVisual;
     }
   | {
       kind: "order3";

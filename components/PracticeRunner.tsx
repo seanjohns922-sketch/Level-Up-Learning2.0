@@ -30,6 +30,7 @@ import BrainBreak from "@/components/lesson/BrainBreak";
 import { pickBreak, type Villain } from "@/lib/brain-break";
 import { getBrainBreakSchedule, type BrainBreakFrequency } from "@/lib/brain-break-settings";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
+import ChanceVisual from "@/components/chance-hollow/ChanceVisual";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 
 type McqTask = Extract<PracticeTask, { kind: "mcq" }>;
@@ -1528,6 +1529,9 @@ export function PracticeRunner({
         )}
 
         {/* ── Builtin task renderers ── */}
+        {task.kind === "mcq" && (task as McqTask).visual && (
+          <ChanceVisual visual={(task as McqTask).visual!} />
+        )}
         {task.kind === "mcq" && (
           <div className="grid gap-3">
             {(task as McqTask).options.map((opt: string, idx: number) => (

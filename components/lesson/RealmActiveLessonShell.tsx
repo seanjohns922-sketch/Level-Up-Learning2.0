@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import {
   getRealmLessonArtwork,
+  numberNexusLearningStatement,
   REALM_LESSON_THEMES,
   type RealmLessonThemeId,
 } from "@/components/lesson/RealmLessonHome";
@@ -37,10 +38,11 @@ export function RealmActiveLessonShell({
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
   const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : realm === "pattern" ? "Challenge" : realm === "chance" ? "Trial" : "Mission";
+  const displayFocus = realm === "number" && focus ? numberNexusLearningStatement(focus) : focus;
   const learningStatement = focus
-    ? /^I\s+am\s+learning\s+to\b/i.test(focus)
-      ? focus
-      : `I am learning to ${focus}`
+    ? /^I\s+am\s+learning\s+to\b/i.test(displayFocus ?? "")
+      ? displayFocus
+      : `I am learning to ${displayFocus}`
     : null;
   const readText = `${lessonTitle}. ${learningStatement ?? "Practise today's lesson skill."}`;
 

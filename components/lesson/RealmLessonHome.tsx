@@ -226,6 +226,54 @@ function uniqueCriteria(criteria: readonly string[], focus: string) {
     : [focus];
 }
 
+function trimStudentSentence(value: string) {
+  const cleaned = value
+    .replace(/\s+/g, " ")
+    .replace(/^(?:Fluency|Core concept|Reasoning prompt|Application task)\s*(?:\([^)]*\))?:\s*/i, "")
+    .replace(/^(?:Explain why|How do you know|Is this reasonable)\??\s*/i, "explain my thinking")
+    .trim();
+  const firstSentence = cleaned.split(/[.!?]/)[0]?.trim() ?? cleaned;
+  return firstSentence.replace(/[.,;:]+$/g, "");
+}
+
+function sentenceFragment(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  return `${trimmed.charAt(0).toLowerCase()}${trimmed.slice(1)}`;
+}
+
+export function numberNexusLearningStatement(focus: string) {
+  const shortFocus = trimStudentSentence(focus)
+    .replace(/\s+(?:with|using|through|by|in)\s+.+$/i, "")
+    .replace(/\s+and\s+.+$/i, "")
+    .trim();
+
+  return sentenceFragment(shortFocus || "practise today's number skill");
+}
+
+function numberNexusSuccessCriteria(criteria: readonly string[], focus: string) {
+  const concise = criteria
+    .map((rawCriterion) => {
+      if (/^\s*fluency\b/i.test(rawCriterion)) return "practise number facts accurately";
+      const criterion = trimStudentSentence(rawCriterion);
+      if (/reasoning|explain|justify|reasonable|how do you know/i.test(criterion)) return "explain my number thinking";
+      if (/apply|solve|real|context|problem|task/i.test(criterion)) return "solve number problems";
+      return sentenceFragment(criterion
+        .replace(/\s+(?:with|using|through|by|in|such as)\s+.+$/i, "")
+        .replace(/\s+and\s+.+$/i, "")
+        .trim());
+    })
+    .filter(Boolean);
+
+  const fallback = [
+    numberNexusLearningStatement(focus),
+    "explain my number thinking",
+    "solve number problems",
+  ];
+
+  return uniqueCriteria(concise.length > 0 ? concise : fallback, focus);
+}
+
 export type LessonConceptIntroData = {
   term: string;
   title: string;
@@ -379,10 +427,14 @@ export function RealmLessonHome({
   onStart,
 }: RealmLessonHomeProps) {
   const theme = REALM_LESSON_THEMES[realm];
-  const criteria = uniqueCriteria(successCriteria, focus);
-  const learningStatement = /^I\s+am\s+learning\s+to\b/i.test(focus)
-    ? focus
-    : `I am learning to ${focus}`;
+  const displayFocus = realm === "number" ? numberNexusLearningStatement(focus) : focus;
+  const criteria =
+    realm === "number"
+      ? numberNexusSuccessCriteria(successCriteria, focus)
+      : uniqueCriteria(successCriteria, focus);
+  const learningStatement = /^I\s+am\s+learning\s+to\b/i.test(displayFocus)
+    ? displayFocus
+    : `I am learning to ${displayFocus}`;
   const criteriaStatements = criteria.map((criterion) =>
     /^I\s+can\b/i.test(criterion) ? criterion : `I can ${criterion}`,
   );
