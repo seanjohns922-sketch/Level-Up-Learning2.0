@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, RotateCw } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -39,52 +39,100 @@ function TallyMarks({ n }: { n: number }) {
   );
 }
 
+const DIE_PIPS: Record<number, ReadonlyArray<[number, number]>> = {
+  1: [[0.5, 0.5]],
+  2: [[0.3, 0.3], [0.7, 0.7]],
+  3: [[0.3, 0.3], [0.5, 0.5], [0.7, 0.7]],
+  4: [[0.32, 0.32], [0.68, 0.32], [0.32, 0.68], [0.68, 0.68]],
+  5: [[0.32, 0.32], [0.68, 0.32], [0.5, 0.5], [0.32, 0.68], [0.68, 0.68]],
+  6: [[0.32, 0.28], [0.68, 0.28], [0.32, 0.5], [0.68, 0.5], [0.32, 0.72], [0.68, 0.72]],
+};
+
+function DieFace({ face }: { face: number }) {
+  const pips = DIE_PIPS[Math.min(Math.max(face, 1), 6)] ?? DIE_PIPS[1]!;
+  const s = 120, pad = 10;
+  return (
+    <svg viewBox="0 0 140 140" width="150" height="150" role="img" aria-label={`Die showing ${face}`}>
+      <rect x={pad} y={pad} width={s} height={s} rx={22} fill="#ffffff" stroke={FRAME} strokeWidth={4} />
+      {pips.map(([px, py], i) => <circle key={i} cx={pad + px * s} cy={pad + py * s} r={10} fill={INK} />)}
+    </svg>
+  );
+}
+
+function CoinFace({ side }: { side: string }) {
+  return (
+    <svg viewBox="0 0 150 150" width="150" height="150" role="img" aria-label={`Coin showing ${side}`}>
+      <circle cx={75} cy={75} r={62} fill="#f4c542" stroke="#b8860b" strokeWidth={5} />
+      <circle cx={75} cy={75} r={50} fill="none" stroke="#d9a521" strokeWidth={3} />
+      <text x={75} y={96} textAnchor="middle" fontSize={56} fontWeight={900} fill="#7a5b12">{side === "tails" ? "T" : "H"}</text>
+    </svg>
+  );
+}
+
 export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
-  const { wedges, labels, spins } = task;
-  const n = Math.max(wedges.length, 1);
+  const { tool, draw, labels, spins } = task;
+  const n = Math.max(draw.length, 1);
   const wedgeAngle = 360 / n;
+  const distinctKeys = labels.map((l) => l.key);
 
   const [rotation, setRotation] = useState(0);
-  const [spinning, setSpinning] = useState(false);
-  const [landed, setLanded] = useState<string | null>(null); // colour awaiting a tally
+  const [busy, setBusy] = useState(false);
+  const [display, setDisplay] = useState<string>(distinctKeys[0] ?? "");
+  const [landed, setLanded] = useState<string | null>(null); // outcome awaiting a tally
   const [tallies, setTallies] = useState<Record<string, number>>({});
   const [done, setDone] = useState(0);
   const [nudge, setNudge] = useState(false);
+  const timers = useRef<number[]>([]);
+  useEffect(() => () => { timers.current.forEach((id) => { window.clearTimeout(id); window.clearInterval(id); }); }, []);
 
   const finished = done >= spins;
-  const nameOf = (colour: string) => labels.find((l) => l.colour === colour)?.name ?? "that colour";
+  const nameOf = (key: string) => labels.find((l) => l.key === key)?.name ?? "that one";
+  const actionWord = tool === "coin" ? "Flip" : tool === "die" ? "Roll" : "Spin";
 
-  function spin() {
-    if (spinning || landed || finished) return;
-    const idx = Math.floor(Math.random() * n);
-    const colour = wedges[idx]!;
-    const centre = idx * wedgeAngle + wedgeAngle / 2;
-    // Land wedge `idx` under the fixed top pointer: rotation ≡ (360 - centre).
-    const base = Math.ceil((rotation + 1) / 360) * 360;
-    const target = base + 360 * 4 + (360 - centre);
-    setSpinning(true);
+  function act() {
+    if (busy || landed || finished) return;
+    setBusy(true);
     setNudge(false);
-    setRotation(target);
-    window.setTimeout(() => {
-      setSpinning(false);
-      setLanded(colour);
-    }, 1500);
+    const idx = Math.floor(Math.random() * n);
+    const result = draw[idx]!;
+
+    if (tool === "spinner") {
+      const centre = idx * wedgeAngle + wedgeAngle / 2;
+      const base = Math.ceil((rotation + 1) / 360) * 360;
+      setRotation(base + 360 * 4 + (360 - centre));
+      timers.current.push(window.setTimeout(() => { setBusy(false); setLanded(result); }, 1500));
+      return;
+    }
+    // coin / die: flicker through faces, then settle on the result
+    let ticks = 0;
+    const iv = window.setInterval(() => {
+      ticks += 1;
+      setDisplay(distinctKeys[Math.floor(Math.random() * distinctKeys.length)]!);
+      if (ticks >= 11) {
+        window.clearInterval(iv);
+        setDisplay(result);
+        setBusy(false);
+        setLanded(result);
+      }
+    }, 90);
+    timers.current.push(iv);
   }
 
-  function record(colour: string) {
-    if (spinning || !landed || finished) return;
+  function record(key: string) {
+    if (busy || !landed || finished) return;
     // A mis-tap just nudges — it must not end the task, so we do not call onWrong.
-    if (colour !== landed) { setNudge(true); return; }
+    if (key !== landed) { setNudge(true); return; }
     setNudge(false);
-    setTallies((t) => ({ ...t, [colour]: (t[colour] ?? 0) + 1 }));
+    setTallies((t) => ({ ...t, [key]: (t[key] ?? 0) + 1 }));
     setLanded(null);
     setDone((d) => {
       const next = d + 1;
-      if (next >= spins) window.setTimeout(() => onCorrect(), 450);
+      if (next >= spins) timers.current.push(window.setTimeout(() => onCorrect(), 450));
       return next;
     });
   }
 
+  const shown = landed ?? display;
   const cx = 90, cy = 90, r = 78;
 
   return (
@@ -94,25 +142,30 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
         <ReadAloudBtn text={task.prompt} />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-[auto_1fr] sm:items-center">
-        {/* Spinner */}
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-[#e4d8f5] bg-[#faf7ff] p-4">
-          <svg viewBox="0 0 180 194" width="180" height="194" role="img" aria-label="Spinner">
-            <g style={{ transition: spinning ? "transform 1.5s cubic-bezier(0.17,0.67,0.32,1.3)" : "none", transform: `rotate(${rotation}deg)`, transformOrigin: `${cx}px ${cy}px` }}>
-              {wedges.map((colour, i) => {
-                const [x0, y0] = pt(cx, cy, r, i * wedgeAngle);
-                const [x1, y1] = pt(cx, cy, r, (i + 1) * wedgeAngle);
-                const large = wedgeAngle > 180 ? 1 : 0;
-                return <path key={i} d={`M ${cx} ${cy} L ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z`} fill={colour} stroke="#ffffff" strokeWidth={2} />;
-              })}
-              <circle cx={cx} cy={cy} r={r} fill="none" stroke={FRAME} strokeWidth={3} />
-            </g>
-            {/* fixed pointer at top */}
-            <path d={`M ${cx} ${cy - r - 8} l -9 16 l 18 0 z`} fill={INK} />
-            <circle cx={cx} cy={cy} r={7} fill={INK} />
-          </svg>
-          <button type="button" onClick={spin} disabled={spinning || !!landed || finished} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-6 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
-            <RotateCw className={spinning ? "h-5 w-5 animate-spin" : "h-5 w-5"} /> Spin
+      <div className="grid gap-4 sm:grid-cols-[auto_1fr] sm:items-start">
+        {/* Tool */}
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-[#e4d8f5] bg-[#faf7ff] p-4">
+          {tool === "spinner" ? (
+            <svg viewBox="0 0 180 194" width="180" height="194" role="img" aria-label="Spinner">
+              <g style={{ transition: busy ? "transform 1.5s cubic-bezier(0.17,0.67,0.32,1.3)" : "none", transform: `rotate(${rotation}deg)`, transformOrigin: `${cx}px ${cy}px` }}>
+                {draw.map((colour, i) => {
+                  const [x0, y0] = pt(cx, cy, r, i * wedgeAngle);
+                  const [x1, y1] = pt(cx, cy, r, (i + 1) * wedgeAngle);
+                  const large = wedgeAngle > 180 ? 1 : 0;
+                  return <path key={i} d={`M ${cx} ${cy} L ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z`} fill={colour} stroke="#ffffff" strokeWidth={2} />;
+                })}
+                <circle cx={cx} cy={cy} r={r} fill="none" stroke={FRAME} strokeWidth={3} />
+              </g>
+              <path d={`M ${cx} ${cy - r - 8} l -9 16 l 18 0 z`} fill={INK} />
+              <circle cx={cx} cy={cy} r={7} fill={INK} />
+            </svg>
+          ) : (
+            <div className={busy ? "animate-pulse" : ""}>
+              {tool === "die" ? <DieFace face={Number(shown) || 1} /> : <CoinFace side={shown} />}
+            </div>
+          )}
+          <button type="button" onClick={act} disabled={busy || !!landed || finished} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-6 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
+            <RotateCw className={busy ? "h-5 w-5 animate-spin" : "h-5 w-5"} /> {actionWord}
           </button>
           <div className="text-sm font-bold text-[#6b6280]">Recorded {done} of {spins}</div>
         </div>
@@ -120,35 +173,33 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
         {/* Record area */}
         <div className="space-y-2">
           <p className="text-sm font-bold text-[#3a2f52]" role="status">
-            {finished ? "All done — nice tallying!" : landed ? `It landed on ${nameOf(landed)}. Tap ${nameOf(landed)} to record it.` : "Press Spin, then record where it lands."}
+            {finished ? "All done — nice tallying!" : landed ? `It landed on ${nameOf(landed)}. Tap ${nameOf(landed)} to record it.` : `Press ${actionWord}, then record where it lands.`}
           </p>
           {nudge && landed ? <p className="text-sm font-bold text-[#c74f4b]">That is not where it landed — tap {nameOf(landed)}.</p> : null}
-          <div className="space-y-2">
+          <div className="grid gap-2 sm:grid-cols-2">
             {labels.map((l) => {
-              const active = landed === l.colour;
+              const active = landed === l.key;
               return (
-                <div key={l.colour} className="flex items-center gap-3">
+                <div key={l.key} className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => record(l.colour)}
+                    onClick={() => record(l.key)}
                     disabled={!landed || finished}
-                    className={["flex min-w-[132px] items-center justify-between gap-2 rounded-lg border-2 px-3 py-2.5 text-left font-black transition disabled:opacity-70", active ? "border-[#6d3f9c] bg-[#f1e8fb] ring-2 ring-[#6d3f9c]/40" : "border-[#e0d3f2] bg-white"].join(" ")}
+                    className={["flex min-w-[112px] items-center justify-between gap-2 rounded-lg border-2 px-3 py-2.5 text-left font-black transition disabled:opacity-70", active ? "border-[#6d3f9c] bg-[#f1e8fb] ring-2 ring-[#6d3f9c]/40" : "border-[#e0d3f2] bg-white"].join(" ")}
                   >
                     <span className="flex items-center gap-2">
-                      <span className="inline-block h-4 w-4 rounded-full border border-white shadow" style={{ background: l.colour }} />
+                      {l.colour ? <span className="inline-block h-4 w-4 rounded-full border border-white shadow" style={{ background: l.colour }} /> : null}
                       <span className="capitalize text-[#3a2f52]">{l.name}</span>
                     </span>
                     <OptionReadAloudButton text={l.name} />
                   </button>
-                  <TallyMarks n={tallies[l.colour] ?? 0} />
-                  <span className="font-mono text-lg font-black tabular-nums text-[#6d3f9c]">{tallies[l.colour] ?? 0}</span>
+                  <TallyMarks n={tallies[l.key] ?? 0} />
+                  <span className="font-mono text-lg font-black tabular-nums text-[#6d3f9c]">{tallies[l.key] ?? 0}</span>
                 </div>
               );
             })}
           </div>
-          {finished ? (
-            <div className="pt-1 text-sm font-bold text-[#2f7d4f]"><Check className="mr-1 inline h-4 w-4" />Tally complete</div>
-          ) : null}
+          {finished ? <div className="pt-1 text-sm font-bold text-[#2f7d4f]"><Check className="mr-1 inline h-4 w-4" />Tally complete</div> : null}
         </div>
       </div>
     </div>

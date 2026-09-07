@@ -181,13 +181,18 @@ export type PracticeTask = (
       visual?: ChanceVisual;
     }
   | {
-      // Chance Hollow: spin a spinner `spins` times and record each result by
-      // tapping the colour it lands on, building a real tally.
+      // Chance Hollow: run a chance tool `spins` times and record each result by
+      // tapping the outcome it lands on, building a real tally.
       kind: "chanceSpinTally";
       prompt: string;
-      wedges: string[]; // one entry per equal wedge (colour)
+      tool: "spinner" | "coin" | "die";
+      // The equal-weight pool drawn from, as outcome keys (repeat a key to weight
+      // it). For a spinner each key is the wedge colour; for a coin "heads"/
+      // "tails"; for a die "1".."6".
+      draw: string[];
       spins: number;
-      labels: { colour: string; name: string }[]; // distinct colours + names
+      // Distinct outcomes shown as tally rows. `colour` is set for spinner keys.
+      labels: { key: string; name: string; colour?: string }[];
     }
   | {
       kind: "order3";

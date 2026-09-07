@@ -422,10 +422,10 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
   }
   if (task.kind === "chanceSpinTally") {
     return hasText(task.prompt)
-      && Array.isArray(task.wedges) && task.wedges.length >= 2
+      && Array.isArray(task.draw) && task.draw.length >= 2
       && Array.isArray(task.labels) && task.labels.length >= 2
       && Number.isInteger(task.spins) && task.spins >= 1
-      && task.labels.every((label) => hasText(label.colour) && hasText(label.name));
+      && task.labels.every((label) => hasText(label.key) && hasText(label.name));
   }
   if (task.kind !== "starpathObject") return true;
   const objectTask = task as StarpathObjectTask;

@@ -461,18 +461,40 @@ const w5l1 = poolGen([
 ]);
 
 // Parametric: fresh randomised tally to read ("which came up most?") each time.
-// Interactive: actually spin the spinner 10 times and record each result as a
-// tally. Fresh spinner (3-4 colours, some with two wedges) every time.
+// Interactive: actually run a chance tool 10 times and record each result as a
+// tally. The tool varies each round — spinner, coin or die — to keep it fresh.
 function makeSpinTallyTask(): PracticeTask {
+  const tool = choice(["spinner", "coin", "die"] as const);
+  if (tool === "coin") {
+    return {
+      kind: "chanceSpinTally",
+      tool,
+      prompt: "Flip the coin 10 times. After each flip, tap the side it landed on to record a tally.",
+      draw: ["heads", "tails"],
+      spins: 10,
+      labels: [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }],
+    };
+  }
+  if (tool === "die") {
+    return {
+      kind: "chanceSpinTally",
+      tool,
+      prompt: "Roll the die 10 times. After each roll, tap the number it landed on to record a tally.",
+      draw: ["1", "2", "3", "4", "5", "6"],
+      spins: 10,
+      labels: [1, 2, 3, 4, 5, 6].map((face) => ({ key: String(face), name: String(face) })),
+    };
+  }
   const chosen = shuffleArr(PAINTS).slice(0, randInt(3, 4));
-  const wedges: string[] = [];
-  for (const p of chosen) for (let i = 0, w = randInt(1, 2); i < w; i += 1) wedges.push(p.c);
+  const draw: string[] = [];
+  for (const p of chosen) for (let i = 0, w = randInt(1, 2); i < w; i += 1) draw.push(p.c);
   return {
     kind: "chanceSpinTally",
+    tool: "spinner",
     prompt: "Spin the spinner 10 times. After each spin, tap the colour it landed on to record a tally.",
-    wedges: shuffleArr(wedges),
+    draw: shuffleArr(draw),
     spins: 10,
-    labels: chosen.map((p) => ({ colour: p.c, name: p.name })),
+    labels: chosen.map((p) => ({ key: p.c, name: p.name, colour: p.c })),
   };
 }
 const w5l2: Gen = makeSpinTallyTask;
