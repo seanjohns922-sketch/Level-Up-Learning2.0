@@ -269,29 +269,58 @@ function compareFractionMaker(): ChanceCase {
 }
 
 // ───────────────────────────── Week 4: Fair Games ───────────────────────────
-// L1 "Is the Game Fair?" — random fair or unfair setup across tools.
-function fairGameMaker(): ChanceCase {
-  const kind = choice(["coin", "evenodd", "spinner", "diesplit"] as const);
-  if (kind === "coin") {
-    return { prompt: "Game: you win on heads, I win on tails. Is the game fair?", answer: "Yes, both players have one outcome", options: ["Yes, both players have one outcome", "No, heads always wins", "No, tails is impossible", "No, one player has more outcomes"], correct: "Yes. Heads and tails are equally likely.", wrong: "Each player has one equally likely coin outcome.", visual: { type: "coin", face: "heads" } };
+// L1 "Is the Game Fair?" — one maker per object (coin, die, spinner, bag), each
+// varying its setup and fairness, so the lesson rotates through many games.
+function fairCoinGameMaker(): ChanceCase {
+  if (Math.random() < 0.5) {
+    const answer = "Yes, each player wins on one side";
+    return { prompt: "Coin game: Player A wins on heads, Player B wins on tails. Is it fair?", answer, options: distinctOptions(answer, ["No, one player has more winning sides", "No, heads is impossible", "No, coins are never fair", "No, tails wins more often"]), correct: "Yes. Heads and tails are equally likely, and each player has one.", wrong: "Each player wins on one of the two equal sides, so it is fair.", visual: { type: "coin", face: "heads" } };
   }
-  if (kind === "evenodd") {
-    return { prompt: "Game: you win on an even number, I win on an odd number, on a normal die. Is it fair?", answer: "Yes, there are three evens and three odds", options: ["Yes, there are three evens and three odds", "No, even numbers are bigger", "No, odds win more often", "No, 6 is impossible"], correct: "Yes. 2, 4, 6 are even and 1, 3, 5 are odd — three each.", wrong: "Three even and three odd faces is equal.", visual: { type: "die", face: choice([2, 4, 6] as const) } };
+  const answer = "No, one player has more winning sides";
+  return { prompt: "Coin game: Player A wins on heads or tails, Player B wins on tails only. Is it fair?", answer, options: distinctOptions(answer, ["Yes, both use the same coin", "Yes, each player wins on one side", "No, tails is impossible", "No, coins are never fair"]), correct: "Correct. Player A wins on both sides, Player B on just one.", wrong: "Count each player's winning sides — A has two, B has one.", visual: { type: "coin", face: "tails" } };
+}
+
+function fairDieGameMaker(): ChanceCase {
+  const v = choice(["evenodd", "highlow", "split", "single"] as const);
+  if (v === "evenodd") {
+    const answer = "Yes, three even and three odd numbers";
+    return { prompt: "Die game: you win on an even number, I win on an odd number. Is it fair?", answer, options: distinctOptions(answer, ["No, even numbers are bigger", "No, odds win more often", "No, 6 is impossible", "No, evens win more often"]), correct: "Yes. 2, 4, 6 are even and 1, 3, 5 are odd — three each.", wrong: "Three even and three odd faces is equal.", visual: { type: "die", face: choice([2, 4, 6] as const) } };
   }
-  if (kind === "spinner") {
-    const [c1, c2] = shuffle(PAL).slice(0, 2) as [Paint, Paint];
-    const a = randInt(1, 3);
-    const b = Math.random() < 0.5 ? a : (() => { let x = randInt(1, 3); while (x === a) x = randInt(1, 3); return x; })();
-    const items = shuffle([...Array(a).fill(c1.k), ...Array(b).fill(c2.k)] as string[]);
-    const fair = a === b;
-    const bigger = a > b ? c1 : c2;
-    const answer = fair ? "Yes, both colours have equal parts" : `No, ${bigger.n} has more parts`;
-    return { prompt: `Game: you win on ${c1.n}, I win on ${c2.n}, on a spinner with ${a} ${c1.n} and ${b} ${c2.n} part${plural(b)}. Is it fair?`, answer, options: [`Yes, both colours have equal parts`, `No, ${c1.n} has more parts`, `No, ${c2.n} has more parts`, `No, ${c2.n} is impossible`], correct: fair ? "Yes. Equal parts give each player the same chance." : `Correct. ${cap(bigger.n)} has more parts, so it is not fair.`, wrong: fair ? "Equal parts means the game is fair." : "Count the winning parts for each player.", visual: { type: "spinner", wedges: items } };
+  if (v === "highlow") {
+    const answer = "Yes, three low and three high numbers";
+    return { prompt: "Die game: you win on 1, 2 or 3, I win on 4, 5 or 6. Is it fair?", answer, options: distinctOptions(answer, ["No, the high numbers win more", "No, the low numbers win more", "No, 6 is impossible", "No, the numbers are not equal"]), correct: "Yes. 1-3 and 4-6 are three numbers each.", wrong: "Each player wins on three of the six numbers.", visual: { type: "die", face: choice([1, 2, 3] as const) } };
   }
-  const k = randInt(2, 4);
-  const fair = k === 3;
-  const answer = fair ? "Yes, each player wins on three numbers" : `No, one player wins on ${Math.max(k, 6 - k)} numbers`;
-  return { prompt: `Game: you win on 1 to ${k}, I win on the rest, on a normal die. Is it fair?`, answer, options: distinctOptions(answer, ["Yes, all dice games are fair", `No, one player wins on ${Math.min(k, 6 - k)} numbers`, "No, some numbers are impossible", "No, the bigger numbers win more"]), correct: fair ? "Yes. 1-3 and 4-6 is three winning numbers each." : `Correct. One player wins on ${Math.max(k, 6 - k)} numbers and the other on ${Math.min(k, 6 - k)}.`, wrong: "Count how many numbers each player wins on.", visual: { type: "die", face: k } };
+  if (v === "split") {
+    const k = randInt(2, 4);
+    const fair = k === 3;
+    const answer = fair ? "Yes, each player wins on three numbers" : `No, one player wins on ${Math.max(k, 6 - k)} numbers`;
+    return { prompt: `Die game: you win on 1 to ${k}, I win on the rest. Is it fair?`, answer, options: distinctOptions(answer, ["Yes, all dice games are fair", `No, one player wins on ${Math.min(k, 6 - k)} numbers`, "No, some numbers are impossible", "No, the bigger numbers win more"]), correct: fair ? "Yes. 1-3 and 4-6 is three numbers each." : `One player wins on ${Math.max(k, 6 - k)} numbers and the other on ${Math.min(k, 6 - k)}.`, wrong: "Count how many numbers each player wins on.", visual: { type: "die", face: k } };
+  }
+  const target = randInt(1, 6);
+  const answer = "No, one player wins on five numbers";
+  return { prompt: `Die game: you win only on ${target}, I win on the other five numbers. Is it fair?`, answer, options: distinctOptions(answer, ["Yes, both use the same die", `Yes, ${target} is a lucky number`, "No, both win on three numbers", `No, ${target} is impossible`]), correct: "Correct. You win on 1 number and I win on 5 — not fair.", wrong: "One number versus five numbers is not equal.", visual: { type: "die", face: target } };
+}
+
+function fairSpinnerGameMaker(): ChanceCase {
+  const [c1, c2] = shuffle(PAL).slice(0, 2) as [Paint, Paint];
+  const a = randInt(1, 3);
+  const b = Math.random() < 0.5 ? a : (() => { let x = randInt(1, 3); while (x === a) x = randInt(1, 3); return x; })();
+  const items = shuffle([...Array(a).fill(c1.k), ...Array(b).fill(c2.k)] as string[]);
+  const fair = a === b;
+  const bigger = a > b ? c1 : c2;
+  const answer = fair ? "Yes, both colours have equal parts" : `No, ${bigger.n} has more parts`;
+  return { prompt: `Spinner game: you win on ${c1.n}, I win on ${c2.n}, with ${a} ${c1.n} and ${b} ${c2.n} part${plural(b)}. Is it fair?`, answer, options: [`Yes, both colours have equal parts`, `No, ${c1.n} has more parts`, `No, ${c2.n} has more parts`, `No, ${c2.n} is impossible`], correct: fair ? "Yes. Equal parts give each player the same chance." : `Correct. ${cap(bigger.n)} has more parts, so it is not fair.`, wrong: fair ? "Equal parts means the game is fair." : "Count the winning parts for each player.", visual: { type: "spinner", wedges: items } };
+}
+
+function fairBagGameMaker(): ChanceCase {
+  const [c1, c2] = shuffle(PAL).slice(0, 2) as [Paint, Paint];
+  const a = randInt(1, 4);
+  const b = Math.random() < 0.5 ? a : (() => { let x = randInt(1, 4); while (x === a) x = randInt(1, 4); return x; })();
+  const items = shuffle([...Array(a).fill(c1.k), ...Array(b).fill(c2.k)] as string[]);
+  const fair = a === b;
+  const bigger = a > b ? c1 : c2;
+  const answer = fair ? "Yes, both colours have equal counts" : `No, ${bigger.n} has more counters`;
+  return { prompt: `Bag game: you win on ${c1.n}, I win on ${c2.n}, from a bag of ${a} ${c1.n} and ${b} ${c2.n} counter${plural(b)}. Is it fair?`, answer, options: [`Yes, both colours have equal counts`, `No, ${c1.n} has more counters`, `No, ${c2.n} has more counters`, `No, ${c2.n} is impossible`], correct: fair ? "Yes. Equal counts give each player the same chance." : `Correct. ${cap(bigger.n)} has more counters, so it is not fair.`, wrong: fair ? "Equal counts means the game is fair." : "Count the winning counters for each player.", visual: { type: "bag", counters: items } };
 }
 
 // L2 "Fix the Game" — how to make an unfair setup fair.
@@ -438,7 +467,7 @@ const lessonGens: Record<string, Gen> = {
   "3-1": generated([oneOutOfMaker]),
   "3-2": generated([fractionChanceMaker]),
   "3-3": generated([compareFractionMaker]),
-  "4-1": generated([fairGameMaker]),
+  "4-1": generated([fairCoinGameMaker, fairDieGameMaker, fairSpinnerGameMaker, fairBagGameMaker]),
   "4-2": generated([fixGameMaker]),
   "4-3": makeBuildFairTask,
   "5-1": generated([compareChanceMaker]),
