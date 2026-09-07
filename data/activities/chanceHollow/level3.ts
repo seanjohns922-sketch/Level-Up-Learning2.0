@@ -1,13 +1,22 @@
 import type { ChanceVisual, PracticeTask } from "@/data/activities/year1/practice-task";
 import type { RealmLessonTaskSet } from "@/data/activities/realm-lesson-blueprint";
 
-type Gen = (round: number, target: number) => PracticeTask;
+type Gen = () => PracticeTask;
 
-const pick = <T,>(items: readonly T[], index: number) => items[((index % items.length) + items.length) % items.length]!;
 const rotate = <T,>(items: readonly T[], amount: number) => {
   const offset = ((amount % items.length) + items.length) % items.length;
   return [...items.slice(offset), ...items.slice(0, offset)];
 };
+
+// Fisher–Yates shuffle of [0..n).
+function shuffledIndices(n: number): number[] {
+  const bag = Array.from({ length: n }, (_, index) => index);
+  for (let index = bag.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [bag[index], bag[swap]] = [bag[swap]!, bag[index]!];
+  }
+  return bag;
+}
 
 // Counter / wedge colours reused across the apparatus visuals.
 const RED = "#e5484d";
@@ -27,21 +36,36 @@ type ChanceCase = {
   visual?: ChanceVisual;
 };
 
-// Turn a pool of cases into a generator. `round` walks the pool and also
-// shuffles the option order so the same case does not always read identically.
-const poolGen =
-  (cases: readonly ChanceCase[], lead?: string): Gen =>
-  (round) => {
-    const c = pick(cases, round);
+// Turn a pool of cases into a generator that walks its own cases WITHOUT
+// repeating: every case is shown once before any repeats, and the same case
+// never appears twice in a row. This is independent of timing, so a lesson can
+// never show the same question over and over.
+const poolGen = (cases: readonly ChanceCase[], lead?: string): Gen => {
+  let queue: number[] = [];
+  let last = -1;
+  let optionSeed = 0;
+  return () => {
+    if (queue.length === 0) {
+      queue = shuffledIndices(cases.length);
+      // Avoid a back-to-back repeat across the reshuffle boundary.
+      if (cases.length > 1 && queue[queue.length - 1] === last) {
+        [queue[queue.length - 1], queue[0]] = [queue[0]!, queue[queue.length - 1]!];
+      }
+    }
+    const index = queue.pop()!;
+    last = index;
+    optionSeed += 1;
+    const c = cases[index]!;
     return {
       kind: "mcq",
       prompt: lead ? `${lead} ${c.prompt}` : c.prompt,
-      options: rotate([...c.options], round),
+      options: rotate([...c.options], optionSeed),
       answer: c.answer,
       feedback: { correct: c.correct, wrong: c.wrong },
       ...(c.visual ? { visual: c.visual } : {}),
     };
   };
+};
 
 const FOUR_SCALE = ["Certain", "Likely", "Unlikely", "Impossible"] as const;
 
@@ -99,6 +123,7 @@ const w3l1 = poolGen([
   { prompt: "What could this spinner land on?", answer: "Red, blue or yellow", options: ["Red, blue or yellow", "Only red", "Red, blue, yellow or green", "Purple or orange"], correct: "Yes. Those three colours are the only sections, so any of them could come up.", wrong: "List only the colours you can see: red, blue and yellow.", visual: { type: "spinner", wedges: [RED, BLUE, YELLOW] } },
   { prompt: "What could a tossed coin land on?", answer: "Heads or tails", options: ["Heads or tails", "Only heads", "Heads, tails or its edge", "A number from 1 to 6"], correct: "Right. A coin has two sides, so it is heads or tails.", wrong: "A coin has two faces, so the outcomes are heads or tails.", visual: { type: "coin", face: "heads" } },
   { prompt: "What could you roll on one die?", answer: "Any number from 1 to 6", options: ["Any number from 1 to 6", "Only a 6", "Any number from 1 to 10", "Heads or tails"], correct: "Yes. The faces are 1 to 6, so any of those could come up.", wrong: "A die has the faces 1 to 6, so any of those numbers could be rolled.", visual: { type: "die", face: 3 } },
+  { prompt: "What could you draw from this bag?", answer: "Red or blue", options: ["Red or blue", "Only red", "Red, blue or green", "A number from 1 to 6"], correct: "Yes. The bag holds red and blue, so a draw is red or blue.", wrong: "Only red and blue are in the bag, so those are the outcomes.", visual: { type: "bag", counters: [RED, RED, BLUE, BLUE] } },
 ]);
 
 const w3l2 = poolGen([
@@ -127,12 +152,14 @@ const w4l2 = poolGen([
   { prompt: "You predicted red on this spinner, but you spun blue. What does that show?", answer: "Blue was less likely but could still happen", options: ["Blue was less likely but could still happen", "Your prediction was cheating", "Blue is impossible", "The spinner is broken"], correct: "Right. A less likely outcome can still happen sometimes.", wrong: "Blue is unlikely here, but 'unlikely' does not mean impossible — it can still happen.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
   { prompt: "You predicted 'a number 1 to 6' and rolled a 4. What does the test show?", answer: "The prediction worked — 4 is one of the outcomes", options: ["The prediction worked — 4 is one of the outcomes", "The prediction failed", "4 is not on a die", "You need to roll again"], correct: "Yes. 4 is in 1 to 6, so the prediction held up.", wrong: "4 is one of the numbers 1 to 6, so the prediction was correct.", visual: { type: "die", face: 4 } },
   { prompt: "You predicted heads and tossed the coin once. It landed tails. What does the test show?", answer: "Tails was just as likely — one toss can go either way", options: ["Tails was just as likely — one toss can go either way", "The coin is broken", "Heads is impossible", "The toss does not count"], correct: "Right. Heads and tails are equally likely, so one toss can be either.", wrong: "A coin is 50/50, so a single toss can land tails even if you picked heads.", visual: { type: "coin", face: "tails" } },
+  { prompt: "You predicted blue on this mostly-blue spinner and spun blue. What does the test show?", answer: "The prediction worked — blue was the likely result", options: ["The prediction worked — blue was the likely result", "Blue only happened by luck", "Blue is now impossible", "You must predict red next"], correct: "Yes. Blue was the biggest section, so predicting it paid off.", wrong: "Blue has the most sections, so a blue result matches the prediction.", visual: { type: "spinner", wedges: [BLUE, BLUE, BLUE, RED] } },
 ]);
 
 const w4l3 = poolGen([
   { prompt: "You predicted heads. The coin landed tails. Did it match?", answer: "No — but tails was still a fair result", options: ["No — but tails was still a fair result", "Yes — they matched", "No — tails is impossible", "Yes — tails counts as heads"], correct: "Right. It did not match, yet tails was always possible.", wrong: "Heads and tails differ, so it did not match — but tails could still happen.", visual: { type: "coin", face: "tails" } },
   { prompt: "You predicted 'a number 1 to 6'. You rolled a 3. Did it match?", answer: "Yes — 3 is in 1 to 6", options: ["Yes — 3 is in 1 to 6", "No — 3 is too small", "No — you needed a 6", "No — 3 is an unlucky number"], correct: "Yes. 3 is one of the numbers you predicted.", wrong: "Your prediction covered 1 to 6, and 3 is in that range, so it matched.", visual: { type: "die", face: 3 } },
   { prompt: "You predicted red (mostly-red spinner). It landed red. Did it match?", answer: "Yes — and red was the likely result", options: ["Yes — and red was the likely result", "No — red does not count", "Yes — but only by luck", "No — you must predict blue"], correct: "Right. It matched, and red was the most likely outcome anyway.", wrong: "You predicted red and got red, so it matched — and red was the likely result.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
+  { prompt: "You predicted 'red or blue' from this bag and drew blue. Did it match?", answer: "Yes — blue was one of the outcomes", options: ["Yes — blue was one of the outcomes", "No — you needed red", "No — blue does not count", "Only if you had said blue"], correct: "Right. Your prediction covered red or blue, and blue is one of them.", wrong: "You predicted red or blue, and blue is in that list, so it matched.", visual: { type: "bag", counters: [RED, RED, BLUE, BLUE] } },
 ]);
 
 // ─────────────────────── Week 5: Repeated Experiments ────────────────────────
@@ -140,6 +167,7 @@ const w5l1 = poolGen([
   { prompt: "You will toss a coin 10 times. What is a fair way to record each toss?", answer: "Make a tally mark under heads or tails each time", options: ["Make a tally mark under heads or tails each time", "Only write down the heads", "Guess the total at the end", "Rub out results you do not like"], correct: "Yes. A tally mark for every toss keeps the record fair and complete.", wrong: "Record every toss with a tally mark so no results are missed.", visual: { type: "coin", face: "heads" } },
   { prompt: "You will spin this 4-colour spinner 20 times. What should you expect?", answer: "Each colour about 5 times", options: ["Each colour about 5 times", "All 20 the same colour", "Red exactly 20 times", "One colour on every spin"], correct: "Right. Equal sections should each come up roughly a quarter of the time.", wrong: "The sections are equal, so 20 spins should give each colour about 5.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
   { prompt: "Why do we repeat a chance experiment many times instead of once?", answer: "More trials give us a clearer picture of what usually happens", options: ["More trials give us a clearer picture of what usually happens", "One try is always enough", "To make the game last longer", "So the teacher stays busy"], correct: "Yes. Lots of trials show the pattern better than a single try.", wrong: "One trial can be luck; repeating many times shows what usually happens.", visual: { type: "die", face: 6 } },
+  { prompt: "You will roll one die 30 times. What should you expect?", answer: "Each number about 5 times", options: ["Each number about 5 times", "Always a six", "Never a one", "All thirty the same number"], correct: "Right. Six equal faces over 30 rolls average about 5 each.", wrong: "The faces are equally likely, so 30 rolls give each number about 5.", visual: { type: "die", face: 3 } },
 ]);
 
 const w5l2 = poolGen([
@@ -153,6 +181,7 @@ const w5l3 = poolGen([
   { prompt: "Spin a 4-colour spinner 16 times. Red:5, Blue:2, Green:5, Yellow:4. Which tied for most?", answer: "Red and green", options: ["Red and green", "Blue and yellow", "Only red", "Green and yellow"], correct: "Right. Red and green both have 5 — the highest count.", wrong: "Look for the two highest equal counts: red and green each have 5.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
   { prompt: "Toss two coins in two groups. Group A: 6 heads. Group B: 6 heads. What can you say?", answer: "Both groups got the same number of heads", options: ["Both groups got the same number of heads", "Group A cheated", "Coins never match", "Group B was luckier"], correct: "Yes. Equal tallies mean the two groups matched this time.", wrong: "Both tallies are 6, so the groups got the same result.", visual: { type: "coin", face: "heads" } },
   { prompt: "Roll a die 10 times. Tally — 6:0. What does a zero tally mean?", answer: "A 6 did not come up in these ten rolls", options: ["A 6 did not come up in these ten rolls", "A 6 is impossible", "The die is broken", "A 6 came up ten times"], correct: "Right. Zero means it just did not happen this time — not that it can't.", wrong: "A zero tally means it did not come up in these rolls, not that it is impossible.", visual: { type: "die", face: 6 } },
+  { prompt: "Roll a die 20 times. Tally — 3:7, and every other number fewer. Which came up most?", answer: "3", options: ["3", "6", "1", "They all tied"], correct: "Yes. 3 has the highest tally at 7.", wrong: "Find the biggest count: 3 has 7, more than any other number.", visual: { type: "die", face: 3 } },
 ]);
 
 // ─────────────────────── Week 6: Variation Investigation ─────────────────────
@@ -160,18 +189,21 @@ const w6l1 = poolGen([
   { prompt: "Group A gets 4 heads out of 10. Group B gets 7 heads out of 10. What does this show?", answer: "Results can vary between repeated trials", options: ["Results can vary between repeated trials", "One group did it wrong", "Coins never land tails", "Heads is impossible"], correct: "Right. The same experiment can give different results each time.", wrong: "Both groups did it properly — chance results simply vary from trial to trial.", visual: { type: "coin", face: "heads" } },
   { prompt: "You spin the same spinner twice: first red-heavy result, then blue-heavy. What is true?", answer: "The same experiment can turn out differently each time", options: ["The same experiment can turn out differently each time", "The spinner changed colours", "One result must be a mistake", "The spinner is broken"], correct: "Yes. Variation between trials is normal in chance.", wrong: "Nothing changed about the spinner — results just vary between trials.", visual: { type: "spinner", wedges: [RED, RED, BLUE, BLUE] } },
   { prompt: "Two groups roll the same die 12 times and get different totals. What should you conclude?", answer: "Different results are normal — that is variation", options: ["Different results are normal — that is variation", "The dice are unfair", "Only one group can be right", "Someone must have miscounted"], correct: "Right. Different totals across trials is exactly what variation means.", wrong: "The same fair die can give different totals — that difference is variation.", visual: { type: "die", face: 4 } },
+  { prompt: "You draw from the same bag twice and get a different colour each time. What does this show?", answer: "The same experiment can give different results", options: ["The same experiment can give different results", "The bag swapped its counters", "One draw must be a mistake", "Draws must always match"], correct: "Right. Repeating a draw can give a different colour — that is variation.", wrong: "Nothing changed in the bag; different draws are just normal variation.", visual: { type: "bag", counters: [RED, RED, BLUE, BLUE] } },
 ]);
 
 const w6l2 = poolGen([
   { prompt: "The whole class combines 100 tosses: Heads 52, Tails 48. What does this suggest?", answer: "Heads and tails are about equally likely", options: ["Heads and tails are about equally likely", "Heads always wins", "Tails is impossible", "The coin is unfair"], correct: "Yes. Over many tosses the counts get close to even — about 50/50.", wrong: "52 and 48 are very close, which suggests heads and tails are about equal.", visual: { type: "coin", face: "heads" } },
   { prompt: "Why do we combine everyone's results as a class?", answer: "More trials together give a clearer, fairer picture", options: ["More trials together give a clearer, fairer picture", "To make one group win", "So we can stop early", "To use up more paper"], correct: "Right. Pooling lots of trials smooths out the ups and downs.", wrong: "Combining results means many more trials, which shows the pattern more clearly.", visual: { type: "die", face: 5 } },
   { prompt: "The class spun an equal 4-colour spinner 40 times. Roughly what do you expect for each colour?", answer: "About 10 each", options: ["About 10 each", "All 40 red", "Exactly 7 each", "About 20 each"], correct: "Yes. Equal sections over 40 spins average about a quarter each — near 10.", wrong: "Equal sections share the 40 spins about evenly, so roughly 10 per colour.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
+  { prompt: "The class rolled a die 120 times and each number came up about 20 times. What does this suggest?", answer: "Each number is about equally likely", options: ["Each number is about equally likely", "Six is the best number", "One is impossible", "The die is loaded"], correct: "Right. Roughly equal counts suggest every face is equally likely.", wrong: "About 20 each means the six numbers are coming up about equally often.", visual: { type: "die", face: 4 } },
 ]);
 
 const w6l3 = poolGen([
   { prompt: "An equal red/blue spinner gave Red 6, Blue 4. Why did they not split evenly?", answer: "Chance results do not always split exactly evenly", options: ["Chance results do not always split exactly evenly", "Blue is impossible", "Red is certain", "The spinner is faulty"], correct: "Right. Even with equal chances, real trials wobble around the even split.", wrong: "Equal chances do not force an exact even split — real results vary a little.", visual: { type: "spinner", wedges: [RED, BLUE] } },
   { prompt: "You predicted blue but red came up. What is the best reflection?", answer: "A prediction can be sensible even when another outcome happens", options: ["A prediction can be sensible even when another outcome happens", "The prediction made red impossible", "Only wrong predictions have outcomes", "Red must have cheated"], correct: "Yes. A good prediction can still be beaten by a possible outcome.", wrong: "Your prediction was reasonable; another possible outcome just happened this time.", visual: { type: "spinner", wedges: [RED, RED, BLUE, BLUE] } },
   { prompt: "The class repeats a die experiment and gets different totals each time. What is worth discussing?", answer: "How and why the results varied across the trials", options: ["How and why the results varied across the trials", "Why dice have no outcomes", "Why the experiment was certain", "Which group is the best"], correct: "Right. Discussing the variation is the whole point of the investigation.", wrong: "The useful discussion is about the variation — how the results differed and why.", visual: { type: "die", face: 6 } },
+  { prompt: "Two groups spin the same fair spinner and get different results. The best explanation is…", answer: "chance naturally varies from trial to trial", options: ["chance naturally varies from trial to trial", "one spinner must be fake", "spinners have no colours", "the results were copied wrongly"], correct: "Right. A fair spinner still gives different results each time — that is variation.", wrong: "Nothing is wrong with the spinner; chance results simply vary between trials.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
 ]);
 
 // Each of the 18 lessons runs the generator that matches its title.
@@ -191,16 +223,11 @@ export function getChanceHollowLevel3TaskSet(lessonId: string): RealmLessonTaskS
   const lesson = Number(match[2]);
   const gen = LESSON_GENERATORS[`${week}-${lesson}`];
   if (!gen) return null;
-  const seed = (week - 1) * 6 + lesson;
   // Teaching and the three activities all come from this lesson's own
-  // generator (different rounds), so every card matches the lesson title while
-  // still varying the question and shuffling the options.
+  // generator, which walks its cases without repeating — so every card matches
+  // the lesson title and no question recurs within the lesson.
   return {
-    teaching: (ctx) => gen((ctx?.elapsedSeconds ?? 0) + seed, 0),
-    activities: [
-      (ctx) => gen((ctx?.elapsedSeconds ?? 0) + seed + 1, 0),
-      (ctx) => gen((ctx?.elapsedSeconds ?? 0) + seed + 2, 0),
-      (ctx) => gen((ctx?.elapsedSeconds ?? 0) + seed + 3, 0),
-    ],
+    teaching: () => gen(),
+    activities: [() => gen(), () => gen(), () => gen()],
   };
 }
