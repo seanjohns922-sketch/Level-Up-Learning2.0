@@ -128,6 +128,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "chanceAutoTally") return "Run the Experiment";
   if (kind === "chanceBuildFair") return "Fix It, Then Face Chanzia";
   if (kind === "chanceCompare") return "Compare the Tools";
+  if (kind === "chancePredictCount") return "Predict and Spin";
   if (kind === "mcq") return "Multiple Choice";
   if (kind === "count") return "Number Input";
   if (kind === "order3") return "Ordering";

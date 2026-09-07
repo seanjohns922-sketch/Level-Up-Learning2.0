@@ -326,6 +326,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "chanceAutoTally",
   "chanceBuildFair",
   "chanceCompare",
+  "chancePredictCount",
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
@@ -435,6 +436,13 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
       && Array.isArray(task.colours) && task.colours.length === 2
       && Number.isInteger(task.maxParts) && task.maxParts >= 2
       && task.colours.every((c) => hasText(c.key) && hasText(c.name) && hasText(c.colour));
+  }
+  if (task.kind === "chancePredictCount") {
+    return hasText(task.prompt)
+      && Array.isArray(task.wedges) && task.wedges.length >= 2
+      && hasText(task.targetKey) && hasText(task.targetName)
+      && Number.isInteger(task.spins) && task.spins >= 1
+      && task.wedges.includes(task.targetKey);
   }
   if (task.kind === "chanceCompare") {
     return hasText(task.prompt)

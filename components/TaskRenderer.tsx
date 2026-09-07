@@ -209,6 +209,7 @@ import ChanceSpinTallyCard from "@/components/chance-hollow/ChanceSpinTallyCard"
 import ChanceAutoTallyCard from "@/components/chance-hollow/ChanceAutoTallyCard";
 import ChanceBuildFairCard from "@/components/chance-hollow/ChanceBuildFairCard";
 import ChanceCompareToolsCard from "@/components/chance-hollow/ChanceCompareToolsCard";
+import ChancePredictCountCard from "@/components/chance-hollow/ChancePredictCountCard";
 import StatisticaCollectCard from "@/components/statistica/StatisticaCollectCard";
 import StatisticaClassifyCard from "@/components/statistica/StatisticaClassifyCard";
 import StatisticaConceptCard from "@/components/statistica/StatisticaConceptCard";
@@ -752,6 +753,8 @@ function TaskRendererInner({
       return <ChanceBuildFairCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceCompare":
       return <ChanceCompareToolsCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "chancePredictCount":
+      return <ChancePredictCountCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaCollect":
       return <StatisticaCollectCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaClassify":

@@ -436,6 +436,22 @@ function compareOutcomesTask(): PracticeTask {
   };
 }
 
+// W5 L1 "More Chance or Less Chance?" — predict how many of 10 spins land on red,
+// then spin and see how close you get. Chanzia predicts too.
+function makePredictCountTask(): PracticeTask {
+  const total = choice([4, 5, 6] as const);
+  const redParts = randInt(1, total - 1);
+  const wedges = shuffle([...Array(redParts).fill(RED), ...Array(total - redParts).fill(BLUE)] as string[]);
+  return {
+    kind: "chancePredictCount",
+    prompt: "Predict how many of 10 spins will land on red, then spin and see how close you get. Beat Chanzia!",
+    wedges,
+    targetKey: RED,
+    targetName: "red",
+    spins: 10,
+  };
+}
+
 // W5 L1 "More Chance or Less Chance?" — two spinners, which has a better chance of red.
 function compareChanceTask(): PracticeTask {
   const total = choice([4, 6] as const);
@@ -490,7 +506,7 @@ const lessonGens: Record<string, Gen> = {
   "4-1": generated([fairCoinGameMaker, fairDieGameMaker, fairSpinnerGameMaker, fairBagGameMaker]),
   "4-2": generated([fixGameMaker]),
   "4-3": makeBuildFairTask,
-  "5-1": randTask([compareChanceTask]),
+  "5-1": randTask([makePredictCountTask, makePredictCountTask, compareChanceTask]),
   "5-2": randTask([compareSameTask]),
   "5-3": generated([bestPredictionMaker]),
   "6-1": makePredictMostTask,

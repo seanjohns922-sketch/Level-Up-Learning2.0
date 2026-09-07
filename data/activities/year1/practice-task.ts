@@ -218,6 +218,16 @@ export type PracticeTask = (
       maxParts: number;
     }
   | {
+      // Chance Hollow: predict how many of `spins` spins land on the target
+      // colour, then run them and compare against Chanzia's prediction.
+      kind: "chancePredictCount";
+      prompt: string;
+      wedges: string[];
+      targetKey: string;
+      targetName: string;
+      spins: number;
+    }
+  | {
       // Chance Hollow: compare two or three real tools shown side by side, then
       // pick the answer (which has more chance / more outcomes / are they equal).
       kind: "chanceCompare";
