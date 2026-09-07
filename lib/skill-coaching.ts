@@ -137,6 +137,87 @@ const TABLE: Record<string, SkillCoaching> = {
     focusLine: "Remember, percent means out of one hundred.",
   },
 
+  // Chance Hollow — probability
+  chance_words: {
+    tip: "Match the chance word to how often the event could happen.",
+    strengthLine: "You used chance words clearly today!",
+    focusLine: "Check if the event is certain, impossible, likely, or unlikely.",
+  },
+  chance_outcomes: {
+    tip: "List only the results that could really happen.",
+    strengthLine: "You named possible outcomes clearly today!",
+    focusLine: "Check the tool, then list every possible outcome.",
+  },
+  chance_prediction: {
+    tip: "Use the possible outcomes before making a prediction.",
+    strengthLine: "You connected predictions to outcomes well!",
+    focusLine: "Make your prediction from the outcomes you can see.",
+  },
+  chance_variation: {
+    tip: "Repeated trials can change because chance results vary.",
+    strengthLine: "You described chance results clearly today!",
+    focusLine: "Compare the tallies and describe what changed.",
+  },
+
+  // Statistica — statistics
+  statistica_collect: {
+    tip: "Use the question to decide what data to collect.",
+    strengthLine: "You collected and sorted data clearly today!",
+    focusLine: "Check the question before choosing the data.",
+  },
+  statistica_record: {
+    tip: "Record each response once, then check the total.",
+    strengthLine: "You recorded the data carefully today!",
+    focusLine: "Check each tally, table entry, or category once.",
+  },
+  statistica_display: {
+    tip: "Choose a display that makes the data easy to compare.",
+    strengthLine: "You represented the data clearly today!",
+    focusLine: "Match the display to the kind of data.",
+  },
+  statistica_interpret: {
+    tip: "Use the data evidence before making a conclusion.",
+    strengthLine: "You used data evidence well today!",
+    focusLine: "Point to the graph or table before answering.",
+  },
+  statistica_investigate: {
+    tip: "Ask, collect, represent, then interpret the data.",
+    strengthLine: "You followed the investigation process well!",
+    focusLine: "Work through the investigation steps in order.",
+  },
+  statistica_media: {
+    tip: "Check whether the evidence really supports the claim.",
+    strengthLine: "You critiqued the statistical evidence well!",
+    focusLine: "Compare the claim with the data shown.",
+  },
+
+  // Starpath — space and spatial reasoning
+  starpath_shape: {
+    tip: "Use the shape features, not its colour or size.",
+    strengthLine: "You reasoned about shapes clearly today!",
+    focusLine: "Check the sides, faces, edges, or vertices.",
+  },
+  starpath_position: {
+    tip: "Name the reference point before describing the position.",
+    strengthLine: "You used position language clearly today!",
+    focusLine: "Check where it is compared with the reference.",
+  },
+  starpath_map: {
+    tip: "Use the map key and location clues together.",
+    strengthLine: "You read the map evidence well today!",
+    focusLine: "Find the landmark first, then follow the clue.",
+  },
+  starpath_transform: {
+    tip: "Track what changes and what stays the same.",
+    strengthLine: "You handled transformations clearly today!",
+    focusLine: "Check the transformation rule before choosing.",
+  },
+  starpath_object: {
+    tip: "Use object features to justify your choice.",
+    strengthLine: "You reasoned about 3D objects clearly today!",
+    focusLine: "Check faces, edges, vertices, and surfaces.",
+  },
+
   // Number Nexus — money & time
   money: {
     tip: "Add coins by starting with the biggest one.",
@@ -338,6 +419,24 @@ const FALLBACK: SkillCoaching = {
 
 // Explicit lesson → coaching key (the lessons we control).
 const LESSON_KEY_MAP: Record<string, string> = {
+  "y3-chance-w1-l1": "chance_words",
+  "y3-chance-w1-l2": "chance_words",
+  "y3-chance-w1-l3": "chance_words",
+  "y3-chance-w2-l1": "chance_words",
+  "y3-chance-w2-l2": "chance_words",
+  "y3-chance-w2-l3": "chance_words",
+  "y3-chance-w3-l1": "chance_outcomes",
+  "y3-chance-w3-l2": "chance_outcomes",
+  "y3-chance-w3-l3": "chance_outcomes",
+  "y3-chance-w4-l1": "chance_prediction",
+  "y3-chance-w4-l2": "chance_prediction",
+  "y3-chance-w4-l3": "chance_prediction",
+  "y3-chance-w5-l1": "chance_variation",
+  "y3-chance-w5-l2": "chance_variation",
+  "y3-chance-w5-l3": "chance_variation",
+  "y3-chance-w6-l1": "chance_variation",
+  "y3-chance-w6-l2": "chance_variation",
+  "y3-chance-w6-l3": "chance_variation",
   "y0-measurement-w1-l1": "ml_prep_w1_l1",
   "y0-measurement-w1-l2": "ml_prep_w1_l2",
   "y0-measurement-w1-l3": "ml_prep_w1_l3",
@@ -501,6 +600,7 @@ function normalizeLessonId(lessonId: string): string {
 
 /** Resolve a coaching key from the lesson + its observed topics/skills. */
 export function resolveCoachingKey(input: {
+  realmId?: string | null;
   lessonId?: string | null;
   topicLabels?: string[];
   practisedSkills?: string[];
@@ -513,6 +613,34 @@ export function resolveCoachingKey(input: {
   const hay = [...(input.practisedSkills ?? []), ...(input.topicLabels ?? [])]
     .join(" ")
     .toLowerCase();
+
+  // ── Realm-specific fallbacks ──
+  if (input.realmId === "chance") {
+    if (/variation|trial|tally|experiment|result/.test(hay)) return "chance_variation";
+    if (/predict|prediction/.test(hay)) return "chance_prediction";
+    if (/outcome|possible/.test(hay)) return "chance_outcomes";
+    if (/chance|certain|impossible|likely|unlikely/.test(hay)) return "chance_words";
+    return "chance_words";
+  }
+
+  if (input.realmId === "statistics") {
+    if (/media|claim|misleading|critique|evidence/.test(hay)) return "statistica_media";
+    if (/investigat|ask|question|collect|survey/.test(hay)) return "statistica_investigate";
+    if (/infer|interpret|conclusion|compare|most|least|variation|range|mode|shape/.test(hay)) return "statistica_interpret";
+    if (/graph|display|represent|picture|column|line/.test(hay)) return "statistica_display";
+    if (/record|tally|table|frequency|list/.test(hay)) return "statistica_record";
+    if (/data|categor|numerical|nominal|ordinal|discrete|continuous/.test(hay)) return "statistica_collect";
+    return "statistica_interpret";
+  }
+
+  if (input.realmId === "space") {
+    if (/transform|translation|reflection|rotation|tessell/.test(hay)) return "starpath_transform";
+    if (/map|grid|coordinate|route|path|landmark|navigation/.test(hay)) return "starpath_map";
+    if (/position|location|above|below|beside|behind|reference|direction/.test(hay)) return "starpath_position";
+    if (/3d|object|solid|prism|net|cross-section|face|edge|vertex|vertices|surface/.test(hay)) return "starpath_object";
+    if (/shape|side|symmetry|parallel|composite/.test(hay)) return "starpath_shape";
+    return "starpath_shape";
+  }
 
   // ── Measurement (Measurelands) ──
   if (/balanc/.test(hay)) return "balance";

@@ -1335,6 +1335,7 @@ export function Year2LessonEngine({
       return (
         <LessonCoachReview
           review={buildCoachReview({
+            realmId,
             levelNumber,
             accuracy,
             topicSummaries: summary.topicSummaries,

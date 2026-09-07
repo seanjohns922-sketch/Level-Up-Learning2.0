@@ -8,6 +8,7 @@
  * realmId === "measurement" → Measurelands (brass / gold / violet / earth).
  * realmId === "space" → Starpath (violet / cyan / cosmic navy).
  * realmId === "pattern" → Pattern Peaks (emerald / violet / mountain dusk).
+ * realmId === "chance" → Chance Hollow (rose / amber / deep hollow).
  */
 
 export type RealmTheme = {
@@ -236,12 +237,48 @@ const PATTERN_PEAKS: RealmTheme = {
   confetti: ["#34d399", "#a78bfa", "#facc15", "#6ee7b7", "#c4b5fd"],
 };
 
+const CHANCE_HOLLOW: RealmTheme = {
+  ...NUMBER_NEXUS,
+  realmId: "chance",
+  ctaFrom: "#be3455",
+  ctaTo: "#fbbf24",
+  ctaHoverFrom: "#fb7185",
+  ctaHoverTo: "#fcd34d",
+  ctaGradientClass: "bg-gradient-to-r from-rose-600 via-pink-500 to-amber-400",
+  ctaHoverGradientClass: "hover:from-rose-500 hover:via-pink-400 hover:to-amber-300",
+  ctaGradientCss: "linear-gradient(135deg, #be3455 0%, #fb7185 58%, #fbbf24 100%)",
+  ctaShadow: "0 10px 30px -8px rgba(251,113,133,0.5)",
+  accentText: "#fb7185",
+  accentTextSoft: "rgba(255,228,230,0.88)",
+  borderRing: "rgba(251,113,133,0.34)",
+  surfaceTint: "rgba(251,113,133,0.10)",
+  haloA: "rgba(251,113,133,0.18)",
+  haloB: "rgba(251,191,36,0.14)",
+  haloC: "rgba(168,85,247,0.08)",
+  passRing: "#fbbf24",
+  passRingGlow: "#fb7185",
+  cardSurface: "linear-gradient(135deg, #17111b 0%, #3b1628 54%, #6b2d17 100%)",
+  cardInsetShadow: "inset 0 1px 0 rgba(251,191,36,0.18), inset 0 -10px 20px rgba(0,0,0,0.5)",
+  cardBorderTint: "rgba(251,191,36,0.18)",
+  chipBorder: "rgba(251,113,133,0.34)",
+  chipBg: "rgba(251,113,133,0.13)",
+  chipText: "#ffe4e6",
+  trophyGradient: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #fb7185 56%, #3b1628 100%)",
+  trophyShadow: "inset 0 0 8px rgba(255,228,230,0.52)",
+  statBorder: "rgba(251,191,36,0.24)",
+  statBg: "rgba(251,113,133,0.08)",
+  statLabel: "rgba(255,228,230,0.74)",
+  statIcon: "#fbbf24",
+  confetti: ["#fb7185", "#fbbf24", "#f472b6", "#a78bfa", "#ffe4e6"],
+};
+
 /** Pure resolver — safe in SSR, client, server components. */
 export function getRealmTheme(realmId?: string | null): RealmTheme {
   if (realmId === "measurement") return MEASURELANDS;
   if (realmId === "space") return STARPATH;
   if (realmId === "statistics") return STATISTICA;
   if (realmId === "pattern") return PATTERN_PEAKS;
+  if (realmId === "chance") return CHANCE_HOLLOW;
   return NUMBER_NEXUS;
 }
 
@@ -253,4 +290,4 @@ export function useRealmTheme(realmId?: string | null): RealmTheme {
   return getRealmTheme(realmId);
 }
 
-export const REALM_THEME_TOKENS = { NUMBER_NEXUS, MEASURELANDS, STARPATH, STATISTICA, PATTERN_PEAKS };
+export const REALM_THEME_TOKENS = { NUMBER_NEXUS, MEASURELANDS, STARPATH, STATISTICA, PATTERN_PEAKS, CHANCE_HOLLOW };

@@ -8,6 +8,7 @@ import { getSkillCoaching, resolveCoachingKey } from "@/lib/skill-coaching";
 type TopicSummary = { label: string; correct: number; total: number; accuracy: number };
 
 export type CoachReviewInput = {
+  realmId?: string | null;
   levelNumber?: number;
   accuracy: number;
   topicSummaries: TopicSummary[];
@@ -34,7 +35,7 @@ export function buildCoachReview(input: CoachReviewInput): CoachReview {
 
   const topicLabels = input.topicSummaries.map((t) => t.label);
   const coaching = getSkillCoaching(
-    resolveCoachingKey({ lessonId: input.lessonId, topicLabels, practisedSkills: input.practisedSkills })
+    resolveCoachingKey({ realmId: input.realmId, lessonId: input.lessonId, topicLabels, practisedSkills: input.practisedSkills })
   );
 
   // What you practised — prefer authored skills, else observed topics.
