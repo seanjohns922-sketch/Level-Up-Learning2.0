@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, CheckCircle, Compass, HelpCircle, Orbit, Sigma, Sparkles, Target } from "lucide-react";
+import { BarChart3, CheckCircle, Compass, Dices, HelpCircle, Orbit, Sigma, Sparkles, Target } from "lucide-react";
 
 export function LessonStatStrip({
   questionsAnswered,
@@ -17,29 +17,30 @@ export function LessonStatStrip({
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
-  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern;
+  const isChance = realmId === "chance";
+  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern || isChance;
 
   const stats = [
     {
-      label: isMeasurement || isStarpath || isPattern ? "Challenges" : isStatistics ? "Data Tasks" : "Questions",
+      label: isMeasurement || isStarpath || isPattern ? "Challenges" : isStatistics ? "Data Tasks" : isChance ? "Trials" : "Questions",
       value: questionsAnswered,
-      icon: isMeasurement ? Compass : isStarpath ? Orbit : isStatistics ? BarChart3 : isPattern ? Sigma : HelpCircle,
-      iconColor: isMeasurement ? "text-amber-300" : isStarpath ? "text-violet-200" : isStatistics ? "text-[#f2bc45]" : isPattern ? "text-emerald-300" : "text-cyan-300",
-      glow: isMeasurement ? "rgba(200,160,48,0.5)" : isStarpath ? "rgba(167,139,250,0.55)" : isStatistics ? "rgba(242,188,69,0.5)" : isPattern ? "rgba(52,211,153,0.5)" : "rgba(34,211,238,0.45)",
+      icon: isMeasurement ? Compass : isStarpath ? Orbit : isStatistics ? BarChart3 : isPattern ? Sigma : isChance ? Dices : HelpCircle,
+      iconColor: isMeasurement ? "text-amber-300" : isStarpath ? "text-violet-200" : isStatistics ? "text-[#f2bc45]" : isPattern ? "text-emerald-300" : isChance ? "text-rose-300" : "text-cyan-300",
+      glow: isMeasurement ? "rgba(200,160,48,0.5)" : isStarpath ? "rgba(167,139,250,0.55)" : isStatistics ? "rgba(242,188,69,0.5)" : isPattern ? "rgba(52,211,153,0.5)" : isChance ? "rgba(251,113,133,0.5)" : "rgba(34,211,238,0.45)",
     },
     {
-      label: isMeasurement || isStarpath || isStatistics || isPattern ? "Solved" : "Correct",
+      label: isMeasurement || isStarpath || isStatistics || isPattern || isChance ? "Solved" : "Correct",
       value: correctAnswers,
       icon: CheckCircle,
-      iconColor: isMeasurement ? "text-amber-200" : isStarpath ? "text-cyan-200" : isStatistics ? "text-[#8fbf7f]" : isPattern ? "text-emerald-200" : "text-emerald-300",
-      glow: isMeasurement ? "rgba(232,200,120,0.55)" : isStarpath ? "rgba(103,232,249,0.55)" : isStatistics ? "rgba(143,191,127,0.5)" : isPattern ? "rgba(52,211,153,0.55)" : "rgba(16,185,129,0.5)",
+      iconColor: isMeasurement ? "text-amber-200" : isStarpath ? "text-cyan-200" : isStatistics ? "text-[#8fbf7f]" : isPattern ? "text-emerald-200" : isChance ? "text-amber-200" : "text-emerald-300",
+      glow: isMeasurement ? "rgba(232,200,120,0.55)" : isStarpath ? "rgba(103,232,249,0.55)" : isStatistics ? "rgba(143,191,127,0.5)" : isPattern ? "rgba(52,211,153,0.55)" : isChance ? "rgba(251,191,36,0.5)" : "rgba(16,185,129,0.5)",
     },
     {
-      label: isMeasurement || isPattern ? "Mastery" : isStarpath ? "Mission Accuracy" : isStatistics ? "Data Accuracy" : "Accuracy",
+      label: isMeasurement || isPattern ? "Mastery" : isStarpath ? "Mission Accuracy" : isStatistics ? "Data Accuracy" : isChance ? "Chance Accuracy" : "Accuracy",
       value: `${accuracy}%`,
-      icon: isMeasurement || isStarpath || isStatistics || isPattern ? Sparkles : Target,
-      iconColor: isMeasurement ? "text-amber-200" : isStarpath ? "text-fuchsia-200" : isStatistics ? "text-[#f06b64]" : isPattern ? "text-violet-200" : "text-teal-200",
-      glow: isMeasurement ? "rgba(200,160,48,0.5)" : isStarpath ? "rgba(240,171,252,0.5)" : isStatistics ? "rgba(240,107,100,0.5)" : isPattern ? "rgba(124,58,237,0.5)" : "rgba(94,234,212,0.5)",
+      icon: isMeasurement || isStarpath || isStatistics || isPattern || isChance ? Sparkles : Target,
+      iconColor: isMeasurement ? "text-amber-200" : isStarpath ? "text-fuchsia-200" : isStatistics ? "text-[#f06b64]" : isPattern ? "text-violet-200" : isChance ? "text-pink-200" : "text-teal-200",
+      glow: isMeasurement ? "rgba(200,160,48,0.5)" : isStarpath ? "rgba(240,171,252,0.5)" : isStatistics ? "rgba(240,107,100,0.5)" : isPattern ? "rgba(124,58,237,0.5)" : isChance ? "rgba(251,113,133,0.52)" : "rgba(94,234,212,0.5)",
     },
   ];
 
@@ -51,6 +52,8 @@ export function LessonStatStrip({
         ? "linear-gradient(135deg, rgba(242,188,69,0.6) 0%, rgba(240,107,100,0.5) 50%, rgba(143,191,127,0.46) 100%)"
       : isPattern
         ? "linear-gradient(135deg, rgba(16,185,129,0.6) 0%, rgba(124,58,237,0.48) 50%, rgba(52,211,153,0.46) 100%)"
+      : isChance
+        ? "linear-gradient(135deg, rgba(251,113,133,0.62) 0%, rgba(251,191,36,0.38) 50%, rgba(34,211,238,0.36) 100%)"
       : "linear-gradient(135deg, rgba(94,234,212,0.45) 0%, rgba(15,118,110,0.25) 50%, rgba(94,234,212,0.35) 100%)";
 
   const plateBg = isMeasurement
@@ -61,6 +64,8 @@ export function LessonStatStrip({
         ? "linear-gradient(135deg, #17281f 0%, #2d4932 54%, #493821 100%)"
       : isPattern
         ? "linear-gradient(135deg, #0a110e 0%, #12261f 54%, #1b1638 100%)"
+      : isChance
+        ? "linear-gradient(135deg, #1f1220 0%, #351d2b 54%, #4b2a14 100%)"
       : "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)";
 
   const plateShadow = isMeasurement
@@ -71,9 +76,11 @@ export function LessonStatStrip({
         ? "inset 0 1px 0 rgba(255,240,199,0.2), inset 0 -8px 18px rgba(8,18,13,0.48)"
       : isPattern
         ? "inset 0 1px 0 rgba(167,243,208,0.2), inset 0 -8px 18px rgba(6,14,10,0.5)"
+      : isChance
+        ? "inset 0 1px 0 rgba(255,241,242,0.2), inset 0 -8px 18px rgba(18,10,24,0.5)"
       : "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 16px rgba(0,0,0,0.4)";
 
-  const labelColor = isMeasurement ? "rgba(240,210,150,0.75)" : isStarpath ? "rgba(207,250,254,0.88)" : isStatistics ? "rgba(255,240,199,0.86)" : isPattern ? "rgba(167,243,208,0.85)" : "rgba(94,234,212,0.8)";
+  const labelColor = isMeasurement ? "rgba(240,210,150,0.75)" : isStarpath ? "rgba(207,250,254,0.88)" : isStatistics ? "rgba(255,240,199,0.86)" : isPattern ? "rgba(167,243,208,0.85)" : isChance ? "rgba(255,228,230,0.86)" : "rgba(94,234,212,0.8)";
 
   return (
     <div className="grid grid-cols-3 gap-2.5">

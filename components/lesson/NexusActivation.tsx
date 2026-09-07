@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Braces, Equal, Hourglass, Cog, Timer, Scale, Ruler, Sigma, Star, Sparkles } from "lucide-react";
+import { Braces, CircleDot, Dices, Equal, Hourglass, Cog, Timer, Scale, Ruler, Sigma, Star, Sparkles } from "lucide-react";
 
 /**
  * The top-tier 10-combo celebration.
@@ -177,18 +177,46 @@ const PATTERN_THEME: RealmTheme = {
   particleSplit: 0.55,
 };
 
+const CHANCE_THEME: RealmTheme = {
+  flashBg: "radial-gradient(circle at 50% 50%, rgba(251,113,133,0.62) 0%, rgba(251,191,36,0.34) 40%, rgba(31,18,32,0) 75%)",
+  gridColor: "rgba(255,228,230,0.16)",
+  scanColor: "rgba(251,191,36,0.42)",
+  ringInner: "rgba(255,228,230,0.94)",
+  ringOuter: "rgba(251,113,133,0.66)",
+  ringShadow: "0 0 54px rgba(251,113,133,0.72), inset 0 0 26px rgba(251,191,36,0.42)",
+  cornerConic: "conic-gradient(from 45deg, rgba(251,113,133,0), rgba(251,113,133,0.76) 15%, rgba(251,191,36,0.58) 30%, rgba(34,211,238,0.32) 45%, rgba(251,113,133,0) 60%)",
+  titleGradient: "linear-gradient(180deg, #fff1f2 0%, #fb7185 42%, #fbbf24 100%)",
+  titleFilter: "drop-shadow(0 0 26px rgba(251,113,133,0.98)) drop-shadow(0 0 52px rgba(251,191,36,0.68))",
+  title: "FORTUNE FLOW",
+  engaged: "UNLOCKED",
+  engagedColor: "rgba(255,228,230,0.98)",
+  engagedShadow: "0 0 18px rgba(251,113,133,0.9), 0 0 36px rgba(251,191,36,0.62)",
+  dividerGradient: "linear-gradient(90deg, transparent, rgba(251,113,133,0.92), rgba(251,191,36,0.74), transparent)",
+  dividerShadow: "0 0 12px rgba(251,113,133,0.74)",
+  copy: "The wheel is spinning in your favour!",
+  copyColor: "rgba(255,228,230,0.94)",
+  copyShadow: "0 0 10px rgba(251,113,133,0.82)",
+  bottomText: "10 correct in a row - probability mastered",
+  bottomColor: "rgba(253,230,138,0.94)",
+  bottomShadow: "0 0 12px rgba(251,191,36,0.78)",
+  particleHues: [345, 42],
+  particleSplit: 0.55,
+};
+
 const MEASURE_GLYPHS = [Hourglass, Cog, Timer, Scale, Ruler];
 const STARPATH_GLYPHS = [Star, Sparkles];
 const PATTERN_GLYPHS = [Sigma, Braces, Equal];
+const CHANCE_GLYPHS = [Dices, CircleDot, Sparkles];
 
 export default function NexusActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
-  const t = isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : isPattern ? PATTERN_THEME : NEXUS_THEME;
-  const glyphSet = isMeasurement ? MEASURE_GLYPHS : isPattern ? PATTERN_GLYPHS : STARPATH_GLYPHS;
-  const glyphColorRgb = isStarpath ? "196,181,253" : isPattern ? "110,231,183" : "200,160,48";
+  const isChance = realmId === "chance";
+  const t = isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : isPattern ? PATTERN_THEME : isChance ? CHANCE_THEME : NEXUS_THEME;
+  const glyphSet = isMeasurement ? MEASURE_GLYPHS : isPattern ? PATTERN_GLYPHS : isChance ? CHANCE_GLYPHS : STARPATH_GLYPHS;
+  const glyphColorRgb = isStarpath ? "196,181,253" : isPattern ? "110,231,183" : isChance ? "251,191,36" : "200,160,48";
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);
@@ -201,11 +229,11 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
       setActive({ id: idRef.current });
       const timer = setTimeout(() => setActive(null), 2800);
       try {
-        window.dispatchEvent(new CustomEvent(isMeasurement ? "lul:legendary-activated" : isStatistics ? "lul:master-analyst-activated" : isPattern ? "lul:pattern-mastery-activated" : "lul:nexus-activated"));
+        window.dispatchEvent(new CustomEvent(isMeasurement ? "lul:legendary-activated" : isStatistics ? "lul:master-analyst-activated" : isPattern ? "lul:pattern-mastery-activated" : isChance ? "lul:fortune-flow-activated" : "lul:nexus-activated"));
       } catch {}
       return () => clearTimeout(timer);
     }
-  }, [comboCount, isMeasurement, isPattern, isStatistics]);
+  }, [comboCount, isChance, isMeasurement, isPattern, isStatistics]);
 
   const particles = useMemo(() => {
     if (!active) return [];
@@ -221,7 +249,7 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
   }, [active, t.particleHues, t.particleSplit]);
 
   const glyphs = useMemo(() => {
-    if (!active || (!isMeasurement && !isStarpath && !isPattern)) return [];
+    if (!active || (!isMeasurement && !isStarpath && !isPattern && !isChance)) return [];
     return Array.from({ length: 14 }, (_, i) => {
       const left = 5 + seeded(active.id * 61 + i) * 90;
       const delay = seeded(active.id * 67 + i) * 0.7;
@@ -229,7 +257,7 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
       const rot = (seeded(active.id * 73 + i) - 0.5) * 50;
       return { id: i, Icon: glyphSet[i % glyphSet.length], left, delay, size, rot };
     });
-  }, [active, isMeasurement, isPattern, isStarpath, glyphSet]);
+  }, [active, isChance, isMeasurement, isPattern, isStarpath, glyphSet]);
 
   if (!active) return null;
 
@@ -292,6 +320,12 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
           18% { opacity: 0.95; }
           78% { opacity: 0.6; }
           100% { opacity: 0; transform: translate(-50%, 0) translateY(-300px) scale(1.2) rotate(calc(var(--rot) * -1)); }
+        }
+        @keyframes fortuneWheelFinal {
+          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.28) rotate(-28deg); filter: blur(10px); }
+          16% { opacity: 1; transform: translate(-50%, -50%) scale(1.08) rotate(12deg); filter: blur(0); }
+          55% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.96) rotate(42deg); filter: blur(3px); }
         }
       `}</style>
 
@@ -363,6 +397,18 @@ export default function NexusActivation({ comboCount, realmId }: { comboCount: n
           }}
         />
       ))}
+
+      {isChance ? (
+        <img
+          src="/images/chance-hollow-streak-wheel-dice.png"
+          alt=""
+          className="absolute left-1/2 top-[42%] w-[min(54vw,500px)] max-w-[86vw]"
+          style={{
+            animation: "fortuneWheelFinal 2.75s cubic-bezier(0.22,1,0.36,1) forwards",
+            filter: "drop-shadow(0 0 32px rgba(251,113,133,0.58)) drop-shadow(0 0 52px rgba(251,191,36,0.42))",
+          }}
+        />
+      ) : null}
 
       {/* Particle burst */}
       {particles.map((p) => (

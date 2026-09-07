@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BarChart3, Compass, Orbit, Sigma, Zap } from "lucide-react";
+import { BarChart3, Compass, Dices, Orbit, Sigma, Zap } from "lucide-react";
 
 type ComboTier = "cold" | "spark" | "surge" | "overdrive" | "nexus";
 
@@ -226,15 +226,64 @@ const STATISTICS_TIER_CONFIG: typeof NEXUS_TIER_CONFIG = {
   },
 };
 
+const CHANCE_TIER_CONFIG: typeof NEXUS_TIER_CONFIG = {
+  cold: {
+    label: "CHANCE STREAK",
+    counterColor: "rgba(251,113,133,0.56)",
+    labelColor: "rgba(255,228,230,0.68)",
+    glowColor: "rgba(251,113,133,0.16)",
+    borderGradient: "linear-gradient(135deg, rgba(251,113,133,0.3), rgba(251,191,36,0.2), rgba(34,211,238,0.18))",
+    bgGradient: "linear-gradient(135deg, #1f1220 0%, #351d2b 58%, #4b2a14 100%)",
+    iconColor: "rgba(251,113,133,0.55)",
+  },
+  spark: {
+    label: "LUCKY ROLL",
+    counterColor: "rgba(251,113,133,1)",
+    labelColor: "rgba(255,228,230,1)",
+    glowColor: "rgba(251,113,133,0.58)",
+    borderGradient: "linear-gradient(135deg, rgba(251,113,133,0.72), rgba(251,191,36,0.42), rgba(251,113,133,0.55))",
+    bgGradient: "linear-gradient(135deg, #3a1428 0%, #6b1d3c 60%, #4b2a14 100%)",
+    iconColor: "rgba(255,228,230,1)",
+  },
+  surge: {
+    label: "SPINNER SURGE",
+    counterColor: "rgba(251,191,36,1)",
+    labelColor: "rgba(253,230,138,1)",
+    glowColor: "rgba(251,191,36,0.62)",
+    borderGradient: "linear-gradient(135deg, rgba(251,191,36,0.78), rgba(251,113,133,0.5), rgba(34,211,238,0.38))",
+    bgGradient: "linear-gradient(135deg, #3a2413 0%, #7c2d12 58%, #581c35 100%)",
+    iconColor: "rgba(253,230,138,1)",
+  },
+  overdrive: {
+    label: "FORTUNE STREAK",
+    counterColor: "rgba(34,211,238,1)",
+    labelColor: "rgba(207,250,254,0.98)",
+    glowColor: "rgba(34,211,238,0.66)",
+    borderGradient: "linear-gradient(135deg, rgba(34,211,238,0.75), rgba(251,113,133,0.62), rgba(251,191,36,0.55))",
+    bgGradient: "linear-gradient(135deg, #083344 0%, #5b2145 58%, #7c2d12 100%)",
+    iconColor: "rgba(207,250,254,1)",
+  },
+  nexus: {
+    label: "FORTUNE FLOW",
+    counterColor: "rgba(255,255,255,1)",
+    labelColor: "rgba(255,228,230,1)",
+    glowColor: "rgba(251,113,133,0.86)",
+    borderGradient: "linear-gradient(135deg, rgba(251,113,133,0.9), rgba(251,191,36,0.76), rgba(34,211,238,0.7))",
+    bgGradient: "linear-gradient(135deg, #6b1d3c 0%, #b45309 55%, #0e7490 100%)",
+    iconColor: "rgba(255,241,242,1)",
+  },
+};
+
 export function ComboCounter({ count, chainLabel, realmId }: { count: number; chainLabel?: string; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
+  const isChance = realmId === "chance";
   // Pattern Peaks reuses the green-family combo tiers (closest to its emerald
   // theme) with its own Sigma glyph.
-  const TIER_CONFIG = isMeasurement ? MEASUREMENT_TIER_CONFIG : isStarpath ? STARPATH_TIER_CONFIG : isStatistics || isPattern ? STATISTICS_TIER_CONFIG : NEXUS_TIER_CONFIG;
-  const IconCmp = isMeasurement ? Compass : isStarpath ? Orbit : isStatistics ? BarChart3 : isPattern ? Sigma : Zap;
+  const TIER_CONFIG = isMeasurement ? MEASUREMENT_TIER_CONFIG : isStarpath ? STARPATH_TIER_CONFIG : isStatistics || isPattern ? STATISTICS_TIER_CONFIG : isChance ? CHANCE_TIER_CONFIG : NEXUS_TIER_CONFIG;
+  const IconCmp = isMeasurement ? Compass : isStarpath ? Orbit : isStatistics ? BarChart3 : isPattern ? Sigma : isChance ? Dices : Zap;
   const prevCountRef = useRef(count);
   const [broken, setBroken] = useState(false);
   const [bump, setBump] = useState(false);
@@ -281,7 +330,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
       <div
         aria-hidden
         className="absolute -inset-[2px] pointer-events-none"
-        style={isMeasurement || isStarpath || isStatistics || isPattern ? {
+        style={isMeasurement || isStarpath || isStatistics || isPattern || isChance ? {
           borderRadius: 12,
           background: config.borderGradient,
           transition: "background 0.5s ease",
@@ -296,7 +345,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
       {/* Inner plate */}
       <div
         className="relative overflow-hidden px-3 py-2.5"
-        style={isMeasurement || isStarpath || isStatistics || isPattern ? {
+        style={isMeasurement || isStarpath || isStatistics || isPattern || isChance ? {
           borderRadius: 10,
           background: config.bgGradient,
           boxShadow:
@@ -306,7 +355,9 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
                 ? "inset 0 1px 0 rgba(200,160,48,0.12), inset 0 -8px 16px rgba(0,0,0,0.4)"
                 : isStarpath
                   ? "inset 0 1px 0 rgba(165,243,252,0.14), inset 0 -8px 18px rgba(2,6,23,0.48)"
-                  : "inset 0 1px 0 rgba(255,240,199,0.14), inset 0 -8px 18px rgba(8,18,13,0.48)",
+                  : isChance
+                    ? "inset 0 1px 0 rgba(255,241,242,0.14), inset 0 -8px 18px rgba(18,10,24,0.48)"
+                    : "inset 0 1px 0 rgba(255,240,199,0.14), inset 0 -8px 18px rgba(8,18,13,0.48)",
           transition: "background 0.5s ease, box-shadow 0.5s ease",
         } : {
           clipPath:
@@ -352,7 +403,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
             }}
           >
             {broken
-              ? (isMeasurement ? "STREAK LOST" : isStarpath ? "SIGNAL LOST" : isStatistics ? "TRAIL RESET" : "CHAIN BROKEN")
+              ? (isMeasurement ? "STREAK LOST" : isStarpath ? "SIGNAL LOST" : isStatistics ? "TRAIL RESET" : isChance ? "STREAK RESET" : "CHAIN BROKEN")
               : milestone ?? (activeTier === "cold" && chainLabel ? chainLabel : config.label)}
           </span>
           {activeTier !== "cold" && !broken && (

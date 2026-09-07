@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartColumn, Hourglass, Orbit, Sigma, Zap } from "lucide-react";
+import { ChartColumn, Dices, Hourglass, Orbit, Sigma, Zap } from "lucide-react";
 
 const XP_PER_CORRECT = 10;
 
@@ -31,7 +31,8 @@ export function LessonXPBar({
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
-  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern;
+  const isChance = realmId === "chance";
+  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern || isChance;
   const earned = mode === "progress" ? Math.max(0, currentValue ?? 0) : calcXP(correct ?? 0);
   const max = mode === "progress"
     ? Math.max(1, maxValue ?? 1)
@@ -46,6 +47,8 @@ export function LessonXPBar({
         ? (mode === "progress" ? "Investigation Progress" : "Data Progress")
       : isPattern
         ? (mode === "progress" ? "Explorer Progress" : "Pattern Progress")
+      : isChance
+        ? (mode === "progress" ? "Trial Progress" : "Chance Progress")
       : (mode === "progress" ? "Session Progress" : "Lesson Progress");
   const trailingLabel = rightLabel ?? defaultRight;
 
@@ -67,6 +70,9 @@ export function LessonXPBar({
         } : isPattern ? {
           borderRadius: 12,
           background: "linear-gradient(135deg, rgba(16,185,129,0.66) 0%, rgba(124,58,237,0.52) 52%, rgba(52,211,153,0.5) 100%)",
+        } : isChance ? {
+          borderRadius: 12,
+          background: "linear-gradient(135deg, rgba(251,113,133,0.66) 0%, rgba(251,191,36,0.36) 52%, rgba(34,211,238,0.38) 100%)",
         } : {
           clipPath:
             "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
@@ -94,6 +100,10 @@ export function LessonXPBar({
           borderRadius: 10,
           background: "linear-gradient(135deg, #0a110e 0%, #12261f 55%, #1b1638 100%)",
           boxShadow: "inset 0 1px 0 rgba(167,243,208,0.22), inset 0 -8px 18px rgba(6,14,10,0.5)",
+        } : isChance ? {
+          borderRadius: 10,
+          background: "linear-gradient(135deg, #1f1220 0%, #351d2b 55%, #4b2a14 100%)",
+          boxShadow: "inset 0 1px 0 rgba(255,241,242,0.2), inset 0 -8px 18px rgba(18,10,24,0.5)",
         } : {
           clipPath:
             "polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px)",
@@ -134,6 +144,10 @@ export function LessonXPBar({
               borderRadius: "50%",
               background: "radial-gradient(circle at 35% 30%, #6ee7b7 0%, #7c3aed 62%, #0a110e 100%)",
               boxShadow: "inset 0 0 6px rgba(167,243,208,0.55), 0 0 12px rgba(52,211,153,0.42)",
+            } : isChance ? {
+              borderRadius: "50%",
+              background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #fb7185 62%, #4c0519 100%)",
+              boxShadow: "inset 0 0 6px rgba(255,241,242,0.55), 0 0 12px rgba(251,113,133,0.42)",
             } : {
               clipPath:
                 "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
@@ -163,6 +177,11 @@ export function LessonXPBar({
                 className="h-4 w-4 text-emerald-50"
                 style={{ filter: "drop-shadow(0 0 4px rgba(52,211,153,0.9))" }}
               />
+            ) : isChance ? (
+              <Dices
+                className="h-4 w-4 text-rose-50"
+                style={{ filter: "drop-shadow(0 0 4px rgba(251,113,133,0.9))" }}
+              />
             ) : (
               <Zap
                 className="h-4 w-4 text-amber-50"
@@ -175,15 +194,15 @@ export function LessonXPBar({
               <span
                 className="text-xs font-mono font-extrabold uppercase tracking-[0.16em] md:text-sm"
                 style={{
-                  color: isMeasurement ? "#fceec1" : isStarpath ? "#cffafe" : isStatistics ? "#fff0c7" : isPattern ? "#d1fae5" : "#fef3c7",
-                  textShadow: isMeasurement ? "0 0 10px rgba(200,160,48,0.4)" : isStarpath ? "0 0 10px rgba(103,232,249,0.45)" : isStatistics ? "0 0 10px rgba(242,188,69,0.42)" : isPattern ? "0 0 10px rgba(52,211,153,0.42)" : "0 0 10px rgba(251,191,36,0.4)",
+                  color: isMeasurement ? "#fceec1" : isStarpath ? "#cffafe" : isStatistics ? "#fff0c7" : isPattern ? "#d1fae5" : isChance ? "#ffe4e6" : "#fef3c7",
+                  textShadow: isMeasurement ? "0 0 10px rgba(200,160,48,0.4)" : isStarpath ? "0 0 10px rgba(103,232,249,0.45)" : isStatistics ? "0 0 10px rgba(242,188,69,0.42)" : isPattern ? "0 0 10px rgba(52,211,153,0.42)" : isChance ? "0 0 10px rgba(251,113,133,0.42)" : "0 0 10px rgba(251,191,36,0.4)",
                 }}
               >
                 {leftLabel}
               </span>
               <span
                 className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] md:text-[11px]"
-                style={{ color: isMeasurement ? "rgba(240,210,150,0.78)" : isStarpath ? "rgba(196,181,253,0.92)" : isStatistics ? "rgba(255,217,213,0.9)" : isPattern ? "rgba(167,243,208,0.85)" : "rgba(153,246,228,0.7)" }}
+                style={{ color: isMeasurement ? "rgba(240,210,150,0.78)" : isStarpath ? "rgba(196,181,253,0.92)" : isStatistics ? "rgba(255,217,213,0.9)" : isPattern ? "rgba(167,243,208,0.85)" : isChance ? "rgba(253,230,138,0.84)" : "rgba(153,246,228,0.7)" }}
               >
                 {trailingLabel}
               </span>
@@ -200,6 +219,8 @@ export function LessonXPBar({
                       ? "inset 0 1px 2px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(242,188,69,0.2)"
                     : isPattern
                       ? "inset 0 1px 2px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(52,211,153,0.2)"
+                    : isChance
+                      ? "inset 0 1px 2px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(251,113,133,0.2)"
                     : "inset 0 1px 2px rgba(0,0,0,0.6), inset 0 -1px 0 rgba(94,234,212,0.1)",
               }}
             >
@@ -215,6 +236,8 @@ export function LessonXPBar({
                         ? "linear-gradient(90deg, #8fbf7f 0%, #f2bc45 50%, #f06b64 100%)"
                       : isPattern
                         ? "linear-gradient(90deg, #10b981 0%, #34d399 45%, #7c3aed 100%)"
+                      : isChance
+                        ? "linear-gradient(90deg, #fb7185 0%, #fbbf24 50%, #22d3ee 100%)"
                       : "linear-gradient(90deg, #fbbf24 0%, #f59e0b 40%, #34d399 100%)",
                   boxShadow: isMeasurement
                     ? "0 0 10px rgba(200,160,48,0.55)"
@@ -224,6 +247,8 @@ export function LessonXPBar({
                         ? "0 0 12px rgba(242,188,69,0.58)"
                       : isPattern
                         ? "0 0 12px rgba(52,211,153,0.58)"
+                      : isChance
+                        ? "0 0 12px rgba(251,113,133,0.58)"
                       : "0 0 10px rgba(251,191,36,0.6)",
                 }}
               />

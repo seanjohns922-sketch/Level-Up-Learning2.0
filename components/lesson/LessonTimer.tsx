@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartColumn, Hourglass, Orbit, Sigma, Timer } from "lucide-react";
+import { ChartColumn, Dices, Hourglass, Orbit, Sigma, Timer } from "lucide-react";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -19,7 +19,8 @@ export function LessonTimer({
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
-  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern;
+  const isChance = realmId === "chance";
+  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern || isChance;
   const clamped = Math.max(0, seconds);
   const minutes = Math.floor(clamped / 60);
   const remaining = clamped % 60;
@@ -137,8 +138,26 @@ export function LessonTimer({
     danger: nexusPalette.danger,
   } as const;
 
-  const palette = (isMeasurement ? measurementPalette : isStarpath ? starpathPalette : isStatistics ? statisticsPalette : isPattern ? patternPalette : nexusPalette)[state];
-  const IconCmp = isMeasurement ? Hourglass : isStarpath ? Orbit : isStatistics ? ChartColumn : isPattern ? Sigma : Timer;
+  const chancePalette = {
+    ok: {
+      bezel: "linear-gradient(135deg, rgba(251,113,133,0.62) 0%, rgba(251,191,36,0.42) 52%, rgba(34,211,238,0.36) 100%)",
+      bg: "linear-gradient(135deg, #1f1220 0%, #351d2b 55%, #4b2a14 100%)",
+      text: "text-rose-50",
+      icon: "text-amber-200",
+      glow: "rgba(251,113,133,0.52)",
+    },
+    warn: {
+      bezel: "linear-gradient(135deg, rgba(251,191,36,0.68) 0%, rgba(251,113,133,0.56) 100%)",
+      bg: "linear-gradient(135deg, #3a2413 0%, #582336 100%)",
+      text: "text-amber-100",
+      icon: "text-rose-200",
+      glow: "rgba(251,191,36,0.54)",
+    },
+    danger: nexusPalette.danger,
+  } as const;
+
+  const palette = (isMeasurement ? measurementPalette : isStarpath ? starpathPalette : isStatistics ? statisticsPalette : isPattern ? patternPalette : isChance ? chancePalette : nexusPalette)[state];
+  const IconCmp = isMeasurement ? Hourglass : isStarpath ? Orbit : isStatistics ? ChartColumn : isPattern ? Sigma : isChance ? Dices : Timer;
 
   return (
     <div className="relative inline-block min-w-[100px]">
@@ -166,6 +185,8 @@ export function LessonTimer({
                 ? "inset 0 1px 0 rgba(165,243,252,0.18), inset 0 -8px 16px rgba(2,6,23,0.48)"
                 : isPattern
                   ? "inset 0 1px 0 rgba(167,243,208,0.18), inset 0 -8px 16px rgba(6,14,10,0.5)"
+                : isChance
+                  ? "inset 0 1px 0 rgba(255,241,242,0.18), inset 0 -8px 16px rgba(18,10,24,0.5)"
                 : "inset 0 1px 0 rgba(255,240,199,0.18), inset 0 -8px 16px rgba(8,18,13,0.48)",
         } : {
           clipPath:

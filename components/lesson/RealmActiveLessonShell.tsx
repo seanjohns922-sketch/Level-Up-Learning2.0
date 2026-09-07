@@ -37,7 +37,12 @@ export function RealmActiveLessonShell({
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
   const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : realm === "pattern" ? "Challenge" : realm === "chance" ? "Trial" : "Mission";
-  const readText = `${lessonTitle}. ${focus ?? "Practise today's lesson skill."}`;
+  const learningStatement = focus
+    ? /^I\s+am\s+learning\s+to\b/i.test(focus)
+      ? focus
+      : `I am learning to ${focus}`
+    : null;
+  const readText = `${lessonTitle}. ${learningStatement ?? "Practise today's lesson skill."}`;
 
   return (
     <div className="relative isolate min-h-[calc(100vh-3rem)] text-white">
@@ -103,7 +108,7 @@ export function RealmActiveLessonShell({
             </div>
             {focus ? (
               <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 sm:text-base" style={{ color: theme.accentSoft }}>
-                {focus}
+                {learningStatement}
               </p>
             ) : null}
           </div>

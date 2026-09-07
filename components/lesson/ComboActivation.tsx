@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
-import { Braces, Equal, Hourglass, Cog, Timer, Scale, Ruler, Sigma, Star, Sparkles, Orbit } from "lucide-react";
+import { Braces, CircleDot, Dices, Equal, Hourglass, Cog, Timer, Scale, Ruler, Sigma, Star, Sparkles, Orbit } from "lucide-react";
 
 type GlyphIcon = ComponentType<{ className?: string; style?: React.CSSProperties }>;
 
@@ -251,6 +251,45 @@ const PATTERN_TIERS: TierConfig[] = [
   },
 ];
 
+const CHANCE_TIERS: TierConfig[] = [
+  {
+    threshold: 5,
+    title: "SPINNER SURGE",
+    engaged: "ROLLING",
+    subtitle: "5 in a row - chance is on your side!",
+    hues: [345, 42],
+    flashColor: "rgba(251,113,133,0.54)",
+    ringColor: "rgba(251,113,133,0.88)",
+    ringCount: 3,
+    particleCount: 30,
+    duration: 1.9,
+    cornerSize: 125,
+    titleGradient: "linear-gradient(180deg, #fff1f2 0%, #fb7185 48%, #be123c 100%)",
+    titleFilter: "drop-shadow(0 0 20px rgba(251,113,133,0.96)) drop-shadow(0 0 42px rgba(251,191,36,0.58))",
+    accentColor: "rgba(255,228,230,0.96)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(251,113,133,0.9), rgba(251,191,36,0.72), transparent)",
+    glyphs: [Dices, CircleDot, Sparkles],
+  },
+  {
+    threshold: 8,
+    title: "FORTUNE STREAK",
+    engaged: "SPINNING",
+    subtitle: "8 in a row - the wheel is heating up!",
+    hues: [42, 188],
+    flashColor: "rgba(251,191,36,0.56)",
+    ringColor: "rgba(251,191,36,0.9)",
+    ringCount: 4,
+    particleCount: 42,
+    duration: 2.3,
+    cornerSize: 150,
+    titleGradient: "linear-gradient(180deg, #fffbeb 0%, #fbbf24 46%, #fb7185 100%)",
+    titleFilter: "drop-shadow(0 0 22px rgba(251,191,36,0.96)) drop-shadow(0 0 46px rgba(251,113,133,0.72))",
+    accentColor: "rgba(253,230,138,0.98)",
+    dividerGradient: "linear-gradient(90deg, transparent, rgba(251,191,36,0.92), rgba(251,113,133,0.74), transparent)",
+    glyphs: [CircleDot, Dices, Sparkles],
+  },
+];
+
 type ActivationKey = { id: number; tier: TierConfig };
 
 export default function ComboActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
@@ -258,7 +297,8 @@ export default function ComboActivation({ comboCount, realmId }: { comboCount: n
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
-  const tiers = isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : isStatistics ? STATISTICS_TIERS : isPattern ? PATTERN_TIERS : NEXUS_TIERS;
+  const isChance = realmId === "chance";
+  const tiers = isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : isStatistics ? STATISTICS_TIERS : isPattern ? PATTERN_TIERS : isChance ? CHANCE_TIERS : NEXUS_TIERS;
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);
@@ -360,6 +400,12 @@ export default function ComboActivation({ comboCount, realmId }: { comboCount: n
           75% { opacity: 0.7; }
           100% { opacity: 0; transform: translate(-50%, 0) translateY(-240px) scale(1.15) rotate(calc(var(--rot) * -1)); }
         }
+        @keyframes chanceWheelPop {
+          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.35) rotate(-18deg); filter: blur(8px); }
+          18% { opacity: 1; transform: translate(-50%, -50%) scale(1.04) rotate(7deg); filter: blur(0); }
+          54% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.92) rotate(28deg); filter: blur(2px); }
+        }
       `}</style>
 
       {/* Colour flash */}
@@ -404,6 +450,18 @@ export default function ComboActivation({ comboCount, realmId }: { comboCount: n
           </span>
         );
       })}
+
+      {isChance ? (
+        <img
+          src="/images/chance-hollow-streak-wheel-dice.png"
+          alt=""
+          className="absolute left-1/2 top-[43%] w-[min(48vw,420px)] max-w-[82vw]"
+          style={{
+            animation: `chanceWheelPop ${(tier.duration + 0.12).toFixed(2)}s cubic-bezier(0.22,1,0.36,1) forwards`,
+            filter: "drop-shadow(0 0 28px rgba(251,113,133,0.52)) drop-shadow(0 0 44px rgba(251,191,36,0.36))",
+          }}
+        />
+      ) : null}
 
       {/* Shockwave rings */}
       {Array.from({ length: tier.ringCount }, (_, i) => (
@@ -464,8 +522,11 @@ export default function ComboActivation({ comboCount, realmId }: { comboCount: n
 
       {/* Main title lockup */}
       <div
-        className="absolute left-1/2 top-1/2 text-center"
-        style={{ animation: `comboTitleIn ${(tier.duration + 0.18).toFixed(2)}s cubic-bezier(0.22,1,0.36,1) forwards` }}
+        className="absolute left-1/2 text-center"
+        style={{
+          top: isChance ? "68%" : "50%",
+          animation: `comboTitleIn ${(tier.duration + 0.18).toFixed(2)}s cubic-bezier(0.22,1,0.36,1) forwards`,
+        }}
       >
         <div
           className="font-mono font-black uppercase leading-none"

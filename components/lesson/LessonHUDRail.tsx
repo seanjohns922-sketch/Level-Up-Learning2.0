@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Lightbulb } from "lucide-react";
+import { ChevronDown, Dices, Lightbulb } from "lucide-react";
 import { LessonXPBar } from "@/components/lesson/LessonXPBar";
 import { LessonTimer } from "@/components/lesson/LessonTimer";
 import { LessonStatStrip } from "@/components/lesson/LessonStatStrip";
@@ -57,6 +57,7 @@ export function LessonHUDRail({
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
+  const isChance = realmId === "chance";
 
   const showCrumb =
     typeof levelNumber === "number" &&
@@ -81,6 +82,9 @@ export function LessonHUDRail({
         } : isPattern ? {
           borderRadius: 18,
           background: "linear-gradient(135deg, rgba(16,185,129,0.62) 0%, rgba(124,58,237,0.5) 48%, rgba(52,211,153,0.5) 100%)",
+        } : isChance ? {
+          borderRadius: 18,
+          background: "linear-gradient(135deg, rgba(251,113,133,0.62) 0%, rgba(251,191,36,0.34) 48%, rgba(34,211,238,0.36) 100%)",
         } : {
           clipPath: "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
           background: "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
@@ -104,23 +108,29 @@ export function LessonHUDRail({
           borderRadius: 16,
           background: "linear-gradient(145deg, #0a110e 0%, #12261f 52%, #1b1638 100%)",
           boxShadow: "inset 0 1px 0 rgba(167,243,208,0.18), inset 0 -14px 28px rgba(6,14,10,0.55), 0 0 26px rgba(124,58,237,0.16)",
+        } : isChance ? {
+          borderRadius: 16,
+          background: "linear-gradient(145deg, #1f1220 0%, #351d2b 52%, #4b2a14 100%)",
+          boxShadow: "inset 0 1px 0 rgba(255,241,242,0.18), inset 0 -14px 28px rgba(18,10,24,0.55), 0 0 26px rgba(251,113,133,0.16)",
         } : {
           clipPath: "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
           background: "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
           boxShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
         }}
       >
-        {isStarpath || isStatistics || isPattern ? (
+        {isStarpath || isStatistics || isPattern || isChance ? (
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 opacity-30"
             style={{
               backgroundImage: isStatistics
                 ? "radial-gradient(circle, rgba(242,188,69,0.55) 1px, transparent 1.5px)"
+                : isChance
+                ? "radial-gradient(circle, rgba(251,191,36,0.46) 1px, transparent 1.5px), radial-gradient(circle, rgba(251,113,133,0.42) 1px, transparent 1.5px)"
                 : isPattern
                 ? "radial-gradient(circle, rgba(52,211,153,0.5) 1px, transparent 1.5px)"
                 : "radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1.4px)",
-              backgroundSize: isStatistics || isPattern ? "22px 22px" : "26px 26px",
+              backgroundSize: isStatistics || isPattern || isChance ? "22px 22px" : "26px 26px",
             }}
           />
         ) : null}
@@ -145,6 +155,10 @@ export function LessonHUDRail({
                 border: "1px solid rgba(52,211,153,0.38)",
                 background: "rgba(16,185,129,0.1)",
                 color: "#a7f3d0",
+              } : isChance ? {
+                border: "1px solid rgba(251,113,133,0.38)",
+                background: "rgba(251,113,133,0.12)",
+                color: "#ffe4e6",
               } : {
                 border: "1px solid rgba(94,234,212,0.3)",
                 background: "rgba(94,234,212,0.1)",
@@ -177,6 +191,10 @@ export function LessonHUDRail({
                 border: "1px solid rgba(124,58,237,0.4)",
                 background: "rgba(124,58,237,0.16)",
                 color: "#ddd6fe",
+              } : isChance ? {
+                border: "1px solid rgba(251,191,36,0.34)",
+                background: "rgba(251,191,36,0.1)",
+                color: "#fde68a",
               } : {
                   border: "1px solid rgba(110,231,183,0.3)",
                   background: "rgba(110,231,183,0.1)",
@@ -221,7 +239,7 @@ export function LessonHUDRail({
         {/* Combo chain counter */}
         <ComboCounter
           count={comboCount}
-          chainLabel={isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : isStatistics ? "DATA STREAK" : isPattern ? "PATTERN STREAK" : undefined}
+          chainLabel={isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : isStatistics ? "DATA STREAK" : isPattern ? "PATTERN STREAK" : isChance ? "CHANCE STREAK" : undefined}
           realmId={realmId}
         />
 
@@ -240,6 +258,10 @@ export function LessonHUDRail({
                 border: "1px solid rgba(52,211,153,0.32)",
                 background: hintOpen ? "rgba(16,185,129,0.12)" : "rgba(16,185,129,0.08)",
                 boxShadow: hintOpen ? "0 0 14px rgba(16,185,129,0.16)" : undefined,
+              } : isChance ? {
+                border: "1px solid rgba(251,191,36,0.32)",
+                background: hintOpen ? "rgba(251,113,133,0.14)" : "rgba(251,113,133,0.09)",
+                boxShadow: hintOpen ? "0 0 14px rgba(251,113,133,0.18)" : undefined,
               } : {
                 border: "1px solid rgba(251,191,36,0.3)",
                 background: "rgba(245,158,11,0.1)",
@@ -252,23 +274,27 @@ export function LessonHUDRail({
                   borderRadius: "50%",
                   background: "radial-gradient(circle at 35% 30%, #c8a030 0%, #4a3010 65%, #1a0e04 100%)",
                   boxShadow: "inset 0 0 4px rgba(200,160,48,0.6)",
+                } : isChance ? {
+                  borderRadius: "50%",
+                  background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #fb7185 62%, #4c0519 100%)",
+                  boxShadow: "inset 0 0 4px rgba(255,241,242,0.6), 0 0 10px rgba(251,113,133,0.35)",
                 } : {
                   clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
                   background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #b45309 65%, #451a03 100%)",
                   boxShadow: "inset 0 0 4px rgba(254,240,138,0.6)",
                 }}
               >
-                <Lightbulb className="h-3 w-3 text-amber-50" />
+                {isChance ? <Dices className="h-3 w-3 text-rose-50" /> : <Lightbulb className="h-3 w-3 text-amber-50" />}
               </span>
               <span
                 className="text-[10px] font-mono font-bold uppercase tracking-[0.2em]"
-                style={{ color: isMeasurement ? "rgba(240,210,150,0.85)" : "rgba(253,230,138,0.9)" }}
+                style={{ color: isChance ? "rgba(255,228,230,0.92)" : isMeasurement ? "rgba(240,210,150,0.85)" : "rgba(253,230,138,0.9)" }}
               >
-                {isMeasurement ? "Clue" : "Hint"}
+                {isMeasurement ? "Clue" : isChance ? "Chance Hint" : "Hint"}
               </span>
               <ChevronDown
                 className={`ml-auto h-3.5 w-3.5 transition-transform ${hintOpen ? "rotate-180" : ""}`}
-                style={{ color: isMeasurement ? "rgba(240,210,150,0.6)" : "rgba(253,230,138,0.7)" }}
+                style={{ color: isChance ? "rgba(255,228,230,0.72)" : isMeasurement ? "rgba(240,210,150,0.6)" : "rgba(253,230,138,0.7)" }}
               />
             </button>
             {hintOpen && (
@@ -279,6 +305,11 @@ export function LessonHUDRail({
                   background: "linear-gradient(135deg, #1a1304 0%, #2e1f05 100%)",
                   boxShadow: "inset 0 1px 0 rgba(200,160,48,0.15)",
                   color: "rgba(240,220,175,0.92)",
+                } : isChance ? {
+                  border: "1px solid rgba(251,113,133,0.24)",
+                  background: "linear-gradient(135deg, #211421 0%, #351d2b 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(255,241,242,0.12)",
+                  color: "rgba(255,241,242,0.95)",
                 } : {
                   border: "1px solid rgba(251,191,36,0.25)",
                   background: "linear-gradient(135deg, #1a1305 0%, #2e1f05 100%)",
