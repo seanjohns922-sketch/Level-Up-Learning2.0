@@ -43,23 +43,21 @@ const poolGen =
     };
   };
 
-const CERTAIN_IMPOSSIBLE = ["Certain", "Impossible"] as const;
-const LIKELY_UNLIKELY = ["Likely", "Unlikely"] as const;
 const FOUR_SCALE = ["Certain", "Likely", "Unlikely", "Impossible"] as const;
 
 // ─────────────────────────────── Week 1: Chance Words ───────────────────────
 const w1l1 = poolGen([
-  { prompt: "The sun will set this evening. Certain or impossible?", answer: "Certain", options: CERTAIN_IMPOSSIBLE, correct: "Yes. The sun sets every day, so it must happen.", wrong: "'Certain' means it must happen. The sun sets every single day.", visual: { type: "scale", highlight: "certain" } },
-  { prompt: "A cat will read a newspaper out loud. Certain or impossible?", answer: "Impossible", options: CERTAIN_IMPOSSIBLE, correct: "Right. Cats cannot read, so it can never happen.", wrong: "'Impossible' means it can never happen. Cats cannot read aloud.", visual: { type: "scale", highlight: "impossible" } },
-  { prompt: "You will get one year older on your next birthday. Certain or impossible?", answer: "Certain", options: CERTAIN_IMPOSSIBLE, correct: "Yes. Birthdays always add a year, so it must happen.", wrong: "This one must happen every birthday, so it is certain.", visual: { type: "scale", highlight: "certain" } },
-  { prompt: "You will draw a red counter from a bag with only blue counters. Certain or impossible?", answer: "Impossible", options: CERTAIN_IMPOSSIBLE, correct: "Correct. There are no red counters, so it can never happen.", wrong: "There are no red counters in the bag, so drawing red is impossible.", visual: { type: "bag", counters: [BLUE, BLUE, BLUE, BLUE, BLUE, BLUE] } },
+  { prompt: "The sun will set this evening. Certain or impossible?", answer: "Certain", options: FOUR_SCALE, correct: "Yes. The sun sets every day, so it must happen.", wrong: "'Certain' means it must happen. The sun sets every single day.", visual: { type: "scale", highlight: "certain" } },
+  { prompt: "A cat will read a newspaper out loud. Certain or impossible?", answer: "Impossible", options: FOUR_SCALE, correct: "Right. Cats cannot read, so it can never happen.", wrong: "'Impossible' means it can never happen. Cats cannot read aloud.", visual: { type: "scale", highlight: "impossible" } },
+  { prompt: "You will get one year older on your next birthday. Certain or impossible?", answer: "Certain", options: FOUR_SCALE, correct: "Yes. Birthdays always add a year, so it must happen.", wrong: "This one must happen every birthday, so it is certain.", visual: { type: "scale", highlight: "certain" } },
+  { prompt: "You will draw a red counter from a bag with only blue counters. Certain or impossible?", answer: "Impossible", options: FOUR_SCALE, correct: "Correct. There are no red counters, so it can never happen.", wrong: "There are no red counters in the bag, so drawing red is impossible.", visual: { type: "bag", counters: [BLUE, BLUE, BLUE, BLUE, BLUE, BLUE] } },
 ]);
 
 const w1l2 = poolGen([
-  { prompt: "The spinner lands on red. Likely or unlikely?", answer: "Likely", options: LIKELY_UNLIKELY, correct: "Yes. Most of the spinner is red, so red is likely.", wrong: "Three of the four parts are red, so landing on red is likely.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
-  { prompt: "The spinner lands on blue. Likely or unlikely?", answer: "Unlikely", options: LIKELY_UNLIKELY, correct: "Right. Only a small part is blue, so blue is unlikely.", wrong: "Only one of the four parts is blue, so blue is unlikely.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
-  { prompt: "You draw the one red counter from this bag. Likely or unlikely?", answer: "Unlikely", options: LIKELY_UNLIKELY, correct: "Yes. There is only one red among many, so it is unlikely.", wrong: "There is only one red counter and lots of blue, so red is unlikely.", visual: { type: "bag", counters: [BLUE, BLUE, BLUE, BLUE, BLUE, RED] } },
-  { prompt: "You roll a number less than 6 on one die. Likely or unlikely?", answer: "Likely", options: LIKELY_UNLIKELY, correct: "Yes. Five of the six numbers are less than 6, so it is likely.", wrong: "The numbers 1, 2, 3, 4 and 5 all work — five out of six — so it is likely.", visual: { type: "die", face: 4 } },
+  { prompt: "The spinner lands on red. Likely or unlikely?", answer: "Likely", options: FOUR_SCALE, correct: "Yes. Most of the spinner is red, so red is likely.", wrong: "Three of the four parts are red, so landing on red is likely.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
+  { prompt: "The spinner lands on blue. Likely or unlikely?", answer: "Unlikely", options: FOUR_SCALE, correct: "Right. Only a small part is blue, so blue is unlikely.", wrong: "Only one of the four parts is blue, so blue is unlikely.", visual: { type: "spinner", wedges: [RED, RED, RED, BLUE] } },
+  { prompt: "You draw the one red counter from this bag. Likely or unlikely?", answer: "Unlikely", options: FOUR_SCALE, correct: "Yes. There is only one red among many, so it is unlikely.", wrong: "There is only one red counter and lots of blue, so red is unlikely.", visual: { type: "bag", counters: [BLUE, BLUE, BLUE, BLUE, BLUE, RED] } },
+  { prompt: "You roll a number less than 6 on one die. Likely or unlikely?", answer: "Likely", options: FOUR_SCALE, correct: "Yes. Five of the six numbers are less than 6, so it is likely.", wrong: "The numbers 1, 2, 3, 4 and 5 all work — five out of six — so it is likely.", visual: { type: "die", face: 4 } },
 ]);
 
 const w1l3 = poolGen([

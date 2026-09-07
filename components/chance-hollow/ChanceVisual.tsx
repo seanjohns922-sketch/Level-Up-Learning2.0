@@ -110,8 +110,12 @@ const SCALE_STOPS: ReadonlyArray<{ key: string; label: string; colour: string }>
 ];
 
 function Scale({ highlight }: { highlight?: string }) {
+  // Wide horizontal padding so the end labels ("Impossible", "Certain") sit
+  // fully inside the viewBox instead of being clipped at the edges.
+  const x0 = 52;
+  const barW = 268;
   return (
-    <svg viewBox="0 0 320 70" width="320" height="70" role="img" aria-label="Likelihood scale">
+    <svg viewBox="0 0 372 72" width="360" height="70" style={{ maxWidth: "100%", height: "auto" }} role="img" aria-label="Likelihood scale">
       <defs>
         <linearGradient id="chance-scale" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0" stopColor="#dc2626" />
@@ -120,14 +124,14 @@ function Scale({ highlight }: { highlight?: string }) {
           <stop offset="1" stopColor="#16a34a" />
         </linearGradient>
       </defs>
-      <rect x={10} y={20} width={300} height={14} rx={7} fill="url(#chance-scale)" />
+      <rect x={x0} y={20} width={barW} height={14} rx={7} fill="url(#chance-scale)" />
       {SCALE_STOPS.map((s, i) => {
-        const x = 10 + (i / (SCALE_STOPS.length - 1)) * 300;
+        const x = x0 + (i / (SCALE_STOPS.length - 1)) * barW;
         const on = highlight === s.key;
         return (
           <g key={s.key}>
             <circle cx={x} cy={27} r={on ? 10 : 5} fill="#ffffff" stroke={s.colour} strokeWidth={on ? 4 : 2} />
-            <text x={x} y={54} textAnchor="middle" fontSize={11} fontWeight={on ? 900 : 600} fill={on ? INK : "#6b6280"}>{s.label}</text>
+            <text x={x} y={56} textAnchor="middle" fontSize={12} fontWeight={on ? 900 : 600} fill={on ? INK : "#6b6280"}>{s.label}</text>
           </g>
         );
       })}
