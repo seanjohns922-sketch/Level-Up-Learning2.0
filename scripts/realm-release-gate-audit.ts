@@ -66,7 +66,6 @@ for (const realm of liveRealms) {
   assert.equal(realm.isSelectable, true, `${realm.name} must be selectable when live.`);
   assert(realm.totalWeeks != null && realm.totalWeeks > 0, `${realm.name} needs a canonical week count.`);
   assert(realm.lessonsPerWeek != null && realm.lessonsPerWeek > 0, `${realm.name} needs a lessons-per-week contract.`);
-  assert(realm.hasWeeklyQuiz, `${realm.name} must declare its weekly-quiz contract.`);
   assert(isSharedWeeklyProgramRealm(realm.realmId), `${realm.name} is not connected to the shared weekly-program journey.`);
   assert(
     buildRealmProgramHref({ realmId: realm.realmId, year: realm.levelLabels[0], week: 1 }).startsWith("/program?"),
@@ -87,7 +86,7 @@ for (const realm of liveRealms) {
       assert(week.curriculum.length > 0, `${realm.name} ${yearLabel} Week ${week.week} needs curriculum descriptors.`);
     }
 
-    if (yearLabel !== "Prep") {
+    if (realm.hasWeeklyQuiz && yearLabel !== "Prep") {
       const pretest = getPretestForYearLabel(yearLabel, realm.realmId);
       const posttest = getPosttestForYearLabel(yearLabel, realm.realmId);
       if (!isRealmFirstLevel(realm.realmId, yearLabel)) {

@@ -91,10 +91,11 @@ const REALMS: RealmDef[] = [
     name: "Chance Hollow",
     legendLine: "Fortune Seekers",
     icon: <Dices className="h-5 w-5" />,
-    totalLegends: 7,
+    totalLegends: 1,
     status: "locked",
+    route: "/legends/chance-hollow",
     glowColor: "transparent",
-    borderGlow: "rgba(255,255,255,0.15)",
+    borderGlow: "rgba(251,113,133,0.58)",
   },
   {
     id: "reading-ridge",
@@ -137,6 +138,7 @@ export default function LegendsPage() {
   const [measureProgress] = useState<StudentProgress | null>(() => readProgress("measurement"));
   const [spaceProgress] = useState<StudentProgress | null>(() => readProgress("space"));
   const [patternProgress] = useState<StudentProgress | null>(() => readProgress("pattern"));
+  const [chanceProgress] = useState<StudentProgress | null>(() => readProgress("chance"));
   const demoPreview =
     useDemoPreviewMode() ||
     (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("teacher_preview") === "1");
@@ -181,6 +183,14 @@ export default function LegendsPage() {
     return all.filter((legend) => visibleIds.includes(legend.id)).length;
   }, [demoPreview, patternProgress]);
 
+  const chanceHollowCollected = useMemo(() => {
+    const all = getAllLegends("chance-hollow");
+    const visibleIds = demoPreview
+      ? all.map((legend) => legend.id)
+      : getEffectiveUnlockedLegendIds(chanceProgress?.year, chanceProgress?.unlockedLegends, "chance-hollow");
+    return all.filter((legend) => visibleIds.includes(legend.id)).length;
+  }, [chanceProgress, demoPreview]);
+
   const realms = useMemo(
     () =>
       REALMS.map((realm) =>
@@ -196,6 +206,7 @@ export default function LegendsPage() {
     measurelandsCollected +
     starpathCollected +
     patternPeaksCollected +
+    chanceHollowCollected +
     statisticaCollected;
   const totalLegends = demoPreview ? getAllLegends().length : realms.reduce((sum, r) => sum + r.totalLegends, 0);
   const pct = totalLegends > 0 ? Math.round((totalCollected / totalLegends) * 100) : 0;
@@ -309,6 +320,8 @@ export default function LegendsPage() {
                         ? starpathCollected
                       : realm.id === "pattern-peaks"
                         ? patternPeaksCollected
+                      : realm.id === "chance-hollow"
+                        ? chanceHollowCollected
                       : realm.id === "statistica"
                         ? statisticaCollected
                       : 0

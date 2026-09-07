@@ -5,12 +5,13 @@ import {
   getLiveRealmDefinitions,
   getRealmDefinition,
   isRealmFirstLevel,
+  type LiveRealmId,
 } from "@/lib/realms/realm-registry";
 
 type CurriculumRealmAvailability = {
   enabled: true;
-  progressRealmId: ProgressRealmScope;
-  destinationRealmId: ProgressRealmScope;
+  progressRealmId: LiveRealmId;
+  destinationRealmId: LiveRealmId;
   route: string;
 };
 

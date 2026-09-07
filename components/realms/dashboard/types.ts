@@ -90,7 +90,7 @@ export type RealmDashboardTheme = {
 };
 
 export type CanonicalRealmDashboardConfig = {
-  realmId: LegendRealmId | "starpath-realm" | "statistica" | "pattern-peaks";
+  realmId: LegendRealmId | "starpath-realm" | "statistica" | "pattern-peaks" | "chance-hollow";
   storageRealmId: ProgramRealmId;
   slug: string;
   displayName: string;

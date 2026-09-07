@@ -1,7 +1,7 @@
 "use client";
 
 import { YEAR_ORDER } from "@/data/yearOrder";
-import { type StudentProgress, writeProgress } from "@/data/progress";
+import { type ProgressRealmScope, type StudentProgress, writeProgress } from "@/data/progress";
 import { makeProgramProgressKey, readProgramStore, writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
 import {
   getActiveStudentIdentity,
@@ -12,7 +12,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 import { awardAndReveal } from "@/lib/gem-reveal";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
-import { getRealmDefinition, isLiveRealmId, type LiveRealmId } from "@/lib/realms/realm-registry";
+import { getRealmDefinition, isLiveRealmId } from "@/lib/realms/realm-registry";
 
 export type StudentProgressSnapshotRow = {
   realm_id?: string | null;
@@ -45,7 +45,7 @@ type StudentRuntimeContextRow = {
   last_name?: string | null;
 };
 
-export type StudentProgressRealmId = LiveRealmId;
+export type StudentProgressRealmId = ProgressRealmScope;
 
 function realmProgramKey(year: string, realmId: StudentProgressRealmId) {
   return `${year.toLowerCase().replace(/\s+/g, "")}-${getRealmDefinition(realmId).programSuffix}`;

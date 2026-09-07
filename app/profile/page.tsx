@@ -39,15 +39,15 @@ import {
 const MELBOURNE_TIME_ZONE = "Australia/Melbourne";
 
 const REALMS = [
-  { name: "Number Nexus", icon: BookOpen, status: "active" as const },
-  { name: "Measurelands", icon: BookOpen, status: "active" as const },
+  { name: "Number Nexus", icon: BookOpen, status: "active" as const, route: "/number-nexus", image: "/images/number-nexus-tile.jpg" },
+  { name: "Measurelands", icon: BookOpen, status: "active" as const, route: "/measurelands", image: "/images/measurelands-home-bg.png" },
+  { name: "Starpath Realm", icon: BookOpen, status: "active" as const, route: "/starpath", image: "/images/starpath-home-bg-y3.png" },
+  { name: "Statistica", icon: BookOpen, status: "active" as const, route: "/statistica", image: "/images/statistica-home-y3.jpeg" },
+  { name: "Pattern Peaks", icon: BookOpen, status: "active" as const, route: "/pattern-peaks", image: "/images/patternpeaks-home-bg-y3.jpeg" },
+  { name: "Chance Hollow", icon: BookOpen, status: "coming-soon" as const },
   { name: "Reading Ridge", icon: BookOpen, status: "coming-soon" as const },
   { name: "Inkwell Wilds", icon: BookOpen, status: "locked" as const },
   { name: "Runehaven Peaks", icon: BookOpen, status: "locked" as const },
-  { name: "Starpath Realm", icon: BookOpen, status: "locked" as const },
-  { name: "Statistica", icon: BookOpen, status: "locked" as const },
-  { name: "Chance Hollow", icon: BookOpen, status: "locked" as const },
-  { name: "Pattern Peaks", icon: BookOpen, status: "locked" as const },
 ];
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -56,10 +56,28 @@ const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
 const REALM_LABELS: Record<string, string> = {
   "number-nexus": "Number Nexus",
   measurelands: "Measurelands",
+  space: "Starpath Realm",
+  starpath: "Starpath Realm",
+  "starpath-realm": "Starpath Realm",
+  statistics: "Statistica",
+  statistica: "Statistica",
+  pattern: "Pattern Peaks",
+  "pattern-peaks": "Pattern Peaks",
+  chance: "Chance Hollow",
+  "chance-hollow": "Chance Hollow",
 };
 const REALM_ROUTES: Record<string, string> = {
   "number-nexus": "/number-nexus",
   measurelands: "/measurelands",
+  space: "/starpath",
+  starpath: "/starpath",
+  "starpath-realm": "/starpath",
+  statistics: "/statistica",
+  statistica: "/statistica",
+  pattern: "/pattern-peaks",
+  "pattern-peaks": "/pattern-peaks",
+  chance: "/chance-hollow",
+  "chance-hollow": "/chance-hollow",
 };
 
 const SOCIAL_TEASERS = [
@@ -620,7 +638,7 @@ export default function ProfilePage() {
                 {REALMS.map((realm) => {
                   const isActive = realm.status === "active";
                   const isComingSoon = realm.status === "coming-soon";
-                  const realmRoute = realm.name === "Measurelands" ? "/measurelands" : "/number-nexus";
+                  const realmRoute = realm.route ?? "/number-nexus";
                   return (
                     <div
                       key={realm.name}
@@ -634,7 +652,7 @@ export default function ProfilePage() {
                       {isActive ? (
                         <div
                           className="h-9 w-9 flex-shrink-0 rounded-md border border-[#E6E8EC] bg-cover bg-center"
-                          style={{ backgroundImage: `url('${realm.name === "Measurelands" ? "/images/measurelands-home-bg.png" : "/images/number-nexus-tile.jpg"}')` }}
+                          style={{ backgroundImage: `url('${realm.image ?? "/images/number-nexus-tile.jpg"}')` }}
                         />
                       ) : (
                         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md border border-[#E6E8EC] bg-[#F1F5F9]">

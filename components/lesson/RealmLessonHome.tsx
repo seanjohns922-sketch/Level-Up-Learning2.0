@@ -7,6 +7,7 @@ import {
   Flame,
   Gem,
   ChartNoAxesColumnIncreasing,
+  Dices,
   Medal,
   Play,
   Ruler,
@@ -21,8 +22,9 @@ import { getHomeBg } from "@/lib/levelBand";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { getStatisticaBackground } from "@/lib/statistica-visuals";
 import { getPatternPeaksBackground } from "@/lib/pattern-peaks-visuals";
+import { getChanceHollowBackground } from "@/lib/chance-hollow-visuals";
 
-export type RealmLessonThemeId = "number" | "measurement" | "statistics" | "pattern";
+export type RealmLessonThemeId = "number" | "measurement" | "statistics" | "pattern" | "chance";
 
 type RealmLessonHomeProps = {
   realm: RealmLessonThemeId;
@@ -166,12 +168,40 @@ export const REALM_LESSON_THEMES = {
     gridColor: "rgba(57,217,160,0.24)",
     ThemeIcon: Sigma,
   },
+  chance: {
+    realmName: "Chance Hollow",
+    experienceLabel: "Chance Trial",
+    startLabel: "Start Trial",
+    videoLabel: "Trial Briefing",
+    rewardLabel: "Trial Rewards",
+    completionLabel: "Trial Complete",
+    legendLabel: "Chanzia",
+    intro:
+      "Read the chance clues, name the possible outcomes, and test what happens across repeated trials.",
+    pageBg: "#17111b",
+    shellBg: "rgba(31, 18, 32, 0.97)",
+    panelBg: "rgba(52, 30, 42, 0.9)",
+    panelBorder: "rgba(251, 191, 36, 0.28)",
+    accent: "#fb7185",
+    accentSoft: "#fff7ed",
+    secondary: "#fbbf24",
+    heroOverlay:
+      "linear-gradient(90deg, rgba(24,14,30,0.98) 0%, rgba(64,35,48,0.84) 50%, rgba(64,35,48,0.22) 100%)",
+    backdropOverlay:
+      "linear-gradient(180deg, rgba(24,14,30,0.46), rgba(23,17,27,0.9))",
+    videoBg: "linear-gradient(135deg, #17111b 0%, #4a2638 52%, #9a3412 100%)",
+    buttonBg: "linear-gradient(90deg, #be3455, #fb7185 58%, #fbbf24)",
+    buttonShadow: "0 16px 40px rgba(251,113,133,0.24)",
+    gridColor: "rgba(251,191,36,0.22)",
+    ThemeIcon: Dices,
+  },
 } as const;
 
 export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: number, year: string) {
   if (realm === "number") return getHomeBg(levelNumber, year === "Prep");
   if (realm === "statistics") return getStatisticaBackground(`Year ${levelNumber}` as RealmLevelId);
   if (realm === "pattern") return getPatternPeaksBackground(`Year ${levelNumber}` as RealmLevelId);
+  if (realm === "chance") return getChanceHollowBackground(`Year ${levelNumber}` as RealmLevelId);
   if (year === "Prep") return "/images/measurelands-home-bg.png";
   return MEASURELANDS_BACKGROUNDS[levelNumber] ?? "/images/measurelands-home-bg.png";
 }

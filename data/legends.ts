@@ -3,8 +3,9 @@ export type LegendRealmId =
   | "measurelands"
   | "starpath"
   | "pattern-peaks"
+  | "chance-hollow"
   | "statistica";
-export type LegendStrand = "Number" | "Measurement" | "Space" | "Algebra" | "Statistics";
+export type LegendStrand = "Number" | "Measurement" | "Space" | "Algebra" | "Probability" | "Statistics";
 
 export type LegendStats = {
   calculation: number;
@@ -54,6 +55,11 @@ const DEFAULT_IMAGES: Record<LegendRealmId, LegendImages> = {
     avatar: "/cards/patternox-sequencer-y4-front.png",
     cardFront: "/cards/patternox-sequencer-y4-front.png",
     cardBack: "/cards/patternox-sequencer-y4-back.png",
+  },
+  "chance-hollow": {
+    avatar: "/cards/chanzia-spin-y3-front.png",
+    cardFront: "/cards/chanzia-spin-y3-front.png",
+    cardBack: "/cards/chanzia-spin-y3-back.png",
   },
   statistica: {
     avatar: "/cards/datara-analyst-y4-front.png",
@@ -202,6 +208,36 @@ function patternPeaksLegend(
     realmId: "pattern-peaks",
     yearLabel,
     strand: "Algebra",
+    name,
+    description,
+    stars,
+    stats,
+    images: {
+      avatar: front,
+      cardFront: front,
+      cardBack: back,
+    },
+    unlockVideoUrl: legendVideoUrl(videoSlug),
+    showcaseVideoUrl: legendVideoUrl(videoSlug),
+  };
+}
+
+function chanceHollowLegend(
+  id: string,
+  yearLabel: string,
+  name: string,
+  description: string,
+  stars: number,
+  stats: LegendStats,
+  front: string,
+  back: string,
+  videoSlug: string,
+): Legend {
+  return {
+    id,
+    realmId: "chance-hollow",
+    yearLabel,
+    strand: "Probability",
     name,
     description,
     stars,
@@ -492,6 +528,17 @@ const LEGENDS: Legend[] = [
     "/cards/patternox-codemaster-y6-back.png",
     "patternox-codemaster",
   ),
+  chanceHollowLegend(
+    "chanzia-spin-y3",
+    "Year 3",
+    "Chanzia Spin",
+    "Reads chance clues, lists possible outcomes, and notices how trial results can vary.",
+    3,
+    { calculation: 56, speed: 58, accuracy: 62 },
+    "/cards/chanzia-spin-y3-front.png",
+    "/cards/chanzia-spin-y3-back.png",
+    "chanzia-spin",
+  ),
   statisticaLegend(
     "datara-picker-y1",
     "Year 1",
@@ -566,6 +613,9 @@ export function normalizeLegendRealmId(realmId?: string | null): LegendRealmId {
   if (realmId === "pattern-peaks" || realmId === "pattern" || realmId === "algebra") {
     return "pattern-peaks";
   }
+  if (realmId === "chance-hollow" || realmId === "chance" || realmId === "probability") {
+    return "chance-hollow";
+  }
   if (realmId === "statistica" || realmId === "statistics") return "statistica";
   return "number-nexus";
 }
@@ -594,6 +644,8 @@ export function getLegendForYear(
             ? "Space"
             : realmId === "pattern-peaks"
               ? "Algebra"
+            : realmId === "chance-hollow"
+              ? "Probability"
             : realmId === "statistica"
               ? "Statistics"
               : "Number",

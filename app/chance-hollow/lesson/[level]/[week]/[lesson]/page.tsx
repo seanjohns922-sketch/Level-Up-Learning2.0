@@ -1,0 +1,52 @@
+import { notFound } from "next/navigation";
+import ChanceHollowLessonShell from "@/components/chance-hollow/ChanceHollowLessonShell";
+import { getChanceHollowProgramForYearLabel } from "@/data/programs/chanceHollow";
+
+type PageProps = {
+  params: Promise<{
+    level: string;
+    week: string;
+    lesson: string;
+  }>;
+};
+
+function parseInteger(value: string, minimum: number, maximum: number) {
+  if (!/^\d+$/.test(value)) return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= minimum && parsed <= maximum ? parsed : null;
+}
+
+function normalizeLevel(value: string) {
+  let decoded = value;
+  try {
+    decoded = decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+  const match = /^Year\s+3$/i.exec(decoded.replace(/\+/g, " ").trim());
+  return match ? { label: "Year 3", number: 3 } : null;
+}
+
+export default async function ChanceHollowLessonPage({ params }: PageProps) {
+  const resolved = await params;
+  const level = normalizeLevel(resolved.level);
+  const week = parseInteger(resolved.week, 1, 6);
+  const lessonNumber = parseInteger(resolved.lesson, 1, 3);
+  if (!level || !week || !lessonNumber) notFound();
+
+  const weekPlan = getChanceHollowProgramForYearLabel(level.label)?.find((candidate) => candidate.week === week);
+  const lesson = weekPlan?.lessons.find((candidate) => candidate.lesson === lessonNumber);
+
+  if (!weekPlan || !lesson) {
+    notFound();
+  }
+
+  return (
+    <ChanceHollowLessonShell
+      level={level.label}
+      levelNumber={level.number}
+      week={week}
+      lesson={lesson}
+    />
+  );
+}

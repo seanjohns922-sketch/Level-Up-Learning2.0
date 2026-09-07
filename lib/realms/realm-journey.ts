@@ -5,7 +5,7 @@ import {
 
 export function isSharedWeeklyProgramRealm(realmId: CanonicalRealmId) {
   const realm = getRealmDefinition(realmId);
-  return realm.totalWeeks != null && realm.lessonsPerWeek != null && realm.hasWeeklyQuiz;
+  return realm.totalWeeks != null && realm.lessonsPerWeek != null;
 }
 
 export function requireSharedWeeklyProgramRealm(value: string): CanonicalRealmId {

@@ -2,7 +2,7 @@ import { getStarpathLevelForYear } from "@/lib/starpath-levels";
 import { buildStarpathLessonHref } from "@/lib/starpath-routes";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
-export type StudentRealmId = LiveRealmId;
+export type StudentRealmId = LiveRealmId | "chance";
 
 function assertLessonRealmHandled(realmId: never): never {
   throw new Error(`Lesson routing is missing for live realm: ${realmId}`);
@@ -47,6 +47,8 @@ export function buildLessonId(input: {
       return `y${parseStudentYearNumber(normalizedYear)}-statistics-w${input.week}-l${input.lessonNumber}`;
     case "pattern":
       return `y${parseStudentYearNumber(normalizedYear)}-pattern-w${input.week}-l${input.lessonNumber}`;
+    case "chance":
+      return `y${parseStudentYearNumber(normalizedYear)}-chance-w${input.week}-l${input.lessonNumber}`;
     case "number":
       return `y${parseStudentYearNumber(normalizedYear)}-w${input.week}-l${input.lessonNumber}`;
     default:
@@ -74,6 +76,9 @@ export function buildLessonRoute(input: {
   }
   if (input.realmId === "pattern") {
     return `/pattern-peaks/lesson/${encodeURIComponent(normalizedYear)}/${input.week}/${input.lessonNumber}`;
+  }
+  if (input.realmId === "chance") {
+    return `/chance-hollow/lesson/${encodeURIComponent(normalizedYear)}/${input.week}/${input.lessonNumber}`;
   }
   const lessonId = buildLessonId(input);
   const realmParam = input.realmId === "measurement" ? `&realm_id=${encodeURIComponent("measurement")}` : "";

@@ -151,11 +151,11 @@ export const REALM_REGISTRY = {
     strand: "Probability",
     status: "coming_soon",
     isSelectable: false,
-    totalWeeks: null,
-    lessonsPerWeek: null,
+    totalWeeks: 6,
+    lessonsPerWeek: 3,
     hasWeeklyQuiz: false,
-    levelLabels: SCHOOL_LEVEL_LABELS,
-    legendCount: 7,
+    levelLabels: ["Year 3"],
+    legendCount: 1,
     legendCollectionName: "Fortune Seekers",
     iconKey: "Dices",
     themeKey: "chance",
@@ -270,11 +270,7 @@ export const REALM_REGISTRY = {
 
 export const CANONICAL_REALM_IDS = Object.keys(REALM_REGISTRY) as CanonicalRealmId[];
 
-export type LiveRealmId = {
-  [RealmId in CanonicalRealmId]: (typeof REALM_REGISTRY)[RealmId]["status"] extends "live"
-    ? RealmId
-    : never;
-}[CanonicalRealmId];
+export type LiveRealmId = "number" | "measurement" | "space" | "pattern" | "statistics";
 
 export type LiveRealmRegistryEntry = RealmRegistryEntry & {
   realmId: LiveRealmId;

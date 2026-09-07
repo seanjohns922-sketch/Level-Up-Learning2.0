@@ -9,6 +9,7 @@ import { YEAR5_MEASURELANDS_PROGRAM } from "./year5Measurelands";
 import { YEAR6_MEASURELANDS_PROGRAM } from "./year6Measurelands";
 import { getStatisticaProgramForYearLabel } from "./statistica";
 import { getPatternPeaksProgramForYearLabel } from "./patternPeaks";
+import { getChanceHollowProgramForYearLabel } from "./chanceHollow";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
 import { getStarpathLevelForYear } from "@/lib/starpath-levels";
 import { buildLessonRoute } from "@/lib/lesson-routing";
@@ -48,7 +49,7 @@ const ALL_GENRES: GenreCatalogEntry[] = [
   // Blueprint-only until lesson activities, quizzes and assessments are built.
   { id: "statistics",  strand: "Statistics",  realm: "Statistica",      unlocksFromLevel: 1 },
   { id: "algebra",     strand: "Algebra",     realm: "Pattern Peaks",   unlocksFromLevel: 3 },
-  { id: "probability", strand: "Probability", realm: "Chanzia",         unlocksFromLevel: 3 },
+  { id: "probability", strand: "Probability", realm: "Chance Hollow",   unlocksFromLevel: 3 },
 ];
 
 /** Genres visible for a given year. Number has real curriculum from Prep upward. */
@@ -241,6 +242,10 @@ export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[
 
   if (genreId === "algebra") {
     return getPatternPeaksProgramForYearLabel(yearLabel) ?? placeholderWeeks(yearLabel, genre);
+  }
+
+  if (genreId === "probability") {
+    return getChanceHollowProgramForYearLabel(yearLabel) ?? placeholderWeeks(yearLabel, genre);
   }
 
   return placeholderWeeks(yearLabel, genre);

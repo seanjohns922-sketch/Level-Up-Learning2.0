@@ -11,6 +11,7 @@ import {
 } from "@/lib/program-progress";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { resolveCanonicalNextActivity } from "@/lib/canonical-next-activity";
+import { isLiveRealmId } from "@/lib/realms/realm-registry";
 
 export type RealmWorldGateState = "locked" | "available" | "current" | "completed";
 
@@ -159,7 +160,7 @@ export function getRealmWorldState(input: {
     } satisfies RealmWorldWeekNode;
   }));
   const currentNode = weekNodes.find((node) => node.week === currentWeek) ?? weekNodes[0];
-  const canonicalNext = progress
+  const canonicalNext = progress && isLiveRealmId(input.realmId)
     ? resolveCanonicalNextActivity({ realmId: input.realmId, progress, store })
     : {
         label: currentNode.nextActivityType === "quiz" ? `Week ${currentWeek} Quiz` : `Week ${currentWeek} Lesson ${currentNode.lessonNumber ?? 1}`,

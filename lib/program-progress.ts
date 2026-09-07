@@ -113,6 +113,13 @@ export function isWeekComplete(p: WeekProgress): boolean {
   return weeklyQuizPassed(p.quizBestScore ?? p.quizScore ?? 0);
 }
 
+export function isWeekCompleteForRealm(p: WeekProgress, realmId: string = "number"): boolean {
+  if (normalizeRealmId(realmId) === "chance") {
+    return p.lessonsCompleted.slice(0, 3).every(Boolean);
+  }
+  return isWeekComplete(p);
+}
+
 export function normalizeWeekList(weeks: number[] | undefined | null, realmId?: string | null): number[] {
   if (!Array.isArray(weeks)) return [];
   const totalWeeks = getProgramWeeks(realmId).length;
@@ -147,7 +154,7 @@ export function getCompletedRequiredWeeks(
   teacherAdvancedWeeks: number[] = [],
 ): number[] {
   return normalizeWeekList(requiredWeeks, realmId).filter(
-    (week) => teacherAdvancedWeeks.includes(week) || isWeekComplete(getWeekProgress(store, year, week, realmId)),
+    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId),
   );
 }
 
@@ -161,7 +168,7 @@ export function hasCompletedRequiredWeeks(
   const normalized = normalizeWeekList(requiredWeeks, realmId);
   if (!normalized.length) return false;
   return normalized.every(
-    (week) => teacherAdvancedWeeks.includes(week) || isWeekComplete(getWeekProgress(store, year, week, realmId)),
+    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId),
   );
 }
 
@@ -176,7 +183,7 @@ export function getFirstIncompleteRequiredWeek(
   if (!normalized.length) return null;
   for (const week of normalized) {
     if (teacherAdvancedWeeks.includes(week)) continue;
-    if (!isWeekComplete(getWeekProgress(store, year, week, realmId))) return week;
+    if (!isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId)) return week;
   }
   return null;
 }

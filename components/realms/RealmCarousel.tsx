@@ -124,13 +124,15 @@ export default function RealmCarousel() {
   const isStarpathPreview = isStarpathRealm && starpathDemoActive;
   const isStatisticaRealm = current.id === "statistica";
   const isStatisticaPreview = isStatisticaRealm && (previewMode || DEMO_MODE);
+  const isChanceRealm = current.id === "chance-hollow";
+  const isChancePreview = isChanceRealm && (previewMode || DEMO_MODE);
   // A realm the class isn't focused on is locked while Focus Mode is engaged.
   const blockedByFocus = isRealmBlockedByFocus(focusLock, current.id);
   const focusRealm = focusLock ? realms.find((r) => tryCanonicalRealmId(r.id) === focusLock.focusRealmId) ?? null : null;
   const isActive =
-    (DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview || isStatisticaPreview) &&
+    (DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview || isStatisticaPreview || isChancePreview) &&
     !blockedByFocus;
-  const isPreviewRealm = previewMode && (current.id === "measurelands" || isStatisticaRealm);
+  const isPreviewRealm = previewMode && (current.id === "measurelands" || isStatisticaRealm || isChanceRealm);
   const prevIdx = (currentIndex - 1 + realms.length) % realms.length;
   const nextIdx = (currentIndex + 1) % realms.length;
   const bgShift = -2 + (currentIndex / realms.length) * 4;
@@ -167,6 +169,12 @@ export default function RealmCarousel() {
       setLastRealm(current.id);
       exitReviewMode();
       router.push(`/world/statistica?teacher_preview=1&level=${encodeURIComponent(displayedLevel)}`);
+      return;
+    }
+    if (isChancePreview) {
+      setLastRealm(current.id);
+      exitReviewMode();
+      router.push(`/chance-hollow?teacher_preview=1&level=${encodeURIComponent(displayedLevel)}`);
       return;
     }
 

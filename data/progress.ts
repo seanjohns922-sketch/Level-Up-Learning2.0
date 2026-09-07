@@ -26,7 +26,7 @@ export type StudentProgress = {
 
 export const STORAGE_KEY = "lul_student_progress_v1";
 export const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
-export type ProgressRealmScope = LiveRealmId;
+export type ProgressRealmScope = LiveRealmId | "chance";
 
 type ProgressCacheEnvelope = {
   student_id: string;

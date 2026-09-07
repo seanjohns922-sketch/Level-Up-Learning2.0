@@ -108,7 +108,7 @@ export async function resolveContinueLearningRoute() {
   const resumeRoute = resolveSavedResumeRoute(readActiveLearningDestination());
   const studentId = getCurrentStudentId();
   if (resumeRoute && studentId) {
-    const resumeRealm: ProgressRealmScope = progressRealmFromRoute(resumeRoute);
+    const resumeRealm = progressRealmFromRoute(resumeRoute);
     const restored = await restoreStudentStateFromServer(studentId, resumeRealm);
     if (!restored.progress) throw new Error("Canonical progress was not found for the saved activity");
     return resumeRoute;

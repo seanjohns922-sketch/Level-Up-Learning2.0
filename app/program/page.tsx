@@ -17,7 +17,7 @@ import {
   readProgramStore,
   getWeekProgress,
   hasCompletedRequiredWeeks,
-  isWeekComplete,
+  isWeekCompleteForRealm,
   isWeekPlayable,
   isFullRequiredPath,
   normalizeWeekList,
@@ -36,6 +36,7 @@ import {
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import { getStatisticaBackground } from "@/lib/statistica-visuals";
 import { getPatternPeaksBackground } from "@/lib/pattern-peaks-visuals";
+import { getChanceHollowBackground } from "@/lib/chance-hollow-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import {
   buildRealmProgramHref,
@@ -89,6 +90,7 @@ function ProgramPage() {
   const isStarpathRealm = realmId === "space";
   const isStatisticsRealm = realmId === "statistics";
   const isPatternRealm = realmId === "pattern";
+  const isChanceRealm = realmId === "chance";
   const starpathProgram = useMemo(
     () => (isStarpathRealm ? getStarpathWeekProgram(year) : null),
     [isStarpathRealm, year],
@@ -209,6 +211,52 @@ function ProgramPage() {
     focusColor: "text-emerald-200",
     dividerColor: "border-emerald-300/20",
     xpLabelColor: "text-emerald-100/90",
+  } : isChanceRealm ? {
+    rounded: true,
+    scanline: false,
+    cardClip: undefined as string | undefined,
+    bezelClip: undefined as string | undefined,
+    badgeClip: undefined as string | undefined,
+    statusClip: undefined as string | undefined,
+    actionClip: undefined as string | undefined,
+    connClip: undefined as string | undefined,
+    cardActiveBg: "linear-gradient(145deg, rgba(31,18,32,0.97), rgba(62,34,46,0.97) 58%, rgba(75,42,20,0.94))",
+    cardCompletedBg: "linear-gradient(145deg, rgba(118,38,58,0.98), rgba(101,67,20,0.95))",
+    cardLockedBg: "linear-gradient(145deg, rgba(31,18,32,0.9), rgba(45,33,43,0.84))",
+    bezelActiveBg: "linear-gradient(145deg, rgba(251,113,133,0.62), rgba(251,191,36,0.28) 48%, rgba(34,211,238,0.5))",
+    bezelCompletedBg: "linear-gradient(145deg, rgba(251,113,133,0.6), rgba(251,191,36,0.45))",
+    bezelLockedBg: "linear-gradient(145deg, rgba(251,113,133,0.18), rgba(251,191,36,0.14))",
+    bezelPosttestBg: "linear-gradient(145deg, rgba(251,191,36,0.7), rgba(251,113,133,0.48))",
+    cardActiveShadow: "0 12px 30px rgba(18,10,24,0.56), 0 0 18px rgba(251,113,133,0.16), inset 0 1px 0 rgba(255,241,242,0.16)",
+    cardCompletedShadow: "0 12px 30px rgba(18,10,24,0.52), 0 0 18px rgba(251,191,36,0.2), inset 0 1px 0 rgba(255,241,242,0.22)",
+    cardLockedShadow: "0 8px 20px rgba(18,10,24,0.46)",
+    badgeActiveBg: "linear-gradient(135deg, #be3455, #b45309)",
+    badgeCompletedBg: "linear-gradient(135deg, #be3455, #fb7185)",
+    badgeLockedBg: "linear-gradient(135deg, #1f2937, #4a2632)",
+    badgePosttestBg: "linear-gradient(135deg, #a16207, #be3455)",
+    badgeShadow: "inset 0 1px 0 rgba(255,241,242,0.28), 0 0 12px rgba(251,113,133,0.22)",
+    statusActiveBg: "linear-gradient(135deg, #be3455, #d97706)",
+    statusCompletedBg: "linear-gradient(135deg, #be3455, #fb7185)",
+    statusLockedBg: "linear-gradient(135deg, #1f2937, #4a2632)",
+    statusPosttestBg: "linear-gradient(135deg, #a16207, #be3455)",
+    statusShadow: "0 0 12px rgba(251,113,133,0.3)",
+    dotClass: "bg-rose-200 shadow-[0_0_8px_rgba(251,113,133,0.9)]",
+    actionActiveBg: "linear-gradient(135deg, #be3455, #fb7185 55%, #fbbf24)",
+    actionCompletedBg: "linear-gradient(135deg, #be3455, #b45309)",
+    actionPosttestBg: "linear-gradient(135deg, #a16207, #be3455)",
+    actionShadow: "0 0 18px rgba(251,113,133,0.34), 0 6px 16px rgba(18,10,24,0.5), inset 0 1px 0 rgba(255,241,242,0.28)",
+    connActiveBg: "radial-gradient(circle, #fbbf24, #fb7185 72%)",
+    connCompletedBg: "radial-gradient(circle, #ffe4e6, #be3455 72%)",
+    connShadow: "0 0 14px rgba(251,113,133,0.5)",
+    xpBg: "linear-gradient(90deg, #fb7185, #fbbf24 55%, #22d3ee)",
+    xpGlow: "0 0 14px rgba(251,113,133,0.58)",
+    pillBg: "linear-gradient(135deg, rgba(31,18,32,0.96), rgba(88,35,54,0.9), rgba(75,42,20,0.94))",
+    pillShadow: "inset 0 1px 0 rgba(255,241,242,0.22), 0 0 22px rgba(251,113,133,0.24)",
+    pillDot: "bg-rose-200 shadow-[0_0_9px_rgba(251,113,133,0.95)]",
+    headingGlow: "drop-shadow-[0_2px_16px_rgba(251,113,133,0.32)]",
+    focusColor: "text-rose-200",
+    dividerColor: "border-rose-300/20",
+    xpLabelColor: "text-rose-100/90",
   } : isStatisticsRealm ? {
     rounded: true,
     scanline: false,
@@ -565,13 +613,13 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    unrestrictedMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekComplete(prevProgress);
+    unrestrictedMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId);
 
   const lastAllowedWeek = useMemo(() => {
     if (unrestrictedMode || hasAssignedWeekAccess) return lastWeek;
     let allowed = 1;
     for (let w = 2; w <= lastWeek; w++) {
-      if (isWeekComplete(getWeekProgress(store, year, w - 1, realmId))) allowed = w;
+      if (isWeekCompleteForRealm(getWeekProgress(store, year, w - 1, realmId), realmId)) allowed = w;
       else break;
     }
     return allowed;
@@ -602,6 +650,7 @@ function ProgramPage() {
       { type: "lesson" as const, n: 2, title: lessons[1]?.displayTitle ?? lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.displayTitle ?? lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
     ];
+    if (isChanceRealm) return base;
     if (weekNum !== lastWeek) {
       base.push({
         type: "quiz" as const,
@@ -613,7 +662,7 @@ function ProgramPage() {
       base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Score 85%+ to unlock your Legend" });
     }
     return base;
-  }, [isStarpathRealm, lastWeek, program, starpathProgram, weekNum]);
+  }, [isChanceRealm, isStarpathRealm, lastWeek, program, starpathProgram, weekNum]);
 
   const currentWeekPlan = useMemo(() => {
     return program.find((w) => w.week === weekNum);
@@ -734,7 +783,7 @@ function ProgramPage() {
   }
 
   const lessonsDoneCount = progress.lessonsCompleted.filter(Boolean).length;
-  const weekComplete = isWeekComplete(progress);
+  const weekComplete = isWeekCompleteForRealm(progress, realmId);
 
   useEffect(() => {
     if (isStarpathRealm || !previewMode) return;
@@ -751,8 +800,8 @@ function ProgramPage() {
     if (nextWeek !== savedWeek) updateProgress({ assignedWeek: nextWeek }, canonicalRealmId);
   }, [canonicalRealmId, curriculumYear, hasPersonalizedPlan, isStarpathRealm, lastWeek, previewMode, realmId, store, weekComplete, weekNum]);
 
-  const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
-  const totalXp = 50;
+  const xp = lessonsDoneCount * 10 + (isChanceRealm ? 0 : progress.quizCompleted ? 20 : 0);
+  const totalXp = isChanceRealm ? 30 : 50;
   const percent = Math.round((xp / totalXp) * 100);
   const realmHomeRoute = isStarpathRealm && starpathProgram
     ? buildStarpathWorldHref({ selectedLevel: starpathProgram.definition.id })
@@ -762,6 +811,8 @@ function ProgramPage() {
       ? `/measurelands?level=${encodeURIComponent(curriculumYear)}`
     : isPatternRealm
       ? `/pattern-peaks?level=${encodeURIComponent(curriculumYear)}`
+    : isChanceRealm
+      ? `/chance-hollow?level=${encodeURIComponent(curriculumYear)}`
       : "/number-nexus";
 
   function goBackToMap() {
@@ -812,6 +863,8 @@ function ProgramPage() {
               ? getStatisticaBackground(curriculumYear as RealmLevelId)
               : isPatternRealm
               ? getPatternPeaksBackground(curriculumYear as RealmLevelId)
+              : isChanceRealm
+              ? getChanceHollowBackground(curriculumYear as RealmLevelId)
               : isMeasurementRealm
               ? isPrep
                 ? "/images/measurelands-home-bg.png"
@@ -839,6 +892,8 @@ function ProgramPage() {
               ? "brightness(0.82) contrast(1.08) saturate(1.12)"
               : isPatternRealm
               ? "brightness(0.82) contrast(1.1) saturate(1.1)"
+              : isChanceRealm
+              ? "brightness(0.82) contrast(1.12) saturate(1.14)"
               : isMeasurementRealm
               ? levelNum === 4
                 ? "brightness(0.90) contrast(1.16) saturate(1.05)"
@@ -846,8 +901,8 @@ function ProgramPage() {
               : isPrep
               ? "brightness(1.22) contrast(1.05) saturate(1.18)"
               : getHomeBgFilter(levelNum),
-            imageRendering: isMeasurementRealm || isStarpathRealm || isStatisticsRealm || isPatternRealm ? "auto" : undefined,
-            WebkitBackfaceVisibility: isMeasurementRealm || isStarpathRealm || isStatisticsRealm ? "hidden" : undefined,
+            imageRendering: isMeasurementRealm || isStarpathRealm || isStatisticsRealm || isPatternRealm || isChanceRealm ? "auto" : undefined,
+            WebkitBackfaceVisibility: isMeasurementRealm || isStarpathRealm || isStatisticsRealm || isChanceRealm ? "hidden" : undefined,
           }}
         />
         <div
@@ -1074,7 +1129,7 @@ function ProgramPage() {
                         const isUnlocked = unrestrictedMode || (hasAssignedWeekAccess ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
                         const isCurrent = targetWeek === weekNum;
                         const isRequiredWeek = requiredWeeks.includes(targetWeek);
-                        const isDoneWeek = isWeekComplete(getWeekProgress(store, year, targetWeek, realmId));
+                        const isDoneWeek = isWeekCompleteForRealm(getWeekProgress(store, year, targetWeek, realmId), realmId);
                         const status = hasPersonalizedPlan
                           ? isCurrent ? "Current" : isRequiredWeek ? isDoneWeek ? "Required Done" : "Required" : isDoneWeek ? "Optional Done" : requiredWeeksComplete ? "Optional" : "Locked"
                           : isCurrent ? "Current" : isUnlocked ? "Open" : "Locked";
@@ -1170,7 +1225,7 @@ function ProgramPage() {
               }}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${rt.pillDot}`} />
-              {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : isStatisticsRealm ? "Data Program" : isPatternRealm ? "Algebra Program" : "Program"}
+              {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : isStatisticsRealm ? "Data Program" : isPatternRealm ? "Algebra Program" : isChanceRealm ? "Probability Program" : "Program"}
             </div>
             <h1 className={`text-4xl md:text-5xl font-black text-white mt-3 tracking-tight ${rt.headingGlow}`}>Week {weekNum}</h1>
             <p className={`text-base md:text-lg mt-2 font-semibold ${isStatisticsRealm ? "text-[#fff4df]" : isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
@@ -1186,6 +1241,8 @@ function ProgramPage() {
               {weekUnlocked
                 ? weekComplete
                   ? "◆ Completed"
+                  : isChanceRealm
+                  ? `${lessonsDoneCount}/3 Lessons`
                   : `${lessonsDoneCount}/3 ${isStarpathRealm ? "Missions" : "Lessons"} · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : isStarpathRealm ? "Voyage Quiz Pending" : "Quiz Pending"}`
                 : "◆ Preview Locked"}
             </p>
@@ -1310,7 +1367,7 @@ function ProgramPage() {
                           </div>
                           <div className="mt-3 flex flex-wrap gap-2">
                             {requiredWeeks.map((requiredWeek) => {
-                              const done = isWeekComplete(getWeekProgress(store, year, requiredWeek, realmId));
+                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, requiredWeek, realmId), realmId);
                               const unlocked = playableWeeks.includes(requiredWeek) || done || requiredWeek === weekNum;
                               return (
                                 <button
@@ -1357,7 +1414,7 @@ function ProgramPage() {
                                 No optional weeks in this pathway.
                               </div>
                             ) : optionalWeeks.map((optionalWeek) => {
-                              const done = isWeekComplete(getWeekProgress(store, year, optionalWeek, realmId));
+                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, optionalWeek, realmId), realmId);
                               const optionalPlayable = requiredWeeksComplete || done;
                               return (
                                 <button
