@@ -323,6 +323,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "numberHunt",
   "groupCountVisual",
   "chanceSpinTally",
+  "chanceAutoTally",
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
@@ -420,7 +421,7 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
       ))
       && (assessmentTask.fixed ?? []).every((item) => isBoardCell(item.r, item.c));
   }
-  if (task.kind === "chanceSpinTally") {
+  if (task.kind === "chanceSpinTally" || task.kind === "chanceAutoTally") {
     return hasText(task.prompt)
       && Array.isArray(task.draw) && task.draw.length >= 2
       && Array.isArray(task.labels) && task.labels.length >= 2

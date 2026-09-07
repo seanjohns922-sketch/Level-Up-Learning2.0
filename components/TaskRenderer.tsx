@@ -206,6 +206,7 @@ import StarpathCrossSectionCard from "@/components/starpath/StarpathCrossSection
 import StarpathCartesianCard from "@/components/starpath/StarpathCartesianCard";
 import StarpathTessellationCard from "@/components/starpath/StarpathTessellationCard";
 import ChanceSpinTallyCard from "@/components/chance-hollow/ChanceSpinTallyCard";
+import ChanceAutoTallyCard from "@/components/chance-hollow/ChanceAutoTallyCard";
 import StatisticaCollectCard from "@/components/statistica/StatisticaCollectCard";
 import StatisticaClassifyCard from "@/components/statistica/StatisticaClassifyCard";
 import StatisticaConceptCard from "@/components/statistica/StatisticaConceptCard";
@@ -743,6 +744,8 @@ function TaskRendererInner({
       return <StarpathTessellationCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceSpinTally":
       return <ChanceSpinTallyCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "chanceAutoTally":
+      return <ChanceAutoTallyCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaCollect":
       return <StatisticaCollectCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaClassify":

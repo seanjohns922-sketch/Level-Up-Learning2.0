@@ -195,6 +195,18 @@ export type PracticeTask = (
       labels: { key: string; name: string; colour?: string }[];
     }
   | {
+      // Chance Hollow: auto-run a chance tool, watch it tally itself, then answer
+      // a question about the results. `compareTrials` runs the experiment twice
+      // to show variation.
+      kind: "chanceAutoTally";
+      prompt: string;
+      tool: "spinner" | "coin" | "die";
+      draw: string[];
+      spins: number;
+      labels: { key: string; name: string; colour?: string }[];
+      mode: "most" | "least" | "compareTrials";
+    }
+  | {
       kind: "order3";
       prompt: string;
       numbers: number[];

@@ -499,20 +499,38 @@ function makeSpinTallyTask(): PracticeTask {
 }
 const w5l2: Gen = makeSpinTallyTask;
 
-const w5l3 = poolGen([
-  { prompt: "Spin a 4-colour spinner 16 times. Red:5, Blue:2, Green:5, Yellow:4. Which tied for most?", answer: "Red and green", options: ["Red and green", "Blue and yellow", "Only red", "Green and yellow"], correct: "Right. Red and green both have 5 — the highest count.", wrong: "Look for the two highest equal counts: red and green each have 5.", visual: { type: "spinner", wedges: [RED, BLUE, GREEN, YELLOW] } },
-  { prompt: "Toss two coins in two groups. Group A: 6 heads. Group B: 6 heads. What can you say?", answer: "Both groups got the same number of heads", options: ["Both groups got the same number of heads", "Group A cheated", "Coins never match", "Group B was luckier"], correct: "Yes. Equal tallies mean the two groups matched this time.", wrong: "Both tallies are 6, so the groups got the same result.", visual: { type: "coin", face: "heads" } },
-  { prompt: "Roll a die 10 times. Tally — 6:0. What does a zero tally mean?", answer: "A 6 did not come up in these ten rolls", options: ["A 6 did not come up in these ten rolls", "A 6 is impossible", "The die is broken", "A 6 came up ten times"], correct: "Right. Zero means it just did not happen this time — not that it can't.", wrong: "A zero tally means it did not come up in these rolls, not that it is impossible.", visual: { type: "die", face: 6 } },
-  { prompt: "Roll a die 20 times. Tally — 3:7, and every other number fewer. Which came up most?", answer: "3", options: ["3", "6", "1", "They all tied"], correct: "Yes. 3 has the highest tally at 7.", wrong: "Find the biggest count: 3 has 7, more than any other number.", visual: { type: "die", face: 3 } },
-]);
+// Interactive: auto-run a chance tool, watch it tally itself, then interpret the
+// results. Tool varies each round. `compareTrials` runs the experiment twice to
+// show variation between trials.
+function makeAutoTallyTask(mode: "most" | "least" | "compareTrials", spins: number): PracticeTask {
+  const tool = choice(["spinner", "coin", "die"] as const);
+  let draw: string[];
+  let labels: { key: string; name: string; colour?: string }[];
+  if (tool === "coin") {
+    draw = ["heads", "tails"];
+    labels = [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }];
+  } else if (tool === "die") {
+    draw = ["1", "2", "3", "4", "5", "6"];
+    labels = [1, 2, 3, 4, 5, 6].map((face) => ({ key: String(face), name: String(face) }));
+  } else {
+    const chosen = shuffleArr(PAINTS).slice(0, randInt(3, 4));
+    const wedges: string[] = [];
+    for (const p of chosen) for (let i = 0, w = randInt(1, 2); i < w; i += 1) wedges.push(p.c);
+    draw = shuffleArr(wedges);
+    labels = chosen.map((p) => ({ key: p.c, name: p.name, colour: p.c }));
+  }
+  const action = tool === "coin" ? "flip" : tool === "die" ? "roll" : "spin";
+  const prompt = mode === "compareTrials"
+    ? `Run the same experiment twice: auto-${action} the ${tool} ${spins} times, twice. Then compare the two trials.`
+    : `Auto-${action} the ${tool} ${spins} times, then read the tally to answer.`;
+  return { kind: "chanceAutoTally", tool, draw, spins, labels, mode, prompt };
+}
+const w5l3: Gen = () => makeAutoTallyTask("most", 16);
 
 // ─────────────────────── Week 6: Variation Investigation ─────────────────────
-const w6l1 = poolGen([
-  { prompt: "Group A gets 4 heads out of 10. Group B gets 7 heads out of 10. What does this show?", answer: "Results can vary between repeated trials", options: ["Results can vary between repeated trials", "One group did it wrong", "Coins never land tails", "Heads is impossible"], correct: "Right. The same experiment can give different results each time.", wrong: "Both groups did it properly — chance results simply vary from trial to trial.", visual: { type: "coin", face: "heads" } },
-  { prompt: "You spin the same spinner twice: first red-heavy result, then blue-heavy. What is true?", answer: "The same experiment can turn out differently each time", options: ["The same experiment can turn out differently each time", "The spinner changed colours", "One result must be a mistake", "The spinner is broken"], correct: "Yes. Variation between trials is normal in chance.", wrong: "Nothing changed about the spinner — results just vary between trials.", visual: { type: "spinner", wedges: [RED, RED, BLUE, BLUE] } },
-  { prompt: "Two groups roll the same die 12 times and get different totals. What should you conclude?", answer: "Different results are normal — that is variation", options: ["Different results are normal — that is variation", "The dice are unfair", "Only one group can be right", "Someone must have miscounted"], correct: "Right. Different totals across trials is exactly what variation means.", wrong: "The same fair die can give different totals — that difference is variation.", visual: { type: "die", face: 4 } },
-  { prompt: "You draw from the same bag twice and get a different colour each time. What does this show?", answer: "The same experiment can give different results", options: ["The same experiment can give different results", "The bag swapped its counters", "One draw must be a mistake", "Draws must always match"], correct: "Right. Repeating a draw can give a different colour — that is variation.", wrong: "Nothing changed in the bag; different draws are just normal variation.", visual: { type: "bag", counters: [RED, RED, BLUE, BLUE] } },
-]);
+// Hands-on variation: run the SAME experiment twice and see the two trials
+// almost never match — that difference is variation.
+const w6l1: Gen = () => makeAutoTallyTask("compareTrials", 10);
 
 const w6l2 = poolGen([
   { prompt: "The whole class combines 100 tosses: Heads 52, Tails 48. What does this suggest?", answer: "Heads and tails are about equally likely", options: ["Heads and tails are about equally likely", "Heads always wins", "Tails is impossible", "The coin is unfair"], correct: "Yes. Over many tosses the counts get close to even — about 50/50.", wrong: "52 and 48 are very close, which suggests heads and tails are about equal.", visual: { type: "coin", face: "heads" } },
