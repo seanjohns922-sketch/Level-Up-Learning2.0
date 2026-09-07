@@ -166,7 +166,7 @@ export default function ChanceBuildFairCard({ task, onCorrect }: { task: Task; o
               </div>
             </div>
             <div className="rounded-lg border-2 p-3 text-center" style={{ borderColor: b!.colour, background: `${b!.colour}18` }}>
-              <Image src="/cards/chanzia-flick-y4-front.png" alt="Chanzia Flick, your Level 4 Chance Hollow opponent" width={160} height={224} className="mx-auto max-h-44 w-auto rounded-md object-contain shadow-lg" />
+              <Image src="/images/chanzia-flick-cutout.png" alt="Chanzia Flick, your Level 4 Chance Hollow opponent" width={220} height={263} className="mx-auto max-h-64 w-auto object-contain drop-shadow-[0_12px_12px_rgba(44,33,64,0.28)]" />
               <div className="mt-2 text-lg font-black text-[#2c2140]">Chanzia: <span className="capitalize">{b!.name}</span></div>
               <div className="mt-1 text-3xl font-black" style={{ color: b!.colour }}>{score[1]}</div>
             </div>
