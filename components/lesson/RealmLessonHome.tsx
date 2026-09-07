@@ -276,6 +276,7 @@ export type LessonConceptIntroData = {
   meaning: string;
   example: string;
   exampleExplanation: string;
+  chanceVisual?: ChanceVisualData;
   chanceModel?: {
     visual: ChanceVisualData;
     numerator: number;
@@ -340,6 +341,11 @@ export function LessonConceptIntro({
       <div className="mt-5 grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
         <div className="rounded-lg border border-white/10 bg-black/25 px-5 py-5 text-center text-2xl font-black text-white sm:text-3xl">
           <div>{conceptIntro.example}</div>
+          {conceptIntro.chanceVisual ? (
+            <div className="mt-6 flex justify-center border-t border-white/10 pt-5">
+              <ChanceVisual visual={conceptIntro.chanceVisual} variant="concept" />
+            </div>
+          ) : null}
           {conceptIntro.chanceModel ? (
             <div className="mt-6 flex flex-col items-center justify-center gap-5 border-t border-white/10 pt-5 sm:flex-row sm:gap-10">
               <ChanceVisual visual={conceptIntro.chanceModel.visual} variant="concept" />

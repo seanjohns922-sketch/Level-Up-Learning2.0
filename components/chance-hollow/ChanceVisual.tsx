@@ -123,6 +123,51 @@ function Die({ face }: { face: number }) {
   );
 }
 
+function DicePair({ left, right }: { left: number; right: number }) {
+  return (
+    <div className="flex items-center justify-center gap-2" role="img" aria-label={`Two dice showing ${left} and ${right}`}>
+      <Die face={left} />
+      <Die face={right} />
+    </div>
+  );
+}
+
+function DiceGrid({ mode, highlight }: { mode: "sum" | "difference"; highlight: number }) {
+  return (
+    <div className="grid grid-cols-6 gap-1" role="img" aria-label={`All two-dice ${mode} outcomes, highlighting ${highlight}`}>
+      {Array.from({ length: 36 }, (_, index) => {
+        const a = Math.floor(index / 6) + 1;
+        const b = (index % 6) + 1;
+        const value = mode === "sum" ? a + b : Math.abs(a - b);
+        const active = value === highlight;
+        return (
+          <div key={`${a}-${b}`} className={`grid h-9 w-9 place-items-center rounded-md border text-xs font-black ${active ? "border-fuchsia-400 bg-fuchsia-500 text-white shadow-[0_0_12px_rgba(217,70,239,0.42)]" : "border-violet-200 bg-white text-violet-950"}`}>
+            {a},{b}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function Frequency({ labels, counts, total }: { labels: string[]; counts: number[]; total: number }) {
+  const max = Math.max(...counts, 1);
+  return (
+    <div className="w-full max-w-md space-y-2" role="img" aria-label={`Frequency results from ${total} trials`}>
+      {labels.map((label, index) => (
+        <div key={`${label}-${index}`} className="grid grid-cols-[5rem_1fr_3rem] items-center gap-2 text-sm font-bold text-[#3a2f52]">
+          <span className="truncate text-right">{label}</span>
+          <div className="h-7 overflow-hidden rounded-md bg-violet-100">
+            <div className="h-full rounded-md bg-gradient-to-r from-fuchsia-500 to-cyan-400" style={{ width: `${Math.max(8, ((counts[index] ?? 0) / max) * 100)}%` }} />
+          </div>
+          <span className="font-mono text-base font-black">{counts[index] ?? 0}</span>
+        </div>
+      ))}
+      <div className="text-center text-xs font-black uppercase tracking-[0.14em] text-violet-500">{total} trials altogether</div>
+    </div>
+  );
+}
+
 function Bag({ counters }: { counters: string[] }) {
   return (
     <svg viewBox="0 0 150 150" width="150" height="150" role="img" aria-label="Bag of counters">
@@ -197,7 +242,10 @@ export default function ChanceVisual({
       {visual.type === "spinner" && <Spinner wedges={visual.wedges} large={concept} />}
       {visual.type === "coin" && <Coin face={visual.face} />}
       {visual.type === "die" && <Die face={visual.face} />}
+      {visual.type === "dicePair" && <DicePair left={visual.left} right={visual.right} />}
+      {visual.type === "diceGrid" && <DiceGrid mode={visual.mode} highlight={visual.highlight} />}
       {visual.type === "bag" && <Bag counters={visual.counters} />}
+      {visual.type === "frequency" && <Frequency labels={visual.labels} counts={visual.counts} total={visual.total} />}
       {visual.type === "scale" && <Scale highlight={visual.highlight} />}
       {legend && legend.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-3">

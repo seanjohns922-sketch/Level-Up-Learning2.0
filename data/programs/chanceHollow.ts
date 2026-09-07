@@ -1,7 +1,7 @@
 import { normalizeWeekPlans } from "./buildProgram";
 import type { CurriculumCode, Lesson, WeekPlan } from "./year1";
 
-export type ChanceHollowYearLabel = "Year 3" | "Year 4";
+export type ChanceHollowYearLabel = "Year 3" | "Year 4" | "Year 5";
 
 type ChanceWeekSeed = {
   topic: string;
@@ -88,6 +88,45 @@ const LEVEL_4_SEEDS: readonly ChanceWeekSeed[] = [
   },
 ];
 
+const LEVEL_5_SEEDS: readonly ChanceWeekSeed[] = [
+  {
+    topic: "Outcome Sets",
+    purpose: "List complete outcome sets and decide whether their outcomes are equally likely.",
+    curriculum: ["AC9M5P01"],
+    lessons: ["Choose the Outcome Lens", "List Every Outcome", "Equally Likely or Not?"],
+  },
+  {
+    topic: "Unequal Outcomes",
+    purpose: "Compare chance tools whose outcomes have equal or unequal chances.",
+    curriculum: ["AC9M5P01"],
+    lessons: ["Equal Regions, Equal Chances", "Unequal Regions, Unequal Chances", "Expose the Hidden Bias"],
+  },
+  {
+    topic: "Roller's Race",
+    purpose: "Use all two-dice combinations to explain why grouped outcomes may have different chances.",
+    curriculum: ["AC9M5P01"],
+    lessons: ["Two Dice, Many Pairs", "Differences Are Not Equal", "Repair the Race"],
+  },
+  {
+    topic: "Relative Frequency",
+    purpose: "Run repeated experiments and describe outcome frequencies as fractions of all trials.",
+    curriculum: ["AC9M5P02"],
+    lessons: ["Run and Record", "Frequency as a Fraction", "Compare Trial Runs"],
+  },
+  {
+    topic: "Evidence and Likelihood",
+    purpose: "Use chance-tool design and experimental frequency to estimate and compare likelihoods.",
+    curriculum: ["AC9M5P01", "AC9M5P02"],
+    lessons: ["Predict From the Design", "Estimate From Results", "Fair or Loaded?"],
+  },
+  {
+    topic: "Roller's Grand Trial",
+    purpose: "Plan, run and explain a repeated chance investigation using frequency evidence.",
+    curriculum: ["AC9M5P01", "AC9M5P02"],
+    lessons: ["Plan the Investigation", "Run the Investigation", "Defend the Verdict"],
+  },
+];
+
 function lessonFocus(seed: ChanceWeekSeed, title: string) {
   switch (title) {
     case "Certain or Impossible":
@@ -162,12 +201,46 @@ function lessonFocus(seed: ChanceWeekSeed, title: string) {
       return "run a chance trial and record the results.";
     case "Compare Expected and Actual":
       return "compare expected and actual chance results.";
+    case "Choose the Outcome Lens":
+      return "list outcomes that match the question being asked.";
+    case "List Every Outcome":
+      return "list every possible outcome once.";
+    case "Equally Likely or Not?":
+      return "decide whether all outcomes have the same chance.";
+    case "Equal Regions, Equal Chances":
+      return "connect equal regions and counts to equal chances.";
+    case "Unequal Regions, Unequal Chances":
+      return "explain how unequal regions or counts change chance.";
+    case "Expose the Hidden Bias":
+      return "use outcome counts to find a hidden advantage.";
+    case "Two Dice, Many Pairs":
+      return "organise all possible outcomes for two dice.";
+    case "Differences Are Not Equal":
+      return "compare how often different two-dice differences can occur.";
+    case "Repair the Race":
+      return "change race rules so both players have equal chances.";
+    case "Frequency as a Fraction":
+      return "write an outcome frequency as a fraction of all trials.";
+    case "Compare Trial Runs":
+      return "compare frequencies from repeated trials.";
+    case "Predict From the Design":
+      return "estimate likelihood by inspecting a chance tool.";
+    case "Estimate From Results":
+      return "use recorded frequencies to estimate likelihood.";
+    case "Fair or Loaded?":
+      return "use results to judge whether a tool may be biased.";
+    case "Plan the Investigation":
+      return "plan a fair repeated chance investigation.";
+    case "Run the Investigation":
+      return "run an investigation and record every result.";
+    case "Defend the Verdict":
+      return "use frequency evidence to defend a probability conclusion.";
     default:
       return seed.purpose.toLowerCase();
   }
 }
 
-function buildChanceProgram(level: 3 | 4, seeds: readonly ChanceWeekSeed[]): WeekPlan[] {
+function buildChanceProgram(level: 3 | 4 | 5, seeds: readonly ChanceWeekSeed[]): WeekPlan[] {
   const raw: WeekPlan[] = seeds.map((seed, weekIndex) => {
     const week = weekIndex + 1;
     return {
@@ -198,26 +271,29 @@ function buildChanceProgram(level: 3 | 4, seeds: readonly ChanceWeekSeed[]): Wee
   return normalizeWeekPlans(level, raw);
 }
 
-export const CHANCE_HOLLOW_PROGRAMS: Record<3 | 4, WeekPlan[]> = {
+export const CHANCE_HOLLOW_PROGRAMS: Record<3 | 4 | 5, WeekPlan[]> = {
   3: buildChanceProgram(3, LEVEL_3_SEEDS),
   4: buildChanceProgram(4, LEVEL_4_SEEDS),
+  5: buildChanceProgram(5, LEVEL_5_SEEDS),
 };
 
 export function getChanceHollowProgramForYearLabel(yearLabel: string): WeekPlan[] | null {
   if (yearLabel === "Year 3") return CHANCE_HOLLOW_PROGRAMS[3];
   if (yearLabel === "Year 4") return CHANCE_HOLLOW_PROGRAMS[4];
+  if (yearLabel === "Year 5") return CHANCE_HOLLOW_PROGRAMS[5];
   return null;
 }
 
 export const CHANCE_HOLLOW_META = {
   realm: "Chance Hollow",
   strand: "Probability",
-  levels: [3, 4] as const,
+  levels: [3, 4, 5] as const,
   weeks: 6,
   lessonsPerWeek: 3,
   curriculum: {
     3: ["AC9M3P01", "AC9M3P02"],
     4: ["AC9M4P01"],
+    5: ["AC9M5P01", "AC9M5P02"],
   },
   outcome: "Students describe chance events, list outcomes, compare likelihoods, use simple probability fractions, and discuss trial results.",
 } as const;

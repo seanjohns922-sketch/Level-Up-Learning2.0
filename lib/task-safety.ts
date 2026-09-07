@@ -327,6 +327,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "chanceBuildFair",
   "chanceCompare",
   "chancePredictCount",
+  "chanceDiceRace",
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
@@ -451,6 +452,21 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
       && Array.isArray(task.options) && task.options.length >= 2
       && new Set(task.options).size === task.options.length
       && task.options.includes(task.answer);
+  }
+  if (task.kind === "chanceDiceRace") {
+    const choiceIds = new Set(task.choices.map((choice) => choice.id));
+    return hasText(task.prompt)
+      && task.choices.length >= 2
+      && choiceIds.size === task.choices.length
+      && choiceIds.has(task.answerId)
+      && task.choices.every((choice) => hasText(choice.label)
+        && choice.playerDifferences.length > 0
+        && choice.chanziaDifferences.length > 0
+        && [...choice.playerDifferences, ...choice.chanziaDifferences].every((value) => Number.isInteger(value) && value >= 0 && value <= 5))
+      && hasText(task.opponentName)
+      && hasText(task.opponentImage)
+      && Number.isInteger(task.winningScore)
+      && task.winningScore >= 1;
   }
   if (task.kind !== "starpathObject") return true;
   const objectTask = task as StarpathObjectTask;

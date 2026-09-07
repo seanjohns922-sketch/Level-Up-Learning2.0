@@ -8,6 +8,7 @@ import { LessonConceptIntro, RealmLessonHome, type LessonConceptIntroData } from
 import { createRandomRealmLessonGenerator, type RealmLessonTaskGenerator } from "@/data/activities/realm-lesson-blueprint";
 import { getChanceHollowLevel3TaskSet } from "@/data/activities/chanceHollow/level3";
 import { getChanceHollowLevel4TaskSet } from "@/data/activities/chanceHollow/level4";
+import { getChanceHollowLevel5TaskSet } from "@/data/activities/chanceHollow/level5";
 import type { Lesson } from "@/data/programs/year1";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
@@ -18,7 +19,64 @@ import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEn
 
 type Phase = "home" | "concept" | "active";
 
-function conceptFor(levelNumber: number, week: number, lesson: Lesson): LessonConceptIntroData {
+function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
+  if (levelNumber === 5) {
+    if (week === 1) return {
+      term: "outcome set",
+      title: "The question decides which outcomes we list",
+      meaning: "An outcome set lists every distinct result that answers the investigation question, with no omissions or repeats.",
+      example: "For a card draw, colour has 2 outcomes, suit has 4 outcomes, and exact card has 52 outcomes.",
+      exampleExplanation: "The same experiment can have different outcome sets because the recorded feature changes.",
+      chanceVisual: { type: "bag", counters: ["#ef5b62", "#ef5b62", "#3b82f6", "#22d3ee", "#22d3ee", "#22d3ee"] },
+    };
+    if (week === 2) return {
+      term: "unequally likely",
+      title: "Possible does not always mean equally likely",
+      meaning: "Outcomes are unequally likely when they occupy different numbers of equal regions, faces, cards or counters.",
+      example: "A spinner with 4 pink regions and 2 cyan regions is more likely to land on pink.",
+      exampleExplanation: "Pink has more winning regions, so it has more ways to occur.",
+      chanceVisual: { type: "spinner", wedges: ["#d946ef", "#d946ef", "#d946ef", "#d946ef", "#22d3ee", "#22d3ee"] },
+    };
+    if (week === 3) return {
+      term: "grouped outcomes",
+      title: "Grouped results can hide different chances",
+      meaning: "When two dice are rolled, each ordered pair is equally likely but grouped sums or differences may contain different numbers of pairs.",
+      example: "A difference of 1 can occur in 10 ordered pairs, while a difference of 5 can occur in only 2.",
+      exampleExplanation: "Counting the full 6 by 6 outcome grid reveals the hidden odds.",
+      chanceVisual: { type: "diceGrid", mode: "difference", highlight: 1 },
+    };
+    if (week === 4) return {
+      term: "relative frequency",
+      title: "Frequency compares a result with all trials",
+      meaning: "Relative frequency records how many times an outcome occurred out of the total number of repeated trials.",
+      example: "If cyan occurs 7 times in 20 spins, its relative frequency is 7 out of 20.",
+      exampleExplanation: "The outcome count is the numerator and all completed trials form the denominator.",
+      chanceModel: {
+        visual: { type: "frequency", labels: ["Cyan", "Other"], counts: [7, 13], total: 20 },
+        numerator: 7,
+        denominator: 20,
+        winningLabel: "7 cyan results",
+        totalLabel: "20 completed trials",
+      },
+    };
+    if (week === 5) return {
+      term: "frequency evidence",
+      title: "Results help us estimate likelihood",
+      meaning: "Repeated results provide evidence about likelihood, but one experiment does not make a future outcome certain.",
+      example: "If one die face appears far more often than the others, investigators test again and consider whether the die is biased.",
+      exampleExplanation: "A careful verdict describes the evidence without claiming absolute proof.",
+      chanceVisual: { type: "frequency", labels: ["1", "2", "3", "4", "5", "6"], counts: [3, 4, 3, 4, 3, 19], total: 36 },
+    };
+    return {
+      term: "chance investigation",
+      title: "A strong investigation connects design, trials and evidence",
+      meaning: "Plan a repeatable method, record every outcome, compare relative frequencies and make a conclusion supported by the results.",
+      example: "Predict from the tool, run the same procedure many times, then explain what the frequencies show.",
+      exampleExplanation: "The conclusion must answer the original question and stay within the collected evidence.",
+      chanceVisual: { type: "dicePair", left: 3, right: 5 },
+    };
+  }
+
   if (levelNumber === 4) {
     if (week <= 2) {
       return {
@@ -91,6 +149,30 @@ function conceptFor(levelNumber: number, week: number, lesson: Lesson): LessonCo
 }
 
 function successCriteriaFor(levelNumber: number, week: number, lessonNumber: number): string[] {
+  if (levelNumber === 5) {
+    const criteria: Record<string, string[]> = {
+      "1-1": ["match outcomes to the question", "separate outcomes from details", "explain why the outcome set changes"],
+      "1-2": ["list every possible outcome", "include each outcome once", "check that the list is complete"],
+      "1-3": ["identify equally likely outcomes", "identify unequally likely outcomes", "use counts as evidence"],
+      "2-1": ["connect equal regions to equal chance", "compare equal outcome counts", "explain why the tool is fair"],
+      "2-2": ["find the outcome with more chance", "compare unequal counts or regions", "explain the likelihood difference"],
+      "2-3": ["spot a hidden advantage", "use outcome counts as evidence", "describe how the design is biased"],
+      "3-1": ["organise all 36 dice pairs", "count pairs for a grouped result", "check that no pair is missing"],
+      "3-2": ["compare two-dice differences", "count how many pairs make each difference", "explain why the chances differ"],
+      "3-3": ["find unfair race rules", "group 18 pairs for each racer", "test the repaired game"],
+      "4-1": ["run the same experiment repeatedly", "record every outcome", "check the total frequency"],
+      "4-2": ["write frequency as a fraction", "use outcome count as the numerator", "use total trials as the denominator"],
+      "4-3": ["compare repeated trial results", "describe frequency variation", "explain why fair trials can differ"],
+      "5-1": ["predict from the tool design", "compare target shares", "explain which outcome should occur more"],
+      "5-2": ["estimate likelihood from frequency", "compare frequencies with different totals", "support my estimate with evidence"],
+      "5-3": ["identify suspicious frequency patterns", "compare fair and loaded results", "make a cautious evidence-based verdict"],
+      "6-1": ["write a testable chance question", "choose a consistent procedure", "plan how every result will be recorded"],
+      "6-2": ["predict before testing", "run and record repeated trials", "calculate each relative frequency"],
+      "6-3": ["answer the investigation question", "defend my conclusion with frequency evidence", "complete the fair race against Roller"],
+    };
+    return criteria[`${week}-${lessonNumber}`] ?? ["list the possible outcomes", "record repeated results", "explain my conclusion with evidence"];
+  }
+
   if (levelNumber === 4) {
     const criteria: Record<string, string[]> = {
       "1-1": [
@@ -317,6 +399,8 @@ export default function ChanceHollowLessonShell({
         ? getChanceHollowLevel3TaskSet(lesson.id)
         : levelNumber === 4
           ? getChanceHollowLevel4TaskSet(lesson.id)
+          : levelNumber === 5
+            ? getChanceHollowLevel5TaskSet(lesson.id)
           : null;
     return taskSet ? createRandomRealmLessonGenerator(taskSet) : null;
   });
@@ -394,7 +478,7 @@ export default function ChanceHollowLessonShell({
   }, [lesson.id, lesson.lesson, level, week]);
 
   const successCriteria = successCriteriaFor(levelNumber, week, lesson.lesson);
-  const conceptIntro = conceptFor(levelNumber, week, lesson);
+  const conceptIntro = conceptFor(levelNumber, week);
 
   useEffect(() => {
     if (!previewMode) router.replace("/realms");

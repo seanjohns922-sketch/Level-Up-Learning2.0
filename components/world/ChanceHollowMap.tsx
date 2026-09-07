@@ -14,6 +14,7 @@ import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 const CHANCE_LEVELS: Array<{ id: RealmLevelId; label: string }> = [
   { id: "Year 3", label: "Level 3" },
   { id: "Year 4", label: "Level 4" },
+  { id: "Year 5", label: "Level 5" },
 ];
 
 const DISTRICTS = [
@@ -22,13 +23,20 @@ const DISTRICTS = [
   { left: "calc(50% - 190px)", top: "56%", color: "#22d3ee", name: "TRIAL FALLS", identity: "TEST" },
 ] as const;
 
+const LEVEL_5_DISTRICTS = [
+  { left: "5%", top: "18%", color: "#fb7185", name: "OUTCOME VAULT", identity: "COMPARE" },
+  { left: "67%", top: "18%", color: "#fbbf24", name: "FREQUENCY FORGE", identity: "RECORD" },
+  { left: "calc(50% - 190px)", top: "56%", color: "#22d3ee", name: "ROLLER CITADEL", identity: "INVESTIGATE" },
+] as const;
+
 function normalizeLevel(level: string): RealmLevelId {
   return CHANCE_LEVELS.some((entry) => entry.id === level) ? (level as RealmLevelId) : "Year 3";
 }
 
 function getDistricts(level: RealmLevelId): readonly RealmDashboardDistrict[] {
   const plan = getCurriculumPlan(level, "probability");
-  return DISTRICTS.map((position, index) => {
+  const districts = level === "Year 5" ? LEVEL_5_DISTRICTS : DISTRICTS;
+  return districts.map((position, index) => {
     const weekStart = index * 2 + 1;
     const weekEnd = weekStart + 1;
     const focus = plan
@@ -52,7 +60,7 @@ function getDistricts(level: RealmLevelId): readonly RealmDashboardDistrict[] {
 function getWorld(level: RealmLevelId): RealmDashboardWorld {
   return {
     bgImage: getChanceHollowBackground(level),
-    levelLabel: level === "Year 4" ? "LEVEL 4" : "LEVEL 3",
+    levelLabel: `LEVEL ${level.replace("Year ", "")}`,
     zones: getDistricts(level),
   };
 }
@@ -67,8 +75,8 @@ export const CHANCE_HOLLOW_DASHBOARD_CONFIG = {
   guidedTagline: "FOLLOW THE CHANCE TRAIL",
   totalWeeks: 6,
   minLevelIndex: 3,
-  maxLevelIndex: 4,
-  districtModeLevels: ["Year 3", "Year 4"],
+  maxLevelIndex: 5,
+  districtModeLevels: ["Year 3", "Year 4", "Year 5"],
   worldForLevel: getWorld,
   districtsForLevel: getDistricts,
   theme: {

@@ -7,7 +7,10 @@ export type ChanceVisual =
   | { type: "spinner"; wedges: string[] } // each entry is one equal wedge colour
   | { type: "coin"; face?: "heads" | "tails" }
   | { type: "die"; face: number }
+  | { type: "dicePair"; left: number; right: number }
+  | { type: "diceGrid"; mode: "sum" | "difference"; highlight: number }
   | { type: "bag"; counters: string[] } // each entry is one counter colour
+  | { type: "frequency"; labels: string[]; counts: number[]; total: number }
   | { type: "scale"; highlight?: "certain" | "likely" | "unlikely" | "impossible" };
 export type StarpathShape = "circle" | "oval" | "triangle" | "square" | "rectangle";
 export type Year1PatternToken =
@@ -236,6 +239,22 @@ export type PracticeTask = (
       options: string[];
       answer: string;
       feedback?: { correct: string; wrong: string };
+    }
+  | {
+      // Chance Hollow Level 5: repair a two-dice race by grouping outcomes with
+      // equal total frequency, then test the repaired rules against Chanzia.
+      kind: "chanceDiceRace";
+      prompt: string;
+      choices: {
+        id: string;
+        label: string;
+        playerDifferences: number[];
+        chanziaDifferences: number[];
+      }[];
+      answerId: string;
+      opponentName: string;
+      opponentImage: string;
+      winningScore: number;
     }
   | {
       kind: "order3";
