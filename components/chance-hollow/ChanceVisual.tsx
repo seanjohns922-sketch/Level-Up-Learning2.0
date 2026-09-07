@@ -16,14 +16,20 @@ function countByColour(colours: string[]) {
   return [...map.entries()];
 }
 
-function Spinner({ wedges }: { wedges: string[] }) {
+function Spinner({ wedges, large = false }: { wedges: string[]; large?: boolean }) {
   const n = Math.max(wedges.length, 1);
   const cx = 70;
   const cy = 70;
   const r = 58;
   const slice = (2 * Math.PI) / n;
   return (
-    <svg viewBox="0 0 140 152" width="150" height="163" role="img" aria-label="Spinner">
+    <svg
+      viewBox="0 0 140 152"
+      width={large ? 190 : 150}
+      height={large ? 206 : 163}
+      role="img"
+      aria-label="Spinner"
+    >
       {wedges.map((colour, i) => {
         const a0 = i * slice - Math.PI / 2;
         const a1 = a0 + slice;
@@ -50,13 +56,28 @@ function Spinner({ wedges }: { wedges: string[] }) {
   );
 }
 
-function Coin({ face }: { face?: "heads" | "tails" }) {
-  const label = face === "tails" ? "T" : "H";
+// A single 3D coin: a tilted disc with a gold rim showing its thickness.
+function coinDisc(cx: number, cy: number, letter: string, key: string) {
+  const rx = 42, ry = 35, t = 10;
   return (
-    <svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Coin">
-      <circle cx={60} cy={60} r={50} fill="#f4c542" stroke="#b8860b" strokeWidth={4} />
-      <circle cx={60} cy={60} r={40} fill="none" stroke="#d9a521" strokeWidth={3} />
-      <text x={60} y={78} textAnchor="middle" fontSize={46} fontWeight={900} fill="#7a5b12">{label}</text>
+    <g key={key}>
+      <ellipse cx={cx} cy={cy + t} rx={rx} ry={ry} fill="#b8860b" />
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="#f4c542" stroke="#b8860b" strokeWidth={3} />
+      <ellipse cx={cx} cy={cy} rx={rx - 7} ry={ry - 7} fill="none" stroke="#d9a521" strokeWidth={2.5} />
+      <text x={cx} y={cy + 14} textAnchor="middle" fontSize={40} fontWeight={900} fill="#7a5b12">{letter}</text>
+    </g>
+  );
+}
+
+// Two 3D coins side by side — heads and tails — so a coin reads as a two-sided
+// object with both outcomes on show. The given face is shown first.
+function Coin({ face }: { face?: "heads" | "tails" }) {
+  const primary = face === "tails" ? "T" : "H";
+  const secondary = primary === "T" ? "H" : "T";
+  return (
+    <svg viewBox="0 0 210 116" width="200" height="110" role="img" aria-label="Coin — heads or tails">
+      {coinDisc(58, 45, primary, "a")}
+      {coinDisc(152, 45, secondary, "b")}
     </svg>
   );
 }
@@ -157,7 +178,14 @@ function Scale({ highlight }: { highlight?: string }) {
   );
 }
 
-export default function ChanceVisual({ visual }: { visual: ChanceVisualData }) {
+export default function ChanceVisual({
+  visual,
+  variant = "question",
+}: {
+  visual: ChanceVisualData;
+  variant?: "question" | "concept";
+}) {
+  const concept = variant === "concept";
   const legend =
     visual.type === "spinner"
       ? countByColour(visual.wedges)
@@ -165,8 +193,8 @@ export default function ChanceVisual({ visual }: { visual: ChanceVisualData }) {
         ? countByColour(visual.counters)
         : null;
   return (
-    <div className="mb-4 flex flex-col items-center gap-2 rounded-xl border border-[#e4d8f5] bg-[#faf7ff] p-4">
-      {visual.type === "spinner" && <Spinner wedges={visual.wedges} />}
+    <div className={concept ? "flex flex-col items-center gap-2" : "mb-4 flex flex-col items-center gap-2 rounded-xl border border-[#e4d8f5] bg-[#faf7ff] p-4"}>
+      {visual.type === "spinner" && <Spinner wedges={visual.wedges} large={concept} />}
       {visual.type === "coin" && <Coin face={visual.face} />}
       {visual.type === "die" && <Die face={visual.face} />}
       {visual.type === "bag" && <Bag counters={visual.counters} />}
@@ -174,7 +202,7 @@ export default function ChanceVisual({ visual }: { visual: ChanceVisualData }) {
       {legend && legend.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-3">
           {legend.map(([colour, n]) => (
-            <span key={colour} className="inline-flex items-center gap-1.5 text-sm font-bold text-[#3a2f52]">
+            <span key={colour} className={`inline-flex items-center gap-1.5 text-sm font-bold ${concept ? "text-white/80" : "text-[#3a2f52]"}`}>
               <span className="inline-block h-3.5 w-3.5 rounded-full border border-white" style={{ background: colour }} />
               {n}
             </span>
