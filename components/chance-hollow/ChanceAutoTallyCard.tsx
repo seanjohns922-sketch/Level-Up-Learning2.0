@@ -96,20 +96,22 @@ function TallyTable({ labels, tally, title }: { labels: Task["labels"]; tally: T
 
 export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
   const { tool, draw, labels, spins, mode } = task;
-  const trials = mode === "compareTrials" ? 2 : 1;
+  const trials = mode === "compareTrials" || mode === "predictMatch" ? 2 : 1;
 
-  const [phase, setPhase] = useState<"ready" | "running" | "answer">("ready");
+  const [phase, setPhase] = useState<"ready" | "predict" | "running" | "answer" | "reveal">(mode === "predictMatch" ? "predict" : "ready");
   const [tallies, setTallies] = useState<Tally[]>(() => Array.from({ length: trials }, () => ({})));
   const [current, setCurrent] = useState<string | null>(null);
   const [rotation, setRotation] = useState(0);
   const [settled, setSettled] = useState(false);
+  const [prediction, setPrediction] = useState<"yes" | "no" | null>(null);
   const timers = useRef<number[]>([]);
   useEffect(() => () => { timers.current.forEach((id) => { window.clearTimeout(id); window.clearInterval(id); }); }, []);
 
   const actionWord = tool === "coin" ? "flip" : tool === "die" ? "roll" : "spin";
+  const trialsIdentical = () => labels.every((l) => (tallies[0]![l.key] ?? 0) === (tallies[1]![l.key] ?? 0));
 
-  function run() {
-    if (phase !== "ready") return;
+  function run(from: "ready" | "predict") {
+    if (phase !== from) return;
     setPhase("running");
     const total = spins * trials;
     let step = 0;
@@ -120,9 +122,23 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
       setRotation((rot) => rot + 120 + Math.floor(Math.random() * 240));
       setTallies((ts) => { const copy = ts.map((m) => ({ ...m })); copy[trial]![key] = (copy[trial]![key] ?? 0) + 1; return copy; });
       step += 1;
-      if (step >= total) { window.clearInterval(iv); setCurrent(null); setPhase("answer"); }
+      if (step >= total) { window.clearInterval(iv); setCurrent(null); setPhase(mode === "predictMatch" ? "reveal" : "answer"); }
     }, 170);
     timers.current.push(iv);
+  }
+
+  function predict(choiceMade: "yes" | "no") {
+    if (phase !== "predict") return;
+    setPrediction(choiceMade);
+    run("predict");
+  }
+
+  function checkPrediction() {
+    if (settled) return;
+    setSettled(true);
+    const identical = trialsIdentical();
+    const wasRight = (prediction === "yes") === identical;
+    if (wasRight) onCorrect(); else onWrong(prediction ?? undefined);
   }
 
   // Grading
@@ -163,9 +179,13 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
           <div className={phase === "running" ? "animate-pulse" : ""}>
             <ToolFace tool={tool} current={current} rotation={rotation} draw={draw} />
           </div>
-          <button type="button" onClick={run} disabled={phase !== "ready"} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-5 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
-            <Play className="h-5 w-5" /> {phase === "ready" ? `Auto-${actionWord} ${spins}${trials > 1 ? ` × ${trials}` : ""}` : phase === "running" ? "Running…" : "Done"}
-          </button>
+          {mode === "predictMatch" ? (
+            <span className="text-sm font-bold text-[#6b6280]">{phase === "running" ? "Running…" : phase === "predict" ? "Predict first" : "Two trials run"}</span>
+          ) : (
+            <button type="button" onClick={() => run("ready")} disabled={phase !== "ready"} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-5 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
+              <Play className="h-5 w-5" /> {phase === "ready" ? `Auto-${actionWord} ${spins}${trials > 1 ? ` × ${trials}` : ""}` : phase === "running" ? "Running…" : "Done"}
+            </button>
+          )}
         </div>
 
         <div className="space-y-3">
@@ -178,7 +198,29 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
             <TallyTable labels={labels} tally={tallies[0]!} />
           )}
 
-          {phase === "answer" ? (
+          {phase === "predict" ? (
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <p className="text-lg font-black text-[#3a2f52]">First, predict: will the two trials come out exactly the same?</p>
+                <ReadAloudBtn text="First, predict: will the two trials come out exactly the same?" />
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {([["no", "No — they will be different"], ["yes", "Yes — they will match exactly"]] as const).map(([id, label]) => (
+                  <button key={id} type="button" onClick={() => predict(id)} className="flex items-center justify-between gap-3 rounded-lg border-2 border-[#e0d3f2] bg-white px-4 py-3 text-left font-black text-[#3a2f52] transition hover:border-[#6d3f9c]">
+                    <span>{label}</span>
+                    <OptionReadAloudButton text={label} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : phase === "reveal" ? (
+            <div className="space-y-2">
+              <p className="text-lg font-black text-[#3a2f52]">You predicted the trials would be <span className="text-[#6d3f9c]">{prediction === "yes" ? "the same" : "different"}</span>.</p>
+              <button type="button" disabled={settled} onClick={checkPrediction} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-5 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
+                See if I was right
+              </button>
+            </div>
+          ) : phase === "answer" ? (
             <div className="space-y-2">
               <div className="flex items-start gap-2">
                 <p className="text-lg font-black text-[#3a2f52]">{question}</p>

@@ -204,7 +204,9 @@ export type PracticeTask = (
       draw: string[];
       spins: number;
       labels: { key: string; name: string; colour?: string }[];
-      mode: "most" | "least" | "compareTrials";
+      // `predictMatch` asks the student to predict whether two trials will match
+      // before running them, then reveals and grades the prediction.
+      mode: "most" | "least" | "compareTrials" | "predictMatch";
     }
   | {
       kind: "order3";

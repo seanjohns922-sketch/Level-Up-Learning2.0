@@ -502,7 +502,7 @@ const w5l2: Gen = makeSpinTallyTask;
 // Interactive: auto-run a chance tool, watch it tally itself, then interpret the
 // results. Tool varies each round. `compareTrials` runs the experiment twice to
 // show variation between trials.
-function makeAutoTallyTask(mode: "most" | "least" | "compareTrials", spins: number): PracticeTask {
+function makeAutoTallyTask(mode: "most" | "least" | "compareTrials" | "predictMatch", spins: number): PracticeTask {
   const tool = choice(["spinner", "coin", "die"] as const);
   let draw: string[];
   let labels: { key: string; name: string; colour?: string }[];
@@ -522,15 +522,21 @@ function makeAutoTallyTask(mode: "most" | "least" | "compareTrials", spins: numb
   const action = tool === "coin" ? "flip" : tool === "die" ? "roll" : "spin";
   const prompt = mode === "compareTrials"
     ? `Run the same experiment twice: auto-${action} the ${tool} ${spins} times, twice. Then compare the two trials.`
-    : `Auto-${action} the ${tool} ${spins} times, then read the tally to answer.`;
+    : mode === "predictMatch"
+      ? `Predict, then test: will two trials of ${spins} ${action}s come out exactly the same? Make your prediction, then run both.`
+      : `Auto-${action} the ${tool} ${spins} times, then read the tally to answer.`;
   return { kind: "chanceAutoTally", tool, draw, spins, labels, mode, prompt };
 }
 const w5l3: Gen = () => makeAutoTallyTask("most", 16);
 
 // ─────────────────────── Week 6: Variation Investigation ─────────────────────
-// Hands-on variation: run the SAME experiment twice and see the two trials
-// almost never match — that difference is variation.
-const w6l1: Gen = () => makeAutoTallyTask("compareTrials", 10);
+// Hands-on variation, two ways: (a) run the same experiment twice and compare
+// the trials, or (b) predict whether the two trials will match, then run and see
+// if you were right. The lesson rotates between them to stay engaging.
+const w6l1: Gen = () => choice([
+  () => makeAutoTallyTask("compareTrials", 10),
+  () => makeAutoTallyTask("predictMatch", 10),
+])();
 
 const w6l2 = poolGen([
   { prompt: "The whole class combines 100 tosses: Heads 52, Tails 48. What does this suggest?", answer: "Heads and tails are about equally likely", options: ["Heads and tails are about equally likely", "Heads always wins", "Tails is impossible", "The coin is unfair"], correct: "Yes. Over many tosses the counts get close to even — about 50/50.", wrong: "52 and 48 are very close, which suggests heads and tails are about equal.", visual: { type: "coin", face: "heads" } },
