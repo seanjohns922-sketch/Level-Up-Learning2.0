@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, RotateCw } from "lucide-react";
+import { Check, FastForward, RotateCw } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -82,6 +82,7 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
   const [tallies, setTallies] = useState<Record<string, number>>({});
   const [done, setDone] = useState(0);
   const [nudge, setNudge] = useState(false);
+  const [autoRunning, setAutoRunning] = useState(false);
   const timers = useRef<number[]>([]);
   useEffect(() => () => { timers.current.forEach((id) => { window.clearTimeout(id); window.clearInterval(id); }); }, []);
 
@@ -132,6 +133,30 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
     });
   }
 
+  // Rapidly run and record every remaining trial, then finish.
+  function autoFinish() {
+    if (finished || autoRunning) return;
+    setNudge(false);
+    setLanded(null);
+    setBusy(false);
+    setAutoRunning(true);
+    let count = done;
+    const iv = window.setInterval(() => {
+      if (count >= spins) { window.clearInterval(iv); setAutoRunning(false); return; }
+      const key = draw[Math.floor(Math.random() * n)]!;
+      setDisplay(key);
+      setTallies((t) => ({ ...t, [key]: (t[key] ?? 0) + 1 }));
+      count += 1;
+      setDone(count);
+      if (count >= spins) {
+        window.clearInterval(iv);
+        setAutoRunning(false);
+        timers.current.push(window.setTimeout(() => onCorrect(), 450));
+      }
+    }, 100);
+    timers.current.push(iv);
+  }
+
   const shown = landed ?? display;
   const cx = 90, cy = 90, r = 78;
 
@@ -164,9 +189,14 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
               {tool === "die" ? <DieFace face={Number(shown) || 1} /> : <CoinFace side={shown} />}
             </div>
           )}
-          <button type="button" onClick={act} disabled={busy || !!landed || finished} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-6 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
+          <button type="button" onClick={act} disabled={busy || !!landed || finished || autoRunning} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-6 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
             <RotateCw className={busy ? "h-5 w-5 animate-spin" : "h-5 w-5"} /> {actionWord}
           </button>
+          {!finished ? (
+            <button type="button" onClick={autoFinish} disabled={autoRunning} className="flex h-9 items-center gap-1.5 rounded-lg border-2 border-[#6d3f9c] bg-white px-4 text-sm font-black text-[#6d3f9c] transition hover:bg-[#f1e8fb] active:scale-95 disabled:opacity-50">
+              <FastForward className="h-4 w-4" /> {autoRunning ? "Finishing…" : "Auto-finish"}
+            </button>
+          ) : null}
           <div className="text-sm font-bold text-[#6b6280]">Recorded {done} of {spins}</div>
         </div>
 
