@@ -251,7 +251,7 @@ const countSumPairs = fresh(() => {
   const sum = randInt(3, 11);
   const count = sumCount(sum);
   return mcq(`How many ordered dice pairs have a sum of ${sum}?`, String(count),
-    [String(Math.max(1, count - 1)), String(count + 1), String(12 - count)],
+    [String(Math.max(1, count - 1)), String(count + 1), String(count + 2)],
     `Correct. ${count} of the 36 cells have a sum of ${sum}.`, "Trace the highlighted diagonal and count every ordered pair.", { type: "diceGrid", mode: "sum", highlight: sum });
 });
 
@@ -336,7 +336,7 @@ const writeFrequency = fresh(() => {
   const total = pick([12, 16, 20, 24, 30] as const);
   const target = randInt(2, total - 2);
   return mcq(`A target outcome occurred ${target} times in ${total} trials. What is its relative frequency?`, `${target}/${total}`,
-    [`${total}/${target}`, `${target}/${total - target}`, `${total - target}/${total}`],
+    [`${total}/${target}`, `${target}/${total - target}`, `${target + 1}/${total}`],
     "Correct. Frequency is the outcome count over the total number of trials.", "Put the target count above the total trial count.", frequency(["Target", "Other"], [target, total - target]));
 });
 
@@ -354,7 +354,7 @@ const completeFrequency = fresh(() => {
   const total = pick([20, 30, 40] as const);
   const target = randInt(5, total - 5);
   return mcq(`The relative frequency of cyan was ${target}/${total}. How many cyan results were recorded?`, String(target),
-    [String(total), String(total - target), String(Math.max(1, target - 1))],
+    [String(total), String(target + 1), String(Math.max(1, target - 1))],
     "Yes. The numerator is the recorded cyan frequency.", "Read the numerator as the number of target outcomes.", frequency(["Cyan", "Other"], [target, total - target]));
 });
 

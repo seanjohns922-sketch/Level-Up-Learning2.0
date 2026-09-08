@@ -24,9 +24,9 @@ function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
     if (week === 1) return {
       term: "outcome set",
       title: "The question decides which outcomes we list",
-      meaning: "An outcome set lists every distinct result that answers the investigation question, with no omissions or repeats.",
-      example: "For a card draw, colour has 2 outcomes, suit has 4 outcomes, and exact card has 52 outcomes.",
-      exampleExplanation: "The same experiment can have different outcome sets because the recorded feature changes.",
+      meaning: "An outcome set is the full list of results that answer your question — every one, and each listed only once.",
+      example: "Draw one counter from this bag. If you ask for the colour there are 3 outcomes (red, blue, cyan); if you ask for the exact counter there are 6.",
+      exampleExplanation: "The same draw gives a different outcome set depending on what you choose to record.",
       chanceVisual: { type: "bag", counters: ["#ef5b62", "#ef5b62", "#3b82f6", "#22d3ee", "#22d3ee", "#22d3ee"] },
     };
     if (week === 2) return {
