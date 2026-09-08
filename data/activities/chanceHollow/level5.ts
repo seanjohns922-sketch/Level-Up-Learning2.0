@@ -285,11 +285,16 @@ const compareDifferences = fresh(() => {
 });
 
 const mostLikelyDifference = fresh(() => {
-  const challengers = shuffle([0, 2, 3, 4, 5]).slice(0, 2);
-  const candidates = shuffle([1, ...challengers]);
-  return mcq(`Which is most likely: difference ${candidates.join(", ")}?`, "Difference 1",
-    [...challengers.map((difference) => `Difference ${difference}`), "They are equally likely"],
-    "Correct. Difference 1 appears in 10 of the 36 ordered pairs.", "Count the pairs for each listed difference.", { type: "diceGrid", mode: "difference", highlight: 1 });
+  // Ask most OR least likely, over candidates with distinct pair-counts, so the
+  // correct answer genuinely varies instead of always being "Difference 1".
+  let candidates: number[];
+  do { candidates = shuffle([0, 1, 2, 3, 4, 5]).slice(0, 3); }
+  while (new Set(candidates.map((d) => differenceCounts[d])).size !== 3);
+  const askMost = Math.random() < 0.5;
+  const chosen = [...candidates].sort((a, b) => askMost ? differenceCounts[b]! - differenceCounts[a]! : differenceCounts[a]! - differenceCounts[b]!)[0]!;
+  return mcq(`Among differences ${candidates.join(", ")}, which is ${askMost ? "most" : "least"} likely?`, `Difference ${chosen}`,
+    [...candidates.map((difference) => `Difference ${difference}`), "They are equally likely"],
+    `Correct. Difference ${chosen} appears in ${differenceCounts[chosen]} of the 36 ordered pairs.`, "Count the ordered pairs for each listed difference.", { type: "diceGrid", mode: "difference", highlight: chosen });
 });
 
 const explainDifferenceOdds = fresh(() => {
@@ -447,25 +452,47 @@ const estimateSpinnerRun = fresh(() => {
   return { kind: "chanceAutoTally", prompt: "Run the uneven spinner and use its recorded frequencies to estimate the most likely outcome.", tool: "spinner", draw: shuffle([...Array(majorCount).fill(major), minorA, minorB] as string[]), spins: randInt(18, 32), labels: [{ key: major, name: cap(NAMES[major]!), colour: major }, { key: minorA, name: cap(NAMES[minorA]!), colour: minorA }, { key: minorB, name: cap(NAMES[minorB]!), colour: minorB }], mode: "most" };
 });
 
-const loadedEvidence = fresh(() => {
+// Judge a die-results chart: the correct verdict depends on the data, so the
+// answer varies between "looks fair" and "may be loaded".
+const judgeDieEvidence = fresh(() => {
   const total = pick([30, 36, 42] as const);
-  const repeated = Math.round(total * pick([0.42, 0.48, 0.52] as const));
-  const others = spreadTotal(total - repeated, 5);
-  return mcq(`A die rolled ${total} times showed 6 on ${repeated} rolls. What should investigators do next?`, "Suspect bias and run more trials to gather evidence",
-    ["Declare 6 certain after one run", "Ignore the recorded frequencies", "Assume every modified die is fair"],
-    "Correct. The unusually high frequency is evidence to investigate, not absolute proof.", "Use the frequency pattern to form a cautious evidence-based conclusion.", frequency(["1", "2", "3", "4", "5", "6"], [...others, repeated]));
+  const loaded = Math.random() < 0.5;
+  let counts: number[];
+  if (loaded) {
+    const heavy = Math.round(total * pick([0.42, 0.48, 0.55] as const));
+    const rest = spreadTotal(total - heavy, 5);
+    const face = randInt(0, 5);
+    counts = [...rest.slice(0, face), heavy, ...rest.slice(face)];
+  } else {
+    counts = spreadTotal(total, 6);
+  }
+  const fairText = "The numbers are fairly evenly spread, so the die looks fair";
+  const loadedText = "One number appears far more often, so the die may be loaded";
+  const answer = loaded ? loadedText : fairText;
+  return mcq("What do these die results suggest?", answer,
+    [loaded ? fairText : loadedText, "Every future roll is now certain", "The die is broken forever"],
+    loaded ? "Right. One face stands out far above the rest — that is evidence to test more." : "Right. A broad, even spread is what a fair die usually gives.",
+    "Look at whether one number sticks out far above the others.", frequency(["1", "2", "3", "4", "5", "6"], counts));
 });
-const fairEvidence = fresh(() => {
+const compareFairLoaded2 = fresh(() => {
   const total = pick([30, 36, 42] as const);
-  const counts = spreadTotal(total, 6);
-  const from = randInt(0, 5);
-  let to = randInt(0, 5);
-  if (to === from) to = (to + 1) % 6;
-  counts[from] = counts[from]! - 1;
-  counts[to] = counts[to]! + 1;
-  return mcq("Which statement best fits these normal-die results?", "The frequencies vary but are reasonably spread across all faces",
-    ["One face is certain", "Five faces are impossible", "Every face must have exactly the same frequency"],
-    "Right. Fair chance can still produce small frequency differences.", "Look for a broad spread without demanding identical counts.", frequency(["1", "2", "3", "4", "5", "6"], counts));
+  const loaded = Math.random() < 0.5;
+  let counts: number[];
+  if (loaded) {
+    const heavy = Math.round(total * pick([0.45, 0.5, 0.55] as const));
+    const rest = spreadTotal(total - heavy, 5);
+    const face = randInt(0, 5);
+    counts = [...rest.slice(0, face), heavy, ...rest.slice(face)];
+  } else {
+    counts = spreadTotal(total, 6);
+  }
+  const balancedText = "Run more trials — the spread is close, so keep the fair verdict for now";
+  const suspectText = "Suspect a loaded die and gather more evidence to be sure";
+  const answer = loaded ? suspectText : balancedText;
+  return mcq("Based only on this chart, what is the fairest next step?", answer,
+    [loaded ? balancedText : suspectText, "Declare the result certain after one run", "Ignore the recorded frequencies"],
+    loaded ? "Correct. A strong spike is evidence worth testing, not proof yet." : "Correct. A close spread is what a fair die gives — no reason to cry foul yet.",
+    "Let the chart's spread decide whether to suspect bias.", frequency(["1", "2", "3", "4", "5", "6"], counts));
 });
 const compareFairLoaded = fresh(() => {
   const fair = frequency(["1", "2", "3", "4", "5", "6"], [6, 5, 7, 6, 5, 7]);
@@ -478,9 +505,26 @@ const compareFairLoaded = fresh(() => {
 const planQuestion = fresh(() => {
   const tool = pick(["coin", "spinner", "die", "bag"] as const);
   const trials = pick([20, 30, 40] as const);
-  return mcq(`Which question can be tested with repeated ${tool} trials?`, `Which ${tool} outcome occurs most often in ${trials} trials?`,
-    [`Which ${tool} looks nicest?`, `Who invented the ${tool}?`, `How heavy is the ${tool} without measuring it?`],
-    "Correct. The question names a tool, outcomes and a repeatable trial.", "Choose a question that repeated chance trials can answer.");
+  const testable = [
+    `Which ${tool} outcome occurs most often in ${trials} trials?`,
+    `How often does each ${tool} outcome appear in ${trials} trials?`,
+    `Which ${tool} outcome is least common in ${trials} trials?`,
+  ];
+  const notTestable = [
+    `Which ${tool} looks nicest?`,
+    `Who invented the ${tool}?`,
+    `How heavy is the ${tool} without weighing it?`,
+    `What is the best colour for the ${tool}?`,
+  ];
+  // Flip which kind of question is the answer so it is not always the testable one.
+  if (Math.random() < 0.5) {
+    return mcq("Which question CAN be tested with repeated trials?", pick(testable),
+      shuffle(notTestable).slice(0, 3),
+      "Correct. It names outcomes we can count across repeated trials.", "Pick the question that repeated chance trials can actually answer.");
+  }
+  return mcq("Which question can NOT be answered by repeated trials?", pick(notTestable),
+    shuffle(testable).slice(0, 3),
+    "Correct. That question is not about counting outcomes across trials.", "Pick the question that counting outcomes cannot answer.");
 });
 const planMethod = fresh(() => {
   const trials = pick([20, 30, 40] as const);
@@ -531,7 +575,7 @@ const LESSONS: Record<string, LessonSpec> = {
   "4-3": { teaching: compareRuns, activities: [compareRuns, compareTrialsInteractive, variationReason] },
   "5-1": { teaching: predictSpinnerDesign, activities: [predictSpinnerDesign, predictBagDesign, predictCount] },
   "5-2": { teaching: estimateFromFrequency, activities: [estimateFromFrequency, compareFrequencyEvidence, estimateSpinnerRun] },
-  "5-3": { teaching: loadedEvidence, activities: [loadedEvidence, fairEvidence, compareFairLoaded] },
+  "5-3": { teaching: judgeDieEvidence, activities: [judgeDieEvidence, compareFairLoaded2, compareFairLoaded] },
   "6-1": { teaching: planQuestion, activities: [planQuestion, planMethod, planTable] },
   "6-2": { teaching: investigationSpinner, activities: [investigationSpinner, investigationCoin, investigationDie] },
   "6-3": { teaching: defendFrequency, activities: [defendFrequency, defendVariation, grandRace] },
