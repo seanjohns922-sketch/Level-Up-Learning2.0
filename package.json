@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run qa:realm-release-gate && npm run qa:pattern-peaks-release && npm run qa:pattern-peaks-assessments && npm run qa:chance-hollow-generation && npm run qa:whole-maths-diagnostic && npm run qa:live-maths-progression",
+    "prebuild": "npm run qa:realm-release-gate && npm run qa:pattern-peaks-release && npm run qa:pattern-peaks-assessments && npm run qa:chance-hollow-generation && npm run qa:chance-hollow-answer-voice && npm run qa:whole-maths-diagnostic && npm run qa:live-maths-progression",
     "build": "next build",
     "build:dev": "next build",
     "start": "next start",
@@ -172,6 +172,7 @@
     "generate:pattern-peaks-review": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/generate-pattern-peaks-educator-review.ts",
     "qa:pattern-peaks-level3": "npm run qa:pattern-peaks-curriculum",
     "qa:chance-hollow-generation": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-chance-hollow-generated-lessons.ts",
+    "qa:chance-hollow-answer-voice": "node scripts/chance-hollow-answer-voice-audit.mjs",
     "qa:archived-student-roster": "node scripts/archived-student-roster-audit.mjs",
     "qa:pretest-pathway": "node --no-warnings --experimental-strip-types scripts/pretest-pathway-assignment-audit.mjs",
     "qa:early-years-inputs": "node scripts/early-years-answer-input-audit.mjs",

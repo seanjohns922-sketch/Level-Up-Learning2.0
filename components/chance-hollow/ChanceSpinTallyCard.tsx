@@ -243,6 +243,7 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
                   <span className="flex min-w-[92px] items-center gap-1.5 font-black text-[#3a2f52]">{l.colour ? <span className="inline-block h-4 w-4 rounded-full border border-white shadow" style={{ background: l.colour }} /> : null}<span className="capitalize">{l.name}</span></span>
                   <button type="button" onClick={() => adjustEntry(l.key, -1)} disabled={tallyDone} aria-label={`fewer ${l.name}`} className="grid h-9 w-9 place-items-center rounded-lg border-2 border-[#e0d3f2] bg-white text-[#3a2f52] disabled:opacity-40"><Minus className="h-4 w-4" /></button>
                   <span className="min-w-[2ch] text-center font-mono text-lg font-black tabular-nums text-[#6d3f9c]">{entry[l.key] ?? 0}</span>
+                  <OptionReadAloudButton text={`${entry[l.key] ?? 0} ${l.name} tally marks`} />
                   <button type="button" onClick={() => adjustEntry(l.key, 1)} disabled={tallyDone} aria-label={`more ${l.name}`} className="grid h-9 w-12 place-items-center rounded-lg border-2 border-[#6d3f9c] bg-[#f1e8fb] text-[#3a2f52] disabled:opacity-40"><Plus className="h-4 w-4" /></button>
                   <TallyMarks n={entry[l.key] ?? 0} />
                 </div>

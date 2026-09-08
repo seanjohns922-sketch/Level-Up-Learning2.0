@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Dices, Flag, Swords } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "chanceDiceRace" }>;
@@ -92,7 +93,7 @@ export default function ChanceDiceRaceCard({ task, onCorrect, onWrong }: { task:
                 const chanziaCount = chanceCount(choice.chanziaDifferences);
                 return (
                   <button key={choice.id} type="button" onClick={() => choose(choice.id)} className="grid gap-1 rounded-lg border-2 border-violet-200 bg-white px-4 py-3 text-left font-bold text-violet-950 transition hover:border-fuchsia-400 hover:bg-fuchsia-50">
-                    <span>{choice.label}</span>
+                    <span className="flex items-center justify-between gap-3"><span>{choice.label}</span><OptionReadAloudButton text={`${choice.label}. You have ${playerCount} possible pairs. ${task.opponentName} has ${chanziaCount} possible pairs.`} /></span>
                     <span className="font-mono text-xs text-violet-500">Possible pairs: You {playerCount} · {task.opponentName} {chanziaCount}</span>
                   </button>
                 );

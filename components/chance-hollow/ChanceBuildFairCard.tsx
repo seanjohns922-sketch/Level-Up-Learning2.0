@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Check, Minus, Play, Plus, Swords } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "chanceBuildFair" }>;
@@ -113,6 +114,7 @@ export default function ChanceBuildFairCard({ task, onCorrect }: { task: Task; o
         <span className="flex min-w-[64px] items-center gap-1.5 font-black text-[#3a2f52]"><span className="inline-block h-4 w-4 rounded-full border border-white shadow" style={{ background: c.colour }} /><span className="capitalize">{c.name}</span></span>
         <button type="button" onClick={() => adjust(idx, -1)} disabled={phase !== "fix"} aria-label={`fewer ${c.name} parts`} className="grid h-10 w-10 place-items-center rounded-lg border-2 border-[#e0d3f2] bg-white text-[#3a2f52] disabled:opacity-40"><Minus className="h-5 w-5" /></button>
         <span className="min-w-[2ch] text-center font-mono text-xl font-black tabular-nums text-[#6d3f9c]">{counts[idx]}</span>
+        <OptionReadAloudButton text={`${counts[idx]} ${c.name} parts`} />
         <button type="button" onClick={() => adjust(idx, 1)} disabled={phase !== "fix"} aria-label={`more ${c.name} parts`} className="grid h-10 w-10 place-items-center rounded-lg border-2 border-[#6d3f9c] bg-[#f1e8fb] text-[#3a2f52] disabled:opacity-40"><Plus className="h-5 w-5" /></button>
       </div>
     );

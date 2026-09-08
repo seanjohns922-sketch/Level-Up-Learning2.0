@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Minus, Plus, RotateCw, Swords } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "chancePredictCount" }>;
@@ -97,6 +98,7 @@ export default function ChancePredictCountCard({ task, onCorrect, onWrong }: { t
               <div className="flex items-center gap-3">
                 <button type="button" onClick={() => setGuess((g) => Math.max(0, g - 1))} aria-label="fewer" className="grid h-11 w-11 place-items-center rounded-lg border-2 border-[#e0d3f2] bg-white text-[#3a2f52]"><Minus className="h-5 w-5" /></button>
                 <span className="min-w-[3ch] text-center font-mono text-3xl font-black tabular-nums text-[#6d3f9c]">{guess}</span>
+                <OptionReadAloudButton text={`${guess} ${targetName} results`} />
                 <button type="button" onClick={() => setGuess((g) => Math.min(spins, g + 1))} aria-label="more" className="grid h-11 w-14 place-items-center rounded-lg border-2 border-[#6d3f9c] bg-[#f1e8fb] text-[#3a2f52]"><Plus className="h-5 w-5" /></button>
               </div>
               <button type="button" onClick={lockIn} className="flex h-12 items-center gap-2 rounded-lg bg-[#6d3f9c] px-6 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95">
