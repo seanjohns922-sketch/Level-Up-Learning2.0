@@ -48,8 +48,11 @@ function mcq(prompt: string, answer: string, distractors: readonly string[], cor
 }
 
 function taskFingerprint(task: PracticeTask) {
+  // For mcqs, de-dup on what the child actually reads — the prompt, answer and
+  // option set — ignoring the shuffled apparatus so a same-reading question with
+  // a differently arranged bag/spinner still counts as a repeat.
   if (task.kind !== "mcq") return JSON.stringify(task);
-  return JSON.stringify({ ...task, options: [...task.options].sort() });
+  return `${task.prompt}${task.answer}${[...task.options].sort().join("")}`;
 }
 
 // Each generator remembers recent payloads and rebuilds collisions. The lesson
