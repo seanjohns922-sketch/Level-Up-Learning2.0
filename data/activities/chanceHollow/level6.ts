@@ -94,11 +94,16 @@ function complement(prompt: string): Gen {
   });
 }
 
-function simulation(prompt: string, challenge: "predict" | "compare" | "convergence", stages?: number[]): Gen {
+function simulation(
+  prompt: string,
+  challenge: "predict" | "compare" | "convergence",
+  stages?: number[],
+  analysis?: "closest" | "furthest" | "gap",
+): Gen {
   return fresh(() => {
     const f = pick(FRACTIONS.filter((item) => item.total <= 10));
     const trialStages = stages ?? (challenge === "predict" ? [pick([20, 30, 40, 50])] : challenge === "compare" ? [pick([20, 30]), pick([80, 100, 120])] : [10, 50, pick([200, 300, 500])]);
-    return { kind: "chanceSimulationLab", prompt, tool: pick(["spinner", "coin", "die"] as const), winning: f.winning, total: f.total, stages: trialStages, targetName: pick(["glow", "shield", "portal", "crystal"]), challenge };
+    return { kind: "chanceSimulationLab", prompt, tool: pick(["spinner", "coin", "die"] as const), winning: f.winning, total: f.total, stages: trialStages, targetName: pick(["glow", "shield", "portal", "crystal"]), challenge, ...(analysis ? { analysis } : {}) };
   });
 }
 
@@ -175,9 +180,9 @@ const predictFrequency = simulation("Predict the count, then launch the experime
 const expectedObserved = simulation("Run the experiment and compare expected with observed.", "compare");
 const explainVariation = simulation("Explain how different results can still fit the same model.", "compare");
 // W4 Trial-Size Effect
-const trialLadder = simulation("Climb the trial ladder and track the relative frequency.", "convergence", [10, 50, 200]);
-const convergence = simulation("Chase the expected probability through three trial stages.", "convergence", [20, 100, 500]);
-const variationStorm = simulation("Ride the variation storm and choose the careful conclusion.", "convergence", [10, 50, 300]);
+const trialLadder = simulation("Climb the trial ladder, then find which run sat closest to the expected chance.", "convergence", [10, 50, 200], "closest");
+const convergence = simulation("Chase the expected probability, then measure how far the biggest sample missed.", "convergence", [20, 100, 500], "gap");
+const variationStorm = simulation("Ride the variation storm, then spot the run that swung the wildest.", "convergence", [10, 50, 300], "furthest");
 // W5 Simulation Engineering
 const chooseSimulator = debuggerTask("Choose the simulator that matches the event.", "choose");
 const debugMachine = debuggerTask("Find the fault in Chanzia's simulation machine.", "debug");

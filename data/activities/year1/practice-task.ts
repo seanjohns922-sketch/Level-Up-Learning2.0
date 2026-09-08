@@ -296,6 +296,10 @@ export type PracticeTask = (
       stages: number[];
       targetName: string;
       challenge: "predict" | "compare" | "convergence";
+      // For `convergence`: which data-driven question the second phase asks about
+      // the run just completed. Makes each lesson's follow-up unique instead of the
+      // same fixed evidence-claim MCQ. Omitted → the generic claim MCQ.
+      analysis?: "closest" | "furthest" | "gap";
     }
   | {
       kind: "chanceModelDebugger";

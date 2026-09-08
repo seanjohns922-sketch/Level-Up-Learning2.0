@@ -13,7 +13,7 @@ type ForgeTask = Extract<PracticeTask, { kind: "chanceProbabilityForge" }>;
 type SimulationTask = Extract<PracticeTask, { kind: "chanceSimulationLab" }>;
 type DebugTask = Extract<PracticeTask, { kind: "chanceModelDebugger" }>;
 type MasterTask = Extract<PracticeTask, { kind: "chanceMasterTrial" }>;
-type CardProps<T> = { task: T; onCorrect: () => void; onWrong: (answer?: string) => void };
+type CardProps<T> = { task: T; onCorrect: () => void; onWrong: (answer?: string, correctAnswer?: string) => void };
 
 const EPSILON = 0.026;
 
@@ -124,12 +124,43 @@ export function ChanceSimulationLabCard({ task, onCorrect, onWrong }: CardProps<
     ? ["Observed and expected counts can differ.", "Observed results must always be exact.", "One run proves the tool is biased."]
     : ["Larger samples tend to reduce relative variation.", "More trials guarantee an exact result.", "Each new trial must copy the last one."];
 
+  // Part 2: when `analysis` is set, ask a question about the actual run just
+  // completed (so each lesson's follow-up is unique and never the same fixed
+  // claim). Options are derived deterministically from `results`, so they stay
+  // stable across re-renders.
+  const expectedPct = Math.round(probability * 100);
+  const relPct = results.map((observed, i) => Math.round((observed / task.stages[i]!) * 100));
+  let analysisQuestion: string | null = null;
+  let analysisOptions: { label: string; correct: boolean }[] = [];
+  if (allRun && task.analysis) {
+    const gaps = relPct.map((p) => Math.abs(p - expectedPct));
+    if (task.analysis === "closest" || task.analysis === "furthest") {
+      const target = task.analysis === "closest" ? Math.min(...gaps) : Math.max(...gaps);
+      analysisQuestion = task.analysis === "closest"
+        ? `Which run landed closest to the expected ${expectedPct}%?`
+        : `Which run swung furthest from the expected ${expectedPct}%?`;
+      // A tie (two runs equally close/far) marks both correct so neither is graded wrong.
+      analysisOptions = task.stages.map((trials, i) => ({ label: `${trials} trials — ${relPct[i]}%`, correct: gaps[i] === target }));
+    } else {
+      const last = task.stages.length - 1;
+      const gap = gaps[last]!;
+      const candidates = [gap, gap + 5, gap + 10, Math.abs(gap - 5), Math.abs(gap - 10)].filter((v) => v <= 100);
+      const others = [...new Set(candidates)].filter((v) => v !== gap).slice(0, 2);
+      const values = [gap, ...others].sort((a, b) => a - b);
+      analysisQuestion = `The ${task.stages[last]}-trial run hit ${relPct[last]}%. How far is that from the expected ${expectedPct}%?`;
+      analysisOptions = values.map((v) => ({ label: `${v}%`, correct: v === gap }));
+    }
+  }
+  const part2Options = task.analysis ? analysisOptions.map((option) => option.label) : claims;
+  const part2CorrectSet = task.analysis ? analysisOptions.filter((option) => option.correct).map((option) => option.label) : [claims[0]!];
+  const part2Heading = task.analysis ? "Read the results" : "Choose the evidence claim";
+
   function launch() {
-    if (task.challenge === "predict" && prediction !== expectedFirst) { onWrong(String(prediction)); return; }
+    if (task.challenge === "predict" && prediction !== expectedFirst) { onWrong(String(prediction), String(expectedFirst)); return; }
     const nextIndex = results.length;
     if (nextIndex < task.stages.length) setResults((current) => [...current, randomCount(task.stages[nextIndex]!, probability)]);
   }
-  function finish() { if (claim === claims[0]) onCorrect(); else onWrong(claim ?? "No conclusion"); }
+  function finish() { if (claim && part2CorrectSet.includes(claim)) onCorrect(); else onWrong(claim ?? "No answer", part2CorrectSet[0]); }
 
   return <div className="space-y-5">
     <TaskHeading text={task.prompt} />
@@ -141,7 +172,7 @@ export function ChanceSimulationLabCard({ task, onCorrect, onWrong }: CardProps<
         const percent = observed === undefined ? 0 : observed / trials * 100;
         return <div key={`${trials}-${index}`} className={`rounded-lg border-2 p-4 ${observed === undefined ? "border-dashed border-[#cdb9df] bg-white/50" : "border-cyan-300 bg-white"}`}><div className="flex items-center justify-between"><span className="text-xs font-black uppercase text-[#6d3f9c]">Stage {index + 1}</span><span className="font-mono font-black">{trials} trials</span></div><div className="mt-3 h-28 overflow-hidden rounded-md bg-[#251833] p-3"><div className="flex h-full items-end gap-2"><div className="w-1/2 rounded-t bg-fuchsia-500 transition-all" style={{ height: `${Math.round(probability * 100)}%` }} /><div className="w-1/2 rounded-t bg-cyan-400 transition-all" style={{ height: `${Math.round(percent)}%` }} /></div></div><div className="mt-2 text-sm font-bold">{observed === undefined ? "Waiting" : `${observed}/${trials} = ${Math.round(percent)}%`}</div></div>;
       })}</div>
-      {!allRun ? <div className="mt-5"><ActionButton onClick={launch}><Play className="h-5 w-5" /> Run stage {results.length + 1}</ActionButton></div> : <div className="mt-5 space-y-3"><div className="text-sm font-black uppercase text-[#8b2cf5]">Choose the evidence claim</div>{claims.map((text) => <button key={text} type="button" onClick={() => setClaim(text)} className={`flex w-full items-center justify-between gap-3 rounded-lg border-2 p-3 text-left font-bold transition ${claim === text ? "border-fuchsia-500 bg-fuchsia-50" : "border-[#ddd0e8] bg-white hover:border-cyan-400"}`}><span>{text}</span><OptionReadAloudButton text={text} /></button>)}<ActionButton onClick={finish} disabled={!claim}><Check className="h-5 w-5" /> Lock conclusion</ActionButton></div>}
+      {!allRun ? <div className="mt-5"><ActionButton onClick={launch}><Play className="h-5 w-5" /> Run stage {results.length + 1}</ActionButton></div> : <div className="mt-5 space-y-3"><div className="text-sm font-black uppercase text-[#8b2cf5]">{part2Heading}</div>{analysisQuestion ? <div className="flex items-start gap-2"><p className="font-bold text-[#2b2135]">{analysisQuestion}</p><OptionReadAloudButton text={analysisQuestion} /></div> : null}{part2Options.map((text) => <button key={text} type="button" onClick={() => setClaim(text)} className={`flex w-full items-center justify-between gap-3 rounded-lg border-2 p-3 text-left font-bold transition ${claim === text ? "border-fuchsia-500 bg-fuchsia-50" : "border-[#ddd0e8] bg-white hover:border-cyan-400"}`}><span>{text}</span><OptionReadAloudButton text={text} /></button>)}<ActionButton onClick={finish} disabled={!claim}><Check className="h-5 w-5" /> Lock conclusion</ActionButton></div>}
     </div>
   </div>;
 }
