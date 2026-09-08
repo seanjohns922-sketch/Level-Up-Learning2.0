@@ -286,6 +286,9 @@ export type PracticeTask = (
       initialWinning: number;
       targetLabel: string;
       sourceWinning?: number;
+      // When true, after the build is fixed the child spins their repaired
+      // device 10 times against Chanzia's to see who lands more winning outcomes.
+      battle?: boolean;
     }
   | {
       kind: "chanceSimulationLab";

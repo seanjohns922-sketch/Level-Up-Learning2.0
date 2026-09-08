@@ -109,14 +109,14 @@ function modelCompare(): Gen {
   });
 }
 
-function forge(prompt: string, targetLabel = "Match the target", fixedTool?: "spinner" | "bag" | "die"): Gen {
+function forge(prompt: string, targetLabel = "Match the target", fixedTool?: "spinner" | "bag" | "die", battle = false): Gen {
   return fresh(() => {
     const tool = fixedTool ?? pick(["spinner", "bag", "die"] as const);
     const total = tool === "die" ? 6 : tool === "bag" ? pick([5, 6, 8, 10, 12] as const) : pick([4, 5, 6, 8, 10, 12] as const);
     const targetWinning = randInt(1, total - 1);
     let initialWinning = randInt(0, total);
     if (initialWinning === targetWinning) initialWinning = (initialWinning + 1) % (total + 1);
-    return { kind: "chanceProbabilityForge", prompt, tool, targetWinning, total, initialWinning, targetLabel };
+    return { kind: "chanceProbabilityForge", prompt, tool, targetWinning, total, initialWinning, targetLabel, ...(battle ? { battle: true } : {}) };
   });
 }
 
@@ -225,9 +225,9 @@ const variationStorm = simulation("Ride the variation storm, then spot the run t
 // device (visual compare), repair a faulty device (forge), then complete a
 // device so every outcome is covered (complement / audit).
 const chooseSimulator = modelCompare();
-const fixSpinner = forge("Chanzia's spinner is faulty — set the winning sectors so it models the event.", "Model the event", "spinner");
-const fixBag = forge("Repair the bag simulator so its winning share models the event.", "Model the event", "bag");
-const fixDie = forge("Fix the die simulator so the winning faces model the event.", "Model the event", "die");
+const fixSpinner = forge("Chanzia's spinner is faulty — set the winning sectors so it models the event.", "Model the event", "spinner", true);
+const fixBag = forge("Repair the bag simulator so its winning share models the event.", "Model the event", "bag", true);
+const fixDie = forge("Fix the die simulator so the winning faces model the event.", "Model the event", "die", true);
 const auditComplete = complement("Audit the machine: add the missing outcomes so every result is covered and the chances total one whole.");
 // W6 Master's Grand Trial
 const planInvestigation = debuggerTask("Lock in a fair investigation plan.", "choose");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Check, CircleDot, Coins, Cpu, Dices, Minus, Play, Plus, Shield, Sparkles, Target } from "lucide-react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -91,9 +91,16 @@ function ToolVisual({ tool, winning, total }: { tool: ForgeTask["tool"]; winning
 
 export function ChanceProbabilityForgeCard({ task, onCorrect, onWrong }: CardProps<ForgeTask>) {
   const [winning, setWinning] = useState(task.initialWinning);
+  const [phase, setPhase] = useState<"build" | "battle">("build");
   const targetPercent = Math.round(task.targetWinning / task.total * 100);
   const currentPercent = Math.round(winning / task.total * 100);
-  function check() { if (winning === task.targetWinning) onCorrect(); else onWrong(`${winning}/${task.total}`); }
+  function check() {
+    if (winning !== task.targetWinning) { onWrong(`${winning}/${task.total}`); return; }
+    if (task.battle) setPhase("battle"); else onCorrect();
+  }
+  if (phase === "battle") {
+    return <ForgeBattle tool={task.tool} winning={task.targetWinning} total={task.total} onDone={onCorrect} />;
+  }
   return <div className="space-y-5">
     <TaskHeading text={task.prompt} />
     <div className="grid gap-5 rounded-lg border-2 border-fuchsia-200 bg-gradient-to-br from-[#fff7fd] to-[#eefcff] p-5 md:grid-cols-[auto_1fr] md:items-center">
@@ -101,8 +108,67 @@ export function ChanceProbabilityForgeCard({ task, onCorrect, onWrong }: CardPro
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-4 rounded-lg bg-[#251833] p-4 text-white"><Target className="h-7 w-7 text-amber-300" /><div><div className="text-xs font-black uppercase text-fuchsia-200">{task.targetLabel}</div>{task.sourceWinning === undefined ? <div className="mt-2 flex items-center gap-3 text-2xl"><Fraction numerator={task.targetWinning} denominator={task.total} /><span>=</span><span className="font-mono font-black">{targetPercent}%</span></div> : <div className="mt-2 flex items-center gap-3 text-2xl"><Fraction numerator={task.sourceWinning} denominator={task.total} /><span>+</span><span className="text-3xl font-black text-amber-300">?</span><span>= 1</span></div>}</div></div>
         <div className="flex items-center gap-3"><button type="button" aria-label="Remove one winning outcome" onClick={() => setWinning((value) => Math.max(0, value - 1))} className="grid h-12 w-12 place-items-center rounded-lg border-2 border-fuchsia-300 bg-white text-[#6d3f9c]"><Minus /></button><div className="min-w-32 text-center"><div className="flex items-center justify-center gap-2 text-3xl font-black text-[#6d3f9c]"><span>{winning} of {task.total}</span><OptionReadAloudButton text={`${winning} out of ${task.total}, ${currentPercent} percent winning`} /></div><div className="text-sm font-bold text-[#645574]">{currentPercent}% winning</div></div><button type="button" aria-label="Add one winning outcome" onClick={() => setWinning((value) => Math.min(task.total, value + 1))} className="grid h-12 w-12 place-items-center rounded-lg bg-[#6d3f9c] text-white"><Plus /></button></div>
-        <ActionButton onClick={check}><Check className="h-5 w-5" /> Test build</ActionButton>
+        <ActionButton onClick={check}><Check className="h-5 w-5" /> {task.battle ? "Test the fix" : "Test build"}</ActionButton>
       </div>
+    </div>
+  </div>;
+}
+
+// After a device is repaired, spin it 10 times against Chanzia's identical
+// device: same chance, so whoever lands more winning outcomes is down to luck —
+// a fun capstone that also shows results vary even when the model is fair. The
+// duel never fails the lesson; finishing it always completes.
+function ForgeBattle({ tool, winning, total, onDone }: { tool: ForgeTask["tool"]; winning: number; total: number; onDone: () => void }) {
+  const probability = winning / total;
+  const SPINS = 10;
+  const [you, setYou] = useState(0);
+  const [chanzia, setChanzia] = useState(0);
+  const [round, setRound] = useState(0);
+  const [spinning, setSpinning] = useState(false);
+  const timers = useRef<number[]>([]);
+  useEffect(() => () => { timers.current.forEach((id) => window.clearInterval(id)); }, []);
+  const done = round >= SPINS && !spinning;
+
+  function spinOff() {
+    if (spinning || done) return;
+    setYou(0); setChanzia(0); setRound(0); setSpinning(true);
+    let r = 0;
+    const iv = window.setInterval(() => {
+      r += 1;
+      if (Math.random() < probability) setYou((v) => v + 1);
+      if (Math.random() < probability) setChanzia((v) => v + 1);
+      setRound(r);
+      if (r >= SPINS) { window.clearInterval(iv); setSpinning(false); }
+    }, 200);
+    timers.current.push(iv);
+  }
+
+  const verdict = you > chanzia ? "You win the spin-off!" : chanzia > you ? "Chanzia wins this one." : "A draw — same chance, different luck!";
+
+  return <div className="space-y-5">
+    <TaskHeading text={`Your machine is fixed — spin it ${SPINS} times against Chanzia!`} />
+    <div className="rounded-lg border-2 border-fuchsia-300 bg-gradient-to-br from-[#1b1130] to-[#071f2b] p-5 text-white">
+      <div className="grid gap-4 sm:grid-cols-2">
+        {[{ name: "You", hits: you, accent: "text-cyan-300", ring: "border-cyan-400" }, { name: "Chanzia", hits: chanzia, accent: "text-fuchsia-300", ring: "border-fuchsia-400" }].map((side) => (
+          <div key={side.name} className={`rounded-lg border-2 ${side.ring} bg-white/5 p-4 text-center`}>
+            <div className={`text-xs font-black uppercase tracking-wide ${side.accent}`}>{side.name}</div>
+            <div className="my-3 flex justify-center opacity-90"><ToolVisual tool={tool} winning={winning} total={total} /></div>
+            <div className="text-4xl font-black">{side.hits}</div>
+            <div className="text-xs font-bold uppercase tracking-wide text-white/60">winning outcomes</div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 text-center text-sm font-black uppercase tracking-[0.14em] text-white/70">Spin {Math.min(round, SPINS)} / {SPINS}</div>
+      {done ? (
+        <div className="mt-4 space-y-3 text-center">
+          <div className="text-2xl font-black text-amber-300">{verdict}</div>
+          <ActionButton onClick={onDone}><Check className="h-5 w-5" /> Claim result</ActionButton>
+        </div>
+      ) : (
+        <div className="mt-4 flex justify-center">
+          <ActionButton onClick={spinOff} disabled={spinning}><Play className="h-5 w-5" /> {spinning ? "Spinning…" : `Spin ${SPINS} vs Chanzia`}</ActionButton>
+        </div>
+      )}
     </div>
   </div>;
 }
