@@ -168,6 +168,95 @@ function Frequency({ labels, counts, total }: { labels: string[]; counts: number
   );
 }
 
+function ExpectedObserved({
+  expected,
+  observed,
+  total,
+  eventLabel,
+}: {
+  expected: number;
+  observed: number;
+  total: number;
+  eventLabel?: string;
+}) {
+  // Both counts live on one shared 0..total axis so the prediction and the
+  // real result can be read against each other. A dotted guide line marks the
+  // expected count, and the observed bar overshoots or falls short of it — that
+  // gap is the "chance variation" the card is teaching.
+  const safeTotal = Math.max(total, 1);
+  const x0 = 116; // left edge of the plotted track
+  const x1 = 386; // right edge (== total); leaves room for the end count chip
+  const trackW = x1 - x0;
+  const toX = (n: number) => x0 + (Math.max(0, Math.min(n, safeTotal)) / safeTotal) * trackW;
+  const expX = toX(expected);
+  const obsX = toX(observed);
+  const diff = observed - expected;
+  const diffLabel = diff === 0 ? "spot on" : `${diff > 0 ? "+" : "−"}${Math.abs(diff)}`;
+
+  const rows: { key: string; label: string; sub: string; value: number; endX: number }[] = [
+    { key: "exp", label: "Expected", sub: "predicted", value: expected, endX: expX },
+    { key: "obs", label: "Observed", sub: "what happened", value: observed, endX: obsX },
+  ];
+
+  return (
+    <div className="w-full max-w-md" role="img" aria-label={`Expected ${expected} versus observed ${observed} out of ${total} trials`}>
+      <svg viewBox="0 0 420 168" className="w-full">
+        <defs>
+          <linearGradient id="eo-observed" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#e64bd8" />
+            <stop offset="1" stopColor="#38d9f0" />
+          </linearGradient>
+        </defs>
+
+        {/* dotted prediction guide, drawn behind the bars */}
+        <line x1={expX} y1="26" x2={expX} y2="132" stroke="#7fe7ff" strokeWidth="2" strokeDasharray="3 5" opacity="0.7" />
+
+        {rows.map((row, i) => {
+          const cy = 44 + i * 52;
+          const barTop = cy - 15;
+          const isObserved = row.key === "obs";
+          return (
+            <g key={row.key}>
+              <text x="14" y={cy - 2} className="fill-white" fontSize="15" fontWeight="800">{row.label}</text>
+              <text x="14" y={cy + 15} fontSize="10.5" fontWeight="700" letterSpacing="0.5" fill="#c7b8e8" style={{ textTransform: "uppercase" }}>{row.sub}</text>
+              {/* track */}
+              <rect x={x0} y={barTop} width={trackW} height="30" rx="9" fill="#ffffff" opacity="0.08" />
+              {/* value bar */}
+              <rect
+                x={x0}
+                y={barTop}
+                width={Math.max(6, row.endX - x0)}
+                height="30"
+                rx="9"
+                fill={isObserved ? "url(#eo-observed)" : "none"}
+                stroke={isObserved ? "none" : "#7fe7ff"}
+                strokeWidth={isObserved ? 0 : 2.5}
+                strokeDasharray={isObserved ? undefined : "6 5"}
+              />
+              {/* count chip */}
+              <g transform={`translate(${row.endX + 10}, ${cy})`}>
+                <circle cx="0" cy="0" r="15" fill={isObserved ? "#e64bd8" : "#0b1020"} stroke={isObserved ? "#ffffff" : "#7fe7ff"} strokeWidth="2" />
+                <text x="0" y="5" textAnchor="middle" fontSize="14" fontWeight="900" fill="#ffffff">{row.value}</text>
+              </g>
+            </g>
+          );
+        })}
+
+        {/* baseline axis */}
+        <line x1={x0} y1="150" x2={x1} y2="150" stroke="#ffffff" strokeWidth="1.5" opacity="0.25" />
+        <text x={x0} y="164" fontSize="11" fontWeight="800" fill="#c7b8e8">0</text>
+        <text x={x1} y="164" textAnchor="end" fontSize="11" fontWeight="800" fill="#c7b8e8">{total}{eventLabel ? ` ${eventLabel}` : " trials"}</text>
+      </svg>
+
+      <div className="mt-1 flex items-center justify-center gap-2 text-center">
+        <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-cyan-200">
+          Chance variation: {diffLabel}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function Bag({ counters }: { counters: string[] }) {
   return (
     <svg viewBox="0 0 150 150" width="150" height="150" role="img" aria-label="Bag of counters">
@@ -246,6 +335,7 @@ export default function ChanceVisual({
       {visual.type === "diceGrid" && <DiceGrid mode={visual.mode} highlight={visual.highlight} />}
       {visual.type === "bag" && <Bag counters={visual.counters} />}
       {visual.type === "frequency" && <Frequency labels={visual.labels} counts={visual.counts} total={visual.total} />}
+      {visual.type === "expectedObserved" && <ExpectedObserved expected={visual.expected} observed={visual.observed} total={visual.total} eventLabel={visual.eventLabel} />}
       {visual.type === "scale" && <Scale highlight={visual.highlight} />}
       {legend && legend.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-3">

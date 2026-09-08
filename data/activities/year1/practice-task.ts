@@ -11,6 +11,7 @@ export type ChanceVisual =
   | { type: "diceGrid"; mode: "sum" | "difference"; highlight: number }
   | { type: "bag"; counters: string[] } // each entry is one counter colour
   | { type: "frequency"; labels: string[]; counts: number[]; total: number }
+  | { type: "expectedObserved"; expected: number; observed: number; total: number; eventLabel?: string }
   | { type: "scale"; highlight?: "certain" | "likely" | "unlikely" | "impossible" };
 export type StarpathShape = "circle" | "oval" | "triangle" | "square" | "rectangle";
 export type Year1PatternToken =

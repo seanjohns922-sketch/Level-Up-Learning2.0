@@ -44,7 +44,7 @@ function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
       meaning: "Expected frequency predicts a count; observed frequency records what happened.",
       example: "A 25% event is expected about 10 times in 40 trials.",
       exampleExplanation: "Chance variation means the observed count may differ.",
-      chanceVisual: { type: "frequency", labels: ["Target", "Other"], counts: [11, 29], total: 40 },
+      chanceVisual: { type: "expectedObserved", expected: 10, observed: 11, total: 40 },
     };
     if (week === 4) return {
       term: "long-run frequency",
