@@ -42,6 +42,18 @@ function scale(prompt: string, displayMode: "decimal" | "percent" | "mixed" = "m
   });
 }
 
+// "Three Forms, One Chance": the chance is shown in ONE form and must be placed
+// on a scale labelled in a DIFFERENT form, so the child converts between
+// fraction, decimal and percentage.
+function convertScale(prompt: string, sourceForm: "fraction" | "percent" | "decimal", tickMode: "decimal" | "percent"): Gen {
+  return fresh(() => {
+    const f = pick(FRACTIONS);
+    const value = f.winning / f.total;
+    const sourceLabel = sourceForm === "fraction" ? `${f.winning}/${f.total}` : sourceForm === "percent" ? `${Math.round(value * 100)}%` : String(value);
+    return { kind: "chanceScalePortal", prompt, sourceLabel, targetValue: value, scaleStep: 0.05, displayMode: tickMode };
+  });
+}
+
 function estimate(prompt: string): Gen {
   return fresh(() => {
     const f = pick(FRACTIONS);
@@ -138,7 +150,9 @@ const masterTrial = fresh(() => {
 });
 
 const placeScale = scale("Open the portal at the matching probability.", "mixed");
-const matchForms = scale("Match the probability to its place on the scale.", "mixed");
+const fractionToPercent = convertScale("This chance is a fraction — open the portal at its place on the percentage scale.", "fraction", "percent");
+const fractionToDecimal = convertScale("This chance is a fraction — open the portal at its place on the decimal scale.", "fraction", "decimal");
+const percentToDecimal = convertScale("This chance is a percentage — open the portal at its place on the decimal scale.", "percent", "decimal");
 const percentScale = scale("Calibrate the percentage portal.", "percent");
 const decimalScale = scale("Calibrate the decimal portal.", "decimal");
 const estimateEvent = estimate("Estimate the chance and open the closest portal.");
@@ -165,7 +179,7 @@ const runInvestigation = simulation("Run the full investigation and track its ev
 
 const LESSONS: Record<string, LessonSpec> = {
   "1-1": { teaching: placeScale, activities: [placeScale, percentScale, decimalScale] },
-  "1-2": { teaching: matchForms, activities: [matchForms, percentScale, decimalScale] },
+  "1-2": { teaching: fractionToPercent, activities: [fractionToPercent, fractionToDecimal, percentToDecimal] },
   "1-3": { teaching: estimateEvent, activities: [estimateEvent, placeScale, percentScale] },
   "2-1": { teaching: calculate, activities: [calculate, buildBag, buildDie] },
   "2-2": { teaching: completeWhole, activities: [completeWhole, calculate, buildSpinner] },
