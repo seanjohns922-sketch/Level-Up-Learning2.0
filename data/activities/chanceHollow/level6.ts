@@ -71,6 +71,44 @@ function makeFormMatch(): Gen {
   });
 }
 
+// W5 "Choose the Simulator": show three real spinners with different winning
+// shares and pick the one whose share models the stated event — a visual device
+// comparison instead of reading three text descriptions.
+function spinnerWedges(winning: number, total: number): string[] {
+  return Array.from({ length: total }, (_, i) => (i < winning ? "#d946ef" : "#22d3ee"));
+}
+const MODEL_EVENTS = [
+  { pct: 25, totals: [4, 8] }, { pct: 50, totals: [4, 6, 8] }, { pct: 75, totals: [4, 8] },
+  { pct: 20, totals: [5, 10] }, { pct: 40, totals: [5, 10] }, { pct: 60, totals: [5, 10] }, { pct: 80, totals: [5, 10] },
+] as const;
+function modelCompare(): Gen {
+  return fresh(() => {
+    const event = pick(MODEL_EVENTS);
+    const total = pick(event.totals);
+    const win = Math.round((event.pct / 100) * total);
+    const distractors = shuffle([win - 1, win + 1, win - 2, win + 2].filter((w) => w >= 1 && w <= total - 1 && w !== win));
+    const wrongs = [...new Set(distractors)].slice(0, 2);
+    while (wrongs.length < 2) {
+      const alt = randInt(1, total - 1);
+      if (alt !== win && !wrongs.includes(alt)) wrongs.push(alt);
+    }
+    const specs = shuffle([
+      { win, correct: true },
+      { win: wrongs[0]!, correct: false },
+      { win: wrongs[1]!, correct: false },
+    ]).map((spec, i) => ({ ...spec, label: `Spinner ${String.fromCharCode(65 + i)}` }));
+    const answer = specs.find((spec) => spec.correct)!.label;
+    return {
+      kind: "chanceCompare",
+      prompt: `Which spinner models a ${event.pct}% event?`,
+      tools: specs.map((spec) => ({ visual: { type: "spinner" as const, wedges: spinnerWedges(spec.win, total) }, label: spec.label })),
+      options: specs.map((spec) => spec.label),
+      answer,
+      feedback: { correct: "Its shaded share equals the event.", wrong: `Count the shaded sectors — the winning share must equal ${event.pct}%.` },
+    };
+  });
+}
+
 function forge(prompt: string, targetLabel = "Match the target", fixedTool?: "spinner" | "bag" | "die"): Gen {
   return fresh(() => {
     const tool = fixedTool ?? pick(["spinner", "bag", "die"] as const);
@@ -183,10 +221,14 @@ const explainVariation = simulation("Explain how different results can still fit
 const trialLadder = simulation("Climb the trial ladder, then find which run sat closest to the expected chance.", "convergence", [10, 50, 200], "closest");
 const convergence = simulation("Chase the expected probability, then measure how far the biggest sample missed.", "convergence", [20, 100, 500], "gap");
 const variationStorm = simulation("Ride the variation storm, then spot the run that swung the wildest.", "convergence", [10, 50, 300], "furthest");
-// W5 Simulation Engineering
-const chooseSimulator = debuggerTask("Choose the simulator that matches the event.", "choose");
-const debugMachine = debuggerTask("Find the fault in Chanzia's simulation machine.", "debug");
-const auditMachine = debuggerTask("Audit the machine before it launches.", "audit");
+// W5 Simulation Engineering — three distinct hands-on mechanics: pick the right
+// device (visual compare), repair a faulty device (forge), then complete a
+// device so every outcome is covered (complement / audit).
+const chooseSimulator = modelCompare();
+const fixSpinner = forge("Chanzia's spinner is faulty — set the winning sectors so it models the event.", "Model the event", "spinner");
+const fixBag = forge("Repair the bag simulator so its winning share models the event.", "Model the event", "bag");
+const fixDie = forge("Fix the die simulator so the winning faces model the event.", "Model the event", "die");
+const auditComplete = complement("Audit the machine: add the missing outcomes so every result is covered and the chances total one whole.");
 // W6 Master's Grand Trial
 const planInvestigation = debuggerTask("Lock in a fair investigation plan.", "choose");
 const runInvestigation = simulation("Run the full investigation and track its evidence.", "convergence", [20, 100, 500]);
@@ -206,8 +248,8 @@ const LESSONS: Record<string, LessonSpec> = {
   "4-2": { teaching: convergence, activities: [convergence, convergence, convergence] },
   "4-3": { teaching: variationStorm, activities: [variationStorm, variationStorm, variationStorm] },
   "5-1": { teaching: chooseSimulator, activities: [chooseSimulator, chooseSimulator, chooseSimulator] },
-  "5-2": { teaching: debugMachine, activities: [debugMachine, debugMachine, debugMachine] },
-  "5-3": { teaching: auditMachine, activities: [auditMachine, auditMachine, auditMachine] },
+  "5-2": { teaching: fixSpinner, activities: [fixSpinner, fixBag, fixDie] },
+  "5-3": { teaching: auditComplete, activities: [auditComplete, auditComplete, auditComplete] },
   "6-1": { teaching: planInvestigation, activities: [planInvestigation, planInvestigation, planInvestigation] },
   "6-2": { teaching: runInvestigation, activities: [runInvestigation, runInvestigation, runInvestigation] },
   "6-3": { teaching: masterTrial, activities: [masterTrial, masterVerdict, masterVerdict] },
