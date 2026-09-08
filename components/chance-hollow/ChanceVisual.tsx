@@ -257,6 +257,71 @@ function ExpectedObserved({
   );
 }
 
+function Convergence({
+  expected,
+  samples,
+  eventLabel,
+}: {
+  expected: number;
+  samples: { trials: number; value: number }[];
+  eventLabel?: string;
+}) {
+  // Relative frequency (y) plotted against a growing number of trials (x). A
+  // dashed line marks the expected probability; the observed line swings wide
+  // at small trial counts and hugs the expected line as trials grow — the
+  // long-run steadying the card is teaching.
+  const pts = samples.length ? samples : [{ trials: 1, value: expected }];
+  const x0 = 52;
+  const x1 = 388;
+  const top = 20;
+  const bottom = 150;
+  const plotH = bottom - top;
+  const stepX = pts.length > 1 ? (x1 - x0) / (pts.length - 1) : 0;
+  const px = (i: number) => x0 + i * stepX;
+  const py = (v: number) => top + (1 - Math.max(0, Math.min(1, v))) * plotH;
+  const expY = py(expected);
+  const line = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${px(i)} ${py(p.value)}`).join(" ");
+  const expPct = Math.round(expected * 100);
+
+  return (
+    <div className="w-full max-w-md" role="img" aria-label={`Relative frequency settling toward ${expPct}% as trials increase`}>
+      <svg viewBox="0 0 420 184" className="w-full">
+        <defs>
+          <linearGradient id="cv-line" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#e64bd8" />
+            <stop offset="1" stopColor="#38d9f0" />
+          </linearGradient>
+        </defs>
+
+        {/* y gridlines at 0 / 50 / 100% */}
+        {[0, 0.5, 1].map((g) => (
+          <g key={g}>
+            <line x1={x0} y1={py(g)} x2={x1} y2={py(g)} stroke="#ffffff" strokeWidth="1" opacity={g === 0 ? 0.22 : 0.08} />
+            <text x={x0 - 8} y={py(g) + 4} textAnchor="end" fontSize="10" fontWeight="700" fill="#c7b8e8">{Math.round(g * 100)}%</text>
+          </g>
+        ))}
+
+        {/* expected probability line */}
+        <line x1={x0} y1={expY} x2={x1} y2={expY} stroke="#7fe7ff" strokeWidth="2" strokeDasharray="4 5" />
+        <text x={x1} y={expY - 6} textAnchor="end" fontSize="11" fontWeight="800" fill="#7fe7ff">expected {expPct}%</text>
+
+        {/* observed relative-frequency path */}
+        <path d={line} fill="none" stroke="url(#cv-line)" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
+        {pts.map((p, i) => {
+          const last = i === pts.length - 1;
+          return (
+            <g key={`${p.trials}-${i}`}>
+              <circle cx={px(i)} cy={py(p.value)} r={last ? 6 : 4} fill={last ? "#38d9f0" : "#e64bd8"} stroke="#150f22" strokeWidth="2" />
+              <text x={px(i)} y="168" textAnchor="middle" fontSize="10.5" fontWeight="800" fill="#c7b8e8">{p.trials}</text>
+            </g>
+          );
+        })}
+        <text x={(x0 + x1) / 2} y="182" textAnchor="middle" fontSize="9.5" fontWeight="800" letterSpacing="1" fill="#8f7fb5" style={{ textTransform: "uppercase" }}>{eventLabel ?? "trials"} →</text>
+      </svg>
+    </div>
+  );
+}
+
 function Bag({ counters }: { counters: string[] }) {
   return (
     <svg viewBox="0 0 150 150" width="150" height="150" role="img" aria-label="Bag of counters">
@@ -336,6 +401,7 @@ export default function ChanceVisual({
       {visual.type === "bag" && <Bag counters={visual.counters} />}
       {visual.type === "frequency" && <Frequency labels={visual.labels} counts={visual.counts} total={visual.total} />}
       {visual.type === "expectedObserved" && <ExpectedObserved expected={visual.expected} observed={visual.observed} total={visual.total} eventLabel={visual.eventLabel} />}
+      {visual.type === "convergence" && <Convergence expected={visual.expected} samples={visual.samples} eventLabel={visual.eventLabel} />}
       {visual.type === "scale" && <Scale highlight={visual.highlight} />}
       {legend && legend.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-3">

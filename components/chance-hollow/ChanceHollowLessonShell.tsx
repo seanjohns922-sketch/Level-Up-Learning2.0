@@ -52,7 +52,16 @@ function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
       meaning: "Larger samples tend to reduce relative variation around the expected probability.",
       example: "Ten trials may swing widely; five hundred usually settles closer.",
       exampleExplanation: "More trials improve evidence but never guarantee an exact match.",
-      chanceVisual: { type: "frequency", labels: ["Target", "Other"], counts: [246, 254], total: 500 },
+      chanceVisual: {
+        type: "convergence",
+        expected: 0.5,
+        samples: [
+          { trials: 10, value: 0.8 },
+          { trials: 50, value: 0.32 },
+          { trials: 150, value: 0.59 },
+          { trials: 500, value: 0.49 },
+        ],
+      },
     };
     if (week === 5) return {
       term: "simulation model",
