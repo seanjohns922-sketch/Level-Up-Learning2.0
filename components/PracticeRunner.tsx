@@ -240,6 +240,39 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
     if (task.targetMinute === 15) return `Quarter past ${task.targetHour}`;
     return `Quarter to ${task.targetHour === 12 ? 1 : task.targetHour + 1}`;
   }
+  // Chance Hollow — reveal the real answer on a wrong attempt, across the realm.
+  if (task.kind === "chanceScalePortal") {
+    const pct = Math.round(task.targetValue * 100);
+    const dec = String(Number(task.targetValue.toFixed(2)));
+    return task.displayMode === "percent" ? `${pct}%` : task.displayMode === "decimal" ? dec : `${dec} (${pct}%)`;
+  }
+  if (task.kind === "chanceFormMatch") {
+    const correct = task.options.filter((option) => option.correct).map((option) => option.label);
+    return correct.length ? correct.join(" and ") : null;
+  }
+  if (task.kind === "chanceProbabilityForge") return `${task.targetWinning}/${task.total}`;
+  if (task.kind === "chanceSimulationLab") {
+    const first = task.stages[0] ?? 0;
+    const expected = Math.round((first * task.winning) / task.total);
+    return `${expected} ${task.targetName} in ${first} trials`;
+  }
+  if (task.kind === "chanceModelDebugger") {
+    return task.machines.find((machine) => machine.id === task.answerId)?.title ?? null;
+  }
+  if (task.kind === "chanceMasterTrial") {
+    const probability = task.targetWinning / task.total;
+    const expected = Math.round(task.trials * probability);
+    return `${Math.round(probability * 100)}% chance — about ${expected} wins in ${task.trials} trials`;
+  }
+  if (task.kind === "chanceDiceRace") {
+    return task.choices.find((choice) => choice.id === task.answerId)?.label ?? null;
+  }
+  if (task.kind === "chancePredictCount") {
+    const targetCount = task.wedges.filter((wedge) => wedge === task.targetKey).length;
+    const expected = Math.round((task.spins * targetCount) / Math.max(1, task.wedges.length));
+    return `about ${expected} of ${task.spins} spins`;
+  }
+  if (task.kind === "chanceCompare") return task.answer ?? null;
   const genericTask = task as Record<string, unknown>;
   for (const key of ["correctAnswer", "answer", "correctOption", "correctLabel", "correctReason", "targetNumber", "targetDeg"]) {
     const value = genericTask[key];
@@ -254,6 +287,28 @@ function getPracticeTaskWrongExplanation(task: PracticeTask) {
   if ("feedback" in task && task.feedback && typeof task.feedback === "object" && "wrong" in task.feedback) {
     const wrong = task.feedback.wrong;
     if (typeof wrong === "string" && wrong.trim()) return wrong;
+  }
+  switch (task.kind) {
+    case "chanceScalePortal":
+      return "Read the chance, then slide the marker to that exact spot on the scale.";
+    case "chanceFormMatch":
+      return "Two cards name the same chance as the fraction — its decimal and its percentage.";
+    case "chanceProbabilityForge":
+      return "Add or remove parts until the winning share matches the target chance.";
+    case "chanceSimulationLab":
+      return "Expected count = chance × number of trials, rounded to a whole number.";
+    case "chanceModelDebugger":
+      return "A fair model gives every outcome its correct share — check each machine's parts.";
+    case "chanceMasterTrial":
+      return "Turn the fraction into a percentage, then multiply the chance by the trials for the expected wins.";
+    case "chanceDiceRace":
+      return "Group the outcomes so each player's rules cover the same total chance.";
+    case "chancePredictCount":
+      return "Expected wins = the target's chance × the number of spins.";
+    case "chanceAutoTally":
+      return "Read the tally you built — the answer is whatever the results actually show.";
+    default:
+      break;
   }
   return "Look at the clue in the question, then try again.";
 }
@@ -960,11 +1015,17 @@ export function PracticeRunner({
     return nextQuestionsAnswered;
   }
 
-  function markWrong(studentAnswer?: string | number | null) {
+  function markWrong(studentAnswer?: string | number | null, correctAnswerOverride?: string | null) {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
     const topicLabel = formatPracticeTopicLabel(task.kind);
     const questionNumber = questionsAnsweredRef.current + 1;
+    // Cards whose correct answer only exists at runtime (e.g. a tally built from
+    // random rolls) pass it in; otherwise derive it from the task definition.
+    const resolvedCorrectAnswer =
+      correctAnswerOverride != null && String(correctAnswerOverride).trim()
+        ? String(correctAnswerOverride)
+        : getPracticeTaskCorrectAnswer(task);
     const mistake: MistakeReviewItem = {
       id: `${resumeLessonKey ?? "lesson"}-mistake-${questionNumber}`,
       questionNumber,
@@ -973,7 +1034,7 @@ export function PracticeRunner({
         studentAnswer === undefined || studentAnswer === null || studentAnswer === ""
           ? "Incorrect attempt"
           : String(studentAnswer),
-      correctAnswer: getPracticeTaskCorrectAnswer(task),
+      correctAnswer: resolvedCorrectAnswer,
       explanation: getPracticeTaskWrongExplanation(task),
       taskId: `${resumeLessonKey ?? "lesson"}-q${questionNumber}`,
       taskData: task,
@@ -1007,7 +1068,7 @@ export function PracticeRunner({
         questionId: `${liveContext.lessonId}-q${questionNumber}`,
         questionText: getPracticeTaskPrompt(task),
         questionType: task.kind,
-        correctAnswer: getPracticeTaskCorrectAnswer(task),
+        correctAnswer: resolvedCorrectAnswer,
         isCorrect: false,
         timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
         attemptNumber: 1,

@@ -247,7 +247,7 @@ import { isPracticeTaskSafe } from "@/lib/task-safety";
 type Callbacks = {
   markCorrect: () => void;
   markCorrectSoft: () => void;
-  markWrong: (studentAnswer?: string | number | null) => void;
+  markWrong: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
   advanceIntro?: () => void;
   markAttempted?: () => void;
   recordAssessmentAnswer?: (correct: boolean, response: string) => void;
@@ -364,7 +364,7 @@ function TaskRendererInner({
     markCorrect();
   }, 0);
   const onCS = () => setTimeout(() => markCorrectSoft(), 0);
-  const onW = (studentAnswer?: string | number | null) => markWrong(studentAnswer);
+  const onW = (studentAnswer?: string | number | null, correctAnswer?: string | null) => markWrong(studentAnswer, correctAnswer);
   // This renderer fans out across many legacy task variants with different payload shapes.
   // Keep the cast local so the switch stays compact without changing runtime behavior.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
