@@ -32,6 +32,7 @@ import { getBrainBreakSchedule, type BrainBreakFrequency } from "@/lib/brain-bre
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 import ChanceVisual from "@/components/chance-hollow/ChanceVisual";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
+import { MathFormattedText } from "@/components/FractionText";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 
 type McqTask = Extract<PracticeTask, { kind: "mcq" }>;
@@ -1479,7 +1480,7 @@ export function PracticeRunner({
               </div>
               {currentCorrectAnswer ? (
                 <div className="mt-1 text-emerald-800">
-                  Correct answer: <span className="font-black">{currentCorrectAnswer}</span>
+                  Correct answer: <span className="font-black">{typeof currentCorrectAnswer === "string" ? <MathFormattedText text={currentCorrectAnswer} /> : currentCorrectAnswer}</span>
                 </div>
               ) : null}
               <div className="mt-1 text-red-900">{currentWrongExplanation}</div>
@@ -1530,7 +1531,7 @@ export function PracticeRunner({
         {isBuiltinKind && "prompt" in task && task.prompt && (
           <div className="mb-4 flex items-center gap-2">
             <div className="text-xl font-extrabold leading-tight text-foreground md:text-2xl">
-              {task.prompt}
+              {task.kind === "mcq" ? <MathFormattedText text={task.prompt} /> : task.prompt}
             </div>
             <ReadAloudBtn text={task.prompt} />
           </div>
@@ -1558,7 +1559,7 @@ export function PracticeRunner({
               >
                 {isChance ? (
                   <>
-                    <span>{opt}</span>
+                    <span><MathFormattedText text={opt} fractionSize="lg" /></span>
                     <OptionReadAloudButton text={opt} />
                   </>
                 ) : (
