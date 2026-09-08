@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
+import { MathFormattedText } from "@/components/FractionText";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type Task = Extract<PracticeTask, { kind: "chanceAutoTally" }>;
@@ -96,10 +97,10 @@ function TallyTable({ labels, tally, title }: { labels: Task["labels"]; tally: T
 
 export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
   const { tool, draw, labels, spins, mode } = task;
-  const trials = mode === "compareTrials" || mode === "predictMatch" ? 2 : 1;
+  const trials = mode === "compareTrials" || mode === "compareFrequencies" || mode === "predictMatch" ? 2 : 1;
 
   const isPredict = mode === "predictMatch" || mode === "predictMost";
-  const [phase, setPhase] = useState<"ready" | "predict" | "running" | "answer" | "reveal">(isPredict ? "predict" : "ready");
+  const [phase, setPhase] = useState<"ready" | "predict" | "running" | "answer" | "interpret" | "reveal">(isPredict ? "predict" : "ready");
   const [tallies, setTallies] = useState<Tally[]>(() => Array.from({ length: trials }, () => ({})));
   const [current, setCurrent] = useState<string | null>(null);
   const [rotation, setRotation] = useState(0);
@@ -166,13 +167,52 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
     if (id === correctId) onCorrect(); else onWrong(id);
   }
 
+  const comparisonOutcome = labels[0]!;
+  const trialOneCount = tallies[0]?.[comparisonOutcome.key] ?? 0;
+  const trialTwoCount = tallies[1]?.[comparisonOutcome.key] ?? 0;
+  const frequencyComparisonId = trialOneCount > trialTwoCount ? "trial-1" : trialTwoCount > trialOneCount ? "trial-2" : "equal";
+
+  function answerFrequencyComparison(id: string) {
+    if (settled) return;
+    if (id === frequencyComparisonId) {
+      setPhase("interpret");
+      return;
+    }
+    setSettled(true);
+    onWrong(id);
+  }
+
+  function answerInterpretation(id: string) {
+    if (settled) return;
+    setSettled(true);
+    if (id === "variation") onCorrect(); else onWrong(id);
+  }
+
   const compareOptions = [
     { id: "varied", label: "No — the two results were different" },
     { id: "identical", label: "Yes — the two trials were exactly the same" },
     { id: "wrong", label: "One of the trials must be wrong" },
     { id: "broken", label: `The ${tool} is broken` },
   ];
-  const question = mode === "least" ? "Which came up the fewest times?" : mode === "compareTrials" ? "Did the two trials come out exactly the same?" : "Which came up the most often?";
+  const frequencyOptions = [
+    { id: "trial-1", label: `Trial 1 has the greater relative frequency: ${trialOneCount}/${spins} > ${trialTwoCount}/${spins}` },
+    { id: "trial-2", label: `Trial 2 has the greater relative frequency: ${trialTwoCount}/${spins} > ${trialOneCount}/${spins}` },
+    { id: "equal", label: `The relative frequencies are equal: ${trialOneCount}/${spins} = ${trialTwoCount}/${spins}` },
+    { id: "cannot", label: "The trials cannot be compared because their results are different" },
+  ];
+  const interpretationOptions = [
+    { id: "variation", label: "Repeated trials can have different relative frequencies even when the chance process stays fair" },
+    { id: "forever", label: `The trial with more ${comparisonOutcome.name.toLowerCase()} proves that outcome will be more likely forever` },
+    { id: "exact", label: `A fair ${tool} must produce exactly the same frequencies in every experiment` },
+    { id: "invalid", label: "Different frequencies prove that one of the experiments was invalid" },
+  ];
+  const question = mode === "least"
+    ? "Which came up the fewest times?"
+    : mode === "compareTrials"
+      ? "Did the two trials come out exactly the same?"
+      : mode === "compareFrequencies"
+        ? `Which statement correctly compares the relative frequency of ${comparisonOutcome.name.toLowerCase()}?`
+        : "Which came up the most often?";
 
   return (
     <div className="space-y-4">
@@ -263,6 +303,18 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
                     </button>
                   ))}
                 </div>
+              ) : mode === "compareFrequencies" ? (
+                <div className="space-y-3">
+                  <div className="text-xs font-black uppercase tracking-[0.16em] text-[#8d4a96]">Analysis 1 of 2</div>
+                  <div className="grid gap-2">
+                    {frequencyOptions.map((option) => (
+                      <button key={option.id} type="button" disabled={settled} onClick={() => answerFrequencyComparison(option.id)} className="flex min-h-16 items-center justify-between gap-3 rounded-lg border-2 border-[#e0d3f2] bg-white px-4 py-3 text-left font-black text-[#3a2f52] transition hover:border-[#6d3f9c] disabled:opacity-60">
+                        <span><MathFormattedText text={option.label} fractionSize="md" /></span>
+                        <OptionReadAloudButton text={option.label} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ) : (
                 <div className="grid gap-2 sm:grid-cols-2">
                   {labels.map((l) => (
@@ -273,6 +325,22 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
                   ))}
                 </div>
               )}
+            </div>
+          ) : phase === "interpret" ? (
+            <div className="space-y-3">
+              <div className="text-xs font-black uppercase tracking-[0.16em] text-[#8d4a96]">Evidence 2 of 2</div>
+              <div className="flex items-start gap-2">
+                <p className="text-lg font-black text-[#3a2f52]">What is the strongest conclusion supported by these two experiments?</p>
+                <ReadAloudBtn text="What is the strongest conclusion supported by these two experiments?" />
+              </div>
+              <div className="grid gap-2">
+                {interpretationOptions.map((option) => (
+                  <button key={option.id} type="button" disabled={settled} onClick={() => answerInterpretation(option.id)} className="flex min-h-16 items-center justify-between gap-3 rounded-lg border-2 border-[#e0d3f2] bg-white px-4 py-3 text-left font-black text-[#3a2f52] transition hover:border-[#6d3f9c] disabled:opacity-60">
+                    <span>{option.label}</span>
+                    <OptionReadAloudButton text={option.label} />
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
             <p className="text-sm font-bold text-[#6b6280]" role="status">{phase === "ready" ? `Press Auto-${actionWord} to run the experiment.` : "Watching the results build…"}</p>

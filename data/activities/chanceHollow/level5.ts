@@ -385,7 +385,7 @@ const compareRuns = fresh(() => {
 
 const compareTrialsInteractive = fresh(() => {
   const spins = randInt(12, 30);
-  return { kind: "chanceAutoTally", prompt: `Run two ${spins}-trial experiments and compare their frequencies.`, tool: "coin", draw: ["heads", "tails"], spins, labels: [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: "compareTrials" };
+  return { kind: "chanceAutoTally", prompt: `Run two ${spins}-trial experiments, compare their relative frequencies and explain the variation.`, tool: "coin", draw: ["heads", "tails"], spins, labels: [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: "compareFrequencies" };
 });
 
 const variationReason = fresh(() => {
@@ -547,7 +547,7 @@ const investigationSpinner = fresh(() => {
   const secondCount = randInt(1, majorCount - 1);
   return { kind: "chanceAutoTally", prompt: "Predict, run and record the uneven spinner investigation.", tool: "spinner", draw: shuffle([...Array(majorCount).fill(major), ...Array(secondCount).fill(second), third] as string[]), spins: randInt(24, 40), labels: [{ key: major, name: cap(NAMES[major]!), colour: major }, { key: second, name: cap(NAMES[second]!), colour: second }, { key: third, name: cap(NAMES[third]!), colour: third }], mode: "predictMost" };
 });
-const investigationCoin = fresh(() => ({ kind: "chanceAutoTally", prompt: "Predict, run and compare two repeated fair-coin investigations.", tool: "coin", draw: ["heads", "tails"], spins: randInt(20, 40), labels: [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: "compareTrials" }));
+const investigationCoin = fresh(() => ({ kind: "chanceAutoTally", prompt: "Run and compare two fair-coin investigations, then defend what the relative frequencies show.", tool: "coin", draw: ["heads", "tails"], spins: randInt(20, 40), labels: [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: "compareFrequencies" }));
 const investigationDie = fresh(() => ({ kind: "chanceSpinTally", prompt: "Run the die investigation and record every result before judging the frequencies.", tool: "die", draw: ["1", "2", "3", "4", "5", "6"], spins: randInt(18, 36), labels: [1, 2, 3, 4, 5, 6].map((value) => ({ key: String(value), name: String(value) })) }));
 
 const defendFrequency = fresh(() => {
