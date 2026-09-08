@@ -6,6 +6,11 @@ type LessonSpec = { teaching: Gen; activities: readonly [Gen, Gen, Gen, ...Gen[]
 
 const pick = <T,>(items: readonly T[]): T => items[Math.floor(Math.random() * items.length)]!;
 const randInt = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+function shuffle<T>(items: readonly T[]): T[] {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [out[i], out[j]] = [out[j]!, out[i]!]; }
+  return out;
+}
 
 function fresh(build: () => PracticeTask): Gen {
   const recent: string[] = [];
@@ -80,13 +85,33 @@ function simulation(prompt: string, challenge: "predict" | "compare" | "converge
   });
 }
 
+const DEBUG_TARGETS = [
+  "a 1 in 2 event", "a 1 in 4 event", "a 1 in 5 event", "a 2 in 5 event",
+  "a 3 in 5 event", "a 3 in 4 event", "a 20% event", "a 40% event", "a 75% event",
+] as const;
+const DEBUG_POOLS: Record<"choose" | "debug" | "audit", { correct: string[]; wrong: string[] }> = {
+  choose: {
+    correct: ["Its winning share matches {t} exactly.", "The outcomes have the same proportions as {t}.", "Every outcome is mapped so the chance equals {t}."],
+    wrong: ["A winning outcome is mapped twice.", "Its winning share does not match the event.", "It uses more winning outcomes than the event.", "One losing outcome is treated as a win."],
+  },
+  debug: {
+    correct: ["Outcomes are mapped once and the tool resets after every trial.", "Each outcome is used once and nothing carries over between trials.", "The mapping is one-to-one and the tool is reset before each trial."],
+    wrong: ["A winning outcome is mapped twice.", "Used outcomes stay removed after each trial.", "The tool is not reset between trials.", "Two different outcomes share the same result."],
+  },
+  audit: {
+    correct: ["All outcomes are included and their probabilities total 100%.", "Every outcome is listed and the shares add to one whole.", "Nothing is missing and the probabilities total 100%."],
+    wrong: ["One possible outcome is missing.", "The probabilities add up to more than 100%.", "An outcome is listed twice.", "Its winning share does not match the event."],
+  },
+};
 function debuggerTask(prompt: string, purpose: "choose" | "debug" | "audit"): Gen {
   return fresh(() => {
-    const target = pick(["a 1 in 2 event", "a 1 in 4 event", "a 3 in 5 event", "a 20% event"] as const);
+    const target = pick(DEBUG_TARGETS);
     const answerId = `machine-${randInt(1000, 9999)}`;
     const wrongA = `machine-${randInt(1000, 9999)}`;
     const wrongB = `machine-${randInt(1000, 9999)}`;
-    const correct = purpose === "audit" ? "All outcomes are included and their probabilities total 100%." : purpose === "debug" ? "Outcomes are mapped once and the tool resets after every trial." : `The outcomes have the same proportions as ${target}.`;
+    const pool = DEBUG_POOLS[purpose];
+    const correct = pick(pool.correct).replace("{t}", target);
+    const [w1, w2] = shuffle(pool.wrong).slice(0, 2);
     return {
       kind: "chanceModelDebugger",
       prompt,
@@ -94,9 +119,9 @@ function debuggerTask(prompt: string, purpose: "choose" | "debug" | "audit"): Ge
       // Shuffle first, THEN label A/B/C by position, so the correct machine's
       // label is not always the same (otherwise kids just learn to pick it).
       machines: [
-        { id: wrongA, detail: purpose === "audit" ? "One possible outcome is missing." : "A winning outcome is mapped twice.", fair: false },
+        { id: wrongA, detail: w1!, fair: false },
         { id: answerId, detail: correct, fair: true },
-        { id: wrongB, detail: purpose === "debug" ? "Used outcomes stay removed after each trial." : "Its winning share does not match the event.", fair: false },
+        { id: wrongB, detail: w2!, fair: false },
       ].sort(() => Math.random() - 0.5).map((machine, index) => ({ ...machine, title: `Machine ${String.fromCharCode(65 + index)}` })),
       answerId,
       reason: correct,
@@ -156,7 +181,7 @@ const LESSONS: Record<string, LessonSpec> = {
   "5-3": { teaching: auditMachine, activities: [auditMachine, debugMachine, completeWhole] },
   "6-1": { teaching: planInvestigation, activities: [planInvestigation, chooseSimulator, predictFrequency] },
   "6-2": { teaching: runInvestigation, activities: [runInvestigation, trialLadder, auditMachine] },
-  "6-3": { teaching: masterTrial, activities: [masterTrial, masterTrial, masterTrial] },
+  "6-3": { teaching: masterTrial, activities: [masterTrial, runInvestigation, runInvestigation] },
 };
 
 export function getChanceHollowLevel6TaskSet(lessonId: string): RealmLessonTaskSet | null {
