@@ -529,16 +529,44 @@ const planQuestion = fresh(() => {
 const planMethod = fresh(() => {
   const trials = pick([20, 30, 40] as const);
   const tool = pick(["coin", "spinner", "die", "counter bag"] as const);
-  return mcq(`Which method makes a ${trials}-trial ${tool} investigation trustworthy?`, "Use the same tool and rule, record every result, and replace drawn items",
-    ["Change the tool after every result", "Record only favourite outcomes", "Stop when the prediction is winning"],
-    "Correct. A consistent method makes the frequencies comparable.", "Keep the procedure unchanged and record every outcome.");
+  const good = [
+    "Use the same tool and rule, and record every result",
+    "Keep the rule fixed and replace each drawn item before the next trial",
+    "Record every outcome, even the ones you did not predict",
+  ];
+  const bad = [
+    "Change the tool after every result",
+    "Record only your favourite outcomes",
+    "Stop as soon as your prediction is winning",
+    "Skip the results that do not match your guess",
+  ];
+  if (Math.random() < 0.5) {
+    return mcq(`Which method makes a ${trials}-trial ${tool} investigation trustworthy?`, pick(good),
+      shuffle(bad).slice(0, 3), "Correct. A fair, consistent method makes the frequencies comparable.", "A trustworthy method keeps the rule fixed and records every result.");
+  }
+  return mcq(`Which choice would SPOIL a ${trials}-trial ${tool} investigation?`, pick(bad),
+    shuffle(good).slice(0, 3), "Correct. That breaks the fair, consistent method.", "The spoiler is the choice that changes the rule or hides results.");
 });
 const planTable = fresh(() => {
   const outcomes = pick(["heads and tails", "die faces 1 to 6", "red, blue and gold"] as const);
   const trials = pick([20, 30, 40] as const);
-  return mcq(`A ${trials}-trial investigation records ${outcomes}. What must the results table include?`, "One labelled frequency row for every possible outcome",
-    ["Only the predicted winner", "A different total for every row", "Unrecorded extra outcomes"],
-    "Correct. Every possible outcome needs a place to be recorded.", "The recording table must match the complete outcome set.");
+  const good = [
+    "One labelled row for every possible outcome",
+    "A clear label and a tally space for each outcome",
+    "Room for every outcome, even the unlikely ones",
+  ];
+  const bad = [
+    "A row only for the predicted winner",
+    "A different total for every row",
+    "Extra rows for outcomes that cannot happen",
+    "Rows only for the outcomes you like",
+  ];
+  if (Math.random() < 0.5) {
+    return mcq(`A ${trials}-trial investigation records ${outcomes}. What must the results table include?`, pick(good),
+      shuffle(bad).slice(0, 3), "Correct. Every possible outcome needs its own place to be recorded.", "The table must match the complete outcome set.");
+  }
+  return mcq(`A ${trials}-trial investigation records ${outcomes}. What would make the results table WRONG?`, pick(bad),
+    shuffle(good).slice(0, 3), "Correct. That table would not match the real outcome set.", "The wrong table leaves out outcomes or adds ones that cannot happen.");
 });
 
 const investigationSpinner = fresh(() => {
@@ -550,14 +578,32 @@ const investigationSpinner = fresh(() => {
 const investigationCoin = fresh(() => ({ kind: "chanceAutoTally", prompt: "Run and compare two fair-coin investigations, then defend what the relative frequencies show.", tool: "coin", draw: ["heads", "tails"], spins: randInt(20, 40), labels: [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: "compareFrequencies" }));
 const investigationDie = fresh(() => ({ kind: "chanceSpinTally", prompt: "Run the die investigation and record every result before judging the frequencies.", tool: "die", draw: ["1", "2", "3", "4", "5", "6"], spins: randInt(18, 36), labels: [1, 2, 3, 4, 5, 6].map((value) => ({ key: String(value), name: String(value) })) }));
 
-const defendFrequency = fresh(() => {
-  const total = pick([24, 30, 36] as const);
-  const target = randInt(Math.ceil(total * 0.45), Math.ceil(total * 0.7));
-  return mcq(`The target occurred ${target}/${total} times. Which verdict uses the evidence correctly?`, "The target had the greatest observed relative frequency in this investigation",
-    ["The target is now certain forever", "Every future trial must match", "The other outcomes are impossible"],
-    "Correct. The verdict describes the recorded evidence without overclaiming.", "A sound conclusion stays tied to this investigation and its frequencies.", frequency(["Target", "Other"], [target, total - target]));
+// Read a real results chart and choose the verdict that fits — the correct
+// answer depends on whether one outcome clearly won or the results were close,
+// and never overclaims. Varies the tool (die or spinner colours) too.
+const judgeVerdict = fresh(() => {
+  const total = pick([30, 36, 42] as const);
+  const winner = Math.random() < 0.5;
+  const useDie = Math.random() < 0.5;
+  const items = useDie ? ["1", "2", "3", "4", "5", "6"] : shuffle(COLOURS).slice(0, 3).map((c) => cap(NAMES[c]!));
+  const k = items.length;
+  let counts: number[];
+  if (winner) {
+    const top = Math.round(total * (useDie ? 0.3 : 0.55));
+    const rest = spreadTotal(total - top, k - 1);
+    const idx = randInt(0, k - 1);
+    counts = [...rest.slice(0, idx), top, ...rest.slice(idx)];
+  } else {
+    counts = spreadTotal(total, k);
+  }
+  const topName = items[counts.indexOf(Math.max(...counts))]!;
+  const winnerText = `${topName} came up most often in this investigation`;
+  const closeText = "The results were close — no outcome clearly stood out";
+  const answer = winner ? winnerText : closeText;
+  return mcq("Read the results. Which verdict fits the evidence?", answer,
+    [winner ? closeText : winnerText, `${topName} is certain to come up next time`, "The other outcomes are now impossible"],
+    "Correct. The verdict matches the frequencies without overclaiming.", "Pick the conclusion that matches the chart and does not overclaim.", frequency(items, counts));
 });
-const defendVariation = fresh(() => variationReason());
 const grandRace = fresh(raceTask);
 
 const LESSONS: Record<string, LessonSpec> = {
@@ -578,7 +624,7 @@ const LESSONS: Record<string, LessonSpec> = {
   "5-3": { teaching: judgeDieEvidence, activities: [judgeDieEvidence, compareFairLoaded2, compareFairLoaded] },
   "6-1": { teaching: planQuestion, activities: [planQuestion, planMethod, planTable] },
   "6-2": { teaching: investigationSpinner, activities: [investigationSpinner, investigationCoin, investigationDie] },
-  "6-3": { teaching: defendFrequency, activities: [defendFrequency, defendVariation, grandRace] },
+  "6-3": { teaching: judgeVerdict, activities: [judgeVerdict, judgeVerdict, grandRace] },
 };
 
 export function getChanceHollowLevel5TaskSet(lessonId: string): RealmLessonTaskSet | null {
