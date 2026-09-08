@@ -257,6 +257,52 @@ export type PracticeTask = (
       winningScore: number;
     }
   | {
+      kind: "chanceScalePortal";
+      prompt: string;
+      sourceLabel: string;
+      targetValue: number;
+      scaleStep: number;
+      displayMode: "decimal" | "percent" | "mixed";
+    }
+  | {
+      kind: "chanceProbabilityForge";
+      prompt: string;
+      tool: "spinner" | "bag" | "die";
+      targetWinning: number;
+      total: number;
+      initialWinning: number;
+      targetLabel: string;
+      sourceWinning?: number;
+    }
+  | {
+      kind: "chanceSimulationLab";
+      prompt: string;
+      tool: "spinner" | "coin" | "die";
+      winning: number;
+      total: number;
+      stages: number[];
+      targetName: string;
+      challenge: "predict" | "compare" | "convergence";
+    }
+  | {
+      kind: "chanceModelDebugger";
+      prompt: string;
+      scenario: string;
+      machines: { id: string; title: string; detail: string; fair: boolean }[];
+      answerId: string;
+      reason: string;
+    }
+  | {
+      kind: "chanceMasterTrial";
+      prompt: string;
+      targetWinning: number;
+      total: number;
+      trials: number;
+      observed: number;
+      opponentName: string;
+      opponentImage: string;
+    }
+  | {
       kind: "order3";
       prompt: string;
       numbers: number[];

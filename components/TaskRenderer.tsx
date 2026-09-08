@@ -211,6 +211,13 @@ import ChanceBuildFairCard from "@/components/chance-hollow/ChanceBuildFairCard"
 import ChanceCompareToolsCard from "@/components/chance-hollow/ChanceCompareToolsCard";
 import ChancePredictCountCard from "@/components/chance-hollow/ChancePredictCountCard";
 import ChanceDiceRaceCard from "@/components/chance-hollow/ChanceDiceRaceCard";
+import {
+  ChanceMasterTrialCard,
+  ChanceModelDebuggerCard,
+  ChanceProbabilityForgeCard,
+  ChanceScalePortalCard,
+  ChanceSimulationLabCard,
+} from "@/components/chance-hollow/ChanceLevel6Cards";
 import StatisticaCollectCard from "@/components/statistica/StatisticaCollectCard";
 import StatisticaClassifyCard from "@/components/statistica/StatisticaClassifyCard";
 import StatisticaConceptCard from "@/components/statistica/StatisticaConceptCard";
@@ -758,6 +765,16 @@ function TaskRendererInner({
       return <ChancePredictCountCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceDiceRace":
       return <ChanceDiceRaceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "chanceScalePortal":
+      return <ChanceScalePortalCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "chanceProbabilityForge":
+      return <ChanceProbabilityForgeCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "chanceSimulationLab":
+      return <ChanceSimulationLabCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "chanceModelDebugger":
+      return <ChanceModelDebuggerCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "chanceMasterTrial":
+      return <ChanceMasterTrialCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaCollect":
       return <StatisticaCollectCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaClassify":

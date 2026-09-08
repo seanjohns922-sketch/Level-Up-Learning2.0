@@ -15,6 +15,7 @@ const CHANCE_LEVELS: Array<{ id: RealmLevelId; label: string }> = [
   { id: "Year 3", label: "Level 3" },
   { id: "Year 4", label: "Level 4" },
   { id: "Year 5", label: "Level 5" },
+  { id: "Year 6", label: "Level 6" },
 ];
 
 const DISTRICTS = [
@@ -29,13 +30,19 @@ const LEVEL_5_DISTRICTS = [
   { left: "calc(50% - 190px)", top: "56%", color: "#22d3ee", name: "ROLLER CITADEL", identity: "INVESTIGATE" },
 ] as const;
 
+const LEVEL_6_DISTRICTS = [
+  { left: "5%", top: "18%", color: "#22d3ee", name: "SCALE SANCTUM", identity: "CALIBRATE" },
+  { left: "67%", top: "18%", color: "#d946ef", name: "SIMULATION SPIRE", identity: "SIMULATE" },
+  { left: "calc(50% - 190px)", top: "56%", color: "#fbbf24", name: "MASTER CITADEL", identity: "INVESTIGATE" },
+] as const;
+
 function normalizeLevel(level: string): RealmLevelId {
   return CHANCE_LEVELS.some((entry) => entry.id === level) ? (level as RealmLevelId) : "Year 3";
 }
 
 function getDistricts(level: RealmLevelId): readonly RealmDashboardDistrict[] {
   const plan = getCurriculumPlan(level, "probability");
-  const districts = level === "Year 5" ? LEVEL_5_DISTRICTS : DISTRICTS;
+  const districts = level === "Year 6" ? LEVEL_6_DISTRICTS : level === "Year 5" ? LEVEL_5_DISTRICTS : DISTRICTS;
   return districts.map((position, index) => {
     const weekStart = index * 2 + 1;
     const weekEnd = weekStart + 1;
@@ -75,8 +82,8 @@ export const CHANCE_HOLLOW_DASHBOARD_CONFIG = {
   guidedTagline: "FOLLOW THE CHANCE TRAIL",
   totalWeeks: 6,
   minLevelIndex: 3,
-  maxLevelIndex: 5,
-  districtModeLevels: ["Year 3", "Year 4", "Year 5"],
+  maxLevelIndex: 6,
+  districtModeLevels: ["Year 3", "Year 4", "Year 5", "Year 6"],
   worldForLevel: getWorld,
   districtsForLevel: getDistricts,
   theme: {

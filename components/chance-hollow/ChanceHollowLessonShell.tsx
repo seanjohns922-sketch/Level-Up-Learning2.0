@@ -9,6 +9,7 @@ import { createRandomRealmLessonGenerator, type RealmLessonTaskGenerator } from 
 import { getChanceHollowLevel3TaskSet } from "@/data/activities/chanceHollow/level3";
 import { getChanceHollowLevel4TaskSet } from "@/data/activities/chanceHollow/level4";
 import { getChanceHollowLevel5TaskSet } from "@/data/activities/chanceHollow/level5";
+import { getChanceHollowLevel6TaskSet } from "@/data/activities/chanceHollow/level6";
 import type { Lesson } from "@/data/programs/year1";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
@@ -20,6 +21,56 @@ import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEn
 type Phase = "home" | "concept" | "active";
 
 function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
+  if (levelNumber === 6) {
+    if (week === 1) return {
+      term: "probability scale",
+      title: "Probability has a place from impossible to certain",
+      meaning: "Every probability sits between 0 and 1, or 0% and 100%.",
+      example: "One half, 0.5 and 50% mark the same point.",
+      exampleExplanation: "Different forms can name the same chance.",
+      chanceModel: { visual: { type: "spinner", wedges: ["#d946ef", "#d946ef", "#22d3ee", "#22d3ee"] }, numerator: 2, denominator: 4, winningLabel: "2 glowing sectors", totalLabel: "4 sectors" },
+    };
+    if (week === 2) return {
+      term: "probability",
+      title: "Winning outcomes are compared with all outcomes",
+      meaning: "Probability equals favourable outcomes divided by all equally likely outcomes.",
+      example: "Three winning sectors out of five gives a probability of 3/5.",
+      exampleExplanation: "The numerator counts wins; the denominator counts every outcome.",
+      chanceModel: { visual: { type: "spinner", wedges: ["#d946ef", "#d946ef", "#d946ef", "#22d3ee", "#22d3ee"] }, numerator: 3, denominator: 5, winningLabel: "3 winning sectors", totalLabel: "5 sectors" },
+    };
+    if (week === 3) return {
+      term: "expected frequency",
+      title: "Expected and observed results are compared",
+      meaning: "Expected frequency predicts a count; observed frequency records what happened.",
+      example: "A 25% event is expected about 10 times in 40 trials.",
+      exampleExplanation: "Chance variation means the observed count may differ.",
+      chanceVisual: { type: "frequency", labels: ["Target", "Other"], counts: [11, 29], total: 40 },
+    };
+    if (week === 4) return {
+      term: "long-run frequency",
+      title: "More trials usually steady the relative frequency",
+      meaning: "Larger samples tend to reduce relative variation around the expected probability.",
+      example: "Ten trials may swing widely; five hundred usually settles closer.",
+      exampleExplanation: "More trials improve evidence but never guarantee an exact match.",
+      chanceVisual: { type: "frequency", labels: ["Target", "Other"], counts: [246, 254], total: 500 },
+    };
+    if (week === 5) return {
+      term: "simulation model",
+      title: "A valid simulator preserves the event's probabilities",
+      meaning: "Each simulated outcome must be mapped fairly and reset every trial.",
+      example: "A 25% event can use one winning sector on a four-part spinner.",
+      exampleExplanation: "The model's winning share matches the real event.",
+      chanceVisual: { type: "spinner", wedges: ["#d946ef", "#22d3ee", "#22d3ee", "#22d3ee"] },
+    };
+    return {
+      term: "probability investigation",
+      title: "Strong conclusions connect model, trials and evidence",
+      meaning: "Plan fairly, predict, simulate many trials and defend a careful conclusion.",
+      example: "Compare expected probability with observed relative frequency across trial sizes.",
+      exampleExplanation: "The verdict must fit the evidence without claiming certainty.",
+      chanceVisual: { type: "dicePair", left: 4, right: 6 },
+    };
+  }
   if (levelNumber === 5) {
     if (week === 1) return {
       term: "outcome set",
@@ -149,6 +200,17 @@ function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
 }
 
 function successCriteriaFor(levelNumber: number, week: number, lessonNumber: number): string[] {
+  if (levelNumber === 6) {
+    const criteria: Record<number, string[]> = {
+      1: ["place probability on a scale", "match fractions, decimals and percentages", "estimate probability from information"],
+      2: ["calculate favourable outcomes", "complete probability to one whole", "build a target probability"],
+      3: ["predict an expected frequency", "compare expected and observed results", "explain chance variation"],
+      4: ["compare increasing trial sizes", "track relative frequency", "state what larger samples tend to do"],
+      5: ["choose a matching simulator", "debug an unfair model", "check probabilities total one"],
+      6: ["plan a fair investigation", "run increasing trial counts", "defend a conclusion with evidence"],
+    };
+    return criteria[week] ?? ["represent probability", "run a simulation", "use evidence carefully"];
+  }
   if (levelNumber === 5) {
     const criteria: Record<string, string[]> = {
       "1-1": ["match outcomes to the question", "separate outcomes from details", "explain why the outcome set changes"],
@@ -401,7 +463,9 @@ export default function ChanceHollowLessonShell({
           ? getChanceHollowLevel4TaskSet(lesson.id)
           : levelNumber === 5
             ? getChanceHollowLevel5TaskSet(lesson.id)
-          : null;
+            : levelNumber === 6
+              ? getChanceHollowLevel6TaskSet(lesson.id)
+              : null;
     return taskSet ? createRandomRealmLessonGenerator(taskSet) : null;
   });
   const weekHref = getWorld3DReturnPathForLesson({

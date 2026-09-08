@@ -1,7 +1,7 @@
 import { normalizeWeekPlans } from "./buildProgram";
 import type { CurriculumCode, Lesson, WeekPlan } from "./year1";
 
-export type ChanceHollowYearLabel = "Year 3" | "Year 4" | "Year 5";
+export type ChanceHollowYearLabel = "Year 3" | "Year 4" | "Year 5" | "Year 6";
 
 type ChanceWeekSeed = {
   topic: string;
@@ -127,6 +127,45 @@ const LEVEL_5_SEEDS: readonly ChanceWeekSeed[] = [
   },
 ];
 
+const LEVEL_6_SEEDS: readonly ChanceWeekSeed[] = [
+  {
+    topic: "Probability Scales",
+    purpose: "Represent and estimate probability from zero to one and zero to one hundred percent.",
+    curriculum: ["AC9M6P01"],
+    lessons: ["Calibrate the Scale", "Three Forms, One Chance", "Estimate the Event"],
+  },
+  {
+    topic: "Calculate Probability",
+    purpose: "Calculate probabilities and build chance tools with a target probability.",
+    curriculum: ["AC9M6P01"],
+    lessons: ["Count the Winning Outcomes", "Complete the Whole", "Build the Probability"],
+  },
+  {
+    topic: "Expected and Observed",
+    purpose: "Compare expected frequencies with observed results from repeated simulations.",
+    curriculum: ["AC9M6P02"],
+    lessons: ["Predict the Frequency", "Expected Versus Observed", "Explain the Difference"],
+  },
+  {
+    topic: "Trial-Size Effect",
+    purpose: "Investigate how increasing trial counts affects variation in relative frequency.",
+    curriculum: ["AC9M6P02"],
+    lessons: ["Climb the Trial Ladder", "Convergence Chase", "Survive the Variation Storm"],
+  },
+  {
+    topic: "Simulation Engineering",
+    purpose: "Select, debug and audit digital simulations for probability investigations.",
+    curriculum: ["AC9M6P01", "AC9M6P02"],
+    lessons: ["Choose the Simulator", "Debug Chanzia's Machine", "Probability Audit"],
+  },
+  {
+    topic: "Master's Grand Trial",
+    purpose: "Plan, run and defend a probability investigation using expected and observed evidence.",
+    curriculum: ["AC9M6P01", "AC9M6P02"],
+    lessons: ["Plan the Investigation", "Run the Investigation", "Challenge Chanzia Master"],
+  },
+];
+
 function lessonFocus(seed: ChanceWeekSeed, title: string) {
   switch (title) {
     case "Certain or Impossible":
@@ -235,12 +274,44 @@ function lessonFocus(seed: ChanceWeekSeed, title: string) {
       return "run an investigation and record every result.";
     case "Defend the Verdict":
       return "use frequency evidence to defend a probability conclusion.";
+    case "Calibrate the Scale":
+      return "place probabilities on scales from zero to one.";
+    case "Three Forms, One Chance":
+      return "connect equivalent fractions, decimals and percentages.";
+    case "Estimate the Event":
+      return "estimate an event's probability from useful information.";
+    case "Count the Winning Outcomes":
+      return "calculate probability from winning and total outcomes.";
+    case "Complete the Whole":
+      return "use complements to complete one whole probability.";
+    case "Build the Probability":
+      return "build a chance tool with a target probability.";
+    case "Predict the Frequency":
+      return "predict an expected frequency before running trials.";
+    case "Expected Versus Observed":
+      return "compare expected and observed frequencies.";
+    case "Explain the Difference":
+      return "explain variation without assuming a tool is biased.";
+    case "Climb the Trial Ladder":
+      return "compare variation across increasing trial counts.";
+    case "Convergence Chase":
+      return "track relative frequency as more trials are run.";
+    case "Survive the Variation Storm":
+      return "draw careful conclusions about larger samples.";
+    case "Choose the Simulator":
+      return "choose a simulation that matches a chance event.";
+    case "Debug Chanzia's Machine":
+      return "repair errors in a probability simulation.";
+    case "Probability Audit":
+      return "check outcomes and probabilities form one whole.";
+    case "Challenge Chanzia Master":
+      return "defend a complete probability investigation.";
     default:
       return seed.purpose.toLowerCase();
   }
 }
 
-function buildChanceProgram(level: 3 | 4 | 5, seeds: readonly ChanceWeekSeed[]): WeekPlan[] {
+function buildChanceProgram(level: 3 | 4 | 5 | 6, seeds: readonly ChanceWeekSeed[]): WeekPlan[] {
   const raw: WeekPlan[] = seeds.map((seed, weekIndex) => {
     const week = weekIndex + 1;
     return {
@@ -271,29 +342,32 @@ function buildChanceProgram(level: 3 | 4 | 5, seeds: readonly ChanceWeekSeed[]):
   return normalizeWeekPlans(level, raw);
 }
 
-export const CHANCE_HOLLOW_PROGRAMS: Record<3 | 4 | 5, WeekPlan[]> = {
+export const CHANCE_HOLLOW_PROGRAMS: Record<3 | 4 | 5 | 6, WeekPlan[]> = {
   3: buildChanceProgram(3, LEVEL_3_SEEDS),
   4: buildChanceProgram(4, LEVEL_4_SEEDS),
   5: buildChanceProgram(5, LEVEL_5_SEEDS),
+  6: buildChanceProgram(6, LEVEL_6_SEEDS),
 };
 
 export function getChanceHollowProgramForYearLabel(yearLabel: string): WeekPlan[] | null {
   if (yearLabel === "Year 3") return CHANCE_HOLLOW_PROGRAMS[3];
   if (yearLabel === "Year 4") return CHANCE_HOLLOW_PROGRAMS[4];
   if (yearLabel === "Year 5") return CHANCE_HOLLOW_PROGRAMS[5];
+  if (yearLabel === "Year 6") return CHANCE_HOLLOW_PROGRAMS[6];
   return null;
 }
 
 export const CHANCE_HOLLOW_META = {
   realm: "Chance Hollow",
   strand: "Probability",
-  levels: [3, 4, 5] as const,
+  levels: [3, 4, 5, 6] as const,
   weeks: 6,
   lessonsPerWeek: 3,
   curriculum: {
     3: ["AC9M3P01", "AC9M3P02"],
     4: ["AC9M4P01"],
     5: ["AC9M5P01", "AC9M5P02"],
+    6: ["AC9M6P01", "AC9M6P02"],
   },
-  outcome: "Students describe chance events, list outcomes, compare likelihoods, use simple probability fractions, and discuss trial results.",
+  outcome: "Students represent probability, compare expected and observed frequencies, and investigate variation with digital simulations.",
 } as const;

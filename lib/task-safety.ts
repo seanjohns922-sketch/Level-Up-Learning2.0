@@ -328,6 +328,11 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "chanceCompare",
   "chancePredictCount",
   "chanceDiceRace",
+  "chanceScalePortal",
+  "chanceProbabilityForge",
+  "chanceSimulationLab",
+  "chanceModelDebugger",
+  "chanceMasterTrial",
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
@@ -467,6 +472,38 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
       && hasText(task.opponentImage)
       && Number.isInteger(task.winningScore)
       && task.winningScore >= 1;
+  }
+  if (task.kind === "chanceScalePortal") {
+    return hasText(task.prompt) && hasText(task.sourceLabel)
+      && Number.isFinite(task.targetValue) && task.targetValue >= 0 && task.targetValue <= 1
+      && Number.isFinite(task.scaleStep) && task.scaleStep > 0 && task.scaleStep <= 0.25;
+  }
+  if (task.kind === "chanceProbabilityForge") {
+    return hasText(task.prompt) && hasText(task.targetLabel)
+      && Number.isInteger(task.total) && task.total >= 2
+      && Number.isInteger(task.targetWinning) && task.targetWinning >= 0 && task.targetWinning <= task.total
+      && Number.isInteger(task.initialWinning) && task.initialWinning >= 0 && task.initialWinning <= task.total
+      && (task.sourceWinning === undefined || (Number.isInteger(task.sourceWinning) && task.sourceWinning >= 0 && task.sourceWinning <= task.total));
+  }
+  if (task.kind === "chanceSimulationLab") {
+    return hasText(task.prompt) && hasText(task.targetName)
+      && Number.isInteger(task.total) && task.total >= 2
+      && Number.isInteger(task.winning) && task.winning >= 1 && task.winning < task.total
+      && task.stages.length >= 1 && task.stages.length <= 3
+      && task.stages.every((stage) => Number.isInteger(stage) && stage >= 5 && stage <= 1000);
+  }
+  if (task.kind === "chanceModelDebugger") {
+    const ids = new Set(task.machines.map((machine) => machine.id));
+    return hasText(task.prompt) && hasText(task.scenario) && hasText(task.reason)
+      && task.machines.length >= 3 && ids.size === task.machines.length && ids.has(task.answerId)
+      && task.machines.every((machine) => hasText(machine.title) && hasText(machine.detail));
+  }
+  if (task.kind === "chanceMasterTrial") {
+    return hasText(task.prompt) && hasText(task.opponentName) && hasText(task.opponentImage)
+      && Number.isInteger(task.total) && task.total >= 2
+      && Number.isInteger(task.targetWinning) && task.targetWinning >= 1 && task.targetWinning < task.total
+      && Number.isInteger(task.trials) && task.trials >= 10
+      && Number.isInteger(task.observed) && task.observed >= 0 && task.observed <= task.trials;
   }
   if (task.kind !== "starpathObject") return true;
   const objectTask = task as StarpathObjectTask;

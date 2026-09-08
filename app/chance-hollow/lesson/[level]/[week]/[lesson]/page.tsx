@@ -23,7 +23,7 @@ function normalizeLevel(value: string) {
   } catch {
     return null;
   }
-  const match = /^Year\s+([345])$/i.exec(decoded.replace(/\+/g, " ").trim());
+  const match = /^Year\s+([3456])$/i.exec(decoded.replace(/\+/g, " ").trim());
   return match ? { label: `Year ${match[1]}`, number: Number(match[1]) } : null;
 }
 

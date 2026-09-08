@@ -7,7 +7,7 @@ import ChanceHollowMap, { CHANCE_HOLLOW_DASHBOARD_CONFIG } from "@/components/wo
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 
-const SUPPORTED_LEVELS = new Set(["Year 3", "Year 4", "Year 5"]);
+const SUPPORTED_LEVELS = new Set(["Year 3", "Year 4", "Year 5", "Year 6"]);
 
 export default function ChanceHollowEntry({ requestedLevel }: { requestedLevel?: string }) {
   const router = useRouter();

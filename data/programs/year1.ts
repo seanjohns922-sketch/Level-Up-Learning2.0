@@ -123,6 +123,8 @@ export type CurriculumCode =
   | "AC9M4P01"
   | "AC9M5P01"
   | "AC9M5P02"
+  | "AC9M6P01"
+  | "AC9M6P02"
   | "ALL";
 
 export type Lesson = {
