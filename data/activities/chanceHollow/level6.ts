@@ -66,9 +66,9 @@ function estimate(prompt: string): Gen {
   });
 }
 
-function forge(prompt: string, targetLabel = "Match the target"): Gen {
+function forge(prompt: string, targetLabel = "Match the target", fixedTool?: "spinner" | "bag" | "die"): Gen {
   return fresh(() => {
-    const tool = pick(["spinner", "bag", "die"] as const);
+    const tool = fixedTool ?? pick(["spinner", "bag", "die"] as const);
     const total = tool === "die" ? 6 : tool === "bag" ? pick([5, 6, 8, 10, 12] as const) : pick([4, 5, 6, 8, 10, 12] as const);
     const targetWinning = randInt(1, total - 1);
     let initialWinning = randInt(0, total);
@@ -149,53 +149,60 @@ const masterTrial = fresh(() => {
   return { kind: "chanceMasterTrial", prompt: "Break Chanzia's probability shield in three moves.", targetWinning: f.winning, total: f.total, trials, observed, opponentName: "Master Chanzia", opponentImage: "/images/chanzia-master-cutout.png" };
 });
 
+// Each lesson gets its OWN generators with unique prompts, so lessons do not
+// borrow each other's questions.
+// W1 Probability Scales
 const placeScale = scale("Open the portal at the matching probability.", "mixed");
+const percentScale = scale("Calibrate the percentage portal.", "percent");
+const decimalScale = scale("Calibrate the decimal portal.", "decimal");
 const fractionToPercent = convertScale("This chance is a fraction — open the portal at its place on the percentage scale.", "fraction", "percent");
 const fractionToDecimal = convertScale("This chance is a fraction — open the portal at its place on the decimal scale.", "fraction", "decimal");
 const percentToDecimal = convertScale("This chance is a percentage — open the portal at its place on the decimal scale.", "percent", "decimal");
-const percentScale = scale("Calibrate the percentage portal.", "percent");
-const decimalScale = scale("Calibrate the decimal portal.", "decimal");
 const estimateEvent = estimate("Estimate the chance and open the closest portal.");
-
-const calculate = forge("Forge the tool so winning outcomes match the target.", "Build the shown probability");
+// W2 Calculate Probability
+const countSpinner = forge("Set the winning sectors so the spinner shows the target probability.", "Spinner target", "spinner");
+const countBag = forge("Set the winning counters so the bag shows the target probability.", "Bag target", "bag");
+const countDie = forge("Choose the winning faces so the die shows the target probability.", "Die target", "die");
 const completeWhole = complement("Complete the other side so both probabilities total one whole.");
-const buildSpinner = forge("Build a spinner with the target probability.", "Spinner target");
-const buildBag = forge("Load the bag with the target probability.", "Bag target");
-const buildDie = forge("Mark the faces to create the target probability.", "Die target");
-
+const buildSpinner = forge("Build a spinner with the target probability.", "Spinner target", "spinner");
+const buildBag = forge("Load the bag with the target probability.", "Bag target", "bag");
+const buildDie = forge("Mark the faces to create the target probability.", "Die target", "die");
+// W3 Expected and Observed
 const predictFrequency = simulation("Predict the count, then launch the experiment.", "predict");
-const compareFrequency = simulation("Run two trial sizes and compare the evidence.", "compare");
-const explainVariation = simulation("Test whether different results can still fit the same model.", "compare");
+const expectedObserved = simulation("Run the experiment and compare expected with observed.", "compare");
+const explainVariation = simulation("Explain how different results can still fit the same model.", "compare");
+// W4 Trial-Size Effect
 const trialLadder = simulation("Climb the trial ladder and track the relative frequency.", "convergence", [10, 50, 200]);
 const convergence = simulation("Chase the expected probability through three trial stages.", "convergence", [20, 100, 500]);
-const variationStorm = simulation("Run through the variation storm and choose the careful conclusion.", "convergence", [10, 50, 300]);
-
+const variationStorm = simulation("Ride the variation storm and choose the careful conclusion.", "convergence", [10, 50, 300]);
+// W5 Simulation Engineering
 const chooseSimulator = debuggerTask("Choose the simulator that matches the event.", "choose");
 const debugMachine = debuggerTask("Find the fault in Chanzia's simulation machine.", "debug");
 const auditMachine = debuggerTask("Audit the machine before it launches.", "audit");
-
-const planInvestigation = debuggerTask("Lock in a fair investigation plan.", "debug");
+// W6 Master's Grand Trial
+const planInvestigation = debuggerTask("Lock in a fair investigation plan.", "choose");
 const runInvestigation = simulation("Run the full investigation and track its evidence.", "convergence", [20, 100, 500]);
+const masterVerdict = simulation("Read the shield's trials and lock the careful verdict.", "convergence", [30, 120, 400]);
 
 const LESSONS: Record<string, LessonSpec> = {
   "1-1": { teaching: placeScale, activities: [placeScale, percentScale, decimalScale] },
   "1-2": { teaching: fractionToPercent, activities: [fractionToPercent, fractionToDecimal, percentToDecimal] },
-  "1-3": { teaching: estimateEvent, activities: [estimateEvent, placeScale, percentScale] },
-  "2-1": { teaching: calculate, activities: [calculate, buildBag, buildDie] },
-  "2-2": { teaching: completeWhole, activities: [completeWhole, calculate, buildSpinner] },
+  "1-3": { teaching: estimateEvent, activities: [estimateEvent, estimateEvent, estimateEvent] },
+  "2-1": { teaching: countSpinner, activities: [countSpinner, countBag, countDie] },
+  "2-2": { teaching: completeWhole, activities: [completeWhole, completeWhole, completeWhole] },
   "2-3": { teaching: buildSpinner, activities: [buildSpinner, buildBag, buildDie] },
-  "3-1": { teaching: predictFrequency, activities: [predictFrequency, calculate, buildBag] },
-  "3-2": { teaching: compareFrequency, activities: [compareFrequency, predictFrequency, explainVariation] },
-  "3-3": { teaching: explainVariation, activities: [explainVariation, compareFrequency, auditMachine] },
-  "4-1": { teaching: trialLadder, activities: [trialLadder, convergence, compareFrequency] },
-  "4-2": { teaching: convergence, activities: [convergence, trialLadder, variationStorm] },
-  "4-3": { teaching: variationStorm, activities: [variationStorm, convergence, explainVariation] },
-  "5-1": { teaching: chooseSimulator, activities: [chooseSimulator, buildSpinner, buildBag] },
-  "5-2": { teaching: debugMachine, activities: [debugMachine, chooseSimulator, auditMachine] },
-  "5-3": { teaching: auditMachine, activities: [auditMachine, debugMachine, completeWhole] },
-  "6-1": { teaching: planInvestigation, activities: [planInvestigation, chooseSimulator, predictFrequency] },
-  "6-2": { teaching: runInvestigation, activities: [runInvestigation, trialLadder, auditMachine] },
-  "6-3": { teaching: masterTrial, activities: [masterTrial, runInvestigation, runInvestigation] },
+  "3-1": { teaching: predictFrequency, activities: [predictFrequency, predictFrequency, predictFrequency] },
+  "3-2": { teaching: expectedObserved, activities: [expectedObserved, expectedObserved, expectedObserved] },
+  "3-3": { teaching: explainVariation, activities: [explainVariation, explainVariation, explainVariation] },
+  "4-1": { teaching: trialLadder, activities: [trialLadder, trialLadder, trialLadder] },
+  "4-2": { teaching: convergence, activities: [convergence, convergence, convergence] },
+  "4-3": { teaching: variationStorm, activities: [variationStorm, variationStorm, variationStorm] },
+  "5-1": { teaching: chooseSimulator, activities: [chooseSimulator, chooseSimulator, chooseSimulator] },
+  "5-2": { teaching: debugMachine, activities: [debugMachine, debugMachine, debugMachine] },
+  "5-3": { teaching: auditMachine, activities: [auditMachine, auditMachine, auditMachine] },
+  "6-1": { teaching: planInvestigation, activities: [planInvestigation, planInvestigation, planInvestigation] },
+  "6-2": { teaching: runInvestigation, activities: [runInvestigation, runInvestigation, runInvestigation] },
+  "6-3": { teaching: masterTrial, activities: [masterTrial, masterVerdict, masterVerdict] },
 };
 
 export function getChanceHollowLevel6TaskSet(lessonId: string): RealmLessonTaskSet | null {
