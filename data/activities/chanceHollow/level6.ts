@@ -91,11 +91,13 @@ function debuggerTask(prompt: string, purpose: "choose" | "debug" | "audit"): Ge
       kind: "chanceModelDebugger",
       prompt,
       scenario: `Model ${target}.`,
+      // Shuffle first, THEN label A/B/C by position, so the correct machine's
+      // label is not always the same (otherwise kids just learn to pick it).
       machines: [
-        { id: wrongA, title: "Machine A", detail: purpose === "audit" ? "One possible outcome is missing." : "A winning outcome is mapped twice.", fair: false },
-        { id: answerId, title: "Machine B", detail: correct, fair: true },
-        { id: wrongB, title: "Machine C", detail: purpose === "debug" ? "Used outcomes stay removed after each trial." : "Its winning share does not match the event.", fair: false },
-      ].sort(() => Math.random() - 0.5),
+        { id: wrongA, detail: purpose === "audit" ? "One possible outcome is missing." : "A winning outcome is mapped twice.", fair: false },
+        { id: answerId, detail: correct, fair: true },
+        { id: wrongB, detail: purpose === "debug" ? "Used outcomes stay removed after each trial." : "Its winning share does not match the event.", fair: false },
+      ].sort(() => Math.random() - 0.5).map((machine, index) => ({ ...machine, title: `Machine ${String.fromCharCode(65 + index)}` })),
       answerId,
       reason: correct,
     };
