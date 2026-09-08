@@ -91,16 +91,23 @@ function spreadTotal(total: number, buckets: number): number[] {
   ] as number[]);
 }
 
-// Week 1: the outcome set depends on what the investigation records.
-const cardLens = fresh(() => {
-  const lens = pick([
-    { label: "suit", outcomes: "hearts, diamonds, clubs and spades", count: 4 },
-    { label: "colour", outcomes: "red and black", count: 2 },
-    { label: "exact card", outcomes: "all 52 different cards", count: 52 },
-  ] as const);
-  return mcq(`A card is drawn and only its ${lens.label} is recorded. Which outcome set matches the question?`, lens.outcomes,
-    ["heads and tails", "the numbers 1 to 6", `${lens.count + 1} unnamed outcomes`],
-    `Correct. Recording ${lens.label} creates ${lens.count} possible outcomes.`, "The outcome set must match exactly what is being recorded.");
+// Week 1: the outcome set depends on what the investigation records. Concrete
+// bag example (matches the lesson's concept intro): recording the colour gives
+// fewer outcomes than recording the exact counter.
+const bagLens = fresh(() => {
+  const chosen = shuffle(COLOURS).slice(0, randInt(2, 3));
+  const counts = chosen.map((_, i) => (i === 0 ? randInt(2, 3) : randInt(1, 3)));
+  const counters = shuffle(chosen.flatMap((colour, i) => Array(counts[i]).fill(colour)) as string[]);
+  const total = counters.length;
+  const colourList = chosen.map((colour) => NAMES[colour]).sort().join(", ");
+  if (Math.random() < 0.5) {
+    return mcq("A counter is drawn from this bag and we record only its colour. What is the complete outcome set?", colourList,
+      [`all ${total} counters, one by one`, "heads and tails", chosen.map((colour) => NAMES[colour]).sort().slice(0, -1).join(", ")],
+      `Correct. Recording colour lists each different colour once — ${chosen.length} outcomes.`, "List each different colour once, not every counter.", { type: "bag", counters });
+  }
+  return mcq("A counter is drawn from this bag and we record which exact counter it is. How many outcomes are there?", `${total} outcomes, one per counter`,
+    [`${chosen.length} outcomes, one per colour`, "2 outcomes", `${total + 1} outcomes`],
+    `Correct. Every counter is its own outcome, so there are ${total}.`, "Each counter is a separate outcome, even when colours repeat.", { type: "bag", counters });
 });
 
 const dieLens = fresh(() => {
@@ -507,7 +514,7 @@ const defendVariation = fresh(() => variationReason());
 const grandRace = fresh(raceTask);
 
 const LESSONS: Record<string, LessonSpec> = {
-  "1-1": { teaching: cardLens, activities: [cardLens, dieLens, spinnerLens] },
+  "1-1": { teaching: bagLens, activities: [bagLens, dieLens, spinnerLens] },
   "1-2": { teaching: listCoinOutcomes, activities: [listCoinOutcomes, listDieOutcomes, listBagOutcomes] },
   "1-3": { teaching: equalNormalDie, activities: [equalNormalDie, equalBagCheck, equalSpinnerCheck] },
   "2-1": { teaching: equalRegions, activities: [equalRegions, equalCounters, equalSingleFaces] },
