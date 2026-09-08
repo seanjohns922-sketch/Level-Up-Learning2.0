@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, FastForward, RotateCw } from "lucide-react";
+import { Check, FastForward, Minus, Plus, RotateCw } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -83,6 +83,13 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
   const [done, setDone] = useState(0);
   const [nudge, setNudge] = useState(false);
   const [autoRunning, setAutoRunning] = useState(false);
+  // Auto-roll path: the tool rolls every trial fast, then the child reads the
+  // results and enters the tally themselves (so they still do the recording).
+  const [results, setResults] = useState<string[]>([]);
+  const [tallyPhase, setTallyPhase] = useState(false);
+  const [entry, setEntry] = useState<Record<string, number>>({});
+  const [tallyNudge, setTallyNudge] = useState<null | "count" | "wrong">(null);
+  const [tallyDone, setTallyDone] = useState(false);
   const timers = useRef<number[]>([]);
   useEffect(() => () => { timers.current.forEach((id) => { window.clearTimeout(id); window.clearInterval(id); }); }, []);
 
@@ -133,28 +140,51 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
     });
   }
 
-  // Rapidly run and record every remaining trial, then finish.
-  function autoFinish() {
-    if (finished || autoRunning) return;
+  // Fast-roll every trial and reveal the results, then hand the tally to the
+  // child (they read the results and enter the counts themselves).
+  function autoRoll() {
+    if (autoRunning || tallyPhase) return;
     setNudge(false);
     setLanded(null);
     setBusy(false);
+    setTallies({});
+    setDone(0);
+    setResults([]);
     setAutoRunning(true);
-    let count = done;
+    const rolled: string[] = [];
     const iv = window.setInterval(() => {
-      if (count >= spins) { window.clearInterval(iv); setAutoRunning(false); return; }
-      const key = draw[Math.floor(Math.random() * n)]!;
-      setDisplay(key);
-      setTallies((t) => ({ ...t, [key]: (t[key] ?? 0) + 1 }));
-      count += 1;
-      setDone(count);
-      if (count >= spins) {
+      if (rolled.length >= spins) {
         window.clearInterval(iv);
         setAutoRunning(false);
-        timers.current.push(window.setTimeout(() => onCorrect(), 450));
+        setEntry(Object.fromEntries(distinctKeys.map((k) => [k, 0])));
+        setTallyPhase(true);
+        return;
       }
-    }, 100);
+      const key = draw[Math.floor(Math.random() * n)]!;
+      rolled.push(key);
+      setResults([...rolled]);
+      setDisplay(key);
+    }, 65);
     timers.current.push(iv);
+  }
+
+  const actualCount = (key: string) => results.filter((r) => r === key).length;
+  function adjustEntry(key: string, delta: number) {
+    if (tallyDone) return;
+    setTallyNudge(null);
+    setEntry((e) => ({ ...e, [key]: Math.max(0, (e[key] ?? 0) + delta) }));
+  }
+  function checkTally() {
+    if (tallyDone) return;
+    const allMatch = distinctKeys.every((k) => (entry[k] ?? 0) === actualCount(k));
+    const totalEntered = distinctKeys.reduce((sum, k) => sum + (entry[k] ?? 0), 0);
+    if (allMatch) { setTallyDone(true); timers.current.push(window.setTimeout(() => onCorrect(), 500)); }
+    else setTallyNudge(totalEntered !== spins ? "count" : "wrong");
+  }
+  function chip(key: string) {
+    const l = labels.find((x) => x.key === key);
+    if (l?.colour) return <span className="inline-block h-5 w-5 rounded-full border border-white shadow" style={{ background: l.colour }} />;
+    return <span className="grid h-6 w-6 place-items-center rounded-full bg-[#f1e8fb] text-xs font-black text-[#3a2f52]">{(l?.name ?? key).slice(0, 1)}</span>;
   }
 
   const shown = landed ?? display;
@@ -189,48 +219,75 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
               {tool === "die" ? <DieFace face={Number(shown) || 1} /> : <CoinFace side={shown} />}
             </div>
           )}
-          <button type="button" onClick={act} disabled={busy || !!landed || finished || autoRunning} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-6 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
+          <button type="button" onClick={act} disabled={busy || !!landed || finished || autoRunning || tallyPhase} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-6 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95 disabled:opacity-40">
             <RotateCw className={busy ? "h-5 w-5 animate-spin" : "h-5 w-5"} /> {actionWord}
           </button>
-          {!finished ? (
-            <button type="button" onClick={autoFinish} disabled={autoRunning} className="flex h-9 items-center gap-1.5 rounded-lg border-2 border-[#6d3f9c] bg-white px-4 text-sm font-black text-[#6d3f9c] transition hover:bg-[#f1e8fb] active:scale-95 disabled:opacity-50">
-              <FastForward className="h-4 w-4" /> {autoRunning ? "Finishing…" : "Auto-finish"}
+          {!finished && !tallyPhase ? (
+            <button type="button" onClick={autoRoll} disabled={autoRunning} className="flex h-9 items-center gap-1.5 rounded-lg border-2 border-[#6d3f9c] bg-white px-4 text-sm font-black text-[#6d3f9c] transition hover:bg-[#f1e8fb] active:scale-95 disabled:opacity-50">
+              <FastForward className="h-4 w-4" /> {autoRunning ? "Rolling…" : `Auto-roll all ${spins}`}
             </button>
           ) : null}
-          <div className="text-sm font-bold text-[#6b6280]">Recorded {done} of {spins}</div>
+          {!tallyPhase ? <div className="text-sm font-bold text-[#6b6280]">Recorded {done} of {spins}</div> : null}
         </div>
 
         {/* Record area */}
-        <div className="space-y-2">
-          <p className="text-sm font-bold text-[#3a2f52]" role="status">
-            {finished ? "All done — nice tallying!" : landed ? `It landed on ${nameOf(landed)}. Tap ${nameOf(landed)} to record it.` : `Press ${actionWord}, then record where it lands.`}
-          </p>
-          {nudge && landed ? <p className="text-sm font-bold text-[#c74f4b]">That is not where it landed — tap {nameOf(landed)}.</p> : null}
-          <div className="grid gap-2 sm:grid-cols-2">
-            {labels.map((l) => {
-              const active = landed === l.key;
-              return (
+        {tallyPhase ? (
+          <div className="space-y-3">
+            <p className="text-sm font-bold text-[#3a2f52]">The {spins} results are in. Read them and make the tally: set how many of each.</p>
+            <div className="flex flex-wrap gap-1 rounded-lg border border-[#e4d8f5] bg-[#faf7ff] p-2">
+              {results.map((k, i) => <span key={i}>{chip(k)}</span>)}
+            </div>
+            <div className="space-y-2">
+              {labels.map((l) => (
                 <div key={l.key} className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => record(l.key)}
-                    disabled={!landed || finished}
-                    className={["flex min-w-[112px] items-center justify-between gap-2 rounded-lg border-2 px-3 py-2.5 text-left font-black transition disabled:opacity-70", active ? "border-[#6d3f9c] bg-[#f1e8fb] ring-2 ring-[#6d3f9c]/40" : "border-[#e0d3f2] bg-white"].join(" ")}
-                  >
-                    <span className="flex items-center gap-2">
-                      {l.colour ? <span className="inline-block h-4 w-4 rounded-full border border-white shadow" style={{ background: l.colour }} /> : null}
-                      <span className="capitalize text-[#3a2f52]">{l.name}</span>
-                    </span>
-                    <OptionReadAloudButton text={l.name} />
-                  </button>
-                  <TallyMarks n={tallies[l.key] ?? 0} />
-                  <span className="font-mono text-lg font-black tabular-nums text-[#6d3f9c]">{tallies[l.key] ?? 0}</span>
+                  <span className="flex min-w-[92px] items-center gap-1.5 font-black text-[#3a2f52]">{l.colour ? <span className="inline-block h-4 w-4 rounded-full border border-white shadow" style={{ background: l.colour }} /> : null}<span className="capitalize">{l.name}</span></span>
+                  <button type="button" onClick={() => adjustEntry(l.key, -1)} disabled={tallyDone} aria-label={`fewer ${l.name}`} className="grid h-9 w-9 place-items-center rounded-lg border-2 border-[#e0d3f2] bg-white text-[#3a2f52] disabled:opacity-40"><Minus className="h-4 w-4" /></button>
+                  <span className="min-w-[2ch] text-center font-mono text-lg font-black tabular-nums text-[#6d3f9c]">{entry[l.key] ?? 0}</span>
+                  <button type="button" onClick={() => adjustEntry(l.key, 1)} disabled={tallyDone} aria-label={`more ${l.name}`} className="grid h-9 w-12 place-items-center rounded-lg border-2 border-[#6d3f9c] bg-[#f1e8fb] text-[#3a2f52] disabled:opacity-40"><Plus className="h-4 w-4" /></button>
+                  <TallyMarks n={entry[l.key] ?? 0} />
                 </div>
-              );
-            })}
+              ))}
+            </div>
+            {tallyNudge === "count" ? <p className="text-sm font-bold text-[#c74f4b]">Your tally does not add up to {spins} yet — count the results again.</p> : null}
+            {tallyNudge === "wrong" ? <p className="text-sm font-bold text-[#c74f4b]">Not quite — check each colour against the results above.</p> : null}
+            {tallyDone ? (
+              <div className="text-sm font-black text-[#2f7d4f]"><Check className="mr-1 inline h-4 w-4" />Tally matches the results — nice recording!</div>
+            ) : (
+              <button type="button" onClick={checkTally} className="flex h-11 items-center gap-2 rounded-lg bg-[#6d3f9c] px-6 font-black text-white shadow-md transition hover:bg-[#5a3183] active:scale-95"><Check className="h-5 w-5" /> Check my tally</button>
+            )}
           </div>
-          {finished ? <div className="pt-1 text-sm font-bold text-[#2f7d4f]"><Check className="mr-1 inline h-4 w-4" />Tally complete</div> : null}
-        </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-sm font-bold text-[#3a2f52]" role="status">
+              {finished ? "All done — nice tallying!" : landed ? `It landed on ${nameOf(landed)}. Tap ${nameOf(landed)} to record it.` : `Press ${actionWord}, then record where it lands.`}
+            </p>
+            {nudge && landed ? <p className="text-sm font-bold text-[#c74f4b]">That is not where it landed — tap {nameOf(landed)}.</p> : null}
+            <div className="grid gap-2 sm:grid-cols-2">
+              {labels.map((l) => {
+                const active = landed === l.key;
+                return (
+                  <div key={l.key} className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => record(l.key)}
+                      disabled={!landed || finished}
+                      className={["flex min-w-[112px] items-center justify-between gap-2 rounded-lg border-2 px-3 py-2.5 text-left font-black transition disabled:opacity-70", active ? "border-[#6d3f9c] bg-[#f1e8fb] ring-2 ring-[#6d3f9c]/40" : "border-[#e0d3f2] bg-white"].join(" ")}
+                    >
+                      <span className="flex items-center gap-2">
+                        {l.colour ? <span className="inline-block h-4 w-4 rounded-full border border-white shadow" style={{ background: l.colour }} /> : null}
+                        <span className="capitalize text-[#3a2f52]">{l.name}</span>
+                      </span>
+                      <OptionReadAloudButton text={l.name} />
+                    </button>
+                    <TallyMarks n={tallies[l.key] ?? 0} />
+                    <span className="font-mono text-lg font-black tabular-nums text-[#6d3f9c]">{tallies[l.key] ?? 0}</span>
+                  </div>
+                );
+              })}
+            </div>
+            {finished ? <div className="pt-1 text-sm font-bold text-[#2f7d4f]"><Check className="mr-1 inline h-4 w-4" />Tally complete</div> : null}
+          </div>
+        )}
       </div>
     </div>
   );
