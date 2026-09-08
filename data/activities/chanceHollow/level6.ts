@@ -42,27 +42,32 @@ function scale(prompt: string, displayMode: "decimal" | "percent" | "mixed" = "m
   });
 }
 
-// "Three Forms, One Chance": the chance is shown in ONE form and must be placed
-// on a scale labelled in a DIFFERENT form, so the child converts between
-// fraction, decimal and percentage.
-function convertScale(prompt: string, sourceForm: "fraction" | "percent" | "decimal", tickMode: "decimal" | "percent"): Gen {
-  return fresh(() => {
-    const f = pick(FRACTIONS);
-    const value = f.winning / f.total;
-    const sourceLabel = sourceForm === "fraction" ? `${f.winning}/${f.total}` : sourceForm === "percent" ? `${Math.round(value * 100)}%` : String(value);
-    return { kind: "chanceScalePortal", prompt, sourceLabel, targetValue: value, scaleStep: 0.05, displayMode: tickMode };
-  });
-}
-
+// L3 "Estimate the Event": show the real tool with its winning outcomes and let
+// the child estimate the probability from the picture.
 function estimate(prompt: string): Gen {
   return fresh(() => {
     const f = pick(FRACTIONS);
-    const detail = pick([
-      `${f.winning} of ${f.total} equal spinner sectors glow`,
-      `${f.winning} of ${f.total} counters are crystal`,
-      `${f.winning} of ${f.total} equally likely cards are shields`,
+    const tool = pick(["spinner", "bag"] as const);
+    return { kind: "chanceScalePortal", prompt, sourceLabel: "Estimate", targetValue: f.winning / f.total, scaleStep: 0.05, displayMode: "mixed", scene: { tool, winning: f.winning, total: f.total } };
+  });
+}
+
+// L2 "Three Forms, One Chance": tap the decimal and percentage that equal the
+// shown fraction (a matching game, not a slider).
+function makeFormMatch(): Gen {
+  return fresh(() => {
+    const f = pick(FRACTIONS);
+    const value = f.winning / f.total;
+    const others = FRACTIONS.filter((g) => g.winning / g.total !== value);
+    const d1 = pick(others);
+    const d2 = pick(others.filter((g) => g.winning / g.total !== d1.winning / d1.total));
+    const options = shuffle([
+      { label: `${Math.round(value * 100)}%`, correct: true },
+      { label: String(value), correct: true },
+      { label: `${Math.round((d1.winning / d1.total) * 100)}%`, correct: false },
+      { label: String(d2.winning / d2.total), correct: false },
     ]);
-    return { kind: "chanceScalePortal", prompt: `${prompt} ${detail}.`, sourceLabel: "Estimate", targetValue: f.winning / f.total, scaleStep: 0.05, displayMode: "mixed" };
+    return { kind: "chanceFormMatch", prompt: "Tap the two cards that show the same chance as this fraction.", anchorLabel: `${f.winning}/${f.total}`, options };
   });
 }
 
@@ -155,10 +160,8 @@ const masterTrial = fresh(() => {
 const placeScale = scale("Open the portal at the matching probability.", "mixed");
 const percentScale = scale("Calibrate the percentage portal.", "percent");
 const decimalScale = scale("Calibrate the decimal portal.", "decimal");
-const fractionToPercent = convertScale("This chance is a fraction — open the portal at its place on the percentage scale.", "fraction", "percent");
-const fractionToDecimal = convertScale("This chance is a fraction — open the portal at its place on the decimal scale.", "fraction", "decimal");
-const percentToDecimal = convertScale("This chance is a percentage — open the portal at its place on the decimal scale.", "percent", "decimal");
-const estimateEvent = estimate("Estimate the chance and open the closest portal.");
+const formMatch = makeFormMatch();
+const estimateEvent = estimate("Estimate the chance shown on the tool, then open the closest portal.");
 // W2 Calculate Probability
 const countSpinner = forge("Set the winning sectors so the spinner shows the target probability.", "Spinner target", "spinner");
 const countBag = forge("Set the winning counters so the bag shows the target probability.", "Bag target", "bag");
@@ -186,7 +189,7 @@ const masterVerdict = simulation("Read the shield's trials and lock the careful 
 
 const LESSONS: Record<string, LessonSpec> = {
   "1-1": { teaching: placeScale, activities: [placeScale, percentScale, decimalScale] },
-  "1-2": { teaching: fractionToPercent, activities: [fractionToPercent, fractionToDecimal, percentToDecimal] },
+  "1-2": { teaching: formMatch, activities: [formMatch, formMatch, formMatch] },
   "1-3": { teaching: estimateEvent, activities: [estimateEvent, estimateEvent, estimateEvent] },
   "2-1": { teaching: countSpinner, activities: [countSpinner, countBag, countDie] },
   "2-2": { teaching: completeWhole, activities: [completeWhole, completeWhole, completeWhole] },

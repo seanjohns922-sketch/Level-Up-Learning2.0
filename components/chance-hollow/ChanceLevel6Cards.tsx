@@ -7,6 +7,7 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 type ScaleTask = Extract<PracticeTask, { kind: "chanceScalePortal" }>;
+type FormMatchTask = Extract<PracticeTask, { kind: "chanceFormMatch" }>;
 type ForgeTask = Extract<PracticeTask, { kind: "chanceProbabilityForge" }>;
 type SimulationTask = Extract<PracticeTask, { kind: "chanceSimulationLab" }>;
 type DebugTask = Extract<PracticeTask, { kind: "chanceModelDebugger" }>;
@@ -46,7 +47,8 @@ export function ChanceScalePortalCard({ task, onCorrect, onWrong }: CardProps<Sc
   return <div className="space-y-5">
     <TaskHeading text={task.prompt} />
     <div className="overflow-hidden rounded-lg border-2 border-[#c89cff] bg-gradient-to-br from-[#25143a] via-[#322051] to-[#102b3e] p-5 text-white shadow-xl">
-      <div className="mb-6 flex items-center justify-between gap-3"><span className="text-xs font-black uppercase text-[#f7b6ff]">Portal target</span><span className="rounded-md border border-fuchsia-300/40 bg-black/25 px-4 py-2 text-2xl font-black">{sourceFraction ? <Fraction numerator={Number(sourceFraction[1])} denominator={Number(sourceFraction[2])} /> : task.sourceLabel}</span></div>
+      <div className="mb-6 flex items-center justify-between gap-3"><span className="text-xs font-black uppercase text-[#f7b6ff]">Portal target</span>{task.scene ? null : <span className="rounded-md border border-fuchsia-300/40 bg-black/25 px-4 py-2 text-2xl font-black">{sourceFraction ? <Fraction numerator={Number(sourceFraction[1])} denominator={Number(sourceFraction[2])} /> : task.sourceLabel}</span>}</div>
+      {task.scene ? <div className="mb-4 flex flex-col items-center gap-2"><ToolVisual tool={task.scene.tool} winning={task.scene.winning} total={task.scene.total} /><span className="text-sm font-bold text-white/70">{task.scene.winning} of {task.scene.total} are winning outcomes</span></div> : null}
       <div className="px-2 pb-3 pt-6">
         <div className="mb-4 flex items-center justify-center gap-2 text-2xl font-black"><Sparkles className="text-cyan-300" /><span>{label(selected)}</span></div>
         <input aria-label="Probability scale" type="range" min={0} max={100} step={task.scaleStep * 100} value={selected * 100} onChange={(event) => setSelected(Number(event.target.value) / 100)} className="h-3 w-full cursor-pointer accent-fuchsia-500" />
@@ -55,6 +57,26 @@ export function ChanceScalePortalCard({ task, onCorrect, onWrong }: CardProps<Sc
       <div className="mt-4 flex items-center justify-between text-xs font-bold text-white/70"><span>Impossible</span><span>Even chance</span><span>Certain</span></div>
     </div>
     <ActionButton onClick={check}><Check className="h-5 w-5" /> Open portal</ActionButton>
+  </div>;
+}
+
+export function ChanceFormMatchCard({ task, onCorrect, onWrong }: CardProps<FormMatchTask>) {
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const anchorFraction = /^(\d+)\/(\d+)$/.exec(task.anchorLabel);
+  function toggle(i: number) { setSelected((s) => { const n = new Set(s); if (n.has(i)) n.delete(i); else n.add(i); return n; }); }
+  function check() {
+    const correctIdx = task.options.map((o, i) => (o.correct ? i : -1)).filter((i) => i >= 0);
+    const ok = correctIdx.length === selected.size && correctIdx.every((i) => selected.has(i));
+    if (ok) onCorrect(); else onWrong([...selected].map((i) => task.options[i]!.label).join(", "));
+  }
+  return <div className="space-y-5">
+    <TaskHeading text={task.prompt} />
+    <div className="overflow-hidden rounded-lg border-2 border-[#c89cff] bg-gradient-to-br from-[#25143a] via-[#322051] to-[#102b3e] p-5 text-white shadow-xl">
+      <div className="mb-5 flex items-center justify-center gap-3"><span className="text-xs font-black uppercase text-[#f7b6ff]">This chance</span><span className="rounded-md border border-fuchsia-300/40 bg-black/25 px-5 py-3 text-3xl font-black">{anchorFraction ? <Fraction numerator={Number(anchorFraction[1])} denominator={Number(anchorFraction[2])} /> : task.anchorLabel}</span></div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{task.options.map((option, index) => <button key={index} type="button" onClick={() => toggle(index)} className={`rounded-lg border-2 p-4 text-xl font-black transition ${selected.has(index) ? "border-amber-300 bg-[#4b2861] shadow-[0_0_18px_rgba(217,70,239,.4)]" : "border-white/20 bg-white/5 hover:border-cyan-300"}`}>{option.label}</button>)}</div>
+      <div className="mt-3 text-center text-xs font-bold text-white/60">Tap both equal forms, then check.</div>
+    </div>
+    <ActionButton onClick={check} disabled={selected.size === 0}><Check className="h-5 w-5" /> Match the forms</ActionButton>
   </div>;
 }
 

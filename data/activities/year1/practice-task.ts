@@ -263,6 +263,17 @@ export type PracticeTask = (
       targetValue: number;
       scaleStep: number;
       displayMode: "decimal" | "percent" | "mixed";
+      // Optional: show the real tool (with winning outcomes highlighted) so the
+      // child estimates from the picture rather than a text label.
+      scene?: { tool: "spinner" | "bag" | "die"; winning: number; total: number };
+    }
+  | {
+      // Chance Hollow L6: tap the equivalent forms (decimal / percent) of a given
+      // chance — fraction/decimal/percentage matching.
+      kind: "chanceFormMatch";
+      prompt: string;
+      anchorLabel: string;
+      options: { label: string; correct: boolean }[];
     }
   | {
       kind: "chanceProbabilityForge";

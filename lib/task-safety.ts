@@ -329,6 +329,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "chancePredictCount",
   "chanceDiceRace",
   "chanceScalePortal",
+  "chanceFormMatch",
   "chanceProbabilityForge",
   "chanceSimulationLab",
   "chanceModelDebugger",
@@ -477,6 +478,11 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
     return hasText(task.prompt) && hasText(task.sourceLabel)
       && Number.isFinite(task.targetValue) && task.targetValue >= 0 && task.targetValue <= 1
       && Number.isFinite(task.scaleStep) && task.scaleStep > 0 && task.scaleStep <= 0.25;
+  }
+  if (task.kind === "chanceFormMatch") {
+    return hasText(task.prompt) && hasText(task.anchorLabel)
+      && Array.isArray(task.options) && task.options.length >= 3
+      && task.options.some((o) => o.correct) && task.options.every((o) => hasText(o.label));
   }
   if (task.kind === "chanceProbabilityForge") {
     return hasText(task.prompt) && hasText(task.targetLabel)

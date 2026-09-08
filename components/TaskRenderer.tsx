@@ -216,6 +216,7 @@ import {
   ChanceModelDebuggerCard,
   ChanceProbabilityForgeCard,
   ChanceScalePortalCard,
+  ChanceFormMatchCard,
   ChanceSimulationLabCard,
 } from "@/components/chance-hollow/ChanceLevel6Cards";
 import StatisticaCollectCard from "@/components/statistica/StatisticaCollectCard";
@@ -767,6 +768,8 @@ function TaskRendererInner({
       return <ChanceDiceRaceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceScalePortal":
       return <ChanceScalePortalCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "chanceFormMatch":
+      return <ChanceFormMatchCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceProbabilityForge":
       return <ChanceProbabilityForgeCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceSimulationLab":
