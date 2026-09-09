@@ -32,6 +32,23 @@ const checks = [
       panel.includes('/statistica/quiz/'),
   ],
   [
+    "Chance Hollow Levels 3-6 expose their real assessment banks",
+    panel.includes('| "chance"') &&
+      panel.includes('{ id: "chance", label: "Chance Hollow"') &&
+      panel.includes('realm !== "chance" || Number(item.id.replace("Year ", "")) >= 3') &&
+      panel.includes('realm_id: realm') &&
+      panel.includes('getPretestForYearLabel(year, realm).length > 0') &&
+      panel.includes('getPosttestForYearLabel(year, realm)?.questions.length'),
+  ],
+  [
+    "Chance Hollow review links use its real map, lesson and quiz routes",
+    panel.includes('/chance-hollow?level=') &&
+      panel.includes('/chance-hollow/lesson/') &&
+      panel.includes('/chance-hollow/quiz/') &&
+      panel.includes('realm === "statistics" || realm === "chance"') &&
+      panel.includes('week <= 5'),
+  ],
+  [
     "Starpath weekly content availability follows the program registry",
     panel.includes("getStarpathProgram") &&
       panel.includes('selectedStarpathWeek?.status === "implemented"') &&

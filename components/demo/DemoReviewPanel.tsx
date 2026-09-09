@@ -42,7 +42,7 @@ import {
   buildStarpathWeeklyQuizHref,
 } from "@/lib/starpath-routes";
 
-type ReviewRealm = "number" | "measurement" | "space" | "statistics" | "pattern";
+type ReviewRealm = "number" | "measurement" | "space" | "statistics" | "pattern" | "chance";
 type YearLabel = "Prep" | `Year ${1 | 2 | 3 | 4 | 5 | 6}`;
 
 const REALMS: readonly { id: ReviewRealm; label: string; accent: string }[] = [
@@ -51,6 +51,7 @@ const REALMS: readonly { id: ReviewRealm; label: string; accent: string }[] = [
   { id: "space", label: "Starpath", accent: "#a78bfa" },
   { id: "statistics", label: "Statistica", accent: "#f06b64" },
   { id: "pattern", label: "Pattern Peaks", accent: "#39d9a0" },
+  { id: "chance", label: "Chance Hollow", accent: "#f472b6" },
 ];
 
 const BRAIN_BREAK_GAME_LABELS: Record<BrainBreakGame, string> = {
@@ -125,7 +126,7 @@ export default function DemoReviewPanel() {
   const [breakGame, setBreakGame] = useState<BrainBreakGame | "random">("random");
   const [activeBreak, setActiveBreak] = useState<Villain | null>(null);
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
-  const maxWeek = realm === "number" ? 12 : realm === "statistics" ? 6 : 8;
+  const maxWeek = realm === "number" ? 12 : realm === "statistics" || realm === "chance" ? 6 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
   const starpathLevel = getStarpathLevelForYear(year).id;
   const starpathProgram = realm === "space" ? getStarpathProgram(starpathLevel) : null;
@@ -138,7 +139,7 @@ export default function DemoReviewPanel() {
   const weeklyContentAvailable = realm === "pattern"
     ? levelNumber >= 3
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
-  const weeklyQuizAvailable = realm === "statistics"
+  const weeklyQuizAvailable = realm === "statistics" || realm === "chance"
     ? week <= 5
     : realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented");
 
@@ -155,6 +156,7 @@ export default function DemoReviewPanel() {
   useEffect(() => {
     if (realm === "statistics" && year === "Prep") setYear("Year 1");
     if (realm === "pattern" && levelNumber < 3) setYear("Year 3");
+    if (realm === "chance" && levelNumber < 3) setYear("Year 3");
   }, [levelNumber, realm, year]);
 
   const realmHome = useMemo(() => {
@@ -167,11 +169,14 @@ export default function DemoReviewPanel() {
     if (realm === "pattern") {
       return `/pattern-peaks?teacher_preview=1&level=${encodeURIComponent(year)}`;
     }
+    if (realm === "chance") {
+      return `/chance-hollow?level=${encodeURIComponent(year)}`;
+    }
     return `${realm === "measurement" ? "/measurelands" : "/number-nexus"}?level=${encodeURIComponent(year)}`;
   }, [realm, starpathLevel, year]);
 
   function preparePreview(profile?: AssessmentResultProfile) {
-    if (realm === "statistics" || realm === "pattern") return;
+    if (realm === "statistics" || realm === "pattern" || realm === "chance") return;
     writeProgress({
       year,
       scorePercent: 0,
@@ -251,6 +256,7 @@ export default function DemoReviewPanel() {
   function programHref() {
     if (realm === "space") return buildStarpathProgramHref({ selectedLevel: starpathLevel }, week);
     if (realm === "pattern") return `/pattern-peaks/program?teacher_preview=1&level=${encodeURIComponent(year)}&week=${week}`;
+    if (realm === "chance") return `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1&realm_id=chance&teacher_preview=1`;
     const params = new URLSearchParams({ year, week: String(week), legacy: "1", realm_id: realm });
     return `/program?${params.toString()}`;
   }
@@ -262,12 +268,16 @@ export default function DemoReviewPanel() {
     if (realm === "statistics") {
       return `/statistica/lesson/${encodeURIComponent(year)}/${week}/${lesson}?teacher_preview=1`;
     }
+    if (realm === "chance") {
+      return `/chance-hollow/lesson/${encodeURIComponent(year)}/${week}/${lesson}?teacher_preview=1`;
+    }
     return buildLessonRoute({ yearLabel: year, week, lessonNumber: lesson, realmId: realm });
   }
 
   function quizHref() {
     if (realm === "space") return buildStarpathWeeklyQuizHref({ selectedLevel: starpathLevel }, week);
     if (realm === "statistics") return `/statistica/quiz/${encodeURIComponent(year)}/${week}`;
+    if (realm === "chance") return `/chance-hollow/quiz/${encodeURIComponent(year)}/${week}?teacher_preview=1`;
     const params = new URLSearchParams({ year, week: String(week), type: "quiz", n: "1", realm_id: realm });
     return `/session?${params.toString()}`;
   }
@@ -328,6 +338,7 @@ export default function DemoReviewPanel() {
                 {LEVEL_CATALOG
                   .filter((item) => realm !== "statistics" || item.id !== "Prep")
                   .filter((item) => realm !== "pattern" || Number(item.id.replace("Year ", "")) >= 3)
+                  .filter((item) => realm !== "chance" || Number(item.id.replace("Year ", "")) >= 3)
                   .map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
               </select>
             </label>
