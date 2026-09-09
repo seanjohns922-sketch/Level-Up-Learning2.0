@@ -9,6 +9,8 @@ import { getStarpathBackground } from "@/lib/starpath-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { isGroundLevelYear } from "@/lib/lesson-routing";
 import { getStatisticaBackground } from "@/lib/statistica-visuals";
+import { getPatternPeaksBackground } from "@/lib/pattern-peaks-visuals";
+import { getChanceHollowBackground } from "@/lib/chance-hollow-visuals";
 
 interface AssessmentShellProps {
   /** "Pre-Test" or "Post-Test" */
@@ -89,8 +91,11 @@ export default function AssessmentShell({
   const theme = getRealmTheme(realmId);
   const isSpace = realmId === "space";
   const isStatistics = realmId === "statistics";
-  const isGroundNumber = !theme.isMeasurement && !isSpace && !isStatistics && isGroundLevelYear(year);
-  const isModernNumber = !theme.isMeasurement && !isSpace && !isStatistics && (isGroundNumber || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6");
+  const isPattern = realmId === "pattern";
+  const isChance = realmId === "chance";
+  const isNumber = !realmId || realmId === "number";
+  const isGroundNumber = isNumber && isGroundLevelYear(year);
+  const isModernNumber = isNumber && (isGroundNumber || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6");
   const contentWidth = wideContent || isModernNumber ? "max-w-6xl" : "max-w-2xl";
   const progressTrack = theme.isMeasurement
     ? "rgba(214,184,108,0.22)"
@@ -98,6 +103,10 @@ export default function AssessmentShell({
       ? "rgba(124,58,237,0.22)"
       : isStatistics
         ? "rgba(242,188,69,0.22)"
+        : isPattern
+          ? "rgba(110,231,183,0.22)"
+          : isChance
+            ? "rgba(251,113,133,0.22)"
       : "rgba(94,234,212,0.18)";
   const progressBg = theme.ctaGradientCss;
 
@@ -112,6 +121,10 @@ export default function AssessmentShell({
             ? "#070a1b"
             : isStatistics
               ? "#14231d"
+            : isPattern
+              ? "#071d18"
+            : isChance
+              ? "#17111b"
             : isModernNumber
               ? "#001b18"
             : "linear-gradient(to bottom, rgb(2 6 23), rgb(15 23 42), rgb(2 6 23))",
@@ -143,6 +156,20 @@ export default function AssessmentShell({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={getStatisticaBackground(year as RealmLevelId)} alt="" className="h-full w-full object-cover" style={{ filter: "brightness(0.3) saturate(1.08)" }} />
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(18,49,42,0.72), rgba(20,35,29,0.92))" }} />
+        </div>
+      )}
+      {isPattern && (
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={getPatternPeaksBackground(year as RealmLevelId)} alt="" className="h-full w-full object-cover" style={{ filter: "brightness(0.28) saturate(1.08)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(7,29,24,0.76), rgba(36,20,67,0.94))" }} />
+        </div>
+      )}
+      {isChance && (
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={getChanceHollowBackground(year as RealmLevelId)} alt="" className="h-full w-full object-cover" style={{ filter: "brightness(0.3) saturate(1.12)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(23,17,27,0.7), rgba(59,22,40,0.94))" }} />
         </div>
       )}
 

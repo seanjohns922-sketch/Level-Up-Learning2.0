@@ -21,6 +21,7 @@ const bankSource = read("data/assessments/chanceHollowIndependentBanks.ts");
 const pretestSource = read("app/pretest/page.tsx");
 const posttestSource = read("app/posttest/page.tsx");
 const cardSource = read("components/assessment/AssessmentQuestionCard.tsx");
+const shellSource = read("components/assessment/AssessmentShell.tsx");
 const dashboardSource = read("components/world/ChanceHollowMap.tsx");
 const taskRendererSource = read("components/TaskRenderer.tsx");
 const voiceControlledTaskSources = [
@@ -138,6 +139,9 @@ assert(pretestSource.includes('question?.type === "chanceHollowTask"'));
 assert(posttestSource.includes('q?.type === "chanceHollowTask"'));
 assert(cardSource.includes("<ChanceVisual"));
 assert(cardSource.includes("<OptionReadAloudButton"));
+assert(shellSource.includes("getChanceHollowBackground"));
+assert(shellSource.includes('const isNumber = !realmId || realmId === "number"'));
+assert(shellSource.includes("{isChance && ("));
 for (const file of voiceControlledTaskSources) {
   const source = read(file);
   assert(source.includes("OptionReadAloudButton"), `${file} must expose answer voice-over controls.`);
