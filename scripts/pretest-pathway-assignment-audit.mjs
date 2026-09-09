@@ -15,6 +15,9 @@ assert.equal(pretestStartingWeekForPercent(50, [6, 2, 4]), 2);
 assert.equal(pretestStartingWeekForPercent(84, [5, 3]), 3);
 assert.equal(pretestStartingWeekForPercent(70, []), 1);
 
+assert.equal(pretestPathwayForPercent(85), "pass");
+assert.equal(pretestPathwayForPercent(100), "pass");
+
 const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/20260728100000_fix_full_path_pretest_start_week.sql"),
   "utf8",

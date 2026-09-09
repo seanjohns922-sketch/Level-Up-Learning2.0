@@ -52,7 +52,10 @@ const form = (
 });
 
 const FORM_PROFILES: Record<StatisticaLevel, readonly StatisticaFormBlueprint[]> = {
-  1: [form("posttest", { accessible: 10, moderate: 8, challenging: 2 }, { recall: 3, understanding: 7, application: 7, reasoning: 3, transfer: 0 }, 12)],
+  1: [
+    form("pretest", { accessible: 10, moderate: 8, challenging: 2 }, { recall: 3, understanding: 7, application: 7, reasoning: 3, transfer: 0 }, 12),
+    form("posttest", { accessible: 10, moderate: 8, challenging: 2 }, { recall: 3, understanding: 7, application: 7, reasoning: 3, transfer: 0 }, 12),
+  ],
   2: [
     form("pretest", { accessible: 11, moderate: 7, challenging: 2 }, { recall: 4, understanding: 7, application: 6, reasoning: 3, transfer: 0 }, 11),
     form("posttest", { accessible: 8, moderate: 8, challenging: 4 }, { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, 10),
@@ -112,7 +115,7 @@ function blueprint(level: StatisticaLevel): StatisticaAssessmentBlueprint {
       description: DESCRIPTIONS[code] ?? code,
       weeks: program.filter((week) => week.curriculum.includes(code)).map((week) => week.week),
       misconceptionIds: STATISTICA_MISCONCEPTION_LIBRARY.filter((item) => item.descriptorCodes.includes(code)).map((item) => item.id),
-      allocation: { pretest: level === 1 ? 0 : counts[index]!, posttest: counts[index]! },
+      allocation: { pretest: counts[index]!, posttest: counts[index]! },
       pretestArchetypes: ["Read an unfamiliar data representation", "Choose or construct a valid response", "Diagnose a likely misconception"],
       posttestArchetypes: ["Analyse an unfamiliar data representation", "Construct or repair a representation", "Use evidence to justify a conclusion"],
     })),

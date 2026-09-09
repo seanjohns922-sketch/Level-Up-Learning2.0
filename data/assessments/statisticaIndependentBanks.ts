@@ -64,7 +64,207 @@ function levelOneData(index: number) {
   };
 }
 
-function levelOneTask(index: number): PracticeTask {
+function levelOnePretestData(index: number) {
+  const datasets = [
+    { context: "Class pet survey", labels: ["Dogs", "Cats", "Fish", "Birds"], counts: [8, 5, 11, 6] },
+    { context: "Daily weather record", labels: ["Sunny", "Cloudy", "Rainy", "Windy"], counts: [7, 12, 4, 9] },
+    { context: "Travel count", labels: ["Walk", "Car", "Bus", "Bike"], counts: [10, 6, 8, 5] },
+    { context: "Schoolyard insect count", labels: ["Bees", "Ants", "Beetles", "Butterflies"], counts: [5, 9, 6, 12] },
+  ] as const;
+  const selected = datasets[index % datasets.length]!;
+  return {
+    context: selected.context,
+    rows: selected.labels.map((label, rowIndex) => ({
+      id: `start-${label.toLowerCase()}`,
+      label,
+      color: COLOURS[rowIndex]!,
+      count: selected.counts[rowIndex]!,
+    })),
+  };
+}
+
+function levelOnePretestTask(index: number): PracticeTask {
+  const dataset = levelOnePretestData(index);
+  const data = dataset.rows;
+  const greatest = [...data].sort((a, b) => b.count - a.count)[0]!;
+  const fewest = [...data].sort((a, b) => a.count - b.count)[0]!;
+
+  switch (index) {
+    case 0:
+      return {
+        kind: "statisticaTally", mode: "read",
+        prompt: "How many playground votes are shown by these tally marks?",
+        speakText: "Read the tally and choose the total number of playground votes.", target: 6, count: 6, label: "playground votes",
+        options: options(["8", "5", "6"]), correctOptionIds: ["2"], feedback: feedback(),
+      };
+    case 1:
+      return {
+        kind: "statisticaTally", mode: "read",
+        prompt: "A class tallied votes for drawing. How many votes were recorded?",
+        speakText: "Read every complete group and every extra mark.", target: 11, count: 11, label: "drawing votes",
+        options: options(["10", "11", "15"]), correctOptionIds: ["1"], feedback: feedback(),
+      };
+    case 2:
+      return {
+        kind: "statisticaTable", mode: "count",
+        prompt: `Use the ${dataset.context.toLowerCase()} table. How many responses were recorded for ${greatest.label}?`,
+        speakText: `Find ${greatest.label} and enter its recorded frequency.`, target: greatest.count, rows: data, answerCount: greatest.count, feedback: feedback(),
+      };
+    case 3:
+      return {
+        kind: "statisticaTally", mode: "record",
+        prompt: "Eight children chose the sandpit. Record 8 using tally marks.",
+        speakText: "Record eight sandpit choices with tally marks.", target: 8, count: 8, label: "sandpit choices", feedback: feedback(),
+      };
+    case 4:
+      return {
+        kind: "statisticaTally", mode: "record",
+        prompt: "Thirteen leaves were collected. Record 13 using tally marks.",
+        speakText: "Record thirteen leaves with tally marks.", target: 13, count: 13, label: "leaves", feedback: feedback(),
+      };
+    case 5:
+      return {
+        kind: "statisticaClassify",
+        prompt: "Which question would collect useful data about playground activities?",
+        speakText: "Choose the question that every child can answer with a playground activity.", target: 1,
+        variable: "Planning a playground survey", examples: "Collect one relevant response from each child.",
+        options: options(["Which activity did you choose at lunch?", "Is lunch good?", "What colour is the classroom door?"]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 6:
+      return {
+        kind: "statisticaClassify",
+        prompt: "Which categories would organise a class weather record?",
+        speakText: "Choose clear weather categories that do not overlap.", target: 1,
+        variable: "What was the weather at lunchtime?", examples: "Each observation needs one clear category.",
+        options: options(["Sunny, cloudy, rainy, windy", "Warm, Tuesday, yellow", "Good, bad, favourite"]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 7: {
+      const categories = [
+        { id: "plant", label: "Plants", color: COLOURS[0]! },
+        { id: "insect", label: "Insects", color: COLOURS[1]! },
+        { id: "other", label: "Other", color: COLOURS[2]! },
+      ];
+      const observations = [
+        ["leaf-1", "leaf", "plant"], ["ant-1", "ant", "insect"], ["bee-1", "bee", "insect"],
+        ["flower-1", "flower", "plant"], ["stone-1", "stone", "other"], ["beetle-1", "beetle", "insect"],
+        ["twig-1", "twig", "plant"], ["ant-2", "ant", "insect"],
+      ] as const;
+      return {
+        kind: "statisticaCollect",
+        prompt: "Collect every schoolyard observation, then choose the category recorded most often.",
+        speakText: "Collect each observation and compare the three category totals.", target: observations.length,
+        items: observations.map(([id, label, category]) => ({ id, label, category })), categories,
+        question: "Which category was recorded most often?", correctOptionIds: ["insect"], feedback: feedback(),
+      };
+    }
+    case 8:
+      return {
+        kind: "statisticaSort",
+        prompt: "Sort each animal into pet or wild animal so the data can be counted.",
+        speakText: "Place every animal into its matching category.", target: 8,
+        categories: [
+          { id: "pet", label: "Pets", color: COLOURS[0]! },
+          { id: "wild", label: "Wild animals", color: COLOURS[1]! },
+        ],
+        items: [
+          { id: "dog", label: "dog", category: "pet" }, { id: "kangaroo", label: "kangaroo", category: "wild" },
+          { id: "cat", label: "cat", category: "pet" }, { id: "wombat", label: "wombat", category: "wild" },
+          { id: "fish", label: "fish", category: "pet" }, { id: "koala", label: "koala", category: "wild" },
+          { id: "rabbit", label: "rabbit", category: "pet" }, { id: "emu", label: "emu", category: "wild" },
+        ], feedback: feedback(),
+      };
+    case 9:
+      return {
+        kind: "statisticaTable", mode: "select",
+        prompt: `Use the ${dataset.context.toLowerCase()} table. Which category has the greatest frequency?`,
+        speakText: "Compare all the frequencies and select the greatest category.", target: greatest.count, rows: data, correctRowId: greatest.id, feedback: feedback(),
+      };
+    case 10: {
+      const categories = [
+        { id: "art", label: "Art", color: COLOURS[0]!, count: 5 },
+        { id: "sport", label: "Sport", color: COLOURS[1]!, count: 9 },
+        { id: "music", label: "Music", color: COLOURS[2]!, count: 7 },
+      ];
+      return {
+        kind: "statisticaGraph", mode: "build",
+        prompt: "Build a one-to-one picture display for the after-school choices.",
+        speakText: "Build each category with one picture for every response.", target: 9, display: "pictures", categories, feedback: feedback(),
+      };
+    }
+    case 11:
+      return {
+        kind: "statisticaGraph", mode: "read",
+        prompt: `Read the ${dataset.context.toLowerCase()} picture display. How many responses are shown for ${fewest.label}?`,
+        speakText: `Count one response for each picture beside ${fewest.label}.`, target: fewest.count, display: "pictures", categories: data,
+        options: options([String(fewest.count), String(fewest.count + 2), String(Math.max(0, fewest.count - 2))]), correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 12:
+      return {
+        kind: "statisticaGraph", mode: "compare",
+        prompt: `Compare the categories in the ${dataset.context.toLowerCase()} display. Which statement is true?`,
+        speakText: "Compare the two named category frequencies.", target: greatest.count, display: "pictures", categories: data,
+        options: options([`${greatest.label} and ${fewest.label} are equal.`, `${fewest.label} has more responses than ${greatest.label}.`, `${greatest.label} has more responses than ${fewest.label}.`]),
+        correctOptionIds: ["2"], feedback: feedback(),
+      };
+    case 13:
+      return {
+        kind: "statisticaTapGraph",
+        prompt: `Tap the category recorded most often in the ${dataset.context.toLowerCase()}.`,
+        speakText: "Compare every category and tap the one with the most responses.", target: greatest.count, ask: "most", display: "pictures", categories: data,
+        correctCategoryId: greatest.id, feedback: feedback(),
+      };
+    case 14:
+      return {
+        kind: "statisticaTapGraph",
+        prompt: `Tap the category recorded least often in the ${dataset.context.toLowerCase()}.`,
+        speakText: "Compare every category and tap the one with the fewest responses.", target: fewest.count, ask: "fewest", display: "pictures", categories: data,
+        correctCategoryId: fewest.id, feedback: feedback(),
+      };
+    case 15:
+      return {
+        kind: "statisticaGap",
+        prompt: `How many more responses did ${greatest.label} receive than ${fewest.label}?`,
+        speakText: "Find the difference between the larger and smaller frequencies.", target: greatest.count - fewest.count,
+        categories: [greatest, fewest], largerCategoryId: greatest.id, difference: greatest.count - fewest.count, feedback: feedback(),
+      };
+    case 16: {
+      const ranked = data.slice(0, 3);
+      return {
+        kind: "statisticaRank",
+        prompt: `Order the first three ${dataset.context.toLowerCase()} categories from least responses to most.`,
+        speakText: "Compare the three frequencies and order them from least to most.", target: ranked.length,
+        direction: "least-to-most", categories: ranked,
+        correctOrderIds: [...ranked].sort((left, right) => left.count - right.count).map((row) => row.id), feedback: feedback(),
+      };
+    }
+    case 17:
+      return {
+        kind: "statisticaInference",
+        prompt: `Which conclusion is supported by the ${dataset.context.toLowerCase()} display?`,
+        speakText: "Choose the conclusion proved by the displayed frequencies.", target: greatest.count, display: "pictures", categories: data,
+        options: options([`${greatest.label} was recorded most often in this group.`, "Every category was recorded equally often.", `${fewest.label} will always be least common everywhere.`]),
+        correctOptionIds: ["0"], feedback: feedback(),
+      };
+    case 18:
+      return {
+        kind: "statisticaInference",
+        prompt: `Someone says, "${fewest.label} was recorded least because nobody likes it." What does the display actually show?`,
+        speakText: "Choose what the recorded data supports without guessing a reason.", target: fewest.count, display: "pictures", categories: data,
+        options: options([`The display proves nobody likes ${fewest.label}.`, `${fewest.label} was recorded least in this group, but the display does not explain why.`, "The display proves every group will get the same result."]),
+        correctOptionIds: ["1"], feedback: feedback(),
+      };
+    default:
+      return {
+        kind: "statisticaInference",
+        prompt: `Which report accurately summarises the ${dataset.context.toLowerCase()} data?`,
+        speakText: "Choose the report that describes this group without making a claim about everyone.", target: greatest.count, display: "pictures", categories: data,
+        options: options([`${fewest.label} was most frequent in this group.`, `${greatest.label} must be most frequent in every group.`, `${greatest.label} was most frequent and ${fewest.label} was least frequent in this group.`]),
+        correctOptionIds: ["2"], feedback: feedback(),
+      };
+  }
+}
+
+function levelOnePosttestTask(index: number): PracticeTask {
   const dataset = levelOneData(index);
   const data = dataset.rows;
   const greatest = [...data].sort((a, b) => b.count - a.count)[0]!;
@@ -1438,7 +1638,7 @@ function levelSixTask(form: StatisticaAssessmentKind, index: number): PracticeTa
 }
 
 function taskFor(level: StatisticaLevel, form: StatisticaAssessmentKind, index: number) {
-  if (level === 1) return levelOneTask(index);
+  if (level === 1) return form === "pretest" ? levelOnePretestTask(index) : levelOnePosttestTask(index);
   if (level === 2) return levelTwoTask(form, index);
   if (level === 3) return levelThreeTask(form, index);
   if (level === 4) return levelFourTask(form, index);
@@ -1529,12 +1729,11 @@ function buildForm(level: StatisticaLevel, form: StatisticaAssessmentKind): Asse
 export const STATISTICA_INDEPENDENT_ASSESSMENT_FORMS: Record<FormKey, AssessmentQuestion[]> = Object.fromEntries(
   ([1, 2, 3, 4, 5, 6] as const).flatMap((level) =>
     (["pretest", "posttest"] as const)
-      .filter((form) => !(level === 1 && form === "pretest"))
       .map((form) => [`${level}-${form}` as FormKey, buildForm(level, form)]),
   ),
 ) as Record<FormKey, AssessmentQuestion[]>;
 
 export function getStatisticaIndependentAssessment(level: number, form: StatisticaAssessmentKind) {
-  if (!Number.isInteger(level) || level < 1 || level > 6 || (level === 1 && form === "pretest")) return [];
+  if (!Number.isInteger(level) || level < 1 || level > 6) return [];
   return STATISTICA_INDEPENDENT_ASSESSMENT_FORMS[`${level as StatisticaLevel}-${form}`] ?? [];
 }

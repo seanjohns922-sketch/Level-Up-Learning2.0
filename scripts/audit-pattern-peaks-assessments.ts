@@ -6,7 +6,7 @@ import { PATTERN_PEAKS_ASSESSMENT_BLUEPRINTS, getPatternPeaksAssessmentBlueprint
 import { PATTERN_PEAKS_INDEPENDENT_ASSESSMENT_FORMS, getPatternPeaksIndependentAssessment } from "@/data/assessments/patternPeaksIndependentBanks";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 import { getPosttestForYearLabel, getPretestForYearLabel, validateAssessmentBlueprintForLevel } from "@/data/assessments/api";
-import { isRealmFirstLevel } from "@/lib/realms/realm-registry";
+import { isFirstLevelPretestEnabled, isRealmFirstLevel } from "@/lib/realms/realm-registry";
 import { getPatternQuestionReadAloudText } from "@/lib/pattern-question-read-aloud";
 
 const levels = [3, 4, 5, 6] as const;
@@ -51,10 +51,11 @@ for (const level of levels) {
 assert.equal(quizIds.size, 420, "All 420 weekly questions must be present");
 
 assert.equal(PATTERN_PEAKS_ASSESSMENT_BLUEPRINTS.length, 4);
-assert.equal(Object.keys(PATTERN_PEAKS_INDEPENDENT_ASSESSMENT_FORMS).length, 7);
-assert.deepEqual(getPatternPeaksIndependentAssessment(3, "pretest"), [], "Entry Level 3 must not have a Pre-Test");
-assert.equal(isRealmFirstLevel("pattern", "Year 3"), true, "Pattern Peaks Year 3 must bypass placement testing");
-assert.deepEqual(getPretestForYearLabel("Year 3", "pattern"), []);
+assert.equal(Object.keys(PATTERN_PEAKS_INDEPENDENT_ASSESSMENT_FORMS).length, 8);
+assert.equal(getPatternPeaksIndependentAssessment(3, "pretest").length, 20, "Entry Level 3 must have a complete Pre-Test");
+assert.equal(isRealmFirstLevel("pattern", "Year 3"), true);
+assert.equal(isFirstLevelPretestEnabled("pattern", "Year 3"), true, "Pattern Peaks Year 3 must support placement testing");
+assert.equal(getPretestForYearLabel("Year 3", "pattern").length, 20);
 
 const allIds = new Set<string>();
 const allPrompts = new Set<string>();
@@ -63,7 +64,7 @@ for (const level of levels) {
   const blueprint = getPatternPeaksAssessmentBlueprint(level)!;
   assert.deepEqual(level < 6 ? validateAssessmentBlueprintForLevel(level as 3 | 4 | 5, "pattern") : validatePatternPeaksAssessmentBlueprintForLevel(level), []);
   assert.equal(getPosttestForYearLabel(`Year ${level}`, "pattern")?.questions.length, 20);
-  if (level > 3) assert.equal(getPretestForYearLabel(`Year ${level}`, "pattern").length, 20);
+  assert.equal(getPretestForYearLabel(`Year ${level}`, "pattern").length, 20);
   assert.equal(blueprint.descriptors.reduce((sum, descriptor) => sum + descriptor.allocation.posttest, 0), 20);
   for (const profile of blueprint.forms) {
     const items = getPatternPeaksIndependentAssessment(level, profile.kind);
@@ -127,7 +128,7 @@ for (const level of levels) {
     assert.ok(items.filter((item) => item.responseMode === "selected_response").length <= selectedMaximum[level]);
   }
 }
-assert.equal(totalAssessmentItems, 140);
+assert.equal(totalAssessmentItems, 160);
 
 const requiredStructures: Record<number, string[]> = {
   3: ["add-sub-inverse", "subtraction-unknown", "partition-equivalence", "derived-addition-fact", "derived-subtraction-fact", "multiplication-fact", "related-division-fact", "connected-fact-family", "multiple-algorithm", "odd-even-algorithm", "ordered-number-algorithm"],
@@ -322,4 +323,4 @@ assert.ok(lessonShellSource.includes("completionKeyRef.current") && lessonShellS
 assert.ok(taskRendererSource.includes("assessmentMode={assessmentMode}"), "Task renderer must pass assessment mode into Pattern Peaks");
 assert.ok(patternQuestionCardSource.includes("assessmentMode={assessmentMode}"), "Pattern Peaks activities must receive assessment mode");
 
-console.log("Pattern Peaks assessment audit passed: 28 weekly forms / 420 quiz items / 7 independent Pre-Post forms / 140 assessment items.");
+console.log("Pattern Peaks assessment audit passed: 28 weekly forms / 420 quiz items / 8 independent Pre-Post forms / 160 assessment items.");

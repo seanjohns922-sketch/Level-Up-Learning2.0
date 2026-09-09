@@ -72,7 +72,10 @@ const form = (
 });
 
 const FORM_PROFILES: Record<PatternPeaksLevel, readonly PatternPeaksFormBlueprint[]> = {
-  3: [form("posttest", { accessible: 5, moderate: 9, challenging: 6 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, 4)],
+  3: [
+    form("pretest", { accessible: 5, moderate: 9, challenging: 6 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, 4),
+    form("posttest", { accessible: 5, moderate: 9, challenging: 6 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, 4),
+  ],
   4: [
     form("pretest", { accessible: 6, moderate: 10, challenging: 4 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 }, 3),
     form("posttest", { accessible: 4, moderate: 9, challenging: 7 }, { recall: 1, understanding: 4, application: 7, reasoning: 6, transfer: 2 }, 3),
@@ -100,7 +103,7 @@ function buildBlueprint(level: PatternPeaksLevel): PatternPeaksAssessmentBluepri
       description: DESCRIPTIONS[code] ?? code,
       weeks: program.filter((week) => week.curriculum.includes(code)).map((week) => week.week),
       misconceptionIds: getPatternPeaksMisconceptions(code).map((item) => item.id),
-      allocation: { pretest: level === 3 ? 0 : ALLOCATIONS[level][index]!, posttest: ALLOCATIONS[level][index]! },
+      allocation: { pretest: ALLOCATIONS[level][index]!, posttest: ALLOCATIONS[level][index]! },
     })),
     forms: FORM_PROFILES[level],
   };

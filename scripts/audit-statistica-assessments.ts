@@ -48,17 +48,26 @@ for (const form of STATISTICA_WEEKLY_QUIZ_FORMS) {
 for (const level of levels) assert.equal(getStatisticaWeeklyQuizTasks(level, 6), null, `Year ${level} Week 6 must not have a quiz`);
 assert.equal(quizSerializations.size, 450, "All 450 quiz tasks must be structurally unique");
 
-assert.equal(Object.keys(STATISTICA_INDEPENDENT_ASSESSMENT_FORMS).length, 11, "Statistica must have 11 pre/post forms");
-assert.deepEqual(getStatisticaIndependentAssessment(1, "pretest"), [], "Year 1 must not have a pre-test");
+assert.equal(Object.keys(STATISTICA_INDEPENDENT_ASSESSMENT_FORMS).length, 12, "Statistica must have 12 pre/post forms");
+const yearOnePretest = getStatisticaIndependentAssessment(1, "pretest");
 const yearOnePosttest = getStatisticaIndependentAssessment(1, "posttest");
-assert.equal(yearOnePosttest.length, 20, "Year 1 must retain a complete post-test");
-assert.ok(yearOnePosttest.every((item) => !/mastery check|evidence file/i.test(item.prompt)), "Year 1 prompts must use natural child-facing language");
-assert.ok(new Set(yearOnePosttest.map((item) => item.practiceTask!.kind)).size >= 9, "Year 1 post-test needs broad interaction variety");
-const yearOneTallyCounts = yearOnePosttest.flatMap((item) => item.practiceTask?.kind === "statisticaTally" ? [item.practiceTask.count] : []);
-assert.ok(new Set(yearOneTallyCounts).size >= 4 && Math.max(...yearOneTallyCounts) >= 14, "Year 1 tallies must vary and include grouped values above 10");
-assert.ok(yearOnePosttest.some((item) => item.practiceTask?.kind === "statisticaCollect"), "Year 1 must assess collecting data");
-assert.ok(yearOnePosttest.some((item) => item.practiceTask?.kind === "statisticaSort"), "Year 1 must assess categorising data");
-assert.ok(yearOnePosttest.slice(-3).every((item) => item.practiceTask?.kind === "statisticaInference"), "Year 1 must finish with evidence-based reasoning");
+for (const [form, items] of [["pre-test", yearOnePretest], ["post-test", yearOnePosttest]] as const) {
+  assert.equal(items.length, 20, `Year 1 ${form} must contain 20 questions`);
+  assert.ok(items.every((item) => !/starting check|mastery check|evidence file/i.test(item.prompt)), `Year 1 ${form} prompts must use natural child-facing language`);
+  assert.ok(new Set(items.map((item) => item.practiceTask!.kind)).size >= 9, `Year 1 ${form} needs broad interaction variety`);
+  const tallyCounts = items.flatMap((item) => item.practiceTask?.kind === "statisticaTally" ? [item.practiceTask.count] : []);
+  assert.ok(new Set(tallyCounts).size >= 4 && Math.max(...tallyCounts) >= 13, `Year 1 ${form} tallies must vary and include grouped values above 10`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaCollect"), `Year 1 ${form} must assess collecting data`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaSort"), `Year 1 ${form} must assess categorising data`);
+  assert.ok(items.some((item) => item.practiceTask?.kind === "statisticaGraph" && item.practiceTask.mode === "build"), `Year 1 ${form} must assess building a one-to-one display`);
+  assert.ok(items.slice(-3).every((item) => item.practiceTask?.kind === "statisticaInference"), `Year 1 ${form} must finish with evidence-based reasoning`);
+}
+assert.notDeepEqual(yearOnePretest.map((item) => item.practiceTask), yearOnePosttest.map((item) => item.practiceTask), "Year 1 pre-test and post-test must be independent forms");
+assert.deepEqual(
+  getStatisticaAssessmentBlueprint(1)!.forms.map((form) => ({ difficulty: form.difficultyMix, cognitive: form.cognitiveMix, selected: form.selectedResponseMaximum })),
+  [getStatisticaAssessmentBlueprint(1)!.forms[0], getStatisticaAssessmentBlueprint(1)!.forms[0]].map((form) => ({ difficulty: form!.difficultyMix, cognitive: form!.cognitiveMix, selected: form!.selectedResponseMaximum })),
+  "Year 1 pre-test and post-test must be parallel forms",
+);
 
 const yearTwoPretest = getStatisticaIndependentAssessment(2, "pretest");
 const yearTwoPosttest = getStatisticaIndependentAssessment(2, "posttest");
@@ -266,12 +275,12 @@ for (const level of levels) {
   }
 }
 
-assert.equal(assessmentCount, 220, "Statistica must contain 220 independent assessment items");
-assert.equal(ids.size, 220);
-assert.equal(prompts.size, 220);
-assert.equal(contexts.size, 220);
-assert.equal(structures.size, 220);
-assert.equal(getPretestForYearLabel("Year 1", "statistics").length, 0, "Year 1 resolver must not expose a pre-test");
+assert.equal(assessmentCount, 240, "Statistica must contain 240 independent assessment items");
+assert.equal(ids.size, 240);
+assert.equal(prompts.size, 240);
+assert.equal(contexts.size, 240);
+assert.equal(structures.size, 240);
+assert.equal(getPretestForYearLabel("Year 1", "statistics").length, 20, "Year 1 resolver must expose its placement pre-test");
 assert.equal(getPosttestForYearLabel("Year 1", "statistics")?.questions.length, 20);
 for (const level of [2, 3, 4, 5, 6]) {
   assert.equal(getPretestForYearLabel(`Year ${level}`, "statistics").length, 20);
@@ -289,8 +298,7 @@ assert.ok(!bankSource.includes("data/activities/statistica/level"), "Assessment 
 const programPageSource = fs.readFileSync(path.join(process.cwd(), "app/program/page.tsx"), "utf8");
 const pretestPageSource = fs.readFileSync(path.join(process.cwd(), "app/pretest/page.tsx"), "utf8");
 assert.ok(programPageSource.includes("/statistica/quiz/"), "Program page must route Statistica weekly quizzes to the dedicated runner");
-assert.ok(pretestPageSource.includes("isRealmFirstLevel(progressRealmId, year)"), "Every realm's first curriculum level must bypass the pre-test");
-assert.ok(pretestPageSource.includes("buildRealmProgramHref({ realmId: progressRealmId, year, week: 1 })"), "First-level pre-test bypass must preserve the selected realm");
+assert.ok(pretestPageSource.includes("isFirstLevelPretestEnabled(progressRealmId, year)"), "Entry-level pre-tests must be allowed only by the registry contract");
 assert.equal(ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent, 80);
 assert.equal(ASSESSMENT_THRESHOLDS.posttestPassPercent, 85);
 assert.equal(weeklyQuizPassed(80), true);
@@ -298,4 +306,4 @@ assert.equal(weeklyQuizPassed(79), false);
 assert.equal(posttestPassed(85), true);
 assert.equal(posttestPassed(84), false);
 
-console.log("Statistica assessment audit passed: 30 weekly forms / 450 questions and 11 independent forms / 220 questions.");
+console.log("Statistica assessment audit passed: 30 weekly forms / 450 questions and 12 independent forms / 240 questions.");

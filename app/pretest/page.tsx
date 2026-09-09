@@ -25,7 +25,7 @@ import {
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { getRealmTheme } from "@/lib/useRealmTheme";
-import { isRealmFirstLevel } from "@/lib/realms/realm-registry";
+import { isFirstLevelPretestEnabled, isRealmFirstLevel } from "@/lib/realms/realm-registry";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 import {
   clearPretestResume,
@@ -384,7 +384,7 @@ function PretestPage() {
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {
-    if (year !== "Prep" && isRealmFirstLevel(progressRealmId, year)) {
+    if (year !== "Prep" && isRealmFirstLevel(progressRealmId, year) && !isFirstLevelPretestEnabled(progressRealmId, year)) {
       router.replace(buildRealmProgramHref({ realmId: progressRealmId, year, week: 1 }));
       return;
     }

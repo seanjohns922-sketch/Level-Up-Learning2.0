@@ -10,6 +10,7 @@ import {
   LIVE_REALM_IDS,
   tryCanonicalRealmId,
   getRealmFirstLevel,
+  isFirstLevelPretestEnabled,
   isRealmFirstLevel,
 } from "@/lib/realms/realm-registry";
 import {
@@ -89,7 +90,7 @@ for (const realm of liveRealms) {
     if (realm.hasWeeklyQuiz && yearLabel !== "Prep") {
       const pretest = getPretestForYearLabel(yearLabel, realm.realmId);
       const posttest = getPosttestForYearLabel(yearLabel, realm.realmId);
-      if (!isRealmFirstLevel(realm.realmId, yearLabel)) {
+      if (!isRealmFirstLevel(realm.realmId, yearLabel) || isFirstLevelPretestEnabled(realm.realmId, yearLabel)) {
         assert(pretest.length > 0, `${realm.name} ${yearLabel} pre-test is missing.`);
       }
       assert((posttest?.questions.length ?? 0) > 0, `${realm.name} ${yearLabel} post-test is missing.`);
@@ -109,9 +110,13 @@ const placements = read("components/teacher/PlacementManager.tsx");
 assert(placements.includes("getLiveRealmDefinitions"), "Placement management must discover registry-live realms.");
 assert(
   placements.includes("isRealmFirstLevel(realmId, level)") &&
-    placements.includes('level === "Prep" ? "ground_week1" : "full_level"'),
-  "Teacher placement must remove the pre-test option at every realm's first curriculum level.",
+    placements.includes("isFirstLevelPretestEnabled(realmId, level)"),
+  "Teacher placement must respect the registered first-level pre-test exceptions.",
 );
+
+const entryPretestMigration = latestMigrationContaining("create or replace function public.realm_first_level_pretest_enabled(");
+assert(entryPretestMigration.source.includes("p_realm_id = 'statistics' and p_level = 'Year 1'"));
+assert(entryPretestMigration.source.includes("p_realm_id = 'pattern' and p_level = 'Year 3'"));
 
 const sharedProgram = read("app/program/page.tsx");
 assert(

@@ -4,12 +4,13 @@ import path from "node:path";
 import { getPosttestForYearLabel, getPretestForYearLabel } from "@/data/assessments/api";
 import { getCurriculumPlan, getGenresForYear } from "@/data/programs/genres";
 import { DIAGNOSTIC_STRANDS, diagnosticAvailableWeight } from "@/lib/whole-maths-diagnostic";
-import { REALM_REGISTRY, getRealmFirstLevel } from "@/lib/realms/realm-registry";
+import { REALM_REGISTRY, getRealmFirstLevel, isFirstLevelPretestEnabled } from "@/lib/realms/realm-registry";
 import { highestRosterCurriculumYear, normalizeClassCurriculumYear } from "@/lib/class-curriculum-year";
 
 const root = process.cwd();
 const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
 const migration = read("supabase/migrations/20260906120000_prepare_pattern_peaks_live_realm.sql");
+const entryPretestMigration = read("supabase/migrations/20260909120000_enable_entry_level_pretests.sql");
 
 assert.equal(REALM_REGISTRY.pattern.status, "live");
 assert.equal(REALM_REGISTRY.pattern.isSelectable, true);
@@ -36,7 +37,8 @@ for (const year of ["Year 3", "Year 4", "Year 5", "Year 6"]) {
   assert(posttest, `${year} must have a Pattern Peaks post-test.`);
   assert.equal(posttest.questions.length, 20, `${year} post-test must have 20 questions.`);
 }
-assert.equal(getPretestForYearLabel("Year 3", "pattern").length, 0, "Year 3 is the first Pattern Peaks level and must not have a pre-test.");
+assert.equal(isFirstLevelPretestEnabled("pattern", "Year 3"), true);
+assert.equal(getPretestForYearLabel("Year 3", "pattern").length, 20, "Year 3 must have a complete entry pre-test.");
 for (const year of ["Year 4", "Year 5", "Year 6"]) {
   assert.equal(getPretestForYearLabel(year, "pattern").length, 20, `${year} pre-test must have 20 questions.`);
 }
@@ -87,8 +89,9 @@ assert(migration.includes("perform public.assert_student_access(p_student_id)"),
 assert(migration.includes("when p_realm_id = 'pattern' then 'pattern-peaks'"), "Pattern Peaks needs an isolated program key.");
 assert(migration.includes("when p_realm_id = 'pattern' then '[1,2,3,4,5,6,7,8]'::jsonb"), "Pattern Peaks needs an explicit eight-week full pathway.");
 assert(migration.includes("Pattern Peaks supports Year 3 to Year 6"), "Teacher placement must reject levels outside Years 3-6.");
-assert(migration.includes("Pattern Peaks Year 3 starts directly without a pre-test"), "Year 3 placement must reject pre-test mode.");
-assert(migration.includes("Pattern Peaks Year 3 does not use a pre-test"), "The assessment RPC must reject a Year 3 pre-test.");
+assert(entryPretestMigration.includes("p_realm_id = 'pattern' and p_level = 'Year 3'"), "The database must enable the Year 3 entry pre-test.");
+assert(entryPretestMigration.includes("create or replace function public.complete_realm_assessment("), "The assessment RPC must accept the newly enabled pre-test.");
+assert(!entryPretestMigration.includes("Pattern Peaks Year 3 does not use a pre-test"), "The latest assessment RPC must not reject the Year 3 pre-test.");
 assert(migration.includes("when p_realm_id in ('measurement', 'space', 'pattern') then 8"), "Canonical sequencing must recognise all eight Pattern Peaks weeks.");
 
 const algebraDiagnostic = DIAGNOSTIC_STRANDS.find((strand) => strand.strand === "algebra");

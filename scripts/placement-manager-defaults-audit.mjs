@@ -14,11 +14,17 @@ assert.match(
 );
 assert.match(
   source,
-  /const level = supportedLevel\(realmId, schoolYearOf\(student\)\);[\s\S]*entry: level === "Prep" \? "ground_week1" : "pretest"/,
+  /const level = supportedLevel\(realmId, schoolYearOf\(student\)\);[\s\S]*entry: normalizeEntryMode\(realmId, level, "pretest"\)/,
   "New placement rows must persist a school-year default supported by the selected realm.",
 );
 assert.match(source, /if \(level === "Prep"\) return "ground_week1"/);
-assert.match(source, /entryModesForLevel\(level\)/);
+assert.match(source, /entryModesForLevel\(realmId, level\)/);
+assert.match(source, /isFirstLevelPretestEnabled\(realmId, level\)/);
+assert.match(
+  source,
+  /ENTRY_MODES\.filter\(\(mode\) => mode\.value !== "ground_week1"\)/,
+  "Enabled entry-level pre-tests must offer both pre-test and full-level placement modes.",
+);
 assert.match(
   source,
   /levelLabels: realm\.levelLabels/,

@@ -4,6 +4,7 @@ import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes
 import {
   getLiveRealmDefinitions,
   getRealmDefinition,
+  isFirstLevelPretestEnabled,
   isRealmFirstLevel,
   type LiveRealmId,
 } from "@/lib/realms/realm-registry";
@@ -57,7 +58,7 @@ export function resolveRealmEntryRoute(args: {
 
   const route = `/${getRealmDefinition(args.realmId).slug}`;
 
-  if (isRealmFirstLevel(args.realmId, year)) return route;
+  if (isRealmFirstLevel(args.realmId, year) && !isFirstLevelPretestEnabled(args.realmId, year)) return route;
   if (isPlacementComplete(args.progress)) return route;
 
   return `/pretest?year=${encodeURIComponent(year)}&realm_id=${args.realmId}`;

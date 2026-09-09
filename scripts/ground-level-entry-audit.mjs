@@ -10,7 +10,7 @@ const home = read("app/home/page.tsx");
 const migration = read("supabase/migrations/20260813130000_ground_level_skips_pretest.sql");
 
 assert.match(placement, /if \(level === "Prep"\) return "ground_week1"/);
-assert.match(placement, /entryModesForLevel\(level\)/);
+assert.match(placement, /entryModesForLevel\(realmId, level\)/);
 assert.match(placement, /level !== "Prep" \? <button onClick=\{\(\) => onResetPretest\(s\)\}/);
 assert.match(client, /assignedLevel === "Prep"[\s\S]*\? "ground_week1"/);
 assert.match(destination, /buildGroundFirstLessonRoute[\s\S]*yearLabel: "Prep", week: 1, lessonNumber: 1, realmId: "number"/);

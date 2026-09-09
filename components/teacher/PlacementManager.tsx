@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowLeft, ArrowUp, ArrowUpDown, ChevronRight, Lock, MoreHorizontal, Users, X } from "lucide-react";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
-import { getLiveRealmDefinitions, isRealmFirstLevel } from "@/lib/realms/realm-registry";
+import { getLiveRealmDefinitions, isFirstLevelPretestEnabled, isRealmFirstLevel } from "@/lib/realms/realm-registry";
 import {
   fetchRealmCompatProgressForClass,
   fetchTeacherRealmPlacements,
@@ -46,14 +46,19 @@ const ENTRY_MODES: { value: PlacementEntryMode; label: string }[] = [
 ];
 
 function normalizeEntryMode(realmId: string, level: string, entry: PlacementEntryMode): PlacementEntryMode {
-  if (isRealmFirstLevel(realmId, level)) return level === "Prep" ? "ground_week1" : "full_level";
+  if (isRealmFirstLevel(realmId, level)) {
+    if (level === "Prep") return "ground_week1";
+    if (!isFirstLevelPretestEnabled(realmId, level)) return "full_level";
+    return entry === "ground_week1" ? "pretest" : entry;
+  }
   return entry === "ground_week1" ? "pretest" : entry;
 }
 
 function entryModesForLevel(realmId: string, level: string) {
   if (isRealmFirstLevel(realmId, level)) {
-    const firstMode = level === "Prep" ? "ground_week1" : "full_level";
-    return ENTRY_MODES.filter((mode) => mode.value === firstMode);
+    if (level === "Prep") return ENTRY_MODES.filter((mode) => mode.value === "ground_week1");
+    if (isFirstLevelPretestEnabled(realmId, level)) return ENTRY_MODES.filter((mode) => mode.value !== "ground_week1");
+    return ENTRY_MODES.filter((mode) => mode.value === "full_level");
   }
   return level === "Prep"
     ? ENTRY_MODES.filter((mode) => mode.value === "ground_week1")

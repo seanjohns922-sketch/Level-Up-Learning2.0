@@ -531,12 +531,11 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
 export const PATTERN_PEAKS_INDEPENDENT_ASSESSMENT_FORMS: Record<FormKey, AssessmentQuestion[]> = Object.fromEntries(
   ([3, 4, 5, 6] as const).flatMap((level) =>
     (["pretest", "posttest"] as const)
-      .filter((form) => !(level === 3 && form === "pretest"))
       .map((form) => [`${level}-${form}` as FormKey, buildForm(level, form)]),
   ),
 ) as Record<FormKey, AssessmentQuestion[]>;
 
 export function getPatternPeaksIndependentAssessment(level: number, form: PatternPeaksAssessmentKind) {
-  if (!Number.isInteger(level) || level < 3 || level > 6 || (level === 3 && form === "pretest")) return [];
+  if (!Number.isInteger(level) || level < 3 || level > 6) return [];
   return PATTERN_PEAKS_INDEPENDENT_ASSESSMENT_FORMS[`${level as PatternPeaksLevel}-${form}`] ?? [];
 }
