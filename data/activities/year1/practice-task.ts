@@ -215,6 +215,21 @@ export type PracticeTask = (
       mode: "most" | "least" | "compareTrials" | "compareFrequencies" | "predictMatch" | "predictMost";
     }
   | {
+      // Chance Hollow L4 (Year 4, AC9M4P02): draw a counter from a bag, then put
+      // it back (replace → chances stay the same, independent) or keep it (→ the
+      // bag changes, dependent), and answer how the next draw is affected.
+      kind: "chanceDependentDraw";
+      prompt: string;
+      bag: { key: string; name: string; colour: string; count: number }[];
+      drawKey: string; // which colour is drawn
+      action: "replace" | "keep";
+      askKey: string; // the colour the question is about
+      question: string;
+      options: string[];
+      answer: string;
+      feedback?: { correct: string; wrong: string };
+    }
+  | {
       // Chance Hollow: build a fair spinner by giving each colour an equal number
       // of parts.
       kind: "chanceBuildFair";

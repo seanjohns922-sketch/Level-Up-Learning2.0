@@ -149,18 +149,12 @@ function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
     }
     if (week <= 3) {
       return {
-        term: "fraction chance",
-        title: "Chance can be described as a fraction",
-        meaning: "A probability fraction compares the number of winning outcomes with the total number of equally likely outcomes.",
-        example: "If 2 of 6 spinner parts are red, the chance of red is 2 out of 6.",
-        exampleExplanation: "The winning outcomes are the red parts, and the total outcomes are all spinner parts.",
-        chanceModel: {
-          visual: { type: "spinner", wedges: ["#fb7185", "#fb7185", "#6d3f9c", "#6d3f9c", "#6d3f9c", "#6d3f9c"] },
-          numerator: 2,
-          denominator: 6,
-          winningLabel: "2 red winning parts",
-          totalLabel: "6 equal parts altogether",
-        },
+        term: "independent and dependent events",
+        title: "Some events change the chance of the next one",
+        meaning: "An event is independent when it does not change the next chance, and dependent when it does. Putting a drawn counter back keeps the bag the same; keeping it out changes what is left.",
+        example: "Draw a red counter from a bag. Put it back and the chances are unchanged; keep it out and red becomes less likely next time.",
+        exampleExplanation: "Replacing the counter is independent; keeping it is dependent because the bag has changed.",
+        chanceVisual: { type: "bag", counters: ["#e5484d", "#e5484d", "#e5484d", "#3b82f6", "#3b82f6"] },
       };
     }
     if (week <= 5) {
@@ -277,19 +271,19 @@ function successCriteriaFor(levelNumber: number, week: number, lessonNumber: num
         "explain the match",
       ],
       "3-1": [
-        "describe one outcome out of all outcomes",
-        "count winning outcomes",
-        "count total outcomes",
+        "draw a counter and put it back or keep it",
+        "tell if the next chance stays the same or changes",
+        "name independent and dependent events",
       ],
       "3-2": [
-        "write chance as a simple fraction",
-        "use winning outcomes as the numerator",
-        "use total outcomes as the denominator",
+        "sort everyday events as independent or dependent",
+        "decide if the first result affects the next",
+        "explain why the chance does or does not change",
       ],
       "3-3": [
-        "compare chance fractions",
-        "decide which chance is greater",
-        "explain my comparison",
+        "predict the next draw after keeping a counter",
+        "tell which colour is now more or less likely",
+        "use what is left in the bag as evidence",
       ],
       "4-1": [
         "decide if a game is fair",

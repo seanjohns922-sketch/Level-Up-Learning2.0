@@ -186,65 +186,102 @@ function countOutcomesMaker(): ChanceCase {
 
 // (W2 L3 "Match Tool to Chance" is now the visual compareOutcomesTask below.)
 
-// ─────────────────────── Week 3: Probability as Fractions ────────────────────
-// L1 "One Out Of" — a single target part; the chance is always 1/total.
-function oneOutOfMaker(): ChanceCase {
-  const total = choice([3, 4, 5, 6] as const);
-  const wedges = shuffle([RED, ...Array(total - 1).fill(BLUE)] as string[]);
-  const answer = `1/${total}`;
+// ────────────── Week 3: Events That Affect Each Other (AC9M4P02) ──────────────
+// Independent vs dependent events, modelled hands-on with a bag: replacing a
+// drawn counter leaves the chances unchanged (independent); keeping it changes
+// what is left in the bag (dependent).
+const DRAW_PAIRS: ReadonlyArray<readonly [Paint, Paint]> = [
+  [{ k: RED, n: "red" }, { k: BLUE, n: "blue" }],
+  [{ k: GREEN, n: "green" }, { k: YELLOW, n: "yellow" }],
+  [{ k: PURPLE, n: "purple" }, { k: RED, n: "red" }],
+  [{ k: BLUE, n: "blue" }, { k: GREEN, n: "green" }],
+];
+
+function drawBag(): { key: string; name: string; colour: string; count: number }[] {
+  const [a, b] = choice(DRAW_PAIRS);
+  return [
+    { key: a.k, name: cap(a.n), colour: a.k, count: randInt(2, 4) },
+    { key: b.k, name: cap(b.n), colour: b.k, count: randInt(2, 4) },
+  ];
+}
+
+// L1 "Does It Change?" — draw, replace or keep, then decide if the chance changed.
+function makeDependentChangeTask(): PracticeTask {
+  const bag = drawBag();
+  const drawn = choice(bag);
+  const action = choice(["replace", "keep"] as const);
+  const answer = action === "replace" ? "The chance stays the same" : "The chance has changed";
   return {
-    prompt: "One part of this spinner is red. What is the chance of landing on red?",
+    kind: "chanceDependentDraw",
+    prompt: "Draw a counter, then decide what happens to the next draw.",
+    bag,
+    drawKey: drawn.key,
+    action,
+    askKey: drawn.key,
+    question: `Is the chance of drawing ${drawn.name.toLowerCase()} on the NEXT draw the same, or has it changed?`,
+    options: shuffle(["The chance stays the same", "The chance has changed"]),
     answer,
-    options: distinctOptions(answer, [`1/${total - 1}`, `${total}/${total}`, `2/${total}`, `1/${total + 1}`]),
-    correct: `Yes. There is 1 red part out of ${total} equal parts, so the chance is 1/${total}.`,
-    wrong: `One red part out of ${total} equal parts is 1/${total}.`,
-    visual: { type: "spinner", wedges },
+    feedback: {
+      correct: action === "replace"
+        ? "Right — putting it back leaves the bag exactly as it was, so the chance is unchanged. That is an independent event."
+        : "Right — keeping the counter changes what is left, so the chance changes. That is a dependent event.",
+      wrong: action === "replace"
+        ? "The counter went back in, so the bag is the same as before — the chance does not change."
+        : "The counter stayed out, so the bag has fewer counters now — the chance changes.",
+    },
   };
 }
 
-// L2 "Fraction Chance" — count the red parts out of the total (no duplicate options).
-function fractionChanceMaker(): ChanceCase {
-  const total = choice([4, 6, 8] as const);
-  const redCount = randInt(1, total - 1);
-  const wedges = shuffle([...Array(redCount).fill(RED), ...Array(total - redCount).fill(BLUE)] as string[]);
-  const answer = `${redCount}/${total}`;
-  const candidates = [
-    `${total - redCount}/${total}`,
-    `${Math.min(redCount + 1, total)}/${total}`,
-    `${Math.max(redCount - 1, 1)}/${total}`,
-    `1/${total}`,
-    `${total}/${total}`,
-  ];
+// L2 "Spot the Link" — classify everyday events as independent or dependent.
+const SCENARIOS: ReadonlyArray<{ text: string; dependent: boolean }> = [
+  { text: "You flip a coin, then flip the same coin again", dependent: false },
+  { text: "You spin a spinner, then spin it again", dependent: false },
+  { text: "You roll a dice, then roll it again", dependent: false },
+  { text: "You draw a counter, look at it, and put it back before drawing again", dependent: false },
+  { text: "You take a lolly from a jar and eat it, then take another", dependent: true },
+  { text: "You draw a card and keep it, then draw another", dependent: true },
+  { text: "You pick a marble and do NOT put it back, then pick again", dependent: true },
+  { text: "You eat one grape from a bowl, then pick another grape", dependent: true },
+  { text: "You pull a sock from a drawer and keep it, then pull another", dependent: true },
+];
+function dependentScenarioMaker(): ChanceCase {
+  const s = choice(SCENARIOS);
+  const answer = s.dependent ? "Yes — the chance changes (dependent)" : "No — the chance stays the same (independent)";
   return {
-    prompt: "What fraction of this spinner is red?",
+    prompt: `${s.text}. Does the first result change the chance for the next one?`,
     answer,
-    options: distinctOptions(answer, candidates),
-    correct: `Yes. ${redCount} out of ${total} equal parts are red.`,
-    wrong: `Count red parts first, then total parts: ${redCount} out of ${total}.`,
-    visual: { type: "spinner", wedges },
+    options: ["Yes — the chance changes (dependent)", "No — the chance stays the same (independent)"],
+    correct: s.dependent
+      ? "Correct — keeping something changes what is left, so the next chance is different. Dependent."
+      : "Correct — nothing is removed, so the next chance is exactly the same. Independent.",
+    wrong: s.dependent
+      ? "Something was taken and not replaced, so there are fewer left — the chance changes. Dependent."
+      : "Nothing was taken away, so the chance for the next one is unchanged. Independent.",
   };
 }
 
-// L3 "Compare Fraction Chances" — which fraction is bigger.
-function compareFractionMaker(): ChanceCase {
-  const pairs: ReadonlyArray<readonly [string, string, string]> = [
-    ["1/2", "1/4", "1/2"],
-    ["1/3", "2/3", "2/3"],
-    ["1/4", "3/4", "3/4"],
-    ["2/6", "1/2", "1/2"],
-    ["3/8", "1/2", "1/2"],
-    ["5/8", "1/2", "5/8"],
-    ["1/4", "2/6", "2/6"],
-    ["3/6", "1/4", "3/6"],
-  ];
-  const [a, b, answer] = choice(pairs);
+// L3 "Predict the Next Draw" — keep a counter, then predict how the next draw shifts.
+function makeDependentPredictTask(): PracticeTask {
+  const bag = drawBag();
+  const drawn = choice(bag);
+  const ask = choice(bag);
+  const answer = ask.key === drawn.key ? "Less likely" : "More likely";
   return {
-    prompt: `Which chance is greater: ${a} or ${b}?`,
+    kind: "chanceDependentDraw",
+    prompt: "Keep the counter you draw, then predict the next draw.",
+    bag,
+    drawKey: drawn.key,
+    action: "keep",
+    askKey: ask.key,
+    question: `You kept the ${drawn.name.toLowerCase()} counter. Is ${ask.name.toLowerCase()} now more likely, less likely, or unchanged on the next draw?`,
+    options: shuffle(["More likely", "Less likely", "No change"]),
     answer,
-    options: [a, b, "They are equal", "Neither can happen"],
-    correct: "Correct. Compare each fraction to see which takes more of the whole.",
-    wrong: "Use the size of the fraction, not just the top number.",
-    visual: { type: "scale" },
+    feedback: {
+      correct: ask.key === drawn.key
+        ? `Right — there are fewer ${ask.name.toLowerCase()} counters now, so ${ask.name.toLowerCase()} is less likely.`
+        : `Right — a ${drawn.name.toLowerCase()} counter was removed, so ${ask.name.toLowerCase()} takes a bigger share and is more likely.`,
+      wrong: `A ${drawn.name.toLowerCase()} counter was kept out, so the bag changed. Compare ${ask.name.toLowerCase()}'s share before and after.`,
+    },
   };
 }
 
@@ -500,9 +537,9 @@ const lessonGens: Record<string, Gen> = {
   "2-1": generated([readToolMaker]),
   "2-2": generated([countOutcomesMaker]),
   "2-3": randTask([compareOutcomesTask]),
-  "3-1": generated([oneOutOfMaker]),
-  "3-2": generated([fractionChanceMaker]),
-  "3-3": generated([compareFractionMaker]),
+  "3-1": makeDependentChangeTask,
+  "3-2": generated([dependentScenarioMaker]),
+  "3-3": makeDependentPredictTask,
   "4-1": generated([fairCoinGameMaker, fairDieGameMaker, fairSpinnerGameMaker, fairBagGameMaker]),
   "4-2": generated([fixGameMaker]),
   "4-3": makeBuildFairTask,
@@ -512,7 +549,7 @@ const lessonGens: Record<string, Gen> = {
   "6-1": makePredictMostTask,
   "6-2": () => ({
     kind: "chanceAutoTally",
-    prompt: "Run the chance tool many times, then read the tally to find which colour came up most.",
+    prompt: "Run the same experiment twice, then decide whether the two runs came out the same.",
     tool: "spinner",
     draw: [RED, RED, RED, BLUE],
     spins: 12,
@@ -520,7 +557,7 @@ const lessonGens: Record<string, Gen> = {
       { key: RED, name: "Red", colour: RED },
       { key: BLUE, name: "Blue", colour: BLUE },
     ],
-    mode: "most",
+    mode: "compareTrials",
   }),
   "6-3": generated([expectedActualMaker]),
 };

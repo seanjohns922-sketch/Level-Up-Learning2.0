@@ -128,6 +128,7 @@ function formatPracticeTopicLabel(kind: PracticeTask["kind"]) {
   if (kind === "chanceSpinTally") return "Record the Tally";
   if (kind === "chanceAutoTally") return "Run the Experiment";
   if (kind === "chanceBuildFair") return "Fix It, Then Face Chanzia";
+  if (kind === "chanceDependentDraw") return "Draw and Decide";
   if (kind === "chanceCompare") return "Compare the Tools";
   if (kind === "chancePredictCount") return "Predict and Spin";
   if (kind === "chanceDiceRace") return "Repair and Race";
@@ -273,6 +274,7 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
     return `about ${expected} of ${task.spins} spins`;
   }
   if (task.kind === "chanceCompare") return task.answer ?? null;
+  if (task.kind === "chanceDependentDraw") return task.answer ?? null;
   const genericTask = task as Record<string, unknown>;
   for (const key of ["correctAnswer", "answer", "correctOption", "correctLabel", "correctReason", "targetNumber", "targetDeg"]) {
     const value = genericTask[key];
@@ -307,6 +309,8 @@ function getPracticeTaskWrongExplanation(task: PracticeTask) {
       return "Expected wins = the target's chance × the number of spins.";
     case "chanceAutoTally":
       return "Read the tally you built — the answer is whatever the results actually show.";
+    case "chanceDependentDraw":
+      return "Putting the counter back keeps the chances the same; keeping it changes what is left in the bag.";
     default:
       break;
   }

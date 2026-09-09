@@ -63,26 +63,26 @@ const LEVEL_4_SEEDS: readonly ChanceWeekSeed[] = [
     lessons: ["Read the Chance Tool", "Count the Outcomes", "Match Tool to Chance"],
   },
   {
-    topic: "Probability as Fractions",
-    purpose: "Describe chance using simple fractions of possible outcomes.",
-    curriculum: ["AC9M4P01"],
-    lessons: ["One Out Of", "Fraction Chance", "Compare Fraction Chances"],
+    topic: "Events That Affect Each Other",
+    purpose: "Recognise when one event changes the chance of the next (dependent) or leaves it unchanged (independent).",
+    curriculum: ["AC9M4P02"],
+    lessons: ["Does It Change?", "Spot the Link", "Predict the Next Draw"],
   },
   {
     topic: "Fair Games",
-    purpose: "Decide whether a game is fair by checking possible outcomes.",
+    purpose: "Decide whether a game is fair by checking possible outcomes, then test it by playing.",
     curriculum: ["AC9M4P01"],
     lessons: ["Is the Game Fair?", "Fix the Game", "Design a Fair Game"],
   },
   {
     topic: "Compare Chances",
-    purpose: "Compare two events using outcome counts and probability language.",
+    purpose: "Compare two events using outcome counts, then predict and run repeated trials to check.",
     curriculum: ["AC9M4P01"],
     lessons: ["More Chance or Less Chance?", "Same Chance", "Best Prediction"],
   },
   {
-    topic: "Chance Investigation",
-    purpose: "Run a simple chance investigation and compare expected with actual results.",
+    topic: "Repeated Experiments and Variation",
+    purpose: "Predict, run repeated chance experiments and notice that results vary from run to run.",
     curriculum: ["AC9M4P01"],
     lessons: ["Predict From the Tool", "Run and Record", "Compare Expected and Actual"],
   },
@@ -216,12 +216,12 @@ function lessonFocus(seed: ChanceWeekSeed, title: string) {
       return "count possible outcomes for a chance tool.";
     case "Match Tool to Chance":
       return "match a chance tool to a probability.";
-    case "One Out Of":
-      return "describe chance as one outcome out of all outcomes.";
-    case "Fraction Chance":
-      return "write chance as a simple fraction.";
-    case "Compare Fraction Chances":
-      return "compare chance fractions.";
+    case "Does It Change?":
+      return "decide whether keeping or replacing a counter changes the next chance.";
+    case "Spot the Link":
+      return "tell independent events from dependent events.";
+    case "Predict the Next Draw":
+      return "predict how removing a counter changes the next draw.";
     case "Is the Game Fair?":
       return "decide if a game is fair.";
     case "Fix the Game":

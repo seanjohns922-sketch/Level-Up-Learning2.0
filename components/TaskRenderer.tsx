@@ -207,6 +207,7 @@ import StarpathCartesianCard from "@/components/starpath/StarpathCartesianCard";
 import StarpathTessellationCard from "@/components/starpath/StarpathTessellationCard";
 import ChanceSpinTallyCard from "@/components/chance-hollow/ChanceSpinTallyCard";
 import ChanceAutoTallyCard from "@/components/chance-hollow/ChanceAutoTallyCard";
+import ChanceDependentDrawCard from "@/components/chance-hollow/ChanceDependentDrawCard";
 import ChanceBuildFairCard from "@/components/chance-hollow/ChanceBuildFairCard";
 import ChanceCompareToolsCard from "@/components/chance-hollow/ChanceCompareToolsCard";
 import ChancePredictCountCard from "@/components/chance-hollow/ChancePredictCountCard";
@@ -760,6 +761,8 @@ function TaskRendererInner({
       return <ChanceAutoTallyCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceBuildFair":
       return <ChanceBuildFairCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "chanceDependentDraw":
+      return <ChanceDependentDrawCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceCompare":
       return <ChanceCompareToolsCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chancePredictCount":

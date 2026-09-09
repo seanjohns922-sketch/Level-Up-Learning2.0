@@ -325,6 +325,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "chanceSpinTally",
   "chanceAutoTally",
   "chanceBuildFair",
+  "chanceDependentDraw",
   "chanceCompare",
   "chancePredictCount",
   "chanceDiceRace",
@@ -443,6 +444,17 @@ export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boole
       && Array.isArray(task.colours) && task.colours.length === 2
       && Number.isInteger(task.maxParts) && task.maxParts >= 2
       && task.colours.every((c) => hasText(c.key) && hasText(c.name) && hasText(c.colour));
+  }
+  if (task.kind === "chanceDependentDraw") {
+    return hasText(task.prompt) && hasText(task.question)
+      && Array.isArray(task.bag) && task.bag.length >= 2
+      && task.bag.every((g) => hasText(g.key) && hasText(g.name) && hasText(g.colour) && Number.isInteger(g.count) && g.count >= 1)
+      && (task.action === "replace" || task.action === "keep")
+      && task.bag.some((g) => g.key === task.drawKey)
+      && task.bag.some((g) => g.key === task.askKey)
+      && Array.isArray(task.options) && task.options.length >= 2
+      && new Set(task.options).size === task.options.length
+      && task.options.includes(task.answer);
   }
   if (task.kind === "chancePredictCount") {
     return hasText(task.prompt)
