@@ -1,17 +1,18 @@
 import type { MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
-import { ACTIVE_STUDENT_KEY } from "@/data/progress";
-import { isLiveRealmId, type LiveRealmId } from "@/lib/realms/realm-registry";
+import { ACTIVE_STUDENT_KEY, type ProgressRealmScope } from "@/data/progress";
+import { isLiveRealmId } from "@/lib/realms/realm-registry";
 
 export type AssessmentReviewMode = "pretest" | "posttest";
 
 type AssessmentReviewState = {
   year: string;
-  realmId: LiveRealmId;
+  realmId: ProgressRealmScope;
   mode: AssessmentReviewMode;
   items: MistakeReviewItem[];
 };
 
-function normalizeRealmId(realmId?: string | null): LiveRealmId {
+function normalizeRealmId(realmId?: string | null): ProgressRealmScope {
+  if (realmId === "chance") return "chance";
   return isLiveRealmId(realmId) ? realmId : "number";
 }
 

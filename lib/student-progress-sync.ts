@@ -1,7 +1,7 @@
 "use client";
 
 import { YEAR_ORDER } from "@/data/yearOrder";
-import { type ProgressRealmScope, type StudentProgress, writeProgress } from "@/data/progress";
+import { isProgressRealmScope, type ProgressRealmScope, type StudentProgress, writeProgress } from "@/data/progress";
 import { makeProgramProgressKey, readProgramStore, writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
 import {
   getActiveStudentIdentity,
@@ -12,7 +12,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 import { awardAndReveal } from "@/lib/gem-reveal";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
-import { getRealmDefinition, isLiveRealmId } from "@/lib/realms/realm-registry";
+import { getRealmDefinition } from "@/lib/realms/realm-registry";
 
 export type StudentProgressSnapshotRow = {
   realm_id?: string | null;
@@ -116,7 +116,7 @@ function hydrateProgramStore(rows: StudentProgressSnapshotRow[], realmId: Studen
   rows.forEach((row) => {
     const year = row.year;
     if (!year) return;
-    const rowRealmId = isLiveRealmId(row.realm_id) ? row.realm_id : realmId;
+    const rowRealmId = isProgressRealmScope(row.realm_id) ? row.realm_id : realmId;
 
     const completedLessonIds = parseStringArray(row.completed_lesson_ids);
     completedLessonIds.forEach((lessonId) => {

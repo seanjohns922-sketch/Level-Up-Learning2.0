@@ -55,9 +55,11 @@ import type { LiveRealmId } from "@/lib/realms/realm-registry";
 import { getStatisticaIndependentAssessment } from "./statisticaIndependentBanks";
 import { getPatternPeaksIndependentAssessment } from "./patternPeaksIndependentBanks";
 import { validatePatternPeaksAssessmentBlueprintForLevel } from "./patternPeaksAssessmentBlueprint";
+import { getChanceHollowIndependentAssessment } from "./chanceHollowIndependentBanks";
+import { validateChanceHollowAssessmentBlueprintForLevel } from "./chanceHollowAssessmentBlueprint";
 
 export type AssessmentQuestion = PretestQuestion | PosttestQuestion;
-export type AssessmentRealmId = LiveRealmId | "statistics" | "pattern";
+export type AssessmentRealmId = LiveRealmId | "statistics" | "pattern" | "chance";
 
 function assertAssessmentRealmHandled(realmId: never): never {
   throw new Error(`Assessment resolver is missing for live realm: ${realmId}`);
@@ -141,6 +143,8 @@ export function getPretestForLevel(level: SupportedMathLevel, realmId: Assessmen
       return getStatisticaIndependentAssessment(level, "pretest") as unknown as PretestQuestion[];
     case "pattern":
       return getPatternPeaksIndependentAssessment(level, "pretest") as unknown as PretestQuestion[];
+    case "chance":
+      return getChanceHollowIndependentAssessment(level, "pretest") as unknown as PretestQuestion[];
     case "number":
       break;
     default:
@@ -171,6 +175,8 @@ export function getPosttestForLevel(level: SupportedMathLevel, realmId: Assessme
       return { yearLabel: yearLabelForLevel(level), questions: getStatisticaIndependentAssessment(level, "posttest") };
     case "pattern":
       return { yearLabel: yearLabelForLevel(level), questions: getPatternPeaksIndependentAssessment(level, "posttest") };
+    case "chance":
+      return { yearLabel: yearLabelForLevel(level), questions: getChanceHollowIndependentAssessment(level, "posttest") };
     case "number":
       break;
     default:
@@ -205,6 +211,8 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
       return getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
     case "pattern":
       return getPatternPeaksIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
+    case "chance":
+      return getChanceHollowIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
     case "number":
       break;
     default:
@@ -238,6 +246,8 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
       return { yearLabel, questions: getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") };
     case "pattern":
       return { yearLabel, questions: getPatternPeaksIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") };
+    case "chance":
+      return { yearLabel, questions: getChanceHollowIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") };
     case "number":
       break;
     default:
@@ -289,6 +299,8 @@ export function validateAssessmentBlueprintForLevel(level: SupportedMathLevel, r
       return [];
     case "pattern":
       return validatePatternPeaksAssessmentBlueprintForLevel(level);
+    case "chance":
+      return validateChanceHollowAssessmentBlueprintForLevel(level);
     case "number":
       break;
     default:

@@ -66,6 +66,7 @@ const REALMS: Record<string, string> = {
   space: "Starpath",
   statistics: "Statistica",
   pattern: "Pattern Peaks",
+  chance: "Chance Hollow",
 };
 
 const YEAR_LEVELS = [

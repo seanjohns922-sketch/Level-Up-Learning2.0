@@ -39,6 +39,7 @@ function curriculumCsv(snapshot: SchoolAnalyticsSnapshot): string {
 const RESULT_REALMS: Array<[string, string]> = [
   ["number", "Number"], ["measurement", "Measurement"], ["space", "Space"], ["statistics", "Statistics"],
   ["pattern", "Algebra"],
+  ["chance", "Probability"],
 ];
 function resultsCsv(snapshot: SchoolAnalyticsSnapshot): string {
   const header = ["Student", "Year level", "Class", "Overall accuracy %", "Overall growth (pts)", "Levels mastered"];

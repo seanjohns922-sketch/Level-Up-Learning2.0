@@ -14,7 +14,7 @@ import { MeasurelandsAssessmentTask } from "@/components/assessment/Measurelands
 import type { MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
-import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import { clearYearProgress, getOptionalWeeks, getProgramWeeks, normalizeWeekList } from "@/lib/program-progress";
 import { restoreStudentStateFromServer, saveRealmAssessment, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import {
@@ -40,7 +40,6 @@ import { supabase } from "@/lib/supabase";
 import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 import { buildAssessmentQuestionSnapshots } from "@/lib/assessment-replay";
 import { curriculumCodesForAssessmentQuestion } from "@/lib/assessment-curriculum";
-import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
@@ -368,11 +367,11 @@ function PretestPage() {
   const searchParams = useSearchParams();
   const year = searchParams.get("year") ?? "Year 3";
   const realmId = searchParams.get("realm_id") ?? "number";
-  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics" && realmId !== "pattern") {
+  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics" && realmId !== "pattern" && realmId !== "chance") {
     throw new Error(`Unsupported pre-test realm: ${realmId}`);
   }
-  const progressRealmId = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : realmId === "pattern" ? "pattern" : "number";
-  const localProgressRealmId = progressRealmId as LiveRealmId;
+  const progressRealmId = realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : realmId === "pattern" ? "pattern" : realmId === "chance" ? "chance" : "number";
+  const localProgressRealmId = progressRealmId as ProgressRealmScope;
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
   const reviewBank = searchParams.get("review_bank");
@@ -384,7 +383,8 @@ function PretestPage() {
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
   useEffect(() => {
-    if (year !== "Prep" && isRealmFirstLevel(progressRealmId, year) && !isFirstLevelPretestEnabled(progressRealmId, year)) {
+    const previewEntryPretest = progressRealmId === "chance" && isDemoPreviewMode();
+    if (year !== "Prep" && isRealmFirstLevel(progressRealmId, year) && !isFirstLevelPretestEnabled(progressRealmId, year) && !previewEntryPretest) {
       router.replace(buildRealmProgramHref({ realmId: progressRealmId, year, week: 1 }));
       return;
     }
@@ -789,7 +789,7 @@ function PretestPage() {
         : selected !== null;
 
   const isMeasurelandsTask =
-    (question?.type === "measurelandsTask" || question?.type === "starpathTask" || question?.type === "statisticaTask" || question?.type === "patternPeaksTask") &&
+    (question?.type === "measurelandsTask" || question?.type === "starpathTask" || question?.type === "statisticaTask" || question?.type === "patternPeaksTask" || question?.type === "chanceHollowTask") &&
     Boolean(question.practiceTask);
 
   useEffect(() => {

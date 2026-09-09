@@ -333,7 +333,8 @@ export function isFirstLevelPretestEnabled(value: string, level: string): boolea
   const realmId = requireCanonicalRealmId(value);
   if (!isRealmFirstLevel(realmId, level)) return false;
   return (realmId === "statistics" && level.trim() === "Year 1")
-    || (realmId === "pattern" && level.trim() === "Year 3");
+    || (realmId === "pattern" && level.trim() === "Year 3")
+    || (realmId === "chance" && level.trim() === "Year 3");
 }
 
 export function getRealmActivityCode(value: string | null | undefined): string | null {

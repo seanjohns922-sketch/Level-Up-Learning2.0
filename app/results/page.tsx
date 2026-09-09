@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getLegendForYear, normalizeLegendRealmId, type LegendRealmId } from "@/data/legends";
-import { readProgress, ACTIVE_STUDENT_KEY, type StudentProgress } from "@/data/progress";
+import { readProgress, ACTIVE_STUDENT_KEY, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError, type StudentProgressSnapshotRow } from "@/lib/student-progress-sync";
 import LegendUnlockReveal from "@/components/LegendUnlockReveal";
 import FogClearCinematic from "@/components/lesson/FogClearCinematic";
@@ -20,7 +20,6 @@ import { buildLessonRoute } from "@/lib/lesson-routing";
 import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { getWorld3DReturnPathForPosttest } from "@/lib/world3d/return-context";
-import type { LiveRealmId } from "@/lib/realms/realm-registry";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 const POSTTEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
 const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
@@ -58,6 +57,7 @@ function getRealmHomeRoute(realmId?: string | null): string {
   if (realmId === "space") return "/starpath?realm_id=space&level=ground";
   if (realmId === "statistics") return "/statistica";
   if (realmId === "pattern") return "/pattern-peaks";
+  if (realmId === "chance") return "/chance-hollow";
   return "/levels";
 }
 
@@ -276,7 +276,7 @@ function ResultsPage() {
   const year = sp.get("year") ?? "Year 3";
   const realmId = sp.get("realm_id") ?? undefined;
   const progressRealmId =
-    (realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : realmId === "pattern" ? "pattern" : "number") as LiveRealmId;
+    (realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : realmId === "pattern" ? "pattern" : realmId === "chance" ? "chance" : "number") as ProgressRealmScope;
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const realmParam = realmId ? `&realm_id=${encodeURIComponent(realmId)}` : "";
@@ -467,6 +467,8 @@ function ResultsPage() {
         ? "Statistica"
         : progressRealmId === "pattern"
           ? "Pattern Peaks"
+          : progressRealmId === "chance"
+            ? "Chance Hollow"
         : "Number Nexus";
   const resultActions = passed
     ? isPostTest || passedByProgram

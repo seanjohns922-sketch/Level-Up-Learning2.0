@@ -30,6 +30,8 @@ import {
   visualScaleForLabel,
 } from "@/data/assessments/measurelandsVisuals";
 import { getRealmTheme } from "@/lib/useRealmTheme";
+import ChanceVisual from "@/components/chance-hollow/ChanceVisual";
+import type { ChanceVisual as ChanceVisualData } from "@/data/activities/year1/practice-task";
 
 type GenericQuestion = {
   id?: string;
@@ -296,12 +298,19 @@ export default function AssessmentQuestionCard({
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const lineRef = useRef<HTMLDivElement | null>(null);
   const theme = getRealmTheme(realmId);
-  const accentLabel = theme.isMeasurement ? "text-[#b8893a]" : "text-teal-400";
+  const isChance = realmId === "chance";
+  const accentLabel = theme.isMeasurement ? "text-[#b8893a]" : isChance ? "text-rose-300" : "text-teal-400";
   const selectedCard = theme.isMeasurement
     ? "border-[#b8893a] bg-[#3c280f]/40 shadow-lg shadow-[#b8893a]/10"
+    : isChance
+      ? "border-rose-400 bg-rose-500/15 shadow-lg shadow-fuchsia-500/10"
     : "border-teal-500 bg-teal-500/15 shadow-lg shadow-teal-500/10";
-  const selectedSoft = theme.isMeasurement ? "border-[#b8893a] bg-[#3c280f]/25" : "border-teal-500 bg-teal-500/10";
-  const focusBorder = theme.isMeasurement ? "focus:border-[#b8893a]" : "focus:border-teal-500";
+  const selectedSoft = theme.isMeasurement
+    ? "border-[#b8893a] bg-[#3c280f]/25"
+    : isChance
+      ? "border-rose-400 bg-rose-500/10"
+      : "border-teal-500 bg-teal-500/10";
+  const focusBorder = theme.isMeasurement ? "focus:border-[#b8893a]" : isChance ? "focus:border-rose-400" : "focus:border-teal-500";
 
   const type = question.type ?? "mcq";
   const visual =
@@ -327,6 +336,9 @@ export default function AssessmentQuestionCard({
 
   const renderedVisual = visual ? (
     <>
+      {realmId === "chance" && typeof visual.type === "string" ? (
+        <ChanceVisual visual={visual as unknown as ChanceVisualData} />
+      ) : null}
       {typeof visual.kind === "string" ? <MeasurelandsAssessmentVisual visual={visual as unknown as MzVisual} /> : null}
       {visual.type === "decimal_model" ? <DecimalModelVisual visual={visual as never} title="Decimal model" /> : null}
       {visual.type === "rule_box" ? <RuleBoxVisual visual={{ ...(visual as Record<string, unknown>), decisionLabel: undefined } as never} title="Given information" /> : null}

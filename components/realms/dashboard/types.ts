@@ -128,6 +128,8 @@ export type CanonicalRealmDashboardConfig = {
     readJourney: (level: RealmLevelId) => { currentWeek: number; currentLesson: number };
     buildLevelHref: (level: RealmLevelId) => string;
     buildProgramHref: (level: RealmLevelId, week: number) => string;
+    buildPretestHref?: (level: RealmLevelId) => string;
+    buildPosttestHref?: (level: RealmLevelId) => string;
   };
   internalPreview?: {
     buildLevelHref: (level: RealmLevelId) => string;

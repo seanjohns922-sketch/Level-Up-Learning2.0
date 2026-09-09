@@ -156,6 +156,7 @@ function realmName(realmId: string) {
     statistica: "Statistica",
     pattern: "Pattern Peaks",
     "pattern-peaks": "Pattern Peaks",
+    chance: "Chance Hollow",
     "chance-hollow": "Chance Hollow",
   } as Record<string, string>)[realmId] ?? realmId;
 }
@@ -171,7 +172,11 @@ function curriculumWeek(realmId: string, workingLevel: string, weekNumber: numbe
   }
 
   const yearLabel = normalizeWorkingLevelLabel(workingLevel) ?? workingLevel;
-  const week = getCurriculumPlan(yearLabel, realmId === "pattern" ? "algebra" : realmId).find((item) => item.week === weekNumber);
+  const canonicalGenreId = realmId === "pattern" ? "algebra" : realmId;
+  const genreId = canonicalGenreId === "chance" || canonicalGenreId === "chance-hollow"
+    ? "probability"
+    : canonicalGenreId;
+  const week = getCurriculumPlan(yearLabel, genreId).find((item) => item.week === weekNumber);
   return week ? {
     title: week.topic,
     lessons: week.lessons.map((lesson) => ({ lesson: lesson.lesson, title: lesson.title, focus: lesson.focus })),

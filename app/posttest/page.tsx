@@ -9,7 +9,7 @@ import { LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS } from "@/data/assessments/l
 import type { Question } from "@/data/assessments/posttests";
 import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
 import ReadAloudBtn, { ReadAloudRateProvider } from "@/components/ReadAloudBtn";
-import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type StudentProgress } from "@/data/progress";
+import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import { MeasurelandsAssessmentTask } from "@/components/assessment/MeasurelandsAssessmentTask";
@@ -29,7 +29,6 @@ import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 import { clearCompletionId, getOrCreateCompletionId } from "@/lib/resume-state";
 import { buildAssessmentQuestionSnapshots } from "@/lib/assessment-replay";
 import { curriculumCodesForAssessmentQuestion } from "@/lib/assessment-curriculum";
-import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 const PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.posttestPassPercent;
 const POSTTEST_DRAFT_VERSION = 1;
@@ -333,12 +332,12 @@ function PostTestPage() {
   const params = useSearchParams();
   const year = params.get("year") ?? "Year 3";
   const realmId = params.get("realm_id") ?? undefined;
-  if (realmId !== undefined && realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics" && realmId !== "pattern") {
+  if (realmId !== undefined && realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics" && realmId !== "pattern" && realmId !== "chance") {
     throw new Error(`Unsupported post-test realm: ${realmId}`);
   }
   const progressRealmId =
-    realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : realmId === "pattern" ? "pattern" : "number";
-  const localProgressRealmId = progressRealmId as LiveRealmId;
+    realmId === "measurement" ? "measurement" : realmId === "space" ? "space" : realmId === "statistics" ? "statistics" : realmId === "pattern" ? "pattern" : realmId === "chance" ? "chance" : "number";
+  const localProgressRealmId = progressRealmId as ProgressRealmScope;
   // Final week is realm-specific: Measurelands = 8, Number Nexus = 12. Never
   // hardcode 12 for a realm-aware assessment (that leaks a Number assumption).
   const lastWeek = getLastProgramWeek(progressRealmId);
@@ -702,7 +701,7 @@ function PostTestPage() {
   }
 
   const isInteractiveTask =
-    (q?.type === "measurelandsTask" || q?.type === "starpathTask" || q?.type === "statisticaTask" || q?.type === "patternPeaksTask") && Boolean(q.practiceTask);
+    (q?.type === "measurelandsTask" || q?.type === "starpathTask" || q?.type === "statisticaTask" || q?.type === "patternPeaksTask" || q?.type === "chanceHollowTask") && Boolean(q.practiceTask);
   const hasAnswer =
     q?.type === "mab" ? mabHasSelection : q?.type === "numeric" ? picked.trim().length > 0 : !!picked;
 

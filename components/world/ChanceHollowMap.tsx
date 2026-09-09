@@ -154,6 +154,8 @@ export const CHANCE_HOLLOW_DASHBOARD_CONFIG = {
       week,
       preview: true,
     }),
+    buildPretestHref: (level) => `/pretest?year=${encodeURIComponent(level)}&realm_id=chance&teacher_preview=1`,
+    buildPosttestHref: (level) => `/posttest?year=${encodeURIComponent(level)}&realm_id=chance&teacher_preview=1`,
   },
 } satisfies CanonicalRealmDashboardConfig;
 

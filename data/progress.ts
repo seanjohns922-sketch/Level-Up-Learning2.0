@@ -4,6 +4,7 @@ import { isReviewMode } from "@/lib/review-mode";
 import {
   getLiveRealmDefinitions,
   isLiveRealmId,
+  tryCanonicalRealmId,
   type LiveRealmId,
 } from "@/lib/realms/realm-registry";
 
@@ -28,6 +29,11 @@ export const STORAGE_KEY = "lul_student_progress_v1";
 export const ACTIVE_STUDENT_KEY = "lul_active_student_v1";
 export type ProgressRealmScope = LiveRealmId | "chance";
 
+export function isProgressRealmScope(value: string | null | undefined): value is ProgressRealmScope {
+  const realmId = tryCanonicalRealmId(value);
+  return realmId === "chance" || isLiveRealmId(realmId);
+}
+
 type ProgressCacheEnvelope = {
   student_id: string;
   realm_id: ProgressRealmScope;
@@ -39,8 +45,9 @@ type ProgressCacheEnvelope = {
 function getActiveRealmScope(): ProgressRealmScope {
   if (typeof window === "undefined") return "number";
   const searchRealm = new URLSearchParams(window.location.search).get("realm_id");
-  if (isLiveRealmId(searchRealm)) return searchRealm;
+  if (isProgressRealmScope(searchRealm)) return searchRealm;
   const pathname = window.location.pathname.toLowerCase();
+  if (pathname.startsWith("/chance-hollow") || pathname.startsWith("/legends/chance-hollow")) return "chance";
   const routeRealm = getLiveRealmDefinitions().find(
     (realm) =>
       pathname.startsWith(`/${realm.slug}`) ||

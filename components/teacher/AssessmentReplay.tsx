@@ -19,6 +19,7 @@ import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCa
 import { TaskRenderer } from "@/components/TaskRenderer";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
+import { getRealmDefinition } from "@/lib/realms/realm-registry";
 
 export type TeacherAssessmentAttempt = {
   id: string;
@@ -79,9 +80,7 @@ function formatValue(value: unknown): string {
 }
 
 function realmName(realmId: string) {
-  if (realmId === "measurement") return "Measurelands";
-  if (realmId === "space") return "Starpath";
-  return "Number Nexus";
+  return getRealmDefinition(realmId).name;
 }
 
 function formatDateTime(value: string) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Play } from "lucide-react";
+import { Award, ClipboardCheck, Lock, Play } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import { computeFogProgress } from "@/lib/fog-progress";
 import FogOfForgetfulness from "@/components/world/FogOfForgetfulness";
@@ -638,6 +638,32 @@ export default function RealmDashboardShell({
             textShadow: config.theme.hudTextShadow,
           }}
         />
+        {previewMode && config.demo?.buildPretestHref ? (
+          <button
+            type="button"
+            onClick={() => router.push(config.demo!.buildPretestHref!(resolvedYear))}
+            style={{ ...hudBtn, color: config.theme.text }}
+            title="Open pre-test"
+          >
+            <ClipboardCheck size={22} color={config.theme.accent} aria-hidden="true" />
+            <span style={{ fontSize: 8, fontWeight: 900, letterSpacing: "0.08em", fontFamily: "ui-monospace,monospace" }}>
+              PRE-TEST
+            </span>
+          </button>
+        ) : null}
+        {previewMode && config.demo?.buildPosttestHref ? (
+          <button
+            type="button"
+            onClick={() => router.push(config.demo!.buildPosttestHref!(resolvedYear))}
+            style={{ ...hudBtn, color: config.theme.text }}
+            title="Open post-test"
+          >
+            <Award size={22} color={config.theme.secondaryAccent} aria-hidden="true" />
+            <span style={{ fontSize: 8, fontWeight: 900, letterSpacing: "0.08em", fontFamily: "ui-monospace,monospace" }}>
+              POST-TEST
+            </span>
+          </button>
+        ) : null}
         <div style={{ ...hudBtn, cursor: "default", gap: 4 }}>
           <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.12em", color: "rgba(var(--realm-accent-rgb),0.5)", fontFamily: "ui-monospace,monospace", textAlign: "center", lineHeight: 1.15 }}>
             MY BEST

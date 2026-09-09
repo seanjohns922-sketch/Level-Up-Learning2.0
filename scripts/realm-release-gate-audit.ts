@@ -18,6 +18,7 @@ import {
   isSharedWeeklyProgramRealm,
 } from "@/lib/realms/realm-journey";
 import { getPlayableWeeks, type ProgramProgressStore } from "@/lib/program-progress";
+import { isProgressRealmScope } from "@/data/progress";
 
 const root = process.cwd();
 const read = (relativePath: string) => fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -139,7 +140,9 @@ assert(
 
 const studentProgressSync = read("lib/student-progress-sync.ts");
 assert(
-  studentProgressSync.includes("isLiveRealmId(row.realm_id) ? row.realm_id : realmId"),
+  LIVE_REALM_IDS.every((realmId) => isProgressRealmScope(realmId)) &&
+    isProgressRealmScope("chance") &&
+    studentProgressSync.includes("isProgressRealmScope(row.realm_id) ? row.realm_id : realmId"),
   "Student progress hydration must recognise every registry-live realm.",
 );
 assert(
