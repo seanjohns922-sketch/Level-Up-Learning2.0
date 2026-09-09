@@ -267,28 +267,18 @@ export function SharedThirdPersonPlayer({
 }
 
 function WorldSprintButton({ active, onChange }: { active: boolean; onChange: (active: boolean) => void }) {
-  const release = () => onChange(false);
   return (
     <button
       type="button"
-      aria-label="Hold to run faster"
+      aria-label={active ? "Stop running faster" : "Run faster"}
       aria-pressed={active}
-      title="Hold to run faster. On a keyboard, hold Shift while moving."
+      title="Tap to toggle running. Double-click the world or hold Shift while moving."
       data-world-sprint
-      onPointerDown={(event) => {
+      onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
-        event.currentTarget.setPointerCapture(event.pointerId);
-        onChange(true);
+        onChange(!active);
       }}
-      onPointerUp={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-        release();
-      }}
-      onPointerCancel={release}
-      onLostPointerCapture={release}
       style={{
         position: "absolute",
         left: "max(166px, calc(env(safe-area-inset-left) + 160px))",
@@ -316,6 +306,60 @@ function WorldSprintButton({ active, onChange }: { active: boolean; onChange: (a
   );
 }
 
+function WorldDoubleTapSprint({ input, onChange }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void }) {
+  const inputRef = useRef(input);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => { inputRef.current = input; }, [input]);
+  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+
+  useEffect(() => {
+    const root = document.querySelector<HTMLElement>("[data-world3d-root]");
+    if (!root) return;
+    let lastTouch: { at: number; x: number; y: number } | null = null;
+    let ignoreSyntheticDoubleClickUntil = 0;
+
+    const toggleSprint = () => {
+      const next = { ...inputRef.current, sprint: !inputRef.current.sprint };
+      inputRef.current = next;
+      onChangeRef.current(next);
+    };
+    const isWorldCanvas = (target: EventTarget | null) => target instanceof HTMLCanvasElement;
+    const onDoubleClick = (event: MouseEvent) => {
+      if (!isWorldCanvas(event.target) || performance.now() < ignoreSyntheticDoubleClickUntil) return;
+      event.preventDefault();
+      toggleSprint();
+    };
+    const onPointerUp = (event: PointerEvent) => {
+      if (event.pointerType !== "touch" || !isWorldCanvas(event.target)) {
+        lastTouch = null;
+        return;
+      }
+      const now = performance.now();
+      const closeToLastTap = lastTouch
+        && now - lastTouch.at <= 340
+        && Math.hypot(event.clientX - lastTouch.x, event.clientY - lastTouch.y) <= 36;
+      if (closeToLastTap) {
+        event.preventDefault();
+        lastTouch = null;
+        ignoreSyntheticDoubleClickUntil = now + 500;
+        toggleSprint();
+        return;
+      }
+      lastTouch = { at: now, x: event.clientX, y: event.clientY };
+    };
+
+    root.addEventListener("dblclick", onDoubleClick);
+    root.addEventListener("pointerup", onPointerUp);
+    return () => {
+      root.removeEventListener("dblclick", onDoubleClick);
+      root.removeEventListener("pointerup", onPointerUp);
+    };
+  }, []);
+
+  return null;
+}
+
 export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void }) {
   const button = (label: "UP" | "DOWN" | "LEFT" | "RIGHT") => {
     const key = label.toLowerCase() as "up" | "down" | "left" | "right";
@@ -332,7 +376,7 @@ export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onCha
       >{display}</button>
     );
   };
-  return <><div style={{ position: "absolute", left: 16, bottom: 18, display: "grid", gridTemplateColumns: "44px 44px 44px", gap: 7, pointerEvents: "auto" }}><span />{button("UP")}<span />{button("LEFT")}{button("DOWN")}{button("RIGHT")}</div><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
+  return <><WorldDoubleTapSprint input={input} onChange={onChange} /><div style={{ position: "absolute", left: 16, bottom: 18, display: "grid", gridTemplateColumns: "44px 44px 44px", gap: 7, pointerEvents: "auto" }}><span />{button("UP")}<span />{button("LEFT")}{button("DOWN")}{button("RIGHT")}</div><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
 }
 
 function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "left" | "right"; label: string; dataAttribute: "move" | "look"; onChange: (input: { x: number; y: number; magnitude: number }) => void }) {
@@ -424,7 +468,7 @@ function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "
 }
 
 export function WorldJoystick({ input, onChange }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void }) {
-  return <><WorldAnalogJoystick side="left" label="Movement joystick. Drag in any direction to move." dataAttribute="move" onChange={({ x, y, magnitude }) => onChange({ ...input, up: false, down: false, left: false, right: false, analogX: x, analogY: y, magnitude })} /><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
+  return <><WorldDoubleTapSprint input={input} onChange={onChange} /><WorldAnalogJoystick side="left" label="Movement joystick. Drag in any direction to move." dataAttribute="move" onChange={({ x, y, magnitude }) => onChange({ ...input, up: false, down: false, left: false, right: false, analogX: x, analogY: y, magnitude })} /><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
 }
 
 export function WorldLookJoystick({ onChange }: { onChange: (input: WorldLookInput) => void }) {

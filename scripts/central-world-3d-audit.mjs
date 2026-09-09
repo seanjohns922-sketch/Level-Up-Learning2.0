@@ -38,6 +38,19 @@ check(sharedPlayer.includes("analogX") && sharedPlayer.includes("analogY") && sh
 check(sharedPlayer.includes('event.pointerType === "touch"') && sharedPlayer.includes("yaw.current -= lookX"), "Touch camera look must use the right joystick instead of canvas dragging");
 check(sharedPlayer.includes("setPointerCapture") && sharedPlayer.includes('touchAction: "none"'), "Joystick pointer capture or iPad touch protection is missing");
 check(
+  sharedPlayer.includes("WorldDoubleTapSprint")
+    && sharedPlayer.includes('root.addEventListener("dblclick", onDoubleClick)')
+    && sharedPlayer.includes('event.pointerType !== "touch"')
+    && sharedPlayer.includes("isWorldCanvas(event.target)"),
+  "Canvas double-click or double-tap sprint control is missing",
+);
+check(
+  sharedPlayer.includes('aria-pressed={active}')
+    && sharedPlayer.includes("onChange(!active)")
+    && sharedPlayer.includes("Tap to toggle running"),
+  "RUN must be an accessible tap-to-toggle control",
+);
+check(
   sharedPlayer.includes("onChangeRef.current = onChange")
     && /document\.addEventListener\("visibilitychange", stop\);[\s\S]*?\}, \[\]\);/.test(sharedPlayer),
   "Joystick input must not reset when its parent callback changes during an iPad drag",
