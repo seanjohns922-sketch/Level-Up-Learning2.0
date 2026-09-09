@@ -153,7 +153,7 @@ export const REALM_REGISTRY = {
     isSelectable: false,
     totalWeeks: 6,
     lessonsPerWeek: 3,
-    hasWeeklyQuiz: false,
+    hasWeeklyQuiz: true,
     levelLabels: ["Year 3", "Year 4", "Year 5", "Year 6"],
     legendCount: 4,
     legendCollectionName: "Fortune Seekers",

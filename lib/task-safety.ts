@@ -335,10 +335,21 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "chanceSimulationLab",
   "chanceModelDebugger",
   "chanceMasterTrial",
+  "chanceQuizQuestion",
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
   if (!task || !hasText(task.kind) || !SUPPORTED_PRACTICE_TASK_KINDS.has(task.kind)) return false;
+  if (task.kind === "chanceQuizQuestion") {
+    return hasText(task.prompt)
+      && hasText(task.speakText)
+      && task.options.length >= 3
+      && new Set(task.options).size === task.options.length
+      && task.options.every(hasText)
+      && task.options.includes(task.answer)
+      && hasText(task.feedback.correct)
+      && hasText(task.feedback.wrong);
+  }
   if (task.kind === "statisticaMediaAnalysis") {
     const optionIds = new Set(task.options.map((option) => option.id));
     return hasText(task.prompt)

@@ -666,9 +666,11 @@ function ProgramPage() {
         type: "quiz" as const,
         n: 1,
         title: "Weekly Quiz",
-        focus: "Coming soon: this will check all three Chance Hollow lessons.",
-        comingSoon: true,
+        focus: "15 independent questions: five from each Chance Hollow lesson.",
       });
+      if (weekNum === lastWeek) {
+        base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Show your Level mastery and unlock your Legend" });
+      }
       return base;
     }
     if (weekNum !== lastWeek) {
@@ -772,6 +774,11 @@ function ProgramPage() {
       router.push(`/pattern-peaks/quiz/${encodeURIComponent(curriculumYear)}/${weekNum}${teacherPreview ? "?teacher_preview=1" : ""}`);
       return;
     }
+    if (isChanceRealm && item.type === "quiz") {
+      preserveWorld3DReturnContextForQuiz({ realmId, level: curriculumYear, week: weekNum });
+      router.push(`/chance-hollow/quiz/${encodeURIComponent(curriculumYear)}/${weekNum}${teacherPreview ? "?teacher_preview=1" : ""}`);
+      return;
+    }
     if (isStarpathRealm && starpathProgram && item.type === "posttest") {
       router.push(buildStarpathPostTestPageHref({ selectedLevel: starpathProgram.definition.id }));
       return;
@@ -821,8 +828,8 @@ function ProgramPage() {
     if (nextWeek !== savedWeek) updateProgress({ assignedWeek: nextWeek }, canonicalRealmId);
   }, [canonicalRealmId, curriculumYear, hasPersonalizedPlan, isStarpathRealm, lastWeek, previewMode, realmId, store, weekComplete, weekNum]);
 
-  const xp = lessonsDoneCount * 10 + (isChanceRealm ? 0 : progress.quizCompleted ? 20 : 0);
-  const totalXp = isChanceRealm ? 30 : 50;
+  const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
+  const totalXp = 50;
   const percent = Math.round((xp / totalXp) * 100);
   const realmHomeRoute = isStarpathRealm && starpathProgram
     ? buildStarpathWorldHref({ selectedLevel: starpathProgram.definition.id })

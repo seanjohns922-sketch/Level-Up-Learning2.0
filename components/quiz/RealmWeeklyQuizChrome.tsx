@@ -1,13 +1,13 @@
 "use client";
 
-import { ArrowLeft, ChartNoAxesColumnIncreasing, Orbit, Ruler, Sigma, Zap } from "lucide-react";
+import { ArrowLeft, ChartNoAxesColumnIncreasing, Dices, Orbit, Ruler, Sigma, Zap } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { getRealmLessonArtwork } from "@/components/lesson/RealmLessonHome";
 import { getStarpathBackground } from "@/lib/starpath-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
-export type RealmQuizThemeId = LiveRealmId | "statistics" | "pattern";
+export type RealmQuizThemeId = LiveRealmId | "statistics" | "pattern" | "chance";
 
 export const REALM_QUIZ_THEMES = {
   number: {
@@ -87,6 +87,20 @@ export const REALM_QUIZ_THEMES = {
     backdropOverlay: "linear-gradient(180deg, rgba(7,18,24,0.5), rgba(7,19,24,0.94))",
     workspaceBg: "linear-gradient(180deg, #f7fffc 0%, #f1efff 100%)",
     ThemeIcon: Sigma,
+  },
+  chance: {
+    realmName: "Chance Hollow",
+    quizName: "Chance Quiz",
+    eyebrow: "Chance Hollow Trial Check",
+    pageBg: "#160d19",
+    shellBg: "rgba(42, 20, 38, 0.96)",
+    panelBorder: "rgba(251, 113, 133, 0.32)",
+    accent: "#fb7185",
+    accentSoft: "#fce7f3",
+    heroOverlay: "linear-gradient(90deg, rgba(31,14,31,0.98) 0%, rgba(74,31,59,0.86) 48%, rgba(63,22,78,0.26) 100%)",
+    backdropOverlay: "linear-gradient(180deg, rgba(22,13,25,0.52), rgba(22,13,25,0.94))",
+    workspaceBg: "linear-gradient(180deg, #fff8fc 0%, #f7edf7 100%)",
+    ThemeIcon: Dices,
   },
 } as const satisfies Record<RealmQuizThemeId, object>;
 

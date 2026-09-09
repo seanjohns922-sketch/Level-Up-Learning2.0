@@ -212,6 +212,7 @@ import ChanceBuildFairCard from "@/components/chance-hollow/ChanceBuildFairCard"
 import ChanceCompareToolsCard from "@/components/chance-hollow/ChanceCompareToolsCard";
 import ChancePredictCountCard from "@/components/chance-hollow/ChancePredictCountCard";
 import ChanceDiceRaceCard from "@/components/chance-hollow/ChanceDiceRaceCard";
+import ChanceQuizQuestionCard from "@/components/chance-hollow/ChanceQuizQuestionCard";
 import {
   ChanceMasterTrialCard,
   ChanceModelDebuggerCard,
@@ -383,6 +384,8 @@ function TaskRendererInner({
   );
 
   switch (task.kind) {
+    case "chanceQuizQuestion":
+      return <ChanceQuizQuestionCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "patternPeaksQuestion":
       return <PatternPeaksQuestionCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />;
     case "matchPairs":

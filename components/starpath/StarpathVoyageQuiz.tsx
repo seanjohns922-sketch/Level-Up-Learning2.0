@@ -40,7 +40,7 @@ export type StarpathVoyageQuizMeta = {
   nextWeekHref?: string;
 };
 
-type VoyageQuizRealm = "space" | "statistics" | "pattern";
+type VoyageQuizRealm = "space" | "statistics" | "pattern" | "chance";
 
 type QuizPhase = "home" | "quiz" | "results" | "review";
 
@@ -89,6 +89,7 @@ function studentAnswerForReview(task: PracticeTask, response?: string) {
 }
 
 function correctAnswerForReview(task: PracticeTask) {
+  if ("answer" in task && typeof task.answer === "string") return task.answer;
   if ("correctOptionIds" in task && Array.isArray(task.correctOptionIds) && task.correctOptionIds.length > 0) {
     return task.correctOptionIds.map((optionId) => optionLabel(task, optionId)).join(" or ");
   }
@@ -139,9 +140,10 @@ export default function StarpathVoyageQuiz({
   const theme = REALM_QUIZ_THEMES[realm];
   const isStatistica = realm === "statistics";
   const isPattern = realm === "pattern";
-  const isLessonRealm = isStatistica || isPattern;
+  const isChance = realm === "chance";
+  const isLessonRealm = isStatistica || isPattern || isChance;
   const unitLabel = isLessonRealm ? "lesson" : "mission";
-  const realmTitle = isStatistica ? "Statistica Data Quiz" : isPattern ? "Pattern Peaks Quiz" : "Starpath Voyage Quiz";
+  const realmTitle = isStatistica ? "Statistica Data Quiz" : isPattern ? "Pattern Peaks Quiz" : isChance ? "Chance Hollow Quiz" : "Starpath Voyage Quiz";
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
   const answersAreEditable = true;
   const storageKey = `${realm}-weekly-quiz:v2:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
@@ -188,6 +190,8 @@ export default function StarpathVoyageQuiz({
       ? "Data check complete!"
       : isPattern
         ? "Peak quiz complete!"
+        : isChance
+          ? "Chance trial complete!"
         : "Voyage complete!"
     : "Keep exploring!";
   const resultsSpeech = [
@@ -303,7 +307,7 @@ export default function StarpathVoyageQuiz({
         correctAnswer: correctAnswerForReview(quizTask),
         skillId: quiz.lessonSkillIds[lessonIndex][0],
         skillLabel: quiz.lessonTitles[lessonIndex],
-        strand: isStatistica ? "Statistics" : isPattern ? "Algebra" : "Space",
+        strand: isStatistica ? "Statistics" : isPattern ? "Algebra" : isChance ? "Probability" : "Space",
         curriculumCodes: quiz.lessonCurriculumCodes[lessonIndex],
         linkedWeeks: [quiz.week],
         linkedLessons: [lessonIndex + 1],
@@ -366,7 +370,7 @@ export default function StarpathVoyageQuiz({
       setFinalScore(score);
       setPhase("results");
     } catch (error) {
-      console.warn(`[${isStatistica ? "Statistica" : isPattern ? "Pattern Peaks" : "Starpath"}] Weekly quiz persist failed`, error);
+      console.warn(`[${isStatistica ? "Statistica" : isPattern ? "Pattern Peaks" : isChance ? "Chance Hollow" : "Starpath"}] Weekly quiz persist failed`, error);
       window.alert("We couldn't save this quiz yet. Please try again.");
     } finally {
       setSaving(false);
@@ -407,7 +411,7 @@ export default function StarpathVoyageQuiz({
         >
           {phase === "home" ? (
             <div className="mx-auto max-w-4xl">
-              <div className="overflow-hidden rounded-lg border shadow-xl" style={{ borderColor: theme.panelBorder, background: isStatistica ? "#163a32" : isPattern ? "#102521" : "#111735" }}>
+              <div className="overflow-hidden rounded-lg border shadow-xl" style={{ borderColor: theme.panelBorder, background: isStatistica ? "#163a32" : isPattern ? "#102521" : isChance ? "#34172f" : "#111735" }}>
                 <div className="relative px-6 py-9 text-white sm:px-10">
                   <div className={isStatistica ? "absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(240,107,100,0.28),transparent_34%),radial-gradient(circle_at_82%_28%,rgba(242,188,69,0.22),transparent_30%)]" : isPattern ? "absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(57,217,160,0.30),transparent_34%),radial-gradient(circle_at_82%_28%,rgba(118,89,196,0.28),transparent_30%)]" : "absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(139,92,246,0.38),transparent_34%),radial-gradient(circle_at_82%_28%,rgba(34,211,238,0.28),transparent_30%)]"} />
                   <div className="relative">
@@ -421,7 +425,7 @@ export default function StarpathVoyageQuiz({
                         speechKey={`${realm}-weekly-quiz-${quiz.level}-${quiz.week}`}
                         size="md"
                         label="Read quiz"
-                        className={isStatistica ? "border-amber-200/30 bg-emerald-950/60 text-amber-50 hover:border-amber-200 hover:text-white" : isPattern ? "border-[#39d9a0]/35 bg-[#071719]/70 text-[#d8fff1] hover:border-[#39d9a0] hover:text-white" : "border-cyan-200/30 bg-indigo-950/70 text-cyan-100 hover:border-cyan-200 hover:text-white"}
+                        className={isStatistica ? "border-amber-200/30 bg-emerald-950/60 text-amber-50 hover:border-amber-200 hover:text-white" : isPattern ? "border-[#39d9a0]/35 bg-[#071719]/70 text-[#d8fff1] hover:border-[#39d9a0] hover:text-white" : isChance ? "border-rose-200/35 bg-[#211321]/70 text-rose-50 hover:border-rose-200 hover:text-white" : "border-cyan-200/30 bg-indigo-950/70 text-cyan-100 hover:border-cyan-200 hover:text-white"}
                       />
                     </div>
                     <p className="mt-4 max-w-2xl text-base font-semibold leading-7" style={{ color: theme.accentSoft }}>
@@ -430,7 +434,7 @@ export default function StarpathVoyageQuiz({
                   </div>
                 </div>
 
-                <div className="grid gap-4 border-t border-white/10 p-5 sm:grid-cols-4 sm:p-7" style={{ background: isStatistica ? "#101d15" : isPattern ? "#091a1b" : "#0b1029" }}>
+                <div className="grid gap-4 border-t border-white/10 p-5 sm:grid-cols-4 sm:p-7" style={{ background: isStatistica ? "#101d15" : isPattern ? "#091a1b" : isChance ? "#211321" : "#0b1029" }}>
                   {[
                     { icon: BookOpen, value: "15 questions", label: `Five from each ${unitLabel}` },
                     { icon: Clock3, value: "8–10 minutes", label: "Work at your own pace" },
@@ -450,7 +454,7 @@ export default function StarpathVoyageQuiz({
                 type="button"
                 onClick={beginQuiz}
                 className="mx-auto mt-6 flex min-h-14 items-center justify-center gap-2 rounded-lg px-8 text-lg font-black text-white shadow-lg transition hover:brightness-110 active:scale-[0.98]"
-                style={{ background: isStatistica ? "linear-gradient(90deg, #a83e4b, #e85d63 58%, #f2bc45)" : isPattern ? "linear-gradient(90deg, #14785f, #28b98b 58%, #7659c4)" : "linear-gradient(90deg, #7c3aed, #06b6d4)" }}
+                style={{ background: isStatistica ? "linear-gradient(90deg, #a83e4b, #e85d63 58%, #f2bc45)" : isPattern ? "linear-gradient(90deg, #14785f, #28b98b 58%, #7659c4)" : isChance ? "linear-gradient(90deg, #8f3f75, #d95079 58%, #f59e0b)" : "linear-gradient(90deg, #7c3aed, #06b6d4)" }}
               >
                 <Sparkles className="h-5 w-5" />
                 {hasResume ? "Resume Quiz" : "Begin Quiz"}
@@ -461,17 +465,17 @@ export default function StarpathVoyageQuiz({
           {phase === "quiz" ? (
             <div className="mx-auto max-w-3xl">
               <div className="mb-5 flex items-center justify-between gap-3">
-                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: isStatistica ? "#8e3341" : isPattern ? "#14785f" : "#5b21b6" }}>
+                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: isStatistica ? "#8e3341" : isPattern ? "#14785f" : isChance ? "#8f3f75" : "#5b21b6" }}>
                   Question {index + 1} of {total}
                 </span>
-                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: isStatistica ? "#13785f" : isPattern ? "#7659c4" : "#0e7490" }}>
+                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: isStatistica ? "#13785f" : isPattern ? "#7659c4" : isChance ? "#b13f67" : "#0e7490" }}>
                   {answeredCount} answered
                 </span>
               </div>
-              <div className="mb-6 h-2 overflow-hidden rounded-full" style={{ background: isStatistica ? "#dcebd6" : isPattern ? "#dff5ec" : "#ede9fe" }}>
+              <div className="mb-6 h-2 overflow-hidden rounded-full" style={{ background: isStatistica ? "#dcebd6" : isPattern ? "#dff5ec" : isChance ? "#efdce9" : "#ede9fe" }}>
                 <div
                   className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${total ? (answeredCount / total) * 100 : 0}%`, background: isStatistica ? "linear-gradient(90deg, #20b486, #f2bc45)" : isPattern ? "linear-gradient(90deg, #39d9a0, #7659c4)" : "linear-gradient(90deg, #8b5cf6, #22d3ee)" }}
+                  style={{ width: `${total ? (answeredCount / total) * 100 : 0}%`, background: isStatistica ? "linear-gradient(90deg, #20b486, #f2bc45)" : isPattern ? "linear-gradient(90deg, #39d9a0, #7659c4)" : isChance ? "linear-gradient(90deg, #8f3f75, #fb7185, #f59e0b)" : "linear-gradient(90deg, #8b5cf6, #22d3ee)" }}
                 />
               </div>
 

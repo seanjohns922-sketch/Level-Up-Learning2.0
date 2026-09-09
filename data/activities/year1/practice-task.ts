@@ -135,6 +135,17 @@ export function diffPick(
 
 export type PracticeTask = (
   | {
+      /** Independent Chance Hollow weekly-quiz item. Quiz questions are generated
+       * outside lesson generators and carry their own apparatus and feedback. */
+      kind: "chanceQuizQuestion";
+      prompt: string;
+      speakText: string;
+      options: string[];
+      answer: string;
+      visual?: ChanceVisual;
+      feedback: { correct: string; wrong: string };
+    }
+  | {
       /** Independent Pattern Peaks quiz/assessment item. The question payload is
        * authored outside the lesson generator so assessment evidence never
        * reuses a taught lesson instance. */

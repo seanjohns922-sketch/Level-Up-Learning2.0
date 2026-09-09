@@ -9,13 +9,13 @@ import {
   isWeekPlayable,
   readProgramStore,
 } from "@/lib/program-progress";
-import type { LiveRealmId } from "@/lib/realms/realm-registry";
+import type { ProgressRealmScope } from "@/data/progress";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 
 type ActivityGateProps = {
-  realmId: LiveRealmId;
+  realmId: ProgressRealmScope;
   year: string;
   week: number;
   activity: "lesson" | "quiz";
