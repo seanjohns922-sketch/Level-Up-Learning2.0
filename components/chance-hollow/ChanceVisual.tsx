@@ -399,7 +399,10 @@ export default function ChanceVisual({
         ? countByColour(visual.counters)
         : null;
   return (
-    <div className={concept ? "flex flex-col items-center gap-2" : "mb-4 flex flex-col items-center gap-2 rounded-xl border border-[#e4d8f5] bg-[#faf7ff] p-4"}>
+    <div
+      className={concept ? "chance-visual flex flex-col items-center gap-2" : "chance-visual mb-4 flex flex-col items-center gap-2 rounded-xl border border-[#e4d8f5] bg-[#faf7ff] p-4"}
+      data-chance-visual={visual.type}
+    >
       {visual.type === "spinner" && <Spinner wedges={visual.wedges} large={concept} />}
       {visual.type === "coin" && <Coin face={visual.face} />}
       {visual.type === "die" && <Die face={visual.face} />}

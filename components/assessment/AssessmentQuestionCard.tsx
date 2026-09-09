@@ -401,7 +401,7 @@ export default function AssessmentQuestionCard({
     const built = value ? value.split(ORDER_SEPARATOR).filter(Boolean) : [];
     const slots = Number(visual?.answerSlots ?? 2);
     return (
-      <div className="mt-3 space-y-4">
+      <div className="assessment-pattern-build-layout mt-3 space-y-4">
         {renderedVisual}
         <div className="rounded-lg border-2 border-dashed border-cyan-900/20 bg-[#f8fbfc] p-4">
           <div className="flex min-h-16 flex-wrap justify-center gap-3">
@@ -898,7 +898,7 @@ export default function AssessmentQuestionCard({
         ? "sm:grid-cols-3"
         : "sm:grid-cols-2 lg:grid-cols-4";
     return (
-      <div className="mt-3 space-y-4">
+      <div className="assessment-early-number-layout mt-3 space-y-4">
         {renderedVisual}
         <div className={`grid gap-3 ${gridClass}`}>
           {options.map((option) => {
@@ -932,7 +932,7 @@ export default function AssessmentQuestionCard({
 
   if (useMeasurelandsVisualOptions) {
     return (
-      <div className="mt-6 grid gap-3">
+      <div className="assessment-measurelands-option-layout mt-6 grid gap-3">
         {renderedVisual ? <div className="mb-1">{renderedVisual}</div> : null}
         <div className="grid gap-3 sm:grid-cols-2">
           {options.map((option) => {

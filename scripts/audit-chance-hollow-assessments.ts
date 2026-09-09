@@ -26,6 +26,8 @@ const questionCardSource = read("components/assessment/AssessmentQuestionCard.ts
 const globalStyles = read("app/globals.css");
 const dashboardSource = read("components/world/ChanceHollowMap.tsx");
 const taskRendererSource = read("components/TaskRenderer.tsx");
+const compareToolsSource = read("components/chance-hollow/ChanceCompareToolsCard.tsx");
+const chanceVisualSource = read("components/chance-hollow/ChanceVisual.tsx");
 const voiceControlledTaskSources = [
   "components/chance-hollow/ChanceSpinTallyCard.tsx",
   "components/chance-hollow/ChanceAutoTallyCard.tsx",
@@ -145,10 +147,19 @@ assert(shellSource.includes("getChanceHollowBackground"));
 assert(shellSource.includes('const isNumber = !realmId || realmId === "number"'));
 assert(shellSource.includes("{isChance && ("));
 assert(shellSource.includes('data-compact-assessment={wideContent ? "false" : "true"}'));
+assert(shellSource.includes('data-assessment-realm={realmId ?? "number"}'));
 assert(questionCardSource.includes("assessment-standard-choice-layout"));
 assert(questionCardSource.includes("assessment-choice-options"));
 assert(globalStyles.includes('.assessment-standard-choice-layout[data-has-visual="true"]'));
 assert(globalStyles.includes('grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.35fr)'));
+assert(globalStyles.includes('.assessment-shell[data-wide-content="true"]'));
+assert(globalStyles.includes('.assessment-shell[data-assessment-realm="chance"] .chance-compare-layout'));
+assert(globalStyles.includes('grid-template-columns: minmax(0, 1.35fr) minmax(250px, 0.65fr)'));
+assert(globalStyles.includes('data-measurelands-task-kind="chanceMasterTrial"'));
+assert(compareToolsSource.includes("chance-compare-layout"));
+assert(compareToolsSource.includes("chance-compare-tools"));
+assert(compareToolsSource.includes("chance-compare-options"));
+assert(chanceVisualSource.includes('data-chance-visual={visual.type}'));
 for (const file of voiceControlledTaskSources) {
   const source = read(file);
   assert(source.includes("OptionReadAloudButton"), `${file} must expose answer voice-over controls.`);

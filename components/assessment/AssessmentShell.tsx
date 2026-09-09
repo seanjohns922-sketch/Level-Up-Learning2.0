@@ -115,6 +115,7 @@ export default function AssessmentShell({
       className="assessment-shell relative min-h-screen flex flex-col items-center px-4 pt-6 md:pt-10"
       data-wide-content={wideContent ? "true" : "false"}
       data-compact-assessment={wideContent ? "false" : "true"}
+      data-assessment-realm={realmId ?? "number"}
       style={{
         background: theme.isMeasurement
           ? "linear-gradient(180deg, #140d04 0%, #2a1a06 40%, #120b03 100%)"
@@ -339,7 +340,7 @@ export default function AssessmentShell({
           ].join(" ")}
         >
           {/* Question number chip */}
-          <div className="flex items-center gap-2 mb-4">
+          <div className="assessment-question-marker flex items-center gap-2 mb-4">
             <span
               className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-xs font-black"
               style={{

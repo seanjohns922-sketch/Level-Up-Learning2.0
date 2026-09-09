@@ -44,7 +44,10 @@ export function MeasurelandsAssessmentTask({
   };
 
   return (
-    <div className="relative">
+    <div
+      className="assessment-native-task relative"
+      data-assessment-task-kind={task.kind}
+    >
       <div className={hasRecordedAnswer ? "pointer-events-none select-none" : undefined}>
         <TaskRenderer
           key={`${questionId}:${taskNonce}`}

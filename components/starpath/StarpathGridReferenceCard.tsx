@@ -100,7 +100,7 @@ export function StarpathGridReferenceCard({
 
       <div className="mx-auto max-w-4xl">
         <div className="overflow-x-auto pb-2">
-          <div className="mx-auto min-w-[330px] max-w-[720px] border-2 border-cyan-300 bg-slate-950 p-2 shadow-[0_16px_40px_rgba(8,145,178,0.18)]">
+          <div className="mx-auto w-full min-w-0 max-w-[720px] border-2 border-cyan-300 bg-slate-950 p-2 shadow-[0_16px_40px_rgba(8,145,178,0.18)]">
             <div className="grid gap-1" style={{ gridTemplateColumns }}>
               <div aria-hidden="true" />
               {shownColumns.map((label, index) => (
