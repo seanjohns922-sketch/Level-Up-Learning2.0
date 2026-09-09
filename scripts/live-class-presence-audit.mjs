@@ -21,9 +21,11 @@ requireText(tracker, "presenceRequestInFlightRef", "Presence heartbeats can over
 requireText(client, 'rpc("touch_live_student_presence_secure"', "The client does not use the secure presence RPC.");
 requireText(panel, "ACTIVE_NOW_WINDOW_MS = 120_000", "Active Now does not use a bounded presence window.");
 requireText(panel, "isCardActiveNow(card)", "Live Class does not classify rows from recent presence.");
-requireText(panel, "isLiveRealmId(normalized)", "Live Class realm recognition is not driven by the live-realm registry.");
+requireText(panel, "return tryCanonicalRealmId(value)", "Live Class realm recognition is not driven by the canonical realm registry.");
 requireText(panel, "getRealmActivityCode(normalized)", "Live Class realm badges are not driven by the realm registry.");
 requireText(registry, 'activityCode: "ST"', "The realm registry does not define Statistica's ST badge.");
+requireText(registry, 'activityCode: "PP"', "The realm registry does not define Pattern Peaks' PP badge.");
+requireText(registry, 'activityCode: "CH"', "The realm registry does not define Chance Hollow's CH badge.");
 requireText(registry, 'programSuffix: "statistica"', "The realm registry does not define Statistica's canonical progress key.");
 requireText(panel, 'aria-label={`Realm: ${formatRealmName(card.currentRealm)}`}', "Live Class realm badges do not expose their full accessible name.");
 requireText(migration, "public.assert_student_write(p_student_id)", "Presence writes are not student-authorised.");

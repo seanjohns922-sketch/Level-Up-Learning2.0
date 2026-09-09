@@ -22,7 +22,6 @@ import FocusModeControl from "@/components/teacher/FocusModeControl";
 import {
   getRealmActivityCode,
   getRealmDefinition,
-  isLiveRealmId,
   tryCanonicalRealmId,
 } from "@/lib/realms/realm-registry";
 import { selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
@@ -447,8 +446,7 @@ function matchesCurrentLesson(row: LiveStudentActivityRow, event: LiveActivityEv
 }
 
 function normalizeAttemptRealm(value?: string | null) {
-  const normalized = tryCanonicalRealmId(value);
-  return isLiveRealmId(normalized) ? normalized : null;
+  return tryCanonicalRealmId(value);
 }
 
 function formatRealmBadge(realm?: string | null) {
