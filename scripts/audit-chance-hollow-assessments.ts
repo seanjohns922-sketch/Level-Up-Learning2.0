@@ -22,6 +22,8 @@ const pretestSource = read("app/pretest/page.tsx");
 const posttestSource = read("app/posttest/page.tsx");
 const cardSource = read("components/assessment/AssessmentQuestionCard.tsx");
 const shellSource = read("components/assessment/AssessmentShell.tsx");
+const questionCardSource = read("components/assessment/AssessmentQuestionCard.tsx");
+const globalStyles = read("app/globals.css");
 const dashboardSource = read("components/world/ChanceHollowMap.tsx");
 const taskRendererSource = read("components/TaskRenderer.tsx");
 const voiceControlledTaskSources = [
@@ -142,6 +144,11 @@ assert(cardSource.includes("<OptionReadAloudButton"));
 assert(shellSource.includes("getChanceHollowBackground"));
 assert(shellSource.includes('const isNumber = !realmId || realmId === "number"'));
 assert(shellSource.includes("{isChance && ("));
+assert(shellSource.includes('data-compact-assessment={wideContent ? "false" : "true"}'));
+assert(questionCardSource.includes("assessment-standard-choice-layout"));
+assert(questionCardSource.includes("assessment-choice-options"));
+assert(globalStyles.includes('.assessment-standard-choice-layout[data-has-visual="true"]'));
+assert(globalStyles.includes('grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.35fr)'));
 for (const file of voiceControlledTaskSources) {
   const source = read(file);
   assert(source.includes("OptionReadAloudButton"), `${file} must expose answer voice-over controls.`);

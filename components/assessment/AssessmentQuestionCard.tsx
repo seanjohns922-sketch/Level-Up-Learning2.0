@@ -982,30 +982,32 @@ export default function AssessmentQuestionCard({
   }
 
   return (
-    <div className="mt-6 grid gap-3">
-      {renderedVisual ? <div className="mb-1">{renderedVisual}</div> : null}
-      {options.map((option) => {
-        const label = typeof option === "string" ? option : option.label ?? option.id;
-        const optionId = typeof option === "string" ? undefined : option.id;
-        const isSelected = value === label || value === optionId;
-        return (
-          <button
-            key={label}
-            type="button"
-            onClick={() => onChange(String(optionId ?? label))}
-            className={[
-              "flex items-center justify-between gap-3 text-left rounded-2xl border p-5 transition font-semibold text-white",
-              isSelected
-                ? selectedCard
-                : "border-slate-600 bg-slate-700/50 hover:bg-slate-700 hover:border-slate-500",
-            ].join(" ")}
-          >
-            <MathFormattedText text={String(label)} compactFractions />
-            {/* Per-option voiceover so children can hear each answer read aloud. */}
-            <OptionReadAloudButton text={String(label)} className="shrink-0" />
-          </button>
-        );
-      })}
+    <div className="assessment-standard-choice-layout mt-4" data-has-visual={renderedVisual ? "true" : "false"}>
+      {renderedVisual ? <div className="assessment-choice-visual">{renderedVisual}</div> : null}
+      <div className="assessment-choice-options grid gap-3">
+        {options.map((option) => {
+          const label = typeof option === "string" ? option : option.label ?? option.id;
+          const optionId = typeof option === "string" ? undefined : option.id;
+          const isSelected = value === label || value === optionId;
+          return (
+            <button
+              key={label}
+              type="button"
+              onClick={() => onChange(String(optionId ?? label))}
+              className={[
+                "flex min-h-14 items-center justify-between gap-3 rounded-lg border px-4 py-3 text-left font-semibold text-white transition",
+                isSelected
+                  ? selectedCard
+                  : "border-slate-600 bg-slate-700/50 hover:bg-slate-700 hover:border-slate-500",
+              ].join(" ")}
+            >
+              <MathFormattedText text={String(label)} compactFractions />
+              {/* Per-option voiceover so children can hear each answer read aloud. */}
+              <OptionReadAloudButton text={String(label)} className="shrink-0" />
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

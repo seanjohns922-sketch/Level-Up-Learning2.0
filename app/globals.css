@@ -360,6 +360,111 @@ html:fullscreen .assessment-shell .assessment-navigation {
   margin-bottom: 0;
 }
 
+/* Standard assessment questions use the available landscape width so the
+   prompt, visual, answers and controls remain visible as one interaction. */
+@media (min-width: 1024px) and (min-height: 700px) {
+  .assessment-shell[data-compact-assessment="true"] {
+    height: 100dvh;
+    min-height: 700px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-top: 0.75rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-header {
+    margin-bottom: 0.65rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-top-bar {
+    margin-bottom: 0.45rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-title-block {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 0.75rem;
+    margin-bottom: 0;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-title-block h1,
+  .assessment-shell[data-compact-assessment="true"] .assessment-title-block p {
+    margin-top: 0;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-title-block h1 {
+    font-size: 1.5rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-progress,
+  .assessment-shell[data-compact-assessment="true"] .assessment-nav-strip {
+    margin-top: 0.5rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-nav-strip > :first-child {
+    display: none;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-nav-buttons {
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-nav-buttons button {
+    height: 1.75rem;
+    min-width: 1.75rem;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-content {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-question-card {
+    min-height: 0;
+    padding: 1rem 1.25rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-question-card > .mb-4,
+  .assessment-shell[data-compact-assessment="true"] .assessment-question-card > .mb-6 {
+    margin-bottom: 0.65rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-standard-choice-layout[data-has-visual="true"] {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.35fr);
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-choice-visual {
+    min-width: 0;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-choice-visual > :first-child {
+    margin-bottom: 0;
+    max-height: 280px;
+    overflow: hidden;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-choice-options {
+    gap: 0.6rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-choice-options > button {
+    min-height: 3.5rem;
+  }
+
+  .assessment-shell[data-compact-assessment="true"] .assessment-navigation {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+  }
+}
+
 html:fullscreen .measurelands-task-frame[data-measurelands-task-kind="timeQuest"] .measurelands-time-clock-pair {
   padding: 0.45rem !important;
 }

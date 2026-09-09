@@ -96,7 +96,7 @@ export default function AssessmentShell({
   const isNumber = !realmId || realmId === "number";
   const isGroundNumber = isNumber && isGroundLevelYear(year);
   const isModernNumber = isNumber && (isGroundNumber || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6");
-  const contentWidth = wideContent || isModernNumber ? "max-w-6xl" : "max-w-2xl";
+  const contentWidth = "max-w-6xl";
   const progressTrack = theme.isMeasurement
     ? "rgba(214,184,108,0.22)"
     : isSpace
@@ -114,6 +114,7 @@ export default function AssessmentShell({
     <main
       className="assessment-shell relative min-h-screen flex flex-col items-center px-4 pt-6 md:pt-10"
       data-wide-content={wideContent ? "true" : "false"}
+      data-compact-assessment={wideContent ? "false" : "true"}
       style={{
         background: theme.isMeasurement
           ? "linear-gradient(180deg, #140d04 0%, #2a1a06 40%, #120b03 100%)"
@@ -132,7 +133,7 @@ export default function AssessmentShell({
           ? "linear-gradient(rgba(45,212,191,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(45,212,191,0.035) 1px, transparent 1px)"
           : undefined,
         backgroundSize: isModernNumber ? "48px 48px" : undefined,
-        paddingBottom: "max(7rem, calc(env(safe-area-inset-bottom) + 6rem))",
+        paddingBottom: "max(2rem, calc(env(safe-area-inset-bottom) + 1rem))",
       }}
     >
       {/* ── Starpath cosmic backdrop (matches the lesson theme) ── */}
@@ -290,7 +291,7 @@ export default function AssessmentShell({
             <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Jump to a question
             </div>
-            <div className="flex flex-wrap gap-1.5">
+          <div className="assessment-nav-buttons flex flex-wrap gap-1.5">
               {answeredFlags.map((answered, i) => {
                 const reachable = i <= frontier;
                 const isCurrent = i === currentIndex;
@@ -365,19 +366,12 @@ export default function AssessmentShell({
           )}
 
           {/* Answer area — lesson-native tasks draw dark text, so give them a light panel */}
-          <div className={lightSurface ? "relative rounded-2xl bg-[#f6f5ff] p-4 text-slate-950 sm:p-6" : "relative"}>
+          <div className={lightSurface ? "assessment-answer-area relative rounded-2xl bg-[#f6f5ff] p-4 text-slate-950 sm:p-6" : "assessment-answer-area relative"}>
             {questionContent}
           </div>
 
-        </div>
-
         {/* ── Navigation ── */}
-        <div
-          className={`assessment-navigation z-20 mt-5 flex items-center justify-between gap-3 ${isModernNumber || isStatistics ? "relative" : "sticky"}`}
-          style={{
-            bottom: isModernNumber || isStatistics ? undefined : "max(5rem, calc(env(safe-area-inset-bottom) + 4rem))",
-          }}
-        >
+        <div className="assessment-navigation relative z-20 mt-5 flex items-center justify-between gap-3 border-t border-slate-700/50 pt-4">
           <button
             onClick={onBack}
             disabled={currentIndex === 0}
@@ -431,6 +425,7 @@ export default function AssessmentShell({
               Next
             </button>
           )}
+        </div>
         </div>
       </div>
     </main>
