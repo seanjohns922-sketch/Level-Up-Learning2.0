@@ -150,20 +150,20 @@ function DiceGrid({ mode, highlight }: { mode: "sum" | "difference"; highlight: 
   );
 }
 
-function Frequency({ labels, counts, total }: { labels: string[]; counts: number[]; total: number }) {
-  const max = Math.max(...counts, 1);
+function Frequency({ labels, counts, total, totalLabel }: { labels: string[]; counts: number[]; total: number; totalLabel?: string }) {
+  const safeTotal = Math.max(total, 1);
   return (
     <div className="w-full max-w-md space-y-2" role="img" aria-label={`Frequency results from ${total} trials`}>
       {labels.map((label, index) => (
         <div key={`${label}-${index}`} className="grid grid-cols-[5rem_1fr_3rem] items-center gap-2 text-sm font-bold text-[#3a2f52]">
           <span className="truncate text-right">{label}</span>
           <div className="h-7 overflow-hidden rounded-md bg-violet-100">
-            <div className="h-full rounded-md bg-gradient-to-r from-fuchsia-500 to-cyan-400" style={{ width: `${Math.max(8, ((counts[index] ?? 0) / max) * 100)}%` }} />
+            <div className="h-full rounded-md bg-gradient-to-r from-fuchsia-500 to-cyan-400" style={{ width: `${Math.max(8, ((counts[index] ?? 0) / safeTotal) * 100)}%` }} />
           </div>
           <span className="font-mono text-base font-black">{counts[index] ?? 0}</span>
         </div>
       ))}
-      <div className="text-center text-xs font-black uppercase tracking-[0.14em] text-violet-500">{total} trials altogether</div>
+      <div className="text-center text-xs font-black uppercase tracking-[0.14em] text-violet-500">{totalLabel ?? `${total} trials altogether`}</div>
     </div>
   );
 }
@@ -343,11 +343,12 @@ function Bag({ counters }: { counters: string[] }) {
 const SCALE_STOPS: ReadonlyArray<{ key: string; label: string; colour: string }> = [
   { key: "impossible", label: "Impossible", colour: "#dc2626" },
   { key: "unlikely", label: "Unlikely", colour: "#f59e0b" },
+  { key: "even", label: "Even chance", colour: "#d4a914" },
   { key: "likely", label: "Likely", colour: "#84cc16" },
   { key: "certain", label: "Certain", colour: "#16a34a" },
 ];
 
-function Scale({ highlight }: { highlight?: string }) {
+function Scale({ highlight, value }: { highlight?: string; value?: number }) {
   // Wide horizontal padding so the end labels ("Impossible", "Certain") sit
   // fully inside the viewBox instead of being clipped at the edges.
   const x0 = 52;
@@ -373,6 +374,12 @@ function Scale({ highlight }: { highlight?: string }) {
           </g>
         );
       })}
+      {typeof value === "number" ? (
+        <g transform={`translate(${x0 + Math.max(0, Math.min(1, value)) * barW}, 8)`}>
+          <path d="M -7 0 L 7 0 L 0 10 Z" fill={INK} />
+          <text x="0" y="-2" textAnchor="middle" fontSize="10" fontWeight="900" fill={INK}>{Math.round(value * 100)}%</text>
+        </g>
+      ) : null}
     </svg>
   );
 }
@@ -399,10 +406,10 @@ export default function ChanceVisual({
       {visual.type === "dicePair" && <DicePair left={visual.left} right={visual.right} />}
       {visual.type === "diceGrid" && <DiceGrid mode={visual.mode} highlight={visual.highlight} />}
       {visual.type === "bag" && <Bag counters={visual.counters} />}
-      {visual.type === "frequency" && <Frequency labels={visual.labels} counts={visual.counts} total={visual.total} />}
+      {visual.type === "frequency" && <Frequency labels={visual.labels} counts={visual.counts} total={visual.total} totalLabel={visual.totalLabel} />}
       {visual.type === "expectedObserved" && <ExpectedObserved expected={visual.expected} observed={visual.observed} total={visual.total} eventLabel={visual.eventLabel} />}
       {visual.type === "convergence" && <Convergence expected={visual.expected} samples={visual.samples} eventLabel={visual.eventLabel} />}
-      {visual.type === "scale" && <Scale highlight={visual.highlight} />}
+      {visual.type === "scale" && <Scale highlight={visual.highlight} value={visual.value} />}
       {legend && legend.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-3">
           {legend.map(([colour, n]) => (

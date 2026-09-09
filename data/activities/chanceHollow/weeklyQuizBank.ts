@@ -23,9 +23,11 @@ function question(input: {
   correct: string;
   wrong: string;
   visual?: ChanceVisual;
-}, variant: number): QuizTask {
+}, variant: number, withLocation = true): QuizTask {
   const locations = ["Moon Gate", "Crystal Bridge", "Fortune Wheel", "Dice Grove", "Shadow Vault"];
-  const prompt = `At the ${locations[variant]}, ${input.prompt.charAt(0).toLowerCase()}${input.prompt.slice(1)}`;
+  const prompt = withLocation
+    ? `At the ${locations[variant]}, ${input.prompt.charAt(0).toLowerCase()}${input.prompt.slice(1)}`
+    : input.prompt;
   const options = [...new Set(input.options)];
   for (const fallback of ["There is not enough information", "The result is certain", "The tool cannot be used"]) {
     if (options.length >= 4) break;
@@ -147,39 +149,65 @@ function level5(week: number, lesson: number, variant: number): QuizTask {
   if (week === 1) {
     const exact = lesson === 1 && variant % 2 === 0;
     const answer = lesson === 1 ? (exact ? `${total} exact-counter outcomes` : "2 colour outcomes") : lesson === 2 ? "Red, blue and green" : "Exact counters are equally likely; colours may not be";
-    return question({ prompt: lesson === 1 ? `A bag has ${total} counters in two colours. Which outcome set answers the stated lens?` : lesson === 2 ? "Which list gives every colour outcome once?" : "Which statement correctly judges equal likelihood?", answer, options: [answer, "Only the outcome drawn first", "Every colour is automatically equal", "The outcome set has no effect"], correct: "Define what is being recorded, list every matching outcome once, then compare equal elementary outcomes.", wrong: "Distinguish exact counters from grouped colour outcomes.", visual: { type: "bag", counters: Array.from({ length: total }, (_, i) => i < target ? RED : i < total - 1 ? BLUE : GREEN) } }, variant);
+    const counters = lesson === 1
+      ? Array.from({ length: total }, (_, i) => i < target ? RED : BLUE)
+      : Array.from({ length: total }, (_, i) => i < target ? RED : i < total - 1 ? BLUE : GREEN);
+    const prompt = lesson === 1
+      ? exact
+        ? `Each of the ${total} counters is recorded separately. How many outcomes are possible?`
+        : `Only the colour is recorded from this two-colour bag. How many outcomes are possible?`
+      : lesson === 2
+        ? "Which list gives every colour outcome once?"
+        : "Are the exact counters and the three colours both equally likely?";
+    return question({ prompt, answer, options: [answer, "Only the outcome drawn first", "Every colour is automatically equal", "The outcome set has no effect"], correct: "Define what is recorded, list each outcome once, then compare the elementary outcomes.", wrong: "Separate individual counters from grouped colour outcomes.", visual: { type: "bag", counters } }, variant, false);
   }
   if (week === 2) {
     const equal = lesson === 1;
-    const purple = equal ? 3 : 4 + (variant % 2);
+    const regionTotal = 4 + variant * 2;
+    const purple = regionTotal / 2 + (equal ? 0 : 1);
     const answer = lesson === 1 ? "Equal regions give equal chances" : lesson === 2 ? "Purple is more likely because it has more equal regions" : "The spinner is biased toward purple";
-    return question({ prompt: lesson === 1 ? "Why are the colour outcomes equally likely?" : lesson === 2 ? "How do unequal region counts change the chance?" : "What hidden bias does the design create?", answer, options: [answer, "Colour brightness controls probability", "All visible outcomes are always equal", "The pointer avoids large regions"], correct: "Probability follows the share of equal regions assigned to each outcome.", wrong: "Count equal regions for each colour.", visual: countVisual(purple, 8) }, variant);
+    return question({ prompt: lesson === 1 ? "Why are the colour outcomes equally likely?" : lesson === 2 ? "How do unequal region counts change the chance?" : "What hidden bias does the design create?", answer, options: [answer, "Colour brightness controls probability", "All visible outcomes are always equal", "The pointer avoids large regions"], correct: "Probability follows the share of equal regions assigned to each outcome.", wrong: "Count equal regions for each colour.", visual: countVisual(purple, regionTotal) }, variant, false);
   }
   if (week === 3) {
     const difference = variant;
     const ways = difference === 0 ? 6 : 2 * (6 - difference);
     const other = difference === 0 ? 5 : difference - 1;
     const otherWays = other === 0 ? 6 : 2 * (6 - other);
-    const answer = lesson === 1 ? "36 ordered pairs" : lesson === 2 ? `Difference ${difference} has ${ways} ordered pairs` : ways === otherWays ? "The groups are fair" : "The groups must be changed to have equal numbers of ordered pairs";
-    return question({ prompt: lesson === 1 ? "How many ordered outcomes are possible when two dice are rolled?" : lesson === 2 ? `How many ordered pairs have a difference of ${difference}?` : `One racer wins on difference ${difference}; the other on difference ${other}. How should the race be repaired?`, answer, options: [answer, "12 ordered pairs", "Each difference has six ways", "The dice colours make it fair"], correct: "Use the full 6 by 6 outcome grid and compare the number of ordered pairs in each group.", wrong: "Count ordered pairs, not just difference labels.", visual: { type: "diceGrid", mode: "difference", highlight: difference } }, variant);
+    const repairs = [
+      "Racer A: difference 0; Racer B: difference 3",
+      "Racer A: differences 0 or 5; Racer B: difference 2",
+      "Racer A: differences 4 or 5; Racer B: difference 3",
+      "Racer A: difference 2; Racer B: differences 0 or 5",
+      "Racer A: difference 3; Racer B: differences 4 or 5",
+    ];
+    const answer = lesson === 1 ? "36 ordered pairs" : lesson === 2 ? `Difference ${difference} has ${ways} ordered pairs` : repairs[variant]!;
+    const prompt = lesson === 1
+      ? "How many ordered outcomes are possible when two dice are rolled?"
+      : lesson === 2
+        ? `How many ordered pairs have a difference of ${difference}?`
+        : `The current rules give the racers ${ways} and ${otherWays} winning pairs. Which replacement is fair?`;
+    return question({ prompt, answer, options: [answer, "Keep the current rules", "Give one racer an extra roll", "Let the dice colours decide"], correct: "Count all ordered pairs. A fair repair gives both racers the same number.", wrong: "Compare ordered pairs, not just difference labels.", visual: { type: "diceGrid", mode: "difference", highlight: difference } }, variant, false);
   }
   if (week === 4) {
     const observed = 5 + variant;
     const trials = 20;
     const answer = lesson === 1 ? `${observed} target results in ${trials} trials` : lesson === 2 ? `${observed}/${trials}` : `Run A: ${observed}/${trials}; Run B: ${observed + 2}/${trials}`;
-    return question({ prompt: lesson === 1 ? "Which statement records the experiment completely?" : lesson === 2 ? "Write the target outcome's relative frequency." : "Which comparison preserves both run sizes?", answer, options: [answer, `${trials}/${observed}`, `${observed}/${trials - observed}`, "The next outcome is certain"], correct: "Relative frequency is the target count over all completed trials.", wrong: "Put the observed target frequency over the total number of trials.", visual: { type: "frequency", labels: ["Target", "Other"], counts: [observed, trials - observed], total: trials } }, variant);
+    const visual: ChanceVisual = lesson === 3
+      ? { type: "frequency", labels: ["Run A", "Run B"], counts: [observed, observed + 2], total: trials, totalLabel: `${trials} trials per run` }
+      : { type: "frequency", labels: ["Target", "Other"], counts: [observed, trials - observed], total: trials };
+    return question({ prompt: lesson === 1 ? "Which statement records the experiment completely?" : lesson === 2 ? "Write the target outcome's relative frequency." : "Which comparison preserves both run sizes?", answer, options: [answer, `${trials}/${observed}`, `${observed}/${trials - observed}`, "The next outcome is certain"], correct: "Relative frequency is the target count over all completed trials.", wrong: "Put the target count over the total number of trials.", visual }, variant, false);
   }
   if (week === 5) {
     const expected = 8;
     const observed = 5 + 2 * variant;
     const answer = lesson === 1 ? "The design suggests about 8 target results" : lesson === 2 ? `${observed}/${20} estimates the target likelihood` : Math.abs(observed - expected) >= 5 ? "The result is unusual; repeat more trials before deciding it is loaded" : "The result is reasonably close; there is not strong evidence of loading";
-    return question({ prompt: lesson === 1 ? "What frequency should the chance-tool design predict?" : lesson === 2 ? "Which estimate uses the recorded results?" : "What is the most careful verdict about fairness?", answer, options: [answer, "One run proves the tool is loaded", "Observed frequency guarantees the next result", "Ignore the design and trial count"], correct: "Compare design probability with observed frequency and use cautious evidence language.", wrong: "One run provides evidence, not absolute proof.", visual: { type: "expectedObserved", expected, observed, total: 20, eventLabel: "Target" } }, variant);
+    return question({ prompt: lesson === 1 ? "What frequency should the chance-tool design predict?" : lesson === 2 ? "Which estimate uses the recorded results?" : "What is the most careful verdict about fairness?", answer, options: [answer, "One run proves the tool is loaded", "Observed frequency guarantees the next result", "Ignore the design and trial count"], correct: "Compare design probability with observed frequency and use cautious evidence language.", wrong: "One run provides evidence, not absolute proof.", visual: { type: "expectedObserved", expected, observed, total: 20, eventLabel: "Target" } }, variant, false);
   }
   const trials = 30 + variant * 10;
   const expected = Math.round(trials / 3);
   const observed = expected + variant - 2;
   const answer = lesson === 1 ? "Keep the tool and method the same and record every trial" : lesson === 2 ? `${observed}/${trials} was observed` : "The evidence is close to one third, with normal chance variation";
-  return question({ prompt: lesson === 1 ? "Which plan makes the investigation repeatable and fair?" : lesson === 2 ? "Which relative frequency records the investigation?" : "Which verdict is supported by expected and observed evidence?", answer, options: [answer, "Change the method halfway", "Remove surprising outcomes", "Claim the next result is certain"], correct: "A strong investigation uses a repeatable method, complete records and a conclusion matched to the evidence.", wrong: "Connect the fixed design, total trials and observed frequency.", visual: { type: "expectedObserved", expected, observed, total: trials, eventLabel: "Winning outcome" } }, variant);
+  return question({ prompt: lesson === 1 ? "Which plan makes the investigation repeatable and fair?" : lesson === 2 ? "Which relative frequency records the investigation?" : "Which verdict is supported by expected and observed evidence?", answer, options: [answer, "Change the method halfway", "Remove surprising outcomes", "Claim the next result is certain"], correct: "A strong investigation uses one method, complete records and an evidence-based conclusion.", wrong: "Connect the design, trial count and observed frequency.", visual: { type: "expectedObserved", expected, observed, total: trials, eventLabel: "Winning outcome" } }, variant, false);
 }
 
 function level6(week: number, lesson: number, variant: number): QuizTask {
@@ -189,35 +217,41 @@ function level6(week: number, lesson: number, variant: number): QuizTask {
   const percent = decimal * 100;
   if (week === 1) {
     const answer = lesson === 1 ? `${decimal}` : lesson === 2 ? `${winning}/${total} = ${decimal} = ${percent}%` : percent < 50 ? "Unlikely" : percent === 50 ? "Even chance" : "Likely";
-    return question({ prompt: lesson === 1 ? `Where does ${winning}/${total} sit on a 0 to 1 probability scale?` : lesson === 2 ? "Which three forms name the same probability?" : `Which chance description best matches ${percent}%?`, answer, options: [answer, `${total}/${winning}`, `${100 - percent}%`, percent === 50 ? "Certain" : "Impossible"], correct: "Fractions, decimals and percentages can name the same point from impossible to certain.", wrong: "Convert the fraction by dividing, then multiply the decimal by 100 for percent.", visual: { type: "scale", highlight: percent < 50 ? "unlikely" : percent === 50 ? "likely" : "likely" } }, variant);
+    const highlight = percent < 50 ? "unlikely" : percent === 50 ? "even" : "likely";
+    return question({ prompt: lesson === 1 ? `Where does ${winning}/${total} sit on a 0 to 1 probability scale?` : lesson === 2 ? "Which three forms name the same probability?" : `Which chance description best matches ${percent}%?`, answer, options: [answer, `${total}/${winning}`, `${100 - percent}%`, percent === 50 ? "Certain" : "Impossible"], correct: "Fractions, decimals and percentages can name the same point from impossible to certain.", wrong: "Divide the fraction, then multiply the decimal by 100 for percent.", visual: { type: "scale", highlight, value: decimal } }, variant, false);
   }
   if (week === 2) {
     const answer = lesson === 1 ? `${winning}/${total}` : lesson === 2 ? `${total - winning} non-winning outcomes` : `${winning} winning parts out of ${total}`;
-    return question({ prompt: lesson === 1 ? "Calculate the probability of the purple outcome." : lesson === 2 ? `${winning} of ${total} outcomes win. How many do not win?` : `Which tool design has probability ${winning}/${total}?`, answer, options: [answer, `${total}/${winning}`, `${winning}/${total - winning}`, `${total - winning}/${total}`], correct: "Probability compares favourable outcomes with all equally likely outcomes.", wrong: "Count winning outcomes for the numerator and all outcomes for the denominator.", visual: countVisual(winning, total) }, variant);
+    return question({ prompt: lesson === 1 ? "Calculate the probability of the purple outcome." : lesson === 2 ? `${winning} of ${total} outcomes win. How many do not win?` : `Which tool design has probability ${winning}/${total}?`, answer, options: [answer, `${total}/${winning}`, `${winning}/${total - winning}`, `${total - winning}/${total}`], correct: "Probability compares favourable outcomes with all equally likely outcomes.", wrong: "Put winning outcomes over all outcomes.", visual: countVisual(winning, total) }, variant, false);
   }
   if (week === 3) {
     const trials = total * 20;
     const expected = winning * 20;
     const observed = expected + variant - 2;
     const answer = lesson === 1 ? `${expected} expected wins` : lesson === 2 ? `Expected ${expected}; observed ${observed}` : "Chance variation can make observed frequency differ from expected frequency";
-    return question({ prompt: lesson === 1 ? `With probability ${winning}/${total} across ${trials} trials, what is the expected frequency?` : lesson === 2 ? "Which statement compares the two frequencies accurately?" : "Why are the expected and observed counts not identical?", answer, options: [answer, "Observed results must equal expected results", "The simulation is automatically invalid", "Expected frequency is the next guaranteed result"], correct: "Expected frequency is probability multiplied by trials; observed results may vary.", wrong: "Calculate the expectation, then treat the difference as possible chance variation.", visual: { type: "expectedObserved", expected, observed, total: trials } }, variant);
+    return question({ prompt: lesson === 1 ? `With probability ${winning}/${total} across ${trials} trials, what is the expected frequency?` : lesson === 2 ? "Which statement compares the two frequencies accurately?" : "Why are the expected and observed counts not identical?", answer, options: [answer, "Observed results must equal expected results", "The simulation is automatically invalid", "Expected frequency is the next guaranteed result"], correct: "Expected frequency is probability multiplied by trials; observed results may vary.", wrong: "Calculate the expectation, then allow for chance variation.", visual: { type: "expectedObserved", expected, observed, total: trials } }, variant, false);
   }
   if (week === 4) {
     const small = [0.2, 0.7, 0.3, 0.8, 0.4][variant]!;
     const large = [0.48, 0.53, 0.49, 0.51, 0.5][variant]!;
     const answer = lesson === 1 ? "Compare relative frequencies at each trial size" : lesson === 2 ? "The larger trial is closer to 0.5" : "Larger samples usually reduce relative variation but do not guarantee an exact result";
-    return question({ prompt: lesson === 1 ? "How should the trial-size effect be investigated?" : lesson === 2 ? "Which run shows stronger convergence toward 0.5?" : "What conclusion survives the variation storm?", answer, options: [answer, "Ten trials always give the best estimate", "More trials guarantee exactly 0.5", "Ignore relative frequency"], correct: "Increasing trial size generally steadies relative frequency near the expected probability.", wrong: "Compare proportions, and avoid claiming that a large sample guarantees an exact match.", visual: { type: "convergence", expected: 0.5, samples: [{ trials: 10, value: small }, { trials: 200, value: large }] } }, variant);
+    return question({ prompt: lesson === 1 ? "How should the trial-size effect be investigated?" : lesson === 2 ? "Which run is closer to the expected probability of 0.5?" : "What conclusion is supported by both runs?", answer, options: [answer, "Ten trials always give the best estimate", "More trials guarantee exactly 0.5", "Ignore relative frequency"], correct: "Larger samples usually steady relative frequency near the expected probability.", wrong: "Compare proportions without claiming an exact result is guaranteed.", visual: { type: "convergence", expected: 0.5, samples: [{ trials: 10, value: small }, { trials: 200, value: large }] } }, variant, false);
   }
   if (week === 5) {
-    const valid = `A ${total}-part equal spinner with ${winning} winning parts, reset after every spin`;
-    const answer = lesson === 1 ? valid : lesson === 2 ? "Repair the unequal regions and reset after each trial" : "The model's outcomes, probabilities and reset rule all match the event";
-    return question({ prompt: lesson === 1 ? `Which simulator models a ${winning}/${total} event?` : lesson === 2 ? "What repairs Chanzia's biased simulation?" : "Which audit statement validates the simulation?", answer, options: [answer, "Use unequal regions and keep results", "Change the winning rule after each trial", "Choose whichever model wins most often"], correct: "A valid simulator preserves probabilities and starts each trial under the same conditions.", wrong: "Audit equal elementary outcomes, the winning share and the reset rule.", visual: countVisual(winning, total) }, variant);
+    const valid = `An equal ${total}-part spinner with ${winning} winning parts`;
+    const answer = lesson === 1 ? valid : lesson === 2 ? "Restore every spinner part before the next trial" : "The outcomes, winning share and reset rule match the event";
+    const prompt = lesson === 1
+      ? `Which simulator models a ${winning}/${total} event?`
+      : lesson === 2
+        ? "Chanzia removes a winning part after each win. What fixes the simulation?"
+        : "Which audit statement validates the simulation?";
+    return question({ prompt, answer, options: [answer, "Keep removing winning parts", "Change the winning rule after each trial", "Choose whichever model wins most often"], correct: "A valid simulation keeps the same probabilities for every independent trial.", wrong: "Check the outcomes, winning share and reset rule.", visual: countVisual(winning, total) }, variant, false);
   }
   const trials = total * 25;
   const expected = winning * 25;
   const observed = expected + variant - 2;
   const answer = lesson === 1 ? "State the event, model, prediction, trial count and recording method" : lesson === 2 ? `Record ${observed} wins from ${trials} trials` : `The observed frequency ${observed}/${trials} is close to the expected probability ${winning}/${total}, allowing for variation`;
-  return question({ prompt: lesson === 1 ? "Which plan is complete enough to repeat?" : lesson === 2 ? "Which record preserves all investigation evidence?" : "Which conclusion best defends the investigation?", answer, options: [answer, "Report only successful trials", "Claim certainty from one run", "Ignore expected probability"], correct: "A defensible investigation connects a fair model, expected frequency, complete observed data and a cautious conclusion.", wrong: "Include the full method and compare observed evidence with the theoretical probability.", visual: { type: "expectedObserved", expected, observed, total: trials } }, variant);
+  return question({ prompt: lesson === 1 ? "Which plan could another student repeat?" : lesson === 2 ? "Which record keeps all the investigation evidence?" : "Which conclusion is supported by the investigation?", answer, options: [answer, "Report only successful trials", "Claim certainty from one run", "Ignore expected probability"], correct: "A strong investigation links its model, prediction, complete data and conclusion.", wrong: "Include the method and compare observed results with theoretical probability.", visual: { type: "expectedObserved", expected, observed, total: trials } }, variant, false);
 }
 
 function buildTask(level: ChanceLevel, week: number, lesson: number, variant: number) {

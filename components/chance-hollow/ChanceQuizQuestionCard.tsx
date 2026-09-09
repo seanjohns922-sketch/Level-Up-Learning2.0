@@ -31,9 +31,7 @@ export default function ChanceQuizQuestionCard({ task, onCorrect, onWrong }: {
         <ReadAloudBtn text={task.speakText} label="Read" className="shrink-0 border-[#b4588d]/35 bg-white text-[#6e315d]" />
       </div>
       {task.visual ? (
-        <div className="flex min-h-44 items-center justify-center rounded-lg border border-[#dcb9d2] bg-[#fff8fc] p-4">
-          <ChanceVisual visual={task.visual} />
-        </div>
+        <ChanceVisual visual={task.visual} />
       ) : null}
       <div className="grid gap-3">
         {task.options.map((option) => (
