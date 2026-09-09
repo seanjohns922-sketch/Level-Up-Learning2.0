@@ -228,7 +228,7 @@ function buildTask(level: ChanceLevel, week: number, lesson: number, variant: nu
 }
 
 export function getChanceHollowWeeklyQuizTasks(level: number, week: number): PracticeTask[] | null {
-  if (!Number.isInteger(level) || level < 3 || level > 6 || !Number.isInteger(week) || week < 1 || week > 6) return null;
+  if (!Number.isInteger(level) || level < 3 || level > 6 || !Number.isInteger(week) || week < 1 || week > 5) return null;
   const tasks = [1, 2, 3].flatMap((lesson) =>
     Array.from({ length: 5 }, (_, variant) => buildTask(level as ChanceLevel, week, lesson, variant)),
   );
@@ -236,5 +236,5 @@ export function getChanceHollowWeeklyQuizTasks(level: number, week: number): Pra
 }
 
 export const CHANCE_HOLLOW_WEEKLY_QUIZ_FORMS = ([3, 4, 5, 6] as const).flatMap((level) =>
-  [1, 2, 3, 4, 5, 6].map((week) => ({ level, week, tasks: getChanceHollowWeeklyQuizTasks(level, week)! })),
+  [1, 2, 3, 4, 5].map((week) => ({ level, week, tasks: getChanceHollowWeeklyQuizTasks(level, week)! })),
 );

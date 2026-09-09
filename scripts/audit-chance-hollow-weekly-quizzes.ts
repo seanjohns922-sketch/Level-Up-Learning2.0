@@ -1,13 +1,41 @@
-import { CHANCE_HOLLOW_WEEKLY_QUIZ_FORMS } from "../data/activities/chanceHollow/weeklyQuizBank";
+import { CHANCE_HOLLOW_WEEKLY_QUIZ_FORMS, getChanceHollowWeeklyQuizTasks } from "../data/activities/chanceHollow/weeklyQuizBank";
 import { CHANCE_HOLLOW_PROGRAMS } from "../data/programs/chanceHollow";
 import { isPracticeTaskSafe } from "../lib/task-safety";
+import { isWeekCompleteForRealm, type WeekProgress } from "../lib/program-progress";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const failures: string[] = [];
 
-if (CHANCE_HOLLOW_WEEKLY_QUIZ_FORMS.length !== 24) {
-  failures.push(`Expected 24 Chance Hollow quiz forms, found ${CHANCE_HOLLOW_WEEKLY_QUIZ_FORMS.length}.`);
+if (CHANCE_HOLLOW_WEEKLY_QUIZ_FORMS.length !== 20) {
+  failures.push(`Expected 20 Chance Hollow quiz forms (Weeks 1-5 only), found ${CHANCE_HOLLOW_WEEKLY_QUIZ_FORMS.length}.`);
+}
+for (const level of [3, 4, 5, 6]) {
+  if (getChanceHollowWeeklyQuizTasks(level, 6) !== null) {
+    failures.push(`Level ${level} incorrectly exposes a Week 6 weekly quiz instead of the post-test.`);
+  }
+}
+
+const completedLessonsWithoutQuiz: WeekProgress = {
+  lessonsCompleted: [true, true, true],
+  quizCompleted: false,
+};
+const completedLessonsWithPassedQuiz: WeekProgress = {
+  lessonsCompleted: [true, true, true],
+  quizCompleted: true,
+  quizBestScore: 100,
+};
+if (isWeekCompleteForRealm(completedLessonsWithoutQuiz, "chance", 5)) {
+  failures.push("Chance Hollow Week 5 can be completed without passing its weekly quiz.");
+}
+if (!isWeekCompleteForRealm(completedLessonsWithPassedQuiz, "chance", 5)) {
+  failures.push("Chance Hollow Week 5 is not completed after its lessons and a passed quiz.");
+}
+if (!isWeekCompleteForRealm(completedLessonsWithoutQuiz, "chance", 6)) {
+  failures.push("Chance Hollow Week 6 incorrectly requires a weekly quiz after its lessons.");
+}
+if (isWeekCompleteForRealm({ lessonsCompleted: [true, true, false], quizCompleted: false }, "chance", 6)) {
+  failures.push("Chance Hollow Week 6 completes before all three lessons are finished.");
 }
 
 for (const form of CHANCE_HOLLOW_WEEKLY_QUIZ_FORMS) {
@@ -46,6 +74,9 @@ const registrySource = readFileSync(join(process.cwd(), "lib/realms/realm-regist
 if (programSource.includes("Coming soon: this will check all three Chance Hollow lessons.")) {
   failures.push("Chance Hollow still exposes the old Coming Soon quiz placeholder.");
 }
+if (!programSource.includes("if (weekNum === lastWeek)") || !programSource.includes('title: "Post-Test"')) {
+  failures.push("Chance Hollow Week 6 does not replace the weekly quiz with the post-test.");
+}
 if (!programSource.includes("/chance-hollow/quiz/${encodeURIComponent(curriculumYear)}/${weekNum}")) {
   failures.push("The Chance Hollow demo card does not route to the dedicated weekly quiz.");
 }
@@ -64,4 +95,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("Chance Hollow weekly quiz audit passed: 24 forms, 360 safe questions, five per lesson, with answer voice copy.");
+console.log("Chance Hollow weekly quiz audit passed: 20 forms, 300 safe questions across Weeks 1-5; Week 6 ends with the post-test.");

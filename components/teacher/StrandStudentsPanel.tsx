@@ -137,7 +137,7 @@ type WeeklyPerformanceSummary = {
   correctCount: number;
   incorrectCount: number;
   weeklyAccuracy: number | null;
-  weeklyQuizStatus: "Completed" | "Attempted" | "Not Attempted";
+  weeklyQuizStatus: "Completed" | "Attempted" | "Not Attempted" | "Not Required";
   weeklyQuizCorrect: number | null;
   weeklyQuizTotal: number | null;
   weeklyQuizAccuracy: number | null;
@@ -340,17 +340,26 @@ function countCompletedQuizzes(raw: unknown): number {
   }).length;
 }
 
-function totalProgramActivities(plan: ReturnType<typeof getCurriculumPlan>): number {
+function hasWeeklyQuizForProgramWeek(realmId: string, week: number, finalWeek: number): boolean {
+  return !(realmId === "chance" && week === finalWeek);
+}
+
+function totalProgramActivities(plan: ReturnType<typeof getCurriculumPlan>, realmId: string): number {
   if (plan.length === 0) return 0;
-  return plan.reduce((sum, week) => sum + week.lessons.length + 1, 0);
+  const finalWeek = Math.max(...plan.map((week) => week.week));
+  return plan.reduce(
+    (sum, week) => sum + week.lessons.length + (hasWeeklyQuizForProgramWeek(realmId, week.week, finalWeek) ? 1 : 0),
+    0,
+  );
 }
 
 function overallProgramPercent(
   completedLessons: number,
   completedQuizzes: number,
   plan: ReturnType<typeof getCurriculumPlan>,
+  realmId: string,
 ): number {
-  const totalActivities = totalProgramActivities(plan);
+  const totalActivities = totalProgramActivities(plan, realmId);
   if (totalActivities <= 0) return 0;
   return Math.max(0, Math.min(100, Math.round(((completedLessons + completedQuizzes) / totalActivities) * 100)));
 }
@@ -569,6 +578,7 @@ function buildStudentWeeklyPerformanceSummary({
   completedIds,
   lessonAttempts,
   weekQuiz,
+  weeklyQuizRequired,
   fallbackStatus,
   liveRow,
 }: {
@@ -577,6 +587,7 @@ function buildStudentWeeklyPerformanceSummary({
   completedIds: string[];
   lessonAttempts: Record<string, InsightCarrier>;
   weekQuiz: JsonObject | undefined;
+  weeklyQuizRequired: boolean;
   fallbackStatus: StrandStatus;
   liveRow?: LiveStudentActivityRow | null;
 }): WeeklyPerformanceSummary {
@@ -656,7 +667,9 @@ function buildStudentWeeklyPerformanceSummary({
   const weeklyQuizTotal = getQuizTotal(weekQuiz);
   const weeklyQuizAccuracy = calculateAccuracy(weeklyQuizCorrect, weeklyQuizTotal);
   const weeklyQuizPassed = weekQuiz ? getQuizPassed(weekQuiz) : null;
-  const weeklyQuizStatus: WeeklyPerformanceSummary["weeklyQuizStatus"] = weekQuiz
+  const weeklyQuizStatus: WeeklyPerformanceSummary["weeklyQuizStatus"] = !weeklyQuizRequired
+    ? "Not Required"
+    : weekQuiz
     ? weeklyQuizPassed
       ? "Completed"
       : "Attempted"
@@ -671,7 +684,11 @@ function buildStudentWeeklyPerformanceSummary({
     resolvedMainGap = "No learning activity recorded for this week";
     resolvedSuggestedAction = `Begin Week ${weekNumber}, Lesson 1.`;
   } else if (lessonsCompleted >= lessons.length && lessons.length > 0) {
-    if (weeklyQuizStatus === "Not Attempted") {
+    if (!weeklyQuizRequired) {
+      resolvedStatus = "Week Complete";
+      resolvedMainGap = weekSummary.mainGap === "No attempt data yet" ? "Weekly goals completed" : weekSummary.mainGap;
+      resolvedSuggestedAction = "Take the level post-test when ready.";
+    } else if (weeklyQuizStatus === "Not Attempted") {
       resolvedStatus = "Lessons Complete — Quiz Pending";
       resolvedMainGap = "Weekly quiz not attempted yet";
       resolvedSuggestedAction = "Complete the weekly quiz to finish this week.";
@@ -842,7 +859,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
       const planForStudentYear = workingYear ? getCurriculumPlan(workingYear, genreId) : [];
       const completedQuizzes = prog ? countCompletedQuizzes(prog.quiz_scores) : 0;
-      const pct = !prog || !workingYear || isPlaceholder ? null : overallProgramPercent(strandIds.length, completedQuizzes, planForStudentYear);
+      const pct = !prog || !workingYear || isPlaceholder ? null : overallProgramPercent(strandIds.length, completedQuizzes, planForStudentYear, selectedRealmId ?? genreId);
       const computedStatus = isPlaceholder ? "Not Started" : computeStatus(prog ?? undefined, strandIds.length, pct ?? 0);
       const status = computedStatus === "Not Started" && liveRow ? liveRowToStatus(liveRow) : computedStatus;
       const placementStatus = !snapshot || snapshot.placementState === "unavailable"
@@ -1181,8 +1198,9 @@ function StudentStrandDetail({
     const done = weekLessonsDone(ids, w);
     const expectedLessons = plan.find((entry) => entry.week === w)?.lessons.length ?? 0;
     const q = quizScores[String(w)];
+    const weeklyQuizRequired = hasWeeklyQuizForProgramWeek(supportedRealmId, w, maxWeek);
     if (q && !getQuizPassed(q)) return "Struggled";
-    if (expectedLessons > 0 && done >= expectedLessons && q && getQuizPassed(q)) return "Complete";
+    if (expectedLessons > 0 && done >= expectedLessons && (!weeklyQuizRequired || (q && getQuizPassed(q)))) return "Complete";
     if (expectedLessons > 0 && done >= expectedLessons) return "Quiz Pending";
     if (done > 0 || w === currentWeek) return "In Progress";
     return "Not Started";
@@ -1197,11 +1215,12 @@ function StudentStrandDetail({
     );
   }
   const weekQuiz = quizScores[String(week.week)];
+  const weeklyQuizRequired = hasWeeklyQuizForProgramWeek(supportedRealmId, week.week, maxWeek);
   const canonicalWeekQuizAttempts = (prog.weekly_quiz_attempts ?? [])
     .filter((attempt) => attempt.week === week.week && attempt.workingLevel === yearLabel)
     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
   const weekQuizAttempts = canonicalWeekQuizAttempts.length || getQuizAttemptsCount(weekQuiz);
-  const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;  const overallPct = overallProgramPercent(ids.filter((id) => id.startsWith(prefix)).length, countCompletedQuizzes(prog.quiz_scores), plan);
+  const weekQuizInsight = (weekQuiz?.latestInsight ?? null) as TeacherInsight | null;  const overallPct = overallProgramPercent(ids.filter((id) => id.startsWith(prefix)).length, countCompletedQuizzes(prog.quiz_scores), plan, supportedRealmId);
   const summaryStatus = computeStatus(prog, ids.filter((id) => id.startsWith(prefix)).length, overallPct);
   const weekPerformance = buildStudentWeeklyPerformanceSummary({
     weekNumber: week.week,
@@ -1209,6 +1228,7 @@ function StudentStrandDetail({
     completedIds: ids,
     lessonAttempts,
     weekQuiz,
+    weeklyQuizRequired,
     fallbackStatus: summaryStatus,
     liveRow,
   });
@@ -1293,9 +1313,10 @@ function StudentStrandDetail({
               </div>
             }
           />
-          <SummaryMetric
-            label="Weekly Quiz"
-            value={
+          {weeklyQuizRequired ? (
+            <SummaryMetric
+              label="Weekly Quiz"
+              value={
               <div className="space-y-1.5">
                 <div>{weekPerformance.weeklyQuizStatus}</div>
                 <div>
@@ -1316,8 +1337,11 @@ function StudentStrandDetail({
                       : "Needs Review"}
                 </div>
               </div>
-            }
-          />
+              }
+            />
+          ) : (
+            <SummaryMetric label="Final Week" value="No weekly quiz. Post-test follows the three lessons." />
+          )}
           <SummaryMetric label="Main Gap" value={weekPerformance.mainGap} />
           <SummaryMetric label="Suggested Action" value={weekPerformance.suggestedAction} />
         </div>
@@ -1460,7 +1484,8 @@ function StudentStrandDetail({
           </div>
 
           {/* Quiz row */}
-          <div className="rounded-xl border border-[#E6E8EC] bg-white px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+          {weeklyQuizRequired ? (
+            <div className="rounded-xl border border-[#E6E8EC] bg-white px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-extrabold text-indigo-700 uppercase tracking-[0.14em]">
                 Weekly Quiz
@@ -1505,7 +1530,8 @@ function StudentStrandDetail({
                 Assign Quiz
               </button>
             </div>
-          </div>
+            </div>
+          ) : null}
           {showQuizAttempts ? (
             <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-3">
               {selectedQuizAttempt ? (

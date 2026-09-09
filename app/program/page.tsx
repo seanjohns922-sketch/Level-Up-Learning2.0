@@ -620,13 +620,13 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    unrestrictedMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId);
+    unrestrictedMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1);
 
   const lastAllowedWeek = useMemo(() => {
     if (unrestrictedMode || hasAssignedWeekAccess) return lastWeek;
     let allowed = 1;
     for (let w = 2; w <= lastWeek; w++) {
-      if (isWeekCompleteForRealm(getWeekProgress(store, year, w - 1, realmId), realmId)) allowed = w;
+      if (isWeekCompleteForRealm(getWeekProgress(store, year, w - 1, realmId), realmId, w - 1)) allowed = w;
       else break;
     }
     return allowed;
@@ -662,14 +662,15 @@ function ProgramPage() {
       { type: "lesson" as const, n: 3, title: lessons[2]?.displayTitle ?? lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
     ];
     if (isChanceRealm) {
-      base.push({
-        type: "quiz" as const,
-        n: 1,
-        title: "Weekly Quiz",
-        focus: "15 independent questions: five from each Chance Hollow lesson.",
-      });
       if (weekNum === lastWeek) {
         base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Show your Level mastery and unlock your Legend" });
+      } else {
+        base.push({
+          type: "quiz" as const,
+          n: 1,
+          title: "Weekly Quiz",
+          focus: "15 independent questions: five from each Chance Hollow lesson.",
+        });
       }
       return base;
     }
@@ -811,7 +812,8 @@ function ProgramPage() {
   }
 
   const lessonsDoneCount = progress.lessonsCompleted.filter(Boolean).length;
-  const weekComplete = isWeekCompleteForRealm(progress, realmId);
+  const hasWeeklyQuizThisWeek = !(isChanceRealm && weekNum === lastWeek);
+  const weekComplete = isWeekCompleteForRealm(progress, realmId, weekNum);
 
   useEffect(() => {
     if (isStarpathRealm || !previewMode) return;
@@ -828,8 +830,8 @@ function ProgramPage() {
     if (nextWeek !== savedWeek) updateProgress({ assignedWeek: nextWeek }, canonicalRealmId);
   }, [canonicalRealmId, curriculumYear, hasPersonalizedPlan, isStarpathRealm, lastWeek, previewMode, realmId, store, weekComplete, weekNum]);
 
-  const xp = lessonsDoneCount * 10 + (progress.quizCompleted ? 20 : 0);
-  const totalXp = 50;
+  const xp = lessonsDoneCount * 10 + (hasWeeklyQuizThisWeek && progress.quizCompleted ? 20 : 0);
+  const totalXp = hasWeeklyQuizThisWeek ? 50 : 30;
   const percent = Math.round((xp / totalXp) * 100);
   const realmHomeRoute = isStarpathRealm && starpathProgram
     ? buildStarpathWorldHref({ selectedLevel: starpathProgram.definition.id })
@@ -1171,7 +1173,7 @@ function ProgramPage() {
                         const isUnlocked = unrestrictedMode || (hasAssignedWeekAccess ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
                         const isCurrent = targetWeek === weekNum;
                         const isRequiredWeek = requiredWeeks.includes(targetWeek);
-                        const isDoneWeek = isWeekCompleteForRealm(getWeekProgress(store, year, targetWeek, realmId), realmId);
+                        const isDoneWeek = isWeekCompleteForRealm(getWeekProgress(store, year, targetWeek, realmId), realmId, targetWeek);
                         const status = hasPersonalizedPlan
                           ? isCurrent ? "Current" : isRequiredWeek ? isDoneWeek ? "Required Done" : "Required" : isDoneWeek ? "Optional Done" : requiredWeeksComplete ? "Optional" : "Locked"
                           : isCurrent ? "Current" : isUnlocked ? "Open" : "Locked";
@@ -1294,7 +1296,9 @@ function ProgramPage() {
                 ? weekComplete
                   ? "◆ Completed"
                   : isChanceRealm
-                  ? `${lessonsDoneCount}/3 Lessons`
+                  ? hasWeeklyQuizThisWeek
+                    ? `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : "Quiz Pending"}`
+                    : `${lessonsDoneCount}/3 Lessons`
                   : `${lessonsDoneCount}/3 ${isStarpathRealm ? "Missions" : "Lessons"} · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : isStarpathRealm ? "Voyage Quiz Pending" : "Quiz Pending"}`
                 : "◆ Preview Locked"}
             </p>
@@ -1430,7 +1434,7 @@ function ProgramPage() {
                           </div>
                           <div className="mt-3 flex flex-wrap gap-2">
                             {requiredWeeks.map((requiredWeek) => {
-                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, requiredWeek, realmId), realmId);
+                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, requiredWeek, realmId), realmId, requiredWeek);
                               const unlocked = playableWeeks.includes(requiredWeek) || done || requiredWeek === weekNum;
                               return (
                                 <button
@@ -1481,7 +1485,7 @@ function ProgramPage() {
                                 No optional weeks in this pathway.
                               </div>
                             ) : optionalWeeks.map((optionalWeek) => {
-                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, optionalWeek, realmId), realmId);
+                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, optionalWeek, realmId), realmId, optionalWeek);
                               const optionalPlayable = requiredWeeksComplete || done;
                               return (
                                 <button

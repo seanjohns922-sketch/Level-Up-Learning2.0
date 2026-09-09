@@ -14,7 +14,7 @@ function parseLevel(value: string) {
 
 function parseWeek(value: string) {
   const week = Number(value);
-  return Number.isInteger(week) && week >= 1 && week <= 6 ? week : null;
+  return Number.isInteger(week) && week >= 1 && week <= 5 ? week : null;
 }
 
 export default async function ChanceHollowQuizPage({ params, searchParams }: {

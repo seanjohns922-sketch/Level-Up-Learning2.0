@@ -113,9 +113,15 @@ export function isWeekComplete(p: WeekProgress): boolean {
   return weeklyQuizPassed(p.quizBestScore ?? p.quizScore ?? 0);
 }
 
-export function isWeekCompleteForRealm(p: WeekProgress, realmId: string = "number"): boolean {
+export function isWeekCompleteForRealm(
+  p: WeekProgress,
+  realmId: string = "number",
+  week?: number,
+): boolean {
   if (normalizeRealmId(realmId) === "chance") {
-    return p.lessonsCompleted.slice(0, 3).every(Boolean);
+    const lessonsComplete = p.lessonsCompleted.slice(0, 3).every(Boolean);
+    if (!lessonsComplete) return false;
+    return week === 6 || weeklyQuizPassed(p.quizBestScore ?? p.quizScore ?? 0);
   }
   return isWeekComplete(p);
 }
@@ -154,7 +160,7 @@ export function getCompletedRequiredWeeks(
   teacherAdvancedWeeks: number[] = [],
 ): number[] {
   return normalizeWeekList(requiredWeeks, realmId).filter(
-    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId),
+    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId, week),
   );
 }
 
@@ -168,7 +174,7 @@ export function hasCompletedRequiredWeeks(
   const normalized = normalizeWeekList(requiredWeeks, realmId);
   if (!normalized.length) return false;
   return normalized.every(
-    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId),
+    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId, week),
   );
 }
 
@@ -183,7 +189,7 @@ export function getFirstIncompleteRequiredWeek(
   if (!normalized.length) return null;
   for (const week of normalized) {
     if (teacherAdvancedWeeks.includes(week)) continue;
-    if (!isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId)) return week;
+    if (!isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId, week)) return week;
   }
   return null;
 }

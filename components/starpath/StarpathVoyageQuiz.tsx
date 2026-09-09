@@ -425,7 +425,7 @@ export default function StarpathVoyageQuiz({
                         speechKey={`${realm}-weekly-quiz-${quiz.level}-${quiz.week}`}
                         size="md"
                         label="Read quiz"
-                        className={isStatistica ? "border-amber-200/30 bg-emerald-950/60 text-amber-50 hover:border-amber-200 hover:text-white" : isPattern ? "border-[#39d9a0]/35 bg-[#071719]/70 text-[#d8fff1] hover:border-[#39d9a0] hover:text-white" : isChance ? "border-rose-200/35 bg-[#211321]/70 text-rose-50 hover:border-rose-200 hover:text-white" : "border-cyan-200/30 bg-indigo-950/70 text-cyan-100 hover:border-cyan-200 hover:text-white"}
+                        className={isStatistica ? "border-amber-200/30 bg-emerald-950/60 text-amber-50 hover:border-amber-200 hover:text-white" : isPattern ? "border-[#39d9a0]/35 bg-[#071719]/70 text-[#d8fff1] hover:border-[#39d9a0] hover:text-white" : isChance ? "!border-[#fb7185] !bg-[#4a1f3b] !text-white shadow-[0_0_18px_rgba(251,113,133,0.22)] hover:!border-[#fda4af] hover:!bg-[#63284f] hover:!text-white" : "border-cyan-200/30 bg-indigo-950/70 text-cyan-100 hover:border-cyan-200 hover:text-white"}
                       />
                     </div>
                     <p className="mt-4 max-w-2xl text-base font-semibold leading-7" style={{ color: theme.accentSoft }}>
