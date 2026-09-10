@@ -17,16 +17,17 @@ const ChanceHollowLevel3World = dynamic(() => import("@/components/world3d/Chanc
   loading: () => <div className="grid min-h-screen place-items-center bg-[#211728] font-semibold text-rose-100/80">Opening Chance Hollow...</div>,
 });
 
-const CHANCE_HOLLOW_3D_LEVELS: RealmLevelId[] = ["Year 3", "Year 4", "Year 5"];
+const CHANCE_HOLLOW_3D_LEVELS: RealmLevelId[] = ["Year 3", "Year 4", "Year 5", "Year 6"];
 
 function resolvePreviewLevel(value: string | null): RealmLevelId {
+  if (value === "Level 6" || value === "Year 6") return "Year 6";
   if (value === "Level 5" || value === "Year 5") return "Year 5";
   if (value === "Level 4" || value === "Year 4") return "Year 4";
   return "Year 3";
 }
 
 function isAvailable3DLevel(value: string | null) {
-  return value === null || value === "Level 3" || value === "Year 3" || value === "Level 4" || value === "Year 4" || value === "Level 5" || value === "Year 5";
+  return value === null || value === "Level 3" || value === "Year 3" || value === "Level 4" || value === "Year 4" || value === "Level 5" || value === "Year 5" || value === "Level 6" || value === "Year 6";
 }
 
 export default function ChanceHollow3DEntry({ teacherPreview = false }: { teacherPreview?: boolean }) {

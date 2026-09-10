@@ -17,6 +17,9 @@ export const CHANCE_HOLLOW_DISTRICT_LAYOUT: Record<string, [number, number, numb
   "outcome-vault": [-12.5, 0, -5.5],
   "frequency-forge": [0, 0, -13.5],
   "roller-citadel": [12.5, 0, -5.5],
+  "scale-sanctum": [-12.5, 0, -5.5],
+  "simulation-spire": [0, 0, -13.5],
+  "master-citadel": [12.5, 0, -5.5],
 };
 
 const LEVEL_VISUALS = {
@@ -53,9 +56,21 @@ const LEVEL_VISUALS = {
     floorTint: "#f1efff",
     floorRepeat: [3.4, 3.3] as const,
   },
+  "Year 6": {
+    front: "/images/chancehollow-home-y6.jpeg",
+    rear: "/images/chancehollow-level6-panorama-rear.png",
+    floor: "/images/chancehollow-level6-floor.png",
+    sky: "#24264b",
+    fog: "#18152d",
+    accent: "#d946ef",
+    secondary: "#22d3ee",
+    floorTint: "#f4efff",
+    floorRepeat: [3.4, 3.3] as const,
+  },
 } as const;
 
 export function getChanceHollow3DVisuals(level: RealmLevelId) {
+  if (level === "Year 6") return LEVEL_VISUALS["Year 6"];
   if (level === "Year 5") return LEVEL_VISUALS["Year 5"];
   return level === "Year 4" ? LEVEL_VISUALS["Year 4"] : LEVEL_VISUALS["Year 3"];
 }

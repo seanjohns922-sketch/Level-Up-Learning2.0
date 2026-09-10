@@ -174,7 +174,7 @@ export default function RealmCarousel() {
     if (isChancePreview) {
       setLastRealm(current.id);
       exitReviewMode();
-      const chanceRoute = displayedLevel === "Year 3" || displayedLevel === "Year 4" || displayedLevel === "Year 5" ? "/world/chance-hollow" : "/chance-hollow";
+      const chanceRoute = displayedLevel === "Year 3" || displayedLevel === "Year 4" || displayedLevel === "Year 5" || displayedLevel === "Year 6" ? "/world/chance-hollow" : "/chance-hollow";
       router.push(`${chanceRoute}?teacher_preview=1&level=${encodeURIComponent(displayedLevel)}`);
       return;
     }

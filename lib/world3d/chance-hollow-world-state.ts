@@ -21,17 +21,25 @@ export const CHANCE_HOLLOW_LEVEL_5_DISTRICTS: readonly RealmWorldDistrictDefinit
   { id: "roller-citadel", label: "Roller Citadel", weeks: [5, 6], accent: "#fbbf24", motif: "Evidence and Investigation" },
 ] as const;
 
+export const CHANCE_HOLLOW_LEVEL_6_DISTRICTS: readonly RealmWorldDistrictDefinition[] = [
+  { id: "scale-sanctum", label: "Scale Sanctum", weeks: [1, 2], accent: "#22d3ee", motif: "Calibrate and Calculate" },
+  { id: "simulation-spire", label: "Simulation Spire", weeks: [3, 4], accent: "#d946ef", motif: "Expected, Observed and Variation" },
+  { id: "master-citadel", label: "Master Citadel", weeks: [5, 6], accent: "#fbbf24", motif: "Simulate, Audit and Investigate" },
+] as const;
+
 export function getChanceHollowWorldState(options: { preview?: boolean; level?: RealmLevelId } = {}) {
   const level = options.level ?? "Year 3";
   return getRealmWorldState({
     realmId: "chance",
     level,
     totalWeeks: 6,
-    districts: level === "Year 5"
-      ? CHANCE_HOLLOW_LEVEL_5_DISTRICTS
-      : level === "Year 4"
-        ? CHANCE_HOLLOW_LEVEL_4_DISTRICTS
-        : CHANCE_HOLLOW_DISTRICTS,
+    districts: level === "Year 6"
+      ? CHANCE_HOLLOW_LEVEL_6_DISTRICTS
+      : level === "Year 5"
+        ? CHANCE_HOLLOW_LEVEL_5_DISTRICTS
+        : level === "Year 4"
+          ? CHANCE_HOLLOW_LEVEL_4_DISTRICTS
+          : CHANCE_HOLLOW_DISTRICTS,
     preview: options.preview,
   });
 }

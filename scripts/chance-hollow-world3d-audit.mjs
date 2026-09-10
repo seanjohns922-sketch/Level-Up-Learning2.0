@@ -24,18 +24,21 @@ assert.match(environment, /chancehollow-level4-floor\.png/, "Level 4 must use it
 assert.match(environment, /chancehollow-home-y5\.jpeg/, "Level 5 must retain its canonical forward artwork");
 assert.match(environment, /chancehollow-level5-panorama-rear\.png/, "Level 5 must provide the rear cliff panorama");
 assert.match(environment, /chancehollow-level5-floor\.png/, "Level 5 must use its cyan-channelled citadel floor");
+assert.match(environment, /chancehollow-home-y6\.jpeg/, "Level 6 must retain its canonical forward artwork");
+assert.match(environment, /chancehollow-level6-panorama-rear\.png/, "Level 6 must provide the rear master-citadel panorama");
+assert.match(environment, /chancehollow-level6-floor\.png/, "Level 6 must use its magenta calibration-grid floor");
 assert.match(environment, /RepeatWrapping/, "The trail texture must tile across the playable floor");
 assert.match(world, /SharedRealmWorld3D/, "Chance Hollow must use the shared canonical 3D world flow");
 assert.match(world, /realmId: "chance"/, "Chance Hollow must retain its canonical realm scope");
 assert.match(world, /backgroundImage: visuals\.front/, "Small devices must retain the selected level artwork beneath the WebGL canvas");
 assert.doesNotMatch(world + environment, /saveRealmLessonAttempt|saveRealmAssessment|markLessonComplete|markQuizComplete|supabase\.rpc/, "The 3D world must not create a second learning-state writer");
-assert.match(entry, /\["Year 3", "Year 4", "Year 5"\]/, "The 3D entry must expose Levels 3 through 5");
+assert.match(entry, /\["Year 3", "Year 4", "Year 5", "Year 6"\]/, "The 3D entry must expose Levels 3 through 6");
 assert.match(state, /totalWeeks: 6/, "Chance Hollow must expose exactly six weeks");
-assert.equal((state.match(/weeks: \[\d, \d\]/g) ?? []).length, 9, "Each Chance Hollow level must pair six weeks across three districts");
+assert.equal((state.match(/weeks: \[\d, \d\]/g) ?? []).length, 12, "Each Chance Hollow level must pair six weeks across three districts");
 assert.match(route, /ChanceHollow3DEntry/, "The Chance Hollow 3D route must render its guarded entry");
 assert.match(access, /"statistics", "chance"/, "Chance Hollow must be registered as a supported 3D realm");
 assert.match(towerEntry, /\/world\/chance-hollow\?level=Year%203/, "Tower preview must enter Chance Hollow Level 3 in 3D");
-assert.match(carousel, /displayedLevel === "Year 3" \|\| displayedLevel === "Year 4" \|\| displayedLevel === "Year 5"/, "Realm preview must open Levels 3 through 5 in 3D");
+assert.match(carousel, /displayedLevel === "Year 3" \|\| displayedLevel === "Year 4" \|\| displayedLevel === "Year 5" \|\| displayedLevel === "Year 6"/, "Realm preview must open Levels 3 through 6 in 3D");
 
 for (const asset of [
   "public/images/chancehollow-home-y3.jpeg",
@@ -47,10 +50,13 @@ for (const asset of [
   "public/images/chancehollow-home-y5.jpeg",
   "public/images/chancehollow-level5-panorama-rear.png",
   "public/images/chancehollow-level5-floor.png",
+  "public/images/chancehollow-home-y6.jpeg",
+  "public/images/chancehollow-level6-panorama-rear.png",
+  "public/images/chancehollow-level6-floor.png",
 ]) {
   const details = await stat(new URL(`../${asset}`, import.meta.url));
   assert.ok(details.size > 100_000, `${asset} must contain production artwork`);
   assert.ok(details.size < 8 * 1024 * 1024, `${asset} must remain below the 8 MB scene target`);
 }
 
-console.log("Chance Hollow Levels 3-5 world audit passed.");
+console.log("Chance Hollow Levels 3-6 world audit passed.");
