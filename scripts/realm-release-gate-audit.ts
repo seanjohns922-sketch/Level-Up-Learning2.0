@@ -118,6 +118,7 @@ assert(
 const entryPretestMigration = latestMigrationContaining("create or replace function public.realm_first_level_pretest_enabled(");
 assert(entryPretestMigration.source.includes("p_realm_id = 'statistics' and p_level = 'Year 1'"));
 assert(entryPretestMigration.source.includes("p_realm_id = 'pattern' and p_level = 'Year 3'"));
+assert(entryPretestMigration.source.includes("p_realm_id = 'chance' and p_level = 'Year 3'"));
 
 const sharedProgram = read("app/program/page.tsx");
 assert(
@@ -192,6 +193,10 @@ const patternLessonRoute = read("app/pattern-peaks/lesson/[level]/[week]/[lesson
 const patternQuizRoute = read("app/pattern-peaks/quiz/[level]/[week]/page.tsx");
 const patternLessonShell = read("components/pattern-peaks/PatternPeaksLessonShell.tsx");
 const patternEntry = read("components/pattern-peaks/PatternPeaksEntry.tsx");
+const chanceLessonRoute = read("app/chance-hollow/lesson/[level]/[week]/[lesson]/page.tsx");
+const chanceQuizRoute = read("app/chance-hollow/quiz/[level]/[week]/page.tsx");
+const chanceLessonShell = read("components/chance-hollow/ChanceHollowLessonShell.tsx");
+const chanceEntry = read("components/chance-hollow/ChanceHollowEntry.tsx");
 assert(
   statisticaLessonRoute.includes("CanonicalRealmActivityGate") && statisticaLessonRoute.includes('activity="lesson"'),
   "Statistica lesson routes must enforce canonical week and lesson order.",
@@ -220,6 +225,10 @@ assert(patternQuizRoute.includes("CanonicalRealmActivityGate") && patternQuizRou
 assert(patternLessonShell.includes("saveRealmLessonAttempt(") && patternLessonShell.includes('"pattern"'), "Pattern Peaks lessons must save canonical progress.");
 assert(patternLessonShell.includes("completionKeyRef.current") && patternLessonShell.includes("exitRequestedRef.current"), "Pattern Peaks completion must be idempotent.");
 assert(patternEntry.includes('restoreStudentStateFromServer(identity.studentId, "pattern")') && patternEntry.includes("RealmDashboardLoading"), "Pattern Peaks must restore canonical progress before rendering.");
+assert(chanceLessonRoute.includes("CanonicalRealmActivityGate") && chanceLessonRoute.includes('activity="lesson"'), "Chance Hollow lessons must enforce canonical order.");
+assert(chanceQuizRoute.includes("CanonicalRealmActivityGate") && chanceQuizRoute.includes('activity="quiz"'), "Chance Hollow quizzes must require three lessons.");
+assert(chanceLessonShell.includes("saveRealmLessonAttempt(") && chanceLessonShell.includes('"chance"'), "Chance Hollow lessons must save canonical progress.");
+assert(chanceEntry.includes('restoreStudentStateFromServer(identity.studentId, "chance")') && chanceEntry.includes("RealmDashboardLoading"), "Chance Hollow must restore canonical progress before rendering.");
 const starpathLessonRoute = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
 const starpathQuizRoute = read("app/starpath/quiz/[level]/[week]/page.tsx");
 assert(
@@ -329,6 +338,10 @@ assert(
 assert(
   assessmentCompletion.body.includes("when p_realm_id = 'pattern' then '[1,2,3,4,5,6,7,8]'::jsonb"),
   `Pattern Peaks full pre-test pathways in ${assessmentCompletion.filename} must contain exactly eight weeks.`,
+);
+assert(
+  assessmentCompletion.body.includes("when p_realm_id = 'chance' then '[1,2,3,4,5,6]'::jsonb"),
+  `Chance Hollow full pre-test pathways in ${assessmentCompletion.filename} must contain exactly six weeks.`,
 );
 assert(
   assessmentCompletion.body.includes("public.realm_program_key(effective_progress->>'next_working_level', p_realm_id)"),

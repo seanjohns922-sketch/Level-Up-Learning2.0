@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run qa:realm-release-gate && npm run qa:pattern-peaks-release && npm run qa:pattern-peaks-assessments && npm run qa:statistica-assessments && npm run qa:placement-manager-defaults && npm run qa:ground-level-entry && npm run qa:pretest-pathway && npm run qa:chance-hollow-generation && npm run qa:chance-hollow-answer-voice && npm run qa:chance-hollow-weekly-quizzes && npm run qa:chance-hollow-assessments && npm run qa:chance-hollow-flow && npm run qa:assessment-layout && npm run qa:whole-maths-diagnostic && npm run qa:live-maths-progression",
+    "prebuild": "npm run qa:realm-release-gate && npm run qa:pattern-peaks-release && npm run qa:pattern-peaks-assessments && npm run qa:statistica-assessments && npm run qa:placement-manager-defaults && npm run qa:ground-level-entry && npm run qa:pretest-pathway && npm run qa:chance-hollow-generation && npm run qa:chance-hollow-answer-voice && npm run qa:chance-hollow-weekly-quizzes && npm run qa:chance-hollow-assessments && npm run qa:chance-hollow-flow && npm run qa:chance-hollow-world3d && npm run qa:assessment-layout && npm run qa:whole-maths-diagnostic && npm run qa:live-maths-progression",
     "build": "next build",
     "build:dev": "next build",
     "start": "next start",

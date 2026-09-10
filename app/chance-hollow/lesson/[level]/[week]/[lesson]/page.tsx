@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import ChanceHollowLessonShell from "@/components/chance-hollow/ChanceHollowLessonShell";
+import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
 import { getChanceHollowProgramForYearLabel } from "@/data/programs/chanceHollow";
 
 type PageProps = {
@@ -42,11 +43,13 @@ export default async function ChanceHollowLessonPage({ params }: PageProps) {
   }
 
   return (
-    <ChanceHollowLessonShell
-      level={level.label}
-      levelNumber={level.number}
-      week={week}
-      lesson={lesson}
-    />
+    <CanonicalRealmActivityGate realmId="chance" year={level.label} week={week} lessonNumber={lessonNumber} activity="lesson">
+      <ChanceHollowLessonShell
+        level={level.label}
+        levelNumber={level.number}
+        week={week}
+        lesson={lesson}
+      />
+    </CanonicalRealmActivityGate>
   );
 }

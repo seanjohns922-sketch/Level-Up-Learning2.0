@@ -2,7 +2,7 @@ import { getStarpathLevelForYear } from "@/lib/starpath-levels";
 import { buildStarpathLessonHref } from "@/lib/starpath-routes";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
-export type StudentRealmId = LiveRealmId | "chance";
+export type StudentRealmId = LiveRealmId;
 
 function assertLessonRealmHandled(realmId: never): never {
   throw new Error(`Lesson routing is missing for live realm: ${realmId}`);

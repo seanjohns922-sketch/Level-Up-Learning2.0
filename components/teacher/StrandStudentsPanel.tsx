@@ -854,6 +854,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             ? `${lessonIdPrefix(workingYear)}statistics-`
             : selectedRealmId === "pattern"
               ? `${lessonIdPrefix(workingYear)}pattern-`
+              : selectedRealmId === "chance"
+                ? `${lessonIdPrefix(workingYear)}chance-`
               : lessonIdPrefix(workingYear)
         : "";
       const strandIds = isPlaceholder ? [] : ids.filter((id) => id.startsWith(sPrefix));
@@ -1098,6 +1100,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                             ? `${lessonIdPrefix(workingYear)}statistics-`
                             : selectedRealmId === "pattern"
                               ? `${lessonIdPrefix(workingYear)}pattern-`
+                              : selectedRealmId === "chance"
+                                ? `${lessonIdPrefix(workingYear)}chance-`
                               : lessonIdPrefix(workingYear)
                     }
                     onProgressChanged={onProgressChanged}

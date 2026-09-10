@@ -139,7 +139,7 @@ export default function WholeMathsDiagnosticPanel({
         }
       } catch (error) {
         if (!cancelled) {
-          console.warn("[WholeMathsDiagnostic] Could not load staged diagnostics", error);
+          console.warn("[WholeMathsDiagnostic] Could not load diagnostics", error);
           setLoadError("The diagnostic database foundation has not been deployed yet.");
         }
       } finally {
@@ -192,15 +192,15 @@ export default function WholeMathsDiagnosticPanel({
       <div className="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-white p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-amber-700">
-              <LockKeyhole className="h-4 w-4" aria-hidden /> Staged build
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
+              <CheckCircle2 className="h-4 w-4" aria-hidden /> Six strands connected
             </div>
             <h2 id="whole-maths-diagnostic-title" className="mt-2 text-2xl font-black text-slate-950">
               Whole-Maths Diagnostic
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              The first five genre engines are coded and use their existing level-test questions.
-              Full diagnostic launch and the official Whole-Maths overall remain locked until Probability is complete.
+              All six maths strand engines are connected to their existing level-test questions, including Chance Hollow for Probability.
+              An official Whole-Maths score is calculated only after all six strand results are complete.
             </p>
           </div>
           <div className="rounded-xl border border-amber-200 bg-white px-4 py-3 text-right">
@@ -239,10 +239,10 @@ export default function WholeMathsDiagnosticPanel({
             <button
               type="button"
               disabled
-              title="Scheduling unlocks when all six strand tests are ready."
+              title="Teacher scheduling controls will be released as a separate workflow."
               className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-black text-slate-400"
             >
-              <CalendarDays className="h-4 w-4" aria-hidden /> Set Start / Mid / End
+              <CalendarDays className="h-4 w-4" aria-hidden /> Scheduling controls
               <LockKeyhole className="h-3.5 w-3.5" aria-hidden />
             </button>
           </div>
@@ -279,7 +279,7 @@ export default function WholeMathsDiagnosticPanel({
                 </div>
                 {selectedStrand === "all" && liveLevel == null && diagnosticPoints.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
-                    Complete Whole-Maths tracking will activate when all six strand engines are available.
+                    A complete Whole-Maths live score appears after the student has progress in all six strands.
                   </div>
                 ) : (
                   <div className="overflow-x-auto pb-1">
@@ -399,7 +399,7 @@ export default function WholeMathsDiagnosticPanel({
           ) : sittings.length === 0 ? (
             <div className="p-8 text-center">
               <p className="font-bold text-slate-700">No diagnostic sittings yet</p>
-              <p className="mt-1 text-sm text-slate-500">Launch remains intentionally disabled while two genre tests are missing.</p>
+              <p className="mt-1 text-sm text-slate-500">No Start, Mid or End diagnostic has been scheduled for this class yet.</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">

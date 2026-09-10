@@ -82,6 +82,7 @@ assert.equal(
 
 const migration = read("supabase/migrations/20260903180000_live_maths_progression_tracker.sql");
 const levelBandMigration = read("supabase/migrations/20260903200000_correct_live_progression_level_band.sql");
+const chanceReleaseMigration = read("supabase/migrations/20260910170000_release_chance_hollow_live_realm.sql");
 for (const required of [
   "student_live_maths_progression",
   "refresh_student_live_maths_progression",
@@ -105,6 +106,14 @@ for (const required of [
   "security definer",
 ]) {
   assert(migration.toLowerCase().includes(required.toLowerCase()), `Live progression migration is missing: ${required}`);
+}
+for (const required of [
+  "check (realm_id in ('number', 'measurement', 'space', 'statistics', 'pattern', 'chance'))",
+  "check (strand in ('number', 'measurement', 'space', 'statistics', 'algebra', 'probability'))",
+  "when p_realm_id in ('statistics', 'chance') then 6",
+  "when p_realm_id = 'chance' then 'probability'",
+]) {
+  assert(chanceReleaseMigration.includes(required), `Chance live progression release is missing: ${required}`);
 }
 assert(
   !/set\s+official_level[\s\S]{0,160}(student_lesson_attempts|student_weekly_quiz_attempts)/i.test(migration),

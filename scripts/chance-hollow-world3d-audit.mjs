@@ -37,7 +37,8 @@ assert.match(state, /totalWeeks: 6/, "Chance Hollow must expose exactly six week
 assert.equal((state.match(/weeks: \[\d, \d\]/g) ?? []).length, 12, "Each Chance Hollow level must pair six weeks across three districts");
 assert.match(route, /ChanceHollow3DEntry/, "The Chance Hollow 3D route must render its guarded entry");
 assert.match(access, /"statistics", "chance"/, "Chance Hollow must be registered as a supported 3D realm");
-assert.match(towerEntry, /\/world\/chance-hollow\?level=Year%203/, "Tower preview must enter Chance Hollow Level 3 in 3D");
+assert.match(towerEntry, /\/world\/chance-hollow\?level=\$\{encodeURIComponent\(level\)\}/, "Tower entry must open the student's resolved Chance Hollow level in 3D");
+assert.doesNotMatch(towerEntry, /previewRouteForStagedRealm/, "Live Chance Hollow must not retain its staged-preview bypass");
 assert.match(carousel, /displayedLevel === "Year 3" \|\| displayedLevel === "Year 4" \|\| displayedLevel === "Year 5" \|\| displayedLevel === "Year 6"/, "Realm preview must open Levels 3 through 6 in 3D");
 
 for (const asset of [

@@ -42,7 +42,9 @@ export const DIAGNOSTIC_STRANDS: readonly DiagnosticStrandDefinition[] =
         ? strand.id
         : strand.id === "algebra"
           ? "pattern"
-        : null;
+          : strand.id === "probability"
+            ? "chance"
+            : null;
     return realmId
       ? { strand: strand.id, realmId, available: true }
       : {

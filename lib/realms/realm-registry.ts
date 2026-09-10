@@ -149,8 +149,8 @@ export const REALM_REGISTRY = {
     activityCode: "CH",
     programSuffix: "chance-hollow",
     strand: "Probability",
-    status: "coming_soon",
-    isSelectable: false,
+    status: "live",
+    isSelectable: true,
     totalWeeks: 6,
     lessonsPerWeek: 3,
     hasWeeklyQuiz: true,
@@ -270,7 +270,7 @@ export const REALM_REGISTRY = {
 
 export const CANONICAL_REALM_IDS = Object.keys(REALM_REGISTRY) as CanonicalRealmId[];
 
-export type LiveRealmId = "number" | "measurement" | "space" | "pattern" | "statistics";
+export type LiveRealmId = "number" | "measurement" | "space" | "pattern" | "statistics" | "chance";
 
 export type LiveRealmRegistryEntry = RealmRegistryEntry & {
   realmId: LiveRealmId;

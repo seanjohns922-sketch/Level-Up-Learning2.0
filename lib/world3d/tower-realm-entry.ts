@@ -20,19 +20,17 @@ function appendPreview(route: string, preview: boolean) {
   return `${route}${separator}teacher_preview=1`;
 }
 
-function adaptCanonicalRouteToAvailable3DWorld(route: string, realmId: CanonicalRealmId) {
+function adaptCanonicalRouteToAvailable3DWorld(route: string, realmId: CanonicalRealmId, workingLevel?: string | null) {
   if (realmId === "number" && route === "/number-nexus") return "/world/number-nexus";
   if (realmId === "measurement" && route === "/measurelands") return "/world/measurelands";
   if (realmId === "pattern" && route === "/pattern-peaks") return "/world/pattern-peaks";
   if (realmId === "space" && route === "/starpath") return "/world/starpath";
   if (realmId === "statistics" && route === "/statistica") return "/world/statistica";
-  if (realmId === "chance" && route === "/chance-hollow") return "/world/chance-hollow?level=Year%203";
+  if (realmId === "chance" && route === "/chance-hollow") {
+    const level = /^Year [3-6]$/.test(workingLevel ?? "") ? workingLevel! : "Year 3";
+    return `/world/chance-hollow?level=${encodeURIComponent(level)}`;
+  }
   return route;
-}
-
-function previewRouteForStagedRealm(realmId: CanonicalRealmId) {
-  if (realmId === "chance") return "/world/chance-hollow?level=Year%203";
-  return null;
 }
 
 export async function resolveTowerRealmEntry(args: {
@@ -40,15 +38,6 @@ export async function resolveTowerRealmEntry(args: {
   teacherPreview: boolean;
 }): Promise<TowerRealmEntryResult> {
   const realm = getRealmDefinition(args.realmId);
-  if (args.teacherPreview) {
-    const stagedPreviewRoute = previewRouteForStagedRealm(args.realmId);
-    if (stagedPreviewRoute) {
-      setLastRealm(realm.portalId);
-      exitReviewMode();
-      return { status: "ready", route: appendPreview(stagedPreviewRoute, true) };
-    }
-  }
-
   const availability = getRealmAvailability(realm.portalId);
   if (!availability?.enabled || realm.status !== "live" || !realm.isSelectable) {
     return { status: "unavailable", message: `${realm.name} is coming soon.` };
@@ -80,7 +69,7 @@ export async function resolveTowerRealmEntry(args: {
   return {
     status: "ready",
     route: resolveRealm3DAccess({ realmId: args.realmId, classId: profile?.classId, studentId: identity.studentId, respectReducedMotion: true }).canExplore3D
-      ? adaptCanonicalRouteToAvailable3DWorld(canonicalRoute, args.realmId)
+      ? adaptCanonicalRouteToAvailable3DWorld(canonicalRoute, args.realmId, restored.progress?.year)
       : canonicalRoute,
   };
 }

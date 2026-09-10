@@ -10,6 +10,7 @@ import { highestRosterCurriculumYear, normalizeClassCurriculumYear } from "@/lib
 const root = process.cwd();
 const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
 const migration = read("supabase/migrations/20260906120000_prepare_pattern_peaks_live_realm.sql");
+const chanceReleaseMigration = read("supabase/migrations/20260910170000_release_chance_hollow_live_realm.sql");
 const entryPretestMigration = read("supabase/migrations/20260909120000_enable_entry_level_pretests.sql");
 
 assert.equal(REALM_REGISTRY.pattern.status, "live");
@@ -63,7 +64,7 @@ assert(read("components/teacher/StrandStudentsPanel.tsx").includes("highestRoste
 const towerChamber = read("components/world3d/TowerRealmChamber.tsx");
 assert(!towerChamber.includes('activePortal?.realmId === "pattern" && preview ? "PREVIEW REALM"'), "The live Pattern Peaks portal must never retain its old preview label.");
 const liveProgressionClient = read("lib/whole-maths-diagnostic-client.ts");
-assert(liveProgressionClient.includes('| "pattern";') && liveProgressionClient.includes('| "algebra";'), "Teacher live progression types must accept Pattern Peaks Algebra rows.");
+assert(liveProgressionClient.includes('| "pattern"') && liveProgressionClient.includes('| "algebra"'), "Teacher live progression types must accept Pattern Peaks Algebra rows.");
 for (const route of [
   "app/pattern-peaks/lesson/[level]/[week]/[lesson]/page.tsx",
   "app/pattern-peaks/quiz/[level]/[week]/page.tsx",
@@ -98,10 +99,11 @@ const algebraDiagnostic = DIAGNOSTIC_STRANDS.find((strand) => strand.strand === 
 const probabilityDiagnostic = DIAGNOSTIC_STRANDS.find((strand) => strand.strand === "probability");
 assert.equal(algebraDiagnostic?.realmId, "pattern");
 assert.equal(algebraDiagnostic?.available, true);
-assert.equal(probabilityDiagnostic?.available, false);
-assert.equal(diagnosticAvailableWeight(), 131);
+assert.equal(probabilityDiagnostic?.realmId, "chance");
+assert.equal(probabilityDiagnostic?.available, true);
+assert.equal(diagnosticAvailableWeight(), 139);
 assert(migration.includes("when v_strand = 'algebra' then 'pattern'"));
-assert(migration.includes("where requested.strand = 'probability'"));
+assert(chanceReleaseMigration.includes("when v_strand = 'probability' then 'chance'"));
 
 const collection = read("app/legends/pattern-peaks/page.tsx");
 assert(collection.includes('readProgress("pattern")'));

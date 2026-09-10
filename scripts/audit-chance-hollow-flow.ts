@@ -19,8 +19,8 @@ const teacherReplay = read("components/teacher/AssessmentReplay.tsx");
 const teacherSnapshot = read("lib/teacher/teacher-student-snapshot.ts");
 const realmCompat = read("lib/realm-progress-compat.ts");
 
-assert.equal(REALM_REGISTRY.chance.status, "coming_soon");
-assert.equal(REALM_REGISTRY.chance.isSelectable, false);
+assert.equal(REALM_REGISTRY.chance.status, "live");
+assert.equal(REALM_REGISTRY.chance.isSelectable, true);
 assert.equal(REALM_REGISTRY.chance.totalWeeks, 6);
 assert.equal(REALM_REGISTRY.chance.lessonsPerWeek, 3);
 assert.equal(isFirstLevelPretestEnabled("chance", "Year 3"), true);
@@ -81,4 +81,21 @@ assert(read("components/parent/ParentPortal.tsx").includes('? "probability"'));
 assert(read("components/school/SchoolAnalyticsDashboard.tsx").includes('chance: "Chance Hollow"'));
 assert(read("app/api/school/[schoolId]/analytics/export/route.ts").includes('["chance", "Probability"]'));
 
-console.log("Chance Hollow flow audit passed: preview isolation, canonical persistence, assessment evidence, progression, teacher replay, parent reporting and school exports are launch-prepared.");
+const entry = read("components/chance-hollow/ChanceHollowEntry.tsx");
+assert(entry.includes('restoreStudentStateFromServer(identity.studentId, "chance")'));
+assert(entry.includes('realmId: "chance"'));
+assert(entry.includes("RealmDashboardLoading"));
+const lessonRoute = read("app/chance-hollow/lesson/[level]/[week]/[lesson]/page.tsx");
+const quizRoute = read("app/chance-hollow/quiz/[level]/[week]/page.tsx");
+assert(lessonRoute.includes("CanonicalRealmActivityGate") && lessonRoute.includes('activity="lesson"'));
+assert(quizRoute.includes("CanonicalRealmActivityGate") && quizRoute.includes('activity="quiz"'));
+assert(!read("components/world/ChanceHollowMap.tsx").includes("only: true"));
+
+const latestReleaseMigration = read("supabase/migrations/20260910170000_release_chance_hollow_live_realm.sql");
+assert(latestReleaseMigration.includes("when 'chance' then 'Year 3'"));
+assert(latestReleaseMigration.includes("p_realm_id = 'chance' and p_level = 'Year 3'"));
+assert(latestReleaseMigration.includes("when v_strand = 'probability' then 'chance'"));
+assert(latestReleaseMigration.includes("when p_realm_id = 'chance' then 'probability'"));
+assert(latestReleaseMigration.includes("when p_realm_id in ('statistics', 'chance') then 6"));
+
+console.log("Chance Hollow live-flow audit passed: canonical entry, guarded progression, assessments, Probability diagnostics, teacher replay, parent reporting and school exports are connected.");

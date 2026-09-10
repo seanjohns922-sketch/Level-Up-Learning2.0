@@ -55,10 +55,10 @@ assert.equal(AC_DESCRIPTOR_COUNTS_BY_LEVEL[4].space, 3, "AC9 Year 4 Space must c
 assert.equal(AC_DESCRIPTOR_COUNTS_BY_LEVEL[6].algebra, 3, "AC9 Year 6 Algebra must carry 3 descriptors.");
 assert.deepEqual(
   AVAILABLE_DIAGNOSTIC_STRANDS.map((strand) => strand.strand),
-  ["number", "measurement", "space", "statistics", "algebra"],
-  "The five built maths strands must be active in the staged diagnostic.",
+  ["number", "measurement", "space", "statistics", "algebra", "probability"],
+  "All six built maths strands must be active in the diagnostic.",
 );
-assert.equal(diagnosticAvailableWeight(), 131, "The staged five strands must cover 131 of 139 curriculum points.");
+assert.equal(diagnosticAvailableWeight(), 139, "The six live strands must cover all 139 curriculum points.");
 
 assert.equal(
   computeWholeMathsLevel({ number: 4, measurement: 4.5, space: 4, statistics: 4.5, algebra: 3.5, probability: 4 }),
@@ -152,7 +152,7 @@ assert.equal(noDemotion.placementChanged, false);
 assert.equal(noDemotion.flag, "review_support");
 
 for (const strand of AVAILABLE_DIAGNOSTIC_STRANDS) {
-  const firstLevel = strand.strand === "algebra" ? 3 : 1;
+  const firstLevel = strand.strand === "algebra" || strand.strand === "probability" ? 3 : 1;
   for (let level = firstLevel; level <= 6; level += 1) {
     const questions = getDiagnosticQuestions(strand.strand, `Year ${level}`, "audit-sitting");
     assert.equal(questions.length, 10, `${strand.strand} Year ${level} must draw 10 questions from its existing level test.`);
@@ -174,20 +174,21 @@ assert(
   "The state-curriculum work must remain sequenced after the complete AC9 diagnostic.",
 );
 const panel = read("components/teacher/WholeMathsDiagnosticPanel.tsx");
-assert(panel.includes("Full diagnostic launch and the official Whole-Maths overall remain locked"), "The staged UI must not imply a complete six-strand release.");
+assert(panel.includes("All six maths strand engines are connected"), "The teacher UI must show that Probability is connected.");
 const studentInstrument = read("app/diagnostic/page.tsx");
 assert(!studentInstrument.includes("isDemoPreviewMode"), "The diagnostic must not have a demo-only persistence shortcut.");
-const migration = read("supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql");
+const migration = read("supabase/migrations/20260910170000_release_chance_hollow_live_realm.sql");
+const diagnosticFoundation = read("supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql");
 assert(!migration.includes("available_weight"), "Curriculum weights must not be duplicated in the database migration.");
 for (const required of [
   "security definer",
   "perform public.assert_student_access(p_student_id)",
   "v_mastery constant integer := 85",
   "v_floor constant integer := 40",
-  "Whole-Maths Diagnostic is staged until all six strand tests are available",
-  "if v_placement then",
+  "when v_strand = 'probability' then 'chance'",
 ]) {
   assert(migration.toLowerCase().includes(required.toLowerCase()), `Diagnostic migration is missing: ${required}`);
 }
+assert(diagnosticFoundation.toLowerCase().includes("if v_placement then"), "Secure diagnostic completion must retain guarded placement application.");
 
-console.log("Whole-Maths Diagnostic audit passed: five strands staged, six-strand overall locked, and server placement guarded.");
+console.log("Whole-Maths Diagnostic audit passed: all six strands connected, official overall requires six results, and server placement remains guarded.");
