@@ -14,6 +14,9 @@ export const CHANCE_HOLLOW_DISTRICT_LAYOUT: Record<string, [number, number, numb
   "chance-gate": [-12.5, 0, -5.5],
   "outcome-caves": [0, 0, -13.5],
   "trial-falls": [12.5, 0, -5.5],
+  "outcome-vault": [-12.5, 0, -5.5],
+  "frequency-forge": [0, 0, -13.5],
+  "roller-citadel": [12.5, 0, -5.5],
 };
 
 const LEVEL_VISUALS = {
@@ -26,7 +29,7 @@ const LEVEL_VISUALS = {
     accent: "#fb7185",
     secondary: "#22d3ee",
     floorTint: "#e8e2f0",
-    floorRepeat: [3.2, 2.35] as const,
+    floorRepeat: [3.2, 3.1] as const,
   },
   "Year 4": {
     front: "/images/chancehollow-home-y4.jpeg",
@@ -37,11 +40,23 @@ const LEVEL_VISUALS = {
     accent: "#22d3ee",
     secondary: "#d946ef",
     floorTint: "#f1efff",
-    floorRepeat: [3.45, 2.5] as const,
+    floorRepeat: [3.45, 3.3] as const,
+  },
+  "Year 5": {
+    front: "/images/chancehollow-home-y5.jpeg",
+    rear: "/images/chancehollow-level5-panorama-rear.png",
+    floor: "/images/chancehollow-level5-floor.png",
+    sky: "#29233f",
+    fog: "#171526",
+    accent: "#22d3ee",
+    secondary: "#d946ef",
+    floorTint: "#f1efff",
+    floorRepeat: [3.4, 3.3] as const,
   },
 } as const;
 
 export function getChanceHollow3DVisuals(level: RealmLevelId) {
+  if (level === "Year 5") return LEVEL_VISUALS["Year 5"];
   return level === "Year 4" ? LEVEL_VISUALS["Year 4"] : LEVEL_VISUALS["Year 3"];
 }
 
@@ -79,11 +94,11 @@ function ChanceHollowGround({ floor, tint, repeat, accent, secondary }: { floor:
   return (
     <group>
       <mesh position={[0, -0.58, 4]}>
-        <boxGeometry args={[72, 1.2, 58]} />
+        <boxGeometry args={[72, 1.2, 76]} />
         <meshStandardMaterial color="#251a2b" roughness={0.92} />
       </mesh>
       <mesh position={[0, 0.08, 4]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[72, 58]} />
+        <planeGeometry args={[72, 76]} />
         <meshBasicMaterial map={texture} color={tint} toneMapped={false} />
       </mesh>
       <mesh position={[0, 0.11, 1.5]} rotation={[-Math.PI / 2, 0, 0]}>
