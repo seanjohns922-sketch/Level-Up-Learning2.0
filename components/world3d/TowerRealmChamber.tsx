@@ -15,7 +15,7 @@ import { TowerRealmChamberEnvironment } from "@/components/world3d/TowerRealmCha
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
-import type { CanonicalRealmId } from "@/lib/realms/realm-registry";
+import { isLiveRealmId, type CanonicalRealmId } from "@/lib/realms/realm-registry";
 import {
   getTowerPortalByInteractionId,
   TOWER_CHAMBER_CONFIG,
@@ -139,7 +139,7 @@ function TowerScene({
 
 function buildProgressSummary(realmId: CanonicalRealmId, preview: boolean) {
   void preview;
-  if (realmId !== "number" && realmId !== "measurement" && realmId !== "space" && realmId !== "statistics" && realmId !== "pattern") return "COMING SOON";
+  if (!isLiveRealmId(realmId)) return "COMING SOON";
   const progress = readProgress(realmId);
   if (!progress) return "BEGIN JOURNEY";
   const week = progress.assignedWeek ? ` · WEEK ${progress.assignedWeek}` : "";

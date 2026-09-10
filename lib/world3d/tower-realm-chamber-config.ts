@@ -80,7 +80,7 @@ const PORTAL_PRESENTATION: readonly TowerPortalPresentation[] = [
     position: [18.1, 0, -15.8],
     rotationY: -0.85,
     returnSpawn: [15.1, 0.75, -13.2],
-    posterAsset: "/images/tower-portal-sealed.jpg",
+    posterAsset: "/images/chancehollow-home-y3.jpeg",
     previewVideo: "/videos/realms/chance-hollow.mp4",
     accent: "#eb79d7",
     accentSoft: "#713b6c",

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [environment, world, entry, state, route, access, towerEntry, carousel] = await Promise.all([
+const [environment, world, entry, state, route, access, towerEntry, towerConfig, towerChamber, carousel] = await Promise.all([
   read("components/world3d/ChanceHollowEnvironment.tsx"),
   read("components/world3d/ChanceHollowLevel3World.tsx"),
   read("components/world3d/ChanceHollow3DEntry.tsx"),
@@ -10,6 +10,8 @@ const [environment, world, entry, state, route, access, towerEntry, carousel] = 
   read("app/world/chance-hollow/page.tsx"),
   read("lib/world3d/access.ts"),
   read("lib/world3d/tower-realm-entry.ts"),
+  read("lib/world3d/tower-realm-chamber-config.ts"),
+  read("components/world3d/TowerRealmChamber.tsx"),
   read("components/realms/RealmCarousel.tsx"),
 ]);
 
@@ -39,6 +41,8 @@ assert.match(route, /ChanceHollow3DEntry/, "The Chance Hollow 3D route must rend
 assert.match(access, /"statistics", "chance"/, "Chance Hollow must be registered as a supported 3D realm");
 assert.match(towerEntry, /\/world\/chance-hollow\?level=\$\{encodeURIComponent\(level\)\}/, "Tower entry must open the student's resolved Chance Hollow level in 3D");
 assert.doesNotMatch(towerEntry, /previewRouteForStagedRealm/, "Live Chance Hollow must not retain its staged-preview bypass");
+assert.match(towerConfig, /realmId: "chance"[\s\S]*posterAsset: "\/images\/chancehollow-home-y3\.jpeg"/, "The Chance Hollow tower portal must use real realm artwork");
+assert.match(towerChamber, /if \(!isLiveRealmId\(realmId\)\) return "COMING SOON"/, "Tower progress labels must follow the live realm registry");
 assert.match(carousel, /displayedLevel === "Year 3" \|\| displayedLevel === "Year 4" \|\| displayedLevel === "Year 5" \|\| displayedLevel === "Year 6"/, "Realm preview must open Levels 3 through 6 in 3D");
 
 for (const asset of [
