@@ -26,11 +26,12 @@ function adaptCanonicalRouteToAvailable3DWorld(route: string, realmId: Canonical
   if (realmId === "pattern" && route === "/pattern-peaks") return "/world/pattern-peaks";
   if (realmId === "space" && route === "/starpath") return "/world/starpath";
   if (realmId === "statistics" && route === "/statistica") return "/world/statistica";
+  if (realmId === "chance" && route === "/chance-hollow") return "/world/chance-hollow?level=Year%203";
   return route;
 }
 
 function previewRouteForStagedRealm(realmId: CanonicalRealmId) {
-  if (realmId === "chance") return "/chance-hollow?level=Year%203";
+  if (realmId === "chance") return "/world/chance-hollow?level=Year%203";
   return null;
 }
 

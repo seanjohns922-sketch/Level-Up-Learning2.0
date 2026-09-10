@@ -27,7 +27,7 @@ export type Realm3DAccessInput = {
   respectReducedMotion?: boolean;
 };
 
-const SUPPORTED_REALMS = new Set<CanonicalRealmId>(["number", "measurement", "space", "pattern", "statistics"]);
+const SUPPORTED_REALMS = new Set<CanonicalRealmId>(["number", "measurement", "space", "pattern", "statistics", "chance"]);
 function parseAllowList(value: string | undefined) {
   return new Set(
     (value ?? "")

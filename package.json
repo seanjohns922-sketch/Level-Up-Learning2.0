@@ -20,6 +20,7 @@
     "qa:tower-world3d": "node scripts/tower-world3d-audit.mjs",
     "qa:world3d-navigation": "node scripts/world3d-navigation-audit.mjs",
     "qa:world3d-level-mode": "node scripts/world3d-level-mode-audit.mjs",
+    "qa:chance-hollow-world3d": "node scripts/chance-hollow-world3d-audit.mjs",
     "qa:measurelands-world3d": "node scripts/measurelands-world3d-audit.mjs",
     "qa:starpath-world3d": "node scripts/starpath-world3d-audit.mjs",
     "qa:realm-weekly-quiz": "node scripts/realm-weekly-quiz-chrome-audit.mjs",

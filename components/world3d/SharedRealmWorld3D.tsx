@@ -46,6 +46,7 @@ export type SharedRealmWorld3DConfig = {
   preview: boolean;
   accent: string;
   sky: string;
+  backgroundImage?: string;
   worldState: RealmWorldState;
   refreshWorldState: () => RealmWorldState;
   worldHref: string;
@@ -217,7 +218,7 @@ export default function SharedRealmWorld3D({ config }: { config: SharedRealmWorl
   }, [config.guidedAdventure, config.level, config.realmId, config.worldHref, router, worldState.weekNodes]);
 
   return (
-    <main data-world3d-root data-shared-realm-world3d={config.realmId} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", backgroundColor: config.sky }}>
+    <main data-world3d-root data-shared-realm-world3d={config.realmId} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", backgroundColor: config.sky, backgroundImage: config.backgroundImage ? `url(${config.backgroundImage})` : undefined, backgroundPosition: "center", backgroundSize: "cover" }}>
       <Canvas camera={{ position: [0, 6, 12], fov: 52 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ alpha: true, antialias: quality !== "low", powerPreference: "high-performance" }} onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}>
         <SharedRealmScene config={liveConfig} activeId={activeId} selectedDistrictId={selectedDistrictId} moveInput={moveInput} quality={quality} onNearest={setActiveId} />
       </Canvas>
