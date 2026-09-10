@@ -85,7 +85,7 @@ function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
       term: "outcome set",
       title: "The question decides which outcomes we list",
       meaning: "An outcome set is the full list of results that answer your question — every one, and each listed only once.",
-      example: "Draw one counter from this bag. If you ask for the colour there are 3 outcomes (red, blue, cyan); if you ask for the exact counter there are 6.",
+      example: "Draw one counter from this bag. If you ask for the colour there are 3 outcomes (red, blue, green); if you ask for the exact counter there are 6.",
       exampleExplanation: "The same draw gives a different outcome set depending on what you choose to record.",
       chanceVisual: { type: "bag", counters: ["#ef5b62", "#ef5b62", "#3b82f6", "#22d3ee", "#22d3ee", "#22d3ee"] },
     };
@@ -93,7 +93,7 @@ function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
       term: "unequally likely",
       title: "Possible does not always mean equally likely",
       meaning: "Outcomes are unequally likely when they occupy different numbers of equal regions, faces, cards or counters.",
-      example: "A spinner with 4 pink regions and 2 cyan regions is more likely to land on pink.",
+      example: "A spinner with 4 pink regions and 2 blue regions is more likely to land on pink.",
       exampleExplanation: "Pink has more winning regions, so it has more ways to occur.",
       chanceVisual: { type: "spinner", wedges: ["#d946ef", "#d946ef", "#d946ef", "#d946ef", "#22d3ee", "#22d3ee"] },
     };
@@ -109,13 +109,13 @@ function conceptFor(levelNumber: number, week: number): LessonConceptIntroData {
       term: "relative frequency",
       title: "Frequency compares a result with all trials",
       meaning: "Relative frequency records how many times an outcome occurred out of the total number of repeated trials.",
-      example: "If cyan occurs 7 times in 20 spins, its relative frequency is 7 out of 20.",
+      example: "If blue occurs 7 times in 20 spins, its relative frequency is 7 out of 20.",
       exampleExplanation: "The outcome count is the numerator and all completed trials form the denominator.",
       chanceModel: {
-        visual: { type: "frequency", labels: ["Cyan", "Other"], counts: [7, 13], total: 20 },
+        visual: { type: "frequency", labels: ["Blue", "Other"], counts: [7, 13], total: 20 },
         numerator: 7,
         denominator: 20,
-        winningLabel: "7 cyan results",
+        winningLabel: "7 blue results",
         totalLabel: "20 completed trials",
       },
     };

@@ -46,6 +46,7 @@ for (const form of CHANCE_HOLLOW_WEEKLY_QUIZ_FORMS) {
   if (form.tasks.length !== 15) failures.push(`${label} has ${form.tasks.length} questions instead of 15.`);
 
   form.tasks.forEach((task, index) => {
+    if (/\bcyan\b/i.test(JSON.stringify(task))) failures.push(`${label} question ${index + 1} must call the colour blue.`);
     if (task.kind !== "chanceQuizQuestion") failures.push(`${label} question ${index + 1} is not an independent Chance quiz item.`);
     if (!isPracticeTaskSafe(task)) failures.push(`${label} question ${index + 1} fails task safety.`);
     if (!("speakText" in task) || typeof task.speakText !== "string" || !task.speakText.includes("Options:")) {

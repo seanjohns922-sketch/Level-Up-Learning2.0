@@ -30,7 +30,7 @@ type ItemCore = {
 
 const CORRECT_TOKEN = "__chance_hollow_task_correct__";
 const PINK = "#d946ef";
-const CYAN = "#22d3ee";
+const BLUE = "#22d3ee";
 const AMBER = "#fbbf24";
 const GREEN = "#34d399";
 
@@ -52,7 +52,7 @@ function interaction(task: PracticeTask, structure: string, review: string): Ite
   return { prompt, task, structure, review };
 }
 
-function spinner(winning: number, total: number, win = PINK, lose = CYAN): ChanceVisual {
+function spinner(winning: number, total: number, win = PINK, lose = BLUE): ChanceVisual {
   return { type: "spinner", wedges: Array.from({ length: total }, (_, index) => index < winning ? win : lose) };
 }
 
@@ -81,26 +81,26 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
       return mcq(
         post ? "Which event is impossible on this spinner?" : "Which event is impossible on a normal die?",
         post ? "Landing on green" : "Rolling an 8",
-        post ? ["Landing on pink", "Landing on cyan", "Landing on either shown colour"] : ["Rolling a 2", "Rolling an even number", "Rolling less than 6"],
+        post ? ["Landing on pink", "Landing on blue", "Landing on either shown colour"] : ["Rolling a 2", "Rolling an even number", "Rolling less than 6"],
         post ? spinner(3, 6) : { type: "die", face: 5 },
         "chance-word-impossible",
         "Impossible means the result is not included among the possible outcomes.",
       );
     case 2:
       return mcq(
-        post ? "Five of these six counters are cyan. Which word best describes drawing cyan?" : "Seven of these eight sectors are pink. Which word best describes landing on pink?",
+        post ? "Five of these six counters are blue. Which word best describes drawing blue?" : "Seven of these eight sectors are pink. Which word best describes landing on pink?",
         "Likely",
         ["Impossible", "Unlikely", "Certain"],
-        post ? bag([CYAN, 5], [PINK, 1]) : spinner(7, 8),
+        post ? bag([BLUE, 5], [PINK, 1]) : spinner(7, 8),
         "chance-word-likely",
         "Likely events have a strong chance but are not guaranteed.",
       );
     case 3:
       return mcq(
-        post ? "One of these eight counters is amber. Which word best describes drawing amber?" : "One of these six sectors is cyan. Which word best describes landing on cyan?",
+        post ? "One of these eight counters is amber. Which word best describes drawing amber?" : "One of these six sectors is blue. Which word best describes landing on blue?",
         "Unlikely",
         ["Certain", "Impossible", "Likely"],
-        post ? bag([AMBER, 1], [PINK, 7]) : spinner(1, 6, CYAN, PINK),
+        post ? bag([AMBER, 1], [PINK, 7]) : spinner(1, 6, BLUE, PINK),
         "chance-word-unlikely",
         "Unlikely events can happen, but have fewer chances than the other outcomes.",
       );
@@ -125,15 +125,15 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 6: {
       const task: PracticeTask = {
         kind: "chanceCompare",
-        prompt: post ? "Which tool can produce exactly three different colour outcomes?" : "Which tool can produce both pink and cyan?",
+        prompt: post ? "Which tool can produce exactly three different colour outcomes?" : "Which tool can produce both pink and blue?",
         tools: post
           ? [
               { label: "Spinner A", visual: spinner(2, 4) },
-              { label: "Bag B", visual: bag([PINK, 2], [CYAN, 2], [AMBER, 2]) },
+              { label: "Bag B", visual: bag([PINK, 2], [BLUE, 2], [AMBER, 2]) },
               { label: "Spinner C", visual: spinner(1, 5, GREEN, GREEN) },
             ]
           : [
-              { label: "Bag A", visual: bag([PINK, 3], [CYAN, 2]) },
+              { label: "Bag A", visual: bag([PINK, 3], [BLUE, 2]) },
               { label: "Bag B", visual: bag([AMBER, 4]) },
             ],
         options: post ? ["Spinner A", "Bag B", "Spinner C"] : ["Bag A", "Bag B"],
@@ -144,10 +144,10 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     }
     case 7:
       return mcq(
-        post ? "A bag contains red, blue and green counters. Which result is possible?" : "A spinner has pink and cyan sectors. Which result is possible?",
-        post ? "Drawing green" : "Landing on cyan",
+        post ? "A bag contains red, blue and green counters. Which result is possible?" : "A spinner has pink and blue sectors. Which result is possible?",
+        post ? "Drawing green" : "Landing on blue",
         post ? ["Drawing orange", "Rolling a six", "Drawing a square"] : ["Landing on amber", "Rolling a four", "Drawing a card"],
-        post ? bag([PINK, 2], [CYAN, 2], [GREEN, 1]) : spinner(2, 5),
+        post ? bag([PINK, 2], [BLUE, 2], [GREEN, 1]) : spinner(2, 5),
         "possible-outcome-match",
         "A possible outcome must appear on the chance tool.",
       );
@@ -157,10 +157,10 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
         prompt: post ? "Which event is more likely?" : "Which event is less likely?",
         tools: [
           { label: "Pink", visual: post ? spinner(5, 6) : spinner(4, 6) },
-          { label: "Cyan", visual: post ? spinner(1, 6, CYAN, PINK) : spinner(2, 6, CYAN, PINK) },
+          { label: "Blue", visual: post ? spinner(1, 6, BLUE, PINK) : spinner(2, 6, BLUE, PINK) },
         ],
-        options: ["Pink", "Cyan", "They have the same chance"],
-        answer: post ? "Pink" : "Cyan",
+        options: ["Pink", "Blue", "They have the same chance"],
+        answer: post ? "Pink" : "Blue",
         feedback: { correct: "Response recorded.", wrong: "Response recorded." },
       };
       return interaction(task, "compare-likelihood-apparatus", "Compare how much of the spinner belongs to each event.");
@@ -168,8 +168,8 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 9:
       return mcq(
         post ? "Before ten spins, which is the most sensible prediction?" : "Before six coin tosses, which is a sensible prediction?",
-        post ? "Pink will probably appear more often, but cyan can still occur" : "Heads and tails could both occur",
-        post ? ["Pink must appear exactly eight times", "Cyan cannot occur", "The results must alternate"] : ["Every toss will be heads", "Heads and tails must alternate", "The result will be a six"],
+        post ? "Pink will probably appear more often, but blue can still occur" : "Heads and tails could both occur",
+        post ? ["Pink must appear exactly eight times", "Blue cannot occur", "The results must alternate"] : ["Every toss will be heads", "Heads and tails must alternate", "The result will be a six"],
         post ? spinner(4, 5) : { type: "coin" },
         "sensible-prediction",
         "A prediction should use the tool's likelihood without claiming an exact result is guaranteed.",
@@ -180,8 +180,8 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
         prompt: post ? "Which tool makes amber most likely?" : "Which tool gives pink the greatest chance?",
         tools: post
           ? [
-              { label: "Tool A", visual: spinner(2, 6, AMBER, CYAN) },
-              { label: "Tool B", visual: bag([AMBER, 5], [CYAN, 1]) },
+              { label: "Tool A", visual: spinner(2, 6, AMBER, BLUE) },
+              { label: "Tool B", visual: bag([AMBER, 5], [BLUE, 1]) },
             ]
           : [
               { label: "Tool A", visual: spinner(2, 6) },
@@ -195,10 +195,10 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     }
     case 11:
       return mcq(
-        post ? "Pink occurred 9 times and cyan 6 times. Which result occurred most often?" : "Heads occurred 7 times and tails 5 times. Which result occurred most often?",
+        post ? "Pink occurred 9 times and blue 6 times. Which result occurred most often?" : "Heads occurred 7 times and tails 5 times. Which result occurred most often?",
         post ? "Pink" : "Heads",
-        post ? ["Cyan", "They were equal", "It cannot be known"] : ["Tails", "They were equal", "The next toss"],
-        post ? { type: "frequency", labels: ["Pink", "Cyan"], counts: [9, 6], total: 15 } : { type: "frequency", labels: ["Heads", "Tails"], counts: [7, 5], total: 12 },
+        post ? ["Blue", "They were equal", "It cannot be known"] : ["Tails", "They were equal", "The next toss"],
+        post ? { type: "frequency", labels: ["Pink", "Blue"], counts: [9, 6], total: 15 } : { type: "frequency", labels: ["Heads", "Tails"], counts: [7, 5], total: 12 },
         "read-experiment-frequency",
         "The outcome with the larger recorded frequency occurred most often in that trial.",
       );
@@ -243,9 +243,9 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
         kind: "chanceAutoTally",
         prompt: post ? "Predict the most likely colour, run 16 spins, then check the tally." : "Run 12 spins and identify the outcome recorded most often.",
         tool: "spinner",
-        draw: post ? ["pink", "pink", "pink", "cyan"] : ["pink", "pink", "cyan"],
+        draw: post ? ["pink", "pink", "pink", "blue"] : ["pink", "pink", "blue"],
         spins: post ? 16 : 12,
-        labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "cyan", name: "Cyan", colour: CYAN }],
+        labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }],
         mode: post ? "predictMost" : "most",
       }, "run-and-read-trial", "Run every trial and use the completed tally as evidence.");
     case 17:
@@ -253,10 +253,10 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
         kind: "chanceSpinTally",
         prompt: post ? "Spin eight times and record every result in the correct tally row." : "Toss the coin six times and record every result.",
         tool: post ? "spinner" : "coin",
-        draw: post ? ["pink", "pink", "cyan", "amber"] : ["heads", "tails"],
+        draw: post ? ["pink", "pink", "blue", "amber"] : ["heads", "tails"],
         spins: post ? 8 : 6,
         labels: post
-          ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "cyan", name: "Cyan", colour: CYAN }, { key: "amber", name: "Amber", colour: AMBER }]
+          ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }, { key: "amber", name: "Amber", colour: AMBER }]
           : [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }],
       }, "record-repeated-trial", "Record each observed result once in its matching tally row.");
     case 18:
@@ -264,19 +264,19 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
         kind: "chanceAutoTally",
         prompt: post ? "Run two identical 20-spin trials and compare their frequencies." : "Run two identical 12-toss trials and decide whether the totals match.",
         tool: post ? "spinner" : "coin",
-        draw: post ? ["pink", "pink", "cyan", "cyan"] : ["heads", "tails"],
+        draw: post ? ["pink", "pink", "blue", "blue"] : ["heads", "tails"],
         spins: post ? 20 : 12,
         labels: post
-          ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "cyan", name: "Cyan", colour: CYAN }]
+          ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }]
           : [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }],
         mode: "compareTrials",
       }, "compare-repeated-trials", "Identical chance methods can still produce different observed frequencies.");
     default:
       return mcq(
-        post ? "A class repeats a fair coin trial. Which conclusion is best supported?" : "A spinner landed on cyan only twice in one short trial. What is the safest conclusion?",
-        post ? "Different groups may record different totals even with the same method" : "Cyan was uncommon in this trial, but another trial may differ",
-        post ? ["Every group must get equal totals", "The first group controls later results", "Any difference proves cheating"] : ["Cyan is impossible", "The spinner is definitely broken", "Cyan can never occur again"],
-        post ? { type: "coin" } : spinner(2, 5, CYAN, PINK),
+        post ? "A class repeats a fair coin trial. Which conclusion is best supported?" : "A spinner landed on blue only twice in one short trial. What is the safest conclusion?",
+        post ? "Different groups may record different totals even with the same method" : "Blue was uncommon in this trial, but another trial may differ",
+        post ? ["Every group must get equal totals", "The first group controls later results", "Any difference proves cheating"] : ["Blue is impossible", "The spinner is definitely broken", "Blue can never occur again"],
+        post ? { type: "coin" } : spinner(2, 5, BLUE, PINK),
         "variation-transfer",
         "Conclusions from chance data should describe the evidence without claiming future certainty.",
       );
@@ -290,27 +290,27 @@ function levelFour(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 0:
       return mcq(post ? "Why are the six numbers equally likely on a fair die?" : "Why are heads and tails equally likely on a fair coin?", post ? "Each number has one equal face" : "Each outcome has one equal face", post ? ["The die follows a pattern", "Six is heavier", "The first roll decides"] : ["The coin alternates", "Heads is lighter", "The first toss decides"], post ? { type: "die", face: 4 } : { type: "coin" }, "equal-coin-outcomes", "Equal outcome shares create equal chances.");
     case 1:
-      return mcq(post ? "Which spinner gives pink and cyan equal chances?" : "Are pink and cyan equally likely on this spinner?", post ? "Spinner with 3 pink and 3 cyan equal sectors" : "Yes, each colour has 2 equal sectors", post ? ["Spinner with 4 pink and 2 cyan", "Spinner with 5 pink and 1 cyan", "Any two-colour spinner"] : ["No, pink is brighter", "No, cyan was drawn last", "It cannot be known"], spinner(post ? 3 : 2, post ? 6 : 4), "equal-spinner-outcomes", "Count equal-sized sectors for each event.");
+      return mcq(post ? "Which spinner gives pink and blue equal chances?" : "Are pink and blue equally likely on this spinner?", post ? "Spinner with 3 pink and 3 blue equal sectors" : "Yes, each colour has 2 equal sectors", post ? ["Spinner with 4 pink and 2 blue", "Spinner with 5 pink and 1 blue", "Any two-colour spinner"] : ["No, pink is brighter", "No, blue was drawn last", "It cannot be known"], spinner(post ? 3 : 2, post ? 6 : 4), "equal-spinner-outcomes", "Count equal-sized sectors for each event.");
     case 2:
-      return mcq(post ? "Which colour has the greater chance of being drawn?" : "Are these two colours equally likely to be drawn?", post ? "Pink" : "No, pink has more counters", post ? ["Cyan", "They are equal", "Neither"] : ["Yes, both colours are possible", "Yes, because the bag is closed", "No, cyan has more counters"], bag([PINK, 5 + base], [CYAN, 2]), "unequal-bag-outcomes", "Possible outcomes are not equally likely when their counts differ.");
+      return mcq(post ? "Which colour has the greater chance of being drawn?" : "Are these two colours equally likely to be drawn?", post ? "Pink" : "No, pink has more counters", post ? ["Blue", "They are equal", "Neither"] : ["Yes, both colours are possible", "Yes, because the bag is closed", "No, blue has more counters"], bag([PINK, 5 + base], [BLUE, 2]), "unequal-bag-outcomes", "Possible outcomes are not equally likely when their counts differ.");
     case 3:
-      return mcq(post ? "How many possible number outcomes are on a normal die?" : "How many colour outcomes are possible in this bag?", post ? "6" : "3", post ? ["1", "3", "12"] : ["2", "6", "8"], post ? { type: "die", face: 2 } : bag([PINK, 2], [CYAN, 3], [AMBER, 1]), "count-possible-outcomes", "Count each distinct outcome once.");
+      return mcq(post ? "How many possible number outcomes are on a normal die?" : "How many colour outcomes are possible in this bag?", post ? "6" : "3", post ? ["1", "3", "12"] : ["2", "6", "8"], post ? { type: "die", face: 2 } : bag([PINK, 2], [BLUE, 3], [AMBER, 1]), "count-possible-outcomes", "Count each distinct outcome once.");
     case 4:
-      return mcq(post ? "Which event is least likely?" : "Which event is most likely?", post ? "Amber" : "Pink", post ? ["Pink", "Cyan", "All are equal"] : ["Cyan", "Amber", "All are equal"], bag([PINK, 4], [CYAN, 2], [AMBER, 1]), "compare-unequal-outcomes", "Compare the number of counters belonging to each event.");
+      return mcq(post ? "Which event is least likely?" : "Which event is most likely?", post ? "Amber" : "Pink", post ? ["Pink", "Blue", "All are equal"] : ["Blue", "Amber", "All are equal"], bag([PINK, 4], [BLUE, 2], [AMBER, 1]), "compare-unequal-outcomes", "Compare the number of counters belonging to each event.");
     case 5:
-      return interaction({ kind: "chanceCompare", prompt: post ? "Which tool gives cyan the greater chance?" : "Which tool gives pink an equal chance with cyan?", tools: post ? [{ label: "Tool A", visual: spinner(1, 4, CYAN, PINK) }, { label: "Tool B", visual: spinner(3, 5, CYAN, PINK) }] : [{ label: "Tool A", visual: spinner(2, 4) }, { label: "Tool B", visual: spinner(3, 4) }], options: ["Tool A", "Tool B"], answer: post ? "Tool B" : "Tool A", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "compare-chance-tools", "Compare winning parts with all equal parts in each tool.");
+      return interaction({ kind: "chanceCompare", prompt: post ? "Which tool gives blue the greater chance?" : "Which tool gives pink an equal chance with blue?", tools: post ? [{ label: "Tool A", visual: spinner(1, 4, BLUE, PINK) }, { label: "Tool B", visual: spinner(3, 5, BLUE, PINK) }] : [{ label: "Tool A", visual: spinner(2, 4) }, { label: "Tool B", visual: spinner(3, 4) }], options: ["Tool A", "Tool B"], answer: post ? "Tool B" : "Tool A", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "compare-chance-tools", "Compare winning parts with all equal parts in each tool.");
     case 6:
-      return mcq(post ? "A game pays pink on 4 sectors and cyan on 2. Is it fair?" : "A game awards one player heads and the other tails. Is it fair?", post ? "No, pink has more winning sectors" : "Yes, both players have one equally likely outcome", post ? ["Yes, both colours can occur", "Yes, because there are two players", "No, cyan is impossible"] : ["No, heads always wins", "No, tails is rarer", "Only if heads wins first"], post ? spinner(4, 6) : { type: "coin" }, "judge-game-fairness", "A fair game gives players equal total chances, not merely possible outcomes.");
+      return mcq(post ? "A game pays pink on 4 sectors and blue on 2. Is it fair?" : "A game awards one player heads and the other tails. Is it fair?", post ? "No, pink has more winning sectors" : "Yes, both players have one equally likely outcome", post ? ["Yes, both colours can occur", "Yes, because there are two players", "No, blue is impossible"] : ["No, heads always wins", "No, tails is rarer", "Only if heads wins first"], post ? spinner(4, 6) : { type: "coin" }, "judge-game-fairness", "A fair game gives players equal total chances, not merely possible outcomes.");
     case 7:
-      return interaction({ kind: "chanceBuildFair", prompt: post ? "Repair the spinner so both players have equal winning parts." : "Build a fair two-colour spinner.", colours: [{ key: "pink", name: "Pink", colour: PINK }, { key: "cyan", name: "Cyan", colour: CYAN }], maxParts: post ? 8 : 6 }, "construct-fair-spinner", "Give both players the same number of equal sectors.");
+      return interaction({ kind: "chanceBuildFair", prompt: post ? "Repair the spinner so both players have equal winning parts." : "Build a fair two-colour spinner.", colours: [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }], maxParts: post ? 8 : 6 }, "construct-fair-spinner", "Give both players the same number of equal sectors.");
     case 8:
-      return mcq(post ? "Which change makes this 5-to-3 spinner fair?" : "Which change makes a bag with 4 pink and 2 cyan counters fair?", post ? "Change one pink sector to cyan" : "Add 2 cyan counters", post ? ["Add another pink sector", "Remove one cyan sector", "Make the pointer longer"] : ["Add 2 pink counters", "Remove both cyan counters", "Shake the bag longer"], post ? spinner(5, 8) : bag([PINK, 4], [CYAN, 2]), "repair-fair-game", "Adjust outcome counts until both players have equal shares.");
+      return mcq(post ? "Which change makes this 5-to-3 spinner fair?" : "Which change makes a bag with 4 pink and 2 blue counters fair?", post ? "Change one pink sector to blue" : "Add 2 blue counters", post ? ["Add another pink sector", "Remove one blue sector", "Make the pointer longer"] : ["Add 2 pink counters", "Remove both blue counters", "Shake the bag longer"], post ? spinner(5, 8) : bag([PINK, 4], [BLUE, 2]), "repair-fair-game", "Adjust outcome counts until both players have equal shares.");
     case 9:
       return interaction({ kind: "chanceCompare", prompt: post ? "Which game is fair?" : "Which tool gives both colours the same chance?", tools: [{ label: "Game A", visual: spinner(4, 6) }, { label: "Game B", visual: spinner(3, 6) }], options: ["Game A", "Game B"], answer: "Game B", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "select-fair-game", "A fair two-player game splits all equal outcomes evenly.");
     case 10:
-      return mcq(post ? "Pink and cyan each cover 4 of 8 sectors. What is true?" : "Red has 3 counters and blue has 3 counters. What is true?", "The outcomes have the same chance", ["The first colour is more likely", "The brighter colour is more likely", "Neither outcome is possible"], post ? spinner(4, 8) : bag([PINK, 3], [CYAN, 3]), "same-chance-different-tool", "Equal counts of equally likely parts produce the same chance.");
+      return mcq(post ? "Pink and blue each cover 4 of 8 sectors. What is true?" : "Red has 3 counters and blue has 3 counters. What is true?", "The outcomes have the same chance", ["The first colour is more likely", "The brighter colour is more likely", "Neither outcome is possible"], post ? spinner(4, 8) : bag([PINK, 3], [BLUE, 3]), "same-chance-different-tool", "Equal counts of equally likely parts produce the same chance.");
     case 11:
-      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run the fair spinner twice and compare the two trial results." : "Run the fair coin experiment and compare the recorded frequencies.", tool: post ? "spinner" : "coin", draw: post ? ["pink", "cyan"] : ["heads", "tails"], spins: post ? 16 : 12, labels: post ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "cyan", name: "Cyan", colour: CYAN }] : [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: post ? "compareTrials" : "compareFrequencies" }, "fair-tool-experiment", "Fair outcomes can have different short-run frequencies.");
+      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run the fair spinner twice and compare the two trial results." : "Run the fair coin experiment and compare the recorded frequencies.", tool: post ? "spinner" : "coin", draw: post ? ["pink", "blue"] : ["heads", "tails"], spins: post ? 16 : 12, labels: post ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }] : [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: post ? "compareTrials" : "compareFrequencies" }, "fair-tool-experiment", "Fair outcomes can have different short-run frequencies.");
     case 12:
       return interaction({ kind: "chanceBuildFair", prompt: post ? "Fix Chanzia's eight-part spinner before the game begins." : "Give both players equal chances on this spinner.", colours: [{ key: "amber", name: "Amber", colour: AMBER }, { key: "green", name: "Green", colour: GREEN }], maxParts: 8 }, "fair-game-repair", "Balance the equal sectors between both players.");
     case 13:
@@ -318,15 +318,15 @@ function levelFour(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 14:
       return mcq(post ? "A fair game is played 20 times and one player wins 12. What is the best conclusion?" : "A fair coin gives 7 heads in 10 tosses. Is the coin proven unfair?", post ? "A fair game can still have unequal short-run results" : "No, short trials can vary", post ? ["The game cannot be fair", "The player must win the next game", "Fair means exactly 10 wins each"] : ["Yes, fair coins always split exactly", "Yes, heads will now always win", "No, because heads is impossible"], post ? { type: "frequency", labels: ["Player 1", "Player 2"], counts: [12, 8], total: 20 } : { type: "frequency", labels: ["Heads", "Tails"], counts: [7, 3], total: 10 }, "fairness-versus-results", "Judge fairness from the tool's chance structure, while recognising short-run variation.");
     case 15:
-      return interaction({ kind: "chanceDependentDraw", prompt: post ? "Replace the drawn pink counter, then decide what happens to the next pink chance." : "Draw and replace the cyan counter. Decide whether the next draw's chances change.", bag: [{ key: "pink", name: "Pink", colour: PINK, count: 3 }, { key: "cyan", name: "Cyan", colour: CYAN, count: 2 }], drawKey: post ? "pink" : "cyan", action: "replace", askKey: post ? "pink" : "cyan", question: "How does replacing the counter affect the next draw?", options: ["The chance stays the same", "The chance increases", "The chance decreases"], answer: "The chance stays the same", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "replacement-independent", "Replacing the counter restores the original bag before the next draw.");
+      return interaction({ kind: "chanceDependentDraw", prompt: post ? "Replace the drawn pink counter, then decide what happens to the next pink chance." : "Draw and replace the blue counter. Decide whether the next draw's chances change.", bag: [{ key: "pink", name: "Pink", colour: PINK, count: 3 }, { key: "blue", name: "Blue", colour: BLUE, count: 2 }], drawKey: post ? "pink" : "blue", action: "replace", askKey: post ? "pink" : "blue", question: "How does replacing the counter affect the next draw?", options: ["The chance stays the same", "The chance increases", "The chance decreases"], answer: "The chance stays the same", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "replacement-independent", "Replacing the counter restores the original bag before the next draw.");
     case 16:
-      return interaction({ kind: "chanceDependentDraw", prompt: post ? "Keep the drawn cyan counter out, then decide what happens to cyan's next chance." : "Keep the drawn pink counter out. Decide how the next pink chance changes.", bag: [{ key: "pink", name: "Pink", colour: PINK, count: 4 }, { key: "cyan", name: "Cyan", colour: CYAN, count: 3 }], drawKey: post ? "cyan" : "pink", action: "keep", askKey: post ? "cyan" : "pink", question: "How does keeping the counter out affect the next draw?", options: ["The chance decreases", "The chance stays the same", "The chance becomes certain"], answer: "The chance decreases", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "removal-dependent", "Removing a matching counter leaves fewer matching outcomes for the next draw.");
+      return interaction({ kind: "chanceDependentDraw", prompt: post ? "Keep the drawn blue counter out, then decide what happens to blue's next chance." : "Keep the drawn pink counter out. Decide how the next pink chance changes.", bag: [{ key: "pink", name: "Pink", colour: PINK, count: 4 }, { key: "blue", name: "Blue", colour: BLUE, count: 3 }], drawKey: post ? "blue" : "pink", action: "keep", askKey: post ? "blue" : "pink", question: "How does keeping the counter out affect the next draw?", options: ["The chance decreases", "The chance stays the same", "The chance becomes certain"], answer: "The chance decreases", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "removal-dependent", "Removing a matching counter leaves fewer matching outcomes for the next draw.");
     case 17:
-      return interaction({ kind: "chanceDependentDraw", prompt: post ? "Keep a pink counter out and decide what happens to cyan's chance." : "Keep a cyan counter out and decide what happens to pink's chance.", bag: [{ key: "pink", name: "Pink", colour: PINK, count: 3 }, { key: "cyan", name: "Cyan", colour: CYAN, count: 3 }], drawKey: post ? "pink" : "cyan", action: "keep", askKey: post ? "cyan" : "pink", question: "How does the other colour's chance change?", options: ["The chance increases", "The chance decreases", "The chance stays the same"], answer: "The chance increases", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "other-outcome-after-removal", "Removing one colour makes the other colour a larger share of what remains.");
+      return interaction({ kind: "chanceDependentDraw", prompt: post ? "Keep a pink counter out and decide what happens to blue's chance." : "Keep a blue counter out and decide what happens to pink's chance.", bag: [{ key: "pink", name: "Pink", colour: PINK, count: 3 }, { key: "blue", name: "Blue", colour: BLUE, count: 3 }], drawKey: post ? "pink" : "blue", action: "keep", askKey: post ? "blue" : "pink", question: "How does the other colour's chance change?", options: ["The chance increases", "The chance decreases", "The chance stays the same"], answer: "The chance increases", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "other-outcome-after-removal", "Removing one colour makes the other colour a larger share of what remains.");
     case 18:
       return interaction({ kind: "chanceDependentDraw", prompt: post ? "Replace after every draw and identify the relationship between draws." : "Keep each drawn counter out and identify the relationship between draws.", bag: [{ key: "amber", name: "Amber", colour: AMBER, count: 2 }, { key: "green", name: "Green", colour: GREEN, count: 2 }], drawKey: "amber", action: post ? "replace" : "keep", askKey: "green", question: "Does the first draw change the chance on the next draw?", options: post ? ["No, replacement restores the bag", "Yes, the bag loses a counter", "Yes, green becomes impossible"] : ["Yes, the contents have changed", "No, every draw is identical", "No, colours never affect chance"], answer: post ? "No, replacement restores the bag" : "Yes, the contents have changed", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "dependent-independent-classification", "Check whether the chance tool is restored before the next event.");
     default:
-      return interaction({ kind: "chanceDependentDraw", prompt: post ? "A game removes each winning counter. Work out whether later turns keep the same chance." : "A game replaces every counter after drawing. Work out whether later turns keep the same chance.", bag: [{ key: "pink", name: "Pink", colour: PINK, count: 2 }, { key: "cyan", name: "Cyan", colour: CYAN, count: 4 }], drawKey: "pink", action: post ? "keep" : "replace", askKey: "pink", question: "What happens to the chance on the following turn?", options: post ? ["It changes because the bag has changed", "It stays the same", "It becomes certain"] : ["It stays the same because the bag is restored", "It decreases every turn", "It becomes impossible"], answer: post ? "It changes because the bag has changed" : "It stays the same because the bag is restored", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "event-relationship-transfer", "Decide whether the first event changes the outcome set for the next event.");
+      return interaction({ kind: "chanceDependentDraw", prompt: post ? "A game removes each winning counter. Work out whether later turns keep the same chance." : "A game replaces every counter after drawing. Work out whether later turns keep the same chance.", bag: [{ key: "pink", name: "Pink", colour: PINK, count: 2 }, { key: "blue", name: "Blue", colour: BLUE, count: 4 }], drawKey: "pink", action: post ? "keep" : "replace", askKey: "pink", question: "What happens to the chance on the following turn?", options: post ? ["It changes because the bag has changed", "It stays the same", "It becomes certain"] : ["It stays the same because the bag is restored", "It decreases every turn", "It becomes impossible"], answer: post ? "It changes because the bag has changed" : "It stays the same because the bag is restored", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "event-relationship-transfer", "Decide whether the first event changes the outcome set for the next event.");
   }
 }
 
@@ -336,13 +336,13 @@ function levelFive(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 0:
       return mcq(post ? "Two coins are tossed. Which is the complete ordered outcome set?" : "A coin and a die are used. Which list describes the outcome types?", post ? "HH, HT, TH, TT" : "A coin face paired with a die number", post ? ["HH, TT", "H, T", "HH, HT, TT"] : ["Only heads", "Only numbers", "One colour only"], post ? { type: "diceGrid", mode: "sum", highlight: 2 } : { type: "dicePair", left: 1, right: 6 }, "complete-compound-outcomes", "A complete outcome set includes every possible paired result once.");
     case 1:
-      return mcq(post ? "Which statement about this spinner is correct?" : "Which colour outcomes are possible from this bag?", post ? "Pink is more likely because it has 5 of 8 sectors" : "Pink, cyan and amber", post ? ["Both colours are equally likely", "Cyan is impossible", "Pink is certain"] : ["Pink only", "Six different outcomes", "Green and orange"], post ? spinner(5, 8) : bag([PINK, 3], [CYAN, 2], [AMBER, 1]), "outcome-set-and-likelihood", "List distinct outcomes, then compare how many equally likely parts belong to each.");
+      return mcq(post ? "Which statement about this spinner is correct?" : "Which colour outcomes are possible from this bag?", post ? "Pink is more likely because it has 5 of 8 sectors" : "Pink, blue and amber", post ? ["Both colours are equally likely", "Blue is impossible", "Pink is certain"] : ["Pink only", "Six different outcomes", "Green and orange"], post ? spinner(5, 8) : bag([PINK, 3], [BLUE, 2], [AMBER, 1]), "outcome-set-and-likelihood", "List distinct outcomes, then compare how many equally likely parts belong to each.");
     case 2:
       return interaction({ kind: "chanceCompare", prompt: post ? "Which tool has unequally likely colour outcomes?" : "Which tool has equally likely colour outcomes?", tools: [{ label: "Tool A", visual: spinner(3, 6) }, { label: "Tool B", visual: spinner(4, 6) }], options: ["Tool A", "Tool B"], answer: post ? "Tool B" : "Tool A", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "equal-versus-unequal-tools", "Compare the number of equal parts assigned to each outcome.");
     case 3:
-      return mcq(post ? "Pink covers 6 of 10 equal sectors. What is its probability?" : "Cyan covers 3 of 8 equal sectors. What is its probability?", post ? "6/10" : "3/8", post ? ["10/6", "4/10", "6/4"] : ["8/3", "5/8", "3/5"], post ? spinner(6, 10) : spinner(3, 8, CYAN, PINK), "probability-as-fraction", "The numerator counts winning outcomes and the denominator counts all equally likely outcomes.");
+      return mcq(post ? "Pink covers 6 of 10 equal sectors. What is its probability?" : "Blue covers 3 of 8 equal sectors. What is its probability?", post ? "6/10" : "3/8", post ? ["10/6", "4/10", "6/4"] : ["8/3", "5/8", "3/5"], post ? spinner(6, 10) : spinner(3, 8, BLUE, PINK), "probability-as-fraction", "The numerator counts winning outcomes and the denominator counts all equally likely outcomes.");
     case 4:
-      return mcq(post ? "A bag has 4 winning counters and 6 others. What is the winning probability?" : "A bag has 3 amber counters and 5 other counters. What is P(amber)?", post ? "4/10" : "3/8", post ? ["6/10", "4/6", "10/4"] : ["5/8", "3/5", "8/3"], post ? bag([PINK, 4], [CYAN, 6]) : bag([AMBER, 3], [CYAN, 5]), "bag-probability-fraction", "Compare the target count with the total number of counters.");
+      return mcq(post ? "A bag has 4 winning counters and 6 others. What is the winning probability?" : "A bag has 3 amber counters and 5 other counters. What is P(amber)?", post ? "4/10" : "3/8", post ? ["6/10", "4/6", "10/4"] : ["5/8", "3/5", "8/3"], post ? bag([PINK, 4], [BLUE, 6]) : bag([AMBER, 3], [BLUE, 5]), "bag-probability-fraction", "Compare the target count with the total number of counters.");
     case 5:
       return mcq(post ? "On two dice, why is a sum of 7 more likely than a sum of 2?" : "On two dice, why are grouped sums not all equally likely?", post ? "Six ordered pairs make 7, but only one makes 2" : "Different sums contain different numbers of ordered pairs", post ? ["Seven is a larger number", "The dice prefer middle numbers", "A sum of 2 is impossible"] : ["Large sums are always certain", "Each sum has one pair", "The second die copies the first"], { type: "diceGrid", mode: "sum", highlight: post ? 7 : 6 }, "two-dice-grouped-outcomes", "Count ordered pairs in the 6 by 6 outcome grid.");
     case 6:
@@ -350,27 +350,27 @@ function levelFive(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 7:
       return mcq(post ? "Which fraction describes the chance of rolling an even number?" : "Which fraction describes rolling a number greater than 4?", post ? "3/6" : "2/6", post ? ["2/6", "3/3", "6/3"] : ["4/6", "2/4", "6/2"], { type: "die", face: post ? 4 : 5 }, "die-event-fraction", "Count all die faces satisfying the event over all six equally likely faces.");
     case 8:
-      return interaction({ kind: "chanceCompare", prompt: post ? "Which spinner gives the target the larger probability?" : "Which bag gives amber the smaller probability?", tools: post ? [{ label: "Tool A", visual: spinner(3, 8) }, { label: "Tool B", visual: spinner(5, 8) }] : [{ label: "Bag A", visual: bag([AMBER, 3], [CYAN, 3]) }, { label: "Bag B", visual: bag([AMBER, 1], [CYAN, 5]) }], options: post ? ["Tool A", "Tool B", "They are equal"] : ["Bag A", "Bag B", "They are equal"], answer: post ? "Tool B" : "Bag B", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "compare-fraction-chances", "Compare winning outcomes as a share of each tool's total outcomes.");
+      return interaction({ kind: "chanceCompare", prompt: post ? "Which spinner gives the target the larger probability?" : "Which bag gives amber the smaller probability?", tools: post ? [{ label: "Tool A", visual: spinner(3, 8) }, { label: "Tool B", visual: spinner(5, 8) }] : [{ label: "Bag A", visual: bag([AMBER, 3], [BLUE, 3]) }, { label: "Bag B", visual: bag([AMBER, 1], [BLUE, 5]) }], options: post ? ["Tool A", "Tool B", "They are equal"] : ["Bag A", "Bag B", "They are equal"], answer: post ? "Tool B" : "Bag B", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "compare-fraction-chances", "Compare winning outcomes as a share of each tool's total outcomes.");
     case 9:
       return mcq(post ? "A race gives Player A sums 6, 7 and 8, and Player B sum 2 only. What is wrong?" : "A game says every possible sum on two dice has the same chance. What is the error?", post ? "Player A has many more winning ordered pairs" : "Different sums contain different numbers of ordered pairs", post ? ["The players have the same chance", "Sum 2 is impossible", "The dice need more faces"] : ["Every sum has exactly one pair", "Sums cannot be outcomes", "Two dice always match"], { type: "diceGrid", mode: "sum", highlight: 7 }, "detect-grouped-outcome-bias", "Fairness depends on the number of equally likely ordered pairs, not the number of labels.");
     case 10:
-      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run 30 spins and identify the most frequent outcome." : "Run 20 spins and compare the outcome frequencies.", tool: "spinner", draw: ["pink", "pink", "pink", "cyan", "cyan"], spins: post ? 30 : 20, labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "cyan", name: "Cyan", colour: CYAN }], mode: post ? "most" : "compareFrequencies" }, "run-frequency-experiment", "Use the completed trial record, not a prediction, to answer.");
+      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run 30 spins and identify the most frequent outcome." : "Run 20 spins and compare the outcome frequencies.", tool: "spinner", draw: ["pink", "pink", "pink", "blue", "blue"], spins: post ? 30 : 20, labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }], mode: post ? "most" : "compareFrequencies" }, "run-frequency-experiment", "Use the completed trial record, not a prediction, to answer.");
     case 11:
-      return mcq(post ? "Cyan occurred 18 times in 30 trials. What is its relative frequency?" : "Pink occurred 12 times in 20 trials. What is its relative frequency?", post ? "18/30" : "12/20", post ? ["30/18", "12/30", "18/12"] : ["20/12", "8/20", "12/8"], post ? { type: "frequency", labels: ["Cyan", "Other"], counts: [18, 12], total: 30 } : { type: "frequency", labels: ["Pink", "Other"], counts: [12, 8], total: 20 }, "relative-frequency-fraction", "Relative frequency is target occurrences over all completed trials.");
+      return mcq(post ? "Blue occurred 18 times in 30 trials. What is its relative frequency?" : "Pink occurred 12 times in 20 trials. What is its relative frequency?", post ? "18/30" : "12/20", post ? ["30/18", "12/30", "18/12"] : ["20/12", "8/20", "12/8"], post ? { type: "frequency", labels: ["Blue", "Other"], counts: [18, 12], total: 30 } : { type: "frequency", labels: ["Pink", "Other"], counts: [12, 8], total: 20 }, "relative-frequency-fraction", "Relative frequency is target occurrences over all completed trials.");
     case 12:
-      return interaction({ kind: "chancePredictCount", prompt: post ? "Predict pink results from the spinner, then run 30 spins against Chanzia." : "Predict cyan results, then run 20 spins and compare.", wedges: post ? [PINK, PINK, PINK, CYAN, CYAN] : [CYAN, CYAN, PINK, PINK], targetKey: post ? PINK : CYAN, targetName: post ? "Pink" : "Cyan", spins: post ? 30 : 20 }, "predict-and-test-frequency", "Use the target's share to predict, then compare the prediction with observed results.");
+      return interaction({ kind: "chancePredictCount", prompt: post ? "Predict pink results from the spinner, then run 30 spins against Chanzia." : "Predict blue results, then run 20 spins and compare.", wedges: post ? [PINK, PINK, PINK, BLUE, BLUE] : [BLUE, BLUE, PINK, PINK], targetKey: post ? PINK : BLUE, targetName: post ? "Pink" : "Blue", spins: post ? 30 : 20 }, "predict-and-test-frequency", "Use the target's share to predict, then compare the prediction with observed results.");
     case 13:
-      return mcq(post ? "Trial A produced 14/20 pink and Trial B produced 11/20. Which had the greater pink frequency?" : "Trial A produced 7/10 cyan and Trial B produced 12/20. Which had the greater cyan frequency?", "Trial A", ["Trial B", "They were equal", "The denominators make comparison impossible"], post ? { type: "frequency", labels: ["Trial A", "Trial B"], counts: [14, 11], total: 20 } : { type: "frequency", labels: ["Trial A", "Trial B"], counts: [7, 6], total: 10 }, "compare-relative-frequencies", "Compare relative frequencies using equivalent denominators or decimal size.");
+      return mcq(post ? "Trial A produced 14/20 pink and Trial B produced 11/20. Which had the greater pink frequency?" : "Trial A produced 7/10 blue and Trial B produced 12/20. Which had the greater blue frequency?", "Trial A", ["Trial B", "They were equal", "The denominators make comparison impossible"], post ? { type: "frequency", labels: ["Trial A", "Trial B"], counts: [14, 11], total: 20 } : { type: "frequency", labels: ["Trial A", "Trial B"], counts: [7, 6], total: 10 }, "compare-relative-frequencies", "Compare relative frequencies using equivalent denominators or decimal size.");
     case 14:
-      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run two 25-spin trials and compare how much their frequencies vary." : "Run two 20-toss trials and inspect the variation.", tool: post ? "spinner" : "coin", draw: post ? ["pink", "cyan"] : ["heads", "tails"], spins: post ? 25 : 20, labels: post ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "cyan", name: "Cyan", colour: CYAN }] : [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: "compareTrials" }, "compare-frequency-variation", "Repeated experiments can vary even when the chance model is unchanged.");
+      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run two 25-spin trials and compare how much their frequencies vary." : "Run two 20-toss trials and inspect the variation.", tool: post ? "spinner" : "coin", draw: post ? ["pink", "blue"] : ["heads", "tails"], spins: post ? 25 : 20, labels: post ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }] : [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: "compareTrials" }, "compare-frequency-variation", "Repeated experiments can vary even when the chance model is unchanged.");
     case 15:
-      return interaction({ kind: "chanceCompare", prompt: post ? "Which tool's design best explains a pink frequency near 75%?" : "Which tool's design best explains cyan appearing about half the time?", tools: post ? [{ label: "Tool A", visual: spinner(3, 4) }, { label: "Tool B", visual: spinner(1, 4) }] : [{ label: "Tool A", visual: spinner(2, 4, CYAN, PINK) }, { label: "Tool B", visual: spinner(1, 4, CYAN, PINK) }], options: ["Tool A", "Tool B"], answer: "Tool A", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "frequency-to-design", "Match the observed long-run share to the tool's winning share.");
+      return interaction({ kind: "chanceCompare", prompt: post ? "Which tool's design best explains a pink frequency near 75%?" : "Which tool's design best explains blue appearing about half the time?", tools: post ? [{ label: "Tool A", visual: spinner(3, 4) }, { label: "Tool B", visual: spinner(1, 4) }] : [{ label: "Tool A", visual: spinner(2, 4, BLUE, PINK) }, { label: "Tool B", visual: spinner(1, 4, BLUE, PINK) }], options: ["Tool A", "Tool B"], answer: "Tool A", feedback: { correct: "Response recorded.", wrong: "Response recorded." } }, "frequency-to-design", "Match the observed long-run share to the tool's winning share.");
     case 16:
       return mcq(post ? "A die shows six 16 times in 24 rolls. What is the most careful next step?" : "A spinner gives 9 pink in 10 spins. Is that enough to prove it is loaded?", post ? "Repeat many more rolls using the same method" : "No, repeat more trials and compare the evidence", post ? ["Declare the die loaded immediately", "Remove the six face", "Assume every future roll is six"] : ["Yes, one short trial proves it", "Yes, pink is now certain", "No, because results never matter"], post ? { type: "frequency", labels: ["Six", "Other"], counts: [16, 8], total: 24 } : { type: "frequency", labels: ["Pink", "Other"], counts: [9, 1], total: 10 }, "evaluate-bias-evidence", "Unusual short-run evidence should be checked with more repeated trials.");
     case 17:
-      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run a larger trial and decide whether the evidence fits the tool's design." : "Run the experiment twice before judging whether the tool may be biased.", tool: "spinner", draw: post ? ["pink", "pink", "cyan"] : ["pink", "cyan"], spins: post ? 40 : 24, labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "cyan", name: "Cyan", colour: CYAN }], mode: "compareFrequencies" }, "test-bias-claim", "Compare observed frequencies with the tool's expected likelihood across enough trials.");
+      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run a larger trial and decide whether the evidence fits the tool's design." : "Run the experiment twice before judging whether the tool may be biased.", tool: "spinner", draw: post ? ["pink", "pink", "blue"] : ["pink", "blue"], spins: post ? 40 : 24, labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }], mode: "compareFrequencies" }, "test-bias-claim", "Compare observed frequencies with the tool's expected likelihood across enough trials.");
     case 18:
-      return interaction({ kind: "chancePredictCount", prompt: post ? "Use the 2-in-5 design to predict the target count, then test 50 spins." : "Use the 1-in-4 design to predict the target count, then test 40 spins.", wedges: post ? [PINK, PINK, CYAN, CYAN, CYAN] : [PINK, CYAN, CYAN, CYAN], targetKey: PINK, targetName: "Pink", spins: post ? 50 : 40 }, "investigation-predict-run", "Multiply the event's share by the trial count for an expected frequency, then compare observations.");
+      return interaction({ kind: "chancePredictCount", prompt: post ? "Use the 2-in-5 design to predict the target count, then test 50 spins." : "Use the 1-in-4 design to predict the target count, then test 40 spins.", wedges: post ? [PINK, PINK, BLUE, BLUE, BLUE] : [PINK, BLUE, BLUE, BLUE], targetKey: PINK, targetName: "Pink", spins: post ? 50 : 40 }, "investigation-predict-run", "Multiply the event's share by the trial count for an expected frequency, then compare observations.");
     default:
       return mcq(post ? "A 3/5 event occurred 28 times in 50 trials. Which verdict is justified?" : "A fair coin produced 23 heads in 40 tosses. Which conclusion is justified?", post ? "The observed 28/50 is reasonably close to the expected 30/50" : "The result differs from half but can occur through variation", post ? ["The event is definitely unfair", "Exactly 30 wins were required", "The next 22 trials must win"] : ["The coin is definitely loaded", "The next toss must be tails", "A fair coin always gives exactly half"], post ? { type: "expectedObserved", expected: 30, observed: 28, total: 50 } : { type: "expectedObserved", expected: 20, observed: 23, total: 40 }, "defend-frequency-verdict", "Use expected and observed evidence while allowing for chance variation.");
   }
@@ -386,7 +386,7 @@ function levelSix(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 2:
       return interaction({ kind: "chanceFormMatch", prompt: post ? "Tap the decimal and percentage equal to 3/5." : "Tap the decimal and percentage equal to 1/4.", anchorLabel: post ? "3/5" : "1/4", options: post ? [{ label: "0.6", correct: true }, { label: "60%", correct: true }, { label: "0.3", correct: false }, { label: "35%", correct: false }] : [{ label: "0.25", correct: true }, { label: "25%", correct: true }, { label: "0.4", correct: false }, { label: "40%", correct: false }] }, "match-probability-forms", "Convert the fraction to both a decimal and a percentage.");
     case 3:
-      return mcq(post ? "A bag has 7 winning counters out of 20. What is the probability?" : "A spinner has 3 winning sectors out of 10. What is the probability?", post ? "7/20" : "3/10", post ? ["13/20", "20/7", "7/13"] : ["7/10", "10/3", "3/7"], post ? bag([PINK, 7], [CYAN, 13]) : spinner(3, 10), "calculate-probability", "Probability equals favourable equally likely outcomes divided by all outcomes.");
+      return mcq(post ? "A bag has 7 winning counters out of 20. What is the probability?" : "A spinner has 3 winning sectors out of 10. What is the probability?", post ? "7/20" : "3/10", post ? ["13/20", "20/7", "7/13"] : ["7/10", "10/3", "3/7"], post ? bag([PINK, 7], [BLUE, 13]) : spinner(3, 10), "calculate-probability", "Probability equals favourable equally likely outcomes divided by all outcomes.");
     case 4:
       return interaction({ kind: "chanceProbabilityForge", prompt: post ? "Build a 5/8 winning spinner." : "Build a 2/5 winning bag.", tool: post ? "spinner" : "bag", targetWinning: post ? 5 : 2, total: post ? 8 : 5, initialWinning: post ? 2 : 4, targetLabel: post ? "5/8 target" : "2/5 target" }, "construct-target-probability", "Set favourable outcomes so their count over the total matches the target fraction.");
     case 5:

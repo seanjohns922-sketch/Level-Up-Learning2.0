@@ -13,10 +13,19 @@ const sourceFiles = [
   new URL("../data/activities/chanceHollow/level5.ts", import.meta.url),
   new URL("../data/activities/chanceHollow/level6.ts", import.meta.url),
 ];
+const learnerCopyFiles = [
+  ...sourceFiles,
+  new URL("../components/chance-hollow/ChanceHollowLessonShell.tsx", import.meta.url),
+];
 
 for (const sourceFile of sourceFiles) {
   const source = readFileSync(fileURLToPath(sourceFile), "utf8");
   assert.doesNotMatch(source, /\b(?:poolGen|questionPool|lessonPool)\b/i, `${sourceFile.pathname} must not use fixed lesson question pools`);
+}
+
+for (const sourceFile of learnerCopyFiles) {
+  const source = readFileSync(fileURLToPath(sourceFile), "utf8");
+  assert.doesNotMatch(source, /\bcyan\b/i, `${sourceFile.pathname} must call the child-facing colour blue`);
 }
 
 const levels = [
@@ -56,6 +65,7 @@ for (const { level, getTaskSet } of levels) {
         const fingerprints = new Set([semanticFingerprint(previous)]);
         for (let sample = 0; sample < 25; sample += 1) {
           const task = generate();
+          assert.doesNotMatch(JSON.stringify(task), /\bcyan\b/i, `${id} activity ${index + 1} must call the colour blue`);
           if (level === 6 && "prompt" in task) {
             assert.ok(task.prompt.trim().split(/\s+/).length <= 18, `${id} activity ${index + 1} prompt must stay concise`);
           }

@@ -9,13 +9,12 @@ type LessonSpec = {
 
 const RED = "#ef5b62";
 const BLUE = "#3b82f6";
-const CYAN = "#22d3ee";
 const PINK = "#d946ef";
 const GOLD = "#f5b942";
 const GREEN = "#22c55e";
-const COLOURS = [RED, BLUE, CYAN, PINK, GOLD, GREEN] as const;
+const COLOURS = [RED, BLUE, PINK, GOLD, GREEN] as const;
 const NAMES: Record<string, string> = {
-  [RED]: "red", [BLUE]: "blue", [CYAN]: "cyan", [PINK]: "pink", [GOLD]: "gold", [GREEN]: "green",
+  [RED]: "red", [BLUE]: "blue", [PINK]: "pink", [GOLD]: "gold", [GREEN]: "green",
 };
 
 const pick = <T,>(items: readonly T[]): T => items[Math.floor(Math.random() * items.length)]!;
@@ -368,9 +367,9 @@ const readFrequency = fresh(() => {
 const completeFrequency = fresh(() => {
   const total = pick([20, 30, 40] as const);
   const target = randInt(5, total - 5);
-  return mcq(`The relative frequency of cyan was ${target}/${total}. How many cyan results were recorded?`, String(target),
+  return mcq(`The relative frequency of blue was ${target}/${total}. How many blue results were recorded?`, String(target),
     [String(total), String(target + 1), String(Math.max(1, target - 1))],
-    "Yes. The numerator is the recorded cyan frequency.", "Read the numerator as the number of target outcomes.", frequency(["Cyan", "Other"], [target, total - target]));
+    "Yes. The numerator is the recorded blue frequency.", "Read the numerator as the number of target outcomes.", frequency(["Blue", "Other"], [target, total - target]));
 });
 
 const compareRuns = fresh(() => {

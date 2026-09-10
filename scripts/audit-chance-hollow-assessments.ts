@@ -111,6 +111,7 @@ for (const level of [3, 4, 5, 6] as const) {
     assert(interactive.length >= 6, `Year ${level} ${form} needs at least six apparatus tasks.`);
 
     for (const question of questions) {
+      assert.doesNotMatch(JSON.stringify(question), /\bcyan\b/i, `${question.id} must call the child-facing colour blue.`);
       assert(!allIds.has(question.id), `Duplicate assessment id ${question.id}`);
       allIds.add(question.id);
       if (question.type === "chanceHollowTask") {
