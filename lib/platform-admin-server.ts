@@ -108,6 +108,16 @@ export type PlatformSchoolDetail = {
   };
   activity: {
     activeToday: number;
+    submittedWorkToday?: number;
+    sessionOnlyToday?: number;
+    activeTodayStudents?: Array<{
+      studentId: string;
+      studentName: string;
+      lastActive: string;
+      usedSession: boolean;
+      submittedWork: boolean;
+      activityTypes: Array<"session" | "lesson" | "quiz" | "assessment">;
+    }>;
     activeLast7Days?: number;
     lessonsLast7Days?: number;
     quizzesLast7Days?: number;

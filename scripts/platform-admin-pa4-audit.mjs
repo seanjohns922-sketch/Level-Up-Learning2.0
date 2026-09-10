@@ -12,6 +12,7 @@ const parentRealmProgress = read("supabase/migrations/20260813100000_parent_real
 const parentUnlockedCollection = read("supabase/migrations/20260813110000_parent_unlocked_collection.sql");
 const schoolActivityUsage = read("supabase/migrations/20260813150000_fix_school_activity_active_usage.sql");
 const schoolRecentActivity = read("supabase/migrations/20260817100000_platform_admin_school_recent_activity.sql");
+const schoolActiveTodayDrilldown = read("supabase/migrations/20260910150000_platform_admin_active_today_drilldown.sql");
 const schoolDetailUi = read("app/admin/schools/[schoolId]/page.tsx");
 const safetyTests = read("supabase/tests/platform_admin_pa4_safety.sql");
 const parent = read("components/parent/ParentPortal.tsx");
@@ -179,6 +180,9 @@ check("school active counts include real session usage", has(schoolActivityUsage
 check("school work totals stay canonical", has(schoolActivityUsage, "'lesson'::text", "'quiz'::text", "'assessment'::text", "attempt.completed = true"));
 check("school detail uses rolling seven-day activity", has(schoolRecentActivity, "now() - interval '7 days'", "'activeLast7Days'", "'lessonsLast7Days'", "'quizzesLast7Days'", "'assessmentsLast7Days'"));
 check("school detail labels rolling window explicitly", has(schoolDetailUi, "Active last 7 days", "Lessons last 7 days", "Quizzes last 7 days", "Assessments last 7 days"));
+check("school active-today total has a student drill-down", has(schoolActiveTodayDrilldown, "activeTodayStudents", "'studentName'", "'lastActive'", "'activityTypes'"));
+check("school activity distinguishes platform use from submitted work", has(schoolActiveTodayDrilldown, "submittedWorkToday", "sessionOnlyToday", "student_access_sessions"));
+check("school detail renders active student evidence", has(schoolDetailUi, "Students active today", "Used platform today", "Submitted work today", "Opened platform"));
 check("PA4 executable safety fixtures exist", has(safetyTests, "resolve_student_identity_merge", "pin_not_matched", "retired-token", "student_belonged_to_school_at", "linked parent cannot complete a lesson"));
 check("PA4 fixture plan matches its assertions", safetyTests.includes("select plan(68)") && (safetyTests.match(/^select (?:has_function|function_returns|ok|is|lives_ok|alike|throws_ok)\(/gmi) ?? []).length === 68);
 for (const table of [

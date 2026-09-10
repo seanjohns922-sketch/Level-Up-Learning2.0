@@ -24,6 +24,7 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
   const { detail } = data;
   const archived = detail.school.status === "archived";
   const schoolLogo = getSchoolLogo({ name: detail.school.name, code: detail.school.code });
+  const activeTodayStudents = detail.activity.activeTodayStudents ?? [];
   return (
     <>
       <Link href="/admin/schools" className="mb-5 inline-flex text-sm font-bold text-emerald-800 hover:underline">← Back to schools</Link>
@@ -72,10 +73,11 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
       </section>
 
       <section className="mt-7 border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-3"><Activity className="h-5 w-5 text-emerald-700" /><div><h2 className="text-xl font-bold">Activity</h2><p className="text-sm text-slate-500">Active counts include student sessions; work totals count submitted lessons, quizzes and assessments over the rolling seven-day window.</p></div></div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="flex items-center gap-3"><Activity className="h-5 w-5 text-emerald-700" /><div><h2 className="text-xl font-bold">Activity</h2><p className="text-sm text-slate-500">Platform use includes student sessions and submitted work. Work totals include completed lessons, quizzes and assessments.</p></div></div>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
           {[
-            ['Active today', detail.activity.activeToday],
+            ['Used platform today', detail.activity.activeToday],
+            ['Submitted work today', detail.activity.submittedWorkToday ?? '—'],
             ['Active last 7 days', detail.activity.activeLast7Days ?? detail.activity.activeThisWeek],
             ['Lessons last 7 days', detail.activity.lessonsLast7Days ?? detail.activity.lessonsThisWeek],
             ['Quizzes last 7 days', detail.activity.quizzesLast7Days ?? detail.activity.quizzesThisWeek],
@@ -83,6 +85,25 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
           ].map(([label,value]) => <div key={String(label)} className="border-l-4 border-emerald-500 bg-slate-50 p-4"><p className="text-xs font-bold uppercase text-slate-500">{label}</p><p className="mt-2 text-2xl font-bold">{value}</p></div>)}
         </div>
         <p className="mt-5 text-sm text-slate-500">Last active: <span className="font-semibold text-slate-700">{formatDate(detail.activity.lastActive)}</span></p>
+        {activeTodayStudents.length ? (
+          <div className="mt-6 overflow-hidden border border-slate-200">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3">
+              <h3 className="font-bold text-slate-900">Students active today</h3>
+              <p className="text-xs text-slate-500">{detail.activity.sessionOnlyToday ?? 0} opened the platform without submitting work</p>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {activeTodayStudents.map((student) => (
+                <div key={student.studentId} className="grid gap-3 px-4 py-3 text-sm sm:grid-cols-[minmax(180px,1fr)_minmax(220px,1fr)_auto] sm:items-center">
+                  <Link href={`/admin/users/students/${student.studentId}`} className="font-semibold text-emerald-800 hover:underline">{student.studentName}</Link>
+                  <div className="flex flex-wrap gap-1.5">
+                    {student.activityTypes.map((type) => <span key={type} className="border border-slate-200 bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-600">{type === "session" ? "Opened platform" : type}</span>)}
+                  </div>
+                  <time className="text-xs text-slate-500 sm:text-right">{formatDate(student.lastActive)}</time>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </section>
 
       <div className="mt-7"><SchoolLifecycleManager detail={detail} /></div>
