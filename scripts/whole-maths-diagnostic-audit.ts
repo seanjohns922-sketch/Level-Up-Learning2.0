@@ -9,8 +9,11 @@ import {
 } from "@/lib/curriculum/ac-standards";
 import {
   AVAILABLE_DIAGNOSTIC_STRANDS,
+  DIAGNOSTIC_DOWNWARD_PROBE,
   DIAGNOSTIC_FLOOR,
   DIAGNOSTIC_MASTERY,
+  DIAGNOSTIC_QUESTIONS_PER_LEVEL,
+  DIAGNOSTIC_REUSE_WINDOW_DAYS,
   WHOLE_MATHS_WEIGHT_TOTAL,
   computeReachedCurriculumPoints,
   computeWholeMathsLevel,
@@ -25,6 +28,9 @@ const read = (relativePath: string) => fs.readFileSync(path.join(root, relativeP
 
 assert.equal(DIAGNOSTIC_MASTERY, 85, "Diagnostic mastery must remain a named 85% threshold.");
 assert.equal(DIAGNOSTIC_FLOOR, 40, "Diagnostic floor must remain a named 40% threshold.");
+assert.equal(DIAGNOSTIC_DOWNWARD_PROBE, 25, "A 25% starting result must remain the named downward-probe threshold.");
+assert.equal(DIAGNOSTIC_QUESTIONS_PER_LEVEL, 20, "Every diagnostic level probe must contain exactly 20 questions.");
+assert.equal(DIAGNOSTIC_REUSE_WINDOW_DAYS, 21, "Recent realm evidence may be reused only inside the named 21-day window.");
 assert.equal(
   Object.values(AC_STRANDS).reduce((sum, strand) => sum + strand.weight, 0),
   WHOLE_MATHS_WEIGHT_TOTAL,
@@ -151,16 +157,29 @@ assert.equal(noDemotion.recommendedLevel, "Year 4");
 assert.equal(noDemotion.placementChanged, false);
 assert.equal(noDemotion.flag, "review_support");
 
+const downwardProbe = decideDiagnosticPlacement("Year 4", [
+  { level: "Year 4", score: 5, total: 20, percent: 25 },
+]);
+assert.equal(downwardProbe.shouldProbeLower, true, "Five correct out of 20 must trigger a lower-level measurement probe.");
+assert.equal(downwardProbe.placementChanged, false, "A downward probe must never silently demote an established student.");
+const noDownwardProbe = decideDiagnosticPlacement("Year 4", [
+  { level: "Year 4", score: 6, total: 20, percent: 30 },
+]);
+assert.equal(noDownwardProbe.shouldProbeLower, false, "Six correct out of 20 must flag support without another level test.");
+
 for (const strand of AVAILABLE_DIAGNOSTIC_STRANDS) {
   const firstLevel = strand.strand === "algebra" || strand.strand === "probability" ? 3 : 1;
   for (let level = firstLevel; level <= 6; level += 1) {
-    const questions = getDiagnosticQuestions(strand.strand, `Year ${level}`, "audit-sitting");
-    assert.equal(questions.length, 10, `${strand.strand} Year ${level} must draw 10 questions from its existing level test.`);
-    assert(questions.every(({ question }) => question.id), `${strand.strand} Year ${level} diagnostic questions need stable IDs.`);
-    assert(
-      questions.some(({ curriculumCodes }) => curriculumCodes.length > 0),
-      `${strand.strand} Year ${level} diagnostic questions are not linked to curriculum codes.`,
-    );
+    for (const checkpoint of ["start", "mid", "end"] as const) {
+      const questions = getDiagnosticQuestions(strand.strand, `Year ${level}`, `audit-${checkpoint}`, checkpoint);
+      assert.equal(questions.length, 20, `${strand.strand} Year ${level} ${checkpoint} must contain 20 questions.`);
+      assert.equal(new Set(questions.map(({ question }) => question.id)).size, 20, `${strand.strand} Year ${level} ${checkpoint} needs 20 unique IDs.`);
+      assert(questions.every(({ question }) => question.id), `${strand.strand} Year ${level} diagnostic questions need stable IDs.`);
+      assert(
+        questions.some(({ curriculumCodes }) => curriculumCodes.length > 0),
+        `${strand.strand} Year ${level} diagnostic questions are not linked to curriculum codes.`,
+      );
+    }
   }
 }
 
@@ -183,6 +202,7 @@ assert(studentInstrument.includes("saveDiagnosticProgress"), "Student answers an
 const migration = read("supabase/migrations/20260910170000_release_chance_hollow_live_realm.sql");
 const completionMigration = read("supabase/migrations/20260911120000_complete_six_strand_whole_maths_diagnostic.sql");
 const diagnosticFoundation = read("supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql");
+const supervisedMigration = read("supabase/migrations/20260911153000_supervised_adaptive_whole_maths_diagnostic.sql");
 assert(!migration.includes("available_weight"), "Curriculum weights must not be duplicated in the database migration.");
 for (const required of [
   "security definer",
@@ -203,6 +223,20 @@ for (const required of [
 ]) {
   assert(completionMigration.toLowerCase().includes(required.toLowerCase()), `Completed diagnostic workflow is missing: ${required}`);
 }
+for (const required of [
+  "whole_math_diagnostic_school_sessions",
+  "whole_math_diagnostic_session_is_open",
+  "the supervised school diagnostic session is closed",
+  "every diagnostic level requires 20 distinct recorded questions",
+  "interval '21 days'",
+  "this student already has this diagnostic checkpoint for the academic year",
+  "start, mid and end diagnostics require all six maths strands",
+  "placement_protected",
+]) {
+  assert(supervisedMigration.toLowerCase().includes(required), `Supervised diagnostic workflow is missing: ${required}`);
+}
+assert(studentInstrument.includes("Diagnostic session closed"), "The student route needs a school-only locked state.");
+assert(panel.includes("Supervised school session"), "Teachers need controls for the school-only diagnostic access window.");
 const centralWorldEntry = read("components/world3d/CentralWorld3DEntry.tsx");
 assert(
   centralWorldEntry.includes("fetchPendingStudentDiagnostic") && centralWorldEntry.includes('router.replace("/diagnostic")'),

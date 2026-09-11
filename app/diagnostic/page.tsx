@@ -10,7 +10,9 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import {
   completeDiagnosticStrand,
   fetchPendingStudentDiagnostic,
+  fetchStudentDiagnosticJourney,
   saveDiagnosticProgress,
+  type StudentDiagnosticJourneyRow,
   type PendingStudentDiagnostic,
 } from "@/lib/whole-maths-diagnostic-client";
 import {
@@ -36,6 +38,8 @@ export default function WholeMathsDiagnosticPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [probes, setProbes] = useState<DiagnosticProbeScore[]>([]);
   const [saving, setSaving] = useState(false);
+  const [journey, setJourney] = useState<StudentDiagnosticJourneyRow[]>([]);
+  const [hasBegunStrand, setHasBegunStrand] = useState(false);
   const profile = useMemo(() => getActiveStudentProfile(), []);
 
   const loadPending = useCallback(async () => {
@@ -43,13 +47,19 @@ export default function WholeMathsDiagnosticPage() {
       router.replace("/login?error=session_missing");
       return null;
     }
-    const next = await fetchPendingStudentDiagnostic(profile.studentId);
+    const next = await fetchPendingStudentDiagnostic(profile.studentId, true);
+    setJourney(await fetchStudentDiagnosticJourney(profile.studentId));
     setPending(next);
     if (next) {
       setLevel(next.active_level ?? next.starting_level);
       setAnswers(next.draft_answers ?? {});
       setProbes(next.draft_probes ?? []);
       setIndex(Math.max(0, next.draft_index ?? 0));
+      setHasBegunStrand(
+        (next.draft_index ?? 0) > 0 ||
+        Object.keys(next.draft_answers ?? {}).length > 0 ||
+        (next.draft_probes ?? []).length > 0,
+      );
     }
     return next;
   }, [profile?.studentId, router]);
@@ -65,7 +75,7 @@ export default function WholeMathsDiagnosticPage() {
   }, [loadPending]);
 
   const linkedQuestions = useMemo(
-    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id) : [],
+    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint) : [],
     [level, pending],
   );
   const current = linkedQuestions[index];
@@ -115,8 +125,14 @@ export default function WholeMathsDiagnosticPage() {
     };
     const nextProbes = [...probes, probe];
     const decision = decideDiagnosticPlacement(pending.starting_level, nextProbes);
-    if (decision.shouldProbeNext) {
-      const nextLevel = diagnosticLevelLabel(diagnosticLevelNumber(level) + 1);
+    const minimumLevel = pending.strand === "algebra" || pending.strand === "probability" ? 3 : 1;
+    const nextProbeLevel = decision.shouldProbeNext
+      ? diagnosticLevelNumber(level) + 1
+      : decision.shouldProbeLower && diagnosticLevelNumber(level) > minimumLevel
+        ? diagnosticLevelNumber(level) - 1
+        : null;
+    if (nextProbeLevel != null) {
+      const nextLevel = diagnosticLevelLabel(nextProbeLevel);
       setSaving(true);
       setError(null);
       try {
@@ -170,6 +186,14 @@ export default function WholeMathsDiagnosticPage() {
   if (!pending) {
     const completionText = "Diagnostic complete. Your six strand results and overall maths level are saved for your teacher.";
     return <ReadAloudRateProvider><main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white"><div><h1 className="text-3xl font-black">Diagnostic complete</h1><p className="mt-2 text-slate-300">Your six strand results and overall maths level are saved for your teacher.</p><ReadAloudBtn text={completionText} className="mt-4" /><button type="button" onClick={() => router.push("/world")} className="mt-5 rounded-xl bg-teal-400 px-5 py-3 font-black text-slate-950">Return to my world</button></div></main></ReadAloudRateProvider>;
+  }
+  if (!pending.access_open) {
+    const lockedText = "Your diagnostic is safely saved. It can only be continued at school when your teacher opens a supervised session.";
+    return <ReadAloudRateProvider><main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white"><div className="max-w-xl"><p className="text-xs font-black uppercase tracking-[0.16em] text-amber-300">School assessment</p><h1 className="mt-2 text-3xl font-black">Diagnostic session closed</h1><p className="mt-3 text-slate-300">Your diagnostic is safely saved. It can only be continued at school when your teacher opens a supervised session.</p><ReadAloudBtn text={lockedText} label="Read this" className="mt-4" /><button type="button" onClick={() => router.push("/world")} className="mt-6 rounded-xl bg-teal-400 px-5 py-3 font-black text-slate-950">Return to my world</button></div></main></ReadAloudRateProvider>;
+  }
+  if (!hasBegunStrand) {
+    const introText = `${checkpointLabel(pending.checkpoint)}. Complete one realm at a time. Your work saves automatically. Your next realm is ${AC_STRANDS[pending.strand].label}, ${level}, with 20 questions.`;
+    return <ReadAloudRateProvider><main className="min-h-screen bg-gradient-to-b from-slate-950 to-[#0A2F2A] px-5 py-8 text-white"><div className="mx-auto max-w-5xl"><header className="rounded-3xl border border-white/15 bg-white/10 p-6"><p className="text-xs font-black uppercase tracking-[0.16em] text-teal-300">{checkpointLabel(pending.checkpoint)}</p><h1 className="mt-2 text-3xl font-black">Your Whole-Maths Diagnostic</h1><p className="mt-3 max-w-2xl text-slate-300">Complete one realm at a time at school. Your work saves automatically, and you can continue during the next session your teacher opens.</p><ReadAloudBtn text={introText} label="Read this" className="mt-4" /></header><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{journey.map((item) => <article key={item.strand} className={`rounded-2xl border p-4 ${item.strand === pending.strand ? "border-teal-300 bg-teal-400/15" : item.status === "completed" ? "border-emerald-400/40 bg-emerald-400/10" : "border-white/10 bg-white/5"}`}><p className="text-xs font-black uppercase tracking-wide text-slate-400">{item.status === "completed" ? "Complete" : item.answered_count > 0 ? `${item.answered_count}/20 answered` : "Not started"}</p><h2 className="mt-1 text-xl font-black">{AC_STRANDS[item.strand].label}</h2><p className="mt-1 text-sm text-slate-300">{item.active_level}</p></article>)}</div><div className="mt-6 flex flex-wrap justify-center gap-3"><button type="button" onClick={() => router.push("/world")} className="rounded-xl border border-white/20 px-5 py-3 font-bold">Return to world</button><button type="button" onClick={() => setHasBegunStrand(true)} className="rounded-xl bg-teal-400 px-7 py-3 font-black text-slate-950">{journey.find((item) => item.strand === pending.strand)?.answered_count ? "Continue" : "Begin"} {AC_STRANDS[pending.strand].label}</button></div></div></main></ReadAloudRateProvider>;
   }
   if (linkedQuestions.length === 0 || !current) {
     return <main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white"><div><h1 className="text-2xl font-black">This strand test is not ready</h1><p className="mt-2 text-slate-300">No level-test bank exists for {AC_STRANDS[pending.strand].label} at {level}. Nothing has been scored or placed.</p></div></main>;

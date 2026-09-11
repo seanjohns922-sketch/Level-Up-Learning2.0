@@ -9,7 +9,9 @@ import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 export const DIAGNOSTIC_MASTERY = 85;
 export const DIAGNOSTIC_FLOOR = 40;
-export const DIAGNOSTIC_QUESTIONS_PER_LEVEL = 10;
+export const DIAGNOSTIC_QUESTIONS_PER_LEVEL = 20;
+export const DIAGNOSTIC_DOWNWARD_PROBE = 25;
+export const DIAGNOSTIC_REUSE_WINDOW_DAYS = 21;
 export const WHOLE_MATHS_WEIGHT_TOTAL = 139;
 
 export type DiagnosticCheckpoint = "start" | "mid" | "end" | "ad_hoc";
@@ -75,6 +77,7 @@ export type DiagnosticPlacementDecision = {
   placementChanged: boolean;
   flag: DiagnosticFlag;
   shouldProbeNext: boolean;
+  shouldProbeLower: boolean;
 };
 
 export function diagnosticLevelNumber(level: string): number {
@@ -110,12 +113,28 @@ export function decideDiagnosticPlacement(
 ): DiagnosticPlacementDecision {
   if (probes.length === 0) throw new Error("At least one diagnostic probe is required.");
   const current = diagnosticLevelNumber(currentLevel);
-  const ordered = [...probes].sort(
-    (left, right) => diagnosticLevelNumber(left.level) - diagnosticLevelNumber(right.level),
-  );
+  const ordered = [...probes];
   const first = ordered[0]!;
   const last = ordered.at(-1)!;
   const firstPercent = first.percent;
+
+  const direction = ordered.length < 2
+    ? "starting"
+    : diagnosticLevelNumber(ordered[1]!.level) < diagnosticLevelNumber(first.level)
+      ? "down"
+      : "up";
+
+  if (direction === "down" || (direction === "starting" && firstPercent <= DIAGNOSTIC_DOWNWARD_PROBE)) {
+    const lastLevel = diagnosticLevelNumber(last.level);
+    return {
+      measuredLevel: measuredLevelForProbe(lastLevel, last.percent),
+      recommendedLevel: currentLevel,
+      placementChanged: false,
+      flag: "review_support",
+      shouldProbeNext: false,
+      shouldProbeLower: last.percent <= DIAGNOSTIC_DOWNWARD_PROBE && lastLevel > 1,
+    };
+  }
 
   if (firstPercent < DIAGNOSTIC_FLOOR) {
     return {
@@ -124,6 +143,7 @@ export function decideDiagnosticPlacement(
       placementChanged: false,
       flag: "review_support",
       shouldProbeNext: false,
+      shouldProbeLower: false,
     };
   }
 
@@ -141,6 +161,7 @@ export function decideDiagnosticPlacement(
         placementChanged: level > current,
         flag: null,
         shouldProbeNext: false,
+        shouldProbeLower: false,
       };
     }
     return {
@@ -149,6 +170,7 @@ export function decideDiagnosticPlacement(
       placementChanged: lastMastered > current,
       flag: "extension_ready_to_bridge",
       shouldProbeNext: false,
+      shouldProbeLower: false,
     };
   }
 
@@ -160,6 +182,7 @@ export function decideDiagnosticPlacement(
     placementChanged: lastMastered > current,
     flag: null,
     shouldProbeNext: last.percent >= DIAGNOSTIC_MASTERY && nextLevel > lastLevel,
+    shouldProbeLower: false,
   };
 }
 

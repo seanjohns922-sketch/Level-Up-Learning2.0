@@ -12,9 +12,14 @@ export type DiagnosticStrandResultRow = {
   strand: AcStrand;
   status: "pending" | "completed" | "unavailable";
   starting_level: string | null;
+  active_level?: string | null;
+  answered_count?: number;
   measured_level: number | null;
   recommended_level: string | null;
   placement_applied: boolean;
+  placement_protected?: boolean;
+  probe_direction?: "up" | "down" | null;
+  source_assessment_id?: string | null;
   flag: DiagnosticFlag;
   probe_scores: DiagnosticProbeScore[];
   curriculum_codes: string[];
@@ -42,6 +47,7 @@ export type PendingStudentDiagnostic = {
   draft_answers: Record<string, string>;
   draft_probes: DiagnosticProbeScore[];
   draft_index: number;
+  access_open: boolean;
 };
 
 export type LiveMathsProgressionRow = {
@@ -63,6 +69,22 @@ export type LiveMathsProgressionRow = {
     totalWeeks?: number;
   };
   updated_at: string;
+};
+
+export type DiagnosticSchoolSession = {
+  id: string;
+  checkpoint: "start" | "mid" | "end";
+  opened_at: string;
+  closes_at: string;
+};
+
+export type StudentDiagnosticJourneyRow = {
+  strand: AcStrand;
+  status: "pending" | "completed" | "unavailable";
+  starting_level: string;
+  active_level: string;
+  answered_count: number;
+  measured_level: number | null;
 };
 
 function rpcError(error: { message?: string } | null, fallback: string): never {
@@ -96,16 +118,54 @@ export async function assignWholeMathsDiagnostic(
     p_strands: strands,
   });
   if (error) rpcError(error, "Could not assign the diagnostic.");
+  const sittingId = String(data);
+  const { error: adoptionError } = await supabase.rpc("teacher_adopt_recent_diagnostic_assessments", {
+    p_sitting_id: sittingId,
+  });
+  if (adoptionError) rpcError(adoptionError, "The diagnostic was assigned, but recent assessment evidence could not be checked.");
+  return sittingId;
+}
+
+export async function fetchDiagnosticSchoolSession(classId: string) {
+  const { data, error } = await supabase.rpc("get_teacher_whole_math_diagnostic_session", { p_class_id: classId });
+  if (error) rpcError(error, "Could not load the supervised diagnostic session.");
+  const row = Array.isArray(data) ? data[0] : data;
+  return row ? row as DiagnosticSchoolSession : null;
+}
+
+export async function openDiagnosticSchoolSession(
+  classId: string,
+  checkpoint: "start" | "mid" | "end",
+  durationMinutes = 120,
+) {
+  const { data, error } = await supabase.rpc("teacher_open_whole_math_diagnostic_session", {
+    p_class_id: classId,
+    p_checkpoint: checkpoint,
+    p_duration_minutes: durationMinutes,
+  });
+  if (error) rpcError(error, "Could not open the supervised diagnostic session.");
   return String(data);
 }
 
-export async function fetchPendingStudentDiagnostic(studentId: string) {
+export async function closeDiagnosticSchoolSession(classId: string) {
+  const { error } = await supabase.rpc("teacher_close_whole_math_diagnostic_session", { p_class_id: classId });
+  if (error) rpcError(error, "Could not close the supervised diagnostic session.");
+}
+
+export async function fetchPendingStudentDiagnostic(studentId: string, includeClosed = false) {
   const { data, error } = await supabase.rpc("get_pending_whole_math_diagnostic", {
     p_student_id: studentId,
   });
   if (error) rpcError(error, "Could not load the diagnostic.");
   const row = Array.isArray(data) ? data[0] : data;
-  return row ? (row as PendingStudentDiagnostic) : null;
+  const pending = row ? (row as PendingStudentDiagnostic) : null;
+  return pending && (includeClosed || pending.access_open) ? pending : null;
+}
+
+export async function fetchStudentDiagnosticJourney(studentId: string) {
+  const { data, error } = await supabase.rpc("get_student_whole_math_diagnostic_journey", { p_student_id: studentId });
+  if (error) rpcError(error, "Could not load diagnostic progress.");
+  return (Array.isArray(data) ? data : []) as StudentDiagnosticJourneyRow[];
 }
 
 export async function completeDiagnosticStrand(

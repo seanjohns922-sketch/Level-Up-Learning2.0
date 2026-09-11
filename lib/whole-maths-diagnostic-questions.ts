@@ -5,6 +5,7 @@ import {
 } from "@/data/assessments/api";
 import { curriculumCodesForAssessmentQuestion } from "@/lib/assessment-curriculum";
 import type { AcStrand } from "@/lib/curriculum/ac-standards";
+import type { DiagnosticCheckpoint } from "@/lib/whole-maths-diagnostic";
 import {
   DIAGNOSTIC_QUESTIONS_PER_LEVEL,
   DIAGNOSTIC_STRANDS,
@@ -29,13 +30,17 @@ export function getDiagnosticQuestions(
   strand: AcStrand,
   level: string,
   sittingId: string,
+  checkpoint: DiagnosticCheckpoint = "start",
 ): LinkedDiagnosticQuestion[] {
   const definition = DIAGNOSTIC_STRANDS.find((candidate) => candidate.strand === strand);
   if (!definition?.available || !definition.realmId) return [];
   const pretest = getPretestForYearLabel(level, definition.realmId);
-  const levelTest = pretest.length > 0
-    ? pretest
-    : (getPosttestForYearLabel(level, definition.realmId)?.questions ?? []);
+  const posttest = getPosttestForYearLabel(level, definition.realmId)?.questions ?? [];
+  const levelTest = checkpoint === "start"
+    ? (pretest.length > 0 ? pretest : posttest)
+    : checkpoint === "mid"
+      ? (posttest.length > 0 ? posttest : pretest)
+      : [...pretest.filter((_, index) => index % 2 === 0), ...posttest.filter((_, index) => index % 2 === 1)];
   return levelTest
     .map((question) => ({
       question,

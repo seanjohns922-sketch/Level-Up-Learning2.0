@@ -6,6 +6,10 @@ curriculum links and secure persistence. Teachers assign Start, Mid and End sitt
 from the Diagnostic tab. Student answers and their current position are saved as they
 work, and an official overall is persisted only after all six strands are complete.
 
+The formal instrument is **school-only and teacher supervised**. Opening a timed
+class session is the server-side access gate; a direct URL or an authenticated home
+session cannot read, save or submit diagnostic questions while that gate is closed.
+
 Current implementation:
 
 - `lib/whole-maths-diagnostic.ts` owns the adaptive rules, named thresholds and
@@ -96,6 +100,14 @@ evidence must come from Algebra-coded questions in the Number realm.
 - Each sitting is persisted as an **immutable record** (checkpoint label, date, the
   per-strand measured levels, and the overall). These are the Start/Mid/End dots on
   the report.
+- A student may have only one Start, one Mid and one End record per academic year.
+  This prevents accidental duplicate formal checkpoints.
+- A valid, completed 20-question realm pre-test or post-test at the required level
+  may be adopted when it was completed in the preceding **21 days**. This applies
+  equally to Start, Mid and End and prevents unnecessary repeat testing. The same
+  realm assessment cannot be reused in two diagnostic sittings.
+- At a school&apos;s first Start window, this diagnostic is the initial placement
+  evidence. Do not also make the student sit six separate realm pre-tests.
 
 The continuous weekly data (lessons, quizzes, post-tests) is **not** the diagnostic —
 it is the live layer between sittings (see "Predicted level").
@@ -107,12 +119,19 @@ recalibrates the live score but does not promote the student's working level.
 
 ## The adaptive instrument (per strand)
 
-- Draw **10–20 questions per strand** from the existing realm level tests
+- Draw **exactly 20 distinct questions per tested level, per strand** from the
+  existing realm level tests
   (see `lib/assessment-curriculum.ts` for how questions link to curriculum codes).
 - **Start at the student's current working level** for that strand.
 - If they **master** a level (`score ≥ MASTERY`), probe the **next level up**, and
-  keep climbing (ceiling-finding). Mid/End can be shorter than Start because a prior
-  level is known — re-test around it ± a band.
+  keep climbing (ceiling-finding). Every additional level probe is another complete
+  20-question form; no shortened form is accepted by the server.
+- If the starting result is **25% or lower**, probe one complete level down and keep
+  descending while results remain at or below 25%. Algebra and Probability stop at
+  Level 3 because those realm pathways begin there; other strands stop at Level 1.
+- The six strands are intentionally completed over multiple supervised school
+  sessions (normally one strand per sitting/day). Every response and the current
+  question are saved to the server, so closing the session never loses the journey.
 - Map performance to a **year-level** for reporting (e.g. 3.5 = mid Year 3).
 
 ## Re-placement (only at a sitting, per strand)
@@ -129,10 +148,15 @@ but above the floor** (their instructional / zone-of-proximal-development level)
   keep climbing).
 - **Never auto-demote:** if measured **below** current placement, do NOT drop the
   student — raise a teacher **"review / support"** flag instead.
+- Existing/current realm placements are protected during downward probes. A new or
+  genuinely unplaced student can use the lower evidence for initial placement; the
+  downward result itself never silently rewrites an established pathway.
 - **Cliff edge:** next level `< FLOOR` → hold at the mastered level and flag
   "extension / ready to bridge" (don't drop them into something too hard).
 
-Thresholds as named constants in one place: `MASTERY = 85`, `FLOOR = 40`.
+Thresholds as named constants in one place: `MASTERY = 85`, `FLOOR = 40`,
+`DOWNWARD_PROBE = 25`, `QUESTIONS_PER_LEVEL = 20`, and
+`REUSE_WINDOW_DAYS = 21`.
 
 Canonical example (Number): **85% on Level 3 (mastered) → probe Level 4 → 60% on
 Level 4 (instructional band) → working level becomes Level 4 and the recorded

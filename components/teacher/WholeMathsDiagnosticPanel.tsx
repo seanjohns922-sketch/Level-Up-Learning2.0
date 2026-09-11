@@ -20,6 +20,10 @@ import {
   fetchTeacherDiagnostics,
   fetchTeacherLiveMathsProgression,
   assignWholeMathsDiagnostic,
+  closeDiagnosticSchoolSession,
+  fetchDiagnosticSchoolSession,
+  openDiagnosticSchoolSession,
+  type DiagnosticSchoolSession,
   type LiveMathsProgressionRow,
   type TeacherDiagnosticSittingRow,
 } from "@/lib/whole-maths-diagnostic-client";
@@ -122,6 +126,9 @@ export default function WholeMathsDiagnosticPanel({
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [assignmentBusy, setAssignmentBusy] = useState(false);
   const [assignmentMessage, setAssignmentMessage] = useState<string | null>(null);
+  const [schoolSession, setSchoolSession] = useState<DiagnosticSchoolSession | null>(null);
+  const [sessionBusy, setSessionBusy] = useState(false);
+  const [sessionError, setSessionError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -134,13 +141,15 @@ export default function WholeMathsDiagnosticPanel({
       }
       if (showLoading) setLoading(true);
       try {
-        const [rows, liveProgression] = await Promise.all([
+        const [rows, liveProgression, activeSchoolSession] = await Promise.all([
           fetchTeacherDiagnostics(selectedClass.id),
           fetchTeacherLiveMathsProgression(selectedClass.id),
+          fetchDiagnosticSchoolSession(selectedClass.id),
         ]);
         if (!cancelled) {
           setSittings(rows);
           setProgression(liveProgression);
+          setSchoolSession(activeSchoolSession);
           setLoadError(null);
         }
       } catch (error) {
@@ -235,6 +244,25 @@ export default function WholeMathsDiagnosticPanel({
     if (failed === 0) setSelectedStudentIds([]);
   }
 
+  async function toggleSchoolSession() {
+    if (!selectedClass?.id) return;
+    setSessionBusy(true);
+    setSessionError(null);
+    try {
+      if (schoolSession) {
+        await closeDiagnosticSchoolSession(selectedClass.id);
+        setSchoolSession(null);
+      } else {
+        await openDiagnosticSchoolSession(selectedClass.id, assignmentCheckpoint, 120);
+        setSchoolSession(await fetchDiagnosticSchoolSession(selectedClass.id));
+      }
+    } catch (cause) {
+      setSessionError(cause instanceof Error ? cause.message : "The supervised session could not be changed.");
+    } finally {
+      setSessionBusy(false);
+    }
+  }
+
   return (
     <section className="space-y-5" aria-labelledby="whole-maths-diagnostic-title">
       <div className="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-white p-5 shadow-sm">
@@ -248,7 +276,8 @@ export default function WholeMathsDiagnosticPanel({
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
               All six maths strand engines are connected to their existing level-test questions, including Chance Hollow for Probability.
-              An official Whole-Maths score is calculated only after all six strand results are complete.
+              Each starting level uses 20 questions. Students complete one strand at a time over several supervised school sessions,
+              and an official Whole-Maths score is calculated only after all six strand results are complete.
             </p>
           </div>
           <div className="rounded-xl border border-amber-200 bg-white px-4 py-3 text-right">
@@ -257,6 +286,20 @@ export default function WholeMathsDiagnosticPanel({
           </div>
         </div>
       </div>
+
+      <article className={`rounded-2xl border p-4 shadow-sm ${schoolSession ? "border-emerald-300 bg-emerald-50" : "border-slate-200 bg-white"}`}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-black text-slate-950">Supervised school session</p>
+            <p className="mt-1 text-xs font-semibold text-slate-600">{schoolSession
+              ? `${CHECKPOINT_LABEL[schoolSession.checkpoint]} is open until ${new Date(schoolSession.closes_at).toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })}. Assigned students can continue at school.`
+              : "Closed. Students cannot open or continue diagnostic questions at home."}</p>
+          </div>
+          <button type="button" disabled={!selectedClass || sessionBusy} onClick={() => void toggleSchoolSession()} className={`rounded-xl px-4 py-2.5 text-sm font-black text-white disabled:opacity-40 ${schoolSession ? "bg-rose-600" : "bg-emerald-700"}`}>{sessionBusy ? "Saving…" : schoolSession ? "Close session" : `Open ${assignmentCheckpoint === "start" ? "Start" : assignmentCheckpoint === "mid" ? "Mid" : "End"} for 2 hours`}</button>
+        </div>
+        {!schoolSession ? <div className="mt-3 flex flex-wrap gap-2">{(["start","mid","end"] as FormalCheckpoint[]).map((checkpoint) => <button key={checkpoint} type="button" onClick={() => setAssignmentCheckpoint(checkpoint)} className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${assignmentCheckpoint === checkpoint ? "border-emerald-500 bg-emerald-100 text-emerald-900" : "border-slate-200 bg-slate-50 text-slate-600"}`}>{checkpoint === "start" ? "Start" : checkpoint === "mid" ? "Mid" : "End"}</button>)}</div> : null}
+        {sessionError ? <p role="alert" className="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-bold text-rose-800">{sessionError}</p> : null}
+      </article>
 
       <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
@@ -346,7 +389,7 @@ export default function WholeMathsDiagnosticPanel({
         <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/60 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !assignmentBusy) setAssignmentOpen(false); }}>
           <section role="dialog" aria-modal="true" aria-labelledby="assign-diagnostic-title" className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
-              <div><h3 id="assign-diagnostic-title" className="text-xl font-black text-slate-950">Assign Whole-Maths Diagnostic</h3><p className="mt-1 text-sm text-slate-500">Students complete all six strands. Their work saves after every response and resumes on their next login.</p></div>
+              <div><h3 id="assign-diagnostic-title" className="text-xl font-black text-slate-950">Assign Whole-Maths Diagnostic</h3><p className="mt-1 text-sm text-slate-500">Students complete six 20-question starting-level tests over several school sessions. Their work saves after every response and resumes when you next open the checkpoint.</p></div>
               <button type="button" disabled={assignmentBusy} onClick={() => setAssignmentOpen(false)} aria-label="Close assignment" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
             </div>
             <div className="space-y-5 p-5">
@@ -473,6 +516,12 @@ export default function WholeMathsDiagnosticPanel({
                   <div>
                     <p className="font-bold text-slate-900">{studentNames.get(sitting.student_id) ?? "Student"}</p>
                     <p className="text-xs text-slate-500">{CHECKPOINT_LABEL[sitting.checkpoint]} · {new Date(sitting.created_at).toLocaleDateString("en-AU")}</p>
+                    {sitting.status !== "completed" ? (() => {
+                      const completed = sitting.strand_results.filter((result) => result.status === "completed").length;
+                      const active = sitting.strand_results.find((result) => result.status === "pending" && (result.answered_count ?? 0) > 0)
+                        ?? sitting.strand_results.find((result) => result.status === "pending");
+                      return <p className="mt-1 text-xs font-semibold text-teal-700">{completed}/6 strands complete{active ? ` · ${AC_STRANDS[active.strand].label} ${active.answered_count ?? 0}/20` : ""}</p>;
+                    })() : null}
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-black capitalize text-slate-800">{sitting.status.replace("_", " ")}</p>
