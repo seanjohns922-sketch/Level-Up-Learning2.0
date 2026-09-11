@@ -1,23 +1,23 @@
 # Whole-Maths Diagnostic — spec & build brief
 
-Status: **staged foundation — not live**. Number, Measurement, Space and Statistics
-are wired to their existing level-test banks, curriculum links and secure persistence.
-The teacher Diagnostic tab is visible as a readiness/reporting surface, but the full
-launch is deliberately locked. Algebra + Probability remain explicit unavailable
-dependencies; no four-strand result is renormalised or presented as a Whole-Maths
-overall. This doc remains the source of truth for the completed six-strand feature.
+Status: **six-strand implementation complete**. Number, Measurement, Space,
+Statistics, Algebra and Probability are wired to their existing level-test banks,
+curriculum links and secure persistence. Teachers assign Start, Mid and End sittings
+from the Diagnostic tab. Student answers and their current position are saved as they
+work, and an official overall is persisted only after all six strands are complete.
 
 Current implementation:
 
 - `lib/whole-maths-diagnostic.ts` owns the adaptive rules, named thresholds and
   weighted-overall calculation; `lib/whole-maths-diagnostic-questions.ts` owns
   deterministic level-test selection and curriculum linking.
-- `components/teacher/WholeMathsDiagnosticPanel.tsx` is the staged teacher tab.
-- `app/diagnostic/page.tsx` is the unlinked student instrument used while building
-  and verifying the four available strands.
-- `supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql` owns
-  immutable sittings and server-controlled placement. Full six-strand assignment is
-  rejected until the two missing test banks exist.
+- `components/teacher/WholeMathsDiagnosticPanel.tsx` owns assignment, reporting and
+  the live-versus-official progression view.
+- `app/diagnostic/page.tsx` is the student instrument. An assigned sitting takes
+  priority on student entry and resumes from its server-saved position.
+- `supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql` owns the
+  original tables; `20260911120000_complete_six_strand_whole_maths_diagnostic.sql`
+  completes resumability, the six-strand official calculation and secure placement.
 - `scripts/whole-maths-diagnostic-audit.ts` prevents partial results being labelled
   as the official 139-point overall.
 
@@ -190,21 +190,20 @@ tracking now?
 - A teal line and endpoint show the current live score.
 - A violet diagnostic line carries fixed `S`, `M` and `E` dots for Start, Mid and
   End results. Historical dots never move when the live score changes.
-- Tabs are ordered `All`, `Number`, `Measurement`, `Space`, `Statistics`, then the
-  future `Algebra` and `Probability` strands.
+- Tabs are ordered `All`, `Number`, `Measurement`, `Space`, `Statistics`, `Algebra`
+  and `Probability`.
 - `All` displays a complete curriculum-point-weighted score only when all six strand
   values exist. It must never substitute, renormalise or approximate from four.
-- Start/Mid/End assignment belongs in this panel. The scheduling control remains
-  locked until all six diagnostic strand engines are production-ready.
+- Start/Mid/End assignment belongs in this panel and always assigns all six strands.
 
 Realm assessment recalibration uses the named `MASTERY = 85` and `FLOOR = 40`
 thresholds. At 85%+, completion of the tested level is confirmed (Level 3 → 3.00).
 From 40–84%, the score is placed proportionally within the tested curriculum band
 (a Level 4 result of 60% → 3.44). Below 40%, the checkpoint may move below the tested level while the
 student's assigned working level remains unchanged for support/review.
-Predicted strand levels will use the same level-aware descriptor calculation for the
-live overall after all six strands exist. Until then, the four available strand
-predictions remain separate and the predicted Whole-Maths overall is `null`.
+Predicted strand levels use the same level-aware descriptor calculation for the live
+overall. The live overall remains `null` whenever any of the six realm predictions is
+missing.
 
 Evidence status is strict and separate from the maths:
 
@@ -297,8 +296,8 @@ Release order is therefore fixed:
 - 88% L4 (also mastered) → probe L5 (multi-level leapfrog).
 - Next level < 40% → hold at mastered level + "extension" flag (no move).
 - Measured below current placement → no demotion; teacher review flag created.
-- Placement changes only at Start/Mid/End (or teacher-triggered), never silently from
-  weekly practice.
+- Placement changes only at Start/Mid/End, never from an ad-hoc check or silently
+  from weekly practice.
 - No demo-only shortcuts — identical rules/persistence for real students.
 
 ## Dependencies

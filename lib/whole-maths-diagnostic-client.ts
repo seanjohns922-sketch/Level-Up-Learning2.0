@@ -38,6 +38,10 @@ export type PendingStudentDiagnostic = {
   strand: AcStrand;
   starting_level: string;
   status: "assigned" | "in_progress";
+  active_level: string | null;
+  draft_answers: Record<string, string>;
+  draft_probes: DiagnosticProbeScore[];
+  draft_index: number;
 };
 
 export type LiveMathsProgressionRow = {
@@ -124,4 +128,25 @@ export async function completeDiagnosticStrand(
     placement_applied: boolean;
     flag: DiagnosticFlag;
   };
+}
+
+export async function saveDiagnosticProgress(
+  studentId: string,
+  sittingId: string,
+  strand: AcStrand,
+  activeLevel: string,
+  answers: Record<string, string>,
+  probes: DiagnosticProbeScore[],
+  questionIndex: number,
+) {
+  const { error } = await supabase.rpc("save_whole_math_diagnostic_progress", {
+    p_student_id: studentId,
+    p_sitting_id: sittingId,
+    p_strand: strand,
+    p_active_level: activeLevel,
+    p_answers: answers,
+    p_probe_scores: probes,
+    p_question_index: questionIndex,
+  });
+  if (error) rpcError(error, "Could not save diagnostic progress.");
 }

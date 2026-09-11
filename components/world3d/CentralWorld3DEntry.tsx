@@ -8,6 +8,7 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { resolveRealm3DAccess } from "@/lib/world3d/access";
 import { restoreCanonicalWorldState } from "@/lib/world3d/canonical-bootstrap";
 import { StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
 
 const CentralWorld = dynamic(() => import("@/components/world3d/CentralWorld"), {
   ssr: false,
@@ -34,6 +35,12 @@ export default function CentralWorld3DEntry({ teacherPreview = false }: { teache
     let cancelled = false;
     const restore = async () => {
       try {
+        const pendingDiagnostic = await fetchPendingStudentDiagnostic(profile.studentId);
+        if (cancelled) return;
+        if (pendingDiagnostic) {
+          router.replace("/diagnostic");
+          return;
+        }
         const restored = await restoreCanonicalWorldState(profile.studentId);
         if (cancelled) return;
         if (!restored.get("number")?.progress) {

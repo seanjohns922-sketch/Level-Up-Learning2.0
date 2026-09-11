@@ -10,6 +10,7 @@ import { markStudentIntroSeen, restoreStudentStateFromServer, StudentRestoreSupe
 import { supabase } from "@/lib/supabase";
 import { buildGroundFirstLessonRoute, resolveStudentDestination } from "@/lib/student-destination";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
 
 function StudentHomeBackdrop() {
   return (
@@ -57,6 +58,12 @@ export default function StudentHomePage() {
     async function restore() {
       setRestoreState("loading");
       try {
+        const pendingDiagnostic = await fetchPendingStudentDiagnostic(studentId!);
+        if (cancelled) return;
+        if (pendingDiagnostic) {
+          router.replace("/diagnostic");
+          return;
+        }
         const restored = await restoreStudentStateFromServer(studentId!, "number");
         if (cancelled) return;
         if (!restored.progress) {

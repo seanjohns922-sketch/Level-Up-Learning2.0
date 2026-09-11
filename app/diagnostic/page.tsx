@@ -10,6 +10,7 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import {
   completeDiagnosticStrand,
   fetchPendingStudentDiagnostic,
+  saveDiagnosticProgress,
   type PendingStudentDiagnostic,
 } from "@/lib/whole-maths-diagnostic-client";
 import {
@@ -44,7 +45,12 @@ export default function WholeMathsDiagnosticPage() {
     }
     const next = await fetchPendingStudentDiagnostic(profile.studentId);
     setPending(next);
-    if (next) setLevel(next.starting_level);
+    if (next) {
+      setLevel(next.active_level ?? next.starting_level);
+      setAnswers(next.draft_answers ?? {});
+      setProbes(next.draft_probes ?? []);
+      setIndex(Math.max(0, next.draft_index ?? 0));
+    }
     return next;
   }, [profile?.studentId, router]);
 
@@ -65,9 +71,31 @@ export default function WholeMathsDiagnosticPage() {
   const current = linkedQuestions[index];
   const answeredCount = linkedQuestions.filter(({ question }) => answers[question.id] != null).length;
 
-  function recordAnswer(value: string) {
-    if (!current) return;
-    setAnswers((previous) => ({ ...previous, [current.question.id]: value }));
+  async function recordAnswer(value: string) {
+    if (!current || !pending || !profile?.studentId) return;
+    const nextAnswers = { ...answers, [current.question.id]: value };
+    setAnswers(nextAnswers);
+    setSaving(true);
+    try {
+      await saveDiagnosticProgress(profile.studentId, pending.sitting_id, pending.strand, level, nextAnswers, probes, index);
+      setError(null);
+    } catch {
+      setError("Your answer is still on this screen, but it could not be saved. Check your connection before continuing.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function moveToQuestion(nextIndex: number) {
+    if (!pending || !profile?.studentId) return;
+    const boundedIndex = Math.max(0, Math.min(linkedQuestions.length - 1, nextIndex));
+    setIndex(boundedIndex);
+    try {
+      await saveDiagnosticProgress(profile.studentId, pending.sitting_id, pending.strand, level, answers, probes, boundedIndex);
+      setError(null);
+    } catch {
+      setError("Your place could not be saved. Check your connection before leaving this page.");
+    }
   }
 
   async function finishLevel() {
@@ -88,11 +116,21 @@ export default function WholeMathsDiagnosticPage() {
     const nextProbes = [...probes, probe];
     const decision = decideDiagnosticPlacement(pending.starting_level, nextProbes);
     if (decision.shouldProbeNext) {
-      setProbes(nextProbes);
-      setLevel(diagnosticLevelLabel(diagnosticLevelNumber(level) + 1));
-      setAnswers({});
-      setIndex(0);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      const nextLevel = diagnosticLevelLabel(diagnosticLevelNumber(level) + 1);
+      setSaving(true);
+      setError(null);
+      try {
+        await saveDiagnosticProgress(profile.studentId, pending.sitting_id, pending.strand, nextLevel, {}, nextProbes, 0);
+        setProbes(nextProbes);
+        setLevel(nextLevel);
+        setAnswers({});
+        setIndex(0);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : "Your next diagnostic level could not be saved.");
+      } finally {
+        setSaving(false);
+      }
       return;
     }
 
@@ -130,7 +168,8 @@ export default function WholeMathsDiagnosticPage() {
     return <main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white"><div><h1 className="text-2xl font-black">Diagnostic unavailable</h1><p className="mt-2 text-slate-300">{error}</p><button type="button" onClick={() => router.push("/world")} className="mt-5 rounded-xl bg-teal-400 px-5 py-3 font-black text-slate-950">Return to my world</button></div></main>;
   }
   if (!pending) {
-    return <main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white"><div><h1 className="text-3xl font-black">Diagnostic section complete</h1><p className="mt-2 text-slate-300">Your saved results are ready for your teacher.</p><button type="button" onClick={() => router.push("/world")} className="mt-5 rounded-xl bg-teal-400 px-5 py-3 font-black text-slate-950">Return to my world</button></div></main>;
+    const completionText = "Diagnostic complete. Your six strand results and overall maths level are saved for your teacher.";
+    return <ReadAloudRateProvider><main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white"><div><h1 className="text-3xl font-black">Diagnostic complete</h1><p className="mt-2 text-slate-300">Your six strand results and overall maths level are saved for your teacher.</p><ReadAloudBtn text={completionText} className="mt-4" /><button type="button" onClick={() => router.push("/world")} className="mt-5 rounded-xl bg-teal-400 px-5 py-3 font-black text-slate-950">Return to my world</button></div></main></ReadAloudRateProvider>;
   }
   if (linkedQuestions.length === 0 || !current) {
     return <main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white"><div><h1 className="text-2xl font-black">This strand test is not ready</h1><p className="mt-2 text-slate-300">No level-test bank exists for {AC_STRANDS[pending.strand].label} at {level}. Nothing has been scored or placed.</p></div></main>;
@@ -160,14 +199,14 @@ export default function WholeMathsDiagnosticPage() {
               key={current.question.id}
               question={current.question}
               value={answers[current.question.id] ?? null}
-              onChange={recordAnswer}
+              onChange={(value) => { void recordAnswer(value); }}
               realmId={pending.strand}
             />
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-700 pt-5">
-              <button type="button" disabled={index === 0 || saving} onClick={() => setIndex((value) => Math.max(0, value - 1))} className="rounded-xl border border-slate-600 px-5 py-3 font-bold disabled:opacity-40">Back</button>
-              <button type="button" onClick={() => recordAnswer("__i_dont_know__")} className="text-sm font-bold text-slate-300 underline decoration-slate-500 underline-offset-4">I don&apos;t know</button>
+              <button type="button" disabled={index === 0 || saving} onClick={() => void moveToQuestion(index - 1)} className="rounded-xl border border-slate-600 px-5 py-3 font-bold disabled:opacity-40">Back</button>
+              <button type="button" disabled={saving} onClick={() => void recordAnswer("__i_dont_know__")} className="text-sm font-bold text-slate-300 underline decoration-slate-500 underline-offset-4 disabled:opacity-40">I don&apos;t know</button>
               {index < linkedQuestions.length - 1 ? (
-                <button type="button" disabled={answers[current.question.id] == null || saving} onClick={() => setIndex((value) => value + 1)} className="rounded-xl bg-teal-400 px-6 py-3 font-black text-slate-950 disabled:opacity-40">Next</button>
+                <button type="button" disabled={answers[current.question.id] == null || saving} onClick={() => void moveToQuestion(index + 1)} className="rounded-xl bg-teal-400 px-6 py-3 font-black text-slate-950 disabled:opacity-40">Next</button>
               ) : (
                 <button type="button" disabled={answeredCount !== linkedQuestions.length || saving} onClick={() => void finishLevel()} className="rounded-xl bg-teal-400 px-6 py-3 font-black text-slate-950 disabled:opacity-40">{saving ? "Saving…" : "Finish this level"}</button>
               )}

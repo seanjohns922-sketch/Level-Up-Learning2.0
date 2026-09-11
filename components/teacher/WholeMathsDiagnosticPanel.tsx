@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, CheckCircle2, Clock3, LockKeyhole, ShieldCheck, TrendingUp } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock3, ShieldCheck, TrendingUp, X } from "lucide-react";
 import {
   AC_DESCRIPTOR_COUNTS_BY_LEVEL,
   AC_PRIMARY_LEVELS,
@@ -19,6 +19,7 @@ import {
 import {
   fetchTeacherDiagnostics,
   fetchTeacherLiveMathsProgression,
+  assignWholeMathsDiagnostic,
   type LiveMathsProgressionRow,
   type TeacherDiagnosticSittingRow,
 } from "@/lib/whole-maths-diagnostic-client";
@@ -116,6 +117,11 @@ export default function WholeMathsDiagnosticPanel({
   const [selectedStrand, setSelectedStrand] = useState<TrackerTab>("all");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [assignmentOpen, setAssignmentOpen] = useState(false);
+  const [assignmentCheckpoint, setAssignmentCheckpoint] = useState<FormalCheckpoint>("start");
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const [assignmentBusy, setAssignmentBusy] = useState(false);
+  const [assignmentMessage, setAssignmentMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -187,6 +193,48 @@ export default function WholeMathsDiagnosticPanel({
     return new Map([...grouped].map(([studentId, checkpoints]) => [studentId, [...checkpoints.values()].sort((left, right) => left.completedAt.localeCompare(right.completedAt))]));
   }, [selectedStrand, sittings]);
 
+  const activeStudentIds = useMemo(
+    () => new Set(sittings.filter((sitting) => sitting.status !== "completed").map((sitting) => sitting.student_id)),
+    [sittings],
+  );
+  const assignableStudents = students.filter((student) => !activeStudentIds.has(student.id));
+
+  function openAssignment() {
+    setSelectedStudentIds(assignableStudents.map((student) => student.id));
+    setAssignmentMessage(null);
+    setAssignmentOpen(true);
+  }
+
+  async function assignDiagnostics() {
+    if (!selectedClass?.id || selectedStudentIds.length === 0) return;
+    setAssignmentBusy(true);
+    setAssignmentMessage(null);
+    const outcomes = await Promise.allSettled(selectedStudentIds.map((studentId) =>
+      assignWholeMathsDiagnostic(
+        studentId,
+        assignmentCheckpoint,
+        DIAGNOSTIC_STRANDS.map((definition) => definition.strand),
+      ),
+    ));
+    const assigned = outcomes.filter((outcome) => outcome.status === "fulfilled").length;
+    const failed = outcomes.length - assigned;
+    try {
+      const [rows, liveProgression] = await Promise.all([
+        fetchTeacherDiagnostics(selectedClass.id),
+        fetchTeacherLiveMathsProgression(selectedClass.id),
+      ]);
+      setSittings(rows);
+      setProgression(liveProgression);
+    } catch {
+      // The assignment result remains authoritative; normal polling retries the report.
+    }
+    setAssignmentBusy(false);
+    setAssignmentMessage(failed === 0
+      ? `${assigned} diagnostic${assigned === 1 ? "" : "s"} assigned successfully.`
+      : `${assigned} assigned. ${failed} could not be assigned because an active diagnostic or class access rule prevented it.`);
+    if (failed === 0) setSelectedStudentIds([]);
+  }
+
   return (
     <section className="space-y-5" aria-labelledby="whole-maths-diagnostic-title">
       <div className="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-white p-5 shadow-sm">
@@ -238,12 +286,11 @@ export default function WholeMathsDiagnosticPanel({
             </div>
             <button
               type="button"
-              disabled
-              title="Teacher scheduling controls will be released as a separate workflow."
-              className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-black text-slate-400"
+              onClick={openAssignment}
+              disabled={!selectedClass || assignableStudents.length === 0}
+              className="inline-flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-xs font-black text-teal-800 transition hover:bg-teal-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
             >
-              <CalendarDays className="h-4 w-4" aria-hidden /> Scheduling controls
-              <LockKeyhole className="h-3.5 w-3.5" aria-hidden />
+              <CalendarDays className="h-4 w-4" aria-hidden /> Assign Start / Mid / End
             </button>
           </div>
         </div>
@@ -294,6 +341,24 @@ export default function WholeMathsDiagnosticPanel({
           The teal marker moves as lessons, quizzes and realm tests update the live score. Purple markers are formal diagnostic results and remain fixed historical checkpoints. The complete All score is withheld until every strand has been tested.
         </div>
       </article>
+
+      {assignmentOpen ? (
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/60 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !assignmentBusy) setAssignmentOpen(false); }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="assign-diagnostic-title" className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
+              <div><h3 id="assign-diagnostic-title" className="text-xl font-black text-slate-950">Assign Whole-Maths Diagnostic</h3><p className="mt-1 text-sm text-slate-500">Students complete all six strands. Their work saves after every response and resumes on their next login.</p></div>
+              <button type="button" disabled={assignmentBusy} onClick={() => setAssignmentOpen(false)} aria-label="Close assignment" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="space-y-5 p-5">
+              <fieldset><legend className="text-sm font-black text-slate-900">Checkpoint</legend><div className="mt-2 grid gap-2 sm:grid-cols-3">{(["start", "mid", "end"] as FormalCheckpoint[]).map((checkpoint) => <label key={checkpoint} className={`cursor-pointer rounded-xl border p-3 ${assignmentCheckpoint === checkpoint ? "border-teal-500 bg-teal-50" : "border-slate-200"}`}><input type="radio" name="diagnostic-checkpoint" value={checkpoint} checked={assignmentCheckpoint === checkpoint} onChange={() => setAssignmentCheckpoint(checkpoint)} className="mr-2" /><span className="font-bold text-slate-900">{checkpoint === "start" ? "Start" : checkpoint === "mid" ? "Mid" : "End"}</span></label>)}</div></fieldset>
+              <fieldset><legend className="sr-only">Students</legend><div className="flex items-center justify-between gap-3"><span className="text-sm font-black text-slate-900">Students</span><button type="button" onClick={() => setSelectedStudentIds(selectedStudentIds.length === assignableStudents.length ? [] : assignableStudents.map((student) => student.id))} className="text-xs font-black text-teal-700">{selectedStudentIds.length === assignableStudents.length ? "Clear all" : "Select all"}</button></div><div className="mt-2 grid max-h-64 gap-2 overflow-y-auto sm:grid-cols-2">{students.map((student) => { const active = activeStudentIds.has(student.id); return <label key={student.id} className={`rounded-xl border p-3 ${active ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-pointer border-slate-200 text-slate-900"}`}><input type="checkbox" disabled={active || assignmentBusy} checked={selectedStudentIds.includes(student.id)} onChange={() => setSelectedStudentIds((current) => current.includes(student.id) ? current.filter((id) => id !== student.id) : [...current, student.id])} className="mr-2" /><span className="font-bold">{student.display_name}</span>{active ? <span className="ml-2 text-xs">Active diagnostic</span> : null}</label>; })}</div></fieldset>
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">Official overall results appear only after Number, Measurement, Space, Statistics, Algebra and Probability are all complete. Start, Mid and End may securely promote a mastered realm, but never automatically demote a student.</div>
+              {assignmentMessage ? <p role="status" className="rounded-xl bg-slate-100 p-3 text-sm font-bold text-slate-800">{assignmentMessage}</p> : null}
+              <div className="flex justify-end gap-2"><button type="button" disabled={assignmentBusy} onClick={() => setAssignmentOpen(false)} className="rounded-xl border border-slate-300 px-4 py-2.5 font-bold text-slate-700">Close</button><button type="button" disabled={assignmentBusy || selectedStudentIds.length === 0} onClick={() => void assignDiagnostics()} className="rounded-xl bg-teal-600 px-5 py-2.5 font-black text-white disabled:opacity-40">{assignmentBusy ? "Assigning…" : `Assign to ${selectedStudentIds.length}`}</button></div>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {DIAGNOSTIC_STRANDS.map((definition) => {

@@ -175,9 +175,13 @@ assert(
 );
 const panel = read("components/teacher/WholeMathsDiagnosticPanel.tsx");
 assert(panel.includes("All six maths strand engines are connected"), "The teacher UI must show that Probability is connected.");
+assert(panel.includes("Assign Start / Mid / End"), "Teachers must be able to assign the formal diagnostic from its dashboard tab.");
+assert(panel.includes("assignWholeMathsDiagnostic"), "The diagnostic assignment control must call the secure assignment RPC.");
 const studentInstrument = read("app/diagnostic/page.tsx");
 assert(!studentInstrument.includes("isDemoPreviewMode"), "The diagnostic must not have a demo-only persistence shortcut.");
+assert(studentInstrument.includes("saveDiagnosticProgress"), "Student answers and position must persist during a sitting.");
 const migration = read("supabase/migrations/20260910170000_release_chance_hollow_live_realm.sql");
+const completionMigration = read("supabase/migrations/20260911120000_complete_six_strand_whole_maths_diagnostic.sql");
 const diagnosticFoundation = read("supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql");
 assert(!migration.includes("available_weight"), "Curriculum weights must not be duplicated in the database migration.");
 for (const required of [
@@ -190,5 +194,19 @@ for (const required of [
   assert(migration.toLowerCase().includes(required.toLowerCase()), `Diagnostic migration is missing: ${required}`);
 }
 assert(diagnosticFoundation.toLowerCase().includes("if v_placement then"), "Secure diagnostic completion must retain guarded placement application.");
+for (const required of [
+  "save_whole_math_diagnostic_progress",
+  "perform public.assert_student_access(p_student_id)",
+  "whole_math_level_for_sitting",
+  "v_sitting.checkpoint in ('start','mid','end')",
+  "official diagnostic requires all six completed strands",
+]) {
+  assert(completionMigration.toLowerCase().includes(required.toLowerCase()), `Completed diagnostic workflow is missing: ${required}`);
+}
+const centralWorldEntry = read("components/world3d/CentralWorld3DEntry.tsx");
+assert(
+  centralWorldEntry.includes("fetchPendingStudentDiagnostic") && centralWorldEntry.includes('router.replace("/diagnostic")'),
+  "An assigned diagnostic must take priority when a student enters the world.",
+);
 
-console.log("Whole-Maths Diagnostic audit passed: all six strands connected, official overall requires six results, and server placement remains guarded.");
+console.log("Whole-Maths Diagnostic audit passed: assignment, six-strand scoring, resumability, student handoff and guarded placement are connected.");
