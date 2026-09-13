@@ -1,20 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, CheckCircle2, Clock3, ShieldCheck, TrendingUp, X } from "lucide-react";
-import {
-  AC_DESCRIPTOR_COUNTS_BY_LEVEL,
-  AC_PRIMARY_LEVELS,
-  AC_STRANDS,
-} from "@/lib/curriculum/ac-standards";
+import { CalendarDays, Info, ListChecks, TrendingUp, X } from "lucide-react";
+import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
 import {
   DIAGNOSTIC_FLOOR,
   DIAGNOSTIC_MASTERY,
   DIAGNOSTIC_STRANDS,
   WHOLE_MATHS_WEIGHT_TOTAL,
   computeWholeMathsLevel,
-  computeReachedCurriculumPoints,
-  diagnosticAvailableWeight,
 } from "@/lib/whole-maths-diagnostic";
 import {
   fetchTeacherDiagnostics,
@@ -31,8 +25,9 @@ import { formatProgressionPoint } from "@/lib/live-maths-progression";
 
 type DiagnosticStudent = { id: string; display_name: string };
 type TrackerTab = "all" | LiveMathsProgressionRow["strand"];
+type DiagnosticView = "live" | "run";
 type FormalCheckpoint = Exclude<TeacherDiagnosticSittingRow["checkpoint"], "ad_hoc">;
-type DiagnosticPoint = { checkpoint: FormalCheckpoint; level: number; completedAt: string };
+type DiagnosticPoint = { sittingId: string; checkpoint: FormalCheckpoint; level: number; completedAt: string };
 
 const CHECKPOINT_LABEL = {
   start: "Start-of-year diagnostic",
@@ -56,9 +51,11 @@ function levelPosition(level: number) {
 function ProgressionTrack({
   liveLevel,
   diagnosticPoints,
+  onSelectDiagnostic,
 }: {
   liveLevel: number | null;
   diagnosticPoints: DiagnosticPoint[];
+  onSelectDiagnostic: (sittingId: string) => void;
 }) {
   const latestDiagnostic = diagnosticPoints.at(-1)?.level ?? null;
   return (
@@ -84,30 +81,23 @@ function ProgressionTrack({
           <div className="absolute inset-x-0 top-3 h-1 rounded-full bg-slate-100" />
           {latestDiagnostic != null && <div className="absolute left-0 top-3 h-1 rounded-full bg-violet-400" style={{ width: levelPosition(latestDiagnostic) }} />}
           {diagnosticPoints.map((point) => (
-            <span
+            <button
               key={`${point.checkpoint}-${point.completedAt}`}
+              type="button"
+              onClick={() => onSelectDiagnostic(point.sittingId)}
               className="absolute top-0 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white bg-violet-600 text-[10px] font-black text-white shadow"
               style={{ left: levelPosition(point.level) }}
-              title={`${CHECKPOINT_LABEL[point.checkpoint]}: ${formatProgressionPoint(point.level)}`}
-              aria-label={`${CHECKPOINT_LABEL[point.checkpoint]} level ${formatProgressionPoint(point.level)}`}
+              title={`${CHECKPOINT_LABEL[point.checkpoint]}: ${formatProgressionPoint(point.level)}. Open details.`}
+              aria-label={`Open ${CHECKPOINT_LABEL[point.checkpoint]} result at level ${formatProgressionPoint(point.level)}`}
             >
               {CHECKPOINT_SHORT[point.checkpoint]}
-            </span>
+            </button>
           ))}
         </div>
       </div>
     </div>
   );
 }
-
-const WORKED_EXAMPLE = {
-  number: 4,
-  measurement: 4.5,
-  space: 4,
-  statistics: 4.5,
-  algebra: 3.5,
-  probability: 4,
-} as const;
 
 export default function WholeMathsDiagnosticPanel({
   selectedClass,
@@ -118,51 +108,88 @@ export default function WholeMathsDiagnosticPanel({
 }) {
   const [sittings, setSittings] = useState<TeacherDiagnosticSittingRow[]>([]);
   const [progression, setProgression] = useState<LiveMathsProgressionRow[]>([]);
+  const [view, setView] = useState<DiagnosticView>("live");
   const [selectedStrand, setSelectedStrand] = useState<TrackerTab>("all");
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [liveLoading, setLiveLoading] = useState(true);
+  const [liveError, setLiveError] = useState<string | null>(null);
+  const [diagnosticLoading, setDiagnosticLoading] = useState(true);
+  const [diagnosticError, setDiagnosticError] = useState<string | null>(null);
   const [assignmentOpen, setAssignmentOpen] = useState(false);
-  const [assignmentCheckpoint, setAssignmentCheckpoint] = useState<FormalCheckpoint>("start");
+  const [assignmentCheckpoint, setAssignmentCheckpoint] = useState<FormalCheckpoint>("end");
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [assignmentBusy, setAssignmentBusy] = useState(false);
   const [assignmentMessage, setAssignmentMessage] = useState<string | null>(null);
   const [schoolSession, setSchoolSession] = useState<DiagnosticSchoolSession | null>(null);
   const [sessionBusy, setSessionBusy] = useState(false);
   const [sessionError, setSessionError] = useState<string | null>(null);
+  const [scoringOpen, setScoringOpen] = useState(false);
+  const [selectedSittingId, setSelectedSittingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    async function load(showLoading: boolean) {
+    async function loadLive(showLoading: boolean) {
       if (!selectedClass?.id) {
-        setSittings([]);
         setProgression([]);
-        setLoading(false);
+        setLiveLoading(false);
         return;
       }
-      if (showLoading) setLoading(true);
+      if (showLoading) setLiveLoading(true);
       try {
-        const [rows, liveProgression, activeSchoolSession] = await Promise.all([
-          fetchTeacherDiagnostics(selectedClass.id),
-          fetchTeacherLiveMathsProgression(selectedClass.id),
-          fetchDiagnosticSchoolSession(selectedClass.id),
-        ]);
+        const rows = await fetchTeacherLiveMathsProgression(selectedClass.id);
         if (!cancelled) {
-          setSittings(rows);
-          setProgression(liveProgression);
-          setSchoolSession(activeSchoolSession);
-          setLoadError(null);
+          setProgression(rows);
+          setLiveError(null);
         }
       } catch (error) {
         if (!cancelled) {
-          console.warn("[WholeMathsDiagnostic] Could not load diagnostics", error);
-          setLoadError("The diagnostic database foundation has not been deployed yet.");
+          console.warn("[WholeMathsDiagnostic] Could not load live progression", error);
+          setProgression([]);
+          setLiveError("Live progression could not be loaded. Try again shortly.");
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setLiveLoading(false);
       }
     }
-    void load(true);
-    const intervalId = window.setInterval(() => { void load(false); }, 30_000);
+    void loadLive(true);
+    const intervalId = window.setInterval(() => { void loadLive(false); }, 30_000);
+    return () => { cancelled = true; window.clearInterval(intervalId); };
+  }, [selectedClass?.id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadDiagnostic(showLoading: boolean) {
+      if (!selectedClass?.id) {
+        setSittings([]);
+        setSchoolSession(null);
+        setDiagnosticLoading(false);
+        return;
+      }
+      if (showLoading) setDiagnosticLoading(true);
+      const [recordsResult, sessionResult] = await Promise.allSettled([
+        fetchTeacherDiagnostics(selectedClass.id),
+        fetchDiagnosticSchoolSession(selectedClass.id),
+      ]);
+      if (cancelled) return;
+      if (recordsResult.status === "fulfilled") {
+        setSittings(recordsResult.value);
+        setDiagnosticError(null);
+      } else {
+        console.warn("[WholeMathsDiagnostic] Could not load diagnostic records", recordsResult.reason);
+        setSittings([]);
+        setDiagnosticError("Diagnostic assessment controls are not available in this environment yet. Live progression is unaffected.");
+      }
+      if (sessionResult.status === "fulfilled") {
+        setSchoolSession(sessionResult.value);
+        setSessionError(null);
+      } else {
+        console.warn("[WholeMathsDiagnostic] Could not load supervised session", sessionResult.reason);
+        setSchoolSession(null);
+        setSessionError("The supervised-session control is unavailable until the diagnostic database update is deployed.");
+      }
+      setDiagnosticLoading(false);
+    }
+    void loadDiagnostic(true);
+    const intervalId = window.setInterval(() => { void loadDiagnostic(false); }, 30_000);
     return () => { cancelled = true; window.clearInterval(intervalId); };
   }, [selectedClass?.id]);
 
@@ -170,9 +197,6 @@ export default function WholeMathsDiagnosticPanel({
     () => new Map(students.map((student) => [student.id, student.display_name])),
     [students],
   );
-  const availableWeight = diagnosticAvailableWeight();
-  const workedOverall = computeWholeMathsLevel(WORKED_EXAMPLE);
-  const workedReachedPoints = computeReachedCurriculumPoints(WORKED_EXAMPLE);
   const progressionByStudent = useMemo(() => {
     const grouped = new Map<string, LiveMathsProgressionRow[]>();
     for (const row of progression) {
@@ -193,6 +217,7 @@ export default function WholeMathsDiagnosticPanel({
       if (level == null) continue;
       const checkpoints = grouped.get(sitting.student_id) ?? new Map<FormalCheckpoint, DiagnosticPoint>();
       checkpoints.set(sitting.checkpoint, {
+        sittingId: sitting.id,
         checkpoint: sitting.checkpoint,
         level,
         completedAt: sitting.completed_at ?? sitting.created_at,
@@ -207,6 +232,9 @@ export default function WholeMathsDiagnosticPanel({
     [sittings],
   );
   const assignableStudents = students.filter((student) => !activeStudentIds.has(student.id));
+  const selectedSitting = selectedSittingId
+    ? sittings.find((sitting) => sitting.id === selectedSittingId) ?? null
+    : null;
 
   function openAssignment() {
     setSelectedStudentIds(assignableStudents.map((student) => student.id));
@@ -228,14 +256,11 @@ export default function WholeMathsDiagnosticPanel({
     const assigned = outcomes.filter((outcome) => outcome.status === "fulfilled").length;
     const failed = outcomes.length - assigned;
     try {
-      const [rows, liveProgression] = await Promise.all([
-        fetchTeacherDiagnostics(selectedClass.id),
-        fetchTeacherLiveMathsProgression(selectedClass.id),
-      ]);
-      setSittings(rows);
-      setProgression(liveProgression);
+      setSittings(await fetchTeacherDiagnostics(selectedClass.id));
+      setDiagnosticError(null);
     } catch {
       // The assignment result remains authoritative; normal polling retries the report.
+      setDiagnosticError("The diagnostic was assigned, but its class progress could not be refreshed.");
     }
     setAssignmentBusy(false);
     setAssignmentMessage(failed === 0
@@ -265,29 +290,23 @@ export default function WholeMathsDiagnosticPanel({
 
   return (
     <section className="space-y-5" aria-labelledby="whole-maths-diagnostic-title">
-      <div className="rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-white p-5 shadow-sm">
+      <header className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
-              <CheckCircle2 className="h-4 w-4" aria-hidden /> Six strands connected
-            </div>
-            <h2 id="whole-maths-diagnostic-title" className="mt-2 text-2xl font-black text-slate-950">
+            <h2 id="whole-maths-diagnostic-title" className="text-2xl font-black text-slate-950">
               Whole-Maths Diagnostic
             </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              All six maths strand engines are connected to their existing level-test questions, including Chance Hollow for Probability.
-              Each starting level uses 20 questions. Students complete one strand at a time over several supervised school sessions,
-              and an official Whole-Maths score is calculated only after all six strand results are complete.
-            </p>
+            <p className="mt-1 text-sm text-slate-500">Follow live learning every day and run a formal Start, Mid or End checkpoint when your school is ready.</p>
           </div>
-          <div className="rounded-xl border border-amber-200 bg-white px-4 py-3 text-right">
-            <div className="text-2xl font-black text-slate-950">{availableWeight}/{WHOLE_MATHS_WEIGHT_TOTAL}</div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">curriculum points ready</div>
-          </div>
+          <button type="button" onClick={() => setScoringOpen(true)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-50"><Info className="h-4 w-4" />How scoring works</button>
         </div>
-      </div>
+        <div className="mt-4 inline-flex rounded-xl bg-slate-100 p-1" aria-label="Diagnostic views">
+          <button type="button" onClick={() => setView("live")} className={view === "live" ? "inline-flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-black text-white shadow" : "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-black text-slate-600"}><TrendingUp className="h-4 w-4" />Live progression</button>
+          <button type="button" onClick={() => setView("run")} className={view === "run" ? "inline-flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-black text-white shadow" : "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-black text-slate-600"}><ListChecks className="h-4 w-4" />Run diagnostic</button>
+        </div>
+      </header>
 
-      <article className={`rounded-2xl border p-4 shadow-sm ${schoolSession ? "border-emerald-300 bg-emerald-50" : "border-slate-200 bg-white"}`}>
+      {view === "run" ? <article className={`rounded-2xl border p-4 shadow-sm ${schoolSession ? "border-emerald-300 bg-emerald-50" : "border-slate-200 bg-white"}`}>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-sm font-black text-slate-950">Supervised school session</p>
@@ -295,13 +314,15 @@ export default function WholeMathsDiagnosticPanel({
               ? `${CHECKPOINT_LABEL[schoolSession.checkpoint]} is open until ${new Date(schoolSession.closes_at).toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })}. Assigned students can continue at school.`
               : "Closed. Students cannot open or continue diagnostic questions at home."}</p>
           </div>
-          <button type="button" disabled={!selectedClass || sessionBusy} onClick={() => void toggleSchoolSession()} className={`rounded-xl px-4 py-2.5 text-sm font-black text-white disabled:opacity-40 ${schoolSession ? "bg-rose-600" : "bg-emerald-700"}`}>{sessionBusy ? "Saving…" : schoolSession ? "Close session" : `Open ${assignmentCheckpoint === "start" ? "Start" : assignmentCheckpoint === "mid" ? "Mid" : "End"} for 2 hours`}</button>
+          <button type="button" disabled={!selectedClass || sessionBusy || Boolean(diagnosticError)} onClick={() => void toggleSchoolSession()} className={`rounded-xl px-4 py-2.5 text-sm font-black text-white disabled:opacity-40 ${schoolSession ? "bg-rose-600" : "bg-emerald-700"}`}>{sessionBusy ? "Saving…" : schoolSession ? "Close session" : `Open ${assignmentCheckpoint === "start" ? "Start" : assignmentCheckpoint === "mid" ? "Mid" : "End"} for 2 hours`}</button>
         </div>
         {!schoolSession ? <div className="mt-3 flex flex-wrap gap-2">{(["start","mid","end"] as FormalCheckpoint[]).map((checkpoint) => <button key={checkpoint} type="button" onClick={() => setAssignmentCheckpoint(checkpoint)} className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${assignmentCheckpoint === checkpoint ? "border-emerald-500 bg-emerald-100 text-emerald-900" : "border-slate-200 bg-slate-50 text-slate-600"}`}>{checkpoint === "start" ? "Start" : checkpoint === "mid" ? "Mid" : "End"}</button>)}</div> : null}
+        {!schoolSession && assignmentCheckpoint === "end" ? <p className="mt-3 text-xs font-semibold text-slate-500">End can be this school&apos;s first formal checkpoint. No Start or Mid result is required.</p> : null}
+        {diagnosticError ? <p role="alert" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-900">{diagnosticError}</p> : null}
         {sessionError ? <p role="alert" className="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-bold text-rose-800">{sessionError}</p> : null}
-      </article>
+      </article> : null}
 
-      <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      {view === "live" ? <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
           <div>
             <div className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-teal-700" aria-hidden /><h3 className="text-lg font-black text-slate-950">Live progression tracker</h3></div>
@@ -327,25 +348,18 @@ export default function WholeMathsDiagnosticPanel({
                 </button>
               ))}
             </div>
-            <button
-              type="button"
-              onClick={openAssignment}
-              disabled={!selectedClass || assignableStudents.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-xs font-black text-teal-800 transition hover:bg-teal-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
-            >
-              <CalendarDays className="h-4 w-4" aria-hidden /> Assign Start / Mid / End
-            </button>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-100 bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600">
           <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-teal-600" />Live score</span>
           <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-violet-600" />Diagnostic score</span>
           <span className="text-slate-400">S = Start · M = Mid · E = End</span>
+          {diagnosticError ? <span className="font-semibold text-amber-700">Diagnostic markers are temporarily unavailable; live scores remain current.</span> : null}
           {selectedStrand === "all" && <span className="font-semibold text-amber-700">All requires completed results from all six strands.</span>}
         </div>
         <div className="divide-y divide-slate-100">
-          {loading || loadError ? (
-            <div className={`px-5 py-8 text-center text-sm font-semibold ${loadError ? "text-amber-800" : "text-slate-500"}`}>{loadError ?? "Loading live progression…"}</div>
+          {liveLoading || liveError ? (
+            <div className={`px-5 py-8 text-center text-sm font-semibold ${liveError ? "text-rose-700" : "text-slate-500"}`}>{liveError ?? "Loading live progression…"}</div>
           ) : students.length === 0 ? (
             <div className="px-5 py-8 text-center text-sm font-semibold text-slate-500">No students in this class.</div>
           ) : students.map((student) => {
@@ -373,7 +387,7 @@ export default function WholeMathsDiagnosticPanel({
                   </div>
                 ) : (
                   <div className="overflow-x-auto pb-1">
-                    <ProgressionTrack liveLevel={liveLevel} diagnosticPoints={diagnosticPoints} />
+                    <ProgressionTrack liveLevel={liveLevel} diagnosticPoints={diagnosticPoints} onSelectDiagnostic={setSelectedSittingId} />
                   </div>
                 )}
               </div>
@@ -381,15 +395,15 @@ export default function WholeMathsDiagnosticPanel({
           })}
         </div>
         <div className="border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs leading-5 text-slate-500">
-          The teal marker moves as lessons, quizzes and realm tests update the live score. Purple markers are formal diagnostic results and remain fixed historical checkpoints. The complete All score is withheld until every strand has been tested.
+          The teal marker moves as lessons, quizzes and realm tests update the live score. Purple markers are fixed formal results. Trial schools can begin with an End checkpoint; Start and Mid remain blank.
         </div>
-      </article>
+      </article> : null}
 
       {assignmentOpen ? (
         <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/60 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !assignmentBusy) setAssignmentOpen(false); }}>
           <section role="dialog" aria-modal="true" aria-labelledby="assign-diagnostic-title" className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
-              <div><h3 id="assign-diagnostic-title" className="text-xl font-black text-slate-950">Assign Whole-Maths Diagnostic</h3><p className="mt-1 text-sm text-slate-500">Students complete six 20-question starting-level tests over several school sessions. Their work saves after every response and resumes when you next open the checkpoint.</p></div>
+              <div><h3 id="assign-diagnostic-title" className="text-xl font-black text-slate-950">Assign Whole-Maths Diagnostic</h3><p className="mt-1 text-sm text-slate-500">Students complete six 20-question starting-level tests over several school sessions. Their work saves after every response and resumes when you next open the checkpoint.</p>{assignmentCheckpoint === "end" ? <p className="mt-2 text-xs font-bold text-teal-700">End may be the student&apos;s first formal checkpoint. Start and Mid will remain blank.</p> : null}</div>
               <button type="button" disabled={assignmentBusy} onClick={() => setAssignmentOpen(false)} aria-label="Close assignment" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
             </div>
             <div className="space-y-5 p-5">
@@ -403,111 +417,23 @@ export default function WholeMathsDiagnosticPanel({
         </div>
       ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {DIAGNOSTIC_STRANDS.map((definition) => {
-          const strand = AC_STRANDS[definition.strand];
-          return (
-            <article key={definition.strand} className={`rounded-2xl border p-4 ${definition.available ? "border-emerald-200 bg-emerald-50/60" : "border-slate-200 bg-slate-100/70"}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="font-black text-slate-950">{strand.label}</h3>
-                  <p className="mt-1 text-xs font-semibold text-slate-500">F–6 total {strand.weight} of {WHOLE_MATHS_WEIGHT_TOTAL}</p>
-                </div>
-                {definition.available ? <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-label="Engine ready" /> : <Clock3 className="h-5 w-5 text-slate-400" aria-label="Waiting for realm" />}
-              </div>
-              <p className={`mt-4 text-xs font-bold ${definition.available ? "text-emerald-700" : "text-slate-500"}`}>
-                {definition.available ? "Level-test engine ready" : definition.unavailableReason}
-              </p>
-            </article>
-          );
-        })}
-      </div>
-
-      <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="max-w-4xl">
-          <h3 className="text-lg font-black text-slate-950">How a student&apos;s overall maths level is calculated</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            The complete diagnostic tests all six maths strands. It counts the Australian Curriculum v9 descriptors reached at each student&apos;s measured level in each strand, then maps the combined curriculum points back to one progression level. This handles mixed profiles without applying one fixed F–6 percentage to every year.
-          </p>
-        </div>
-        <div className="mt-5 overflow-x-auto">
-          <table className="w-full min-w-[620px] text-left text-sm">
-            <thead><tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500"><th className="pb-2">Strand</th><th className="pb-2">Points (F–6)</th><th className="pb-2">F–6 share</th><th className="pb-2">Curriculum share</th></tr></thead>
-            <tbody>
-              {DIAGNOSTIC_STRANDS.map((definition) => {
-                const strand = AC_STRANDS[definition.strand];
-                const percent = Math.round((strand.weight / WHOLE_MATHS_WEIGHT_TOTAL) * 100);
-                return (
-                  <tr key={strand.id} className="border-b border-slate-100 last:border-0">
-                    <th className="py-3 font-bold text-slate-900">{strand.label}</th>
-                    <td className="py-3 font-semibold text-slate-700">{strand.weight}</td>
-                    <td className="py-3 font-black text-slate-900">{percent}%</td>
-                    <td className="py-3"><div className="h-2.5 w-full max-w-xs overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-teal-500" style={{ width: `${percent}%` }} /></div></td>
-                  </tr>
-                );
-              })}
-              <tr className="border-t-2 border-slate-200"><th className="pt-3 font-black text-slate-950">Total</th><td className="pt-3 font-black text-slate-950">{WHOLE_MATHS_WEIGHT_TOTAL}</td><td className="pt-3 font-black text-slate-950">100%</td><td /></tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="mt-5 overflow-x-auto">
-          <table className="w-full min-w-[720px] text-center text-xs">
-            <caption className="mb-2 text-left font-black uppercase tracking-wide text-slate-500">AC9 descriptors at each level</caption>
-            <thead><tr className="border-b border-slate-200 text-slate-500"><th className="pb-2 text-left">Strand</th>{AC_PRIMARY_LEVELS.map((level) => <th key={level} className="pb-2">{level === 0 ? "F" : `L${level}`}</th>)}<th className="pb-2">F–6</th></tr></thead>
-            <tbody>
-              {DIAGNOSTIC_STRANDS.map((definition) => (
-                <tr key={definition.strand} className="border-b border-slate-100 last:border-0">
-                  <th className="py-2 text-left font-bold text-slate-800">{AC_STRANDS[definition.strand].label}</th>
-                  {AC_PRIMARY_LEVELS.map((level) => <td key={level} className="py-2 font-semibold text-slate-600">{AC_DESCRIPTOR_COUNTS_BY_LEVEL[level][definition.strand]}</td>)}
-                  <td className="py-2 font-black text-slate-900">{AC_STRANDS[definition.strand].weight}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl bg-slate-950 p-4 text-white">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-teal-300">How it&apos;s combined</p>
-            <p className="mt-2 font-mono text-base font-bold">overall = level position of Σ curriculum points reached</p>
-            <p className="mt-2 text-xs leading-5 text-slate-300">An official number is withheld until all six formal strand tests are complete. A live estimate may use all six current realm predictions before then.</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Worked Year 5 example</p>
-            <p className="mt-2 text-sm text-slate-700">{workedReachedPoints} of {WHOLE_MATHS_WEIGHT_TOTAL} curriculum points reached</p>
-            <p className="mt-1 text-2xl font-black text-slate-950">Overall level {workedOverall?.toFixed(1)}/6</p>
-          </div>
-        </div>
-      </article>
-
-      <div className="grid gap-4 lg:grid-cols-[1fr_1.35fr]">
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-teal-700" aria-hidden />
-            <h3 className="font-black text-slate-950">Placement rules</h3>
-          </div>
-          <dl className="mt-4 grid gap-3 text-sm">
-            <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3"><dt className="font-semibold text-slate-600">Mastery</dt><dd className="font-black text-slate-950">{DIAGNOSTIC_MASTERY}%+</dd></div>
-            <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3"><dt className="font-semibold text-slate-600">Instructional floor</dt><dd className="font-black text-slate-950">{DIAGNOSTIC_FLOOR}%</dd></div>
-            <div className="flex items-center justify-between gap-4"><dt className="font-semibold text-slate-600">Automatic demotion</dt><dd className="font-black text-emerald-700">Never</dd></div>
-          </dl>
-          <p className="mt-4 text-xs leading-5 text-slate-500">
-            Placement is calculated and written by the secure database function only. Weekly practice never silently changes an official diagnostic checkpoint.
-          </p>
-        </article>
-
+      {view === "run" ? <div>
         <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-5 py-4">
-            <h3 className="font-black text-slate-950">Diagnostic history</h3>
-            <p className="mt-1 text-xs text-slate-500">Immutable Start, Mid, End and teacher-triggered records will appear here.</p>
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
+            <div>
+              <h3 className="font-black text-slate-950">Class diagnostic progress</h3>
+              <p className="mt-1 text-xs text-slate-500">Students complete all six strands over multiple supervised sessions.</p>
+            </div>
+            <button type="button" onClick={openAssignment} disabled={!selectedClass || assignableStudents.length === 0 || Boolean(diagnosticError)} className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-black text-white disabled:opacity-40"><CalendarDays className="h-4 w-4" />Assign Start / Mid / End</button>
           </div>
-          {loading ? (
+          {diagnosticLoading ? (
             <div className="p-8 text-center text-sm font-semibold text-slate-500">Loading diagnostic records…</div>
-          ) : loadError ? (
-            <div className="m-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">{loadError}</div>
+          ) : diagnosticError ? (
+            <div className="m-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">{diagnosticError}</div>
           ) : sittings.length === 0 ? (
             <div className="p-8 text-center">
               <p className="font-bold text-slate-700">No diagnostic sittings yet</p>
-              <p className="mt-1 text-sm text-slate-500">No Start, Mid or End diagnostic has been scheduled for this class yet.</p>
+              <p className="mt-1 text-sm text-slate-500">Trial schools can begin with the End diagnostic when they are ready.</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
@@ -532,7 +458,46 @@ export default function WholeMathsDiagnosticPanel({
             </div>
           )}
         </article>
-      </div>
+      </div> : null}
+
+      {selectedSitting ? (
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/60 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedSittingId(null); }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="diagnostic-detail-title" className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
+              <div>
+                <p className="text-xs font-black uppercase tracking-wide text-violet-700">{CHECKPOINT_LABEL[selectedSitting.checkpoint]}</p>
+                <h3 id="diagnostic-detail-title" className="mt-1 text-xl font-black text-slate-950">{studentNames.get(selectedSitting.student_id) ?? "Student"}</h3>
+                <p className="mt-1 text-sm text-slate-500">Overall {selectedSitting.overall_level == null ? "pending" : formatProgressionPoint(selectedSitting.overall_level)}</p>
+              </div>
+              <button type="button" onClick={() => setSelectedSittingId(null)} aria-label="Close diagnostic details" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="grid gap-3 p-5 sm:grid-cols-2">
+              {DIAGNOSTIC_STRANDS.map((definition) => {
+                const result = selectedSitting.strand_results.find((item) => item.strand === definition.strand);
+                return <div key={definition.strand} className="rounded-xl border border-slate-200 p-4"><p className="font-black text-slate-900">{AC_STRANDS[definition.strand].label}</p><p className="mt-1 text-2xl font-black text-violet-700">{result?.measured_level == null ? "—" : formatProgressionPoint(result.measured_level)}</p><p className="mt-1 text-xs font-semibold capitalize text-slate-500">{result?.status ?? "Not recorded"}</p></div>;
+              })}
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {scoringOpen ? (
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/60 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setScoringOpen(false); }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="scoring-title" className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
+              <div><h3 id="scoring-title" className="text-xl font-black text-slate-950">How scoring works</h3><p className="mt-1 text-sm text-slate-500">The detail is available here without crowding the live tracker.</p></div>
+              <button type="button" onClick={() => setScoringOpen(false)} aria-label="Close scoring information" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="space-y-5 p-5 text-sm leading-6 text-slate-600">
+              <p>All six maths strand engines are connected. Each starting-level strand test has 20 questions. An official overall result appears only when all six strands are complete.</p>
+              <div className="grid gap-2 sm:grid-cols-2">{DIAGNOSTIC_STRANDS.map((definition) => <div key={definition.strand} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2"><span className="font-bold text-slate-800">{AC_STRANDS[definition.strand].label}</span><span>{AC_STRANDS[definition.strand].weight}/{WHOLE_MATHS_WEIGHT_TOTAL}</span></div>)}</div>
+              <p><strong className="text-slate-900">Adaptive testing:</strong> {DIAGNOSTIC_MASTERY}% or higher probes the next level. A very low result may probe down to produce a more accurate measurement. Existing placements are never automatically lowered.</p>
+              <p><strong className="text-slate-900">Trial schools:</strong> End can be the first official checkpoint. It produces a valid achievement result; diagnostic growth appears only when two formal checkpoints exist.</p>
+              <p><strong className="text-slate-900">Instructional band:</strong> {DIAGNOSTIC_FLOOR}% to {DIAGNOSTIC_MASTERY - 1}% indicates learning within the tested level.</p>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }

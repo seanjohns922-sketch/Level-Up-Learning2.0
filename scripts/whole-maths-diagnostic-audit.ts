@@ -196,6 +196,13 @@ const panel = read("components/teacher/WholeMathsDiagnosticPanel.tsx");
 assert(panel.includes("All six maths strand engines are connected"), "The teacher UI must show that Probability is connected.");
 assert(panel.includes("Assign Start / Mid / End"), "Teachers must be able to assign the formal diagnostic from its dashboard tab.");
 assert(panel.includes("assignWholeMathsDiagnostic"), "The diagnostic assignment control must call the secure assignment RPC.");
+assert(panel.includes('type DiagnosticView = "live" | "run"'), "The Diagnostic tab must stay focused on live progression and running diagnostics.");
+assert(panel.includes("Live progression is unaffected"), "A diagnostic-control failure must explicitly preserve the live tracker.");
+assert(panel.includes("Trial schools can begin with the End diagnostic"), "The teacher workflow must support an End-only first checkpoint.");
+assert(
+  !/Promise\.all\(\[\s*fetchTeacherDiagnostics\([\s\S]*?fetchTeacherLiveMathsProgression/.test(panel),
+  "Live progression must never share an all-or-nothing request with diagnostic administration.",
+);
 const studentInstrument = read("app/diagnostic/page.tsx");
 assert(!studentInstrument.includes("isDemoPreviewMode"), "The diagnostic must not have a demo-only persistence shortcut.");
 assert(studentInstrument.includes("saveDiagnosticProgress"), "Student answers and position must persist during a sitting.");
