@@ -13,6 +13,7 @@ import { deactivateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/dem
 import { bootstrapDemoPreview } from "@/lib/demo-preview-bootstrap";
 import { resolveStudentDestination } from "@/lib/student-destination";
 import { resolvePostLoginExperience } from "@/lib/world3d/access";
+import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import { GraduationCap, Briefcase, KeyRound, User, Lock, Users } from "lucide-react";
@@ -662,6 +663,20 @@ export default function LoginPage() {
       yearLevel: resolvedYearLevel,
     })) {
       failCurrentAttempt("This device could not save your session. Please allow browser storage, refresh, and try again.", true);
+      return;
+    }
+
+    try {
+      const pendingDiagnostic = await fetchPendingStudentDiagnostic(student.student_id);
+      if (!isCurrentAttempt()) return;
+      if (pendingDiagnostic) {
+        setStudentBootstrapState("resolved");
+        router.push("/diagnostic");
+        return;
+      }
+    } catch (error) {
+      console.warn("[Login] Could not check assigned diagnostic", error);
+      failCurrentAttempt("We could not check your assigned school assessment. Please try again.", true);
       return;
     }
 

@@ -113,7 +113,7 @@ $$;
 revoke all on function public.get_student_whole_math_diagnostic_journey(uuid)
   from public,anon,authenticated;
 grant execute on function public.get_student_whole_math_diagnostic_journey(uuid)
-  to authenticated;
+  to anon,authenticated;
 revoke all on function public.get_teacher_whole_math_diagnostics(uuid)
   from public,anon,authenticated;
 grant execute on function public.get_teacher_whole_math_diagnostics(uuid)

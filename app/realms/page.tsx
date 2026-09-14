@@ -7,6 +7,7 @@ import { isPlacementComplete } from "@/data/progress";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
 
 function GuardedRealmsPage() {
   const router = useRouter();
@@ -25,11 +26,16 @@ function GuardedRealmsPage() {
     }
     let cancelled = false;
     void Promise.all([
+      fetchPendingStudentDiagnostic(studentId),
       restoreStudentStateFromServer(studentId, "number"),
       restoreStudentStateFromServer(studentId, "measurement"),
       restoreStudentStateFromServer(studentId, "space"),
-    ]).then(([numberState]) => {
+    ]).then(([pendingDiagnostic, numberState]) => {
       if (cancelled) return;
+      if (pendingDiagnostic) {
+        router.replace("/diagnostic");
+        return;
+      }
       if (!numberState.progress) {
         setRestoreState("error");
         return;

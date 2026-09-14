@@ -215,6 +215,15 @@ const completionMigration = read("supabase/migrations/20260911120000_complete_si
 const diagnosticFoundation = read("supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql");
 const supervisedMigration = read("supabase/migrations/20260911153000_supervised_adaptive_whole_maths_diagnostic.sql");
 const answerCountFix = read("supabase/migrations/20260914110000_fix_whole_maths_diagnostic_answer_counts.sql");
+const studentJourneyAccessFix = read("supabase/migrations/20260914123000_restore_student_diagnostic_journey_access.sql");
+const studentLogin = read("app/login/page.tsx");
+const realmsPage = read("app/realms/page.tsx");
+assert(studentLogin.includes("fetchPendingStudentDiagnostic(student.student_id)"), "Student login must prioritise an open assigned diagnostic.");
+assert(realmsPage.includes("fetchPendingStudentDiagnostic(studentId)"), "The 2D realm entry must not bypass an open assigned diagnostic.");
+assert(
+  studentJourneyAccessFix.includes("to anon,authenticated") && answerCountFix.includes("to anon,authenticated"),
+  "Custom student sessions must retain execute access to their diagnostic journey.",
+);
 assert(!supervisedMigration.includes("jsonb_object_length"), "Diagnostic RPCs must use a valid PostgreSQL JSONB key count.");
 assert(answerCountFix.includes("jsonb_object_keys"), "The deployed diagnostic answer-count repair must count JSONB object keys.");
 assert(answerCountFix.includes("get_student_whole_math_diagnostic_journey"), "The answer-count repair must cover the student journey RPC.");
