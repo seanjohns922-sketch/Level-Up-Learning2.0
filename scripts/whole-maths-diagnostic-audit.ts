@@ -218,12 +218,38 @@ assert(studentInstrument.includes("saveDiagnosticProgress"), "Student answers an
 assert(studentInstrument.includes('label="Read page"'), "The student diagnostic journey must offer a complete page read-aloud.");
 assert(studentInstrument.includes("STRAND_PRESENTATION"), "The student journey must visually identify all six maths realms.");
 assert(studentInstrument.includes("Go to Central Hub"), "Students must be able to leave the diagnostic home for the Central Hub.");
+const functionBody = (name: string) => {
+  const start = studentInstrument.indexOf(name);
+  return start === -1 ? "" : studentInstrument.slice(start).split("\n  }\n")[0];
+};
+const exitBody = functionBody("async function exitDiagnostic()");
 assert(
-  studentInstrument.includes("async function exitDiagnostic()") &&
-    studentInstrument.includes('Save & exit') &&
-    studentInstrument.includes("pauseDiagnosticHandoff(pending.sitting_id)") &&
-    studentInstrument.includes('router.push("/world")'),
-  "Students must be able to save their exact diagnostic position and safely exit to the world.",
+  studentInstrument.includes('Save & exit') &&
+    exitBody.includes("saveDiagnosticProgress") &&
+    exitBody.includes("setHasBegunStrand(false)") &&
+    !exitBody.includes("router.push"),
+  "Save & exit must save the exact diagnostic position and return students to the diagnostic home screen.",
+);
+const hubBody = functionBody("function leaveToCentralHub()");
+assert(
+  hubBody.includes("pauseDiagnosticHandoff(pending.sitting_id)") &&
+    hubBody.includes('router.push("/world")') &&
+    studentInstrument.includes("onClick={leaveToCentralHub}"),
+  "Leaving the diagnostic home for the Central Hub must pause the handoff so the world does not send students straight back.",
+);
+const deferredFollowUps = read("supabase/migrations/20260915113000_defer_whole_maths_diagnostic_follow_ups.sql");
+assert(
+  deferredFollowUps.includes("create or replace function public.get_pending_whole_math_diagnostic") &&
+    /jsonb_array_length\(result\.draft_probe_scores\)>0 then 1 else 0 end,\s*case result\.strand/.test(deferredFollowUps) &&
+    deferredFollowUps.includes("grant execute on function public.get_pending_whole_math_diagnostic(uuid) to anon,authenticated"),
+  "Realms with a waiting follow-up level must queue behind realms that have not had their first test.",
+);
+const finishBody = functionBody("async function finishLevel()");
+assert(
+  (finishBody.match(/await loadPending\(\)/g) ?? []).length === 2 &&
+    (finishBody.match(/setHasBegunStrand\(false\)/g) ?? []).length === 2 &&
+    !/await loadPending\(\);\s*setProbes\(\[\]\)/.test(finishBody),
+  "Finishing any level test must return students to the diagnostic home and keep saved follow-up scores.",
 );
 assert(
   diagnosticHandoff.includes("sessionStorage") &&
