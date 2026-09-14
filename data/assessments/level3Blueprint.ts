@@ -1,3 +1,4 @@
+import { repairLevel3Form } from "./level3AssessmentRepair";
 import type { Question as PretestQuestion } from "./pretests";
 import type { PostTest, Question as PosttestQuestion } from "./posttests";
 
@@ -758,7 +759,7 @@ export function buildLevel3AssessmentQuestions(form: AssessmentForm): Level3Gene
 }
 
 export function buildLevel3PretestFormA(): PretestQuestion[] {
-  return buildLevel3AssessmentQuestions("A").map((question) => ({
+  return repairLevel3Form("pretest", buildLevel3AssessmentQuestions("A").map((question) => ({
     type: question.type,
     id: question.id,
     prompt: question.prompt,
@@ -772,7 +773,7 @@ export function buildLevel3PretestFormA(): PretestQuestion[] {
     strand: question.strand,
     difficultyBand: question.difficultyBand,
     visual: question.visual,
-  }));
+  })) as PosttestQuestion[]) as unknown as PretestQuestion[];
 }
 
 export function buildLevel3PosttestFormB(): PostTest {
@@ -794,7 +795,7 @@ export function buildLevel3PosttestFormB(): PostTest {
 
   return {
     yearLabel: "Year 3",
-    questions,
+    questions: repairLevel3Form("posttest", questions),
   };
 }
 

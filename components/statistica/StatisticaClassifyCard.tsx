@@ -10,19 +10,19 @@ type Task = Extract<PracticeTask, { kind: "statisticaClassify" }>;
 
 // Classify a data variable as categorical or numerical (Year 3). Shows the
 // variable and example responses, then the child picks the data type.
-export default function StatisticaClassifyCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaClassifyCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
 
   function submit() {
     if (settled || !chosen) return;
     setSettled(true);
-    if (task.correctOptionIds.includes(chosen)) onCorrect(); else onWrong(chosen);
+    if (task.correctOptionIds.includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (
     <div className={task.supportingDetails?.length ? "space-y-3" : "space-y-4"}>
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       <div className={`mx-auto rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] text-center shadow-[inset_0_1px_0_rgba(255,240,199,0.14)] ${task.supportingDetails?.length ? "max-w-2xl p-3" : "max-w-md p-5"}`}>
         <div className="text-[11px] font-black uppercase tracking-[0.14em] text-[#f2bc45]/70">{task.variableLabel ?? "The data we collect"}</div>

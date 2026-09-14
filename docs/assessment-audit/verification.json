@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-14",
+  "scope": {
+    "forms": 70,
+    "questions": 1400,
+    "pairs": 35,
+    "statisticaLevels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "build": "passed (webpack, prebuild gates and TypeScript)",
+  "scoringRegression": "passed",
+  "pairedProfiles": "passed",
+  "starpathRebuild": "passed",
+  "browserChecks": [
+    "PASS: wrong first graph stays incorrect, source data visible, all subanswers retained.",
+    "PASS: dice task has no balanced-rule label or solved pair counts.",
+    "PASS: Statistica stores actual category selection.",
+    "PASS: numerical answer and reason persist through reload; mobile fits.",
+    "PASS: algorithm construction stores the ordered instructions and fits mobile.",
+    "PASS: informal block measurement and graduated exact protractor render."
+  ],
+  "database": {
+    "environment": "isolated schema-only PostgreSQL clone; synthetic fixtures",
+    "preservationAssertions": 3,
+    "cycleAssertions": 6,
+    "result": "passed"
+  },
+  "productionApplied": true,
+  "productionVerifiedDate": "2026-09-15",
+  "productionVerification": "Read-only function, trigger, grant and schema comparison passed; manually applied versions not recorded in CLI migration history."
+}

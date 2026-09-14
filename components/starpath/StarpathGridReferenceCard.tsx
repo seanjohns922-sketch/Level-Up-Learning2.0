@@ -20,8 +20,8 @@ export function StarpathGridReferenceCard({
   onWrong,
 }: {
   task: GridTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
   const [selectedLandmarkId, setSelectedLandmarkId] = useState("");
@@ -59,29 +59,30 @@ export function StarpathGridReferenceCard({
 
   function check() {
     if (task.mode === "referenceToCell" || task.mode === "placeAtReference") {
-      if (sameCell(selectedCell, task.correctCell)) onCorrect();
-      else onWrong();
+      if (sameCell(selectedCell, task.correctCell)) onCorrect(JSON.stringify(selectedCell));
+      else onWrong(JSON.stringify(selectedCell));
       return;
     }
     if (task.mode === "referenceToLandmark") {
-      if (selectedLandmarkId === task.correctLandmarkId) onCorrect();
-      else onWrong();
+      if (selectedLandmarkId === task.correctLandmarkId) onCorrect(selectedLandmarkId ?? "");
+      else onWrong(selectedLandmarkId ?? "");
       return;
     }
     if (task.mode === "typeReference") {
-      if (normaliseGridReference(typedReference) === normaliseGridReference(task.expectedReference ?? "")) onCorrect();
-      else onWrong();
+      if (normaliseGridReference(typedReference) === normaliseGridReference(task.expectedReference ?? "")) onCorrect(typedReference);
+      else onWrong(typedReference);
       return;
     }
     if (task.mode === "labelGrid") {
       const columnsCorrect = assignedColumns.every((label, index) => label === task.columnLabels[index]);
       const rowsCorrect = assignedRows.every((label, index) => label === task.rowLabels[index]);
-      if (columnsCorrect && rowsCorrect) onCorrect();
-      else onWrong();
+      const response = JSON.stringify({ columns: assignedColumns, rows: assignedRows });
+      if (columnsCorrect && rowsCorrect) onCorrect(response);
+      else onWrong(response);
       return;
     }
-    if (selectedOptionId === task.correctOptionId) onCorrect();
-    else onWrong();
+    if (selectedOptionId === task.correctOptionId) onCorrect(selectedOptionId ?? "");
+    else onWrong(selectedOptionId ?? "");
   }
 
   function selectCell(cell: Cell, landmarkId?: string) {

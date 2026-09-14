@@ -54,15 +54,15 @@ function RouteStrip({ route }: { route: GridMove[] }) {
   return <div className="flex min-h-12 flex-wrap items-center justify-center gap-1.5">{route.map((move, index) => { const Icon = ICONS[move]; return <span key={`${move}-${index}`} className="flex h-10 w-10 items-center justify-center rounded-lg border border-violet-200 bg-white"><Icon className="h-5 w-5" /></span>; })}</div>;
 }
 
-export default function StarpathGridRouteCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathGridRouteCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [moves, setMoves] = useState<GridMove[]>([]);
   const [answer, setAnswer] = useState("");
   const [settled, setSettled] = useState(false);
   const shownRoute = task.route ?? moves;
   const typedMode = task.mode === "trace" || task.mode === "missingReference";
-  function submitTyped() { if (!answer.trim() || settled) return; setSettled(true); if (normaliseGridReference(answer) === normaliseGridReference(task.expectedReference ?? "")) onCorrect(); else onWrong(answer); }
-  function runAuthored() { if (!moves.length || settled) return; setSettled(true); if (runGridRoute(task, moves).valid) onCorrect(); else onWrong(moves.join(",")); }
-  function choose(id: string) { if (settled) return; setSettled(true); if (id === task.correctOptionId) onCorrect(); else onWrong(id); }
+  function submitTyped() { if (!answer.trim() || settled) return; setSettled(true); if (normaliseGridReference(answer) === normaliseGridReference(task.expectedReference ?? "")) onCorrect(answer); else onWrong(answer); }
+  function runAuthored() { if (!moves.length || settled) return; setSettled(true); if (runGridRoute(task, moves).valid) onCorrect(JSON.stringify(moves)); else onWrong(moves.join(",")); }
+  function choose(id: string) { if (settled) return; setSettled(true); if (id === task.correctOptionId) onCorrect(id); else onWrong(id); }
   return <div className="space-y-4">
     <TaskHeading prompt={task.prompt} speech={task.speakText} />
     <div><p className="mx-auto mb-3 max-w-xl text-center text-sm font-bold text-slate-600">{task.rule}</p><RouteGrid task={task} route={shownRoute} /></div>

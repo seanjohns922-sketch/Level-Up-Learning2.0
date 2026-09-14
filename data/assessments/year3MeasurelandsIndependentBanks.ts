@@ -21,11 +21,11 @@ type ItemSpec = {
 
 function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion {
   const selected = spec.options !== undefined;
-  const id = `y3-measurement-${form === "pretest" ? "pre" : "post"}-${String(index + 1).padStart(2, "0")}-v2`;
+  const id = `y3-measurement-${form === "pretest" ? "pre" : "post"}-${String(index + 1).padStart(2, "0")}-v3`;
   const selectedAnswerPosition = spec.options?.indexOf(spec.correctAnswer);
   return {
-    schemaVersion: 1, id, version: "1.0.0", realm: "measurement", level: 3, form,
-    origin: "assessment_authored", sourcePool: form, bankId: `measurelands-level-3-${form}-v1`,
+    schemaVersion: 1, id, version: "3.0.0", realm: "measurement", level: 3, form,
+    origin: "assessment_authored", sourcePool: form, bankId: `measurelands-level-3-${form}-v3`,
     primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
     cognitiveCategory: spec.cognitiveCategory, difficulty: spec.difficulty,
@@ -68,28 +68,160 @@ const PRETEST_SPECS: readonly ItemSpec[] = [
   { descriptor: "AC9M3M02", week: 3, lesson: 3, skillId: "measurement_transfer", skillLabel: "Compare Instrument Measurements", difficulty: "very_challenging", cognitiveCategory: "transfer", responseMode: "constructed_response", misconceptionTags: ["mixed-unit-comparison"], contextKey: "pre-parcel-masses", structureKey: "pre-three-mass-difference", prompt: "Three parcels have masses 425 g, 680 g and 540 g. Enter the difference between the heaviest and lightest parcel in grams.", correctAnswer: "255", domain: "instrument" },
 ];
 
-const POSTTEST_SPECS: readonly ItemSpec[] = [
-  { descriptor: "AC9M3M01", week: 4, lesson: 1, skillId: "choose_metric_unit", skillLabel: "Choose a Suitable Capacity Unit", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "selected_response", misconceptionTags: ["inappropriate-metric-unit"], contextKey: "post-water-bottle-unit", structureKey: "post-unit-choice-bottle", prompt: "Which unit is most suitable for measuring the capacity of a school water bottle?", correctAnswer: "millilitres", domain: "unit_estimate", options: ["grams", "millilitres", "metres"] },
-  { descriptor: "AC9M3M02", week: 4, lesson: 2, skillId: "read_measuring_jug", skillLabel: "Read a Measuring Jug", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["scale-interval-value"], contextKey: "post-juice-jug", structureKey: "post-jug-fifties-millilitres", prompt: "Read the juice jug shown. Enter the capacity in millilitres.", correctAnswer: "650", domain: "instrument", visual: { kind: "jug", value: 650, unit: "mL", max: 1000 } },
-  { descriptor: "AC9M3M03", week: 5, lesson: 1, skillId: "formal_time_units", skillLabel: "Relate Days and Hours", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["duration-unit-scale"], contextKey: "post-two-days", structureKey: "post-days-to-hours", prompt: "Enter the number of hours in 2 days.", correctAnswer: "48", domain: "duration" },
-  { descriptor: "AC9M3M04", week: 6, lesson: 1, skillId: "read_analog_time", skillLabel: "Read an Analog Clock", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["minute-mark-counting"], contextKey: "post-training-clock", structureKey: "post-clock-five-minute-offset", prompt: "Read the training clock shown. Enter the time as four digits, without punctuation.", correctAnswer: "0935", domain: "clock", visual: { kind: "clock", hour: 9, minute: 35 } },
-  { descriptor: "AC9M3M05", week: 7, lesson: 2, skillId: "compare_right_angle", skillLabel: "Compare a Turn with a Right Angle", difficulty: "moderate", cognitiveCategory: "application", responseMode: "selected_response", misconceptionTags: ["turn-size-vs-direction"], contextKey: "post-door-wide-opening", structureKey: "post-angle-greater-choice", prompt: "A door opens wider than a square corner. How does its opening compare with a right angle?", correctAnswer: "Greater than a right angle", domain: "angle", options: ["Less than a right angle", "Equal to a right angle", "Greater than a right angle"] },
-  { descriptor: "AC9M3M01", week: 3, lesson: 1, skillId: "estimate_mass", skillLabel: "Estimate with a Mass Benchmark", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["estimate-vs-exact-reading"], contextKey: "post-orange-benchmark", structureKey: "post-mass-benchmark-five", prompt: "One orange has a familiar mass of about 200 g. Enter a reasonable estimate for 5 similar oranges in grams.", correctAnswer: "1000", domain: "unit_estimate" },
-  { descriptor: "AC9M3M02", week: 3, lesson: 2, skillId: "read_mass_scale", skillLabel: "Read a Labelled Mass Scale", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["scale-interval-value"], contextKey: "post-flour-scale", structureKey: "post-scale-fifties-grams", prompt: "Read the flour scale shown. Enter the mass in grams.", correctAnswer: "850", domain: "instrument", visual: { kind: "scaleDial", value: 850, unit: "g", max: 1000 } },
-  { descriptor: "AC9M3M03", week: 5, lesson: 3, skillId: "compare_duration", skillLabel: "Compare Unlike Time Units", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["duration-unit-scale"], contextKey: "post-practice-sessions", structureKey: "post-hours-minutes-difference", prompt: "A music practice lasts 2 hours and a sports practice lasts 95 minutes. Enter the difference in minutes.", correctAnswer: "25", domain: "duration" },
-  { descriptor: "AC9M3M04", week: 6, lesson: 2, skillId: "read_minute_time", skillLabel: "Read Time to the Minute", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["minute-mark-counting"], contextKey: "post-library-clock", structureKey: "post-clock-before-hour", prompt: "Read the library clock shown. Enter the time as four digits, without punctuation.", correctAnswer: "1058", domain: "clock", visual: { kind: "clock", hour: 10, minute: 58 } },
-  { descriptor: "AC9M3M05", week: 7, lesson: 1, skillId: "angle_as_turn", skillLabel: "Identify a Right-Angle Turn", difficulty: "moderate", cognitiveCategory: "application", responseMode: "selected_response", misconceptionTags: ["right-angle-orientation"], contextKey: "post-map-quarter-turn", structureKey: "post-rotated-right-angle-choice", prompt: "A map arrow makes a quarter turn from pointing south to pointing west. Which statement is correct?", correctAnswer: "The turn is equal to a right angle.", domain: "angle", options: ["The turn is less than a right angle because it finishes west.", "The turn is equal to a right angle.", "The turn is greater than a right angle because it started south."] },
-  { descriptor: "AC9M3M01", week: 2, lesson: 3, skillId: "estimate_length", skillLabel: "Estimate from a Length Benchmark", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["estimate-vs-exact-reading"], contextKey: "post-book-benchmark", structureKey: "post-length-benchmark-stack", prompt: "One book is about 3 cm thick. Enter a reasonable estimate for a stack of 8 similar books in centimetres.", correctAnswer: "24", domain: "unit_estimate" },
-  { descriptor: "AC9M3M02", week: 1, lesson: 3, skillId: "length_difference", skillLabel: "Find a Measurement Difference", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["mixed-unit-comparison"], contextKey: "post-plant-heights", structureKey: "post-length-difference-three-values", prompt: "Three plants are 38 cm, 52 cm and 45 cm tall. Enter the difference between the tallest and shortest plant in centimetres.", correctAnswer: "14", domain: "instrument" },
-  { descriptor: "AC9M3M03", week: 5, lesson: 1, skillId: "formal_time_units", skillLabel: "Relate Minutes and Seconds", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["duration-unit-scale"], contextKey: "post-five-minutes", structureKey: "post-minutes-to-seconds", prompt: "Enter the number of seconds in 5 minutes.", correctAnswer: "300", domain: "duration" },
-  { descriptor: "AC9M3M04", week: 6, lesson: 3, skillId: "digital_time", skillLabel: "Represent Time Digitally", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["analog-hand-role"], contextKey: "post-excursion-clock", structureKey: "post-clock-hour-transition", prompt: "Read the excursion clock shown. Enter the time as four digits, without punctuation.", correctAnswer: "0219", domain: "clock", visual: { kind: "clock", hour: 2, minute: 19 } },
-  { descriptor: "AC9M3M05", week: 7, lesson: 2, skillId: "angle_diagnosis", skillLabel: "Diagnose an Angle Comparison", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "selected_response", misconceptionDiagnosis: true, misconceptionTags: ["angle-arm-length"], contextKey: "post-clock-hands-length", structureKey: "post-arm-length-misconception-choice", prompt: "Two drawn angles have the same opening, but one has longer arms. A student says the longer one is greater. Which correction is best?", correctAnswer: "The angles are equal because angle size depends on the turn, not arm length.", domain: "angle", options: ["The longer one is greater because it reaches farther.", "The angles are equal because angle size depends on the turn, not arm length.", "The shorter one is greater because its arms are closer."] },
-  { descriptor: "AC9M3M02", week: 1, lesson: 3, skillId: "ruler_diagnosis", skillLabel: "Diagnose a Ruler Starting Point", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "constructed_response", misconceptionDiagnosis: true, misconceptionTags: ["ruler-starting-point"], contextKey: "post-offset-straw", structureKey: "post-ruler-offset-whole", prompt: "A straw begins at the 4 cm mark and ends at the 18 cm mark. A student reports 18 cm. Enter the straw's actual length in centimetres.", correctAnswer: "14", domain: "instrument" },
-  { descriptor: "AC9M3M01", week: 4, lesson: 3, skillId: "estimate_capacity", skillLabel: "Check a Capacity Estimate", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "constructed_response", misconceptionDiagnosis: true, misconceptionTags: ["estimate-vs-exact-reading"], contextKey: "post-mug-benchmark", structureKey: "post-capacity-estimate-diagnosis", prompt: "A familiar mug holds about 300 mL. A student estimates 4 similar mugs hold about 600 mL. Enter a more reasonable estimate in millilitres.", correctAnswer: "1200", domain: "unit_estimate" },
-  { descriptor: "AC9M3M02", week: 4, lesson: 3, skillId: "capacity_difference", skillLabel: "Reason About Capacity Difference", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "constructed_response", misconceptionTags: ["mixed-unit-comparison"], contextKey: "post-three-jugs", structureKey: "post-capacity-range-three-values", prompt: "Three jugs contain 425 mL, 900 mL and 675 mL. Enter the difference between the greatest and least amounts in millilitres.", correctAnswer: "475", domain: "instrument" },
-  { descriptor: "AC9M3M04", week: 6, lesson: 3, skillId: "clock_transfer", skillLabel: "Correct and Represent a Clock Time", difficulty: "very_challenging", cognitiveCategory: "transfer", responseMode: "constructed_response", misconceptionDiagnosis: true, misconceptionTags: ["minute-mark-counting"], contextKey: "post-miscounted-clock", structureKey: "post-minute-mark-correction", prompt: "The minute hand is 17 marks clockwise from 12 and the hour hand is just past 3. A student counts 12 as mark 1 and writes 3:18. Enter the correct time as four digits, without punctuation.", correctAnswer: "0317", domain: "clock" },
-  { descriptor: "AC9M3M02", week: 2, lesson: 3, skillId: "measurement_transfer", skillLabel: "Solve a Multi-Measurement Comparison", difficulty: "very_challenging", cognitiveCategory: "transfer", responseMode: "constructed_response", misconceptionTags: ["mixed-unit-comparison"], contextKey: "post-race-ribbons", structureKey: "post-combined-length-difference", prompt: "A craft project uses ribbon pieces of 36 cm and 48 cm. Another project uses one 95 cm piece. Enter how many centimetres longer the second project is than the combined first project.", correctAnswer: "11", domain: "instrument" },
+// Parallel forms keep the same descriptor, operation and response demand.
+const PARALLEL_POST_VARIANTS: readonly Partial<ItemSpec>[] = [
+  {
+    "prompt": "Which unit is most suitable for the mass of a full suitcase?",
+    "correctAnswer": "kilograms",
+    "visual": undefined,
+    "options": [
+      "millilitres",
+      "kilograms",
+      "centimetres"
+    ]
+  },
+  {
+    "prompt": "Read the ruler shown. Enter the crayon length in centimetres.",
+    "correctAnswer": "8",
+    "visual": {
+      "kind": "ruler",
+      "toCm": 8,
+      "label": "crayon"
+    }
+  },
+  {
+    "prompt": "How many minutes in 3 hours?",
+    "correctAnswer": "180",
+    "visual": undefined
+  },
+  {
+    "prompt": "Read the training clock. Enter the time as four digits, without punctuation.",
+    "correctAnswer": "0935",
+    "visual": {
+      "kind": "clock",
+      "hour": 9,
+      "minute": 35
+    }
+  },
+  {
+    "prompt": "A door opens wider than a square corner. How does its opening compare with a right angle?",
+    "correctAnswer": "Greater than a right angle",
+    "visual": undefined,
+    "options": [
+      "Less than a right angle",
+      "Equal to a right angle",
+      "Greater than a right angle"
+    ]
+  },
+  {
+    "prompt": "A familiar metre stick is about as long as a bench. Three such benches are placed end to end. Using this benchmark, estimate the total length in metres.",
+    "correctAnswer": "3",
+    "visual": undefined
+  },
+  {
+    "prompt": "Read the flour scale shown. Enter the mass in grams.",
+    "correctAnswer": "800",
+    "visual": {
+      "kind": "scaleDial",
+      "value": 800,
+      "unit": "g",
+      "max": 1000
+    }
+  },
+  {
+    "prompt": "How many seconds in 4 minutes?",
+    "correctAnswer": "240",
+    "visual": undefined
+  },
+  {
+    "prompt": "Read the library clock. Enter the time as four digits, without punctuation.",
+    "correctAnswer": "1058",
+    "visual": {
+      "kind": "clock",
+      "hour": 10,
+      "minute": 58
+    }
+  },
+  {
+    "prompt": "A map arrow makes a quarter turn clockwise. Which statement describes the turn?",
+    "correctAnswer": "It is equal to a right angle.",
+    "visual": undefined,
+    "options": [
+      "It is less than a right angle.",
+      "It is equal to a right angle.",
+      "It is greater than a right angle."
+    ]
+  },
+  {
+    "prompt": "One orange has a familiar mass of about 200 g. Using this benchmark, estimate the mass of 4 similar oranges in grams.",
+    "correctAnswer": "800",
+    "visual": undefined
+  },
+  {
+    "prompt": "Read the juice jug shown. Enter the amount in millilitres.",
+    "correctAnswer": "650",
+    "visual": {
+      "kind": "jug",
+      "value": 650,
+      "unit": "mL",
+      "max": 1000
+    }
+  },
+  {
+    "prompt": "One practice lasts 1 hour and another lasts 40 minutes. What is the difference in minutes?",
+    "correctAnswer": "20",
+    "visual": undefined
+  },
+  {
+    "prompt": "Read the excursion clock. Enter the time as four digits, without punctuation.",
+    "correctAnswer": "0219",
+    "visual": {
+      "kind": "clock",
+      "hour": 2,
+      "minute": 19
+    }
+  },
+  {
+    "prompt": "Two angles have the same opening but one has longer arms. Which comparison is correct?",
+    "correctAnswer": "The angles are equal because arm length does not change the opening.",
+    "visual": undefined,
+    "options": [
+      "The longer arms make a greater angle.",
+      "The angles are equal because arm length does not change the opening.",
+      "The shorter arms make a greater angle."
+    ]
+  },
+  {
+    "prompt": "A green ribbon is 83 cm and a yellow ribbon is 56 cm. What is the difference in centimetres?",
+    "correctAnswer": "27",
+    "visual": undefined
+  },
+  {
+    "prompt": "A familiar mug holds about 300 mL. Using this benchmark, estimate the amount in 3 full mugs in millilitres.",
+    "correctAnswer": "900",
+    "visual": undefined
+  },
+  {
+    "prompt": "A straw begins at 3 cm and ends at 15 cm on a ruler. A student reports 15 cm. What is its actual length in centimetres?",
+    "correctAnswer": "12",
+    "visual": undefined
+  },
+  {
+    "prompt": "The long clock hand points to 6 and the short hand is halfway between 7 and 8. A student says 6:07. Enter the correct time as four digits.",
+    "correctAnswer": "0730",
+    "visual": undefined
+  },
+  {
+    "prompt": "Three boxes have masses 435 g, 690 g and 550 g. What is the difference between the heaviest and lightest in grams?",
+    "correctAnswer": "255",
+    "visual": undefined
+  }
 ];
+
+const POSTTEST_SPECS: readonly ItemSpec[] = PRETEST_SPECS.map((spec, index) => ({
+  ...spec, ...PARALLEL_POST_VARIANTS[index],
+  contextKey: `post-paired-${index + 1}`, structureKey: `post-paired-${index + 1}`,
+}));
 
 export const YEAR3_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS = PRETEST_SPECS.map((spec, index) => candidate("pretest", index, spec));
 export const YEAR3_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS = POSTTEST_SPECS.map((spec, index) => candidate("posttest", index, spec));

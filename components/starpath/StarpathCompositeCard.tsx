@@ -32,7 +32,7 @@ function shapeIcon(shape: string, size = 34) {
 }
 
 // ── Figure build: place familiar shapes into a composite silhouette ────────────
-function FigureBuild({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (a?: string) => void }) {
+function FigureBuild({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (a?: string) => void }) {
   const fig = task.figure as Figure;
   const palette = task.buildPalette ?? ["triangle", "square", "rectangle", "circle"];
   const [selected, setSelected] = useState(palette[0]!);
@@ -58,7 +58,7 @@ function FigureBuild({ task, onCorrect, onWrong }: { task: Task; onCorrect: () =
     setPlaced(next);
     if (fig.parts.every((p) => next[p.id])) {
       setSettled(true);
-      onCorrect();
+      onCorrect(JSON.stringify(next));
     }
   }
 
@@ -107,14 +107,14 @@ function FigureBuild({ task, onCorrect, onWrong }: { task: Task; onCorrect: () =
 }
 
 // ── Figure scan: name the familiar shapes that make the figure ─────────────────
-function FigureScan({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (a?: string) => void }) {
+function FigureScan({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (a?: string) => void }) {
   const [wrongId, setWrongId] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
   function choose(id: string) {
     if (settled) return;
     if (id === task.correctOptionId) {
       setSettled(true);
-      onCorrect();
+      onCorrect(id);
     } else {
       setWrongId(id);
       setTimeout(() => setWrongId((v) => (v === id ? null : v)), 400);
@@ -146,14 +146,14 @@ function FigureScan({ task, onCorrect, onWrong }: { task: Task; onCorrect: () =>
 }
 
 // ── Figure compare: pick the complete build, then the reason ───────────────────
-function FigureCompare({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (a?: string) => void }) {
+function FigureCompare({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (a?: string) => void }) {
   const [choice, setChoice] = useState("");
   const [reason, setReason] = useState("");
   const [settled, setSettled] = useState(false);
   function submit() {
     if (settled) return;
     setSettled(true);
-    if (choice === task.correctOptionId && reason === task.correctReasonId) onCorrect();
+    if (choice === task.correctOptionId && reason === task.correctReasonId) onCorrect(JSON.stringify({ choice, reason }));
     else onWrong(`${choice}:${reason}`);
   }
   return (
@@ -208,7 +208,7 @@ function cubeStack(height: number, size = 42) {
   }
   return `<svg viewBox="0 0 48 48" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${parts.join("")}</svg>`;
 }
-function LegacyBoard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (a?: string) => void }) {
+function LegacyBoard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (a?: string) => void }) {
   const [selected, setSelected] = useState(task.palette?.[0]?.id ?? "");
   const [placements, setPlacements] = useState<CompositePlacement[]>(task.fixedCells ?? []);
   const [settled, setSettled] = useState(false);
@@ -223,7 +223,7 @@ function LegacyBoard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () =
   function submit() {
     if (settled) return;
     setSettled(true);
-    if (isCompositeSolution(task, placements)) onCorrect();
+    if (isCompositeSolution(task, placements)) onCorrect(JSON.stringify(placements));
     else onWrong(placements.map((item) => `${cellKey(item)}=${item.pieceId}`).join(","));
   }
   return (
@@ -268,7 +268,7 @@ function LegacyBoard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () =
   );
 }
 
-export default function StarpathCompositeCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathCompositeCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   if (task.figure) return <FigureBuild task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.figureOptions?.length) return <FigureCompare task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.figureSvg) return <FigureScan task={task} onCorrect={onCorrect} onWrong={onWrong} />;

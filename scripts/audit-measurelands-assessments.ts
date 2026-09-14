@@ -21,7 +21,7 @@ function check(condition: boolean, message: string): void {
 
 const globalIds = new Set<string>();
 for (const [level, year] of years.entries()) {
-  const kinds = level === 0 ? (["posttest"] as const) : (["pretest", "posttest"] as const);
+  const kinds = ["pretest", "posttest"] as const;
   for (const kind of kinds) {
     const direct = (kind === "pretest"
       ? getMeasurelandsPretestForYear(year)
@@ -51,12 +51,12 @@ for (const [level, year] of years.entries()) {
   }
 }
 
-check(getMeasurelandsPretestForYear("Prep").length === 0, "Ground must not expose a pre-test.");
+check(getMeasurelandsPretestForYear("Prep").length === 20, "Ground must expose its approved baseline.");
 check(getLastProgramWeek("measurement") === 8, "Measurelands final week must remain Week 8.");
 check(getLastProgramWeek("number") === 12, "Number Nexus final week regressed while validating Measurelands.");
-check(globalIds.size === 260, `Expected 260 globally unique production items; found ${globalIds.size}.`);
+check(globalIds.size === 280, `Expected 280 globally unique production items; found ${globalIds.size}.`);
 
-console.log(`Measurelands production assessment audit: ${passed} passed, ${failures.length} failed across 13 forms and ${globalIds.size} items.`);
+console.log(`Measurelands production assessment audit: ${passed} passed, ${failures.length} failed across 14 forms and ${globalIds.size} items.`);
 if (failures.length > 0) {
   for (const failure of failures) console.error(`FAIL: ${failure}`);
   process.exitCode = 1;

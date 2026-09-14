@@ -352,7 +352,7 @@ function PostTestPage() {
   const starpathLevel1CandidateRequested = progressRealmId === "space"
     && year === "Year 1"
     && reviewBank === "level1-starpath-post-rc1";
-  const candidateReviewRequested = (progressRealmId === "number" && year === "Year 6")
+  const candidateReviewRequested = (progressRealmId === "number" && year === "Year 6" && reviewBank === "year6-number-post-rc1")
     || starpathCandidateReviewRequested
     || starpathLevel1CandidateRequested;
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);

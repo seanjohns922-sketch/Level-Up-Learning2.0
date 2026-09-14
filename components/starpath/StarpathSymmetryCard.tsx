@@ -52,7 +52,7 @@ function RotationGuide({ task }: { task: Task }) {
   );
 }
 
-export default function StarpathSymmetryCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathSymmetryCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [cells, setCells] = useState<SymmetryCell[]>(task.seedCells);
   const [colour, setColour] = useState(COLOURS[0]!);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -115,7 +115,7 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong, assessm
     const correct = optionsMode
       ? (task.correctOptionIds ?? []).length === selectedOptions.length && (task.correctOptionIds ?? []).every((id) => selectedOptions.includes(id))
       : task.mode === "create" ? isSymmetricDesign(task, cells) : exact(task, cells);
-    if (correct) onCorrect();
+    if (correct) onCorrect(JSON.stringify(optionsMode ? selectedOptions : cells));
     else onWrong(optionsMode ? selectedOptions.join(",") : cells.map(key).join(","));
   }
 

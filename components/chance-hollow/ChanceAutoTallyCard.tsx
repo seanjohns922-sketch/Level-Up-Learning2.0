@@ -95,7 +95,7 @@ function TallyTable({ labels, tally, title }: { labels: Task["labels"]; tally: T
   );
 }
 
-export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string, correctAnswer?: string) => void }) {
+export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string, correctAnswer?: string) => void }) {
   const { tool, draw, labels, spins, mode } = task;
   const trials = mode === "compareTrials" || mode === "compareFrequencies" || mode === "predictMatch" ? 2 : 1;
 
@@ -150,7 +150,7 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
       wasRight = (prediction === "yes") === trialsIdentical();
       correctAnswer = trialsIdentical() ? "Yes — they matched" : "No — they differed";
     }
-    if (wasRight) onCorrect(); else onWrong(prediction ?? undefined, correctAnswer);
+    if (wasRight) onCorrect(JSON.stringify({ prediction, tallies })); else onWrong(JSON.stringify({ prediction, tallies }), correctAnswer);
   }
 
   // Grading
@@ -162,7 +162,7 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
     const target = mode === "least" ? Math.min(...counts) : Math.max(...counts);
     const ok = (tallies[0]![key] ?? 0) === target;
     const correctKey = labels.find((l) => (tallies[0]![l.key] ?? 0) === target)?.key ?? key;
-    if (ok) onCorrect(); else onWrong(nameOf(key), nameOf(correctKey));
+    if (ok) onCorrect(JSON.stringify({ selected: key, tallies })); else onWrong(JSON.stringify({ selected: key, tallies }), nameOf(correctKey));
   }
   function answerCompare(id: string) {
     if (settled) return;
@@ -170,7 +170,7 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
     const identical = labels.every((l) => (tallies[0]![l.key] ?? 0) === (tallies[1]![l.key] ?? 0));
     const correctId = identical ? "identical" : "varied";
     const correctLabel = compareOptions.find((option) => option.id === correctId)?.label ?? correctId;
-    if (id === correctId) onCorrect(); else onWrong(id, correctLabel);
+    if (id === correctId) onCorrect(JSON.stringify({ selected: id, tallies })); else onWrong(JSON.stringify({ selected: id, tallies }), correctLabel);
   }
 
   const comparisonOutcome = labels[0]!;
@@ -191,8 +191,8 @@ export default function ChanceAutoTallyCard({ task, onCorrect, onWrong }: { task
   function answerInterpretation(id: string) {
     if (settled) return;
     setSettled(true);
-    if (id === "variation") onCorrect();
-    else onWrong(id, interpretationOptions.find((option) => option.id === "variation")?.label);
+    if (id === "variation") onCorrect(JSON.stringify({ selected: id, tallies }));
+    else onWrong(JSON.stringify({ selected: id, tallies }), interpretationOptions.find((option) => option.id === "variation")?.label);
   }
 
   const compareOptions = [

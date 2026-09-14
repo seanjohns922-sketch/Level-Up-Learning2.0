@@ -12,12 +12,28 @@ type ItemSpec = {
 };
 
 function candidate(index: number, spec: ItemSpec, form: "pretest" | "posttest" = "posttest"): CandidateQuestion {
+  let comparisonVisual: Record<string, unknown> | undefined;
+  if (["compare_length", "compare_mass", "counterintuitive_mass"].includes(spec.skillId)) {
+    const mass = spec.skillId !== "compare_length";
+    const first = spec.correctAnswer.endsWith("1");
+    const labelled = ["1", "2"].map(id => spec.options?.find(option => option.endsWith(id)) ?? id);
+    const objectNames = form === "pretest" ? (index === 9 ? ["Block", "Ball"] : ["Stone", "Box"]) : (index === 9 ? ["Book", "Toy"] : ["Bag", "Cup"]);
+    const labels = mass && labelled.every(label => ["1", "2"].includes(label)) ? objectNames : labelled;
+    if (labels !== labelled) spec = { ...spec, correctAnswer: labels[first ? 0 : 1]! };
+    const values = mass ? (first ? [105, 65] : [65, 105]) : (first ? [235, 145] : [145, 235]);
+    comparisonVisual = { type: "ground_measurement_comparison", attribute: mass ? "mass" : "length", labels, values,
+      description: mass ? `A balance holding ${labels[0]} and ${labels[1]}. The ${first ? labels[0] : labels[1]} pan is lower.` : `Two aligned strips labelled ${labels.join(" and ")}. Both begin at the dashed line.` };
+    const equalLabel = mass ? "They have the same mass" : "They are the same length";
+    const alternate = labels[first ? 1 : 0]!;
+    const options = !mass ? [equalLabel, alternate, spec.correctAnswer] : spec.skillId === "counterintuitive_mass" ? [spec.correctAnswer, alternate, equalLabel] : [labels[0]!, labels[1]!, equalLabel];
+    spec = { ...spec, prompt: mass ? "Look at the balance. Which is heavier?" : "Look at the two strips. Which is longer?", options, responseMode: "selected_response" };
+  }
   const selected = spec.options !== undefined;
   const selectedAnswerPosition = spec.options?.indexOf(spec.correctAnswer);
   return {
-    schemaVersion: 1, id: `y0-measurement-${form === "pretest" ? "pre" : "post"}-${String(index + 1).padStart(2, "0")}-v2`, version: "1.0.0",
+    schemaVersion: 1, id: `y0-measurement-${form === "pretest" ? "pre" : "post"}-${String(index + 1).padStart(2, "0")}-v3`, version: "3.0.0",
     realm: "measurement", level: 0, form, origin: "assessment_authored", sourcePool: form,
-    bankId: `measurelands-level-0-${form}-v1`, primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
+    bankId: `measurelands-level-0-${form}-v3`, primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }], cognitiveCategory: spec.cognitiveCategory,
     difficulty: spec.difficulty, isTransfer: spec.cognitiveCategory === "transfer",
     requiresReasoning: spec.cognitiveCategory === "reasoning" || spec.cognitiveCategory === "transfer",
@@ -25,6 +41,7 @@ function candidate(index: number, spec: ItemSpec, form: "pretest" | "posttest" =
     misconceptionTags: spec.misconceptionTags, contextKey: spec.contextKey, structureKey: spec.structureKey,
     ...(selected ? { selectedAnswerPosition: (selectedAnswerPosition ?? -1) + 1 } : {}), prompt: spec.prompt,
     renderer: { type: selected ? "selected_response" : "numeric_entry", payload: { domain: spec.domain, prompt: spec.prompt, correctAnswer: spec.correctAnswer, ...(spec.options ? { options: spec.options } : {}) } },
+    visual: comparisonVisual,
     scoring: { kind: "exact", correctResponse: spec.correctAnswer }, statistics: createUncalibratedItemStatistics(spec.difficulty),
     type: selected ? "mcq" : "numeric", options: spec.options ? [...spec.options] : undefined, correctAnswer: spec.correctAnswer,
     answer: spec.correctAnswer, skillId: spec.skillId, skillLabel: spec.skillLabel, linkedWeeks: [spec.week], linkedLessons: [spec.lesson],

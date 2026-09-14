@@ -29,12 +29,12 @@ function ContextLine({ task }: { task: ProtractorTask }) {
   return <div className="text-center text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{task.context.emoji} {task.context.label}</div>;
 }
 
-function DegRow({ options, correct, onCorrect, onWrong, onWrongPick }: { options: number[]; correct: number; onCorrect: () => void; onWrong: () => void; onWrongPick?: () => void }) {
+function DegRow({ options, correct, onCorrect, onWrong, onWrongPick }: { options: number[]; correct: number; onCorrect: (response?: string) => void; onWrong: (response?: string) => void; onWrongPick?: () => void }) {
   const [wrong, setWrong] = useState<number | null>(null);
   const [reveal, setReveal] = useState(false);
   const pick = (n: number) => {
-    if (n === correct) onCorrect();
-    else { setWrong(n); setReveal(true); onWrong(); onWrongPick?.(); }
+    if (n === correct) onCorrect(String(n));
+    else { setWrong(n); setReveal(true); onWrong(String(n)); onWrongPick?.(); }
   };
   return (
     <div className="space-y-2">
@@ -54,7 +54,7 @@ function DegRow({ options, correct, onCorrect, onWrong, onWrongPick }: { options
 }
 
 /* ── L1 Estimate (no protractor) ── */
-function EstimateScene({ task, onCorrect, onWrong, badge }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void; badge: string }) {
+function EstimateScene({ task, onCorrect, onWrong, badge }: { task: ProtractorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void; badge: string }) {
   return (
     <Shell badge={task.badgeLabel ?? badge} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="flex flex-col items-center gap-2 rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
@@ -66,11 +66,11 @@ function EstimateScene({ task, onCorrect, onWrong, badge }: { task: ProtractorTa
   );
 }
 
-function GuessScene({ task, onCorrect, onWrong }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void }) {
+function GuessScene({ task, onCorrect, onWrong }: { task: ProtractorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const [wrong, setWrong] = useState<string | null>(null);
   const pick = (yes: boolean) => {
-    if (yes === task.sensible) onCorrect();
-    else { setWrong(yes ? "y" : "n"); onWrong(); window.setTimeout(() => setWrong(null), 600); }
+    if (yes === task.sensible) onCorrect(String(yes));
+    else { setWrong(yes ? "y" : "n"); onWrong(String(yes)); window.setTimeout(() => setWrong(null), 600); }
   };
   return (
     <Shell badge={task.badgeLabel ?? "Professor Gauge's Guess"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -88,7 +88,7 @@ function GuessScene({ task, onCorrect, onWrong }: { task: ProtractorTask; onCorr
 }
 
 /* ── L2 Measure (protractor) ── */
-function ReadScene({ task, onCorrect, onWrong, badge, assessmentMode }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void; badge: string; assessmentMode: boolean }) {
+function ReadScene({ task, onCorrect, onWrong, badge, assessmentMode }: { task: ProtractorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void; badge: string; assessmentMode: boolean }) {
   const [revealed, setRevealed] = useState(false);
   const guidance = assessmentMode ? "none" : revealed ? "full" : task.guidance ?? "full";
   return (
@@ -104,7 +104,7 @@ function ReadScene({ task, onCorrect, onWrong, badge, assessmentMode }: { task: 
   );
 }
 
-function MistakeScene({ task, onCorrect, onWrong, assessmentMode }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void; assessmentMode: boolean }) {
+function MistakeScene({ task, onCorrect, onWrong, assessmentMode }: { task: ProtractorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void; assessmentMode: boolean }) {
   const [wrong, setWrong] = useState<string | null>(null);
   return (
     <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -114,7 +114,7 @@ function MistakeScene({ task, onCorrect, onWrong, assessmentMode }: { task: Prot
       </div>
       <div className="grid gap-3">
         {(task.reasonOptions ?? []).map((r) => (
-          <button key={r} type="button" onClick={() => (r === task.correctReason ? onCorrect() : (setWrong(r), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`relative flex min-h-[56px] items-center justify-center rounded-[22px] border-2 px-4 text-base font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === r ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
+          <button key={r} type="button" onClick={() => (r === task.correctReason ? onCorrect(r) : (setWrong(r), onWrong(r), window.setTimeout(() => setWrong(null), 600)))} className={`relative flex min-h-[56px] items-center justify-center rounded-[22px] border-2 px-4 text-base font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === r ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
             <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={r} /></span>{r}
           </button>
         ))}
@@ -131,8 +131,8 @@ function ConstructScene({
   assessmentMode,
 }: {
   task: ProtractorTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
   assessmentMode: boolean;
 }) {
   const target = task.targetDeg ?? 45;
@@ -144,8 +144,8 @@ function ConstructScene({
     setDeg(value);
   };
   const handleSubmit = () => {
-    if (deg === target) onCorrect();
-    else onWrong();
+    if (deg === target) onCorrect(JSON.stringify({ degrees: deg }));
+    else onWrong(JSON.stringify({ degrees: deg }));
   };
   return (
     <Shell badge={task.badgeLabel ?? "Build the Angle"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -157,14 +157,14 @@ function ConstructScene({
       {assessmentMode ? (
         <button type="button" disabled={!hasMoved} onClick={handleSubmit} className={`mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 px-10 text-xl font-black uppercase shadow-sm transition ${hasMoved ? "border-[#5b21b6] bg-[#5b21b6] text-white hover:-translate-y-0.5" : "border-[rgba(214,184,108,0.5)] bg-[#f3ead2] text-[#a98b52]"}`}>Record angle</button>
       ) : (
-        <button type="button" disabled={!atTarget} onClick={onCorrect} className={`mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 px-10 text-xl font-black uppercase shadow-sm transition ${atTarget ? "border-[#16a34a] bg-[#16a34a] text-white hover:-translate-y-0.5" : "border-[rgba(214,184,108,0.5)] bg-[#f3ead2] text-[#a98b52]"}`}>{atTarget ? `Build ${target}° ✓` : `Build (${deg}°)`}</button>
+        <button type="button" disabled={!atTarget} onClick={() => onCorrect()} className={`mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 px-10 text-xl font-black uppercase shadow-sm transition ${atTarget ? "border-[#16a34a] bg-[#16a34a] text-white hover:-translate-y-0.5" : "border-[rgba(214,184,108,0.5)] bg-[#f3ead2] text-[#a98b52]"}`}>{atTarget ? `Build ${target}° ✓` : `Build (${deg}°)`}</button>
       )}
     </Shell>
   );
 }
 
 /* ── Meet the Protractor: guided walkthrough (Centre → Align → Read) ── */
-function LearnScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () => void }) {
+function LearnScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: (response?: string) => void }) {
   const angle = task.angle ?? 60;
   const side = task.baselineSide ?? "right";
   const [step, setStep] = useState(0);
@@ -186,13 +186,13 @@ function LearnScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () =
       {step < steps.length - 1 ? (
         <button type="button" onClick={() => setStep((v) => v + 1)} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next step →</button>
       ) : (
-        <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Got it — let&apos;s measure! →</button>
+        <button type="button" onClick={() => onCorrect()} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Got it — let&apos;s measure! →</button>
       )}
     </Shell>
   );
 }
 
-function IntroScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () => void }) {
+function IntroScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: (response?: string) => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid gap-3 sm:grid-cols-3">
@@ -204,7 +204,7 @@ function IntroScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () =
         ))}
       </div>
       <p className="text-center text-[15px] font-bold text-[#2c1c07]">Before engineers measure, they <span className="font-black text-[#5b21b6]">estimate</span> — compare to a right angle (90°) and a straight angle (180°).</p>
-      <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s estimate! →</button>
+      <button type="button" onClick={() => onCorrect()} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s estimate! →</button>
     </Shell>
   );
 }
@@ -220,7 +220,7 @@ function apt(deg: number, len: number): [number, number] {
 function alienStars(diff: number): number { return diff <= 3 ? 3 : diff <= 8 ? 2 : diff <= 15 ? 1 : 0; }
 function alienMedal(diff: number): string { return diff === 0 ? "🎯 Bullseye!" : diff <= 3 ? "🎯 Brilliant aim!" : diff <= 8 ? "👏 Great estimating!" : diff <= 15 ? "👍 Close!" : "Keep practising your angle sense!"; }
 
-function AlienScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () => void }) {
+function AlienScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: (response?: string) => void }) {
   const target = task.targetDeg ?? 45;
   const [deg, setDeg] = useState(90);
   const [revealed, setRevealed] = useState(false);
@@ -287,14 +287,14 @@ function AlienScene({ task, onCorrect }: { task: ProtractorTask; onCorrect: () =
             <div className="text-lg font-black text-[#2c1c07]">Target <span className="text-[#16a34a]">{target}°</span> · you aimed <span className="text-[#7c3aed]">{deg}°</span></div>
             <div className="text-base font-black text-[#16a34a]">{diff === 0 ? "Spot on!" : `${diff}° away`} — {alienMedal(diff)}</div>
           </div>
-          <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-10 text-xl font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next →</button>
+          <button type="button" onClick={() => onCorrect()} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[#16a34a] bg-[#16a34a] px-10 text-xl font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Next →</button>
         </>
       )}
     </Shell>
   );
 }
 
-export function MeasurelandsProtractorCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: ProtractorTask; onCorrect: () => void; onWrong: () => void; assessmentMode?: boolean }) {
+export function MeasurelandsProtractorCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: ProtractorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void; assessmentMode?: boolean }) {
   switch (task.scene) {
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
     case "learn": return <LearnScene task={task} onCorrect={onCorrect} />;

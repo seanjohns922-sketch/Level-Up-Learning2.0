@@ -83,19 +83,19 @@ function form(
 const FORM_PROFILES: Record<ChanceHollowLevel, readonly ChanceHollowFormBlueprint[]> = {
   3: [
     form("pretest", { accessible: 7, moderate: 9, challenging: 4 }, { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, 14),
-    form("posttest", { accessible: 5, moderate: 10, challenging: 5 }, { recall: 1, understanding: 5, application: 8, reasoning: 5, transfer: 1 }, 14),
+    form("posttest", { accessible: 7, moderate: 9, challenging: 4 }, { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, 14),
   ],
   4: [
     form("pretest", { accessible: 6, moderate: 10, challenging: 4 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 }, 12),
-    form("posttest", { accessible: 4, moderate: 10, challenging: 6 }, { recall: 1, understanding: 4, application: 8, reasoning: 5, transfer: 2 }, 12),
+    form("posttest", { accessible: 6, moderate: 10, challenging: 4 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 }, 12),
   ],
   5: [
     form("pretest", { accessible: 5, moderate: 10, challenging: 5 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, 11),
-    form("posttest", { accessible: 3, moderate: 10, challenging: 7 }, { recall: 1, understanding: 3, application: 7, reasoning: 6, transfer: 3 }, 11),
+    form("posttest", { accessible: 5, moderate: 10, challenging: 5 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, 11),
   ],
   6: [
     form("pretest", { accessible: 4, moderate: 10, challenging: 6 }, { recall: 1, understanding: 4, application: 7, reasoning: 5, transfer: 3 }, 8),
-    form("posttest", { accessible: 2, moderate: 9, challenging: 9 }, { recall: 0, understanding: 3, application: 6, reasoning: 7, transfer: 4 }, 8),
+    form("posttest", { accessible: 4, moderate: 10, challenging: 6 }, { recall: 1, understanding: 4, application: 7, reasoning: 5, transfer: 3 }, 8),
   ],
 };
 

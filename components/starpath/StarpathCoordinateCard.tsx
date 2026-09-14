@@ -20,7 +20,7 @@ function StarMark({ cx, cy, colour = "#fcd34d" }: { cx: number; cy: number; colo
   return <polygon points={pts} fill={colour} stroke="#fff7d6" strokeWidth="1" style={{ filter: "drop-shadow(0 0 5px rgba(252,211,77,0.8))" }} />;
 }
 
-export default function StarpathCoordinateCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathCoordinateCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const { bounds } = task;
   const W = PAD_L + bounds.x * STEP + PAD_R;
   const H = PAD_T + bounds.y * STEP + PAD_B;
@@ -41,12 +41,12 @@ export default function StarpathCoordinateCard({ task, onCorrect, onWrong }: { t
   function submitTap() {
     if (settled || !selected) return;
     setSettled(true);
-    if (task.answer && samePoint(selected, task.answer)) onCorrect(); else onWrong(selected ? `${selected.x},${selected.y}` : "");
+    if (task.answer && samePoint(selected, task.answer)) onCorrect(JSON.stringify(selected)); else onWrong(selected ? `${selected.x},${selected.y}` : "");
   }
   function submitOption() {
     if (settled || !chosen) return;
     setSettled(true);
-    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(); else onWrong(chosen);
+    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
   function runRoute() {
     if (settled || running || !task.start || !commands.length) return;
@@ -60,7 +60,7 @@ export default function StarpathCoordinateCard({ task, onCorrect, onWrong }: { t
           setSettled(true);
           const reached = task.goal ? samePoint(p, task.goal) : false;
           const efficient = task.maxSteps === undefined || commands.length <= task.maxSteps;
-          if (reached && onGrid && !hitBlock && efficient) onCorrect(); else onWrong(commands.join(","));
+          if (reached && onGrid && !hitBlock && efficient) onCorrect(JSON.stringify(commands)); else onWrong(commands.join(","));
         }
       }, index * 240);
       timers.current.push(t);

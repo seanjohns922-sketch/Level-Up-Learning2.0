@@ -42,8 +42,8 @@ export function StarpathTurnMoveCard({
   onWrong,
 }: {
   task: TurnMoveTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const banner =
     task.mode === "turn" && task.turn
@@ -80,7 +80,7 @@ export function StarpathTurnMoveCard({
             <button
               key={option.id}
               type="button"
-              onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+              onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
               className="relative flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl border-2 border-violet-200 bg-white px-3 text-indigo-950 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
             >
               {Icon ? <Icon className="h-6 w-6" strokeWidth={2.75} /> : null}
@@ -102,18 +102,18 @@ export function StarpathRouteDebugCard({
   onWrong,
 }: {
   task: RouteDebugTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const [wrongTap, setWrongTap] = useState<string | null>(null);
 
   function tap(stepId: string) {
     if (stepId === task.wrongStepId) {
-      onCorrect();
+      onCorrect(stepId);
     } else {
       setWrongTap(stepId);
       setTimeout(() => setWrongTap((value) => (value === stepId ? null : value)), 440);
-      onWrong();
+      onWrong(stepId);
     }
   }
 
@@ -170,7 +170,7 @@ export function StarpathRouteBuildCard({
   onWrong,
 }: {
   task: RouteBuildTask;
-  onComplete: () => void;
+  onComplete: (response?: string) => void;
   onWrong: (studentAnswer?: string) => void;
 }) {
   const [moves, setMoves] = useState<Direction[]>(task.preset ? [...task.preset] : []);
@@ -230,7 +230,7 @@ export function StarpathRouteBuildCard({
         if (reached && !doneRef.current) {
           doneRef.current = true;
           setStatus("done");
-          setTimeout(onComplete, 1000);
+          setTimeout(() => onComplete(JSON.stringify(moves)), 1000);
         } else {
           setStatus("fail");
           if (task.singleAttempt) {
@@ -430,7 +430,7 @@ export function StarpathRouteRecordCard({
   onWrong,
 }: {
   task: RouteRecordTask;
-  onCorrect: () => void;
+  onCorrect: (response?: string) => void;
   onWrong: (studentAnswer?: string) => void;
 }) {
   const [moves, setMoves] = useState<Direction[]>([]);
@@ -448,7 +448,7 @@ export function StarpathRouteRecordCard({
       moves.length === task.route.length
       && moves.every((direction, index) => direction === task.route[index]);
     if (correct) {
-      onCorrect();
+      onCorrect(JSON.stringify(moves));
       return;
     }
     setWrong(true);

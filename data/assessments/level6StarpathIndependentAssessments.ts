@@ -194,14 +194,14 @@ function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion
   const skill = descriptorSkill(spec.descriptor);
   return {
     schemaVersion: 1,
-    id: `y6-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v4`,
-    version: "4.0.0",
+    id: `y6-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v5`,
+    version: "5.0.0",
     realm: "space",
     level: 6,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `starpath-level-6-${form}-v4`,
+    bankId: `starpath-level-6-${form}-v5`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],

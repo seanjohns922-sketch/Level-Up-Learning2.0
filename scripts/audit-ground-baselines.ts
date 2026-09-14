@@ -39,7 +39,7 @@ for (const realm of ['number','measurement'] as const) {
  assert.equal(comparableAssessmentGrowth([history[0]!,make('old','posttest','2025-12-01',90)],realm,'Prep').post,null);
  assert.equal(comparableAssessmentGrowth([history[0]!,make('changed','posttest','2026-03-26',90,'different-bank')],realm,'Prep').change,null);
  assert.equal(comparableAssessmentGrowth([history[2]!],realm,'Prep').baseline,null);
- assert.deepEqual(assessmentEvidenceMetadata(realm,'Year 1',pre),{});
+ assert.ok(assessmentEvidenceMetadata(realm,'Year 1',getPretestForYearLabel('Year 1',realm)).assessment_evidence?.comparison_group);
 }
 assert.equal(getPretestForYear('Prep').length,20,'Legacy Number resolver uses canonical baseline');
 assert.equal(resolveStudentDestination({progress:buildDefaultStudentProgress('Prep'),introSeen:true}),'/realms');

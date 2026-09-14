@@ -1,5 +1,6 @@
 "use client";
 
+import { MeasurelandsProtractor } from "@/components/measurelands/MeasurelandsProtractor";
 import type { MzVisual } from "@/data/assessments/measurelandsVisuals";
 import { objectBaseNameForLabel, visualScaleForLabel } from "@/data/assessments/measurelandsVisuals";
 import { MeasurelandsScale } from "@/components/measurelands/MeasurelandsScale";
@@ -22,11 +23,11 @@ const GOLD = "#c79a3e";
 // Assessment visuals must stay COMPACT so the question + visual + all options fit
 // one screen (no scrolling). The inner box caps every visual — SVG instruments
 // scale down to fit ~132px tall.
-function Panel({ label, children }: { label?: string; children: React.ReactNode }) {
+function Panel({ label, children, graduated = false }: { label?: string; children: React.ReactNode; graduated?: boolean }) {
   return (
     <div className="measurelands-assessment-visual rounded-[20px] border px-4 py-3" style={{ borderColor: "rgba(184,137,58,0.4)", background: "linear-gradient(150deg,#fdf6e6,#f7ecd2)" }}>
       {label ? <div className="mb-1.5 text-[11px] font-black uppercase tracking-[0.18em]" style={{ color: GOLD_DEEP }}>{label}</div> : null}
-      <div className="measurelands-assessment-visual-stage flex items-center justify-center [&_svg]:max-h-[168px] [&_svg]:w-auto">{children}</div>
+      <div className={graduated ? "mx-auto w-full max-w-[480px] [&_svg]:w-full" : "measurelands-assessment-visual-stage flex items-center justify-center [&_svg]:max-h-[168px] [&_svg]:w-auto"}>{children}</div>
     </div>
   );
 }
@@ -166,6 +167,8 @@ export default function MeasurelandsAssessmentVisual({ visual }: { visual: MzVis
       return <Panel label="Thermometer"><MeasurelandsThermometer value={visual.value} max={Math.max(50, Math.ceil((visual.value + 5) / 10) * 10)} size={150} /></Panel>;
     case "clock":
       return <Panel label="Clock"><ClockFace hour={visual.hour} minute={visual.minute} size={220} /></Panel>;
+    case "protractor":
+      return <Panel label="Read the protractor" graduated><MeasurelandsProtractor angle={visual.angle} baselineSide={visual.baselineSide} guidance="none" showReading={false} /></Panel>;
     case "angle": {
       const known = visual.known ?? visual.single ?? 45;
       // The given angle as two rays + shaded turn-arc, sitting on a horizontal

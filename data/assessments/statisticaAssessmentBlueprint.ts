@@ -57,24 +57,24 @@ const FORM_PROFILES: Record<StatisticaLevel, readonly StatisticaFormBlueprint[]>
     form("posttest", { accessible: 10, moderate: 8, challenging: 2 }, { recall: 3, understanding: 7, application: 7, reasoning: 3, transfer: 0 }, 12),
   ],
   2: [
-    form("pretest", { accessible: 11, moderate: 7, challenging: 2 }, { recall: 4, understanding: 7, application: 6, reasoning: 3, transfer: 0 }, 11),
-    form("posttest", { accessible: 8, moderate: 8, challenging: 4 }, { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, 10),
+    form("pretest", { accessible: 11, moderate: 7, challenging: 2 }, { recall: 4, understanding: 7, application: 6, reasoning: 3, transfer: 0 }, 13),
+    form("posttest", { accessible: 11, moderate: 7, challenging: 2 }, { recall: 4, understanding: 7, application: 6, reasoning: 3, transfer: 0 }, 13),
   ],
   3: [
-    form("pretest", { accessible: 9, moderate: 8, challenging: 3 }, { recall: 3, understanding: 6, application: 7, reasoning: 4, transfer: 0 }, 10),
-    form("posttest", { accessible: 7, moderate: 8, challenging: 5 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 }, 9),
+    form("pretest", { accessible: 9, moderate: 8, challenging: 3 }, { recall: 3, understanding: 6, application: 7, reasoning: 4, transfer: 0 }, 15),
+    form("posttest", { accessible: 9, moderate: 8, challenging: 3 }, { recall: 3, understanding: 6, application: 7, reasoning: 4, transfer: 0 }, 15),
   ],
   4: [
-    form("pretest", { accessible: 8, moderate: 9, challenging: 3 }, { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, 9),
-    form("posttest", { accessible: 6, moderate: 9, challenging: 5 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, 8),
+    form("pretest", { accessible: 8, moderate: 9, challenging: 3 }, { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, 17),
+    form("posttest", { accessible: 8, moderate: 9, challenging: 3 }, { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, 17),
   ],
   5: [
-    form("pretest", { accessible: 7, moderate: 9, challenging: 4 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 }, 8),
-    form("posttest", { accessible: 5, moderate: 9, challenging: 6 }, { recall: 1, understanding: 4, application: 7, reasoning: 6, transfer: 2 }, 7),
+    form("pretest", { accessible: 7, moderate: 9, challenging: 4 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 }, 18),
+    form("posttest", { accessible: 7, moderate: 9, challenging: 4 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 }, 18),
   ],
   6: [
-    form("pretest", { accessible: 6, moderate: 9, challenging: 5 }, { recall: 1, understanding: 5, application: 6, reasoning: 6, transfer: 2 }, 7),
-    form("posttest", { accessible: 4, moderate: 8, challenging: 8 }, { recall: 0, understanding: 4, application: 6, reasoning: 7, transfer: 3 }, 6),
+    form("pretest", { accessible: 6, moderate: 9, challenging: 5 }, { recall: 1, understanding: 5, application: 6, reasoning: 6, transfer: 2 }, 18),
+    form("posttest", { accessible: 6, moderate: 9, challenging: 5 }, { recall: 1, understanding: 5, application: 6, reasoning: 6, transfer: 2 }, 18),
   ],
 };
 

@@ -1676,24 +1676,29 @@ function buildForm(level: StatisticaLevel, form: StatisticaAssessmentKind): Asse
   const cognitive = expandMix(formBlueprint.cognitiveMix);
   return Array.from({ length: 20 }, (_, index) => {
     const descriptor = descriptors[index]!;
-    const task = taskFor(level, form, index);
-    const responseMode: AssessmentResponseMode = index < formBlueprint.selectedResponseMaximum ? "selected_response" : "manipulated_response";
+    const authoredTask = taskFor(level, form, index);
+    // Read the question neutrally; lesson strategy narration must not coach an assessment.
+    const task = { ...authoredTask, speakText: "prompt" in authoredTask ? authoredTask.prompt : "Read the displayed question." } as PracticeTask;
+    const manipulates = ["statisticaSort", "statisticaInvestigation", "statisticaRank", "statisticaGap", "statisticaCollect"].includes(task.kind)
+      || ((task.kind === "statisticaGraph" || task.kind === "statisticaPictograph") && task.mode === "build")
+      || (task.kind === "statisticaTally" && task.mode === "record");
+    const responseMode: AssessmentResponseMode = manipulates ? "manipulated_response" : task.kind === "statisticaTable" && task.mode === "count" ? "constructed_response" : "selected_response";
     const cognitiveCategory = cognition(cognitive[index]!);
     const itemDifficulty = difficulty(difficulties[index]!);
     const week = descriptor.weeks[index % descriptor.weeks.length] ?? descriptor.weeks[0] ?? 1;
     const misconception = descriptor.misconceptionIds[index % Math.max(1, descriptor.misconceptionIds.length)];
     const shortForm = form === "pretest" ? "pre" : "post";
-    const id = `statistica-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v1`;
+    const id = `statistica-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v2`;
     return {
       schemaVersion: 1,
       id,
-      version: "1.0.0",
+      version: "2.0.0",
       realm: "statistics",
       level,
       form,
       origin: "assessment_authored",
       sourcePool: form,
-      bankId: `statistica-year-${level}-${form}-v1`,
+      bankId: `statistica-year-${level}-${form}-v2`,
       primaryDescriptorCode: descriptor.code,
       descriptorCodes: [descriptor.code],
       curriculumLessonMapping: [{ week, lesson: (index % 3) + 1 }],

@@ -62,11 +62,11 @@ export function MeasurelandsProtractor({
   const move = (e: React.PointerEvent) => { if (dragging.current && onDeg) onDeg(degFromEvent(e)); };
 
   const ticks: React.ReactNode[] = [];
-  for (let t = 0; t <= 180; t += 5) {
+  for (let t = 0; t <= 180; t += 1) {
     const major = t % 10 === 0;
     const [x1, y1] = pt(t, R);
-    const [x2, y2] = pt(t, R - (major ? 16 : 9));
-    ticks.push(<line key={`t${t}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#6d5b2a" strokeWidth={major ? 1.8 : 1} />);
+    const [x2, y2] = pt(t, R - (major ? 16 : t % 5 === 0 ? 9 : 5));
+    ticks.push(<line key={`t${t}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#6d5b2a" strokeWidth={major ? 1.8 : t % 5 === 0 ? 1 : 0.6} />);
   }
   const num = (scale: "outer" | "inner") => {
     const active = guidance === "full" ? correctScale === scale : true;

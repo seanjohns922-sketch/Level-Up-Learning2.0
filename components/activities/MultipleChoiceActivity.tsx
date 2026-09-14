@@ -148,7 +148,7 @@ export default function MultipleChoiceActivity({
   assessmentMode = false,
 }: {
   questionData: MultipleChoiceQuestion;
-  onCorrect?: () => void;
+  onCorrect?: (response?: string) => void;
   onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
   realmId?: string;
@@ -226,7 +226,7 @@ export default function MultipleChoiceActivity({
     }
     setPicked(option);
     if (renderMode === "lesson") setSubmitted(true);
-    if (option === questionData.answer) onCorrect?.();
+    if (option === questionData.answer) onCorrect?.(option);
     else onWrong?.(option);
   }
 
@@ -246,7 +246,7 @@ export default function MultipleChoiceActivity({
           "Great thinking. You found all the answers that make sense."
       );
       setFeedbackTone("correct");
-      onCorrect?.();
+      onCorrect?.(selected.join(", "));
       return;
     }
 

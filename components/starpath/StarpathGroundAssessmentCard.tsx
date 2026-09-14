@@ -52,8 +52,8 @@ export function StarpathGroundAssessmentCard({
   onWrong,
 }: {
   task: StarpathGroundAssessmentTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
   const [placements, setPlacements] = useState<Placement[]>([]);
@@ -99,8 +99,9 @@ export function StarpathGroundAssessmentCard({
       ? groundPlacementIsCorrect(task, placements)
       : moves.length === task.answerMoves.length
         && moves.every((move, index) => move === task.answerMoves[index]);
-    if (correct) onCorrect();
-    else onWrong();
+    const response = JSON.stringify(task.mode === "placement" ? placements : moves);
+    if (correct) onCorrect(response);
+    else onWrong(response);
   };
 
   const reset = () => {

@@ -5,29 +5,45 @@ export function isGroundBaseline(realmId: string, year: string) {
   return year === "Prep" && ["number", "measurement", "space"].includes(realmId);
 }
 export function hasComparableAssessmentGrowth(realmId: string, year: string) {
-  return realmId === "space" || isGroundBaseline(realmId, year);
+  return year === "Prep" ? isGroundBaseline(realmId, year) : ["number", "measurement", "space", "statistics", "pattern", "chance"].includes(realmId);
+}
+function comparisonGroup(realmId: string, year: string, questions: readonly { id: string }[]): string | null {
+  const usesVersion = (version: number) => questions.some(q => q.id.endsWith(`-v${version}`));
+  if (realmId === "space") return STARPATH_COMPARISON_GROUP + (usesVersion(5) ? "-v5" : "");
+  if (isGroundBaseline(realmId, year)) return `ground-${realmId}-2026-09-14${realmId === "measurement" && usesVersion(3) ? "-v3" : ""}`;
+  const expectedVersion = realmId === "measurement" || realmId === "pattern" ? 3 : 2;
+  if (!questions.length || questions.some(q => !q.id.endsWith(`-v${expectedVersion}`))) return null;
+  return `paired-${realmId}-${year}-2026-09-14-repair-v${expectedVersion}`;
 }
 export function assessmentEvidenceMetadata(realmId: string, year: string, questions: readonly { id: string }[]) {
   if (!hasComparableAssessmentGrowth(realmId, year)) return {};
   return { assessment_evidence: {
     realm: realmId, working_level: year,
-    comparison_group: realmId === "space" ? STARPATH_COMPARISON_GROUP : `ground-${realmId}-2026-09-14`,
+    comparison_group: comparisonGroup(realmId, year, questions),
+    comparability_status: comparisonGroup(realmId, year, questions) ? "blueprint_matched_uncalibrated" : "unmatched_version",
     bank_versions: [...new Set(questions.map(q => q.id.match(/-v(\d+)$/)?.[1] ?? "unknown"))],
     calibration_status: "uncalibrated", baseline_only: isGroundBaseline(realmId, year),
   } };
 }
+
 function group(attempt: NormalizedAssessmentAttempt): string | null {
   const metadata = attempt.placementResult.assessment_evidence;
   return metadata && typeof metadata === "object" && "comparison_group" in metadata && typeof metadata.comparison_group === "string" ? metadata.comparison_group : null;
 }
+function cycle(attempt: NormalizedAssessmentAttempt): string | null {
+  const metadata = attempt.placementResult.assessment_evidence;
+  return metadata && typeof metadata === "object" && "learning_cycle_id" in metadata && typeof metadata.learning_cycle_id === "string" ? metadata.learning_cycle_id : null;
+}
 export function comparableAssessmentGrowth(attempts: readonly NormalizedAssessmentAttempt[], realmId: string, year: string) {
   const ordered = attempts.filter(a => a.realmId === realmId && a.workingLevel === year && Number.isFinite(Date.parse(a.completedAt)))
     .sort((a,b) => Date.parse(a.completedAt)-Date.parse(b.completedAt) || a.id.localeCompare(b.id));
-  const baseline = ordered.find(a => a.assessmentType === "pretest");
+  const latest = ordered.at(-1);
+  const cycleAttempts = latest && cycle(latest) ? ordered.filter(a => cycle(a) === cycle(latest)) : ordered;
+  const baseline = cycleAttempts.find(a => a.assessmentType === "pretest");
   if (!baseline) return {baseline:null,post:null,change:null,days:null,reason:"No recorded baseline"};
-  const post = ordered.filter(a => a.assessmentType === "posttest" && Date.parse(a.completedAt)>Date.parse(baseline.completedAt)).at(-1);
+  const post = cycleAttempts.filter(a => a.assessmentType === "posttest" && Date.parse(a.completedAt)>Date.parse(baseline.completedAt)).at(-1);
   if (!post) return {baseline,post:null,change:null,days:null,reason:"Awaiting a later post-test"};
-  const comparable = group(baseline)!==null && group(baseline)===group(post);
+  const comparable = group(baseline)!==null && group(baseline)===group(post) && cycle(baseline)===cycle(post);
   return {baseline,post,change:comparable ? post.scorePercent-baseline.scorePercent : null,
     days:Math.floor((Date.parse(post.completedAt)-Date.parse(baseline.completedAt))/86400000),
     reason:comparable ? null : "Assessment versions differ or are unrecorded"};

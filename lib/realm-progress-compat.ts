@@ -405,7 +405,8 @@ function buildRowsFromRealmData(
       week: summary.current_week ?? summary.assigned_week ?? null,
       status: summary.status,
       pretest_score: latestPretest?.score_percent ?? summary.pretest_score,
-      placement_complete: hasComparableAssessmentGrowth(summary.realm_id, summary.working_level) ? summary.placement_complete : summary.placement_complete || latestPretest !== null,
+      // Persisted placement state is authoritative: retained attempts cannot undo a reset.
+      placement_complete: summary.placement_complete,
       assigned_week: summary.assigned_week,
       required_weeks: summary.required_weeks,
       optional_weeks: summary.optional_weeks,

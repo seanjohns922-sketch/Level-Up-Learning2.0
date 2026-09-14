@@ -379,7 +379,7 @@ function PretestPage() {
   const starpathLevel1CandidateRequested = progressRealmId === "space"
     && year === "Year 1"
     && reviewBank === "level1-starpath-pre-rc1";
-  const candidateReviewRequested = (progressRealmId === "number" && year === "Year 6")
+  const candidateReviewRequested = (progressRealmId === "number" && year === "Year 6" && reviewBank === "year6-number-pre-rc1")
     || starpathLevel1CandidateRequested;
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
 
@@ -791,7 +791,7 @@ function PretestPage() {
       ? mabHasSelection
       : question?.type === "numeric"
         ? (selected ?? "").trim().length > 0
-        : selected !== null;
+        : Boolean(selected?.trim());
 
   const isMeasurelandsTask =
     (question?.type === "measurelandsTask" || question?.type === "starpathTask" || question?.type === "statisticaTask" || question?.type === "patternPeaksTask" || question?.type === "chanceHollowTask") &&

@@ -1,6 +1,6 @@
 "use client";
 
-import { encodeStarpathResponse } from "@/lib/starpath-assessment-response";
+import { encodeAssessmentResponse } from "@/lib/assessment-response";
 import { useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { TaskRenderer } from "@/components/TaskRenderer";
@@ -63,7 +63,7 @@ export function MeasurelandsAssessmentTask({
             markWrong: () => record(`${WRONG_PREFIX}:${questionId}`),
             markAttempted: () => undefined,
             recordAssessmentAnswer: (correct, response) =>
-              record(task.kind === "starpathIndependentConstruction" ? encodeStarpathResponse(questionId, correct, response) : correct ? correctToken : `${WRONG_PREFIX}:${questionId}`),
+              record(encodeAssessmentResponse(questionId, task.kind, correct, response)),
           }}
         />
       </div>

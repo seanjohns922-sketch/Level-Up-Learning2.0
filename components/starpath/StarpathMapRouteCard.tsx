@@ -127,7 +127,7 @@ function ArrowPad({ onPick, wrong, disabled }: { onPick: (d: Direction) => void;
 }
 
 // ── Test & Fix: find the broken step in a route drawn across the map ──────────
-function DebugRoute({ task, onCorrect, onWrong, editableAssessmentMode = false, assessmentAnswer, onAssessmentAnswer }: { task: MapRouteTask; onCorrect: () => void; onWrong: () => void; editableAssessmentMode?: boolean; assessmentAnswer?: string; onAssessmentAnswer?: (correct: boolean, response: string) => void }) {
+function DebugRoute({ task, onCorrect, onWrong, editableAssessmentMode = false, assessmentAnswer, onAssessmentAnswer }: { task: MapRouteTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void; editableAssessmentMode?: boolean; assessmentAnswer?: string; onAssessmentAnswer?: (correct: boolean, response: string) => void }) {
   const [wrongTap, setWrongTap] = useState<string | null>(null);
   const steps = task.debugSteps ?? [];
 
@@ -178,7 +178,7 @@ function DebugRoute({ task, onCorrect, onWrong, editableAssessmentMode = false, 
   );
 }
 
-export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () => void; onWrong: (studentAnswer?: string) => void; onComplete: () => void; editableAssessmentMode?: boolean; assessmentAnswer?: string; onAssessmentAnswer?: (correct: boolean, response: string) => void }) {
+export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: (response?: string) => void; onWrong: (studentAnswer?: string) => void; onComplete: () => void; editableAssessmentMode?: boolean; assessmentAnswer?: string; onAssessmentAnswer?: (correct: boolean, response: string) => void }) {
   const { task } = props;
   const [rover, setRover] = useState<Cell>(task.start);
   const [stepIndex, setStepIndex] = useState(0);
@@ -281,7 +281,7 @@ export function StarpathMapRouteCard(props: { task: MapRouteTask; onCorrect: () 
           {(task.options ?? []).map((option) => {
             const Icon = ARROW_ICON[option.direction];
             return (
-              <button key={option.id} type="button" onClick={() => (option.id === task.correctOptionId ? props.onCorrect() : props.onWrong())} className="relative flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl border-2 border-violet-200 bg-white px-3 text-indigo-950 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]">
+              <button key={option.id} type="button" onClick={() => (option.id === task.correctOptionId ? props.onCorrect(option.id) : props.onWrong(option.id))} className="relative flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl border-2 border-violet-200 bg-white px-3 text-indigo-950 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]">
                 <Icon className="h-6 w-6" strokeWidth={2.75} />
                 <span className="text-sm font-black">{DIRECTION_WORD[option.direction]}</span>
                 <OptionReadAloudButton text={DIRECTION_WORD[option.direction]} className="absolute right-1.5 top-1.5" />

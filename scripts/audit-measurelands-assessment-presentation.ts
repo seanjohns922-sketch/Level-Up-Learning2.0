@@ -106,7 +106,7 @@ check(!protractorCardSource.includes("Target: {target}° — drag") || protracto
 check(metricUnitCardSource.includes('<MeasurelandsObjectArt name={o.label}'), "Metric-unit assessment tasks still render object emoji instead of commissioned art.");
 check(fs.existsSync(path.join(root, "public/images/measurelands/week2-3d/parcel.png")), "The Level 5 parcel unit-choice task has no commissioned art asset.");
 
-for (const id of ["y5-measurement-post-06-v2", "y5-measurement-post-12-v2", "y5-measurement-pre-16-v2"]) {
+for (const id of ["y5-measurement-post-16-v3", "y5-measurement-pre-16-v3"]) {
   const question = forms.flatMap((form) => form.questions).find((item) => item.id === id);
   check((question?.visual as { kind?: unknown } | undefined)?.kind === "perimeterShape", `${id} does not expose its labelled boundary plan.`);
 }

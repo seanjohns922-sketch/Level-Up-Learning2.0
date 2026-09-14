@@ -1,5 +1,8 @@
 "use client";
+import NumberReasoningResponse from "./NumberReasoningResponse";
 
+import InformalMeasurementVisual from "./InformalMeasurementVisual";
+import GroundMeasurementComparisonVisual from "./GroundMeasurementComparisonVisual";
 import { useMemo, useRef, useState } from "react";
 import { RotateCcw, Trash2, Undo2 } from "lucide-react";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
@@ -320,6 +323,7 @@ export default function AssessmentQuestionCard({
   const isYearFiveNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_y5_");
   const isYearSixNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_y6_");
   const isEarlyNumberVisual =
+    question.id?.startsWith("y3-number-") ||
     question.id?.startsWith("y3-a-") ||
     question.id?.startsWith("y3-b-") ||
     (typeof visual?.type === "string" &&
@@ -347,6 +351,8 @@ export default function AssessmentQuestionCard({
       ) : null}
       {visual.type === "cartesian_grid" ? <CartesianGridVisual visual={visual as never} /> : null}
       {visual.type === "expression_flow" ? <ExpressionFlowVisual visual={visual as never} /> : null}
+      {visual.type === "informal_measurement_units" ? <InformalMeasurementVisual visual={visual} /> : null}
+      {visual.type === "ground_measurement_comparison" ? <GroundMeasurementComparisonVisual visual={visual} /> : null}
       {visual.type === "input_output_table" ? <InputOutputTableVisual visual={visual as never} /> : null}
       {visual.type === "function_machine_card" ? <FunctionMachineCardVisual visual={visual as never} /> : null}
       {visual.type === "decision_path_card" ? <DecisionPathCardVisual visual={visual as never} /> : null}
@@ -435,6 +441,7 @@ export default function AssessmentQuestionCard({
   }
 
   if (type === "number_order") {
+    const algorithm = visual?.type === "algorithm_steps";
     const numbers = ((question.options as string[] | undefined) ?? []).map(String);
     const visualValues = Array.isArray(visual?.values) ? visual.values.map(String) : [];
     const numberLabels = (visual?.type === "number_y5_decimal_set" || visual?.type === "number_y6_integer_set") && visualValues.length === numbers.length
@@ -467,14 +474,14 @@ export default function AssessmentQuestionCard({
     return (
       <div className={isEarlyNumberVisual ? "mt-3" : "mt-6"}>
         {showOrderVisual ? renderedVisual : null}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className={algorithm ? "grid gap-3" : "grid gap-4 md:grid-cols-3"}>
           {numbers.map((num, index) => (
             <div key={num} className={isEarlyNumberVisual ? "flex items-center gap-2 rounded-lg border-2 border-slate-300 bg-[#f8fbfc] p-2 shadow-sm" : "flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-700/50 p-2"}>
               <button
                 type="button"
                 onClick={() => addNumber(num)}
                 disabled={order.includes(num)}
-                className={isEarlyNumberVisual
+                className={algorithm ? "min-h-14 min-w-0 flex-1 rounded-lg px-3 text-left text-base font-bold text-white transition hover:bg-slate-700 disabled:opacity-50" : isEarlyNumberVisual
                   ? "min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-slate-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
                   : "min-h-14 flex-1 rounded-lg px-3 text-left text-3xl font-black text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"}
               >
@@ -485,8 +492,8 @@ export default function AssessmentQuestionCard({
           ))}
         </div>
         <div className={isEarlyNumberVisual ? "mt-5 rounded-lg border-2 border-dashed border-cyan-900/20 bg-[#f8fbfc] p-4" : "mt-5 rounded-lg border border-dashed border-slate-600 bg-slate-800/50 p-4"}>
-          {!isEarlyNumberVisual ? <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>Drag To Reorder</div> : null}
-          <div className="mt-3 grid gap-3 md:grid-cols-3">
+          {!isEarlyNumberVisual ? <div className={`text-xs font-bold uppercase tracking-wide ${accentLabel}`}>{algorithm ? "Your algorithm — drag to reorder" : "Drag To Reorder"}</div> : null}
+          <div className={algorithm ? "mt-3 grid gap-3" : "mt-3 grid gap-3 md:grid-cols-3"}>
             {order.length > 0 ? (
               order.map((num, index) => (
                 <div
@@ -505,7 +512,7 @@ export default function AssessmentQuestionCard({
             ) : (
               isEarlyNumberVisual
                 ? Array.from({ length: numbers.length }, (_, index) => <div key={index} className="h-14 rounded-lg border-2 border-dashed border-cyan-900/25" />)
-                : <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">Tap the numbers in order, then drag to adjust if needed.</div>
+                : <div className="col-span-full rounded-2xl border border-dashed border-slate-600 bg-slate-700/30 p-4 text-sm font-semibold text-slate-400">{algorithm ? "Tap the instructions in order. You can undo or reorder before submitting." : "Tap the numbers in order, then drag to adjust if needed."}</div>
             )}
           </div>
         </div>
@@ -515,8 +522,8 @@ export default function AssessmentQuestionCard({
             onClick={undoLast}
             disabled={order.length === 0}
             className={isEarlyNumberVisual ? "grid h-11 w-11 place-items-center rounded-lg border-2 border-slate-300 bg-[#f8fbfc] text-slate-600 shadow-sm disabled:opacity-40" : "rounded-2xl border border-slate-600 bg-slate-700/50 px-4 py-2 font-black text-slate-300 hover:bg-slate-700 disabled:opacity-40"}
-            aria-label="Undo last number"
-            title="Undo last number"
+            aria-label={algorithm ? "Undo last instruction" : "Undo last number"}
+            title={algorithm ? "Undo last instruction" : "Undo last number"}
           >
             {isEarlyNumberVisual ? <Undo2 className="h-5 w-5" aria-hidden /> : "Undo last"}
           </button>
@@ -782,6 +789,8 @@ export default function AssessmentQuestionCard({
       </div>
     );
   }
+
+  if (type === "numeric" && Array.isArray(visual?.reasonOptions)) return <div className="space-y-4">{renderedVisual}<NumberReasoningResponse key={question.id} value={value} options={visual.reasonOptions as string[]} unit={question.answerFormat?.kind === "number" ? question.answerFormat.unit : undefined} onChange={onChange} /></div>;
 
   if (type === "numeric") {
     if (isEarlyNumberVisual) {

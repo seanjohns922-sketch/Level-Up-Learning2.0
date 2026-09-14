@@ -46,11 +46,11 @@ function ObjectPanel({ task }: { task: MetricTask }) {
 }
 
 /* Shared unit-chip picker for chooseUnit / accuracyPick / spotMistake. */
-function UnitPickScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: () => void; onWrong: () => void }) {
+function UnitPickScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const [wrong, setWrong] = useState<string | null>(null);
   const pick = (o: string) => {
-    if (o === task.correctOption) onCorrect();
-    else { setWrong(o); onWrong(); window.setTimeout(() => setWrong(null), 600); }
+    if (o === task.correctOption) onCorrect(o);
+    else { setWrong(o); onWrong(o); window.setTimeout(() => setWrong(null), 600); }
   };
   return (
     <Shell badge={task.badgeLabel ?? "Choose the Unit"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -67,7 +67,7 @@ function UnitPickScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorre
 }
 
 /* Sort objects into unit bins (tap an object, then tap its bin). */
-function SortScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: () => void; onWrong: () => void }) {
+function SortScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const bins = task.bins ?? [];
   const items = task.metricItems ?? [];
   const [placed, setPlaced] = useState<Record<string, string>>({});
@@ -120,7 +120,7 @@ function SortScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: 
 }
 
 /* Choose the tool AND the unit (both must be right). */
-function ToolUnitScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: () => void; onWrong: () => void }) {
+function ToolUnitScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const [tool, setTool] = useState<string | null>(null);
   const [wrongTool, setWrongTool] = useState<string | null>(null);
   const [wrongUnit, setWrongUnit] = useState<string | null>(null);
@@ -130,8 +130,8 @@ function ToolUnitScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorre
   };
   const pickUnit = (o: string) => {
     if (!tool) return;
-    if (o === task.correctOption) onCorrect();
-    else { setWrongUnit(o); onWrong(); window.setTimeout(() => setWrongUnit(null), 600); }
+    if (o === task.correctOption) onCorrect(o);
+    else { setWrongUnit(o); onWrong(o); window.setTimeout(() => setWrongUnit(null), 600); }
   };
   return (
     <Shell badge={task.badgeLabel ?? "Tool + Unit"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -159,11 +159,11 @@ function ToolUnitScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorre
 }
 
 /* Pick the reason a unit is best. */
-function JustifyScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: () => void; onWrong: () => void }) {
+function JustifyScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const [wrong, setWrong] = useState<string | null>(null);
   const pick = (r: string) => {
-    if (r === task.correctReason) onCorrect();
-    else { setWrong(r); onWrong(); window.setTimeout(() => setWrong(null), 600); }
+    if (r === task.correctReason) onCorrect(r);
+    else { setWrong(r); onWrong(r); window.setTimeout(() => setWrong(null), 600); }
   };
   return (
     <Shell badge={task.badgeLabel ?? "Explain Your Choice"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -180,7 +180,7 @@ function JustifyScene({ task, onCorrect, onWrong }: { task: MetricTask; onCorrec
 }
 
 /* Intro / teaching briefing with a unit ladder. */
-function IntroScene({ task, onCorrect }: { task: MetricTask; onCorrect: () => void }) {
+function IntroScene({ task, onCorrect }: { task: MetricTask; onCorrect: (response?: string) => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-4">
@@ -206,12 +206,12 @@ function IntroScene({ task, onCorrect }: { task: MetricTask; onCorrect: () => vo
           </div>
         </div>
       ) : null}
-      <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s decide! →</button>
+      <button type="button" onClick={() => onCorrect()} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s decide! →</button>
     </Shell>
   );
 }
 
-export function MeasurelandsMetricUnitCard({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: () => void; onWrong: () => void }) {
+export function MeasurelandsMetricUnitCard({ task, onCorrect, onWrong }: { task: MetricTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   switch (task.scene) {
     case "intro": return <IntroScene task={task} onCorrect={onCorrect} />;
     case "sortBins": return <SortScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;

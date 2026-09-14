@@ -202,9 +202,9 @@ function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion
   spec.responseMode = starpathResponseMode(spec.task);
   const shortForm = form === "pretest" ? "pre" : "post";
   return {
-    schemaVersion: 1, id: `y3-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v4`, version: "4.0.0",
+    schemaVersion: 1, id: `y3-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v5`, version: "5.0.0",
     realm: "space", level: 3, form, origin: "assessment_authored", sourcePool: form,
-    bankId: `starpath-level-3-${form}-v4`, primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
+    bankId: `starpath-level-3-${form}-v5`, primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }], cognitiveCategory: spec.cognitiveCategory,
     difficulty: spec.difficulty, isTransfer: spec.cognitiveCategory === "transfer",
     requiresReasoning: spec.cognitiveCategory === "reasoning" || spec.cognitiveCategory === "transfer",

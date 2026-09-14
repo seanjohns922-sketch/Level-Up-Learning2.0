@@ -115,7 +115,7 @@ function OptionButton({ selected, onClick, children }: { selected: boolean; onCl
   );
 }
 
-export default function StarpathCrossSectionCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathCrossSectionCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const object = getCrossObject(task.objectId);
   const [t, setT] = useState(0.35);
   const [chosen, setChosen] = useState<string | null>(null);
@@ -124,7 +124,7 @@ export default function StarpathCrossSectionCard({ task, onCorrect, onWrong, ass
   function submit() {
     if (settled || !chosen) return;
     setSettled(true);
-    if (task.correctOptionIds.includes(chosen)) onCorrect(); else onWrong(chosen);
+    if (task.correctOptionIds.includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (

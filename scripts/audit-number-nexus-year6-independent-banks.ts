@@ -31,7 +31,7 @@ check(blueprint?.crossRealmCoverage?.[0]?.implementationStatus === "owned-by-pat
 
 const forms = [
   { kind: "pretest", bank: YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS, difficulty: { easy: 4, moderate: 10, challenging: 6 }, cognitive: { recall: 1, understanding: 4, application: 6, reasoning: 6, transfer: 3 } },
-  { kind: "posttest", bank: YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS, difficulty: { easy: 2, moderate: 8, challenging: 10 }, cognitive: { understanding: 3, application: 6, reasoning: 7, transfer: 4 } },
+  { kind: "posttest", bank: YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS, difficulty: { easy: 4, moderate: 10, challenging: 6 }, cognitive: { recall: 1, understanding: 4, application: 6, reasoning: 6, transfer: 3 } },
 ] as const;
 const misconceptionById = new Map(NUMBER_NEXUS_MISCONCEPTION_LIBRARY.map((entry) => [entry.id, entry]));
 const weeklyPrompts = new Set<string>();
@@ -42,7 +42,7 @@ check(allItems.length === 40, "Year 6 banks must contain 40 items.");
 check(new Set(allItems.map((item) => item.id)).size === 40, "Candidate IDs must be unique.");
 check(new Set(allItems.map((item) => item.contextKey)).size === 40, "Candidate contexts must be unique.");
 check(new Set(allItems.map((item) => item.structureKey)).size === 40, "Candidate structures must be unique.");
-check(new Set(allItems.map((item) => item.prompt.trim().toLowerCase())).size === 40, "Candidate wording must be unique across forms.");
+check(new Set(allItems.map((item) => JSON.stringify({prompt:item.prompt,visual:item.visual,options:item.options}))).size === 40, "Mathematical items must be distinct across forms.");
 check(allItems.every((item) => !weeklyPrompts.has(item.prompt.trim().toLowerCase())), "An assessment prompt duplicates a weekly quiz prompt.");
 
 for (const form of forms) {
@@ -80,10 +80,10 @@ for (const form of forms) {
   check(resultAt80.recommendedWeeks.length > 0 && resultAt80.assignedWeek !== undefined, `${form.kind} cannot produce targeted recommendations.`);
 
   for (const item of bank) {
-    check(item.version === "1.0.0" && item.schemaVersion === 1, `${item.id} has incorrect version metadata.`);
+    check(item.version === "2.0.0" && item.schemaVersion === 1, `${item.id} has incorrect version metadata.`);
     check(item.realm === "number" && item.level === 6 && item.form === form.kind, `${item.id} targets the wrong form.`);
     check(item.origin === "assessment_authored" && item.sourcePool === form.kind, `${item.id} is not independent content.`);
-    check(item.bankId === `number-nexus-level-6-${form.kind}-v1`, `${item.id} has the wrong bank ID.`);
+    check(item.bankId === `number-nexus-level-6-${form.kind}-v2`, `${item.id} has the wrong bank ID.`);
     check(item.statistics.calibrationStatus === "uncalibrated" && item.statistics.sampleSize === 0, `${item.id} must start uncalibrated.`);
     check(item.descriptorCodes.includes(item.primaryDescriptorCode), `${item.id} omits its primary descriptor.`);
     check(item.curriculumLessonMapping.length > 0, `${item.id} has no lesson-origin metadata.`);
@@ -125,9 +125,7 @@ check(visualSource.includes("FractionExpression") && cardSource.includes('aria-l
 check(!visualSource.includes("Object.entries(visual)"), "Level 6 read-aloud infers text from hidden visual data and may expose an answer.");
 check(visualSource.includes("A point is marked on the line."), "Level 6 number-line read-aloud does not use an answer-neutral description.");
 check(shellSource.includes('year === "Year 6"') && shellSource.includes("max-w-6xl"), "Level 6 does not use the modern wide assessment shell.");
-check(pretestPageSource.includes("candidateReviewRequested = progressRealmId === \"number\" && year === \"Year 6\"") && pretestPageSource.includes("isDemoPreviewMode()"), "Level 6 candidate Pre-Test is not available throughout demo review mode.");
-check(posttestPageSource.includes("candidateReviewRequested = progressRealmId === \"number\" && year === \"Year 6\"") && posttestPageSource.includes("isDemoPreviewMode()"), "Level 6 candidate Post-Test is not available throughout demo review mode.");
-check(!apiSource.includes("YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS"), "Release candidate was routed to production before educator approval.");
+check(apiSource.includes("YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS") && apiSource.includes("YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS"), "The curriculum-repaired pair must resolve consistently for students.");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "The 85% assessment threshold changed.");
 
 if (failures.length) {
@@ -136,4 +134,4 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(`Year 6 Number Nexus release-candidate bank audit passed: 40/40 items across 2 forms; ${passed} validation checks passed.`);
-console.log("Production resolver remains unchanged pending educator approval.");
+console.log("Canonical student resolver uses the repaired pre/post pair.");

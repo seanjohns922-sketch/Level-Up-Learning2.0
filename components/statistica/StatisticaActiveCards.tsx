@@ -11,7 +11,7 @@ type RankTask = Extract<PracticeTask, { kind: "statisticaRank" }>;
 type GapTask = Extract<PracticeTask, { kind: "statisticaGap" }>;
 type TapGraphTask = Extract<PracticeTask, { kind: "statisticaTapGraph" }>;
 type TableTask = Extract<PracticeTask, { kind: "statisticaTable" }>;
-type ResultProps = { onCorrect: () => void; onWrong: (answer?: string) => void };
+type ResultProps = { onCorrect: (response?: string) => void; onWrong: (answer?: string) => void };
 
 const panel = "mx-auto max-w-2xl rounded-lg border border-[#f2bc45]/45 bg-[#17281f] p-4 shadow-[inset_0_1px_0_rgba(255,240,199,0.12)] sm:p-5";
 
@@ -33,13 +33,13 @@ export function StatisticaRankCard({ task, onCorrect, onWrong }: { task: RankTas
   function submit() {
     if (settled || order.length !== task.categories.length) return;
     setSettled(true);
-    if (order.every((id, index) => id === task.correctOrderIds[index])) onCorrect();
+    if (order.every((id, index) => id === task.correctOrderIds[index])) onCorrect(JSON.stringify(order));
     else onWrong(order.join(","));
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
       <StatisticaPlot categories={task.categories} display="columns" onColumnClick={choose} selectedIds={order} />
       <div className="mx-auto grid max-w-lg grid-cols-3 gap-2" aria-label="Ranked order">
         {task.categories.map((_, index) => {
@@ -75,12 +75,12 @@ export function StatisticaGapCard({ task, onCorrect, onWrong }: { task: GapTask 
   function submit() {
     if (settled || selected.length === 0) return;
     setSettled(true);
-    if (selected.length === task.difference) onCorrect(); else onWrong(String(selected.length));
+    if (selected.length === task.difference) onCorrect(JSON.stringify(selected)); else onWrong(String(selected.length));
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
       <StatisticaPlot
         categories={task.categories}
         display="objects"
@@ -111,7 +111,7 @@ export function StatisticaTapGraphCard({ task, onCorrect, onWrong }: { task: Tap
   function submit() {
     if (settled || !chosen) return;
     setSettled(true);
-    if (chosen === task.correctCategoryId) onCorrect(); else onWrong(chosen);
+    if (chosen === task.correctCategoryId) onCorrect(chosen); else onWrong(chosen);
   }
 
   const statusById: Record<string, "correct" | "wrong"> = settled
@@ -120,7 +120,7 @@ export function StatisticaTapGraphCard({ task, onCorrect, onWrong }: { task: Tap
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
       <StatisticaPlot
         categories={task.categories}
         display={task.display}
@@ -143,14 +143,14 @@ export function StatisticaTableCard({ task, onCorrect, onWrong }: { task: TableT
     if (settled) return;
     setSettled(true);
     if (task.mode === "select") {
-      if (chosen === task.correctRowId) onCorrect(); else onWrong(chosen ?? "");
-    } else if (count === task.answerCount) onCorrect();
+      if (chosen === task.correctRowId) onCorrect(chosen ?? ""); else onWrong(chosen ?? "");
+    } else if (count === task.answerCount) onCorrect(String(count));
     else onWrong(String(count));
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
       <div className={panel}>
         <div className="overflow-hidden rounded-lg border border-[#f2bc45]/45">
           <div className="grid grid-cols-[1fr_90px] bg-[#f2bc45]/15 px-4 py-2 text-xs font-black uppercase text-[#fff0c7]"><span>Category</span><span className="text-center">Frequency</span></div>

@@ -88,8 +88,8 @@ export function StarpathObjectCard({
   onAssessmentAnswer,
 }: {
   task: StarpathObjectTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
   editableAssessmentMode?: boolean;
   assessmentAnswer?: string;
   onAssessmentAnswer?: (correct: boolean, response: string) => void;
@@ -141,7 +141,7 @@ export function StarpathObjectCard({
                   onAssessmentAnswer(option.id === task.correctOptionId, option.id);
                   return;
                 }
-                if (option.id === task.correctOptionId) onCorrect();
+                if (option.id === task.correctOptionId) onCorrect(option.id);
                 else miss(option.id);
               }}
             />
@@ -167,7 +167,7 @@ export function StarpathObjectCard({
       const next = { ...classified, [selectedId]: groupId };
       setClassified(next);
       setSelectedId(null);
-      if (!isEditableAssessment && Object.keys(next).length === classifyTask.scene.length) onCorrect();
+      if (!isEditableAssessment && Object.keys(next).length === classifyTask.scene.length) onCorrect(JSON.stringify(next));
     }
 
     function moveAgain(objectId: string) {
@@ -303,7 +303,7 @@ export function StarpathObjectCard({
       const next = { ...placedSlots, [slotId]: piece.id };
       setPlacedSlots(next);
       setSelectedId(null);
-      if (Object.keys(next).length === buildTask.slots.length) onCorrect();
+      if (Object.keys(next).length === buildTask.slots.length) onCorrect(JSON.stringify(next));
     }
 
     return (
@@ -388,7 +388,7 @@ export function StarpathObjectCard({
                   onAssessmentAnswer(obj.id === findTask.correctObjectId, obj.id);
                   return;
                 }
-                if (obj.id === findTask.correctObjectId) onCorrect();
+                if (obj.id === findTask.correctObjectId) onCorrect(obj.id);
                 else miss(obj.id);
               }}
               className={[

@@ -179,7 +179,7 @@ export function StarpathShapeWorkshopCard({
   assessmentMode = false,
 }: {
   task: WorkshopTask;
-  onCorrect: () => void;
+  onCorrect: (response?: string) => void;
   onWrong: (studentAnswer?: string) => void;
   assessmentMode?: boolean;
 }) {
@@ -226,7 +226,7 @@ export function StarpathShapeWorkshopCard({
     ) {
       setRepairPoints(chosen);
       setComplete(true);
-      window.setTimeout(onCorrect, 650);
+      window.setTimeout(() => onCorrect(JSON.stringify(chosen)), 650);
       return;
     }
     setRepairPoints([]);
@@ -239,7 +239,7 @@ export function StarpathShapeWorkshopCard({
     if (samePoint(point, start)) {
       if (assessmentPoints.length < 3) return;
       setComplete(true);
-      if (assessmentConstructionIsCorrect(task, assessmentPoints)) onCorrect();
+      if (assessmentConstructionIsCorrect(task, assessmentPoints)) onCorrect(JSON.stringify(assessmentPoints));
       else onWrong(assessmentPoints.map((item) => `${item.r}:${item.c}`).join(","));
       return;
     }
@@ -277,8 +277,8 @@ export function StarpathShapeWorkshopCard({
                 key={option.id}
                 type="button"
                 onClick={() => option.id === task.correctOptionId
-                  ? onCorrect()
-                  : onWrong(option.label)}
+                  ? onCorrect(option.id)
+                  : onWrong(option.id)}
                 className="relative flex min-h-20 items-center justify-center rounded-lg border-2 border-violet-200 bg-white px-10 py-3 text-base font-black text-indigo-950 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
               >
                 {option.label}

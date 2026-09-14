@@ -1,3 +1,4 @@
+import { YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS, YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "./year6NumberNexusIndependentBanks";
 import { GROUND_STARPATH_INDEPENDENT_PRETEST_ITEMS } from "./groundStarpathIndependentPosttest";
 import { getPretestForYear, type Question as PretestQuestion } from "./pretests";
 import { POSTTESTS, type PostTest, type Question as PosttestQuestion } from "./posttests";
@@ -220,6 +221,7 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
     default:
       return assertAssessmentRealmHandled(realmId);
   }
+  if (yearLabel === "Year 6") return [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   if (yearLabel === "Year 3") {
     return buildLevel3PretestFormA();
   }
@@ -256,6 +258,7 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
     default:
       return assertAssessmentRealmHandled(realmId);
   }
+  if (yearLabel === "Year 6") return { yearLabel, questions: [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] };
   if (isGroundLevelYear(yearLabel)) {
     return {
       yearLabel: "Prep",

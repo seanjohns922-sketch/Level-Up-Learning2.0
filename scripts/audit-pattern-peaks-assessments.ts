@@ -16,12 +16,12 @@ const descriptorStructures: Record<string, string[]> = {
   AC9M3A01: ["add-sub-inverse", "subtraction-unknown", "partition-equivalence"],
   AC9M3A02: ["derived-addition-fact", "derived-subtraction-fact"],
   AC9M3A03: ["multiplication-fact", "related-division-fact", "connected-fact-family"],
-  AC9M3A04: ["multiple-algorithm", "odd-even-algorithm", "ordered-number-algorithm"],
+  AC9M3N07: ["multiple-algorithm", "odd-even-algorithm", "ordered-number-algorithm"],
   AC9M4A01: ["unknown-addend", "unknown-subtrahend", "unknown-minuend", "balanced-addition-equation", "compensating-equivalence", "connected-addition-equations"],
   AC9M4A02: ["multiplication-product", "multiplication-unknown", "division-quotient", "division-unknown", "derived-multiplication-fact", "connected-fact-family"],
-  AC9M5A01: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence"],
+  AC9M5A01: ["inverse-multiplication-division-fact-family"],
   AC9M5A02: ["multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence"],
-  AC9M5A03: ["factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
+  AC9M5N10: ["factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
   AC9M6A01: ["natural-number-sequence", "decimal-sequence", "fraction-sequence", "reverse-sequence", "sequence-rule-transfer", "visual-stage-generalisation", "rational-rule-transfer"],
   AC9M6A02: ["bracket-order", "bracketed-unknown", "bracketed-equivalence", "two-sided-unknown", "connected-bracketed-equations", "bracket-placement-comparison"],
   AC9M6A03: ["follow-function-machine", "infer-function-rule", "compare-function-machines", "debug-function-machine", "branching-number-algorithm", "reverse-number-algorithm", "generated-number-set"],
@@ -82,9 +82,16 @@ for (const level of levels) {
       assert.equal(item.realm, "pattern");
       assert.equal(item.origin, "assessment_authored");
       assert.equal(item.sourcePool, profile.kind);
-      assert.equal(item.type, "patternPeaksTask");
-      assert.equal(item.practiceTask?.kind, "patternPeaksQuestion");
-      assert.equal(isPracticeTaskSafe(item.practiceTask), true, `${item.id} must be accepted by the production renderer`);
+      if (item.type === "number_order") {
+        assert.equal(item.renderer.type, "algorithm_order");
+        assert.equal(item.responseMode, "manipulated_response");
+        assert.equal(item.options?.length, 3);
+        assert.equal(String(item.correctAnswer).split("||").length, 3);
+      } else {
+        assert.equal(item.type, "patternPeaksTask");
+        assert.equal(item.practiceTask?.kind, "patternPeaksQuestion");
+        assert.equal(isPracticeTaskSafe(item.practiceTask), true, `${item.id} must be accepted by the production renderer`);
+      }
       if (item.practiceTask?.kind === "patternPeaksQuestion") {
         const question = item.practiceTask.question;
         assert.ok(
@@ -105,7 +112,7 @@ for (const level of levels) {
         }
       }
       assert.ok(item.curriculumCodes?.includes(item.primaryDescriptorCode));
-      assert.ok(descriptorStructures[item.primaryDescriptorCode]?.some((structure) => item.structureKey.includes(structure)), `${item.id} structure must match ${item.primaryDescriptorCode}`);
+      assert.ok(item.structureKey.includes("algorithm-construction") || descriptorStructures[item.primaryDescriptorCode]?.some((structure) => item.structureKey.includes(structure)), `${item.id} structure must match ${item.primaryDescriptorCode}`);
       assert.ok(item.misconceptionTags.length > 0);
       assert.ok(!allIds.has(item.id), `Duplicate id ${item.id}`);
       assert.ok(!allPrompts.has(item.prompt), `Duplicate prompt ${item.prompt}`);
@@ -133,7 +140,7 @@ assert.equal(totalAssessmentItems, 160);
 const requiredStructures: Record<number, string[]> = {
   3: ["add-sub-inverse", "subtraction-unknown", "partition-equivalence", "derived-addition-fact", "derived-subtraction-fact", "multiplication-fact", "related-division-fact", "connected-fact-family", "multiple-algorithm", "odd-even-algorithm", "ordered-number-algorithm"],
   4: ["unknown-addend", "unknown-subtrahend", "unknown-minuend", "balanced-addition-equation", "compensating-equivalence", "connected-addition-equations", "multiplication-product", "multiplication-unknown", "division-quotient", "division-unknown", "derived-multiplication-fact", "connected-fact-family"],
-  5: ["extended-additive-sequence", "decimal-additive-sequence", "fraction-additive-sequence", "multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence", "factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
+  5: ["inverse-multiplication-division-fact-family", "multiplicative-unknown", "division-unknown", "multiplication-property", "distributive-equivalence", "factor-search-algorithm", "common-multiple-algorithm", "multiple-search-algorithm"],
   6: ["natural-number-sequence", "decimal-sequence", "fraction-sequence", "reverse-sequence", "sequence-rule-transfer", "visual-stage-generalisation", "rational-rule-transfer", "bracket-order", "bracketed-unknown", "bracketed-equivalence", "two-sided-unknown", "connected-bracketed-equations", "bracket-placement-comparison", "follow-function-machine", "infer-function-rule", "compare-function-machines", "debug-function-machine", "branching-number-algorithm", "reverse-number-algorithm", "generated-number-set"],
 };
 for (const level of levels) {
@@ -172,19 +179,20 @@ for (const form of ["pretest", "posttest"] as const) {
 
 const levelThreeItems = getPatternPeaksIndependentAssessment(3, "posttest");
 assert.deepEqual(
-  ["AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3A04"].map((code) => levelThreeItems.filter((item) => item.primaryDescriptorCode === code).length),
+  ["AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3N07"].map((code) => levelThreeItems.filter((item) => item.primaryDescriptorCode === code).length),
   [5, 5, 5, 5],
   "Year 3 Post-Test must allocate five items to every Algebra descriptor",
 );
 for (let index = 1; index < levelThreeItems.length; index += 1) {
   assert.notEqual(levelThreeItems[index]!.primaryDescriptorCode, levelThreeItems[index - 1]!.primaryDescriptorCode, "Year 3 standards must be interleaved");
 }
-for (const code of ["AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3A04"]) {
+for (const code of ["AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3N07"]) {
   for (const structure of descriptorStructures[code]!) {
     assert.ok(levelThreeItems.some((item) => item.primaryDescriptorCode === code && item.structureKey.includes(structure)), `Year 3 Post-Test must include ${structure}`);
   }
 }
 const levelThreeMaths = levelThreeItems.map((item) => {
+  if (item.type === "number_order") return JSON.stringify(item.renderer.payload);
   assert.equal(item.practiceTask?.kind, "patternPeaksQuestion");
   const question = item.practiceTask.question;
   return JSON.stringify({ ...question, prompt: question.prompt.replace(/^Peak South-\d+:\s*/, "") });
@@ -194,7 +202,7 @@ assert.equal(new Set(levelThreeMaths).size, 20, "Year 3 Post-Test must not repea
 for (const form of ["pretest", "posttest"] as const) {
   const levelFiveItems = getPatternPeaksIndependentAssessment(5, form);
   assert.deepEqual(
-    ["AC9M5A01", "AC9M5A02", "AC9M5A03"].map((code) => levelFiveItems.filter((item) => item.primaryDescriptorCode === code).length),
+    ["AC9M5A01", "AC9M5A02", "AC9M5N10"].map((code) => levelFiveItems.filter((item) => item.primaryDescriptorCode === code).length),
     [6, 8, 6],
     `Year 5 ${form} must preserve the 6/8/6 standards allocation`,
   );
@@ -207,7 +215,7 @@ for (const form of ["pretest", "posttest"] as const) {
     longestDescriptorRun = Math.max(longestDescriptorRun, currentDescriptorRun);
   }
   assert.ok(longestDescriptorRun <= 2, `Year 5 ${form} must interleave standards rather than block repeated skills`);
-  for (const code of ["AC9M5A01", "AC9M5A02", "AC9M5A03"]) {
+  for (const code of ["AC9M5A01", "AC9M5A02", "AC9M5N10"]) {
     for (const structure of descriptorStructures[code]!) {
       assert.ok(
         levelFiveItems.some((item) => item.primaryDescriptorCode === code && item.structureKey.includes(structure)),
@@ -219,14 +227,14 @@ for (const form of ["pretest", "posttest"] as const) {
 
 for (const level of [4, 5, 6] as const) {
   assert.notDeepEqual(
-    getPatternPeaksIndependentAssessment(level, "pretest").map((item) => item.practiceTask),
-    getPatternPeaksIndependentAssessment(level, "posttest").map((item) => item.practiceTask),
+    getPatternPeaksIndependentAssessment(level, "pretest").map((item) => item.practiceTask ?? item.renderer.payload),
+    getPatternPeaksIndependentAssessment(level, "posttest").map((item) => item.practiceTask ?? item.renderer.payload),
     `Year ${level} Pre and Post forms must be independent`,
   );
 }
 
 const normaliseLevelFourTask = (item: ReturnType<typeof getPatternPeaksIndependentAssessment>[number]) => {
-  if (item.practiceTask?.kind !== "patternPeaksQuestion") return "";
+  if (item.practiceTask?.kind !== "patternPeaksQuestion") return JSON.stringify(item.renderer.payload);
   const question = item.practiceTask.question;
   return JSON.stringify({
     ...question,
@@ -242,7 +250,7 @@ assert.equal(
 );
 
 const normaliseYearFiveTask = (item: ReturnType<typeof getPatternPeaksIndependentAssessment>[number]) => {
-  if (item.practiceTask?.kind !== "patternPeaksQuestion") return "";
+  if (item.practiceTask?.kind !== "patternPeaksQuestion") return JSON.stringify(item.renderer.payload);
   const question = item.practiceTask.question;
   return JSON.stringify({
     question: {
@@ -262,7 +270,7 @@ assert.equal(
 );
 
 const normaliseLevelSixTask = (item: ReturnType<typeof getPatternPeaksIndependentAssessment>[number]) => {
-  if (item.practiceTask?.kind !== "patternPeaksQuestion") return "";
+  if (item.practiceTask?.kind !== "patternPeaksQuestion") return JSON.stringify(item.renderer.payload);
   const question = item.practiceTask.question;
   return JSON.stringify({
     ...question,

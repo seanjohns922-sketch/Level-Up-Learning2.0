@@ -31,27 +31,27 @@ const level3Seeds: WeekSeed[] = [
     topic: "Spot Patterns",
     purpose: "Notice, describe and explain how doubling and halving sequences change.",
     lessons: [
-      lesson("What Changes?", "Follow a repeated doubling or halving algorithm and describe the emerging pattern.", "Pattern scanner", "AC9M3A04"),
-      lesson("Double or Halve", "Apply repeated doubling or halving steps to investigate a number sequence.", "Crystal chain", "AC9M3A04"),
-      lesson("Find the Broken Step", "Debug a repeated-operation algorithm by locating and repairing an incorrect output.", "Fault finder", "AC9M3A04"),
+      lesson("What Changes?", "Follow a repeated doubling or halving algorithm and describe the emerging pattern.", "Pattern scanner", "AC9M3N07"),
+      lesson("Double or Halve", "Apply repeated doubling or halving steps to investigate a number sequence.", "Crystal chain", "AC9M3N07"),
+      lesson("Find the Broken Step", "Debug a repeated-operation algorithm by locating and repairing an incorrect output.", "Fault finder", "AC9M3N07"),
     ],
   },
   {
     topic: "Multiples and Number Algorithms",
     purpose: "Follow and create algorithms that investigate odd and even numbers and multiples of 2, 3, 5 and 10.",
     lessons: [
-      lesson("Follow the Multiples", "Follow an algorithm to generate and continue multiples of 2, 3, 5 or 10.", "Sequence bridge", "AC9M3A04"),
-      lesson("Odd or Even Path", "Follow a decision algorithm that sends odd and even numbers along different paths.", "Missing rune slots", "AC9M3A04"),
-      lesson("Create and Check an Algorithm", "Apply and debug a sequence of steps used to investigate numbers.", "Pattern forge", "AC9M3A04"),
+      lesson("Follow the Multiples", "Follow an algorithm to generate and continue multiples of 2, 3, 5 or 10.", "Sequence bridge", "AC9M3N07"),
+      lesson("Odd or Even Path", "Follow a decision algorithm that sends odd and even numbers along different paths.", "Missing rune slots", "AC9M3N07"),
+      lesson("Create and Check an Algorithm", "Apply and debug a sequence of steps used to investigate numbers.", "Pattern forge", "AC9M3N07"),
     ],
   },
   {
     topic: "Rules and Function Machines",
     purpose: "Connect a simple operation rule with its inputs, outputs and sequence.",
     lessons: [
-      lesson("Inputs and Outputs", "Follow an operation algorithm and record its output for several inputs.", "Function machine", "AC9M3A04"),
-      lesson("Discover the Rule", "Infer and check a consistent algorithm from several input-output pairs.", "Rule decoder", "AC9M3A04"),
-      lesson("Build a Rule Machine", "Create and test a one-step algorithm that produces specified outputs.", "Machine builder", "AC9M3A04"),
+      lesson("Inputs and Outputs", "Follow an operation algorithm and record its output for several inputs.", "Function machine", "AC9M3N07"),
+      lesson("Discover the Rule", "Infer and check a consistent algorithm from several input-output pairs.", "Rule decoder", "AC9M3N07"),
+      lesson("Build a Rule Machine", "Create and test a one-step algorithm that produces specified outputs.", "Machine builder", "AC9M3N07"),
     ],
   },
   {
@@ -94,9 +94,9 @@ const level3Seeds: WeekSeed[] = [
     topic: "Pattern Investigation",
     purpose: "Apply, compare and justify pattern and inverse reasoning in an investigation.",
     lessons: [
-      lesson("Plan and Test", "Plan a number algorithm and record the resulting values systematically.", "Investigation board", "AC9M3A04"),
-      lesson("Compare Two Rules", "Compare two algorithms and explain where their outputs differ or coincide.", "Dual-rule race", "AC9M3A03", "AC9M3A04"),
-      lesson("Justify and Diagnose", "Evaluate a claim, identify its error and support a correction with evidence.", "Pattern trial", "AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3A04"),
+      lesson("Plan and Test", "Plan a number algorithm and record the resulting values systematically.", "Investigation board", "AC9M3N07"),
+      lesson("Compare Two Rules", "Compare two algorithms and explain where their outputs differ or coincide.", "Dual-rule race", "AC9M3A03", "AC9M3N07"),
+      lesson("Justify and Diagnose", "Evaluate a claim, identify its error and support a correction with evidence.", "Pattern trial", "AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3N07"),
     ],
   },
 ];
@@ -177,24 +177,24 @@ const level4Seeds: WeekSeed[] = [
   },
 ];
 
-// ACARA Mathematics Curriculum F-6 v9: AC9M5A01, AC9M5A02 and AC9M5A03.
+// ACARA Mathematics Curriculum F-6 v9: AC9M5A01, AC9M5A02 and AC9M5N10.
 const level5Seeds: WeekSeed[] = [
   {
-    topic: "Extended Number Sequences",
-    purpose: "Continue and create additive sequences with natural numbers and decimals, then explain the emerging pattern.",
+    topic: "Multiplication and Division Families",
+    purpose: "Recognise multiplication and division as inverse operations and develop connected families of number facts.",
     lessons: [
-      lesson("Continue the Pattern", "Continue extended natural-number sequences generated by repeated addition or subtraction.", "Sequence trail", "AC9M5A01"),
-      lesson("Fill the Missing Terms", "Reason forwards and backwards to complete non-consecutive terms in additive sequences.", "Missing-term bridge", "AC9M5A01"),
-      lesson("Explain the Pattern", "Identify the rule and explain a pattern that emerges across an extended sequence.", "Pattern evidence board", "AC9M5A01"),
+      lesson("Related Division Facts", "Derive division facts from a known multiplication fact.", "Fact-family trail", "AC9M5A01"),
+      lesson("Check with Multiplication", "Use multiplication to check a division and explain the inverse relationship.", "Inverse bridge", "AC9M5A01"),
+      lesson("Use and Repair a Fact Family", "Use fact families in equal-group problems and repair a reversed division.", "Fact evidence board", "AC9M5A01"),
     ],
   },
   {
-    topic: "Fractions and Decimal Sequences",
-    purpose: "Create and continue additive sequences involving fractions and decimals.",
+    topic: "Extend and Use Fact Families",
+    purpose: "Use known multiplication and division relationships to extend fact families and solve equal-group problems.",
     lessons: [
-      lesson("Decimal Steps", "Continue and create decimal sequences using a constant additive step.", "Decimal stepping stones", "AC9M5A01"),
-      lesson("Fraction Steps", "Continue fraction sequences with a common denominator using addition or subtraction.", "Fraction ridge trail", "AC9M5A01"),
-      lesson("Create and Check", "Choose a rule, generate an extended sequence and check that every transition follows it.", "Sequence rule forge", "AC9M5A01"),
+      lesson("Scale a Known Fact", "Extend a known fact to a related multiple and derive the inverse division.", "Linked fact stones", "AC9M5A01"),
+      lesson("Connect the Inverses", "Check larger division facts using related multiplication.", "Inverse ridge trail", "AC9M5A01"),
+      lesson("Apply and Explain", "Apply an extended fact family to grouping and explain a valid inverse relationship.", "Fact-family forge", "AC9M5A01"),
     ],
   },
   {
@@ -237,18 +237,18 @@ const level5Seeds: WeekSeed[] = [
     topic: "Factors, Multiples and Constraints",
     purpose: "Use factors and multiples as tools to find unknowns satisfying several equation conditions.",
     lessons: [
-      lesson("Use Factor Clues", "Use a systematic procedure to find factors and identify every satisfying value.", "Factor clue wall", "AC9M5A02", "AC9M5A03"),
-      lesson("Use Multiple Clues", "Generate multiples systematically and interpret the patterns they form.", "Multiple filter machine", "AC9M5A03"),
-      lesson("Find All Solutions", "Apply a factor-search algorithm and justify that every solution has been found.", "Solution-set expedition", "AC9M5A02", "AC9M5A03"),
+      lesson("Use Factor Clues", "Use a systematic procedure to find factors and identify every satisfying value.", "Factor clue wall", "AC9M5A02", "AC9M5N10"),
+      lesson("Use Multiple Clues", "Generate multiples systematically and interpret the patterns they form.", "Multiple filter machine", "AC9M5N10"),
+      lesson("Find All Solutions", "Apply a factor-search algorithm and justify that every solution has been found.", "Solution-set expedition", "AC9M5A02", "AC9M5N10"),
     ],
   },
   {
     topic: "Multiplicative Mystery",
     purpose: "Integrate inverse, property and equivalence reasoning in a connected investigation.",
     lessons: [
-      lesson("Analyse the Evidence", "Use arrays and fact families to reconstruct missing values in a case file.", "Evidence board investigation", "AC9M5A02", "AC9M5A03"),
+      lesson("Analyse the Evidence", "Use arrays and fact families to reconstruct missing values in a case file.", "Evidence board investigation", "AC9M5A02", "AC9M5N10"),
       lesson("Solve the Connected Equations", "Coordinate equations where each solved unknown informs the next one.", "Linked-equation ascent", "AC9M5A02"),
-      lesson("Expose the Flawed Argument", "Identify a misused property and justify a corrected multiplicative argument.", "Solver summit hearing", "AC9M5A02", "AC9M5A03"),
+      lesson("Expose the Flawed Argument", "Identify a misused property and justify a corrected multiplicative argument.", "Solver summit hearing", "AC9M5A02", "AC9M5N10"),
     ],
   },
 ];

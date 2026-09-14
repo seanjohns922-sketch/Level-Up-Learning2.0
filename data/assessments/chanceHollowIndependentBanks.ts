@@ -241,20 +241,20 @@ function levelThree(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 16:
       return interaction({
         kind: "chanceAutoTally",
-        prompt: post ? "Predict the most likely colour, run 16 spins, then check the tally." : "Run 12 spins and identify the outcome recorded most often.",
+        prompt: post ? "Run 12 spins and identify the colour recorded most often." : "Run 12 spins and identify the outcome recorded most often.",
         tool: "spinner",
-        draw: post ? ["pink", "pink", "pink", "blue"] : ["pink", "pink", "blue"],
-        spins: post ? 16 : 12,
+        draw: post ? ["blue", "blue", "pink"] : ["pink", "pink", "blue"],
+        spins: 12,
         labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }],
-        mode: post ? "predictMost" : "most",
+        mode: "most",
       }, "run-and-read-trial", "Run every trial and use the completed tally as evidence.");
     case 17:
       return interaction({
         kind: "chanceSpinTally",
-        prompt: post ? "Spin eight times and record every result in the correct tally row." : "Toss the coin six times and record every result.",
+        prompt: post ? "Spin six times and record every result in the correct tally row." : "Toss the coin six times and record every result.",
         tool: post ? "spinner" : "coin",
-        draw: post ? ["pink", "pink", "blue", "amber"] : ["heads", "tails"],
-        spins: post ? 8 : 6,
+        draw: post ? ["pink", "blue"] : ["heads", "tails"],
+        spins: 6,
         labels: post
           ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }, { key: "amber", name: "Amber", colour: AMBER }]
           : [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }],
@@ -310,7 +310,7 @@ function levelFour(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 10:
       return mcq(post ? "Pink and blue each cover 4 of 8 sectors. What is true?" : "Red has 3 counters and blue has 3 counters. What is true?", "The outcomes have the same chance", ["The first colour is more likely", "The brighter colour is more likely", "Neither outcome is possible"], post ? spinner(4, 8) : bag([PINK, 3], [BLUE, 3]), "same-chance-different-tool", "Equal counts of equally likely parts produce the same chance.");
     case 11:
-      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run the fair spinner twice and compare the two trial results." : "Run the fair coin experiment and compare the recorded frequencies.", tool: post ? "spinner" : "coin", draw: post ? ["pink", "blue"] : ["heads", "tails"], spins: post ? 16 : 12, labels: post ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }] : [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: post ? "compareTrials" : "compareFrequencies" }, "fair-tool-experiment", "Fair outcomes can have different short-run frequencies.");
+      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run the fair spinner twice and compare the two trial results." : "Run the fair coin experiment and compare the recorded frequencies.", tool: post ? "spinner" : "coin", draw: post ? ["pink", "blue"] : ["heads", "tails"], spins: 12, labels: post ? [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }] : [{ key: "heads", name: "Heads" }, { key: "tails", name: "Tails" }], mode: "compareFrequencies" }, "fair-tool-experiment", "Fair outcomes can have different short-run frequencies.");
     case 12:
       return interaction({ kind: "chanceBuildFair", prompt: post ? "Fix Chanzia's eight-part spinner before the game begins." : "Give both players equal chances on this spinner.", colours: [{ key: "amber", name: "Amber", colour: AMBER }, { key: "green", name: "Green", colour: GREEN }], maxParts: 8 }, "fair-game-repair", "Balance the equal sectors between both players.");
     case 13:
@@ -354,11 +354,11 @@ function levelFive(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 9:
       return mcq(post ? "A race gives Player A sums 6, 7 and 8, and Player B sum 2 only. What is wrong?" : "A game says every possible sum on two dice has the same chance. What is the error?", post ? "Player A has many more winning ordered pairs" : "Different sums contain different numbers of ordered pairs", post ? ["The players have the same chance", "Sum 2 is impossible", "The dice need more faces"] : ["Every sum has exactly one pair", "Sums cannot be outcomes", "Two dice always match"], { type: "diceGrid", mode: "sum", highlight: 7 }, "detect-grouped-outcome-bias", "Fairness depends on the number of equally likely ordered pairs, not the number of labels.");
     case 10:
-      return interaction({ kind: "chanceAutoTally", prompt: post ? "Run 30 spins and identify the most frequent outcome." : "Run 20 spins and compare the outcome frequencies.", tool: "spinner", draw: ["pink", "pink", "pink", "blue", "blue"], spins: post ? 30 : 20, labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }], mode: post ? "most" : "compareFrequencies" }, "run-frequency-experiment", "Use the completed trial record, not a prediction, to answer.");
+      return interaction({ kind: "chanceAutoTally", prompt: post ? "Use 20 spinner trials to compare the recorded frequencies." : "Run 20 spins and compare the outcome frequencies.", tool: "spinner", draw: post ? ["blue", "blue", "blue", "pink", "pink"] : ["pink", "pink", "pink", "blue", "blue"], spins: 20, labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }], mode: "compareFrequencies" }, "run-frequency-experiment", "Use the completed trial record, not a prediction, to answer.");
     case 11:
       return mcq(post ? "Blue occurred 18 times in 30 trials. What is its relative frequency?" : "Pink occurred 12 times in 20 trials. What is its relative frequency?", post ? "18/30" : "12/20", post ? ["30/18", "12/30", "18/12"] : ["20/12", "8/20", "12/8"], post ? { type: "frequency", labels: ["Blue", "Other"], counts: [18, 12], total: 30 } : { type: "frequency", labels: ["Pink", "Other"], counts: [12, 8], total: 20 }, "relative-frequency-fraction", "Relative frequency is target occurrences over all completed trials.");
     case 12:
-      return interaction({ kind: "chancePredictCount", prompt: post ? "Predict pink results from the spinner, then run 30 spins against Chanzia." : "Predict blue results, then run 20 spins and compare.", wedges: post ? [PINK, PINK, PINK, BLUE, BLUE] : [BLUE, BLUE, PINK, PINK], targetKey: post ? PINK : BLUE, targetName: post ? "Pink" : "Blue", spins: post ? 30 : 20 }, "predict-and-test-frequency", "Use the target's share to predict, then compare the prediction with observed results.");
+      return interaction({ kind: "chancePredictCount", prompt: post ? "About how many pink results would you expect in 20 spins?" : "About how many blue results would you expect in 20 spins?", wedges: post ? [PINK, PINK, PINK, BLUE, BLUE] : [BLUE, BLUE, PINK, PINK], targetKey: post ? PINK : BLUE, targetName: post ? "Pink" : "Blue", spins: 20 }, "predict-and-test-frequency", "Use the target's share to predict, then compare the prediction with observed results.");
     case 13:
       return mcq(post ? "Trial A produced 14/20 pink and Trial B produced 11/20. Which had the greater pink frequency?" : "Trial A produced 7/10 blue and Trial B produced 12/20. Which had the greater blue frequency?", "Trial A", ["Trial B", "They were equal", "The denominators make comparison impossible"], post ? { type: "frequency", labels: ["Trial A", "Trial B"], counts: [14, 11], total: 20 } : { type: "frequency", labels: ["Trial A", "Trial B"], counts: [7, 6], total: 10 }, "compare-relative-frequencies", "Compare relative frequencies using equivalent denominators or decimal size.");
     case 14:
@@ -370,7 +370,7 @@ function levelFive(form: ChanceHollowAssessmentKind, index: number): ItemCore {
     case 17:
       return interaction({ kind: "chanceAutoTally", prompt: post ? "Run a larger trial and decide whether the evidence fits the tool's design." : "Run the experiment twice before judging whether the tool may be biased.", tool: "spinner", draw: post ? ["pink", "pink", "blue"] : ["pink", "blue"], spins: post ? 40 : 24, labels: [{ key: "pink", name: "Pink", colour: PINK }, { key: "blue", name: "Blue", colour: BLUE }], mode: "compareFrequencies" }, "test-bias-claim", "Compare observed frequencies with the tool's expected likelihood across enough trials.");
     case 18:
-      return interaction({ kind: "chancePredictCount", prompt: post ? "Use the 2-in-5 design to predict the target count, then test 50 spins." : "Use the 1-in-4 design to predict the target count, then test 40 spins.", wedges: post ? [PINK, PINK, BLUE, BLUE, BLUE] : [PINK, BLUE, BLUE, BLUE], targetKey: PINK, targetName: "Pink", spins: post ? 50 : 40 }, "investigation-predict-run", "Multiply the event's share by the trial count for an expected frequency, then compare observations.");
+      return interaction({ kind: "chancePredictCount", prompt: post ? "Use the 2-in-5 design to predict the expected pink count in 50 spins." : "Use the 1-in-4 design to predict the expected pink count in 40 spins.", wedges: post ? [PINK, PINK, BLUE, BLUE, BLUE] : [PINK, BLUE, BLUE, BLUE], targetKey: PINK, targetName: "Pink", spins: post ? 50 : 40 }, "investigation-predict-run", "Multiply the event's share by the trial count for an expected frequency, then compare observations.");
     default:
       return mcq(post ? "A 3/5 event occurred 28 times in 50 trials. Which verdict is justified?" : "A fair coin produced 23 heads in 40 tosses. Which conclusion is justified?", post ? "The observed 28/50 is reasonably close to the expected 30/50" : "The result differs from half but can occur through variation", post ? ["The event is definitely unfair", "Exactly 30 wins were required", "The next 22 trials must win"] : ["The coin is definitely loaded", "The next toss must be tails", "A fair coin always gives exactly half"], post ? { type: "expectedObserved", expected: 30, observed: 28, total: 50 } : { type: "expectedObserved", expected: 20, observed: 23, total: 40 }, "defend-frequency-verdict", "Use expected and observed evidence while allowing for chance variation.");
   }
@@ -463,20 +463,20 @@ function buildForm(level: ChanceHollowLevel, form: ChanceHollowAssessmentKind): 
     const misconception = descriptor.misconceptionIds[index % Math.max(1, descriptor.misconceptionIds.length)];
     const week = descriptor.weeks[index % descriptor.weeks.length] ?? descriptor.weeks[0] ?? 1;
     const shortForm = form === "pretest" ? "pre" : "post";
-    const id = `chance-hollow-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v1`;
+    const id = `chance-hollow-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v2`;
     const isInteractive = Boolean(core.task);
     const responseMode: AssessmentResponseMode = isInteractive ? "manipulated_response" : "selected_response";
     const rotatedOptions = core.options ? rotateOptions(core.options, index + (form === "posttest" ? 1 : 0)) : undefined;
     const common = {
       schemaVersion: 1 as const,
       id,
-      version: "1.0.0",
+      version: "2.0.0",
       realm: "chance" as const,
       level,
       form,
       origin: "assessment_authored" as const,
       sourcePool: form,
-      bankId: `chance-hollow-year-${level}-${form}-v1`,
+      bankId: `chance-hollow-year-${level}-${form}-v2`,
       primaryDescriptorCode: descriptor.code,
       descriptorCodes: [descriptor.code],
       curriculumLessonMapping: [{ week, lesson: (index % 3) + 1 }],

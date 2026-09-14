@@ -32,7 +32,7 @@ function TallyMarks({ n }: { n: number }) {
   );
 }
 
-export default function StatisticaTallyCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaTallyCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const isRecord = task.mode === "record";
   const [built, setBuilt] = useState(0);
   const [chosen, setChosen] = useState<string | null>(null);
@@ -41,17 +41,17 @@ export default function StatisticaTallyCard({ task, onCorrect, onWrong }: { task
   function submitRecord() {
     if (settled) return;
     setSettled(true);
-    if (built === task.count) onCorrect(); else onWrong(String(built));
+    if (built === task.count) onCorrect(JSON.stringify(built)); else onWrong(String(built));
   }
   function submitRead() {
     if (settled || !chosen) return;
     setSettled(true);
-    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(); else onWrong(chosen);
+    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       <div className="mx-auto flex min-h-[96px] max-w-md items-center justify-center rounded-lg border border-[#f2bc45]/45 bg-[#17281f] p-4">
         <TallyMarks n={isRecord ? built : task.count} />

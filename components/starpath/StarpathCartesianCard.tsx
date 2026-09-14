@@ -18,7 +18,7 @@ function StarMark({ cx, cy, colour = "#fcd34d" }: { cx: number; cy: number; colo
   return <polygon points={pts} fill={colour} stroke="#fff7d6" strokeWidth="1" style={{ filter: "drop-shadow(0 0 4px rgba(252,211,77,0.8))" }} />;
 }
 
-export default function StarpathCartesianCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathCartesianCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const R = task.range;
   const span = 2 * R;
   const W = PAD * 2 + span * STEP;
@@ -36,12 +36,12 @@ export default function StarpathCartesianCard({ task, onCorrect, onWrong }: { ta
   function submitTap() {
     if (settled || !selected) return;
     setSettled(true);
-    if (task.answer && samePoint(selected, task.answer)) onCorrect(); else onWrong(selected ? `${selected.x},${selected.y}` : "");
+    if (task.answer && samePoint(selected, task.answer)) onCorrect(JSON.stringify(selected)); else onWrong(selected ? `${selected.x},${selected.y}` : "");
   }
   function submitOption() {
     if (settled || !chosen) return;
     setSettled(true);
-    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(); else onWrong(chosen);
+    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (

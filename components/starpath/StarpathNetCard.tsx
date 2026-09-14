@@ -174,7 +174,7 @@ const FoldButton = ({ folded, onClick, disabled = false }: { folded: boolean; on
   </button>
 );
 
-export default function StarpathNetCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathNetCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [folded, setFolded] = useState(false);
   const [chosen, setChosen] = useState<string[]>([]);
   const [tapped, setTapped] = useState<string | null>(null);
@@ -192,22 +192,22 @@ export default function StarpathNetCard({ task, onCorrect, onWrong, assessmentMo
     setSettled(true);
     const correct = task.correctOptionIds ?? [];
     const ok = chosen.length === correct.length && correct.every((id) => chosen.includes(id));
-    if (ok) onCorrect(); else onWrong(chosen.join(","));
+    if (ok) onCorrect(JSON.stringify(chosen)); else onWrong(chosen.join(","));
   }
   function submitText() {
     if (settled || !chosen.length) return;
     setSettled(true);
-    if ((task.correctOptionIds ?? []).includes(chosen[0]!)) onCorrect(); else onWrong(chosen[0]);
+    if ((task.correctOptionIds ?? []).includes(chosen[0]!)) onCorrect(JSON.stringify(chosen)); else onWrong(chosen[0]);
   }
   function submitCell() {
     if (settled || !tapped) return;
     setSettled(true);
-    if ((task.answerCells ?? []).includes(tapped)) onCorrect(); else onWrong(tapped);
+    if ((task.answerCells ?? []).includes(tapped)) onCorrect(tapped); else onWrong(tapped);
   }
   function submitBuild() {
     if (settled || built.length !== (task.buildFaces ?? 6)) return;
     setSettled(true);
-    if (foldNet(built).valid) onCorrect(); else onWrong(built.map(key).join(","));
+    if (foldNet(built).valid) onCorrect(JSON.stringify(built)); else onWrong(built.map(key).join(","));
   }
 
   // ── Choose-a-net / select-all (thumbnails) ──

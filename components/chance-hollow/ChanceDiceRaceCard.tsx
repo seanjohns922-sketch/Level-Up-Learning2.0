@@ -29,7 +29,7 @@ function DieFace({ value, tone }: { value: number; tone: "cyan" | "pink" }) {
   );
 }
 
-export default function ChanceDiceRaceCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function ChanceDiceRaceCard({ task, onCorrect, onWrong, assessmentMode = false, onAssessmentAnswer }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void; assessmentMode?: boolean; onAssessmentAnswer?: (correct: boolean, response: string) => void }) {
   const [phase, setPhase] = useState<"repair" | "race" | "finished">("repair");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dice, setDice] = useState<[number, number]>([1, 1]);
@@ -46,6 +46,10 @@ export default function ChanceDiceRaceCard({ task, onCorrect, onWrong }: { task:
   function choose(id: string) {
     if (phase !== "repair") return;
     setSelectedId(id);
+    if (assessmentMode && onAssessmentAnswer) {
+      onAssessmentAnswer(id === task.answerId, JSON.stringify({ selectedRuleId: id }));
+      return;
+    }
     if (id !== task.answerId) {
       onWrong(task.choices.find((choice) => choice.id === id)?.label ?? id);
       return;
@@ -86,15 +90,17 @@ export default function ChanceDiceRaceCard({ task, onCorrect, onWrong }: { task:
         <div className="grid gap-4 lg:grid-cols-[1fr_18rem]">
           <div className="rounded-lg border border-violet-200 bg-[linear-gradient(135deg,#f8f5ff,#e8fbff)] p-4">
             <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-fuchsia-700"><Swords className="h-4 w-4" /> Repair Roller&apos;s race</div>
-            <p className="mb-4 font-bold text-violet-950">Choose rules that give each racer 18 of the 36 possible dice pairs.</p>
+            <p className="mb-4 font-bold text-violet-950">{assessmentMode ? "Two fair six-sided dice are rolled. The difference is the larger number minus the smaller number. Which rules give both racers an equal chance of winning?" : "Choose rules that give each racer 18 of the 36 possible dice pairs."}</p>
             <div className="grid gap-2">
-              {task.choices.map((choice) => {
+              {task.choices.map((choice, index) => {
                 const playerCount = chanceCount(choice.playerDifferences);
                 const chanziaCount = chanceCount(choice.chanziaDifferences);
+                const label = assessmentMode ? `Rule ${index + 1}` : choice.label;
+                const detail = assessmentMode ? `You win on differences ${choice.playerDifferences.join(", ")}. ${task.opponentName} wins on differences ${choice.chanziaDifferences.join(", ")}.` : `You have ${playerCount} possible pairs. ${task.opponentName} has ${chanziaCount} possible pairs.`;
                 return (
                   <button key={choice.id} type="button" onClick={() => choose(choice.id)} className="grid gap-1 rounded-lg border-2 border-violet-200 bg-white px-4 py-3 text-left font-bold text-violet-950 transition hover:border-fuchsia-400 hover:bg-fuchsia-50">
-                    <span className="flex items-center justify-between gap-3"><span>{choice.label}</span><OptionReadAloudButton text={`${choice.label}. You have ${playerCount} possible pairs. ${task.opponentName} has ${chanziaCount} possible pairs.`} /></span>
-                    <span className="font-mono text-xs text-violet-500">Possible pairs: You {playerCount} · {task.opponentName} {chanziaCount}</span>
+                    <span className="flex items-center justify-between gap-3"><span>{label}</span><OptionReadAloudButton text={`${label}. ${detail}`} /></span>
+                    <span className="font-mono text-xs text-violet-500">{detail}</span>
                   </button>
                 );
               })}

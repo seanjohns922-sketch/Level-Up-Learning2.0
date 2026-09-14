@@ -1,0 +1,2408 @@
+[
+  {
+    "realm": "number",
+    "level": 0,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9MFN01": 3,
+      "AC9MFN02": 2,
+      "AC9MFN03": 3,
+      "AC9MFN04": 4,
+      "AC9MFN05": 3,
+      "AC9MFN06": 3,
+      "AC9MFA01": 2
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 8,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "reasoning": 4,
+      "application": 7,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 7,
+      "constructed_response": 11,
+      "manipulated_response": 2
+    },
+    "kind": {
+      "mcq": 7,
+      "numeric": 11,
+      "number_order": 1,
+      "pattern_build": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 0,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9MFN01": 3,
+      "AC9MFN02": 2,
+      "AC9MFN03": 3,
+      "AC9MFN04": 4,
+      "AC9MFN05": 3,
+      "AC9MFN06": 3,
+      "AC9MFA01": 2
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 8,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "reasoning": 4,
+      "application": 7,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 7,
+      "constructed_response": 11,
+      "manipulated_response": 2
+    },
+    "kind": {
+      "mcq": 7,
+      "numeric": 11,
+      "number_order": 1,
+      "pattern_build": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 1,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M1N01": 3,
+      "AC9M1N02": 2,
+      "AC9M1N03": 2,
+      "AC9M1N04": 3,
+      "AC9M1N05": 3,
+      "AC9M1N06": 3,
+      "AC9M1A01": 2,
+      "AC9M1A02": 2
+    },
+    "difficulty": {
+      "easy": 10,
+      "moderate": 8,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 4,
+      "understanding": 7,
+      "application": 6,
+      "reasoning": 3
+    },
+    "response": {
+      "constructed_response": 14,
+      "manipulated_response": 3,
+      "selected_response": 3
+    },
+    "kind": {
+      "numeric": 14,
+      "pattern_build": 2,
+      "mcq": 3,
+      "number_order": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 1,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M1N01": 3,
+      "AC9M1N02": 2,
+      "AC9M1N03": 2,
+      "AC9M1N04": 3,
+      "AC9M1N05": 3,
+      "AC9M1N06": 3,
+      "AC9M1A01": 2,
+      "AC9M1A02": 2
+    },
+    "difficulty": {
+      "easy": 10,
+      "moderate": 8,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 4,
+      "understanding": 7,
+      "application": 6,
+      "reasoning": 3
+    },
+    "response": {
+      "constructed_response": 14,
+      "manipulated_response": 3,
+      "selected_response": 3
+    },
+    "kind": {
+      "numeric": 14,
+      "pattern_build": 2,
+      "mcq": 3,
+      "number_order": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 2,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M2N01": 2,
+      "AC9M2N02": 2,
+      "AC9M2N03": 2,
+      "AC9M2N04": 3,
+      "AC9M2N05": 3,
+      "AC9M2N06": 3,
+      "AC9M2A01": 2,
+      "AC9M2A02": 2,
+      "AC9M2A03": 1
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 9,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 3,
+      "application": 7,
+      "understanding": 6,
+      "reasoning": 4
+    },
+    "response": {
+      "constructed_response": 15,
+      "manipulated_response": 1,
+      "selected_response": 4
+    },
+    "kind": {
+      "numeric": 15,
+      "number_order": 1,
+      "mcq": 4
+    }
+  },
+  {
+    "realm": "number",
+    "level": 2,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M2N01": 2,
+      "AC9M2N02": 2,
+      "AC9M2N03": 2,
+      "AC9M2N04": 3,
+      "AC9M2N05": 3,
+      "AC9M2N06": 3,
+      "AC9M2A01": 2,
+      "AC9M2A02": 2,
+      "AC9M2A03": 1
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 9,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 3,
+      "application": 7,
+      "understanding": 6,
+      "reasoning": 4
+    },
+    "response": {
+      "constructed_response": 15,
+      "manipulated_response": 1,
+      "selected_response": 4
+    },
+    "kind": {
+      "numeric": 15,
+      "number_order": 1,
+      "mcq": 4
+    }
+  },
+  {
+    "realm": "number",
+    "level": 3,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3N01": 2,
+      "AC9M3N05": 2,
+      "AC9M3N03": 4,
+      "AC9M3M06": 2,
+      "AC9M3N06": 2,
+      "AC9M3N04": 3,
+      "AC9M3N07": 1,
+      "AC9M3N02": 4
+    },
+    "difficulty": {
+      "easy": 3,
+      "moderate": 13,
+      "challenging": 4
+    },
+    "cognitive": {
+      "understanding": 3,
+      "application": 17
+    },
+    "response": {
+      "constructed_response": 14,
+      "manipulated_response": 3,
+      "selected_response": 3
+    },
+    "kind": {
+      "numeric": 14,
+      "number_order": 1,
+      "mcq": 1,
+      "fraction_model_select": 1,
+      "build_whole": 1,
+      "fraction_order": 1,
+      "fraction_number_line": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 3,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3N01": 2,
+      "AC9M3N05": 2,
+      "AC9M3N03": 4,
+      "AC9M3M06": 2,
+      "AC9M3N06": 2,
+      "AC9M3N04": 3,
+      "AC9M3N07": 1,
+      "AC9M3N02": 4
+    },
+    "difficulty": {
+      "easy": 3,
+      "moderate": 13,
+      "challenging": 4
+    },
+    "cognitive": {
+      "understanding": 3,
+      "application": 17
+    },
+    "response": {
+      "constructed_response": 14,
+      "manipulated_response": 3,
+      "selected_response": 3
+    },
+    "kind": {
+      "numeric": 14,
+      "number_order": 1,
+      "mcq": 1,
+      "fraction_model_select": 1,
+      "build_whole": 1,
+      "fraction_order": 1,
+      "fraction_number_line": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 4,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4N01": 2,
+      "AC9M4N02": 2,
+      "AC9M4N03": 2,
+      "AC9M4N04": 2,
+      "AC9M4N05": 1,
+      "AC9M4N06": 3,
+      "AC9M4N07": 2,
+      "AC9M4N08": 4,
+      "AC9M4N09": 2
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 10,
+      "challenging": 4
+    },
+    "cognitive": {
+      "understanding": 5,
+      "reasoning": 5,
+      "recall": 2,
+      "application": 7,
+      "transfer": 1
+    },
+    "response": {
+      "constructed_response": 16,
+      "selected_response": 3,
+      "manipulated_response": 1
+    },
+    "kind": {
+      "numeric": 16,
+      "mcq": 3,
+      "number_order": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 4,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4N01": 2,
+      "AC9M4N02": 2,
+      "AC9M4N03": 2,
+      "AC9M4N04": 2,
+      "AC9M4N05": 1,
+      "AC9M4N06": 3,
+      "AC9M4N07": 2,
+      "AC9M4N08": 4,
+      "AC9M4N09": 2
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 10,
+      "challenging": 4
+    },
+    "cognitive": {
+      "understanding": 5,
+      "reasoning": 5,
+      "recall": 2,
+      "application": 7,
+      "transfer": 1
+    },
+    "response": {
+      "constructed_response": 16,
+      "selected_response": 3,
+      "manipulated_response": 1
+    },
+    "kind": {
+      "numeric": 16,
+      "mcq": 3,
+      "number_order": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 5,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5N01": 2,
+      "AC9M5N02": 2,
+      "AC9M5N03": 2,
+      "AC9M5N04": 2,
+      "AC9M5N05": 2,
+      "AC9M5N06": 2,
+      "AC9M5N07": 2,
+      "AC9M5N08": 2,
+      "AC9M5N09": 2,
+      "AC9M5N10": 2
+    },
+    "difficulty": {
+      "easy": 5,
+      "moderate": 10,
+      "challenging": 5
+    },
+    "cognitive": {
+      "understanding": 5,
+      "application": 7,
+      "recall": 1,
+      "reasoning": 5,
+      "transfer": 2
+    },
+    "response": {
+      "constructed_response": 15,
+      "manipulated_response": 3,
+      "selected_response": 2
+    },
+    "kind": {
+      "numeric": 15,
+      "number_order": 2,
+      "mcq": 2,
+      "fraction_order": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 5,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5N01": 2,
+      "AC9M5N02": 2,
+      "AC9M5N03": 2,
+      "AC9M5N04": 2,
+      "AC9M5N05": 2,
+      "AC9M5N06": 2,
+      "AC9M5N07": 2,
+      "AC9M5N08": 2,
+      "AC9M5N09": 2,
+      "AC9M5N10": 2
+    },
+    "difficulty": {
+      "easy": 5,
+      "moderate": 10,
+      "challenging": 5
+    },
+    "cognitive": {
+      "understanding": 5,
+      "application": 7,
+      "recall": 1,
+      "reasoning": 5,
+      "transfer": 2
+    },
+    "response": {
+      "constructed_response": 15,
+      "manipulated_response": 3,
+      "selected_response": 2
+    },
+    "kind": {
+      "numeric": 15,
+      "number_order": 2,
+      "mcq": 2,
+      "fraction_order": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 6,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6N01": 2,
+      "AC9M6N02": 2,
+      "AC9M6N03": 2,
+      "AC9M6N04": 2,
+      "AC9M6N05": 2,
+      "AC9M6N06": 2,
+      "AC9M6N07": 3,
+      "AC9M6N08": 2,
+      "AC9M6N09": 3
+    },
+    "difficulty": {
+      "easy": 4,
+      "moderate": 10,
+      "challenging": 6
+    },
+    "cognitive": {
+      "understanding": 4,
+      "reasoning": 6,
+      "recall": 1,
+      "application": 6,
+      "transfer": 3
+    },
+    "response": {
+      "manipulated_response": 2,
+      "constructed_response": 16,
+      "justification": 2
+    },
+    "kind": {
+      "number_order": 1,
+      "numeric": 18,
+      "fraction_order": 1
+    }
+  },
+  {
+    "realm": "number",
+    "level": 6,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6N01": 2,
+      "AC9M6N02": 2,
+      "AC9M6N03": 2,
+      "AC9M6N04": 2,
+      "AC9M6N05": 2,
+      "AC9M6N06": 2,
+      "AC9M6N07": 3,
+      "AC9M6N08": 2,
+      "AC9M6N09": 3
+    },
+    "difficulty": {
+      "easy": 4,
+      "moderate": 10,
+      "challenging": 6
+    },
+    "cognitive": {
+      "understanding": 4,
+      "reasoning": 6,
+      "recall": 1,
+      "application": 6,
+      "transfer": 3
+    },
+    "response": {
+      "manipulated_response": 2,
+      "constructed_response": 16,
+      "justification": 2
+    },
+    "kind": {
+      "number_order": 1,
+      "numeric": 18,
+      "fraction_order": 1
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 0,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9MFM01": 14,
+      "AC9MFM02": 6
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 8,
+      "challenging": 3,
+      "very_challenging": 1
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 7,
+      "application": 7,
+      "reasoning": 3,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 13,
+      "constructed_response": 7
+    },
+    "kind": {
+      "mcq": 13,
+      "numeric": 7
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 0,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9MFM01": 14,
+      "AC9MFM02": 6
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 8,
+      "challenging": 3,
+      "very_challenging": 1
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 7,
+      "application": 7,
+      "reasoning": 3,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 13,
+      "constructed_response": 7
+    },
+    "kind": {
+      "mcq": 13,
+      "numeric": 7
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 1,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M1M01": 8,
+      "AC9M1M02": 5,
+      "AC9M1M03": 7
+    },
+    "difficulty": {
+      "easy": 10,
+      "moderate": 8,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 3,
+      "understanding": 7,
+      "application": 8,
+      "reasoning": 2
+    },
+    "response": {
+      "selected_response": 17,
+      "constructed_response": 3
+    },
+    "kind": {
+      "mcq": 17,
+      "numeric": 3
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 1,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M1M01": 8,
+      "AC9M1M02": 5,
+      "AC9M1M03": 7
+    },
+    "difficulty": {
+      "easy": 10,
+      "moderate": 8,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 3,
+      "understanding": 7,
+      "application": 8,
+      "reasoning": 2
+    },
+    "response": {
+      "selected_response": 17,
+      "constructed_response": 3
+    },
+    "kind": {
+      "mcq": 17,
+      "numeric": 3
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 2,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M2M01": 6,
+      "AC9M2M02": 3,
+      "AC9M2M03": 4,
+      "AC9M2M04": 4,
+      "AC9M2M05": 3
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 9,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "application": 9,
+      "reasoning": 3
+    },
+    "response": {
+      "selected_response": 6,
+      "constructed_response": 14
+    },
+    "kind": {
+      "mcq": 6,
+      "numeric": 14
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 2,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M2M01": 6,
+      "AC9M2M02": 3,
+      "AC9M2M03": 4,
+      "AC9M2M04": 4,
+      "AC9M2M05": 3
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 9,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "application": 9,
+      "reasoning": 3
+    },
+    "response": {
+      "selected_response": 6,
+      "constructed_response": 14
+    },
+    "kind": {
+      "mcq": 6,
+      "numeric": 14
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 3,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3M01": 4,
+      "AC9M3M02": 6,
+      "AC9M3M03": 3,
+      "AC9M3M04": 4,
+      "AC9M3M05": 3
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 9,
+      "challenging": 3,
+      "very_challenging": 1
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 5,
+      "application": 10,
+      "reasoning": 3,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 4,
+      "constructed_response": 16
+    },
+    "kind": {
+      "mcq": 4,
+      "numeric": 16
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 3,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3M01": 4,
+      "AC9M3M02": 6,
+      "AC9M3M03": 3,
+      "AC9M3M04": 4,
+      "AC9M3M05": 3
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 9,
+      "challenging": 3,
+      "very_challenging": 1
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 5,
+      "application": 10,
+      "reasoning": 3,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 4,
+      "constructed_response": 16
+    },
+    "kind": {
+      "mcq": 4,
+      "numeric": 16
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 4,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4M01": 6,
+      "AC9M4M02": 5,
+      "AC9M4M03": 5,
+      "AC9M4M04": 4
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 10,
+      "challenging": 3,
+      "very_challenging": 1
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 4,
+      "application": 10,
+      "reasoning": 4,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 3,
+      "constructed_response": 17
+    },
+    "kind": {
+      "mcq": 3,
+      "numeric": 17
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 4,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4M01": 6,
+      "AC9M4M02": 5,
+      "AC9M4M03": 5,
+      "AC9M4M04": 4
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 10,
+      "challenging": 3,
+      "very_challenging": 1
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 4,
+      "application": 10,
+      "reasoning": 4,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 3,
+      "constructed_response": 17
+    },
+    "kind": {
+      "mcq": 3,
+      "numeric": 17
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 5,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5M01": 4,
+      "AC9M5M02": 6,
+      "AC9M5M04": 6,
+      "AC9M5M03": 4
+    },
+    "difficulty": {
+      "easy": 5,
+      "moderate": 10,
+      "challenging": 5
+    },
+    "cognitive": {
+      "understanding": 4,
+      "application": 10,
+      "reasoning": 6
+    },
+    "response": {
+      "selected_response": 2,
+      "constructed_response": 14,
+      "manipulated_response": 2,
+      "justification": 2
+    },
+    "kind": {
+      "metricUnit": 1,
+      "numeric": 15,
+      "perimeterCalc": 1,
+      "protractor": 3
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 5,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5M01": 4,
+      "AC9M5M02": 6,
+      "AC9M5M04": 6,
+      "AC9M5M03": 4
+    },
+    "difficulty": {
+      "easy": 5,
+      "moderate": 10,
+      "challenging": 5
+    },
+    "cognitive": {
+      "understanding": 4,
+      "application": 10,
+      "reasoning": 6
+    },
+    "response": {
+      "selected_response": 2,
+      "constructed_response": 14,
+      "manipulated_response": 2,
+      "justification": 2
+    },
+    "kind": {
+      "metricUnit": 1,
+      "numeric": 15,
+      "perimeterCalc": 1,
+      "protractor": 3
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 6,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6M01": 5,
+      "AC9M6M02": 5,
+      "AC9M6M03": 5,
+      "AC9M6M04": 5
+    },
+    "difficulty": {
+      "easy": 1,
+      "moderate": 9,
+      "challenging": 6,
+      "very_challenging": 4
+    },
+    "cognitive": {
+      "understanding": 1,
+      "application": 8,
+      "reasoning": 7,
+      "transfer": 4
+    },
+    "response": {
+      "constructed_response": 17,
+      "explanation": 2,
+      "justification": 1
+    },
+    "kind": {
+      "numeric": 19,
+      "mcq": 1
+    }
+  },
+  {
+    "realm": "measurement",
+    "level": 6,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6M01": 5,
+      "AC9M6M02": 5,
+      "AC9M6M03": 5,
+      "AC9M6M04": 5
+    },
+    "difficulty": {
+      "easy": 1,
+      "moderate": 9,
+      "challenging": 6,
+      "very_challenging": 4
+    },
+    "cognitive": {
+      "understanding": 1,
+      "application": 8,
+      "reasoning": 7,
+      "transfer": 4
+    },
+    "response": {
+      "constructed_response": 17,
+      "explanation": 2,
+      "justification": 1
+    },
+    "kind": {
+      "numeric": 19,
+      "mcq": 1
+    }
+  },
+  {
+    "realm": "space",
+    "level": 0,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9MFSP01": 10,
+      "AC9MFSP02": 10
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 10,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "reasoning": 3,
+      "application": 8,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 10,
+      "manipulated_response": 10
+    },
+    "kind": {
+      "starpathShapeMatch": 1,
+      "starpathShapeName": 1,
+      "starpathObjectShape": 1,
+      "starpathOddOneOut": 1,
+      "starpathShapeClassify": 1,
+      "starpathShapeWorkshop": 2,
+      "starpathGroundAssessment": 8,
+      "starpathPositionWord": 2,
+      "starpathPositionPicture": 2,
+      "starpathPositionFind": 1
+    }
+  },
+  {
+    "realm": "space",
+    "level": 0,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9MFSP01": 10,
+      "AC9MFSP02": 10
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 10,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "reasoning": 3,
+      "application": 8,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 10,
+      "manipulated_response": 10
+    },
+    "kind": {
+      "starpathShapeMatch": 1,
+      "starpathShapeName": 1,
+      "starpathObjectShape": 1,
+      "starpathOddOneOut": 1,
+      "starpathShapeClassify": 1,
+      "starpathShapeWorkshop": 2,
+      "starpathGroundAssessment": 8,
+      "starpathPositionWord": 2,
+      "starpathPositionPicture": 2,
+      "starpathPositionFind": 1
+    }
+  },
+  {
+    "realm": "space",
+    "level": 1,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M1SP01": 12,
+      "AC9M1SP02": 8
+    },
+    "difficulty": {
+      "easy": 10,
+      "moderate": 8,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 4,
+      "understanding": 7,
+      "application": 6,
+      "reasoning": 3
+    },
+    "response": {
+      "selected_response": 8,
+      "manipulated_response": 12
+    },
+    "kind": {
+      "starpathShapeClassify": 4,
+      "starpathObjectCompare": 2,
+      "starpathShapeWorkshop": 4,
+      "starpathObjectMatch": 2,
+      "starpathRouteRecord": 2,
+      "starpathRouteBuild": 4,
+      "starpathRouteDebug": 2
+    }
+  },
+  {
+    "realm": "space",
+    "level": 1,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M1SP01": 12,
+      "AC9M1SP02": 8
+    },
+    "difficulty": {
+      "easy": 10,
+      "moderate": 8,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 4,
+      "understanding": 7,
+      "application": 6,
+      "reasoning": 3
+    },
+    "response": {
+      "selected_response": 8,
+      "manipulated_response": 12
+    },
+    "kind": {
+      "starpathShapeClassify": 4,
+      "starpathObjectCompare": 2,
+      "starpathShapeWorkshop": 4,
+      "starpathObjectMatch": 2,
+      "starpathRouteRecord": 2,
+      "starpathRouteBuild": 4,
+      "starpathRouteDebug": 2
+    }
+  },
+  {
+    "realm": "space",
+    "level": 2,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M2SP01": 10,
+      "AC9M2SP02": 10
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 9,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 3,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4
+    },
+    "response": {
+      "selected_response": 10,
+      "manipulated_response": 10
+    },
+    "kind": {
+      "starpathShapeFeature": 6,
+      "starpathShapeWorkshop": 4,
+      "starpathMapLocate": 3,
+      "starpathMapRoute": 7
+    }
+  },
+  {
+    "realm": "space",
+    "level": 2,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M2SP01": 10,
+      "AC9M2SP02": 10
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 9,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 3,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4
+    },
+    "response": {
+      "selected_response": 10,
+      "manipulated_response": 10
+    },
+    "kind": {
+      "starpathShapeFeature": 6,
+      "starpathShapeWorkshop": 4,
+      "starpathMapLocate": 3,
+      "starpathMapRoute": 7
+    }
+  },
+  {
+    "realm": "space",
+    "level": 3,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3SP01": 10,
+      "AC9M3SP02": 10
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 9,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 4,
+      "manipulated_response": 16
+    },
+    "kind": {
+      "starpathObject": 8,
+      "starpathIndependentConstruction": 2,
+      "starpathMapCreate": 6,
+      "starpathMapRoute": 4
+    }
+  },
+  {
+    "realm": "space",
+    "level": 3,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3SP01": 10,
+      "AC9M3SP02": 10
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 9,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 4,
+      "manipulated_response": 16
+    },
+    "kind": {
+      "starpathObject": 8,
+      "starpathIndependentConstruction": 2,
+      "starpathMapCreate": 6,
+      "starpathMapRoute": 4
+    }
+  },
+  {
+    "realm": "space",
+    "level": 4,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4SP01": 7,
+      "AC9M4SP02": 6,
+      "AC9M4SP03": 7
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 10,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 6,
+      "manipulated_response": 14
+    },
+    "kind": {
+      "starpathComposite": 4,
+      "starpathIndependentConstruction": 3,
+      "starpathGridReference": 4,
+      "starpathGridRoute": 2,
+      "starpathSymmetry": 7
+    }
+  },
+  {
+    "realm": "space",
+    "level": 4,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4SP01": 7,
+      "AC9M4SP02": 6,
+      "AC9M4SP03": 7
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 10,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 6,
+      "manipulated_response": 14
+    },
+    "kind": {
+      "starpathComposite": 4,
+      "starpathIndependentConstruction": 3,
+      "starpathGridReference": 4,
+      "starpathGridRoute": 2,
+      "starpathSymmetry": 7
+    }
+  },
+  {
+    "realm": "space",
+    "level": 5,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5SP01": 7,
+      "AC9M5SP02": 6,
+      "AC9M5SP03": 7
+    },
+    "difficulty": {
+      "easy": 5,
+      "moderate": 10,
+      "challenging": 5
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 2
+    },
+    "response": {
+      "selected_response": 13,
+      "manipulated_response": 7
+    },
+    "kind": {
+      "starpathNet": 7,
+      "starpathCoordinate": 5,
+      "starpathIndependentConstruction": 4,
+      "starpathTransform": 4
+    }
+  },
+  {
+    "realm": "space",
+    "level": 5,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5SP01": 7,
+      "AC9M5SP02": 6,
+      "AC9M5SP03": 7
+    },
+    "difficulty": {
+      "easy": 5,
+      "moderate": 10,
+      "challenging": 5
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 2
+    },
+    "response": {
+      "selected_response": 13,
+      "manipulated_response": 7
+    },
+    "kind": {
+      "starpathNet": 7,
+      "starpathCoordinate": 5,
+      "starpathIndependentConstruction": 4,
+      "starpathTransform": 4
+    }
+  },
+  {
+    "realm": "space",
+    "level": 6,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6SP01": 6,
+      "AC9M6SP02": 6,
+      "AC9M6SP03": 8
+    },
+    "difficulty": {
+      "easy": 4,
+      "moderate": 10,
+      "challenging": 6
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 4,
+      "application": 6,
+      "reasoning": 6,
+      "transfer": 3
+    },
+    "response": {
+      "selected_response": 13,
+      "manipulated_response": 7
+    },
+    "kind": {
+      "starpathCrossSection": 6,
+      "starpathCartesian": 4,
+      "starpathIndependentConstruction": 6,
+      "starpathTransform": 1,
+      "starpathTessellation": 3
+    }
+  },
+  {
+    "realm": "space",
+    "level": 6,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6SP01": 6,
+      "AC9M6SP02": 6,
+      "AC9M6SP03": 8
+    },
+    "difficulty": {
+      "easy": 4,
+      "moderate": 10,
+      "challenging": 6
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 4,
+      "application": 6,
+      "reasoning": 6,
+      "transfer": 3
+    },
+    "response": {
+      "selected_response": 13,
+      "manipulated_response": 7
+    },
+    "kind": {
+      "starpathCrossSection": 6,
+      "starpathCartesian": 4,
+      "starpathIndependentConstruction": 6,
+      "starpathTransform": 1,
+      "starpathTessellation": 3
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 1,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M1ST01": 10,
+      "AC9M1ST02": 10
+    },
+    "difficulty": {
+      "easy": 10,
+      "moderate": 8,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 3,
+      "understanding": 7,
+      "application": 7,
+      "reasoning": 3
+    },
+    "response": {
+      "selected_response": 12,
+      "constructed_response": 1,
+      "manipulated_response": 7
+    },
+    "kind": {
+      "statisticaTally": 4,
+      "statisticaTable": 2,
+      "statisticaClassify": 2,
+      "statisticaCollect": 1,
+      "statisticaSort": 1,
+      "statisticaGraph": 3,
+      "statisticaTapGraph": 2,
+      "statisticaGap": 1,
+      "statisticaRank": 1,
+      "statisticaInference": 3
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 1,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M1ST01": 10,
+      "AC9M1ST02": 10
+    },
+    "difficulty": {
+      "easy": 10,
+      "moderate": 8,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 3,
+      "understanding": 7,
+      "application": 7,
+      "reasoning": 3
+    },
+    "response": {
+      "selected_response": 12,
+      "constructed_response": 1,
+      "manipulated_response": 7
+    },
+    "kind": {
+      "statisticaTally": 4,
+      "statisticaTable": 2,
+      "statisticaClassify": 2,
+      "statisticaCollect": 1,
+      "statisticaSort": 1,
+      "statisticaGraph": 3,
+      "statisticaTapGraph": 2,
+      "statisticaGap": 1,
+      "statisticaRank": 1,
+      "statisticaInference": 3
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 2,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M2ST01": 10,
+      "AC9M2ST02": 10
+    },
+    "difficulty": {
+      "easy": 11,
+      "moderate": 7,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 4,
+      "understanding": 7,
+      "application": 6,
+      "reasoning": 3
+    },
+    "response": {
+      "selected_response": 13,
+      "constructed_response": 1,
+      "manipulated_response": 6
+    },
+    "kind": {
+      "statisticaTally": 2,
+      "statisticaTable": 2,
+      "statisticaClassify": 4,
+      "statisticaCollect": 1,
+      "statisticaSort": 1,
+      "statisticaGraph": 3,
+      "statisticaTapGraph": 1,
+      "statisticaGap": 1,
+      "statisticaRank": 1,
+      "statisticaDisplayStudio": 1,
+      "statisticaInference": 3
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 2,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M2ST01": 10,
+      "AC9M2ST02": 10
+    },
+    "difficulty": {
+      "easy": 11,
+      "moderate": 7,
+      "challenging": 2
+    },
+    "cognitive": {
+      "recall": 4,
+      "understanding": 7,
+      "application": 6,
+      "reasoning": 3
+    },
+    "response": {
+      "selected_response": 13,
+      "constructed_response": 1,
+      "manipulated_response": 6
+    },
+    "kind": {
+      "statisticaTally": 2,
+      "statisticaTable": 2,
+      "statisticaClassify": 4,
+      "statisticaCollect": 1,
+      "statisticaSort": 1,
+      "statisticaGraph": 3,
+      "statisticaTapGraph": 1,
+      "statisticaGap": 1,
+      "statisticaRank": 1,
+      "statisticaDisplayStudio": 1,
+      "statisticaInference": 3
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 3,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3ST01": 7,
+      "AC9M3ST03": 7,
+      "AC9M3ST02": 6
+    },
+    "difficulty": {
+      "easy": 9,
+      "moderate": 8,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 3,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4
+    },
+    "response": {
+      "selected_response": 15,
+      "manipulated_response": 4,
+      "constructed_response": 1
+    },
+    "kind": {
+      "statisticaClassify": 8,
+      "statisticaTally": 1,
+      "statisticaSort": 2,
+      "statisticaTable": 1,
+      "statisticaDisplayStudio": 2,
+      "statisticaInference": 3,
+      "statisticaGraph": 1,
+      "statisticaShape": 1,
+      "statisticaRank": 1
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 3,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3ST01": 7,
+      "AC9M3ST03": 7,
+      "AC9M3ST02": 6
+    },
+    "difficulty": {
+      "easy": 9,
+      "moderate": 8,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 3,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4
+    },
+    "response": {
+      "selected_response": 15,
+      "manipulated_response": 4,
+      "constructed_response": 1
+    },
+    "kind": {
+      "statisticaClassify": 8,
+      "statisticaTally": 1,
+      "statisticaSort": 2,
+      "statisticaTable": 1,
+      "statisticaDisplayStudio": 2,
+      "statisticaInference": 3,
+      "statisticaGraph": 1,
+      "statisticaShape": 1,
+      "statisticaRank": 1
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 4,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4ST01": 7,
+      "AC9M4ST02": 7,
+      "AC9M4ST03": 6
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 9,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 17,
+      "manipulated_response": 3
+    },
+    "kind": {
+      "statisticaPictograph": 4,
+      "statisticaGraph": 2,
+      "statisticaInference": 3,
+      "statisticaShape": 5,
+      "statisticaDisplayStudio": 2,
+      "statisticaClassify": 3,
+      "statisticaInvestigation": 1
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 4,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4ST01": 7,
+      "AC9M4ST02": 7,
+      "AC9M4ST03": 6
+    },
+    "difficulty": {
+      "easy": 8,
+      "moderate": 9,
+      "challenging": 3
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 17,
+      "manipulated_response": 3
+    },
+    "kind": {
+      "statisticaPictograph": 4,
+      "statisticaGraph": 2,
+      "statisticaInference": 3,
+      "statisticaShape": 5,
+      "statisticaDisplayStudio": 2,
+      "statisticaClassify": 3,
+      "statisticaInvestigation": 1
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 5,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5ST01": 7,
+      "AC9M5ST02": 7,
+      "AC9M5ST03": 6
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 9,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 18,
+      "manipulated_response": 2
+    },
+    "kind": {
+      "statisticaClassify": 7,
+      "statisticaSort": 1,
+      "statisticaShape": 3,
+      "statisticaLineGraph": 5,
+      "statisticaDisplayStudio": 3,
+      "statisticaInvestigation": 1
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 5,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5ST01": 7,
+      "AC9M5ST02": 7,
+      "AC9M5ST03": 6
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 9,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 18,
+      "manipulated_response": 2
+    },
+    "kind": {
+      "statisticaClassify": 7,
+      "statisticaSort": 1,
+      "statisticaShape": 3,
+      "statisticaLineGraph": 5,
+      "statisticaDisplayStudio": 3,
+      "statisticaInvestigation": 1
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 6,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6ST01": 7,
+      "AC9M6ST02": 7,
+      "AC9M6ST03": 6
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 9,
+      "challenging": 5
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 5,
+      "application": 6,
+      "reasoning": 6,
+      "transfer": 2
+    },
+    "response": {
+      "selected_response": 18,
+      "manipulated_response": 2
+    },
+    "kind": {
+      "statisticaClassify": 8,
+      "statisticaSort": 1,
+      "statisticaShape": 2,
+      "statisticaMediaAnalysis": 7,
+      "statisticaDisplayStudio": 1,
+      "statisticaInvestigation": 1
+    }
+  },
+  {
+    "realm": "statistics",
+    "level": 6,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6ST01": 7,
+      "AC9M6ST02": 7,
+      "AC9M6ST03": 6
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 9,
+      "challenging": 5
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 5,
+      "application": 6,
+      "reasoning": 6,
+      "transfer": 2
+    },
+    "response": {
+      "selected_response": 18,
+      "manipulated_response": 2
+    },
+    "kind": {
+      "statisticaClassify": 8,
+      "statisticaSort": 1,
+      "statisticaShape": 2,
+      "statisticaMediaAnalysis": 7,
+      "statisticaDisplayStudio": 1,
+      "statisticaInvestigation": 1
+    }
+  },
+  {
+    "realm": "pattern",
+    "level": 3,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3A01": 5,
+      "AC9M3A02": 5,
+      "AC9M3A03": 5,
+      "AC9M3N07": 5
+    },
+    "difficulty": {
+      "moderate": 15,
+      "easy": 4,
+      "challenging": 1
+    },
+    "cognitive": {
+      "understanding": 6,
+      "application": 9,
+      "recall": 4,
+      "reasoning": 1
+    },
+    "response": {
+      "selected_response": 4,
+      "constructed_response": 15,
+      "manipulated_response": 1
+    },
+    "kind": {
+      "patternPeaksQuestion": 19,
+      "number_order": 1
+    }
+  },
+  {
+    "realm": "pattern",
+    "level": 3,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3A01": 5,
+      "AC9M3A02": 5,
+      "AC9M3A03": 5,
+      "AC9M3N07": 5
+    },
+    "difficulty": {
+      "moderate": 15,
+      "easy": 4,
+      "challenging": 1
+    },
+    "cognitive": {
+      "understanding": 6,
+      "application": 9,
+      "recall": 4,
+      "reasoning": 1
+    },
+    "response": {
+      "selected_response": 4,
+      "constructed_response": 15,
+      "manipulated_response": 1
+    },
+    "kind": {
+      "patternPeaksQuestion": 19,
+      "number_order": 1
+    }
+  },
+  {
+    "realm": "pattern",
+    "level": 4,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4A01": 10,
+      "AC9M4A02": 10
+    },
+    "difficulty": {
+      "moderate": 17,
+      "easy": 3
+    },
+    "cognitive": {
+      "application": 15,
+      "recall": 3,
+      "understanding": 2
+    },
+    "response": {
+      "selected_response": 3,
+      "constructed_response": 17
+    },
+    "kind": {
+      "patternPeaksQuestion": 20
+    }
+  },
+  {
+    "realm": "pattern",
+    "level": 4,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4A01": 10,
+      "AC9M4A02": 10
+    },
+    "difficulty": {
+      "moderate": 17,
+      "easy": 3
+    },
+    "cognitive": {
+      "application": 15,
+      "recall": 3,
+      "understanding": 2
+    },
+    "response": {
+      "selected_response": 3,
+      "constructed_response": 17
+    },
+    "kind": {
+      "patternPeaksQuestion": 20
+    }
+  },
+  {
+    "realm": "pattern",
+    "level": 5,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5A01": 6,
+      "AC9M5A02": 8,
+      "AC9M5N10": 6
+    },
+    "difficulty": {
+      "moderate": 19,
+      "challenging": 1
+    },
+    "cognitive": {
+      "understanding": 6,
+      "application": 13,
+      "reasoning": 1
+    },
+    "response": {
+      "selected_response": 2,
+      "constructed_response": 17,
+      "manipulated_response": 1
+    },
+    "kind": {
+      "patternPeaksQuestion": 19,
+      "number_order": 1
+    }
+  },
+  {
+    "realm": "pattern",
+    "level": 5,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5A01": 6,
+      "AC9M5A02": 8,
+      "AC9M5N10": 6
+    },
+    "difficulty": {
+      "moderate": 19,
+      "challenging": 1
+    },
+    "cognitive": {
+      "understanding": 6,
+      "application": 13,
+      "reasoning": 1
+    },
+    "response": {
+      "selected_response": 2,
+      "constructed_response": 17,
+      "manipulated_response": 1
+    },
+    "kind": {
+      "patternPeaksQuestion": 19,
+      "number_order": 1
+    }
+  },
+  {
+    "realm": "pattern",
+    "level": 6,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6A01": 7,
+      "AC9M6A02": 6,
+      "AC9M6A03": 7
+    },
+    "difficulty": {
+      "moderate": 10,
+      "challenging": 10
+    },
+    "cognitive": {
+      "application": 10,
+      "reasoning": 10
+    },
+    "response": {
+      "selected_response": 1,
+      "constructed_response": 19
+    },
+    "kind": {
+      "patternPeaksQuestion": 20
+    }
+  },
+  {
+    "realm": "pattern",
+    "level": 6,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6A01": 7,
+      "AC9M6A02": 6,
+      "AC9M6A03": 7
+    },
+    "difficulty": {
+      "moderate": 10,
+      "challenging": 10
+    },
+    "cognitive": {
+      "application": 10,
+      "reasoning": 10
+    },
+    "response": {
+      "selected_response": 1,
+      "constructed_response": 19
+    },
+    "kind": {
+      "patternPeaksQuestion": 20
+    }
+  },
+  {
+    "realm": "chance",
+    "level": 3,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3P01": 11,
+      "AC9M3P02": 9
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 9,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 14,
+      "manipulated_response": 6
+    },
+    "kind": {
+      "mcq": 14,
+      "chanceCompare": 3,
+      "chanceAutoTally": 2,
+      "chanceSpinTally": 1
+    }
+  },
+  {
+    "realm": "chance",
+    "level": 3,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M3P01": 11,
+      "AC9M3P02": 9
+    },
+    "difficulty": {
+      "easy": 7,
+      "moderate": 9,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 6,
+      "application": 7,
+      "reasoning": 4,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 14,
+      "manipulated_response": 6
+    },
+    "kind": {
+      "mcq": 14,
+      "chanceCompare": 3,
+      "chanceAutoTally": 2,
+      "chanceSpinTally": 1
+    }
+  },
+  {
+    "realm": "chance",
+    "level": 4,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4P01": 15,
+      "AC9M4P02": 5
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 10,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 9,
+      "manipulated_response": 11
+    },
+    "kind": {
+      "mcq": 9,
+      "chanceCompare": 3,
+      "chanceBuildFair": 2,
+      "chanceAutoTally": 1,
+      "chanceDependentDraw": 5
+    }
+  },
+  {
+    "realm": "chance",
+    "level": 4,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M4P01": 15,
+      "AC9M4P02": 5
+    },
+    "difficulty": {
+      "easy": 6,
+      "moderate": 10,
+      "challenging": 4
+    },
+    "cognitive": {
+      "recall": 2,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 1
+    },
+    "response": {
+      "selected_response": 9,
+      "manipulated_response": 11
+    },
+    "kind": {
+      "mcq": 9,
+      "chanceCompare": 3,
+      "chanceBuildFair": 2,
+      "chanceAutoTally": 1,
+      "chanceDependentDraw": 5
+    }
+  },
+  {
+    "realm": "chance",
+    "level": 5,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5P01": 10,
+      "AC9M5P02": 10
+    },
+    "difficulty": {
+      "easy": 5,
+      "moderate": 10,
+      "challenging": 5
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 2
+    },
+    "response": {
+      "selected_response": 11,
+      "manipulated_response": 9
+    },
+    "kind": {
+      "mcq": 11,
+      "chanceCompare": 3,
+      "chanceDiceRace": 1,
+      "chanceAutoTally": 3,
+      "chancePredictCount": 2
+    }
+  },
+  {
+    "realm": "chance",
+    "level": 5,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M5P01": 10,
+      "AC9M5P02": 10
+    },
+    "difficulty": {
+      "easy": 5,
+      "moderate": 10,
+      "challenging": 5
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 5,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 2
+    },
+    "response": {
+      "selected_response": 11,
+      "manipulated_response": 9
+    },
+    "kind": {
+      "mcq": 11,
+      "chanceCompare": 3,
+      "chanceDiceRace": 1,
+      "chanceAutoTally": 3,
+      "chancePredictCount": 2
+    }
+  },
+  {
+    "realm": "chance",
+    "level": 6,
+    "form": "pretest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6P01": 10,
+      "AC9M6P02": 10
+    },
+    "difficulty": {
+      "easy": 4,
+      "moderate": 10,
+      "challenging": 6
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 4,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 3
+    },
+    "response": {
+      "selected_response": 7,
+      "manipulated_response": 13
+    },
+    "kind": {
+      "mcq": 7,
+      "chanceScalePortal": 1,
+      "chanceFormMatch": 1,
+      "chanceProbabilityForge": 3,
+      "chanceCompare": 1,
+      "chanceSimulationLab": 4,
+      "chanceModelDebugger": 2,
+      "chanceMasterTrial": 1
+    }
+  },
+  {
+    "realm": "chance",
+    "level": 6,
+    "form": "posttest",
+    "count": 20,
+    "descriptors": {
+      "AC9M6P01": 10,
+      "AC9M6P02": 10
+    },
+    "difficulty": {
+      "easy": 4,
+      "moderate": 10,
+      "challenging": 6
+    },
+    "cognitive": {
+      "recall": 1,
+      "understanding": 4,
+      "application": 7,
+      "reasoning": 5,
+      "transfer": 3
+    },
+    "response": {
+      "selected_response": 7,
+      "manipulated_response": 13
+    },
+    "kind": {
+      "mcq": 7,
+      "chanceScalePortal": 1,
+      "chanceFormMatch": 1,
+      "chanceProbabilityForge": 3,
+      "chanceCompare": 1,
+      "chanceSimulationLab": 4,
+      "chanceModelDebugger": 2,
+      "chanceMasterTrial": 1
+    }
+  }
+]

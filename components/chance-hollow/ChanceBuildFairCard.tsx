@@ -45,7 +45,7 @@ function SpinnerWheel({ wedges, rotation = 0, spinning = false }: { wedges: stri
   );
 }
 
-export default function ChanceBuildFairCard({ task, onCorrect }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function ChanceBuildFairCard({ task, onCorrect, onWrong, assessmentMode = false }: { assessmentMode?: boolean; task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [a, b] = task.colours;
   const [counts, setCounts] = useState<[number, number]>([3, 1]);
   const [phase, setPhase] = useState<"fix" | "battle" | "finished">("fix");
@@ -78,6 +78,12 @@ export default function ChanceBuildFairCard({ task, onCorrect }: { task: Task; o
 
   function check() {
     if (phase !== "fix") return;
+    if (assessmentMode) {
+      setPhase("finished");
+      const response = JSON.stringify({ counts });
+      if (counts[0] === counts[1]) onCorrect(response); else onWrong(response);
+      return;
+    }
     if (counts[0] === counts[1]) {
       setNudge(false);
       setPhase("battle");
@@ -102,7 +108,7 @@ export default function ChanceBuildFairCard({ task, onCorrect }: { task: Task; o
       setSpinning(false);
       if (nextScore[0] === 3 || nextScore[1] === 3) {
         setPhase("finished");
-        onCorrect();
+        onCorrect(JSON.stringify({ counts, history: [...history, result] }));
       }
     }, 975);
   }

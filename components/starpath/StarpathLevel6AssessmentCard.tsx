@@ -62,7 +62,7 @@ function CartesianBoard({ range, points, selected, onSelect }: { range: number; 
   );
 }
 
-export default function StarpathLevel6AssessmentCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathLevel6AssessmentCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [profile, setProfile] = useState<[number, number, number]>([1, 1, 1]);
   const [selectedPoints, setSelectedPoints] = useState<Point[]>([]);
   const [translation, setTranslation] = useState<Point>({ x: 0, y: 0 });
@@ -92,7 +92,7 @@ export default function StarpathLevel6AssessmentCard({ task, onCorrect, onWrong 
       answer = `${rule.across}:${rule.down}:${rule.quarterTurns}`;
     }
     setSettled(true);
-    if (correct) onCorrect(); else onWrong(answer);
+    if (correct) onCorrect(answer); else onWrong(answer);
   };
 
   const ready = task.mode === "diagnose" ? Boolean(option) : task.mode === "coordinatePlot" ? selectedPoints.length === (task.targetPoints?.length ?? 0) : true;

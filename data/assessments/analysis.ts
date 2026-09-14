@@ -1,3 +1,4 @@
+import { decodeAssessmentResponse } from "@/lib/assessment-response";
 import { decodeStarpathResponse } from "@/lib/starpath-assessment-response";
 export type AssessmentQuestionMetadata = {
   id: string;
@@ -55,6 +56,29 @@ function parseNumericAssessmentValue(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+// Full fraction answers and mixed numbers are values; a missing numerator is
+// handled separately below because its denominator is part of the question.
+function parseRationalAssessmentValue(value: unknown): number | null {
+  const numeric = parseNumericAssessmentValue(value);
+  if (numeric != null) return numeric;
+  if (typeof value !== "string") return null;
+  const text = value.trim().replace(/−/g, "-");
+  const fraction = text.match(/^([+-]?\d+)\s*\/\s*(\d+)$/);
+  if (fraction) {
+    const numerator = Number(fraction[1]);
+    const denominator = Number(fraction[2]);
+    return Number.isSafeInteger(numerator) && Number.isSafeInteger(denominator) && denominator > 0
+      ? numerator / denominator : null;
+  }
+  const mixed = text.match(/^([+-]?)(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+  if (!mixed) return null;
+  const whole = Number(mixed[2]);
+  const numerator = Number(mixed[3]);
+  const denominator = Number(mixed[4]);
+  if (![whole, numerator, denominator].every(Number.isSafeInteger) || denominator <= 0 || numerator >= denominator) return null;
+  return (mixed[1] === "-" ? -1 : 1) * (whole + numerator / denominator);
+}
+
 function parseCoordinateAssessmentValue(
   value: unknown
 ): { x: number; y: number } | null {
@@ -109,11 +133,25 @@ export function isAssessmentAnswerCorrect(
   question: GenericAssessmentQuestion,
   chosen: string | undefined
 ): boolean {
+  const response = decodeAssessmentResponse(chosen);
+  if (response) return question.type?.endsWith("Task") === true && response.questionId === question.id && response.correct;
   const evidence = decodeStarpathResponse(chosen);
   if (evidence && question.type === "starpathTask") return evidence.questionId === question.id && evidence.correct;
   const expected = question.answerOptionId ?? question.correctAnswer ?? question.answer;
   if (expected == null || chosen == null) return false;
 
+  if (question.type === "numeric" && question.visual && typeof question.visual === "object" && "answerTolerance" in question.visual) {
+    const tolerance = question.visual.answerTolerance;
+    const expectedNumber = parseNumericAssessmentValue(expected);
+    const chosenNumber = parseNumericAssessmentValue(chosen);
+    return typeof tolerance === "number" && Number.isFinite(tolerance) && tolerance >= 0
+      && expectedNumber != null && chosenNumber != null && Math.abs(expectedNumber - chosenNumber) <= tolerance;
+  }
+  if (question.type === "numeric" && question.visual && typeof question.visual === "object" && "reasonOptions" in question.visual) {
+    const parts = chosen.split("||"); const expectedParts = String(expected).split("||");
+    return parts.length === 2 && expectedParts.length === 2 && parts[1] === expectedParts[1]
+      && isAssessmentAnswerCorrect({ ...question, visual: undefined, correctAnswer: expectedParts[0], answer: expectedParts[0], answerOptionId: undefined }, parts[0]);
+  }
   if (question.type === "numeric" || question.type === "numberLine" || question.type === "mab") {
     const expectedValue = parseNumericAssessmentValue(expected);
     const chosenValue = parseNumericAssessmentValue(chosen);
@@ -128,6 +166,14 @@ export function isAssessmentAnswerCorrect(
         Math.abs(expectedValue - chosenFraction.numerator) < 1e-9 &&
         chosenFraction.denominator === expectedDenominator
       );
+    }
+
+    if (expectedDenominator == null) {
+      const expectedRational = parseRationalAssessmentValue(expected);
+      const chosenRational = parseRationalAssessmentValue(chosen);
+      if (expectedRational != null && chosenRational != null) {
+        return Math.abs(expectedRational - chosenRational) < 1e-9;
+      }
     }
 
     const expectedCoordinate = parseCoordinateAssessmentValue(expected);

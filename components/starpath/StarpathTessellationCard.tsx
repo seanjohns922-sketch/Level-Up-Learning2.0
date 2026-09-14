@@ -51,7 +51,7 @@ function tileNodes(id: string): Node[] {
   return out;
 }
 
-export default function StarpathTessellationCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathTessellationCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const tile = getTile(task.tileId);
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
@@ -60,7 +60,7 @@ export default function StarpathTessellationCard({ task, onCorrect, onWrong }: {
   function submit() {
     if (settled || !chosen) return;
     setSettled(true);
-    if (task.correctOptionIds.includes(chosen)) onCorrect(); else onWrong(chosen);
+    if (task.correctOptionIds.includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (

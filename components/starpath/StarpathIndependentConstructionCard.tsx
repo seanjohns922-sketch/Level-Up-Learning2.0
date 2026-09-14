@@ -5,7 +5,7 @@ import {axesAreCorrect, samePointSet, tileCells, tilesAreCorrect, type GridPoint
 
 const colours = ["#a78bfa", "#67e8f9", "#fbbf24", "#fda4af", "#86efac", "#fdba74", "#c4b5fd", "#93c5fd"];
 const buttonClass = "min-h-11 rounded-lg border-2 border-indigo-200 bg-white px-4 py-2 font-bold text-indigo-950";
-export default function StarpathIndependentConstructionCard({task, onCorrect, onWrong, onAssessmentAnswer}: {onAssessmentAnswer?: (correct: boolean, response: string) => void; task: IndependentConstructionTask; onCorrect: () => void; onWrong: (answer?: string) => void}) {
+export default function StarpathIndependentConstructionCard({task, onCorrect, onWrong, onAssessmentAnswer}: {onAssessmentAnswer?: (correct: boolean, response: string) => void; task: IndependentConstructionTask; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void}) {
   const [points, setPoints] = useState<GridPoint[]>([]);
   const [tiles, setTiles] = useState<TilePlacement[]>([]);
   const [turn, setTurn] = useState(0);

@@ -36,18 +36,18 @@ function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion
   const number = String(index + 1).padStart(2, "0");
   const selected = spec.options !== undefined;
   const selectedAnswerPosition = spec.options?.indexOf(spec.correctAnswer);
-  const id = `y6-measurement-${form === "pretest" ? "pre" : "post"}-${number}-v2`;
+  const id = `y6-measurement-${form === "pretest" ? "pre" : "post"}-${number}-v3`;
 
   return {
     schemaVersion: 1,
     id,
-    version: "1.0.0",
+    version: "3.0.0",
     realm: "measurement",
     level: 6,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `measurelands-level-6-${form}-v1`,
+    bankId: `measurelands-level-6-${form}-v3`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
@@ -93,141 +93,6 @@ function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion
     reviewFeedback: "Review the measurement relationship and the evidence required by the problem.",
   };
 }
-
-const PRETEST_SPECS: readonly ItemSpec[] = [
-  {
-    descriptor: "AC9M6M01", week: 4, lesson: 1, skillId: "metric_conversion", skillLabel: "Convert Metric Length",
-    difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response",
-    misconceptionTags: ["conversion-direction"], contextKey: "pre-space-rope", structureKey: "pre-m-to-cm-whole-tenths",
-    prompt: "A space-camp rope is 3.6 m long. Enter its length in centimetres.", correctAnswer: "360", domain: "metric",
-    visual: { kind: "convert", fromValue: 3.6, fromUnit: "m", toValue: 0, toUnit: "cm" },
-  },
-  {
-    descriptor: "AC9M6M02", week: 1, lesson: 2, skillId: "rectangle_area", skillLabel: "Calculate Rectangle Area",
-    difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response",
-    misconceptionTags: ["linear-vs-square-units"], contextKey: "pre-seedling-bed", structureKey: "pre-area-integer-basic",
-    prompt: "A rectangular seedling bed is 7 m long and 5 m wide. Enter its area in square metres.", correctAnswer: "35", domain: "area",
-    visual: { kind: "rectangle", w: 7, h: 5, mode: "area", unit: "m" },
-  },
-  {
-    descriptor: "AC9M6M03", week: 5, lesson: 2, skillId: "journey_duration", skillLabel: "Determine Journey Duration",
-    difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response",
-    misconceptionTags: ["elapsed-time-base-ten"], contextKey: "pre-museum-shuttle", structureKey: "pre-duration-under-hour",
-    prompt: "A museum shuttle leaves at 09:15 and arrives at 10:05. Enter the journey duration in minutes.", correctAnswer: "50", domain: "timetable",
-  },
-  {
-    descriptor: "AC9M6M04", week: 6, lesson: 1, skillId: "straight_line_angles", skillLabel: "Angles on a Straight Line",
-    difficulty: "easy", cognitiveCategory: "application", responseMode: "constructed_response",
-    misconceptionTags: ["angle-relationship-confusion"], contextKey: "pre-rail-junction", structureKey: "pre-line-single-obtuse",
-    prompt: "Two adjacent angles lie on a straight line. One is 112 degrees. Enter the other angle in degrees.", correctAnswer: "68", domain: "angle",
-    visual: { kind: "angle", known: 112, unknown: 68, total: 180 },
-  },
-  {
-    descriptor: "AC9M6M01", week: 4, lesson: 2, skillId: "metric_conversion", skillLabel: "Convert Metric Mass",
-    difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response",
-    misconceptionTags: ["metric-decimal-place-value"], contextKey: "pre-flour-crate", structureKey: "pre-kg-to-g-hundredths",
-    prompt: "A flour crate has a mass of 2.45 kg. Enter its mass in grams.", correctAnswer: "2450", domain: "metric",
-    visual: { kind: "convert", fromValue: 2.45, fromUnit: "kg", toValue: 0, toUnit: "g" },
-  },
-  {
-    descriptor: "AC9M6M02", week: 1, lesson: 3, skillId: "rectangle_area", skillLabel: "Apply the Area Formula",
-    difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response",
-    misconceptionTags: ["linear-vs-square-units"], contextKey: "pre-stage-panel", structureKey: "pre-area-decimal-length",
-    prompt: "A rectangular stage panel is 12.5 m long and 4 m wide. Enter its area in square metres.", correctAnswer: "50", domain: "area",
-    visual: { kind: "rectangle", w: 12.5, h: 4, mode: "area", unit: "m" },
-  },
-  {
-    descriptor: "AC9M6M03", week: 5, lesson: 2, skillId: "elapsed_time", skillLabel: "Solve Elapsed-Time Problems",
-    difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response",
-    misconceptionTags: ["elapsed-time-base-ten"], contextKey: "pre-ferry-crossing", structureKey: "pre-duration-cross-hour",
-    prompt: "A ferry departs at 13:40 and arrives at 15:05. Enter the journey duration in minutes.", correctAnswer: "85", domain: "timetable",
-  },
-  {
-    descriptor: "AC9M6M04", week: 6, lesson: 2, skillId: "angles_around_point", skillLabel: "Angles Around a Point",
-    difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response",
-    misconceptionTags: ["angle-point-vs-line-total"], contextKey: "pre-playground-hub", structureKey: "pre-point-four-angles",
-    prompt: "Angles around a point are 90 degrees, 125 degrees, 75 degrees and x. Enter x in degrees.", correctAnswer: "70", domain: "angle",
-    visual: { kind: "angle", known: 290, unknown: 70, total: 360 },
-  },
-  {
-    descriptor: "AC9M6M01", week: 4, lesson: 2, skillId: "mixed_metric", skillLabel: "Combine Metric Capacity",
-    difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response",
-    misconceptionTags: ["mixed-unit-comparison"], contextKey: "pre-water-dispenser", structureKey: "pre-capacity-add-mixed",
-    prompt: "A dispenser contains 1.8 L of water. Another 350 mL is added. Enter the total in millilitres.", correctAnswer: "2150", domain: "metric",
-  },
-  {
-    descriptor: "AC9M6M02", week: 2, lesson: 1, skillId: "missing_dimension", skillLabel: "Find a Rectangle Dimension",
-    difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response",
-    misconceptionTags: ["rectangle-area-factor-pairs"], contextKey: "pre-display-board", structureKey: "pre-area-to-width-integer",
-    prompt: "A rectangular display board has area 96 square metres and length 12 m. Enter its width in metres.", correctAnswer: "8", domain: "area",
-  },
-  {
-    descriptor: "AC9M6M03", week: 5, lesson: 1, skillId: "timetable_deadline", skillLabel: "Use a Timetable Deadline",
-    difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response",
-    misconceptionTags: ["timetable-deadline-inclusive"], contextKey: "pre-clinic-bus", structureKey: "pre-arrival-before-deadline",
-    prompt: "A bus arrives at 11:58. An appointment begins at 12:00. Enter how many minutes early the bus arrives.", correctAnswer: "2", domain: "timetable",
-  },
-  {
-    descriptor: "AC9M6M04", week: 6, lesson: 3, skillId: "vertical_angles", skillLabel: "Use Vertically Opposite Angles",
-    difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response",
-    misconceptionTags: ["vertical-opposite-supplement"], contextKey: "pre-crossed-paths", structureKey: "pre-vertical-single-acute",
-    prompt: "Two straight paths cross. One angle is 47 degrees. Enter the vertically opposite angle in degrees.", correctAnswer: "47", domain: "angle",
-    visual: { kind: "angle", known: 47, unknown: 47, total: 360 },
-  },
-  {
-    descriptor: "AC9M6M01", week: 4, lesson: 3, skillId: "conversion_reasoning", skillLabel: "Reason About Metric Conversion",
-    difficulty: "moderate", cognitiveCategory: "reasoning", responseMode: "justification",
-    misconceptionTags: ["metric-decimal-place-value"], contextKey: "pre-running-track", structureKey: "pre-conversion-explanation-choice",
-    prompt: "A running track section is 0.72 km long. Which explanation correctly converts it to metres?",
-    correctAnswer: "0.72 km is 720 m because each kilometre contains 1000 metres.", domain: "metric",
-    options: ["0.72 km is 72 m because two decimal places are removed.", "0.72 km is 720 m because each kilometre contains 1000 metres.", "0.72 km is 7200 m because kilometres are larger than metres."],
-  },
-  {
-    descriptor: "AC9M6M02", week: 2, lesson: 2, skillId: "area_misconception", skillLabel: "Distinguish Area from Perimeter",
-    difficulty: "moderate", cognitiveCategory: "reasoning", responseMode: "constructed_response", misconceptionDiagnosis: true,
-    misconceptionTags: ["perimeter-vs-area"], contextKey: "pre-artwork-cover", structureKey: "pre-diagnose-area-not-perimeter",
-    prompt: "A student adds 9 + 6 + 9 + 6 to find the surface covered by a 9 m by 6 m mural. Enter the correct area in square metres.", correctAnswer: "54", domain: "area",
-    visual: { kind: "rectangle", w: 9, h: 6, mode: "area", unit: "m" },
-  },
-  {
-    descriptor: "AC9M6M03", week: 5, lesson: 2, skillId: "timetable_wait", skillLabel: "Calculate Waiting Time",
-    difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "constructed_response",
-    misconceptionTags: ["timetable-wait-time"], contextKey: "pre-station-transfer", structureKey: "pre-wait-between-services",
-    prompt: "A train arrives at 10:20 and the connecting bus leaves at 10:47. Enter the waiting time in minutes.", correctAnswer: "27", domain: "timetable",
-  },
-  {
-    descriptor: "AC9M6M04", week: 6, lesson: 1, skillId: "straight_line_angles", skillLabel: "Reason with a Straight Line",
-    difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "constructed_response",
-    misconceptionTags: ["angle-point-vs-line-total"], contextKey: "pre-folding-ramp", structureKey: "pre-line-complement-trap",
-    prompt: "An angle of 68 degrees and angle x form a straight line. Enter x in degrees.", correctAnswer: "112", domain: "angle",
-    visual: { kind: "angle", known: 68, unknown: 112, total: 180 },
-  },
-  {
-    descriptor: "AC9M6M01", week: 4, lesson: 3, skillId: "metric_comparison", skillLabel: "Compare Compatible Measurements",
-    difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "constructed_response",
-    misconceptionTags: ["mixed-unit-comparison"], contextKey: "pre-supply-bags", structureKey: "pre-mass-difference-mixed",
-    prompt: "One supply bag has mass 2.05 kg and another has mass 1980 g. Enter the difference in grams.", correctAnswer: "70", domain: "metric",
-  },
-  {
-    descriptor: "AC9M6M02", week: 3, lesson: 2, skillId: "area_constraint", skillLabel: "Reason About Rectangle Dimensions",
-    difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "constructed_response",
-    misconceptionTags: ["rectangle-area-factor-pairs"], contextKey: "pre-market-stall", structureKey: "pre-factor-pair-missing-width",
-    prompt: "A rectangular market stall must cover 72 square metres. If its length is 9 m, enter the required width in metres.", correctAnswer: "8", domain: "area",
-  },
-  {
-    descriptor: "AC9M6M03", week: 5, lesson: 3, skillId: "itinerary_duration", skillLabel: "Determine Multi-Leg Duration",
-    difficulty: "very_challenging", cognitiveCategory: "transfer", responseMode: "constructed_response",
-    misconceptionTags: ["timetable-wait-time"], contextKey: "pre-island-itinerary", structureKey: "pre-two-leg-total-elapsed",
-    prompt: "A ferry leaves at 08:35 and arrives at 09:20. After a 15-minute wait, a bus leaves at 09:35 and arrives at 10:10. Enter the total time from the ferry departure to the bus arrival in minutes.", correctAnswer: "95", domain: "timetable",
-  },
-  {
-    descriptor: "AC9M6M04", week: 6, lesson: 3, skillId: "angle_reasoning_chain", skillLabel: "Complete an Angle Reasoning Chain",
-    difficulty: "very_challenging", cognitiveCategory: "transfer", responseMode: "explanation",
-    misconceptionTags: ["vertical-opposite-supplement"], contextKey: "pre-road-intersection", structureKey: "pre-vertical-adjacent-chain",
-    prompt: "Two straight roads cross. One angle is 64 degrees. Angle x is adjacent to it on a straight line. Enter x in degrees.", correctAnswer: "116", domain: "angle",
-    visual: { kind: "angle", known: 64, unknown: 116, total: 180 },
-  },
-];
 
 const POSTTEST_SPECS: readonly ItemSpec[] = [
   {
@@ -360,6 +225,39 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
     prompt: "Two straight bars cross. One angle is 42 degrees. Let x be its adjacent angle and y its vertically opposite angle. Enter x,y using a comma.", correctAnswer: "138,42", domain: "angle", inputMode: "text",
   },
 ];
+
+const PARALLEL_PRE_VARIANTS: Array<Pick<ItemSpec,"prompt"|"correctAnswer"> & Partial<Pick<ItemSpec,"options"|"visual"|"inputMode">>> = [
+ {prompt:"A path section is 0.008 km long. Enter its length in metres.",correctAnswer:"8"},
+ {prompt:"A rectangular display is 12.5 m long and 6 m wide. Enter its area in square metres.",correctAnswer:"75"},
+ {prompt:"A coach departs at 13:35 and arrives at 15:20. Enter its journey duration in minutes.",correctAnswer:"105"},
+ {prompt:"Two adjacent angles lie on a straight line. One is 126 degrees. Enter the other angle in degrees.",correctAnswer:"54"},
+ {prompt:"A water vat contains 3.425 L. Enter this capacity in millilitres.",correctAnswer:"3425"},
+ {prompt:"A rectangular garden has area 154 square metres and width 11 m. Enter its length in metres.",correctAnswer:"14"},
+ {prompt:"A cruise starts at 10:38 and ends at 11:53. Enter its duration in minutes.",correctAnswer:"75"},
+ {prompt:"Three angles around a point are 116 degrees, 94 degrees and x. Enter x in degrees.",correctAnswer:"150"},
+ {prompt:"A container holds 3.8 kg of flour. After 750 g is used, enter the remaining mass in grams.",correctAnswer:"3050"},
+ {prompt:"A rectangular floor has area 154 square metres. Its whole-number length is greater than 13 m but no more than 14 m. Enter the length and width in metres, separated by a comma.",correctAnswer:"14,11",inputMode:"text"},
+ {prompt:"A performance requires arrival by 17:15. A bus arrives at exactly 17:15. A student says it is late. Enter how many minutes late it is.",correctAnswer:"0"},
+ {prompt:"A student subtracts 46 degrees from 90 to find the adjacent angle on a straight line. Enter the correct adjacent angle in degrees.",correctAnswer:"134"},
+ {prompt:"A student writes that 0.76 m equals 76 mm. Enter the correct length in millimetres.",correctAnswer:"760"},
+ {prompt:"A student says a 14 m by 6 m banner has area 40 square metres because they added all four sides. Enter the correct area in square metres.",correctAnswer:"84"},
+ {prompt:"Service A leaves at 09:10 and arrives at 10:35. Service B leaves at 09:30 and arrives at 10:15. Enter how many minutes earlier B arrives than A.",correctAnswer:"20"},
+ {prompt:"Angles around a point are 105 degrees, 85 degrees, 75 degrees and x. A student uses a total of 180 degrees. Enter the correct value of x in degrees.",correctAnswer:"95"},
+ {prompt:"A tank needs 4.15 L more water. Which statement gives an equivalent amount and a valid reason?",correctAnswer:"4150 mL, because multiplying litres by 1000 preserves the amount.",options:["415 mL, because litres are ten times millilitres.","4150 mL, because multiplying litres by 1000 preserves the amount.","41.5 mL, because decimal digits stay in the same places."]},
+ {prompt:"Two rectangular enclosures each have area 72 square metres. Design A is 9 m by 8 m. Design B is 12 m by 6 m. Enter the difference between their perimeters in metres.",correctAnswer:"2"},
+ {prompt:"A train leaves at 08:42 and arrives at 09:31. A connecting bus leaves at 09:55 and arrives at 10:28. Enter the total time from the train departure to the bus arrival in minutes.",correctAnswer:"106"},
+ {prompt:"Two straight bars cross. One angle is 56 degrees. Let x be its adjacent angle and y its vertically opposite angle. Enter x,y using a comma.",correctAnswer:"124,56",inputMode:"text"}
+];
+const PRE_VISUALS: Record<number, Question["visual"]> = {
+  0:{kind:"convert",fromValue:0.008,fromUnit:"km",toValue:0,toUnit:"m"},
+  1:{kind:"rectangle",w:12.5,h:6,mode:"area",unit:"m"},
+  3:{kind:"angle",known:126,unknown:54,total:180},
+  7:{kind:"angle",known:210,unknown:150,total:360},
+  11:{kind:"angle",known:46,unknown:134,total:180},
+  13:{kind:"rectangle",w:14,h:6,mode:"area",unit:"m"},
+  15:{kind:"angle",known:265,unknown:95,total:360},
+};
+const PRETEST_SPECS: readonly ItemSpec[] = POSTTEST_SPECS.map((spec,index)=>({...spec,...PARALLEL_PRE_VARIANTS[index]!,visual:PRE_VISUALS[index],contextKey:spec.contextKey.replace("post-","pre-"),structureKey:spec.structureKey.replace("post-","pre-")}));
 
 export const YEAR6_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS = PRETEST_SPECS.map((spec, index) =>
   candidate("pretest", index, spec),

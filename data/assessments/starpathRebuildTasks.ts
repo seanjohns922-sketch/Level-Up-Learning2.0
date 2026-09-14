@@ -38,6 +38,12 @@ function crossTask(post: boolean, index: number): PracticeTask {
   if(index<3){prompt=`Predict the shape of a cut through this ${object.name.toLowerCase()}, parallel to its base. Select the shape and the reason.`;labels=[`${object.sectionName}: parallel cuts follow the shape of its base.`,"Rectangle: every flat side face gives a rectangular section.","Triangle: every cut through a solid narrows to a point.","Circle: all cuts through solids have a curved boundary."];correct=0;}
   else if(index===3){prompt="Which claim about the object and its parallel cross-sections is correct?";labels=object.isPrism?["It is a right prism: the polygonal sections stay congruent.","It is a pyramid: the sections shrink.","It is a cylinder: each section is a circle."]:object.constantSection?["It is a right prism because its sections stay the same size.","It is a cylinder: its sections are circles, not polygons.","It is a cone because the sections shrink."]:["It is a right prism because its base is a polygon.","It is a cylinder because each section is curved.","It is a pyramid: the sections shrink towards the apex."];correct=object.isPrism?0:object.constantSection?1:2;}
   else {prompt=post?"Compare parallel cuts one-quarter and three-quarters of the way up this object. Which statement explains their relationship?":"Compare a parallel cut near the base with one near the top. Which statement explains their relationship?";labels=["Same shape and size, because the object has a uniform cross-section.","Same shape but different sizes, because the object narrows towards its apex.","Different shapes, because moving a parallel cut changes the number of sides."];correct=object.constantSection?0:1;}
+  if (post && index < 2) {
+    const sides = index === 0 ? 6 : 4;
+    prompt = `A slice is made parallel to the base of this ${object.name.toLowerCase()}. Which description of the slice is correct?`;
+    labels = [`It has ${sides} straight sides, matching the base boundary.`, `It has ${sides + 2} straight sides, because the prism has extra side faces.`, "It has a curved boundary because the cutting plane is flat."];
+    correct = 0;
+  }
   const ordered=labels.map((label,i)=>({id:`o${i}`,label}));const shift=(index+(post?1:0))%ordered.length;
   return {kind:"starpathCrossSection",mode:index<3?"predict":"explain",target:1,objectId:object.id,prompt,speakText:prompt,options:[...ordered.slice(shift),...ordered.slice(0,shift)],correctOptionIds:[`o${correct}`],feedback};
 }
@@ -59,7 +65,7 @@ export function rebuildStarpathTask(level: number, form: "pretest" | "posttest",
   }
   if(level===3 && (index===8 || index===9)) task=model(post,index===9);
   if(level===4 && [1,2,3].includes(index)) {
-    const width=index===1?4:index===2?5:4, height=index===1?3:index===2?4:4;
+    const width=index===1?(post?3:4):index===2?5:4, height=index===1?(post?4:3):index===2?4:4;
     const piece=index===1?[{x:0,y:0},{x:1,y:0}]:[{x:0,y:0},{x:1,y:0},{x:0,y:1}];
     // L-shaped composite is two 2x3/3x2 blocks: 12 cells, tileable by four L triominoes.
     const outline=index===1?rectangle(width,height):index===2?rectangle(4,3).map(p=>post?{x:p.y,y:p.x}:p):rectangle(4,4).filter(p=>post?!(p.x<2&&p.y<2):!(p.x>=2&&p.y>=2));

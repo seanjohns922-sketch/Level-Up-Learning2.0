@@ -13,8 +13,8 @@ export function PatternPeaksQuestionCard({
   assessmentMode = false,
 }: {
   task: PatternTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
   assessmentMode?: boolean;
 }) {
   const question = task.question;

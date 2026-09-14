@@ -26,7 +26,8 @@ export type MzVisual =
   | { kind: "rectangle"; w: number; h: number; mode: "perimeter" | "area"; unit?: string; sample?: boolean }
   | { kind: "perimeterShape"; points: Array<[number, number]>; sideLabels: number[]; unit: string }
   | { kind: "cubes"; l: number; w: number; h: number }
-  | { kind: "angle"; single?: number; known?: number; unknown?: number; total?: 180 | 360 }
+  | { kind: "protractor"; angle: number; baselineSide: "left" | "right" }
+  | { kind: "angle"; answerTolerance?: number; single?: number; known?: number; unknown?: number; total?: 180 | 360 }
   | { kind: "convert"; fromValue: number; fromUnit: string; toValue: number; toUnit: string }
   | { kind: "objects"; items: Array<{ label: string; emoji: string }>; caption?: string }
   | { kind: "contextObject"; label: string; assetName: string; emoji: string }

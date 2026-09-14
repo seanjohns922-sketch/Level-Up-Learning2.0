@@ -167,8 +167,8 @@ export function StarpathObjectCompareCard({
   onWrong,
 }: {
   task: CompareTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const isAssessment = task.presentation === "assessment";
   return (
@@ -194,7 +194,7 @@ export function StarpathObjectCompareCard({
           <button
             key={option.id}
             type="button"
-            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
             className="grid min-h-16 grid-cols-[minmax(0,1fr)_48px] items-stretch overflow-hidden rounded-lg border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             <span className="flex min-w-0 items-center justify-center px-3 py-3 text-center text-base font-black text-indigo-950 sm:text-lg">
@@ -208,7 +208,7 @@ export function StarpathObjectCompareCard({
           <button
             key={option.id}
             type="button"
-            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
             className="relative flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             <span className="text-lg font-black text-indigo-950">{option.label}</span>
@@ -223,11 +223,14 @@ export function StarpathObjectCompareCard({
 // ── L3 · Shape Match (pairs) — open or face-down memory ──────────────────────
 export function StarpathObjectMatchCard({
   task,
-  onComplete,
+  onComplete, onWrong, assessmentMode = false,
 }: {
   task: MatchTask;
-  onComplete: () => void;
+  onComplete: (response?: string) => void;
+  onWrong?: (response?: string) => void;
+  assessmentMode?: boolean;
 }) {
+  const [pairResponses, setPairResponses] = useState<string[][]>([]);
   const isMemory = task.mode === "memory";
   const [selected, setSelected] = useState<string | null>(null); // open mode
   const [flipped, setFlipped] = useState<string[]>([]); // memory mode (face-up, unpaired)
@@ -237,10 +240,10 @@ export function StarpathObjectMatchCard({
   const lockRef = useRef(false);
   const doneRef = useRef(false);
 
-  function complete(next: Set<string>) {
+  function complete(next: Set<string>, responses: string[][]) {
     if (next.size >= task.objects.length) {
       doneRef.current = true;
-      setTimeout(onComplete, 900);
+      setTimeout(() => onComplete(JSON.stringify(responses)), 900);
     }
   }
 
@@ -252,13 +255,20 @@ export function StarpathObjectMatchCard({
       return;
     }
     const first = task.objects.find((o) => o.id === flipped[0])!;
+    const responses = [...pairResponses, [first.id, entry.id]];
+    setPairResponses(responses);
+    if (assessmentMode && worldObjectShape(first.objectId) !== worldObjectShape(entry.objectId)) {
+      doneRef.current = true;
+      onWrong?.(JSON.stringify(responses));
+      return;
+    }
     if (worldObjectShape(first.objectId) === worldObjectShape(entry.objectId)) {
       const next = new Set(paired).add(first.id).add(entry.id);
       setPaired(next);
       setFlipped([]);
-      setPulse(entry.id);
+      if (!assessmentMode) setPulse(entry.id);
       setTimeout(() => setPulse(null), 400);
-      complete(next);
+      complete(next, responses);
     } else {
       setFlipped([first.id, entry.id]);
       setWrongPair([first.id, entry.id]);
@@ -282,13 +292,20 @@ export function StarpathObjectMatchCard({
       return;
     }
     const first = task.objects.find((o) => o.id === selected)!;
+    const responses = [...pairResponses, [first.id, entry.id]];
+    setPairResponses(responses);
+    if (assessmentMode && worldObjectShape(first.objectId) !== worldObjectShape(entry.objectId)) {
+      doneRef.current = true;
+      onWrong?.(JSON.stringify(responses));
+      return;
+    }
     if (worldObjectShape(first.objectId) === worldObjectShape(entry.objectId)) {
       const next = new Set(paired).add(first.id).add(entry.id);
       setPaired(next);
       setSelected(null);
-      setPulse(entry.id);
+      if (!assessmentMode) setPulse(entry.id);
       setTimeout(() => setPulse(null), 400);
-      complete(next);
+      complete(next, responses);
     } else {
       setWrongPair([first.id, entry.id]);
       setSelected(null);
