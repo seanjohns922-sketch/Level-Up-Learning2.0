@@ -210,6 +210,14 @@ assert(
 const studentInstrument = read("app/diagnostic/page.tsx");
 assert(!studentInstrument.includes("isDemoPreviewMode"), "The diagnostic must not have a demo-only persistence shortcut.");
 assert(studentInstrument.includes("saveDiagnosticProgress"), "Student answers and position must persist during a sitting.");
+assert(studentInstrument.includes('label="Read page"'), "The student diagnostic journey must offer a complete page read-aloud.");
+assert(studentInstrument.includes("STRAND_PRESENTATION"), "The student journey must visually identify all six maths realms.");
+assert(
+  studentInstrument.includes("async function exitDiagnostic()") &&
+    studentInstrument.includes('Save & exit') &&
+    studentInstrument.includes('router.push("/world")'),
+  "Students must be able to save their exact diagnostic position and safely exit to the world.",
+);
 const migration = read("supabase/migrations/20260910170000_release_chance_hollow_live_realm.sql");
 const completionMigration = read("supabase/migrations/20260911120000_complete_six_strand_whole_maths_diagnostic.sql");
 const diagnosticFoundation = read("supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql");
