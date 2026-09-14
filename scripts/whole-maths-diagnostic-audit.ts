@@ -197,6 +197,10 @@ assert(panel.includes("All six maths strand engines are connected"), "The teache
 assert(panel.includes("Assign Start / Mid / End"), "Teachers must be able to assign the formal diagnostic from its dashboard tab.");
 assert(panel.includes("assignWholeMathsDiagnostic"), "The diagnostic assignment control must call the secure assignment RPC.");
 assert(panel.includes('type DiagnosticView = "live" | "run"'), "The Diagnostic tab must stay focused on live progression and running diagnostics.");
+assert(panel.includes('const TRACK_MAX_LEVEL = 8'), "The live tracker must show the complete Prep–8 extension scale.");
+assert(panel.includes('value={studentSort}'), "Teachers must be able to order students in the live progression tracker.");
+assert(panel.includes('Surname A–Z') && panel.includes('Live level: highest'), "The live tracker must support surname and attainment ordering.");
+assert(!panel.includes('className="min-w-[520px]"'), "The Prep–8 tracker must fit its card without forced horizontal scrolling.");
 assert(panel.includes("Live progression is unaffected"), "A diagnostic-control failure must explicitly preserve the live tracker.");
 assert(panel.includes("Trial schools can begin with the End diagnostic"), "The teacher workflow must support an End-only first checkpoint.");
 assert(

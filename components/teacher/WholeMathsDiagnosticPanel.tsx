@@ -26,6 +26,7 @@ import { formatProgressionPoint } from "@/lib/live-maths-progression";
 type DiagnosticStudent = { id: string; display_name: string };
 type TrackerTab = "all" | LiveMathsProgressionRow["strand"];
 type DiagnosticView = "live" | "run";
+type StudentSort = "surname-asc" | "surname-desc" | "given-asc" | "live-desc" | "live-asc" | "diagnostic-desc" | "diagnostic-asc";
 type FormalCheckpoint = Exclude<TeacherDiagnosticSittingRow["checkpoint"], "ad_hoc">;
 type DiagnosticPoint = { sittingId: string; checkpoint: FormalCheckpoint; level: number; completedAt: string };
 
@@ -42,10 +43,27 @@ const CHECKPOINT_SHORT: Record<FormalCheckpoint, string> = {
   end: "E",
 };
 
-const TRACK_LEVELS = ["Prep", "1", "2", "3", "4", "5", "6"] as const;
+const TRACK_LEVELS = ["Prep", "1", "2", "3", "4", "5", "6", "7", "8"] as const;
+const TRACK_MAX_LEVEL = 8;
+const NAME_COLLATOR = new Intl.Collator("en-AU", { numeric: true, sensitivity: "base" });
 
 function levelPosition(level: number) {
-  return `${(Math.max(0, Math.min(6, level)) / 6) * 100}%`;
+  return `${(Math.max(0, Math.min(TRACK_MAX_LEVEL, level)) / TRACK_MAX_LEVEL) * 100}%`;
+}
+
+function studentNameParts(displayName: string) {
+  const parts = displayName.trim().split(/\s+/).filter(Boolean);
+  return {
+    given: parts[0] ?? "",
+    surname: parts.length > 1 ? parts.slice(1).join(" ") : parts[0] ?? "",
+  };
+}
+
+function compareNullableLevels(left: number | null, right: number | null, direction: "asc" | "desc") {
+  if (left == null && right == null) return 0;
+  if (left == null) return 1;
+  if (right == null) return -1;
+  return direction === "asc" ? left - right : right - left;
 }
 
 function ProgressionTrack({
@@ -59,10 +77,16 @@ function ProgressionTrack({
 }) {
   const latestDiagnostic = diagnosticPoints.at(-1)?.level ?? null;
   return (
-    <div className="min-w-[520px]">
+    <div className="w-full min-w-0">
       <div className="relative ml-[76px] h-4 text-[10px] font-black uppercase tracking-wide text-slate-400" aria-hidden>
         {TRACK_LEVELS.map((level, index) => (
-          <span key={level} className="absolute -translate-x-1/2" style={{ left: levelPosition(index) }}>{level}</span>
+          <span
+            key={level}
+            className={`absolute ${index === 0 ? "" : index === TRACK_LEVELS.length - 1 ? "-translate-x-full" : "-translate-x-1/2"}`}
+            style={{ left: levelPosition(index) }}
+          >
+            {level}
+          </span>
         ))}
       </div>
       <div className="mt-1 grid grid-cols-[68px_1fr] items-center gap-2">
@@ -110,6 +134,7 @@ export default function WholeMathsDiagnosticPanel({
   const [progression, setProgression] = useState<LiveMathsProgressionRow[]>([]);
   const [view, setView] = useState<DiagnosticView>("live");
   const [selectedStrand, setSelectedStrand] = useState<TrackerTab>("all");
+  const [studentSort, setStudentSort] = useState<StudentSort>("surname-asc");
   const [liveLoading, setLiveLoading] = useState(true);
   const [liveError, setLiveError] = useState<string | null>(null);
   const [diagnosticLoading, setDiagnosticLoading] = useState(true);
@@ -236,6 +261,40 @@ export default function WholeMathsDiagnosticPanel({
     ? sittings.find((sitting) => sitting.id === selectedSittingId) ?? null
     : null;
 
+  const trackerStudents = useMemo(() => {
+    const rows = students.map((student) => {
+      const studentProgression = progressionByStudent.get(student.id) ?? [];
+      const realmRow = selectedStrand === "all"
+        ? null
+        : studentProgression.find((row) => row.strand === selectedStrand) ?? null;
+      const liveLevel = selectedStrand === "all"
+        ? computeWholeMathsLevel(Object.fromEntries(studentProgression.map((row) => [row.strand, row.predicted_level])))
+        : realmRow?.predicted_level ?? null;
+      const diagnosticPoints = diagnosticPointsByStudent.get(student.id) ?? [];
+      return {
+        student,
+        liveLevel,
+        diagnosticPoints,
+        latestDiagnostic: diagnosticPoints.at(-1)?.level ?? null,
+        ...studentNameParts(student.display_name),
+      };
+    });
+
+    return rows.sort((left, right) => {
+      let comparison = 0;
+      switch (studentSort) {
+        case "surname-asc": comparison = NAME_COLLATOR.compare(left.surname, right.surname); break;
+        case "surname-desc": comparison = NAME_COLLATOR.compare(right.surname, left.surname); break;
+        case "given-asc": comparison = NAME_COLLATOR.compare(left.given, right.given); break;
+        case "live-desc": comparison = compareNullableLevels(left.liveLevel, right.liveLevel, "desc"); break;
+        case "live-asc": comparison = compareNullableLevels(left.liveLevel, right.liveLevel, "asc"); break;
+        case "diagnostic-desc": comparison = compareNullableLevels(left.latestDiagnostic, right.latestDiagnostic, "desc"); break;
+        case "diagnostic-asc": comparison = compareNullableLevels(left.latestDiagnostic, right.latestDiagnostic, "asc"); break;
+      }
+      return comparison || NAME_COLLATOR.compare(left.student.display_name, right.student.display_name);
+    });
+  }, [diagnosticPointsByStudent, progressionByStudent, selectedStrand, studentSort, students]);
+
   function openAssignment() {
     setSelectedStudentIds(assignableStudents.map((student) => student.id));
     setAssignmentMessage(null);
@@ -325,7 +384,7 @@ export default function WholeMathsDiagnosticPanel({
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
           <div>
             <div className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-teal-700" aria-hidden /><h3 className="text-lg font-black text-slate-950">Live progression tracker</h3></div>
-            <p className="mt-1 text-sm text-slate-500">Compare each student&apos;s live learning level with their Start, Mid and End diagnostic checkpoints on the Prep–6 continuum.</p>
+            <p className="mt-1 text-sm text-slate-500">Compare each student&apos;s live learning level with their Start, Mid and End diagnostic checkpoints on the Prep–8 continuum.</p>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1">
@@ -347,6 +406,22 @@ export default function WholeMathsDiagnosticPanel({
                 </button>
               ))}
             </div>
+            <label className="flex items-center gap-2 text-xs font-bold text-slate-600">
+              <span className="whitespace-nowrap">Order by</span>
+              <select
+                value={studentSort}
+                onChange={(event) => setStudentSort(event.target.value as StudentSort)}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
+              >
+                <option value="surname-asc">Surname A–Z</option>
+                <option value="surname-desc">Surname Z–A</option>
+                <option value="given-asc">First name A–Z</option>
+                <option value="live-desc">Live level: highest</option>
+                <option value="live-asc">Live level: lowest</option>
+                <option value="diagnostic-desc">Diagnostic: highest</option>
+                <option value="diagnostic-asc">Diagnostic: lowest</option>
+              </select>
+            </label>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-100 bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600">
@@ -361,18 +436,8 @@ export default function WholeMathsDiagnosticPanel({
             <div className={`px-5 py-8 text-center text-sm font-semibold ${liveError ? "text-rose-700" : "text-slate-500"}`}>{liveError ?? "Loading live progression…"}</div>
           ) : students.length === 0 ? (
             <div className="px-5 py-8 text-center text-sm font-semibold text-slate-500">No students in this class.</div>
-          ) : students.map((student) => {
-            const studentProgression = progressionByStudent.get(student.id) ?? [];
-            const realmRow = selectedStrand === "all"
-              ? null
-              : studentProgression.find((row) => row.strand === selectedStrand) ?? null;
-            const liveLevel = selectedStrand === "all"
-              ? computeWholeMathsLevel(Object.fromEntries(studentProgression.map((row) => [row.strand, row.predicted_level])))
-              : realmRow?.predicted_level ?? null;
-            const diagnosticPoints = diagnosticPointsByStudent.get(student.id) ?? [];
-            const latestDiagnostic = diagnosticPoints.at(-1)?.level ?? null;
-            return (
-              <div key={student.id} className="grid gap-4 px-5 py-4 xl:grid-cols-[220px_minmax(560px,1fr)] xl:items-center">
+          ) : trackerStudents.map(({ student, liveLevel, diagnosticPoints, latestDiagnostic }) => (
+              <div key={student.id} className="grid gap-4 px-5 py-4 lg:grid-cols-[200px_minmax(0,1fr)] lg:items-center">
                 <div>
                   <p className="font-black text-slate-950">{student.display_name}</p>
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-bold">
@@ -385,16 +450,15 @@ export default function WholeMathsDiagnosticPanel({
                     A complete Whole-Maths live score appears after the student has progress in all six strands.
                   </div>
                 ) : (
-                  <div className="overflow-x-auto pb-1">
+                  <div className="min-w-0 pb-1">
                     <ProgressionTrack liveLevel={liveLevel} diagnosticPoints={diagnosticPoints} onSelectDiagnostic={setSelectedSittingId} />
                   </div>
                 )}
               </div>
-            );
-          })}
+          ))}
         </div>
         <div className="border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs leading-5 text-slate-500">
-          The teal marker moves as lessons, quizzes and realm tests update the live score. Purple markers are fixed formal results. Trial schools can begin with an End checkpoint; Start and Mid remain blank.
+          The teal marker moves as lessons, quizzes and realm tests update the live score. Purple markers are fixed formal results. Levels 7–8 show the future Advanced Pathway range. Trial schools can begin with an End checkpoint; Start and Mid remain blank.
         </div>
       </article> : null}
 
