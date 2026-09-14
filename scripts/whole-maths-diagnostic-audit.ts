@@ -237,6 +237,20 @@ assert(
     studentInstrument.includes("onClick={leaveToCentralHub}"),
   "Leaving the diagnostic home for the Central Hub must pause the handoff so the world does not send students straight back.",
 );
+const deferredFollowUps = read("supabase/migrations/20260915113000_defer_whole_maths_diagnostic_follow_ups.sql");
+assert(
+  deferredFollowUps.includes("create or replace function public.get_pending_whole_math_diagnostic") &&
+    /jsonb_array_length\(result\.draft_probe_scores\)>0 then 1 else 0 end,\s*case result\.strand/.test(deferredFollowUps) &&
+    deferredFollowUps.includes("grant execute on function public.get_pending_whole_math_diagnostic(uuid) to anon,authenticated"),
+  "Realms with a waiting follow-up level must queue behind realms that have not had their first test.",
+);
+const finishBody = functionBody("async function finishLevel()");
+assert(
+  (finishBody.match(/await loadPending\(\)/g) ?? []).length === 2 &&
+    (finishBody.match(/setHasBegunStrand\(false\)/g) ?? []).length === 2 &&
+    !/await loadPending\(\);\s*setProbes\(\[\]\)/.test(finishBody),
+  "Finishing any level test must return students to the diagnostic home and keep saved follow-up scores.",
+);
 assert(
   diagnosticHandoff.includes("sessionStorage") &&
     centralWorldEntry.includes("isDiagnosticHandoffPaused(pendingDiagnostic.sitting_id)") &&

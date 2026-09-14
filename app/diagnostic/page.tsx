@@ -162,10 +162,10 @@ export default function WholeMathsDiagnosticPage() {
       setAnswers(next.draft_answers ?? {});
       setProbes(next.draft_probes ?? []);
       setIndex(Math.max(0, next.draft_index ?? 0));
+      // A waiting follow-up level (saved probes, no answers yet) opens on the home screen first.
       setHasBegunStrand(
         (next.draft_index ?? 0) > 0 ||
-        Object.keys(next.draft_answers ?? {}).length > 0 ||
-        (next.draft_probes ?? []).length > 0,
+        Object.keys(next.draft_answers ?? {}).length > 0,
       );
     }
     return next;
@@ -278,16 +278,25 @@ export default function WholeMathsDiagnosticPage() {
       setError(null);
       try {
         await saveDiagnosticProgress(profile.studentId, pending.sitting_id, pending.strand, nextLevel, {}, nextProbes, 0);
-        setProbes(nextProbes);
-        setLevel(nextLevel);
-        setAnswers({});
-        setIndex(0);
-        window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Your next diagnostic level could not be saved.");
-      } finally {
         setSaving(false);
+        return;
       }
+      // The follow-up level waits so students aren't given back-to-back tests. Return to the
+      // diagnostic home, where the server lines up fresh realms before any follow-ups.
+      setProbes(nextProbes);
+      setLevel(nextLevel);
+      setAnswers({});
+      setIndex(0);
+      try {
+        await loadPending();
+      } catch {
+        // The follow-up is saved; the home screen can show this realm's follow-up as up next.
+      }
+      setHasBegunStrand(false);
+      setSaving(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
@@ -307,10 +316,14 @@ export default function WholeMathsDiagnosticPage() {
         return;
       }
       const next = await loadPending();
-      setProbes([]);
-      setAnswers({});
-      setIndex(0);
-      if (next) window.scrollTo({ top: 0, behavior: "smooth" });
+      // loadPending restores the next realm's saved follow-up scores; only clear when nothing is left.
+      if (!next) {
+        setProbes([]);
+        setAnswers({});
+        setIndex(0);
+      }
+      setHasBegunStrand(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Your result could not be saved.");
     } finally {
@@ -337,6 +350,7 @@ export default function WholeMathsDiagnosticPage() {
     const currentJourney = journey.find((item) => item.strand === pending.strand);
     const currentStep = Math.max(0, journey.findIndex((item) => item.strand === pending.strand)) + 1;
     const currentAnswered = currentJourney?.answered_count ?? 0;
+    const isFollowUp = probes.length > 0;
     const currentPresentation = STRAND_PRESENTATION[pending.strand];
     const CurrentIcon = currentPresentation.icon;
     const ringCircumference = 2 * Math.PI * 42;
@@ -345,10 +359,12 @@ export default function WholeMathsDiagnosticPage() {
         ? "complete"
         : item.answered_count > 0
           ? `${item.answered_count} of 20 questions answered`
-          : "not started";
+          : item.active_level !== item.starting_level
+            ? "follow-up test waiting"
+            : "not started";
       return `${AC_STRANDS[item.strand].label}, ${item.active_level}, ${status}`;
     }).join(". ");
-    const introText = `${checkpointLabel(pending.checkpoint)}. Welcome to your maths journey. You have completed ${completedCount} of 6 realms. Complete one realm at a time at school. Your work saves automatically, so you can safely continue during the next session your teacher opens. Up next is ${currentPresentation.realm}: ${AC_STRANDS[pending.strand].label}, ${level}, with 20 questions. You can also go back to the Central Hub. ${journeyReadout}.`;
+    const introText = `${checkpointLabel(pending.checkpoint)}. Welcome to your maths journey. You have completed ${completedCount} of 6 realms. Complete one realm at a time at school. Your work saves automatically, so you can safely continue during the next session your teacher opens. Up next is ${isFollowUp ? "a follow-up test in " : ""}${currentPresentation.realm}: ${AC_STRANDS[pending.strand].label}, ${level}, with 20 questions. You can also go back to the Central Hub. ${journeyReadout}.`;
 
     return (
       <ReadAloudRateProvider>
@@ -435,7 +451,7 @@ export default function WholeMathsDiagnosticPage() {
                 <div className="flex flex-col justify-center gap-6 p-6 sm:p-8 lg:p-10">
                   <div>
                     <p className={`text-xs font-black uppercase tracking-[0.2em] ${currentPresentation.accent}`}>
-                      {currentAnswered ? "Pick up where you left off" : "Up next"}
+                      {currentAnswered ? "Pick up where you left off" : isFollowUp ? "Follow-up test" : "Up next"}
                     </p>
                     <h2 id="next-realm-title" className="mt-2 text-3xl font-black tracking-tight sm:text-5xl">{currentPresentation.realm}</h2>
                     <p className="mt-2 text-lg font-semibold text-slate-300">{AC_STRANDS[pending.strand].label} · {level}</p>
@@ -490,13 +506,16 @@ export default function WholeMathsDiagnosticPage() {
                   const isComplete = item.status === "completed";
                   const isUnavailable = item.status === "unavailable";
                   const isStarted = item.answered_count > 0;
+                  const hasFollowUp = !isComplete && item.active_level !== item.starting_level;
                   const statusText = isComplete
                     ? "Complete"
                     : isUnavailable
                       ? "Unavailable"
                       : isStarted
                         ? `${item.answered_count} / 20 answered`
-                        : isCurrent
+                        : hasFollowUp
+                          ? "Follow-up waiting"
+                          : isCurrent
                           ? "Ready to begin"
                           : "Not started";
                   return (
@@ -514,7 +533,7 @@ export default function WholeMathsDiagnosticPage() {
                         <img
                           src={presentation.poster}
                           alt=""
-                          className={`absolute inset-0 h-full w-full object-cover ${isComplete || isCurrent || isStarted ? "" : "opacity-40 saturate-[0.35]"}`}
+                          className={`absolute inset-0 h-full w-full object-cover ${isComplete || isCurrent || isStarted || hasFollowUp ? "" : "opacity-40 saturate-[0.35]"}`}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/65 to-slate-950/0" aria-hidden="true" />
 
