@@ -7,7 +7,7 @@ function isFullscreenActive() {
   return Boolean(document.fullscreenElement);
 }
 
-export function FullscreenToggle() {
+export function FullscreenToggle({ inline = false }: { inline?: boolean } = {}) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
 
@@ -45,8 +45,9 @@ export function FullscreenToggle() {
     <button
       type="button"
       onClick={toggleFullscreen}
-      className="fullscreen-toggle fixed bottom-4 right-4 z-[100] rounded-2xl border border-white/20 bg-slate-950/80 px-4 py-2 text-sm font-black text-white shadow-xl backdrop-blur transition hover:bg-slate-900"
-      style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
+      data-inline={inline ? "true" : undefined}
+      className={`fullscreen-toggle ${inline ? "rounded-lg px-2.5 py-1.5 text-xs" : "fixed bottom-4 right-4 z-[100] rounded-2xl px-4 py-2 text-sm"} border border-white/20 bg-slate-950/80 font-black text-white shadow-xl backdrop-blur transition hover:bg-slate-900`}
+      style={inline ? undefined : { bottom: "max(1rem, env(safe-area-inset-bottom))" }}
       aria-label={isFullscreen ? "Exit full screen" : "Enter full screen"}
       title={isFullscreen ? "Exit full screen" : "Enter full screen"}
     >

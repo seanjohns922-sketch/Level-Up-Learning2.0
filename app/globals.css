@@ -874,3 +874,8 @@ html:fullscreen .measurelands-month-grid {
     max-height: 132px !important;
   }
 }
+
+/* Assessment headers own this control so it cannot cover Finish on tablets. */
+body:has(.assessment-shell) .fullscreen-toggle:not([data-inline="true"]) {
+  display: none;
+}
