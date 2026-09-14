@@ -1,6 +1,8 @@
+import { YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS, YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "./year6NumberNexusIndependentBanks";
+import { GROUND_STARPATH_INDEPENDENT_PRETEST_ITEMS } from "./groundStarpathIndependentPosttest";
 import { getPretestForYear, type Question as PretestQuestion } from "./pretests";
 import { POSTTESTS, type PostTest, type Question as PosttestQuestion } from "./posttests";
-import { GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "./groundNumberNexusIndependentPosttest";
+import { GROUND_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS, GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "./groundNumberNexusIndependentPosttest";
 import {
   YEAR1_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS,
   YEAR1_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS,
@@ -108,6 +110,7 @@ function getStarpathPosttest(yearLabel: string): PostTest | undefined {
 }
 
 function getStarpathPretest(yearLabel: string): PretestQuestion[] {
+  if (isGroundLevelYear(yearLabel)) return [...GROUND_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   if (yearLabel === "Year 1") {
     return [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   }
@@ -218,6 +221,7 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
     default:
       return assertAssessmentRealmHandled(realmId);
   }
+  if (yearLabel === "Year 6") return [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   if (yearLabel === "Year 3") {
     return buildLevel3PretestFormA();
   }
@@ -233,6 +237,7 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
   if (yearLabel === "Year 5") {
     return [...YEAR5_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   }
+  if (isGroundLevelYear(yearLabel)) return [...GROUND_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   return getPretestForYear(yearLabel);
 }
 
@@ -253,6 +258,7 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
     default:
       return assertAssessmentRealmHandled(realmId);
   }
+  if (yearLabel === "Year 6") return { yearLabel, questions: [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] };
   if (isGroundLevelYear(yearLabel)) {
     return {
       yearLabel: "Prep",

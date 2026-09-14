@@ -21,11 +21,11 @@ type ItemSpec = {
 
 function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion {
   const selected = spec.options !== undefined;
-  const id = `y2-measurement-${form === "pretest" ? "pre" : "post"}-${String(index + 1).padStart(2, "0")}-v2`;
+  const id = `y2-measurement-${form === "pretest" ? "pre" : "post"}-${String(index + 1).padStart(2, "0")}-v3`;
   const selectedAnswerPosition = spec.options?.indexOf(spec.correctAnswer);
   return {
-    schemaVersion: 1, id, version: "1.0.0", realm: "measurement", level: 2, form,
-    origin: "assessment_authored", sourcePool: form, bankId: `measurelands-level-2-${form}-v1`,
+    schemaVersion: 1, id, version: "3.0.0", realm: "measurement", level: 2, form,
+    origin: "assessment_authored", sourcePool: form, bankId: `measurelands-level-2-${form}-v3`,
     primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
     cognitiveCategory: spec.cognitiveCategory, difficulty: spec.difficulty,
@@ -68,28 +68,156 @@ const PRETEST_SPECS: readonly ItemSpec[] = [
   { descriptor: "AC9M2M01", week: 4, lesson: 3, skillId: "diagnose_cross_unit_measure", skillLabel: "Diagnose Different Unit Counts", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "selected_response", misconceptionDiagnosis: true, misconceptionTags: ["cross-unit-count-comparison"], contextKey: "pre-desk-hands-pencils", structureKey: "pre-reject-cross-unit-numeral", prompt: "Mia measures a desk as 7 hand spans. Leo measures it as 10 pencils. Leo says the desk became longer because 10 is greater than 7. Which correction is best?", correctAnswer: "The counts cannot be compared until the same-sized unit is used.", domain: "informal_measurement", options: ["Leo is correct because 10 is always longer than 7.", "The counts cannot be compared until the same-sized unit is used.", "Mia is correct because hand spans are always exact."] },
 ];
 
-const POSTTEST_SPECS: readonly ItemSpec[] = [
-  { descriptor: "AC9M2M01", week: 1, lesson: 3, skillId: "choose_informal_unit", skillLabel: "Choose a Uniform Informal Unit", difficulty: "easy", cognitiveCategory: "recall", responseMode: "selected_response", misconceptionTags: ["non-uniform-units"], contextKey: "post-marker-tile-unit", structureKey: "post-select-uniform-length-unit", prompt: "Which plan fairly measures a marker's length?", correctAnswer: "Repeat one equal unit from end to end", domain: "informal_measurement", options: ["Repeat one equal unit from end to end", "Mix large and small units", "Leave spaces between each unit"] },
-  { descriptor: "AC9M2M02", week: 5, lesson: 3, skillId: "recognise_eighths", skillLabel: "Recognise Equal Eighths", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["unequal-fractional-parts"], contextKey: "post-pizza-eighths", structureKey: "post-eighth-part-count", prompt: "A pizza is divided into equal eighths. Enter the number of equal slices.", correctAnswer: "8", domain: "fraction" },
-  { descriptor: "AC9M2M03", week: 7, lesson: 1, skillId: "count_calendar_days", skillLabel: "Count Days Between Dates", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["calendar-inclusive-count"], contextKey: "post-april-short-interval", structureKey: "post-date-jumps-same-week", prompt: "A book is borrowed on 4 April and returned on 9 April. Enter the number of days between the dates.", correctAnswer: "5", domain: "calendar" },
-  { descriptor: "AC9M2M04", week: 5, lesson: 2, skillId: "read_half_past", skillLabel: "Read Half-Past Time", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["analog-hand-role"], contextKey: "post-school-half-past", structureKey: "post-clock-half-hour", prompt: "Read the school clock shown. Enter the time as four digits, without punctuation.", correctAnswer: "0830", domain: "clock", visual: { kind: "clock", hour: 8, minute: 30 } },
-  { descriptor: "AC9M2M05", week: 6, lesson: 3, skillId: "recognise_full_turn", skillLabel: "Recognise a Full Turn", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "selected_response", misconceptionTags: ["turn-size-vs-direction"], contextKey: "post-spinner-full-turn", structureKey: "post-name-return-to-start-turn", prompt: "A spinner starts pointing west, turns once all the way around, and finishes pointing west. What turn did it make?", correctAnswer: "A full turn", domain: "turn", options: ["A quarter turn", "A full turn", "A half turn"] },
-  { descriptor: "AC9M2M01", week: 1, lesson: 1, skillId: "compare_uniform_lengths", skillLabel: "Compare Uniform Length Counts", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["gaps-or-overlaps"], contextKey: "post-two-ribbon-counts", structureKey: "post-same-unit-length-difference", prompt: "Two ribbons are measured with identical counters. One is 14 counters long and one is 9 counters long. Enter the difference in counters.", correctAnswer: "5", domain: "informal_measurement" },
-  { descriptor: "AC9M2M02", week: 5, lesson: 3, skillId: "check_equal_quarters", skillLabel: "Check Equal Quarters", difficulty: "moderate", cognitiveCategory: "application", responseMode: "selected_response", misconceptionDiagnosis: true, misconceptionTags: ["unequal-fractional-parts"], contextKey: "post-garden-quarters", structureKey: "post-diagnose-unequal-quarters", prompt: "A garden is split into 4 sections, but the sections have different sizes. Which statement is correct?", correctAnswer: "They are not quarters because the sections are not equal.", domain: "fraction", options: ["They are quarters because there are 4 sections.", "They are not quarters because the sections are not equal.", "Only the largest section is a quarter."] },
-  { descriptor: "AC9M2M03", week: 7, lesson: 2, skillId: "count_forward_dates", skillLabel: "Count Forward to an Event", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["calendar-inclusive-count"], contextKey: "post-concert-count-forward", structureKey: "post-date-after-six-days", prompt: "Today is 7 September. A concert is 6 days later. Enter the date in September of the concert.", correctAnswer: "13", domain: "calendar" },
-  { descriptor: "AC9M2M04", week: 6, lesson: 1, skillId: "read_quarter_past", skillLabel: "Read Quarter-Past Time", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["analog-hand-role"], contextKey: "post-reading-quarter-past", structureKey: "post-clock-quarter-past", prompt: "Read the reading clock shown. Enter the time as four digits, without punctuation.", correctAnswer: "1115", domain: "clock", visual: { kind: "clock", hour: 11, minute: 15 } },
-  { descriptor: "AC9M2M05", week: 6, lesson: 3, skillId: "apply_three_quarter_turn", skillLabel: "Apply a Three-Quarter Turn", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["turn-size-vs-direction"], contextKey: "post-three-quarter-components", structureKey: "post-quarter-turns-in-three-quarter", prompt: "Enter how many quarter turns make a three-quarter turn.", correctAnswer: "3", domain: "turn" },
-  { descriptor: "AC9M2M01", week: 2, lesson: 2, skillId: "compare_uniform_mass", skillLabel: "Compare Uniform Mass Counts", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["non-uniform-units"], contextKey: "post-toy-balance-blocks", structureKey: "post-same-unit-mass-range", prompt: "Three toys balance 7, 13 and 10 identical blocks. Enter the difference between the heaviest and lightest toys in blocks.", correctAnswer: "6", domain: "informal_measurement" },
-  { descriptor: "AC9M2M03", week: 7, lesson: 1, skillId: "calendar_week_boundary", skillLabel: "Count Across Weeks", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["calendar-inclusive-count"], contextKey: "post-october-two-weeks", structureKey: "post-date-jumps-fourteen-days", prompt: "Training starts on 2 October and finishes on 16 October. Enter the number of days between the dates.", correctAnswer: "14", domain: "calendar" },
-  { descriptor: "AC9M2M04", week: 6, lesson: 2, skillId: "read_quarter_to", skillLabel: "Read Quarter-To Time", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["quarter-to-hour-name"], contextKey: "post-bus-quarter-to", structureKey: "post-clock-quarter-to", prompt: "Read the bus clock shown. Enter the time as four digits, without punctuation.", correctAnswer: "0445", domain: "clock", visual: { kind: "clock", hour: 4, minute: 45 } },
-  { descriptor: "AC9M2M01", week: 3, lesson: 2, skillId: "compare_uniform_capacity", skillLabel: "Compare Uniform Capacity Counts", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["cross-unit-count-comparison"], contextKey: "post-bucket-cup-counts", structureKey: "post-capacity-difference-same-scoop", prompt: "A red bucket holds 11 scoops and a blue bucket holds 7 of the same scoop. Enter how many more scoops the red bucket holds.", correctAnswer: "4", domain: "informal_measurement" },
-  { descriptor: "AC9M2M03", week: 7, lesson: 3, skillId: "cross_month_calendar", skillLabel: "Count Across a Month Boundary", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["calendar-month-length"], contextKey: "post-january-february-boundary", structureKey: "post-cross-month-three-days", prompt: "A challenge starts on 30 January and ends on 2 February. January has 31 days. Enter the number of days between the dates.", correctAnswer: "3", domain: "calendar" },
-  { descriptor: "AC9M2M02", week: 5, lesson: 3, skillId: "reason_equal_parts", skillLabel: "Reason About Equal Parts", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "selected_response", misconceptionDiagnosis: true, misconceptionTags: ["unequal-fractional-parts"], contextKey: "post-paper-fold-eighths", structureKey: "post-correct-eighth-representation", prompt: "A student draws 8 strips with different widths and calls each strip one-eighth. Which correction is best?", correctAnswer: "All 8 strips must be equal parts of the same whole.", domain: "fraction", options: ["Any 8 strips are eighths.", "All 8 strips must be equal parts of the same whole.", "Only the widest strip is one-eighth."] },
-  { descriptor: "AC9M2M04", week: 6, lesson: 2, skillId: "diagnose_quarter_to", skillLabel: "Diagnose Quarter-To Time", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "constructed_response", misconceptionDiagnosis: true, misconceptionTags: ["quarter-to-hour-name"], contextKey: "post-swimming-quarter-to-error", structureKey: "post-correct-quarter-to-digital", prompt: "The minute hand points to 9 and the hour hand is nearly at 8. A student writes 8:45. Enter the correct time as four digits, without punctuation.", correctAnswer: "0745", domain: "clock" },
-  { descriptor: "AC9M2M05", week: 6, lesson: 3, skillId: "diagnose_turn_direction", skillLabel: "Diagnose Turn Size and Direction", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "selected_response", misconceptionDiagnosis: true, misconceptionTags: ["turn-size-vs-direction"], contextKey: "post-robot-west-quarter", structureKey: "post-reject-start-direction-turn-size", prompt: "A robot faces west and turns anticlockwise to face south. A student says it cannot be a quarter turn because it did not start north. Which correction is best?", correctAnswer: "It is a quarter turn; the starting direction does not change the turn size.", domain: "turn", options: ["It is a quarter turn; the starting direction does not change the turn size.", "It is a half turn because it started west.", "Anticlockwise turns are always full turns."] },
-  { descriptor: "AC9M2M01", week: 4, lesson: 1, skillId: "diagnose_smaller_units", skillLabel: "Diagnose Smaller Unit Counts", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "selected_response", misconceptionDiagnosis: true, misconceptionTags: ["informal-unit-size-count"], contextKey: "post-mat-big-small-blocks", structureKey: "post-correct-smaller-unit-count", prompt: "A mat is 5 large blocks long and 15 small blocks long. A student says the small-block measure must be wrong because 15 is larger than 5. Which correction is best?", correctAnswer: "Smaller units need a larger count to cover the same length.", domain: "informal_measurement", options: ["The mat changed length while it was measured.", "Smaller units need a larger count to cover the same length.", "A larger count always means a longer object."] },
-  { descriptor: "AC9M2M01", week: 4, lesson: 3, skillId: "measurement_transfer", skillLabel: "Plan a Fair Informal Comparison", difficulty: "very_challenging", cognitiveCategory: "transfer", responseMode: "constructed_response", misconceptionDiagnosis: true, misconceptionTags: ["cross-unit-count-comparison"], contextKey: "post-path-tile-transfer", structureKey: "post-convert-informal-counts-common-unit", prompt: "A short path is 8 large tiles long. A long path is 18 small tiles long. Each large tile is the same length as 2 small tiles. Enter how many small tiles longer the long path is.", correctAnswer: "2", domain: "informal_measurement" },
+// Parallel forms keep the same descriptor, operation and response demand.
+const PARALLEL_POST_VARIANTS: readonly Partial<ItemSpec>[] = [
+  {
+    "prompt": "Which plan fairly measures a marker's length?",
+    "correctAnswer": "Repeat one equal unit from end to end",
+    "visual": undefined,
+    "options": [
+      "Repeat one equal unit from end to end",
+      "Mix large and small units",
+      "Leave gaps between units"
+    ]
+  },
+  {
+    "prompt": "A pizza is cut into equal quarters. How many equal slices?",
+    "correctAnswer": "4",
+    "visual": undefined
+  },
+  {
+    "prompt": "A book is borrowed on 4 April and returned on 9 April. How many days between the dates?",
+    "correctAnswer": "5",
+    "visual": undefined
+  },
+  {
+    "prompt": "Read the arrival clock. Enter the time as four digits, without punctuation.",
+    "correctAnswer": "0800",
+    "visual": {
+      "kind": "clock",
+      "hour": 8,
+      "minute": 0
+    }
+  },
+  {
+    "prompt": "An arrow points west, then turns clockwise to north. What turn did it make?",
+    "correctAnswer": "A quarter turn",
+    "visual": undefined,
+    "options": [
+      "A full turn",
+      "A quarter turn",
+      "A half turn"
+    ]
+  },
+  {
+    "prompt": "Two ribbons measure 8 and 5 of the same counter. How many counters longer is the first ribbon?",
+    "correctAnswer": "3",
+    "visual": undefined
+  },
+  {
+    "prompt": "A paper strip is divided into eighths. How many equal parts make the whole strip?",
+    "correctAnswer": "8",
+    "visual": undefined
+  },
+  {
+    "prompt": "Today is 7 September. A concert is 4 days later. What is the date in September of the concert?",
+    "correctAnswer": "11",
+    "visual": undefined
+  },
+  {
+    "prompt": "Read the reading clock. Enter the time as four digits, without punctuation.",
+    "correctAnswer": "1130",
+    "visual": {
+      "kind": "clock",
+      "hour": 11,
+      "minute": 30
+    }
+  },
+  {
+    "prompt": "A robot starts facing west and makes a half turn. Which direction does it face now?",
+    "correctAnswer": "East",
+    "visual": undefined,
+    "options": [
+      "North",
+      "West",
+      "East"
+    ]
+  },
+  {
+    "prompt": "A truck balances 13 identical blocks and a car balances 9. How many blocks heavier is the truck?",
+    "correctAnswer": "4",
+    "visual": undefined
+  },
+  {
+    "prompt": "Three buckets hold 6, 10 and 8 of the same scoop. What is the difference between the greatest and least capacities?",
+    "correctAnswer": "4",
+    "visual": undefined
+  },
+  {
+    "prompt": "A biscuit is broken into two unequal pieces. Which statement is correct?",
+    "correctAnswer": "The pieces are not halves because they are unequal.",
+    "visual": undefined,
+    "options": [
+      "Any two pieces are halves.",
+      "The pieces are not halves because they are unequal.",
+      "The larger piece is a quarter."
+    ]
+  },
+  {
+    "prompt": "A project begins on 17 October and ends on 24 October. How many days between the dates?",
+    "correctAnswer": "7",
+    "visual": undefined
+  },
+  {
+    "prompt": "Read the bus clock. Enter the time as four digits, without punctuation.",
+    "correctAnswer": "0415",
+    "visual": {
+      "kind": "clock",
+      "hour": 4,
+      "minute": 15
+    }
+  },
+  {
+    "prompt": "A robot makes three quarter turns in the same direction. How many quarter turns has it made?",
+    "correctAnswer": "3",
+    "visual": undefined
+  },
+  {
+    "prompt": "A mat measures 7 large blocks. Each large block is as long as 2 small blocks. How long is the mat in small blocks?",
+    "correctAnswer": "14",
+    "visual": undefined
+  },
+  {
+    "prompt": "Camp begins on 8 July and ends on 12 July. A student counts both dates and says 5 days between. How many days between the dates?",
+    "correctAnswer": "4",
+    "visual": undefined
+  },
+  {
+    "prompt": "The minute hand points to 9 and the hour hand is nearly at 8. Which time is correct?",
+    "correctAnswer": "Quarter to 8",
+    "visual": undefined,
+    "options": [
+      "Quarter past 8",
+      "Quarter to 8",
+      "Quarter to 7"
+    ]
+  },
+  {
+    "prompt": "A table measures 8 hand spans or 12 pencils. A student says it is longer when measured in pencils. Which correction is best?",
+    "correctAnswer": "Use the same-sized unit before comparing the counts.",
+    "visual": undefined,
+    "options": [
+      "More units always means a longer table.",
+      "The table changed length.",
+      "Use the same-sized unit before comparing the counts."
+    ]
+  }
 ];
+
+const POSTTEST_SPECS: readonly ItemSpec[] = PRETEST_SPECS.map((spec, index) => ({
+  ...spec, ...PARALLEL_POST_VARIANTS[index],
+  contextKey: `post-paired-${index + 1}`, structureKey: `post-paired-${index + 1}`,
+}));
 
 export const YEAR2_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS = PRETEST_SPECS.map((spec, index) => candidate("pretest", index, spec));
 export const YEAR2_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS = POSTTEST_SPECS.map((spec, index) => candidate("posttest", index, spec));

@@ -318,6 +318,7 @@ function workshopQuestion(round: number, target: number, mode: "construct" | "re
       speakText: "Compare both completed shapes. Choose the statement that is true.",
       target,
       shapeLabel: diagram.label,
+    constructionRule: diagram.label === "square" ? "square" : diagram.label === "rectangle" ? "rectangle" : "polygon",
       points: diagram.points,
       secondShape: { label: second.label, points: second.points },
       options: [
@@ -338,6 +339,7 @@ function workshopQuestion(round: number, target: number, mode: "construct" | "re
       : `Find the missing side of the ${diagram.label} and join its two corners.`,
     target,
     shapeLabel: diagram.label,
+    constructionRule: diagram.label === "square" ? "square" : diagram.label === "rectangle" ? "rectangle" : "polygon",
     points: diagram.points,
     missingEdgeIndex: mode === "repair" ? (round + 1) % diagram.points.length : undefined,
     feedback: { correct: "The shape is complete.", wrong: "Follow the outside corners of the shape." },

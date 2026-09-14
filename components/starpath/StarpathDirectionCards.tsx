@@ -287,8 +287,8 @@ export function StarpathDirectionChoiceCard({
   onWrong,
 }: {
   task: DirectionChoiceTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>
@@ -323,7 +323,7 @@ export function StarpathDirectionChoiceCard({
             <button
               key={option.id}
               type="button"
-              onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+              onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
               className="relative flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl border-2 border-violet-200 bg-white px-3 text-indigo-950 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
             >
               <Icon className="h-6 w-6" strokeWidth={2.75} />

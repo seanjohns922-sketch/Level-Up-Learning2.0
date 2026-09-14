@@ -37,14 +37,14 @@ function candidate(form: AssessmentFormKind, index: number, spec: ItemSpec): Can
   const shortForm = form === "pretest" ? "pre" : "post";
   return {
     schemaVersion: 1,
-    id: `y5-number-${shortForm}-${String(index + 1).padStart(2, "0")}-v1`,
-    version: "1.0.0",
+    id: `y5-number-${shortForm}-${String(index + 1).padStart(2, "0")}-v2`,
+    version: "2.0.0",
     realm: "number",
     level: 5,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `number-nexus-level-5-${form}-v1`,
+    bankId: `number-nexus-level-5-${form}-v2`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
@@ -96,7 +96,7 @@ const PRETEST_SPECS: readonly ItemSpec[] = [
   { descriptor: "AC9M5N06", week: 5, lesson: 3, skillId: "correct_product", skillLabel: "Check Multiplication", difficulty: "moderate", cognitiveCategory: "reasoning", responseMode: "constructed_response", misconceptionTags: ["reasonableness-no-reference", "additive-vs-multiplicative"], misconceptionDiagnosis: true, contextKey: "y5-pre-product-correction", structureKey: "y5-pre-correct-reported-product", prompt: "A student wrote 812. Calculate 48 × 19 and enter the correct product.", correctAnswer: "912", type: "numeric", visual: { type: "number_y5_calculation", expression: "48 × 19" } },
   { descriptor: "AC9M5N07", week: 6, lesson: 1, skillId: "division_remainder", skillLabel: "Division with Remainders", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["remainder-context"], contextKey: "y5-pre-division-973-8", structureKey: "y5-pre-enter-remainder", prompt: "Enter the remainder.", correctAnswer: "5", type: "numeric", visual: { type: "number_y5_division", dividend: 973, divisor: 8 } },
   { descriptor: "AC9M5N07", week: 6, lesson: 2, skillId: "interpret_remainder", skillLabel: "Interpret a Remainder", difficulty: "challenging", cognitiveCategory: "transfer", responseMode: "constructed_response", misconceptionTags: ["remainder-context", "additive-vs-multiplicative"], misconceptionDiagnosis: true, contextKey: "y5-pre-book-boxes", structureKey: "y5-pre-enter-containers-needed", prompt: "How many boxes are needed?", correctAnswer: "122", type: "numeric", visual: { type: "number_y5_model", rows: [["Books", "973"], ["Each box holds", "8"]] } },
-  { descriptor: "AC9M5N08", week: 5, lesson: 3, skillId: "multiplication_estimate", skillLabel: "Estimate a Product", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["estimation-vs-exact"], contextKey: "y5-pre-estimate-78-31", structureKey: "y5-pre-enter-rounded-product", prompt: "Use 80 × 30. Enter the estimate.", correctAnswer: "2400", type: "numeric", visual: { type: "number_y5_estimate", expression: "78 × 31" } },
+  { descriptor: "AC9M5N08", week: 5, lesson: 3, skillId: "multiplication_estimate", skillLabel: "Estimate a Product", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["estimation-vs-exact"], contextKey: "y5-pre-estimate-78-31", structureKey: "y5-pre-enter-rounded-product", prompt: "Round each factor to the nearest ten. Enter the estimated product.", correctAnswer: "2400", type: "numeric", visual: { type: "number_y5_estimate", expression: "78 × 31" } },
   { descriptor: "AC9M5N08", week: 2, lesson: 3, skillId: "financial_reasonableness", skillLabel: "Check Financial Reasonableness", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "selected_response", misconceptionTags: ["reasonableness-no-reference", "financial-operation-choice"], misconceptionDiagnosis: true, contextKey: "y5-pre-financial-estimate", structureKey: "y5-pre-judge-trip-estimate", prompt: "A student estimates about $28. Is this reasonable?", correctAnswer: "No. $40 × 7 is about $280.", type: "mcq", options: ["No. $40 × 7 is about $280.", "Yes. $39 is close to $4.", "No. Seven tickets cost less than $39."], visual: { type: "number_y5_receipt", rows: [["Tickets", "7"], ["Price each", "$39"]] } },
   { descriptor: "AC9M5N09", week: 11, lesson: 1, skillId: "financial_model", skillLabel: "Model a Financial Problem", difficulty: "moderate", cognitiveCategory: "application", responseMode: "constructed_response", misconceptionTags: ["operation-story-structure", "financial-operation-choice"], contextKey: "y5-pre-camp-budget", structureKey: "y5-pre-enter-budget-remainder", prompt: "How much of the camp budget remains?", correctAnswer: "158", type: "numeric", visual: { type: "number_y5_budget", budget: 650, items: [["Passes", "8 × $54"], ["Booking fee", "$60"]] } },
   { descriptor: "AC9M5N09", week: 11, lesson: 1, skillId: "transfer_model", skillLabel: "Transfer a Multi-Step Model", difficulty: "challenging", cognitiveCategory: "transfer", responseMode: "constructed_response", misconceptionTags: ["operation-story-structure", "additive-vs-multiplicative"], misconceptionDiagnosis: true, contextKey: "y5-pre-auditorium-capacity", structureKey: "y5-pre-enter-usable-seats", prompt: "How many seats can be used?", correctAnswer: "491", type: "numeric", visual: { type: "number_y5_model", rows: [["Rows", "24"], ["Seats per row", "22"], ["Unavailable", "37"]] } },
@@ -127,5 +127,22 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
   { descriptor: "AC9M5N10", week: 4, lesson: 3, skillId: "build_factor_algorithm", skillLabel: "Build a Number Algorithm", difficulty: "moderate", cognitiveCategory: "application", responseMode: "manipulated_response", misconceptionTags: ["algorithm-step-order", "pattern-rule-vs-example"], contextKey: "y5-post-order-factor-algorithm", structureKey: "y5-post-order-factor-test", prompt: "Order the steps that test whether 8 is a factor.", correctAnswer: "Divide the number by 8.||Check whether the remainder is zero.||State whether 8 is a factor.", type: "number_order", options: ["State whether 8 is a factor.", "Check whether the remainder is zero.", "Divide the number by 8."], visual: { type: "number_y5_algorithm_target", number: 1_064, test: "Is 8 a factor?" } },
 ] as const;
 
+const PAIRED_POST_OVERRIDES: Record<number, Partial<ItemSpec>> = {
+  0:{prompt:"What value does the digit 3 have?",correctAnswer:"0.3",visual:{type:"number_y5_decimal_chart",value:"6.305",focus:"tenths"}},
+  1:{prompt:"Order the decimals from smallest to largest.",correctAnswer:"2.059||2.095||2.5",options:["2.5","2.059","2.095"],visual:{type:"number_y5_decimal_set",values:["2.5","2.059","2.095"]}},
+  2:{prompt:"How many factor pairs does 64 have?",correctAnswer:"4",visual:{type:"number_y5_factor_card",number:64}},
+  3:{prompt:"Is the student's reason correct?",correctAnswer:"No. Being even does not prove divisibility by 4.",type:"mcq",options:["Yes. Every even number is divisible by 4.","No. Being even does not prove divisibility by 4.","No. No three-digit number is divisible by 4."],visual:{type:"number_y5_claim",statement:"354 is divisible by 4 because it is even."}},
+  4:{prompt:"Arrange these fractions from least to greatest.",correctAnswer:"3/8,2/3,3/4",options:["3/4","3/8","2/3"],visual:{type:"number_y5_fraction_set",values:["3/4","3/8","2/3"]}},
+  5:{prompt:"The marker is ?/4. Enter the numerator.",correctAnswer:"7",visual:{type:"number_y5_number_line",min:0,max:2,divisions:8,marker:7}},
+  7:{prompt:"3/5 equals what percentage? Enter the number only.",correctAnswer:"60",type:"numeric",options:undefined,visual:{type:"number_y5_fdp",fraction:"3/5",decimal:null,percent:null}},
+  11:{prompt:"A student wrote 1306. Calculate 67 × 18 and enter the correct product.",correctAnswer:"1206",visual:{type:"number_y5_calculation",expression:"67 × 18"}},
+  14:{prompt:"Round each factor to the nearest ten. Enter the estimated product.",correctAnswer:"3600",visual:{type:"number_y5_estimate",expression:"87 × 42"}},
+  15:{prompt:"A student estimates about $30. Is this reasonable?",correctAnswer:"No. $50 × 6 is about $300.",options:["No. $50 × 6 is about $300.","Yes. $49 is close to $5.","No. Six tickets cost less than $49."],visual:{type:"number_y5_receipt",rows:[["Tickets","6"],["Price each","$49"]]}}
+};
+
 export const YEAR5_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS: readonly CandidateQuestion[] = PRETEST_SPECS.map((spec, index) => candidate("pretest", index, spec));
-export const YEAR5_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS: readonly CandidateQuestion[] = POSTTEST_SPECS.map((spec, index) => candidate("posttest", index, spec));
+export const YEAR5_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS: readonly CandidateQuestion[] = POSTTEST_SPECS.map((spec, index) => candidate("posttest", index, {
+  ...spec, difficulty: PRETEST_SPECS[index]!.difficulty, cognitiveCategory: PRETEST_SPECS[index]!.cognitiveCategory,
+  responseMode: PRETEST_SPECS[index]!.responseMode, ...PAIRED_POST_OVERRIDES[index],
+  ...(PAIRED_POST_OVERRIDES[index] ? { skillId: PRETEST_SPECS[index]!.skillId, skillLabel: PRETEST_SPECS[index]!.skillLabel } : {})
+}));

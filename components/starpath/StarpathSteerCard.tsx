@@ -89,7 +89,7 @@ export function StarpathSteerCard({
   onAssessmentAnswer,
 }: {
   task: SteerTask;
-  onCorrect: () => void;
+  onCorrect: (response?: string) => void;
   onWrong: (studentAnswer?: string) => void;
   editableAssessmentMode?: boolean;
   assessmentAnswer?: string;

@@ -14,6 +14,7 @@ import { getMeasurelandsMisconception } from "./measurelandsMisconceptions";
 
 type MeasurelandsInstructionalLevel = Exclude<MeasurelandsLevel, 0>;
 export type MeasurelandsFormKey =
+  | "0:pretest"
   | "0:posttest"
   | `${MeasurelandsInstructionalLevel}:${MeasurelandsAssessmentKind}`;
 
@@ -68,34 +69,36 @@ export const MEASURELANDS_LEGACY_ARCHIVE = {
 } as const;
 
 const VERY_CHALLENGING_QUOTAS: Record<MeasurelandsFormKey, number> = {
+  "0:pretest": 1,
   "0:posttest": 1,
   "1:pretest": 0,
-  "1:posttest": 1,
+  "1:posttest": 0,
   "2:pretest": 0,
-  "2:posttest": 1,
+  "2:posttest": 0,
   "3:pretest": 1,
-  "3:posttest": 2,
+  "3:posttest": 1,
   "4:pretest": 1,
-  "4:posttest": 2,
-  "5:pretest": 1,
-  "5:posttest": 3,
-  "6:pretest": 2,
+  "4:posttest": 1,
+  "5:pretest": 0,
+  "5:posttest": 0,
+  "6:pretest": 4,
   "6:posttest": 4,
 };
 
 const TRANSFER_QUOTAS: Record<MeasurelandsFormKey, number> = {
+  "0:pretest": 1,
   "0:posttest": 1,
   "1:pretest": 0,
-  "1:posttest": 1,
+  "1:posttest": 0,
   "2:pretest": 0,
-  "2:posttest": 1,
+  "2:posttest": 0,
   "3:pretest": 1,
-  "3:posttest": 2,
+  "3:posttest": 1,
   "4:pretest": 1,
-  "4:posttest": 2,
-  "5:pretest": 1,
-  "5:posttest": 3,
-  "6:pretest": 2,
+  "4:posttest": 1,
+  "5:pretest": 0,
+  "5:posttest": 0,
+  "6:pretest": 4,
   "6:posttest": 4,
 };
 
@@ -114,7 +117,7 @@ export const MEASURELANDS_INDEPENDENT_FORM_STANDARDS: readonly MeasurelandsIndep
         level: blueprint.level,
         yearLabel: blueprint.yearLabel,
         kind: form.kind,
-        bankId: `measurelands-level-${blueprint.level}-${form.kind}-v1`,
+        bankId: `measurelands-level-${blueprint.level}-${form.kind}-v3`,
         questionCount: form.questionCount,
         passPercent: form.passPercent,
         descriptorAllocation: Object.fromEntries(
@@ -136,7 +139,7 @@ export const MEASURELANDS_INDEPENDENT_FORM_STANDARDS: readonly MeasurelandsIndep
         selectedResponseMaximum: form.responseMix.selectedResponseMaximum,
         constructedOrManipulatedMinimum: form.responseMix.constructedOrManipulatedMinimum,
         transferTaskMinimum:
-          form.kind === "posttest" && blueprint.level >= 5 ? 2 : 0,
+          transfer,
         reasoningJustificationMinimum:
           form.kind === "posttest" && blueprint.level >= 5 ? 2 : 0,
         misconceptionDiagnosisMinimum:

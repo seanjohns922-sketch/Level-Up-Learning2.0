@@ -12,7 +12,7 @@ type Task = Extract<PracticeTask, { kind: "statisticaShape" }>;
 // Statistica Level 4 — describe a distribution (AC9M4ST02): where the data is
 // concentrated, its overall shape, and how spread out / variable it is. Two
 // data sets are shown side by side for compare / variation questions.
-export default function StatisticaShapeCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaShapeCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
   const twoSets = Boolean(task.categoriesB);
@@ -25,12 +25,12 @@ export default function StatisticaShapeCard({ task, onCorrect, onWrong }: { task
   function submit() {
     if (settled || !chosen) return;
     setSettled(true);
-    if (task.correctOptionIds.includes(chosen)) onCorrect(); else onWrong(chosen);
+    if (task.correctOptionIds.includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       {twoSets ? (
         <div className="mx-auto flex max-w-2xl flex-col items-stretch gap-3 sm:flex-row">

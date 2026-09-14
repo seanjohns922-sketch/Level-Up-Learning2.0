@@ -1,3 +1,5 @@
+> **14 September implementation update:** Ground now has a pre-test and post-test. The current form counts and response classifications are in `data/assessments/starpathAssessmentBlueprint.ts`; the table below records the earlier design proposal. See [implementation and deployment notes](assessment-rebuild-scope.md) for the revised construction tasks, baseline-only Ground progression and calibration limits. The original claim of 18–19 constructed responses in upper levels overstated their actual interactions and has been corrected.
+
 # Starpath Assessment Blueprint
 
 Status: **Conditionally approved - assessment generation remains blocked**

@@ -142,8 +142,8 @@ function buildFixture(standard: MeasurelandsIndependentFormStandard): Independen
 
 const blueprintIssues = validateMeasurelandsAssessmentBlueprints();
 check(blueprintIssues.length === 0, `Approved blueprint issues: ${blueprintIssues.join(" | ")}`);
-check(MEASURELANDS_INDEPENDENT_FORM_STANDARDS.length === 13, "Expected 13 independent form standards.");
-check(MEASURELANDS_FORM_MIGRATIONS.length === 13, "Expected 13 form migration records.");
+check(MEASURELANDS_INDEPENDENT_FORM_STANDARDS.length === 14, "Expected 14 independent form standards.");
+check(MEASURELANDS_FORM_MIGRATIONS.length === 14, "Expected 14 form migration records.");
 check(
   new Set(MEASURELANDS_MISCONCEPTION_LIBRARY.map((item) => item.id)).size
     === MEASURELANDS_MISCONCEPTION_LIBRARY.length,
@@ -159,7 +159,7 @@ check(
 );
 check(Object.keys(MEASURELANDS_INDEPENDENT_ITEM_BANKS).length === 0, "Phase 1 bank registry must remain empty.");
 check(
-  new Set(MEASURELANDS_INDEPENDENT_FORM_STANDARDS.map((standard) => standard.key)).size === 13,
+  new Set(MEASURELANDS_INDEPENDENT_FORM_STANDARDS.map((standard) => standard.key)).size === 14,
   "Independent form keys must be unique.",
 );
 
@@ -273,7 +273,7 @@ for (const standard of MEASURELANDS_INDEPENDENT_FORM_STANDARDS) {
   if (issues.length > 0) productionFailures.push(`${standard.key} ${standard.yearLabel} ${standard.kind}: ${issues.join(" ")}`);
 }
 
-check(productionFailures.length === 0, `Expected all 13 production forms to satisfy independence; found ${productionFailures.length} failures.`);
+check(productionFailures.length === 0, `Expected all 14 production forms to satisfy independence; found ${productionFailures.length} failures.`);
 check(
   MEASURELANDS_FORM_MIGRATIONS.every(
     (migration) => migration.liveStatus === "independent_bank_v1"
@@ -285,7 +285,7 @@ check(
 );
 
 console.log(`Phase 1 architecture checks: ${checksPassed} passed, ${failures.length} failed.`);
-console.log(`Production independent-pool compliance: ${13 - productionFailures.length} passed, ${productionFailures.length} failed.`);
+console.log(`Production independent-pool compliance: ${14 - productionFailures.length} passed, ${productionFailures.length} failed.`);
 for (const failure of productionFailures) console.log(`PRODUCTION FAIL: ${failure}`);
 
 if (failures.length > 0) {

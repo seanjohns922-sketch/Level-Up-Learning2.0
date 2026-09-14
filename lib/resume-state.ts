@@ -18,6 +18,7 @@ export type PretestResumeState = {
   realmId?: ProgressRealmScope;
   index: number;
   answers: Array<string | null>;
+  questionIds?: string[];
   /** Question ids the student tapped "I Don't Know" on (for later analytics). */
   idkResponses: string[];
   /** First time this assessment attempt was started, retained across resumes. */

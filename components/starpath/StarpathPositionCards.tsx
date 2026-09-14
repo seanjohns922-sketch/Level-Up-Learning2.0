@@ -368,8 +368,8 @@ export function StarpathPositionFindCard({
   onWrong,
 }: {
   task: PositionFindTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>
@@ -377,7 +377,7 @@ export function StarpathPositionFindCard({
       <PositionScene
         anchorObject={task.anchorObject}
         placements={task.placements}
-        onTap={(placement) => (placement.id === task.correctId ? onCorrect() : onWrong())}
+        onTap={(placement) => (placement.id === task.correctId ? onCorrect(String(placement.id)) : onWrong(String(placement.id)))}
       />
       <p className="mt-3 text-center text-sm font-semibold text-slate-600">Tap the object the clue describes.</p>
     </div>
@@ -391,8 +391,8 @@ export function StarpathPositionWordCard({
   onWrong,
 }: {
   task: PositionWordTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const placements: Placement[] = [
     { id: "subject", object: task.subjectObject, relation: task.relation, side: task.side },
@@ -406,7 +406,7 @@ export function StarpathPositionWordCard({
           <button
             key={option.id}
             type="button"
-            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
             className="relative flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             <span className="text-xl font-black text-indigo-950">{RELATION_WORD[option.relation]}</span>
@@ -528,8 +528,8 @@ export function StarpathPositionPictureCard({
   onWrong,
 }: {
   task: PositionPictureTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>
@@ -539,7 +539,7 @@ export function StarpathPositionPictureCard({
           <button
             key={option.id}
             type="button"
-            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
             className="group rounded-2xl border-2 border-transparent p-1 transition hover:border-cyan-400 focus:border-cyan-400"
           >
             <PositionScene

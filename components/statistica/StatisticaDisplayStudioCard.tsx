@@ -17,7 +17,7 @@ const DISPLAY_LABELS: Record<DisplayKind, string> = {
 
 export default function StatisticaDisplayStudioCard({ task, onCorrect, onWrong, onContinue }: {
   task: Task;
-  onCorrect: () => void;
+  onCorrect: (response?: string) => void;
   onWrong: (answer?: string) => void;
   onContinue: () => void;
 }) {
@@ -29,7 +29,7 @@ export default function StatisticaDisplayStudioCard({ task, onCorrect, onWrong, 
   if (task.mode === "guide") {
     return (
       <div className="space-y-5">
-        <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+        <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
         <div className="mx-auto max-w-4xl rounded-xl border-2 border-[#b9caaa] bg-[#fffaf0] p-4 shadow-md">
           <p className="text-center text-base font-bold text-[#355444]">{task.purpose}</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
@@ -58,13 +58,13 @@ export default function StatisticaDisplayStudioCard({ task, onCorrect, onWrong, 
     setSettled(true);
     const correct = display === task.correctDisplay
       && (task.mode !== "design" || (titleId === task.correctTitleId && reasonId === task.correctReasonId));
-    if (correct) onCorrect();
-    else onWrong([display, titleId, reasonId].filter(Boolean).join(" | "));
+    if (correct) onCorrect(JSON.stringify({ display, titleId, reasonId }));
+    else onWrong(JSON.stringify({ display, titleId, reasonId }));
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       <div className="mx-auto max-w-4xl rounded-xl border border-[#d6dfce] bg-[#f8fbf5] px-4 py-3 text-center">
         <div className="text-xs font-black uppercase tracking-[0.14em] text-[#6b7f70]">Question to answer</div>

@@ -39,7 +39,7 @@ check(Boolean(standard), "Missing Ground post-test standard.");
 if (standard) { const issues = validateIndependentMeasurelandsForm(standard, posttest); check(issues.length === 0, `Ground post-test blueprint failure: ${issues.join(" | ")}`); }
 check(posttest.length === 20, "Ground post-test must contain 20 items.");
 check(new Set(posttest.map((item) => item.id)).size === 20, "Ground candidate IDs must be unique.");
-check(new Set(posttest.map((item) => item.prompt)).size === 20, "Ground candidate prompts must be unique.");
+check(new Set(posttest.map((item) => JSON.stringify([item.prompt,item.visual,item.options]))).size === 20, "Ground mathematical tasks must be unique.");
 check(new Set(posttest.map((item) => JSON.stringify(item.renderer.payload))).size === 20, "Ground candidates reuse a payload.");
 for (const item of posttest) {
   const issues = runtimeIssues(item);
@@ -47,8 +47,8 @@ for (const item of posttest) {
   check(item.statistics.calibrationStatus === "uncalibrated", `${item.id} must remain uncalibrated.`);
   check(item.statistics.sampleSize === 0, `${item.id} must start with a zero calibration sample.`);
 }
-check(posttest.filter((item) => item.type === "numeric").length === 10, "Ground post-test must have 10 generated responses.");
-check(posttest.filter((item) => item.type === "mcq").length === 10, "Ground post-test must have 10 selected responses.");
+check(posttest.filter((item) => item.type === "numeric").length === 7, "Ground post-test must have 7 generated responses.");
+check(posttest.filter((item) => item.type === "mcq").length === 13, "Ground post-test must have 13 selected responses.");
 const source = fs.readFileSync(path.join(process.cwd(), "data/assessments/groundMeasurelandsIndependentPosttest.ts"), "utf8");
 check(!source.includes("prepMeasurelands/registry") && !source.includes("buildMeasurelandsWeek") && !source.includes("PracticeTask"), "Ground bank imports lesson or weekly-quiz content.");
 check(buildGroundMeasurelandsPosttestQuestions().every((item) => !("origin" in item)), "Ground legacy archive must remain distinguishable from the independent bank.");

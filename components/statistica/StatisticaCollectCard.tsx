@@ -11,7 +11,7 @@ type Task = Extract<PracticeTask, { kind: "statisticaCollect" }>;
 
 // Collect the data: tap each scattered item to gather it into its category's live
 // counter. Once every item is collected, answer a question about the counts.
-export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [collected, setCollected] = useState<Set<string>>(() => new Set());
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
@@ -32,12 +32,12 @@ export default function StatisticaCollectCard({ task, onCorrect, onWrong }: { ta
   function submit() {
     if (settled || !chosen) return;
     setSettled(true);
-    if (task.correctOptionIds.includes(chosen)) onCorrect(); else onWrong(chosen);
+    if (task.correctOptionIds.includes(chosen)) onCorrect(JSON.stringify({ collected: [...collected], chosen })); else onWrong(JSON.stringify({ collected: [...collected], chosen }));
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       {/* live per-category counters */}
       <div className="mx-auto grid max-w-md gap-2" style={{ gridTemplateColumns: `repeat(${task.categories.length}, minmax(0,1fr))` }}>

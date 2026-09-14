@@ -46,19 +46,19 @@ function LineChart({ points, unit, yLabel, color }: { points: Task["points"]; un
   );
 }
 
-export default function StatisticaLineGraphCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaLineGraphCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
 
   function submit() {
     if (settled || !chosen) return;
     setSettled(true);
-    if (task.correctOptionIds.includes(chosen)) onCorrect(); else onWrong(chosen);
+    if (task.correctOptionIds.includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       <LineChart points={task.points} unit={task.unit} yLabel={task.yLabel} color={task.color} />
 

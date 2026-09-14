@@ -15,7 +15,7 @@ type Survey = Task["surveys"][number];
 // the column graph, then analyse your own data set.
 type Step = "choose" | "predict" | "reveal" | "build" | "analyse";
 
-export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaInvestigationCard({ task, onCorrect, onWrong, assessmentMode = false, onAssessmentAnswer }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void; assessmentMode?: boolean; onAssessmentAnswer?: (correct: boolean, response: string) => void }) {
   const [step, setStep] = useState<Step>("choose");
   const [surveyId, setSurveyId] = useState<string | null>(null);
   const [prediction, setPrediction] = useState<string | null>(null);
@@ -24,6 +24,9 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
   const [chosen, setChosen] = useState<string | null>(null);
   const [analysisIndex, setAnalysisIndex] = useState(0);
   const [settled, setSettled] = useState(false);
+
+  const [analysisAnswers, setAnalysisAnswers] = useState<string[]>([]);
+  const [firstBuildCorrect, setFirstBuildCorrect] = useState(false);
 
   const buildStep = task.buildStep ?? 1;
   const survey = useMemo<Survey | null>(() => task.surveys.find((s) => s.id === surveyId) ?? null, [task.surveys, surveyId]);
@@ -34,16 +37,37 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
     setStep("predict");
   }
   function addBar(i: number, delta: number) {
-    setBuilt((b) => b.map((v, j) => (j === i ? Math.max(0, Math.min(survey!.categories[j]!.count + buildStep, v + delta)) : v)));
+    setBuilt((b) => b.map((v, j) => (j === i ? Math.max(0, Math.min(Math.max(...survey!.categories.map(c => c.count)) + buildStep * 3, v + delta)) : v)));
   }
+  const sourceTable = survey ? <table className="mx-auto w-full max-w-lg rounded-lg border border-[#b9caaa] bg-white text-[#244531]">
+    <caption className="p-2 font-bold">Recorded survey data</caption>
+    <thead><tr><th scope="col" className="px-3 py-2 text-left">Category</th><th scope="col" className="px-3 py-2 text-right">Count</th></tr></thead>
+    <tbody>{survey.categories.map(category => <tr key={category.label}><th scope="row" className="px-3 py-2 text-left font-normal">{category.label}</th><td className="px-3 py-2 text-right">{category.count}</td></tr>)}</tbody>
+  </table> : null;
   const buildMatches = Boolean(survey) && survey!.categories.every((c, i) => built[i] === c.count);
   function checkBuild() {
+    if (assessmentMode) {
+      setFirstBuildCorrect(buildMatches);
+      setStep("analyse");
+      return;
+    }
     setBuildTried(true);
     if (buildMatches) setStep("analyse");
   }
   function submitAnalysis() {
     if (settled || !chosen || !survey) return;
     const q = survey.analyses[analysisIndex]!;
+    if (assessmentMode && onAssessmentAnswer) {
+      const answers = [...analysisAnswers, chosen];
+      setAnalysisAnswers(answers);
+      if (analysisIndex + 1 < survey.analyses.length) {
+        setAnalysisIndex(analysisIndex + 1); setChosen(null);
+      } else {
+        setSettled(true);
+        onAssessmentAnswer(firstBuildCorrect && survey.analyses.every((item, i) => item.correctOptionIds.includes(answers[i]!)), JSON.stringify({ surveyId, prediction, built, analysisAnswers: answers }));
+      }
+      return;
+    }
     if (!q.correctOptionIds.includes(chosen)) { setSettled(true); onWrong(chosen); return; }
     if (analysisIndex + 1 < survey.analyses.length) {
       setAnalysisIndex(analysisIndex + 1);
@@ -74,7 +98,7 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
 
       {step === "choose" && (
         <>
-          <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+          <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
           <div className="mx-auto grid max-w-xl gap-2">
             {task.surveys.map((s) => (
               <div key={s.id} className="relative">
@@ -99,7 +123,7 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
 
       {step === "reveal" && survey && (
         <>
-          <TaskHeading prompt="You surveyed the class! Here is what they said." speech={`You surveyed the class. Here is what they said. ${predictionLabel ? `You predicted ${predictionLabel}.` : ""}`} />
+          <TaskHeading prompt="Here are the results from a class survey." speech={`Here are the results from a class survey. ${predictionLabel ? `You predicted ${predictionLabel}.` : ""}`} />
           <div className="mx-auto max-w-sm overflow-hidden rounded-xl border-2 border-[#b9caaa] bg-[#fffaf0]">
             {survey.categories.map((c, i) => (
               <div key={c.id} className={`flex items-center justify-between px-4 py-2.5 ${i > 0 ? "border-t border-[#e2ddce]" : ""}`}>
@@ -117,6 +141,7 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
       {step === "build" && survey && (
         <>
           <TaskHeading prompt={`Build the column graph to match your ${survey.unit} data.`} speech={`Build the column graph so each bar matches the data. ${buildStep > 1 ? `Each tap is worth ${buildStep}.` : ""}`} />
+          {assessmentMode ? sourceTable : null}
           <StatisticaPlot
             categories={survey.categories}
             display="columns"
@@ -124,7 +149,7 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
             labelReadAloud={false}
             footer={(cat, i) => (
               <>
-                <div className={`mt-1 text-[11px] font-black ${built[i] === cat.count ? "text-emerald-300" : "text-amber-300"}`}>aim {cat.count}</div>
+                {!assessmentMode && <div className={`mt-1 text-[11px] font-black ${built[i] === cat.count ? "text-emerald-300" : "text-amber-300"}`}>aim {cat.count}</div>}
                 <div className="mt-1 flex gap-1">
                   <button type="button" onClick={() => addBar(i, -buildStep)} aria-label={`remove ${buildStep} from ${cat.label}`} className="grid h-7 w-7 place-items-center rounded-md border border-white/15 bg-white/5 text-white/70 transition hover:bg-white/10"><Minus className="h-3.5 w-3.5" /></button>
                   <button type="button" onClick={() => addBar(i, buildStep)} aria-label={`add ${buildStep} to ${cat.label}`} className="grid h-7 w-10 place-items-center rounded-md border border-[#f2bc45]/55 bg-[#f2bc45]/15 text-base font-black text-[#fff0c7] transition hover:bg-[#f2bc45]/25">{buildStep > 1 ? `+${buildStep}` : "+"}</button>
@@ -136,18 +161,19 @@ export default function StatisticaInvestigationCard({ task, onCorrect, onWrong }
             <p className="text-center text-sm font-bold text-[#c74f4b]">Not yet — make each bar reach its aim.</p>
           )}
           <div className="flex justify-center">
-            <button type="button" onClick={checkBuild} className="flex h-12 items-center gap-2 rounded-lg bg-[#c74f4b] px-7 font-black text-white shadow-md transition hover:bg-[#a93f3c] active:scale-95"><Check className="h-5 w-5" /> Check graph</button>
+            <button type="button" onClick={checkBuild} className="flex h-12 items-center gap-2 rounded-lg bg-[#c74f4b] px-7 font-black text-white shadow-md transition hover:bg-[#a93f3c] active:scale-95"><Check className="h-5 w-5" /> {assessmentMode ? "Submit graph" : "Check graph"}</button>
           </div>
         </>
       )}
 
       {step === "analyse" && survey && (() => {
-        const q = survey.analyses[analysisIndex]!;
+        const authored = survey.analyses[analysisIndex]!;
+        const q = assessmentMode ? { ...authored, prompt: authored.prompt.replace(/graph/gi, "data") } : authored;
         return (
         <>
           <p className="text-center text-[11px] font-black uppercase tracking-[0.14em] text-[#c74f4b]">Question {analysisIndex + 1} of {survey.analyses.length}</p>
-          <TaskHeading prompt={q.prompt} speech={`${q.prompt}. ${q.speak}`} />
-          <StatisticaPlot categories={survey.categories} display="columns" labelReadAloud={false} />
+          <TaskHeading prompt={q.prompt} speech={assessmentMode ? q.prompt : `${q.prompt}. ${q.speak}`} />
+          {assessmentMode ? sourceTable : <StatisticaPlot categories={survey.categories} display="columns" labelReadAloud={false} />}
           <div className="mx-auto grid max-w-lg gap-2">
             {q.options.map((option) => (
               <div key={option.id} className="relative">

@@ -91,8 +91,8 @@ export function createUnplacedStarpathPlacement(input: {
 
 export function deriveStarpathShellState(placement: StarpathPlacement): StarpathShellState {
   if (!placement.workingLevel || placement.status === "unplaced") return "unplaced";
-  if (isGroundStarpathLevel(placement.workingLevel)) return "ground-level";
   if (placement.status === "pre_test_required") return "pre-test-required";
+  if (isGroundStarpathLevel(placement.workingLevel)) return "ground-level";
   if (placement.status === "level_complete" || placement.levelComplete) return "level-complete";
   if (placement.status === "program_ready") return "program-ready";
   return "teacher-assigned";
@@ -101,9 +101,7 @@ export function deriveStarpathShellState(placement: StarpathPlacement): Starpath
 export function validateStarpathTeacherPlacement(command: StarpathTeacherPlacementCommand) {
   if (command.realmId !== STARPATH_REALM_ID) throw new Error("Starpath placement requires realm_id=space");
   if (!command.studentId.trim()) throw new Error("Starpath placement requires a student ID");
-  if (isGroundStarpathLevel(command.workingLevel) && command.entryMode === "pre_test") {
-    throw new Error("Ground Level does not use a Starpath pre-test");
-  }
+
   return command;
 }
 

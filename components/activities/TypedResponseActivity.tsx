@@ -1607,7 +1607,7 @@ export default function TypedResponseActivity({
   assessmentMode = false,
 }: {
   questionData: TypedResponseQuestion;
-  onCorrect?: () => void;
+  onCorrect?: (response?: string) => void;
   onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
   realmId?: string;
@@ -2116,14 +2116,14 @@ export default function TypedResponseActivity({
 
       if (currentColumn === 0) {
         setGuidedPhase("done");
-        onCorrect?.();
+        onCorrect?.(typed);
         return;
       }
 
       const nextColumn = getPreviousEditableWrittenMethodColumn(writtenMethod, currentColumn);
       if (nextColumn < 0) {
         setGuidedPhase("done");
-        onCorrect?.();
+        onCorrect?.(typed);
         return;
       }
 
@@ -2149,7 +2149,7 @@ export default function TypedResponseActivity({
 
     if (currentColumn === 0) {
       setGuidedPhase("done");
-      onCorrect?.();
+      onCorrect?.(typed);
       return;
     }
 
@@ -2230,7 +2230,7 @@ export default function TypedResponseActivity({
         normalizedPercent === expectedPercent.replace("%", "");
 
       if (decimalMatches && percentMatches) {
-        onCorrect?.();
+        onCorrect?.(typed);
       } else {
         onWrong?.(typed);
       }
@@ -2242,7 +2242,7 @@ export default function TypedResponseActivity({
         normalizeNumberInput(buildGroupsRemainder) === String(questionData.visual.remainder);
       if (remainderMatches) {
         setBuildGroupsFeedback("");
-        onCorrect?.();
+        onCorrect?.(typed);
       } else {
         setBuildGroupsFeedback(
           `Reveal the groups until the next multiple is too large, then type what is left.`
@@ -2266,7 +2266,7 @@ export default function TypedResponseActivity({
 
       if (quotientMatches && remainderMatches && checkQuotientMatches && checkRemainderMatches && checkTotalMatches) {
         setDivisionCheckFeedback(`Correct! ${dividend} = ${dividend}`);
-        onCorrect?.();
+        onCorrect?.(typed);
       } else {
         setDivisionCheckFeedback(`That doesn't match ${dividend}. Try again.`);
         onWrong?.(typed);
@@ -2298,7 +2298,7 @@ export default function TypedResponseActivity({
                 ? "Correct answer. Now reflect on how your strategy worked for you."
                 : "Correct answer."
           );
-          if (!requiresReflection) onCorrect?.();
+          if (!requiresReflection) onCorrect?.(typed);
           return;
         }
 
@@ -2316,7 +2316,7 @@ export default function TypedResponseActivity({
       }
 
       setOwnershipFeedback("");
-      onCorrect?.();
+      onCorrect?.(typed);
       return;
     }
 
@@ -2404,7 +2404,7 @@ export default function TypedResponseActivity({
       }
 
       setStrategyFeedback("");
-      onCorrect?.();
+      onCorrect?.(typed);
       return;
     }
 
@@ -2470,7 +2470,7 @@ export default function TypedResponseActivity({
         if (normalizeNumberInput(columnChartInputs.total) === String(expected.total)) {
           setMultiplicationFeedback("");
           setMultiplicationStep("done");
-          onCorrect?.();
+          onCorrect?.(typed);
         } else {
           setMultiplicationFeedback("Add the rows carefully to find the final total.");
           onWrong?.(typed);
@@ -2489,7 +2489,7 @@ export default function TypedResponseActivity({
 
       if (boxesMatch && totalMatches) {
         setBoxMethodFeedback("");
-        onCorrect?.();
+        onCorrect?.(typed);
       } else {
         setBoxMethodFeedback("Complete each box correctly, then add the totals for the final answer.");
         onWrong?.(typed);
@@ -2510,7 +2510,7 @@ export default function TypedResponseActivity({
         setPercentMethodFeedback("");
         if (percentMethodStep >= stepVisual.steps.length - 1) {
           setPercentMethodStep(stepVisual.steps.length);
-          onCorrect?.();
+          onCorrect?.(typed);
         } else {
           setPercentMethodStep((current) => current + 1);
         }
@@ -2564,7 +2564,7 @@ export default function TypedResponseActivity({
         ) {
           setRelatedDenominatorFeedback("");
           setRelatedDenominatorStep("done");
-          onCorrect?.();
+          onCorrect?.(typed);
         } else {
           setRelatedDenominatorFeedback(
             sameDenominatorOperationVisual.operation === "+"
@@ -2625,7 +2625,7 @@ export default function TypedResponseActivity({
       });
 
       if (matchesAcceptedFraction) {
-        onCorrect?.();
+        onCorrect?.(typed);
       } else {
         onWrong?.(typed);
       }
@@ -2645,7 +2645,7 @@ export default function TypedResponseActivity({
       });
 
       if (matchesAcceptedFraction) {
-        onCorrect?.();
+        onCorrect?.(typed);
       } else {
         onWrong?.(typed);
       }
@@ -2655,7 +2655,7 @@ export default function TypedResponseActivity({
     if (isEquivalentFractionInput && equivalentFractionInputVisual) {
       const normalizedTyped = normalizeNumberInput(typed);
       if (acceptedAnswerList.some((answerOption) => normalizedTyped === String(answerOption))) {
-        onCorrect?.();
+        onCorrect?.(typed);
       } else {
         onWrong?.(typed);
       }
@@ -2664,7 +2664,7 @@ export default function TypedResponseActivity({
 
     if (isNumericInputOnly) {
       if (acceptedAnswerList.some((answerOption) => numericInputsMatch(typed, answerOption))) {
-        onCorrect?.();
+        onCorrect?.(typed);
       } else {
         onWrong?.(typed);
       }
@@ -2698,7 +2698,7 @@ export default function TypedResponseActivity({
         return value === normalizedOption || isEquivalentNumberSequence(typed, answerOption);
       });
     if (matchesAcceptedAnswer) {
-      onCorrect?.();
+      onCorrect?.(typed);
     } else {
       onWrong?.(typed);
     }

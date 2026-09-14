@@ -127,8 +127,8 @@ export function StarpathFinishPictureCard({
   onWrong,
 }: {
   task: FinishPictureTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const dragStart = useRef<{ x: number; y: number } | null>(null);
   const suppressClick = useRef(false);
@@ -138,7 +138,7 @@ export function StarpathFinishPictureCard({
   const visibleIds = object.pieces.filter((item) => item.id !== task.missingPieceId).map((item) => item.id);
 
   function choose(optionId: string) {
-    if (optionId === task.correctOptionId) onCorrect();
+    if (optionId === task.correctOptionId) onCorrect(optionId);
     else onWrong();
   }
 
@@ -209,8 +209,8 @@ export function StarpathShapeBuilderCard({
   onWrong,
 }: {
   task: ShapeBuilderTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const [placed, setPlaced] = useState<string[]>([]);
   const object = getBuildObject(task.objectId);
@@ -279,8 +279,8 @@ export function StarpathBuildShapeIdentifyCard({
   onWrong,
 }: {
   task: BuildShapeIdentifyTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -325,8 +325,8 @@ function ObjectOptions({
 }: {
   options: Array<{ id: string; objectId: string }>;
   correctOptionId: string;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -336,7 +336,7 @@ function ObjectOptions({
           <button
             key={option.id}
             type="button"
-            onClick={() => option.id === correctOptionId ? onCorrect() : onWrong()}
+            onClick={() => option.id === correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id))}
             className="relative flex min-h-56 flex-col items-center justify-center rounded-xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             <OptionReadAloudButton text={object.label} className="absolute right-3 top-3" />
@@ -355,8 +355,8 @@ export function StarpathBuildMatchCard({
   onWrong,
 }: {
   task: BuildMatchTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>
@@ -376,8 +376,8 @@ export function StarpathSpaceMuseumCard({
   onWrong,
 }: {
   task: SpaceMuseumTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>

@@ -11,7 +11,7 @@ type Task = Extract<PracticeTask, { kind: "statisticaGraph" }>;
 
 // One-to-one displays (objects), picture graphs and column graphs. build = fill
 // each column to its target; read/compare/claim = answer about the display.
-export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const isBuild = task.mode === "build";
   const buildStep = task.buildStep ?? 1;
   const rows = Math.max(1, ...task.categories.map((c) => c.count));
@@ -27,17 +27,17 @@ export default function StatisticaGraphCard({ task, onCorrect, onWrong }: { task
     if (settled) return;
     setSettled(true);
     const ok = task.categories.every((c, i) => built[i] === c.count);
-    if (ok) onCorrect(); else onWrong(built.join(","));
+    if (ok) onCorrect(JSON.stringify(built)); else onWrong(built.join(","));
   }
   function submitOption() {
     if (settled || !chosen) return;
     setSettled(true);
-    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(); else onWrong(chosen);
+    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       {isBuild && task.sourceObservations?.length ? (
         <div className="mx-auto max-w-lg rounded-xl border-2 border-[#b9caaa] bg-[#fffaf0] p-3 text-[#244531]">

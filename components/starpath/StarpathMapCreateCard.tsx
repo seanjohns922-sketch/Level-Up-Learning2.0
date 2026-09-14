@@ -11,7 +11,7 @@ import { isStarpathMapCreationValid } from "@/lib/starpath-map-create";
 type MapCreateTask = Extract<PracticeTask, { kind: "starpathMapCreate" }>;
 type Cell = { r: number; c: number };
 
-export function StarpathMapCreateCard({ task, onComplete, onWrong }: { task: MapCreateTask; onComplete: () => void; onWrong: () => void }) {
+export function StarpathMapCreateCard({ task, onComplete, onWrong }: { task: MapCreateTask; onComplete: (response?: string) => void; onWrong: (response?: string) => void }) {
   const [selectedId, setSelectedId] = useState(task.landmarks[0]?.id ?? "");
   const [placements, setPlacements] = useState<Record<string, Cell>>({});
   const cells = useMemo(() => Array.from({ length: task.rows * task.cols }, (_, index) => ({ r: Math.floor(index / task.cols), c: index % task.cols })), [task.cols, task.rows]);
@@ -31,8 +31,8 @@ export function StarpathMapCreateCard({ task, onComplete, onWrong }: { task: Map
   }
 
   function check() {
-    if (isStarpathMapCreationValid(task, placements)) onComplete();
-    else onWrong();
+    if (isStarpathMapCreationValid(task, placements)) onComplete(JSON.stringify(placements));
+    else onWrong(JSON.stringify(placements));
   }
 
   return (

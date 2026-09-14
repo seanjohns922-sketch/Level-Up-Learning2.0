@@ -1231,145 +1231,51 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
   // "?" token is the answer box the student types into. Cards never show the
   // answer. Each week's three lessons have distinct focuses (see level5Seeds).
 
-  // Week 1 — Extended Number Sequences (AC9M5A01).
-  if (week === 1) {
-    const step = pick([4, 6, 7, 8, 9, 12, 15]);
-    const subtract = Math.random() < 0.35;
-    const start = subtract ? rand(90, 145) : rand(18, 65);
-    const values = Array.from({ length: 6 }, (_, index) => start + (subtract ? -1 : 1) * step * index);
-    const rule = `${subtract ? "−" : "+"} ${step}`;
-
+  // Weeks 1–2 — multiplication/division inverse relationships (AC9M5A01).
+  if (week === 1 || week === 2) {
+    const a = pick([6, 7, 8, 9]);
+    const b = pick([11, 12, 13, 14]);
+    const product = a * b;
+    const scale = week === 2 ? 10 : 1;
+    const left = a * scale;
+    const total = product * scale;
+    const known = { tokens: [`${a}`, "×", `${b}`, "=", `${product}`] };
     if (lessonNumber === 1) {
-      const terms = values.slice(0, 5).map(String);
-      terms[4] = "?";
-      if (role === "reasoning") {
-        return mcq(
-          "Which rule continues the sequence?",
-          rule,
-          [`${subtract ? "+" : "−"} ${step}`, `${subtract ? "−" : "+"} ${step + 1}`],
-          "Check that the same change works between every pair of terms.",
-          { type: "pattern_sequence_strip", title: "Extended sequence", terms: values.slice(0, 5).map(String) },
-        );
-      }
-      return typed(
-        "Continue the sequence.",
-        values[4]!,
-        "Use the same additive change each time.",
-        { type: "pattern_sequence_strip", title: "Continue the pattern", terms },
+      if (role === "reasoning") return mcq(
+        `Which division fact checks ${left} × ${b} = ${total}?`,
+        `${total} ÷ ${left} = ${b}`,
+        [`${total} ÷ ${left} = ${left}`, `${left} ÷ ${total} = ${b}`],
+        "Multiplication and division undo each other. Keep the whole and the two factors connected.",
+        promptVisual("Connected facts", [known]),
+      );
+      return typed("Use the known fact to complete the related division.", b,
+        "The product is the whole. Dividing by one factor gives the other factor.",
+        promptVisual("Fact family", [known, { tokens: [`${total}`, "÷", `${left}`, "=", "?"] }]),
       );
     }
-
     if (lessonNumber === 2) {
-      const missingIndex = role === "reasoning" ? 1 : role === "apply_create" ? 3 : 2;
-      const terms = values.slice(0, 5).map((value, index) => index === missingIndex ? "?" : String(value));
-      if (role === "reasoning") {
-        return typed(
-          "Find the earlier missing term.",
-          values[missingIndex]!,
-          "Use neighbouring terms to reason backwards.",
-          { type: "pattern_sequence_strip", title: "Missing term", terms },
-        );
-      }
-      return typed(
-        "Complete the missing term.",
-        values[missingIndex]!,
-        "The same addition or subtraction rule connects every term.",
-        { type: "pattern_sequence_strip", title: "Fill the gap", terms },
+      if (role === "reasoning") return mcq(
+        `Which multiplication checks ${total} ÷ ${b} = ${left}?`,
+        `${left} × ${b} = ${total}`,
+        [`${total} × ${b} = ${left}`, `${left} + ${b} = ${total}`],
+        "Multiply the quotient by the divisor to check the original whole.",
+        promptVisual("Check the inverse", [{ tokens: [`${total}`, "÷", `${b}`, "=", `${left}`] }]),
+      );
+      return typed("Complete the multiplication using the given division fact.", total,
+        "Use the inverse relationship between the division and multiplication facts.",
+        promptVisual("Related multiplication", [{ tokens: [`${total}`, "÷", `${b}`, "=", `${left}`] }, { tokens: [`${left}`, "×", `${b}`, "=", "?"] }]),
       );
     }
-
-    // L3 Explain the Pattern.
-    if (role === "apply_create") {
-      return typed(
-        "Use the rule to find the sixth term.",
-        values[5]!,
-        "Apply the same rule for every transition.",
-        { type: "pattern_sequence_strip", title: `Rule: ${rule}`, terms: values.slice(0, 5).map(String).concat("?") },
-      );
-    }
-    return mcq(
-      "Which statement explains the pattern?",
-      `Every term is ${step} ${subtract ? "less" : "more"} than the term before it`,
-      [`Only the first two terms change by ${step}`, `The terms are multiplied by ${step}`],
-      "Test the statement across the complete sequence.",
-      { type: "pattern_sequence_strip", title: "Explain the pattern", terms: values.slice(0, 5).map(String) },
+    if (role === "reasoning") return mcq(
+      `A student says ${b} ÷ ${total} = ${left}. Which repair belongs to this fact family?`,
+      `${total} ÷ ${b} = ${left}`,
+      [`${total} + ${b} = ${left}`, `${left} ÷ ${b} = ${total}`],
+      "In a division fact, start with the whole and divide by one factor.",
+      promptVisual("Repair the family", [{ tokens: [`${left}`, "×", `${b}`, "=", `${total}`] }]),
     );
-  }
-
-  // Week 2 — Fractions and Decimal Sequences (AC9M5A01).
-  if (week === 2) {
-    if (lessonNumber === 1) {
-      const decimalStart = pick([0.4, 0.75, 1.2, 1.65, 2.25]);
-      const decimalStep = pick([0.15, 0.2, 0.25, 0.4, 0.5]);
-      const decimalValues = Array.from({ length: 6 }, (_, index) => Number((decimalStart + decimalStep * index).toFixed(2)));
-      if (role === "reasoning") {
-        return mcq(
-          "Which rule generates this decimal sequence?",
-          `+ ${decimalStep}`,
-          [`− ${decimalStep}`, `+ ${Number((decimalStep + 0.1).toFixed(2))}`],
-          "Compare consecutive terms.",
-          { type: "pattern_sequence_strip", title: "Decimal steps", terms: decimalValues.slice(0, 5).map(String) },
-        );
-      }
-      return typed(
-        "Continue the decimal sequence.",
-        decimalValues[5]!,
-        "Add the same decimal amount each time.",
-        { type: "pattern_sequence_strip", title: "Decimal sequence", terms: decimalValues.slice(0, 5).map(String).concat("?") },
-      );
-    }
-
-    if (lessonNumber === 2) {
-      const denominator = pick([4, 5, 6, 8, 10]);
-      const numeratorStart = rand(1, denominator);
-      const numeratorStep = pick([1, 2, 3]);
-      const numerators = Array.from({ length: 6 }, (_, index) => numeratorStart + numeratorStep * index);
-      const missingIndex = role === "reasoning" ? 2 : 5;
-      if (role === "reasoning") {
-        return typed(
-          "Find the missing numerator.",
-          numerators[missingIndex]!,
-          "The denominator stays fixed while the numerator changes by a constant amount.",
-          { type: "pattern_sequence_strip", title: "Fraction sequence", terms: numerators.slice(0, 5).map((value, index) => index === missingIndex ? `?/${denominator}` : `${value}/${denominator}`) },
-        );
-      }
-      return typed(
-        "Continue the fraction sequence. Type the missing numerator.",
-        numerators[5]!,
-        "Keep the denominator fixed and continue the numerator pattern.",
-        { type: "pattern_sequence_strip", title: "Fraction steps", terms: numerators.slice(0, 5).map((value) => `${value}/${denominator}`).concat(`?/${denominator}`) },
-      );
-    }
-
-    // L3 Create and Check.
-    const seqStart = rand(10, 35);
-    const seqStep = pick([3, 4, 6, 7, 9]);
-    const correct = Array.from({ length: 5 }, (_, index) => seqStart + seqStep * index);
-    if (role === "apply_create") {
-      return typed(
-        "Use the rule to generate the fifth term.",
-        correct[4]!,
-        "Start at the first term and apply the rule four times.",
-        { type: "pattern_sequence_strip", title: `Start at ${seqStart}; add ${seqStep}`, terms: correct.slice(0, 4).map(String).concat("?") },
-      );
-    }
-    if (role === "reasoning") {
-      const broken = [...correct];
-      broken[3] = broken[3]! + 1;
-      return mcq(
-        "Which term breaks the rule?",
-        String(broken[3]),
-        [String(broken[2]), String(broken[4])],
-        "Check every transition against the stated rule.",
-        { type: "pattern_sequence_strip", title: `Rule: + ${seqStep}`, terms: broken.map(String) },
-      );
-    }
-    return mcq(
-      "Which sequence follows the rule?",
-      correct.join(", "),
-      [[...correct.slice(0, 3), correct[3]! + 1, correct[4]! + 1].join(", "), correct.map((value, index) => value + index).join(", ")],
-      "The rule must work between every pair of terms.",
-      { type: "pattern_sequence_strip", title: `Start at ${seqStart}; add ${seqStep}`, terms: [String(seqStart), "…"] },
+    return typed(`There are ${total} counters, with ${b} in each group. How many groups?`, left,
+      "Use the related multiplication fact to identify how many equal groups make the whole.",
+      promptVisual("Use a fact family", [known, { tokens: ["?", "×", `${b}`, "=", `${total}`] }]),
     );
   }
 
@@ -1757,7 +1663,7 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
     );
   }
 
-  // Week 7 — Factors, Multiples and Constraints (AC9M5A02, AC9M5A03).
+  // Week 7 — Factors, Multiples and Constraints (AC9M5A02, AC9M5N10).
   if (week === 7) {
     if (lessonNumber === 1) {
       // Use Factor Clues.
@@ -1887,7 +1793,7 @@ function year5Question(week: number, lessonNumber: number, role: RotationRole): 
     );
   }
 
-  // Week 8 — Multiplicative Mystery (AC9M5A02, AC9M5A03): integrate inverse,
+  // Week 8 — Multiplicative Mystery (AC9M5A02, AC9M5N10): integrate inverse,
   // property and equivalence reasoning across a connected investigation.
   if (week === 8) {
     const a = rand(4, 10);

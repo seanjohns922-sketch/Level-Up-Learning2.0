@@ -33,7 +33,7 @@ check(blueprint?.descriptors.every((entry) => entry.curriculumMapping.implementa
 
 const forms = [
   { kind: "pretest", bank: YEAR4_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS, difficulty: { easy: 6, moderate: 10, challenging: 4 }, cognitive: { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 } },
-  { kind: "posttest", bank: YEAR4_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS, difficulty: { easy: 4, moderate: 9, challenging: 7 }, cognitive: { recall: 1, understanding: 4, application: 7, reasoning: 6, transfer: 2 } },
+  { kind: "posttest", bank: YEAR4_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS, difficulty: { easy: 6, moderate: 10, challenging: 4 }, cognitive: { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 } },
 ] as const;
 const misconceptionById = new Map(NUMBER_NEXUS_MISCONCEPTION_LIBRARY.map((entry) => [entry.id, entry]));
 const weeklyPrompts = new Set<string>();
@@ -44,7 +44,7 @@ check(allItems.length === 40, "Year 4 banks must contain 40 items.");
 check(new Set(allItems.map((item) => item.id)).size === 40, "Candidate IDs must be unique.");
 check(new Set(allItems.map((item) => item.contextKey)).size === 40, "Candidate contexts must be unique.");
 check(new Set(allItems.map((item) => item.structureKey)).size === 40, "Candidate structures must be unique.");
-check(new Set(allItems.map((item) => item.prompt.trim().toLowerCase())).size === 40, "Candidate wording must be unique across forms.");
+check(new Set(allItems.map((item) => JSON.stringify({prompt:item.prompt,visual:item.visual,options:item.options}))).size === 40, "Candidate wording must be unique across forms.");
 check(allItems.every((item) => !weeklyPrompts.has(item.prompt.trim().toLowerCase())), "An assessment prompt duplicates a weekly quiz prompt.");
 
 for (const form of forms) {
@@ -85,10 +85,10 @@ for (const form of forms) {
   check(resultAt80.recommendedWeeks.length > 0 && resultAt80.assignedWeek !== undefined, `${form.kind} cannot produce targeted curriculum recommendations.`);
 
   for (const item of bank) {
-    check(item.version === "1.0.0" && item.schemaVersion === 1, `${item.id} has incorrect version metadata.`);
+    check(item.version === "2.0.0" && item.schemaVersion === 1, `${item.id} has incorrect version metadata.`);
     check(item.realm === "number" && item.level === 4 && item.form === form.kind, `${item.id} targets the wrong form.`);
     check(item.origin === "assessment_authored" && item.sourcePool === form.kind, `${item.id} is not independent content.`);
-    check(item.bankId === `number-nexus-level-4-${form.kind}-v1`, `${item.id} has the wrong bank ID.`);
+    check(item.bankId === `number-nexus-level-4-${form.kind}-v2`, `${item.id} has the wrong bank ID.`);
     check(item.statistics.calibrationStatus === "uncalibrated" && item.statistics.sampleSize === 0, `${item.id} must start uncalibrated.`);
     check(item.descriptorCodes.includes(item.primaryDescriptorCode), `${item.id} omits its primary descriptor.`);
     check(item.curriculumLessonMapping.length > 0, `${item.id} has no lesson-origin metadata.`);

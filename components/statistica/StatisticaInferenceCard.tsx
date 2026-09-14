@@ -11,19 +11,19 @@ type Task = Extract<PracticeTask, { kind: "statisticaInference" }>;
 
 // Read a data display, then choose the conclusion the data actually supports
 // (Year 3 "make inferences in context").
-export default function StatisticaInferenceCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaInferenceCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
 
   function submit() {
     if (settled || !chosen) return;
     setSettled(true);
-    if (task.correctOptionIds.includes(chosen)) onCorrect(); else onWrong(chosen);
+    if (task.correctOptionIds.includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       <StatisticaPlot categories={task.categories} display={task.display} />
 

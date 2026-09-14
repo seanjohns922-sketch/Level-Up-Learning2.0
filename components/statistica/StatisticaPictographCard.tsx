@@ -33,7 +33,7 @@ function symbolsFor(value: number, keyUnits: number) {
 // Statistica Level 4 — many-to-one pictographs with a KEY (AC9M4ST01). Each
 // symbol stands for keyUnits data points, so children multiply (and read half
 // symbols) instead of counting one-to-one.
-export default function StatisticaPictographCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaPictographCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const isBuild = task.mode === "build";
   const [chosen, setChosen] = useState<string | null>(null);
   const [built, setBuilt] = useState<number[]>(() => task.categories.map(() => 0));
@@ -52,17 +52,17 @@ export default function StatisticaPictographCard({ task, onCorrect, onWrong }: {
     if (isBuild) {
       setSettled(true);
       const ok = task.categories.every((_, i) => built[i] === targetSymbols[i]);
-      if (ok) onCorrect(); else onWrong(built.join(","));
+      if (ok) onCorrect(JSON.stringify(built)); else onWrong(built.join(","));
       return;
     }
     if (!chosen) return;
     setSettled(true);
-    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(); else onWrong(chosen);
+    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       {isBuild && task.sourceFrequencies?.length ? (
         <div className="mx-auto max-w-lg overflow-hidden rounded-xl border-2 border-[#b9caaa] bg-[#fffaf0] text-[#244531]">

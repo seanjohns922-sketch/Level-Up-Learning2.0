@@ -40,18 +40,19 @@ type ItemSpec = {
 
 function assessmentItem(form: Form, spec: ItemSpec): AssessmentAuthoredQuestion {
   const number = String(spec.index).padStart(2, "0");
-  const id = `y5-measurement-${form === "pretest" ? "pre" : "post"}-${number}-v2`;
-  const bankId = `measurelands-level-5-${form}-v1`;
+  const id = `y5-measurement-${form === "pretest" ? "pre" : "post"}-${number}-v3`;
+  const bankId = `measurelands-level-5-${form}-v3`;
   const isTransfer = spec.cognitiveCategory === "transfer";
   const requiresReasoning = spec.cognitiveCategory === "reasoning" || isTransfer;
   const prompt = "prompt" in spec.task ? String(spec.task.prompt) : spec.skillLabel;
   const directResponse = spec.directResponse;
   const correctAnswer = directResponse?.correctAnswer ?? CORRECT_TOKEN;
+  const tolerance = (directResponse?.visual as { answerTolerance?: number } | undefined)?.answerTolerance;
 
   return {
     schemaVersion: 1,
     id,
-    version: "1.0.0",
+    version: "3.0.0",
     realm: "measurement",
     level: 5,
     form,
@@ -75,7 +76,7 @@ function assessmentItem(form: Form, spec: ItemSpec): AssessmentAuthoredQuestion 
       ? { type: "numeric_entry", payload: { ...directResponse, sourceTask: spec.task } }
       : { type: spec.task.kind, payload: spec.task },
     scoring: directResponse
-      ? { kind: "exact", correctResponse: directResponse.correctAnswer }
+      ? { kind: tolerance == null ? "exact" : "numeric_tolerance", correctResponse: directResponse.correctAnswer, ...(tolerance == null ? {} : { tolerance }) }
       : { kind: "interaction", correctResponse: CORRECT_TOKEN },
     statistics: createUncalibratedItemStatistics(spec.difficulty),
     type: directResponse ? "numeric" : "measurelandsTask",
@@ -179,7 +180,7 @@ const PRETEST_SPECS: readonly ItemSpec[] = [
       options: [35, 70, 110],
       correctOption: 70,
     },
-    directResponse: { correctAnswer: "70", domain: "angle", visual: { kind: "angle", single: 70 } },
+    directResponse: { correctAnswer: "70", domain: "angle", visual: { kind: "angle", single: 70, answerTolerance: 10 } },
   },
   {
     index: 4,
@@ -285,7 +286,7 @@ const PRETEST_SPECS: readonly ItemSpec[] = [
       options: [56, 90, 124],
       correctOption: 124,
     },
-    directResponse: { correctAnswer: "124", domain: "angle", visual: { kind: "angle", single: 124 } },
+    directResponse: { correctAnswer: "124", domain: "angle", visual: { kind: "protractor", angle: 124, baselineSide: "right" } },
   },
   {
     index: 8,
@@ -561,7 +562,7 @@ const PRETEST_SPECS: readonly ItemSpec[] = [
       ],
       correctReason: "He read the scale that does not begin at zero on the baseline.",
     },
-    directResponse: { correctAnswer: "36", domain: "angle", visual: { kind: "angle", single: 36 } },
+    directResponse: { correctAnswer: "36", domain: "angle", visual: { kind: "protractor", angle: 36, baselineSide: "right" } },
   },
   {
     index: 18,
@@ -649,565 +650,631 @@ const PRETEST_SPECS: readonly ItemSpec[] = [
   },
 ] as const;
 
-const POSTTEST_SPECS: readonly ItemSpec[] = [
+// The post form uses the same operations and interaction demands as its baseline.
+const PARALLEL_POST_VARIANTS: readonly Pick<ItemSpec, "task" | "directResponse">[] = [
   {
-    index: 1,
-    descriptor: "AC9M5M01",
-    week: 1,
-    lesson: 2,
-    skillId: "fit_for_purpose_unit",
-    skillLabel: "Choose a Fit-for-Purpose Unit",
-    difficulty: "easy",
-    cognitiveCategory: "understanding",
-    responseMode: "constructed_response",
-    misconceptionTags: ["inappropriate-metric-unit"],
-    contextKey: "post-bike-frame-tolerance",
-    structureKey: "post-unit-choice-precision-decision",
-    task: {
-      kind: "metricUnit",
-      scene: "accuracyPick",
-      prompt: "A bike frame tube is 32 mm wide. Enter its width in centimetres.",
-      attribute: "length",
-      object: { label: "frame tube", emoji: "🚲", context: "Bike repair workshop" },
-      options: ["mm", "m", "km"],
-      correctOption: "mm",
-    },
-    directResponse: { correctAnswer: "3.2", domain: "metric" },
-  },
-  {
-    index: 2,
-    descriptor: "AC9M5M02",
-    week: 5,
-    lesson: 1,
-    skillId: "choose_area_or_perimeter",
-    skillLabel: "Choose Area or Perimeter",
-    difficulty: "easy",
-    cognitiveCategory: "understanding",
-    responseMode: "constructed_response",
-    misconceptionTags: ["perimeter-vs-area"],
-    contextKey: "post-mural-surface",
-    structureKey: "post-area-decision-surface-coverage",
-    task: {
-      kind: "area",
-      scene: "whichPart",
-      prompt: "A mural wall is 6 m by 4 m. Enter the surface area to be painted in square metres.",
-      cells: rectangleCells(6, 4),
-      gridW: 6,
-      gridH: 4,
-      label: "mural wall",
-      emoji: "🎨",
-      partOptions: [
-        { id: "inside", fillType: "inside" },
-        { id: "edge", fillType: "edge" },
-        { id: "partial", fillType: "partial" },
-      ],
-      correctPartId: "inside",
-    },
-    directResponse: {
-      correctAnswer: "24",
-      domain: "area",
-      visual: { kind: "rectangle", w: 6, h: 4, mode: "area", unit: "m" },
-    },
-  },
-  {
-    index: 3,
-    descriptor: "AC9M5M04",
-    week: 7,
-    lesson: 3,
-    skillId: "estimate_unfamiliar_angle",
-    skillLabel: "Estimate an Unfamiliar Angle",
-    difficulty: "moderate",
-    cognitiveCategory: "application",
-    responseMode: "constructed_response",
-    misconceptionTags: ["angle-arm-length"],
-    contextKey: "post-camera-boom-angle",
-    structureKey: "post-angle-estimate-obtuse",
-    task: {
-      kind: "protractor",
-      scene: "closest",
-      prompt: "Estimate the camera-boom angle to the nearest ten degrees. Enter the number of degrees.",
-      angle: 132,
-      baselineSide: "left",
-      guidance: "none",
-      context: { label: "camera boom", emoji: "🎥" },
-      options: [48, 90, 130],
-      correctOption: 130,
-    },
-    directResponse: { correctAnswer: "130", domain: "angle", visual: { kind: "angle", single: 132 } },
-  },
-  {
-    index: 4,
-    descriptor: "AC9M5M03",
-    week: 6,
-    lesson: 1,
-    skillId: "convert_operating_time",
-    skillLabel: "Convert an Operating Time",
-    difficulty: "moderate",
-    cognitiveCategory: "application",
-    responseMode: "constructed_response",
-    misconceptionTags: ["twelve-vs-twenty-four-hour-time"],
-    contextKey: "post-observatory-opening",
-    structureKey: "post-time-convert-evening-quarter",
-    task: {
-      kind: "time24",
-      scene: "convert",
-      prompt: "The observatory opens at 7:45 pm. Enter the 24-hour time as four digits.",
-      minutes: 19 * 60 + 45,
-      direction: "to24",
-      options: ["07:45", "17:45", "19:45", "21:45"],
-      correctOption: "19:45",
-    },
-    directResponse: { correctAnswer: "1945", domain: "time24" },
-  },
-  {
-    index: 5,
-    descriptor: "AC9M5M01",
-    week: 2,
-    lesson: 2,
-    skillId: "justify_measurement_precision",
-    skillLabel: "Justify Measurement Precision",
-    difficulty: "moderate",
-    cognitiveCategory: "application",
-    responseMode: "constructed_response",
-    misconceptionTags: ["conversion-direction"],
-    contextKey: "post-medicine-volume-precision",
-    structureKey: "post-precision-justify-capacity",
-    task: {
-      kind: "precisionMeasure",
-      scene: "problem",
-      prompt: "A veterinary solution is 1 L 25 mL. Enter its total volume in litres.",
-      attribute: "capacity",
-      valueSmall: 1025,
-      object: { label: "prepared solution", emoji: "🧪", context: "Veterinary clinic" },
-      options: [
-        "The smaller unit records the part left after the whole litre.",
-        "Using millilitres makes the container hold more.",
-        "Litres measure mass while millilitres measure capacity.",
-      ],
-      correctOption: "The smaller unit records the part left after the whole litre.",
-    },
-    directResponse: { correctAnswer: "1.025", domain: "metric" },
-  },
-  {
-    index: 6,
-    descriptor: "AC9M5M02",
-    week: 3,
-    lesson: 3,
-    skillId: "practical_irregular_perimeter",
-    skillLabel: "Solve a Practical Perimeter",
-    difficulty: "moderate",
-    cognitiveCategory: "application",
-    responseMode: "constructed_response",
-    misconceptionTags: ["perimeter-vs-area"],
-    contextKey: "post-wetland-boardwalk",
-    structureKey: "post-irregular-perimeter-problem-choice",
-    task: {
-      kind: "perimeterCalc",
-      scene: "problem",
-      prompt: "A safety rail must follow every outside edge of this wetland platform. Enter the metres needed.",
-      poly: [[0, 0], [10, 0], [10, 4], [7, 4], [7, 7], [0, 7]],
-      sideLabels: [10, 4, 3, 3, 7, 7],
-      unit: "m",
-      theme: "park",
-      shapeName: "wetland platform",
-      perimeter: 34,
-      options: [28, 31, 34],
-      correctNumber: 34,
-      answerUnit: "m",
-    },
-    directResponse: { correctAnswer: "34", domain: "perimeter" },
-  },
-  {
-    index: 7,
-    descriptor: "AC9M5M04",
-    week: 7,
-    lesson: 1,
-    skillId: "construct_angle_independently",
-    skillLabel: "Construct an Angle Independently",
-    difficulty: "moderate",
-    cognitiveCategory: "application",
-    responseMode: "manipulated_response",
-    misconceptionTags: ["protractor-wrong-scale"],
-    contextKey: "post-crane-arm-reading",
-    structureKey: "post-protractor-construct-acute-left-base",
-    task: {
-      kind: "protractor",
-      scene: "construct",
-      prompt: "A crane operator needs a 58° lifting angle from the marked baseline. Construct the angle.",
-      targetDeg: 58,
-      baselineSide: "left",
-      guidance: "none",
-      context: { label: "crane arm", emoji: "🏗️" },
-    },
-  },
-  {
-    index: 8,
-    descriptor: "AC9M5M03",
-    week: 6,
-    lesson: 2,
-    skillId: "match_time_systems",
-    skillLabel: "Match 12-Hour and 24-Hour Time",
-    difficulty: "moderate",
-    cognitiveCategory: "application",
-    responseMode: "constructed_response",
-    misconceptionTags: ["twelve-vs-twenty-four-hour-time"],
-    contextKey: "post-museum-audio-tour",
-    structureKey: "post-time-match-afternoon-quarter-hour",
-    task: {
-      kind: "time24",
-      scene: "match",
-      prompt: "A museum audio tour begins at quarter past two in the afternoon. Enter the 24-hour time as four digits.",
-      minutes: 14 * 60 + 15,
-      options: ["02:15", "12:15", "14:15", "14:50"],
-      correctOption: "14:15",
-    },
-    directResponse: { correctAnswer: "1415", domain: "time24" },
-  },
-  {
-    index: 9,
-    descriptor: "AC9M5M02",
-    week: 4,
-    lesson: 3,
-    skillId: "practical_rectangle_area",
-    skillLabel: "Solve a Practical Area",
-    difficulty: "moderate",
-    cognitiveCategory: "application",
-    responseMode: "constructed_response",
-    misconceptionTags: ["linear-vs-square-units"],
-    contextKey: "post-greenhouse-shade-cloth",
-    structureKey: "post-area-choice-practical-rectangle",
-    task: {
-      kind: "area",
-      scene: "chooseArea",
-      prompt: "A greenhouse roof section is 12 m by 4 m. Enter the shade-cloth area in square metres.",
-      gridW: 12,
-      gridH: 4,
-      areaUnit: "m²",
-      context: "Greenhouse shade cloth",
-      emoji: "🌱",
-      options: [16, 32, 48],
-      correctNumber: 48,
-    },
-    directResponse: {
-      correctAnswer: "48",
-      domain: "area",
-      visual: { kind: "rectangle", w: 12, h: 4, mode: "area", unit: "m" },
-    },
-  },
-  {
-    index: 10,
-    descriptor: "AC9M5M04",
-    week: 7,
-    lesson: 2,
-    skillId: "construct_design_angle",
-    skillLabel: "Construct a Design Angle",
-    difficulty: "moderate",
-    cognitiveCategory: "application",
-    responseMode: "manipulated_response",
-    misconceptionTags: ["protractor-baseline"],
-    contextKey: "post-kite-frame-construction",
-    structureKey: "post-protractor-construct-right-base",
-    task: {
-      kind: "protractor",
-      scene: "construct",
-      prompt: "Construct an 82° joint for the kite frame.",
-      targetDeg: 82,
-      baselineSide: "right",
-      guidance: "none",
-      context: { label: "kite frame", emoji: "🪁" },
-    },
-  },
-  {
-    index: 11,
-    descriptor: "AC9M5M01",
-    week: 2,
-    lesson: 2,
-    skillId: "compare_precise_capacity",
-    skillLabel: "Compare Precise Capacities",
-    difficulty: "moderate",
-    cognitiveCategory: "application",
-    responseMode: "constructed_response",
-    misconceptionTags: ["mixed-unit-comparison"],
-    contextKey: "post-water-sample-capacity",
-    structureKey: "post-precision-compare-capacity",
-    task: {
-      kind: "precisionMeasure",
-      scene: "compareMixed",
-      prompt: "A creek sample holds 1 L 725 mL and a pond sample holds 1 L 805 mL. Enter the difference in millilitres.",
-      attribute: "capacity",
-      pair: {
-        a: { valueSmall: 1725, label: "creek sample", emoji: "💧" },
-        b: { valueSmall: 1805, label: "pond sample", emoji: "🫙" },
+    "task": {
+      "kind": "metricUnit",
+      "scene": "chooseUnit",
+      "prompt": "Which unit is most suitable for the mass of a packed suitcase?",
+      "attribute": "mass",
+      "object": {
+        "label": "suitcase",
+        "emoji": "🧳",
+        "context": "Journey"
       },
-      compareMode: "larger",
-      correctSide: "b",
-    },
-    directResponse: { correctAnswer: "80", domain: "metric" },
-  },
-  {
-    index: 12,
-    descriptor: "AC9M5M02",
-    week: 3,
-    lesson: 3,
-    skillId: "diagnose_internal_edge",
-    skillLabel: "Diagnose a Perimeter Plan",
-    difficulty: "moderate",
-    cognitiveCategory: "reasoning",
-    responseMode: "constructed_response",
-    misconceptionTags: ["perimeter-vs-area"],
-    misconceptionDiagnosis: true,
-    contextKey: "post-playground-fence-error",
-    structureKey: "post-perimeter-diagnosis-internal-edge",
-    task: {
-      kind: "perimeterCalc",
-      scene: "choose",
-      prompt: "Professor Gauge counted an internal edge in this playground plan. Enter the correct outside perimeter in metres.",
-      poly: [[0, 0], [9, 0], [9, 5], [6, 5], [6, 8], [0, 8]],
-      sideLabels: [9, 5, 3, 3, 6, 8],
-      unit: "m",
-      theme: "playground",
-      shapeName: "playground",
-      perimeter: 34,
-      options: [31, 34, 37],
-      correctNumber: 34,
-    },
-    directResponse: { correctAnswer: "34", domain: "perimeter" },
-  },
-  {
-    index: 13,
-    descriptor: "AC9M5M03",
-    week: 6,
-    lesson: 2,
-    skillId: "diagnose_midnight_conversion",
-    skillLabel: "Diagnose Midnight Conversion",
-    difficulty: "challenging",
-    cognitiveCategory: "reasoning",
-    responseMode: "constructed_response",
-    misconceptionTags: ["twelve-vs-twenty-four-hour-time"],
-    misconceptionDiagnosis: true,
-    contextKey: "post-midnight-maintenance",
-    structureKey: "post-time-diagnosis-midnight-minute",
-    task: {
-      kind: "time24",
-      scene: "mistake",
-      prompt: "A maintenance notice writes 12:20 for 12:20 am. Correct it by entering the 24-hour time as four digits.",
-      minutes: 20,
-      statement: "12:20 am becomes 12:20 in 24-hour time.",
-      options: ["00:20", "12:20", "20:00"],
-      correctOption: "00:20",
-    },
-    directResponse: { correctAnswer: "20", domain: "time24" },
-  },
-  {
-    index: 14,
-    descriptor: "AC9M5M04",
-    week: 7,
-    lesson: 3,
-    skillId: "diagnose_protractor_baseline",
-    skillLabel: "Diagnose Protractor Alignment",
-    difficulty: "challenging",
-    cognitiveCategory: "reasoning",
-    responseMode: "constructed_response",
-    misconceptionTags: ["protractor-baseline"],
-    misconceptionDiagnosis: true,
-    contextKey: "post-bridge-joint-error",
-    structureKey: "post-protractor-diagnosis-baseline",
-    task: {
-      kind: "protractor",
-      scene: "mistake",
-      prompt: "A technician started from the wrong protractor scale. Enter the correct bridge-joint angle.",
-      angle: 76,
-      baselineSide: "left",
-      guidance: "none",
-      context: { label: "bridge joint", emoji: "🌉" },
-      statement: "I started reading from 180° because that number was nearest the arm.",
-      reasonOptions: [
-        "The reading must start from 0° on the aligned baseline.",
-        "A bridge angle must always be greater than 90°.",
-        "The longer arm should be measured in centimetres first.",
+      "options": [
+        "cm",
+        "g",
+        "kg",
+        "mL"
       ],
-      correctReason: "The reading must start from 0° on the aligned baseline.",
-    },
-    directResponse: { correctAnswer: "76", domain: "angle", visual: { kind: "angle", single: 76 } },
+      "correctOption": "kg"
+    }
   },
   {
-    index: 15,
-    descriptor: "AC9M5M01",
-    week: 1,
-    lesson: 2,
-    skillId: "justify_precision_choice",
-    skillLabel: "Justify a Precision Choice",
-    difficulty: "challenging",
-    cognitiveCategory: "reasoning",
-    responseMode: "justification",
-    misconceptionTags: ["inappropriate-metric-unit"],
-    contextKey: "post-seedling-growth-record",
-    structureKey: "post-unit-justify-fit-for-purpose",
-    task: {
-      kind: "metricUnit",
-      scene: "justify",
-      prompt: "A scientist records a seedling as 14 cm 6 mm tall. Which reason justifies this precision?",
-      attribute: "length",
-      object: { label: "seedling", emoji: "🌱", context: "Growth study" },
-      reasonOptions: [
-        "Millimetres record the small part beyond the whole centimetres.",
-        "Using two units makes the seedling grow taller.",
-        "Millimetres are used because plants are measured by mass.",
+    "task": {
+      "kind": "perimeterCalc",
+      "scene": "choose",
+      "prompt": "A rectangular pen is 8 m long and 3 m wide. Enter its perimeter in metres.",
+      "poly": [
+        [
+          0,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          0,
+          3
+        ]
       ],
-      correctReason: "Millimetres record the small part beyond the whole centimetres.",
-    },
-  },
-  {
-    index: 16,
-    descriptor: "AC9M5M02",
-    week: 5,
-    lesson: 2,
-    skillId: "diagnose_square_units",
-    skillLabel: "Diagnose an Area Unit Error",
-    difficulty: "challenging",
-    cognitiveCategory: "reasoning",
-    responseMode: "constructed_response",
-    misconceptionTags: ["linear-vs-square-units"],
-    misconceptionDiagnosis: true,
-    contextKey: "post-courtyard-paving-error",
-    structureKey: "post-area-diagnosis-linear-unit",
-    task: {
-      kind: "area",
-      scene: "mistakeDims",
-      prompt: "Professor Gauge wrote 66 m for an 11 m by 6 m courtyard. Enter the numerical area in square metres.",
-      gridW: 11,
-      gridH: 6,
-      areaUnit: "m²",
-      context: "Courtyard paving",
-      emoji: "🧱",
-      statement: "The paving area is 66 m.",
-      reasonOptions: [
-        "Area covers a surface, so the answer needs square metres.",
-        "The dimensions should be added to make 17 metres.",
-        "Metres can only be used for objects shorter than a kilometre.",
+      "sideLabels": [
+        8,
+        3,
+        8,
+        3
       ],
-      correctReason: "Area covers a surface, so the answer needs square metres.",
-    },
-    directResponse: {
-      correctAnswer: "66",
-      domain: "area",
-      visual: { kind: "rectangle", w: 11, h: 6, mode: "area", unit: "m" },
-    },
-  },
-  {
-    index: 17,
-    descriptor: "AC9M5M04",
-    week: 7,
-    lesson: 2,
-    skillId: "transfer_construct_obtuse",
-    skillLabel: "Transfer Angle Construction",
-    difficulty: "challenging",
-    cognitiveCategory: "transfer",
-    responseMode: "manipulated_response",
-    misconceptionTags: ["protractor-baseline"],
-    contextKey: "post-rescue-ramp-design",
-    structureKey: "post-transfer-construct-obtuse-left-base",
-    task: {
-      kind: "protractor",
-      scene: "construct",
-      prompt: "A rescue-training map requires a 137° turn from the marked baseline. Construct the turn.",
-      targetDeg: 137,
-      baselineSide: "left",
-      guidance: "none",
-      context: { label: "rescue route", emoji: "🧭" },
-    },
-  },
-  {
-    index: 18,
-    descriptor: "AC9M5M03",
-    week: 6,
-    lesson: 2,
-    skillId: "justify_time_equivalence",
-    skillLabel: "Justify Equivalent Times",
-    difficulty: "very_challenging",
-    cognitiveCategory: "reasoning",
-    responseMode: "constructed_response",
-    misconceptionTags: ["twelve-vs-twenty-four-hour-time"],
-    contextKey: "post-community-radio-broadcast",
-    structureKey: "post-time-justify-evening-equivalence",
-    task: {
-      kind: "time24",
-      scene: "convert",
-      badgeLabel: "Explain the Match",
-      prompt: "A radio broadcast begins at 6:40 pm. Enter the matching 24-hour time as four digits.",
-      minutes: 18 * 60 + 40,
-      direction: "to12",
-      options: [
-        "18:40 is 6:40 pm because 18 − 12 = 6.",
-        "18:40 is 8:40 pm because 18 − 10 = 8.",
-        "18:40 is 6:40 am because 18 is before midday.",
+      "unit": "m",
+      "theme": "garden",
+      "shapeName": "pen",
+      "perimeter": 22,
+      "options": [
+        11,
+        22,
+        24
       ],
-      correctOption: "18:40 is 6:40 pm because 18 − 12 = 6.",
+      "correctNumber": 22
     },
-    directResponse: { correctAnswer: "1840", domain: "time24" },
+    "directResponse": {
+      "correctAnswer": "22",
+      "domain": "perimeter",
+      "visual": {
+        "kind": "rectangle",
+        "w": 8,
+        "h": 3,
+        "mode": "perimeter",
+        "unit": "m"
+      }
+    }
   },
   {
-    index: 19,
-    descriptor: "AC9M5M02",
-    week: 5,
-    lesson: 3,
-    skillId: "transfer_area_perimeter_design",
-    skillLabel: "Transfer Area and Perimeter",
-    difficulty: "very_challenging",
-    cognitiveCategory: "transfer",
-    responseMode: "constructed_response",
-    misconceptionTags: ["perimeter-vs-area"],
-    contextKey: "post-habitat-design-comparison",
-    structureKey: "post-transfer-same-area-different-perimeter",
-    task: {
-      kind: "area",
-      scene: "investigate",
-      prompt: "Two habitat plans both cover 18 square metres. Plan A is 6 m by 3 m and Plan B is 9 m by 2 m. Enter the difference between their perimeters in metres.",
-      compareShapes: {
-        a: { cells: rectangleCells(6, 3), label: "Plan A", emoji: "🐝", gridW: 6, gridH: 3 },
-        b: { cells: rectangleCells(9, 2), label: "Plan B", emoji: "🦋", gridW: 9, gridH: 2 },
+    "task": {
+      "kind": "protractor",
+      "scene": "estimate",
+      "prompt": "Estimate the camera-support angle in degrees.",
+      "angle": 60,
+      "baselineSide": "right",
+      "guidance": "none",
+      "context": {
+        "label": "camera support",
+        "emoji": "📷"
       },
+      "options": [
+        30,
+        60,
+        100
+      ],
+      "correctOption": 60
     },
-    directResponse: {
-      correctAnswer: "4",
-      domain: "perimeter",
-      visual: { kind: "rectangle", w: 9, h: 2, mode: "perimeter", unit: "m" },
-    },
+    "directResponse": {
+      "correctAnswer": "60",
+      "domain": "angle",
+      "visual": {
+        "kind": "angle",
+        "single": 60,
+        "answerTolerance": 10
+      }
+    }
   },
   {
-    index: 20,
-    descriptor: "AC9M5M04",
-    week: 7,
-    lesson: 3,
-    skillId: "transfer_evaluate_angle",
-    skillLabel: "Evaluate an Angle Decision",
-    difficulty: "very_challenging",
-    cognitiveCategory: "transfer",
-    responseMode: "justification",
-    misconceptionTags: ["protractor-wrong-scale"],
-    contextKey: "post-robot-arm-evaluation",
-    structureKey: "post-transfer-angle-evaluation-scale",
-    task: {
-      kind: "protractor",
-      scene: "mistake",
-      prompt: "A robot arm should turn 142°. Evaluate the technician's 38° reading.",
-      angle: 142,
-      baselineSide: "right",
-      guidance: "none",
-      context: { label: "robot arm", emoji: "🦾" },
-      statement: "The arm turns 38° because that is the first number I saw at the ray.",
-      reasonOptions: [
-        "The baseline starts at 0° on the other scale, giving 142°.",
-        "The two scale readings should be added to make 180° and then halved.",
-        "The arm length changes the required angle from 142° to 38°.",
+    "task": {
+      "kind": "time24",
+      "scene": "convert",
+      "prompt": "The museum closes at 2:00 pm. Enter the 24-hour time as four digits.",
+      "minutes": 840,
+      "direction": "to24",
+      "options": [
+        "02:00",
+        "12:00",
+        "14:00",
+        "22:00"
       ],
-      correctReason: "The baseline starts at 0° on the other scale, giving 142°.",
+      "correctOption": "14:00"
     },
+    "directResponse": {
+      "correctAnswer": "1400",
+      "domain": "time24"
+    }
   },
-] as const;
+  {
+    "task": {
+      "kind": "precisionMeasure",
+      "scene": "readMixed",
+      "prompt": "A ribbon measures 3 m 45 cm. Enter its length in metres.",
+      "attribute": "length",
+      "valueSmall": 345,
+      "object": {
+        "label": "ribbon",
+        "emoji": "🎀",
+        "context": "Craft room"
+      },
+      "options": [
+        "3 m 45 cm",
+        "3 m 54 cm",
+        "345 m"
+      ],
+      "correctOption": "3 m 45 cm"
+    },
+    "directResponse": {
+      "correctAnswer": "3.45",
+      "domain": "metric"
+    }
+  },
+  {
+    "task": {
+      "kind": "area",
+      "scene": "chooseArea",
+      "prompt": "A mural is 7 m by 4 m. Enter its area in square metres.",
+      "gridW": 7,
+      "gridH": 4,
+      "areaUnit": "m²",
+      "context": "Mural",
+      "emoji": "🎨",
+      "options": [
+        11,
+        22,
+        28
+      ],
+      "correctNumber": 28
+    },
+    "directResponse": {
+      "correctAnswer": "28",
+      "domain": "area",
+      "visual": {
+        "kind": "rectangle",
+        "w": 7,
+        "h": 4,
+        "mode": "area",
+        "unit": "m"
+      }
+    }
+  },
+  {
+    "task": {
+      "kind": "protractor",
+      "scene": "read",
+      "prompt": "Read the bridge-brace protractor. Enter the angle in degrees.",
+      "angle": 132,
+      "baselineSide": "right",
+      "guidance": "none",
+      "context": {
+        "label": "bridge brace",
+        "emoji": "🌉"
+      },
+      "options": [
+        48,
+        90,
+        132
+      ],
+      "correctOption": 132
+    },
+    "directResponse": {
+      "correctAnswer": "132",
+      "domain": "angle",
+      "visual": {
+        "kind": "protractor",
+        "angle": 132,
+        "baselineSide": "right"
+      }
+    }
+  },
+  {
+    "task": {
+      "kind": "time24",
+      "scene": "match",
+      "prompt": "The evening concert starts at 8:05 pm. Enter the 24-hour time as four digits.",
+      "minutes": 1205,
+      "options": [
+        "08:05",
+        "18:05",
+        "20:05",
+        "20:50"
+      ],
+      "correctOption": "20:05"
+    },
+    "directResponse": {
+      "correctAnswer": "2005",
+      "domain": "time24"
+    }
+  },
+  {
+    "task": {
+      "kind": "perimeterCalc",
+      "scene": "calc",
+      "prompt": "Find the total boundary length of this park.",
+      "poly": [
+        [
+          0,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          0,
+          7
+        ]
+      ],
+      "sideLabels": [
+        8,
+        4,
+        3,
+        3,
+        5,
+        7
+      ],
+      "unit": "m",
+      "theme": "garden",
+      "shapeName": "park",
+      "perimeter": 30,
+      "answerValue": 30,
+      "answerUnit": "m"
+    }
+  },
+  {
+    "task": {
+      "kind": "protractor",
+      "scene": "construct",
+      "prompt": "Construct a 74° angle for the kite frame.",
+      "targetDeg": 74,
+      "baselineSide": "right",
+      "guidance": "none",
+      "context": {
+        "label": "kite frame",
+        "emoji": "🪁"
+      }
+    }
+  },
+  {
+    "task": {
+      "kind": "metricUnit",
+      "scene": "toolAndUnit",
+      "prompt": "A small bottle contains 0.75 L. Enter the capacity in millilitres.",
+      "attribute": "capacity",
+      "object": {
+        "label": "bottle",
+        "emoji": "🧴",
+        "context": "Art room"
+      },
+      "tools": [
+        {
+          "id": "jug",
+          "label": "measuring jug",
+          "emoji": "🥛"
+        },
+        {
+          "id": "scale",
+          "label": "mass scale",
+          "emoji": "⚖️"
+        },
+        {
+          "id": "tape",
+          "label": "tape measure",
+          "emoji": "📏"
+        }
+      ],
+      "correctTool": "jug",
+      "options": [
+        "mL",
+        "kg",
+        "cm"
+      ],
+      "correctOption": "mL"
+    },
+    "directResponse": {
+      "correctAnswer": "750",
+      "domain": "metric"
+    }
+  },
+  {
+    "task": {
+      "kind": "area",
+      "scene": "chooseArea",
+      "prompt": "A sign is 8 cm by 5 cm. Enter its area in square centimetres.",
+      "gridW": 8,
+      "gridH": 5,
+      "areaUnit": "cm²",
+      "context": "Sign",
+      "emoji": "🪧",
+      "options": [
+        13,
+        26,
+        40
+      ],
+      "correctNumber": 40
+    },
+    "directResponse": {
+      "correctAnswer": "40",
+      "domain": "area",
+      "visual": {
+        "kind": "rectangle",
+        "w": 8,
+        "h": 5,
+        "mode": "area",
+        "unit": "cm"
+      }
+    }
+  },
+  {
+    "task": {
+      "kind": "time24",
+      "scene": "mistake",
+      "prompt": "A notice writes 12:00 for midnight. Enter the correct 24-hour time as four digits.",
+      "minutes": 0,
+      "statement": "Midnight is 12:00.",
+      "options": [
+        "00:00",
+        "12:00",
+        "22:00"
+      ],
+      "correctOption": "00:00"
+    },
+    "directResponse": {
+      "correctAnswer": "0000",
+      "domain": "time24"
+    }
+  },
+  {
+    "task": {
+      "kind": "protractor",
+      "scene": "whichScale",
+      "prompt": "The hatch hinge starts from the left baseline. Which reading is correct?",
+      "angle": 48,
+      "baselineSide": "left",
+      "guidance": "none",
+      "context": {
+        "label": "hatch hinge",
+        "emoji": "🚪"
+      },
+      "options": [
+        48,
+        90,
+        132
+      ],
+      "correctOption": 48
+    }
+  },
+  {
+    "task": {
+      "kind": "precisionMeasure",
+      "scene": "compareMixed",
+      "prompt": "A sand sample is 1 kg 560 g and a soil sample is 1 kg 480 g. Enter the difference in grams.",
+      "attribute": "mass",
+      "pair": {
+        "a": {
+          "valueSmall": 1560,
+          "label": "sand",
+          "emoji": "🏖️"
+        },
+        "b": {
+          "valueSmall": 1480,
+          "label": "soil",
+          "emoji": "🪨"
+        }
+      },
+      "compareMode": "larger",
+      "correctSide": "a"
+    },
+    "directResponse": {
+      "correctAnswer": "80",
+      "domain": "metric"
+    }
+  },
+  {
+    "task": {
+      "kind": "perimeterCalc",
+      "scene": "choose",
+      "prompt": "A student missed an outside edge of this enclosure. Enter the correct perimeter in metres.",
+      "poly": [
+        [
+          0,
+          0
+        ],
+        [
+          9,
+          0
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          0,
+          6
+        ]
+      ],
+      "sideLabels": [
+        9,
+        2,
+        4,
+        4,
+        5,
+        6
+      ],
+      "unit": "m",
+      "theme": "paddock",
+      "shapeName": "enclosure",
+      "perimeter": 30,
+      "options": [
+        24,
+        27,
+        30
+      ],
+      "correctNumber": 30
+    },
+    "directResponse": {
+      "correctAnswer": "30",
+      "domain": "perimeter",
+      "visual": {
+        "kind": "perimeterShape",
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            9,
+            0
+          ],
+          [
+            9,
+            2
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            0,
+            6
+          ]
+        ],
+        "sideLabels": [
+          9,
+          2,
+          4,
+          4,
+          5,
+          6
+        ],
+        "unit": "m"
+      }
+    }
+  },
+  {
+    "task": {
+      "kind": "protractor",
+      "scene": "mistake",
+      "prompt": "A student read the wrong protractor scale and wrote 142°. Enter the correct ramp angle.",
+      "angle": 38,
+      "baselineSide": "right",
+      "guidance": "none",
+      "context": {
+        "label": "ramp",
+        "emoji": "♿"
+      },
+      "statement": "The angle is 142°.",
+      "reasonOptions": [
+        "He read the scale that does not begin at zero on the baseline.",
+        "He should add 90° because the ramp rises.",
+        "The arm is too short to measure the angle."
+      ],
+      "correctReason": "He read the scale that does not begin at zero on the baseline."
+    },
+    "directResponse": {
+      "correctAnswer": "38",
+      "domain": "angle",
+      "visual": {
+        "kind": "protractor",
+        "angle": 38,
+        "baselineSide": "right"
+      }
+    }
+  },
+  {
+    "task": {
+      "kind": "time24",
+      "scene": "convert",
+      "prompt": "A radio program begins at 9:45 pm. Enter the matching 24-hour time as four digits.",
+      "minutes": 1305,
+      "direction": "to24",
+      "options": [
+        "09:45",
+        "19:45",
+        "21:45",
+        "21:54"
+      ],
+      "correctOption": "21:45"
+    },
+    "directResponse": {
+      "correctAnswer": "2145",
+      "domain": "time24"
+    }
+  },
+  {
+    "task": {
+      "kind": "area",
+      "scene": "mistakeDims",
+      "prompt": "A student used perimeter for an 8 m by 4 m carpet. Enter its correct area in square metres.",
+      "gridW": 8,
+      "gridH": 4,
+      "areaUnit": "m²",
+      "context": "Carpet",
+      "emoji": "🏫",
+      "statement": "The carpet area is 8 + 4 + 8 + 4 = 24 square metres.",
+      "reasonOptions": [
+        "He calculated perimeter instead of area.",
+        "He should change metres into centimetres first.",
+        "He counted the width twice but not the length."
+      ],
+      "correctReason": "He calculated perimeter instead of area."
+    },
+    "directResponse": {
+      "correctAnswer": "32",
+      "domain": "area",
+      "visual": {
+        "kind": "rectangle",
+        "w": 8,
+        "h": 4,
+        "mode": "area",
+        "unit": "m"
+      }
+    }
+  },
+  {
+    "task": {
+      "kind": "protractor",
+      "scene": "construct",
+      "prompt": "A robot arm must turn 123° from its baseline. Construct the angle.",
+      "targetDeg": 123,
+      "baselineSide": "right",
+      "guidance": "none",
+      "context": {
+        "label": "robot arm",
+        "emoji": "🦾"
+      }
+    }
+  }
+];
+const POSTTEST_SPECS: readonly ItemSpec[] = PRETEST_SPECS.map((spec,index) => ({ ...spec, ...PARALLEL_POST_VARIANTS[index], contextKey: `post-paired-${index+1}`, structureKey: `post-paired-${index+1}` }));
+
+function withIndependentReasoning(spec: ItemSpec): ItemSpec {
+  if (spec.index === 20) return { ...spec, difficulty: "challenging", cognitiveCategory: "application" };
+  if (![15, 19].includes(spec.index) || !spec.directResponse) return spec;
+  const difference = spec.index === 15;
+  const reasonOptions = difference
+    ? ["Subtract the gram parts and then add the kilogram parts.", "Express both masses in grams and subtract to find the difference.", "Add the two masses to find how much heavier one is."]
+    : ["Multiply the length by the width to count the square units covering the surface.", "Add all boundary lengths to find the surface area.", "Double the length and ignore the width."];
+  return { ...spec, cognitiveCategory: "reasoning", responseMode: "justification",
+    directResponse: { ...spec.directResponse, correctAnswer: `${spec.directResponse.correctAnswer}||${difference ? 2 : 1}`,
+      visual: { ...(spec.directResponse.visual as Record<string, unknown> | undefined), reasonOptions } },
+  };
+}
 
 export const YEAR5_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS: readonly AssessmentAuthoredQuestion[] =
-  PRETEST_SPECS.map((spec) => assessmentItem("pretest", spec));
+  PRETEST_SPECS.map((spec) => assessmentItem("pretest", withIndependentReasoning(spec)));
 
 export const YEAR5_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS: readonly AssessmentAuthoredQuestion[] =
-  POSTTEST_SPECS.map((spec) => assessmentItem("posttest", spec));
+  POSTTEST_SPECS.map((spec) => assessmentItem("posttest", withIndependentReasoning(spec)));

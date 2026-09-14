@@ -1,5 +1,6 @@
 "use client";
 
+import { encodeAssessmentResponse } from "@/lib/assessment-response";
 import { useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { TaskRenderer } from "@/components/TaskRenderer";
@@ -61,8 +62,8 @@ export function MeasurelandsAssessmentTask({
             markCorrectSoft: () => record(correctToken),
             markWrong: () => record(`${WRONG_PREFIX}:${questionId}`),
             markAttempted: () => undefined,
-            recordAssessmentAnswer: (correct) =>
-              record(correct ? correctToken : `${WRONG_PREFIX}:${questionId}`),
+            recordAssessmentAnswer: (correct, response) =>
+              record(encodeAssessmentResponse(questionId, task.kind, correct, response)),
           }}
         />
       </div>

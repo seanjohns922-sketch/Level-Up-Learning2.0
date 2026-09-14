@@ -50,20 +50,28 @@ const objectToken = (id: string, label: string, objectId: string): StarpathGroun
   visual: { kind: "object", objectId },
 });
 
-function candidate(index: number, spec: ItemSpec): CandidateQuestion {
+function candidate(index: number, spec: ItemSpec, form: "pretest" | "posttest" = "posttest"): CandidateQuestion {
+  if (index === 5 || index === 8) {
+    const square = index === 8;
+    const prompt = square ? "Make a square by joining the dots." : "Make a triangle by joining the dots.";
+    const points = square
+      ? form === "pretest" ? [{r:0,c:0},{r:0,c:3},{r:3,c:3},{r:3,c:0}] : [{r:1,c:1},{r:1,c:4},{r:4,c:4},{r:4,c:1}]
+      : form === "pretest" ? [{r:4,c:0},{r:0,c:2},{r:4,c:4}] : [{r:0,c:0},{r:4,c:2},{r:0,c:4}];
+    spec = {...spec, cognitiveCategory: "application", difficulty: "moderate", skillId: "construct_familiar_shape", skillLabel: "Construct Familiar Shapes", task: {kind:"starpathShapeWorkshop", mode:"construct", presentation:"assessment", constructionRule:square?"square":"polygon",shapeLabel:square?"square":"triangle",prompt,speakText:prompt,target:1,points,feedback:FEEDBACK}};
+  }
   if (!("prompt" in spec.task) || typeof spec.task.prompt !== "string") {
     throw new Error(`Ground Starpath assessment task ${index + 1} requires a prompt.`);
   }
   return {
     schemaVersion: 1,
-    id: `y0-starpath-post-${String(index + 1).padStart(2, "0")}-v1`,
-    version: "1.0.1",
+    id: `y0-starpath-${form === "pretest" ? "pre" : "post"}-${String(index + 1).padStart(2, "0")}-v2`,
+    version: "2.0.0",
     realm: "space",
     level: 0,
-    form: "posttest",
+    form,
     origin: "assessment_authored",
-    sourcePool: "posttest",
-    bankId: "starpath-level-0-posttest-v1",
+    sourcePool: form,
+    bankId: `starpath-level-0-${form}-v2`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
@@ -217,10 +225,11 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
     difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "manipulated_response", misconceptionDiagnosis: true,
     misconceptionTags: ["shape-in-object"], contextKey: "fixed-square-rectangle-below", structureKey: "complete-two-shape-stack",
     task: {
-      kind: "starpathGroundAssessment", mode: "placement", prompt: "Put the rectangle below the square.", speakText: "Put the rectangle below the square.", target: 1, rows: 2, cols: 1,
+      kind: "starpathGroundAssessment", mode: "placement", prompt: "Put the rectangle below the square.", speakText: "Put the rectangle below the square.", target: 1, rows: 3, cols: 3,
       tokens: [shapeToken("rectangle", "rectangle", "rectangle", "#f97316")],
-      fixed: [{ token: shapeToken("square", "square", "square", "#67e8f9"), r: 0, c: 0 }],
-      answer: [{ tokenId: "rectangle", r: 1, c: 0 }], feedback: FEEDBACK,
+      fixed: [{ token: shapeToken("square", "square", "square", "#67e8f9"), r: 1, c: 1 }],
+      relations: [{subject: "rectangle", reference: "square", relation: "below"}],
+      answer: [{ tokenId: "rectangle", r: 2, c: 1 }], feedback: FEEDBACK,
     },
   },
   {
@@ -234,6 +243,7 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
         shapeToken("circle", "circle", "circle", "#67e8f9"),
         shapeToken("oval", "oval", "oval", "#f9a8d4"),
       ],
+      relations: [{subject: "triangle", reference: "circle", relation: "above"}, {subject: "triangle", reference: "oval", relation: "above"}, {subject: "circle", reference: "oval", relation: "left"}],
       answer: [{ tokenId: "triangle", r: 0, c: 1 }, { tokenId: "circle", r: 1, c: 0 }, { tokenId: "oval", r: 1, c: 2 }], feedback: FEEDBACK,
     },
   },
@@ -310,6 +320,7 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
       kind: "starpathGroundAssessment", mode: "placement", prompt: "Put the star above the planet.", speakText: "Put the star above the planet.", target: 1, rows: 3, cols: 3,
       tokens: [objectToken("star", "star", "star")],
       fixed: [{ token: objectToken("planet", "planet", "planet"), r: 1, c: 1 }],
+      relations: [{subject: "star", reference: "planet", relation: "above"}],
       answer: [{ tokenId: "star", r: 0, c: 1 }], feedback: FEEDBACK,
     },
   },
@@ -321,6 +332,7 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
       kind: "starpathGroundAssessment", mode: "placement", prompt: "Put the rocket below the moon.", speakText: "Put the rocket below the moon.", target: 1, rows: 3, cols: 3,
       tokens: [objectToken("rocket", "rocket", "rocket")],
       fixed: [{ token: objectToken("moon", "moon", "moon"), r: 1, c: 1 }],
+      relations: [{subject: "rocket", reference: "moon", relation: "below"}],
       answer: [{ tokenId: "rocket", r: 2, c: 1 }], feedback: FEEDBACK,
     },
   },
@@ -343,6 +355,7 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
       kind: "starpathGroundAssessment", mode: "placement", prompt: "Put the explorer beside Geospin.", speakText: "Put the explorer beside Geospin.", target: 1, rows: 3, cols: 3,
       tokens: [objectToken("explorer", "explorer", "explorer")],
       fixed: [{ token: objectToken("geospin", "Geospin", "geospin"), r: 1, c: 1 }],
+      relations: [{subject: "explorer", reference: "geospin", relation: "beside"}],
       answer: [{ tokenId: "explorer", r: 1, c: 2 }], feedback: FEEDBACK,
     },
   },
@@ -354,6 +367,7 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
       kind: "starpathGroundAssessment", mode: "placement", prompt: "Place Geospin above and the explorer below the flag.", speakText: "Place Geospin above the flag. Place the explorer below the flag.", target: 1, rows: 3, cols: 3,
       tokens: [objectToken("geospin", "Geospin", "geospin"), objectToken("explorer", "explorer", "explorer")],
       fixed: [{ token: objectToken("flag", "flag", "flag"), r: 1, c: 1 }],
+      relations: [{subject: "geospin", reference: "flag", relation: "above"}, {subject: "explorer", reference: "flag", relation: "below"}],
       answer: [{ tokenId: "geospin", r: 0, c: 1 }, { tokenId: "explorer", r: 2, c: 1 }], feedback: FEEDBACK,
     },
   },
@@ -361,3 +375,29 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
 
 export const GROUND_STARPATH_INDEPENDENT_POSTTEST_ITEMS: readonly CandidateQuestion[] =
   POSTTEST_SPECS.map((spec, index) => candidate(index, spec));
+
+// Matched descriptor/response blueprint; independently authored entry situations.
+const groundPlacement = (prompt: string, tokens: StarpathGroundAssessmentToken[], rows: number, cols: number, answer: Array<{tokenId: string; r: number; c: number}>, relations?: Extract<PracticeTask, {kind: "starpathGroundAssessment"; mode: "placement"}>["relations"], fixed?: Extract<PracticeTask, {kind: "starpathGroundAssessment"; mode: "placement"}>["fixed"]): PracticeTask => ({kind: "starpathGroundAssessment", mode: "placement", prompt, speakText: prompt, target: 1, rows, cols, tokens, answer, relations, fixed, feedback: FEEDBACK});
+const PRETEST_TASKS: PracticeTask[] = [
+  {kind: "starpathShapeMatch", prompt: "Tap the triangle.", speakText: "Tap the triangle.", target: 1, targetShape: "triangle", options: [{id: "square", shape: "square", colour: "#67e8f9", scale: 1, rotation: 45}, {id: "oval", shape: "oval", colour: "#fde047", scale: 1}, {id: "triangle", shape: "triangle", colour: "#a78bfa", scale: 1, rotation: 100}], correctOptionId: "triangle", feedback: FEEDBACK},
+  {kind: "starpathShapeName", prompt: "Name this shape.", speakText: "Name this shape.", target: 1, shape: "rectangle", options: [{id: "rectangle", name: "rectangle"}, {id: "square", name: "square"}, {id: "circle", name: "circle"}], correctOptionId: "rectangle", feedback: FEEDBACK},
+  {kind: "starpathObjectShape", prompt: "What shape is the clock face?", speakText: "What shape is the clock face?", target: 1, objectId: "clock", targetShape: "circle", options: [{id: "triangle", shape: "triangle", colour: "#f97316"}, {id: "square", shape: "square", colour: "#a78bfa"}, {id: "circle", shape: "circle", colour: "#67e8f9"}], correctOptionId: "circle", feedback: FEEDBACK},
+  {kind: "starpathOddOneOut", prompt: "Which shape does not belong with the triangles?", speakText: "Which shape does not belong with the triangles?", target: 1, options: [{id: "a", shape: "triangle", colour: "#67e8f9"}, {id: "b", shape: "rectangle", colour: "#67e8f9"}, {id: "c", shape: "triangle", colour: "#fde047"}, {id: "d", shape: "triangle", colour: "#a78bfa"}], oddOptionId: "b", feedback: FEEDBACK},
+  {kind: "starpathShapeClassify", mode: "rule", prompt: "Why can these shapes go in the same group?", speakText: "Why can these shapes go in the same group?", target: 1, specimens: [{id: "s", shape: "square", colour: "#67e8f9", scale: 0.7}, {id: "r", shape: "rectangle", colour: "#a78bfa", scale: 1}], options: [{id: "colour", label: "They have the same colour."}, {id: "sides", label: "They both have four straight sides."}, {id: "curved", label: "They both have a curved edge."}], correctOptionId: "sides", feedback: FEEDBACK},
+  groundPlacement("Make a row: square, circle, triangle.", [shapeToken("s", "square", "square", "#a78bfa"), shapeToken("c", "circle", "circle", "#fde047"), shapeToken("t", "triangle", "triangle", "#67e8f9")], 1, 3, [{tokenId: "s", r: 0, c: 0}, {tokenId: "c", r: 0, c: 1}, {tokenId: "t", r: 0, c: 2}]),
+  groundPlacement("Make a tree: triangle above rectangle.", [shapeToken("leaves", "triangle", "triangle", "#86efac"), shapeToken("trunk", "rectangle", "rectangle", "#f97316")], 2, 1, [{tokenId: "leaves", r: 0, c: 0}, {tokenId: "trunk", r: 1, c: 0}]),
+  groundPlacement("Put the circle above the rectangle. Put the triangle to the right of the rectangle.", [shapeToken("c", "circle", "circle", "#fde047"), shapeToken("r", "rectangle", "rectangle", "#a78bfa"), shapeToken("t", "triangle", "triangle", "#67e8f9")], 2, 2, [{tokenId: "c", r: 0, c: 0}, {tokenId: "r", r: 1, c: 0}, {tokenId: "t", r: 1, c: 1}], [{subject: "c", reference: "r", relation: "above"}, {subject: "t", reference: "r", relation: "right"}]),
+  groundPlacement("Put the triangle above the rectangle.", [shapeToken("t", "triangle", "triangle", "#67e8f9")], 3, 3, [{tokenId: "t", r: 0, c: 1}], [{subject: "t", reference: "r", relation: "above"}], [{token: shapeToken("r", "rectangle", "rectangle", "#a78bfa"), r: 1, c: 1}]),
+  groundPlacement("Put the square below both round shapes. Put the oval to the left of the circle.", [shapeToken("s", "square", "square", "#67e8f9"), shapeToken("o", "oval", "oval", "#a78bfa"), shapeToken("c", "circle", "circle", "#fde047")], 2, 3, [{tokenId: "s", r: 1, c: 1}, {tokenId: "o", r: 0, c: 0}, {tokenId: "c", r: 0, c: 2}], [{subject: "s", reference: "o", relation: "below"}, {subject: "s", reference: "c", relation: "below"}, {subject: "o", reference: "c", relation: "left"}]),
+  {kind: "starpathPositionWord", prompt: "Where is the moon compared with the star?", speakText: "Where is the moon compared with the star?", target: 1, anchorObject: "star", subjectObject: "moon", relation: "below", options: [{id: "beside", relation: "beside"}, {id: "above", relation: "above"}, {id: "below", relation: "below"}], correctOptionId: "below", feedback: FEEDBACK},
+  {kind: "starpathPositionPicture", prompt: "Which picture shows the star above the cave?", speakText: "Which picture shows the star above the cave?", target: 1, options: [{id: "a", anchorObject: "cave", subjectObject: "star", relation: "above"}, {id: "b", anchorObject: "cave", subjectObject: "star", relation: "beside"}, {id: "c", anchorObject: "cave", subjectObject: "star", relation: "below"}], correctOptionId: "a", feedback: FEEDBACK},
+  {kind: "starpathPositionFind", prompt: "Tap the object beside the rocket.", speakText: "Tap the object beside the rocket.", target: 1, anchorObject: "rocket", placements: [{id: "m", object: "moon", relation: "above"}, {id: "a", object: "alien", relation: "beside", side: "left"}, {id: "s", object: "star", relation: "below"}], correctId: "a", feedback: FEEDBACK},
+  {kind: "starpathPositionWord", prompt: "Where is Geospin compared with the explorer?", speakText: "Where is Geospin compared with the explorer?", target: 1, anchorObject: "explorer", subjectObject: "geospin", relation: "below", options: [{id: "beside", relation: "beside"}, {id: "below", relation: "below"}, {id: "above", relation: "above"}], correctOptionId: "below", feedback: FEEDBACK},
+  {kind: "starpathPositionPicture", prompt: "Which picture shows the explorer in front of Geospin?", speakText: "Which picture shows the explorer in front of Geospin?", target: 1, options: [{id: "a", anchorObject: "geospin", subjectObject: "explorer", relation: "in-front"}, {id: "b", anchorObject: "geospin", subjectObject: "explorer", relation: "behind"}, {id: "c", anchorObject: "geospin", subjectObject: "explorer", relation: "beside"}], correctOptionId: "a", feedback: FEEDBACK},
+  groundPlacement("Put the moon above the rocket.", [objectToken("m", "moon", "moon")], 3, 3, [{tokenId: "m", r: 0, c: 1}], [{subject: "m", reference: "r", relation: "above"}], [{token: objectToken("r", "rocket", "rocket"), r: 1, c: 1}]),
+  groundPlacement("Put the star below the cave.", [objectToken("s", "star", "star")], 3, 3, [{tokenId: "s", r: 2, c: 1}], [{subject: "s", reference: "c", relation: "below"}], [{token: objectToken("c", "cave", "cave"), r: 1, c: 1}]),
+  groundPlacement("Put the alien to the left of the planet.", [objectToken("a", "alien", "alien")], 3, 3, [{tokenId: "a", r: 1, c: 0}], [{subject: "a", reference: "p", relation: "left"}], [{token: objectToken("p", "planet", "planet"), r: 1, c: 1}]),
+  groundPlacement("Put Geospin beside the explorer.", [objectToken("g", "Geospin", "geospin")], 3, 3, [{tokenId: "g", r: 1, c: 0}], [{subject: "g", reference: "e", relation: "beside"}], [{token: objectToken("e", "explorer", "explorer"), r: 1, c: 1}]),
+  groundPlacement("Put the explorer above the crystal and Geospin below the crystal.", [objectToken("e", "explorer", "explorer"), objectToken("g", "Geospin", "geospin")], 3, 3, [{tokenId: "e", r: 0, c: 1}, {tokenId: "g", r: 2, c: 1}], [{subject: "e", reference: "c", relation: "above"}, {subject: "g", reference: "c", relation: "below"}], [{token: objectToken("c", "crystal", "crystal"), r: 1, c: 1}]),
+];
+export const GROUND_STARPATH_INDEPENDENT_PRETEST_ITEMS = PRETEST_TASKS.map((task, index) => candidate(index, {...POSTTEST_SPECS[index]!, task, contextKey: `entry-${index + 1}`, structureKey: `entry-${POSTTEST_SPECS[index]!.structureKey}`}, "pretest"));

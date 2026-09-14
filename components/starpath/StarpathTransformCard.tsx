@@ -10,7 +10,7 @@ type Task = Extract<PracticeTask, { kind: "starpathTransform" }>;
 const STEP = 38, PAD_L = 26, PAD_T = 14, PAD_R = 14, PAD_B = 26;
 const TILE = STEP - 9;
 
-export default function StarpathTransformCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathTransformCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const { bounds } = task;
   const W = PAD_L + bounds.x * STEP + PAD_R;
   const H = PAD_T + bounds.y * STEP + PAD_B;
@@ -25,12 +25,12 @@ export default function StarpathTransformCard({ task, onCorrect, onWrong }: { ta
   function submitTap() {
     if (settled || !selected) return;
     setSettled(true);
-    if (task.answer && samePoint(selected, task.answer)) onCorrect(); else onWrong(selected ? `${selected.x},${selected.y}` : "");
+    if (task.answer && samePoint(selected, task.answer)) onCorrect(JSON.stringify(selected)); else onWrong(selected ? `${selected.x},${selected.y}` : "");
   }
   function submitOption() {
     if (settled || !chosen) return;
     setSettled(true);
-    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(); else onWrong(chosen);
+    if ((task.correctOptionIds ?? []).includes(chosen)) onCorrect(chosen); else onWrong(chosen);
   }
 
   const tile = (p: Point, fill: string, ring = false, key?: string) => (

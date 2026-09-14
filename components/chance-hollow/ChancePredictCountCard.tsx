@@ -16,7 +16,7 @@ function pt(cx: number, cy: number, r: number, deg: number): [number, number] {
   return [cx + r * Math.cos(A), cy + r * Math.sin(A)];
 }
 
-export default function ChancePredictCountCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function ChancePredictCountCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const { wedges, targetKey, targetName, spins } = task;
   const total = Math.max(wedges.length, 1);
   const redCount = wedges.filter((w) => w === targetKey).length;
@@ -38,6 +38,13 @@ export default function ChancePredictCountCard({ task, onCorrect, onWrong }: { t
 
   function lockIn() {
     if (phase !== "predict") return;
+    if (assessmentMode) {
+      setSettled(true);
+      const expected = spins * wedges.filter(value => value === targetKey).length / total;
+      const response = JSON.stringify({ prediction: guess, expected, tolerance: 1 });
+      if (Math.abs(guess - expected) <= 1) onCorrect(response); else onWrong(response);
+      return;
+    }
     setPhase("running");
     let step = 0;
     let reds = 0;
@@ -60,7 +67,7 @@ export default function ChancePredictCountCard({ task, onCorrect, onWrong }: { t
   function finish() {
     if (settled) return;
     setSettled(true);
-    if (kidWon) onCorrect(); else onWrong(String(guess));
+    if (kidWon) onCorrect(JSON.stringify({ prediction: guess, actual })); else onWrong(JSON.stringify({ prediction: guess, actual }));
   }
 
   return (

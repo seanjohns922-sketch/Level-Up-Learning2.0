@@ -69,7 +69,7 @@ function CoinFace({ side }: { side: string }) {
   );
 }
 
-export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function ChanceSpinTallyCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const { tool, draw, labels, spins } = task;
   const n = Math.max(draw.length, 1);
   const wedgeAngle = 360 / n;
@@ -129,13 +129,13 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
   function record(key: string) {
     if (busy || !landed || finished) return;
     // A mis-tap just nudges — it must not end the task, so we do not call onWrong.
-    if (key !== landed) { setNudge(true); return; }
+    if (key !== landed) { if (assessmentMode) onWrong(JSON.stringify({ selected: key, landed, tallies, done })); else setNudge(true); return; }
     setNudge(false);
     setTallies((t) => ({ ...t, [key]: (t[key] ?? 0) + 1 }));
     setLanded(null);
     setDone((d) => {
       const next = d + 1;
-      if (next >= spins) timers.current.push(window.setTimeout(() => onCorrect(), 450));
+      if (next >= spins) timers.current.push(window.setTimeout(() => onCorrect(JSON.stringify({ tallies: { ...tallies, [key]: (tallies[key] ?? 0) + 1 }, spins: next })), 450));
       return next;
     });
   }
@@ -178,7 +178,8 @@ export default function ChanceSpinTallyCard({ task, onCorrect }: { task: Task; o
     if (tallyDone) return;
     const allMatch = distinctKeys.every((k) => (entry[k] ?? 0) === actualCount(k));
     const totalEntered = distinctKeys.reduce((sum, k) => sum + (entry[k] ?? 0), 0);
-    if (allMatch) { setTallyDone(true); timers.current.push(window.setTimeout(() => onCorrect(), 500)); }
+    if (allMatch) { setTallyDone(true); timers.current.push(window.setTimeout(() => onCorrect(JSON.stringify({ entry, results })), 500)); }
+    else if (assessmentMode) onWrong(JSON.stringify({ entry, results }));
     else setTallyNudge(totalEntered !== spins ? "count" : "wrong");
   }
   function chip(key: string) {

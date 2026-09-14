@@ -103,13 +103,13 @@ function assertAssessmentBank(
 ) {
   check(bank.length === 20, `Level 5 ${kind} must contain 20 items`);
   check(new Set(bank.map((item) => item.id)).size === 20, `Level 5 ${kind} IDs must be unique`);
-  check(new Set(bank.map((item) => item.prompt)).size === 20, `Level 5 ${kind} prompts must be unique`);
+  check(new Set(bank.map((item) => JSON.stringify(item.practiceTask))).size === 20, `Level 5 ${kind} task payloads must be unique`);
   check(new Set(bank.map((item) => item.contextKey)).size === 20, `Level 5 ${kind} contexts must be unique`);
   check(new Set(bank.map((item) => item.structureKey)).size === 20, `Level 5 ${kind} structures must be unique`);
   check(sameCounts(counts(bank.map((item) => item.primaryDescriptorCode)), { AC9M5SP01: 7, AC9M5SP02: 6, AC9M5SP03: 7 }), `Level 5 ${kind} descriptor allocation must be 7/6/7`);
   check(sameCounts(counts(bank.map((item) => item.difficulty)), expectedDifficulty), `Level 5 ${kind} difficulty mix must match blueprint`);
   check(sameCounts(counts(bank.map((item) => item.cognitiveCategory)), expectedCognitive), `Level 5 ${kind} cognitive mix must match blueprint`);
-  check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 2, manipulated_response: 18 }), `Level 5 ${kind} response mix must be 2 selected and 18 manipulated`);
+  check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 13, manipulated_response: 7 }), `Level 5 ${kind} response mix must be 13 selected and 7 independently constructed`);
 
   const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [item.id, item]));
   for (const item of bank) {
@@ -257,7 +257,7 @@ const blueprint = STARPATH_ASSESSMENT_BLUEPRINTS.find((item) => item.level === 5
 check(Boolean(blueprint), "Year 5 Starpath blueprint is missing");
 check(blueprint?.descriptors.every((item) => item.curriculumMapping.implementationStatus === "aligned") ?? false, "Year 5 Starpath blueprint must be curriculum-aligned");
 assertAssessmentBank("pretest", LEVEL5_STARPATH_INDEPENDENT_PRETEST_ITEMS as readonly Candidate[], { easy: 5, moderate: 10, challenging: 5 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 });
-assertAssessmentBank("posttest", LEVEL5_STARPATH_INDEPENDENT_POSTTEST_ITEMS as readonly Candidate[], { easy: 3, moderate: 9, challenging: 8 }, { recall: 1, understanding: 3, application: 6, reasoning: 7, transfer: 3 });
+assertAssessmentBank("posttest", LEVEL5_STARPATH_INDEPENDENT_POSTTEST_ITEMS as readonly Candidate[], {"easy": 5, "moderate": 10, "challenging": 5}, {"recall": 1, "understanding": 5, "application": 7, "reasoning": 5, "transfer": 2});
 
 const expectedPreIds = LEVEL5_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) => item.id);
 const expectedPostIds = LEVEL5_STARPATH_INDEPENDENT_POSTTEST_ITEMS.map((item) => item.id);

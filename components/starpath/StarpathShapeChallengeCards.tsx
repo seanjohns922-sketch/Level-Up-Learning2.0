@@ -122,8 +122,8 @@ export function StarpathOddOneOutCard({
   onWrong,
 }: {
   task: OddOneOutTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>
@@ -134,7 +134,7 @@ export function StarpathOddOneOutCard({
             key={option.id}
             type="button"
             aria-label={option.shape}
-            onClick={() => (option.id === task.oddOptionId ? onCorrect() : onWrong())}
+            onClick={() => (option.id === task.oddOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
             className="relative flex min-h-40 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             <OptionReadAloudButton text={option.shape} className="absolute right-3 top-3" />
@@ -152,8 +152,8 @@ export function StarpathShapeCompareCard({
   onWrong,
 }: {
   task: ShapeCompareTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>
@@ -180,7 +180,7 @@ export function StarpathShapeCompareCard({
           <button
             key={answer}
             type="button"
-            onClick={() => (answer === task.answer ? onCorrect() : onWrong())}
+            onClick={() => (answer === task.answer ? onCorrect(String(answer)) : onWrong(String(answer)))}
             className="relative min-h-16 rounded-2xl border-2 border-violet-200 bg-white px-5 text-xl font-black capitalize text-indigo-950 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             {answer}
@@ -200,8 +200,8 @@ export function StarpathShapeNameCard({
   onWrong,
 }: {
   task: ShapeNameTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>
@@ -215,7 +215,7 @@ export function StarpathShapeNameCard({
           <button
             key={option.id}
             type="button"
-            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
             className="relative flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             <span className="text-xl font-black capitalize text-indigo-950">{option.name}</span>
@@ -234,8 +234,8 @@ export function StarpathObjectShapeCard({
   onWrong,
 }: {
   task: ObjectShapeTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const objectId = task.objectId as ShapeObjectId;
   return (
@@ -252,7 +252,7 @@ export function StarpathObjectShapeCard({
             key={option.id}
             type="button"
             aria-label={option.shape}
-            onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
+            onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
             className="relative flex min-h-36 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             <OptionReadAloudButton text={option.shape} className="absolute right-2 top-2" />
@@ -507,8 +507,8 @@ export function StarpathWhatChangedCard({
   onWrong,
 }: {
   task: WhatChangedTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>
@@ -530,7 +530,7 @@ export function StarpathWhatChangedCard({
           <button
             key={option.id}
             type="button"
-            onClick={() => (option.id === task.answer ? onCorrect() : onWrong())}
+            onClick={() => (option.id === task.answer ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
             className="relative flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
             <span className="text-lg font-black text-indigo-950">{option.label}</span>

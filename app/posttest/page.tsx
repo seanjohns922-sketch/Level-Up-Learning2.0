@@ -1,5 +1,6 @@
 "use client";
 
+import { assessmentEvidenceMetadata } from "@/lib/assessment-growth";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPosttestForYearLabel } from "@/data/assessments/api";
@@ -351,7 +352,7 @@ function PostTestPage() {
   const starpathLevel1CandidateRequested = progressRealmId === "space"
     && year === "Year 1"
     && reviewBank === "level1-starpath-post-rc1";
-  const candidateReviewRequested = (progressRealmId === "number" && year === "Year 6")
+  const candidateReviewRequested = (progressRealmId === "number" && year === "Year 6" && reviewBank === "year6-number-post-rc1")
     || starpathCandidateReviewRequested
     || starpathLevel1CandidateRequested;
   const [candidateReviewEnabled, setCandidateReviewEnabled] = useState(false);
@@ -590,6 +591,7 @@ function PostTestPage() {
       const completionId = getOrCreateCompletionId(assessmentCompletionKey);
       const latest = {
         ...profile,
+        ...assessmentEvidenceMetadata(progressRealmId, year, questions),
         assignedWeek,
         at: completedAt,
         replay_metadata: {

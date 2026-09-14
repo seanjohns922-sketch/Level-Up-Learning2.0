@@ -1,0 +1,37 @@
+select public.test_assert(not exists(select * from before_rows except (select 'progress',to_jsonb(t) from public.student_realm_progress t union all select 'lesson',to_jsonb(t) from public.student_lesson_attempts t union all select 'quiz',to_jsonb(t) from public.student_weekly_quiz_attempts t union all select 'assessment',to_jsonb(t) from public.student_realm_assessments t)), 'Migrations preserve every existing progress, lesson, quiz and assessment row byte-for-byte');
+select public.test_assert((select current_week=5 and placement_complete and unlocked_legends='["existing-reward"]'::jsonb from public.get_student_realm_progress_compat_secure('00000000-0000-0000-0000-000000000010','space')), 'Existing Ground learner reloads at week 5 with placement and rewards intact');
+select public.teacher_change_starting_level('00000000-0000-0000-0000-000000000011','space','Prep','pretest');
+select public.test_assert((select not placement_complete and current_week is null from public.student_realm_progress where student_id='00000000-0000-0000-0000-000000000011' and realm_id='space'), 'New Ground student requires a baseline');
+select public.test_assert((select assigned_entry_mode='pretest' from public.student_realm_placement where student_id='00000000-0000-0000-0000-000000000011' and realm_id='space'), 'Ground pretest placement survives database normalisation');
+create temporary table request as select
+ '00000000-0000-0000-0000-000000000011'::uuid student,
+ '00000000-0000-0000-0000-000000000001'::uuid class,
+ '00000000-0000-0000-0000-000000000100'::uuid receipt,
+ jsonb_build_object('score_percent',95,'correct_count',19,'total_questions',20,'completed_at',now()-interval '20 days','placement_result','{"assessment_evidence":{"comparison_group":"starpath-space-2026-09-14","bank_versions":["2"],"baseline_only":true}}'::jsonb,'question_results','[{"question_id":"ground-v2","student_answer":{"points":[[0,0],[1,0],[0,1]]},"correct":true}]'::jsonb) attempt,
+ '{"status":"PASSED","placement_complete":true,"next_working_level":"Year 1","unlocked_legends":["baseline-reward"]}'::jsonb progress;
+select public.test_assert(public.complete_realm_assessment(student,class,'space','prep-space','Prep','Prep','pretest',receipt,attempt,progress), 'Baseline save commits') from request;
+select public.test_assert(not public.complete_realm_assessment(student,class,'space','prep-space','Prep','Prep','pretest',receipt,attempt,progress), 'Duplicate completion retry is idempotent') from request;
+select public.test_assert((select count(*)=1 from public.student_realm_assessments where student_id=(select student from request)), 'Duplicate retry creates exactly one assessment');
+select public.test_assert((select status='ASSIGNED_PROGRAM' and working_level='Prep' and current_week=1 and placement_complete and required_weeks='[1,2,3,4,5,6,7,8]'::jsonb from public.get_student_realm_progress_compat_secure((select student from request),'space')), '95 percent Ground result stays Ground and assigns all eight weeks');
+select public.test_assert(not exists(select from public.student_realm_progress where student_id=(select student from request) and working_level='Year 1'), 'Ground save cannot create a higher-level placement');
+select public.test_assert((select question_results=(select attempt->'question_results' from request) and placement_result=(select attempt->'placement_result' from request) from public.get_student_realm_assessments((select student from request),'space','Prep')), 'Reload preserves submitted construction evidence and bank metadata exactly');
+select public.complete_realm_assessment(student,class,'space','prep-space','Prep','Prep','posttest','00000000-0000-0000-0000-000000000101',attempt||jsonb_build_object('score_percent',100,'completed_at',now()),'{"status":"PASSED","placement_complete":true,"current_week":8,"required_weeks":[1,2,3,4,5,6,7,8],"unlocked_legends":["baseline-reward","post-reward"]}') from request;
+select public.test_assert((select count(*)=2 from public.get_student_realm_assessments((select student from request),'space','Prep')), 'Pre and post remain separate historical attempts');
+select public.test_assert((select pretest_score=95 and posttest_score=100 and current_week=8 from public.get_student_realm_progress_compat_secure((select student from request),'space')), 'Progress reload retains pre-score, post-score and completed week');
+select public.teacher_reset_pretest((select student from request),'space');
+select public.test_assert((select count(*)=2 from public.get_student_realm_assessments((select student from request),'space','Prep')), 'Teacher pretest reset preserves baseline and post history');
+select public.test_assert((select not placement_complete and pretest_score is null and current_week=8 and posttest_score=100 and unlocked_legends='["baseline-reward","post-reward"]'::jsonb from public.get_student_realm_progress_compat_secure((select student from request),'space')), 'Explicit reset reopens pretest without erasing completed week, post-score or rewards');
+-- Failure after receipt and assessment insert must roll the entire operation back.
+do $$ declare r record; before_count int; begin select * into r from request;
+ select count(*) into before_count from public.student_realm_assessments;
+ begin perform public.complete_realm_assessment(r.student,r.class,'space','year1-space','Prep','Year 1','pretest','00000000-0000-0000-0000-000000000102',r.attempt,'{"current_week":"invalid-integer"}'); raise exception 'Expected invalid integer'; exception when invalid_text_representation then null; end;
+ perform public.test_assert((select count(*)=before_count from public.student_realm_assessments) and not exists(select from public.student_completion_receipts where completion_key='00000000-0000-0000-0000-000000000102'), 'Failed progress write rolls back assessment and completion receipt');
+ begin perform public.complete_realm_assessment(r.student,'00000000-0000-0000-0000-000000000099','space','prep-space','Prep','Prep','pretest',gen_random_uuid(),r.attempt,r.progress); raise exception 'Expected class rejection'; exception when raise_exception then if sqlerrm <> 'Student context does not match' then raise; end if; end;
+ perform public.test_assert((select count(*)=before_count from public.student_realm_assessments),'Wrong class rejected before saving');
+ perform set_config('test.deny_access','on',true);
+ begin perform public.complete_realm_assessment(r.student,r.class,'space','prep-space','Prep','Prep','pretest',gen_random_uuid(),r.attempt,r.progress); raise exception 'Expected access rejection'; exception when insufficient_privilege then null; end;
+ perform set_config('test.deny_access','off',true);
+ perform public.test_assert((select count(*)=before_count from public.student_realm_assessments),'Completion honours the access-guard failure');
+end $$;
+select public.test_assert((select current_week=7 and unlocked_legends='["number-reward"]'::jsonb from public.student_realm_progress where realm_id='number'),'Starpath completion and reset leave Number progress and rewards intact');
+select public.test_assert(not public.realm_first_level_pretest_enabled('number','Prep') and not public.realm_first_level_pretest_enabled('measurement','Prep') and public.realm_first_level_pretest_enabled('statistics','Year 1') and public.realm_first_level_pretest_enabled('pattern','Year 3') and public.realm_first_level_pretest_enabled('chance','Year 3'), 'Other realm entry-test rules unchanged');

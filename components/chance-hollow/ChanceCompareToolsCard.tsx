@@ -9,7 +9,7 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 type Task = Extract<PracticeTask, { kind: "chanceCompare" }>;
 
 // Two or three chance tools shown side by side to compare, then a graded choice.
-export default function ChanceCompareToolsCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function ChanceCompareToolsCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [settled, setSettled] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
 
@@ -17,7 +17,7 @@ export default function ChanceCompareToolsCard({ task, onCorrect, onWrong }: { t
     if (settled) return;
     setSettled(true);
     setPicked(option);
-    if (option === task.answer) onCorrect(); else onWrong(option);
+    if (option === task.answer) onCorrect(option); else onWrong(option);
   }
 
   return (

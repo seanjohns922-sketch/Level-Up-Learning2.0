@@ -200,6 +200,7 @@ import { StarpathShapeFeatureCard } from "@/components/starpath/StarpathShapeFea
 import { StarpathGridReferenceCard } from "@/components/starpath/StarpathGridReferenceCard";
 import StarpathGridRouteCard from "@/components/starpath/StarpathGridRouteCard";
 import StarpathCompositeCard from "@/components/starpath/StarpathCompositeCard";
+import StarpathIndependentConstructionCard from "@/components/starpath/StarpathIndependentConstructionCard";
 import StarpathSymmetryCard from "@/components/starpath/StarpathSymmetryCard";
 import StarpathNetCard from "@/components/starpath/StarpathNetCard";
 import StarpathCrossSectionCard from "@/components/starpath/StarpathCrossSectionCard";
@@ -358,7 +359,10 @@ function TaskRendererInner({
 }) {
   const { markCorrect, markCorrectSoft, markWrong, advanceIntro, markAttempted, recordAssessmentAnswer } = callbacks;
   const isIntroTask = "scene" in task && task.scene === "intro";
-  const onC = () => setTimeout(() => {
+  const onC = (response?: unknown) => setTimeout(() => {
+    if (assessmentMode && recordAssessmentAnswer && typeof response === "string") {
+      recordAssessmentAnswer(true, response); return;
+    }
     if (isIntroTask && advanceIntro) {
       advanceIntro();
       return;
@@ -366,7 +370,10 @@ function TaskRendererInner({
     markCorrect();
   }, 0);
   const onCS = () => setTimeout(() => markCorrectSoft(), 0);
-  const onW = (studentAnswer?: string | number | null, correctAnswer?: string | null) => markWrong(studentAnswer, correctAnswer);
+  const onW = (studentAnswer?: string | number | null, correctAnswer?: string | null) => {
+    if (assessmentMode && recordAssessmentAnswer && studentAnswer != null) { recordAssessmentAnswer(false, String(studentAnswer)); return; }
+    markWrong(studentAnswer, correctAnswer);
+  };
   // This renderer fans out across many legacy task variants with different payload shapes.
   // Keep the cast local so the switch stays compact without changing runtime behavior.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -583,7 +590,7 @@ function TaskRendererInner({
     case "temperature":
       return wrapMeasurelands(<MeasurelandsTemperatureCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />);
     case "perimeterCalc":
-      return wrapMeasurelands(<MeasurelandsSurveyorCard key={k} task={t} onCorrect={onC} onWrong={onW} />);
+      return wrapMeasurelands(<MeasurelandsSurveyorCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />);
     case "timeQuest":
       return wrapMeasurelands(<MeasurelandsTimeQuestCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />);
     case "fractionTurn":
@@ -731,7 +738,7 @@ function TaskRendererInner({
     case "starpathObjectCompare":
       return <StarpathObjectCompareCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathObjectMatch":
-      return <StarpathObjectMatchCard key={k} task={t} onComplete={onC} />;
+      return <StarpathObjectMatchCard key={k} task={t} onComplete={onC} onWrong={onW} assessmentMode={assessmentMode} />;
     case "starpathMapLocate":
       return <StarpathMapCard key={k} task={t} onCorrect={onC} onWrong={onW} editableAssessmentMode={editableAssessmentMode} assessmentAnswer={assessmentAnswer} onAssessmentAnswer={recordAssessmentAnswer} />;
     case "starpathMapCreate":
@@ -748,38 +755,40 @@ function TaskRendererInner({
       return <StarpathGridRouteCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathComposite":
       return <StarpathCompositeCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathIndependentConstruction":
+      return <StarpathIndependentConstructionCard key={k} task={t} onCorrect={onC} onWrong={onW} onAssessmentAnswer={assessmentMode ? recordAssessmentAnswer : undefined} />;
     case "starpathSymmetry":
-      return <StarpathSymmetryCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathSymmetryCard key={k} assessmentMode={assessmentMode} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathNet":
-      return <StarpathNetCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathNetCard key={k} assessmentMode={assessmentMode} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathCrossSection":
-      return <StarpathCrossSectionCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathCrossSectionCard key={k} assessmentMode={assessmentMode} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathCartesian":
       return <StarpathCartesianCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathTessellation":
       return <StarpathTessellationCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceSpinTally":
-      return <ChanceSpinTallyCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <ChanceSpinTallyCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />;
     case "chanceAutoTally":
       return <ChanceAutoTallyCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceBuildFair":
-      return <ChanceBuildFairCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <ChanceBuildFairCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />;
     case "chanceDependentDraw":
       return <ChanceDependentDrawCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceCompare":
       return <ChanceCompareToolsCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chancePredictCount":
-      return <ChancePredictCountCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <ChancePredictCountCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />;
     case "chanceDiceRace":
-      return <ChanceDiceRaceCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <ChanceDiceRaceCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} onAssessmentAnswer={recordAssessmentAnswer} />;
     case "chanceScalePortal":
       return <ChanceScalePortalCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceFormMatch":
       return <ChanceFormMatchCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceProbabilityForge":
-      return <ChanceProbabilityForgeCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <ChanceProbabilityForgeCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />;
     case "chanceSimulationLab":
-      return <ChanceSimulationLabCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <ChanceSimulationLabCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} />;
     case "chanceModelDebugger":
       return <ChanceModelDebuggerCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "chanceMasterTrial":
@@ -801,7 +810,7 @@ function TaskRendererInner({
     case "statisticaShape":
       return <StatisticaShapeCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaInvestigation":
-      return <StatisticaInvestigationCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StatisticaInvestigationCard key={k} task={t} onCorrect={onC} onWrong={onW} assessmentMode={assessmentMode} onAssessmentAnswer={recordAssessmentAnswer} />;
     case "statisticaLineGraph":
       return <StatisticaLineGraphCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "statisticaSort":

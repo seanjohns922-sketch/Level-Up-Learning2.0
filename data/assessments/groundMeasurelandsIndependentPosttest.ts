@@ -11,13 +11,29 @@ type ItemSpec = {
   prompt: string; correctAnswer: string; domain: Domain; options?: readonly string[];
 };
 
-function candidate(index: number, spec: ItemSpec): CandidateQuestion {
+function candidate(index: number, spec: ItemSpec, form: "pretest" | "posttest" = "posttest"): CandidateQuestion {
+  let comparisonVisual: Record<string, unknown> | undefined;
+  if (["compare_length", "compare_mass", "counterintuitive_mass"].includes(spec.skillId)) {
+    const mass = spec.skillId !== "compare_length";
+    const first = spec.correctAnswer.endsWith("1");
+    const labelled = ["1", "2"].map(id => spec.options?.find(option => option.endsWith(id)) ?? id);
+    const objectNames = form === "pretest" ? (index === 9 ? ["Block", "Ball"] : ["Stone", "Box"]) : (index === 9 ? ["Book", "Toy"] : ["Bag", "Cup"]);
+    const labels = mass && labelled.every(label => ["1", "2"].includes(label)) ? objectNames : labelled;
+    if (labels !== labelled) spec = { ...spec, correctAnswer: labels[first ? 0 : 1]! };
+    const values = mass ? (first ? [105, 65] : [65, 105]) : (first ? [235, 145] : [145, 235]);
+    comparisonVisual = { type: "ground_measurement_comparison", attribute: mass ? "mass" : "length", labels, values,
+      description: mass ? `A balance holding ${labels[0]} and ${labels[1]}. The ${first ? labels[0] : labels[1]} pan is lower.` : `Two aligned strips labelled ${labels.join(" and ")}. Both begin at the dashed line.` };
+    const equalLabel = mass ? "They have the same mass" : "They are the same length";
+    const alternate = labels[first ? 1 : 0]!;
+    const options = !mass ? [equalLabel, alternate, spec.correctAnswer] : spec.skillId === "counterintuitive_mass" ? [spec.correctAnswer, alternate, equalLabel] : [labels[0]!, labels[1]!, equalLabel];
+    spec = { ...spec, prompt: mass ? "Look at the balance. Which is heavier?" : "Look at the two strips. Which is longer?", options, responseMode: "selected_response" };
+  }
   const selected = spec.options !== undefined;
   const selectedAnswerPosition = spec.options?.indexOf(spec.correctAnswer);
   return {
-    schemaVersion: 1, id: `y0-measurement-post-${String(index + 1).padStart(2, "0")}-v2`, version: "1.0.0",
-    realm: "measurement", level: 0, form: "posttest", origin: "assessment_authored", sourcePool: "posttest",
-    bankId: "measurelands-level-0-posttest-v1", primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
+    schemaVersion: 1, id: `y0-measurement-${form === "pretest" ? "pre" : "post"}-${String(index + 1).padStart(2, "0")}-v3`, version: "3.0.0",
+    realm: "measurement", level: 0, form, origin: "assessment_authored", sourcePool: form,
+    bankId: `measurelands-level-0-${form}-v3`, primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }], cognitiveCategory: spec.cognitiveCategory,
     difficulty: spec.difficulty, isTransfer: spec.cognitiveCategory === "transfer",
     requiresReasoning: spec.cognitiveCategory === "reasoning" || spec.cognitiveCategory === "transfer",
@@ -25,6 +41,7 @@ function candidate(index: number, spec: ItemSpec): CandidateQuestion {
     misconceptionTags: spec.misconceptionTags, contextKey: spec.contextKey, structureKey: spec.structureKey,
     ...(selected ? { selectedAnswerPosition: (selectedAnswerPosition ?? -1) + 1 } : {}), prompt: spec.prompt,
     renderer: { type: selected ? "selected_response" : "numeric_entry", payload: { domain: spec.domain, prompt: spec.prompt, correctAnswer: spec.correctAnswer, ...(spec.options ? { options: spec.options } : {}) } },
+    visual: comparisonVisual,
     scoring: { kind: "exact", correctResponse: spec.correctAnswer }, statistics: createUncalibratedItemStatistics(spec.difficulty),
     type: selected ? "mcq" : "numeric", options: spec.options ? [...spec.options] : undefined, correctAnswer: spec.correctAnswer,
     answer: spec.correctAnswer, skillId: spec.skillId, skillLabel: spec.skillLabel, linkedWeeks: [spec.week], linkedLessons: [spec.lesson],
@@ -60,3 +77,29 @@ const POSTTEST_ORDER = [0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 10, 11, 12, 14, 13, 15, 16
 export const GROUND_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS = POSTTEST_ORDER.map(
   (specIndex, index) => candidate(index, POSTTEST_SPECS[specIndex]!),
 );
+
+// Parallel content coverage and intended demand, with separate assessment examples.
+const PRETEST_TASKS = [
+ {prompt:"We want to find which skipping rope is longer. What attribute are we comparing?",correctAnswer:"Length",options:["Length","Capacity","Mass"]},
+ {prompt:"One whole week goes from Monday to Sunday. How many days is that?",correctAnswer:"7"},
+ {prompt:"Two pencils start at the same line. Pencil 1 reaches farther than Pencil 2. Which pencil is longer?",correctAnswer:"Pencil 1",options:["They are the same length","Pencil 2","Pencil 1"]},
+ {prompt:"A balance tips down on the side holding Bag 2. Which bag is heavier?",correctAnswer:"Bag 2",options:["Bag 2","Bag 1","They have the same mass"]},
+ {prompt:"Jug 2 fills Jug 1 and still has water left. Which jug holds more?",correctAnswer:"Jug 2",options:["Jug 1","They hold the same","Jug 2"]},
+ {prompt:"Which usually takes longer?",correctAnswer:"Walking around the playground",options:["Walking around the playground","One finger click","One blink"]},
+ {prompt:"When do children usually arrive at school to begin their day?",correctAnswer:"Morning",options:["Afternoon","Night","Morning"]},
+ {prompt:"Straws 1 and 2 start together. Straw 1 reaches farther. Enter the label number of the longer straw.",correctAnswer:"1"},
+ {prompt:"Which day comes after Saturday?",correctAnswer:"Sunday",options:["Friday","Monday","Sunday"]},
+ {prompt:"A balance holds Bag 1 and Bag 2. The side with Bag 2 is lower. Enter the label number of the heavier bag.",correctAnswer:"2"},
+ {prompt:"Jug 1 fills Jug 2 and has water left. Enter the label number of the jug that holds more.",correctAnswer:"1"},
+ {prompt:"Count Monday as day 1 and Tuesday as day 2. Enter the day number for Thursday.",correctAnswer:"4"},
+ {prompt:"Event 1 is eating breakfast. Event 2 is one clap. Enter the label number of the event that usually takes longer.",correctAnswer:"1"},
+ {prompt:"Use this order: morning, lunchtime, afternoon, night time. Enter the position number of afternoon.",correctAnswer:"3"},
+ {prompt:"Rope 1 and Rope 2 are moved to the same start line. Rope 2 then reaches farther. Enter the label number of the longer rope.",correctAnswer:"2"},
+ {prompt:"A small full tin is Object 1. A large empty carton is Object 2. A balance tips down under Object 1. Enter the label number of the heavier object.",correctAnswer:"1"},
+ {prompt:"A wide low jug fills a narrow tall bottle and has water left. Why does the jug hold more?",correctAnswer:"The pouring test shows it holds more",options:["Tall bottles are always empty","The pouring test shows it holds more","Every wide jug holds more than every bottle"]},
+ {prompt:"Today is Thursday. Which statement is correct?",correctAnswer:"Tomorrow is Friday",options:["Tomorrow is Friday","Yesterday is Friday","Tomorrow is always Monday"]},
+ {prompt:"Alex likes one clap more than singing a whole song. The song lasts much longer. Which event has the greater duration?",correctAnswer:"The song, because it lasts longer",options:["The song, because it lasts longer","The clap, because Alex likes it","They must take the same time"]},
+ {prompt:"Jug 3 fills Jug 1 with some left. Jug 1 fills Jug 2 with some left. Enter the label number of the jug that holds the most.",correctAnswer:"3"},
+] satisfies readonly Pick<ItemSpec,"prompt"|"correctAnswer"|"options">[];
+export const GROUND_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS = POSTTEST_ORDER.map((specIndex,index)=>
+ candidate(index,{...POSTTEST_SPECS[specIndex]!,...PRETEST_TASKS[specIndex]!,contextKey:`ground-measurement-baseline-${specIndex+1}`},"pretest"));

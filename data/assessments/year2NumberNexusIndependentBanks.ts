@@ -37,14 +37,14 @@ function candidate(form: AssessmentFormKind, index: number, spec: ItemSpec): Can
   const shortForm = form === "pretest" ? "pre" : "post";
   return {
     schemaVersion: 1,
-    id: `y2-number-${shortForm}-${String(index + 1).padStart(2, "0")}-v1`,
-    version: "1.0.0",
+    id: `y2-number-${shortForm}-${String(index + 1).padStart(2, "0")}-v2`,
+    version: "2.0.0",
     realm: "number",
     level: 2,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `number-nexus-level-2-${form}-v1`,
+    bankId: `number-nexus-level-2-${form}-v2`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
@@ -80,7 +80,7 @@ function candidate(form: AssessmentFormKind, index: number, spec: ItemSpec): Can
 
 const PRETEST_SPECS: readonly ItemSpec[] = [
   { descriptor: "AC9M2N01", week: 1, lesson: 2, skillId: "represent_to_1000", skillLabel: "Represent Numbers", difficulty: "easy", cognitiveCategory: "recall", responseMode: "constructed_response", misconceptionTags: ["numeral-quantity-disconnect"], contextKey: "y2-pre-mab-326", structureKey: "y2-pre-read-hundreds-blocks", prompt: "Each flat is 100, rod is 10 and small block is 1. Write the number.", correctAnswer: "326", type: "numeric", visual: { type: "number_y2_place_value", hundreds: 3, tens: 2, ones: 6 } },
-  { descriptor: "AC9M2N01", week: 1, lesson: 3, skillId: "order_to_1000", skillLabel: "Order Numbers", difficulty: "moderate", cognitiveCategory: "application", responseMode: "manipulated_response", misconceptionTags: ["numeral-quantity-disconnect"], contextKey: "y2-pre-order-407-470-740", structureKey: "y2-pre-build-ascending-order", prompt: "Put these numbers in order. Smallest first.", correctAnswer: "407||470||740", type: "number_order", options: ["740", "407", "470"], visual: { type: "number_y2_number_cards", values: [740, 407, 470] } },
+  { descriptor: "AC9M2N01", week: 1, lesson: 3, skillId: "order_to_1000", skillLabel: "Order Numbers", difficulty: "moderate", cognitiveCategory: "application", responseMode: "manipulated_response", misconceptionTags: ["numeral-quantity-disconnect"], contextKey: "y2-pre-order-407-470-740", structureKey: "y2-pre-build-ascending-order", prompt: "Put these numbers in order. Smallest first.", correctAnswer: "907||970||1000", type: "number_order", options: ["1000", "907", "970"], visual: { type: "number_y2_number_cards", values: [1000, 907, 970] } },
   { descriptor: "AC9M2N02", week: 2, lesson: 1, skillId: "place_value_parts", skillLabel: "Partition Numbers", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["place-value-position"], contextKey: "y2-pre-parts-504", structureKey: "y2-pre-combine-hundreds-ones", prompt: "What number do 5 hundreds, 0 tens and 4 ones make?", correctAnswer: "504", type: "numeric", visual: { type: "number_y2_place_value", hundreds: 5, tens: 0, ones: 4 } },
   { descriptor: "AC9M2N02", week: 2, lesson: 3, skillId: "zero_placeholder", skillLabel: "Check Place Value", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "selected_response", misconceptionTags: ["zero-placeholder", "part-whole-conservation"], misconceptionDiagnosis: true, contextKey: "y2-pre-zero-603-error", structureKey: "y2-pre-diagnose-zero-partition", prompt: "Which partition does not make 603?", correctAnswer: "600 + 30", type: "mcq", options: ["600 + 3", "500 + 103", "600 + 30"], visual: { type: "number_y2_partition_choices", whole: 603, choices: [[600, 3], [500, 103], [600, 30]] } },
   { descriptor: "AC9M2N03", week: 12, lesson: 1, skillId: "equal_fraction_parts", skillLabel: "Equal Fraction Parts", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["unequal-fraction-parts"], contextKey: "y2-pre-quarter-four-parts", structureKey: "y2-pre-enter-selected-quarter", prompt: "One of 4 equal parts is selected. Write the numerator.", correctAnswer: "1", type: "numeric", visual: { type: "number_y2_fraction", parts: 4, selected: 1 } },
@@ -103,7 +103,7 @@ const PRETEST_SPECS: readonly ItemSpec[] = [
 
 const POSTTEST_SPECS: readonly ItemSpec[] = [
   { descriptor: "AC9M2N01", week: 1, lesson: 2, skillId: "represent_to_1000", skillLabel: "Represent Numbers", difficulty: "easy", cognitiveCategory: "recall", responseMode: "constructed_response", misconceptionTags: ["numeral-quantity-disconnect"], contextKey: "y2-post-mab-542", structureKey: "y2-post-read-hundreds-blocks", prompt: "Read the blocks. Flats show 100, rods show 10 and small blocks show 1.", correctAnswer: "542", type: "numeric", visual: { type: "number_y2_place_value", hundreds: 5, tens: 4, ones: 2 } },
-  { descriptor: "AC9M2N01", week: 1, lesson: 3, skillId: "order_to_1000", skillLabel: "Order Numbers", difficulty: "moderate", cognitiveCategory: "application", responseMode: "manipulated_response", misconceptionTags: ["numeral-quantity-disconnect"], contextKey: "y2-post-order-609-690-906", structureKey: "y2-post-build-descending-order", prompt: "Put these numbers in order. Largest first.", correctAnswer: "906||690||609", type: "number_order", options: ["609", "906", "690"], visual: { type: "number_y2_number_cards", values: [609, 906, 690] } },
+  { descriptor: "AC9M2N01", week: 1, lesson: 3, skillId: "order_to_1000", skillLabel: "Order Numbers", difficulty: "moderate", cognitiveCategory: "application", responseMode: "manipulated_response", misconceptionTags: ["numeral-quantity-disconnect"], contextKey: "y2-post-order-609-690-906", structureKey: "y2-post-build-descending-order", prompt: "Put these numbers in order. Largest first.", correctAnswer: "1000||990||909", type: "number_order", options: ["909", "1000", "990"], visual: { type: "number_y2_number_cards", values: [909, 1000, 990] } },
   { descriptor: "AC9M2N02", week: 2, lesson: 1, skillId: "place_value_parts", skillLabel: "Partition Numbers", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["place-value-position"], contextKey: "y2-post-parts-708", structureKey: "y2-post-combine-hundreds-ones", prompt: "What number do 7 hundreds, 0 tens and 8 ones make?", correctAnswer: "708", type: "numeric", visual: { type: "number_y2_place_value", hundreds: 7, tens: 0, ones: 8 } },
   { descriptor: "AC9M2N02", week: 2, lesson: 3, skillId: "partition_check", skillLabel: "Check a Partition", difficulty: "challenging", cognitiveCategory: "reasoning", responseMode: "selected_response", misconceptionTags: ["nonstandard-partition", "part-whole-conservation"], misconceptionDiagnosis: true, contextKey: "y2-post-partition-482-error", structureKey: "y2-post-diagnose-changed-whole", prompt: "Which partition does not make 482?", correctAnswer: "400 + 28", type: "mcq", options: ["400 + 82", "300 + 182", "400 + 28"], visual: { type: "number_y2_partition_choices", whole: 482, choices: [[400, 82], [300, 182], [400, 28]] } },
   { descriptor: "AC9M2N03", week: 12, lesson: 1, skillId: "equal_fraction_parts", skillLabel: "Equal Fraction Parts", difficulty: "easy", cognitiveCategory: "understanding", responseMode: "constructed_response", misconceptionTags: ["unequal-fraction-parts"], contextKey: "y2-post-three-quarters", structureKey: "y2-post-enter-selected-parts", prompt: "How many of the 4 equal parts are selected?", correctAnswer: "3", type: "numeric", visual: { type: "number_y2_fraction", parts: 4, selected: 3 } },
@@ -124,5 +124,12 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
   { descriptor: "AC9M2A03", week: 10, lesson: 3, skillId: "derive_twos_division", skillLabel: "Derive a Twos Division Fact", difficulty: "moderate", cognitiveCategory: "reasoning", responseMode: "selected_response", misconceptionTags: ["fact-recall-transfer"], misconceptionDiagnosis: true, contextKey: "y2-post-double-9", structureKey: "y2-post-diagnose-related-halving-fact", prompt: "Double 9 is 18. Which related halving fact is true?", correctAnswer: "18 ÷ 2 = 9", type: "mcq", options: ["18 ÷ 2 = 9", "18 ÷ 9 = 9", "9 ÷ 2 = 18"], visual: { type: "number_y2_double_halve", factor: 9, total: 18 } },
 ] as const;
 
+const PAIRED_POST_OVERRIDES: Record<number, Partial<ItemSpec>> = {
+  5:{prompt:"Halve each half once. How many equal parts are there now?",correctAnswer:"4",visual:{type:"number_y2_fraction_halving",before:2,after:4}},
+  8:{prompt:"Which strategy correctly solves 58 + 26?",correctAnswer:"60 + 24",options:["60 + 24","60 + 26","58 + 20"],visual:{type:"number_y2_equation",expression:"58 + 26"}},
+  16:{prompt:"The rule is subtract 10. Fill the gap.",correctAnswer:"80",visual:{type:"number_y2_sequence",values:[110,100,90,null],rule:"-10"}},
+  18:{prompt:"Use 7 + 6 = 13. Find 13 - 6.",correctAnswer:"7",visual:{type:"number_y2_fact_family",family:[7,6,13],missing:"difference"}},
+  19:{prompt:"Double 9 is 18. Halve 18 into 2 equal groups. How many in each?",correctAnswer:"9",type:"numeric",options:undefined,visual:{type:"number_y2_double_halve",factor:9,total:18}}
+};
 export const YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS: readonly CandidateQuestion[] = PRETEST_SPECS.map((spec, index) => candidate("pretest", index, spec));
-export const YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS: readonly CandidateQuestion[] = POSTTEST_SPECS.map((spec, index) => candidate("posttest", index, spec));
+export const YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS: readonly CandidateQuestion[] = POSTTEST_SPECS.map((spec, index) => candidate("posttest", index, {...spec, difficulty:PRETEST_SPECS[index]!.difficulty,cognitiveCategory:PRETEST_SPECS[index]!.cognitiveCategory,responseMode:PRETEST_SPECS[index]!.responseMode,...PAIRED_POST_OVERRIDES[index]}));

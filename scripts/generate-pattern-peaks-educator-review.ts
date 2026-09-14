@@ -25,7 +25,10 @@ const assessmentRows = [["level", "form", "id", "descriptor", "week_link", "cogn
 for (const items of Object.values(PATTERN_PEAKS_INDEPENDENT_ASSESSMENT_FORMS)) {
   for (const item of items) {
     const task = item.practiceTask;
-    if (task?.kind !== "patternPeaksQuestion") continue;
+    if (task?.kind !== "patternPeaksQuestion") {
+      assessmentRows.push([String(item.level), item.form, item.id, item.primaryDescriptorCode, item.linkedWeeks?.join("|") ?? "", item.cognitiveCategory, item.difficulty, item.responseMode, item.prompt, String(item.correctAnswer), "algorithm_steps", item.misconceptionTags.join("|")]);
+      continue;
+    }
     assessmentRows.push([
       String(item.level), item.form, item.id, item.primaryDescriptorCode, item.linkedWeeks?.join("|") ?? "",
       item.cognitiveCategory, item.difficulty, item.responseMode, task.question.prompt, task.question.answer,

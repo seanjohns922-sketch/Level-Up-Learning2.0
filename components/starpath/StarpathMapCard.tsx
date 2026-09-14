@@ -150,8 +150,8 @@ export function StarpathMapCard({
   onAssessmentAnswer,
 }: {
   task: MapTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
   editableAssessmentMode?: boolean;
   assessmentAnswer?: string;
   onAssessmentAnswer?: (correct: boolean, response: string) => void;
@@ -219,7 +219,7 @@ export function StarpathMapCard({
                 onAssessmentAnswer(option.id === task.correctOptionId, option.id);
                 return;
               }
-              if (option.id === task.correctOptionId) onCorrect();
+              if (option.id === task.correctOptionId) onCorrect(option.id);
               else onWrong();
             }}
             className={`relative flex min-h-14 items-center justify-center rounded-2xl border-2 bg-white px-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98] ${editableAssessmentMode && assessmentAnswer === option.id ? "border-cyan-600 bg-cyan-50 ring-4 ring-cyan-200" : "border-violet-200"}`}

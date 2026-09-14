@@ -37,12 +37,12 @@ const DESCRIPTIONS: Record<string, string> = {
   AC9M3A01: "Recognise addition and subtraction as inverse operations, partition numbers and find unknown values in number sentences.",
   AC9M3A02: "Extend and apply addition and subtraction facts to 20 to calculate efficiently with larger numbers.",
   AC9M3A03: "Recall multiplication facts for 3, 4, 5 and 10 and apply the related division facts.",
-  AC9M3A04: "Describe, follow and create algorithms to investigate numbers, including odd, even and multiples patterns.",
+  AC9M3N07: "Describe, follow and create algorithms to investigate numbers, including odd, even and multiples patterns.",
   AC9M4A01: "Find unknown values in equivalent addition and subtraction equations.",
   AC9M4A02: "Recall and use multiplication facts and related division facts.",
-  AC9M5A01: "Continue and create extended additive sequences with natural numbers, fractions and decimals, and explain emerging patterns.",
+  AC9M5A01: "Recognise and explain multiplication and division as inverse operations and use this relationship to develop families of number facts.",
   AC9M5A02: "Find unknown values in equivalent multiplication and division number sentences using properties, inverse operations, factors and multiples.",
-  AC9M5A03: "Use algorithms and digital tools to explore factors and multiples and explain emerging patterns.",
+  AC9M5N10: "Use algorithms and digital tools to explore factors and multiples and explain emerging patterns.",
   AC9M6A01: "Recognise and use rules that generate visually growing patterns and number patterns involving rational numbers.",
   AC9M6A02: "Find unknown values in numerical equations involving brackets and combinations of arithmetic operations, using number properties.",
   AC9M6A03: "Create and use multi-step and decision algorithms that generate number sets, then interpret emerging patterns.",
@@ -73,20 +73,20 @@ const form = (
 
 const FORM_PROFILES: Record<PatternPeaksLevel, readonly PatternPeaksFormBlueprint[]> = {
   3: [
-    form("pretest", { accessible: 5, moderate: 9, challenging: 6 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, 4),
-    form("posttest", { accessible: 5, moderate: 9, challenging: 6 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, 4),
+    form("pretest", { accessible: 4, moderate: 15, challenging: 1 }, { recall: 4, understanding: 6, application: 9, reasoning: 1, transfer: 0 }, 4),
+    form("posttest", { accessible: 4, moderate: 15, challenging: 1 }, { recall: 4, understanding: 6, application: 9, reasoning: 1, transfer: 0 }, 4),
   ],
   4: [
-    form("pretest", { accessible: 6, moderate: 10, challenging: 4 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 }, 3),
-    form("posttest", { accessible: 4, moderate: 9, challenging: 7 }, { recall: 1, understanding: 4, application: 7, reasoning: 6, transfer: 2 }, 3),
+    form("pretest", { accessible: 3, moderate: 17, challenging: 0 }, { recall: 3, understanding: 2, application: 15, reasoning: 0, transfer: 0 }, 3),
+    form("posttest", { accessible: 3, moderate: 17, challenging: 0 }, { recall: 3, understanding: 2, application: 15, reasoning: 0, transfer: 0 }, 3),
   ],
   5: [
-    form("pretest", { accessible: 5, moderate: 10, challenging: 5 }, { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, 2),
-    form("posttest", { accessible: 3, moderate: 9, challenging: 8 }, { recall: 1, understanding: 3, application: 6, reasoning: 7, transfer: 3 }, 2),
+    form("pretest", { accessible: 0, moderate: 19, challenging: 1 }, { recall: 0, understanding: 6, application: 13, reasoning: 1, transfer: 0 }, 2),
+    form("posttest", { accessible: 0, moderate: 19, challenging: 1 }, { recall: 0, understanding: 6, application: 13, reasoning: 1, transfer: 0 }, 2),
   ],
   6: [
-    form("pretest", { accessible: 4, moderate: 10, challenging: 6 }, { recall: 1, understanding: 4, application: 6, reasoning: 6, transfer: 3 }, 1),
-    form("posttest", { accessible: 2, moderate: 8, challenging: 10 }, { recall: 0, understanding: 3, application: 6, reasoning: 7, transfer: 4 }, 1),
+    form("pretest", { accessible: 0, moderate: 10, challenging: 10 }, { recall: 0, understanding: 0, application: 10, reasoning: 10, transfer: 0 }, 1),
+    form("posttest", { accessible: 0, moderate: 10, challenging: 10 }, { recall: 0, understanding: 0, application: 10, reasoning: 10, transfer: 0 }, 1),
   ],
 };
 
@@ -97,7 +97,7 @@ function buildBlueprint(level: PatternPeaksLevel): PatternPeaksAssessmentBluepri
   return {
     level,
     yearLabel,
-    curriculumSource: "Australian Curriculum: Mathematics, Version 9.0, Algebra strand, Years 3–6",
+    curriculumSource: "Australian Curriculum: Mathematics, Version 9.0, Algebra strand and Number algorithms AC9M3N07 / AC9M5N10, Years 3–6",
     descriptors: codes.map((code, index) => ({
       code,
       description: DESCRIPTIONS[code] ?? code,

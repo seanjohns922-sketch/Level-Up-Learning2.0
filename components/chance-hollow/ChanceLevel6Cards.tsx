@@ -13,7 +13,7 @@ type ForgeTask = Extract<PracticeTask, { kind: "chanceProbabilityForge" }>;
 type SimulationTask = Extract<PracticeTask, { kind: "chanceSimulationLab" }>;
 type DebugTask = Extract<PracticeTask, { kind: "chanceModelDebugger" }>;
 type MasterTask = Extract<PracticeTask, { kind: "chanceMasterTrial" }>;
-type CardProps<T> = { task: T; onCorrect: () => void; onWrong: (answer?: string, correctAnswer?: string) => void };
+type CardProps<T> = { task: T; assessmentMode?: boolean; onCorrect: (response?: string) => void; onWrong: (answer?: string, correctAnswer?: string) => void };
 
 const EPSILON = 0.026;
 
@@ -41,7 +41,7 @@ export function ChanceScalePortalCard({ task, onCorrect, onWrong }: CardProps<Sc
   const sourceFraction = /^(\d+)\/(\d+)$/.exec(task.sourceLabel);
 
   function check() {
-    if (Math.abs(selected - task.targetValue) <= EPSILON) onCorrect();
+    if (Math.abs(selected - task.targetValue) <= EPSILON) onCorrect(label(selected));
     else onWrong(label(selected));
   }
 
@@ -68,7 +68,7 @@ export function ChanceFormMatchCard({ task, onCorrect, onWrong }: CardProps<Form
   function check() {
     const correctIdx = task.options.map((o, i) => (o.correct ? i : -1)).filter((i) => i >= 0);
     const ok = correctIdx.length === selected.size && correctIdx.every((i) => selected.has(i));
-    if (ok) onCorrect(); else onWrong([...selected].map((i) => task.options[i]!.label).join(", "));
+    if (ok) onCorrect(JSON.stringify([...selected].map(i => task.options[i]!.label))); else onWrong([...selected].map((i) => task.options[i]!.label).join(", "));
   }
   return <div className="space-y-5">
     <TaskHeading text={task.prompt} />
@@ -89,17 +89,17 @@ function ToolVisual({ tool, winning, total }: { tool: ForgeTask["tool"]; winning
   return <div className={`grid w-52 gap-2 rounded-lg border-2 border-[#b78ae8] bg-white/70 p-4 ${total > 8 ? "grid-cols-5" : "grid-cols-4"}`}>{items.map((_, index) => <span key={index} className={`grid aspect-square place-items-center font-black text-white shadow-sm ${tool === "die" ? "rounded-md" : "rounded-full"} ${index < winning ? "bg-fuchsia-500" : "bg-cyan-500"}`}>{tool === "die" ? index + 1 : ""}</span>)}</div>;
 }
 
-export function ChanceProbabilityForgeCard({ task, onCorrect, onWrong }: CardProps<ForgeTask>) {
+export function ChanceProbabilityForgeCard({ task, onCorrect, onWrong, assessmentMode = false }: CardProps<ForgeTask>) {
   const [winning, setWinning] = useState(task.initialWinning);
   const [phase, setPhase] = useState<"build" | "battle">("build");
   const targetPercent = Math.round(task.targetWinning / task.total * 100);
   const currentPercent = Math.round(winning / task.total * 100);
   function check() {
     if (winning !== task.targetWinning) { onWrong(`${winning}/${task.total}`); return; }
-    if (task.battle) setPhase("battle"); else onCorrect();
+    if (task.battle && !assessmentMode) setPhase("battle"); else onCorrect(JSON.stringify({ winning, total: task.total }));
   }
   if (phase === "battle") {
-    return <ForgeBattle tool={task.tool} winning={task.targetWinning} total={task.total} onDone={onCorrect} />;
+    return <ForgeBattle tool={task.tool} winning={task.targetWinning} total={task.total} onDone={() => onCorrect(JSON.stringify({ winning, total: task.total }))} />;
   }
   return <div className="space-y-5">
     <TaskHeading text={task.prompt} />
@@ -179,9 +179,9 @@ function randomCount(trials: number, probability: number) {
   return count;
 }
 
-export function ChanceSimulationLabCard({ task, onCorrect, onWrong }: CardProps<SimulationTask>) {
+export function ChanceSimulationLabCard({ task, onCorrect, onWrong, assessmentMode = false }: CardProps<SimulationTask>) {
   const probability = task.winning / task.total;
-  const [prediction, setPrediction] = useState(Math.round(task.stages[0]! * probability));
+  const [prediction, setPrediction] = useState(assessmentMode ? 0 : Math.round(task.stages[0]! * probability));
   const [results, setResults] = useState<number[]>([]);
   const [claim, setClaim] = useState<string | null>(null);
   const expectedFirst = Math.round(task.stages[0]! * probability);
@@ -222,11 +222,11 @@ export function ChanceSimulationLabCard({ task, onCorrect, onWrong }: CardProps<
   const part2Heading = task.analysis ? "Read the results" : "Choose the evidence claim";
 
   function launch() {
-    if (task.challenge === "predict" && prediction !== expectedFirst) { onWrong(String(prediction), String(expectedFirst)); return; }
+    if (task.challenge === "predict" && prediction !== expectedFirst) { onWrong(JSON.stringify({ prediction, results, claim }), String(expectedFirst)); return; }
     const nextIndex = results.length;
     if (nextIndex < task.stages.length) setResults((current) => [...current, randomCount(task.stages[nextIndex]!, probability)]);
   }
-  function finish() { if (claim && part2CorrectSet.includes(claim)) onCorrect(); else onWrong(claim ?? "No answer", part2CorrectSet[0]); }
+  function finish() { if (claim && part2CorrectSet.includes(claim)) onCorrect(JSON.stringify({ prediction, results, claim })); else onWrong(JSON.stringify({ prediction, results, claim }), part2CorrectSet[0]); }
 
   return <div className="space-y-5">
     <TaskHeading text={task.prompt} />
@@ -245,7 +245,7 @@ export function ChanceSimulationLabCard({ task, onCorrect, onWrong }: CardProps<
 
 export function ChanceModelDebuggerCard({ task, onCorrect, onWrong }: CardProps<DebugTask>) {
   const [selected, setSelected] = useState<string | null>(null);
-  function check() { if (selected === task.answerId) onCorrect(); else onWrong(task.machines.find((machine) => machine.id === selected)?.title); }
+  function check() { if (selected === task.answerId) onCorrect(selected ?? ""); else onWrong(task.machines.find((machine) => machine.id === selected)?.title); }
   return <div className="space-y-5"><TaskHeading text={task.prompt} /><div className="rounded-lg border-2 border-[#ca9df2] bg-[#1f152c] p-5 text-white"><div className="mb-5 flex items-center gap-3"><Cpu className="h-7 w-7 text-cyan-300" /><div><div className="text-xs font-black uppercase text-fuchsia-300">Simulation brief</div><div className="text-xl font-black">{task.scenario}</div></div></div><div className="grid gap-3 md:grid-cols-3">{task.machines.map((machine) => <button key={machine.id} type="button" onClick={() => setSelected(machine.id)} className={`min-h-40 rounded-lg border-2 p-4 text-left transition ${selected === machine.id ? "border-amber-300 bg-[#4b2861] shadow-[0_0_24px_rgba(217,70,239,.35)]" : "border-white/15 bg-white/5 hover:border-cyan-300"}`}><span className="mb-5 flex items-center justify-between gap-2"><span className="grid h-10 w-10 place-items-center rounded-md bg-gradient-to-br from-fuchsia-500 to-cyan-400"><Cpu /></span><OptionReadAloudButton text={`${machine.title}. ${machine.detail}`} /></span><span className="block text-lg font-black">{machine.title}</span><span className="mt-2 block text-sm font-semibold text-white/75">{machine.detail}</span></button>)}</div></div><ActionButton onClick={check} disabled={!selected}><Check className="h-5 w-5" /> Run diagnostic</ActionButton></div>;
 }
 
@@ -254,15 +254,18 @@ export function ChanceMasterTrialCard({ task, onCorrect, onWrong }: CardProps<Ma
   const expected = Math.round(task.trials * probability);
   const [stage, setStage] = useState(0);
   const [wrong, setWrong] = useState(false);
+  const [responses, setResponses] = useState<string[]>([]);
   const shieldPower = Math.max(0, 100 - stage * 34);
   const equivalentChoices = rotateChoices([Math.round(probability * 100), Math.min(100, Math.round(probability * 100) + 10), Math.max(0, Math.round(probability * 100) - 10)], task.targetWinning);
   const expectedChoices = rotateChoices([expected, Math.min(task.trials, expected + Math.max(2, Math.round(task.trials * 0.1))), Math.max(0, expected - Math.max(2, Math.round(task.trials * 0.1)))], task.total);
   const verdicts = ["The difference is normal variation; repeat more trials for stronger evidence.", "The observed result must equal the expected result.", "One result proves the machine is unfair."];
 
   function strike(correct: boolean, answer: string) {
-    if (!correct) { setWrong(true); onWrong(answer); return; }
+    const next = [...responses, answer];
+    if (!correct) { setWrong(true); onWrong(JSON.stringify(next)); return; }
+    setResponses(next);
     setWrong(false);
-    if (stage === 2) onCorrect(); else setStage((value) => value + 1);
+    if (stage === 2) onCorrect(JSON.stringify(next)); else setStage((value) => value + 1);
   }
   return <div className="space-y-4"><TaskHeading text={task.prompt} /><div className="grid overflow-hidden rounded-lg border-2 border-fuchsia-400 bg-gradient-to-br from-[#130d20] via-[#2b1641] to-[#071f2b] text-white shadow-2xl md:grid-cols-[minmax(220px,34%)_1fr]"><div className="relative flex min-h-[360px] items-end justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_45%,rgba(217,70,239,.45),transparent_58%)] p-4 pt-20"><Image src={task.opponentImage} alt={task.opponentName} width={527} height={746} className="h-auto w-full max-w-[280px] object-contain" priority /><div className="absolute left-3 right-3 top-3 rounded-md border border-fuchsia-300/30 bg-black/55 p-3 backdrop-blur"><div className="flex items-center justify-between text-xs font-black uppercase"><span>{task.opponentName}</span><span>{shieldPower}% shield</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-white/15"><div className="h-full bg-gradient-to-r from-cyan-400 to-fuchsia-500 transition-all" style={{ width: `${shieldPower}%` }} /></div></div></div><div className="p-5 md:p-7"><div className="mb-4 flex items-center gap-3"><Shield className="h-8 w-8 text-amber-300" /><div><div className="text-xs font-black uppercase text-fuchsia-300">Strike {stage + 1} of 3</div><div className="text-xl font-black">{stage === 0 ? "Crack the scale seal" : stage === 1 ? "Predict the pulse" : "Defend the verdict"}</div></div></div>{stage === 0 ? <><p className="mb-4 font-bold">Which percentage equals <Fraction numerator={task.targetWinning} denominator={task.total} />?</p><div className="grid gap-3 sm:grid-cols-3">{equivalentChoices.map((value) => <button key={value} type="button" onClick={() => strike(value === Math.round(probability * 100), `${value}%`)} className="flex items-center justify-between gap-2 rounded-lg border-2 border-white/20 bg-white/10 p-4 text-xl font-black hover:border-cyan-300 hover:bg-cyan-400/20"><span>{value}%</span><OptionReadAloudButton text={`${value} percent`} /></button>)}</div></> : stage === 1 ? <><p className="mb-4 font-bold">About how many wins are expected in {task.trials} trials?</p><div className="grid gap-3 sm:grid-cols-3">{expectedChoices.map((value) => <button key={value} type="button" onClick={() => strike(value === expected, String(value))} className="flex items-center justify-between gap-2 rounded-lg border-2 border-white/20 bg-white/10 p-4 text-xl font-black hover:border-cyan-300 hover:bg-cyan-400/20"><span>{value}</span><OptionReadAloudButton text={`${value} wins`} /></button>)}</div></> : <><p className="mb-4 font-bold">The simulation recorded {task.observed} wins; expected was about {expected}. Which verdict holds?</p><div className="space-y-3">{verdicts.map((verdict, index) => <button key={verdict} type="button" onClick={() => strike(index === 0, verdict)} className="flex w-full items-center justify-between gap-3 rounded-lg border-2 border-white/20 bg-white/10 p-3 text-left font-bold hover:border-amber-300"><span>{verdict}</span><OptionReadAloudButton text={verdict} /></button>)}</div></>}{wrong ? <p className="mt-4 font-bold text-rose-300">The shield held. Recheck the evidence.</p> : null}</div></div></div>;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { ReactNode } from "react";
 import { ChevronLeft, Home, LogOut, DoorOpen, HelpCircle } from "lucide-react";
 import { MathFormattedText } from "@/components/FractionText";
@@ -130,10 +131,12 @@ export default function AssessmentShell({
             : isModernNumber
               ? "#001b18"
             : "linear-gradient(to bottom, rgb(2 6 23), rgb(15 23 42), rgb(2 6 23))",
-        backgroundImage: isModernNumber
-          ? "linear-gradient(rgba(45,212,191,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(45,212,191,0.035) 1px, transparent 1px)"
-          : undefined,
-        backgroundSize: isModernNumber ? "48px 48px" : undefined,
+        // Do not clear backgroundImage after setting a background shorthand:
+        // that removes the gradient used by Measurement and legacy Number.
+        ...(isModernNumber ? {
+          backgroundImage: "linear-gradient(rgba(45,212,191,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(45,212,191,0.035) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        } : {}),
         paddingBottom: "max(2rem, calc(env(safe-area-inset-bottom) + 1rem))",
       }}
     >
@@ -178,7 +181,7 @@ export default function AssessmentShell({
       {/* ── Mission Header ── */}
       <div className={`assessment-header relative z-10 w-full ${contentWidth} ${isModernNumber ? "mb-4" : "mb-6"}`}>
         {/* Top bar */}
-        <div className="assessment-top-bar flex items-center justify-between mb-4">
+        <div className="assessment-top-bar flex flex-wrap items-center justify-between gap-2 mb-4">
           {hasExitMenu ? (
             <div className="flex items-center gap-1.5">
               {onHome && (
@@ -222,7 +225,8 @@ export default function AssessmentShell({
             </button>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <FullscreenToggle inline />
             <span
               className="px-3 py-1 rounded-lg text-xs font-bold"
               style={{

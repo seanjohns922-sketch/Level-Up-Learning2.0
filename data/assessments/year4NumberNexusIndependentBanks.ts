@@ -37,14 +37,14 @@ function candidate(form: AssessmentFormKind, index: number, spec: ItemSpec): Can
   const shortForm = form === "pretest" ? "pre" : "post";
   return {
     schemaVersion: 1,
-    id: `y4-number-${shortForm}-${String(index + 1).padStart(2, "0")}-v1`,
-    version: "1.0.0",
+    id: `y4-number-${shortForm}-${String(index + 1).padStart(2, "0")}-v2`,
+    version: "2.0.0",
     realm: "number",
     level: 4,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `number-nexus-level-4-${form}-v1`,
+    bankId: `number-nexus-level-4-${form}-v2`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
@@ -127,5 +127,19 @@ const POSTTEST_SPECS: readonly ItemSpec[] = [
   { descriptor: "AC9M4N09", week: 11, lesson: 3, skillId: "create_addition_algorithm", skillLabel: "Create an Algorithm", difficulty: "challenging", cognitiveCategory: "application", responseMode: "manipulated_response", misconceptionTags: ["algorithm-step-order", "pattern-rule-vs-example"], contextKey: "y4-post-build-algorithm", structureKey: "y4-post-order-algorithm-steps", prompt: "The sequence is shown. Put the four algorithm instructions in order.", correctAnswer: "Start at 8.||Record the current number.||Add 9.||Repeat steps 2 and 3.", type: "number_order", options: ["Repeat steps 2 and 3.", "Add 9.", "Record the current number.", "Start at 8."], visual: { type: "number_y4_sequence", values: [8, 17, 26, 35] } },
 ] as const;
 
+const PAIRED_POST_OVERRIDES: Record<number, Partial<ItemSpec>> = {
+  3:{prompt:"Enter the smallest positive number that makes the sum even.",correctAnswer:"1",type:"numeric",options:undefined,visual:{type:"number_y4_equation",expression:"35 + □",label:"even total"}},
+  6:{prompt:"Continue the quarter count. Enter the missing numerator.",correctAnswer:"7",visual:{type:"number_y4_fraction_sequence",values:["4/4","5/4","6/4","?/4"],answerDenominator:4}},
+  7:{prompt:"What decimal is marked on the line?",correctAnswer:"2.25",visual:{type:"number_y4_number_line",min:2,max:3,divisions:4,marker:1}},
+  8:{prompt:"Find the scaled product.",correctAnswer:"5300",visual:{type:"number_y4_equation",expression:"53 × 100"}},
+  9:{prompt:"Find the sum.",correctAnswer:"5274",visual:{type:"number_y4_vertical_calculation",top:3578,bottom:1696,operation:"+"}},
+  13:{prompt:"Is an estimate of $200 reasonable for four items costing $49 each?",correctAnswer:"Yes",type:"mcq",options:["No","Yes","There is not enough information"],visual:{type:"number_y4_equation",expression:"4 × $49 ≈ $200"}},
+  17:{prompt:"What total does the model represent?",correctAnswer:"56",visual:{type:"number_y4_equation",expression:"8 × 7"}}
+};
+
 export const YEAR4_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS: readonly CandidateQuestion[] = PRETEST_SPECS.map((spec, index) => candidate("pretest", index, spec));
-export const YEAR4_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS: readonly CandidateQuestion[] = POSTTEST_SPECS.map((spec, index) => candidate("posttest", index, spec));
+export const YEAR4_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS: readonly CandidateQuestion[] = POSTTEST_SPECS.map((spec, index) => candidate("posttest", index, {
+  ...spec, difficulty: PRETEST_SPECS[index]!.difficulty, cognitiveCategory: PRETEST_SPECS[index]!.cognitiveCategory,
+  responseMode: PRETEST_SPECS[index]!.responseMode, ...PAIRED_POST_OVERRIDES[index],
+  ...(PAIRED_POST_OVERRIDES[index] ? { skillId: PRETEST_SPECS[index]!.skillId, skillLabel: PRETEST_SPECS[index]!.skillLabel } : {})
+}));

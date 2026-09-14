@@ -43,8 +43,8 @@ check(Boolean(blueprint), "Year 3 Starpath blueprint is missing.");
 check(blueprint?.descriptors.every((item) => item.curriculumMapping.implementationStatus === "aligned") ?? false, "Year 3 blueprint is not curriculum-aligned.");
 
 const forms = [
-  { kind: "pretest", bank: LEVEL3_STARPATH_INDEPENDENT_PRETEST_ITEMS, difficulty: { easy: 7, moderate: 9, challenging: 4 }, cognitive: { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, bankId: "starpath-level-3-pretest-v1" },
-  { kind: "posttest", bank: LEVEL3_STARPATH_INDEPENDENT_POSTTEST_ITEMS, difficulty: { easy: 5, moderate: 9, challenging: 6 }, cognitive: { recall: 1, understanding: 5, application: 7, reasoning: 5, transfer: 2 }, bankId: "starpath-level-3-posttest-v1" },
+  { kind: "pretest", bank: LEVEL3_STARPATH_INDEPENDENT_PRETEST_ITEMS, difficulty: {"easy": 7, "moderate": 9, "challenging": 4}, cognitive: {"recall": 2, "understanding": 6, "application": 7, "reasoning": 4, "transfer": 1}, bankId: "starpath-level-3-pretest-v4" },
+  { kind: "posttest", bank: LEVEL3_STARPATH_INDEPENDENT_POSTTEST_ITEMS, difficulty: {"easy": 7, "moderate": 9, "challenging": 4}, cognitive: {"recall": 2, "understanding": 6, "application": 7, "reasoning": 4, "transfer": 1}, bankId: "starpath-level-3-posttest-v4" },
 ] as const;
 
 for (const form of forms) {
@@ -54,17 +54,17 @@ for (const form of forms) {
   check(new Set(bank.map((item) => item.prompt)).size === 20, `${form.kind} prompts must be unique.`);
   check(new Set(bank.map((item) => item.contextKey)).size === 20, `${form.kind} contexts must be unique.`);
   check(new Set(bank.map((item) => item.structureKey)).size === 20, `${form.kind} structures must be unique.`);
-  check(sameCounts(counts(bank.map((item) => item.primaryDescriptorCode)), { AC9M3SP01: 8, AC9M3SP02: 12 }), `${form.kind} descriptor allocation must be 8 SP01 and 12 SP02.`);
+  check(sameCounts(counts(bank.map((item) => item.primaryDescriptorCode)), { AC9M3SP01: 10, AC9M3SP02: 10 }), `${form.kind} descriptor allocation must be 10 SP01 and 10 SP02.`);
   check(sameCounts(counts(bank.map((item) => item.difficulty)), form.difficulty), `${form.kind} difficulty mix differs from the approved blueprint.`);
   check(sameCounts(counts(bank.map((item) => item.cognitiveCategory)), form.cognitive), `${form.kind} cognitive mix differs from the approved blueprint.`);
   check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 4, manipulated_response: 16 }), `${form.kind} response mix must be 4 selected and 16 manipulated.`);
-  check(bank.filter((item) => item.practiceTask?.kind === "starpathMapCreate").length === 8, `${form.kind} must contain eight map-creation tasks.`);
+  check(bank.filter((item) => item.practiceTask?.kind === "starpathMapCreate").length === 6, `${form.kind} must contain six map-creation tasks and two object models.`);
   check(bank.filter((item) => item.practiceTask?.kind === "starpathMapRoute").length === 4, `${form.kind} must contain four route-authoring tasks.`);
   check(bank.every((item) => item.prompt.trim().split(/\s+/).length <= 15), `${form.kind} contains a prompt above the 15-word Year 3 ceiling.`);
 
   for (const item of bank) {
     const task = item.practiceTask;
-    check(item.version === "1.0.0" && item.bankId === form.bankId, `${item.id} has incorrect release metadata.`);
+    check(item.version === "4.0.0" && item.bankId === form.bankId, `${item.id} has incorrect release metadata.`);
     check(item.realm === "space" && item.level === 3 && item.form === form.kind, `${item.id} targets the wrong form.`);
     check(item.origin === "assessment_authored" && item.sourcePool === form.kind, `${item.id} is not independent assessment content.`);
     check(item.renderer.type === "starpath_assessment_task" && item.type === "starpathTask", `${item.id} is not launchable.`);

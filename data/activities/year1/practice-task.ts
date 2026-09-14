@@ -55,6 +55,7 @@ export type StarpathGroundAssessmentTask =
       tokens: StarpathGroundAssessmentToken[];
       fixed?: Array<{ token: StarpathGroundAssessmentToken; r: number; c: number }>;
       answer: Array<{ tokenId: string; r: number; c: number }>;
+      relations?: Array<{ subject: string; reference: string; relation: "above" | "below" | "left" | "right" | "beside" }>;
     })
   | (StarpathGroundAssessmentTaskBase & {
       mode: "route";
@@ -134,6 +135,7 @@ export function diffPick(
 }
 
 export type PracticeTask = (
+  | import("@/lib/starpath-independent-construction").IndependentConstructionTask
   | {
       /** Independent Chance Hollow weekly-quiz item. Quiz questions are generated
        * outside lesson generators and carry their own apparatus and feedback. */
@@ -3740,6 +3742,8 @@ export type PracticeTask = (
       speakText: string;
       target: number;
       shapeLabel: string;
+      orientationConstraint?: "oblique";
+      constructionRule?: "polygon" | "square" | "rectangle" | "parallel-pair" | "two-parallel-pairs";
       points: Array<{ r: number; c: number }>;
       missingEdgeIndex?: number;
       secondShape?: {

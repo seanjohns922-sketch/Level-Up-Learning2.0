@@ -11,14 +11,14 @@ type ChanceQuizTask = Extract<PracticeTask, { kind: "chanceQuizQuestion" }>;
 
 export default function ChanceQuizQuestionCard({ task, onCorrect, onWrong }: {
   task: ChanceQuizTask;
-  onCorrect: () => void;
+  onCorrect: (response?: string) => void;
   onWrong: (answer?: string) => void;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
 
   function choose(option: string) {
     setPicked(option);
-    if (option === task.answer) onCorrect();
+    if (option === task.answer) onCorrect(option);
     else onWrong(option);
   }
 

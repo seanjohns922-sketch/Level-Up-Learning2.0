@@ -17,7 +17,7 @@ assert.match(
   /const level = supportedLevel\(realmId, schoolYearOf\(student\)\);[\s\S]*entry: normalizeEntryMode\(realmId, level, "pretest"\)/,
   "New placement rows must persist a school-year default supported by the selected realm.",
 );
-assert.match(source, /if \(level === "Prep"\) return "ground_week1"/);
+assert.match(source, /if \(level === "Prep" && !isFirstLevelPretestEnabled\(realmId, level\)\) return "ground_week1"/);
 assert.match(source, /entryModesForLevel\(realmId, level\)/);
 assert.match(source, /isFirstLevelPretestEnabled\(realmId, level\)/);
 assert.match(
@@ -45,7 +45,7 @@ assert.match(
   /database migration must be deployed/,
   "Database realm drift must produce an actionable teacher-facing error.",
 );
-assert.match(source, /level !== "Prep" \? <button onClick=\{\(\) => onResetPretest\(s\)\}/);
+assert.match(source, /\(level !== "Prep" \|\| isFirstLevelPretestEnabled\(realmId, level\)\) \? <button onClick=\{\(\) => onResetPretest\(s\)\}/);
 for (const key of ["surname", "schoolYear", "assignedStart", "currentProgress"]) {
   assert.match(source, new RegExp(`toggleSort\\("${key}"\\)`));
 }

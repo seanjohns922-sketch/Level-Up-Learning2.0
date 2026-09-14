@@ -49,7 +49,7 @@ function authoredQuestion(
   descriptorCode: string,
   descriptorIndex = index,
 ): { question: TypedResponseQuestion; structure: string } {
-  const offset = form === "posttest" ? 17 : 3;
+  const offset = form === "posttest" ? 18 : 3;
   const seed = level * 101 + index * 13 + offset;
   let archetype = index % 5;
 
@@ -98,20 +98,20 @@ function authoredQuestion(
     archetype = descriptorIndex % 3;
     if (archetype === 0) {
       const base = [2, 3, 5, 10][descriptorIndex % 4]!;
-      const startMultiplier = 3 + descriptorIndex;
+      const startMultiplier = 3 + descriptorIndex + (form === "posttest" ? 1 : 0);
       const terms = Array.from({ length: 6 }, (_, position) => base * (startMultiplier + position));
       const missingPosition = descriptorIndex >= 3 ? 4 : 3;
       return { question: { kind: "typed_response", prompt: "Follow the algorithm. Type the missing multiple.", answer: String(terms[missingPosition]), visual: { type: "pattern_sequence_strip", title: `Add ${base} each step`, terms: terms.map((value, position) => position === missingPosition ? "?" : String(value)) } }, structure: "multiple-algorithm" };
     }
     if (archetype === 1) {
-      const input = 23 + descriptorIndex * 7;
+      const input = 23 + descriptorIndex * 7 + (form === "posttest" ? 2 : 0);
       const even = input % 2 === 0;
       const hasFinalStep = descriptorIndex >= 4;
       const branchResult = even ? input / 2 : input + 5;
       const answer = hasFinalStep ? branchResult * 2 : branchResult;
-      return { question: { kind: "typed_response", prompt: hasFinalStep ? "Follow the decision branch, then double its result. What is the output?" : "Follow the correct decision branch. What is the output?", answer: String(answer), visual: { type: "decision_path_card", title: "Odd or even decision", input: String(input), decision: "Is the input even?", passLabel: hasFinalStep ? "Yes: halve, then double" : "Yes: halve it", failLabel: hasFinalStep ? "No: add 5, then double" : "No: add 5", activeBranch: even ? "pass" : "fail" } }, structure: "odd-even-algorithm" };
+      return { question: { kind: "typed_response", prompt: hasFinalStep ? "Follow the decision branch, then double its result. What is the output?" : "Follow the correct decision branch. What is the output?", answer: String(answer), visual: { type: "decision_path_card", title: "Odd or even decision", input: String(input), decision: "Is the input even?", passLabel: hasFinalStep ? "Yes: halve, then double" : "Yes: halve it", failLabel: hasFinalStep ? "No: add 5, then double" : "No: add 5"} }, structure: "odd-even-algorithm" };
     }
-    const input = 4 + descriptorIndex;
+    const input = 4 + descriptorIndex + (form === "posttest" ? 2 : 0);
     const add = [3, 5, 10][descriptorIndex % 3]!;
     return { question: { kind: "typed_response", prompt: "Follow both steps in order. What is the final output?", answer: String((input + add) * 2), visual: { type: "expression_flow", title: "Two-step number algorithm", cards: [{ label: "Input", tokens: [String(input)] }, { label: "Step 1", tokens: ["add", String(add)] }, { label: "Step 2", tokens: ["double"], result: "?" }] } }, structure: "ordered-number-algorithm" };
   }
@@ -119,7 +119,7 @@ function authoredQuestion(
   if (level === 4) {
     const formShift = form === "posttest" ? 3 : 0;
     if (descriptorCode === "AC9M4A01") {
-      archetype = descriptorIndex >= 8 ? (descriptorIndex === 8 ? 4 : 5) : (descriptorIndex + formShift) % 6;
+      archetype = descriptorIndex >= 8 ? (descriptorIndex === 8 ? 4 : 5) : descriptorIndex % 6;
       const challengeLift = descriptorIndex >= 6 ? 120 : 0;
       const whole = 145 + challengeLift + ((seed + descriptorIndex * 19) % 180);
       const part = 34 + ((seed + descriptorIndex * 11) % 90);
@@ -153,8 +153,8 @@ function authoredQuestion(
       return { question: { kind: "typed_response", prompt: "What number makes the connected equations agree?", answer: String(b + c), visual: { type: "expression_flow", title: "Connected equivalent equations", cards: [{ tokens: [String(a), "+", String(b), "+", String(c)] }, { tokens: [String(a), "+", "?"], result: String(a + b + c) }] } }, structure: "connected-addition-equations" };
     }
 
-    archetype = descriptorIndex >= 8 ? (descriptorIndex === 8 ? 4 : 5) : (descriptorIndex + formShift) % 6;
-    const factor = [3, 4, 6, 7, 8, 9][(descriptorIndex + formShift) % 6]!;
+    archetype = descriptorIndex >= 8 ? (descriptorIndex === 8 ? 4 : 5) : descriptorIndex % 6;
+    const factor = [3, 4, 6, 7, 8, 9][descriptorIndex % 6]!;
     const groups = 3 + ((seed + descriptorIndex * 5) % 8);
     const product = factor * groups;
     if (archetype === 0) {
@@ -186,31 +186,17 @@ function authoredQuestion(
     const formShift = form === "posttest" ? 5 : 0;
 
     if (descriptorCode === "AC9M5A01") {
-      archetype = (descriptorIndex + formShift) % 3;
-      if (archetype === 0) {
-        const step = [7, 9, 12, 14][(descriptorIndex + formShift) % 4]!;
-        const start = (form === "pretest" ? 28 : 43) + descriptorIndex * 6;
-        const terms = Array.from({ length: 6 }, (_, position) => start + step * position);
-        const missingPosition = descriptorIndex % 2 === 0 ? 5 : 3;
-        return { question: { kind: "typed_response", prompt: "Find the missing term in the sequence.", answer: String(terms[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Extended natural-number sequence", terms: terms.map((value, position) => position === missingPosition ? "?" : String(value)) } }, structure: "extended-additive-sequence" };
-      }
-      if (archetype === 1) {
-        const start = (form === "pretest" ? 0.35 : 0.6) + descriptorIndex * 0.1;
-        const step = [0.2, 0.25, 0.4][(descriptorIndex + formShift) % 3]!;
-        const terms = Array.from({ length: 6 }, (_, position) => Number((start + step * position).toFixed(2)));
-        const missingPosition = descriptorIndex % 2 === 0 ? 4 : 2;
-        return { question: { kind: "typed_response", prompt: "Complete the decimal sequence.", answer: String(terms[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Extended decimal sequence", terms: terms.map((value, position) => position === missingPosition ? "?" : String(value)) } }, structure: "decimal-additive-sequence" };
-      }
-      const denominator = [4, 5, 6, 8][(descriptorIndex + formShift) % 4]!;
-      const numeratorStep = 1 + ((descriptorIndex + formShift) % 3);
-      const numeratorStart = 1 + descriptorIndex + (form === "posttest" ? 2 : 0);
-      const numerators = Array.from({ length: 6 }, (_, position) => numeratorStart + numeratorStep * position);
-      const missingPosition = descriptorIndex % 2 === 0 ? 5 : 3;
-      return { question: { kind: "typed_response", prompt: "Complete the fraction sequence. Type the missing numerator.", answer: String(numerators[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Extended fraction sequence", terms: numerators.map((value, position) => position === missingPosition ? `?/${denominator}` : `${value}/${denominator}`) } }, structure: "fraction-additive-sequence" };
+      const factor = 4 + descriptorIndex;
+      const other = (form === "pretest" ? 7 : 8) + descriptorIndex;
+      const product = factor * other;
+      const inverseFirst = descriptorIndex % 2 === 0;
+      return { question: { kind: "typed_response", prompt: "The two equations belong to the same fact family. What number completes the second equation?", answer: String(other), visual: { type: "expression_flow", title: "Multiplication and division fact family", cards: inverseFirst
+        ? [{ tokens: [String(factor), "×", String(other), "=", String(product)] }, { tokens: [String(product), "÷", String(factor)], result: "?" }]
+        : [{ tokens: [String(product), "÷", String(other), "=", String(factor)] }, { tokens: [String(factor), "×", "?"], result: String(product) }] } }, structure: "inverse-multiplication-division-fact-family" };
     }
 
     if (descriptorCode === "AC9M5A02") {
-      archetype = (descriptorIndex + formShift) % 4;
+      archetype = descriptorIndex % 4;
       if (archetype === 0) {
         const factor = 7 + ((seed + descriptorIndex) % 12) + (form === "posttest" ? 11 : 0); const other = 4 + ((descriptorIndex + formShift) % 8); const product = factor * other;
         return { question: { kind: "typed_response", prompt: "Find the unknown factor.", answer: String(factor), visual: { type: "unknown_tile_equation", title: "Equivalent multiplication sentence", left: `? × ${other}`, right: String(product) } }, structure: "multiplicative-unknown" };
@@ -227,22 +213,22 @@ function authoredQuestion(
       return { question: { kind: "typed_response", prompt: "Find the value of the equivalent expression.", answer: String(factor * (10 + extra)), visual: { type: "expression_flow", title: "Equivalent distributive expressions", cards: [{ tokens: [String(factor), "×", `(10 + ${extra})`] }, { tokens: [`${factor} × 10`, "+", `${factor} × ${extra}`], result: "?" }] } }, structure: "distributive-equivalence" };
     }
 
-    archetype = (descriptorIndex + formShift) % 3;
+    archetype = descriptorIndex % 3;
     if (archetype === 0) {
-      const product = [36, 40, 48, 54, 60, 72, 84, 90][(descriptorIndex + formShift) % 8]!;
+      const product = (form === "posttest" ? [100, 56, 80, 88, 90, 108, 132, 126] : [36, 40, 48, 54, 60, 72, 84, 90])[descriptorIndex % 8]!;
       let pairCount = 0;
       for (let value = 1; value <= Math.sqrt(product); value += 1) if (product % value === 0) pairCount += 1;
       return { question: { kind: "typed_response", prompt: `How many factor pairs does ${product} have?`, answer: String(pairCount), visual: { type: "factor_pair_tree", title: "Systematic factor search", product, pairs: [] } }, structure: "factor-search-algorithm" };
     }
     if (archetype === 1) {
-      const first = [4, 6, 8, 9][(descriptorIndex + formShift) % 4]!;
+      const first = [4, 6, 8, 9][descriptorIndex % 4]!;
       const second = [6, 8, 10, 12][(descriptorIndex + 2 + formShift) % 4]!;
       let common = Math.max(first, second);
       while (common % first !== 0 || common % second !== 0) common += 1;
       return { question: { kind: "typed_response", prompt: `Find the least common multiple of ${first} and ${second}.`, answer: String(common), visual: { type: "pattern_sequence_strip", title: "Compare two multiple sequences", terms: [`Multiples of ${first}`, `Multiples of ${second}`, "First match: ?"] } }, structure: "common-multiple-algorithm" };
     }
     const base = [5, 6, 7, 8, 9][(descriptorIndex + formShift) % 5]!;
-    const lower = base * (5 + descriptorIndex);
+    const lower = base * (5 + descriptorIndex + (form === "posttest" ? 2 : 0));
     const upper = lower + base * (3 + (descriptorIndex % 2));
     const count = Math.floor(upper / base) - Math.floor(lower / base) + 1;
     return { question: { kind: "typed_response", prompt: `How many multiples of ${base} are there from ${lower} to ${upper}, including both endpoints?`, answer: String(count), visual: { type: "pattern_sequence_strip", title: "Systematic multiple search", terms: [String(lower), "…", String(upper)] } }, structure: "multiple-search-algorithm" };
@@ -261,15 +247,15 @@ function authoredQuestion(
     }
     if (archetype === 1) {
       const start = 0.4 + formShift * 0.15;
-      const step = [0.25, 0.35, 0.45][(descriptorIndex + formShift) % 3]!;
+      const step = [0.25, 0.35, 0.45][descriptorIndex % 3]!;
       const terms = Array.from({ length: 7 }, (_, position) => Number((start + position * step).toFixed(2)));
       const missingPosition = 5;
       return { question: { kind: "typed_response", prompt: "Complete the extended decimal sequence.", answer: String(terms[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Decimal sequence", terms: terms.map((value, position) => position === missingPosition ? "?" : String(value)) } }, structure: "decimal-sequence" };
     }
     if (archetype === 2) {
-      const denominator = [5, 6, 8, 10][(descriptorIndex + formShift) % 4]!;
+      const denominator = [5, 6, 8, 10][descriptorIndex % 4]!;
       const numeratorStart = 1 + formShift;
-      const numeratorStep = 2 + ((descriptorIndex + formShift) % 3);
+      const numeratorStep = 2 + (descriptorIndex % 3);
       const numerators = Array.from({ length: 7 }, (_, position) => numeratorStart + position * numeratorStep);
       const missingPosition = 5;
       return { question: { kind: "typed_response", prompt: "What numerator completes this extended fraction sequence?", answer: String(numerators[missingPosition]), visual: { type: "pattern_sequence_strip", title: "Fraction sequence", terms: numerators.map((value, position) => position === missingPosition ? `?/${denominator}` : `${value}/${denominator}`) } }, structure: "fraction-sequence" };
@@ -309,7 +295,7 @@ function authoredQuestion(
     archetype = descriptorIndex % 6;
     const a = 5 + ((seed + descriptorIndex) % 9);
     const b = 3 + ((seed + formShift) % 7);
-    const outside = 2 + ((descriptorIndex + formShift) % 4);
+    const outside = 2 + (descriptorIndex % 4);
     if (archetype === 0) {
       return { question: { kind: "typed_response", prompt: "Calculate the bracketed expression.", answer: String((a + b) * outside), visual: { type: "bracket_equation_card", title: "Brackets and operation order", left: `(${a} + ${b}) × ${outside}`, right: "?", bracketGroup: `${a} + ${b}`, outsideFactor: `× ${outside}` } }, structure: "bracket-order" };
     }
@@ -339,7 +325,7 @@ function authoredQuestion(
   archetype = descriptorIndex % 7;
   const input = 4 + ((seed + descriptorIndex) % 9);
   const add = 3 + ((seed + formShift) % 7);
-  const multiply = 2 + ((descriptorIndex + formShift) % 3);
+  const multiply = 2 + (descriptorIndex % 3);
   const output = (input + add) * multiply;
   if (archetype === 0) {
     return { question: { kind: "typed_response", prompt: "Follow the function machine. What is the output?", answer: String(output), visual: { type: "expression_flow", title: "Two-step function machine", cards: [{ label: "Input", tokens: [String(input)] }, { label: "Step 1", tokens: ["add", String(add)] }, { label: "Step 2", tokens: ["multiply by", String(multiply)], result: "?" }] } }, structure: "follow-function-machine" };
@@ -361,7 +347,7 @@ function authoredQuestion(
     const even = input % 2 === 0;
     const branchResult = even ? input / 2 : input + add;
     const final = branchResult * multiply;
-    return { question: { kind: "typed_response", prompt: "Follow the decision and final algorithm step. What is the output?", answer: String(final), visual: { type: "decision_path_card", title: "Branching number algorithm", input: String(input), decision: "Is the input even?", passLabel: `Yes: halve, then multiply by ${multiply}`, failLabel: `No: add ${add}, then multiply by ${multiply}`, activeBranch: even ? "pass" : "fail" } }, structure: "branching-number-algorithm" };
+    return { question: { kind: "typed_response", prompt: "Follow the decision and final algorithm step. What is the output?", answer: String(final), visual: { type: "decision_path_card", title: "Branching number algorithm", input: String(input), decision: "Is the input even?", passLabel: `Yes: halve, then multiply by ${multiply}`, failLabel: `No: add ${add}, then multiply by ${multiply}`} }, structure: "branching-number-algorithm" };
   }
   if (archetype === 5) {
     const finalOutput = output;
@@ -376,7 +362,7 @@ function descriptorSlots(level: PatternPeaksLevel, form: PatternPeaksAssessmentK
   const blueprint = getPatternPeaksAssessmentBlueprint(level)!;
   if (level === 3) {
     const descriptorsByCode = new Map(blueprint.descriptors.map((descriptor) => [descriptor.code, descriptor]));
-    return Array.from({ length: 20 }, (_, index) => descriptorsByCode.get(["AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3A04"][index % 4]!)!);
+    return Array.from({ length: 20 }, (_, index) => descriptorsByCode.get(["AC9M3A01", "AC9M3A02", "AC9M3A03", "AC9M3N07"][index % 4]!)!);
   }
   if (level === 4) {
     const [additionAndSubtraction, multiplicationAndDivision] = blueprint.descriptors;
@@ -390,16 +376,16 @@ function descriptorSlots(level: PatternPeaksLevel, form: PatternPeaksAssessmentK
   if (level === 5) {
     const descriptorsByCode = new Map(blueprint.descriptors.map((descriptor) => [descriptor.code, descriptor]));
     const pretestCodes = [
-      "AC9M5A01", "AC9M5A02", "AC9M5A03", "AC9M5A02", "AC9M5A01",
-      "AC9M5A03", "AC9M5A02", "AC9M5A01", "AC9M5A03", "AC9M5A02",
-      "AC9M5A01", "AC9M5A03", "AC9M5A02", "AC9M5A01", "AC9M5A03",
-      "AC9M5A02", "AC9M5A01", "AC9M5A03", "AC9M5A02", "AC9M5A02",
+      "AC9M5A01", "AC9M5A02", "AC9M5N10", "AC9M5A02", "AC9M5A01",
+      "AC9M5N10", "AC9M5A02", "AC9M5A01", "AC9M5N10", "AC9M5A02",
+      "AC9M5A01", "AC9M5N10", "AC9M5A02", "AC9M5A01", "AC9M5N10",
+      "AC9M5A02", "AC9M5A01", "AC9M5N10", "AC9M5A02", "AC9M5A02",
     ];
     const posttestCodes = [
-      "AC9M5A03", "AC9M5A02", "AC9M5A01", "AC9M5A02", "AC9M5A03",
-      "AC9M5A01", "AC9M5A02", "AC9M5A03", "AC9M5A01", "AC9M5A02",
-      "AC9M5A03", "AC9M5A01", "AC9M5A02", "AC9M5A03", "AC9M5A01",
-      "AC9M5A02", "AC9M5A03", "AC9M5A01", "AC9M5A02", "AC9M5A02",
+      "AC9M5N10", "AC9M5A02", "AC9M5A01", "AC9M5A02", "AC9M5N10",
+      "AC9M5A01", "AC9M5A02", "AC9M5N10", "AC9M5A01", "AC9M5A02",
+      "AC9M5N10", "AC9M5A01", "AC9M5A02", "AC9M5N10", "AC9M5A01",
+      "AC9M5A02", "AC9M5N10", "AC9M5A01", "AC9M5A02", "AC9M5A02",
     ];
     return (form === "pretest" ? pretestCodes : posttestCodes).map((code) => descriptorsByCode.get(code)!);
   }
@@ -423,13 +409,36 @@ function descriptorSlots(level: PatternPeaksLevel, form: PatternPeaksAssessmentK
   return blueprint.descriptors.flatMap((descriptor) => Array.from({ length: descriptor.allocation[form] }, () => descriptor));
 }
 
+// Constrained algorithm construction: learners assemble an ordered procedure,
+// rather than only entering the next value produced by a supplied procedure.
+function withAlgorithmConstruction(item: AssessmentQuestion, level: PatternPeaksLevel, form: PatternPeaksAssessmentKind, index: number): AssessmentQuestion {
+  if (!((level === 3 && index === 19) || (level === 5 && index === 17))) return item;
+  const post = form === "posttest";
+  const add = post ? 4 : 3;
+  const target = post ? 40 : 36;
+  const steps = level === 3
+    ? ["If the number is even, halve it. Otherwise add 1.", `Add ${add}.`, "Double the number."]
+    : [`List the whole numbers from 1 to ${target}.`, `Divide ${target} by each listed number.`, "Keep each listed number whose division has no remainder."];
+  const prompt = level === 3
+    ? `Build an algorithm using each instruction once. It must change ${post ? "12 into 20 and 9 into 28" : "10 into 16 and 7 into 22"}. Put the instructions in the order they should run.`
+    : `Build an algorithm to find every factor of ${target}. Put all three instructions in the order they should run.`;
+  const answer = steps.join("||");
+  return { ...item, prompt, type: "number_order", practiceTask: undefined,
+    options: [steps[2]!, steps[0]!, steps[1]!], correctAnswer: answer, answer,
+    visual: { type: "algorithm_steps" },
+    responseMode: "manipulated_response", cognitiveCategory: "reasoning", difficulty: "challenging", requiresReasoning: true,
+    skillId: `${item.primaryDescriptorCode.toLowerCase()}_construct_algorithm`, skillLabel: "Construct an ordered algorithm",
+    structureKey: `pattern-peaks-y${level}-${form}-algorithm-construction`,
+    renderer: { type: "algorithm_order", payload: { instructions: [steps[2],steps[0],steps[1]], prompt } },
+    scoring: { kind: "exact", correctResponse: answer }, statistics: createUncalibratedItemStatistics("challenging"),
+  };
+}
+
 function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): AssessmentQuestion[] {
   const blueprint = getPatternPeaksAssessmentBlueprint(level)!;
   const profile = blueprint.forms.find((candidate) => candidate.kind === form);
   if (!profile) return [];
-  const descriptors = descriptorSlots(level, form);
-  const difficulties = expandMix(profile.difficultyMix);
-  const cognitive = expandMix(profile.cognitiveMix);
+  const descriptors = descriptorSlots(level, "pretest");
 
   return Array.from({ length: 20 }, (_, index) => {
     const descriptor = descriptors[index]!;
@@ -439,8 +448,11 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
     const isSelected = index < profile.selectedResponseMaximum;
     const question: PatternQuestion = isSelected ? numericChoice(core.question, index) : core.question;
     const responseMode: AssessmentResponseMode = isSelected ? "selected_response" : "constructed_response";
-    const itemDifficulty = difficulty(difficulties[index]!);
-    const cognitiveCategory = cognition(cognitive[index]!);
+    // Describe the work demanded by the item, never its position in the test.
+    const cognitiveCategory: AssessmentCognitiveCategory = /^(multiplication-fact|related-division-fact|multiplication-product|division-quotient)$/.test(core.structure) ? "recall"
+      : /(debug|compare-function|infer-function|reverse-number|visual-stage|rational-rule|sequence-rule-transfer|two-sided|bracket-placement|connected-bracketed)/.test(core.structure) ? "reasoning"
+      : /(fact-family|partition-equivalence|add-sub-inverse|subtraction-unknown)/.test(core.structure) ? "understanding" : "application";
+    const itemDifficulty: AssessmentItemDifficulty = cognitiveCategory === "recall" ? "easy" : cognitiveCategory === "reasoning" ? "challenging" : "moderate";
     const week = descriptor.weeks[index % descriptor.weeks.length] ?? 1;
     const levelThreeMisconception = level === 3
       ? core.structure.includes("algorithm")
@@ -460,7 +472,7 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
           ? "pp-distributive-part-missed"
           : core.structure.includes("multiplication-property")
             ? "pp-property-overgeneralisation"
-            : core.structure.includes("unknown")
+            : (core.structure.includes("unknown") || core.structure.includes("fact-family"))
               ? "pp-related-fact-confusion"
               : core.structure.includes("factor-search") || core.structure.includes("multiple-search")
                 ? "pp-systematic-search-gap"
@@ -468,7 +480,7 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
       : undefined;
     const misconception = levelThreeMisconception ?? levelFiveMisconception ?? descriptor.misconceptionIds[index % Math.max(1, descriptor.misconceptionIds.length)];
     const shortForm = form === "pretest" ? "pre" : "post";
-    const contentVersion = level >= 3 ? 2 : 1;
+    const contentVersion = 3;
     const id = `pattern-peaks-y${level}-${shortForm}-q${String(index + 1).padStart(2, "0")}-v${contentVersion}`;
     const options = question.kind === "multiple_choice" ? question.options.map((label, optionIndex) => ({ id: String(optionIndex), label })) : undefined;
     const correctIndex = question.kind === "multiple_choice" ? question.options.indexOf(question.answer) : -1;
@@ -485,7 +497,7 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
       feedback: { correct: "Response recorded.", wrong: "Response recorded." },
     };
 
-    return {
+    const item: AssessmentQuestion = {
       schemaVersion: 1,
       id,
       version: `${contentVersion}.0.0`,
@@ -500,8 +512,8 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
       curriculumLessonMapping: [{ week, lesson: (index % 3) + 1 }],
       cognitiveCategory,
       difficulty: itemDifficulty,
-      isTransfer: cognitiveCategory === "transfer",
-      requiresReasoning: cognitiveCategory === "reasoning" || cognitiveCategory === "transfer",
+      isTransfer: false,
+      requiresReasoning: cognitiveCategory === "reasoning",
       misconceptionDiagnosis: Boolean(misconception),
       responseMode,
       misconceptionTags: misconception ? [misconception] : [],
@@ -519,12 +531,13 @@ function buildForm(level: PatternPeaksLevel, form: PatternPeaksAssessmentKind): 
       skillLabel: descriptor.description,
       linkedWeeks: [week],
       linkedLessons: [(index % 3) + 1],
-      strand: "Algebra",
+      strand: descriptor.code.includes("N") ? "Number" : "Algebra",
       curriculumCodes: [descriptor.code],
       difficultyBand: `year-${level}-pattern-peaks`,
       visual: { type: "pattern_peaks_assessment", questionKind: question.kind, structure: core.structure },
       practiceTask: task,
     };
+    return withAlgorithmConstruction(item, level, form, index);
   });
 }
 

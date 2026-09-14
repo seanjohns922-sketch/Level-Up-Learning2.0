@@ -27,6 +27,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 | Form | Questions | Pass | Accessible | Moderate | Challenging | Recall | Understand | Apply | Reason | Transfer | Constructed minimum | Selected maximum |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| pretest | 20 | 85% | 8 | 8 | 4 | 2 | 6 | 7 | 4 | 1 | 10 | 10 |
 | posttest | 20 | 85% | 8 | 8 | 4 | 2 | 6 | 7 | 4 | 1 | 10 | 10 |
 
 ### AC9MFN01
@@ -43,7 +44,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 - I represent a named number accurately.
 - I order numbers to 20 and explain their positions.
 
-**Question Allocation:** Pre-Test 0; Post-Test 3
+**Question Allocation:** Pre-Test 3; Post-Test 3
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -72,7 +73,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 - I name a quantity to 5 after a brief view.
 
-**Question Allocation:** Pre-Test 0; Post-Test 2
+**Question Allocation:** Pre-Test 2; Post-Test 2
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -101,7 +102,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 - I count a rearranged collection accurately.
 - I identify more, fewer or equal and show why.
 
-**Question Allocation:** Pre-Test 0; Post-Test 3
+**Question Allocation:** Pre-Test 3; Post-Test 3
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -132,7 +133,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 - I create 2 valid partitions of a whole to 10.
 - I find a missing part without changing the whole.
 
-**Question Allocation:** Pre-Test 0; Post-Test 4
+**Question Allocation:** Pre-Test 4; Post-Test 4
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -163,7 +164,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 - I build the situation before answering.
 - I produce and explain the resulting quantity.
 
-**Question Allocation:** Pre-Test 0; Post-Test 3
+**Question Allocation:** Pre-Test 3; Post-Test 3
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -192,7 +193,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 - I make equal groups with no items left unfairly placed.
 - I answer the quantity asked for in the situation.
 
-**Question Allocation:** Pre-Test 0; Post-Test 3
+**Question Allocation:** Pre-Test 3; Post-Test 3
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -221,7 +222,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 - I mark the complete repeating unit.
 - I continue the pattern without changing its rule.
 
-**Question Allocation:** Pre-Test 0; Post-Test 2
+**Question Allocation:** Pre-Test 2; Post-Test 2
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -243,7 +244,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 | Form | Questions | Pass | Accessible | Moderate | Challenging | Recall | Understand | Apply | Reason | Transfer | Constructed minimum | Selected maximum |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | pretest | 20 | 85% | 10 | 8 | 2 | 4 | 7 | 6 | 3 | 0 | 12 | 8 |
-| posttest | 20 | 85% | 7 | 8 | 5 | 2 | 6 | 7 | 4 | 1 | 12 | 8 |
+| posttest | 20 | 85% | 10 | 8 | 2 | 4 | 7 | 6 | 3 | 0 | 12 | 8 |
 
 ### AC9M1N01
 
@@ -481,7 +482,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 | Form | Questions | Pass | Accessible | Moderate | Challenging | Recall | Understand | Apply | Reason | Transfer | Constructed minimum | Selected maximum |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | pretest | 20 | 85% | 8 | 9 | 3 | 3 | 6 | 7 | 4 | 0 | 14 | 6 |
-| posttest | 20 | 85% | 6 | 9 | 5 | 2 | 5 | 7 | 5 | 1 | 14 | 6 |
+| posttest | 20 | 85% | 8 | 9 | 3 | 3 | 6 | 7 | 4 | 0 | 14 | 6 |
 
 ### AC9M2N01
 
@@ -742,8 +743,8 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 | Form | Questions | Pass | Accessible | Moderate | Challenging | Recall | Understand | Apply | Reason | Transfer | Constructed minimum | Selected maximum |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| pretest | 20 | 85% | 7 | 9 | 4 | 2 | 6 | 7 | 4 | 1 | 16 | 4 |
-| posttest | 20 | 85% | 5 | 9 | 6 | 1 | 5 | 7 | 5 | 2 | 16 | 4 |
+| pretest | 20 | 85% | 3 | 13 | 4 | 0 | 3 | 17 | 0 | 0 | 17 | 3 |
+| posttest | 20 | 85% | 3 | 13 | 4 | 0 | 3 | 17 | 0 | 0 | 17 | 3 |
 
 ### AC9M3N01
 
@@ -757,7 +758,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 - I preserve every place and use conventions accurately.
 
-**Question Allocation:** Pre-Test 3; Post-Test 3
+**Question Allocation:** Pre-Test 2; Post-Test 2
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -786,7 +787,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 - I use equal parts and maintain the same whole.
 - I complete the whole accurately.
 
-**Question Allocation:** Pre-Test 3; Post-Test 3
+**Question Allocation:** Pre-Test 4; Post-Test 4
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -813,7 +814,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 - I regroup accurately and check the result.
 
-**Question Allocation:** Pre-Test 3; Post-Test 3
+**Question Allocation:** Pre-Test 4; Post-Test 4
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -898,7 +899,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 - I identify the operation from relationships, not keywords.
 - I communicate the result in context.
 
-**Question Allocation:** Pre-Test 3; Post-Test 3
+**Question Allocation:** Pre-Test 2; Post-Test 2
 
 **Difficulty Mix:** Governed by the level form design above; descriptor items must span the allocated form bands rather than repeat one procedure.
 
@@ -973,7 +974,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### Cross-Realm Boundary
 
-- **AC9M3A01, AC9M3A02, AC9M3A03, AC9M3A04 -> Pattern Peaks (Algebra):** From Level 3 onward, Algebra is exclusively owned by Pattern Peaks; Number Nexus contains no AC9M3A-coded lessons or quizzes.
+- **AC9M3A01, AC9M3A02, AC9M3A03 -> Pattern Peaks (Algebra):** From Level 3 onward, Algebra is exclusively owned by Pattern Peaks; Number Nexus contains no AC9M3A-coded lessons or quizzes. AC9M3N07 is shared Number/Pattern evidence under one curriculum code, not a separate Algebra standard.
 
 ## Year 4
 
@@ -982,7 +983,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 | Form | Questions | Pass | Accessible | Moderate | Challenging | Recall | Understand | Apply | Reason | Transfer | Constructed minimum | Selected maximum |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | pretest | 20 | 85% | 6 | 10 | 4 | 2 | 5 | 7 | 5 | 1 | 17 | 3 |
-| posttest | 20 | 85% | 4 | 9 | 7 | 1 | 4 | 7 | 6 | 2 | 17 | 3 |
+| posttest | 20 | 85% | 6 | 10 | 4 | 2 | 5 | 7 | 5 | 1 | 17 | 3 |
 
 ### AC9M4N01
 
@@ -1244,7 +1245,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 | Form | Questions | Pass | Accessible | Moderate | Challenging | Recall | Understand | Apply | Reason | Transfer | Constructed minimum | Selected maximum |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | pretest | 20 | 85% | 5 | 10 | 5 | 1 | 5 | 7 | 5 | 2 | 18 | 2 |
-| posttest | 20 | 85% | 3 | 9 | 8 | 1 | 3 | 6 | 7 | 3 | 18 | 2 |
+| posttest | 20 | 85% | 5 | 10 | 5 | 1 | 5 | 7 | 5 | 2 | 18 | 2 |
 
 ### AC9M5N01
 
@@ -1522,7 +1523,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### Cross-Realm Boundary
 
-- **AC9M5A01, AC9M5A02, AC9M5A03 -> Pattern Peaks (Algebra):** Level 5 Algebra belongs exclusively to Pattern Peaks. Number Nexus lessons, quizzes and assessments contain only AC9M5N-coded outcomes.
+- **AC9M5A01, AC9M5A02 -> Pattern Peaks (Algebra):** Level 5 Algebra belongs exclusively to Pattern Peaks. Number Nexus lessons, quizzes and assessments contain only AC9M5N-coded outcomes. AC9M5N10 algorithm evidence is also collected in Pattern Peaks and must retain the same curriculum code.
 
 ## Year 6
 
@@ -1531,7 +1532,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 | Form | Questions | Pass | Accessible | Moderate | Challenging | Recall | Understand | Apply | Reason | Transfer | Constructed minimum | Selected maximum |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | pretest | 20 | 85% | 4 | 10 | 6 | 1 | 4 | 6 | 6 | 3 | 19 | 1 |
-| posttest | 20 | 85% | 2 | 8 | 10 | 0 | 3 | 6 | 7 | 4 | 19 | 1 |
+| posttest | 20 | 85% | 4 | 10 | 6 | 1 | 4 | 6 | 6 | 3 | 19 | 1 |
 
 ### AC9M6N01
 
@@ -1555,7 +1556,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `integer-order`, `coordinate-sign`
 
-**Curriculum Mapping:** **aligned**; weeks 4, 10, 11. Integer and coordinate lessons carry AC9M6N01. Coordinate content remains a Number outcome even where neighbouring Algebra lessons relocate.
+**Curriculum Mapping:** **aligned**; weeks 4, 10, 12. Integer and coordinate learning is consolidated in Weeks 10 and 12.
 
 **Question Blueprint**
 
@@ -1583,7 +1584,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `prime-composite-one`, `factor-vs-multiple`
 
-**Curriculum Mapping:** **aligned**; weeks 2. Number-property lessons now carry AC9M6N02.
+**Curriculum Mapping:** **aligned**; weeks 2, 12. Number properties are taught in Week 2 and revisited in the final review.
 
 **Question Blueprint**
 
@@ -1611,7 +1612,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `denominator-size`, `equivalent-fraction-scale`, `fraction-number-line`
 
-**Curriculum Mapping:** **aligned**; weeks 5. Fraction equivalence and ordering lessons now carry AC9M6N03.
+**Curriculum Mapping:** **aligned**; weeks 5, 9, 12. Fraction comparison is taught in Week 5 and consolidated in Weeks 9 and 12.
 
 **Question Blueprint**
 
@@ -1639,7 +1640,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `decimal-operation-alignment`, `reasonableness-no-reference`
 
-**Curriculum Mapping:** **aligned**; weeks 1. Decimal calculation and reasonableness lessons now carry AC9M6N04.
+**Curriculum Mapping:** **aligned**; weeks 1, 9, 12. Decimal calculation is taught in Week 1 and consolidated in Weeks 9 and 12.
 
 **Question Blueprint**
 
@@ -1666,7 +1667,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `fraction-add-denominator`, `equivalent-fraction-scale`
 
-**Curriculum Mapping:** **aligned**; weeks 6. Fraction operation lessons now carry AC9M6N05.
+**Curriculum Mapping:** **aligned**; weeks 6, 12. Fraction operations are taught in Week 6 and revisited in Week 12.
 
 **Question Blueprint**
 
@@ -1694,7 +1695,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `powers-ten-direction`, `decimal-place-value`, `reasonableness-no-reference`
 
-**Curriculum Mapping:** **aligned**; weeks 3. Decimal scaling lessons now carry AC9M6N06.
+**Curriculum Mapping:** **aligned**; weeks 3, 12. Decimal scaling is taught in Week 3 and revisited in Week 12.
 
 **Question Blueprint**
 
@@ -1722,7 +1723,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `percentage-of-quantity`, `percentage-whole`, `fraction-decimal-connection`
 
-**Curriculum Mapping:** **aligned**; weeks 7, 8. Quantity and discount lessons now carry AC9M6N07.
+**Curriculum Mapping:** **aligned**; weeks 7, 8, 9, 11, 12. Quantity and discount learning is consolidated through rational-number and financial contexts.
 
 **Question Blueprint**
 
@@ -1750,7 +1751,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `estimation-vs-exact`, `reasonableness-no-reference`, `financial-operation-choice`
 
-**Curriculum Mapping:** **aligned**; weeks 1, 3, 8. Approximation and reasonableness lessons now carry AC9M6N08 in decimal and financial contexts.
+**Curriculum Mapping:** **aligned**; weeks 1, 3, 8, 9, 11, 12. Approximation and reasonableness recur across decimal, rational-number and financial contexts.
 
 **Question Blueprint**
 
@@ -1779,7 +1780,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 **Misconceptions:** `operation-story-structure`, `financial-operation-choice`, `percentage-of-quantity`
 
-**Curriculum Mapping:** **aligned**; weeks 8. Financial modelling and communication lessons now carry AC9M6N09.
+**Curriculum Mapping:** **aligned**; weeks 8, 11, 12. Financial modelling is taught in Week 8 and strengthened through decision tasks in Weeks 11 and 12.
 
 **Question Blueprint**
 
@@ -1788,7 +1789,7 @@ The blueprint design is approved. Assessment generation proceeds level by level 
 
 ### Cross-Realm Boundary
 
-- **AC9M6A01, AC9M6A02, AC9M6A03 -> Pattern Peaks (Algebra):** Number Nexus Weeks 9-11 are predominantly Algebra and must move to Pattern Peaks or be replaced with Number consolidation before Number Nexus assessments are rebuilt.
+- **AC9M6A01, AC9M6A02, AC9M6A03 -> Pattern Peaks (Algebra):** Level 6 Algebra belongs exclusively to Pattern Peaks. Number Nexus lessons, quizzes and assessments contain only AC9M6N-coded outcomes.
 
 ## Approval Gate
 

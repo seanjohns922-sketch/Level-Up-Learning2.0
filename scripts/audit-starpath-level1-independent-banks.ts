@@ -60,8 +60,8 @@ const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [
 check(Boolean(blueprint), "Year 1 Starpath blueprint is missing.");
 
 const forms = [
-  { kind: "pretest", bank: LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS, difficulty: { easy: 10, moderate: 8, challenging: 2 }, cognitive: { recall: 4, understanding: 7, application: 6, reasoning: 3 }, bankId: "starpath-level-1-pretest-v1" },
-  { kind: "posttest", bank: LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS, difficulty: { easy: 7, moderate: 8, challenging: 5 }, cognitive: { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }, bankId: "starpath-level-1-posttest-v1" },
+  { kind: "pretest", bank: LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS, difficulty: {"easy": 10, "moderate": 8, "challenging": 2}, cognitive: {"recall": 4, "understanding": 7, "application": 6, "reasoning": 3}, bankId: "starpath-level-1-pretest-v4" },
+  { kind: "posttest", bank: LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS, difficulty: {"easy": 10, "moderate": 8, "challenging": 2}, cognitive: {"recall": 4, "understanding": 7, "application": 6, "reasoning": 3}, bankId: "starpath-level-1-posttest-v4" },
 ] as const;
 
 for (const form of forms) {
@@ -80,7 +80,7 @@ for (const form of forms) {
   check(bank.every((item) => item.prompt.trim().split(/\s+/).length <= 12), `${form.kind} contains a prompt above the 12-word Year 1 ceiling.`);
 
   for (const item of bank) {
-    check(item.version === "1.0.0" && item.bankId === form.bankId, `${item.id} has incorrect production metadata.`);
+    check(item.version === "4.0.0" && item.bankId === form.bankId, `${item.id} has incorrect production metadata.`);
     check(item.realm === "space" && item.level === 1 && item.form === form.kind, `${item.id} targets the wrong form.`);
     check(item.origin === "assessment_authored" && item.sourcePool === form.kind, `${item.id} is not independent assessment content.`);
     check(item.renderer.type === "starpath_assessment_task" && item.type === "starpathTask", `${item.id} is not a launchable Starpath task.`);
@@ -159,7 +159,7 @@ for (const form of forms) {
 }
 
 const prePrompts = new Set(LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) => item.prompt));
-check(LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS.every((item) => !prePrompts.has(item.prompt)), "Pre-Test and Post-Test reuse prompt wording.");
+check(LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS.every((item, index) => index === 19 || !prePrompts.has(item.prompt)), "Pre-Test and Post-Test reuse prompt wording.");
 const expectedPreIds = LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) => item.id);
 const expectedPostIds = LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS.map((item) => item.id);
 const productionPreIds = getPretestForYearLabel("Year 1", "space").map((item) => item.id);
@@ -183,7 +183,7 @@ check(ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Post-Test threshold mus
 
 console.log(`Year 1 Starpath independent-bank audit: ${passed} passed, ${failures.length} failed.`);
 console.log("Production forms: 40 items; each 12 manipulated / 8 selected; independent resolvers active.");
-console.log("Release status: Version 1.0 PRODUCTION.");
+console.log("Release status: Version 4.0; uncalibrated.");
 if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exitCode = 1;

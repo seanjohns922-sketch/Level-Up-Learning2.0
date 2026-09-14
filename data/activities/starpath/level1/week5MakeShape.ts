@@ -131,6 +131,7 @@ export function constructTask(index: number, target: number): PracticeTask {
     speakText: `Start at the glowing star. Join the corners in order and return to the start to make a ${diagram.label}.`,
     target,
     shapeLabel: diagram.label,
+    constructionRule: diagram.label === "square" ? "square" : diagram.label === "rectangle" ? "rectangle" : "polygon",
     points: diagram.points,
     feedback: {
       correct: `You constructed a ${diagram.label}.`,
@@ -149,6 +150,7 @@ export function repairTask(index: number, target: number): PracticeTask {
     speakText: `One side of this ${diagram.label} is missing. Tap the two corners that need to be joined.`,
     target,
     shapeLabel: diagram.label,
+    constructionRule: diagram.label === "square" ? "square" : diagram.label === "rectangle" ? "rectangle" : "polygon",
     points: diagram.points,
     missingEdgeIndex,
     feedback: {

@@ -11,7 +11,7 @@ type Task = Extract<PracticeTask, { kind: "chanceDependentDraw" }>;
 // Year 4 (AC9M4P02): draw a counter, then replace it (chances stay the same —
 // independent) or keep it (the bag changes — dependent), and read how the next
 // draw is affected. Hands-on: the child taps Draw and watches the bag update.
-export default function ChanceDependentDrawCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function ChanceDependentDrawCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [drawn, setDrawn] = useState(false);
   const [settled, setSettled] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export default function ChanceDependentDrawCard({ task, onCorrect, onWrong }: { 
     if (settled) return;
     setSettled(true);
     setPicked(option);
-    if (option === task.answer) onCorrect(); else onWrong(option);
+    if (option === task.answer) onCorrect(option); else onWrong(option);
   }
 
   const counters = shownBag.flatMap((group) => Array.from({ length: group.count }, (_, i) => ({ colour: group.colour, id: `${group.key}-${i}` })));

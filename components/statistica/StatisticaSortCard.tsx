@@ -11,7 +11,7 @@ type Task = Extract<PracticeTask, { kind: "statisticaSort" }>;
 
 // Sort each item into its category bin: tap an item to pick it up, tap a bin to
 // drop it in. Correct when every item sits in its own category.
-export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [placement, setPlacement] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
@@ -32,7 +32,7 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
     if (Object.keys(placement).length !== task.items.length) return;
     setSettled(true);
     const ok = task.items.every((it) => placement[it.id] === it.category);
-    if (ok) onCorrect(); else onWrong(task.items.map((it) => `${it.id}:${placement[it.id]}`).join(","));
+    if (ok) onCorrect(JSON.stringify(placement)); else onWrong(task.items.map((it) => `${it.id}:${placement[it.id]}`).join(","));
   }
 
   // After checking, mark each placed card right (green) or wrong (red).
@@ -66,7 +66,7 @@ export default function StatisticaSortCard({ task, onCorrect, onWrong }: { task:
 
   return (
     <div className="space-y-4">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
 
       {/* tray of items to sort */}
       <div className="mx-auto flex min-h-[52px] max-w-md flex-wrap items-center justify-center gap-2 rounded-lg border border-dashed border-[#f2bc45]/45 bg-[#17281f] p-3">

@@ -56,8 +56,8 @@ function validateTask(item: CandidateItem): string[] {
   if (isDirectResponse) {
     if (item.practiceTask !== undefined) issues.push(`${scope} exposes an unused interactive task.`);
     if (item.renderer.type !== "numeric_entry") issues.push(`${scope} does not use the numeric-entry renderer contract.`);
-    if (!Number.isFinite(Number(item.correctAnswer))) issues.push(`${scope} has a non-numeric constructed answer.`);
-    if (item.responseMode !== "constructed_response") {
+    if (!Number.isFinite(Number(String(item.correctAnswer).split("||")[0]))) issues.push(`${scope} has a non-numeric constructed answer.`);
+    if (!["constructed_response", "justification"].includes(item.responseMode)) {
       issues.push(`${scope} numeric entry is not classified as constructed response.`);
     }
   } else if (item.renderer.payload !== task || item.renderer.type !== task.kind) {
@@ -109,7 +109,7 @@ function validateTask(item: CandidateItem): string[] {
   if (item.misconceptionDiagnosis && !isDirectResponse && options.length < 3) {
     issues.push(`${scope} misconception diagnosis offers fewer than 3 defensible responses.`);
   }
-  if (item.responseMode === "justification" && options.length < 3) {
+  if (item.responseMode === "justification" && options.length < 3 && !(isDirectResponse && (item.visual as { reasonOptions?: string[] })?.reasonOptions?.length === 3)) {
     issues.push(`${scope} justification task does not present competing explanations.`);
   }
 
@@ -216,8 +216,8 @@ for (const item of [...pretest, ...posttest]) {
 }
 
 check(
-  posttest.filter((item) => item.isTransfer).length === 3,
-  "Level 5 post-test must contain exactly 3 approved transfer items.",
+  posttest.filter((item) => item.isTransfer).length === 0,
+  "Level 5 post-test must contain no unsubstantiated transfer labels.",
 );
 check(
   posttest.filter((item) => item.requiresReasoning && item.responseMode === "justification").length >= 2,

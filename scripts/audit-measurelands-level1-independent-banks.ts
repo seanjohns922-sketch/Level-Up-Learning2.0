@@ -54,8 +54,8 @@ for (const item of allItems) {
   check(item.statistics.sampleSize === 0, `${item.id} must start with a zero calibration sample.`);
 }
 for (const [label, form] of [["pre-test", pretest], ["post-test", posttest]] as const) {
-  check(form.filter((item) => item.type === "numeric").length === 12, `Level 1 ${label} must have 12 generated responses.`);
-  check(form.filter((item) => item.type === "mcq").length === 8, `Level 1 ${label} must have 8 selected responses.`);
+  check(form.filter((item) => item.type === "numeric").length === 3, `Level 1 ${label} must have 3 generated responses.`);
+  check(form.filter((item) => item.type === "mcq").length === 17, `Level 1 ${label} must have 17 selected responses.`);
 }
 const source = fs.readFileSync(path.join(process.cwd(), "data/assessments/year1MeasurelandsIndependentBanks.ts"), "utf8");
 check(!source.includes("year1Measurelands/registry") && !source.includes("buildY1Measurelands") && !source.includes("PracticeTask"), "Level 1 bank imports lesson or weekly-quiz content.");

@@ -108,7 +108,7 @@ function EvidenceDisplay({ task }: { task: Task }) {
   );
 }
 
-export default function StatisticaMediaAnalysisCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StatisticaMediaAnalysisCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: (response?: string) => void; onWrong: (answer?: string) => void }) {
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
 
@@ -116,7 +116,7 @@ export default function StatisticaMediaAnalysisCard({ task, onCorrect, onWrong }
     if (!chosen || settled) return;
     setSettled(true);
     if (task.correctOptionIds.includes(chosen)) {
-      onCorrect();
+      onCorrect(chosen);
     } else {
       onWrong(task.options.find((option) => option.id === chosen)?.label ?? chosen);
     }
@@ -124,7 +124,7 @@ export default function StatisticaMediaAnalysisCard({ task, onCorrect, onWrong }
 
   return (
     <div className="space-y-2">
-      <TaskHeading prompt={task.prompt} speech={`${task.prompt}. ${task.speakText}`} />
+      <TaskHeading prompt={task.prompt} speech={task.speakText === task.prompt ? task.prompt : `${task.prompt}. ${task.speakText}`} />
       <div className="mx-auto grid max-w-4xl gap-2 sm:grid-cols-[minmax(0,1.15fr)_minmax(250px,.85fr)]">
         <EvidenceDisplay task={task} />
         <aside className="rounded-lg border-2 border-[#d8c98e] bg-[#fffaf0] p-3 text-[#244531]">

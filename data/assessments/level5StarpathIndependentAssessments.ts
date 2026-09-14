@@ -1,3 +1,4 @@
+import { rebuildStarpathTask, starpathResponseMode } from "./starpathRebuildTasks";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { GRID_8, commandsTask, errorTask, moveAxisTask, orderTask, readTask, routeTask } from "@/data/activities/starpath/level5/coordinateTasks";
 import { buildTask, chooseNetTask, classifyTask, countTask, foldPredictTask, reasonTask, relationTask, selectValidTask } from "@/data/activities/starpath/level5/netTasks";
@@ -13,7 +14,7 @@ import {
 type Descriptor = "AC9M5SP01" | "AC9M5SP02" | "AC9M5SP03";
 type Form = "pretest" | "posttest";
 type CandidateQuestion = Question & IndependentAssessmentItem;
-type AssessmentTask = Extract<PracticeTask, { kind: "starpathNet" | "starpathCoordinate" | "starpathTransform" }>;
+type AssessmentTask = Extract<PracticeTask, { kind: "starpathNet" | "starpathCoordinate" | "starpathTransform" }> | Extract<PracticeTask, {kind: "starpathIndependentConstruction"}>;
 type ResponseMode = "selected_response" | "manipulated_response";
 type Misconception =
   | "object-view-consistency"
@@ -52,19 +53,9 @@ const PRE_COGNITIVE: AssessmentCognitiveCategory[] = [
   "understanding", "understanding", "application", "application", "reasoning", "transfer",
   "understanding", "application", "application", "reasoning", "reasoning", "transfer", "application",
 ];
-const POST_DIFFICULTY: AssessmentItemDifficulty[] = [
-  "easy", "moderate", "challenging", "moderate", "challenging", "challenging", "moderate",
-  "easy", "moderate", "challenging", "moderate", "challenging", "moderate",
-  "easy", "moderate", "challenging", "moderate", "challenging", "challenging", "moderate",
-];
-const POST_COGNITIVE: AssessmentCognitiveCategory[] = [
-  "recall", "understanding", "application", "application", "reasoning", "reasoning", "transfer",
-  "understanding", "application", "application", "reasoning", "transfer", "reasoning",
-  "understanding", "application", "reasoning", "application", "reasoning", "transfer", "reasoning",
-];
 
 function assessmentTask(task: AssessmentTask, prompt: string): AssessmentTask {
-  return { ...task, prompt, speakText: task.speakText || prompt, feedback: FEEDBACK } as AssessmentTask;
+  return { ...task, prompt: task.prompt, speakText: task.prompt, feedback: FEEDBACK } as AssessmentTask;
 }
 
 function descriptorForIndex(index: number): Descriptor {
@@ -132,8 +123,8 @@ const POST_TASKS: readonly AssessmentTask[] = [
 ];
 
 function specs(form: Form, tasks: readonly AssessmentTask[]): ItemSpec[] {
-  const difficulty = form === "pretest" ? PRE_DIFFICULTY : POST_DIFFICULTY;
-  const cognitive = form === "pretest" ? PRE_COGNITIVE : POST_COGNITIVE;
+  const difficulty = PRE_DIFFICULTY;
+  const cognitive = PRE_COGNITIVE;
   return tasks.map((task, index) => {
     const descriptor = descriptorForIndex(index);
     const selected = index === 0 || index === 13;
@@ -154,12 +145,14 @@ function specs(form: Form, tasks: readonly AssessmentTask[]): ItemSpec[] {
 }
 
 function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion {
+  spec = {...spec, task: rebuildStarpathTask(5, form, index, spec.task) as ItemSpec["task"]};
+  spec.responseMode = starpathResponseMode(spec.task);
   const shortForm = form === "pretest" ? "pre" : "post";
   const skill = descriptorSkill(spec.descriptor);
   return {
-    schemaVersion: 1, id: `y5-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v1`, version: "1.0.0",
+    schemaVersion: 1, id: `y5-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v4`, version: "4.0.0",
     realm: "space", level: 5, form, origin: "assessment_authored", sourcePool: form,
-    bankId: `starpath-level-5-${form}-v1`, primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
+    bankId: `starpath-level-5-${form}-v4`, primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
     cognitiveCategory: spec.cognitiveCategory, difficulty: spec.difficulty,
     isTransfer: spec.cognitiveCategory === "transfer",

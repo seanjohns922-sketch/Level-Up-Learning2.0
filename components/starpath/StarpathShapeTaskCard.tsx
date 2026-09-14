@@ -779,8 +779,8 @@ export function StarpathShapeMatchCard({
   onWrong,
 }: {
   task: ShapeMatchTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   return (
     <div>
@@ -794,7 +794,7 @@ export function StarpathShapeMatchCard({
           <button
             key={option.id}
             type="button"
-            onClick={() => option.id === task.correctOptionId ? onCorrect() : onWrong()}
+            onClick={() => option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id))}
             aria-label={option.shape}
             className="relative flex min-h-44 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
           >
@@ -815,8 +815,8 @@ export function StarpathShapeSortCard({
   onWrong,
 }: {
   task: ShapeSortTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -864,7 +864,7 @@ export function StarpathShapeSortCard({
             key={shape}
             type="button"
             data-shape-drop={shape}
-            onClick={() => shape === task.shape ? onCorrect() : onWrong()}
+            onClick={() => shape === task.shape ? onCorrect(String(shape)) : onWrong(String(shape))}
             className="flex min-h-32 flex-col items-center justify-center rounded-2xl border-2 border-indigo-200 bg-gradient-to-b from-indigo-50 to-violet-100 p-3 shadow-sm transition hover:border-cyan-400 hover:shadow-md"
           >
             <span className="h-12 w-12 rounded-full border-4 border-violet-300 bg-indigo-950 shadow-[inset_0_0_18px_rgba(103,232,249,0.45)]" />
@@ -954,8 +954,8 @@ export function StarpathShapeSceneCard({
   onWrong,
 }: {
   task: ShapeSceneTask;
-  onCorrect: () => void;
-  onWrong: () => void;
+  onCorrect: (response?: string) => void;
+  onWrong: (response?: string) => void;
 }) {
   const objectIds = (task.objects && task.objects.length ? task.objects : DEFAULT_SCENE_OBJECTS) as ShapeObjectId[];
   return (
@@ -970,7 +970,7 @@ export function StarpathShapeSceneCard({
               <button
                 key={objectId}
                 type="button"
-                onClick={() => (objectId === task.correctObjectId ? onCorrect() : onWrong())}
+                onClick={() => (objectId === task.correctObjectId ? onCorrect(String(objectId)) : onWrong(String(objectId)))}
                 className="relative flex min-h-44 flex-col items-center justify-center rounded-2xl border-2 border-white/30 bg-white/10 p-3 text-white backdrop-blur-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:bg-white/20 active:scale-[0.98]"
               >
                 <OptionReadAloudButton text={label} className="absolute right-2 top-2 bg-white" />

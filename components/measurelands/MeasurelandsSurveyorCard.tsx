@@ -181,11 +181,11 @@ function SurveyorShape({
 }
 
 /* ── Keypad for typed perimeter (with an add-the-sides working strip) ── */
-function Keypad({ answer, unit, hint, addends, onCorrect, onWrong }: { answer: number; unit: string; hint: string; addends?: number[]; onCorrect: () => void; onWrong: () => void }) {
+function Keypad({ answer, unit, hint, addends, onCorrect, onWrong }: { answer: number; unit: string; hint: string; addends?: number[]; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const [typed, setTyped] = useState("");
   const [status, setStatus] = useState<"idle" | "wrong">("idle");
   const add = (d: string) => { setStatus("idle"); setTyped((c) => (c === "0" ? d : c.length >= 4 ? c : `${c}${d}`)); };
-  const check = () => { if (!typed) return; if (Number(typed) === answer) onCorrect(); else { setStatus("wrong"); onWrong(); } };
+  const check = () => { if (!typed) return; if (Number(typed) === answer) onCorrect(typed); else { setStatus("wrong"); onWrong(typed); } };
   return (
     <div className="rounded-[24px] border-2 border-[rgba(214,184,108,0.52)] bg-white p-3 shadow-sm">
       {addends && addends.length > 0 ? (
@@ -217,12 +217,12 @@ function Keypad({ answer, unit, hint, addends, onCorrect, onWrong }: { answer: n
   );
 }
 
-function McqRow({ options, correct, unit, onCorrect, onWrong }: { options: number[]; correct: number; unit: string; onCorrect: () => void; onWrong: () => void }) {
+function McqRow({ options, correct, unit, onCorrect, onWrong }: { options: number[]; correct: number; unit: string; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const [wrong, setWrong] = useState<number | null>(null);
   return (
     <div className="grid grid-cols-3 gap-3">
       {options.map((n) => (
-        <button key={n} type="button" onClick={() => (n === correct ? onCorrect() : (setWrong(n), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`relative flex min-h-[72px] items-center justify-center rounded-[24px] border-2 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] ${wrong === n ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
+        <button key={n} type="button" onClick={() => (n === correct ? onCorrect(String(n)) : (setWrong(n), onWrong(String(n)), window.setTimeout(() => setWrong(null), 600)))} className={`relative flex min-h-[72px] items-center justify-center rounded-[24px] border-2 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] ${wrong === n ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>
           <span className="absolute right-2 top-2 z-10"><OptionReadAloudButton text={`${n} ${unit}`} /></span>
           {n} {unit}
         </button>
@@ -231,7 +231,7 @@ function McqRow({ options, correct, unit, onCorrect, onWrong }: { options: numbe
   );
 }
 
-function IntroScene({ task, onCorrect }: { task: SurveyorTask; onCorrect: () => void }) {
+function IntroScene({ task, onCorrect }: { task: SurveyorTask; onCorrect: (response?: string) => void }) {
   const sum = task.sideLabels.reduce((a, b) => a + b, 0);
   const sumStr = task.sideLabels.join(" + ");
   return (
@@ -267,12 +267,12 @@ function IntroScene({ task, onCorrect }: { task: SurveyorTask; onCorrect: () => 
           </div>
         </div>
       </div>
-      <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s survey! →</button>
+      <button type="button" onClick={() => onCorrect()} className="mx-auto flex min-h-[60px] items-center justify-center rounded-[24px] border-2 border-[rgba(180,120,20,0.55)] bg-[#fffaf0] px-8 text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98]">Let&apos;s survey! →</button>
     </Shell>
   );
 }
 
-function MeasureEveryScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: () => void; onWrong: () => void }) {
+function MeasureEveryScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
   const total = task.sideLabels.length;
   const tap = (i: number) => {
@@ -292,18 +292,18 @@ function MeasureEveryScene({ task, onCorrect, onWrong }: { task: SurveyorTask; o
   );
 }
 
-function CalcScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: () => void; onWrong: () => void }) {
+function CalcScene({ task, onCorrect, onWrong, assessmentMode = false }: { assessmentMode?: boolean; task: SurveyorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Find the Perimeter"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_300px]">
         <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3"><SurveyorShape task={task} /></div>
-        <Keypad answer={task.answerValue ?? task.perimeter ?? 0} unit={task.answerUnit ?? task.unit} hint="Add every side to find the total." addends={task.sideLabels} onCorrect={onCorrect} onWrong={onWrong} />
+        <Keypad answer={task.answerValue ?? task.perimeter ?? 0} unit={task.answerUnit ?? task.unit} hint={assessmentMode ? "Enter your answer." : "Add every side to find the total."} addends={assessmentMode ? undefined : task.sideLabels} onCorrect={onCorrect} onWrong={onWrong} />
       </div>
     </Shell>
   );
 }
 
-function ChooseScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: () => void; onWrong: () => void }) {
+function ChooseScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   return (
     <Shell badge={task.badgeLabel ?? "Choose the Perimeter"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3"><SurveyorShape task={task} /></div>
@@ -312,7 +312,7 @@ function ChooseScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorre
   );
 }
 
-function SpotMissedScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: () => void; onWrong: () => void }) {
+function SpotMissedScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const gaugeRight = (task.answerValue ?? -1) === (task.perimeter ?? task.sideLabels.reduce((a, b) => a + b, 0));
   const [wrong, setWrong] = useState<string | null>(null);
   const opts = [
@@ -332,7 +332,7 @@ function SpotMissedScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onC
   );
 }
 
-function ProblemScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: () => void; onWrong: () => void }) {
+function ProblemScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const useMcq = (task.options?.length ?? 0) > 0;
   return (
     <Shell badge={task.badgeLabel ?? "Surveyor Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
@@ -353,7 +353,7 @@ function ProblemScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorr
 
 /* "Measure once, use twice" — two adjacent sides are pre-measured; tap each
  * opposite "?" side and choose its (equal) length, then confirm the perimeter. */
-function MeasureOnceScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: () => void; onWrong: () => void }) {
+function MeasureOnceScene({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   const measured = task.measuredSides ?? [0, 1];
   const total = task.sideLabels.length;
   const [revealed, setRevealed] = useState<Set<number>>(() => new Set(measured));
@@ -403,19 +403,19 @@ function MeasureOnceScene({ task, onCorrect, onWrong }: { task: SurveyorTask; on
             ))}
             <span className="text-[#a98b52]">=</span><span className="text-[#5b21b6]">{sum} {task.unit}</span>
           </div>
-          <button type="button" onClick={onCorrect} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Confirm — {sum} {task.unit}</button>
+          <button type="button" onClick={() => onCorrect()} className="mx-auto flex min-h-[58px] items-center justify-center rounded-[24px] border-2 border-[#5b21b6] bg-[#5b21b6] px-8 text-lg font-black uppercase text-white shadow-sm transition hover:-translate-y-0.5">Confirm — {sum} {task.unit}</button>
         </div>
       ) : null}
     </Shell>
   );
 }
 
-export function MeasurelandsSurveyorCard({ task, onCorrect, onWrong }: { task: SurveyorTask; onCorrect: () => void; onWrong: () => void }) {
+export function MeasurelandsSurveyorCard({ task, onCorrect, onWrong, assessmentMode = false }: { assessmentMode?: boolean; task: SurveyorTask; onCorrect: (response?: string) => void; onWrong: (response?: string) => void }) {
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "measureEvery") return <MeasureEveryScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "measureOnce") return <MeasureOnceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "choose") return <ChooseScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "spotMissed") return <SpotMissedScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "problem") return <ProblemScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-  return <CalcScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  return <CalcScene task={task} onCorrect={onCorrect} onWrong={onWrong} assessmentMode={assessmentMode} />;
 }
