@@ -8,6 +8,8 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { resolveRealm3DAccess } from "@/lib/world3d/access";
 import { restoreCanonicalWorldState } from "@/lib/world3d/canonical-bootstrap";
 import { StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
+import { clearDiagnosticHandoffPause } from "@/lib/diagnostic-handoff";
 
 const TowerRealmChamber = dynamic(() => import("@/components/world3d/TowerRealmChamber"), {
   ssr: false,
@@ -31,6 +33,13 @@ export default function TowerRealmChamber3DEntry({ teacherPreview = false }: { t
     let cancelled = false;
     const restore = async () => {
       try {
+        const pendingDiagnostic = await fetchPendingStudentDiagnostic(profile.studentId);
+        if (cancelled) return;
+        if (pendingDiagnostic) {
+          clearDiagnosticHandoffPause();
+          router.replace("/diagnostic");
+          return;
+        }
         await restoreCanonicalWorldState(profile.studentId);
         if (!cancelled) setStatus("ready");
       } catch (error) {

@@ -319,7 +319,7 @@ export default function WholeMathsDiagnosticPage() {
           : "not started";
       return `${AC_STRANDS[item.strand].label}, ${item.active_level}, ${status}`;
     }).join(". ");
-    const introText = `${checkpointLabel(pending.checkpoint)}. Welcome to your maths journey. You have completed ${completedCount} of 6 realms. Complete one realm at a time at school. Your work saves automatically, so you can safely continue during the next session your teacher opens. Up next is ${currentPresentation.realm}: ${AC_STRANDS[pending.strand].label}, ${level}, with 20 questions. ${journeyReadout}.`;
+    const introText = `${checkpointLabel(pending.checkpoint)}. Welcome to your maths journey. You have completed ${completedCount} of 6 realms. Complete one realm at a time at school. Your work saves automatically, so you can safely continue during the next session your teacher opens. Up next is ${currentPresentation.realm}: ${AC_STRANDS[pending.strand].label}, ${level}, with 20 questions. You can also go back to the Central Hub. ${journeyReadout}.`;
 
     return (
       <ReadAloudRateProvider>
@@ -449,7 +449,7 @@ export default function WholeMathsDiagnosticPage() {
             <div className="mt-7 flex justify-center">
               <button type="button" onClick={() => router.push("/world")} className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 py-3 font-bold text-slate-200 transition hover:bg-white/10 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-teal-200">
                 <DoorOpen className="h-5 w-5" aria-hidden="true" />
-                Return to world
+                Go to Central Hub
               </button>
             </div>
           </div>
@@ -501,7 +501,7 @@ export default function WholeMathsDiagnosticPage() {
                     className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-black text-white transition hover:border-white/25 hover:bg-white/10 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-teal-200 disabled:opacity-50"
                   >
                     <DoorOpen className="h-4 w-4" aria-hidden="true" />
-                    {saving ? "Saving…" : "Save & exit"}
+                    {saving ? "Saving…" : "Save & exit to Hub"}
                   </button>
                 </div>
                 <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/10" role="progressbar" aria-label="Diagnostic progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressPercent}>

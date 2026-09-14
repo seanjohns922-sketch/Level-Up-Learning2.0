@@ -210,12 +210,14 @@ assert(
 const studentInstrument = read("app/diagnostic/page.tsx");
 const diagnosticHandoff = read("lib/diagnostic-handoff.ts");
 const centralWorldEntry = read("components/world3d/CentralWorld3DEntry.tsx");
+const towerWorldEntry = read("components/world3d/TowerRealmChamber3DEntry.tsx");
 const studentLogin = read("app/login/page.tsx");
 const realmsPage = read("app/realms/page.tsx");
 assert(!studentInstrument.includes("isDemoPreviewMode"), "The diagnostic must not have a demo-only persistence shortcut.");
 assert(studentInstrument.includes("saveDiagnosticProgress"), "Student answers and position must persist during a sitting.");
 assert(studentInstrument.includes('label="Read page"'), "The student diagnostic journey must offer a complete page read-aloud.");
 assert(studentInstrument.includes("STRAND_PRESENTATION"), "The student journey must visually identify all six maths realms.");
+assert(studentInstrument.includes("Go to Central Hub"), "Students must be able to leave the diagnostic home for the Central Hub.");
 assert(
   studentInstrument.includes("async function exitDiagnostic()") &&
     studentInstrument.includes('Save & exit') &&
@@ -229,6 +231,12 @@ assert(
     realmsPage.includes("isDiagnosticHandoffPaused(pendingDiagnostic.sitting_id)") &&
     studentLogin.includes("clearDiagnosticHandoffPause()"),
   "A deliberate diagnostic pause must survive the world handoff without weakening the next-login assignment check.",
+);
+assert(
+  towerWorldEntry.includes("fetchPendingStudentDiagnostic(profile.studentId)") &&
+    towerWorldEntry.includes("clearDiagnosticHandoffPause()") &&
+    towerWorldEntry.includes('router.replace("/diagnostic")'),
+  "Entering the Tower during an open diagnostic session must resume the diagnostic home page.",
 );
 assert(
   studentInstrument.includes("visibleAnswer = isUnknownAnswer ? null : currentAnswer"),
