@@ -2,7 +2,7 @@
 
 ## Result
 
-**109 isolated PostgreSQL checks passed. Production verification remains blocked by database authentication. Nothing was pushed or deployed, and no live student data was changed.**
+**109 isolated PostgreSQL checks and seven live rollback-only SQL checks passed. Database authentication is restored and both migrations are verified, including the corrected reporting function. The application branch is pushed; `main` is unchanged. Existing student data was not changed.**
 
 The suite executes the repository's canonical table definitions and assessment/progress functions in a dedicated Supabase PostgreSQL 17 container with networking disabled. It seeds synthetic students before applying the two new Starpath migrations, then executes saves and read RPCs. Each run creates and drops its own test database.
 
@@ -57,3 +57,11 @@ docker rm -f starpath-integration-20260914
 ```
 
 Tests live in `supabase/tests/starpath_rebuild/`; the runner extracts the current pre-migration functions rather than maintaining independent copies of persistence logic.
+
+## Live verification follow-up — 14 September 2026
+
+The reset database password now authenticates successfully. The deployed Ground completion and teacher-reset function bodies match the reviewed migration. The manually applied reporting function was the earlier revision; the reviewed Space-only correction was applied in a guarded transaction, preserving all other realms' existing growth calculation. No student rows were changed by this function replacement.
+
+Seven live SQL checks passed using a synthetic Home student, real student-session authorization and the deployed RPCs: baseline save, duplicate retry, authenticated Ground/full-pathway reload, response geometry and metadata preservation, post-test save, separate attempt retrieval, and both scores/current-week retrieval. All synthetic identity and activity writes were inside one transaction ending in ROLLBACK. A subsequent independent read confirmed zero synthetic accounts and zero synthetic completion receipts remained.
+
+The live test is `supabase/tests/starpath_rebuild/live-smoke.sql`. It validates real database authorization and SQL save/read behaviour within a transaction; it does not claim a committed cross-session or browser end-to-end test, or a live school-teacher reporting test. School analytics execution and cross-realm parity remain covered by the 109 isolated PostgreSQL checks. `main` remains unchanged; the application rebuild is on `codex/starpath-assessment-rebuild`.
