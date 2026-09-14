@@ -77,6 +77,12 @@ below `L`, plus `fraction × descriptors at L`. The overall is the position of t
 combined reached points on the cumulative whole-maths curve. Level 6 is the
 primary reporting ceiling and represents the completed F–6 continuum.
 
+The agreed future Level 7–8 extension, including the Level 6 Summit Challenge and
+teacher-approved Advanced Pathway, is recorded in
+[`advanced-pathway-levels-7-8.md`](advanced-pathway-levels-7-8.md). Until that
+curriculum, assessment and reporting contract is implemented, this diagnostic must
+remain capped at Level 6.
+
 Live in `lib/curriculum/ac-standards.ts` → `AC_DESCRIPTOR_COUNTS_BY_LEVEL` and
 `AC_STRANDS`. Do not hard-code counts elsewhere.
 

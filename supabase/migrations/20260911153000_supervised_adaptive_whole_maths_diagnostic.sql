@@ -285,7 +285,9 @@ begin
   order by sitting.created_at limit 1;
   if v_sitting_id is null then return; end if;
   return query select result.strand,result.status,result.starting_level,
-    coalesce(result.active_level,result.starting_level),jsonb_object_length(result.draft_answers),result.measured_level
+    coalesce(result.active_level,result.starting_level),
+    (select count(*)::integer from jsonb_object_keys(coalesce(result.draft_answers,'{}'::jsonb))),
+    result.measured_level
   from public.whole_math_diagnostic_strand_results result where result.sitting_id=v_sitting_id
   order by case result.strand when 'number' then 1 when 'measurement' then 2 when 'space' then 3 when 'statistics' then 4 when 'algebra' then 5 when 'probability' then 6 else 9 end;
 end;
@@ -310,7 +312,7 @@ begin
     coalesce(jsonb_agg(jsonb_build_object(
       'strand',result.strand,'status',result.status,'starting_level',result.starting_level,
       'active_level',coalesce(result.active_level,result.starting_level),
-      'answered_count',jsonb_object_length(result.draft_answers),
+      'answered_count',(select count(*)::integer from jsonb_object_keys(coalesce(result.draft_answers,'{}'::jsonb))),
       'measured_level',result.measured_level,'recommended_level',result.recommended_level,
       'placement_applied',result.placement_applied,'placement_protected',result.placement_protected,
       'probe_direction',result.probe_direction,'source_assessment_id',result.source_assessment_id,

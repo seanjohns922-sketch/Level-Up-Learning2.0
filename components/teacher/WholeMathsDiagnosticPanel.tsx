@@ -176,7 +176,7 @@ export default function WholeMathsDiagnosticPanel({
       } else {
         console.warn("[WholeMathsDiagnostic] Could not load diagnostic records", recordsResult.reason);
         setSittings([]);
-        setDiagnosticError("Diagnostic assessment controls are not available in this environment yet. Live progression is unaffected.");
+        setDiagnosticError("Diagnostic results could not be loaded. Live progression is unaffected.");
       }
       if (sessionResult.status === "fulfilled") {
         setSchoolSession(sessionResult.value);
@@ -314,11 +314,10 @@ export default function WholeMathsDiagnosticPanel({
               ? `${CHECKPOINT_LABEL[schoolSession.checkpoint]} is open until ${new Date(schoolSession.closes_at).toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })}. Assigned students can continue at school.`
               : "Closed. Students cannot open or continue diagnostic questions at home."}</p>
           </div>
-          <button type="button" disabled={!selectedClass || sessionBusy || Boolean(diagnosticError)} onClick={() => void toggleSchoolSession()} className={`rounded-xl px-4 py-2.5 text-sm font-black text-white disabled:opacity-40 ${schoolSession ? "bg-rose-600" : "bg-emerald-700"}`}>{sessionBusy ? "Saving…" : schoolSession ? "Close session" : `Open ${assignmentCheckpoint === "start" ? "Start" : assignmentCheckpoint === "mid" ? "Mid" : "End"} for 2 hours`}</button>
+          <button type="button" disabled={!selectedClass || sessionBusy || Boolean(sessionError)} onClick={() => void toggleSchoolSession()} className={`rounded-xl px-4 py-2.5 text-sm font-black text-white disabled:opacity-40 ${schoolSession ? "bg-rose-600" : "bg-emerald-700"}`}>{sessionBusy ? "Saving…" : schoolSession ? "Close session" : `Open ${assignmentCheckpoint === "start" ? "Start" : assignmentCheckpoint === "mid" ? "Mid" : "End"} for 2 hours`}</button>
         </div>
         {!schoolSession ? <div className="mt-3 flex flex-wrap gap-2">{(["start","mid","end"] as FormalCheckpoint[]).map((checkpoint) => <button key={checkpoint} type="button" onClick={() => setAssignmentCheckpoint(checkpoint)} className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${assignmentCheckpoint === checkpoint ? "border-emerald-500 bg-emerald-100 text-emerald-900" : "border-slate-200 bg-slate-50 text-slate-600"}`}>{checkpoint === "start" ? "Start" : checkpoint === "mid" ? "Mid" : "End"}</button>)}</div> : null}
         {!schoolSession && assignmentCheckpoint === "end" ? <p className="mt-3 text-xs font-semibold text-slate-500">End can be this school&apos;s first formal checkpoint. No Start or Mid result is required.</p> : null}
-        {diagnosticError ? <p role="alert" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-900">{diagnosticError}</p> : null}
         {sessionError ? <p role="alert" className="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-bold text-rose-800">{sessionError}</p> : null}
       </article> : null}
 

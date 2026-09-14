@@ -210,6 +210,11 @@ const migration = read("supabase/migrations/20260910170000_release_chance_hollow
 const completionMigration = read("supabase/migrations/20260911120000_complete_six_strand_whole_maths_diagnostic.sql");
 const diagnosticFoundation = read("supabase/migrations/20260903170000_whole_maths_diagnostic_foundation.sql");
 const supervisedMigration = read("supabase/migrations/20260911153000_supervised_adaptive_whole_maths_diagnostic.sql");
+const answerCountFix = read("supabase/migrations/20260914110000_fix_whole_maths_diagnostic_answer_counts.sql");
+assert(!supervisedMigration.includes("jsonb_object_length"), "Diagnostic RPCs must use a valid PostgreSQL JSONB key count.");
+assert(answerCountFix.includes("jsonb_object_keys"), "The deployed diagnostic answer-count repair must count JSONB object keys.");
+assert(answerCountFix.includes("get_student_whole_math_diagnostic_journey"), "The answer-count repair must cover the student journey RPC.");
+assert(answerCountFix.includes("get_teacher_whole_math_diagnostics"), "The answer-count repair must cover the teacher diagnostic RPC.");
 assert(!migration.includes("available_weight"), "Curriculum weights must not be duplicated in the database migration.");
 for (const required of [
   "security definer",
