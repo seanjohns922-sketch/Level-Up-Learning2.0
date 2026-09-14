@@ -218,12 +218,24 @@ assert(studentInstrument.includes("saveDiagnosticProgress"), "Student answers an
 assert(studentInstrument.includes('label="Read page"'), "The student diagnostic journey must offer a complete page read-aloud.");
 assert(studentInstrument.includes("STRAND_PRESENTATION"), "The student journey must visually identify all six maths realms.");
 assert(studentInstrument.includes("Go to Central Hub"), "Students must be able to leave the diagnostic home for the Central Hub.");
+const functionBody = (name: string) => {
+  const start = studentInstrument.indexOf(name);
+  return start === -1 ? "" : studentInstrument.slice(start).split("\n  }\n")[0];
+};
+const exitBody = functionBody("async function exitDiagnostic()");
 assert(
-  studentInstrument.includes("async function exitDiagnostic()") &&
-    studentInstrument.includes('Save & exit') &&
-    studentInstrument.includes("pauseDiagnosticHandoff(pending.sitting_id)") &&
-    studentInstrument.includes('router.push("/world")'),
-  "Students must be able to save their exact diagnostic position and safely exit to the world.",
+  studentInstrument.includes('Save & exit') &&
+    exitBody.includes("saveDiagnosticProgress") &&
+    exitBody.includes("setHasBegunStrand(false)") &&
+    !exitBody.includes("router.push"),
+  "Save & exit must save the exact diagnostic position and return students to the diagnostic home screen.",
+);
+const hubBody = functionBody("function leaveToCentralHub()");
+assert(
+  hubBody.includes("pauseDiagnosticHandoff(pending.sitting_id)") &&
+    hubBody.includes('router.push("/world")') &&
+    studentInstrument.includes("onClick={leaveToCentralHub}"),
+  "Leaving the diagnostic home for the Central Hub must pause the handoff so the world does not send students straight back.",
 );
 assert(
   diagnosticHandoff.includes("sessionStorage") &&
