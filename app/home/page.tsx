@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { buildGroundFirstLessonRoute, resolveStudentDestination } from "@/lib/student-destination";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
+import { isDiagnosticHandoffPaused } from "@/lib/diagnostic-handoff";
 
 function StudentHomeBackdrop() {
   return (
@@ -60,7 +61,7 @@ export default function StudentHomePage() {
       try {
         const pendingDiagnostic = await fetchPendingStudentDiagnostic(studentId!);
         if (cancelled) return;
-        if (pendingDiagnostic) {
+        if (pendingDiagnostic && !isDiagnosticHandoffPaused(pendingDiagnostic.sitting_id)) {
           router.replace("/diagnostic");
           return;
         }

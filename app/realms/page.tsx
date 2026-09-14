@@ -8,6 +8,7 @@ import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
+import { isDiagnosticHandoffPaused } from "@/lib/diagnostic-handoff";
 
 function GuardedRealmsPage() {
   const router = useRouter();
@@ -32,7 +33,7 @@ function GuardedRealmsPage() {
       restoreStudentStateFromServer(studentId, "space"),
     ]).then(([pendingDiagnostic, numberState]) => {
       if (cancelled) return;
-      if (pendingDiagnostic) {
+      if (pendingDiagnostic && !isDiagnosticHandoffPaused(pendingDiagnostic.sitting_id)) {
         router.replace("/diagnostic");
         return;
       }

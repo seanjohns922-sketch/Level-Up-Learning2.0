@@ -208,6 +208,10 @@ assert(
   "Live progression must never share an all-or-nothing request with diagnostic administration.",
 );
 const studentInstrument = read("app/diagnostic/page.tsx");
+const diagnosticHandoff = read("lib/diagnostic-handoff.ts");
+const centralWorldEntry = read("components/world3d/CentralWorld3DEntry.tsx");
+const studentLogin = read("app/login/page.tsx");
+const realmsPage = read("app/realms/page.tsx");
 assert(!studentInstrument.includes("isDemoPreviewMode"), "The diagnostic must not have a demo-only persistence shortcut.");
 assert(studentInstrument.includes("saveDiagnosticProgress"), "Student answers and position must persist during a sitting.");
 assert(studentInstrument.includes('label="Read page"'), "The student diagnostic journey must offer a complete page read-aloud.");
@@ -215,8 +219,20 @@ assert(studentInstrument.includes("STRAND_PRESENTATION"), "The student journey m
 assert(
   studentInstrument.includes("async function exitDiagnostic()") &&
     studentInstrument.includes('Save & exit') &&
+    studentInstrument.includes("pauseDiagnosticHandoff(pending.sitting_id)") &&
     studentInstrument.includes('router.push("/world")'),
   "Students must be able to save their exact diagnostic position and safely exit to the world.",
+);
+assert(
+  diagnosticHandoff.includes("sessionStorage") &&
+    centralWorldEntry.includes("isDiagnosticHandoffPaused(pendingDiagnostic.sitting_id)") &&
+    realmsPage.includes("isDiagnosticHandoffPaused(pendingDiagnostic.sitting_id)") &&
+    studentLogin.includes("clearDiagnosticHandoffPause()"),
+  "A deliberate diagnostic pause must survive the world handoff without weakening the next-login assignment check.",
+);
+assert(
+  studentInstrument.includes("visibleAnswer = isUnknownAnswer ? null : currentAnswer"),
+  "The internal I-don't-know marker must never render as a student response.",
 );
 const migration = read("supabase/migrations/20260910170000_release_chance_hollow_live_realm.sql");
 const completionMigration = read("supabase/migrations/20260911120000_complete_six_strand_whole_maths_diagnostic.sql");
@@ -224,8 +240,6 @@ const diagnosticFoundation = read("supabase/migrations/20260903170000_whole_math
 const supervisedMigration = read("supabase/migrations/20260911153000_supervised_adaptive_whole_maths_diagnostic.sql");
 const answerCountFix = read("supabase/migrations/20260914110000_fix_whole_maths_diagnostic_answer_counts.sql");
 const studentJourneyAccessFix = read("supabase/migrations/20260914123000_restore_student_diagnostic_journey_access.sql");
-const studentLogin = read("app/login/page.tsx");
-const realmsPage = read("app/realms/page.tsx");
 assert(studentLogin.includes("fetchPendingStudentDiagnostic(student.student_id)"), "Student login must prioritise an open assigned diagnostic.");
 assert(realmsPage.includes("fetchPendingStudentDiagnostic(studentId)"), "The 2D realm entry must not bypass an open assigned diagnostic.");
 assert(
@@ -270,7 +284,6 @@ for (const required of [
 }
 assert(studentInstrument.includes("Diagnostic session closed"), "The student route needs a school-only locked state.");
 assert(panel.includes("Supervised school session"), "Teachers need controls for the school-only diagnostic access window.");
-const centralWorldEntry = read("components/world3d/CentralWorld3DEntry.tsx");
 assert(
   centralWorldEntry.includes("fetchPendingStudentDiagnostic") && centralWorldEntry.includes('router.replace("/diagnostic")'),
   "An assigned diagnostic must take priority when a student enters the world.",

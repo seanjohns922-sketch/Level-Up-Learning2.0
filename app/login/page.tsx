@@ -14,6 +14,7 @@ import { bootstrapDemoPreview } from "@/lib/demo-preview-bootstrap";
 import { resolveStudentDestination } from "@/lib/student-destination";
 import { resolvePostLoginExperience } from "@/lib/world3d/access";
 import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
+import { clearDiagnosticHandoffPause } from "@/lib/diagnostic-handoff";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import { GraduationCap, Briefcase, KeyRound, User, Lock, Users } from "lucide-react";
@@ -667,6 +668,7 @@ export default function LoginPage() {
     }
 
     try {
+      clearDiagnosticHandoffPause();
       const pendingDiagnostic = await fetchPendingStudentDiagnostic(student.student_id);
       if (!isCurrentAttempt()) return;
       if (pendingDiagnostic) {

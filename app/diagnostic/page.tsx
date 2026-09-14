@@ -6,6 +6,9 @@ import {
   ArrowRight,
   BarChart3,
   Check,
+  ChevronLeft,
+  ChevronRight,
+  CircleHelp,
   Compass,
   Dices,
   DoorOpen,
@@ -37,6 +40,9 @@ import {
   type DiagnosticProbeScore,
 } from "@/lib/whole-maths-diagnostic";
 import { getDiagnosticQuestions } from "@/lib/whole-maths-diagnostic-questions";
+import { pauseDiagnosticHandoff } from "@/lib/diagnostic-handoff";
+
+const UNKNOWN_ANSWER = "__i_dont_know__";
 
 function checkpointLabel(checkpoint: PendingStudentDiagnostic["checkpoint"]) {
   if (checkpoint === "ad_hoc") return "Teacher check-in";
@@ -49,6 +55,9 @@ const STRAND_PRESENTATION: Record<AcStrand, {
   card: string;
   iconBox: string;
   accent: string;
+  progress: string;
+  button: string;
+  assessmentRealmId: string;
 }> = {
   number: {
     realm: "Number Nexus",
@@ -56,6 +65,9 @@ const STRAND_PRESENTATION: Record<AcStrand, {
     card: "border-cyan-300/40 bg-gradient-to-br from-cyan-400/15 to-teal-500/5",
     iconBox: "bg-cyan-300 text-cyan-950",
     accent: "text-cyan-300",
+    progress: "bg-gradient-to-r from-cyan-300 to-teal-300",
+    button: "bg-cyan-300 hover:bg-cyan-200 focus-visible:outline-cyan-200",
+    assessmentRealmId: "number",
   },
   measurement: {
     realm: "Measurelands",
@@ -63,6 +75,9 @@ const STRAND_PRESENTATION: Record<AcStrand, {
     card: "border-amber-300/40 bg-gradient-to-br from-amber-400/15 to-orange-500/5",
     iconBox: "bg-amber-300 text-amber-950",
     accent: "text-amber-300",
+    progress: "bg-gradient-to-r from-amber-300 to-orange-300",
+    button: "bg-amber-300 hover:bg-amber-200 focus-visible:outline-amber-200",
+    assessmentRealmId: "measurement",
   },
   space: {
     realm: "Starpath",
@@ -70,6 +85,9 @@ const STRAND_PRESENTATION: Record<AcStrand, {
     card: "border-blue-300/40 bg-gradient-to-br from-blue-400/15 to-indigo-500/5",
     iconBox: "bg-blue-300 text-blue-950",
     accent: "text-blue-300",
+    progress: "bg-gradient-to-r from-blue-300 to-indigo-300",
+    button: "bg-blue-300 hover:bg-blue-200 focus-visible:outline-blue-200",
+    assessmentRealmId: "space",
   },
   statistics: {
     realm: "Statistica",
@@ -77,6 +95,9 @@ const STRAND_PRESENTATION: Record<AcStrand, {
     card: "border-rose-300/40 bg-gradient-to-br from-rose-400/15 to-pink-500/5",
     iconBox: "bg-rose-300 text-rose-950",
     accent: "text-rose-300",
+    progress: "bg-gradient-to-r from-rose-300 to-pink-300",
+    button: "bg-rose-300 hover:bg-rose-200 focus-visible:outline-rose-200",
+    assessmentRealmId: "statistics",
   },
   algebra: {
     realm: "Pattern Peaks",
@@ -84,6 +105,9 @@ const STRAND_PRESENTATION: Record<AcStrand, {
     card: "border-violet-300/40 bg-gradient-to-br from-violet-400/15 to-purple-500/5",
     iconBox: "bg-violet-300 text-violet-950",
     accent: "text-violet-300",
+    progress: "bg-gradient-to-r from-violet-300 to-purple-300",
+    button: "bg-violet-300 hover:bg-violet-200 focus-visible:outline-violet-200",
+    assessmentRealmId: "pattern",
   },
   probability: {
     realm: "Chance Hollow",
@@ -91,6 +115,9 @@ const STRAND_PRESENTATION: Record<AcStrand, {
     card: "border-fuchsia-300/40 bg-gradient-to-br from-fuchsia-400/15 to-purple-500/5",
     iconBox: "bg-fuchsia-300 text-fuchsia-950",
     accent: "text-fuchsia-300",
+    progress: "bg-gradient-to-r from-fuchsia-300 to-pink-300",
+    button: "bg-fuchsia-300 hover:bg-fuchsia-200 focus-visible:outline-fuchsia-200",
+    assessmentRealmId: "chance",
   },
 };
 
@@ -188,6 +215,7 @@ export default function WholeMathsDiagnosticPage() {
         probes,
         index,
       );
+      pauseDiagnosticHandoff(pending.sitting_id);
       router.push("/world");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Your place could not be saved. Please try again before leaving.");
@@ -433,54 +461,126 @@ export default function WholeMathsDiagnosticPage() {
     return <main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white"><div><h1 className="text-2xl font-black">This strand test is not ready</h1><p className="mt-2 text-slate-300">No level-test bank exists for {AC_STRANDS[pending.strand].label} at {level}. Nothing has been scored or placed.</p></div></main>;
   }
 
+  const testPresentation = STRAND_PRESENTATION[pending.strand];
+  const TestStrandIcon = testPresentation.icon;
+  const currentAnswer = answers[current.question.id] ?? null;
+  const isUnknownAnswer = currentAnswer === UNKNOWN_ANSWER;
+  const visibleAnswer = isUnknownAnswer ? null : currentAnswer;
+  const progressPercent = Math.round(((index + 1) / linkedQuestions.length) * 100);
+
   return (
     <ReadAloudRateProvider>
-      <main className="min-h-screen bg-gradient-to-b from-slate-950 to-[#0A2F2A] px-5 py-8 text-white">
-        <div className="mx-auto max-w-4xl">
-          <header className="mb-6 rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-teal-300">{checkpointLabel(pending.checkpoint)}</p>
-                <h1 className="mt-2 text-3xl font-black">{AC_STRANDS[pending.strand].label} · {level}</h1>
-                <p className="mt-1 text-sm text-slate-300">Question {index + 1} of {linkedQuestions.length}</p>
+      <main className="relative min-h-screen overflow-hidden bg-[#06131f] px-4 py-5 text-white sm:px-6 sm:py-7">
+        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div className="absolute -left-32 top-10 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
+          <div className="absolute -right-36 bottom-0 h-[28rem] w-[28rem] rounded-full bg-violet-500/10 blur-3xl" />
+          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-teal-950/75 to-transparent" />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl">
+          <header className={`mb-5 overflow-hidden rounded-[2rem] border ${testPresentation.card} shadow-xl`}>
+            <div className="grid gap-5 bg-slate-950/55 p-5 backdrop-blur-xl sm:p-6 lg:grid-cols-[1fr_minmax(18rem,24rem)] lg:items-center">
+              <div className="flex items-center gap-4">
+                <div className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl shadow-lg ${testPresentation.iconBox}`}>
+                  <TestStrandIcon className="h-7 w-7" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className={`text-xs font-black uppercase tracking-[0.18em] ${testPresentation.accent}`}>{checkpointLabel(pending.checkpoint)} · {testPresentation.realm}</p>
+                  <h1 className="mt-1 text-2xl font-black sm:text-3xl">{AC_STRANDS[pending.strand].label} <span className="text-slate-500">·</span> {level}</h1>
+                  <p className="mt-1 text-sm font-semibold text-slate-400">Your answers save as you go</p>
+                </div>
               </div>
-              <div className="flex min-w-52 flex-col items-end gap-4">
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={() => void exitDiagnostic()}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-black text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-teal-200 disabled:opacity-50"
-                >
-                  <DoorOpen className="h-4 w-4" aria-hidden="true" />
-                  {saving ? "Saving…" : "Save & exit"}
-                </button>
-                <div className="w-full"><div className="h-2 overflow-hidden rounded-full bg-white/15"><div className="h-full rounded-full bg-teal-400" style={{ width: `${((index + 1) / linkedQuestions.length) * 100}%` }} /></div></div>
+
+              <div>
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-sm font-black text-slate-200">Question {index + 1} <span className="text-slate-500">of {linkedQuestions.length}</span></p>
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void exitDiagnostic()}
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-black text-white transition hover:border-white/25 hover:bg-white/10 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-teal-200 disabled:opacity-50"
+                  >
+                    <DoorOpen className="h-4 w-4" aria-hidden="true" />
+                    {saving ? "Saving…" : "Save & exit"}
+                  </button>
+                </div>
+                <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/10" role="progressbar" aria-label="Diagnostic progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressPercent}>
+                  <div className={`h-full rounded-full transition-all duration-500 ${testPresentation.progress}`} style={{ width: `${progressPercent}%` }} />
+                </div>
+                <p className="mt-2 text-right text-xs font-bold text-slate-500">{progressPercent}% through this realm</p>
               </div>
             </div>
           </header>
 
-          <section className="rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <h2 className="text-xl font-black leading-7">{current.question.prompt}</h2>
-              <ReadAloudBtn text={current.question.prompt} />
+          <section className="overflow-hidden rounded-[2rem] border border-white/15 bg-slate-900/90 shadow-2xl shadow-black/35 backdrop-blur-xl">
+            <div className="border-b border-white/10 bg-white/[0.025] px-5 py-5 sm:px-8 sm:py-6">
+              <div className="flex items-center justify-between gap-4">
+                <span className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] ${testPresentation.accent}`}>
+                  <span className={`h-2 w-2 rounded-full ${testPresentation.progress}`} aria-hidden="true" />
+                  Question {String(index + 1).padStart(2, "0")}
+                </span>
+                <ReadAloudBtn text={current.question.prompt} label="Read question" />
+              </div>
+              <h2 className="mt-4 max-w-4xl text-2xl font-black leading-tight tracking-tight sm:text-3xl">{current.question.prompt}</h2>
             </div>
-            <AssessmentQuestionCard
-              key={current.question.id}
-              question={current.question}
-              value={answers[current.question.id] ?? null}
-              onChange={(value) => { void recordAnswer(value); }}
-              realmId={pending.strand}
-            />
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-700 pt-5">
-              <button type="button" disabled={index === 0 || saving} onClick={() => void moveToQuestion(index - 1)} className="rounded-xl border border-slate-600 px-5 py-3 font-bold disabled:opacity-40">Back</button>
-              <button type="button" disabled={saving} onClick={() => void recordAnswer("__i_dont_know__")} className="text-sm font-bold text-slate-300 underline decoration-slate-500 underline-offset-4 disabled:opacity-40">I don&apos;t know</button>
-              {index < linkedQuestions.length - 1 ? (
-                <button type="button" disabled={answers[current.question.id] == null || saving} onClick={() => void moveToQuestion(index + 1)} className="rounded-xl bg-teal-400 px-6 py-3 font-black text-slate-950 disabled:opacity-40">Next</button>
-              ) : (
-                <button type="button" disabled={answeredCount !== linkedQuestions.length || saving} onClick={() => void finishLevel()} className="rounded-xl bg-teal-400 px-6 py-3 font-black text-slate-950 disabled:opacity-40">{saving ? "Saving…" : "Finish this level"}</button>
-              )}
+
+            <div className="p-4 sm:p-7">
+              <div className="rounded-3xl border border-white/10 bg-slate-950/35 p-3 sm:p-5">
+                <AssessmentQuestionCard
+                  key={current.question.id}
+                  question={current.question}
+                  value={visibleAnswer}
+                  onChange={(value) => { void recordAnswer(value); }}
+                  realmId={testPresentation.assessmentRealmId}
+                />
+              </div>
+
+              {isUnknownAnswer ? (
+                <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl border border-slate-600/70 bg-slate-800/70 px-4 py-3 text-sm font-bold text-slate-300" role="status">
+                  <CircleHelp className="h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
+                  Marked “I don&apos;t know”. You can still choose an answer before moving on.
+                </div>
+              ) : null}
+
+              <div className="mt-6 grid grid-cols-2 items-center gap-3 border-t border-white/10 pt-5 sm:grid-cols-[1fr_auto_1fr]">
+                <button
+                  type="button"
+                  disabled={index === 0 || saving}
+                  onClick={() => void moveToQuestion(index - 1)}
+                  className="inline-flex min-h-12 w-fit items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 font-black text-slate-200 transition hover:bg-white/10 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-300 disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" /> Back
+                </button>
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => void recordAnswer(UNKNOWN_ANSWER)}
+                  className={`col-span-2 row-start-2 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-300 disabled:opacity-40 sm:col-span-1 sm:col-start-2 sm:row-start-1 ${isUnknownAnswer ? "bg-slate-700 text-white" : "text-slate-400 hover:bg-white/5 hover:text-white"}`}
+                >
+                  <CircleHelp className="h-5 w-5" aria-hidden="true" /> I don&apos;t know
+                </button>
+                {index < linkedQuestions.length - 1 ? (
+                  <button
+                    type="button"
+                    disabled={currentAnswer == null || saving}
+                    onClick={() => void moveToQuestion(index + 1)}
+                    className={`inline-flex min-h-12 items-center justify-center gap-2 justify-self-end rounded-xl px-6 py-3 font-black text-slate-950 shadow-lg transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-35 ${testPresentation.button}`}
+                  >
+                    Next <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={answeredCount !== linkedQuestions.length || saving}
+                    onClick={() => void finishLevel()}
+                    className={`inline-flex min-h-12 items-center justify-center gap-2 justify-self-end rounded-xl px-6 py-3 font-black text-slate-950 shadow-lg transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-35 ${testPresentation.button}`}
+                  >
+                    {saving ? "Saving…" : "Finish this level"} <Check className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+              {error ? <p className="mt-4 rounded-xl border border-red-400/40 bg-red-950/50 p-3 text-sm font-semibold text-red-100" role="alert">{error}</p> : null}
             </div>
-            {error ? <p className="mt-4 rounded-xl border border-red-400/40 bg-red-950/50 p-3 text-sm font-semibold text-red-100" role="alert">{error}</p> : null}
           </section>
         </div>
       </main>
