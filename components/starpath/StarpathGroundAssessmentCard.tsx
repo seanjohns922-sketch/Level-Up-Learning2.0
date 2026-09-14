@@ -1,5 +1,6 @@
 "use client";
 
+import { groundPlacementIsCorrect } from "@/lib/starpath-ground-assessment";
 import { useMemo, useState } from "react";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCcw } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -43,11 +44,7 @@ function TokenVisual({ token, compact = false }: { token: StarpathGroundAssessme
   return <PositionObjectVisual objectId={token.visual.objectId} className={compact ? "h-12 w-12" : "h-16 w-16"} />;
 }
 
-function samePlacements(actual: Placement[], expected: Placement[]): boolean {
-  const key = (item: Placement) => `${item.tokenId}:${item.r}:${item.c}`;
-  return actual.length === expected.length
-    && actual.map(key).sort().every((value, index) => value === expected.map(key).sort()[index]);
-}
+
 
 export function StarpathGroundAssessmentCard({
   task,
@@ -99,7 +96,7 @@ export function StarpathGroundAssessmentCard({
 
   const submit = () => {
     const correct = task.mode === "placement"
-      ? samePlacements(placements, task.answer)
+      ? groundPlacementIsCorrect(task, placements)
       : moves.length === task.answerMoves.length
         && moves.every((move, index) => move === task.answerMoves[index]);
     if (correct) onCorrect();

@@ -1,3 +1,4 @@
+import { GROUND_STARPATH_INDEPENDENT_PRETEST_ITEMS } from "./groundStarpathIndependentPosttest";
 import { getPretestForYear, type Question as PretestQuestion } from "./pretests";
 import { POSTTESTS, type PostTest, type Question as PosttestQuestion } from "./posttests";
 import { GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "./groundNumberNexusIndependentPosttest";
@@ -108,6 +109,7 @@ function getStarpathPosttest(yearLabel: string): PostTest | undefined {
 }
 
 function getStarpathPretest(yearLabel: string): PretestQuestion[] {
+  if (isGroundLevelYear(yearLabel)) return [...GROUND_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   if (yearLabel === "Year 1") {
     return [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   }

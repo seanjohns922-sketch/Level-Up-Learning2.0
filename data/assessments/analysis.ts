@@ -1,3 +1,4 @@
+import { decodeStarpathResponse } from "@/lib/starpath-assessment-response";
 export type AssessmentQuestionMetadata = {
   id: string;
   skillId?: string;
@@ -108,6 +109,8 @@ export function isAssessmentAnswerCorrect(
   question: GenericAssessmentQuestion,
   chosen: string | undefined
 ): boolean {
+  const evidence = decodeStarpathResponse(chosen);
+  if (evidence && question.type === "starpathTask") return evidence.questionId === question.id && evidence.correct;
   const expected = question.answerOptionId ?? question.correctAnswer ?? question.answer;
   if (expected == null || chosen == null) return false;
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { starpathAssessmentGrowth } from "@/lib/starpath-assessment-growth";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { BarChart3, ChevronDown, ChevronUp, Eye } from "lucide-react";
 import {
@@ -422,6 +423,7 @@ function computePlacementStatus(
   }
   if (pct >= 100) return "Post-Test Ready";
 
+  if (prog.realm_id === "space" && prog.year === "Prep") return "Full Program";
   if (prog.pretest_score != null) {
     const pathway = pretestPathwayForPercent(prog.pretest_score);
     // A pre-test pass may advance the student, but it does not mean the
@@ -1236,12 +1238,15 @@ function StudentStrandDetail({
     fallbackStatus: summaryStatus,
     liveRow,
   });
+  const growth = supportedRealmId === "space" ? starpathAssessmentGrowth(prog.assessment_attempts ?? [], yearLabel) : null;
   const currentPretestScore = prog.pretest_score ?? null;
   const previousPretest =
     latestPretest && latestPretest.year !== yearLabel ? latestPretest : undefined;
   const pretestSub =
     currentPretestScore != null
-      ? currentPretestScore >= ASSESSMENT_PASS_THRESHOLD
+      ? supportedRealmId === "space" && yearLabel === "Prep"
+        ? `Ground baseline recorded · ${timeAgo(pretestCompletedAt(prog))}`
+        : currentPretestScore >= ASSESSMENT_PASS_THRESHOLD
         ? `${yearToLevelLabel(yearLabel)} pre-test passed · ${timeAgo(pretestCompletedAt(prog))}`
         : `${yearToLevelLabel(yearLabel)} assigned · ${timeAgo(pretestCompletedAt(prog))}`
       : previousPretest?.pretest_score != null
@@ -1299,6 +1304,12 @@ function StudentStrandDetail({
           sub={latestPost ? (latestPost.passed ? "Pass" : "Needs review") : `Last active ${timeAgo(prog.updated_at ?? undefined)}`}
         />
       </div>
+
+      {growth && <div className="rounded-2xl border border-indigo-200 bg-white p-4">
+        <h3 className="font-bold text-slate-900">{yearToLevelLabel(yearLabel)} Space growth</h3>
+        <p className="mt-2 text-sm text-slate-700">Baseline: {growth.baseline ? `${growth.baseline.scorePercent}% (${new Date(growth.baseline.completedAt).toLocaleDateString("en-AU")})` : "Not recorded"} · Post-test: {growth.post ? `${growth.post.scorePercent}% (${new Date(growth.post.completedAt).toLocaleDateString("en-AU")})` : "Not recorded"}</p>
+        <p className="mt-1 text-sm font-semibold text-slate-700">{growth.change !== null ? `${growth.change > 0 ? "+" : ""}${growth.change} percentage points over ${growth.days} days` : growth.reason}</p>
+      </div>}
 
       <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
         <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">

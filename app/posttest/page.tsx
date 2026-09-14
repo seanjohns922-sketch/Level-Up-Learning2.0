@@ -1,5 +1,6 @@
 "use client";
 
+import { starpathAssessmentMetadata } from "@/lib/starpath-assessment-growth";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPosttestForYearLabel } from "@/data/assessments/api";
@@ -590,6 +591,7 @@ function PostTestPage() {
       const completionId = getOrCreateCompletionId(assessmentCompletionKey);
       const latest = {
         ...profile,
+        ...starpathAssessmentMetadata(progressRealmId, year, questions),
         assignedWeek,
         at: completedAt,
         replay_metadata: {

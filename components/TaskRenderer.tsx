@@ -200,6 +200,7 @@ import { StarpathShapeFeatureCard } from "@/components/starpath/StarpathShapeFea
 import { StarpathGridReferenceCard } from "@/components/starpath/StarpathGridReferenceCard";
 import StarpathGridRouteCard from "@/components/starpath/StarpathGridRouteCard";
 import StarpathCompositeCard from "@/components/starpath/StarpathCompositeCard";
+import StarpathIndependentConstructionCard from "@/components/starpath/StarpathIndependentConstructionCard";
 import StarpathSymmetryCard from "@/components/starpath/StarpathSymmetryCard";
 import StarpathNetCard from "@/components/starpath/StarpathNetCard";
 import StarpathCrossSectionCard from "@/components/starpath/StarpathCrossSectionCard";
@@ -748,12 +749,14 @@ function TaskRendererInner({
       return <StarpathGridRouteCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathComposite":
       return <StarpathCompositeCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+    case "starpathIndependentConstruction":
+      return <StarpathIndependentConstructionCard key={k} task={t} onCorrect={onC} onWrong={onW} onAssessmentAnswer={assessmentMode ? recordAssessmentAnswer : undefined} />;
     case "starpathSymmetry":
-      return <StarpathSymmetryCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathSymmetryCard key={k} assessmentMode={assessmentMode} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathNet":
-      return <StarpathNetCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathNetCard key={k} assessmentMode={assessmentMode} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathCrossSection":
-      return <StarpathCrossSectionCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
+      return <StarpathCrossSectionCard key={k} assessmentMode={assessmentMode} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathCartesian":
       return <StarpathCartesianCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "starpathTessellation":

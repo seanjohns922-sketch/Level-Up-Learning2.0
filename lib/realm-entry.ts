@@ -50,7 +50,7 @@ export function resolveRealmEntryRoute(args: {
   if (args.realmId === STARPATH_REALM_ID) {
     const starpathYear = (year === "Foundation" ? "Prep" : year) as StarpathLevelDefinition["yearLabel"];
     const level = getStarpathLevelForYear(starpathYear);
-    if (year !== "Prep" && year !== "Foundation" && !isPlacementComplete(args.progress)) {
+    if (!isPlacementComplete(args.progress)) {
       return `/pretest?year=${encodeURIComponent(level.yearLabel)}&realm_id=${STARPATH_REALM_ID}`;
     }
     return buildStarpathWorldHref({ selectedLevel: level.id });

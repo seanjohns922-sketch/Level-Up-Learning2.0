@@ -16,7 +16,7 @@ const pretest = read("app/pretest/page.tsx");
 const posttest = read("app/posttest/page.tsx");
 
 requireText(wrapper, 'task.kind === "starpathObject" && task.mode === "classify"', "Starpath classification assessments do not enable editable mode.");
-requireText(wrapper, "recordAssessmentAnswer: (correct)", "Starpath classification results are not recorded through the neutral assessment contract.");
+requireText(wrapper, "recordAssessmentAnswer: (correct, response)", "Starpath classification results are not recorded through the neutral assessment contract.");
 requireText(card, "if (!isEditableAssessment && classifyTask.assignments[selectedId] !== groupId)", "Assessment sorting still reveals incorrect groups while the child is working.");
 requireText(card, "moveAgain(objectId", "Placed assessment objects cannot be moved to another group.");
 requireText(card, "recordClassification", "Classification answers still submit automatically.");

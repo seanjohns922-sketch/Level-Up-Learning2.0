@@ -63,8 +63,8 @@ check(Boolean(blueprint), "Year 2 Starpath blueprint is missing.");
 check(blueprint?.descriptors.every((item) => item.curriculumMapping.implementationStatus === "aligned") ?? false, "Year 2 blueprint is not curriculum-aligned.");
 
 const forms = [
-  { kind: "pretest", bank: LEVEL2_STARPATH_INDEPENDENT_PRETEST_ITEMS, difficulty: { easy: 8, moderate: 9, challenging: 3 }, cognitive: { recall: 3, understanding: 6, application: 7, reasoning: 4 }, bankId: "starpath-level-2-pretest-v1" },
-  { kind: "posttest", bank: LEVEL2_STARPATH_INDEPENDENT_POSTTEST_ITEMS, difficulty: { easy: 6, moderate: 9, challenging: 5 }, cognitive: { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 }, bankId: "starpath-level-2-posttest-v1" },
+  { kind: "pretest", bank: LEVEL2_STARPATH_INDEPENDENT_PRETEST_ITEMS, difficulty: {"easy": 8, "moderate": 9, "challenging": 3}, cognitive: {"recall": 3, "understanding": 6, "application": 7, "reasoning": 4}, bankId: "starpath-level-2-pretest-v4" },
+  { kind: "posttest", bank: LEVEL2_STARPATH_INDEPENDENT_POSTTEST_ITEMS, difficulty: {"easy": 8, "moderate": 9, "challenging": 3}, cognitive: {"recall": 3, "understanding": 6, "application": 7, "reasoning": 4}, bankId: "starpath-level-2-posttest-v4" },
 ] as const;
 
 for (const form of forms) {
@@ -77,11 +77,11 @@ for (const form of forms) {
   check(sameCounts(counts(bank.map((item) => item.primaryDescriptorCode)), { AC9M2SP01: 10, AC9M2SP02: 10 }), `${form.kind} descriptor allocation must be 10/10.`);
   check(sameCounts(counts(bank.map((item) => item.difficulty)), form.difficulty), `${form.kind} difficulty mix differs from the approved blueprint.`);
   check(sameCounts(counts(bank.map((item) => item.cognitiveCategory)), form.cognitive), `${form.kind} cognitive mix differs from the approved blueprint.`);
-  check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 6, manipulated_response: 14 }), `${form.kind} response mix must be 6 selected and 14 manipulated.`);
+  check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 10, manipulated_response: 10 }), `${form.kind} response mix must be 10 selected and 10 manipulated.`);
   check(bank.every((item) => item.prompt.trim().split(/\s+/).length <= 16), `${form.kind} contains a prompt above the 16-word Year 2 ceiling.`);
 
   for (const item of bank) {
-    check(item.version === "1.0.0" && item.bankId === form.bankId, `${item.id} has incorrect release metadata.`);
+    check(item.version === "4.0.0" && item.bankId === form.bankId, `${item.id} has incorrect release metadata.`);
     check(item.realm === "space" && item.level === 2 && item.form === form.kind, `${item.id} targets the wrong form.`);
     check(item.origin === "assessment_authored" && item.sourcePool === form.kind, `${item.id} is not independent assessment content.`);
     check(item.renderer.type === "starpath_assessment_task" && item.type === "starpathTask", `${item.id} is not a launchable Starpath task.`);
@@ -142,12 +142,12 @@ check(JSON.stringify(productionPostByLevel.map((item) => item.id)) === JSON.stri
 check(productionPostByYear.every((item) => !legacyIds.has(item.id)), "Production still resolves a retired quiz-derived Post-Test item.");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Assessment thresholds must remain 85%.");
 check(workshopSource.includes("AssessmentConstructionGrid") && workshopSource.includes('assessmentMode && task.mode === "construct"'), "Assessment constructions still expose the guided target shape.");
-check(workshopSource.includes("isSimplePolygon") && workshopSource.includes("parallelPairCount"), "Assessment construction does not validate genuine closed shapes and parallel-side requirements.");
+check(fs.readFileSync("lib/starpath-assessment-construction.ts", "utf8").includes("isSimplePolygon") && fs.readFileSync("lib/starpath-assessment-construction.ts", "utf8").includes("parallelPairCount"), "Assessment construction does not validate genuine closed shapes and parallel-side requirements.");
 check(shapeFeatureSource.includes("[&>svg]:h-full") && shapeFeatureSource.includes("[&>svg]:w-full"), "Level 2 assessment shapes are not centred within their option widgets.");
 
 console.log(`Year 2 Starpath independent-bank audit: ${passed} passed, ${failures.length} failed.`);
-console.log("Forms: 40 items; each 14 manipulated / 6 selected; independent production resolver active.");
-console.log("Release status: Version 1.0 PRODUCTION.");
+console.log("Forms: 40 items; each 10 manipulated / 10 selected; independent production resolver active.");
+console.log("Release status: Version 4.0; uncalibrated.");
 if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exitCode = 1;

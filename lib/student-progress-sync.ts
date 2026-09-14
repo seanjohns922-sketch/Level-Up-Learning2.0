@@ -30,6 +30,7 @@ export type StudentProgressSnapshotRow = {
   quiz_scores: unknown;
   lesson_attempts: unknown;
   pretest_profile?: unknown;
+  assessment_attempts?: import("@/lib/realm-progress-compat").NormalizedAssessmentAttempt[];
   posttest_profile?: unknown;
   teacher_advanced_weeks?: unknown;
   has_seen_intro: boolean | null;

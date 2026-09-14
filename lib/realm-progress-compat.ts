@@ -402,7 +402,7 @@ function buildRowsFromRealmData(
       week: summary.current_week ?? summary.assigned_week ?? null,
       status: summary.status,
       pretest_score: latestPretest?.score_percent ?? summary.pretest_score,
-      placement_complete: summary.placement_complete || latestPretest !== null,
+      placement_complete: summary.realm_id === "space" ? summary.placement_complete : summary.placement_complete || latestPretest !== null,
       assigned_week: summary.assigned_week,
       required_weeks: summary.required_weeks,
       optional_weeks: summary.optional_weeks,
@@ -584,7 +584,7 @@ export async function teacherChangeStartingLevel(
   assignedLevel: string,
   entryMode: PlacementEntryMode = "pretest",
 ) {
-  const normalizedEntryMode = assignedLevel === "Prep"
+  const normalizedEntryMode = assignedLevel === "Prep" && realmId !== "space"
     ? "ground_week1"
     : entryMode === "ground_week1" ? "pretest" : entryMode;
   const { error } = await supabase.rpc("teacher_change_starting_level", {
@@ -605,7 +605,7 @@ export async function teacherChangeStartingLevels(
     p_placements: placements.map((placement) => ({
       student_id: placement.studentId,
       assigned_level: placement.assignedLevel,
-      entry_mode: placement.assignedLevel === "Prep"
+      entry_mode: placement.assignedLevel === "Prep" && realmId !== "space"
         ? "ground_week1"
         : placement.entryMode === "ground_week1" ? "pretest" : placement.entryMode,
     })),

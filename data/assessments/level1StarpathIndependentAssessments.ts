@@ -1,3 +1,4 @@
+import { rebuildStarpathTask, starpathResponseMode } from "./starpathRebuildTasks";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { Question } from "@/data/assessments/posttests";
 import {
@@ -18,7 +19,7 @@ type StarpathAssessmentTask = Extract<PracticeTask, {
     | "starpathObjectMatch"
     | "starpathRouteBuild"
     | "starpathRouteRecord"
-    | "starpathRouteDebug";
+    | "starpathRouteDebug" | Extract<PracticeTask, {kind: "starpathIndependentConstruction"}>;
 }>;
 type ResponseMode = "selected_response" | "manipulated_response";
 type Misconception =
@@ -72,7 +73,7 @@ function objectCompare(prompt: string, left: string, right: string, options: Arr
 
 function workshop(mode: "construct" | "repair", label: string, points: Array<{ r: number; c: number }>, missingEdgeIndex?: number): StarpathAssessmentTask {
   const prompt = mode === "construct" ? `Make the ${label}.` : `Complete the ${label}.`;
-  return { kind: "starpathShapeWorkshop", mode, prompt, speakText: prompt, target: 1, shapeLabel: label, points, missingEdgeIndex, feedback: FEEDBACK };
+  return { kind: "starpathShapeWorkshop", mode, prompt, speakText: prompt, target: 1, shapeLabel: label, orientationConstraint: label === "turned square" ? "oblique" : undefined, constructionRule: label.includes("square") ? "square" : label === "rectangle" ? "rectangle" : "polygon", points, missingEdgeIndex, feedback: FEEDBACK };
 }
 
 function objectMatch(prompt: string, objects: Array<{ id: string; objectId: string }>): StarpathAssessmentTask {
@@ -115,18 +116,21 @@ function routeDebug(prompt: string, start: Cell, correctRoute: Direction[], wron
 }
 
 function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion {
+  spec = {...spec, task: rebuildStarpathTask(1, form, index, spec.task) as ItemSpec["task"]};
+  if (index === 19 && form === "pretest") spec = {...spec, task: routeBuild("Visit the crystal, avoid the asteroid and reach the star.", {r:0,c:3}, {r:3,c:0}, {mode:"mission",blocked:[{r:1,c:3}],checkpoints:[{r:1,c:1,object:"crystal"}],missionRule:"Visit the crystal, avoid the asteroid and reach the star.",singleAttempt:true})};
+  spec.responseMode = starpathResponseMode(spec.task);
   const formLabel = form === "pretest" ? "pre" : "post";
   const task = { ...spec.task, presentation: "assessment" as const };
   return {
     schemaVersion: 1,
-    id: `y1-starpath-${formLabel}-${String(index + 1).padStart(2, "0")}-v1`,
-    version: "1.0.0",
+    id: `y1-starpath-${formLabel}-${String(index + 1).padStart(2, "0")}-v4`,
+    version: "4.0.0",
     realm: "space",
     level: 1,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `starpath-level-1-${form}-v1`,
+    bankId: `starpath-level-1-${form}-v4`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
@@ -191,7 +195,7 @@ const POSTTEST_TASKS: readonly StarpathAssessmentTask[] = [
   { ...workshop("construct", "triangle", [{ r: 4, c: 0 }, { r: 1, c: 2 }, { r: 4, c: 4 }]), prompt: "Build a three-sided shape." },
   { ...workshop("repair", "square", [{ r: 0, c: 0 }, { r: 0, c: 4 }, { r: 4, c: 4 }, { r: 4, c: 0 }], 1), prompt: "Add the missing side to finish the square." },
   objectMatch("Pair every object with a shape partner.", [{ id: "wheel", objectId: "wheel" }, { id: "clock", objectId: "clock" }, { id: "present", objectId: "present" }, { id: "frame", objectId: "frame" }]),
-  { ...workshop("construct", "turned square", [{ r: 0, c: 2 }, { r: 2, c: 3 }, { r: 4, c: 2 }, { r: 2, c: 1 }]), prompt: "Build a square standing on one corner." },
+  { ...workshop("construct", "turned square", [{ r: 0, c: 2 }, { r: 2, c: 4 }, { r: 4, c: 2 }, { r: 2, c: 0 }]), prompt: "Build a square standing on one corner." },
   { ...workshop("repair", "rectangle", [{ r: 0, c: 0 }, { r: 0, c: 3 }, { r: 4, c: 3 }, { r: 4, c: 0 }], 3), prompt: "Finish the wide four-sided shape." },
   objectMatch("Match each object by its main outline.", [{ id: "ball", objectId: "ball" }, { id: "wheel", objectId: "wheel" }, { id: "door", objectId: "door" }, { id: "tv", objectId: "tv" }]),
   routeRecord("Send these directions in the shown order.", { r: 0, c: 0 }, ["down", "right", "right", "down"]),
@@ -208,8 +212,6 @@ const POSTTEST_SPECS: readonly ItemSpec[] = PRETEST_SPECS.map((spec, index) => (
   ...spec,
   contextKey: spec.contextKey.replace("pre-", "post-"),
   structureKey: `${spec.structureKey}-post`,
-  difficulty: (["easy", "easy", "easy", "easy", "easy", "easy", "easy", "moderate", "moderate", "moderate", "moderate", "moderate", "moderate", "moderate", "moderate", "challenging", "challenging", "challenging", "challenging", "challenging"] as AssessmentItemDifficulty[])[index]!,
-  cognitiveCategory: (["recall", "recall", "understanding", "understanding", "understanding", "understanding", "understanding", "understanding", "application", "application", "application", "reasoning", "application", "application", "application", "application", "reasoning", "reasoning", "reasoning", "transfer"] as AssessmentCognitiveCategory[])[index]!,
   task: POSTTEST_TASKS[index]!,
 }));
 

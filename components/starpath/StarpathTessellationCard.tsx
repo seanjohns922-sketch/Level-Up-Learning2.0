@@ -37,8 +37,8 @@ function tileNodes(id: string): Node[] {
     // L-trominoes pair into 2x3 blocks that tile by translation.
     const u = 20; let i = 0;
     for (let y = -2; y < VH + 3 * u; y += 3 * u) for (let x = -2; x < VW + 2 * u; x += 2 * u) {
-      push([[x, y], [x + u, y], [x + u, y + 2 * u], [x + 2 * u, y + 2 * u], [x + 2 * u, y + 3 * u], [x, y + 3 * u]], i++);
-      push([[x + u, y], [x + 2 * u, y], [x + 2 * u, y + 2 * u], [x + u, y + 2 * u]], i++);
+      push([[x, y], [x + 2 * u, y], [x + 2 * u, y + u], [x + u, y + u], [x + u, y + 2 * u], [x, y + 2 * u]], i++);
+      push([[x + u, y + u], [x + 2 * u, y + u], [x + 2 * u, y + 3 * u], [x, y + 3 * u], [x, y + 2 * u], [x + u, y + 2 * u]], i++);
     }
   } else if (id === "pentagon") {
     const R = 28; let i = 0;

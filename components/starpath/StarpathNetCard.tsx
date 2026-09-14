@@ -174,7 +174,7 @@ const FoldButton = ({ folded, onClick, disabled = false }: { folded: boolean; on
   </button>
 );
 
-export default function StarpathNetCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathNetCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: () => void; onWrong: (answer?: string) => void }) {
   const [folded, setFolded] = useState(false);
   const [chosen, setChosen] = useState<string[]>([]);
   const [tapped, setTapped] = useState<string | null>(null);
@@ -270,7 +270,7 @@ export default function StarpathNetCard({ task, onCorrect, onWrong }: { task: Ta
         </div>
         <div className="flex items-center justify-center gap-3">
           <button type="button" onClick={() => { setBuilt([]); setFolded(false); }} disabled={settled} title="Clear" aria-label="Clear" className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-slate-200 bg-white text-slate-600 disabled:opacity-40"><RotateCcw className="h-5 w-5" /></button>
-          <FoldButton folded={folded} onClick={() => setFolded((v) => !v)} disabled={!ready} />
+          {!assessmentMode && <FoldButton folded={folded} onClick={() => setFolded((v) => !v)} disabled={!ready} />}
           <SubmitButton disabled={settled || !ready} onClick={submitBuild} />
         </div>
       </div>
@@ -285,7 +285,7 @@ export default function StarpathNetCard({ task, onCorrect, onWrong }: { task: Ta
         <div className="l4sym-stage mx-auto max-w-sm rounded-3xl p-4">
           <SolidFoldStage kind={task.solid ?? "cube"} folded={folded} />
         </div>
-        {task.fold ? <div className="flex justify-center"><FoldButton folded={folded} onClick={() => setFolded((v) => !v)} /></div> : null}
+        {task.fold && !assessmentMode ? <div className="flex justify-center"><FoldButton folded={folded} onClick={() => setFolded((v) => !v)} /></div> : null}
         <div className="mx-auto grid max-w-md gap-2 sm:grid-cols-2">
           {task.textOptions?.map((option) => (
             <OptionButton key={option.id} selected={chosen.includes(option.id)} onClick={() => toggleChoice(option.id)}>{option.label}</OptionButton>
@@ -315,7 +315,7 @@ export default function StarpathNetCard({ task, onCorrect, onWrong }: { task: Ta
           onTap={(k) => { if (!settled) setTapped(k); }}
         />
       </div>
-      {task.fold ? <div className="flex justify-center"><FoldButton folded={folded} onClick={() => setFolded((v) => !v)} /></div> : null}
+      {task.fold && !assessmentMode ? <div className="flex justify-center"><FoldButton folded={folded} onClick={() => setFolded((v) => !v)} /></div> : null}
 
       {isTap ? (
         <div className="flex justify-center"><SubmitButton disabled={settled || !tapped} onClick={submitCell} /></div>

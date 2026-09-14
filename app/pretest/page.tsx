@@ -1,5 +1,6 @@
 "use client";
 
+import { starpathAssessmentMetadata } from "@/lib/starpath-assessment-growth";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { Pin, PartyPopper } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -388,7 +389,7 @@ function PretestPage() {
       router.replace(buildRealmProgramHref({ realmId: progressRealmId, year, week: 1 }));
       return;
     }
-    if (year === "Prep") {
+    if (year === "Prep" && progressRealmId !== "space") {
       router.replace(realmId === "measurement" ? "/measurelands" : "/home");
     }
   }, [progressRealmId, realmId, router, year]);
@@ -488,7 +489,7 @@ function PretestPage() {
   // ── Load any saved snapshot once; offer to resume rather than auto-restart ──
   useEffect(() => {
     const snapshot = loadPretestResume(year, localProgressRealmId);
-    if (pretestResumeHasProgress(snapshot)) {
+    if (pretestResumeHasProgress(snapshot) && (progressRealmId !== "space" || JSON.stringify(snapshot?.questionIds) === JSON.stringify(questions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
     setResumeReady(true);
@@ -496,7 +497,7 @@ function PretestPage() {
 
   function resumeFromSnapshot() {
     const snapshot = loadPretestResume(year, localProgressRealmId);
-    if (snapshot) {
+    if (snapshot && (progressRealmId !== "space" || JSON.stringify(snapshot.questionIds) === JSON.stringify(questions.map(q => q.id)))) {
       const restored = [...Array(questions.length).fill(null)];
       snapshot.answers.forEach((a, i) => {
         if (i < restored.length) restored[i] = a;
@@ -526,6 +527,7 @@ function PretestPage() {
       realmId: localProgressRealmId,
       index,
       answers,
+      questionIds: questions.map(q => q.id),
       idkResponses,
       startedAt: assessmentStartedAt,
       updatedAt: Date.now(),
@@ -581,6 +583,7 @@ function PretestPage() {
       realmId: localProgressRealmId,
       index,
       answers,
+      questionIds: questions.map(q => q.id),
       idkResponses,
       startedAt: assessmentStartedAt,
       updatedAt: Date.now(),
@@ -624,7 +627,7 @@ function PretestPage() {
     const profile = analyzeAssessmentResult({
       questions,
       answers: answerMap,
-      yearLevel: Number(year.replace(/\D/g, "")) || 3,
+      yearLevel: year === "Prep" ? 0 : Number(year.replace(/\D/g, "")) || 3,
       testType: "pre",
       passThreshold: PRETEST_PASS_THRESHOLD,
       studentId,
@@ -632,9 +635,10 @@ function PretestPage() {
     const prev = canonicalProgress;
     const prevUnlocked = prev?.unlockedLegends ?? [];
     const nextYear = getNextYearLabel(year);
-    const passed = profile.percentage >= PRETEST_PASS_THRESHOLD;
+    const baselineOnly = progressRealmId === "space" && year === "Prep";
+    const passed = !baselineOnly && profile.percentage >= PRETEST_PASS_THRESHOLD;
     const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks, progressRealmId);
-    const requiresFullPathway = pretestPathwayForPercent(profile.percentage) === "full";
+    const requiresFullPathway = baselineOnly || pretestPathwayForPercent(profile.percentage) === "full";
     // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
     const allProgramWeeks = getProgramWeeks(progressRealmId);
     const requiredWeeks = passed
@@ -684,7 +688,7 @@ function PretestPage() {
         lastPreTestProfile: profile,
       };
     } else {
-      const assignedWeek = pretestStartingWeekForPercent(profile.percentage, [
+      const assignedWeek = baselineOnly ? 1 : pretestStartingWeekForPercent(profile.percentage, [
         profile.assignedWeek,
         getLowestRecommendedWeek(profile.recommendedWeeks),
         ...profile.recommendedWeeks,
@@ -731,6 +735,7 @@ function PretestPage() {
           passed: nextProgress.status === "PASSED",
           placement_result: {
             ...profile,
+            ...starpathAssessmentMetadata(progressRealmId, year, questions),
             replay_metadata: {
               started_at: new Date(assessmentStartedAt).toISOString(),
               completed_at: completedAt,
@@ -800,7 +805,7 @@ function PretestPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mabTotal, mabHasSelection, question?.type, index]);
 
-  if (year === "Prep") {
+  if (year === "Prep" && progressRealmId !== "space") {
     return null;
   }
 

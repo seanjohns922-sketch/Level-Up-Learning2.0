@@ -41,13 +41,13 @@ export function orderMattersTask(round: number, target: number): TransformTask {
   const ab = second(slide(shape));
   const ba = slide(second(shape));
   const same = sameShape(ab, ba);
-  const secondName = commute ? "slide it 2 up" : "turn it a quarter-turn about the middle";
+  const secondName = commute ? "slide it 2 up" : "turn it 90 degrees clockwise about (4, 4)";
   const options = order([
     { id: "same", label: "Same result either way" },
     { id: "diff", label: "Different result depending on order" },
   ], round);
   return {
-    ...base("order", "options", target), shape,
+    ...base("order", "options", target), shape, centre,
     prompt: `You slide the shape 3 right, then ${secondName}. Would doing those two moves in the other order give the same final position?`,
     speakText: "Picture both orders. For some pairs the order changes the result, for others it does not.",
     options, correctOptionIds: [same ? "same" : "diff"],
@@ -62,12 +62,12 @@ export function findChainTask(round: number, target: number): TransformTask {
   const image = rotate(translate(shape, 2, 1), centre, 180);
   const safe = inBounds(image, BOUNDS) ? image : translate(shape, 3, 2);
   const options = order([
-    { id: "a", label: "Slide 2 right and 1 up, then turn a half-turn" },
-    { id: "b", label: "Turn a half-turn, then slide 2 right and 1 up" },
-    { id: "c", label: "Flip across a mirror, then slide up" },
+    { id: "a", label: "Slide 2 right and 1 up, then turn a half-turn about (4, 4)" },
+    { id: "b", label: "Turn a half-turn about (4, 4), then slide 2 right and 1 up" },
+    { id: "c", label: "Reflect in x = 4, then slide 1 up" },
   ], round);
   return {
-    ...base("chain", "options", target), shape, image: safe,
+    ...base("chain", "options", target), shape, centre, image: safe,
     prompt: "Which sequence of moves takes the shape to the blue image?",
     speakText: "Track a corner from the shape to the image. Which two moves, in order, get it there?",
     options, correctOptionIds: ["a"],

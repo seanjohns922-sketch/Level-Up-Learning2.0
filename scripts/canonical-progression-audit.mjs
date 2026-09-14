@@ -37,7 +37,7 @@ const checks = [
   ["legacy real-student progress cache fails closed", progressCache.includes("return isDemoPreviewMode() ? parsed : null")],
   ["teacher override has a dedicated immutable table", overrideMigration.includes("create table if not exists public.student_progress_overrides")],
   ["teacher override does not fabricate attempts or rewards", !overrideMigration.includes("insert into public.student_lesson_attempts") && !overrideMigration.includes("student_economy")],
-  ["teacher override reporting is separate", teacherDashboard.includes("teacher advanced")],
+  ["teacher override reporting is separate", teacherDashboard.includes("StrandStudentsPanel") && teacher.includes("Teacher Advanced on") && teacher.includes("prog.teacher_advanced_weeks")],
   ["onboarding verifies canonical server state", intro.includes('restoreStudentStateFromServer(studentId, "number")')],
   ["onboarding completion is saved before routing", /await markStudentIntroSeen\(studentId\)[\s\S]*router\.push\("\/home"\)/.test(intro)],
   ["home routing ignores local intro markers", !home.includes("hasActiveStudentSeenIntro")],

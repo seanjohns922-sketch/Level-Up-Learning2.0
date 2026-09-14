@@ -52,7 +52,7 @@ function RotationGuide({ task }: { task: Task }) {
   );
 }
 
-export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { task: Task; onCorrect: () => void; onWrong: (answer?: string) => void }) {
+export default function StarpathSymmetryCard({ task, onCorrect, onWrong, assessmentMode = false }: { task: Task; assessmentMode?: boolean; onCorrect: () => void; onWrong: (answer?: string) => void }) {
   const [cells, setCells] = useState<SymmetryCell[]>(task.seedCells);
   const [colour, setColour] = useState(COLOURS[0]!);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -67,7 +67,7 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
   // Live reflection preview: the mirror image of every placed tile, ghosted where
   // it isn't filled yet. Off in test/record mode so it never reveals the answer.
   const ghosts = new Map<string, string>();
-  if (!optionsMode) {
+  if (!assessmentMode && !optionsMode) {
     for (const cell of cells) {
       const t = transformCell(task, cell);
       const tk = key(t);
@@ -78,14 +78,14 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
   // Repair mode: flag the tile whose colour no longer matches its mirror partner,
   // so the "unmatched tile" is unmistakable. Checked against the target design.
   const mismatched = new Set<string>();
-  if (task.mode === "repair" && !optionsMode) {
+  if (!assessmentMode && task.mode === "repair" && !optionsMode) {
     const expected = new Map(task.expectedCells.map((cell) => [key(cell), cell.colour]));
     for (const cell of cells) if (expected.get(key(cell)) !== cell.colour) mismatched.add(key(cell));
   }
 
   const isTurn = task.rotation !== undefined;
   const turnLabel = task.rotation === 90 ? "quarter turn" : "half turn";
-  const helperText = task.mode === "repair"
+  const helperText = assessmentMode ? "Choose a colour, then tap a cell to place or remove a tile. Submit when your design is ready." : task.mode === "repair"
     ? isTurn
       ? "One tile does not match the turn. Tap it, then choose the colour its turn-partners show."
       : "One tile does not match its mirror. Tap it, then choose the colour its partner shows."
@@ -122,12 +122,12 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
   return (
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
-      {isTurn ? (
+      {isTurn && (!assessmentMode || !optionsMode) ? (
         <div className="mx-auto flex w-fit items-center gap-2 rounded-full border border-cyan-300/50 bg-cyan-50 px-3 py-1 text-xs font-black text-cyan-700">
           <RotateCw className="h-4 w-4" aria-hidden /> {task.rotation === 90 ? "Quarter turn · 90°" : "Half turn · 180°"} around the centre
         </div>
       ) : null}
-      {!optionsMode ? <p className="text-center text-sm font-bold text-slate-500">{helperText}</p> : isTurn ? <p className="text-center text-sm font-bold text-slate-500">Use Turn it to see whether the pattern lands back on itself, then choose.</p> : null}
+      {!optionsMode ? <p className="text-center text-sm font-bold text-slate-500">{helperText}</p> : isTurn && !assessmentMode ? <p className="text-center text-sm font-bold text-slate-500">Use Turn it to see whether the pattern lands back on itself, then choose.</p> : null}
       <div className="l4sym-stage mx-auto max-w-sm rounded-3xl p-4">
         <div className="relative">
           <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${task.size}, minmax(0, 1fr))` }}>
@@ -159,8 +159,8 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
             })}
           </div>
           <MirrorLine task={task} />
-          <RotationGuide task={task} />
-          {isTurn ? (
+          {!assessmentMode && <RotationGuide task={task} />}
+          {isTurn && !assessmentMode ? (
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 grid gap-1.5"
@@ -184,7 +184,7 @@ export default function StarpathSymmetryCard({ task, onCorrect, onWrong }: { tas
           ) : null}
         </div>
       </div>
-      {isTurn ? (
+      {isTurn && !assessmentMode ? (
         <div className="flex justify-center">
           <button
             type="button"

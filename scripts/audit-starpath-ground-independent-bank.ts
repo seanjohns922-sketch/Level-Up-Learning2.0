@@ -92,16 +92,16 @@ const expectedDescriptors = Object.fromEntries(
   (blueprint?.descriptors ?? []).map((item) => [item.code, item.allocation.posttest]),
 );
 check(sameCounts(counts(bank.map((item) => item.primaryDescriptorCode)), expectedDescriptors), "Descriptor allocation must be 10 AC9MFSP01 and 10 AC9MFSP02.");
-check(sameCounts(counts(bank.map((item) => item.difficulty)), { easy: 8, moderate: 8, challenging: 4 }), "Difficulty mix must be 8 easy, 8 moderate and 4 challenging.");
-check(sameCounts(counts(bank.map((item) => item.cognitiveCategory)), { recall: 2, understanding: 6, application: 7, reasoning: 4, transfer: 1 }), "Cognitive mix must be 2 recall, 6 understanding, 7 application, 4 reasoning and 1 transfer.");
+check(sameCounts(counts(bank.map((item) => item.difficulty)), { easy: 7, moderate: 10, challenging: 3 }), "Difficulty mix must be 8 easy, 8 moderate and 4 challenging.");
+check(sameCounts(counts(bank.map((item) => item.cognitiveCategory)), { recall: 2, understanding: 6, application: 8, reasoning: 3, transfer: 1 }), "Cognitive mix must be 2 recall, 6 understanding, 7 application, 4 reasoning and 1 transfer.");
 check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 10, manipulated_response: 10 }), "Response mix must be exactly 10 selected and 10 manipulated responses.");
 check(bank.every((item) => item.prompt.trim().split(/\s+/).length <= 14), "A prompt exceeds the Foundation 14-word reading ceiling.");
 
 for (const item of bank) {
-  check(item.schemaVersion === 1 && item.version === "1.0.1", `${item.id} has incorrect version metadata.`);
+  check(item.schemaVersion === 1 && item.version === "2.0.0", `${item.id} has incorrect version metadata.`);
   check(item.realm === "space" && item.level === 0 && item.form === "posttest", `${item.id} targets the wrong assessment form.`);
   check(item.origin === "assessment_authored" && item.sourcePool === "posttest", `${item.id} is not independent assessment content.`);
-  check(item.bankId === "starpath-level-0-posttest-v1", `${item.id} has the wrong bank ID.`);
+  check(item.bankId === "starpath-level-0-posttest-v2", `${item.id} has the wrong bank ID.`);
   check(item.type === "starpathTask" && Boolean(item.practiceTask), `${item.id} is not a launchable Starpath task.`);
   check(isPracticeTaskSafe(item.practiceTask), `${item.id} is blocked by the task-safety gate.`);
   check(item.renderer.type === "starpath_assessment_task", `${item.id} has the wrong renderer metadata.`);
@@ -134,11 +134,9 @@ for (const item of bank) {
 }
 
 const compactPlacementBoards = new Map([
-  ["y0-starpath-post-06-v1", "1x3"],
-  ["y0-starpath-post-07-v1", "2x1"],
-  ["y0-starpath-post-08-v1", "2x2"],
-  ["y0-starpath-post-09-v1", "2x1"],
-  ["y0-starpath-post-10-v1", "2x3"],
+  ["y0-starpath-post-07-v2", "2x1"],
+  ["y0-starpath-post-08-v2", "2x2"],
+  ["y0-starpath-post-10-v2", "2x3"],
 ]);
 for (const [itemId, expectedSize] of compactPlacementBoards) {
   const item = bank.find((candidateItem) => candidateItem.id === itemId);
@@ -163,7 +161,7 @@ check(demoReviewSource.includes("ground-starpath-rc1"), "Demo Review does not ex
 
 console.log(`Ground Starpath independent-bank audit: ${checksPassed} passed, ${failures.length} failed.`);
 console.log("Production form: 20 items; 10 manipulated; 10 selected; independent resolver active.");
-console.log("Release status: Version 1.0 PRODUCTION.");
+console.log("Release status: Version 2.0; uncalibrated.");
 if (failures.length > 0) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;

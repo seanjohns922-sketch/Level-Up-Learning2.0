@@ -1,3 +1,4 @@
+import { rebuildStarpathTask, starpathResponseMode } from "./starpathRebuildTasks";
 import type { PracticeTask, StarpathObjectSceneItem } from "@/data/activities/year1/practice-task";
 import { getL3Object, l3ObjectSvg, type L3ObjectId } from "@/data/activities/starpath/level3/l3-objects";
 import type { Question } from "@/data/assessments/posttests";
@@ -11,7 +12,7 @@ import {
 type Descriptor = "AC9M3SP01" | "AC9M3SP02";
 type Form = "pretest" | "posttest";
 type CandidateQuestion = Question & IndependentAssessmentItem;
-type AssessmentTask = Extract<PracticeTask, { kind: "starpathObject" | "starpathMapCreate" | "starpathMapRoute" }>;
+type AssessmentTask = Extract<PracticeTask, { kind: "starpathObject" | "starpathMapCreate" | "starpathMapRoute" }> | Extract<PracticeTask, {kind: "starpathIndependentConstruction"}>;
 type ResponseMode = "selected_response" | "manipulated_response";
 type Misconception =
   | "object-feature-vocabulary"
@@ -171,14 +172,12 @@ const POST_TASKS: readonly AssessmentTask[] = [
 
 const PRE_DIFFICULTY: AssessmentItemDifficulty[] = ["easy", "easy", "moderate", "moderate", "easy", "moderate", "challenging", "moderate", "easy", "easy", "moderate", "moderate", "moderate", "moderate", "challenging", "easy", "moderate", "challenging", "easy", "challenging"];
 const PRE_COGNITIVE: AssessmentCognitiveCategory[] = ["recall", "recall", "understanding", "understanding", "understanding", "understanding", "application", "application", "understanding", "understanding", "application", "application", "application", "application", "application", "reasoning", "reasoning", "reasoning", "reasoning", "transfer"];
-const POST_DIFFICULTY: AssessmentItemDifficulty[] = ["easy", "easy", "moderate", "moderate", "easy", "moderate", "challenging", "moderate", "easy", "easy", "moderate", "moderate", "moderate", "moderate", "challenging", "moderate", "challenging", "challenging", "challenging", "challenging"];
-const POST_COGNITIVE: AssessmentCognitiveCategory[] = ["recall", "understanding", "understanding", "understanding", "understanding", "understanding", "application", "application", "application", "application", "application", "application", "application", "reasoning", "reasoning", "reasoning", "reasoning", "reasoning", "transfer", "transfer"];
 
 function specs(form: Form, tasks: readonly AssessmentTask[]): ItemSpec[] {
-  const difficulty = form === "pretest" ? PRE_DIFFICULTY : POST_DIFFICULTY;
-  const cognitive = form === "pretest" ? PRE_COGNITIVE : POST_COGNITIVE;
+  const difficulty = PRE_DIFFICULTY;
+  const cognitive = PRE_COGNITIVE;
   return tasks.map((task, index) => {
-    const objectItem = index < 8;
+    const objectItem = index < 10;
     const selected = index < 4;
     const mapOffset = index - 8;
     return {
@@ -199,11 +198,13 @@ function specs(form: Form, tasks: readonly AssessmentTask[]): ItemSpec[] {
 }
 
 function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion {
+  spec = {...spec, task: rebuildStarpathTask(3, form, index, spec.task) as ItemSpec["task"]};
+  spec.responseMode = starpathResponseMode(spec.task);
   const shortForm = form === "pretest" ? "pre" : "post";
   return {
-    schemaVersion: 1, id: `y3-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v1`, version: "1.0.0",
+    schemaVersion: 1, id: `y3-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v4`, version: "4.0.0",
     realm: "space", level: 3, form, origin: "assessment_authored", sourcePool: form,
-    bankId: `starpath-level-3-${form}-v1`, primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
+    bankId: `starpath-level-3-${form}-v4`, primaryDescriptorCode: spec.descriptor, descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }], cognitiveCategory: spec.cognitiveCategory,
     difficulty: spec.difficulty, isTransfer: spec.cognitiveCategory === "transfer",
     requiresReasoning: spec.cognitiveCategory === "reasoning" || spec.cognitiveCategory === "transfer",

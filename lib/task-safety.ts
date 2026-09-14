@@ -313,6 +313,7 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "statisticaGraph",
   "patternPeaksQuestion",
   "starpathLevel6Assessment",
+  "starpathIndependentConstruction",
   "starpathCoordinate",
   "starpathTransform",
   "starpathObject",

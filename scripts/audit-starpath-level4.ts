@@ -107,18 +107,18 @@ function assertAssessmentBank(
 ) {
   assert.equal(bank.length, 20, `Level 4 ${kind} must contain 20 items`);
   assert.equal(new Set(bank.map((item) => item.id)).size, 20, `Level 4 ${kind} IDs must be unique`);
-  assert.equal(new Set(bank.map((item) => item.prompt)).size, 20, `Level 4 ${kind} prompts must be unique`);
+  assert.equal(new Set(bank.map((item) => JSON.stringify(item.practiceTask))).size, 20, `Level 4 ${kind} task payloads must be unique`);
   assert.equal(new Set(bank.map((item) => item.contextKey)).size, 20, `Level 4 ${kind} contexts must be unique`);
   assert.equal(new Set(bank.map((item) => item.structureKey)).size, 20, `Level 4 ${kind} structures must be unique`);
   assertSameCounts(counts(bank.map((item) => item.primaryDescriptorCode)), { AC9M4SP01: 7, AC9M4SP02: 6, AC9M4SP03: 7 }, `Level 4 ${kind} descriptor allocation`);
   assertSameCounts(counts(bank.map((item) => item.difficulty)), expectedDifficulty, `Level 4 ${kind} difficulty mix`);
   assertSameCounts(counts(bank.map((item) => item.cognitiveCategory)), expectedCognitive, `Level 4 ${kind} cognitive mix`);
-  assertSameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 3, manipulated_response: 17 }, `Level 4 ${kind} response mix`);
+  assertSameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 6, manipulated_response: 14 }, `Level 4 ${kind} response mix`);
   const openingItems = bank.slice(0, 8);
   const openingModes = openingItems.slice(0, 7).map((item) => item.practiceTask?.kind === "starpathComposite" ? item.practiceTask.mode : null);
-  assert.deepEqual(openingModes, ["scan", "alternate", "model", "views", "hidden", "simplify", "evaluate"], `Level 4 ${kind} Q1-Q7 must progress from identification to decomposition, constraints, views, hidden structure, approximation and transfer`);
-  assert(openingItems.slice(1, 7).every((item) => item.responseMode === "manipulated_response"), `Level 4 ${kind} Q2-Q7 must require a two-part evidence response`);
-  openingItems.slice(1, 7).forEach((item) => {
+  assert.deepEqual(openingModes, ["scan", null, null, null, "hidden", "simplify", "evaluate"], `Level 4 ${kind} Q1-Q7 must progress from identification to decomposition, constraints, views, hidden structure, approximation and transfer`);
+  assert(openingItems.slice(1, 4).every((item) => item.responseMode === "manipulated_response"), `Level 4 ${kind} Q2-Q7 must require a two-part evidence response`);
+  openingItems.slice(4, 7).forEach((item) => {
     const task = item.practiceTask;
     assert(task?.kind === "starpathComposite" && task.figureOptions?.length === 2, `${item.id} must compare two plausible models`);
     assert((task?.evidenceClues?.length ?? 0) >= 2, `${item.id} must require multiple clues`);
@@ -128,6 +128,10 @@ function assertAssessmentBank(
   const abstractOpeningLanguage = /\b(approximation|communicates?|components?|essential|evidence|preserves?|relationships?|representations?)\b/i;
   openingItems.slice(0, 7).forEach((item) => {
     const task = item.practiceTask;
+    if (task?.kind === "starpathIndependentConstruction") {
+      assert.equal(task.mode, "tiles");
+      return; // Solvability and gap/overlap scoring are exercised by qa:starpath-rebuild.
+    }
     assert(task?.kind === "starpathComposite", `${item.id} must use the composite task renderer`);
     assert(task.prompt.trim().split(/\s+/).length <= 10, `${item.id} prompt is too wordy for a Level 4 assessment`);
     assert(!abstractOpeningLanguage.test(task.prompt), `${item.id} prompt uses avoidable abstract language`);
@@ -140,8 +144,8 @@ function assertAssessmentBank(
 
   const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [item.id, item]));
   for (const item of bank) {
-    assert.equal(item.version, "3.0.0", `${item.id} must declare release metadata`);
-    assert.equal(item.bankId, `starpath-level-4-${kind}-v3`, `${item.id} bank ID mismatch`);
+    assert.equal(item.version, "4.0.0", `${item.id} must declare release metadata`);
+    assert.equal(item.bankId, `starpath-level-4-${kind}-v4`, `${item.id} bank ID mismatch`);
     assert.equal(item.realm, "space", `${item.id} realm mismatch`);
     assert.equal(item.level, 4, `${item.id} level mismatch`);
     assert.equal(item.form, kind, `${item.id} form mismatch`);
@@ -214,7 +218,7 @@ const blueprint = STARPATH_ASSESSMENT_BLUEPRINTS.find((item) => item.level === 4
 assert(blueprint, "Year 4 Starpath blueprint is missing");
 assert(blueprint.descriptors.every((item) => item.curriculumMapping.implementationStatus === "aligned"), "Year 4 blueprint must be curriculum-aligned");
 assertAssessmentBank("pretest", LEVEL4_STARPATH_INDEPENDENT_PRETEST_ITEMS as readonly Candidate[], { easy: 6, moderate: 10, challenging: 4 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 });
-assertAssessmentBank("posttest", LEVEL4_STARPATH_INDEPENDENT_POSTTEST_ITEMS as readonly Candidate[], { easy: 4, moderate: 9, challenging: 7 }, { recall: 1, understanding: 4, application: 7, reasoning: 6, transfer: 2 });
+assertAssessmentBank("posttest", LEVEL4_STARPATH_INDEPENDENT_POSTTEST_ITEMS as readonly Candidate[], {"easy": 6, "moderate": 10, "challenging": 4}, {"recall": 2, "understanding": 5, "application": 7, "reasoning": 5, "transfer": 1});
 
 const expectedPreIds = LEVEL4_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) => item.id);
 const expectedPostIds = LEVEL4_STARPATH_INDEPENDENT_POSTTEST_ITEMS.map((item) => item.id);

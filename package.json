@@ -196,7 +196,8 @@
     "qa:quiz-math-integrity": "node --no-warnings --experimental-strip-types scripts/quiz-math-answer-integrity-audit.mjs",
     "qa:realmies-r2": "node scripts/realmies-r2-audit.mjs",
     "qa:realmies-r3-assets": "node scripts/realmies-r3-assets-audit.mjs",
-    "qa:realmies-collection": "node scripts/realmies-collection-ui-audit.mjs"
+    "qa:realmies-collection": "node scripts/realmies-collection-ui-audit.mjs",
+    "qa:starpath-rebuild": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-rebuild.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

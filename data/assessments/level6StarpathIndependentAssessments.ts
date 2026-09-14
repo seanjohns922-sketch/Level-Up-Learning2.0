@@ -1,3 +1,4 @@
+import { rebuildStarpathTask, starpathResponseMode } from "./starpathRebuildTasks";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { Question } from "@/data/assessments/posttests";
 import {
@@ -46,7 +47,7 @@ type AssessmentTask = Extract<
       | "starpathCrossSection"
       | "starpathCartesian"
       | "starpathTransform"
-      | "starpathTessellation";
+      | "starpathTessellation" | Extract<PracticeTask, {kind: "starpathIndependentConstruction"}>;
   }
 >;
 type Misconception =
@@ -86,16 +87,6 @@ const PRE_COGNITIVE: AssessmentCognitiveCategory[] = [
   "recall", "understanding", "understanding", "application", "reasoning", "reasoning",
   "understanding", "application", "application", "reasoning", "reasoning", "transfer",
   "understanding", "application", "reasoning", "application", "reasoning", "transfer", "transfer", "application",
-];
-const POST_DIFFICULTY: AssessmentItemDifficulty[] = [
-  "moderate", "challenging", "moderate", "challenging", "challenging", "moderate",
-  "easy", "moderate", "challenging", "moderate", "challenging", "challenging",
-  "easy", "moderate", "challenging", "moderate", "challenging", "challenging", "moderate", "challenging",
-];
-const POST_COGNITIVE: AssessmentCognitiveCategory[] = [
-  "understanding", "application", "reasoning", "reasoning", "transfer", "application",
-  "understanding", "application", "reasoning", "application", "reasoning", "transfer",
-  "understanding", "application", "reasoning", "application", "reasoning", "transfer", "transfer", "reasoning",
 ];
 
 function neutral<T extends AssessmentTask>(task: T): T {
@@ -173,8 +164,8 @@ function misconceptionFor(descriptor: Descriptor, index: number): readonly Misco
 }
 
 function specs(form: Form, tasks: readonly AssessmentTask[]): ItemSpec[] {
-  const difficulty = form === "pretest" ? PRE_DIFFICULTY : POST_DIFFICULTY;
-  const cognitive = form === "pretest" ? PRE_COGNITIVE : POST_COGNITIVE;
+  const difficulty = PRE_DIFFICULTY;
+  const cognitive = PRE_COGNITIVE;
   return tasks.map((assessmentTask, index) => {
     const descriptor = descriptorForIndex(index);
     return {
@@ -197,18 +188,20 @@ function specs(form: Form, tasks: readonly AssessmentTask[]): ItemSpec[] {
 }
 
 function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion {
+  spec = {...spec, task: rebuildStarpathTask(6, form, index, spec.task) as ItemSpec["task"]};
+  spec.responseMode = starpathResponseMode(spec.task);
   const shortForm = form === "pretest" ? "pre" : "post";
   const skill = descriptorSkill(spec.descriptor);
   return {
     schemaVersion: 1,
-    id: `y6-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v3`,
-    version: "3.0.0",
+    id: `y6-starpath-${shortForm}-${String(index + 1).padStart(2, "0")}-v4`,
+    version: "4.0.0",
     realm: "space",
     level: 6,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `starpath-level-6-${form}-v3`,
+    bankId: `starpath-level-6-${form}-v4`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],

@@ -1,3 +1,4 @@
+import { decodeStarpathResponse } from "@/lib/starpath-assessment-response";
 export type AssessmentReplayStatus = "correct" | "incorrect" | "skipped" | "dont_know";
 
 export type AssessmentLessonMapping = {
@@ -33,6 +34,7 @@ export type AssessmentQuestionSnapshot = {
 
 export type ReplayQuestionSource = {
   id: string;
+  version?: string;
   prompt: string;
   type?: string;
   options?: unknown[];
@@ -118,7 +120,7 @@ export function buildAssessmentQuestionSnapshots(
     return {
       schema_version: 1,
       question_id: question.id,
-      question_version: "1",
+      question_version: question.version ?? question.id.match(/-v(\d+)$/)?.[1] ?? "1",
       question_number: index + 1,
       question_text: question.prompt,
       question_type: question.type ?? "mcq",
@@ -126,7 +128,7 @@ export function buildAssessmentQuestionSnapshots(
       visual: cloneJsonValue(question.visual),
       task_snapshot: cloneJsonValue(question.practiceTask),
       correct_answer: correctAnswerForReplay(question),
-      student_answer: cloneJsonValue(studentAnswer),
+      student_answer: cloneJsonValue(decodeStarpathResponse(studentAnswer)?.response ?? studentAnswer),
       correct,
       response_status: responseStatus(studentAnswer, correct),
       explanation:

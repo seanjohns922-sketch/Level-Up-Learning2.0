@@ -1,5 +1,6 @@
 "use client";
 
+import { starpathAssessmentGrowth } from "@/lib/starpath-assessment-growth";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -298,6 +299,7 @@ function ResultsPage() {
   const [storedPosttestProfile, setStoredPosttestProfile] = useState<AssessmentResultProfile | null>(initialPreviewProgress?.lastPostTestProfile ?? null);
   const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">(previewMode ? "ready" : "loading");
   const [restoreError, setRestoreError] = useState("");
+  const [growthNote, setGrowthNote] = useState<string | null>(null);
 
   useEffect(() => {
     if (previewMode) return;
@@ -330,7 +332,11 @@ function ResultsPage() {
           return;
         }
         setCanonicalProgress(restored.progress);
-        setStoredPretestProfile(preProfile);
+        if (progressRealmId === "space" && isPostTest) {
+          const comparison = starpathAssessmentGrowth(levelRow?.assessment_attempts ?? [], year);
+          setStoredPretestProfile(comparison.change !== null && comparison.baseline ? assessmentProfileFromRow(comparison.baseline.placementResult) : null);
+          setGrowthNote(comparison.reason ?? `${comparison.days} days between assessments`);
+        } else setStoredPretestProfile(preProfile);
         setStoredPosttestProfile(postProfile);
         setRestoreState("ready");
       } catch (error) {
@@ -353,7 +359,8 @@ function ResultsPage() {
     return Math.round((score / total) * 100);
   }, [activeProfile, score, total]);
 
-  const passedByPretest = !isPostTest && scorePercent >= PRETEST_PASS_THRESHOLD;
+  const baselineOnly = progressRealmId === "space" && year === "Prep" && !isPostTest;
+  const passedByPretest = !baselineOnly && !isPostTest && scorePercent >= PRETEST_PASS_THRESHOLD;
   const passedByPosttest = isPostTest && scorePercent >= POSTTEST_PASS_THRESHOLD;
   const [fogCinematicDismissed, setFogCinematicDismissed] = useState(false);
   const showFogCinematic = passedByPosttest && !fogCinematicDismissed;
@@ -402,7 +409,7 @@ function ResultsPage() {
     !hasSeenLegendUnlockVideo(unlockDisplayLegend.id) &&
     !unlockDismissed;
   const isFailedPretest = !isPostTest && !passedByPretest;
-  const requiresFullPathway = isFailedPretest && scorePercent < 50;
+  const requiresFullPathway = baselineOnly || (isFailedPretest && scorePercent < 50);
   const diagnosticRequiredWeeks = !isPostTest
     ? normalizeWeekList(storedPretestProfile?.recommendedWeeks, progressRealmId)
     : [];
@@ -419,7 +426,7 @@ function ResultsPage() {
     ? getWorld3DReturnPathForPosttest({ realmId: progressRealmId, level: year })
     : null;
   function goHome() { router.push(posttestReturnPath ?? getRealmHomeRoute(realmId)); }
-  const assignedStartWeek = isPostTest
+  const assignedStartWeek = baselineOnly ? 1 : isPostTest
     ? getAssignedReviewWeek(storedPosttestProfile) ?? 1
     : getAssignedReviewWeek(storedPretestProfile) ?? 1;
 
@@ -440,6 +447,7 @@ function ResultsPage() {
 
   // Icon + message based on score (no emojis)
   const getMessage = () => {
+    if (baselineOnly) return { icon: "play", title: "Starting Point Recorded", sub: "Your first score is saved. Start Ground Starpath and see what you learn." };
     if (passed) return { icon: "star", title: isPostTest ? "Level Mastered" : "Pre-Test Passed", sub: isPostTest ? "You've proven your skills — collect your Legend." : "Strong result — moving to the next level." };
     if (isPostTest) return { icon: "arrow", title: "Not Quite Yet", sub: `You need ${POSTTEST_PASS_THRESHOLD}% to pass. Review the suggested weeks and try again.` };
     if (scorePercent >= 70) return { icon: "arrow", title: "Nearly There", sub: "Strong attempt. Your personalised program will close the gap." };
@@ -493,7 +501,7 @@ function ResultsPage() {
   const resultsSpeech = [
     `${msg.title}. ${msg.sub}`,
     `${realmSpokenName}, ${studentLevelLabel}, ${isPostTest ? "post-test" : source === "program_complete" ? "program" : "pre-test"} results.`,
-    `You scored ${score} out of ${total}, which is ${displayPercent} percent. Your status is ${passed ? "pass" : "keep growing"}.`,
+    `You scored ${score} out of ${total}, which is ${displayPercent} percent. Your status is ${baselineOnly ? "baseline recorded" : passed ? "pass" : "keep growing"}.`,
     passed
       ? isPostTest
         ? year === "Prep"
@@ -648,7 +656,7 @@ function ResultsPage() {
               <div className="w-px h-8 bg-white/10" />
               <div className="text-center">
                 <div className="text-2xl font-extrabold" style={{ color: passed ? "rgb(45 212 191)" : "rgb(251 191 36)" }}>
-                  {passed ? "PASS" : "GROW"}
+                  {baselineOnly ? "BASELINE" : passed ? "PASS" : "GROW"}
                 </div>
                 <div className="text-[10px] uppercase tracking-wider text-slate-500 mt-0.5">Status</div>
               </div>
@@ -714,7 +722,7 @@ function ResultsPage() {
                   {requiredWeeks.length > 0 ? (
                     <p className="mt-2 text-xs text-slate-400 leading-relaxed">
                       {requiresFullPathway
-                        ? "Complete the full 12-week pathway to be ready to pass this level."
+                        ? `Complete the full ${allProgramWeeks.length}-week pathway.`
                         : `Focus on Weeks ${requiredWeeks.join(", ")} to reach mastery.`}
                     </p>
                   ) : null}
@@ -756,7 +764,7 @@ function ResultsPage() {
                   {storedPretestProfile ? (
                     <div className="space-y-3">
                       <p className="text-sm text-slate-300">
-                        You improved from {storedPretestProfile.percentage}% to {storedPosttestProfile.percentage}%.
+                        Your score changed from {storedPretestProfile.percentage}% to {storedPosttestProfile.percentage}%. {growthNote}
                       </p>
                       <div className="grid grid-cols-3 gap-3 text-center">
                         <div className="rounded-xl bg-slate-950/60 border border-white/10 p-3">
@@ -771,7 +779,7 @@ function ResultsPage() {
                           <div className="text-[10px] uppercase tracking-wider text-slate-500">Growth</div>
                           <div className={`text-xl font-extrabold mt-1 ${growthPercentagePoints && growthPercentagePoints >= 0 ? "text-emerald-400" : "text-amber-400"}`}>
                             {growthPercentagePoints && growthPercentagePoints > 0 ? "+" : ""}
-                            {growthPercentagePoints ?? 0}%
+                            {growthPercentagePoints ?? 0} pp
                           </div>
                         </div>
                       </div>
@@ -800,7 +808,7 @@ function ResultsPage() {
                     </div>
                   ) : (
                     <p className="text-sm text-slate-400">
-                      Pre-test result not found. Complete the pre-test to compare growth.
+                      {growthNote ?? "Pre-test result not found. Complete the pre-test to compare growth."}
                     </p>
                   )}
                 </div>
@@ -822,7 +830,7 @@ function ResultsPage() {
                             <span>Post: {item.postAccuracy}%</span>
                             <span className={item.improvement >= 0 ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
                               {item.improvement > 0 ? "+" : ""}
-                              {item.improvement}%
+                              {item.improvement} pp
                             </span>
                           </div>
                         </div>

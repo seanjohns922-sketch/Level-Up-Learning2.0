@@ -1,3 +1,4 @@
+import { rebuildStarpathTask, starpathResponseMode } from "./starpathRebuildTasks";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import type { Question } from "@/data/assessments/posttests";
 import {
@@ -11,7 +12,7 @@ type Descriptor = "AC9M2SP01" | "AC9M2SP02";
 type Form = "pretest" | "posttest";
 type CandidateQuestion = Question & IndependentAssessmentItem;
 type StarpathAssessmentTask = Extract<PracticeTask, {
-  kind: "starpathShapeFeature" | "starpathShapeWorkshop" | "starpathMapLocate" | "starpathMapRoute";
+  kind: "starpathShapeFeature" | "starpathShapeWorkshop" | "starpathMapLocate" | "starpathMapRoute" | Extract<PracticeTask, {kind: "starpathIndependentConstruction"}>;
 }>;
 type ResponseMode = "selected_response" | "manipulated_response";
 type Misconception =
@@ -91,7 +92,7 @@ function workshop(
   points: Array<{ r: number; c: number }>,
   missingEdgeIndex?: number,
 ): StarpathAssessmentTask {
-  return { kind: "starpathShapeWorkshop", mode, prompt, speakText: prompt, target: 1, shapeLabel, points, missingEdgeIndex, feedback: FEEDBACK };
+  return { kind: "starpathShapeWorkshop", mode, prompt, speakText: prompt, target: 1, shapeLabel, constructionRule: shapeLabel === "parallel-sided quadrilateral" ? "two-parallel-pairs" : shapeLabel === "trapezoid" ? "parallel-pair" : shapeLabel === "rectangle" ? "rectangle" : "polygon", points, missingEdgeIndex, feedback: FEEDBACK };
 }
 
 function locate(
@@ -164,17 +165,19 @@ function debug(prompt: string, mapId: string, landmarks: typeof MAP_A | typeof M
 }
 
 function candidate(form: Form, index: number, spec: ItemSpec): CandidateQuestion {
+  spec = {...spec, task: rebuildStarpathTask(2, form, index, spec.task) as ItemSpec["task"]};
+  spec.responseMode = starpathResponseMode(spec.task);
   const formLabel = form === "pretest" ? "pre" : "post";
   return {
     schemaVersion: 1,
-    id: `y2-starpath-${formLabel}-${String(index + 1).padStart(2, "0")}-v1`,
-    version: "1.0.0",
+    id: `y2-starpath-${formLabel}-${String(index + 1).padStart(2, "0")}-v4`,
+    version: "4.0.0",
     realm: "space",
     level: 2,
     form,
     origin: "assessment_authored",
     sourcePool: form,
-    bankId: `starpath-level-2-${form}-v1`,
+    bankId: `starpath-level-2-${form}-v4`,
     primaryDescriptorCode: spec.descriptor,
     descriptorCodes: [spec.descriptor],
     curriculumLessonMapping: [{ week: spec.week, lesson: spec.lesson }],
@@ -216,7 +219,7 @@ const PRETEST_TASKS: readonly StarpathAssessmentTask[] = [
   workshop("Make a triangle with 3 straight sides.", "construct", "triangle", [...SHAPES.triangle]),
   workshop("Join the missing side of this rectangle.", "repair", "rectangle", [...SHAPES.rectangle], 2),
   workshop("Make a closed shape with 5 straight sides.", "construct", "pentagon", [...SHAPES.pentagon]),
-  workshop("Make a four-sided shape with parallel top and bottom sides.", "construct", "trapezoid", [...SHAPES.trapezoid]),
+  workshop("Make a four-sided shape with at least one pair of parallel sides.", "construct", "trapezoid", [...SHAPES.trapezoid]),
   locate("Tap Planet Plaza on this map.", "assessment-pre-map-a", MAP_A, "planet-plaza"),
   locate("Find Moon Maze on this map.", "assessment-pre-map-b", MAP_B, "moon-maze"),
   locate("Tap the landmark at the top right of the map.", "assessment-pre-map-c", MAP_B, "flag-point"),
@@ -254,12 +257,10 @@ const POSTTEST_TASKS: readonly StarpathAssessmentTask[] = [
 
 const PRE_DIFFICULTY: AssessmentItemDifficulty[] = ["easy", "easy", "easy", "easy", "moderate", "moderate", "easy", "moderate", "challenging", "challenging", "easy", "easy", "moderate", "easy", "moderate", "moderate", "moderate", "moderate", "challenging", "moderate"];
 const PRE_COGNITIVE: AssessmentCognitiveCategory[] = ["recall", "recall", "recall", "understanding", "understanding", "understanding", "application", "application", "reasoning", "application", "understanding", "understanding", "understanding", "application", "application", "application", "application", "reasoning", "reasoning", "reasoning"];
-const POST_DIFFICULTY: AssessmentItemDifficulty[] = ["easy", "easy", "moderate", "easy", "moderate", "moderate", "moderate", "moderate", "challenging", "challenging", "easy", "easy", "moderate", "easy", "moderate", "moderate", "moderate", "challenging", "challenging", "challenging"];
-const POST_COGNITIVE: AssessmentCognitiveCategory[] = ["recall", "recall", "understanding", "understanding", "understanding", "application", "application", "application", "reasoning", "reasoning", "understanding", "understanding", "application", "application", "application", "application", "reasoning", "reasoning", "reasoning", "transfer"];
 
 function specs(form: Form, tasks: readonly StarpathAssessmentTask[]): ItemSpec[] {
-  const difficulty = form === "pretest" ? PRE_DIFFICULTY : POST_DIFFICULTY;
-  const cognitive = form === "pretest" ? PRE_COGNITIVE : POST_COGNITIVE;
+  const difficulty = PRE_DIFFICULTY;
+  const cognitive = PRE_COGNITIVE;
   return tasks.map((task, index) => {
     const shape = index < 10;
     const shapeWeeks = [1, 2, 3, 4, 1, 4, 2, 3, 2, 3];

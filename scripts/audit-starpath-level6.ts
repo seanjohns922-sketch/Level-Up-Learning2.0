@@ -97,7 +97,7 @@ function auditCross(lessonId: string, t: CrossTask) {
   check(t.correctOptionIds.length === 1 && ids.has(t.correctOptionIds[0]!), `${lessonId}: exactly one valid correct answer`);
   const correct = t.options.find((o) => o.id === t.correctOptionIds[0]);
   if (t.mode === "sliceShape" || t.mode === "predict") {
-    check(correct?.label === cap(obj.sectionName), `${lessonId}/${t.mode}: section must be ${obj.sectionName} for ${obj.id}`);
+    check((correct?.label === cap(obj.sectionName) || correct?.label.startsWith(`${obj.sectionName}:`) === true), `${lessonId}/${t.mode}: section must be ${obj.sectionName} for ${obj.id}`);
   } else if (t.mode === "sliceChange") {
     check(t.correctOptionIds[0] === (obj.constantSection ? "same" : "smaller"), `${lessonId}/sliceChange: wrong answer for ${obj.id}`);
   } else if (t.mode === "prism") {
@@ -105,7 +105,7 @@ function auditCross(lessonId: string, t: CrossTask) {
   } else if (t.mode === "constant") {
     check(t.correctOptionIds[0] === (obj.constantSection ? "congruent" : "smaller"), `${lessonId}/constant: wrong answer for ${obj.id}`);
   } else if (t.mode === "explain") {
-    check(t.correctOptionIds[0] === (obj.constantSection ? "prismlike" : "apex"), `${lessonId}/explain: wrong answer for ${obj.id}`);
+    check(t.correctOptionIds[0] === (obj.constantSection ? "prismlike" : "apex") || (t.correctOptionIds[0]?.startsWith("o") === true && (obj.constantSection ? /uniform cross-section|sections are circles/.test(correct?.label ?? "") : /narrows towards its apex|sections shrink/.test(correct?.label ?? ""))), `${lessonId}/explain: wrong answer for ${obj.id}`);
   }
   check(Boolean(t.feedback?.correct && t.feedback?.wrong), `${lessonId}: feedback required`);
 }
@@ -160,6 +160,7 @@ function auditTask(label: string, task: PracticeTask) {
   else if (task.kind === "starpathTransform") auditTransform(label, task as TransformTask);
   else if (task.kind === "starpathTessellation") auditTess(label, task as TessTask);
   else if (task.kind === "starpathLevel6Assessment") auditIndependentAssessmentTask(label, task as AssessmentTask);
+  else if (task.kind === "starpathIndependentConstruction") check(["image", "tiles"].includes(task.mode), `${label}: independent geometry interaction required`);
   else check(false, `${label}: unsupported Level 6 task kind ${(task as PracticeTask).kind}`);
 }
 
@@ -171,14 +172,14 @@ function auditAssessmentBank(
 ) {
   check(bank.length === 20, `Level 6 ${kind} must contain 20 items`);
   check(new Set(bank.map((item) => item.id)).size === 20, `Level 6 ${kind} IDs must be unique`);
-  check(new Set(bank.map((item) => item.prompt)).size === 20, `Level 6 ${kind} prompts must be unique`);
+  check(new Set(bank.map((item) => JSON.stringify(item.practiceTask))).size === 20, `Level 6 ${kind} task payloads must be unique`);
   check(new Set(bank.map((item) => item.contextKey)).size === 20, `Level 6 ${kind} contexts must be unique`);
   check(new Set(bank.map((item) => item.structureKey)).size === 20, `Level 6 ${kind} structures must be unique`);
   check(sameCounts(counts(bank.map((item) => item.primaryDescriptorCode)), { AC9M6SP01: 6, AC9M6SP02: 6, AC9M6SP03: 8 }), `Level 6 ${kind} descriptor allocation must be 6/6/8`);
   check(sameCounts(counts(bank.map((item) => item.difficulty)), expectedDifficulty), `Level 6 ${kind} difficulty mix must match blueprint`);
   check(sameCounts(counts(bank.map((item) => item.cognitiveCategory)), expectedCognitive), `Level 6 ${kind} cognitive mix must match blueprint`);
-  check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 17, manipulated_response: 3 }), `Level 6 ${kind} response mix must use the lesson-renderer visual mix`);
-  check(sameCounts(counts(bank.map((item) => item.practiceTask?.kind ?? "missing")), { starpathCrossSection: 6, starpathCartesian: 6, starpathTransform: 3, starpathTessellation: 5 }), `Level 6 ${kind} must borrow the proven lesson visual renderers across all strands`);
+  check(sameCounts(counts(bank.map((item) => item.responseMode)), { selected_response: 13, manipulated_response: 7 }), `Level 6 ${kind} response mix must use the lesson-renderer visual mix`);
+  check(sameCounts(counts(bank.map((item) => item.practiceTask?.kind ?? "missing")), { starpathCrossSection: 6, starpathCartesian: 4, starpathTransform: 1, starpathTessellation: 3, starpathIndependentConstruction: 6 }), `Level 6 ${kind} must borrow the proven lesson visual renderers across all strands`);
 
   const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [item.id, item]));
   for (const item of bank) {
@@ -190,7 +191,7 @@ function auditAssessmentBank(
     check(item.curriculumCodes?.[0] === item.primaryDescriptorCode && item.descriptorCodes.includes(item.primaryDescriptorCode), `${item.id}: curriculum descriptor metadata mismatch`);
     check(item.misconceptionTags.length > 0 && item.misconceptionTags.every((tag) => misconceptionById.get(tag)?.descriptorCodes.includes(item.primaryDescriptorCode)), `${item.id}: misconception tag outside descriptor`);
     check(Boolean(item.practiceTask && "feedback" in item.practiceTask && item.practiceTask.feedback?.correct === item.practiceTask.feedback?.wrong), `${item.id}: feedback must not reveal correctness`);
-    const actualResponseMode = item.practiceTask?.kind === "starpathLevel6Assessment"
+    const actualResponseMode = item.practiceTask?.kind === "starpathIndependentConstruction" ? "manipulated_response" : item.practiceTask?.kind === "starpathLevel6Assessment"
       ? item.practiceTask.mode === "diagnose" ? "selected_response" : "manipulated_response"
       : item.practiceTask && "render" in item.practiceTask && item.practiceTask.render === "tap"
         ? "manipulated_response"
@@ -249,7 +250,7 @@ const blueprint = STARPATH_ASSESSMENT_BLUEPRINTS.find((item) => item.level === 6
 check(Boolean(blueprint), "Year 6 Starpath blueprint is missing");
 check(blueprint?.descriptors.every((item) => item.curriculumMapping.implementationStatus === "aligned") ?? false, "Year 6 Starpath blueprint must be curriculum-aligned");
 auditAssessmentBank("pretest", LEVEL6_STARPATH_INDEPENDENT_PRETEST_ITEMS as readonly Candidate[], { easy: 4, moderate: 10, challenging: 6 }, { recall: 1, understanding: 4, application: 6, reasoning: 6, transfer: 3 });
-auditAssessmentBank("posttest", LEVEL6_STARPATH_INDEPENDENT_POSTTEST_ITEMS as readonly Candidate[], { easy: 2, moderate: 8, challenging: 10 }, { understanding: 3, application: 6, reasoning: 7, transfer: 4 });
+auditAssessmentBank("posttest", LEVEL6_STARPATH_INDEPENDENT_POSTTEST_ITEMS as readonly Candidate[], {"easy": 4, "moderate": 10, "challenging": 6}, {"recall": 1, "understanding": 4, "application": 6, "reasoning": 6, "transfer": 3});
 
 const expectedPreIds = LEVEL6_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) => item.id);
 const expectedPostIds = LEVEL6_STARPATH_INDEPENDENT_POSTTEST_ITEMS.map((item) => item.id);
