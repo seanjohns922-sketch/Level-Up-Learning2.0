@@ -13,11 +13,15 @@ export default function DemoModeNavigationControls({
   text,
   background = "rgba(255,255,255,0.055)",
   border,
+  accentText = "#fff",
+  size = "compact",
 }: {
   accent: string;
   text: string;
   background?: string;
   border?: string;
+  accentText?: string;
+  size?: "compact" | "hud";
 }) {
   const router = useRouter();
   if (!isDemoPreviewMode()) return null;
@@ -31,22 +35,25 @@ export default function DemoModeNavigationControls({
     router.replace("/login");
   }
 
+  const hud = size === "hud";
   const base = {
-    minHeight: 30,
-    borderRadius: 999,
+    minHeight: hud ? 40 : 30,
+    borderRadius: hud ? 5 : 999,
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
     whiteSpace: "nowrap" as const,
-    fontFamily: "ui-monospace,monospace",
-    fontSize: 8,
+    fontFamily: hud ? "inherit" : "ui-monospace,monospace",
+    fontSize: hud ? 11 : 8,
     fontWeight: 900,
-    letterSpacing: "0.08em",
+    letterSpacing: hud ? "0.05em" : "0.08em",
+    textTransform: hud ? ("uppercase" as const) : undefined,
   };
 
   return (
     <div className="realm-demo-controls" style={{ display: "flex", alignItems: "center", gap: 5 }}>
       <span
+        className="realm-demo-mode-pill"
         title="Preview Mode"
         style={{ ...base, padding: "0 9px", color: text, background, border: border ?? `1px solid ${accent}44` }}
       >
@@ -58,15 +65,15 @@ export default function DemoModeNavigationControls({
         onClick={() => router.push("/demo-review")}
         title="Open Demo Review"
         aria-label="Open Demo Review"
-        style={{ ...base, width: 30, padding: 0, cursor: "pointer", color: text, background, border: border ?? `1px solid ${accent}44` }}
+        style={{ ...base, width: hud ? 40 : 30, padding: 0, cursor: "pointer", color: text, background, border: border ?? `1px solid ${accent}44` }}
       >
-        <ClipboardCheck size={14} aria-hidden="true" />
+        <ClipboardCheck size={hud ? 17 : 14} aria-hidden="true" />
       </button>
       <button
         type="button"
         onClick={exitDemoMode}
         title="Exit Preview Mode"
-        style={{ ...base, padding: "0 10px", cursor: "pointer", color: "#fff", background: accent, border: `1px solid ${accent}` }}
+        style={{ ...base, padding: "0 10px", cursor: "pointer", color: accentText, background: accent, border: `1px solid ${accent}` }}
       >
         <span className="realm-demo-long-label">Exit Preview</span>
         <span className="realm-demo-short-label">Exit</span>

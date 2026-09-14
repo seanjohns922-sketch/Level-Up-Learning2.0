@@ -13,7 +13,8 @@ export default function DemoPreviewBanner() {
   const searchParams = useSearchParams();
   const active = useDemoPreviewMode();
   const isStarpathProgram = pathname === "/program" && searchParams.get("realm_id") === "space";
-  const usesRealmNavigation = ["/measurelands", "/number-nexus", "/starpath"].some(
+  // These routes carry their own Preview / Demo Review / Exit controls (realm top bar or 3D world HUD).
+  const usesRealmNavigation = ["/measurelands", "/number-nexus", "/starpath", "/world"].some(
     (route) => pathname.startsWith(route),
   );
 

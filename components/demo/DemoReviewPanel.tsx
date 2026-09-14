@@ -90,6 +90,26 @@ function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "
   return `/${kind}?${params.toString()}`;
 }
 
+const DIAGNOSTIC_PREVIEW_CHECKPOINTS = [
+  { id: "start", label: "Start" },
+  { id: "mid", label: "Mid" },
+  { id: "end", label: "End" },
+] as const;
+
+const DIAGNOSTIC_STRAND_FOR_REALM: Record<ReviewRealm, string> = {
+  number: "number",
+  measurement: "measurement",
+  space: "space",
+  statistics: "statistics",
+  pattern: "algebra",
+  chance: "probability",
+};
+
+function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: "start" | "mid" | "end") {
+  const params = new URLSearchParams({ strand: DIAGNOSTIC_STRAND_FOR_REALM[realm], level: year, checkpoint });
+  return `/demo-review/diagnostic?${params.toString()}`;
+}
+
 function hasPretest(realm: ReviewRealm, year: YearLabel) {
   if (realm === "statistics" && year === "Prep") return false;
   return getPretestForYearLabel(year, realm).length > 0;
@@ -370,6 +390,21 @@ export default function DemoReviewPanel() {
               <GraduationCap size={17} /> {posttestAvailable ? "Open Post-Test" : "Post-Test not implemented"}
             </button>
           </div>
+        </section>
+
+        <section className="border-t border-white/10 py-6">
+          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-sky-300" /><h2 className="text-base font-black">Whole-Maths Diagnostic</h2></div>
+          {year !== "Prep" ? (
+            <div className="grid gap-3 sm:grid-cols-3">
+              {DIAGNOSTIC_PREVIEW_CHECKPOINTS.map((checkpoint) => (
+                <button key={checkpoint.id} type="button" onClick={() => router.push(diagnosticPreviewHref(realm, year, checkpoint.id))} className={actionClass()}>
+                  <Eye size={17} /> {checkpoint.label} Diagnostic
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs font-bold text-white/50">The diagnostic starts at Year 1 (Year 3 for Pattern Peaks and Chance Hollow).</p>
+          )}
         </section>
 
         <section className="border-t border-white/10 py-6">

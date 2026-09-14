@@ -251,6 +251,15 @@ assert(
     !/await loadPending\(\);\s*setProbes\(\[\]\)/.test(finishBody),
   "Finishing any level test must return students to the diagnostic home and keep saved follow-up scores.",
 );
+const diagnosticPreview = read("components/demo/DiagnosticPreview.tsx");
+const diagnosticPreviewRoute = read("app/demo-review/diagnostic/page.tsx");
+assert(
+  diagnosticPreview.includes("getDiagnosticQuestions") &&
+    diagnosticPreview.includes("AssessmentQuestionCard") &&
+    !diagnosticPreview.includes("whole-maths-diagnostic-client") &&
+    diagnosticPreviewRoute.includes("getServerStarpathAccess"),
+  "Demo Review must preview the exact diagnostic questions through the real question card, behind demo access, without writing diagnostic progress.",
+);
 assert(
   diagnosticHandoff.includes("sessionStorage") &&
     centralWorldEntry.includes("isDiagnosticHandoffPaused(pendingDiagnostic.sitting_id)") &&

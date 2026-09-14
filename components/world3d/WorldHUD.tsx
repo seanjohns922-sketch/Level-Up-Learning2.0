@@ -10,6 +10,7 @@ import { TOWER_REALM_PORTALS } from "@/lib/world3d/tower-realm-chamber-config";
 import { resolveTowerRealmEntry } from "@/lib/world3d/tower-realm-entry";
 import { resolveWorldJourney, type WorldJourney } from "@/lib/world3d/world-journey";
 import { joinSpeechParts, WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
+import DemoModeNavigationControls from "@/components/demo/DemoModeNavigationControls";
 
 export type WorldHUDContext = "central" | "tower" | "realm";
 
@@ -149,6 +150,15 @@ export function WorldHUD({
         </section>
 
         <div className="worldHudIdentity">
+          {/* Renders only in Demo Preview; students never see these controls. */}
+          <DemoModeNavigationControls
+            size="hud"
+            accent={accent}
+            accentText="#1d2422"
+            text="#fff4dd"
+            background="rgba(24,22,21,.82)"
+            border="1px solid rgba(255,235,195,.28)"
+          />
           {navActions?.map((action) => (
             <button key={action.key} type="button" className="worldHudGoBtn" onClick={action.onClick} aria-label={action.label}>{action.icon}<span>{action.label}</span></button>
           ))}
@@ -217,8 +227,9 @@ export function WorldHUD({
         .worldHudEditInline{margin-left:8px;background:rgba(24,22,21,.66)!important}
         .worldHudGoBtn{height:40px;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,235,195,.28);border-radius:5px;padding:0 11px;background:rgba(24,22,21,.82);color:#fff4dd;font-size:11px;font-weight:900;letter-spacing:.03em;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.22);backdrop-filter:blur(9px)}.worldHudGoBtn svg{color:var(--world-accent)}
         .worldHudActionRead{border-radius:5px!important}.worldTeleportBackdrop{position:absolute;inset:0;z-index:50;display:grid;place-items:center;padding:18px;background:rgba(10,10,12,.72);backdrop-filter:blur(8px)}.worldTeleportPanel{width:min(760px,100%);max-height:min(760px,calc(100dvh - 36px));overflow:auto;border:1px solid rgba(238,206,148,.35);border-radius:7px;padding:18px;background:#241d1a;color:#fff3dc;box-shadow:0 28px 70px rgba(0,0,0,.5)}.worldTeleportPanel header{display:flex;align-items:center;justify-content:space-between;gap:14px}.worldTeleportPanel header span{color:#efc677;font-size:10px;font-weight:950;letter-spacing:.16em}.worldTeleportPanel h2{margin:3px 0 0;font-size:24px}.worldTeleportHeaderActions{display:flex;align-items:center;gap:8px}.worldTeleportPanel header button:not(.worldVoiceButton){width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:#332722;color:#fff;cursor:pointer}.worldTeleportGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:16px}.worldTeleportTile{position:relative;min-height:118px;border:1px solid;border-radius:5px;padding:13px 48px 46px 13px;background:rgba(12,14,15,.5);color:#fff;text-align:left}.worldTeleportTileRead{position:absolute;right:10px;top:10px}.worldTeleportTileDisabled{opacity:.56}.worldTeleportTile>button:not(.worldVoiceButton){position:absolute;left:13px;right:13px;bottom:10px;height:30px;border:1px solid rgba(255,235,195,.22);border-radius:5px;background:rgba(255,244,221,.1);color:#fff4dd;font-size:11px;font-weight:950;cursor:pointer}.worldTeleportTile>button:disabled{cursor:default}.worldTeleportGrid strong,.worldTeleportGrid span,.worldTeleportGrid small{display:block}.worldTeleportGrid strong{font-size:16px}.worldTeleportGrid span{margin-top:4px;font-size:10px;font-weight:900;letter-spacing:.08em}.worldTeleportGrid small{margin-top:13px;font-size:11px;font-weight:900}.worldTeleportPanel p{margin:12px 0 0;color:#ffdca0;font-weight:800}
+        @media(max-width:1280px){.worldHudIdentity .realm-demo-mode-pill,.worldHudIdentity .realm-demo-long-label{display:none!important}.worldHudIdentity .realm-demo-short-label{display:inline!important}.worldHudIdentity:has(.realm-demo-controls) .worldHudGoBtn span{display:none}}
         @media(max-width:900px){.worldHudMission{top:max(68px,calc(env(safe-area-inset-top) + 54px));width:275px}.worldHudActions{bottom:max(78px,calc(env(safe-area-inset-bottom) + 70px));max-width:calc(100vw - 120px);flex-wrap:wrap}.worldHudActions button:not(.worldVoiceButton){min-height:46px}.worldHudFallback{font-size:0!important;width:46px;padding:0!important}.worldHudFallback svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-        @media(max-width:560px){.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHud[data-world-hud="central"] .worldHudActions{top:max(164px,calc(env(safe-area-inset-top) + 158px));bottom:auto;max-width:calc(100vw - 20px)}.worldHudGoBtn span{display:none}.worldHudGoBtn{padding:0 9px}.worldHudActions button:not(.worldVoiceButton){padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary.worldHudEdit{width:auto!important;padding:8px 9px!important;font-size:11px!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
+        @media(max-width:560px){.worldHudIdentity .realm-demo-mode-pill{display:none!important}.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHud[data-world-hud="central"] .worldHudActions{top:max(164px,calc(env(safe-area-inset-top) + 158px));bottom:auto;max-width:calc(100vw - 20px)}.worldHudGoBtn span{display:none}.worldHudGoBtn{padding:0 9px}.worldHudActions button:not(.worldVoiceButton){padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary.worldHudEdit{width:auto!important;padding:8px 9px!important;font-size:11px!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
       `}</style>
     </>
   );
