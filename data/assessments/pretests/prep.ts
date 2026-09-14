@@ -1,3 +1,4 @@
+import { GROUND_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS } from "../groundNumberNexusIndependentPosttest";
 type QuestionOption = number | string | { label?: string; value?: string; id?: string; groups?: number[] };
 
 type QuestionVisual = {
@@ -42,12 +43,4 @@ export type Question = {
   practiceTask?: import("@/data/activities/year1/practice-task").PracticeTask;
 };
 
-export const PREP_PRETEST: Question[] = [
-  {
-    type: "mcq",
-    id: "prep-q1",
-    prompt: "Which number is the largest?",
-    options: ["4", "8", "2", "5"],
-    answer: "8",
-  },
-];
+export const PREP_PRETEST: Question[] = [...GROUND_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[];

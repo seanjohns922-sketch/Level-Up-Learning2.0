@@ -9,16 +9,17 @@ const destination = read("lib/student-destination.ts");
 const home = read("app/home/page.tsx");
 const migration = read("supabase/migrations/20260813130000_ground_level_skips_pretest.sql");
 
-assert.match(placement, /if \(level === "Prep" && realmId !== "space"\) return "ground_week1"/);
+assert.match(placement, /if \(level === "Prep" && !isFirstLevelPretestEnabled\(realmId, level\)\) return "ground_week1"/);
 assert.match(placement, /entryModesForLevel\(realmId, level\)/);
-assert.match(placement, /\(level !== "Prep" \|\| realmId === "space"\) \? <button onClick=\{\(\) => onResetPretest\(s\)\}/);
+assert.match(placement, /\(level !== "Prep" \|\| isFirstLevelPretestEnabled\(realmId, level\)\) \? <button onClick=\{\(\) => onResetPretest\(s\)\}/);
 assert.match(client, /assignedLevel === "Prep"[\s\S]*\? "ground_week1"/);
 assert.match(destination, /buildGroundFirstLessonRoute[\s\S]*yearLabel: "Prep", week: 1, lessonNumber: 1, realmId: "number"/);
-assert.match(home, /isGroundLevel[\s\S]*\? buildGroundFirstLessonRoute\(\)/);
+assert.match(home, /router.push\(resolveStudentDestination\(/);
+assert.doesNotMatch(home, /buildGroundFirstLessonRoute/);
 assert.match(migration, /student_realm_placement_ground_entry_check/);
 assert.match(migration, /Ground Level does not use a pre-test/);
 assert.match(migration, /not exists \([\s\S]*student_lesson_attempts/);
 assert.match(migration, /not exists \([\s\S]*student_weekly_quiz_attempts/);
 assert.match(migration, /not exists \([\s\S]*student_realm_assessments/);
 
-console.log("Ground Level entry audit passed: Starpath baseline exception, guarded resets and Number Ground Week 1 first journey.");
+console.log("Ground Level entry audit passed: Ground baseline entry, guarded resets and realm-first onboarding.");

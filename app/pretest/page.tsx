@@ -1,6 +1,6 @@
 "use client";
 
-import { starpathAssessmentMetadata } from "@/lib/starpath-assessment-growth";
+import { assessmentEvidenceMetadata, isGroundBaseline, hasComparableAssessmentGrowth } from "@/lib/assessment-growth";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { Pin, PartyPopper } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -389,7 +389,7 @@ function PretestPage() {
       router.replace(buildRealmProgramHref({ realmId: progressRealmId, year, week: 1 }));
       return;
     }
-    if (year === "Prep" && progressRealmId !== "space") {
+    if (year === "Prep" && !isGroundBaseline(progressRealmId, year)) {
       router.replace(realmId === "measurement" ? "/measurelands" : "/home");
     }
   }, [progressRealmId, realmId, router, year]);
@@ -489,7 +489,7 @@ function PretestPage() {
   // ── Load any saved snapshot once; offer to resume rather than auto-restart ──
   useEffect(() => {
     const snapshot = loadPretestResume(year, localProgressRealmId);
-    if (pretestResumeHasProgress(snapshot) && (progressRealmId !== "space" || JSON.stringify(snapshot?.questionIds) === JSON.stringify(questions.map(q => q.id)))) {
+    if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(questions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
     setResumeReady(true);
@@ -497,7 +497,7 @@ function PretestPage() {
 
   function resumeFromSnapshot() {
     const snapshot = loadPretestResume(year, localProgressRealmId);
-    if (snapshot && (progressRealmId !== "space" || JSON.stringify(snapshot.questionIds) === JSON.stringify(questions.map(q => q.id)))) {
+    if (snapshot && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot.questionIds) === JSON.stringify(questions.map(q => q.id)))) {
       const restored = [...Array(questions.length).fill(null)];
       snapshot.answers.forEach((a, i) => {
         if (i < restored.length) restored[i] = a;
@@ -635,7 +635,7 @@ function PretestPage() {
     const prev = canonicalProgress;
     const prevUnlocked = prev?.unlockedLegends ?? [];
     const nextYear = getNextYearLabel(year);
-    const baselineOnly = progressRealmId === "space" && year === "Prep";
+    const baselineOnly = isGroundBaseline(progressRealmId, year);
     const passed = !baselineOnly && profile.percentage >= PRETEST_PASS_THRESHOLD;
     const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks, progressRealmId);
     const requiresFullPathway = baselineOnly || pretestPathwayForPercent(profile.percentage) === "full";
@@ -735,7 +735,7 @@ function PretestPage() {
           passed: nextProgress.status === "PASSED",
           placement_result: {
             ...profile,
-            ...starpathAssessmentMetadata(progressRealmId, year, questions),
+            ...assessmentEvidenceMetadata(progressRealmId, year, questions),
             replay_metadata: {
               started_at: new Date(assessmentStartedAt).toISOString(),
               completed_at: completedAt,
@@ -805,7 +805,7 @@ function PretestPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mabTotal, mabHasSelection, question?.type, index]);
 
-  if (year === "Prep" && progressRealmId !== "space") {
+  if (year === "Prep" && !isGroundBaseline(progressRealmId, year)) {
     return null;
   }
 

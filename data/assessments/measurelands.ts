@@ -1,7 +1,7 @@
 import type { PostTest, Question } from "./posttests";
 import { deriveMeasurelandsAssessmentVisual } from "./measurelandsVisuals";
 import { prepareMeasurelandsAssessmentPresentation } from "./measurelandsPresentation";
-import { GROUND_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS } from "./groundMeasurelandsIndependentPosttest";
+import { GROUND_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS, GROUND_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS } from "./groundMeasurelandsIndependentPosttest";
 import {
   YEAR1_MEASURELANDS_INDEPENDENT_POSTTEST_ITEMS,
   YEAR1_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS,
@@ -282,6 +282,7 @@ export const LEGACY_YEAR5_POSTTEST: Question[] = [
 ];
 
 export const MEASURELANDS_PRETESTS_BY_YEAR: Partial<Record<YearLabel, Question[]>> = {
+  Prep: GROUND_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
   "Year 1": YEAR1_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
   "Year 2": YEAR2_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
   "Year 3": YEAR3_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS.map(presentQuestion),
@@ -301,7 +302,7 @@ export const MEASURELANDS_POSTTESTS_BY_YEAR: Record<YearLabel, PostTest> = {
 };
 
 export function getMeasurelandsPretestForYear(yearLabel: string): Question[] {
-  return MEASURELANDS_PRETESTS_BY_YEAR[yearLabel as YearLabel] ?? [];
+  return MEASURELANDS_PRETESTS_BY_YEAR[(yearLabel === "Foundation" ? "Prep" : yearLabel) as YearLabel] ?? [];
 }
 
 export function getMeasurelandsPosttestForYear(yearLabel: string): PostTest | undefined {

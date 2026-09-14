@@ -8,7 +8,7 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { clearActiveStudentSession, getActiveStudentProfile, getPlacementEntryYear, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { markStudentIntroSeen, restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
 import { supabase } from "@/lib/supabase";
-import { buildGroundFirstLessonRoute, resolveStudentDestination } from "@/lib/student-destination";
+import { resolveStudentDestination } from "@/lib/student-destination";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
 import { isDiagnosticHandoffPaused } from "@/lib/diagnostic-handoff";
@@ -41,7 +41,7 @@ export default function StudentHomePage() {
   const isGroundLevel = placementYear === "Prep";
   const studentNamePrefix = studentProfile?.displayName ? `${studentProfile.displayName}, ` : "";
   const welcomeMessage = isGroundLevel
-    ? `${studentNamePrefix}watch the welcome video, then begin Ground Level Week 1 in Number Nexus.`
+    ? `${studentNamePrefix}watch the welcome video, then choose a realm to begin your Ground adventure.`
     : `${studentNamePrefix}your journey starts with a short skill check. We'll use your pre-test to place you at the right level, unlock the correct learning path, and guide you into the Tower.`;
 
   useEffect(() => {
@@ -104,9 +104,7 @@ export default function StudentHomePage() {
     try {
       await markStudentIntroSeen(studentId);
       markActiveStudentIntroSeen(studentId);
-      router.push(isGroundLevel
-        ? buildGroundFirstLessonRoute()
-        : resolveStudentDestination({
+      router.push(resolveStudentDestination({
             progress,
             introSeen: true,
             fallbackYear: progress.year,

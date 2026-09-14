@@ -6,12 +6,11 @@ export function buildGroundFirstLessonRoute() {
 }
 
 export function buildDefaultStudentProgress(year: string): StudentProgress {
-  const isGroundLevel = year.trim() === "Prep";
   return {
     year,
     scorePercent: 0,
     status: "ASSIGNED_PROGRAM",
-    placementComplete: isGroundLevel,
+    placementComplete: false,
     assignedWeek: 1,
     requiredWeeks: [],
     optionalWeeks: [],
@@ -32,8 +31,7 @@ export function resolveStudentDestination(args: {
   }
 
   if (isGroundLevel) {
-    // Ground Level does not require placement testing. After the shared intro,
-    // let the student choose Number Nexus or Measurelands from the Tower.
+    // Each Ground realm now resolves its own baseline or existing program.
     return "/realms";
   }
 

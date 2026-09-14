@@ -47,7 +47,7 @@ const ENTRY_MODES: { value: PlacementEntryMode; label: string }[] = [
 
 function normalizeEntryMode(realmId: string, level: string, entry: PlacementEntryMode): PlacementEntryMode {
   if (isRealmFirstLevel(realmId, level)) {
-    if (level === "Prep" && realmId !== "space") return "ground_week1";
+    if (level === "Prep" && !isFirstLevelPretestEnabled(realmId, level)) return "ground_week1";
     if (!isFirstLevelPretestEnabled(realmId, level)) return "full_level";
     return entry === "ground_week1" ? "pretest" : entry;
   }
@@ -56,7 +56,7 @@ function normalizeEntryMode(realmId: string, level: string, entry: PlacementEntr
 
 function entryModesForLevel(realmId: string, level: string) {
   if (isRealmFirstLevel(realmId, level)) {
-    if (level === "Prep" && realmId !== "space") return ENTRY_MODES.filter((mode) => mode.value === "ground_week1");
+    if (level === "Prep" && !isFirstLevelPretestEnabled(realmId, level)) return ENTRY_MODES.filter((mode) => mode.value === "ground_week1");
     if (isFirstLevelPretestEnabled(realmId, level)) return ENTRY_MODES.filter((mode) => mode.value !== "ground_week1");
     return ENTRY_MODES.filter((mode) => mode.value === "full_level");
   }
@@ -635,7 +635,7 @@ export default function PlacementManager({
                           <>
                             <div className="fixed inset-0 z-10" onClick={() => setMenuFor(null)} />
                             <div className="absolute right-0 top-8 z-20 w-52 overflow-hidden rounded-xl border border-[#E6E8EC] bg-white py-1 shadow-[0_12px_32px_-12px_rgba(15,23,42,0.35)]">
-                              {(level !== "Prep" || realmId === "space") ? <button onClick={() => onResetPretest(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset pre-test</button> : null}
+                              {(level !== "Prep" || isFirstLevelPretestEnabled(realmId, level)) ? <button onClick={() => onResetPretest(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset pre-test</button> : null}
                               <button onClick={() => onResetWeek(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset current week</button>
                               <div className="my-1 h-px bg-[#F1F5F9]" />
                               <button onClick={() => { setMenuFor(null); setResetRealmFor(s); setResetConfirmText(""); }} className="block w-full px-3 py-2 text-left text-sm font-bold text-[#DC2626] hover:bg-[#FEF2F2]">Reset this realm…</button>

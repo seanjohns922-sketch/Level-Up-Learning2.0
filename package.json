@@ -197,6 +197,7 @@
     "qa:realmies-r2": "node scripts/realmies-r2-audit.mjs",
     "qa:realmies-r3-assets": "node scripts/realmies-r3-assets-audit.mjs",
     "qa:realmies-collection": "node scripts/realmies-collection-ui-audit.mjs",
+    "qa:ground-baselines": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-ground-baselines.ts",
     "qa:starpath-rebuild": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-rebuild.ts"
   },
   "dependencies": {

@@ -1,7 +1,7 @@
 import { GROUND_STARPATH_INDEPENDENT_PRETEST_ITEMS } from "./groundStarpathIndependentPosttest";
 import { getPretestForYear, type Question as PretestQuestion } from "./pretests";
 import { POSTTESTS, type PostTest, type Question as PosttestQuestion } from "./posttests";
-import { GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "./groundNumberNexusIndependentPosttest";
+import { GROUND_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS, GROUND_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "./groundNumberNexusIndependentPosttest";
 import {
   YEAR1_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS,
   YEAR1_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS,
@@ -235,6 +235,7 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
   if (yearLabel === "Year 5") {
     return [...YEAR5_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   }
+  if (isGroundLevelYear(yearLabel)) return [...GROUND_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
   return getPretestForYear(yearLabel);
 }
 

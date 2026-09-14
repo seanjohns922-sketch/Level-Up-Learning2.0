@@ -14,6 +14,7 @@ import { getMeasurelandsMisconception } from "./measurelandsMisconceptions";
 
 type MeasurelandsInstructionalLevel = Exclude<MeasurelandsLevel, 0>;
 export type MeasurelandsFormKey =
+  | "0:pretest"
   | "0:posttest"
   | `${MeasurelandsInstructionalLevel}:${MeasurelandsAssessmentKind}`;
 
@@ -68,6 +69,7 @@ export const MEASURELANDS_LEGACY_ARCHIVE = {
 } as const;
 
 const VERY_CHALLENGING_QUOTAS: Record<MeasurelandsFormKey, number> = {
+  "0:pretest": 1,
   "0:posttest": 1,
   "1:pretest": 0,
   "1:posttest": 1,
@@ -84,6 +86,7 @@ const VERY_CHALLENGING_QUOTAS: Record<MeasurelandsFormKey, number> = {
 };
 
 const TRANSFER_QUOTAS: Record<MeasurelandsFormKey, number> = {
+  "0:pretest": 1,
   "0:posttest": 1,
   "1:pretest": 0,
   "1:posttest": 1,

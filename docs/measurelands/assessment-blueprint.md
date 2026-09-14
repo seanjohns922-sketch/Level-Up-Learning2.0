@@ -1,3 +1,5 @@
+> Ground pre-tests were added on 14 September 2026. The current TypeScript blueprint includes both 20-item Ground forms; see [Ground baseline implementation](../assessments/ground-baselines-2026-09-14.md). Older tables below describe the preceding release.
+
 # Measurelands Assessment Blueprint
 
 Status: **Approved; independent-bank rebuild pending**

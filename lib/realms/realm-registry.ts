@@ -332,7 +332,7 @@ export function isRealmFirstLevel(value: string, level: string): boolean {
 export function isFirstLevelPretestEnabled(value: string, level: string): boolean {
   const realmId = requireCanonicalRealmId(value);
   if (!isRealmFirstLevel(realmId, level)) return false;
-  return (realmId === "space" && level.trim() === "Prep")
+  return (["number", "measurement", "space"].includes(realmId) && level.trim() === "Prep")
     || (realmId === "statistics" && level.trim() === "Year 1")
     || (realmId === "pattern" && level.trim() === "Year 3")
     || (realmId === "chance" && level.trim() === "Year 3");

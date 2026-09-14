@@ -1,6 +1,6 @@
 "use client";
 
-import { starpathAssessmentGrowth } from "@/lib/starpath-assessment-growth";
+import { comparableAssessmentGrowth, hasComparableAssessmentGrowth, isGroundBaseline } from "@/lib/assessment-growth";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -332,8 +332,8 @@ function ResultsPage() {
           return;
         }
         setCanonicalProgress(restored.progress);
-        if (progressRealmId === "space" && isPostTest) {
-          const comparison = starpathAssessmentGrowth(levelRow?.assessment_attempts ?? [], year);
+        if (hasComparableAssessmentGrowth(progressRealmId, year) && isPostTest) {
+          const comparison = comparableAssessmentGrowth(levelRow?.assessment_attempts ?? [], progressRealmId, year);
           setStoredPretestProfile(comparison.change !== null && comparison.baseline ? assessmentProfileFromRow(comparison.baseline.placementResult) : null);
           setGrowthNote(comparison.reason ?? `${comparison.days} days between assessments`);
         } else setStoredPretestProfile(preProfile);
@@ -359,7 +359,7 @@ function ResultsPage() {
     return Math.round((score / total) * 100);
   }, [activeProfile, score, total]);
 
-  const baselineOnly = progressRealmId === "space" && year === "Prep" && !isPostTest;
+  const baselineOnly = isGroundBaseline(progressRealmId, year) && !isPostTest;
   const passedByPretest = !baselineOnly && !isPostTest && scorePercent >= PRETEST_PASS_THRESHOLD;
   const passedByPosttest = isPostTest && scorePercent >= POSTTEST_PASS_THRESHOLD;
   const [fogCinematicDismissed, setFogCinematicDismissed] = useState(false);
@@ -447,7 +447,7 @@ function ResultsPage() {
 
   // Icon + message based on score (no emojis)
   const getMessage = () => {
-    if (baselineOnly) return { icon: "play", title: "Starting Point Recorded", sub: "Your first score is saved. Start Ground Starpath and see what you learn." };
+    if (baselineOnly) return { icon: "play", title: "Starting Point Recorded", sub: "Your first score is saved. Start your Ground program and see what you learn." };
     if (passed) return { icon: "star", title: isPostTest ? "Level Mastered" : "Pre-Test Passed", sub: isPostTest ? "You've proven your skills — collect your Legend." : "Strong result — moving to the next level." };
     if (isPostTest) return { icon: "arrow", title: "Not Quite Yet", sub: `You need ${POSTTEST_PASS_THRESHOLD}% to pass. Review the suggested weeks and try again.` };
     if (scorePercent >= 70) return { icon: "arrow", title: "Nearly There", sub: "Strong attempt. Your personalised program will close the gap." };

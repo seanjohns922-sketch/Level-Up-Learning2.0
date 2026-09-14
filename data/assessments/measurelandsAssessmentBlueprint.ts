@@ -140,13 +140,13 @@ export const MEASURELANDS_ASSESSMENT_BLUEPRINTS: readonly MeasurelandsLevelAsses
         ["Identify the attribute being compared.", "Compare 2 objects or events directly.", "Communicate why one is longer, heavier, holds more or takes longer."],
         ["I select the relevant attribute.", "I make a valid direct comparison.", "I use comparison language and point to evidence."],
         ["Size always determines mass or capacity.", "The visual position of an object determines its length.", "Familiarity rather than duration determines which event takes longer."],
-        0,
+        14,
         14,
         "aligned",
         [1, 2, 3, 4, 8],
         ["W1 length", "W2 mass", "W3 capacity", "W4 duration", "W8 application"],
         "Current lessons cover all 4 attributes; the approved post-test must add explicit comparison reasoning.",
-        [],
+        ["Direct comparison and sequence tasks using separate baseline examples."],
         ["Direct pair comparison with a reason choice.", "Attribute selection before comparison.", "Counter-intuitive comparison that prevents size-only guessing."],
       ),
       descriptor(
@@ -155,17 +155,17 @@ export const MEASURELANDS_ASSESSMENT_BLUEPRINTS: readonly MeasurelandsLevelAsses
         ["Sequence familiar days and parts of a day.", "Connect routine events to an appropriate day or time of day."],
         ["I place days or day parts in order.", "I match an event to a sensible time and explain the sequence."],
         ["The week begins again after Friday.", "Lunch and afternoon are interchangeable.", "Yesterday, today and tomorrow are fixed weekday names."],
-        0,
+        6,
         6,
         "aligned",
         [5, 6, 7, 8],
         ["W5 days", "W6 times of day", "W7 calendar language", "W8 sequencing"],
         "Current coverage is suitable, but the assessment must avoid repeated label-recognition items.",
-        [],
+        ["Direct comparison and sequence tasks using separate baseline examples."],
         ["Complete a day/week sequence.", "Place a familiar event in a routine and justify its position."],
       ),
     ],
-    forms: [form("posttest", { accessible: 8, moderate: 8, challenging: 4 }, { recall: 2, understanding: 7, application: 7, reasoning: 4 }, 10, 10)],
+    forms: [{ ...form("pretest", { accessible: 8, moderate: 8, challenging: 4 }, { recall: 2, understanding: 7, application: 7, reasoning: 4 }, 10, 10), purpose: "Record Ground baseline knowledge; every score begins the full eight-week program." }, form("posttest", { accessible: 8, moderate: 8, challenging: 4 }, { recall: 2, understanding: 7, application: 7, reasoning: 4 }, 10, 10)],
   },
   {
     level: 1,
@@ -656,7 +656,7 @@ export function validateMeasurelandsAssessmentBlueprints(): string[] {
       }
     }
 
-    const expectedKinds: MeasurelandsAssessmentKind[] = blueprint.level === 0 ? ["posttest"] : ["pretest", "posttest"];
+    const expectedKinds: MeasurelandsAssessmentKind[] = ["pretest", "posttest"];
     const actualKinds = blueprint.forms.map((assessment) => assessment.kind);
     for (const kind of expectedKinds) {
       if (!actualKinds.includes(kind)) issues.push(`${scope} is missing its ${kind}.`);
