@@ -18,19 +18,18 @@ const profiles=[
 // Each form tests the same parity inference, with a new four-digit example.
 function make(form:NumberLevel4Form,f:number):NumberLevel4ReviewItem[]{
  const p=profiles[f];const factor=3;
- const parity=1235+f*202;
- const correctCompare=`${p.compare[0]} is greater than ${p.compare[1]}`;
- const correctRule=`${parity} × ${parity+2} is odd: both factors are odd.`;
+ const parity=23+f*4;
+ const decimalValues=[`${4+f}.6`,`${4+f}.42`,`${4+f}.04`,`${4+f}.24`];
+ const tenths=[3,6,7,4,8][f];
  const check=`${p.quotient} × 8 = ${p.quotient*8}`;
  const start=p.sequence[0],step=p.sequence[1];
- const sequenceAnswer=[`Start at ${start}.`,'Record the current number.',`Add ${step}.`,'Repeat steps 2 and 3.'];
  const examples:Example[]=[
  numeric(`What value does the digit ${p.digit} have?`,p.digit/100,{type:'number_y4_decimal_chart',value:p.decimal,focus:'hundredths'}),
- {prompt:'Choose the true decimal comparison.',correctAnswer:correctCompare,type:'mcq',options:[correctCompare,`${p.compare[1]} is greater because it has more digits.`,'The numbers are equal.'],visual:{type:'number_y4_decimal_compare',left:p.compare[0],right:p.compare[1]}},
+ {prompt:'Order the decimals from smallest to largest.',correctAnswer:[...decimalValues].sort((a,b)=>Number(a)-Number(b)).join('||'),type:'number_order',options:decimalValues,visual:{type:'number_y4_decimal_order',values:decimalValues}},
  numeric('How many numbers are odd?',3,{type:'number_y4_number_set',values:[...p.odd]}),
- {prompt:'Without multiplying, choose the correct conclusion and reason.',type:'mcq',correctAnswer:correctRule,options:[correctRule,`${parity} × ${parity+2} is even: every product is even.`,`${parity} × ${parity+2} is even: two odd numbers always make even.`],visual:equation(`${parity} × ${parity+2}`)},
+ {prompt:'Is the product odd or even?',type:'mcq',correctAnswer:'Odd',options:['Odd','Even'],visual:equation(`${parity} × ${parity+2}`)},
  numeric('Complete the equivalent fraction. Enter the missing numerator.',p.fraction[0]*factor,{type:'number_y4_fraction_equivalence',left:[...p.fraction],right:[null,8*factor]}),
- numeric('Write this fraction as a decimal.',p.fifth/25,{type:'number_y4_fraction_decimal',numerator:p.fifth,denominator:25,reported:'?',contextLabel:['Ribbon','Track','Water','Ribbon','Track'][f]}),
+ numeric('Write this fraction as a decimal.',tenths/10,{type:'number_y4_fraction_decimal',numerator:tenths,denominator:10,reported:'?'}),
  numeric('Continue counting by quarters. Enter the missing numerator.',p.quarter+3,{type:'number_y4_fraction_sequence',values:[`${p.quarter}/4`,`${p.quarter+1}/4`,`${p.quarter+2}/4`,'?/4'],answerDenominator:4}),
  numeric('What decimal is marked on the line?',p.line+0.25,{type:'number_y4_number_line',min:p.line,max:p.line+1,divisions:4,marker:1}),
  numeric('Find the scaled product.',p.scale*100,equation(`${p.scale} × 100`)),
@@ -39,19 +38,19 @@ function make(form:NumberLevel4Form,f:number):NumberLevel4ReviewItem[]{
  {prompt:'Select the multiplication that checks this division.',type:'mcq',correctAnswer:check,options:[check,`${p.quotient} + 8 = ${p.quotient+8}`,`${p.quotient*8} × 8 = ${p.quotient*64}`],visual:equation(`${p.quotient*8} ÷ 8 = ${p.quotient}`)},
  numeric(`Round ${p.round} to the nearest hundred.`,Math.round(p.round/100)*100,{type:'number_y4_rounding',value:p.round,benchmark:100}),
  numeric('Round the price to the nearest ten dollars. Estimate the total cost.',p.estimate[0]*50,{type:'number_y4_receipt',rows:[['Items',String(p.estimate[0])],['Price each',`$${p.estimate[1]}`]]}),
- numeric('How many dollars remain in the budget?',p.budget[0]-p.budget[1]*p.budget[2],{type:'number_y4_budget',budget:p.budget[0],items:[{label:'Supplies',quantity:p.budget[1],price:p.budget[2]}]}),
- numeric('What is the total cost in dollars?',p.tickets[0]*p.tickets[1]+p.tickets[2],{type:'number_y4_budget',budget:null,items:[{label:'Tickets',quantity:p.tickets[0],price:p.tickets[1]},{label:'Booking fee',quantity:1,price:p.tickets[2]}]}),
- numeric('How many students are travelling?',p.vans[0]*p.vans[1]-p.vans[2],{type:'number_y4_model',rows:[['Vans',String(p.vans[0])],['Seats in each van',String(p.vans[1])],['Empty seats',String(p.vans[2])]]}),
+ numeric(`After buying all ${p.budget[1]} supply packs, how many dollars remain?`,p.budget[0]-p.budget[1]*p.budget[2],{type:'number_y4_budget',budget:p.budget[0],items:[{label:'Supply packs',quantity:p.budget[1],price:p.budget[2]}]}),
+ numeric('What is the total ticket cost, including the booking fee?',p.tickets[0]*p.tickets[1]+p.tickets[2],{type:'number_y4_budget',budget:null,items:[{label:'Tickets',quantity:p.tickets[0],price:p.tickets[1]},{label:'Booking fee',quantity:1,price:p.tickets[2]}]}),
+ numeric('How many students are travelling?',p.vans[0]*p.vans[1]-p.vans[2],{type:'number_y4_model',rows:[['Vans',String(p.vans[0])],['Seats in each van',String(p.vans[1])],['Empty seats altogether',String(p.vans[2])]]}),
  numeric('After buying meals and passes, how many dollars remain?',p.event[0]-p.event[1]*p.event[2]-p.event[3]*p.event[4],{type:'number_y4_budget',budget:p.event[0],items:[{label:'Meals',quantity:p.event[1],price:p.event[2]},{label:'Passes',quantity:p.event[3],price:p.event[4]}]}),
  numeric('Continue the pattern. Enter the missing number.',p.algorithm*4,{type:'number_y4_algorithm',start:p.algorithm,rule:'Multiply by 2',outputs:[p.algorithm,p.algorithm*2,null]}),
- {prompt:'Put the four instructions in order to generate the sequence.',type:'number_order',correctAnswer:sequenceAnswer.join('||'),options:[sequenceAnswer[3],sequenceAnswer[2],sequenceAnswer[1],sequenceAnswer[0]],visual:{type:'number_y4_sequence',values:[start,start+step,start+step*2,start+step*3]}},
+ numeric('What number comes next?',start+step*4,{type:'number_y4_sequence',values:[start,start+step,start+step*2,start+step*3,'?']}),
  ];
  return examples.map((e,i)=>{
   const base=benchmark[i];const id=`y4-number-review-${form}-${String(i+1).padStart(2,'0')}-v3`;
-  const options=e.options?.length&&e.type==='mcq'?[...e.options.slice((f+i)%3),...e.options.slice(0,(f+i)%3)]:e.options;
-  const difficulty=[3,17].includes(i)?'challenging':[5,13].includes(i)?'moderate':base.difficulty;
-  const cognitiveCategory=i===3?'reasoning':i===17?'transfer':[5,13].includes(i)?'application':base.cognitiveCategory;
-  const skillLabel=i===5?'Convert a fraction to a decimal':i===3?'Apply odd-number multiplication properties':i===13?'Estimate a financial total':i===17?'Solve a two-item budget':base.skillLabel;
+  const options=e.options?.length&&e.type==='mcq'?[...e.options.slice((f+i)%e.options.length),...e.options.slice(0,(f+i)%e.options.length)]:e.options;
+  const difficulty=i===17?'challenging':i===5?'easy':[1,3,13,19].includes(i)?'moderate':base.difficulty;
+  const cognitiveCategory=i===3?'reasoning':i===17?'transfer':[1,5,13,19].includes(i)?'application':base.cognitiveCategory;
+  const skillLabel=i===1?'Order decimals':i===19?'Continue a number sequence':i===5?'Convert a fraction to a decimal':i===3?'Apply odd-number multiplication properties':i===13?'Estimate a financial total':i===17?'Solve a two-item budget':base.skillLabel;
   return {...base,...e,visual:{...e.visual,reviewPresentation:true},options,id,version:'3.0.0-review.1',form,sourcePool:'assessment_review',bankId:`number-level4-${form}-review-v3`,answer:e.correctAnswer,
    contextKey:id,skillId:`number-y4-review-slot-${i+1}`,structureKey:`number-level4-slot-${i+1}`,skillLabel,difficulty,statistics:createUncalibratedItemStatistics(difficulty),
    cognitiveCategory,isTransfer:cognitiveCategory==='transfer',requiresReasoning:cognitiveCategory==='reasoning'||cognitiveCategory==='transfer',misconceptionDiagnosis:e.type==='mcq',responseMode:e.type==='mcq'?'selected_response':e.type==='number_order'?'manipulated_response':'constructed_response',

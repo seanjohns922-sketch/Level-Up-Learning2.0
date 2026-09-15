@@ -9,6 +9,9 @@ function ContextIcon({label}:{label:string}) {
  const Icon=/ticket|pass|fee/i.test(label)?Ticket:/meal/i.test(label)?Utensils:/van/i.test(label)?Bus:Boxes;
  return <Icon className="mb-3 h-12 w-12 text-teal-700" strokeWidth={1.5} aria-hidden="true"/>;
 }
+function VanPicture() {
+ return <svg viewBox="0 0 144 88" className="h-20 w-32" aria-hidden="true"><path d="M10 23Q10 13 22 13H100L131 43V69H10Z" fill="#0f766e" stroke="#164e63" strokeWidth="3"/><path d="M101 19L123 42H101Z" fill="#c9eeef"/><rect x="21" y="23" width="24" height="22" rx="3" fill="#c9eeef"/><rect x="52" y="23" width="24" height="22" rx="3" fill="#c9eeef"/><rect x="83" y="23" width="12" height="22" rx="2" fill="#c9eeef"/><path d="M97 49V66M18 54H88" stroke="#85c9c8" strokeWidth="2"/><circle cx="35" cy="69" r="13" fill="#243747"/><circle cx="111" cy="69" r="13" fill="#243747"/><circle cx="35" cy="69" r="6" fill="#cbd5e1"/><circle cx="111" cy="69" r="6" fill="#cbd5e1"/><rect x="125" y="48" width="8" height="9" rx="2" fill="#fde68a"/></svg>;
+}
 function Surface({ children }: { children: React.ReactNode }) {
   return <div className="rounded-lg border border-cyan-900/15 bg-[#f8fbfc] p-4 text-slate-950 shadow-[0_8px_24px_rgba(15,23,42,0.08)] sm:p-5">{children}</div>;
 }
@@ -84,6 +87,10 @@ export default function NumberNexusYear4AssessmentVisual({ visual }: { visual: V
   if (type === "number_y4_budget") {
     const budget = visual.budget === null || visual.budget === undefined ? null : Number(visual.budget);
     const items = (visual.items as Array<{ label: string; quantity: number; price: number }> | undefined) ?? [];
+    if (visual.reviewPresentation) return <Surface><div className="mx-auto max-w-3xl space-y-4">
+      {budget!==null?<div className="flex items-center justify-between rounded-xl bg-teal-950 px-5 py-4 text-white"><span className="font-bold">Money available</span><span className="text-3xl font-black">${budget}</span></div>:null}
+      {items.map((item,index)=><div key={index} className="rounded-xl border border-teal-200 bg-white p-5"><div className="flex items-center gap-4"><ContextIcon label={item.label}/><h3 className="text-xl font-black">{item.label}</h3></div><div className="mt-3 grid grid-cols-2 gap-4"><div className="rounded-lg bg-slate-100 p-4"><div className="text-sm font-bold text-slate-600">Quantity to buy</div><div className="mt-1 text-3xl font-black">{item.quantity}</div></div><div className="rounded-lg bg-amber-50 p-4"><div className="text-sm font-bold text-slate-600">Price for ONE</div><div className="mt-1 text-3xl font-black">${item.price}<span className="ml-2 text-base">each</span></div></div></div></div>)}
+    </div></Surface>;
     return <Surface><div className="mx-auto max-w-3xl space-y-4">{budget !== null ? <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4"><span className="text-sm font-black uppercase text-cyan-900">Budget</span><span className="text-2xl font-black">${budget}</span></div> : null}<div className="grid gap-3 sm:grid-cols-2">{items.map((item, index) => <div key={index} className="flex items-center justify-between gap-3 rounded-lg border border-amber-700/20 bg-amber-50 p-4"><div>{visual.reviewPresentation?<ContextIcon label={item.label}/>:null}<div className="font-black">{item.label}</div><div className="text-sm font-bold text-slate-600">{item.quantity} at ${item.price}</div></div><div className="flex min-h-10 max-w-72 items-center justify-end">{renderCoins(item.price)}</div></div>)}</div></div></Surface>;
   }
 
@@ -93,6 +100,7 @@ export default function NumberNexusYear4AssessmentVisual({ visual }: { visual: V
 
   if (type === "number_y4_model") {
     const rows = (visual.rows as string[][] | undefined) ?? [];
+    if(visual.reviewPresentation && rows[0]?.[0]==="Vans") return <Surface><div className="mx-auto max-w-3xl space-y-5"><div className="flex flex-wrap items-center justify-between gap-3"><h3 className="text-2xl font-black">{rows[0][1]} vans</h3><span className="rounded-lg bg-teal-100 px-4 py-2 text-lg font-bold">{rows[1][1]} seats in EACH van</span></div><div className="flex flex-wrap justify-center gap-4 rounded-xl border border-teal-200 bg-white p-4">{Array.from({length:Number(rows[0][1])},(_,i)=><VanPicture key={i}/>)}</div><div className="rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 p-4 text-center"><span className="text-3xl font-black">{rows[2][1]}</span><span className="ml-3 text-lg font-bold">empty seats altogether</span><p className="mt-1 text-sm text-slate-600">Across all the vans</p></div></div></Surface>;
     return <Surface><div className="mx-auto grid max-w-2xl gap-2 sm:grid-cols-3">{rows.map((row, index) => <div key={index} className="rounded-lg border border-cyan-800/20 bg-white p-4 text-center">{visual.reviewPresentation&&index===0?<div className="flex justify-center"><ContextIcon label={row[0]}/></div>:null}<div className="text-sm font-black text-cyan-900">{row[0]}</div><div className="mt-2 text-3xl font-black">{row[1]}</div></div>)}</div></Surface>;
   }
 

@@ -9,11 +9,11 @@ The supplied Australian Curriculum Mathematics F–6 v9 PDF, pages 38–41, supp
 | Q | Code | Same task in all five forms |
 |---|---|---|
 | 1 | N01 | Identify the value of the hundredths digit with zero tenths. |
-| 2 | N01 | Compare one-decimal and two-decimal numbers; reject the longer-number misconception. |
+| 2 | N01 | Order four decimals from smallest to largest, mixing tenths and hundredths with the same whole part. |
 | 3 | N02 | Count odd numbers in a set of six two-digit numbers. |
-| 4 | N02 | Choose a conclusion and reason about the product of two four-digit odd numbers, without calculating the product. |
+| 4 | N02 | Identify whether a product of two two-digit odd numbers is odd or even, with short response choices. |
 | 5 | N03 | Complete equivalent fractions from eighths to twenty-fourths: numerator multiplied by 3. |
-| 6 | N03 | Convert a proper fraction with denominator 25 to hundredths/decimal notation. All five have the same denominator and scale factor 4. |
+| 6 | N03 | Convert a proper fraction in tenths to decimal notation. All five use denominator 10. |
 | 7 | N04 | Continue a quarter-count sequence, including values above one, by entering a missing numerator. |
 | 8 | N04 | Read a marked quarter point between consecutive whole numbers as a decimal. |
 | 9 | N05 | Multiply a two-digit number by 100. |
@@ -27,28 +27,28 @@ The supplied Australian Curriculum Mathematics F–6 v9 PDF, pages 38–41, supp
 | 17 | N08 | Find travellers from vans × seats, minus empty seats. |
 | 18 | N08 | Find a budget remainder after buying two different quantities of meals and passes. |
 | 19 | N09 | Continue a doubling pattern by supplying the missing third displayed number. |
-| 20 | N09 | Order four instructions to generate an additive sequence. |
+| 20 | N09 | Supply the next number after four terms of an additive sequence, with no rule provided. |
 
 ## Targeted changes from the current post-test
 
-- Q4 replaces a “smallest positive number” parity item whose answer was always 1 with a parity inference and reason. Each form asks the same inference with different operands.
+- Q2 uses decimal ordering instead of lengthy comparison choices. Q4 uses a short odd/even product question and two-digit operands.
 - Q5 retains the post-test's ×3 equivalent-fraction demand in every form.
-- Q6 uses denominator 25 consistently across all five examples. This samples the curriculum's equivalent fractions/decimal connection at hundredths precision; it removes the unexplained incorrect decimal previously shown in the visual. This is a deliberate change for owner review.
+- Following owner review, Q6 uses tenths consistently across all five forms instead of denominator 25. It samples the basic fraction/decimal connection.
 - Q14 replaces yes/no guessing about an estimate with calculating the estimate, without supplying the rounded unit price or total.
 - Q18 restores the original two-item financial model that an earlier paired override had reduced to a basic multiplication fact.
-- Q19 says “missing number”, avoiding ambiguity about whether the starting number counted as an output.
+- Q19 says “missing number”, avoiding ambiguity about whether the starting number counted as an output. Q20 is a next-number sequence instead of instruction ordering.
 
 The remaining slots retain their task structure from the existing post-test. Each corresponding form uses the same primary code, response mode, visual family and intended difficulty. Repeated correct answers can occur naturally (for example, parity counts and the budget-remainder slot); the supplied quantities/examples differ. End is not intentionally harder than Start.
 
 ## Visuals and usability
 
-Reuse the existing Level 4 assessment visuals and the weekly money asset renderer. Australian note and coin images remain the established assets. Add contextual ticket, meal, supplies and van icons only in the new review forms. Fractions use clear stacked notation, with no shaded comparison aids. Number lines preserve equal intervals and do not label the marked answer. Prices and budgets shown are problem inputs; totals and remainders are not displayed.
+Reuse the existing Level 4 assessment visuals and the weekly money asset renderer. New review budget questions clearly separate Quantity to buy and Price for ONE, with “each” beside the price. Cash pictures have been removed from those unit-price cards because they were mistaken for the complete purchase amount. Other money visuals retain the established Australian assets. Q17 shows the actual number of illustrated vans, seats in EACH van, and empty seats altogether across all vans. Fractions use clear stacked notation, with no shaded comparison aids. Number lines preserve equal intervals and do not label the marked answer. Prices and budgets shown are problem inputs; totals and remainders are not displayed.
 
 Read-aloud includes visual facts such as prices, quantities, fraction notation, algorithm steps and number-line intervals. The supplied division result in Q12 is intentional: the task is to select an inverse check, not compute the quotient. Author answers stay behind Review details. Form switching retains the current slot; all questions are reachable in author review; Exit returns to Level 4 in Demo Review. These review navigation controls do not change student sequential navigation.
 
 ## Evidence limits
 
-All nine Number descriptors are sampled; this is not exhaustive proof of every verb in each descriptor. These questions do not directly record a child's strategy explanation, their independent choice of digital tools, division by powers of ten, or creation of a branching algorithm. Q14 samples forming an estimate, not a full written explanation of reasonableness. Recognition tasks and constructed numeric responses provide different evidence, which is kept consistent between forms. A future student release must retain older banks for historical baselines and in-progress diagnostics; these revised scores should not be silently compared with old versions.
+All nine Number descriptors are sampled; this is not exhaustive proof of every verb in each descriptor. These questions do not directly record a child's strategy explanation, their independent choice of digital tools, division by powers of ten, or creation of an algorithm. Q20 now observes numerical pattern continuation rather than ordering instructions. Q14 samples forming an estimate, not a full written explanation of reasonableness. Recognition tasks and constructed numeric responses provide different evidence, which is kept consistent between forms. A future student release must retain older banks for historical baselines and in-progress diagnostics; these revised scores should not be silently compared with old versions.
 
 ## Validation
 

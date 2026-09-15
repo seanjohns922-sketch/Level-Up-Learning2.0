@@ -104,38 +104,42 @@
             "lesson": 1
           }
         ],
-        "cognitiveCategory": "reasoning",
+        "cognitiveCategory": "application",
         "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
-        "misconceptionDiagnosis": true,
-        "responseMode": "selected_response",
+        "requiresReasoning": false,
+        "misconceptionDiagnosis": false,
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "decimal-length"
         ],
         "contextKey": "y4-number-review-pretest-02-v3",
         "structureKey": "number-level4-slot-2",
-        "selectedAnswerPosition": 3,
-        "prompt": "Choose the true decimal comparison.",
+        "prompt": "Order the decimals from smallest to largest.",
         "renderer": {
-          "type": "mcq",
+          "type": "number_order",
           "payload": {
-            "prompt": "Choose the true decimal comparison.",
+            "prompt": "Order the decimals from smallest to largest.",
             "visual": {
-              "type": "number_y4_decimal_compare",
-              "left": "4.7",
-              "right": "4.53"
+              "type": "number_y4_decimal_order",
+              "values": [
+                "4.6",
+                "4.42",
+                "4.04",
+                "4.24"
+              ]
             },
             "options": [
-              "4.53 is greater because it has more digits.",
-              "The numbers are equal.",
-              "4.7 is greater than 4.53"
+              "4.6",
+              "4.42",
+              "4.04",
+              "4.24"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "4.7 is greater than 4.53"
+          "correctResponse": "4.04||4.24||4.42||4.6"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -145,16 +149,17 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "mcq",
+        "type": "number_order",
         "options": [
-          "4.53 is greater because it has more digits.",
-          "The numbers are equal.",
-          "4.7 is greater than 4.53"
+          "4.6",
+          "4.42",
+          "4.04",
+          "4.24"
         ],
-        "correctAnswer": "4.7 is greater than 4.53",
-        "answer": "4.7 is greater than 4.53",
+        "correctAnswer": "4.04||4.24||4.42||4.6",
+        "answer": "4.04||4.24||4.42||4.6",
         "skillId": "number-y4-review-slot-2",
-        "skillLabel": "Compare Decimals",
+        "skillLabel": "Order decimals",
         "linkedWeeks": [
           2
         ],
@@ -167,12 +172,16 @@
         ],
         "difficultyBand": "year4-number",
         "visual": {
-          "type": "number_y4_decimal_compare",
-          "left": "4.7",
-          "right": "4.53",
+          "type": "number_y4_decimal_order",
+          "values": [
+            "4.6",
+            "4.42",
+            "4.04",
+            "4.24"
+          ],
           "reviewPresentation": true
         },
-        "readAloudText": "Choose the true decimal comparison. 4.7 and 4.53."
+        "readAloudText": "Order the decimals from smallest to largest. 4.6, 4.42, 4.04, 4.24"
       },
       {
         "schemaVersion": 1,
@@ -289,7 +298,7 @@
           }
         ],
         "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "difficulty": "moderate",
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": true,
@@ -299,29 +308,28 @@
         ],
         "contextKey": "y4-number-review-pretest-04-v3",
         "structureKey": "number-level4-slot-4",
-        "prompt": "Without multiplying, choose the correct conclusion and reason.",
+        "prompt": "Is the product odd or even?",
         "renderer": {
           "type": "mcq",
           "payload": {
-            "prompt": "Without multiplying, choose the correct conclusion and reason.",
+            "prompt": "Is the product odd or even?",
             "visual": {
               "type": "number_y4_equation",
-              "expression": "1235 × 1237"
+              "expression": "23 × 25"
             },
             "options": [
-              "1235 × 1237 is odd: both factors are odd.",
-              "1235 × 1237 is even: every product is even.",
-              "1235 × 1237 is even: two odd numbers always make even."
+              "Even",
+              "Odd"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "1235 × 1237 is odd: both factors are odd."
+          "correctResponse": "Odd"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -329,12 +337,11 @@
         },
         "type": "mcq",
         "options": [
-          "1235 × 1237 is odd: both factors are odd.",
-          "1235 × 1237 is even: every product is even.",
-          "1235 × 1237 is even: two odd numbers always make even."
+          "Even",
+          "Odd"
         ],
-        "correctAnswer": "1235 × 1237 is odd: both factors are odd.",
-        "answer": "1235 × 1237 is odd: both factors are odd.",
+        "correctAnswer": "Odd",
+        "answer": "Odd",
         "skillId": "number-y4-review-slot-4",
         "skillLabel": "Apply odd-number multiplication properties",
         "linkedWeeks": [
@@ -350,12 +357,12 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_equation",
-          "expression": "1235 × 1237",
+          "expression": "23 × 25",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "selectedAnswerPosition": 1,
-        "readAloudText": "Without multiplying, choose the correct conclusion and reason. 1235 × 1237"
+        "selectedAnswerPosition": 2,
+        "readAloudText": "Is the product odd or even? 23 × 25"
       },
       {
         "schemaVersion": 1,
@@ -472,7 +479,7 @@
           }
         ],
         "cognitiveCategory": "application",
-        "difficulty": "moderate",
+        "difficulty": "easy",
         "isTransfer": false,
         "requiresReasoning": false,
         "misconceptionDiagnosis": false,
@@ -489,21 +496,20 @@
             "prompt": "Write this fraction as a decimal.",
             "visual": {
               "type": "number_y4_fraction_decimal",
-              "numerator": 7,
-              "denominator": 25,
-              "reported": "?",
-              "contextLabel": "Ribbon"
+              "numerator": 3,
+              "denominator": 10,
+              "reported": "?"
             },
             "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "0.28"
+          "correctResponse": "0.3"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "moderate",
+          "expectedDifficulty": "easy",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -511,8 +517,8 @@
         },
         "type": "numeric",
         "options": [],
-        "correctAnswer": "0.28",
-        "answer": "0.28",
+        "correctAnswer": "0.3",
+        "answer": "0.3",
         "skillId": "number-y4-review-slot-6",
         "skillLabel": "Convert a fraction to a decimal",
         "linkedWeeks": [
@@ -528,14 +534,13 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_fraction_decimal",
-          "numerator": 7,
-          "denominator": 25,
+          "numerator": 3,
+          "denominator": 10,
           "reported": "?",
-          "contextLabel": "Ribbon",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "Write this fraction as a decimal. 7 over 25."
+        "readAloudText": "Write this fraction as a decimal. 3 over 10."
       },
       {
         "schemaVersion": 1,
@@ -1259,17 +1264,17 @@
         ],
         "contextKey": "y4-number-review-pretest-15-v3",
         "structureKey": "number-level4-slot-15",
-        "prompt": "How many dollars remain in the budget?",
+        "prompt": "After buying all 5 supply packs, how many dollars remain?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "How many dollars remain in the budget?",
+            "prompt": "After buying all 5 supply packs, how many dollars remain?",
             "visual": {
               "type": "number_y4_budget",
               "budget": 350,
               "items": [
                 {
-                  "label": "Supplies",
+                  "label": "Supply packs",
                   "quantity": 5,
                   "price": 53
                 }
@@ -1312,7 +1317,7 @@
           "budget": 350,
           "items": [
             {
-              "label": "Supplies",
+              "label": "Supply packs",
               "quantity": 5,
               "price": 53
             }
@@ -1320,7 +1325,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many dollars remain in the budget? Budget 350 dollars. Supplies: 5 at 53 dollars each."
+        "readAloudText": "After buying all 5 supply packs, how many dollars remain? Budget 350 dollars. Supply packs: 5 at 53 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -1354,11 +1359,11 @@
         ],
         "contextKey": "y4-number-review-pretest-16-v3",
         "structureKey": "number-level4-slot-16",
-        "prompt": "What is the total cost in dollars?",
+        "prompt": "What is the total ticket cost, including the booking fee?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "What is the total cost in dollars?",
+            "prompt": "What is the total ticket cost, including the booking fee?",
             "visual": {
               "type": "number_y4_budget",
               "budget": null,
@@ -1425,7 +1430,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "What is the total cost in dollars?  Tickets: 6 at 28 dollars each. Booking fee: 1 at 14 dollars each."
+        "readAloudText": "What is the total ticket cost, including the booking fee?  Tickets: 6 at 28 dollars each. Booking fee: 1 at 14 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -1476,7 +1481,7 @@
                   "14"
                 ],
                 [
-                  "Empty seats",
+                  "Empty seats altogether",
                   "17"
                 ]
               ]
@@ -1525,14 +1530,14 @@
               "14"
             ],
             [
-              "Empty seats",
+              "Empty seats altogether",
               "17"
             ]
           ],
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many students are travelling? Vans: 8. Seats in each van: 14. Empty seats: 17"
+        "readAloudText": "How many students are travelling? Vans: 8. Seats in each van: 14. Empty seats altogether: 17"
       },
       {
         "schemaVersion": 1,
@@ -1751,63 +1756,54 @@
             "lesson": 3
           }
         ],
-        "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "cognitiveCategory": "application",
+        "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
+        "requiresReasoning": false,
         "misconceptionDiagnosis": false,
-        "responseMode": "manipulated_response",
+        "responseMode": "constructed_response",
         "misconceptionTags": [
           "algorithm-step-order",
           "pattern-rule-vs-example"
         ],
         "contextKey": "y4-number-review-pretest-20-v3",
         "structureKey": "number-level4-slot-20",
-        "prompt": "Put the four instructions in order to generate the sequence.",
+        "prompt": "What number comes next?",
         "renderer": {
-          "type": "number_order",
+          "type": "numeric",
           "payload": {
-            "prompt": "Put the four instructions in order to generate the sequence.",
+            "prompt": "What number comes next?",
             "visual": {
               "type": "number_y4_sequence",
               "values": [
                 7,
                 15,
                 23,
-                31
+                31,
+                "?"
               ]
             },
-            "options": [
-              "Repeat steps 2 and 3.",
-              "Add 8.",
-              "Record the current number.",
-              "Start at 7."
-            ]
+            "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "Start at 7.||Record the current number.||Add 8.||Repeat steps 2 and 3."
+          "correctResponse": "39"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "number_order",
-        "options": [
-          "Repeat steps 2 and 3.",
-          "Add 8.",
-          "Record the current number.",
-          "Start at 7."
-        ],
-        "correctAnswer": "Start at 7.||Record the current number.||Add 8.||Repeat steps 2 and 3.",
-        "answer": "Start at 7.||Record the current number.||Add 8.||Repeat steps 2 and 3.",
+        "type": "numeric",
+        "options": [],
+        "correctAnswer": "39",
+        "answer": "39",
         "skillId": "number-y4-review-slot-20",
-        "skillLabel": "Create an Algorithm",
+        "skillLabel": "Continue a number sequence",
         "linkedWeeks": [
           11
         ],
@@ -1825,11 +1821,12 @@
             7,
             15,
             23,
-            31
+            31,
+            "?"
           ],
           "reviewPresentation": true
         },
-        "readAloudText": "Put the four instructions in order to generate the sequence. 7, 15, 23, 31"
+        "readAloudText": "What number comes next? 7, 15, 23, 31, ?"
       }
     ],
     "posttest": [
@@ -1935,38 +1932,42 @@
             "lesson": 1
           }
         ],
-        "cognitiveCategory": "reasoning",
+        "cognitiveCategory": "application",
         "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
-        "misconceptionDiagnosis": true,
-        "responseMode": "selected_response",
+        "requiresReasoning": false,
+        "misconceptionDiagnosis": false,
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "decimal-length"
         ],
         "contextKey": "y4-number-review-posttest-02-v3",
         "structureKey": "number-level4-slot-2",
-        "selectedAnswerPosition": 2,
-        "prompt": "Choose the true decimal comparison.",
+        "prompt": "Order the decimals from smallest to largest.",
         "renderer": {
-          "type": "mcq",
+          "type": "number_order",
           "payload": {
-            "prompt": "Choose the true decimal comparison.",
+            "prompt": "Order the decimals from smallest to largest.",
             "visual": {
-              "type": "number_y4_decimal_compare",
-              "left": "5.6",
-              "right": "5.42"
+              "type": "number_y4_decimal_order",
+              "values": [
+                "5.6",
+                "5.42",
+                "5.04",
+                "5.24"
+              ]
             },
             "options": [
-              "The numbers are equal.",
-              "5.6 is greater than 5.42",
-              "5.42 is greater because it has more digits."
+              "5.6",
+              "5.42",
+              "5.04",
+              "5.24"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "5.6 is greater than 5.42"
+          "correctResponse": "5.04||5.24||5.42||5.6"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -1976,16 +1977,17 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "mcq",
+        "type": "number_order",
         "options": [
-          "The numbers are equal.",
-          "5.6 is greater than 5.42",
-          "5.42 is greater because it has more digits."
+          "5.6",
+          "5.42",
+          "5.04",
+          "5.24"
         ],
-        "correctAnswer": "5.6 is greater than 5.42",
-        "answer": "5.6 is greater than 5.42",
+        "correctAnswer": "5.04||5.24||5.42||5.6",
+        "answer": "5.04||5.24||5.42||5.6",
         "skillId": "number-y4-review-slot-2",
-        "skillLabel": "Compare Decimals",
+        "skillLabel": "Order decimals",
         "linkedWeeks": [
           2
         ],
@@ -1998,12 +2000,16 @@
         ],
         "difficultyBand": "year4-number",
         "visual": {
-          "type": "number_y4_decimal_compare",
-          "left": "5.6",
-          "right": "5.42",
+          "type": "number_y4_decimal_order",
+          "values": [
+            "5.6",
+            "5.42",
+            "5.04",
+            "5.24"
+          ],
           "reviewPresentation": true
         },
-        "readAloudText": "Choose the true decimal comparison. 5.6 and 5.42."
+        "readAloudText": "Order the decimals from smallest to largest. 5.6, 5.42, 5.04, 5.24"
       },
       {
         "schemaVersion": 1,
@@ -2120,7 +2126,7 @@
           }
         ],
         "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "difficulty": "moderate",
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": true,
@@ -2130,29 +2136,28 @@
         ],
         "contextKey": "y4-number-review-posttest-04-v3",
         "structureKey": "number-level4-slot-4",
-        "prompt": "Without multiplying, choose the correct conclusion and reason.",
+        "prompt": "Is the product odd or even?",
         "renderer": {
           "type": "mcq",
           "payload": {
-            "prompt": "Without multiplying, choose the correct conclusion and reason.",
+            "prompt": "Is the product odd or even?",
             "visual": {
               "type": "number_y4_equation",
-              "expression": "1437 × 1439"
+              "expression": "27 × 29"
             },
             "options": [
-              "1437 × 1439 is even: every product is even.",
-              "1437 × 1439 is even: two odd numbers always make even.",
-              "1437 × 1439 is odd: both factors are odd."
+              "Odd",
+              "Even"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "1437 × 1439 is odd: both factors are odd."
+          "correctResponse": "Odd"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -2160,12 +2165,11 @@
         },
         "type": "mcq",
         "options": [
-          "1437 × 1439 is even: every product is even.",
-          "1437 × 1439 is even: two odd numbers always make even.",
-          "1437 × 1439 is odd: both factors are odd."
+          "Odd",
+          "Even"
         ],
-        "correctAnswer": "1437 × 1439 is odd: both factors are odd.",
-        "answer": "1437 × 1439 is odd: both factors are odd.",
+        "correctAnswer": "Odd",
+        "answer": "Odd",
         "skillId": "number-y4-review-slot-4",
         "skillLabel": "Apply odd-number multiplication properties",
         "linkedWeeks": [
@@ -2181,12 +2185,12 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_equation",
-          "expression": "1437 × 1439",
+          "expression": "27 × 29",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "selectedAnswerPosition": 3,
-        "readAloudText": "Without multiplying, choose the correct conclusion and reason. 1437 × 1439"
+        "selectedAnswerPosition": 1,
+        "readAloudText": "Is the product odd or even? 27 × 29"
       },
       {
         "schemaVersion": 1,
@@ -2303,7 +2307,7 @@
           }
         ],
         "cognitiveCategory": "application",
-        "difficulty": "moderate",
+        "difficulty": "easy",
         "isTransfer": false,
         "requiresReasoning": false,
         "misconceptionDiagnosis": false,
@@ -2320,21 +2324,20 @@
             "prompt": "Write this fraction as a decimal.",
             "visual": {
               "type": "number_y4_fraction_decimal",
-              "numerator": 12,
-              "denominator": 25,
-              "reported": "?",
-              "contextLabel": "Track"
+              "numerator": 6,
+              "denominator": 10,
+              "reported": "?"
             },
             "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "0.48"
+          "correctResponse": "0.6"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "moderate",
+          "expectedDifficulty": "easy",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -2342,8 +2345,8 @@
         },
         "type": "numeric",
         "options": [],
-        "correctAnswer": "0.48",
-        "answer": "0.48",
+        "correctAnswer": "0.6",
+        "answer": "0.6",
         "skillId": "number-y4-review-slot-6",
         "skillLabel": "Convert a fraction to a decimal",
         "linkedWeeks": [
@@ -2359,14 +2362,13 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_fraction_decimal",
-          "numerator": 12,
-          "denominator": 25,
+          "numerator": 6,
+          "denominator": 10,
           "reported": "?",
-          "contextLabel": "Track",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "Write this fraction as a decimal. 12 over 25."
+        "readAloudText": "Write this fraction as a decimal. 6 over 10."
       },
       {
         "schemaVersion": 1,
@@ -3090,17 +3092,17 @@
         ],
         "contextKey": "y4-number-review-posttest-15-v3",
         "structureKey": "number-level4-slot-15",
-        "prompt": "How many dollars remain in the budget?",
+        "prompt": "After buying all 5 supply packs, how many dollars remain?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "How many dollars remain in the budget?",
+            "prompt": "After buying all 5 supply packs, how many dollars remain?",
             "visual": {
               "type": "number_y4_budget",
               "budget": 400,
               "items": [
                 {
-                  "label": "Supplies",
+                  "label": "Supply packs",
                   "quantity": 5,
                   "price": 63
                 }
@@ -3143,7 +3145,7 @@
           "budget": 400,
           "items": [
             {
-              "label": "Supplies",
+              "label": "Supply packs",
               "quantity": 5,
               "price": 63
             }
@@ -3151,7 +3153,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many dollars remain in the budget? Budget 400 dollars. Supplies: 5 at 63 dollars each."
+        "readAloudText": "After buying all 5 supply packs, how many dollars remain? Budget 400 dollars. Supply packs: 5 at 63 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -3185,11 +3187,11 @@
         ],
         "contextKey": "y4-number-review-posttest-16-v3",
         "structureKey": "number-level4-slot-16",
-        "prompt": "What is the total cost in dollars?",
+        "prompt": "What is the total ticket cost, including the booking fee?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "What is the total cost in dollars?",
+            "prompt": "What is the total ticket cost, including the booking fee?",
             "visual": {
               "type": "number_y4_budget",
               "budget": null,
@@ -3256,7 +3258,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "What is the total cost in dollars?  Tickets: 7 at 28 dollars each. Booking fee: 1 at 14 dollars each."
+        "readAloudText": "What is the total ticket cost, including the booking fee?  Tickets: 7 at 28 dollars each. Booking fee: 1 at 14 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -3307,7 +3309,7 @@
                   "14"
                 ],
                 [
-                  "Empty seats",
+                  "Empty seats altogether",
                   "17"
                 ]
               ]
@@ -3356,14 +3358,14 @@
               "14"
             ],
             [
-              "Empty seats",
+              "Empty seats altogether",
               "17"
             ]
           ],
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many students are travelling? Vans: 9. Seats in each van: 14. Empty seats: 17"
+        "readAloudText": "How many students are travelling? Vans: 9. Seats in each van: 14. Empty seats altogether: 17"
       },
       {
         "schemaVersion": 1,
@@ -3582,63 +3584,54 @@
             "lesson": 3
           }
         ],
-        "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "cognitiveCategory": "application",
+        "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
+        "requiresReasoning": false,
         "misconceptionDiagnosis": false,
-        "responseMode": "manipulated_response",
+        "responseMode": "constructed_response",
         "misconceptionTags": [
           "algorithm-step-order",
           "pattern-rule-vs-example"
         ],
         "contextKey": "y4-number-review-posttest-20-v3",
         "structureKey": "number-level4-slot-20",
-        "prompt": "Put the four instructions in order to generate the sequence.",
+        "prompt": "What number comes next?",
         "renderer": {
-          "type": "number_order",
+          "type": "numeric",
           "payload": {
-            "prompt": "Put the four instructions in order to generate the sequence.",
+            "prompt": "What number comes next?",
             "visual": {
               "type": "number_y4_sequence",
               "values": [
                 8,
                 17,
                 26,
-                35
+                35,
+                "?"
               ]
             },
-            "options": [
-              "Repeat steps 2 and 3.",
-              "Add 9.",
-              "Record the current number.",
-              "Start at 8."
-            ]
+            "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "Start at 8.||Record the current number.||Add 9.||Repeat steps 2 and 3."
+          "correctResponse": "44"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "number_order",
-        "options": [
-          "Repeat steps 2 and 3.",
-          "Add 9.",
-          "Record the current number.",
-          "Start at 8."
-        ],
-        "correctAnswer": "Start at 8.||Record the current number.||Add 9.||Repeat steps 2 and 3.",
-        "answer": "Start at 8.||Record the current number.||Add 9.||Repeat steps 2 and 3.",
+        "type": "numeric",
+        "options": [],
+        "correctAnswer": "44",
+        "answer": "44",
         "skillId": "number-y4-review-slot-20",
-        "skillLabel": "Create an Algorithm",
+        "skillLabel": "Continue a number sequence",
         "linkedWeeks": [
           11
         ],
@@ -3656,11 +3649,12 @@
             8,
             17,
             26,
-            35
+            35,
+            "?"
           ],
           "reviewPresentation": true
         },
-        "readAloudText": "Put the four instructions in order to generate the sequence. 8, 17, 26, 35"
+        "readAloudText": "What number comes next? 8, 17, 26, 35, ?"
       }
     ],
     "start": [
@@ -3766,38 +3760,42 @@
             "lesson": 1
           }
         ],
-        "cognitiveCategory": "reasoning",
+        "cognitiveCategory": "application",
         "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
-        "misconceptionDiagnosis": true,
-        "responseMode": "selected_response",
+        "requiresReasoning": false,
+        "misconceptionDiagnosis": false,
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "decimal-length"
         ],
         "contextKey": "y4-number-review-start-02-v3",
         "structureKey": "number-level4-slot-2",
-        "selectedAnswerPosition": 1,
-        "prompt": "Choose the true decimal comparison.",
+        "prompt": "Order the decimals from smallest to largest.",
         "renderer": {
-          "type": "mcq",
+          "type": "number_order",
           "payload": {
-            "prompt": "Choose the true decimal comparison.",
+            "prompt": "Order the decimals from smallest to largest.",
             "visual": {
-              "type": "number_y4_decimal_compare",
-              "left": "6.8",
-              "right": "6.64"
+              "type": "number_y4_decimal_order",
+              "values": [
+                "6.6",
+                "6.42",
+                "6.04",
+                "6.24"
+              ]
             },
             "options": [
-              "6.8 is greater than 6.64",
-              "6.64 is greater because it has more digits.",
-              "The numbers are equal."
+              "6.6",
+              "6.42",
+              "6.04",
+              "6.24"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "6.8 is greater than 6.64"
+          "correctResponse": "6.04||6.24||6.42||6.6"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -3807,16 +3805,17 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "mcq",
+        "type": "number_order",
         "options": [
-          "6.8 is greater than 6.64",
-          "6.64 is greater because it has more digits.",
-          "The numbers are equal."
+          "6.6",
+          "6.42",
+          "6.04",
+          "6.24"
         ],
-        "correctAnswer": "6.8 is greater than 6.64",
-        "answer": "6.8 is greater than 6.64",
+        "correctAnswer": "6.04||6.24||6.42||6.6",
+        "answer": "6.04||6.24||6.42||6.6",
         "skillId": "number-y4-review-slot-2",
-        "skillLabel": "Compare Decimals",
+        "skillLabel": "Order decimals",
         "linkedWeeks": [
           2
         ],
@@ -3829,12 +3828,16 @@
         ],
         "difficultyBand": "year4-number",
         "visual": {
-          "type": "number_y4_decimal_compare",
-          "left": "6.8",
-          "right": "6.64",
+          "type": "number_y4_decimal_order",
+          "values": [
+            "6.6",
+            "6.42",
+            "6.04",
+            "6.24"
+          ],
           "reviewPresentation": true
         },
-        "readAloudText": "Choose the true decimal comparison. 6.8 and 6.64."
+        "readAloudText": "Order the decimals from smallest to largest. 6.6, 6.42, 6.04, 6.24"
       },
       {
         "schemaVersion": 1,
@@ -3951,7 +3954,7 @@
           }
         ],
         "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "difficulty": "moderate",
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": true,
@@ -3961,29 +3964,28 @@
         ],
         "contextKey": "y4-number-review-start-04-v3",
         "structureKey": "number-level4-slot-4",
-        "prompt": "Without multiplying, choose the correct conclusion and reason.",
+        "prompt": "Is the product odd or even?",
         "renderer": {
           "type": "mcq",
           "payload": {
-            "prompt": "Without multiplying, choose the correct conclusion and reason.",
+            "prompt": "Is the product odd or even?",
             "visual": {
               "type": "number_y4_equation",
-              "expression": "1639 × 1641"
+              "expression": "31 × 33"
             },
             "options": [
-              "1639 × 1641 is even: two odd numbers always make even.",
-              "1639 × 1641 is odd: both factors are odd.",
-              "1639 × 1641 is even: every product is even."
+              "Even",
+              "Odd"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "1639 × 1641 is odd: both factors are odd."
+          "correctResponse": "Odd"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -3991,12 +3993,11 @@
         },
         "type": "mcq",
         "options": [
-          "1639 × 1641 is even: two odd numbers always make even.",
-          "1639 × 1641 is odd: both factors are odd.",
-          "1639 × 1641 is even: every product is even."
+          "Even",
+          "Odd"
         ],
-        "correctAnswer": "1639 × 1641 is odd: both factors are odd.",
-        "answer": "1639 × 1641 is odd: both factors are odd.",
+        "correctAnswer": "Odd",
+        "answer": "Odd",
         "skillId": "number-y4-review-slot-4",
         "skillLabel": "Apply odd-number multiplication properties",
         "linkedWeeks": [
@@ -4012,12 +4013,12 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_equation",
-          "expression": "1639 × 1641",
+          "expression": "31 × 33",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
         "selectedAnswerPosition": 2,
-        "readAloudText": "Without multiplying, choose the correct conclusion and reason. 1639 × 1641"
+        "readAloudText": "Is the product odd or even? 31 × 33"
       },
       {
         "schemaVersion": 1,
@@ -4134,7 +4135,7 @@
           }
         ],
         "cognitiveCategory": "application",
-        "difficulty": "moderate",
+        "difficulty": "easy",
         "isTransfer": false,
         "requiresReasoning": false,
         "misconceptionDiagnosis": false,
@@ -4151,21 +4152,20 @@
             "prompt": "Write this fraction as a decimal.",
             "visual": {
               "type": "number_y4_fraction_decimal",
-              "numerator": 17,
-              "denominator": 25,
-              "reported": "?",
-              "contextLabel": "Water"
+              "numerator": 7,
+              "denominator": 10,
+              "reported": "?"
             },
             "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "0.68"
+          "correctResponse": "0.7"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "moderate",
+          "expectedDifficulty": "easy",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -4173,8 +4173,8 @@
         },
         "type": "numeric",
         "options": [],
-        "correctAnswer": "0.68",
-        "answer": "0.68",
+        "correctAnswer": "0.7",
+        "answer": "0.7",
         "skillId": "number-y4-review-slot-6",
         "skillLabel": "Convert a fraction to a decimal",
         "linkedWeeks": [
@@ -4190,14 +4190,13 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_fraction_decimal",
-          "numerator": 17,
-          "denominator": 25,
+          "numerator": 7,
+          "denominator": 10,
           "reported": "?",
-          "contextLabel": "Water",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "Write this fraction as a decimal. 17 over 25."
+        "readAloudText": "Write this fraction as a decimal. 7 over 10."
       },
       {
         "schemaVersion": 1,
@@ -4921,17 +4920,17 @@
         ],
         "contextKey": "y4-number-review-start-15-v3",
         "structureKey": "number-level4-slot-15",
-        "prompt": "How many dollars remain in the budget?",
+        "prompt": "After buying all 5 supply packs, how many dollars remain?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "How many dollars remain in the budget?",
+            "prompt": "After buying all 5 supply packs, how many dollars remain?",
             "visual": {
               "type": "number_y4_budget",
               "budget": 450,
               "items": [
                 {
-                  "label": "Supplies",
+                  "label": "Supply packs",
                   "quantity": 5,
                   "price": 73
                 }
@@ -4974,7 +4973,7 @@
           "budget": 450,
           "items": [
             {
-              "label": "Supplies",
+              "label": "Supply packs",
               "quantity": 5,
               "price": 73
             }
@@ -4982,7 +4981,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many dollars remain in the budget? Budget 450 dollars. Supplies: 5 at 73 dollars each."
+        "readAloudText": "After buying all 5 supply packs, how many dollars remain? Budget 450 dollars. Supply packs: 5 at 73 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -5016,11 +5015,11 @@
         ],
         "contextKey": "y4-number-review-start-16-v3",
         "structureKey": "number-level4-slot-16",
-        "prompt": "What is the total cost in dollars?",
+        "prompt": "What is the total ticket cost, including the booking fee?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "What is the total cost in dollars?",
+            "prompt": "What is the total ticket cost, including the booking fee?",
             "visual": {
               "type": "number_y4_budget",
               "budget": null,
@@ -5087,7 +5086,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "What is the total cost in dollars?  Tickets: 8 at 28 dollars each. Booking fee: 1 at 14 dollars each."
+        "readAloudText": "What is the total ticket cost, including the booking fee?  Tickets: 8 at 28 dollars each. Booking fee: 1 at 14 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -5138,7 +5137,7 @@
                   "14"
                 ],
                 [
-                  "Empty seats",
+                  "Empty seats altogether",
                   "17"
                 ]
               ]
@@ -5187,14 +5186,14 @@
               "14"
             ],
             [
-              "Empty seats",
+              "Empty seats altogether",
               "17"
             ]
           ],
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many students are travelling? Vans: 7. Seats in each van: 14. Empty seats: 17"
+        "readAloudText": "How many students are travelling? Vans: 7. Seats in each van: 14. Empty seats altogether: 17"
       },
       {
         "schemaVersion": 1,
@@ -5413,63 +5412,54 @@
             "lesson": 3
           }
         ],
-        "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "cognitiveCategory": "application",
+        "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
+        "requiresReasoning": false,
         "misconceptionDiagnosis": false,
-        "responseMode": "manipulated_response",
+        "responseMode": "constructed_response",
         "misconceptionTags": [
           "algorithm-step-order",
           "pattern-rule-vs-example"
         ],
         "contextKey": "y4-number-review-start-20-v3",
         "structureKey": "number-level4-slot-20",
-        "prompt": "Put the four instructions in order to generate the sequence.",
+        "prompt": "What number comes next?",
         "renderer": {
-          "type": "number_order",
+          "type": "numeric",
           "payload": {
-            "prompt": "Put the four instructions in order to generate the sequence.",
+            "prompt": "What number comes next?",
             "visual": {
               "type": "number_y4_sequence",
               "values": [
                 6,
                 13,
                 20,
-                27
+                27,
+                "?"
               ]
             },
-            "options": [
-              "Repeat steps 2 and 3.",
-              "Add 7.",
-              "Record the current number.",
-              "Start at 6."
-            ]
+            "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "Start at 6.||Record the current number.||Add 7.||Repeat steps 2 and 3."
+          "correctResponse": "34"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "number_order",
-        "options": [
-          "Repeat steps 2 and 3.",
-          "Add 7.",
-          "Record the current number.",
-          "Start at 6."
-        ],
-        "correctAnswer": "Start at 6.||Record the current number.||Add 7.||Repeat steps 2 and 3.",
-        "answer": "Start at 6.||Record the current number.||Add 7.||Repeat steps 2 and 3.",
+        "type": "numeric",
+        "options": [],
+        "correctAnswer": "34",
+        "answer": "34",
         "skillId": "number-y4-review-slot-20",
-        "skillLabel": "Create an Algorithm",
+        "skillLabel": "Continue a number sequence",
         "linkedWeeks": [
           11
         ],
@@ -5487,11 +5477,12 @@
             6,
             13,
             20,
-            27
+            27,
+            "?"
           ],
           "reviewPresentation": true
         },
-        "readAloudText": "Put the four instructions in order to generate the sequence. 6, 13, 20, 27"
+        "readAloudText": "What number comes next? 6, 13, 20, 27, ?"
       }
     ],
     "mid": [
@@ -5597,38 +5588,42 @@
             "lesson": 1
           }
         ],
-        "cognitiveCategory": "reasoning",
+        "cognitiveCategory": "application",
         "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
-        "misconceptionDiagnosis": true,
-        "responseMode": "selected_response",
+        "requiresReasoning": false,
+        "misconceptionDiagnosis": false,
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "decimal-length"
         ],
         "contextKey": "y4-number-review-mid-02-v3",
         "structureKey": "number-level4-slot-2",
-        "selectedAnswerPosition": 3,
-        "prompt": "Choose the true decimal comparison.",
+        "prompt": "Order the decimals from smallest to largest.",
         "renderer": {
-          "type": "mcq",
+          "type": "number_order",
           "payload": {
-            "prompt": "Choose the true decimal comparison.",
+            "prompt": "Order the decimals from smallest to largest.",
             "visual": {
-              "type": "number_y4_decimal_compare",
-              "left": "7.5",
-              "right": "7.34"
+              "type": "number_y4_decimal_order",
+              "values": [
+                "7.6",
+                "7.42",
+                "7.04",
+                "7.24"
+              ]
             },
             "options": [
-              "7.34 is greater because it has more digits.",
-              "The numbers are equal.",
-              "7.5 is greater than 7.34"
+              "7.6",
+              "7.42",
+              "7.04",
+              "7.24"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "7.5 is greater than 7.34"
+          "correctResponse": "7.04||7.24||7.42||7.6"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -5638,16 +5633,17 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "mcq",
+        "type": "number_order",
         "options": [
-          "7.34 is greater because it has more digits.",
-          "The numbers are equal.",
-          "7.5 is greater than 7.34"
+          "7.6",
+          "7.42",
+          "7.04",
+          "7.24"
         ],
-        "correctAnswer": "7.5 is greater than 7.34",
-        "answer": "7.5 is greater than 7.34",
+        "correctAnswer": "7.04||7.24||7.42||7.6",
+        "answer": "7.04||7.24||7.42||7.6",
         "skillId": "number-y4-review-slot-2",
-        "skillLabel": "Compare Decimals",
+        "skillLabel": "Order decimals",
         "linkedWeeks": [
           2
         ],
@@ -5660,12 +5656,16 @@
         ],
         "difficultyBand": "year4-number",
         "visual": {
-          "type": "number_y4_decimal_compare",
-          "left": "7.5",
-          "right": "7.34",
+          "type": "number_y4_decimal_order",
+          "values": [
+            "7.6",
+            "7.42",
+            "7.04",
+            "7.24"
+          ],
           "reviewPresentation": true
         },
-        "readAloudText": "Choose the true decimal comparison. 7.5 and 7.34."
+        "readAloudText": "Order the decimals from smallest to largest. 7.6, 7.42, 7.04, 7.24"
       },
       {
         "schemaVersion": 1,
@@ -5782,7 +5782,7 @@
           }
         ],
         "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "difficulty": "moderate",
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": true,
@@ -5792,29 +5792,28 @@
         ],
         "contextKey": "y4-number-review-mid-04-v3",
         "structureKey": "number-level4-slot-4",
-        "prompt": "Without multiplying, choose the correct conclusion and reason.",
+        "prompt": "Is the product odd or even?",
         "renderer": {
           "type": "mcq",
           "payload": {
-            "prompt": "Without multiplying, choose the correct conclusion and reason.",
+            "prompt": "Is the product odd or even?",
             "visual": {
               "type": "number_y4_equation",
-              "expression": "1841 × 1843"
+              "expression": "35 × 37"
             },
             "options": [
-              "1841 × 1843 is odd: both factors are odd.",
-              "1841 × 1843 is even: every product is even.",
-              "1841 × 1843 is even: two odd numbers always make even."
+              "Odd",
+              "Even"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "1841 × 1843 is odd: both factors are odd."
+          "correctResponse": "Odd"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -5822,12 +5821,11 @@
         },
         "type": "mcq",
         "options": [
-          "1841 × 1843 is odd: both factors are odd.",
-          "1841 × 1843 is even: every product is even.",
-          "1841 × 1843 is even: two odd numbers always make even."
+          "Odd",
+          "Even"
         ],
-        "correctAnswer": "1841 × 1843 is odd: both factors are odd.",
-        "answer": "1841 × 1843 is odd: both factors are odd.",
+        "correctAnswer": "Odd",
+        "answer": "Odd",
         "skillId": "number-y4-review-slot-4",
         "skillLabel": "Apply odd-number multiplication properties",
         "linkedWeeks": [
@@ -5843,12 +5841,12 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_equation",
-          "expression": "1841 × 1843",
+          "expression": "35 × 37",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
         "selectedAnswerPosition": 1,
-        "readAloudText": "Without multiplying, choose the correct conclusion and reason. 1841 × 1843"
+        "readAloudText": "Is the product odd or even? 35 × 37"
       },
       {
         "schemaVersion": 1,
@@ -5965,7 +5963,7 @@
           }
         ],
         "cognitiveCategory": "application",
-        "difficulty": "moderate",
+        "difficulty": "easy",
         "isTransfer": false,
         "requiresReasoning": false,
         "misconceptionDiagnosis": false,
@@ -5982,21 +5980,20 @@
             "prompt": "Write this fraction as a decimal.",
             "visual": {
               "type": "number_y4_fraction_decimal",
-              "numerator": 18,
-              "denominator": 25,
-              "reported": "?",
-              "contextLabel": "Ribbon"
+              "numerator": 4,
+              "denominator": 10,
+              "reported": "?"
             },
             "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "0.72"
+          "correctResponse": "0.4"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "moderate",
+          "expectedDifficulty": "easy",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -6004,8 +6001,8 @@
         },
         "type": "numeric",
         "options": [],
-        "correctAnswer": "0.72",
-        "answer": "0.72",
+        "correctAnswer": "0.4",
+        "answer": "0.4",
         "skillId": "number-y4-review-slot-6",
         "skillLabel": "Convert a fraction to a decimal",
         "linkedWeeks": [
@@ -6021,14 +6018,13 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_fraction_decimal",
-          "numerator": 18,
-          "denominator": 25,
+          "numerator": 4,
+          "denominator": 10,
           "reported": "?",
-          "contextLabel": "Ribbon",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "Write this fraction as a decimal. 18 over 25."
+        "readAloudText": "Write this fraction as a decimal. 4 over 10."
       },
       {
         "schemaVersion": 1,
@@ -6752,17 +6748,17 @@
         ],
         "contextKey": "y4-number-review-mid-15-v3",
         "structureKey": "number-level4-slot-15",
-        "prompt": "How many dollars remain in the budget?",
+        "prompt": "After buying all 5 supply packs, how many dollars remain?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "How many dollars remain in the budget?",
+            "prompt": "After buying all 5 supply packs, how many dollars remain?",
             "visual": {
               "type": "number_y4_budget",
               "budget": 500,
               "items": [
                 {
-                  "label": "Supplies",
+                  "label": "Supply packs",
                   "quantity": 5,
                   "price": 83
                 }
@@ -6805,7 +6801,7 @@
           "budget": 500,
           "items": [
             {
-              "label": "Supplies",
+              "label": "Supply packs",
               "quantity": 5,
               "price": 83
             }
@@ -6813,7 +6809,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many dollars remain in the budget? Budget 500 dollars. Supplies: 5 at 83 dollars each."
+        "readAloudText": "After buying all 5 supply packs, how many dollars remain? Budget 500 dollars. Supply packs: 5 at 83 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -6847,11 +6843,11 @@
         ],
         "contextKey": "y4-number-review-mid-16-v3",
         "structureKey": "number-level4-slot-16",
-        "prompt": "What is the total cost in dollars?",
+        "prompt": "What is the total ticket cost, including the booking fee?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "What is the total cost in dollars?",
+            "prompt": "What is the total ticket cost, including the booking fee?",
             "visual": {
               "type": "number_y4_budget",
               "budget": null,
@@ -6918,7 +6914,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "What is the total cost in dollars?  Tickets: 9 at 28 dollars each. Booking fee: 1 at 14 dollars each."
+        "readAloudText": "What is the total ticket cost, including the booking fee?  Tickets: 9 at 28 dollars each. Booking fee: 1 at 14 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -6969,7 +6965,7 @@
                   "14"
                 ],
                 [
-                  "Empty seats",
+                  "Empty seats altogether",
                   "17"
                 ]
               ]
@@ -7018,14 +7014,14 @@
               "14"
             ],
             [
-              "Empty seats",
+              "Empty seats altogether",
               "17"
             ]
           ],
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many students are travelling? Vans: 6. Seats in each van: 14. Empty seats: 17"
+        "readAloudText": "How many students are travelling? Vans: 6. Seats in each van: 14. Empty seats altogether: 17"
       },
       {
         "schemaVersion": 1,
@@ -7244,63 +7240,54 @@
             "lesson": 3
           }
         ],
-        "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "cognitiveCategory": "application",
+        "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
+        "requiresReasoning": false,
         "misconceptionDiagnosis": false,
-        "responseMode": "manipulated_response",
+        "responseMode": "constructed_response",
         "misconceptionTags": [
           "algorithm-step-order",
           "pattern-rule-vs-example"
         ],
         "contextKey": "y4-number-review-mid-20-v3",
         "structureKey": "number-level4-slot-20",
-        "prompt": "Put the four instructions in order to generate the sequence.",
+        "prompt": "What number comes next?",
         "renderer": {
-          "type": "number_order",
+          "type": "numeric",
           "payload": {
-            "prompt": "Put the four instructions in order to generate the sequence.",
+            "prompt": "What number comes next?",
             "visual": {
               "type": "number_y4_sequence",
               "values": [
                 9,
                 15,
                 21,
-                27
+                27,
+                "?"
               ]
             },
-            "options": [
-              "Repeat steps 2 and 3.",
-              "Add 6.",
-              "Record the current number.",
-              "Start at 9."
-            ]
+            "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "Start at 9.||Record the current number.||Add 6.||Repeat steps 2 and 3."
+          "correctResponse": "33"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "number_order",
-        "options": [
-          "Repeat steps 2 and 3.",
-          "Add 6.",
-          "Record the current number.",
-          "Start at 9."
-        ],
-        "correctAnswer": "Start at 9.||Record the current number.||Add 6.||Repeat steps 2 and 3.",
-        "answer": "Start at 9.||Record the current number.||Add 6.||Repeat steps 2 and 3.",
+        "type": "numeric",
+        "options": [],
+        "correctAnswer": "33",
+        "answer": "33",
         "skillId": "number-y4-review-slot-20",
-        "skillLabel": "Create an Algorithm",
+        "skillLabel": "Continue a number sequence",
         "linkedWeeks": [
           11
         ],
@@ -7318,11 +7305,12 @@
             9,
             15,
             21,
-            27
+            27,
+            "?"
           ],
           "reviewPresentation": true
         },
-        "readAloudText": "Put the four instructions in order to generate the sequence. 9, 15, 21, 27"
+        "readAloudText": "What number comes next? 9, 15, 21, 27, ?"
       }
     ],
     "end": [
@@ -7428,38 +7416,42 @@
             "lesson": 1
           }
         ],
-        "cognitiveCategory": "reasoning",
+        "cognitiveCategory": "application",
         "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
-        "misconceptionDiagnosis": true,
-        "responseMode": "selected_response",
+        "requiresReasoning": false,
+        "misconceptionDiagnosis": false,
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "decimal-length"
         ],
         "contextKey": "y4-number-review-end-02-v3",
         "structureKey": "number-level4-slot-2",
-        "selectedAnswerPosition": 2,
-        "prompt": "Choose the true decimal comparison.",
+        "prompt": "Order the decimals from smallest to largest.",
         "renderer": {
-          "type": "mcq",
+          "type": "number_order",
           "payload": {
-            "prompt": "Choose the true decimal comparison.",
+            "prompt": "Order the decimals from smallest to largest.",
             "visual": {
-              "type": "number_y4_decimal_compare",
-              "left": "8.9",
-              "right": "8.72"
+              "type": "number_y4_decimal_order",
+              "values": [
+                "8.6",
+                "8.42",
+                "8.04",
+                "8.24"
+              ]
             },
             "options": [
-              "The numbers are equal.",
-              "8.9 is greater than 8.72",
-              "8.72 is greater because it has more digits."
+              "8.6",
+              "8.42",
+              "8.04",
+              "8.24"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "8.9 is greater than 8.72"
+          "correctResponse": "8.04||8.24||8.42||8.6"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -7469,16 +7461,17 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "mcq",
+        "type": "number_order",
         "options": [
-          "The numbers are equal.",
-          "8.9 is greater than 8.72",
-          "8.72 is greater because it has more digits."
+          "8.6",
+          "8.42",
+          "8.04",
+          "8.24"
         ],
-        "correctAnswer": "8.9 is greater than 8.72",
-        "answer": "8.9 is greater than 8.72",
+        "correctAnswer": "8.04||8.24||8.42||8.6",
+        "answer": "8.04||8.24||8.42||8.6",
         "skillId": "number-y4-review-slot-2",
-        "skillLabel": "Compare Decimals",
+        "skillLabel": "Order decimals",
         "linkedWeeks": [
           2
         ],
@@ -7491,12 +7484,16 @@
         ],
         "difficultyBand": "year4-number",
         "visual": {
-          "type": "number_y4_decimal_compare",
-          "left": "8.9",
-          "right": "8.72",
+          "type": "number_y4_decimal_order",
+          "values": [
+            "8.6",
+            "8.42",
+            "8.04",
+            "8.24"
+          ],
           "reviewPresentation": true
         },
-        "readAloudText": "Choose the true decimal comparison. 8.9 and 8.72."
+        "readAloudText": "Order the decimals from smallest to largest. 8.6, 8.42, 8.04, 8.24"
       },
       {
         "schemaVersion": 1,
@@ -7613,7 +7610,7 @@
           }
         ],
         "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "difficulty": "moderate",
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": true,
@@ -7623,29 +7620,28 @@
         ],
         "contextKey": "y4-number-review-end-04-v3",
         "structureKey": "number-level4-slot-4",
-        "prompt": "Without multiplying, choose the correct conclusion and reason.",
+        "prompt": "Is the product odd or even?",
         "renderer": {
           "type": "mcq",
           "payload": {
-            "prompt": "Without multiplying, choose the correct conclusion and reason.",
+            "prompt": "Is the product odd or even?",
             "visual": {
               "type": "number_y4_equation",
-              "expression": "2043 × 2045"
+              "expression": "39 × 41"
             },
             "options": [
-              "2043 × 2045 is even: every product is even.",
-              "2043 × 2045 is even: two odd numbers always make even.",
-              "2043 × 2045 is odd: both factors are odd."
+              "Even",
+              "Odd"
             ]
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "2043 × 2045 is odd: both factors are odd."
+          "correctResponse": "Odd"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -7653,12 +7649,11 @@
         },
         "type": "mcq",
         "options": [
-          "2043 × 2045 is even: every product is even.",
-          "2043 × 2045 is even: two odd numbers always make even.",
-          "2043 × 2045 is odd: both factors are odd."
+          "Even",
+          "Odd"
         ],
-        "correctAnswer": "2043 × 2045 is odd: both factors are odd.",
-        "answer": "2043 × 2045 is odd: both factors are odd.",
+        "correctAnswer": "Odd",
+        "answer": "Odd",
         "skillId": "number-y4-review-slot-4",
         "skillLabel": "Apply odd-number multiplication properties",
         "linkedWeeks": [
@@ -7674,12 +7669,12 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_equation",
-          "expression": "2043 × 2045",
+          "expression": "39 × 41",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "selectedAnswerPosition": 3,
-        "readAloudText": "Without multiplying, choose the correct conclusion and reason. 2043 × 2045"
+        "selectedAnswerPosition": 2,
+        "readAloudText": "Is the product odd or even? 39 × 41"
       },
       {
         "schemaVersion": 1,
@@ -7796,7 +7791,7 @@
           }
         ],
         "cognitiveCategory": "application",
-        "difficulty": "moderate",
+        "difficulty": "easy",
         "isTransfer": false,
         "requiresReasoning": false,
         "misconceptionDiagnosis": false,
@@ -7813,21 +7808,20 @@
             "prompt": "Write this fraction as a decimal.",
             "visual": {
               "type": "number_y4_fraction_decimal",
-              "numerator": 22,
-              "denominator": 25,
-              "reported": "?",
-              "contextLabel": "Track"
+              "numerator": 8,
+              "denominator": 10,
+              "reported": "?"
             },
             "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "0.88"
+          "correctResponse": "0.8"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "moderate",
+          "expectedDifficulty": "easy",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
@@ -7835,8 +7829,8 @@
         },
         "type": "numeric",
         "options": [],
-        "correctAnswer": "0.88",
-        "answer": "0.88",
+        "correctAnswer": "0.8",
+        "answer": "0.8",
         "skillId": "number-y4-review-slot-6",
         "skillLabel": "Convert a fraction to a decimal",
         "linkedWeeks": [
@@ -7852,14 +7846,13 @@
         "difficultyBand": "year4-number",
         "visual": {
           "type": "number_y4_fraction_decimal",
-          "numerator": 22,
-          "denominator": 25,
+          "numerator": 8,
+          "denominator": 10,
           "reported": "?",
-          "contextLabel": "Track",
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "Write this fraction as a decimal. 22 over 25."
+        "readAloudText": "Write this fraction as a decimal. 8 over 10."
       },
       {
         "schemaVersion": 1,
@@ -8583,17 +8576,17 @@
         ],
         "contextKey": "y4-number-review-end-15-v3",
         "structureKey": "number-level4-slot-15",
-        "prompt": "How many dollars remain in the budget?",
+        "prompt": "After buying all 5 supply packs, how many dollars remain?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "How many dollars remain in the budget?",
+            "prompt": "After buying all 5 supply packs, how many dollars remain?",
             "visual": {
               "type": "number_y4_budget",
               "budget": 550,
               "items": [
                 {
-                  "label": "Supplies",
+                  "label": "Supply packs",
                   "quantity": 5,
                   "price": 93
                 }
@@ -8636,7 +8629,7 @@
           "budget": 550,
           "items": [
             {
-              "label": "Supplies",
+              "label": "Supply packs",
               "quantity": 5,
               "price": 93
             }
@@ -8644,7 +8637,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many dollars remain in the budget? Budget 550 dollars. Supplies: 5 at 93 dollars each."
+        "readAloudText": "After buying all 5 supply packs, how many dollars remain? Budget 550 dollars. Supply packs: 5 at 93 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -8678,11 +8671,11 @@
         ],
         "contextKey": "y4-number-review-end-16-v3",
         "structureKey": "number-level4-slot-16",
-        "prompt": "What is the total cost in dollars?",
+        "prompt": "What is the total ticket cost, including the booking fee?",
         "renderer": {
           "type": "numeric",
           "payload": {
-            "prompt": "What is the total cost in dollars?",
+            "prompt": "What is the total ticket cost, including the booking fee?",
             "visual": {
               "type": "number_y4_budget",
               "budget": null,
@@ -8749,7 +8742,7 @@
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "What is the total cost in dollars?  Tickets: 5 at 28 dollars each. Booking fee: 1 at 14 dollars each."
+        "readAloudText": "What is the total ticket cost, including the booking fee?  Tickets: 5 at 28 dollars each. Booking fee: 1 at 14 dollars each."
       },
       {
         "schemaVersion": 1,
@@ -8800,7 +8793,7 @@
                   "14"
                 ],
                 [
-                  "Empty seats",
+                  "Empty seats altogether",
                   "17"
                 ]
               ]
@@ -8849,14 +8842,14 @@
               "14"
             ],
             [
-              "Empty seats",
+              "Empty seats altogether",
               "17"
             ]
           ],
           "reviewPresentation": true
         },
         "inputMode": "decimal",
-        "readAloudText": "How many students are travelling? Vans: 5. Seats in each van: 14. Empty seats: 17"
+        "readAloudText": "How many students are travelling? Vans: 5. Seats in each van: 14. Empty seats altogether: 17"
       },
       {
         "schemaVersion": 1,
@@ -9075,63 +9068,54 @@
             "lesson": 3
           }
         ],
-        "cognitiveCategory": "reasoning",
-        "difficulty": "challenging",
+        "cognitiveCategory": "application",
+        "difficulty": "moderate",
         "isTransfer": false,
-        "requiresReasoning": true,
+        "requiresReasoning": false,
         "misconceptionDiagnosis": false,
-        "responseMode": "manipulated_response",
+        "responseMode": "constructed_response",
         "misconceptionTags": [
           "algorithm-step-order",
           "pattern-rule-vs-example"
         ],
         "contextKey": "y4-number-review-end-20-v3",
         "structureKey": "number-level4-slot-20",
-        "prompt": "Put the four instructions in order to generate the sequence.",
+        "prompt": "What number comes next?",
         "renderer": {
-          "type": "number_order",
+          "type": "numeric",
           "payload": {
-            "prompt": "Put the four instructions in order to generate the sequence.",
+            "prompt": "What number comes next?",
             "visual": {
               "type": "number_y4_sequence",
               "values": [
                 5,
                 13,
                 21,
-                29
+                29,
+                "?"
               ]
             },
-            "options": [
-              "Repeat steps 2 and 3.",
-              "Add 8.",
-              "Record the current number.",
-              "Start at 5."
-            ]
+            "options": []
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "Start at 5.||Record the current number.||Add 8.||Repeat steps 2 and 3."
+          "correctResponse": "37"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
-          "expectedDifficulty": "challenging",
+          "expectedDifficulty": "moderate",
           "observedDifficulty": null,
           "discriminationIndex": null,
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "number_order",
-        "options": [
-          "Repeat steps 2 and 3.",
-          "Add 8.",
-          "Record the current number.",
-          "Start at 5."
-        ],
-        "correctAnswer": "Start at 5.||Record the current number.||Add 8.||Repeat steps 2 and 3.",
-        "answer": "Start at 5.||Record the current number.||Add 8.||Repeat steps 2 and 3.",
+        "type": "numeric",
+        "options": [],
+        "correctAnswer": "37",
+        "answer": "37",
         "skillId": "number-y4-review-slot-20",
-        "skillLabel": "Create an Algorithm",
+        "skillLabel": "Continue a number sequence",
         "linkedWeeks": [
           11
         ],
@@ -9149,11 +9133,12 @@
             5,
             13,
             21,
-            29
+            29,
+            "?"
           ],
           "reviewPresentation": true
         },
-        "readAloudText": "Put the four instructions in order to generate the sequence. 5, 13, 21, 29"
+        "readAloudText": "What number comes next? 5, 13, 21, 29, ?"
       }
     ]
   }
