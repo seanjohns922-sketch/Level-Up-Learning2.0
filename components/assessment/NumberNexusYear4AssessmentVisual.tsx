@@ -1,10 +1,14 @@
 "use client";
 
-import { ArrowRight, Boxes, ReceiptText, Workflow } from "lucide-react";
+import { ArrowRight, Boxes, ReceiptText, Workflow, Ticket, Utensils, Bus } from "lucide-react";
 import { renderCoins } from "@/components/week7/moneyAssets";
 
 type Visual = Record<string, unknown>;
 
+function ContextIcon({label}:{label:string}) {
+ const Icon=/ticket|pass|fee/i.test(label)?Ticket:/meal/i.test(label)?Utensils:/van/i.test(label)?Bus:Boxes;
+ return <Icon className="mb-3 h-12 w-12 text-teal-700" strokeWidth={1.5} aria-hidden="true"/>;
+}
 function Surface({ children }: { children: React.ReactNode }) {
   return <div className="rounded-lg border border-cyan-900/15 bg-[#f8fbfc] p-4 text-slate-950 shadow-[0_8px_24px_rgba(15,23,42,0.08)] sm:p-5">{children}</div>;
 }
@@ -53,7 +57,7 @@ export default function NumberNexusYear4AssessmentVisual({ visual }: { visual: V
 
   if (type === "number_y4_fraction_sequence" || type === "number_y4_sequence") {
     const values = (visual.values as Array<string | number> | undefined) ?? [];
-    return <Surface><div className="flex flex-wrap items-center justify-center gap-3">{values.map((value, index) => <Tile key={index} muted={String(value).includes("?")}>{value}</Tile>)}</div></Surface>;
+    return <Surface><div className="flex flex-wrap items-center justify-center gap-3">{values.map((value, index) => <Tile key={index} muted={String(value).includes("?")}>{visual.reviewPresentation&&String(value).includes("/")?<Fraction numerator={String(value).split("/")[0]==="?"?null:Number(String(value).split("/")[0])} denominator={Number(String(value).split("/")[1])}/>:value}</Tile>)}</div></Surface>;
   }
 
   if (type === "number_y4_number_line") {
@@ -80,7 +84,7 @@ export default function NumberNexusYear4AssessmentVisual({ visual }: { visual: V
   if (type === "number_y4_budget") {
     const budget = visual.budget === null || visual.budget === undefined ? null : Number(visual.budget);
     const items = (visual.items as Array<{ label: string; quantity: number; price: number }> | undefined) ?? [];
-    return <Surface><div className="mx-auto max-w-3xl space-y-4">{budget !== null ? <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4"><span className="text-sm font-black uppercase text-cyan-900">Budget</span><span className="text-2xl font-black">${budget}</span></div> : null}<div className="grid gap-3 sm:grid-cols-2">{items.map((item, index) => <div key={index} className="flex items-center justify-between gap-3 rounded-lg border border-amber-700/20 bg-amber-50 p-4"><div><div className="font-black">{item.label}</div><div className="text-sm font-bold text-slate-600">{item.quantity} at ${item.price}</div></div><div className="flex min-h-10 max-w-72 items-center justify-end">{renderCoins(item.price)}</div></div>)}</div></div></Surface>;
+    return <Surface><div className="mx-auto max-w-3xl space-y-4">{budget !== null ? <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4"><span className="text-sm font-black uppercase text-cyan-900">Budget</span><span className="text-2xl font-black">${budget}</span></div> : null}<div className="grid gap-3 sm:grid-cols-2">{items.map((item, index) => <div key={index} className="flex items-center justify-between gap-3 rounded-lg border border-amber-700/20 bg-amber-50 p-4"><div>{visual.reviewPresentation?<ContextIcon label={item.label}/>:null}<div className="font-black">{item.label}</div><div className="text-sm font-bold text-slate-600">{item.quantity} at ${item.price}</div></div><div className="flex min-h-10 max-w-72 items-center justify-end">{renderCoins(item.price)}</div></div>)}</div></div></Surface>;
   }
 
   if (type === "number_y4_groups") {
@@ -89,7 +93,7 @@ export default function NumberNexusYear4AssessmentVisual({ visual }: { visual: V
 
   if (type === "number_y4_model") {
     const rows = (visual.rows as string[][] | undefined) ?? [];
-    return <Surface><div className="mx-auto grid max-w-2xl gap-2 sm:grid-cols-3">{rows.map((row, index) => <div key={index} className="rounded-lg border border-cyan-800/20 bg-white p-4 text-center"><div className="text-sm font-black text-cyan-900">{row[0]}</div><div className="mt-2 text-3xl font-black">{row[1]}</div></div>)}</div></Surface>;
+    return <Surface><div className="mx-auto grid max-w-2xl gap-2 sm:grid-cols-3">{rows.map((row, index) => <div key={index} className="rounded-lg border border-cyan-800/20 bg-white p-4 text-center">{visual.reviewPresentation&&index===0?<div className="flex justify-center"><ContextIcon label={row[0]}/></div>:null}<div className="text-sm font-black text-cyan-900">{row[0]}</div><div className="mt-2 text-3xl font-black">{row[1]}</div></div>)}</div></Surface>;
   }
 
   if (type === "number_y4_algorithm") {

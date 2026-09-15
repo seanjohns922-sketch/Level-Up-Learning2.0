@@ -13,6 +13,7 @@ type ScoredQuestion = Parameters<typeof isAssessmentAnswerCorrect>[0];
 export type FiveFormReviewItem = {
   id: string;
   prompt: string;
+  readAloudText?: string;
   correctAnswer: string;
   skillLabel?: string;
   primaryDescriptorCode?: string;
@@ -98,7 +99,7 @@ export default function FiveFormAssessmentReview<Form extends string>({
         totalQuestions={questions.length}
         subtitle={subtitle}
         questionPrompt={question.prompt}
-        promptAction={<ReadAloudBtn text={question.prompt} />}
+        promptAction={<ReadAloudBtn text={question.readAloudText ?? question.prompt} />}
         questionContent={<>
           <AssessmentQuestionCard key={question.id} question={question as unknown as CardQuestion} value={value} onChange={(answer) => setAnswers((previous) => ({ ...previous, [question.id]: answer }))} realmId={realmId} />
           <details className="mt-5 rounded-lg border border-teal-700 p-4 text-teal-50">
