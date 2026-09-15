@@ -1,4 +1,4 @@
-import { PREP_NUMBER_CANDIDATE_VERSION, type PrepNumberCandidate, type PrepNumberResponse, type PrepNumberSubmission } from "./types";
+import { type PrepNumberCandidate, type PrepNumberResponse, type PrepNumberSubmission } from "./types";
 
 export const PREP_NUMBER_SCORER_VERSION = "prep-number-evidence-1";
 const whole = (v: unknown): v is number => typeof v === "number" && Number.isSafeInteger(v);
@@ -44,6 +44,7 @@ export function scorePrepNumberResponse(item: PrepNumberCandidate, r: PrepNumber
     }
     case "build": { const counts = allocation(r,t.supply,1,true); return counts !== null && counts[0]===t.target; }
     case "conserve": return equal(r.values,[t.count]) && r.reason==="Nothing was added or taken away.";
+    case "supply_shortfall": return equal(r.values,[t.recipients-t.available]);
     case "provide": { const counts = allocation(r,t.supply,t.recipients,true); return counts !== null && counts.every(n=>n===1); }
   }
 }
@@ -63,7 +64,7 @@ export function scorePrepNumberSubmission(item: PrepNumberCandidate, submission:
 export function parsePrepNumberSubmission(item: PrepNumberCandidate, value: string | null): PrepNumberSubmission | null {
   try {
     const parsed = JSON.parse(value ?? "null");
-    return parsed && parsed.itemId===item.id && parsed.version===PREP_NUMBER_CANDIDATE_VERSION && parsed.response && typeof parsed.response==="object" && !Array.isArray(parsed.response) ? parsed : null;
+    return parsed && parsed.itemId===item.id && parsed.version===item.version && parsed.response && typeof parsed.response==="object" && !Array.isArray(parsed.response) ? parsed : null;
   } catch { return null; }
 }
 

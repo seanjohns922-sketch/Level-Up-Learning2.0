@@ -104,12 +104,13 @@ function measuredLevelForProbe(level: number, percent: number): number {
     const fractionBelow = (DIAGNOSTIC_FLOOR - percent) / DIAGNOSTIC_FLOOR;
     measured = Math.max(0, level - 1 - Math.min(0.9, fractionBelow));
   }
-  return Math.round(measured * 100) / 100;
+  return Math.round(Math.max(0, measured) * 100) / 100;
 }
 
 export function decideDiagnosticPlacement(
   currentLevel: string,
   probes: readonly DiagnosticProbeScore[],
+  minimumLevel = 1,
 ): DiagnosticPlacementDecision {
   if (probes.length === 0) throw new Error("At least one diagnostic probe is required.");
   const current = diagnosticLevelNumber(currentLevel);
@@ -132,7 +133,7 @@ export function decideDiagnosticPlacement(
       placementChanged: false,
       flag: "review_support",
       shouldProbeNext: false,
-      shouldProbeLower: last.percent <= DIAGNOSTIC_DOWNWARD_PROBE && lastLevel > 1,
+      shouldProbeLower: last.percent <= DIAGNOSTIC_DOWNWARD_PROBE && lastLevel > minimumLevel,
     };
   }
 

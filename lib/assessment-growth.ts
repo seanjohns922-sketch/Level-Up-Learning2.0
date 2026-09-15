@@ -10,6 +10,7 @@ export function hasComparableAssessmentGrowth(realmId: string, year: string) {
 function comparisonGroup(realmId: string, year: string, questions: readonly { id: string }[]): string | null {
   const usesVersion = (version: number) => questions.some(q => q.id.endsWith(`-v${version}`));
   if (realmId === "space") return STARPATH_COMPARISON_GROUP + (usesVersion(5) ? "-v5" : "");
+  if (realmId === "number" && year === "Prep" && questions.length===20 && questions.every(q=>/^y0-number-(pre|post)-\d{2}-v3$/.test(q.id))) return "ground-number-2026-09-15-v3";
   if (isGroundBaseline(realmId, year)) return `ground-${realmId}-2026-09-14${realmId === "measurement" && usesVersion(3) ? "-v3" : ""}`;
   if (realmId === "number" && year === "Year 1" && questions.length === 20 && questions.every(q => /^y1-number-(pre|post)-\d{2}-v3$/.test(q.id))) return "paired-number-Year 1-2026-09-15-v3";
   if (realmId === "number" && year === "Year 1" && questions.length === 20 && questions.every(q => /^y1-number-(pre|post)-\d{2}-v5$/.test(q.id))) return "paired-number-Year 1-2026-09-15-v5";

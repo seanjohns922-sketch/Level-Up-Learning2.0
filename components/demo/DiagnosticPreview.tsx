@@ -43,11 +43,11 @@ const PREVIEW_STRANDS = DIAGNOSTIC_STRANDS.filter((definition) => definition.ava
 type PreviewCheckpoint = (typeof CHECKPOINTS)[number]["id"];
 
 function minimumLevel(strand: AcStrand) {
-  return strand === "algebra" || strand === "probability" ? 3 : 1;
+  return strand === "number" ? 0 : strand === "algebra" || strand === "probability" ? 3 : 1;
 }
 
 function levelsFor(strand: AcStrand) {
-  return Array.from({ length: 7 - minimumLevel(strand) }, (_, offset) => `Year ${minimumLevel(strand) + offset}`);
+  return Array.from({ length: 7 - minimumLevel(strand) }, (_, offset) => diagnosticLevelLabel(minimumLevel(strand) + offset));
 }
 
 function parseStrand(value: string | null): AcStrand {
@@ -151,7 +151,7 @@ export default function DiagnosticPreview() {
 
 function PreviewSession({ strand, level, checkpoint }: { strand: AcStrand; level: string; checkpoint: PreviewCheckpoint }) {
   const questions = useMemo(
-    () => getDiagnosticQuestions(strand, level, PREVIEW_SITTING_ID, checkpoint, 5),
+    () => getDiagnosticQuestions(strand, level, PREVIEW_SITTING_ID, checkpoint, 5,3),
     [checkpoint, level, strand],
   );
   const [index, setIndex] = useState(0);
@@ -225,7 +225,7 @@ function PreviewSession({ strand, level, checkpoint }: { strand: AcStrand; level
       percent,
       curriculumCodes: Array.from(new Set(questions.flatMap((item) => item.curriculumCodes))),
       questionIds: questions.map(({ question }) => question.id),
-    }]);
+    }],minimumLevel(strand));
     const levelNumber = diagnosticLevelNumber(level);
     if (decision.shouldProbeNext) {
       outcome = `Follow-up test at ${diagnosticLevelLabel(levelNumber + 1)}, after the other realms`;

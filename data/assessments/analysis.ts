@@ -1,3 +1,5 @@
+import { groundNumberReleaseItem } from "./releases/groundNumber";
+import { parsePrepNumberSubmission, scorePrepNumberSubmission } from "./candidates/prep-number/scoring";
 import { decodeAssessmentResponse } from "@/lib/assessment-response";
 import { decodeStarpathResponse } from "@/lib/starpath-assessment-response";
 export type AssessmentQuestionMetadata = {
@@ -133,6 +135,10 @@ export function isAssessmentAnswerCorrect(
   question: GenericAssessmentQuestion,
   chosen: string | undefined
 ): boolean {
+  if (question.type === "prepNumberTask") {
+    const item=groundNumberReleaseItem(question);
+    return item !== null && scorePrepNumberSubmission(item,parsePrepNumberSubmission(item,chosen ?? null)).score===1;
+  }
   const response = decodeAssessmentResponse(chosen);
   if (response) return question.type?.endsWith("Task") === true && response.questionId === question.id && response.correct;
   const evidence = decodeStarpathResponse(chosen);

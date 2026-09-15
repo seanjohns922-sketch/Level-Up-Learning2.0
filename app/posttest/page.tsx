@@ -1,4 +1,6 @@
 "use client";
+import { groundNumberHasAnswer } from "@/lib/ground-number-answer";
+import { groundNumberPostVersion } from "@/lib/ground-number-assessment-version";
 
 import { year1NumberPostVersion } from "@/lib/year1-number-assessment-version";
 import { assessmentEvidenceMetadata } from "@/lib/assessment-growth";
@@ -362,6 +364,7 @@ function PostTestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
+  const [groundNumberVersion,setGroundNumberVersion]=useState<1|3>(3);
   const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(2);
   const questions = useMemo<Question[]>(
     () => candidateReviewEnabled
@@ -370,8 +373,8 @@ function PostTestPage() {
         : starpathLevel1CandidateRequested
           ? [...LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
-      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version)?.questions ?? [],
-    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version],
+      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion)?.questions ?? [],
+    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion],
   );
 
   const [idx, setIdx] = useState(0);
@@ -406,6 +409,7 @@ function PostTestPage() {
   useEffect(() => {
     if (isDemoPreviewMode()) {
       setNumberLevel1Version(5);
+      setGroundNumberVersion(3);
       setRestoreState("ready");
       setCanonicalProgress(readProgress(localProgressRealmId));
       return;
@@ -424,6 +428,14 @@ function PostTestPage() {
           setRestoreError("Your saved program could not be found. Ask your teacher to check your placement.");
           setRestoreState("error");
           return;
+        }
+        if (progressRealmId === "number" && year === "Prep") {
+          let draftIds: string[] | undefined;
+          try {
+            const draft=JSON.parse(localStorage.getItem(getPosttestDraftKey(progressRealmId,year))??"null");
+            draftIds=draft?.questionIds??(draft?.answers?Object.keys(draft.answers):undefined);
+          } catch { /* Keep baseline version when a draft cannot be read. */ }
+          setGroundNumberVersion(groundNumberPostVersion(restored.rows.flatMap(row=>row.assessment_attempts??[]),draftIds));
         }
         if (progressRealmId === "number" && year === "Year 1") {
           let draftIds: string[] | undefined;
@@ -716,7 +728,7 @@ function PostTestPage() {
 
   const isInteractiveTask =
     (q?.type === "measurelandsTask" || q?.type === "starpathTask" || q?.type === "statisticaTask" || q?.type === "patternPeaksTask" || q?.type === "chanceHollowTask") && Boolean(q.practiceTask);
-  const hasAnswer =
+  const hasAnswer = q?.type === "prepNumberTask" ? groundNumberHasAnswer(q,picked) :
     q?.type === "mab" ? mabHasSelection : q?.type === "numeric" ? picked.trim().length > 0 : !!picked;
 
   let questionContent: React.ReactNode;
@@ -871,7 +883,7 @@ function PostTestPage() {
           lightSurface={isInteractiveTask}
           answeredFlags={questions.map((qq) => {
             const a = answers[qq.id];
-            return a !== undefined && a !== "";
+            return qq.type === "prepNumberTask" ? groundNumberHasAnswer(qq,a) : a !== undefined && a !== "";
           })}
           onJump={(i) => {
             setMab({ tens: 0, ones: 0 });

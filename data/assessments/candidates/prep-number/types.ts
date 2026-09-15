@@ -1,6 +1,6 @@
 import type { DesignedForm, SkillSlot } from "../../design/assessmentContract";
 
-export const PREP_NUMBER_CANDIDATE_VERSION = "prep-number-2026-09-15-candidate-1";
+export const PREP_NUMBER_CANDIDATE_VERSION = "prep-number-2026-09-15-candidate-2";
 export type Token = "star" | "crystal" | "robot" | "leaf" | "shell";
 export type PrepNumberTask =
   | { kind: "numerals"; targets: [number, number]; choices: number[][] }
@@ -18,11 +18,12 @@ export type PrepNumberTask =
   | { kind: "group"; total: number; size: number }
   | { kind: "build"; target: number; supply: number }
   | { kind: "conserve"; count: number; layout: number; reasons: string[] }
+  | { kind: "supply_shortfall"; recipients: number; available: number }
   | { kind: "provide"; recipients: number; supply: number };
 
 export type PrepNumberCandidate = {
   id: string;
-  version: typeof PREP_NUMBER_CANDIDATE_VERSION;
+  version: string;
   blueprintVersion: string;
   form: DesignedForm;
   slot: SkillSlot;
@@ -46,6 +47,6 @@ export type PrepNumberResponse = {
 };
 export type PrepNumberSubmission = {
   itemId: string;
-  version: typeof PREP_NUMBER_CANDIDATE_VERSION;
+  version: string;
   response: PrepNumberResponse;
 };

@@ -12,14 +12,13 @@ const a = (...counts:number[]): PrepNumberResponse => ({placements:counts.flatMa
 const supply = (used:number,unused:number): PrepNumberResponse => ({placements:[...Array<number>(used).fill(0),...Array<number>(unused).fill(-1)]});
 const symbols = (...values: NonNullable<PrepNumberResponse["symbols"]>): PrepNumberResponse => ({symbols:values});
 const pairs = (aCount:number,bCount:number,choice:number): PrepNumberResponse => ({pairs:Array.from({length:aCount},(_,i)=>i<bCount ? i : -1),choice});
-const give = (recipients:number,unused:number): PrepNumberResponse => ({placements:[...Array.from({length:recipients},(_,i)=>i),...Array<number>(unused).fill(-1)]});
 const reason = (total:number): PrepNumberResponse => ({values:[total],reason:"Nothing was added or taken away."});
 const worked: PrepNumberResponse[][] = [
-  [n(0,17),n(4),n(20),n(7),supply(5,4),a(3,3),symbols("star","robot","star","robot"),n(0,7,13,20),n(5),pairs(8,6,0),a(5,3),a(2,5),{choice:1},a(2,2,2,2),supply(7,5),a(4,4),reason(8),give(5,5),a(4,4),symbols("crystal","robot")],
-  [n(0,18),n(4),n(20),n(8),supply(6,4),a(4,4),symbols("crystal","star","crystal","star"),n(0,6,12,20),n(5),pairs(7,9,1),a(5,4),a(3,5),{choice:0},a(2,2,2,2),supply(8,4),a(3,6),reason(9),give(6,4),a(5,5),symbols("star","robot")],
-  [n(0,19),n(4),n(20),n(9),supply(6,3),a(5,5),symbols("robot","crystal","robot","crystal"),n(0,8,14,20),n(4),pairs(9,7,0),a(4,3),a(4,5),{choice:2},a(2,2,2,2),supply(9,3),a(2,5),reason(7),give(7,3),a(3,3),symbols("crystal","star")],
-  [n(0,16),n(4),n(20),n(7),supply(7,3),a(4,4),symbols("robot","star","robot","star"),n(0,5,11,20),n(4),pairs(6,8,1),a(6,3),a(3,5),{choice:2},a(2,2,2,2),supply(6,6),a(3,5),reason(8),give(6,4),a(4,4),symbols("star","crystal")],
-  [n(0,15),n(4),n(20),n(8),supply(7,4),a(3,3),symbols("star","crystal","star","crystal"),n(0,9,15,20),n(4),pairs(10,8,0),a(4,4),a(2,5),{choice:1},a(2,2,2,2),supply(10,2),a(4,5),reason(9),give(5,5),a(5,5),symbols("robot","crystal")],
+  [n(0,17),n(4),n(20),n(7),supply(5,4),a(3,3),symbols("star","robot","star","robot"),n(0,7,13,20),n(5),pairs(8,6,0),a(5,3),a(2,5),{choice:1},a(2,2,2,2),supply(7,5),a(4,4),reason(8),n(3),a(4,4),symbols("crystal","robot")],
+  [n(0,18),n(4),n(20),n(8),supply(6,4),a(4,4),symbols("crystal","star","crystal","star"),n(0,6,12,20),n(5),pairs(7,9,1),a(5,4),a(3,5),{choice:0},a(2,2,2,2),supply(8,4),a(3,6),reason(9),n(3),a(5,5),symbols("star","robot")],
+  [n(0,19),n(4),n(20),n(9),supply(6,3),a(5,5),symbols("robot","crystal","robot","crystal"),n(0,8,14,20),n(4),pairs(9,7,0),a(4,3),a(4,5),{choice:2},a(2,2,2,2),supply(9,3),a(2,5),reason(7),n(4),a(3,3),symbols("crystal","star")],
+  [n(0,16),n(4),n(20),n(7),supply(7,3),a(4,4),symbols("robot","star","robot","star"),n(0,5,11,20),n(4),pairs(6,8,1),a(6,3),a(3,5),{choice:2},a(2,2,2,2),supply(6,6),a(3,5),reason(8),n(3),a(4,4),symbols("star","crystal")],
+  [n(0,15),n(4),n(20),n(8),supply(7,4),a(3,3),symbols("star","crystal","star","crystal"),n(0,9,15,20),n(4),pairs(10,8,0),a(4,4),a(2,5),{choice:1},a(2,2,2,2),supply(10,2),a(4,5),reason(9),n(4),a(5,5),symbols("robot","crystal")],
 ];
 
 let assertions=0;
@@ -66,6 +65,14 @@ for (const [f,form] of ASSESSMENT_FORMS.entries()) {
     if(item.task.kind==="compare") {
       check(!scorePrepNumberResponse(item,{...correct,choice:1-correct.choice!}),`${label}: wrong comparison rejected`);
       check(!scorePrepNumberResponse(item,{...correct,pairs:correct.pairs!.map(()=>0)}),`${label}: duplicated pairing rejected`);
+    }
+    if(item.task.kind==="supply_shortfall") {
+      const {recipients,available}=item.task;
+      check(recipients>=7 && recipients<=10 && available>=4 && available<=6,`${label}: matched collection sizes`);
+      check(recipients-available>=3 && recipients-available<=4,`${label}: matched shortfall`);
+      check(!scorePrepNumberResponse(item,n(recipients)),`${label}: total needed is not the shortfall`);
+      check(!scorePrepNumberResponse(item,n(available)),`${label}: available amount is not the shortfall`);
+      check(!scorePrepNumberResponse(item,n(recipients+available)),`${label}: adding both sets rejected`);
     }
     if(item.task.kind==="match") check(!scorePrepNumberResponse(item,{choice:(correct.choice!+1)%3}),`${label}: wrong dot card rejected`);
     inventory.push({form,slot:item.slot.id,code:item.slot.descriptor,prompt:item.prompt,task:item.task,token:item.token,workedResponse:correct});

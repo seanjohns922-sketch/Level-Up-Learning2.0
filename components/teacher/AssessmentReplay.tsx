@@ -194,6 +194,7 @@ function SnapshotQuestion({
         <div className="pointer-events-none mt-5 rounded-xl bg-slate-950 p-4" aria-label="Original assessment visual">
           <AssessmentQuestionCard
             question={{
+              id: question.question_id,
               type: question.question_type,
               prompt: question.question_text,
               options: question.options,

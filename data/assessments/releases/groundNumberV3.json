@@ -1,0 +1,3517 @@
+{
+  "pretest": [
+    {
+      "id": "number-0-pretest-01-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-01",
+        "descriptor": "AC9MFN01",
+        "evidence": "Connect spoken zero and a nonzero number name to their numerals.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral cards including zero; neutral spoken prompt."
+        },
+        "invariants": [
+          "Include zero and one matched nonzero target in every form; same range to 20 and choices.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Selected numeral matches the requested number."
+      },
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          17
+        ],
+        "choices": [
+          [
+            2,
+            0,
+            5
+          ],
+          [
+            7,
+            17,
+            19
+          ]
+        ]
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-02-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-02",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise a small quantity without counting each object.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Briefly present a dot collection up to five; accessible viewing/replay policy must be identical across forms."
+        },
+        "invariants": [
+          "Same quantity band and exposure conditions; do not infer subitising from accuracy alone.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct quantity; method evidence remains limited without observation."
+      },
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 0,
+        "quickLook": true
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-03-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-03",
+        "descriptor": "AC9MFN03",
+        "evidence": "Count a collection of 20.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Separate countable objects with no overlapping or hidden members."
+        },
+        "invariants": [
+          "Include 20 in every form; same spacing complexity and object size.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact total; no numeral label supplying the answer."
+      },
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 0,
+        "quickLook": false
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-04-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-04",
+        "descriptor": "AC9MFN04",
+        "evidence": "Combine two visible parts into a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two collections in a part-part-whole layout; whole is blank."
+        },
+        "invariants": [
+          "Same total band and part sizes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact whole quantity."
+      },
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          3,
+          4
+        ]
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-05-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-05",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent adding to a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Show a short add-to scene and movable objects; do not pre-build the final collection."
+        },
+        "invariants": [
+          "Initial collection and added amount remain within ten; same action structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Submitted model represents both groups and the correct resulting quantity."
+      },
+      "prompt": "3 robots are here. Add 2 more robots to the tray.",
+      "task": {
+        "kind": "add",
+        "start": 3,
+        "change": 2,
+        "supply": 6
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-06-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-06",
+        "descriptor": "AC9MFN06",
+        "evidence": "Share a small collection equally.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and equally sized recipient areas."
+        },
+        "invariants": [
+          "Same number of recipients and divisibility; no remainder.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All objects allocated equally with none lost or duplicated."
+      },
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 6,
+        "recipients": 2
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-07-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-07",
+        "descriptor": "AC9MFA01",
+        "evidence": "Copy a repeating pattern.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Show the complete repeated unit and a separate blank construction row."
+        },
+        "invariants": [
+          "Same unit length, repetitions and number of attributes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Constructed row repeats the source unit in the correct order."
+      },
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "star",
+          "robot",
+          "star",
+          "robot"
+        ],
+        "palette": [
+          "robot",
+          "crystal",
+          "star"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-08-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-08",
+        "descriptor": "AC9MFN01",
+        "evidence": "Order numerals including zero and 20.",
+        "response": "ordering",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Movable numeral cards; no pre-sorted track revealing order."
+        },
+        "invariants": [
+          "Same number of cards and comparable gaps; include zero and 20 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All cards ordered correctly."
+      },
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          20,
+          7,
+          0,
+          13
+        ]
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-09-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-09",
+        "descriptor": "AC9MFN04",
+        "evidence": "Find a missing part of a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Whole and one part represented with materials; other part blank."
+        },
+        "invariants": [
+          "Same whole/part complexity; do not hide essential data.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact missing part."
+      },
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 8,
+        "part": 3
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-10-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-10",
+        "descriptor": "AC9MFN03",
+        "evidence": "Compare two collections and demonstrate why one has more.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Two collections whose spacing does not make the larger quantity obvious; allow one-to-one pairing."
+        },
+        "invariants": [
+          "Same difference and count range.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct comparison plus valid pairing/count evidence."
+      },
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
+      "task": {
+        "kind": "compare",
+        "a": 8,
+        "b": 6
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-11-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-11",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent taking away from a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Initial collection and an instruction to remove objects."
+        },
+        "invariants": [
+          "Same initial amount band and subtraction structure within ten.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct objects removed and correct remainder retained."
+      },
+      "prompt": "8 robots are here. Move 3 away.",
+      "task": {
+        "kind": "remove",
+        "start": 8,
+        "change": 3
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-12-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-12",
+        "descriptor": "AC9MFN04",
+        "evidence": "Partition a whole into two parts.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "A collection up to ten and two empty part areas."
+        },
+        "invariants": [
+          "Same whole band; neither part is pre-filled.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Both parts conserve the whole; accept every permitted partition."
+      },
+      "prompt": "Put some objects in each tray. Use them all.",
+      "task": {
+        "kind": "partition",
+        "total": 7
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-13-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-13",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise the same small quantity in different arrangements.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two or more dot arrangements up to five with matched dot sizes."
+        },
+        "invariants": [
+          "Same quantity and arrangement complexity; identical exposure conditions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct equivalent collection; do not claim strategy solely from selection."
+      },
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          4,
+          5,
+          3
+        ],
+        "layout": 0
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-14-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-14",
+        "descriptor": "AC9MFN06",
+        "evidence": "Make equal groups from a given collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and a grouping area; specify group size rather than recipient count."
+        },
+        "invariants": [
+          "Same total, group-size band and no-remainder structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct number of complete equal groups; conserve all objects."
+      },
+      "prompt": "Put 2 objects in each group. Use them all.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-15-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-15",
+        "descriptor": "AC9MFN01",
+        "evidence": "Represent a requested number with materials.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral/neutral spoken number and a supply of countable objects."
+        },
+        "invariants": [
+          "Same nonzero target range and object controls.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact requested nonzero collection; zero is assessed consistently in slot 1."
+      },
+      "prompt": "Put 7 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 7,
+        "supply": 12
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-16-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-16",
+        "descriptor": "AC9MFN04",
+        "evidence": "Create a second partition without changing the whole.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show one partition and offer a blank two-part model."
+        },
+        "invariants": [
+          "Same total and definition of a different partition.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Valid distinct partition conserving the original whole."
+      },
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 8,
+        "previous": [
+          3,
+          5
+        ]
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-17-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-17",
+        "descriptor": "AC9MFN03",
+        "evidence": "Recognise quantity is unchanged after rearrangement.",
+        "response": "number-and-reason",
+        "cognitiveDemand": "reasoning",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show a collection before and after spreading the same objects apart."
+        },
+        "invariants": [
+          "Same count band; no objects added or removed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct total and a conservation-based reason; neutrally read reason choices."
+      },
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 8,
+        "layout": 0,
+        "reasons": [
+          "Nothing was added or taken away.",
+          "More space means more objects.",
+          "They are smaller now."
+        ]
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-18-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-18",
+        "descriptor": "AC9MFN05",
+        "evidence": "Determine how many more items are needed to give everyone one.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Two separate visible collections: robots needing one star each and the stars already available. Do not pair the collections or reveal the shortfall."
+        },
+        "invariants": [
+          "7–10 recipients, 4–6 available items and a shortfall of 3–4 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct additional quantity, not the total needed or the quantity already available."
+      },
+      "prompt": "Each robot needs one star. How many more stars are needed?",
+      "task": {
+        "kind": "supply_shortfall",
+        "recipients": 7,
+        "available": 4
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-19-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-19",
+        "descriptor": "AC9MFN06",
+        "evidence": "Repair an unequal sharing arrangement.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show unequal recipient groups with a fixed total."
+        },
+        "invariants": [
+          "Same recipient count and number of moves needed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Final sharing is equal and conserves the total; no feedback before submission."
+      },
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 8,
+        "recipients": 2,
+        "initial": [
+          5,
+          3
+        ]
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-pretest-20-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "pretest",
+      "slot": {
+        "id": "number-0-20",
+        "descriptor": "AC9MFA01",
+        "evidence": "Continue a repeating pattern by its unit.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Visible repetitions followed by empty spaces and an unsorted palette."
+        },
+        "invariants": [
+          "Same unit length and number of missing positions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct continuation; no advance highlighting of the next symbol."
+      },
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "crystal",
+          "robot",
+          "crystal",
+          "robot"
+        ],
+        "palette": [
+          "robot",
+          "star",
+          "crystal"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    }
+  ],
+  "posttest": [
+    {
+      "id": "number-0-posttest-01-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-01",
+        "descriptor": "AC9MFN01",
+        "evidence": "Connect spoken zero and a nonzero number name to their numerals.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral cards including zero; neutral spoken prompt."
+        },
+        "invariants": [
+          "Include zero and one matched nonzero target in every form; same range to 20 and choices.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Selected numeral matches the requested number."
+      },
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          18
+        ],
+        "choices": [
+          [
+            0,
+            3,
+            6
+          ],
+          [
+            18,
+            8,
+            16
+          ]
+        ]
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-02-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-02",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise a small quantity without counting each object.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Briefly present a dot collection up to five; accessible viewing/replay policy must be identical across forms."
+        },
+        "invariants": [
+          "Same quantity band and exposure conditions; do not infer subitising from accuracy alone.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct quantity; method evidence remains limited without observation."
+      },
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 1,
+        "quickLook": true
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-03-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-03",
+        "descriptor": "AC9MFN03",
+        "evidence": "Count a collection of 20.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Separate countable objects with no overlapping or hidden members."
+        },
+        "invariants": [
+          "Include 20 in every form; same spacing complexity and object size.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact total; no numeral label supplying the answer."
+      },
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 1,
+        "quickLook": false
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-04-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-04",
+        "descriptor": "AC9MFN04",
+        "evidence": "Combine two visible parts into a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two collections in a part-part-whole layout; whole is blank."
+        },
+        "invariants": [
+          "Same total band and part sizes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact whole quantity."
+      },
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          5,
+          3
+        ]
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-05-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-05",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent adding to a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Show a short add-to scene and movable objects; do not pre-build the final collection."
+        },
+        "invariants": [
+          "Initial collection and added amount remain within ten; same action structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Submitted model represents both groups and the correct resulting quantity."
+      },
+      "prompt": "4 stars are here. Add 2 more stars to the tray.",
+      "task": {
+        "kind": "add",
+        "start": 4,
+        "change": 2,
+        "supply": 6
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-06-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-06",
+        "descriptor": "AC9MFN06",
+        "evidence": "Share a small collection equally.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and equally sized recipient areas."
+        },
+        "invariants": [
+          "Same number of recipients and divisibility; no remainder.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All objects allocated equally with none lost or duplicated."
+      },
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 8,
+        "recipients": 2
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-07-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-07",
+        "descriptor": "AC9MFA01",
+        "evidence": "Copy a repeating pattern.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Show the complete repeated unit and a separate blank construction row."
+        },
+        "invariants": [
+          "Same unit length, repetitions and number of attributes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Constructed row repeats the source unit in the correct order."
+      },
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "crystal",
+          "star",
+          "crystal",
+          "star"
+        ],
+        "palette": [
+          "star",
+          "robot",
+          "crystal"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-08-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-08",
+        "descriptor": "AC9MFN01",
+        "evidence": "Order numerals including zero and 20.",
+        "response": "ordering",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Movable numeral cards; no pre-sorted track revealing order."
+        },
+        "invariants": [
+          "Same number of cards and comparable gaps; include zero and 20 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All cards ordered correctly."
+      },
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          6,
+          20,
+          12,
+          0
+        ]
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-09-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-09",
+        "descriptor": "AC9MFN04",
+        "evidence": "Find a missing part of a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Whole and one part represented with materials; other part blank."
+        },
+        "invariants": [
+          "Same whole/part complexity; do not hide essential data.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact missing part."
+      },
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 9,
+        "part": 4
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-10-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-10",
+        "descriptor": "AC9MFN03",
+        "evidence": "Compare two collections and demonstrate why one has more.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Two collections whose spacing does not make the larger quantity obvious; allow one-to-one pairing."
+        },
+        "invariants": [
+          "Same difference and count range.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct comparison plus valid pairing/count evidence."
+      },
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
+      "task": {
+        "kind": "compare",
+        "a": 7,
+        "b": 9
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-11-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-11",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent taking away from a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Initial collection and an instruction to remove objects."
+        },
+        "invariants": [
+          "Same initial amount band and subtraction structure within ten.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct objects removed and correct remainder retained."
+      },
+      "prompt": "9 stars are here. Move 4 away.",
+      "task": {
+        "kind": "remove",
+        "start": 9,
+        "change": 4
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-12-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-12",
+        "descriptor": "AC9MFN04",
+        "evidence": "Partition a whole into two parts.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "A collection up to ten and two empty part areas."
+        },
+        "invariants": [
+          "Same whole band; neither part is pre-filled.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Both parts conserve the whole; accept every permitted partition."
+      },
+      "prompt": "Put some objects in each tray. Use them all.",
+      "task": {
+        "kind": "partition",
+        "total": 8
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-13-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-13",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise the same small quantity in different arrangements.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two or more dot arrangements up to five with matched dot sizes."
+        },
+        "invariants": [
+          "Same quantity and arrangement complexity; identical exposure conditions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct equivalent collection; do not claim strategy solely from selection."
+      },
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          5,
+          3,
+          4
+        ],
+        "layout": 1
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-14-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-14",
+        "descriptor": "AC9MFN06",
+        "evidence": "Make equal groups from a given collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and a grouping area; specify group size rather than recipient count."
+        },
+        "invariants": [
+          "Same total, group-size band and no-remainder structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct number of complete equal groups; conserve all objects."
+      },
+      "prompt": "Put 2 objects in each group. Use them all.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-15-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-15",
+        "descriptor": "AC9MFN01",
+        "evidence": "Represent a requested number with materials.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral/neutral spoken number and a supply of countable objects."
+        },
+        "invariants": [
+          "Same nonzero target range and object controls.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact requested nonzero collection; zero is assessed consistently in slot 1."
+      },
+      "prompt": "Put 8 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 8,
+        "supply": 12
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-16-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-16",
+        "descriptor": "AC9MFN04",
+        "evidence": "Create a second partition without changing the whole.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show one partition and offer a blank two-part model."
+        },
+        "invariants": [
+          "Same total and definition of a different partition.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Valid distinct partition conserving the original whole."
+      },
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 9,
+        "previous": [
+          4,
+          5
+        ]
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-17-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-17",
+        "descriptor": "AC9MFN03",
+        "evidence": "Recognise quantity is unchanged after rearrangement.",
+        "response": "number-and-reason",
+        "cognitiveDemand": "reasoning",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show a collection before and after spreading the same objects apart."
+        },
+        "invariants": [
+          "Same count band; no objects added or removed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct total and a conservation-based reason; neutrally read reason choices."
+      },
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 9,
+        "layout": 1,
+        "reasons": [
+          "More space means more objects.",
+          "Nothing was added or taken away.",
+          "They are smaller now."
+        ]
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-18-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-18",
+        "descriptor": "AC9MFN05",
+        "evidence": "Determine how many more items are needed to give everyone one.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Two separate visible collections: robots needing one star each and the stars already available. Do not pair the collections or reveal the shortfall."
+        },
+        "invariants": [
+          "7–10 recipients, 4–6 available items and a shortfall of 3–4 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct additional quantity, not the total needed or the quantity already available."
+      },
+      "prompt": "Each robot needs one star. How many more stars are needed?",
+      "task": {
+        "kind": "supply_shortfall",
+        "recipients": 8,
+        "available": 5
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-19-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-19",
+        "descriptor": "AC9MFN06",
+        "evidence": "Repair an unequal sharing arrangement.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show unequal recipient groups with a fixed total."
+        },
+        "invariants": [
+          "Same recipient count and number of moves needed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Final sharing is equal and conserves the total; no feedback before submission."
+      },
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 10,
+        "recipients": 2,
+        "initial": [
+          4,
+          6
+        ]
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-posttest-20-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "posttest",
+      "slot": {
+        "id": "number-0-20",
+        "descriptor": "AC9MFA01",
+        "evidence": "Continue a repeating pattern by its unit.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Visible repetitions followed by empty spaces and an unsorted palette."
+        },
+        "invariants": [
+          "Same unit length and number of missing positions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct continuation; no advance highlighting of the next symbol."
+      },
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "star",
+          "robot",
+          "star",
+          "robot"
+        ],
+        "palette": [
+          "robot",
+          "crystal",
+          "star"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    }
+  ],
+  "diagnostic-start": [
+    {
+      "id": "number-0-diagnostic-start-01-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-01",
+        "descriptor": "AC9MFN01",
+        "evidence": "Connect spoken zero and a nonzero number name to their numerals.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral cards including zero; neutral spoken prompt."
+        },
+        "invariants": [
+          "Include zero and one matched nonzero target in every form; same range to 20 and choices.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Selected numeral matches the requested number."
+      },
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          19
+        ],
+        "choices": [
+          [
+            4,
+            7,
+            0
+          ],
+          [
+            17,
+            9,
+            19
+          ]
+        ]
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-02-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-02",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise a small quantity without counting each object.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Briefly present a dot collection up to five; accessible viewing/replay policy must be identical across forms."
+        },
+        "invariants": [
+          "Same quantity band and exposure conditions; do not infer subitising from accuracy alone.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct quantity; method evidence remains limited without observation."
+      },
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 2,
+        "quickLook": true
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-03-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-03",
+        "descriptor": "AC9MFN03",
+        "evidence": "Count a collection of 20.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Separate countable objects with no overlapping or hidden members."
+        },
+        "invariants": [
+          "Include 20 in every form; same spacing complexity and object size.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact total; no numeral label supplying the answer."
+      },
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 2,
+        "quickLook": false
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-04-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-04",
+        "descriptor": "AC9MFN04",
+        "evidence": "Combine two visible parts into a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two collections in a part-part-whole layout; whole is blank."
+        },
+        "invariants": [
+          "Same total band and part sizes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact whole quantity."
+      },
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          4,
+          5
+        ]
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-05-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-05",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent adding to a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Show a short add-to scene and movable objects; do not pre-build the final collection."
+        },
+        "invariants": [
+          "Initial collection and added amount remain within ten; same action structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Submitted model represents both groups and the correct resulting quantity."
+      },
+      "prompt": "3 crystals are here. Add 3 more crystals to the tray.",
+      "task": {
+        "kind": "add",
+        "start": 3,
+        "change": 3,
+        "supply": 6
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-06-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-06",
+        "descriptor": "AC9MFN06",
+        "evidence": "Share a small collection equally.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and equally sized recipient areas."
+        },
+        "invariants": [
+          "Same number of recipients and divisibility; no remainder.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All objects allocated equally with none lost or duplicated."
+      },
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 10,
+        "recipients": 2
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-07-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-07",
+        "descriptor": "AC9MFA01",
+        "evidence": "Copy a repeating pattern.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Show the complete repeated unit and a separate blank construction row."
+        },
+        "invariants": [
+          "Same unit length, repetitions and number of attributes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Constructed row repeats the source unit in the correct order."
+      },
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "robot",
+          "crystal",
+          "robot",
+          "crystal"
+        ],
+        "palette": [
+          "crystal",
+          "star",
+          "robot"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-08-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-08",
+        "descriptor": "AC9MFN01",
+        "evidence": "Order numerals including zero and 20.",
+        "response": "ordering",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Movable numeral cards; no pre-sorted track revealing order."
+        },
+        "invariants": [
+          "Same number of cards and comparable gaps; include zero and 20 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All cards ordered correctly."
+      },
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          14,
+          0,
+          20,
+          8
+        ]
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-09-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-09",
+        "descriptor": "AC9MFN04",
+        "evidence": "Find a missing part of a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Whole and one part represented with materials; other part blank."
+        },
+        "invariants": [
+          "Same whole/part complexity; do not hide essential data.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact missing part."
+      },
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 7,
+        "part": 3
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-10-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-10",
+        "descriptor": "AC9MFN03",
+        "evidence": "Compare two collections and demonstrate why one has more.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Two collections whose spacing does not make the larger quantity obvious; allow one-to-one pairing."
+        },
+        "invariants": [
+          "Same difference and count range.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct comparison plus valid pairing/count evidence."
+      },
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
+      "task": {
+        "kind": "compare",
+        "a": 9,
+        "b": 7
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-11-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-11",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent taking away from a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Initial collection and an instruction to remove objects."
+        },
+        "invariants": [
+          "Same initial amount band and subtraction structure within ten.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct objects removed and correct remainder retained."
+      },
+      "prompt": "7 crystals are here. Move 3 away.",
+      "task": {
+        "kind": "remove",
+        "start": 7,
+        "change": 3
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-12-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-12",
+        "descriptor": "AC9MFN04",
+        "evidence": "Partition a whole into two parts.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "A collection up to ten and two empty part areas."
+        },
+        "invariants": [
+          "Same whole band; neither part is pre-filled.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Both parts conserve the whole; accept every permitted partition."
+      },
+      "prompt": "Put some objects in each tray. Use them all.",
+      "task": {
+        "kind": "partition",
+        "total": 9
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-13-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-13",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise the same small quantity in different arrangements.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two or more dot arrangements up to five with matched dot sizes."
+        },
+        "invariants": [
+          "Same quantity and arrangement complexity; identical exposure conditions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct equivalent collection; do not claim strategy solely from selection."
+      },
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          3,
+          4,
+          5
+        ],
+        "layout": 2
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-14-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-14",
+        "descriptor": "AC9MFN06",
+        "evidence": "Make equal groups from a given collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and a grouping area; specify group size rather than recipient count."
+        },
+        "invariants": [
+          "Same total, group-size band and no-remainder structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct number of complete equal groups; conserve all objects."
+      },
+      "prompt": "Put 2 objects in each group. Use them all.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-15-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-15",
+        "descriptor": "AC9MFN01",
+        "evidence": "Represent a requested number with materials.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral/neutral spoken number and a supply of countable objects."
+        },
+        "invariants": [
+          "Same nonzero target range and object controls.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact requested nonzero collection; zero is assessed consistently in slot 1."
+      },
+      "prompt": "Put 9 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 9,
+        "supply": 12
+      },
+      "token": "crystal",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-16-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-16",
+        "descriptor": "AC9MFN04",
+        "evidence": "Create a second partition without changing the whole.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show one partition and offer a blank two-part model."
+        },
+        "invariants": [
+          "Same total and definition of a different partition.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Valid distinct partition conserving the original whole."
+      },
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 7,
+        "previous": [
+          3,
+          4
+        ]
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-17-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-17",
+        "descriptor": "AC9MFN03",
+        "evidence": "Recognise quantity is unchanged after rearrangement.",
+        "response": "number-and-reason",
+        "cognitiveDemand": "reasoning",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show a collection before and after spreading the same objects apart."
+        },
+        "invariants": [
+          "Same count band; no objects added or removed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct total and a conservation-based reason; neutrally read reason choices."
+      },
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 7,
+        "layout": 2,
+        "reasons": [
+          "They are smaller now.",
+          "More space means more objects.",
+          "Nothing was added or taken away."
+        ]
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-18-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-18",
+        "descriptor": "AC9MFN05",
+        "evidence": "Determine how many more items are needed to give everyone one.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Two separate visible collections: robots needing one star each and the stars already available. Do not pair the collections or reveal the shortfall."
+        },
+        "invariants": [
+          "7–10 recipients, 4–6 available items and a shortfall of 3–4 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct additional quantity, not the total needed or the quantity already available."
+      },
+      "prompt": "Each robot needs one star. How many more stars are needed?",
+      "task": {
+        "kind": "supply_shortfall",
+        "recipients": 9,
+        "available": 5
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-19-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-19",
+        "descriptor": "AC9MFN06",
+        "evidence": "Repair an unequal sharing arrangement.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show unequal recipient groups with a fixed total."
+        },
+        "invariants": [
+          "Same recipient count and number of moves needed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Final sharing is equal and conserves the total; no feedback before submission."
+      },
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 6,
+        "recipients": 2,
+        "initial": [
+          4,
+          2
+        ]
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-start-20-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-start",
+      "slot": {
+        "id": "number-0-20",
+        "descriptor": "AC9MFA01",
+        "evidence": "Continue a repeating pattern by its unit.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Visible repetitions followed by empty spaces and an unsorted palette."
+        },
+        "invariants": [
+          "Same unit length and number of missing positions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct continuation; no advance highlighting of the next symbol."
+      },
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "crystal",
+          "star",
+          "crystal",
+          "star"
+        ],
+        "palette": [
+          "star",
+          "robot",
+          "crystal"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    }
+  ],
+  "diagnostic-mid": [
+    {
+      "id": "number-0-diagnostic-mid-01-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-01",
+        "descriptor": "AC9MFN01",
+        "evidence": "Connect spoken zero and a nonzero number name to their numerals.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral cards including zero; neutral spoken prompt."
+        },
+        "invariants": [
+          "Include zero and one matched nonzero target in every form; same range to 20 and choices.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Selected numeral matches the requested number."
+      },
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          16
+        ],
+        "choices": [
+          [
+            1,
+            0,
+            8
+          ],
+          [
+            6,
+            16,
+            18
+          ]
+        ]
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-02-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-02",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise a small quantity without counting each object.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Briefly present a dot collection up to five; accessible viewing/replay policy must be identical across forms."
+        },
+        "invariants": [
+          "Same quantity band and exposure conditions; do not infer subitising from accuracy alone.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct quantity; method evidence remains limited without observation."
+      },
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 3,
+        "quickLook": true
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-03-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-03",
+        "descriptor": "AC9MFN03",
+        "evidence": "Count a collection of 20.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Separate countable objects with no overlapping or hidden members."
+        },
+        "invariants": [
+          "Include 20 in every form; same spacing complexity and object size.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact total; no numeral label supplying the answer."
+      },
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 3,
+        "quickLook": false
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-04-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-04",
+        "descriptor": "AC9MFN04",
+        "evidence": "Combine two visible parts into a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two collections in a part-part-whole layout; whole is blank."
+        },
+        "invariants": [
+          "Same total band and part sizes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact whole quantity."
+      },
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          4,
+          3
+        ]
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-05-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-05",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent adding to a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Show a short add-to scene and movable objects; do not pre-build the final collection."
+        },
+        "invariants": [
+          "Initial collection and added amount remain within ten; same action structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Submitted model represents both groups and the correct resulting quantity."
+      },
+      "prompt": "4 robots are here. Add 3 more robots to the tray.",
+      "task": {
+        "kind": "add",
+        "start": 4,
+        "change": 3,
+        "supply": 6
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-06-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-06",
+        "descriptor": "AC9MFN06",
+        "evidence": "Share a small collection equally.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and equally sized recipient areas."
+        },
+        "invariants": [
+          "Same number of recipients and divisibility; no remainder.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All objects allocated equally with none lost or duplicated."
+      },
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 8,
+        "recipients": 2
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-07-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-07",
+        "descriptor": "AC9MFA01",
+        "evidence": "Copy a repeating pattern.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Show the complete repeated unit and a separate blank construction row."
+        },
+        "invariants": [
+          "Same unit length, repetitions and number of attributes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Constructed row repeats the source unit in the correct order."
+      },
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "robot",
+          "star",
+          "robot",
+          "star"
+        ],
+        "palette": [
+          "star",
+          "crystal",
+          "robot"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-08-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-08",
+        "descriptor": "AC9MFN01",
+        "evidence": "Order numerals including zero and 20.",
+        "response": "ordering",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Movable numeral cards; no pre-sorted track revealing order."
+        },
+        "invariants": [
+          "Same number of cards and comparable gaps; include zero and 20 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All cards ordered correctly."
+      },
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          20,
+          11,
+          5,
+          0
+        ]
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-09-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-09",
+        "descriptor": "AC9MFN04",
+        "evidence": "Find a missing part of a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Whole and one part represented with materials; other part blank."
+        },
+        "invariants": [
+          "Same whole/part complexity; do not hide essential data.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact missing part."
+      },
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 8,
+        "part": 4
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-10-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-10",
+        "descriptor": "AC9MFN03",
+        "evidence": "Compare two collections and demonstrate why one has more.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Two collections whose spacing does not make the larger quantity obvious; allow one-to-one pairing."
+        },
+        "invariants": [
+          "Same difference and count range.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct comparison plus valid pairing/count evidence."
+      },
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
+      "task": {
+        "kind": "compare",
+        "a": 6,
+        "b": 8
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-11-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-11",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent taking away from a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Initial collection and an instruction to remove objects."
+        },
+        "invariants": [
+          "Same initial amount band and subtraction structure within ten.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct objects removed and correct remainder retained."
+      },
+      "prompt": "9 robots are here. Move 3 away.",
+      "task": {
+        "kind": "remove",
+        "start": 9,
+        "change": 3
+      },
+      "token": "robot",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-12-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-12",
+        "descriptor": "AC9MFN04",
+        "evidence": "Partition a whole into two parts.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "A collection up to ten and two empty part areas."
+        },
+        "invariants": [
+          "Same whole band; neither part is pre-filled.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Both parts conserve the whole; accept every permitted partition."
+      },
+      "prompt": "Put some objects in each tray. Use them all.",
+      "task": {
+        "kind": "partition",
+        "total": 8
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-13-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-13",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise the same small quantity in different arrangements.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two or more dot arrangements up to five with matched dot sizes."
+        },
+        "invariants": [
+          "Same quantity and arrangement complexity; identical exposure conditions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct equivalent collection; do not claim strategy solely from selection."
+      },
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          4,
+          3,
+          5
+        ],
+        "layout": 3
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-14-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-14",
+        "descriptor": "AC9MFN06",
+        "evidence": "Make equal groups from a given collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and a grouping area; specify group size rather than recipient count."
+        },
+        "invariants": [
+          "Same total, group-size band and no-remainder structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct number of complete equal groups; conserve all objects."
+      },
+      "prompt": "Put 2 objects in each group. Use them all.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-15-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-15",
+        "descriptor": "AC9MFN01",
+        "evidence": "Represent a requested number with materials.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral/neutral spoken number and a supply of countable objects."
+        },
+        "invariants": [
+          "Same nonzero target range and object controls.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact requested nonzero collection; zero is assessed consistently in slot 1."
+      },
+      "prompt": "Put 6 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 6,
+        "supply": 12
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-16-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-16",
+        "descriptor": "AC9MFN04",
+        "evidence": "Create a second partition without changing the whole.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show one partition and offer a blank two-part model."
+        },
+        "invariants": [
+          "Same total and definition of a different partition.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Valid distinct partition conserving the original whole."
+      },
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 8,
+        "previous": [
+          2,
+          6
+        ]
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-17-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-17",
+        "descriptor": "AC9MFN03",
+        "evidence": "Recognise quantity is unchanged after rearrangement.",
+        "response": "number-and-reason",
+        "cognitiveDemand": "reasoning",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show a collection before and after spreading the same objects apart."
+        },
+        "invariants": [
+          "Same count band; no objects added or removed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct total and a conservation-based reason; neutrally read reason choices."
+      },
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 8,
+        "layout": 3,
+        "reasons": [
+          "They are smaller now.",
+          "Nothing was added or taken away.",
+          "More space means more objects."
+        ]
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-18-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-18",
+        "descriptor": "AC9MFN05",
+        "evidence": "Determine how many more items are needed to give everyone one.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Two separate visible collections: robots needing one star each and the stars already available. Do not pair the collections or reveal the shortfall."
+        },
+        "invariants": [
+          "7–10 recipients, 4–6 available items and a shortfall of 3–4 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct additional quantity, not the total needed or the quantity already available."
+      },
+      "prompt": "Each robot needs one star. How many more stars are needed?",
+      "task": {
+        "kind": "supply_shortfall",
+        "recipients": 9,
+        "available": 6
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-19-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-19",
+        "descriptor": "AC9MFN06",
+        "evidence": "Repair an unequal sharing arrangement.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show unequal recipient groups with a fixed total."
+        },
+        "invariants": [
+          "Same recipient count and number of moves needed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Final sharing is equal and conserves the total; no feedback before submission."
+      },
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 8,
+        "recipients": 2,
+        "initial": [
+          3,
+          5
+        ]
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-mid-20-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-mid",
+      "slot": {
+        "id": "number-0-20",
+        "descriptor": "AC9MFA01",
+        "evidence": "Continue a repeating pattern by its unit.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Visible repetitions followed by empty spaces and an unsorted palette."
+        },
+        "invariants": [
+          "Same unit length and number of missing positions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct continuation; no advance highlighting of the next symbol."
+      },
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "star",
+          "crystal",
+          "star",
+          "crystal"
+        ],
+        "palette": [
+          "crystal",
+          "robot",
+          "star"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    }
+  ],
+  "diagnostic-end": [
+    {
+      "id": "number-0-diagnostic-end-01-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-01",
+        "descriptor": "AC9MFN01",
+        "evidence": "Connect spoken zero and a nonzero number name to their numerals.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral cards including zero; neutral spoken prompt."
+        },
+        "invariants": [
+          "Include zero and one matched nonzero target in every form; same range to 20 and choices.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Selected numeral matches the requested number."
+      },
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          15
+        ],
+        "choices": [
+          [
+            0,
+            9,
+            2
+          ],
+          [
+            17,
+            5,
+            15
+          ]
+        ]
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-02-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-02",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise a small quantity without counting each object.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Briefly present a dot collection up to five; accessible viewing/replay policy must be identical across forms."
+        },
+        "invariants": [
+          "Same quantity band and exposure conditions; do not infer subitising from accuracy alone.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct quantity; method evidence remains limited without observation."
+      },
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 4,
+        "quickLook": true
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-03-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-03",
+        "descriptor": "AC9MFN03",
+        "evidence": "Count a collection of 20.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Separate countable objects with no overlapping or hidden members."
+        },
+        "invariants": [
+          "Include 20 in every form; same spacing complexity and object size.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact total; no numeral label supplying the answer."
+      },
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 4,
+        "quickLook": false
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-04-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-04",
+        "descriptor": "AC9MFN04",
+        "evidence": "Combine two visible parts into a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two collections in a part-part-whole layout; whole is blank."
+        },
+        "invariants": [
+          "Same total band and part sizes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact whole quantity."
+      },
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          3,
+          5
+        ]
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-05-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-05",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent adding to a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Show a short add-to scene and movable objects; do not pre-build the final collection."
+        },
+        "invariants": [
+          "Initial collection and added amount remain within ten; same action structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Submitted model represents both groups and the correct resulting quantity."
+      },
+      "prompt": "5 stars are here. Add 2 more stars to the tray.",
+      "task": {
+        "kind": "add",
+        "start": 5,
+        "change": 2,
+        "supply": 6
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-06-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-06",
+        "descriptor": "AC9MFN06",
+        "evidence": "Share a small collection equally.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and equally sized recipient areas."
+        },
+        "invariants": [
+          "Same number of recipients and divisibility; no remainder.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All objects allocated equally with none lost or duplicated."
+      },
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 6,
+        "recipients": 2
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-07-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-07",
+        "descriptor": "AC9MFA01",
+        "evidence": "Copy a repeating pattern.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Show the complete repeated unit and a separate blank construction row."
+        },
+        "invariants": [
+          "Same unit length, repetitions and number of attributes.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Constructed row repeats the source unit in the correct order."
+      },
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "star",
+          "crystal",
+          "star",
+          "crystal"
+        ],
+        "palette": [
+          "crystal",
+          "robot",
+          "star"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-08-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-08",
+        "descriptor": "AC9MFN01",
+        "evidence": "Order numerals including zero and 20.",
+        "response": "ordering",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Movable numeral cards; no pre-sorted track revealing order."
+        },
+        "invariants": [
+          "Same number of cards and comparable gaps; include zero and 20 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "All cards ordered correctly."
+      },
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          15,
+          0,
+          9,
+          20
+        ]
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-09-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-09",
+        "descriptor": "AC9MFN04",
+        "evidence": "Find a missing part of a whole up to ten.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Whole and one part represented with materials; other part blank."
+        },
+        "invariants": [
+          "Same whole/part complexity; do not hide essential data.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact missing part."
+      },
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 9,
+        "part": 5
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-10-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-10",
+        "descriptor": "AC9MFN03",
+        "evidence": "Compare two collections and demonstrate why one has more.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Two collections whose spacing does not make the larger quantity obvious; allow one-to-one pairing."
+        },
+        "invariants": [
+          "Same difference and count range.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct comparison plus valid pairing/count evidence."
+      },
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
+      "task": {
+        "kind": "compare",
+        "a": 10,
+        "b": 8
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-11-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-11",
+        "descriptor": "AC9MFN05",
+        "evidence": "Represent taking away from a collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Initial collection and an instruction to remove objects."
+        },
+        "invariants": [
+          "Same initial amount band and subtraction structure within ten.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct objects removed and correct remainder retained."
+      },
+      "prompt": "8 stars are here. Move 4 away.",
+      "task": {
+        "kind": "remove",
+        "start": 8,
+        "change": 4
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-12-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-12",
+        "descriptor": "AC9MFN04",
+        "evidence": "Partition a whole into two parts.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "A collection up to ten and two empty part areas."
+        },
+        "invariants": [
+          "Same whole band; neither part is pre-filled.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Both parts conserve the whole; accept every permitted partition."
+      },
+      "prompt": "Put some objects in each tray. Use them all.",
+      "task": {
+        "kind": "partition",
+        "total": 7
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-13-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-13",
+        "descriptor": "AC9MFN02",
+        "evidence": "Recognise the same small quantity in different arrangements.",
+        "response": "selection",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Two or more dot arrangements up to five with matched dot sizes."
+        },
+        "invariants": [
+          "Same quantity and arrangement complexity; identical exposure conditions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct equivalent collection; do not claim strategy solely from selection."
+      },
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          3,
+          5,
+          4
+        ],
+        "layout": 4
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-14-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-14",
+        "descriptor": "AC9MFN06",
+        "evidence": "Make equal groups from a given collection.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Movable objects and a grouping area; specify group size rather than recipient count."
+        },
+        "invariants": [
+          "Same total, group-size band and no-remainder structure.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct number of complete equal groups; conserve all objects."
+      },
+      "prompt": "Put 2 objects in each group. Use them all.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-15-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-15",
+        "descriptor": "AC9MFN01",
+        "evidence": "Represent a requested number with materials.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "accessible",
+        "representation": {
+          "required": true,
+          "specification": "Numeral/neutral spoken number and a supply of countable objects."
+        },
+        "invariants": [
+          "Same nonzero target range and object controls.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Exact requested nonzero collection; zero is assessed consistently in slot 1."
+      },
+      "prompt": "Put 10 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 10,
+        "supply": 12
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-16-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-16",
+        "descriptor": "AC9MFN04",
+        "evidence": "Create a second partition without changing the whole.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show one partition and offer a blank two-part model."
+        },
+        "invariants": [
+          "Same total and definition of a different partition.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Valid distinct partition conserving the original whole."
+      },
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 9,
+        "previous": [
+          3,
+          6
+        ]
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-17-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-17",
+        "descriptor": "AC9MFN03",
+        "evidence": "Recognise quantity is unchanged after rearrangement.",
+        "response": "number-and-reason",
+        "cognitiveDemand": "reasoning",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show a collection before and after spreading the same objects apart."
+        },
+        "invariants": [
+          "Same count band; no objects added or removed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct total and a conservation-based reason; neutrally read reason choices."
+      },
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 9,
+        "layout": 4,
+        "reasons": [
+          "Nothing was added or taken away.",
+          "They are smaller now.",
+          "More space means more objects."
+        ]
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-18-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-18",
+        "descriptor": "AC9MFN05",
+        "evidence": "Determine how many more items are needed to give everyone one.",
+        "response": "number",
+        "cognitiveDemand": "understanding",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Two separate visible collections: robots needing one star each and the stars already available. Do not pair the collections or reveal the shortfall."
+        },
+        "invariants": [
+          "7–10 recipients, 4–6 available items and a shortfall of 3–4 in every form.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct additional quantity, not the total needed or the quantity already available."
+      },
+      "prompt": "Each robot needs one star. How many more stars are needed?",
+      "task": {
+        "kind": "supply_shortfall",
+        "recipients": 10,
+        "available": 6
+      },
+      "token": "star",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-19-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-19",
+        "descriptor": "AC9MFN06",
+        "evidence": "Repair an unequal sharing arrangement.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "challenging",
+        "representation": {
+          "required": true,
+          "specification": "Show unequal recipient groups with a fixed total."
+        },
+        "invariants": [
+          "Same recipient count and number of moves needed.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Final sharing is equal and conserves the total; no feedback before submission."
+      },
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 10,
+        "recipients": 2,
+        "initial": [
+          6,
+          4
+        ]
+      },
+      "token": "shell",
+      "maximumScore": 1,
+      "status": "candidate"
+    },
+    {
+      "id": "number-0-diagnostic-end-20-candidate-2",
+      "version": "prep-number-2026-09-15-candidate-2",
+      "blueprintVersion": "2026-09-15-blueprint-1",
+      "form": "diagnostic-end",
+      "slot": {
+        "id": "number-0-20",
+        "descriptor": "AC9MFA01",
+        "evidence": "Continue a repeating pattern by its unit.",
+        "response": "construction",
+        "cognitiveDemand": "application",
+        "expectedDifficulty": "moderate",
+        "representation": {
+          "required": true,
+          "specification": "Visible repetitions followed by empty spaces and an unsorted palette."
+        },
+        "invariants": [
+          "Same unit length and number of missing positions.",
+          "Same instruction length, interaction, read-aloud access and amount of supplied information across all five forms."
+        ],
+        "scoring": "Correct continuation; no advance highlighting of the next symbol."
+      },
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "robot",
+          "crystal",
+          "robot",
+          "crystal"
+        ],
+        "palette": [
+          "crystal",
+          "star",
+          "robot"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "leaf",
+      "maximumScore": 1,
+      "status": "candidate"
+    }
+  ]
+}

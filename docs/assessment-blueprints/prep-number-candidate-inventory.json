@@ -1,6 +1,6 @@
 {
   "status": "candidate-not-released",
-  "assertions": 1365,
+  "assertions": 1375,
   "items": [
     {
       "form": "pretest",
@@ -406,25 +406,16 @@
       "form": "pretest",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one star. Leave the extra stars in the box.",
+      "prompt": "Each robot needs one star. How many more stars are needed?",
       "task": {
-        "kind": "provide",
-        "recipients": 5,
-        "supply": 10
+        "kind": "supply_shortfall",
+        "recipients": 7,
+        "available": 4
       },
       "token": "star",
       "workedResponse": {
-        "placements": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          -1,
-          -1,
-          -1,
-          -1,
-          -1
+        "values": [
+          3
         ]
       }
     },
@@ -894,25 +885,16 @@
       "form": "posttest",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one star. Leave the extra stars in the box.",
+      "prompt": "Each robot needs one star. How many more stars are needed?",
       "task": {
-        "kind": "provide",
-        "recipients": 6,
-        "supply": 10
+        "kind": "supply_shortfall",
+        "recipients": 8,
+        "available": 5
       },
       "token": "star",
       "workedResponse": {
-        "placements": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          -1,
-          -1,
-          -1,
-          -1
+        "values": [
+          3
         ]
       }
     },
@@ -1384,25 +1366,16 @@
       "form": "diagnostic-start",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one star. Leave the extra stars in the box.",
+      "prompt": "Each robot needs one star. How many more stars are needed?",
       "task": {
-        "kind": "provide",
-        "recipients": 7,
-        "supply": 10
+        "kind": "supply_shortfall",
+        "recipients": 9,
+        "available": 5
       },
       "token": "star",
       "workedResponse": {
-        "placements": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          -1,
-          -1,
-          -1
+        "values": [
+          4
         ]
       }
     },
@@ -1868,25 +1841,16 @@
       "form": "diagnostic-mid",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one star. Leave the extra stars in the box.",
+      "prompt": "Each robot needs one star. How many more stars are needed?",
       "task": {
-        "kind": "provide",
-        "recipients": 6,
-        "supply": 10
+        "kind": "supply_shortfall",
+        "recipients": 9,
+        "available": 6
       },
       "token": "star",
       "workedResponse": {
-        "placements": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          -1,
-          -1,
-          -1,
-          -1
+        "values": [
+          3
         ]
       }
     },
@@ -2356,25 +2320,16 @@
       "form": "diagnostic-end",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one star. Leave the extra stars in the box.",
+      "prompt": "Each robot needs one star. How many more stars are needed?",
       "task": {
-        "kind": "provide",
-        "recipients": 5,
-        "supply": 10
+        "kind": "supply_shortfall",
+        "recipients": 10,
+        "available": 6
       },
       "token": "star",
       "workedResponse": {
-        "placements": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          -1,
-          -1,
-          -1,
-          -1,
-          -1
+        "values": [
+          4
         ]
       }
     },

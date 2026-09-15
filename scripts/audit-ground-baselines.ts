@@ -1,3 +1,4 @@
+// Retained v1 baselines; the current v3 raw-model release is covered by qa:ground-number-release.
 import {GROUND_MEASURELANDS_INDEPENDENT_PRETEST_ITEMS} from "../data/assessments/groundMeasurelandsIndependentPosttest";
 import {getMeasurelandsFormStandard,validateIndependentMeasurelandsForm} from "../data/assessments/measurelandsAssessmentArchitecture";
 import assert from 'node:assert/strict';
@@ -11,9 +12,9 @@ import type {IndependentAssessmentItem} from '../data/assessments/assessmentItem
 import type {NormalizedAssessmentAttempt} from '../lib/realm-progress-compat';
 let count=0;
 for (const realm of ['number','measurement'] as const) {
- const pre=getPretestForYearLabel('Prep',realm),post=getPosttestForYearLabel('Prep',realm)!.questions;
+ const pre=getPretestForYearLabel('Prep',realm,5,1),post=getPosttestForYearLabel('Prep',realm,5,1)!.questions;
  assert.equal(pre.length,20);assert.equal(post.length,20);
- assert.deepEqual(getPretestForYearLabel('Foundation',realm).map(q=>q.id),pre.map(q=>q.id));
+ assert.deepEqual(getPretestForYearLabel('Foundation',realm,5,1).map(q=>q.id),pre.map(q=>q.id));
  assert.equal(new Set([...pre,...post].map(q=>q.id)).size,40);
  for(let i=0;i<20;i++) {
   count++;
@@ -45,7 +46,7 @@ assert.equal(getPretestForYear('Prep').length,20,'Legacy Number resolver uses ca
 assert.equal(resolveStudentDestination({progress:buildDefaultStudentProgress('Prep'),introSeen:true}),'/realms');
 assert.equal(buildDefaultStudentProgress('Prep').placementComplete,false);
 // Derive Number answers independently from the visual models, rather than mirroring stored answers.
-for (const q of getPretestForYearLabel('Prep','number')) {
+for (const q of getPretestForYearLabel('Prep','number',5,1)) {
  const v=q.visual as Record<string,unknown>;
  if(q.type==='numeric') {
   let expected:number|undefined;

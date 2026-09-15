@@ -98,10 +98,10 @@ const rows: Row[] = [
     {kind:"conserve",count:8,layout:3,reasons:["They are smaller now.","Nothing was added or taken away.","More space means more objects."]},
     {kind:"conserve",count:9,layout:4,reasons:["Nothing was added or taken away.","They are smaller now.","More space means more objects."]},
   ] },
-  { prompts: same("Give each robot one star. Leave the extra stars in the box."), tasks: [
-    {kind:"provide",recipients:5,supply:10}, {kind:"provide",recipients:6,supply:10},
-    {kind:"provide",recipients:7,supply:10}, {kind:"provide",recipients:6,supply:10},
-    {kind:"provide",recipients:5,supply:10},
+  { prompts: same("Each robot needs one star. How many more stars are needed?"), tasks: [
+    {kind:"supply_shortfall",recipients:7,available:4}, {kind:"supply_shortfall",recipients:8,available:5},
+    {kind:"supply_shortfall",recipients:9,available:5}, {kind:"supply_shortfall",recipients:9,available:6},
+    {kind:"supply_shortfall",recipients:10,available:6},
   ] },
   { prompts: same("Make the sharing equal. Keep all the objects."), tasks: [
     {kind:"share",total:8,recipients:2,initial:[5,3]}, {kind:"share",total:10,recipients:2,initial:[4,6]},
@@ -124,7 +124,7 @@ const materials: readonly Five<Token>[] = [
 ];
 export const PREP_NUMBER_CANDIDATE_FORMS = Object.fromEntries(ASSESSMENT_FORMS.map((form, f) => [form,
   rows.map((row, i): PrepNumberCandidate => ({
-    id: `number-0-${form}-${String(i+1).padStart(2,"0")}-candidate-1`,
+    id: `number-0-${form}-${String(i+1).padStart(2,"0")}-candidate-2`,
     version: PREP_NUMBER_CANDIDATE_VERSION, blueprintVersion: ASSESSMENT_DESIGN_VERSION,
     form, slot: PREP_NUMBER_SLOTS[i]!, prompt: row.prompts[f], task: row.tasks[f],
     token: i === 17 ? "star" : (i === 4 || i === 10) ? (["robot","star","crystal","robot","star"] as const)[f] : materials[i % 3][f],

@@ -1,4 +1,6 @@
 "use client";
+import { groundNumberHasAnswer } from "@/lib/ground-number-answer";
+import { savedGroundNumberVersion } from "@/lib/ground-number-assessment-version";
 
 import { savedYear1NumberVersion } from "@/lib/year1-number-assessment-version";
 import { assessmentEvidenceMetadata, isGroundBaseline, hasComparableAssessmentGrowth } from "@/lib/assessment-growth";
@@ -399,14 +401,15 @@ function PretestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
+  const [groundNumberVersion,setGroundNumberVersion]=useState<1|3>(3);
   const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(5);
   const questions: Question[] = useMemo(
     () => candidateReviewEnabled
       ? starpathLevel1CandidateRequested
         ? [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
-      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version),
-    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version]
+      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion),
+    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion]
   );
 
   const [index, setIndex] = useState(0);
@@ -494,7 +497,9 @@ function PretestPage() {
     const version = progressRealmId === "number" && year === "Year 1" && !isDemoPreviewMode()
       ? savedYear1NumberVersion(snapshot?.questionIds) ?? 5 : 5;
     setNumberLevel1Version(version);
-    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version);
+    const groundVersion=progressRealmId==="number"&&year==="Prep"&&!isDemoPreviewMode() ? savedGroundNumberVersion(snapshot?.questionIds)??3 : 3;
+    setGroundNumberVersion(groundVersion);
+    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion);
     if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(resumeQuestions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
@@ -518,6 +523,7 @@ function PretestPage() {
 
   function restartAssessment() {
     setNumberLevel1Version(5);
+    setGroundNumberVersion(3);
     clearPretestResume(year, localProgressRealmId);
     setAnswers(Array(questions.length).fill(null));
     setIdkResponses([]);
@@ -793,7 +799,7 @@ function PretestPage() {
 
   const mabTotal = mab.tens * 10 + mab.ones;
   const mabHasSelection = mab.tens > 0 || mab.ones > 0;
-  const isReady =
+  const isReady = question?.type === "prepNumberTask" ? groundNumberHasAnswer(question,selected) :
     question?.type === "mab"
       ? mabHasSelection
       : question?.type === "numeric"
@@ -1008,7 +1014,7 @@ function PretestPage() {
           wideContent={isMeasurelandsTask}
           hidePrompt={isMeasurelandsTask}
           lightSurface={isMeasurelandsTask}
-          answeredFlags={answers.map((a) => a !== null && a !== undefined && a !== "")}
+          answeredFlags={questions.map((q,i) => q.type === "prepNumberTask" ? groundNumberHasAnswer(q,answers[i]) : answers[i] !== null && answers[i] !== undefined && answers[i] !== "")}
           onJump={(i) => setIndex(i)}
           realmId={realmId}
         />

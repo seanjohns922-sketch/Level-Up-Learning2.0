@@ -1,4 +1,6 @@
 "use client";
+import PrepNumberCandidateCard from "./PrepNumberCandidateCard";
+import { groundNumberReleaseItem } from "@/data/assessments/releases/groundNumber";
 import NumberReasoningResponse from "./NumberReasoningResponse";
 
 import InformalMeasurementVisual from "./InformalMeasurementVisual";
@@ -337,6 +339,9 @@ export default function AssessmentQuestionCard({
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
   );
+
+  const groundItem=groundNumberReleaseItem(question);
+  if (groundItem) return <PrepNumberCandidateCard key={question.id} item={groundItem} value={value} onChange={onChange}/>;
 
   const renderedVisual = visual ? (
     <>

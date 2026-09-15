@@ -1,4 +1,5 @@
 "use client";
+import { groundNumberHasAnswer } from "@/lib/ground-number-answer";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -92,11 +93,12 @@ export default function WholeMathsDiagnosticPage() {
   }, [loadPending]);
 
   const linkedQuestions = useMemo(
-    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2) : [],
+    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1) : [],
     [level, pending],
   );
   const current = linkedQuestions[index];
-  const answeredCount = linkedQuestions.filter(({ question }) => answers[question.id] != null).length;
+  const isAnswered=(question:typeof linkedQuestions[number]["question"])=>answers[question.id]===UNKNOWN_ANSWER || (question.type==="prepNumberTask" ? groundNumberHasAnswer(question,answers[question.id]) : answers[question.id]!=null && answers[question.id]!=="");
+  const answeredCount = linkedQuestions.filter(({question})=>isAnswered(question)).length;
 
   async function recordAnswer(value: string) {
     if (!current || !pending || !profile?.studentId) return;
@@ -116,7 +118,7 @@ export default function WholeMathsDiagnosticPage() {
   async function moveToQuestion(nextIndex: number) {
     if (!pending || !profile?.studentId) return;
     const boundedIndex = Math.max(0, Math.min(linkedQuestions.length - 1, nextIndex));
-    const flags = linkedQuestions.map(({ question }) => answers[question.id] != null && answers[question.id] !== "");
+    const flags = linkedQuestions.map(({question})=>isAnswered(question));
     if (saving || !canVisitAssessmentQuestion(boundedIndex, flags, index)) return;
     setIndex(boundedIndex);
     try {
@@ -177,8 +179,8 @@ export default function WholeMathsDiagnosticPage() {
       questionIds: linkedQuestions.map(({ question }) => question.id),
     };
     const nextProbes = [...probes, probe];
-    const decision = decideDiagnosticPlacement(pending.starting_level, nextProbes);
-    const minimumLevel = pending.strand === "algebra" || pending.strand === "probability" ? 3 : 1;
+    const minimumLevel = pending.strand === "number" && pending.number_ground_bank_version===3 ? 0 : pending.strand === "algebra" || pending.strand === "probability" ? 3 : 1;
+    const decision = decideDiagnosticPlacement(pending.starting_level, nextProbes,minimumLevel);
     const nextProbeLevel = decision.shouldProbeNext
       ? diagnosticLevelNumber(level) + 1
       : decision.shouldProbeLower && diagnosticLevelNumber(level) > minimumLevel
@@ -551,7 +553,7 @@ export default function WholeMathsDiagnosticPage() {
             </div>
             <div className="px-5 pb-5 sm:px-6">
               <AssessmentQuestionNavigator
-                answeredFlags={linkedQuestions.map(({ question }) => answers[question.id] != null && answers[question.id] !== "")}
+                answeredFlags={linkedQuestions.map(({question})=>isAnswered(question))}
                 currentIndex={index} onJump={next => void moveToQuestion(next)}
                 realmId={testPresentation.assessmentRealmId} disabled={saving}/>
             </div>
@@ -607,7 +609,7 @@ export default function WholeMathsDiagnosticPage() {
                 {index < linkedQuestions.length - 1 ? (
                   <button
                     type="button"
-                    disabled={currentAnswer == null || saving}
+                    disabled={!isAnswered(current.question) || saving}
                     onClick={() => void moveToQuestion(index + 1)}
                     className={`inline-flex min-h-12 items-center justify-center gap-2 justify-self-end rounded-xl px-6 py-3 font-black text-slate-950 shadow-lg transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-35 ${testPresentation.button}`}
                   >

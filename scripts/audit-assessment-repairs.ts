@@ -28,7 +28,9 @@ for (const realm of ["number", "measurement", "space", "statistics", "pattern", 
     for (const questions of [getPretestForYearLabel(year, realm), getPosttestForYearLabel(year, realm)?.questions ?? []]) {
       assert.equal(questions.length, 20, `${realm} ${year}`);
       for (const q of questions) {
-        assert.equal(isAssessmentAnswerCorrect(q, String(q.correctAnswer)), true, q.id);
+        // Ground model tasks require raw evidence; their rubric is not a valid answer.
+        // qa:ground-number-release independently verifies all 100 worked responses.
+        assert.equal(isAssessmentAnswerCorrect(q, String(q.correctAnswer)), q.type !== "prepNumberTask", q.id);
         assert.equal(isAssessmentAnswerCorrect(q, "__invalid_answer__"), false, q.id);
         for (const code of (q as { curriculumCodes?: string[] }).curriculumCodes ?? []) assert.ok(AUSTRALIAN_CURRICULUM_V9_PAGES[code], `${q.id}: ${code} must exist in the supplied PDF`);
         count++;

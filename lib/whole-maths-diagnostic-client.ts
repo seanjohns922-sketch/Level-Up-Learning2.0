@@ -49,6 +49,7 @@ export type PendingStudentDiagnostic = {
   draft_index: number;
   access_open: boolean;
   number_level1_bank_version?: 2 | 5;
+  number_ground_bank_version?: 1 | 3;
 };
 
 export type LiveMathsProgressionRow = {
@@ -154,9 +155,12 @@ export async function closeDiagnosticSchoolSession(classId: string) {
 }
 
 export async function fetchPendingStudentDiagnostic(studentId: string, includeClosed = false) {
-  let { data, error } = await supabase.rpc("get_pending_whole_math_diagnostic_versioned", {
+  let { data, error } = await supabase.rpc("get_pending_whole_math_diagnostic_released", {
     p_student_id: studentId,
   });
+  if (error && (error.code === "PGRST202" || error.code === "42883")) {
+    ({ data, error } = await supabase.rpc("get_pending_whole_math_diagnostic_versioned", { p_student_id: studentId }));
+  }
   if (error && (error.code === "PGRST202" || error.code === "42883")) {
     ({ data, error } = await supabase.rpc("get_pending_whole_math_diagnostic", { p_student_id: studentId }));
   }

@@ -42,8 +42,8 @@ export default function PrepNumberCandidateCard({item,value,onChange}: {item:Pre
   function update(patch: Partial<PrepNumberResponse>) {
     onChange(JSON.stringify({itemId:item.id,version:item.version,response:{...r,...patch}}));
   }
-  function numeric() {
-    return <label className="flex flex-col items-center gap-2 text-lg font-bold">How many?<input aria-label="Your number" inputMode="numeric" pattern="[0-9]*" value={r.values?.[0] ?? ""} onChange={e=>update({values:/^\d+$/.test(e.target.value) ? [Number(e.target.value)] : []})} className="h-16 w-28 rounded-xl border-2 border-slate-500 bg-white text-center text-3xl text-slate-950 focus:outline-cyan-700" /></label>;
+  function numeric(label = "How many?") {
+    return <label className="flex flex-col items-center gap-2 text-lg font-bold">{label}<input aria-label="Your number" inputMode="numeric" pattern="[0-9]*" value={r.values?.[0] ?? ""} onChange={e=>update({values:/^\d+$/.test(e.target.value) ? [Number(e.target.value)] : []})} className="h-16 w-28 rounded-xl border-2 border-slate-500 bg-white text-center text-3xl text-slate-950 focus:outline-cyan-700" /></label>;
   }
   function allocation() {
     if (!r.placements) return null;
@@ -71,6 +71,14 @@ export default function PrepNumberCandidateCard({item,value,onChange}: {item:Pre
 
   let content: React.ReactNode;
   switch(t.kind) {
+    case "supply_shortfall": {
+      content=<div className="space-y-5">
+        <Panel label="Robots"><Objects count={t.recipients} token="robot"/></Panel>
+        <Panel label="Stars we have"><Objects count={t.available} token="star"/></Panel>
+        {numeric("How many more stars?")}
+      </div>;
+      break;
+    }
     case "add": {
       const placements=r.placements ?? [];
       const noun=item.token==="crystal" ? "crystals" : item.token==="star" ? "stars" : "robots";
