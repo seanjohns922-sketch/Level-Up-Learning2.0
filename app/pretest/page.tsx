@@ -375,8 +375,8 @@ export default function PretestPageWrapper() {
 
 function AssessmentRoute() {
   const params=useSearchParams();
-  return params.get("year")==="Year 7" && (params.get("realm_id")??"number")==="number"
-    ? <NumberExtensionAssessment key="pretest" form="pretest"/> : <PretestPage/>;
+  return ["Year 7","Year 8"].includes(params.get("year")??"") && (params.get("realm_id")??"number")==="number"
+    ? <NumberExtensionAssessment key={`pretest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="pretest"/> : <PretestPage/>;
 }
 
 function PretestPage() {

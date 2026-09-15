@@ -43,7 +43,7 @@ import {
 } from "@/lib/starpath-routes";
 
 type ReviewRealm = "number" | "measurement" | "space" | "statistics" | "pattern" | "chance";
-type YearLabel = "Prep" | `Year ${1 | 2 | 3 | 4 | 5 | 6}`;
+type YearLabel = "Prep" | `Year ${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8}`;
 
 const REALMS: readonly { id: ReviewRealm; label: string; accent: string }[] = [
   { id: "number", label: "Number Nexus", accent: "#14b8a6" },
@@ -80,9 +80,7 @@ const STARPATH_REVIEW_BANKS: Partial<Record<YearLabel, Partial<Record<"pretest" 
 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
   const params = new URLSearchParams({ year, realm_id: realm });
-  if (realm === "number" && year === "Year 6") {
-    params.set("review_bank", "year6-number-v1");
-  }
+
   if (realm === "space") {
     const reviewBank = STARPATH_REVIEW_BANKS[year]?.[kind];
     if (reviewBank) params.set("review_bank", reviewBank);
@@ -144,7 +142,7 @@ export default function DemoReviewPanel() {
     const requestedRealm = params.get("realm");
     const requestedYear = params.get("year");
     if (REALMS.some(r=>r.id===requestedRealm)) setRealm(requestedRealm as ReviewRealm);
-    if (requestedYear === "Prep" || /^Year [1-6]$/.test(requestedYear ?? "")) setYear(requestedYear as YearLabel);
+    if (requestedYear === "Prep" || /^Year [1-8]$/.test(requestedYear ?? "")) setYear(requestedYear as YearLabel);
   }, []);
   const [week, setWeek] = useState(1);
   const [lesson, setLesson] = useState(1);
@@ -155,7 +153,7 @@ export default function DemoReviewPanel() {
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
   const maxWeek = realm === "number" ? 12 : realm === "statistics" || realm === "chance" ? 6 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
-  const starpathLevel = getStarpathLevelForYear(year).id;
+  const starpathLevel = getStarpathLevelForYear(year === "Year 7" || year === "Year 8" ? "Year 6" : year).id;
   const starpathProgram = realm === "space" ? getStarpathProgram(starpathLevel) : null;
   const selectedStarpathWeek = starpathProgram?.weeks[week - 1];
   const pretestAvailable = hasPretest(realm, year);
@@ -181,6 +179,7 @@ export default function DemoReviewPanel() {
   }, [maxWeek]);
 
   useEffect(() => {
+    if (realm !== "number" && levelNumber > 6) setYear("Year 6");
     if (realm === "statistics" && year === "Prep") setYear("Year 1");
     if (realm === "pattern" && levelNumber < 3) setYear("Year 3");
     if (realm === "chance" && levelNumber < 3) setYear("Year 3");
@@ -203,7 +202,7 @@ export default function DemoReviewPanel() {
   }, [realm, starpathLevel, year]);
 
   function preparePreview(profile?: AssessmentResultProfile) {
-    if (realm === "statistics" || realm === "pattern" || realm === "chance") return;
+    if (levelNumber > 6 || realm === "statistics" || realm === "pattern" || realm === "chance") return;
     writeProgress({
       year,
       scorePercent: 0,
@@ -362,7 +361,7 @@ export default function DemoReviewPanel() {
             </label>
             <label className="text-xs font-bold text-white/60">Level
               <select value={year} onChange={(event) => setYear(event.target.value as YearLabel)} className="mt-2 h-11 w-full border border-white/15 bg-[#171a22] px-3 text-sm font-bold text-white">
-                {LEVEL_CATALOG
+                {[...LEVEL_CATALOG, ...(realm === "number" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : [])]
                   .filter((item) => realm !== "statistics" || item.id !== "Prep")
                   .filter((item) => realm !== "pattern" || Number(item.id.replace("Year ", "")) >= 3)
                   .filter((item) => realm !== "chance" || Number(item.id.replace("Year ", "")) >= 3)
@@ -370,7 +369,7 @@ export default function DemoReviewPanel() {
               </select>
             </label>
             <div className="flex items-end gap-2">
-              <button type="button" onClick={() => open(realmHome)} className={actionClass()} style={{ borderColor: `${realmDefinition.accent}66` }}>
+              <button type="button" disabled={levelNumber > 6} onClick={() => open(realmHome)} className={actionClass(levelNumber <= 6)} style={{ borderColor: `${realmDefinition.accent}66` }}>
                 <Eye size={17} /> Open Realm
               </button>
               <button type="button" onClick={resetDemoState} className="grid h-11 w-11 shrink-0 place-items-center border border-white/15 bg-white/[0.06] text-white hover:bg-white/[0.1]" title="Reset demo preview state" aria-label="Reset demo preview state">
@@ -383,9 +382,6 @@ export default function DemoReviewPanel() {
 
         <section className="py-6">
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">Live Assessments</h2></div>
-          {realm === "number" && year === "Year 6" ? (
-            <p className="mb-3 text-xs font-bold text-amber-200">Level 6 opens the independent V1 candidate banks for review. Production remains unchanged.</p>
-          ) : null}
           {realm === "space" && year === "Prep" ? (
             <p className="mb-3 text-xs font-bold text-amber-200">Ground opens the independent Starpath Version 1.0 production bank for review.</p>
           ) : null}
@@ -398,49 +394,6 @@ export default function DemoReviewPanel() {
             </button>
           </div>
         </section>
-
-        {realm === "number" ? <section className="border-t border-teal-300/20 py-6">
-          <h2 className="mb-2 text-base font-black">Level 7 · All five forms</h2>
-          <p className="mb-3 text-sm text-white/70">Year 7 Number curriculum. Review Pre, Post, Start, Mid and End.</p>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-7")}><Eye size={17}/> Review Level 7</button>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-8")}><Eye size={17}/> Review Level 8</button>
-        </section> : null}
-
-        {realm === "number" && year === "Year 6" ? <section className="border-t border-teal-300/20 py-6">
-          <h2 className="mb-2 text-base font-black">Level 6 · All five forms</h2>
-          <p className="mb-3 text-sm text-white/70">Matched Level 6 questions and visuals, ready for your manual review.</p>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-6")}><Eye size={17}/> Review all five forms</button>
-        </section> : null}
-        {realm === "number" && year === "Year 5" ? <section className="border-t border-teal-300/20 py-6">
-          <h2 className="mb-2 text-base font-black">Level 5 · All five forms</h2>
-          <p className="mb-3 text-sm text-white/70">Matched Level 5 questions and visuals, ready for your manual review.</p>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-5")}><Eye size={17}/> Review all five forms</button>
-        </section> : null}
-        {realm === "number" && year === "Year 4" ? <section className="border-t border-teal-300/20 py-6">
-          <h2 className="mb-2 text-base font-black">Level 4 · All five forms</h2>
-          <p className="mb-3 text-sm text-white/70">Matched Level 4 questions and visuals, ready for your manual review.</p>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-4")}><Eye size={17}/> Review all five forms</button>
-        </section> : null}
-        {realm === "number" && year === "Year 3" ? <section className="border-t border-teal-300/20 py-6">
-          <h2 className="mb-2 text-base font-black">Level 3 · All five forms</h2>
-          <p className="mb-3 text-sm text-white/70">Review the matched questions and updated visuals across Pre-Test, Post-Test, Start, Mid and End.</p>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-3")}><Eye size={17}/> Review all five forms</button>
-        </section> : null}
-        {realm === "number" && year === "Year 1" ? <section className="border-t border-teal-300/20 py-6">
-          <h2 className="mb-2 text-base font-black">Level 1 · All five forms</h2>
-          <p className="mb-3 text-sm text-white/70">Pre-Test, Post-Test, Start, Mid and End matched to the post-test standard. Ready for your manual review.</p>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-1")}><Eye size={17}/> Review all five forms</button>
-        </section> : null}
-        {realm === "number" && year === "Year 2" ? <section className="border-t border-teal-300/20 py-6">
-          <h2 className="mb-2 text-base font-black">Level 2 · All five forms</h2>
-          <p className="mb-3 text-sm text-white/70">Pre-Test, Post-Test, Start, Mid and End matched slot by slot. Live for students. Review any form here; nothing is saved.</p>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-2")}><Eye size={17}/> Review all five forms</button>
-        </section> : null}
-        {realm === "number" && year === "Prep" ? <section className="border-t border-teal-300/20 py-6">
-          <h2 className="mb-2 text-base font-black">Prep Number Nexus review</h2>
-          <p className="mb-3 text-sm text-white/70">Review the Prep candidates. Preview only; no student results are saved.</p>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/assessment-candidates")}><Eye size={17}/> Open Prep assessments</button>
-        </section> : null}
 
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-sky-300" /><h2 className="text-base font-black">Whole-Maths Diagnostic</h2></div>
@@ -457,6 +410,7 @@ export default function DemoReviewPanel() {
           )}
         </section>
 
+        {levelNumber <= 6 ? <>
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><BookOpen size={18} className="text-amber-300" /><h2 className="text-base font-black">Weekly Content</h2></div>
           <div className="grid gap-4 md:grid-cols-[1fr_1fr_2fr]">
@@ -517,6 +471,7 @@ export default function DemoReviewPanel() {
         <footer className="border-t border-white/10 py-5 text-xs leading-5 text-white/45">
           Preview actions use the real student components with demo-scoped local state. Use a mock student to validate database saving, teacher reporting, replay, progression and awarded rewards.
         </footer>
+        </> : <p className="py-6 text-sm text-white/60">Weekly lessons for Levels 7 and 8 will be added with the advanced pathway.</p>}
       </div>
 
       {activeBreak ? (

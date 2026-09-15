@@ -45,6 +45,7 @@ export const NUMBER_LEVEL8_BLUEPRINT=[
  ['AC9M8N05','Model water use and a percentage loss','challenging'],
 ] as const;
 function make(form:NumberLevel8Form,f:number){
+ const circleObject=['circular plate','circular clock face','bicycle wheel','circular mirror','circular tabletop'][f];
  const area=[18,32,50,72,98][f],rootFloor=[4,5,7,8,9][f];
  const base=2+f,a=3+f,b=2+f,den=[8,20,25,40,50][f];
  const repeated=['27','36','45','54','63'][f],digitPosition=15+2*f;
@@ -58,9 +59,9 @@ function make(form:NumberLevel8Form,f:number){
   return mc(prompt,answer,options,expression(`${left} ${op} ${right}`),`${left} ${op==='+'?'plus':op==='−'?'minus':op==='×'?'times':'divided by'} ${right}.`);
  };
  const items:Example[]=[
-  mc('What is the exact side length, in metres?',`√${area}`,[`√${area}`,String(area/2),String(rootFloor),String(rootFloor+1)],v('square',{area}),`A square has area ${area} square metres.`),
+  mc(`This square has an area of ${area} m². What is the exact length of one side?`,`√${area}`,[`√${area}`,String(area/2),String(rootFloor),String(rootFloor+1)],v('square',{area}),'All four sides are equal. Give the length in metres.'),
   num('Between which whole numbers does this root lie? Enter the smaller number.',rootFloor,expression(`√${area+1}`),`Square root of ${area+1}.`),
-  mc('Divide the circumference by the diameter. Which value is exact?','π',['π','3.14','22/7','3.1416'],v('circle',{diameter:12+2*f}),`A circle has diameter ${12+2*f} centimetres. Use its exact circumference, not a rounded measurement.`),
+  mc('Which number equals circumference ÷ diameter exactly?','π',['π','3.14','22/7','3.1416'],v('circle',{object:circleObject}),`The diagram shows a ${circleObject}. Circumference is the distance around it; diameter passes through its centre.`),
   mc('Which number is irrational?',`√${[7,11,13,19,23][f]}`,[`√${[7,11,13,19,23][f]}`,`√${(f+4)**2}`,`${f+2}/9`,`${f+1}.25`],v('classification',{}),'Choose one number. A square root symbol means the exact value.'),
   num('Enter the missing exponent.',a+b,v('exponent',{left:`${power(base,a)} × ${power(base,b)}`,base}),`${base} to power ${a} times ${base} to power ${b}. Write as one power of ${base}.`),
   num('Enter the missing exponent.',a,v('exponent',{left:`${power(base,a+b)} ÷ ${power(base,b)}`,base}),`${base} to power ${a+b} divided by ${base} to power ${b}. Write as one power of ${base}.`),
@@ -93,7 +94,7 @@ function make(form:NumberLevel8Form,f:number){
   const [code,skillLabel,difficulty]=NUMBER_LEVEL8_BLUEPRINT[i];
   const shift=(f+i)%(e.options?.length??1),options=e.options?[...e.options.slice(shift),...e.options.slice(0,shift)]:undefined;
   const id=`y8-number-review-${form}-${String(i+1).padStart(2,'0')}-v1`;
-  return {...e,visual:{...e.visual,topic:skillLabel},options,id,inputMode:i>=14&&i<=21?'text' as const:'decimal' as const,answer:e.correctAnswer,version:'1.0.0-review.1',form,sourcePool:'assessment_review',bankId:`number-level8-${form}-review-v1`,yearLevel:8,realmId:'number',strand:'Number',primaryDescriptorCode:code,curriculumCodes:[code],skillId:`number-y8-slot-${i+1}`,skillLabel,structureKey:`number-y8-slot-${i+1}`,contextKey:id,difficulty,statistics:createUncalibratedItemStatistics(difficulty),showFractionModels:false,responseMode:e.type==='mcq'?'selected_response':'constructed_response',scoring:{kind:'exact',correctResponse:e.correctAnswer},renderer:{type:e.type,payload:{...e.visual}}};
+  return {...e,visual:{...e.visual,topic:i===2?'Circle relationship':skillLabel},options,id,inputMode:i>=14&&i<=21?'text' as const:'decimal' as const,answer:e.correctAnswer,version:'1.0.0-review.1',form,sourcePool:'assessment_review',bankId:`number-level8-${form}-review-v1`,yearLevel:8,realmId:'number',strand:'Number',primaryDescriptorCode:code,curriculumCodes:[code],skillId:`number-y8-slot-${i+1}`,skillLabel,structureKey:`number-y8-slot-${i+1}`,contextKey:id,difficulty,statistics:createUncalibratedItemStatistics(difficulty),showFractionModels:false,responseMode:e.type==='mcq'?'selected_response':'constructed_response',scoring:{kind:'exact',correctResponse:e.correctAnswer},renderer:{type:e.type,payload:{...e.visual}}};
  });
 }
 export const NUMBER_LEVEL8_FIVE_FORMS=Object.fromEntries(NUMBER_LEVEL8_FORMS.map((form,f)=>[form,make(form,f)])) as Record<NumberLevel8Form,ReturnType<typeof make>>;

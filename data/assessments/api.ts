@@ -1,4 +1,5 @@
 import { YEAR3_NUMBER_RELEASED_FORMS } from "./revisions/year3NumberReleasedForms";
+import { YEAR8_NUMBER_RELEASED_FORMS } from "./revisions/year8NumberReleasedForms";
 import { YEAR7_NUMBER_RELEASED_FORMS } from "./revisions/year7NumberReleasedForms";
 import { YEAR6_NUMBER_RELEASED_FORMS } from "./revisions/year6NumberReleasedForms";
 import { GROUND_NUMBER_V3_FORMS } from "./releases/groundNumber";
@@ -230,6 +231,7 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
     default:
       return assertAssessmentRealmHandled(realmId);
   }
+  if (yearLabel === "Year 8") return [...YEAR8_NUMBER_RELEASED_FORMS.pretest] as unknown as PretestQuestion[];
   if (yearLabel === "Year 7") return [...YEAR7_NUMBER_RELEASED_FORMS.pretest] as unknown as PretestQuestion[];
   if (yearLabel === "Year 6") return [...(numberLevel6Version === 2 ? YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS : YEAR6_NUMBER_RELEASED_FORMS.pretest)] as unknown as PretestQuestion[];
   if (yearLabel === "Year 3") {
@@ -268,6 +270,7 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
     default:
       return assertAssessmentRealmHandled(realmId);
   }
+  if (yearLabel === "Year 8") return {yearLabel, questions: [...YEAR8_NUMBER_RELEASED_FORMS.posttest]};
   if (yearLabel === "Year 7") return {yearLabel, questions: [...YEAR7_NUMBER_RELEASED_FORMS.posttest]};
   if (yearLabel === "Year 6") return { yearLabel, questions: [...(numberLevel6Version === 2 ? YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS : YEAR6_NUMBER_RELEASED_FORMS.posttest)] };
   if (isGroundLevelYear(yearLabel)) {

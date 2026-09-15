@@ -101,7 +101,8 @@ export default function FiveFormAssessmentReview<Form extends string>({
         questionPrompt={question.prompt}
         promptAction={<ReadAloudBtn text={question.readAloudText ?? question.prompt} />}
         questionContent={<>
-          <AssessmentQuestionCard key={question.id} question={question as unknown as CardQuestion} value={value} onChange={(answer) => setAnswers((previous) => ({ ...previous, [question.id]: answer }))} realmId={realmId} />
+          <AssessmentQuestionCard key={question.id} question={question as unknown as CardQuestion} value={value === "idk" ? "" : value} onChange={(answer) => setAnswers((previous) => ({ ...previous, [question.id]: answer }))} realmId={realmId} />
+          {value === "idk" ? <p role="status" className="mt-3 text-teal-100">Marked “I don’t know”. You can still answer this question.</p> : null}
           <details className="mt-5 rounded-lg border border-teal-700 p-4 text-teal-50">
             <summary className="cursor-pointer font-bold">Review details</summary>
             <p className="mt-3 text-sm">{question.primaryDescriptorCode} · {question.skillLabel} · Intended difficulty: {question.difficulty}</p>
@@ -123,6 +124,7 @@ export default function FiveFormAssessmentReview<Form extends string>({
         onBack={() => select(form, Math.max(0, index - 1))}
         onNext={() => select(form, Math.min(last, index + 1))}
         onSubmit={() => setFinished((previous) => ({ ...previous, [form]: true }))}
+        onIdk={() => { setAnswers(previous => ({...previous,[question.id]:"idk"})); if(index < last) select(form,index+1); else setFinished(previous=>({...previous,[form]:true})); }}
         onExit={() => router.push(exitHref)}
       />
     </ReadAloudRateProvider>

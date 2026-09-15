@@ -7,7 +7,7 @@ import {
   NUMBER_LEVEL8_FORMS,
 } from "@/data/assessments/revisions/year8NumberFiveForms";
 
-/** Protected owner review of the matched Level 8 Number forms. Student banks are unchanged. */
+/** Protected owner review of the released Level 8 Number forms. */
 export default function NumberLevel8FiveFormReview() {
   return (
     <FiveFormAssessmentReview
@@ -16,7 +16,7 @@ export default function NumberLevel8FiveFormReview() {
       year="Year 8"
       realmId="number"
       basePath="/demo-review/number-level-8"
-      exitHref="/demo-review?realm=number&year=Year%206"
+      exitHref="/demo-review?realm=number&year=Year%208"
       formOrder={NUMBER_LEVEL8_FORMS}
       labels={NUMBER_LEVEL8_FORM_LABELS}
       forms={NUMBER_LEVEL8_FIVE_FORMS}

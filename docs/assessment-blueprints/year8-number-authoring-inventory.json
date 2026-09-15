@@ -1,7 +1,7 @@
 {
   "pretest": [
     {
-      "prompt": "What is the exact side length, in metres?",
+      "prompt": "This square has an area of 18 m². What is the exact length of one side?",
       "correctAnswer": "√18",
       "type": "mcq",
       "options": [
@@ -16,7 +16,7 @@
         "area": 18,
         "topic": "Represent an irrational square side exactly"
       },
-      "readAloudText": "What is the exact side length, in metres? A square has area 18 square metres.",
+      "readAloudText": "This square has an area of 18 m². What is the exact length of one side? All four sides are equal. Give the length in metres.",
       "id": "y8-number-review-pretest-01-v1",
       "inputMode": "decimal",
       "answer": "√18",
@@ -113,7 +113,7 @@
       }
     },
     {
-      "prompt": "Divide the circumference by the diameter. Which value is exact?",
+      "prompt": "Which number equals circumference ÷ diameter exactly?",
       "correctAnswer": "π",
       "type": "mcq",
       "options": [
@@ -125,10 +125,10 @@
       "visual": {
         "type": "number_y8_panel",
         "kind": "circle",
-        "diameter": 12,
-        "topic": "Recognise pi as an exact circle ratio"
+        "object": "circular plate",
+        "topic": "Circle relationship"
       },
-      "readAloudText": "Divide the circumference by the diameter. Which value is exact? A circle has diameter 12 centimetres. Use its exact circumference, not a rounded measurement.",
+      "readAloudText": "Which number equals circumference ÷ diameter exactly? The diagram shows a circular plate. Circumference is the distance around it; diameter passes through its centre.",
       "id": "y8-number-review-pretest-03-v1",
       "inputMode": "decimal",
       "answer": "π",
@@ -167,7 +167,7 @@
         "payload": {
           "type": "number_y8_panel",
           "kind": "circle",
-          "diameter": 12
+          "object": "circular plate"
         }
       }
     },
@@ -1824,7 +1824,7 @@
   ],
   "posttest": [
     {
-      "prompt": "What is the exact side length, in metres?",
+      "prompt": "This square has an area of 32 m². What is the exact length of one side?",
       "correctAnswer": "√32",
       "type": "mcq",
       "options": [
@@ -1839,7 +1839,7 @@
         "area": 32,
         "topic": "Represent an irrational square side exactly"
       },
-      "readAloudText": "What is the exact side length, in metres? A square has area 32 square metres.",
+      "readAloudText": "This square has an area of 32 m². What is the exact length of one side? All four sides are equal. Give the length in metres.",
       "id": "y8-number-review-posttest-01-v1",
       "inputMode": "decimal",
       "answer": "√32",
@@ -1936,7 +1936,7 @@
       }
     },
     {
-      "prompt": "Divide the circumference by the diameter. Which value is exact?",
+      "prompt": "Which number equals circumference ÷ diameter exactly?",
       "correctAnswer": "π",
       "type": "mcq",
       "options": [
@@ -1948,10 +1948,10 @@
       "visual": {
         "type": "number_y8_panel",
         "kind": "circle",
-        "diameter": 14,
-        "topic": "Recognise pi as an exact circle ratio"
+        "object": "circular clock face",
+        "topic": "Circle relationship"
       },
-      "readAloudText": "Divide the circumference by the diameter. Which value is exact? A circle has diameter 14 centimetres. Use its exact circumference, not a rounded measurement.",
+      "readAloudText": "Which number equals circumference ÷ diameter exactly? The diagram shows a circular clock face. Circumference is the distance around it; diameter passes through its centre.",
       "id": "y8-number-review-posttest-03-v1",
       "inputMode": "decimal",
       "answer": "π",
@@ -1990,7 +1990,7 @@
         "payload": {
           "type": "number_y8_panel",
           "kind": "circle",
-          "diameter": 14
+          "object": "circular clock face"
         }
       }
     },
@@ -3647,7 +3647,7 @@
   ],
   "start": [
     {
-      "prompt": "What is the exact side length, in metres?",
+      "prompt": "This square has an area of 50 m². What is the exact length of one side?",
       "correctAnswer": "√50",
       "type": "mcq",
       "options": [
@@ -3662,7 +3662,7 @@
         "area": 50,
         "topic": "Represent an irrational square side exactly"
       },
-      "readAloudText": "What is the exact side length, in metres? A square has area 50 square metres.",
+      "readAloudText": "This square has an area of 50 m². What is the exact length of one side? All four sides are equal. Give the length in metres.",
       "id": "y8-number-review-start-01-v1",
       "inputMode": "decimal",
       "answer": "√50",
@@ -3759,7 +3759,7 @@
       }
     },
     {
-      "prompt": "Divide the circumference by the diameter. Which value is exact?",
+      "prompt": "Which number equals circumference ÷ diameter exactly?",
       "correctAnswer": "π",
       "type": "mcq",
       "options": [
@@ -3771,10 +3771,10 @@
       "visual": {
         "type": "number_y8_panel",
         "kind": "circle",
-        "diameter": 16,
-        "topic": "Recognise pi as an exact circle ratio"
+        "object": "bicycle wheel",
+        "topic": "Circle relationship"
       },
-      "readAloudText": "Divide the circumference by the diameter. Which value is exact? A circle has diameter 16 centimetres. Use its exact circumference, not a rounded measurement.",
+      "readAloudText": "Which number equals circumference ÷ diameter exactly? The diagram shows a bicycle wheel. Circumference is the distance around it; diameter passes through its centre.",
       "id": "y8-number-review-start-03-v1",
       "inputMode": "decimal",
       "answer": "π",
@@ -3813,7 +3813,7 @@
         "payload": {
           "type": "number_y8_panel",
           "kind": "circle",
-          "diameter": 16
+          "object": "bicycle wheel"
         }
       }
     },
@@ -5470,7 +5470,7 @@
   ],
   "mid": [
     {
-      "prompt": "What is the exact side length, in metres?",
+      "prompt": "This square has an area of 72 m². What is the exact length of one side?",
       "correctAnswer": "√72",
       "type": "mcq",
       "options": [
@@ -5485,7 +5485,7 @@
         "area": 72,
         "topic": "Represent an irrational square side exactly"
       },
-      "readAloudText": "What is the exact side length, in metres? A square has area 72 square metres.",
+      "readAloudText": "This square has an area of 72 m². What is the exact length of one side? All four sides are equal. Give the length in metres.",
       "id": "y8-number-review-mid-01-v1",
       "inputMode": "decimal",
       "answer": "√72",
@@ -5582,7 +5582,7 @@
       }
     },
     {
-      "prompt": "Divide the circumference by the diameter. Which value is exact?",
+      "prompt": "Which number equals circumference ÷ diameter exactly?",
       "correctAnswer": "π",
       "type": "mcq",
       "options": [
@@ -5594,10 +5594,10 @@
       "visual": {
         "type": "number_y8_panel",
         "kind": "circle",
-        "diameter": 18,
-        "topic": "Recognise pi as an exact circle ratio"
+        "object": "circular mirror",
+        "topic": "Circle relationship"
       },
-      "readAloudText": "Divide the circumference by the diameter. Which value is exact? A circle has diameter 18 centimetres. Use its exact circumference, not a rounded measurement.",
+      "readAloudText": "Which number equals circumference ÷ diameter exactly? The diagram shows a circular mirror. Circumference is the distance around it; diameter passes through its centre.",
       "id": "y8-number-review-mid-03-v1",
       "inputMode": "decimal",
       "answer": "π",
@@ -5636,7 +5636,7 @@
         "payload": {
           "type": "number_y8_panel",
           "kind": "circle",
-          "diameter": 18
+          "object": "circular mirror"
         }
       }
     },
@@ -7293,7 +7293,7 @@
   ],
   "end": [
     {
-      "prompt": "What is the exact side length, in metres?",
+      "prompt": "This square has an area of 98 m². What is the exact length of one side?",
       "correctAnswer": "√98",
       "type": "mcq",
       "options": [
@@ -7308,7 +7308,7 @@
         "area": 98,
         "topic": "Represent an irrational square side exactly"
       },
-      "readAloudText": "What is the exact side length, in metres? A square has area 98 square metres.",
+      "readAloudText": "This square has an area of 98 m². What is the exact length of one side? All four sides are equal. Give the length in metres.",
       "id": "y8-number-review-end-01-v1",
       "inputMode": "decimal",
       "answer": "√98",
@@ -7405,7 +7405,7 @@
       }
     },
     {
-      "prompt": "Divide the circumference by the diameter. Which value is exact?",
+      "prompt": "Which number equals circumference ÷ diameter exactly?",
       "correctAnswer": "π",
       "type": "mcq",
       "options": [
@@ -7417,10 +7417,10 @@
       "visual": {
         "type": "number_y8_panel",
         "kind": "circle",
-        "diameter": 20,
-        "topic": "Recognise pi as an exact circle ratio"
+        "object": "circular tabletop",
+        "topic": "Circle relationship"
       },
-      "readAloudText": "Divide the circumference by the diameter. Which value is exact? A circle has diameter 20 centimetres. Use its exact circumference, not a rounded measurement.",
+      "readAloudText": "Which number equals circumference ÷ diameter exactly? The diagram shows a circular tabletop. Circumference is the distance around it; diameter passes through its centre.",
       "id": "y8-number-review-end-03-v1",
       "inputMode": "decimal",
       "answer": "π",
@@ -7459,7 +7459,7 @@
         "payload": {
           "type": "number_y8_panel",
           "kind": "circle",
-          "diameter": 20
+          "object": "circular tabletop"
         }
       }
     },

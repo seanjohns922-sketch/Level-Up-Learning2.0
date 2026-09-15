@@ -55,7 +55,7 @@ export type PendingStudentDiagnostic = {
   number_level5_bank_version?: 2 | 3;
   number_level6_bank_version?: 2 | 3;
   number_level3_bank_version?: 2 | 3;
-  number_maximum_level?: 6 | 7;
+  number_maximum_level?: 6 | 7 | 8;
 };
 
 export type LiveMathsProgressionRow = {

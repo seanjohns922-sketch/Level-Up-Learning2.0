@@ -340,8 +340,8 @@ export default function PostTestPageWrapper() {
 
 function AssessmentRoute() {
   const params=useSearchParams();
-  return params.get("year")==="Year 7" && (params.get("realm_id")??"number")==="number"
-    ? <NumberExtensionAssessment key="posttest" form="posttest"/> : <PostTestPage/>;
+  return ["Year 7","Year 8"].includes(params.get("year")??"") && (params.get("realm_id")??"number")==="number"
+    ? <NumberExtensionAssessment key={`posttest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="posttest"/> : <PostTestPage/>;
 }
 
 function PostTestPage() {
