@@ -56,4 +56,5 @@ const sql=readFileSync('supabase/migrations/20260916090000_number_level3_and_lev
 assert.ok(sql.includes('number_maximum_level integer not null default 6'));
 assert.ok(sql.includes("p_active_level='Year 7' then 29 else 19"));
 assert.ok(sql.includes("v_level=7 then 30 else 20"));
+assert.ok(readFileSync('supabase/migrations/20260916091000_number_level7_draft_positions.sql','utf8').includes("strand='number' and active_level='Year 7' then 29 else 19"));
 console.log('Number release: Ground–6 20 items, Level 7 30; approved content, five checkpoint banks, historical Level 3 pinning, old diagnostic ceilings, scoring, replay and growth verified.');
