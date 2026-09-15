@@ -79,6 +79,7 @@ const STARPATH_REVIEW_BANKS: Partial<Record<YearLabel, Partial<Record<"pretest" 
 };
 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
+  if(realm === "measurement" && year === "Prep") return `/demo-review/measurement-ground?form=${kind}`;
   const params = new URLSearchParams({ year, realm_id: realm });
 
   if (realm === "space") {
@@ -104,6 +105,7 @@ const DIAGNOSTIC_STRAND_FOR_REALM: Record<ReviewRealm, string> = {
 };
 
 function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: "start" | "mid" | "end") {
+  if(realm === "measurement" && year === "Prep") return `/demo-review/measurement-ground?form=${checkpoint}`;
   const params = new URLSearchParams({ strand: DIAGNOSTIC_STRAND_FOR_REALM[realm], level: year, checkpoint });
   return `/demo-review/diagnostic?${params.toString()}`;
 }
@@ -381,7 +383,7 @@ export default function DemoReviewPanel() {
         </section>
 
         <section className="py-6">
-          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">Live Assessments</h2></div>
+          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{realm === "measurement" && year === "Prep" ? "Assessments for review" : "Live Assessments"}</h2></div>
           {realm === "space" && year === "Prep" ? (
             <p className="mb-3 text-xs font-bold text-amber-200">Ground opens the independent Starpath Version 1.0 production bank for review.</p>
           ) : null}
@@ -397,7 +399,7 @@ export default function DemoReviewPanel() {
 
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-sky-300" /><h2 className="text-base font-black">Whole-Maths Diagnostic</h2></div>
-          {year !== "Prep" || realm === "number" ? (
+          {year !== "Prep" || realm === "number" || realm === "measurement" ? (
             <div className="grid gap-3 sm:grid-cols-3">
               {DIAGNOSTIC_PREVIEW_CHECKPOINTS.map((checkpoint) => (
                 <button key={checkpoint.id} type="button" onClick={() => router.push(diagnosticPreviewHref(realm, year, checkpoint.id))} className={actionClass()}>

@@ -1,4 +1,6 @@
 "use client";
+import GroundMeasurementAssessmentVisual from "./GroundMeasurementAssessmentVisual";
+import type { GroundMeasurementVisual } from "@/data/assessments/revisions/groundMeasurementFiveForms";
 import NumberNexusYear8AssessmentVisual from "./NumberNexusYear8AssessmentVisual";
 import NumberLevel3QuestionCard from "./NumberLevel3QuestionCard";
 import type { NumberLevel3ReviewItem } from "@/data/assessments/revisions/year3NumberFiveForms";
@@ -330,7 +332,7 @@ export default function AssessmentQuestionCard({
       : undefined;
   const isYearFiveNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_y5_");
   const isYearSixNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_y6_");
-  const isEarlyNumberVisual =
+  const isEarlyNumberVisual = visual?.type === "measurement_ground_panel" ||
     question.id?.startsWith("y3-number-") ||
     question.id?.startsWith("y3-a-") ||
     question.id?.startsWith("y3-b-") ||
@@ -351,7 +353,7 @@ export default function AssessmentQuestionCard({
   const groundItem=groundNumberReleaseItem(question);
   if (groundItem) return <PrepNumberCandidateCard key={question.id} item={groundItem} value={value} onChange={onChange}/>;
 
-  const renderedVisual = visual ? (
+  const renderedVisual = visual?.type === "measurement_ground_panel" ? <GroundMeasurementAssessmentVisual visual={visual as unknown as GroundMeasurementVisual}/> : visual ? (
     <>
       {realmId === "chance" && typeof visual.type === "string" ? (
         <ChanceVisual visual={visual as unknown as ChanceVisualData} />
