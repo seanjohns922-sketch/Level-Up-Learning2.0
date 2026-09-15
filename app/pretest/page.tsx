@@ -4,6 +4,7 @@ import { savedGroundNumberVersion } from "@/lib/ground-number-assessment-version
 
 import { savedYear1NumberVersion } from "@/lib/year1-number-assessment-version";
 import { savedYear2NumberVersion } from "@/lib/year2-number-assessment-version";
+import { savedYear4NumberVersion } from "@/lib/year4-number-assessment-version";
 import { assessmentEvidenceMetadata, isGroundBaseline, hasComparableAssessmentGrowth } from "@/lib/assessment-growth";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { Pin, PartyPopper } from "lucide-react";
@@ -405,13 +406,14 @@ function PretestPage() {
   const [groundNumberVersion,setGroundNumberVersion]=useState<1|3>(3);
   const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(5);
   const [numberLevel2Version, setNumberLevel2Version] = useState<2 | 3>(3);
+  const [numberLevel4Version, setNumberLevel4Version] = useState<2 | 3>(3);
   const questions: Question[] = useMemo(
     () => candidateReviewEnabled
       ? starpathLevel1CandidateRequested
         ? [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
-      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version),
-    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version]
+      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version),
+    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version]
   );
 
   const [index, setIndex] = useState(0);
@@ -505,7 +507,9 @@ function PretestPage() {
     const level2Version = progressRealmId === "number" && year === "Year 2" && !isDemoPreviewMode()
       ? savedYear2NumberVersion(snapshot?.questionIds) ?? 3 : 3;
     setNumberLevel2Version(level2Version);
-    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version);
+    const level4Version = progressRealmId === "number" && year === "Year 4" && !isDemoPreviewMode() ? savedYear4NumberVersion(snapshot?.questionIds) ?? 3 : 3;
+    setNumberLevel4Version(level4Version);
+    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version,level4Version);
     if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(resumeQuestions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
@@ -529,6 +533,8 @@ function PretestPage() {
 
   function restartAssessment() {
     setNumberLevel1Version(5);
+    setNumberLevel2Version(3);
+    setNumberLevel4Version(3);
     setGroundNumberVersion(3);
     clearPretestResume(year, localProgressRealmId);
     setAnswers(Array(questions.length).fill(null));

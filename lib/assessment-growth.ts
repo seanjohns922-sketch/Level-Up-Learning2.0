@@ -15,6 +15,7 @@ function comparisonGroup(realmId: string, year: string, questions: readonly { id
   if (realmId === "number" && year === "Year 1" && questions.length === 20 && questions.every(q => /^y1-number-(pre|post)-\d{2}-v3$/.test(q.id))) return "paired-number-Year 1-2026-09-15-v3";
   if (realmId === "number" && year === "Year 1" && questions.length === 20 && questions.every(q => /^y1-number-(pre|post)-\d{2}-v5$/.test(q.id))) return "paired-number-Year 1-2026-09-15-v5";
   if (realmId === "number" && year === "Year 2" && questions.length === 20 && questions.every(q => /^y2-number-(pre|post)-\d{2}-v3$/.test(q.id))) return "paired-number-Year 2-2026-09-15-v3";
+  if (realmId === "number" && year === "Year 4" && questions.length === 20 && questions.every(q => /^y4-number-(pre|post)-\d{2}-v3$/.test(q.id))) return "paired-number-Year 4-2026-09-15-v3";
   const expectedVersion = realmId === "measurement" || realmId === "pattern" ? 3 : 2;
   if (!questions.length || questions.some(q => !q.id.endsWith(`-v${expectedVersion}`))) return null;
   return `paired-${realmId}-${year}-2026-09-14-repair-v${expectedVersion}`;

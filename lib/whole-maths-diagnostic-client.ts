@@ -51,6 +51,7 @@ export type PendingStudentDiagnostic = {
   number_level1_bank_version?: 2 | 5;
   number_ground_bank_version?: 1 | 3;
   number_level2_bank_version?: 2 | 3;
+  number_level4_bank_version?: 2 | 3;
 };
 
 export type LiveMathsProgressionRow = {
@@ -157,9 +158,12 @@ export async function closeDiagnosticSchoolSession(classId: string) {
 
 export async function fetchPendingStudentDiagnostic(studentId: string, includeClosed = false) {
   // Newest pinned-version RPC first; older RPCs keep working until each migration is applied.
-  let { data, error } = await supabase.rpc("get_pending_whole_math_diagnostic_level2", {
+  let { data, error } = await supabase.rpc("get_pending_whole_math_diagnostic_level4", {
     p_student_id: studentId,
   });
+  if (error && (error.code === "PGRST202" || error.code === "42883")) {
+    ({ data, error } = await supabase.rpc("get_pending_whole_math_diagnostic_level2", { p_student_id: studentId }));
+  }
   if (error && (error.code === "PGRST202" || error.code === "42883")) {
     ({ data, error } = await supabase.rpc("get_pending_whole_math_diagnostic_released", { p_student_id: studentId }));
   }

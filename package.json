@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run qa:realm-release-gate && npm run qa:pattern-peaks-release && npm run qa:pattern-peaks-assessments && npm run qa:statistica-assessments && npm run qa:placement-manager-defaults && npm run qa:school-teacher-learning-access && npm run qa:ground-level-entry && npm run qa:pretest-pathway && npm run qa:chance-hollow-generation && npm run qa:chance-hollow-answer-voice && npm run qa:chance-hollow-weekly-quizzes && npm run qa:chance-hollow-assessments && npm run qa:chance-hollow-flow && npm run qa:chance-hollow-world3d && npm run qa:assessment-layout && npm run qa:whole-maths-diagnostic && npm run qa:live-maths-progression && npm run qa:assessment-repairs && npm run qa:year1-number-matched-pair && npm run qa:year1-number-five-forms && npm run qa:assessment-navigation && npm run qa:year1-number-release && npm run qa:ground-number-release && npm run qa:year2-number-release && npm run qa:year4-number-five-forms",
+    "prebuild": "npm run qa:realm-release-gate && npm run qa:pattern-peaks-release && npm run qa:pattern-peaks-assessments && npm run qa:statistica-assessments && npm run qa:placement-manager-defaults && npm run qa:school-teacher-learning-access && npm run qa:ground-level-entry && npm run qa:pretest-pathway && npm run qa:chance-hollow-generation && npm run qa:chance-hollow-answer-voice && npm run qa:chance-hollow-weekly-quizzes && npm run qa:chance-hollow-assessments && npm run qa:chance-hollow-flow && npm run qa:chance-hollow-world3d && npm run qa:assessment-layout && npm run qa:whole-maths-diagnostic && npm run qa:live-maths-progression && npm run qa:assessment-repairs && npm run qa:year1-number-matched-pair && npm run qa:year1-number-five-forms && npm run qa:assessment-navigation && npm run qa:year1-number-release && npm run qa:ground-number-release && npm run qa:year2-number-release && npm run qa:year4-number-five-forms && npm run qa:year4-number-release",
     "build": "next build",
     "build:dev": "next build",
     "start": "next start",
@@ -209,7 +209,8 @@
     "qa:assessment-navigation": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-assessment-navigation.ts",
     "qa:year1-number-release": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-year1-number-release.ts",
     "qa:ground-number-release": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-ground-number-release.ts",
-    "qa:year4-number-five-forms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-year4-number-five-forms.ts"
+    "qa:year4-number-five-forms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-year4-number-five-forms.ts",
+    "qa:year4-number-release": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-year4-number-release.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
