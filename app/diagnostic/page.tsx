@@ -1,4 +1,5 @@
 "use client";
+import { assessmentSpokenPrompt } from "@/lib/assessment-spoken-prompt";
 import { groundNumberHasAnswer } from "@/lib/ground-number-answer";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -31,6 +32,7 @@ import {
 } from "@/lib/whole-maths-diagnostic-client";
 import {
   decideDiagnosticPlacement,
+  diagnosticQuestionCount,
   diagnosticLevelLabel,
   diagnosticLevelNumber,
   type DiagnosticProbeScore,
@@ -93,7 +95,7 @@ export default function WholeMathsDiagnosticPage() {
   }, [loadPending]);
 
   const linkedQuestions = useMemo(
-    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2,pending.number_level5_bank_version??2,pending.number_level6_bank_version??2) : [],
+    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2,pending.number_level5_bank_version??2,pending.number_level6_bank_version??2,pending.number_level3_bank_version??2,pending.number_maximum_level??6) : [],
     [level, pending],
   );
   const current = linkedQuestions[index];
@@ -180,7 +182,7 @@ export default function WholeMathsDiagnosticPage() {
     };
     const nextProbes = [...probes, probe];
     const minimumLevel = pending.strand === "number" && pending.number_ground_bank_version===3 ? 0 : pending.strand === "algebra" || pending.strand === "probability" ? 3 : 1;
-    const decision = decideDiagnosticPlacement(pending.starting_level, nextProbes,minimumLevel);
+    const decision = decideDiagnosticPlacement(pending.starting_level, nextProbes,minimumLevel,pending.strand === "number" ? pending.number_maximum_level ?? 6 : 6);
     const nextProbeLevel = decision.shouldProbeNext
       ? diagnosticLevelNumber(level) + 1
       : decision.shouldProbeLower && diagnosticLevelNumber(level) > minimumLevel
@@ -272,13 +274,13 @@ export default function WholeMathsDiagnosticPage() {
       const status = item.status === "completed"
         ? "complete"
         : item.answered_count > 0
-          ? `${item.answered_count} of 20 questions answered`
+          ? `${item.answered_count} of ${diagnosticQuestionCount(item.strand, item.active_level || item.starting_level)} questions answered`
           : item.active_level !== item.starting_level
             ? "follow-up test waiting"
             : "not started";
       return `${AC_STRANDS[item.strand].label}, ${item.active_level}, ${status}`;
     }).join(". ");
-    const introText = `${checkpointLabel(pending.checkpoint)}. Welcome to your maths journey. You have completed ${completedCount} of 6 realms. Complete one realm at a time at school. Your work saves automatically, so you can safely continue during the next session your teacher opens. Up next is ${isFollowUp ? "a follow-up test in " : ""}${currentPresentation.realm}: ${AC_STRANDS[pending.strand].label}, ${level}, with 20 questions. You can also go back to the Central Hub. ${journeyReadout}.`;
+    const introText = `${checkpointLabel(pending.checkpoint)}. Welcome to your maths journey. You have completed ${completedCount} of 6 realms. Complete one realm at a time at school. Your work saves automatically, so you can safely continue during the next session your teacher opens. Up next is ${isFollowUp ? "a follow-up test in " : ""}${currentPresentation.realm}: ${AC_STRANDS[pending.strand].label}, ${level}, with ${linkedQuestions.length} questions. You can also go back to the Central Hub. ${journeyReadout}.`;
 
     return (
       <ReadAloudRateProvider>
@@ -374,7 +376,7 @@ export default function WholeMathsDiagnosticPage() {
                   <dl className="grid max-w-md grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.04]">
                     <div className="px-4 py-3">
                       <dt className="text-xs font-bold text-slate-400">Questions</dt>
-                      <dd className="mt-0.5 text-2xl font-black">20</dd>
+                      <dd className="mt-0.5 text-2xl font-black">{linkedQuestions.length}</dd>
                     </div>
                     <div className="px-4 py-3">
                       <dt className="text-xs font-bold text-slate-400">Answered</dt>
@@ -388,7 +390,7 @@ export default function WholeMathsDiagnosticPage() {
 
                   {currentAnswered > 0 ? (
                     <div className="h-2 max-w-md overflow-hidden rounded-full bg-white/10" aria-hidden="true">
-                      <div className={`h-full rounded-full ${currentPresentation.progress}`} style={{ width: `${Math.min(100, (currentAnswered / 20) * 100)}%` }} />
+                      <div className={`h-full rounded-full ${currentPresentation.progress}`} style={{ width: `${Math.min(100, (currentAnswered / linkedQuestions.length) * 100)}%` }} />
                     </div>
                   ) : null}
 
@@ -426,7 +428,7 @@ export default function WholeMathsDiagnosticPage() {
                     : isUnavailable
                       ? "Unavailable"
                       : isStarted
-                        ? `${item.answered_count} / 20 answered`
+                        ? `${item.answered_count} / ${diagnosticQuestionCount(item.strand, item.active_level || item.starting_level)} answered`
                         : hasFollowUp
                           ? "Follow-up waiting"
                           : isCurrent
@@ -476,7 +478,7 @@ export default function WholeMathsDiagnosticPage() {
                           <p className={`mt-1 text-sm font-black ${isComplete ? "text-emerald-300" : isCurrent ? "text-white" : "text-slate-400"}`}>{statusText}</p>
                           {isStarted && !isComplete ? (
                             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
-                              <div className={`h-full rounded-full ${presentation.progress}`} style={{ width: `${Math.min(100, (item.answered_count / 20) * 100)}%` }} />
+                              <div className={`h-full rounded-full ${presentation.progress}`} style={{ width: `${Math.min(100, (item.answered_count / diagnosticQuestionCount(item.strand, item.active_level || item.starting_level)) * 100)}%` }} />
                             </div>
                           ) : null}
                         </div>
@@ -566,7 +568,7 @@ export default function WholeMathsDiagnosticPage() {
                   <span className={`h-2 w-2 rounded-full ${testPresentation.progress}`} aria-hidden="true" />
                   Question {String(index + 1).padStart(2, "0")}
                 </span>
-                <ReadAloudBtn text={current.question.prompt} label="Read question" />
+                <ReadAloudBtn text={assessmentSpokenPrompt(current.question)} label="Read question" />
               </div>
               <h2 className="mt-4 max-w-4xl text-2xl font-black leading-tight tracking-tight sm:text-3xl">{current.question.prompt}</h2>
             </div>

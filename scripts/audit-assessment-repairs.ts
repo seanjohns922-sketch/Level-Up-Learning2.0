@@ -72,7 +72,8 @@ for (const answer of ["60", "70", "80"]) assert.equal(isAssessmentAnswerCorrect(
 for (const answer of ["59", "81", "junk"]) assert.equal(isAssessmentAnswerCorrect(estimate, answer), false);
 const exactAngle = getPretestForYearLabel("Year 5", "measurement")[6]!;
 assert.equal(isAssessmentAnswerCorrect(exactAngle, "123"), false, "Exact protractor reading does not inherit estimate tolerance");
-const year3 = getPretestForYearLabel("Year 3", "number");
+// This section verifies the retained repair bank; released forms have their own audit.
+const year3 = getPretestForYearLabel("Year 3", "number", 5, 3, 3, 3, 3, 3, 2);
 for (const index of [4,5,6,7]) assert.deepEqual((year3[index] as { curriculumCodes?: string[] }).curriculumCodes, ["AC9M3N03"], "Addition/subtraction belongs to N03");
 for (const index of [12,13,14]) assert.deepEqual((year3[index] as { curriculumCodes?: string[] }).curriculumCodes, ["AC9M3N04"], "Multiplication/division belongs to N04");
 for (const index of [2,3]) assert.deepEqual((year3[index] as { curriculumCodes?: string[] }).curriculumCodes, ["AC9M3N05"], "Estimation belongs to N05");

@@ -1,0 +1,21 @@
+import type { ReactNode } from 'react';
+import Year7ContextArt from './Year7ContextArt';
+import NumberNexusYear7AssessmentVisual from './NumberNexusYear7AssessmentVisual';
+import { FractionText } from '../FractionText';
+
+export default function NumberNexusYear8AssessmentVisual({visual:v}:{visual:Record<string,unknown>}){
+ let content:ReactNode;
+ const card='rounded-2xl border border-teal-200 bg-white p-5 shadow-sm';
+ if(v.kind==='square') return <NumberNexusYear7AssessmentVisual visual={v}/>;
+ switch(v.kind){
+  case 'classification':return null;
+  case 'expression':content=<div className={`${card} flex min-h-36 flex-wrap items-center justify-center gap-4 text-4xl font-black sm:text-5xl`}>{String(v.expression).split(' ').map((x,i)=>/^\-?\d+\/\d+$/.test(x)?<span key={i} className="inline-flex items-center gap-1">{x.startsWith('-')?<span>−</span>:null}<FractionText value={x.replace('-','')}/></span>:<span key={i} className={/^[+−×÷]$/.test(x)?'font-medium text-teal-700':''}>{x}</span>)}</div>;break;
+  case 'exponent':content=<div className={`${card} flex min-h-36 flex-wrap items-center justify-center gap-4 text-3xl font-black sm:text-4xl`}><span>{String(v.left)}</span><span className="font-medium text-teal-700">=</span><span>{String(v.base)}<sup className="ml-1 rounded border-2 border-dashed border-teal-600 bg-teal-50 px-2">?</sup></span></div>;break;
+  case 'recurring':content=<div className={`${card} text-center`}><p className="py-5 text-4xl font-black sm:text-5xl">0.{String(v.digits).repeat(3)}…</p><p className="text-base text-slate-600">The block {String(v.digits)} repeats forever.</p></div>;break;
+  case 'circle':content=<div className={`${card} grid items-center gap-4 sm:grid-cols-2`}><svg viewBox="0 0 280 240" className="mx-auto w-full max-w-xs" aria-hidden="true"><circle cx="140" cy="120" r="95" fill="#f0fdfa" stroke="#0f766e" strokeWidth="4"/><path d="M45 120H235" stroke="#0f766e" strokeWidth="2"/><circle cx="140" cy="120" r="4" fill="#0f766e"/><rect x="83" y="127" width="114" height="32" rx="8" fill="white"/><text x="140" y="150" textAnchor="middle" fontSize="22" fill="#0f172a">{String(v.diameter)} cm</text></svg><div><p className="text-sm font-bold uppercase tracking-wide text-teal-800">Every circle</p><p className="mt-4 text-2xl font-black">Circumference ÷ diameter = ?</p><p className="mt-3 text-base text-slate-600">Choose the exact value.</p></div></div>;break;
+  case 'tax':content=<div className={`${card} flex flex-col gap-5 sm:flex-row sm:items-center`}><Year7ContextArt kind="wallet"/><div className="min-w-0 flex-1"><p className="mb-3 text-2xl font-black">Income: ${Number(v.income).toLocaleString('en-AU')}</p><table className="w-full text-left text-base"><caption className="mb-3 text-left text-sm font-bold text-teal-800">Example tax table · for this question only</caption><thead><tr className="border-b border-teal-200"><th className="p-2">Part of income</th><th className="p-2">Tax on that part</th></tr></thead><tbody><tr className="border-b border-slate-200"><td className="p-2">First $20,000</td><td className="p-2">$0</td></tr><tr><td className="p-2">Above $20,000</td><td className="p-2">20c for each extra $1</td></tr></tbody></table><p className="mt-3 text-sm text-slate-600">No other taxes or charges.</p></div></div>;break;
+  case 'context':content=<div className="flex flex-col items-center gap-4 sm:flex-row"><Year7ContextArt kind={v.art as Parameters<typeof Year7ContextArt>[0]['kind']}/><div className="grid w-full min-w-0 flex-1 gap-3 sm:grid-cols-2">{(v.cards as Array<[string,string]>).map(([label,value])=><div key={label} className={card}><p className="mb-2 text-sm font-bold uppercase tracking-wide text-teal-800">{label}</p><p className="text-xl font-black leading-snug sm:text-2xl">{value}</p></div>)}</div></div>;break;
+  default:return null;
+ }
+ return <section className="mb-6 rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-slate-50 p-4 text-slate-950 sm:p-6"><p className="mb-4 text-xs font-black uppercase tracking-widest text-teal-800">{String(v.topic??'Number Nexus')}</p>{content}</section>;
+}

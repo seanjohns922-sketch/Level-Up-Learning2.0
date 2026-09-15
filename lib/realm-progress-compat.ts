@@ -669,3 +669,10 @@ export async function teacherAdvanceStudentWeek(input: {
   if (error) throw error;
   return data as string;
 }
+
+/** Extension assessments have evidence without an active weekly-program summary. */
+export async function fetchNumberExtensionAssessments(studentId: string): Promise<NormalizedAssessmentAttempt[]> {
+  const {data,error}=await supabase.rpc('get_student_realm_assessments_secure',{p_student_id:studentId,p_realm_id:'number',p_working_level:'Year 7'});
+  if(error)throw new Error(error.message);
+  return ((data??[]) as RealmAssessmentRow[]).sort((a,b)=>Date.parse(a.completed_at)-Date.parse(b.completed_at)).map((row,i)=>normalizeAssessmentAttempt(row,i+1));
+}

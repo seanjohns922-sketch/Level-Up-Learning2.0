@@ -10,6 +10,10 @@ import type { LiveRealmId } from "@/lib/realms/realm-registry";
 export const DIAGNOSTIC_MASTERY = 85;
 export const DIAGNOSTIC_FLOOR = 40;
 export const DIAGNOSTIC_QUESTIONS_PER_LEVEL = 20;
+export function diagnosticQuestionCount(strand: string, level: string): number {
+  return strand === "number" && level === "Year 7" ? 30 : DIAGNOSTIC_QUESTIONS_PER_LEVEL;
+}
+
 export const DIAGNOSTIC_DOWNWARD_PROBE = 25;
 export const DIAGNOSTIC_REUSE_WINDOW_DAYS = 21;
 export const WHOLE_MATHS_WEIGHT_TOTAL = 139;
@@ -83,23 +87,23 @@ export type DiagnosticPlacementDecision = {
 export function diagnosticLevelNumber(level: string): number {
   if (level === "Prep" || level === "Foundation") return 0;
   const parsed = Number(level.replace(/\D/g, ""));
-  if (!Number.isInteger(parsed) || parsed < 0 || parsed > 6) {
+  if (!Number.isInteger(parsed) || parsed < 0 || parsed > 7) {
     throw new Error(`Unsupported diagnostic level: ${level}`);
   }
   return parsed;
 }
 
 export function diagnosticLevelLabel(level: number): string {
-  const bounded = Math.max(0, Math.min(6, Math.trunc(level)));
+  const bounded = Math.max(0, Math.min(7, Math.trunc(level)));
   return bounded === 0 ? "Prep" : `Year ${bounded}`;
 }
 
 function measuredLevelForProbe(level: number, percent: number): number {
   let measured: number;
-  if (percent >= DIAGNOSTIC_MASTERY) measured = Math.min(6, level);
+  if (percent >= DIAGNOSTIC_MASTERY) measured = Math.min(7, level);
   else if (percent >= DIAGNOSTIC_FLOOR) {
     const fraction = (percent - DIAGNOSTIC_FLOOR) / (DIAGNOSTIC_MASTERY - DIAGNOSTIC_FLOOR);
-    measured = Math.min(6, level - 1 + fraction);
+    measured = Math.min(7, level - 1 + fraction);
   } else {
     const fractionBelow = (DIAGNOSTIC_FLOOR - percent) / DIAGNOSTIC_FLOOR;
     measured = Math.max(0, level - 1 - Math.min(0.9, fractionBelow));
@@ -111,6 +115,7 @@ export function decideDiagnosticPlacement(
   currentLevel: string,
   probes: readonly DiagnosticProbeScore[],
   minimumLevel = 1,
+  maximumLevel = 6,
 ): DiagnosticPlacementDecision {
   if (probes.length === 0) throw new Error("At least one diagnostic probe is required.");
   const current = diagnosticLevelNumber(currentLevel);
@@ -176,7 +181,7 @@ export function decideDiagnosticPlacement(
   }
 
   const lastLevel = diagnosticLevelNumber(last.level);
-  const nextLevel = Math.min(6, lastLevel + 1);
+  const nextLevel = Math.min(maximumLevel, lastLevel + 1);
   return {
     measuredLevel: measuredLevelForProbe(lastLevel, last.percent),
     recommendedLevel: diagnosticLevelLabel(Math.max(current, lastMastered)),

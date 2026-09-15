@@ -403,6 +403,7 @@ export default function DemoReviewPanel() {
           <h2 className="mb-2 text-base font-black">Level 7 · All five forms</h2>
           <p className="mb-3 text-sm text-white/70">Year 7 Number curriculum. Review Pre, Post, Start, Mid and End.</p>
           <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-7")}><Eye size={17}/> Review Level 7</button>
+          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-8")}><Eye size={17}/> Review Level 8</button>
         </section> : null}
 
         {realm === "number" && year === "Year 6" ? <section className="border-t border-teal-300/20 py-6">

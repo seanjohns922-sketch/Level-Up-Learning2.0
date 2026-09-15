@@ -1,4 +1,7 @@
 "use client";
+import NumberNexusYear8AssessmentVisual from "./NumberNexusYear8AssessmentVisual";
+import NumberLevel3QuestionCard from "./NumberLevel3QuestionCard";
+import type { NumberLevel3ReviewItem } from "@/data/assessments/revisions/year3NumberFiveForms";
 import NumberNexusYear7AssessmentVisual from "./NumberNexusYear7AssessmentVisual";
 import FractionPlacementLine from "./FractionPlacementLine";
 import PrepNumberCandidateCard from "./PrepNumberCandidateCard";
@@ -338,12 +341,13 @@ export default function AssessmentQuestionCard({
         visual.type.startsWith("number_y4_") ||
         visual.type.startsWith("number_y5_") ||
         visual.type.startsWith("number_y6_") ||
-        visual.type.startsWith("number_y7_")));
+        visual.type.startsWith("number_y7_") || visual.type.startsWith("number_y8_")));
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
   );
 
+  if (/^y3-number-.*-v3$/.test(question.id ?? "") && visual?.kind) return <NumberLevel3QuestionCard question={question as unknown as NumberLevel3ReviewItem} value={value ?? ""} onChange={onChange}/>;
   const groundItem=groundNumberReleaseItem(question);
   if (groundItem) return <PrepNumberCandidateCard key={question.id} item={groundItem} value={value} onChange={onChange}/>;
 
@@ -406,6 +410,7 @@ export default function AssessmentQuestionCard({
         <NumberNexusYear5AssessmentVisual visual={visual} />
       ) : null}
       {typeof visual.type === "string" && visual.type.startsWith("number_y7_") ? <NumberNexusYear7AssessmentVisual visual={visual} /> : null}
+      {visual.type === "number_y8_panel" ? <NumberNexusYear8AssessmentVisual visual={visual} /> : null}
       {typeof visual.type === "string" && visual.type.startsWith("number_y6_") ? (
         <NumberNexusYear6AssessmentVisual visual={visual} />
       ) : null}

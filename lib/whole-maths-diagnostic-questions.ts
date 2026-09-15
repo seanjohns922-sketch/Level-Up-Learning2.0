@@ -1,3 +1,5 @@
+import { YEAR3_NUMBER_RELEASED_FORMS } from "@/data/assessments/revisions/year3NumberReleasedForms";
+import { YEAR7_NUMBER_RELEASED_FORMS } from "@/data/assessments/revisions/year7NumberReleasedForms";
 import { YEAR6_NUMBER_RELEASED_FORMS } from "@/data/assessments/revisions/year6NumberReleasedForms";
 import { GROUND_NUMBER_V3_FORMS } from "@/data/assessments/releases/groundNumber";
 import { YEAR1_NUMBER_RELEASED_FORMS } from "@/data/assessments/revisions/year1NumberReleasedForms";
@@ -13,7 +15,7 @@ import { curriculumCodesForAssessmentQuestion } from "@/lib/assessment-curriculu
 import type { AcStrand } from "@/lib/curriculum/ac-standards";
 import type { DiagnosticCheckpoint } from "@/lib/whole-maths-diagnostic";
 import {
-  DIAGNOSTIC_QUESTIONS_PER_LEVEL,
+  diagnosticQuestionCount,
   DIAGNOSTIC_STRANDS,
 } from "@/lib/whole-maths-diagnostic";
 
@@ -43,13 +45,20 @@ export function getDiagnosticQuestions(
   numberLevel4Version: 2 | 3 = 2,
   numberLevel5Version: 2 | 3 = 2,
   numberLevel6Version: 2 | 3 = 2,
+  numberLevel3Version: 2 | 3 = 2,
+  numberMaximumLevel: 6 | 7 = 6,
 ): LinkedDiagnosticQuestion[] {
   const definition = DIAGNOSTIC_STRANDS.find((candidate) => candidate.strand === strand);
   if (!definition?.available || !definition.realmId) return [];
+  if (strand === "number" && Number(level.replace(/\D/g, "")) > numberMaximumLevel) return [];
   // Retain existing diagnostic sittings until independent checkpoint forms are version-pinned.
-  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2);
-  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2)?.questions ?? [];
-  const levelTest = strand === "number" && level === "Prep" && groundNumberVersion===3
+  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2);
+  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2)?.questions ?? [];
+  const levelTest = strand === "number" && level === "Year 7" && numberMaximumLevel === 7
+    ? YEAR7_NUMBER_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint] as unknown as AssessmentQuestion[]
+    : strand === "number" && level === "Year 3" && numberLevel3Version === 3
+    ? YEAR3_NUMBER_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint] as unknown as AssessmentQuestion[]
+    : strand === "number" && level === "Prep" && groundNumberVersion===3
     ? GROUND_NUMBER_V3_FORMS[({start:"diagnostic-start",mid:"diagnostic-mid",end:"diagnostic-end",ad_hoc:"diagnostic-start"} as const)[checkpoint]]
     : strand === "number" && level === "Year 1" && numberLevel1Version === 5
     ? YEAR1_NUMBER_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint]
@@ -79,5 +88,5 @@ export function getDiagnosticQuestions(
       (left, right) =>
         seededOrder(sittingId, left.question.id) - seededOrder(sittingId, right.question.id),
     )
-    .slice(0, DIAGNOSTIC_QUESTIONS_PER_LEVEL);
+    .slice(0, diagnosticQuestionCount(strand, level));
 }

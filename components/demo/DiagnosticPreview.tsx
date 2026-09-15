@@ -47,7 +47,7 @@ function minimumLevel(strand: AcStrand) {
 }
 
 function levelsFor(strand: AcStrand) {
-  return Array.from({ length: 7 - minimumLevel(strand) }, (_, offset) => diagnosticLevelLabel(minimumLevel(strand) + offset));
+  return Array.from({ length: (strand === "number" ? 8 : 7) - minimumLevel(strand) }, (_, offset) => diagnosticLevelLabel(minimumLevel(strand) + offset));
 }
 
 function parseStrand(value: string | null): AcStrand {
@@ -151,7 +151,7 @@ export default function DiagnosticPreview() {
 
 function PreviewSession({ strand, level, checkpoint }: { strand: AcStrand; level: string; checkpoint: PreviewCheckpoint }) {
   const questions = useMemo(
-    () => getDiagnosticQuestions(strand, level, PREVIEW_SITTING_ID, checkpoint, 5,3,3,3,3,3),
+    () => getDiagnosticQuestions(strand, level, PREVIEW_SITTING_ID, checkpoint, 5,3,3,3,3,3,3,7),
     [checkpoint, level, strand],
   );
   const [index, setIndex] = useState(0);

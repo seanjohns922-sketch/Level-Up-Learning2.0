@@ -1,4 +1,7 @@
 "use client";
+import NumberExtensionAssessment from "@/components/assessment/NumberExtensionAssessment";
+import { assessmentSpokenPrompt } from "@/lib/assessment-spoken-prompt";
+import { savedYear3NumberVersion } from "@/lib/year3-number-assessment-version";
 import { groundNumberHasAnswer } from "@/lib/ground-number-answer";
 import { savedGroundNumberVersion } from "@/lib/ground-number-assessment-version";
 
@@ -365,9 +368,15 @@ export default function PretestPageWrapper() {
         </div>
       }
     >
-      <PretestPage />
+      <AssessmentRoute />
     </Suspense>
   );
+}
+
+function AssessmentRoute() {
+  const params=useSearchParams();
+  return params.get("year")==="Year 7" && (params.get("realm_id")??"number")==="number"
+    ? <NumberExtensionAssessment key="pretest" form="pretest"/> : <PretestPage/>;
 }
 
 function PretestPage() {
@@ -411,13 +420,14 @@ function PretestPage() {
   const [numberLevel4Version, setNumberLevel4Version] = useState<2 | 3>(3);
   const [numberLevel5Version, setNumberLevel5Version] = useState<2 | 3>(3);
   const [numberLevel6Version, setNumberLevel6Version] = useState<2 | 3>(3);
+  const [numberLevel3Version, setNumberLevel3Version] = useState<2 | 3>(3);
   const questions: Question[] = useMemo(
     () => candidateReviewEnabled
       ? starpathLevel1CandidateRequested
         ? [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
-      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version),
-    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version]
+      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version),
+    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version]
   );
 
   const [index, setIndex] = useState(0);
@@ -517,7 +527,9 @@ function PretestPage() {
     setNumberLevel4Version(level4Version);
     setNumberLevel5Version(level5Version);
     setNumberLevel6Version(level6Version);
-    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version,level4Version,level5Version,level6Version);
+    const level3Version = progressRealmId === "number" && year === "Year 3" && !isDemoPreviewMode() ? savedYear3NumberVersion(snapshot?.questionIds) ?? 3 : 3;
+    setNumberLevel3Version(level3Version);
+    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version,level4Version,level5Version,level6Version,level3Version);
     if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(resumeQuestions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
@@ -545,6 +557,7 @@ function PretestPage() {
     setNumberLevel4Version(3);
     setNumberLevel5Version(3);
     setNumberLevel6Version(3);
+    setNumberLevel3Version(3);
     setGroundNumberVersion(3);
     clearPretestResume(year, localProgressRealmId);
     setAnswers(Array(questions.length).fill(null));
@@ -1020,7 +1033,7 @@ function PretestPage() {
           currentIndex={index}
           totalQuestions={questions.length}
           questionPrompt={question.prompt}
-          promptAction={isMeasurelandsTask ? undefined : <ReadAloudBtn text={question.prompt} />}
+          promptAction={isMeasurelandsTask ? undefined : <ReadAloudBtn text={assessmentSpokenPrompt(question)} />}
           questionContent={questionContent}
           hasAnswer={isReady}
           isLast={index === questions.length - 1}

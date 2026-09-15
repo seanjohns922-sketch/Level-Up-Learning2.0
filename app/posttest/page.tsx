@@ -1,4 +1,7 @@
 "use client";
+import NumberExtensionAssessment from "@/components/assessment/NumberExtensionAssessment";
+import { assessmentSpokenPrompt } from "@/lib/assessment-spoken-prompt";
+import { year3NumberPostVersion } from "@/lib/year3-number-assessment-version";
 import { groundNumberHasAnswer } from "@/lib/ground-number-answer";
 import { groundNumberPostVersion } from "@/lib/ground-number-assessment-version";
 
@@ -330,9 +333,15 @@ export default function PostTestPageWrapper() {
         </div>
       }
     >
-      <PostTestPage />
+      <AssessmentRoute />
     </Suspense>
   );
+}
+
+function AssessmentRoute() {
+  const params=useSearchParams();
+  return params.get("year")==="Year 7" && (params.get("realm_id")??"number")==="number"
+    ? <NumberExtensionAssessment key="posttest" form="posttest"/> : <PostTestPage/>;
 }
 
 function PostTestPage() {
@@ -375,6 +384,7 @@ function PostTestPage() {
   const [numberLevel4Version, setNumberLevel4Version] = useState<2 | 3>(2);
   const [numberLevel5Version, setNumberLevel5Version] = useState<2 | 3>(2);
   const [numberLevel6Version, setNumberLevel6Version] = useState<2 | 3>(2);
+  const [numberLevel3Version, setNumberLevel3Version] = useState<2 | 3>(2);
   const questions = useMemo<Question[]>(
     () => candidateReviewEnabled
       ? starpathCandidateReviewRequested
@@ -382,8 +392,8 @@ function PostTestPage() {
         : starpathLevel1CandidateRequested
           ? [...LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
-      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version)?.questions ?? [],
-    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version],
+      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version)?.questions ?? [],
+    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version],
   );
 
   const [idx, setIdx] = useState(0);
@@ -423,6 +433,7 @@ function PostTestPage() {
       setNumberLevel4Version(3);
     setNumberLevel5Version(3);
     setNumberLevel6Version(3);
+    setNumberLevel3Version(3);
       setRestoreState("ready");
       setCanonicalProgress(readProgress(localProgressRealmId));
       return;
@@ -489,6 +500,14 @@ function PostTestPage() {
             draftIds = draft?.questionIds ?? (draft?.answers ? Object.keys(draft.answers) : undefined);
           } catch { /* A malformed draft does not change the recorded baseline version. */ }
           setNumberLevel6Version(year6NumberPostVersion(restored.rows.flatMap(row => row.assessment_attempts ?? []), draftIds));
+        }
+        if (progressRealmId === "number" && year === "Year 3") {
+          let draftIds: string[] | undefined;
+          try {
+            const draft = JSON.parse(localStorage.getItem(getPosttestDraftKey(progressRealmId, year)) ?? "null");
+            draftIds = draft?.questionIds ?? (draft?.answers ? Object.keys(draft.answers) : undefined);
+          } catch { /* A malformed draft does not change the recorded baseline version. */ }
+          setNumberLevel3Version(year3NumberPostVersion(restored.rows.flatMap(row => row.assessment_attempts ?? []), draftIds));
         }
         setCanonicalProgress(progress);
         setRestoreState("ready");
@@ -913,7 +932,7 @@ function PostTestPage() {
           totalQuestions={questions.length}
           subtitle={`Complete all ${questions.length} questions to unlock your Legend (${PASS_THRESHOLD}%+)`}
           questionPrompt={q.prompt}
-          promptAction={isInteractiveTask ? undefined : <ReadAloudBtn text={q.prompt} />}
+          promptAction={isInteractiveTask ? undefined : <ReadAloudBtn text={assessmentSpokenPrompt(q)} />}
           questionContent={questionContent}
           hasAnswer={hasAnswer}
           isLast={idx === questions.length - 1}
