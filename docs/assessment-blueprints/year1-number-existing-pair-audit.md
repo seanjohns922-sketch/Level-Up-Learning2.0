@@ -1,6 +1,6 @@
 # Level 1 Number: existing pre/post audit
 
-Status: initial content audit and targeted presentation corrections; not release approval. Source: supplied Australian Curriculum Mathematics F–6 v9 PDF, Year 1 descriptors (pages 12–14), and `year1NumberNexusIndependentBanks.ts`. This report concerns the existing student banks, not the replacement candidate preview.
+Status: targeted v3 release authorised by the owner. The table records the original v2 audit; the release section records the resulting corrections. This is not a full curriculum-coverage sign-off. Source: supplied Australian Curriculum Mathematics F–6 v9 PDF, Year 1 descriptors (pages 12–14), and `year1NumberNexusIndependentBanks.ts`. This report concerns the existing student banks, not the replacement candidate preview.
 
 ## Item decisions
 
@@ -40,3 +40,23 @@ Resolve gaps through the smallest justified amendments and document what remains
 Implemented bank changes are visual payload only. Item IDs, prompts, keys, options, score rules and bank versions are retained. No resolver, persistence, progression or migration changes are included. Existing candidate preview remains a reference; only its MAB rendering is shared with the corrected display.
 
 Content amendments require explicit version/cycle handling before student release. Next: correct remaining presentation issues, resolve the flagged pair differences, and derive diagnostic variants from that corrected pair. Verify actual rendered desktop/tablet/mobile questions and audio, then save/resume, first submission, historical attempts and teacher reports. Owner review follows those checks; this document is not a claim that they have passed.
+
+
+## Targeted difficulty revision (v3 release)
+
+`data/assessments/revisions/year1NumberMatchedPair.ts` retains every pre-test prompt and answer, and changes only post-test slots 10, 12, 14, 15, 16 and 20:
+
+- Missing part: 13−6, so both forms bridge ten.
+- Grouping: 110 as 11 groups of ten, retaining the pre-test grouping unit and similar distractor demands.
+- Money: $5+$3, so neither form requires bridging ten.
+- Grouping division: 20 into groups of four; both forms use the same divisor and a nearby group count.
+- Skip counting: five-term sequence with an interior missing term in the same position.
+- Equal sharing: 7/3, retaining two unequal groups totalling ten. Both keys are “No”; different examples alone do not establish empirical equivalence.
+
+Both forms relabel missing-part demand moderate, coin-value reasoning moderate, and simple equal-sharing recognition easy. No claim of empirical calibration is made. Existing v2 banks remain intact; draft IDs and bank metadata use v3. The v3 pair has its own comparison group, separate from v2. Existing baselines and interrupted sittings retain v2; fresh baselines and Demo Review use v3. The revision does not yet resolve every curriculum evidence gap or provide independent diagnostic forms.
+
+Validation: `scripts/audit-year1-number-matched-pair.ts` checks 40 independently calculated answers, incorrect choices, empty responses, matching descriptor/response/difficulty profiles, relevant numerical demands and preservation of released v2 questions.
+
+Release integration: pre-test resume selects the saved question version before restoring answers. Post-tests select from recorded baseline metadata or saved draft IDs; missing historical metadata retains v2. Completed results still use the existing snapshot/save path and idempotent completion IDs. No migration or historical-result rewrite is included. Real diagnostic sittings continue to resolve v2 until their checkpoint forms are version-pinned.
+
+Browser evidence: inspected all six amended post-test questions on desktop, tested numeric entry and selected responses, and confirmed the answer 8 on question 14 survived a reload alongside the revised prompt. Fixed an existing nested answer/read-aloud button error and preview hydration mismatch found during review. Tablet/mobile and audible playback were not verified in this pass. Automated tests cover independent keys, distractors, version selection, snapshot serialization and teacher growth calculations; they are not a production database roundtrip test.

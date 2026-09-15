@@ -1,5 +1,6 @@
 "use client";
 
+import { savedYear1NumberVersion } from "@/lib/year1-number-assessment-version";
 import { assessmentEvidenceMetadata, isGroundBaseline, hasComparableAssessmentGrowth } from "@/lib/assessment-growth";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { Pin, PartyPopper } from "lucide-react";
@@ -398,13 +399,14 @@ function PretestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
+  const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3>(3);
   const questions: Question[] = useMemo(
     () => candidateReviewEnabled
       ? starpathLevel1CandidateRequested
         ? [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
-      : getPretestForYearLabel(year, progressRealmId),
-    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId]
+      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version),
+    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version]
   );
 
   const [index, setIndex] = useState(0);
@@ -489,11 +491,15 @@ function PretestPage() {
   // ── Load any saved snapshot once; offer to resume rather than auto-restart ──
   useEffect(() => {
     const snapshot = loadPretestResume(year, localProgressRealmId);
-    if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(questions.map(q => q.id)))) {
+    const version = progressRealmId === "number" && year === "Year 1" && !isDemoPreviewMode()
+      ? savedYear1NumberVersion(snapshot?.questionIds) ?? 3 : 3;
+    setNumberLevel1Version(version);
+    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version);
+    if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(resumeQuestions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
     setResumeReady(true);
-  }, [localProgressRealmId, year]);
+  }, [localProgressRealmId, progressRealmId, year]);
 
   function resumeFromSnapshot() {
     const snapshot = loadPretestResume(year, localProgressRealmId);
@@ -511,6 +517,7 @@ function PretestPage() {
   }
 
   function restartAssessment() {
+    setNumberLevel1Version(3);
     clearPretestResume(year, localProgressRealmId);
     setAnswers(Array(questions.length).fill(null));
     setIdkResponses([]);
@@ -532,7 +539,7 @@ function PretestPage() {
       startedAt: assessmentStartedAt,
       updatedAt: Date.now(),
     });
-  }, [resumeReady, showResumePrompt, year, localProgressRealmId, index, answers, idkResponses, assessmentStartedAt]);
+  }, [resumeReady, showResumePrompt, year, localProgressRealmId, index, answers, idkResponses, assessmentStartedAt, questions]);
 
   function choose(value: string) {
     const next = [...answers];

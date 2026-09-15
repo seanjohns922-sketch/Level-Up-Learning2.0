@@ -916,22 +916,22 @@ export default function AssessmentQuestionCard({
             const isSelected = value === label || value === optionId;
             const isToken = label === "star" || label === "robot" || label === "crystal";
             return (
-              <button
+              <div
                 key={label}
-                type="button"
-                onClick={() => onChange(String(optionId ?? label))}
                 className={[
-                  "flex min-h-20 items-center justify-between gap-3 rounded-lg border-2 bg-[#f8fbfc] px-4 py-3 text-left text-slate-950 shadow-sm transition",
+                  "flex min-h-20 items-center justify-between gap-3 rounded-lg border-2 bg-[#f8fbfc] text-left text-slate-950 shadow-sm transition",
                   isSelected
                     ? "border-cyan-500 ring-4 ring-cyan-500/15"
                     : "border-slate-300 hover:border-cyan-600 hover:bg-white",
                 ].join(" ")}
               >
+                <button type="button" aria-pressed={isSelected} onClick={() => onChange(String(optionId ?? label))} className="flex min-h-20 flex-1 items-center self-stretch rounded-lg px-4 py-3 text-left focus-visible:outline-2 focus-visible:outline-cyan-600">
                 <span className={isToken ? "" : "text-xl font-black sm:text-2xl"}>
                   {isToken ? <GroundAssessmentToken token={label} /> : <MathFormattedText text={label} compactFractions />}
                 </span>
-                <OptionReadAloudButton text={label} className="shrink-0" />
-              </button>
+                </button>
+                <OptionReadAloudButton text={label} className="mr-4 shrink-0" />
+              </div>
             );
           })}
         </div>

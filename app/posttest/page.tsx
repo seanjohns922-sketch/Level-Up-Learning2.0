@@ -1,5 +1,6 @@
 "use client";
 
+import { year1NumberPostVersion } from "@/lib/year1-number-assessment-version";
 import { assessmentEvidenceMetadata } from "@/lib/assessment-growth";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -18,7 +19,7 @@ import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/
 import { analyzeAssessmentResult, isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 import { ActiveLearningTracker } from "@/components/student/ActiveLearningTracker";
 import { DEMO_MODE } from "@/data/config";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { isDemoPreviewMode, useDemoPreviewMode } from "@/lib/demo-mode";
 import { getLastProgramWeek, getProgramWeeks, getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from "@/lib/program-progress";
 import { buildAssessmentReturnRoute } from "@/lib/assessment-routes";
 import { buildLessonRoute } from "@/lib/lesson-routing";
@@ -361,6 +362,7 @@ function PostTestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
+  const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3>(2);
   const questions = useMemo<Question[]>(
     () => candidateReviewEnabled
       ? starpathCandidateReviewRequested
@@ -368,8 +370,8 @@ function PostTestPage() {
         : starpathLevel1CandidateRequested
           ? [...LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
-      : getPosttestForYearLabel(year, progressRealmId)?.questions ?? [],
-    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId],
+      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version)?.questions ?? [],
+    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version],
   );
 
   const [idx, setIdx] = useState(0);
@@ -382,7 +384,7 @@ function PostTestPage() {
     tens: 0,
     ones: 0,
   });
-  const previewMode = isDemoPreviewMode();
+  const previewMode = useDemoPreviewMode();
   const [canonicalProgress, setCanonicalProgress] = useState<StudentProgress | null>(null);
   const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">(previewMode ? "ready" : "loading");
   const [restoreError, setRestoreError] = useState("");
@@ -402,7 +404,9 @@ function PostTestPage() {
   }, [candidateReviewEnabled]);
 
   useEffect(() => {
-    if (previewMode) {
+    if (isDemoPreviewMode()) {
+      setNumberLevel1Version(3);
+      setRestoreState("ready");
       setCanonicalProgress(readProgress(localProgressRealmId));
       return;
     }
@@ -420,6 +424,14 @@ function PostTestPage() {
           setRestoreError("Your saved program could not be found. Ask your teacher to check your placement.");
           setRestoreState("error");
           return;
+        }
+        if (progressRealmId === "number" && year === "Year 1") {
+          let draftIds: string[] | undefined;
+          try {
+            const draft = JSON.parse(localStorage.getItem(getPosttestDraftKey(progressRealmId, year)) ?? "null");
+            draftIds = draft?.questionIds ?? (draft?.answers ? Object.keys(draft.answers) : undefined);
+          } catch { /* A malformed draft does not change the recorded baseline version. */ }
+          setNumberLevel1Version(year1NumberPostVersion(restored.rows.flatMap(row => row.assessment_attempts ?? []), draftIds));
         }
         setCanonicalProgress(progress);
         setRestoreState("ready");
@@ -485,9 +497,9 @@ function PostTestPage() {
     if (!draftLoaded || submitted || questions.length === 0) return;
     localStorage.setItem(
       getPosttestDraftKey(progressRealmId, year),
-      JSON.stringify({ index: idx, answers, startedAt: assessmentStartedAt })
+      JSON.stringify({ index: idx, answers, questionIds: questions.map(q => q.id), startedAt: assessmentStartedAt })
     );
-  }, [answers, assessmentStartedAt, draftLoaded, idx, progressRealmId, questions.length, submitted, year]);
+  }, [answers, assessmentStartedAt, draftLoaded, idx, progressRealmId, questions, submitted, year]);
 
   function pick(option: string) {
     if (!q) return;

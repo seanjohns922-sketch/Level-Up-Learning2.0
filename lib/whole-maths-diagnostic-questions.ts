@@ -34,8 +34,9 @@ export function getDiagnosticQuestions(
 ): LinkedDiagnosticQuestion[] {
   const definition = DIAGNOSTIC_STRANDS.find((candidate) => candidate.strand === strand);
   if (!definition?.available || !definition.realmId) return [];
-  const pretest = getPretestForYearLabel(level, definition.realmId);
-  const posttest = getPosttestForYearLabel(level, definition.realmId)?.questions ?? [];
+  // Retain existing diagnostic sittings until independent checkpoint forms are version-pinned.
+  const pretest = getPretestForYearLabel(level, definition.realmId, 2);
+  const posttest = getPosttestForYearLabel(level, definition.realmId, 2)?.questions ?? [];
   const levelTest = checkpoint === "start"
     ? (pretest.length > 0 ? pretest : posttest)
     : checkpoint === "mid"
