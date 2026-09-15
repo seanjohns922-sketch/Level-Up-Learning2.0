@@ -30,7 +30,7 @@ The revised post-test retains the mathematical examples/answers for Q1–Q16 and
 | 16 | AC9M3N07 | Follow a branching algorithm: even start, halve, then add 3. Same branch/step count in every form. |
 | 17 | AC9M3N02 | Select a unit fraction model from five equal-length strips split into 2, 3, 4, 5 and 10 equal parts. Targets vary; all models appear in every form. |
 | 18 | AC9M3N02 | Find the additional tenths required to complete a whole; 3–8 tenths supplied. |
-| 19 | AC9M3N02 | Order three distinct internal multiples of one-tenth; no 0/1 endpoints or mixed denominators. |
+| 19 | AC9M3N02 | Order three distinct internal multiples of one-tenth using fraction notation only; no shaded bars, 0/1 endpoints or mixed denominators. |
 | 20 | AC9M3N02 | Place a multiple of one-tenth on the same 0–1 line; internal points only. |
 
 Q18 replaces the older “which picture shows the whole?” item because that did not directly sample combining same-denominator fractions to complete a whole. Q19/Q20 use tenths in every form so five different examples can retain the same denominator and response format. These are explicit content changes for owner review, not a claim that historical scores can be directly compared.
@@ -39,7 +39,7 @@ Q18 replaces the older “which picture shows the whole?” item because that di
 
 Keep Number Nexus's dark teal shell with lighter, high-contrast mathematical panels. Use place-value columns, clean equation displays, labelled collection/story panels, Australian coin denominations, bag diagrams, arrays, a decision diagram, equal-length fraction strips and an interactive number line. No decorative collectible cards or changes to lesson artwork.
 
-Visuals show supplied facts, not a completed calculation or highlighted correct choice. Equation questions retain symbolic displays; redundant pictures would dilute the mental-calculation evidence. The rounding interval gives endpoints but does not locate the number or highlight an answer. Coins are clearly labelled schematic denominations, not photographic replicas.
+Visuals show supplied facts, not a completed calculation or highlighted correct choice. Equation questions retain symbolic displays; redundant pictures would dilute the mental-calculation evidence. The rounding interval gives endpoints but does not locate the number or highlight an answer. Money questions use the existing Australian coin images (kangaroos, Aboriginal elder, platypus and lyrebird designs), with denomination-specific sizing. Q11 includes contextual can illustrations, including a damaged can; these do not represent the count.
 
 Read-aloud includes diagram quantities and instructions, including both branches of the algorithm. Review details and solutions stay collapsed. Form switches retain the same slot for comparison; all 20 slots are accessible in author review. Exit returns to Number Level 3 in Demo Review. Responses remain in component memory only. On narrow phones, the number line scrolls horizontally to retain usable targets; arrays use smaller spacing. Child-view inspection on the intended tablets remains the owner's review step.
 
@@ -56,3 +56,5 @@ The Level 3 audit uses 100 independently worked keys, rejects incorrect/blank re
 The generated inventory contains every prompt, option, answer, visual parameter and curriculum mapping. The existing release gates, TypeScript, lint and production build are checked separately. No automated Chrome tour is needed for this pass.
 
 Validation completed: all 100 question cards server-render without invalid quantities; all 23 existing release gates pass; TypeScript and lint pass; isolated production build passes using webpack with the existing local configuration. No credentials were copied into the checkout. The local review server uses port 3003.
+
+Owner review adjustments: Q9/Q10 Australian coin images, Q11 can illustrations, and Q19 fraction notation without model aids apply to all five forms. Answers, question identities and scoring are unchanged. Other levels retain their existing fraction visuals.

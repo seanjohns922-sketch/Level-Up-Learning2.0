@@ -39,6 +39,7 @@ import ChanceVisual from "@/components/chance-hollow/ChanceVisual";
 import type { ChanceVisual as ChanceVisualData } from "@/data/activities/year1/practice-task";
 
 type GenericQuestion = {
+  showFractionModels?: boolean;
   id?: string;
   type?: string;
   prompt: string;
@@ -587,10 +588,10 @@ export default function AssessmentQuestionCard({
                 ? "rounded-lg border-2 border-slate-300 bg-[#f8fbfc] p-4 text-left shadow-sm transition hover:border-cyan-600 hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
                 : "rounded-2xl border border-slate-600 bg-slate-700/50 p-4 text-left shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"}
             >
-              <div className={isEarlyNumberVisual ? "text-lg font-black text-slate-950" : "text-lg font-black text-white"}>
+              <div className={question.showFractionModels === false ? "py-3 text-center text-4xl font-black text-slate-950" : isEarlyNumberVisual ? "text-lg font-black text-slate-950" : "text-lg font-black text-white"}>
                 <FractionText value={fraction} />
               </div>
-              {!isYearFiveNumberVisual && !isYearSixNumberVisual ? <div className="mt-3"><FractionBar fraction={fraction} large /></div> : null}
+              {question.showFractionModels !== false && !isYearFiveNumberVisual && !isYearSixNumberVisual ? <div className="mt-3"><FractionBar fraction={fraction} large /></div> : null}
             </button>
           ))}
         </div>
@@ -607,10 +608,10 @@ export default function AssessmentQuestionCard({
                   onDrop={() => moveDragged(index)}
                   className={isEarlyNumberVisual ? "cursor-move rounded-lg border-2 border-cyan-600 bg-white p-3 shadow-sm" : "cursor-move rounded-2xl border border-slate-600 bg-slate-700/50 p-3 shadow-sm"}
                 >
-                  <div className={isEarlyNumberVisual ? "text-sm font-black text-slate-950" : "text-sm font-black text-white"}>
+                  <div className={question.showFractionModels === false ? "py-2 text-center text-3xl font-black text-slate-950" : isEarlyNumberVisual ? "text-sm font-black text-slate-950" : "text-sm font-black text-white"}>
                     <FractionText value={fraction} compact />
                   </div>
-                  {!isYearFiveNumberVisual && !isYearSixNumberVisual ? <div className="mt-2"><FractionBar fraction={fraction} /></div> : null}
+                  {question.showFractionModels !== false && !isYearFiveNumberVisual && !isYearSixNumberVisual ? <div className="mt-2"><FractionBar fraction={fraction} /></div> : null}
                 </div>
               ))
             ) : (
