@@ -1,4 +1,5 @@
 "use client";
+import NumberNexusYear7AssessmentVisual from "./NumberNexusYear7AssessmentVisual";
 import FractionPlacementLine from "./FractionPlacementLine";
 import PrepNumberCandidateCard from "./PrepNumberCandidateCard";
 import { groundNumberReleaseItem } from "@/data/assessments/releases/groundNumber";
@@ -336,7 +337,8 @@ export default function AssessmentQuestionCard({
         visual.type.startsWith("number_y2_") ||
         visual.type.startsWith("number_y4_") ||
         visual.type.startsWith("number_y5_") ||
-        visual.type.startsWith("number_y6_")));
+        visual.type.startsWith("number_y6_") ||
+        visual.type.startsWith("number_y7_")));
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
@@ -403,6 +405,7 @@ export default function AssessmentQuestionCard({
       {typeof visual.type === "string" && visual.type.startsWith("number_y5_") ? (
         <NumberNexusYear5AssessmentVisual visual={visual} />
       ) : null}
+      {typeof visual.type === "string" && visual.type.startsWith("number_y7_") ? <NumberNexusYear7AssessmentVisual visual={visual} /> : null}
       {typeof visual.type === "string" && visual.type.startsWith("number_y6_") ? (
         <NumberNexusYear6AssessmentVisual visual={visual} />
       ) : null}

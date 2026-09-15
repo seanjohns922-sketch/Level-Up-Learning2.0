@@ -25,7 +25,7 @@ export default function DemoPreviewBanner() {
     if (reviewingAssessment) {
       const strand = searchParams.get("strand");
       const realm = pathname.includes("number") ? "number" : searchParams.get("realm_id") ?? (strand === "algebra" ? "pattern" : strand === "probability" ? "chance" : strand) ?? "number";
-      const year = /^\/demo-review\/number-level-[1-6]$/.test(pathname) ? `Year ${pathname.slice(-1)}` : searchParams.get("year") ?? searchParams.get("level") ?? "Prep";
+      const year = pathname === "/demo-review/number-level-7" ? "Year 6" : /^\/demo-review\/number-level-[1-7]$/.test(pathname) ? `Year ${pathname.slice(-1)}` : searchParams.get("year") ?? searchParams.get("level") ?? "Prep";
       router.push(`/demo-review?${new URLSearchParams({realm,year}).toString()}`);
       return;
     }
