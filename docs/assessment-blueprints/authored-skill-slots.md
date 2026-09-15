@@ -250,7 +250,7 @@ Partition a two-digit number into tens and ones.
 
 Create different partitions of one- and two-digit numbers.
 
-- Response: construction; thinking: reasoning; expected difficulty: moderate (uncalibrated).
+- Response: construction; thinking: reasoning; expected difficulty: challenging (uncalibrated).
 - Required representation: Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer.
 - Keep equivalent: One one-digit partition and one two-digit exchange; same part count and value conservation. Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples.
 - Scoring: Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations.

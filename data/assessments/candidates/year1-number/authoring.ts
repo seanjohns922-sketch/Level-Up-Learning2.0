@@ -80,8 +80,8 @@ export const YEAR1_NUMBER_AUTHORING_ROWS: readonly AuthoredRow[] = [
   {
     visual:"Clear addition expression with optional blank two-ten-frame workspace and counters. No completed groups or make-ten step. Same optional tools across forms.",
     rubric:"Exact sum. All examples cross ten, use two single-digit addends, and stay within 20. Strategy is available, not asserted from the answer.",
-    prompts:["What is 8 + 5?","What is 9 + 5?","What is 8 + 6?","What is 7 + 5?","What is 9 + 6?"],
-    tasks:[{kind:"add",left:8,right:5},{kind:"add",left:9,right:5},{kind:"add",left:8,right:6},{kind:"add",left:7,right:5},{kind:"add",left:9,right:6}],
+    prompts:["What is 8 + 7?","What is 9 + 8?","What is 8 + 9?","What is 7 + 9?","What is 9 + 7?"],
+    tasks:[{kind:"add",left:8,right:7},{kind:"add",left:9,right:8},{kind:"add",left:8,right:9},{kind:"add",left:7,right:9},{kind:"add",left:9,right:7}],
   },
   {
     visual:"Clear subtraction expression, optional blank two-ten-frame workspace and counters. No crossed-out answer model or worked intermediate step.",
@@ -157,11 +157,11 @@ export const YEAR1_NUMBER_AUTHORING_ROWS: readonly AuthoredRow[] = [
   },
 ];
 
-export const YEAR1_NUMBER_AUTHORING_VERSION="year1-number-authoring-2026-09-15-1";
+export const YEAR1_NUMBER_AUTHORING_VERSION="year1-number-authoring-2026-09-15-2";
 const materials=["shells","beads","cards","buttons","leaves"] as const;
 export const YEAR1_NUMBER_CANDIDATE_SPECS=Object.fromEntries(ASSESSMENT_FORMS.map((form,f)=>[form,
   YEAR1_NUMBER_AUTHORING_ROWS.map((row,i)=>({
-    id:`number-1-${form}-${String(i+1).padStart(2,"0")}-candidate-1`,
+    id:`number-1-${form}-${String(i+1).padStart(2,"0")}-candidate-2`,
     version:YEAR1_NUMBER_AUTHORING_VERSION,blueprintVersion:ASSESSMENT_DESIGN_VERSION,
     form,slot:NUMBER_SLOTS[1][i],prompt:row.prompts[f],task:row.tasks[f],
     visual:row.visual,materials:materials[f],rubric:row.rubric,maximumScore:1 as const,

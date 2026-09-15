@@ -5,7 +5,7 @@ export const NUMBER_SLOTS = {
  ['N01','order','Order numbers spanning the hundred boundary.','Four cards: one value from 95–99, plus 100, 110 and 120; same zero placeholders and boundary crossings, comparable rather than identical gaps.','AM'],
  ['N01','numberLine','Locate and name numbers up to 120.','Same interval and labelled endpoints; include the 120 boundary in the form.','AM'],
  ['N02','baseTen','Partition a two-digit number into tens and ones.','Same two-digit band; standard partition required.','AA'],
- ['N02','baseTen','Create different partitions of one- and two-digit numbers.','One one-digit partition and one two-digit exchange; same part count and value conservation.','RM'],
+ ['N02','baseTen','Create different partitions of one- and two-digit numbers.','One one-digit partition and one two-digit exchange; same part count and value conservation.','RC'],
  ['N03','count','Quantify a collection grouped in tens.','Twelve full groups of ten, reaching 120 in every form; no loose objects and no printed total.','AA'],
  ['N03','model','Group a collection in fives to count efficiently.','Groups of five from 20–30 objects; complete groups; identical multi-select controls limit motor workload. Twos and tens are sampled in sequence slots.','AM'],
  ['N04','calculate','Add within 20 using part-whole knowledge.','Same crossing-ten and operand-size demand.','AA'],

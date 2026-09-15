@@ -7,11 +7,11 @@ import { scoreYear1NumberResponse, scoreYear1NumberSubmission, type Year1NumberR
 // Independently calculated targets by form. These verify authoring arithmetic;
 // they are not runtime scorers or a claim that constructions have been tested.
 const keys = [
-  {build:[11,1],order:[96,100,110,120],line:114,partition:[3,4],exchange:[2,14],small:[2,5],total:120,groups:4,add:13,subtract:8,missing:5,arrive:12,leave:9,money:4,share:4,group:4,skip:[18,20],stages:[20,30,40]},
-  {build:[11,4],order:[97,100,110,120],line:117,partition:[3,7],exchange:[2,17],small:[3,5],total:120,groups:5,add:14,subtract:8,missing:5,arrive:13,leave:9,money:4,share:5,group:5,skip:[20,22],stages:[30,40,50]},
-  {build:[11,2],order:[98,100,110,120],line:113,partition:[3,5],exchange:[2,15],small:[4,5],total:120,groups:6,add:14,subtract:7,missing:7,arrive:12,leave:8,money:4,share:6,group:6,skip:[22,24],stages:[40,50,60]},
-  {build:[11,5],order:[99,100,110,120],line:116,partition:[3,8],exchange:[2,18],small:[3,4],total:120,groups:5,add:12,subtract:8,missing:5,arrive:13,leave:9,money:6,share:5,group:5,skip:[24,26],stages:[50,60,70]},
-  {build:[11,3],order:[95,100,110,120],line:118,partition:[3,6],exchange:[2,16],small:[2,6],total:120,groups:4,add:15,subtract:7,missing:6,arrive:14,leave:8,money:6,share:4,group:4,skip:[16,18],stages:[60,70,80]},
+  {build:[11,1],order:[96,100,110,120],line:114,partition:[3,4],exchange:[2,14],small:[2,5],total:120,groups:4,add:15,subtract:8,missing:5,arrive:12,leave:9,money:4,share:4,group:4,skip:[18,20],stages:[20,30,40]},
+  {build:[11,4],order:[97,100,110,120],line:117,partition:[3,7],exchange:[2,17],small:[3,5],total:120,groups:5,add:17,subtract:8,missing:5,arrive:13,leave:9,money:4,share:5,group:5,skip:[20,22],stages:[30,40,50]},
+  {build:[11,2],order:[98,100,110,120],line:113,partition:[3,5],exchange:[2,15],small:[4,5],total:120,groups:6,add:17,subtract:7,missing:7,arrive:12,leave:8,money:4,share:6,group:6,skip:[22,24],stages:[40,50,60]},
+  {build:[11,5],order:[99,100,110,120],line:116,partition:[3,8],exchange:[2,18],small:[3,4],total:120,groups:5,add:16,subtract:8,missing:5,arrive:13,leave:9,money:6,share:5,group:5,skip:[24,26],stages:[50,60,70]},
+  {build:[11,3],order:[95,100,110,120],line:118,partition:[3,6],exchange:[2,16],small:[2,6],total:120,groups:4,add:16,subtract:7,missing:6,arrive:14,leave:8,money:6,share:4,group:4,skip:[16,18],stages:[60,70,80]},
 ];
 let assertions=0;
 const check=(value:unknown,label:string)=>{assertions++;assert.ok(value,label);};
@@ -113,4 +113,14 @@ for(let i=0;i<20;i++) {
 }
 writeFileSync("docs/assessment-blueprints/year1-number-authoring-matrix.md",matrix.join("\n")+"\n");
 writeFileSync("docs/assessment-blueprints/year1-number-authoring-inventory.json",JSON.stringify({status:"authoring-only",assertions,forms:YEAR1_NUMBER_CANDIDATE_SPECS,independentWorkedTargets:keys},null,2)+"\n");
-console.log(`Level 1 Number: 100 specifications; ${assertions} authoring and candidate-scoring checks passed. Renderers and live saving not yet implemented.`);
+const profile:Record<string,number>={};
+for(const item of YEAR1_NUMBER_CANDIDATE_SPECS.pretest) profile[item.slot.expectedDifficulty]=(profile[item.slot.expectedDifficulty]??0)+1;
+const difficulty=["# Level 1 Number: difficulty audit","","Design review, not empirical calibration. All five forms share this intended difficulty profile: "+Object.entries(profile).map(([name,count])=>`${count} ${name}`).join(", ")+".","","## Changes from the first draft","","- Addition now samples sums 15–17 instead of clustering at 12–15. All five examples still use two single-digit addends crossing ten, within Year 1 scope.","- The two-part partition/exchange task is challenging: it requires conservation of a one-digit whole and exchanging one ten in a two-digit representation. It is not treated like straightforward place-value recognition.","- Grouping supports multi-select and untimed work. Larger totals still involve more selections; this workload variation must be checked during rendered review and piloting.","- Number-line movement has one-step buttons as well as a slider so motor precision need not determine correctness.","- Every form reaches 120, distinguishes sharing from grouping, samples twos/fives/tens, and distinguishes growing sequences from repeating patterns.","","## Slot comparison","","Prompt counts below cover the stem only. Instructions, labels and reason choices also contribute reading load and must be reviewed on screen. Read-aloud is available. Matching these properties does not establish statistically equal form difficulty.","","| Slot | Expected difficulty | Cognitive demand | Response | Stem words across forms | Main control |","| --- | --- | --- | --- | --- | --- |"];
+for(let i=0;i<20;i++) {
+  const item=YEAR1_NUMBER_CANDIDATE_SPECS.pretest[i];
+  const counts=ASSESSMENT_FORMS.map(f=>YEAR1_NUMBER_CANDIDATE_SPECS[f][i].prompt.trim().split(/\s+/).length);
+  difficulty.push(`| ${i+1} | ${item.slot.expectedDifficulty} | ${item.slot.cognitiveDemand} | ${item.slot.response} | ${Math.min(...counts)}–${Math.max(...counts)} | ${item.task.kind} |`);
+}
+difficulty.push("","## Limits before student release","","This is a broad Year 1 sample with both accessible and demanding tasks, not evidence of a measured test ceiling. A high-performing cohort may still score highly. Review item success rates, distractors and discrimination after piloting before declaring calibration. Same-level growth requires compatible form versions and observed parallel-form performance; do not strengthen End questions merely because they are taken later.","","Remaining: all rendered desktop/tablet/mobile states, spoken output, model construction and submission usability, then real save/resume/report verification. No claim that the full assessment is ready for students.");
+writeFileSync("docs/assessment-blueprints/year1-number-difficulty-audit.md",difficulty.join("\n")+"\n");
+console.log(`Level 1 Number: 100 specifications; ${assertions} authoring and candidate-scoring checks passed. Rendered review and live saving remain release gates.`);

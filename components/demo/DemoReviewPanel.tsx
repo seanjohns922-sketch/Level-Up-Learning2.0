@@ -392,6 +392,12 @@ export default function DemoReviewPanel() {
           </div>
         </section>
 
+        {realm === "number" && (year === "Prep" || year === "Year 1") ? <section className="border-t border-teal-300/20 py-6">
+          <h2 className="mb-2 text-base font-black">New Number Nexus assessments</h2>
+          <p className="mb-3 text-sm text-white/70">Review the Prep and Level 1 candidates across all five forms. Preview only; no student results are saved.</p>
+          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/assessment-candidates")}><Eye size={17}/> Open candidate assessments</button>
+        </section> : null}
+
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-sky-300" /><h2 className="text-base font-black">Whole-Maths Diagnostic</h2></div>
           {year !== "Prep" ? (

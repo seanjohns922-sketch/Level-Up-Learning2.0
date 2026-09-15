@@ -27,6 +27,7 @@ export const FORM_EQUIVALENCE_RULES = [
 ] as const;
 export const RELEASE_EVIDENCE = [
   "descriptor-and-skill-coverage", "independent-answer-key-check", "five-form-equivalence-review",
+  "difficulty-and-workload-review",
   "rendered-desktop-review", "rendered-tablet-review", "rendered-mobile-review", "read-aloud-review",
   "first-submission-scoring", "resume-same-item-version", "save-retry-idempotency",
   "teacher-report-roundtrip", "version-and-cycle-comparison", "owner-child-view-review",

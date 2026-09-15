@@ -14,7 +14,7 @@ Date: 2026-09-15. Status: **authoring and scorer draft; not release-ready**.
 - Composite items require both requested parts of the answer. A numeric answer alone cannot satisfy conservation reasoning, and a correct comparison alone cannot satisfy pairing evidence.
 - Scoring checks item identity and version, retains raw response, and represents missing/unmatched evidence as `score: null`, not zero.
 - Independent worked examples and negative scoring checks cover all 100 items. Audit additionally checks all two-part partitions for the authored totals.
-- Development-only review route: `/demo-review/assessment-candidates`. Production returns 404. The harness has no student identity or database, storage, progression or reward writes.
+- Protected review route: `/demo-review/assessment-candidates`, using the same server-side access check as Diagnostic Preview. The harness has no student identity or database, storage, progression or reward writes. Prep and Level 1 are selectable; the shared Number Nexus shell supplies the theme.
 
 ## Important limits and remaining work
 
