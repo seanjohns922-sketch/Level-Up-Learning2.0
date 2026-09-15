@@ -95,7 +95,7 @@ assert.doesNotMatch(reviewComponent,/localStorage|sessionStorage|supabase|saveRe
 const route=readFileSync(new URL("../app/demo-review/number-level-1/page.tsx",import.meta.url),"utf8");
 assert.ok(route.includes("getServerStarpathAccess")&&route.includes('if (!access.allowed) redirect("/login")'));
 // Manual review must not alter currently assigned student questions or diagnostics.
-assert.ok(getPretestForYearLabel("Year 1","number").every(q=>q.id.endsWith("-v3")));
+assert.ok(getPretestForYearLabel("Year 1","number",3).every(q=>q.id.endsWith("-v3")));
 assert.ok(getPosttestForYearLabel("Year 1","number",2)!.questions.every(q=>q.id.endsWith("-v2")));
 assert.ok(getDiagnosticQuestions("number","Year 1","existing-sitting","start").every(q=>q.question.id.endsWith("-v2")));
 console.log(`Number Level 1: 100 independent answer/visual checks, five distinct examples per slot, six strengthened slots, retained benchmark elsewhere, matched demand, scoring and protected review isolation pass. Counting workload: ${JSON.stringify(workload)}.`);

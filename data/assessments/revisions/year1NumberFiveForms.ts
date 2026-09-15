@@ -73,10 +73,10 @@ function strengthenedExamples(form: NumberLevel1Form): Record<number, Example> {
   const total = (coins: readonly number[]) => coins.reduce((a,b)=>a+b,0);
   return {
     3: {...numeric(p.add[1]-p.add[0],{type:"number_y1_equation",expression:`${p.add[0]} + ? = ${p.add[1]}`},"What number makes this addition correct?"),skillLabel:"Find a Missing Addend",cognitiveCategory:"reasoning"},
-    4: {...numeric(p.grow[1]-p.grow[0],{type:"number_y1_growth_story",before:p.grow[0],after:p.grow[1]},`There were ${p.grow[0]} seedlings. Now there are ${p.grow[1]}. How many were planted?`),skillLabel:"Find an Unknown Increase",cognitiveCategory:"application"},
+    4: {...numeric(p.grow[1]-p.grow[0],{type:"number_y1_growth_story",before:p.grow[0],after:p.grow[1]},`There were ${p.grow[0]} seedlings. Now there are ${p.grow[1]}. How many more were planted?`),skillLabel:"Find an Unknown Increase",cognitiveCategory:"application"},
     12: {...numeric(p.subtract[0]+p.subtract[1],{type:"number_y1_equation",expression:`? − ${p.subtract[0]} = ${p.subtract[1]}`},"What starting number makes this subtraction correct?"),skillLabel:"Find a Missing Starting Number",cognitiveCategory:"reasoning"},
     13: {...numeric(20-p.prices[0]-p.prices[1],{type:"number_y1_shop_change",paid:20,prices:[...p.prices],labels:["Puzzle","Kite"]},"You pay $20 for both toys. How much change?"),skillLabel:"Calculate Change for Two Items",cognitiveCategory:"application"},
-    18: {...numeric(total(p.coins[1])-total(p.coins[0]),{type:"number_y1_money_compare",groups:p.coins.map(coins=>[...coins]),labels:[...p.names]},`How many more dollars does ${p.names[1]} have than ${p.names[0]}?`),type:"numeric",options:[],skillLabel:"Compare Coin Values",cognitiveCategory:"reasoning"},
+    18: {...numeric(total(p.coins[1])-total(p.coins[0]),{type:"number_y1_money_compare",groups:p.coins.map(coins=>[...coins]),labels:[...p.names]},`How much more money does ${p.names[1]} have than ${p.names[0]}?`),type:"numeric",options:[],skillLabel:"Compare Coin Values",cognitiveCategory:"reasoning"},
     19: {...numeric((p.trays[0]-p.trays[1])/2,{type:"number_y1_balance_trays",groups:[...p.trays],labels:["Tray A","Tray B"]},"Move counters from Tray A to Tray B to make them equal. How many?"),type:"numeric",options:[],skillLabel:"Redistribute into Equal Shares",cognitiveCategory:"reasoning"},
   };
 }

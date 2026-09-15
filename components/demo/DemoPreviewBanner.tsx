@@ -20,7 +20,15 @@ export default function DemoPreviewBanner() {
 
   if (!active || usesRealmNavigation) return null;
 
+  const reviewingAssessment = pathname === "/pretest" || pathname === "/posttest" || pathname.startsWith("/demo-review/");
   function exitDemoMode() {
+    if (reviewingAssessment) {
+      const strand = searchParams.get("strand");
+      const realm = pathname.includes("number") ? "number" : searchParams.get("realm_id") ?? (strand === "algebra" ? "pattern" : strand === "probability" ? "chance" : strand) ?? "number";
+      const year = pathname.includes("number-level-1") ? "Year 1" : searchParams.get("year") ?? searchParams.get("level") ?? "Prep";
+      router.push(`/demo-review?${new URLSearchParams({realm,year}).toString()}`);
+      return;
+    }
     clearScopedProgress("demo-preview");
     clearScopedProgramStore("demo-preview");
     resetDemoEconomyPreview();
@@ -38,7 +46,7 @@ export default function DemoPreviewBanner() {
           onClick={exitDemoMode}
           className={`${isStarpathProgram ? "rounded-md" : "rounded-full"} bg-amber-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-amber-50 transition hover:brightness-110`}
         >
-          Exit
+          {reviewingAssessment ? "Back to Review" : "Exit"}
         </button>
       </div>
     </div>

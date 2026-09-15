@@ -72,9 +72,9 @@ export default function NumberNexusYear1AssessmentVisual({ visual }: { visual: V
     const prices = visual.prices as number[];
     const labels = visual.labels as string[];
     return <Surface><div className="space-y-4">
-      <div className="rounded-xl border border-amber-800/20 bg-amber-50 p-4 text-center text-xl font-black">You pay ${Number(visual.paid)}</div>
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-amber-800/20 bg-amber-50 p-4 text-center text-xl font-black"><span>You pay ${Number(visual.paid)}</span>{renderCoins(Number(visual.paid))}</div>
       <div className="grid grid-cols-2 gap-4">{prices.map((price,i)=><div key={i} className="flex flex-col items-center gap-3 rounded-xl border border-teal-800/20 bg-white p-4">
-        <MoneyItemIcon label={labels[i]}/><h3 className="text-lg font-bold">{labels[i]}</h3><span className="text-3xl font-black">${price}</span>
+        <MoneyItemIcon label={labels[i]}/><h3 className="text-lg font-bold">{labels[i]}</h3><span className="text-3xl font-black">${price}</span>{renderCoins(price)}
       </div>)}</div>
       <p className="text-center text-lg font-bold">Your change: $ ?</p>
     </div></Surface>;

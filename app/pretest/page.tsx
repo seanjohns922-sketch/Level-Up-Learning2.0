@@ -399,7 +399,7 @@ function PretestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
-  const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3>(3);
+  const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(5);
   const questions: Question[] = useMemo(
     () => candidateReviewEnabled
       ? starpathLevel1CandidateRequested
@@ -492,7 +492,7 @@ function PretestPage() {
   useEffect(() => {
     const snapshot = loadPretestResume(year, localProgressRealmId);
     const version = progressRealmId === "number" && year === "Year 1" && !isDemoPreviewMode()
-      ? savedYear1NumberVersion(snapshot?.questionIds) ?? 3 : 3;
+      ? savedYear1NumberVersion(snapshot?.questionIds) ?? 5 : 5;
     setNumberLevel1Version(version);
     const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version);
     if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(resumeQuestions.map(q => q.id)))) {
@@ -517,7 +517,7 @@ function PretestPage() {
   }
 
   function restartAssessment() {
-    setNumberLevel1Version(3);
+    setNumberLevel1Version(5);
     clearPretestResume(year, localProgressRealmId);
     setAnswers(Array(questions.length).fill(null));
     setIdkResponses([]);
@@ -602,7 +602,7 @@ function PretestPage() {
   }
   function exitToLevels() {
     persistSnapshot();
-    router.push("/levels");
+    router.push(isDemoPreviewMode() ? `/demo-review?realm=${progressRealmId}&year=${encodeURIComponent(year)}` : "/levels");
   }
   async function exitLogout() {
     persistSnapshot();

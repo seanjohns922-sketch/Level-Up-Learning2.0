@@ -54,7 +54,7 @@ const { comparableAssessmentGrowth } = await import("../lib/assessment-growth");
 const { buildAssessmentQuestionSnapshots } = await import("../lib/assessment-replay");
 const { getPretestForYearLabel, getPosttestForYearLabel } = await import("../data/assessments/api");
 const { getDiagnosticQuestions } = await import("../lib/whole-maths-diagnostic-questions");
-assert.deepEqual(getPretestForYearLabel("Year 1", "number").map(q => q.id), pre.map(q => q.id));
+assert.deepEqual(getPretestForYearLabel("Year 1", "number", 3).map(q => q.id), pre.map(q => q.id));
 assert.deepEqual(getPosttestForYearLabel("Year 1", "number", 2)!.questions.map(q => q.id), oldPost.map(q => q.id));
 assert.equal(savedYear1NumberVersion(oldPre.map(q => q.id)), 2);
 assert.equal(savedYear1NumberVersion(pre.map(q => q.id)), 3);

@@ -362,7 +362,7 @@ function PostTestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
-  const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3>(2);
+  const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(2);
   const questions = useMemo<Question[]>(
     () => candidateReviewEnabled
       ? starpathCandidateReviewRequested
@@ -405,7 +405,7 @@ function PostTestPage() {
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
-      setNumberLevel1Version(3);
+      setNumberLevel1Version(5);
       setRestoreState("ready");
       setCanonicalProgress(readProgress(localProgressRealmId));
       return;
@@ -865,7 +865,7 @@ function PostTestPage() {
           onNext={next}
           onSubmit={() => submit()}
           onIdk={answerIdk}
-          onExit={() => router.push(buildAssessmentReturnRoute({ year, realmId }))}
+          onExit={() => router.push(isDemoPreviewMode() ? `/demo-review?realm=${progressRealmId}&year=${encodeURIComponent(year)}` : buildAssessmentReturnRoute({ year, realmId }))}
           wideContent={isInteractiveTask}
           hidePrompt={isInteractiveTask}
           lightSurface={isInteractiveTask}

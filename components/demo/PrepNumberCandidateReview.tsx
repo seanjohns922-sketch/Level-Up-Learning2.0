@@ -61,7 +61,7 @@ export default function PrepNumberCandidateReview() {
       onBack={()=>setIndex(i=>Math.max(0,i-1))}
       onNext={()=>setIndex(i=>Math.min(19,i+1))}
       onSubmit={()=>{setSubmitted(s=>({...s,[item.id]:true}));setFinishedItem(item.id);}}
-      onExit={()=>{window.location.href="/demo-review";}}
+      onExit={()=>{window.location.href="/demo-review?realm=number&year=Prep";}}
     />
   </ReadAloudRateProvider>;
 }

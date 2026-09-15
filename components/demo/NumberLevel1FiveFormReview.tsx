@@ -72,7 +72,7 @@ export default function NumberLevel1FiveFormReview() {
       hasAnswer={true} isLast={index===19}
       onBack={()=>select(form,Math.max(0,index-1))} onNext={()=>select(form,Math.min(19,index+1))}
       onSubmit={()=>setFinished(previous=>({...previous,[form]:true}))}
-      onExit={()=>router.push("/demo-review")}
+      onExit={()=>router.push("/demo-review?realm=number&year=Year%201")}
     />
   </ReadAloudRateProvider>;
 }

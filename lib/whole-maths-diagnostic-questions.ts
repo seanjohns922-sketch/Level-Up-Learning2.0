@@ -1,3 +1,4 @@
+import { YEAR1_NUMBER_RELEASED_FORMS } from "@/data/assessments/revisions/year1NumberReleasedForms";
 import {
   getPosttestForYearLabel,
   getPretestForYearLabel,
@@ -31,13 +32,16 @@ export function getDiagnosticQuestions(
   level: string,
   sittingId: string,
   checkpoint: DiagnosticCheckpoint = "start",
+  numberLevel1Version: 2 | 5 = 2,
 ): LinkedDiagnosticQuestion[] {
   const definition = DIAGNOSTIC_STRANDS.find((candidate) => candidate.strand === strand);
   if (!definition?.available || !definition.realmId) return [];
   // Retain existing diagnostic sittings until independent checkpoint forms are version-pinned.
   const pretest = getPretestForYearLabel(level, definition.realmId, 2);
   const posttest = getPosttestForYearLabel(level, definition.realmId, 2)?.questions ?? [];
-  const levelTest = checkpoint === "start"
+  const levelTest = strand === "number" && level === "Year 1" && numberLevel1Version === 5
+    ? YEAR1_NUMBER_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint]
+    : checkpoint === "start"
     ? (pretest.length > 0 ? pretest : posttest)
     : checkpoint === "mid"
       ? (posttest.length > 0 ? posttest : pretest)

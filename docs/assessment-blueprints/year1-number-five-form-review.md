@@ -1,4 +1,4 @@
-# Number Level 1: five forms ready for manual review
+# Number Level 1: approved five-form release
 
 Review entry: `/demo-review/number-level-1`. In Demo Review select Number Nexus and Level 1, then **Review all five forms**. The form buttons keep the same question number so corresponding examples are easy to compare. Every question is reachable without completing earlier answers. Answer checks are behind **Review details**. Review responses stay in component memory and do not write student data.
 
@@ -53,4 +53,8 @@ Repeated correct values can occur naturally in different arithmetic examples. Th
 
 `npm run qa:year1-number-five-forms` verifies 100 separately worked keys, independently solves each visual, tests blank/wrong answers and all multiple-choice distractors, checks curriculum/format/visual/scoring alignment and the numerical demand rules above, and confirms the other fourteen original post-test questions are retained. Q19/Q20 use numeric scoring and constructed-response metadata across all five forms. It also verifies five distinct examples per slot, the bounded workload, access protection and absence of student writes in the review component.
 
-The complete set is for manual review. Student v2/v3 banks, recorded attempts, learning cycles, progress and active diagnostics remain unchanged. After review, activation needs a new compatible form group and versions pinned to student sittings; review IDs must never be substituted into an existing attempt. Level 2 starts after this set is reviewed.
+The owner approved live activation following the Q5/Q14/Q19 refinements. Q5 now asks how many more were planted, Q14 displays actual currency for payment and prices, and Q19 asks how much more money. `year1NumberReleasedForms.ts` assigns production v5 identities distinct from review answers. New pre-tests and their matching post-tests use v5. Saved v2/v3 attempts retain their banks; post-tests without a recorded v5 baseline keep the historical version. Comparison groups prevent mixing versions in growth figures.
+
+Migration `20260915160000_number_level1_five_form_release.sql` is applied **after** the web deployment. It keeps existing diagnostic sittings at v2, defaults new cycles to v5, and inherits the first sitting's version for later checkpoints in the same academic year. The additive pending-sitting RPC preserves existing access/session/ordering checks. The client falls back to the original RPC only while the new RPC is unavailable. Recent assessment adoption accepts matching Number Level 1 versions only. No existing scores or answer records are rewritten.
+
+Normal demo pre/post screens now use the new default bank; the diagnostic preview explicitly loads v5. Exiting demo assessments returns to Demo Review with realm/level retained. Student exit destinations are unchanged. `qa:year1-number-release` checks release/review content equality, legacy resume, pinned diagnostic forms, snapshots and version-safe growth.

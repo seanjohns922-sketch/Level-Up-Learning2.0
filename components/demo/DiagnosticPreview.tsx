@@ -93,7 +93,7 @@ export default function DiagnosticPreview() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <button
               type="button"
-              onClick={() => router.push("/demo-review")}
+              onClick={() => router.push(`/demo-review?realm=${DIAGNOSTIC_STRANDS.find(s=>s.strand===strand)?.realmId ?? "number"}&year=${encodeURIComponent(level)}`)}
               className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-black text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-300"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Demo Review
@@ -151,7 +151,7 @@ export default function DiagnosticPreview() {
 
 function PreviewSession({ strand, level, checkpoint }: { strand: AcStrand; level: string; checkpoint: PreviewCheckpoint }) {
   const questions = useMemo(
-    () => getDiagnosticQuestions(strand, level, PREVIEW_SITTING_ID, checkpoint),
+    () => getDiagnosticQuestions(strand, level, PREVIEW_SITTING_ID, checkpoint, 5),
     [checkpoint, level, strand],
   );
   const [index, setIndex] = useState(0);

@@ -139,6 +139,13 @@ export default function DemoReviewPanel() {
   const router = useRouter();
   const [realm, setRealm] = useState<ReviewRealm>("measurement");
   const [year, setYear] = useState<YearLabel>("Year 3");
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedRealm = params.get("realm");
+    const requestedYear = params.get("year");
+    if (REALMS.some(r=>r.id===requestedRealm)) setRealm(requestedRealm as ReviewRealm);
+    if (requestedYear === "Prep" || /^Year [1-6]$/.test(requestedYear ?? "")) setYear(requestedYear as YearLabel);
+  }, []);
   const [week, setWeek] = useState(1);
   const [lesson, setLesson] = useState(1);
   const [resetDone, setResetDone] = useState(false);
