@@ -4,11 +4,11 @@ import {NUMBER_LEVEL6_FIVE_FORMS as forms,NUMBER_LEVEL6_FORMS as names} from '..
 import {isAssessmentAnswerCorrect} from '../data/assessments/analysis';
 // Independently worked answer keys, separate from authoring calculations.
 const keys=[
- ['-12||-5||0||7','(4, -3)','43','16','3/8,2/5,5/12','14','24.017','6.425','17','7','61.72','0.0472','39','144','294','200','50','202','6','19'],
- ['-14||-6||0||9','(-3, -4)','47','36','7/12,3/5,5/8','10','34.017','7.425','11','5','81.46','0.0628','47','192','238','300','100','228','8','22'],
- ['-16||-7||0||8','(-4, 2)','53','36','4/5,7/8,11/12','16','44.017','8.425','21','1','101.28','0.0784','59','208','266','260','150','248','8','24'],
- ['-18||-8||0||6','(2, 4)','59','100','2/5,5/12,5/8','18','54.017','9.425','19','7','120.94','0.0836','67','256','322','340','200','310','10','25'],
- ['-17||-9||0||5','(3, -2)','61','196','7/12,5/8,4/5','22','64.017','10.425','7','5','140.76','0.0964','79','288','308','380','250','270','12','25'],
+ ['-12||-5||0||7','(4, -3)','43','16','3/8,2/5,5/12','3/12','24.017','6.425','17','7','61.72','0.0472','39','144','294','200','50','202','6','19'],
+ ['-14||-6||0||9','(-3, -4)','47','36','7/12,3/5,5/8','9/12','34.017','7.425','11','5','81.46','0.0628','47','192','238','300','100','228','8','22'],
+ ['-16||-7||0||8','(-4, 2)','53','36','4/5,7/8,11/12','4/12','44.017','8.425','21','1','101.28','0.0784','59','208','266','260','150','248','8','24'],
+ ['-18||-8||0||6','(2, 4)','59','100','2/5,5/12,5/8','8/12','54.017','9.425','19','7','120.94','0.0836','67','256','322','340','200','310','10','25'],
+ ['-17||-9||0||5','(3, -2)','61','196','7/12,5/8,4/5','10/12','64.017','10.425','7','5','140.76','0.0964','79','288','308','380','250','270','12','25'],
 ];
 const ids=new Set<string>();
 for(const [f,form] of names.entries()) {
@@ -29,7 +29,11 @@ for(const [f,form] of names.entries()) {
  const prime=Number(bank[2].correctAnswer);for(let d=2;d*d<=prime;d++)assert.notEqual(prime%d,0);
  const divisor=Number((bank[3].visual as {rules:string[]}).rules[1].match(/\d+/)![0]);const sq=Number(bank[3].correctAnswer);assert.equal(Math.sqrt(sq)%1,0);assert.equal(sq%divisor,0);for(let r=1;r*r<sq;r++)assert.notEqual(r*r%divisor,0);assert.ok(bank[3].prompt.includes('positive'));
  assert.deepEqual(bank[4].options!.map(o=>Number(String(o).split('/')[1])).sort((a,b)=>a-b),[5,8,12]);
- const line=bank[5].visual as {divisions:number;marker:number};assert.equal(line.divisions,12);assert.equal(Number(bank[5].correctAnswer),line.marker*2);
+ const line=bank[5].visual as {divisions:number;targetFraction:string};assert.equal(line.divisions,12);
+ const [n,d]=line.targetFraction.split('/').map(Number);
+ assert.equal(bank[5].correctAnswer,`${n*12/d}/12`);
+ assert.ok(!('marker' in line));
+ for(let tick=0;tick<=12;tick++)assert.equal(isAssessmentAnswerCorrect(bank[5],`${tick}/12`),tick===n*12/d);
  assert.ok((bank[10].visual as {expression:string}).expression.endsWith('× 20'));
  assert.ok((bank[11].visual as {expression:string}).expression.endsWith('÷ 1000'));
  assert.equal((bank[14].visual as {percentFull:number}).percentFull,65);

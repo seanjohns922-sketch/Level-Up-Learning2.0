@@ -1,6 +1,6 @@
 # Number Nexus Level 6 — five matched forms
 
-Review only: 20 questions in each of Pre-Test, Post-Test, Start, Mid and End. Existing Level 6 student banks remain unchanged. The owner reviews these forms before a separately versioned student release.
+Owner-approved release: 20 questions in each of Pre-Test, Post-Test, Start, Mid and End. Production v3 identities distinguish these forms from review responses. New pre-tests use v3; post-tests match the saved draft or baseline version. Existing diagnostic cycles retain v2, while new cycles use v3 across their checkpoints. Historical results are preserved.
 
 ## Curriculum and assessment blueprint
 
@@ -10,7 +10,7 @@ Reviewed against the supplied Australian Curriculum v9 F–6 Mathematics PDF, Ye
 | --- | --- | --- |
 | 1–2 | AC9M6N01 | Order negative/positive integers and zero; read both coordinates of a point on a labelled Cartesian grid. |
 | 3–4 | AC9M6N02 | Identify a two-digit prime among odd composites; find the smallest positive square divisible by a given integer. |
-| 5–6 | AC9M6N03 | Order fractions with denominators 5, 8 and 12; convert a point on a twelfths line to twenty-fourths. |
+| 5–6 | AC9M6N03 | Order fractions with denominators 5, 8 and 12; place a common fraction on a line divided into twelve equal parts. |
 | 7–8 | AC9M6N04 | Add/subtract decimals with unequal decimal lengths and regrouping through zero places. |
 | 9–10 | AC9M6N05 | Add unlike fractions using twentieths; subtract unlike fractions using twelfths. |
 | 11–12 | AC9M6N06 | Multiply a three-decimal-place number by 20; divide a one-decimal-place number by 1000. |
@@ -26,7 +26,7 @@ The test includes accessible entry questions alongside fraction comparison, numb
 - The grid has clear signed tick labels, comfortable margins and an unambiguous point marker. Read-aloud does not announce the point's coordinates.
 - Prime identification uses odd composite distractors, so simply spotting even numbers is insufficient.
 - “Positive” removes the otherwise valid zero answer from the square-number task.
-- Fraction ordering uses the same denominator set across all five forms, with notation only. The number-line task requires equivalence rather than only counting ticks.
+- Fraction ordering uses the same denominator set across all five forms, with notation only. The number-line task asks students to tap a target fraction on twelve equal parts, without a supplied marker or shaded model. Targets are 1/4, 3/4, 1/3, 2/3 and 5/6; these require equivalence to twelfths, with intended moderate difficulty. Tick buttons support touch and keyboard use, and preserve the selected response.
 - Direct decimal and fraction calculations replace unnecessary “a student says” stories. Decimal multiplication includes a multiple of ten (20), not only a power of ten.
 - Both estimation tasks specify exactly how to round, avoiding multiple defensible estimates with only one accepted answer.
 - Budget visuals separate quantity, price for ONE and available money. Prices use Australian dollar formatting. Pack comparisons and the kit discount make the unit-price meaning explicit.
@@ -40,6 +40,6 @@ Number Nexus styling, large mathematical notation, no shaded hints on fraction-o
 
 Independent worked keys for all 100 responses; correct/blank/wrong/reversed-order scoring checks; unique identities and distinct examples; matched descriptor/type/response/structure; prime and least-square checks; fraction denominator controls; decimal scaling; coordinate bounds; and both sides of the final affordability boundary. All 100 question cards render without invalid quantities. TypeScript, lint, prebuild audits and production build are release checks.
 
-These 20 questions sample the descriptors. They do not independently prove every required explanation, choice of strategy, use of digital tools or justification. Broader classroom/program evidence and later item-performance data remain necessary. Manual review is the next child-usability check.
+These 20 questions sample the descriptors. They do not independently prove every required explanation, choice of strategy, use of digital tools or justification. Broader classroom/program evidence and later item-performance data remain necessary. The owner completed manual review; Q6 was clarified as fraction placement on a number line.
 
 Open Demo Review → Number Nexus → Level 6 → Review all five forms.

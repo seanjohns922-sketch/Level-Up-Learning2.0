@@ -40,9 +40,9 @@ for (const realm of ["number", "measurement", "space", "statistics", "pattern", 
 }
 
 
-// Independent calculations for the replacement Year 6 post-test, rather than
+// Independent calculations for the retained v2 Year 6 post-test, rather than
 // merely checking that its answer keys are accepted by their own scorer.
-const year6 = getPosttestForYearLabel("Year 6", "number")!.questions;
+const year6 = getPosttestForYearLabel("Year 6", "number", 5, 3, 3, 3, 3, 2)!.questions;
 const calculations: Record<number, number> = {
   6: 26.58 + 7.437, 7: 15.3 - 7.875, 8: (1/4 + 3/10) * 20,
   9: (2/3 - 1/4) * 12, 10: 4.073 * 100, 11: 62.8 / 1000,
@@ -58,7 +58,7 @@ for (const [index, expected] of Object.entries(calculations)) {
 
 // A correct numerical value cannot compensate for an incorrect justification.
 for (const [realm, level, indices] of [["number", 6, [16,19]], ["measurement", 5, [14,18]]] as const) {
-  const questions = getPretestForYearLabel(`Year ${level}`, realm);
+  const questions = getPretestForYearLabel(`Year ${level}`, realm, 5, 3, 3, 3, 3, 2);
   for (const index of indices) {
     const q = questions[index]!;
     const [value, reason] = String(q.correctAnswer).split("||");

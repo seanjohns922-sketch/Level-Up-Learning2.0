@@ -1,3 +1,4 @@
+import { YEAR6_NUMBER_RELEASED_FORMS } from "@/data/assessments/revisions/year6NumberReleasedForms";
 import { GROUND_NUMBER_V3_FORMS } from "@/data/assessments/releases/groundNumber";
 import { YEAR1_NUMBER_RELEASED_FORMS } from "@/data/assessments/revisions/year1NumberReleasedForms";
 import { YEAR4_NUMBER_RELEASED_FORMS } from "@/data/assessments/revisions/year4NumberReleasedForms";
@@ -41,12 +42,13 @@ export function getDiagnosticQuestions(
   numberLevel2Version: 2 | 3 = 2,
   numberLevel4Version: 2 | 3 = 2,
   numberLevel5Version: 2 | 3 = 2,
+  numberLevel6Version: 2 | 3 = 2,
 ): LinkedDiagnosticQuestion[] {
   const definition = DIAGNOSTIC_STRANDS.find((candidate) => candidate.strand === strand);
   if (!definition?.available || !definition.realmId) return [];
   // Retain existing diagnostic sittings until independent checkpoint forms are version-pinned.
-  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2);
-  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2)?.questions ?? [];
+  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2);
+  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2)?.questions ?? [];
   const levelTest = strand === "number" && level === "Prep" && groundNumberVersion===3
     ? GROUND_NUMBER_V3_FORMS[({start:"diagnostic-start",mid:"diagnostic-mid",end:"diagnostic-end",ad_hoc:"diagnostic-start"} as const)[checkpoint]]
     : strand === "number" && level === "Year 1" && numberLevel1Version === 5
@@ -57,6 +59,8 @@ export function getDiagnosticQuestions(
     ? YEAR4_NUMBER_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint] as unknown as AssessmentQuestion[]
     : strand === "number" && level === "Year 5" && numberLevel5Version === 3
     ? YEAR5_NUMBER_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint] as unknown as AssessmentQuestion[]
+    : strand === "number" && level === "Year 6" && numberLevel6Version === 3
+    ? YEAR6_NUMBER_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint] as unknown as AssessmentQuestion[]
     : checkpoint === "start"
     ? (pretest.length > 0 ? pretest : posttest)
     : checkpoint === "mid"

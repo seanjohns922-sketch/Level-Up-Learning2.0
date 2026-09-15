@@ -1,4 +1,5 @@
 "use client";
+import FractionPlacementLine from "./FractionPlacementLine";
 import PrepNumberCandidateCard from "./PrepNumberCandidateCard";
 import { groundNumberReleaseItem } from "@/data/assessments/releases/groundNumber";
 import NumberReasoningResponse from "./NumberReasoningResponse";
@@ -715,6 +716,10 @@ export default function AssessmentQuestionCard({
         </div>
       </div>
     );
+  }
+
+  if (type === "fraction_number_line" && visual?.type === "number_y6_fraction_placement") {
+    return <FractionPlacementLine targetFraction={String(visual.targetFraction)} value={value ?? ""} onChange={onChange} />;
   }
 
   if (type === "fraction_number_line") {

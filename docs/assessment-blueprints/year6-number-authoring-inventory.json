@@ -508,31 +508,29 @@
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": false,
-        "responseMode": "constructed_response",
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "fraction-number-line",
           "equivalent-fraction-scale"
         ],
         "contextKey": "y6-number-review-pretest-06-v3",
         "structureKey": "number-level6-slot-6",
-        "prompt": "The marker is ?/24. Enter the numerator.",
+        "prompt": "Tap the point that represents 1/4.",
         "renderer": {
-          "type": "numeric",
+          "type": "fraction_number_line",
           "payload": {
-            "prompt": "The marker is ?/24. Enter the numerator.",
+            "prompt": "Tap the point that represents 1/4.",
             "visual": {
-              "type": "number_y6_number_line",
-              "min": 0,
-              "max": 1,
+              "type": "number_y6_fraction_placement",
+              "targetFraction": "1/4",
               "divisions": 12,
-              "marker": 7,
               "reviewPresentation": true
             }
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "14"
+          "correctResponse": "3/12"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -542,9 +540,9 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "numeric",
-        "correctAnswer": "14",
-        "answer": "14",
+        "type": "fraction_number_line",
+        "correctAnswer": "3/12",
+        "answer": "3/12",
         "skillId": "number-y6-review-slot-6",
         "skillLabel": "Represent equivalent fractions on a line",
         "linkedWeeks": [
@@ -559,16 +557,14 @@
         ],
         "difficultyBand": "year6-number",
         "visual": {
-          "type": "number_y6_number_line",
-          "min": 0,
-          "max": 1,
+          "type": "number_y6_fraction_placement",
+          "targetFraction": "1/4",
           "divisions": 12,
-          "marker": 7,
           "reviewPresentation": true
         },
         "inputMode": "decimal",
         "showFractionModels": false,
-        "readAloudText": "The marker is ?/24. Enter the numerator. The line runs from zero to one, with twelve equal intervals and a marked point."
+        "readAloudText": "Tap the point that represents 1/4. The line runs from zero to one, with twelve equal parts. Choose a tick on the line."
       },
       {
         "schemaVersion": 1,
@@ -2268,31 +2264,29 @@
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": false,
-        "responseMode": "constructed_response",
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "fraction-number-line",
           "equivalent-fraction-scale"
         ],
         "contextKey": "y6-number-review-posttest-06-v3",
         "structureKey": "number-level6-slot-6",
-        "prompt": "The marker is ?/24. Enter the numerator.",
+        "prompt": "Tap the point that represents 3/4.",
         "renderer": {
-          "type": "numeric",
+          "type": "fraction_number_line",
           "payload": {
-            "prompt": "The marker is ?/24. Enter the numerator.",
+            "prompt": "Tap the point that represents 3/4.",
             "visual": {
-              "type": "number_y6_number_line",
-              "min": 0,
-              "max": 1,
+              "type": "number_y6_fraction_placement",
+              "targetFraction": "3/4",
               "divisions": 12,
-              "marker": 5,
               "reviewPresentation": true
             }
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "10"
+          "correctResponse": "9/12"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -2302,9 +2296,9 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "numeric",
-        "correctAnswer": "10",
-        "answer": "10",
+        "type": "fraction_number_line",
+        "correctAnswer": "9/12",
+        "answer": "9/12",
         "skillId": "number-y6-review-slot-6",
         "skillLabel": "Represent equivalent fractions on a line",
         "linkedWeeks": [
@@ -2319,16 +2313,14 @@
         ],
         "difficultyBand": "year6-number",
         "visual": {
-          "type": "number_y6_number_line",
-          "min": 0,
-          "max": 1,
+          "type": "number_y6_fraction_placement",
+          "targetFraction": "3/4",
           "divisions": 12,
-          "marker": 5,
           "reviewPresentation": true
         },
         "inputMode": "decimal",
         "showFractionModels": false,
-        "readAloudText": "The marker is ?/24. Enter the numerator. The line runs from zero to one, with twelve equal intervals and a marked point."
+        "readAloudText": "Tap the point that represents 3/4. The line runs from zero to one, with twelve equal parts. Choose a tick on the line."
       },
       {
         "schemaVersion": 1,
@@ -4028,31 +4020,29 @@
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": false,
-        "responseMode": "constructed_response",
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "fraction-number-line",
           "equivalent-fraction-scale"
         ],
         "contextKey": "y6-number-review-start-06-v3",
         "structureKey": "number-level6-slot-6",
-        "prompt": "The marker is ?/24. Enter the numerator.",
+        "prompt": "Tap the point that represents 1/3.",
         "renderer": {
-          "type": "numeric",
+          "type": "fraction_number_line",
           "payload": {
-            "prompt": "The marker is ?/24. Enter the numerator.",
+            "prompt": "Tap the point that represents 1/3.",
             "visual": {
-              "type": "number_y6_number_line",
-              "min": 0,
-              "max": 1,
+              "type": "number_y6_fraction_placement",
+              "targetFraction": "1/3",
               "divisions": 12,
-              "marker": 8,
               "reviewPresentation": true
             }
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "16"
+          "correctResponse": "4/12"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -4062,9 +4052,9 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "numeric",
-        "correctAnswer": "16",
-        "answer": "16",
+        "type": "fraction_number_line",
+        "correctAnswer": "4/12",
+        "answer": "4/12",
         "skillId": "number-y6-review-slot-6",
         "skillLabel": "Represent equivalent fractions on a line",
         "linkedWeeks": [
@@ -4079,16 +4069,14 @@
         ],
         "difficultyBand": "year6-number",
         "visual": {
-          "type": "number_y6_number_line",
-          "min": 0,
-          "max": 1,
+          "type": "number_y6_fraction_placement",
+          "targetFraction": "1/3",
           "divisions": 12,
-          "marker": 8,
           "reviewPresentation": true
         },
         "inputMode": "decimal",
         "showFractionModels": false,
-        "readAloudText": "The marker is ?/24. Enter the numerator. The line runs from zero to one, with twelve equal intervals and a marked point."
+        "readAloudText": "Tap the point that represents 1/3. The line runs from zero to one, with twelve equal parts. Choose a tick on the line."
       },
       {
         "schemaVersion": 1,
@@ -5788,31 +5776,29 @@
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": false,
-        "responseMode": "constructed_response",
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "fraction-number-line",
           "equivalent-fraction-scale"
         ],
         "contextKey": "y6-number-review-mid-06-v3",
         "structureKey": "number-level6-slot-6",
-        "prompt": "The marker is ?/24. Enter the numerator.",
+        "prompt": "Tap the point that represents 2/3.",
         "renderer": {
-          "type": "numeric",
+          "type": "fraction_number_line",
           "payload": {
-            "prompt": "The marker is ?/24. Enter the numerator.",
+            "prompt": "Tap the point that represents 2/3.",
             "visual": {
-              "type": "number_y6_number_line",
-              "min": 0,
-              "max": 1,
+              "type": "number_y6_fraction_placement",
+              "targetFraction": "2/3",
               "divisions": 12,
-              "marker": 9,
               "reviewPresentation": true
             }
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "18"
+          "correctResponse": "8/12"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -5822,9 +5808,9 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "numeric",
-        "correctAnswer": "18",
-        "answer": "18",
+        "type": "fraction_number_line",
+        "correctAnswer": "8/12",
+        "answer": "8/12",
         "skillId": "number-y6-review-slot-6",
         "skillLabel": "Represent equivalent fractions on a line",
         "linkedWeeks": [
@@ -5839,16 +5825,14 @@
         ],
         "difficultyBand": "year6-number",
         "visual": {
-          "type": "number_y6_number_line",
-          "min": 0,
-          "max": 1,
+          "type": "number_y6_fraction_placement",
+          "targetFraction": "2/3",
           "divisions": 12,
-          "marker": 9,
           "reviewPresentation": true
         },
         "inputMode": "decimal",
         "showFractionModels": false,
-        "readAloudText": "The marker is ?/24. Enter the numerator. The line runs from zero to one, with twelve equal intervals and a marked point."
+        "readAloudText": "Tap the point that represents 2/3. The line runs from zero to one, with twelve equal parts. Choose a tick on the line."
       },
       {
         "schemaVersion": 1,
@@ -7548,31 +7532,29 @@
         "isTransfer": false,
         "requiresReasoning": true,
         "misconceptionDiagnosis": false,
-        "responseMode": "constructed_response",
+        "responseMode": "manipulated_response",
         "misconceptionTags": [
           "fraction-number-line",
           "equivalent-fraction-scale"
         ],
         "contextKey": "y6-number-review-end-06-v3",
         "structureKey": "number-level6-slot-6",
-        "prompt": "The marker is ?/24. Enter the numerator.",
+        "prompt": "Tap the point that represents 5/6.",
         "renderer": {
-          "type": "numeric",
+          "type": "fraction_number_line",
           "payload": {
-            "prompt": "The marker is ?/24. Enter the numerator.",
+            "prompt": "Tap the point that represents 5/6.",
             "visual": {
-              "type": "number_y6_number_line",
-              "min": 0,
-              "max": 1,
+              "type": "number_y6_fraction_placement",
+              "targetFraction": "5/6",
               "divisions": 12,
-              "marker": 11,
               "reviewPresentation": true
             }
           }
         },
         "scoring": {
           "kind": "exact",
-          "correctResponse": "22"
+          "correctResponse": "10/12"
         },
         "statistics": {
           "calibrationStatus": "uncalibrated",
@@ -7582,9 +7564,9 @@
           "responseFrequency": {},
           "sampleSize": 0
         },
-        "type": "numeric",
-        "correctAnswer": "22",
-        "answer": "22",
+        "type": "fraction_number_line",
+        "correctAnswer": "10/12",
+        "answer": "10/12",
         "skillId": "number-y6-review-slot-6",
         "skillLabel": "Represent equivalent fractions on a line",
         "linkedWeeks": [
@@ -7599,16 +7581,14 @@
         ],
         "difficultyBand": "year6-number",
         "visual": {
-          "type": "number_y6_number_line",
-          "min": 0,
-          "max": 1,
+          "type": "number_y6_fraction_placement",
+          "targetFraction": "5/6",
           "divisions": 12,
-          "marker": 11,
           "reviewPresentation": true
         },
         "inputMode": "decimal",
         "showFractionModels": false,
-        "readAloudText": "The marker is ?/24. Enter the numerator. The line runs from zero to one, with twelve equal intervals and a marked point."
+        "readAloudText": "Tap the point that represents 5/6. The line runs from zero to one, with twelve equal parts. Choose a tick on the line."
       },
       {
         "schemaVersion": 1,
