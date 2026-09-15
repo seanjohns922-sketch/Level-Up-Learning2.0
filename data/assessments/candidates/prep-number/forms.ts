@@ -32,7 +32,7 @@ const rows: Row[] = [
     {kind:"combine",parts:[3,4]}, {kind:"combine",parts:[5,3]}, {kind:"combine",parts:[4,5]},
     {kind:"combine",parts:[4,3]}, {kind:"combine",parts:[3,5]},
   ] },
-  { prompts: ["3 robots are here. Tap 2 more robots to join them.","4 stars are here. Tap 2 more stars to join them.","3 crystals are here. Tap 3 more crystals to join them.","4 robots are here. Tap 3 more robots to join them.","5 stars are here. Tap 2 more stars to join them."], tasks: [
+  { prompts: ["3 robots are here. Add 2 more robots to the tray.","4 stars are here. Add 2 more stars to the tray.","3 crystals are here. Add 3 more crystals to the tray.","4 robots are here. Add 3 more robots to the tray.","5 stars are here. Add 2 more stars to the tray."], tasks: [
     {kind:"add",start:3,change:2,supply:6}, {kind:"add",start:4,change:2,supply:6},
     {kind:"add",start:3,change:3,supply:6}, {kind:"add",start:4,change:3,supply:6},
     {kind:"add",start:5,change:2,supply:6},
@@ -59,7 +59,7 @@ const rows: Row[] = [
     {kind:"missing",whole:7,part:3}, {kind:"missing",whole:8,part:4},
     {kind:"missing",whole:9,part:5},
   ] },
-  { prompts: same("Match one from A with one from B. Which has more?"), tasks: [
+  { prompts: same("Make pairs: one from each tray. Which tray has more left over?"), tasks: [
     {kind:"compare",a:8,b:6}, {kind:"compare",a:7,b:9}, {kind:"compare",a:9,b:7},
     {kind:"compare",a:6,b:8}, {kind:"compare",a:10,b:8},
   ] },
@@ -68,7 +68,7 @@ const rows: Row[] = [
     {kind:"remove",start:7,change:3}, {kind:"remove",start:9,change:3},
     {kind:"remove",start:8,change:4},
   ] },
-  { prompts: same("Split all the objects between the two trays. Use both trays."), tasks: [
+  { prompts: same("Put some objects in each tray. Use them all."), tasks: [
     {kind:"partition",total:7}, {kind:"partition",total:8}, {kind:"partition",total:9},
     {kind:"partition",total:8}, {kind:"partition",total:7},
   ] },
@@ -77,7 +77,7 @@ const rows: Row[] = [
     {kind:"match",count:5,choices:[3,4,5],layout:2}, {kind:"match",count:5,choices:[4,3,5],layout:3},
     {kind:"match",count:5,choices:[3,5,4],layout:4},
   ] },
-  { prompts: same("Make groups of 2. Use all the objects."), tasks: [
+  { prompts: same("Put 2 objects in each group. Use them all."), tasks: [
     {kind:"group",total:8,size:2}, {kind:"group",total:8,size:2}, {kind:"group",total:8,size:2},
     {kind:"group",total:8,size:2}, {kind:"group",total:8,size:2},
   ] },
@@ -98,7 +98,7 @@ const rows: Row[] = [
     {kind:"conserve",count:8,layout:3,reasons:["They are smaller now.","Nothing was added or taken away.","More space means more objects."]},
     {kind:"conserve",count:9,layout:4,reasons:["Nothing was added or taken away.","They are smaller now.","More space means more objects."]},
   ] },
-  { prompts: same("Give each robot one object. Leave the extras in the supply."), tasks: [
+  { prompts: same("Give each robot one star. Leave the extra stars in the box."), tasks: [
     {kind:"provide",recipients:5,supply:10}, {kind:"provide",recipients:6,supply:10},
     {kind:"provide",recipients:7,supply:10}, {kind:"provide",recipients:6,supply:10},
     {kind:"provide",recipients:5,supply:10},
@@ -127,7 +127,7 @@ export const PREP_NUMBER_CANDIDATE_FORMS = Object.fromEntries(ASSESSMENT_FORMS.m
     id: `number-0-${form}-${String(i+1).padStart(2,"0")}-candidate-1`,
     version: PREP_NUMBER_CANDIDATE_VERSION, blueprintVersion: ASSESSMENT_DESIGN_VERSION,
     form, slot: PREP_NUMBER_SLOTS[i]!, prompt: row.prompts[f], task: row.tasks[f],
-    token: (i === 4 || i === 10) ? (["robot","star","crystal","robot","star"] as const)[f] : materials[i % 3][f],
+    token: i === 17 ? "star" : (i === 4 || i === 10) ? (["robot","star","crystal","robot","star"] as const)[f] : materials[i % 3][f],
     maximumScore: 1, status: "candidate",
   })),
 ])) as Record<typeof ASSESSMENT_FORMS[number], PrepNumberCandidate[]>;

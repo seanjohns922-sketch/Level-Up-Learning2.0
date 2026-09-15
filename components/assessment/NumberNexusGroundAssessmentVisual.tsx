@@ -4,11 +4,11 @@ import { Bot, Gem, Star } from "lucide-react";
 
 type Visual = Record<string, unknown>;
 
-export function GroundAssessmentToken({ token, muted = false }: { token: string; muted?: boolean }) {
+export function GroundAssessmentToken({ token, muted = false, large = false }: { token: string; muted?: boolean; large?: boolean }) {
   const Icon = token === "star" ? Star : token === "robot" ? Bot : Gem;
   return (
-    <span className={`grid h-11 w-11 place-items-center rounded-lg border-2 ${muted ? "border-slate-300 bg-slate-100 text-slate-400" : token === "star" ? "border-amber-500 bg-amber-100 text-amber-800" : token === "robot" ? "border-rose-500 bg-rose-100 text-rose-800" : "border-cyan-500 bg-cyan-100 text-cyan-800"}`}>
-      <Icon className="h-6 w-6" />
+    <span className={`grid shrink-0 ${large ? "h-16 w-16" : "h-11 w-11"} place-items-center rounded-lg border-2 ${muted ? "border-slate-300 bg-slate-100 text-slate-400" : token === "star" ? "border-amber-500 bg-amber-100 text-amber-800" : token === "robot" ? "border-rose-500 bg-rose-100 text-rose-800" : "border-cyan-500 bg-cyan-100 text-cyan-800"}`}>
+      <Icon className={large ? "h-10 w-10" : "h-6 w-6"} />
     </span>
   );
 }

@@ -93,7 +93,7 @@
       "form": "pretest",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "3 robots are here. Tap 2 more robots to join them.",
+      "prompt": "3 robots are here. Add 2 more robots to the tray.",
       "task": {
         "kind": "add",
         "start": 3,
@@ -213,7 +213,7 @@
       "form": "pretest",
       "slot": "number-0-10",
       "code": "AC9MFN03",
-      "prompt": "Match one from A with one from B. Which has more?",
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
       "task": {
         "kind": "compare",
         "a": 8,
@@ -262,7 +262,7 @@
       "form": "pretest",
       "slot": "number-0-12",
       "code": "AC9MFN04",
-      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "prompt": "Put some objects in each tray. Use them all.",
       "task": {
         "kind": "partition",
         "total": 7
@@ -304,7 +304,7 @@
       "form": "pretest",
       "slot": "number-0-14",
       "code": "AC9MFN06",
-      "prompt": "Make groups of 2. Use all the objects.",
+      "prompt": "Put 2 objects in each group. Use them all.",
       "task": {
         "kind": "group",
         "total": 8,
@@ -406,13 +406,13 @@
       "form": "pretest",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "prompt": "Give each robot one star. Leave the extra stars in the box.",
       "task": {
         "kind": "provide",
         "recipients": 5,
         "supply": 10
       },
-      "token": "robot",
+      "token": "star",
       "workedResponse": {
         "placements": [
           0,
@@ -576,7 +576,7 @@
       "form": "posttest",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "4 stars are here. Tap 2 more stars to join them.",
+      "prompt": "4 stars are here. Add 2 more stars to the tray.",
       "task": {
         "kind": "add",
         "start": 4,
@@ -699,7 +699,7 @@
       "form": "posttest",
       "slot": "number-0-10",
       "code": "AC9MFN03",
-      "prompt": "Match one from A with one from B. Which has more?",
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
       "task": {
         "kind": "compare",
         "a": 7,
@@ -748,7 +748,7 @@
       "form": "posttest",
       "slot": "number-0-12",
       "code": "AC9MFN04",
-      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "prompt": "Put some objects in each tray. Use them all.",
       "task": {
         "kind": "partition",
         "total": 8
@@ -791,7 +791,7 @@
       "form": "posttest",
       "slot": "number-0-14",
       "code": "AC9MFN06",
-      "prompt": "Make groups of 2. Use all the objects.",
+      "prompt": "Put 2 objects in each group. Use them all.",
       "task": {
         "kind": "group",
         "total": 8,
@@ -894,7 +894,7 @@
       "form": "posttest",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "prompt": "Give each robot one star. Leave the extra stars in the box.",
       "task": {
         "kind": "provide",
         "recipients": 6,
@@ -1066,7 +1066,7 @@
       "form": "diagnostic-start",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "3 crystals are here. Tap 3 more crystals to join them.",
+      "prompt": "3 crystals are here. Add 3 more crystals to the tray.",
       "task": {
         "kind": "add",
         "start": 3,
@@ -1190,7 +1190,7 @@
       "form": "diagnostic-start",
       "slot": "number-0-10",
       "code": "AC9MFN03",
-      "prompt": "Match one from A with one from B. Which has more?",
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
       "task": {
         "kind": "compare",
         "a": 9,
@@ -1239,7 +1239,7 @@
       "form": "diagnostic-start",
       "slot": "number-0-12",
       "code": "AC9MFN04",
-      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "prompt": "Put some objects in each tray. Use them all.",
       "task": {
         "kind": "partition",
         "total": 9
@@ -1283,7 +1283,7 @@
       "form": "diagnostic-start",
       "slot": "number-0-14",
       "code": "AC9MFN06",
-      "prompt": "Make groups of 2. Use all the objects.",
+      "prompt": "Put 2 objects in each group. Use them all.",
       "task": {
         "kind": "group",
         "total": 8,
@@ -1384,13 +1384,13 @@
       "form": "diagnostic-start",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "prompt": "Give each robot one star. Leave the extra stars in the box.",
       "task": {
         "kind": "provide",
         "recipients": 7,
         "supply": 10
       },
-      "token": "crystal",
+      "token": "star",
       "workedResponse": {
         "placements": [
           0,
@@ -1552,7 +1552,7 @@
       "form": "diagnostic-mid",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "4 robots are here. Tap 3 more robots to join them.",
+      "prompt": "4 robots are here. Add 3 more robots to the tray.",
       "task": {
         "kind": "add",
         "start": 4,
@@ -1675,7 +1675,7 @@
       "form": "diagnostic-mid",
       "slot": "number-0-10",
       "code": "AC9MFN03",
-      "prompt": "Match one from A with one from B. Which has more?",
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
       "task": {
         "kind": "compare",
         "a": 6,
@@ -1723,7 +1723,7 @@
       "form": "diagnostic-mid",
       "slot": "number-0-12",
       "code": "AC9MFN04",
-      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "prompt": "Put some objects in each tray. Use them all.",
       "task": {
         "kind": "partition",
         "total": 8
@@ -1766,7 +1766,7 @@
       "form": "diagnostic-mid",
       "slot": "number-0-14",
       "code": "AC9MFN06",
-      "prompt": "Make groups of 2. Use all the objects.",
+      "prompt": "Put 2 objects in each group. Use them all.",
       "task": {
         "kind": "group",
         "total": 8,
@@ -1868,13 +1868,13 @@
       "form": "diagnostic-mid",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "prompt": "Give each robot one star. Leave the extra stars in the box.",
       "task": {
         "kind": "provide",
         "recipients": 6,
         "supply": 10
       },
-      "token": "leaf",
+      "token": "star",
       "workedResponse": {
         "placements": [
           0,
@@ -2038,7 +2038,7 @@
       "form": "diagnostic-end",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "5 stars are here. Tap 2 more stars to join them.",
+      "prompt": "5 stars are here. Add 2 more stars to the tray.",
       "task": {
         "kind": "add",
         "start": 5,
@@ -2160,7 +2160,7 @@
       "form": "diagnostic-end",
       "slot": "number-0-10",
       "code": "AC9MFN03",
-      "prompt": "Match one from A with one from B. Which has more?",
+      "prompt": "Make pairs: one from each tray. Which tray has more left over?",
       "task": {
         "kind": "compare",
         "a": 10,
@@ -2211,7 +2211,7 @@
       "form": "diagnostic-end",
       "slot": "number-0-12",
       "code": "AC9MFN04",
-      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "prompt": "Put some objects in each tray. Use them all.",
       "task": {
         "kind": "partition",
         "total": 7
@@ -2253,7 +2253,7 @@
       "form": "diagnostic-end",
       "slot": "number-0-14",
       "code": "AC9MFN06",
-      "prompt": "Make groups of 2. Use all the objects.",
+      "prompt": "Put 2 objects in each group. Use them all.",
       "task": {
         "kind": "group",
         "total": 8,
@@ -2356,13 +2356,13 @@
       "form": "diagnostic-end",
       "slot": "number-0-18",
       "code": "AC9MFN05",
-      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "prompt": "Give each robot one star. Leave the extra stars in the box.",
       "task": {
         "kind": "provide",
         "recipients": 5,
         "supply": 10
       },
-      "token": "shell",
+      "token": "star",
       "workedResponse": {
         "placements": [
           0,
